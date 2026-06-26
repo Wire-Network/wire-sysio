@@ -6,6 +6,7 @@
 #include <fc/crypto/signature.hpp>
 #include <fc/io/raw.hpp>
 #include <fc/network/ethereum/ethereum_abi.hpp>
+#include <fc/network/ethereum/ethereum_client.hpp>
 #include <fc/task/retry.hpp>
 #include <fc/variant_object.hpp>
 #include <boost/algorithm/string/predicate.hpp>
@@ -31,6 +32,7 @@
 #include <map>
 #include <numeric>
 #include <set>
+#include <string_view>
 #include <tuple>
 #include <unordered_set>
 
@@ -38,7 +40,15 @@ namespace sysio {
 
 using namespace chain_apis;
 using namespace sysio::opp::types;
+namespace eth = fc::network::ethereum;
 namespace opp_att = sysio::opp::attestations;
+
+namespace {
+
+/// Ethereum JSON-RPC method used to inspect the finalized source-chain head.
+constexpr std::string_view ETH_GET_BLOCK_BY_NUMBER_METHOD = "eth_getBlockByNumber";
+
+} // namespace
 
 // ---------------------------------------------------------------------------
 //  Underwrite request — read directly from sysio.uwrit::uwreqs table.
@@ -131,12 +141,6 @@ struct underwriter_plugin::impl {
    std::string  eth_client_id;
    std::string  sol_client_id;
    std::string  eth_opreg_addr;             // OperatorRegistry contract address on ETH
-   /// Minimum ETH block confirmations required before a SwapDeposit
-   /// log is accepted as source-deposit-verified. Default mirrors
-   /// `underwriter::ETH_MIN_CONFIRMATIONS` (12, mainnet-safe). The
-   /// test cluster overrides via `--underwriter-eth-min-confirmations 1`.
-   uint64_t     eth_min_confirmations =
-      sysio::underwriter::ETH_MIN_CONFIRMATIONS;
    /// Maximum number of recent EVM blocks one `eth_getLogs`
    /// source-deposit lookup may cover. Keeping this window bounded prevents
    /// invalid or stale deposit ids from forcing whole-history RPC scans.
@@ -1395,8 +1399,8 @@ struct underwriter_plugin::impl {
    ///   * source contract — `tx.to` (ETH) / program-id (SOL) must match the configured address.
    ///   * function selector / instruction discriminator — must match the configured value.
    ///   * receipt status (ETH) / meta.err (SOL) — must indicate success.
-   ///   * inclusion depth — ETH requires `ETH_MIN_CONFIRMATIONS` past the receipt's block.
-   ///                       SOL fetches at commitment `SOL_COMMITMENT`.
+   ///   * finality — ETH logs are queried only through `finalized`; SOL txs
+   ///                are fetched at commitment `SOL_COMMITMENT`.
    ///
    /// Hard-fail on empty `source_tx_id` — the depot's `createuwreq` rejects
    /// SwapRequests without one (emits SwapRevert), so by the time a uwreq
@@ -1459,8 +1463,10 @@ struct underwriter_plugin::impl {
    ///          variance_tolerance_bps [u32 BE])
    ///      The depot's UWREQ row carries every input; matches must be
    ///      bit-exact against the contract-emitted `hash`.
-   ///   5. Pull the matching log's `transactionHash`. Receipt must exist,
-   ///      status != "0x0", and confirmations >= ETH_MIN_CONFIRMATIONS.
+   ///   5. Pull the matching log's `transactionHash`. Receipt must exist
+   ///      and status != "0x0". The log lookup itself is bounded by
+   ///      Ethereum's finalized head; if the finalized head is unavailable
+   ///      the verifier defers without widening to `latest`.
    ///
    /// A non-matching hash is a hard mismatch — the depositor's swap
    /// params disagree with what's recorded on the source chain. A
@@ -1509,13 +1515,51 @@ struct underwriter_plugin::impl {
          id_topic.append(buf, 2);
       }
 
+      uint64_t finalized_blk = 0;
       try {
-         const uint64_t head_blk =
-            entry->client->get_block_number().convert_to<uint64_t>();
+         const auto finalized_var = entry->client->execute(
+            std::string{ETH_GET_BLOCK_BY_NUMBER_METHOD},
+            fc::variants{eth::to_block_tag(eth::block_tag_t::finalized), false});
+         if (finalized_var.is_null()) {
+            ilog("underwriter: source-deposit verify deferred for uwreq {} — "
+                 "ETH finalized head unavailable", req.id);
+            return false;
+         }
+         if (!finalized_var.is_object()) {
+            ilog("underwriter: source-deposit verify deferred for uwreq {} — "
+                 "ETH finalized head response is not an object", req.id);
+            return false;
+         }
+         const auto finalized_obj = finalized_var.get_object();
+         if (!finalized_obj.contains("number") || !finalized_obj["number"].is_string()) {
+            ilog("underwriter: source-deposit verify deferred for uwreq {} — "
+                 "ETH finalized head missing numeric block number", req.id);
+            return false;
+         }
+         const auto parsed_finalized_blk =
+            sysio::underwriter::eth_parse_block_quantity(finalized_obj["number"].as_string());
+         if (!parsed_finalized_blk) {
+            ilog("underwriter: source-deposit verify deferred for uwreq {} — "
+                 "ETH finalized head block number is malformed ('{}')",
+                 req.id, finalized_obj["number"].as_string());
+            return false;
+         }
+         finalized_blk = *parsed_finalized_blk;
+      } catch (const fc::exception& e) {
+         ilog("underwriter: source-deposit verify deferred for uwreq {} — "
+              "ETH finalized head unavailable: {}", req.id, e.to_detail_string());
+         return false;
+      } catch (const std::exception& e) {
+         ilog("underwriter: source-deposit verify deferred for uwreq {} — "
+              "ETH finalized head response is malformed: {}", req.id, e.what());
+         return false;
+      }
+
+      try {
          const uint64_t from_blk = sysio::underwriter::eth_source_deposit_from_block(
-            head_blk, eth_source_deposit_lookback_blocks);
+            finalized_blk, eth_source_deposit_lookback_blocks);
          const std::string from_block = sysio::underwriter::eth_block_quantity(from_blk);
-         const std::string to_block = sysio::underwriter::eth_block_quantity(head_blk);
+         const std::string to_block = sysio::underwriter::eth_block_quantity(finalized_blk);
 
          fc::mutable_variant_object filter;
          filter("address",   resolved_eth_source_contract_addr);
@@ -1616,7 +1660,7 @@ struct underwriter_plugin::impl {
             return false;
          }
 
-         // (5) Receipt + confirmation depth on the matching tx.
+         // (5) Receipt status on the matching finalized tx.
          std::string tx_hash_hex;
          if (log.contains("transactionHash") &&
              log["transactionHash"].is_string()) {
@@ -1642,35 +1686,9 @@ struct underwriter_plugin::impl {
             bump_mismatch();
             return false;
          }
-         if (!rcpt_obj.contains("blockNumber") ||
-             !rcpt_obj["blockNumber"].is_string()) {
-            ilog("underwriter: source-deposit verify deferred for uwreq {} — "
-                 "receipt missing blockNumber for tx {}", req.id, tx_hash_hex);
-            return false;
-         }
-         const std::string blk_str = rcpt_obj["blockNumber"].as_string();
-         // Require a 0x-prefixed, non-empty hex body before substr(2)/stoull so a malformed
-         // blockNumber defers this uwreq rather than throwing std::out_of_range / invalid_argument.
-         if (blk_str.size() <= 2 || blk_str[0] != '0' ||
-             (blk_str[1] != 'x' && blk_str[1] != 'X')) {
-            ilog("underwriter: source-deposit verify deferred for uwreq {} — "
-                 "receipt blockNumber not 0x-prefixed hex ('{}') for tx {}",
-                 req.id, blk_str, tx_hash_hex);
-            return false;
-         }
-         const uint64_t rcpt_blk = std::stoull(blk_str.substr(2), nullptr, 16);
-         if (head_blk < rcpt_blk ||
-             (head_blk - rcpt_blk) < eth_min_confirmations) {
-            ilog("underwriter: source-deposit verify deferred for uwreq {} — "
-                 "insufficient confirmations: head={} receipt={} need={}",
-                 req.id, head_blk, rcpt_blk,
-                 eth_min_confirmations);
-            return false;
-         }
-
          ilog("underwriter: source-deposit verify passed for uwreq {} "
-              "(SwapDeposit id={} tx={} depth={})",
-              req.id, deposit_id, tx_hash_hex, head_blk - rcpt_blk);
+              "(SwapDeposit id={} tx={} finalized_head={})",
+              req.id, deposit_id, tx_hash_hex, finalized_blk);
          return true;
       } catch (const fc::exception& e) {
          elog("underwriter: source-deposit verify failed for uwreq {} — "
@@ -1713,11 +1731,10 @@ struct underwriter_plugin::impl {
    ///   4. Recompute the same hash from the UWREQ row's flat fields
    ///      (depositor[32] + 7×u64 BE + u32 BE = 92 packed bytes).
    ///      Bit-exact mismatch → hard mismatch counter.
-   ///   5. Confirmation gate: matching tx's `meta.confirmationStatus`
+   ///   5. Finality gate: matching tx's `meta.confirmationStatus`
    ///      (when present on the per-sig listing from step 2a) must
-   ///      be `"finalized"` — same severity as ETH's `head -
-   ///      receipt.blockNumber >= eth_min_confirmations` gate. Tx
-   ///      not yet finalized → deferred retry (no mismatch bump).
+   ///      be `"finalized"` — same finality requirement as ETH's finalized
+   ///      log lookup. Tx not yet finalized → deferred retry (no mismatch bump).
    ///
    /// `false` returns:
    ///   - hard mismatch on bad size;
@@ -2255,18 +2272,10 @@ void underwriter_plugin::set_program_options(options_description& cli,
         "files registered with --solana-idl-file; the matching instruction's anchor "
         "discriminator (8 bytes) is used to identify the deposit instruction in source "
         "txs. Required.");
-   opts(sysio::underwriter::ETH_MIN_CONFIRMATIONS_OPTION.data(),
-        bpo::value<uint64_t>()->default_value(
-           sysio::underwriter::ETH_MIN_CONFIRMATIONS),
-        "Minimum ETH block confirmations the underwriter requires before a "
-        "SwapDeposit log is accepted as source-deposit-verified. Default 12 "
-        "(mainnet-safe). Lower (e.g. 1) on the local anvil test cluster where "
-        "blocks only mine on user txs and waiting for 12 confirmations would "
-        "stall the underwriter race.");
    opts(sysio::underwriter::ETH_SOURCE_DEPOSIT_LOOKBACK_BLOCKS_OPTION.data(),
         bpo::value<uint64_t>()->default_value(
            sysio::underwriter::ETH_SOURCE_DEPOSIT_LOOKBACK_BLOCKS),
-        "Maximum number of recent ETH blocks searched for the source "
+        "Maximum number of recent finalized ETH blocks searched for the source "
         "SwapDeposit event. Bounds the per-uwreq eth_getLogs filter so stale "
         "or invalid deposit ids cannot trigger whole-history provider scans.");
 }
@@ -2287,21 +2296,11 @@ void underwriter_plugin::plugin_initialize(const variables_map& options) {
    if (options.count("underwriter-sol-source-deposit-instruction"))
       _impl->sol_source_deposit_instruction_name =
          options["underwriter-sol-source-deposit-instruction"].as<std::string>();
-   _impl->eth_min_confirmations =
-      options[sysio::underwriter::ETH_MIN_CONFIRMATIONS_OPTION.data()].as<uint64_t>();
    _impl->eth_source_deposit_lookback_blocks =
       options[sysio::underwriter::ETH_SOURCE_DEPOSIT_LOOKBACK_BLOCKS_OPTION.data()].as<uint64_t>();
    FC_ASSERT(_impl->eth_source_deposit_lookback_blocks > 0,
              "{} must be positive",
              sysio::underwriter::ETH_SOURCE_DEPOSIT_LOOKBACK_BLOCKS_OPTION);
-   FC_ASSERT(sysio::underwriter::eth_source_deposit_window_can_satisfy_confirmations(
-                _impl->eth_source_deposit_lookback_blocks, _impl->eth_min_confirmations),
-             "{} ({}) must exceed {} ({}) so the bounded log window can contain "
-             "a SwapDeposit with enough confirmations",
-             sysio::underwriter::ETH_SOURCE_DEPOSIT_LOOKBACK_BLOCKS_OPTION,
-             _impl->eth_source_deposit_lookback_blocks,
-             sysio::underwriter::ETH_MIN_CONFIRMATIONS_OPTION,
-             _impl->eth_min_confirmations);
 
    _impl->chain_plug = &app().get_plugin<chain_plugin>();
    _impl->cron_plug  = &app().get_plugin<cron_plugin>();

@@ -3,30 +3,14 @@
 #include <charconv>
 #include <cstddef>
 #include <cstdint>
+#include <optional>
 #include <string>
 #include <string_view>
+#include <system_error>
 
 #include <fc/network/solana/solana_types.hpp>
 
 namespace sysio::underwriter {
-
-/// ETH: minimum number of block confirmations required before treating
-/// a source-deposit tx as final for verification purposes.
-///
-/// We don't require `finalized` — the plugin's verification window is
-/// bounded by the depot's epoch cycle, and waiting for finality (~12
-/// minutes on mainnet ETH) would routinely race past the depot's
-/// minimum-epoch-duration boundary. 12 confirmations is the same depth
-/// most large-stake protocols use as the "practically irreversible"
-/// threshold.
-///
-/// Increase this if the source chain's reorg history grows; decrease if
-/// the deposit-to-race latency window shrinks below tolerance.
-inline constexpr uint64_t ETH_MIN_CONFIRMATIONS = 12;
-
-/// Configuration option name for the EVM source-deposit confirmation depth.
-inline constexpr std::string_view ETH_MIN_CONFIRMATIONS_OPTION =
-   "underwriter-eth-min-confirmations";
 
 /// ETH: maximum number of recent blocks one source-deposit `eth_getLogs`
 /// lookup may cover.
@@ -34,9 +18,11 @@ inline constexpr std::string_view ETH_MIN_CONFIRMATIONS_OPTION =
 /// The verifier only has the outpost-local `SwapDeposit.id`, so it still
 /// needs an event lookup. Keep that lookup bounded to protect underwriter
 /// scan cycles and EVM RPC providers from whole-history scans on absent or
-/// expensive ids. 7200 mainnet blocks is roughly one day at 12 seconds per
-/// block; deployments with a different source-chain cadence can override the
-/// plugin option without changing code.
+/// expensive ids. The window is anchored on Ethereum's `finalized` block so
+/// the underwriter never fronts collateral against reversible source-chain
+/// history. 7200 mainnet blocks is roughly one day at 12 seconds per block;
+/// deployments with a different source-chain cadence can override the plugin
+/// option without changing code.
 inline constexpr uint64_t ETH_SOURCE_DEPOSIT_LOOKBACK_BLOCKS = 7200;
 
 /// Configuration option name for the EVM source-deposit log lookup window.
@@ -45,6 +31,27 @@ inline constexpr std::string_view ETH_SOURCE_DEPOSIT_LOOKBACK_BLOCKS_OPTION =
 
 /// JSON-RPC quantity prefix used for explicit EVM block numbers.
 inline constexpr std::string_view ETH_JSON_RPC_QUANTITY_PREFIX = "0x";
+
+/// Parses an Ethereum JSON-RPC quantity into a block number.
+///
+/// The parser requires the canonical `0x` prefix, a non-empty hex body, full
+/// consumption, and no overflow. Malformed provider fields return
+/// `std::nullopt` so callers can fail closed without throwing through the scan
+/// cycle.
+inline std::optional<uint64_t> eth_parse_block_quantity(std::string_view block_quantity) {
+   if (block_quantity.size() <= ETH_JSON_RPC_QUANTITY_PREFIX.size()) return std::nullopt;
+   if (block_quantity[0] != '0' || (block_quantity[1] != 'x' && block_quantity[1] != 'X')) {
+      return std::nullopt;
+   }
+
+   block_quantity.remove_prefix(ETH_JSON_RPC_QUANTITY_PREFIX.size());
+   uint64_t out = 0;
+   const char* const begin = block_quantity.data();
+   const char* const end   = begin + block_quantity.size();
+   const auto [ptr, ec] = std::from_chars(begin, end, out, 16);
+   if (ec != std::errc{} || ptr != end) return std::nullopt;
+   return out;
+}
 
 /// Returns the inclusive lower block bound for a bounded EVM source-deposit
 /// log lookup.
@@ -58,18 +65,6 @@ inline constexpr uint64_t eth_source_deposit_from_block(uint64_t head_block, uin
    if (lookback_blocks <= 1) return head_block;
    const uint64_t trailing_blocks = lookback_blocks - 1;
    return head_block > trailing_blocks ? head_block - trailing_blocks : 0;
-}
-
-/// Returns whether a lookback window can contain a log old enough to satisfy
-/// the configured ETH confirmation depth.
-///
-/// The lookup range is inclusive and ends at the captured head block. A
-/// receipt with exactly `min_confirmations` confirmations is at
-/// `head_block - min_confirmations`, so the window must contain at least
-/// `min_confirmations + 1` blocks.
-inline constexpr bool eth_source_deposit_window_can_satisfy_confirmations(
-   uint64_t lookback_blocks, uint64_t min_confirmations) {
-   return lookback_blocks > min_confirmations;
 }
 
 /// Formats an EVM block number as a JSON-RPC quantity string.

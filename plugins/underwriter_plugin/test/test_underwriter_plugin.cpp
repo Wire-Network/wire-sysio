@@ -3,6 +3,7 @@
 #include <map>
 #include <set>
 #include <string>
+#include <string_view>
 #include <unordered_set>
 #include <vector>
 
@@ -19,6 +20,10 @@ using namespace sysio::underwriter_defaults;
 using namespace sysio::underwriter;
 
 namespace {
+
+/// Removed ETH confirmation-depth option name. Keeping the spelling here makes
+/// the option-surface test catch any future non-finality escape hatch.
+constexpr std::string_view removed_eth_min_confirmations_option = "underwriter-eth-min-confirmations";
 
 /// Program id used by the scanner tests to model the configured opp-outpost.
 const std::string test_sol_program_id = "OppOutpost11111111111111111111111111111111";
@@ -134,6 +139,7 @@ BOOST_AUTO_TEST_CASE(plugin_options_are_registered) try {
    BOOST_CHECK(option_names.count("underwriter-eth-client-id") > 0);
    BOOST_CHECK(option_names.count("underwriter-sol-client-id") > 0);
    BOOST_CHECK(option_names.count(std::string{ETH_SOURCE_DEPOSIT_LOOKBACK_BLOCKS_OPTION}) > 0);
+   BOOST_CHECK_EQUAL(option_names.count(std::string{removed_eth_min_confirmations_option}), 0);
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(default_options_are_correct) try {
@@ -156,9 +162,10 @@ BOOST_AUTO_TEST_CASE(default_options_are_correct) try {
       ETH_SOURCE_DEPOSIT_LOOKBACK_BLOCKS);
 } FC_LOG_AND_RETHROW();
 
-/// The ETH source-deposit event lookup window is inclusive and never reaches
-/// below genesis, so the verifier can bound each `eth_getLogs` request without
-/// losing well-defined behavior on young chains.
+/// The ETH source-deposit event lookup window is inclusive and anchored on the
+/// finalized head. It never reaches below genesis, so the verifier can bound
+/// each `eth_getLogs` request without losing well-defined behavior on young
+/// chains.
 BOOST_AUTO_TEST_CASE(eth_source_deposit_log_window_is_bounded) try {
    constexpr uint64_t first_non_genesis_head = 1;
    constexpr uint64_t one_block_window       = 1;
@@ -175,24 +182,16 @@ BOOST_AUTO_TEST_CASE(eth_source_deposit_log_window_is_bounded) try {
                      0);
    BOOST_CHECK_EQUAL(eth_source_deposit_from_block(larger_head, one_block_window),
                      larger_head);
-   BOOST_CHECK(!eth_source_deposit_window_can_satisfy_confirmations(
-      ETH_MIN_CONFIRMATIONS, ETH_MIN_CONFIRMATIONS));
-   BOOST_CHECK(eth_source_deposit_window_can_satisfy_confirmations(
-      ETH_MIN_CONFIRMATIONS + 1, ETH_MIN_CONFIRMATIONS));
 } FC_LOG_AND_RETHROW();
 
-/// Reject a configuration where the bounded ETH log lookup cannot include any
-/// deposit old enough to satisfy the confirmation gate.
-BOOST_AUTO_TEST_CASE(eth_source_deposit_options_reject_unsatisfiable_window) try {
+/// Reject an empty bounded ETH log lookup window.
+BOOST_AUTO_TEST_CASE(eth_source_deposit_options_reject_zero_window) try {
    sysio::underwriter_plugin plugin;
    boost::program_options::options_description cli, cfg;
    plugin.set_program_options(cli, cfg);
 
    const std::vector<std::string> args{
-      "--" + std::string{ETH_MIN_CONFIRMATIONS_OPTION} + "=" +
-         std::to_string(ETH_MIN_CONFIRMATIONS),
-      "--" + std::string{ETH_SOURCE_DEPOSIT_LOOKBACK_BLOCKS_OPTION} + "=" +
-         std::to_string(ETH_MIN_CONFIRMATIONS),
+      "--" + std::string{ETH_SOURCE_DEPOSIT_LOOKBACK_BLOCKS_OPTION} + "=0",
    };
 
    boost::program_options::variables_map vm;
@@ -214,6 +213,23 @@ BOOST_AUTO_TEST_CASE(eth_block_quantity_formats_json_rpc_numbers) try {
    BOOST_CHECK_EQUAL(eth_block_quantity(low_nibble_block), "0xf");
    BOOST_CHECK_EQUAL(eth_block_quantity(two_digit_block), "0x10");
    BOOST_CHECK_EQUAL(eth_block_quantity(sample_block), "0x1234abcd");
+} FC_LOG_AND_RETHROW();
+
+/// Malformed finalized-head block numbers defer source-deposit verification
+/// instead of escaping through the scan cycle.
+BOOST_AUTO_TEST_CASE(eth_block_quantity_parser_rejects_malformed_rpc_numbers) try {
+   const auto parsed_zero = eth_parse_block_quantity("0x0");
+   const auto parsed_sample = eth_parse_block_quantity("0x1234abcd");
+
+   BOOST_REQUIRE(parsed_zero);
+   BOOST_REQUIRE(parsed_sample);
+   BOOST_CHECK_EQUAL(*parsed_zero, 0);
+   BOOST_CHECK_EQUAL(*parsed_sample, 0x1234abcd);
+   BOOST_CHECK(!eth_parse_block_quantity(""));
+   BOOST_CHECK(!eth_parse_block_quantity("0x"));
+   BOOST_CHECK(!eth_parse_block_quantity("1234"));
+   BOOST_CHECK(!eth_parse_block_quantity("0x12zz"));
+   BOOST_CHECK(!eth_parse_block_quantity("0x10000000000000000"));
 } FC_LOG_AND_RETHROW();
 
 // ── B1: preflight option-coverage ──────────────────────────────────────

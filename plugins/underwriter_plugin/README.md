@@ -85,7 +85,7 @@ verifies the signature against every permission on `uw_account` via the
 | `--underwriter-eth-client-id` | `eth-default` | Ethereum outpost RPC client id |
 | `--underwriter-sol-client-id` | `sol-default` | Solana outpost RPC client id |
 | `--underwriter-eth-opreg-addr` | — | OperatorRegistry contract address on Ethereum (hex) |
-| `--underwriter-eth-source-deposit-lookback-blocks` | 7200 | Recent ETH blocks searched per source deposit |
+| `--underwriter-eth-source-deposit-lookback-blocks` | 7200 | Recent finalized ETH blocks searched per source deposit |
 | `--underwriter-sol-program-id` | — | opp-outpost program id on Solana (base58) |
 
 ## Dependencies
@@ -107,7 +107,7 @@ for a follow-up:
   per-`(chain, token_kind)` credit constraints.
 - **Source-deposit locator hardening** — the current verifier validates
   `SwapRequest.source_tx_id` before committing; ETH uses a bounded
-  `eth_getLogs` window over recent blocks, while SOL reads the source
+  `eth_getLogs` window over finalized blocks, while SOL reads the source
   tx directly. Future work can carry a richer tx/block locator to avoid
   event search entirely.
 - **Outstanding-commits tracking + one-leg-stuck retry** — persistent
