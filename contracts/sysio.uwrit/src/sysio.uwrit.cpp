@@ -95,7 +95,9 @@ uint64_t opreg_pending_withdraws(name underwriter,
    auto end = idx.upper_bound(underwriter.value);
    for (; it != end; ++it) {
       if (it->chain_code != chain_code || it->token_code != token_code) continue;
-      total += it->amount;
+      // Saturating: amounts are uncapped uint64 (external-chain values); a
+      // wrapped subtotal would understate `reserved` and overstate availability.
+      total = opp::safe::add_sat_u64(total, it->amount);
    }
    return total;
 }
@@ -118,7 +120,9 @@ uint64_t sum_locks_inline(name self,
    auto end = idx.upper_bound(underwriter.value);
    for (; it != end; ++it) {
       if (it->chain_code != chain_code || it->token_code != token_code) continue;
-      total += it->amount;
+      // Saturating: amounts are uncapped uint64 (external-chain values); a
+      // wrapped subtotal would understate `reserved` and overstate availability.
+      total = opp::safe::add_sat_u64(total, it->amount);
    }
    return total;
 }
@@ -1050,20 +1054,25 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
    // the deferred slash/remit cleanup (`opreg::releaselock` inside `chklocks`)
    // then has to draw 200 from a 150 balance. Require availability to cover
    // the AGGREGATE required amount of every leg that shares a collateral
-   // bucket. `add_sat_u64` keeps the sum overflow-free — a near-`UINT64_MAX`
-   // aggregate saturates and is rejected, never wraps to a small passing
-   // value; this resolver is non-throwing (`feedback_opp_handlers_never_throw`),
-   // so saturate-then-compare is the correct guard here, not a checked throw.
+   // bucket. The sum is computed in uint128: `src + dst` can exceed uint64,
+   // and a balance is itself uint64, so an overflowing aggregate must read as
+   // genuinely insufficient — NOT saturate to UINT64_MAX (which a UINT64_MAX
+   // available balance would spuriously satisfy) and NOT wrap to a small
+   // passing value. This resolver is non-throwing
+   // (`feedback_opp_handlers_never_throw`), so it disqualifies the candidate
+   // rather than asserting on an over-large request.
    const bool same_bucket = src_needed && dst_needed
                             && req.src_chain_code == req.dst_chain_code
                             && req.src_token_code == req.dst_token_code;
    bool insufficient_bond = false;
    if (same_bucket) {
-      // One opreg balance funds both legs — it must cover their sum.
-      const uint64_t need  = opp::safe::add_sat_u64(req.src_amount, req.dst_amount);
-      const uint64_t avail = available_via_mirrors(self, candidate,
-                                                   req.src_chain_code, req.src_token_code);
-      insufficient_bond = avail < need;
+      // One opreg balance funds both legs — it must cover their sum. uint128
+      // keeps the comparison honest when src+dst exceeds uint64 (no uint64
+      // balance can cover it, so availability is insufficient by construction).
+      const uint64_t  avail = available_via_mirrors(self, candidate,
+                                                    req.src_chain_code, req.src_token_code);
+      const uint128_t need  = static_cast<uint128_t>(req.src_amount) + req.dst_amount;
+      insufficient_bond = static_cast<uint128_t>(avail) < need;
    } else {
       // Distinct buckets (or a single required leg) — check each independently.
       const uint64_t src_avail = src_needed

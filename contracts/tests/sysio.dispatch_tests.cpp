@@ -1456,26 +1456,31 @@ BOOST_FIXTURE_TEST_CASE(swap_same_token_legs_exact_balance_wins,
    BOOST_REQUIRE(dq);
 } FC_LOG_AND_RETHROW() }
 
-// Boundary: the aggregate must use saturating addition. src=100 +
-// dst=(UINT64_MAX - 50) saturates to UINT64_MAX (a naive src+dst wraps to 49),
-// so a 100 balance is correctly judged insufficient rather than "covering" 49.
-BOOST_FIXTURE_TEST_CASE(swap_same_token_legs_aggregate_saturates,
+// Boundary: when src+dst overflows uint64 the requirement exceeds ANY uint64
+// balance, so even the maximum possible availability is insufficient. Exact
+// case: src=UINT64_MAX, dst=1, avail=UINT64_MAX — a saturating `need` (capped at
+// UINT64_MAX) would spuriously satisfy `avail < need`; the uint128 aggregate
+// rejects it. Also guards that the lock/pending subtotals can't wrap to overstate
+// availability (the rollup loops saturate).
+BOOST_FIXTURE_TEST_CASE(swap_same_token_legs_aggregate_overflow_insufficient,
                         sysio_dispatch_tester) { try {
    bootstrap_for_dispatch();
 
    const uint64_t eth       = fc::slug_name{"ETH"}.value;
    const uint64_t primary   = fc::slug_name{"PRIMARY"}.value;
    const uint64_t secondary = fc::slug_name{"SECOND"}.value;
-   constexpr uint64_t ATT_ID    = 8200;
-   constexpr int64_t  SRC_AMOUNT = 100;
-   constexpr uint64_t HUGE_DST   = ~uint64_t{0} - 50;   // UINT64_MAX - 50
+   constexpr uint64_t ATT_ID = 8200;
 
-   BOOST_REQUIRE_EQUAL(success(), depositinle_credit(UWRIT_OP, "ETH", "ETH", 100));
+   // Maximum possible availability: balance == UINT64_MAX, no locks / pending.
+   BOOST_REQUIRE_EQUAL(success(),
+      depositinle_credit(UWRIT_OP, "ETH", "ETH", ~uint64_t{0}));
 
+   // src_amount == UINT64_MAX (set via the int64 amount field) + dst 1 overflows
+   // the uint64 aggregate — insufficient regardless of how large the balance is.
    const auto sr = encode_swap_request(
       ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
-      eth, eth, primary,   SRC_AMOUNT,
-      eth, eth, secondary, HUGE_DST,
+      eth, eth, primary,   static_cast<int64_t>(~uint64_t{0}),
+      eth, eth, secondary, /*dst_amount*/ 1,
       /*tolerance_bps*/ 1'000'000, ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0b'));
    BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, eth, sr));
 
@@ -1491,7 +1496,8 @@ BOOST_FIXTURE_TEST_CASE(swap_same_token_legs_aggregate_saturates,
    bool dq = false;
    for (const auto& c : req["commits_by"].get_array()) {
       if (c["underwriter"].as_string() == UWRIT_OP.to_string())
-         dq = (c["status"].as_string() == "UNDERWRITE_STATUS_DISQUALIFIED");
+         dq = (c["status"].as_string() == "UNDERWRITE_STATUS_DISQUALIFIED"
+               && c["reason"].as_string().find("aggregate required") != std::string::npos);
    }
    BOOST_REQUIRE(dq);
 } FC_LOG_AND_RETHROW() }

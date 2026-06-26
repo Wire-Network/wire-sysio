@@ -268,7 +268,9 @@ uint64_t sum_locks_inline(name account, sysio::slug_name chain_code, sysio::slug
    auto end = idx.upper_bound(account.value);
    for (; it != end; ++it) {
       if (it->chain_code != chain_code || it->token_code != token_code) continue;
-      total += it->amount;
+      // Saturating: amounts are uncapped uint64 (external-chain values); a
+      // wrapped subtotal would understate `reserved` and overstate availability.
+      total = opp::safe::add_sat_u64(total, it->amount);
    }
    return total;
 }
@@ -291,7 +293,9 @@ uint64_t sum_pending_withdraws(name account, sysio::slug_name chain_code, sysio:
    auto end = idx.upper_bound(account.value);
    for (; it != end; ++it) {
       if (it->chain_code != chain_code || it->token_code != token_code) continue;
-      total += it->amount;
+      // Saturating: amounts are uncapped uint64 (external-chain values); a
+      // wrapped subtotal would understate `reserved` and overstate availability.
+      total = opp::safe::add_sat_u64(total, it->amount);
    }
    return total;
 }
