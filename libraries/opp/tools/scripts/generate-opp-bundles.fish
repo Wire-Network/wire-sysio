@@ -29,7 +29,9 @@ end
 # --- Setup & build tools ---
 pushd $tools_root
 pnpm install; or exit 1
-pnpm --filter "proto*" dist; or exit 1
+# Match the workspace package directories so scoped npm package names do not
+# bypass the OPP tool build on pnpm 10.
+pnpm --filter "./proto*" dist; or exit 1
 cd protoc-gen-solidity && pnpm link --global && cd ..; or exit 1
 cd protoc-gen-solana && pnpm link --global && cd ..; or exit 1
 cd protobuf-bundler && pnpm link --global && cd ..; or exit 1
