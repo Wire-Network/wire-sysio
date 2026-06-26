@@ -273,6 +273,16 @@ that case the team should either:
 - redesign specific value-transfer effects so one transaction needs fewer
   dynamic accounts.
 
+Recommendation: do not block the SEC-94 safety floor on perfect production
+volume data. Implement bounded packing, terminal-finalize, relay guards, and
+parity fixtures first. Use volume sizing to decide whether ALT or
+effect-account reduction must ship in the same release train. A practical
+trigger is sustained expected Solana demand above roughly half of the terminal
+dynamic-account budget per epoch. Short bursts are acceptable if READY backlog
+drains quickly; sustained backlog means user-visible withdrawal latency and
+should be treated as a throughput follow-up, not as a reason to leave the
+chain-wide halt unfixed.
+
 ## Account Budget Model
 
 Add an SVM budget estimator to WIRE-side envelope packing. The estimator should
@@ -322,10 +332,11 @@ Per-attestation effect-account estimates:
 | `RESERVE_READY` | Reserve PDA |
 | `RESERVE_CREATE_CANCELLED` | Reserve PDA plus refund accounts that the Solana handler may need |
 
-The first implementation can use an intentionally pessimistic SVM estimate for
-token effects if exact native-vs-SPL classification is not cheaply available to
-`sysio.msgch`. Pessimistic packing is acceptable because it only rolls more
-READY attestations into the next epoch. Over-packing can wedge delivery.
+The first implementation should use an intentionally pessimistic SVM estimate
+for token effects unless exact native-vs-SPL classification is available from
+deterministic existing metadata in `sysio.msgch`. Pessimistic packing is
+acceptable because it only rolls more READY attestations into the next epoch.
+Over-packing can wedge delivery.
 
 The estimator should dedupe by semantic account identity where deterministic:
 
@@ -452,6 +463,17 @@ Proposed flow:
 9. Leave omitted candidates READY for the next epoch.
 10. Provide the governance recovery action that re-packs the current pinned
     epoch in place when a bad envelope has already been committed.
+11. If a single attestation cannot fit by itself under the conservative SVM
+    budget, move it to an explicit dead-letter/error state rather than
+    hard-aborting the whole outpost queue. The row must preserve enough data for
+    refund, manual remediation, or a future protocol upgrade.
+
+Budget trimming should be operator-visible. At minimum, emit a deterministic
+log or print when SVM budget trimming occurs with chain code, epoch, included
+count, omitted count, estimated dynamic accounts, estimated packet bytes, and
+the limit that caused trimming. A persistent on-chain counter or table row is
+useful if operators need queryable monitoring, but it is not required for the
+core safety fix.
 
 Add tests that prove:
 
@@ -465,6 +487,8 @@ Add tests that prove:
   the whole outpost queue. The recommended behavior is to mark that attestation
   as a dead-letter/error state with an explicit refund or remediation policy,
   not to hard-abort `buildenv` forever.
+- SVM budget trimming emits the expected observability signal with included and
+  omitted counts plus the limiting budget;
 - the governance recovery action can reconstruct attestations from a pending
   bad envelope, replace the same epoch's `outenvelopes` row with a fitting
   envelope, and recreate the remainder as READY without dropping or reordering
@@ -659,9 +683,11 @@ affected targets. For `wire-sysio`, this should include at minimum:
 
 ## Rollout Plan
 
-1. Decide whether expected Solana-bound value-transfer volume fits the
-   conservative throughput ceiling. If it does not, schedule an ALT or
-   account-reduction plan alongside this safety floor.
+1. Start the SEC-94 safety floor without waiting for perfect volume data.
+   Separately size expected Solana-bound value-transfer volume against roughly
+   half of the terminal dynamic-account budget. If sustained expected demand is
+   above that threshold, schedule ALT or account-reduction work alongside this
+   release train.
 2. Land `wire-solana` terminal-call changes and generated budget fixtures.
 3. Merge and deploy the WIRE-side account-budget-aware `buildenv` change with
    the same constants used by the relay/program fixtures.
@@ -676,17 +702,30 @@ affected targets. For `wire-sysio`, this should include at minimum:
    growing backlog means funds are delayed even though consensus is no longer
    wedged.
 
-## Open Questions
+## Implementation Defaults And Remaining Decisions
 
-1. What Solana-bound per-epoch volume is expected for withdrawals, deposit
-   reverts, and swap remits? Does the conservative dynamic-account ceiling meet
-   that requirement without unacceptable latency?
-2. If expected volume exceeds the terminal-call throughput ceiling, should ALT
-   support or effect-account reduction ship in the same release train?
-3. Should `sysio.msgch` use exact native-vs-SPL classification by reading token
-   metadata, or should the first implementation pessimistically treat all SVM
-   token effects as SPL worst case?
-4. Should the contract expose a counter or log row when SVM budget trimming
-   happens, so operators can observe that backlog is intentional?
-5. What is the exact dead-letter or refund policy for a single
-   attestation-over-budget case? Do not hard-abort the whole outpost queue.
+Default implementation choices:
+
+- Proceed with the safety floor now: bounded `buildenv`, zero-data terminal
+  finalize, relay/client guards, mandatory parity fixtures, and in-place
+  recovery for a bad pinned epoch.
+- Do not include ALT in the first SEC-94 patch unless volume sizing proves the
+  terminal budget is insufficient for sustained demand.
+- Use exact native-vs-SPL classification only when `sysio.msgch` can prove it
+  from deterministic existing metadata. Otherwise use pessimistic SPL
+  worst-case estimation.
+- Emit deterministic SVM budget-trim observability. Add a persistent counter or
+  table only if operators need on-chain querying.
+- Treat a single attestation that cannot fit by itself as a dedicated
+  dead-letter/error case. Preserve the value-transfer record and exclude it
+  from normal `buildenv` packing until it is explicitly remediated.
+
+Remaining decisions before final PR:
+
+1. What is the expected sustained Solana-bound volume for withdrawals, deposit
+   reverts, and swap remits? If it is above roughly half the terminal
+   dynamic-account budget per epoch, ALT or effect-account reduction should be
+   scheduled with this release train.
+2. What authority and policy remediates a dead-lettered value-transfer
+   attestation: governance refund, manual re-encoding, protocol upgrade, or a
+   more specific operational path?
