@@ -1,11 +1,16 @@
 #include <boost/test/unit_test.hpp>
 
 #include <set>
+#include <string>
+#include <vector>
 
+#include <fc/exception/exception.hpp>
+#include <sysio/underwriter_plugin/source_deposit_constants.hpp>
 #include <sysio/underwriter_plugin/underwriter_plugin.hpp>
 
 using namespace std::literals;
 using namespace sysio::underwriter_defaults;
+using namespace sysio::underwriter;
 
 BOOST_AUTO_TEST_SUITE(underwriter_plugin_tests)
 
@@ -30,6 +35,7 @@ BOOST_AUTO_TEST_CASE(plugin_options_are_registered) try {
    BOOST_CHECK(option_names.count("underwriter-enabled") > 0);
    BOOST_CHECK(option_names.count("underwriter-eth-client-id") > 0);
    BOOST_CHECK(option_names.count("underwriter-sol-client-id") > 0);
+   BOOST_CHECK(option_names.count(std::string{ETH_SOURCE_DEPOSIT_LOOKBACK_BLOCKS_OPTION}) > 0);
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(default_options_are_correct) try {
@@ -47,6 +53,69 @@ BOOST_AUTO_TEST_CASE(default_options_are_correct) try {
    BOOST_CHECK_EQUAL(vm["underwriter-enabled"].as<bool>(), enabled);
    BOOST_CHECK_EQUAL(vm["underwriter-eth-client-id"].as<std::string>(), eth_client_id);
    BOOST_CHECK_EQUAL(vm["underwriter-sol-client-id"].as<std::string>(), sol_client_id);
+   BOOST_CHECK_EQUAL(
+      vm[std::string{ETH_SOURCE_DEPOSIT_LOOKBACK_BLOCKS_OPTION}].as<uint64_t>(),
+      ETH_SOURCE_DEPOSIT_LOOKBACK_BLOCKS);
+} FC_LOG_AND_RETHROW();
+
+/// The ETH source-deposit event lookup window is inclusive and never reaches
+/// below genesis, so the verifier can bound each `eth_getLogs` request without
+/// losing well-defined behavior on young chains.
+BOOST_AUTO_TEST_CASE(eth_source_deposit_log_window_is_bounded) try {
+   constexpr uint64_t first_non_genesis_head = 1;
+   constexpr uint64_t one_block_window       = 1;
+   constexpr uint64_t larger_head            = ETH_SOURCE_DEPOSIT_LOOKBACK_BLOCKS + 99;
+
+   BOOST_CHECK_EQUAL(
+      eth_source_deposit_from_block(larger_head, ETH_SOURCE_DEPOSIT_LOOKBACK_BLOCKS),
+      larger_head - ETH_SOURCE_DEPOSIT_LOOKBACK_BLOCKS + 1);
+   BOOST_CHECK_EQUAL(
+      larger_head - eth_source_deposit_from_block(larger_head, ETH_SOURCE_DEPOSIT_LOOKBACK_BLOCKS) + 1,
+      ETH_SOURCE_DEPOSIT_LOOKBACK_BLOCKS);
+   BOOST_CHECK_EQUAL(eth_source_deposit_from_block(first_non_genesis_head,
+                                                   ETH_SOURCE_DEPOSIT_LOOKBACK_BLOCKS),
+                     0);
+   BOOST_CHECK_EQUAL(eth_source_deposit_from_block(larger_head, one_block_window),
+                     larger_head);
+   BOOST_CHECK(!eth_source_deposit_window_can_satisfy_confirmations(
+      ETH_MIN_CONFIRMATIONS, ETH_MIN_CONFIRMATIONS));
+   BOOST_CHECK(eth_source_deposit_window_can_satisfy_confirmations(
+      ETH_MIN_CONFIRMATIONS + 1, ETH_MIN_CONFIRMATIONS));
+} FC_LOG_AND_RETHROW();
+
+/// Reject a configuration where the bounded ETH log lookup cannot include any
+/// deposit old enough to satisfy the confirmation gate.
+BOOST_AUTO_TEST_CASE(eth_source_deposit_options_reject_unsatisfiable_window) try {
+   sysio::underwriter_plugin plugin;
+   boost::program_options::options_description cli, cfg;
+   plugin.set_program_options(cli, cfg);
+
+   const std::vector<std::string> args{
+      "--" + std::string{ETH_MIN_CONFIRMATIONS_OPTION} + "=" +
+         std::to_string(ETH_MIN_CONFIRMATIONS),
+      "--" + std::string{ETH_SOURCE_DEPOSIT_LOOKBACK_BLOCKS_OPTION} + "=" +
+         std::to_string(ETH_MIN_CONFIRMATIONS),
+   };
+
+   boost::program_options::variables_map vm;
+   boost::program_options::store(
+      boost::program_options::command_line_parser(args).options(cfg).run(), vm);
+   boost::program_options::notify(vm);
+
+   BOOST_CHECK_THROW(plugin.plugin_initialize(vm), fc::exception);
+} FC_LOG_AND_RETHROW();
+
+/// Explicit block bounds must be encoded as JSON-RPC quantities, not tags such
+/// as `earliest` or `latest`.
+BOOST_AUTO_TEST_CASE(eth_block_quantity_formats_json_rpc_numbers) try {
+   constexpr uint64_t low_nibble_block = 15;
+   constexpr uint64_t two_digit_block  = 16;
+   constexpr uint64_t sample_block     = 0x1234abcd;
+
+   BOOST_CHECK_EQUAL(eth_block_quantity(0), "0x0");
+   BOOST_CHECK_EQUAL(eth_block_quantity(low_nibble_block), "0xf");
+   BOOST_CHECK_EQUAL(eth_block_quantity(two_digit_block), "0x10");
+   BOOST_CHECK_EQUAL(eth_block_quantity(sample_block), "0x1234abcd");
 } FC_LOG_AND_RETHROW();
 
 // ── B1: preflight option-coverage ──────────────────────────────────────

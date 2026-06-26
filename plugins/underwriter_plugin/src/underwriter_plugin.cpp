@@ -135,6 +135,11 @@ struct underwriter_plugin::impl {
    /// test cluster overrides via `--underwriter-eth-min-confirmations 1`.
    uint64_t     eth_min_confirmations =
       sysio::underwriter::ETH_MIN_CONFIRMATIONS;
+   /// Maximum number of recent EVM blocks one `eth_getLogs`
+   /// source-deposit lookup may cover. Keeping this window bounded prevents
+   /// invalid or stale deposit ids from forcing whole-history RPC scans.
+   uint64_t     eth_source_deposit_lookback_blocks =
+      sysio::underwriter::ETH_SOURCE_DEPOSIT_LOOKBACK_BLOCKS;
    /// opp-outpost program ID on SOL. Not a CLI option — resolved at
    /// preflight from the loaded IDL's top-level `address` field (or
    /// `metadata.address` on older IDLs).
@@ -1440,10 +1445,17 @@ struct underwriter_plugin::impl {
       }
 
       try {
+         const uint64_t head_blk =
+            entry->client->get_block_number().convert_to<uint64_t>();
+         const uint64_t from_blk = sysio::underwriter::eth_source_deposit_from_block(
+            head_blk, eth_source_deposit_lookback_blocks);
+         const std::string from_block = sysio::underwriter::eth_block_quantity(from_blk);
+         const std::string to_block = sysio::underwriter::eth_block_quantity(head_blk);
+
          fc::mutable_variant_object filter;
          filter("address",   resolved_eth_source_contract_addr);
-         filter("fromBlock", std::string{"earliest"});
-         filter("toBlock",   std::string{"latest"});
+         filter("fromBlock", from_block);
+         filter("toBlock",   to_block);
          filter("topics", fc::variants{
             fc::variant{SWAP_DEPOSIT_TOPIC},
             fc::variant{id_topic},
@@ -1454,8 +1466,10 @@ struct underwriter_plugin::impl {
             fc::variant{fc::variants{fc::variant{filter}}});
          if (!logs_var.is_array() || logs_var.size() == 0) {
             ilog("underwriter: source-deposit verify deferred for uwreq {} — "
-                 "no SwapDeposit log yet (id={}, contract={})",
-                 req.id, deposit_id, resolved_eth_source_contract_addr);
+                 "no SwapDeposit log in recent block window (id={}, "
+                 "contract={}, range={}..{})",
+                 req.id, deposit_id, resolved_eth_source_contract_addr,
+                 from_block, to_block);
             return false;
          }
          // Should be exactly one match — id is unique per outpost. Use
@@ -1580,8 +1594,6 @@ struct underwriter_plugin::impl {
             return false;
          }
          const uint64_t rcpt_blk = std::stoull(blk_str.substr(2), nullptr, 16);
-         const uint64_t head_blk =
-            entry->client->get_block_number().convert_to<uint64_t>();
          if (head_blk < rcpt_blk ||
              (head_blk - rcpt_blk) < eth_min_confirmations) {
             ilog("underwriter: source-deposit verify deferred for uwreq {} — "
@@ -2199,7 +2211,7 @@ void underwriter_plugin::set_program_options(options_description& cli,
         "files registered with --solana-idl-file; the matching instruction's anchor "
         "discriminator (8 bytes) is used to identify the deposit instruction in source "
         "txs. Required.");
-   opts("underwriter-eth-min-confirmations",
+   opts(sysio::underwriter::ETH_MIN_CONFIRMATIONS_OPTION.data(),
         bpo::value<uint64_t>()->default_value(
            sysio::underwriter::ETH_MIN_CONFIRMATIONS),
         "Minimum ETH block confirmations the underwriter requires before a "
@@ -2207,6 +2219,12 @@ void underwriter_plugin::set_program_options(options_description& cli,
         "(mainnet-safe). Lower (e.g. 1) on the local anvil test cluster where "
         "blocks only mine on user txs and waiting for 12 confirmations would "
         "stall the underwriter race.");
+   opts(sysio::underwriter::ETH_SOURCE_DEPOSIT_LOOKBACK_BLOCKS_OPTION.data(),
+        bpo::value<uint64_t>()->default_value(
+           sysio::underwriter::ETH_SOURCE_DEPOSIT_LOOKBACK_BLOCKS),
+        "Maximum number of recent ETH blocks searched for the source "
+        "SwapDeposit event. Bounds the per-uwreq eth_getLogs filter so stale "
+        "or invalid deposit ids cannot trigger whole-history provider scans.");
 }
 
 void underwriter_plugin::plugin_initialize(const variables_map& options) {
@@ -2226,7 +2244,20 @@ void underwriter_plugin::plugin_initialize(const variables_map& options) {
       _impl->sol_source_deposit_instruction_name =
          options["underwriter-sol-source-deposit-instruction"].as<std::string>();
    _impl->eth_min_confirmations =
-      options["underwriter-eth-min-confirmations"].as<uint64_t>();
+      options[sysio::underwriter::ETH_MIN_CONFIRMATIONS_OPTION.data()].as<uint64_t>();
+   _impl->eth_source_deposit_lookback_blocks =
+      options[sysio::underwriter::ETH_SOURCE_DEPOSIT_LOOKBACK_BLOCKS_OPTION.data()].as<uint64_t>();
+   FC_ASSERT(_impl->eth_source_deposit_lookback_blocks > 0,
+             "{} must be positive",
+             sysio::underwriter::ETH_SOURCE_DEPOSIT_LOOKBACK_BLOCKS_OPTION);
+   FC_ASSERT(sysio::underwriter::eth_source_deposit_window_can_satisfy_confirmations(
+                _impl->eth_source_deposit_lookback_blocks, _impl->eth_min_confirmations),
+             "{} ({}) must exceed {} ({}) so the bounded log window can contain "
+             "a SwapDeposit with enough confirmations",
+             sysio::underwriter::ETH_SOURCE_DEPOSIT_LOOKBACK_BLOCKS_OPTION,
+             _impl->eth_source_deposit_lookback_blocks,
+             sysio::underwriter::ETH_MIN_CONFIRMATIONS_OPTION,
+             _impl->eth_min_confirmations);
 
    _impl->chain_plug = &app().get_plugin<chain_plugin>();
    _impl->cron_plug  = &app().get_plugin<cron_plugin>();

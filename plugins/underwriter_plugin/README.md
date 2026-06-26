@@ -49,9 +49,9 @@ Every `--underwriter-scan-interval-ms` (default 5 s):
 5. `select_coverable()` — greedy ascending-by-`src_amount` selection
    (knapsack optimization deferred); reserves both legs' credit so the
    same balance can't be double-used inside a single cycle.
-6. `submit_intent_to_outpost()` — for each selected uwreq, build a
-   signed `UnderwriteIntentCommit` per leg and submit to that leg's
-   outpost.
+6. `submit_intent_to_outpost()` — for each selected uwreq, verify the
+   source-chain deposit, build a signed `UnderwriteIntentCommit` per
+   leg, and submit to that leg's outpost.
 
 ### Commit submission (`build_signed_uic_bytes`)
 
@@ -85,6 +85,7 @@ verifies the signature against every permission on `uw_account` via the
 | `--underwriter-eth-client-id` | `eth-default` | Ethereum outpost RPC client id |
 | `--underwriter-sol-client-id` | `sol-default` | Solana outpost RPC client id |
 | `--underwriter-eth-opreg-addr` | — | OperatorRegistry contract address on Ethereum (hex) |
+| `--underwriter-eth-source-deposit-lookback-blocks` | 7200 | Recent ETH blocks searched per source deposit |
 | `--underwriter-sol-program-id` | — | opp-outpost program id on Solana (base58) |
 
 ## Dependencies
@@ -104,10 +105,11 @@ for a follow-up:
 - **Knapsack selector** — replace the ascending-sort greedy with a
   branch-and-bound search maximizing total committed value subject to
   per-`(chain, token_kind)` credit constraints.
-- **Source-deposit verification** — read the source-chain deposit tx by
-  id (`SwapRequest.source_tx_id`) and validate args before committing.
-  Requires a cross-track decision on the source-tx-id encoding (raw
-  hash vs `eth_getLogs` filter vs derived id).
+- **Source-deposit locator hardening** — the current verifier validates
+  `SwapRequest.source_tx_id` before committing; ETH uses a bounded
+  `eth_getLogs` window over recent blocks, while SOL reads the source
+  tx directly. Future work can carry a richer tx/block locator to avoid
+  event search entirely.
 - **Outstanding-commits tracking + one-leg-stuck retry** — persistent
   in-process map of submitted commits, with retry of a missing leg
   after `max_partial_landing_wait_epochs`.
