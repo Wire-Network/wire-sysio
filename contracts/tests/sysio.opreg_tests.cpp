@@ -484,6 +484,65 @@ BOOST_FIXTURE_TEST_CASE(depositinle_credit_over_max_collateral_is_reverted, sysi
    }
 } FC_LOG_AND_RETHROW() }
 
+// SEC-103 (PR #449 review): the deposit cap must hold under RE-ENTRANCY. An
+// operator account that carries contract code is notified by sysio.token::transfer
+// when opreg::deposit moves its SYS collateral, and can re-enter deposit during
+// that notification. Were the cap a pre-read-then-credit (not atomic with the
+// mutation), two credits could pass against the same stale balance and push the
+// WIRE collateral row past asset::max_amount. opreg::deposit performs the cap check
+// INSIDE the same modify as the credit (and credits before the transfer), so the
+// re-entrant deposit observes the already-committed balance: its own check trips
+// and the whole transaction aborts. reenter_deposit (contracts/test_contracts)
+// models the malicious operator — it re-enters deposit(+1) on the outgoing transfer.
+BOOST_FIXTURE_TEST_CASE(deposit_reentrancy_cannot_exceed_max_collateral, sysio_opreg_tester) { try {
+   constexpr uint64_t MAX_COLLATERAL = (uint64_t{1} << 62) - 1;     // asset::max_amount
+   const std::string  CAP_SYS        = "461168601842738.7903 SYS";  // (2^62-1) at precision 4
+   const auto         OPERATOR       = "uwrit.alice"_n;
+
+   BOOST_REQUIRE_EQUAL(success(), setconfig());
+   BOOST_REQUIRE_EQUAL(success(), regoperator(OPERATOR, OPERATOR_TYPE_UNDERWRITER, false));
+
+   // Core SYS token (opreg's CORE_SYM = symbol("SYS", 4)); fund the operator with
+   // EXACTLY the cap so the outer deposit fills the WIRE row to asset::max_amount
+   // and only the re-entrant +1 would exceed it.
+   set_code(TOKEN_ACCOUNT, contracts::token_wasm());
+   set_abi(TOKEN_ACCOUNT, contracts::token_abi().data());
+   set_privileged(TOKEN_ACCOUNT);   // so create/issue can bill the stat/balance RAM
+   produce_blocks();
+   base_tester::push_action(TOKEN_ACCOUNT, "create"_n, TOKEN_ACCOUNT,
+      mvo()("issuer", "sysio")("maximum_supply", CAP_SYS));
+   base_tester::push_action(TOKEN_ACCOUNT, "issue"_n, config::system_account_name,
+      mvo()("to", "sysio")("quantity", CAP_SYS)("memo", "seed"));
+   base_tester::push_action(TOKEN_ACCOUNT, "transfer"_n, config::system_account_name,
+      mvo()("from", "sysio")("to", OPERATOR)("quantity", CAP_SYS)("memo", "fund operator"));
+
+   // Turn the operator into a re-entrant contract, and grant its active authority
+   // the sysio.code permission so its inline deposit ({operator, active}) authorizes.
+   set_code(OPERATOR, contracts::util::reenter_deposit_wasm());
+   set_abi(OPERATOR, contracts::util::reenter_deposit_abi().data());
+   {
+      authority a(get_public_key(OPERATOR, "active"));
+      a.accounts.push_back(permission_level_weight{ {OPERATOR, config::sysio_code_name}, 1 });
+      set_authority(OPERATOR, config::active_name, a, config::owner_name);
+   }
+   produce_blocks();
+
+   // Deposit the entire cap: the credit fills the WIRE row to asset::max_amount, the
+   // outgoing SYS transfer notifies the operator, and its handler re-enters
+   // deposit(+1). The +1 would push the row to 2^62 — its in-modify cap check trips
+   // and aborts the whole transaction. No over-credit is possible.
+   auto r = push_opreg_action(OPERATOR, "deposit"_n,
+                              mvo()("account", OPERATOR)("amount", MAX_COLLATERAL));
+   BOOST_REQUIRE_MESSAGE(r != success(), "re-entrant over-cap deposit unexpectedly succeeded");
+   BOOST_REQUIRE_MESSAGE(r.find("deposit would exceed max collateral") != std::string::npos,
+                         "unexpected failure reason: " + r);
+
+   // The whole transaction reverted — no collateral was credited.
+   auto op = get_operator(OPERATOR);
+   BOOST_REQUIRE(!op.is_null());
+   BOOST_REQUIRE_EQUAL(0u, op["balances"].get_array().size());
+} FC_LOG_AND_RETHROW() }
+
 BOOST_FIXTURE_TEST_CASE(deposit_keeps_chain_token_pairs_separate, sysio_opreg_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), setconfig());
    BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.alice"_n, OPERATOR_TYPE_UNDERWRITER, false));
