@@ -39,6 +39,15 @@ constexpr name     ram_payer       = "sysio"_n;
 /// One end of every cross-chain envelope is always WIRE.
 constexpr uint32_t WIRE_CHAIN_ID  = 1;
 
+using sysio::slug_name_literals::operator""_s;
+
+/// Codename of the Ethereum outpost — the sole source of node-owner NFT (ERC1155) deposits, which
+/// occur on Ethereum mainnet only. This is the `ChainSpec.code` the launch and dev bootstrap configs
+/// register for the EVM chain (`etc/config/dex/dex-config*.json`); it is stable across environments
+/// (only `external_chain_id` differs: 1 on mainnet, 31337 on the anvil devnet). `dispatch_node_owner_reg`
+/// binds inbound registrations to this exact outpost — see the WSA-005 note there.
+constexpr sysio::slug_name NODE_OWNER_SRC_CHAIN = "ETHEREUM"_s;
+
 /// Hard cap on the encoded outbound envelope size, mirroring the Solana
 /// (`opp_outpost::MAX_ENVELOPE_BYTES`) and Ethereum (`OPP.MAX_ENVELOPE_BYTES`)
 /// caps. 64 KiB is the e2e-supported maximum across WIRE / Ethereum / Solana,
@@ -242,17 +251,6 @@ name resolve_account_from_op_address(const opp::types::ChainAddress& op_address)
                 " does not match the proven source outpost chain_code=", proven_chain_code,
                 " (WSA-005 cross-chain provenance mismatch)\n");
    return false;
-}
-
-/// Resolve the VM family (`ChainKind`) of an outpost by its `chain_code` (slug_name value), reading
-/// the authoritative `sysio.chains` registry. Returns `CHAIN_KIND_UNKNOWN` when no row exists — the
-/// caller treats that as "not the expected family, drop". Used by the value-bearing paths whose
-/// payload carries NO exact chain code to match (NodeOwnerRegistration), so binding is by family.
-ChainKind chain_kind_for(uint64_t chain_code) {
-   sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
-   auto pk = sysio::chains::chain_key{sysio::slug_name{chain_code}};
-   if (!chains_tbl.contains(pk)) return ChainKind::CHAIN_KIND_UNKNOWN;
-   return chains_tbl.get(pk).kind;
 }
 
 /// Decode an OperatorAction sub-message and dispatch to the appropriate
@@ -552,20 +550,21 @@ std::optional<sysio::public_key> em_pubkey_from_eth_bytes(const std::vector<char
 /// dispatching transaction.
 ///
 /// WSA-005 source binding: this path is value-bearing (it creates a Wire account, registers a node
-/// owner, and records an ETH authex link, with the consensus-reached attestation as the sole proof),
-/// but `NodeOwnerRegistration` carries no exact chain code to match against the proven source outpost
-/// -- the claim is an ERC1155 NFT deposit identified only by `ChainAddress` fields. So it is bound by
-/// VM family instead: the registration is an Ethereum-family claim (the depositor's `actor_pub_key`
-/// is an EVM secp256k1 key), and is accepted only when the proven source outpost (`chain_code`) is an
-/// EVM chain. This stops a quorum for a non-EVM (SVM/WIRE) outpost from driving Wire-side node-owner
-/// state off a forged claim. Exact single-chain binding would require a chain-code field on the
-/// claim proto (a coordinated outpost change); the family gate closes the cross-VM-family hole today.
+/// owner, and records an ETH authex link, with the consensus-reached attestation as the sole proof).
+/// `NodeOwnerRegistration` carries no chain code of its own -- the claim is an ERC1155 NFT deposit
+/// identified only by `ChainAddress` (VM-family) fields -- so, unlike the other value-bearing payloads,
+/// it cannot self-describe its source. But node-owner NFT deposits originate on exactly one outpost:
+/// the Ethereum mainnet chain (`NODE_OWNER_SRC_CHAIN`). So bind to that outpost directly -- accept only
+/// when the proven source `chain_code` IS the Ethereum outpost, and drop a registration relayed by any
+/// other outpost. That covers both a non-EVM (SVM/WIRE) quorum AND a second, unrelated EVM outpost
+/// (Polygon/Base/Arbitrum/...): a `CHAIN_KIND_EVM` family check would let those through, but they are
+/// not the chain the NFT was deposited on. This is the exact-outpost binding the other paths get from
+/// `source_chain_binding_ok`; the constant stands in for the chain code the claim does not carry.
+/// (If multiple Ethereum-family outposts must each source node-owner registrations, the source has to
+/// become a chain-code field on the proto -- a coordinated outpost change, tracked as a follow-up.)
 void dispatch_node_owner_reg(const std::vector<char>& data, uint64_t chain_code) {
-   if (chain_kind_for(chain_code) != ChainKind::CHAIN_KIND_EVM) {
-      sysio::print("msgch::dispatch_node_owner_reg: DROP -- proven source outpost chain_code=",
-                   chain_code, " is not an EVM outpost (node-owner registration is Ethereum-only)\n");
+   if (!source_chain_binding_ok(chain_code, NODE_OWNER_SRC_CHAIN.value, "dispatch_node_owner_reg"))
       return;
-   }
 
    opp::attestations::NodeOwnerRegistration reg;
    {
@@ -807,8 +806,8 @@ void apply_consensus(name self, uint64_t chain_code, uint32_t epoch_index,
    // Extract + dispatch each attestation in every message of the envelope. The proven source
    // outpost is `chain_code` (validated by `deliver`); the per-attestation dispatch binds every
    // value-bearing payload to it (WSA-005) -- by exact chain_code via `source_chain_binding_ok`
-   // where the payload carries one, and by VM family for NodeOwnerRegistration, which carries no
-   // chain code and is gated to the EVM outpost family in `dispatch_node_owner_reg`.
+   // where the payload carries one, and (for NodeOwnerRegistration, which carries no chain code)
+   // against the fixed Ethereum source outpost `NODE_OWNER_SRC_CHAIN` in `dispatch_node_owner_reg`.
    msgch::attestations_t atts(self);
    for (auto& msg : envelope.messages) {
       for (auto& entry : msg.payload.attestations) {

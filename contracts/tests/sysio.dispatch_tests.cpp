@@ -371,7 +371,14 @@ public:
       uwrit_op_eth_pubkey = em_pubkey_bytes(pub);
    }
 
-   void bootstrap_for_dispatch() {
+   // `outpost_code` / `outpost_kind` name the single bootstrapped outpost. They default to the EVM
+   // "ETH" chain used by the deposit/withdraw/swap/underwrite cases. The node-owner happy path passes
+   // "ETHEREUM" so the source it binds against (msgch's NODE_OWNER_SRC_CHAIN) is the scheduled outpost
+   // and reaches consensus; the non-EVM drop case passes an SVM "SOLANA" so its delivery also reaches
+   // consensus and the drop is exercised at the source binding, not merely the consensus gate. The
+   // outpost is registered before `schbatchgps`, so the batch op is scheduled for it.
+   void bootstrap_for_dispatch(const std::string& outpost_code = "ETH",
+                               ChainKind outpost_kind = ChainKind::CHAIN_KIND_EVM) {
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT,
          "setconfig"_n, mvo()
             ("epoch_duration_sec",                  60)
@@ -410,10 +417,10 @@ public:
       // v6: chains are first-class registry rows.
       BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT,
          "regchain"_n, mvo()
-            ("kind",              ChainKind::CHAIN_KIND_EVM)
-            ("code",              codename_mvo("ETH"))
+            ("kind",              outpost_kind)
+            ("code",              codename_mvo(outpost_code))
             ("external_chain_id", 31337)
-            ("name",              std::string("ethereum-test"))
+            ("name",              std::string("outpost-test"))
             ("description",       std::string{})));
 
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT,
@@ -896,9 +903,12 @@ BOOST_FIXTURE_TEST_CASE(deliver_duplicate_from_same_operator_reverts, sysio_disp
 // owner and inline-records the depositor's ETH link in sysio.authex). Exercises the full dispatch:
 // proto decode (account name + WireKey + ETH key) -> routing -> both roa actions -> recordlink.
 BOOST_FIXTURE_TEST_CASE(dispatch_routes_node_owner_reg_to_roa, sysio_dispatch_tester) { try {
-   bootstrap_for_dispatch();
+   // Node-owner NFT deposits originate on the Ethereum outpost (code "ETHEREUM", matching the launch
+   // bootstrap config and msgch's NODE_OWNER_SRC_CHAIN). Bootstrap it as the scheduled source outpost
+   // so the delivery below reaches consensus and dispatches.
+   bootstrap_for_dispatch("ETHEREUM");
 
-   const auto eth_code = fc::slug_name{"ETH"}.value;
+   const auto eth_code = fc::slug_name{"ETHEREUM"}.value;
    // The claim must carry CLAIM_ACCOUNT's own active key so nodeownreg's active_key_matches passes.
    auto wire_key = k1_pubkey_bytes(get_public_key(CLAIM_ACCOUNT, "active"));
    // Depositor's ETH key (EM, 33-byte compressed).
@@ -922,16 +932,46 @@ BOOST_FIXTURE_TEST_CASE(dispatch_routes_node_owner_reg_to_roa, sysio_dispatch_te
    BOOST_REQUIRE_EQUAL(audit["status"].as<uint64_t>(), 0u);  // CONFIRMED
 } FC_LOG_AND_RETHROW() }
 
-// WSA-005: NodeOwnerRegistration is an Ethereum-family claim (ERC1155 NFT + ETH actor key) carrying
-// no exact chain code, so it is bound by VM family — a registration proven-delivered from a NON-EVM
-// outpost (SOLANA) must be dropped, with no Wire account / node-owner state created. The matched-chain
-// control is `dispatch_routes_node_owner_reg_to_roa` above, which registers from the ETH outpost.
-BOOST_FIXTURE_TEST_CASE(node_owner_reg_from_non_evm_outpost_is_dropped, sysio_dispatch_tester) { try {
-   bootstrap_for_dispatch();   // ETH (EVM) outpost
-   // A second, active, NON-EVM outpost the forged claim is proven-delivered from.
+// WSA-005: node-owner registration is bound to the EXACT Ethereum source outpost (NODE_OWNER_SRC_CHAIN
+// = "ETHEREUM"), not merely to the EVM family. A claim proven-delivered from a DIFFERENT active EVM
+// outpost — here the fixture's "ETH" chain — is dropped, with no Wire account / node-owner state
+// created. This is the precise hole a CHAIN_KIND_EVM family gate would leave open: a second, unrelated
+// EVM operator quorum (Polygon / Base / Arbitrum / …) forging an NFT deposit the Ethereum outpost
+// never saw. deliver() still reaches consensus, so the drop is the source binding, not a missing
+// delivery. The matched-chain control is `dispatch_routes_node_owner_reg_to_roa` above.
+BOOST_FIXTURE_TEST_CASE(node_owner_reg_from_other_evm_outpost_is_dropped, sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();   // registers "ETH" — an EVM outpost, but NOT the node-owner source
+   // Register the real node-owner source too, so the ONLY thing wrong below is the delivering outpost.
    BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
-      ("kind", ChainKind::CHAIN_KIND_SVM)("code", codename_mvo("SOLANA"))
-      ("external_chain_id", 900)("name", std::string("solana-test"))("description", std::string{})));
+      ("kind", ChainKind::CHAIN_KIND_EVM)("code", codename_mvo("ETHEREUM"))
+      ("external_chain_id", 1)("name", std::string("ethereum-mainnet"))("description", std::string{})));
+   const auto other_evm = fc::slug_name{"ETH"}.value;   // active EVM outpost, but not "ETHEREUM"
+
+   auto wire_key  = k1_pubkey_bytes(get_public_key(CLAIM_ACCOUNT, "active"));
+   auto eth_pub   = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em).get_public_key();
+   auto eth_bytes = em_pubkey_bytes(eth_pub);
+   auto payload   = encode_node_owner_registration(
+      CLAIM_ACCOUNT.to_string(), /*tier=*/2,
+      sysio::opp::types::WIRE_KEY_TYPE_K1, wire_key, eth_bytes);
+   auto envelope  = encode_envelope_with_one_attestation(
+      current_epoch(), sysio::opp::types::ATTESTATION_TYPE_NODE_OWNER_REG, payload);
+
+   // Proven outpost = "ETH" (EVM, but not "ETHEREUM"); the exact-chain binding drops it. deliver()
+   // still succeeds (no throw) and reaches consensus.
+   BOOST_REQUIRE_EQUAL(success(), deliver(/*chain_code=*/other_evm, envelope));
+
+   // Nothing was sent to sysio.roa: no node-owner registration and no audit row.
+   BOOST_REQUIRE(get_nodeowner(CLAIM_ACCOUNT).is_null());
+   BOOST_REQUIRE(get_nodeownerreg(CLAIM_ACCOUNT).is_null());
+} FC_LOG_AND_RETHROW() }
+
+// WSA-005 (cross-VM-family case): NodeOwnerRegistration carries no chain code, so msgch binds it to the
+// exact Ethereum source outpost. A registration proven-delivered from a NON-EVM outpost (SOLANA) is
+// dropped too — complementing `node_owner_reg_from_other_evm_outpost_is_dropped` (wrong EVM chain).
+BOOST_FIXTURE_TEST_CASE(node_owner_reg_from_non_evm_outpost_is_dropped, sysio_dispatch_tester) { try {
+   // Bootstrap SOLANA (SVM) as the scheduled outpost so its delivery reaches consensus and the drop is
+   // exercised at the source binding, not the consensus gate.
+   bootstrap_for_dispatch("SOLANA", ChainKind::CHAIN_KIND_SVM);
    const auto sol_code = fc::slug_name{"SOLANA"}.value;
 
    auto wire_key  = k1_pubkey_bytes(get_public_key(CLAIM_ACCOUNT, "active"));
@@ -943,7 +983,8 @@ BOOST_FIXTURE_TEST_CASE(node_owner_reg_from_non_evm_outpost_is_dropped, sysio_di
    auto envelope  = encode_envelope_with_one_attestation(
       current_epoch(), sysio::opp::types::ATTESTATION_TYPE_NODE_OWNER_REG, payload);
 
-   // Proven outpost = SOLANA (SVM); the VM-family gate drops it. deliver() still succeeds (no throw).
+   // Proven outpost = SOLANA (SVM), not "ETHEREUM"; the exact-chain binding drops it. deliver() still
+   // succeeds (no throw) and reaches consensus.
    BOOST_REQUIRE_EQUAL(success(), deliver(/*chain_code=*/sol_code, envelope));
 
    // Nothing was sent to sysio.roa: no node-owner registration and no audit row.
