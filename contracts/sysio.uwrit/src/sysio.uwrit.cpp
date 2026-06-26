@@ -720,6 +720,24 @@ void uwrit::createuwreq(uint64_t attestation_id,
    const uint64_t        src_amount =
       static_cast<uint64_t>(static_cast<int64_t>(sr.source_amount.amount));
 
+   // WSA-005 source-chain binding. `chain_code` is the source outpost `sysio.msgch::dispatch`
+   // proved via `deliver` (an active, non-depot `sysio.chains` row); `sr.source_chain_code` is the
+   // payload's self-asserted source. They MUST be identical — a SwapRequest about a deposit on
+   // chain X is always relayed by outpost X. A divergence means an envelope proven from outpost A is
+   // claiming the swap was funded on a different chain B; settling it would lock/draw against B's
+   // source reserve while the user's funds are escrowed on A — a cross-chain settlement forgery.
+   // Refund on the PROVEN outpost (A, == `chain_code`, where the deposit actually sits) and create
+   // no uwreq. Never throw: we are inside the evalcons dispatch chain, where a `check()` stalls
+   // consensus chain-wide (`feedback_opp_handlers_never_throw`). Checked before the amount/registry
+   // guards because provenance is the most fundamental precondition.
+   if (sr.source_chain_code != chain_code) {
+      emit_swap_revert(get_self(), chain_code, attestation_id, sr,
+                       sysio::slug_name{chain_code}, src_reserve_code,
+                       "SwapRequest rejected: source chain does not match the proven "
+                       "delivering outpost (cross-chain provenance mismatch)");
+      return;
+   }
+
    // Structural guards — refund via SwapRevert, never throw (we are inside
    // the evalcons dispatch chain). Zero amounts are rejected up front so
    // every downstream lock/settlement amount is provably positive (a
