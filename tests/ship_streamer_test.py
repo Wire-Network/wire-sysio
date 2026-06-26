@@ -143,9 +143,10 @@ try:
         results = nonProdNode.pushTransaction(jumbotxn)
         if results[0]:
             break
-        Print(f"Jumbo transaction attempt {attempt}/{jumboMaxRetries} failed (likely transient CPU contention), retrying")
-        time.sleep(attempt)
-    assert results[0], f"Failed to land jumbo transaction after {jumboMaxRetries} attempts"
+        if attempt < jumboMaxRetries:
+            Print(f"Jumbo transaction attempt {attempt}/{jumboMaxRetries} failed (likely transient CPU contention), retrying")
+            time.sleep(attempt)
+    assert results[0], f"Failed to land jumbo transaction after {jumboMaxRetries} attempts; last node response: {results[1]}"
 
     Print("Configure and launch txn generators")
     targetTpsPerGenerator = 10
