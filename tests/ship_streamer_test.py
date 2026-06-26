@@ -130,8 +130,22 @@ try:
                      "data": "",
                      "compression": "none"}]
     }
-    results = nonProdNode.pushTransaction(jumbotxn)
-    assert(results[0])
+    # The jumbotime action writes a ~33MB row but normally completes well under max_transaction_cpu_usage.
+    # CPU is billed by wall-clock elapsed time, so under the concurrent NP/LR test sharding the nodeop thread
+    # can be descheduled mid-execution (CPU starvation) and trip the deadline anyway -- the trx is aborted
+    # with tx_cpu_usage_exceeded the instant it crosses the limit, so the billed time only ever shows up just
+    # over it and is not a true measure of the work. Raising the limit wouldn't reliably help (a bad enough
+    # stall trips any limit), but the stall is transient: retry. clio rebuilds the transaction with a fresh
+    # ref block and expiration each attempt (no duplication), and the backoff lets contention subside first.
+    jumboMaxRetries = 5
+    results = (False, None)
+    for attempt in range(1, jumboMaxRetries + 1):
+        results = nonProdNode.pushTransaction(jumbotxn)
+        if results[0]:
+            break
+        Print(f"Jumbo transaction attempt {attempt}/{jumboMaxRetries} failed (likely transient CPU contention), retrying")
+        time.sleep(attempt)
+    assert results[0], f"Failed to land jumbo transaction after {jumboMaxRetries} attempts"
 
     Print("Configure and launch txn generators")
     targetTpsPerGenerator = 10
