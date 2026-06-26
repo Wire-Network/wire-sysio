@@ -378,9 +378,17 @@ class Cluster(object):
         if topo=="bridge":
             shapeFilePrefix="shape_bridge"
             shapeFile=shapeFilePrefix+".json"
+            # Keep the shape file inside this cluster's per-process log directory. nodeopLogPath is
+            # uniquified by PID, so every test gets its own copy. Writing the bare relative filename
+            # instead would land it in the shared CWD ($BUILD_DIR); two "bridge" topology tests running
+            # concurrently (e.g. nodeop_snapshot_forked_test and nodeop_short_fork_take_over_test) would
+            # then read and write the same ./shape_bridge.json, racing and corrupting it. The reader
+            # (make_custom() in launcher.py) would observe a partially/doubly written document and fail
+            # with json.decoder.JSONDecodeError: "Extra data".
+            shapeFilePath=nodeopLogPath / shapeFile
             cmdArrForOutput=copy.deepcopy(argsArr)
             cmdArrForOutput.append("--output")
-            cmdArrForOutput.append(str(nodeopLogPath / shapeFile))
+            cmdArrForOutput.append(str(shapeFilePath))
             cmdArrForOutput.append("--shape")
             cmdArrForOutput.append("line")
             s=" ".join(cmdArrForOutput)
@@ -388,8 +396,8 @@ class Cluster(object):
             bridgeLauncher.define_network()
             bridgeLauncher.generate()
 
-            Utils.Print(f"opening {topo} shape file: {nodeopLogPath / shapeFile}")
-            f = open(nodeopLogPath / shapeFile, "r")
+            Utils.Print(f"opening {topo} shape file: {shapeFilePath}")
+            f = open(shapeFilePath, "r")
             shapeFileJsonStr = f.read()
             f.close()
             shapeFileObject = json.loads(shapeFileJsonStr)
@@ -468,12 +476,12 @@ class Cluster(object):
             connectGroup(producerGroup1, producerNodes, bridgeNodes)
             connectGroup(producerGroup2, producerNodes, bridgeNodes)
 
-            f=open(shapeFile,"w")
+            f=open(shapeFilePath,"w")
             f.write(json.dumps(shapeFileObject, indent=4, sort_keys=True))
             f.close()
 
             argsArr.append("--shape")
-            argsArr.append(shapeFile)
+            argsArr.append(str(shapeFilePath))
         else:
             argsArr.append("--shape")
             argsArr.append(topo)
