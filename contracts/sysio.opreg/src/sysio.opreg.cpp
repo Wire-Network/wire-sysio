@@ -929,17 +929,29 @@ void opreg::deposit(name account, uint64_t amount) {
          op.status != OperatorStatus::OPERATOR_STATUS_TERMINATED,
          "operator not in a deposit-eligible state");
 
-   // Collateral must stay within the asset magnitude range: the WIRE-direct
-   // withdraw / terminate remit path builds `asset(balance, CORE_SYM)`, which
-   // aborts above `asset::max_amount`. Reject before the inline WIRE transfer
-   // moves anything, so the running sum can never exceed the cap. A direct user
-   // deposit may legitimately `check()`-throw here — unlike the never-throw OPP
-   // `depositinle` — and the whole transaction reverts, so no tokens move (SEC-103).
-   check(amount <= MAX_COLLATERAL_AMOUNT &&
-            balance_of(op, kWireChainCode, kWireTokenCode) <= MAX_COLLATERAL_AMOUNT - amount,
-         "deposit would exceed max collateral");
+   // Credit collateral BEFORE the outbound WIRE transfer, with the cap check
+   // performed ATOMICALLY inside the same `modify` as the credit — reading the
+   // live row, not the `op` copy read above. This closes a reentrancy window on
+   // operator accounts that carry contract code: `sysio.token::transfer` notifies
+   // `from` (the operator), and that notification handler could re-enter
+   // `deposit`. A separate pre-read-then-check-then-credit could let two credits
+   // pass against the same stale balance and push the WIRE row past
+   // `asset::max_amount` — recreating the withdraw/terminate remit abort
+   // (`asset(balance, CORE_SYM)` aborts above the limit). Checking inside the
+   // modify makes check+credit indivisible, and crediting before the transfer
+   // means any re-entry observes the committed balance. A direct user deposit may
+   // legitimately `check()`-throw here (unlike the never-throw OPP `depositinle`);
+   // if the transfer below aborts (operator lacks the WIRE) the whole
+   // transaction — including this credit — rolls back. (SEC-103; PR #449 review.)
+   ops.modify(same_payer, op_pk, [&](auto& o) {
+      check(amount <= MAX_COLLATERAL_AMOUNT &&
+               balance_of(o, kWireChainCode, kWireTokenCode) <= MAX_COLLATERAL_AMOUNT - amount,
+            "deposit would exceed max collateral");
+      add_balance(o, kWireChainCode, kWireTokenCode, amount);
+   });
 
-   // Direct WIRE token transfer from operator -> opreg.
+   // Direct WIRE token transfer from operator -> opreg, sent after the credit so
+   // a transfer-notification re-entry observes the already-committed balance.
    action(
       permission_level{account, "active"_n},
       TOKEN_ACCOUNT, "transfer"_n,
@@ -947,10 +959,6 @@ void opreg::deposit(name account, uint64_t amount) {
          asset(static_cast<int64_t>(amount), CORE_SYM),
          std::string("opreg::deposit"))
    ).send();
-
-   ops.modify(same_payer, op_pk, [&](auto& o) {
-      add_balance(o, kWireChainCode, kWireTokenCode, amount);
-   });
 
    auto deposit_action = build_deposit_action(
       operator_chain_address(account, kWireChainCode),
