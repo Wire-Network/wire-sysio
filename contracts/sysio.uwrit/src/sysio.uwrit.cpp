@@ -162,7 +162,10 @@ uint64_t available_via_mirrors(name self,
    }
    uint64_t locked  = sum_locks_inline(self, underwriter, chain_code, token_code);
    uint64_t pending = opreg_pending_withdraws(underwriter, chain_code, token_code);
-   uint64_t reserved = locked + pending;
+   // Saturating: a wrap of locked+pending would understate `reserved` and
+   // overstate availability — the exact direction that lets an overcommit
+   // through. The cap is unreachable for real amounts.
+   uint64_t reserved = opp::safe::add_sat_u64(locked, pending);
    return balance > reserved ? balance - reserved : 0;
 }
 
@@ -1034,16 +1037,48 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
       return;
    }
 
-   // Bond availability — required legs only (the WIRE leg carries no bond).
-   const uint64_t src_avail = src_needed
-      ? available_via_mirrors(self, candidate, req.src_chain_code, req.src_token_code) : 0;
-   const uint64_t dst_avail = dst_needed
-      ? available_via_mirrors(self, candidate, req.dst_chain_code, req.dst_token_code) : 0;
-   if ((src_needed && src_avail < req.src_amount) ||
-       (dst_needed && dst_avail < req.dst_amount)) {
-      // Insufficient bond — disqualify this candidate, leave the race open.
+   // ── Bond availability — required legs, aggregated per collateral bucket ─
+   // Underwriter collateral is held and rolled up by (underwriter,
+   // chain_code, token_code) — NOT by reserve_code (see `available_via_mirrors`
+   // / `opreg::available`). A same-(chain, token) swap between two reserves
+   // (distinct `reserve_code`, a shape `rcrdcommit` explicitly routes) draws
+   // BOTH required legs against the SAME balance bucket. Checking each leg
+   // independently would let an underwriter whose balance covers each single
+   // leg but not their sum win and write two locks that overcommit the one
+   // balance: balance 150 wins `src_amount=100` + `dst_amount=100` because
+   // 150>=100 holds per leg, yet the aggregate 200 is uncovered, and
+   // the deferred slash/remit cleanup (`opreg::releaselock` inside `chklocks`)
+   // then has to draw 200 from a 150 balance. Require availability to cover
+   // the AGGREGATE required amount of every leg that shares a collateral
+   // bucket. `add_sat_u64` keeps the sum overflow-free — a near-`UINT64_MAX`
+   // aggregate saturates and is rejected, never wraps to a small passing
+   // value; this resolver is non-throwing (`feedback_opp_handlers_never_throw`),
+   // so saturate-then-compare is the correct guard here, not a checked throw.
+   const bool same_bucket = src_needed && dst_needed
+                            && req.src_chain_code == req.dst_chain_code
+                            && req.src_token_code == req.dst_token_code;
+   bool insufficient_bond = false;
+   if (same_bucket) {
+      // One opreg balance funds both legs — it must cover their sum.
+      const uint64_t need  = opp::safe::add_sat_u64(req.src_amount, req.dst_amount);
+      const uint64_t avail = available_via_mirrors(self, candidate,
+                                                   req.src_chain_code, req.src_token_code);
+      insufficient_bond = avail < need;
+   } else {
+      // Distinct buckets (or a single required leg) — check each independently.
+      const uint64_t src_avail = src_needed
+         ? available_via_mirrors(self, candidate, req.src_chain_code, req.src_token_code) : 0;
+      const uint64_t dst_avail = dst_needed
+         ? available_via_mirrors(self, candidate, req.dst_chain_code, req.dst_token_code) : 0;
+      insufficient_bond = (src_needed && src_avail < req.src_amount)
+                       || (dst_needed && dst_avail < req.dst_amount);
+   }
+   if (insufficient_bond) {
+      // Insufficient bond to cover the aggregate required collateral —
+      // disqualify this candidate, leave the race open for another.
       disqualify_candidate(reqs, pk, candidate,
-                           "insufficient bond on one or both legs");
+                           "insufficient bond to cover the aggregate required "
+                           "collateral on one or both legs");
       return;
    }
 
@@ -1664,8 +1699,11 @@ uint64_t uwrit::sumlocks(name underwriter,
 // Runs as one of the FIRST steps of sysio.epoch::advance so freshly freed
 // collateral is visible to the same advance's withdraw flushing. NEVER
 // throws on reachable state: lock amounts are provably positive (enforced
-// at uwreq/queue creation), so opreg::releaselock's amount check cannot
-// fire.
+// at uwreq/queue creation), so opreg::releaselock's amount>0 check cannot
+// fire; and releaselock clamps its balance subtraction to the live bucket,
+// so even a residual over-committed lock set cannot underflow + abort the
+// advance (defence-in-depth — the winner-selection aggregate bond check
+// already prevents the over-commit at lock-creation time).
 void uwrit::chklocks() {
    // Two valid callers:
    //   * sysio.epoch::advance — inlined at every epoch boundary.
