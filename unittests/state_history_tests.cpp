@@ -6,6 +6,7 @@
 #include <sysio/state_history/abi.hpp>
 #include <sysio/state_history/create_deltas.hpp>
 #include <sysio/state_history/log_catalog.hpp>
+#include <sysio/state_history/status_request_queue.hpp>
 #include <sysio/state_history/trace_converter.hpp>
 #include <sysio/testing/tester.hpp>
 #include <fc/io/json.hpp>
@@ -64,6 +65,38 @@ std::vector<table_delta> create_deltas(const chainbase::database& db, bool full_
 }
 
 BOOST_AUTO_TEST_SUITE(test_state_history)
+
+/// Verifies SHiP status requests are bounded, drained by version count, and reusable after drain.
+BOOST_AUTO_TEST_CASE(status_request_queue_is_bounded)
+{
+   sysio::state_history::status_request_queue queue;
+   std::size_t expected_v0 = 0;
+   std::size_t expected_v1 = 0;
+
+   for(std::size_t i = 0; i < sysio::state_history::max_status_request_queue_depth; ++i) {
+      const sysio::state_history::status_request_version request_version =
+            (i % 2) == 1 ? sysio::state_history::status_request_version::v1 :
+                           sysio::state_history::status_request_version::v0;
+      BOOST_REQUIRE(queue.try_append(request_version));
+
+      if(request_version == sysio::state_history::status_request_version::v1)
+         ++expected_v1;
+      else
+         ++expected_v0;
+   }
+
+   BOOST_REQUIRE_EQUAL(queue.size(), sysio::state_history::max_status_request_queue_depth);
+   BOOST_CHECK(!queue.try_append(sysio::state_history::status_request_version::v0));
+
+   const sysio::state_history::pending_status_request_counts pending = queue.pop_all();
+   BOOST_CHECK(queue.empty());
+   BOOST_REQUIRE_EQUAL(pending.size(), sysio::state_history::max_status_request_queue_depth);
+   BOOST_CHECK_EQUAL(pending.v0, expected_v0);
+   BOOST_CHECK_EQUAL(pending.v1, expected_v1);
+
+   BOOST_CHECK(queue.try_append(sysio::state_history::status_request_version::v1));
+   BOOST_REQUIRE_EQUAL(queue.size(), 1u);
+}
 
 class table_deltas_tester : public tester {
 public:

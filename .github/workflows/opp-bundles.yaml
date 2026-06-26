@@ -38,9 +38,9 @@ jobs:
           package_json_file: libraries/opp/tools/package.json
 
       - name: Install deps
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
+          # PR validation must not expose the npm publish token to dependency
+          # install lifecycle scripts; publishing is scoped to the push-only step.
           cd ./libraries/opp/tools
           pnpm install
         
