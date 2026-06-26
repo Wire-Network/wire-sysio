@@ -20,8 +20,6 @@
 #include <boost/iostreams/device/back_inserter.hpp>
 #include <boost/iostreams/copy.hpp>
 
-#include <deque>
-
 using namespace sysio::chain;
 using namespace sysio::testing;
 using namespace std::literals;
@@ -68,28 +66,35 @@ std::vector<table_delta> create_deltas(const chainbase::database& db, bool full_
 
 BOOST_AUTO_TEST_SUITE(test_state_history)
 
-/// Verifies SHiP status requests are bounded, drained in FIFO order, and reusable after drain.
+/// Verifies SHiP status requests are bounded, drained by version count, and reusable after drain.
 BOOST_AUTO_TEST_CASE(status_request_queue_is_bounded)
 {
    sysio::state_history::status_request_queue queue;
+   std::size_t expected_v0 = 0;
+   std::size_t expected_v1 = 0;
 
    for(std::size_t i = 0; i < sysio::state_history::max_status_request_queue_depth; ++i) {
-      const bool is_v1_request = (i % 2) == 1;
-      BOOST_REQUIRE(queue.try_append(is_v1_request));
+      const sysio::state_history::status_request_version request_version =
+            (i % 2) == 1 ? sysio::state_history::status_request_version::v1 :
+                           sysio::state_history::status_request_version::v0;
+      BOOST_REQUIRE(queue.try_append(request_version));
+
+      if(request_version == sysio::state_history::status_request_version::v1)
+         ++expected_v1;
+      else
+         ++expected_v0;
    }
 
    BOOST_REQUIRE_EQUAL(queue.size(), sysio::state_history::max_status_request_queue_depth);
-   BOOST_CHECK(!queue.try_append(false));
+   BOOST_CHECK(!queue.try_append(sysio::state_history::status_request_version::v0));
 
-   const std::deque<bool> pending = queue.pop_all();
+   const sysio::state_history::pending_status_request_counts pending = queue.pop_all();
    BOOST_CHECK(queue.empty());
    BOOST_REQUIRE_EQUAL(pending.size(), sysio::state_history::max_status_request_queue_depth);
-   for(std::size_t i = 0; i < pending.size(); ++i) {
-      const bool expected_is_v1_request = (i % 2) == 1;
-      BOOST_CHECK_EQUAL(pending[i], expected_is_v1_request);
-   }
+   BOOST_CHECK_EQUAL(pending.v0, expected_v0);
+   BOOST_CHECK_EQUAL(pending.v1, expected_v1);
 
-   BOOST_CHECK(queue.try_append(true));
+   BOOST_CHECK(queue.try_append(sysio::state_history::status_request_version::v1));
    BOOST_REQUIRE_EQUAL(queue.size(), 1u);
 }
 
