@@ -41,9 +41,6 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/nodeop_forked_chain_test.py ${CMAKE_C
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/nodeop_short_fork_take_over_test.py ${CMAKE_CURRENT_BINARY_DIR}/nodeop_short_fork_take_over_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/nodeop_run_test.py ${CMAKE_CURRENT_BINARY_DIR}/nodeop_run_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/nodeop_lib_test.py ${CMAKE_CURRENT_BINARY_DIR}/nodeop_lib_test.py COPYONLY)
-configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/producer_api_public_http_test.py
-  ${CMAKE_CURRENT_BINARY_DIR}/producer_api_public_http_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/nodeop_under_min_avail_ram.py ${CMAKE_CURRENT_BINARY_DIR}/nodeop_under_min_avail_ram.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/nodeop_irreversible_mode_test.py ${CMAKE_CURRENT_BINARY_DIR}/nodeop_irreversible_mode_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/nodeop_read_terminate_at_block_test.py ${CMAKE_CURRENT_BINARY_DIR}/nodeop_read_terminate_at_block_test.py COPYONLY)
@@ -271,8 +268,6 @@ add_p_test(NAME clio_em_key_test COMMAND tests/clio_em_key_test.py)
 add_p_test(NAME sysio_util_snapshot_info_test COMMAND tests/sysio_util_snapshot_info_test.py)
 
 add_np_test(NAME http_plugin_test COMMAND tests/http_plugin_test.py TIMEOUT 200)
-
-add_p_test(NAME producer_api_public_http_test COMMAND tests/producer_api_public_http_test.py)
 
 add_np_test(NAME plugin_http_api_test COMMAND tests/plugin_http_api_test.py TIMEOUT 100)
 

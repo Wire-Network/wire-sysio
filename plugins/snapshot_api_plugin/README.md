@@ -27,6 +27,12 @@ nodeop \
 
 This exposes **all** enabled API categories on port 8888. For production nodes this is usually not desirable — you likely want to keep admin APIs (producer, chain write) on loopback while exposing only snapshot endpoints publicly.
 
+This is especially important when `producer_api_plugin` is enabled. Its `producer_rw` and admin `snapshot` categories
+can pause production, alter runtime settings, or create/schedule snapshot work. `nodeop` warns when those categories
+are reachable beyond loopback, but it does not block the configuration because some producers intentionally run their
+admin APIs on closed private networks. Treat any non-loopback bind for those categories as a deliberate
+private-management-network decision, not as a public HTTP configuration.
+
 ### Recommended: Isolate with `--http-category-address`
 
 Use `--http-category-address` to bind only the `snapshot_ro` category to a public address, keeping everything else on loopback:
