@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <cstddef>
 #include <string_view>
 
 #include <fc/network/solana/solana_types.hpp>
@@ -35,5 +36,12 @@ inline constexpr uint64_t ETH_MIN_CONFIRMATIONS = 12;
 /// reorgs become a real concern) is one edit.
 inline constexpr auto SOL_COMMITMENT =
    fc::network::solana::commitment_t::confirmed;
+
+/// SOL: maximum page size accepted by Solana JSON-RPC
+/// `getSignaturesForAddress`. The underwriter walks one page per retry
+/// callback and persists the `before` cursor between outer scan cycles so
+/// unrelated newer program traffic cannot keep an older valid source deposit
+/// outside the verifier's search window forever.
+inline constexpr size_t SOL_SIGNATURE_SCAN_PAGE_SIZE = 1000;
 
 } // namespace sysio::underwriter
