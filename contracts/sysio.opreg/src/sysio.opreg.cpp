@@ -4,6 +4,7 @@
 #include <sysio.authex/sysio.authex.hpp>
 #include <sysio.uwrit/sysio.uwrit.hpp>
 #include <sysio.opp.common/slug_name.hpp>
+#include <sysio.opp.common/safe_ops.hpp>
 #include <sysio/opp/attestations/attestations.pb.hpp>
 #include <magic_enum/magic_enum.hpp>
 #include <zpp_bits.h>
@@ -267,7 +268,9 @@ uint64_t sum_locks_inline(name account, sysio::slug_name chain_code, sysio::slug
    auto end = idx.upper_bound(account.value);
    for (; it != end; ++it) {
       if (it->chain_code != chain_code || it->token_code != token_code) continue;
-      total += it->amount;
+      // Saturating: amounts are uncapped uint64 (external-chain values); a
+      // wrapped subtotal would understate `reserved` and overstate availability.
+      total = opp::safe::add_sat_u64(total, it->amount);
    }
    return total;
 }
@@ -290,7 +293,9 @@ uint64_t sum_pending_withdraws(name account, sysio::slug_name chain_code, sysio:
    auto end = idx.upper_bound(account.value);
    for (; it != end; ++it) {
       if (it->chain_code != chain_code || it->token_code != token_code) continue;
-      total += it->amount;
+      // Saturating: amounts are uncapped uint64 (external-chain values); a
+      // wrapped subtotal would understate `reserved` and overstate availability.
+      total = opp::safe::add_sat_u64(total, it->amount);
    }
    return total;
 }
@@ -320,7 +325,10 @@ uint64_t available_inline(const opreg::operator_entry& op,
 
    uint64_t locked  = sum_locks_inline(op.account, chain_code, token_code);
    uint64_t pending = sum_pending_withdraws(op.account, chain_code, token_code);
-   uint64_t reserved = locked + pending;
+   // Saturating: a wrap of locked+pending would understate `reserved` and
+   // overstate availability — the direction that admits an overcommit. The
+   // cap is unreachable for real amounts.
+   uint64_t reserved = opp::safe::add_sat_u64(locked, pending);
    return bal->balance > reserved ? bal->balance - reserved : 0;
 }
 
@@ -1218,13 +1226,38 @@ void opreg::releaselock(name account,
 
    // SLASHED or TERMINATED — decrement opreg balance and emit the matching
    // outbound attestation (deferred-slash to LP or deferred-remit to authex).
+   //
+   // Clamp the settled amount to the live balance bucket. In correct
+   // operation sum(active locks) <= balance for every (underwriter,
+   // chain_code, token_code) — the sysio.uwrit winner check reserves the
+   // aggregate per collateral bucket before writing locks — so `amount`
+   // never exceeds the remaining balance and this clamp is a no-op.
+   // It is the safety net for any residual/over-committed lock set:
+   // releaselock runs INLINE inside `sysio.uwrit::chklocks` at
+   // `sysio.epoch::advance`, and a `subtract_balance` underflow `check()`
+   // there would abort the advance and permanently stall epoch advancement
+   // chain-wide (`epoch-stall-is-fatal`). Settle — and attest — only what the
+   // balance can actually back.
+   uint64_t settle_amount = amount;
+   if (const auto* bal = find_balance(op, chain_code, token_code)) {
+      if (settle_amount > bal->balance) settle_amount = bal->balance;
+   } else {
+      settle_amount = 0;   // no balance row for this bucket — nothing to settle
+   }
+   if (settle_amount == 0) {
+      // Bucket already fully drained (e.g. by prior releases of an
+      // over-committed set) — the caller has erased the lock row; emit no
+      // zero-value slash/remit attestation.
+      return;
+   }
+
    ops.modify(same_payer, op_pk, [&](auto& o) {
-      subtract_balance(o, chain_code, token_code, amount);
+      subtract_balance(o, chain_code, token_code, settle_amount);
    });
 
    if (op.status == OperatorStatus::OPERATOR_STATUS_SLASHED) {
       auto slash_action = build_slash_action(op.account, op.type,
-                                             chain_code, token_code, amount,
+                                             chain_code, token_code, settle_amount,
                                              /*reason*/ "deferred slash on lock release");
       emit_slash_attestation(get_self(), slash_action);
       append_action_log(ops, op_pk, slash_action, /*success*/ true, "");
@@ -1237,12 +1270,12 @@ void opreg::releaselock(name account,
             permission_level{get_self(), "active"_n},
             TOKEN_ACCOUNT, "transfer"_n,
             std::make_tuple(get_self(), account,
-               asset(static_cast<int64_t>(amount), CORE_SYM),
+               asset(static_cast<int64_t>(settle_amount), CORE_SYM),
                std::string("terminate-deferred-remit"))
          ).send();
       } else {
          emit_withdraw_remit(get_self(), op.account, op.type,
-                             chain_code, token_code, amount, /*request_id*/ 0);
+                             chain_code, token_code, settle_amount, /*request_id*/ 0);
       }
    }
 }
