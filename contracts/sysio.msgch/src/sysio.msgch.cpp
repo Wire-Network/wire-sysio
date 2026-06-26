@@ -421,8 +421,10 @@ void dispatch_reserve_create(name self, const std::vector<char>& data, uint64_t 
    // `external_amount` (a `ReserveAmount`): the amount is ALREADY in the
    // depot's canonical 9-decimal frame (the outpost converts chain-native
    // units at the boundary, exactly like the swap paths). A negative OR
-   // out-of-range TokenAmount collapses to 0 so `oncrtreserve`'s zero-amount
-   // guard cancels the request back (refunding the creator) instead of wrapping.
+   // out-of-range TokenAmount collapses to 0, which `oncrtreserve` routes into its
+   // cancel/refund flow — inserting a CANCELLED row and queueing
+   // RESERVE_CREATE_CANCELLED so the outpost releases the creator's escrow —
+   // instead of wrapping into a huge custodied amount.
    const auto&    ext        = rc.external_amount;
 
    // WSA-005: `external_amount.chain_code` is documented in the proto as "the outpost's own chain".
