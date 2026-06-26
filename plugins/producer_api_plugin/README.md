@@ -1,4 +1,4 @@
-# Producer API Plugin — Operator Guide
+# Producer API Plugin - Operator Guide
 
 The `producer_api_plugin` exposes HTTP endpoints for inspecting and administering a producing node. It is intended
 for node operators and automation that already run inside the operator's trusted management environment.
@@ -7,11 +7,11 @@ for node operators and automation that already run inside the operator's trusted
 
 The plugin registers endpoints in these HTTP API categories:
 
-- `producer_ro` — read-only producer status, runtime options, greylist/whitelist state, protocol feature state, and
+- `producer_ro` - read-only producer status, runtime options, greylist/whitelist state, protocol feature state, and
   unapplied transaction inspection.
-- `producer_rw` — administrative actions such as pause/resume production, changing runtime options, updating greylist
+- `producer_rw` - administrative actions such as pause/resume production, changing runtime options, updating greylist
   and whitelist settings, scheduling protocol feature activations, and requesting integrity hashes.
-- `snapshot` — administrative snapshot creation and snapshot scheduling through the producer API.
+- `snapshot` - administrative snapshot creation and snapshot scheduling through the producer API.
 
 ## Network Exposure
 
