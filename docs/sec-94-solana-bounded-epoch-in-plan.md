@@ -8,7 +8,9 @@ This plan supersedes the earlier finalization paging proposal. The paging
 proposal introduced a post-consensus crank/page action. That shape is rejected:
 Solana outpost consensus must continue to hold inside the existing
 consensus-reaching `epoch_in` transaction. The fix should make each outbound
-envelope safe before any batch operator delivers it to Solana.
+envelope safe before any batch operator delivers it to Solana, and it should
+prefer a small pre-consensus Solana program change if that materially simplifies
+the safety proof.
 
 Primary repositories:
 
@@ -160,6 +162,14 @@ change. The existing OPP envelope already carries the attestations. The change
 is how `sysio.msgch::buildenv` chooses the prefix of READY attestations for an
 SVM outpost.
 
+The estimator is consensus-critical. It must be a guaranteed upper bound on the
+real final-transaction account count and packet bytes, including safety margin.
+Under-packing is acceptable because it only reduces throughput. Over-packing is
+unsafe because `buildenv` has already committed the PROCESSED/READY split and
+the pending outbound envelope. If that committed envelope cannot be represented
+as a Solana transaction, every batch operator will see the same unrepresentable
+envelope and the system needs an explicit recovery path.
+
 Overflow behavior should mirror the existing byte-cap behavior:
 
 - build the largest stable prefix that fits all applicable limits;
@@ -172,10 +182,91 @@ This keeps all batch operators deterministic. Every operator reads the same
 bounded `outenvelopes` row, delivers the same bytes, and consensus/finalization
 still happens in the ordinary `epoch_in` path.
 
+## Preferred Crank-Free Shape
+
+The cleanest version of this plan makes one small Solana program/API change:
+separate the last byte-upload from the consensus/finalization call.
+
+Today the final `epoch_in` transaction carries both:
+
+- the last data chunk; and
+- every dynamic effect account needed by inline finalization.
+
+That coupling makes the packet budget depend on `encoded_envelope_size %
+SOLANA_MAX_CHUNK_BYTES`. With the current `672` byte chunk size, the dynamic
+account budget is approximately:
+
+```text
+floor((1232 - 492 - 40 - final_chunk_bytes) / 33)
+```
+
+So a near-empty final chunk allows about 21 dynamic accounts, while a near-full
+final chunk allows about 0. The result is a sawtooth budget: removing one
+attestation can make `final_chunk_bytes` jump upward by hundreds of bytes, even
+though the dynamic account count dropped. A naive "pop one and retry" loop must
+not assume this estimate is monotonic.
+
+Preferred fix:
+
+- upload all non-empty envelope chunks first;
+- submit a terminal `epoch_in` mode with zero chunk data, or an
+  `epoch_in_finalize` instruction, that consumes the already-complete
+  `EnvelopeChunks` buffer and carries the dynamic effect accounts;
+- perform the existing delivery record, consensus check, attestation dispatch,
+  outbound emit, and chunk-buffer close inside that terminal call.
+
+This is not a post-consensus crank. It is the final pre-consensus delivery step
+for that operator, and consensus still becomes true inside the same
+`epoch_in`-family transaction. The benefit is that the dynamic-account budget
+is stable and monotonic, roughly 21 accounts before safety margin, independent
+of envelope byte alignment.
+
+If the team rejects this small Solana change, `sysio.msgch::buildenv` must use
+an exhaustive descending-prefix search or another algorithm that handles the
+non-monotonic modulo budget correctly. It must not rely on the existing byte
+trim loop's monotonic intuition.
+
+## Throughput Decision
+
+The bounded-envelope fix converts a hard final-chunk failure into intentional
+READY backlog. That is safer, but it creates a real throughput ceiling for
+Solana-bound value transfers.
+
+Using the current final-chunk shape:
+
+- near-empty final chunk: about 21 dynamic accounts;
+- native `SWAP_REMIT`: about 2 dynamic accounts per swap, so roughly 9 native
+  swaps per epoch after safety margin;
+- SPL `SWAP_REMIT`: up to about 6 dynamic accounts per swap, so roughly 3 SPL
+  swaps per epoch after safety margin;
+- near-full final chunk: about 0 dynamic accounts.
+
+With the preferred zero-data terminal finalize shape:
+
+- the budget is stable at about 21 dynamic accounts before safety margin;
+- native swap throughput is still single-digit per epoch unless the account
+  set is further reduced;
+- SPL swap throughput remains lower because each swap needs more accounts.
+
+Before implementation, the team should size expected Solana-bound withdrawals,
+deposit reverts, and swap remits against this ceiling. If bursts of dozens of
+Solana-bound value transfers per epoch are realistic, bounded packing alone
+will avoid wedges but can still produce unacceptable withdrawal latency. In
+that case the team should either:
+
+- implement the zero-data terminal finalize shape and accept the remaining
+  ceiling as sufficient;
+- adopt Address Lookup Tables as a later transaction-format upgrade; or
+- redesign specific value-transfer effects so one transaction needs fewer
+  dynamic accounts.
+
 ## Account Budget Model
 
 Add an SVM budget estimator to WIRE-side envelope packing. The estimator should
-be conservative: it may under-pack, but it must not over-pack.
+be conservative: it may under-pack, but it must not over-pack. The source of
+truth for the no-extra transaction size must be generated from the actual
+`epoch_in` IDL/program client layout, not copied from a comment. The current
+`492` byte number is evidence, not a consensus parameter definition.
 
 Inputs available to the WIRE contract:
 
@@ -189,13 +280,16 @@ Inputs available to the WIRE contract:
 
 Recommended hard constants:
 
-- `SVM_MAX_TX_PACKET_BYTES`: conservative Solana packet ceiling used for
-  final `epoch_in`.
-- `SVM_MAX_ACCOUNT_KEYS`: 256 account-index ceiling.
+- `SVM_MAX_TX_PACKET_BYTES`: raw Solana packet ceiling used for final
+  `epoch_in`; use `1232` bytes minus a project safety margin. Do not use the
+  observed `1644` base64-encoded transport length as a raw packet budget.
+- `SVM_MAX_ACCOUNT_KEYS`: 256 account-index ceiling, with any project safety
+  margin applied before comparison.
 - `SVM_FINAL_EPOCH_IN_STATIC_ACCOUNT_KEYS`: fee payer, declared `epoch_in`
   accounts, outpost program id, system program, and ComputeBudget program.
-- `SVM_FINAL_EPOCH_IN_STATIC_TX_BYTES`: conservative no-extra final-chunk
-  overhead.
+- `SVM_FINAL_EPOCH_IN_STATIC_TX_BYTES`: conservative no-extra terminal
+  transaction overhead, generated from the real client layout and pinned by
+  tests.
 - `SVM_FINAL_EPOCH_IN_PER_EXTRA_ACCOUNT_BYTES`: at least 33 bytes, plus any
   extra slop needed for compact-u16 length expansion.
 - `SVM_FINAL_EPOCH_IN_SAFETY_BYTES`: fixed safety margin for IDL drift and
@@ -228,8 +322,48 @@ The estimator should dedupe by semantic account identity where deterministic:
 - token code for mint accounts when token classification is known;
 - singleton program ids.
 
-If exact derivation is unavailable in the contract, dedupe by the stable fields
-that determine the PDA or account.
+Dedup is safe only when the contract can prove that two references collapse to
+the same on-chain account that the relay will also dedupe. If exact derivation
+is unavailable in the contract, dedupe by the stable fields that determine the
+PDA or account. If the stable identity is uncertain, over-count. The estimator
+must model the final union size, and the required parity fixture must assert:
+
+```text
+contract_estimated_dynamic_accounts >= relay_actual_dynamic_account_union
+contract_estimated_packet_bytes     >= relay_actual_packet_bytes
+```
+
+The constants above are consensus parameters. Changing them changes which
+attestations become PROCESSED versus remain READY. A change to the Solana IDL,
+the terminal `epoch_in` account list, chunk sizing, or transaction format must
+therefore be treated as a coordinated contract/relay/program rollout.
+
+## Recovery And Escape Hatch
+
+The relay-side guard is a diagnostic tripwire, not a liveness recovery path. If
+the WIRE contract over-packs, the pending outbound envelope is already
+committed. A relay guard firing in production means every honest operator will
+reject the same envelope locally. That is a Sev1 condition, not graceful
+degradation.
+
+Add a governance-controlled recovery action for pending Solana-bound outbound
+envelopes that are proven unrepresentable. The recovery action should:
+
+- require privileged governance or emergency authority;
+- operate only on a pending outbound envelope that has not finalized on the
+  destination outpost;
+- parse the pending raw OPP envelope and reconstruct its attestation entries;
+- recreate those entries as READY in the original order, or directly re-pack
+  them under corrected budget constants;
+- mark the bad pending envelope as abandoned or errored so batch operators stop
+  trying to deliver it;
+- preserve auditability with the old envelope hash, replacement envelope hash,
+  reason, timestamp, and actor;
+- avoid silently dropping any value-transfer attestation.
+
+This action is not part of the happy path and should not be used for routine
+backlog management. It exists because the estimator is consensus-critical and a
+bad constant otherwise creates a permanent wedge.
 
 ## Wire-Sysio Changes
 
@@ -246,15 +380,20 @@ Proposed flow:
 4. Serialize the candidate envelope.
 5. If destination is not SVM, keep current byte-only behavior.
 6. If destination is SVM, compute:
-   - final chunk length: `encoded_size % SOLANA_MAX_CHUNK_BYTES`, treating
-     exact multiples as a full final chunk;
+   - terminal transaction payload length. With the preferred zero-data terminal
+     finalize shape, this is zero. Without that Solana change, it is
+     `encoded_size % SOLANA_MAX_CHUNK_BYTES`, treating exact multiples as a
+     full final chunk;
    - estimated dynamic account count for included attestations;
    - estimated total static plus dynamic account-key count;
    - estimated final transaction packet bytes.
-7. If either SVM limit is exceeded, pop the last candidate and retry, exactly
-   like the current byte trim loop.
+7. If either SVM limit is exceeded, shrink the candidate prefix and retry. If
+   the final-chunk-carries-data shape remains, use an algorithm that handles
+   the non-monotonic modulo budget correctly.
 8. Mark only the final included candidates as `PROCESSED`.
 9. Leave omitted candidates READY for the next epoch.
+10. Provide the governance recovery action for unrepresentable pending
+    envelopes.
 
 Add tests that prove:
 
@@ -264,8 +403,12 @@ Add tests that prove:
 - SVM buildenv does not pack the 128-native-`SWAP_REMIT` account-key
   counterexample into one envelope;
 - omitted READY attestations remain READY and preserve ordering;
-- if one single attestation exceeds the conservative budget, the action fails
-  with an explicit error rather than looping silently.
+- if one single attestation exceeds the conservative budget, it does not DoS
+  the whole outpost queue. The preferred behavior is to mark that attestation
+  as a dead-letter/error state with an explicit refund or remediation policy,
+  not to hard-abort `buildenv` forever.
+- the governance recovery action can reconstruct READY attestations from a
+  pending bad envelope without dropping or reordering them.
 
 ### `plugins/outpost_solana_client_plugin`
 
@@ -284,14 +427,18 @@ Add defensive guards before submitting the final chunk:
 
 These guards are not the primary liveness fix. They catch drift between the
 WIRE contract budget model, relay extraction, and Solana IDL changes before the
-builder wraps `uint8_t` account indices or submits an opaque RPC failure.
+builder wraps `uint8_t` account indices or submits an opaque RPC failure. If
+they fire in production, the committed envelope is already bad and the
+governance recovery action is required.
 
 Also update the extractor tests:
 
 - native `SWAP_REMIT` derives recipient plus Reserve PDA;
 - SPL `SWAP_REMIT` derives the additional SPL accounts;
 - duplicated recipients/reserves are deduped;
-- generated account-budget fixtures match the contract-side estimator.
+- generated account-budget fixtures match the contract-side estimator;
+- CI fails if the relay's actual dynamic account union exceeds the contract
+  estimate for representative native and SPL envelopes.
 
 ### `libraries/libfc/src/network/solana`
 
@@ -315,7 +462,17 @@ submission.
 Do not add `process_finalization_page`, `complete_finalization`, or any other
 post-consensus finalization crank.
 
-Expected Solana-side changes are intentionally small:
+Expected Solana-side changes are intentionally small but should not be limited
+to docs if the team accepts the preferred shape:
+
+- add a terminal zero-data `epoch_in` mode or a pre-consensus
+  `epoch_in_finalize` instruction that consumes a complete chunk buffer and
+  performs the existing delivery/consensus/finalization path;
+- keep this terminal call in the normal operator delivery flow, before
+  consensus is reached, not as a post-consensus page/crank;
+- update the Anchor IDL and relay account resolution for the terminal call.
+
+Additional Solana-side work:
 
 - document the remaining-account contract for every attestation branch in
   `epoch_in.rs`;
@@ -328,6 +485,8 @@ Expected Solana-side changes are intentionally small:
   - maximum accepted final dynamic accounts under the current IDL;
 - keep missing effect-account behavior aligned with the existing
   "do not stall consensus" rule.
+- fix stale comments that still say `MAX_CHUNK_BYTES = 768`; the current
+  value is `672`.
 
 If the Solana program adds any new required finalization accounts, the
 wire-sysio budget constants and tests must be updated in the same release.
@@ -358,13 +517,15 @@ Before this fix:
 
 After this fix:
 
-- `buildenv` emits only envelopes whose final `epoch_in` transaction is within
-  the conservative Solana budget;
+- `buildenv` emits only envelopes whose terminal `epoch_in` transaction is
+  within the conservative Solana budget;
 - excess attestations stay READY and are emitted in later epochs;
 - operators do not need a post-consensus crank;
 - Solana consensus/finalization remains atomic inside `epoch_in`;
 - relay-side guards produce explicit local errors if code drift violates the
-  budget model.
+  budget model;
+- if a bad envelope is nevertheless committed, governance has an explicit
+  recovery path to reconstruct or re-pack the pending attestations.
 
 ## Validation Plan
 
@@ -376,7 +537,9 @@ Add or extend `sysio.msgch` tests to construct Solana-bound READY attestations:
 - `buildenv_svm_limits_native_swap_remit_by_account_key_budget`;
 - `buildenv_svm_keeps_omitted_attestations_ready`;
 - `buildenv_non_svm_preserves_existing_byte_cap_behavior`;
-- `buildenv_svm_single_attestation_over_budget_errors`.
+- `buildenv_svm_single_attestation_over_budget_deadletters_or_errors`;
+- `buildenv_svm_recovery_requeues_bad_pending_envelope`;
+- `buildenv_svm_estimator_is_upper_bound_for_relay_fixtures`.
 
 ### Focused Relay Tests
 
@@ -388,6 +551,11 @@ Add `outpost_solana_client_plugin` tests for:
 - parity fixture between contract budget estimates and relay extraction for
   representative native and SPL envelopes.
 
+The parity fixture is mandatory CI coverage, not optional test polish. It
+duplicates a consensus-critical transaction layout across `wire-sysio`,
+`wire-solana`, and the relay extractor. A drift in the Solana account set must
+fail CI before it can produce a committed unrepresentable envelope.
+
 ### Libfc Solana Tests
 
 Add `test_fc` coverage for:
@@ -395,6 +563,17 @@ Add `test_fc` coverage for:
 - `create_transaction` rejects more than 256 account keys;
 - a boundary case at exactly 256 keys behaves as expected;
 - packet-size guard reports the serialized byte count.
+
+### Wire-Solana Tests
+
+Add Rust/Anchor tests or fixtures that:
+
+- build the real terminal no-extra `epoch_in` transaction shape and report the
+  raw serialized byte count used by the WIRE-side constant;
+- prove the terminal zero-data finalize mode, if implemented, consumes a
+  complete buffer and reaches consensus/finalization in the same handler path;
+- fail when the declared terminal `epoch_in` account set changes without
+  updating the shared budget fixture.
 
 ### Integration Validation
 
@@ -410,30 +589,40 @@ affected targets. For `wire-sysio`, this should include at minimum:
 
 ## Rollout Plan
 
-1. Merge and deploy the WIRE-side account-budget-aware `buildenv` change before
-   relying on larger Solana-bound traffic.
-2. Deploy relay binaries with the defensive final-chunk guards.
-3. Keep the existing Solana outpost program if no IDL/program change is needed.
-4. If `wire-solana` receives documentation/test-only changes, release them with
-   the corresponding relay budget constants.
-5. Monitor logs for "SVM envelope budget trim" events to confirm that excess
+1. Decide whether expected Solana-bound value-transfer volume fits the
+   conservative throughput ceiling. If it does not, include the terminal
+   zero-data finalize change or an ALT plan in the release.
+2. Land `wire-solana` terminal-call changes and generated budget fixtures if
+   the team accepts the preferred shape.
+3. Merge and deploy the WIRE-side account-budget-aware `buildenv` change with
+   the same constants used by the relay/program fixtures.
+4. Deploy relay binaries with the defensive terminal-call guards.
+5. Treat budget constants as consensus parameters. Any later account-list,
+   packet-format, or chunk-size change requires a coordinated
+   contract/relay/program rollout.
+6. Monitor logs for "SVM envelope budget trim" events to confirm that excess
    READY attestations are rolling to later epochs rather than causing final
    chunk failures.
+7. Monitor READY backlog age and count for Solana-bound value transfers. A
+   growing backlog means funds are delayed even though consensus is no longer
+   wedged.
 
 ## Open Questions
 
-1. Should `sysio.msgch` use exact native-vs-SPL classification by reading token
+1. What Solana-bound per-epoch volume is expected for withdrawals, deposit
+   reverts, and swap remits? Does the conservative dynamic-account ceiling meet
+   that requirement without unacceptable latency?
+2. Should the release include the preferred terminal zero-data `epoch_in`
+   shape, or should the first implementation absorb the non-monotonic
+   final-chunk budget in `sysio.msgch`?
+3. Should `sysio.msgch` use exact native-vs-SPL classification by reading token
    metadata, or should the first implementation pessimistically treat all SVM
    token effects as SPL worst case?
-2. What conservative packet ceiling should be used in code: Solana's raw
-   1232-byte packet target, the 1644-byte encoded cap observed in prior logs,
-   or a lower project-defined constant with safety margin?
-3. Should the contract expose a counter or log row when SVM budget trimming
+4. Should the contract expose a counter or log row when SVM budget trimming
    happens, so operators can observe that backlog is intentional?
-4. For a theoretically single-attestation-over-budget case, should `buildenv`
-   fail hard, mark an `ATTESTATION_PROCESSING_ERROR`, or require governance
-   intervention?
-5. Should address lookup tables be considered later for operator convenience?
+5. What is the exact dead-letter or refund policy for a single
+   attestation-over-budget case? Do not hard-abort the whole outpost queue.
+6. Should address lookup tables be considered later for operator convenience?
    They are not part of this primary fix because the current client builds
    legacy transactions and consensus liveness should not depend on ALT
    availability.
