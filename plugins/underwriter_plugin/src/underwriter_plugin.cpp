@@ -19,6 +19,7 @@
 #include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
 #include <sysio/underwriter_plugin/underwriter_plugin.hpp>
 #include <sysio/underwriter_plugin/source_deposit_constants.hpp>
+#include <sysio/underwriter_plugin/solana_source_deposit_scanner.hpp>
 #include <sysio/depot/opreg_status.hpp>
 #include <sysio/opp/opp.hpp>
 #include <sysio/opp/types/types.pb.h>
@@ -27,6 +28,7 @@
 #include <mutex>
 
 #include <algorithm>
+#include <map>
 #include <numeric>
 #include <set>
 #include <tuple>
@@ -75,8 +77,8 @@ struct uw_request {
    /// so the underwriter cannot collude with a stale on-chain
    /// `SwapDeposit` whose terms differ from the depot's UWREQ.
    uint32_t                 variance_tolerance_bps{};
-   /// Source-chain identifier. ETH = 8-byte big-endian `SwapDeposit.id`
-   /// (the outpost-local monotonic counter); SOL = 64-byte signature.
+   /// Source-chain identifier. ETH and SOL both use the 8-byte big-endian
+   /// `SwapDeposit.id` minted by their source outpost's monotonic counter.
    /// Populated by `createuwreq` from `SwapRequest.source_tx_id`. The
    /// underwriter's source-deposit verifier interprets the bytes
    /// per-chain.
@@ -170,10 +172,11 @@ struct underwriter_plugin::impl {
    uint64_t     commits_failed_count          = 0;
    uint64_t     uwreqs_seen_pending_count     = 0;
 
-   // Protects `confirmed_commits` and the diagnostic counters from
-   // concurrent access between the cron-callback (single-threaded) and
-   // the HTTP handler threads. The cron callback takes the lock around
-   // mutations; the HTTP handlers take it around reads.
+   // Protects `confirmed_commits`, `sol_source_deposit_scan_cursors`, and
+   // the diagnostic counters from concurrent access between the
+   // cron-callback (single-threaded) and the HTTP handler threads. The cron
+   // callback takes the lock around mutations; the HTTP handlers take it
+   // around reads.
    mutable std::mutex                stats_mutex;
 
    // Credit lines (read from sysio.opreg::operators each cycle)
@@ -233,6 +236,65 @@ struct underwriter_plugin::impl {
       friend auto operator<=>(const commit_key&, const commit_key&) = default;
    };
    std::set<commit_key>              confirmed_commits;
+
+   /// Per-pending-UWREQ Solana scan cursors. Persisting `before` across
+   /// retry attempts and outer scan cycles prevents unrelated newer
+   /// opp-outpost traffic from keeping a valid source deposit forever
+   /// outside the newest-page window. Terminal negative entries remain until
+   /// the UWREQ leaves PENDING so failed scans do not re-walk full history or
+   /// re-bump mismatch counters every outer scan cycle.
+   underwriter::solana_source_deposit_scan_cursor_map sol_source_deposit_scan_cursors;
+
+   /// Returns the current SOL source-deposit scan cursor for `key`, creating
+   /// one at the newest page when this is the first scan attempt for a UWREQ.
+   underwriter::solana_source_deposit_scan_cursor get_or_create_sol_source_deposit_scan_cursor(
+      const underwriter::solana_source_deposit_scan_key& key) {
+      std::lock_guard lk{stats_mutex};
+      return underwriter::get_or_create_solana_source_deposit_scan_cursor(
+         sol_source_deposit_scan_cursors, key);
+   }
+
+   /// Returns a terminal SOL source-deposit failure for `key`, when one has
+   /// already been recorded while the UWREQ remains PENDING.
+   std::optional<underwriter::solana_source_deposit_scan_cursor>
+   get_sol_source_deposit_terminal_failure(
+      const underwriter::solana_source_deposit_scan_key& key) const {
+      std::lock_guard lk{stats_mutex};
+      return underwriter::get_solana_source_deposit_terminal_failure(
+         sol_source_deposit_scan_cursors, key);
+   }
+
+   /// Persists the next SOL source-deposit `before` cursor after a clean page
+   /// that did not contain the target marker.
+   underwriter::solana_source_deposit_scan_cursor advance_sol_source_deposit_scan_cursor(
+      const underwriter::solana_source_deposit_scan_key& key,
+      std::string                        before,
+      size_t                             signature_count) {
+      std::lock_guard lk{stats_mutex};
+      return underwriter::advance_solana_source_deposit_scan_cursor(
+         sol_source_deposit_scan_cursors, key, std::move(before), signature_count);
+   }
+
+   /// Records a terminal SOL source-deposit failure while keeping the scan
+   /// state until the UWREQ leaves PENDING.
+   underwriter::solana_source_deposit_terminal_failure_result
+   record_sol_source_deposit_terminal_failure(
+      const underwriter::solana_source_deposit_scan_key& key,
+      std::string reason,
+      size_t signature_count) {
+      std::lock_guard lk{stats_mutex};
+      return underwriter::record_solana_source_deposit_terminal_failure(
+         sol_source_deposit_scan_cursors, key, std::move(reason), signature_count);
+   }
+
+   /// Drops SOL source-deposit scan progress for a UWREQ once it either
+   /// matches or leaves the PENDING set.
+   void erase_sol_source_deposit_scan_cursor(
+      const underwriter::solana_source_deposit_scan_key& key) {
+      std::lock_guard lk{stats_mutex};
+      underwriter::erase_solana_source_deposit_scan_cursor(
+         sol_source_deposit_scan_cursors, key);
+   }
 
    // -----------------------------------------------------------------------
    //  Table read helper
@@ -603,10 +665,10 @@ struct underwriter_plugin::impl {
       // Step 4: Scan sysio.uwrit::uwreqs for PENDING requests
       auto requests = scan_pending_requests();
 
-      // Step 4b: prune `confirmed_commits` of entries whose uwreq is no
-      // longer PENDING — the depot has resolved (won/lost/expired) those
-      // races, so the local set should not grow unbounded. This is the
-      // same pass that already reads the PENDING set, so it's free.
+      // Step 4b: prune local per-uwreq state whose uwreq is no longer
+      // PENDING — the depot has resolved (won/lost/expired) those races, so
+      // the local sets should not grow unbounded. This is the same pass that
+      // already reads the PENDING set, so it's free.
       {
          std::unordered_set<uint64_t> still_pending;
          still_pending.reserve(requests.size());
@@ -615,6 +677,8 @@ struct underwriter_plugin::impl {
          std::erase_if(confirmed_commits, [&](const commit_key& k) {
             return !still_pending.contains(k.uwreq_id);
          });
+         underwriter::prune_solana_source_deposit_scan_cursors(
+            sol_source_deposit_scan_cursors, still_pending);
          uwreqs_seen_pending_count = requests.size();
       }
 
@@ -1316,10 +1380,11 @@ struct underwriter_plugin::impl {
 
    /// Before committing collateral, independently verify the source-chain
    /// deposit that funded this swap. `req.source_tx_id` is the chain-native
-   /// transaction id captured at swap-emit time (ETH: 32-byte tx hash;
-   /// SOL: 64-byte signature). The verify path fetches that tx, confirms
-   /// it succeeded against the configured source contract / program, and
-   /// cross-references every argument we can decode against the uwreq:
+   /// deposit id captured at swap-emit time (ETH/SOL: 8-byte monotonic
+   /// `SwapDeposit.id`). The verify path locates the source-chain event or
+   /// log for that id, confirms the transaction succeeded against the
+   /// configured source contract / program, and cross-references every
+   /// argument we can decode against the uwreq:
    ///
    ///   * `depositor`   — `tx.from` (ETH) / fee-payer (SOL) must match `req.depositor`.
    ///   * source contract — `tx.to` (ETH) / program-id (SOL) must match the configured address.
@@ -1621,14 +1686,17 @@ struct underwriter_plugin::impl {
    ///   2. `fc::task::retry_until` with
    ///      `SOL_SWAP_DEPOSIT_POLL_INTERVAL` (15s) /
    ///      `SOL_SWAP_DEPOSIT_TOTAL_TIMEOUT` (120s, both in
-   ///      `outpost_solana_client_plugin.hpp`) drives the scan loop:
+   ///      `outpost_solana_client_plugin.hpp`) drives the paginated scan:
    ///        a. `getSignaturesForAddress(sol_program_id,
-   ///           limit=SOL_SCAN_LIMIT)` — enumerate recent program
-   ///           sigs.
+   ///           before=<persisted cursor>, limit=SOL_SIGNATURE_SCAN_PAGE_SIZE)`
+   ///           enumerates the next older page of program sigs.
    ///        b. For each sig, `getTransaction(sig)`; inspect
    ///           `meta.err` (skip failed tx) and
    ///           `meta.logMessages[]` for the canonical marker:
    ///           `Program log: opp_outpost: SwapDeposit id=<id> hash=<64hex>`.
+   ///        c. Persist the next `before` cursor only after a clean page with
+   ///           no match; unfinalized matches and transient tx fetch failures
+   ///           retry the same page.
    ///   3. On match, parse the 32-byte on-chain hash from the log.
    ///   4. Recompute the same hash from the UWREQ row's flat fields
    ///      (depositor[32] + 7×u64 BE + u32 BE = 92 packed bytes).
@@ -1640,11 +1708,13 @@ struct underwriter_plugin::impl {
    ///      not yet finalized → deferred retry (no mismatch bump).
    ///
    /// `false` returns:
-   ///   - hard mismatch (counter bumped) on bad size, hash divergence,
-   ///     or tx-level execution error;
+   ///   - hard mismatch on bad size;
+   ///   - terminal source-deposit failure (counter bumped once per pending
+   ///     UWREQ) on hash divergence, malformed marker hash, or full-history
+   ///     exhaustion without a marker;
    ///   - deferred retry (no counter bump) on `retry_until` deadline
-   ///     reached without a matching log — the outer poll loop
-   ///     reattempts on its next tick.
+   ///     reached without a matching finalized log — the outer poll loop
+   ///     reattempts on its next tick from the persisted cursor.
    bool verify_source_deposit_sol(const uw_request& req) {
       auto entry = sol_plug->get_client(sol_client_id);
       if (!entry || !entry->client) {
@@ -1723,15 +1793,29 @@ struct underwriter_plugin::impl {
 
       // ── (2) + (3) retry-loop until matched or budget expires ───────────
       // `bool hard_mismatch` distinguishes "found and known-bad" (hash
-      // divergence / tx error) from "not yet found" (deferred). The
-      // retry-callback returns:
-      //   - Some(true)               → success, exit retry_until
-      //   - Some(false) hard_mismatch → fail-fast, exit retry_until
-      //   - None                     → deferred, sleep + retry
+      // divergence / malformed marker / exhausted history) from "not yet
+      // found" (deferred). Terminal SOL failures are cached until the UWREQ
+      // leaves PENDING so later scan cycles do not re-walk full history.
+      // The retry-callback returns:
+      //   - Some(true)                 -> success, exit retry_until
+      //   - Some(false) hard_mismatch  -> fail-fast, exit retry_until
+      //   - None                       -> deferred, sleep + retry
       // Outer `try { retry_until } catch (timeout_exception)` maps the
-      // deadline-without-match case to deferred-no-mismatch-bump,
-      // matching the ETH verify's semantics.
-      constexpr size_t SOL_SCAN_LIMIT = 50;   // per-iteration sig batch
+      // deadline-without-match case to deferred-no-mismatch-bump, while the
+      // cursor survives for the next outer scan tick.
+      const underwriter::solana_source_deposit_scan_key scan_key{req.id, deposit_id};
+      if (const auto terminal = get_sol_source_deposit_terminal_failure(scan_key)) {
+         ilog("underwriter: source-deposit verify skipped for uwreq {} — "
+              "previous terminal SOL verification failure: {} "
+              "(deposit_id={}, pages_scanned={}, signatures_scanned={})",
+              req.id,
+              terminal->terminal_failure_reason,
+              deposit_id,
+              terminal->pages_scanned,
+              terminal->signatures_scanned);
+         return false;
+      }
+
       bool        hard_mismatch_seen = false;
       std::string matched_sig;
 
@@ -1744,166 +1828,114 @@ struct underwriter_plugin::impl {
 
          std::function<std::optional<bool>()> attempt =
          [&]() -> std::optional<bool> {
+            const auto cursor = get_or_create_sol_source_deposit_scan_cursor(scan_key);
             std::vector<fc::variant> sigs;
             try {
                sigs = entry->client->get_signatures_for_address(
-                  sol_program_id, std::nullopt, std::nullopt, SOL_SCAN_LIMIT);
+                  sol_program_id,
+                  cursor.before,
+                  std::nullopt,
+                  underwriter::SOL_SIGNATURE_SCAN_PAGE_SIZE);
             } catch (const fc::exception& e) {
                ilog("underwriter: source-deposit verify deferred for uwreq {} — "
-                    "getSignaturesForAddress({}) RPC error: {}",
-                    req.id, sol_program_id, e.to_detail_string());
+                    "getSignaturesForAddress({}, before={}) RPC error: {}",
+                    req.id,
+                    sol_program_id,
+                    cursor.before.value_or("<newest>"),
+                    e.to_detail_string());
                return std::nullopt;
             }
 
-            for (const auto& sig_var : sigs) {
-               if (!sig_var.is_object()) continue;
-               const auto sig_obj = sig_var.get_object();
-               if (!sig_obj.contains("signature") ||
-                   !sig_obj["signature"].is_string()) continue;
-               const std::string sig_b58 = sig_obj["signature"].as_string();
+            const underwriter::solana_source_deposit_page_scan_config scan_config{
+               .sol_program_id = sol_program_id,
+               .marker_prefix = marker_prefix,
+               .recomputed_hash = recomputed_hash,
+            };
+            const auto scan_result = underwriter::scan_solana_source_deposit_signature_page(
+               sigs,
+               [&](const std::string& sig_b58) {
+                  return entry->client->get_transaction(sig_b58, underwriter::SOL_COMMITMENT);
+               },
+               scan_config);
 
-               // Skip failed txs at the listing level — sigs with an `err`
-               // field carry execution failures and can't have emitted our
-               // marker line successfully.
-               if (sig_obj.contains("err") && !sig_obj["err"].is_null()) {
-                  continue;
-               }
-
-               fc::variant tx;
-               try {
-                  tx = entry->client->get_transaction(
-                     sig_b58, underwriter::SOL_COMMITMENT);
-               } catch (const fc::exception& e) {
-                  // Transient — move on; the next iteration may succeed.
-                  continue;
-               }
-               if (tx.is_null() || !tx.is_object()) continue;
-               const auto tx_obj = tx.get_object();
-               if (!tx_obj.contains("meta") || !tx_obj["meta"].is_object()) {
-                  continue;
-               }
-               const auto meta_obj = tx_obj["meta"].get_object();
-               // Skip failed txs again at the tx level for completeness.
-               if (meta_obj.contains("err") && !meta_obj["err"].is_null()) {
-                  continue;
-               }
-               if (!meta_obj.contains("logMessages") ||
-                   !meta_obj["logMessages"].is_array()) {
-                  continue;
-               }
-               // Solana interleaves every invoked program's logs in meta.logMessages. Attribute each
-               // "Program log:" payload to the program currently executing by tracking the
-               // "Program <id> invoke" / "Program <id> success|failed" bracket lines, and trust the
-               // SwapDeposit marker ONLY when opp-outpost (sol_program_id) is the top-of-stack
-               // program. Without this, a forged "Program log:" emitted by any attacker program in a
-               // transaction that merely references sol_program_id would pass verification.
-               std::vector<std::string> program_stack;
-               for (const auto& line_var : meta_obj["logMessages"].get_array()) {
-                  if (!line_var.is_string()) continue;
-                  const std::string line = line_var.as_string();
-
-                  // Maintain the invocation stack from the bracket lines (which are not log payloads).
-                  if (boost::algorithm::starts_with(line, "Program ") &&
-                      !boost::algorithm::starts_with(line, "Program log:") &&
-                      !boost::algorithm::starts_with(line, "Program data:") &&
-                      !boost::algorithm::starts_with(line, "Program return:")) {
-                     std::string_view rest{line};
-                     rest.remove_prefix(8);                  // strip "Program "
-                     const size_t sp1 = rest.find(' ');
-                     if (sp1 != std::string_view::npos) {
-                        const std::string_view prog = rest.substr(0, sp1);
-                        std::string_view after = rest.substr(sp1 + 1);
-                        const size_t sp2 = after.find(' ');
-                        const std::string_view verb =
-                           (sp2 == std::string_view::npos) ? after : after.substr(0, sp2);
-                        if (verb == "invoke") {
-                           program_stack.emplace_back(prog);
-                        } else if (verb.starts_with("success") || verb.starts_with("failed")) {
-                           if (!program_stack.empty()) program_stack.pop_back();
-                        }
-                        // "consumed", etc. — no stack change.
-                     }
-                     continue;
-                  }
-
-                  if (!boost::algorithm::starts_with(line, marker_prefix)) {
-                     continue;
-                  }
-                  // Attribution: the marker is a "Program log:" payload of the top-of-stack program.
-                  if (program_stack.empty() || program_stack.back() != sol_program_id) {
-                     ilog("underwriter: ignoring SwapDeposit marker for uwreq {} in tx {} — not "
-                          "emitted by opp-outpost program {} (attributed to {})",
-                          req.id, sig_b58, sol_program_id,
-                          program_stack.empty() ? std::string{"<none>"} : program_stack.back());
-                     continue;
-                  }
-                  // Parse the 64-char lowercase hex hash that follows
-                  // `marker_prefix`. Format MUST match the producer's
-                  // `format!("{:02x}", b)` per-byte spelling.
-                  const auto hash_hex = std::string_view{line}
-                                          .substr(marker_prefix.size());
-                  if (hash_hex.size() != 64) {
-                     elog("underwriter: source-deposit verify failed for "
-                          "uwreq {} — marker found in tx {} but hash field "
-                          "has wrong size ({} chars; expected 64)",
-                          req.id, sig_b58, hash_hex.size());
-                     hard_mismatch_seen = true;
-                     bump_mismatch();
-                     return std::optional<bool>(false);
-                  }
-                  std::array<uint8_t, 32> on_chain_hash{};
-                  bool parse_ok = true;
-                  for (size_t i = 0; i < 32 && parse_ok; ++i) {
-                     try {
-                        on_chain_hash[i] = static_cast<uint8_t>(std::stoul(
-                           std::string{hash_hex.substr(i * 2, 2)},
-                           nullptr, 16));
-                     } catch (...) {
-                        parse_ok = false;
-                     }
-                  }
-                  if (!parse_ok) {
-                     elog("underwriter: source-deposit verify failed for "
-                          "uwreq {} — marker found in tx {} but hash field "
-                          "is not lowercase hex: {}",
-                          req.id, sig_b58, std::string(hash_hex));
-                     hard_mismatch_seen = true;
-                     bump_mismatch();
-                     return std::optional<bool>(false);
-                  }
-                  if (std::memcmp(recomputed_hash.data(),
-                                   on_chain_hash.data(), 32) != 0) {
-                     const std::string got_hex(hash_hex);
-                     const std::string want_hex = fc::to_hex(
-                        reinterpret_cast<const char*>(recomputed_hash.data()),
-                        32);
-                     elog("underwriter: source-deposit verify failed for "
-                          "uwreq {} — SwapDeposit hash mismatch "
-                          "(deposit_id={} tx={}): on-chain={} recomputed={}",
-                          req.id, deposit_id, sig_b58, got_hex, want_hex);
-                     hard_mismatch_seen = true;
-                     bump_mismatch();
-                     return std::optional<bool>(false);
-                  }
-
-                  // ── (5) Confirmation gate — must be finalized ──────────
-                  std::string conf_status;
-                  if (sig_obj.contains("confirmationStatus") &&
-                      sig_obj["confirmationStatus"].is_string()) {
-                     conf_status = sig_obj["confirmationStatus"].as_string();
-                  }
-                  if (conf_status != "finalized") {
-                     ilog("underwriter: source-deposit verify deferred for "
-                          "uwreq {} — matching tx {} not yet finalized "
-                          "(confirmationStatus={})",
-                          req.id, sig_b58, conf_status);
-                     return std::nullopt;
-                  }
-
-                  matched_sig = sig_b58;
+            using page_status = underwriter::solana_source_deposit_page_status;
+            switch (scan_result.status) {
+               case page_status::matched:
+                  matched_sig = scan_result.matched_signature;
+                  erase_sol_source_deposit_scan_cursor(scan_key);
                   return std::optional<bool>(true);
-               }
+               case page_status::hard_mismatch:
+                  elog("underwriter: source-deposit verify failed for uwreq {} — "
+                       "{} (deposit_id={}, program={}, before={})",
+                       req.id,
+                       scan_result.reason,
+                       deposit_id,
+                       sol_program_id,
+                       cursor.before.value_or("<newest>"));
+                  hard_mismatch_seen = true;
+                  {
+                     const auto terminal = record_sol_source_deposit_terminal_failure(
+                        scan_key, scan_result.reason, sigs.size());
+                     if (terminal.first_failure) bump_mismatch();
+                  }
+                  return std::optional<bool>(false);
+               case page_status::deferred:
+                  ilog("underwriter: source-deposit verify deferred for uwreq {} — "
+                       "{} (deposit_id={}, program={}, before={})",
+                       req.id,
+                       scan_result.reason,
+                       deposit_id,
+                       sol_program_id,
+                       cursor.before.value_or("<newest>"));
+                  return std::nullopt;
+               case page_status::not_found:
+                  break;
             }
+
+            if (scan_result.page_exhausted) {
+               const std::string reason =
+                  "exhausted Solana program signature history without SwapDeposit log";
+               elog("underwriter: source-deposit verify failed for uwreq {} — "
+                    "{} (deposit_id={}, program={}, before={}, page_size={})",
+                    req.id,
+                    reason,
+                    deposit_id,
+                    sol_program_id,
+                    cursor.before.value_or("<newest>"),
+                    sigs.size());
+               hard_mismatch_seen = true;
+               {
+                  const auto terminal = record_sol_source_deposit_terminal_failure(
+                     scan_key, reason, sigs.size());
+                  if (terminal.first_failure) bump_mismatch();
+               }
+               return std::optional<bool>(false);
+            }
+
+            if (!scan_result.next_before) {
+               ilog("underwriter: source-deposit verify deferred for uwreq {} — "
+                    "signature page produced no usable pagination cursor "
+                    "(deposit_id={}, program={}, before={}, page_size={})",
+                    req.id,
+                    deposit_id,
+                    sol_program_id,
+                    cursor.before.value_or("<newest>"),
+                    sigs.size());
+               return std::nullopt;
+            }
+
+            const auto advanced = advance_sol_source_deposit_scan_cursor(
+               scan_key, *scan_result.next_before, sigs.size());
+            ilog("underwriter: source-deposit verify paginated for uwreq {} — "
+                 "no SwapDeposit log in page (deposit_id={}, program={}, "
+                 "before={}, next_before={}, pages_scanned={}, signatures_scanned={})",
+                 req.id,
+                 deposit_id,
+                 sol_program_id,
+                 cursor.before.value_or("<newest>"),
+                 *scan_result.next_before,
+                 advanced.pages_scanned,
+                 advanced.signatures_scanned);
             return std::nullopt;   // not found this iteration; sleep + retry
          };
 
@@ -1930,11 +1962,12 @@ struct underwriter_plugin::impl {
          }
          ilog("underwriter: source-deposit verify deferred for uwreq {} — "
               "no SwapDeposit log line for deposit_id={} after {}s "
-              "(program={}, scan-interval={}s, will retry on next outer tick)",
+              "(program={}, scan-interval={}s, page-size={}, will retry from persisted cursor)",
               req.id, deposit_id,
               SOL_SWAP_DEPOSIT_TOTAL_TIMEOUT.count() / 1'000'000,
               sol_program_id,
-              SOL_SWAP_DEPOSIT_POLL_INTERVAL.count() / 1'000'000);
+              SOL_SWAP_DEPOSIT_POLL_INTERVAL.count() / 1'000'000,
+              underwriter::SOL_SIGNATURE_SCAN_PAGE_SIZE);
          return false;
       } catch (const fc::exception& e) {
          elog("underwriter: source-deposit verify failed for uwreq {} — "
@@ -2095,6 +2128,15 @@ struct underwriter_plugin::impl {
    // the nodeop HTTP port.
    fc::variant build_stats_response() {
       std::lock_guard lk{stats_mutex};
+      size_t active_sol_source_deposit_cursor_count = 0;
+      size_t sol_source_deposit_terminal_failure_count = 0;
+      for (const auto& entry : sol_source_deposit_scan_cursors) {
+         if (entry.second.terminal_failure) {
+            sol_source_deposit_terminal_failure_count++;
+         } else {
+            active_sol_source_deposit_cursor_count++;
+         }
+      }
       return fc::variant(fc::mutable_variant_object()
          ("underwriter_account",            underwriter_account.to_string())
          ("enabled",                        enabled)
@@ -2113,6 +2155,8 @@ struct underwriter_plugin::impl {
          ("commits_failed",                 commits_failed_count)
          ("source_deposit_mismatch",        source_deposit_mismatch_count)
          ("outstanding_commit_count",       confirmed_commits.size())
+         ("sol_source_deposit_cursor_count", active_sol_source_deposit_cursor_count)
+         ("sol_source_deposit_terminal_failure_count", sol_source_deposit_terminal_failure_count)
       );
    }
 
