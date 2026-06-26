@@ -4,6 +4,7 @@
 #include <fc/variant_object.hpp>
 #include <fc/io/json.hpp>
 #include <boost/asio/io_context.hpp>
+#include <boost/asio/ip/tcp.hpp>
 
 #include <string>
 #include <variant>
@@ -65,13 +66,31 @@ public:
    static json_rpc_client create(const std::variant<std::string, fc::url>& source);
 
 private:
+   using tcp = boost::asio::ip::tcp;
+
    asio::io_context _io_ctx{};
    fc::url      _url;
+   std::string  _host;
+   std::string  _port;
    std::string  _user_agent;
    std::int64_t _next_id;
+   tcp::resolver::results_type _resolved_endpoints;
+   bool                        _resolved_endpoints_stale;
 
    // Perform HTTP POST with JSON payload; optionally parse JSON body.
    variant send_json(const variant& payload, bool expect_json_body = true);
+
+   /// Resolve the configured host and replace the cached endpoint set without a per-RPC deadline.
+   void refresh_resolved_endpoints();
+
+   /// Refresh stale cached endpoints using the active RPC deadline when one exists.
+   void refresh_resolved_endpoints_with_active_deadline();
+
+   /// Mark cached endpoints stale after a connection failure.
+   void mark_resolved_endpoints_stale();
+
+   /// Return cached endpoints, refreshing only after a previous connection failure.
+   const tcp::resolver::results_type& resolved_endpoints();
 
    static void validate_basic_response(const variant& response);
 };

@@ -188,6 +188,40 @@ BOOST_AUTO_TEST_CASE(test_trx_buffer_factory_format) {
 
 BOOST_AUTO_TEST_SUITE_END()
 
+BOOST_AUTO_TEST_SUITE(net_message_session_gate)
+
+/// Verifies that only handshake/auth control traffic is accepted before session establishment.
+BOOST_AUTO_TEST_CASE(pre_session_control_messages_are_limited) {
+   BOOST_CHECK( is_pre_session_control_message( msg_type_t::handshake_message ) );
+   BOOST_CHECK( is_pre_session_control_message( msg_type_t::go_away_message ) );
+   BOOST_CHECK( is_pre_session_control_message( msg_type_t::time_message ) );
+   BOOST_CHECK( is_pre_session_control_message( msg_type_t::peer_auth_message ) );
+}
+
+/// Verifies that block-sync and broadcast traffic waits for handshake/auth completion.
+BOOST_AUTO_TEST_CASE(pre_session_rejects_expensive_messages) {
+   const msg_type_t rejected_messages[] = {
+      msg_type_t::peer_status_notice,
+      msg_type_t::block_request_message,
+      msg_type_t::sync_request_message,
+      msg_type_t::signed_block,
+      msg_type_t::transaction_message,
+      msg_type_t::vote_message,
+      msg_type_t::block_nack_message,
+      msg_type_t::block_nack_request_message,
+      msg_type_t::block_notice_message,
+      msg_type_t::gossip_bp_peers_message,
+      msg_type_t::transaction_notice_message,
+      msg_type_t::unknown,
+   };
+
+   for( const auto msg : rejected_messages ) {
+      BOOST_CHECK( !is_pre_session_control_message( msg ) );
+   }
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
 BOOST_AUTO_TEST_SUITE(vote_msg_wire)
 
 // Verify vote_message wire format: [which][vote_id (32 bytes)][vote_message ...]

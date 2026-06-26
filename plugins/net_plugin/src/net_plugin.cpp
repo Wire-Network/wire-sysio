@@ -6,6 +6,7 @@
 #include <sysio/net_plugin/net_logger.hpp>
 #include <sysio/net_plugin/net_utils.hpp>
 #include <sysio/net_plugin/auto_bp_peering.hpp>
+#include <sysio/net_plugin/local_txn_cache.hpp>
 #include <sysio/net_plugin/peer_auth.hpp>
 #include <sysio/net_plugin/peer_scoring.hpp>
 #include <sysio/chain/types.hpp>
@@ -36,8 +37,6 @@
 #include <boost/asio/post.hpp>
 #include <boost/multi_index/hashed_index.hpp>
 #include <boost/multi_index/key.hpp>
-#include <boost/unordered/unordered_flat_set.hpp>
-#include <boost/container/small_vector.hpp>
 
 #if __has_include(<sys/ioctl.h>)
 #include <sys/ioctl.h>
@@ -120,29 +119,6 @@ namespace sysio {
 
    static constexpr int64_t block_interval_ns =
       std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::milliseconds(config::block_interval_ms)).count();
-
-   using connection_id_set = boost::unordered_flat_set<connection_id_t>;
-   using connection_id_vector = boost::container::small_vector<connection_id_t, 64>;
-   struct node_transaction_state {
-      transaction_id_type        id;
-      time_point_sec             expires;           // time after which this may be purged.
-      mutable connection_id_set  connection_ids;    // all connections trx or trx notice received or trx sent
-      mutable bool               have_trx = false;  // trx received, not just trx notice, mutable because not indexed
-   };
-
-   typedef multi_index_container<
-      node_transaction_state,
-      indexed_by<
-         hashed_unique<
-            tag<by_id>,
-            member<node_transaction_state, transaction_id_type, &node_transaction_state::id>
-         >,
-         ordered_non_unique<
-            tag< struct by_expiry >,
-            member< node_transaction_state, fc::time_point_sec, &node_transaction_state::expires > >
-         >
-      >
-   node_transaction_index;
 
    struct peer_block_state {
       block_id_type      id;
@@ -239,7 +215,7 @@ namespace sysio {
 
       alignas(hardware_destructive_interference_sz)
       mutable fc::mutex      local_txns_mtx;
-      node_transaction_index  local_txns GUARDED_BY(local_txns_mtx);
+      local_txn_cache         local_txns GUARDED_BY(local_txns_mtx);
 
       // Vote dedup cache: tracks recently seen vote IDs to avoid expensive BLS deserialization for duplicates.
       // Indexed by vote_id for O(1) lookup and by block_num for LIB-based pruning.
@@ -302,7 +278,7 @@ namespace sysio {
     *  The version value is sent directly as handshake_message::network_version.
     */
    enum class proto_version_t : uint16_t {
-      base = 1      // Wire genesis protocol (Savanna, block_nack, gossip_bp_peers, trx_notice, etc.)
+      base = wire_protocol_base_version // Wire genesis protocol (Savanna, block_nack, gossip_bp_peers, trx_notice, etc.)
    };
 
    constexpr proto_version_t net_version_min = proto_version_t::base;
@@ -548,6 +524,8 @@ namespace sysio {
        */
       bool is_key_authorized(const chain::public_key_type& key) const;
       bool needs_auth() const;
+      /// Return the configured initial ordinary-frame gate state for a connection.
+      bool initial_peer_authenticated() const;
       chain::public_key_type get_authentication_key() const;
       chain::signature_type sign_compact(const chain::public_key_type& signer, const fc::sha256& digest) const;
 
@@ -739,7 +717,7 @@ namespace sysio {
       uint32_t                   trx_entries_size{0};
       fc::time_point             trx_entries_reset = fc::time_point::now();
       // does not account for the overhead of the multindex entry, but this is just an approximation
-      static constexpr uint32_t  trx_full_entry_size = sizeof(node_transaction_state);
+      static constexpr uint32_t  trx_full_entry_size = static_cast<uint32_t>(local_txn_cache::tracked_entry_size);
       static constexpr uint32_t  trx_conn_entry_size = sizeof(connection_id_t);
 
       fc::time_point          last_dropped_trx_msg_time;
@@ -758,7 +736,10 @@ namespace sysio {
       std::atomic<bp_connection_type> bp_connection = bp_connection_type::non_bp;
       block_status_monitor    block_status_monitor_;
       std::atomic<time_point> last_vote_received;
-      std::atomic<bool>       peer_authenticated{true}; // set false in recv_handshake when needs_auth()
+      /// True once this peer may send ordinary frames to normal handlers.
+      std::atomic<bool>       peer_authenticated{false};
+      /// True after this connection has accepted the peer's initial handshake.
+      std::atomic<bool>       peer_session_established{false};
 
       alignas(hardware_destructive_interference_sz)
       peer_scoring::peer_score peer_score_;
@@ -893,6 +874,9 @@ namespace sysio {
 
       void cancel_sync_wait();
       void sync_wait();
+
+      /// Reset the pre-session and peer-auth ordinary-frame gates.
+      void reset_peer_authentication_state();
 
       void queue_write(msg_type_t net_msg,
                        std::optional<block_num_type> block_num,
@@ -1157,6 +1141,7 @@ namespace sysio {
       listen_address = host + ":" + port; // do not include type in listen_address to avoid peer setting type on connection
       set_connection_type( peer_address() );
       my_impl->mark_configured_bp_connection(this);
+      reset_peer_authentication_state();
       fc_ilog( p2p_conn_log, "created connection - {} to {}", connection_id, endpoint );
    }
 
@@ -1173,6 +1158,7 @@ namespace sysio {
    {
       /// The locally configured address type is authoritative; a peer's advertised address may only narrow it later.
       set_connection_type( listen_address );
+      reset_peer_authentication_state();
       fc_dlog( p2p_conn_log, "new connection - {} object created for peer {}:{} from listener {}",
                connection_id, log_remote_endpoint_ip, log_remote_endpoint_port, listen_address );
    }
@@ -1281,6 +1267,11 @@ namespace sysio {
       conn_state = s;
    }
 
+   void connection::reset_peer_authentication_state() {
+      peer_authenticated.store(my_impl->initial_peer_authenticated(), std::memory_order_relaxed);
+      peer_session_established.store(false, std::memory_order_relaxed);
+   }
+
    connection_status connection::get_status()const {
       connection_status stat;
       stat.connection_id = connection_id;
@@ -1318,6 +1309,7 @@ namespace sysio {
          peer_dlog( p2p_conn_log, this, "connected" );
          socket_open = true;
          connection_start_time = get_time();
+         reset_peer_authentication_state();
          start_read_message();
          return true;
       }
@@ -1392,7 +1384,7 @@ namespace sysio {
          conn_node_id = fc::sha256();
          last_block_nack_request_message_id = block_id_type{};
       }
-      peer_authenticated.store(true, std::memory_order_relaxed); // reset; will be set false on next handshake if auth required
+      reset_peer_authentication_state();
       peer_fork_db_root_num.store( 0, std::memory_order_relaxed );
       peer_ping_time_ns = std::numeric_limits<decltype(peer_ping_time_ns)::value_type>::max();
       peer_requested.reset();
@@ -2623,35 +2615,31 @@ namespace sysio {
       index.erase(p.first, p.second);
    }
 
+   namespace {
+      /// Applies the local transaction cache accounting delta to the connection-level memory estimate.
+      void apply_trx_entry_delta(connection& c, local_txn_cache::entry_delta delta) {
+         switch(delta) {
+         case local_txn_cache::entry_delta::none:
+            return;
+         case local_txn_cache::entry_delta::connection:
+            c.trx_entries_size += connection::trx_conn_entry_size;
+            return;
+         case local_txn_cache::entry_delta::full:
+            c.trx_entries_size += connection::trx_full_entry_size;
+            return;
+         }
+      }
+   } // namespace
+
    dispatch_manager::add_peer_txn_info dispatch_manager::add_peer_txn( const transaction_id_type& id, const time_point_sec& trx_expires, connection& c )
    {
       fc::lock_guard g( local_txns_mtx );
 
-      auto& id_idx = local_txns.get<by_id>();
-      bool already_have_trx = false;
-      if (auto tptr = id_idx.find( id ); tptr != id_idx.end()) {
-         if (tptr->connection_ids.insert(c.connection_id).second)
-            c.trx_entries_size += connection::trx_conn_entry_size;
-         already_have_trx = tptr->have_trx;
-         if (!already_have_trx) {
-            time_point_sec expires{fc::time_point::now() + my_impl->p2p_dedup_cache_expire_time_us};
-            expires = std::min( trx_expires, expires );
-            local_txns.modify(tptr, [&](auto& v) {
-               v.expires = expires;
-               v.have_trx = true;
-            });
-         }
-      } else {
-         // expire at either transaction expiration or configured max expire time whichever is less
-         time_point_sec expires{fc::time_point::now() + my_impl->p2p_dedup_cache_expire_time_us};
-         expires = std::min( trx_expires, expires );
-         local_txns.insert( node_transaction_state{
-            .id = id,
-            .expires = expires,
-            .connection_ids = {c.connection_id},
-            .have_trx = true } );
-         c.trx_entries_size += connection::trx_full_entry_size;
-      }
+      // expire at either transaction expiration or configured max expire time whichever is less
+      time_point_sec expires{fc::time_point::now() + my_impl->p2p_dedup_cache_expire_time_us};
+      expires = std::min( trx_expires, expires );
+      const auto result = local_txns.add_transaction(id, expires, c.connection_id);
+      apply_trx_entry_delta(c, result.delta);
 
       if (c.trx_entries_size > def_max_trx_entries_per_conn_size) {
          auto now = fc::time_point::now();
@@ -2660,26 +2648,16 @@ namespace sysio {
             c.trx_entries_reset = now;
          }
       }
-      return {c.trx_entries_size, already_have_trx};
+      return {c.trx_entries_size, result.already_have_trx};
    }
 
    size_t dispatch_manager::add_peer_txn_notice( const transaction_id_type& id, connection& c )
    {
       fc::lock_guard g( local_txns_mtx );
 
-      auto& id_idx = local_txns.get<by_id>();
-      if (auto tptr = id_idx.find( id ); tptr != id_idx.end()) {
-         if (tptr->connection_ids.insert(c.connection_id).second)
-            c.trx_entries_size += connection::trx_conn_entry_size;
-      } else {
-         time_point_sec expires{fc::time_point::now() + my_impl->p2p_dedup_cache_expire_time_us};
-         local_txns.insert( node_transaction_state{
-            .id = id,
-            .expires = expires,
-            .connection_ids = {c.connection_id},
-            .have_trx = false } );
-         c.trx_entries_size += connection::trx_full_entry_size;
-      }
+      const time_point_sec notice_expires{fc::time_point::now() + local_txn_cache::notice_only_lifetime};
+      const auto           result = local_txns.add_transaction_notice(id, notice_expires, c.connection_id);
+      apply_trx_entry_delta(c, result.delta);
 
       if (c.trx_entries_size > def_max_trx_entries_per_conn_size) {
          auto now = fc::time_point::now();
@@ -2693,11 +2671,9 @@ namespace sysio {
 
    bool dispatch_manager::have_peer_txn(const transaction_id_type& id, connection& c) {
       fc::lock_guard g( local_txns_mtx );
-      auto& id_idx = local_txns.get<by_id>();
-      auto tptr = id_idx.find( id );
-      if (tptr != id_idx.end() && tptr->have_trx) {
-         if (tptr->connection_ids.insert(c.connection_id).second)
-            c.trx_entries_size += connection::trx_conn_entry_size;
+      const auto result = local_txns.have_transaction(id, c.connection_id);
+      apply_trx_entry_delta(c, result.delta);
+      if (result.recorded) {
          return true;
       }
       return false;
@@ -2706,11 +2682,7 @@ namespace sysio {
    connection_id_vector
    dispatch_manager::peer_connections(const transaction_id_type& id) const {
       fc::lock_guard g( local_txns_mtx );
-      auto& id_idx = local_txns.get<by_id>();
-      if (auto tptr = id_idx.find(id); tptr != id_idx.end()) {
-         return {tptr->connection_ids.begin(), tptr->connection_ids.end()};
-      }
-      return {};
+      return local_txns.peer_connections(id);
    }
 
    void dispatch_manager::expire_txns() {
@@ -2720,11 +2692,9 @@ namespace sysio {
       {
          fc::lock_guard g( local_txns_mtx );
          start_size = local_txns.size();
-         auto& old = local_txns.get<by_expiry>();
-         auto ex_lo = old.lower_bound( fc::time_point_sec( 0 ) );
-         auto ex_up = old.upper_bound( fc::time_point_sec{now - def_allowed_clock_skew} ); // allow for some clock-skew
-         old.erase( ex_lo, ex_up );
-         end_size = local_txns.size();
+         const std::size_t removed = local_txns.expire(fc::time_point_sec{now - def_allowed_clock_skew}, // allow for some clock-skew
+                                                       fc::time_point_sec{now});
+         end_size = start_size - removed;
       }
 
       fc_dlog( p2p_trx_log, "expire_local_txns size {} removed {} in {}us", start_size, start_size - end_size, fc::time_point::now() - now );
@@ -3138,17 +3108,16 @@ namespace sysio {
 
          msg_type_t net_msg = to_msg_type_t(which.value);
 
-         // When auth is required, only allow handshake/go_away/time/peer_auth until authenticated.
-         // All other messages are dropped until the peer proves its identity.
-         if( !peer_authenticated.load(std::memory_order_relaxed) ) {
-            if( net_msg != msg_type_t::handshake_message &&
-                net_msg != msg_type_t::go_away_message &&
-                net_msg != msg_type_t::time_message &&
-                net_msg != msg_type_t::peer_auth_message ) {
-               peer_wlog( p2p_conn_log, this, "Dropping {} message from unauthenticated peer", static_cast<uint32_t>(net_msg) );
-               pending_message_buffer.advance_read_ptr( message_length );
-               return true;
-            }
+         // Keep expensive or stateful messages behind the session gate. The
+         // first accepted handshake establishes peer chain/protocol identity;
+         // optional peer_auth then proves the configured node key.
+         if( !(peer_session_established.load(std::memory_order_relaxed) &&
+               peer_authenticated.load(std::memory_order_relaxed)) &&
+             !is_pre_session_control_message(net_msg) ) {
+            peer_wlog( p2p_conn_log, this,
+                       "Dropping {} message before peer handshake/authentication completes", to_index(net_msg) );
+            pending_message_buffer.advance_read_ptr( message_length );
+            return true;
          }
 
          if( net_msg == msg_type_t::signed_block ) {
@@ -3697,14 +3666,23 @@ namespace sysio {
             }
          }
 
-         send_gossip_bp_peers_initial_message();
+         // The session gate opens after the initial generation-1 handshake passes
+         // validation; later heartbeat handshakes keep the session state current.
+         peer_session_established.store(true, std::memory_order_relaxed);
+         // Queue initial gossip behind any handshake/auth frames posted above so
+         // the peer's own session gate can accept it.
+         boost::asio::post(strand, [c = shared_from_this()]() {
+            if( !c->closed() )
+               c->send_gossip_bp_peers_initial_message();
+         });
       }
 
       // Defer sync negotiation until peer is authenticated. The auth exchange
       // must complete before sync requests are sent, otherwise they get dropped
       // by the peer's message gate. handle_message(peer_auth_message) re-runs
       // recv_handshake after authentication succeeds.
-      if( peer_authenticated.load(std::memory_order_relaxed) ) {
+      if( peer_session_established.load(std::memory_order_relaxed) &&
+          peer_authenticated.load(std::memory_order_relaxed) ) {
          uint32_t nblk_combined_latency = calc_block_latency();
          my_impl->sync_master->recv_handshake( shared_from_this(), msg, nblk_combined_latency );
       }
@@ -3740,9 +3718,8 @@ namespace sysio {
       }
       peer_ilog( p2p_conn_log, this, "Peer authenticated successfully" );
       peer_authenticated.store(true, std::memory_order_relaxed);
-      // Re-process peer's handshake now that auth is complete. The initial
-      // recv_handshake sent sync requests that were dropped by the peer's
-      // message gate (we weren't authenticated yet), so re-trigger sync.
+      // Re-process peer's handshake now that auth is complete; initial
+      // handshake handling deferred sync negotiation while the peer was gated.
       {
          fc::unique_lock g_conn( conn_mtx );
          if( last_handshake_recv.generation > 0 ) {
@@ -4405,6 +4382,10 @@ namespace sysio {
 
    bool net_plugin_impl::needs_auth() const {
       return auth_config.needs_auth();
+   }
+
+   bool net_plugin_impl::initial_peer_authenticated() const {
+      return auth_config.initial_peer_authenticated();
    }
 
    chain::public_key_type net_plugin_impl::get_authentication_key() const {

@@ -79,6 +79,15 @@ namespace sysio {
       // requirement; covers SETTLED, REVERTED, EXPIRED uwreqs alike.
       static constexpr uint32_t UWREQ_RETENTION_EPOCHS = 10;
 
+      // Maximum accepted swap fee, in basis points. A 100% fee (10000 bps)
+      // would zero the post-fee WIRE leg of every swap (`net == 0` in
+      // `opp::amm::split_wire_fee`), which let a from-WIRE or token-to-token
+      // swap debit destination reserve liquidity while crediting zero WIRE —
+      // draining the reserve at an arbitrary price (SEC-26 / WSA-042). Any fee
+      // below 100% leaves a positive remainder for every positive input, so the
+      // cap is 9999 (mirrors `sysio.reserv::MAX_CONNECTOR_WEIGHT_BPS`).
+      static constexpr uint32_t MAX_FEE_BPS = 9999;
+
       // -----------------------------------------------------------------------
       //  Actions
       // -----------------------------------------------------------------------
