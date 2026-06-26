@@ -4,6 +4,7 @@
 #include <sysio.chains/sysio.chains.hpp>
 #include <sysio.chalg/sysio.chalg.hpp>     // dispute trigger + open-dispute gate (disputes table)
 #include <sysio.opp.common/slug_name.hpp>
+#include <sysio.opp.common/safe_ops.hpp>   // to_depot_amount — WSA-028 fail-closed TokenAmount gate
 #include <sysio/opp/opp.pb.hpp>
 #include <sysio/opp/attestations/attestations.pb.hpp>
 #include <zpp_bits.h>
@@ -313,8 +314,17 @@ void dispatch_operator_action(name self, const std::vector<char>& data,
    // no-proto-messages-in-actions rule.
    const sysio::slug_name chain_code_slug{chain_code};
    const sysio::slug_name token_code{oa.amount.token_code};
-   const uint64_t raw_amount =
-      static_cast<uint64_t>(static_cast<int64_t>(oa.amount.amount));
+   // WSA-028: TokenAmount.amount is signed on the wire. Gate it through the
+   // shared fail-closed parser before any unsigned use — a negative or
+   // out-of-range amount is dropped here, never wrapped into a huge collateral
+   // credit. An impossible deposit/withdraw has no escrow to refund, so a silent
+   // drop (not a revert) is the correct fail-closed action; the originating
+   // OperatorRegistry sees no matching depot state change and can re-emit a
+   // well-formed action. Never-throw: drop, do not check().
+   const std::optional<uint64_t> amount_opt =
+      sysio::opp::safe::to_depot_amount(static_cast<int64_t>(oa.amount.amount));
+   if (!amount_opt) return;
+   const uint64_t raw_amount = *amount_opt;
    switch (oa.action_type) {
       case AT::ACTION_TYPE_DEPOSIT_REQUEST: {
          // opreg::depositinle checks require_auth(get_self()=opreg). msgch
@@ -410,9 +420,9 @@ void dispatch_reserve_create(name self, const std::vector<char>& data, uint64_t 
    // Reserve identity + the custodied amount travel together in
    // `external_amount` (a `ReserveAmount`): the amount is ALREADY in the
    // depot's canonical 9-decimal frame (the outpost converts chain-native
-   // units at the boundary, exactly like the swap paths). A negative
-   // TokenAmount clamps to 0 so `oncrtreserve`'s zero-amount guard cancels
-   // the request back (refunding the creator) instead of wrapping.
+   // units at the boundary, exactly like the swap paths). A negative OR
+   // out-of-range TokenAmount collapses to 0 so `oncrtreserve`'s zero-amount
+   // guard cancels the request back (refunding the creator) instead of wrapping.
    const auto&    ext        = rc.external_amount;
 
    // WSA-005: `external_amount.chain_code` is documented in the proto as "the outpost's own chain".
@@ -420,9 +430,8 @@ void dispatch_reserve_create(name self, const std::vector<char>& data, uint64_t 
    // reserve whose external custody is claimed against a different chain B.
    if (!source_chain_binding_ok(chain_code, ext.chain_code, "dispatch_reserve_create")) return;
 
-   const uint64_t ext_amount = ext.amount.amount > 0
-                                  ? static_cast<uint64_t>(ext.amount.amount)
-                                  : 0;
+   const uint64_t ext_amount =
+      sysio::opp::safe::to_depot_amount(static_cast<int64_t>(ext.amount.amount)).value_or(0);
 
    action(
       permission_level{self, "active"_n},
@@ -656,8 +665,15 @@ void dispatch_attestation(name self, uint64_t attestation_id,
             // WSA-005: the reward-emitting chain (sr.chain_code) must be the proven delivering
             // outpost before any claim credit is recorded.
             if (!source_chain_binding_ok(chain_code, sr.chain_code, "staking_reward")) break;
-            const uint64_t reward_raw =
-               static_cast<uint64_t>(static_cast<int64_t>(sr.reward_amount.amount));
+            // WSA-028: gate the signed reward through the shared fail-closed
+            // parser. A negative or out-of-range reward is dropped at the
+            // boundary so it never reaches the claim ledger (dclaim also
+            // soft-drops oversized values, but every inbound TokenAmount is
+            // validated uniformly at ingress). Never-throw: break, do not check().
+            const std::optional<uint64_t> reward_opt =
+               sysio::opp::safe::to_depot_amount(static_cast<int64_t>(sr.reward_amount.amount));
+            if (!reward_opt) break;
+            const uint64_t reward_raw = *reward_opt;
             // staker_wire_account.name is the raw account string (empty =>
             // staker not yet AuthX-linked, so sysio.dclaim parks by native
             // address). staker_native_address carries the chain (kind) and
