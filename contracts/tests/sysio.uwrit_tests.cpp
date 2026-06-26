@@ -131,9 +131,26 @@ BOOST_FIXTURE_TEST_CASE(setconfig_writes_custom_lock_duration, sysio_uwrit_teste
 
 BOOST_FIXTURE_TEST_CASE(setconfig_rejects_excessive_fee, sysio_uwrit_tester) { try {
    BOOST_REQUIRE_EQUAL(
-      error("assertion failure with message: fee_bps cannot exceed 10000 (100%)"),
+      error("assertion failure with message: fee_bps must be below 10000 (100%): a 100% fee zeroes the post-fee WIRE leg"),
       setconfig(10001)
    );
+} FC_LOG_AND_RETHROW() }
+
+// SEC-26 / WSA-042: the exact 100% boundary must be rejected. It was previously
+// accepted (`fee_bps <= 10000`), which zeroed the post-fee WIRE leg and let a
+// swap debit destination reserve liquidity while crediting zero WIRE.
+BOOST_FIXTURE_TEST_CASE(setconfig_rejects_full_fee, sysio_uwrit_tester) { try {
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: fee_bps must be below 10000 (100%): a 100% fee zeroes the post-fee WIRE leg"),
+      setconfig(10000)
+   );
+} FC_LOG_AND_RETHROW() }
+
+// The largest sub-100% fee (MAX_FEE_BPS) is accepted and leaves a positive
+// post-fee WIRE leg for every positive input.
+BOOST_FIXTURE_TEST_CASE(setconfig_accepts_max_fee, sysio_uwrit_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), setconfig(9999));
+   BOOST_REQUIRE_EQUAL(9999, get_uwconfig()["fee_bps"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(setconfig_rejects_zero_lock_duration, sysio_uwrit_tester) { try {

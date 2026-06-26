@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
 #include <format>
 #include <memory>
@@ -12,6 +13,11 @@
 #include <sysio/opp/opp.hpp>
 
 namespace sysio {
+
+/// Cross-chain hard cap for a serialized OPP envelope accepted from an outpost.
+/// This mirrors the Solana program's `MAX_ENVELOPE_BYTES` and the e2e-supported
+/// WIRE / Ethereum / Solana envelope boundary.
+inline constexpr size_t OPP_MAX_ENVELOPE_BYTES = 65'536;
 
 /**
  * @brief Chain-agnostic facade for OPP delivery on a single external outpost.

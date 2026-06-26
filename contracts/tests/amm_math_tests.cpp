@@ -135,4 +135,36 @@ BOOST_AUTO_TEST_CASE(convenience_wrappers) {
    }
 }
 
+/// SEC-26 / WSA-042: a 100% fee (`fee_bps == BPS_TOTAL`) consumes the entire
+/// WIRE leg, leaving `net == 0`. That degenerate post-fee leg is what let a
+/// from-WIRE / token-to-token swap debit destination reserve liquidity while
+/// crediting zero WIRE. Any fee below 100% leaves a positive remainder for
+/// every positive input — so rejecting `fee_bps >= BPS_TOTAL` at
+/// `sysio.uwrit::setconfig` makes `net == 0` unconstructible at settlement.
+BOOST_AUTO_TEST_CASE(split_wire_fee_boundaries) {
+   // 100% fee: fee == input, net == 0, and the fee splits exactly.
+   {
+      const auto f = split_wire_fee(1'000'000'000ULL, BPS_TOTAL, /*reward_share_bps*/5000);
+      BOOST_CHECK_EQUAL(f.fee, 1'000'000'000ULL);
+      BOOST_CHECK_EQUAL(f.net, 0u);
+      BOOST_CHECK_EQUAL(f.reward_share + f.emissions_share, f.fee);
+   }
+   // Over-100% is clamped to 100% (split_wire_fee guards fee_bps > BPS_TOTAL),
+   // still net == 0 — also rejected upstream by setconfig.
+   {
+      const auto f = split_wire_fee(500ULL, BPS_TOTAL + 12'345, 5000);
+      BOOST_CHECK_EQUAL(f.fee, 500u);
+      BOOST_CHECK_EQUAL(f.net, 0u);
+   }
+   // Every sub-100% fee leaves net > 0 for every positive input, incl. dust,
+   // and conserves the leg exactly (net + fee == input).
+   for (uint32_t bps : {1u, 10u, 100u, 5'000u, 9'000u, BPS_TOTAL - 1}) {
+      for (uint64_t amt : {1ULL, 2ULL, 7ULL, 1'000ULL, 1'000'000'000'000ULL}) {
+         const auto f = split_wire_fee(amt, bps, 5000);
+         BOOST_CHECK_GT(f.net, 0u);
+         BOOST_CHECK_EQUAL(f.net + f.fee, amt);
+      }
+   }
+}
+
 BOOST_AUTO_TEST_SUITE_END()

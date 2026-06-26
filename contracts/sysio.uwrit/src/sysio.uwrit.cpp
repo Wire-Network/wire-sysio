@@ -234,6 +234,33 @@ uint64_t swap_quote(sysio::slug_name src_chain_code,
                                src_amount, fee_bps);
 }
 
+/// True iff every NON-WIRE leg of a swap has an ACTIVE reserve row. Lets callers
+/// distinguish a zero `swap_quote` caused by an unprovisioned / not-ACTIVE
+/// reserve (dev & smoke clusters — the variance check is intentionally skipped)
+/// from one caused by a *degenerate but ACTIVE* reserve: a side drained to zero,
+/// extreme connector weights, or a WIRE leg too small for the weighted-Bancor
+/// kernel to price (it floors the output to 0). In that case a zero quote is a
+/// real pricing failure and the caller MUST fail closed — otherwise the
+/// user-supplied `target_amount` bypasses the variance check and settlement
+/// over-debits the reserve (WSA-041). A WIRE endpoint has no reserve and is not
+/// required (the depot IS the WIRE side), mirroring `swap_quote`.
+bool required_reserves_active(sysio::slug_name src_chain_code,
+                             sysio::slug_name src_token_code,
+                             sysio::slug_name src_reserve_code,
+                             sysio::slug_name dst_chain_code,
+                             sysio::slug_name dst_token_code,
+                             sysio::slug_name dst_reserve_code) {
+   auto leg_active = [](sysio::slug_name c, sysio::slug_name t, sysio::slug_name r) {
+      auto row = find_reserve(c, t, r);
+      return row && row->status == ReserveStatus::RESERVE_STATUS_ACTIVE;
+   };
+   if (src_token_code != WIRE_TOKEN
+       && !leg_active(src_chain_code, src_token_code, src_reserve_code)) return false;
+   if (dst_token_code != WIRE_TOKEN
+       && !leg_active(dst_chain_code, dst_token_code, dst_reserve_code)) return false;
+   return true;
+}
+
 /// Encode + queue a SWAP_REVERT attestation back to the source outpost when
 /// the variance check fails. The outpost matches the original SWAP_REQUEST
 /// via `original_swap_message_id` (low 8 bytes carry the depot's
@@ -612,7 +639,12 @@ uint64_t next_fromwire_id(name self) {
 void uwrit::setconfig(uint32_t fee_bps,
                       uint64_t collateral_lock_duration_ms) {
    require_auth(get_self());
-   check(fee_bps <= 10000, "fee_bps cannot exceed 10000 (100%)");
+   // Reject a 100% (or higher) fee: it zeroes the post-fee WIRE leg
+   // (`net == 0`), which let a swap debit destination reserve liquidity while
+   // crediting zero WIRE (SEC-26 / WSA-042). MAX_FEE_BPS == 9999 keeps the
+   // remainder positive for every positive input.
+   check(fee_bps <= MAX_FEE_BPS,
+         "fee_bps must be below 10000 (100%): a 100% fee zeroes the post-fee WIRE leg");
    check(collateral_lock_duration_ms > 0,
          "collateral_lock_duration_ms must be positive");
 
@@ -787,18 +819,34 @@ void uwrit::createuwreq(uint64_t attestation_id,
    const uint64_t current_quote = swap_quote(src_chain_code, src_token_code, src_reserve_code,
                                               dst_chain_code, dst_token_code, dst_reserve_code,
                                               src_amount, current_fee_bps(get_self()));
-   if (current_quote != 0 && sr.target_amount != 0) {
-      uint64_t target   = sr.target_amount;
-      uint64_t diff     = current_quote > target ? current_quote - target : target - current_quote;
-      // tolerance_bps / 10000 of target; computed in uint128 to avoid overflow.
-      uint128_t allowed = (static_cast<uint128_t>(target) * sr.target_tolerance_bps) / 10000u;
-      if (static_cast<uint128_t>(diff) > allowed) {
-         emit_swap_revert(get_self(), chain_code, attestation_id, sr,
-                          src_chain_code, src_reserve_code,
-                          "variance exceeded tolerance: target=" + std::to_string(target)
-                          + " current=" + std::to_string(current_quote)
-                          + " tolerance_bps=" + std::to_string(sr.target_tolerance_bps));
-         return;   // no UWREQ created
+   if (sr.target_amount != 0) {
+      if (current_quote == 0) {
+         // Zero quote: skip only when a required reserve is genuinely
+         // unprovisioned / not ACTIVE (dev & smoke clusters). If every required
+         // reserve IS ACTIVE, a zero quote is an unpriceable/degenerate reserve
+         // — fail closed so target_amount cannot bypass variance and over-debit
+         // at settlement (WSA-041).
+         if (required_reserves_active(src_chain_code, src_token_code, src_reserve_code,
+                                      dst_chain_code, dst_token_code, dst_reserve_code)) {
+            emit_swap_revert(get_self(), chain_code, attestation_id, sr,
+                             src_chain_code, src_reserve_code,
+                             "unpriceable reserve: zero quote from an ACTIVE reserve "
+                             "(degenerate weights/balances) — fail closed");
+            return;   // no UWREQ created
+         }
+      } else {
+         uint64_t target   = sr.target_amount;
+         uint64_t diff     = current_quote > target ? current_quote - target : target - current_quote;
+         // tolerance_bps / 10000 of target; computed in uint128 to avoid overflow.
+         uint128_t allowed = (static_cast<uint128_t>(target) * sr.target_tolerance_bps) / 10000u;
+         if (static_cast<uint128_t>(diff) > allowed) {
+            emit_swap_revert(get_self(), chain_code, attestation_id, sr,
+                             src_chain_code, src_reserve_code,
+                             "variance exceeded tolerance: target=" + std::to_string(target)
+                             + " current=" + std::to_string(current_quote)
+                             + " tolerance_bps=" + std::to_string(sr.target_tolerance_bps));
+            return;   // no UWREQ created
+         }
       }
    }
 
@@ -993,22 +1041,37 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
          req.dst_chain_code, req.dst_token_code, req.dst_reserve_code,
          req.src_amount, current_fee_bps(self));
       const uint64_t quoted = req.dst_amount;
-      if (current_quote != 0 && quoted != 0) {
-         const uint64_t diff = current_quote > quoted
-                                  ? current_quote - quoted
-                                  : quoted - current_quote;
-         const uint128_t allowed = (static_cast<uint128_t>(quoted)
-                                       * req.variance_tolerance_bps) / 10000u;
-         if (static_cast<uint128_t>(diff) > allowed) {
-            // Drift now exceeds the user's tolerance — refund the source
-            // side and REJECT rather than lock a stale quote. Non-throwing.
-            reject_and_refund(self, reqs, pk, req, src_needed,
-               "variance exceeded tolerance at race resolution: "
-               "quoted=" + std::to_string(quoted)
-               + " current=" + std::to_string(current_quote)
-               + " tolerance_bps=" + std::to_string(req.variance_tolerance_bps),
-               "uwreq reverted at race resolution (variance drift)");
-            return;
+      if (quoted != 0) {
+         if (current_quote == 0) {
+            // Zero quote with every required reserve ACTIVE = unpriceable /
+            // degenerate reserve (drained side, extreme weights, leg too small
+            // to price). Fail closed so a stale target cannot settle against a
+            // reserve the AMM can no longer price (WSA-041). Skip only when a
+            // required reserve is genuinely unprovisioned (dev & smoke clusters).
+            if (required_reserves_active(req.src_chain_code, req.src_token_code, req.src_reserve_code,
+                                         req.dst_chain_code, req.dst_token_code, req.dst_reserve_code)) {
+               reject_and_refund(self, reqs, pk, req, src_needed,
+                  "unpriceable reserve: zero quote from an ACTIVE reserve at race resolution",
+                  "uwreq reverted at race resolution (unpriceable reserve)");
+               return;
+            }
+         } else {
+            const uint64_t diff = current_quote > quoted
+                                     ? current_quote - quoted
+                                     : quoted - current_quote;
+            const uint128_t allowed = (static_cast<uint128_t>(quoted)
+                                          * req.variance_tolerance_bps) / 10000u;
+            if (static_cast<uint128_t>(diff) > allowed) {
+               // Drift now exceeds the user's tolerance — refund the source
+               // side and REJECT rather than lock a stale quote. Non-throwing.
+               reject_and_refund(self, reqs, pk, req, src_needed,
+                  "variance exceeded tolerance at race resolution: "
+                  "quoted=" + std::to_string(quoted)
+                  + " current=" + std::to_string(current_quote)
+                  + " tolerance_bps=" + std::to_string(req.variance_tolerance_bps),
+                  "uwreq reverted at race resolution (variance drift)");
+               return;
+            }
          }
       }
    }
@@ -1461,13 +1524,23 @@ void uwrit::drainfwq() {
          refund_and_drop("target reserve is private (excluded from WIRE-endpoint swaps)");
          continue;
       }
-      // Authoritative variance check — same convention as createuwreq: a
-      // zero quote (unprovisioned LP) skips the check.
+      // Authoritative variance check. The target reserve is confirmed ACTIVE
+      // above, so a zero quote here is NOT an unprovisioned-LP skip — it is a
+      // degenerate / unpriceable ACTIVE reserve (token side drained to zero,
+      // extreme connector weights, or a WIRE escrow too small for the
+      // weighted-Bancor kernel to price). Fail closed and refund: otherwise a
+      // caller-chosen target_amount bypasses variance and drains the reserve's
+      // token side for a negligible WIRE escrow (WSA-041).
       const uint64_t quote = swap_quote(*depot_code, WIRE_TOKEN, WIRE_TOKEN,
                                          row.dst_chain_code, row.dst_token_code,
                                          row.dst_reserve_code, row.wire_amount,
                                          current_fee_bps(get_self()));
-      if (quote != 0 && row.target_amount != 0) {
+      if (quote == 0) {
+         refund_and_drop("unpriceable target reserve: zero quote from an ACTIVE reserve");
+         continue;
+      }
+      {
+         // `target_amount > 0` is guaranteed by swapfromwire.
          const uint64_t diff = quote > row.target_amount
                                   ? quote - row.target_amount
                                   : row.target_amount - quote;

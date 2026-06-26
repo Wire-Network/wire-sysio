@@ -9,11 +9,12 @@ namespace {
 // model, as sysio.token uses): the account stays finite at code+abi size; growth draws from the pool.
 constexpr name ram_payer = "sysio"_n;
 
-// Maximum decimal precision a token concept or chain-token binding may declare.
-// 10^18 is the largest power of ten that fits in int64 (the asset amount type),
-// matching the asset/symbol convention; values above this cannot be represented
-// safely by downstream asset math.
-constexpr uint32_t MAX_TOKEN_PRECISION = 18;
+// Maximum decimal precision a token may declare on the depot. `Token.precision`
+// is the depot-FRAME precision (the canonical 9-decimal frame is the cap); a
+// token whose native precision exceeds this is downscaled to the frame at the
+// outpost boundary (`min(native, 9)`), so the depot never holds more than 9
+// decimals — which also keeps every uint64/int64 amount field in range.
+constexpr uint32_t MAX_TOKEN_PRECISION = 9;
 
 uint64_t current_time_ms() {
    return static_cast<uint64_t>(current_time_point().sec_since_epoch()) * 1000;
@@ -48,7 +49,7 @@ void tokens::regtoken(opp::types::TokenKind    kind,
    sysio::check(kind != opp::types::TOKEN_KIND_UNKNOWN,
                 "sysio.tokens: token kind must not be UNKNOWN");
    sysio::check(precision <= MAX_TOKEN_PRECISION,
-                "sysio.tokens: precision exceeds maximum supported (18)");
+                "sysio.tokens: precision exceeds the depot frame maximum (9)");
 
    tokens_t tbl(get_self());
    token_key pk{code};
@@ -89,12 +90,8 @@ void tokens::activtoken(sysio::slug_name code) {
 void tokens::regctok(sysio::slug_name   chain_code,
                       sysio::slug_name   token_code,
                       std::vector<char> contract_addr,
-                      uint32_t          precision_override,
                       bool              is_native) {
    require_priv_caller();
-
-   sysio::check(precision_override <= MAX_TOKEN_PRECISION,
-                "sysio.tokens: precision_override exceeds maximum supported (18)");
 
    chaintokens_t tbl(get_self());
    chain_token_key pk{chain_code, token_code};
@@ -119,7 +116,6 @@ void tokens::regctok(sysio::slug_name   chain_code,
       .chain_code         = chain_code,
       .token_code         = token_code,
       .contract_addr      = std::move(contract_addr),
-      .precision_override = precision_override,
       .is_native          = is_native,
       .active             = bootstrap,
       .registered_at_ms   = now,

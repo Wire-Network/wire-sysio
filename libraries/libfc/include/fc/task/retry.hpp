@@ -1,6 +1,7 @@
 #pragma once
 
 #include <fc/exception/exception.hpp>
+#include <fc/task/deadline.hpp>
 #include <fc/time.hpp>
 
 #include <algorithm>
@@ -71,10 +72,18 @@ template <typename T>
 T retry_until(std::string_view                          op_label,
               const retry_options&                      opts,
               const std::function<std::optional<T>()>&  attempt) {
-   const auto deadline_abs = fc::time_point::now() + opts.total_timeout;
+   const auto start_time   = fc::time_point::now();
+   const auto deadline_abs = fc::task::clamp_to_current_deadline(start_time + opts.total_timeout);
+   const auto budget       = std::max(fc::microseconds(), deadline_abs - start_time);
    auto       backoff      = opts.initial_backoff;
 
    while (true) {
+      if (fc::time_point::now() >= deadline_abs) {
+         FC_THROW_EXCEPTION(fc::timeout_exception,
+                            "{}: deadline exceeded after {}ms",
+                            std::string(op_label),
+                            budget.count() / 1000);
+      }
       if (auto out = attempt(); out.has_value()) {
          return std::move(*out);
       }
@@ -83,7 +92,7 @@ T retry_until(std::string_view                          op_label,
          FC_THROW_EXCEPTION(fc::timeout_exception,
                             "{}: deadline exceeded after {}ms",
                             std::string(op_label),
-                            opts.total_timeout.count() / 1000);
+                            budget.count() / 1000);
       }
       const auto remaining = deadline_abs - now;
       const auto sleep_for_us = std::min(backoff, remaining);

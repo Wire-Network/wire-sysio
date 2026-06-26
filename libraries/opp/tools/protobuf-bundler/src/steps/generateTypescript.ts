@@ -3,7 +3,7 @@ import Fs from "node:fs"
 import Path from "node:path"
 import { log } from "../util/logger.js"
 import { renderTemplate } from "../util/templates.js"
-import { resolvePluginBin, findProtoRoot } from "./runProtoc.js"
+import { resolvePluginBin, resolveProtocBin, findProtoRoot } from "./runProtoc.js"
 import { Target, TemplatePath, TemplateFile } from "../constants.js"
 
 export interface GenerateTypescriptOptions {
@@ -61,10 +61,11 @@ export async function generateTypescript(
     ...relativeProtos
   ]
 
-  log.info("Running protoc for TypeScript: npx protoc %s", args.join(" "))
+  const protocBin = resolveProtocBin()
+  log.info("Running protoc for TypeScript: %s %s", protocBin, args.join(" "))
 
   try {
-    execFileSync("npx", ["protoc", ...args], {
+    execFileSync(protocBin, args, {
       stdio: ["pipe", "pipe", "inherit"]
     })
   } catch (err: any) {

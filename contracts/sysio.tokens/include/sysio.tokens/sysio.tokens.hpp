@@ -25,8 +25,11 @@ namespace sysio {
     *    Composite PK = uint128 `(chain_code << 64) | token_code`. Carries
     *    `contract_addr` (the per-outpost address — equal to `Token.address`
     *    bytes for the chain-of-origin binding, distinct for wrapped versions
-    *    on other chains), `precision_override`, and `is_native` (exactly one
-    *    per Chain).
+    *    on other chains) and `is_native` (exactly one per Chain). Chain-native
+    *    decimal precision is NOT stored here — the depot's per-token precision
+    *    lives on `sysio.tokens::token_row.precision` (the single source of
+    *    truth) and on each `sysio.reserv` reserve row; the outpost owns the
+    *    chain-native ↔ depot-frame conversion at its boundary.
     *
     * ## Lifecycle (unified bootstrap + post-bootstrap, per
     * /data/shared/code/wire/.claude/rules/epoch-duration-global.md):
@@ -60,18 +63,10 @@ namespace sysio {
       [[sysio::action]]
       void activtoken(sysio::slug_name code);
 
-      /// @param precision_override Chain-native decimal precision for this
-      ///        (chain, token) binding. Defaults to the canonical 9-decimal
-      ///        depot frame; pass a different value only when the origin chain
-      ///        represents the asset with a different number of decimals
-      ///        (e.g. a 6-decimal ERC-20). Stored as metadata; the depot's
-      ///        on-chain accounting always operates in the canonical 9-decimal
-      ///        frame.
       [[sysio::action]]
       void regctok(sysio::slug_name   chain_code,
                    sysio::slug_name   token_code,
                    std::vector<char> contract_addr,
-                   uint32_t          precision_override,
                    bool              is_native);
 
       [[sysio::action]]
@@ -128,10 +123,6 @@ namespace sysio {
          sysio::slug_name   chain_code;
          sysio::slug_name   token_code;
          std::vector<char> contract_addr;
-         // Chain-native decimal precision for this binding. Defaults to the
-         // canonical 9-decimal depot frame so every token is 9 decimals unless
-         // an origin chain explicitly represents it differently.
-         uint32_t          precision_override = 9;
          bool              is_native          = false;
          bool              active             = false;
          uint64_t          registered_at_ms   = 0;
@@ -142,7 +133,7 @@ namespace sysio {
          uint64_t by_active()     const { return active ? 1 : 0; }
 
          SYSLIB_SERIALIZE(chain_token_row,
-            (chain_code)(token_code)(contract_addr)(precision_override)
+            (chain_code)(token_code)(contract_addr)
             (is_native)(active)(registered_at_ms)(activated_at_ms))
       };
 

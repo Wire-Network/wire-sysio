@@ -92,6 +92,11 @@ namespace sysio::peer_auth {
          return (allowed_connections & (Producers | Specified)) != 0;
       }
 
+      /// Returns the initial authenticated flag for a new or reset connection.
+      bool initial_peer_authenticated() const {
+         return !needs_auth();
+      }
+
       /// Check whether a given public key is authorized to connect under the
       /// current policy. Does not log — callers should log on failure.
       bool is_key_authorized(const public_key_type& key) const {
