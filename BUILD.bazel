@@ -105,7 +105,7 @@ cmake_workspace_build(
     pre_build_steps = [
         "npm i -g @protobuf-ts/plugin",
         "pnpm i -g @protobuf-ts/plugin",
-        "( cd libraries/opp/tools && pnpm install --force --no-frozen-lockfile && pnpm --filter 'proto*' dist )",
+        "( cd libraries/opp/tools && pnpm install --force --no-frozen-lockfile && pnpm --filter './proto*' dist )",
     ],
     tags = [
         "cpp",
