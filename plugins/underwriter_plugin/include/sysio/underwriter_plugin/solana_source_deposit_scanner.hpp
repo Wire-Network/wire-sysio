@@ -10,8 +10,10 @@
 #include <boost/algorithm/string/predicate.hpp>
 
 #include <array>
+#include <compare>
 #include <cstring>
 #include <functional>
+#include <map>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -56,6 +58,107 @@ struct solana_source_deposit_page_scan_result {
 
 /// Fetches one decoded Solana transaction for the supplied base58 signature.
 using solana_transaction_fetcher = std::function<fc::variant(const std::string&)>;
+
+/// Cursor key for SOL source-deposit discovery. The uwreq id bounds the
+/// cursor to one depot request while the deposit id prevents accidental reuse
+/// if a stale entry survives across schema or replay changes.
+struct solana_source_deposit_scan_key {
+   uint64_t uwreq_id;
+   uint64_t deposit_id;
+   friend auto operator<=>(const solana_source_deposit_scan_key&,
+                           const solana_source_deposit_scan_key&) = default;
+};
+
+/// Persistent SOL signature scan progress for one pending UWREQ.
+struct solana_source_deposit_scan_cursor {
+   /// Signature cursor passed to `getSignaturesForAddress(before=...)`.
+   std::optional<std::string> before;
+   /// Number of pages inspected while walking this UWREQ's source deposit.
+   uint64_t pages_scanned = 0;
+   /// Number of signature-list entries inspected across scanned pages.
+   uint64_t signatures_scanned = 0;
+   /// True once verification found a terminal source-deposit failure.
+   bool terminal_failure = false;
+   /// First terminal failure reason, kept for later short-circuit logs.
+   std::string terminal_failure_reason;
+};
+
+/// Per-pending-UWREQ Solana scan state.
+using solana_source_deposit_scan_cursor_map =
+   std::map<solana_source_deposit_scan_key, solana_source_deposit_scan_cursor>;
+
+/// Result from recording a terminal SOL source-deposit verification failure.
+struct solana_source_deposit_terminal_failure_result {
+   /// Updated cursor state after recording the failure.
+   solana_source_deposit_scan_cursor cursor;
+   /// True only for the first terminal failure recorded for this UWREQ.
+   bool first_failure = false;
+};
+
+/// Returns the current SOL source-deposit scan cursor for `key`, creating one
+/// at the newest page when this is the first scan attempt for a UWREQ.
+inline solana_source_deposit_scan_cursor
+get_or_create_solana_source_deposit_scan_cursor(solana_source_deposit_scan_cursor_map& cursors,
+                                                const solana_source_deposit_scan_key& key) {
+   return cursors[key];
+}
+
+/// Returns terminal failure state for a SOL source-deposit scan, when present.
+inline std::optional<solana_source_deposit_scan_cursor>
+get_solana_source_deposit_terminal_failure(const solana_source_deposit_scan_cursor_map& cursors,
+                                           const solana_source_deposit_scan_key& key) {
+   const auto it = cursors.find(key);
+   if (it == cursors.end() || !it->second.terminal_failure) return std::nullopt;
+   return it->second;
+}
+
+/// Persists the next SOL source-deposit `before` cursor after a clean page
+/// that did not contain the target marker.
+inline solana_source_deposit_scan_cursor
+advance_solana_source_deposit_scan_cursor(solana_source_deposit_scan_cursor_map& cursors,
+                                          const solana_source_deposit_scan_key& key,
+                                          std::string before,
+                                          size_t signature_count) {
+   auto& cursor = cursors[key];
+   cursor.before = std::move(before);
+   cursor.pages_scanned++;
+   cursor.signatures_scanned += signature_count;
+   return cursor;
+}
+
+/// Records a terminal SOL source-deposit failure without allowing future scan
+/// cycles to re-walk the same pending UWREQ from the newest signature page.
+inline solana_source_deposit_terminal_failure_result
+record_solana_source_deposit_terminal_failure(solana_source_deposit_scan_cursor_map& cursors,
+                                              const solana_source_deposit_scan_key& key,
+                                              std::string reason,
+                                              size_t signature_count) {
+   auto& cursor = cursors[key];
+   const bool first_failure = !cursor.terminal_failure;
+   if (first_failure) {
+      cursor.pages_scanned++;
+      cursor.signatures_scanned += signature_count;
+      cursor.terminal_failure = true;
+      cursor.terminal_failure_reason = std::move(reason);
+   }
+   return {.cursor = cursor, .first_failure = first_failure};
+}
+
+/// Drops SOL source-deposit scan progress for a UWREQ once it matches or
+/// leaves the PENDING set.
+inline void erase_solana_source_deposit_scan_cursor(solana_source_deposit_scan_cursor_map& cursors,
+                                                    const solana_source_deposit_scan_key& key) {
+   cursors.erase(key);
+}
+
+/// Prunes SOL source-deposit scan state for UWREQs that are no longer pending.
+template<typename PendingUwreqIds>
+void prune_solana_source_deposit_scan_cursors(solana_source_deposit_scan_cursor_map& cursors,
+                                              const PendingUwreqIds& still_pending) {
+   std::erase_if(cursors, [&](const auto& entry) {
+      return !still_pending.contains(entry.first.uwreq_id);
+   });
+}
 
 /// Returns true when a Solana log line opens, closes, or otherwise describes
 /// an invocation frame rather than carrying a user `Program log:` payload.

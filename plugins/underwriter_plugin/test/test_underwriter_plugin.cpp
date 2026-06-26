@@ -7,6 +7,7 @@
 #include <set>
 #include <map>
 #include <string>
+#include <unordered_set>
 #include <vector>
 
 #include <sysio/underwriter_plugin/solana_source_deposit_scanner.hpp>
@@ -215,6 +216,86 @@ BOOST_AUTO_TEST_CASE(knapsack_fallback_threshold_is_documented) try {
 // integration coverage via curl in the flow tests.
 BOOST_AUTO_TEST_CASE(http_endpoints_registered_at_startup) try {
    BOOST_CHECK(true);
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(solana_source_deposit_scan_state_advances_across_pages) try {
+   sysio::underwriter::solana_source_deposit_scan_cursor_map cursors;
+   const sysio::underwriter::solana_source_deposit_scan_key key{
+      .uwreq_id = 42,
+      .deposit_id = 7,
+   };
+
+   const auto initial =
+      sysio::underwriter::get_or_create_solana_source_deposit_scan_cursor(cursors, key);
+   BOOST_CHECK(!initial.before);
+   BOOST_CHECK_EQUAL(initial.pages_scanned, 0);
+   BOOST_CHECK_EQUAL(initial.signatures_scanned, 0);
+
+   const auto first_page = sysio::underwriter::advance_solana_source_deposit_scan_cursor(
+      cursors, key, "page-0-last-signature", sysio::underwriter::SOL_SIGNATURE_SCAN_PAGE_SIZE);
+   BOOST_REQUIRE(first_page.before);
+   BOOST_CHECK_EQUAL(*first_page.before, "page-0-last-signature");
+   BOOST_CHECK_EQUAL(first_page.pages_scanned, 1);
+   BOOST_CHECK_EQUAL(first_page.signatures_scanned, sysio::underwriter::SOL_SIGNATURE_SCAN_PAGE_SIZE);
+
+   const auto second_page = sysio::underwriter::advance_solana_source_deposit_scan_cursor(
+      cursors, key, "page-1-last-signature", sysio::underwriter::SOL_SIGNATURE_SCAN_PAGE_SIZE);
+   BOOST_REQUIRE(second_page.before);
+   BOOST_CHECK_EQUAL(*second_page.before, "page-1-last-signature");
+   BOOST_CHECK_EQUAL(second_page.pages_scanned, 2);
+   BOOST_CHECK_EQUAL(second_page.signatures_scanned, sysio::underwriter::SOL_SIGNATURE_SCAN_PAGE_SIZE * 2);
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(solana_source_deposit_scan_state_records_terminal_failure_once) try {
+   sysio::underwriter::solana_source_deposit_scan_cursor_map cursors;
+   const sysio::underwriter::solana_source_deposit_scan_key key{
+      .uwreq_id = 43,
+      .deposit_id = 8,
+   };
+
+   sysio::underwriter::advance_solana_source_deposit_scan_cursor(
+      cursors, key, "page-0-last-signature", sysio::underwriter::SOL_SIGNATURE_SCAN_PAGE_SIZE);
+   const auto first = sysio::underwriter::record_solana_source_deposit_terminal_failure(
+      cursors, key, "exhausted history", 17);
+   BOOST_CHECK(first.first_failure);
+   BOOST_CHECK(first.cursor.terminal_failure);
+   BOOST_CHECK_EQUAL(first.cursor.terminal_failure_reason, "exhausted history");
+   BOOST_CHECK_EQUAL(first.cursor.pages_scanned, 2);
+   BOOST_CHECK_EQUAL(first.cursor.signatures_scanned, sysio::underwriter::SOL_SIGNATURE_SCAN_PAGE_SIZE + 17);
+
+   const auto terminal =
+      sysio::underwriter::get_solana_source_deposit_terminal_failure(cursors, key);
+   BOOST_REQUIRE(terminal);
+   BOOST_CHECK_EQUAL(terminal->terminal_failure_reason, "exhausted history");
+
+   const auto repeated = sysio::underwriter::record_solana_source_deposit_terminal_failure(
+      cursors, key, "second failure should not replace first", 99);
+   BOOST_CHECK(!repeated.first_failure);
+   BOOST_CHECK_EQUAL(repeated.cursor.terminal_failure_reason, "exhausted history");
+   BOOST_CHECK_EQUAL(repeated.cursor.pages_scanned, 2);
+   BOOST_CHECK_EQUAL(repeated.cursor.signatures_scanned, sysio::underwriter::SOL_SIGNATURE_SCAN_PAGE_SIZE + 17);
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(solana_source_deposit_scan_state_prunes_resolved_uwreqs) try {
+   sysio::underwriter::solana_source_deposit_scan_cursor_map cursors;
+   const sysio::underwriter::solana_source_deposit_scan_key pending_key{
+      .uwreq_id = 44,
+      .deposit_id = 9,
+   };
+   const sysio::underwriter::solana_source_deposit_scan_key resolved_key{
+      .uwreq_id = 45,
+      .deposit_id = 10,
+   };
+   sysio::underwriter::advance_solana_source_deposit_scan_cursor(
+      cursors, pending_key, "pending-last-signature", 3);
+   sysio::underwriter::record_solana_source_deposit_terminal_failure(
+      cursors, resolved_key, "resolved terminal failure", 5);
+
+   const std::unordered_set<uint64_t> still_pending{pending_key.uwreq_id};
+   sysio::underwriter::prune_solana_source_deposit_scan_cursors(cursors, still_pending);
+
+   BOOST_CHECK(cursors.contains(pending_key));
+   BOOST_CHECK(!cursors.contains(resolved_key));
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(solana_source_deposit_scan_finds_match_after_legacy_window) try {

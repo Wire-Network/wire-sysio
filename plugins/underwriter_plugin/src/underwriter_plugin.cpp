@@ -237,57 +237,63 @@ struct underwriter_plugin::impl {
    };
    std::set<commit_key>              confirmed_commits;
 
-   /// Cursor key for SOL source-deposit discovery. The uwreq id bounds the
-   /// cursor to one depot request while the deposit id prevents accidental
-   /// reuse if a stale entry survives across schema or replay changes.
-   struct sol_source_deposit_scan_key {
-      uint64_t uwreq_id;
-      uint64_t deposit_id;
-      friend auto operator<=>(const sol_source_deposit_scan_key&,
-                              const sol_source_deposit_scan_key&) = default;
-   };
-
-   /// Persistent SOL signature scan progress for one pending UWREQ.
-   struct sol_source_deposit_scan_cursor {
-      std::optional<std::string> before;
-      uint64_t pages_scanned = 0;
-      uint64_t signatures_scanned = 0;
-   };
-
    /// Per-pending-UWREQ Solana scan cursors. Persisting `before` across
    /// retry attempts and outer scan cycles prevents unrelated newer
    /// opp-outpost traffic from keeping a valid source deposit forever
-   /// outside the newest-page window.
-   std::map<sol_source_deposit_scan_key, sol_source_deposit_scan_cursor>
-      sol_source_deposit_scan_cursors;
+   /// outside the newest-page window. Terminal negative entries remain until
+   /// the UWREQ leaves PENDING so failed scans do not re-walk full history or
+   /// re-bump mismatch counters every outer scan cycle.
+   underwriter::solana_source_deposit_scan_cursor_map sol_source_deposit_scan_cursors;
 
    /// Returns the current SOL source-deposit scan cursor for `key`, creating
    /// one at the newest page when this is the first scan attempt for a UWREQ.
-   sol_source_deposit_scan_cursor get_or_create_sol_source_deposit_scan_cursor(
-      const sol_source_deposit_scan_key& key) {
+   underwriter::solana_source_deposit_scan_cursor get_or_create_sol_source_deposit_scan_cursor(
+      const underwriter::solana_source_deposit_scan_key& key) {
       std::lock_guard lk{stats_mutex};
-      return sol_source_deposit_scan_cursors[key];
+      return underwriter::get_or_create_solana_source_deposit_scan_cursor(
+         sol_source_deposit_scan_cursors, key);
+   }
+
+   /// Returns a terminal SOL source-deposit failure for `key`, when one has
+   /// already been recorded while the UWREQ remains PENDING.
+   std::optional<underwriter::solana_source_deposit_scan_cursor>
+   get_sol_source_deposit_terminal_failure(
+      const underwriter::solana_source_deposit_scan_key& key) const {
+      std::lock_guard lk{stats_mutex};
+      return underwriter::get_solana_source_deposit_terminal_failure(
+         sol_source_deposit_scan_cursors, key);
    }
 
    /// Persists the next SOL source-deposit `before` cursor after a clean page
    /// that did not contain the target marker.
-   sol_source_deposit_scan_cursor advance_sol_source_deposit_scan_cursor(
-      const sol_source_deposit_scan_key& key,
+   underwriter::solana_source_deposit_scan_cursor advance_sol_source_deposit_scan_cursor(
+      const underwriter::solana_source_deposit_scan_key& key,
       std::string                        before,
       size_t                             signature_count) {
       std::lock_guard lk{stats_mutex};
-      auto& cursor = sol_source_deposit_scan_cursors[key];
-      cursor.before = std::move(before);
-      cursor.pages_scanned++;
-      cursor.signatures_scanned += signature_count;
-      return cursor;
+      return underwriter::advance_solana_source_deposit_scan_cursor(
+         sol_source_deposit_scan_cursors, key, std::move(before), signature_count);
+   }
+
+   /// Records a terminal SOL source-deposit failure while keeping the scan
+   /// state until the UWREQ leaves PENDING.
+   underwriter::solana_source_deposit_terminal_failure_result
+   record_sol_source_deposit_terminal_failure(
+      const underwriter::solana_source_deposit_scan_key& key,
+      std::string reason,
+      size_t signature_count) {
+      std::lock_guard lk{stats_mutex};
+      return underwriter::record_solana_source_deposit_terminal_failure(
+         sol_source_deposit_scan_cursors, key, std::move(reason), signature_count);
    }
 
    /// Drops SOL source-deposit scan progress for a UWREQ once it either
-   /// matches, fails hard, or leaves the PENDING set.
-   void erase_sol_source_deposit_scan_cursor(const sol_source_deposit_scan_key& key) {
+   /// matches or leaves the PENDING set.
+   void erase_sol_source_deposit_scan_cursor(
+      const underwriter::solana_source_deposit_scan_key& key) {
       std::lock_guard lk{stats_mutex};
-      sol_source_deposit_scan_cursors.erase(key);
+      underwriter::erase_solana_source_deposit_scan_cursor(
+         sol_source_deposit_scan_cursors, key);
    }
 
    // -----------------------------------------------------------------------
@@ -671,9 +677,8 @@ struct underwriter_plugin::impl {
          std::erase_if(confirmed_commits, [&](const commit_key& k) {
             return !still_pending.contains(k.uwreq_id);
          });
-         std::erase_if(sol_source_deposit_scan_cursors, [&](const auto& entry) {
-            return !still_pending.contains(entry.first.uwreq_id);
-         });
+         underwriter::prune_solana_source_deposit_scan_cursors(
+            sol_source_deposit_scan_cursors, still_pending);
          uwreqs_seen_pending_count = requests.size();
       }
 
@@ -1703,8 +1708,10 @@ struct underwriter_plugin::impl {
    ///      not yet finalized → deferred retry (no mismatch bump).
    ///
    /// `false` returns:
-   ///   - hard mismatch (counter bumped) on bad size, hash divergence,
-   ///     malformed marker hash, or full-history exhaustion without a marker;
+   ///   - hard mismatch on bad size;
+   ///   - terminal source-deposit failure (counter bumped once per pending
+   ///     UWREQ) on hash divergence, malformed marker hash, or full-history
+   ///     exhaustion without a marker;
    ///   - deferred retry (no counter bump) on `retry_until` deadline
    ///     reached without a matching finalized log — the outer poll loop
    ///     reattempts on its next tick from the persisted cursor.
@@ -1787,14 +1794,28 @@ struct underwriter_plugin::impl {
       // ── (2) + (3) retry-loop until matched or budget expires ───────────
       // `bool hard_mismatch` distinguishes "found and known-bad" (hash
       // divergence / malformed marker / exhausted history) from "not yet
-      // found" (deferred). The retry-callback returns:
+      // found" (deferred). Terminal SOL failures are cached until the UWREQ
+      // leaves PENDING so later scan cycles do not re-walk full history.
+      // The retry-callback returns:
       //   - Some(true)                 -> success, exit retry_until
       //   - Some(false) hard_mismatch  -> fail-fast, exit retry_until
       //   - None                       -> deferred, sleep + retry
       // Outer `try { retry_until } catch (timeout_exception)` maps the
       // deadline-without-match case to deferred-no-mismatch-bump, while the
       // cursor survives for the next outer scan tick.
-      const sol_source_deposit_scan_key scan_key{req.id, deposit_id};
+      const underwriter::solana_source_deposit_scan_key scan_key{req.id, deposit_id};
+      if (const auto terminal = get_sol_source_deposit_terminal_failure(scan_key)) {
+         ilog("underwriter: source-deposit verify skipped for uwreq {} — "
+              "previous terminal SOL verification failure: {} "
+              "(deposit_id={}, pages_scanned={}, signatures_scanned={})",
+              req.id,
+              terminal->terminal_failure_reason,
+              deposit_id,
+              terminal->pages_scanned,
+              terminal->signatures_scanned);
+         return false;
+      }
+
       bool        hard_mismatch_seen = false;
       std::string matched_sig;
 
@@ -1852,8 +1873,11 @@ struct underwriter_plugin::impl {
                        sol_program_id,
                        cursor.before.value_or("<newest>"));
                   hard_mismatch_seen = true;
-                  erase_sol_source_deposit_scan_cursor(scan_key);
-                  bump_mismatch();
+                  {
+                     const auto terminal = record_sol_source_deposit_terminal_failure(
+                        scan_key, scan_result.reason, sigs.size());
+                     if (terminal.first_failure) bump_mismatch();
+                  }
                   return std::optional<bool>(false);
                case page_status::deferred:
                   ilog("underwriter: source-deposit verify deferred for uwreq {} — "
@@ -1869,17 +1893,22 @@ struct underwriter_plugin::impl {
             }
 
             if (scan_result.page_exhausted) {
+               const std::string reason =
+                  "exhausted Solana program signature history without SwapDeposit log";
                elog("underwriter: source-deposit verify failed for uwreq {} — "
-                    "exhausted Solana program signature history without SwapDeposit log "
-                    "(deposit_id={}, program={}, before={}, page_size={})",
+                    "{} (deposit_id={}, program={}, before={}, page_size={})",
                     req.id,
+                    reason,
                     deposit_id,
                     sol_program_id,
                     cursor.before.value_or("<newest>"),
                     sigs.size());
                hard_mismatch_seen = true;
-               erase_sol_source_deposit_scan_cursor(scan_key);
-               bump_mismatch();
+               {
+                  const auto terminal = record_sol_source_deposit_terminal_failure(
+                     scan_key, reason, sigs.size());
+                  if (terminal.first_failure) bump_mismatch();
+               }
                return std::optional<bool>(false);
             }
 
@@ -2099,6 +2128,15 @@ struct underwriter_plugin::impl {
    // the nodeop HTTP port.
    fc::variant build_stats_response() {
       std::lock_guard lk{stats_mutex};
+      size_t active_sol_source_deposit_cursor_count = 0;
+      size_t sol_source_deposit_terminal_failure_count = 0;
+      for (const auto& entry : sol_source_deposit_scan_cursors) {
+         if (entry.second.terminal_failure) {
+            sol_source_deposit_terminal_failure_count++;
+         } else {
+            active_sol_source_deposit_cursor_count++;
+         }
+      }
       return fc::variant(fc::mutable_variant_object()
          ("underwriter_account",            underwriter_account.to_string())
          ("enabled",                        enabled)
@@ -2117,7 +2155,8 @@ struct underwriter_plugin::impl {
          ("commits_failed",                 commits_failed_count)
          ("source_deposit_mismatch",        source_deposit_mismatch_count)
          ("outstanding_commit_count",       confirmed_commits.size())
-         ("sol_source_deposit_cursor_count", sol_source_deposit_scan_cursors.size())
+         ("sol_source_deposit_cursor_count", active_sol_source_deposit_cursor_count)
+         ("sol_source_deposit_terminal_failure_count", sol_source_deposit_terminal_failure_count)
       );
    }
 
