@@ -445,6 +445,45 @@ BOOST_FIXTURE_TEST_CASE(deposit_aggregates_into_existing_balance_row, sysio_opre
    BOOST_REQUIRE_EQUAL(150, balances[0]["balance"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
+// SEC-103 (WSA-028 follow-up): operator collateral must never accumulate past
+// asset::max_amount (2^62-1). A balance above the asset range would abort the
+// WIRE-direct remit path's asset(balance, CORE_SYM); on the never-throw
+// depositinle (OPP-inbound) path that abort would stall consensus. depositinle
+// gates the RUNNING SUM: a credit that would push the balance over the cap is
+// refunded via DEPOSIT_REVERT (the action still succeeds — never throws) and the
+// stored balance is left unchanged. The single-value WSA-028 wrap is closed
+// upstream in sysio.msgch; this is the accumulation guard.
+BOOST_FIXTURE_TEST_CASE(depositinle_credit_over_max_collateral_is_reverted, sysio_opreg_tester) { try {
+   // asset::max_amount — the Antelope asset magnitude limit (2^62 - 1), the cap
+   // sysio.opreg enforces on a single balance row.
+   constexpr uint64_t MAX_COLLATERAL = (uint64_t{1} << 62) - 1;
+
+   BOOST_REQUIRE_EQUAL(success(), setconfig());
+   BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.alice"_n, OPERATOR_TYPE_UNDERWRITER, false));
+
+   // Credit the balance up to EXACTLY the cap — accepted (the boundary is inclusive).
+   BOOST_REQUIRE_EQUAL(success(),
+      depositinle("uwrit.alice"_n, "ETH", "ETH", MAX_COLLATERAL));
+   {
+      auto op       = get_operator("uwrit.alice"_n);
+      auto balances = op["balances"].get_array();
+      BOOST_REQUIRE_EQUAL(1, balances.size());
+      BOOST_REQUIRE_EQUAL(MAX_COLLATERAL, balances[0]["balance"].as_uint64());
+   }
+
+   // A further +1 would push the sum to 2^62 (one past asset::max_amount). It is
+   // refunded via DEPOSIT_REVERT: the action succeeds (never throws) and the
+   // stored balance is unchanged — the credit did NOT wrap or saturate it in.
+   BOOST_REQUIRE_EQUAL(success(),
+      depositinle("uwrit.alice"_n, "ETH", "ETH", 1));
+   {
+      auto op       = get_operator("uwrit.alice"_n);
+      auto balances = op["balances"].get_array();
+      BOOST_REQUIRE_EQUAL(1, balances.size());
+      BOOST_REQUIRE_EQUAL(MAX_COLLATERAL, balances[0]["balance"].as_uint64());
+   }
+} FC_LOG_AND_RETHROW() }
+
 BOOST_FIXTURE_TEST_CASE(deposit_keeps_chain_token_pairs_separate, sysio_opreg_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), setconfig());
    BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.alice"_n, OPERATOR_TYPE_UNDERWRITER, false));
