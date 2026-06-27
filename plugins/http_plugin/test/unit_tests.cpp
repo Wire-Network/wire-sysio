@@ -39,6 +39,7 @@ constexpr uint32_t category_rw_index = 1;
 constexpr uint32_t category_ro_index = 2;
 constexpr uint32_t bytes_in_flight_index = 3;
 constexpr uint32_t requests_in_flight_index = 4;
+constexpr uint32_t request_body_bytes_in_flight_index = 5;
 // Keeps unsharded IPv6 probe coverage on the historical port 9999.
 constexpr uint32_t ipv6_probe_index = 2;
 
@@ -725,6 +726,78 @@ BOOST_FIXTURE_TEST_CASE(bytes_in_flight, http_plugin_test_fixture) {
       ilog( "response: {}, count: {}", std::string(obsolete_reason(e.first)), e.second );
    }
    BOOST_REQUIRE_EQUAL(r[boost::beast::http::status::ok], 8u);
+}
+
+// Regression test for request bodies queued to the app thread being accounted against the bytes_in_flight
+// budget. The handler samples the budget while the request body is still in flight (after admission/reservation
+// but before the response payload is accounted), so the sampled value reflects only the request-body
+// reservation. Without request-body accounting that sample is 0; with it, the in-flight body is counted. The
+// budget must also return to zero after the request completes, proving the reservation is released exactly once.
+BOOST_FIXTURE_TEST_CASE(request_body_bytes_in_flight, http_plugin_test_fixture) {
+   const std::string endpoint = test_http_endpoint("127.0.0.1", request_body_bytes_in_flight_index);
+   const std::string server_address = "--http-server-address=" + endpoint;
+   const std::string port = test_http_port(request_body_bytes_in_flight_index);
+
+   http_plugin* http_plugin = init({"--plugin=sysio::http_plugin",
+                                    server_address.c_str(),
+                                    "--http-max-bytes-in-flight-mb=64"});
+   BOOST_REQUIRE(http_plugin);
+
+   std::atomic<size_t> observed_body_size{0};
+   std::atomic<size_t> observed_bytes_in_flight{0};
+   http_plugin->add_api({{std::string("/echo_body"), api_category::node,
+                          [&](string&&, string&& body, url_response_callback&& cb) {
+                             // Sampled on the app thread while the request body is still in flight and before the
+                             // response payload is accounted, so it reflects only the request-body reservation.
+                             observed_body_size.store(body.size());
+                             observed_bytes_in_flight.store(http_plugin->bytes_in_flight());
+                             cb(200, "ok");
+                          }}}, appbase::exec_queue::read_write);
+
+   boost::asio::io_context ctx;
+   boost::asio::ip::tcp::resolver resolver(ctx);
+
+   // 1 MiB body: comfortably under the 2 MiB max-body-size and the 64 MiB in-flight budget.
+   const size_t body_size = 1024 * 1024;
+
+   auto post_body = [&]() {
+      boost::asio::ip::tcp::socket s(ctx, boost::asio::ip::tcp::v4());
+      boost::asio::connect(s, resolver.resolve("127.0.0.1", port));
+      boost::beast::http::request<boost::beast::http::string_body> req(boost::beast::http::verb::post, "/echo_body", 11);
+      req.keep_alive(true);
+      req.set(http::field::host, endpoint);
+      req.body() = std::string(body_size, 'x');
+      req.prepare_payload();
+      boost::beast::http::write(s, req);
+
+      boost::beast::http::response<boost::beast::http::string_body> resp;
+      boost::beast::flat_buffer buffer;
+      boost::beast::http::read(s, buffer, resp);
+      return resp.result();
+   };
+
+   auto wait_for_no_bytes_in_flight = [&]() {
+      uint16_t max = std::numeric_limits<uint16_t>::max();
+      while (http_plugin->requests_in_flight() > 0 && --max)
+         std::this_thread::sleep_for(std::chrono::milliseconds(5));
+      BOOST_CHECK(max > 0);
+      BOOST_CHECK_EQUAL(http_plugin->bytes_in_flight(), 0u);
+   };
+
+   BOOST_REQUIRE(post_body() == boost::beast::http::status::ok);
+   // The handler saw the full request body...
+   BOOST_CHECK_EQUAL(observed_body_size.load(), body_size);
+   // ...and the body was reserved against bytes_in_flight while in flight. This is the regression assertion:
+   // it reads 0 on the unfixed code (request bodies uncounted) and >= body_size with the fix.
+   BOOST_CHECK_GE(observed_bytes_in_flight.load(), body_size);
+   // The reservation is released once the request completes.
+   wait_for_no_bytes_in_flight();
+
+   // A second request must be admitted and counted the same way: no leaked or double-counted reservation.
+   observed_bytes_in_flight.store(0);
+   BOOST_REQUIRE(post_body() == boost::beast::http::status::ok);
+   BOOST_CHECK_GE(observed_bytes_in_flight.load(), body_size);
+   wait_for_no_bytes_in_flight();
 }
 
 BOOST_FIXTURE_TEST_CASE(requests_in_flight, http_plugin_test_fixture) {
