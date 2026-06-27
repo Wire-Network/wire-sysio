@@ -96,8 +96,9 @@ try:
     # relaunch and verify auto recovery
     prodNode.relaunch(timeout=365) # large timeout to wait on other producer
 
-    prodNode.waitForProducer("defproducerb")
-    prodNode.waitForProducer("defproducera")
+    # The recovery path requires the restarted producer to catch the peer fork and resume its own round.
+    assert prodNode.waitForProducer("defproducerb", exitOnError=True)
+    assert prodNode.waitForProducer("defproducera", exitOnError=True)
 
     # verify auto recovery without any restart
     prodNode.processUrllibRequest("test_control", "swap_action",
