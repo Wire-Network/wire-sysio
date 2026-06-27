@@ -283,6 +283,15 @@ drains quickly; sustained backlog means user-visible withdrawal latency and
 should be treated as a throughput follow-up, not as a reason to leave the
 chain-wide halt unfixed.
 
+Size volume by the worst realistic operation mix, not the average mix. SPL
+swaps dominate because one SPL swap can consume several times the dynamic
+account budget of a withdraw, deposit revert, or native swap. Before reaching
+for ALT, prefer cheaper throughput levers: shorten `epoch_duration_sec` if the
+extra consensus rounds are acceptable, and consider source-side pacing for
+drains such as `flushwtdw` and `drainfwq` so one epoch does not receive every
+matured withdrawal at once. ALT should be the last lever, gated by measured
+sustained demand rather than by the existence of short bursts.
+
 ## Account Budget Model
 
 Add an SVM budget estimator to WIRE-side envelope packing. The estimator should
@@ -297,7 +306,9 @@ Inputs available to the WIRE contract:
 - candidate READY attestations for the outpost;
 - protobuf attestation type and data;
 - the serialized candidate envelope bytes after each pack attempt;
-- token/reserve metadata if the contract chooses to read it;
+- token/reserve metadata only for deterministic account identity; do not use it
+  for cheaper native-vs-SPL classification unless it is proven identical to the
+  relay/outpost configuration;
 - stable constants matching the current Solana IDL and relay transaction
   construction.
 
@@ -332,11 +343,13 @@ Per-attestation effect-account estimates:
 | `RESERVE_READY` | Reserve PDA |
 | `RESERVE_CREATE_CANCELLED` | Reserve PDA plus refund accounts that the Solana handler may need |
 
-The first implementation should use an intentionally pessimistic SVM estimate
-for token effects unless exact native-vs-SPL classification is available from
-deterministic existing metadata in `sysio.msgch`. Pessimistic packing is
-acceptable because it only rolls more READY attestations into the next epoch.
-Over-packing can wedge delivery.
+The WIRE-side contract estimator must use an intentionally pessimistic SPL
+estimate for token effects unless it can prove native-vs-SPL classification
+from a source that is identical to the relay/outpost view. The authoritative
+classification lives in the Solana outpost configuration, which `sysio.msgch`
+cannot read. Therefore the first implementation should treat SVM token effects
+as SPL worst case. Pessimistic packing is acceptable because it only rolls more
+READY attestations into the next epoch. Over-packing can wedge delivery.
 
 The estimator should dedupe by semantic account identity where deterministic:
 
@@ -358,6 +371,12 @@ must model the final union size, and the required parity fixture must assert:
 contract_estimated_dynamic_accounts >= relay_actual_dynamic_account_union
 contract_estimated_packet_bytes     >= relay_actual_packet_bytes
 ```
+
+The fixture is meaningful only if it enforces the same classification rule.
+Include both SPL and native swap envelopes. For a native swap, the WIRE
+contract estimate should still use the pessimistic SPL budget while the relay's
+actual dynamic account union is smaller; the fixture must prove the contract
+estimate remains greater than or equal to the actual relay union.
 
 The constants above are consensus parameters. Changing them changes which
 attestations become PROCESSED versus remain READY. A change to the Solana IDL,
@@ -392,7 +411,7 @@ Consequences:
 
 - the one-deep `outenvelopes` row is not overwritten by a later `buildenv`;
 - the retained raw epoch-`N` envelope remains the recovery source;
-- no later epoch chains `previous_envelope_hash` from the bad hash;
+- no later outbound row is emitted to supersede the bad hash;
 - the stuck epoch is structurally unfinalized on the destination outpost;
 - the halt is chain-wide because the global advance gate waits on every active
   outpost;
@@ -419,12 +438,12 @@ should:
   attestation entries, because `buildenv` already erased the original source
   rows after marking them PROCESSED;
 - pack a now-fitting prefix back into the same `outenvelopes` row with the
-  same `epoch_index = N` and the same `previous_envelope_hash` anchor;
+  same `epoch_index = N`;
 - atomically replace the recorded epoch-`N` envelope bytes and envelope hash;
 - recreate the remainder as READY in original order so `buildenv(N + 1)` can
   drain them after epoch `N` unsticks;
-- preserve auditability with the old envelope hash, replacement envelope hash,
-  affected attestation ids, reason, timestamp, and actor;
+- write a new `envlog` audit entry with the replacement hash and preserve the
+  old envelope hash, affected attestation ids, reason, timestamp, and actor;
 - avoid silently dropping any value-transfer attestation.
 
 The action must not "requeue everything into a future epoch." Under the
@@ -468,6 +487,13 @@ Proposed flow:
     hard-aborting the whole outpost queue. The row must preserve enough data for
     refund, manual remediation, or a future protocol upgrade.
 
+The single-attestation-over-budget path should be treated as a loud,
+governance-gated "should never fire" safety net, not as an automated refund
+pipeline. Under the selected terminal-finalize shape, every current attestation
+type should fit by itself with margin. The implementation should include a
+regression test that constructs the worst current single attestation, including
+SPL `SWAP_REVERT` with ATA creation, and proves it fits the solo budget.
+
 Budget trimming should be operator-visible. At minimum, emit a deterministic
 log or print when SVM budget trimming occurs with chain code, epoch, included
 count, omitted count, estimated dynamic accounts, estimated packet bytes, and
@@ -487,6 +513,8 @@ Add tests that prove:
   the whole outpost queue. The recommended behavior is to mark that attestation
   as a dead-letter/error state with an explicit refund or remediation policy,
   not to hard-abort `buildenv` forever.
+- every current attestation type fits by itself under the terminal-call budget
+  with safety margin;
 - SVM budget trimming emits the expected observability signal with included and
   omitted counts plus the limiting budget;
 - the governance recovery action can reconstruct attestations from a pending
@@ -527,6 +555,8 @@ Also update the extractor tests:
 - SPL `SWAP_REMIT` derives the additional SPL accounts;
 - duplicated recipients/reserves are deduped;
 - generated account-budget fixtures match the contract-side estimator;
+- native swap fixtures prove the contract over-counts pessimistically while
+  still satisfying `contract_estimate >= relay_actual`;
 - CI fails if the relay's actual dynamic account union exceeds the contract
   estimate for representative native and SPL envelopes.
 
@@ -688,19 +718,35 @@ affected targets. For `wire-sysio`, this should include at minimum:
    half of the terminal dynamic-account budget. If sustained expected demand is
    above that threshold, schedule ALT or account-reduction work alongside this
    release train.
-2. Land `wire-solana` terminal-call changes and generated budget fixtures.
-3. Merge and deploy the WIRE-side account-budget-aware `buildenv` change with
+2. Decide deployment compatibility for the terminal call. If the Solana outpost
+   program is pre-launch, use a hard cutover. If it is deployed anywhere,
+   deploy the program/IDL first, deploy relay support second, and either keep
+   the old final-chunk-with-data path accepted during the transition or schedule
+   a coordinated downtime window.
+3. Land and deploy `wire-solana` terminal-call changes and generated budget
+   fixtures.
+4. Deploy relay binaries that use the terminal call and include the defensive
+   terminal-call guards.
+5. Merge and deploy the WIRE-side account-budget-aware `buildenv` change with
    the same constants used by the relay/program fixtures.
-4. Deploy relay binaries with the defensive terminal-call guards.
-5. Treat budget constants as consensus parameters. Any later account-list,
+6. Treat budget constants as consensus parameters. Any later account-list,
    packet-format, or chunk-size change requires a coordinated
    contract/relay/program rollout.
-6. Monitor logs for "SVM envelope budget trim" events to confirm that excess
+7. Monitor logs for "SVM envelope budget trim" events to confirm that excess
    READY attestations are rolling to later epochs rather than causing final
    chunk failures.
-7. Monitor READY backlog age and count for Solana-bound value transfers. A
+8. Monitor READY backlog age and count for Solana-bound value transfers. A
    growing backlog means funds are delayed even though consensus is no longer
    wedged.
+9. Ship a detection-to-recovery runbook: if the relay terminal-call guard fires
+   on a committed envelope, treat it as a chain-wide halt risk and invoke the
+   in-place recovery action on the current pinned epoch.
+
+Shared-fate note: SEC-94 removes the Solana account-overflow trigger, but WIRE
+epoch advancement still waits on every active outpost. Any other outpost
+deliverability failure can still halt all OPP advancement. ETH envelope
+representability should remain in scope for the broader WSA-049-style
+deliverability audit.
 
 ## Implementation Defaults And Remaining Decisions
 
@@ -709,23 +755,26 @@ Default implementation choices:
 - Proceed with the safety floor now: bounded `buildenv`, zero-data terminal
   finalize, relay/client guards, mandatory parity fixtures, and in-place
   recovery for a bad pinned epoch.
-- Do not include ALT in the first SEC-94 patch unless volume sizing proves the
-  terminal budget is insufficient for sustained demand.
-- Use exact native-vs-SPL classification only when `sysio.msgch` can prove it
-  from deterministic existing metadata. Otherwise use pessimistic SPL
-  worst-case estimation.
+- Do not include ALT in the first SEC-94 patch unless measured volume sizing
+  proves the terminal budget is insufficient after considering
+  `epoch_duration_sec` tuning and source-side pacing.
+- Use pessimistic SPL worst-case estimation for SVM token effects. Exact
+  native-vs-SPL classification is allowed only if `sysio.msgch` can prove it
+  from a source identical to the relay/outpost configuration.
 - Emit deterministic SVM budget-trim observability. Add a persistent counter or
   table only if operators need on-chain querying.
 - Treat a single attestation that cannot fit by itself as a dedicated
-  dead-letter/error case. Preserve the value-transfer record and exclude it
-  from normal `buildenv` packing until it is explicitly remediated.
+  dead-letter/error case. It should be governance-gated and should never fire
+  for current attestation types; preserve the value-transfer record and exclude
+  it from normal `buildenv` packing until it is explicitly remediated.
 
 Remaining decisions before final PR:
 
 1. What is the expected sustained Solana-bound volume for withdrawals, deposit
-   reverts, and swap remits? If it is above roughly half the terminal
-   dynamic-account budget per epoch, ALT or effect-account reduction should be
-   scheduled with this release train.
+   reverts, and swap remits, sized by worst realistic operation mix and current
+   `epoch_duration_sec`? If it is above roughly half the terminal
+   dynamic-account budget per epoch after source-side pacing, ALT or
+   effect-account reduction should be scheduled with this release train.
 2. What authority and policy remediates a dead-lettered value-transfer
    attestation: governance refund, manual re-encoding, protocol upgrade, or a
    more specific operational path?
