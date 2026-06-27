@@ -375,6 +375,10 @@ namespace sysio {
                             timer_type which);
 
       void add(connection_ptr c);
+      /// Validate and retain an operator-supplied peer, then attempt to connect. Unparseable endpoints are
+      /// rejected without being retained, so addresses the node refuses do not accumulate in the supplied-peer
+      /// set that later reconnect and inbound-acceptance scans iterate.
+      /// @return human-readable status string.
       string connect(const string& host, const string& p2p_address);
       string resolve_and_connect(const string& peer_address, const string& listen_address);
       connection_ptr is_other_connected(const string& peer_address, const connection_ptr& c) const;
@@ -4930,6 +4934,13 @@ namespace sysio {
 
    // called by API
    string connections_manager::connect( const string& host, const string& p2p_address ) {
+      // Validate before retaining. split_host_port_type yields an empty host for anything unparseable and
+      // never throws. The historical code inserted into supplied_peers first, so a rejected address was kept
+      // permanently and then iterated by every reconnect scan and inbound-acceptance check even though
+      // resolve_and_connect would never act on it.
+      if (auto [vhost, vport, vtype] = net_utils::split_host_port_type(host); vhost.empty()) {
+         return "invalid peer address";
+      }
       std::unique_lock g( connections_mtx );
       supplied_peers.insert(host);
       g.unlock();
