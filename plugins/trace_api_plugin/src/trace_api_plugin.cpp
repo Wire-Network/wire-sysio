@@ -410,7 +410,7 @@ struct trace_api_rpc_plugin_impl : public std::enable_shared_from_this<trace_api
             auto result = self->req_handler->get_actions(query);
             cb( 200, fc::mutable_variant_object()
                         ("block_num_start", query.block_num_start)
-                        ("block_num_end",   query.block_num_end)
+                        ("block_num_end",   result.last_block_num)
                         ("actions",         result.actions) );
          } catch (...) {
             http_plugin::handle_exception("trace_api", "get_actions", body, cb);
@@ -459,7 +459,7 @@ struct trace_api_rpc_plugin_impl : public std::enable_shared_from_this<trace_api
             auto result = self->req_handler->get_token_transfer_actions(query);
             cb( 200, fc::mutable_variant_object()
                         ("block_num_start", query.block_num_start)
-                        ("block_num_end",   query.block_num_end)
+                        ("block_num_end",   result.last_block_num)
                         ("transfers",       result.actions) );
          } catch (...) {
             http_plugin::handle_exception("trace_api", "get_token_transfers", body, cb);

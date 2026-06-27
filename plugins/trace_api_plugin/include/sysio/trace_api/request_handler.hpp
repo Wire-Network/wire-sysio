@@ -68,10 +68,31 @@ namespace sysio::trace_api {
    };
 
    /**
+    * Soft ceiling on the number of action results materialized into a single get_actions /
+    * get_token_transfers response.  Complements the per-request block-window cap
+    * (trace-max-block-range): the window bounds how many blocks are scanned, this bounds how many
+    * matching actions are decoded, hex-serialized, and held in memory from that window, so a broad
+    * or unfiltered query over a busy range cannot materialize an unbounded response set.
+    *
+    * Enforced at block boundaries (see get_actions_impl): the scan stops once a fully scanned block
+    * brings the running total to this value, so a single response may exceed it by at most one
+    * block's worth of matching actions (itself bounded by consensus block limits).  Clients page
+    * past the ceiling by resuming the scan at actions_result::last_block_num + 1.
+    *
+    * Intentionally a hard-coded constant, NOT a nodeop configuration option: there is no setting to
+    * raise or disable it, so the bound holds on every node regardless of operator configuration.
+    */
+   inline constexpr uint32_t max_actions_per_response = 10'000;
+
+   /**
     * Result returned by get_actions.
     */
    struct actions_result {
       fc::variants actions;
+      /// Highest block number fully scanned by the request.  Equals the clamped block_num_end on a
+      /// complete scan; lower when max_actions_per_response stopped the scan early.  Clients resume
+      /// at last_block_num + 1.
+      uint32_t     last_block_num = 0;
    };
 
    /**
@@ -246,11 +267,14 @@ namespace sysio::trace_api {
        * Scan a block range for action traces matching the given filter.
        *
        * Blocks are scanned in ascending order.  Within each block, actions are visited in ascending
-       * global_sequence order.  All matching actions in the (caller-clamped) range are returned;
-       * the caller is responsible for capping block_num_end so that the response stays bounded.
+       * global_sequence order.  Matching actions in the (caller-clamped) block range are returned up
+       * to max_actions_per_response; if that ceiling is reached the scan stops at the next block
+       * boundary and actions_result::last_block_num reports the last block fully scanned, so the
+       * client can resume at last_block_num + 1.  Capping the block window itself remains the
+       * caller's responsibility (trace-max-block-range).
        *
        * @param query - filter parameters
-       * @return actions_result containing the matching actions
+       * @return actions_result with the matching actions and the last block scanned
        */
       actions_result get_actions(const action_query& query) {
          return get_actions_impl(query, variant_shape::full);
@@ -258,6 +282,7 @@ namespace sysio::trace_api {
 
       /// Slim response for get_token_transfers: transfer-relevant fields only.
       /// Omits execution-tree ordinals, receipt sequences, ram_deltas, and resource usage.
+      /// Subject to the same max_actions_per_response ceiling as get_actions.
       actions_result get_token_transfer_actions(const action_query& query) {
          return get_actions_impl(query, variant_shape::slim);
       }
@@ -297,6 +322,12 @@ namespace sysio::trace_api {
          // unvalidated client input on the HTTP path), so a uint32_t counter would wrap from UINT32_MAX
          // back to 0 at ++block_num and spin forever.  bn stays in [start, end+1] and never wraps; the
          // HTTP-side clamp is then only a range bound, not the sole thing preventing an infinite loop.
+
+         // Default to reporting a complete scan; lowered below only if the action ceiling stops us
+         // early.  On natural completion this stays at the clamped end, so trailing blocks with no
+         // recorded data are still counted as scanned and a client resumes past them, not before.
+         result.last_block_num = query.block_num_end;
+
          const uint64_t end = query.block_num_end;
          for (uint64_t bn = query.block_num_start; bn <= end; ++bn) {
             // bn <= end <= UINT32_MAX throughout the loop body, so this narrowing is value-preserving.
@@ -389,6 +420,15 @@ namespace sysio::trace_api {
                   }
                }
             }, std::get<0>(*data));
+
+            // Stop at this block boundary once the response reaches the ceiling.  The current block
+            // was scanned in full above, so no partial block is ever returned and a client resuming
+            // at last_block_num + 1 neither skips nor duplicates actions.  Worst-case overshoot is
+            // one block's matching actions.
+            if (result.actions.size() >= max_actions_per_response) {
+               result.last_block_num = block_num;
+               break;
+            }
          }
 
          return result;
