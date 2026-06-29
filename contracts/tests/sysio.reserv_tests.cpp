@@ -165,21 +165,6 @@ public:
          ("owner",                 owner));
    }
 
-   /// `onreward` v6 signature: `(chain_code, token_code, reserve_code,
-   /// outpost_amount)`.
-   action_result onreward(name signer,
-                          std::string_view chain_code,
-                          std::string_view token_code,
-                          std::string_view reserve_code,
-                          uint64_t outpost_amount) {
-      return push_action(signer, "onreward"_n, mvo()
-         ("chain_code",     codename_mvo(chain_code))
-         ("token_code",     codename_mvo(token_code))
-         ("reserve_code",   codename_mvo(reserve_code))
-         ("outpost_amount", outpost_amount));
-   }
-
-
    /// The contract's real WIRE token balance (raw units, 9 decimals).
    int64_t wire_balance(name account) {
       auto bal = get_currency_balance(TOKEN_ACCOUNT, symbol(9, "WIRE"), account);
@@ -578,39 +563,6 @@ BOOST_FIXTURE_TEST_CASE(matchreserve_rejects_non_pending, sysio_reserve_tester) 
          ("reserve_code", codename_mvo("PRIMARY"))
          ("matcher",      "alice")
          ("wire_amount",  1000)));
-} FC_LOG_AND_RETHROW() }
-
-// ── onreward ──
-
-BOOST_FIXTURE_TEST_CASE(onreward_requires_msgch_auth, sysio_reserve_tester) { try {
-   BOOST_REQUIRE_EQUAL(success(),
-      regreserve("ETH", "ETH", "PRIMARY", 1000, 1000));
-
-   BOOST_REQUIRE(onreward(RESERVE_ACCOUNT, "ETH", "ETH", "PRIMARY", 100)
-      .find("missing authority of sysio.msgch") != std::string::npos);
-} FC_LOG_AND_RETHROW() }
-
-BOOST_FIXTURE_TEST_CASE(onreward_grows_outpost_reserve_only, sysio_reserve_tester) { try {
-   BOOST_REQUIRE_EQUAL(success(),
-      regreserve("ETH", "ETH", "PRIMARY", 1000, 1000));
-   BOOST_REQUIRE_EQUAL(success(),
-      onreward(MSGCH_ACCOUNT, "ETH", "ETH", "PRIMARY", 100));
-
-   auto r = find_reserve("ETH", "ETH", "PRIMARY");
-   BOOST_REQUIRE(!r.is_null());
-   BOOST_REQUIRE_EQUAL(1100, r["reserve_chain_amount"].as_uint64());
-   BOOST_REQUIRE_EQUAL(1000, r["reserve_wire_amount"].as_uint64());
-} FC_LOG_AND_RETHROW() }
-
-BOOST_FIXTURE_TEST_CASE(onreward_silently_skips_unknown_reserve, sysio_reserve_tester) { try {
-   // v6: onreward is dispatched from msgch; per
-   // feedback_opp_handlers_never_throw.md it MUST NOT throw. An unknown
-   // reserve simply logs + skips and the action returns success.
-   BOOST_REQUIRE_EQUAL(success(),
-      onreward(MSGCH_ACCOUNT, "ETH", "ETH", "MISSING", 100));
-
-   auto r = find_reserve("ETH", "ETH", "MISSING");
-   BOOST_REQUIRE(r.is_null());
 } FC_LOG_AND_RETHROW() }
 
 // ── Emit-time settlement actions (auth = sysio.uwrit) ──

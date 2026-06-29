@@ -561,10 +561,10 @@ DataStream& operator>>(DataStream& ds, NodeOwnerReg& t) {
    return ds >> t.owner_address >> t.token_id >> t.nft_address;
 }
 
-// StakingReward — the single staker-reward feedback path. `sysio.msgch`
-// routes it twice: the aggregate native amount to `sysio.reserv::onreward`
-// (outpost-side reserve), and the per-staker body to `sysio.dclaim::onreward`
-// (WIRE-side claim ledger). Field order mirrors the proto (1..7).
+// StakingReward: the single staker-reward feedback path. `sysio.msgch`
+// dispatches the per-staker body to `sysio.dclaim::onreward` (the WIRE-side
+// claim ledger); the amount is already WIRE-denominated, so there is no
+// reserve leg. Field order mirrors the proto (1..7).
 template <typename DataStream>
 DataStream& operator<<(DataStream& ds, const StakingReward& t) {
    return ds << t.chain_code << t.staker_wire_account << t.share_bps

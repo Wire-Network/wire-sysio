@@ -226,12 +226,9 @@ namespace sysio {
       // depot-initiated REMIT is paid by the destination outpost (no rejection,
       // so no reserve-ledger reconciliation is needed).
 
-      /// Auth=sysio.msgch. Credit STAKING_REWARD into the matching reserve.
-      [[sysio::action]]
-      void onreward(sysio::slug_name chain_code,
-                    sysio::slug_name token_code,
-                    sysio::slug_name reserve_code,
-                    uint64_t        outpost_amount);
+      // onreward was removed: the v6 STAKING_REWARD path credits the per-staker
+      // reward to sysio.dclaim directly (already WIRE-denominated), so there is
+      // no reserve leg and no reserve-side reward crediting.
 
       /// Auth=sysio.uwrit. Emit-time apply for a normal (outpost ↔ outpost)
       /// swap, fired from `try_select_winner` BEFORE the SWAP_REMIT is queued so
