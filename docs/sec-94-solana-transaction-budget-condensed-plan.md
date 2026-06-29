@@ -46,35 +46,6 @@ The relevant hard limits are:
 - The current C++ transaction builder mirrors that with `uint8_t` account-key
   indices, but does not guard overflow.
 
-### Why `uint16_t` Does Not Fix It
-
-Changing the local C++ index type from `uint8_t` to `uint16_t` would not make
-the transaction valid on Solana.
-
-The one-byte index is part of Solana's transaction format and runtime
-semantics. A client cannot unilaterally send 16-bit account indices in a legacy
-transaction and expect the chain to accept them. If the local builder used
-`uint16_t`, it would only hide the local truncation bug while still producing a
-transaction Solana cannot represent.
-
-Also, the packet-size limit fails much earlier than the 256-account index
-limit. With the current final chunk shape, the lower bound is roughly:
-
-```text
-492 static bytes + 40 ComputeBudget bytes + final_chunk_bytes + 33 bytes per dynamic account
-```
-
-At a 405-byte final chunk, just 16 dynamic accounts already gives:
-
-```text
-492 + 40 + 405 + (16 * 33) = 1465 bytes
-```
-
-That exceeds the `1232` byte packet budget even though it is far below 256
-dynamic accounts. So SEC-94 is not just a local integer-size bug. The real bug
-is that WIRE can commit an outbound envelope whose Solana finalization
-transaction is unrepresentable.
-
 ## Impact
 
 The impact is liveness, not value theft.
