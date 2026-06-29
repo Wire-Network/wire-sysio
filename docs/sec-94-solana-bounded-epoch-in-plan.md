@@ -38,6 +38,19 @@ The selected fix:
 
 There must be no post-consensus crank or paging action.
 
+SEC-94 now intentionally bundles two workstreams:
+
+- the transaction-budget liveness fix that prevents Solana-bound envelopes from
+  exceeding terminal packet/account limits;
+- a reserve-custody/precision immutability fix required by the new manifest:
+  reserve-backed effects must derive native-vs-SPL mode, mint, and decimals from
+  pinned Reserve state instead of mutable admin config rows.
+
+The second workstream moves value, so it needs focused implementation review in
+the PR. It is still bundled here because the account-meta manifest and parity
+fixtures are only trustworthy when the relay and Solana program use immutable
+custody facts for existing reserves.
+
 ## Current Flow
 
 ### WIRE Side
@@ -122,6 +135,11 @@ epoch because it waits for every active outpost.
 
 So the impact is liveness, not value theft: one oversized Solana-bound envelope
 can halt OPP advancement chain-wide.
+
+Because this plan is still in the development phase, recovery from a
+drift-committed unrepresentable envelope is out of scope for this patch and can
+be handled by redeploy/state reset. A production recovery path is a
+pre-production gate, not part of the first SEC-94 implementation.
 
 ## Why Envelope Creation Is The Right Boundary
 
@@ -338,8 +356,10 @@ before any envelope is committed. That is a safe deployment/configuration
 failure: the row remains `READY` instead of being packed with an unsafe
 under-estimate.
 
-Use pessimistic defaults until parity fixtures prove tighter estimates are
-safe.
+Use pessimistic defaults for the WIRE consensus estimator. Relay/program
+fixtures may prove tighter actual manifests, but `buildenv` can use a tighter
+row only when the needed identity and branch facts are visible to WIRE before
+the envelope is committed.
 
 | Attestation shape | Default dynamic-account estimate |
 | --- | ---: |
@@ -350,18 +370,17 @@ safe.
 | `OPERATOR_ACTION(WITHDRAW_REMIT)` | `1` |
 | `DEPOSIT_REVERT` | `1` |
 | `RESERVE_READY` | `1` |
-| proven-native `SWAP_REMIT` | `2` |
-| proven-native `SWAP_REVERT` | `2` |
-| SPL `SWAP_REMIT` pre-created recipient ATA path | `4` |
-| SPL `SWAP_REVERT` ATA-create-capable path | `8` |
-| default `SWAP_REMIT` or `SWAP_REVERT` when native-vs-SPL is not proven | `8` |
+| `SWAP_REMIT` or `SWAP_REVERT` in v1 | `8` |
+| future WIRE-proven native `SWAP_REMIT` or `SWAP_REVERT` | `2` |
 | proven-native `RESERVE_CREATE_CANCELLED` | `2` |
 | SPL `RESERVE_CREATE_CANCELLED` canonical-ATA refund path | `8` |
 | default `RESERVE_CREATE_CANCELLED` when native-vs-SPL is not proven | `8` |
 
-The first implementation should use the pessimistic rows unless WIRE can prove
-the native-vs-SPL branch from the same data used by the relay and Solana
-program.
+The first implementation must use the pessimistic `8`-account row for all
+reserve-backed `SWAP_REMIT` and `SWAP_REVERT` candidates. Pinning Reserve
+custody lets the relay and Solana program agree on the real account set, but it
+does not give the WIRE contract access to Solana Reserve state during
+`buildenv`.
 
 The relay/parity fixture must keep this table honest for every current effect
 branch. The required assertion is not only "estimated account count is high
@@ -496,6 +515,15 @@ Initial manifest requirements:
 This manifest must be generated from the same account identities that the
 Solana program handlers use. Do not depend on comments or a hand-maintained
 count table alone.
+
+For SPL `SWAP_REMIT`, the v1 protocol requires the recipient canonical ATA to
+pre-exist. The terminal handler must not create that ATA during finalization.
+If the ATA is missing or uninitialized, the handler should take its documented
+non-throwing rejection path and queue the existing swap-rejected response rather
+than silently dropping value. This is why the relay manifest does not include
+the Associated Token Program or System Program for SPL `SWAP_REMIT`, even though
+the WIRE estimator still budgets the pessimistic `8` accounts for every
+reserve-backed swap candidate.
 
 For `RESERVE_CREATE_CANCELLED`, use deterministic account discovery, not blind
 over-supply. The relay must derive the Reserve PDA from the attestation and
@@ -677,7 +705,10 @@ that source pacing or more throughput work is needed.
 ### Phase 5: Capacity SLO
 
 - Derive the hard dynamic-account budget from measured constants.
-- Set an initial production planning SLO at 50 percent of the hard budget.
+- Set the launch SLO from the pessimistic WIRE estimator, not the relay's
+  tighter actual manifest. With an example hard dynamic-account budget around
+  `18`, reserve-backed swaps budgeted at `8` dynamic accounts cap at about
+  `2` swaps per epoch, so a 50 percent SLO is about `1` swap per epoch.
 - Alert on Solana-bound READY backlog age/count.
 - Decide whether source admission or pacing is needed before production.
 
@@ -697,8 +728,8 @@ Test cases should prove:
 - estimator coverage is exhaustive for all current outbound-capable Solana
   attestation types, including explicit zero-cost rows;
 - adding a new outbound-capable type without an estimator case fails tests;
-- the estimator uses pessimistic SPL defaults when native-vs-SPL cannot be
-  proven.
+- the estimator budgets every reserve-backed `SWAP_REMIT` and `SWAP_REVERT`
+  candidate at the pessimistic `8`-account row in v1.
 
 ### Relay And `libfc` Tests
 
@@ -732,6 +763,9 @@ Test cases should prove:
 - each current effect branch succeeds with the relay-generated account
   manifest, or reaches its documented non-throwing rejection path for invalid
   input;
+- SPL `SWAP_REMIT` does not create recipient ATAs during terminal
+  finalization; a missing or uninitialized recipient ATA queues the documented
+  swap-rejected response instead of silently dropping value;
 - every reserve creation path stores pinned custody mint/native mode and
   decimals;
 - changing `set_token_address` after reserve creation does not change the
@@ -785,6 +819,21 @@ Budget constants are consensus parameters once they affect `buildenv` packing.
 Changing them after deployment requires coordinated contract, relay, and
 program updates.
 
+## PR Sign-Off Items
+
+Before the implementation PR is accepted, reviewers should explicitly sign off
+on two bundled decisions:
+
+1. Scope:
+   SEC-94 includes both the transaction-budget liveness fix and the
+   reserve-custody/precision immutability correctness fix. The latter touches
+   value-moving reserve/refund paths and needs focused review.
+
+2. Capacity:
+   Launch capacity planning uses the pessimistic WIRE estimator. For
+   reserve-backed swaps, v1 budgets `8` dynamic accounts per swap even when the
+   relay's exact manifest is smaller.
+
 ## Remaining Production Inputs
 
 1. Measurement fixture ownership:
@@ -794,9 +843,12 @@ program updates.
    source that the fixture consumes.
 
 2. Production Solana-bound capacity:
-   Set the launch SLO from the measured hard dynamic-account budget. If
-   expected demand exceeds the SLO, add source pacing or an ALT throughput
-   track before production.
+   Set the launch SLO from the measured hard dynamic-account budget and the
+   pessimistic WIRE estimate. For reserve-backed swaps, v1 should assume `8`
+   dynamic accounts per swap. With an example `18`-account hard budget, that is
+   about `2` swaps per epoch hard cap and about `1` swap per epoch at a 50
+   percent SLO. If expected demand exceeds that SLO, add source pacing or an
+   ALT throughput track before production.
 
 3. Future solo-over-budget policy:
    Current valid attestation shapes should fit solo. If a future shape cannot,
@@ -812,3 +864,5 @@ program updates.
 - Do not rely on relay-side sharding to reinterpret an already committed
   envelope.
 - Do not add generic automatic refund behavior in `sysio.msgch`.
+- Do not add the production governance recovery path for a drift-committed
+  unrepresentable envelope in the first dev-phase implementation.
