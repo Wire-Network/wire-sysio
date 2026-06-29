@@ -7,7 +7,6 @@
 #include <fc/log/logger_config.hpp>
 #include <fc/reflect/variant.hpp>
 #include <fc/network/listener.hpp>
-#include <fc/scoped_exit.hpp>
 
 #include <boost/asio.hpp>
 
@@ -22,6 +21,27 @@ namespace sysio {
          static fc::logger log{ "http_plugin" };
          return log;
       }
+
+      /**
+       * RAII reservation against http_plugin_state::bytes_in_flight.  The increment runs in the
+       * constructor and the decrement in the destructor, so the reservation is bound to a successfully
+       * constructed guard: if allocating the guard throws (e.g. std::bad_alloc while admitting a request
+       * under memory pressure) the increment never runs, and once constructed the matching decrement is
+       * guaranteed exactly once when the guard is destroyed.  Held via shared_ptr at the call site so the
+       * posted app-thread lambda stays copyable (boost::asio::post requires a copyable handler) and the
+       * release fires only when the final copy is destroyed.
+       */
+      struct bytes_in_flight_reservation {
+         detail::abstract_conn_ptr conn;
+         size_t                    size = 0;
+
+         bytes_in_flight_reservation(detail::abstract_conn_ptr c, size_t sz)
+            : conn(std::move(c)), size(sz) { conn->increment_bytes_in_flight(size); }
+         ~bytes_in_flight_reservation() { conn->decrement_bytes_in_flight(size); }
+
+         bytes_in_flight_reservation(const bytes_in_flight_reservation&) = delete;
+         bytes_in_flight_reservation& operator=(const bytes_in_flight_reservation&) = delete;
+      };
    }
 
    using std::vector;
@@ -135,7 +155,7 @@ namespace sysio {
           * return to the http thread pool for response processing
           *
           * The returned handler reserves the request body against bytes_in_flight on admission and releases
-          * it (via a shared scoped_exit) when the posted app-thread work completes or is discarded.
+          * it (via a shared bytes_in_flight_reservation) when the posted app-thread work completes or is discarded.
           * @param priority - priority to post to the app thread at
           * @param to_queue - execution queue to post to
           * @param next - the next handler for responses
@@ -155,17 +175,12 @@ namespace sysio {
                }
 
                // The request body is about to be moved into the (unbounded) app-thread queue, where it can
-               // sit until a possibly-slow handler runs. Reserve its bytes against bytes_in_flight now that
-               // admission passed so that the memory is visible to concurrent verify_max_bytes_in_flight()
-               // checks instead of accumulating uncounted. The reservation is released exactly once when the
+               // sit until a possibly-slow handler runs.  Reserve its bytes against bytes_in_flight now that
+               // admission passed, so the queued memory is visible to concurrent verify_max_bytes_in_flight()
+               // checks instead of accumulating uncounted.  The reservation is released exactly once when the
                // posted work below is destroyed -- whether it runs to completion, throws, returns early on
-               // shutdown, or is discarded unrun when the queue is cleared. The guard is held through a
-               // shared_ptr so the posted lambda stays copyable (as boost::asio::post requires) and so the
-               // release fires only when the final copy of the lambda is destroyed.
-               const size_t body_size = b.size();
-               conn->increment_bytes_in_flight(body_size);
-               auto body_in_flight_guard = std::make_shared<fc::scoped_exit<std::function<void()>>>(
-                     [conn, body_size]() { conn->decrement_bytes_in_flight(body_size); } );
+               // shutdown, or is discarded unrun when the queue is cleared.
+               auto body_in_flight_guard = std::make_shared<bytes_in_flight_reservation>(conn, b.size());
 
                url_response_callback wrapped_then = [then=std::move(then)](int code, std::optional<fc::variant> resp) {
                   then(code, std::move(resp));
