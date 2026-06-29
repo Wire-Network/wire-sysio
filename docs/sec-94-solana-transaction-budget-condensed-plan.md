@@ -10,9 +10,19 @@ decisions.
 
 ## Problem
 
-WIRE sends WIRE-to-Solana outbound envelopes through
-`outpost_solana_client::deliver_outbound_envelope`. The relay uploads the
-encoded envelope to the Solana outpost in `epoch_in` chunks.
+The main SEC-94 problem is that the final Solana transaction has a hard raw
+packet limit of about `1232` bytes, and WIRE does not currently cap against
+that limit when it builds a Solana-bound outbound envelope.
+
+Today `sysio.msgch::buildenv` only enforces the WIRE/OPP envelope byte cap
+(`MAX_ENVELOPE_BYTES = 65,536`). That cap answers "how much encoded OPP data
+can this WIRE envelope contain?" It does not answer "will the final Solana
+`epoch_in` transaction fit into one Solana packet?"
+
+That distinction matters because the OPP envelope can be much larger than one
+Solana packet. The relay sends it through
+`outpost_solana_client::deliver_outbound_envelope` by uploading the encoded
+envelope to the Solana outpost in multiple `epoch_in` chunks.
 
 The current final `epoch_in` transaction is special:
 
@@ -24,9 +34,12 @@ Those dynamic accounts include recipient/depositor/operator wallets, Reserve
 PDAs, SPL vaults, recipient ATAs, mints, and token program accounts. The exact
 set depends on the attestations in the envelope.
 
-Today `sysio.msgch::buildenv` only enforces the OPP envelope byte cap
-(`MAX_ENVELOPE_BYTES = 65,536`). It does not check whether the final Solana
-transaction can actually fit:
+WIRE currently does not cap that terminal transaction by raw Solana packet
+bytes before committing the envelope. The Solana outpost program also cannot
+recover from an oversized terminal packet, because the transaction is invalid
+before the instruction can execute.
+
+The relevant hard limits are:
 
 - Solana legacy transactions have a raw packet limit of about `1232` bytes.
 - Solana compiled instructions index accounts with one-byte account indices.
