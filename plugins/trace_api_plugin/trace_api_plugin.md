@@ -538,9 +538,9 @@ POST /v1/trace_api/get_actions
 ```
 
 Continue until `block_num_end` returned by the server equals the
-requested `block_num_end` (no truncation happened).  The same loop
-absorbs the action ceiling transparently: over a busy range a single
-window may take several requests to cross, each resuming at the previous
+requested `block_num_end` (no truncation happened).  The same loop also
+handles the action ceiling: over a busy range a single window may take
+several requests to cross, each resuming at the previous
 `block_num_end + 1`.  When you catch up to the chain head, the server's
 recorded-block clamp shrinks the reported window for you: a response with
 `block_num_end < block_num_start` means nothing new is scannable yet —

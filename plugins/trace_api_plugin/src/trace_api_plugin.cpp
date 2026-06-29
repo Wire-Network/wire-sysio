@@ -171,9 +171,10 @@ struct trace_api_common_impl {
       cfg_options("trace-max-block-range", bpo::value<uint32_t>()->default_value(default_max_block_range),
                   "Maximum number of blocks scanned by a single get_actions or get_token_transfers request.\n"
                   "Must be in [1, 10000]. block_num_end is silently clamped to block_num_start + this - 1.\n"
-                  "The response envelope reports the actual range scanned; clients paginate by resuming\n"
-                  "block_num_start at the response's block_num_end + 1 (which also absorbs early stops from\n"
-                  "the per-response action ceiling).");
+                  "The response reports the last block actually scanned as block_num_end. To page, set the\n"
+                  "next request's block_num_start to block_num_end + 1; do not advance by a fixed step,\n"
+                  "because the scan can also stop short of the requested end when a response reaches the\n"
+                  "per-response limit on the number of actions returned.");
    }
 
    void plugin_initialize(const appbase::variables_map& options) {
