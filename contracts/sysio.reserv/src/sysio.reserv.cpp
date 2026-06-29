@@ -255,10 +255,13 @@ void reserve::oncrtreserve(sysio::slug_name       chain_code,
       sysio::print("oncrtreserve: bad connector_weight_bps; skipping\n");
       return;
    }
-   if (external_token_amount == 0 || requested_wire_amount == 0) {
-      sysio::print("oncrtreserve: zero deposit / requested amount; skipping\n");
-      return;
-   }
+   // An invalid amount — a zero deposit / requested amount, OR an inbound
+   // TokenAmount that sysio.msgch clamped to 0 because it was negative or out of
+   // asset range (WSA-028) — cannot create a reserve. It must NOT be silently
+   // dropped: the creator's outpost escrow still has to be released. Route it into
+   // the SAME cancel/refund path as an unlinked creator below (insert a CANCELLED
+   // row + queue RESERVE_CREATE_CANCELLED), idempotently.
+   const bool invalid_amount = (external_token_amount == 0 || requested_wire_amount == 0);
    // The outpost downscales to min(native, 9) at its boundary, so a
    // source_token_precision above the depot frame means a malformed attestation.
    if (source_token_precision > WIRE_PRECISION) {
@@ -309,20 +312,19 @@ void reserve::oncrtreserve(sysio::slug_name       chain_code,
             canonical_creator_key = sysio::pubkey_to_bytes(*pk_variant);
          }
       }
-      if (!linked) {
-         // A CANCELLED row already standing means this is a re-relay of the
-         // same no-link create (or a fresh unlinked squatter). Leave it and
-         // do NOT queue a second refund — the refund was queued when the row
-         // was first inserted, and the outpost refunds per
-         // (chain,token,reserve_code). The row stays reclaimable by a future
-         // linked creator.
+      if (!linked || invalid_amount) {
+         // A CANCELLED row already standing means this is a re-relay of the same
+         // rejected create (an unlinked squatter OR an invalid amount). Leave it
+         // and do NOT queue a second refund — the refund was queued when the row
+         // was first inserted, and the outpost refunds per (chain,token,reserve_code).
+         // The row stays reclaimable by a future linked creator with a valid amount.
          if (reclaimable_cancelled) {
-            sysio::print("oncrtreserve: unlinked creator for an already-"
-                         "CANCELLED reserve; leaving it (no double refund)\n");
+            sysio::print("oncrtreserve: re-relay of an already-CANCELLED reserve; "
+                         "leaving it (no double refund)\n");
             return;
          }
-         sysio::print("oncrtreserve: creator has no authex link (or malformed "
-                      "creator key); rejecting with RESERVE_CREATE_CANCELLED\n");
+         sysio::print("oncrtreserve: rejecting with RESERVE_CREATE_CANCELLED "
+                      "(invalid amount or unlinked / malformed creator key)\n");
          const auto now = current_time_ms();
          tbl.emplace(ram_payer, pk, reserve_row{
             .chain_code             = chain_code,

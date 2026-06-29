@@ -60,6 +60,13 @@ struct abstract_conn {
    virtual ~abstract_conn() = default;
    virtual std::string verify_max_bytes_in_flight(size_t extra_bytes) = 0;
    virtual std::string verify_max_requests_in_flight() = 0;
+
+   /// Reserve sz bytes against the bytes_in_flight budget. Used to account for request/response payload
+   /// memory held while work is in flight. Must be paired with exactly one decrement_bytes_in_flight(sz).
+   virtual void increment_bytes_in_flight(size_t sz) = 0;
+
+   /// Release sz bytes previously reserved with increment_bytes_in_flight.
+   virtual void decrement_bytes_in_flight(size_t sz) = 0;
    virtual void send_busy_response(std::string&& what) = 0;
    virtual void handle_exception() = 0;
 

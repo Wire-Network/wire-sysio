@@ -1,6 +1,7 @@
 #pragma once
 #include <sysio/state_history/log.hpp>
 #include <sysio/state_history/serialization.hpp>
+#include <sysio/state_history/status_request_queue.hpp>
 #include <sysio/state_history/types.hpp>
 
 #include <sysio/chain/types.hpp>
@@ -12,6 +13,8 @@
 #include <boost/asio/error.hpp>
 #include <boost/beast/websocket.hpp>
 #include <memory>
+#include <stdexcept>
+#include <string>
 
 extern const char* const state_history_plugin_abi;
 
@@ -151,7 +154,11 @@ private:
                 */
                std::visit(chain::overloaded {
                   [&]<typename GetStatusRequestV0orV1, typename = std::enable_if_t<std::is_base_of_v<get_status_request_v0, GetStatusRequestV0orV1>>>(const GetStatusRequestV0orV1&) {
-                     queued_status_requests.emplace_back(std::is_same_v<GetStatusRequestV0orV1, get_status_request_v1>);
+                     constexpr status_request_version request_version =
+                           std::is_same_v<GetStatusRequestV0orV1, get_status_request_v1> ? status_request_version::v1 :
+                                                                                             status_request_version::v0;
+                     if(!queued_status_requests.try_append(request_version))
+                        throw std::runtime_error(std::string(status_request_queue_limit_exceeded));
                   },
                   [&]<typename GetBlocksRequestV0orV1, typename = std::enable_if_t<std::is_base_of_v<get_blocks_request_v0, GetBlocksRequestV0orV1>>>(const GetBlocksRequestV0orV1& gbr) {
                      current_blocks_request_v1_finality.reset();
@@ -231,14 +238,14 @@ private:
             if(!stream.is_open())
                break;
 
-            std::deque<bool>             status_requests;
-            std::optional<block_package> block_to_send;
+            pending_status_request_counts status_requests;
+            std::optional<block_package>  block_to_send;
 
             co_await boost::asio::co_spawn(app().get_io_context(), [&]() -> boost::asio::awaitable<void> {
                /**
                 * This lambda executes on the main thread; upon returning, the enclosing coroutine continues execution on the connection's strand
                 */
-               status_requests = std::move(queued_status_requests);
+               status_requests = queued_status_requests.pop_all();
 
                //decide what block -- if any -- to send out
                const chain::block_num_type latest_to_consider = current_blocks_request.irreversible_only ?
@@ -272,7 +279,7 @@ private:
                   --send_credits;
                }
 
-               if(status_requests.size())
+               if(!status_requests.empty())
                   current_status_result = fill_current_status_result();
                co_return;
             }, boost::asio::use_awaitable);
@@ -283,13 +290,12 @@ private:
                continue;
             }
 
-            //send replies to all send status requests first
-            for(const bool status_request_is_v1 : status_requests) {
-               if(status_request_is_v1 == false) //v0 status request, gets a v0 status result
-                  co_await stream.async_write(boost::asio::buffer(fc::raw::pack(state_result((get_status_result_v0)current_status_result))));
-               else
-                  co_await stream.async_write(boost::asio::buffer(fc::raw::pack(state_result(current_status_result))));
-            }
+            // Send status responses first; a session uses one status version, so counted drains can write by batch.
+            for(std::size_t i = 0; i < status_requests.v0; ++i)
+               co_await stream.async_write(
+                     boost::asio::buffer(fc::raw::pack(state_result((get_status_result_v0)current_status_result))));
+            for(std::size_t i = 0; i < status_requests.v1; ++i)
+               co_await stream.async_write(boost::asio::buffer(fc::raw::pack(state_result(current_status_result))));
 
             //and then send the block
             if(block_to_send) {
@@ -319,7 +325,7 @@ private:
    std::atomic_flag                  has_logged_exception;  //left as atomic_flag for useful test_and_set() interface
 
    ///these items must only ever be touched on the main thread
-   std::deque<bool>                  queued_status_requests;  //false for v0, true for v1
+   status_request_queue              queued_status_requests;
 
    get_blocks_request_v0             current_blocks_request;
    std::optional<bool>               current_blocks_request_v1_finality; //unset: current request is v0; set means v1; true/false is if finality requested

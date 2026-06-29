@@ -4,6 +4,7 @@
 #include <sysio.authex/sysio.authex.hpp>
 #include <sysio.uwrit/sysio.uwrit.hpp>
 #include <sysio.opp.common/slug_name.hpp>
+#include <sysio.opp.common/safe_ops.hpp>
 #include <sysio/opp/attestations/attestations.pb.hpp>
 #include <magic_enum/magic_enum.hpp>
 #include <zpp_bits.h>
@@ -267,7 +268,9 @@ uint64_t sum_locks_inline(name account, sysio::slug_name chain_code, sysio::slug
    auto end = idx.upper_bound(account.value);
    for (; it != end; ++it) {
       if (it->chain_code != chain_code || it->token_code != token_code) continue;
-      total += it->amount;
+      // Saturating: amounts are uncapped uint64 (external-chain values); a
+      // wrapped subtotal would understate `reserved` and overstate availability.
+      total = opp::safe::add_sat_u64(total, it->amount);
    }
    return total;
 }
@@ -290,7 +293,9 @@ uint64_t sum_pending_withdraws(name account, sysio::slug_name chain_code, sysio:
    auto end = idx.upper_bound(account.value);
    for (; it != end; ++it) {
       if (it->chain_code != chain_code || it->token_code != token_code) continue;
-      total += it->amount;
+      // Saturating: amounts are uncapped uint64 (external-chain values); a
+      // wrapped subtotal would understate `reserved` and overstate availability.
+      total = opp::safe::add_sat_u64(total, it->amount);
    }
    return total;
 }
@@ -320,7 +325,10 @@ uint64_t available_inline(const opreg::operator_entry& op,
 
    uint64_t locked  = sum_locks_inline(op.account, chain_code, token_code);
    uint64_t pending = sum_pending_withdraws(op.account, chain_code, token_code);
-   uint64_t reserved = locked + pending;
+   // Saturating: a wrap of locked+pending would understate `reserved` and
+   // overstate availability — the direction that admits an overcommit. The
+   // cap is unreachable for real amounts.
+   uint64_t reserved = opp::safe::add_sat_u64(locked, pending);
    return bal->balance > reserved ? bal->balance - reserved : 0;
 }
 
@@ -386,9 +394,35 @@ uint64_t opreg::available(name account, sysio::slug_name chain_code, sysio::slug
 
 namespace {
 
+/// Maximum collateral a single `(chain_code, token_code)` balance row may hold:
+/// the Antelope `asset` magnitude limit (`2^62 - 1`). A stored balance above
+/// this cannot be carried by the WIRE-frame `asset()` that the withdraw /
+/// terminate remit path constructs — `asset()` `check()`-aborts past
+/// `asset::max_amount` — so every credit is gated to keep the running sum within
+/// range. The WSA-028 ingress gate (`sysio.msgch`) already bounds a *single*
+/// inbound amount to this limit; this caps the *accumulation* across deposits
+/// (SEC-103).
+constexpr uint64_t MAX_COLLATERAL_AMOUNT = static_cast<uint64_t>(asset::max_amount);
+
+/// Current stored balance of the `(chain_code, token_code)` row, or 0 when the
+/// operator has no row for that pair yet. Read-only companion to `add_balance`:
+/// a caller checks a pending credit against `MAX_COLLATERAL_AMOUNT` before
+/// mutating, so collateral never accumulates past the asset range.
+uint64_t balance_of(const opreg::operator_entry& o,
+                    sysio::slug_name chain_code, sysio::slug_name token_code) {
+   for (const auto& b : o.balances) {
+      if (b.chain_code == chain_code && b.token_code == token_code) {
+         return b.balance;
+      }
+   }
+   return 0;
+}
+
 /// Add `amount` to the (chain_code, token_code) balance row, creating the row
 /// if it doesn't exist. Mutates the operator entry in place — caller is
-/// expected to be inside an `ops.modify(...)` lambda.
+/// expected to be inside an `ops.modify(...)` lambda. Callers MUST first verify
+/// the credit keeps the row within `MAX_COLLATERAL_AMOUNT` (see `balance_of`);
+/// `add_balance` itself does not cap, mirroring the unchecked `subtract_balance`.
 void add_balance(opreg::operator_entry& o,
                  sysio::slug_name chain_code, sysio::slug_name token_code,
                  uint64_t amount) {
@@ -895,7 +929,29 @@ void opreg::deposit(name account, uint64_t amount) {
          op.status != OperatorStatus::OPERATOR_STATUS_TERMINATED,
          "operator not in a deposit-eligible state");
 
-   // Direct WIRE token transfer from operator -> opreg.
+   // Credit collateral BEFORE the outbound WIRE transfer, with the cap check
+   // performed ATOMICALLY inside the same `modify` as the credit — reading the
+   // live row, not the `op` copy read above. This closes a reentrancy window on
+   // operator accounts that carry contract code: `sysio.token::transfer` notifies
+   // `from` (the operator), and that notification handler could re-enter
+   // `deposit`. A separate pre-read-then-check-then-credit could let two credits
+   // pass against the same stale balance and push the WIRE row past
+   // `asset::max_amount` — recreating the withdraw/terminate remit abort
+   // (`asset(balance, CORE_SYM)` aborts above the limit). Checking inside the
+   // modify makes check+credit indivisible, and crediting before the transfer
+   // means any re-entry observes the committed balance. A direct user deposit may
+   // legitimately `check()`-throw here (unlike the never-throw OPP `depositinle`);
+   // if the transfer below aborts (operator lacks the WIRE) the whole
+   // transaction — including this credit — rolls back. (SEC-103; PR #449 review.)
+   ops.modify(same_payer, op_pk, [&](auto& o) {
+      check(amount <= MAX_COLLATERAL_AMOUNT &&
+               balance_of(o, kWireChainCode, kWireTokenCode) <= MAX_COLLATERAL_AMOUNT - amount,
+            "deposit would exceed max collateral");
+      add_balance(o, kWireChainCode, kWireTokenCode, amount);
+   });
+
+   // Direct WIRE token transfer from operator -> opreg, sent after the credit so
+   // a transfer-notification re-entry observes the already-committed balance.
    action(
       permission_level{account, "active"_n},
       TOKEN_ACCOUNT, "transfer"_n,
@@ -903,10 +959,6 @@ void opreg::deposit(name account, uint64_t amount) {
          asset(static_cast<int64_t>(amount), CORE_SYM),
          std::string("opreg::deposit"))
    ).send();
-
-   ops.modify(same_payer, op_pk, [&](auto& o) {
-      add_balance(o, kWireChainCode, kWireTokenCode, amount);
-   });
 
    auto deposit_action = build_deposit_action(
       operator_chain_address(account, kWireChainCode),
@@ -984,6 +1036,20 @@ void opreg::depositinle(name account,
    // the depositor when it processes the revert.
    if (op.is_bootstrapped) {
       const std::string err = "bootstrapped operator cannot accept deposits";
+      emit_deposit_revert(get_self(), chain_code, actor, token_code, amount,
+                          original_message_id, err);
+      append_action_log(ops, op_pk, deposit_action, false, err);
+      return;
+   }
+   // SEC-103 (WSA-028 follow-up): the credited collateral must stay within the
+   // asset magnitude range so the WIRE-direct remit path's `asset(balance,
+   // CORE_SYM)` can never abort — an abort on this OPP-inbound path would stall
+   // consensus. The msgch ingress gate already bounds a single `amount` to
+   // `asset::max_amount`; this additionally bounds the running sum. Fail closed
+   // by refunding via DEPOSIT_REVERT — never `check()`.
+   if (amount > MAX_COLLATERAL_AMOUNT ||
+       balance_of(op, chain_code, token_code) > MAX_COLLATERAL_AMOUNT - amount) {
+      const std::string err = "deposit would exceed max collateral";
       emit_deposit_revert(get_self(), chain_code, actor, token_code, amount,
                           original_message_id, err);
       append_action_log(ops, op_pk, deposit_action, false, err);
@@ -1218,13 +1284,38 @@ void opreg::releaselock(name account,
 
    // SLASHED or TERMINATED — decrement opreg balance and emit the matching
    // outbound attestation (deferred-slash to LP or deferred-remit to authex).
+   //
+   // Clamp the settled amount to the live balance bucket. In correct
+   // operation sum(active locks) <= balance for every (underwriter,
+   // chain_code, token_code) — the sysio.uwrit winner check reserves the
+   // aggregate per collateral bucket before writing locks — so `amount`
+   // never exceeds the remaining balance and this clamp is a no-op.
+   // It is the safety net for any residual/over-committed lock set:
+   // releaselock runs INLINE inside `sysio.uwrit::chklocks` at
+   // `sysio.epoch::advance`, and a `subtract_balance` underflow `check()`
+   // there would abort the advance and permanently stall epoch advancement
+   // chain-wide (`epoch-stall-is-fatal`). Settle — and attest — only what the
+   // balance can actually back.
+   uint64_t settle_amount = amount;
+   if (const auto* bal = find_balance(op, chain_code, token_code)) {
+      if (settle_amount > bal->balance) settle_amount = bal->balance;
+   } else {
+      settle_amount = 0;   // no balance row for this bucket — nothing to settle
+   }
+   if (settle_amount == 0) {
+      // Bucket already fully drained (e.g. by prior releases of an
+      // over-committed set) — the caller has erased the lock row; emit no
+      // zero-value slash/remit attestation.
+      return;
+   }
+
    ops.modify(same_payer, op_pk, [&](auto& o) {
-      subtract_balance(o, chain_code, token_code, amount);
+      subtract_balance(o, chain_code, token_code, settle_amount);
    });
 
    if (op.status == OperatorStatus::OPERATOR_STATUS_SLASHED) {
       auto slash_action = build_slash_action(op.account, op.type,
-                                             chain_code, token_code, amount,
+                                             chain_code, token_code, settle_amount,
                                              /*reason*/ "deferred slash on lock release");
       emit_slash_attestation(get_self(), slash_action);
       append_action_log(ops, op_pk, slash_action, /*success*/ true, "");
@@ -1237,12 +1328,12 @@ void opreg::releaselock(name account,
             permission_level{get_self(), "active"_n},
             TOKEN_ACCOUNT, "transfer"_n,
             std::make_tuple(get_self(), account,
-               asset(static_cast<int64_t>(amount), CORE_SYM),
+               asset(static_cast<int64_t>(settle_amount), CORE_SYM),
                std::string("terminate-deferred-remit"))
          ).send();
       } else {
          emit_withdraw_remit(get_self(), op.account, op.type,
-                             chain_code, token_code, amount, /*request_id*/ 0);
+                             chain_code, token_code, settle_amount, /*request_id*/ 0);
       }
    }
 }

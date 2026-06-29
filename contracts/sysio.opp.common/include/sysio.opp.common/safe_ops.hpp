@@ -22,9 +22,50 @@
  */
 
 #include <cstdint>
+#include <optional>
 #include <string_view>
 
 namespace sysio::opp::safe {
+
+/// The Antelope `asset` magnitude limit, `2^62 - 1`. Equal to
+/// `sysio::asset::max_amount` in both the CDT (contract/WASM) and chain (host)
+/// `asset` types, but defined locally so this header stays dependency-free: it
+/// is included by WASM contracts AND by the native-tester host build
+/// (`safe_ops_tests.cpp`), where `<sysio/asset.hpp>` is not on the include path.
+/// `safe_ops_tests.cpp` static_asserts this against the real `asset::max_amount`
+/// so the two can never silently drift.
+inline constexpr int64_t depot_amount_max = (int64_t{1} << 62) - 1;
+
+/// Fail-closed parse of an inbound OPP `TokenAmount.amount` into a non-negative
+/// depot amount.
+///
+/// `TokenAmount.amount` is signed on the wire (`int64`) and in the contract
+/// binding (`vint64_t`). The WSA-028 foot-gun was
+/// `static_cast<uint64_t>(static_cast<int64_t>(amount))`: a negative value such
+/// as `-1` wraps to `18446744073709551615`, an impossible "balance" that sails
+/// through every zero-only guard and inflates collateral, reserve, reward, and
+/// settlement accounting.
+///
+/// This gate returns the amount as a `uint64_t` iff it is strictly positive AND
+/// within the asset magnitude range (`<= depot_amount_max`, i.e. `2^62 - 1`);
+/// otherwise it returns `std::nullopt`. The upper bound guarantees the validated
+/// value can later be carried by a WIRE-frame `asset` (e.g. `sysio.dclaim`)
+/// without tripping `asset()`'s range `check()`, so the never-throw dispatch
+/// contract is preserved end to end.
+///
+/// Callers MUST treat `std::nullopt` as "drop / refund-revert this inbound
+/// message" — never as a reason to `check()`-abort inside the consensus
+/// dispatch chain, which would stall epoch advancement chain-wide
+/// (`feedback_opp_handlers_never_throw.md`).
+///
+/// @param amount the decoded `TokenAmount.amount` (cast from its `vint64_t`).
+/// @return the amount as a `uint64_t` in `(0, depot_amount_max]`, or
+///         `std::nullopt` when it is non-positive or out of asset range.
+inline std::optional<uint64_t> to_depot_amount(int64_t amount) {
+   if (amount <= 0)               return std::nullopt;
+   if (amount > depot_amount_max) return std::nullopt;
+   return static_cast<uint64_t>(amount);
+}
 
 /// Non-throwing validation of a string destined for `name(std::string_view)`.
 ///
