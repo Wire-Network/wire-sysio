@@ -3,6 +3,7 @@
 #include <sysio.authex/sysio.authex.hpp>
 #include <sysio.chains/sysio.chains.hpp>
 #include <sysio.chalg/sysio.chalg.hpp>     // dispute trigger + open-dispute gate (disputes table)
+#include <sysio.opreg/sysio.opreg.hpp>     // operator-status delivery gate (operators table)
 #include <sysio.opp.common/slug_name.hpp>
 #include <sysio.opp.common/safe_ops.hpp>   // to_depot_amount — WSA-028 fail-closed TokenAmount gate
 #include <sysio/opp/opp.pb.hpp>
@@ -980,6 +981,20 @@ void msgch::bootstrap() {
 // ---------------------------------------------------------------------------
 void msgch::deliver(name batch_op_name, uint64_t chain_code, std::vector<char> data) {
    is_batch_operator_active(batch_op_name);
+
+   // Gate on the operator's *current* opreg status, not just resident-group
+   // membership. The batch-op group is a snapshot taken at advance()/schbatchgps
+   // time; an operator slashed, terminated, or dropped below its collateral
+   // minimum (status -> UNKNOWN) mid-window stays in batch_op_groups[current]
+   // until the next reschedule. Membership is therefore necessary but not
+   // sufficient: only an ACTIVE operator may deliver and be counted toward
+   // consensus. A missing operator row is treated as not-active (fail closed).
+   opreg::operators_t ops(OPREG_ACCOUNT);
+   auto op = ops.get(opreg::operator_key{batch_op_name.value},
+                     "delivering operator has no sysio.opreg registration");
+   check(op.status == opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE,
+         "delivering operator is not ACTIVE in sysio.opreg");
+
    check(!data.empty(), "delivery data cannot be empty");
 
    // Verify outpost exists on the new `sysio.chains::chains` table.
