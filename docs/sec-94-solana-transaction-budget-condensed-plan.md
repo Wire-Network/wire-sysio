@@ -176,11 +176,89 @@ Missing and required for the SEC-94 fix:
 | --- | --- | --- |
 | Raw terminal packet cap | Prevents committing an envelope whose terminal Solana transaction exceeds the raw `1232` byte packet limit. Use raw bytes minus margin, never base64 size. | `sysio.msgch` estimator, relay guard, tests |
 | Terminal static transaction size | The estimator needs the measured no-extra-account terminal transaction size. This must be generated from the real Solana client/IDL layout and pinned by tests. | Cross-repo fixture, consumed by `sysio.msgch` constants |
+| Terminal runtime account cap | Prevents committing an envelope whose terminal Solana transaction exceeds the currently enforced Solana runtime account limit. Treat `64` as the default unless the target cluster's `increase_tx_account_lock_limit` feature is explicitly confirmed and the relay/program support that higher limit. | `sysio.msgch` estimator and relay guard |
 | Terminal account-key cap | Prevents account-key index overflow. Solana legacy compiled instructions use one-byte account indices, and the C++ builder currently mirrors that with `uint8_t`. | `sysio.msgch` estimator and `libfc` transaction-builder guard |
 | Dynamic-account budget | Converts the remaining packet/key space into a maximum number of Solana `remaining_accounts` for the terminal call. | `sysio.msgch::buildenv` |
 | Per-attestation account-cost table | Lets `buildenv` decide whether adding the next READY attestation keeps the terminal transaction representable. The first version should pessimistically count SPL paths unless WIRE can prove native-vs-SPL from the same source as the relay/outpost. | `sysio.msgch`, with parity tests against relay extraction |
 | Solo-attestation cap and dead-letter path | Ensures one impossible attestation cannot block all later Solana-bound work. Every current attestation type should fit solo with margin. | `sysio.msgch` plus governance/remediation policy |
 | Production Solana-bound capacity cap | Defines the maximum Solana-bound value-transfer workload the system is willing to accept per WIRE epoch before backlog becomes an operational incident. This may be a source-admission/pacing cap, or an alerting/SLO cap tied to READY backlog growth. | Launch configuration/operations; optionally source contracts later |
+
+Solana system hard limits:
+
+| Cap | System limit | Reference |
+| --- | --- | --- |
+| Raw Solana packet limit | `1232` bytes | Solana transaction limits list `1,232` bytes; Solana `PACKET_DATA_SIZE` source defines `1280 - 40 - 8`. |
+| Runtime account limit | `64` loaded accounts | Solana transaction limits list `64` max accounts per transaction; Solana constants reference says the enforced runtime limit is `64`, or `128` only when `increase_tx_account_lock_limit` is activated. |
+| Raw account-key limit | `256` unique keys | Solana constants reference describes `256` as the hard ceiling from `u8` index encoding; Solana transaction structure defines `CompiledInstruction.program_id_index: u8` and `accounts: Vec<u8>`. |
+
+Reference URLs for Solana-enforced caps:
+
+- Solana transactions limits: https://solana.com/docs/core/transactions
+- Solana constants reference: https://solana.com/docs/core/constants-reference
+- `PACKET_DATA_SIZE` source: https://github.com/solana-labs/solana/blob/master/sdk/src/packet.rs
+- Solana transaction structure / `CompiledInstruction` fields:
+  https://solana.com/docs/core/transactions/transaction-structure
+
+Recommended WIRE estimator defaults:
+
+| Cap | Default value | Reference |
+| --- | --- | --- |
+| Packet safety margin | `80` bytes | WIRE safety margin. |
+| Effective packet budget | `1152` raw bytes | WIRE default derived from the raw Solana packet limit minus margin. |
+| Effective runtime account budget | `64` loaded accounts | WIRE default follows the currently enforced Solana runtime limit unless the target cluster and client path explicitly support the higher feature-gated limit. |
+| Account-key safety margin | `16` keys | WIRE safety margin. |
+| Effective account-key budget | `240` unique keys | WIRE default derived from the raw `u8` representation ceiling minus margin. |
+| Per dynamic account byte cost | `33` bytes | WIRE estimator default: 32-byte pubkey plus at least one account-index byte. |
+| Terminal static transaction size | Measured no-extra terminal transaction size plus `64` bytes margin. The measured value must come from a fixture that builds the real terminal call from the current Anchor IDL/client layout. | Cross-repo measurement fixture, not a Solana protocol constant. |
+| Production planning cap | `50%` of the measured hard dynamic-account budget per WIRE epoch. This is an SLO/source-pacing target, not the consensus hard cap. | WIRE launch/SLO default. |
+
+Use these formulas:
+
+```text
+effective_packet_budget = 1232 - 80 = 1152
+effective_runtime_account_budget = 64
+effective_key_budget    = 256 - 16  = 240
+
+packet_dynamic_account_budget =
+  floor((effective_packet_budget - measured_terminal_static_bytes_with_margin) / 33)
+
+hard_dynamic_account_budget =
+  min(packet_dynamic_account_budget,
+      effective_runtime_account_budget - measured_terminal_static_account_count,
+      effective_key_budget - measured_terminal_static_key_count)
+
+production_dynamic_account_slo =
+  floor(hard_dynamic_account_budget / 2)
+```
+
+If the measured terminal static transaction size plus margin is around `532`
+bytes, the hard packet-derived budget is:
+
+```text
+floor((1152 - 532) / 33) = 18 dynamic accounts
+```
+
+With the default `360` second WIRE epoch, the initial production planning SLO
+would therefore be about `9` dynamic accounts per Solana-bound epoch. Do not
+hard-code `9` as the consensus cap; derive it from the measured budget and use
+it for launch sizing, alerts, and source-side pacing.
+
+Recommended per-attestation account-cost defaults:
+
+| Attestation shape | Default dynamic-account estimate |
+| --- | --- |
+| `OPERATOR_ACTION(SLASH)` | `0` |
+| `OPERATOR_ACTION(WITHDRAW_REMIT)` | `1` |
+| `DEPOSIT_REVERT` | `1` |
+| `RESERVE_READY` | `1` |
+| proven-native `SWAP_REMIT` or `SWAP_REVERT` | `2` |
+| default `SWAP_REMIT` or `SWAP_REVERT` when WIRE cannot prove native-vs-SPL | `8` |
+| proven-native `RESERVE_CREATE_CANCELLED` | `2` |
+| default `RESERVE_CREATE_CANCELLED` when WIRE cannot prove native-vs-SPL | `6` |
+
+The default estimator should use the pessimistic rows unless WIRE can prove the
+native-vs-SPL classification from the same source the relay and Solana outpost
+use. That preserves the upper-bound invariant.
 
 Current source paths are not capped by Solana volume:
 
