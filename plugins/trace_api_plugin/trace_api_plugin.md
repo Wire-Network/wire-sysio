@@ -312,11 +312,14 @@ for the cursor pattern.
 
 `block_num_start` and `block_num_end` on the response reflect the actual
 range scanned (after clamping), so a client can detect a clamp and
-resume pagination from `block_num_end + 1`.  Because the server also
-clamps to its last recorded block, resuming at `block_num_end + 1` can
-never skip blocks that had not been produced (or recorded) at the time
-of the request.  When nothing in the requested window has been recorded
-yet, the response carries `block_num_end == block_num_start - 1`
+resume pagination from `block_num_end + 1`.  The reported `block_num_end`
+is also reduced when a response reaches the `max_actions_per_response`
+ceiling (see the [Pagination guide](#pagination-guide)); the resume rule
+is identical.  Because the server also clamps to its last recorded block,
+resuming at `block_num_end + 1` can never skip blocks that had not been
+produced (or recorded) at the time of the request.  When nothing in the
+requested window has been recorded yet, the response carries
+`block_num_end == block_num_start - 1`
 ("nothing scanned") — retry the same `block_num_start` later.
 
 **Response fields:**
@@ -324,8 +327,8 @@ yet, the response carries `block_num_end == block_num_start - 1`
 | Field | Description |
 |-------|-------------|
 | `block_num_start` | First block number actually scanned. |
-| `block_num_end` | Last block number actually scanned (after clamping to the range cap and the last recorded block). |
-| `actions` | Array of matching action objects, ordered by `(block_num, global_sequence)`. |
+| `block_num_end` | Last block number actually scanned. Reduced below the requested end by the `trace-max-block-range` window, the last recorded block, or the `max_actions_per_response` (10,000) action ceiling — whichever stops the scan first. Resume the next page at `block_num_end + 1`. |
+| `actions` | Array of matching action objects, ordered by `(block_num, global_sequence)`. Capped per response by `max_actions_per_response` (see the Pagination guide). |
 
 **Action object fields:**
 
@@ -467,6 +470,12 @@ just as much as general action consumers. See the `get_actions` field
 table above for its semantics, including the irreversible-mode operator
 note.
 
+Pagination is identical to `get_actions`: the same `trace-max-block-range`
+window and `max_actions_per_response` (10,000) ceiling apply, with matched
+transfers counted toward the ceiling, and the response's `block_num_end`
+drives the `block_num_end + 1` resume cursor.  See the
+[Pagination guide](#pagination-guide).
+
 **Error responses:**
 
 | Code | Condition |
@@ -484,14 +493,32 @@ clamped to `block_num_start + trace-max-block-range - 1` if the client asks
 for more. The response always includes the actual `block_num_start` and
 `block_num_end` scanned so the client can page reliably.
 
-Within that window, ALL matching actions are returned — there is no
-per-result limit and no in-window cursor.
+Within that window the number of actions returned in one response is
+bounded by a hard ceiling, `max_actions_per_response` (10,000). This
+complements the block-window cap: the window bounds how many blocks are
+scanned, the action ceiling bounds how many matching actions are decoded,
+serialized, and held in memory, so a broad or unfiltered query over a
+busy range cannot materialize an unbounded result set. The ceiling is a
+hard-coded constant, not a nodeop setting — it cannot be raised or
+disabled, so the bound holds on every node.
 
-The server clamps the reported `block_num_end` twice: to the
-`trace-max-block-range` window AND to the last block it has actually
-recorded.  Resuming at `block_num_end + 1` is therefore always safe:
-blocks that had not been produced (or had not reached this node) when
-you asked are never reported as scanned, so they cannot be skipped.
+The ceiling is enforced at block boundaries: the scan stops once a fully
+scanned block brings the running action total to the ceiling, and the
+response's `block_num_end` is set to that last fully-scanned block. A
+response is never split in the middle of a block, so it may exceed the
+ceiling by at most one block's worth of matching actions (itself bounded
+by consensus block limits). Resume at `block_num_end + 1` exactly as for
+the block-window clamp — block-boundary truncation means resuming neither
+skips nor duplicates actions.
+
+The server therefore reduces the reported `block_num_end` below the
+requested end for any of three reasons: the `trace-max-block-range`
+window, the last block it has actually recorded, or the
+`max_actions_per_response` ceiling.  Resuming at `block_num_end + 1` is
+safe in all three cases: blocks that had not been produced (or had not
+reached this node) when you asked are never reported as scanned, so they
+cannot be skipped, and a truncated block is always reported either as
+fully scanned or not at all.
 
 To page across a wide range, advance `block_num_start` to the response's
 `block_num_end + 1` each call:
@@ -511,11 +538,13 @@ POST /v1/trace_api/get_actions
 ```
 
 Continue until `block_num_end` returned by the server equals the
-requested `block_num_end` (no clamp happened).  When you catch up to the
-chain head, the server's recorded-block clamp shrinks the reported
-window for you: a response with `block_num_end < block_num_start` means
-nothing new is scannable yet — wait and retry the same
-`block_num_start`.
+requested `block_num_end` (no truncation happened).  The same loop also
+handles the action ceiling: over a busy range a single window may take
+several requests to cross, each resuming at the previous
+`block_num_end + 1`.  When you catch up to the chain head, the server's
+recorded-block clamp shrinks the reported window for you: a response with
+`block_num_end < block_num_start` means nothing new is scannable yet —
+wait and retry the same `block_num_start`.
 
 Notes:
 - Within each transaction, actions are sorted by `global_sequence`
@@ -524,9 +553,12 @@ Notes:
 - The maximum supported `trace-max-block-range` is 10,000. Raise it via
   `config.ini` on private/trusted nodes; public nodes should typically
   leave it at the default.
-- There is no per-response row cap: the range cap bounds scan work, not
-  result volume.  A busy receiver over a 10,000-block window can produce
-  a very large response — size your window to your traffic.
+- A response carries at most `max_actions_per_response` (10,000) matching
+  actions plus the overflow from the final block, then stops at that
+  block boundary (reported via `block_num_end`).  This caps result volume
+  independently of the block-window cap, so a busy receiver over a wide
+  window is paged across multiple responses instead of returned all at
+  once.
 - Retention pruning (`trace-minimum-irreversible-history-blocks`) deletes
   old slices.  A query into a pruned range returns an empty result
   indistinguishable from "no matches" — indexers backfilling history must

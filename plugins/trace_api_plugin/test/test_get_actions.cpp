@@ -156,6 +156,21 @@ static const chain::transaction_id_type TRX2 =
 static const chain::transaction_id_type TRX3 =
    "0000000000000000000000000000000000000000000000000000000000000003"_h;
 
+// Build a block whose single transaction carries `count` matching actions with sequential
+// global_sequences starting at `first_seq`.  Used by the response-ceiling tests, which need to
+// drive the matching-action count above max_actions_per_response.  receiver/account/action default
+// to the values matched by the get_token_transfers filter so the same builder feeds both shapes.
+block_trace_v0 make_block_with_actions(uint32_t block_num, uint32_t count, uint64_t first_seq,
+                                       chain::name receiver = "sysio.token"_n,
+                                       chain::name account  = "sysio.token"_n,
+                                       chain::name act      = "transfer"_n) {
+   std::vector<action_trace_v0> actions;
+   actions.reserve(count);
+   for (uint32_t i = 0; i < count; ++i)
+      actions.push_back(make_action(first_seq + i, receiver, account, act));
+   return make_block(block_num, { make_trx(TRX1, block_num, std::move(actions)) });
+}
+
 } // anonymous namespace
 
 // ---------------------------------------------------------------------------
@@ -911,6 +926,149 @@ BOOST_AUTO_TEST_CASE(clamp_query_end_to_recorded_bounds_scan) {
       clamp_query_end_to_recorded(q, /*last_recorded=*/0);
       BOOST_TEST(q.block_num_end == 0u);
    }
+}
+
+// ---------------------------------------------------------------------------
+// Response cardinality ceiling (max_actions_per_response)
+// ---------------------------------------------------------------------------
+// The block window bounds how many blocks are scanned; max_actions_per_response bounds how many
+// matching actions are materialized from that window, so a broad query cannot build an unbounded
+// response.  The scan stops at a block boundary once the ceiling is reached: the last block is
+// returned in full (never partial) and last_block_num reports it, so a client resumes at
+// last_block_num + 1 without skipping or duplicating an action.
+
+// Under the ceiling the whole requested window is reported as scanned -- including trailing blocks
+// that held no data -- so a resuming client advances past them instead of re-scanning.
+BOOST_FIXTURE_TEST_CASE(under_ceiling_reports_requested_end, get_actions_fixture)
+{
+   blocks[1] = make_block(1, { make_trx(TRX1, 1, { make_action(1, "a"_n, "tok"_n, "transfer"_n) }) });
+   blocks[2] = make_block(2, { make_trx(TRX2, 2, { make_action(2, "a"_n, "tok"_n, "transfer"_n) }) });
+
+   action_query q;
+   q.block_num_start = 1;
+   q.block_num_end   = 5;   // blocks 3..5 hold no data
+
+   auto r = get_actions(q);
+
+   BOOST_REQUIRE_EQUAL(r.actions.size(), 2u);
+   BOOST_TEST(r.last_block_num == 5u);
+}
+
+// Crossing the ceiling across several blocks stops the scan at a block boundary: the result holds a
+// whole number of blocks, overshoots the ceiling by less than one block, and last_block_num is below
+// the requested end.
+BOOST_FIXTURE_TEST_CASE(ceiling_truncates_at_block_boundary, get_actions_fixture)
+{
+   constexpr uint32_t per_block = 1000;
+   const uint32_t stop_block   = (max_actions_per_response + per_block - 1) / per_block;
+   const uint32_t total_blocks = stop_block + 5;
+
+   uint64_t seq = 1;
+   for (uint32_t b = 1; b <= total_blocks; ++b, seq += per_block)
+      blocks[b] = make_block_with_actions(b, per_block, seq);
+
+   action_query q;
+   q.block_num_start = 1;
+   q.block_num_end   = total_blocks;
+
+   auto r = get_actions(q);
+
+   BOOST_TEST(r.actions.size() >= static_cast<size_t>(max_actions_per_response));
+   BOOST_TEST(r.actions.size() <  static_cast<size_t>(max_actions_per_response) + per_block);
+   BOOST_REQUIRE_EQUAL(r.actions.size(), static_cast<size_t>(per_block) * stop_block);
+   BOOST_TEST(r.last_block_num == stop_block);
+   BOOST_TEST(r.last_block_num <  q.block_num_end);
+
+   // No action from beyond the reported boundary leaked into the result.
+   for (const auto& a : r.actions) {
+      const uint32_t bn = a.get_object()["block_num"].as<uint32_t>();
+      BOOST_TEST(bn >= 1u);
+      BOOST_TEST(bn <= r.last_block_num);
+   }
+}
+
+// A single block whose matching actions exceed the ceiling is still returned in full (forward
+// progress -- the client never gets stuck unable to page past it), and the scan stops there rather
+// than spilling into later blocks.
+BOOST_FIXTURE_TEST_CASE(single_block_over_ceiling_returns_full_block, get_actions_fixture)
+{
+   const uint32_t count = max_actions_per_response + 500;
+   blocks[1] = make_block_with_actions(1, count, 1);
+   blocks[2] = make_block_with_actions(2, 10, uint64_t{count} + 1);  // must not be scanned
+
+   action_query q;
+   q.block_num_start = 1;
+   q.block_num_end   = 2;
+
+   auto r = get_actions(q);
+
+   BOOST_REQUIRE_EQUAL(r.actions.size(), static_cast<size_t>(count));
+   BOOST_TEST(r.last_block_num == 1u);
+   for (const auto& a : r.actions)
+      BOOST_TEST(a.get_object()["block_num"].as<uint32_t>() == 1u);
+}
+
+// Resuming from last_block_num + 1 after a truncation yields the remaining actions with no gap and
+// no duplicate: the two pages together cover the full global_sequence range exactly once.
+BOOST_FIXTURE_TEST_CASE(resume_after_ceiling_has_no_gap_or_duplicate, get_actions_fixture)
+{
+   constexpr uint32_t per_block  = 1000;
+   const uint32_t stop_block     = (max_actions_per_response + per_block - 1) / per_block;
+   const uint32_t total_blocks   = stop_block + 3;
+   const uint64_t total_actions  = static_cast<uint64_t>(per_block) * total_blocks;
+
+   uint64_t seq = 1;
+   for (uint32_t b = 1; b <= total_blocks; ++b, seq += per_block)
+      blocks[b] = make_block_with_actions(b, per_block, seq);
+
+   action_query q1;
+   q1.block_num_start = 1;
+   q1.block_num_end   = total_blocks;
+   auto r1 = get_actions(q1);
+   BOOST_TEST(r1.last_block_num < total_blocks);    // first page truncated
+
+   action_query q2;
+   q2.block_num_start = r1.last_block_num + 1;
+   q2.block_num_end   = total_blocks;
+   auto r2 = get_actions(q2);
+   BOOST_TEST(r2.last_block_num == total_blocks);    // remaining fits in one page
+
+   std::set<uint64_t> seqs;
+   for (const auto& a : r1.actions) seqs.insert(a.get_object()["global_sequence"].as_uint64());
+   for (const auto& a : r2.actions) seqs.insert(a.get_object()["global_sequence"].as_uint64());
+
+   // No duplicates across pages, and the union is the contiguous full set [1, total_actions].
+   BOOST_REQUIRE_EQUAL(r1.actions.size() + r2.actions.size(), static_cast<size_t>(total_actions));
+   BOOST_REQUIRE_EQUAL(seqs.size(), static_cast<size_t>(total_actions));
+   BOOST_TEST(*seqs.begin()  == 1u);
+   BOOST_TEST(*seqs.rbegin() == total_actions);
+}
+
+// get_token_transfers funnels through the same get_actions_impl, so the ceiling applies to the slim
+// shape identically.
+BOOST_FIXTURE_TEST_CASE(ceiling_applies_to_token_transfers, get_actions_fixture)
+{
+   constexpr uint32_t per_block = 1000;
+   const uint32_t stop_block   = (max_actions_per_response + per_block - 1) / per_block;
+   const uint32_t total_blocks = stop_block + 2;
+
+   uint64_t seq = 1;
+   for (uint32_t b = 1; b <= total_blocks; ++b, seq += per_block)
+      blocks[b] = make_block_with_actions(b, per_block, seq);  // receiver==account==sysio.token, transfer
+
+   action_query q;
+   q.block_num_start = 1;
+   q.block_num_end   = total_blocks;
+   q.receiver        = "sysio.token"_n;
+   q.account         = "sysio.token"_n;
+   q.action          = "transfer"_n;
+
+   auto r = get_token_transfer_actions(q);
+
+   BOOST_TEST(r.actions.size() >= static_cast<size_t>(max_actions_per_response));
+   BOOST_TEST(r.actions.size() <  static_cast<size_t>(max_actions_per_response) + per_block);
+   BOOST_TEST(r.last_block_num == stop_block);
+   BOOST_TEST(r.last_block_num <  q.block_num_end);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
