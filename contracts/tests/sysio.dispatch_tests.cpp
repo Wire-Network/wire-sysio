@@ -45,6 +45,18 @@ inline fc::mutable_variant_object codename_mvo(std::string_view s) {
    return mvo()("value", fc::slug_name{s}.value);
 }
 
+/// One `chain_min_bond` entry for `sysio.opreg::setconfig`'s `req_*_collat`
+/// vectors. `config_timestamp_ms` is stamped by the contract, so 0 here.
+inline fc::variant chain_min_bond_mvo(std::string_view chain_code,
+                                      std::string_view token_code,
+                                      uint64_t min_bond) {
+   return fc::variant(mvo()
+      ("chain_code",          codename_mvo(chain_code))
+      ("token_code",          codename_mvo(token_code))
+      ("min_bond",            min_bond)
+      ("config_timestamp_ms", uint64_t{0}));
+}
+
 /// Build an `authority` whose active permission is the account's own
 /// active key + a list of `{actor, sysio.code}` co-signers.
 authority active_with_code_authors(name account, const std::vector<name>& code_authors) {
@@ -371,6 +383,28 @@ public:
       uwrit_op_eth_pubkey = em_pubkey_bytes(pub);
    }
 
+   /// Push `sysio.opreg::setconfig` with the dispatch-suite defaults, varying
+   /// the underwriter and (optionally) producer collateral requirements. Batch
+   /// minimums stay empty (those operators are bootstrapped or unused here). The
+   /// race resolver gates winner selection on ACTIVE UNDERWRITER, and
+   /// `req_uw_collat` is what promotes UWRIT_OP to ACTIVE via
+   /// `opreg::processuw`; the eligibility-gate tests tune these to make a
+   /// candidate ACTIVE (a funded producer) or keep one inactive while funded.
+   action_result opreg_setconfig_collat(const fc::variants& req_uw_collat,
+                                        const fc::variants& req_prod_collat = fc::variants{}) {
+      return push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "setconfig"_n, mvo()
+         ("max_available_producers",          21)
+         ("max_available_batch_ops",          63)
+         ("max_available_underwriters",       21)
+         ("terminate_prune_delay_ms",         600000)
+         ("terminate_max_consecutive_misses", 5)
+         ("terminate_max_pct_misses_24h",     5)
+         ("terminate_window_ms",              uint64_t{24ULL * 60 * 60 * 1000})
+         ("req_prod_collat",                  req_prod_collat)
+         ("req_batchop_collat",               fc::variants{})
+         ("req_uw_collat",                    req_uw_collat));
+   }
+
    // `outpost_code` / `outpost_kind` name the single bootstrapped outpost. They default to the EVM
    // "ETH" chain used by the deposit/withdraw/swap/underwrite cases. The node-owner happy path passes
    // "ETHEREUM" so the source it binds against (msgch's NODE_OWNER_SRC_CHAIN) is the scheduled outpost
@@ -387,18 +421,15 @@ public:
             ("batch_op_groups",                     1)
             ("epoch_retention_envelope_log_count",  200)));
 
-      BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT,
-         "setconfig"_n, mvo()
-            ("max_available_producers",          21)
-            ("max_available_batch_ops",          63)
-            ("max_available_underwriters",       21)
-            ("terminate_prune_delay_ms",         600000)
-            ("terminate_max_consecutive_misses", 5)
-            ("terminate_max_pct_misses_24h",     5)
-            ("terminate_window_ms",              uint64_t{24ULL * 60 * 60 * 1000})
-            ("req_prod_collat",                  fc::variants{})
-            ("req_batchop_collat",               fc::variants{})
-            ("req_uw_collat",                    fc::variants{})));
+      // A 1-unit ETH/ETH underwriter minimum: every swap-race test funds
+      // UWRIT_OP's ETH bond, so this promotes it to ACTIVE via
+      // `opreg::processuw` (it registers UNKNOWN — underwriters cannot be
+      // bootstrapped). The race resolver now gates winner selection on ACTIVE
+      // UNDERWRITER, so the happy-path winner tests need a genuinely-active
+      // underwriter. Adds NO balance row — deposit-routing assertions (exact /
+      // zero balances) are unaffected.
+      BOOST_REQUIRE_EQUAL(success(),
+         opreg_setconfig_collat(fc::variants{chain_min_bond_mvo("ETH", "ETH", 1)}));
 
       BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT,
          "regoperator"_n, mvo()
@@ -1304,6 +1335,146 @@ BOOST_FIXTURE_TEST_CASE(swap_candidate_with_invalid_uic_signature_is_disqualifie
    BOOST_REQUIRE(found);
 } FC_LOG_AND_RETHROW() }
 
+// ── Underwriter role + activation gate at winner selection ───────────────────
+//
+// `try_select_winner` must select only an ACTIVE UNDERWRITER (opreg type ==
+// UNDERWRITER && status == ACTIVE). The balance mirror it reads zeroes only
+// SLASHED / TERMINATED and ignores `op.type`, so before this gate a candidate
+// needed merely a valid UIC signature and enough mirrored bond — letting a
+// non-underwriter, or a not-yet-active underwriter, become the persisted winner,
+// consume lock capacity, and drive settlement. Both cases below carry real ETH
+// bond and a valid self-signed UIC; only the eligibility gate stops them, and it
+// leaves the race PENDING (reclaimable) for a genuine winner. The positive
+// control — an ACTIVE underwriter that wins — is `swap_same_token_legs_exact_balance_wins`.
+
+// A non-underwriter operator that is fully ACTIVE and bonded — a funded
+// PRODUCER — cannot win an underwriting race even with a valid self-signed UIC.
+// Activating it (status ACTIVE) isolates the op.type half of the gate: a
+// status-only check would let it through, so this test fails if the type check
+// is dropped.
+BOOST_FIXTURE_TEST_CASE(swap_winner_non_underwriter_type_is_disqualified,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();          // ETH source outpost + UWRIT_OP
+   register_wire_depot();             // to-WIRE: a single (source) required leg
+
+   // Require producer ETH collateral too, so funding the producer below promotes
+   // it to ACTIVE via opreg::processprod (the underwriter requirement stays as
+   // bootstrap set it).
+   BOOST_REQUIRE_EQUAL(success(), opreg_setconfig_collat(
+      /*req_uw_collat=*/   fc::variants{chain_min_bond_mvo("ETH", "ETH", 1)},
+      /*req_prod_collat=*/ fc::variants{chain_min_bond_mvo("ETH", "ETH", 1)}));
+
+   // A second operator registered as a PRODUCER (NOT an underwriter). Privileged
+   // opreg self-registration skips the authex-link precondition.
+   const name PRODOP = "prodop.a"_n;
+   create_account(PRODOP);
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT,
+      "regoperator"_n, mvo()
+         ("account",         PRODOP.to_string())
+         ("type",            OperatorType::OPERATOR_TYPE_PRODUCER)
+         ("is_bootstrapped", false)));
+
+   const uint64_t eth     = fc::slug_name{"ETH"}.value;
+   const uint64_t wire    = fc::slug_name{"WIRE"}.value;
+   const uint64_t primary = fc::slug_name{"PRIMARY"}.value;
+   constexpr uint64_t ATT_ID = 7400;
+
+   // Fund ETH bond: covers the source leg AND clears req_prod_collat, so
+   // processprod flips PRODOP to ACTIVE. The candidate is now an ACTIVE,
+   // sufficiently-bonded operator that is simply the wrong role — only op.type
+   // can disqualify it.
+   BOOST_REQUIRE_EQUAL(success(),
+      depositinle_credit(PRODOP, "ETH", "ETH", uint64_t{1'000'000}));
+   {
+      const auto op = get_operator(PRODOP);
+      BOOST_REQUIRE_EQUAL("OPERATOR_TYPE_PRODUCER", op["type"].as_string());
+      BOOST_REQUIRE_EQUAL("OPERATOR_STATUS_ACTIVE", op["status"].as_string());
+   }
+
+   const std::string rs = UWRIT_OP.to_string();
+   const std::vector<char> rcpt(rs.begin(), rs.end());
+   const auto sr = encode_swap_request(
+      ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
+      eth, eth, primary, /*src_amount*/ 100,
+      wire, wire, primary, /*target*/ 50,
+      5000, ChainKind::CHAIN_KIND_WIRE, rcpt);
+   BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, eth, sr));
+
+   // Valid UIC self-signed by PRODOP — signature recovery passes, so only the
+   // eligibility gate can reject it.
+   const auto uic = make_signed_uic(PRODOP, ATT_ID, eth, eth, eth, primary);
+   BOOST_REQUIRE_EQUAL(success(),
+      rcrdcommit_direct(ATT_ID, PRODOP, eth, "ETH", "ETH", "PRIMARY", uic));
+
+   const auto req = get_uwreq(ATT_ID);
+   BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_PENDING", req["status"].as_string());
+   bool found = false;
+   for (const auto& c : req["commits_by"].get_array()) {
+      if (c["underwriter"].as_string() == PRODOP.to_string()) {
+         found = true;
+         BOOST_REQUIRE_EQUAL("UNDERWRITE_STATUS_DISQUALIFIED", c["status"].as_string());
+         BOOST_REQUIRE(c["reason"].as_string().find("underwriter") != std::string::npos);
+      }
+   }
+   BOOST_REQUIRE(found);
+   BOOST_REQUIRE(get_lock(1).is_null());   // no lock written
+} FC_LOG_AND_RETHROW() }
+
+// A registered UNDERWRITER that has NOT cleared its activation threshold (status
+// UNKNOWN) cannot win, even funded on the swap's leg. Requiring an additional
+// unfunded collateral pair (SOLANA/SOL) keeps UWRIT_OP inactive while it still
+// holds ample ETH bond — isolating the activation gate from the bond check.
+BOOST_FIXTURE_TEST_CASE(swap_winner_inactive_underwriter_is_disqualified,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+   register_wire_depot();
+   // Require ETH AND SOLANA collateral, so funding ETH alone no longer activates.
+   BOOST_REQUIRE_EQUAL(success(), opreg_setconfig_collat(fc::variants{
+      chain_min_bond_mvo("ETH",    "ETH", 1),
+      chain_min_bond_mvo("SOLANA", "SOL", 1)}));
+
+   const uint64_t eth     = fc::slug_name{"ETH"}.value;
+   const uint64_t wire    = fc::slug_name{"WIRE"}.value;
+   const uint64_t primary = fc::slug_name{"PRIMARY"}.value;
+   constexpr uint64_t ATT_ID = 7500;
+
+   // Ample ETH bond for the source leg, but SOLANA stays unfunded → meets_role_min
+   // is false → UWRIT_OP never reaches ACTIVE.
+   BOOST_REQUIRE_EQUAL(success(),
+      depositinle_credit(UWRIT_OP, "ETH", "ETH", uint64_t{1'000'000}));
+   {
+      const auto op = get_operator(UWRIT_OP);
+      BOOST_REQUIRE_EQUAL("OPERATOR_TYPE_UNDERWRITER", op["type"].as_string());
+      BOOST_REQUIRE_EQUAL("OPERATOR_STATUS_UNKNOWN",   op["status"].as_string());
+   }
+
+   const std::string rs = UWRIT_OP.to_string();
+   const std::vector<char> rcpt(rs.begin(), rs.end());
+   const auto sr = encode_swap_request(
+      ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
+      eth, eth, primary, /*src_amount*/ 100,
+      wire, wire, primary, /*target*/ 50,
+      5000, ChainKind::CHAIN_KIND_WIRE, rcpt);
+   BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, eth, sr));
+
+   const auto uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, eth, primary);
+   BOOST_REQUIRE_EQUAL(success(),
+      rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", uic));
+
+   const auto req = get_uwreq(ATT_ID);
+   BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_PENDING", req["status"].as_string());
+   bool found = false;
+   for (const auto& c : req["commits_by"].get_array()) {
+      if (c["underwriter"].as_string() == UWRIT_OP.to_string()) {
+         found = true;
+         BOOST_REQUIRE_EQUAL("UNDERWRITE_STATUS_DISQUALIFIED", c["status"].as_string());
+         BOOST_REQUIRE(c["reason"].as_string().find("underwriter") != std::string::npos);
+      }
+   }
+   BOOST_REQUIRE(found);
+   BOOST_REQUIRE(get_lock(1).is_null());
+} FC_LOG_AND_RETHROW() }
+
 // Regression (r3444212155): a malformed inbound SwapRequest must NOT abort the
 // consensus-tipping delivery. createuwreq logs + skips (no row, no throw) when
 // the payload fails to decode — it cannot be refunded either, since the revert
@@ -1588,7 +1759,7 @@ BOOST_FIXTURE_TEST_CASE(swap_oversized_source_reverts_at_ingress,
    // Maximal availability, so the revert below is provably from the oversized
    // source at ingress — not from an insufficient-balance check downstream.
    BOOST_REQUIRE_EQUAL(success(),
-      depositinle_credit(UWRIT_OP, "ETH", "ETH", ~uint64_t{0}));
+      depositinle_credit(UWRIT_OP, "ETH", "ETH", (uint64_t{1} << 62) - 1));
 
    // source_amount == UINT64_MAX, encoded as -1 in the signed wire field (the
    // exact pre-WSA-028 wrap). to_depot_amount rejects it via the amount <= 0 branch.
