@@ -809,6 +809,15 @@ namespace sysio {
       bool process_next_trx_message(uint32_t message_length);
       bool process_next_trx_notice_message(uint32_t message_length);
       bool process_next_vote_message(uint32_t message_length);
+
+      /// Advance the read pointer to the exact end of the frame currently being parsed.
+      /// @param bytes_before pending_message_buffer.bytes_to_read() captured at the frame body start
+      /// @param message_length the peer-declared payload length of the frame
+      /// Skips any declared payload bytes the parser did not consume so the next pipelined frame
+      /// stays aligned. Parsers must bound their reads to message_length (see fc::bounded_datastream),
+      /// so the consumed count can never exceed message_length.
+      void advance_to_frame_end(uint32_t bytes_before, uint32_t message_length);
+
       void update_endpoints(const tcp::endpoint& endpoint = tcp::endpoint());
 
       void send_gossip_bp_peers_initial_message();
@@ -3136,16 +3145,28 @@ namespace sysio {
    }
 
    // called from connection strand
+   void connection::advance_to_frame_end( uint32_t bytes_before, uint32_t message_length ) {
+      const uint32_t consumed = bytes_before - pending_message_buffer.bytes_to_read();
+      // Frame parsers read through fc::bounded_datastream limited to message_length, so they can
+      // never consume past the declared frame; assert to catch any future path that omits the bound.
+      SYS_ASSERT( consumed <= message_length, plugin_exception,
+                  "frame parser consumed {} bytes, exceeding declared length {}", consumed, message_length );
+      pending_message_buffer.advance_read_ptr( message_length - consumed );
+   }
+
+   // called from connection strand
    bool connection::process_next_message( uint32_t message_length ) {
       bytes_received += message_length;
       last_bytes_received = get_time();
       try {
          auto now = latest_msg_time = std::chrono::steady_clock::now();
 
-         // if next message is a block we already have, exit early
+         // if next message is a block we already have, exit early. Bound the type-tag peek to the
+         // declared frame so a truncated frame cannot source its routing tag from a pipelined frame.
          auto peek_ds = pending_message_buffer.create_peek_datastream();
+         fc::bounded_datastream bounded_peek( peek_ds, message_length );
          unsigned_int which{};
-         fc::raw::unpack( peek_ds, which );
+         fc::raw::unpack( bounded_peek, which );
 
          msg_type_t net_msg = to_msg_type_t(which.value);
 
@@ -3171,9 +3192,14 @@ namespace sysio {
          } else if( net_msg == msg_type_t::vote_message ) {
             return process_next_vote_message( message_length );
          } else {
-            auto ds = pending_message_buffer.create_datastream();
+            // Confine the generic net_message parse to the declared frame, then advance to the
+            // frame boundary so an under-length message cannot read into the next pipelined frame.
+            const auto bytes_before = pending_message_buffer.bytes_to_read();
+            auto mb_ds = pending_message_buffer.create_datastream();
+            fc::bounded_datastream ds( mb_ds, message_length );
             net_message msg;
             fc::raw::unpack( ds, msg );
+            advance_to_frame_end( bytes_before, message_length );
             msg_handler m( shared_from_this() );
             std::visit( m, msg );
          }
@@ -3188,11 +3214,14 @@ namespace sysio {
 
    // called from connection strand
    bool connection::process_next_block_message(uint32_t message_length) {
+      // Bound the header peek to the declared frame so the block id is derived only from this
+      // frame's bytes, never from a pipelined frame following an under-length block.
       auto peek_ds = pending_message_buffer.create_peek_datastream();
+      fc::bounded_datastream bounded_peek( peek_ds, message_length );
       unsigned_int which{};
-      fc::raw::unpack( peek_ds, which ); // throw away
+      fc::raw::unpack( bounded_peek, which ); // throw away
       block_header bh;
-      fc::raw::unpack( peek_ds, bh );
+      fc::raw::unpack( bounded_peek, bh );
       const block_id_type blk_id = bh.calculate_id();
       const uint32_t blk_num = last_received_block_num = block_header::num_from_id(blk_id);
       const fc::time_point now = fc::time_point::now();
@@ -3237,12 +3266,18 @@ namespace sysio {
             return true;
       }
 
+      // Confine the full block unpack to the declared frame. The datastream_mirror captures the
+      // packed block bytes for relay (consumed by fc::raw::unpack(signed_block)); wrapping a
+      // bounded_datastream preserves that capture while preventing reads from crossing the frame.
+      const auto bytes_before = pending_message_buffer.bytes_to_read();
       auto mb_ds = pending_message_buffer.create_datastream();
-      fc::raw::unpack( mb_ds, which );
+      fc::bounded_datastream bounded_ds( mb_ds, message_length );
+      fc::raw::unpack( bounded_ds, which );
 
-      fc::datastream_mirror ds(mb_ds, message_length);
+      fc::datastream_mirror ds( bounded_ds, message_length );
       shared_ptr<signed_block> ptr = std::make_shared<signed_block>();
       fc::raw::unpack( ds, *ptr );
+      advance_to_frame_end( bytes_before, message_length );
 
       handle_message( blk_id, std::move( ptr ), now );
       return true;
@@ -3294,7 +3329,11 @@ namespace sysio {
       auto now = fc::time_point::now();
       // shared_ptr<packed_transaction> needed here because packed_transaction_ptr is shared_ptr<const packed_transaction>
       std::shared_ptr<packed_transaction> ptr = std::make_shared<packed_transaction>();
-      fc::raw::unpack( ds, *ptr );
+      // Confine the body to the remaining declared frame bytes, then advance to the frame boundary,
+      // so the transaction cannot be unpacked from bytes belonging to a following pipelined frame.
+      fc::bounded_datastream body_ds( ds, message_length - header_bytes );
+      fc::raw::unpack( body_ds, *ptr );
+      advance_to_frame_end( bytes_before, message_length );
 
       // Validate that the wire ID matches the actual transaction ID.
       if( ptr->id() != trx_id ) {
@@ -3357,11 +3396,16 @@ namespace sysio {
          return true;
       }
 
-      auto ds = pending_message_buffer.create_datastream();
+      // Confine the notice parse to the declared frame so the tracked transaction id cannot be
+      // sourced from a following pipelined frame, then advance to the frame boundary.
+      const auto bytes_before = pending_message_buffer.bytes_to_read();
+      auto mb_ds = pending_message_buffer.create_datastream();
+      fc::bounded_datastream ds( mb_ds, message_length );
       unsigned_int which{};
       fc::raw::unpack( ds, which );
       transaction_notice_message msg;
       fc::raw::unpack( ds, msg );
+      advance_to_frame_end( bytes_before, message_length );
 
       size_t trx_entries_sz = my_impl->dispatcher.add_peer_txn_notice( msg.id, *this );
       if (trx_entries_sz > def_max_trx_entries_per_conn_size) {
@@ -3408,7 +3452,11 @@ namespace sysio {
          return true;
       }
       vote_message_ptr ptr = std::make_shared<vote_message>();
-      fc::raw::unpack( ds, *ptr );
+      // Confine the body to the remaining declared frame bytes, then advance to the frame boundary,
+      // so the vote cannot be unpacked from bytes belonging to a following pipelined frame.
+      fc::bounded_datastream body_ds( ds, message_length - header_bytes );
+      fc::raw::unpack( body_ds, *ptr );
+      advance_to_frame_end( bytes_before, message_length );
 
       // Validate that the wire vote_id matches the actual computed vote_id.
       auto computed_vote_id = compute_vote_id(*ptr);
