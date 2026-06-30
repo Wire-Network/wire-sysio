@@ -464,11 +464,13 @@ public:
       }
    }
 
-   void increment_bytes_in_flight(size_t sz) {
+   /// @copydoc detail::abstract_conn::increment_bytes_in_flight
+   virtual void increment_bytes_in_flight(size_t sz) final {
       plugin_state_->bytes_in_flight += sz;
    }
 
-   void decrement_bytes_in_flight(size_t sz) {
+   /// @copydoc detail::abstract_conn::decrement_bytes_in_flight
+   virtual void decrement_bytes_in_flight(size_t sz) final {
       plugin_state_->bytes_in_flight -= sz;
    }
 

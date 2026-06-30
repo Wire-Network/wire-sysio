@@ -173,6 +173,30 @@ uint64_t available_via_mirrors(name self,
    return balance > reserved ? balance - reserved : 0;
 }
 
+/// True iff `candidate` is currently an ACTIVE underwriter on opreg: an
+/// operator row that EXISTS, is typed `OPERATOR_TYPE_UNDERWRITER`, AND is in
+/// `OPERATOR_STATUS_ACTIVE`. This is the authorization the race resolver
+/// requires before a candidate may win and drive value settlement.
+///
+/// opreg's eligibility model registers every non-bootstrapped operator as
+/// `UNKNOWN`, forbids bootstrapping an underwriter active at registration, and
+/// only promotes an underwriter to `ACTIVE` through `opreg::processuw` once it
+/// clears the role's `req_uw_collat` minimum. The balance mirror
+/// (`available_via_mirrors`) zeroes only SLASHED / TERMINATED rows and ignores
+/// `op.type`, so on its own it would admit a non-underwriter (PRODUCER / BATCH
+/// / CHALLENGER) or a pre-activation underwriter (UNKNOWN / WARMUP / COOLDOWN)
+/// that merely holds enough mirrored balance. Reads the opreg `operators` row
+/// directly — the authoritative type/status source, mirrored nowhere else in
+/// uwrit.
+bool is_active_underwriter(name candidate) {
+   opreg::operators_t ops(uwrit::OPREG_ACCOUNT);
+   opreg::operator_key op_pk{candidate.value};
+   if (!ops.contains(op_pk)) return false;
+   const auto op = ops.get(op_pk);
+   return op.type   == OperatorType::OPERATOR_TYPE_UNDERWRITER
+       && op.status == OperatorStatus::OPERATOR_STATUS_ACTIVE;
+}
+
 /// Live per-spoke swap fee (basis points) from `uwconfig`, read fresh so the
 /// ingestion variance check, the race-time recheck, and settlement all charge
 /// one rate. `self` is the uwrit contract account (where the singleton lives).
@@ -724,8 +748,13 @@ void uwrit::createuwreq(uint64_t attestation_id,
    const sysio::slug_name dst_chain_code{sr.target_chain_code};
    const sysio::slug_name dst_token_code{sr.target_token_code};
    const sysio::slug_name dst_reserve_code{sr.target_reserve_code};
-   const uint64_t        src_amount =
-      static_cast<uint64_t>(static_cast<int64_t>(sr.source_amount.amount));
+   // WSA-028: source_amount is signed on the wire. Gate it through the shared
+   // fail-closed parser; a non-positive or out-of-range value yields nullopt and
+   // is reverted (refund on the proven outpost) by the positivity guard below,
+   // never wrapped into a huge src_amount that would corrupt the swap quote and
+   // reserve settlement. Never-throw: revert, do not check().
+   const std::optional<uint64_t> src_amount_opt =
+      opp::safe::to_depot_amount(static_cast<int64_t>(sr.source_amount.amount));
 
    // WSA-005 source-chain binding. `chain_code` is the source outpost `sysio.msgch::dispatch`
    // proved via `deliver` (an active, non-depot `sysio.chains` row); `sr.source_chain_code` is the
@@ -750,12 +779,13 @@ void uwrit::createuwreq(uint64_t attestation_id,
    // every downstream lock/settlement amount is provably positive (a
    // zero-amount lock would trip `opreg::releaselock`'s amount check from
    // inside `chklocks` at epoch advance — a consensus stall).
-   if (src_amount == 0 || sr.target_amount == 0) {
+   if (!src_amount_opt || sr.target_amount == 0) {
       emit_swap_revert(get_self(), chain_code, attestation_id, sr,
                        src_chain_code, src_reserve_code,
                        "SwapRequest rejected: source and target amounts must be positive");
       return;
    }
+   const uint64_t src_amount = *src_amount_opt;
    if (!chain_registered_active(src_chain_code) || !chain_registered_active(dst_chain_code)) {
       emit_swap_revert(get_self(), chain_code, attestation_id, sr,
                        src_chain_code, src_reserve_code,
@@ -1017,6 +1047,29 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
 
    const bool src_needed = !leg_is_depot(req.src_chain_code);
    const bool dst_needed = !leg_is_depot(req.dst_chain_code);
+
+   // ── Underwriter eligibility — role + activation gate ─────────────────
+   // Mirrored bond availability and UIC signature recovery alone do NOT
+   // establish that `candidate` is an authorized underwriter. opreg registers
+   // every non-bootstrapped operator as UNKNOWN, forbids bootstrapping an
+   // underwriter active, and only flips an underwriter to ACTIVE through
+   // `opreg::processuw` once it clears `req_uw_collat`. The balance mirror
+   // (`available_via_mirrors`) zeroes only SLASHED / TERMINATED and ignores
+   // `op.type`, so without this gate a non-underwriter (PRODUCER / BATCH /
+   // CHALLENGER) or a not-yet-active underwriter (UNKNOWN / WARMUP / COOLDOWN)
+   // carrying enough mirrored balance and a valid UIC signature would be
+   // selected as the winner, consume lock capacity, and settle against the
+   // reserves. Require an ACTIVE UNDERWRITER before any signature work, lock,
+   // CONFIRMED write, or reserve mutation. Disqualify (reclaimable — a later
+   // rcrdcommit re-arms the entry once the operator activates) rather than
+   // throw: this resolver runs inside the evalcons dispatch chain, and a
+   // check() here would stall OPP consensus (`feedback_opp_handlers_never_throw`).
+   if (!is_active_underwriter(candidate)) {
+      disqualify_candidate(reqs, pk, candidate,
+                           "candidate is not an ACTIVE underwriter on opreg "
+                           "(role/activation eligibility not satisfied)");
+      return;
+   }
 
    // ── T7: signature verification — required (outpost) legs only ────────
    // Look up the candidate's commit_entry to get the per-leg UIC bytes.

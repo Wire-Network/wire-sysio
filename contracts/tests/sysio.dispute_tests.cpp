@@ -359,6 +359,48 @@ public:
          ("operator_acct", op.to_string())("reason", std::string("test non-canonical delivery")));
    }
 
+   // ── opreg collateral / status helpers (mirror sysio.opreg_tests) ──────────
+
+   /// One `chain_min_bond` entry for setconfig's req_*_collat vectors.
+   static fc::variant make_chain_min_bond(std::string_view chain_code,
+                                          std::string_view token_code, uint64_t min_bond) {
+      return fc::variant(mvo()
+         ("chain_code", codename_mvo(chain_code))("token_code", codename_mvo(token_code))
+         ("min_bond", min_bond)("config_timestamp_ms", uint64_t{0}));
+   }
+
+   action_result depositinle(name account, std::string_view chain_code,
+                             std::string_view token_code, uint64_t amount) {
+      return push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "depositinle"_n, mvo()
+         ("account", account.to_string())("chain_code", codename_mvo(chain_code))
+         ("token_code", codename_mvo(token_code))("amount", amount)
+         ("actor_chain", ChainKind::CHAIN_KIND_EVM)("actor_address", std::vector<char>{})
+         ("original_message_id", std::string(64, '0')));
+   }
+
+   action_result withdrawinle(name account, std::string_view chain_code,
+                              std::string_view token_code, uint64_t amount) {
+      return push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "withdrawinle"_n, mvo()
+         ("account", account.to_string())("chain_code", codename_mvo(chain_code))
+         ("token_code", codename_mvo(token_code))("amount", amount));
+   }
+
+   action_result flushwtdw(uint32_t up_to_epoch) {
+      return push(OPREG_ACCOUNT, opreg_abi, EPOCH_ACCOUNT, "flushwtdw"_n, mvo()
+         ("current_epoch", up_to_epoch));
+   }
+
+   action_result terminate(name account) {
+      return push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "terminate"_n, mvo()
+         ("account", account.to_string())("reason", std::string("test terminate")));
+   }
+
+   /// deliver() for an arbitrary operator (the deliver() helper is hardcoded to BATCHOP).
+   action_result deliver_as(name op, uint64_t chain_code, const std::vector<char>& data) {
+      return push(MSGCH_ACCOUNT, msgch_abi, op, "deliver"_n, mvo()
+         ("batch_op_name", op.to_string())("chain_code", chain_code)("data", data));
+   }
+
    abi_serializer chalg_abi, epoch_abi, msgch_abi, opreg_abi, uwrit_abi, chains_abi, roa_abi, system_abi;
 };
 
@@ -699,6 +741,86 @@ BOOST_FIXTURE_TEST_CASE(post_consensus_evalcons_refire_is_benign_noop, sysio_dis
    // The durable guard short-circuits it to a no-op instead of decoding empty bytes and aborting.
    BOOST_REQUIRE_EQUAL(success(), evalcons(eth_code(), epoch));
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(epoch), outpcons_epoch(eth_code()));  // still recorded
+} FC_LOG_AND_RETHROW() }
+
+// =============================================================================
+//  deliver — operator must be ACTIVE in sysio.opreg, not merely group-resident
+// =============================================================================
+// The batch-op group is a snapshot taken at schedule time; an operator that loses
+// ACTIVE status mid-window (slashed, terminated, or de-collateralized to UNKNOWN)
+// stays in the resident group until the next reschedule. deliver() must reject it
+// so a non-active, non-slashable operator cannot be counted toward OPP consensus.
+// Each rejection case keeps the operator group-resident (no reschedule after the
+// status flip) so it exercises the delivery-time status gate, not the scheduling
+// filter (which is covered by slashed_op_excluded_from_scheduling_no_double_slash).
+
+BOOST_FIXTURE_TEST_CASE(deliver_accepts_active_group_member, sysio_dispute_tester) { try {
+   const uint32_t epoch = current_epoch();
+   BOOST_REQUIRE(group_contains(current_group(), BATCHOP));
+   BOOST_REQUIRE_EQUAL("OPERATOR_STATUS_ACTIVE", operator_status(BATCHOP));
+   BOOST_REQUIRE_EQUAL(success(), deliver(eth_code(), encode_envelope(epoch, "active")));
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(deliver_rejects_slashed_group_member, sysio_dispute_tester) { try {
+   const uint32_t epoch = current_epoch();
+   BOOST_REQUIRE_EQUAL(success(), slashop(BATCHOP));
+   BOOST_REQUIRE_EQUAL("OPERATOR_STATUS_SLASHED", operator_status(BATCHOP));
+   BOOST_REQUIRE(group_contains(current_group(), BATCHOP));  // still resident
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: delivering operator is not ACTIVE in sysio.opreg"),
+      deliver(eth_code(), encode_envelope(epoch, "slashed")));
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(deliver_rejects_terminated_group_member, sysio_dispute_tester) { try {
+   const uint32_t epoch = current_epoch();
+   BOOST_REQUIRE_EQUAL(success(), terminate(BATCHOP));
+   BOOST_REQUIRE_EQUAL("OPERATOR_STATUS_TERMINATED", operator_status(BATCHOP));
+   BOOST_REQUIRE(group_contains(current_group(), BATCHOP));  // still resident
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: delivering operator is not ACTIVE in sysio.opreg"),
+      deliver(eth_code(), encode_envelope(epoch, "terminated")));
+} FC_LOG_AND_RETHROW() }
+
+// Realistic non-malicious trigger: a scheduled, ACTIVE operator withdraws enough
+// collateral to fall below its role minimum, flipping to UNKNOWN, yet remaining in
+// the resident group snapshot.
+BOOST_FIXTURE_TEST_CASE(deliver_rejects_decollateralized_unknown_group_member, sysio_dispute_tester) { try {
+   constexpr auto     BATCHOP_B = "batchop.b"_n;
+   constexpr uint64_t MIN_BOND  = 1'000'000;
+   create_account(BATCHOP_B, config::system_account_name, false, true, /*include_roa_policy=*/false);
+
+   // Require an ETH bond so a non-bootstrapped op's status tracks its collateral.
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "setconfig"_n, mvo()
+      ("max_available_producers", 21)("max_available_batch_ops", 63)("max_available_underwriters", 21)
+      ("terminate_prune_delay_ms", 600000)("terminate_max_consecutive_misses", 5)
+      ("terminate_max_pct_misses_24h", 5)("terminate_window_ms", uint64_t{24ULL * 60 * 60 * 1000})
+      ("req_prod_collat", fc::variants{})
+      ("req_batchop_collat", fc::variants{make_chain_min_bond("ETH", "ETH", MIN_BOND)})
+      ("req_uw_collat", fc::variants{})));
+
+   // Register + fully collateralize batchop.b -> ACTIVE.
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "regoperator"_n, mvo()
+      ("account", BATCHOP_B.to_string())("type", OperatorType::OPERATOR_TYPE_BATCH)
+      ("is_bootstrapped", false)));
+   BOOST_REQUIRE_EQUAL(success(), depositinle(BATCHOP_B, "ETH", "ETH", MIN_BOND));
+   BOOST_REQUIRE_EQUAL("OPERATOR_STATUS_ACTIVE", operator_status(BATCHOP_B));
+
+   // Schedule it into the single-slot group (non-bootstrapped sorts ahead of the
+   // bootstrapped default op, so batchop.b takes the slot).
+   BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "schbatchgps"_n, mvo()));
+   BOOST_REQUIRE(group_contains(current_group(), BATCHOP_B));
+   const uint32_t epoch = current_epoch();
+
+   // Withdraw the full bond and flush past maturity -> reevaluate drops it to UNKNOWN.
+   // The epoch group snapshot is untouched (no reschedule), so it stays resident.
+   BOOST_REQUIRE_EQUAL(success(), withdrawinle(BATCHOP_B, "ETH", "ETH", MIN_BOND));
+   BOOST_REQUIRE_EQUAL(success(), flushwtdw(1'000'000u));
+   BOOST_REQUIRE_EQUAL("OPERATOR_STATUS_UNKNOWN", operator_status(BATCHOP_B));
+   BOOST_REQUIRE(group_contains(current_group(), BATCHOP_B));
+
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: delivering operator is not ACTIVE in sysio.opreg"),
+      deliver_as(BATCHOP_B, eth_code(), encode_envelope(epoch, "unknown")));
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()

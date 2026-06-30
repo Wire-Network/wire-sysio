@@ -185,6 +185,8 @@ namespace sysio {
       connection_ptr find_next_sync_node(); // call with locked mutex
       void start_sync( const connection_ptr& c, uint32_t target ); // locks mutex
       bool sync_recently_active() const;
+      /// Complete LIB catchup when the local fork DB root has already reached the known peer root.
+      bool complete_lib_catchup_if_root_reached( uint32_t fork_db_root_num ) REQUIRES(sync_mtx);
       bool verify_catchup( const connection_ptr& c, uint32_t num, const block_id_type& id ); // locks mutex
    public:
       enum class closing_mode {
@@ -375,6 +377,10 @@ namespace sysio {
                             timer_type which);
 
       void add(connection_ptr c);
+      /// Validate and retain an operator-supplied peer, then attempt to connect. Unparseable endpoints are
+      /// rejected without being retained, so addresses the node refuses do not accumulate in the supplied-peer
+      /// set that later reconnect and inbound-acceptance scans iterate.
+      /// @return human-readable status string.
       string connect(const string& host, const string& p2p_address);
       string resolve_and_connect(const string& peer_address, const string& listen_address);
       connection_ptr is_other_connected(const string& peer_address, const connection_ptr& c) const;
@@ -2206,6 +2212,27 @@ namespace sysio {
       return active;
    }
 
+   /**
+    * Promotes LIB catchup to head catchup once the local fork DB root already satisfies the peer root target.
+    *
+    * This covers restart and duplicate-block paths where no new accepted-block signal is emitted for the target root.
+    * Any outstanding LIB sync wait is canceled before the source is cleared so the old timer cannot close a live peer.
+    */
+   bool sync_manager::complete_lib_catchup_if_root_reached( uint32_t fork_db_root_num ) {
+      if( sync_state != lib_catchup || sync_known_fork_db_root_num == 0 ||
+          fork_db_root_num < sync_known_fork_db_root_num ) {
+         return false;
+      }
+
+      if( sync_source )
+         sync_source->cancel_sync_wait();
+      sync_source.reset();
+      sync_last_requested_num = 0;
+      sync_next_expected_num = std::max( sync_next_expected_num, fork_db_root_num + 1 );
+      set_state( head_catchup );
+      return true;
+   }
+
    // called from connection strand
    void sync_manager::sync_wait(const connection_ptr& c) {
       ++sync_timers_active;
@@ -2352,15 +2379,23 @@ namespace sysio {
       };
       my_impl->connections.any_of_block_connections(is_fork_db_head_greater);
       if( !already_have ) {
+         auto chain_info = my_impl->get_chain_info();
+         bool request_from_fork_db_root = false;
          {
             fc::lock_guard g( sync_mtx );
             peer_ilog( p2p_blk_log, c, "catch_up while in {}, fhead = {} "
                           "target froot = {} next_expected = {}, id {}...",
                       stage_str( sync_state ), num, sync_known_fork_db_root_num,
                       sync_next_expected_num, id.short_id() );
+            if( sync_state == lib_catchup ) {
+               request_from_fork_db_root = complete_lib_catchup_if_root_reached( chain_info.fork_db_root_num );
+               if( !request_from_fork_db_root ) {
+                  c->send_handshake();
+                  return false;
+               }
+            }
          }
-         auto chain_info = my_impl->get_chain_info();
-         if( sync_state == lib_catchup || num < chain_info.fork_db_root_num ) {
+         if( num < chain_info.fork_db_root_num ) {
             c->send_handshake();
             return false;
          }
@@ -2372,7 +2407,7 @@ namespace sysio {
          }
 
          block_request_message req;
-         req.my_head_id = chain_info.fork_db_head_id;
+         req.my_head_id = request_from_fork_db_root ? block_id_type{} : chain_info.fork_db_head_id;
          c->enqueue( req );
       } else {
          peer_ilog( p2p_blk_log, c, "already have block while in {}, fhead = {}, id {}...",
@@ -2507,7 +2542,8 @@ namespace sysio {
          if( blk_applied && blk_num >= sync_known_fork_db_root_num ) {
             fc_dlog(p2p_blk_log, "All caught up {} with last known froot {} resending handshake",
                     blk_num, sync_known_fork_db_root_num);
-            set_state( head_catchup );
+            if( !complete_lib_catchup_if_root_reached( my_impl->get_fork_db_root_num() ) )
+               set_state( head_catchup );
             g_sync.unlock();
             send_handshakes();
          } else {
@@ -2533,7 +2569,12 @@ namespace sysio {
                if (blk_num >= sync_known_fork_db_root_num) {
                   peer_dlog(p2p_blk_log, c, "received non-applied block {} >= {}, will send handshakes when caught up",
                             blk_num, sync_known_fork_db_root_num);
-                  send_handshakes_when_synced = true;
+                  if( complete_lib_catchup_if_root_reached( my_impl->get_fork_db_root_num() ) ) {
+                     g_sync.unlock();
+                     send_handshakes();
+                  } else {
+                     send_handshakes_when_synced = true;
+                  }
                } else {
                   if (is_sync_request_ahead_allowed(blk_num)) {
                      // block was not applied, possibly because we already have the block
@@ -4930,6 +4971,13 @@ namespace sysio {
 
    // called by API
    string connections_manager::connect( const string& host, const string& p2p_address ) {
+      // Validate before retaining. split_host_port_type yields an empty host for anything unparseable and
+      // never throws. The historical code inserted into supplied_peers first, so a rejected address was kept
+      // permanently and then iterated by every reconnect scan and inbound-acceptance check even though
+      // resolve_and_connect would never act on it.
+      if (auto [vhost, vport, vtype] = net_utils::split_host_port_type(host); vhost.empty()) {
+         return "invalid peer address";
+      }
       std::unique_lock g( connections_mtx );
       supplied_peers.insert(host);
       g.unlock();

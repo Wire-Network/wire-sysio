@@ -171,8 +171,10 @@ struct trace_api_common_impl {
       cfg_options("trace-max-block-range", bpo::value<uint32_t>()->default_value(default_max_block_range),
                   "Maximum number of blocks scanned by a single get_actions or get_token_transfers request.\n"
                   "Must be in [1, 10000]. block_num_end is silently clamped to block_num_start + this - 1.\n"
-                  "Clients paginate by advancing block_num_start by this amount each call. The response\n"
-                  "envelope reports the actual range scanned.");
+                  "The response reports the last block actually scanned as block_num_end. To page, set the\n"
+                  "next request's block_num_start to block_num_end + 1; do not advance by a fixed step,\n"
+                  "because the scan can also stop short of the requested end when a response reaches the\n"
+                  "per-response limit on the number of actions returned.");
    }
 
    void plugin_initialize(const appbase::variables_map& options) {
@@ -410,7 +412,7 @@ struct trace_api_rpc_plugin_impl : public std::enable_shared_from_this<trace_api
             auto result = self->req_handler->get_actions(query);
             cb( 200, fc::mutable_variant_object()
                         ("block_num_start", query.block_num_start)
-                        ("block_num_end",   query.block_num_end)
+                        ("block_num_end",   result.last_block_num)
                         ("actions",         result.actions) );
          } catch (...) {
             http_plugin::handle_exception("trace_api", "get_actions", body, cb);
@@ -459,7 +461,7 @@ struct trace_api_rpc_plugin_impl : public std::enable_shared_from_this<trace_api
             auto result = self->req_handler->get_token_transfer_actions(query);
             cb( 200, fc::mutable_variant_object()
                         ("block_num_start", query.block_num_start)
-                        ("block_num_end",   query.block_num_end)
+                        ("block_num_end",   result.last_block_num)
                         ("transfers",       result.actions) );
          } catch (...) {
             http_plugin::handle_exception("trace_api", "get_token_transfers", body, cb);
