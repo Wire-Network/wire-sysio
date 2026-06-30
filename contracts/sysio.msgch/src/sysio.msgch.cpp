@@ -611,8 +611,8 @@ void dispatch_node_owner_reg(const std::vector<char>& data, uint64_t chain_code)
 /// in `evalcons` after a consensus envelope has been unpacked. Dispatch is
 /// best-effort — silently no-ops on unknown / out-of-scope types so the
 /// inbound stream can keep flowing even when the depot hasn't yet wired up
-/// every handler (e.g. RESERVE_BALANCE_SHEET / STAKING_REWARD route to
-/// sysio.reserve, which lands in Task 5).
+/// every handler (e.g. the deferred STAKE / UNSTAKE / STAKE_UPDATE staking
+/// lifecycle types).
 void dispatch_attestation(name self, uint64_t attestation_id,
                           AttestationType type,
                           const std::vector<char>& data,

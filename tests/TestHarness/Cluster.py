@@ -63,6 +63,10 @@ class Cluster(object):
     __bootlog="wire_sysio-ignition-wd/bootlog.txt"
     __localLaunchPortCheckAttempts=90
     __localLaunchPortCheckSleepSeconds=2
+    __finalizerCatchupTimeoutMultiplier=4
+    __finalizerCatchupMaxLagBlocks=2
+    __finalizerCatchupStableRounds=3
+    __finalizerCatchupReportInterval=5
 
     # pylint: disable=too-many-arguments
     def __init__(self, localCluster=True, host="localhost", port=None, walletHost="localhost", walletPort=None
@@ -1036,19 +1040,85 @@ class Cluster(object):
         Utils.Print(f'Found {len(producerKeys)} producer keys')
         return producerKeys
 
-    def activateInstantFinality(self, biosFinalizer=True, waitForFinalization=True, signatureProviderForNonProducer=False):
-        nodes = self.nodes.copy()
-        nodes.append(self.biosNode)
+    def getInstantFinalityNodes(self, biosFinalizer=True, signatureProviderForNonProducer=False):
+        """Return the nodes eligible for the instant-finality policy."""
+        nodes = []
         for n in (self.nodes + [self.biosNode]):
             if not n or not n.keys or not n.keys[0].blspubkey:
-                nodes.remove(n)
                 continue
             if not signatureProviderForNonProducer and not n.isProducer:
-                nodes.remove(n)
                 continue
             if n.nodeId == 'bios' and not biosFinalizer:
-                nodes.remove(n)
                 continue
+            nodes.append(n)
+        return nodes
+
+    @staticmethod
+    def __nodeLabel(node):
+        """Return a compact human-readable node label for diagnostics."""
+        return node.producerName if node.producerName else node.nodeId
+
+    def waitForFinalizerNodesToCatchUp(self, finalizerNodes, timeout=None,
+                                       maxLagBlocks=__finalizerCatchupMaxLagBlocks,
+                                       stableRounds=__finalizerCatchupStableRounds):
+        """Wait until selected finalizer nodes remain close to the bios node head."""
+        if timeout is None:
+            timeout = Utils.systemWaitTimeout * Cluster.__finalizerCatchupTimeoutMultiplier
+
+        consecutiveRounds = 0
+        printCount = 0
+        Utils.Print(f'Waiting for {len(finalizerNodes)} finalizer nodes to catch up within '
+                    f'{maxLagBlocks} blocks of bios.')
+
+        def areFinalizersCaughtUp():
+            nonlocal consecutiveRounds
+            nonlocal printCount
+
+            printCount += 1
+            biosInfo = self.biosNode.getInfo(silentErrors=True, exitOnError=False)
+            if biosInfo is None:
+                consecutiveRounds = 0
+                return False
+
+            biosHead = int(biosInfo["head_block_num"])
+            laggingFinalizers = []
+            for node in finalizerNodes:
+                if node.killed:
+                    laggingFinalizers.append(f'{Cluster.__nodeLabel(node)}: killed')
+                    continue
+
+                info = node.getInfo(silentErrors=True, exitOnError=False)
+                if info is None:
+                    laggingFinalizers.append(f'{Cluster.__nodeLabel(node)}: unavailable')
+                    continue
+
+                nodeHead = int(info["head_block_num"])
+                lag = biosHead - nodeHead
+                if lag > maxLagBlocks:
+                    laggingFinalizers.append(
+                        f'{Cluster.__nodeLabel(node)}: head={nodeHead}, bios={biosHead}, lag={lag}'
+                    )
+
+            if laggingFinalizers:
+                consecutiveRounds = 0
+                if printCount % Cluster.__finalizerCatchupReportInterval == 0:
+                    Utils.Print('Waiting for finalizers to catch up: ' + '; '.join(laggingFinalizers))
+                return False
+
+            consecutiveRounds += 1
+            return consecutiveRounds >= stableRounds
+
+        return Utils.waitForBool(areFinalizersCaughtUp, timeout=timeout, sleepTime=1)
+
+    def activateInstantFinality(self, biosFinalizer=True, waitForFinalization=True,
+                                signatureProviderForNonProducer=False, finalizerNodes=None):
+        nodes = list(finalizerNodes) if finalizerNodes is not None else self.getInstantFinalityNodes(
+            biosFinalizer=biosFinalizer,
+            signatureProviderForNonProducer=signatureProviderForNonProducer
+        )
+        if len(nodes) == 0:
+            Utils.Print('ERROR: No finalizer nodes available for instant finality')
+            return None, 0
 
         transId = self.setFinalizers(nodes)
         if transId is None:
@@ -1057,6 +1127,9 @@ class Cluster(object):
             if not self.biosNode.waitForTransFinalization(transId, timeout=21 * 12 * 3):
                 Utils.Print(f'ERROR: Failed to validate setfinalizer transaction {transId} got rolled into a '
                             f'LIB block on server port {self.biosNode.port}.')
+                return None, transId
+            if not self.biosNode.waitForLibToAdvance(timeout=Utils.systemWaitTimeout):
+                Utils.Print('ERROR: LIB did not advance after activating instant finality.')
                 return None, transId
         return True, transId
 
@@ -1155,7 +1228,18 @@ class Cluster(object):
             biosNode.activateAllBuiltinProtocolFeature()
 
         if activateIF:
-            success, transId = self.activateInstantFinality(biosFinalizer=biosFinalizer, signatureProviderForNonProducer=signatureProviderForNonProducer)
+            finalizerNodes = self.getInstantFinalityNodes(
+                biosFinalizer=biosFinalizer,
+                signatureProviderForNonProducer=signatureProviderForNonProducer
+            )
+            if not self.waitForFinalizerNodesToCatchUp(finalizerNodes):
+                Utils.Print('ERROR: Finalizer nodes failed to catch up before activating instant finality')
+                return None
+            success, transId = self.activateInstantFinality(
+                biosFinalizer=biosFinalizer,
+                signatureProviderForNonProducer=signatureProviderForNonProducer,
+                finalizerNodes=finalizerNodes
+            )
             if not success:
                 Utils.Print("ERROR: Activate instant finality failed")
                 return None

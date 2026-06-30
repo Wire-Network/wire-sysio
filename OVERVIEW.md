@@ -68,7 +68,7 @@ This allows a single unified message format across all supported chains.
 | Category | Types | Purpose |
 |----------|-------|---------|
 | **Operator Management** | `OPERATOR_ACTION`, `BATCH_OPERATOR_NEXT_GROUP`, `SLASH_OPERATOR` | Operator registration, rotation, penalties |
-| **Staking** | `STAKE_UPDATE`, `PRETOKEN_STAKE_CHANGE`, `NATIVE_YIELD_REWARD` | Cross-chain staking and yield distribution |
+| **Staking** | `STAKING_REWARD` | Per-staker cross-chain yield distribution (validator-staking lifecycle types are reserved but deferred post-launch) |
 | **Swaps & Liquidity** | `SWAP`, `UNDERWRITE_INTENT`, `UNDERWRITE_CONFIRM`, `REMIT` | Cross-chain swaps backed by underwriter collateral |
 | **Governance** | `CHALLENGE_REQUEST`, `CHALLENGE_RESPONSE`, `EPOCH_SYNC`, `ROSTER_UPDATE` | Dispute resolution and epoch synchronization |
 | **Reserves** | `RESERVE_BALANCE_SHEET` | Collateral snapshots across chains |
@@ -114,7 +114,7 @@ Independent operators running the `underwriter_plugin`. They provide collateral-
 | **OPP.sol** | Message sender — collects attestations in send mode, builds merkle trees, emits `OPPMessage` / `OPPEpoch` events |
 | **OPPInbound.sol** | Message receiver — validates consensus, verifies merkle proofs, routes attestations to handlers |
 | **OperatorRegistry.sol** | Maps operators to roles, keys, and status for identity validation |
-| **BAR.sol** (Bond Agreement Registry) | Receives collateral bonds, emits `OPERATOR_ACTION` attestations |
+| **BAR.sol** (Bond Agreement Registry) | Records validator / node-owner bonds; operator-collateral `OPERATOR_ACTION` emission has moved to `OperatorRegistry.sol` |
 | **IOPPReceiver implementations** | Domain-specific handlers (Depositor, Pool, Pretoken) that process individual attestation types |
 
 ---

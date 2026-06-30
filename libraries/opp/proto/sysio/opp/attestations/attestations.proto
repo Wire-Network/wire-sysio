@@ -301,13 +301,13 @@ message NodeOwnerReg {
 // reward period.
 //
 // Emitted by an outpost when a staker's slice of a validator-reward
-// distribution has been computed. `sysio.msgch` routes it two ways: the
-// aggregate native amount credits the outpost-side reserve
-// (`sysio.reserv::onreward`, keeps `swapquote` solvent), and the per-staker
-// body is dispatched to `sysio.cap::onreward`, which prices native -> WIRE off
-// the reserve and credits the staker's claim ledger (`pending_claims` if the
-// staker has an AuthX-linked WIRE account, otherwise parked in
-// `unmapped_tokens` keyed by the native address until they link).
+// distribution has been computed. The amount arrives already
+// WIRE-denominated; the native -> WIRE conversion and the per-staker
+// proration are done outpost-side. `sysio.msgch` dispatches the per-staker
+// body to `sysio.dclaim::onreward`, which credits the staker's claim ledger
+// directly without re-splitting (`pending_claims` if the staker has an
+// AuthX-linked WIRE account, otherwise parked in `unmapped_tokens` keyed by
+// the native address until they link).
 message StakingReward {
   // Chain code emitting the reward — identifies the (chain, validator) context.
   uint64                       chain_code = 1;
@@ -327,7 +327,9 @@ message StakingReward {
   // dedupes and rolls up against it and rejects anything at or below the last
   // processed value, so no per-period history is retained (data-leak safe).
   uint64                       external_epoch_ref = 5;
-  // Absolute reward amount + token kind being credited (native-denominated).
+  // Absolute reward amount being credited, already WIRE-denominated: the outpost
+  // does the native -> WIRE conversion and source-chain precision scaling, so the
+  // depot credits reward_amount.amount as WIRE directly.
   sysio.opp.types.TokenAmount  reward_amount = 6;
   // The staker's native (ETH / SOL / ...) address — the address they staked
   // from. Always populated so a not-yet-linked staker's reward can be parked
