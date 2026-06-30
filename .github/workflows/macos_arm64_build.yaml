@@ -2,6 +2,14 @@ name: "macOS arm64 build & tests"
 
 on:
   workflow_dispatch:
+    inputs:
+      run_sharded_np_lr:
+        description: "Run macOS nonparallelizable/long-running tests"
+        type: boolean
+        default: false
+  schedule:
+    # GitHub schedules run from the default branch, providing nightly coverage for origin/master.
+    - cron: "0 8 * * *"
   push:
     branches:
       - master
@@ -109,6 +117,7 @@ jobs:
             2>&1 | tee "$RUNNER_TEMP/macos-arm64-parallel-ctest.log"
 
       - name: Run sharded NP/LR tests
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.run_sharded_np_lr }}
         run: |
           cd "$BUILD_DIR"
           test_jobs="$(sysctl -n hw.logicalcpu)"
