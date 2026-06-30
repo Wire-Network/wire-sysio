@@ -88,22 +88,21 @@ struct opp_solana_outpost_client : fc::network::solana::solana_program_client {
    /// Inbound delivery is chunked: Solana's 1 232-byte tx MTU can't carry
    /// a full OPP envelope at production roster sizes, so the caller streams
    /// the envelope into a per-(epoch, signer) staging PDA and the program
-   /// auto-finalizes on the last chunk. epoch_index selects both the
-   /// per-epoch EpochDeliveries PDA and the per-(epoch, signer) chunk-buffer
-   /// PDA.
+   /// finalizes only on a zero-data terminal call where
+   /// `chunk_index == total_chunks`. `epoch_index` selects both the per-epoch
+   /// EpochDeliveries PDA and the per-(epoch, signer) chunk-buffer PDA.
    ///
-   /// `extra_remaining_accounts` is appended past the IDL's account list
-   /// as Anchor `remaining_accounts`. The on-chain WITHDRAW_REMIT and
-   /// DEPOSIT_REVERT handlers need to CPI-transfer to operator /
-   /// depositor wallets, which Solana requires be declared on the tx;
-   /// the cranker (`outpost_solana_client::deliver_outbound_envelope`)
-   /// decodes the envelope, extracts `op_address.address` pubkeys from
-   /// inbound WITHDRAW_REMIT / DEPOSIT_REVERT attestations, and passes
-   /// them here. Non-final chunks ignore the slice — only the
-   /// finalize-triggering chunk's account list matters for dispatch.
+   /// `extra_remaining_accounts` is appended past the IDL's account list as
+   /// Anchor `remaining_accounts`. The cranker
+   /// (`outpost_solana_client::deliver_outbound_envelope`) decodes the
+   /// committed envelope and builds account metas for every effect account the
+   /// terminal handlers may touch: operator/depositor wallets, Reserve PDAs,
+   /// SPL vaults, canonical ATAs, mints, and token/ATA/system programs. Data
+   /// chunks ignore the slice — only the zero-data terminal call's account
+   /// list matters for dispatch.
    solana_program_tx_fn<std::string, uint32_t, uint16_t, uint16_t, uint32_t,
                          std::vector<uint8_t>,
-                         std::vector<fc::network::solana::solana_public_key>> epoch_in;
+                         std::vector<fc::network::solana::account_meta>> epoch_in;
    /// `cleanup_envelope_chunks(epoch_index) -> signature`.
    /// Permissionless reaper for chunk buffers an operator started but
    /// never finished. Callable once the chain has advanced past
@@ -170,7 +169,7 @@ struct opp_solana_outpost_client : fc::network::solana::solana_program_client {
                         uint16_t total_chunks,
                         uint32_t total_bytes,
                         std::vector<uint8_t> chunk_data,
-                        std::vector<fc::network::solana::solana_public_key> extra_remaining_accounts) -> std::string {
+                        std::vector<fc::network::solana::account_meta> extra_remaining_accounts) -> std::string {
            const std::vector<uint8_t> epoch_seed = {
               static_cast<uint8_t>(epoch_index & 0xFF),
               static_cast<uint8_t>((epoch_index >>  8) & 0xFF),
@@ -221,8 +220,8 @@ struct opp_solana_outpost_client : fc::network::solana::solana_program_client {
               fc::variant(chunk_data),
            };
 
-           // ComputeBudget pre-ixs are injected ONLY on the final chunk —
-           // that's the chunk that triggers `finalize_envelope` +
+           // ComputeBudget pre-ixs are injected ONLY on the zero-data
+           // terminal call — that's the call that triggers `finalize_envelope` +
            // `emit_outbound_inner` on the Solana side, which compounds:
            //   * Anchor deserialise of 9 mut accounts (~5–7 KiB heap)
            //   * `chunk_buffer.data` manual read + envelope_data clone (~5 KiB)
@@ -245,25 +244,22 @@ struct opp_solana_outpost_client : fc::network::solana::solana_program_client {
            // bottleneck for the production 2.5 KB envelope. Add a CU
            // bump only when 64 KB envelopes land live.
            std::vector<fc::network::solana::instruction> pre_ixs;
-           if (chunk_index == total_chunks - 1) {
+           if (chunk_index == total_chunks) {
               pre_ixs.push_back(
                  fc::network::solana::system::compute_budget::request_heap_frame(256'000));
            }
            // Resolve the IDL's declared accounts first, then append any
            // extra `remaining_accounts` the cranker decoded from the
-           // inbound envelope (operator / depositor wallets that
-           // WITHDRAW_REMIT / DEPOSIT_REVERT handlers need to address).
-           // Anchor's runtime exposes everything past the IDL's
-           // declared accounts as `ctx.remaining_accounts`; the
-           // operator pubkeys land there in order. They're marked
-           // writable (the CPI transfer adds lamports) and non-signer
-           // (the operator isn't signing this tx).
+           // inbound envelope (operator / depositor wallets, reserve PDAs,
+           // SPL vaults, and token programs that effect handlers need to
+           // address).
+           // Anchor's runtime exposes everything past the IDL's declared
+           // accounts as `ctx.remaining_accounts`; the relay supplies full
+           // account metas so writable/readonly flags match each effect
+           // handler's requirements.
            auto accounts = resolve_accounts(instr, params, overrides);
            accounts.reserve(accounts.size() + extra_remaining_accounts.size());
-           for (const auto& extra_pk : extra_remaining_accounts) {
-              accounts.push_back(
-                 fc::network::solana::account_meta::writable(extra_pk, /*is_signer=*/false));
-           }
+           accounts.insert(accounts.end(), extra_remaining_accounts.begin(), extra_remaining_accounts.end());
            return execute_tx_and_confirm(instr, accounts, params, pre_ixs);
         })
       , cleanup_envelope_chunks([this](uint32_t epoch_index) -> std::string {

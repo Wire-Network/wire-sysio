@@ -81,7 +81,40 @@ std::pair<uint16_t, size_t> decode(const uint8_t* data, size_t len) {
 // message implementation
 //=============================================================================
 
+void validate_legacy_message(const message& msg) {
+   FC_ASSERT(
+      msg.account_keys.size() <= limits::LEGACY_ACCOUNT_KEY_LIMIT,
+      "Solana legacy message has {} account keys, exceeding the {} key uint8_t instruction-index limit",
+      msg.account_keys.size(),
+      limits::LEGACY_ACCOUNT_KEY_LIMIT);
+
+   for (size_t instruction_index = 0; instruction_index < msg.instructions.size(); ++instruction_index) {
+      const auto& instr = msg.instructions[instruction_index];
+      FC_ASSERT(
+         instr.program_id_index < msg.account_keys.size(),
+         "Solana instruction {} program_id_index {} is outside {} account keys",
+         instruction_index,
+         instr.program_id_index,
+         msg.account_keys.size());
+
+      for (size_t account_index_offset = 0;
+           account_index_offset < instr.account_indices.size();
+           ++account_index_offset) {
+         const auto account_index = instr.account_indices[account_index_offset];
+         FC_ASSERT(
+            account_index < msg.account_keys.size(),
+            "Solana instruction {} account index {} at offset {} is outside {} account keys",
+            instruction_index,
+            account_index,
+            account_index_offset,
+            msg.account_keys.size());
+      }
+   }
+}
+
 std::vector<uint8_t> message::serialize() const {
+   validate_legacy_message(*this);
+
    std::vector<uint8_t> result;
 
    // Header (3 bytes)
@@ -273,7 +306,18 @@ std::vector<uint8_t> transaction::serialize() const {
    auto msg_bytes = msg.serialize();
    result.insert(result.end(), msg_bytes.begin(), msg_bytes.end());
 
+   FC_ASSERT(
+      result.size() <= limits::PACKET_DATA_SIZE,
+      "Solana legacy transaction is {} bytes, exceeding the {} byte raw packet limit",
+      result.size(),
+      limits::PACKET_DATA_SIZE);
+
    return result;
+}
+
+void validate_legacy_transaction(const transaction& tx) {
+   validate_legacy_message(tx.msg);
+   (void)tx.serialize();
 }
 
 transaction transaction::deserialize(const uint8_t* data, size_t len) {

@@ -307,6 +307,18 @@ public:
       );
    }
 
+   /// Return the first outbound envelope row found in a small id scan.
+   fc::variant find_outbound_envelope(uint64_t scan_until = 16) {
+      for (uint64_t id = 0; id < scan_until; ++id) {
+         auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "outenvelopes"_n, id);
+         if (data.empty()) continue;
+         return msgch_abi.binary_to_variant(
+            "outbound_envelope", data,
+            abi_serializer::create_yield_function(abi_serializer_max_time));
+      }
+      return fc::variant{};
+   }
+
    /// Count populated `envlog` rows in the id range `[0, max_id_exclusive)`.
    /// Cheap enough for the test scales here (≤ a few thousand probes).
    uint32_t envlog_row_count_until(uint64_t max_id_exclusive) {
@@ -330,6 +342,21 @@ using fc::slug_name_literals::operator""_s;
 /// tests register one EVM-class chain via `register_outpost(...)` which uses
 /// the spelling `"ETH"`. ETH_OUTPOST_ID is the slug_name's packed value.
 constexpr uint64_t ETH_OUTPOST_ID = "ETH"_s.value;
+
+/// Solana/SVM test outpost registered by `register_outpost(CHAIN_KIND_SVM, ...)`.
+constexpr uint64_t SOL_OUTPOST_ID = "SOL"_s.value;
+
+constexpr uint32_t SWAP_REMIT_ATTESTATION_TYPE = 60944;
+constexpr uint32_t UNCOVERED_TEST_ATTESTATION_TYPE = 60940;
+
+/// Decode the emitted OPP envelope and count attestations in its single message.
+uint32_t emitted_attestation_count(const fc::variant& emitted_row) {
+   const auto& raw = emitted_row["raw_envelope"].as<std::vector<char>>();
+   sysio::opp::Envelope env;
+   BOOST_REQUIRE(env.ParseFromArray(raw.data(), static_cast<int>(raw.size())));
+   BOOST_REQUIRE_EQUAL(env.messages_size(), 1);
+   return static_cast<uint32_t>(env.messages(0).payload().attestations_size());
+}
 
 } // anonymous namespace
 
@@ -592,6 +619,61 @@ BOOST_FIXTURE_TEST_CASE(buildenv_packs_until_cap_then_leaves_remainder,
    uint32_t still_ready_after_emit2 =
       count_ready_attestations(/*chain_code=*/ETH_OUTPOST_ID, /*scan_until=*/TOTAL_ATTESTATIONS + 4);
    BOOST_REQUIRE_EQUAL(still_ready_after_emit2, 0u);
+} FC_LOG_AND_RETHROW() }
+
+/// Solana/SVM buildenv must stop before the terminal transaction's dynamic
+/// account budget is exceeded. With the launch default budget of 18 dynamic
+/// accounts and pessimistic SWAP_REMIT cost of 8 each, two swap remits fit and
+/// the third stays READY for a later epoch.
+BOOST_FIXTURE_TEST_CASE(buildenv_svm_packs_until_terminal_budget_then_leaves_remainder,
+                        sysio_msgch_envlog_tester) { try {
+   bootstrap_epoch_config(/*retention=*/200);
+   register_outpost(opp::types::CHAIN_KIND_SVM, 101);
+   produce_blocks();
+
+   constexpr uint32_t TOTAL_ATTESTATIONS = 3;
+   for (uint32_t i = 0; i < TOTAL_ATTESTATIONS; ++i) {
+      std::vector<char> payload{static_cast<char>(0x30 + i)};
+      BOOST_REQUIRE_EQUAL(success(),
+         queueout_with_data(SOL_OUTPOST_ID, SWAP_REMIT_ATTESTATION_TYPE, payload));
+   }
+   produce_blocks();
+
+   BOOST_REQUIRE_EQUAL(success(), buildenv(SOL_OUTPOST_ID));
+   produce_blocks();
+
+   auto emitted = find_outbound_envelope();
+   BOOST_REQUIRE(!emitted.is_null());
+   BOOST_REQUIRE_EQUAL(emitted_attestation_count(emitted), 2u);
+   BOOST_REQUIRE_EQUAL(count_ready_attestations(SOL_OUTPOST_ID, TOTAL_ATTESTATIONS + 4), 1u);
+
+   BOOST_REQUIRE_EQUAL(success(), buildenv(SOL_OUTPOST_ID));
+   produce_blocks();
+
+   auto emitted_2 = find_outbound_envelope();
+   BOOST_REQUIRE(!emitted_2.is_null());
+   BOOST_REQUIRE_EQUAL(emitted_attestation_count(emitted_2), 1u);
+   BOOST_REQUIRE_EQUAL(count_ready_attestations(SOL_OUTPOST_ID, TOTAL_ATTESTATIONS + 4), 0u);
+} FC_LOG_AND_RETHROW() }
+
+/// An uncovered Solana-bound attestation type must fail before committing an
+/// outbound envelope. The row remains READY so a corrected contract can process
+/// it later with an explicit estimator case.
+BOOST_FIXTURE_TEST_CASE(buildenv_svm_rejects_uncovered_attestation_type,
+                        sysio_msgch_envlog_tester) { try {
+   bootstrap_epoch_config(/*retention=*/200);
+   register_outpost(opp::types::CHAIN_KIND_SVM, 101);
+   produce_blocks();
+
+   BOOST_REQUIRE_EQUAL(success(),
+      queueout_with_data(SOL_OUTPOST_ID, UNCOVERED_TEST_ATTESTATION_TYPE, std::vector<char>{0x01}));
+   produce_blocks();
+
+   const auto result = buildenv(SOL_OUTPOST_ID);
+   BOOST_REQUIRE_NE(result, success());
+   BOOST_REQUIRE(result.find("no Solana terminal account estimate") != std::string::npos);
+   BOOST_REQUIRE(find_outbound_envelope().is_null());
+   BOOST_REQUIRE_EQUAL(count_ready_attestations(SOL_OUTPOST_ID, 4), 1u);
 } FC_LOG_AND_RETHROW() }
 
 // queueout carries no ABI-level auth. Without the depot-contract gate, any account could call it

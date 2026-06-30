@@ -71,6 +71,160 @@ constexpr size_t   ATTESTATION_OVERHEAD_BYTES = 24;
 /// + payload preamble, and a safety margin for `zpp::bits` length prefixes.
 constexpr size_t   ENVELOPE_BASELINE_BYTES    = 512;
 
+/// Solana raw transaction packet ceiling used by legacy transactions.
+constexpr size_t   SVM_TERMINAL_PACKET_LIMIT_BYTES = 1'232;
+
+/// Packet safety margin reserved for future IDL/layout drift before the
+/// measured parity fixture is promoted to the consensus constant source.
+constexpr size_t   SVM_TERMINAL_PACKET_SAFETY_MARGIN_BYTES = 80;
+
+/// Effective Solana terminal packet budget used by `buildenv` prefix packing.
+constexpr size_t   SVM_TERMINAL_PACKET_BUDGET_BYTES =
+   SVM_TERMINAL_PACKET_LIMIT_BYTES - SVM_TERMINAL_PACKET_SAFETY_MARGIN_BYTES;
+
+/// Current Solana loaded-account runtime cap for one terminal transaction.
+constexpr size_t   SVM_TERMINAL_RUNTIME_ACCOUNT_LIMIT = 64;
+
+/// Legacy transaction account-key ceiling from one-byte instruction indices.
+constexpr size_t   SVM_TERMINAL_ACCOUNT_KEY_LIMIT = 256;
+
+/// Account-key margin reserved for static account drift.
+constexpr size_t   SVM_TERMINAL_ACCOUNT_KEY_SAFETY_MARGIN = 16;
+
+/// Effective legacy account-key budget used by the WIRE estimator.
+constexpr size_t   SVM_TERMINAL_ACCOUNT_KEY_BUDGET =
+   SVM_TERMINAL_ACCOUNT_KEY_LIMIT - SVM_TERMINAL_ACCOUNT_KEY_SAFETY_MARGIN;
+
+/// Pessimistic packet-byte cost for adding one dynamic account key.
+constexpr size_t   SVM_DYNAMIC_ACCOUNT_PACKET_BYTES = 33;
+
+/// Conservative zero-data terminal-finalize static packet size, including
+/// safety margin. The cross-repo measurement fixture must pin this before the
+/// SEC-94 cutover; until then, keep the value pessimistic.
+constexpr size_t   SVM_TERMINAL_STATIC_PACKET_BYTES_WITH_MARGIN = 558;
+
+/// Conservative static loaded-account count for the zero-data terminal
+/// finalization transaction. Chosen so the launch dynamic budget is 18.
+constexpr size_t   SVM_TERMINAL_STATIC_LOADED_ACCOUNTS = 46;
+
+/// Conservative static legacy account-key count for the zero-data terminal
+/// finalization transaction.
+constexpr size_t   SVM_TERMINAL_STATIC_ACCOUNT_KEYS = 46;
+
+/// Return the remaining budget without underflow when a static estimate has
+/// already consumed the whole cap.
+constexpr size_t checked_budget_remainder(size_t budget, size_t used) {
+   return used < budget ? budget - used : 0;
+}
+
+/// Dynamic-account budget implied by Solana packet bytes.
+constexpr size_t svm_packet_dynamic_account_budget() {
+   return checked_budget_remainder(SVM_TERMINAL_PACKET_BUDGET_BYTES,
+                                   SVM_TERMINAL_STATIC_PACKET_BYTES_WITH_MARGIN) /
+          SVM_DYNAMIC_ACCOUNT_PACKET_BYTES;
+}
+
+/// Dynamic-account budget implied by the Solana runtime loaded-account cap.
+constexpr size_t svm_runtime_dynamic_account_budget() {
+   return checked_budget_remainder(SVM_TERMINAL_RUNTIME_ACCOUNT_LIMIT,
+                                   SVM_TERMINAL_STATIC_LOADED_ACCOUNTS);
+}
+
+/// Dynamic-account budget implied by the legacy account-key cap.
+constexpr size_t svm_key_dynamic_account_budget() {
+   return checked_budget_remainder(SVM_TERMINAL_ACCOUNT_KEY_BUDGET,
+                                   SVM_TERMINAL_STATIC_ACCOUNT_KEYS);
+}
+
+/// Hard dynamic-account budget for the SVM terminal transaction.
+constexpr size_t svm_hard_dynamic_account_budget() {
+   constexpr size_t packet_budget = svm_packet_dynamic_account_budget();
+   constexpr size_t runtime_budget = svm_runtime_dynamic_account_budget();
+   constexpr size_t key_budget = svm_key_dynamic_account_budget();
+   constexpr size_t packet_runtime_min = packet_budget < runtime_budget ? packet_budget : runtime_budget;
+   return packet_runtime_min < key_budget ? packet_runtime_min : key_budget;
+}
+
+static_assert(svm_hard_dynamic_account_budget() == 18,
+              "SEC-94 SVM dynamic-account budget changed; update tests and the plan");
+
+/// Estimate terminal transaction bytes from the dynamic account count.
+constexpr size_t svm_estimated_terminal_packet_bytes(size_t dynamic_accounts) {
+   return SVM_TERMINAL_STATIC_PACKET_BYTES_WITH_MARGIN +
+          dynamic_accounts * SVM_DYNAMIC_ACCOUNT_PACKET_BYTES;
+}
+
+/// Check all SVM terminal caps against one dynamic account count.
+constexpr bool svm_terminal_budget_fits(size_t dynamic_accounts) {
+   return dynamic_accounts <= svm_hard_dynamic_account_budget() &&
+          svm_estimated_terminal_packet_bytes(dynamic_accounts) <= SVM_TERMINAL_PACKET_BUDGET_BYTES &&
+          SVM_TERMINAL_STATIC_LOADED_ACCOUNTS + dynamic_accounts <= SVM_TERMINAL_RUNTIME_ACCOUNT_LIMIT &&
+          SVM_TERMINAL_STATIC_ACCOUNT_KEYS + dynamic_accounts <= SVM_TERMINAL_ACCOUNT_KEY_BUDGET;
+}
+
+/// Pessimistic dynamic-account estimate for one Solana-bound outbound
+/// attestation. `std::nullopt` means the attestation is not covered by the
+/// SEC-94 manifest and must not be committed to a Solana envelope.
+std::optional<size_t> estimate_svm_dynamic_accounts(AttestationType type,
+                                                    const std::vector<char>& data) {
+   using AT = AttestationType;
+   switch (type) {
+      case AT::ATTESTATION_TYPE_OPERATORS:
+      case AT::ATTESTATION_TYPE_BATCH_OPERATOR_GROUPS:
+      case AT::ATTESTATION_TYPE_EMISSIONS_BLOCKED:
+         return 0;
+
+      case AT::ATTESTATION_TYPE_OPERATOR_ACTION: {
+         opp::attestations::OperatorAction oa;
+         auto in = zpp::bits::in{std::span{data.data(), data.size()}, zpp::bits::no_size{}};
+         if (in(oa) != zpp::bits::errc{}) return std::nullopt;
+
+         using OAT = opp::attestations::OperatorAction;
+         switch (oa.action_type) {
+            case OAT::ACTION_TYPE_WITHDRAW_REMIT:
+               return 1;
+            case OAT::ACTION_TYPE_SLASH:
+               return 0;
+            case OAT::ACTION_TYPE_DEPOSIT_REQUEST:
+            case OAT::ACTION_TYPE_WITHDRAW_REQUEST:
+            case OAT::ACTION_TYPE_UNKNOWN:
+            default:
+               return std::nullopt;
+         }
+      }
+
+      case AT::ATTESTATION_TYPE_DEPOSIT_REVERT:
+      case AT::ATTESTATION_TYPE_RESERVE_READY:
+         return 1;
+
+      case AT::ATTESTATION_TYPE_SWAP_REMIT:
+      case AT::ATTESTATION_TYPE_SWAP_REVERT:
+      case AT::ATTESTATION_TYPE_RESERVE_CREATE_CANCELLED:
+         return 8;
+
+      case AT::ATTESTATION_TYPE_UNSPECIFIED:
+      case AT::ATTESTATION_TYPE_STAKE:
+      case AT::ATTESTATION_TYPE_UNSTAKE:
+      case AT::ATTESTATION_TYPE_PRETOKEN_PURCHASE:
+      case AT::ATTESTATION_TYPE_PRETOKEN_YIELD:
+      case AT::ATTESTATION_TYPE_WIRE_TOKEN_PURCHASE:
+      case AT::ATTESTATION_TYPE_RESERVE_BALANCE_SHEET:
+      case AT::ATTESTATION_TYPE_STAKE_UPDATE:
+      case AT::ATTESTATION_TYPE_CHALLENGE_RESPONSE:
+      case AT::ATTESTATION_TYPE_SWAP_REQUEST:
+      case AT::ATTESTATION_TYPE_CHALLENGE_REQUEST:
+      case AT::ATTESTATION_TYPE_NODE_OWNER_REG:
+      case AT::ATTESTATION_TYPE_STAKING_REWARD:
+      case AT::ATTESTATION_TYPE_STAKE_RESULT:
+      case AT::ATTESTATION_TYPE_ATTESTATION_PROCESSING_ERROR:
+      case AT::ATTESTATION_TYPE_UNDERWRITE_INTENT_COMMIT:
+      case AT::ATTESTATION_TYPE_RESERVE_CREATE:
+      case AT::ATTESTATION_TYPE_RESERVE_CREATE_CANCEL:
+      default:
+         return std::nullopt;
+   }
+}
+
 uint32_t current_epoch_index() {
    epoch::epochstate_t tbl(EPOCH_ACCOUNT);
    return tbl.exists() ? tbl.get().current_epoch_index : 0;
@@ -1308,28 +1462,50 @@ void msgch::buildenv(uint64_t chain_code) {
 
    if (candidate_entries.empty()) return;
 
+   const auto op_row = [&]() {
+      sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
+      return chains_tbl.get(sysio::chains::chain_key{sysio::slug_name{chain_code}});
+   }();
+   const bool is_svm_destination = op_row.kind == ChainKind::CHAIN_KIND_SVM;
+
    // Phase 2: estimator-based initial pick. Walk candidates in order, accumulating a conservative byte
    // estimate; stop once the next one would push the envelope over MAX_ENVELOPE_BYTES. The trim loop
-   // below is the source of truth for the size invariant; this estimator just keeps the typical case to
-   // a single serialise pass.
-   size_t included_count  = 0;
-   size_t estimated_bytes = ENVELOPE_BASELINE_BYTES;
+   // below is the source of truth for the encoded size invariant; for SVM destinations this pass also
+   // enforces the consensus-critical terminal transaction budget before the envelope is committed.
+   size_t              included_count = 0;
+   size_t              estimated_bytes = ENVELOPE_BASELINE_BYTES;
+   size_t              estimated_svm_dynamic_accounts = 0;
+   std::vector<size_t> included_svm_dynamic_costs;
    for (const auto& entry : candidate_entries) {
       const size_t entry_bytes = ATTESTATION_OVERHEAD_BYTES + entry.data.size();
       if (estimated_bytes + entry_bytes > MAX_ENVELOPE_BYTES) {
          break;
       }
+      size_t next_svm_dynamic_accounts = estimated_svm_dynamic_accounts;
+      size_t entry_svm_dynamic_accounts = 0;
+      if (is_svm_destination) {
+         auto estimate = estimate_svm_dynamic_accounts(entry.type, entry.data);
+         check(estimate.has_value(),
+               "sysio.msgch::buildenv: no Solana terminal account estimate for READY attestation");
+         entry_svm_dynamic_accounts = *estimate;
+         next_svm_dynamic_accounts += entry_svm_dynamic_accounts;
+         if (!svm_terminal_budget_fits(next_svm_dynamic_accounts)) {
+            break;
+         }
+      }
       estimated_bytes += entry_bytes;
+      estimated_svm_dynamic_accounts = next_svm_dynamic_accounts;
+      if (is_svm_destination) included_svm_dynamic_costs.push_back(entry_svm_dynamic_accounts);
       ++included_count;
    }
 
    // First-attestation-too-big guard. The estimator picks zero only when the first candidate alone
-   // overshoots the cap; the trim loop below would surface the same condition, but aborting upfront
-   // avoids building anything in the doomed case. Never expected at protocol level because individual
-   // attestations are bounded well below MAX_ENVELOPE_BYTES.
+   // overshoots the envelope or SVM terminal cap; the trim loop below would surface the same envelope
+   // condition, but aborting upfront avoids building anything in the doomed case. Never expected at
+   // protocol level because every valid current Solana-bound attestation should fit by itself.
    check(included_count > 0,
          "sysio.msgch::buildenv: a single READY attestation exceeds "
-         "MAX_ENVELOPE_BYTES -- cannot pack into an envelope");
+         "the outbound envelope or Solana terminal budget");
 
    std::vector<opp::AttestationEntry> entries(
       std::make_move_iterator(candidate_entries.begin()),
@@ -1379,6 +1555,12 @@ void msgch::buildenv(uint64_t chain_code) {
             "MAX_ENVELOPE_BYTES -- cannot pack into an envelope");
       entries.pop_back();
       included_ids.pop_back();
+      if (is_svm_destination) {
+         estimated_svm_dynamic_accounts -= included_svm_dynamic_costs.back();
+         included_svm_dynamic_costs.pop_back();
+         check(svm_terminal_budget_fits(estimated_svm_dynamic_accounts),
+               "sysio.msgch::buildenv: Solana terminal estimate drifted after envelope trim");
+      }
       packed = build_packed(entries);
    }
 
@@ -1418,11 +1600,6 @@ void msgch::buildenv(uint64_t chain_code) {
       // Resolve the destination chain row on `sysio.chains` (PK = slug_name
       // value). Symmetric with the evalcons inbound endpoints projection
       // — `kind` → `ChainId.kind`, `external_chain_id` → `ChainId.id`.
-      const auto op_row = [&]() {
-         sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
-         return chains_tbl.get(sysio::chains::chain_key{sysio::slug_name{chain_code}});
-      }();
-
       sysio::opp::Endpoints endpoints;
       endpoints.start.kind = ChainKind::CHAIN_KIND_WIRE;
       endpoints.start.id   = WIRE_CHAIN_ID;

@@ -3,6 +3,8 @@
 
 #include <array>
 #include <cstdint>
+#include <cstddef>
+#include <limits>
 #include <optional>
 #include <string>
 #include <variant>
@@ -19,6 +21,17 @@
 
 namespace fc::network::solana {
 using namespace fc::crypto::solana;
+
+/**
+ * @brief Hard limits for legacy Solana transactions.
+ */
+namespace limits {
+   /// Raw Solana packet data size available to a serialized transaction.
+   inline constexpr size_t PACKET_DATA_SIZE = 1232;
+
+   /// Maximum number of account keys addressable by legacy uint8_t instruction indices.
+   inline constexpr size_t LEGACY_ACCOUNT_KEY_LIMIT = static_cast<size_t>(std::numeric_limits<uint8_t>::max()) + 1;
+} // namespace limits
 
 /**
  * @brief Commitment levels for RPC queries
@@ -180,6 +193,16 @@ struct transaction {
       return signatures.size() >= num_required_signatures();
    }
 };
+
+/**
+ * @brief Validate legacy message account-key and instruction-index invariants.
+ */
+void validate_legacy_message(const message& msg);
+
+/**
+ * @brief Validate legacy transaction message invariants and raw packet size.
+ */
+void validate_legacy_transaction(const transaction& tx);
 
 /**
  * @brief Versioned transaction with signatures

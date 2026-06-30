@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 #include <boost/test/unit_test.hpp>
 #include <fc/crypto/sha256.hpp>
+#include <fc/exception/exception.hpp>
 #include <fc/network/solana/solana_borsh.hpp>
 #include <fc/network/solana/solana_client.hpp>
 #include <fc/network/solana/solana_idl.hpp>
@@ -11,6 +12,40 @@ using namespace fc::network::solana;
 using namespace fc::crypto::solana;
 
 BOOST_AUTO_TEST_SUITE(solana_client_tests)
+
+namespace {
+
+/**
+ * @brief Construct a deterministic Solana public key for serialization tests.
+ */
+solana_public_key make_test_pubkey(uint16_t seed) {
+   solana_public_key key;
+   std::ranges::fill(key._data, 0);
+   key._data[0] = static_cast<uint8_t>(seed & 0xff);
+   key._data[1] = static_cast<uint8_t>((seed >> 8) & 0xff);
+   return key;
+}
+
+/**
+ * @brief Build a minimal legacy message with a caller-selected account-key count.
+ */
+message make_index_limit_message(size_t account_key_count) {
+   message msg;
+   msg.header.num_required_signatures = 1;
+   msg.recent_blockhash = make_test_pubkey(900);
+   msg.account_keys.reserve(account_key_count);
+   for (size_t i = 0; i < account_key_count; ++i) {
+      msg.account_keys.push_back(make_test_pubkey(static_cast<uint16_t>(i)));
+   }
+
+   compiled_instruction instr;
+   instr.program_id_index = 0;
+   instr.account_indices = {0};
+   msg.instructions.push_back(instr);
+   return msg;
+}
+
+} // namespace
 
 //=============================================================================
 // Pubkey Tests
@@ -257,6 +292,31 @@ BOOST_AUTO_TEST_CASE(test_message_serialization_roundtrip) {
    BOOST_CHECK_EQUAL(deserialized.instructions.size(), msg.instructions.size());
 }
 
+BOOST_AUTO_TEST_CASE(test_message_serialization_accepts_256_account_keys) {
+   auto msg = make_index_limit_message(limits::LEGACY_ACCOUNT_KEY_LIMIT);
+   msg.instructions[0].program_id_index = static_cast<uint8_t>(limits::LEGACY_ACCOUNT_KEY_LIMIT - 1);
+   msg.instructions[0].account_indices = {0, static_cast<uint8_t>(limits::LEGACY_ACCOUNT_KEY_LIMIT - 1)};
+
+   std::vector<uint8_t> serialized;
+   BOOST_CHECK_NO_THROW(serialized = msg.serialize());
+   BOOST_CHECK(!serialized.empty());
+}
+
+BOOST_AUTO_TEST_CASE(test_message_serialization_rejects_more_than_256_account_keys) {
+   auto msg = make_index_limit_message(limits::LEGACY_ACCOUNT_KEY_LIMIT + 1);
+   BOOST_CHECK_THROW(msg.serialize(), fc::assert_exception);
+}
+
+BOOST_AUTO_TEST_CASE(test_message_serialization_rejects_out_of_range_instruction_indices) {
+   auto msg = make_index_limit_message(2);
+   msg.instructions[0].program_id_index = 2;
+   BOOST_CHECK_THROW(msg.serialize(), fc::assert_exception);
+
+   msg.instructions[0].program_id_index = 0;
+   msg.instructions[0].account_indices = {2};
+   BOOST_CHECK_THROW(msg.serialize(), fc::assert_exception);
+}
+
 //=============================================================================
 // Transaction Serialization Tests
 //=============================================================================
@@ -295,6 +355,18 @@ BOOST_AUTO_TEST_CASE(test_transaction_serialization_roundtrip) {
    // Verify
    BOOST_CHECK_EQUAL(deserialized.signatures.size(), tx.signatures.size());
    BOOST_CHECK(deserialized.signatures[0] == tx.signatures[0]);
+}
+
+BOOST_AUTO_TEST_CASE(test_transaction_serialization_rejects_packet_overflow) {
+   transaction tx;
+   tx.msg = make_index_limit_message(1);
+   tx.msg.instructions[0].data.assign(limits::PACKET_DATA_SIZE, 0xaa);
+
+   solana_signature sig;
+   std::ranges::fill(sig, 0xAB);
+   tx.signatures.push_back(sig);
+
+   BOOST_CHECK_THROW(tx.serialize(), fc::assert_exception);
 }
 
 //=============================================================================

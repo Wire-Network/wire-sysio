@@ -66,7 +66,8 @@ BOOST_AUTO_TEST_CASE(opp_outpost_epoch_in_has_chunked_args) try {
    // Chunked signature: (epoch_index, chunk_index, total_chunks, total_bytes,
    // chunk_data). Solana's 1 232-byte tx MTU forces multi-call streaming for
    // production-scale envelopes; the program assembles per-(epoch, signer)
-   // staging PDAs and auto-finalizes on the last chunk.
+   // staging PDAs and finalizes on a zero-data terminal call where
+   // chunk_index == total_chunks.
    BOOST_REQUIRE_EQUAL(epoch_in->args.size(), 5u);
    BOOST_CHECK_EQUAL(epoch_in->args[0].name, "epoch_index");
    BOOST_CHECK_EQUAL(epoch_in->args[1].name, "chunk_index");
@@ -74,11 +75,15 @@ BOOST_AUTO_TEST_CASE(opp_outpost_epoch_in_has_chunked_args) try {
    BOOST_CHECK_EQUAL(epoch_in->args[3].name, "total_bytes");
    BOOST_CHECK_EQUAL(epoch_in->args[4].name, "chunk_data");
 
-   // Accounts: operator (signer), config (PDA), operator_registry (PDA),
-   //           epoch_deliveries, chunk_buffer, inbound_envelopes, system_program
-   BOOST_CHECK_EQUAL(epoch_in->accounts.size(), 7u);
+   // Accounts: operator (signer), config, operator_registry, epoch_deliveries,
+   //           chunk_buffer, inbound_envelopes, outbound emit state, vault,
+   //           reserve_aggregate, system_program.
+   BOOST_CHECK_EQUAL(epoch_in->accounts.size(), 12u);
    BOOST_CHECK(epoch_in->accounts[0].is_signer);
    BOOST_CHECK_EQUAL(epoch_in->accounts[4].name, "chunk_buffer");
+   BOOST_CHECK_EQUAL(epoch_in->accounts[6].name, "outbound_message_buffer");
+   BOOST_CHECK_EQUAL(epoch_in->accounts[8].name, "latest_outbound_envelope");
+   BOOST_CHECK_EQUAL(epoch_in->accounts[10].name, "reserve_aggregate");
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(opp_outpost_cleanup_envelope_chunks_present) try {
@@ -92,12 +97,14 @@ BOOST_AUTO_TEST_CASE(opp_outpost_cleanup_envelope_chunks_present) try {
    BOOST_REQUIRE_EQUAL(cleanup->args.size(), 1u);
    BOOST_CHECK_EQUAL(cleanup->args[0].name, "epoch_index");
 
-   // Accounts: reaper (signer), config, chunk_buffer, uploader
-   BOOST_REQUIRE_EQUAL(cleanup->accounts.size(), 4u);
+   // Accounts: reaper (signer), config, latest_outbound_envelope,
+   //           chunk_buffer, uploader.
+   BOOST_REQUIRE_EQUAL(cleanup->accounts.size(), 5u);
    BOOST_CHECK_EQUAL(cleanup->accounts[0].name, "reaper");
    BOOST_CHECK(cleanup->accounts[0].is_signer);
-   BOOST_CHECK_EQUAL(cleanup->accounts[2].name, "chunk_buffer");
-   BOOST_CHECK_EQUAL(cleanup->accounts[3].name, "uploader");
+   BOOST_CHECK_EQUAL(cleanup->accounts[2].name, "latest_outbound_envelope");
+   BOOST_CHECK_EQUAL(cleanup->accounts[3].name, "chunk_buffer");
+   BOOST_CHECK_EQUAL(cleanup->accounts[4].name, "uploader");
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(envelope_chunk_count_math) try {
@@ -109,16 +116,23 @@ BOOST_AUTO_TEST_CASE(envelope_chunk_count_math) try {
    auto chunks_for = [](size_t total) {
       return (total + sysio::SOLANA_MAX_CHUNK_BYTES - 1) / sysio::SOLANA_MAX_CHUNK_BYTES;
    };
+   auto epoch_in_calls_for = [&](size_t total) {
+      return chunks_for(total) + 1; // data chunks plus zero-data terminal finalize
+   };
 
    BOOST_CHECK_EQUAL(chunks_for(1),                                 1u);
+   BOOST_CHECK_EQUAL(epoch_in_calls_for(1),                          2u);
    BOOST_CHECK_EQUAL(chunks_for(sysio::SOLANA_MAX_CHUNK_BYTES),     1u);
+   BOOST_CHECK_EQUAL(epoch_in_calls_for(sysio::SOLANA_MAX_CHUNK_BYTES), 2u);
    BOOST_CHECK_EQUAL(chunks_for(sysio::SOLANA_MAX_CHUNK_BYTES + 1), 2u);
+   BOOST_CHECK_EQUAL(epoch_in_calls_for(sysio::SOLANA_MAX_CHUNK_BYTES + 1), 3u);
    BOOST_CHECK_EQUAL(chunks_for(2 * sysio::SOLANA_MAX_CHUNK_BYTES), 2u);
    // dev-026 captured 2,526-byte envelope (groups-of-7 batch op delivery).
    BOOST_CHECK_EQUAL(chunks_for(2526), 4u);   // 2526/672 = 3.76 → 4
    // 64 KiB cap: ceil(65 536 / 672) = 98 chunks. Last chunk is 352 B
    // (65_536 mod 672 = 352), the first 97 are full at MAX_CHUNK_BYTES.
    BOOST_CHECK_EQUAL(chunks_for(sysio::SOLANA_MAX_ENVELOPE_BYTES), 98u);
+   BOOST_CHECK_EQUAL(epoch_in_calls_for(sysio::SOLANA_MAX_ENVELOPE_BYTES), 99u);
    BOOST_CHECK_EQUAL(sysio::SOLANA_MAX_ENVELOPE_BYTES % sysio::SOLANA_MAX_CHUNK_BYTES, 352u);
 
    // Last-chunk size at the dev-026 reproduction: the loop fills the first
@@ -262,6 +276,70 @@ sysio::opp::AttestationEntry revert_entry(const sysio::opp::types::ChainAddress&
    return entry;
 }
 
+/// Build a `SWAP_REMIT` entry pointing at `recipient_addr`.
+sysio::opp::AttestationEntry swap_remit_entry(uint64_t token_code,
+                                              uint64_t reserve_code,
+                                              const sysio::opp::types::ChainAddress& recipient_addr) {
+   sysio::opp::attestations::SwapRemit remit;
+   remit.mutable_amount()->set_token_code(token_code);
+   remit.mutable_amount()->set_amount(123);
+   remit.set_reserve_code(reserve_code);
+   *remit.mutable_recipient() = recipient_addr;
+   std::string body;
+   remit.SerializeToString(&body);
+
+   sysio::opp::AttestationEntry entry;
+   entry.set_type(sysio::opp::types::ATTESTATION_TYPE_SWAP_REMIT);
+   entry.set_data(std::move(body));
+   return entry;
+}
+
+/// Build a `SWAP_REVERT` entry pointing at `depositor_addr`.
+sysio::opp::AttestationEntry swap_revert_entry(uint64_t token_code,
+                                               uint64_t reserve_code,
+                                               const sysio::opp::types::ChainAddress& depositor_addr) {
+   sysio::opp::attestations::SwapRevert revert;
+   revert.mutable_refund_amount()->set_token_code(token_code);
+   revert.mutable_refund_amount()->set_amount(456);
+   revert.set_source_reserve_code(reserve_code);
+   *revert.mutable_depositor() = depositor_addr;
+   std::string body;
+   revert.SerializeToString(&body);
+
+   sysio::opp::AttestationEntry entry;
+   entry.set_type(sysio::opp::types::ATTESTATION_TYPE_SWAP_REVERT);
+   entry.set_data(std::move(body));
+   return entry;
+}
+
+/// Build a `RESERVE_READY` entry.
+sysio::opp::AttestationEntry reserve_ready_entry(uint64_t token_code, uint64_t reserve_code) {
+   sysio::opp::attestations::ReserveReady ready;
+   ready.set_token_code(token_code);
+   ready.set_reserve_code(reserve_code);
+   std::string body;
+   ready.SerializeToString(&body);
+
+   sysio::opp::AttestationEntry entry;
+   entry.set_type(sysio::opp::types::ATTESTATION_TYPE_RESERVE_READY);
+   entry.set_data(std::move(body));
+   return entry;
+}
+
+/// Build a `RESERVE_CREATE_CANCELLED` entry.
+sysio::opp::AttestationEntry reserve_create_cancelled_entry(uint64_t token_code, uint64_t reserve_code) {
+   sysio::opp::attestations::ReserveCreateCancelled cancelled;
+   cancelled.set_token_code(token_code);
+   cancelled.set_reserve_code(reserve_code);
+   std::string body;
+   cancelled.SerializeToString(&body);
+
+   sysio::opp::AttestationEntry entry;
+   entry.set_type(sysio::opp::types::ATTESTATION_TYPE_RESERVE_CREATE_CANCELLED);
+   entry.set_data(std::move(body));
+   return entry;
+}
+
 std::array<uint8_t, 32> filled_pubkey(uint8_t byte) {
    std::array<uint8_t, 32> arr{};
    arr.fill(byte);
@@ -374,6 +452,72 @@ BOOST_AUTO_TEST_CASE(extract_pubkeys_mixed_remit_and_revert_preserved_order) try
    BOOST_CHECK(pks[0].serialize() == op_a);
    BOOST_CHECK(pks[1].serialize() == depositor);
    BOOST_CHECK(pks[2].serialize() == op_b);
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(extract_pubkeys_includes_native_swap_effect_wallets) try {
+   auto swap_recipient = filled_pubkey(0x41);
+   auto swap_depositor = filled_pubkey(0x42);
+   auto withdraw_op    = filled_pubkey(0x43);
+   auto envelope       = envelope_with_entries({
+      swap_remit_entry(10, 20, make_sol_addr(swap_recipient)),
+      swap_revert_entry(11, 21, make_sol_addr(swap_depositor)),
+      remit_entry(make_sol_addr(withdraw_op)),
+   });
+
+   auto pks = sysio::outpost_solana_client_detail::extract_inbound_recipient_pubkeys(envelope);
+   BOOST_REQUIRE_EQUAL(pks.size(), 3u);
+   BOOST_CHECK(pks[0].serialize() == swap_recipient);
+   BOOST_CHECK(pks[1].serialize() == swap_depositor);
+   BOOST_CHECK(pks[2].serialize() == withdraw_op);
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(extract_reserve_seeds_includes_all_terminal_reserve_effects_and_dedupes) try {
+   auto recipient = filled_pubkey(0x51);
+   auto depositor = filled_pubkey(0x52);
+   auto envelope  = envelope_with_entries({
+      swap_remit_entry(100, 200, make_sol_addr(recipient)),
+      swap_revert_entry(101, 201, make_sol_addr(depositor)),
+      reserve_ready_entry(102, 202),
+      reserve_create_cancelled_entry(103, 203),
+      reserve_ready_entry(102, 202),
+   });
+
+   auto seeds = sysio::outpost_solana_client_detail::extract_inbound_swap_remit_reserve_seeds(envelope);
+   BOOST_REQUIRE_EQUAL(seeds.size(), 4u);
+   BOOST_CHECK_EQUAL(seeds[0].token_code, 100u);
+   BOOST_CHECK_EQUAL(seeds[0].reserve_code, 200u);
+   BOOST_CHECK_EQUAL(seeds[1].token_code, 101u);
+   BOOST_CHECK_EQUAL(seeds[1].reserve_code, 201u);
+   BOOST_CHECK_EQUAL(seeds[2].token_code, 102u);
+   BOOST_CHECK_EQUAL(seeds[2].reserve_code, 202u);
+   BOOST_CHECK_EQUAL(seeds[3].token_code, 103u);
+   BOOST_CHECK_EQUAL(seeds[3].reserve_code, 203u);
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(extract_swap_remit_spl_targets_uses_recipient_pubkey) try {
+   auto recipient = filled_pubkey(0x61);
+   auto envelope  = envelope_with_entries({
+      swap_remit_entry(300, 400, make_sol_addr(recipient)),
+   });
+
+   auto targets = sysio::outpost_solana_client_detail::extract_inbound_swap_remit_spl_targets(envelope);
+   BOOST_REQUIRE_EQUAL(targets.size(), 1u);
+   BOOST_CHECK_EQUAL(targets[0].token_code, 300u);
+   BOOST_CHECK_EQUAL(targets[0].reserve_code, 400u);
+   BOOST_CHECK(targets[0].recipient.serialize() == recipient);
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(extract_swap_revert_spl_targets_uses_depositor_pubkey) try {
+   auto depositor = filled_pubkey(0x62);
+   auto envelope  = envelope_with_entries({
+      swap_revert_entry(301, 401, make_sol_addr(depositor)),
+   });
+
+   auto targets = sysio::outpost_solana_client_detail::extract_inbound_swap_revert_spl_targets(envelope);
+   BOOST_REQUIRE_EQUAL(targets.size(), 1u);
+   BOOST_CHECK_EQUAL(targets[0].token_code, 301u);
+   BOOST_CHECK_EQUAL(targets[0].reserve_code, 401u);
+   BOOST_CHECK(targets[0].recipient.serialize() == depositor);
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_SUITE_END()
