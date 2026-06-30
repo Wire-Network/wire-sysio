@@ -69,6 +69,7 @@ Options:
 #include <regex>
 #include <iostream>
 #include <locale>
+#include <optional>
 #include <tuple>
 #include <unordered_map>
 #include <utility>
@@ -81,6 +82,7 @@ Options:
 #include <fc/exception/exception.hpp>
 #include <fc/variant_object.hpp>
 #include <fc/io/fstream.hpp>
+#include <fc/io/secure_file.hpp>
 
 #include <sysio/chain/name.hpp>
 #include <sysio/chain/config.hpp>
@@ -1987,9 +1989,8 @@ int main( int argc, char** argv ) {
          std::cout << localized("Public key: ${key}", ("key", pubs ) ) << std::endl;
       } else {
          std::cerr << localized("saving keys to ${filename}", ("filename", key_file)) << std::endl;
-         std::ofstream out( key_file.c_str() );
-         out << localized("Private key: ${key}", ("key",  privs) ) << std::endl;
-         out << localized("Public key: ${key}", ("key", pubs ) ) << std::endl;
+         fc::write_secure_file(key_file, localized("Private key: ${key}", ("key", privs)) + "\n" +
+                                            localized("Public key: ${key}", ("key", pubs)) + "\n");
       }
    });
    auto k1_flag  = create_key_cmd->add_flag( "--k1", k1, "Generate a key using the K1 curve (Bitcoin) with PUB_K1_ & PVT_K1_ prefix instead of legacy"  );
@@ -2177,11 +2178,11 @@ int main( int argc, char** argv ) {
          std::cout << localized("Public key: ${key}", ("key", pubk.to_string({}, true) ) ) << std::endl;
       } else {
          std::cerr << localized("saving keys to ${filename}", ("filename", key_file)) << std::endl;
-         std::ofstream out( key_file.c_str() );
-         out << localized("Private key: ${key}", ("key", privk.to_string({})) ) << std::endl;
-         out << localized("Public key: ${key}", ("key", pubk.to_string({}) ) ) << std::endl;
-         out << localized("Private key: ${key}", ("key", privk.to_string({}, true)) ) << std::endl;
-         out << localized("Public key: ${key}", ("key", pubk.to_string({}, true) ) ) << std::endl;
+         fc::write_secure_file(key_file,
+                               localized("Private key: ${key}", ("key", privk.to_string({}))) + "\n" +
+                                  localized("Public key: ${key}", ("key", pubk.to_string({}))) + "\n" +
+                                  localized("Private key: ${key}", ("key", privk.to_string({}, true))) + "\n" +
+                                  localized("Public key: ${key}", ("key", pubk.to_string({}, true))) + "\n");
       }
    });
 
@@ -2241,9 +2242,8 @@ int main( int argc, char** argv ) {
          std::cout << localized("Public key: ${key}",  ("key", pubk.to_string({}, true))  ) << std::endl;
       } else {
          std::cerr << localized("saving keys to ${filename}", ("filename", key_file)) << std::endl;
-         std::ofstream out( key_file.c_str() );
-         out << localized("Private key: ${key}", ("key", privk.to_string({}, true)) ) << std::endl;
-         out << localized("Public key: ${key}",  ("key", pubk.to_string({}, true))  ) << std::endl;
+         fc::write_secure_file(key_file, localized("Private key: ${key}", ("key", privk.to_string({}, true))) + "\n" +
+                                            localized("Public key: ${key}", ("key", pubk.to_string({}, true))) + "\n");
       }
    });
 
@@ -2335,10 +2335,9 @@ int main( int argc, char** argv ) {
          std::cout << localized("Ethereum address: ${a}", ("a", addr)) << std::endl;
       } else {
          std::cerr << localized("saving keys to ${f}", ("f", key_file)) << std::endl;
-         std::ofstream out( key_file.c_str() );
-         out << localized("Private key: ${k}", ("k", k1_priv.to_string({}, true))) << std::endl;
-         out << localized("Public key: ${k}",  ("k", k1_pub.to_string({}, true)))  << std::endl;
-         out << localized("Ethereum address: ${a}", ("a", addr)) << std::endl;
+         fc::write_secure_file(key_file, localized("Private key: ${k}", ("k", k1_priv.to_string({}, true))) + "\n" +
+                                            localized("Public key: ${k}", ("k", k1_pub.to_string({}, true))) + "\n" +
+                                            localized("Ethereum address: ${a}", ("a", addr)) + "\n");
       }
    });
 
@@ -3113,7 +3112,9 @@ int main( int argc, char** argv ) {
    create_wallet_cmd->add_flag( "--to-console", print_console, localized("Print password to console."));
    create_wallet_cmd->callback([&wallet_name, &password_file, &print_console] {
       SYSC_ASSERT( !password_file.empty() ^ print_console, "ERROR: Either indicate a file using \"--file\" or pass \"--to-console\"" );
-      SYSC_ASSERT( password_file.empty() || !std::ofstream(password_file.c_str()).fail(), "ERROR: Failed to create file in specified path" );
+      std::optional<fc::secure_output_file> password_out;
+      if (!password_file.empty())
+         password_out.emplace(password_file);
 
       const auto& v = call(wallet_url, wallet_create, wallet_name);
       std::cout << localized("Creating wallet: ${wallet_name}", ("wallet_name", wallet_name)) << std::endl;
@@ -3125,8 +3126,8 @@ int main( int argc, char** argv ) {
          std::cerr << localized("saving password to ${filename}", ("filename", password_file)) << std::endl;
          auto password_str = fc::json::to_pretty_string(v);
          boost::replace_all(password_str, "\"", "");
-         std::ofstream out( password_file.c_str() );
-         out << password_str;
+         password_out->write(password_str);
+         password_out->close();
       }
    });
 
