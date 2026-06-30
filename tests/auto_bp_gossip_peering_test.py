@@ -85,7 +85,7 @@ try:
     extraNodeopArgs = " --production-pause-vote-timeout-ms 0 --plugin sysio::net_api_plugin "
 
     TestHelper.printSystemInfo("BEGIN")
-    cluster.launch(
+    if not cluster.launch(
         prodCount=producerCountInEachNode,
         totalNodes=totalNodes,
         pnodes=producerNodes,
@@ -94,7 +94,8 @@ try:
         topo="./tests/auto_bp_peering_test_shape.json",
         extraNodeopArgs=extraNodeopArgs,
         specificExtraNodeopArgs=specificNodeopArgs,
-    )
+    ):
+        errorExit("Failed to stand up cluster.")
 
     testWalletName="test"
     Print("Creating wallet \"%s\"" % (testWalletName))
