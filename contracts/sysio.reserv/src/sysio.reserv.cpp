@@ -50,8 +50,8 @@ constexpr sysio::slug_name WIRE_TOKEN = "WIRE"_s;
 
 /// Saturating uint64 credit for reserve balances / rewards-bucket counters. These accumulate from
 /// operator-relayed external-chain amounts (no on-chain supply cap), and the credit sites run
-/// inside the consensus dispatch chain (onreward via msgch::evalcons; applyswap / applyfromwire /
-/// paywire inline from uwrit::try_select_winner). A raw `+=` could wrap the uint64 and corrupt the
+/// inside the consensus dispatch chain (applyswap / applyfromwire / paywire inline from
+/// uwrit::try_select_winner). A raw `+=` could wrap the uint64 and corrupt the
 /// weighted-AMM curve and the `>=` sufficiency checks; cap at UINT64_MAX instead — never wrap,
 /// never throw on the consensus path. The cap is unreachable for any real token amount. Delegates
 /// to the shared `sysio::opp::safe::add_sat_u64` so the never-wrap rule lives in one place.
@@ -607,28 +607,8 @@ void reserve::debit(sysio::slug_name chain_code,
 // onreject was removed — no SwapRejected attestation exists (every depot-initiated
 // REMIT is paid by the destination outpost; reserves need no rejection reconciliation).
 
-void reserve::onreward(sysio::slug_name chain_code,
-                        sysio::slug_name token_code,
-                        sysio::slug_name reserve_code,
-                        uint64_t        outpost_amount) {
-   require_auth(MSGCH_ACCOUNT);
-   if (outpost_amount == 0) return;
-
-   reserves_t tbl(get_self());
-   auto pk = make_key(chain_code, token_code, reserve_code);
-   auto it = tbl.find(pk);
-   if (it == tbl.end()) {
-      sysio::print("onreward: reserve not found; silently skipping\n");
-      return;
-   }
-   if (it->status != opp::types::RESERVE_STATUS_ACTIVE) {
-      sysio::print("onreward: reserve not ACTIVE; silently skipping\n");
-      return;
-   }
-   tbl.modify(ram_payer, pk, [&](auto& row) {
-      add_capped_u64(row.reserve_chain_amount, outpost_amount);
-   });
-}
+// onreward was removed: the v6 STAKING_REWARD path credits the per-staker reward to
+// sysio.dclaim directly (already WIRE-denominated), so there is no reserve leg.
 
 // ---------------------------------------------------------------------------
 //  Emit-time swap settlement (auth = sysio.uwrit)

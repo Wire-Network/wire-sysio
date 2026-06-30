@@ -224,28 +224,6 @@
             ]
         },
         {
-            "name": "onreward",
-            "base": "",
-            "fields": [
-                {
-                    "name": "chain_code",
-                    "type": "slug_name"
-                },
-                {
-                    "name": "token_code",
-                    "type": "slug_name"
-                },
-                {
-                    "name": "reserve_code",
-                    "type": "slug_name"
-                },
-                {
-                    "name": "outpost_amount",
-                    "type": "uint64"
-                }
-            ]
-        },
-        {
             "name": "paywire",
             "base": "",
             "fields": [
@@ -537,11 +515,6 @@
         {
             "name": "oncrtreserve",
             "type": "oncrtreserve",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "onreward",
-            "type": "onreward",
             "ricardian_contract": ""
         },
         {
