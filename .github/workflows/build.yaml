@@ -5,6 +5,8 @@ on:
     branches:
       - master
       - "release/*"
+    tags:
+      - "v*"
   pull_request:
     types: [ opened, synchronize, reopened, ready_for_review ]
     branches:
@@ -50,7 +52,7 @@ jobs:
 
   build-test-package:
     name: Build, test, and package (${{matrix.platform}})
-    needs: [platform-cache]
+    needs: [platform-cache, v]
     strategy:
       fail-fast: false
       matrix:
@@ -110,10 +112,19 @@ jobs:
           restore-keys: |
             ccache-${{ matrix.platform }}-
 
+      - name: Build Wire CDT for release tag
+        if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN_DEV }}
+        run: |
+          bash .github/scripts/setup-wire-cdt.sh "${{ needs.v.outputs.cdt-target }}"
+
       - name: Build
         id: build
         env:
           SYSIO_PLATFORM_NAME: ${{ matrix.platform }}
+          SYSIO_BUILD_SYSTEM_CONTRACTS: ${{ startsWith(github.ref, 'refs/tags/v') && 'ON' || 'OFF' }}
+          SYSIO_BUILD_TEST_CONTRACTS: "OFF"
         run: |
           bash .github/scripts/build-sysio.sh "${{ matrix.build_jobs }}"
 
@@ -247,6 +258,9 @@ jobs:
         if: ${{ steps.build.outcome == 'success' && !cancelled() }}
         run: |
           cd build
+          if [[ "${GITHUB_REF:-}" == refs/tags/v* ]]; then
+            bash ../.github/scripts/assert-system-contract-build.sh .
+          fi
           cpack
           ../tools/tweak-deb.sh wire-sysio_*.deb
 

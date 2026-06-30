@@ -1,6 +1,6 @@
 {
     "wirecdt":{
-       "target":"4.1.0",
+       "target":"11c1065f014cbd085a006d35beaea09b838bc935",
        "prerelease":true
     },
     "wiresystemcontracts":{
