@@ -30,6 +30,7 @@ release_ref="$CDT_TARGET"
 if [[ "$release_ref" =~ ^[0-9]+\.[0-9]+\.[0-9]+([-+._A-Za-z0-9]*)?$ ]]; then
   release_ref="v$release_ref"
 fi
+checkout_ref="$release_ref"
 
 if [[ ! -d "$CDT_SOURCE_DIR/.git" ]]; then
   mkdir -p "$(dirname "$CDT_SOURCE_DIR")"
@@ -37,10 +38,12 @@ if [[ ! -d "$CDT_SOURCE_DIR/.git" ]]; then
 fi
 
 git -C "$CDT_SOURCE_DIR" "${git_auth[@]}" fetch origin --tags --prune
-if ! git -C "$CDT_SOURCE_DIR" rev-parse --verify --quiet "$release_ref^{commit}" >/dev/null; then
-  git -C "$CDT_SOURCE_DIR" "${git_auth[@]}" fetch origin "$release_ref"
+if git -C "$CDT_SOURCE_DIR" rev-parse --verify --quiet "origin/$release_ref^{commit}" >/dev/null; then
+  checkout_ref="origin/$release_ref"
+elif ! git -C "$CDT_SOURCE_DIR" rev-parse --verify --quiet "$checkout_ref^{commit}" >/dev/null; then
+  git -C "$CDT_SOURCE_DIR" "${git_auth[@]}" fetch origin "$checkout_ref"
 fi
-git -C "$CDT_SOURCE_DIR" checkout --detach "$release_ref"
+git -C "$CDT_SOURCE_DIR" checkout --detach "$checkout_ref"
 git -C "$CDT_SOURCE_DIR" submodule update --init --recursive
 
 (
