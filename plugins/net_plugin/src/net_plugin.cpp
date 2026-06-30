@@ -3299,24 +3299,19 @@ namespace sysio {
       // Early dedup: check if we already have this transaction — zero heap allocations on the duplicate path.
       // Consume which + trx_id from buffer
       // Wire format: [which (varint)][transaction_id (32 bytes)][packed_transaction ...]
+      // Bound the entire parse to the declared frame. A frame too short to hold which + trx_id (or a
+      // body that runs past message_length) throws here; process_next_message then closes the peer and
+      // returns false, stopping the read loop rather than consuming or acting on bytes from a following
+      // pipelined frame. Because the bound guarantees header_bytes <= message_length, the duplicate-path
+      // advance below cannot underflow.
       const auto bytes_before = pending_message_buffer.bytes_to_read();
-      auto ds = pending_message_buffer.create_datastream();
+      auto mb_ds = pending_message_buffer.create_datastream();
+      fc::bounded_datastream ds( mb_ds, message_length );
       unsigned_int which{};
       fc::raw::unpack( ds, which );
       transaction_id_type trx_id;
       fc::raw::unpack( ds, trx_id );
       const auto header_bytes = bytes_before - pending_message_buffer.bytes_to_read();
-
-      // A well-formed transaction_message frame contains at least which + trx_id. If the
-      // peer-declared message_length is shorter than the bytes just consumed, the id was read
-      // by spilling past this frame into pipelined bytes; closing here avoids underflowing the
-      // unsigned `message_length - header_bytes` advance below (which would corrupt the buffer).
-      if( header_bytes > message_length ) {
-         peer_wlog( p2p_trx_log, this, "transaction_message frame too short: length {} < header {} - closing",
-                    message_length, header_bytes );
-         close();
-         return true;
-      }
 
       if( my_impl->dispatcher.have_peer_txn( trx_id, *this ) ) {
          peer_dlog( p2p_trx_log, this, "got a duplicate transaction - dropping {}", trx_id );
@@ -3329,10 +3324,9 @@ namespace sysio {
       auto now = fc::time_point::now();
       // shared_ptr<packed_transaction> needed here because packed_transaction_ptr is shared_ptr<const packed_transaction>
       std::shared_ptr<packed_transaction> ptr = std::make_shared<packed_transaction>();
-      // Confine the body to the remaining declared frame bytes, then advance to the frame boundary,
-      // so the transaction cannot be unpacked from bytes belonging to a following pipelined frame.
-      fc::bounded_datastream body_ds( ds, message_length - header_bytes );
-      fc::raw::unpack( body_ds, *ptr );
+      // ds is bounded to message_length, so the body cannot be unpacked from bytes belonging to a
+      // following pipelined frame; advance to the frame boundary once the body is consumed.
+      fc::raw::unpack( ds, *ptr );
       advance_to_frame_end( bytes_before, message_length );
 
       // Validate that the wire ID matches the actual transaction ID.
@@ -3428,8 +3422,13 @@ namespace sysio {
 
       // Early dedup: consume which + vote_id from buffer
       // Wire format: [which (varint)][vote_id (32 bytes)][vote_message ...]
+      // See process_next_trx_message: bound the entire parse to the declared frame so an under-length
+      // frame throws (the caller then closes the peer and stops the read loop) rather than reading the
+      // id or body from a following pipelined frame. The bound also keeps the duplicate-path advance
+      // below from underflowing.
       const auto bytes_before = pending_message_buffer.bytes_to_read();
-      auto ds = pending_message_buffer.create_datastream();
+      auto mb_ds = pending_message_buffer.create_datastream();
+      fc::bounded_datastream ds( mb_ds, message_length );
       unsigned_int which{};
       fc::raw::unpack( ds, which );
       assert(to_msg_type_t(which) == msg_type_t::vote_message); // verified by caller
@@ -3437,25 +3436,15 @@ namespace sysio {
       fc::raw::unpack( ds, vote_id );
       const auto header_bytes = bytes_before - pending_message_buffer.bytes_to_read();
 
-      // See process_next_trx_message: a frame shorter than which + vote_id means the id was read
-      // from pipelined bytes past this frame; close rather than underflow the advance below.
-      if( header_bytes > message_length ) {
-         peer_wlog( vote_logger, this, "vote_message frame too short: length {} < header {} - closing",
-                    message_length, header_bytes );
-         close();
-         return true;
-      }
-
       if( my_impl->dispatcher.have_vote( vote_id ) ) {
          peer_dlog( vote_logger, this, "duplicate vote - dropping {}", vote_id );
          pending_message_buffer.advance_read_ptr( message_length - header_bytes );
          return true;
       }
       vote_message_ptr ptr = std::make_shared<vote_message>();
-      // Confine the body to the remaining declared frame bytes, then advance to the frame boundary,
-      // so the vote cannot be unpacked from bytes belonging to a following pipelined frame.
-      fc::bounded_datastream body_ds( ds, message_length - header_bytes );
-      fc::raw::unpack( body_ds, *ptr );
+      // ds is bounded to message_length, so the body cannot be unpacked from bytes belonging to a
+      // following pipelined frame; advance to the frame boundary once the body is consumed.
+      fc::raw::unpack( ds, *ptr );
       advance_to_frame_end( bytes_before, message_length );
 
       // Validate that the wire vote_id matches the actual computed vote_id.
