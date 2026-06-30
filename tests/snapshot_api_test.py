@@ -140,8 +140,13 @@ try:
         json.dumps({"producer": producerA, "rank": 1}),
         "--permission sysio@active")
     assert success, f"Failed to set rank for {producerA}: {trans}"
+    setRankTransId = node0.getTransId(trans)
 
-    assert node0.waitForHeadToAdvance(), "Head did not advance after setrank"
+    # regsnapprov reads producer ranks from the on-chain producers table. A
+    # generic head advance can race the exact setrank transaction under
+    # multi-producer scheduling, so wait for that transaction specifically.
+    assert node0.waitForTransactionInBlock(setRankTransId, timeout=60), \
+        "setrank transaction did not make it into a block before regsnapprov"
 
     success, trans = node0.pushMessage("sysio", "regsnapprov",
         json.dumps({"producer": producerA, "snap_account": snapProv1.name}),
