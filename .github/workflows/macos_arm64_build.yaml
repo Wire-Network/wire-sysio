@@ -117,7 +117,7 @@ jobs:
             2>&1 | tee "$RUNNER_TEMP/macos-arm64-parallel-ctest.log"
 
       - name: Run sharded NP/LR tests
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.run_sharded_np_lr }}
+        if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.run_sharded_np_lr) }}
         run: |
           cd "$BUILD_DIR"
           test_jobs="$(sysctl -n hw.logicalcpu)"
