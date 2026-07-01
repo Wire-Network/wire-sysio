@@ -7,6 +7,7 @@
 #include <sysio.opp.common/slug_name.hpp>
 #include <sysio.opp.common/amm_math.hpp>
 #include <sysio.opp.common/safe_ops.hpp>
+#include <sysio.opp.common/name_ops.hpp>
 #include <sysio/opp/attestations/attestations.pb.hpp>
 #include <sysio/permission.hpp>
 #include <sysio/crypto.hpp>
@@ -406,18 +407,14 @@ std::optional<reserve::reserve_row> find_active_reserve(sysio::slug_name chain_c
 }
 
 /// Parse a WIRE account name from its string-spelling bytes (the canonical
-/// `ChainAddress.address` encoding for CHAIN_KIND_WIRE). Charset + length +
-/// final-symbol bounds are validated BEFORE constructing the `name`, so this
-/// never throws — it runs inside the evalcons dispatch chain. Validation is
-/// delegated to the shared `sysio::opp::safe::is_valid_name_string`, which
-/// mirrors CDT's exact rules and accepts the FULL CDT name domain — including a
-/// legitimate 13-byte name whose final symbol fits the 4-bit final slot. (The
-/// earlier `size() > 12` cap wrongly rejected every 13-character WIRE
-/// depositor/recipient.) An empty address is not a valid principal here.
+/// `ChainAddress.address` encoding for CHAIN_KIND_WIRE). Delegates to the shared
+/// `sysio::opp::safe::parse_wire_account_name`, which validates charset, length,
+/// and final-symbol bounds BEFORE constructing the `name`, so this never throws
+/// inside the evalcons dispatch chain. The full CDT name domain is accepted —
+/// including a legitimate 13-byte name whose final symbol fits the 4-bit final
+/// slot. An empty address is not a valid principal here.
 std::optional<name> parse_wire_name(const std::vector<char>& bytes) {
-   const std::string_view sv{bytes.data(), bytes.size()};
-   if (sv.empty() || !sysio::opp::safe::is_valid_name_string(sv)) return std::nullopt;
-   return name{sv};
+   return sysio::opp::safe::parse_wire_account_name(std::string_view{bytes.data(), bytes.size()});
 }
 
 /// A WIRE account name as its string-spelling bytes — the inverse of
@@ -1466,18 +1463,28 @@ void uwrit::rcrdcommit(uint64_t uwreq_id,
       return;
    }
 
+   // Classify the UIC's leg BEFORE touching commits_by. `src_*`/`dst_*` are set once at
+   // createuwreq and never change here, so the snapshot's values are authoritative. Route by the
+   // full `(chain_code, token_code, reserve_code)` triple so same-chain swaps with multiple
+   // reserves on the same (chain, token) pair land in the correct per-leg slot.
+   const bool is_source = (from_chain_code   == req_snapshot.src_chain_code
+                           && from_token_code == req_snapshot.src_token_code
+                           && reserve_code    == req_snapshot.src_reserve_code);
+   const bool is_dest   = (from_chain_code   == req_snapshot.dst_chain_code
+                           && from_token_code == req_snapshot.dst_token_code
+                           && reserve_code    == req_snapshot.dst_reserve_code);
+   // A UIC whose leg matches neither the source nor the destination is not bound to this request.
+   // Drop it with no mutation so a stream of unmatched commits cannot grow commits_by or re-arm a
+   // disqualified entry. Fail closed, never check().
+   if (!is_source && !is_dest) {
+      sysio::print("rcrdcommit: uwreq ", uwreq_id,
+                   " UIC leg matches neither source nor destination, skipping\n");
+      return;
+   }
+
    reqs.modify(same_payer, pk, [&](auto& r) {
       auto* c = find_or_create_commit(r, underwriter);
       uint64_t now_ms = current_time_ms();
-      // Route by the full `(chain_code, token_code, reserve_code)` triple
-      // so same-chain swaps with multiple reserves on the same (chain,
-      // token) pair land in the correct per-leg slot.
-      const bool is_source = (from_chain_code  == r.src_chain_code
-                              && from_token_code == r.src_token_code
-                              && reserve_code    == r.src_reserve_code);
-      const bool is_dest   = (from_chain_code  == r.dst_chain_code
-                              && from_token_code == r.dst_token_code
-                              && reserve_code    == r.dst_reserve_code);
       if (is_source) {
          c->source_received_at_ms = now_ms;
          c->source_outpost_id     = chain_code;

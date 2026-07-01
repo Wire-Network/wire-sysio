@@ -624,6 +624,28 @@ public:
       return std::vector<char>(full.begin(), full.end());
    }
 
+   /// Build an UnderwriteIntentCommit carrying an arbitrary raw `uw_account.name`
+   /// string — including names that are not constructible as a `sysio::name`
+   /// (uppercase, hyphen, over-long). No signature is embedded: the dispatch path
+   /// validates the account name and drops a malformed UIC before rcrdcommit or
+   /// signature verification is ever reached, so a valid signature is unnecessary.
+   std::vector<char> make_uic_raw_name(const std::string& raw_name, uint64_t uwreq_id,
+                                       uint64_t outpost_id, uint64_t chain_code_v,
+                                       uint64_t token_code_v, uint64_t reserve_code_v) {
+      sysio::opp::attestations::UnderwriteIntentCommit uic;
+      uic.mutable_uw_account()->set_name(raw_name);
+      uic.mutable_uw_ext_chain_addr()->set_kind(sysio::opp::types::CHAIN_KIND_EVM);
+      uic.set_uw_request_id(uwreq_id);
+      uic.set_outpost_id(outpost_id);
+      uic.set_token_code(token_code_v);
+      uic.set_chain_code(chain_code_v);
+      uic.set_reserve_code(reserve_code_v);
+
+      std::string full;
+      uic.SerializeToString(&full);
+      return std::vector<char>(full.begin(), full.end());
+   }
+
    fc::variant get_uwreq(uint64_t id) {
       auto data = get_row_by_id(UWRIT_ACCOUNT, UWRIT_ACCOUNT, "uwreqs"_n, id);
       return data.empty() ? fc::variant() : uwrit_abi.binary_to_variant(
@@ -709,6 +731,31 @@ public:
             ("external_chain_id", 0)
             ("name",              std::string("wire-depot"))
             ("description",       std::string{})));
+   }
+
+   /// Register SOLANA, seed ACTIVE ETH+SOLANA reserves, credit UWRIT_OP collateral,
+   /// and create a PENDING ETH->SOLANA uwreq under `att_id` with source leg
+   /// (ETH, ETH, PRIMARY) and destination leg (SOLANA, SOL, PRIMARY). Shared by the
+   /// UIC leg-binding and account-name-validation cases below. `bootstrap_for_dispatch`
+   /// must have been called first.
+   void setup_eth_to_sol_uwreq(uint64_t att_id) {
+      BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
+         ("kind", ChainKind::CHAIN_KIND_SVM)("code", codename_mvo("SOLANA"))
+         ("external_chain_id", 900)("name", std::string("solana-test"))("description", std::string{})));
+      setup_wire_token_and_reserves();
+      BOOST_REQUIRE_EQUAL(success(), depositinle_credit(UWRIT_OP, "ETH",    "ETH", 1'000'000'000));
+      BOOST_REQUIRE_EQUAL(success(), depositinle_credit(UWRIT_OP, "SOLANA", "SOL", 1'000'000'000));
+
+      const auto eth       = fc::slug_name{"ETH"}.value;
+      const auto sol_chain = fc::slug_name{"SOLANA"}.value;
+      const auto sol_token = fc::slug_name{"SOL"}.value;
+      const auto primary   = fc::slug_name{"PRIMARY"}.value;
+      const auto sr = encode_swap_request(
+         ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
+         eth, eth, primary, 100, sol_chain, sol_token, primary, 100,
+         5000, ChainKind::CHAIN_KIND_SVM, std::vector<char>(32, '\x0b'));
+      BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(att_id, /*proven=*/ eth, sr));
+      BOOST_REQUIRE(!get_uwreq(att_id).is_null());
    }
 
    abi_serializer msgch_abi, opreg_abi, uwrit_abi, epoch_abi, reserv_abi, authex_abi, chains_abi, roa_abi,
@@ -940,6 +987,99 @@ BOOST_FIXTURE_TEST_CASE(underwrite_commit_mismatched_source_chain_is_dropped,
    // Control: the SAME commit proven-delivered from the SOLANA outpost is recorded.
    BOOST_REQUIRE_EQUAL(success(), deliver(/*proven=*/ sol_chain, uic_env));
    BOOST_REQUIRE(dest_committed());
+} FC_LOG_AND_RETHROW() }
+
+// A decode-clean UIC whose `uw_account.name` is nonempty but not a constructible account name
+// (uppercase, hyphen, over-long) must be dropped inside dispatch WITHOUT throwing: constructing
+// `name{}` from it would abort the evalcons/apply_consensus transaction and stall consensus
+// chain-wide. All three malformed names ride one envelope so a single consensus delivery exercises
+// them (a second deliver from the same operator+epoch would revert as a duplicate).
+BOOST_FIXTURE_TEST_CASE(underwrite_commit_invalid_account_name_is_dropped,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+   constexpr uint64_t ATT_ID = 9200;
+   setup_eth_to_sol_uwreq(ATT_ID);
+
+   const auto sol_chain = fc::slug_name{"SOLANA"}.value;
+   const auto sol_token = fc::slug_name{"SOL"}.value;
+   const auto primary   = fc::slug_name{"PRIMARY"}.value;
+
+   const auto uic_upper  = make_uic_raw_name("BADNAME",        ATT_ID, sol_chain, sol_chain, sol_token, primary);
+   const auto uic_hyphen = make_uic_raw_name("bad-name",       ATT_ID, sol_chain, sol_chain, sol_token, primary);
+   const auto uic_long   = make_uic_raw_name("abcdefghijklmn", ATT_ID, sol_chain, sol_chain, sol_token, primary);
+   const auto env = encode_envelope_with_attestations(
+      current_epoch(), sysio::opp::types::ATTESTATION_TYPE_UNDERWRITE_INTENT_COMMIT,
+      {std::string(uic_upper.begin(),  uic_upper.end()),
+       std::string(uic_hyphen.begin(), uic_hyphen.end()),
+       std::string(uic_long.begin(),   uic_long.end())});
+
+   // deliver() must SUCCEED — the malformed names are dropped inside dispatch, never thrown.
+   BOOST_REQUIRE_EQUAL(success(), deliver(/*proven=*/ sol_chain, env));
+   // ...and nothing was recorded against the request.
+   BOOST_REQUIRE_EQUAL(0u, get_uwreq(ATT_ID)["commits_by"].get_array().size());
+} FC_LOG_AND_RETHROW() }
+
+// A UIC whose (chain_code, token_code, reserve_code) triple matches neither the source nor the
+// destination leg of the pending request must leave commits_by untouched — no inert commit_entry,
+// no mutation. rcrdcommit is msgch-authorized; call it directly.
+BOOST_FIXTURE_TEST_CASE(rcrdcommit_unmatched_leg_leaves_commits_empty,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+   constexpr uint64_t ATT_ID = 9300;
+   setup_eth_to_sol_uwreq(ATT_ID);   // src=(ETH,ETH,PRIMARY) dst=(SOLANA,SOL,PRIMARY)
+
+   const auto sol_chain = fc::slug_name{"SOLANA"}.value;
+   const auto sol_token = fc::slug_name{"SOL"}.value;
+   const auto primary   = fc::slug_name{"PRIMARY"}.value;
+   const auto uic = make_signed_uic(UWRIT_OP, ATT_ID, sol_chain, sol_chain, sol_token, primary);
+
+   // (SOLANA, ETH, PRIMARY): source-chain differs from the dest leg, token differs from the source
+   // leg — matches neither.
+   BOOST_REQUIRE_EQUAL(success(),
+      rcrdcommit_direct(ATT_ID, UWRIT_OP, sol_chain, "SOLANA", "ETH", "PRIMARY", uic));
+   BOOST_REQUIRE_EQUAL(0u, get_uwreq(ATT_ID)["commits_by"].get_array().size());
+} FC_LOG_AND_RETHROW() }
+
+// Repeating unmatched commits with distinct underwriter names must not grow the row — the
+// pre-mutation leg guard is what closes the storage/scan-cost bloat vector.
+BOOST_FIXTURE_TEST_CASE(rcrdcommit_unmatched_distinct_underwriters_do_not_grow_row,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+   constexpr uint64_t ATT_ID = 9301;
+   setup_eth_to_sol_uwreq(ATT_ID);
+
+   const auto sol_chain = fc::slug_name{"SOLANA"}.value;
+   const auto sol_token = fc::slug_name{"SOL"}.value;
+   const auto primary   = fc::slug_name{"PRIMARY"}.value;
+   const auto uic = make_signed_uic(UWRIT_OP, ATT_ID, sol_chain, sol_chain, sol_token, primary);
+
+   for (name uw : {"uwtwo"_n, "uwthree"_n, "uwfour"_n}) {
+      BOOST_REQUIRE_EQUAL(success(),
+         rcrdcommit_direct(ATT_ID, uw, sol_chain, "SOLANA", "ETH", "PRIMARY", uic));
+   }
+   BOOST_REQUIRE_EQUAL(0u, get_uwreq(ATT_ID)["commits_by"].get_array().size());
+} FC_LOG_AND_RETHROW() }
+
+// Control for the leg-branch refactor: a UIC that DOES match the source leg still records a
+// commit_entry with the source arrival slot armed.
+BOOST_FIXTURE_TEST_CASE(rcrdcommit_matched_source_leg_is_recorded,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+   constexpr uint64_t ATT_ID = 9302;
+   setup_eth_to_sol_uwreq(ATT_ID);
+
+   const auto eth     = fc::slug_name{"ETH"}.value;
+   const auto primary = fc::slug_name{"PRIMARY"}.value;
+   const auto uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, eth, primary);
+
+   // (ETH, ETH, PRIMARY) is the source leg.
+   BOOST_REQUIRE_EQUAL(success(),
+      rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", uic));
+
+   const auto commits = get_uwreq(ATT_ID)["commits_by"].get_array();
+   BOOST_REQUIRE_EQUAL(1u, commits.size());
+   BOOST_REQUIRE_EQUAL(UWRIT_OP.to_string(), commits[0]["underwriter"].as_string());
+   BOOST_REQUIRE(commits[0]["source_received_at_ms"].as_uint64() != 0);
 } FC_LOG_AND_RETHROW() }
 
 // A second `deliver` from the SAME operator for the same outpost+epoch must REVERT, not land as a
