@@ -1,10 +1,13 @@
 #include <fc/io/secure_file.hpp>
 
 #include <algorithm>
+#include <atomic>
 #include <cerrno>
+#include <cstdint>
 #include <ios>
 #include <limits>
 #include <string>
+#include <string_view>
 #include <system_error>
 #include <utility>
 
@@ -19,14 +22,18 @@ namespace fc {
 namespace {
 
 #ifndef _WIN32
-constexpr mode_t secret_file_mode = S_IRUSR | S_IWUSR;
-constexpr int    invalid_descriptor = -1;
+constexpr mode_t      secret_file_mode        = S_IRUSR | S_IWUSR;
+constexpr auto        temp_file_prefix        = ".";
+constexpr auto        temp_file_separator     = ".tmp.";
+constexpr auto        temp_file_fallback_name = "secure-output";
+constexpr unsigned    max_temp_file_attempts  = 100;
+std::atomic<uint64_t> temp_file_counter{0};
 
 /**
- * Returns the platform open flags needed for secret output files.
+ * Returns the platform open flags needed for temporary secret output files.
  */
 int secret_file_open_flags() {
-   int flags = O_WRONLY | O_CREAT | O_NONBLOCK;
+   int flags = O_WRONLY | O_CREAT | O_EXCL;
 #ifdef O_CLOEXEC
    flags |= O_CLOEXEC;
 #endif
@@ -35,6 +42,53 @@ int secret_file_open_flags() {
 #endif
    return flags;
 }
+
+/**
+ * Returns the directory where the temporary file should be created.
+ */
+std::filesystem::path temp_file_directory(const std::filesystem::path& file_path) {
+   const auto parent = file_path.parent_path();
+   return parent.empty() ? std::filesystem::path(".") : parent;
+}
+
+/**
+ * Returns a filename component suitable for deriving a temporary secret-file path.
+ */
+std::string temp_file_base_name(const std::filesystem::path& file_path) {
+   auto base_name = file_path.filename().string();
+   return base_name.empty() ? std::string(temp_file_fallback_name) : base_name;
+}
+
+/**
+ * Returns a candidate temporary path in the target directory.
+ */
+std::filesystem::path make_temp_file_path(const std::filesystem::path& file_path, uint64_t attempt) {
+   const auto unique_id = temp_file_counter.fetch_add(1, std::memory_order_relaxed);
+   auto       temp_name = std::string(temp_file_prefix) + temp_file_base_name(file_path) + temp_file_separator +
+                    std::to_string(::getpid()) + "." + std::to_string(unique_id) + "." + std::to_string(attempt);
+   return temp_file_directory(file_path) / temp_name;
+}
+
+/**
+ * Removes a temporary file without throwing.
+ */
+void unlink_noexcept(const std::filesystem::path& file_path) noexcept {
+   if (!file_path.empty())
+      ::unlink(file_path.c_str());
+}
+
+/**
+ * Closes a file descriptor without throwing.
+ */
+void close_descriptor_noexcept(int file_descriptor) noexcept {
+   if (file_descriptor >= 0)
+      ::close(file_descriptor);
+}
+
+/**
+ * Rejects existing final targets that should not be replaced by a secret file.
+ */
+void throw_if_target_is_not_replaceable(const std::filesystem::path& file_path);
 #endif
 
 /**
@@ -47,42 +101,73 @@ int secret_file_open_flags() {
                                 std::error_code(err, std::generic_category()));
 }
 
+#ifndef _WIN32
+void throw_if_target_is_not_replaceable(const std::filesystem::path& file_path) {
+   struct stat stat_result {};
+   if (::lstat(file_path.c_str(), &stat_result) == -1) {
+      if (errno == ENOENT)
+         return;
+      throw_file_failure(file_path, "stat target", errno);
+   }
+
+   if (S_ISLNK(stat_result.st_mode))
+      throw_file_failure(file_path, "replace symlink target", ELOOP);
+
+   if (!S_ISREG(stat_result.st_mode))
+      throw_file_failure(file_path, "replace regular file", EINVAL);
+}
+
+/**
+ * Opens a unique owner-only temporary file in the target directory.
+ */
+std::pair<int, std::filesystem::path> open_temp_file(const std::filesystem::path& file_path) {
+   for (unsigned attempt = 0; attempt < max_temp_file_attempts; ++attempt) {
+      auto temp_path = make_temp_file_path(file_path, attempt);
+      int  fd        = ::open(temp_path.c_str(), secret_file_open_flags(), secret_file_mode);
+      if (fd >= 0)
+         return {fd, std::move(temp_path)};
+
+      if (errno != EEXIST)
+         throw_file_failure(file_path, "open temporary file", errno);
+   }
+
+   throw_file_failure(file_path, "create unique temporary file", EEXIST);
+}
+#endif
+
 } // namespace
 
 secure_output_file::secure_output_file(std::filesystem::path file_path)
    : file_path_(std::move(file_path)) {
 #ifndef _WIN32
-   int fd = ::open(file_path_.c_str(), secret_file_open_flags(), secret_file_mode);
-   if (fd == invalid_descriptor)
-      throw_file_failure(file_path_, "open", errno);
+   throw_if_target_is_not_replaceable(file_path_);
 
-   auto close_on_failure = [fd]() noexcept { ::close(fd); };
+   auto [fd, temp_path] = open_temp_file(file_path_);
+   auto cleanup_on_failure = [&]() noexcept {
+      close_descriptor_noexcept(fd);
+      unlink_noexcept(temp_path);
+   };
 
    struct stat stat_result {};
    if (::fstat(fd, &stat_result) == -1) {
       const int saved_errno = errno;
-      close_on_failure();
-      throw_file_failure(file_path_, "stat", saved_errno);
+      cleanup_on_failure();
+      throw_file_failure(file_path_, "stat temporary file", saved_errno);
    }
 
    if (!S_ISREG(stat_result.st_mode)) {
-      close_on_failure();
-      throw_file_failure(file_path_, "open regular file", EINVAL);
+      cleanup_on_failure();
+      throw_file_failure(file_path_, "open regular temporary file", EINVAL);
    }
 
    if (::fchmod(fd, secret_file_mode) == -1) {
       const int saved_errno = errno;
-      close_on_failure();
-      throw_file_failure(file_path_, "restrict permissions", saved_errno);
-   }
-
-   if (::ftruncate(fd, 0) == -1) {
-      const int saved_errno = errno;
-      close_on_failure();
-      throw_file_failure(file_path_, "truncate", saved_errno);
+      cleanup_on_failure();
+      throw_file_failure(file_path_, "restrict temporary file permissions", saved_errno);
    }
 
    file_descriptor_ = fd;
+   temp_file_path_  = std::move(temp_path);
 #else
    file_.open(file_path_, std::ios::out | std::ios::binary | std::ios::trunc);
    if (!file_)
@@ -94,6 +179,8 @@ secure_output_file::secure_output_file(secure_output_file&& other) noexcept
    : file_path_(std::move(other.file_path_)) {
 #ifndef _WIN32
    file_descriptor_ = std::exchange(other.file_descriptor_, invalid_file_descriptor);
+   temp_file_path_  = std::move(other.temp_file_path_);
+   other.temp_file_path_.clear();
 #else
    file_ = std::move(other.file_);
 #endif
@@ -105,6 +192,8 @@ secure_output_file& secure_output_file::operator=(secure_output_file&& other) no
       file_path_ = std::move(other.file_path_);
 #ifndef _WIN32
       file_descriptor_ = std::exchange(other.file_descriptor_, invalid_file_descriptor);
+      temp_file_path_  = std::move(other.temp_file_path_);
+      other.temp_file_path_.clear();
 #else
       file_ = std::move(other.file_);
 #endif
@@ -121,7 +210,7 @@ void secure_output_file::write(std::string_view content) {
    auto*  cursor    = content.data();
    size_t remaining = content.size();
    while (remaining > 0) {
-      const auto chunk = std::min(remaining, static_cast<size_t>(std::numeric_limits<ssize_t>::max()));
+      const auto chunk  = std::min(remaining, static_cast<size_t>(std::numeric_limits<ssize_t>::max()));
       const auto result = ::write(file_descriptor_, cursor, chunk);
       if (result > 0) {
          cursor += result;
@@ -145,8 +234,29 @@ void secure_output_file::close() {
       return;
 
    const int fd = std::exchange(file_descriptor_, invalid_file_descriptor);
-   if (::close(fd) == -1)
-      throw_file_failure(file_path_, "close", errno);
+   if (::fsync(fd) == -1) {
+      const int saved_errno = errno;
+      close_descriptor_noexcept(fd);
+      unlink_noexcept(temp_file_path_);
+      temp_file_path_.clear();
+      throw_file_failure(file_path_, "sync temporary file", saved_errno);
+   }
+
+   if (::close(fd) == -1) {
+      const int saved_errno = errno;
+      unlink_noexcept(temp_file_path_);
+      temp_file_path_.clear();
+      throw_file_failure(file_path_, "close temporary file", saved_errno);
+   }
+
+   if (::rename(temp_file_path_.c_str(), file_path_.c_str()) == -1) {
+      const int saved_errno = errno;
+      unlink_noexcept(temp_file_path_);
+      temp_file_path_.clear();
+      throw_file_failure(file_path_, "commit temporary file", saved_errno);
+   }
+
+   temp_file_path_.clear();
 #else
    if (!file_.is_open())
       return;
@@ -163,6 +273,8 @@ void secure_output_file::close_noexcept() noexcept {
       ::close(file_descriptor_);
       file_descriptor_ = invalid_file_descriptor;
    }
+   unlink_noexcept(temp_file_path_);
+   temp_file_path_.clear();
 #else
    if (file_.is_open())
       file_.close();

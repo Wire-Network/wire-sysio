@@ -12,15 +12,14 @@ namespace fc {
 /**
  * Owner-only output file for newly generated secret material.
  *
- * On POSIX systems the file is opened without following the final path component
- * when the platform exposes that flag, restricted to owner read/write
- * permissions, truncated, and then written through the opened descriptor.
+ * On POSIX systems content is written to an owner-only temporary file in the
+ * target directory and then committed with rename after a successful close. The
+ * final target is rejected when it is already a symlink or non-regular file.
  */
 class secure_output_file {
 public:
    /**
-    * Opens a secret output file and applies owner-only permissions before any
-    * caller-provided content is written.
+    * Opens an owner-only temporary file for a secret output.
     *
     * @param file_path path to the secret file to create or replace
     * @throws std::ios_base::failure when the file cannot be opened securely
@@ -59,13 +58,15 @@ public:
 private:
    void close_noexcept() noexcept;
 
+   std::filesystem::path file_path_;
+
 #ifndef _WIN32
    static constexpr int invalid_file_descriptor = -1;
    int                  file_descriptor_        = invalid_file_descriptor;
+   std::filesystem::path temp_file_path_;
 #else
    std::ofstream file_;
 #endif
-   std::filesystem::path file_path_;
 };
 
 /**
