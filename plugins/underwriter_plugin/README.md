@@ -17,15 +17,17 @@ underwriter only signs and submits underwriting commits.
 any failure logs a structured `elog` and skips cron registration:
 
 1. `sysio.opreg::operators[underwriter_account].status == OPERATOR_STATUS_ACTIVE`.
-2. Every registered non-depot chain in `sysio.chains::chains` has a
+2. Every **active** non-depot chain in `sysio.chains::chains` has a
    configured `--underwriter-{eth,sol}-outpost` endpoint of the matching
    VM family. The served set is derived from the registry while the
    outpost clients are built from config, so a missing or wrong-family
    endpoint would let the scan loop pick a request it cannot fully
-   commit — landing one leg and stalling the other.
-3. `sysio.authex::links` covers every chain in `sysio.chains::chains` —
+   commit — landing one leg and stalling the other. Inactive
+   (not-yet-`activchain`ed) chains are skipped, so registering a future
+   chain never blocks startup before its endpoint/collateral land.
+3. `sysio.authex::links` covers every active chain in `sysio.chains::chains` —
    the underwriter cannot sign a commit on a chain it has no authex link for.
-4. Non-zero balance on at least one TokenKind for every registered
+4. Non-zero balance on at least one TokenKind for every active
    outpost chain.
 5. The required source-deposit function / instruction names resolve
    against the loaded ABI / IDL files, and a signature self-test passes.
@@ -99,9 +101,10 @@ verifies the signature against every permission on `uw_account` via the
 > `--underwriter-sol-client-id`, `--underwriter-eth-opreg-addr`, and
 > `--underwriter-sol-program-id` options are replaced by the repeatable,
 > exact-`chain_code`-keyed `--underwriter-{eth,sol}-outpost` options above.
-> One entry is required for **every** registered non-depot chain in
-> `sysio.chains::chains`; the underwriter's per-chain contract / program
-> address now lives in that entry rather than in a per-family scalar option.
+> One entry is required for **every active** non-depot chain in
+> `sysio.chains::chains` (inactive/not-yet-activated chains are skipped);
+> the underwriter's per-chain contract / program address now lives in that
+> entry rather than in a per-family scalar option.
 
 ## Dependencies
 

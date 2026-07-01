@@ -373,11 +373,13 @@ struct underwriter_plugin::impl {
    //
    //  Checks (all required):
    //    1. Operator exists in `sysio.opreg::operators` and status == ACTIVE.
-   //    2. Every registered outpost chain in `sysio.chains::chains` has a
+   //    2. Every ACTIVE outpost chain in `sysio.chains::chains` has a
    //       configured `--underwriter-{eth,sol}-outpost` endpoint of the
    //       matching VM family. The served set is derived from the registry
    //       while the outpost clients are built from config, so a gap would
-   //       let the scan loop pick a request it cannot fully commit.
+   //       let the scan loop pick a request it cannot fully commit. Inactive
+   //       (not-yet-activated) chains are excluded, so registering a future
+   //       chain does not block startup before its endpoint is configured.
    //    3. `sysio.authex::links` covers every chain in the
    //       `sysio.chains::chains` registered set; without an authex link
    //       for a chain the underwriter cannot sign a commit on that chain.
@@ -436,16 +438,17 @@ struct underwriter_plugin::impl {
          return false;
       }
 
-      // -- Check 2: outpost-client wiring covers every registered chain --
+      // -- Check 2: outpost-client wiring covers every active chain --
       //
-      // The served set is derived from the registry (`outpost_chain_kinds`) by
-      // `is_available` / `select_coverable`, but the outpost_client handles are
-      // built only from operator-supplied `--underwriter-{eth,sol}-outpost`
-      // config (`outpost_endpoints`). A registered chain that is unconfigured,
-      // or configured under the wrong VM family, would let the scan loop
-      // SELECT a request for it and land one leg before discovering the other
-      // leg has no (or a wrong-kind) client (SEC-13/WSA-027). Fail closed here
-      // so a misconfigured underwriter never starts committing partial swaps.
+      // The served set is `outpost_chain_kinds` (ACTIVE non-depot chains only,
+      // per `read_outpost_registry`) as consumed by `is_available` /
+      // `select_coverable`, but the outpost_client handles are built only from
+      // operator-supplied `--underwriter-{eth,sol}-outpost` config
+      // (`outpost_endpoints`). An active chain that is unconfigured, or
+      // configured under the wrong VM family, would let the scan loop SELECT a
+      // request for it and land one leg before discovering the other leg has no
+      // (or a wrong-kind) client (SEC-13/WSA-027). Fail closed here so a
+      // misconfigured underwriter never starts committing partial swaps.
       {
          std::map<uint64_t, int> registered_kinds;
          for (const auto& [code, kind] : outpost_chain_kinds)
@@ -462,9 +465,9 @@ struct underwriter_plugin::impl {
             // is the CLAUDE.md-mandated spelling for proto enums.
             const ChainKind reg_kind = outpost_chain_kinds.at(gap->chain_code);
             if (gap->config_kind == underwriter_detail::endpoint_coverage_gap::unconfigured) {
-               elog("underwriter preflight: registered outpost chain {} (kind={}) has no "
+               elog("underwriter preflight: active outpost chain {} (kind={}) has no "
                     "--underwriter-eth-outpost / --underwriter-sol-outpost entry; configure "
-                    "one endpoint for every registered outpost chain",
+                    "one endpoint for every active outpost chain",
                     code_str, std::string{sysio::opp::types::ChainKind_Name(reg_kind)});
             } else {
                const ChainKind cfg_kind = outpost_endpoints.at(gap->chain_code).kind;
@@ -817,6 +820,9 @@ struct underwriter_plugin::impl {
       //   `is_depot`          — true for the WIRE depot's own row; we filter
       //                          it out since underwriters don't commit to the
       //                          depot itself.
+      //   `active`            - false until `sysio.chains::activchain` runs;
+      //                          post-bootstrap `regchain` rows start inactive,
+      //                          so they are not yet live outposts and are skipped.
       auto rows = read_all("sysio.chains", "sysio.chains", "chains");
       depot_chain_code.reset();
       for (auto& row : rows.rows) {
@@ -831,6 +837,15 @@ struct underwriter_plugin::impl {
             depot_chain_code = chain_code;
             continue;
          }
+         // Skip chains not yet activated. `regchain` inserts post-bootstrap
+         // rows with `active=false` until `activchain` flips them; treating an
+         // inactive (future) chain as a live outpost would make the endpoint-
+         // coverage preflight and `is_available()` demand config + collateral
+         // for a chain that is not serving yet, blocking startup or halting the
+         // already-active chains. Mirrors batch_operator_plugin's
+         // `is_depot || !active` outpost filter.
+         if (!obj.contains("active") || !obj["active"].as_bool())
+            continue;
          // FC_REFLECT_ENUM in sysio/opp/opp.hpp gives us a direct enum
          // round-trip — the variant carries the symbolic name and `.as<T>()`
          // recovers the typed value without a string switch.
