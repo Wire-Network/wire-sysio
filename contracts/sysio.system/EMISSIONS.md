@@ -31,7 +31,11 @@ does nothing.
 | Capex | `capex_bps` | `sysio.ops` | `T5 capex` |
 | Governance | `governance_bps` | `sysio.gov` | `T5 governance` |
 
-Producer / batch-op pay is weight- and eligible-rounds-scaled; shares of skipped
+Producer pay is weight-scaled: active producers carry a flat weight and are
+additionally scaled by their eligible rounds over the pay period, while standbys
+carry a rank-decreasing weight and are not round-scaled. Batch-op pay is weighted
+per group by that group's active-epoch count over the pay period, then split
+evenly among the group's opreg-ACTIVE members. Shares of skipped
 (slashed / terminated) recipients stay in the treasury. Swap-fee rewards from
 `sysio.reserv`'s `rewards_bucket` are swept in (`drainrewards`) and folded into
 the same compute distribution on top of emissions, split by the same
@@ -55,8 +59,8 @@ The capital bucket is the implicit remainder
 payepoch; it stays in sysio's balance and drains lazily:
 
 1. A cross-chain `STAKING_REWARD` OPP message lands on `sysio.dclaim::onreward`.
-2. `onreward` credits the staker's `pending_claims` row (or parks it in
-   `unmapped_tokens` when the account is not yet AuthX-linked) and calls
+2. `onreward` credits the staker's `pclaims` (pending-claims) row (or parks it
+   in `unmapped` when the account is not yet AuthX-linked) and calls
    `sysio.system::fundclaim` to pull matching WIRE from the pool into
    `sysio.dclaim`.
 3. The staker calls `dclaim::claim` (auth = their own account) to transfer the
