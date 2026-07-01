@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "description": "SEC-94 terminal epoch_in legacy-transaction budget fixture. The dynamic accounts are modeled as distinct remaining_accounts, which upper-bounds packet/account-key growth when shared programs dedupe with the static IDL accounts.",
+  "program": "opp_outpost",
+  "instruction": "epoch_in",
+  "program_id": "2FcAgnSdn29VXZ3eF2jS4U4KzGaYm5M9Wha1CtArm9EU",
+  "legacy_packet_limit_bytes": 1232,
+  "runtime_account_limit": 64,
+  "legacy_account_key_limit": 256,
+  "terminal_pre_instructions": [
+    {
+      "name": "request_heap_frame",
+      "bytes": 256000
+    }
+  ],
+  "terminal_args": {
+    "epoch_index": 7,
+    "chunk_index": 3,
+    "total_chunks": 3,
+    "total_bytes": 2526,
+    "chunk_data_bytes": 0
+  },
+  "static": {
+    "declared_idl_accounts": 12,
+    "instruction_data_bytes": 24,
+    "required_signatures": 1,
+    "legacy_account_keys": 14,
+    "loaded_accounts": 14,
+    "packet_bytes": 597
+  },
+  "cases": [
+    {
+      "name": "withdraw_remit_or_deposit_revert_native",
+      "attestation_type": "ATTESTATION_TYPE_OPERATOR_ACTION_WITHDRAW_REMIT_OR_DEPOSIT_REVERT",
+      "dynamic_remaining_accounts": 1,
+      "legacy_account_keys": 15,
+      "loaded_accounts": 15,
+      "packet_bytes": 630
+    },
+    {
+      "name": "native_reserve_effect",
+      "attestation_type": "ATTESTATION_TYPE_SWAP_REMIT_OR_SWAP_REVERT_OR_RESERVE_CREATE_CANCELLED_NATIVE",
+      "dynamic_remaining_accounts": 2,
+      "legacy_account_keys": 16,
+      "loaded_accounts": 16,
+      "packet_bytes": 663
+    },
+    {
+      "name": "swap_remit_spl",
+      "attestation_type": "ATTESTATION_TYPE_SWAP_REMIT",
+      "dynamic_remaining_accounts": 5,
+      "legacy_account_keys": 19,
+      "loaded_accounts": 19,
+      "packet_bytes": 762
+    },
+    {
+      "name": "swap_revert_or_reserve_cancelled_spl",
+      "attestation_type": "ATTESTATION_TYPE_SWAP_REVERT_OR_RESERVE_CREATE_CANCELLED",
+      "dynamic_remaining_accounts": 8,
+      "legacy_account_keys": 22,
+      "loaded_accounts": 22,
+      "packet_bytes": 861
+    },
+    {
+      "name": "max_wire_sysio_budget",
+      "attestation_type": "SEC_94_MAX_DYNAMIC_BUDGET",
+      "dynamic_remaining_accounts": 16,
+      "legacy_account_keys": 30,
+      "loaded_accounts": 30,
+      "packet_bytes": 1125
+    }
+  ]
+}

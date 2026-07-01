@@ -622,9 +622,9 @@ BOOST_FIXTURE_TEST_CASE(buildenv_packs_until_cap_then_leaves_remainder,
 } FC_LOG_AND_RETHROW() }
 
 /// Solana/SVM buildenv must stop before the terminal transaction's dynamic
-/// account budget is exceeded. With the launch default budget of 18 dynamic
-/// accounts and pessimistic SWAP_REMIT cost of 8 each, two swap remits fit and
-/// the third stays READY for a later epoch.
+/// account budget is exceeded. With the measured terminal packet baseline,
+/// the launch budget is 16 dynamic accounts; pessimistic SWAP_REMIT cost is
+/// 8 each, so two swap remits fit and the third stays READY for a later epoch.
 BOOST_FIXTURE_TEST_CASE(buildenv_svm_packs_until_terminal_budget_then_leaves_remainder,
                         sysio_msgch_envlog_tester) { try {
    bootstrap_epoch_config(/*retention=*/200);

@@ -8,10 +8,15 @@
 
 #include <sysio/outpost_solana_client_plugin.hpp>
 #include <sysio/outpost_solana_client_plugin/outpost_solana_client.hpp>
+#include <sysio.msgch/solana_terminal_budget.hpp>
 
 #include <sysio/opp/opp.pb.h>
 #include <sysio/opp/attestations/attestations.pb.h>
 #include <sysio/opp/types/types.pb.h>
+
+#include <algorithm>
+#include <filesystem>
+#include <map>
 
 using namespace std::literals;
 using namespace fc::network::solana;
@@ -20,10 +25,219 @@ namespace {
 
 constexpr std::string_view counter_anchor_idl_fixture = "solana-idl-counter-anchor.json";
 constexpr std::string_view opp_outpost_idl_fixture = "solana-idl-opp-outpost-stub.json";
+constexpr std::string_view sec94_terminal_budget_fixture = "sec-94-solana-terminal-budget.json";
 
+/// Measured legacy transaction dimensions for a terminal Solana `epoch_in` call.
+struct terminal_tx_measurement {
+   size_t declared_idl_accounts = 0;
+   size_t instruction_data_bytes = 0;
+   size_t required_signatures = 0;
+   size_t legacy_account_keys = 0;
+   size_t loaded_accounts = 0;
+   size_t packet_bytes = 0;
+};
+
+/// Load an Anchor IDL fixture from the libfc test fixture directory.
 idl::program load_idl_fixture(std::string_view filename) {
    auto path = fc::test::get_test_fixtures_path() / boost::filesystem::path(filename);
    return idl::parse_idl_file(path.generic_string());
+}
+
+/// Load a JSON fixture from the libfc test fixture directory.
+fc::variant load_json_fixture(std::string_view filename) {
+   auto path = fc::test::get_test_fixtures_path() / boost::filesystem::path(filename);
+   return fc::json::from_file(std::filesystem::path(path.generic_string()));
+}
+
+/// Create deterministic placeholder keys for transaction-size measurements.
+solana_public_key measurement_pubkey(uint32_t seed) {
+   solana_public_key key;
+   std::ranges::fill(key._data, 0);
+   key._data[0] = static_cast<uint8_t>(seed & 0xff);
+   key._data[1] = static_cast<uint8_t>((seed >> 8) & 0xff);
+   key._data[2] = static_cast<uint8_t>((seed >> 16) & 0xff);
+   key._data[3] = static_cast<uint8_t>((seed >> 24) & 0xff);
+   return key;
+}
+
+/// Append an unsigned 16-bit little-endian integer to an instruction buffer.
+void write_u16_le(std::vector<uint8_t>& out, uint16_t value) {
+   out.push_back(static_cast<uint8_t>(value & 0xff));
+   out.push_back(static_cast<uint8_t>((value >> 8) & 0xff));
+}
+
+/// Append an unsigned 32-bit little-endian integer to an instruction buffer.
+void write_u32_le(std::vector<uint8_t>& out, uint32_t value) {
+   out.push_back(static_cast<uint8_t>(value & 0xff));
+   out.push_back(static_cast<uint8_t>((value >> 8) & 0xff));
+   out.push_back(static_cast<uint8_t>((value >> 16) & 0xff));
+   out.push_back(static_cast<uint8_t>((value >> 24) & 0xff));
+}
+
+/// Encode the terminal zero-data `epoch_in` args used by the SEC-94 fixture.
+std::vector<uint8_t> terminal_epoch_in_data(const idl::instruction& instr,
+                                            const fc::variant_object& fixture) {
+   const auto& args = fixture["terminal_args"].get_object();
+   std::vector<uint8_t> data;
+   data.reserve(instr.discriminator.size() + 16 + args["chunk_data_bytes"].as_uint64());
+   data.insert(data.end(), instr.discriminator.begin(), instr.discriminator.end());
+   write_u32_le(data, static_cast<uint32_t>(args["epoch_index"].as_uint64()));
+   write_u16_le(data, static_cast<uint16_t>(args["chunk_index"].as_uint64()));
+   write_u16_le(data, static_cast<uint16_t>(args["total_chunks"].as_uint64()));
+   write_u32_le(data, static_cast<uint32_t>(args["total_bytes"].as_uint64()));
+   write_u32_le(data, static_cast<uint32_t>(args["chunk_data_bytes"].as_uint64()));
+   data.resize(data.size() + static_cast<size_t>(args["chunk_data_bytes"].as_uint64()));
+   return data;
+}
+
+/// Build the IDL-declared static account metas for terminal `epoch_in`.
+std::vector<account_meta> terminal_static_accounts(const idl::instruction& instr,
+                                                   const solana_public_key& fee_payer) {
+   std::vector<account_meta> accounts;
+   accounts.reserve(instr.accounts.size());
+   for (size_t i = 0; i < instr.accounts.size(); ++i) {
+      const auto& acct = instr.accounts[i];
+      solana_public_key key;
+      if (acct.name == "operator") {
+         key = fee_payer;
+      } else if (acct.name == "system_program") {
+         key = system::program_ids::SYSTEM_PROGRAM;
+      } else {
+         key = measurement_pubkey(static_cast<uint32_t>(100 + i));
+      }
+
+      if (acct.is_signer) {
+         accounts.push_back(account_meta::signer(key, acct.is_mut));
+      } else if (acct.is_mut) {
+         accounts.push_back(account_meta::writable(key, false));
+      } else {
+         accounts.push_back(account_meta::readonly(key, false));
+      }
+   }
+   return accounts;
+}
+
+/// Build a legacy Solana transaction using the same account ordering rules as the client.
+transaction build_measured_legacy_transaction(const std::vector<instruction>& instructions,
+                                              const solana_public_key& fee_payer) {
+   transaction tx;
+   tx.msg.recent_blockhash = measurement_pubkey(2);
+
+   std::vector<account_meta> all_accounts;
+   all_accounts.push_back(account_meta::signer(fee_payer, true));
+
+   auto add_account = [&](const account_meta& meta) {
+      auto it = std::find_if(all_accounts.begin(), all_accounts.end(), [&](const auto& existing) {
+         return existing.key == meta.key;
+      });
+      if (it == all_accounts.end()) {
+         all_accounts.push_back(meta);
+         return;
+      }
+      it->is_signer = it->is_signer || meta.is_signer;
+      it->is_writable = it->is_writable || meta.is_writable;
+   };
+
+   for (const auto& instr : instructions) {
+      for (const auto& meta : instr.accounts) {
+         add_account(meta);
+      }
+      add_account(account_meta::readonly(instr.program_id, false));
+   }
+
+   std::vector<account_meta> writable_signers;
+   std::vector<account_meta> readonly_signers;
+   std::vector<account_meta> writable_non_signers;
+   std::vector<account_meta> readonly_non_signers;
+   for (const auto& meta : all_accounts) {
+      if (meta.is_signer) {
+         (meta.is_writable ? writable_signers : readonly_signers).push_back(meta);
+      } else {
+         (meta.is_writable ? writable_non_signers : readonly_non_signers).push_back(meta);
+      }
+   }
+
+   auto append_keys = [&](const std::vector<account_meta>& metas) {
+      for (const auto& meta : metas) {
+         tx.msg.account_keys.push_back(meta.key);
+      }
+   };
+   append_keys(writable_signers);
+   append_keys(readonly_signers);
+   append_keys(writable_non_signers);
+   append_keys(readonly_non_signers);
+
+   tx.msg.header.num_required_signatures =
+      static_cast<uint8_t>(writable_signers.size() + readonly_signers.size());
+   tx.msg.header.num_readonly_signed_accounts = static_cast<uint8_t>(readonly_signers.size());
+   tx.msg.header.num_readonly_unsigned_accounts = static_cast<uint8_t>(readonly_non_signers.size());
+
+   std::map<solana_public_key, size_t> key_index_map;
+   for (size_t i = 0; i < tx.msg.account_keys.size(); ++i) {
+      key_index_map[tx.msg.account_keys[i]] = i;
+   }
+
+   for (const auto& instr : instructions) {
+      compiled_instruction compiled;
+      compiled.program_id_index = static_cast<uint8_t>(key_index_map.at(instr.program_id));
+      for (const auto& meta : instr.accounts) {
+         compiled.account_indices.push_back(static_cast<uint8_t>(key_index_map.at(meta.key)));
+      }
+      compiled.data = instr.data;
+      tx.msg.instructions.push_back(std::move(compiled));
+   }
+
+   tx.signatures.resize(tx.msg.header.num_required_signatures);
+   validate_legacy_transaction(tx);
+   return tx;
+}
+
+/// Measure terminal `epoch_in` with distinct dynamic `remaining_accounts`.
+terminal_tx_measurement measure_terminal_epoch_in_transaction(const idl::instruction& instr,
+                                                              const fc::variant_object& fixture,
+                                                              size_t dynamic_accounts) {
+   const auto fee_payer = measurement_pubkey(1);
+   auto accounts = terminal_static_accounts(instr, fee_payer);
+   accounts.reserve(accounts.size() + dynamic_accounts);
+   for (size_t i = 0; i < dynamic_accounts; ++i) {
+      accounts.push_back(account_meta::writable(measurement_pubkey(static_cast<uint32_t>(1'000 + i)), false));
+   }
+
+   const auto program_id = solana_public_key::from_base58_string(fixture["program_id"].as_string());
+   const auto heap_bytes =
+      fixture["terminal_pre_instructions"].get_array().front()["bytes"].as_uint64();
+   std::vector<instruction> instructions = {
+      system::compute_budget::request_heap_frame(static_cast<uint32_t>(heap_bytes)),
+      instruction{program_id, std::move(accounts), terminal_epoch_in_data(instr, fixture)},
+   };
+
+   auto tx = build_measured_legacy_transaction(instructions, fee_payer);
+   const auto packet = tx.serialize();
+   return terminal_tx_measurement{
+      .declared_idl_accounts = instr.accounts.size(),
+      .instruction_data_bytes = instructions.back().data.size(),
+      .required_signatures = tx.msg.header.num_required_signatures,
+      .legacy_account_keys = tx.msg.account_keys.size(),
+      .loaded_accounts = tx.msg.account_keys.size(),
+      .packet_bytes = packet.size(),
+   };
+}
+
+/// Assert that a measured transaction row exactly matches the JSON fixture.
+void check_measurement_matches_fixture(const terminal_tx_measurement& measured,
+                                       const fc::variant_object& expected) {
+   if (expected.contains("declared_idl_accounts")) {
+      BOOST_CHECK_EQUAL(measured.declared_idl_accounts, expected["declared_idl_accounts"].as_uint64());
+   }
+   if (expected.contains("instruction_data_bytes")) {
+      BOOST_CHECK_EQUAL(measured.instruction_data_bytes, expected["instruction_data_bytes"].as_uint64());
+   }
+   if (expected.contains("required_signatures")) {
+      BOOST_CHECK_EQUAL(measured.required_signatures, expected["required_signatures"].as_uint64());
+   }
+   BOOST_CHECK_EQUAL(measured.legacy_account_keys, expected["legacy_account_keys"].as_uint64());
+   BOOST_CHECK_EQUAL(measured.loaded_accounts, expected["loaded_accounts"].as_uint64());
+   BOOST_CHECK_EQUAL(measured.packet_bytes, expected["packet_bytes"].as_uint64());
 }
 
 } // anonymous namespace
@@ -84,6 +298,43 @@ BOOST_AUTO_TEST_CASE(opp_outpost_epoch_in_has_chunked_args) try {
    BOOST_CHECK_EQUAL(epoch_in->accounts[6].name, "outbound_message_buffer");
    BOOST_CHECK_EQUAL(epoch_in->accounts[8].name, "latest_outbound_envelope");
    BOOST_CHECK_EQUAL(epoch_in->accounts[10].name, "reserve_aggregate");
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(sec94_terminal_budget_fixture_matches_contract_estimator) try {
+   auto prog = load_idl_fixture(opp_outpost_idl_fixture);
+   auto fixture = load_json_fixture(sec94_terminal_budget_fixture).get_object();
+
+   const idl::instruction* epoch_in = nullptr;
+   for (auto& instr : prog.instructions) {
+      if (instr.name == "epoch_in") { epoch_in = &instr; break; }
+   }
+   BOOST_REQUIRE(epoch_in != nullptr);
+
+   const auto static_measured = measure_terminal_epoch_in_transaction(*epoch_in, fixture, 0);
+   check_measurement_matches_fixture(static_measured, fixture["static"].get_object());
+   BOOST_CHECK_LE(static_measured.packet_bytes,
+                  sysio::msgch_svm_terminal_budget::SVM_TERMINAL_STATIC_PACKET_BYTES_WITH_MARGIN);
+   BOOST_CHECK_LE(static_measured.legacy_account_keys,
+                  sysio::msgch_svm_terminal_budget::SVM_TERMINAL_STATIC_ACCOUNT_KEYS);
+   BOOST_CHECK_LE(static_measured.loaded_accounts,
+                  sysio::msgch_svm_terminal_budget::SVM_TERMINAL_STATIC_LOADED_ACCOUNTS);
+   BOOST_CHECK_EQUAL(sysio::msgch_svm_terminal_budget::svm_hard_dynamic_account_budget(), 16u);
+
+   for (const auto& entry : fixture["cases"].get_array()) {
+      const auto& test_case = entry.get_object();
+      const auto dynamic_accounts = static_cast<size_t>(test_case["dynamic_remaining_accounts"].as_uint64());
+      const auto measured = measure_terminal_epoch_in_transaction(*epoch_in, fixture, dynamic_accounts);
+      check_measurement_matches_fixture(measured, test_case);
+      BOOST_CHECK(sysio::msgch_svm_terminal_budget::svm_terminal_budget_fits(dynamic_accounts));
+      BOOST_CHECK_LE(measured.packet_bytes,
+                     sysio::msgch_svm_terminal_budget::svm_estimated_terminal_packet_bytes(dynamic_accounts));
+      BOOST_CHECK_LE(measured.packet_bytes,
+                     sysio::msgch_svm_terminal_budget::SVM_TERMINAL_PACKET_BUDGET_BYTES);
+      BOOST_CHECK_LE(measured.loaded_accounts,
+                     sysio::msgch_svm_terminal_budget::SVM_TERMINAL_STATIC_LOADED_ACCOUNTS + dynamic_accounts);
+      BOOST_CHECK_LE(measured.legacy_account_keys,
+                     sysio::msgch_svm_terminal_budget::SVM_TERMINAL_STATIC_ACCOUNT_KEYS + dynamic_accounts);
+   }
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(opp_outpost_cleanup_envelope_chunks_present) try {
