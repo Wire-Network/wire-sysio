@@ -1482,6 +1482,17 @@ void uwrit::rcrdcommit(uint64_t uwreq_id,
       return;
    }
 
+   // Only a registered ACTIVE underwriter can win this race — try_select_winner enforces the same
+   // gate, and the DISQUALIFIED re-arm below already requires a fresh rcrdcommit, so an entry for
+   // any other account is pure dead weight. Refuse to create one: otherwise a matched-leg UIC could
+   // append one commit_entry per attacker-chosen valid-but-unregistered account name and bloat the
+   // row. Fail closed, no mutation, never check().
+   if (!is_active_underwriter(underwriter)) {
+      sysio::print("rcrdcommit: uwreq ", uwreq_id, " underwriter ", underwriter,
+                   " is not an ACTIVE underwriter, skipping\n");
+      return;
+   }
+
    reqs.modify(same_payer, pk, [&](auto& r) {
       auto* c = find_or_create_commit(r, underwriter);
       uint64_t now_ms = current_time_ms();

@@ -1082,6 +1082,28 @@ BOOST_FIXTURE_TEST_CASE(rcrdcommit_matched_source_leg_is_recorded,
    BOOST_REQUIRE(commits[0]["source_received_at_ms"].as_uint64() != 0);
 } FC_LOG_AND_RETHROW() }
 
+// Even on a matched leg, a UIC whose account name is a valid `name` but NOT a registered ACTIVE
+// underwriter must not create a commit_entry: only active underwriters can win, so gating entry
+// creation on activation bounds commits_by to the legitimate racer set and blocks the matched-leg
+// name-varying bloat vector (varying valid account names would otherwise append one entry per name).
+BOOST_FIXTURE_TEST_CASE(rcrdcommit_matched_leg_non_underwriter_names_do_not_grow_row,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+   constexpr uint64_t ATT_ID = 9303;
+   setup_eth_to_sol_uwreq(ATT_ID);   // src=(ETH,ETH,PRIMARY)
+
+   const auto eth = fc::slug_name{"ETH"}.value;
+   const std::vector<char> uic(8, '\x00');   // opaque: dropped before the bytes are ever read
+
+   // (ETH, ETH, PRIMARY) IS the source leg, so these clear the leg-binding guard; each name is a
+   // valid sysio::name but none is a registered underwriter, so all are dropped before mutation.
+   for (name uw : {"alice"_n, "bob"_n, "carol"_n}) {
+      BOOST_REQUIRE_EQUAL(success(),
+         rcrdcommit_direct(ATT_ID, uw, eth, "ETH", "ETH", "PRIMARY", uic));
+   }
+   BOOST_REQUIRE_EQUAL(0u, get_uwreq(ATT_ID)["commits_by"].get_array().size());
+} FC_LOG_AND_RETHROW() }
+
 // A second `deliver` from the SAME operator for the same outpost+epoch must REVERT, not land as a
 // recorded no-op: a reverted transaction is never included in a block and bills no CPU/NET, whereas
 // the previous soft print-and-return shape charged the operator and consumed block space for zero
@@ -1475,24 +1497,24 @@ BOOST_FIXTURE_TEST_CASE(swap_candidate_with_invalid_uic_signature_is_disqualifie
    BOOST_REQUIRE(found);
 } FC_LOG_AND_RETHROW() }
 
-// ── Underwriter role + activation gate at winner selection ───────────────────
+// ── Underwriter role + activation gate at commit ingestion ───────────────────
 //
-// `try_select_winner` must select only an ACTIVE UNDERWRITER (opreg type ==
-// UNDERWRITER && status == ACTIVE). The balance mirror it reads zeroes only
-// SLASHED / TERMINATED and ignores `op.type`, so before this gate a candidate
-// needed merely a valid UIC signature and enough mirrored bond — letting a
-// non-underwriter, or a not-yet-active underwriter, become the persisted winner,
-// consume lock capacity, and drive settlement. Both cases below carry real ETH
-// bond and a valid self-signed UIC; only the eligibility gate stops them, and it
-// leaves the race PENDING (reclaimable) for a genuine winner. The positive
-// control — an ACTIVE underwriter that wins — is `swap_same_token_legs_exact_balance_wins`.
+// Only an ACTIVE UNDERWRITER (opreg type == UNDERWRITER && status == ACTIVE) can
+// win a race, so `rcrdcommit` refuses to record a commit_entry for anything else:
+// a UIC from a non-underwriter, or a not-yet-active underwriter, is dropped before
+// any mutation. This bounds `commits_by` to the registered active-underwriter set,
+// so a matched-leg UIC cannot append one row per attacker-chosen valid name.
+// `try_select_winner` keeps the same eligibility check as defensive depth. Both
+// cases below carry real ETH bond and a valid self-signed UIC; the ingestion gate
+// drops them (no row, no lock) and leaves the race PENDING (reclaimable) for a
+// genuine winner. The positive control — an ACTIVE underwriter that wins — is
+// `swap_same_token_legs_exact_balance_wins`.
 
-// A non-underwriter operator that is fully ACTIVE and bonded — a funded
-// PRODUCER — cannot win an underwriting race even with a valid self-signed UIC.
-// Activating it (status ACTIVE) isolates the op.type half of the gate: a
-// status-only check would let it through, so this test fails if the type check
-// is dropped.
-BOOST_FIXTURE_TEST_CASE(swap_winner_non_underwriter_type_is_disqualified,
+// A non-underwriter operator that is fully ACTIVE and bonded — a funded PRODUCER —
+// cannot have a commit recorded even with a valid self-signed UIC. Activating it
+// (status ACTIVE) isolates the op.type half of the gate: a status-only check would
+// let it through, so this test fails if the type check is dropped.
+BOOST_FIXTURE_TEST_CASE(swap_commit_non_underwriter_type_is_dropped,
                         sysio_dispatch_tester) { try {
    bootstrap_for_dispatch();          // ETH source outpost + UWRIT_OP
    register_wire_depot();             // to-WIRE: a single (source) required leg
@@ -1546,25 +1568,20 @@ BOOST_FIXTURE_TEST_CASE(swap_winner_non_underwriter_type_is_disqualified,
    BOOST_REQUIRE_EQUAL(success(),
       rcrdcommit_direct(ATT_ID, PRODOP, eth, "ETH", "ETH", "PRIMARY", uic));
 
+   // rcrdcommit drops the commit at ingestion — an ACTIVE PRODUCER is the wrong role, so it is not
+   // an ACTIVE underwriter. No commit_entry is created (no row growth), the uwreq stays PENDING, and
+   // no lock is written.
    const auto req = get_uwreq(ATT_ID);
    BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_PENDING", req["status"].as_string());
-   bool found = false;
-   for (const auto& c : req["commits_by"].get_array()) {
-      if (c["underwriter"].as_string() == PRODOP.to_string()) {
-         found = true;
-         BOOST_REQUIRE_EQUAL("UNDERWRITE_STATUS_DISQUALIFIED", c["status"].as_string());
-         BOOST_REQUIRE(c["reason"].as_string().find("underwriter") != std::string::npos);
-      }
-   }
-   BOOST_REQUIRE(found);
+   BOOST_REQUIRE_EQUAL(0u, req["commits_by"].get_array().size());
    BOOST_REQUIRE(get_lock(1).is_null());   // no lock written
 } FC_LOG_AND_RETHROW() }
 
 // A registered UNDERWRITER that has NOT cleared its activation threshold (status
-// UNKNOWN) cannot win, even funded on the swap's leg. Requiring an additional
-// unfunded collateral pair (SOLANA/SOL) keeps UWRIT_OP inactive while it still
-// holds ample ETH bond — isolating the activation gate from the bond check.
-BOOST_FIXTURE_TEST_CASE(swap_winner_inactive_underwriter_is_disqualified,
+// UNKNOWN) cannot have a commit recorded, even funded on the swap's leg. Requiring
+// an additional unfunded collateral pair (SOLANA/SOL) keeps UWRIT_OP inactive while
+// it still holds ample ETH bond — isolating the activation gate from the bond check.
+BOOST_FIXTURE_TEST_CASE(swap_commit_inactive_underwriter_is_dropped,
                         sysio_dispatch_tester) { try {
    bootstrap_for_dispatch();
    register_wire_depot();
@@ -1601,17 +1618,11 @@ BOOST_FIXTURE_TEST_CASE(swap_winner_inactive_underwriter_is_disqualified,
    BOOST_REQUIRE_EQUAL(success(),
       rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", uic));
 
+   // rcrdcommit drops the commit at ingestion — UWRIT_OP is a registered underwriter but not yet
+   // ACTIVE. No commit_entry is created, the uwreq stays PENDING, and no lock is written.
    const auto req = get_uwreq(ATT_ID);
    BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_PENDING", req["status"].as_string());
-   bool found = false;
-   for (const auto& c : req["commits_by"].get_array()) {
-      if (c["underwriter"].as_string() == UWRIT_OP.to_string()) {
-         found = true;
-         BOOST_REQUIRE_EQUAL("UNDERWRITE_STATUS_DISQUALIFIED", c["status"].as_string());
-         BOOST_REQUIRE(c["reason"].as_string().find("underwriter") != std::string::npos);
-      }
-   }
-   BOOST_REQUIRE(found);
+   BOOST_REQUIRE_EQUAL(0u, req["commits_by"].get_array().size());
    BOOST_REQUIRE(get_lock(1).is_null());
 } FC_LOG_AND_RETHROW() }
 
