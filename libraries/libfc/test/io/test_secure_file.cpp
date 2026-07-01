@@ -5,6 +5,7 @@
 #include <fc/io/secure_file.hpp>
 
 #include <fstream>
+#include <memory>
 #include <string>
 #include <utility>
 
@@ -27,48 +28,20 @@ constexpr auto   second_secret_contents        = "replacement\n";
 constexpr auto   symlink_target_contents       = "target\n";
 
 /**
- * Closes a POSIX file descriptor when a test scope exits.
+ * Closes and releases a heap-owned POSIX file descriptor when a test scope exits.
  */
-class scoped_file_descriptor {
-public:
-   explicit scoped_file_descriptor(int file_descriptor)
-      : file_descriptor_(file_descriptor) {}
-
-   scoped_file_descriptor(const scoped_file_descriptor&) = delete;
-   scoped_file_descriptor& operator=(const scoped_file_descriptor&) = delete;
-
-   scoped_file_descriptor(scoped_file_descriptor&& other) noexcept
-      : file_descriptor_(std::exchange(other.file_descriptor_, closed_file_descriptor)) {}
-
-   scoped_file_descriptor& operator=(scoped_file_descriptor&& other) noexcept {
-      if (this != &other) {
-         close();
-         file_descriptor_ = std::exchange(other.file_descriptor_, closed_file_descriptor);
-      }
-      return *this;
-   }
-
-   ~scoped_file_descriptor() {
-      close();
-   }
-
-   /**
-    * Returns the wrapped file descriptor.
-    */
-   int get() const { return file_descriptor_; }
-
-private:
-   static constexpr int closed_file_descriptor = -1;
-
-   void close() noexcept {
-      if (file_descriptor_ != closed_file_descriptor) {
-         ::close(file_descriptor_);
-         file_descriptor_ = closed_file_descriptor;
+struct file_descriptor_deleter {
+   void operator()(int* file_descriptor) const noexcept {
+      if (file_descriptor != nullptr) {
+         if (*file_descriptor >= 0) {
+            ::close(*file_descriptor);
+         }
+         delete file_descriptor;
       }
    }
-
-   int file_descriptor_;
 };
+
+using file_descriptor_ptr = std::unique_ptr<int, file_descriptor_deleter>;
 
 /**
  * Restores the process umask when a test scope exits.
@@ -141,14 +114,14 @@ BOOST_AUTO_TEST_CASE(write_secure_file_replaces_existing_file_with_owner_only_fi
    }
    BOOST_REQUIRE_EQUAL(::chmod(secret_path.c_str(), group_world_readable_mode), 0);
    BOOST_REQUIRE_EQUAL(file_mode(secret_path), group_world_readable_mode);
-   scoped_file_descriptor existing_reader(::open(secret_path.c_str(), O_RDONLY));
-   BOOST_REQUIRE_GE(existing_reader.get(), 0);
+   file_descriptor_ptr existing_reader(new int(::open(secret_path.c_str(), O_RDONLY)));
+   BOOST_REQUIRE_GE(*existing_reader, 0);
 
    fc::write_secure_file(secret_path, second_secret_contents);
 
    BOOST_REQUIRE_EQUAL(file_mode(secret_path), secret_file_mode);
    BOOST_REQUIRE_EQUAL(file_contents(secret_path), second_secret_contents);
-   BOOST_REQUIRE_EQUAL(descriptor_contents(existing_reader.get()), first_secret_contents);
+   BOOST_REQUIRE_EQUAL(descriptor_contents(*existing_reader), first_secret_contents);
 }
 
 BOOST_AUTO_TEST_CASE(secure_output_file_supports_move_construction_and_assignment) {
