@@ -494,6 +494,49 @@ BOOST_AUTO_TEST_CASE(extract_reserve_seeds_includes_all_terminal_reserve_effects
    BOOST_CHECK_EQUAL(seeds[3].reserve_code, 203u);
 } FC_LOG_AND_RETHROW();
 
+BOOST_AUTO_TEST_CASE(extract_reserve_create_cancelled_seeds_only_reads_cancelled_effects) try {
+   auto recipient = filled_pubkey(0x53);
+   auto depositor = filled_pubkey(0x54);
+   auto envelope  = envelope_with_entries({
+      swap_remit_entry(110, 210, make_sol_addr(recipient)),
+      reserve_create_cancelled_entry(111, 211),
+      swap_revert_entry(112, 212, make_sol_addr(depositor)),
+      reserve_create_cancelled_entry(111, 211),
+      reserve_create_cancelled_entry(113, 213),
+   });
+
+   auto seeds = sysio::outpost_solana_client_detail::extract_inbound_reserve_create_cancelled_seeds(envelope);
+   BOOST_REQUIRE_EQUAL(seeds.size(), 2u);
+   BOOST_CHECK_EQUAL(seeds[0].token_code, 111u);
+   BOOST_CHECK_EQUAL(seeds[0].reserve_code, 211u);
+   BOOST_CHECK_EQUAL(seeds[1].token_code, 113u);
+   BOOST_CHECK_EQUAL(seeds[1].reserve_code, 213u);
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(record_terminal_account_dedupes_and_merges_writable) try {
+   std::vector<account_meta> metas;
+   const solana_public_key readonly_key(filled_pubkey(0x55));
+   const solana_public_key writable_key(filled_pubkey(0x56));
+
+   sysio::outpost_solana_client_detail::record_terminal_account(metas, readonly_key, false);
+   BOOST_REQUIRE_EQUAL(metas.size(), 1u);
+   BOOST_CHECK(metas[0].key == readonly_key);
+   BOOST_CHECK(!metas[0].is_signer);
+   BOOST_CHECK(!metas[0].is_writable);
+
+   sysio::outpost_solana_client_detail::record_terminal_account(metas, readonly_key, true);
+   BOOST_REQUIRE_EQUAL(metas.size(), 1u);
+   BOOST_CHECK(metas[0].key == readonly_key);
+   BOOST_CHECK(!metas[0].is_signer);
+   BOOST_CHECK(metas[0].is_writable);
+
+   sysio::outpost_solana_client_detail::record_terminal_account(metas, writable_key, true);
+   BOOST_REQUIRE_EQUAL(metas.size(), 2u);
+   BOOST_CHECK(metas[1].key == writable_key);
+   BOOST_CHECK(!metas[1].is_signer);
+   BOOST_CHECK(metas[1].is_writable);
+} FC_LOG_AND_RETHROW();
+
 BOOST_AUTO_TEST_CASE(extract_swap_remit_spl_targets_uses_recipient_pubkey) try {
    auto recipient = filled_pubkey(0x61);
    auto envelope  = envelope_with_entries({

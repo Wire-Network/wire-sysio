@@ -101,8 +101,9 @@ constexpr size_t   SVM_TERMINAL_ACCOUNT_KEY_BUDGET =
 constexpr size_t   SVM_DYNAMIC_ACCOUNT_PACKET_BYTES = 33;
 
 /// Conservative zero-data terminal-finalize static packet size, including
-/// safety margin. The cross-repo measurement fixture must pin this before the
-/// SEC-94 cutover; until then, keep the value pessimistic.
+/// safety margin. This is a consensus parameter coupled to wire-solana's
+/// terminal `epoch_in` account list; any relay/program account-layout change
+/// must update this upper-bound estimate before the dynamic budget increases.
 constexpr size_t   SVM_TERMINAL_STATIC_PACKET_BYTES_WITH_MARGIN = 558;
 
 /// Conservative static loaded-account count for the zero-data terminal
@@ -148,7 +149,7 @@ constexpr size_t svm_hard_dynamic_account_budget() {
 }
 
 static_assert(svm_hard_dynamic_account_budget() == 18,
-              "SEC-94 SVM dynamic-account budget changed; update tests and the plan");
+              "SEC-94 SVM dynamic-account budget changed; update tests and terminal budget docs");
 
 /// Estimate terminal transaction bytes from the dynamic account count.
 constexpr size_t svm_estimated_terminal_packet_bytes(size_t dynamic_accounts) {
@@ -1436,6 +1437,15 @@ void msgch::queueout(uint64_t chain_code,
    check(has_auth(EPOCH_ACCOUNT) || has_auth(OPREG_ACCOUNT) || has_auth(UWRIT_ACCOUNT) ||
          has_auth(RESERV_ACCOUNT) || has_auth(get_self()),
          "queueout: caller not authorized to queue outbound attestations");
+
+   {
+      sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
+      auto chain_it = chains_tbl.find(sysio::chains::chain_key{sysio::slug_name{chain_code}});
+      if (chain_it != chains_tbl.end() && chain_it->kind == ChainKind::CHAIN_KIND_SVM) {
+         check(estimate_svm_dynamic_accounts(attest_type, data).has_value(),
+               "sysio.msgch::queueout: no Solana terminal account estimate for attestation");
+      }
+   }
 
    auto now_sec = static_cast<uint64_t>(current_time_point().sec_since_epoch());
 

@@ -1461,10 +1461,10 @@ transaction solana_client::create_transaction(const std::vector<instruction>& in
    // Compile instructions
    for (const auto& instr : instructions) {
       compiled_instruction compiled;
-      compiled.program_id_index = checked_u8_index(key_index_map[instr.program_id], "program id");
+      compiled.program_id_index = checked_u8_index(key_index_map.at(instr.program_id), "program id");
 
       for (const auto& meta : instr.accounts) {
-         compiled.account_indices.push_back(checked_u8_index(key_index_map[meta.key], "account"));
+         compiled.account_indices.push_back(checked_u8_index(key_index_map.at(meta.key), "account"));
       }
 
       compiled.data = instr.data;

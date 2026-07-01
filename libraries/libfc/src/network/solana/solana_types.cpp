@@ -316,7 +316,6 @@ std::vector<uint8_t> transaction::serialize() const {
 }
 
 void validate_legacy_transaction(const transaction& tx) {
-   validate_legacy_message(tx.msg);
    (void)tx.serialize();
 }
 

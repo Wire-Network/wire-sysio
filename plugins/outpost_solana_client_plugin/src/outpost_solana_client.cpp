@@ -73,6 +73,8 @@ std::optional<fc::network::solana::solana_public_key> sol_pubkey_from_chain_addr
    return fc::network::solana::solana_public_key(bytes);
 }
 
+} // anonymous namespace (within outpost_solana_client_detail)
+
 /// Append a terminal remaining-account meta, merging permissions when a
 /// previous effect branch already added the same pubkey.
 void record_terminal_account(std::vector<fc::network::solana::account_meta>& metas,
@@ -89,6 +91,8 @@ void record_terminal_account(std::vector<fc::network::solana::account_meta>& met
    }
    it->is_writable = it->is_writable || is_writable;
 }
+
+namespace {
 
 /// Little-endian seed bytes for Anchor PDA derivation from a `u64`.
 std::vector<uint8_t> u64_seed(uint64_t value) {
@@ -358,7 +362,7 @@ extract_inbound_reserve_create_cancelled_seeds(const std::vector<char>& envelope
    return seeds;
 }
 
-} // namespace
+} // namespace outpost_solana_client_detail
 
 outpost_solana_client::outpost_solana_client(
    solana_client_entry_ptr                        entry,
@@ -453,7 +457,7 @@ std::string outpost_solana_client::deliver_outbound_envelope(
    // Reserve PDA first and use its pinned custody facts, not mutable
    // OutpostConfig token rows.
    std::vector<fc::network::solana::account_meta> terminal_accounts;
-   std::map<std::pair<uint64_t, uint64_t>, reserve_terminal_info> reserve_info_cache;
+   std::map<std::pair<uint64_t, uint64_t>, std::optional<reserve_terminal_info>> reserve_info_cache;
 
    auto add_terminal_account = [&](const fc::network::solana::solana_public_key& key,
                                    bool is_writable) {
@@ -465,8 +469,7 @@ std::string outpost_solana_client::deliver_outbound_envelope(
       if (it != reserve_info_cache.end()) return it->second;
 
       auto info = reserve_info_for_codes(token_code, reserve_code);
-      if (!info.has_value()) return std::nullopt;
-      return reserve_info_cache.emplace(cache_key, *info).first->second;
+      return reserve_info_cache.emplace(cache_key, std::move(info)).first->second;
    };
    auto is_native_custody = [](const fc::network::solana::solana_public_key& mint) {
       return mint == fc::network::solana::system::program_ids::SYSTEM_PROGRAM;

@@ -99,6 +99,12 @@ using outpost_solana_client_ptr = std::shared_ptr<outpost_solana_client>;
 
 namespace outpost_solana_client_detail {
 
+/// Append `key` to `metas`, or merge its writable flag into the existing
+/// entry when an earlier terminal effect already required the same account.
+void record_terminal_account(std::vector<fc::network::solana::account_meta>& metas,
+                             const fc::network::solana::solana_public_key& key,
+                             bool is_writable);
+
 /// Decode an inbound envelope and return the deduplicated set of
 /// 32-byte Solana pubkeys that the on-chain `epoch_in` handler will
 /// need to address in its CPI lamport transfers:
@@ -151,6 +157,14 @@ struct reserve_pda_seeds {
 /// the lifecycle types are first-class here, not best-effort.
 std::vector<reserve_pda_seeds>
 extract_inbound_swap_remit_reserve_seeds(const std::vector<char>& envelope_bytes);
+
+/// Walk every `RESERVE_CREATE_CANCELLED` attestation in `envelope_bytes`
+/// and collect each unique reserve PDA seed pair. The terminal manifest
+/// uses this narrower extractor after the Reserve PDA has been declared so
+/// it can append branch-specific refund/vault accounts from pinned reserve
+/// metadata.
+std::vector<reserve_pda_seeds>
+extract_inbound_reserve_create_cancelled_seeds(const std::vector<char>& envelope_bytes);
 
 /// Tuple of (token_code, reserve_code, recipient) pulled from every
 /// inbound SWAP_REMIT attestation in the envelope. The relay uses this
