@@ -245,14 +245,30 @@ BOOST_FIXTURE_TEST_CASE(flushexpired_reverts_expired_pending, sysio_dclaim_teste
 
 // onreward runs inside the OPP inbound dispatch chain (msgch::evalcons), where an abort rolls back
 // the consensus-tipping deliver and stalls epoch advancement. A cross-chain-supplied
-// staker_wire_account that name() would reject (>13 chars / bad alphabet) must NOT abort: it is
-// treated as unlinked and the credit is parked in unmapped_tokens by native address.
+// staker_wire_account that name() would reject (overlong at > 13 chars, or bearing a character
+// outside the ".12345a-z" name alphabet such as uppercase or '-') must NOT abort: onreward treats
+// it as unlinked and parks the credit in unmapped_tokens by native address. Each malformed spelling
+// is exercised on a distinct native address so it lands as its own row (unmapped + dedupe cursor
+// are keyed by native address), covering the full reject domain the dispatch name guard absorbs.
 BOOST_FIXTURE_TEST_CASE(onreward_invalid_wire_account_parks_unmapped, sysio_dclaim_tester) { try {
-   BOOST_REQUIRE_EQUAL(success(),
-      onreward(MSGCH_ACCOUNT, 1, "thisnameistoolong", ChainKind::CHAIN_KIND_EVM, addr20,
-               1000, 7, 100));
-   // Soft-handled: credit parked as unmapped (unlinked), not aborted.
-   BOOST_REQUIRE(!unmapped_row(1).is_null());
+   const struct { const char* wire_account; char addr_byte; } cases[] = {
+      { "thisnameistoolong", char(0xB1) },   // 17 chars: length > 13
+      { "BADNAME",           char(0xB2) },   // uppercase: outside the name alphabet
+      { "bad-name",          char(0xB3) },   // '-': outside the name alphabet
+   };
+
+   uint64_t expected_id = 1;   // next_unmapped_id defaults to 1; one new row per distinct address
+   for (const auto& c : cases) {
+      const std::vector<char> addr(20, c.addr_byte);
+      BOOST_REQUIRE_EQUAL(success(),
+         onreward(MSGCH_ACCOUNT, 1, c.wire_account, ChainKind::CHAIN_KIND_EVM, addr,
+                  1000, 7, 100));
+      // Soft-handled: credit parked as unmapped (unlinked), never aborted.
+      auto u = unmapped_row(expected_id);
+      BOOST_REQUIRE(!u.is_null());
+      BOOST_REQUIRE_EQUAL(u["balance"].as<asset>().get_amount(), 1000);
+      ++expected_id;
+   }
 } FC_LOG_AND_RETHROW() }
 
 // A reward_amount above asset::max_amount (2^62-1) would abort the WIRE asset constructor. onreward
@@ -265,6 +281,18 @@ BOOST_FIXTURE_TEST_CASE(onreward_oversized_amount_soft_skips, sysio_dclaim_teste
    // Soft-skipped: neither a pending claim (valid name "alice") nor an unmapped row was created.
    BOOST_REQUIRE(pending_of("alice"_n).is_null());
    BOOST_REQUIRE(unmapped_row(1).is_null());
+} FC_LOG_AND_RETHROW() }
+
+// The positive side of the dispatch name guard: a valid account name that is not plain lowercase
+// (here one carrying both a dot and a digit) must still resolve to a linked staker and credit
+// pending_claims, never fall through to the unmapped native-address parking path.
+BOOST_FIXTURE_TEST_CASE(onreward_dotted_digit_name_credits_pending, sysio_dclaim_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(),
+      onreward(MSGCH_ACCOUNT, 1, "stak.er1", ChainKind::CHAIN_KIND_EVM, addr20, 1000, 7, 100));
+   auto p = pending_of("stak.er1"_n);
+   BOOST_REQUIRE(!p.is_null());
+   BOOST_REQUIRE_EQUAL(p["balance"].as<asset>().get_amount(), 1000);
+   BOOST_REQUIRE(unmapped_row(1).is_null());   // linked directly, not parked as unmapped
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()
