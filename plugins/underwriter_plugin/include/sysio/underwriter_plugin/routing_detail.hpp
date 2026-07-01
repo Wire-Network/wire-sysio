@@ -21,6 +21,7 @@
 #include <compare>
 #include <cstdint>
 #include <map>
+#include <optional>
 
 namespace sysio::underwriter_detail {
 
@@ -58,8 +59,14 @@ inline bool try_debit_buckets(credit_buckets& remaining,
    // Same bucket on both legs: a single row must cover the combined draw.
    if (src_req > 0 && dst_req > 0 && src.bucket == dst.bucket) {
       auto it = remaining.find(src.bucket);
-      if (it == remaining.end() || it->second < src_req + dst_req) return false;
-      it->second -= (src_req + dst_req);
+      // Sum the two user-controlled requirements in 128-bit width: a pair
+      // whose true sum exceeds UINT64_MAX (e.g. UINT64_MAX + 1) must never
+      // wrap to a small uint64 and make an impossible request look coverable.
+      const __uint128_t combined = static_cast<__uint128_t>(src_req) + dst_req;
+      if (it == remaining.end() || it->second < combined) return false;
+      // Reached only when combined <= it->second <= UINT64_MAX, so the draw
+      // fits a uint64 exactly and the debit cannot underflow.
+      it->second -= static_cast<uint64_t>(combined);
       return true;
    }
 
@@ -89,5 +96,42 @@ struct commit_key {
    uint64_t reserve_code = 0;   ///< `fc::slug_name::value`
    friend auto operator<=>(const commit_key&, const commit_key&) = default;
 };
+
+/// One registered outpost chain the operator config fails to serve correctly:
+/// either no endpoint was configured for it, or the configured endpoint's VM
+/// family does not match the registry. Returned by `find_endpoint_coverage_gap`.
+struct endpoint_coverage_gap {
+   /// Sentinel `config_kind` meaning "no endpoint configured for this chain".
+   static constexpr int unconfigured = -1;
+
+   uint64_t chain_code    = 0;              ///< `fc::slug_name::value` of the registered chain.
+   int      registry_kind = 0;              ///< raw `ChainKind` integer from the registry.
+   int      config_kind   = unconfigured;   ///< configured kind, or `unconfigured`.
+};
+
+/// Verify that every registered outpost chain has a configured endpoint of the
+/// MATCHING VM family. Returns the first offending chain, or `nullopt` when the
+/// config covers the whole registered set exactly.
+///
+/// SEC-13 / WSA-027: the underwriter derives its served set from the on-chain
+/// registry (`sysio.chains`) but builds its outpost_client handles only from
+/// operator config. A registered chain that is unconfigured, or configured
+/// under the wrong VM family, lets the scan loop select a request whose leg has
+/// no (or a wrong-kind) client and land only the OTHER leg. Preflight uses this
+/// to fail closed before scheduling the scan job. Kinds are compared as raw
+/// integers so this header stays free of opp/fc dependencies (the plugin passes
+/// `magic_enum::enum_integer(kind)` at the boundary).
+inline std::optional<endpoint_coverage_gap>
+find_endpoint_coverage_gap(const std::map<uint64_t, int>& registered_kinds,
+                           const std::map<uint64_t, int>& configured_kinds) {
+   for (const auto& [chain_code, reg_kind] : registered_kinds) {
+      auto it = configured_kinds.find(chain_code);
+      if (it == configured_kinds.end())
+         return endpoint_coverage_gap{chain_code, reg_kind, endpoint_coverage_gap::unconfigured};
+      if (it->second != reg_kind)
+         return endpoint_coverage_gap{chain_code, reg_kind, it->second};
+   }
+   return std::nullopt;
+}
 
 } // namespace sysio::underwriter_detail

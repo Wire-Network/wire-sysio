@@ -373,10 +373,15 @@ struct underwriter_plugin::impl {
    //
    //  Checks (all required):
    //    1. Operator exists in `sysio.opreg::operators` and status == ACTIVE.
-   //    2. `sysio.authex::links` covers every chain in the
-   //       `sysio.epoch::outposts` registered set — without an authex link
+   //    2. Every registered outpost chain in `sysio.chains::chains` has a
+   //       configured `--underwriter-{eth,sol}-outpost` endpoint of the
+   //       matching VM family. The served set is derived from the registry
+   //       while the outpost clients are built from config, so a gap would
+   //       let the scan loop pick a request it cannot fully commit.
+   //    3. `sysio.authex::links` covers every chain in the
+   //       `sysio.chains::chains` registered set; without an authex link
    //       for a chain the underwriter cannot sign a commit on that chain.
-   //    3. Non-zero balance on at least one TokenKind for every registered
+   //    4. Non-zero balance on at least one TokenKind for every registered
    //       outpost chain.
    //
    //  Returns true on success. On any failure logs a structured `elog`
@@ -389,7 +394,7 @@ struct underwriter_plugin::impl {
    //  to ship in the plugin.
    // -----------------------------------------------------------------------
    bool run_preflight() {
-      // ── Check 1: operator status ─────────────────────────────────────
+      // -- Check 1: operator status --
       bool found_op = false;
       bool active   = false;
       {
@@ -431,7 +436,49 @@ struct underwriter_plugin::impl {
          return false;
       }
 
-      // ── Check 2: authex link coverage per outpost chain ──────────────
+      // -- Check 2: outpost-client wiring covers every registered chain --
+      //
+      // The served set is derived from the registry (`outpost_chain_kinds`) by
+      // `is_available` / `select_coverable`, but the outpost_client handles are
+      // built only from operator-supplied `--underwriter-{eth,sol}-outpost`
+      // config (`outpost_endpoints`). A registered chain that is unconfigured,
+      // or configured under the wrong VM family, would let the scan loop
+      // SELECT a request for it and land one leg before discovering the other
+      // leg has no (or a wrong-kind) client (SEC-13/WSA-027). Fail closed here
+      // so a misconfigured underwriter never starts committing partial swaps.
+      {
+         std::map<uint64_t, int> registered_kinds;
+         for (const auto& [code, kind] : outpost_chain_kinds)
+            registered_kinds[code] = magic_enum::enum_integer(kind);
+         std::map<uint64_t, int> configured_kinds;
+         for (const auto& [code, ep] : outpost_endpoints)
+            configured_kinds[code] = magic_enum::enum_integer(ep.kind);
+
+         if (auto gap = underwriter_detail::find_endpoint_coverage_gap(
+                registered_kinds, configured_kinds)) {
+            const auto code_str = fc::slug_name{gap->chain_code}.to_string();
+            // Re-derive the typed ChainKind names from the source maps rather
+            // than reverse-casting the raw ints; the generated `_Name` helper
+            // is the CLAUDE.md-mandated spelling for proto enums.
+            const ChainKind reg_kind = outpost_chain_kinds.at(gap->chain_code);
+            if (gap->config_kind == underwriter_detail::endpoint_coverage_gap::unconfigured) {
+               elog("underwriter preflight: registered outpost chain {} (kind={}) has no "
+                    "--underwriter-eth-outpost / --underwriter-sol-outpost entry; configure "
+                    "one endpoint for every registered outpost chain",
+                    code_str, std::string{sysio::opp::types::ChainKind_Name(reg_kind)});
+            } else {
+               const ChainKind cfg_kind = outpost_endpoints.at(gap->chain_code).kind;
+               elog("underwriter preflight: outpost chain {} is registered as kind={} but "
+                    "configured as kind={}; fix --underwriter-*-outpost to match the registry",
+                    code_str,
+                    std::string{sysio::opp::types::ChainKind_Name(reg_kind)},
+                    std::string{sysio::opp::types::ChainKind_Name(cfg_kind)});
+            }
+            return false;
+         }
+      }
+
+      // -- Check 3: authex link coverage per outpost chain --
       std::set<ChainKind> linked_chains;
       {
          auto rows = read_all("sysio.authex", "sysio.authex", "links");
@@ -452,7 +499,7 @@ struct underwriter_plugin::impl {
          }
       }
 
-      // ── Check 3: non-zero RAW balance per outpost chain ──────────────
+      // -- Check 4: non-zero RAW balance per outpost chain --
       //
       // Reads `sysio.opreg::operators[underwriter].balances` directly and
       // does NOT subtract active locks or pending withdraws. An underwriter
@@ -497,7 +544,7 @@ struct underwriter_plugin::impl {
          }
       }
 
-      // ── Check 4: required CLI options + ABI/IDL resolution ───────────
+      // -- Check 5: required CLI options + ABI/IDL resolution --
       //
       // The verify_source_deposit path identifies the swap-deposit
       // function (ETH) / instruction (SOL) by NAME. The contract

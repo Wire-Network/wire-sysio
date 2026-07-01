@@ -2,6 +2,9 @@
 
 #include <sysio/underwriter_plugin/routing_detail.hpp>
 
+#include <limits>
+#include <map>
+#include <optional>
 #include <set>
 
 /**
@@ -45,7 +48,7 @@ const bucket_key B_EVM2_USDC{ EVM2, USDC };
 
 BOOST_AUTO_TEST_SUITE(underwriter_routing_tests)
 
-// ── commit_key: exact-identity de-dup ───────────────────────────────────────
+// -- commit_key: exact-identity de-dup --
 
 BOOST_AUTO_TEST_CASE(commit_key_distinguishes_same_kind_chains) {
    // Two legs identical but for chain_code: a confirmed commit on ETH must NOT
@@ -82,7 +85,7 @@ BOOST_AUTO_TEST_CASE(commit_key_identical_legs_dedup) {
    BOOST_CHECK_EQUAL(s.size(), 1u);   // same leg recorded once
 }
 
-// ── credit buckets: per-exact-chain capacity ────────────────────────────────
+// -- credit buckets: per-exact-chain capacity --
 
 BOOST_AUTO_TEST_CASE(same_kind_chains_have_independent_credit) {
    // Underwriter holds 100 USDC collateral on EACH of two EVM chains.
@@ -127,6 +130,25 @@ BOOST_AUTO_TEST_CASE(same_bucket_dual_leg_needs_combined_balance) {
    BOOST_CHECK_EQUAL(credit[B_ETH_USDC], 0u);
 }
 
+BOOST_AUTO_TEST_CASE(same_bucket_dual_leg_sum_cannot_overflow) {
+   // Two same-bucket legs whose bond requirements sum past UINT64_MAX must be
+   // rejected, never wrapped to a small, coverable-looking value. Before the
+   // 128-bit combine, `UINT64_MAX + 1` folded to 0 and the request debited the
+   // bucket as if free.
+   constexpr uint64_t U64_MAX = std::numeric_limits<uint64_t>::max();
+   credit_buckets credit{{B_ETH_USDC, 100}};
+   const leg_bond src{B_ETH_USDC, U64_MAX};
+   const leg_bond dst{B_ETH_USDC, 1};   // U64_MAX + 1 wraps to 0 in 64-bit
+   BOOST_CHECK(!try_debit_buckets(credit, src, dst));
+   BOOST_CHECK_EQUAL(credit[B_ETH_USDC], 100u);   // untouched on failure
+
+   // Even a bucket holding the max possible uint64 balance cannot cover a draw
+   // that overflows: the row can never exceed UINT64_MAX < (U64_MAX + 1).
+   credit[B_ETH_USDC] = U64_MAX;
+   BOOST_CHECK(!try_debit_buckets(credit, src, dst));
+   BOOST_CHECK_EQUAL(credit[B_ETH_USDC], U64_MAX);
+}
+
 BOOST_AUTO_TEST_CASE(depot_leg_requires_no_bucket) {
    // A to-WIRE swap has one real leg + one depot leg (require 0). The depot leg
    // consults no bucket; only the real leg must cover.
@@ -137,6 +159,65 @@ BOOST_AUTO_TEST_CASE(depot_leg_requires_no_bucket) {
 
    // both-depot (degenerate) is rejected — there is nothing to underwrite.
    BOOST_CHECK(!try_debit_buckets(credit, NO_LEG, NO_LEG));
+}
+
+// -- endpoint coverage: config must serve every registered chain --
+
+namespace {
+// Stand-in `ChainKind` integers. The helper compares raw ints (the plugin
+// passes `magic_enum::enum_integer(ChainKind)` at the boundary); these two
+// distinct values model two different VM families.
+constexpr int KIND_EVM = 2;
+constexpr int KIND_SVM = 3;
+} // namespace
+
+BOOST_AUTO_TEST_CASE(endpoint_coverage_all_registered_chains_configured) {
+   // Two registered EVM chains, both configured with the matching kind -> no gap.
+   const std::map<uint64_t, int> registered{{ETH, KIND_EVM}, {EVM2, KIND_EVM}};
+   const std::map<uint64_t, int> configured{{ETH, KIND_EVM}, {EVM2, KIND_EVM}};
+   BOOST_CHECK(!find_endpoint_coverage_gap(registered, configured).has_value());
+}
+
+BOOST_AUTO_TEST_CASE(endpoint_coverage_flags_unconfigured_chain) {
+   // A second EVM chain is registered but the operator forgot its endpoint. The
+   // pre-fix wiring would start the cron anyway and fail the EVM2 leg mid-swap;
+   // preflight must instead flag EVM2 as unconfigured and refuse to start.
+   const std::map<uint64_t, int> registered{{ETH, KIND_EVM}, {EVM2, KIND_EVM}};
+   const std::map<uint64_t, int> configured{{ETH, KIND_EVM}};
+   const auto gap = find_endpoint_coverage_gap(registered, configured);
+   BOOST_REQUIRE(gap.has_value());
+   BOOST_CHECK_EQUAL(gap->chain_code, EVM2);
+   BOOST_CHECK_EQUAL(gap->registry_kind, KIND_EVM);
+   BOOST_CHECK_EQUAL(gap->config_kind, endpoint_coverage_gap::unconfigured);
+}
+
+BOOST_AUTO_TEST_CASE(endpoint_coverage_flags_wrong_family) {
+   // A chain registered as EVM but configured under --underwriter-sol-outpost
+   // (kind SVM). The chain_code lookup would find a client of the wrong type;
+   // preflight must flag the family mismatch.
+   const std::map<uint64_t, int> registered{{ETH, KIND_EVM}};
+   const std::map<uint64_t, int> configured{{ETH, KIND_SVM}};
+   const auto gap = find_endpoint_coverage_gap(registered, configured);
+   BOOST_REQUIRE(gap.has_value());
+   BOOST_CHECK_EQUAL(gap->chain_code, ETH);
+   BOOST_CHECK_EQUAL(gap->registry_kind, KIND_EVM);
+   BOOST_CHECK_EQUAL(gap->config_kind, KIND_SVM);
+}
+
+BOOST_AUTO_TEST_CASE(endpoint_coverage_extra_config_is_ok) {
+   // The operator configured an endpoint for a chain not (yet) registered;
+   // harmless: no leg references it, so it must NOT be reported as a gap.
+   const std::map<uint64_t, int> registered{{ETH, KIND_EVM}};
+   const std::map<uint64_t, int> configured{{ETH, KIND_EVM}, {EVM2, KIND_EVM}};
+   BOOST_CHECK(!find_endpoint_coverage_gap(registered, configured).has_value());
+}
+
+BOOST_AUTO_TEST_CASE(endpoint_coverage_empty_registry_has_no_gap) {
+   // Degenerate: nothing registered -> nothing to cover. (Preflight rejects the
+   // empty-registry case separately, before this check runs.)
+   const std::map<uint64_t, int> registered;
+   const std::map<uint64_t, int> configured{{ETH, KIND_EVM}};
+   BOOST_CHECK(!find_endpoint_coverage_gap(registered, configured).has_value());
 }
 
 BOOST_AUTO_TEST_SUITE_END()
