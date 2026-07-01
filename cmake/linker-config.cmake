@@ -1,5 +1,5 @@
 # cmake/linker-config.cmake
-if(CMAKE_C_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND (CMAKE_C_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang"))
   add_link_options($<$<LINK_LANGUAGE:C>:-fuse-ld=bfd>)
   add_link_options($<$<LINK_LANGUAGE:CXX>:-fuse-ld=bfd>)
 endif()
@@ -26,11 +26,13 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   endif()
 endif()
 
-# Mild, deterministic defaults for Release; split into separate genex args
-add_link_options(
-  $<$<CONFIG:Release>:-Wl,--as-needed>
-  $<$<CONFIG:Release>:-Wl,-O1>
-)
+# Mild, deterministic defaults for Release; split into separate genex args.
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  add_link_options(
+    $<$<CONFIG:Release>:-Wl,--as-needed>
+    $<$<CONFIG:Release>:-Wl,-O1>
+  )
+endif()
 
 # apply_malloc_config(target)
 #
@@ -43,9 +45,14 @@ add_link_options(
 # and validated mutually exclusive in cmake/compiler-config.cmake.
 function(apply_malloc_config target)
   if(ENABLE_JEMALLOC)
-    # --whole-archive forces all jemalloc symbols in so malloc/free override libc.
-    target_link_options(${target} PRIVATE
-      "LINKER:--whole-archive" "${JEMALLOC_LIB_PATH}" "LINKER:--no-whole-archive")
+    if(APPLE)
+      # -force_load pulls in jemalloc's allocator override from the static archive.
+      target_link_options(${target} PRIVATE "LINKER:-force_load,${JEMALLOC_LIB_PATH}")
+    else()
+      # --whole-archive forces all jemalloc symbols in so malloc/free override libc.
+      target_link_options(${target} PRIVATE
+        "LINKER:--whole-archive" "${JEMALLOC_LIB_PATH}" "LINKER:--no-whole-archive")
+    endif()
   elseif(ENABLE_TCMALLOC)
     # tcmalloc replaces malloc/free at link time. Linking last keeps the heap
     # profiler/checker accurate; target_link_libraries appends here, which is

@@ -279,8 +279,8 @@ struct sys_vm_oc_type_converter : public sysio::vm::type_converter<webassembly::
    vm::wasm_ptr_t to_wasm(void*&& ptr) {
       return convert_native_to_wasm(static_cast<char*>(ptr));
    }
-   SYS_VM_FROM_WASM(float32_t, (float f)) { return ::to_softfloat32(f); }
-   SYS_VM_FROM_WASM(float64_t, (double f)) { return ::to_softfloat64(f); }
+   SYS_VM_FROM_WASM(softfloat32_t, (float f)) { return ::to_softfloat32(f); }
+   SYS_VM_FROM_WASM(softfloat64_t, (double f)) { return ::to_softfloat64(f); }
 
    template<typename T>
    inline decltype(auto) as_value(const vm::native_value& val) const {

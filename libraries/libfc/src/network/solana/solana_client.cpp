@@ -1277,7 +1277,7 @@ fc::variant solana_client::get_vote_accounts(commitment_t commitment) {
 //=============================================================================
 
 uint64_t solana_client::get_minimum_balance_for_rent_exemption(size_t data_length, commitment_t commitment) {
-   fc::variants params{data_length, build_config(commitment)};
+   fc::variants params{static_cast<uint64_t>(data_length), build_config(commitment)};
    return execute("getMinimumBalanceForRentExemption", params).as_uint64();
 }
 
@@ -1286,7 +1286,7 @@ uint64_t solana_client::get_minimum_balance_for_rent_exemption(size_t data_lengt
 //=============================================================================
 
 fc::variant solana_client::get_recent_performance_samples(size_t limit) {
-   fc::variants params{limit};
+   fc::variants params{static_cast<uint64_t>(limit)};
    return execute("getRecentPerformanceSamples", params);
 }
 

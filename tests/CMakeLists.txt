@@ -183,6 +183,20 @@ add_np_test(NAME read-only-trx-parallel-no-oc-if-test COMMAND tests/read_only_tr
 add_np_test(NAME interrupt-read-only-trx-basic-test COMMAND tests/interrupt_read_only_trx_test.py -p 2 -n 3 --read-only-threads 1)
 add_np_test(NAME interrupt-read-only-trx-parallel-test COMMAND tests/interrupt_read_only_trx_test.py -p 2 -n 3 --read-only-threads 16)
 add_np_test(NAME interrupt-read-only-trx-parallel-if-sys-vm-oc-test COMMAND tests/interrupt_read_only_trx_test.py -p 2 -n 3 --sys-vm-oc-enable all --read-only-threads 16)
+
+# Serialize read-only transaction integration tests so parallel CTest runs do not start multiple
+# read-only thread-heavy clusters at the same time.
+set(READ_ONLY_TRX_TESTS
+  read-only-trx-basic-test
+  read-only-trx-parallel-test
+  read-only-trx-parallel-if-sys-vm-oc-test
+  read-only-trx-parallel-no-oc-if-test
+  interrupt-read-only-trx-basic-test
+  interrupt-read-only-trx-parallel-test
+  interrupt-read-only-trx-parallel-if-sys-vm-oc-test
+)
+set_tests_properties(${READ_ONLY_TRX_TESTS} PROPERTIES RESOURCE_LOCK read_only_trx)
+
 add_np_test(NAME subjective_billing_test COMMAND tests/subjective_billing_test.py -v -p 2 -n 4)
 add_np_test(NAME get_account_test COMMAND tests/get_account_test.py -v -p 2 -n 3)
 add_np_test(NAME multisig_review_test COMMAND tests/multisig_review_test.py -v -p 1 -n 1)
