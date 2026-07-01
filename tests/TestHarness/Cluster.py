@@ -1194,7 +1194,7 @@ class Cluster(object):
             return trans
 
         # sysio.noop used by trx_generator for noop action
-        systemAccounts = ['sysio.noop', 'sysio.bpay', 'sysio.msig', 'sysio.names', 'sysio.token', 'sysio.vpay', 'sysio.wrap', 'sysio.roa', 'sysio.acct', 'sysio.authex', 'carl']
+        systemAccounts = ['sysio.noop', 'sysio.bpay', 'sysio.msig', 'sysio.names', 'sysio.token', 'sysio.vpay', 'sysio.wrap', 'sysio.roa', 'sysio.acct', 'sysio.authex', 'sysio.opreg', 'carl']
         acctTrans = list(map(createSystemAccount, systemAccounts))
 
         for trans in acctTrans:
@@ -1417,6 +1417,43 @@ class Cluster(object):
         if not biosNode.waitForTransactionInBlock(transId):
             Utils.Print("ERROR: Failed to delegate sysio.authex.active to sysio.roa@sysio.code (tx %s)" % transId)
             return None
+
+        # Deploy sysio.opreg and register the cluster producers as ACTIVE producer
+        # operators. sysio.system::update_ranked_producers schedules a producer only
+        # if it is an ACTIVE OPERATOR_TYPE_PRODUCER operator in sysio.opreg (producers
+        # post slashable collateral to produce); bootstrapped operators are ACTIVE by
+        # fiat, so this makes bootstrap producers schedulable under the collateral gate.
+        sysioOpregAccount = copy.deepcopy(sysioAccount)
+        sysioOpregAccount.name = 'sysio.opreg'
+        contract="sysio.opreg"
+        contractDir=str(self.contractsPath / contract)
+        wasmFile="%s.wasm" % (contract)
+        abiFile="%s.abi" % (contract)
+        Utils.Print("Publish %s contract" % (contract))
+        trans=biosNode.publishContract(sysioOpregAccount, contractDir, wasmFile, abiFile, waitForTransBlock=True)
+        if trans is None:
+            Utils.Print("ERROR: Failed to publish contract %s." % (contract))
+            return None
+        trans=biosNode.setPriv(sysioOpregAccount, sysioAccount, isPriv=True, waitForTransBlock=True)
+        if trans is None:
+            Utils.Print("ERROR: Failed to set sysio.opreg as privileged")
+            return None
+        opregConfig=('{"max_available_producers":21,"max_available_batch_ops":63,"max_available_underwriters":21,'
+                     '"terminate_prune_delay_ms":600000,"terminate_max_consecutive_misses":5,'
+                     '"terminate_max_pct_misses_24h":5,"terminate_window_ms":86400000,'
+                     '"req_prod_collat":[],"req_batchop_collat":[],"req_uw_collat":[]}')
+        trans=biosNode.pushMessage('sysio.opreg', 'setconfig', opregConfig, '--permission sysio.opreg@active')
+        if trans is None or not trans[0]:
+            Utils.Print("ERROR: Failed to configure sysio.opreg")
+            return None
+        for pKeys in producerKeys.values():
+            if pKeys["name"] == 'sysio':
+                continue
+            opData='{"account":"%s","type":"OPERATOR_TYPE_PRODUCER","is_bootstrapped":true}' % pKeys["name"]
+            trans=biosNode.pushMessage('sysio.opreg', 'regoperator', opData, '--permission sysio.opreg@active')
+            if trans is None or not trans[0]:
+                Utils.Print("ERROR: Failed to register producer operator %s." % (pKeys["name"]))
+                return None
 
         if loadSystemContract:
             Utils.Print("Set default emission config")
