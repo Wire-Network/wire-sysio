@@ -4,13 +4,13 @@
 #include <fc/io/fstream.hpp>
 #include <fc/io/secure_file.hpp>
 
+#include <cstdio>
 #include <fstream>
 #include <memory>
 #include <string>
 #include <utility>
 
 #ifndef _WIN32
-#include <fcntl.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #endif
@@ -28,20 +28,9 @@ constexpr auto   second_secret_contents        = "replacement\n";
 constexpr auto   symlink_target_contents       = "target\n";
 
 /**
- * Closes and releases a heap-owned POSIX file descriptor when a test scope exits.
+ * Owns an open file stream and closes its underlying descriptor when a test scope exits.
  */
-struct file_descriptor_deleter {
-   void operator()(int* file_descriptor) const noexcept {
-      if (file_descriptor != nullptr) {
-         if (*file_descriptor >= 0) {
-            ::close(*file_descriptor);
-         }
-         delete file_descriptor;
-      }
-   }
-};
-
-using file_descriptor_ptr = std::unique_ptr<int, file_descriptor_deleter>;
+using file_stream_ptr = std::unique_ptr<std::FILE, decltype(&std::fclose)>;
 
 /**
  * Restores the process umask when a test scope exits.
@@ -78,15 +67,15 @@ std::string file_contents(const std::filesystem::path& file_path) {
 }
 
 /**
- * Reads the remaining contents of an opened file descriptor from the beginning.
+ * Reads the contents of an opened file stream from the beginning.
  */
-std::string descriptor_contents(int file_descriptor) {
-   BOOST_REQUIRE_EQUAL(::lseek(file_descriptor, 0, SEEK_SET), 0);
+std::string stream_contents(std::FILE* file) {
+   BOOST_REQUIRE_EQUAL(std::fseek(file, 0, SEEK_SET), 0);
 
    char       buffer[128];
-   const auto bytes_read = ::read(file_descriptor, buffer, sizeof(buffer));
-   BOOST_REQUIRE_GE(bytes_read, 0);
-   return std::string(buffer, static_cast<size_t>(bytes_read));
+   const auto bytes_read = std::fread(buffer, sizeof(char), sizeof(buffer), file);
+   BOOST_REQUIRE(!std::ferror(file));
+   return std::string(buffer, bytes_read);
 }
 
 } // namespace
@@ -114,14 +103,14 @@ BOOST_AUTO_TEST_CASE(write_secure_file_replaces_existing_file_with_owner_only_fi
    }
    BOOST_REQUIRE_EQUAL(::chmod(secret_path.c_str(), group_world_readable_mode), 0);
    BOOST_REQUIRE_EQUAL(file_mode(secret_path), group_world_readable_mode);
-   file_descriptor_ptr existing_reader(new int(::open(secret_path.c_str(), O_RDONLY)));
-   BOOST_REQUIRE_GE(*existing_reader, 0);
+   file_stream_ptr existing_reader(std::fopen(secret_path.c_str(), "r"), &std::fclose);
+   BOOST_REQUIRE(existing_reader != nullptr);
 
    fc::write_secure_file(secret_path, second_secret_contents);
 
    BOOST_REQUIRE_EQUAL(file_mode(secret_path), secret_file_mode);
    BOOST_REQUIRE_EQUAL(file_contents(secret_path), second_secret_contents);
-   BOOST_REQUIRE_EQUAL(descriptor_contents(*existing_reader), first_secret_contents);
+   BOOST_REQUIRE_EQUAL(stream_contents(existing_reader.get()), first_secret_contents);
 }
 
 BOOST_AUTO_TEST_CASE(secure_output_file_supports_move_construction_and_assignment) {
