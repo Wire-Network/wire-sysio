@@ -13,15 +13,24 @@ underwriter only signs and submits underwriting commits.
 
 ### Startup pre-flight (unconditional, no dev escape hatch)
 
-`plugin_startup` runs three checks before scheduling the cron job; any
-failure logs a structured `elog` and skips cron registration:
+`plugin_startup` runs a series of checks before scheduling the cron job;
+any failure logs a structured `elog` and skips cron registration:
 
 1. `sysio.opreg::operators[underwriter_account].status == OPERATOR_STATUS_ACTIVE`.
-2. `sysio.authex::links` covers every chain present in
-   `sysio.epoch::outposts` — the underwriter cannot sign a commit on a
-   chain it has no authex link for.
-3. Non-zero balance on at least one TokenKind for every registered
+2. Every **active** non-depot chain in `sysio.chains::chains` has a
+   configured `--underwriter-{eth,sol}-outpost` endpoint of the matching
+   VM family. The served set is derived from the registry while the
+   outpost clients are built from config, so a missing or wrong-family
+   endpoint would let the scan loop pick a request it cannot fully
+   commit — landing one leg and stalling the other. Inactive
+   (not-yet-`activchain`ed) chains are skipped, so registering a future
+   chain never blocks startup before its endpoint/collateral land.
+3. `sysio.authex::links` covers every active chain in `sysio.chains::chains` —
+   the underwriter cannot sign a commit on a chain it has no authex link for.
+4. Non-zero balance on at least one TokenKind for every active
    outpost chain.
+5. The required source-deposit function / instruction names resolve
+   against the loaded ABI / IDL files, and a signature self-test passes.
 
 No `--strict=false` flag, no dev fallback. Cluster bootstrap is
 responsible for establishing the required state — see
@@ -34,7 +43,7 @@ Every `--underwriter-scan-interval-ms` (default 5 s):
 1. `poll_own_status()` — short-circuit if the underwriter's status has
    flipped to `SLASHED` / `TERMINATED`.
 2. `read_outpost_registry()` — refresh the `(chain_code → chain_kind)`
-   cache from `sysio.epoch::outposts`.
+   cache from `sysio.chains::chains`.
 3. `read_credit_lines()` — compute available bond per
    `(chain, token_kind)` by mirroring the depot's `sysio.opreg::available()`
    math:
@@ -82,15 +91,24 @@ verifies the signature against every permission on `uw_account` via the
 | `--underwriter-scan-interval-ms` | 5000 | How often to scan for pending uwreqs (ms) |
 | `--underwriter-action-timeout-ms` | 15000 | Timeout for outpost RPC calls + table reads (ms) |
 | `--underwriter-enabled` | false | Enable underwriter functionality |
-| `--underwriter-eth-client-id` | `eth-default` | Ethereum outpost RPC client id |
-| `--underwriter-sol-client-id` | `sol-default` | Solana outpost RPC client id |
-| `--underwriter-eth-opreg-addr` | — | OperatorRegistry contract address on Ethereum (hex) |
+| `--underwriter-eth-outpost` | — | Per-EVM-chain outpost wiring (repeatable, one per served EVM chain). Format `<chain_code>,<client_id>,<operator_registry_addr>,<source_deposit_contract_addr>` — keyed by exact `chain_code`, so two EVM chains are wired independently |
+| `--underwriter-sol-outpost` | — | Per-SVM-chain outpost wiring (repeatable, one per served SVM chain). Format `<chain_code>,<client_id>,<opp_outpost_program_id>` |
+| `--underwriter-eth-source-deposit-function` | — | Name of the ETH swap-deposit function; the chain-agnostic 4-byte selector is resolved at preflight from the loaded `--ethereum-abi-file` ABIs (required) |
+| `--underwriter-sol-source-deposit-instruction` | — | Name of the SOL swap-deposit instruction; the 8-byte anchor discriminator is resolved at preflight from the loaded `--solana-idl-file` IDLs (required) |
 | `--underwriter-eth-source-deposit-lookback-blocks` | 7200 | Recent finalized ETH blocks searched per source deposit |
-| `--underwriter-sol-program-id` | — | opp-outpost program id on Solana (base58) |
+
+> SEC-13/WSA-027: the former single `--underwriter-eth-client-id`,
+> `--underwriter-sol-client-id`, `--underwriter-eth-opreg-addr`, and
+> `--underwriter-sol-program-id` options are replaced by the repeatable,
+> exact-`chain_code`-keyed `--underwriter-{eth,sol}-outpost` options above.
+> One entry is required for **every active** non-depot chain in
+> `sysio.chains::chains` (inactive/not-yet-activated chains are skipped);
+> the underwriter's per-chain contract / program address now lives in that
+> entry rather than in a per-family scalar option.
 
 ## Dependencies
 
-- `chain_plugin` — read-only table access against `sysio.opreg`, `sysio.uwrit`, `sysio.authex`, `sysio.epoch`.
+- `chain_plugin` — read-only table access against `sysio.opreg`, `sysio.uwrit`, `sysio.authex`, `sysio.chains`.
 - `cron_plugin` — scheduled scan loop.
 - `signature_provider_manager_plugin` — WIRE K1 signer for the UIC digest.
 - `outpost_ethereum_client_plugin` — ETH RPC + ABI loader for the `commit(bytes)` call.

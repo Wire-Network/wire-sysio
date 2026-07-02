@@ -201,7 +201,6 @@ message UnderwriteIntentCommit {
   sysio.opp.types.WireAccount     uw_account        = 1;
   sysio.opp.types.ChainAddress    uw_ext_chain_addr = 2;
   uint64                          uw_request_id     = 3;
-  uint64                          outpost_id        = 4;
   bytes                           signature         = 5;
   uint64                          token_code        = 6;
   uint64                          chain_code        = 7;
