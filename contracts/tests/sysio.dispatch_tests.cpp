@@ -653,6 +653,18 @@ public:
          abi_serializer::create_yield_function(abi_serializer_max_time));
    }
 
+   /// Next attestation id `sysio.msgch::mint_att_id` will return: the `attseq` singleton's
+   /// `next`, or 1 before the row is materialised. Outbound queueouts share the same sequence
+   /// (e.g. reserve registration emits RESERVE_READY), so a test that needs the ids an inbound
+   /// envelope's attestations will mint must read the counter rather than assume it starts at 1.
+   uint64_t next_att_id() {
+      auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "attseq"_n, 0);
+      if (data.empty()) return 1;
+      auto v = msgch_abi.binary_to_variant("att_seq_entry", data,
+         abi_serializer::create_yield_function(abi_serializer_max_time));
+      return v["next"].as_uint64();
+   }
+
    /// Read a collateral lock row by lock_id (uwrit `locks` KV table). lock_ids
    /// are allocated from 1 (uwcounters default), so the first swap's source +
    /// destination locks are ids 1 and 2.
@@ -1646,6 +1658,109 @@ BOOST_FIXTURE_TEST_CASE(createuwreq_malformed_swaprequest_does_not_abort,
    // exists) and must NOT create a uwreq row.
    BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, eth, garbage_str));
    BOOST_REQUIRE(get_uwreq(ATT_ID).is_null());
+} FC_LOG_AND_RETHROW() }
+
+// The consensus-envelope analogue of the case above. msgch's dispatch forwards SWAP_REQUEST bytes
+// to createuwreq UNDECODED, so createuwreq's own decode guard is all that stands between
+// attacker-shaped attestation bytes and a throw that would abort the consensus-tipping delivery
+// (and drop the whole epoch's inbound dispatch with it). Three malformed shapes ride ONE envelope
+// through the full deliver -> evalcons -> apply_consensus -> inline-createuwreq chain, ahead of a
+// fully valid swap: deliver must succeed, the malformed entries must create no uwreq rows, and the
+// valid entry behind them must still create exactly one.
+BOOST_FIXTURE_TEST_CASE(swap_request_malformed_bytes_do_not_abort_consensus_delivery,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();   // ETH source outpost
+   BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
+      ("kind", ChainKind::CHAIN_KIND_SVM)("code", codename_mvo("SOLANA"))
+      ("external_chain_id", 900)("name", std::string("solana-test"))("description", std::string{})));
+   setup_wire_token_and_reserves();
+   BOOST_REQUIRE_EQUAL(success(), depositinle_credit(UWRIT_OP, "ETH",    "ETH", 1'000'000'000));
+   BOOST_REQUIRE_EQUAL(success(), depositinle_credit(UWRIT_OP, "SOLANA", "SOL", 1'000'000'000));
+
+   const auto eth       = fc::slug_name{"ETH"}.value;
+   const auto sol_chain = fc::slug_name{"SOLANA"}.value;
+   const auto sol_token = fc::slug_name{"SOL"}.value;
+   const auto primary   = fc::slug_name{"PRIMARY"}.value;
+
+   // Empty bytes: proto3 decodes zero fields into an all-defaults SwapRequest whose
+   // source_chain_code (0) can never match the proven outpost -- refunded/dropped, never thrown.
+   const std::string empty_bytes{};
+   // A lone length-delimited field tag with its length varint missing -- the decoder underruns.
+   const std::string truncated_tag{"\x0a"};
+   // Deterministic junk: the leading tag varint carries wire type 6, which protobuf does not define.
+   const std::string junk_bytes{"\xde\xad\xbe\xef\x42"};
+   // Fully valid ETH->SOLANA swap, placed LAST so every malformed entry dispatches before it.
+   const auto valid_sr = encode_swap_request(
+      ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
+      eth, eth, primary, /*src_amount*/ 100,
+      sol_chain, sol_token, primary, /*target*/ 100,
+      5000, ChainKind::CHAIN_KIND_SVM, std::vector<char>(32, '\x0b'));
+
+   // The envelope's four attestations mint sequential ids starting here (reserve registration
+   // above already consumed ids for its outbound RESERVE_READY queueouts).
+   const uint64_t first_att_id = next_att_id();
+
+   // deliver() must SUCCEED -- each malformed payload is dropped inside its inline createuwreq,
+   // never thrown up through the dispatch chain.
+   BOOST_REQUIRE_EQUAL(success(), deliver(/*proven=*/ eth,
+      encode_envelope_with_attestations(current_epoch(),
+         sysio::opp::types::ATTESTATION_TYPE_SWAP_REQUEST,
+         {empty_bytes, truncated_tag, junk_bytes, valid_sr})));
+
+   // The three malformed entries created no uwreq; the valid one behind them created exactly
+   // one, keyed by its minted id.
+   BOOST_REQUIRE(get_uwreq(first_att_id + 0).is_null());
+   BOOST_REQUIRE(get_uwreq(first_att_id + 1).is_null());
+   BOOST_REQUIRE(get_uwreq(first_att_id + 2).is_null());
+   const auto req = get_uwreq(first_att_id + 3);
+   BOOST_REQUIRE(!req.is_null());
+   BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_PENDING", req["status"].as_string());
+   BOOST_REQUIRE_EQUAL(eth, req["src_chain_code"]["value"].as_uint64());
+   BOOST_REQUIRE_EQUAL(100u, req["src_amount"].as_uint64());
+} FC_LOG_AND_RETHROW() }
+
+// Duplicate-id idempotency: re-delivering an attestation_id that already has a uwreq row -- the
+// protocol's normal every-cron-tick re-relay -- must no-op WITHOUT throwing and WITHOUT touching
+// the existing row, even when the re-delivery carries different (or malformed) bytes. The
+// duplicate guard runs before the decode, so a garbage duplicate is skipped by id alone.
+BOOST_FIXTURE_TEST_CASE(createuwreq_duplicate_attestation_id_is_idempotent,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+   BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
+      ("kind", ChainKind::CHAIN_KIND_SVM)("code", codename_mvo("SOLANA"))
+      ("external_chain_id", 900)("name", std::string("solana-test"))("description", std::string{})));
+   setup_wire_token_and_reserves();
+   BOOST_REQUIRE_EQUAL(success(), depositinle_credit(UWRIT_OP, "ETH",    "ETH", 1'000'000'000));
+   BOOST_REQUIRE_EQUAL(success(), depositinle_credit(UWRIT_OP, "SOLANA", "SOL", 1'000'000'000));
+
+   const auto eth       = fc::slug_name{"ETH"}.value;
+   const auto sol_chain = fc::slug_name{"SOLANA"}.value;
+   const auto sol_token = fc::slug_name{"SOL"}.value;
+   const auto primary   = fc::slug_name{"PRIMARY"}.value;
+   constexpr uint64_t ATT_ID = 7400;
+
+   const auto sr = encode_swap_request(
+      ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
+      eth, eth, primary, /*src_amount*/ 100,
+      sol_chain, sol_token, primary, /*target*/ 100,
+      5000, ChainKind::CHAIN_KIND_SVM, std::vector<char>(32, '\x0b'));
+   BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, eth, sr));
+   const auto row_before = get_row_by_id(UWRIT_ACCOUNT, UWRIT_ACCOUNT, "uwreqs"_n, ATT_ID);
+   BOOST_REQUIRE(!row_before.empty());
+
+   // Same id, different payload (amounts 100 -> 250): the duplicate must be skipped, not
+   // overwritten -- the row stays byte-identical to the original delivery.
+   const auto sr_conflicting = encode_swap_request(
+      ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0c'),
+      eth, eth, primary, /*src_amount*/ 250,
+      sol_chain, sol_token, primary, /*target*/ 250,
+      5000, ChainKind::CHAIN_KIND_SVM, std::vector<char>(32, '\x0d'));
+   BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, eth, sr_conflicting));
+   BOOST_REQUIRE(get_row_by_id(UWRIT_ACCOUNT, UWRIT_ACCOUNT, "uwreqs"_n, ATT_ID) == row_before);
+
+   // Same id, malformed payload: skipped by id before the decode ever runs.
+   BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, eth, std::string{"\x0a"}));
+   BOOST_REQUIRE(get_row_by_id(UWRIT_ACCOUNT, UWRIT_ACCOUNT, "uwreqs"_n, ATT_ID) == row_before);
 } FC_LOG_AND_RETHROW() }
 
 // ───────────────────────────── WSA-028: signed TokenAmount ingress ─────────────────────────────
