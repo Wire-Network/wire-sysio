@@ -34,6 +34,10 @@ testSuccessful=False
 prodNodeId = 0
 shipNodeId = 1
 
+# SHiP log rotation stride. The shutdown guard below keeps the stop point clear of stride
+# boundaries so the head log/index files the test operates on are never empty.
+shipStride = 200
+
 origStateHistoryLog   = ""
 stateHistoryLog       = ""
 origStateHistoryIndex = ""
@@ -63,7 +67,7 @@ try:
     specificExtraNodeopArgs[shipNodeId]=(
         "--plugin sysio::state_history_plugin "
         "--trace-history --chain-state-history --finality-data-history "
-        "--state-history-stride 200 "
+        f"--state-history-stride {shipStride} "
         f"--state-history-endpoint 127.0.0.1:{Utils.getPort(Utils.PortStateHistory)} "
         "--plugin sysio::net_api_plugin --plugin sysio::producer_api_plugin"
     )
@@ -85,6 +89,19 @@ try:
     shipNode = cluster.getNode(shipNodeId)
 
     Print("Shutdown producer and SHiP nodes")
+
+    # Stay clear of a state-history-stride boundary before stopping. When the last stored block is
+    # exactly a stride multiple, rotation has just moved every entry into retained/ and the head
+    # log/index files are 0 bytes, so the file surgery below would operate on empty files. A few
+    # more blocks can be produced between this check and the pause taking effect, so keep a margin
+    # on both sides of the boundary.
+    head = prodNode.getHeadBlockNum()
+    posInStride = head % shipStride
+    if posInStride < 5 or posInStride > shipStride - 10:
+        safeBlock = head - posInStride + (5 if posInStride < 5 else shipStride + 5)
+        Print(f"Head block {head} is near a stride boundary, waiting for block {safeBlock}")
+        assert prodNode.waitForBlock(safeBlock, timeout=30), f"Timed out waiting for block {safeBlock}"
+
     prodNode.processUrllibRequest("producer", "pause", exitOnError=True)
     blockNum = prodNode.getHeadBlockNum()
     shipNode.waitForBlock(blockNum)
