@@ -1,5 +1,6 @@
 #include <sysio.system/sysio.system.hpp>
 #include <sysio.system/emissions.hpp>
+#include <sysio.system/opreg_status.hpp>
 
 #include <sysio/opp/types/types.pb.hpp>
 #include <sysio.opp.common/opp_table_types.hpp>
@@ -24,10 +25,6 @@ using namespace emissions;
 // ---------------------------------------------------------------------------
 // Well-known OPP accounts.
 // ---------------------------------------------------------------------------
-
-namespace opreg_refs {
-   constexpr sysio::name account = "sysio.opreg"_n;
-}
 
 namespace epoch_refs {
    constexpr sysio::name account = "sysio.epoch"_n;
@@ -73,7 +70,7 @@ using sysio::asset;
 using sysio::current_time_point;
 using sysio::name;
 using sysio::time_point_sec;
-using sysio::opp::types::OperatorStatus;
+using sysio::opp::types::OperatorType;
 
 // ---------------------------------------------------------------------------
 // Pure helpers
@@ -164,16 +161,6 @@ int64_t get_reserv_rewards_balance() {
    const uint64_t bal = bkt.get_or_default(reserv_rewards_bucket{}).balance;
    constexpr uint64_t max_amt = static_cast<uint64_t>(sysio::asset::max_amount);
    return bal > max_amt ? sysio::asset::max_amount : static_cast<int64_t>(bal);
-}
-
-// Returns true iff the account is registered in sysio.opreg with AVAILABLE
-// status (OPERATOR_STATUS_ACTIVE). Slashed/terminated/unknown all return false.
-// Non-registered accounts return false.
-bool is_op_active(name account) {
-   sysio::opreg::operators_t ops(opreg_refs::account);
-   auto key = sysio::opreg::operator_key{account.value};
-   if (!ops.contains(key)) return false;
-   return ops.get(key).status == OperatorStatus::OPERATOR_STATUS_ACTIVE;
 }
 
 // ---------------------------------------------------------------------------
@@ -670,7 +657,7 @@ void system_contract::payepoch(uint32_t epoch_index,
 
          if (!it->is_active) continue;
          // opreg filter: skip slashed / terminated / unknown
-         if (!is_op_active(it->owner)) continue;
+         if (!is_op_active(it->owner, OperatorType::OPERATOR_TYPE_PRODUCER)) continue;
 
          uint32_t w      = 0;
          bool     standby = false;
@@ -769,7 +756,7 @@ void system_contract::payepoch(uint32_t epoch_index,
          const int64_t fee_per_member = fee_group_pool / members;
 
          for (const auto& m : group) {
-            if (!is_op_active(m)) continue;
+            if (!is_op_active(m, OperatorType::OPERATOR_TYPE_BATCH)) continue;
             // One transfer carries both the emission and the fee share.
             send_wire_transfer(get_self(), m, per_member + fee_per_member, memo::batch_op_reward);
             actual_paid += per_member;

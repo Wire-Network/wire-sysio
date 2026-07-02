@@ -743,7 +743,7 @@ namespace webassembly {
           * @ingroup console
           * @param val - single-precision floating point number to be printed.
           */
-         void printsf(float32_t val);
+         void printsf(softfloat32_t val);
 
          /**
           * Prints value as double-precision floating point number.
@@ -751,7 +751,7 @@ namespace webassembly {
           * @ingroup console
           * @param val - double-precision floating point number to be printed
           */
-         void printdf(float64_t val);
+         void printdf(softfloat64_t val);
 
          /**
           * Prints value as quadruple-precision floating point number.
@@ -759,7 +759,7 @@ namespace webassembly {
           * @ingroup console
           * @param val - a pointer to the quadruple-precision floating point number to be printed
           */
-         void printqf(aligned_ptr<const float128_t> val);
+         void printqf(aligned_ptr<const softfloat128_t> val);
 
          /**
           * Prints a 64 bit names as base32 encoded string.

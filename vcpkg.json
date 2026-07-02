@@ -81,7 +81,7 @@
     },
     {
       "name": "boost",
-      "version": "1.89.0#1"
+      "version": "1.89.0#3"
     },
     {
       "name": "llvm",
@@ -117,7 +117,7 @@
     },
     {
       "name": "secp256k1-internal",
-      "version": "0.7.0"
+      "version": "0.7.0#1"
     },
     {
       "name": "prometheus-cpp",
@@ -129,11 +129,11 @@
     },
     {
       "name": "softfloat",
-      "version": "3.0.0"
+      "version": "3.0.0#1"
     },
     {
       "name": "wire-sys-vm",
-      "version": "1.1.0"
+      "version": "1.2.0"
     },
     {
       "name": "nlohmann-json",

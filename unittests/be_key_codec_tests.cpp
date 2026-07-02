@@ -109,7 +109,7 @@ BOOST_AUTO_TEST_CASE(float128_roundtrip_and_ordering) {
    auto shapes = codec::build_key_shapes(abi, {"k"}, {"float128"});
 
    auto f128_var = [](double d) {
-      float128_t f = ::f64_to_f128(to_softfloat64(d));
+      softfloat128_t f = ::f64_to_f128(to_softfloat64(d));
       fc::variant v;
       fc::to_variant(f, v);
       return v;
@@ -179,7 +179,7 @@ BOOST_AUTO_TEST_CASE(leaf_support_list_roundtrips) {
       if (t == "bool")        return fc::variant(true);
       if (t == "string")      return fc::variant(std::string("hi"));
       if (t == "float128" || t == "long double") {
-         float128_t f = ::f64_to_f128(to_softfloat64(1.5));
+         softfloat128_t f = ::f64_to_f128(to_softfloat64(1.5));
          fc::variant v; fc::to_variant(f, v); return v;
       }
       if (t == "float32" || t == "float" || t == "float64" || t == "double")
@@ -212,7 +212,7 @@ BOOST_AUTO_TEST_CASE(leaf_spelling_aliases_match_canonical) {
    const abi_def abi;
 
    auto f128_var = [](double d) {
-      float128_t f = ::f64_to_f128(to_softfloat64(d));
+      softfloat128_t f = ::f64_to_f128(to_softfloat64(d));
       fc::variant v;
       fc::to_variant(f, v);
       return v;

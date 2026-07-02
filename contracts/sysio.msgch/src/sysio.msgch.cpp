@@ -7,6 +7,7 @@
 #include <sysio.opreg/sysio.opreg.hpp>     // operator-status delivery gate (operators table)
 #include <sysio.opp.common/slug_name.hpp>
 #include <sysio.opp.common/safe_ops.hpp>   // to_depot_amount — WSA-028 fail-closed TokenAmount gate
+#include <sysio.opp.common/name_ops.hpp>   // parse_wire_account_name — never-throw account-name parse
 #include <sysio/opp/opp.pb.hpp>
 #include <sysio/opp/attestations/attestations.pb.hpp>
 #include <zpp_bits.h>
@@ -455,7 +456,11 @@ void dispatch_underwrite_commit(name self, const std::vector<char>& data, uint64
       auto rc = in(uic);
       if (rc != zpp::bits::errc{}) return;
    }
-   if (uic.uw_account.name.empty()) return;
+   // Pre-validate the relayed account string before constructing `name` below. The CDT `name`
+   // ctor aborts on an empty, overlong, or out-of-charset string, and an abort here would revert
+   // the whole evalcons/apply_consensus delivery; a malformed name is dropped instead.
+   const auto underwriter = sysio::opp::safe::parse_wire_account_name(uic.uw_account.name);
+   if (!underwriter) return;
 
    // WSA-005: the leg's chain (uic.chain_code) must be the proven delivering outpost before the
    // commit is recorded against a swap leg.
@@ -466,7 +471,7 @@ void dispatch_underwrite_commit(name self, const std::vector<char>& data, uint64
    action(
       permission_level{self, "active"_n},
       UWRIT_ACCOUNT, "rcrdcommit"_n,
-      std::make_tuple(uic.uw_request_id, name{uic.uw_account.name}, chain_code,
+      std::make_tuple(uic.uw_request_id, *underwriter, chain_code,
                       sysio::slug_name{chain_code},
                       sysio::slug_name{uic.token_code},
                       sysio::slug_name{uic.reserve_code},
@@ -558,13 +563,11 @@ void dispatch_reserve_create_cancel(name self, const std::vector<char>& data, ui
 /// The tier-specific length rule (tier-1 = 2-6, tier 2/3 = 1-12) is enforced later by nodeownreg;
 /// here we only guarantee the name is constructible and within the node-owner budget.
 std::optional<name> parse_owner_name(const std::string& s) {
-   if (s.empty() || s.size() > 12) return std::nullopt;
-   for (char c : s) {
-      // sysio base32 alphabet: '.', '1'-'5', 'a'-'z'. Anything else aborts in name's ctor.
-      const bool ok = (c == '.') || (c >= '1' && c <= '5') || (c >= 'a' && c <= 'z');
-      if (!ok) return std::nullopt;
-   }
-   return name{std::string_view{s}};
+   // Node-owner names are capped tighter (<=12) than the full 13-char account domain; charset,
+   // final-symbol, and constructibility are delegated to the shared parser so the rules live in
+   // one place.
+   if (s.size() > 12) return std::nullopt;
+   return sysio::opp::safe::parse_wire_account_name(s);
 }
 
 /// Build a sysio::public_key from a WireKeyType + the raw key bytes carried in

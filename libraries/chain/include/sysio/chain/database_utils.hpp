@@ -157,13 +157,13 @@ namespace detail {
 // directly-supported scalar leaf types is the `key_leaf_kind` enum below
 // (struct keys are expanded field-by-field on top of those leaves).
 // ---------------------------------------------------------------------------
-// Forward declarations: the fc float128_t variant conversions are defined at
+// Forward declarations: the fc softfloat128_t variant conversions are defined at
 // the bottom of this header; the BE key codec below uses them.
 } // namespace sysio::chain
 namespace fc {
    class variant;
-   inline void to_variant( const float128_t& f, variant& v );
-   inline void from_variant( const variant& v, float128_t& f );
+   inline void to_variant( const softfloat128_t& f, variant& v );
+   inline void from_variant( const variant& v, softfloat128_t& f );
 } // namespace fc
 namespace sysio::chain {
 
@@ -384,13 +384,13 @@ inline fc::variant decode_field(reader& r, key_leaf_kind kind) {
       // key — this branch must invert that transform byte-for-byte. The e2e
       // float128 pagination in get_table_tests (sec-9) pins the agreement; a
       // change to CDT's long-double key encoding would break it there. Spelling
-      // is fc's canonical float128_t form ("0x" + 16 LE hex bytes).
+      // is fc's canonical softfloat128_t form ("0x" + 16 LE hex bytes).
       const uint64_t hi_enc = r.read_be64();
       const uint64_t lo_enc = r.read_be64();
       fc::uint128 bits = fc::to_uint128(hi_enc, lo_enc);
       if (bits >> 127) bits ^= (fc::uint128(1) << 127);
       else             bits = ~bits;
-      float128_t v;
+      softfloat128_t v;
       memcpy(&v, &bits, sizeof(v)); // little-endian platform assumption, as elsewhere in this file
       fc::variant out;
       fc::to_variant(v, out);
@@ -458,7 +458,7 @@ inline void encode_field(writer& w, key_leaf_kind kind, const fc::variant& val) 
       // kv_multi_index::encode_secondary(long double) byte-for-byte so a JSON
       // bound compares against the stored secondary key (see that branch for the
       // source-of-truth note).
-      float128_t f;
+      softfloat128_t f;
       fc::from_variant(val, f);
       fc::uint128 bits;
       memcpy(&bits, &f, sizeof(bits)); // little-endian platform assumption, as elsewhere in this file
@@ -624,41 +624,41 @@ namespace fc {
    }
 
    inline
-   void float64_to_double (const float64_t& f, double& d) {
+   void float64_to_double (const softfloat64_t& f, double& d) {
       memcpy(&d, &f, sizeof(d));
    }
 
    inline
-   void double_to_float64 (const double& d, float64_t& f) {
+   void double_to_float64 (const double& d, softfloat64_t& f) {
       memcpy(&f, &d, sizeof(f));
    }
 
    inline
-   void float128_to_uint128 (const float128_t& f, sysio::chain::uint128_t& u) {
+   void float128_to_uint128 (const softfloat128_t& f, sysio::chain::uint128_t& u) {
       memcpy(&u, &f, sizeof(u));
    }
 
    inline
-   void uint128_to_float128 (const sysio::chain::uint128_t& u,  float128_t& f) {
+   void uint128_to_float128 (const sysio::chain::uint128_t& u,  softfloat128_t& f) {
       memcpy(&f, &u, sizeof(f));
    }
 
    inline
-   void to_variant( const float64_t& f, variant& v ) {
+   void to_variant( const softfloat64_t& f, variant& v ) {
       double double_f;
       float64_to_double(f, double_f);
       v = variant(double_f);
    }
 
    inline
-   void from_variant( const variant& v, float64_t& f ) {
+   void from_variant( const variant& v, softfloat64_t& f ) {
       double double_f;
       from_variant(v, double_f);
       double_to_float64(double_f, f);
    }
 
    inline
-   void to_variant( const float128_t& f, variant& v ) {
+   void to_variant( const softfloat128_t& f, variant& v ) {
       // Assumes platform is little endian and hex representation of 128-bit integer is in little endian order.	
       char as_bytes[sizeof(sysio::chain::uint128_t)];
       memcpy(as_bytes, &f, sizeof(as_bytes));
@@ -668,15 +668,16 @@ namespace fc {
    }
 
    inline
-   void from_variant( const variant& v, float128_t& f ) {
-      // Temporarily hold the binary in uint128_t before casting it to float128_t
+   void from_variant( const variant& v, softfloat128_t& f ) {
+      // Temporarily hold the binary in uint128_t before casting it to softfloat128_t
       char temp[sizeof(sysio::chain::uint128_t)];
       memset(temp, 0, sizeof(temp));
-      auto s = v.as_string();	
-      FC_ASSERT( s.size() == 2 + 2 * sizeof(temp) && s.find("0x") == 0,	"Failure in converting hex data into a float128_t");	
+      auto s = v.as_string();
+      FC_ASSERT( s.size() == 2 + 2 * sizeof(temp) && s.find("0x") == 0,
+                 "Failure in converting hex data into a softfloat128_t" );
       auto sz = from_hex( s.substr(2), temp, sizeof(temp) );
-      // Assumes platform is little endian and hex representation of 128-bit integer is in little endian order.	
-      FC_ASSERT( sz == sizeof(temp), "Failure in converting hex data into a float128_t" );	
+      // Assumes platform is little endian and hex representation of 128-bit integer is in little endian order.
+      FC_ASSERT( sz == sizeof(temp), "Failure in converting hex data into a softfloat128_t" );
       memcpy(&f, temp, sizeof(f));
    }
 
@@ -806,7 +807,7 @@ namespace chainbase {
 
 // overloads for softfloat packing
 template<typename DataStream>
-DataStream& operator << ( DataStream& ds, const float64_t& v ) {
+DataStream& operator << ( DataStream& ds, const softfloat64_t& v ) {
    double double_v;
    fc::float64_to_double(v, double_v);
    fc::raw::pack(ds, double_v);
@@ -814,7 +815,7 @@ DataStream& operator << ( DataStream& ds, const float64_t& v ) {
 }
 
 template<typename DataStream>
-DataStream& operator >> ( DataStream& ds, float64_t& v ) {
+DataStream& operator >> ( DataStream& ds, softfloat64_t& v ) {
    double double_v;
    fc::raw::unpack(ds, double_v);
    fc::double_to_float64(double_v, v);
@@ -822,7 +823,7 @@ DataStream& operator >> ( DataStream& ds, float64_t& v ) {
 }
 
 template<typename DataStream>
-DataStream& operator << ( DataStream& ds, const float128_t& v ) {
+DataStream& operator << ( DataStream& ds, const softfloat128_t& v ) {
    sysio::chain::uint128_t uint128_v;
    fc::float128_to_uint128(v, uint128_v);
    fc::raw::pack(ds, uint128_v);
@@ -830,7 +831,7 @@ DataStream& operator << ( DataStream& ds, const float128_t& v ) {
 }
 
 template<typename DataStream>
-DataStream& operator >> ( DataStream& ds, float128_t& v ) {
+DataStream& operator >> ( DataStream& ds, softfloat128_t& v ) {
    sysio::chain::uint128_t uint128_v;
    fc::raw::unpack(ds, uint128_v);
    fc::uint128_to_float128(uint128_v, v);
