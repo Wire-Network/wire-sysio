@@ -13,6 +13,7 @@ set(fc_sources
         src/io/json.cpp
         src/io/varint.cpp
         src/io/fstream.cpp
+        src/io/secure_file.cpp
         src/io/console.cpp
         src/filesystem.cpp
         src/interprocess/file_mapping.cpp
@@ -143,4 +144,3 @@ install(
         DIRECTORY include/fc
         DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR}
 )
-

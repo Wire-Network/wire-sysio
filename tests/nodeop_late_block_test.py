@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os
+import re
 import shutil
 import signal
 import time
@@ -30,6 +31,7 @@ canonicalConvergenceTimeout=90
 expectedIProducerBlocks=9
 forkSwitchLogTimeout=30
 producerSlotBlockCount=12
+bridgeReconnectProducer="defproducerk"
 delay=args.d
 debug=args.v
 dumpErrorDetails=args.dump_error_details
@@ -95,11 +97,15 @@ try:
     node4.kill(signal.SIGTERM)
     assert not node4.verifyAlive(), "Node4 did not shutdown"
 
-    Print("Wait until Node_03 is well into its isolated fork (defproducerl)")
-    node3.waitForProducer("defproducerl", exitOnError=True)
+    Print(f"Wait until Node_03 is producing on its isolated fork ({bridgeReconnectProducer})")
+    node3.waitForProducer(bridgeReconnectProducer, exitOnError=True)
     isolatedForkInfo = node3.getInfo(exitOnError=True)
     isolatedForkHeadId = isolatedForkInfo["head_block_id"]
     isolatedForkHeadNum = isolatedForkInfo["head_block_num"]
+
+    Print("Relaunch bridge to reconnect Node_02 and Node_03 while Node_03 is still producing")
+    node4.relaunch()
+
     def collectCanonicalIProducerBlocks():
         """Return canonical defproduceri blocks once node_02 has the whole verification window."""
         blocks = getProducerBlockIds(node2, "defproduceri", firstIProdBlockNum, producerSlotBlockCount)
@@ -109,9 +115,6 @@ try:
     canonicalIProducerBlocks = Utils.waitForObj(collectCanonicalIProducerBlocks, timeout=forkSwitchLogTimeout)
     assert canonicalIProducerBlocks, \
         f"Expected at least {expectedIProducerBlocks} canonical defproduceri blocks from block {firstIProdBlockNum}"
-
-    Print("Relaunch bridge to reconnect Node_02 and Node_03")
-    node4.relaunch()
 
     Print("Verify Node_03 converges from its isolated fork back to Node_02's canonical branch")
     def node3ConvergedToCanonicalBranch():
@@ -134,11 +137,18 @@ try:
     Print("Verify fork switch - poll for log entry in case sync is still settling")
     # The fork switch log may reference any of node_03's producers (j, k, or l) depending
     # on exactly when the bridge reconnects and blocks propagate.
-    def findForkSwitch():
-        """Return the log line number for node_03 switching away from one of its fork producers."""
-        return node3.findInLog("switching forks .* defproducer[jkl]")
-    switchForkLineNum = Utils.waitForObj(findForkSwitch, timeout=forkSwitchLogTimeout)
-    assert switchForkLineNum, "Expected to find 'switching forks' from a node_03 producer in node_03 log"
+    switchForkLogPattern = re.compile(r"switching forks from \S+ \(block number (\d+) (defproducer[jkl])\)")
+
+    def partitionForkSwitches():
+        """Return node_03 producers abandoned after the partition, in log order."""
+        producers = []
+        for line in node3.linesInLog("switching forks"):
+            match = switchForkLogPattern.search(line)
+            if match and int(match.group(1)) > firstIProdBlockNum:
+                producers.append(match.group(2))
+        return producers
+    switchedFrom = Utils.waitForObj(lambda: partitionForkSwitches() or None, timeout=forkSwitchLogTimeout)
+    assert switchedFrom, "Expected to find 'switching forks' from a node_03 producer in node_03 log"
 
     # Verify the lockout-detection optimization fired: when the bridge reconnects, node_03
     # is still inside its producing slot, and the rest of the network's blocks reach node_03's
@@ -166,17 +176,18 @@ try:
     # verify that defproducerk or defproducerl blocks made it into the canonical chain
     # It can take a while to resolve the fork, but should have at least one block from node_03's
     # producers unless defproducera wins the fork
-    expectedProd = "defproducerk"
-    if node3.findInLog("switching forks .* defproducerl", switchForkLineNum):
-        expectedProd = "defproducera"
-    iProdBlockNum += 12 # into the next set of blocks
+    expectedProducers = {"defproducerk", "defproducerl"}
+    if "defproducerl" in partitionForkSwitches():
+        expectedProducers = {"defproducera"}
+    iProdBlockNum += producerSlotBlockCount  # into the next set of blocks
     found_defproducer = False
-    for i in range(12):
+    for i in range(producerSlotBlockCount):
         defprod=node3.getBlockProducerByNum(iProdBlockNum + i)
-        if defprod == expectedProd:
+        if defprod in expectedProducers:
             found_defproducer = True
 
-    assert found_defproducer, f"expected {expectedProd} in blocks {iProdBlockNum}-{iProdBlockNum+12}"
+    assert found_defproducer, \
+        f"expected one of {sorted(expectedProducers)} in blocks {iProdBlockNum}-{iProdBlockNum+producerSlotBlockCount}"
 
     testSuccessful=True
 finally:

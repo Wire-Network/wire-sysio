@@ -84,12 +84,17 @@ struct sysvmoc_tier {
             runtime_interface = std::make_unique<webassembly::sys_vm_runtime::sys_vm_runtime<sysio::vm::interpreter>>();
 #endif
 #ifdef SYSIO_SYS_VM_JIT_RUNTIME_ENABLED
-         if(vm == wasm_interface::vm_type::sys_vm_jit && profile) {
-            sysio::vm::set_profile_interval_us(200);
-            runtime_interface = std::make_unique<webassembly::sys_vm_runtime::sys_vm_profile_runtime>();
+         if(vm == wasm_interface::vm_type::sys_vm_jit) {
+#ifdef __x86_64__
+            if(profile) {
+               sysio::vm::set_profile_interval_us(200);
+               runtime_interface = std::make_unique<webassembly::sys_vm_runtime::sys_vm_profile_runtime>();
+            } else
+#endif
+            {
+               runtime_interface = std::make_unique<webassembly::sys_vm_runtime::sys_vm_runtime<sysio::vm::jit>>();
+            }
          }
-         if(vm == wasm_interface::vm_type::sys_vm_jit && !profile)
-            runtime_interface = std::make_unique<webassembly::sys_vm_runtime::sys_vm_runtime<sysio::vm::jit>>();
 #endif
 #ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
          if(vm == wasm_interface::vm_type::sys_vm_oc)

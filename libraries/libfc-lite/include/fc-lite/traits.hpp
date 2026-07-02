@@ -5,6 +5,7 @@
 #include <iostream>
 #include <tuple>
 #include <type_traits>
+#include <variant>
 #include <utility>
 #include <gsl-lite/gsl-lite.hpp>
 

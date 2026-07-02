@@ -10,6 +10,7 @@ add_executable( test_fc
         crypto/test_webauthn.cpp
         io/test_cfile.cpp
         io/test_json.cpp
+        io/test_secure_file.cpp
         log/test_json_formatter.cpp
         io/test_json_variant.cpp
         io/test_random_access_file.cpp

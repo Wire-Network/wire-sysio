@@ -134,7 +134,7 @@ int main(int argc, char* argv[]) {
          std::cout << "]" << std::endl;
 
          std::cerr << fc::json::to_pretty_string(mvo()("status", "done")
-                                                      ("time", time(NULL))
+                                                      ("time", int64_t{time(NULL)})
                                                       ("first_block_num", first_block_num)
                                                       ("last_block_num", last_block_num)) << std::endl << "]" << std::endl;
       };

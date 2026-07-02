@@ -20,7 +20,7 @@ namespace sysio { namespace chain { namespace webassembly {
 
       template<typename T>
       inline constexpr bool is_softfloat_type_v =
-         std::is_same_v<T, float32_t> || std::is_same_v<T, float64_t> || std::is_same_v<T, float128_t>;
+         std::is_same_v<T, softfloat32_t> || std::is_same_v<T, softfloat64_t> || std::is_same_v<T, softfloat128_t>;
 
       template<typename T>
       inline constexpr bool is_wasm_arithmetic_type_v =
@@ -28,7 +28,7 @@ namespace sysio { namespace chain { namespace webassembly {
 
       template <typename T>
       struct is_whitelisted_aligned_type {
-         static constexpr bool value = std::is_same_v<float128_t, T> ||
+         static constexpr bool value = std::is_same_v<softfloat128_t, T> ||
                                        std::is_same_v<null_terminated_ptr, T> ||
                                        std::is_same_v<memcpy_params, T> ||
                                        std::is_same_v<memcmp_params, T> ||
@@ -100,13 +100,13 @@ namespace sysio { namespace chain { namespace webassembly {
       return true;
    }
 
-   inline static bool is_nan( const float32_t f ) {
+   inline static bool is_nan( const softfloat32_t f ) {
       return f32_is_nan( f );
    }
-   inline static bool is_nan( const float64_t f ) {
+   inline static bool is_nan( const softfloat64_t f ) {
       return f64_is_nan( f );
    }
-   inline static bool is_nan( const float128_t& f ) {
+   inline static bool is_nan( const softfloat128_t& f ) {
       return f128_is_nan( f );
    }
 
@@ -152,7 +152,7 @@ namespace sysio { namespace chain { namespace webassembly {
 
    template<typename T>
    inline constexpr bool should_check_nan_v =
-      std::is_same_v<T, float32_t> || std::is_same_v<T, float64_t> || std::is_same_v<T, float128_t>;
+      std::is_same_v<T, softfloat32_t> || std::is_same_v<T, softfloat64_t> || std::is_same_v<T, softfloat128_t>;
 
    template<typename T>
    struct remove_argument_proxy {

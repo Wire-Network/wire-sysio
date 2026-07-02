@@ -1,4 +1,4 @@
-name: "Build & Test(Parallel ctest)"
+name: "Linux amd64 build & tests"
 
 on:
   push:
@@ -106,7 +106,8 @@ jobs:
             vcpkg-binaries-${{ matrix.platform }}-
 
       - name: Restore ccache
-        uses: actions/cache@v5
+        id: restore-ccache
+        uses: actions/cache/restore@v5
         with:
           path: ${{ github.workspace }}/.ccache
           key: ccache-${{ matrix.platform }}-${{ github.sha }}
@@ -138,7 +139,10 @@ jobs:
           SYSIO_PLATFORM_NAME: ${{ matrix.platform }}
           SYSIO_BUILD_SYSTEM_CONTRACTS: ${{ startsWith(github.ref, 'refs/tags/v') && 'ON' || 'OFF' }}
           SYSIO_BUILD_TEST_CONTRACTS: "OFF"
+          VCPKG_TARGET_TRIPLET: x64-linux-release
+          VCPKG_HOST_TRIPLET: x64-linux-release
         run: |
+          chown -R "$(id -u):$(id -g)" "$PWD"
           bash .github/scripts/build-sysio.sh "${{ matrix.build_jobs }}"
 
       - name: Show vcpkg logs if failure
@@ -147,11 +151,6 @@ jobs:
           echo "$PWD"
           echo "=== vcpkg-manifest-install.log ==="
           cat build/vcpkg-manifest-install.log || true
-          echo "=== Other vcpkg logs ==="
-          find build -type f -name '*.log' | while read f; do
-            echo "----- $f -----"
-            tail -n 40 "$f"
-          done
 
       - name: Debug environment and workspace
         if: ${{ runner.debug == '1' }}
@@ -248,6 +247,13 @@ jobs:
           # Caches are immutable, so save each run under a unique key and restore by platform prefix.
           path: build/Testing/Temporary/CTestCostData.txt
           key: ctest-cost-${{ matrix.platform }}-${{ github.run_id }}-${{ github.run_attempt }}
+
+      - name: Save ccache
+        if: ${{ always() && steps.restore-ccache.outputs.cache-hit != 'true' }}
+        uses: actions/cache/save@v5
+        with:
+          path: ${{ github.workspace }}/.ccache
+          key: ccache-${{ matrix.platform }}-${{ github.sha }}
 
       - name: Upload core files from failed tests
         uses: actions/upload-artifact@v6
