@@ -313,9 +313,14 @@ try:
         termAt = headBlockNum + 5
         replayTermAt[nodeId] = termAt
 
-    # wait for all to terminate, needs to be larger than largest terminate-at-block
-    # and leave room for snapshot blocks
-    producingNode.waitForBlock( 250, timeout=150 )
+    # Wait for the producer to advance past every terminate-at-block target before the
+    # cluster is torn down. Regular nodes (1-4) terminate at <=180, but the snapshot-replay
+    # nodes terminate at snapshot_head+5, which is only known now and can land at/beyond a
+    # fixed cap when bootstrap is slow. If the producer stopped exactly at a replay node's
+    # termAt, that node's block log would hold no block beyond termAt and the later
+    # "advance past termAt" check could never pass. The 250 floor keeps the regular nodes
+    # covered; the +5 margin lets a lagging replay node still sync a block beyond termAt.
+    producingNode.waitForBlock( max(250, max(replayTermAt.values()) + 5), timeout=150 )
     cluster.biosNode.kill(signal.SIGTERM)
     producingNode.kill(signal.SIGTERM)
 

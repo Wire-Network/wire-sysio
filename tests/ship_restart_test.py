@@ -90,17 +90,11 @@ try:
 
     Print("Shutdown producer and SHiP nodes")
 
-    # Stay clear of a state-history-stride boundary before stopping. When the last stored block is
-    # exactly a stride multiple, rotation has just moved every entry into retained/ and the head
-    # log/index files are 0 bytes, so the file surgery below would operate on empty files. A few
-    # more blocks can be produced between this check and the pause taking effect, so keep a margin
-    # on both sides of the boundary.
-    head = prodNode.getHeadBlockNum()
-    posInStride = head % shipStride
-    if posInStride < 5 or posInStride > shipStride - 10:
-        safeBlock = head - posInStride + (5 if posInStride < 5 else shipStride + 5)
-        Print(f"Head block {head} is near a stride boundary, waiting for block {safeBlock}")
-        assert prodNode.waitForBlock(safeBlock, timeout=30), f"Timed out waiting for block {safeBlock}"
+    # Stop clear of a state-history-stride boundary: on an exact multiple the head log/index have
+    # just rotated into retained/ and are 0 bytes, so the file surgery below would operate on empty
+    # files.
+    assert prodNode.waitForBlockClearOfStride(shipStride, timeout=30), \
+        "producer did not advance clear of a state-history-stride boundary"
 
     prodNode.processUrllibRequest("producer", "pause", exitOnError=True)
     blockNum = prodNode.getHeadBlockNum()

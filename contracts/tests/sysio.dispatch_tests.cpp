@@ -600,13 +600,12 @@ public:
    /// proto3/zpp encoder-parity rule), sha256 the RAW bytes, sign with the
    /// underwriter's active key, embed the packed signature, serialize.
    std::vector<char> make_signed_uic(name underwriter, uint64_t uwreq_id,
-                                     uint64_t outpost_id, uint64_t chain_code_v,
+                                     uint64_t chain_code_v,
                                      uint64_t token_code_v, uint64_t reserve_code_v) {
       sysio::opp::attestations::UnderwriteIntentCommit uic;
       uic.mutable_uw_account()->set_name(underwriter.to_string());
       uic.mutable_uw_ext_chain_addr()->set_kind(sysio::opp::types::CHAIN_KIND_EVM);
       uic.set_uw_request_id(uwreq_id);
-      uic.set_outpost_id(outpost_id);
       uic.set_token_code(token_code_v);
       uic.set_chain_code(chain_code_v);
       uic.set_reserve_code(reserve_code_v);
@@ -630,13 +629,12 @@ public:
    /// validates the account name and drops a malformed UIC before rcrdcommit or
    /// signature verification is ever reached, so a valid signature is unnecessary.
    std::vector<char> make_uic_raw_name(const std::string& raw_name, uint64_t uwreq_id,
-                                       uint64_t outpost_id, uint64_t chain_code_v,
+                                       uint64_t chain_code_v,
                                        uint64_t token_code_v, uint64_t reserve_code_v) {
       sysio::opp::attestations::UnderwriteIntentCommit uic;
       uic.mutable_uw_account()->set_name(raw_name);
       uic.mutable_uw_ext_chain_addr()->set_kind(sysio::opp::types::CHAIN_KIND_EVM);
       uic.set_uw_request_id(uwreq_id);
-      uic.set_outpost_id(outpost_id);
       uic.set_token_code(token_code_v);
       uic.set_chain_code(chain_code_v);
       uic.set_reserve_code(reserve_code_v);
@@ -965,7 +963,7 @@ BOOST_FIXTURE_TEST_CASE(underwrite_commit_mismatched_source_chain_is_dropped,
 
    // One signed dest-leg (SOLANA) UIC, wrapped in an envelope. The outpost it is proven-delivered
    // from is the ONLY thing that varies between the two deliveries below.
-   const auto uic_sol = make_signed_uic(UWRIT_OP, ATT_ID, /*outpost_id*/ sol_chain,
+   const auto uic_sol = make_signed_uic(UWRIT_OP, ATT_ID,
                                         /*chain_code*/ sol_chain, sol_token, primary);
    const auto uic_env = encode_envelope_with_one_attestation(
       current_epoch(), sysio::opp::types::ATTESTATION_TYPE_UNDERWRITE_INTENT_COMMIT,
@@ -989,6 +987,70 @@ BOOST_FIXTURE_TEST_CASE(underwrite_commit_mismatched_source_chain_is_dropped,
    BOOST_REQUIRE(dest_committed());
 } FC_LOG_AND_RETHROW() }
 
+// SEC-13/WSA-027: two chains of the SAME VM family (ETH + a second EVM chain)
+// must be disambiguated by EXACT chain_code at the depot — never collapsed onto
+// one ChainKind. A commit for the SECOND EVM chain's leg, proven-delivered from
+// the FIRST EVM chain's outpost, is dropped (its chain_code != the proven
+// outpost); delivered from the second EVM outpost it lands. This is the
+// same-family analogue of underwrite_commit_mismatched_source_chain_is_dropped
+// and pins the two-same-kind-chain invariant WSA-027 is about.
+BOOST_FIXTURE_TEST_CASE(underwrite_commit_two_evm_chains_route_per_chain,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();   // ETH (EVM) source outpost
+   // A SECOND active EVM chain — same VM family, distinct chain_code.
+   BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
+      ("kind", ChainKind::CHAIN_KIND_EVM)("code", codename_mvo("POLYGON"))
+      ("external_chain_id", 137)("name", std::string("polygon-test"))("description", std::string{})));
+   // SOLANA is registered only because the shared reserve-setup helper seeds a
+   // SOLANA/SOL reserve; it is otherwise unused by this two-EVM scenario.
+   BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
+      ("kind", ChainKind::CHAIN_KIND_SVM)("code", codename_mvo("SOLANA"))
+      ("external_chain_id", 900)("name", std::string("solana-test"))("description", std::string{})));
+   setup_wire_token_and_reserves();
+   BOOST_REQUIRE_EQUAL(success(), regreserve_active("POLYGON", "POL", "PRIMARY"));
+   BOOST_REQUIRE_EQUAL(success(), depositinle_credit(UWRIT_OP, "ETH",     "ETH", 1'000'000'000));
+   BOOST_REQUIRE_EQUAL(success(), depositinle_credit(UWRIT_OP, "POLYGON", "POL", 1'000'000'000));
+
+   const auto eth     = fc::slug_name{"ETH"}.value;
+   const auto polygon = fc::slug_name{"POLYGON"}.value;
+   const auto pol_tok = fc::slug_name{"POL"}.value;
+   const auto primary = fc::slug_name{"PRIMARY"}.value;
+   constexpr uint64_t ATT_ID = 9200;
+
+   // ETH -> POLYGON swap (both EVM). Proven source outpost = ETH.
+   const auto sr = encode_swap_request(
+      ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
+      eth, eth, primary, 100, polygon, pol_tok, primary, 100,
+      5000, ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0c'));
+   BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, /*proven=*/ eth, sr));
+   BOOST_REQUIRE(!get_uwreq(ATT_ID).is_null());
+
+   // One signed dest-leg (POLYGON) UIC; the proven delivering outpost is the
+   // only thing that varies between the two deliveries below.
+   const auto uic_pol = make_signed_uic(UWRIT_OP, ATT_ID, /*chain_code*/ polygon, pol_tok, primary);
+   const auto uic_env = encode_envelope_with_one_attestation(
+      current_epoch(), sysio::opp::types::ATTESTATION_TYPE_UNDERWRITE_INTENT_COMMIT,
+      std::string(uic_pol.begin(), uic_pol.end()));
+
+   auto dest_committed = [&]() {
+      auto req = get_uwreq(ATT_ID);
+      for (const auto& c : req["commits_by"].get_array())
+         if (c["underwriter"].as_string() == UWRIT_OP.to_string() &&
+             c["dest_received_at_ms"].as_uint64() != 0)
+            return true;
+      return false;
+   };
+
+   // Mismatch: a POLYGON-leg commit proven-delivered from the ETH outpost (same
+   // VM family, different chain_code) is dropped — exact chain_code != proven ETH.
+   BOOST_REQUIRE_EQUAL(success(), deliver(/*proven=*/ eth, uic_env));
+   BOOST_REQUIRE(!dest_committed());
+
+   // Control: the SAME commit proven-delivered from the POLYGON outpost lands.
+   BOOST_REQUIRE_EQUAL(success(), deliver(/*proven=*/ polygon, uic_env));
+   BOOST_REQUIRE(dest_committed());
+} FC_LOG_AND_RETHROW() }
+
 // A decode-clean UIC whose `uw_account.name` is nonempty but not a constructible account name
 // (uppercase, hyphen, over-long) must be dropped inside dispatch WITHOUT throwing: constructing
 // `name{}` from it would abort the evalcons/apply_consensus transaction and stall consensus
@@ -1004,9 +1066,9 @@ BOOST_FIXTURE_TEST_CASE(underwrite_commit_invalid_account_name_is_dropped,
    const auto sol_token = fc::slug_name{"SOL"}.value;
    const auto primary   = fc::slug_name{"PRIMARY"}.value;
 
-   const auto uic_upper  = make_uic_raw_name("BADNAME",        ATT_ID, sol_chain, sol_chain, sol_token, primary);
-   const auto uic_hyphen = make_uic_raw_name("bad-name",       ATT_ID, sol_chain, sol_chain, sol_token, primary);
-   const auto uic_long   = make_uic_raw_name("abcdefghijklmn", ATT_ID, sol_chain, sol_chain, sol_token, primary);
+   const auto uic_upper  = make_uic_raw_name("BADNAME",        ATT_ID, sol_chain, sol_token, primary);
+   const auto uic_hyphen = make_uic_raw_name("bad-name",       ATT_ID, sol_chain, sol_token, primary);
+   const auto uic_long   = make_uic_raw_name("abcdefghijklmn", ATT_ID, sol_chain, sol_token, primary);
    const auto env = encode_envelope_with_attestations(
       current_epoch(), sysio::opp::types::ATTESTATION_TYPE_UNDERWRITE_INTENT_COMMIT,
       {std::string(uic_upper.begin(),  uic_upper.end()),
@@ -1031,7 +1093,7 @@ BOOST_FIXTURE_TEST_CASE(rcrdcommit_unmatched_leg_leaves_commits_empty,
    const auto sol_chain = fc::slug_name{"SOLANA"}.value;
    const auto sol_token = fc::slug_name{"SOL"}.value;
    const auto primary   = fc::slug_name{"PRIMARY"}.value;
-   const auto uic = make_signed_uic(UWRIT_OP, ATT_ID, sol_chain, sol_chain, sol_token, primary);
+   const auto uic = make_signed_uic(UWRIT_OP, ATT_ID, sol_chain, sol_token, primary);
 
    // (SOLANA, ETH, PRIMARY): source-chain differs from the dest leg, token differs from the source
    // leg — matches neither.
@@ -1051,7 +1113,7 @@ BOOST_FIXTURE_TEST_CASE(rcrdcommit_unmatched_distinct_underwriters_do_not_grow_r
    const auto sol_chain = fc::slug_name{"SOLANA"}.value;
    const auto sol_token = fc::slug_name{"SOL"}.value;
    const auto primary   = fc::slug_name{"PRIMARY"}.value;
-   const auto uic = make_signed_uic(UWRIT_OP, ATT_ID, sol_chain, sol_chain, sol_token, primary);
+   const auto uic = make_signed_uic(UWRIT_OP, ATT_ID, sol_chain, sol_token, primary);
 
    for (name uw : {"uwtwo"_n, "uwthree"_n, "uwfour"_n}) {
       BOOST_REQUIRE_EQUAL(success(),
@@ -1070,7 +1132,7 @@ BOOST_FIXTURE_TEST_CASE(rcrdcommit_matched_source_leg_is_recorded,
 
    const auto eth     = fc::slug_name{"ETH"}.value;
    const auto primary = fc::slug_name{"PRIMARY"}.value;
-   const auto uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, eth, primary);
+   const auto uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
 
    // (ETH, ETH, PRIMARY) is the source leg.
    BOOST_REQUIRE_EQUAL(success(),
@@ -1327,10 +1389,10 @@ BOOST_FIXTURE_TEST_CASE(swap_winner_without_dst_authex_link_is_disqualified,
       5000, ChainKind::CHAIN_KIND_SVM, std::vector<char>(32, '\x0b'));
    BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, eth, sr));
 
-   const auto src_uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, eth, primary);
+   const auto src_uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
    BOOST_REQUIRE_EQUAL(success(),
       rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", src_uic));
-   const auto dst_uic = make_signed_uic(UWRIT_OP, ATT_ID, sol_chain, sol_chain, sol_token, primary);
+   const auto dst_uic = make_signed_uic(UWRIT_OP, ATT_ID, sol_chain, sol_token, primary);
    BOOST_REQUIRE_EQUAL(success(),
       rcrdcommit_direct(ATT_ID, UWRIT_OP, sol_chain, "SOLANA", "SOL", "PRIMARY", dst_uic));
 
@@ -1429,7 +1491,7 @@ BOOST_FIXTURE_TEST_CASE(swap_to_wire_oversized_target_is_rejected_not_aborted,
          wire, wire, primary, target,
          /*tolerance_bps*/ 1'000'000, ChainKind::CHAIN_KIND_WIRE, rcpt);
       BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(att_id, eth, sr));
-      const auto src_uic = make_signed_uic(UWRIT_OP, att_id, eth, eth, eth, primary);
+      const auto src_uic = make_signed_uic(UWRIT_OP, att_id, eth, eth, primary);
       // The push MUST succeed — a pre-fix wrap aborts paywire's asset() here and
       // fails the whole transaction (the production consensus stall).
       BOOST_REQUIRE_EQUAL(success(),
@@ -1479,7 +1541,7 @@ BOOST_FIXTURE_TEST_CASE(swap_candidate_with_invalid_uic_signature_is_disqualifie
    // Source UIC signed by the WRONG account (batchop.a): the recovered key does
    // not match UWRIT_OP's active/owner permission, so verify_uic_signature
    // returns false. The push must still succeed (non-throwing).
-   const auto bad_uic = make_signed_uic(BATCHOP, ATT_ID, eth, eth, eth, primary);
+   const auto bad_uic = make_signed_uic(BATCHOP, ATT_ID, eth, eth, primary);
    BOOST_REQUIRE_EQUAL(success(),
       rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", bad_uic));
 
@@ -1564,7 +1626,7 @@ BOOST_FIXTURE_TEST_CASE(swap_commit_non_underwriter_type_is_dropped,
 
    // Valid UIC self-signed by PRODOP — signature recovery passes, so only the
    // eligibility gate can reject it.
-   const auto uic = make_signed_uic(PRODOP, ATT_ID, eth, eth, eth, primary);
+   const auto uic = make_signed_uic(PRODOP, ATT_ID, eth, eth, primary);
    BOOST_REQUIRE_EQUAL(success(),
       rcrdcommit_direct(ATT_ID, PRODOP, eth, "ETH", "ETH", "PRIMARY", uic));
 
@@ -1614,7 +1676,7 @@ BOOST_FIXTURE_TEST_CASE(swap_commit_inactive_underwriter_is_dropped,
       5000, ChainKind::CHAIN_KIND_WIRE, rcpt);
    BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, eth, sr));
 
-   const auto uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, eth, primary);
+   const auto uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
    BOOST_REQUIRE_EQUAL(success(),
       rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", uic));
 
@@ -1796,10 +1858,10 @@ BOOST_FIXTURE_TEST_CASE(swap_same_token_legs_overcommit_is_disqualified,
       /*tolerance_bps*/ 1'000'000, ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0b'));
    BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, eth, sr));
 
-   const auto src_uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, eth, primary);
+   const auto src_uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
    BOOST_REQUIRE_EQUAL(success(),
       rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", src_uic));
-   const auto dst_uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, eth, secondary);
+   const auto dst_uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, secondary);
    BOOST_REQUIRE_EQUAL(success(),
       rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "SECOND", dst_uic));
 
@@ -1841,10 +1903,10 @@ BOOST_FIXTURE_TEST_CASE(swap_same_token_legs_exact_balance_wins,
       /*tolerance_bps*/ 1'000'000, ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0b'));
    BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, eth, sr));
 
-   const auto src_uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, eth, primary);
+   const auto src_uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
    BOOST_REQUIRE_EQUAL(success(),
       rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", src_uic));
-   const auto dst_uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, eth, secondary);
+   const auto dst_uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, secondary);
    BOOST_REQUIRE_EQUAL(success(),
       rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "SECOND", dst_uic));
 
@@ -1874,10 +1936,10 @@ BOOST_FIXTURE_TEST_CASE(swap_same_token_legs_exact_balance_wins,
       eth, eth, secondary, /*dst_amount*/ 100,
       /*tolerance_bps*/ 1'000'000, ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0b'));
    BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID2, eth, sr2));
-   const auto src_uic2 = make_signed_uic(UWRIT_OP, ATT_ID2, eth, eth, eth, primary);
+   const auto src_uic2 = make_signed_uic(UWRIT_OP, ATT_ID2, eth, eth, primary);
    BOOST_REQUIRE_EQUAL(success(),
       rcrdcommit_direct(ATT_ID2, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", src_uic2));
-   const auto dst_uic2 = make_signed_uic(UWRIT_OP, ATT_ID2, eth, eth, eth, secondary);
+   const auto dst_uic2 = make_signed_uic(UWRIT_OP, ATT_ID2, eth, eth, secondary);
    BOOST_REQUIRE_EQUAL(success(),
       rcrdcommit_direct(ATT_ID2, UWRIT_OP, eth, "ETH", "ETH", "SECOND", dst_uic2));
 
@@ -1954,7 +2016,7 @@ BOOST_FIXTURE_TEST_CASE(releaselock_clamps_overdrain_without_aborting,
       wire, wire, primary, /*target*/ 50,
       /*tolerance_bps*/ 1'000'000, ChainKind::CHAIN_KIND_WIRE, rcpt);
    BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, eth, sr));
-   const auto src_uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, eth, primary);
+   const auto src_uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
    BOOST_REQUIRE_EQUAL(success(),
       rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", src_uic));
    BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_CONFIRMED",
