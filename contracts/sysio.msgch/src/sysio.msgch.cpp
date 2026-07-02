@@ -90,7 +90,7 @@ std::optional<size_t> estimate_svm_dynamic_accounts(AttestationType type,
       case AT::ATTESTATION_TYPE_OPERATORS:
       case AT::ATTESTATION_TYPE_BATCH_OPERATOR_GROUPS:
       case AT::ATTESTATION_TYPE_EMISSIONS_BLOCKED:
-         return 0;
+         return SVM_DYNAMIC_ACCOUNTS_NONE;
 
       case AT::ATTESTATION_TYPE_OPERATOR_ACTION: {
          opp::attestations::OperatorAction oa;
@@ -100,9 +100,9 @@ std::optional<size_t> estimate_svm_dynamic_accounts(AttestationType type,
          using OAT = opp::attestations::OperatorAction;
          switch (oa.action_type) {
             case OAT::ACTION_TYPE_WITHDRAW_REMIT:
-               return 1;
+               return SVM_DYNAMIC_ACCOUNTS_NATIVE_WALLET;
             case OAT::ACTION_TYPE_SLASH:
-               return 0;
+               return SVM_DYNAMIC_ACCOUNTS_NONE;
             case OAT::ACTION_TYPE_DEPOSIT_REQUEST:
             case OAT::ACTION_TYPE_WITHDRAW_REQUEST:
             case OAT::ACTION_TYPE_UNKNOWN:
@@ -113,12 +113,12 @@ std::optional<size_t> estimate_svm_dynamic_accounts(AttestationType type,
 
       case AT::ATTESTATION_TYPE_DEPOSIT_REVERT:
       case AT::ATTESTATION_TYPE_RESERVE_READY:
-         return 1;
+         return SVM_DYNAMIC_ACCOUNTS_NATIVE_WALLET;
 
       case AT::ATTESTATION_TYPE_SWAP_REMIT:
       case AT::ATTESTATION_TYPE_SWAP_REVERT:
       case AT::ATTESTATION_TYPE_RESERVE_CREATE_CANCELLED:
-         return 8;
+         return SVM_DYNAMIC_ACCOUNTS_RESERVE_EFFECT_WORST_CASE;
 
       case AT::ATTESTATION_TYPE_UNSPECIFIED:
       case AT::ATTESTATION_TYPE_STAKE:
@@ -1357,8 +1357,9 @@ void msgch::queueout(uint64_t chain_code,
 
    {
       sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
-      auto chain_it = chains_tbl.find(sysio::chains::chain_key{sysio::slug_name{chain_code}});
-      if (chain_it != chains_tbl.end() && chain_it->kind == ChainKind::CHAIN_KIND_SVM) {
+      auto chain = chains_tbl.get(sysio::chains::chain_key{sysio::slug_name{chain_code}},
+                                  "sysio.msgch::queueout: chain_code is not registered");
+      if (chain.kind == ChainKind::CHAIN_KIND_SVM) {
          check(estimate_svm_dynamic_accounts(attest_type, data).has_value(),
                "sysio.msgch::queueout: no Solana terminal account estimate for attestation");
       }
@@ -1435,7 +1436,6 @@ void msgch::buildenv(uint64_t chain_code) {
    size_t              included_count = 0;
    size_t              estimated_bytes = ENVELOPE_BASELINE_BYTES;
    size_t              estimated_svm_dynamic_accounts = 0;
-   std::vector<size_t> included_svm_dynamic_costs;
    for (const auto& entry : candidate_entries) {
       const size_t entry_bytes = ATTESTATION_OVERHEAD_BYTES + entry.data.size();
       if (estimated_bytes + entry_bytes > MAX_ENVELOPE_BYTES) {
@@ -1455,7 +1455,6 @@ void msgch::buildenv(uint64_t chain_code) {
       }
       estimated_bytes += entry_bytes;
       estimated_svm_dynamic_accounts = next_svm_dynamic_accounts;
-      if (is_svm_destination) included_svm_dynamic_costs.push_back(entry_svm_dynamic_accounts);
       ++included_count;
    }
 
@@ -1515,12 +1514,6 @@ void msgch::buildenv(uint64_t chain_code) {
             "MAX_ENVELOPE_BYTES -- cannot pack into an envelope");
       entries.pop_back();
       included_ids.pop_back();
-      if (is_svm_destination) {
-         estimated_svm_dynamic_accounts -= included_svm_dynamic_costs.back();
-         included_svm_dynamic_costs.pop_back();
-         check(svm_terminal_budget_fits(estimated_svm_dynamic_accounts),
-               "sysio.msgch::buildenv: Solana terminal estimate drifted after envelope trim");
-      }
       packed = build_packed(entries);
    }
 

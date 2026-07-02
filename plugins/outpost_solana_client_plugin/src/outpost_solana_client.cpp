@@ -393,43 +393,34 @@ outpost_solana_client::reserve_info_for_codes(uint64_t token_code, uint64_t rese
    const auto reserve_pda =
       outpost_solana_client_detail::derive_reserve_pda(_program_id, token_code, reserve_code);
 
-   try {
-      const auto reserve_v = _program_client->get_account_data<fc::variant>("Reserve", reserve_pda);
-      const auto& reserve = reserve_v.get_object();
-      FC_ASSERT(reserve.contains("creator"), "Reserve account missing creator field");
-      FC_ASSERT(reserve.contains("custody_mint"), "Reserve account missing custody_mint field");
-      FC_ASSERT(reserve.contains("custody_decimals"), "Reserve account missing custody_decimals field");
-
-      return reserve_terminal_info{
-         fc::network::solana::solana_public_key::from_base58_string(reserve["creator"].as_string()),
-         fc::network::solana::solana_public_key::from_base58_string(reserve["custody_mint"].as_string()),
-         static_cast<uint8_t>(reserve["custody_decimals"].as_uint64())
-      };
-   } catch (const fc::exception& e) {
-      wlog("outpost_solana_client[{}]: failed to load Reserve({}, {}) at {}: {}; "
-           "terminal manifest will omit branch-specific accounts for this reserve",
-           to_string(),
-           token_code,
-           reserve_code,
-           reserve_pda.to_string(fc::yield_function_t{}),
-           e.to_string());
-   } catch (const std::exception& e) {
-      wlog("outpost_solana_client[{}]: failed to load Reserve({}, {}) at {}: {}; "
-           "terminal manifest will omit branch-specific accounts for this reserve",
-           to_string(),
-           token_code,
-           reserve_code,
-           reserve_pda.to_string(fc::yield_function_t{}),
-           e.what());
-   } catch (...) {
-      wlog("outpost_solana_client[{}]: failed to load Reserve({}, {}) at {}; "
+   const auto account_info = _entry->client->get_account_info(reserve_pda);
+   if (!account_info.has_value()) {
+      wlog("outpost_solana_client[{}]: Reserve({}, {}) absent at {}; "
            "terminal manifest will omit branch-specific accounts for this reserve",
            to_string(),
            token_code,
            reserve_code,
            reserve_pda.to_string(fc::yield_function_t{}));
+      return std::nullopt;
    }
-   return std::nullopt;
+
+   FC_ASSERT(!account_info->data.empty(),
+             "Reserve({}, {}) at {} has no account data",
+             token_code,
+             reserve_code,
+             reserve_pda.to_string(fc::yield_function_t{}));
+
+   const auto reserve_v = _program_client->decode_account_info_data("Reserve", account_info->data);
+   const auto& reserve = reserve_v.get_object();
+   FC_ASSERT(reserve.contains("creator"), "Reserve account missing creator field");
+   FC_ASSERT(reserve.contains("custody_mint"), "Reserve account missing custody_mint field");
+   FC_ASSERT(reserve.contains("custody_decimals"), "Reserve account missing custody_decimals field");
+
+   return reserve_terminal_info{
+      fc::network::solana::solana_public_key::from_base58_string(reserve["creator"].as_string()),
+      fc::network::solana::solana_public_key::from_base58_string(reserve["custody_mint"].as_string()),
+      static_cast<uint8_t>(reserve["custody_decimals"].as_uint64())
+   };
 }
 
 std::string outpost_solana_client::deliver_outbound_envelope(

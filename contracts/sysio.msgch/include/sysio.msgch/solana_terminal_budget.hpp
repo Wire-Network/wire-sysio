@@ -30,6 +30,17 @@ inline constexpr size_t SVM_TERMINAL_ACCOUNT_KEY_BUDGET =
 /// Pessimistic packet-byte cost for adding one dynamic remaining account.
 inline constexpr size_t SVM_DYNAMIC_ACCOUNT_PACKET_BYTES = 33;
 
+/// No terminal remaining account is needed for static roster/env attestations.
+inline constexpr size_t SVM_DYNAMIC_ACCOUNTS_NONE = 0;
+
+/// One writable wallet is needed for native withdraw-remit/deposit-revert effects.
+inline constexpr size_t SVM_DYNAMIC_ACCOUNTS_NATIVE_WALLET = 1;
+
+/// Worst-case reserve-backed effect account contribution mirrored from the
+/// Solana relay manifest: Reserve PDA, vault, destination ATA, wallet, mint,
+/// token program, associated-token program, and system program.
+inline constexpr size_t SVM_DYNAMIC_ACCOUNTS_RESERVE_EFFECT_WORST_CASE = 8;
+
 /// Conservative zero-data terminal-finalize static packet size, including
 /// the terminal `request_heap_frame` compute-budget pre-instruction.
 ///
@@ -46,6 +57,13 @@ inline constexpr size_t SVM_TERMINAL_STATIC_LOADED_ACCOUNTS = 46;
 /// Conservative static legacy account-key count for the zero-data terminal
 /// finalization transaction.
 inline constexpr size_t SVM_TERMINAL_STATIC_ACCOUNT_KEYS = 46;
+
+static_assert(SVM_TERMINAL_STATIC_PACKET_BYTES_WITH_MARGIN <= SVM_TERMINAL_PACKET_BUDGET_BYTES,
+              "SVM terminal static packet estimate exceeds packet budget");
+static_assert(SVM_TERMINAL_STATIC_LOADED_ACCOUNTS <= SVM_TERMINAL_RUNTIME_ACCOUNT_LIMIT,
+              "SVM terminal static loaded-account estimate exceeds runtime limit");
+static_assert(SVM_TERMINAL_STATIC_ACCOUNT_KEYS <= SVM_TERMINAL_ACCOUNT_KEY_BUDGET,
+              "SVM terminal static account-key estimate exceeds key budget");
 
 /// Return the remaining budget without underflow when a static estimate has
 /// already consumed the whole cap.
@@ -94,5 +112,8 @@ constexpr bool svm_terminal_budget_fits(size_t dynamic_accounts) {
           SVM_TERMINAL_STATIC_LOADED_ACCOUNTS + dynamic_accounts <= SVM_TERMINAL_RUNTIME_ACCOUNT_LIMIT &&
           SVM_TERMINAL_STATIC_ACCOUNT_KEYS + dynamic_accounts <= SVM_TERMINAL_ACCOUNT_KEY_BUDGET;
 }
+
+static_assert(svm_terminal_budget_fits(svm_hard_dynamic_account_budget()),
+              "SVM terminal hard dynamic-account budget must fit all caps");
 
 } // namespace sysio::msgch_svm_terminal_budget

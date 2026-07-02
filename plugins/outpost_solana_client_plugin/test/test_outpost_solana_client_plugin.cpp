@@ -74,10 +74,9 @@ void write_u32_le(std::vector<uint8_t>& out, uint32_t value) {
    out.push_back(static_cast<uint8_t>((value >> 24) & 0xff));
 }
 
-/// Encode the terminal zero-data `epoch_in` args used by the SEC-94 fixture.
-std::vector<uint8_t> terminal_epoch_in_data(const idl::instruction& instr,
-                                            const fc::variant_object& fixture) {
-   const auto& args = fixture["terminal_args"].get_object();
+/// Encode `epoch_in` args used by the SEC-94 packet-budget fixture.
+std::vector<uint8_t> epoch_in_data(const idl::instruction& instr,
+                                   const fc::variant_object& args) {
    std::vector<uint8_t> data;
    data.reserve(instr.discriminator.size() + 16 + args["chunk_data_bytes"].as_uint64());
    data.insert(data.end(), instr.discriminator.begin(), instr.discriminator.end());
@@ -208,7 +207,31 @@ terminal_tx_measurement measure_terminal_epoch_in_transaction(const idl::instruc
       fixture["terminal_pre_instructions"].get_array().front()["bytes"].as_uint64();
    std::vector<instruction> instructions = {
       system::compute_budget::request_heap_frame(static_cast<uint32_t>(heap_bytes)),
-      instruction{program_id, std::move(accounts), terminal_epoch_in_data(instr, fixture)},
+      instruction{program_id, std::move(accounts), epoch_in_data(instr, fixture["terminal_args"].get_object())},
+   };
+
+   auto tx = build_measured_legacy_transaction(instructions, fee_payer);
+   const auto packet = tx.serialize();
+   return terminal_tx_measurement{
+      .declared_idl_accounts = instr.accounts.size(),
+      .instruction_data_bytes = instructions.back().data.size(),
+      .required_signatures = tx.msg.header.num_required_signatures,
+      .legacy_account_keys = tx.msg.account_keys.size(),
+      .loaded_accounts = tx.msg.account_keys.size(),
+      .packet_bytes = packet.size(),
+   };
+}
+
+/// Measure a non-terminal data chunk with no ComputeBudget pre-instruction.
+terminal_tx_measurement measure_data_chunk_epoch_in_transaction(const idl::instruction& instr,
+                                                                const fc::variant_object& fixture) {
+   const auto fee_payer = measurement_pubkey(1);
+   auto accounts = terminal_static_accounts(instr, fee_payer);
+   const auto program_id = solana_public_key::from_base58_string(fixture["program_id"].as_string());
+   const auto& data_chunk = fixture["data_chunk"].get_object();
+
+   std::vector<instruction> instructions = {
+      instruction{program_id, std::move(accounts), epoch_in_data(instr, data_chunk["args"].get_object())},
    };
 
    auto tx = build_measured_legacy_transaction(instructions, fee_payer);
@@ -310,6 +333,22 @@ BOOST_AUTO_TEST_CASE(sec94_terminal_budget_fixture_matches_contract_estimator) t
    }
    BOOST_REQUIRE(epoch_in != nullptr);
 
+   BOOST_REQUIRE_EQUAL(fixture["legacy_packet_limit_bytes"].as_uint64(),
+                       limits::PACKET_DATA_SIZE);
+   BOOST_REQUIRE_EQUAL(fixture["legacy_packet_limit_bytes"].as_uint64(),
+                       sysio::msgch_svm_terminal_budget::SVM_TERMINAL_PACKET_LIMIT_BYTES);
+   BOOST_REQUIRE_EQUAL(fixture["runtime_account_limit"].as_uint64(),
+                       sysio::msgch_svm_terminal_budget::SVM_TERMINAL_RUNTIME_ACCOUNT_LIMIT);
+   BOOST_REQUIRE_EQUAL(fixture["legacy_account_key_limit"].as_uint64(),
+                       limits::LEGACY_ACCOUNT_KEY_LIMIT);
+   BOOST_REQUIRE_EQUAL(fixture["legacy_account_key_limit"].as_uint64(),
+                       sysio::msgch_svm_terminal_budget::SVM_TERMINAL_ACCOUNT_KEY_LIMIT);
+
+   const auto data_chunk_measured = measure_data_chunk_epoch_in_transaction(*epoch_in, fixture);
+   check_measurement_matches_fixture(data_chunk_measured, fixture["data_chunk"].get_object());
+   BOOST_CHECK_LE(data_chunk_measured.packet_bytes + sysio::msgch_svm_terminal_budget::SVM_DYNAMIC_ACCOUNT_PACKET_BYTES,
+                  sysio::msgch_svm_terminal_budget::SVM_TERMINAL_PACKET_LIMIT_BYTES);
+
    const auto static_measured = measure_terminal_epoch_in_transaction(*epoch_in, fixture, 0);
    check_measurement_matches_fixture(static_measured, fixture["static"].get_object());
    BOOST_CHECK_LE(static_measured.packet_bytes,
@@ -379,17 +418,17 @@ BOOST_AUTO_TEST_CASE(envelope_chunk_count_math) try {
    BOOST_CHECK_EQUAL(epoch_in_calls_for(sysio::SOLANA_MAX_CHUNK_BYTES + 1), 3u);
    BOOST_CHECK_EQUAL(chunks_for(2 * sysio::SOLANA_MAX_CHUNK_BYTES), 2u);
    // dev-026 captured 2,526-byte envelope (groups-of-7 batch op delivery).
-   BOOST_CHECK_EQUAL(chunks_for(2526), 4u);   // 2526/672 = 3.76 → 4
-   // 64 KiB cap: ceil(65 536 / 672) = 98 chunks. Last chunk is 352 B
-   // (65_536 mod 672 = 352), the first 97 are full at MAX_CHUNK_BYTES.
-   BOOST_CHECK_EQUAL(chunks_for(sysio::SOLANA_MAX_ENVELOPE_BYTES), 98u);
-   BOOST_CHECK_EQUAL(epoch_in_calls_for(sysio::SOLANA_MAX_ENVELOPE_BYTES), 99u);
-   BOOST_CHECK_EQUAL(sysio::SOLANA_MAX_ENVELOPE_BYTES % sysio::SOLANA_MAX_CHUNK_BYTES, 352u);
+   BOOST_CHECK_EQUAL(chunks_for(2526), 4u);   // 2526/640 = 3.95 -> 4
+   // 64 KiB cap: ceil(65 536 / 640) = 103 chunks. Last chunk is 256 B
+   // (65_536 mod 640 = 256), the first 102 are full at MAX_CHUNK_BYTES.
+   BOOST_CHECK_EQUAL(chunks_for(sysio::SOLANA_MAX_ENVELOPE_BYTES), 103u);
+   BOOST_CHECK_EQUAL(epoch_in_calls_for(sysio::SOLANA_MAX_ENVELOPE_BYTES), 104u);
+   BOOST_CHECK_EQUAL(sysio::SOLANA_MAX_ENVELOPE_BYTES % sysio::SOLANA_MAX_CHUNK_BYTES, 256u);
 
    // Last-chunk size at the dev-026 reproduction: the loop fills the first
-   // 3 chunks at MAX_CHUNK_BYTES (= 672) and the last with the remainder.
+   // 3 chunks at MAX_CHUNK_BYTES (= 640) and the last with the remainder.
    const size_t last_chunk_size = 2526 - 3 * sysio::SOLANA_MAX_CHUNK_BYTES;
-   BOOST_CHECK_EQUAL(last_chunk_size, 510u);   // 2526 − 2016 = 510
+   BOOST_CHECK_EQUAL(last_chunk_size, 606u);   // 2526 - 1920 = 606
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(opp_outpost_emit_has_wire_epoch_arg) try {

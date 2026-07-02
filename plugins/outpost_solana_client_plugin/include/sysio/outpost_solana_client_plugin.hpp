@@ -121,6 +121,14 @@ struct opp_solana_outpost_client : fc::network::solana::solana_program_client {
    /// the COMMIT back to the depot; no other state changes.
    solana_program_tx_fn<std::string, std::vector<uint8_t>> commit_underwrite;
 
+   /// Decode already-fetched Anchor account bytes using the outpost IDL.
+   /// This lets callers distinguish account-not-found from RPC/transport
+   /// failure before decoding the returned data.
+   fc::variant decode_account_info_data(const std::string& account_name,
+                                        const std::vector<uint8_t>& data) {
+      return decode_account_data(data, account_name);
+   }
+
    opp_solana_outpost_client(const solana_client_ptr& client,
                              const fc::network::solana::solana_public_key& prog_id,
                              const std::vector<fc::network::solana::idl::program>& idls = {})

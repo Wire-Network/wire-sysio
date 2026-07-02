@@ -92,6 +92,19 @@ public:
       );
    }
 
+   action_result regchain(opp::types::ChainKind kind,
+                          std::string_view code,
+                          uint32_t chain_id) {
+      base_tester::push_action(CHAINS_ACCOUNT, "regchain"_n, CHAINS_ACCOUNT, mvo()
+         ("kind",              kind)
+         ("code",              codename_mvo(code))
+         ("external_chain_id", chain_id)
+         ("name",              std::string("outpost"))
+         ("description",       std::string{})
+      );
+      return success();
+   }
+
    action_result buildenv(uint64_t chain_code) {
       return push_msgch_action(MSGCH_ACCOUNT, "buildenv"_n, {{
          EPOCH_ACCOUNT, config::active_name
@@ -149,11 +162,11 @@ BOOST_FIXTURE_TEST_CASE(deliver_invalid_request, sysio_msgch_tester) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(queueout_basic, sysio_msgch_tester) { try {
-   // v6: chain_code is the chain's slug_name value. This test intentionally
-   // leaves the chain unregistered because it only verifies queueout/table
-   // mechanics; registered SVM destinations get additional estimator checks
-   // in the envlog suite below.
+   // v6: chain_code is the chain's slug_name value. queueout now requires a
+   // registered chain row so Solana-bound account-estimator coverage is
+   // enforced before a READY row can be created.
    const uint64_t chain_code = fc::slug_name{"ETH"}.value;
+   BOOST_REQUIRE_EQUAL(success(), regchain(opp::types::CHAIN_KIND_EVM, "ETH", 1));
    BOOST_REQUIRE_EQUAL(success(), queueout(chain_code, opp::types::ATTESTATION_TYPE_OPERATORS));
 
    // `mint_att_id`'s first call returns id=1 — the `attseq` singleton at

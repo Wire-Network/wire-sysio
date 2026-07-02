@@ -1474,8 +1474,6 @@ transaction solana_client::create_transaction(const std::vector<instruction>& in
    // Initialize empty signatures
    tx.signatures.resize(tx.msg.header.num_required_signatures);
 
-   validate_legacy_transaction(tx);
-
    return tx;
 }
 
