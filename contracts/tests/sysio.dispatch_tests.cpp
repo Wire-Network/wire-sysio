@@ -1000,12 +1000,12 @@ BOOST_FIXTURE_TEST_CASE(underwrite_commit_two_evm_chains_route_per_chain,
    // A SECOND active EVM chain — same VM family, distinct chain_code.
    BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
       ("kind", ChainKind::CHAIN_KIND_EVM)("code", codename_mvo("POLYGON"))
-      ("external_chain_id", 137)("name", std::string("polygon-test"))("description", std::string{})));
+      ("external_chain_id", 137)("name", std::string("polygon-test"))("description", std::string{})("opp_addr", std::string{})("opp_inbound_addr", std::string{})));
    // SOLANA is registered only because the shared reserve-setup helper seeds a
    // SOLANA/SOL reserve; it is otherwise unused by this two-EVM scenario.
    BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
       ("kind", ChainKind::CHAIN_KIND_SVM)("code", codename_mvo("SOLANA"))
-      ("external_chain_id", 900)("name", std::string("solana-test"))("description", std::string{})));
+      ("external_chain_id", 900)("name", std::string("solana-test"))("description", std::string{})("opp_addr", std::string{})("opp_inbound_addr", std::string{})));
    setup_wire_token_and_reserves();
    BOOST_REQUIRE_EQUAL(success(), regreserve_active("POLYGON", "POL", "PRIMARY"));
    BOOST_REQUIRE_EQUAL(success(), depositinle_credit(UWRIT_OP, "ETH",     "ETH", 1'000'000'000));
