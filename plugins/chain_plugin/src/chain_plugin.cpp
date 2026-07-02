@@ -2259,6 +2259,14 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
    std::string_view ub_sv(ub_bytes.data(), ub_bytes.size());
 
    uint32_t limit = effective_limit;
+   // Bound the per-page row count exactly as get_table_by_scope does: when the scan is subject to a finite
+   // deadline, clamp the caller's limit to api_base::max_return_items so a single HTTP page cannot stage an
+   // unbounded number of KV rows before the response byte budget is enforced. The caller recovers the
+   // remaining rows through the existing more/next_key pagination. Two cases are intentionally exempt --
+   // params_deadline is maximum() for both: an in-process all_rows full-table walk, and an operator-configured
+   // unlimited http-max-response-time-ms (-1).
+   if (params_deadline != fc::time_point::maximum() && limit > max_return_items)
+      limit = max_return_items;
    bool reverse = p.reverse.has_value() && *p.reverse;
 
    // --- Secondary index query path ---
