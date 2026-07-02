@@ -21,6 +21,8 @@ relaunchTimeout = 10
 numOfProducers = 1
 replayBlocksFromSnapshot = 5
 postTerminateBlockMargin = 1
+postTerminateProducerBlockMargin = 5
+snapshotReplayProducerFloorBlock = 250
 postSnapshotBlockTimeout = 150
 # One producing node, four regular terminate-at-block nodes, and six nodes
 # where replay snapshot through block logs with terminate-at-block
@@ -329,8 +331,17 @@ try:
         termAt = headBlockNum + replayBlocksFromSnapshot
         replayTermAt[nodeId] = termAt
 
-    # Keep block production alive until every replay test node has persisted at least
-    # one block past its later terminate-at-block target.
+    # Keep block production alive past every replay target, then wait for each replay
+    # node to persist a block past its own terminate-at-block target. The floor keeps
+    # the regular terminate-at-block nodes covered, while the snapshot-derived target
+    # handles slow bootstrap runs where replay nodes terminate at or beyond that floor.
+    producerRequiredBlock = max(
+        snapshotReplayProducerFloorBlock,
+        max(replayTermAt.values()) + postTerminateProducerBlockMargin,
+    )
+    assert producingNode.waitForBlock(producerRequiredBlock, timeout=postSnapshotBlockTimeout), \
+        f"Producer did not reach block {producerRequiredBlock} before snapshot replay tests"
+
     for nodeId, termAt in replayTermAt.items():
         requiredBlock = termAt + postTerminateBlockMargin
         assert cluster.getNode(nodeId).waitForBlock(requiredBlock, timeout=postSnapshotBlockTimeout), \

@@ -281,6 +281,22 @@ class Node(Transactions):
                 return False
         return True
 
+    def waitForBlockClearOfStride(self, stride, lowerMargin=5, upperMargin=10, timeout=None):
+        """Advance the head clear of a state-history-stride rotation boundary before stopping.
+
+        When the last stored block is exactly a stride multiple, SHiP log rotation has just moved
+        every entry into retained/ and the head log/index files are 0 bytes, so tooling that reads
+        the head log has nothing to work with. A few more blocks can be produced between this check
+        and a pause taking effect, so a margin is kept on both sides of the boundary. Returns True
+        once the head is clear of the boundary, waiting for a safe block if needed."""
+        head = self.getHeadBlockNum()
+        posInStride = head % stride
+        if lowerMargin <= posInStride <= stride - upperMargin:
+            return True
+        safeBlock = head - posInStride + (lowerMargin if posInStride < lowerMargin else stride + lowerMargin)
+        Utils.Print(f"Head block {head} is near a state-history-stride boundary, waiting for block {safeBlock}")
+        return self.waitForBlock(safeBlock, timeout=timeout)
+
     def waitForAnyProducer(self, producers, timeout=None, exitOnError=False):
         if timeout is None:
             # default to the typical configuration of 21 producers, each producing 12 blocks in a row (every 1/2 second)
