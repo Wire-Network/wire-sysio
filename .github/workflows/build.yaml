@@ -28,6 +28,7 @@ on:
         type: string
 
 permissions:
+  actions: read
   packages: read
   contents: read
 
@@ -112,12 +113,24 @@ jobs:
           restore-keys: |
             ccache-${{ matrix.platform }}-
 
-      - name: Build Wire CDT for release tag
+      - name: Download Wire CDT package for release tag
+        id: wire-cdt-package
         if: ${{ startsWith(github.ref, 'refs/tags/v') }}
-        env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN_DEV }}
+        uses: AntelopeIO/asset-artifact-download-action@v3
+        with:
+          owner: Wire-Network
+          repo: wire-cdt
+          file: 'cdt_.*_amd64.deb'
+          target: ${{ needs.v.outputs.cdt-target }}
+          prereleases: ${{ needs.v.outputs.cdt-prerelease }}
+          artifact-name: cdt_ubuntu_package_amd64
+          token: ${{ secrets.GH_TOKEN_DEV }}
+          wait-for-exact-target: true
+
+      - name: Install Wire CDT package for release tag
+        if: ${{ startsWith(github.ref, 'refs/tags/v') }}
         run: |
-          bash .github/scripts/setup-wire-cdt.sh "${{ needs.v.outputs.cdt-target }}"
+          bash .github/scripts/install-wire-cdt-package.sh "${{ steps.wire-cdt-package.outputs.downloaded-file }}"
 
       - name: Build
         id: build
