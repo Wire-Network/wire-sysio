@@ -245,16 +245,19 @@ BOOST_FIXTURE_TEST_CASE(flushexpired_reverts_expired_pending, sysio_dclaim_teste
 
 // onreward runs inside the OPP inbound dispatch chain (msgch::evalcons), where an abort rolls back
 // the consensus-tipping deliver and stalls epoch advancement. A cross-chain-supplied
-// staker_wire_account that name() would reject (overlong at > 13 chars, or bearing a character
-// outside the ".12345a-z" name alphabet such as uppercase or '-') must NOT abort: onreward treats
-// it as unlinked and parks the credit in unmapped_tokens by native address. Each malformed spelling
-// is exercised on a distinct native address so it lands as its own row (unmapped + dedupe cursor
-// are keyed by native address), covering the full reject domain the dispatch name guard absorbs.
+// staker_wire_account that name() would reject must NOT abort: onreward treats it as unlinked and
+// parks the credit in unmapped_tokens by native address. name() has three distinct reject classes,
+// and the guard absorbs all three: (1) overlong at > 13 chars, (2) a character outside the
+// ".12345a-z" name alphabet such as uppercase or '-', and (3) a length-valid 13-character name whose
+// final symbol exceeds 'j' (value 15): the 13th position encodes only 4 bits. Each malformed
+// spelling is exercised on a distinct native address so it lands as its own row (unmapped + dedupe
+// cursor are keyed by native address), covering the full reject domain the dispatch name guard absorbs.
 BOOST_FIXTURE_TEST_CASE(onreward_invalid_wire_account_parks_unmapped, sysio_dclaim_tester) { try {
    const struct { const char* wire_account; char addr_byte; } cases[] = {
       { "thisnameistoolong", char(0xB1) },   // 17 chars: length > 13
       { "BADNAME",           char(0xB2) },   // uppercase: outside the name alphabet
       { "bad-name",          char(0xB3) },   // '-': outside the name alphabet
+      { "aaaaaaaaaaaak",     char(0xB4) },   // 13 chars, 13th symbol 'k' (16) > 'j' (15): 4-bit slot overflow
    };
 
    uint64_t expected_id = 1;   // next_unmapped_id defaults to 1; one new row per distinct address
