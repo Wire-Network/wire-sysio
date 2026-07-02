@@ -23,8 +23,9 @@ namespace sysio {
       constexpr uint32_t scan_interval_ms    = 5000;
       constexpr uint32_t action_timeout_ms   = 15000;
       constexpr bool     enabled             = false;
-      constexpr const char* eth_client_id    = "eth-default";
-      constexpr const char* sol_client_id    = "sol-default";
+      // SEC-13/WSA-027: the single eth/sol client-id defaults were removed with
+      // the single-client config — outpost wiring is now per-chain and required
+      // (--underwriter-{eth,sol}-outpost), with no single fallback.
    }
 
    class underwriter_plugin : public appbase::plugin<underwriter_plugin> {

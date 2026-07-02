@@ -136,8 +136,8 @@ BOOST_AUTO_TEST_CASE(plugin_options_are_registered) try {
    BOOST_CHECK(option_names.count("underwriter-scan-interval-ms") > 0);
    BOOST_CHECK(option_names.count("underwriter-action-timeout-ms") > 0);
    BOOST_CHECK(option_names.count("underwriter-enabled") > 0);
-   BOOST_CHECK(option_names.count("underwriter-eth-client-id") > 0);
-   BOOST_CHECK(option_names.count("underwriter-sol-client-id") > 0);
+   BOOST_CHECK(option_names.count("underwriter-eth-outpost") > 0);
+   BOOST_CHECK(option_names.count("underwriter-sol-outpost") > 0);
    BOOST_CHECK(option_names.count(std::string{ETH_SOURCE_DEPOSIT_LOOKBACK_BLOCKS_OPTION}) > 0);
    BOOST_CHECK_EQUAL(option_names.count(std::string{removed_eth_min_confirmations_option}), 0);
 } FC_LOG_AND_RETHROW();
@@ -155,8 +155,9 @@ BOOST_AUTO_TEST_CASE(default_options_are_correct) try {
    BOOST_CHECK_EQUAL(vm["underwriter-scan-interval-ms"].as<uint32_t>(), scan_interval_ms);
    BOOST_CHECK_EQUAL(vm["underwriter-action-timeout-ms"].as<uint32_t>(), action_timeout_ms);
    BOOST_CHECK_EQUAL(vm["underwriter-enabled"].as<bool>(), enabled);
-   BOOST_CHECK_EQUAL(vm["underwriter-eth-client-id"].as<std::string>(), eth_client_id);
-   BOOST_CHECK_EQUAL(vm["underwriter-sol-client-id"].as<std::string>(), sol_client_id);
+   // SEC-13/WSA-027: the former single --underwriter-{eth,sol}-client-id were
+   // replaced by repeatable per-chain --underwriter-{eth,sol}-outpost (no scalar
+   // default to assert; presence is checked in the option-registration case).
    BOOST_CHECK_EQUAL(
       vm[std::string{ETH_SOURCE_DEPOSIT_LOOKBACK_BLOCKS_OPTION}].as<uint64_t>(),
       ETH_SOURCE_DEPOSIT_LOOKBACK_BLOCKS);
