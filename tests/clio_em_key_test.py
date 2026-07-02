@@ -31,7 +31,9 @@ be edited to match a code change -- a mismatch means clio/libfc diverged from
 the Ethereum ecosystem, which is a bug in libfc, not in this vector.
 """
 
+import os
 import re
+import stat
 import subprocess
 import tempfile
 
@@ -64,6 +66,23 @@ KAT_PVT_K1      = "PVT_K1_Xx4wsMynSZ39WiwEn8wzRL9trcKK33ZzwaZKJmymYx5UTjKvv"
 KAT_PUB_K1      = "PUB_K1_5TrYnZP1RkDSUMzBY4GanCy6AP68kCMdkAb5EACkAwkdc8tm4t"
 
 testSuccessful = False
+PERMISSIVE_UMASK = stat.S_IWGRP | stat.S_IWOTH
+SECRET_FILE_MODE = stat.S_IRUSR | stat.S_IWUSR
+
+
+def run_with_umask(mask, callback):
+    """Run ``callback`` while the process umask is temporarily set to ``mask``."""
+    old_umask = os.umask(mask)
+    try:
+        return callback()
+    finally:
+        os.umask(old_umask)
+
+
+def assert_owner_only_secret_file(path):
+    """Assert that a generated secret file is readable and writable only by its owner."""
+    mode = stat.S_IMODE(os.stat(path).st_mode)
+    assert mode == SECRET_FILE_MODE, "expected %s to have mode 0o600, got 0o%03o" % (path, mode)
 
 
 def clio(*args, expect_fail=False, raw=False):
@@ -116,13 +135,31 @@ def test_create_key_sol():
     assert clio("create", "key", "--sol", "--to-console")["Private key"] != r["Private key"]
 
 
-def test_create_key_to_file():
-    """--file persists the same forms --to-console prints."""
-    with tempfile.NamedTemporaryFile(mode="w+") as f:
-        clio("create", "key", "--em", "--file", f.name)
-        f.seek(0)
-        body = f.read()
-    assert "PVT_EM_" in body and "PUB_EM_" in body, body
+def test_secret_key_output_files_are_owner_only():
+    """Secret-bearing ``--file`` outputs are owner-only even under a permissive umask."""
+    with tempfile.TemporaryDirectory() as temp_dir:
+        def create_secret_files():
+            """Create representative clio secret-output files in ``temp_dir``."""
+            create_path = os.path.join(temp_dir, "created-em-key.txt")
+            clio("create", "key", "--em", "--file", create_path)
+            assert_owner_only_secret_file(create_path)
+            with open(create_path, encoding="utf-8") as f:
+                body = f.read()
+            assert "PVT_EM_" in body and "PUB_EM_" in body, body
+
+            k1_convert_path = os.path.join(temp_dir, "converted-k1-key.txt")
+            clio("convert", "k1_private_key", "--private-key", KAT_PVT_K1, "--file", k1_convert_path)
+            assert_owner_only_secret_file(k1_convert_path)
+
+            em_convert_path = os.path.join(temp_dir, "converted-em-key.txt")
+            clio("convert", "em_private_key", "--private-key", KAT_ETH_SECRET, "--file", em_convert_path)
+            assert_owner_only_secret_file(em_convert_path)
+
+            eth_to_k1_path = os.path.join(temp_dir, "eth-to-k1-key.txt")
+            clio("convert", "eth_to_k1_private", "--private-key", KAT_ETH_SECRET, "--file", eth_to_k1_path)
+            assert_owner_only_secret_file(eth_to_k1_path)
+
+        run_with_umask(PERMISSIVE_UMASK, create_secret_files)
 
 
 def test_known_answer_vector():
@@ -227,7 +264,7 @@ def test_eth_to_k1():
 try:
     test_create_key_em_roundtrip()
     test_create_key_sol()
-    test_create_key_to_file()
+    test_secret_key_output_files_are_owner_only()
     test_known_answer_vector()
     test_recover_is_digest_bound()
     test_error_handling()

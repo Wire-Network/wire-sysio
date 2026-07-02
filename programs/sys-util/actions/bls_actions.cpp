@@ -3,6 +3,7 @@
 #include <fc/crypto/bls_private_key.hpp>
 #include <fc/crypto/bls_public_key.hpp>
 #include <fc/crypto/bls_signature.hpp>
+#include <fc/io/secure_file.hpp>
 
 #include <boost/program_options.hpp>
 
@@ -66,8 +67,7 @@ int bls_actions::create_key() {
       std::cout << out_str;
    } else {
       std::cout << "saving keys to " << opt->key_file << "\n";
-      std::ofstream out( opt->key_file.c_str() );
-      out << out_str;
+      fc::write_secure_file(opt->key_file, out_str);
    }
 
    return 0;
