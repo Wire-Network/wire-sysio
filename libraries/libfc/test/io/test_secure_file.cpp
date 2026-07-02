@@ -26,6 +26,8 @@ constexpr mode_t group_world_readable_mode     = S_IRUSR | S_IWUSR | S_IRGRP | S
 constexpr auto   first_secret_contents         = "secret\n";
 constexpr auto   second_secret_contents        = "replacement\n";
 constexpr auto   symlink_target_contents       = "target\n";
+constexpr long   fallback_name_max             = 255;
+constexpr long   minimum_long_filename_name_max = 64;
 
 /**
  * Owns an open file stream and closes its underlying descriptor when a test scope exits.
@@ -78,6 +80,16 @@ std::string stream_contents(std::FILE* file) {
    return std::string(buffer, bytes_read);
 }
 
+/**
+ * Returns a test-safe near-limit filename length for the temporary directory.
+ */
+size_t near_limit_file_name_length(const std::filesystem::path& directory_path) {
+   const auto name_max = ::pathconf(directory_path.c_str(), _PC_NAME_MAX);
+   const auto limit    = name_max > 0 ? name_max : fallback_name_max;
+   BOOST_REQUIRE_GT(limit, minimum_long_filename_name_max);
+   return static_cast<size_t>(limit - 1);
+}
+
 } // namespace
 
 BOOST_AUTO_TEST_CASE(write_secure_file_creates_owner_only_file_under_permissive_umask) {
@@ -113,6 +125,16 @@ BOOST_AUTO_TEST_CASE(write_secure_file_replaces_existing_file_with_owner_only_fi
    BOOST_REQUIRE_EQUAL(stream_contents(existing_reader.get()), first_secret_contents);
 }
 
+BOOST_AUTO_TEST_CASE(write_secure_file_handles_near_limit_file_name) {
+   fc::temp_directory tempdir;
+   const auto         secret_path = tempdir.path() / std::string(near_limit_file_name_length(tempdir.path()), 's');
+
+   fc::write_secure_file(secret_path, first_secret_contents);
+
+   BOOST_REQUIRE_EQUAL(file_mode(secret_path), secret_file_mode);
+   BOOST_REQUIRE_EQUAL(file_contents(secret_path), first_secret_contents);
+}
+
 BOOST_AUTO_TEST_CASE(secure_output_file_supports_move_construction_and_assignment) {
    fc::temp_directory tempdir;
    const auto         move_constructed_path = tempdir.path() / "move-constructed-secret.txt";
@@ -133,6 +155,18 @@ BOOST_AUTO_TEST_CASE(secure_output_file_supports_move_construction_and_assignmen
    BOOST_REQUIRE_EQUAL(file_contents(move_constructed_path), first_secret_contents);
    BOOST_REQUIRE_EQUAL(file_contents(move_assigned_path), second_secret_contents);
    BOOST_REQUIRE(!std::filesystem::exists(discarded_path));
+}
+
+BOOST_AUTO_TEST_CASE(secure_output_file_destruction_without_close_discards_pending_file) {
+   fc::temp_directory tempdir;
+   const auto         secret_path = tempdir.path() / "discarded-secret.txt";
+
+   {
+      fc::secure_output_file output_file(secret_path);
+      output_file.write(first_secret_contents);
+   }
+
+   BOOST_REQUIRE(!std::filesystem::exists(secret_path));
 }
 
 BOOST_AUTO_TEST_CASE(write_secure_file_rejects_non_regular_target) {

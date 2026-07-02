@@ -3126,8 +3126,9 @@ int main( int argc, char** argv ) {
          std::cerr << localized("saving password to ${filename}", ("filename", password_file)) << std::endl;
          auto password_str = fc::json::to_pretty_string(v);
          boost::replace_all(password_str, "\"", "");
-         password_out->write(password_str);
-         password_out->close();
+         auto& out = password_out.value();
+         out.write(password_str);
+         out.close();
       }
    });
 

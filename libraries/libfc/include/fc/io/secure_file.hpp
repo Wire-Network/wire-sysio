@@ -10,11 +10,17 @@
 namespace fc {
 
 /**
- * Owner-only output file for newly generated secret material.
+ * Output file for newly generated secret material.
  *
- * On POSIX systems content is written to an owner-only temporary file in the
- * target directory and then committed with rename after a successful close. The
- * final target is rejected when it is already a symlink or non-regular file.
+ * On POSIX systems content is written to an owner-only temporary file in the target directory. Calling close()
+ * publishes the file by syncing the temporary file, renaming it into place, and syncing the target directory.
+ * Destroying the object before the rename commit point discards the temporary file without publishing it. If close()
+ * reports a directory sync failure after the rename succeeds, the final file may already be visible but its directory
+ * entry durability could not be confirmed. Existing final symlinks and non-regular final targets are rejected, but
+ * intermediate directory symlinks are still resolved by the platform.
+ *
+ * On Windows this helper currently falls back to plain std::ofstream semantics; owner-only permissions, final-target
+ * rejection, and temporary-file rename commit guarantees are POSIX-only.
  */
 class secure_output_file {
 public:
@@ -30,6 +36,9 @@ public:
    secure_output_file& operator=(const secure_output_file&) = delete;
    secure_output_file(secure_output_file&& other) noexcept;
    secure_output_file& operator=(secure_output_file&& other) noexcept;
+   /**
+    * Destroys the output file, discarding any uncommitted POSIX temporary file.
+    */
    ~secure_output_file();
 
    /**
@@ -41,10 +50,11 @@ public:
    void write(std::string_view content);
 
    /**
-    * Closes the opened secret file and reports close errors.
+    * Closes the opened secret file, publishes it on POSIX, and reports close errors.
     *
-    * Destruction also closes the file, but close errors are intentionally not
-    * thrown from the destructor.
+    * Destruction before the POSIX rename commit point discards pending output. Once the rename succeeds, a later
+    * directory sync failure can still be reported even though the final file may already be visible. Close errors are
+    * intentionally not thrown from the destructor.
     *
     * @throws std::ios_base::failure when close fails
     */
