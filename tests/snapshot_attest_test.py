@@ -113,19 +113,26 @@ try:
     assert node0.waitForTransactionsInBlock(regProducerTransIds, timeout=60), \
         "regproducer transactions did not make it into a block before setrank"
 
+    setRankTransIds = []
     Print(f"Set rank for {producerA}")
     success, trans = node0.pushMessage("sysio", "setrank",
         json.dumps({"producer": producerA, "rank": 1}),
         "--permission sysio@active")
     assert success, f"Failed to set rank for {producerA}: {trans}"
+    setRankTransIds.append(node0.getTransId(trans))
 
     Print(f"Set rank for {producerB}")
     success, trans = node0.pushMessage("sysio", "setrank",
         json.dumps({"producer": producerB, "rank": 2}),
         "--permission sysio@active")
     assert success, f"Failed to set rank for {producerB}: {trans}"
+    setRankTransIds.append(node0.getTransId(trans))
 
-    assert node0.waitForHeadToAdvance(), "Head did not advance after setrank"
+    # regsnapprov reads producer ranks from the on-chain producers table. A
+    # generic head advance can race the exact setrank transactions under
+    # multi-producer scheduling, so wait for those transactions specifically.
+    assert node0.waitForTransactionsInBlock(setRankTransIds, timeout=60), \
+        "setrank transactions did not make it into a block before regsnapprov"
 
     # ---------------------------------------------------------------
     # Register snapshot providers

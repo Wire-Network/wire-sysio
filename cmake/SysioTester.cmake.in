@@ -48,7 +48,7 @@ find_library(SYSIO_TESTER_ATOMIC_LIB atomic)
 set(SYSIO_TESTER_ATOMIC_LINK "")
 if(SYSIO_TESTER_ATOMIC_LIB)
     set(SYSIO_TESTER_ATOMIC_LINK ${SYSIO_TESTER_ATOMIC_LIB})
-else()
+elseif(NOT APPLE)
     # Fall back to linking by name; harmless if not needed/available
     set(SYSIO_TESTER_ATOMIC_LINK atomic)
 endif()
@@ -77,15 +77,28 @@ if(IS_DIRECTORY "${sysioPrefixDir}/libraries")
     endforeach()
     list(REMOVE_DUPLICATES _sysio_build_tree_lib_dirs)
 endif()
-# Also add vcpkg dirs if present (for Boost, OpenSSL, etc.)
-foreach(_vcpkg_sub "vcpkg_installed/x64-linux/lib" "vcpkg_installed/x64-linux/debug/lib")
+# Also add vcpkg dirs if present (for Boost, OpenSSL, etc.).
+set(_sysio_vcpkg_triplet "@VCPKG_TARGET_TRIPLET@")
+if(NOT _sysio_vcpkg_triplet OR _sysio_vcpkg_triplet STREQUAL "@VCPKG_TARGET_TRIPLET@")
+    # Installed/build-tree SysioTester configs normally receive the configured
+    # vcpkg triplet above. This fallback is only for ad-hoc template
+    # consumption where CMake has not substituted @VCPKG_TARGET_TRIPLET@.
+    if(APPLE)
+        set(_sysio_vcpkg_triplet "arm64-osx")
+    else()
+        set(_sysio_vcpkg_triplet "x64-linux")
+    endif()
+endif()
+foreach(_vcpkg_sub
+        "vcpkg_installed/${_sysio_vcpkg_triplet}/lib"
+        "vcpkg_installed/${_sysio_vcpkg_triplet}/debug/lib")
     if(IS_DIRECTORY "${sysioPrefixDir}/${_vcpkg_sub}")
         list(APPEND _sysio_build_tree_lib_dirs "${sysioPrefixDir}/${_vcpkg_sub}")
     endif()
 endforeach()
 # Add vcpkg prefix to CMAKE_PREFIX_PATH so find_package(Boost) etc. work
-if(IS_DIRECTORY "${sysioPrefixDir}/vcpkg_installed/x64-linux")
-    list(APPEND CMAKE_PREFIX_PATH "${sysioPrefixDir}/vcpkg_installed/x64-linux")
+if(IS_DIRECTORY "${sysioPrefixDir}/vcpkg_installed/${_sysio_vcpkg_triplet}")
+    list(APPEND CMAKE_PREFIX_PATH "${sysioPrefixDir}/vcpkg_installed/${_sysio_vcpkg_triplet}")
 endif()
 
 # Helper macro to find sysio-provided libraries from ${sysioLibDir}
@@ -223,14 +236,20 @@ target_link_libraries(SysioChain INTERFACE
 # so protobuf, abseil, fmt, keccak, etc. are available without listing each one.
 # Use only one variant (prefer non-debug, fall back to debug) to avoid duplicate symbols.
 set(_vcpkg_all_libs "")
-if(IS_DIRECTORY "${sysioPrefixDir}/vcpkg_installed/x64-linux/lib")
-    file(GLOB _vcpkg_all_libs "${sysioPrefixDir}/vcpkg_installed/x64-linux/lib/*.a")
-elseif(IS_DIRECTORY "${sysioPrefixDir}/vcpkg_installed/x64-linux/debug/lib")
-    file(GLOB _vcpkg_all_libs "${sysioPrefixDir}/vcpkg_installed/x64-linux/debug/lib/*.a")
+if(IS_DIRECTORY "${sysioPrefixDir}/vcpkg_installed/${_sysio_vcpkg_triplet}/lib")
+    file(GLOB _vcpkg_all_libs "${sysioPrefixDir}/vcpkg_installed/${_sysio_vcpkg_triplet}/lib/*.a")
+elseif(IS_DIRECTORY "${sysioPrefixDir}/vcpkg_installed/${_sysio_vcpkg_triplet}/debug/lib")
+    file(GLOB _vcpkg_all_libs "${sysioPrefixDir}/vcpkg_installed/${_sysio_vcpkg_triplet}/debug/lib/*.a")
 endif()
 if(_vcpkg_all_libs)
-    # Use linker group to resolve circular dependencies between vcpkg static libs
-    target_link_libraries(SysioChain INTERFACE -Wl,--start-group ${_vcpkg_all_libs} -Wl,--end-group)
+    # GNU ld can rescan a static archive group until circular dependencies settle. Darwin ld has no
+    # equivalent group option, so list the archives twice to give later archives a second chance to
+    # satisfy symbols introduced by earlier ones without whole-archiving every object.
+    if(APPLE)
+        target_link_libraries(SysioChain INTERFACE ${_vcpkg_all_libs} ${_vcpkg_all_libs})
+    else()
+        target_link_libraries(SysioChain INTERFACE -Wl,--start-group ${_vcpkg_all_libs} -Wl,--end-group)
+    endif()
 endif()
 
 # Build-tree include auto-discovery: find all include/ dirs under libraries/

@@ -1,20 +1,22 @@
-#include <sysio/producer_plugin/trx_priority_db.hpp>
+#include <appbase/application_base.hpp>
+#include <cstring>
 #include <sysio/chain/abi_serializer.hpp>
+#include <sysio/chain/account_object.hpp>
 #include <sysio/chain/kv_table_objects.hpp>
 #include <sysio/chain/wasm_interface_private.hpp>
-#include <sysio/chain/account_object.hpp>
-
-#include <appbase/application_base.hpp>
-
+#include <sysio/producer_plugin/trx_priority_db.hpp>
 #include <vector>
-#include <cstring>
 
 namespace sysio {
 
 using namespace sysio::chain;
 
 int trx_priority_db::get_trx_priority(const transaction& trx) const {
-   const std::shared_ptr<const trx_priority_map_t> map_ptr = _trx_priority_map.load();
+   trx_priority_map_ptr map_ptr;
+   {
+      std::scoped_lock lock{_trx_priority_map_mutex};
+      map_ptr = _trx_priority_map;
+   }
    if (map_ptr == nullptr || map_ptr->empty())
       return appbase::priority::low;
 
@@ -74,7 +76,8 @@ block_timestamp_type get_last_trx_priority_update(const controller& control) {
       if (data.empty())
          return {};
       return fc::raw::unpack<block_timestamp_type>(data);
-   } FC_LOG_AND_DROP()
+   }
+   FC_LOG_AND_DROP()
    return {};
 }
 
@@ -93,12 +96,13 @@ void trx_priority_db::load_trx_priority_map(const controller& control, trx_prior
       const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
       // Start from beginning of this table_id — all-zero is the minimum BE uint64
       char min_key[kv_pri_key_size] = {};
-      auto itr = kv_idx.lower_bound(boost::make_tuple(config::system_account_name, trx_tid,
-                                                        std::string_view(min_key, kv_pri_key_size)));
+      auto itr = kv_idx.lower_bound(
+         boost::make_tuple(config::system_account_name, trx_tid, std::string_view(min_key, kv_pri_key_size)));
 
       while (itr != kv_idx.end() && itr->code == config::system_account_name && itr->table_id == trx_tid) {
          auto kv = itr->key_view();
-         if (kv.size() != kv_pri_key_size) break;
+         if (kv.size() != kv_pri_key_size)
+            break;
 
          trx_prio tmp;
          datastream<const char*> ds(itr->value.data(), itr->value.size());
@@ -112,13 +116,12 @@ void trx_priority_db::load_trx_priority_map(const controller& control, trx_prior
          }
          ++itr;
       }
-
-   } FC_LOG_AND_DROP()
+   }
+   FC_LOG_AND_DROP()
 }
 
-// -----------------------------------------------------------------------------------------------------------------
-
-void trx_priority_db::on_irreversible_block(const signed_block_ptr& lib, const block_id_type&, const controller& chain) {
+void trx_priority_db::on_irreversible_block(const signed_block_ptr& lib, const block_id_type&,
+                                            const controller& chain) {
    if (lib->block_num() % trx_priority_refresh_interval != 0)
       return;
 
@@ -135,9 +138,12 @@ void trx_priority_db::on_irreversible_block(const signed_block_ptr& lib, const b
       _last_trx_priority_update = last_chain_update; // reset in load_trx_priority_map on failure
       load_trx_priority_map(chain, *new_map);
 
-      if (_last_trx_priority_update == last_chain_update)
-         _trx_priority_map = new_map; // atomic swap
-   } FC_LOG_AND_DROP();
+      if (_last_trx_priority_update == last_chain_update) {
+         std::scoped_lock lock{_trx_priority_map_mutex};
+         _trx_priority_map = std::move(new_map);
+      }
+   }
+   FC_LOG_AND_DROP();
 }
 
 

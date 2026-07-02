@@ -713,14 +713,13 @@ std::string abi::to_contract_component_signature(const component_type& component
    if (component.is_container()) {
       ss << '(';
 
-      std::ranges::for_each(component.components | std::views::enumerate, [&](auto&& enum_item) {
-         auto& [i, child_comp] = enum_item;
-         if (i) {
+      for (size_t i = 0; i < component.components.size(); ++i) {
+         if (i != 0) {
             ss << ',';
          }
 
-         ss << abi::to_contract_component_signature(child_comp);
-      });
+         ss << abi::to_contract_component_signature(component.components[i]);
+      }
 
       ss << ')';
    }
@@ -752,14 +751,13 @@ std::string abi::to_contract_function_signature(const contract& contract) {
    FC_ASSERT(contract.type == invoke_target_type::function, "ABI contract must be a function");
    std::stringstream ss;
    ss << contract.name << '(';
-   std::ranges::for_each(contract.inputs | std::views::enumerate, [&](auto&& enum_item) {
-      auto& [i, input_comp] = enum_item;
-      if (i) {
+   for (size_t i = 0; i < contract.inputs.size(); ++i) {
+      if (i != 0) {
          ss << ',';
       }
 
-      ss << abi::to_contract_component_signature(input_comp);
-   });
+      ss << abi::to_contract_component_signature(contract.inputs[i]);
+   }
    ss << ')';
    return ss.str();
 }
@@ -794,13 +792,12 @@ std::string abi::to_event_signature(const contract& contract) {
    FC_ASSERT(contract.type == invoke_target_type::event, "ABI contract must be an event");
    std::stringstream ss;
    ss << contract.name << '(';
-   std::ranges::for_each(contract.inputs | std::views::enumerate, [&](auto&& enum_item) {
-      auto& [i, input_comp] = enum_item;
-      if (i) {
+   for (size_t i = 0; i < contract.inputs.size(); ++i) {
+      if (i != 0) {
          ss << ',';
       }
-      ss << abi::to_contract_component_signature(input_comp);
-   });
+      ss << abi::to_contract_component_signature(contract.inputs[i]);
+   }
    ss << ')';
    return ss.str();
 }

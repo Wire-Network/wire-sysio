@@ -33,6 +33,7 @@
 #include <sysio/opp/opp.hpp>
 
 #include "sysio.system_tester.hpp"
+#include "finalizer_test_keys.hpp"
 
 #include <fc/variant_object.hpp>
 #include <fc/io/raw.hpp>
@@ -896,7 +897,7 @@ public:
       );
    }
 
-private:
+protected:
    // -----------------------------
    // Internal push helpers
    // -----------------------------
@@ -1079,7 +1080,7 @@ public:
          abi_serializer::create_yield_function(abi_serializer_max_time));
    }
 
-private:
+protected:
    action_result push_opreg_action(account_name signer, action_name act, const variant_object& data) {
       try {
          base_tester::push_action(OPREG, act, signer, data);
@@ -4141,3 +4142,248 @@ BOOST_FIXTURE_TEST_CASE( fundclaim_silent_when_t5state_missing, sysio_emissions_
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_SUITE_END() // t5_emissions_tests
+
+// ===========================================================================
+// Producer scheduling eligibility
+//
+// update_ranked_producers must schedule only producers that are ACTIVE
+// OPERATOR_TYPE_PRODUCER operators in sysio.opreg, backfill vacated active slots
+// from standbys, and never shrink the schedule (with its lock-step finalizer
+// policy) below the BFT safety floor (min_schedule_size). The gate treats every
+// non-ACTIVE status identically (UNKNOWN from a collateral withdrawal, SLASHED,
+// TERMINATED all fail is_op_active), so slash / terminate exercise the same
+// decision the withdrawal path reaches once flushwtdw flips status to UNKNOWN
+// (that transition itself is covered by the opreg / epoch suites).
+//
+// Scheduling is asserted through the last-proposed finalizer policy, which
+// update_ranked_producers writes in the same loop as the producer schedule, so
+// its key_ids are exactly the scheduled producers -- and reading it does not
+// depend on the (unsignable, test-key) policy ever activating.
+// ===========================================================================
+
+struct producer_eligibility_tester : public sysio_emissions_tester {
+
+   /// producera, producerb, ... for the first `count` indices.
+   std::vector<account_name> producer_names(uint32_t count) {
+      std::vector<account_name> names;
+      names.reserve(count);
+      for (uint32_t i = 0; i < count; ++i) names.push_back(producer_name_at(i));
+      return names;
+   }
+
+   /// Create producer accounts with enough RAM to store a finalizer key. Uses the
+   /// system setacctram action (a direct native limit set) rather than the ROA /
+   /// RAM market, which this fixture does not activate.
+   void create_producer_accounts(const std::vector<account_name>& names) {
+      create_accounts(names, false, false, false, true);
+      produce_blocks(1);
+      for (const auto& p : names) {
+         BOOST_REQUIRE_EQUAL(success(), push_system_action(config::system_account_name, "setacctram"_n,
+            mvo()("account", p)("ram_bytes", int64_t(1'000'000))));
+      }
+      produce_blocks(1);
+   }
+
+   action_result register_finalizer_key(account_name act, const std::string& key, const std::string& pop) {
+      return push_system_action(act, "regfinkey"_n, mvo()
+         ("finalizer_name", act)("finalizer_key", key)("proof_of_possession", pop));
+   }
+
+   /// Assigns key_pairs[i] to names[i] for the first `count` producers. regfinkey
+   /// auto-activates a producer's first key, satisfying the schedule's finalizer gate.
+   void register_finalizer_keys(const std::vector<account_name>& names, uint32_t count) {
+      for (uint32_t i = 0; i < count && i < names.size(); ++i) {
+         BOOST_REQUIRE_EQUAL(success(),
+            register_finalizer_key(names[i], sysio_test::key_pairs[i].pub_key, sysio_test::key_pairs[i].pop));
+      }
+   }
+
+   action_result setrank(account_name producer, uint32_t rank) {
+      return push_system_action(config::system_account_name, "setrank"_n, mvo()
+         ("producer", producer)("rank", rank));
+   }
+
+   action_result terminate_operator(account_name account, const std::string& reason = "test terminate") {
+      return push_opreg_action(OPREG, "terminate"_n, mvo()("account", account)("reason", reason));
+   }
+
+   /// Registers `count` producers, each an ACTIVE bootstrapped PRODUCER operator
+   /// with an active finalizer key, ranked 1..count via setrank. setrank is used
+   /// rather than setprodkeys because setprodkeys publishes the whole set through
+   /// set_proposed_producers, which the native layer caps at max_producers; this
+   /// helper must be able to seed standby ranks (> max_producers) for backfill.
+   /// The producer/finalizer rows are populated but no schedule is published
+   /// until the caller triggers update_ranked_producers via trigger_reschedule().
+   std::vector<account_name> setup_ranked_producers(uint32_t count) {
+      auto names = producer_names(count);
+      create_producer_accounts(names);
+      for (auto& p : names) {
+         BOOST_REQUIRE_EQUAL(success(), push_system_action(p, "regproducer"_n, mvo()
+            ("producer", p)("producer_key", get_public_key(p, "active"))("url", "")("location", 0)));
+      }
+      for (auto& p : names) {
+         BOOST_REQUIRE_EQUAL(success(), register_operator(p, OperatorType::OPERATOR_TYPE_PRODUCER, true));
+      }
+      for (uint32_t i = 0; i < count; ++i) {
+         BOOST_REQUIRE_EQUAL(success(), setrank(names[i], i + 1));
+      }
+      register_finalizer_keys(names, count);
+      produce_blocks(1);
+      return names;
+   }
+
+   /// Fire onblock's update_ranked_producers rebuild (throttled to once per 120
+   /// slots). Advance 130 blocks (~65s) so the threshold is crossed gradually --
+   /// a single large time jump would expire subsequently pushed transactions.
+   void trigger_reschedule() {
+      produce_blocks(130);
+   }
+
+   /// True iff `producer`'s active finalizer key appears in the finalizer policy
+   /// that update_ranked_producers last proposed -- i.e. the producer is scheduled.
+   /// Finalizer key_ids are zero-based, so row presence (not a non-zero id) is the
+   /// "producer has an active key" test.
+   bool is_scheduled(account_name producer) {
+      auto data = get_row_by_account(config::system_account_name, config::system_account_name,
+                                     "finalizers"_n, producer);
+      if (data.empty()) return false;
+      auto v = sysio_abi_ser.binary_to_variant("finalizer_info", data,
+         abi_serializer::create_yield_function(abi_serializer_max_time));
+      auto ids = sysio_test::get_last_prop_fin_ids(*this, sysio_abi_ser);
+      return ids.count(v["active_key_id"].as_uint64()) > 0;
+   }
+};
+
+BOOST_AUTO_TEST_SUITE(sysio_producer_eligibility_tests)
+
+// Baseline: collateralized, finalizer-keyed producers are all scheduled.
+BOOST_FIXTURE_TEST_CASE( active_producers_scheduled, producer_eligibility_tester ) try {
+   auto names = setup_ranked_producers(5);
+   trigger_reschedule();
+
+   for (const auto& p : names) {
+      BOOST_REQUIRE_MESSAGE(is_scheduled(p), "expected " << p.to_string() << " scheduled");
+   }
+} FC_LOG_AND_RETHROW()
+
+// A slashed producer (status SLASHED) is dropped from the schedule; the others
+// remain (4 eligible >= min_schedule_size).
+BOOST_FIXTURE_TEST_CASE( slashed_producer_removed, producer_eligibility_tester ) try {
+   auto names = setup_ranked_producers(5);
+   trigger_reschedule();
+   BOOST_REQUIRE( is_scheduled(names[4]) );
+
+   BOOST_REQUIRE_EQUAL( success(), slash_operator(names[4]) );
+   trigger_reschedule();
+
+   BOOST_REQUIRE( !is_scheduled(names[4]) );
+   BOOST_REQUIRE(  is_scheduled(names[0]) );
+   BOOST_REQUIRE(  is_scheduled(names[3]) );
+} FC_LOG_AND_RETHROW()
+
+// A terminated producer (status TERMINATED) is dropped from the schedule.
+BOOST_FIXTURE_TEST_CASE( terminated_producer_removed, producer_eligibility_tester ) try {
+   auto names = setup_ranked_producers(5);
+   trigger_reschedule();
+   BOOST_REQUIRE( is_scheduled(names[2]) );
+
+   BOOST_REQUIRE_EQUAL( success(), terminate_operator(names[2]) );
+   trigger_reschedule();
+
+   BOOST_REQUIRE( !is_scheduled(names[2]) );
+   BOOST_REQUIRE(  is_scheduled(names[0]) );
+} FC_LOG_AND_RETHROW()
+
+// Re-collateralization (register a fresh ACTIVE producer operator) restores
+// schedulability: an account whose operator row is absent is not scheduled, and
+// once it becomes an ACTIVE PRODUCER operator it is picked up on the next rebuild.
+BOOST_FIXTURE_TEST_CASE( noncollateralized_producer_not_scheduled_then_restored, producer_eligibility_tester ) try {
+   // Four collateralized producers plus one that is registered + finalizer-keyed
+   // + ranked but has NO opreg operator row yet.
+   auto names = producer_names(5);
+   create_producer_accounts(names);
+   for (auto& p : names) {
+      BOOST_REQUIRE_EQUAL( success(), push_system_action(p, "regproducer"_n, mvo()
+         ("producer", p)("producer_key", get_public_key(p, "active"))("url", "")("location", 0)) );
+   }
+   for (uint32_t i = 0; i < 4; ++i) {
+      BOOST_REQUIRE_EQUAL( success(), register_operator(names[i], OperatorType::OPERATOR_TYPE_PRODUCER, true) );
+   }
+   for (uint32_t i = 0; i < 5; ++i) BOOST_REQUIRE_EQUAL( success(), setrank(names[i], i + 1) );
+   register_finalizer_keys(names, 5);
+   produce_blocks(1);
+   trigger_reschedule();
+
+   BOOST_REQUIRE(  is_scheduled(names[0]) );
+   BOOST_REQUIRE( !is_scheduled(names[4]) );   // no operator row -> not scheduled
+
+   BOOST_REQUIRE_EQUAL( success(), register_operator(names[4], OperatorType::OPERATOR_TYPE_PRODUCER, true) );
+   trigger_reschedule();
+
+   BOOST_REQUIRE( is_scheduled(names[4]) );     // now ACTIVE PRODUCER -> scheduled
+} FC_LOG_AND_RETHROW()
+
+// An account that is ACTIVE only as a BATCH operator (different collateral) must
+// not be scheduled as a producer even though its opreg status is ACTIVE.
+BOOST_FIXTURE_TEST_CASE( active_batch_operator_not_scheduled_as_producer, producer_eligibility_tester ) try {
+   auto names = producer_names(5);
+   create_producer_accounts(names);
+   for (auto& p : names) {
+      BOOST_REQUIRE_EQUAL( success(), push_system_action(p, "regproducer"_n, mvo()
+         ("producer", p)("producer_key", get_public_key(p, "active"))("url", "")("location", 0)) );
+   }
+   for (uint32_t i = 0; i < 4; ++i) {
+      BOOST_REQUIRE_EQUAL( success(), register_operator(names[i], OperatorType::OPERATOR_TYPE_PRODUCER, true) );
+   }
+   // names[4] is ACTIVE, but as a BATCH operator -- wrong type for producing.
+   BOOST_REQUIRE_EQUAL( success(), register_operator(names[4], OperatorType::OPERATOR_TYPE_BATCH, true) );
+   for (uint32_t i = 0; i < 5; ++i) BOOST_REQUIRE_EQUAL( success(), setrank(names[i], i + 1) );
+   register_finalizer_keys(names, 5);
+   produce_blocks(1);
+   trigger_reschedule();
+
+   BOOST_REQUIRE(  is_scheduled(names[0]) );
+   BOOST_REQUIRE( !is_scheduled(names[4]) );
+} FC_LOG_AND_RETHROW()
+
+// When an active-rank producer becomes ineligible and a standby is available,
+// the standby backfills the vacated slot (schedule stays full).
+BOOST_FIXTURE_TEST_CASE( standby_backfills_ineligible_active, producer_eligibility_tester ) try {
+   // emitcfg must exist for standby_end_rank (else backfill is disabled and the
+   // schedule caps at max_producers with no standbys considered).
+   BOOST_REQUIRE_EQUAL( success(), setemitcfg_defaults( config::system_account_name ) );
+   produce_blocks(1);
+
+   // 21 active-rank (1..21) + one standby at rank 22.
+   auto names = setup_ranked_producers(22);
+   trigger_reschedule();
+
+   BOOST_REQUIRE(  is_scheduled(names[0])  );   // rank 1 active
+   BOOST_REQUIRE( !is_scheduled(names[21]) );   // rank 22 standby: not scheduled while actives are full
+
+   BOOST_REQUIRE_EQUAL( success(), slash_operator(names[0]) );
+   trigger_reschedule();
+
+   BOOST_REQUIRE( !is_scheduled(names[0])  );   // slashed active removed
+   BOOST_REQUIRE(  is_scheduled(names[21]) );   // standby backfilled into the schedule
+} FC_LOG_AND_RETHROW()
+
+// The schedule (and its lock-step finalizer policy) never shrinks below the BFT
+// safety floor: with min_schedule_size producers and no standbys, making one
+// ineligible leaves fewer than the floor eligible, so the last good schedule is
+// retained rather than published smaller -- the ineligible producer stays.
+BOOST_FIXTURE_TEST_CASE( schedule_not_shrunk_below_floor, producer_eligibility_tester ) try {
+   auto names = setup_ranked_producers(4);      // min_schedule_size == 4
+   trigger_reschedule();
+   for (const auto& p : names) BOOST_REQUIRE( is_scheduled(p) );
+
+   BOOST_REQUIRE_EQUAL( success(), slash_operator(names[3]) );
+   trigger_reschedule();
+
+   // Only 3 eligible (< floor). update_ranked_producers returns early, so the
+   // last good 4-member schedule -- including the slashed producer -- is kept.
+   BOOST_REQUIRE( is_scheduled(names[3]) );
+   BOOST_REQUIRE( is_scheduled(names[0]) );
+} FC_LOG_AND_RETHROW()
+
+BOOST_AUTO_TEST_SUITE_END() // sysio_producer_eligibility_tests

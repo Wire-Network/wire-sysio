@@ -1,8 +1,10 @@
 #pragma once
 
+#include <memory>
+#include <mutex>
 #include <sysio/chain/block.hpp>
-#include <sysio/chain/transaction.hpp>
 #include <sysio/chain/name.hpp>
+#include <sysio/chain/transaction.hpp>
 
 namespace sysio {
 
@@ -27,14 +29,15 @@ public:
    /**
     * Called from main thread
     */
-   void on_irreversible_block(const chain::signed_block_ptr& lib, const chain::block_id_type& block_id, const chain::controller& chain);
+   void on_irreversible_block(const chain::signed_block_ptr& lib, const chain::block_id_type& block_id,
+                              const chain::controller& chain);
 
 private:
    // matches trx_match_type of system contract
    enum trx_match_type : uint8_t {
-      only = 0,    // trx has only one action and it matches
-      first = 1,   // trx first action matches
-      any = 2      // trx has any action that matches
+      only = 0,  // trx has only one action and it matches
+      first = 1, // trx first action matches
+      any = 2    // trx has any action that matches
    };
    // matches trx_prio of system contract
    struct trx_prio {
@@ -47,10 +50,14 @@ private:
    friend struct fc::reflector<trx_prio>;
 
    using trx_priority_map_t = boost::container::flat_multimap<chain::name, trx_prio>;
-private:
+   using trx_priority_map_ptr = std::shared_ptr<const trx_priority_map_t>;
 
-   std::atomic<std::shared_ptr<trx_priority_map_t>>  _trx_priority_map{nullptr};
-   chain::block_timestamp_type                       _last_trx_priority_update{}; // only accessed on main thread
+private:
+   /// Guards replacement and snapshot reads of `_trx_priority_map`.
+   mutable std::mutex _trx_priority_map_mutex{};
+   /// Immutable map snapshot, replaced on refresh while readers keep shared ownership of older snapshots.
+   trx_priority_map_ptr _trx_priority_map{};
+   chain::block_timestamp_type _last_trx_priority_update{}; // only accessed on main thread
 
 private:
    void load_trx_priority_map(const chain::controller& control, trx_priority_map_t& m);

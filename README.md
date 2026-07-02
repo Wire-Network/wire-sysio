@@ -15,6 +15,7 @@ We currently support the following operating systems.
 |-----------------------|
 | Ubuntu 24.04 Jammy    |
 | Ubuntu 25.04 Plucky   |
+| macOS Apple Silicon   |
 
 <!-- TODO: needs to add and test build on unsupported environments -->
 
@@ -41,6 +42,31 @@ v3.1.2-0b64f879e3ebe2e4df09d2e62f1fc164cc1125d1
 
 Follow the instructions [BUILD.md](./BUILD.md) to build Wire Sysio
 from source.
+
+### macOS Apple Silicon developer build
+
+The macOS Apple Silicon path is phase-one developer support. It uses vcpkg `arm64-osx`, prebuilt checked-in contract
+artifacts, and the interpreted `sys-vm` runtime. CDT contract rebuilds, `sys-vm-jit`, `sys-vm-oc`, and native-module
+contract debugging are not part of this support tier yet.
+
+```bash
+brew install cmake ninja ccache pkgconf autoconf automake libtool
+git submodule update --init --recursive vcpkg libraries/appbase
+./vcpkg/bootstrap-vcpkg.sh
+
+cmake -B build/macos-arm64 -S . -G Ninja \
+  -DCMAKE_BUILD_TYPE=Debug \
+  -DVCPKG_TARGET_TRIPLET=arm64-osx \
+  -DBUILD_SYSTEM_CONTRACTS=OFF \
+  -DBUILD_TEST_CONTRACTS=OFF \
+  -DENABLE_CCACHE=ON \
+  -DENABLE_TESTS=ON \
+  -DENABLE_JEMALLOC=OFF \
+  -DDISABLE_WASM_SPEC_TESTS=OFF \
+  -DCMAKE_TOOLCHAIN_FILE=$PWD/vcpkg/scripts/buildsystems/vcpkg.cmake
+
+cmake --build build/macos-arm64 --target fc nodeop clio kiod sys-util unit_test plugin_test test_fc -- -j"$(sysctl -n hw.logicalcpu)"
+```
 
 ## Local Development (Docker)
 

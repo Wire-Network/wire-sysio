@@ -202,20 +202,22 @@ namespace sysio::chain {
 
       std::array all_actions = {std::views::all(trx.context_free_actions), std::views::all(trx.actions)};
       assert(std::ranges::distance(std::views::join(all_actions)) == trx.total_actions());
-      for (const auto& [i, act] : std::views::enumerate(std::views::join(all_actions))) {
+      size_t action_index = 0;
+      for (const auto& act : std::views::join(all_actions)) {
          // For each action, add either the explicit payer (if present) or the contract (if no payer)
          account_name a = act.payer();
          auto& b = accounts_billing[a];
          if (is_input) {
-            uint64_t billable_size = packed_trx.get_action_billable_size(i);
+            uint64_t billable_size = packed_trx.get_action_billable_size(action_index);
             b.net_usage += billable_size;
             trace->net_usage += billable_size;
          }
          if (explicit_billed_cpu_time) {
             assert(!is_read_only());
-            assert(billed_cpu_us.size() > static_cast<size_t>(i));
-            b.cpu_usage_us += billed_cpu_us[i];
+            assert(billed_cpu_us.size() > action_index);
+            b.cpu_usage_us += billed_cpu_us[action_index];
          }
+         ++action_index;
       }
       check_trx_net_usage(); // Fail early if current net usage exceeds limit
 
@@ -743,7 +745,8 @@ namespace sysio::chain {
          total_cpu_time_us = 0;
          const bool subjectively_bill_payer_disabled = control.get_subjective_billing().is_payer_billing_disabled();
          const auto trx_first_authorizer = packed_trx.get_transaction().first_authorizer(); // used if action has no authorizer
-         for (auto&& [i, b] : std::views::enumerate(billed_cpu_us)) {
+         for (size_t i = 0; i < billed_cpu_us.size(); ++i) {
+            auto& b = billed_cpu_us[i];
             // if exception thrown, action_traces may not be the same size as billed_cpu_us
             auto& act_trace = trace->action_traces[i];
             b.value += delta_per_action;
@@ -1001,7 +1004,8 @@ namespace sysio::chain {
                        "read-only action '{}' cannot have authorizations", a.name );
          }
          name payer;
-         for (const auto& [i, auth] : std::views::enumerate(a.authorization)) {
+         for (size_t i = 0; i < a.authorization.size(); ++i) {
+            const auto& auth = a.authorization[i];
             if (auth.permission == config::sysio_payer_name) {
                SYS_ASSERT(payer.empty(), transaction_exception,
                           "action cannot have multiple payers");
