@@ -237,7 +237,8 @@ public:
 
       BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
          ("kind", ChainKind::CHAIN_KIND_EVM)("code", codename_mvo("ETH"))
-         ("external_chain_id", 31337)("name", std::string("ethereum-test"))("description", std::string{})));
+         ("external_chain_id", 31337)("name", std::string("ethereum-test"))("description", std::string{})
+         ("opp_addr", std::string{})("opp_inbound_addr", std::string{})));
 
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "schbatchgps"_n, mvo()));
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "advance"_n, mvo()));
