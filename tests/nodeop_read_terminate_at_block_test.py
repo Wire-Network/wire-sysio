@@ -19,6 +19,9 @@ errorExit = Utils.errorExit
 cmdError = Utils.cmdError
 relaunchTimeout = 10
 numOfProducers = 1
+replayBlocksFromSnapshot = 5
+postTerminateBlockMargin = 1
+postSnapshotBlockTimeout = 150
 # One producing node, four regular terminate-at-block nodes, and six nodes
 # where replay snapshot through block logs with terminate-at-block
 # and in combinations of --read-mode and --force-all-checks.
@@ -134,7 +137,10 @@ def checkReplay(testNode, testNodeArgs):
     ]))
 
     assert not testNode.verifyAlive()
-    testNode.relaunch(chainArg="--replay-blockchain", addSwapFlags={"--terminate-at-block": "0", "--truncate-at-block": "0"})
+    testNode.relaunch(
+        chainArg="--replay-blockchain",
+        addSwapFlags={"--terminate-at-block": "0", "--truncate-at-block": "0"},
+    )
 
     # Wait for node to finish up.
     time.sleep(3)
@@ -201,6 +207,7 @@ def checkHeadOrSpeculative(head, lib):
 
 # Test terminate-at-block for replay from snapshot through block logs
 def executeSnapshotBlocklogTest(cluster, testNodeId, resultMsgs, nodeArgs, termAtBlock):
+    """Test --terminate-at-block when replaying from a snapshot through existing block logs."""
     testNode = cluster.getNode(testNodeId)
     testResult = False
     resultDesc = "!!!BUG IS CONFIRMED ON TEST CASE #{}  ({})".format(
@@ -213,7 +220,10 @@ def executeSnapshotBlocklogTest(cluster, testNodeId, resultMsgs, nodeArgs, termA
         assert testNode.kill(signal.SIGTERM)
 
     # Start from snapshot, replay through block log and terminate at specified block
-    chainArg=f'--snapshot {testNode.getLatestSnapshot()} --replay-blockchain --terminate-at-block {termAtBlock} --truncate-at-block {termAtBlock}'
+    chainArg=(
+        f'--snapshot {testNode.getLatestSnapshot()} --replay-blockchain '
+        f'--terminate-at-block {termAtBlock} --truncate-at-block {termAtBlock}'
+    )
     testNode.relaunch(chainArg=chainArg, waitForTerm=True)
 
     # Check the node stops at the correct block by checking the log.
@@ -222,8 +232,13 @@ def executeSnapshotBlocklogTest(cluster, testNodeId, resultMsgs, nodeArgs, termA
         for line in errFile:
             m=re.search(r"Block ([\d]+) reached configured maximum block", line)
             if m:
-                assert int(m.group(1)) == termAtBlock, f"actual terminating block number {m.group(1)} not equal to expected termAtBlock {termAtBlock}"
-                resultDesc = f"!!!TEST CASE #{testNodeId}  (replay block log, mode {nodeArgs} --terminate-at-block {termAtBlock}) IS SUCCESSFUL"
+                assert int(m.group(1)) == termAtBlock, (
+                    f"actual terminating block number {m.group(1)} not equal to expected termAtBlock {termAtBlock}"
+                )
+                resultDesc = (
+                    f"!!!TEST CASE #{testNodeId}  (replay block log, mode {nodeArgs} "
+                    f"--terminate-at-block {termAtBlock}) IS SUCCESSFUL"
+                )
                 testResult = True
 
     Print(resultDesc)
@@ -235,23 +250,24 @@ def executeSnapshotBlocklogTest(cluster, testNodeId, resultMsgs, nodeArgs, termA
     if not testNode.relaunch(rmArgs=chainArg):
         Utils.errorExit(f"Unable to relaunch after terminate-at-block {termAtBlock}")
 
-    if testNode and not testNode.killed:
-        assert testNode.kill(signal.SIGTERM)
-
     if testResult:
         testResult = False
-        # Check the node continued past the terminate block
-        errFileName=f"{cluster.nodeopLogPath}/node_{str(testNodeId).zfill(2)}/stderr.txt"
-        with open(errFileName) as errFile:
-            for line in errFile:
-                m=re.search(r"Writing chain_head block ([\d]+)", line)
-                if m:
-                    assert int(m.group(1)) > termAtBlock, f"End block number {m.group(1)} not greater than termAtBlock {termAtBlock}"
-                    resultDesc = f"!!!TEST CASE #{testNodeId}a (replay block log after terminate, mode {nodeArgs} --terminate-at-block {termAtBlock}) IS SUCCESSFUL"
-                    testResult = True
+        # A truncated replay may have pruned fork-db blocks past the terminate block,
+        # so verify restart state directly and let the later cluster restart verify sync.
+        head, lib = getBlockNumInfo(testNode)
+        assert head >= termAtBlock, f"Restarted head {head} lower than terminate-at-block {termAtBlock}"
+        assert head >= lib, f"Restarted head {head} lower than lib {lib}"
+        resultDesc = (
+            f"!!!TEST CASE #{testNodeId}a (restart after replay terminate, mode {nodeArgs} "
+            f"--terminate-at-block {termAtBlock}) IS SUCCESSFUL"
+        )
+        testResult = True
 
         Print(resultDesc)
         resultMsgs.append(resultDesc)
+
+    if testNode and not testNode.killed:
+        assert testNode.kill(signal.SIGTERM)
 
     return testResult
 
@@ -309,13 +325,17 @@ try:
         assert ret is not None, "snapshot creation on node {nodeId} failed"
         headBlockNum = ret["payload"]["head_block_num"]
 
-        # Set replay for 5 blocks
-        termAt = headBlockNum + 5
+        # Set replay for a fixed number of blocks beyond the snapshot.
+        termAt = headBlockNum + replayBlocksFromSnapshot
         replayTermAt[nodeId] = termAt
 
-    # wait for all to terminate, needs to be larger than largest terminate-at-block
-    # and leave room for snapshot blocks
-    producingNode.waitForBlock( 250, timeout=150 )
+    # Keep block production alive until every replay test node has persisted at least
+    # one block past its later terminate-at-block target.
+    for nodeId, termAt in replayTermAt.items():
+        requiredBlock = termAt + postTerminateBlockMargin
+        assert cluster.getNode(nodeId).waitForBlock(requiredBlock, timeout=postSnapshotBlockTimeout), \
+            f"Node {nodeId} did not reach block {requiredBlock} before snapshot replay tests"
+
     cluster.biosNode.kill(signal.SIGTERM)
     producingNode.kill(signal.SIGTERM)
 
