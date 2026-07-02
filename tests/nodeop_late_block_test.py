@@ -30,6 +30,7 @@ canonicalConvergenceTimeout=90
 expectedIProducerBlocks=9
 forkSwitchLogTimeout=30
 producerSlotBlockCount=12
+bridgeReconnectProducer="defproducerk"
 delay=args.d
 debug=args.v
 dumpErrorDetails=args.dump_error_details
@@ -95,11 +96,15 @@ try:
     node4.kill(signal.SIGTERM)
     assert not node4.verifyAlive(), "Node4 did not shutdown"
 
-    Print("Wait until Node_03 is well into its isolated fork (defproducerl)")
-    node3.waitForProducer("defproducerl", exitOnError=True)
+    Print(f"Wait until Node_03 is producing on its isolated fork ({bridgeReconnectProducer})")
+    node3.waitForProducer(bridgeReconnectProducer, exitOnError=True)
     isolatedForkInfo = node3.getInfo(exitOnError=True)
     isolatedForkHeadId = isolatedForkInfo["head_block_id"]
     isolatedForkHeadNum = isolatedForkInfo["head_block_num"]
+
+    Print("Relaunch bridge to reconnect Node_02 and Node_03 while Node_03 is still producing")
+    node4.relaunch()
+
     def collectCanonicalIProducerBlocks():
         """Return canonical defproduceri blocks once node_02 has the whole verification window."""
         blocks = getProducerBlockIds(node2, "defproduceri", firstIProdBlockNum, producerSlotBlockCount)
@@ -109,9 +114,6 @@ try:
     canonicalIProducerBlocks = Utils.waitForObj(collectCanonicalIProducerBlocks, timeout=forkSwitchLogTimeout)
     assert canonicalIProducerBlocks, \
         f"Expected at least {expectedIProducerBlocks} canonical defproduceri blocks from block {firstIProdBlockNum}"
-
-    Print("Relaunch bridge to reconnect Node_02 and Node_03")
-    node4.relaunch()
 
     Print("Verify Node_03 converges from its isolated fork back to Node_02's canonical branch")
     def node3ConvergedToCanonicalBranch():
@@ -166,17 +168,18 @@ try:
     # verify that defproducerk or defproducerl blocks made it into the canonical chain
     # It can take a while to resolve the fork, but should have at least one block from node_03's
     # producers unless defproducera wins the fork
-    expectedProd = "defproducerk"
+    expectedProducers = {"defproducerk", "defproducerl"}
     if node3.findInLog("switching forks .* defproducerl", switchForkLineNum):
-        expectedProd = "defproducera"
-    iProdBlockNum += 12 # into the next set of blocks
+        expectedProducers = {"defproducera"}
+    iProdBlockNum += producerSlotBlockCount # into the next set of blocks
     found_defproducer = False
-    for i in range(12):
+    for i in range(producerSlotBlockCount):
         defprod=node3.getBlockProducerByNum(iProdBlockNum + i)
-        if defprod == expectedProd:
+        if defprod in expectedProducers:
             found_defproducer = True
 
-    assert found_defproducer, f"expected {expectedProd} in blocks {iProdBlockNum}-{iProdBlockNum+12}"
+    assert found_defproducer, \
+        f"expected one of {sorted(expectedProducers)} in blocks {iProdBlockNum}-{iProdBlockNum+producerSlotBlockCount}"
 
     testSuccessful=True
 finally:
