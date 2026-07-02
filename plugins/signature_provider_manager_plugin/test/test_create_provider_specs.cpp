@@ -9,6 +9,7 @@
 #include <fc/crypto/hex.hpp>
 #include <fc/io/fstream.hpp>
 #include <fc/io/json.hpp>
+#include <filesystem>
 #include <format>
 #include <memory>
 #include <sodium.h>
@@ -337,6 +338,65 @@ BOOST_AUTO_TEST_CASE(solana_signature_provider_spec_options) {
    auto providers = mgr.query_providers(fixture1.key_name);
    BOOST_REQUIRE(!providers.empty());
    BOOST_TEST((providers[0]->key_type == chain_key_type_solana));
+}
+
+// A signature-provider spec must never be logged with its inline private key intact; `redact_signature_provider_spec`
+// masks only the final `KEY:<private-key>` field while leaving name/chain/type/public-key and non-KEY providers
+// (which reference external key material) untouched.
+BOOST_AUTO_TEST_CASE(redact_signature_provider_spec_masks_inline_private_key) {
+   using sysio::redact_signature_provider_spec;
+
+   // Full CSV spec with an inline KEY: private key -> only the private key is masked.
+   BOOST_CHECK_EQUAL(
+      redact_signature_provider_spec("wire-1,wire,wire,PUB_WA_pub,KEY:PVT_WA_secretkey"),
+      "wire-1,wire,wire,PUB_WA_pub,KEY:<redacted>");
+
+   // Ethereum-style hex key (no ':') is still fully masked.
+   BOOST_CHECK_EQUAL(
+      redact_signature_provider_spec("eth-1,ethereum,ethereum,0xabc,KEY:0xdeadbeef"),
+      "eth-1,ethereum,ethereum,0xabc,KEY:<redacted>");
+
+   // Bare provider spec (no CSV prefix) is masked too.
+   BOOST_CHECK_EQUAL(redact_signature_provider_spec("KEY:PVT_WA_secretkey"), "KEY:<redacted>");
+
+   // KIOD (and other non-KEY) providers reference external material -> returned unchanged.
+   BOOST_CHECK_EQUAL(
+      redact_signature_provider_spec("wire-1,wire,wire,PUB_WA_pub,KIOD:http://127.0.0.1:8888"),
+      "wire-1,wire,wire,PUB_WA_pub,KIOD:http://127.0.0.1:8888");
+
+   // Only the final field is inspected: a KEY:-prefixed *name* must not trigger false redaction.
+   BOOST_CHECK_EQUAL(
+      redact_signature_provider_spec("KEY:weird-name,wire,wire,PUB_WA_pub,KIOD:url"),
+      "KEY:weird-name,wire,wire,PUB_WA_pub,KIOD:url");
+}
+
+// The auto-generated default signature-provider file holds private keys and must be written owner-only (0600),
+// not left group/world readable under the process umask.
+BOOST_AUTO_TEST_CASE(default_signature_provider_file_is_owner_only) {
+   using namespace fc::crypto;
+   auto clean_app = gsl_lite::finally([]() { appbase::application::reset_app_singleton(); });
+
+   // Isolated, writable config-dir so the persisted key file is under our control.
+   auto config_dir = std::filesystem::temp_directory_path() / "sec79_sigprov_perms_test";
+   std::error_code ec;
+   std::filesystem::remove_all(config_dir, ec);
+   std::filesystem::create_directories(config_dir);
+   auto cleanup = gsl_lite::finally([&]() { std::error_code e; std::filesystem::remove_all(config_dir, e); });
+
+   std::vector<std::string> args = {"--config-dir", config_dir.string()};
+   auto tester = create_app(args);
+
+   // Generating + persisting a default provider must write the key file with owner-only permissions.
+   tester->plugin().register_default_signature_providers({chain_key_type_wire});
+
+   auto key_file = config_dir / "default_signature_providers.json";
+   BOOST_REQUIRE(std::filesystem::exists(key_file));
+
+   const auto perms = std::filesystem::status(key_file).permissions();
+   BOOST_CHECK((perms & std::filesystem::perms::owner_read)  != std::filesystem::perms::none);
+   BOOST_CHECK((perms & std::filesystem::perms::owner_write) != std::filesystem::perms::none);
+   BOOST_CHECK((perms & std::filesystem::perms::group_all)   == std::filesystem::perms::none);
+   BOOST_CHECK((perms & std::filesystem::perms::others_all)  == std::filesystem::perms::none);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

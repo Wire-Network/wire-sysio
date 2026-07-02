@@ -12,6 +12,8 @@
 #include <fc-lite/algorithm.hpp>
 #include <gsl-lite/gsl-lite.hpp>
 
+#include <filesystem>
+
 #include <sysio/chain/types.hpp>
 #include <sysio/chain/exceptions.hpp>
 #include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
@@ -23,6 +25,25 @@ constexpr auto option_name_kiod_timeout_us = "signature-provider-kiod-timeout-us
 
 std::filesystem::path default_signature_provider_spec_file() {
    return app().config_dir() / "default_signature_providers.json";
+}
+
+/**
+ * Restrict a file to owner read/write only (0600).
+ *
+ * Used for files that persist private signing keys so they are not left group- or world-readable under the
+ * process umask. Best-effort: a failure to set permissions is logged, not fatal, so key persistence still
+ * succeeds on platforms/filesystems that do not support POSIX permission bits.
+ *
+ * @param file_path the file to restrict; it must already exist.
+ */
+void restrict_file_to_owner(const std::filesystem::path& file_path) {
+   std::error_code ec;
+   std::filesystem::permissions(file_path,
+                                std::filesystem::perms::owner_read | std::filesystem::perms::owner_write,
+                                std::filesystem::perm_options::replace, ec);
+   if (ec) {
+      wlog("could not restrict permissions on {}: {}", file_path.string(), ec.message());
+   }
 }
 } // namespace
 
@@ -209,6 +230,9 @@ public:
          fc::cfile file(def_sig_prov_file, fc::cfile::truncate_rw_mode);
          gsl_lite::final_action file_guard([&file]() { file.close(); });
 
+         // This file persists private signing keys. Restrict it to owner-only now, while it is still empty,
+         // so the key material is never momentarily written to a group/world-readable file under the umask.
+         restrict_file_to_owner(def_sig_prov_file);
          file.write(file_content.c_str(), file_content.size());
       }
    }
@@ -423,7 +447,7 @@ void signature_provider_manager_plugin::plugin_initialize(const variables_map& o
    if (options.contains(option_name_provider)) {
       auto specs = options.at(option_name_provider).as<std::vector<std::string>>();
       for (const auto& spec : specs) {
-         dlog("Registering signature provider from spec: {}", spec);
+         dlog("Registering signature provider from spec: {}", redact_signature_provider_spec(spec));
          auto provider = create_provider(spec);
          dlog("Registered signature provider ({}): {}",
               provider->key_name, provider->public_key.to_string({}));
