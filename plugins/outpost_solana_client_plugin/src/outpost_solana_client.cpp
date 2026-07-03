@@ -4,7 +4,6 @@
 #include <bit>
 #include <cstring>
 #include <limits>
-#include <map>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -356,10 +355,10 @@ sysio::opp::types::ChainKind outpost_solana_client::chain_kind() const {
    return sysio::opp::types::CHAIN_KIND_SVM;
 }
 
-std::map<std::pair<uint64_t, uint64_t>, std::optional<outpost_solana_client::reserve_terminal_info>>
+outpost_solana_client_detail::reserve_terminal_info_cache
 outpost_solana_client::reserve_infos_for_lookups(
    const std::vector<outpost_solana_client_detail::reserve_terminal_lookup>& lookups) {
-   std::map<std::pair<uint64_t, uint64_t>, std::optional<reserve_terminal_info>> infos;
+   outpost_solana_client_detail::reserve_terminal_info_cache infos;
 
    if (lookups.empty()) return infos;
 
@@ -383,7 +382,7 @@ outpost_solana_client::reserve_infos_for_lookups(
    for (size_t i = 0; i < lookups.size(); ++i) {
       const auto& lookup = lookups[i];
       infos.emplace(
-         std::make_pair(lookup.seeds.token_code, lookup.seeds.reserve_code),
+         lookup.seeds,
          outpost_solana_client_detail::reserve_terminal_info_from_account(
             lookup.seeds, lookup.reserve_pda, account_infos[i], decode_reserve, client_label));
    }
@@ -461,7 +460,7 @@ std::string outpost_solana_client::deliver_outbound_envelope(
 
    const auto reserve_info_cache = reserve_infos_for_lookups(reserve_info_lookups);
    auto reserve_info = [&](uint64_t token_code, uint64_t reserve_code) -> std::optional<reserve_terminal_info> {
-      const auto cache_key = std::make_pair(token_code, reserve_code);
+      const outpost_solana_client_detail::reserve_pda_seeds cache_key{token_code, reserve_code};
       auto it = reserve_info_cache.find(cache_key);
       FC_ASSERT(it != reserve_info_cache.end(),
                 "Missing batched Reserve({}, {}) account result",

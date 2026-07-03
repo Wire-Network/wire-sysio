@@ -6,7 +6,6 @@
 #include <optional>
 #include <string>
 #include <string_view>
-#include <utility>
 #include <vector>
 
 #include <fc/network/solana/solana_client.hpp>
@@ -31,6 +30,13 @@ struct reserve_pda_seeds {
    uint64_t reserve_code;
 };
 
+/// Value ordering for Reserve seed pairs, allowing them to be used directly
+/// as cache keys without losing the domain meaning behind the two integers.
+inline bool operator<(const reserve_pda_seeds& lhs, const reserve_pda_seeds& rhs) {
+   if (lhs.token_code != rhs.token_code) return lhs.token_code < rhs.token_code;
+   return lhs.reserve_code < rhs.reserve_code;
+}
+
 /// Pinned terminal-finalization facts decoded from a per-reserve Solana PDA.
 struct reserve_terminal_info {
    fc::network::solana::solana_public_key creator;
@@ -43,6 +49,13 @@ struct reserve_terminal_lookup {
    reserve_pda_seeds                       seeds;
    fc::network::solana::solana_public_key  reserve_pda;
 };
+
+/// Cache of batched Reserve account lookups. `std::nullopt` means Solana
+/// returned a successful response with a null account for that Reserve PDA;
+/// callers still need that cached absence so they can omit branch-specific
+/// accounts without retrying the same missing PDA or confusing it with a
+/// lookup that was never requested.
+using reserve_terminal_info_cache = std::map<reserve_pda_seeds, std::optional<reserve_terminal_info>>;
 
 } // namespace outpost_solana_client_detail
 
@@ -112,7 +125,7 @@ private:
    /// Batch-resolve the pinned terminal-finalization facts stored on per-reserve
    /// PDAs. Reserve-backed effects must not infer native-vs-SPL or decimals
    /// from mutable `OutpostConfig` rows after the reserve has been created.
-   std::map<std::pair<uint64_t, uint64_t>, std::optional<reserve_terminal_info>>
+   outpost_solana_client_detail::reserve_terminal_info_cache
    reserve_infos_for_lookups(const std::vector<outpost_solana_client_detail::reserve_terminal_lookup>& lookups);
 
    solana_client_entry_ptr                       _entry;
