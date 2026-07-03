@@ -102,7 +102,11 @@ PRIMITIVE_SCHEMA = {
     'int8': {'type': 'integer'}, 'uint8': {'type': 'integer'},
     'int16': {'type': 'integer'}, 'uint16': {'type': 'integer'},
     'int32': {'type': 'integer'}, 'uint32': {'type': 'integer'},
-    'int64': {'type': 'integer'}, 'uint64': {'type': 'integer'},
+    # Mirrors PRIMITIVE_TS: int64-class values exceed 2^53 on the wire, so the
+    # chain returns (and accepts) a decimal-string form for large magnitudes.
+    # `pattern` constrains only the string alternative.
+    'int64': {'type': ['integer', 'string'], 'pattern': '^-?[0-9]+$'},
+    'uint64': {'type': ['integer', 'string'], 'pattern': '^[0-9]+$'},
     'int128': {'type': 'string'}, 'uint128': {'type': 'string'},
     'float32': {'type': 'number'}, 'float64': {'type': 'number'}, 'float128': {'type': 'string'},
     'name': {'type': 'string', 'pattern': '^[a-z1-5.]{1,13}$'},
