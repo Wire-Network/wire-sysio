@@ -10,6 +10,7 @@
 #include <fc/task/retry.hpp>
 #include <fc/variant_object.hpp>
 #include <boost/algorithm/string/predicate.hpp>
+#include <boost/asio/steady_timer.hpp>
 #include <boost/endian/conversion.hpp>
 #include <magic_enum/magic_enum.hpp>
 
@@ -250,6 +251,10 @@ struct underwriter_plugin::impl {
    /// True once the deferred startup body (preflight → wiring → cron) has run —
    /// the gate callback must arm at most once.
    bool                              startup_armed = false;
+   /// When the sync gate armed — bounds the preflight retry grace window.
+   fc::time_point                    startup_armed_at;
+   /// Bounded-grace preflight retry timer (main io_context; main-thread wait).
+   std::optional<boost::asio::steady_timer> preflight_retry_timer;
    /// Deferred-startup lifecycle surfaced by the `/v1/underwriter/*` handlers
    /// (which register in `plugin_startup`, BEFORE the gate arms). Written on
    /// the main thread by {@link run_deferred_startup}; read from the HTTP
@@ -731,38 +736,74 @@ struct underwriter_plugin::impl {
    //  Sync-gated startup
    // -----------------------------------------------------------------------
 
-   /// The chain plugin's "node is synced" predicate: head block time within
-   /// `underwriter_defaults::sync_recency_ms` of wall-clock now (the recency
-   /// notion producer_plugin uses to decide it may produce). While a
-   /// cold-booting operator node replays blocks the head trails `now` by the
-   /// replay gap and every local table read sees stale (possibly genesis)
-   /// state — preflight must not run until this is true.
+   /// The "node is synced" predicate: the LAST IRREVERSIBLE block's time
+   /// within `underwriter_defaults::sync_recency_ms` of wall-clock now.
+   /// The plugin's table reads serve the IRREVERSIBLE state (operator
+   /// daemons run read-mode = irreversible), so the gate must measure LIB
+   /// recency — head-time recency armed the gate while the local LIB still
+   /// trailed the rows the preflight needs (observed live: a registration
+   /// in block N was readable only 50ms after a preflight read at LIB N−3).
+   /// While a cold-booting operator node syncs blocks, LIB trails `now` by
+   /// the catch-up gap and every local table read sees stale (possibly
+   /// genesis) state — preflight must not run until this is true.
    bool chain_is_synced() const {
+      auto& chain = chain_plug->chain();
+      if (!chain.fork_db_has_root()) {
+         return false;
+      }
       return underwriter_detail::head_is_recent(
-         chain_plug->chain().head().block_time(), fc::time_point::now(),
+         chain.fork_db_root().block_time(), fc::time_point::now(),
          fc::milliseconds(underwriter_defaults::sync_recency_ms));
    }
 
-   /// The startup body deferred behind the sync gate: preflight → outpost
-   /// client wiring → cron scheduling → HTTP diagnostics. Runs AT MOST once
-   /// (`startup_armed`), on the main thread (either directly from
-   /// `plugin_startup` when the node is already synced, or from the
-   /// `accepted_block` signal once it becomes synced). A preflight failure on
-   /// a SYNCED chain remains a loud, terminal bootstrap bug — no cron job, no
-   /// dev escape hatch — exactly as before; the gate only removes the
-   /// cold-boot false negative.
+   /// Arm the deferred startup: runs AT MOST once (`startup_armed`), on the
+   /// main thread (either directly from `plugin_startup` when the node is
+   /// already synced, or from the `accepted_block` signal once it becomes
+   /// synced). The body itself lives in {@link attempt_deferred_startup},
+   /// which may retry the preflight within a bounded grace.
    void run_deferred_startup() {
-      startup_armed = true;
+      startup_armed    = true;
+      startup_armed_at = fc::time_point::now();
       if (sync_gate_connection) {
          sync_gate_connection->disconnect();
       }
+      attempt_deferred_startup();
+   }
 
-      // Unconditional pre-flight: bail (no cron job) if the depot-side state
-      // for this underwriter is incomplete. Cluster bootstrap is responsible
-      // for establishing the missing state — there is no dev escape hatch.
-      // The already-registered HTTP endpoints keep reporting the terminal
-      // state so a permanently-disabled underwriter is diagnosable over HTTP.
+   /// One attempt of the deferred startup body: preflight → outpost client
+   /// wiring → cron scheduling. A failing preflight within
+   /// `underwriter_defaults::preflight_retry_grace_ms` of the gate arming is
+   /// NOT terminal — rows the harness confirmed final on the producer can
+   /// land in the LOCAL irreversible state a beat after the gate arms
+   /// (observed live: `regoperator` in block 405 readable 50ms after a
+   /// preflight read at LIB 402), so the attempt re-schedules itself on
+   /// `preflight_retry_interval_ms` until the grace expires. Past the grace,
+   /// a preflight failure on a synced chain remains a loud, terminal
+   /// bootstrap bug — no cron job, no dev escape hatch — exactly as before.
+   void attempt_deferred_startup() {
+      if (shutting_down) {
+         return;
+      }
+
+      // Pre-flight: bail (no cron job) if the depot-side state for this
+      // underwriter is incomplete. Cluster bootstrap is responsible for
+      // establishing the missing state — there is no dev escape hatch.
+      // The already-registered HTTP endpoints keep reporting the gate state
+      // so a not-yet-live underwriter is diagnosable over HTTP.
       if (!run_preflight()) {
+         const auto since_armed = fc::time_point::now() - startup_armed_at;
+         if (since_armed <
+             fc::milliseconds(underwriter_defaults::preflight_retry_grace_ms)) {
+            gate_state = underwriter_detail::startup_state::preflight_retrying;
+            ilog("underwriter_plugin: preflight incomplete {}ms after the sync gate "
+                 "armed — retrying in {}ms (grace {}ms); the error above is "
+                 "transient until the grace expires",
+                 since_armed.count() / 1000,
+                 underwriter_defaults::preflight_retry_interval_ms,
+                 underwriter_defaults::preflight_retry_grace_ms);
+            schedule_preflight_retry();
+            return;
+         }
          gate_state = underwriter_detail::startup_state::preflight_failed;
          elog("underwriter_plugin: pre-flight failed — cron job NOT registered");
          return;
@@ -837,6 +878,29 @@ struct underwriter_plugin::impl {
       // The `/v1/underwriter/*` endpoints (registered back in `plugin_startup`)
       // switch from gate-state reporting to the real payloads.
       gate_state = underwriter_detail::startup_state::active;
+   }
+
+   /// Re-run {@link attempt_deferred_startup} after one retry interval, on
+   /// the main thread (appbase-wrapped wait on the app io_context).
+   void schedule_preflight_retry() {
+      if (!preflight_retry_timer) {
+         preflight_retry_timer.emplace(app().get_io_context());
+      }
+      preflight_retry_timer->expires_after(
+         std::chrono::milliseconds(underwriter_defaults::preflight_retry_interval_ms));
+      // Plain wait on the main io_context, then POST the attempt to the app
+      // queue — the same pattern the sync-gate callback uses, so the body
+      // runs in the same main-thread context plugin_startup does.
+      preflight_retry_timer->async_wait([this](const boost::system::error_code& ec) {
+         if (ec || shutting_down) {
+            return;
+         }
+         app().executor().post(appbase::priority::medium, [this]() {
+            if (!shutting_down) {
+               attempt_deferred_startup();
+            }
+         });
+      });
    }
 
    // -----------------------------------------------------------------------
@@ -2616,13 +2680,16 @@ void underwriter_plugin::plugin_startup() {
 
    // The preflight validates depot-side state (opreg registration, chain
    // registry, authex links) via LOCAL table reads. On a cold-booting
-   // operator node those reads see mid-replay (possibly genesis) state and
+   // operator node those reads see mid-sync (possibly genesis) state and
    // would fail spuriously, so the whole startup body (preflight → outpost
-   // client wiring → cron) is DEFERRED until the chain plugin reports the
-   // node synced — head block time within `underwriter_defaults::
-   // sync_recency_ms` of now, observed via the controller's `accepted_block`
-   // signal. A genuinely incomplete bootstrap still fails preflight loudly
-   // AFTER sync; there remains no dev escape hatch.
+   // client wiring → cron) is DEFERRED until the node is synced — the LAST
+   // IRREVERSIBLE block's time within `underwriter_defaults::sync_recency_ms`
+   // of now (the state the reads actually serve under read-mode =
+   // irreversible), observed via the controller's `accepted_block` signal.
+   // Post-arming, the preflight retries within a bounded grace (see
+   // attempt_deferred_startup) to absorb the LIB boundary race; a genuinely
+   // incomplete bootstrap still fails loudly once the grace expires — there
+   // remains no dev escape hatch.
    auto& chain = _impl->chain_plug->chain();
    if (_impl->chain_is_synced()) {
       _impl->run_deferred_startup();
@@ -2630,9 +2697,12 @@ void underwriter_plugin::plugin_startup() {
    }
 
    ilog("underwriter_plugin: waiting for chain sync before preflight "
-        "(head {} is {}s behind now)",
+        "(head {} is {}s behind now; irreversible state is {}s behind)",
         chain.head().block_num(),
-        (fc::time_point::now() - chain.head().block_time()).to_seconds());
+        (fc::time_point::now() - chain.head().block_time()).to_seconds(),
+        chain.fork_db_has_root()
+           ? (fc::time_point::now() - chain.fork_db_root().block_time()).to_seconds()
+           : -1);
    _impl->sync_gate_connection.emplace(
       chain.accepted_block().connect([this](const chain::block_signal_params&) {
          if (_impl->startup_armed || _impl->shutting_down) {
@@ -2662,6 +2732,9 @@ void underwriter_plugin::plugin_startup() {
 void underwriter_plugin::plugin_shutdown() {
    _impl->shutting_down = true;
    _impl->sync_gate_connection.reset();
+   if (_impl->preflight_retry_timer) {
+      _impl->preflight_retry_timer->cancel();
+   }
 
    if (_impl->scan_job_id != 0) {
       auto& cron = app().get_plugin<cron_plugin>();
