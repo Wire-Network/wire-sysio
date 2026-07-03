@@ -250,6 +250,12 @@ struct underwriter_plugin::impl {
    /// True once the deferred startup body (preflight → wiring → cron) has run —
    /// the gate callback must arm at most once.
    bool                              startup_armed = false;
+   /// Deferred-startup lifecycle surfaced by the `/v1/underwriter/*` handlers
+   /// (which register in `plugin_startup`, BEFORE the gate arms). Written on
+   /// the main thread by {@link run_deferred_startup}; read from the HTTP
+   /// handlers' read-only queue — hence atomic.
+   std::atomic<underwriter_detail::startup_state> gate_state{
+      underwriter_detail::startup_state::waiting_for_sync};
 
    // Outpost chain_kind cache: chain_code -> ChainKind
    std::map<uint64_t, ChainKind>     outpost_chain_kinds;
@@ -754,7 +760,10 @@ struct underwriter_plugin::impl {
       // Unconditional pre-flight: bail (no cron job) if the depot-side state
       // for this underwriter is incomplete. Cluster bootstrap is responsible
       // for establishing the missing state — there is no dev escape hatch.
+      // The already-registered HTTP endpoints keep reporting the terminal
+      // state so a permanently-disabled underwriter is diagnosable over HTTP.
       if (!run_preflight()) {
+         gate_state = underwriter_detail::startup_state::preflight_failed;
          elog("underwriter_plugin: pre-flight failed — cron job NOT registered");
          return;
       }
@@ -803,6 +812,7 @@ struct underwriter_plugin::impl {
                  "--underwriter-eth-outpost / --underwriter-sol-outpost for each served chain");
          }
       } catch (const fc::exception& e) {
+         gate_state = underwriter_detail::startup_state::wiring_failed;
          elog("underwriter_plugin: failed to build outpost_client(s): {}",
               e.to_detail_string());
          return;
@@ -824,10 +834,9 @@ struct underwriter_plugin::impl {
       ilog("underwriter_plugin: scheduled scan (id={}, interval={}ms)",
            scan_job_id, scan_interval_ms);
 
-      // Register read-only HTTP diagnostics. Endpoints:
-      //   GET /v1/underwriter/stats    — session counters + config snapshot
-      //   GET /v1/underwriter/commits  — outstanding confirmed commits
-      register_http_endpoints();
+      // The `/v1/underwriter/*` endpoints (registered back in `plugin_startup`)
+      // switch from gate-state reporting to the real payloads.
+      gate_state = underwriter_detail::startup_state::active;
    }
 
    // -----------------------------------------------------------------------
@@ -2338,9 +2347,21 @@ struct underwriter_plugin::impl {
    //   /v1/underwriter/stats   — session counters + config snapshot
    //   /v1/underwriter/commits — outstanding confirmed commits (per leg)
    //
+   // Both carry a `status` discriminator: until the deferred startup body
+   // completes they answer with the gate state (`waiting_for_sync` +
+   // `head_behind_sec`, or a terminal `preflight_failed`/`wiring_failed`
+   // with `detail`); once active they serve the payloads below with
+   // `status:"active"`.
+   //
    // The matching `clio opp uw <stats|commits>` CLI wrapper is planned in
    // a follow-up; today the endpoints are addressable via `curl` against
    // the nodeop HTTP port.
+
+   /// The uniform `status` spelling for the post-startup payloads.
+   static std::string active_status_name() {
+      return std::string{magic_enum::enum_name(underwriter_detail::startup_state::active)};
+   }
+
    fc::variant build_stats_response() {
       std::lock_guard lk{stats_mutex};
       size_t active_sol_source_deposit_cursor_count = 0;
@@ -2366,6 +2387,7 @@ struct underwriter_plugin::impl {
             ("source_deposit_addr", ep.source_deposit_addr));
       }
       return fc::variant(fc::mutable_variant_object()
+         ("status",                         active_status_name())
          ("underwriter_account",            underwriter_account.to_string())
          ("enabled",                        enabled)
          ("is_active",                      is_active)
@@ -2397,13 +2419,34 @@ struct underwriter_plugin::impl {
          ));
       }
       return fc::variant(fc::mutable_variant_object()
+         ("status",  active_status_name())
          ("count",   entries.size())
          ("entries", std::move(entries))
       );
    }
 
+   /// Answer `cb` with the gate-state payload and return true when the
+   /// deferred startup body has not completed (waiting for sync, or failed
+   /// terminally); return false once {@link run_deferred_startup} reached
+   /// `active` so the caller serves the real payload.
+   bool respond_if_gated(const url_response_callback& cb) {
+      const auto state = gate_state.load();
+      if (state == underwriter_detail::startup_state::active) {
+         return false;
+      }
+      const int64_t head_behind_sec =
+         (fc::time_point::now() - chain_plug->chain().head().block_time()).to_seconds();
+      cb(200, underwriter_detail::startup_gate_payload(state, head_behind_sec));
+      return true;
+   }
+
    /// Register the `/v1/underwriter/*` HTTP endpoints. Called once from
-   /// `plugin_startup` after preflight passes and the cron job is queued.
+   /// `plugin_startup`, UNCONDITIONALLY and BEFORE the sync gate:
+   /// `http_plugin`'s handler map is read lock-free by the HTTP worker
+   /// threads, so every registration must happen during plugin startup —
+   /// before the posted listener creation runs — never from a task queued
+   /// after `exec()` is live. Until the deferred startup body completes the
+   /// handlers report the gate state (see {@link respond_if_gated}).
    void register_http_endpoints() {
       auto& hp = app().get_plugin<http_plugin>();
       hp.add_api({
@@ -2412,6 +2455,9 @@ struct underwriter_plugin::impl {
                     std::string&& /*body*/,
                     url_response_callback&& cb) {
                try {
+                  if (respond_if_gated(cb)) {
+                     return;
+                  }
                   cb(200, build_stats_response());
                } catch (const fc::exception& e) {
                   cb(500, fc::variant(fc::mutable_variant_object()
@@ -2423,6 +2469,9 @@ struct underwriter_plugin::impl {
                     std::string&& /*body*/,
                     url_response_callback&& cb) {
                try {
+                  if (respond_if_gated(cb)) {
+                     return;
+                  }
                   cb(200, build_commits_response());
                } catch (const fc::exception& e) {
                   cb(500, fc::variant(fc::mutable_variant_object()
@@ -2555,6 +2604,15 @@ void underwriter_plugin::plugin_startup() {
    }
 
    ilog("underwriter_plugin: starting for account {}", _impl->underwriter_account.to_string());
+
+   // Register the `/v1/underwriter/*` endpoints FIRST, unconditionally:
+   // handler registration must complete during plugin startup (before the
+   // posted HTTP listener goes live) because the handler map is read
+   // lock-free by the HTTP threads — it must never ride the deferred
+   // startup body below. Until that body completes, the handlers answer
+   // with the gate state, so a cold-booting (or permanently-disabled)
+   // underwriter is diagnosable over HTTP instead of a single ilog.
+   _impl->register_http_endpoints();
 
    // The preflight validates depot-side state (opreg registration, chain
    // registry, authex links) via LOCAL table reads. On a cold-booting
