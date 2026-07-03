@@ -10,7 +10,7 @@
 #include <fc/io/fstream.hpp>
 #include <fc/io/json.hpp>
 #include <fc-lite/algorithm.hpp>
-#include <gsl-lite/gsl-lite.hpp>
+#include <fc/io/secure_file.hpp>
 
 #include <filesystem>
 
@@ -30,9 +30,11 @@ std::filesystem::path default_signature_provider_spec_file() {
 /**
  * Restrict a file to owner read/write only (0600).
  *
- * Used for files that persist private signing keys so they are not left group- or world-readable under the
- * process umask. Best-effort: a failure to set permissions is logged, not fatal, so key persistence still
- * succeeds on platforms/filesystems that do not support POSIX permission bits.
+ * Used to bring pre-existing key files that predate the owner-only hardening (and were therefore created
+ * group/world readable under the process umask) down to owner-only when they are loaded. New key files are
+ * instead written through `fc::write_secure_file`, which creates them owner-only from the start. Best-effort:
+ * a failure to set permissions is logged, not fatal, so loading still succeeds on platforms/filesystems that
+ * do not support POSIX permission bits.
  *
  * @param file_path the file to restrict; it must already exist.
  */
@@ -226,15 +228,10 @@ public:
 
       auto file_content = fc::json::to_string(vo, fc::time_point::maximum());
 
-      {
-         fc::cfile file(def_sig_prov_file, fc::cfile::truncate_rw_mode);
-         gsl_lite::final_action file_guard([&file]() { file.close(); });
-
-         // This file persists private signing keys. Restrict it to owner-only now, while it is still empty,
-         // so the key material is never momentarily written to a group/world-readable file under the umask.
-         restrict_file_to_owner(def_sig_prov_file);
-         file.write(file_content.c_str(), file_content.size());
-      }
+      // This file persists private signing keys: publish it through the secure-file helper so the content
+      // is written to an owner-only temporary file and atomically renamed into place (fsync'd), never
+      // passing through a group/world-readable window under the process umask.
+      fc::write_secure_file(def_sig_prov_file, file_content);
    }
 
    void load_default_signature_provider_specs() {
@@ -246,6 +243,16 @@ public:
       auto def_sig_prov_file = default_signature_provider_spec_file();
       if (!std::filesystem::exists(def_sig_prov_file)) {
          return;
+      }
+
+      // Key files that predate the owner-only hardening were written under the process umask and may be
+      // group/world readable. Bring any such pre-existing file down to owner-only before its specs are
+      // registered; a freshly generated file is already owner-only, so leave it untouched.
+      std::error_code perm_ec;
+      const auto perms = std::filesystem::status(def_sig_prov_file, perm_ec).permissions();
+      if (perm_ec || (perms & (std::filesystem::perms::group_all | std::filesystem::perms::others_all)) !=
+                        std::filesystem::perms::none) {
+         restrict_file_to_owner(def_sig_prov_file);
       }
 
       std::string json_data;
@@ -323,7 +330,8 @@ public:
       //<name>,<chain-kind>,<key-type>,<public-key>,<private-key-provider-spec>
       auto spec_parts = fc::split(spec, ',', 5);
       auto num_parts = spec_parts.size();
-      SYS_ASSERT(num_parts == 5 || num_parts == 4, chain::plugin_config_exception, "Invalid key spec: {}", spec);
+      SYS_ASSERT(num_parts == 5 || num_parts == 4, chain::plugin_config_exception, "Invalid key spec: {}",
+                 redact_signature_provider_spec(spec));
       std::string key_name;
       std::size_t target_chain_idx = 1;
       if (num_parts == 4) {
