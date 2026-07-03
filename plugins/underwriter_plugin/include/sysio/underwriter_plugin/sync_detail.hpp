@@ -53,7 +53,8 @@ inline bool head_is_recent(fc::time_point head_time, fc::time_point now,
  */
 enum class startup_state : uint8_t {
    waiting_for_sync,   ///< Sync gate not yet armed — the node is still catching up.
-   preflight_failed,   ///< Gate armed but the startup preflight failed (terminal).
+   preflight_retrying, ///< Gate armed; preflight incomplete, retrying within the bounded grace.
+   preflight_failed,   ///< Preflight still failing after the retry grace (terminal).
    wiring_failed,      ///< Preflight passed but outpost client wiring threw (terminal).
    active              ///< Deferred startup completed — the scan cron is scheduled.
 };

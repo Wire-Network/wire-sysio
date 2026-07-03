@@ -96,6 +96,13 @@ BOOST_AUTO_TEST_CASE(gate_payload_wiring_failed_carries_detail) {
    BOOST_TEST(!body.contains("head_behind_sec"));
 }
 
+BOOST_AUTO_TEST_CASE(gate_payload_preflight_retrying_is_status_only) {
+   const auto body =
+      startup_gate_payload(startup_state::preflight_retrying, 0).get_object();
+   BOOST_TEST(body["status"].as_string() == "preflight_retrying");
+   BOOST_TEST(body.size() == 1u);
+}
+
 BOOST_AUTO_TEST_CASE(gate_payload_active_is_status_only) {
    const auto body = startup_gate_payload(startup_state::active, 99).get_object();
    BOOST_TEST(body["status"].as_string() == "active");
