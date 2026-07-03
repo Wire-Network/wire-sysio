@@ -1,8 +1,12 @@
 #pragma once
 
+#include <functional>
+#include <map>
 #include <memory>
 #include <optional>
 #include <string>
+#include <string_view>
+#include <utility>
 #include <vector>
 
 #include <fc/network/solana/solana_client.hpp>
@@ -12,6 +16,35 @@
 #include <sysio/outpost_solana_client_plugin.hpp>
 
 namespace sysio {
+
+namespace opp {
+class Envelope;
+} // namespace opp
+
+namespace outpost_solana_client_detail {
+
+/// `(token_code, reserve_code)` pair for a Reserve PDA derivation. Used
+/// by the terminal remaining-accounts path to derive and fetch per-reserve
+/// Solana PDAs without re-walking the envelope.
+struct reserve_pda_seeds {
+   uint64_t token_code;
+   uint64_t reserve_code;
+};
+
+/// Pinned terminal-finalization facts decoded from a per-reserve Solana PDA.
+struct reserve_terminal_info {
+   fc::network::solana::solana_public_key creator;
+   fc::network::solana::solana_public_key custody_mint;
+   uint8_t                                custody_decimals = 0;
+};
+
+/// Batched lookup request for one unique Reserve PDA.
+struct reserve_terminal_lookup {
+   reserve_pda_seeds                       seeds;
+   fc::network::solana::solana_public_key  reserve_pda;
+};
+
+} // namespace outpost_solana_client_detail
 
 /// Hard cap on the assembled OPP envelope. Mirrors the Solana program's
 /// `MAX_ENVELOPE_BYTES` (`programs/opp-outpost/src/state/envelope_chunks.rs`).
@@ -74,17 +107,13 @@ public:
    const fc::network::solana::solana_public_key& program_id()            const { return _program_id; }
 
 private:
-   struct reserve_terminal_info {
-      fc::network::solana::solana_public_key creator;
-      fc::network::solana::solana_public_key custody_mint;
-      uint8_t                                custody_decimals = 0;
-   };
+   using reserve_terminal_info = outpost_solana_client_detail::reserve_terminal_info;
 
-   /// Resolve the pinned terminal-finalization facts stored on a per-reserve
-   /// PDA. Reserve-backed effects must not infer native-vs-SPL or decimals
+   /// Batch-resolve the pinned terminal-finalization facts stored on per-reserve
+   /// PDAs. Reserve-backed effects must not infer native-vs-SPL or decimals
    /// from mutable `OutpostConfig` rows after the reserve has been created.
-   std::optional<reserve_terminal_info>
-   reserve_info_for_codes(uint64_t token_code, uint64_t reserve_code);
+   std::map<std::pair<uint64_t, uint64_t>, std::optional<reserve_terminal_info>>
+   reserve_infos_for_lookups(const std::vector<outpost_solana_client_detail::reserve_terminal_lookup>& lookups);
 
    solana_client_entry_ptr                       _entry;
    fc::network::solana::solana_public_key        _program_id;
@@ -131,18 +160,29 @@ void record_terminal_account(std::vector<fc::network::solana::account_meta>& met
 std::vector<fc::network::solana::solana_public_key>
 extract_inbound_recipient_pubkeys(const std::vector<char>& envelope_bytes);
 
-/// `(token_code, reserve_code)` pair for a Reserve PDA derivation. Used
-/// by the SWAP_REMIT remaining-accounts path: the cranker walks inbound
-/// SWAP_REMIT attestations, collects every (token_code, reserve_code)
-/// pair, and the caller derives + appends the corresponding Reserve
-/// PDA(s) past the IDL's declared accounts on the zero-data terminal
-/// `epoch_in` submission. Without this the on-chain `handle_swap_remit`
-/// can't `find_remaining_account` the Reserve PDA and logs the unpaid remit
-/// instead of paying the recipient.
-struct reserve_pda_seeds {
-   uint64_t token_code;
-   uint64_t reserve_code;
-};
+/// Callback used to decode already-fetched Reserve account data. Tests supply
+/// a small lambda; production passes `opp_solana_outpost_client`'s IDL decoder.
+using reserve_account_decoder = std::function<fc::variant(const std::vector<uint8_t>&)>;
+
+/// Decode one Reserve account variant into the typed terminal facts used by
+/// remaining-account construction.
+reserve_terminal_info reserve_terminal_info_from_variant(const fc::variant& reserve_v);
+
+/// Interpret one Reserve account RPC result. A genuinely absent account returns
+/// `std::nullopt`; transport and decode failures are intentionally not caught
+/// so outbound delivery can retry.
+std::optional<reserve_terminal_info>
+reserve_terminal_info_from_account(const reserve_pda_seeds& seeds,
+                                   const fc::network::solana::solana_public_key& reserve_pda,
+                                   const std::optional<fc::network::solana::account_info>& account_info,
+                                   const reserve_account_decoder& decode_reserve,
+                                   std::string_view client_label);
+
+/// Derive each unique Reserve PDA from seed pairs in first-seen order. The
+/// returned addresses are suitable for one `getMultipleAccounts` RPC call.
+std::vector<reserve_terminal_lookup>
+reserve_terminal_lookups_for_seeds(const fc::network::solana::solana_public_key& program_id,
+                                   const std::vector<reserve_pda_seeds>& seeds);
 
 /// Walk every Reserve-PDA-consuming attestation in `envelope_bytes` —
 /// `SWAP_REMIT`, `SWAP_REVERT`, `RESERVE_READY`, and
@@ -180,6 +220,25 @@ struct swap_remit_spl_target {
    uint64_t                                reserve_code;
    fc::network::solana::solana_public_key  recipient;
 };
+
+/// All envelope-derived inputs needed to build the zero-data terminal
+/// `epoch_in` remaining-account manifest. Vectors preserve the legacy
+/// extractor order so account-meta ordering remains stable.
+struct terminal_manifest_sources {
+   std::vector<fc::network::solana::solana_public_key>  recipient_pubkeys;
+   std::vector<reserve_pda_seeds>                       reserve_seeds;
+   std::vector<swap_remit_spl_target>                   swap_remit_spl_targets;
+   std::vector<swap_remit_spl_target>                   swap_revert_spl_targets;
+   std::vector<reserve_pda_seeds>                       reserve_create_cancelled_seeds;
+};
+
+/// Walk a decoded envelope once and collect every terminal manifest input.
+terminal_manifest_sources extract_inbound_terminal_manifest_sources(const sysio::opp::Envelope& env);
+
+/// Decode an envelope and collect every terminal manifest input. A whole-envelope
+/// decode failure returns empty sources after logging the same fail-open terminal
+/// warning used by the legacy extractor wrappers.
+terminal_manifest_sources extract_inbound_terminal_manifest_sources(const std::vector<char>& envelope_bytes);
 
 /// Walk every `SWAP_REMIT` attestation in `envelope_bytes` and collect
 /// the SPL-relevant tuple. Caller is responsible for resolving each
