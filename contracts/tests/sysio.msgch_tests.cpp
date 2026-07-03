@@ -257,8 +257,6 @@ public:
             ("external_chain_id", chain_id)
             ("name",              std::string("outpost"))
             ("description",       std::string{})
-            ("opp_addr",          std::string{})
-            ("opp_inbound_addr",  std::string{})
          ));
    }
 

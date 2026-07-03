@@ -62,14 +62,6 @@
                 {
                     "name": "activated_at_ms",
                     "type": "uint64"
-                },
-                {
-                    "name": "opp_addr",
-                    "type": "string"
-                },
-                {
-                    "name": "opp_inbound_addr",
-                    "type": "string"
                 }
             ]
         },
@@ -96,32 +88,6 @@
                 {
                     "name": "description",
                     "type": "string"
-                },
-                {
-                    "name": "opp_addr",
-                    "type": "string"
-                },
-                {
-                    "name": "opp_inbound_addr",
-                    "type": "string"
-                }
-            ]
-        },
-        {
-            "name": "setoutpost",
-            "base": "",
-            "fields": [
-                {
-                    "name": "code",
-                    "type": "slug_name"
-                },
-                {
-                    "name": "opp_addr",
-                    "type": "string"
-                },
-                {
-                    "name": "opp_inbound_addr",
-                    "type": "string"
                 }
             ]
         },
@@ -145,11 +111,6 @@
         {
             "name": "regchain",
             "type": "regchain",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "setoutpost",
-            "type": "setoutpost",
             "ricardian_contract": ""
         }
     ],

@@ -46,50 +46,21 @@ namespace sysio {
       /// window (`current_epoch_index == 0`), inserts with `active=true`
       /// inline; else `active=false`.
       ///
-      /// `opp_addr` / `opp_inbound_addr` bind this chain code to the exact
-      /// remote OPP contracts, so a batch operator relaying two same-kind
-      /// outposts cannot collapse them onto one shared remote endpoint. The
-      /// binding is a consensus fact (every operator reads the same row), which
-      /// also lets the remote outpost reject an envelope delivered under a
-      /// mismatched WIRE chain code. Encoding by kind:
-      ///  * `EVM`  — `opp_addr` = OPP contract, `opp_inbound_addr` = OPPInbound
-      ///     contract, each a `0x`-prefixed 20-byte hex address.
-      ///  * `SVM`  — `opp_addr` = the outpost program id (base58); the single
-      ///     program serves both directions, so `opp_inbound_addr` is empty.
-      ///  * `WIRE` — both empty (the depot self-row has no remote endpoint).
-      ///
-      /// Addresses may be left empty at registration (e.g. the remote contract
-      /// is not deployed yet) and filled in later via `setoutpost`; the batch
-      /// operator fail-closed skips any active outpost whose addresses are not
-      /// yet set, so an unconfigured row never rides on another chain's endpoint.
-      ///
       /// Validation:
       ///  * `code` slug_name format already enforced by the type itself at
       ///     deserialization (alphabet `[A-Z0-9_]+`, ≤8 chars).
       ///  * `code` must be unique.
       ///  * `kind=WIRE` may appear at most once (the depot self-row).
-      ///  * addresses, when non-empty, must match the kind's expected format.
       [[sysio::action]]
       void regchain(opp::types::ChainKind kind,
                     sysio::slug_name       code,
                     uint32_t              external_chain_id,
                     std::string           name,
-                    std::string           description,
-                    std::string           opp_addr,
-                    std::string           opp_inbound_addr);
+                    std::string           description);
 
       /// Activate a previously-registered chain (priv-gated, one-shot).
       [[sysio::action]]
       void activchain(sysio::slug_name code);
-
-      /// Update the remote OPP contract binding for an already-registered
-      /// chain (priv-gated). Used when a remote contract is (re)deployed after
-      /// the row was registered. Same per-kind encoding and format validation
-      /// as `regchain`; rejects the WIRE depot self-row (no remote endpoint).
-      [[sysio::action]]
-      void setoutpost(sysio::slug_name code,
-                      std::string      opp_addr,
-                      std::string      opp_inbound_addr);
 
       // -----------------------------------------------------------------------
       //  Tables
@@ -111,12 +82,6 @@ namespace sysio {
          bool                           active            = false;
          uint64_t                       registered_at_ms  = 0;
          uint64_t                       activated_at_ms   = 0;
-         /// Exact remote OPP contract binding for this chain code (see
-         /// `regchain`). EVM: `opp_addr` = OPP, `opp_inbound_addr` = OPPInbound
-         /// (0x-hex). SVM: `opp_addr` = program id (base58), `opp_inbound_addr`
-         /// empty. WIRE: both empty.
-         std::string                    opp_addr;
-         std::string                    opp_inbound_addr;
 
          uint64_t by_kind()              const { return magic_enum::enum_integer(kind); }
          uint64_t by_external_chain_id() const { return external_chain_id; }
@@ -124,8 +89,7 @@ namespace sysio {
 
          SYSLIB_SERIALIZE(chain_row,
             (code)(kind)(external_chain_id)(name)(description)
-            (is_depot)(active)(registered_at_ms)(activated_at_ms)
-            (opp_addr)(opp_inbound_addr))
+            (is_depot)(active)(registered_at_ms)(activated_at_ms))
       };
 
       using chains_t = sysio::kv::table<"chains"_n, chain_key, chain_row,

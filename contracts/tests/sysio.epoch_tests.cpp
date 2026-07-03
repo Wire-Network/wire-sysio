@@ -110,8 +110,6 @@ public:
          ("external_chain_id", external_chain_id)
          ("name", name_str)
          ("description", description)
-         ("opp_addr", std::string{})
-         ("opp_inbound_addr", std::string{})
       );
    }
 

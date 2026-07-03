@@ -452,7 +452,7 @@ public:
             ("code",              codename_mvo(outpost_code))
             ("external_chain_id", 31337)
             ("name",              std::string("outpost-test"))
-            ("description",       std::string{})("opp_addr", std::string{})("opp_inbound_addr", std::string{})));
+            ("description",       std::string{})));
 
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT,
          "schbatchgps"_n, mvo()));
@@ -728,7 +728,7 @@ public:
             ("code",              codename_mvo("WIRE"))
             ("external_chain_id", 0)
             ("name",              std::string("wire-depot"))
-            ("description",       std::string{})("opp_addr", std::string{})("opp_inbound_addr", std::string{})));
+            ("description",       std::string{})));
    }
 
    /// Register SOLANA, seed ACTIVE ETH+SOLANA reserves, credit UWRIT_OP collateral,
@@ -739,7 +739,7 @@ public:
    void setup_eth_to_sol_uwreq(uint64_t att_id) {
       BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
          ("kind", ChainKind::CHAIN_KIND_SVM)("code", codename_mvo("SOLANA"))
-         ("external_chain_id", 900)("name", std::string("solana-test"))("description", std::string{})("opp_addr", std::string{})("opp_inbound_addr", std::string{})));
+         ("external_chain_id", 900)("name", std::string("solana-test"))("description", std::string{})));
       setup_wire_token_and_reserves();
       BOOST_REQUIRE_EQUAL(success(), depositinle_credit(UWRIT_OP, "ETH",    "ETH", 1'000'000'000));
       BOOST_REQUIRE_EQUAL(success(), depositinle_credit(UWRIT_OP, "SOLANA", "SOL", 1'000'000'000));
@@ -876,7 +876,7 @@ BOOST_FIXTURE_TEST_CASE(operator_action_mismatched_source_chain_is_dropped,
    // were proven-delivered from ETH rather than SOLANA — the exact WSA-005 forgery.
    BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
       ("kind", ChainKind::CHAIN_KIND_SVM)("code", codename_mvo("SOLANA"))
-      ("external_chain_id", 900)("name", std::string("solana-test"))("description", std::string{})("opp_addr", std::string{})("opp_inbound_addr", std::string{})));
+      ("external_chain_id", 900)("name", std::string("solana-test"))("description", std::string{})));
 
    auto deposit_sol = encode_operator_action(
       sysio::opp::attestations::OperatorAction::ACTION_TYPE_DEPOSIT_REQUEST,
@@ -908,7 +908,7 @@ BOOST_FIXTURE_TEST_CASE(swap_request_mismatched_source_chain_is_refunded,
    bootstrap_for_dispatch();   // ETH source outpost
    BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
       ("kind", ChainKind::CHAIN_KIND_SVM)("code", codename_mvo("SOLANA"))
-      ("external_chain_id", 900)("name", std::string("solana-test"))("description", std::string{})("opp_addr", std::string{})("opp_inbound_addr", std::string{})));
+      ("external_chain_id", 900)("name", std::string("solana-test"))("description", std::string{})));
    setup_wire_token_and_reserves();   // ACTIVE ETH/ETH/PRIMARY + SOLANA/SOL/PRIMARY reserves
    BOOST_REQUIRE_EQUAL(success(), depositinle_credit(UWRIT_OP, "ETH",    "ETH", 1'000'000'000));
    BOOST_REQUIRE_EQUAL(success(), depositinle_credit(UWRIT_OP, "SOLANA", "SOL", 1'000'000'000));
@@ -942,7 +942,7 @@ BOOST_FIXTURE_TEST_CASE(underwrite_commit_mismatched_source_chain_is_dropped,
    bootstrap_for_dispatch();
    BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
       ("kind", ChainKind::CHAIN_KIND_SVM)("code", codename_mvo("SOLANA"))
-      ("external_chain_id", 900)("name", std::string("solana-test"))("description", std::string{})("opp_addr", std::string{})("opp_inbound_addr", std::string{})));
+      ("external_chain_id", 900)("name", std::string("solana-test"))("description", std::string{})));
    setup_wire_token_and_reserves();
    BOOST_REQUIRE_EQUAL(success(), depositinle_credit(UWRIT_OP, "ETH",    "ETH", 1'000'000'000));
    BOOST_REQUIRE_EQUAL(success(), depositinle_credit(UWRIT_OP, "SOLANA", "SOL", 1'000'000'000));
@@ -1000,12 +1000,12 @@ BOOST_FIXTURE_TEST_CASE(underwrite_commit_two_evm_chains_route_per_chain,
    // A SECOND active EVM chain — same VM family, distinct chain_code.
    BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
       ("kind", ChainKind::CHAIN_KIND_EVM)("code", codename_mvo("POLYGON"))
-      ("external_chain_id", 137)("name", std::string("polygon-test"))("description", std::string{})("opp_addr", std::string{})("opp_inbound_addr", std::string{})));
+      ("external_chain_id", 137)("name", std::string("polygon-test"))("description", std::string{})));
    // SOLANA is registered only because the shared reserve-setup helper seeds a
    // SOLANA/SOL reserve; it is otherwise unused by this two-EVM scenario.
    BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
       ("kind", ChainKind::CHAIN_KIND_SVM)("code", codename_mvo("SOLANA"))
-      ("external_chain_id", 900)("name", std::string("solana-test"))("description", std::string{})("opp_addr", std::string{})("opp_inbound_addr", std::string{})));
+      ("external_chain_id", 900)("name", std::string("solana-test"))("description", std::string{})));
    setup_wire_token_and_reserves();
    BOOST_REQUIRE_EQUAL(success(), regreserve_active("POLYGON", "POL", "PRIMARY"));
    BOOST_REQUIRE_EQUAL(success(), depositinle_credit(UWRIT_OP, "ETH",     "ETH", 1'000'000'000));
@@ -1237,7 +1237,7 @@ BOOST_FIXTURE_TEST_CASE(node_owner_reg_from_other_evm_outpost_is_dropped, sysio_
    // Register the real node-owner source too, so the ONLY thing wrong below is the delivering outpost.
    BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
       ("kind", ChainKind::CHAIN_KIND_EVM)("code", codename_mvo("ETHEREUM"))
-      ("external_chain_id", 1)("name", std::string("ethereum-mainnet"))("description", std::string{})("opp_addr", std::string{})("opp_inbound_addr", std::string{})));
+      ("external_chain_id", 1)("name", std::string("ethereum-mainnet"))("description", std::string{})));
    const auto other_evm = fc::slug_name{"ETH"}.value;   // active EVM outpost, but not "ETHEREUM"
 
    auto wire_key  = k1_pubkey_bytes(get_public_key(CLAIM_ACCOUNT, "active"));
@@ -1367,7 +1367,7 @@ BOOST_FIXTURE_TEST_CASE(swap_winner_without_dst_authex_link_is_disqualified,
          ("code",              codename_mvo("SOLANA"))
          ("external_chain_id", 900)
          ("name",              std::string("solana-test"))
-         ("description",       std::string{})("opp_addr", std::string{})("opp_inbound_addr", std::string{})));
+         ("description",       std::string{})));
 
    const uint64_t eth       = fc::slug_name{"ETH"}.value;
    const uint64_t sol_chain = fc::slug_name{"SOLANA"}.value;
@@ -1429,7 +1429,7 @@ BOOST_FIXTURE_TEST_CASE(swap_zero_quote_from_active_reserve_fails_closed,
          ("code",              codename_mvo("SOLANA"))
          ("external_chain_id", 900)
          ("name",              std::string("solana-test"))
-         ("description",       std::string{})("opp_addr", std::string{})("opp_inbound_addr", std::string{})));
+         ("description",       std::string{})));
 
    const uint64_t eth       = fc::slug_name{"ETH"}.value;
    const uint64_t sol_chain = fc::slug_name{"SOLANA"}.value;
@@ -1802,7 +1802,7 @@ BOOST_FIXTURE_TEST_CASE(swap_request_negative_source_is_reverted,
          ("code",              codename_mvo("SOLANA"))
          ("external_chain_id", 900)
          ("name",              std::string("solana-test"))
-         ("description",       std::string{})("opp_addr", std::string{})("opp_inbound_addr", std::string{})));
+         ("description",       std::string{})));
 
    const uint64_t eth       = fc::slug_name{"ETH"}.value;
    const uint64_t sol_chain = fc::slug_name{"SOLANA"}.value;
