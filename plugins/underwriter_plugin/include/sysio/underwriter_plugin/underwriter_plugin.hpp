@@ -23,6 +23,11 @@ namespace sysio {
       constexpr uint32_t scan_interval_ms    = 5000;
       constexpr uint32_t action_timeout_ms   = 15000;
       constexpr bool     enabled             = false;
+      /// Head-behind-now gap (ms) under which the node counts as synced.
+      /// Gates the deferred startup (preflight → cron) on cold-booting
+      /// operator nodes; see `sync_detail.hpp::head_is_recent`. Must exceed
+      /// block-interval jitter and stay well under one epoch.
+      constexpr uint32_t sync_recency_ms     = 5000;
       // SEC-13/WSA-027: the single eth/sol client-id defaults were removed with
       // the single-client config — outpost wiring is now per-chain and required
       // (--underwriter-{eth,sol}-outpost), with no single fallback.
