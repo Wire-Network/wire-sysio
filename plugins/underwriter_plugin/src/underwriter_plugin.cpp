@@ -10,6 +10,7 @@
 #include <fc/task/retry.hpp>
 #include <fc/variant_object.hpp>
 #include <boost/algorithm/string/predicate.hpp>
+#include <boost/asio/steady_timer.hpp>
 #include <boost/endian/conversion.hpp>
 #include <magic_enum/magic_enum.hpp>
 
@@ -22,6 +23,7 @@
 #include <sysio/underwriter_plugin/source_deposit_constants.hpp>
 #include <sysio/underwriter_plugin/solana_source_deposit_scanner.hpp>
 #include <sysio/underwriter_plugin/routing_detail.hpp>
+#include <sysio/underwriter_plugin/sync_detail.hpp>
 #include <sysio/depot/opreg_status.hpp>
 #include <sysio/opp/opp.hpp>
 #include <sysio/opp/types/types.pb.h>
@@ -241,6 +243,24 @@ struct underwriter_plugin::impl {
    // Cron job handle
    cron_service::job_id_t            scan_job_id = 0;
    std::atomic<bool>                 shutting_down{false};
+
+   /// Sync gate: `accepted_block` subscription that arms {@link run_deferred_startup}
+   /// once the local head is current (see `sync_detail.hpp::head_is_recent`).
+   /// Disconnected after arming; reset on shutdown.
+   std::optional<boost::signals2::scoped_connection> sync_gate_connection;
+   /// True once the deferred startup body (preflight → wiring → cron) has run —
+   /// the gate callback must arm at most once.
+   bool                              startup_armed = false;
+   /// When the sync gate armed — bounds the preflight retry grace window.
+   fc::time_point                    startup_armed_at;
+   /// Bounded-grace preflight retry timer (main io_context; main-thread wait).
+   std::optional<boost::asio::steady_timer> preflight_retry_timer;
+   /// Deferred-startup lifecycle surfaced by the `/v1/underwriter/*` handlers
+   /// (which register in `plugin_startup`, BEFORE the gate arms). Written on
+   /// the main thread by {@link run_deferred_startup}; read from the HTTP
+   /// handlers' read-only queue — hence atomic.
+   std::atomic<underwriter_detail::startup_state> gate_state{
+      underwriter_detail::startup_state::waiting_for_sync};
 
    // Outpost chain_kind cache: chain_code -> ChainKind
    std::map<uint64_t, ChainKind>     outpost_chain_kinds;
@@ -710,6 +730,177 @@ struct underwriter_plugin::impl {
            underwriter_account.to_string(),
            outpost_chain_kinds.size());
       return true;
+   }
+
+   // -----------------------------------------------------------------------
+   //  Sync-gated startup
+   // -----------------------------------------------------------------------
+
+   /// The "node is synced" predicate: the LAST IRREVERSIBLE block's time
+   /// within `underwriter_defaults::sync_recency_ms` of wall-clock now.
+   /// The plugin's table reads serve the IRREVERSIBLE state (operator
+   /// daemons run read-mode = irreversible), so the gate must measure LIB
+   /// recency — head-time recency armed the gate while the local LIB still
+   /// trailed the rows the preflight needs (observed live: a registration
+   /// in block N was readable only 50ms after a preflight read at LIB N−3).
+   /// While a cold-booting operator node syncs blocks, LIB trails `now` by
+   /// the catch-up gap and every local table read sees stale (possibly
+   /// genesis) state — preflight must not run until this is true.
+   bool chain_is_synced() const {
+      auto& chain = chain_plug->chain();
+      if (!chain.fork_db_has_root()) {
+         return false;
+      }
+      return underwriter_detail::head_is_recent(
+         chain.fork_db_root().block_time(), fc::time_point::now(),
+         fc::milliseconds(underwriter_defaults::sync_recency_ms));
+   }
+
+   /// Arm the deferred startup: runs AT MOST once (`startup_armed`), on the
+   /// main thread (either directly from `plugin_startup` when the node is
+   /// already synced, or from the `accepted_block` signal once it becomes
+   /// synced). The body itself lives in {@link attempt_deferred_startup},
+   /// which may retry the preflight within a bounded grace.
+   void run_deferred_startup() {
+      startup_armed    = true;
+      startup_armed_at = fc::time_point::now();
+      if (sync_gate_connection) {
+         sync_gate_connection->disconnect();
+      }
+      attempt_deferred_startup();
+   }
+
+   /// One attempt of the deferred startup body: preflight → outpost client
+   /// wiring → cron scheduling. A failing preflight within
+   /// `underwriter_defaults::preflight_retry_grace_ms` of the gate arming is
+   /// NOT terminal — rows the harness confirmed final on the producer can
+   /// land in the LOCAL irreversible state a beat after the gate arms
+   /// (observed live: `regoperator` in block 405 readable 50ms after a
+   /// preflight read at LIB 402), so the attempt re-schedules itself on
+   /// `preflight_retry_interval_ms` until the grace expires. Past the grace,
+   /// a preflight failure on a synced chain remains a loud, terminal
+   /// bootstrap bug — no cron job, no dev escape hatch — exactly as before.
+   void attempt_deferred_startup() {
+      if (shutting_down) {
+         return;
+      }
+
+      // Pre-flight: bail (no cron job) if the depot-side state for this
+      // underwriter is incomplete. Cluster bootstrap is responsible for
+      // establishing the missing state — there is no dev escape hatch.
+      // The already-registered HTTP endpoints keep reporting the gate state
+      // so a not-yet-live underwriter is diagnosable over HTTP.
+      if (!run_preflight()) {
+         const auto since_armed = fc::time_point::now() - startup_armed_at;
+         if (since_armed <
+             fc::milliseconds(underwriter_defaults::preflight_retry_grace_ms)) {
+            gate_state = underwriter_detail::startup_state::preflight_retrying;
+            ilog("underwriter_plugin: preflight incomplete {}ms after the sync gate "
+                 "armed — retrying in {}ms (grace {}ms); the error above is "
+                 "transient until the grace expires",
+                 since_armed.count() / 1000,
+                 underwriter_defaults::preflight_retry_interval_ms,
+                 underwriter_defaults::preflight_retry_grace_ms);
+            schedule_preflight_retry();
+            return;
+         }
+         gate_state = underwriter_detail::startup_state::preflight_failed;
+         elog("underwriter_plugin: pre-flight failed — cron job NOT registered");
+         return;
+      }
+
+      // Materialize one outpost_client SPI handle per CONFIGURED chain
+      // (SEC-13/WSA-027: keyed by EXACT chain_code, so two chains of the same VM
+      // family each get their own client + RPC). The underwriter never sees raw
+      // `ethereum_client` / `solana_client` instances after this point — every
+      // outpost-side action goes through the SPI virtuals. Per `outpost-client-spi.md`:
+      //   * ETH client carries only the OperatorRegistry address (the uw_commit
+      //     target); the underwriter neither consumes nor emits OPP envelopes, so
+      //     OPP / OPPInbound addresses are left empty.
+      //   * SOL client carries the opp-outpost program id; the typed wrapper
+      //     exposes `commit_underwrite` directly.
+      // `external_chain_id` comes from `sysio.chains` (read here so the registry
+      // caches are warm); a chain configured but not yet in the registry builds
+      // with id 0 (harmless — no leg references it until it is active).
+      read_outpost_registry();
+      try {
+         for (const auto& [chain_code, ep] : outpost_endpoints) {
+            const auto     code_str = fc::slug_name{chain_code}.to_string();
+            const uint32_t ext_id   = [&] {
+               auto it = outpost_external_chain_ids.find(chain_code);
+               return it != outpost_external_chain_ids.end() ? it->second : 0u;
+            }();
+            if (ep.kind == ChainKind::CHAIN_KIND_EVM) {
+               outpost_by_chain[chain_code] =
+                  eth_plug->create_outpost_client(ep.client_id, chain_code, ext_id,
+                                                  /*opp_addr=*/"", /*opp_inbound_addr=*/"",
+                                                  ep.commit_addr);
+               ilog("underwriter_plugin: wired ETH outpost_client chain={} (client_id='{}', opreg={})",
+                    code_str, ep.client_id, ep.commit_addr);
+            } else if (ep.kind == ChainKind::CHAIN_KIND_SVM) {
+               outpost_by_chain[chain_code] =
+                  sol_plug->create_outpost_client(ep.client_id, chain_code, ext_id,
+                                                  ep.commit_addr /*program_id*/);
+               ilog("underwriter_plugin: wired SOL outpost_client chain={} (client_id='{}', program={})",
+                    code_str, ep.client_id, ep.commit_addr);
+            } else {
+               wlog("underwriter_plugin: outpost_endpoint chain={} has unknown kind — skipped",
+                    code_str);
+            }
+         }
+         if (outpost_by_chain.empty()) {
+            wlog("underwriter_plugin: NO outpost_clients wired — pass "
+                 "--underwriter-eth-outpost / --underwriter-sol-outpost for each served chain");
+         }
+      } catch (const fc::exception& e) {
+         gate_state = underwriter_detail::startup_state::wiring_failed;
+         elog("underwriter_plugin: failed to build outpost_client(s): {}",
+              e.to_detail_string());
+         return;
+      }
+
+      cron_service::job_schedule sched;
+      sched.milliseconds = {cron_service::job_schedule::step_value{scan_interval_ms}};
+
+      cron_service::job_metadata_t meta;
+      meta.label         = "underwriter_scan";
+      meta.one_at_a_time = true;
+
+      scan_job_id = cron_plug->add_job(
+         sched,
+         [this]() { scan_cycle(); },
+         meta
+      );
+
+      ilog("underwriter_plugin: scheduled scan (id={}, interval={}ms)",
+           scan_job_id, scan_interval_ms);
+
+      // The `/v1/underwriter/*` endpoints (registered back in `plugin_startup`)
+      // switch from gate-state reporting to the real payloads.
+      gate_state = underwriter_detail::startup_state::active;
+   }
+
+   /// Re-run {@link attempt_deferred_startup} after one retry interval, on
+   /// the main thread (appbase-wrapped wait on the app io_context).
+   void schedule_preflight_retry() {
+      if (!preflight_retry_timer) {
+         preflight_retry_timer.emplace(app().get_io_context());
+      }
+      preflight_retry_timer->expires_after(
+         std::chrono::milliseconds(underwriter_defaults::preflight_retry_interval_ms));
+      // Plain wait on the main io_context, then POST the attempt to the app
+      // queue — the same pattern the sync-gate callback uses, so the body
+      // runs in the same main-thread context plugin_startup does.
+      preflight_retry_timer->async_wait([this](const boost::system::error_code& ec) {
+         if (ec || shutting_down) {
+            return;
+         }
+         app().executor().post(appbase::priority::medium, [this]() {
+            if (!shutting_down) {
+               attempt_deferred_startup();
+            }
+         });
+      });
    }
 
    // -----------------------------------------------------------------------
@@ -2220,9 +2411,21 @@ struct underwriter_plugin::impl {
    //   /v1/underwriter/stats   — session counters + config snapshot
    //   /v1/underwriter/commits — outstanding confirmed commits (per leg)
    //
+   // Both carry a `status` discriminator: until the deferred startup body
+   // completes they answer with the gate state (`waiting_for_sync` +
+   // `head_behind_sec`, or a terminal `preflight_failed`/`wiring_failed`
+   // with `detail`); once active they serve the payloads below with
+   // `status:"active"`.
+   //
    // The matching `clio opp uw <stats|commits>` CLI wrapper is planned in
    // a follow-up; today the endpoints are addressable via `curl` against
    // the nodeop HTTP port.
+
+   /// The uniform `status` spelling for the post-startup payloads.
+   static std::string active_status_name() {
+      return std::string{magic_enum::enum_name(underwriter_detail::startup_state::active)};
+   }
+
    fc::variant build_stats_response() {
       std::lock_guard lk{stats_mutex};
       size_t active_sol_source_deposit_cursor_count = 0;
@@ -2248,6 +2451,7 @@ struct underwriter_plugin::impl {
             ("source_deposit_addr", ep.source_deposit_addr));
       }
       return fc::variant(fc::mutable_variant_object()
+         ("status",                         active_status_name())
          ("underwriter_account",            underwriter_account.to_string())
          ("enabled",                        enabled)
          ("is_active",                      is_active)
@@ -2279,13 +2483,34 @@ struct underwriter_plugin::impl {
          ));
       }
       return fc::variant(fc::mutable_variant_object()
+         ("status",  active_status_name())
          ("count",   entries.size())
          ("entries", std::move(entries))
       );
    }
 
+   /// Answer `cb` with the gate-state payload and return true when the
+   /// deferred startup body has not completed (waiting for sync, or failed
+   /// terminally); return false once {@link run_deferred_startup} reached
+   /// `active` so the caller serves the real payload.
+   bool respond_if_gated(const url_response_callback& cb) {
+      const auto state = gate_state.load();
+      if (state == underwriter_detail::startup_state::active) {
+         return false;
+      }
+      const int64_t head_behind_sec =
+         (fc::time_point::now() - chain_plug->chain().head().block_time()).to_seconds();
+      cb(200, underwriter_detail::startup_gate_payload(state, head_behind_sec));
+      return true;
+   }
+
    /// Register the `/v1/underwriter/*` HTTP endpoints. Called once from
-   /// `plugin_startup` after preflight passes and the cron job is queued.
+   /// `plugin_startup`, UNCONDITIONALLY and BEFORE the sync gate:
+   /// `http_plugin`'s handler map is read lock-free by the HTTP worker
+   /// threads, so every registration must happen during plugin startup —
+   /// before the posted listener creation runs — never from a task queued
+   /// after `exec()` is live. Until the deferred startup body completes the
+   /// handlers report the gate state (see {@link respond_if_gated}).
    void register_http_endpoints() {
       auto& hp = app().get_plugin<http_plugin>();
       hp.add_api({
@@ -2294,6 +2519,9 @@ struct underwriter_plugin::impl {
                     std::string&& /*body*/,
                     url_response_callback&& cb) {
                try {
+                  if (respond_if_gated(cb)) {
+                     return;
+                  }
                   cb(200, build_stats_response());
                } catch (const fc::exception& e) {
                   cb(500, fc::variant(fc::mutable_variant_object()
@@ -2305,6 +2533,9 @@ struct underwriter_plugin::impl {
                     std::string&& /*body*/,
                     url_response_callback&& cb) {
                try {
+                  if (respond_if_gated(cb)) {
+                     return;
+                  }
                   cb(200, build_commits_response());
                } catch (const fc::exception& e) {
                   cb(500, fc::variant(fc::mutable_variant_object()
@@ -2438,88 +2669,72 @@ void underwriter_plugin::plugin_startup() {
 
    ilog("underwriter_plugin: starting for account {}", _impl->underwriter_account.to_string());
 
-   // Unconditional pre-flight: bail (no cron job) if the depot-side state
-   // for this underwriter is incomplete. Cluster bootstrap is responsible
-   // for establishing the missing state — there is no dev escape hatch.
-   if (!_impl->run_preflight()) {
-      elog("underwriter_plugin: pre-flight failed — cron job NOT registered");
-      return;
-   }
-
-   // Materialize one outpost_client SPI handle per CONFIGURED chain
-   // (SEC-13/WSA-027: keyed by EXACT chain_code, so two chains of the same VM
-   // family each get their own client + RPC). The underwriter never sees raw
-   // `ethereum_client` / `solana_client` instances after this point — every
-   // outpost-side action goes through the SPI virtuals. Per `outpost-client-spi.md`:
-   //   * ETH client carries only the OperatorRegistry address (the uw_commit
-   //     target); the underwriter neither consumes nor emits OPP envelopes, so
-   //     OPP / OPPInbound addresses are left empty.
-   //   * SOL client carries the opp-outpost program id; the typed wrapper
-   //     exposes `commit_underwrite` directly.
-   // `external_chain_id` comes from `sysio.chains` (read here so the registry
-   // caches are warm); a chain configured but not yet in the registry builds
-   // with id 0 (harmless — no leg references it until it is active).
-   _impl->read_outpost_registry();
-   try {
-      for (const auto& [chain_code, ep] : _impl->outpost_endpoints) {
-         const auto    code_str = fc::slug_name{chain_code}.to_string();
-         const uint32_t ext_id  = [&] {
-            auto it = _impl->outpost_external_chain_ids.find(chain_code);
-            return it != _impl->outpost_external_chain_ids.end() ? it->second : 0u;
-         }();
-         if (ep.kind == ChainKind::CHAIN_KIND_EVM) {
-            _impl->outpost_by_chain[chain_code] =
-               _impl->eth_plug->create_outpost_client(ep.client_id, chain_code, ext_id,
-                                                      /*opp_addr=*/"", /*opp_inbound_addr=*/"",
-                                                      ep.commit_addr);
-            ilog("underwriter_plugin: wired ETH outpost_client chain={} (client_id='{}', opreg={})",
-                 code_str, ep.client_id, ep.commit_addr);
-         } else if (ep.kind == ChainKind::CHAIN_KIND_SVM) {
-            _impl->outpost_by_chain[chain_code] =
-               _impl->sol_plug->create_outpost_client(ep.client_id, chain_code, ext_id,
-                                                      ep.commit_addr /*program_id*/);
-            ilog("underwriter_plugin: wired SOL outpost_client chain={} (client_id='{}', program={})",
-                 code_str, ep.client_id, ep.commit_addr);
-         } else {
-            wlog("underwriter_plugin: outpost_endpoint chain={} has unknown kind — skipped",
-                 code_str);
-         }
-      }
-      if (_impl->outpost_by_chain.empty()) {
-         wlog("underwriter_plugin: NO outpost_clients wired — pass "
-              "--underwriter-eth-outpost / --underwriter-sol-outpost for each served chain");
-      }
-   } catch (const fc::exception& e) {
-      elog("underwriter_plugin: failed to build outpost_client(s): {}",
-           e.to_detail_string());
-      return;
-   }
-
-   auto& cron = app().get_plugin<cron_plugin>();
-   cron_service::job_schedule sched;
-   sched.milliseconds = {cron_service::job_schedule::step_value{_impl->scan_interval_ms}};
-
-   cron_service::job_metadata_t meta;
-   meta.label = "underwriter_scan";
-   meta.one_at_a_time = true;
-
-   _impl->scan_job_id = cron.add_job(
-      sched,
-      [this]() { _impl->scan_cycle(); },
-      meta
-   );
-
-   ilog("underwriter_plugin: scheduled scan (id={}, interval={}ms)",
-        _impl->scan_job_id, _impl->scan_interval_ms);
-
-   // Register read-only HTTP diagnostics. Endpoints:
-   //   GET /v1/underwriter/stats    — session counters + config snapshot
-   //   GET /v1/underwriter/commits  — outstanding confirmed commits
+   // Register the `/v1/underwriter/*` endpoints FIRST, unconditionally:
+   // handler registration must complete during plugin startup (before the
+   // posted HTTP listener goes live) because the handler map is read
+   // lock-free by the HTTP threads — it must never ride the deferred
+   // startup body below. Until that body completes, the handlers answer
+   // with the gate state, so a cold-booting (or permanently-disabled)
+   // underwriter is diagnosable over HTTP instead of a single ilog.
    _impl->register_http_endpoints();
+
+   // The preflight validates depot-side state (opreg registration, chain
+   // registry, authex links) via LOCAL table reads. On a cold-booting
+   // operator node those reads see mid-sync (possibly genesis) state and
+   // would fail spuriously, so the whole startup body (preflight → outpost
+   // client wiring → cron) is DEFERRED until the node is synced — the LAST
+   // IRREVERSIBLE block's time within `underwriter_defaults::sync_recency_ms`
+   // of now (the state the reads actually serve under read-mode =
+   // irreversible), observed via the controller's `accepted_block` signal.
+   // Post-arming, the preflight retries within a bounded grace (see
+   // attempt_deferred_startup) to absorb the LIB boundary race; a genuinely
+   // incomplete bootstrap still fails loudly once the grace expires — there
+   // remains no dev escape hatch.
+   auto& chain = _impl->chain_plug->chain();
+   if (_impl->chain_is_synced()) {
+      _impl->run_deferred_startup();
+      return;
+   }
+
+   ilog("underwriter_plugin: waiting for chain sync before preflight "
+        "(head {} is {}s behind now; irreversible state is {}s behind)",
+        chain.head().block_num(),
+        (fc::time_point::now() - chain.head().block_time()).to_seconds(),
+        chain.fork_db_has_root()
+           ? (fc::time_point::now() - chain.fork_db_root().block_time()).to_seconds()
+           : -1);
+   _impl->sync_gate_connection.emplace(
+      chain.accepted_block().connect([this](const chain::block_signal_params&) {
+         if (_impl->startup_armed || _impl->shutting_down) {
+            return;
+         }
+         if (!_impl->chain_is_synced()) {
+            return;
+         }
+         // Detected sync — disconnect the gate (safe mid-invocation) and POST
+         // the startup body to the app queue. It must NOT run inline here:
+         // the accepted_block signal fires mid block-application, where the
+         // chain API table reads see an incomplete view (observed live: a
+         // registered operator row read back EMPTY → spurious preflight
+         // failure). The posted task runs after the block commits, in the
+         // same main-thread context plugin_startup itself runs in.
+         _impl->sync_gate_connection->disconnect();
+         ilog("underwriter_plugin: chain synced — scheduling deferred startup");
+         app().executor().post(appbase::priority::medium, [this]() {
+            if (_impl->startup_armed || _impl->shutting_down) {
+               return;
+            }
+            _impl->run_deferred_startup();
+         });
+      }));
 }
 
 void underwriter_plugin::plugin_shutdown() {
    _impl->shutting_down = true;
+   _impl->sync_gate_connection.reset();
+   if (_impl->preflight_retry_timer) {
+      _impl->preflight_retry_timer->cancel();
+   }
 
    if (_impl->scan_job_id != 0) {
       auto& cron = app().get_plugin<cron_plugin>();
