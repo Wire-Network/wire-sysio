@@ -19,6 +19,8 @@
 
 #include <magic_enum/magic_enum.hpp>
 
+#include <optional>
+
 namespace sysio::underwriter_detail {
 
 /**
@@ -112,21 +114,22 @@ inline constexpr std::string_view startup_failed_detail =
  *   - `active` → `{"status":"active"}` (callers normally serve the real
  *     payload instead once active — the builders stamp the same field).
  *
- * @param state           The current deferred-startup lifecycle state.
- * @param head_behind_sec How far the head trails wall-clock now (seconds);
- *                        consumed only by the `waiting_for_sync` payload.
- * @param lib_behind_sec  How far the last-irreversible block trails wall-clock
- *                        now (seconds; -1 when no root yet); consumed only by
- *                        the `waiting_for_sync` payload.
+ * @param state       The current deferred-startup lifecycle state.
+ * @param head_behind How far the head trails wall-clock now; consumed only by
+ *                    the `waiting_for_sync` payload (emitted in whole seconds).
+ * @param lib_behind  How far the last-irreversible block trails wall-clock
+ *                    now, or empty while no irreversible root exists yet
+ *                    (emitted as -1, matching the startup wait log); consumed
+ *                    only by the `waiting_for_sync` payload.
  * @return The response body as an `fc::variant`.
  */
-inline fc::variant startup_gate_payload(startup_state state, int64_t head_behind_sec,
-                                        int64_t lib_behind_sec) {
+inline fc::variant startup_gate_payload(startup_state state, fc::microseconds head_behind,
+                                        std::optional<fc::microseconds> lib_behind) {
    fc::mutable_variant_object body;
    body(field::status, std::string{magic_enum::enum_name(state)});
    if (state == startup_state::waiting_for_sync) {
-      body(field::head_behind_sec, head_behind_sec);
-      body(field::lib_behind_sec, lib_behind_sec);
+      body(field::head_behind_sec, head_behind.to_seconds());
+      body(field::lib_behind_sec, lib_behind ? lib_behind->to_seconds() : -1);
    } else if (state == startup_state::preflight_failed) {
       body(field::detail, std::string{preflight_failed_detail});
    } else if (state == startup_state::wiring_failed) {

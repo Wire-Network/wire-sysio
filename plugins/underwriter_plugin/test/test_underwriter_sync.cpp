@@ -77,7 +77,8 @@ using sysio::underwriter_detail::startup_state;
 namespace field = sysio::underwriter_detail::field;
 
 BOOST_AUTO_TEST_CASE(gate_payload_waiting_for_sync_reports_behind_gaps) {
-   const auto body = startup_gate_payload(startup_state::waiting_for_sync, 204, 206)
+   const auto body = startup_gate_payload(startup_state::waiting_for_sync,
+                                          fc::seconds(204), fc::seconds(206))
                         .get_object();
    BOOST_TEST(body[field::status].as_string() == "waiting_for_sync");
    BOOST_TEST(body[field::head_behind_sec].as_int64() == 204);
@@ -85,16 +86,29 @@ BOOST_AUTO_TEST_CASE(gate_payload_waiting_for_sync_reports_behind_gaps) {
    BOOST_TEST(!body.contains(field::detail));
 }
 
-BOOST_AUTO_TEST_CASE(gate_payload_waiting_for_sync_passes_no_root_sentinel) {
-   // Before the fork database has a root the caller reports -1 (matching the
-   // startup wait log); the payload forwards it untouched.
-   const auto body = startup_gate_payload(startup_state::waiting_for_sync, 3, -1)
+BOOST_AUTO_TEST_CASE(gate_payload_no_root_emits_minus_one_sentinel) {
+   // Before the fork database has a root the caller passes an empty optional;
+   // the payload builder emits the wire's -1 sentinel (matching the startup
+   // wait log).
+   const auto body = startup_gate_payload(startup_state::waiting_for_sync,
+                                          fc::seconds(3), std::nullopt)
                         .get_object();
    BOOST_TEST(body[field::lib_behind_sec].as_int64() == -1);
 }
 
+BOOST_AUTO_TEST_CASE(gate_payload_truncates_to_whole_seconds) {
+   // Durations travel as fc::microseconds; the JSON boundary emits whole
+   // seconds.
+   const auto body = startup_gate_payload(startup_state::waiting_for_sync,
+                                          fc::milliseconds(2500), fc::milliseconds(1999))
+                        .get_object();
+   BOOST_TEST(body[field::head_behind_sec].as_int64() == 2);
+   BOOST_TEST(body[field::lib_behind_sec].as_int64() == 1);
+}
+
 BOOST_AUTO_TEST_CASE(gate_payload_preflight_failed_carries_detail) {
-   const auto body = startup_gate_payload(startup_state::preflight_failed, 0, 0)
+   const auto body = startup_gate_payload(startup_state::preflight_failed,
+                                          fc::microseconds(0), std::nullopt)
                         .get_object();
    BOOST_TEST(body[field::status].as_string() == "preflight_failed");
    BOOST_TEST(body[field::detail].as_string() ==
@@ -104,7 +118,8 @@ BOOST_AUTO_TEST_CASE(gate_payload_preflight_failed_carries_detail) {
 }
 
 BOOST_AUTO_TEST_CASE(gate_payload_wiring_failed_carries_detail) {
-   const auto body = startup_gate_payload(startup_state::wiring_failed, 0, 0)
+   const auto body = startup_gate_payload(startup_state::wiring_failed,
+                                          fc::microseconds(0), std::nullopt)
                         .get_object();
    BOOST_TEST(body[field::status].as_string() == "wiring_failed");
    BOOST_TEST(body[field::detail].as_string() ==
@@ -116,7 +131,8 @@ BOOST_AUTO_TEST_CASE(gate_payload_wiring_failed_carries_detail) {
 BOOST_AUTO_TEST_CASE(gate_payload_startup_failed_carries_detail) {
    // The catch-all terminal state: the deferred startup body threw past the
    // specific preflight/wiring failure paths.
-   const auto body = startup_gate_payload(startup_state::startup_failed, 0, 0)
+   const auto body = startup_gate_payload(startup_state::startup_failed,
+                                          fc::microseconds(0), std::nullopt)
                         .get_object();
    BOOST_TEST(body[field::status].as_string() == "startup_failed");
    BOOST_TEST(body[field::detail].as_string() ==
@@ -127,13 +143,16 @@ BOOST_AUTO_TEST_CASE(gate_payload_startup_failed_carries_detail) {
 
 BOOST_AUTO_TEST_CASE(gate_payload_preflight_retrying_is_status_only) {
    const auto body =
-      startup_gate_payload(startup_state::preflight_retrying, 0, 0).get_object();
+      startup_gate_payload(startup_state::preflight_retrying, fc::microseconds(0), std::nullopt)
+         .get_object();
    BOOST_TEST(body[field::status].as_string() == "preflight_retrying");
    BOOST_TEST(body.size() == 1u);
 }
 
 BOOST_AUTO_TEST_CASE(gate_payload_active_is_status_only) {
-   const auto body = startup_gate_payload(startup_state::active, 99, 99).get_object();
+   const auto body = startup_gate_payload(startup_state::active,
+                                          fc::seconds(99), fc::seconds(99))
+                        .get_object();
    BOOST_TEST(body[field::status].as_string() == "active");
    BOOST_TEST(body.size() == 1u);
 }

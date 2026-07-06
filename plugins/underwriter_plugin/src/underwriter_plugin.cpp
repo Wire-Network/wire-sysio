@@ -2536,17 +2536,19 @@ struct underwriter_plugin::impl {
       // the chain reads for the other states. `lib_behind_sec` is the gate's
       // actual criterion (reads serve the irreversible state); the head gap
       // distinguishes a finality-stalled node from one still catching up.
-      int64_t head_behind_sec = 0;
-      int64_t lib_behind_sec  = 0;
+      // An absent irreversible root stays a typed empty optional here — the
+      // payload builder turns it into the wire's -1 sentinel.
+      fc::microseconds                head_behind{};
+      std::optional<fc::microseconds> lib_behind;
       if (state == underwriter_detail::startup_state::waiting_for_sync) {
          auto&      chain = chain_plug->chain();
          const auto now   = fc::time_point::now();
-         head_behind_sec  = (now - chain.head().block_time()).to_seconds();
-         lib_behind_sec   = chain.fork_db_has_root()
-                               ? (now - chain.fork_db_root().block_time()).to_seconds()
-                               : -1;
+         head_behind      = now - chain.head().block_time();
+         if (chain.fork_db_has_root()) {
+            lib_behind = now - chain.fork_db_root().block_time();
+         }
       }
-      cb(200, underwriter_detail::startup_gate_payload(state, head_behind_sec, lib_behind_sec));
+      cb(200, underwriter_detail::startup_gate_payload(state, head_behind, lib_behind));
       return true;
    }
 
