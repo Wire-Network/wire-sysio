@@ -173,21 +173,27 @@ try:
         assert block["producer"] == "defproduceri", \
             f"expected defproduceri for block {canonicalBlock['block_num']}, instead: {block['producer']}"
 
-    # verify that defproducerk or defproducerl blocks made it into the canonical chain
-    # It can take a while to resolve the fork, but should have at least one block from node_03's
-    # producers unless defproducera wins the fork
-    expectedProducers = {"defproducerk", "defproducerl"}
-    if "defproducerl" in partitionForkSwitches():
-        expectedProducers = {"defproducera"}
+    # verify the post-partition canonical chain holds blocks from a plausible producer.
+    # Normally node_03 resumes producing on the canonical branch and defproducerk and/or
+    # defproducerl blocks land in the verification window. When the reconnect is slow enough
+    # that node_03 burns its k and l slots on the abandoned fork, defproducera may own the
+    # whole window instead - but only when node_03's log also shows it abandoned one of its
+    # own defproducerl blocks. Decide from the window content rather than from the fork-switch
+    # log alone: a routine slot-handoff micro-fork past the window (defproducera winning the
+    # boundary race against node_03's last defproducerl block) also logs an abandoned
+    # defproducerl block and must not change what the window is expected to hold.
     iProdBlockNum += producerSlotBlockCount  # into the next set of blocks
-    found_defproducer = False
-    for i in range(producerSlotBlockCount):
-        defprod=node3.getBlockProducerByNum(iProdBlockNum + i)
-        if defprod in expectedProducers:
-            found_defproducer = True
-
-    assert found_defproducer, \
-        f"expected one of {sorted(expectedProducers)} in blocks {iProdBlockNum}-{iProdBlockNum+producerSlotBlockCount}"
+    lastWindowBlockNum = iProdBlockNum + producerSlotBlockCount - 1
+    windowProducers = [node3.getBlockProducerByNum(blockNum)
+                       for blockNum in range(iProdBlockNum, lastWindowBlockNum + 1)]
+    if not {"defproducerk", "defproducerl"} & set(windowProducers):
+        # re-check the fork switches: cascade switch lines can land after the first wait
+        assert "defproducerl" in partitionForkSwitches(), \
+            f"expected defproducerk or defproducerl in blocks {iProdBlockNum}-{lastWindowBlockNum} " \
+            f"when node_03 abandoned no defproducerl block on its fork, instead: {windowProducers}"
+        assert "defproducera" in windowProducers, \
+            f"expected defproducera in blocks {iProdBlockNum}-{lastWindowBlockNum} after node_03 " \
+            f"burned its production slots on the abandoned fork, instead: {windowProducers}"
 
     testSuccessful=True
 finally:

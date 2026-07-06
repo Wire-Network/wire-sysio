@@ -413,13 +413,13 @@ done
 
 To generate the client types for the system contracts,run the following commands.
 
-`<wire-sysio>/contracts/tools/generate-system-contract-types.py -B . -O /tmp/ctt -P snake -f` then `cp
-  /tmp/ctt/typescript/SystemContractTypes.ts  <wire-libraries-ts>/packages/sdk-core/src/types/` and lastly run `cd <wire-libraries-ts> &&
+`<wire-sysio>/contracts/tools/generate-sysio-contract-types.py -B . -O /tmp/ctt -P snake -f` then `cp
+  /tmp/ctt/typescript/SysioContractTypes.ts  <wire-libraries-ts>/packages/sdk-core/src/types/` and lastly run `cd <wire-libraries-ts> &&
   pnpm build`
 
 This makes the types available in the SDK as:
 ```ts
-import { SystemContracts } from '@wire-libraries/sdk-core';
+import { SysioContracts } from '@wire-libraries/sdk-core';
 ```
 
 
