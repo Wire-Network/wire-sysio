@@ -66,47 +66,83 @@ BOOST_AUTO_TEST_CASE(zero_window_requires_head_at_or_past_now) {
 // ── startup_gate_payload: the /v1/underwriter/* body served until the ──
 // ── deferred startup body completes (registration is unconditional at ──
 // ── plugin_startup, so these payloads are what a cold-boot query sees) ──
+//
+// Field KEYS come from the shared `field::` constants (one spelling
+// authority with the payload builder); the `status` VALUES stay literal on
+// purpose — they pin the wire contract, so an enum-member rename that would
+// silently change the HTTP format fails here.
 
 using sysio::underwriter_detail::startup_gate_payload;
 using sysio::underwriter_detail::startup_state;
+namespace field = sysio::underwriter_detail::field;
 
-BOOST_AUTO_TEST_CASE(gate_payload_waiting_for_sync_reports_head_gap) {
-   const auto body = startup_gate_payload(startup_state::waiting_for_sync, 204)
+BOOST_AUTO_TEST_CASE(gate_payload_waiting_for_sync_reports_behind_gaps) {
+   const auto body = startup_gate_payload(startup_state::waiting_for_sync, 204, 206)
                         .get_object();
-   BOOST_TEST(body["status"].as_string() == "waiting_for_sync");
-   BOOST_TEST(body["head_behind_sec"].as_int64() == 204);
-   BOOST_TEST(!body.contains("detail"));
+   BOOST_TEST(body[field::status].as_string() == "waiting_for_sync");
+   BOOST_TEST(body[field::head_behind_sec].as_int64() == 204);
+   BOOST_TEST(body[field::lib_behind_sec].as_int64() == 206);
+   BOOST_TEST(!body.contains(field::detail));
+}
+
+BOOST_AUTO_TEST_CASE(gate_payload_waiting_for_sync_passes_no_root_sentinel) {
+   // Before the fork database has a root the caller reports -1 (matching the
+   // startup wait log); the payload forwards it untouched.
+   const auto body = startup_gate_payload(startup_state::waiting_for_sync, 3, -1)
+                        .get_object();
+   BOOST_TEST(body[field::lib_behind_sec].as_int64() == -1);
 }
 
 BOOST_AUTO_TEST_CASE(gate_payload_preflight_failed_carries_detail) {
-   const auto body = startup_gate_payload(startup_state::preflight_failed, 0)
+   const auto body = startup_gate_payload(startup_state::preflight_failed, 0, 0)
                         .get_object();
-   BOOST_TEST(body["status"].as_string() == "preflight_failed");
-   BOOST_TEST(body["detail"].as_string() ==
+   BOOST_TEST(body[field::status].as_string() == "preflight_failed");
+   BOOST_TEST(body[field::detail].as_string() ==
               std::string{sysio::underwriter_detail::preflight_failed_detail});
-   BOOST_TEST(!body.contains("head_behind_sec"));
+   BOOST_TEST(!body.contains(field::head_behind_sec));
+   BOOST_TEST(!body.contains(field::lib_behind_sec));
 }
 
 BOOST_AUTO_TEST_CASE(gate_payload_wiring_failed_carries_detail) {
-   const auto body = startup_gate_payload(startup_state::wiring_failed, 0)
+   const auto body = startup_gate_payload(startup_state::wiring_failed, 0, 0)
                         .get_object();
-   BOOST_TEST(body["status"].as_string() == "wiring_failed");
-   BOOST_TEST(body["detail"].as_string() ==
+   BOOST_TEST(body[field::status].as_string() == "wiring_failed");
+   BOOST_TEST(body[field::detail].as_string() ==
               std::string{sysio::underwriter_detail::wiring_failed_detail});
-   BOOST_TEST(!body.contains("head_behind_sec"));
+   BOOST_TEST(!body.contains(field::head_behind_sec));
+   BOOST_TEST(!body.contains(field::lib_behind_sec));
+}
+
+BOOST_AUTO_TEST_CASE(gate_payload_startup_failed_carries_detail) {
+   // The catch-all terminal state: the deferred startup body threw past the
+   // specific preflight/wiring failure paths.
+   const auto body = startup_gate_payload(startup_state::startup_failed, 0, 0)
+                        .get_object();
+   BOOST_TEST(body[field::status].as_string() == "startup_failed");
+   BOOST_TEST(body[field::detail].as_string() ==
+              std::string{sysio::underwriter_detail::startup_failed_detail});
+   BOOST_TEST(!body.contains(field::head_behind_sec));
+   BOOST_TEST(!body.contains(field::lib_behind_sec));
 }
 
 BOOST_AUTO_TEST_CASE(gate_payload_preflight_retrying_is_status_only) {
    const auto body =
-      startup_gate_payload(startup_state::preflight_retrying, 0).get_object();
-   BOOST_TEST(body["status"].as_string() == "preflight_retrying");
+      startup_gate_payload(startup_state::preflight_retrying, 0, 0).get_object();
+   BOOST_TEST(body[field::status].as_string() == "preflight_retrying");
    BOOST_TEST(body.size() == 1u);
 }
 
 BOOST_AUTO_TEST_CASE(gate_payload_active_is_status_only) {
-   const auto body = startup_gate_payload(startup_state::active, 99).get_object();
-   BOOST_TEST(body["status"].as_string() == "active");
+   const auto body = startup_gate_payload(startup_state::active, 99, 99).get_object();
+   BOOST_TEST(body[field::status].as_string() == "active");
    BOOST_TEST(body.size() == 1u);
+}
+
+BOOST_AUTO_TEST_CASE(active_status_constant_matches_enum_spelling) {
+   // The post-startup response builders stamp `active_status`; it must stay
+   // in lock-step with the enum member the gate payload spells via
+   // magic_enum.
+   BOOST_TEST(std::string{sysio::underwriter_detail::active_status} == "active");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

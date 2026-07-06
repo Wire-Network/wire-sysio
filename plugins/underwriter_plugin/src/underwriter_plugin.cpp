@@ -245,12 +245,10 @@ struct underwriter_plugin::impl {
    std::atomic<bool>                 shutting_down{false};
 
    /// Sync gate: `accepted_block` subscription that arms {@link run_deferred_startup}
-   /// once the local head is current (see `sync_detail.hpp::head_is_recent`).
-   /// Disconnected after arming; reset on shutdown.
+   /// once the local irreversible state is current (see
+   /// `sync_detail.hpp::head_is_recent`). Disconnected after arming; reset on
+   /// shutdown.
    std::optional<boost::signals2::scoped_connection> sync_gate_connection;
-   /// True once the deferred startup body (preflight → wiring → cron) has run —
-   /// the gate callback must arm at most once.
-   bool                              startup_armed = false;
    /// When the sync gate armed — bounds the preflight retry grace window.
    fc::time_point                    startup_armed_at;
    /// Bounded-grace preflight retry timer (main io_context; main-thread wait).
@@ -258,9 +256,23 @@ struct underwriter_plugin::impl {
    /// Deferred-startup lifecycle surfaced by the `/v1/underwriter/*` handlers
    /// (which register in `plugin_startup`, BEFORE the gate arms). Written on
    /// the main thread by {@link run_deferred_startup}; read from the HTTP
-   /// handlers' read-only queue — hence atomic.
+   /// handlers' read-only queue — hence atomic. Also the single source of
+   /// truth for "has the deferred startup been armed" ({@link
+   /// startup_attempted}) — every armed attempt leaves `waiting_for_sync`
+   /// before it returns, so no separate armed flag exists to drift.
    std::atomic<underwriter_detail::startup_state> gate_state{
       underwriter_detail::startup_state::waiting_for_sync};
+
+   /// True once the deferred startup has been armed: {@link
+   /// attempt_deferred_startup} stores a non-waiting `gate_state` on every
+   /// path (retrying / a terminal failure / active), so "still
+   /// `waiting_for_sync`" IS "not yet armed". Guards the gate callback and
+   /// its posted task against re-arming (each site also checks
+   /// `shutting_down`, which covers the only path that returns before the
+   /// first store).
+   bool startup_attempted() const {
+      return gate_state.load() != underwriter_detail::startup_state::waiting_for_sync;
+   }
 
    // Outpost chain_kind cache: chain_code -> ChainKind
    std::map<uint64_t, ChainKind>     outpost_chain_kinds;
@@ -756,17 +768,18 @@ struct underwriter_plugin::impl {
          fc::milliseconds(underwriter_defaults::sync_recency_ms));
    }
 
-   /// Arm the deferred startup: runs AT MOST once (`startup_armed`), on the
-   /// main thread (either directly from `plugin_startup` when the node is
-   /// already synced, or from the `accepted_block` signal once it becomes
-   /// synced). The body itself lives in {@link attempt_deferred_startup},
-   /// which may retry the preflight within a bounded grace.
+   /// Arm the deferred startup: runs AT MOST once (re-entry is guarded by
+   /// {@link startup_attempted}), on the main thread (either directly from
+   /// `plugin_startup` when the node is already synced, or from the
+   /// `accepted_block` signal once it becomes synced). The body itself lives
+   /// in {@link attempt_deferred_startup}, which may retry the preflight
+   /// within a bounded grace.
    void run_deferred_startup() {
-      startup_armed    = true;
       startup_armed_at = fc::time_point::now();
-      if (sync_gate_connection) {
-         sync_gate_connection->disconnect();
-      }
+      // Release the gate slot; the callback already disconnected it before
+      // posting, so this is an idempotent cleanup, not the load-bearing
+      // disconnect.
+      sync_gate_connection.reset();
       attempt_deferred_startup();
    }
 
@@ -784,7 +797,33 @@ struct underwriter_plugin::impl {
       if (shutting_down) {
          return;
       }
+      // Contain every escape as a terminal, diagnosable gate state. This runs
+      // from tasks posted to the app executor (the sync-gate callback and the
+      // preflight retry timer) as well as directly from plugin_startup; an
+      // exception unwinding out of a posted task makes appbase quit() and
+      // tear down the whole node, with the gate still claiming
+      // waiting_for_sync. The expected preflight/wiring failures inside the
+      // body set their own more specific states; this catches what they
+      // don't (a throwing table decode in the preflight or registry read, a
+      // non-fc exception from client wiring, a cron add_job failure).
+      try {
+         attempt_deferred_startup_body();
+      } catch (const fc::exception& e) {
+         gate_state = underwriter_detail::startup_state::startup_failed;
+         elog("underwriter_plugin: deferred startup failed unexpectedly: {}",
+              e.to_detail_string());
+      } catch (const std::exception& e) {
+         gate_state = underwriter_detail::startup_state::startup_failed;
+         elog("underwriter_plugin: deferred startup failed unexpectedly: {}", e.what());
+      } catch (...) {
+         gate_state = underwriter_detail::startup_state::startup_failed;
+         elog("underwriter_plugin: deferred startup failed unexpectedly (unknown exception)");
+      }
+   }
 
+   /// The deferred startup body proper — see {@link attempt_deferred_startup}
+   /// for the retry semantics and the exception containment around it.
+   void attempt_deferred_startup_body() {
       // Pre-flight: bail (no cron job) if the depot-side state for this
       // underwriter is incomplete. Cluster bootstrap is responsible for
       // establishing the missing state — there is no dev escape hatch.
@@ -2413,18 +2452,13 @@ struct underwriter_plugin::impl {
    //
    // Both carry a `status` discriminator: until the deferred startup body
    // completes they answer with the gate state (`waiting_for_sync` +
-   // `head_behind_sec`, or a terminal `preflight_failed`/`wiring_failed`
-   // with `detail`); once active they serve the payloads below with
-   // `status:"active"`.
+   // `head_behind_sec`/`lib_behind_sec`, `preflight_retrying`, or a terminal
+   // `preflight_failed`/`wiring_failed`/`startup_failed` with `detail`);
+   // once active they serve the payloads below with `status:"active"`.
    //
    // The matching `clio opp uw <stats|commits>` CLI wrapper is planned in
    // a follow-up; today the endpoints are addressable via `curl` against
    // the nodeop HTTP port.
-
-   /// The uniform `status` spelling for the post-startup payloads.
-   static std::string active_status_name() {
-      return std::string{magic_enum::enum_name(underwriter_detail::startup_state::active)};
-   }
 
    fc::variant build_stats_response() {
       std::lock_guard lk{stats_mutex};
@@ -2451,7 +2485,7 @@ struct underwriter_plugin::impl {
             ("source_deposit_addr", ep.source_deposit_addr));
       }
       return fc::variant(fc::mutable_variant_object()
-         ("status",                         active_status_name())
+         (underwriter_detail::field::status, std::string{underwriter_detail::active_status})
          ("underwriter_account",            underwriter_account.to_string())
          ("enabled",                        enabled)
          ("is_active",                      is_active)
@@ -2483,24 +2517,36 @@ struct underwriter_plugin::impl {
          ));
       }
       return fc::variant(fc::mutable_variant_object()
-         ("status",  active_status_name())
+         (underwriter_detail::field::status, std::string{underwriter_detail::active_status})
          ("count",   entries.size())
          ("entries", std::move(entries))
       );
    }
 
    /// Answer `cb` with the gate-state payload and return true when the
-   /// deferred startup body has not completed (waiting for sync, or failed
-   /// terminally); return false once {@link run_deferred_startup} reached
-   /// `active` so the caller serves the real payload.
+   /// deferred startup body has not completed (waiting for sync, retrying,
+   /// or failed terminally); return false once {@link run_deferred_startup}
+   /// reached `active` so the caller serves the real payload.
    bool respond_if_gated(const url_response_callback& cb) {
       const auto state = gate_state.load();
       if (state == underwriter_detail::startup_state::active) {
          return false;
       }
-      const int64_t head_behind_sec =
-         (fc::time_point::now() - chain_plug->chain().head().block_time()).to_seconds();
-      cb(200, underwriter_detail::startup_gate_payload(state, head_behind_sec));
+      // Only the waiting_for_sync payload carries the behind-now gaps; skip
+      // the chain reads for the other states. `lib_behind_sec` is the gate's
+      // actual criterion (reads serve the irreversible state); the head gap
+      // distinguishes a finality-stalled node from one still catching up.
+      int64_t head_behind_sec = 0;
+      int64_t lib_behind_sec  = 0;
+      if (state == underwriter_detail::startup_state::waiting_for_sync) {
+         auto&      chain = chain_plug->chain();
+         const auto now   = fc::time_point::now();
+         head_behind_sec  = (now - chain.head().block_time()).to_seconds();
+         lib_behind_sec   = chain.fork_db_has_root()
+                               ? (now - chain.fork_db_root().block_time()).to_seconds()
+                               : -1;
+      }
+      cb(200, underwriter_detail::startup_gate_payload(state, head_behind_sec, lib_behind_sec));
       return true;
    }
 
@@ -2705,7 +2751,7 @@ void underwriter_plugin::plugin_startup() {
            : -1);
    _impl->sync_gate_connection.emplace(
       chain.accepted_block().connect([this](const chain::block_signal_params&) {
-         if (_impl->startup_armed || _impl->shutting_down) {
+         if (_impl->startup_attempted() || _impl->shutting_down) {
             return;
          }
          if (!_impl->chain_is_synced()) {
@@ -2721,7 +2767,7 @@ void underwriter_plugin::plugin_startup() {
          _impl->sync_gate_connection->disconnect();
          ilog("underwriter_plugin: chain synced — scheduling deferred startup");
          app().executor().post(appbase::priority::medium, [this]() {
-            if (_impl->startup_armed || _impl->shutting_down) {
+            if (_impl->startup_attempted() || _impl->shutting_down) {
                return;
             }
             _impl->run_deferred_startup();
