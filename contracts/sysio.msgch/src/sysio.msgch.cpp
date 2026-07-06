@@ -51,14 +51,16 @@ using sysio::slug_name_literals::operator""_s;
 /// binds inbound registrations to this exact outpost — see the WSA-005 note there.
 constexpr sysio::slug_name NODE_OWNER_SRC_CHAIN = "ETHEREUM"_s;
 
-/// Hard cap on the encoded outbound envelope size, mirroring the Solana
-/// (`opp_outpost::MAX_ENVELOPE_BYTES`) and Ethereum (`OPP.MAX_ENVELOPE_BYTES`)
+/// Hard cap on the encoded envelope size in BOTH directions, mirroring the
+/// Solana (`opp_outpost::MAX_ENVELOPE_BYTES`) and Ethereum (`OPP.MAX_ENVELOPE_BYTES`)
 /// caps. 64 KiB is the e2e-supported maximum across WIRE / Ethereum / Solana,
 /// bound by Solana's 256 KiB BPF heap divided by ~3.3× envelope-size peak heap
 /// usage during the finalising chunk's `Envelope::decode + keccak::hash + clone`.
-/// The `buildenv` packing loop uses this to decide how many READY attestations
-/// to bundle into the current epoch's envelope; any that don't fit stay in the
-/// `attestations` table with status READY for the next epoch's `buildenv` call.
+/// Outbound, the `buildenv` packing loop uses this to decide how many READY
+/// attestations to bundle into the current epoch's envelope; any that don't fit
+/// stay in the `attestations` table with status READY for the next epoch's
+/// `buildenv` call. Inbound, `deliver` rejects anything larger before hashing
+/// or storing it.
 constexpr size_t   MAX_ENVELOPE_BYTES         = 65'536;
 
 /// Conservative per-attestation byte budget used by the `buildenv` packing
@@ -999,6 +1001,15 @@ void msgch::deliver(name batch_op_name, uint64_t chain_code, std::vector<char> d
          "delivering operator is not ACTIVE in sysio.opreg");
 
    check(!data.empty(), "delivery data cannot be empty");
+
+   // Enforce the protocol envelope cap on the inbound boundary, not just in the
+   // outbound `buildenv` packer: every outpost packs to the same 64 KiB cap, so
+   // an oversized delivery is malformed by construction. The generic chain
+   // ceilings (`max_inline_action_size` ~512 KiB, `max_kv_value_size` ~256 KiB)
+   // are far looser and would otherwise let an operator persist envelopes here
+   // that WIRE's own packer could never emit. Checked before decode/hash so the
+   // rejection costs as little CPU as possible.
+   check(data.size() <= MAX_ENVELOPE_BYTES, "inbound envelope exceeds MAX_ENVELOPE_BYTES");
 
    // Verify outpost exists on the new `sysio.chains::chains` table.
    // `chain_code` is the originating chain's slug_name value (uint64) per
