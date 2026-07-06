@@ -31,16 +31,16 @@ namespace sysio::underwriter_detail {
  * jitter. The window must exceed that jitter (plus scheduling slack) but stay
  * well under one epoch so underwriting never starts against stale state.
  *
- * @param head_time      The block timestamp to test — the caller's sync
+ * @param block_time     The block timestamp to test — the caller's sync
  *                       criterion (the underwriter feeds the LAST IRREVERSIBLE
  *                       block's time, since that is the state its reads serve).
  * @param now            Wall-clock now.
  * @param recency_window Maximum behind-now gap still considered synced.
- * @return True when `head_time >= now - recency_window`.
+ * @return True when `block_time >= now - recency_window`.
  */
-inline bool head_is_recent(fc::time_point head_time, fc::time_point now,
-                           fc::microseconds recency_window) {
-   return head_time >= now - recency_window;
+inline bool block_time_is_recent(fc::time_point block_time, fc::time_point now,
+                                 fc::microseconds recency_window) {
+   return block_time >= now - recency_window;
 }
 
 /// JSON field keys shared by the gate payloads below, the post-startup
@@ -84,6 +84,9 @@ enum class startup_state : uint8_t {
 /// post-startup response builders so the value has one authority beside the
 /// enum whose member spellings define the wire format.
 inline constexpr std::string_view active_status = magic_enum::enum_name(startup_state::active);
+// Compile-time wire-format pin: renaming the enum member would silently change
+// the HTTP `status` value every consumer switches on.
+static_assert(active_status == "active");
 
 /// `detail` carried by the {@link startup_state::preflight_failed} gate payload.
 inline constexpr std::string_view preflight_failed_detail =
@@ -102,12 +105,13 @@ inline constexpr std::string_view startup_failed_detail =
  * @brief The JSON body a `/v1/underwriter/...` endpoint answers with for `state`.
  *
  * Pure (unit-testable without a chain). Shape per state:
- *   - `waiting_for_sync` → `{"status":"waiting_for_sync","head_behind_sec":N,
- *     "lib_behind_sec":M}` — the gate's criterion is the IRREVERSIBLE state
- *     (`lib_behind_sec`); the head gap is reported alongside so a
+ *   - `waiting_for_sync` → `{"status":"waiting_for_sync","head_behind_sec":N
+ *     [,"lib_behind_sec":M]}` — the gate's criterion is the IRREVERSIBLE
+ *     state (`lib_behind_sec`); the head gap is reported alongside so a
  *     head-current-but-finality-stalled node is distinguishable from one
- *     still catching up. `lib_behind_sec` is -1 until an irreversible root
- *     exists (matching the startup wait log).
+ *     still catching up. `lib_behind_sec` is ABSENT until an irreversible
+ *     root exists: an in-band sentinel would collide with real negative
+ *     gaps (clock skew) after whole-second truncation.
  *   - `preflight_retrying` → `{"status":"preflight_retrying"}`
  *   - `preflight_failed` / `wiring_failed` / `startup_failed` →
  *     `{"status":...,"detail":...}`
@@ -116,11 +120,12 @@ inline constexpr std::string_view startup_failed_detail =
  *
  * @param state       The current deferred-startup lifecycle state.
  * @param head_behind How far the head trails wall-clock now; consumed only by
- *                    the `waiting_for_sync` payload (emitted in whole seconds).
+ *                    the `waiting_for_sync` payload (emitted in whole seconds;
+ *                    may be negative under clock skew).
  * @param lib_behind  How far the last-irreversible block trails wall-clock
- *                    now, or empty while no irreversible root exists yet
- *                    (emitted as -1, matching the startup wait log); consumed
- *                    only by the `waiting_for_sync` payload.
+ *                    now, or empty while no irreversible root exists yet (the
+ *                    key is then omitted); consumed only by the
+ *                    `waiting_for_sync` payload.
  * @return The response body as an `fc::variant`.
  */
 inline fc::variant startup_gate_payload(startup_state state, fc::microseconds head_behind,
@@ -129,7 +134,9 @@ inline fc::variant startup_gate_payload(startup_state state, fc::microseconds he
    body(field::status, std::string{magic_enum::enum_name(state)});
    if (state == startup_state::waiting_for_sync) {
       body(field::head_behind_sec, head_behind.to_seconds());
-      body(field::lib_behind_sec, lib_behind ? lib_behind->to_seconds() : -1);
+      if (lib_behind) {
+         body(field::lib_behind_sec, lib_behind->to_seconds());
+      }
    } else if (state == startup_state::preflight_failed) {
       body(field::detail, std::string{preflight_failed_detail});
    } else if (state == startup_state::wiring_failed) {

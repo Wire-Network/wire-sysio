@@ -14,6 +14,8 @@
 #include <boost/endian/conversion.hpp>
 #include <magic_enum/magic_enum.hpp>
 
+#include <cassert>
+
 #include <sysio/chain_plugin/chain_plugin.hpp>
 #include <sysio/chain/authorization_manager.hpp>
 #include <sysio/chain/controller.hpp>
@@ -246,7 +248,7 @@ struct underwriter_plugin::impl {
 
    /// Sync gate: `accepted_block` subscription that arms {@link run_deferred_startup}
    /// once the local irreversible state is current (see
-   /// `sync_detail.hpp::head_is_recent`). Disconnected after arming; reset on
+   /// `sync_detail.hpp::block_time_is_recent`). Disconnected after arming; reset on
    /// shutdown.
    std::optional<boost::signals2::scoped_connection> sync_gate_connection;
    /// When the sync gate armed — bounds the preflight retry grace window.
@@ -763,10 +765,19 @@ struct underwriter_plugin::impl {
       if (!chain.fork_db_has_root()) {
          return false;
       }
-      return underwriter_detail::head_is_recent(
+      return underwriter_detail::block_time_is_recent(
          chain.fork_db_root().block_time(), fc::time_point::now(),
          fc::milliseconds(underwriter_defaults::sync_recency_ms));
    }
+
+   /// What an exception escaping the deferred startup body does. The
+   /// synchronous `plugin_startup` path must ABORT node startup — fail-fast,
+   /// supervisor-visible; booting without underwriting would hide a broken
+   /// deployment behind one log line. Tasks posted after `exec()` is live
+   /// must CONTAIN the escape as a terminal gate state instead: unwinding
+   /// out of a posted task makes appbase `quit()` and tear down a node that
+   /// may be serving other roles.
+   enum class escape_policy : uint8_t { abort_on_escape, contain_escapes };
 
    /// Arm the deferred startup: runs AT MOST once (re-entry is guarded by
    /// {@link startup_attempted}), on the main thread (either directly from
@@ -774,13 +785,13 @@ struct underwriter_plugin::impl {
    /// `accepted_block` signal once it becomes synced). The body itself lives
    /// in {@link attempt_deferred_startup}, which may retry the preflight
    /// within a bounded grace.
-   void run_deferred_startup() {
+   void run_deferred_startup(escape_policy policy) {
       startup_armed_at = fc::time_point::now();
       // Release the gate slot; the callback already disconnected it before
       // posting, so this is an idempotent cleanup, not the load-bearing
       // disconnect.
       sync_gate_connection.reset();
-      attempt_deferred_startup();
+      attempt_deferred_startup(policy);
    }
 
    /// One attempt of the deferred startup body: preflight → outpost client
@@ -793,32 +804,42 @@ struct underwriter_plugin::impl {
    /// `preflight_retry_interval_ms` until the grace expires. Past the grace,
    /// a preflight failure on a synced chain remains a loud, terminal
    /// bootstrap bug — no cron job, no dev escape hatch — exactly as before.
-   void attempt_deferred_startup() {
+   void attempt_deferred_startup(escape_policy policy) {
       if (shutting_down) {
          return;
       }
-      // Contain every escape as a terminal, diagnosable gate state. This runs
-      // from tasks posted to the app executor (the sync-gate callback and the
-      // preflight retry timer) as well as directly from plugin_startup; an
-      // exception unwinding out of a posted task makes appbase quit() and
-      // tear down the whole node, with the gate still claiming
-      // waiting_for_sync. The expected preflight/wiring failures inside the
-      // body set their own more specific states; this catches what they
-      // don't (a throwing table decode in the preflight or registry read, a
-      // non-fc exception from client wiring, a cron add_job failure).
-      try {
+      if (policy == escape_policy::abort_on_escape) {
+         // Synchronous plugin_startup path: let an escape abort node startup
+         // (nodeop exits nonzero) exactly as before the sync gate existed.
          attempt_deferred_startup_body();
-      } catch (const fc::exception& e) {
-         gate_state = underwriter_detail::startup_state::startup_failed;
-         elog("underwriter_plugin: deferred startup failed unexpectedly: {}",
-              e.to_detail_string());
-      } catch (const std::exception& e) {
-         gate_state = underwriter_detail::startup_state::startup_failed;
-         elog("underwriter_plugin: deferred startup failed unexpectedly: {}", e.what());
-      } catch (...) {
-         gate_state = underwriter_detail::startup_state::startup_failed;
-         elog("underwriter_plugin: deferred startup failed unexpectedly (unknown exception)");
+      } else {
+         // Posted contexts (the sync-gate callback's task and the preflight
+         // retry timer): contain every escape as a terminal, diagnosable gate
+         // state — unwinding out of a posted task makes appbase quit() and
+         // tear down the whole node, with the gate still claiming
+         // waiting_for_sync. The expected preflight/wiring failures inside
+         // the body set their own more specific states; this catches what
+         // they don't (a throwing table decode in the preflight or registry
+         // read, a non-fc exception from client wiring, a cron add_job
+         // failure). FC_LOG_AND_DROP is the tree's containment idiom (see
+         // scan_cycle below) and deliberately rethrows
+         // boost::interprocess::bad_alloc — chainbase shared-memory
+         // exhaustion must stay fatal rather than linger as a gate state.
+         bool completed = false;
+         try {
+            attempt_deferred_startup_body();
+            completed = true;
+         } FC_LOG_AND_DROP("underwriter_plugin: deferred startup failed unexpectedly:");
+         if (!completed) {
+            gate_state = underwriter_detail::startup_state::startup_failed;
+         }
       }
+      // Tripwire for the {@link startup_attempted} derivation: every attempt
+      // that returns normally must have left `waiting_for_sync` — a future
+      // early return in the body before its first gate_state store would
+      // otherwise strand the node in undiagnosable limbo (gate connection
+      // already released, nothing left to re-arm).
+      assert(startup_attempted());
    }
 
    /// The deferred startup body proper — see {@link attempt_deferred_startup}
@@ -910,13 +931,15 @@ struct underwriter_plugin::impl {
          [this]() { scan_cycle(); },
          meta
       );
+      // Stored immediately after the job exists — anything thrown between a
+      // successful add_job and this store would otherwise leave the scan cron
+      // running while the gate reports a terminal failure. The
+      // `/v1/underwriter/*` endpoints (registered back in `plugin_startup`)
+      // switch from gate-state reporting to the real payloads here.
+      gate_state = underwriter_detail::startup_state::active;
 
       ilog("underwriter_plugin: scheduled scan (id={}, interval={}ms)",
            scan_job_id, scan_interval_ms);
-
-      // The `/v1/underwriter/*` endpoints (registered back in `plugin_startup`)
-      // switch from gate-state reporting to the real payloads.
-      gate_state = underwriter_detail::startup_state::active;
    }
 
    /// Re-run {@link attempt_deferred_startup} after one retry interval, on
@@ -935,9 +958,16 @@ struct underwriter_plugin::impl {
             return;
          }
          app().executor().post(appbase::priority::medium, [this]() {
-            if (!shutting_down) {
-               attempt_deferred_startup();
+            // Proceed only while the retry grace is the live state: a
+            // terminal state stored between the timer firing and this task
+            // running must stay terminal. Structural guard — today no such
+            // interleaving exists, but the terminal-stays-terminal invariant
+            // should not rest on statement order in schedule_preflight_retry.
+            if (shutting_down ||
+                gate_state.load() != underwriter_detail::startup_state::preflight_retrying) {
+               return;
             }
+            attempt_deferred_startup(escape_policy::contain_escapes);
          });
       });
    }
@@ -2740,7 +2770,10 @@ void underwriter_plugin::plugin_startup() {
    // remains no dev escape hatch.
    auto& chain = _impl->chain_plug->chain();
    if (_impl->chain_is_synced()) {
-      _impl->run_deferred_startup();
+      // Synchronous boot path: an escape aborts node startup (fail-fast,
+      // supervisor-visible) rather than booting with underwriting silently
+      // disabled.
+      _impl->run_deferred_startup(impl::escape_policy::abort_on_escape);
       return;
    }
 
@@ -2772,7 +2805,7 @@ void underwriter_plugin::plugin_startup() {
             if (_impl->startup_attempted() || _impl->shutting_down) {
                return;
             }
-            _impl->run_deferred_startup();
+            _impl->run_deferred_startup(impl::escape_policy::contain_escapes);
          });
       }));
 }
