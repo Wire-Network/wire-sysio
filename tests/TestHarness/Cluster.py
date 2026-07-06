@@ -67,6 +67,9 @@ class Cluster(object):
     __finalizerCatchupMaxLagBlocks=2
     __finalizerCatchupStableRounds=3
     __finalizerCatchupReportInterval=5
+    # Default generated-genesis CPU limits used by Cluster.launch.
+    __defaultMaxBlockCpuUsage=400000
+    __defaultMaxTransactionCpuUsage=375000
 
     # pylint: disable=too-many-arguments
     def __init__(self, localCluster=True, host="localhost", port=None, walletHost="localhost", walletPort=None
@@ -208,7 +211,8 @@ class Cluster(object):
                activateIF=False, biosFinalizer=True,
                signatureProviderForNonProducer=False,
                nodeopLogPath=Path(Utils.TestLogRoot) / Path(f'{Path(sys.argv[0]).stem}{os.getpid()}'), genesisPath=None,
-               maximumP2pPerHost=0, maximumClients=25, prodsEnableTraceApi=True):
+               maximumP2pPerHost=0, maximumClients=25, prodsEnableTraceApi=True,
+               maxBlockCpuUsage=None, maxTransactionCpuUsage=None):
         """Launch cluster.
         pnodes: producer nodes count
         unstartedNodes: non-producer nodes that are configured into the launch, but not started.  Should be included in totalNodes.
@@ -237,6 +241,8 @@ class Cluster(object):
         maximumP2pPerHost:  Maximum number of client nodes from any single IP address. Defaults to totalNodes if not set.
         maximumClients: Maximum number of clients from which connections are accepted, use 0 for no limit. Defaults to 25.
         prodsEnableTraceApi: Determines whether producer nodes should have sysio::trace_api_plugin enabled. Defaults to True.
+        maxBlockCpuUsage: Override generated genesis max_block_cpu_usage when genesisPath is not supplied.
+        maxTransactionCpuUsage: Override generated genesis max_transaction_cpu_usage when genesisPath is not supplied.
         """
         assert(isinstance(topo, str))
         assert PFSetupPolicy.isValid(pfSetupPolicy)
@@ -357,10 +363,14 @@ class Cluster(object):
             argsArr.append(nodeopArgs)
 
         if genesisPath is None:
+            if maxBlockCpuUsage is None:
+                maxBlockCpuUsage = Cluster.__defaultMaxBlockCpuUsage
+            if maxTransactionCpuUsage is None:
+                maxTransactionCpuUsage = Cluster.__defaultMaxTransactionCpuUsage
             argsArr.append("--max-block-cpu-usage")
-            argsArr.append(str(400000))
+            argsArr.append(str(maxBlockCpuUsage))
             argsArr.append("--max-transaction-cpu-usage")
-            argsArr.append(str(375000))
+            argsArr.append(str(maxTransactionCpuUsage))
         else:
             argsArr.append("--genesis")
             argsArr.append(str(genesisPath))
