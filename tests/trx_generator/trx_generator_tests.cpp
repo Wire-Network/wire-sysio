@@ -2,15 +2,161 @@
 #include <trx_generator.hpp>
 #include <http_client_async.hpp>
 #include <simple_rest_server.hpp>
+#include <test_port_shard.hpp>
+#include <sysio/net_plugin/protocol.hpp>
 
 #define BOOST_TEST_MODULE trx_generator_tests
 #include <boost/test/included/unit_test.hpp>
+
+#include <boost/asio/read.hpp>
+#include <boost/asio/write.hpp>
+
+#include <array>
+#include <cstdlib>
+#include <exception>
+#include <future>
+#include <optional>
+#include <stdexcept>
+#include <string>
+#include <thread>
 
 using namespace sysio;
 using namespace sysio::testing;
 using namespace std::literals::string_literals;
 
 static const char* api_name = "/v1/chain/test";
+
+namespace {
+/** Restore SYSIO_TEST_PORT_OFFSET after tests that exercise environment parsing. */
+class test_port_offset_env_guard {
+ public:
+   test_port_offset_env_guard() {
+      if(const char* value = std::getenv(test_port_offset_env_var))
+         _previous = value;
+   }
+
+   ~test_port_offset_env_guard() {
+      if(_previous)
+         setenv(test_port_offset_env_var, _previous->c_str(), 1);
+      else
+         unsetenv(test_port_offset_env_var);
+   }
+
+   /** Set the current process test port offset for this scoped test. */
+   void set(const char* value) const { setenv(test_port_offset_env_var, value, 1); }
+
+   /** Clear the current process test port offset for this scoped test. */
+   void clear() const { unsetenv(test_port_offset_env_var); }
+
+ private:
+   std::optional<std::string> _previous;
+};
+
+struct expected_port {
+   port_category category;
+   uint32_t      slot;
+   uint32_t      count;
+   uint16_t      unsharded_base;
+};
+
+constexpr std::array expected_ports{
+    expected_port{port_category::ship, compact_ship_slot, 1, 7899},
+    expected_port{port_category::state_history, compact_state_history_slot, 1, default_state_history_port},
+    expected_port{port_category::bios_http, compact_bios_http_slot, 1, 8788},
+    expected_port{port_category::bios_p2p, compact_bios_p2p_slot, 1, compact_bios_p2p_port},
+    expected_port{port_category::node_http, compact_http_slot, compact_http_last_port - compact_http_first_port + 1,
+                  compact_http_first_port},
+    expected_port{port_category::alternate_service, compact_alternate_service_slot, 1, 8976},
+    expected_port{port_category::plugin_http_peer, compact_plugin_http_peer_slot, 1, 9009},
+    expected_port{port_category::plugin_http_local, compact_plugin_http_local_slot, 1, 9011},
+    expected_port{port_category::alternate_p2p, compact_alternate_p2p_slot,
+                  compact_alternate_last_port - compact_alternate_first_port + 1, compact_alternate_first_port},
+    expected_port{port_category::p2p, compact_p2p_slot, compact_p2p_last_port - compact_p2p_first_port + 1,
+                  compact_p2p_first_port},
+    expected_port{port_category::wallet, compact_wallet_base_slot, wallet_port_count, compact_wallet_first_port},
+    expected_port{port_category::transaction_only, compact_transaction_only_slot, transaction_only_port_count,
+                  compact_transaction_only_first_port},
+    expected_port{port_category::ipv6_probe, compact_ipv6_probe_slot,
+                  compact_ipv6_probe_last_port - compact_ipv6_probe_first_port + 1, compact_ipv6_probe_first_port}};
+
+constexpr int16_t expected_trx_generator_handshake_generation = 1;
+constexpr int16_t expected_trx_generator_response_handshake_generation = 2;
+constexpr std::string_view expected_trx_generator_chain_id = "999";
+constexpr std::string_view expected_trx_generator_p2p_address = "127.0.0.1:0:trx";
+constexpr std::string_view expected_trx_generator_lib_id =
+      "00000062989f69fd251df3e0b274c3364ffc2f4fce73de3f1c7b5e11a4c92f21";
+constexpr std::string_view expected_trx_generator_peer_lib_id =
+      "00000063989f69fd251df3e0b274c3364ffc2f4fce73de3f1c7b5e11a4c92f21";
+constexpr std::string_view expected_trx_generator_peer_head_id =
+      "00000064989f69fd251df3e0b274c3364ffc2f4fce73de3f1c7b5e11a4c92f21";
+constexpr std::string_view expected_trx_generator_peer_p2p_address = "127.0.0.1:0";
+constexpr std::string_view expected_trx_generator_peer_agent = "nodeop";
+constexpr std::string_view expected_trx_generator_peer_node_id_seed = "trx_generator_test_peer";
+constexpr int64_t expected_trx_generator_peer_time_xmt = 42;
+
+struct p2p_provider_exchange {
+   net_message initial_handshake;
+   net_message handshake_response;
+   net_message time_response;
+};
+
+/** Reads one framed net_message from a test P2P socket. */
+static net_message read_test_net_message(boost::asio::ip::tcp::socket& socket) {
+   uint32_t payload_size = 0;
+   boost::asio::read(socket, boost::asio::buffer(&payload_size, sizeof(payload_size)));
+
+   std::vector<char> payload(payload_size);
+   boost::asio::read(socket, boost::asio::buffer(payload));
+
+   fc::datastream<const char*> ds(payload.data(), payload.size());
+   net_message msg;
+   fc::raw::unpack(ds, msg);
+   if (ds.remaining() != 0) {
+      throw std::runtime_error("framed net_message has trailing bytes");
+   }
+   return msg;
+}
+
+/** Writes one framed net_message to a test P2P socket. */
+template<typename Message>
+static void write_test_net_message(boost::asio::ip::tcp::socket& socket, const Message& message) {
+   const net_message net_msg{message};
+   const uint32_t payload_size = fc::raw::pack_size(net_msg);
+   const size_t buffer_size = sizeof(payload_size) + payload_size;
+   std::vector<char> buffer(buffer_size);
+   fc::datastream<char*> ds(buffer.data(), buffer.size());
+   ds.write(reinterpret_cast<const char*>(&payload_size), sizeof(payload_size));
+   fc::raw::pack(ds, net_msg);
+   boost::asio::write(socket, boost::asio::buffer(buffer));
+}
+
+/** Builds a peer heartbeat handshake carrying fresh chain head state. */
+static handshake_message make_test_peer_handshake(const chain::chain_id_type& chain_id,
+                                                  const chain::block_id_type& fork_db_root_id,
+                                                  const chain::block_id_type& fork_db_head_id) {
+   handshake_message handshake;
+   handshake.network_version = wire_protocol_base_version;
+   handshake.chain_id = chain_id;
+   handshake.node_id = fc::sha256::hash(std::string(expected_trx_generator_peer_node_id_seed));
+   handshake.fork_db_root_id = fork_db_root_id;
+   handshake.fork_db_head_id = fork_db_head_id;
+   handshake.chain_head_id = fork_db_head_id;
+   handshake.generation = expected_trx_generator_handshake_generation;
+   handshake.p2p_address = std::string(expected_trx_generator_peer_p2p_address);
+   handshake.agent = std::string(expected_trx_generator_peer_agent);
+   return handshake;
+}
+
+/** Builds a minimal signed transaction that can be packed for provider transport tests. */
+static chain::signed_transaction make_test_signed_transaction() {
+   chain::signed_transaction trx;
+   trx.expiration = fc::time_point_sec(fc::time_point::now() + fc::seconds(30));
+   trx.actions.emplace_back(std::vector<chain::permission_level>{}, chain::name("sysio"), chain::name("noop"),
+                            chain::bytes{});
+   return trx;
+}
+
+} // namespace
 
 namespace http = boost::beast::http;
 struct echo_server_impl : rest::simple_server<echo_server_impl> {
@@ -366,11 +512,59 @@ BOOST_AUTO_TEST_CASE(tps_cant_keep_up_monitored)
    BOOST_REQUIRE_LT(generator->_calls.size(), expected_trxs);
 }
 
+BOOST_AUTO_TEST_CASE(test_port_shard_unsharded_defaults)
+{
+   test_port_offset_env_guard env;
+   env.clear();
+
+   for(const auto& expected : expected_ports) {
+      BOOST_REQUIRE_EQUAL(get_port(expected.category), expected.unsharded_base);
+      BOOST_REQUIRE_EQUAL(get_port(expected.category, expected.count - 1),
+                          expected.unsharded_base + expected.count - 1);
+   }
+}
+
+BOOST_AUTO_TEST_CASE(test_port_shard_sharded_offsets)
+{
+   test_port_offset_env_guard env;
+   env.set("100");
+
+   constexpr uint32_t offset = 100;
+   for(const auto& expected : expected_ports) {
+      BOOST_REQUIRE_EQUAL(get_port(expected.category), compact_shard_anchor_port + offset + expected.slot);
+      BOOST_REQUIRE_EQUAL(get_port(expected.category, expected.count - 1),
+                          compact_shard_anchor_port + offset + expected.slot + expected.count - 1);
+   }
+}
+
+BOOST_AUTO_TEST_CASE(test_port_shard_rejects_invalid_indices)
+{
+   test_port_offset_env_guard env;
+   env.set("100");
+
+   for(const auto& expected : expected_ports) {
+      BOOST_REQUIRE_THROW(get_port(expected.category, expected.count), std::runtime_error);
+   }
+}
+
+BOOST_AUTO_TEST_CASE(test_port_shard_rejects_invalid_offsets)
+{
+   test_port_offset_env_guard env;
+
+   for(const char* value : {"-1", "+1", " 1", "1 ", "1_000"}) {
+      env.set(value);
+      BOOST_REQUIRE_THROW(test_port_offset(), std::runtime_error);
+   }
+
+   env.set("60000");
+   BOOST_REQUIRE_THROW(get_port(port_category::ipv6_probe, 3), std::runtime_error);
+}
+
 BOOST_AUTO_TEST_CASE(trx_generator_constructor)
 {
    trx_generator_base_config tg_config{1, chain::chain_id_type("999"), chain::name("sysio"), fc::seconds(3600),
                                        fc::variant("00000062989f69fd251df3e0b274c3364ffc2f4fce73de3f1c7b5e11a4c92f21").as<chain::block_id_type>(), ".", true};
-   provider_base_config p_config{"p2p", "127.0.0.1", 9876};
+   provider_base_config p_config{"p2p", "127.0.0.1", get_port(port_category::p2p)};
    const std::string abi_file = "../../contracts/sysio.token/sysio.token.abi";
    const std::string actions_data = "[{\"actionAuthAcct\": \"testacct1\",\"actionName\": \"transfer\",\"authorization\": {\"actor\": \"testacct1\",\"permission\": \"active\"},"
                                     "\"actionData\": {\"from\": \"testacct1\",\"to\": \"testacct2\",\"quantity\": \"0.0001 CUR\",\"memo\": \"transaction specified\"}}]";
@@ -379,6 +573,154 @@ BOOST_AUTO_TEST_CASE(trx_generator_constructor)
    user_specified_trx_config trx_config{abi_file, actions_data, action_auths};
 
    auto generator = std::make_shared<trx_generator>(tg_config, p_config, trx_config);
+}
+
+/// Verifies the P2P provider sends a valid session handshake and answers peer heartbeat messages.
+BOOST_AUTO_TEST_CASE(p2p_provider_sends_handshake_on_setup)
+{
+   boost::asio::io_context io;
+   boost::asio::ip::tcp::acceptor acceptor(io, {boost::asio::ip::tcp::v4(), 0});
+   const uint16_t port = acceptor.local_endpoint().port();
+
+   const chain::chain_id_type chain_id{std::string(expected_trx_generator_chain_id)};
+   const auto lib_id = fc::variant(std::string(expected_trx_generator_lib_id)).as<chain::block_id_type>();
+   const auto peer_lib_id = fc::variant(std::string(expected_trx_generator_peer_lib_id)).as<chain::block_id_type>();
+   const auto peer_head_id = fc::variant(std::string(expected_trx_generator_peer_head_id)).as<chain::block_id_type>();
+
+   std::promise<p2p_provider_exchange> exchange_promise;
+   auto exchange_future = exchange_promise.get_future();
+   std::thread server([&]() {
+      boost::asio::ip::tcp::socket socket(io);
+      acceptor.accept(socket);
+
+      auto initial_handshake = read_test_net_message(socket);
+
+      write_test_net_message(socket, make_test_peer_handshake(chain_id, peer_lib_id, peer_head_id));
+      auto handshake_response = read_test_net_message(socket);
+
+      time_message ping;
+      ping.xmt = expected_trx_generator_peer_time_xmt;
+      write_test_net_message(socket, ping);
+      auto time_response = read_test_net_message(socket);
+
+      exchange_promise.set_value(
+            {std::move(initial_handshake), std::move(handshake_response), std::move(time_response)});
+   });
+
+   provider_base_config p_config{"p2p", "127.0.0.1", port};
+   trx_provider provider{p_config};
+
+   provider.setup(chain_id, lib_id);
+   auto exchange = exchange_future.get();
+   BOOST_CHECK(provider.reference_block_id(lib_id) == peer_lib_id);
+   provider.teardown();
+   server.join();
+
+   const auto* handshake = std::get_if<handshake_message>(&exchange.initial_handshake);
+   BOOST_REQUIRE(handshake != nullptr);
+   BOOST_CHECK_EQUAL(handshake->network_version, wire_protocol_base_version);
+   BOOST_CHECK(handshake->chain_id == chain_id);
+   BOOST_CHECK(handshake->fork_db_root_id == lib_id);
+   BOOST_CHECK(handshake->fork_db_head_id == lib_id);
+   BOOST_CHECK(handshake->chain_head_id == lib_id);
+   BOOST_CHECK_EQUAL(handshake->generation, expected_trx_generator_handshake_generation);
+   BOOST_CHECK_EQUAL(handshake->p2p_address, std::string(expected_trx_generator_p2p_address));
+   BOOST_CHECK_EQUAL(handshake->agent, std::string(trx_generator_agent));
+   BOOST_CHECK(!handshake->node_id.empty());
+
+   const auto* response_handshake = std::get_if<handshake_message>(&exchange.handshake_response);
+   BOOST_REQUIRE(response_handshake != nullptr);
+   BOOST_CHECK_EQUAL(response_handshake->network_version, wire_protocol_base_version);
+   BOOST_CHECK(response_handshake->chain_id == chain_id);
+   BOOST_CHECK(response_handshake->node_id == handshake->node_id);
+   BOOST_CHECK(response_handshake->fork_db_root_id == peer_lib_id);
+   BOOST_CHECK(response_handshake->fork_db_head_id == peer_head_id);
+   BOOST_CHECK(response_handshake->chain_head_id == peer_head_id);
+   BOOST_CHECK_EQUAL(response_handshake->generation, expected_trx_generator_response_handshake_generation);
+   BOOST_CHECK_EQUAL(response_handshake->p2p_address, std::string(expected_trx_generator_p2p_address));
+   BOOST_CHECK_EQUAL(response_handshake->agent, std::string(trx_generator_agent));
+
+   const auto* time_response = std::get_if<time_message>(&exchange.time_response);
+   BOOST_REQUIRE(time_response != nullptr);
+   BOOST_CHECK_EQUAL(time_response->org, expected_trx_generator_peer_time_xmt);
+   BOOST_CHECK_GT(time_response->rec, 0);
+   BOOST_CHECK_GT(time_response->xmt, 0);
+   BOOST_CHECK_EQUAL(time_response->dst, trx_generator_empty_time_message_timestamp);
+}
+
+/// Verifies a failed P2P transaction write is not counted as a successful acknowledgement.
+BOOST_AUTO_TEST_CASE(p2p_provider_write_failure_does_not_ack_transaction)
+{
+   boost::asio::io_context io;
+   boost::asio::ip::tcp::acceptor acceptor(io, {boost::asio::ip::tcp::v4(), 0});
+   const uint16_t port = acceptor.local_endpoint().port();
+
+   const chain::chain_id_type chain_id{std::string(expected_trx_generator_chain_id)};
+   const auto lib_id = fc::variant(std::string(expected_trx_generator_lib_id)).as<chain::block_id_type>();
+
+   std::promise<void> handshake_received_promise;
+   auto handshake_received = handshake_received_promise.get_future();
+   std::thread server([&]() {
+      try {
+         boost::asio::ip::tcp::socket socket(io);
+         acceptor.accept(socket);
+         (void)read_test_net_message(socket);
+         handshake_received_promise.set_value();
+      } catch (...) {
+         handshake_received_promise.set_exception(std::current_exception());
+      }
+   });
+
+   provider_base_config p_config{"p2p", "127.0.0.1", port};
+   p2p_connection connection{p_config};
+   connection.init_and_connect(chain_id, lib_id);
+   std::exception_ptr unexpected_server_exception;
+   try {
+      handshake_received.get();
+   } catch (...) {
+      unexpected_server_exception = std::current_exception();
+   }
+
+   if (unexpected_server_exception) {
+      connection.cleanup_and_disconnect();
+      server.join();
+      std::rethrow_exception(unexpected_server_exception);
+   }
+
+   boost::asio::post(connection._strand, [&connection]() {
+      boost::system::error_code ec;
+      connection._p2p_socket.close(ec);
+   });
+
+   auto trx = make_test_signed_transaction();
+   const auto trx_id = trx.id();
+   const chain::packed_transaction packed_trx{trx};
+   std::exception_ptr unexpected_send_exception;
+   try {
+      connection.send_transaction(packed_trx);
+   } catch (...) {
+      unexpected_send_exception = std::current_exception();
+   }
+   connection.cleanup_and_disconnect();
+   server.join();
+
+   if (unexpected_send_exception) {
+      std::rethrow_exception(unexpected_send_exception);
+   }
+
+   BOOST_CHECK_EQUAL(connection._sent.load(), 1);
+   BOOST_CHECK_EQUAL(connection._sent_callback_num.load(), 0);
+   BOOST_CHECK_EQUAL(connection._errors.load(), 1);
+
+   {
+      std::lock_guard<std::mutex> lock(connection._trx_ack_map_lock);
+      BOOST_CHECK(connection._trxs_ack_time_map.find(trx_id) == connection._trxs_ack_time_map.end());
+   }
+   BOOST_CHECK_THROW(connection.throw_if_unhealthy(), std::runtime_error);
+
+   auto next_trx = make_test_signed_transaction();
+   const chain::packed_transaction next_packed_trx{next_trx};
+   BOOST_CHECK_THROW(connection.send_transaction(next_packed_trx), std::runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE(account_name_generator_tests)
@@ -488,7 +830,7 @@ BOOST_AUTO_TEST_CASE(account_name_generator_tests)
 BOOST_AUTO_TEST_CASE(simple_http_client_async_test) {
 
    const std::string host     = "127.0.0.1"s;
-   constexpr unsigned short     port     = 8888;
+   const unsigned short port = get_port(port_category::node_http);
 
    // Start Server
    echo_server_impl               server = echo_server_impl();

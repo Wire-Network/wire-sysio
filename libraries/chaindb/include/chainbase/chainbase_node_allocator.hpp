@@ -55,8 +55,21 @@ namespace chainbase {
       }
 
       void preallocate(std::size_t num) {
-         if (num >= 2 * _allocation_batch_size)
-            get_some((num + 7) & ~7);
+         // Account for capacity already on hand -- the freelist plus the unconsumed remnant of the
+         // current block -- and only carve what is still missing, when it is worth a bulk
+         // allocation. get_some() overwrites the block pointers, so the remnant is pushed onto the
+         // freelist first rather than stranded (it stays reachable for future allocations).
+         const std::size_t on_hand = _freelist_size + (_block_end - _block_start) / sizeof(T);
+         if (num <= on_hand)
+            return;
+         const std::size_t needed = num - on_hand;
+         if (needed < 2 * _allocation_batch_size)
+            return;
+         while (_block_start < _block_end) {
+            deallocate(pointer{static_cast<T*>(static_cast<void*>(_block_start.get()))}, 1);
+            _block_start += sizeof(T);
+         }
+         get_some((needed + 7) & ~7);
       }
 
       bool operator==(const chainbase_node_allocator& other) const { return this == &other; }

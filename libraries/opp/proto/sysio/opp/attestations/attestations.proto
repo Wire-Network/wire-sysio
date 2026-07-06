@@ -18,12 +18,15 @@ option cc_enable_arenas = true;
 message ReserveBalanceSheet {
   // Chain identifier (codename) on which these reserves live.
   uint64 chain_code = 1;
-  // One TokenAmount per reserve being reported. The matching reserve_code
-  // for each entry is at the same index in `reserve_codes` — this lets the
-  // depot disambiguate when a single (chain, token) pair has multiple
-  // reserves.
-  repeated sysio.opp.types.TokenAmount amounts        = 2;
-  repeated uint64                      reserve_codes  = 3;
+  // (fields 2-3 retired — the parallel `amounts[]` / `reserve_codes[]`
+  //  arrays were replaced by the self-describing `reserves` entries.)
+  reserved 2, 3;
+  reserved "amounts", "reserve_codes";
+  // One `ReserveAmount` per reserve being reported. Each entry is
+  // self-describing — (chain_code, reserve_code, token + amount) — and the
+  // amount is in the depot's canonical 9-decimal frame (the outpost
+  // converts chain-native units at the boundary; see `ReserveAmount`).
+  repeated sysio.opp.types.ReserveAmount reserves = 4;
 }
 
 // ---------------------------------------------------------------------------
@@ -99,8 +102,9 @@ message OperatorAction {
   // on log-only failure paths; empty otherwise.
   string                           reason      = 8;
   // SLASH-only — identifies WHICH reserve on (chain, token) receives the
-  // seized funds. The outpost routes via `ReserveTarget`. Empty (0) for
-  // non-SLASH action types.
+  // seized funds; (chain_code, reserve_code, amount) assemble into a
+  // `ReserveAmount` for the outpost's routing. Empty (0) for non-SLASH
+  // action types.
   uint64                           reserve_code = 9;
 }
 
@@ -116,6 +120,26 @@ message ReserveDisbursement {
   sysio.opp.types.ChainAddress             actor     = 1;
   sysio.opp.types.TokenAmount              amount    = 2;
   repeated sysio.opp.types.ChainSignature  signature = 3;
+}
+
+// ---------------------------------------------------------------------------
+//  Node owner registration
+// ---------------------------------------------------------------------------
+
+// Node owner registration via ERC1155 NFT deposit on an external chain.
+message NodeOwnerRegistration {
+  sysio.opp.types.ChainAddress actor          = 1;  // Depositor's ETH address (for reference)
+  bytes                        actor_pub_key  = 2;  // Depositor's full ETH public key (for on-chain verification)
+  sysio.opp.types.WireAccount  account        = 3;  // Wire account to register; created in-flow with wire_pub_key if it does not yet exist
+  uint32                       tier           = 4;  // Node owner tier: 1, 2, or 3
+  sysio.opp.types.ChainAddress token_contract = 5;  // ERC1155 contract address
+  uint64                       token_id       = 6;  // NFT token ID
+  uint64                       token_amount   = 7;  // ERC1155 token amount
+  uint64                       timestamp      = 8;  // Deposit block timestamp (seconds)
+  // Wire account owner/active key: key_type names the Wire public_key variant (K1/R1/WA/EM/ED/BLS)
+  // and `key` is the raw key bytes (no variant-index prefix). The depot builds the on-chain
+  // sysio::public_key from (key_type, key).
+  sysio.opp.types.WireKey      wire_pub_key   = 9;
 }
 
 // ---------------------------------------------------------------------------
@@ -149,12 +173,14 @@ message SwapRequest {
   uint64                       target_token_code  = 6;
   uint64                       target_reserve_code = 7;
   sysio.opp.types.ChainAddress recipient    = 8;
-  // Target destination amount at deposit time, in destination-chain token units.
-  // The user expresses the minimum they accept; the depot's variance check
-  // compares the live `swapquote` output against this and rejects if drift
-  // exceeds `target_tolerance_bps`. The user need not have fetched a quote
-  // before submitting — they may be arbitraging, guessing, or simply naming
-  // a preferred minimum.
+  // Target destination amount at deposit time, in the depot's canonical
+  // 9-decimal frame (the SAME frame as `source_amount`; the outpost converts
+  // chain-native units at the boundary). This is the EXACT amount the recipient
+  // receives — never less — provided the depot's live POST-FEE `swapquote` is
+  // within `target_tolerance_bps` of it; if the quote has drifted outside that
+  // tolerance the swap is reverted (SwapRevert) rather than under-filled. The
+  // user need not have fetched a quote before submitting (they may be
+  // arbitraging or simply naming a preferred amount).
   uint64                       target_amount             = 9;
   // Variance tolerance in basis points (e.g. 50 = 0.5%).
   uint32                       target_tolerance_bps      = 10;
@@ -175,7 +201,6 @@ message UnderwriteIntentCommit {
   sysio.opp.types.WireAccount     uw_account        = 1;
   sysio.opp.types.ChainAddress    uw_ext_chain_addr = 2;
   uint64                          uw_request_id     = 3;
-  uint64                          outpost_id        = 4;
   bytes                           signature         = 5;
   uint64                          token_code        = 6;
   uint64                          chain_code        = 7;
@@ -206,15 +231,9 @@ message SwapRemit {
   uint64                       reserve_code         = 7;
 }
 
-// Swap-payout rejection (destination Outpost -> Depot).
-message SwapRejected {
-  bytes                        original_swap_remit_id = 1;
-  sysio.opp.types.ChainAddress recipient              = 2;
-  sysio.opp.types.TokenAmount  unremitted_amount      = 3;
-  string                       reason                 = 4;
-  uint64                       chain_code             = 5;
-  uint64                       reserve_code           = 6;
-}
+// SwapRejected (destination Outpost -> Depot) was here — REMOVED. Every REMIT is
+// depot-initiated against a verified reserve ledger, so the destination outpost can
+// always pay; there is no post-underwriting rejection path (enum slot 60957 retired).
 
 // ---------------------------------------------------------------------------
 //  Challenge attestations
@@ -281,13 +300,13 @@ message NodeOwnerReg {
 // reward period.
 //
 // Emitted by an outpost when a staker's slice of a validator-reward
-// distribution has been computed. `sysio.msgch` routes it two ways: the
-// aggregate native amount credits the outpost-side reserve
-// (`sysio.reserv::onreward`, keeps `swapquote` solvent), and the per-staker
-// body is dispatched to `sysio.cap::onreward`, which prices native -> WIRE off
-// the reserve and credits the staker's claim ledger (`pending_claims` if the
-// staker has an AuthX-linked WIRE account, otherwise parked in
-// `unmapped_tokens` keyed by the native address until they link).
+// distribution has been computed. The amount arrives already
+// WIRE-denominated; the native -> WIRE conversion and the per-staker
+// proration are done outpost-side. `sysio.msgch` dispatches the per-staker
+// body to `sysio.dclaim::onreward`, which credits the staker's claim ledger
+// directly without re-splitting (`pending_claims` if the staker has an
+// AuthX-linked WIRE account, otherwise parked in `unmapped_tokens` keyed by
+// the native address until they link).
 message StakingReward {
   // Chain code emitting the reward — identifies the (chain, validator) context.
   uint64                       chain_code = 1;
@@ -307,7 +326,9 @@ message StakingReward {
   // dedupes and rolls up against it and rejects anything at or below the last
   // processed value, so no per-period history is retained (data-leak safe).
   uint64                       external_epoch_ref = 5;
-  // Absolute reward amount + token kind being credited (native-denominated).
+  // Absolute reward amount being credited, already WIRE-denominated: the outpost
+  // does the native -> WIRE conversion and source-chain precision scaling, so the
+  // depot credits reward_amount.amount as WIRE directly.
   sysio.opp.types.TokenAmount  reward_amount = 6;
   // The staker's native (ETH / SOL / ...) address — the address they staked
   // from. Always populated so a not-yet-linked staker's reward can be parked
@@ -355,15 +376,39 @@ message AttestationProcessingError {
 
 // Outpost -> Depot. Open a new PENDING reserve.
 message ReserveCreate {
-  uint64                       chain_code             = 1;   // the outpost's own chain
-  uint64                       token_code             = 2;
-  uint64                       reserve_code           = 3;
-  string                       name                   = 4;
-  string                       description            = 5;
-  uint64                       external_token_amount  = 6;
-  uint64                       requested_wire_amount  = 7;
-  uint32                       connector_weight_bps   = 8;
-  sysio.opp.types.ChainAddress creator_addr           = 9;   // refund target on cancel
+  // (fields 1-3 + 6 retired — the reserve identity and the custodied
+  //  amount now travel together in `external_amount`, see below.)
+  reserved 1, 2, 3, 6;
+  reserved "chain_code", "token_code", "reserve_code", "external_token_amount";
+  string                        name                   = 4;
+  string                        description            = 5;
+  uint64                        requested_wire_amount  = 7;
+  uint32                        connector_weight_bps   = 8;   // Bancor WIRE-side weight in bps (1..9999); 10000 is rejected by oncrtreserve (zero token-side weight = dead reserve).
+  sysio.opp.types.ChainAddress  creator_addr           = 9;   // refund target on cancel
+  // Private reserves restrict swap counterparts to reserve_codes owned by the
+  // same WIRE account (ownership = the authex-linked account that matches).
+  // Immutable after create.
+  bool                          is_private             = 10;
+  // The creator's chain public key, used by the depot to resolve the creator's
+  // authex link (`sysio.authex::links.bypubkey`). EVM chains: REQUIRED — the
+  // 33-byte compressed secp256k1 key, verified on-outpost to derive to
+  // msg.sender (a 20-byte EVM address cannot be reverse-mapped to a key).
+  // SVM chains: may be empty — `creator_addr.address` already IS the signer's
+  // 32-byte ed25519 public key and the depot falls back to it.
+  bytes                         creator_pub_key        = 11;
+  // Reserve identity — (chain_code = the outpost's own chain, reserve_code,
+  // amount.token_code) — plus the custodied external-token amount, in the
+  // depot's canonical 9-decimal frame. The outpost converts its chain-native
+  // escrow units at the boundary (EVM `PrecisionLib.toDepot`, SVM
+  // `precision::to_depot`) exactly like the swap paths; the outpost's LOCAL
+  // reserve record keeps the raw chain-native amount for refunds.
+  sysio.opp.types.ReserveAmount external_amount        = 12;
+  // Depot-frame decimal precision of the reserve's source token side = min(native, 9):
+  // the outpost downscales anything above the 9-dec frame cap at its boundary
+  // and reports the frame precision it used here, so the depot's reserve row is
+  // self-describing and never assumes 9. The WIRE/target side is always the WIRE
+  // token's 9 (WIRE_PRECISION), so it is not carried.
+  uint32                        source_token_precision = 13;
 }
 
 // Outpost -> Depot. Creator cancels their PENDING reserve.

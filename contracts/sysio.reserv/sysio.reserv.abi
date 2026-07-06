@@ -18,6 +18,70 @@
             ]
         },
         {
+            "name": "applyfromwire",
+            "base": "",
+            "fields": [
+                {
+                    "name": "dst_chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "dst_token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "dst_reserve_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "wire_in",
+                    "type": "uint64"
+                },
+                {
+                    "name": "dst_amount",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "applyswap",
+            "base": "",
+            "fields": [
+                {
+                    "name": "src_chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "src_token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "src_reserve_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "src_amount",
+                    "type": "uint64"
+                },
+                {
+                    "name": "dst_chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "dst_token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "dst_reserve_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "dst_amount",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "debit",
             "base": "",
             "fields": [
@@ -36,6 +100,16 @@
                 {
                     "name": "amount",
                     "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "drainrewards",
+            "base": "",
+            "fields": [
+                {
+                    "name": "amount",
+                    "type": "int64"
                 }
             ]
         },
@@ -124,6 +198,10 @@
                     "type": "uint64"
                 },
                 {
+                    "name": "source_token_precision",
+                    "type": "uint32"
+                },
+                {
                     "name": "connector_weight_bps",
                     "type": "uint32"
                 },
@@ -134,61 +212,57 @@
                 {
                     "name": "creator_chain_addr",
                     "type": "bytes"
+                },
+                {
+                    "name": "is_private",
+                    "type": "bool"
+                },
+                {
+                    "name": "creator_pub_key",
+                    "type": "bytes"
                 }
             ]
         },
         {
-            "name": "onreject",
+            "name": "paywire",
             "base": "",
             "fields": [
                 {
-                    "name": "original_swap_remit_id",
-                    "type": "checksum256"
-                },
-                {
-                    "name": "chain_code",
+                    "name": "src_chain_code",
                     "type": "slug_name"
                 },
                 {
-                    "name": "token_code",
+                    "name": "src_token_code",
                     "type": "slug_name"
                 },
                 {
-                    "name": "reserve_code",
+                    "name": "src_reserve_code",
                     "type": "slug_name"
                 },
                 {
-                    "name": "unremitted_amount",
+                    "name": "src_amount",
                     "type": "uint64"
                 },
                 {
-                    "name": "recipient_address",
-                    "type": "bytes"
+                    "name": "recipient",
+                    "type": "name"
                 },
                 {
-                    "name": "reason",
-                    "type": "string"
+                    "name": "wire_out",
+                    "type": "uint64"
                 }
             ]
         },
         {
-            "name": "onreward",
+            "name": "refundwire",
             "base": "",
             "fields": [
                 {
-                    "name": "chain_code",
-                    "type": "slug_name"
+                    "name": "recipient",
+                    "type": "name"
                 },
                 {
-                    "name": "token_code",
-                    "type": "slug_name"
-                },
-                {
-                    "name": "reserve_code",
-                    "type": "slug_name"
-                },
-                {
-                    "name": "outpost_amount",
+                    "name": "wire_amount",
                     "type": "uint64"
                 }
             ]
@@ -226,8 +300,20 @@
                     "type": "uint64"
                 },
                 {
+                    "name": "source_token_precision",
+                    "type": "uint32"
+                },
+                {
                     "name": "connector_weight_bps",
                     "type": "uint32"
+                },
+                {
+                    "name": "is_private",
+                    "type": "bool"
+                },
+                {
+                    "name": "owner",
+                    "type": "name"
                 }
             ]
         },
@@ -286,6 +372,10 @@
                     "type": "uint64"
                 },
                 {
+                    "name": "source_token_precision",
+                    "type": "uint32"
+                },
+                {
                     "name": "connector_weight_bps",
                     "type": "uint32"
                 },
@@ -311,6 +401,37 @@
                 },
                 {
                     "name": "cancelled_at_ms",
+                    "type": "uint64"
+                },
+                {
+                    "name": "is_private",
+                    "type": "bool"
+                },
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "creator_pub_key",
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "rewardbal",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "rewards_bucket",
+            "base": "",
+            "fields": [
+                {
+                    "name": "balance",
+                    "type": "uint64"
+                },
+                {
+                    "name": "lifetime_accrued",
                     "type": "uint64"
                 }
             ]
@@ -362,8 +483,23 @@
     ],
     "actions": [
         {
+            "name": "applyfromwire",
+            "type": "applyfromwire",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "applyswap",
+            "type": "applyswap",
+            "ricardian_contract": ""
+        },
+        {
             "name": "debit",
             "type": "debit",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "drainrewards",
+            "type": "drainrewards",
             "ricardian_contract": ""
         },
         {
@@ -382,18 +518,23 @@
             "ricardian_contract": ""
         },
         {
-            "name": "onreject",
-            "type": "onreject",
+            "name": "paywire",
+            "type": "paywire",
             "ricardian_contract": ""
         },
         {
-            "name": "onreward",
-            "type": "onreward",
+            "name": "refundwire",
+            "type": "refundwire",
             "ricardian_contract": ""
         },
         {
             "name": "regreserve",
             "type": "regreserve",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "rewardbal",
+            "type": "rewardbal",
             "ricardian_contract": ""
         },
         {
@@ -422,11 +563,23 @@
                     "table_id": 46081
                 }
             ]
+        },
+        {
+            "name": "rewardbkt",
+            "type": "rewards_bucket",
+            "index_type": "i64",
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 15326
         }
     ],
     "ricardian_clauses": [],
     "variants": [],
     "action_results": [
+        {
+            "name": "rewardbal",
+            "result_type": "uint64"
+        },
         {
             "name": "swapquote",
             "result_type": "uint64"

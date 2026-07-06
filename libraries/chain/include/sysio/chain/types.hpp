@@ -24,6 +24,8 @@
 #include <deque>
 #include <cstdint>
 #include <functional>
+#include <type_traits>
+#include <utility>
 
 #define OBJECT_CTOR1(NAME) \
     public: \
@@ -539,6 +541,71 @@ namespace sysio::chain {
    template<typename T>
    using next_function_variant = std::variant<fc::exception_ptr, T, std::function<t_or_exception<T>()>>;
 
+   namespace detail {
+      /**
+       * @brief Move-only callable storage for standard libraries without std::move_only_function.
+       *
+       * libc++ versions shipped with current AppleClang do not always provide the C++23
+       * std::move_only_function API. This wrapper preserves the same move-only capture support
+       * needed by next_function without requiring that library feature.
+       *
+       * This is intentionally a narrow polyfill for next_function's current
+       * `void(T&&)` storage shape, not a general std::move_only_function
+       * replacement. If next_function starts storing another callable
+       * signature, extend this wrapper alongside that change.
+       */
+      template<typename Signature>
+      class move_only_function;
+
+      template<typename Arg>
+      class move_only_function<void(Arg&&)> {
+      public:
+         move_only_function() = default;
+         move_only_function(std::nullptr_t) noexcept {}
+
+         template<typename F>
+            requires (!std::is_same_v<std::decay_t<F>, move_only_function> &&
+                      std::is_invocable_r_v<void, std::decay_t<F>&, Arg&&>)
+         move_only_function(F&& f)
+            : _callable(std::make_unique<callable<std::decay_t<F>>>(std::forward<F>(f))) {}
+
+         move_only_function(move_only_function&&) noexcept = default;
+         move_only_function& operator=(move_only_function&&) noexcept = default;
+         move_only_function(const move_only_function&) = delete;
+         move_only_function& operator=(const move_only_function&) = delete;
+
+         void operator()(Arg&& arg) { _callable->invoke(std::forward<Arg>(arg)); }
+         explicit operator bool() const noexcept { return static_cast<bool>(_callable); }
+
+      private:
+         struct callable_base {
+            virtual ~callable_base() = default;
+            virtual void invoke(Arg&& arg) = 0;
+         };
+
+         template<typename F>
+         struct callable final : callable_base {
+            template<typename Fn>
+            explicit callable(Fn&& fn)
+               : f(std::forward<Fn>(fn)) {}
+
+            void invoke(Arg&& arg) override { f(std::forward<Arg>(arg)); }
+
+            F f;
+         };
+
+         std::unique_ptr<callable_base> _callable;
+      };
+
+      template<typename Signature>
+      using next_move_only_function =
+#if defined(__cpp_lib_move_only_function) && __cpp_lib_move_only_function >= 202110L
+         std::move_only_function<Signature>;
+#else
+         move_only_function<Signature>;
+#endif
+   }
+
    template<typename T>
    class next_function {
    public:
@@ -546,7 +613,7 @@ namespace sysio::chain {
       // (`std::get<T>(std::move(v))`) instead of copying.  Lvalue callers must explicitly
       // std::move; this is a deliberate compile-time forcing function rather than a silent
       // copy at the by-value parameter boundary.
-      using element_type = std::move_only_function<void(next_function_variant<T>&&)>;
+      using element_type = detail::next_move_only_function<void(next_function_variant<T>&&)>;
 
       next_function() = default;
       next_function(std::nullptr_t) noexcept {}

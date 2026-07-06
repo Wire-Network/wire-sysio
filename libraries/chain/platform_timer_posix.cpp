@@ -103,9 +103,12 @@ void platform_timer::expire_now(generation_t expired_generation) {
 }
 
 void platform_timer::set_expired() {
+   // The replacement state must carry the loaded generation_running (as interrupt_timer and
+   // expire_now do), not the member `generation`: callers may race start(), and stamping the
+   // newer generation onto an older run's timed_out state would mis-attribute the expiry.
    const generation_t generation_running = _state.load().generation_running;
    timer_state_t expected{.state = state_t::running, .callback_in_flight = false, .generation_running = generation_running};
-   _state.compare_exchange_strong(expected, timer_state_t{state_t::timed_out, false, generation});
+   _state.compare_exchange_strong(expected, timer_state_t{state_t::timed_out, false, generation_running});
 }
 
 void platform_timer::interrupt_timer() {

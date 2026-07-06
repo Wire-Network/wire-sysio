@@ -20,6 +20,8 @@
 #include <boost/algorithm/string/predicate.hpp>
 
 #include <fc/io/fstream.hpp>
+/// Silence incbin's Apple bitcode warning for test-only embedded WASM fixtures.
+#define INCBIN_SILENCE_BITCODE_WARNING
 #include <fc/io/incbin.h>
 #include <fc/io/json.hpp>
 #include <fc/variant_object.hpp>
@@ -1781,7 +1783,6 @@ BOOST_AUTO_TEST_CASE( billed_cpu_test ) try {
          billed_cpu_us.insert(billed_cpu_us.end(), trx->packed_trx()->get_transaction().total_actions(), billed_cpu_time_us);
       auto r = chain.control->test_push_transaction( trx, deadline, fc::microseconds::maximum(), billed_cpu_us, explicit_billed_cpu_time );
       if( r->except_ptr ) std::rethrow_exception( r->except_ptr );
-      if( r->except ) throw *r->except;
       return r;
    };
 
@@ -2005,7 +2006,6 @@ BOOST_AUTO_TEST_CASE( more_billed_cpu_test ) try {
                      const cpu_usage_t& billed_cpu_us, bool explicit_billed_cpu_time ) {
       auto r = chain.control->test_push_transaction( trx, deadline, fc::microseconds::maximum(), billed_cpu_us, explicit_billed_cpu_time );
       if( r->except_ptr ) std::rethrow_exception( r->except_ptr );
-      if( r->except ) throw *r->except;
       return r;
    };
 

@@ -1,5 +1,8 @@
 #include <fc/network/message_buffer.hpp>
+#include <fc/io/datastream.hpp>
+#include <fc/io/raw.hpp>
 
+#include <string>
 #include <thread>
 
 #include <boost/test/unit_test.hpp>
@@ -303,6 +306,147 @@ BOOST_AUTO_TEST_CASE(message_buffer_read_peek_bounds_multi) {
    mbuff.read(&throw_away_buffer, 0); //1 bytes left to read afterwards
    mbuff.read(&throw_away_buffer, 1); //no bytes left to read afterwards
    BOOST_CHECK_THROW(mbuff.read(&throw_away_buffer, 1), fc::out_of_range_exception);
+}
+
+// A read advance must never exceed the buffered bytes. The net_plugin early-dedup path computed
+// `message_length - header_bytes` from a peer-declared frame length; a frame shorter than the
+// already-consumed header underflowed that unsigned subtraction to ~4.29e9, over-popping the
+// buffer deque (undefined behavior). The bound in advance_read_ptr converts that into a catchable
+// exception (the net read loop then closes the offending peer).
+BOOST_AUTO_TEST_CASE(message_buffer_advance_read_ptr_bounds) {
+   using my_message_buffer_t = fc::message_buffer<1024>;
+   my_message_buffer_t mbuff;
+   unsigned char stuff[12] = { 0 };
+   memcpy(mbuff.write_ptr(), stuff, sizeof(stuff));
+   mbuff.advance_write_ptr(sizeof(stuff));            // 12 bytes available to read
+   BOOST_CHECK_EQUAL(mbuff.bytes_to_read(), 12u);
+
+   // Advancing more than the buffered bytes must throw rather than corrupt the chain.
+   BOOST_CHECK_THROW(mbuff.advance_read_ptr(13), fc::assert_exception);
+   // The exact unsigned-underflow value (5 - 33 as uint32_t == 4294967268) must also throw, not wrap.
+   BOOST_CHECK_THROW(mbuff.advance_read_ptr(static_cast<uint32_t>(5) - static_cast<uint32_t>(33)),
+                     fc::assert_exception);
+   // State is unchanged after the rejected advances; an in-bounds advance still works.
+   BOOST_CHECK_EQUAL(mbuff.bytes_to_read(), 12u);
+   mbuff.advance_read_ptr(12);
+   BOOST_CHECK_EQUAL(mbuff.bytes_to_read(), 0u);
+}
+
+// fc::bounded_datastream confines reads/skips to a byte budget taken from the wrapped stream,
+// even when the underlying stream physically holds more. This is the primitive the net_plugin
+// frame parsers use to keep an under-length P2P frame from reading into the next pipelined frame.
+BOOST_AUTO_TEST_CASE(bounded_datastream_respects_limit) {
+   char buf[16];
+   for (int i = 0; i < 16; ++i) buf[i] = static_cast<char>(i);
+   fc::datastream<char*> inner( buf, sizeof(buf) );
+   fc::bounded_datastream bounded( inner, 4 );          // only 4 of 16 bytes are in-bounds
+
+   BOOST_CHECK_EQUAL( bounded.remaining(), 4u );
+   bounded.skip( 2 );
+   BOOST_CHECK_EQUAL( bounded.remaining(), 2u );
+   char c = 0;
+   bounded.get( c );
+   BOOST_CHECK_EQUAL( c, 2 );
+   char two[2];
+   bounded.read( two, 1 );                              // exactly reaches the bound
+   BOOST_CHECK_EQUAL( two[0], 3 );
+   BOOST_CHECK_EQUAL( bounded.remaining(), 0u );
+
+   // Reading or skipping past the bound throws, even though `inner` still holds 12 bytes.
+   BOOST_CHECK_THROW( bounded.get( c ), fc::out_of_range_exception );
+   BOOST_CHECK_THROW( bounded.read( two, 2 ), fc::out_of_range_exception );
+   BOOST_CHECK_THROW( bounded.skip( 1 ), fc::out_of_range_exception );
+   BOOST_CHECK_EQUAL( bounded.remaining(), 0u );        // failed operations do not advance
+}
+
+// Realistic scenario: a length-prefixed frame whose declared length is shorter than the fields it
+// claims. Without a bound, fc::raw::unpack would satisfy the missing bytes from the next pipelined
+// frame already sitting in the message_buffer. Bounded to the declared frame length, it throws.
+BOOST_AUTO_TEST_CASE(bounded_datastream_blocks_cross_frame_overread) {
+   using mb_t = fc::message_buffer<1024>;
+   mb_t mb;
+
+   // Lay out two back-to-back frames in the buffer:
+   //   frame 1 payload: a std::string claiming 5 chars ("AAAAA") -> 6 wire bytes (length + data)
+   //   frame 2 payload: distinct "BBBBBBBB" pipelined bytes
+   char buf[64];
+   fc::datastream<char*> ds( buf, sizeof(buf) );
+   fc::raw::pack( ds, std::string( "AAAAA" ) );
+   const char pipelined[] = { 'B','B','B','B','B','B','B','B' };
+   ds.write( pipelined, sizeof(pipelined) );
+   const size_t total = ds.tellp();
+   memcpy( mb.write_ptr(), buf, total );
+   mb.advance_write_ptr( total );
+
+   // Declare frame 1 as only 3 bytes: the string's 1-byte length prefix plus 2 of its 5 chars.
+   constexpr uint32_t frame_len = 3;
+   auto mb_ds = mb.create_datastream();
+   fc::bounded_datastream bounded( mb_ds, frame_len );
+   std::string s;
+   BOOST_CHECK_THROW( fc::raw::unpack( bounded, s ), fc::out_of_range_exception );
+}
+
+// A well-formed frame unpacks fully within its bound, and the bound prevents any read from reaching
+// the following frame's bytes, which remain buffered for the next parse.
+BOOST_AUTO_TEST_CASE(bounded_datastream_leaves_pipelined_frame_intact) {
+   using mb_t = fc::message_buffer<1024>;
+   mb_t mb;
+
+   char buf[64];
+   fc::datastream<char*> ds( buf, sizeof(buf) );
+   fc::raw::pack( ds, std::string( "hello" ) );         // 6 wire bytes
+   const char pipelined[] = { 'X','X','X','X','X','X' };
+   ds.write( pipelined, sizeof(pipelined) );
+   const size_t total = ds.tellp();
+   memcpy( mb.write_ptr(), buf, total );
+   mb.advance_write_ptr( total );
+
+   auto mb_ds = mb.create_datastream();
+   fc::bounded_datastream bounded( mb_ds, 6 );           // bound to exactly frame 1
+   std::string s;
+   fc::raw::unpack( bounded, s );
+   BOOST_CHECK_EQUAL( s, std::string( "hello" ) );
+   BOOST_CHECK_EQUAL( bounded.remaining(), 0u );
+
+   // The pipelined frame is off-limits to the bounded stream...
+   char c = 0;
+   BOOST_CHECK_THROW( bounded.read( &c, 1 ), fc::out_of_range_exception );
+   // ...but is still physically present in the buffer for the next frame's parser.
+   BOOST_CHECK_EQUAL( mb.bytes_to_read(), total - 6 );
+}
+
+// The signed_block relay path composes datastream_mirror over a bounded_datastream so the packed
+// block bytes are still captured for relay while reads stay within the frame. Verify that exact
+// composition: the mirror reflects precisely the in-bound bytes and never the pipelined frame.
+BOOST_AUTO_TEST_CASE(bounded_datastream_composes_with_mirror) {
+   using mb_t = fc::message_buffer<1024>;
+   mb_t mb;
+
+   char buf[64];
+   fc::datastream<char*> ds( buf, sizeof(buf) );
+   fc::raw::pack( ds, std::string( "payload" ) );       // 8 wire bytes (length 7 + "payload")
+   const char pipelined[] = { 'Z','Z','Z','Z' };
+   ds.write( pipelined, sizeof(pipelined) );
+   const size_t total = ds.tellp();
+   memcpy( mb.write_ptr(), buf, total );
+   mb.advance_write_ptr( total );
+
+   constexpr uint32_t frame_len = 8;
+   auto mb_ds = mb.create_datastream();
+   fc::bounded_datastream bounded( mb_ds, frame_len );
+   fc::datastream_mirror mirror( bounded, frame_len );   // same composition as the block path
+   std::string s;
+   fc::raw::unpack( mirror, s );
+   BOOST_CHECK_EQUAL( s, std::string( "payload" ) );
+
+   // The mirror captured exactly the frame's bytes — this is what the block path stores as
+   // signed_block::packed_block for relay.
+   auto captured = mirror.extract_mirror();
+   BOOST_CHECK_EQUAL( captured.size(), static_cast<size_t>(frame_len) );
+   BOOST_CHECK_EQUAL( std::string( captured.begin(), captured.end() ),
+                      std::string( buf, buf + frame_len ) );
+   // The pipelined bytes were never reachable through the bounded mirror.
+   BOOST_CHECK_EQUAL( mb.bytes_to_read(), total - frame_len );
 }
 
 BOOST_AUTO_TEST_CASE(message_buffer_datastream) {

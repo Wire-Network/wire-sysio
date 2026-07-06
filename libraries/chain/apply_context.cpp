@@ -531,6 +531,16 @@ uint64_t apply_context::next_recv_sequence( const account_object& receiver_accou
    }
 }
 uint64_t apply_context::next_auth_sequence( account_name actor ) {
+   if ( trx_context.is_read_only() ) {
+      // To avoid confusion of duplicated auth sequence number, hard code to be 0.
+      // Mirrors next_global_sequence/next_recv_sequence. Currently unreachable:
+      // validate_referenced_accounts rejects any authorization on a read-only
+      // action before execution. Kept as defense-in-depth — read-only execution
+      // has no undo session and runs on parallel read-only-window threads, so if
+      // that guard ever changed, the modify below would persist state from a
+      // read-only transaction or race other read threads.
+      return 0;
+   }
    const auto& amo = db.get<account_object,by_name>( actor );
    db.modify( amo, [&](auto& am ){
       ++am.auth_sequence;
@@ -615,10 +625,10 @@ int64_t apply_context::kv_set(uint16_t table_id, uint64_t payer_val, const char*
    SYS_ASSERT( value_size <= control.get_global_properties().configuration.max_kv_value_size, kv_value_too_large,
                "KV value size {} exceeds maximum {}", value_size, control.get_global_properties().configuration.max_kv_value_size );
 
-   // Resolve payer: 0 = receiver (default), non-zero = explicit.
    // Authorization is enforced at the transaction level via unauthorized_ram_usage_increase.
-   account_name payer = (payer_val == 0) ? receiver : account_name(payer_val);
-
+   // payer_val == 0 is the CDT `same_payer` sentinel (name{}): valid only on update, where it keeps
+   // the existing payer. A new row has no existing payer to keep, so 0 is rejected on insert below --
+   // matching the classic db_store_i64 / generic_index::store `invalid_table_payer` assert.
    auto sv_key = to_sv(key, key_size);
    const auto& idx = db.get_index<kv_index, by_code_key>();
    auto itr = idx.find(boost::make_tuple(receiver, table_id, sv_key));
@@ -628,8 +638,11 @@ int64_t apply_context::kv_set(uint16_t table_id, uint64_t payer_val, const char*
       int64_t old_billable = kv_object_ram(*itr);
       int64_t new_billable = kv_object_ram(key_size, value_size);
 
-      // Handle payer change
+      // `same_payer` (payer_val == 0) must KEEP the existing payer, not move the row's RAM onto the
+      // receiver -- otherwise modify(same_payer, ...) silently re-bills any row whose payer differs
+      // from the contract account (e.g. a row billed to the `sysio` pool).
       account_name old_payer = itr->payer;
+      account_name payer = (payer_val == 0) ? old_payer : account_name(payer_val);
       if (payer != old_payer) {
          update_db_usage(old_payer, -old_billable);
          update_db_usage(payer, new_billable);
@@ -658,7 +671,10 @@ int64_t apply_context::kv_set(uint16_t table_id, uint64_t payer_val, const char*
 
       return new_billable - old_billable;
    } else {
-      // Create new
+      // Create new. A brand-new row has no existing payer to keep, so `same_payer` (payer_val == 0)
+      // is invalid on insert -- the caller must name the account that pays for the new row.
+      SYS_ASSERT( payer_val != 0, invalid_table_payer, "must specify a valid account to pay for new record" );
+      account_name payer = account_name(payer_val);
       const auto& obj = db.create<kv_object>([&](auto& o) {
          o.code = receiver;
          o.payer = payer;
@@ -771,10 +787,13 @@ int32_t apply_context::kv_it_next(uint32_t handle) {
          advanced = true;
       }
    }
-   // Slow path: re-seek by key bytes (current row was erased)
+   // Slow path: re-seek by key bytes (current row was erased). upper_bound, not lower_bound: "next"
+   // must advance strictly past the current key, and if the row was erased then reinserted at the
+   // same key within this transaction, lower_bound would land on it again and the iterator would
+   // never advance.
    if (!advanced) {
       auto sv_key = to_sv(slot.current_key.data(), slot.current_key.size());
-      itr = idx.lower_bound(boost::make_tuple(slot.code, slot.table_id, sv_key));
+      itr = idx.upper_bound(boost::make_tuple(slot.code, slot.table_id, sv_key));
    }
 
    if (itr != idx.end() && itr->code == slot.code && itr->table_id == slot.table_id && key_has_prefix(*itr, slot.prefix)) {
@@ -963,7 +982,10 @@ void apply_context::kv_idx_store(uint64_t payer_val, uint16_t table_id,
    SYS_ASSERT( pri_key_size <= control.get_global_properties().configuration.max_kv_key_size, kv_key_too_large,
                "KV primary key size {} exceeds maximum {}", pri_key_size, control.get_global_properties().configuration.max_kv_key_size );
 
-   account_name payer = (payer_val == 0) ? receiver : account_name(payer_val);
+   // kv_idx_store always creates a new entry; `same_payer` (payer_val == 0) is invalid on insert
+   // (no existing payer to keep), matching kv_set's create branch and classic generic_index::store.
+   SYS_ASSERT( payer_val != 0, invalid_table_payer, "must specify a valid account to pay for new record" );
+   account_name payer = account_name(payer_val);
 
    db.create<kv_index_object>([&](auto& o) {
       o.code = receiver;
@@ -1011,8 +1033,10 @@ void apply_context::kv_idx_update(uint64_t payer_val, uint16_t table_id,
 
    SYS_ASSERT( itr != idx.end(), kv_key_not_found, "KV secondary index entry not found for update" );
 
-   account_name payer = (payer_val == 0) ? receiver : account_name(payer_val);
+   // `same_payer` (payer_val == 0) keeps the existing index entry's payer rather than re-billing it
+   // to the receiver, matching the primary-row semantics in kv_set.
    account_name old_payer = itr->payer;
+   account_name payer = (payer_val == 0) ? old_payer : account_name(payer_val);
 
    int64_t old_billable = kv_index_object_ram(*itr);
    int64_t new_billable = kv_index_object_ram(new_sec_key_size, pri_key_size);
@@ -1114,11 +1138,15 @@ int32_t apply_context::kv_idx_next(uint32_t handle) {
          advanced = true;
       }
    }
-   // Slow path: re-seek by key bytes
+   // Slow path: re-seek by key bytes (current entry was erased). upper_bound on the full
+   // (sec_key, pri_key) tuple advances strictly past the current position even when the entry was
+   // erased and reinserted at the same keys within this transaction; with lower_bound the iterator
+   // would return the same position again and never advance. Entries sharing the secondary key but
+   // with a greater primary key still compare greater, so they are not skipped.
    if (!advanced) {
       auto sv_sec = to_sv(slot.current_sec_key.data(), slot.current_sec_key.size());
       auto sv_pri = to_sv(slot.current_pri_key.data(), slot.current_pri_key.size());
-      itr = idx.lower_bound(boost::make_tuple(slot.code, slot.table_id, sv_sec, sv_pri));
+      itr = idx.upper_bound(boost::make_tuple(slot.code, slot.table_id, sv_sec, sv_pri));
    }
 
    if (itr != idx.end() && itr->code == slot.code && itr->table_id == slot.table_id) {

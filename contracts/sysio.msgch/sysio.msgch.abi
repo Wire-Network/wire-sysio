@@ -295,18 +295,6 @@
                     "type": "checksum256"
                 },
                 {
-                    "name": "merkle_root",
-                    "type": "checksum256"
-                },
-                {
-                    "name": "start_message_id",
-                    "type": "checksum256"
-                },
-                {
-                    "name": "end_message_id",
-                    "type": "checksum256"
-                },
-                {
                     "name": "status",
                     "type": "EnvelopeStatus"
                 },
@@ -331,6 +319,10 @@
                 {
                     "name": "consensus_reached",
                     "type": "bool"
+                },
+                {
+                    "name": "winning_checksum",
+                    "type": "checksum256"
                 }
             ]
         },
@@ -359,6 +351,24 @@
                 {
                     "name": "data",
                     "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "resolvedisp",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "uint64"
+                },
+                {
+                    "name": "epoch_index",
+                    "type": "uint32"
+                },
+                {
+                    "name": "winning_checksum",
+                    "type": "checksum256"
                 }
             ]
         },
@@ -402,6 +412,11 @@
         {
             "name": "queueout",
             "type": "queueout",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "resolvedisp",
+            "type": "resolvedisp",
             "ricardian_contract": ""
         }
     ],
@@ -449,7 +464,7 @@
             "secondary_indexes": [
                 {
                     "name": "byoutepoch",
-                    "key_type": "uint64",
+                    "key_type": "uint128",
                     "table_id": 57096
                 },
                 {
@@ -507,7 +522,7 @@
                 },
                 {
                     "name": "byoutepoch",
-                    "key_type": "uint64",
+                    "key_type": "uint128",
                     "table_id": 12275
                 }
             ]
@@ -634,10 +649,6 @@
                 {
                     "name": "ATTESTATION_TYPE_DEPOSIT_REVERT",
                     "value": 60956
-                },
-                {
-                    "name": "ATTESTATION_TYPE_SWAP_REJECTED",
-                    "value": 60957
                 },
                 {
                     "name": "ATTESTATION_TYPE_RESERVE_CREATE",

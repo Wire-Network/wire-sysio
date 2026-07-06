@@ -143,7 +143,7 @@ DataStream& operator>>(DataStream& ds, EncodingFlags& t) {
 }
 
 // ---------------------------------------------------------------------------
-//  v6 registry-entity messages (Chain / Token / ChainToken / Reserve / ReserveTarget)
+//  v6 registry-entity messages (Chain / Token / ChainToken / Reserve / ReserveAmount)
 // ---------------------------------------------------------------------------
 
 template <typename DataStream>
@@ -197,11 +197,11 @@ DataStream& operator>>(DataStream& ds, Reserve& t) {
 }
 
 template <typename DataStream>
-DataStream& operator<<(DataStream& ds, const ReserveTarget& t) {
+DataStream& operator<<(DataStream& ds, const ReserveAmount& t) {
    return ds << t.chain_code << t.reserve_code << t.amount;
 }
 template <typename DataStream>
-DataStream& operator>>(DataStream& ds, ReserveTarget& t) {
+DataStream& operator>>(DataStream& ds, ReserveAmount& t) {
    return ds >> t.chain_code >> t.reserve_code >> t.amount;
 }
 
@@ -266,18 +266,19 @@ DataStream& operator>>(DataStream& ds, Message& t) {
    return ds >> t.header >> t.payload;
 }
 
-// Envelope: trimmed v6 — merkle/start_message_id/end_message_id removed
+// Envelope: inline-consensus fields. Legacy merkle/range metadata was removed
+// from the schema and is not stored in CDT table serialization.
 template <typename DataStream>
 DataStream& operator<<(DataStream& ds, const Envelope& t) {
    return ds << t.envelope_hash << t.endpoints << t.epoch_timestamp
              << t.epoch_index << t.epoch_envelope_index
-             << t.previous_envelope_hash;
+             << t.previous_envelope_hash << t.messages;
 }
 template <typename DataStream>
 DataStream& operator>>(DataStream& ds, Envelope& t) {
    return ds >> t.envelope_hash >> t.endpoints >> t.epoch_timestamp
              >> t.epoch_index >> t.epoch_envelope_index
-             >> t.previous_envelope_hash;
+             >> t.previous_envelope_hash >> t.messages;
 }
 
 } // namespace sysio::opp
@@ -295,14 +296,16 @@ DataStream& operator>>(DataStream& ds, Envelope& t) {
 // ─────────────────────────────────────────────────────────────────────────────
 namespace sysio::opp::attestations {
 
-// ReserveBalanceSheet (v6, renamed from ChainReserveBalanceSheet)
+// ReserveBalanceSheet (v6, renamed from ChainReserveBalanceSheet; the
+// parallel amounts[]/reserve_codes[] arrays were replaced by
+// self-describing depot-frame `ReserveAmount` entries).
 template <typename DataStream>
 DataStream& operator<<(DataStream& ds, const ReserveBalanceSheet& t) {
-   return ds << t.chain_code << t.amounts << t.reserve_codes;
+   return ds << t.chain_code << t.reserves;
 }
 template <typename DataStream>
 DataStream& operator>>(DataStream& ds, ReserveBalanceSheet& t) {
-   return ds >> t.chain_code >> t.amounts >> t.reserve_codes;
+   return ds >> t.chain_code >> t.reserves;
 }
 
 // PretokenStakeChange (deprecated; pre-launch only)
@@ -420,17 +423,21 @@ DataStream& operator>>(DataStream& ds, SwapRequest& t) {
 }
 
 // UnderwriteIntentCommit — v6: (token_code, chain_code, reserve_code) triple
-// disambiguates same-chain swap legs.
+// disambiguates same-chain swap legs. Field order MUST match the generated proto struct
+// (attestations.proto): uw_account, uw_ext_chain_addr, uw_request_id, signature,
+// token_code, chain_code, reserve_code. (The legacy v5 `outpost_id` field — a per-outpost
+// numeric id redundant with `chain_code` and read by no one — was removed in SEC-13/WSA-027.)
+// These operators are currently unreached (UIC always travels as raw zpp::bits proto bytes).
 template <typename DataStream>
 DataStream& operator<<(DataStream& ds, const UnderwriteIntentCommit& t) {
    return ds << t.uw_account << t.uw_ext_chain_addr << t.uw_request_id
-             << t.chain_code << t.signature
+             << t.signature
              << t.token_code << t.chain_code << t.reserve_code;
 }
 template <typename DataStream>
 DataStream& operator>>(DataStream& ds, UnderwriteIntentCommit& t) {
    return ds >> t.uw_account >> t.uw_ext_chain_addr >> t.uw_request_id
-             >> t.chain_code >> t.signature
+             >> t.signature
              >> t.token_code >> t.chain_code >> t.reserve_code;
 }
 
@@ -462,19 +469,8 @@ DataStream& operator>>(DataStream& ds, SwapRemit& t) {
              >> t.chain_code >> t.reserve_code;
 }
 
-// SwapRejected — v6: adds chain_code + reserve_code.
-template <typename DataStream>
-DataStream& operator<<(DataStream& ds, const SwapRejected& t) {
-   return ds << t.original_swap_remit_id << t.recipient
-             << t.unremitted_amount << t.reason
-             << t.chain_code << t.reserve_code;
-}
-template <typename DataStream>
-DataStream& operator>>(DataStream& ds, SwapRejected& t) {
-   return ds >> t.original_swap_remit_id >> t.recipient
-             >> t.unremitted_amount >> t.reason
-             >> t.chain_code >> t.reserve_code;
-}
+// SwapRejected DataStream operators removed — the SwapRejected message no longer
+// exists (no post-underwriting rejection path; every REMIT is depot-initiated).
 
 // ChallengeOperatorHash — field name `operator_` (trailing underscore) because
 // `operator` is a C++ keyword.
@@ -539,9 +535,9 @@ DataStream& operator>>(DataStream& ds, BatchOperatorGroups& t) {
    return ds >> t.active_group_index >> t.epoch_index >> t.groups;
 }
 
-// ReserveTarget — v6: (chain_code, reserve_code, TokenAmount).
-// (NOTE: ReserveTarget lives in `sysio::opp::types` per v6 types.proto;
-//  the DataStream overloads below in the types namespace.)
+// ReserveAmount — v6: (chain_code, reserve_code, TokenAmount), depot-frame.
+// (NOTE: ReserveAmount lives in `sysio::opp::types` per v6 types.proto;
+//  the DataStream overloads are above in the types namespace.)
 
 // DepositRevert — v6: adds chain_code.
 template <typename DataStream>
@@ -565,10 +561,10 @@ DataStream& operator>>(DataStream& ds, NodeOwnerReg& t) {
    return ds >> t.owner_address >> t.token_id >> t.nft_address;
 }
 
-// StakingReward — the single staker-reward feedback path. `sysio.msgch`
-// routes it twice: the aggregate native amount to `sysio.reserv::onreward`
-// (outpost-side reserve), and the per-staker body to `sysio.dclaim::onreward`
-// (WIRE-side claim ledger). Field order mirrors the proto (1..7).
+// StakingReward: the single staker-reward feedback path. `sysio.msgch`
+// dispatches the per-staker body to `sysio.dclaim::onreward` (the WIRE-side
+// claim ledger); the amount is already WIRE-denominated, so there is no
+// reserve leg. Field order mirrors the proto (1..7).
 template <typename DataStream>
 DataStream& operator<<(DataStream& ds, const StakingReward& t) {
    return ds << t.chain_code << t.staker_wire_account << t.share_bps
@@ -586,19 +582,22 @@ DataStream& operator>>(DataStream& ds, StakingReward& t) {
 //  v6 reserve-flow attestations
 // ---------------------------------------------------------------------------
 
+// ReserveCreate — reserve identity + custodied amount travel together in
+// `external_amount` (a depot-frame `ReserveAmount`); field order mirrors
+// the generated struct (proto fields 4,5,7,8,9,10,11,12).
 template <typename DataStream>
 DataStream& operator<<(DataStream& ds, const ReserveCreate& t) {
-   return ds << t.chain_code << t.token_code << t.reserve_code
-             << t.name << t.description
-             << t.external_token_amount << t.requested_wire_amount
-             << t.connector_weight_bps << t.creator_addr;
+   return ds << t.name << t.description
+             << t.requested_wire_amount << t.connector_weight_bps
+             << t.creator_addr << t.is_private << t.creator_pub_key
+             << t.external_amount;
 }
 template <typename DataStream>
 DataStream& operator>>(DataStream& ds, ReserveCreate& t) {
-   return ds >> t.chain_code >> t.token_code >> t.reserve_code
-             >> t.name >> t.description
-             >> t.external_token_amount >> t.requested_wire_amount
-             >> t.connector_weight_bps >> t.creator_addr;
+   return ds >> t.name >> t.description
+             >> t.requested_wire_amount >> t.connector_weight_bps
+             >> t.creator_addr >> t.is_private >> t.creator_pub_key
+             >> t.external_amount;
 }
 
 template <typename DataStream>

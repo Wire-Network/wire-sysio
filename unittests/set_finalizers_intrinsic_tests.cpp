@@ -177,6 +177,33 @@ BOOST_AUTO_TEST_CASE(validate_rejects_too_many_finalizers) try {
       fc_exception_message_contains("exceeds max"));
 } FC_LOG_AND_RETHROW()
 
+// The default-constructed (all-zero) key is the BLS identity / point at
+// infinity; validate() must reject it as a finalizer key.
+BOOST_AUTO_TEST_CASE(validate_rejects_identity_public_key) try {
+   finalizer_policy pol;
+   pol.generation = 1;
+   pol.threshold = 1;
+   pol.finalizers.push_back({.description = "f", .weight = 1, .public_key = fc::crypto::bls::public_key{}});
+   BOOST_CHECK_EXCEPTION(pol.validate(), invalid_finalizer_policy_exception,
+      fc_exception_message_contains("identity point"));
+} FC_LOG_AND_RETHROW()
+
+// The all-zero 96-byte encoding deserializes to the identity point WITHOUT a
+// curve-membership check (the zero encoding short-circuits it), so the
+// bls_public_key constructor in set_finalizers does not throw for it. The
+// validate() identity check is what rejects it at the intrinsic boundary.
+BOOST_FIXTURE_TEST_CASE(identity_public_key_test, set_finalizers_fixture) try {
+   set_code_and_produce(set_finalizers_forward_wast);
+
+   abi_finalizer_policy pol;
+   pol.threshold = 1;
+   pol.finalizers.push_back({.description = "f", .weight = 1, .public_key = std::vector<uint8_t>(96, 0)});
+   auto bytes = fc::raw::pack(pol);
+
+   BOOST_CHECK_EXCEPTION(push_payload(bytes), wasm_execution_error,
+      fc_exception_message_contains("identity point"));
+} FC_LOG_AND_RETHROW()
+
 // description.size() > config::max_finalizer_description_size rejected by validate().
 BOOST_FIXTURE_TEST_CASE(description_too_long_test, set_finalizers_fixture) try {
    set_code_and_produce(set_finalizers_forward_wast);

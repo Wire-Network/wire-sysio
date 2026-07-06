@@ -2,6 +2,7 @@
 #include <sysio/producer_plugin/block_timing_util.hpp>
 #include <sysio/producer_plugin/production_pause_vote_tracker.hpp>
 #include <sysio/producer_plugin/trx_priority_db.hpp>
+#include <sysio/chain/authorization_manager.hpp>
 #include <sysio/chain/plugin_interface.hpp>
 #include <sysio/chain/global_property_object.hpp>
 #include <sysio/chain/snapshot.hpp>
@@ -666,21 +667,101 @@ public:
       return {chain.head().id(), chain.calculate_integrity_hash()};
    }
 
-   void create_snapshot(producer_plugin::next_function<chain::snapshot_scheduler::snapshot_information> next) {
-      chain::controller& chain = chain_plug->chain();
+   void submit_snapshot_vote(const snapshot_scheduler::snapshot_information& si) {
+      if (_snapshot_provider_account.empty()) return;
 
-      auto reschedule = fc::make_scoped_exit([this]() { schedule_production_loop(); });
+      try {
+         chain::controller& chain = chain_plug->chain();
 
-      auto predicate = [&]() -> void {
-         if (chain.is_building_block()) {
-            // abort the pending block
-            abort_block();
-         } else {
-            reschedule.cancel();
+         auto snap_account_name = chain::name(_snapshot_provider_account);
+
+         // Build the votesnaphash action
+         chain::action vote_action;
+         vote_action.account = chain::config::system_account_name;
+         vote_action.name = chain::name("votesnaphash");
+         vote_action.authorization = {{snap_account_name, chain::config::active_name}};
+         // Parameter order must match votesnaphash(name, checksum256, checksum256) in snapshot_attest.hpp.
+         // root_hash is fc::crypto::blake3 (32 bytes) which is binary-compatible with checksum256.
+         vote_action.data = fc::raw::pack(
+            std::make_tuple(snap_account_name, si.head_block_id, si.root_hash));
+
+         // Build the transaction
+         chain::signed_transaction trx;
+         trx.actions.emplace_back(std::move(vote_action));
+         trx.expiration = fc::time_point_sec(chain.head().block_time() + fc::seconds(30));
+         trx.set_reference_block(chain.head().id());
+
+         // Determine the required signing keys for the snapshot provider account's active authority
+         auto& sig_plug = app().get_plugin<signature_provider_manager_plugin>();
+         auto wire_sig_providers = sig_plug.query_providers(
+            std::nullopt, std::nullopt, chain::crypto::chain_key_type_wire);
+
+         // Collect available public keys
+         flat_set<chain::public_key_type> candidate_keys;
+         std::map<chain::public_key_type, fc::crypto::private_key> key_map;
+         for (auto& sig_prov : wire_sig_providers) {
+            if (sig_prov->private_key.has_value()) {
+               candidate_keys.insert(sig_prov->public_key);
+               key_map[sig_prov->public_key] = *sig_prov->private_key;
+            }
          }
-      };
 
-      _snapshot_scheduler.create_snapshot(std::move(next), chain, predicate);
+         // Use authorization_manager to find which keys satisfy snap_account@active
+         auto required_keys = chain.get_authorization_manager().get_required_keys(
+            trx, candidate_keys);
+
+         if (required_keys.empty()) {
+            elog("Snapshot provider: no signing key available for {}@active votesnaphash transaction",
+                 _snapshot_provider_account);
+            return;
+         }
+
+         for (const auto& key : required_keys) {
+            trx.sign(key_map.at(key), chain.get_chain_id());
+         }
+
+         auto packed_trx = std::make_shared<chain::packed_transaction>(std::move(trx));
+
+         // Submit via incoming transaction async method.
+         // return_failure_traces=true so we can inspect trace->error_code on assertion failures.
+         app().get_method<chain::plugin_interface::incoming::methods::transaction_async>()(
+            packed_trx, true /*api_trx*/,
+            chain::transaction_metadata::trx_type::input,
+            true /*return_failure_traces*/,
+            [](const chain::next_function_variant<chain::transaction_trace_ptr>& result) {
+               if (std::holds_alternative<fc::exception_ptr>(result)) {
+                  auto& ex = std::get<fc::exception_ptr>(result);
+                  fc_elog(_log, "Snapshot provider: votesnaphash transaction failed: {}", ex->to_detail_string());
+               } else {
+                  auto trace = std::get<chain::transaction_trace_ptr>(result);
+                  if (trace && trace->except) {
+                     // Check for snapshot hash disagreement via error code.
+                     // snap_hash_disagreement_error (9001) is defined in snapshot_attest.hpp
+                     // and emitted by the votesnaphash action's check() call.
+                     constexpr uint64_t snap_hash_disagreement_error = 9001;
+                     if (trace->error_code && *trace->error_code == snap_hash_disagreement_error) {
+                        fc_elog(_log, "FATAL: Snapshot hash disagreement detected (error code {})! "
+                                      "This node's snapshot differs from the attested record. Shutting down.",
+                                      snap_hash_disagreement_error);
+                        app().quit();
+                     } else {
+                        fc_elog(_log, "Snapshot provider: votesnaphash transaction failed: {}",
+                                 trace->except->to_detail_string());
+                     }
+                  } else if (trace && trace->receipt) {
+                     fc_ilog(_log, "Snapshot provider: votesnaphash submitted successfully for block {}", trace->block_num);
+                  }
+               }
+            });
+
+         ilog("Snapshot provider: submitting votesnaphash for block {} with root hash {}",
+              si.head_block_num, si.root_hash.str());
+
+      } catch (const fc::exception& e) {
+         elog("Snapshot provider: failed to submit vote: {}", e.to_detail_string());
+      } catch (const std::exception& e) {
+         elog("Snapshot provider: failed to submit vote: {}", e.what());
+      }
    }
 
    void update_runtime_options(const producer_plugin::runtime_options& options);
@@ -729,6 +810,14 @@ public:
    unapplied_transaction_queue                       _unapplied_transactions;
    alignas(hardware_destructive_interference_sz)
    std::atomic<int32_t>                              _max_transaction_time_ms; // modified by app thread, read by net_plugin thread pool
+   // Floor for the speculative-retry CPU cap applied in push_transaction(). That cap is normally
+   // 2x the transaction's previously measured wall-clock cost, which guards against "producer bombs"
+   // (transactions that speculate cheaply but consume large CPU when produced into a block). For very
+   // cheap transactions, however, 2x prev_elapsed can fall below the run-to-run wall-clock variance of
+   // re-execution during fork catch-up or node load, dropping a valid forked-out transaction (the only
+   // copy on this node, never rebroadcast) instead of re-applying it. Flooring the cap lets cheap
+   // transactions absorb that variance while still bounding the CPU a bomb can consume before rejection.
+   static constexpr fc::microseconds                 _speculative_retry_min_cpu_cap{5000}; // 5 ms
    alignas(hardware_destructive_interference_sz)
    std::atomic<uint32_t>                             _received_block{0};       // modified by net_plugin thread pool
    implicit_production_pause_vote_tracker            _implicit_pause_vote_tracker;
@@ -780,6 +869,10 @@ public:
 
    // async snapshot scheduler
    snapshot_scheduler _snapshot_scheduler;
+
+   // snapshot provider configuration
+   std::string _snapshot_provider_account;
+   static constexpr uint32_t _snapshot_provider_block_spacing = 25000;
 
    std::function<void(speculative_block_metrics)> _update_speculative_block_metrics;
 
@@ -1092,7 +1185,7 @@ public:
             if (std::holds_alternative<fc::exception_ptr>(response)) {
                except_ptr = std::get<fc::exception_ptr>(response);
             } else if (std::get<transaction_trace_ptr>(response)->except) {
-               except_ptr = std::get<transaction_trace_ptr>(response)->except->dynamic_copy_exception();
+               except_ptr = std::get<transaction_trace_ptr>(response)->except;
             }
             _transaction_ack_channel.publish(priority::low, std::pair<fc::exception_ptr, packed_transaction_ptr>(except_ptr, trx));
             next(std::move(response));
@@ -1377,6 +1470,8 @@ void producer_plugin::set_program_options(
           "Disable subjective CPU billing for API transactions")
          ("snapshots-dir", bpo::value<std::filesystem::path>()->default_value("snapshots"),
           "the location of the snapshots directory (absolute path or relative to application data dir)")
+         ("snapshot-provider-account", bpo::value<std::string>()->default_value(""),
+          "Account name used to sign and submit votesnaphash transactions. When set, enables snapshot provider mode. Cannot be used alongside producer-name.")
          ("read-only-threads", bpo::value<uint32_t>(),
          ("Number of worker threads in read-only execution thread pool. Defaults to 0 if configured as producer, otherwise defaults to "s + std::to_string(producer_plugin_impl::_ro_default_threads_nonproducer) + ". Max "s + std::to_string(producer_plugin_impl::_ro_max_threads_allowed) + "."s).c_str())
          ("read-only-write-window-time-us", bpo::value<uint32_t>()->default_value(my->_ro_write_window_time_us.count()),
@@ -1621,6 +1716,18 @@ void producer_plugin_impl::plugin_initialize(const boost::program_options::varia
    _snapshot_scheduler.set_db_path(_snapshots_dir);
    _snapshot_scheduler.set_snapshots_path(_snapshots_dir);
 
+   // Snapshot provider configuration
+   _snapshot_provider_account = options.at("snapshot-provider-account").as<std::string>();
+   if (!_snapshot_provider_account.empty()) {
+      SYS_ASSERT(!is_configured_producer(), plugin_config_exception,
+                 "snapshot-provider-account cannot be used alongside producer-name");
+
+      _snapshot_scheduler.add_snapshot_finalized_callback(
+         [this](const snapshot_scheduler::snapshot_information& si) {
+            submit_snapshot_vote(si);
+         });
+   }
+
    SYS_ASSERT(!is_configured_producer() || !irreversible_mode(), plugin_config_exception,
               "node cannot have any producer-name configured because block production is impossible when read_mode is \"irreversible\"");
 
@@ -1670,6 +1777,33 @@ void producer_plugin_impl::plugin_startup() {
             app().quit();
          }
       }));
+
+      // Auto-schedule periodic snapshots for snapshot provider mode.
+      // All providers use the same block_spacing so they snapshot at identical heights.
+      // The scheduler fires when (height - start_block_num - 1) % block_spacing == 0,
+      // so set start_block_num = block_spacing - 1 to trigger at exact multiples:
+      // blocks 25000, 50000, 75000, ...
+      if (!_snapshot_provider_account.empty()) {
+         snapshot_scheduler::snapshot_request_information sri;
+         sri.block_spacing = _snapshot_provider_block_spacing;
+         sri.start_block_num = _snapshot_provider_block_spacing - 1;
+         sri.end_block_num = std::numeric_limits<uint32_t>::max();
+         sri.snapshot_description = "snapshot-provider auto";
+
+         // The auto-schedule is persisted to snapshot-schedule.json and reloaded by set_db_path()
+         // on restart, so only schedule it when an identical request is not already present;
+         // otherwise schedule_snapshot() would throw duplicate_snapshot_request on every restart.
+         if (auto existing = _snapshot_scheduler.find_snapshot_request(sri.block_spacing, sri.start_block_num, sri.end_block_num)) {
+            ilog("Snapshot provider mode: reusing persisted auto-schedule for every {} blocks (request id {})",
+                 _snapshot_provider_block_spacing, *existing);
+         } else {
+            // scheduled (non create_snapshot) requests store no completion callback; the produced
+            // snapshots are observed through add_snapshot_finalized_callback (provider-mode voting)
+            auto result = _snapshot_scheduler.schedule_snapshot(sri, {});
+            ilog("Snapshot provider mode: auto-scheduled snapshots every {} blocks (request id {})",
+                 _snapshot_provider_block_spacing, result.snapshot_request_id);
+         }
+      }
 
       if (is_configured_producer()) { // track votes if producer to verify votes are being processed
          auto on_vote_signal = [this]( const vote_signal_params& vote_signal ) {
@@ -1868,7 +2002,34 @@ producer_plugin::integrity_hash_information producer_plugin::get_integrity_hash(
 }
 
 void producer_plugin::create_snapshot(producer_plugin::next_function<chain::snapshot_scheduler::snapshot_information> next) {
-   my->create_snapshot(std::move(next));
+   chain::controller& chain = my->chain_plug->chain();
+   const auto head_block_num = chain.head().block_num();
+
+   auto reschedule = fc::make_scoped_exit([my=my]() { my->schedule_production_loop(); });
+
+   if (chain.is_building_block()) {
+      // abort the pending block
+      my->abort_block();
+   } else {
+      reschedule.cancel();
+   }
+
+   if(chain.get_read_mode() == db_read_mode::IRREVERSIBLE) {
+      // /v1/producer/create_snapshot is expected to immediately create a snapshot. When in irreversible mode this
+      // can't be completely faked by scheduling to create on the next start_block as a start_block might never happen.
+      // Create snapshot directly. Since in irreversible mode it can't be forked out there is no need to have the
+      // snapshot scheduler schedule the snapshot, just create it here and now.
+      my->_snapshot_scheduler.create_snapshot(std::move(next), chain);
+   } else {
+      // setup for execute on the next start block
+      chain::snapshot_scheduler::snapshot_request_information sri = {
+         .block_spacing   = 0,
+         .start_block_num = head_block_num + 1,
+         .end_block_num   = std::numeric_limits<uint32_t>::max(),
+         .snapshot_description = ""
+      };
+      my->_snapshot_scheduler.schedule_snapshot(sri, std::move(next));
+   }
 }
 
 chain::snapshot_scheduler::snapshot_schedule_result
@@ -1887,7 +2048,10 @@ producer_plugin::schedule_snapshot(const chain::snapshot_scheduler::snapshot_req
    if(sri.end_block_num == 0)
       sri.end_block_num = std::numeric_limits<uint32_t>::max();
 
-   return my->_snapshot_scheduler.schedule_snapshot(sri);
+   // validation errors are thrown to the HTTP caller; store no completion callback so execution
+   // results of scheduled snapshots are logged by the scheduler as before (only create_snapshot
+   // requests carry a response callback)
+   return my->_snapshot_scheduler.schedule_snapshot(sri, {});
 }
 
 chain::snapshot_scheduler::snapshot_schedule_result
@@ -1897,6 +2061,14 @@ producer_plugin::unschedule_snapshot(const chain::snapshot_scheduler::snapshot_r
 
 chain::snapshot_scheduler::get_snapshot_requests_result producer_plugin::get_snapshot_requests() const {
    return my->_snapshot_scheduler.get_snapshot_requests();
+}
+
+void producer_plugin::add_snapshot_finalized_callback(chain::snapshot_scheduler::snapshot_finalized_callback_t cb) {
+   my->_snapshot_scheduler.add_snapshot_finalized_callback(std::move(cb));
+}
+
+std::filesystem::path producer_plugin::get_snapshots_dir() const {
+   return my->_snapshots_dir;
 }
 
 producer_plugin::scheduled_protocol_feature_activations producer_plugin::get_scheduled_protocol_feature_activations() const {
@@ -2193,7 +2365,7 @@ producer_plugin_impl::determine_pending_block_mode(const fc::time_point& now,
          if (now < start_block_time) {
             _pending_block_mode = pending_block_mode::speculating;
             fc_dlog(_log, "Not starting block until {}", start_block_time);
-            schedule_delayed_production_loop(weak_from_this(), start_block_time);
+            schedule_delayed_production_loop(this->weak_from_this(), start_block_time);
             return start_block_result::waiting_for_production;
          }
       }
@@ -2258,7 +2430,7 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block() {
       };
       while (in_speculating_mode() || !chain.is_head_descendant_of_pending_lib() || fork_db_ahead_on_same_chain()) {
          if (is_configured_producer())
-            schedule_delayed_production_loop(weak_from_this(), _pending_block_deadline); // interrupt apply_blocks at deadline
+            schedule_delayed_production_loop(this->weak_from_this(), _pending_block_deadline); // interrupt apply_blocks at deadline
 
          auto result = apply_blocks();
          if (result.num_blocks_applied == 0) {
@@ -2667,8 +2839,11 @@ producer_plugin_impl::push_result producer_plugin_impl::push_transaction(const f
 
       // elapsed can be set on failure, but prev_succeeded indicates a real cost
       // measurement -- only then is 2x prev_elapsed a sound cap on this retry.
+      // Floor the cap at _speculative_retry_min_cpu_cap: for very cheap trxs, 2x prev_elapsed is below
+      // the wall-clock variance of re-execution during fork catch-up / node load and would otherwise
+      // drop a valid forked-out trx; the floor still bounds the CPU a producer bomb can consume.
       if (trx->prev_succeeded) {
-         max_trx_time = std::min(max_trx_time, prev_elapsed * 2);
+         max_trx_time = std::min(max_trx_time, std::max(prev_elapsed * 2, _speculative_retry_min_cpu_cap));
       }
    }
 
@@ -2724,8 +2899,7 @@ producer_plugin_impl::handle_push_result(const transaction_metadata_ptr&        
             if (return_failure_trace) {
                next(trace);
             } else {
-               auto e_ptr = trace->except->dynamic_copy_exception();
-               next(e_ptr);
+               next(trace->except);
             }
          }
       }
@@ -2871,7 +3045,7 @@ void producer_plugin_impl::schedule_production_loop() {
          fc_dlog(_log, "Waiting till another block is received and scheduling Speculative/Production Change");
          auto wake_time = block_timing_util::calculate_producer_wake_up_time(_produce_block_cpu_effort, chain.head().block_num(), calculate_pending_block_time(),
                                                                              _producers, chain.head_active_producers().producers);
-         schedule_delayed_production_loop(weak_from_this(), wake_time);
+         schedule_delayed_production_loop(this->weak_from_this(), wake_time);
       } else {
          fc_tlog(_log, "Waiting till another block is received");
          // nothing to do until more blocks arrive
@@ -2893,7 +3067,7 @@ void producer_plugin_impl::schedule_production_loop() {
          // if wake time has already passed then use the block deadline instead
          wake_time = _pending_block_deadline;
       }
-      schedule_delayed_production_loop(weak_from_this(), wake_time);
+      schedule_delayed_production_loop(this->weak_from_this(), wake_time);
    } else {
       fc_dlog(_log, "Speculative Block Created");
    }
@@ -2987,7 +3161,7 @@ bool producer_plugin_impl::maybe_produce_block() {
    // block failed to produce, wait until the next block to try again
    block_timestamp_type block_time = calculate_pending_block_time();
    fc_dlog(_log, "Not starting block until {}", block_time);
-   schedule_delayed_production_loop(weak_from_this(), block_time);
+   schedule_delayed_production_loop(this->weak_from_this(), block_time);
 
    return false;
 }

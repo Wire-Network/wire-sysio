@@ -96,8 +96,12 @@ SYS_PIN_INTRINSIC( set_privileged,
 // =============================================================================
 // Producers
 // =============================================================================
+// Intentionally span<char>: the CDT-side ABI passes the buffer length in
+// bytes. The earlier aligned_span<account_name> pin treated that byte count
+// as an element count, validating 8x the caller's buffer. The wasm-visible
+// shape (i32 ptr, i32 len) -> i32 is unchanged.
 SYS_PIN_INTRINSIC( get_active_producers,
-                   int32_t (interface::*)(aligned_span<account_name>) const );
+                   int32_t (interface::*)(span<char>) const );
 
 // =============================================================================
 // Crypto -- hashes + signature recovery
@@ -210,11 +214,11 @@ SYS_PIN_INTRINSIC( printi128,
 SYS_PIN_INTRINSIC( printui128,
                    void (interface::*)(aligned_ptr<const unsigned __int128>) );
 SYS_PIN_INTRINSIC( printsf,
-                   void (interface::*)(float32_t) );
+                   void (interface::*)(softfloat32_t) );
 SYS_PIN_INTRINSIC( printdf,
-                   void (interface::*)(float64_t) );
+                   void (interface::*)(softfloat64_t) );
 SYS_PIN_INTRINSIC( printqf,
-                   void (interface::*)(aligned_ptr<const float128_t>) );
+                   void (interface::*)(aligned_ptr<const softfloat128_t>) );
 SYS_PIN_INTRINSIC( printn,
                    void (interface::*)(name) );
 SYS_PIN_INTRINSIC( printhex,

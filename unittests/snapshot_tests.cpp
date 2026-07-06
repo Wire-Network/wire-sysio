@@ -1,7 +1,9 @@
 #include <sstream>
 
+#include <sysio/chain/authorization_manager.hpp>
 #include <sysio/chain/block_log.hpp>
 #include <sysio/chain/global_property_object.hpp>
+#include <sysio/chain/permission_object.hpp>
 #include <sysio/chain/snapshot.hpp>
 #include <sysio/chain/s_root_extension.hpp>
 #include <sysio/chain/contract_table_objects.hpp>
@@ -15,9 +17,16 @@
 #include <test_contracts.hpp>
 #include "test_wasts.hpp"
 
+#include <fc/filesystem.hpp>
+
 using namespace sysio;
 using namespace testing;
 using namespace chain;
+
+// Minimal reflected row type for the binary-snapshot section-consumption regression test
+// (threaded_snapshot_requires_full_section_consumption) in snapshot_part1_tests below.
+namespace snapshot_consume_test { struct row { uint64_t v = 0; }; }
+FC_REFLECT(snapshot_consume_test::row, (v))
 
 
 namespace {
@@ -130,6 +139,52 @@ namespace {
 // Split the tests into multiple parts which run approximately the same time
 // so that they can finish within CICD time limits
 BOOST_AUTO_TEST_SUITE(snapshot_part1_tests)
+
+// A binary (v1) snapshot section's row_count is stored in the section index, which is NOT covered
+// by the integrity/root hash; only the row data (data_size) is. clear_section must therefore reject
+// any selected section that is not consumed exactly. The case a per-read check in read_row cannot
+// catch is the singleton-reader shape — one read_row with the returned "more" ignored — against a
+// row_count tampered upward: the single read succeeds and the callback returns with cur_row <
+// num_rows. Writing a genuine 2-row section and then reading only one row reproduces exactly that
+// shape, so teardown must throw.
+BOOST_AUTO_TEST_CASE(threaded_snapshot_requires_full_section_consumption)
+{
+   fc::temp_directory tmp_dir;
+   const std::filesystem::path snap_path = tmp_dir.path() / "consume_test.bin";
+
+   {
+      threaded_snapshot_writer writer(snap_path);
+      writer.write_section("test_section", [](auto& s) {
+         s.add_row(snapshot_consume_test::row{1});
+         s.add_row(snapshot_consume_test::row{2});
+      });
+      writer.finalize();
+   }
+
+   // Full consumption of the 2-row section loads cleanly.
+   {
+      threaded_snapshot_reader reader(snap_path);
+      reader.validate();
+      reader.read_section("test_section", [](auto& s) {
+         snapshot_consume_test::row r;
+         BOOST_CHECK(s.read_row(r));    // row 1 -> more rows remain
+         BOOST_CHECK(!s.read_row(r));   // row 2 -> section exhausted
+      });
+   }
+
+   // Under-consumption (read 1 of 2, ignoring the "more" signal, exactly as a singleton reader does
+   // against an upward-tampered row_count) must be rejected at section teardown.
+   {
+      threaded_snapshot_reader reader(snap_path);
+      reader.validate();
+      BOOST_CHECK_THROW(
+         reader.read_section("test_section", [](auto& s) {
+            snapshot_consume_test::row r;
+            s.read_row(r); // read only the first of two rows
+         }),
+         snapshot_exception);
+   }
+}
 
 template<typename TESTER, typename SNAPSHOT_SUITE>
 void exhaustive_snapshot_test()
@@ -443,6 +498,253 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(test_s_root_in_snapshot, SNAPSHOT_SUITE, snapshot_
 BOOST_AUTO_TEST_CASE_TEMPLATE(test_chain_id_in_snapshot, SNAPSHOT_SUITE, snapshot_suites)
 {
    chain_id_in_snapshot_test<savanna_tester, SNAPSHOT_SUITE>();
+}
+
+// Permission parent chains deeper than config::default_max_auth_depth (6) are legal: creation
+// (updateauth) never caps chain depth -- only authority *satisfaction* recursion is bounded, by
+// the separate max_authority_depth config. A snapshot of such a chain must therefore load. The
+// load-time parent-chain walk previously reused default_max_auth_depth as its bound and threw
+// snapshot_exception for any honest chain deeper than 6, so every node restarting or onboarding
+// from such a snapshot failed.
+template<typename TESTER, typename SNAPSHOT_SUITE>
+void deep_permission_chain_in_snapshot_test()
+{
+   TESTER chain;
+   const auto deep_account = "deepperms"_n;
+   chain.create_account(deep_account);
+   chain.produce_block();
+
+   // Build a custom permission chain twice as deep as default_max_auth_depth:
+   // active <- deepa <- deepb <- ... (12 links). Letter suffixes only: digits 6-9
+   // are not valid name characters.
+   constexpr uint32_t chain_depth = 2 * config::default_max_auth_depth;
+   std::string parent = "active";
+   for (uint32_t i = 0; i < chain_depth; ++i) {
+      const std::string perm = std::string("deep") + static_cast<char>('a' + i);
+      chain.set_authority(deep_account, name(perm),
+                          authority(chain.get_public_key(deep_account, perm)),
+                          name(parent));
+      parent = perm;
+   }
+   chain.produce_block();
+   chain.control->abort_block();
+
+   auto writer = SNAPSHOT_SUITE::get_writer();
+   chain.control->write_snapshot(writer);
+   auto snapshot = SNAPSHOT_SUITE::finalize(writer);
+
+   // Loading must succeed; depth alone is not corruption.
+   snapshotted_tester snap_chain(chain.get_config(), SNAPSHOT_SUITE::get_reader(snapshot), 0);
+   verify_integrity_hash<SNAPSHOT_SUITE>(*chain.control, *snap_chain.control);
+
+   // The deepest permission survived the round trip with its parent chain intact.
+   const auto& po = snap_chain.control->get_authorization_manager().get_permission(
+      permission_level{deep_account, name(parent)});
+   BOOST_TEST(po.name == name(parent));
+}
+
+BOOST_AUTO_TEST_CASE_TEMPLATE(test_deep_permission_chain_in_snapshot, SNAPSHOT_SUITE, snapshot_suites)
+{
+   deep_permission_chain_in_snapshot_test<savanna_tester, SNAPSHOT_SUITE>();
+}
+
+// A permission row carrying a structurally invalid authority -- here a duplicated key entry,
+// which both breaks the strict key ordering updateauth enforces at creation and double-counts
+// that key's weight toward threshold -- must be rejected at snapshot load rather than silently
+// reconstructed into chain state. Uses the variant snapshot format so the row can be mutated.
+BOOST_AUTO_TEST_CASE(test_invalid_authority_in_snapshot_rejected)
+{
+   savanna_tester chain;
+   const auto victim = "victim"_n;
+   chain.create_account(victim);
+   chain.produce_block();
+   chain.control->abort_block();
+
+   auto writer = variant_snapshot_suite::get_writer();
+   chain.control->write_snapshot(writer);
+   auto snapshot = variant_snapshot_suite::finalize(writer);
+
+   // Rebuild the snapshot variant with victim@active's first key entry duplicated.
+   const std::string perm_section = chain::detail::snapshot_section_traits<permission_object>::section_name();
+   uint32_t mutated_rows = 0;
+   fc::variants new_sections;
+   for (const auto& section : snapshot["sections"].get_array()) {
+      if (section["name"].as_string() != perm_section) {
+         new_sections.push_back(section);
+         continue;
+      }
+      fc::variants new_rows;
+      for (const auto& row : section["rows"].get_array()) {
+         const auto& ro = row.get_object();
+         if (ro["owner"].as_string() == victim.to_string() && ro["name"].as_string() == "active") {
+            fc::variants keys = ro["auth"]["keys"].get_array();
+            BOOST_REQUIRE(!keys.empty());
+            keys.push_back(keys.front());
+            new_rows.emplace_back(
+               fc::mutable_variant_object(ro)
+                  ("auth", fc::mutable_variant_object(ro["auth"].get_object())("keys", std::move(keys))));
+            ++mutated_rows;
+         } else {
+            new_rows.push_back(row);
+         }
+      }
+      new_sections.emplace_back(fc::mutable_variant_object()("name", section["name"])("rows", std::move(new_rows)));
+   }
+   BOOST_REQUIRE_EQUAL(mutated_rows, 1u);
+   fc::variant mutated = fc::mutable_variant_object()
+      ("version", snapshot["version"])
+      ("sections", std::move(new_sections));
+
+   // The exception must point at the mutated row -- not at some other permission tripping the
+   // check incidentally (e.g. sysio.null's deliberately empty authority, which is exempt).
+   BOOST_REQUIRE_EXCEPTION(
+      snapshotted_tester(chain.get_config(), variant_snapshot_suite::get_reader(mutated), 0),
+      snapshot_exception,
+      [](const snapshot_exception& e) {
+         return e.to_detail_string().find("victim@active has invalid authority") != std::string::npos;
+      });
+}
+
+// The empty-authority exemption is scoped to the three rows genesis deliberately creates
+// unsatisfiable (sysio.null@owner, sysio.null@active, sysio.prods@owner). newaccount and
+// updateauth reject empty authorities everywhere else via validate(), so a hand-crafted snapshot
+// row carrying one on any other permission -- or carrying a non-genesis value on an exempt row --
+// must be rejected rather than loaded past the structural checks.
+BOOST_AUTO_TEST_CASE(test_unscoped_empty_authority_in_snapshot_rejected)
+{
+   savanna_tester chain;
+   const auto victim = "victim"_n;
+   chain.create_account(victim);
+   chain.produce_block();
+   chain.control->abort_block();
+
+   auto writer = variant_snapshot_suite::get_writer();
+   chain.control->write_snapshot(writer);
+   auto snapshot = variant_snapshot_suite::finalize(writer);
+
+   // Rebuild the snapshot variant with <owner>@<perm>'s auth object rewritten by `mutate`.
+   const std::string perm_section = chain::detail::snapshot_section_traits<permission_object>::section_name();
+   auto mutate_auth = [&](const std::string& owner, const std::string& perm, auto&& mutate) -> fc::variant {
+      uint32_t mutated_rows = 0;
+      fc::variants new_sections;
+      for (const auto& section : snapshot["sections"].get_array()) {
+         if (section["name"].as_string() != perm_section) {
+            new_sections.push_back(section);
+            continue;
+         }
+         fc::variants new_rows;
+         for (const auto& row : section["rows"].get_array()) {
+            const auto& ro = row.get_object();
+            if (ro["owner"].as_string() == owner && ro["name"].as_string() == perm) {
+               new_rows.emplace_back(fc::mutable_variant_object(ro)("auth", mutate(ro["auth"].get_object())));
+               ++mutated_rows;
+            } else {
+               new_rows.push_back(row);
+            }
+         }
+         new_sections.emplace_back(fc::mutable_variant_object()("name", section["name"])("rows", std::move(new_rows)));
+      }
+      BOOST_REQUIRE_EQUAL(mutated_rows, 1u);
+      return fc::mutable_variant_object()
+         ("version", snapshot["version"])
+         ("sections", std::move(new_sections));
+   };
+   auto empty_auth = [](const fc::variant_object& auth) {
+      return fc::mutable_variant_object(auth)("threshold", 1)("keys", fc::variants{})("accounts", fc::variants{});
+   };
+   auto expect_rejected = [&](const fc::variant& mutated, int ordinal, const std::string& msg) {
+      BOOST_REQUIRE_EXCEPTION(
+         snapshotted_tester(chain.get_config(), variant_snapshot_suite::get_reader(mutated), ordinal),
+         snapshot_exception,
+         [&](const snapshot_exception& e) {
+            return e.to_detail_string().find(msg) != std::string::npos;
+         });
+   };
+
+   // Exactly the empty shape genesis gives sysio.null -- but on a normal account: rejected.
+   expect_rejected(mutate_auth(victim.to_string(), "active", empty_auth), 0,
+                   "victim@active has invalid authority");
+
+   // Empty authority on a non-exempt permission of an exempt-listed account: only
+   // sysio.prods@owner is genesis-empty; @active must stay subject to the structural check.
+   expect_rejected(mutate_auth("sysio.prods", "active", empty_auth), 1,
+                   "sysio.prods@active has invalid authority");
+
+   // An exempt row must carry exactly the genesis value: bumping the threshold of the
+   // (legitimately empty) sysio.null@owner row is corruption, not a wider exemption.
+   expect_rejected(mutate_auth("sysio.null", "owner",
+                               [](const fc::variant_object& auth) {
+                                  return fc::mutable_variant_object(auth)("threshold", 2);
+                               }),
+                   2, "sysio.null@owner has invalid authority");
+}
+
+// Permission parent integrity at load is guaranteed by name resolution against already-loaded
+// rows (ids strictly decrease toward the root, so every ancestor precedes its children): a row
+// whose parent cannot be resolved is corrupt -- a dangling reference, or a parent cycle, which
+// necessarily places some parent after its child in row order. Both shapes must be rejected
+// with an error naming the offending row. Uses the variant format so rows can be mutated.
+BOOST_AUTO_TEST_CASE(test_corrupt_permission_parent_in_snapshot_rejected)
+{
+   savanna_tester chain;
+   const auto victim = "victim"_n;
+   chain.create_account(victim);
+   // Two custom permissions: custa under active, custb under custa.
+   chain.set_authority(victim, "custa"_n, authority(chain.get_public_key(victim, "custa")), "active"_n);
+   chain.set_authority(victim, "custb"_n, authority(chain.get_public_key(victim, "custb")), "custa"_n);
+   chain.produce_block();
+   chain.control->abort_block();
+
+   auto writer = variant_snapshot_suite::get_writer();
+   chain.control->write_snapshot(writer);
+   auto snapshot = variant_snapshot_suite::finalize(writer);
+
+   // Rebuild the snapshot variant with victim@<perm>'s parent name rewritten.
+   const std::string perm_section = chain::detail::snapshot_section_traits<permission_object>::section_name();
+   auto mutate_parent = [&](const std::string& perm, const std::string& new_parent) -> fc::variant {
+      uint32_t mutated_rows = 0;
+      fc::variants new_sections;
+      for (const auto& section : snapshot["sections"].get_array()) {
+         if (section["name"].as_string() != perm_section) {
+            new_sections.push_back(section);
+            continue;
+         }
+         fc::variants new_rows;
+         for (const auto& row : section["rows"].get_array()) {
+            const auto& ro = row.get_object();
+            if (ro["owner"].as_string() == victim.to_string() && ro["name"].as_string() == perm) {
+               new_rows.emplace_back(fc::mutable_variant_object(ro)("parent", new_parent));
+               ++mutated_rows;
+            } else {
+               new_rows.push_back(row);
+            }
+         }
+         new_sections.emplace_back(fc::mutable_variant_object()("name", section["name"])("rows", std::move(new_rows)));
+      }
+      BOOST_REQUIRE_EQUAL(mutated_rows, 1u);
+      return fc::mutable_variant_object()
+         ("version", snapshot["version"])
+         ("sections", std::move(new_sections));
+   };
+
+   // Parent cycle: custa's parent rewritten to custb while custb's parent is custa. custa loads
+   // first, custb is not yet present, so the load must fail on the unresolvable parent.
+   fc::variant cyclic = mutate_parent("custa", "custb");
+   BOOST_REQUIRE_EXCEPTION(
+      snapshotted_tester(chain.get_config(), variant_snapshot_suite::get_reader(cyclic), 0),
+      snapshot_exception,
+      [](const snapshot_exception& e) {
+         return e.to_detail_string().find("victim@custa references parent custb") != std::string::npos;
+      });
+
+   // Dangling parent: references a permission name that exists nowhere in the snapshot.
+   fc::variant dangling = mutate_parent("custb", "nosuchperm");
+   BOOST_REQUIRE_EXCEPTION(
+      snapshotted_tester(chain.get_config(), variant_snapshot_suite::get_reader(dangling), 1),
+      snapshot_exception,
+      [](const snapshot_exception& e) {
+         return e.to_detail_string().find("victim@custb references parent nosuchperm") != std::string::npos;
+      });
 }
 
 BOOST_AUTO_TEST_SUITE_END()

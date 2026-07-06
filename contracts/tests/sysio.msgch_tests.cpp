@@ -106,13 +106,6 @@ public:
 
    // ── Table read helpers ──
 
-   fc::variant get_message(uint64_t id) {
-      auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "messages"_n, id);
-      return data.empty() ? fc::variant() : abi_ser.binary_to_variant(
-         "message_entry", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
-   }
-
    fc::variant get_outbound_envelope(uint64_t id) {
       auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "outenvelopes"_n, id);
       return data.empty() ? fc::variant() : abi_ser.binary_to_variant(
@@ -337,7 +330,6 @@ using fc::slug_name_literals::operator""_s;
 /// tests register one EVM-class chain via `register_outpost(...)` which uses
 /// the spelling `"ETH"`. ETH_OUTPOST_ID is the slug_name's packed value.
 constexpr uint64_t ETH_OUTPOST_ID = "ETH"_s.value;
-constexpr uint64_t SOL_OUTPOST_ID = "SOL"_s.value;
 
 } // anonymous namespace
 
@@ -600,6 +592,23 @@ BOOST_FIXTURE_TEST_CASE(buildenv_packs_until_cap_then_leaves_remainder,
    uint32_t still_ready_after_emit2 =
       count_ready_attestations(/*chain_code=*/ETH_OUTPOST_ID, /*scan_until=*/TOTAL_ATTESTATIONS + 4);
    BOOST_REQUIRE_EQUAL(still_ready_after_emit2, 0u);
+} FC_LOG_AND_RETHROW() }
+
+// queueout carries no ABI-level auth. Without the depot-contract gate, any account could call it
+// directly and inject a forged READY attestation that buildenv() then packs into the depot's
+// group-signed outbound envelope (a forged SWAP_REMIT / WITHDRAW_REMIT / SLASH the outpost executes).
+// A direct call from a non-depot account must revert at the auth gate, which is the first statement
+// in queueout (before any state read), so this holds regardless of epoch-state setup. The authorized
+// path (msgch self / epoch / opreg / uwrit / reserv) is covered by the queueout()/buildenv() helpers
+// used throughout this suite, which sign as the depot and succeed.
+BOOST_FIXTURE_TEST_CASE(queueout_rejects_unauthorized_caller, sysio_msgch_tester) { try {
+   std::vector<char> forged(8, 0x7f);
+   BOOST_REQUIRE_EXCEPTION(
+      push_msgch_action("batchop1"_n, "queueout"_n,
+                        {{ "batchop1"_n, config::active_name }},
+                        mvo()("chain_code", 999)("attest_type", (uint16_t)7)("data", forged)),
+      sysio_assert_message_exception,
+      sysio_assert_message_is("queueout: caller not authorized to queue outbound attestations"));
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -18,6 +18,45 @@ using namespace std::literals;
 
 BOOST_AUTO_TEST_SUITE(protocol_feature_tests)
 
+namespace {
+
+constexpr std::string_view default_roa_net_cpu_weight = "1.0000 SYS";
+constexpr std::string_view zero_roa_weight            = "0.0000 SYS";
+constexpr int64_t          temporary_contract_roa_ram_units = 10000; // 1.0000 SYS
+constexpr uint32_t         ram_limit_probe_data_len = base_tester::bytes_per_unit + 1;
+
+/**
+ * Return the smallest ROA RAM asset that covers a concrete byte count.
+ */
+asset roa_ram_weight_for_bytes(uint64_t ram_bytes) {
+   const auto units = (ram_bytes + base_tester::bytes_per_unit - 1) / base_tester::bytes_per_unit;
+   return asset(static_cast<int64_t>(units), symbol(CORE_SYMBOL));
+}
+
+/**
+ * Return the temporary ROA RAM asset used while loading test contracts.
+ */
+asset temporary_contract_roa_ram_weight() {
+   return asset(temporary_contract_roa_ram_units, symbol(CORE_SYMBOL));
+}
+
+/**
+ * Trim the temporary contract-load RAM grant down to the account's current usage above its base RAM gift.
+ */
+void reduce_contract_roa_ram_to_current_usage(tester& c, account_name owner) {
+   const auto current_ram_usage = c.control->get_resource_limits_manager().get_account_ram_usage(owner);
+   BOOST_REQUIRE_GT(current_ram_usage, base_tester::newaccount_ram);
+
+   const auto target_ram_weight = roa_ram_weight_for_bytes(current_ram_usage - base_tester::newaccount_ram);
+   const auto temporary_ram_weight = temporary_contract_roa_ram_weight();
+   BOOST_REQUIRE_GT(temporary_ram_weight.get_amount(), target_ram_weight.get_amount());
+
+   c.reduce_roa_policy(c.NODE_DADDY, owner, std::string(zero_roa_weight), std::string(zero_roa_weight),
+                       (temporary_ram_weight - target_ram_weight).to_string(), 0);
+}
+
+} // namespace
+
 BOOST_AUTO_TEST_CASE( activate_protocol_feature ) try {
    tester c( setup_policy::none );
    const auto& pfm = c.control->get_protocol_feature_manager();
@@ -724,16 +763,18 @@ BOOST_AUTO_TEST_CASE(steal_contract_ram) {
       const auto &bob_account = account_name("bob");
 
       c.create_accounts({tester1_account, tester2_account, alice_account, bob_account}, false, true, false, true);
-      // Issuing _only_ enough RAM to load the contracts (KV contract is ~100KB)
-      c.add_roa_policy(c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "0.0968 SYS", 0, 0);
-      c.add_roa_policy(c.NODE_DADDY, tester2_account, "1.0000 SYS", "1.0000 SYS", "0.0968 SYS", 0, 0);
+      c.add_roa_policy(c.NODE_DADDY, tester1_account, std::string(default_roa_net_cpu_weight),
+                       std::string(default_roa_net_cpu_weight), temporary_contract_roa_ram_weight().to_string(), 0, 0);
+      c.add_roa_policy(c.NODE_DADDY, tester2_account, std::string(default_roa_net_cpu_weight),
+                       std::string(default_roa_net_cpu_weight), temporary_contract_roa_ram_weight().to_string(), 0, 0);
       c.produce_block();
       c.set_code(tester1_account, test_contracts::ram_restrictions_test_wasm());
       c.set_abi(tester1_account, test_contracts::ram_restrictions_test_abi());
       c.set_code(tester2_account, test_contracts::ram_restrictions_test_wasm());
       c.set_abi(tester2_account, test_contracts::ram_restrictions_test_abi());
       c.produce_block();
-      c.reduce_roa_policy(c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "0.0968 SYS", 0);
+      reduce_contract_roa_ram_to_current_usage(c, tester1_account);
+      reduce_contract_roa_ram_to_current_usage(c, tester2_account);
 
       c.register_node_owner(alice_account, 1);
       c.produce_block();
@@ -742,7 +783,7 @@ BOOST_AUTO_TEST_CASE(steal_contract_ram) {
       BOOST_REQUIRE_EXCEPTION(
          c.push_action(tester1_account, "setdata"_n, bob_account, mutable_variant_object()
             ("len1", 0)
-            ("len2", 10)
+            ("len2", ram_limit_probe_data_len)
             ("payer", tester1_account)
          ),
          ram_usage_exceeded,
@@ -751,7 +792,7 @@ BOOST_AUTO_TEST_CASE(steal_contract_ram) {
       BOOST_REQUIRE_EXCEPTION(
          c.push_action(tester2_account, "setdata"_n, bob_account, mutable_variant_object()
             ("len1", 0)
-            ("len2", 10)
+            ("len2", ram_limit_probe_data_len)
             ("payer", tester2_account)
          ),
          ram_usage_exceeded,
@@ -766,13 +807,13 @@ BOOST_AUTO_TEST_CASE(steal_contract_ram) {
       // Verify bob can add data to tester1, but not tester2
       c.push_action(tester1_account, "setdata"_n, bob_account, mutable_variant_object()
                     ("len1", 0)
-                    ("len2", 10)
+                    ("len2", ram_limit_probe_data_len)
                     ("payer", tester1_account)
       );
       BOOST_REQUIRE_EXCEPTION(
          c.push_action(tester2_account, "setdata"_n, bob_account, mutable_variant_object()
             ("len1", 0)
-            ("len2", 10)
+            ("len2", ram_limit_probe_data_len)
             ("payer", tester2_account)
          ),
          ram_usage_exceeded,
@@ -789,14 +830,14 @@ BOOST_AUTO_TEST_CASE(steal_contract_ram) {
          vector<permission_level>{{bob_account, config::active_name}},
          mutable_variant_object()
            ("len1", 0)
-           ("len2", 20)
+           ("len2", ram_limit_probe_data_len)
            ("payer", tester1_account)
       ) );
       trx.actions.emplace_back( c.get_action( tester2_account, "setdata"_n,
          vector<permission_level>{{bob_account, config::active_name}},
          mutable_variant_object()
            ("len1", 0)
-           ("len2", 20)
+           ("len2", ram_limit_probe_data_len)
            ("payer", tester2_account)
       ) );
 
@@ -806,7 +847,7 @@ BOOST_AUTO_TEST_CASE(steal_contract_ram) {
       BOOST_REQUIRE_EXCEPTION(
          c.push_transaction(trx),
          ram_usage_exceeded,
-         // Note: error requires 10 more bytes because we're sharing the cost of the transaction
+         // The second action still exceeds tester2's tight RAM quota when transaction costs are shared.
          fc_exception_message_starts_with("account tester2 has insufficient ram; needs")
       );
 
@@ -832,8 +873,10 @@ BOOST_AUTO_TEST_CASE( ram_restrictions_with_roa_test ) { try {
    const auto &carl_account = account_name("carl");
 
    c.create_accounts( {tester1_account, tester2_account, alice_account, bob_account, carl_account}, false, true, false);
-   c.add_roa_policy(c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "0.0968 SYS", 0, 0);
-   c.add_roa_policy(c.NODE_DADDY, tester2_account, "1.0000 SYS", "1.0000 SYS", "0.0968 SYS", 0, 0);
+   c.add_roa_policy(c.NODE_DADDY, tester1_account, std::string(default_roa_net_cpu_weight),
+                    std::string(default_roa_net_cpu_weight), temporary_contract_roa_ram_weight().to_string(), 0, 0);
+   c.add_roa_policy(c.NODE_DADDY, tester2_account, std::string(default_roa_net_cpu_weight),
+                    std::string(default_roa_net_cpu_weight), temporary_contract_roa_ram_weight().to_string(), 0, 0);
    c.produce_block();
    c.set_code( tester1_account, test_contracts::ram_restrictions_test_wasm() );
    c.set_abi( tester1_account, test_contracts::ram_restrictions_test_abi() );
@@ -841,6 +884,8 @@ BOOST_AUTO_TEST_CASE( ram_restrictions_with_roa_test ) { try {
    c.set_code( tester2_account, test_contracts::ram_restrictions_test_wasm() );
    c.set_abi( tester2_account, test_contracts::ram_restrictions_test_abi() );
    c.produce_block();
+   reduce_contract_roa_ram_to_current_usage(c, tester1_account);
+   reduce_contract_roa_ram_to_current_usage(c, tester2_account);
 
    // Make Alice and Carl Tier 1 Node Owners
    c.register_node_owner(alice_account, 1);
@@ -994,8 +1039,8 @@ BOOST_AUTO_TEST_CASE( ram_restrictions_with_roa_test ) { try {
    BOOST_REQUIRE_EXCEPTION(
    c.push_action( tester2_account, "notifysetdat"_n, bob_payer, mutable_variant_object()
       ("acctonotify", "tester1")
-      ("len1", 10)
-      ("len2", 10)
+      ("len1", ram_limit_probe_data_len)
+      ("len2", ram_limit_probe_data_len)
       ("payer", "tester1")
       ),
       ram_usage_exceeded,
@@ -1005,12 +1050,101 @@ BOOST_AUTO_TEST_CASE( ram_restrictions_with_roa_test ) { try {
    c.expand_roa_policy(c.NODE_DADDY, tester1_account, "100.0000 SYS", "100.0000 SYS", "100.0000 SYS", 0);
    c.push_action( tester2_account, "notifysetdat"_n, bob_payer, mutable_variant_object()
       ("acctonotify", "tester1")
-      ("len1", 10)
-      ("len2", 10)
+      ("len1", ram_limit_probe_data_len)
+      ("len2", ram_limit_probe_data_len)
       ("payer", "tester1")
    );
 
    c.produce_block();
+
+} FC_LOG_AND_RETHROW() }
+
+// ROA limit enforcement on KV storage operations.
+// All multi_index operations route through kv_set/kv_idx_store internally,
+// so this tests the KV billing path hitting the ROA RAM ceiling.
+BOOST_AUTO_TEST_CASE( kv_roa_limit_enforcement ) { try {
+   tester c( setup_policy::full );
+   c.produce_block();
+
+   const auto& tester1_account = account_name("tester1");
+   const auto& alice_account = account_name("alice");
+
+   c.create_accounts( {tester1_account, alice_account}, false, true, false );
+   c.add_roa_policy(c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "0.0986 SYS", 0, 0);
+   // Give alice a small RAM quota — enough for small data but not large
+   c.add_roa_policy(c.NODE_DADDY, alice_account, "1.0000 SYS", "1.0000 SYS", "0.0100 SYS", 0, 0);
+   c.produce_block();
+
+   c.set_code( tester1_account, test_contracts::ram_restrictions_test_wasm() );
+   c.set_abi( tester1_account, test_contracts::ram_restrictions_test_abi() );
+   c.produce_block();
+
+   // Small store works (within quota)
+   auto alice_payer = vector<permission_level>{
+      {alice_account, config::sysio_payer_name}, {alice_account, config::active_name}};
+   c.push_action( tester1_account, "setdata"_n, alice_payer, mutable_variant_object()
+      ("len1", 10)("len2", 0)("payer", alice_account) );
+   c.produce_block();
+
+   // Large store exceeds alice's ROA RAM quota (kv_set -> update_db_usage -> ram limit)
+   BOOST_REQUIRE_EXCEPTION(
+      c.push_action( tester1_account, "setdata"_n, alice_payer, mutable_variant_object()
+         ("len1", 100000)("len2", 0)("payer", alice_account) ),
+      ram_usage_exceeded,
+      fc_exception_message_contains("has insufficient ram")
+   );
+
+} FC_LOG_AND_RETHROW() }
+
+// Privileged sysio.* contract bypasses payer authorization.
+// validate_account_ram_deltas allows sysio.* privileged contracts to bill
+// any account's RAM without sysio.payer permission.
+BOOST_AUTO_TEST_CASE( privileged_kv_payer_bypass ) { try {
+   tester c( setup_policy::full );
+   c.produce_block();
+
+   const auto& priv_account = account_name("sysio.test");
+   const auto& alice_account = account_name("alice");
+
+   c.create_account( priv_account, config::system_account_name, false, true, false, false );
+   c.create_accounts( {alice_account}, false, true, false );
+   c.add_roa_policy(c.NODE_DADDY, alice_account, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0, 0);
+   c.produce_block();
+
+   c.set_code( priv_account, test_contracts::ram_restrictions_test_wasm() );
+   c.set_abi( priv_account, test_contracts::ram_restrictions_test_abi() );
+   c.set_privileged( priv_account );
+   c.produce_block();
+
+   // Privileged sysio.* contract billing alice WITHOUT sysio.payer auth succeeds
+   auto alice_ram_before = c.control->get_resource_limits_manager().get_account_ram_usage(alice_account);
+   c.push_action( priv_account, "setdata"_n, priv_account, mutable_variant_object()
+      ("len1", 10)("len2", 0)("payer", alice_account) );
+   c.produce_block();
+
+   // alice's RAM increased even though she didn't authorize
+   auto alice_ram_after = c.control->get_resource_limits_manager().get_account_ram_usage(alice_account);
+   BOOST_REQUIRE_GT(alice_ram_after, alice_ram_before);
+
+   // Non-sysio privileged contract still requires sysio.payer auth
+   const auto& priv2_account = account_name("privtest");
+   c.create_accounts( {priv2_account}, false, true, false );
+   c.add_roa_policy(c.NODE_DADDY, priv2_account, "1.0000 SYS", "1.0000 SYS", "0.0986 SYS", 0, 0);
+   c.produce_block();
+   c.set_code( priv2_account, test_contracts::ram_restrictions_test_wasm() );
+   c.set_abi( priv2_account, test_contracts::ram_restrictions_test_abi() );
+   c.set_privileged( priv2_account );
+   c.produce_block();
+
+   // Privileged but NOT sysio.* — skips the unprivileged has_authorization check
+   // (Path 1 in validate_account_ram_deltas) but still fails the sysio.payer
+   // permission check (Path 2) -> unsatisfied_authorization.
+   BOOST_REQUIRE_EXCEPTION(
+      c.push_action( priv2_account, "setdata"_n, priv2_account, mutable_variant_object()
+         ("len1", 10)("len2", 0)("payer", alice_account) ),
+      unsatisfied_authorization,
+      fc_exception_message_contains("Missing")
+   );
 
 } FC_LOG_AND_RETHROW() }
 

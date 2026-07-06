@@ -20,12 +20,14 @@ class WalletMgr(object):
 
     # pylint: disable=too-many-arguments
     # walletd [True|False] True=Launch wallet(kiod) process; False=Manage launch process externally.
-    def __init__(self, walletd, nodeopPort=8888, nodeopHost="localhost", port=9899, host="localhost", keepRunning=False, keepLogs=False):
+    def __init__(self, walletd, nodeopPort=None, nodeopHost="localhost", port=None, host="localhost", keepRunning=False, keepLogs=False):
+        """Create a wallet manager using sharded default ports when callers omit explicit ports."""
         atexit.register(self.shutdown)
         self.walletd=walletd
-        self.nodeopPort=nodeopPort
+        self.nodeopPort=Utils.getPort(Utils.PortNodeHttp) if nodeopPort is None else nodeopPort
         self.nodeopHost=nodeopHost
-        self.port=port
+        self.port=Utils.getPort(Utils.PortWallet) if port is None else port
+        self.usesDefaultWalletPort=port is None
         self.host=host
         self.keepRunning=keepRunning
         self.keepLogs=keepLogs or keepRunning
@@ -50,9 +52,16 @@ class WalletMgr(object):
         return self.host=="localhost" or self.host=="127.0.0.1"
 
     def findAvailablePort(self):
+        """Find an available wallet port within this test's shard."""
+        offset=Utils.getTestPortOffset()
+        shardLimit=(
+            Utils.getPort(Utils.PortWallet, Utils.WalletPortCount - 1)
+            if offset > 0 and self.usesDefaultWalletPort else 65535)
         for i in range(WalletMgr.__MaxPort):
             port=self.port+i  # pyright: ignore[reportOptionalOperand]
-            if port > WalletMgr.__MaxPort:
+            if port > shardLimit:
+                break
+            if offset == 0 and port > WalletMgr.__MaxPort:
                 port-=WalletMgr.__MaxPort
             if Utils.arePortsAvailable(port):
                 return port
@@ -317,9 +326,12 @@ class WalletMgr(object):
             Utils.Print(f"Shutting down wallet manager process {self.walletPid}")
             self.popenProc.send_signal(signal.SIGTERM)
             self.popenProc.wait()
+            self.popenProc=None
+            self.walletPid=None
         elif self.walletPid:
             Utils.Print("Killing wallet manager process %d" % (self.walletPid))
             os.kill(self.walletPid, signal.SIGKILL)
+            self.walletPid=None
         self.cleanup()
 
     def cleanup(self):

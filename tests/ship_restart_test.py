@@ -34,6 +34,10 @@ testSuccessful=False
 prodNodeId = 0
 shipNodeId = 1
 
+# SHiP log rotation stride. The shutdown guard below keeps the stop point clear of stride
+# boundaries so the head log/index files the test operates on are never empty.
+shipStride = 200
+
 origStateHistoryLog   = ""
 stateHistoryLog       = ""
 origStateHistoryIndex = ""
@@ -60,7 +64,13 @@ try:
 
     specificExtraNodeopArgs={}
     specificExtraNodeopArgs[prodNodeId]="--plugin sysio::producer_api_plugin"
-    specificExtraNodeopArgs[shipNodeId]="--plugin sysio::state_history_plugin --trace-history --chain-state-history --finality-data-history --state-history-stride 200 --plugin sysio::net_api_plugin --plugin sysio::producer_api_plugin"
+    specificExtraNodeopArgs[shipNodeId]=(
+        "--plugin sysio::state_history_plugin "
+        "--trace-history --chain-state-history --finality-data-history "
+        f"--state-history-stride {shipStride} "
+        f"--state-history-endpoint 127.0.0.1:{Utils.getPort(Utils.PortStateHistory)} "
+        "--plugin sysio::net_api_plugin --plugin sysio::producer_api_plugin"
+    )
 
     if cluster.launch(topo="mesh", pnodes=totalProducerNodes, totalNodes=totalNodes,
                       activateIF=True,
@@ -79,6 +89,13 @@ try:
     shipNode = cluster.getNode(shipNodeId)
 
     Print("Shutdown producer and SHiP nodes")
+
+    # Stop clear of a state-history-stride boundary: on an exact multiple the head log/index have
+    # just rotated into retained/ and are 0 bytes, so the file surgery below would operate on empty
+    # files.
+    assert prodNode.waitForBlockClearOfStride(shipStride, timeout=30), \
+        "producer did not advance clear of a state-history-stride boundary"
+
     prodNode.processUrllibRequest("producer", "pause", exitOnError=True)
     blockNum = prodNode.getHeadBlockNum()
     shipNode.waitForBlock(blockNum)

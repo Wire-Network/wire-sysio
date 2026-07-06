@@ -5,6 +5,7 @@
 #include <fc/io/json.hpp>
 #include <fc/log/logger.hpp>
 #include <fc/network/ethereum/ethereum_abi.hpp>
+#include <fc/task/deadline.hpp>
 
 #include <sysio/opp/opp.hpp>
 #include <sysio/opp/opp.pb.h>
@@ -19,6 +20,16 @@ namespace eth = fc::network::ethereum;
 constexpr std::string_view OP_DELIVER_OUTBOUND = "deliver_outbound_envelope";
 constexpr std::string_view OP_READ_INBOUND     = "read_inbound_envelope";
 constexpr std::string_view OP_UW_COMMIT        = "uw_commit";
+constexpr size_t EVM_ABI_WORD_BYTES            = 32;
+constexpr size_t HEX_PREFIX_CHARS              = 2;
+constexpr size_t HEX_CHARS_PER_BYTE            = 2;
+constexpr size_t MAX_ENVELOPE_HEX_CHARS =
+   HEX_PREFIX_CHARS + OPP_MAX_ENVELOPE_BYTES * HEX_CHARS_PER_BYTE;
+constexpr size_t MAX_LATEST_OUTBOUND_RPC_BYTES =
+   EVM_ABI_WORD_BYTES * 3 +
+   ((OPP_MAX_ENVELOPE_BYTES + EVM_ABI_WORD_BYTES - 1) / EVM_ABI_WORD_BYTES) * EVM_ABI_WORD_BYTES;
+constexpr size_t MAX_LATEST_OUTBOUND_RPC_HEX_CHARS =
+   HEX_PREFIX_CHARS + MAX_LATEST_OUTBOUND_RPC_BYTES * HEX_CHARS_PER_BYTE;
 
 } // namespace
 
@@ -67,6 +78,7 @@ std::string outpost_ethereum_client::deliver_outbound_envelope(
    const std::vector<char>& envelope_bytes,
    fc::microseconds         deadline) {
    const auto deadline_abs = fc::time_point::now() + deadline;
+   fc::task::deadline_scope rpc_deadline(deadline_abs);
 
    throw_if_past_deadline(deadline_abs, OP_DELIVER_OUTBOUND);
    FC_ASSERT(_opp_inbound_client,
@@ -86,6 +98,8 @@ std::vector<char> outpost_ethereum_client::read_inbound_envelope(
    uint32_t         epoch_index,
    fc::microseconds deadline) {
    const auto deadline_abs = fc::time_point::now() + deadline;
+   fc::task::deadline_scope rpc_deadline(deadline_abs);
+
    throw_if_past_deadline(deadline_abs, OP_READ_INBOUND);
    FC_ASSERT(_opp_client,
              "outpost_ethereum_client[{}]: read_inbound_envelope requires an OPP "
@@ -103,8 +117,14 @@ std::vector<char> outpost_ethereum_client::read_inbound_envelope(
    // so we get the structured outputs `(uint32 epoch_, bytes data_)`
    // back as a `mutable_variant_object`.
    const auto& abi = _opp_client->get_abi("getLatestOutboundEnvelope");
-   const auto raw_hex_var = _opp_client->get_latest_outbound_envelope(
-      std::string(eth::block_tag_latest));
+   // Read at `finalized`, not `latest`. WIRE consensus on inbound is committed forward against this
+   // read: an operator that reads a slot at `latest` can achieve WIRE-side consensus on it and queue
+   // attestations off it, then watch that slot reorg out of Ethereum's canonical chain seconds later,
+   // leaving WIRE committed to history that no longer exists. `finalized` is the only tag with
+   // cryptoeconomic finality. This is deliberately not operator-configurable: the read commitment is a
+   // consensus parameter, and operators reading at different commitments would deliver divergent
+   // envelopes for the same epoch, manufacturing disputes among honest operators.
+   const auto raw_hex_var = _opp_client->get_latest_outbound_envelope(eth::block_tag_t::finalized);
    if (!raw_hex_var.is_string()) {
       wlog("outpost_ethereum_client[{}]: getLatestOutboundEnvelope returned non-string variant",
            to_string());
@@ -119,6 +139,12 @@ std::vector<char> outpost_ethereum_client::read_inbound_envelope(
       // chain rolled back. Surface as a warning either way.
       wlog("outpost_ethereum_client[{}]: getLatestOutboundEnvelope returned empty hex",
            to_string());
+      return {};
+   }
+   if (raw_hex.size() > MAX_LATEST_OUTBOUND_RPC_HEX_CHARS) {
+      wlog("outpost_ethereum_client[{}]: getLatestOutboundEnvelope raw hex "
+           "({} chars) exceeds ABI envelope cap of {} chars",
+           to_string(), raw_hex.size(), MAX_LATEST_OUTBOUND_RPC_HEX_CHARS);
       return {};
    }
 
@@ -175,8 +201,20 @@ std::vector<char> outpost_ethereum_client::read_inbound_envelope(
       return {};
    }
    const std::string hex_data = data_var.as_string();
+   if (hex_data.size() > MAX_ENVELOPE_HEX_CHARS) {
+      wlog("outpost_ethereum_client[{}]: latestOutboundEnvelope data_ "
+           "({} chars) exceeds envelope cap of {} chars",
+           to_string(), hex_data.size(), MAX_ENVELOPE_HEX_CHARS);
+      return {};
+   }
    const auto raw = fc::crypto::ethereum::hex_to_bytes(hex_data);
    if (raw.empty()) return {};
+   if (raw.size() > OPP_MAX_ENVELOPE_BYTES) {
+      wlog("outpost_ethereum_client[{}]: latestOutboundEnvelope raw "
+           "envelope ({} bytes) exceeds cap of {} bytes",
+           to_string(), raw.size(), OPP_MAX_ENVELOPE_BYTES);
+      return {};
+   }
 
    sysio::opp::Envelope envelope;
    if (!envelope.ParseFromArray(raw.data(), static_cast<int>(raw.size()))) {
@@ -204,6 +242,8 @@ std::string outpost_ethereum_client::uw_commit(
    const std::vector<char>& uic_bytes,
    fc::microseconds         deadline) {
    const auto deadline_abs = fc::time_point::now() + deadline;
+   fc::task::deadline_scope rpc_deadline(deadline_abs);
+
    throw_if_past_deadline(deadline_abs, OP_UW_COMMIT);
 
    FC_ASSERT(_operator_registry_client,

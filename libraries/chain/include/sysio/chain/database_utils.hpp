@@ -1,9 +1,17 @@
 #pragma once
 
 #include <sysio/chain/types.hpp>
+#include <sysio/chain/abi_def.hpp>
+#include <fc/int128.hpp>
 #include <fc/io/raw.hpp>
 #include <fc/crypto/base64.hpp>
 #include <softfloat/softfloat.hpp>
+
+#include <algorithm>
+#include <array>
+#include <optional>
+#include <set>
+#include <string_view>
 
 namespace sysio::chain {
 
@@ -145,10 +153,20 @@ namespace detail {
 
 // ---------------------------------------------------------------------------
 // BE key codec -- mirrors the CDT's be_key_stream encoding in kv_raw_table.hpp.
-// Used by get_table_rows API to decode/encode format=0 raw keys.
-// Supports: uint8, int8, uint16, int16, uint32, int32, uint64, int64,
-//           name, bool, string, float64/double.
+// Used by get_table_rows API to decode/encode format=0 raw keys. The set of
+// directly-supported scalar leaf types is the `key_leaf_kind` enum below
+// (struct keys are expanded field-by-field on top of those leaves).
 // ---------------------------------------------------------------------------
+// Forward declarations: the fc softfloat128_t variant conversions are defined at
+// the bottom of this header; the BE key codec below uses them.
+} // namespace sysio::chain
+namespace fc {
+   class variant;
+   inline void to_variant( const softfloat128_t& f, variant& v );
+   inline void from_variant( const variant& v, softfloat128_t& f );
+} // namespace fc
+namespace sysio::chain {
+
 namespace be_key_codec {
 
 struct reader {
@@ -162,6 +180,13 @@ struct reader {
    uint16_t read_be16() { return read_be<uint16_t>(); }
    uint32_t read_be32() { return read_be<uint32_t>(); }
    uint64_t read_be64() { return read_be<uint64_t>(); }
+
+   // Copy `n` raw bytes (already order-preserving, e.g. a checksum digest).
+   void read_bytes(char* out, size_t n) {
+      FC_ASSERT(remaining() >= n, "BE key underflow reading {} raw bytes", n);
+      std::memcpy(out, pos, n);
+      pos += n;
+   }
 
    // NUL-escape decoding: 0x00,0x01 = literal NUL byte, 0x00,0x00 = end of string.
    std::string read_nul_escaped_string() {
@@ -201,6 +226,9 @@ struct writer {
 
    void write_u8(uint8_t v) { buf.push_back(static_cast<char>(v)); }
 
+   // Append `n` raw bytes verbatim (already order-preserving).
+   void write_bytes(const char* p, size_t n) { buf.insert(buf.end(), p, p + n); }
+
    void write_be16(uint16_t v) { write_be(v); }
 
    void write_be32(uint32_t v) { write_be(v); }
@@ -231,87 +259,349 @@ private:
    }
 };
 
-inline fc::variant decode_field(reader& r, const std::string& type) {
-   if (type == "uint8")         return fc::variant(r.read_u8());
-   if (type == "int8")          return fc::variant(static_cast<int8_t>(r.read_u8() ^ 0x80u));
-   if (type == "uint16")        return fc::variant(r.read_be16());
-   if (type == "int16")         return fc::variant(static_cast<int16_t>(r.read_be16() ^ 0x8000u));
-   if (type == "uint32")        return fc::variant(r.read_be32());
-   if (type == "int32")         return fc::variant(static_cast<int32_t>(r.read_be32() ^ 0x80000000u));
-   if (type == "uint64")        return fc::variant(r.read_be64());
-   if (type == "int64")         return fc::variant(static_cast<int64_t>(r.read_be64() ^ (uint64_t(1) << 63)));
-   if (type == "name")          return fc::variant(name(r.read_be64()).to_string());
-   if (type == "bool")          return fc::variant(r.read_u8() != 0);
-   if (type == "string")        return fc::variant(r.read_nul_escaped_string());
-   if (type == "float32" || type == "float") {
+// ── Leaf key kinds ──────────────────────────────────────────────────────────
+// The closed set of builtin scalar types the codec encodes/decodes directly;
+// every other key type is a struct key, expanded field-by-field on top of these
+// leaves (see the ABI-aware key shapes below). A key field's ABI spelling is
+// resolved to one of these kinds ONCE, when its key_shape is built, so the
+// encode/decode paths switch on an enum instead of re-comparing type strings on
+// every row. Several ABI spellings collapse to one kind (e.g. "float"/"float32",
+// "double"/"float64", "long double"/"float128").
+enum class key_leaf_kind {
+   uint8, int8, uint16, int16, uint32, int32, uint64, int64,
+   uint128, int128, checksum256,
+   name, boolean, string,
+   float32, float64, float128,
+};
+
+/// One ABI type spelling and the leaf kind it resolves to.
+struct leaf_key_spelling {
+   std::string_view spelling;
+   key_leaf_kind    kind;
+};
+
+/// Single source of truth for which ABI spellings are codec leaves and which
+/// kind each maps to. `leaf_kind_of` looks up this table, and `build_key_shape`
+/// uses the result to decide leaf-vs-struct; a spelling absent here is treated
+/// as a struct key. Multiple spellings may share a kind (the float aliases).
+/// INVARIANT: every `key_leaf_kind` reachable from this table MUST have a case
+/// in BOTH the encode_field and decode_field switches below. Those switches are
+/// exhaustive over the enum, so under -Wswitch a new kind without a branch is a
+/// compile error; the be_key_codec_tests `leaf_support_list_roundtrips` case
+/// additionally round-trips every spelling here to pin the mapping at test time.
+/// The array size is deduced from the initializer (via std::to_array) so adding
+/// a spelling needs no count to be kept in sync.
+inline constexpr auto leaf_key_spellings = std::to_array<leaf_key_spelling>({
+   {"uint8",       key_leaf_kind::uint8},
+   {"int8",        key_leaf_kind::int8},
+   {"uint16",      key_leaf_kind::uint16},
+   {"int16",       key_leaf_kind::int16},
+   {"uint32",      key_leaf_kind::uint32},
+   {"int32",       key_leaf_kind::int32},
+   {"uint64",      key_leaf_kind::uint64},
+   {"int64",       key_leaf_kind::int64},
+   {"uint128",     key_leaf_kind::uint128},
+   {"int128",      key_leaf_kind::int128},
+   {"checksum256", key_leaf_kind::checksum256},
+   {"name",        key_leaf_kind::name},
+   {"bool",        key_leaf_kind::boolean},
+   {"string",      key_leaf_kind::string},
+   {"float32",     key_leaf_kind::float32},
+   {"float",       key_leaf_kind::float32},
+   {"float64",     key_leaf_kind::float64},
+   {"double",      key_leaf_kind::float64},
+   {"float128",    key_leaf_kind::float128},
+   {"long double", key_leaf_kind::float128},
+});
+
+/// Resolve an (already typedef-resolved) ABI type spelling to its leaf kind, or
+/// nullopt if it is not a codec leaf — i.e. it must be expanded as a struct key.
+inline std::optional<key_leaf_kind> leaf_kind_of(std::string_view type) {
+   for (const auto& e : leaf_key_spellings)
+      if (e.spelling == type)
+         return e.kind;
+   return std::nullopt;
+}
+
+inline fc::variant decode_field(reader& r, key_leaf_kind kind) {
+   switch (kind) {
+   case key_leaf_kind::uint8:  return fc::variant(r.read_u8());
+   case key_leaf_kind::int8:   return fc::variant(static_cast<int8_t>(r.read_u8() ^ 0x80u));
+   case key_leaf_kind::uint16: return fc::variant(r.read_be16());
+   case key_leaf_kind::int16:  return fc::variant(static_cast<int16_t>(r.read_be16() ^ 0x8000u));
+   case key_leaf_kind::uint32: return fc::variant(r.read_be32());
+   case key_leaf_kind::int32:  return fc::variant(static_cast<int32_t>(r.read_be32() ^ 0x80000000u));
+   case key_leaf_kind::uint64: return fc::variant(r.read_be64());
+   case key_leaf_kind::int64:  return fc::variant(static_cast<int64_t>(r.read_be64() ^ (uint64_t(1) << 63)));
+   case key_leaf_kind::uint128: {
+      // 16-byte big-endian, high quadword first — mirrors the uint64 BE layout.
+      const uint64_t hi = r.read_be64();
+      const uint64_t lo = r.read_be64();
+      fc::variant v;
+      fc::to_variant(fc::to_uint128(hi, lo), v);
+      return v;
+   }
+   case key_leaf_kind::int128: {
+      // Sign-flip the high quadword (same bias trick as int64) so signed values BE-sort.
+      const uint64_t hi = r.read_be64() ^ (uint64_t(1) << 63);
+      const uint64_t lo = r.read_be64();
+      fc::variant v;
+      fc::to_variant(static_cast<fc::int128>(fc::to_uint128(hi, lo)), v);
+      return v;
+   }
+   case key_leaf_kind::checksum256: {
+      // Raw 32 digest bytes in display order: fixed_bytes packs its words
+      // big-endian, so CDT's to_key emits the canonical byte sequence and
+      // memcmp order matches checksum256 ordering. Canonical hex spelling
+      // via fc::sha256's variant conversion.
+      fc::sha256 h;
+      r.read_bytes(h.data(), h.data_size());
+      fc::variant v;
+      fc::to_variant(h, v);
+      return v;
+   }
+   case key_leaf_kind::name:    return fc::variant(name(r.read_be64()).to_string());
+   case key_leaf_kind::boolean: return fc::variant(r.read_u8() != 0);
+   case key_leaf_kind::string:  return fc::variant(r.read_nul_escaped_string());
+   case key_leaf_kind::float32: {
       uint32_t bits = r.read_be32();
       if (bits >> 31) bits ^= (uint32_t(1) << 31);
       else            bits = ~bits;
       float v; memcpy(&v, &bits, 4);
       return fc::variant(static_cast<double>(v));
    }
-   if (type == "float64" || type == "double") {
+   case key_leaf_kind::float64: {
       uint64_t bits = r.read_be64();
       if (bits >> 63) bits ^= (uint64_t(1) << 63);
       else            bits = ~bits;
       double v; memcpy(&v, &bits, 8);
       return fc::variant(v);
    }
-   FC_ASSERT(false, "Unsupported BE key type: {}", type);
+   case key_leaf_kind::float128: {
+      // Same IEEE sort-order trick as float32/64 at 128 bits. SOURCE OF TRUTH:
+      // these bytes were produced by CDT kv_multi_index::encode_secondary(long
+      // double) (wire-cdt kv_multi_index.hpp) and stored in the row's secondary
+      // key — this branch must invert that transform byte-for-byte. The e2e
+      // float128 pagination in get_table_tests (sec-9) pins the agreement; a
+      // change to CDT's long-double key encoding would break it there. Spelling
+      // is fc's canonical softfloat128_t form ("0x" + 16 LE hex bytes).
+      const uint64_t hi_enc = r.read_be64();
+      const uint64_t lo_enc = r.read_be64();
+      fc::uint128 bits = fc::to_uint128(hi_enc, lo_enc);
+      if (bits >> 127) bits ^= (fc::uint128(1) << 127);
+      else             bits = ~bits;
+      softfloat128_t v;
+      memcpy(&v, &bits, sizeof(v)); // little-endian platform assumption, as elsewhere in this file
+      fc::variant out;
+      fc::to_variant(v, out);
+      return out;
+   }
+   }
+   // Unreachable: the switch is exhaustive over key_leaf_kind and `kind` is only
+   // ever produced by leaf_kind_of. Guards against a future kind added without a
+   // decode_field case (also surfaced at compile time under -Wswitch).
+   FC_ASSERT(false, "Unhandled BE key leaf kind in decode_field — add a case for every key_leaf_kind");
 }
 
-inline void encode_field(writer& w, const std::string& type, const fc::variant& val) {
-   if (type == "uint8")         { w.write_u8(static_cast<uint8_t>(val.as_uint64())); return; }
-   if (type == "int8")          { w.write_u8(static_cast<uint8_t>(static_cast<uint8_t>(val.as_int64()) ^ 0x80u)); return; }
-   if (type == "uint16")        { w.write_be16(static_cast<uint16_t>(val.as_uint64())); return; }
-   if (type == "int16")         { w.write_be16(static_cast<uint16_t>(static_cast<uint16_t>(val.as_int64()) ^ 0x8000u)); return; }
-   if (type == "uint32")        { w.write_be32(static_cast<uint32_t>(val.as_uint64())); return; }
-   if (type == "int32")         { w.write_be32(static_cast<uint32_t>(static_cast<uint32_t>(val.as_int64()) ^ 0x80000000u)); return; }
-   if (type == "uint64")        { w.write_be64(val.as_uint64()); return; }
-   if (type == "int64")         { w.write_be64(static_cast<uint64_t>(val.as_int64()) ^ (uint64_t(1) << 63)); return; }
-   if (type == "name")          { w.write_be64(name(val.as_string()).to_uint64_t()); return; }
-   if (type == "bool")          { w.write_u8(val.as_bool() ? 1 : 0); return; }
-   if (type == "string")        { w.write_nul_escaped_string(val.as_string()); return; }
-   if (type == "float32" || type == "float") {
+inline void encode_field(writer& w, key_leaf_kind kind, const fc::variant& val) {
+   switch (kind) {
+   case key_leaf_kind::uint8:  w.write_u8(static_cast<uint8_t>(val.as_uint64())); return;
+   case key_leaf_kind::int8:   w.write_u8(static_cast<uint8_t>(static_cast<uint8_t>(val.as_int64()) ^ 0x80u)); return;
+   case key_leaf_kind::uint16: w.write_be16(static_cast<uint16_t>(val.as_uint64())); return;
+   case key_leaf_kind::int16:  w.write_be16(static_cast<uint16_t>(static_cast<uint16_t>(val.as_int64()) ^ 0x8000u)); return;
+   case key_leaf_kind::uint32: w.write_be32(static_cast<uint32_t>(val.as_uint64())); return;
+   case key_leaf_kind::int32:  w.write_be32(static_cast<uint32_t>(static_cast<uint32_t>(val.as_int64()) ^ 0x80000000u)); return;
+   case key_leaf_kind::uint64: w.write_be64(val.as_uint64()); return;
+   case key_leaf_kind::int64:  w.write_be64(static_cast<uint64_t>(val.as_int64()) ^ (uint64_t(1) << 63)); return;
+   case key_leaf_kind::uint128: {
+      // Accepts a native uint128 variant, a uint64 number, or a decimal/hex string
+      // (the JSON spelling for values past 2^64) via fc::from_variant.
+      fc::uint128 u = 0;
+      fc::from_variant(val, u);
+      w.write_be64(static_cast<uint64_t>(u >> 64));
+      w.write_be64(static_cast<uint64_t>(u));
+      return;
+   }
+   case key_leaf_kind::int128: {
+      fc::int128 i = 0;
+      fc::from_variant(val, i);
+      const auto u = static_cast<fc::uint128>(i);
+      w.write_be64(static_cast<uint64_t>(u >> 64) ^ (uint64_t(1) << 63));
+      w.write_be64(static_cast<uint64_t>(u));
+      return;
+   }
+   case key_leaf_kind::checksum256: {
+      fc::sha256 h;
+      fc::from_variant(val, h);
+      w.write_bytes(h.data(), h.data_size());
+      return;
+   }
+   case key_leaf_kind::name:    w.write_be64(name(val.as_string()).to_uint64_t()); return;
+   case key_leaf_kind::boolean: w.write_u8(val.as_bool() ? 1 : 0); return;
+   case key_leaf_kind::string:  w.write_nul_escaped_string(val.as_string()); return;
+   case key_leaf_kind::float32: {
       float f = static_cast<float>(val.as_double());
       uint32_t bits; memcpy(&bits, &f, 4);
       if (bits >> 31) bits = ~bits;
       else            bits ^= (uint32_t(1) << 31);
       w.write_be32(bits); return;
    }
-   if (type == "float64" || type == "double") {
+   case key_leaf_kind::float64: {
       double d = val.as_double();
       uint64_t bits; memcpy(&bits, &d, 8);
       if (bits >> 63) bits = ~bits;
       else            bits ^= (uint64_t(1) << 63);
       w.write_be64(bits); return;
    }
-   FC_ASSERT(false, "Unsupported BE key type: {}", type);
+   case key_leaf_kind::float128: {
+      // Inverse of the decode_field float128 branch; must reproduce CDT
+      // kv_multi_index::encode_secondary(long double) byte-for-byte so a JSON
+      // bound compares against the stored secondary key (see that branch for the
+      // source-of-truth note).
+      softfloat128_t f;
+      fc::from_variant(val, f);
+      fc::uint128 bits;
+      memcpy(&bits, &f, sizeof(bits)); // little-endian platform assumption, as elsewhere in this file
+      if (bits >> 127) bits = ~bits;
+      else             bits ^= (fc::uint128(1) << 127);
+      w.write_be64(static_cast<uint64_t>(bits >> 64));
+      w.write_be64(static_cast<uint64_t>(bits));
+      return;
+   }
+   }
+   // Unreachable: the switch is exhaustive over key_leaf_kind and `kind` is only
+   // ever produced by leaf_kind_of. Guards against a future kind added without an
+   // encode_field case (also surfaced at compile time under -Wswitch).
+   FC_ASSERT(false, "Unhandled BE key leaf kind in encode_field — add a case for every key_leaf_kind");
 }
 
-inline fc::variant decode_key(const char* data, size_t size,
-                              const vector<std::string>& key_names,
-                              const vector<std::string>& key_types) {
+// ── ABI-aware key shapes ────────────────────────────────────────────────────
+// kv/multi_index keys are not limited to the builtin leaf types above: CDT's
+// to_key reflects through typedefs and struct key types — e.g. `slug_name`
+// (struct { value: uint64 }) is the primary key of the v6 registry tables
+// (sysio.chains chains, sysio.tokens tokens/chaintokens, sysio.reserv
+// reserves). A key_shape is the resolved encode/decode plan for one key
+// field: a leaf with a codec-supported type, or a struct node whose children
+// encode in declaration order (matching to_key's reflected-field walk). Leaf
+// types and their kinds are defined above, with the codec (key_leaf_kind /
+// leaf_key_spellings / leaf_kind_of).
+
+/// Canonicalize abigen template spellings and chase ABI typedefs to a fixpoint.
+/// A visited set of resolved typedef names makes an alias cycle (a -> b -> ...
+/// -> a) a precise diagnostic instead of the generic "Unsupported BE key type"
+/// the caller would otherwise report once the loop landed on the unresolved
+/// alias. The set holds at most one entry per typedef, so the walk still
+/// terminates in O(typedef count).
+inline std::string resolve_key_type(const abi_def& abi, std::string type) {
+   std::set<std::string> seen;
+   for (;;) {
+      if (type == "fixed_bytes<32>") { type = "checksum256"; } // checksum256-equivalent key spelling
+      auto it = std::find_if(abi.types.begin(), abi.types.end(),
+                             [&](const type_def& td) { return td.new_type_name == type; });
+      if (it == abi.types.end())
+         return type; // not (or no longer) a typedef — fully resolved
+      FC_ASSERT(seen.insert(type).second, "Typedef cycle while resolving BE key type '{}'", type);
+      type = it->type;
+   }
+}
+
+/// Maximum struct-key nesting depth. Bounds build_key_shape's recursion so a
+/// self-referential struct definition (a key struct with a field of its own
+/// type) is rejected with a clear error instead of overflowing the stack.
+inline constexpr size_t max_key_struct_depth = 8;
+
+/// Resolved encode/decode plan for one key field.
+struct key_shape {
+   std::string            name;            ///< field name (bound-object key / decoded-object key)
+   std::string            type;            ///< resolved type — leaf spelling (diagnostics) or struct name for nodes
+   bool                   is_leaf = false; ///< true → encode/decode via the leaf codec (dispatch on `kind`); false → struct node (recurse children)
+   key_leaf_kind          kind{};          ///< leaf codec dispatch discriminant; meaningful only when is_leaf
+   std::vector<key_shape> children;        ///< struct field shapes in declaration (encode) order
+};
+
+/// Build the shape for one declared key field, expanding struct key types
+/// through the ABI. Struct bases are rejected (CDT's reflected to_key walks
+/// only the declared fields, so a based key struct has no defined order here).
+inline key_shape build_key_shape(const abi_def& abi, const std::string& field_name,
+                                 const std::string& declared_type, size_t depth = 0) {
+   FC_ASSERT(depth <= max_key_struct_depth, "BE key struct nesting too deep at field '{}'", field_name);
+   key_shape shape;
+   shape.name = field_name;
+   shape.type = resolve_key_type(abi, declared_type);
+   if (auto kind = leaf_kind_of(shape.type)) {
+      shape.is_leaf = true;
+      shape.kind    = *kind;
+      return shape;
+   }
+   // Not a leaf: a struct node. A zero-field struct stays a node with no
+   // children and encodes to zero bytes, matching to_key's reflected walk.
+   auto it = std::find_if(abi.structs.begin(), abi.structs.end(),
+                          [&](const struct_def& sd) { return sd.name == shape.type; });
+   FC_ASSERT(it != abi.structs.end(), "Unsupported BE key type: {}", shape.type);
+   FC_ASSERT(it->base.empty(), "BE key struct '{}' with a base is not supported", shape.type);
+   shape.children.reserve(it->fields.size());
+   for (const auto& f : it->fields)
+      shape.children.push_back(build_key_shape(abi, f.name, f.type, depth + 1));
+   return shape;
+}
+
+/// Build shapes for a table's full key field list (ABI key_names/key_types).
+inline std::vector<key_shape> build_key_shapes(const abi_def& abi,
+                                               const vector<std::string>& key_names,
+                                               const vector<std::string>& key_types) {
    FC_ASSERT(key_names.size() == key_types.size(), "ABI key_names/key_types size mismatch");
+   std::vector<key_shape> shapes;
+   shapes.reserve(key_names.size());
+   for (size_t i = 0; i < key_names.size(); ++i)
+      shapes.push_back(build_key_shape(abi, key_names[i], key_types[i]));
+   return shapes;
+}
+
+/// Encode one key field per its shape: a leaf goes straight to encode_field; a
+/// struct node reads each child by name from `val` (a JSON object) and encodes
+/// the children in declaration order, matching to_key's reflected-field walk.
+inline void encode_shape(writer& w, const key_shape& shape, const fc::variant& val) {
+   if (shape.is_leaf) {
+      encode_field(w, shape.kind, val);
+      return;
+   }
+   const auto& obj = val.get_object();
+   for (const auto& child : shape.children) {
+      auto it = obj.find(child.name);
+      FC_ASSERT(it != obj.end(), "Key field '{}' not found in bound object for struct '{}'",
+                child.name, shape.type);
+      encode_shape(w, child, it->value());
+   }
+}
+
+/// Decode one key field per its shape: a leaf returns the decoded scalar; a
+/// struct node returns a nested object of its children, decoded in declaration
+/// order (the inverse of encode_shape).
+inline fc::variant decode_shape(reader& r, const key_shape& shape) {
+   if (shape.is_leaf)
+      return decode_field(r, shape.kind);
+   fc::mutable_variant_object obj;
+   for (const auto& child : shape.children)
+      obj(child.name, decode_shape(r, child));
+   return fc::variant(std::move(obj));
+}
+
+inline fc::variant decode_key(const char* data, size_t size, const std::vector<key_shape>& shapes) {
    reader r(data, size);
    fc::mutable_variant_object obj;
-   for (size_t i = 0; i < key_names.size(); ++i) {
-      obj(key_names[i], decode_field(r, key_types[i]));
-   }
+   for (const auto& shape : shapes)
+      obj(shape.name, decode_shape(r, shape));
    FC_ASSERT(r.remaining() == 0, "BE key has {} trailing bytes after decoding all fields", r.remaining());
    return fc::variant(std::move(obj));
 }
 
-inline std::vector<char> encode_key(const fc::variant& key_var,
-                                    const vector<std::string>& key_names,
-                                    const vector<std::string>& key_types) {
-   FC_ASSERT(key_names.size() == key_types.size(), "ABI key_names/key_types size mismatch");
+inline std::vector<char> encode_key(const fc::variant& key_var, const std::vector<key_shape>& shapes) {
    const auto& obj = key_var.get_object();
    writer w;
-   for (size_t i = 0; i < key_names.size(); ++i) {
-      auto it = obj.find(key_names[i]);
-      FC_ASSERT(it != obj.end(), "Key field '{}' not found in bound object", key_names[i]);
-      encode_field(w, key_types[i], it->value());
+   for (const auto& shape : shapes) {
+      auto it = obj.find(shape.name);
+      FC_ASSERT(it != obj.end(), "Key field '{}' not found in bound object", shape.name);
+      encode_shape(w, shape, it->value());
    }
    return w.release();
 }
@@ -334,41 +624,41 @@ namespace fc {
    }
 
    inline
-   void float64_to_double (const float64_t& f, double& d) {
+   void float64_to_double (const softfloat64_t& f, double& d) {
       memcpy(&d, &f, sizeof(d));
    }
 
    inline
-   void double_to_float64 (const double& d, float64_t& f) {
+   void double_to_float64 (const double& d, softfloat64_t& f) {
       memcpy(&f, &d, sizeof(f));
    }
 
    inline
-   void float128_to_uint128 (const float128_t& f, sysio::chain::uint128_t& u) {
+   void float128_to_uint128 (const softfloat128_t& f, sysio::chain::uint128_t& u) {
       memcpy(&u, &f, sizeof(u));
    }
 
    inline
-   void uint128_to_float128 (const sysio::chain::uint128_t& u,  float128_t& f) {
+   void uint128_to_float128 (const sysio::chain::uint128_t& u,  softfloat128_t& f) {
       memcpy(&f, &u, sizeof(f));
    }
 
    inline
-   void to_variant( const float64_t& f, variant& v ) {
+   void to_variant( const softfloat64_t& f, variant& v ) {
       double double_f;
       float64_to_double(f, double_f);
       v = variant(double_f);
    }
 
    inline
-   void from_variant( const variant& v, float64_t& f ) {
+   void from_variant( const variant& v, softfloat64_t& f ) {
       double double_f;
       from_variant(v, double_f);
       double_to_float64(double_f, f);
    }
 
    inline
-   void to_variant( const float128_t& f, variant& v ) {
+   void to_variant( const softfloat128_t& f, variant& v ) {
       // Assumes platform is little endian and hex representation of 128-bit integer is in little endian order.	
       char as_bytes[sizeof(sysio::chain::uint128_t)];
       memcpy(as_bytes, &f, sizeof(as_bytes));
@@ -378,15 +668,16 @@ namespace fc {
    }
 
    inline
-   void from_variant( const variant& v, float128_t& f ) {
-      // Temporarily hold the binary in uint128_t before casting it to float128_t
+   void from_variant( const variant& v, softfloat128_t& f ) {
+      // Temporarily hold the binary in uint128_t before casting it to softfloat128_t
       char temp[sizeof(sysio::chain::uint128_t)];
       memset(temp, 0, sizeof(temp));
-      auto s = v.as_string();	
-      FC_ASSERT( s.size() == 2 + 2 * sizeof(temp) && s.find("0x") == 0,	"Failure in converting hex data into a float128_t");	
+      auto s = v.as_string();
+      FC_ASSERT( s.size() == 2 + 2 * sizeof(temp) && s.find("0x") == 0,
+                 "Failure in converting hex data into a softfloat128_t" );
       auto sz = from_hex( s.substr(2), temp, sizeof(temp) );
-      // Assumes platform is little endian and hex representation of 128-bit integer is in little endian order.	
-      FC_ASSERT( sz == sizeof(temp), "Failure in converting hex data into a float128_t" );	
+      // Assumes platform is little endian and hex representation of 128-bit integer is in little endian order.
+      FC_ASSERT( sz == sizeof(temp), "Failure in converting hex data into a softfloat128_t" );
       memcpy(&f, temp, sizeof(f));
    }
 
@@ -516,7 +807,7 @@ namespace chainbase {
 
 // overloads for softfloat packing
 template<typename DataStream>
-DataStream& operator << ( DataStream& ds, const float64_t& v ) {
+DataStream& operator << ( DataStream& ds, const softfloat64_t& v ) {
    double double_v;
    fc::float64_to_double(v, double_v);
    fc::raw::pack(ds, double_v);
@@ -524,7 +815,7 @@ DataStream& operator << ( DataStream& ds, const float64_t& v ) {
 }
 
 template<typename DataStream>
-DataStream& operator >> ( DataStream& ds, float64_t& v ) {
+DataStream& operator >> ( DataStream& ds, softfloat64_t& v ) {
    double double_v;
    fc::raw::unpack(ds, double_v);
    fc::double_to_float64(double_v, v);
@@ -532,7 +823,7 @@ DataStream& operator >> ( DataStream& ds, float64_t& v ) {
 }
 
 template<typename DataStream>
-DataStream& operator << ( DataStream& ds, const float128_t& v ) {
+DataStream& operator << ( DataStream& ds, const softfloat128_t& v ) {
    sysio::chain::uint128_t uint128_v;
    fc::float128_to_uint128(v, uint128_v);
    fc::raw::pack(ds, uint128_v);
@@ -540,7 +831,7 @@ DataStream& operator << ( DataStream& ds, const float128_t& v ) {
 }
 
 template<typename DataStream>
-DataStream& operator >> ( DataStream& ds, float128_t& v ) {
+DataStream& operator >> ( DataStream& ds, softfloat128_t& v ) {
    sysio::chain::uint128_t uint128_v;
    fc::raw::unpack(ds, uint128_v);
    fc::uint128_to_float128(uint128_v, v);

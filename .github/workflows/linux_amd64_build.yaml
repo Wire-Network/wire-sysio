@@ -1,0 +1,341 @@
+name: "Linux amd64 build & tests"
+
+on:
+  push:
+    branches:
+      - master
+      - "release/*"
+  pull_request:
+    types: [ opened, synchronize, reopened, ready_for_review ]
+    branches:
+      - master
+  workflow_dispatch:
+    inputs:
+      override-cdt:
+        description: 'Override cdt target'
+        type: string
+      override-cdt-prerelease:
+        type: choice
+        description: Override cdt prelease
+        options:
+        - default
+        - true
+        - false
+      override-sys-system-contracts:
+        description: 'Override sys-system-contracts ref'
+        type: string
+
+permissions:
+  packages: read
+  contents: read
+
+env:
+  WORKFLOW_NAME: "Build & Test Workflow"
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  platform-cache:
+    name: Platform Cache
+    uses: Wire-Network/platform-cache-workflow/.github/workflows/platformcache.yaml@v2
+    permissions:
+      packages: write
+      contents: read
+    with:
+      runs-on: '{"group": "core-repo-group"}'
+      platform-files: |
+        .cicd/platforms
+
+  build-test-package:
+    name: Build, test, and package (${{matrix.platform}})
+    needs: [platform-cache]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: ubuntu24
+            build_jobs: 11
+            run_sharded_np_lr: true
+          - platform: ubsan
+            build_jobs: 11
+            run_sharded_np_lr: true
+          - platform: asan
+            build_jobs: 11
+            run_sharded_np_lr: false
+          - platform: asserton
+            build_jobs: 11
+            run_sharded_np_lr: true
+          - platform: gcc
+            build_jobs: 8
+            run_sharded_np_lr: true
+    runs-on:
+      group: core-repo-group
+    # Full-job ceiling for build, package, parallel tests, and sharded NP/LR tests whose per-test timeout is 45 minutes.
+    timeout-minutes: 360
+    container:
+      image: ${{fromJSON(needs.platform-cache.outputs.platforms)[matrix.platform].image}}
+      credentials:
+        username: dev-wire
+        password: ${{ secrets.GH_TOKEN_DEV }}
+      options: --security-opt seccomp=unconfined --mount type=bind,source=/var/lib/systemd/coredump,target=/cores
+      volumes:
+      - ${{ github.workspace }}:/__w/wire-sysio/wire-sysio
+    env:
+      CCACHE_MAXSIZE: "10G"
+      CCACHE_COMPRESS: "true"
+      CCACHE_COMPRESSLEVEL: "6"
+    steps:
+      - name: Allow safe directories
+        run: git config --global --add safe.directory '*'
+
+      - uses: actions/checkout@v5
+        with:
+          submodules: recursive
+
+      - name: Restore vcpkg binary cache
+        uses: actions/cache@v5
+        with:
+          path: ${{ github.workspace }}/vcpkg-binary-cache
+          key: vcpkg-binaries-${{ matrix.platform }}-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json', '.github/vcpkg-triplets/**') }}
+          restore-keys: |
+            vcpkg-binaries-${{ matrix.platform }}-
+
+      - name: Restore ccache
+        id: restore-ccache
+        uses: actions/cache/restore@v5
+        with:
+          path: ${{ github.workspace }}/.ccache
+          key: ccache-${{ matrix.platform }}-${{ github.sha }}
+          restore-keys: |
+            ccache-${{ matrix.platform }}-
+
+      - name: Build
+        id: build
+        env:
+          SYSIO_PLATFORM_NAME: ${{ matrix.platform }}
+          VCPKG_TARGET_TRIPLET: x64-linux-release
+          VCPKG_HOST_TRIPLET: x64-linux-release
+        run: |
+          chown -R "$(id -u):$(id -g)" "$PWD"
+          bash .github/scripts/build-sysio.sh "${{ matrix.build_jobs }}"
+
+      - name: Show vcpkg logs if failure
+        if: failure()
+        run: |
+          echo "$PWD"
+          echo "=== vcpkg-manifest-install.log ==="
+          cat build/vcpkg-manifest-install.log || true
+
+      - name: Debug environment and workspace
+        if: ${{ runner.debug == '1' }}
+        run: |
+          echo "=== SYSTEM INFO ==="
+          whoami
+          id
+          hostname
+
+          echo
+          echo "=== ENVIRONMENT ==="
+          env | sort
+
+          echo
+          echo "=== DOCKER CONTEXT INFO ==="
+          docker context ls || true
+          echo "Current DOCKER_HOST: $DOCKER_HOST"
+          echo "Current DOCKER_CONTEXT: $DOCKER_CONTEXT"
+
+          echo
+          echo "=== GITHUB WORKSPACE ==="
+          echo "GITHUB_WORKSPACE: $GITHUB_WORKSPACE"
+          echo "Current directory: $PWD"
+          ls -la "$GITHUB_WORKSPACE" || true
+
+          echo
+          echo "=== PATHS & PERMISSIONS ==="
+          echo "--- /github ---"
+          ls -ld /github || true
+          echo "--- /github/home ---"
+          ls -ld /github/home || true
+          echo "--- Current workspace ---"
+          ls -ld "$GITHUB_WORKSPACE" || true
+          echo "--- ./build ---"
+          ls -ld build || true
+          ls -ld "$GITHUB_WORKSPACE/build" || true
+          echo "--- ./build/Testing ---"
+          ls -ld build/Testing || true
+          echo "--- ./build/Testing/Temporary ---"
+          ls -ld build/Testing/Temporary || true
+
+          echo
+          echo "=== FILE OWNERSHIP TOP 20 ==="
+          find "$GITHUB_WORKSPACE" -maxdepth 2 -type d -printf '%u:%g %p\n' 2>/dev/null | sort | uniq -c | sort -nr | head -n 20
+
+          echo
+          echo "=== MOUNTED FILESYSTEMS ==="
+          df -h
+          mount | grep "$GITHUB_WORKSPACE" || true
+
+          echo
+          echo "=== GIT CONFIG LOCATIONS ==="
+          git config --list --show-origin || true
+
+          echo
+          echo "=== CHECK WRITABILITY OF BUILD DIR ==="
+          touch build/debug_write_test 2>&1 || echo "Cannot write to build/"
+          rm -f build/debug_write_test || true
+
+      - name: Restore CTest cost data
+        uses: actions/cache/restore@v5
+        with:
+          # CTest uses this file to schedule higher-cost tests first when running with -j.
+          path: build/Testing/Temporary/CTestCostData.txt
+          key: ctest-cost-${{ matrix.platform }}-${{ github.sha }}
+          restore-keys: |
+            ctest-cost-${{ matrix.platform }}-
+
+      - name: Run Parallel Tests
+        if: ${{ steps.build.outcome == 'success' && !cancelled() }}
+        env:
+          DOCKER_HOST: ${{ env.DOCKER_HOST }}
+          DOCKER_CONTEXT: ${{ env.DOCKER_CONTEXT }}
+        run: |
+          cd build
+          ctest --output-on-failure -j $(nproc) -LE "(nonparallelizable_tests|long_running_tests)" --timeout 1000
+
+      - name: Run Sharded NP/LR Tests
+        if: ${{ steps.build.outcome == 'success' && matrix.run_sharded_np_lr && !cancelled() }}
+        run: |
+          cd build
+          # Run against all CPUs available to the CI container. These NP/LR tests are
+          # expected to be deterministic under CI scheduling pressure; flakes caused
+          # by host load, sanitizer overhead, or process interleaving are test bugs
+          # that should remain visible instead of being hidden by an artificial cap.
+          test_jobs="$(nproc)"
+          echo "Running sharded NP/LR tests with ${test_jobs} jobs"
+          ctest --output-on-failure -j "${test_jobs}" -L "(nonparallelizable_tests|long_running_tests)" --timeout 2700
+
+      - name: Save CTest cost data
+        if: ${{ always() && hashFiles('build/Testing/Temporary/CTestCostData.txt') != '' }}
+        uses: actions/cache/save@v5
+        with:
+          # Caches are immutable, so save each run under a unique key and restore by platform prefix.
+          path: build/Testing/Temporary/CTestCostData.txt
+          key: ctest-cost-${{ matrix.platform }}-${{ github.run_id }}-${{ github.run_attempt }}
+
+      - name: Save ccache
+        if: ${{ always() && steps.restore-ccache.outputs.cache-hit != 'true' }}
+        uses: actions/cache/save@v5
+        with:
+          path: ${{ github.workspace }}/.ccache
+          key: ccache-${{ matrix.platform }}-${{ github.sha }}
+
+      - name: Upload core files from failed tests
+        uses: actions/upload-artifact@v6
+        if: failure()
+        with:
+          name: ${{matrix.platform}}-tests-logs
+          if-no-files-found: warn
+          path: |
+              /cores
+              build/Testing/Temporary/
+              build/TestLogs/
+              build/PerformanceHarnessScenarioRunnerLogs/
+
+      - name: Check CPU Features
+        if: ${{ steps.build.outcome == 'success' && !cancelled() }}
+        run: |
+          awk 'BEGIN {err = 1} /bmi2/ && /adx/ {err = 0} END {exit err}' /proc/cpuinfo
+          build/tools/fsgsbase-enabled
+
+      - name: Build packages
+        if: ${{ steps.build.outcome == 'success' && !cancelled() }}
+        run: |
+          cd build
+          cpack
+          ../tools/tweak-deb.sh wire-sysio_*.deb
+
+      - name: Install dev package
+        if: ${{ steps.build.outcome == 'success' && !cancelled() }}
+        run: |
+          apt-get update && apt-get upgrade -y
+          apt-get install -y ./build/wire-sysio_*.deb
+
+      - name: Upload dev package
+        if: ${{ steps.build.outcome == 'success' && !cancelled() }}
+        uses: actions/upload-artifact@v6
+        with:
+          name: wire-sysio-dev-${{matrix.platform}}-amd64
+          path: build/wire-sysio_*.deb
+
+  v:
+    name: Discover Versions
+    runs-on: ubuntu-latest
+    outputs:
+      cdt-target: ${{steps.versions.outputs.cdt-target}}
+      cdt-prerelease: ${{steps.versions.outputs.cdt-prerelease}}
+      wire-system-contracts-ref: ${{steps.versions.outputs.wire-system-contracts-ref}}
+    steps:
+      - name: Setup wire-cdt and wire-system-contracts versions
+        id: versions
+        env:
+          GH_TOKEN: ${{secrets.GH_TOKEN_DEV}}
+          # Untrusted workflow_dispatch overrides are passed as environment variables and are
+          # NEVER interpolated into the script body. GitHub expands ${{ }} before bash parses the
+          # script, so interpolating an override directly would let a value such as $(...) run as
+          # shell code in trusted CI that holds GH_TOKEN_DEV (WSA-094 / SEC-094). As env vars the
+          # values are inert data: bash does not re-evaluate command substitution found inside a
+          # variable's value. github.repository / github.sha are likewise read via env and quoted.
+          OVERRIDE_CDT: ${{ inputs.override-cdt }}
+          OVERRIDE_CDT_PRERELEASE: ${{ inputs.override-cdt-prerelease }}
+          OVERRIDE_SYS_SYSTEM_CONTRACTS: ${{ inputs.override-sys-system-contracts }}
+          REPO: ${{ github.repository }}
+          REF_SHA: ${{ github.sha }}
+        run: |
+          # Defense in depth: reject ref/target overrides containing anything outside a conservative
+          # allowlist. This blocks every shell metacharacter and newline (so an override can never
+          # break out of $GITHUB_OUTPUT's "name=value" line either) while still accepting real values
+          # such as "4.1.0" and "release/4.0". The pattern is held in a variable so [[ =~ ]] treats it
+          # as a regex, and the candidate matched is only ever the variable's literal value.
+          ref_re='^[A-Za-z0-9._/+-]+$'
+          for ov in "$OVERRIDE_CDT" "$OVERRIDE_SYS_SYSTEM_CONTRACTS"; do
+            if [[ -n "$ov" && ! "$ov" =~ $ref_re ]]; then
+              echo "::error::Invalid override ref '$ov'; only [A-Za-z0-9._/+-] are allowed." >&2
+              exit 1
+            fi
+          done
+
+          DEFAULTS_JSON=$(curl -sSfL "$(gh api "https://api.github.com/repos/${REPO}/contents/.cicd/defaults.json?ref=${REF_SHA}" --jq .download_url)")
+          echo "cdt-target=$(echo "$DEFAULTS_JSON" | jq -r '.wirecdt.target')" >> "$GITHUB_OUTPUT"
+          echo "cdt-prerelease=$(echo "$DEFAULTS_JSON" | jq -r '.wirecdt.prerelease')" >> "$GITHUB_OUTPUT"
+          echo "wire-system-contracts-ref=$(echo "$DEFAULTS_JSON" | jq -r '.wiresystemcontracts.ref')" >> "$GITHUB_OUTPUT"
+
+          if [[ -n "$OVERRIDE_CDT" ]]; then
+            echo "cdt-target=$OVERRIDE_CDT" >> "$GITHUB_OUTPUT"
+          fi
+          if [[ "$OVERRIDE_CDT_PRERELEASE" == "true" || "$OVERRIDE_CDT_PRERELEASE" == "false" ]]; then
+            echo "cdt-prerelease=$OVERRIDE_CDT_PRERELEASE" >> "$GITHUB_OUTPUT"
+          fi
+          if [[ -n "$OVERRIDE_SYS_SYSTEM_CONTRACTS" ]]; then
+            echo "wire-system-contracts-ref=$OVERRIDE_SYS_SYSTEM_CONTRACTS" >> "$GITHUB_OUTPUT"
+          fi
+
+  all-passing:
+    name: All Required Tests Passed
+    needs: [ build-test-package ]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Notification
+        if: always()
+        uses: Wire-Network/notification-action@v1
+        with:
+          webhook-url: ${{ secrets.WEBHOOK_URL }}
+          notification-type: 1
+          workflow-name: "Build & Test Workflow"
+          job-results: "build-test-package:${{ needs.build-test-package.result }}"
+          github-context: ${{ toJSON(github) }}
+
+      - if: needs.build-test-package.result != 'success'
+        run: false

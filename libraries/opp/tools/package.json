@@ -24,7 +24,8 @@
   "resolutions": {
     "lodash": "4.17.21",
     "prettier": "3.8.1",
-    "typescript": "6.0.2"
+    "typescript": "6.0.2",
+    "@protobuf-ts/plugin>typescript": "3.9.10"
   },
   "packageManager": "pnpm@10.32.1",
   "engines": {

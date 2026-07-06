@@ -84,6 +84,44 @@ class Node(Transactions):
         return "Host: %s, Port:%d, NodeNum:%s, Pid:%s" % (self.host, self.port, self.nodeId, self.pid)
 
     @staticmethod
+    def _portFromEndpoint(endpoint):
+        """Return the numeric TCP port from a nodeop endpoint argument."""
+        if endpoint is None:
+            return None
+
+        portText = endpoint.rsplit(":", 1)[-1].strip("[]")
+        try:
+            return int(portText)
+        except ValueError:
+            return None
+
+    @staticmethod
+    def _listenerPortsFromCmd(cmd):
+        """Return final listener ports declared in a nodeop command line."""
+        listenerArgs = {
+            "--http-server-address",
+            "--p2p-listen-endpoint",
+            "--state-history-endpoint",
+        }
+        ports = set()
+        for index, arg in enumerate(cmd):
+            endpoint = None
+            if arg in listenerArgs and index + 1 < len(cmd):
+                endpoint = cmd[index + 1]
+            else:
+                for listenerArg in listenerArgs:
+                    prefix = listenerArg + "="
+                    if arg.startswith(prefix):
+                        endpoint = arg[len(prefix):]
+                        break
+
+            port = Node._portFromEndpoint(endpoint)
+            if port is not None:
+                ports.add(port)
+
+        return ports
+
+    @staticmethod
     def __printTransStructureError(trans, context):
         Utils.Print("ERROR: Failure in expected transaction structure. Missing trans%s." % (context))
         Utils.Print("Transaction: %s" % (json.dumps(trans, indent=1)))
@@ -242,6 +280,22 @@ class Node(Transactions):
             if time.time() > endTime:
                 return False
         return True
+
+    def waitForBlockClearOfStride(self, stride, lowerMargin=5, upperMargin=10, timeout=None):
+        """Advance the head clear of a state-history-stride rotation boundary before stopping.
+
+        When the last stored block is exactly a stride multiple, SHiP log rotation has just moved
+        every entry into retained/ and the head log/index files are 0 bytes, so tooling that reads
+        the head log has nothing to work with. A few more blocks can be produced between this check
+        and a pause taking effect, so a margin is kept on both sides of the boundary. Returns True
+        once the head is clear of the boundary, waiting for a safe block if needed."""
+        head = self.getHeadBlockNum()
+        posInStride = head % stride
+        if lowerMargin <= posInStride <= stride - upperMargin:
+            return True
+        safeBlock = head - posInStride + (lowerMargin if posInStride < lowerMargin else stride + lowerMargin)
+        Utils.Print(f"Head block {head} is near a state-history-stride boundary, waiting for block {safeBlock}")
+        return self.waitForBlock(safeBlock, timeout=timeout)
 
     def waitForAnyProducer(self, producers, timeout=None, exitOnError=False):
         if timeout is None:
@@ -471,7 +525,8 @@ class Node(Transactions):
             Utils.errorExit("Cannot find unstarted node since %s file does not exist" % startFile)
         return startFile
 
-    def launchUnstarted(self, waitForAlive=True):
+    def launchUnstarted(self, waitForAlive=True, timeout=Utils.systemWaitTimeout):
+        """Launch a previously configured node and wait up to timeout seconds for it to answer get_info."""
         Utils.Print("launchUnstarted cmd: %s" % (self.cmd))
         self.popenProc = self.launchCmd(self.cmd, self.data_dir, self.launch_time)
 
@@ -486,7 +541,7 @@ class Node(Transactions):
                 pass
             return False
 
-        isAlive=Utils.waitForBool(isNodeAlive)
+        isAlive=Utils.waitForBool(isNodeAlive, timeout=timeout)
 
         if isAlive:
             if Utils.Debug: Utils.Print("Node launch was successful.")
@@ -498,18 +553,28 @@ class Node(Transactions):
                 self.popenProc.wait()
             self.pid=None
 
-    def launchCmd(self, cmd: List[str], data_dir: Path, launch_time: str):
+    def launchCmd(self, cmd: List[str], data_dir: Path, launch_time: str, waitForPorts=True):
+        """Launch a nodeop command, optionally waiting for declared listener ports before spawning."""
         dd = data_dir
         out = dd / 'stdout.txt'
         err_sl = dd / 'stderr.txt'
         err = dd / Path(f'stderr.{launch_time}.txt')
         pidf = dd / Path(f'{Utils.SysServerName}.pid')
+        ports = Node._listenerPortsFromCmd(cmd)
 
         # make sure unique file name to avoid overwrite of existing log file
         i = 0
         while err.is_file():
             i = i + 1
             err = dd / Path(f'stderr.{launch_time}-{i}.txt')
+
+        if waitForPorts and ports:
+            def areNodePortsAvailable():
+                """Wait until this node's concrete listener ports can be bound."""
+                return Utils.arePortsAvailable(ports)
+
+            if not Utils.waitForBool(areNodePortsAvailable, Utils.systemWaitTimeout, sleepTime=2):
+                Utils.errorExit("Failed to find free node listener ports: %s" % sorted(ports))
 
         Utils.Print(f'spawning child: {" ".join(cmd)}')
         dd.mkdir(parents=True, exist_ok=True)

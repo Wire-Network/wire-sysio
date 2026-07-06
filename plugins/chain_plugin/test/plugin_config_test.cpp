@@ -23,7 +23,24 @@ BOOST_AUTO_TEST_CASE(chain_plugin_default_tests) {
    BOOST_CHECK_EQUAL(config->max_retained_files, UINT32_MAX);
    BOOST_CHECK_EQUAL(config->stride, 10);
 
-   // test default sys-vm-oc-whitelist
+}
+
+#ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
+/** Verify the default SYS VM OC whitelist when the OC runtime is compiled into this build. */
+BOOST_AUTO_TEST_CASE(chain_plugin_default_sys_vm_oc_whitelist) {
+   fc::temp_directory  tmp;
+   sysio::chain::application exe({
+      .enable_resource_monitor = false
+   });
+
+   auto tmp_path = tmp.path().string();
+   std::array          args = {
+       "test_chain_plugin", "--config-dir", tmp_path.c_str(), "--data-dir", tmp_path.c_str(),
+   };
+
+   BOOST_CHECK(exe.init<sysio::chain_plugin>(args.size(), const_cast<char**>(args.data())) == sysio::chain::exit_code::SUCCESS);
+   auto& plugin = appbase::app().get_plugin<sysio::chain_plugin>();
+
    BOOST_CHECK(plugin.chain().is_sys_vm_oc_whitelisted(sysio::chain::name{"wire"}));
    BOOST_CHECK(plugin.chain().is_sys_vm_oc_whitelisted(sysio::chain::name{"core.wire"}));
    BOOST_CHECK(plugin.chain().is_sys_vm_oc_whitelisted(sysio::chain::name{"xs.wire"}));
@@ -32,6 +49,7 @@ BOOST_AUTO_TEST_CASE(chain_plugin_default_tests) {
    BOOST_CHECK(!plugin.chain().is_sys_vm_oc_whitelisted(sysio::chain::name{""}));
 }
 
+/** Verify command-line overrides for the SYS VM OC whitelist on builds that include the OC runtime. */
 BOOST_AUTO_TEST_CASE(chain_plugin_sys_vm_oc_whitelist) {
    fc::temp_directory  tmp;
    sysio::chain::application exe({
@@ -49,3 +67,4 @@ BOOST_AUTO_TEST_CASE(chain_plugin_sys_vm_oc_whitelist) {
    BOOST_CHECK(plugin.chain().is_sys_vm_oc_whitelisted(sysio::chain::name{"xs.hello"}));
    BOOST_CHECK(!plugin.chain().is_sys_vm_oc_whitelisted(sysio::chain::name{"wire"}));
 }
+#endif

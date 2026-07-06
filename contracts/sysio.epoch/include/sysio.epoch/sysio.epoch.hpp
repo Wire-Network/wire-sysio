@@ -125,6 +125,7 @@ namespace sysio {
       static constexpr name OPREG_ACCOUNT  = "sysio.opreg"_n;
       static constexpr name AUTHEX_ACCOUNT = "sysio.authex"_n;
       static constexpr name CHAINS_ACCOUNT = "sysio.chains"_n;
+      static constexpr name UWRIT_ACCOUNT  = "sysio.uwrit"_n;
 
       /// Bounds on `epoch_duration_sec`. Floor is a typo-guard: well below this
       /// value, `expected_rounds` in sysio.system::payepoch falls back to 1
@@ -141,6 +142,11 @@ namespace sysio {
       using OperatorStatus = sysio::opp::types::OperatorStatus;
    };
 
+   /// Asserts the caller signed the transaction and is a member of the current
+   /// resident batch-operator group. This is a group-membership check only: the
+   /// group is a snapshot from the last schedule, so current operator eligibility
+   /// (sysio.opreg ACTIVE status) must be enforced separately at the delivery
+   /// call site (see msgch::deliver).
    inline void is_batch_operator_active(const name& batch_op_name) {
       require_auth(batch_op_name);
       epoch::epochstate_t epoch_tbl(epoch::EPOCH_ACCOUNT);

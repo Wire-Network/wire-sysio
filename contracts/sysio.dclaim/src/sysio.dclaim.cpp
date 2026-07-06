@@ -1,4 +1,5 @@
 #include <sysio.dclaim/sysio.dclaim.hpp>
+#include <sysio.opp.common/safe_ops.hpp>
 
 #include <cstdint>
 #include <string>
@@ -9,6 +10,10 @@ namespace sysio {
 namespace {
 
 using opp::types::ChainKind;
+
+// System-owned rows bill to the sysio RAM pool, not this contract account (privileged-contract
+// model, as sysio.token uses): the account stays finite at code+abi size; growth draws from the pool.
+constexpr name ram_payer = "sysio"_n;
 
 /// Deterministic wall-clock seconds (block time). Used for the claimable
 /// window; epoch indices carried on the attestation are for audit only.
@@ -45,8 +50,22 @@ uint64_t next_id(name self, Pick pick) {
    dclaim::cap_counters c = cnt.get_or_default(dclaim::cap_counters{});
    uint64_t& field = pick(c);
    uint64_t id = field++;
-   cnt.set(c, self);
+   cnt.set(c, ram_payer);
    return id;
+}
+
+/// Non-throwing validation of a string destined for `name(std::string_view)`. Shared with every
+/// other OPP inbound handler via `sysio.opp.common/safe_ops.hpp` so the never-throw name domain is
+/// defined and audited in exactly one place.
+using sysio::opp::safe::is_valid_name_string;
+
+/// Saturating WIRE credit. `asset::operator+=` aborts on overflow past `asset::max_amount`
+/// (2^62-1); credit_wire runs inside the never-throw OPP inbound path (via onreward), so cap at
+/// the asset maximum rather than abort. A single staker balance approaching 2^62 atomic WIRE units
+/// is not reachable in practice — the cap exists purely to preserve the never-throw contract.
+inline void add_wire_capped(asset& balance, const asset& amt) {
+   const int64_t room = asset::max_amount - balance.amount;   // balance.amount in [0, max_amount]
+   balance.amount += (amt.amount <= room ? amt.amount : room);
 }
 
 /// Credit `amt` WIRE to the staker. Linked (`wacct` set) -> `pending_claims`;
@@ -62,13 +81,13 @@ void credit_wire(name self, name wacct, ChainKind chain,
       dclaim::pclaims_t pclaims(self);
       auto it = pclaims.find(dclaim::pclaim_key{wacct.value});
       if (it == pclaims.end()) {
-         pclaims.emplace(self, dclaim::pclaim_key{wacct.value},
+         pclaims.emplace(ram_payer, dclaim::pclaim_key{wacct.value},
             dclaim::pending_claim{ .wire_account = wacct,
                                 .balance      = amt,
                                 .expires_at_sec = exp });
       } else {
          pclaims.modify(same_payer, dclaim::pclaim_key{wacct.value}, [&](auto& r) {
-            r.balance        += amt;
+            add_wire_capped(r.balance, amt);
             r.expires_at_sec  = exp;
          });
       }
@@ -86,7 +105,7 @@ void credit_wire(name self, name wacct, ChainKind chain,
       uint64_t id = next_id(self, [](dclaim::cap_counters& c) -> uint64_t& {
          return c.next_unmapped_id;
       });
-      unmapped.emplace(self, dclaim::unmapped_key{id},
+      unmapped.emplace(ram_payer, dclaim::unmapped_key{id},
          dclaim::unmapped_token{ .id             = id,
                               .chain_kind     = chain,
                               .native_pubkey  = addr,
@@ -95,7 +114,7 @@ void credit_wire(name self, name wacct, ChainKind chain,
    } else {
       uint64_t rid = it->id;
       unmapped.modify(same_payer, dclaim::unmapped_key{rid}, [&](auto& r) {
-         r.balance        += amt;
+         add_wire_capped(r.balance, amt);
          r.expires_at_sec  = exp;
       });
    }
@@ -121,7 +140,7 @@ bool cursor_admit(name self, uint64_t chain_code, ChainKind chain,
       uint64_t id = next_id(self, [](dclaim::cap_counters& c) -> uint64_t& {
          return c.next_cursor_id;
       });
-      cur.emplace(self, dclaim::rwdcur_key{id},
+      cur.emplace(ram_payer, dclaim::rwdcur_key{id},
          dclaim::reward_cursor{ .id         = id,
                              .chain_code = chain_code,
                              .chain      = chain,
@@ -146,7 +165,7 @@ void dclaim::setconfig() {
    require_auth(get_self());
    capcfg_t cfg(get_self());
    if (!cfg.exists()) {
-      cfg.set(cap_config{}, get_self());
+      cfg.set(cap_config{}, ram_payer);
    }
 }
 
@@ -159,7 +178,7 @@ void dclaim::setclmwindow(uint32_t window_sec) {
    capcfg_t cfg(get_self());
    cap_config c = cfg.get_or_default(cap_config{});
    c.claim_window_sec = window_sec;
-   cfg.set(c, get_self());
+   cfg.set(c, ram_payer);
 }
 
 // ---------------------------------------------------------------------------
@@ -223,8 +242,11 @@ void dclaim::onreward(uint64_t              chain_code,
 
    // Tolerate degenerate input rather than aborting the inbound OPP envelope
    // (the verifier role lives upstream in msgch::evalcons; dclaim trusts but
-   // must not break the message chain on a malformed row).
-   if (reward_amount == 0 || staker_native_addr.empty()) return;
+   // must not break the message chain on a malformed row). reward_amount is cross-chain-supplied;
+   // bound it to the asset range here so an oversized value soft-drops instead of aborting later
+   // when the WIRE asset is constructed/credited (asset()/operator+= range-check abort).
+   if (reward_amount == 0 || reward_amount > static_cast<uint64_t>(asset::max_amount) ||
+       staker_native_addr.empty()) return;
 
    // Dedupe at ingest so a replay / out-of-order duplicate is rejected.
    if (!cursor_admit(get_self(), chain_code, reward_chain,
@@ -233,7 +255,10 @@ void dclaim::onreward(uint64_t              chain_code,
    }
 
    name wacct;   // value 0 == not yet AuthX-linked
-   if (!staker_wire_account.empty()) {
+   // Validate the cross-chain-supplied account string before constructing name(): an invalid or
+   // oversized string is treated as unlinked (credit parked by native address) rather than
+   // aborting the inbound dispatch via name()'s internal check(). See is_valid_name_string.
+   if (!staker_wire_account.empty() && is_valid_name_string(staker_wire_account)) {
       wacct = name(staker_wire_account);
    }
 
@@ -322,7 +347,7 @@ void dclaim::importdone() {
    cap_config current = cfg.get_or_default(cap_config{});
    check(!current.imported_complete, "import already finalized");
    current.imported_complete = true;
-   cfg.set(current, get_self());
+   cfg.set(current, ram_payer);
 }
 
 } // namespace sysio

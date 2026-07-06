@@ -1,5 +1,6 @@
 #include <sysio/outpost_solana_client_plugin/outpost_solana_client.hpp>
 
+#include <bit>
 #include <cstring>
 #include <optional>
 #include <string>
@@ -8,6 +9,7 @@
 #include <fc/crypto/sha256.hpp>
 #include <fc/exception/exception.hpp>
 #include <fc/log/logger.hpp>
+#include <fc/task/deadline.hpp>
 #include <fc/variant_object.hpp>
 
 #include <sysio/opp/opp.hpp>
@@ -38,8 +40,11 @@ constexpr size_t LATEST_VEC_LEN_OFF = LATEST_HEADER_LEN;
 constexpr size_t LATEST_DATA_OFF    = LATEST_HEADER_LEN + 4;
 constexpr size_t LATEST_EPOCH_OFF   = ANCHOR_DISCRIMINATOR_LEN;
 
-/// Read a little-endian u32 from `buf` at `off`.
+/// Read a little-endian u32 from `buf` at `off`. Borsh is little-endian on the wire; the native-endian
+/// `memcpy` below is correct only on a little-endian host. WIRE is x86_64-only today; the static_assert
+/// documents that dependency and fails the build if a future port to a big-endian host removes it.
 uint32_t read_u32_le(const std::vector<uint8_t>& buf, size_t off) {
+   static_assert(std::endian::native == std::endian::little, "read_u32_le assumes a little-endian host");
    if (off + 4 > buf.size()) FC_THROW("LatestOutboundEnvelope: truncated u32 at {}", off);
    uint32_t v;
    std::memcpy(&v, buf.data() + off, 4);
@@ -186,10 +191,38 @@ extract_inbound_swap_remit_reserve_seeds(const std::vector<char>& envelope_bytes
 
    for (const auto& message : env.messages()) {
       for (const auto& entry : message.payload().attestations()) {
-         if (entry.type() != sysio::opp::types::ATTESTATION_TYPE_SWAP_REMIT) continue;
-         sysio::opp::attestations::SwapRemit sr;
-         if (!sr.ParseFromString(entry.data())) continue;
-         record_unique(sr.amount().token_code(), sr.reserve_code());
+         switch (entry.type()) {
+            case sysio::opp::types::ATTESTATION_TYPE_SWAP_REMIT: {
+               sysio::opp::attestations::SwapRemit sr;
+               if (!sr.ParseFromString(entry.data())) continue;
+               record_unique(sr.amount().token_code(), sr.reserve_code());
+               break;
+            }
+            // The reserve-lifecycle round-trips need the per-(token, reserve)
+            // Reserve PDA in remaining_accounts too: `handle_reserve_ready`
+            // flips its status field, and `handle_reserve_create_cancelled`
+            // reads the refund amount/creator off it. RESERVE_READY rides
+            // exactly ONE envelope (queued once at `matchreserve`), so a
+            // missing PDA here doesn't defer the flip — it strands the
+            // reserve in PENDING permanently. (The cancel path's refund
+            // additionally needs creator/vault accounts on-chain; those are
+            // looked up from the PDA at dispatch and remain log-and-skip
+            // until a SOL-side cancel flow lands.)
+            case sysio::opp::types::ATTESTATION_TYPE_RESERVE_READY: {
+               sysio::opp::attestations::ReserveReady rr;
+               if (!rr.ParseFromString(entry.data())) continue;
+               record_unique(rr.token_code(), rr.reserve_code());
+               break;
+            }
+            case sysio::opp::types::ATTESTATION_TYPE_RESERVE_CREATE_CANCELLED: {
+               sysio::opp::attestations::ReserveCreateCancelled rcc;
+               if (!rcc.ParseFromString(entry.data())) continue;
+               record_unique(rcc.token_code(), rcc.reserve_code());
+               break;
+            }
+            default:
+               break;
+         }
       }
    }
 
@@ -287,6 +320,7 @@ std::string outpost_solana_client::deliver_outbound_envelope(
    const std::vector<char>& envelope_bytes,
    fc::microseconds         deadline) {
    const auto deadline_abs = fc::time_point::now() + deadline;
+   fc::task::deadline_scope rpc_deadline(deadline_abs);
 
    const size_t total = envelope_bytes.size();
    FC_ASSERT(total > 0,
@@ -448,6 +482,8 @@ std::vector<char> outpost_solana_client::read_inbound_envelope(
    uint32_t         epoch_index,
    fc::microseconds deadline) {
    const auto deadline_abs = fc::time_point::now() + deadline;
+   fc::task::deadline_scope rpc_deadline(deadline_abs);
+
    throw_if_past_deadline(deadline_abs, OP_READ_LATEST);
 
    // Single RPC: fetch the `latest_outbound_envelope` PDA. The Solana
@@ -456,9 +492,15 @@ std::vector<char> outpost_solana_client::read_inbound_envelope(
    // time only the most-recent emitted envelope is in flight — so a
    // single-slot PDA is sufficient and historical reads are out of
    // scope (off-chain audit tooling owns them).
+   // Read at `finalized`, not `confirmed`. WIRE consensus on inbound is committed forward against this
+   // read: `confirmed` is supermajority lockout but can still revert below it during cluster instability,
+   // which would leave WIRE state derived from a Solana slot that no longer exists. `finalized` is the
+   // only commitment that cannot be rolled back. Deliberately not operator-configurable: the read
+   // commitment is a consensus parameter, and operators reading at different commitments would deliver
+   // divergent envelopes for the same epoch, manufacturing disputes among honest operators.
    auto info = _entry->client->get_account_info(
       _program_client->latest_outbound_envelope_pda,
-      fc::network::solana::commitment_t::confirmed);
+      fc::network::solana::commitment_t::finalized);
    if (!info.has_value()) {
       // PDA was init'd at outpost initialize — absence here means the
       // RPC is out of sync or the program redeployed mid-run. Surface.
@@ -499,6 +541,12 @@ std::vector<char> outpost_solana_client::read_inbound_envelope(
    }
 
    const uint32_t data_len = read_u32_le(buf, LATEST_VEC_LEN_OFF);
+   if (data_len > SOLANA_MAX_ENVELOPE_BYTES) {
+      wlog("outpost_solana_client[{}]: latest_outbound_envelope data length "
+           "{} exceeds envelope cap of {} bytes",
+           to_string(), data_len, SOLANA_MAX_ENVELOPE_BYTES);
+      return {};
+   }
    if (LATEST_DATA_OFF + data_len > buf.size()) {
       wlog("outpost_solana_client[{}]: latest_outbound_envelope data length "
            "{} exceeds account size {}",
@@ -535,6 +583,8 @@ std::string outpost_solana_client::uw_commit(
    const std::vector<char>& uic_bytes,
    fc::microseconds         deadline) {
    const auto deadline_abs = fc::time_point::now() + deadline;
+   fc::task::deadline_scope rpc_deadline(deadline_abs);
+
    throw_if_past_deadline(deadline_abs, OP_UW_COMMIT);
 
    // `commit_underwrite(uic_bytes: bytes)` — opaque relay. The typed

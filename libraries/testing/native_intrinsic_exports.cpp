@@ -261,7 +261,7 @@ void printdf(double val) {
 
 INTRINSIC_EXPORT
 void printqf(const void* val) {
-   native_context_stack::current()->printqf(aligned_ptr<const float128_t>{(void*)val});
+   native_context_stack::current()->printqf(aligned_ptr<const softfloat128_t>{(void*)val});
 }
 
 INTRINSIC_EXPORT
@@ -522,8 +522,9 @@ int64_t set_proposed_producers_ex(uint64_t format, const char* data, size_t data
 
 INTRINSIC_EXPORT
 int32_t get_active_producers(uint64_t* producers, uint32_t datalen) {
+   // datalen is a byte count (CDT-side ABI); the interface takes a byte span
    return native_context_stack::current()->get_active_producers(
-      aligned_span<name>{(void*)producers, datalen});
+      sysio::vm::span<char>{(char*)producers, datalen});
 }
 
 INTRINSIC_EXPORT

@@ -1,32 +1,12 @@
 #include <cstdint>
 #include <sysio.authex/sysio.authex.hpp>
-#include <sysio.system/native.hpp>
 #include <sysio/print.hpp>
 
 namespace {
 using namespace sysio;
 
-constexpr name ex_eth = "ex.eth"_n;
-constexpr name ex_sol = "ex.sol"_n;
-// TODO @jglanz: SUI removed in v6; restore when SUI outpost is added.
-[[maybe_unused]] constexpr name ex_sui = "ex.sui"_n;
-
-/**
- * Duplicated struct representing ABI of the `updateauth` action.
- */
-struct updateauth {
-   name account;
-   name permission;
-   name parent;
-   sysiosystem::authority auth;
-};
-
-struct expandauth {
-   name account;
-   name permission;
-   std::vector<key_weight> new_keys;
-   std::vector<sysiosystem::permission_level_weight> new_accounts;
-};
+// sysio funds the RAM for every link row (system-paid) -- createlink and recordlink alike.
+constexpr name link_row_payer = "sysio"_n;
 
 using ed_raw_key_t = std::array<uint8_t, 32>;
 
@@ -84,7 +64,6 @@ namespace sysio {
    std::string msg = pubkey_to_string(pub_key) + "|" + account.to_string() + "|" + chain_kind_str + "|" +
                      std::to_string(nonce) + "|" + DIGEST_TAIL;
 
-   std::optional<name> ex_permission = std::nullopt;
    // For EM keys, recover_key returns the real y-parity prefix.
    // Store it so downstream consumers (advance → OPERATORS attestation)
    // get the correct compressed key for ETH address derivation.
@@ -111,7 +90,6 @@ namespace sysio {
             "EM key recovery failed: x-coordinate mismatch");
 
       verified_pub_key = recovered;
-      ex_permission = ex_eth;
 
    } else if (chain_kind == ChainKind::CHAIN_KIND_SVM) {
       checksum256 hash256;
@@ -128,28 +106,7 @@ namespace sysio {
       // 3) pack into checksum256
       std::memcpy(hash256.data(), mapped, 32);
       assert_recover_key(hash256, sig, pub_key);
-
-      ex_permission = ex_sol;
    }
-#if 0
-   // TODO @jglanz: SUI removed in v6; restore when SUI outpost is added.
-   else if (chain_kind == ChainKind::CHAIN_KIND_SUI) { // sui
-      std::vector<uint8_t> bcs;
-      bcs.reserve(4 + msg.size());
-      bcs.insert(bcs.end(), {3, 0, 0, static_cast<uint8_t>(msg.size())});
-      bcs.insert(bcs.end(), msg.begin(), msg.end());
-
-      unsigned char raw_digest[32];
-      check(sysio::blake2b_256(reinterpret_cast<const char*>(bcs.data()), bcs.size(),
-                               reinterpret_cast<char*>(raw_digest), sizeof(raw_digest)) == 0,
-            "blake2b_256 failed");
-
-      ex_permission = ex_sui;
-   }
-#endif
-
-   // MAKE SURE WE MAPPED TO A SUPPORTED PERMISSION
-   sysio::check(ex_permission.has_value(), "Internal error: ex_permission not set");
 
    // CREATE LINK RECORD — use verified_pub_key which has the real y-parity
    // prefix from recovery (for EM) rather than the potentially ambiguous input.
@@ -158,35 +115,18 @@ namespace sysio {
       auto last = --links.cend();
       next_key = last->key + 1;
    }
-   links.emplace("sysio"_n, links_key{next_key}, links_s{
+   links.emplace(link_row_payer, links_key{next_key}, links_s{
       .key = next_key,
       .username = account,
       .chain_kind = chain_kind,
       .pub_key = verified_pub_key,
    });
 
-   // PUSH `ex.<chain_prefix>` TO PERMISSIONS
-   action(
-      permission_level{
-         get_self(), "owner"_n
-   },
-      "sysio"_n, "updateauth"_n,
-      updateauth{account,
-                 ex_permission.value(),
-                 "active"_n,
-                 {
-                    1,
-                    {{verified_pub_key, 1}},
-                 }})
-      .send();
-
-   // AMEND `active` PERMISSIONS
-   action(permission_level{"sysio"_n, "active"_n}, "sysio"_n, "expandauth"_n,
-          expandauth{account, "active"_n,
-
-                     std::vector<key_weight>{key_weight{verified_pub_key, 1}},
-                     std::vector<sysiosystem::permission_level_weight>{}})
-      .send();
+   // The verified key is recorded in the links table only; it is NOT added to the
+   // account's `active` (or any) permission, so the link grants no Wire signing
+   // authority. Downstream consumers (OPERATORS attestation, ETH address derivation)
+   // read the link record. The row is billed to sysio (links.emplace above), so
+   // createlink charges the account no RAM -- no gift is needed.
 }
 
 
@@ -204,39 +144,41 @@ namespace sysio {
 };
 
 
-// TODO: Adjust this logic need to handle removal of ex.eth or ex.sol respectively.
-void authex::onmanualrmv(const name& account, const name& permission) {
-   using ChainKind = opp::types::ChainKind;
+// Trusted depot-only link insert -- the counterpart to createlink that skips signature/nonce
+// verification. The OPP NodeOwnerRegistration attestation is the proof; the chain accepts this
+// inline send because sysio.authex.active trusts the caller (sysio.roa@sysio.code). Idempotent and
+// non-throwing so the trust-OPP dispatch never aborts.
+[[sysio::action]] void authex::recordlink(const name& account, const opp::types::ChainKind chain_kind,
+                                          const public_key& pub_key) {
+   require_auth(get_self());
 
-   ChainKind kind;
-   switch (permission.value) {
-   case ex_sol.value:
-      kind = ChainKind::CHAIN_KIND_SVM;
-      break;
-   case ex_eth.value:
-      kind = ChainKind::CHAIN_KIND_EVM;
-      break;
-#if 0
-   // TODO @jglanz: SUI removed in v6; restore when SUI outpost is added.
-   case ex_sui.value:
-      kind = ChainKind::CHAIN_KIND_SUI;
-      break;
-#endif
-   default:
-      sysio::check(false, "Invalid permission for removal.");
-      return; // unreachable, silences uninitialized warning
-   }
-
-   // Find reference to 'account' in links table via namechain index
    links_t links(get_self());
    auto by_namechain = links.get_index<"bynamechain"_n>();
-   uint128_t name_chain = to_namechain_key(account, kind);
-   auto itr = by_namechain.find(name_chain);
-   if (itr == by_namechain.end())
-      return;
+   // Idempotent: if this account already has a link for this chain, leave the table unchanged and
+   // return (never throw -- the trust-OPP depot dispatch must not abort).
+   //
+   // We deliberately do NOT reject when `pub_key` is already linked to a *different* account: one
+   // external wallet can hold several WireNodes NFTs and therefore legitimately back several Wire
+   // accounts, so one ETH key -> many accounts is allowed on this path. The operator path
+   // (createlink) keeps its 1:1 `bypubkey` check, which also guarantees an operator's link is the
+   // lowest-primary-key row for that key; sysio.msgch's resolve_account_from_op_address does a single
+   // `bypubkey.find()` (lowest-primary-key match), so it still lands on the operator's account rather
+   // than a later node-owner duplicate.
+   if (by_namechain.find(to_namechain_key(account, chain_kind)) != by_namechain.end()) return;
 
-   by_namechain.erase(std::move(itr));
-};
+   uint64_t next_key = 0;
+   if (links.cbegin() != links.cend()) {
+      auto last = --links.cend();
+      next_key = last->key + 1;
+   }
+   links.emplace(link_row_payer, links_key{next_key}, links_s{
+      .key = next_key,
+      .username = account,
+      .chain_kind = chain_kind,
+      .pub_key = pub_key,
+   });
+}
+
 
 // ----- PRIVATE HELPER METHODS -----
 

@@ -299,6 +299,27 @@ BOOST_AUTO_TEST_CASE(test_em_is_canonical) try {
    BOOST_TEST(!em::public_key::is_canonical(non_canonical.get<em::signature_shim>()._data));
 } FC_LOG_AND_RETHROW();
 
+// public_key::operator< must order key bytes UNSIGNED (it routes through
+// less_comparator -> std::memcmp). authority validate() relies on this exact
+// ordering, and CDT-side contract code sorts keys with the same semantics, so a
+// regression to signed-char comparison here would silently disagree with the
+// contract for any key byte >= 0x80 and make valid authorities look unsorted.
+// Two EM keys (same variant index) differing first at a high-bit byte pin it.
+BOOST_AUTO_TEST_CASE(test_em_ordering_is_unsigned) try {
+   auto make_em = [](unsigned char second_byte) {
+      std::array<char, 33> d{};
+      d[0] = static_cast<char>(0x02);          // compressed-point prefix
+      d[1] = static_cast<char>(second_byte);   // first differing byte
+      return public_key(em::public_key_shim(d));
+   };
+   const auto k_hi = make_em(0x80);  // 128 unsigned, -128 if compared as signed char
+   const auto k_lo = make_em(0x01);  //   1 unsigned,    1 signed
+
+   // memcmp orders 0x80 (128) after 0x01 (1); signed char would invert both.
+   BOOST_TEST(  (k_lo < k_hi) );
+   BOOST_TEST( !(k_hi < k_lo) );
+} FC_LOG_AND_RETHROW();
+
 BOOST_AUTO_TEST_CASE(test_ed_pub_str) try {
    auto pub_str = "5oNDL3swdJJF1g9DzJiZ4ynHXgszjAEpUkxVYejchzrY";
    auto pub_key = fc::crypto::public_key::from_string(pub_str, public_key::key_type::ed);
@@ -344,6 +365,35 @@ BOOST_AUTO_TEST_CASE(test_ed_sig_str) try {
    fc::variant test_sig_variant{sig};
    signature test_sig2 = test_sig_variant.as<signature>();
    BOOST_CHECK_EQUAL(sig.to_string({}), test_sig2.to_string({}));
+} FC_LOG_AND_RETHROW();
+
+// --- ed25519 recovery KAT: public_key::recover is the single verification path shared by
+// transaction authorization, the recover_key intrinsic, and the assert_recover_key intrinsic.
+// Pins that (a) recover returns the signer's embedded pub, (b) the payload actually signed is
+// the HEX-ENCODED digest (Phantom-wallet compatibility -- see ed::private_key_shim::sign_sha256),
+// not the raw 32 digest bytes, and (c) recovery against a different digest throws rather than
+// returning a key. A host-side ed verify that disagrees on (b) -- as assert_recover_key once
+// did by verifying over the raw bytes -- rejects every signature this path accepts.
+BOOST_AUTO_TEST_CASE(test_ed_recovery) try {
+   auto priv = private_key::generate(private_key::key_type::ed);
+   auto pub = priv.get_public_key();
+   auto digest = sha256::hash(std::string("wire ed recovery payload"));
+   auto sig = priv.sign(digest);
+
+   // (a) full-path recovery agrees with the signer's public key
+   auto recovered = public_key::recover(sig, digest);
+   BOOST_CHECK_EQUAL(recovered.to_string({}), pub.to_string({}));
+
+   // (b) the signed payload is the hex-encoded digest, not the raw digest bytes
+   auto& ed_sig = sig.get<ed::signature_shim>();
+   auto& ed_pub = pub.get<ed::public_key_shim>();
+   const std::string hex = fc::to_hex(digest.data(), digest.data_size());
+   BOOST_TEST( ed_sig.verify_solana(reinterpret_cast<const uint8_t*>(hex.data()), hex.size(), ed_pub));
+   BOOST_TEST(!ed_sig.verify_solana(reinterpret_cast<const uint8_t*>(digest.data()), digest.data_size(), ed_pub));
+
+   // (c) a mismatched digest must not recover
+   auto wrong_digest = sha256::hash(std::string("some other payload"));
+   BOOST_CHECK_THROW(public_key::recover(sig, wrong_digest), fc::exception);
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(test_bls_pub_str) try {

@@ -3,6 +3,7 @@
 #include <sysio/chain/controller.hpp>
 #include <sysio/chain/types.hpp>
 
+#include <fc/crypto/blake3.hpp>
 #include <string>
 
 namespace sysio::chain {
@@ -14,8 +15,8 @@ class pending_snapshot {
 public:
    using next_t = sysio::chain::next_function<T>;
 
-   pending_snapshot(const chain::block_id_type& block_id, block_timestamp_type timestamp, const next_t& next, std::string pending_path, std::string final_path)
-       : block_id(block_id), timestamp(timestamp), next(next), pending_path(std::move(pending_path)), final_path(std::move(final_path)) {}
+   pending_snapshot(const chain::block_id_type& block_id, block_timestamp_type timestamp, const next_t& next, std::string pending_path, std::string final_path, fc::crypto::blake3 root_hash = {})
+       : block_id(block_id), timestamp(timestamp), next(next), pending_path(std::move(pending_path)), final_path(std::move(final_path)), root_hash(std::move(root_hash)) {}
 
    uint32_t get_height() const {
       return chain::block_header::num_from_id(block_id);
@@ -54,19 +55,19 @@ public:
       std::error_code ec;
       if(!valid) {
          fs::remove(fs::path(pending_path), ec);
-         ilog("Snapshot created at block id {} invalidated because block was forked out", block_id);
+         ilog("Snapshot created at block {} id {} invalidated because block was forked out", block_num, block_id);
          SYS_THROW(chain::snapshot_finalization_exception,
-                   "Snapshotted block was forked out of the chain.  ID: {}", block_id);
+                   "Snapshot block {} was forked out of the chain. ID: {}", block_num, block_id);
       }
 
       fs::rename(fs::path(pending_path), fs::path(final_path), ec);
       SYS_ASSERT(!ec, chain::snapshot_finalization_exception,
-                 "Unable to finalize valid snapshot of block number {}: [code: {}] {}",
-                 block_num, ec.value(), ec.message());
+                 "Unable to finalize valid snapshot of block {} {} : [code: {}] {}",
+                 block_num, block_id, ec.value(), ec.message());
 
       ilog("Snapshot created at block {} available at {}", block_num, final_path);
 
-      return {block_id, block_num, timestamp, chain::chain_snapshot_header::current_version, final_path};
+      return {block_id, block_num, timestamp, chain::chain_snapshot_header::current_version, final_path, root_hash};
    }
 
    chain::block_id_type block_id;
@@ -74,5 +75,6 @@ public:
    next_t next;
    std::string pending_path;
    std::string final_path;
+   fc::crypto::blake3 root_hash;
 };
 }// namespace sysio::chain

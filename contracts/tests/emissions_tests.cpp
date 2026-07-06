@@ -33,10 +33,12 @@
 #include <sysio/opp/opp.hpp>
 
 #include "sysio.system_tester.hpp"
+#include "finalizer_test_keys.hpp"
 
 #include <fc/variant_object.hpp>
 #include <fc/io/raw.hpp>
 #include <fc/reflect/reflect.hpp>
+#include <fc/slug_name.hpp>
 
 using namespace sysio::testing;
 using namespace sysio;
@@ -212,7 +214,8 @@ static constexpr uint16_t GOV_BPS                = 1000;
 // lazily via sysio.dclaim::onreward -> sysio.system::fundclaim, not paid at
 // payepoch -- so it doesn't appear in t5state.total_distributed until the
 // underlying fundclaim transfer happens.
-static constexpr uint16_t IMPLICIT_CAPITAL_BPS   = 10000 - COMPUTE_BPS - CAPEX_BPS - GOV_BPS;
+// The implicit capital reserve at these defaults is
+// 10000 - COMPUTE_BPS - CAPEX_BPS - GOV_BPS = 3000 bps.
 static constexpr uint16_t PRODUCER_BPS           = 7000;
 
 // Performance-based pay constants (keep in sync with emissions.cpp)
@@ -433,6 +436,27 @@ public:
       set_code( DCLAIM, contracts::dclaim_wasm() );
       set_abi ( DCLAIM, contracts::dclaim_abi().data() );
       set_privileged( DCLAIM );
+      produce_blocks(1);
+   }
+
+   /// Deploy the real sysio.reserv contract (privileged) so the swap-fee
+   /// fold-in test can seed its rewards bucket via a swap. Mirrors
+   /// deploy_dclaim_for_signing's account + ROA-policy + code pattern.
+   void deploy_reserv() {
+      const account_name RESERV = "sysio.reserv"_n;
+      if (!control->db().find<account_object, by_name>(RESERV)) {
+         create_accounts({ RESERV });
+         produce_blocks(1);
+      }
+      if (get_roa_policy(RESERV, "nodedaddy"_n).is_null()) {
+         auto tr = addpolicy_ram_only("nodedaddy"_n, RESERV, asset::from_string("500.0000 SYS"));
+         BOOST_REQUIRE( tr );
+         BOOST_REQUIRE( !tr->except );
+         produce_blocks(1);
+      }
+      set_code( RESERV, contracts::reserve_wasm() );
+      set_abi ( RESERV, contracts::reserve_abi().data() );
+      set_privileged( RESERV );
       produce_blocks(1);
    }
 
@@ -873,7 +897,7 @@ public:
       );
    }
 
-private:
+protected:
    // -----------------------------
    // Internal push helpers
    // -----------------------------
@@ -1017,6 +1041,17 @@ public:
       return push_epoch_action(signer, "advance"_n, mvo());
    }
 
+   // Push an action against the (separately deployed) sysio.reserv contract.
+   // Only the swap-fee fold-in test deploys reserv and uses this.
+   action_result push_reserv_action(account_name signer, action_name act, const variant_object& data) {
+      try {
+         base_tester::push_action("sysio.reserv"_n, act, signer, data);
+         return success();
+      } catch (const fc::exception& ex) {
+         return error(ex.top_message());
+      }
+   }
+
    // Convenience: set epoch config only. Genesis advance is deferred so each
    // test can decide whether to initt5 (and thus pass the emissions gate) or
    // exercise gate-block behavior. Under the new model, the first
@@ -1045,7 +1080,7 @@ public:
          abi_serializer::create_yield_function(abi_serializer_max_time));
    }
 
-private:
+protected:
    action_result push_opreg_action(account_name signer, action_name act, const variant_object& data) {
       try {
          base_tester::push_action(OPREG, act, signer, data);
@@ -3108,6 +3143,106 @@ BOOST_FIXTURE_TEST_CASE( single_active_producer_full_active_share, sysio_emissio
    BOOST_REQUIRE( got <= producer_pool );
 } FC_LOG_AND_RETHROW()
 
+// Swap-fee rewards (sysio.reserv rewards_bucket) are folded into payepoch's
+// compute distribution: producers + batch operators receive them on top of
+// emissions, split by producer_bps / batch_op_bps. End-to-end: deploy reserv,
+// seed the bucket with a real swap fee, advance to the (cadence-1) pay-epoch,
+// and verify the single producer is paid producer_pool + its fee share, the
+// bucket is swept to 0, the fee is NOT counted against the emission treasury,
+// and the audit log records it.
+BOOST_FIXTURE_TEST_CASE( payepoch_folds_swap_fee_rewards, sysio_emissions_tester ) try {
+   const account_name RESERV = "sysio.reserv"_n;
+   const account_name UWRIT  = "sysio.uwrit"_n;
+
+   create_t5_holding_accounts();
+
+   // Deploy sysio.reserv (the single extra real contract this test stands up).
+   deploy_reserv();
+
+   // Local ABI serializer + slug_name helper for reserv reads/writes.
+   abi_serializer reserv_ser;
+   {
+      const auto* a = control->find_account_metadata( RESERV );
+      BOOST_REQUIRE( a != nullptr );
+      abi_def d;
+      BOOST_REQUIRE_EQUAL( abi_serializer::to_abi(a->abi, d), true );
+      reserv_ser.set_abi( d, abi_serializer::create_yield_function(abi_serializer_max_time) );
+   }
+   auto codename = [](std::string_view s) { return mvo()("value", fc::slug_name{s}.value); };
+   auto reward_balance = [&]() -> int64_t {
+      auto data = get_row_by_account(RESERV, RESERV, "rewardbkt"_n, "rewardbkt"_n);
+      if (data.empty()) return 0;
+      auto v = reserv_ser.binary_to_variant("rewards_bucket", data,
+                  abi_serializer::create_yield_function(abi_serializer_max_time));
+      return static_cast<int64_t>(v["balance"].as_uint64());
+   };
+
+   // --- Seed the rewards bucket via a real swap (still in the bootstrap window,
+   // current_epoch_index == 0, so regreserve is permitted) ---
+   BOOST_REQUIRE_EQUAL( success(), push_reserv_action(RESERV, "regreserve"_n, mvo()
+      ("chain_code", codename("ETH"))("token_code", codename("ETH"))("reserve_code", codename("PRIMARY"))
+      ("name", "eth")("description", "")
+      ("initial_chain_amount", 1'000'000'000'000ULL)("initial_wire_amount", 1'000'000'000'000ULL)
+      ("source_token_precision", 9u)("connector_weight_bps", 5000u)("is_private", false)("owner", name{}) ) );
+   BOOST_REQUIRE_EQUAL( success(), push_reserv_action(RESERV, "regreserve"_n, mvo()
+      ("chain_code", codename("SOLANA"))("token_code", codename("SOL"))("reserve_code", codename("PRIMARY"))
+      ("name", "sol")("description", "")
+      ("initial_chain_amount", 1'000'000'000'000ULL)("initial_wire_amount", 1'000'000'000'000ULL)
+      ("source_token_precision", 9u)("connector_weight_bps", 5000u)("is_private", false)("owner", name{}) ) );
+   BOOST_REQUIRE_EQUAL( success(), push_reserv_action(UWRIT, "applyswap"_n, mvo()
+      ("src_chain_code", codename("ETH"))("src_token_code", codename("ETH"))("src_reserve_code", codename("PRIMARY"))
+      ("src_amount", 1'000'000'000ULL)
+      ("dst_chain_code", codename("SOLANA"))("dst_token_code", codename("SOL"))("dst_reserve_code", codename("PRIMARY"))
+      ("dst_amount", 100'000'000ULL) ) );
+
+   const int64_t fee_total = reward_balance();
+   BOOST_REQUIRE_GT( fee_total, 0 );
+   const int64_t fee_producer_pool = test_split_bps(fee_total, PRODUCER_BPS);
+   BOOST_REQUIRE_GT( fee_producer_pool, 0 );
+
+   // --- Single full-round producer; advance to the cadence-1 pay-epoch ---
+   setup_producers(1);
+   wait_for_producer_schedule();
+   produce_complete_cycles(1, 2);
+
+   const uint32_t start = head_secs() - ONE_EPOCH - 1;
+   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
+
+   const int64_t t5_before = get_t5_state()["total_distributed"].as<int64_t>();
+   const int64_t bal_before = get_wire_balance("producera"_n).get_amount();
+
+   // Must NOT overdraw: payepoch queues the reserv->sysio drain ahead of the
+   // payout transfers, so the swept fee lands in sysio's balance first.
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+
+   const int64_t got = get_wire_balance("producera"_n).get_amount() - bal_before;
+
+   auto log = get_epoch_log(1);
+   const int64_t compute       = log["compute_amount"].as<int64_t>();
+   const int64_t capex         = log["capex_amount"].as<int64_t>();
+   const int64_t gov           = log["governance_amount"].as<int64_t>();
+   const int64_t producer_pool = test_split_bps(compute, PRODUCER_BPS);
+
+   // The producer received its full emission share PLUS its share of the fee
+   // (expected_rounds clamps to 1 at the 60s epoch, so the single active
+   // producer takes the whole producer pool).
+   BOOST_REQUIRE_EQUAL( got, producer_pool + fee_producer_pool );
+   BOOST_REQUIRE_GT( got, producer_pool ); // fee folded in: pure emission caps at producer_pool
+
+   // The audit log records the fee actually distributed (only the producer
+   // share; the batch-op share rolled to treasury with no active group).
+   BOOST_REQUIRE_EQUAL( log["fee_distributed"].as<int64_t>(), fee_producer_pool );
+
+   // The bucket was swept to zero by the inline drain.
+   BOOST_REQUIRE_EQUAL( reward_balance(), 0 );
+
+   // total_distributed counts emission only (producer_pool + capex + gov, with
+   // the empty batch group's share staying in treasury) -- the fee is NOT
+   // charged against the emission curve.
+   const int64_t t5_after = get_t5_state()["total_distributed"].as<int64_t>();
+   BOOST_REQUIRE_EQUAL( t5_after - t5_before, producer_pool + capex + gov );
+} FC_LOG_AND_RETHROW()
+
 BOOST_FIXTURE_TEST_CASE( standby_weight_decreases_by_rank, sysio_emissions_tester ) try {
    // Rank 22 should receive more than rank 23, which should receive more than rank 24, etc.
    // Weight formula: w = 29 - rank (22→7, 23→6, 24→5)
@@ -4007,3 +4142,248 @@ BOOST_FIXTURE_TEST_CASE( fundclaim_silent_when_t5state_missing, sysio_emissions_
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_SUITE_END() // t5_emissions_tests
+
+// ===========================================================================
+// Producer scheduling eligibility
+//
+// update_ranked_producers must schedule only producers that are ACTIVE
+// OPERATOR_TYPE_PRODUCER operators in sysio.opreg, backfill vacated active slots
+// from standbys, and never shrink the schedule (with its lock-step finalizer
+// policy) below the BFT safety floor (min_schedule_size). The gate treats every
+// non-ACTIVE status identically (UNKNOWN from a collateral withdrawal, SLASHED,
+// TERMINATED all fail is_op_active), so slash / terminate exercise the same
+// decision the withdrawal path reaches once flushwtdw flips status to UNKNOWN
+// (that transition itself is covered by the opreg / epoch suites).
+//
+// Scheduling is asserted through the last-proposed finalizer policy, which
+// update_ranked_producers writes in the same loop as the producer schedule, so
+// its key_ids are exactly the scheduled producers -- and reading it does not
+// depend on the (unsignable, test-key) policy ever activating.
+// ===========================================================================
+
+struct producer_eligibility_tester : public sysio_emissions_tester {
+
+   /// producera, producerb, ... for the first `count` indices.
+   std::vector<account_name> producer_names(uint32_t count) {
+      std::vector<account_name> names;
+      names.reserve(count);
+      for (uint32_t i = 0; i < count; ++i) names.push_back(producer_name_at(i));
+      return names;
+   }
+
+   /// Create producer accounts with enough RAM to store a finalizer key. Uses the
+   /// system setacctram action (a direct native limit set) rather than the ROA /
+   /// RAM market, which this fixture does not activate.
+   void create_producer_accounts(const std::vector<account_name>& names) {
+      create_accounts(names, false, false, false, true);
+      produce_blocks(1);
+      for (const auto& p : names) {
+         BOOST_REQUIRE_EQUAL(success(), push_system_action(config::system_account_name, "setacctram"_n,
+            mvo()("account", p)("ram_bytes", int64_t(1'000'000))));
+      }
+      produce_blocks(1);
+   }
+
+   action_result register_finalizer_key(account_name act, const std::string& key, const std::string& pop) {
+      return push_system_action(act, "regfinkey"_n, mvo()
+         ("finalizer_name", act)("finalizer_key", key)("proof_of_possession", pop));
+   }
+
+   /// Assigns key_pairs[i] to names[i] for the first `count` producers. regfinkey
+   /// auto-activates a producer's first key, satisfying the schedule's finalizer gate.
+   void register_finalizer_keys(const std::vector<account_name>& names, uint32_t count) {
+      for (uint32_t i = 0; i < count && i < names.size(); ++i) {
+         BOOST_REQUIRE_EQUAL(success(),
+            register_finalizer_key(names[i], sysio_test::key_pairs[i].pub_key, sysio_test::key_pairs[i].pop));
+      }
+   }
+
+   action_result setrank(account_name producer, uint32_t rank) {
+      return push_system_action(config::system_account_name, "setrank"_n, mvo()
+         ("producer", producer)("rank", rank));
+   }
+
+   action_result terminate_operator(account_name account, const std::string& reason = "test terminate") {
+      return push_opreg_action(OPREG, "terminate"_n, mvo()("account", account)("reason", reason));
+   }
+
+   /// Registers `count` producers, each an ACTIVE bootstrapped PRODUCER operator
+   /// with an active finalizer key, ranked 1..count via setrank. setrank is used
+   /// rather than setprodkeys because setprodkeys publishes the whole set through
+   /// set_proposed_producers, which the native layer caps at max_producers; this
+   /// helper must be able to seed standby ranks (> max_producers) for backfill.
+   /// The producer/finalizer rows are populated but no schedule is published
+   /// until the caller triggers update_ranked_producers via trigger_reschedule().
+   std::vector<account_name> setup_ranked_producers(uint32_t count) {
+      auto names = producer_names(count);
+      create_producer_accounts(names);
+      for (auto& p : names) {
+         BOOST_REQUIRE_EQUAL(success(), push_system_action(p, "regproducer"_n, mvo()
+            ("producer", p)("producer_key", get_public_key(p, "active"))("url", "")("location", 0)));
+      }
+      for (auto& p : names) {
+         BOOST_REQUIRE_EQUAL(success(), register_operator(p, OperatorType::OPERATOR_TYPE_PRODUCER, true));
+      }
+      for (uint32_t i = 0; i < count; ++i) {
+         BOOST_REQUIRE_EQUAL(success(), setrank(names[i], i + 1));
+      }
+      register_finalizer_keys(names, count);
+      produce_blocks(1);
+      return names;
+   }
+
+   /// Fire onblock's update_ranked_producers rebuild (throttled to once per 120
+   /// slots). Advance 130 blocks (~65s) so the threshold is crossed gradually --
+   /// a single large time jump would expire subsequently pushed transactions.
+   void trigger_reschedule() {
+      produce_blocks(130);
+   }
+
+   /// True iff `producer`'s active finalizer key appears in the finalizer policy
+   /// that update_ranked_producers last proposed -- i.e. the producer is scheduled.
+   /// Finalizer key_ids are zero-based, so row presence (not a non-zero id) is the
+   /// "producer has an active key" test.
+   bool is_scheduled(account_name producer) {
+      auto data = get_row_by_account(config::system_account_name, config::system_account_name,
+                                     "finalizers"_n, producer);
+      if (data.empty()) return false;
+      auto v = sysio_abi_ser.binary_to_variant("finalizer_info", data,
+         abi_serializer::create_yield_function(abi_serializer_max_time));
+      auto ids = sysio_test::get_last_prop_fin_ids(*this, sysio_abi_ser);
+      return ids.count(v["active_key_id"].as_uint64()) > 0;
+   }
+};
+
+BOOST_AUTO_TEST_SUITE(sysio_producer_eligibility_tests)
+
+// Baseline: collateralized, finalizer-keyed producers are all scheduled.
+BOOST_FIXTURE_TEST_CASE( active_producers_scheduled, producer_eligibility_tester ) try {
+   auto names = setup_ranked_producers(5);
+   trigger_reschedule();
+
+   for (const auto& p : names) {
+      BOOST_REQUIRE_MESSAGE(is_scheduled(p), "expected " << p.to_string() << " scheduled");
+   }
+} FC_LOG_AND_RETHROW()
+
+// A slashed producer (status SLASHED) is dropped from the schedule; the others
+// remain (4 eligible >= min_schedule_size).
+BOOST_FIXTURE_TEST_CASE( slashed_producer_removed, producer_eligibility_tester ) try {
+   auto names = setup_ranked_producers(5);
+   trigger_reschedule();
+   BOOST_REQUIRE( is_scheduled(names[4]) );
+
+   BOOST_REQUIRE_EQUAL( success(), slash_operator(names[4]) );
+   trigger_reschedule();
+
+   BOOST_REQUIRE( !is_scheduled(names[4]) );
+   BOOST_REQUIRE(  is_scheduled(names[0]) );
+   BOOST_REQUIRE(  is_scheduled(names[3]) );
+} FC_LOG_AND_RETHROW()
+
+// A terminated producer (status TERMINATED) is dropped from the schedule.
+BOOST_FIXTURE_TEST_CASE( terminated_producer_removed, producer_eligibility_tester ) try {
+   auto names = setup_ranked_producers(5);
+   trigger_reschedule();
+   BOOST_REQUIRE( is_scheduled(names[2]) );
+
+   BOOST_REQUIRE_EQUAL( success(), terminate_operator(names[2]) );
+   trigger_reschedule();
+
+   BOOST_REQUIRE( !is_scheduled(names[2]) );
+   BOOST_REQUIRE(  is_scheduled(names[0]) );
+} FC_LOG_AND_RETHROW()
+
+// Re-collateralization (register a fresh ACTIVE producer operator) restores
+// schedulability: an account whose operator row is absent is not scheduled, and
+// once it becomes an ACTIVE PRODUCER operator it is picked up on the next rebuild.
+BOOST_FIXTURE_TEST_CASE( noncollateralized_producer_not_scheduled_then_restored, producer_eligibility_tester ) try {
+   // Four collateralized producers plus one that is registered + finalizer-keyed
+   // + ranked but has NO opreg operator row yet.
+   auto names = producer_names(5);
+   create_producer_accounts(names);
+   for (auto& p : names) {
+      BOOST_REQUIRE_EQUAL( success(), push_system_action(p, "regproducer"_n, mvo()
+         ("producer", p)("producer_key", get_public_key(p, "active"))("url", "")("location", 0)) );
+   }
+   for (uint32_t i = 0; i < 4; ++i) {
+      BOOST_REQUIRE_EQUAL( success(), register_operator(names[i], OperatorType::OPERATOR_TYPE_PRODUCER, true) );
+   }
+   for (uint32_t i = 0; i < 5; ++i) BOOST_REQUIRE_EQUAL( success(), setrank(names[i], i + 1) );
+   register_finalizer_keys(names, 5);
+   produce_blocks(1);
+   trigger_reschedule();
+
+   BOOST_REQUIRE(  is_scheduled(names[0]) );
+   BOOST_REQUIRE( !is_scheduled(names[4]) );   // no operator row -> not scheduled
+
+   BOOST_REQUIRE_EQUAL( success(), register_operator(names[4], OperatorType::OPERATOR_TYPE_PRODUCER, true) );
+   trigger_reschedule();
+
+   BOOST_REQUIRE( is_scheduled(names[4]) );     // now ACTIVE PRODUCER -> scheduled
+} FC_LOG_AND_RETHROW()
+
+// An account that is ACTIVE only as a BATCH operator (different collateral) must
+// not be scheduled as a producer even though its opreg status is ACTIVE.
+BOOST_FIXTURE_TEST_CASE( active_batch_operator_not_scheduled_as_producer, producer_eligibility_tester ) try {
+   auto names = producer_names(5);
+   create_producer_accounts(names);
+   for (auto& p : names) {
+      BOOST_REQUIRE_EQUAL( success(), push_system_action(p, "regproducer"_n, mvo()
+         ("producer", p)("producer_key", get_public_key(p, "active"))("url", "")("location", 0)) );
+   }
+   for (uint32_t i = 0; i < 4; ++i) {
+      BOOST_REQUIRE_EQUAL( success(), register_operator(names[i], OperatorType::OPERATOR_TYPE_PRODUCER, true) );
+   }
+   // names[4] is ACTIVE, but as a BATCH operator -- wrong type for producing.
+   BOOST_REQUIRE_EQUAL( success(), register_operator(names[4], OperatorType::OPERATOR_TYPE_BATCH, true) );
+   for (uint32_t i = 0; i < 5; ++i) BOOST_REQUIRE_EQUAL( success(), setrank(names[i], i + 1) );
+   register_finalizer_keys(names, 5);
+   produce_blocks(1);
+   trigger_reschedule();
+
+   BOOST_REQUIRE(  is_scheduled(names[0]) );
+   BOOST_REQUIRE( !is_scheduled(names[4]) );
+} FC_LOG_AND_RETHROW()
+
+// When an active-rank producer becomes ineligible and a standby is available,
+// the standby backfills the vacated slot (schedule stays full).
+BOOST_FIXTURE_TEST_CASE( standby_backfills_ineligible_active, producer_eligibility_tester ) try {
+   // emitcfg must exist for standby_end_rank (else backfill is disabled and the
+   // schedule caps at max_producers with no standbys considered).
+   BOOST_REQUIRE_EQUAL( success(), setemitcfg_defaults( config::system_account_name ) );
+   produce_blocks(1);
+
+   // 21 active-rank (1..21) + one standby at rank 22.
+   auto names = setup_ranked_producers(22);
+   trigger_reschedule();
+
+   BOOST_REQUIRE(  is_scheduled(names[0])  );   // rank 1 active
+   BOOST_REQUIRE( !is_scheduled(names[21]) );   // rank 22 standby: not scheduled while actives are full
+
+   BOOST_REQUIRE_EQUAL( success(), slash_operator(names[0]) );
+   trigger_reschedule();
+
+   BOOST_REQUIRE( !is_scheduled(names[0])  );   // slashed active removed
+   BOOST_REQUIRE(  is_scheduled(names[21]) );   // standby backfilled into the schedule
+} FC_LOG_AND_RETHROW()
+
+// The schedule (and its lock-step finalizer policy) never shrinks below the BFT
+// safety floor: with min_schedule_size producers and no standbys, making one
+// ineligible leaves fewer than the floor eligible, so the last good schedule is
+// retained rather than published smaller -- the ineligible producer stays.
+BOOST_FIXTURE_TEST_CASE( schedule_not_shrunk_below_floor, producer_eligibility_tester ) try {
+   auto names = setup_ranked_producers(4);      // min_schedule_size == 4
+   trigger_reschedule();
+   for (const auto& p : names) BOOST_REQUIRE( is_scheduled(p) );
+
+   BOOST_REQUIRE_EQUAL( success(), slash_operator(names[3]) );
+   trigger_reschedule();
+
+   // Only 3 eligible (< floor). update_ranked_producers returns early, so the
+   // last good 4-member schedule -- including the slashed producer -- is kept.
+   BOOST_REQUIRE( is_scheduled(names[3]) );
+   BOOST_REQUIRE( is_scheduled(names[0]) );
+} FC_LOG_AND_RETHROW()
+
+BOOST_AUTO_TEST_SUITE_END() // sysio_producer_eligibility_tests

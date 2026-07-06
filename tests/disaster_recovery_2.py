@@ -101,7 +101,7 @@ try:
     node0.waitForHeadToAdvance(timeout=3) # should time out
 
     Print("Disconnect the producing node (Node0) from peer Node1")
-    node0.processUrllibRequest("net", "disconnect", "localhost:9877")
+    node0.processUrllibRequest("net", "disconnect", cluster.getNodeP2pEndpoint(1))
     assert not node0.waitForLibToAdvance(timeout=10), "Node0 LIB still advancing after disconnect"
     assert not node1.waitForHeadToAdvance(timeout=5), "Node1 head still advancing after disconnect"
 

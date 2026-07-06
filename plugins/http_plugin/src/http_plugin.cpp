@@ -10,6 +10,7 @@
 
 #include <boost/asio.hpp>
 
+#include <functional>
 #include <memory>
 #include <regex>
 
@@ -20,6 +21,27 @@ namespace sysio {
          static fc::logger log{ "http_plugin" };
          return log;
       }
+
+      /**
+       * RAII reservation against http_plugin_state::bytes_in_flight.  The increment runs in the
+       * constructor and the decrement in the destructor, so the reservation is bound to a successfully
+       * constructed guard: if allocating the guard throws (e.g. std::bad_alloc while admitting a request
+       * under memory pressure) the increment never runs, and once constructed the matching decrement is
+       * guaranteed exactly once when the guard is destroyed.  Held via shared_ptr at the call site so the
+       * posted app-thread lambda stays copyable (boost::asio::post requires a copyable handler) and the
+       * release fires only when the final copy is destroyed.
+       */
+      struct bytes_in_flight_reservation {
+         detail::abstract_conn_ptr conn;
+         size_t                    size = 0;
+
+         bytes_in_flight_reservation(detail::abstract_conn_ptr c, size_t sz)
+            : conn(std::move(c)), size(sz) { conn->increment_bytes_in_flight(size); }
+         ~bytes_in_flight_reservation() { conn->decrement_bytes_in_flight(size); }
+
+         bytes_in_flight_reservation(const bytes_in_flight_reservation&) = delete;
+         bytes_in_flight_reservation& operator=(const bytes_in_flight_reservation&) = delete;
+      };
    }
 
    using std::vector;
@@ -52,6 +74,7 @@ namespace sysio {
       if (name == "trace_api") return api_category::trace_api;
       if (name == "prometheus") return api_category::prometheus;
       if (name == "test_control") return api_category::test_control;
+      if (name == "snapshot_ro") return api_category::snapshot_ro;
       return api_category::unknown;
    }
 
@@ -67,6 +90,7 @@ namespace sysio {
       if (category == api_category::trace_api) return "trace_api";
       if (category == api_category::prometheus) return "prometheus";
       if (category == api_category::test_control) return "test_control";
+      if (category == api_category::snapshot_ro) return "snapshot_ro";
       if (category == api_category::node) return "node";
       // It's a programming error when the control flow reaches this point, 
       // please make sure all the category names are returned from above statements.
@@ -90,7 +114,9 @@ namespace sysio {
       if (api_category_set({api_category::producer_ro, api_category::producer_rw, api_category::snapshot})
               .contains(category))
          return "sysio::producer_api_plugin";
-      // It's a programming error when the control flow reaches this point, 
+      if (category == api_category::snapshot_ro)
+         return "sysio::snapshot_api_plugin";
+      // It's a programming error when the control flow reaches this point,
       // please make sure all the plugin names are returned from above statements.
       assert(false && "No corresponding plugin for the category value");
       return {};
@@ -99,7 +125,7 @@ namespace sysio {
    std::string category_names(api_category_set set) {
       if (set == api_category_set::all()) return "all";
       std::string result;
-      for (uint32_t i = 1; i <= static_cast<uint32_t>(api_category::test_control); i<<=1) {
+      for (uint32_t i = 1; i <= static_cast<uint32_t>(api_category::snapshot_ro); i<<=1) {
          if (set.contains(api_category(i))) {
             result += from_category(api_category(i));
             result += " ";
@@ -128,7 +154,8 @@ namespace sysio {
           * Make an internal_url_handler that will run the url_handler on the app() thread and then
           * return to the http thread pool for response processing
           *
-          * @pre b.size() has been added to bytes_in_flight by caller
+          * The returned handler reserves the request body against bytes_in_flight on admission and releases
+          * it (via a shared bytes_in_flight_reservation) when the posted app-thread work completes or is discarded.
           * @param priority - priority to post to the app thread at
           * @param to_queue - execution queue to post to
           * @param next - the next handler for responses
@@ -144,8 +171,16 @@ namespace sysio {
                        ( detail::abstract_conn_ptr conn, string&& r, string&& b, url_response_callback&& then ) {
                if (auto error_str = conn->verify_max_bytes_in_flight(b.size()); !error_str.empty()) {
                   conn->send_busy_response(std::move(error_str));
-                  return;
+                  return; // admission rejected before any reservation was made, nothing to release
                }
+
+               // The request body is about to be moved into the (unbounded) app-thread queue, where it can
+               // sit until a possibly-slow handler runs.  Reserve its bytes against bytes_in_flight now that
+               // admission passed, so the queued memory is visible to concurrent verify_max_bytes_in_flight()
+               // checks instead of accumulating uncounted.  The reservation is released exactly once when the
+               // posted work below is destroyed -- whether it runs to completion, throws, returns early on
+               // shutdown, or is discarded unrun when the queue is cleared.
+               auto body_in_flight_guard = std::make_shared<bytes_in_flight_reservation>(conn, b.size());
 
                url_response_callback wrapped_then = [then=std::move(then)](int code, std::optional<fc::variant> resp) {
                   then(code, std::move(resp));
@@ -154,7 +189,7 @@ namespace sysio {
                // post to the app thread taking shared ownership of next (via std::shared_ptr),
                // sole ownership of the tracked body and the passed in parameters
                // we can't std::move() next_ptr because we post a new lambda for each http request and we need to keep the original
-               app().executor().post( priority, to_queue, [next_ptr, conn=std::move(conn), r=std::move(r), b = std::move(b), wrapped_then=std::move(wrapped_then)]() mutable {
+               app().executor().post( priority, to_queue, [next_ptr, conn=std::move(conn), r=std::move(r), b = std::move(b), wrapped_then=std::move(wrapped_then), body_in_flight_guard=std::move(body_in_flight_guard)]() mutable {
                   try {
                      if( app().is_quiting() ) return; // http_plugin shutting down, do not call callback
                      // call the `next` url_handler and wrap the response handler
@@ -170,7 +205,8 @@ namespace sysio {
          /**
           * Make an internal_url_handler that will run the url_handler directly
           *
-          * @pre b.size() has been added to bytes_in_flight by caller
+          * Runs inline on the http thread with no app-thread queueing, so the request body does not linger
+          * in a queue and is not separately reserved against bytes_in_flight here.
           * @param next - the next handler for responses
           * @return the constructed internal_url_handler
           */
@@ -302,7 +338,7 @@ namespace sysio {
              "    in addition, unix socket path must starts with '/', './' or '../'. When relative path\n"
              "    is used, it is relative to the data path.\n\n"
              "    Valid categories include chain_ro, chain_rw, db_size, net_ro, net_rw, producer_ro\n"
-             "    producer_rw, snapshot, trace_api, prometheus, and test_control.\n\n"
+             "    producer_rw, snapshot, trace_api, prometheus, test_control, and snapshot_ro.\n\n"
              "    A single `hostname:port` specification can be used by multiple categories\n" 
              "    However, two specifications having the same port with different hostname strings\n" 
              "    are always considered as configuration error regardless of whether they can be resolved\n"
@@ -534,6 +570,26 @@ namespace sysio {
       std::string path  = entry.path;
       auto p = my->plugin_state->url_handlers.emplace(path, my->make_http_thread_url_handler(std::move(entry), content_type));
       SYS_ASSERT( p.second, chain::plugin_config_exception, "http url {} is not unique", path );
+   }
+
+   void http_plugin::add_raw_handler(string path, api_category category, raw_url_handler handler) {
+      fc_ilog(logger(), "add {} api url: {} {}",
+              from_category(category), path,
+              my->addresses_for_category(category).empty() ? "disabled for category address not configured"
+                                                           : "on " + my->addresses_for_category(category));
+      detail::internal_url_handler internal_handler;
+      internal_handler.category = category;
+      internal_handler.content_type = http_content_type::json; // default, though raw handlers manage their own responses
+      auto handler_ptr = std::make_shared<raw_url_handler>(std::move(handler));
+      internal_handler.fn = [handler_ptr](detail::abstract_conn_ptr conn, string&& r, string&& b, url_response_callback&&) {
+         try {
+            (*handler_ptr)(std::move(conn), std::move(r), std::move(b));
+         } catch (...) {
+            conn->handle_exception();
+         }
+      };
+      auto p = my->plugin_state->url_handlers.emplace(std::move(path), std::move(internal_handler));
+      SYS_ASSERT(p.second, chain::plugin_config_exception, "http url {} is not unique", p.first->first);
    }
 
    void http_plugin::post_http_thread_pool(std::function<void()> f) {

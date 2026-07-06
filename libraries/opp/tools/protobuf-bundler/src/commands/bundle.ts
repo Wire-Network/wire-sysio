@@ -84,6 +84,10 @@ export async function bundleCommand(args: BundleArgs): Promise<void> {
   } catch (err: any) {
     skipCleanup = true
     log.error(`Bundle failed: ${err.message}`, err)
+    // Re-throw so the failure propagates to `main().catch` → process.exit(1).
+    // Without this the CLI exits 0 on a failed generate/publish and CI reports
+    // a green run even though no package was produced or published.
+    throw err
   } finally {
     if (!skipCleanup) {
       try {

@@ -2,6 +2,8 @@
 
 import os
 import re
+import shlex
+import stat
 import tempfile
 
 from TestHarness import Utils
@@ -18,17 +20,44 @@ from TestHarness import Utils
 
 Print=Utils.Print
 testSuccessful=False
+PERMISSIVE_UMASK = stat.S_IWGRP | stat.S_IWOTH
+SECRET_FILE_MODE = stat.S_IRUSR | stat.S_IWUSR
+
+def run_with_umask(mask, callback):
+    """Run ``callback`` while the process umask is temporarily set to ``mask``."""
+    old_umask = os.umask(mask)
+    try:
+        return callback()
+    finally:
+        os.umask(old_umask)
+
+def assert_owner_only_secret_file(path):
+    """Assert that a generated secret file is readable and writable only by its owner."""
+    mode = stat.S_IMODE(os.stat(path).st_mode)
+    assert mode == SECRET_FILE_MODE, "expected %s to have mode 0o600, got 0o%03o" % (path, mode)
+
 
 def test_create_key_to_console():
     rslts = Utils.processSysioUtilCmd("bls create key --to-console", "create key to console", silentErrors=False)
     check_create_key_results(rslts)
 
 def test_create_key_to_file():
-    with tempfile.NamedTemporaryFile(mode="w+") as tmp_file:
-        Utils.processSysioUtilCmd("bls create key --file {}".format(tmp_file.name), "create key to file", silentErrors=False)
+    """``bls create key --file`` creates owner-only secret files under permissive umask."""
+    with tempfile.TemporaryDirectory() as temp_dir:
+        secret_path = os.path.join(temp_dir, "bls-key.txt")
 
-        tmp_file.seek(0)
-        rslts = tmp_file.read()
+        def create_secret_file():
+            """Create the BLS secret file while the test umask is active."""
+            Utils.processSysioUtilCmd(
+                "bls create key --file {}".format(shlex.quote(secret_path)),
+                "create key to file",
+                silentErrors=False,
+            )
+
+        run_with_umask(PERMISSIVE_UMASK, create_secret_file)
+        assert_owner_only_secret_file(secret_path)
+        with open(secret_path, encoding="utf-8") as secret_file:
+            rslts = secret_file.read()
         check_create_key_results(rslts)
 
 def test_create_pop_from_command_line():

@@ -29,8 +29,6 @@ totalProducers=maxActiveProducers
 activateIF=args.activate_if
 walletPort=args.wallet_port
 walletMgr=WalletMgr(True, port=walletPort)
-producerEndpoint = '127.0.0.1:8888'
-httpServerAddress = '127.0.0.1:8889'
 
 testSuccessful=False
 trxGenLauncher=None

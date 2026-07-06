@@ -64,6 +64,9 @@ constexpr auto probe_msg_seed = "wire-intrinsic-probe-message";
 struct intrinsic_probe_shared_tester : validating_tester {
    digest_type unactivated_feature_digest;
    bytes       recover_key_payload;
+   bytes       ed_recover_key_payload;
+   bytes       ed_wrong_pub_payload;
+   bytes       ed_wrong_digest_payload;
    bytes       oversized_wa_payload;
 
    intrinsic_probe_shared_tester()
@@ -88,23 +91,20 @@ struct intrinsic_probe_shared_tester : validating_tester {
       unactivated_feature_digest = *d;
 
       build_recover_key_payload();
+      build_ed_recover_key_payloads();
       build_oversized_wa_payload();
    }
 
-   // Build (digest, sig, pub) triple from a deterministic seed so the probe
-   // can be re-run and cross-checked against a source-embedded expectation.
-   void build_recover_key_payload() {
-      const auto priv = fc::crypto::private_key::from_string(probe_priv_wif);
-      const auto pub = priv.get_public_key();
-      const auto digest = fc::sha256::hash(std::string{probe_msg_seed});
-      const auto sig = priv.sign(digest);
-
+   // Pack the (digest, sig, pub) triple into the sig_hash_key_header wire layout the
+   // recover_key / assert_recover_key probe actions expect.
+   static bytes pack_sig_hash_key(const fc::sha256& digest,
+                                  const fc::crypto::signature& sig,
+                                  const fc::crypto::public_key& pub) {
       const auto packed_sig = fc::raw::pack(sig);
       const auto packed_pub = fc::raw::pack(pub);
 
-      recover_key_payload.resize(
-         sig_hash_key_hdr_size + packed_sig.size() + packed_pub.size());
-      char* p = recover_key_payload.data();
+      bytes payload(sig_hash_key_hdr_size + packed_sig.size() + packed_pub.size());
+      char* p = payload.data();
       std::memcpy(p, digest.data(), 32);                p += 32;
       const uint32_t pk_len  = static_cast<uint32_t>(packed_pub.size());
       const uint32_t sig_len = static_cast<uint32_t>(packed_sig.size());
@@ -112,6 +112,42 @@ struct intrinsic_probe_shared_tester : validating_tester {
       std::memcpy(p, &sig_len, sizeof(sig_len));        p += sizeof(sig_len);
       std::memcpy(p, packed_sig.data(), sig_len);       p += sig_len;
       std::memcpy(p, packed_pub.data(), pk_len);
+      return payload;
+   }
+
+   // Build (digest, sig, pub) triple from a deterministic seed so the probe
+   // can be re-run and cross-checked against a source-embedded expectation.
+   void build_recover_key_payload() {
+      const auto priv = fc::crypto::private_key::from_string(probe_priv_wif);
+      const auto digest = fc::sha256::hash(std::string{probe_msg_seed});
+      recover_key_payload = pack_sig_hash_key(digest, priv.sign(digest), priv.get_public_key());
+   }
+
+   // ed25519 (digest, sig, pub) triples. There is no deterministic regenerate-from-seed path for
+   // ed keys (the 64-byte libsodium secret key embeds its public half, so arbitrary seed bytes do
+   // not form a valid keypair); fresh keypairs are generated per run and every assertion below is
+   // self-consistent against them.
+   //   * ed_recover_key_payload   -- golden triple: recover_key and assert_recover_key must BOTH
+   //                                 accept it, pinning that the two intrinsics share one
+   //                                 verification path (raw-vs-hex digest regression guard).
+   //   * ed_wrong_pub_payload     -- sig by key A, pub of key B: recovery succeeds and returns A's
+   //                                 embedded pub, so assert_recover_key must throw on the compare.
+   //   * ed_wrong_digest_payload  -- valid triple but a different digest: ed verification fails,
+   //                                 so recover_key returns -1 and assert_recover_key throws.
+   void build_ed_recover_key_payloads() {
+      using fc::crypto::private_key;
+      const auto priv = private_key::generate(private_key::key_type::ed);
+      const auto pub = priv.get_public_key();
+      const auto digest = fc::sha256::hash(std::string{probe_msg_seed});
+      const auto sig = priv.sign(digest);
+
+      ed_recover_key_payload = pack_sig_hash_key(digest, sig, pub);
+
+      const auto other_pub = private_key::generate(private_key::key_type::ed).get_public_key();
+      ed_wrong_pub_payload = pack_sig_hash_key(digest, sig, other_pub);
+
+      const auto wrong_digest = fc::sha256::hash(std::string{"wire-intrinsic-probe-ed-wrong-digest"});
+      ed_wrong_digest_payload = pack_sig_hash_key(wrong_digest, sig, pub);
    }
 
    // Build a raw WA-variant signature blob whose auth_data + client_json variable-size components exceed the
@@ -351,6 +387,42 @@ BOOST_FIXTURE_TEST_CASE(assert_recover_key_empty_sig, intrinsic_probe_fixture) {
    BOOST_CHECK_THROW(t.run("arecempsig"_n), fc::exception);
 }
 
+// -----------------------------------------------------------------------------
+// ed25519 agreement: recover_key and assert_recover_key must accept and reject
+// the SAME (digest, sig, pub) triples. assert_recover_key previously verified
+// ed signatures over the raw 32-byte digest while recover_key (and transaction
+// authorization) verified over the hex-encoded digest, so every SDK-signed ed
+// signature passed recover_key but failed assert_recover_key. Both now share
+// the public_key::recover path; these cases pin that agreement.
+// -----------------------------------------------------------------------------
+
+BOOST_FIXTURE_TEST_CASE(recover_key_ed_golden, intrinsic_probe_fixture) {
+   BOOST_CHECK_NO_THROW(t.run_with_data("recok"_n, t.ed_recover_key_payload));
+}
+
+BOOST_FIXTURE_TEST_CASE(assert_recover_key_ed_golden, intrinsic_probe_fixture) {
+   BOOST_CHECK_NO_THROW(t.run_with_data("arecok"_n, t.ed_recover_key_payload));
+}
+
+// Signature by key A, expected pub of key B: ed recovery succeeds (the signature verifies against
+// its embedded key A) so the failure must come from the host's recovered-vs-expected compare.
+BOOST_FIXTURE_TEST_CASE(assert_recover_key_ed_wrong_pub, intrinsic_probe_fixture) {
+   BOOST_CHECK_THROW(
+      t.run_with_data("arecok"_n, t.ed_wrong_pub_payload), crypto_api_exception);
+}
+
+// Different digest: ed verification fails inside signature_shim::recover. recover_key maps that
+// to rc = -1 (the probe's rc==pk_len check then fires); assert_recover_key propagates the throw.
+BOOST_FIXTURE_TEST_CASE(recover_key_ed_wrong_digest, intrinsic_probe_fixture) {
+   BOOST_CHECK_THROW(
+      t.run_with_data("recok"_n, t.ed_wrong_digest_payload), sysio_assert_message_exception);
+}
+
+BOOST_FIXTURE_TEST_CASE(assert_recover_key_ed_wrong_digest, intrinsic_probe_fixture) {
+   BOOST_CHECK_THROW(
+      t.run_with_data("arecok"_n, t.ed_wrong_digest_payload), fc::exception);
+}
+
 // =============================================================================
 // D. preactivate_feature
 //
@@ -480,5 +552,32 @@ BOOST_FIXTURE_TEST_CASE(send_inline_empty, intrinsic_probe_fixture) {
 
 BOOST_FIXTURE_TEST_CASE(set_action_return_value_ok,    intrinsic_probe_fixture) { BOOST_CHECK_NO_THROW(t.run("sarvok"_n)); }
 BOOST_FIXTURE_TEST_CASE(set_action_return_value_empty, intrinsic_probe_fixture) { BOOST_CHECK_NO_THROW(t.run("sarvem"_n)); }
+
+// =============================================================================
+// I. get_permission_lower_bound (P2)
+//
+// Wire-specific intrinsic (libraries/chain/webassembly/permission.cpp) backing CDT's sysio::get_permission --
+// the only host path a contract has to read another account's authority on-chain (sysio.roa::active_key_matches,
+// sysio.uwrit). Each probe queries get_self()'s owner/active permissions (created with a single K1 key at
+// threshold 1) and self-verifies the record via in-contract check(); the driver asserts the host stays silent,
+// so any layout / size-query / sentinel / lower-bound-semantics regression surfaces as a
+// sysio_assert_message_exception here. Not privileged-gated, so all run from the ordinary probe account.
+// =============================================================================
+
+BOOST_FIXTURE_TEST_CASE(get_permission_lower_bound_active_golden, intrinsic_probe_fixture) {
+   BOOST_CHECK_NO_THROW(t.run("glpbact"_n));
+}
+BOOST_FIXTURE_TEST_CASE(get_permission_lower_bound_owner_root_parent, intrinsic_probe_fixture) {
+   BOOST_CHECK_NO_THROW(t.run("glpbown"_n));
+}
+BOOST_FIXTURE_TEST_CASE(get_permission_lower_bound_size_query, intrinsic_probe_fixture) {
+   BOOST_CHECK_NO_THROW(t.run("glpbsz"_n));
+}
+BOOST_FIXTURE_TEST_CASE(get_permission_lower_bound_next_not_exact, intrinsic_probe_fixture) {
+   BOOST_CHECK_NO_THROW(t.run("glpbnx"_n));
+}
+BOOST_FIXTURE_TEST_CASE(get_permission_lower_bound_not_found, intrinsic_probe_fixture) {
+   BOOST_CHECK_NO_THROW(t.run("glpbnf"_n));
+}
 
 BOOST_AUTO_TEST_SUITE_END()

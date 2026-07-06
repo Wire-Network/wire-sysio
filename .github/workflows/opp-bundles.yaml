@@ -1,0 +1,67 @@
+name: "OPP Bundles"
+
+on:
+  # Manual trigger so a publish can be run on demand (e.g. to ship a bundle whose
+  # proto already merged to master but whose publish run failed). Publishes the
+  # current master state — same code path as the push trigger.
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+    paths:
+      - "libraries/opp/**"
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches:
+      - master
+    paths:
+      - "libraries/opp/**"
+
+permissions:
+  contents: read
+
+jobs:
+  opp-bundles:
+    name: Generate OPP Bundles
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install fish shell
+        run: |
+          sudo apt-add-repository -y ppa:fish-shell/release-4
+          sudo apt-get update
+          sudo apt-get install -y fish
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: libraries/opp/tools/package.json
+
+      - name: Install deps
+        run: |
+          # PR validation must not expose the npm publish token to dependency
+          # install lifecycle scripts; publishing is scoped to the push-only step.
+          cd ./libraries/opp/tools
+          pnpm install
+        
+      - name: Generate & Publish OPP Bundles
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          # `npm publish` (invoked by wire-protobuf-bundler --publish) does NOT read a
+          # bare $NPM_TOKEN env var — it needs an _authToken line in .npmrc. Without
+          # this the publish fails ENEEDAUTH (regression from SEC-41, which scoped the
+          # token to this step but dropped the auth wiring). Writing ~/.npmrc here keeps
+          # the token confined to the push/dispatch publish step — it is never present
+          # during pull_request validation or the dependency install step.
+          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> ~/.npmrc
+          fish ./libraries/opp/tools/scripts/generate-opp-bundles.fish --publish
+
+      - name: Validate OPP Bundles
+        if: github.event_name == 'pull_request'
+        run: fish ./libraries/opp/tools/scripts/generate-opp-bundles.fish

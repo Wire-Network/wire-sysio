@@ -102,7 +102,6 @@ FC_REFLECT_ENUM(sysio::opp::types::AttestationType,
    (ATTESTATION_TYPE_UNDERWRITE_INTENT_COMMIT)
    (ATTESTATION_TYPE_SWAP_REVERT)
    (ATTESTATION_TYPE_DEPOSIT_REVERT)
-   (ATTESTATION_TYPE_SWAP_REJECTED)
    (ATTESTATION_TYPE_RESERVE_CREATE)
    (ATTESTATION_TYPE_RESERVE_CREATE_CANCEL)
    (ATTESTATION_TYPE_RESERVE_CREATE_CANCELLED)
@@ -127,7 +126,8 @@ FC_REFLECT_ENUM(sysio::opp::attestations::OperatorAction_ActionType,
    (OperatorAction_ActionType_ACTION_TYPE_WITHDRAW_REMIT)
    (OperatorAction_ActionType_ACTION_TYPE_SLASH))
 
-// ReserveTarget_Kind removed in v6 — ReserveTarget is now (chain_code, reserve_code, TokenAmount).
+// ReserveTarget_Kind removed in v6 — the carrier (renamed `ReserveAmount`)
+// is now (chain_code, reserve_code, TokenAmount) in the depot 9-dec frame.
 
 FC_REFLECT_ENUM(sysio::opp::types::AttestationStatus,
    (ATTESTATION_STATUS_PENDING)
@@ -177,13 +177,25 @@ FC_REFLECT_ENUM(sysio::opp::types::UnderwriteStatus,
    (UNDERWRITE_STATUS_INTENT_CONFIRMED)
    (UNDERWRITE_STATUS_READY)
    (UNDERWRITE_STATUS_RELEASED)
-   (UNDERWRITE_STATUS_SLASHED))
+   (UNDERWRITE_STATUS_SLASHED)
+   (UNDERWRITE_STATUS_DISQUALIFIED))
 
 FC_REFLECT_ENUM(sysio::opp::types::ChallengeStatus,
    (CHALLENGE_STATUS_CHALLENGE_SENT)
    (CHALLENGE_STATUS_RESPONSE_RECEIVED)
    (CHALLENGE_STATUS_RESOLVED)
    (CHALLENGE_STATUS_ESCALATED))
+
+FC_REFLECT_ENUM(sysio::opp::types::DisputeStatus,
+   (DISPUTE_STATUS_UNKNOWN)
+   (DISPUTE_STATUS_OPEN)
+   (DISPUTE_STATUS_RESOLVED))
+
+FC_REFLECT_ENUM(sysio::opp::types::NodeOwnerTier,
+   (NODE_OWNER_TIER_UNKNOWN)
+   (NODE_OWNER_TIER_T1)
+   (NODE_OWNER_TIER_T2)
+   (NODE_OWNER_TIER_T3))
 
 // ---------------------------------------------------------------------------
 //  Encoding enums

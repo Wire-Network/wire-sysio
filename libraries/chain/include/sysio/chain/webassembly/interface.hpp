@@ -339,11 +339,15 @@ namespace webassembly {
           * Get the list of active producer names.
           *
           * @ingroup producer
-          * @param[out] producers - output buffer containing the names of the current active producer names.
+          * @param[out] producers - output byte buffer receiving the packed names of the
+          *    current active producers. The CDT-side ABI passes the buffer length in
+          *    bytes, so the parameter is a byte span; declaring it as a span of
+          *    account_name would validate (and bound the copy by) the raw length
+          *    multiplied by sizeof(account_name).
           *
           * @return number of bytes required (if the buffer is empty), or the number of bytes written to the buffer.
          */
-         int32_t get_active_producers(aligned_span<account_name> producers) const;
+         int32_t get_active_producers(span<char> producers) const;
 
          /**
           * Tests a given public key with the recovered public key from digest and signature.
@@ -739,7 +743,7 @@ namespace webassembly {
           * @ingroup console
           * @param val - single-precision floating point number to be printed.
           */
-         void printsf(float32_t val);
+         void printsf(softfloat32_t val);
 
          /**
           * Prints value as double-precision floating point number.
@@ -747,7 +751,7 @@ namespace webassembly {
           * @ingroup console
           * @param val - double-precision floating point number to be printed
           */
-         void printdf(float64_t val);
+         void printdf(softfloat64_t val);
 
          /**
           * Prints value as quadruple-precision floating point number.
@@ -755,7 +759,7 @@ namespace webassembly {
           * @ingroup console
           * @param val - a pointer to the quadruple-precision floating point number to be printed
           */
-         void printqf(aligned_ptr<const float128_t> val);
+         void printqf(aligned_ptr<const softfloat128_t> val);
 
          /**
           * Prints a 64 bit names as base32 encoded string.
@@ -773,7 +777,7 @@ namespace webassembly {
           */
          void printhex(span<const char> data);
 
-         // ---- KV Database API — Primary Operations ----
+         // ---- KV Database API -- Primary Operations ----
 
          /**
           * Store or update a key-value pair in the executing contract's KV table.
@@ -783,10 +787,13 @@ namespace webassembly {
           * (max 256 bytes), values up to 256 KiB.
           *
           * @param table_id - table namespace identifier (lower 16 bits of the DJB2 hash of table name)
-          * @param payer - account to bill for RAM. Pass 0 to bill the executing
-          *   contract. Non-zero payer is accepted but the transaction-level
-          *   `unauthorized_ram_usage_increase` check requires the payer to have
-          *   authorized the action (or net RAM usage must not increase).
+          * @param payer - account to bill for RAM. 0 is the CDT `same_payer` sentinel (name{}) and is
+          *   valid only on update (existing key), where it keeps the row's current payer so billing
+          *   does not move off it. On insert (new key) there is no existing payer to keep, so 0 is
+          *   rejected with `invalid_table_payer` -- the caller must name the paying account. A
+          *   non-zero payer bills that account explicitly; the transaction-level
+          *   `unauthorized_ram_usage_increase` check then requires the payer to have authorized the
+          *   action (or net RAM usage must not increase).
           * @param key - the key bytes
           * @param value - the value bytes
           * @return RAM byte delta (positive on growth, negative on shrink, 0 on same-size update)
@@ -812,11 +819,11 @@ namespace webassembly {
           * Erase a key-value pair from the executing contract's KV table.
           *
           * The RAM charged for the row is refunded to the original payer.
-          * No-op if the key does not exist (returns 0).
           *
           * @param table_id - table namespace identifier (lower 16 bits of the DJB2 hash of table name)
           * @param key - the key bytes to erase
-          * @return negative RAM byte delta (refund amount), or 0 if key not found
+          * @return negative RAM byte delta (refund amount)
+          * @throws kv_key_not_found if the key does not exist
           */
          int64_t  kv_erase(uint32_t table_id, span<const char> key);
 
@@ -830,26 +837,26 @@ namespace webassembly {
           */
          int32_t  kv_contains(uint32_t table_id, uint64_t code, span<const char> key);
 
-         // ---- KV Database API — Primary Iterators ----
+         // ---- KV Database API -- Primary Iterators ----
          //
          // Iterators traverse keys lexicographically within a prefix scope.
          // They re-seek by key on each operation, so they are never invalidated
          // by concurrent writes or undo operations.
          //
-         // A fixed pool of 16 iterator handles is available per action context.
-         // Handles must be destroyed with kv_it_destroy when no longer needed.
+         // Up to config::max_kv_iterators (1024) live iterator handles are available per apply
+         // context. Handles must be destroyed with kv_it_destroy when no longer needed.
 
          /**
           * Create a forward iterator over keys matching a given prefix.
           *
-          * The iterator is initially positioned *before* the first matching key;
-          * call kv_it_next() to advance to the first result.
+          * The iterator is positioned directly ON the first matching key (status 0); if no key
+          * matches the prefix it starts in the end state (status 1).
           *
           * @param table_id - table namespace identifier (lower 16 bits of the DJB2 hash of table name)
           * @param code - account whose KV table to iterate
           * @param prefix - key prefix to scope the iteration (may be empty for all keys)
-          * @return iterator handle (0–15)
-          * @throws kv_iterator_exception if the iterator pool is exhausted
+          * @return iterator handle
+          * @throws kv_iterator_limit_exceeded if the iterator pool is exhausted
           */
          uint32_t kv_it_create(uint32_t table_id, uint64_t code, span<const char> prefix);
 
@@ -863,9 +870,11 @@ namespace webassembly {
          /**
           * Query the current position status of an iterator.
           *
+          * Status values (kv_it_stat): 0 = positioned on a valid key, 1 = at end (no current
+          * key), 2 = erased (the current row was erased out from under the iterator).
+          *
           * @param handle - iterator handle
-          * @return 0 = positioned on a valid key, 1 = at end (past last key),
-          *         2 = at beginning (before first key), -1 = erased/invalid
+          * @return current status (0, 1, or 2)
           */
          int32_t  kv_it_status(uint32_t handle);
 
@@ -880,8 +889,11 @@ namespace webassembly {
          /**
           * Move the iterator to the previous key in lexicographic order.
           *
+          * From the end state the iterator moves to the LAST in-prefix key; from the first
+          * in-prefix key it moves to the end state.
+          *
           * @param handle - iterator handle
-          * @return new status (0 = valid, 2 = at beginning)
+          * @return new status (0 = valid, 1 = at end)
           */
          int32_t  kv_it_prev(uint32_t handle);
 
@@ -889,44 +901,51 @@ namespace webassembly {
           * Seek the iterator to the first key >= the given key within the prefix scope.
           *
           * @param handle - iterator handle
-          * @param key - key to seek to (must start with the iterator's prefix)
-          * @return 0 if positioned on an exact match, 1 if positioned on a greater key
-          *         or at end
+          * @param key - key to seek to (keys below the prefix seek from the prefix itself)
+          * @return new status: 0 if positioned on any in-prefix key >= the seek key (not
+          *         necessarily an exact match), 1 if no such key exists (at end)
           */
          int32_t  kv_it_lower_bound(uint32_t handle, span<const char> key);
 
          /**
           * Read the key at the iterator's current position.
           *
-          * @param handle - iterator handle (must be status 0)
+          * If the iterator is not on a valid key, returns the iterator status (1 = end,
+          * 2 = erased) and sets actual_size to 0 without copying anything.
+          *
+          * @param handle - iterator handle
           * @param offset - byte offset within the key to start reading
           * @param dest - destination buffer
           * @param actual_size - [out] receives the full key size
-          * @return 0 on success
+          * @return 0 on success, otherwise the iterator status
           */
          int32_t  kv_it_key(uint32_t handle, uint32_t offset, span<char> dest, aligned_ptr<uint32_t> actual_size);
 
          /**
           * Read the value at the iterator's current position.
           *
-          * @param handle - iterator handle (must be status 0)
+          * If the iterator is not on a valid key, returns the iterator status (1 = end,
+          * 2 = erased) and sets actual_size to 0 without copying anything.
+          *
+          * @param handle - iterator handle
           * @param offset - byte offset within the value to start reading
           * @param dest - destination buffer
           * @param actual_size - [out] receives the full value size
-          * @return 0 on success
+          * @return 0 on success, otherwise the iterator status
           */
          int32_t  kv_it_value(uint32_t handle, uint32_t offset, span<char> dest, aligned_ptr<uint32_t> actual_size);
 
-         // ---- KV Database API — Secondary Index Operations ----
+         // ---- KV Database API -- Secondary Index Operations ----
          //
-         // Secondary indices map (sec_key → pri_key) within a table namespace.
+         // Secondary indices map (sec_key -> pri_key) within a table namespace.
          // The executing contract manages index entries explicitly; the CDT
          // `kv_multi_index` wrapper automates this.
 
          /**
           * Insert a secondary index entry mapping a secondary key to a primary key.
           *
-          * @param payer - account to bill for RAM (0 = receiver)
+          * @param payer - account to bill for RAM. kv_idx_store always creates a new entry, so a
+          *   paying account must be named; 0 (`same_payer`) is rejected with `invalid_table_payer`.
           * @param table_id - secondary index identifier
           * @param pri_key - primary key bytes this entry points to
           * @param sec_key - secondary key bytes (order-preserving encoded)
@@ -945,7 +964,10 @@ namespace webassembly {
          /**
           * Update a secondary index entry's key (remove old, insert new).
           *
-          * @param payer - account to bill for RAM (0 = receiver)
+          * @param payer - account to bill for RAM. 0 (the CDT `same_payer` sentinel) keeps the
+          *   entry's existing payer -- kv_idx_update always operates on an existing entry, so there
+          *   is no "bill the receiver" default here. Pass a non-zero payer to bill that account
+          *   explicitly.
           * @param table_id - secondary index identifier
           * @param pri_key - primary key (unchanged)
           * @param old_sec_key - current secondary key to replace
@@ -987,8 +1009,11 @@ namespace webassembly {
          /**
           * Move a secondary index iterator to the previous entry.
           *
+          * From the end state the iterator moves to the LAST entry of the (code, table_id)
+          * range; from the first entry it moves to the end state.
+          *
           * @param handle - secondary iterator handle
-          * @return 0 = valid, 2 = at beginning
+          * @return 0 = valid, 1 = at end
           */
          int32_t  kv_idx_prev(uint32_t handle);
 

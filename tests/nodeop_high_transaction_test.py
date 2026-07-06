@@ -3,6 +3,7 @@
 import signal
 import time
 import json
+import math
 
 from TestHarness import Cluster, Node, TestHelper, Utils, WalletMgr, CORE_SYMBOL
 from TestHarness.accounts import NamedAccounts
@@ -250,6 +251,7 @@ try:
             toAccount = accounts[toAccountIndex]
             node = nonProdNodes[accountIndex % nonProdNodeCount]
             trans = None
+            acceptedAt = None
             attempts = 0
             maxAttempts = maxTransactionAttempts if not args.send_duplicates else maxTransactionAttemptsNoSend  # for send_duplicates we are just constructing a transaction, so should never require a second attempt
             # can try up to maxAttempts times to send the transfer
@@ -260,6 +262,8 @@ try:
                     time.sleep(1)
                 expiration=None if args.send_duplicates else 90
                 trans=node.transferFunds(fromAccount, toAccount, transferAmount, "transfer round %d" % (round), exitOnError=False, reportStatus=False, sign=True, dontSend=args.send_duplicates, expiration=expiration)
+                if trans is not None and not args.send_duplicates:
+                    acceptedAt = time.perf_counter()
                 attempts += 1
 
             if args.send_duplicates:
@@ -273,6 +277,7 @@ try:
                         if repeatTrans is not None:
                             if trans is None and repeatTrans[0]:
                                 trans = repeatTrans[1]
+                                acceptedAt = time.perf_counter()
                                 transId = Node.getTransId(trans)
 
                             numAccepted += 1
@@ -280,8 +285,12 @@ try:
                     attempts += 1
 
             assert trans is not None, "ERROR: failed round: %d, fromAccount: %s, toAccount: %s" % (round, accountIndex, toAccountIndex)
+            assert acceptedAt is not None, "ERROR: no acceptance time recorded for round: %d, fromAccount: %s, toAccount: %s" % (round, accountIndex, toAccountIndex)
             transId = Node.getTransId(trans)
-            history.append(transId)
+            history.append({
+                "trans_id": transId,
+                "accepted_at": acceptedAt
+            })
 
     nextTime = time.perf_counter()
     Print("Sending transfers took %s sec" % (nextTime - startTransferTime))
@@ -296,9 +305,19 @@ try:
     newestBlockNumTransOrder = None
     lastBlockNum = None
     lastTransId = None
+    lastAcceptedAt = None
     transOrder = 0
     lastPassLIB = None
-    for transId in history:
+    def getAllowedBlockDelta(acceptedAt, lastAcceptedAt):
+        """Return the tolerated block drift for the active submission mode."""
+        if not args.send_duplicates:
+            return transBlocksBehind
+        acceptedDeltaBlocks = math.ceil(abs(acceptedAt - lastAcceptedAt) * blocksPerSec)
+        return transBlocksBehind + acceptedDeltaBlocks
+
+    for transRecord in history:
+        transId = transRecord["trans_id"]
+        acceptedAt = transRecord["accepted_at"]
         blockNum = None
         block = None
         transDesc = None
@@ -323,14 +342,17 @@ try:
             assert blockNum is not None, "ERROR: could not retrieve block num for block retrieved for transId: %s, block: %s" % (transId, json.dumps(block, indent=2))
 
         if lastBlockNum is not None:
-            if blockNum > lastBlockNum + transBlocksBehind or blockNum + transBlocksBehind < lastBlockNum:
+            allowedBlockDelta = getAllowedBlockDelta(acceptedAt, lastAcceptedAt)
+            if blockNum > lastBlockNum + allowedBlockDelta or blockNum + allowedBlockDelta < lastBlockNum:
                 transBlockOrderWeird.append({
                     "newer_trans_id" : transId,
                     "newer_trans_index" : transOrder,
                     "newer_bnum" : blockNum,
                     "last_trans_id" : lastTransId,
                     "last_trans_index" : transOrder - 1,
-                    "last_bnum" : lastBlockNum
+                    "last_bnum" : lastBlockNum,
+                    "accepted_delta_seconds" : acceptedAt - lastAcceptedAt,
+                    "allowed_block_delta" : allowedBlockDelta
                 })
                 if newestBlockNum > lastBlockNum:
                     last = transBlockOrderWeird[-1]
@@ -348,6 +370,7 @@ try:
             newestBlockNumTransOrder = transOrder
 
         lastTransId = transId
+        lastAcceptedAt = acceptedAt
         transOrder += 1
         lastBlockNum = blockNum
 
@@ -366,7 +389,8 @@ try:
         verboseOutput = "Delayed transaction information: [" if Utils.Debug else "Delayed transaction ids: ["
         verboseOutput = ", ".join([json.dumps(trans, indent=2) if Utils.Debug else trans["newer_trans_id"] for trans in transBlockOrderWeird])
         verboseOutput += "]"
-        Utils.Print("ERROR: There are %d transactions delayed more than %d seconds.  %s" % (len(transBlockOrderWeird), args.transaction_time_delta, verboseOutput))
+        toleranceKind = "accepted-time-adjusted" if args.send_duplicates else "fixed"
+        Utils.Print("ERROR: There are %d transactions outside the %s %d second tolerance.  %s" % (len(transBlockOrderWeird), toleranceKind, args.transaction_time_delta, verboseOutput))
         delayedReportError = True
 
     testSuccessful = not delayedReportError

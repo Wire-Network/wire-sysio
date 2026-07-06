@@ -39,6 +39,31 @@ enum ChainKeyType {
   CHAIN_KEY_TYPE_SUI      = 5;
 }
 
+// Wire public_key variant type. Identifies which `sysio::public_key` alternative the `WireKey.key`
+// raw bytes decode to. The bytes carry NO leading variant-index byte -- this enum is the type
+// discriminant instead. Values are (variant index + 1), leaving 0 for UNKNOWN per the proto3
+// convention used throughout this file. Distinct from `ChainKeyType`, which is keyed on chain family
+// (WIRE/ETHEREUM/SOLANA/...) and cannot express R1 or WebAuthn.
+enum WireKeyType {
+  WIRE_KEY_TYPE_UNKNOWN = 0;
+  WIRE_KEY_TYPE_K1      = 1;   // secp256k1            (sysio::public_key variant index 0)
+  WIRE_KEY_TYPE_R1      = 2;   // secp256r1 / P-256    (1)
+  WIRE_KEY_TYPE_WA      = 3;   // WebAuthn             (2)
+  WIRE_KEY_TYPE_EM      = 4;   // Ethereum secp256k1   (3)
+  WIRE_KEY_TYPE_ED      = 5;   // ed25519              (4)
+  WIRE_KEY_TYPE_BLS     = 6;   // BLS12-381            (5)
+}
+
+// A typed Wire public key. `key` is the bare serialized key bytes (NO leading variant-index byte);
+// `key_type` names the `sysio::public_key` variant they decode to. Kept as its own message rather
+// than a field on the shared `ChainAddress` so that adding it does not change the abi layout of the
+// many contract tables that already store a `ChainAddress` -- a new, usually-default field there is
+// omitted by proto3 on the wire but expected by the regenerated abi, which breaks table decodes.
+message WireKey {
+  WireKeyType key_type = 1;
+  bytes       key      = 2;
+}
+
 // Address on a specific chain.
 message ChainAddress {
   ChainKind kind    = 1;
@@ -116,7 +141,7 @@ enum ReserveStatus {
 }
 
 // ---------------------------------------------------------------------------
-//  Registry entities (Chain / Token / ChainToken / Reserve / ReserveTarget)
+//  Registry entities (Chain / Token / ChainToken / Reserve / ReserveAmount)
 //
 //  These are the proto carriers for the depot's registry tables on the new
 //  contracts `sysio.chains` and `sysio.tokens` (+ existing `sysio.reserv`).
@@ -171,19 +196,29 @@ message Reserve {
   ReserveStatus status                  = 6;
   uint64        reserve_chain_amount    = 7;
   uint64        reserve_wire_amount     = 8;
-  uint32        connector_weight_bps    = 9;   // Bancor weight (5000 = 50%, pure constant product)
+  uint32        connector_weight_bps    = 9;   // Bancor WIRE-side weight in bps (1..9999); 5000 = 50/50 pure constant product. Honored by the weighted swap curve. 10000 is rejected by sysio.reserv: it zeroes the token-side weight, making every quote 0 (a dead, unpriceable reserve).
   ChainAddress  creator_addr            = 10;
   uint64        requested_wire_amount   = 11;
   uint64        external_token_amount   = 12;
   uint64        registered_at_ms        = 13;
   uint64        activated_at_ms         = 14;
   uint64        cancelled_at_ms         = 15;
+  uint32        source_token_precision  = 16;  // depot-frame precision of the source token side = min(native, 9); self-describing, never assumed. The WIRE/target side is always 9 (WIRE_PRECISION), so it is not carried.
+  reserved 17;                                 // was wire_precision (always 9 = WIRE_PRECISION); the target side is never carried, so there is no target_token_precision
+  reserved "wire_precision";
 }
 
-// Slash / reward routing target. Identifies (chain, reserve_code, amount)
-// so the outpost can find the matching reserve unambiguously even when
-// multiple reserves exist for the same (chain, token) pair.
-message ReserveTarget {
+// Canonical reserve-scoped amount carrier. Identifies WHICH reserve —
+// (chain_code, reserve_code, amount.token_code) — holds or receives the
+// amount, unambiguously even when multiple reserves exist for the same
+// (chain, token) pair. `amount.amount` is ALWAYS expressed in the depot's
+// canonical 9-decimal frame: outpost-side producers convert chain-native
+// units at the boundary (EVM `PrecisionLib.toDepot`, SVM
+// `precision::to_depot`) before shipping, exactly like the swap-request
+// paths. Carried by RESERVE_CREATE (custodied external amount),
+// RESERVE_BALANCE_SHEET (per-reserve balance entries), and SLASH routing
+// (seized-funds destination).
+message ReserveAmount {
   uint64      chain_code   = 1;
   uint64      reserve_code = 2;
   TokenAmount amount       = 3;
@@ -256,7 +291,9 @@ enum AttestationType {
   // 60954 was ATTESTATION_TYPE_UNDERWRITE_INTENT_REJECT — removed; do not reuse.
   ATTESTATION_TYPE_SWAP_REVERT    = 60955;
   ATTESTATION_TYPE_DEPOSIT_REVERT = 60956;
-  ATTESTATION_TYPE_SWAP_REJECTED  = 60957;
+  // 60957 was ATTESTATION_TYPE_SWAP_REJECTED — removed; do not reuse. Every REMIT is
+  // depot-initiated against a verified reserve ledger, so the destination outpost can
+  // always pay; there is no post-underwriting rejection path.
 
   // ---------------------------------------------------------------------------
   //  Reserve-flow attestations (v6 data-model refactor, 2026-05-19)
@@ -353,6 +390,12 @@ enum UnderwriteStatus {
   UNDERWRITE_STATUS_READY            = 3;
   UNDERWRITE_STATUS_RELEASED         = 5;
   UNDERWRITE_STATUS_SLASHED          = 10;
+  // Candidate-specific, pre-settlement invalidity in the underwriter race (bad
+  // UIC signature, insufficient bond, missing destination authex link). The
+  // candidate is removed from contention but NO collateral was slashed — kept
+  // distinct from SLASHED (economic punishment) and RELEASED (clean race
+  // loser) so indexing/audits do not conflate them.
+  UNDERWRITE_STATUS_DISQUALIFIED     = 11;
 }
 
 enum ChallengeStatus {
@@ -360,4 +403,23 @@ enum ChallengeStatus {
   CHALLENGE_STATUS_RESPONSE_RECEIVED = 1;
   CHALLENGE_STATUS_RESOLVED          = 2;
   CHALLENGE_STATUS_ESCALATED         = 3;
+}
+
+// Node-owner registration tier (sysio.roa::nodeownreg). Mirrors the MockWireNodes NodeInfo tier and
+// the on-chain `check(tier >= 1 && tier <= 3)` range -- T1/T2/T3 are the only valid registration tiers.
+enum NodeOwnerTier {
+  NODE_OWNER_TIER_UNKNOWN = 0;
+  NODE_OWNER_TIER_T1      = 1;
+  NODE_OWNER_TIER_T2      = 2;
+  NODE_OWNER_TIER_T3      = 3;
+}
+
+// OPP envelope dispute lifecycle (sysio.chalg dispute-vote flow). A dispute opens when batch
+// operators deliver 3+ distinct envelope versions for one (outpost, epoch) with no majority; the
+// Tier-1 node owners then vote on the canonical envelope. OPEN until the tally resolves a winning
+// checksum, then RESOLVED (the winner is dispatched and the paused epoch is released).
+enum DisputeStatus {
+  DISPUTE_STATUS_UNKNOWN  = 0;
+  DISPUTE_STATUS_OPEN     = 1;
+  DISPUTE_STATUS_RESOLVED = 2;
 }

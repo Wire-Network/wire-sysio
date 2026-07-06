@@ -2,10 +2,25 @@
 
 #include "mocks/mock_depot_ops.hpp"
 
+#include <sysio/batch_operator_plugin/outpost_epoch_lookup.hpp>
+
 using sysio::outbound_envelope_record;
 using sysio::test::mock_depot_ops;
 
 BOOST_AUTO_TEST_SUITE(depot_ops_interface_tests)
+
+/// Regression coverage for SEC-7: high-bit slug chain codes must not truncate
+/// when building the `byoutepoch` secondary-index exact-match bound.
+BOOST_AUTO_TEST_CASE(byoutepoch_find_bound_preserves_slug_high_bits) {
+   constexpr uint64_t chain_code = 1ull << 42;
+   constexpr uint32_t epoch_index = 9;
+   constexpr auto expected_key = "18889465931478580854793";
+
+   BOOST_CHECK_EQUAL(fc::to_string(sysio::batch_operator_detail::outpost_epoch_key(chain_code, epoch_index)),
+                     expected_key);
+   BOOST_CHECK_EQUAL(sysio::batch_operator_detail::byoutepoch_find_bound(chain_code, epoch_index),
+                     "{\"byoutepoch\":\"18889465931478580854793\"}");
+}
 
 BOOST_AUTO_TEST_CASE(defaults) {
    mock_depot_ops d;

@@ -6,12 +6,7 @@
         {
             "name": "chklocks",
             "base": "",
-            "fields": [
-                {
-                    "name": "up_to_epoch",
-                    "type": "uint32"
-                }
-            ]
+            "fields": []
         },
         {
             "name": "commit_entry",
@@ -78,11 +73,66 @@
             ]
         },
         {
-            "name": "expirelock",
+            "name": "drainfwq",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "fromwire_q",
             "base": "",
             "fields": [
                 {
-                    "name": "uwreq_id",
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "user",
+                    "type": "name"
+                },
+                {
+                    "name": "wire_amount",
+                    "type": "uint64"
+                },
+                {
+                    "name": "dst_chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "dst_token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "dst_reserve_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "target_amount",
+                    "type": "uint64"
+                },
+                {
+                    "name": "variance_tolerance_bps",
+                    "type": "uint32"
+                },
+                {
+                    "name": "recipient_kind",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "recipient_addr",
+                    "type": "bytes"
+                },
+                {
+                    "name": "created_at_epoch",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "fw_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
                     "type": "uint64"
                 }
             ]
@@ -130,12 +180,12 @@
                     "type": "uint64"
                 },
                 {
-                    "name": "created_at_epoch",
-                    "type": "uint32"
+                    "name": "created_at_ms",
+                    "type": "uint64"
                 },
                 {
-                    "name": "expires_at_epoch",
-                    "type": "uint32"
+                    "name": "expires_at_ms",
+                    "type": "uint64"
                 }
             ]
         },
@@ -184,16 +234,6 @@
             ]
         },
         {
-            "name": "release",
-            "base": "",
-            "fields": [
-                {
-                    "name": "uwreq_id",
-                    "type": "uint64"
-                }
-            ]
-        },
-        {
             "name": "setconfig",
             "base": "",
             "fields": [
@@ -202,20 +242,8 @@
                     "type": "uint32"
                 },
                 {
-                    "name": "collateral_lock_duration_epoch_count",
-                    "type": "uint32"
-                },
-                {
-                    "name": "fee_split_winner_pct",
-                    "type": "uint8"
-                },
-                {
-                    "name": "fee_split_other_uw_pct",
-                    "type": "uint8"
-                },
-                {
-                    "name": "fee_split_batch_op_pct",
-                    "type": "uint8"
+                    "name": "collateral_lock_duration_ms",
+                    "type": "uint64"
                 }
             ]
         },
@@ -248,6 +276,48 @@
             ]
         },
         {
+            "name": "swapfromwire",
+            "base": "",
+            "fields": [
+                {
+                    "name": "user",
+                    "type": "name"
+                },
+                {
+                    "name": "wire_amount",
+                    "type": "uint64"
+                },
+                {
+                    "name": "dst_chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "dst_token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "dst_reserve_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "target_amount",
+                    "type": "uint64"
+                },
+                {
+                    "name": "target_tolerance_bps",
+                    "type": "uint32"
+                },
+                {
+                    "name": "recipient_kind",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "recipient_addr",
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
             "name": "uw_config",
             "base": "",
             "fields": [
@@ -256,20 +326,8 @@
                     "type": "uint32"
                 },
                 {
-                    "name": "collateral_lock_duration_epoch_count",
-                    "type": "uint32"
-                },
-                {
-                    "name": "fee_split_winner_pct",
-                    "type": "uint8"
-                },
-                {
-                    "name": "fee_split_other_uw_pct",
-                    "type": "uint8"
-                },
-                {
-                    "name": "fee_split_batch_op_pct",
-                    "type": "uint8"
+                    "name": "collateral_lock_duration_ms",
+                    "type": "uint64"
                 }
             ]
         },
@@ -279,6 +337,10 @@
             "fields": [
                 {
                     "name": "next_lock_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "next_fromwire_seq",
                     "type": "uint64"
                 }
             ]
@@ -386,18 +448,13 @@
             "ricardian_contract": ""
         },
         {
-            "name": "expirelock",
-            "type": "expirelock",
+            "name": "drainfwq",
+            "type": "drainfwq",
             "ricardian_contract": ""
         },
         {
             "name": "rcrdcommit",
             "type": "rcrdcommit",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "release",
-            "type": "release",
             "ricardian_contract": ""
         },
         {
@@ -409,9 +466,29 @@
             "name": "sumlocks",
             "type": "sumlocks",
             "ricardian_contract": ""
+        },
+        {
+            "name": "swapfromwire",
+            "type": "swapfromwire",
+            "ricardian_contract": ""
         }
     ],
     "tables": [
+        {
+            "name": "fwqueue",
+            "type": "fromwire_q",
+            "index_type": "i64",
+            "key_names": ["id"],
+            "key_types": ["uint64"],
+            "table_id": 19551,
+            "secondary_indexes": [
+                {
+                    "name": "byepoch",
+                    "key_type": "uint64",
+                    "table_id": 10478
+                }
+            ]
+        },
         {
             "name": "locks",
             "type": "lock_entry",
@@ -576,10 +653,6 @@
                     "value": 60956
                 },
                 {
-                    "name": "ATTESTATION_TYPE_SWAP_REJECTED",
-                    "value": 60957
-                },
-                {
                     "name": "ATTESTATION_TYPE_RESERVE_CREATE",
                     "value": 60958
                 },
@@ -598,6 +671,28 @@
                 {
                     "name": "ATTESTATION_TYPE_EMISSIONS_BLOCKED",
                     "value": 60962
+                }
+            ]
+        },
+        {
+            "name": "ChainKind",
+            "type": "int32",
+            "values": [
+                {
+                    "name": "CHAIN_KIND_UNKNOWN",
+                    "value": 0
+                },
+                {
+                    "name": "CHAIN_KIND_WIRE",
+                    "value": 1
+                },
+                {
+                    "name": "CHAIN_KIND_EVM",
+                    "value": 2
+                },
+                {
+                    "name": "CHAIN_KIND_SVM",
+                    "value": 3
                 }
             ]
         },
@@ -654,6 +749,10 @@
                 {
                     "name": "UNDERWRITE_STATUS_SLASHED",
                     "value": 10
+                },
+                {
+                    "name": "UNDERWRITE_STATUS_DISQUALIFIED",
+                    "value": 11
                 }
             ]
         }

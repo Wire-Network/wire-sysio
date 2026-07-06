@@ -79,6 +79,14 @@ namespace sysio::chain {
       *trace = transaction_trace{}; // reset trace
       trace->net_usage = net_usage;
       initialize();
+      // reset() runs only on the sys-vm-oc tier-up interrupt retry, which re-runs exec() but NOT
+      // init_for_input_trx. The undo() above reverted the dedup record made in init_for_input_trx,
+      // so it must be re-issued here under the freshly-initialized undo session -- otherwise an
+      // interrupting validator silently drops this transaction from its dedup set (diverging the
+      // integrity hash from non-interrupting nodes, and letting a still-unexpired resubmission
+      // double-execute). Gated exactly as the original record: input and non-transient.
+      if (is_input && !is_transient())
+         record_transaction(packed_trx.id(), packed_trx.get_transaction().expiration);
       if (!explicit_billed_cpu_time)
          billed_cpu_us.clear();
       trx_blk_context = trx_block_context{};
@@ -96,7 +104,7 @@ namespace sysio::chain {
 
    void transaction_context::initialize() {
       if (!control.skip_db_sessions() && !is_read_only()) {
-         undo_session.emplace(control.mutable_db(), control);
+         undo_session.emplace(control.mutable_db());
       }
 
       trace->id = packed_trx.id();
@@ -194,20 +202,22 @@ namespace sysio::chain {
 
       std::array all_actions = {std::views::all(trx.context_free_actions), std::views::all(trx.actions)};
       assert(std::ranges::distance(std::views::join(all_actions)) == trx.total_actions());
-      for (const auto& [i, act] : std::views::enumerate(std::views::join(all_actions))) {
+      size_t action_index = 0;
+      for (const auto& act : std::views::join(all_actions)) {
          // For each action, add either the explicit payer (if present) or the contract (if no payer)
          account_name a = act.payer();
          auto& b = accounts_billing[a];
          if (is_input) {
-            uint64_t billable_size = packed_trx.get_action_billable_size(i);
+            uint64_t billable_size = packed_trx.get_action_billable_size(action_index);
             b.net_usage += billable_size;
             trace->net_usage += billable_size;
          }
          if (explicit_billed_cpu_time) {
             assert(!is_read_only());
-            assert(billed_cpu_us.size() > static_cast<size_t>(i));
-            b.cpu_usage_us += billed_cpu_us[i];
+            assert(billed_cpu_us.size() > action_index);
+            b.cpu_usage_us += billed_cpu_us[action_index];
          }
+         ++action_index;
       }
       check_trx_net_usage(); // Fail early if current net usage exceeds limit
 
@@ -302,7 +312,17 @@ namespace sysio::chain {
       }
 
       init();
-      if ( !is_read_only() && trx.expiration.to_time_point() >= control.pending_lib_time() ) {
+      // Record unconditionally for every applied non-transient transaction. The dedup set is
+      // folded into the integrity hash and snapshots, so gating the record on any node-local
+      // observation (e.g. the previously used pending LIB time, which differs between a replaying
+      // node and a live one) makes otherwise-identical nodes diverge on auxiliary state.
+      // Expired entries are pruned deterministically by clear_expired at the next block start.
+      // Transient transactions (read-only, dry-run) never persist in a block, so they must not
+      // leave dedup entries -- and read-only transactions additionally execute concurrently on
+      // other threads, where mutating shared dedup state would be a data race. This matches
+      // Spring, where record_transaction is gated on !is_transient(); it also means a dry-run of
+      // an already-known transaction executes instead of failing tx_duplicate.
+      if ( !is_transient() ) {
          record_transaction( packed_trx.id(), trx.expiration );
       }
    }
@@ -689,7 +709,8 @@ namespace sysio::chain {
 
    void transaction_context::add_ram_usage( account_name account, int64_t ram_delta ) {
       auto& rl = control.get_mutable_resource_limits_manager();
-      rl.add_pending_ram_usage( account, ram_delta );
+      // Pass is_transient() so read-only / dry-run transactions do not emit deep-mind RAM events.
+      rl.add_pending_ram_usage( account, ram_delta, is_transient() );
       if( ram_delta > 0 ) {
          validate_ram_usage.insert( account );
       }
@@ -724,7 +745,8 @@ namespace sysio::chain {
          total_cpu_time_us = 0;
          const bool subjectively_bill_payer_disabled = control.get_subjective_billing().is_payer_billing_disabled();
          const auto trx_first_authorizer = packed_trx.get_transaction().first_authorizer(); // used if action has no authorizer
-         for (auto&& [i, b] : std::views::enumerate(billed_cpu_us)) {
+         for (size_t i = 0; i < billed_cpu_us.size(); ++i) {
+            auto& b = billed_cpu_us[i];
             // if exception thrown, action_traces may not be the same size as billed_cpu_us
             auto& act_trace = trace->action_traces[i];
             b.value += delta_per_action;
@@ -982,7 +1004,8 @@ namespace sysio::chain {
                        "read-only action '{}' cannot have authorizations", a.name );
          }
          name payer;
-         for (const auto& [i, auth] : std::views::enumerate(a.authorization)) {
+         for (size_t i = 0; i < a.authorization.size(); ++i) {
+            const auto& auth = a.authorization[i];
             if (auth.permission == config::sysio_payer_name) {
                SYS_ASSERT(payer.empty(), transaction_exception,
                           "action cannot have multiple payers");

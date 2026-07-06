@@ -16,6 +16,10 @@ from .accounts import createAccountKeys
 
 block_dir = 'blocks'
 
+def _is_command_option(token):
+    """Return whether a command-line token is an option name rather than an option value."""
+    return token.startswith('--')
+
 class EnhancedEncoder(json.JSONEncoder):
     def default(self, o):
         if is_dataclass(o):
@@ -50,8 +54,10 @@ class nodeDefinition:
     data_dir_name: str = field(init=False)
     p2p_port: int = 0
     http_port: int = 0
-    base_p2p_port: ClassVar[int] = 9876
-    base_http_port: ClassVar[int] = 8888
+    base_p2p_port: ClassVar[int] = Utils.getPort(Utils.PortP2P)
+    base_http_port: ClassVar[int] = Utils.getPort(Utils.PortNodeHttp)
+    bios_p2p_port: ClassVar[int] = Utils.getPort(Utils.PortBiosP2P)
+    bios_http_port: ClassVar[int] = Utils.getPort(Utils.PortBiosHttp)
     host_name: str = 'localhost'
     public_name: str = 'localhost'
     listen_addr: str = '0.0.0.0'
@@ -75,22 +81,26 @@ class nodeDefinition:
 
     @classmethod
     def p2p_bios_port(cls):
-        return cls.base_p2p_port - 100
+        """Return the BIOS P2P listener port assigned to this test shard."""
+        return cls.bios_p2p_port
 
     @classmethod
     def http_bios_port(cls):
-        return cls.base_http_port - 100
+        """Return the BIOS HTTP listener port assigned to this test shard."""
+        return cls.bios_http_port
 
     @classmethod
     def create_p2p_port_generator(cls):
+        """Yield checked P2P ports from this test's shard."""
         while True:
-            yield cls.base_p2p_port + cls.p2p_count
+            yield Utils.getPort(Utils.PortP2P, cls.p2p_count)
             cls.p2p_count += 1
 
     @classmethod
     def create_http_port_generator(cls):
+        """Yield checked HTTP ports from this test's shard."""
         while True:
-            yield cls.base_http_port + cls.http_count
+            yield Utils.getPort(Utils.PortNodeHttp, cls.http_count)
             cls.http_count += 1
 
     @property
@@ -565,13 +575,12 @@ class cluster_generator:
                 '--p2p-peer-address', '--p2p-auto-bp-peer', '--peer-key', '--peer-private-key',
                 # producer_plugin
                 '--producer-name', '--signature-provider', '--greylist-account', '--disable-subjective-account-billing',
-                # trace_api_plugin
-                '--trace-rpc-abi']
+                ]
             for arg in specificList:
                 if '-' in arg and arg not in repeatable:
                     if arg in sysdcmd:
                         i = sysdcmd.index(arg)
-                        if sysdcmd[i+1] != '-':
+                        if i + 1 < len(sysdcmd) and not _is_command_option(sysdcmd[i+1]):
                             sysdcmd.pop(i+1)
                         sysdcmd.pop(i)
             sysdcmd.extend(specificList)

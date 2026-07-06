@@ -1,5 +1,6 @@
 
 add_executable( test_fc
+        crypto/test_base58.cpp
         crypto/test_blake2.cpp
         crypto/test_bls.cpp
         crypto/test_cypher_suites.cpp
@@ -9,12 +10,14 @@ add_executable( test_fc
         crypto/test_webauthn.cpp
         io/test_cfile.cpp
         io/test_json.cpp
+        io/test_secure_file.cpp
         log/test_json_formatter.cpp
         io/test_json_variant.cpp
         io/test_random_access_file.cpp
         io/test_raw.cpp
         io/test_tracked_storage.cpp
         network/ethereum/test_ethereum_client_and_rlp.cpp
+        network/test_json_rpc_client.cpp
         network/solana/test_solana_client.cpp
         network/test_message_buffer.cpp
         scoped_exit/test_scoped_exit.cpp
@@ -32,6 +35,7 @@ add_executable( test_fc
         test_slug_name.cpp
         test_traits.cpp
         test_escape_str.cpp
+        test_exception.cpp
         test_bls.cpp
         test_bitset.cpp
         test_ordered_diff.cpp

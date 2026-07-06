@@ -3,6 +3,7 @@
 #include <sysio/chain/wasm_interface.hpp>
 #ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
 #include <sysio/chain/webassembly/sys-vm-oc.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/thread_exec_mem.hpp>
 #else
 #define _REGISTER_SYSVMOC_INTRINSIC(CLS, MOD, METHOD, WASM_SIG, NAME, SIG)
 #endif
@@ -55,23 +56,18 @@ struct sysvmoc_tier {
    // Called from main thread
    sysvmoc_tier(const std::filesystem::path& d, const sysvmoc::config& c, const chainbase::database& db,
                 sysvmoc::code_cache_async::compile_complete_callback cb)
-      : cc(d, c, db, std::move(cb)) {
-      // Construct exec and mem for the main thread
-      exec = std::make_unique<sysvmoc::executor>(cc);
-      mem  = std::make_unique<sysvmoc::memory>(wasm_constraints::maximum_linear_memory/wasm_constraints::wasm_page_size);
-   }
+      : cc(d, c, db, std::move(cb))
+      , exec_mem(cc) {}
 
    // Called from read-only threads
-   void init_thread_local_data() {
-      exec = std::make_unique<sysvmoc::executor>(cc);
-      mem  = std::make_unique<sysvmoc::memory>(sysvmoc::memory::sliced_pages_for_ro_thread);
-   }
+   void init_thread_local_data() { exec_mem.init_thread_local_data(); }
 
    sysvmoc::code_cache_async cc;
 
-   // Each thread requires its own exec and mem. Defined in wasm_interface.cpp
-   thread_local static std::unique_ptr<sysvmoc::executor> exec;
-   thread_local static std::unique_ptr<sysvmoc::memory>   mem;
+   // Per-thread executor/memory, always paired with this tier's code cache. Multiple tiers can
+   // exist in one process (one per controller, e.g. in a validating tester); an executor's
+   // mapping of one tier's cache file must never execute another tier's descriptor offsets.
+   sysvmoc::thread_exec_mem exec_mem;
 };
 #endif
 
@@ -88,12 +84,17 @@ struct sysvmoc_tier {
             runtime_interface = std::make_unique<webassembly::sys_vm_runtime::sys_vm_runtime<sysio::vm::interpreter>>();
 #endif
 #ifdef SYSIO_SYS_VM_JIT_RUNTIME_ENABLED
-         if(vm == wasm_interface::vm_type::sys_vm_jit && profile) {
-            sysio::vm::set_profile_interval_us(200);
-            runtime_interface = std::make_unique<webassembly::sys_vm_runtime::sys_vm_profile_runtime>();
+         if(vm == wasm_interface::vm_type::sys_vm_jit) {
+#ifdef __x86_64__
+            if(profile) {
+               sysio::vm::set_profile_interval_us(200);
+               runtime_interface = std::make_unique<webassembly::sys_vm_runtime::sys_vm_profile_runtime>();
+            } else
+#endif
+            {
+               runtime_interface = std::make_unique<webassembly::sys_vm_runtime::sys_vm_runtime<sysio::vm::jit>>();
+            }
          }
-         if(vm == wasm_interface::vm_type::sys_vm_jit && !profile)
-            runtime_interface = std::make_unique<webassembly::sys_vm_runtime::sys_vm_runtime<sysio::vm::jit>>();
 #endif
 #ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
          if(vm == wasm_interface::vm_type::sys_vm_oc)
@@ -170,7 +171,7 @@ struct sysvmoc_tier {
             if (cd) {
                if (!context.is_applying_block()) // read_only_trx_test.py looks for this log statement
                   tlog("{} speculatively executing {} with sys vm oc", context.get_receiver(), code_hash);
-               sysvmoc->exec->execute(*cd, *sysvmoc->mem, context);
+               sysvmoc->exec_mem.get_executor().execute(*cd, sysvmoc->exec_mem.get_memory(), context);
                return;
             }
          }

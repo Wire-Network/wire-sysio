@@ -176,7 +176,7 @@ class sys_vm_instantiated_module : public wasm_instantiated_module_interface {
       std::unique_ptr<backend_t> _instantiated_module;
 };
 
-#ifdef __x86_64__
+#if defined(SYSIO_SYS_VM_JIT_RUNTIME_ENABLED) && defined(__x86_64__)
 class sys_vm_profiling_module : public wasm_instantiated_module_interface {
       using backend_t = sysio::vm::backend<sys_vm_host_functions_t, sysio::vm::jit_profile, webassembly::sys_vm_runtime::apply_options, vm::profile_instr_map>;
    public:
@@ -269,9 +269,11 @@ std::unique_ptr<wasm_instantiated_module_interface> sys_vm_runtime<Impl>::instan
 }
 
 template class sys_vm_runtime<sysio::vm::interpreter>;
-#ifdef __x86_64__
+#ifdef SYSIO_SYS_VM_JIT_RUNTIME_ENABLED
 template class sys_vm_runtime<sysio::vm::jit>;
+#endif
 
+#if defined(SYSIO_SYS_VM_JIT_RUNTIME_ENABLED) && defined(__x86_64__)
 sys_vm_profile_runtime::sys_vm_profile_runtime() {}
 
 std::unique_ptr<wasm_instantiated_module_interface> sys_vm_profile_runtime::instantiate_module(const char* code_bytes, size_t code_size,
@@ -433,7 +435,7 @@ REGISTER_INJECTED_HOST_FUNCTION(_sysio_ui32_to_f64);
 REGISTER_INJECTED_HOST_FUNCTION(_sysio_ui64_to_f64);
 
 // producer api
-REGISTER_ALIGNED_HOST_FUNCTION(get_active_producers);
+REGISTER_HOST_FUNCTION(get_active_producers);
 
 // crypto api
 REGISTER_ALIGNED_CF_HOST_FUNCTION(assert_recover_key);

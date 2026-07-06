@@ -445,6 +445,104 @@ BOOST_FIXTURE_TEST_CASE(deposit_aggregates_into_existing_balance_row, sysio_opre
    BOOST_REQUIRE_EQUAL(150, balances[0]["balance"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
+// SEC-103 (WSA-028 follow-up): operator collateral must never accumulate past
+// asset::max_amount (2^62-1). A balance above the asset range would abort the
+// WIRE-direct remit path's asset(balance, CORE_SYM); on the never-throw
+// depositinle (OPP-inbound) path that abort would stall consensus. depositinle
+// gates the RUNNING SUM: a credit that would push the balance over the cap is
+// refunded via DEPOSIT_REVERT (the action still succeeds — never throws) and the
+// stored balance is left unchanged. The single-value WSA-028 wrap is closed
+// upstream in sysio.msgch; this is the accumulation guard.
+BOOST_FIXTURE_TEST_CASE(depositinle_credit_over_max_collateral_is_reverted, sysio_opreg_tester) { try {
+   // asset::max_amount — the Antelope asset magnitude limit (2^62 - 1), the cap
+   // sysio.opreg enforces on a single balance row.
+   constexpr uint64_t MAX_COLLATERAL = (uint64_t{1} << 62) - 1;
+
+   BOOST_REQUIRE_EQUAL(success(), setconfig());
+   BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.alice"_n, OPERATOR_TYPE_UNDERWRITER, false));
+
+   // Credit the balance up to EXACTLY the cap — accepted (the boundary is inclusive).
+   BOOST_REQUIRE_EQUAL(success(),
+      depositinle("uwrit.alice"_n, "ETH", "ETH", MAX_COLLATERAL));
+   {
+      auto op       = get_operator("uwrit.alice"_n);
+      auto balances = op["balances"].get_array();
+      BOOST_REQUIRE_EQUAL(1, balances.size());
+      BOOST_REQUIRE_EQUAL(MAX_COLLATERAL, balances[0]["balance"].as_uint64());
+   }
+
+   // A further +1 would push the sum to 2^62 (one past asset::max_amount). It is
+   // refunded via DEPOSIT_REVERT: the action succeeds (never throws) and the
+   // stored balance is unchanged — the credit did NOT wrap or saturate it in.
+   BOOST_REQUIRE_EQUAL(success(),
+      depositinle("uwrit.alice"_n, "ETH", "ETH", 1));
+   {
+      auto op       = get_operator("uwrit.alice"_n);
+      auto balances = op["balances"].get_array();
+      BOOST_REQUIRE_EQUAL(1, balances.size());
+      BOOST_REQUIRE_EQUAL(MAX_COLLATERAL, balances[0]["balance"].as_uint64());
+   }
+} FC_LOG_AND_RETHROW() }
+
+// SEC-103 (PR #449 review): the deposit cap must hold under RE-ENTRANCY. An
+// operator account that carries contract code is notified by sysio.token::transfer
+// when opreg::deposit moves its SYS collateral, and can re-enter deposit during
+// that notification. Were the cap a pre-read-then-credit (not atomic with the
+// mutation), two credits could pass against the same stale balance and push the
+// WIRE collateral row past asset::max_amount. opreg::deposit performs the cap check
+// INSIDE the same modify as the credit (and credits before the transfer), so the
+// re-entrant deposit observes the already-committed balance: its own check trips
+// and the whole transaction aborts. reenter_deposit (contracts/test_contracts)
+// models the malicious operator — it re-enters deposit(+1) on the outgoing transfer.
+BOOST_FIXTURE_TEST_CASE(deposit_reentrancy_cannot_exceed_max_collateral, sysio_opreg_tester) { try {
+   constexpr uint64_t MAX_COLLATERAL = (uint64_t{1} << 62) - 1;     // asset::max_amount
+   const std::string  CAP_SYS        = "461168601842738.7903 SYS";  // (2^62-1) at precision 4
+   const auto         OPERATOR       = "uwrit.alice"_n;
+
+   BOOST_REQUIRE_EQUAL(success(), setconfig());
+   BOOST_REQUIRE_EQUAL(success(), regoperator(OPERATOR, OPERATOR_TYPE_UNDERWRITER, false));
+
+   // Core SYS token (opreg's CORE_SYM = symbol("SYS", 4)); fund the operator with
+   // EXACTLY the cap so the outer deposit fills the WIRE row to asset::max_amount
+   // and only the re-entrant +1 would exceed it.
+   set_code(TOKEN_ACCOUNT, contracts::token_wasm());
+   set_abi(TOKEN_ACCOUNT, contracts::token_abi().data());
+   set_privileged(TOKEN_ACCOUNT);   // so create/issue can bill the stat/balance RAM
+   produce_blocks();
+   base_tester::push_action(TOKEN_ACCOUNT, "create"_n, TOKEN_ACCOUNT,
+      mvo()("issuer", "sysio")("maximum_supply", CAP_SYS));
+   base_tester::push_action(TOKEN_ACCOUNT, "issue"_n, config::system_account_name,
+      mvo()("to", "sysio")("quantity", CAP_SYS)("memo", "seed"));
+   base_tester::push_action(TOKEN_ACCOUNT, "transfer"_n, config::system_account_name,
+      mvo()("from", "sysio")("to", OPERATOR)("quantity", CAP_SYS)("memo", "fund operator"));
+
+   // Turn the operator into a re-entrant contract, and grant its active authority
+   // the sysio.code permission so its inline deposit ({operator, active}) authorizes.
+   set_code(OPERATOR, contracts::util::reenter_deposit_wasm());
+   set_abi(OPERATOR, contracts::util::reenter_deposit_abi().data());
+   {
+      authority a(get_public_key(OPERATOR, "active"));
+      a.accounts.push_back(permission_level_weight{ {OPERATOR, config::sysio_code_name}, 1 });
+      set_authority(OPERATOR, config::active_name, a, config::owner_name);
+   }
+   produce_blocks();
+
+   // Deposit the entire cap: the credit fills the WIRE row to asset::max_amount, the
+   // outgoing SYS transfer notifies the operator, and its handler re-enters
+   // deposit(+1). The +1 would push the row to 2^62 — its in-modify cap check trips
+   // and aborts the whole transaction. No over-credit is possible.
+   auto r = push_opreg_action(OPERATOR, "deposit"_n,
+                              mvo()("account", OPERATOR)("amount", MAX_COLLATERAL));
+   BOOST_REQUIRE_MESSAGE(r != success(), "re-entrant over-cap deposit unexpectedly succeeded");
+   BOOST_REQUIRE_MESSAGE(r.find("deposit would exceed max collateral") != std::string::npos,
+                         "unexpected failure reason: " + r);
+
+   // The whole transaction reverted — no collateral was credited.
+   auto op = get_operator(OPERATOR);
+   BOOST_REQUIRE(!op.is_null());
+   BOOST_REQUIRE_EQUAL(0u, op["balances"].get_array().size());
+} FC_LOG_AND_RETHROW() }
+
 BOOST_FIXTURE_TEST_CASE(deposit_keeps_chain_token_pairs_separate, sysio_opreg_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), setconfig());
    BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.alice"_n, OPERATOR_TYPE_UNDERWRITER, false));
@@ -661,6 +759,29 @@ BOOST_FIXTURE_TEST_CASE(setconfig_stamps_collat_config_timestamp, sysio_opreg_te
    auto bops = cfg["req_batchop_collat"].get_array();
    BOOST_REQUIRE_EQUAL(1u, bops.size());
    BOOST_REQUIRE(bops[0]["config_timestamp_ms"].as_uint64() > 0);
+} FC_LOG_AND_RETHROW() }
+
+// #3/#10: a TERMINATED operator with a still-queued withdraw must not abort flushwtdw. terminate
+// remits the operator's full unlocked balance (zeroing it), leaving the matured withdraw row to be
+// subtracted from a zero balance — pre-fix that underflowed and aborted the epoch-inline flushwtdw,
+// permanently stalling epoch advancement. The TERMINATED branch erases the row without subtracting.
+BOOST_FIXTURE_TEST_CASE(flushwtdw_terminated_operator_does_not_abort, sysio_opreg_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), setconfig());
+   BOOST_REQUIRE_EQUAL(success(),
+      regoperator("batchop.a"_n, OPERATOR_TYPE_BATCH, /*is_bootstrapped=*/false));
+   BOOST_REQUIRE_EQUAL(success(), depositinle("batchop.a"_n, "ETH", "ETH", 500));
+
+   // Queue a withdraw of the full balance, then terminate (remits + zeroes the balance), leaving
+   // the queued row matured against a now-zero balance.
+   BOOST_REQUIRE_EQUAL(success(), withdrawinle("batchop.a"_n, "ETH", "ETH", 500));
+   BOOST_REQUIRE(!get_wtdw(1).is_null());
+   BOOST_REQUIRE_EQUAL(success(), terminate("batchop.a"_n, "rolling-24h miss"));
+
+   // Flush at an epoch well past the withdraw's eligibility. Pre-fix this aborted with a
+   // "balance underflow"; the TERMINATED branch erases the matured row instead.
+   BOOST_REQUIRE_EQUAL(success(),
+      push_opreg_action(EPOCH_ACCOUNT, "flushwtdw"_n, mvo()("current_epoch", 1000000u)));
+   BOOST_REQUIRE(get_wtdw(1).is_null());   // matured row erased, not stuck re-throwing every advance
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()

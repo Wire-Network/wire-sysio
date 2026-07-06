@@ -130,12 +130,17 @@ namespace Serialization
 	};
 
 	// Serialize raw byte sequences.
+	// numBytes == 0 must not reach memcpy: the source/destination pointer may be null then
+	// (e.g. std::vector::data() of an empty vector for a zero-length UserSection payload or
+	// data segment), and passing null to memcpy is undefined behavior regardless of size.
 	FORCEINLINE void serializeBytes(OutputStream& stream,const U8* bytes,Uptr numBytes)
-	{ memcpy(stream.advance(numBytes),bytes,numBytes); }
+	{ if(numBytes) memcpy(stream.advance(numBytes),bytes,numBytes); }
 	FORCEINLINE void serializeBytes(InputStream& stream,U8* bytes,Uptr numBytes)
-	{ 
+	{
+      if ( numBytes == 0 )
+         return;
       if ( numBytes < sysio::chain::wasm_constraints::wasm_page_size || !WASM::check_limits)
-         memcpy(bytes,stream.advance(numBytes),numBytes); 
+         memcpy(bytes,stream.advance(numBytes),numBytes);
       else
          throw FatalSerializationException(std::string("Trying to deserialize bytes of size : " + std::to_string((uint64_t)numBytes)));
    }

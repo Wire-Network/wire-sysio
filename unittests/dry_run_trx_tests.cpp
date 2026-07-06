@@ -352,6 +352,74 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( sequence_numbers_test, T, dry_run_trx_testers ) {
    BOOST_CHECK_EQUAL( prev_global_action_sequence, p.global_action_sequence );
    BOOST_CHECK_EQUAL( prev_recv_sequence, receiver_account.recv_sequence );
    BOOST_CHECK_EQUAL( prev_auth_sequence, amo.auth_sequence );
+
+   chain.produce_block();
+
+   // Unlike dry-run (authorizations permitted, signatures optional), read-only
+   // actions must carry NO authorizations: validate_referenced_accounts rejects
+   // them before execution. This is what keeps the read-only path away from the
+   // sequence-number state mutations above (read-only execution has no undo
+   // session and runs on parallel read threads), so pin the boundary and that
+   // the rejection leaves all sequence numbers untouched.
+   prev_global_action_sequence = p.global_action_sequence;
+   prev_recv_sequence = receiver_account.recv_sequence;
+   prev_auth_sequence = amo.auth_sequence;
+
+   BOOST_CHECK_EXCEPTION(
+      chain.send_db_api_transaction("getage"_n, chain.getage_data,
+         vector<permission_level>{{"alice"_n, config::active_name}}, transaction_metadata::trx_type::read_only),
+      transaction_exception,
+      [](const fc::exception& e) {
+         return expect_assert_message(e, "cannot have authorizations");
+      });
+
+   BOOST_CHECK_EQUAL( prev_global_action_sequence, p.global_action_sequence );
+   BOOST_CHECK_EQUAL( prev_recv_sequence, receiver_account.recv_sequence );
+   BOOST_CHECK_EQUAL( prev_auth_sequence, amo.auth_sequence );
+} FC_LOG_AND_RETHROW() }
+
+// Transient transactions (dry-run, read-only) must not leave transaction-dedup records: they
+// never persist in a block, so a dry-run must neither block a later input submission of the
+// same transaction nor fail tx_duplicate when the transaction is already known. Mirrors
+// Spring, where record_transaction is gated on !is_transient().
+BOOST_AUTO_TEST_CASE_TEMPLATE( dry_run_does_not_record_in_dedup, T, dry_run_trx_testers ) { try {
+   T chain;
+
+   chain.set_up_test_contract();
+   chain.insert_a_record(); // so getage executes successfully
+
+   // Build ONE signed transaction so every push below shares the same transaction id.
+   action act;
+   act.account = "noauthtable"_n;
+   act.name = "getage"_n;
+   act.authorization = vector<permission_level>{{"alice"_n, config::active_name}};
+   act.data = chain.getage_data;
+
+   signed_transaction trx;
+   trx.actions.push_back( act );
+   chain.set_transaction_headers( trx );
+   trx.sign(chain.get_private_key("alice"_n, "active"), chain.get_chain_id());
+   const auto trx_id = trx.id();
+
+   // A dry-run executes but leaves no dedup trace.
+   auto dry_before = chain.push_transaction( trx, fc::time_point::maximum(), chain.DEFAULT_BILLED_CPU_TIME_US,
+                                             false, transaction_metadata::trx_type::dry_run );
+   BOOST_CHECK(!!dry_before->receipt);
+   BOOST_CHECK(!chain.control->is_known_unexpired_transaction(trx_id));
+
+   // The same transaction is then accepted as a real input transaction and becomes known.
+   auto applied = chain.push_transaction( trx );
+   BOOST_CHECK(!!applied->receipt);
+   BOOST_CHECK(chain.control->is_known_unexpired_transaction(trx_id));
+
+   // A dry-run of the now-known transaction still executes: it neither consults nor mutates
+   // the dedup set, so no tx_duplicate.
+   auto dry_after = chain.push_transaction( trx, fc::time_point::maximum(), chain.DEFAULT_BILLED_CPU_TIME_US,
+                                            false, transaction_metadata::trx_type::dry_run );
+   BOOST_CHECK(!!dry_after->receipt);
+
+   // Real input deduplication is unaffected: resubmitting remains a duplicate.
+   BOOST_REQUIRE_THROW(chain.push_transaction( trx ), tx_duplicate);
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()

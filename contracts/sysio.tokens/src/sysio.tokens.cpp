@@ -5,6 +5,17 @@ namespace sysio {
 
 namespace {
 
+// System-owned rows bill to the sysio RAM pool, not this contract account (privileged-contract
+// model, as sysio.token uses): the account stays finite at code+abi size; growth draws from the pool.
+constexpr name ram_payer = "sysio"_n;
+
+// Maximum decimal precision a token may declare on the depot. `Token.precision`
+// is the depot-FRAME precision (the canonical 9-decimal frame is the cap); a
+// token whose native precision exceeds this is downscaled to the frame at the
+// outpost boundary (`min(native, 9)`), so the depot never holds more than 9
+// decimals — which also keeps every uint64/int64 amount field in range.
+constexpr uint32_t MAX_TOKEN_PRECISION = 9;
+
 uint64_t current_time_ms() {
    return static_cast<uint64_t>(current_time_point().sec_since_epoch()) * 1000;
 }
@@ -37,6 +48,8 @@ void tokens::regtoken(opp::types::TokenKind    kind,
 
    sysio::check(kind != opp::types::TOKEN_KIND_UNKNOWN,
                 "sysio.tokens: token kind must not be UNKNOWN");
+   sysio::check(precision <= MAX_TOKEN_PRECISION,
+                "sysio.tokens: precision exceeds the depot frame maximum (9)");
 
    tokens_t tbl(get_self());
    token_key pk{code};
@@ -46,7 +59,7 @@ void tokens::regtoken(opp::types::TokenKind    kind,
    const auto now = current_time_ms();
    const bool bootstrap = is_bootstrap_window();
 
-   tbl.emplace(get_self(), pk, token_row{
+   tbl.emplace(ram_payer, pk, token_row{
       .code               = code,
       .kind               = kind,
       .symbol_name        = std::move(symbol_name),
@@ -68,7 +81,7 @@ void tokens::activtoken(sysio::slug_name code) {
    sysio::check(it != tbl.end(), "sysio.tokens: token code not registered");
    sysio::check(!it->active, "sysio.tokens: token is already active");
 
-   tbl.modify(get_self(), pk, [&](auto& row) {
+   tbl.modify(ram_payer, pk, [&](auto& row) {
       row.active          = true;
       row.activated_at_ms = current_time_ms();
    });
@@ -99,7 +112,7 @@ void tokens::regctok(sysio::slug_name   chain_code,
       }
    }
 
-   tbl.emplace(get_self(), pk, chain_token_row{
+   tbl.emplace(ram_payer, pk, chain_token_row{
       .chain_code         = chain_code,
       .token_code         = token_code,
       .contract_addr      = std::move(contract_addr),
@@ -131,7 +144,7 @@ void tokens::activctok(sysio::slug_name chain_code, sysio::slug_name token_code)
       }
    }
 
-   tbl.modify(get_self(), pk, [&](auto& row) {
+   tbl.modify(ram_payer, pk, [&](auto& row) {
       row.active          = true;
       row.activated_at_ms = current_time_ms();
    });

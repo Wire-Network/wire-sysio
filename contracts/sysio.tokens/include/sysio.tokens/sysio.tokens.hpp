@@ -25,8 +25,11 @@ namespace sysio {
     *    Composite PK = uint128 `(chain_code << 64) | token_code`. Carries
     *    `contract_addr` (the per-outpost address — equal to `Token.address`
     *    bytes for the chain-of-origin binding, distinct for wrapped versions
-    *    on other chains), `precision_override`, and `is_native` (exactly one
-    *    per Chain).
+    *    on other chains) and `is_native` (exactly one per Chain). Chain-native
+    *    decimal precision is NOT stored here — the depot's per-token precision
+    *    lives on `sysio.tokens::token_row.precision` (the single source of
+    *    truth) and on each `sysio.reserv` reserve row; the outpost owns the
+    *    chain-native ↔ depot-frame conversion at its boundary.
     *
     * ## Lifecycle (unified bootstrap + post-bootstrap, per
     * /data/shared/code/wire/.claude/rules/epoch-duration-global.md):

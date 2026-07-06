@@ -1,13 +1,19 @@
 #include <fc/log/logger.hpp>
 #include <fc/crypto/sha256.hpp>
+#include <fc/int128.hpp>
 #include <fc/io/json.hpp>
 #include <fc/variant_object.hpp>
 #include <boost/endian/conversion.hpp>
+#include <algorithm>
+#include <format>
 #include <functional>
+#include <map>
 #include <optional>
+#include <string_view>
 
 #include <sysio/batch_operator_plugin/batch_operator_plugin.hpp>
 #include <sysio/batch_operator_plugin/depot_ops.hpp>
+#include <sysio/batch_operator_plugin/outpost_epoch_lookup.hpp>
 #include <sysio/batch_operator_plugin/outpost_opp_job.hpp>
 #include <sysio/depot/opreg_status.hpp>
 #include <sysio/chain/abi_serializer.hpp>
@@ -34,15 +40,15 @@ namespace {
    /// discovered at startup — keeps `epoch_tick` viable so a cold-sync node
    /// that finds outposts later still responds.
    constexpr std::size_t MIN_CRON_THREADS = 5;
+   /// Inbound plus outbound cron entries for each active outpost.
+   constexpr std::size_t OPP_CRON_JOBS_PER_OUTPOST = 2;
+   /// The plugin-wide epoch polling cron entry.
+   constexpr std::size_t EPOCH_TICK_CRON_JOBS = 1;
+   /// Exact secondary-index lookups should return at most the matching row.
+   constexpr uint32_t EXACT_LOOKUP_LIMIT = 1;
 
    /// my_group sentinel meaning "we are not in any batch-op group".
    constexpr uint8_t GROUP_NONE = 255;
-
-   /// Rolling window size for the outbound-envelope lookup. Covers ~4 epochs
-   /// across up to 2 outposts (`DEPOT → OUTPOST` pair each epoch) plus a
-   /// slack row, so `read_pending_outbound` always sees the current epoch
-   /// without paying for a full-table scan as `outenvelopes` grows.
-   constexpr uint32_t OUTBOUND_LOOKUP_WINDOW = 8;
 
    // ── WIRE contract identifiers (actions, tables, indexes, field names) ──
    // Centralised so a contract rename/refactor shows up as one search hit,
@@ -53,7 +59,6 @@ namespace {
       constexpr auto account             = "sysio.msgch";
       constexpr auto table_envelopes     = "envelopes";
       constexpr auto table_outenvelopes  = "outenvelopes";
-      constexpr auto index_byoutepoch    = "byoutepoch";
       constexpr auto action_deliver      = "deliver";
       constexpr auto action_chkcons      = "chkcons";
       constexpr auto action_bootstrap    = "bootstrap";
@@ -164,11 +169,17 @@ struct batch_operator_plugin::impl {
    signal<void(const opp::debugging::DebugEnvelopeEvent&)> debug_envelope_signal;
 
    /// Private cron_service owned by this plugin. Sized from the outpost
-   /// count at plugin_startup so per-outpost jobs run in parallel without
-   /// fighting over the shared cron_plugin pool. Lifecycle tied to the
+   /// count at plugin_startup and accepts dynamic per-outpost jobs as
+   /// `refresh_outposts` observes governance changes. Lifecycle tied to the
    /// plugin's startup/shutdown.
    sysio::services::cron_service_ptr cron_svc;
    std::vector<cron_service::job_id_t> cron_job_ids;
+   /// Cron job IDs for a scheduled outpost relay pair.
+   struct scheduled_opp_job_ids {
+      cron_service::job_id_t outbound = 0;
+      cron_service::job_id_t inbound  = 0;
+   };
+   std::map<uint64_t, scheduled_opp_job_ids> scheduled_opp_jobs;
    std::atomic<bool>                 shutting_down{false};
 
    // -----------------------------------------------------------------------
@@ -186,17 +197,16 @@ struct batch_operator_plugin::impl {
 
       std::optional<sysio::outbound_envelope_record>
       read_pending_outbound(uint64_t chain_code, uint32_t epoch_index) override {
-         // Reverse-iterate the latest `OUTBOUND_LOOKUP_WINDOW` rows. The primary
-         // key is auto-incrementing `id`, so reverse + small window gives the
-         // most recent epochs' envelopes without scanning the whole table (which
-         // grows unbounded until cleanup). Filtering by (chain_code, epoch_index)
-         // after the fact is O(window), not O(rows).
+         // Exact-match the `(chain_code, epoch_index)` secondary index. A fixed
+         // latest-N primary-key scan can hide an active outpost behind unrelated
+         // rows when the deployment has many outposts or bursty outbound emits.
          sysio::chain_apis::read_only::get_table_rows_params p;
          p.code        = chain::name(msgch::account);
          p.scope       = msgch::account;
          p.table       = msgch::table_outenvelopes;
-         p.reverse     = true;
-         p.limit       = OUTBOUND_LOOKUP_WINDOW;
+         p.find        = batch_operator_detail::byoutepoch_find_bound(chain_code, epoch_index);
+         p.index_name  = batch_operator_detail::byoutepoch_index_name;
+         p.limit       = EXACT_LOOKUP_LIMIT;
          p.values_only = true;
          auto rows = _impl.read_table(std::move(p));
          for (auto& row : rows.rows) {
@@ -274,7 +284,10 @@ struct batch_operator_plugin::impl {
    /// given outpost + epoch by querying msgch::envelopes via the
    /// byoutepoch secondary index.
    bool has_delivered_envelope(uint64_t chain_code, uint32_t epoch_index) {
-      uint64_t key = (static_cast<uint64_t>(chain_code) << 32) | epoch_index;
+      // Canonical (outpost, epoch) packing per sysio.opp.common/opp_keys.hpp —
+      // chain_code (a slug_name, up to 48 bits) occupies bits 32-79, epoch bits 0-31.
+      // The byoutepoch index is uint128; serialize the bound as a decimal string so
+      // the JSON round-trip stays lossless past 2^64.
       auto op_account = operator_account;
       // chain_plugin::get_table_rows forwards secondary-index bounds through
       // be_key_codec::encode_key, which unconditionally calls get_object() on
@@ -288,8 +301,8 @@ struct batch_operator_plugin::impl {
       p.code        = chain::name(msgch::account);
       p.scope       = msgch::account;
       p.table       = msgch::table_envelopes;
-      p.find        = std::format("{{\"{}\":{}}}", msgch::index_byoutepoch, key);
-      p.index_name  = msgch::index_byoutepoch;
+      p.find        = batch_operator_detail::byoutepoch_find_bound(chain_code, epoch_index);
+      p.index_name  = batch_operator_detail::byoutepoch_index_name;
       p.values_only = true;
       p.filter      = [op_account](const fc::variant& row) {
          return chain::name(row[msgch::field::batch_op_name].as_string()) == op_account;
@@ -377,7 +390,7 @@ struct batch_operator_plugin::impl {
       is_active = sysio::depot::opreg_status::compute_is_active(status, was_active);
 
       if (was_active && !is_active) {
-         elog("batch_operator: own status flipped to {} — halting relay loop", ("s", status));
+         elog("batch_operator: own status flipped to {} — halting relay loop", status);
       } else if (!was_active && is_active) {
          ilog("batch_operator: own status flipped to ACTIVE — resuming relay loop");
       }
@@ -477,8 +490,8 @@ struct batch_operator_plugin::impl {
       }
       current_epoch = epoch_index;
       // Refresh the outpost list so governance-added outposts become visible.
-      // Job scheduling is fixed at plugin_startup; a genuine governance change
-      // still requires a batch_operator restart to size the cron pool.
+      // `build_opp_jobs` and `schedule_opp_jobs` are idempotent, so newly
+      // active outposts start relaying without a batch-operator restart.
       refresh_outposts();
    }
 
@@ -547,13 +560,15 @@ struct batch_operator_plugin::impl {
          outposts.push_back(std::move(od));
       }
       ilog("batch_operator: loaded {} outposts (v6 sysio.chains)", outposts.size());
+      prune_inactive_opp_jobs();
       build_opp_jobs();
+      schedule_opp_jobs();
    }
 
    /// Construct an `outpost_opp_job` per registered outpost using the
    /// chain-specific plugin factories. Idempotent: already-built jobs stay.
-   /// Called from `refresh_outposts`; jobs only run if USE_OUTPOST_OPP_JOB
-   /// is on (guarded at each use site).
+   /// Called from `refresh_outposts`; scheduling is handled separately so
+   /// startup-created jobs and governance-added jobs share the same path.
    void build_opp_jobs() {
       if (!depot_ops_backing) return; // plugin not initialized yet
       for (auto& op : outposts) {
@@ -582,6 +597,87 @@ struct batch_operator_plugin::impl {
             client, *depot_ops_backing, fc::milliseconds(delivery_timeout_ms));
          opp_jobs.emplace(op.id, std::move(job));
          ilog("batch_operator: built outpost_opp_job for {}", client->to_string());
+      }
+   }
+
+   /// Returns true when a chain code is present in the latest active outpost list.
+   bool is_current_outpost(uint64_t chain_code) const {
+      for (const auto& outpost : outposts) {
+         if (outpost.id == chain_code) return true;
+      }
+      return false;
+   }
+
+   /// Forget a cron job ID after the job has been cancelled individually.
+   void forget_cron_job_id(cron_service::job_id_t id) {
+      cron_job_ids.erase(std::remove(cron_job_ids.begin(), cron_job_ids.end(), id),
+                         cron_job_ids.end());
+   }
+
+   /// Cancel the inbound/outbound cron entries for one outpost, if they exist.
+   void cancel_scheduled_opp_job(uint64_t chain_code) {
+      auto sched_it = scheduled_opp_jobs.find(chain_code);
+      if (sched_it == scheduled_opp_jobs.end()) return;
+      if (cron_svc) {
+         cron_svc->cancel(sched_it->second.outbound);
+         cron_svc->cancel(sched_it->second.inbound);
+      }
+      forget_cron_job_id(sched_it->second.outbound);
+      forget_cron_job_id(sched_it->second.inbound);
+      scheduled_opp_jobs.erase(sched_it);
+   }
+
+   /// Remove relay jobs for outposts that are no longer active on `sysio.chains`.
+   void prune_inactive_opp_jobs() {
+      for (auto it = opp_jobs.begin(); it != opp_jobs.end(); ) {
+         if (is_current_outpost(it->first)) {
+            ++it;
+            continue;
+         }
+         cancel_scheduled_opp_job(it->first);
+         ilog("batch_operator: removed outpost_opp_job for inactive outpost {}", it->first);
+         it = opp_jobs.erase(it);
+      }
+   }
+
+   /// Schedule one cron direction for an outpost relay job.
+   cron_service::job_id_t schedule_opp_job_direction(uint64_t chain_code,
+                                                     const std::shared_ptr<sysio::outpost_opp_job>& job,
+                                                     std::string_view direction,
+                                                     void (sysio::outpost_opp_job::*runner)()) {
+      sysio::services::cron_service::job_schedule sched;
+      sched.milliseconds = {sysio::services::cron_service::job_schedule::step_value{epoch_poll_ms}};
+      sysio::services::cron_service::job_metadata_t meta;
+      meta.label         = std::format("outpost_opp_{}_{}", direction, chain_code);
+      meta.one_at_a_time = true;
+      auto id = cron_svc->add(sched,
+                              [job_wp = std::weak_ptr<sysio::outpost_opp_job>(job), runner]() {
+                                 if (auto j = job_wp.lock()) ((*j).*runner)();
+                              },
+                              meta);
+      cron_job_ids.push_back(id);
+      ilog("batch_operator_plugin: scheduled {} for {} (id={}, every {}ms)",
+           meta.label, job->client().to_string(), id, epoch_poll_ms);
+      return id;
+   }
+
+   /// Schedule inbound and outbound cron jobs for a single active outpost.
+   void schedule_opp_job(uint64_t chain_code, const std::shared_ptr<sysio::outpost_opp_job>& job) {
+      if (!cron_svc || shutting_down || scheduled_opp_jobs.contains(chain_code)) return;
+      auto outbound_id = schedule_opp_job_direction(chain_code, job, "outbound",
+                                                    &sysio::outpost_opp_job::run_outbound);
+      auto inbound_id = schedule_opp_job_direction(chain_code, job, "inbound",
+                                                   &sysio::outpost_opp_job::run_inbound);
+      scheduled_opp_jobs.emplace(chain_code, scheduled_opp_job_ids{
+         .outbound = outbound_id,
+         .inbound  = inbound_id,
+      });
+   }
+
+   /// Schedule every built active outpost job that does not already have cron entries.
+   void schedule_opp_jobs() {
+      for (const auto& [chain_code, job] : opp_jobs) {
+         schedule_opp_job(chain_code, job);
       }
    }
 
@@ -739,22 +835,21 @@ void batch_operator_plugin::plugin_startup() {
 
    ilog("batch_operator_plugin: starting for account {}", _impl->operator_account.to_string());
 
-   // Discover outposts once so we can size the private cron_service thread
-   // pool to match. A governance change that adds or removes an outpost
-   // requires a batch operator restart — the set is fixed here.
+   // Discover outposts before the private cron_service starts. Later refresh
+   // ticks add/remove per-outpost cron jobs as the active chain set changes.
    try {
       _impl->refresh_outposts();
    } catch (const fc::exception& e) {
       wlog("batch_operator_plugin: initial outpost discovery failed: {}. "
-           "Starting with 0 per-outpost jobs; restart batch_operator after "
+           "Starting with 0 per-outpost jobs; refresh ticks will retry after "
            "the chain has caught up.", e.to_string());
    }
 
-   // Size the pool: two jobs per outpost (outbound + inbound) plus one
-   // epoch_tick. A minimum floor of 3 keeps the service viable even when
-   // no outposts are known yet (so epoch_tick can still run).
+   // Size the pool for startup outposts. Later dynamic outposts are added to
+   // the same queued cron service; the minimum keeps epoch_tick viable even
+   // when no outposts are known yet.
    const std::size_t outpost_count   = _impl->opp_jobs.size();
-   const std::size_t required_threads = outpost_count * 2 + 1;
+   const std::size_t required_threads = outpost_count * OPP_CRON_JOBS_PER_OUTPOST + EPOCH_TICK_CRON_JOBS;
    const std::size_t thread_count    = std::max(required_threads, MIN_CRON_THREADS);
 
    sysio::services::cron_service::options svc_opts;
@@ -783,42 +878,7 @@ void batch_operator_plugin::plugin_startup() {
       ilog("batch_operator_plugin: scheduled {} (id={}, every {}ms)", meta.label, id, poll_ms);
    }
 
-   // Per-outpost outbound + inbound. Each pair targets the same
-   // outpost_opp_job instance; the job's internal mutex serializes them
-   // when they run on different worker threads concurrently.
-   for (auto& [chain_code, job] : _impl->opp_jobs) {
-      const auto identifier = job->client().to_string();
-      {
-         sysio::services::cron_service::job_schedule sched;
-         sched.milliseconds = {sysio::services::cron_service::job_schedule::step_value{poll_ms}};
-         sysio::services::cron_service::job_metadata_t meta;
-         meta.label         = std::format("outpost_opp_outbound_{}", chain_code);
-         meta.one_at_a_time = true;
-         auto id = _impl->cron_svc->add(sched,
-                                        [job_wp = std::weak_ptr(job)]() {
-                                           if (auto j = job_wp.lock()) j->run_outbound();
-                                        },
-                                        meta);
-         _impl->cron_job_ids.push_back(id);
-         ilog("batch_operator_plugin: scheduled {} for {} (id={}, every {}ms)",
-              meta.label, identifier, id, poll_ms);
-      }
-      {
-         sysio::services::cron_service::job_schedule sched;
-         sched.milliseconds = {sysio::services::cron_service::job_schedule::step_value{poll_ms}};
-         sysio::services::cron_service::job_metadata_t meta;
-         meta.label         = std::format("outpost_opp_inbound_{}", chain_code);
-         meta.one_at_a_time = true;
-         auto id = _impl->cron_svc->add(sched,
-                                        [job_wp = std::weak_ptr(job)]() {
-                                           if (auto j = job_wp.lock()) j->run_inbound();
-                                        },
-                                        meta);
-         _impl->cron_job_ids.push_back(id);
-         ilog("batch_operator_plugin: scheduled {} for {} (id={}, every {}ms)",
-              meta.label, identifier, id, poll_ms);
-      }
-   }
+   _impl->schedule_opp_jobs();
 }
 
 void batch_operator_plugin::plugin_shutdown() {
@@ -828,6 +888,7 @@ void batch_operator_plugin::plugin_shutdown() {
       _impl->cron_svc->stop();
       _impl->cron_svc.reset();
    }
+   _impl->scheduled_opp_jobs.clear();
    _impl->cron_job_ids.clear();
    ilog("batch_operator_plugin: shutdown complete");
 }

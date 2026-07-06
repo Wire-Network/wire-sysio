@@ -58,12 +58,18 @@ class Cluster(object):
     __WalletName="MyWallet"
     __localHost="localhost"
     __BiosHost="localhost"
-    __BiosPort=8788
+    __BiosPort=Utils.getPort(Utils.PortBiosHttp)
     __LauncherCmdArr=[]
     __bootlog="wire_sysio-ignition-wd/bootlog.txt"
+    __localLaunchPortCheckAttempts=90
+    __localLaunchPortCheckSleepSeconds=2
+    __finalizerCatchupTimeoutMultiplier=4
+    __finalizerCatchupMaxLagBlocks=2
+    __finalizerCatchupStableRounds=3
+    __finalizerCatchupReportInterval=5
 
     # pylint: disable=too-many-arguments
-    def __init__(self, localCluster=True, host="localhost", port=8888, walletHost="localhost", walletPort=9899
+    def __init__(self, localCluster=True, host="localhost", port=None, walletHost="localhost", walletPort=None
                  , defproduceraPrvtKey=None, defproducerbPrvtKey=None, staging=False, loggingLevel="debug", loggingLevelDict={}, nodeopVers="", unshared=False, keepRunning=False, keepLogs=False):
         """Cluster container.
         localCluster [True|False] Is cluster local to host.
@@ -88,10 +94,10 @@ class Cluster(object):
         self.wallet=None
         self.walletMgr=None
         self.host=host
-        self.port=port
-        self.p2pBasePort=9876
+        self.port=Utils.getPort(Utils.PortNodeHttp) if port is None else port
+        self.p2pBasePort=Utils.getPort(Utils.PortP2P)
         self.walletHost=walletHost
-        self.walletPort=walletPort
+        self.walletPort=Utils.getPort(Utils.PortWallet) if walletPort is None else walletPort
         self.staging=staging
         self.loggingLevel=loggingLevel
         self.loggingLevelDict=loggingLevelDict
@@ -171,6 +177,31 @@ class Cluster(object):
     # pylint: disable=too-many-return-statements
     # pylint: disable=too-many-branches
     # pylint: disable=too-many-statements
+    def _shutdownLaunchFailure(self):
+        """Terminate nodes started by a failed launch without deleting diagnostic logs."""
+        if self.keepRunning:
+            Utils.Print('Cluster launch failed; cluster left running.')
+            return False
+
+        Utils.Print('Cluster launch failed; shutting down started nodes.')
+        for node in self.nodes:
+            node.kill(signal.SIGTERM)
+        if self.biosNode is not None and (len(self.nodes) == 0 or self.biosNode != self.nodes[0]):
+            self.biosNode.kill(signal.SIGTERM)
+
+        if self.trxGenLauncher is not None:
+            self.trxGenLauncher.killAll()
+
+        return False
+
+    def _portsForLocalLaunch(self, totalNodes):
+        """Return the local HTTP and P2P ports reserved by a cluster launch."""
+        ports = {Utils.getPort(Utils.PortNodeHttp, index) for index in range(totalNodes)}
+        ports.add(Utils.getPort(Utils.PortBiosHttp))
+        ports.update(Utils.getPort(Utils.PortP2P, index) for index in range(totalNodes))
+        ports.add(Utils.getPort(Utils.PortBiosP2P))
+        return ports
+
     def launch(self, pnodes=1, unstartedNodes=0, totalNodes=1, prodCount=21, topo="mesh", delay=2, onlyBios=False, dontBootstrap=False,
                totalProducers=None, sharedProducers=0, extraNodeopArgs="", specificExtraNodeopArgs=None, specificNodeopInstances=None, onlySetProds=False,
                pfSetupPolicy=PFSetupPolicy.FULL, alternateVersionLabelsFile=None, associatedNodeLabels=None, loadSystemContract=True,
@@ -247,13 +278,14 @@ class Cluster(object):
 
         self.setAlternateVersionLabels(alternateVersionLabelsFile)
 
-        tries = 30
-        while not Utils.arePortsAvailable(set(range(self.port, self.port+totalNodes+1))):
-            Utils.Print("ERROR: Another process is listening on nodeop default port. wait...")
+        portsToCheck = self._portsForLocalLaunch(totalNodes)
+        tries = Cluster.__localLaunchPortCheckAttempts
+        while not Utils.arePortsAvailable(portsToCheck):
+            Utils.Print("ERROR: Another process is listening on a nodeop launch port. wait...")
             if tries == 0:
                 return False
             tries = tries - 1
-            time.sleep(2)
+            time.sleep(Cluster.__localLaunchPortCheckSleepSeconds)
         loggingLevelDictString = json.dumps(self.loggingLevelDict, separators=(',', ':'))
         args=(f'-p {pnodes} -n {totalNodes} -d {delay} '
               f'-i {datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]} -f {producerFlag} '
@@ -283,11 +315,9 @@ class Cluster(object):
         if Utils.Debug and "--contracts-console" not in extraNodeopArgs:
             nodeopArgs += " --contracts-console"
         if PFSetupPolicy.hasPreactivateFeature(pfSetupPolicy):
-            nodeopArgs += " --plugin sysio::producer_api_plugin"
+            nodeopArgs += " --plugin sysio::producer_api_plugin "
         if prodsEnableTraceApi:
             nodeopArgs += " --plugin sysio::trace_api_plugin "
-        if extraNodeopArgs.find("--trace-rpc-abi") == -1:
-            nodeopArgs += " --trace-no-abis "
         httpMaxResponseTimeSet = False
         if specificExtraNodeopArgs is not None:
             assert(isinstance(specificExtraNodeopArgs, dict))
@@ -352,9 +382,17 @@ class Cluster(object):
         if topo=="bridge":
             shapeFilePrefix="shape_bridge"
             shapeFile=shapeFilePrefix+".json"
+            # Keep the shape file inside this cluster's per-process log directory. nodeopLogPath is
+            # uniquified by PID, so every test gets its own copy. Writing the bare relative filename
+            # instead would land it in the shared CWD ($BUILD_DIR); two "bridge" topology tests running
+            # concurrently (e.g. nodeop_snapshot_forked_test and nodeop_short_fork_take_over_test) would
+            # then read and write the same ./shape_bridge.json, racing and corrupting it. The reader
+            # (make_custom() in launcher.py) would observe a partially/doubly written document and fail
+            # with json.decoder.JSONDecodeError: "Extra data".
+            shapeFilePath=nodeopLogPath / shapeFile
             cmdArrForOutput=copy.deepcopy(argsArr)
             cmdArrForOutput.append("--output")
-            cmdArrForOutput.append(str(nodeopLogPath / shapeFile))
+            cmdArrForOutput.append(str(shapeFilePath))
             cmdArrForOutput.append("--shape")
             cmdArrForOutput.append("line")
             s=" ".join(cmdArrForOutput)
@@ -362,8 +400,8 @@ class Cluster(object):
             bridgeLauncher.define_network()
             bridgeLauncher.generate()
 
-            Utils.Print(f"opening {topo} shape file: {nodeopLogPath / shapeFile}")
-            f = open(nodeopLogPath / shapeFile, "r")
+            Utils.Print(f"opening {topo} shape file: {shapeFilePath}")
+            f = open(shapeFilePath, "r")
             shapeFileJsonStr = f.read()
             f.close()
             shapeFileObject = json.loads(shapeFileJsonStr)
@@ -442,12 +480,12 @@ class Cluster(object):
             connectGroup(producerGroup1, producerNodes, bridgeNodes)
             connectGroup(producerGroup2, producerNodes, bridgeNodes)
 
-            f=open(shapeFile,"w")
+            f=open(shapeFilePath,"w")
             f.write(json.dumps(shapeFileObject, indent=4, sort_keys=True))
             f.close()
 
             argsArr.append("--shape")
-            argsArr.append(shapeFile)
+            argsArr.append(str(shapeFilePath))
         else:
             argsArr.append("--shape")
             argsArr.append(topo)
@@ -465,7 +503,9 @@ class Cluster(object):
             sysdcmd = launcher.construct_command_line(instance)
 
             nodeNum = instance.index
-            node = Node(self.host, self.port + nodeNum, nodeNum, Path(instance.data_dir_name),
+            # Bios port is shard-offset to PortBiosHttp; it no longer equals cluster.port+biosNodeId.
+            node_port = Cluster.__BiosPort if nodeNum == Node.biosNodeId else self.port + nodeNum
+            node = Node(self.host, node_port, nodeNum, Path(instance.data_dir_name),
                         Path(instance.config_dir_name), sysdcmd, unstarted=instance.dont_start,
                         launch_time=launcher.launch_time, walletMgr=self.walletMgr, nodeopVers=self.nodeopVers)
             node.keys = instance.keys
@@ -487,17 +527,17 @@ class Cluster(object):
         if self.nodes is None or self.startedNodesCount != len(self.nodes):
             Utils.Print("ERROR: Unable to validate %s instances, expected: %d, actual: %d" %
                           (Utils.SysServerName, self.startedNodesCount, len(self.nodes)))
-            return False
+            return self._shutdownLaunchFailure()
 
         if not self.biosNode or not Utils.waitForBool(self.biosNode.checkPulse, Utils.systemWaitTimeout):
             Utils.Print("ERROR: Bios node doesn't appear to be running...")
-            return False
+            return self._shutdownLaunchFailure()
 
         # ensure cluster node are inter-connected by ensuring everyone has block 1
         Utils.Print("Cluster viability smoke test. Validate every cluster node has block 1. ")
         if not self.waitOnClusterBlockNumSync(1):
             Utils.Print("ERROR: Cluster doesn't seem to be in sync. Some nodes missing block 1")
-            return False
+            return self._shutdownLaunchFailure()
 
         if dontBootstrap:
             Utils.Print("Skipping bootstrap.")
@@ -506,14 +546,14 @@ class Cluster(object):
         Utils.Print("Bootstrap cluster.")
         if not self.bootstrap(launcher, self.biosNode, self.startedNodesCount, prodCount + sharedProducers, totalProducers, pfSetupPolicy, onlyBios, onlySetProds, loadSystemContract, activateIF, biosFinalizer, signatureProviderForNonProducer):
             Utils.Print("ERROR: Bootstrap failed.")
-            return False
+            return self._shutdownLaunchFailure()
 
         # validate iniX accounts can be retrieved
 
         producerKeys=Cluster.parseClusterKeys(totalNodes)
         if producerKeys is None:
             Utils.Print("ERROR: Unable to parse cluster info")
-            return False
+            return self._shutdownLaunchFailure()
 
         def initAccountKeys(account, keys):
             account.ownerPrivateKey=keys["private"]
@@ -703,7 +743,20 @@ class Cluster(object):
         return True
 
     def getNodeP2pPort(self, nodeId: int):
-        return self.p2pBasePort + nodeId
+        """Return the sharded P2P port for a non-BIOS node."""
+        return Utils.getPort(Utils.PortP2P, nodeId)
+
+    def getNodeP2pEndpoint(self, nodeId: int):
+        """Return the sharded P2P endpoint for a non-BIOS node."""
+        return f"{self.host}:{self.getNodeP2pPort(nodeId)}"
+
+    def getBiosP2pEndpoint(self):
+        """Return the sharded P2P endpoint for the BIOS node."""
+        return f"{self.host}:{Utils.getPort(Utils.PortBiosP2P)}"
+
+    def getHttpEndpoint(self, nodeId: int):
+        """Return the sharded HTTP endpoint for a non-BIOS node."""
+        return f"{self.host}:{self.port + nodeId}"
 
     def getNode(self, nodeId=0, exitOnError=True):
         if exitOnError and nodeId >= len(self.nodes):
@@ -724,14 +777,15 @@ class Cluster(object):
         nodes += self.getNodes()
         return nodes
 
-    def launchUnstarted(self, numToLaunch=1):
+    def launchUnstarted(self, numToLaunch=1, timeout=Utils.systemWaitTimeout):
+        """Launch queued unstarted nodes and wait up to timeout seconds for each node to answer get_info."""
         assert(isinstance(numToLaunch, int))
         assert(numToLaunch>0)
         launchList=self.unstartedNodes[:numToLaunch]
         del self.unstartedNodes[:numToLaunch]
         for node in launchList:
             # the node number is indexed off of the started nodes list
-            node.launchUnstarted()
+            node.launchUnstarted(timeout=timeout)
             self.nodes.append(node)
 
     # Spread funds across accounts with transactions spread through cluster nodes.
@@ -986,19 +1040,85 @@ class Cluster(object):
         Utils.Print(f'Found {len(producerKeys)} producer keys')
         return producerKeys
 
-    def activateInstantFinality(self, biosFinalizer=True, waitForFinalization=True, signatureProviderForNonProducer=False):
-        nodes = self.nodes.copy()
-        nodes.append(self.biosNode)
+    def getInstantFinalityNodes(self, biosFinalizer=True, signatureProviderForNonProducer=False):
+        """Return the nodes eligible for the instant-finality policy."""
+        nodes = []
         for n in (self.nodes + [self.biosNode]):
             if not n or not n.keys or not n.keys[0].blspubkey:
-                nodes.remove(n)
                 continue
             if not signatureProviderForNonProducer and not n.isProducer:
-                nodes.remove(n)
                 continue
             if n.nodeId == 'bios' and not biosFinalizer:
-                nodes.remove(n)
                 continue
+            nodes.append(n)
+        return nodes
+
+    @staticmethod
+    def __nodeLabel(node):
+        """Return a compact human-readable node label for diagnostics."""
+        return node.producerName if node.producerName else node.nodeId
+
+    def waitForFinalizerNodesToCatchUp(self, finalizerNodes, timeout=None,
+                                       maxLagBlocks=__finalizerCatchupMaxLagBlocks,
+                                       stableRounds=__finalizerCatchupStableRounds):
+        """Wait until selected finalizer nodes remain close to the bios node head."""
+        if timeout is None:
+            timeout = Utils.systemWaitTimeout * Cluster.__finalizerCatchupTimeoutMultiplier
+
+        consecutiveRounds = 0
+        printCount = 0
+        Utils.Print(f'Waiting for {len(finalizerNodes)} finalizer nodes to catch up within '
+                    f'{maxLagBlocks} blocks of bios.')
+
+        def areFinalizersCaughtUp():
+            nonlocal consecutiveRounds
+            nonlocal printCount
+
+            printCount += 1
+            biosInfo = self.biosNode.getInfo(silentErrors=True, exitOnError=False)
+            if biosInfo is None:
+                consecutiveRounds = 0
+                return False
+
+            biosHead = int(biosInfo["head_block_num"])
+            laggingFinalizers = []
+            for node in finalizerNodes:
+                if node.killed:
+                    laggingFinalizers.append(f'{Cluster.__nodeLabel(node)}: killed')
+                    continue
+
+                info = node.getInfo(silentErrors=True, exitOnError=False)
+                if info is None:
+                    laggingFinalizers.append(f'{Cluster.__nodeLabel(node)}: unavailable')
+                    continue
+
+                nodeHead = int(info["head_block_num"])
+                lag = biosHead - nodeHead
+                if lag > maxLagBlocks:
+                    laggingFinalizers.append(
+                        f'{Cluster.__nodeLabel(node)}: head={nodeHead}, bios={biosHead}, lag={lag}'
+                    )
+
+            if laggingFinalizers:
+                consecutiveRounds = 0
+                if printCount % Cluster.__finalizerCatchupReportInterval == 0:
+                    Utils.Print('Waiting for finalizers to catch up: ' + '; '.join(laggingFinalizers))
+                return False
+
+            consecutiveRounds += 1
+            return consecutiveRounds >= stableRounds
+
+        return Utils.waitForBool(areFinalizersCaughtUp, timeout=timeout, sleepTime=1)
+
+    def activateInstantFinality(self, biosFinalizer=True, waitForFinalization=True,
+                                signatureProviderForNonProducer=False, finalizerNodes=None):
+        nodes = list(finalizerNodes) if finalizerNodes is not None else self.getInstantFinalityNodes(
+            biosFinalizer=biosFinalizer,
+            signatureProviderForNonProducer=signatureProviderForNonProducer
+        )
+        if len(nodes) == 0:
+            Utils.Print('ERROR: No finalizer nodes available for instant finality')
+            return None, 0
 
         transId = self.setFinalizers(nodes)
         if transId is None:
@@ -1007,6 +1127,9 @@ class Cluster(object):
             if not self.biosNode.waitForTransFinalization(transId, timeout=21 * 12 * 3):
                 Utils.Print(f'ERROR: Failed to validate setfinalizer transaction {transId} got rolled into a '
                             f'LIB block on server port {self.biosNode.port}.')
+                return None, transId
+            if not self.biosNode.waitForLibToAdvance(timeout=Utils.systemWaitTimeout):
+                Utils.Print('ERROR: LIB did not advance after activating instant finality.')
                 return None, transId
         return True, transId
 
@@ -1105,7 +1228,18 @@ class Cluster(object):
             biosNode.activateAllBuiltinProtocolFeature()
 
         if activateIF:
-            success, transId = self.activateInstantFinality(biosFinalizer=biosFinalizer, signatureProviderForNonProducer=signatureProviderForNonProducer)
+            finalizerNodes = self.getInstantFinalityNodes(
+                biosFinalizer=biosFinalizer,
+                signatureProviderForNonProducer=signatureProviderForNonProducer
+            )
+            if not self.waitForFinalizerNodesToCatchUp(finalizerNodes):
+                Utils.Print('ERROR: Finalizer nodes failed to catch up before activating instant finality')
+                return None
+            success, transId = self.activateInstantFinality(
+                biosFinalizer=biosFinalizer,
+                signatureProviderForNonProducer=signatureProviderForNonProducer,
+                finalizerNodes=finalizerNodes
+            )
             if not success:
                 Utils.Print("ERROR: Activate instant finality failed")
                 return None
@@ -1144,7 +1278,7 @@ class Cluster(object):
             return trans
 
         # sysio.noop used by trx_generator for noop action
-        systemAccounts = ['sysio.noop', 'sysio.bpay', 'sysio.msig', 'sysio.names', 'sysio.token', 'sysio.vpay', 'sysio.wrap', 'sysio.roa', 'sysio.acct', 'sysio.authex', 'carl']
+        systemAccounts = ['sysio.noop', 'sysio.bpay', 'sysio.msig', 'sysio.names', 'sysio.token', 'sysio.vpay', 'sysio.wrap', 'sysio.roa', 'sysio.acct', 'sysio.authex', 'sysio.opreg', 'carl']
         acctTrans = list(map(createSystemAccount, systemAccounts))
 
         for trans in acctTrans:
@@ -1335,6 +1469,75 @@ class Cluster(object):
         if trans is None:
             Utils.Print("ERROR: Failed to set sysio.roa as privileged")
             return None
+
+        sysioAuthexAccount = copy.deepcopy(sysioAccount)
+        sysioAuthexAccount.name = 'sysio.authex'
+        contract="sysio.authex"
+        contractDir=str(self.libTestingContractsPath / contract)
+        wasmFile="%s.wasm" % (contract)
+        abiFile="%s.abi" % (contract)
+        Utils.Print("Publish %s contract" % (contract))
+        trans=biosNode.publishContract(sysioAuthexAccount, contractDir, wasmFile, abiFile, waitForTransBlock=True)
+        if trans is None:
+            Utils.Print("ERROR: Failed to publish contract %s." % (contract))
+            return None
+
+        trans=biosNode.setPriv(sysioAuthexAccount, sysioAccount, isPriv=True, waitForTransBlock=True)
+        if trans is None:
+            Utils.Print("ERROR: Failed to set sysio.authex as privileged")
+            return None
+
+        # Delegate sysio.authex.active to sysio.roa@sysio.code so sysio.roa::nodeownreg's inline
+        # sysio.authex::recordlink is authorized (mirrors the production ClusterManager grant).
+        # accounts is sorted by actor (sysio.authex < sysio.roa) as the authority encoding requires.
+        Utils.Print("Delegate sysio.authex.active to sysio.roa@sysio.code")
+        authexAuth=('{"account":"sysio.authex","permission":"active","parent":"owner","auth":'
+                    '{"threshold":1,"keys":[{"key":"%s","weight":1}],'
+                    '"accounts":[{"permission":{"actor":"sysio.authex","permission":"sysio.code"},"weight":1},'
+                    '{"permission":{"actor":"sysio.roa","permission":"sysio.code"},"weight":1}],'
+                    '"waits":[]}}' % sysioAuthexAccount.activePublicKey)
+        trans=biosNode.pushMessage('sysio', 'updateauth', authexAuth, '--permission sysio.authex@owner')
+        transId=Node.getTransId(trans[1])
+        if not biosNode.waitForTransactionInBlock(transId):
+            Utils.Print("ERROR: Failed to delegate sysio.authex.active to sysio.roa@sysio.code (tx %s)" % transId)
+            return None
+
+        # Deploy sysio.opreg and register the cluster producers as ACTIVE producer
+        # operators. sysio.system::update_ranked_producers schedules a producer only
+        # if it is an ACTIVE OPERATOR_TYPE_PRODUCER operator in sysio.opreg (producers
+        # post slashable collateral to produce); bootstrapped operators are ACTIVE by
+        # fiat, so this makes bootstrap producers schedulable under the collateral gate.
+        sysioOpregAccount = copy.deepcopy(sysioAccount)
+        sysioOpregAccount.name = 'sysio.opreg'
+        contract="sysio.opreg"
+        contractDir=str(self.contractsPath / contract)
+        wasmFile="%s.wasm" % (contract)
+        abiFile="%s.abi" % (contract)
+        Utils.Print("Publish %s contract" % (contract))
+        trans=biosNode.publishContract(sysioOpregAccount, contractDir, wasmFile, abiFile, waitForTransBlock=True)
+        if trans is None:
+            Utils.Print("ERROR: Failed to publish contract %s." % (contract))
+            return None
+        trans=biosNode.setPriv(sysioOpregAccount, sysioAccount, isPriv=True, waitForTransBlock=True)
+        if trans is None:
+            Utils.Print("ERROR: Failed to set sysio.opreg as privileged")
+            return None
+        opregConfig=('{"max_available_producers":21,"max_available_batch_ops":63,"max_available_underwriters":21,'
+                     '"terminate_prune_delay_ms":600000,"terminate_max_consecutive_misses":5,'
+                     '"terminate_max_pct_misses_24h":5,"terminate_window_ms":86400000,'
+                     '"req_prod_collat":[],"req_batchop_collat":[],"req_uw_collat":[]}')
+        trans=biosNode.pushMessage('sysio.opreg', 'setconfig', opregConfig, '--permission sysio.opreg@active')
+        if trans is None or not trans[0]:
+            Utils.Print("ERROR: Failed to configure sysio.opreg")
+            return None
+        for pKeys in producerKeys.values():
+            if pKeys["name"] == 'sysio':
+                continue
+            opData='{"account":"%s","type":"OPERATOR_TYPE_PRODUCER","is_bootstrapped":true}' % pKeys["name"]
+            trans=biosNode.pushMessage('sysio.opreg', 'regoperator', opData, '--permission sysio.opreg@active')
+            if trans is None or not trans[0]:
+                Utils.Print("ERROR: Failed to register producer operator %s." % (pKeys["name"]))
+                return None
 
         if loadSystemContract:
             Utils.Print("Set default emission config")

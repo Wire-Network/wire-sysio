@@ -6,6 +6,7 @@
 #include <sys/auxv.h>
 #include <elf.h>
 #include <immintrin.h>
+#include <stdlib.h>
 
 int arch_prctl(int code, unsigned long* addr);
 
@@ -89,37 +90,53 @@ void __attribute__ ((__target__ ("fsgsbase"))) sys_vm_oc_setgs_fsgsbase(uint64_t
    return _writegsbase_u64(gs);
 }
 
-extern char** _dl_argv;
+// Choose between the fsgsbase instructions and the arch_prctl syscall for
+// accessing the GS base. SYSIO_DISABLE_FSGSBASE forces the syscall path, which
+// is useful where userspace fsgsbase is advertised in HWCAP2 but not actually
+// usable (some VMs). Resolved from the constructor below, after the dynamic
+// loader has finished and before any threads start, so getenv()/getauxval() are
+// safe to call here.
 static int sys_vm_oc_use_fsgsbase() {
-   /* ifunc resolvers run _super_ early -- before getenv() is set up even! This is relying on the layout of _dl_argv to be
-          _dl_argv
-              ↓
-      argc, argv[0], ..., argv[argc - 1], NULL, evniron0, environ1, ..., NULL
-   */
-   const int argc = *(int*)(_dl_argv - 1);
-   char** my_environ = _dl_argv + argc + 1;
-   while(*my_environ != NULL) {
-      const char disable_str[] = "SYSIO_DISABLE_FSGSBASE";
-      if(strncmp(*my_environ++, disable_str, strlen(disable_str)) == 0)
-         return 0;
-   }
-
+   if(getenv("SYSIO_DISABLE_FSGSBASE"))
+      return 0;
    //see linux Documentation/arch/x86/x86_64/fsgs.rst; check that kernel has enabled userspace fsgsbase
    return getauxval(AT_HWCAP2) & HWCAP2_FSGSBASE;
 }
 
-uint64_t (*resolve_sys_vm_oc_getgs())() {
-   if(sys_vm_oc_use_fsgsbase())
-      return sys_vm_oc_getgs_fsgsbase;
-   return sys_vm_oc_getgs_syscall;
+// sys_vm_oc_getgs/setgs were previously GNU ifuncs, but an ifunc resolver runs
+// during early dynamic relocation -- before its own GOT entries are guaranteed
+// relocated. The old resolver read the external _dl_argv symbol from that
+// context to scan the environment, which crashed pre-main on some libc layouts
+// (observed under WSL2). Resolving the implementation from a constructor avoids
+// the fragile early-relocation context entirely. These helpers are called only
+// at OC execution-context setup/teardown and on memory.grow -- never per wasm
+// instruction -- so the added indirect call is off the hot path.
+static uint64_t (*sys_vm_oc_getgs_impl)() = 0;
+static void     (*sys_vm_oc_setgs_impl)(uint64_t) = 0;
+
+static void sys_vm_oc_resolve_gs_helpers() {
+   if(sys_vm_oc_use_fsgsbase()) {
+      sys_vm_oc_getgs_impl = sys_vm_oc_getgs_fsgsbase;
+      sys_vm_oc_setgs_impl = sys_vm_oc_setgs_fsgsbase;
+   } else {
+      sys_vm_oc_getgs_impl = sys_vm_oc_getgs_syscall;
+      sys_vm_oc_setgs_impl = sys_vm_oc_setgs_syscall;
+   }
 }
 
-uint64_t sys_vm_oc_getgs() __attribute__ ((ifunc ("resolve_sys_vm_oc_getgs")));
-
-void (*resolve_sys_vm_oc_setgs())(uint64_t) {
-   if(sys_vm_oc_use_fsgsbase())
-      return sys_vm_oc_setgs_fsgsbase;
-   return sys_vm_oc_setgs_syscall;
+__attribute__((constructor))
+static void sys_vm_oc_init_gs_helpers() {
+   sys_vm_oc_resolve_gs_helpers();
 }
 
-void sys_vm_oc_setgs(uint64_t) __attribute__ ((ifunc ("resolve_sys_vm_oc_setgs")));
+uint64_t sys_vm_oc_getgs() {
+   if(!sys_vm_oc_getgs_impl) // the constructor normally runs first; guard a stray pre-constructor call
+      sys_vm_oc_resolve_gs_helpers();
+   return sys_vm_oc_getgs_impl();
+}
+
+void sys_vm_oc_setgs(uint64_t gs) {
+   if(!sys_vm_oc_setgs_impl)
+      sys_vm_oc_resolve_gs_helpers();
+   sys_vm_oc_setgs_impl(gs);
+}

@@ -14,6 +14,7 @@
 
 #include <sysio.system/emissions.hpp>
 #include <sysio.system/native.hpp>
+#include <sysio.system/snapshot_attest.hpp>
 
 #include <limits>
 #include <optional>
@@ -57,6 +58,15 @@ namespace sysiosystem {
 
 
    static constexpr size_t   max_producers         = 21;
+   /// Minimum number of producers -- and, in lock-step, finalizers -- that
+   /// update_ranked_producers will ever publish. Savanna's finality threshold
+   /// is (N*2)/3 + 1, so remaining live with at least one faulty finalizer
+   /// requires N >= 4 (N=4 -> threshold 3 tolerates 1 fault; N=3 -> threshold 3
+   /// tolerates 0). When fewer producers than this are collateral-eligible the
+   /// last good schedule is retained rather than concentrating consensus onto
+   /// too few nodes. Raising it trades more aggressive removal of ineligible
+   /// producers for a stronger anti-concentration floor.
+   static constexpr size_t   min_schedule_size     = 4;
    static constexpr uint32_t seconds_per_year      = 52 * 7 * 24 * 3600;
    static constexpr uint32_t seconds_per_day       = 24 * 3600;
    static constexpr uint32_t seconds_per_hour      = 3600;
@@ -350,6 +360,13 @@ namespace sysiosystem {
           * @param url - the url of the block producer, normally the url of the block producer presentation website,
           * @param location - is the country code as defined in the ISO 3166, https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes
           *
+          * @note Registration alone does not schedule the producer. To be placed
+          *       in the active schedule the account must also be an ACTIVE
+          *       OPERATOR_TYPE_PRODUCER operator in sysio.opreg (i.e. have posted
+          *       the required slashable collateral). Eligibility is enforced when
+          *       the schedule is built, so withdrawing that collateral -- or
+          *       being slashed or terminated -- drops the producer.
+          *
           * @pre Producer to register is an account
           * @pre Authority of producer to register
           */
@@ -365,6 +382,13 @@ namespace sysiosystem {
           * @param producer_authority - the weighted threshold multisig block signing authority of the block producer used to sign blocks,
           * @param url - the url of the block producer, normally the url of the block producer presentation website,
           * @param location - is the country code as defined in the ISO 3166, https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes
+          *
+          * @note Registration alone does not schedule the producer. To be placed
+          *       in the active schedule the account must also be an ACTIVE
+          *       OPERATOR_TYPE_PRODUCER operator in sysio.opreg (i.e. have posted
+          *       the required slashable collateral). Eligibility is enforced when
+          *       the schedule is built, so withdrawing that collateral -- or
+          *       being slashed or terminated -- drops the producer.
           *
           * @pre Producer to register is an account
           * @pre Authority of producer to register
@@ -503,20 +527,6 @@ namespace sysiosystem {
          void limitauthchg( const name& account, const std::vector<name>& allow_perms, const std::vector<name>& disallow_perms );
 
          /**
-          * Expand the authority of a permission by adding keys and/or account permissions.
-          * Can only be called by the system contract itself (privileged).
-          *
-          * @param account - the account whose permission to expand
-          * @param permission - the permission name to expand
-          * @param keys - vector of key_weight entries to add
-          * @param accounts - vector of permission_level_weight entries to add
-          */
-         [[sysio::action]]
-         void expandauth( const name& account, const name& permission,
-                          const std::vector<key_weight>& keys,
-                          const std::vector<permission_level_weight>& accounts );
-
-         /**
           * On Link Auth notify to catch auth.ext stuff for sig-em
           */
          [[sysio::on_notify("auth.msg::onlinkauth")]]
@@ -650,7 +660,6 @@ namespace sysiosystem {
          using setpriv_action = sysio::action_wrapper<"setpriv"_n, &system_contract::setpriv>;
          using setalimits_action = sysio::action_wrapper<"setalimits"_n, &system_contract::setalimits>;
          using setparams_action = sysio::action_wrapper<"setparams"_n, &system_contract::setparams>;
-         using expandauth_action = sysio::action_wrapper<"expandauth"_n, &system_contract::expandauth>;
 
       private:
          // Implementation details:
