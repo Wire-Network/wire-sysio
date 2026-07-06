@@ -26,9 +26,6 @@ cmdError = Utils.cmdError
 producerNodes = 21
 producerCountInEachNode = 1
 totalNodes = producerNodes
-# The 7-finalizer bootstrap action can exceed the default generated-genesis CPU budget on slower macOS arm64 runners.
-autoBpGossipMaxBlockCpuUsage = 1000000
-autoBpGossipMaxTransactionCpuUsage = 900000
 
 # Parse command line arguments
 args = TestHelper.parse_args({
@@ -97,8 +94,6 @@ try:
         topo="./tests/auto_bp_peering_test_shape.json",
         extraNodeopArgs=extraNodeopArgs,
         specificExtraNodeopArgs=specificNodeopArgs,
-        maxBlockCpuUsage=autoBpGossipMaxBlockCpuUsage,
-        maxTransactionCpuUsage=autoBpGossipMaxTransactionCpuUsage,
     ):
         errorExit("Failed to stand up cluster.")
 

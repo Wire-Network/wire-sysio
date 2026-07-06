@@ -14,6 +14,8 @@ class Transactions(NodeopQueries):
     retry_num_blocks_default = 1
     # Default clio action-push subprocess timeout, in seconds, used to bound a stuck push.
     push_message_timeout_default = 45
+    # Default number of clio action-push attempts for transient subjective CPU overages.
+    push_message_cpu_retry_attempts_default = 5
 
     def __init__(self, host, port, walletMgr=None):
         super().__init__(host, port, walletMgr)
@@ -264,10 +266,13 @@ class Transactions(NodeopQueries):
 
     # returns tuple with transaction execution status and transaction
     def pushMessage(self, account, action, data, opts, silentErrors=False, signatures=None, expectTrxTrace=True,
-                    timeout=None):
-        """Push an action with clio, bounding the clio subprocess runtime by default."""
+                    timeout=None, cpuRetryAttempts=None):
+        """Push an action with clio, retrying transient subjective CPU failures."""
         if timeout is None:
             timeout = self.push_message_timeout_default
+        if cpuRetryAttempts is None:
+            cpuRetryAttempts = self.push_message_cpu_retry_attempts_default
+        assert(isinstance(cpuRetryAttempts, int) and cpuRetryAttempts > 0)
         cmd="%s %s push action -j %s %s" % (Utils.SysClientPath, self.sysClientArgs(), account, action)
         cmdArr=cmd.split()
         # not using sign_str, since cmdArr messes up the string
@@ -279,7 +284,7 @@ class Transactions(NodeopQueries):
         if opts is not None:
             cmdArr += opts.split()
         if Utils.Debug: Utils.Print("cmd: %s" % (cmdArr))
-        retries = 5
+        retries = cpuRetryAttempts
         start=time.perf_counter()
         while retries > 0:
             retries -= 1

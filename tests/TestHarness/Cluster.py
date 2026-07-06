@@ -67,9 +67,7 @@ class Cluster(object):
     __finalizerCatchupMaxLagBlocks=2
     __finalizerCatchupStableRounds=3
     __finalizerCatchupReportInterval=5
-    # Default generated-genesis CPU limits used by Cluster.launch.
-    __defaultMaxBlockCpuUsage=400000
-    __defaultMaxTransactionCpuUsage=375000
+    __setFinalizerCpuRetryAttempts=30
 
     # pylint: disable=too-many-arguments
     def __init__(self, localCluster=True, host="localhost", port=None, walletHost="localhost", walletPort=None
@@ -211,8 +209,7 @@ class Cluster(object):
                activateIF=False, biosFinalizer=True,
                signatureProviderForNonProducer=False,
                nodeopLogPath=Path(Utils.TestLogRoot) / Path(f'{Path(sys.argv[0]).stem}{os.getpid()}'), genesisPath=None,
-               maximumP2pPerHost=0, maximumClients=25, prodsEnableTraceApi=True,
-               maxBlockCpuUsage=None, maxTransactionCpuUsage=None):
+               maximumP2pPerHost=0, maximumClients=25, prodsEnableTraceApi=True):
         """Launch cluster.
         pnodes: producer nodes count
         unstartedNodes: non-producer nodes that are configured into the launch, but not started.  Should be included in totalNodes.
@@ -241,8 +238,6 @@ class Cluster(object):
         maximumP2pPerHost:  Maximum number of client nodes from any single IP address. Defaults to totalNodes if not set.
         maximumClients: Maximum number of clients from which connections are accepted, use 0 for no limit. Defaults to 25.
         prodsEnableTraceApi: Determines whether producer nodes should have sysio::trace_api_plugin enabled. Defaults to True.
-        maxBlockCpuUsage: Override generated genesis max_block_cpu_usage when genesisPath is not supplied.
-        maxTransactionCpuUsage: Override generated genesis max_transaction_cpu_usage when genesisPath is not supplied.
         """
         assert(isinstance(topo, str))
         assert PFSetupPolicy.isValid(pfSetupPolicy)
@@ -363,14 +358,10 @@ class Cluster(object):
             argsArr.append(nodeopArgs)
 
         if genesisPath is None:
-            if maxBlockCpuUsage is None:
-                maxBlockCpuUsage = Cluster.__defaultMaxBlockCpuUsage
-            if maxTransactionCpuUsage is None:
-                maxTransactionCpuUsage = Cluster.__defaultMaxTransactionCpuUsage
             argsArr.append("--max-block-cpu-usage")
-            argsArr.append(str(maxBlockCpuUsage))
+            argsArr.append(str(400000))
             argsArr.append("--max-transaction-cpu-usage")
-            argsArr.append(str(maxTransactionCpuUsage))
+            argsArr.append(str(375000))
         else:
             argsArr.append("--genesis")
             argsArr.append(str(genesisPath))
@@ -1145,6 +1136,7 @@ class Cluster(object):
 
     # finalizerNames specifies non-default finalizer name for each node
     def setFinalizers(self, nodes, node=None, finalizerNames=None):
+        """Set the active finalizer policy, retrying transient CPU overages during bootstrap."""
         # finalizerNames, if present, must specify finalizer names for all the nodes
         assert(finalizerNames is None or len(nodes) == len(finalizerNames))
         if node is None:
@@ -1171,15 +1163,8 @@ class Cluster(object):
         if Utils.Debug: Utils.Print("setfinalizers: %s" % (setFinStr))
         Utils.Print("Setting finalizers")
         opts = "--permission sysio@active"
-        # setfinalizer can fail on ci/cd because it required too much CPU, try a few times
-        retries = 3
-        while retries > 0:
-            trans = node.pushMessage("sysio", "setfinalizer", setFinStr, opts)
-            if trans is None or not trans[0]:
-                retries = retries - 1
-                continue
-            else:
-                break
+        trans = node.pushMessage("sysio", "setfinalizer", setFinStr, opts,
+                                 cpuRetryAttempts=Cluster.__setFinalizerCpuRetryAttempts)
         if trans is None or not trans[0]:
             Utils.Print("ERROR: Failed to set finalizers")
             return None
