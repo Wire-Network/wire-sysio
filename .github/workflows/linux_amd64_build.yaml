@@ -40,6 +40,44 @@ defaults:
     shell: bash
 
 jobs:
+  root-node-tooling:
+    name: Root Node tooling audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: package.json
+
+      - name: Validate root pnpm lockfile
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
+      - name: Audit root pnpm dependencies
+        run: pnpm audit --audit-level=moderate
+
+      - name: Load plop generators
+        run: |
+          node <<'NODE'
+          const plopfile = require("./plopfile.js")
+          const calls = { generators: [] }
+          const plop = {
+            setActionType() {},
+            setHelper() {},
+            setGenerator(name) { calls.generators.push(name) }
+          }
+          plopfile(plop)
+          const expected = ["create-cxx-library", "create-cxx-plugin"]
+          const missing = expected.filter(name => !calls.generators.includes(name))
+          if (missing.length) {
+            throw new Error(`Missing plop generators: ${missing.join(", ")}`)
+          }
+          NODE
+
   platform-cache:
     name: Platform Cache
     uses: Wire-Network/platform-cache-workflow/.github/workflows/platformcache.yaml@v2
