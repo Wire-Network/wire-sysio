@@ -1,8 +1,6 @@
 #pragma once
 
-#include <map>
 #include <memory>
-#include <mutex>
 #include <optional>
 #include <string>
 #include <vector>
@@ -23,16 +21,11 @@ inline constexpr size_t SOLANA_MAX_ENVELOPE_BYTES = OPP_MAX_ENVELOPE_BYTES;
 
 /// Per-`epoch_in` chunk payload limit. Mirrors `MAX_CHUNK_BYTES` on the
 /// Solana side. Solana's tx-packet MTU is 1 232 B raw. Tx overhead at the
-/// current 12-account / 1-ix shape is ~492 B. The FINAL chunk tx also
-/// carries one ComputeBudget `request_heap_frame(256_000)` pre-ix (~40 B
-/// for the ComputeBudget program key + ix wrapper) so the consensus-reach
-/// finalize path gets a 256 KiB BPF heap budget instead of the 32 KiB
-/// default that OOM'd at epoch 13. Budget:
-///     492 (overhead) + 40 (last-chunk pre-ix) + chunk_size ≤ 1232
-///     → chunk_size ≤ 700; rounded down to 672 for a comfortable
-///     32-byte safety margin against future ABI / varint slop.
-/// Was 704 (no pre-ixs) and 768 before that (when `EpochIn` had 7
-/// accounts pre-Task 54).
+/// current full data-chunk shape is fixture-measured and must stay <= 1 232 B.
+/// Finalization happens in a separate zero-data terminal call, so data chunks
+/// do not reserve packet space for dynamic effect accounts. If the static
+/// `epoch_in` account list changes, the SEC-94 fixture/parity test must be
+/// regenerated and will catch any packet overflow.
 inline constexpr size_t SOLANA_MAX_CHUNK_BYTES = 672;
 
 /**
@@ -81,15 +74,17 @@ public:
    const fc::network::solana::solana_public_key& program_id()            const { return _program_id; }
 
 private:
-   /// Resolve `token_code` → SPL mint pubkey via the on-chain
-   /// `OutpostConfig.token_addresses_by_code` table. Returns
-   /// `std::nullopt` for unknown codes OR for native-marker mints
-   /// (`NATIVE_TOKEN_MARKER`, the all-zeroes pubkey the program
-   /// stamps for native-SOL token bindings). Lazy-initialises the
-   /// cache from the chain on first call; subsequent calls hit the
-   /// in-memory map. Thread-safe via `_token_address_mutex`.
-   std::optional<fc::network::solana::solana_public_key>
-   spl_mint_for_token_code(uint64_t token_code);
+   struct reserve_terminal_info {
+      fc::network::solana::solana_public_key creator;
+      fc::network::solana::solana_public_key custody_mint;
+      uint8_t                                custody_decimals = 0;
+   };
+
+   /// Resolve the pinned terminal-finalization facts stored on a per-reserve
+   /// PDA. Reserve-backed effects must not infer native-vs-SPL or decimals
+   /// from mutable `OutpostConfig` rows after the reserve has been created.
+   std::optional<reserve_terminal_info>
+   reserve_info_for_codes(uint64_t token_code, uint64_t reserve_code);
 
    solana_client_entry_ptr                       _entry;
    fc::network::solana::solana_public_key        _program_id;
@@ -97,21 +92,17 @@ private:
    uint64_t                                      _outpost_id;
    uint32_t                                      _chain_id;
 
-   /// Lazy cache populated from `OutpostConfig.token_addresses_by_code`
-   /// on first SPL-targeted SwapRemit. Mint pubkey is keyed by the 8-
-   /// byte `slug_name` integer (e.g. `SlugName.from("USDCSOL")`).
-   /// Empty optional values are stored to remember misses without
-   /// re-querying the chain.
-   std::map<uint64_t,
-            std::optional<fc::network::solana::solana_public_key>>
-                                                 _mint_by_token_code;
-   bool                                          _token_address_cache_loaded {false};
-   std::mutex                                    _token_address_mutex;
 };
 
 using outpost_solana_client_ptr = std::shared_ptr<outpost_solana_client>;
 
 namespace outpost_solana_client_detail {
+
+/// Append `key` to `metas`, or merge its writable flag into the existing
+/// entry when an earlier terminal effect already required the same account.
+void record_terminal_account(std::vector<fc::network::solana::account_meta>& metas,
+                             const fc::network::solana::solana_public_key& key,
+                             bool is_writable);
 
 /// Decode an inbound envelope and return the deduplicated set of
 /// 32-byte Solana pubkeys that the on-chain `epoch_in` handler will
@@ -144,18 +135,19 @@ extract_inbound_recipient_pubkeys(const std::vector<char>& envelope_bytes);
 /// by the SWAP_REMIT remaining-accounts path: the cranker walks inbound
 /// SWAP_REMIT attestations, collects every (token_code, reserve_code)
 /// pair, and the caller derives + appends the corresponding Reserve
-/// PDA(s) past the IDL's declared accounts on the final-chunk
+/// PDA(s) past the IDL's declared accounts on the zero-data terminal
 /// `epoch_in` submission. Without this the on-chain `handle_swap_remit`
-/// can't `find_remaining_account` the Reserve PDA and queues
-/// SWAP_REJECTED instead of paying the recipient.
+/// can't `find_remaining_account` the Reserve PDA and logs the unpaid remit
+/// instead of paying the recipient.
 struct reserve_pda_seeds {
    uint64_t token_code;
    uint64_t reserve_code;
 };
 
 /// Walk every Reserve-PDA-consuming attestation in `envelope_bytes` —
-/// `SWAP_REMIT`, `RESERVE_READY`, and `RESERVE_CREATE_CANCELLED` — and
-/// collect the (token_code, reserve_code) pair for each (deduped).
+/// `SWAP_REMIT`, `SWAP_REVERT`, `RESERVE_READY`, and
+/// `RESERVE_CREATE_CANCELLED` — and collect the (token_code, reserve_code)
+/// pair for each (deduped).
 /// Caller derives the Reserve PDA via Anchor's `find_program_address`
 /// with the `[RESERVE_SEED, &token_code.to_le_bytes(),
 /// &reserve_code.to_le_bytes()]` seed list against the program id.
@@ -164,6 +156,14 @@ struct reserve_pda_seeds {
 /// the lifecycle types are first-class here, not best-effort.
 std::vector<reserve_pda_seeds>
 extract_inbound_swap_remit_reserve_seeds(const std::vector<char>& envelope_bytes);
+
+/// Walk every `RESERVE_CREATE_CANCELLED` attestation in `envelope_bytes`
+/// and collect each unique reserve PDA seed pair. The terminal manifest
+/// uses this narrower extractor after the Reserve PDA has been declared so
+/// it can append branch-specific refund/vault accounts from pinned reserve
+/// metadata.
+std::vector<reserve_pda_seeds>
+extract_inbound_reserve_create_cancelled_seeds(const std::vector<char>& envelope_bytes);
 
 /// Tuple of (token_code, reserve_code, recipient) pulled from every
 /// inbound SWAP_REMIT attestation in the envelope. The relay uses this
@@ -188,6 +188,11 @@ struct swap_remit_spl_target {
 std::vector<swap_remit_spl_target>
 extract_inbound_swap_remit_spl_targets(const std::vector<char>& envelope_bytes);
 
+/// Walk every `SWAP_REVERT` attestation in `envelope_bytes` and collect the
+/// SPL-relevant tuple. The `recipient` field carries the depositor pubkey,
+/// because the SPL revert branch refunds into the depositor's ATA.
+std::vector<swap_remit_spl_target>
+extract_inbound_swap_revert_spl_targets(const std::vector<char>& envelope_bytes);
 
 } // namespace outpost_solana_client_detail
 
