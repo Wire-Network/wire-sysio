@@ -27,7 +27,7 @@ namespace sysio {
       /// against the LAST IRREVERSIBLE block's time — the state the plugin's
       /// table reads actually serve (operator daemons run read-mode =
       /// irreversible). Gates the deferred startup (preflight → cron) on
-      /// cold-booting operator nodes; see `sync_detail.hpp::head_is_recent`.
+      /// cold-booting operator nodes; see `sync_detail.hpp::block_time_is_recent`.
       /// Must exceed steady-state finality lag (a few blocks) and stay well
       /// under one epoch.
       constexpr uint32_t sync_recency_ms     = 5000;
