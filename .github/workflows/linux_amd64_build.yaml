@@ -115,23 +115,25 @@ jobs:
             ccache-${{ matrix.platform }}-
 
       - name: Download Wire CDT package for release tag
-        id: wire-cdt-package
         if: ${{ startsWith(github.ref, 'refs/tags/v') }}
-        uses: AntelopeIO/asset-artifact-download-action@v3
+        uses: actions/download-artifact@v8.0.1
         with:
-          owner: Wire-Network
-          repo: wire-cdt
-          file: 'cdt_.*_amd64.deb'
-          target: ${{ needs.v.outputs.cdt-target }}
-          prereleases: ${{ needs.v.outputs.cdt-prerelease }}
-          artifact-name: cdt_ubuntu_package_amd64
-          token: ${{ secrets.GH_TOKEN_DEV }}
-          wait-for-exact-target: true
+          name: cdt_ubuntu_package_amd64
+          path: cdt-package
+          github-token: ${{ secrets.GH_TOKEN_DEV }}
+          repository: Wire-Network/wire-cdt
+          run-id: ${{ needs.v.outputs.cdt-artifact-run-id }}
 
       - name: Install Wire CDT package for release tag
         if: ${{ startsWith(github.ref, 'refs/tags/v') }}
         run: |
-          bash .github/scripts/install-wire-cdt-package.sh "${{ steps.wire-cdt-package.outputs.downloaded-file }}"
+          cdt_deb="$(find cdt-package -type f -name 'cdt_*_amd64.deb' -print -quit)"
+          if [[ -z "$cdt_deb" ]]; then
+            echo "::error::No Wire CDT Debian package was downloaded."
+            find cdt-package -maxdepth 3 -type f -print || true
+            exit 1
+          fi
+          bash .github/scripts/install-wire-cdt-package.sh "$cdt_deb"
 
       - name: Build
         id: build
@@ -302,6 +304,7 @@ jobs:
     outputs:
       cdt-target: ${{steps.versions.outputs.cdt-target}}
       cdt-prerelease: ${{steps.versions.outputs.cdt-prerelease}}
+      cdt-artifact-run-id: ${{steps.cdt-artifact.outputs.run-id}}
       wire-system-contracts-ref: ${{steps.versions.outputs.wire-system-contracts-ref}}
     steps:
       - name: Setup wire-cdt and wire-system-contracts versions
@@ -347,6 +350,68 @@ jobs:
           if [[ -n "$OVERRIDE_SYS_SYSTEM_CONTRACTS" ]]; then
             echo "wire-system-contracts-ref=$OVERRIDE_SYS_SYSTEM_CONTRACTS" >> "$GITHUB_OUTPUT"
           fi
+
+      - name: Resolve Wire CDT package artifact run
+        id: cdt-artifact
+        if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+        env:
+          GH_TOKEN: ${{secrets.GH_TOKEN_DEV}}
+          CDT_TARGET: ${{steps.versions.outputs.cdt-target}}
+        run: |
+          set -euo pipefail
+
+          cdt_ref="$CDT_TARGET"
+          if [[ "$cdt_ref" =~ ^[0-9]+\.[0-9]+\.[0-9]+([-+._A-Za-z0-9]*)?$ ]]; then
+            cdt_ref="v$cdt_ref"
+          fi
+
+          cdt_sha="$(gh api "repos/Wire-Network/wire-cdt/commits/${cdt_ref}" --jq .sha)"
+          echo "Resolved Wire CDT target ${CDT_TARGET} to ${cdt_sha}"
+
+          for attempt in {1..30}; do
+            runs_json="$(gh api "repos/Wire-Network/wire-cdt/actions/workflows/build.yaml/runs?head_sha=${cdt_sha}&event=push&per_page=10")"
+            run_id="$(
+              jq -r '.workflow_runs[]
+                | select(.status == "completed" and .conclusion == "success")
+                | .id' <<<"$runs_json" |
+                head -n 1
+            )"
+
+            if [[ -n "$run_id" ]]; then
+              artifact_id="$(
+                gh api "repos/Wire-Network/wire-cdt/actions/runs/${run_id}/artifacts" \
+                  --jq '.artifacts[]
+                    | select(.name == "cdt_ubuntu_package_amd64" and .expired == false)
+                    | .id' |
+                  head -n 1
+              )"
+              if [[ -n "$artifact_id" ]]; then
+                echo "run-id=$run_id" >> "$GITHUB_OUTPUT"
+                echo "Resolved Wire CDT artifact run ${run_id}"
+                exit 0
+              fi
+
+              echo "::error::Wire CDT build run ${run_id} did not publish a non-expired cdt_ubuntu_package_amd64 artifact" >&2
+              exit 1
+            fi
+
+            failed_run_url="$(
+              jq -r '.workflow_runs[]
+                | select(.status == "completed" and .conclusion != "success")
+                | .html_url' <<<"$runs_json" |
+                head -n 1
+            )"
+            if [[ -n "$failed_run_url" ]]; then
+              echo "::error::Wire CDT build run for ${cdt_sha} did not succeed: ${failed_run_url}" >&2
+              exit 1
+            fi
+
+            echo "Waiting for Wire CDT package artifact for ${cdt_sha} (attempt ${attempt}/30)"
+            sleep 60
+          done
+
+          echo "::error::Timed out waiting for Wire CDT package artifact for ${cdt_sha}" >&2
+          exit 1
 
   all-passing:
     name: All Required Tests Passed
