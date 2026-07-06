@@ -346,7 +346,10 @@ BOOST_AUTO_TEST_CASE(sec94_terminal_budget_fixture_matches_contract_estimator) t
 
    const auto data_chunk_measured = measure_data_chunk_epoch_in_transaction(*epoch_in, fixture);
    check_measurement_matches_fixture(data_chunk_measured, fixture["data_chunk"].get_object());
-   BOOST_CHECK_LE(data_chunk_measured.packet_bytes + sysio::msgch_svm_terminal_budget::SVM_DYNAMIC_ACCOUNT_PACKET_BYTES,
+   // Data chunks do not carry terminal remaining_accounts. The hard invariant
+   // is that the measured full data-chunk packet fits Solana's raw MTU; future
+   // static IDL/account-list drift must update this fixture and keep fitting.
+   BOOST_CHECK_LE(data_chunk_measured.packet_bytes,
                   sysio::msgch_svm_terminal_budget::SVM_TERMINAL_PACKET_LIMIT_BYTES);
 
    const auto static_measured = measure_terminal_epoch_in_transaction(*epoch_in, fixture, 0);
@@ -418,17 +421,17 @@ BOOST_AUTO_TEST_CASE(envelope_chunk_count_math) try {
    BOOST_CHECK_EQUAL(epoch_in_calls_for(sysio::SOLANA_MAX_CHUNK_BYTES + 1), 3u);
    BOOST_CHECK_EQUAL(chunks_for(2 * sysio::SOLANA_MAX_CHUNK_BYTES), 2u);
    // dev-026 captured 2,526-byte envelope (groups-of-7 batch op delivery).
-   BOOST_CHECK_EQUAL(chunks_for(2526), 4u);   // 2526/640 = 3.95 -> 4
-   // 64 KiB cap: ceil(65 536 / 640) = 103 chunks. Last chunk is 256 B
-   // (65_536 mod 640 = 256), the first 102 are full at MAX_CHUNK_BYTES.
-   BOOST_CHECK_EQUAL(chunks_for(sysio::SOLANA_MAX_ENVELOPE_BYTES), 103u);
-   BOOST_CHECK_EQUAL(epoch_in_calls_for(sysio::SOLANA_MAX_ENVELOPE_BYTES), 104u);
-   BOOST_CHECK_EQUAL(sysio::SOLANA_MAX_ENVELOPE_BYTES % sysio::SOLANA_MAX_CHUNK_BYTES, 256u);
+   BOOST_CHECK_EQUAL(chunks_for(2526), 4u);   // 2526/672 = 3.75 -> 4
+   // 64 KiB cap: ceil(65 536 / 672) = 98 chunks. Last chunk is 352 B
+   // (65_536 mod 672 = 352), the first 97 are full at MAX_CHUNK_BYTES.
+   BOOST_CHECK_EQUAL(chunks_for(sysio::SOLANA_MAX_ENVELOPE_BYTES), 98u);
+   BOOST_CHECK_EQUAL(epoch_in_calls_for(sysio::SOLANA_MAX_ENVELOPE_BYTES), 99u);
+   BOOST_CHECK_EQUAL(sysio::SOLANA_MAX_ENVELOPE_BYTES % sysio::SOLANA_MAX_CHUNK_BYTES, 352u);
 
    // Last-chunk size at the dev-026 reproduction: the loop fills the first
-   // 3 chunks at MAX_CHUNK_BYTES (= 640) and the last with the remainder.
+   // 3 chunks at MAX_CHUNK_BYTES (= 672) and the last with the remainder.
    const size_t last_chunk_size = 2526 - 3 * sysio::SOLANA_MAX_CHUNK_BYTES;
-   BOOST_CHECK_EQUAL(last_chunk_size, 606u);   // 2526 - 1920 = 606
+   BOOST_CHECK_EQUAL(last_chunk_size, 510u);   // 2526 - 2016 = 510
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(opp_outpost_emit_has_wire_epoch_arg) try {
