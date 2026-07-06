@@ -79,6 +79,27 @@ namespace sysio {
       // requirement; covers SETTLED, REVERTED, EXPIRED uwreqs alike.
       static constexpr uint32_t UWREQ_RETENTION_EPOCHS = 10;
 
+      // Safety rails on the depot-originated swap-from-WIRE queue (SEC-77 /
+      // WSA-165). `swapfromwire` is public and escrows only the caller's WIRE,
+      // so without bounds a caller could split real WIRE into an unbounded
+      // number of system-paid `fwqueue` rows and force `drainfwq` to process
+      // them all inside one `sysio.epoch::advance` transaction. That
+      // transaction's CPU budget (~150 ms) is a hard, uncatchable deadline, so
+      // an oversized queue would abort every advance and permanently stall
+      // epoch progress chain-wide.
+      //
+      // MAX_FWQ_DRAIN_PER_EPOCH bounds the rows drained per advance; undrained
+      // rows stay queued (escrow safe in reserve custody) and drain a later
+      // epoch, converting a potential halt into bounded drain latency.
+      // Ingress is already throttled economically — every `swapfromwire` is a
+      // `require_auth(user)` transaction that bills the caller CPU/NET and
+      // escrows real WIRE per row — so the drain bound alone is the liveness
+      // rail; there is no per-caller row cap. Conservatively sized to stay well
+      // under the transaction CPU ceiling shared with chklocks / buildenv /
+      // emissions; raise it (contract upgrade) only if legitimate from-WIRE
+      // throughput approaches the bound.
+      static constexpr uint32_t MAX_FWQ_DRAIN_PER_EPOCH = 32;
+
       // Maximum accepted swap fee, in basis points. A 100% fee (10000 bps)
       // would zero the post-fee WIRE leg of every swap (`net == 0` in
       // `opp::amm::split_wire_fee`), which let a from-WIRE or token-to-token

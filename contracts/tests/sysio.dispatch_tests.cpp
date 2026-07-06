@@ -2156,4 +2156,75 @@ BOOST_FIXTURE_TEST_CASE(releaselock_clamps_overdrain_without_aborting,
    BOOST_REQUIRE_EQUAL(0u, find_balance(op, "ETH", "ETH")["balance"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
+// SEC-77 / WSA-165: drainfwq drains at most MAX_FWQ_DRAIN_PER_EPOCH swap-from-WIRE rows per advance,
+// so a caller cannot split escrowed WIRE into enough queued rows to blow the transaction CPU deadline
+// advance shares with the rest of its fan-out and stall epoch progress chain-wide. The remainder stays
+// queued (escrow safe in reserve custody) and drains on the next advance. This is also the first
+// end-to-end coverage of drainfwq draining a populated queue: the bounded front-read FIFO loop, and
+// that a second drain resumes where the first stopped.
+BOOST_FIXTURE_TEST_CASE(drainfwq_bounds_rows_per_epoch, sysio_dispatch_tester) { try {
+   // Mirror of the contract-internal cap (contract headers are not host-compilable, same convention
+   // as the msgch size-cap tests). Keep in sync with sysio.uwrit.hpp::MAX_FWQ_DRAIN_PER_EPOCH.
+   constexpr uint32_t MAX_FWQ_DRAIN_PER_EPOCH = 32;
+   constexpr uint32_t N = MAX_FWQ_DRAIN_PER_EPOCH + 8;              // 40 > one epoch's drain budget
+   constexpr uint64_t DEPOT_ORIGIN_ID_BASE = 0x8000000000000000ull; // fwqueue id = base | seq
+
+   bootstrap_for_dispatch();            // registers the ETH (EVM) outpost + epoch machinery
+   setup_wire_token_and_reserves();     // sysio.token + ACTIVE public ETH/ETH/PRIMARY reserve
+   register_wire_depot();               // so drainfwq's depot_chain_code() resolves
+   BOOST_REQUIRE_EQUAL(success(), push(UWRIT_ACCOUNT, uwrit_abi, UWRIT_ACCOUNT, "setconfig"_n, mvo()
+      ("fee_bps", 10)("collateral_lock_duration_ms", 120'000u)));
+
+   // A funded from-WIRE swap user (plain account, no ROA policy).
+   create_account("swapuser"_n, config::system_account_name, /*multisig=*/false,
+                  /*include_code=*/true, /*include_roa_policy=*/false);
+   BOOST_REQUIRE_EQUAL(success(), push(TOKEN_ACCOUNT, token_abi, config::system_account_name,
+      "transfer"_n, mvo()("from", "sysio")("to", "swapuser")
+         ("quantity", "1000.000000000 WIRE")("memo", "fund swap user")));
+
+   // Queue N from-WIRE swaps. wire_amount varies (1e6 + i) so each is a distinct transaction AND
+   // prices to a positive quote (rows take drainfwq's uwreq-emplace path, not the refund path); the
+   // exact amount is otherwise irrelevant to the bound. target_amount + 100% tolerance keep every
+   // row within variance so none refund.
+   for (uint32_t i = 0; i < N; ++i) {
+      BOOST_REQUIRE_EQUAL(success(),
+         push(UWRIT_ACCOUNT, uwrit_abi, "swapuser"_n, "swapfromwire"_n, mvo()
+            ("user",                 "swapuser")
+            ("wire_amount",          uint64_t{1'000'000} + i)
+            ("dst_chain_code",       codename_mvo("ETH"))
+            ("dst_token_code",       codename_mvo("ETH"))
+            ("dst_reserve_code",     codename_mvo("PRIMARY"))
+            ("target_amount",        uint64_t{1'000'000})
+            ("target_tolerance_bps", uint32_t{10000})
+            ("recipient_kind",       sysio::opp::types::ChainKind::CHAIN_KIND_EVM)
+            ("recipient_addr",       std::vector<char>(20, '\x0a'))));
+   }
+
+   auto get_fwqueue = [&](uint64_t id) -> fc::variant {
+      auto data = get_row_by_id(UWRIT_ACCOUNT, UWRIT_ACCOUNT, "fwqueue"_n, id);
+      return data.empty() ? fc::variant() : uwrit_abi.binary_to_variant(
+         "fromwire_q", data, abi_serializer::create_yield_function(abi_serializer_max_time));
+   };
+   auto count_queued = [&]() {
+      uint32_t n = 0;
+      for (uint32_t s = 0; s < N; ++s)
+         if (!get_fwqueue(DEPOT_ORIGIN_ID_BASE | s).is_null()) ++n;
+      return n;
+   };
+   BOOST_REQUIRE_EQUAL(N, count_queued());
+
+   // One drain processes exactly MAX_FWQ_DRAIN_PER_EPOCH rows; the remainder stays queued.
+   BOOST_REQUIRE_EQUAL(success(),
+      push(UWRIT_ACCOUNT, uwrit_abi, EPOCH_ACCOUNT, "drainfwq"_n, mvo()));
+   BOOST_REQUIRE_EQUAL(N - MAX_FWQ_DRAIN_PER_EPOCH, count_queued());
+
+   // Cross a block boundary so the second drain is a distinct transaction — an identical action in
+   // the same block is rejected as a duplicate before the contract runs, masking the guard under test.
+   produce_blocks();
+   // The next drain resumes where the first stopped and clears the rest.
+   BOOST_REQUIRE_EQUAL(success(),
+      push(UWRIT_ACCOUNT, uwrit_abi, EPOCH_ACCOUNT, "drainfwq"_n, mvo()));
+   BOOST_REQUIRE_EQUAL(0u, count_queued());
+} FC_LOG_AND_RETHROW() }
+
 BOOST_AUTO_TEST_SUITE_END()

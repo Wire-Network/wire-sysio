@@ -1624,16 +1624,27 @@ void uwrit::drainfwq() {
          "drainfwq requires sysio.epoch or sysio.uwrit authority");
 
    fwqueue_t q(get_self());
-   std::vector<fromwire_q> rows;
-   for (auto it = q.begin(); it != q.end(); ++it) {
-      rows.push_back(*it);
-   }
-   if (rows.empty()) return;
-
    uwreqs_t reqs(get_self());
    const auto depot_code = depot_chain_code();
 
-   for (const auto& row : rows) {
+   // Bounded FIFO drain (SEC-77): process at most MAX_FWQ_DRAIN_PER_EPOCH rows
+   // per advance, oldest first (primary-key = id order). Every branch of the
+   // loop body erases the front row, so re-reading `q.begin()` each iteration
+   // walks the queue forward and the next advance resumes where this one
+   // stopped; undrained rows keep their WIRE escrow in reserve custody and
+   // drain a later epoch. Bounding this loop is what keeps `advance` inside its
+   // hard, uncatchable CPU deadline: an unbounded drain over an attacker-
+   // inflated queue would abort every advance and stall epoch progress chain-
+   // wide. `drained` is incremented before any of the per-row `continue`
+   // branches, so it counts every attempt (refund-and-drop included). Reading
+   // only the front row (not a full-table pre-copy) also bounds the scan cost.
+   uint32_t drained = 0;
+   while (drained < MAX_FWQ_DRAIN_PER_EPOCH) {
+      auto head = q.begin();
+      if (head == q.end()) break;
+      const auto row = *head;
+      ++drained;
+
       auto refund_and_drop = [&](const char* why) {
          sysio::print("drainfwq: ", why, " — refunding queued swap ", row.id, "\n");
          action(
