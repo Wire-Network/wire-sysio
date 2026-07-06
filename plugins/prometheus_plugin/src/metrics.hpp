@@ -10,6 +10,13 @@
 #include <prometheus/registry.h>
 #include <prometheus/text_serializer.h>
 #include <fc/log/logger.hpp>
+
+#include <string>
+#include <unordered_map>
+#include <unordered_set>
+#include <utility>
+#include <vector>
+
 namespace sysio::metrics {
 
 struct catalog_type {
@@ -44,7 +51,6 @@ struct catalog_type {
       Gauge& num_peers;
       Gauge& num_clients;
 
-      prometheus::Family<Gauge>& addr; // Empty gauge; ipv6 address can't be transmitted as a double
       prometheus::Family<Gauge>& port;
       prometheus::Family<Gauge>& connection_number;
       prometheus::Family<Gauge>& accepting_blocks;
@@ -62,9 +68,13 @@ struct catalog_type {
       prometheus::Family<Gauge>& block_sync_throttling;
       prometheus::Family<Gauge>& connection_start_time;
       prometheus::Family<Gauge>& peer_score;
-      prometheus::Family<Gauge>& peer_addr; // Empty gauge; we only want the label
    };
    p2p_connection_metrics p2p_metrics;
+
+   // Live per-connection gauge handles, keyed by "<remote_ip>|<connection_id>", so that when a connection
+   // leaves the net_plugin snapshot its series can be removed from every p2p family. Bounds registry growth
+   // from P2P connection churn. Only accessed on the prometheus update strand, so it needs no locking.
+   std::unordered_map<std::string, std::vector<std::pair<prometheus::Family<Gauge>*, Gauge*>>> tracked_p2p_series;
 
    prometheus::Family<Counter>& cpu_usage_us;
    prometheus::Family<Counter>& net_usage_us;
@@ -122,7 +132,6 @@ struct catalog_type {
        , p2p_metrics{
               .num_peers{build<Gauge>("nodeop_p2p_peers", "current number of connected outgoing peers")}
             , .num_clients{build<Gauge>("nodeop_p2p_clients", "current number of connected incoming clients")}
-            , .addr{family<Gauge>("nodeop_p2p_addr", "ipv6 address")}
             , .port{family<Gauge>("nodeop_p2p_port", "port")}
             , .connection_number{family<Gauge>("nodeop_p2p_connection_number", "monatomic increasing connection number")}
             , .accepting_blocks{family<Gauge>("nodeop_p2p_accepting_blocks", "accepting blocks on connection")}
@@ -140,7 +149,6 @@ struct catalog_type {
             , .block_sync_throttling{family<Gauge>("nodeop_p2p_block_sync_throttling", "is block sync throttling currently active")}
             , .connection_start_time{family<Gauge>("nodeop_p2p_connection_start_time", "time of last connection to peer")}
             , .peer_score{family<Gauge>("nodeop_p2p_peer_score", "peer quality score")}
-            , .peer_addr{family<Gauge>("nodeop_p2p_peer_addr", "peer address")}
          }
        , cpu_usage_us(family<Counter>("nodeop_cpu_usage_us_total", "total cpu usage in microseconds for blocks"))
        , net_usage_us(family<Counter>("nodeop_net_usage_us_total", "total net usage in microseconds for blocks"))
@@ -205,16 +213,29 @@ struct catalog_type {
    void update(const net_plugin::p2p_connections_metrics& metrics) {
       p2p_metrics.num_peers.Set(metrics.num_peers);
       p2p_metrics.num_clients.Set(metrics.num_clients);
-      for(size_t i = 0; i < metrics.stats.peers.size(); ++i) {
-         const auto& peer = metrics.stats.peers[i];
-         const auto& conn_id = peer.unique_conn_node_id;
 
-         const auto addr = boost::asio::ip::make_address_v6(peer.address).to_string();
-         p2p_metrics.addr.Add({{"connid", conn_id},{"ipv6", addr},{"address", peer.p2p_address}});
+      // Per-connection series are keyed by {remote_ip, connection_id}: the real socket peer IP and the node's
+      // own monotonic connection counter. Both are observed locally, never values the remote peer supplies in
+      // its handshake, so a peer cannot inject arbitrary label text or inflate label cardinality by
+      // reconnecting with fresh node ids. Stale series are pruned below once a connection leaves the snapshot.
+      std::unordered_set<std::string> live_keys;
+      live_keys.reserve(metrics.stats.peers.size());
 
-         auto add_and_set_gauge = [&](auto& fam, const auto& value) {
-            auto& gauge = fam.Add({{"connid", conn_id}});
+      for (const auto& peer : metrics.stats.peers) {
+         const std::string remote_ip = boost::asio::ip::make_address_v6(peer.address).to_string();
+         const std::string conn_num  = std::to_string(peer.connection_id);
+         const std::string key       = remote_ip + '|' + conn_num;
+         live_keys.insert(key);
+
+         const prometheus::Labels labels{{"remote_ip", remote_ip}, {"connection_id", conn_num}};
+         auto&      handles    = tracked_p2p_series[key];
+         const bool first_seen = handles.empty();
+
+         auto add_and_set_gauge = [&](prometheus::Family<Gauge>& fam, const auto& value) {
+            auto& gauge = fam.Add(labels);
             gauge.Set(value);
+            if (first_seen)
+               handles.emplace_back(&fam, &gauge);
          };
 
          add_and_set_gauge(p2p_metrics.connection_number, peer.connection_id);
@@ -234,6 +255,18 @@ struct catalog_type {
          add_and_set_gauge(p2p_metrics.block_sync_throttling, peer.block_sync_throttling);
          add_and_set_gauge(p2p_metrics.connection_start_time, peer.connection_start_time.count());
          add_and_set_gauge(p2p_metrics.peer_score, peer.peer_score);
+      }
+
+      // Prune series for connections no longer present in the snapshot so peer-driven churn cannot accumulate
+      // stale per-connection labels in the registry.
+      for (auto it = tracked_p2p_series.begin(); it != tracked_p2p_series.end();) {
+         if (live_keys.count(it->first) == 0) {
+            for (auto& [fam, gauge] : it->second)
+               fam->Remove(gauge);
+            it = tracked_p2p_series.erase(it);
+         } else {
+            ++it;
+         }
       }
    }
 
