@@ -1,0 +1,584 @@
+{
+    "____comment": "This file was generated with sysio-abigen. DO NOT EDIT ",
+    "version": "sysio::abi/1.2",
+    "types": [],
+    "structs": [
+        {
+            "name": "addcandidate",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "handle",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "ballot_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "voter",
+                    "type": "name"
+                },
+                {
+                    "name": "v1",
+                    "type": "bool"
+                },
+                {
+                    "name": "v2",
+                    "type": "bool"
+                },
+                {
+                    "name": "v3",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "cand_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "candidate_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "handle",
+                    "type": "string"
+                },
+                {
+                    "name": "elected",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "config_state",
+            "base": "",
+            "fields": [
+                {
+                    "name": "initialized",
+                    "type": "bool"
+                },
+                {
+                    "name": "init_phase",
+                    "type": "uint8"
+                },
+                {
+                    "name": "reg_open",
+                    "type": "bool"
+                },
+                {
+                    "name": "time_slot_sec",
+                    "type": "uint64"
+                },
+                {
+                    "name": "network_gen",
+                    "type": "uint8"
+                },
+                {
+                    "name": "election_gen",
+                    "type": "uint64"
+                },
+                {
+                    "name": "n2",
+                    "type": "uint32"
+                },
+                {
+                    "name": "n3",
+                    "type": "uint32"
+                },
+                {
+                    "name": "t2_loaded",
+                    "type": "uint32"
+                },
+                {
+                    "name": "t3_loaded",
+                    "type": "uint32"
+                },
+                {
+                    "name": "cand_count",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "council_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "seat",
+                    "type": "uint64"
+                },
+                {
+                    "name": "seat_owner",
+                    "type": "name"
+                },
+                {
+                    "name": "filled_tier",
+                    "type": "uint8"
+                },
+                {
+                    "name": "proposer",
+                    "type": "name"
+                },
+                {
+                    "name": "member",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "election_state",
+            "base": "",
+            "fields": [
+                {
+                    "name": "phase",
+                    "type": "uint8"
+                },
+                {
+                    "name": "active_seat",
+                    "type": "uint8"
+                },
+                {
+                    "name": "tier",
+                    "type": "uint8"
+                },
+                {
+                    "name": "proposer",
+                    "type": "name"
+                },
+                {
+                    "name": "round_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "round_open_ts",
+                    "type": "time_point"
+                },
+                {
+                    "name": "vote_deadline",
+                    "type": "time_point"
+                },
+                {
+                    "name": "elect_N",
+                    "type": "uint64"
+                },
+                {
+                    "name": "eligible_voters",
+                    "type": "uint32"
+                },
+                {
+                    "name": "votes_cast",
+                    "type": "uint32"
+                },
+                {
+                    "name": "tried_count",
+                    "type": "uint32"
+                },
+                {
+                    "name": "seats_filled",
+                    "type": "uint8"
+                },
+                {
+                    "name": "c1",
+                    "type": "name"
+                },
+                {
+                    "name": "c2",
+                    "type": "name"
+                },
+                {
+                    "name": "c3",
+                    "type": "name"
+                },
+                {
+                    "name": "yes1",
+                    "type": "uint64"
+                },
+                {
+                    "name": "yes2",
+                    "type": "uint64"
+                },
+                {
+                    "name": "yes3",
+                    "type": "uint64"
+                },
+                {
+                    "name": "no1",
+                    "type": "uint64"
+                },
+                {
+                    "name": "no2",
+                    "type": "uint64"
+                },
+                {
+                    "name": "no3",
+                    "type": "uint64"
+                },
+                {
+                    "name": "acc",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "stir_count",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "finalizeinit",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "forceassign",
+            "base": "",
+            "fields": [
+                {
+                    "name": "member",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "index_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "idx",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "loadtier",
+            "base": "",
+            "fields": [
+                {
+                    "name": "tier",
+                    "type": "uint8"
+                },
+                {
+                    "name": "max_rows",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "repcandidate",
+            "base": "",
+            "fields": [
+                {
+                    "name": "proposer",
+                    "type": "name"
+                },
+                {
+                    "name": "c1",
+                    "type": "name"
+                },
+                {
+                    "name": "c2",
+                    "type": "name"
+                },
+                {
+                    "name": "c3",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "reset",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "rmcandidate",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "roster_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "idx",
+                    "type": "uint64"
+                },
+                {
+                    "name": "owner",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "settle",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "startinit",
+            "base": "",
+            "fields": [
+                {
+                    "name": "time_slot_sec",
+                    "type": "uint64"
+                },
+                {
+                    "name": "ordered_owners",
+                    "type": "name[]"
+                }
+            ]
+        },
+        {
+            "name": "stir",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tier2_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "idx",
+                    "type": "uint64"
+                },
+                {
+                    "name": "owner",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "tier3_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "idx",
+                    "type": "uint64"
+                },
+                {
+                    "name": "owner",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "tried_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "idx",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "vote",
+            "base": "",
+            "fields": [
+                {
+                    "name": "voter",
+                    "type": "name"
+                },
+                {
+                    "name": "v1",
+                    "type": "bool"
+                },
+                {
+                    "name": "v2",
+                    "type": "bool"
+                },
+                {
+                    "name": "v3",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "voter_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "voter",
+                    "type": "uint64"
+                }
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "name": "addcandidate",
+            "type": "addcandidate",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "finalizeinit",
+            "type": "finalizeinit",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "forceassign",
+            "type": "forceassign",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "loadtier",
+            "type": "loadtier",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "repcandidate",
+            "type": "repcandidate",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "reset",
+            "type": "reset",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "rmcandidate",
+            "type": "rmcandidate",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "settle",
+            "type": "settle",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "startinit",
+            "type": "startinit",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "stir",
+            "type": "stir",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "vote",
+            "type": "vote",
+            "ricardian_contract": ""
+        }
+    ],
+    "tables": [
+        {
+            "name": "ballots",
+            "type": "ballot_row",
+            "index_type": "i64",
+            "key_names": ["scope","voter"],
+            "key_types": ["name","uint64"],
+            "table_id": 23362
+        },
+        {
+            "name": "candidates",
+            "type": "candidate_row",
+            "index_type": "i64",
+            "key_names": ["scope","account"],
+            "key_types": ["name","uint64"],
+            "table_id": 37238
+        },
+        {
+            "name": "config",
+            "type": "config_state",
+            "index_type": "i64",
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 21143
+        },
+        {
+            "name": "council",
+            "type": "council_row",
+            "index_type": "i64",
+            "key_names": ["scope","idx"],
+            "key_types": ["name","uint64"],
+            "table_id": 39085
+        },
+        {
+            "name": "roster",
+            "type": "roster_row",
+            "index_type": "i64",
+            "key_names": ["scope","idx"],
+            "key_types": ["name","uint64"],
+            "table_id": 35108,
+            "secondary_indexes": [
+                {
+                    "name": "byowner",
+                    "key_type": "uint64",
+                    "table_id": 60639
+                }
+            ]
+        },
+        {
+            "name": "state",
+            "type": "election_state",
+            "index_type": "i64",
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 56269
+        },
+        {
+            "name": "tier2",
+            "type": "tier2_row",
+            "index_type": "i64",
+            "key_names": ["scope","idx"],
+            "key_types": ["name","uint64"],
+            "table_id": 25558,
+            "secondary_indexes": [
+                {
+                    "name": "byowner",
+                    "key_type": "uint64",
+                    "table_id": 22929
+                }
+            ]
+        },
+        {
+            "name": "tier3",
+            "type": "tier3_row",
+            "index_type": "i64",
+            "key_names": ["scope","idx"],
+            "key_types": ["name","uint64"],
+            "table_id": 42070,
+            "secondary_indexes": [
+                {
+                    "name": "byowner",
+                    "key_type": "uint64",
+                    "table_id": 6673
+                }
+            ]
+        },
+        {
+            "name": "tried3",
+            "type": "tried_row",
+            "index_type": "i64",
+            "key_names": ["scope","idx"],
+            "key_types": ["name","uint64"],
+            "table_id": 26046
+        }
+    ],
+    "ricardian_clauses": [],
+    "variants": [],
+    "action_results": []
+}
