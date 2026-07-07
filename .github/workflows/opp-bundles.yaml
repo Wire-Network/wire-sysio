@@ -46,7 +46,12 @@ jobs:
           # PR validation must not expose the npm publish token to dependency
           # install lifecycle scripts; publishing is scoped to the push-only step.
           cd ./libraries/opp/tools
-          pnpm install
+          pnpm install --frozen-lockfile --ignore-scripts
+
+      - name: Audit deps
+        run: |
+          cd ./libraries/opp/tools
+          pnpm audit --audit-level=moderate
         
       - name: Generate & Publish OPP Bundles
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
