@@ -35,6 +35,9 @@ target_link_libraries(${TARGET_NAME}
         # library targets) without pulling the plugin's whole archive (and
         # appbase / http_client / wallet_plugin) into the link line.
         signature_provider_manager_plugin_headers
+        # Shared AWS glue (SDK lifecycle, per-region client cache,
+        # transient-vs-permanent error split) co-owned with the ssm/ sibling.
+        sigprov_aws_common
         aws-cpp-sdk-kms)
 
 if (ENABLE_TESTS)

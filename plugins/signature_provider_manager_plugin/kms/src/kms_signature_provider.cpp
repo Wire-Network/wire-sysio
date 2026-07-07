@@ -1,5 +1,7 @@
 #include <sysio/signature_provider_manager_plugin/kms/kms_signature_provider.hpp>
 
+#include <sysio/signature_provider_manager_plugin/aws/aws_common.hpp>
+
 #include <sysio/chain/exceptions.hpp>
 #include <sysio/chain/types.hpp>
 
@@ -7,8 +9,6 @@
 #include <fc/exception/exception.hpp>
 #include <fc/string.hpp>
 
-#include <aws/core/Aws.h>
-#include <aws/core/client/ClientConfiguration.h>
 #include <aws/core/utils/Array.h>
 #include <aws/kms/KMSClient.h>
 #include <aws/kms/KMSErrors.h>
@@ -20,15 +20,11 @@
 #include <fc/log/logger.hpp>
 #include <magic_enum/magic_enum.hpp>
 
-#include <fmt/format.h>
-
 #include <secp256k1.h>
 #include <secp256k1_recovery.h>
 
 #include <algorithm>
 #include <array>
-#include <cctype>
-#include <map>
 #include <memory>
 #include <mutex>
 #include <span>
@@ -52,25 +48,11 @@ namespace {
 /// Anchor for ARN detection. ARNs always start with `arn:aws:kms:` (no
 /// regional suffix on the partition for kms -- `arn:aws-cn:kms:` and
 /// `arn:aws-us-gov:kms:` are not currently in scope; revisit if a partition
-/// other than `aws` becomes a deployment target).
+/// other than `aws` becomes a deployment target). The service-agnostic ARN
+/// pieces (`arn:` lead-in, segment count / indices, the case-insensitive
+/// prefix test) are shared with the sibling sub-libraries via
+/// `sysio::sigprov::aws` (aws_common.hpp).
 constexpr std::string_view kms_arn_prefix = "arn:aws:kms:";
-
-/// Case-insensitive lead-in shared by every ARN. A spec that begins with this
-/// but does not match `kms_arn_prefix` is a malformed or out-of-scope ARN --
-/// never the shorthand `<region>:<key-id>` form -- and must fail loudly rather
-/// than fall through to the shorthand parser. See `parse_kms_spec`.
-constexpr std::string_view arn_lead_in = "arn:";
-
-/// Number of colon-separated segments in a well-formed KMS ARN:
-/// `arn`, `aws`, `kms`, `<region>`, `<account>`, `(key|alias)/<id>`.
-constexpr std::size_t kms_arn_segment_count = 6;
-
-/// Indices into the split ARN.
-constexpr std::size_t arn_idx_partition = 1;
-constexpr std::size_t arn_idx_service   = 2;
-constexpr std::size_t arn_idx_region    = 3;
-constexpr std::size_t arn_idx_account   = 4;
-constexpr std::size_t arn_idx_tail      = 5;
 
 /// Tail prefixes the KMS API accepts for the `KeyId` field.
 constexpr std::string_view tail_prefix_key   = "key/";
@@ -88,42 +70,6 @@ const secp256k1_context* kms_secp_ctx() {
    static secp256k1_context* ctx = secp256k1_context_create(SECP256K1_CONTEXT_NONE);
    return ctx;
 }
-
-/// Process-wide AWS SDK lifecycle. Constructed lazily on first KMS access,
-/// destroyed at static destruction (after the client cache, since the cache
-/// is touched by `get_kms_client` *after* this lifecycle, making it the
-/// younger Meyers singleton; younger statics are destroyed first). Holding a
-/// `KMSClient` shared_ptr inside a long-lived `sign_fn` closure is safe
-/// because the application object owns the plugin and is destroyed before
-/// atexit static teardown; do not hand a KMS-backed `sign_fn` to an owner
-/// that outlives the application.
-struct aws_sdk_lifecycle {
-   static aws_sdk_lifecycle& instance() {
-      static aws_sdk_lifecycle s;
-      return s;
-   }
-
-   // This is a Meyers singleton: there is exactly one lifecycle per process.
-   // Deleting copy / move makes that intent explicit and stops a stray
-   // `aws_sdk_lifecycle copy = ...` from compiling and running a second
-   // InitAPI / ShutdownAPI pair.
-   aws_sdk_lifecycle(const aws_sdk_lifecycle&)            = delete;
-   aws_sdk_lifecycle(aws_sdk_lifecycle&&)                 = delete;
-   aws_sdk_lifecycle& operator=(const aws_sdk_lifecycle&) = delete;
-   aws_sdk_lifecycle& operator=(aws_sdk_lifecycle&&)      = delete;
-
-private:
-   aws_sdk_lifecycle()  { Aws::InitAPI(_options); }
-   ~aws_sdk_lifecycle() { Aws::ShutdownAPI(_options); }
-
-   // TODO: the default-constructed SDKOptions leaves the AWS SDK's internal
-   // logger disabled. To diagnose an AWS-side retry storm or credential-chain
-   // failure from the node's own logs -- without restarting the node under the
-   // AWS_LOG_LEVEL environment variable -- install an
-   // Aws::Utils::Logging::LogSystemInterface here that forwards to fc::log
-   // before the Aws::InitAPI call above.
-   Aws::SDKOptions _options{};
-};
 
 /// Per-closure state for a KMS-backed signer. Captured by `std::shared_ptr`
 /// so that `std::function` copies remain cheap and the same `KMSClient` /
@@ -158,33 +104,6 @@ struct kms_signer_state {
    std::mutex                           pin_mutex;
    bool                                 pinned = false;
 };
-
-/// Per-region cache of KMS clients. Lock once on lookup; the SDK's HTTP
-/// pool inside the client is itself thread-safe, so multiple sign closures
-/// sharing a client may submit `Sign` requests concurrently.
-struct kms_client_cache {
-   std::mutex                                                      mutex;
-   std::map<std::string, std::shared_ptr<Aws::KMS::KMSClient>>     by_region;
-};
-
-kms_client_cache& kms_clients() {
-   static kms_client_cache c;
-   return c;
-}
-
-/// Case-insensitive ASCII prefix test. ARN partitions and services are
-/// lowercase by convention, but an operator may paste a mis-cased
-/// `ARN:AWS:KMS:...`; we still want to recognise it as an ARN so it fails
-/// loudly in `parse_kms_spec` rather than being mistaken for the shorthand
-/// `<region>:<key-id>` form.
-bool starts_with_ci(std::string_view s, std::string_view prefix) {
-   if (s.size() < prefix.size())
-      return false;
-   return std::equal(prefix.begin(), prefix.end(), s.begin(),
-                     [](unsigned char a, unsigned char b) {
-                        return std::tolower(a) == std::tolower(b);
-                     });
-}
 
 // ---------------------------------------------------------------------------
 // X.509 SubjectPublicKeyInfo (DER) decoding for KMS public-key pinning.
@@ -374,29 +293,11 @@ void ensure_kms_pubkey_pinned(kms_signer_state& state) {
 
 [[noreturn]] void throw_kms_error(std::string_view op, std::string_view key_id,
                                   const Aws::Client::AWSError<Aws::KMS::KMSErrors>& err) {
-   // The AWS SDK tags every deserialised error with a retryability class when
-   // it parses the response. Transient classes (throttling, KMSInternal,
-   // dependency / network timeouts, service-unavailable) report ShouldRetry();
-   // permanent ones (access denied, key not found, disabled key, invalid
-   // state, bad parameters) do not. Map that split onto two exception types so
-   // a caller can retry the transient class with backoff and treat the rest as
-   // a fatal misconfiguration. The SDK's own classification is authoritative --
-   // it is what the SDK's retry strategy uses -- so there is no hand-maintained
-   // table of error codes here to drift out of date.
-   const bool transient = err.ShouldRetry();
-   const auto message = fmt::format(
-      "AWS KMS {} for key \"{}\" failed: {} (status {}, {}) [{}]: {}",
-      op, key_id,
-      magic_enum::enum_name(err.GetErrorType()),
-      magic_enum::enum_integer(err.GetResponseCode()),
-      err.GetExceptionName(),
-      transient ? "transient, retryable" : "permanent",
-      err.GetMessage());
-
-   if (transient) {
-      FC_THROW_EXCEPTION(chain::signing_transient_exception, "{}", message);
-   }
-   FC_THROW_EXCEPTION(chain::plugin_config_exception, "{}", message);
+   // Classification (ShouldRetry -> transient vs permanent) and message shape
+   // live in the shared `sysio::sigprov::aws::throw_aws_error`; see its doc
+   // for the full rationale. This wrapper contributes the KMS service label
+   // and the "key" resource noun.
+   sigprov::aws::throw_aws_error("KMS", op, "key", key_id, err);
 }
 
 kms_key_ref parse_kms_spec(std::string_view spec_data) {
@@ -404,20 +305,20 @@ kms_key_ref parse_kms_spec(std::string_view spec_data) {
               "KMS spec body is empty; expected an ARN or '<region>:<key-id-or-alias>'");
 
    if (spec_data.starts_with(kms_arn_prefix)) {
-      // Full ARN form. Split into exactly `kms_arn_segment_count` parts so any
-      // stray colons inside the trailing `key/<id>` / `alias/<name>` segment
-      // stay glued to it (KMS key ids are uuids with no colons today, but
-      // aliases are operator-chosen and must not be silently truncated). The
-      // split is only for *validation* below -- the value handed to KMS is the
-      // unmodified ARN.
-      auto parts = fc::split(spec_data, ':', kms_arn_segment_count);
-      SYS_ASSERT(parts.size() == kms_arn_segment_count, chain::plugin_config_exception,
+      // Full ARN form. Split into exactly `aws::arn_segment_count` parts so
+      // any stray colons inside the trailing `key/<id>` / `alias/<name>`
+      // segment stay glued to it (KMS key ids are uuids with no colons today,
+      // but aliases are operator-chosen and must not be silently truncated).
+      // The split is only for *validation* below -- the value handed to KMS is
+      // the unmodified ARN.
+      auto parts = fc::split(spec_data, ':', sigprov::aws::arn_segment_count);
+      SYS_ASSERT(parts.size() == sigprov::aws::arn_segment_count, chain::plugin_config_exception,
                  "Malformed KMS ARN \"{}\": expected {} colon-separated segments, got {}",
-                 spec_data, kms_arn_segment_count, parts.size());
+                 spec_data, sigprov::aws::arn_segment_count, parts.size());
 
-      const auto& region  = parts[arn_idx_region];
-      const auto& account = parts[arn_idx_account];
-      const auto& tail    = parts[arn_idx_tail];
+      const auto& region  = parts[sigprov::aws::arn_idx_region];
+      const auto& account = parts[sigprov::aws::arn_idx_account];
+      const auto& tail    = parts[sigprov::aws::arn_idx_tail];
 
       // `arn`, `aws`, and `kms` are guaranteed non-empty and correct by the
       // `kms_arn_prefix` match above. The region, account, and tail segments
@@ -464,13 +365,13 @@ kms_key_ref parse_kms_spec(std::string_view spec_data) {
    // enforces it. A mis-cased `ARN:AWS:KMS:...` and a typo'd service
    // (`arn:aws:ksm:...`) land here too -- the message points at the canonical
    // form in every case.
-   if (starts_with_ci(spec_data, arn_lead_in)) {
-      const auto parts = fc::split(spec_data, ':', kms_arn_segment_count);
+   if (sigprov::aws::starts_with_ci(spec_data, sigprov::aws::arn_lead_in)) {
+      const auto parts = fc::split(spec_data, ':', sigprov::aws::arn_segment_count);
       std::string partition, service;
-      if (parts.size() > arn_idx_partition)
-         partition = parts[arn_idx_partition];
-      if (parts.size() > arn_idx_service)
-         service = parts[arn_idx_service];
+      if (parts.size() > sigprov::aws::arn_idx_partition)
+         partition = parts[sigprov::aws::arn_idx_partition];
+      if (parts.size() > sigprov::aws::arn_idx_service)
+         service = parts[sigprov::aws::arn_idx_service];
       FC_THROW_EXCEPTION(chain::plugin_config_exception,
                          "Unsupported KMS ARN \"{}\": only the 'arn:aws:kms:' partition/service "
                          "is supported (got partition \"{}\", service \"{}\"). Non-'aws' "
@@ -699,22 +600,12 @@ std::shared_ptr<Aws::KMS::KMSClient> get_kms_client(const std::string& region) {
    SYS_ASSERT(!region.empty(), chain::plugin_config_exception,
               "get_kms_client: region must not be empty");
 
-   // Force the lifecycle singleton's construction *before* we touch the
-   // cache, so its destructor (Aws::ShutdownAPI) runs *after* the cache's
-   // destructor (which clears all KMSClient shared_ptrs). Static-init order
-   // is the order of first-touch within the same TU; hitting the lifecycle
-   // first here pins it as the older static.
-   (void)aws_sdk_lifecycle::instance();
-
-   auto& c = kms_clients();
-   std::scoped_lock lock{c.mutex};
-   auto& slot = c.by_region[region];
-   if (!slot) {
-      Aws::Client::ClientConfiguration cfg;
-      cfg.region = Aws::String{region};
-      slot = std::make_shared<Aws::KMS::KMSClient>(cfg);
-   }
-   return slot;
+   // Function-local static, constructed on first use. Its constructor runs
+   // `ensure_aws_sdk_initialized()`, pinning the SDK lifecycle singleton as
+   // the older static so Aws::ShutdownAPI runs only after this cache has
+   // released its KMSClient shared_ptrs.
+   static sigprov::aws::region_client_cache<Aws::KMS::KMSClient> cache;
+   return cache.get(region);
 }
 
 sysio::provider_spec_result create_kms_provider(
