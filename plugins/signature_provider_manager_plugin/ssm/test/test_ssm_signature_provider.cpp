@@ -15,6 +15,13 @@
 #include <fc/crypto/key_serdes.hpp>
 #include <fc-test/crypto_utils.hpp>
 
+// Full SDK headers: the error-classification and client-cache cases construct
+// real `AWSError<SSMErrors>` values (plain value types -- offline, no SDK init
+// or network) and real `SSMClient`s (construction is offline by design).
+#include <aws/core/client/AWSError.h>
+#include <aws/ssm/SSMClient.h>
+#include <aws/ssm/SSMErrors.h>
+
 #include <cstdlib>
 #include <memory>
 #include <string>
@@ -341,6 +348,92 @@ BOOST_AUTO_TEST_CASE(transient_fetch_failure_propagates_as_transient) {
    };
    BOOST_CHECK_THROW(create_ssm_provider_with_fetcher(chain_key_type_wire, pub, test_spec_body, throttled),
                      chain::signing_transient_exception);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(ssm_error_classification)
+
+// ---------------------------------------------------------------------------
+// throw_ssm_error -- transient vs permanent classification and the IAM hint.
+//
+// Constructing an `AWSError` is offline -- it is a plain value type, so these
+// tests need no SDK init and no network. The shared classification template is
+// also exercised by the kms suite; these cases pin the SSM wrapper's
+// contributions: the service label / "parameter" noun in the message, the IAM
+// remediation hint on permanent failures ONLY, and the SSMErrors
+// magic_enum-range widening.
+// ---------------------------------------------------------------------------
+
+BOOST_AUTO_TEST_CASE(throw_ssm_error_maps_retryable_to_transient) {
+   const Aws::Client::AWSError<Aws::SSM::SSMErrors> err(
+      Aws::SSM::SSMErrors::THROTTLING, "ThrottlingException", "Rate exceeded",
+      /* isRetryable */ true);
+   BOOST_CHECK_THROW(throw_ssm_error("GetParameter", "/wire/test/bp1", err),
+                     chain::signing_transient_exception);
+}
+
+BOOST_AUTO_TEST_CASE(throw_ssm_error_maps_non_retryable_to_config_with_hint) {
+   // Access-denied is permanent -- retrying will not help, the IAM grant is
+   // missing. It must surface as a config exception whose message carries the
+   // remediation (the two IAM actions) and names the parameter.
+   const Aws::Client::AWSError<Aws::SSM::SSMErrors> err(
+      Aws::SSM::SSMErrors::ACCESS_DENIED, "AccessDeniedException",
+      "not authorized to perform ssm:GetParameter", /* isRetryable */ false);
+   BOOST_CHECK_EXCEPTION(throw_ssm_error("GetParameter", "/wire/test/bp1", err),
+                         chain::plugin_config_exception, [](const fc::exception& e) {
+                            const auto detail = e.to_detail_string();
+                            return detail.find("AWS SSM GetParameter for parameter \"/wire/test/bp1\"") !=
+                                      std::string::npos &&
+                                   detail.find("kms:Decrypt") != std::string::npos;
+                         });
+}
+
+BOOST_AUTO_TEST_CASE(throw_ssm_error_transient_omits_hint) {
+   // The IAM hint would be misleading on a throttle -- nothing is
+   // misconfigured -- so it is appended to permanent failures only.
+   const Aws::Client::AWSError<Aws::SSM::SSMErrors> err(
+      Aws::SSM::SSMErrors::THROTTLING, "ThrottlingException", "Rate exceeded",
+      /* isRetryable */ true);
+   BOOST_CHECK_EXCEPTION(throw_ssm_error("GetParameter", "/wire/test/bp1", err),
+                         chain::signing_transient_exception, [](const fc::exception& e) {
+                            return e.to_detail_string().find("kms:Decrypt") == std::string::npos;
+                         });
+}
+
+BOOST_AUTO_TEST_CASE(throw_ssm_error_message_carries_enum_name) {
+   // Regression guard for the magic_enum range widening: SSM service-specific
+   // error codes begin above magic_enum's default ceiling of 128, so without
+   // the enum_range<SSMErrors> specialization the enum-name field of the
+   // diagnostic would be blank. PARAMETER_NOT_FOUND sits in that range, and
+   // its all-caps enum_name spelling appears nowhere else in the inputs.
+   const Aws::Client::AWSError<Aws::SSM::SSMErrors> err(
+      Aws::SSM::SSMErrors::PARAMETER_NOT_FOUND, "ParameterNotFound",
+      "parameter does not exist", /* isRetryable */ false);
+   BOOST_CHECK_EXCEPTION(throw_ssm_error("GetParameter", "/wire/test/absent", err),
+                         chain::plugin_config_exception, [](const fc::exception& e) {
+                            return e.to_detail_string().find("PARAMETER_NOT_FOUND") != std::string::npos;
+                         });
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(ssm_client_cache)
+
+BOOST_AUTO_TEST_CASE(get_ssm_client_caches_per_region) {
+   // Client construction is offline (no credential resolution, no network),
+   // so exercising the cache is safe in a unit test. Same region -> same
+   // client instance; different region -> a different one.
+   const auto a1 = get_ssm_client("us-east-1");
+   const auto a2 = get_ssm_client("us-east-1");
+   const auto b  = get_ssm_client("eu-west-2");
+   BOOST_REQUIRE(a1 != nullptr);
+   BOOST_CHECK(a1.get() == a2.get());
+   BOOST_CHECK(a1.get() != b.get());
+}
+
+BOOST_AUTO_TEST_CASE(get_ssm_client_rejects_empty_region) {
+   BOOST_CHECK_THROW(get_ssm_client(""), chain::plugin_config_exception);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -16,7 +16,6 @@
 
 #include <magic_enum/magic_enum.hpp>
 
-#include <cctype>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -60,8 +59,13 @@ constexpr std::string_view ssm_permanent_hint =
 /// Strip leading and trailing ASCII whitespace. Operators create parameters
 /// from shells (`aws ssm put-parameter --value "$(cat key.txt)"`), so a
 /// trailing newline is a likely artifact that must not brick a producer key.
+/// The whitespace set is spelled out explicitly rather than delegated to
+/// `std::isspace`, whose classification follows the process locale -- what
+/// gets trimmed from a secret must not depend on ambient locale state.
 std::string_view trim_ascii_whitespace(std::string_view s) {
-   const auto is_space = [](unsigned char c) { return std::isspace(c) != 0; };
+   const auto is_space = [](char c) {
+      return c == ' ' || c == '\t' || c == '\n' || c == '\v' || c == '\f' || c == '\r';
+   };
    while (!s.empty() && is_space(s.front()))
       s.remove_prefix(1);
    while (!s.empty() && is_space(s.back()))

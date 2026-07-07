@@ -581,7 +581,7 @@ void signature_provider_manager_plugin::set_program_options(options_description&
       "`<name>,<chain-kind>,<key-type>,<public-key>,<private-key-provider-spec>`. "
       "Provider types KEY:<private-key> and KIOD:<url> are built in; host binaries "
       "may register additional schemes (nodeop registers SSM:<region>:<parameter-name> "
-      "to fetch the key from AWS SSM Parameter Store at startup).");;
+      "to fetch the key from AWS SSM Parameter Store at startup).");
    cfg.add_options()(
       option_name_kms_startup_check,
       boost::program_options::value<bool>()->default_value(false),

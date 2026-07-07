@@ -23,7 +23,6 @@
 #include <secp256k1.h>
 #include <secp256k1_recovery.h>
 
-#include <algorithm>
 #include <array>
 #include <memory>
 #include <mutex>

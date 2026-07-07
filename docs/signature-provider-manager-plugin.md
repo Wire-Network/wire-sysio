@@ -16,7 +16,7 @@ with varied key types.
    `<chain-kind>`           chain where the key will be used
    `<key-type>`             key format to parse
    `<public-key>`           is a string form of a valid <key-type>
-   `<key-provider-spec>`        is a string in the form <key-provider-type>:<data>
+   `<private-key-provider-spec>`   is a string in the form <key-provider-type>:<data>
        
 ```
 ## Key Provider Spec
