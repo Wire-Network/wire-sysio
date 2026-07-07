@@ -78,6 +78,43 @@ std::unique_ptr<sig_provider_tester> create_app(Args&&... extra_args) {
    return create_app(args_vec);
 }
 
+/**
+ * Build and initialize a tester with a `PROBE:` spec handler whose returned
+ * provider carries `probe_body` as its `startup_probe`. The handler's signer
+ * is a trivial stub (never invoked by these tests). `enable_startup_check`
+ * toggles the `signature-provider-kms-startup-check` option so the caller can
+ * exercise both the enabled and the disabled `plugin_startup()` paths.
+ *
+ * The handler is registered via `_register_plugin<>` BEFORE `initialize<>`, so
+ * it is in place by the time any provider spec is parsed -- mirroring how a
+ * host application registers a real extension handler in `main()`.
+ *
+ * @param probe_body          callback the registered provider's startup probe runs
+ * @param enable_startup_check pass the startup-check option when true
+ * @return an initialized tester ready for `create_provider` / `plugin_startup`
+ */
+std::unique_ptr<sig_provider_tester> make_probe_tester(std::function<void()> probe_body,
+                                                       bool                  enable_startup_check) {
+   auto  tester = std::make_unique<sig_provider_tester>();
+   auto& mgr    = tester->app->_register_plugin<signature_provider_manager_plugin>();
+   mgr.register_spec_handler(
+      "PROBE",
+      [body = std::move(probe_body)](fc::crypto::chain_key_type_t, const fc::crypto::public_key&,
+                                     std::string_view) -> sysio::provider_spec_result {
+         return {.signer        = [](const fc::sha256&) { return fc::crypto::signature{}; },
+                 .private_key   = std::nullopt,
+                 .startup_probe = body};
+      });
+
+   std::vector<const char*> argv{"test_signature_provider_manager_plugin"};
+   if (enable_startup_check) {
+      argv.push_back("--signature-provider-kms-startup-check=1");
+   }
+   BOOST_CHECK(tester->app->initialize<signature_provider_manager_plugin>(
+      argv.size(), const_cast<char**>(argv.data())));
+   return tester;
+}
+
 } // anonymous namespace
 
 BOOST_AUTO_TEST_SUITE(signature_provider_manager_create_provider_specs)
@@ -340,6 +377,252 @@ BOOST_AUTO_TEST_CASE(solana_signature_provider_spec_options) {
    auto providers = mgr.query_providers(fixture1.key_name);
    BOOST_REQUIRE(!providers.empty());
    BOOST_TEST((providers[0]->key_type == chain_key_type_solana));
+}
+
+BOOST_AUTO_TEST_CASE(create_provider_unknown_scheme_throws_with_hint) {
+   // Any `<provider-type>:` not built in (KEY, KIOD) and not registered by
+   // the host application must throw with a clear hint about how to enable
+   // it -- this is the operator-facing surface for a binary that does not
+   // link the relevant extension library.
+   using namespace fc::crypto;
+
+   auto clean_app = gsl_lite::finally([]() {
+      appbase::application::reset_app_singleton();
+   });
+
+   keygen_result fixture          = fc::test::load_keygen_fixture("ethereum", 1);
+   const std::string kms_spec     = "KMS:us-east-1:alias/none";
+   const auto provider_spec       = to_signature_provider_spec(
+      "kms-eth-01", chain_kind_ethereum, chain_key_type_ethereum,
+      fixture.public_key, kms_spec);
+
+   auto  tester = create_app();
+   auto& mgr    = tester->plugin();
+
+   BOOST_CHECK_THROW(mgr.create_provider(provider_spec),
+                     sysio::chain::plugin_config_exception);
+}
+
+BOOST_AUTO_TEST_CASE(register_spec_handler_dispatches_custom_scheme) {
+   // The extension API: a host application registers a handler for a custom
+   // scheme via `register_spec_handler` before app().initialize(); the
+   // plugin's spec parser then routes that scheme through the handler. This
+   // test uses a mock handler -- no AWS, no network -- to exercise the
+   // wiring end-to-end and verify the returned provider is in the registry.
+   using namespace fc::crypto;
+
+   auto clean_app = gsl_lite::finally([]() {
+      appbase::application::reset_app_singleton();
+   });
+
+   keygen_result fixture     = fc::test::load_keygen_fixture("ethereum", 1);
+   const auto provider_spec  = to_signature_provider_spec(
+      "mock-eth-01", chain_kind_ethereum, chain_key_type_ethereum,
+      fixture.public_key, "MOCK:anything");
+
+   // Build a tester *without* initializing; we need to register a handler in
+   // the gap between plugin construction and initialize (which parses
+   // --signature-provider options). `register_plugin<>` (static) only
+   // enqueues a name in the static registration list, so call
+   // `_register_plugin<>` directly to construct the instance now --
+   // `_register_plugin<>` is idempotent, so the later `initialize<>` pass is
+   // a no-op for this plugin.
+   auto tester = std::make_unique<sig_provider_tester>();
+   auto& mgr   = tester->app->_register_plugin<signature_provider_manager_plugin>();
+
+   bool handler_called = false;
+   mgr.register_spec_handler(
+      "MOCK",
+      [&handler_called](chain_key_type_t /*key_type*/,
+                        const public_key& /*expected*/,
+                        std::string_view spec_data) -> sysio::provider_spec_result {
+         handler_called = true;
+         BOOST_CHECK_EQUAL(spec_data, "anything");
+         // Trivial signer: returns a default-constructed signature. The
+         // plugin never invokes it in this test -- we only verify routing.
+         return {
+            .signer        = [](const fc::sha256&) { return fc::crypto::signature{}; },
+            .private_key   = std::nullopt,
+            .startup_probe = {}
+         };
+      });
+
+   std::vector<const char*> argv{"test_signature_provider_manager_plugin"};
+   BOOST_CHECK(tester->app->initialize<signature_provider_manager_plugin>(
+      argv.size(), const_cast<char**>(argv.data())));
+
+   const auto provider = tester->plugin().create_provider(provider_spec);
+   BOOST_CHECK(handler_called);
+   BOOST_CHECK_EQUAL(provider->key_name, "mock-eth-01");
+   BOOST_CHECK(static_cast<bool>(provider->sign));
+   BOOST_CHECK(!provider->private_key.has_value());
+}
+
+BOOST_AUTO_TEST_CASE(register_spec_handler_rejects_builtin_and_duplicates) {
+   // The extension API must refuse to override built-ins and refuse to
+   // re-register the same scheme twice -- both are operator-facing bugs that
+   // would otherwise yield baffling runtime behaviour.
+   auto clean_app = gsl_lite::finally([]() {
+      appbase::application::reset_app_singleton();
+   });
+
+   // `register_plugin<>` only enqueues the plugin name; the instance is not
+   // constructed until `initialize<>` runs. Use `_register_plugin<>` to
+   // construct the instance now so we can call `register_spec_handler` on
+   // it.
+   auto tester = std::make_unique<sig_provider_tester>();
+   auto& mgr   = tester->app->_register_plugin<signature_provider_manager_plugin>();
+
+   sysio::spec_handler noop_handler =
+      [](fc::crypto::chain_key_type_t, const fc::crypto::public_key&, std::string_view) {
+         return sysio::provider_spec_result{};
+      };
+
+   BOOST_CHECK_THROW(mgr.register_spec_handler("KEY", noop_handler),
+                     fc::exception);
+   BOOST_CHECK_THROW(mgr.register_spec_handler("KIOD", noop_handler),
+                     fc::exception);
+
+   BOOST_CHECK_NO_THROW(mgr.register_spec_handler("TEST", noop_handler));
+   BOOST_CHECK_THROW(mgr.register_spec_handler("TEST", noop_handler),
+                     fc::exception);
+}
+
+// ---------------------------------------------------------------------------
+// Startup-probe pass (plugin_startup -> run_startup_probes)
+//
+// A spec handler may attach a `startup_probe` to its result; the plugin runs
+// every such probe from plugin_startup() when the opt-in
+// `signature-provider-kms-startup-check` option is set. These cases drive that
+// machinery with a mock handler -- no AWS, no network -- to pin its branchy
+// control flow: transient failures are deferred, permanent failures abort
+// startup, a disabled check skips the probes, and the probe list is one-shot.
+// ---------------------------------------------------------------------------
+
+BOOST_AUTO_TEST_CASE(startup_probe_transient_failure_is_deferred_not_fatal) {
+   // A transient probe failure (e.g. KMS throttle / KMSInternal / timeout) is
+   // not a misconfiguration: plugin_startup() must log it and return normally,
+   // leaving the lazy first-sign check to retry. The probe still runs once.
+   using namespace fc::crypto;
+   auto clean_app = gsl_lite::finally([]() { appbase::application::reset_app_singleton(); });
+
+   keygen_result fixture = fc::test::load_keygen_fixture("ethereum", 1);
+
+   int  probe_calls = 0;
+   auto tester      = make_probe_tester(
+      [&probe_calls] {
+         ++probe_calls;
+         FC_THROW_EXCEPTION(sysio::chain::signing_transient_exception,
+                            "simulated transient signing-provider failure");
+      },
+      /* enable_startup_check */ true);
+
+   tester->plugin().create_provider("probe-transient", chain_kind_ethereum, chain_key_type_ethereum,
+                                    fixture.public_key, "PROBE:x");
+
+   BOOST_CHECK_NO_THROW(tester->plugin().plugin_startup());
+   BOOST_CHECK_EQUAL(probe_calls, 1); // probe ran (threw transient, was swallowed)
+}
+
+BOOST_AUTO_TEST_CASE(startup_probe_permanent_failure_aborts_startup) {
+   // A permanent probe failure (bad credentials / region / IAM / pinned key)
+   // must propagate out of plugin_startup() to abort node startup loudly,
+   // rather than waiting to fail on the first production sign.
+   using namespace fc::crypto;
+   auto clean_app = gsl_lite::finally([]() { appbase::application::reset_app_singleton(); });
+
+   keygen_result fixture = fc::test::load_keygen_fixture("ethereum", 1);
+
+   int  probe_calls = 0;
+   auto tester      = make_probe_tester(
+      [&probe_calls] {
+         ++probe_calls;
+         FC_THROW_EXCEPTION(sysio::chain::plugin_config_exception,
+                            "simulated permanent signing-provider misconfiguration");
+      },
+      /* enable_startup_check */ true);
+
+   tester->plugin().create_provider("probe-permanent", chain_kind_ethereum, chain_key_type_ethereum,
+                                    fixture.public_key, "PROBE:x");
+
+   BOOST_CHECK_THROW(tester->plugin().plugin_startup(), sysio::chain::plugin_config_exception);
+   BOOST_CHECK_EQUAL(probe_calls, 1); // probe ran (threw permanent, propagated)
+}
+
+BOOST_AUTO_TEST_CASE(startup_probe_not_run_when_check_disabled) {
+   // With the startup-check option off (the default), the probe pass is a
+   // no-op: a probe that would otherwise abort startup never runs at all.
+   using namespace fc::crypto;
+   auto clean_app = gsl_lite::finally([]() { appbase::application::reset_app_singleton(); });
+
+   keygen_result fixture = fc::test::load_keygen_fixture("ethereum", 1);
+
+   int  probe_calls = 0;
+   auto tester      = make_probe_tester(
+      [&probe_calls] {
+         ++probe_calls;
+         FC_THROW_EXCEPTION(sysio::chain::plugin_config_exception,
+                            "probe must not run when the startup check is disabled");
+      },
+      /* enable_startup_check */ false);
+
+   tester->plugin().create_provider("probe-disabled", chain_kind_ethereum, chain_key_type_ethereum,
+                                    fixture.public_key, "PROBE:x");
+
+   BOOST_CHECK_NO_THROW(tester->plugin().plugin_startup());
+   BOOST_CHECK_EQUAL(probe_calls, 0); // disabled -> probe never invoked
+}
+
+BOOST_AUTO_TEST_CASE(startup_probes_are_one_shot) {
+   // The probe list is drained on the first plugin_startup(); a second call
+   // re-runs nothing, so the startup check cannot fire twice for one provider.
+   using namespace fc::crypto;
+   auto clean_app = gsl_lite::finally([]() { appbase::application::reset_app_singleton(); });
+
+   keygen_result fixture = fc::test::load_keygen_fixture("ethereum", 1);
+
+   int  probe_calls = 0;
+   auto tester      = make_probe_tester([&probe_calls] { ++probe_calls; },
+                                        /* enable_startup_check */ true);
+
+   tester->plugin().create_provider("probe-once", chain_kind_ethereum, chain_key_type_ethereum,
+                                    fixture.public_key, "PROBE:x");
+
+   BOOST_CHECK_NO_THROW(tester->plugin().plugin_startup());
+   BOOST_CHECK_EQUAL(probe_calls, 1);
+   BOOST_CHECK_NO_THROW(tester->plugin().plugin_startup()); // list already drained
+   BOOST_CHECK_EQUAL(probe_calls, 1);                       // not re-run
+}
+
+BOOST_AUTO_TEST_CASE(startup_probe_not_retained_for_rejected_duplicate_provider) {
+   // create_provider() appends the startup_probe ONLY after set_provider()
+   // succeeds. A provider rejected as a duplicate (same key_name) must leave
+   // no orphan probe behind, so plugin_startup() runs exactly one probe -- the
+   // surviving provider's -- not two.
+   using namespace fc::crypto;
+   auto clean_app = gsl_lite::finally([]() { appbase::application::reset_app_singleton(); });
+
+   keygen_result fixture1 = fc::test::load_keygen_fixture("ethereum", 1);
+   keygen_result fixture2 = fc::test::load_keygen_fixture("ethereum", 2);
+
+   int  probe_calls = 0;
+   auto tester      = make_probe_tester([&probe_calls] { ++probe_calls; },
+                                        /* enable_startup_check */ true);
+   auto& plug = tester->plugin();
+
+   // Provider #1 succeeds -> its probe is retained.
+   plug.create_provider("dup-name", chain_kind_ethereum, chain_key_type_ethereum,
+                        fixture1.public_key, "PROBE:a");
+
+   // Provider #2 reuses the same key_name (different public key) -> set_provider
+   // throws a duplicate; the handler already built a probe for it, which must
+   // be dropped rather than retained.
+   BOOST_CHECK_THROW(plug.create_provider("dup-name", chain_kind_ethereum, chain_key_type_ethereum,
+                                          fixture2.public_key, "PROBE:b"),
+                     sysio::chain::plugin_config_exception);
+
+   BOOST_CHECK_NO_THROW(plug.plugin_startup());
+   BOOST_CHECK_EQUAL(probe_calls, 1); // only the surviving provider's probe ran
 }
 
 // A signature-provider spec must never be logged with its inline private key intact; `redact_signature_provider_spec`
