@@ -78,10 +78,6 @@ public:
     */
    bool _startup_probe_enabled{false};
 
-   fc::crypto::sign_fn make_key_signature_provider(const chain::private_key_type& key) const {
-      return [key](const chain::digest_type& digest) { return key.sign(digest); };
-   }
-
    fc::crypto::sign_fn make_kiod_signature_provider(const string& url_str, const chain::public_key_type& pubkey) const {
       fc::url kiod_url;
       if (boost::algorithm::starts_with(url_str, "unix://"))
@@ -121,21 +117,16 @@ public:
          chain::private_key_type privkey;
 
          switch (key_type) {
-         case chain_key_type_wire: {
-            privkey = from_native_string_to_private_key<chain_key_type_wire>(spec_data);
-            break;
-         }
-         case chain_key_type_wire_bls: {
-            privkey = from_native_string_to_private_key<chain_key_type_wire_bls>(spec_data);
-            break;
-         }
-
-         case chain_key_type_ethereum: {
-            privkey = from_native_string_to_private_key<chain_key_type_ethereum>(spec_data);
-            break;
-         }
+         case chain_key_type_wire:
+         case chain_key_type_wire_bls:
+         case chain_key_type_ethereum:
          case chain_key_type_solana: {
-            privkey = from_native_string_to_private_key<chain_key_type_solana>(spec_data);
+            // Runtime dispatch over the per-type native parsers lives in libfc
+            // (fc/crypto/signature_provider.cpp) so extension handlers that
+            // also construct local-key providers (e.g. the ssm sub-library)
+            // share it. The sui / unknown arms stay here: libfc cannot throw
+            // the chain-level config exceptions this plugin's contract uses.
+            privkey = from_native_string_to_private_key(key_type, spec_data);
             break;
          }
          case chain_key_type_sui: {
@@ -150,7 +141,7 @@ public:
 
          FC_ASSERT(public_key == privkey.get_public_key(), "Private key does not match given public key for {}",
                    fc::json::to_log_string(public_key));
-         return {.signer = make_key_signature_provider(privkey), .private_key = privkey};
+         return {.signer = fc::crypto::make_local_sign_fn(privkey), .private_key = privkey};
       }
 
       if (spec_type_str == "KIOD") {
@@ -410,20 +401,14 @@ public:
       chain::public_key_type pubkey;
 
       switch (key_type) {
-      case chain_key_type_wire: {
-         pubkey = from_native_string_to_public_key<chain_key_type_wire>(public_key_text);
-         break;
-      }
-      case chain_key_type_wire_bls: {
-         pubkey = from_native_string_to_public_key<chain_key_type_wire_bls>(public_key_text);
-         break;
-      }
-      case chain_key_type_ethereum: {
-         pubkey = from_native_string_to_public_key<chain_key_type_ethereum>(public_key_text);
-         break;
-      }
+      case chain_key_type_wire:
+      case chain_key_type_wire_bls:
+      case chain_key_type_ethereum:
       case chain_key_type_solana: {
-         pubkey = from_native_string_to_public_key<chain_key_type_solana>(public_key_text);
+         // Runtime dispatch lives in libfc (fc/crypto/signature_provider.cpp);
+         // the sui / unknown arms stay here for the chain-level exception
+         // taxonomy, same as the KEY: private-key parse.
+         pubkey = from_native_string_to_public_key(key_type, public_key_text);
          break;
       }
       case chain_key_type_sui: {
@@ -660,7 +645,7 @@ fc::crypto::signature_provider_ptr signature_provider_manager_plugin::create_pro
 
 fc::crypto::sign_fn
 signature_provider_manager_plugin::create_anonymous_provider_from_private_key(chain::private_key_type priv) const {
-   return [priv](const fc::sha256& d) { return priv.sign(d); };
+   return fc::crypto::make_local_sign_fn(priv);
 }
 
 bool signature_provider_manager_plugin::has_provider(const fc::crypto::signature_provider_id_t& key) {
