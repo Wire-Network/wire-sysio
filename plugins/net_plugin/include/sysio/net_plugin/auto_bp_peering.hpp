@@ -51,7 +51,6 @@ class bp_connection_manager {
    } config; // thread safe only because modified at plugin startup currently
 
    // the following members are only accessed from main thread
-   name_set_t             pending_bps;
    uint32_t               pending_schedule_version = 0;
    uint32_t               active_schedule_version  = 0;
 
@@ -60,6 +59,7 @@ class bp_connection_manager {
 
    fc::mutex                     mtx;
    gossip_buffer_initial_factory initial_gossip_msg_factory GUARDED_BY(mtx);
+   name_set_t                    pending_bps GUARDED_BY(mtx); // written on main thread, read by gossip_bp_addresses_to_drop() on net threads
    name_set_t                    active_bps GUARDED_BY(mtx);
    name_set_t                    active_schedule GUARDED_BY(mtx);
 
@@ -116,6 +116,16 @@ class bp_connection_manager {
    void set_active_bps(name_set_t bps) {
       fc::lock_guard g(mtx);
       active_bps = std::move(bps);
+   }
+   // for testing
+   name_set_t get_pending_bps() {
+      fc::lock_guard g(mtx);
+      return pending_bps;
+   }
+   // for testing
+   void set_pending_bps(name_set_t bps) {
+      fc::lock_guard g(mtx);
+      pending_bps = std::move(bps);
    }
 
 public:
@@ -479,33 +489,67 @@ public:
       return false;
    }
 
+   // desc is a log label; pass nullptr to skip the per-address logging (periodic callers)
    address_set_t find_gossip_bp_addresses(const name_set_t& accounts, const char* desc) const {
       address_set_t addresses;
       fc::lock_guard g(gossip_bps.mtx);
       const auto& prod_idx = gossip_bps.index.get<by_producer>();
       for (const auto& account : accounts) {
          if (auto i = config.auto_bp_addresses.find(account); i != config.auto_bp_addresses.end()) {
-            fc_dlog(p2p_conn_log, "{} manual bp peer {}", desc, i->second.address());
+            if (desc)
+               fc_dlog(p2p_conn_log, "{} manual bp peer {}", desc, i->second.address());
             addresses.insert(i->second.address());
          }
          auto r = prod_idx.equal_range(account);
          for (auto i = r.first; i != r.second; ++i) {
-            fc_dlog(p2p_conn_log, "{} gossip bp peer {}", desc, i->server_endpoint());
+            if (desc)
+               fc_dlog(p2p_conn_log, "{} gossip bp peer {}", desc, i->server_endpoint());
             addresses.insert(i->server_endpoint());
          }
       }
       return addresses;
    }
 
+   // desc is a log label; pass nullptr to skip the per-address logging (periodic callers)
    address_set_t all_gossip_bp_addresses(const char* desc) const {
       address_set_t addresses;
       fc::lock_guard g(gossip_bps.mtx);
       const auto& prod_idx = gossip_bps.index.get<by_producer>();
       for (auto& i : prod_idx) {
-         fc_dlog(p2p_conn_log, "{} gossip bp peer {}", desc, i.server_endpoint());
+         if (desc)
+            fc_dlog(p2p_conn_log, "{} gossip bp peer {}", desc, i.server_endpoint());
          addresses.insert(i.server_endpoint());
       }
       return addresses;
+   }
+
+   // thread-safe
+   // The gossip + configured bp peer addresses whose producers are no longer within scheduling
+   // proximity (neither in the active nor in the pending schedule) — or every known bp peer
+   // address when this node has left the bp gossip group. The connection monitor prunes
+   // outbound connections to these addresses (see connections_manager::connection_monitor);
+   // supplied peers (p2p-peer-address / API connect) are exempted there. Reconciling via the
+   // periodic monitor instead of a one-shot disconnect on the schedule-change edge means a
+   // concurrent connect_to_active_bp_peers() working from a pre-change address snapshot can at
+   // worst resurrect a connection until the next monitor pass, not permanently.
+   // Empty when auto bp peering is not enabled, so non-participating nodes pay no cost.
+   address_set_t gossip_bp_addresses_to_drop() {
+      if (!auto_bp_peering_enabled())
+         return {};
+
+      name_set_t keep_accounts;
+      if (connect_bp_gossip_peers) {
+         fc::lock_guard g(mtx);
+         keep_accounts = active_bps;
+         keep_accounts.insert(pending_bps.begin(), pending_bps.end());
+      } // else: dropped out of the bp gossip group, no bp peer connection is kept
+
+      address_set_t drop = all_gossip_bp_addresses(nullptr);
+      for (const auto& [account, e] : config.auto_bp_addresses)
+         drop.insert(e.address());
+      for (const auto& add : find_gossip_bp_addresses(keep_accounts, nullptr))
+         drop.erase(add);
+      return drop;
    }
 
    // thread-safe
@@ -557,12 +601,16 @@ public:
                   self()->connections.resolve_and_connect(add, self()->get_first_p2p_address());
                }
 
-               pending_bps = std::move(pending_connections);
+               {
+                  fc::lock_guard g(mtx);
+                  pending_bps = std::move(pending_connections);
+               }
 
                pending_schedule_version = schedule.version;
             }
          } else {
             fc_dlog(p2p_conn_log, "pending producer schedule version {} is being cleared", schedule.version);
+            fc::lock_guard g(mtx);
             pending_bps.clear();
          }
       }
@@ -571,7 +619,13 @@ public:
    // Only called from main thread
    void on_active_schedule(const chain::producer_authority_schedule& schedule) {
       if (auto_bp_peering_enabled() && active_schedule_version != schedule.version && !self()->is_lib_catchup()) {
-         /// drops any BP connection which is no longer within our scheduling proximity
+         /// BP connections which are no longer within our scheduling proximity are pruned by the
+         /// connection monitor via gossip_bp_addresses_to_drop(). Pruning is deliberately NOT a
+         /// one-shot disconnect on the schedule-change edge: connect_to_active_bp_peers() runs
+         /// concurrently on net threads from address snapshots computed against the previous
+         /// schedule, and a disconnect sweep here races those snapshots — the sweep erases the
+         /// connections and the stale snapshots immediately re-establish them, after which
+         /// nothing would ever disconnect them again.
          fc_dlog(p2p_conn_log, "active producer schedule switches from version {} to {}",
                  active_schedule_version, schedule.version);
 
@@ -589,31 +643,18 @@ public:
 
          fc_dlog(p2p_conn_log, "active_bps: {}", to_string(active_bps));
 
-         name_set_t peers_to_stay;
-         std::set_union(active_bps.begin(), active_bps.end(), pending_bps.begin(), pending_bps.end(),
-                        std::inserter(peers_to_stay, peers_to_stay.begin()));
-         gm.unlock();
-
-         fc_dlog(p2p_conn_log, "peers_to_stay: {}", to_string(peers_to_stay));
-
-         name_set_t peers_to_drop;
-         std::set_difference(old_bps.begin(), old_bps.end(), peers_to_stay.begin(), peers_to_stay.end(),
-                             std::inserter(peers_to_drop, peers_to_drop.end()));
-         fc_dlog(p2p_conn_log, "peers to drop: {}", to_string(peers_to_drop));
-
-         // if we dropped out of active schedule then disconnect from all
-         bool disconnect_from_all = !config.my_bp_gossip_accounts.empty() &&
-                                    std::all_of(config.my_bp_gossip_accounts.begin(), config.my_bp_gossip_accounts.end(),
-                                                [&](const auto& e) { return peers_to_drop.contains(e.first); });
-         if (disconnect_from_all) {
+         // if all our bp accounts dropped out of scheduling proximity (were active, now neither
+         // active nor pending) then leave the bp gossip group: stop connecting to bp peers and
+         // let the connection monitor prune every bp peer connection
+         bool dropped_out = !config.my_bp_gossip_accounts.empty() &&
+                            std::all_of(config.my_bp_gossip_accounts.begin(), config.my_bp_gossip_accounts.end(),
+                                        [&](const auto& e) {
+                                           return old_bps.contains(e.first) && !active_bps.contains(e.first) &&
+                                                  !pending_bps.contains(e.first);
+                                        });
+         if (dropped_out) {
+            fc_dlog(p2p_conn_log, "dropped out of bp gossip group, no longer connecting to bp peers");
             connect_bp_gossip_peers = false;
-         }
-
-         address_set_t addresses = disconnect_from_all
-                                   ? all_gossip_bp_addresses("disconnect")
-                                   : find_gossip_bp_addresses(peers_to_drop, "disconnect");
-         for (const auto& add : addresses) {
-            self()->connections.disconnect_gossip_connection(add);
          }
 
          active_schedule_version = schedule.version;
