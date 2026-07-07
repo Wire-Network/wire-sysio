@@ -36,6 +36,11 @@ namespace {
 // model, as sysio.token uses): the account stays finite at code+abi size; growth draws from the pool.
 constexpr name ram_payer = "sysio"_n;
 
+/// `reserv::refundwire` fee argument for full refunds — refunds whose cause
+/// the caller does not control (system state changed after enqueue, uwreq
+/// rejected at resolution) forfeit nothing.
+constexpr uint32_t REFUND_FEE_EXEMPT_BPS = 0;
+
 using sysio::slug_name_literals::operator""_s;
 
 /// The WIRE token's slug — both the depot-native token code and (by
@@ -198,12 +203,18 @@ bool is_active_underwriter(name candidate) {
        && op.status == OperatorStatus::OPERATOR_STATUS_ACTIVE;
 }
 
+/// Live `uwconfig` snapshot (defaults when `setconfig` has never run).
+/// `self` is the uwrit contract account (where the singleton lives).
+uwrit::uw_config read_config(name self) {
+   uwrit::uwconfig_t cfg(self);
+   return cfg.get_or_default(uwrit::uw_config{});
+}
+
 /// Live per-spoke swap fee (basis points) from `uwconfig`, read fresh so the
 /// ingestion variance check, the race-time recheck, and settlement all charge
-/// one rate. `self` is the uwrit contract account (where the singleton lives).
+/// one rate.
 uint32_t current_fee_bps(name self) {
-   uwrit::uwconfig_t cfg(self);
-   return cfg.get_or_default(uwrit::uw_config{}).fee_bps;
+   return read_config(self).fee_bps;
 }
 
 /// Find a reserve by its triple key, returning the row pointer-equivalent
@@ -665,7 +676,9 @@ uint64_t next_fromwire_id(name self) {
 //  setconfig
 // ---------------------------------------------------------------------------
 void uwrit::setconfig(uint32_t fee_bps,
-                      uint64_t collateral_lock_duration_ms) {
+                      uint64_t collateral_lock_duration_ms,
+                      uint64_t min_fromwire_amount,
+                      uint32_t fromwire_revert_fee_bps) {
    require_auth(get_self());
    // Reject a 100% (or higher) fee: it zeroes the post-fee WIRE leg
    // (`net == 0`), which let a swap debit destination reserve liquidity while
@@ -675,11 +688,21 @@ void uwrit::setconfig(uint32_t fee_bps,
          "fee_bps must be below 10000 (100%): a 100% fee zeroes the post-fee WIRE leg");
    check(collateral_lock_duration_ms > 0,
          "collateral_lock_duration_ms must be positive");
+   // A zero floor would reopen free dust rows in the swap-from-WIRE queue —
+   // the floor is the queue-slot price (see DEFAULT_MIN_FROMWIRE_AMOUNT).
+   check(min_fromwire_amount > 0, "min_fromwire_amount must be positive");
+   // Same 100% rationale as fee_bps, and on this path it is also a liveness
+   // rail: a 100% revert fee would zero the post-fee refund transfer inside
+   // the never-throw drainfwq drain (`refundwire` rejects zero transfers).
+   check(fromwire_revert_fee_bps <= MAX_FEE_BPS,
+         "fromwire_revert_fee_bps must be below 10000 (100%): a 100% revert fee zeroes the refund");
 
    uwconfig_t cfg_tbl(get_self());
    uw_config cfg = cfg_tbl.get_or_default(uw_config{});
    cfg.fee_bps                     = fee_bps;
    cfg.collateral_lock_duration_ms = collateral_lock_duration_ms;
+   cfg.min_fromwire_amount         = min_fromwire_amount;
+   cfg.fromwire_revert_fee_bps     = fromwire_revert_fee_bps;
    cfg_tbl.set(cfg, ram_payer);
 }
 
@@ -996,10 +1019,12 @@ void reject_and_refund(name self, uwrit::uwreqs_t& reqs, const uwrit::id_key& pk
    } else if (auto user = parse_wire_name(req.depositor)) {
       // Swap-from-WIRE: the escrowed WIRE was never credited to a reserve —
       // refund it directly (there is no source outpost to route a revert to).
+      // Full refund: uwreq-stage rejection (race loss, post-drain market
+      // movement, expiry) is not a caller-controlled revert cause.
       action(
          permission_level{self, "active"_n},
          uwrit::RESERVE_ACCOUNT, "refundwire"_n,
-         std::make_tuple(*user, req.src_amount)
+         std::make_tuple(*user, req.src_amount, REFUND_FEE_EXEMPT_BPS)
       ).send();
    } else {
       sysio::print("reject_and_refund: cannot parse from-WIRE depositor for "
@@ -1555,6 +1580,12 @@ void uwrit::swapfromwire(name                  user,
                           std::vector<char>     recipient_addr) {
    require_auth(user);
    check(wire_amount > 0, "swapfromwire: wire_amount must be positive");
+   // Queue-slot price floor (default 5 WIRE, retunable via setconfig): the
+   // escrow of a failed row is refunded, so without a floor dust rows could
+   // hold drain slots while locking no meaningful capital — and sit below the
+   // Bancor kernel's pricing floor, guaranteeing zero-quote reverts.
+   check(wire_amount >= read_config(get_self()).min_fromwire_amount,
+         "swapfromwire: wire_amount below the configured minimum");
    check(target_amount > 0, "swapfromwire: target_amount must be positive");
    check(!recipient_addr.empty() && recipient_addr.size() <= 64,
          "swapfromwire: recipient address must be 1..64 bytes");
@@ -1616,9 +1647,10 @@ void uwrit::swapfromwire(name                  user,
 // Inlined from sysio.epoch::advance. NEVER throws: every reachable
 // `check()` in the reserv actions it inlines (`refundwire`) is
 // pre-guaranteed (wire_amount > 0 enforced at swapfromwire; the user
-// account existed at escrow time and accounts are not deletable).
-// Validation failures refund + drop; only validated rows become PENDING
-// uwreqs.
+// account existed at escrow time and accounts are not deletable; the
+// post-fee refund stays positive because setconfig caps the revert fee
+// below 100%). Validation failures refund + drop; only validated rows
+// become PENDING uwreqs.
 void uwrit::drainfwq() {
    check(has_auth(EPOCH_ACCOUNT) || has_auth(get_self()),
          "drainfwq requires sysio.epoch or sysio.uwrit authority");
@@ -1626,6 +1658,9 @@ void uwrit::drainfwq() {
    fwqueue_t q(get_self());
    uwreqs_t reqs(get_self());
    const auto depot_code = depot_chain_code();
+   // One config snapshot for the whole drain: quotes and revert fees inside a
+   // single action must charge one rate.
+   const uw_config cfg = read_config(get_self());
 
    // Bounded FIFO drain (SEC-77): process at most MAX_FWQ_DRAIN_PER_EPOCH rows
    // per advance, oldest first (primary-key = id order). Every branch of the
@@ -1645,27 +1680,34 @@ void uwrit::drainfwq() {
       const auto row = *head;
       ++drained;
 
-      auto refund_and_drop = [&](const char* why) {
+      // Fault taxonomy for the revert fee: system-caused failures (the chain
+      // registry or reserve state changed AFTER swapfromwire validated the
+      // row) refund in full via REFUND_FEE_EXEMPT_BPS; failures the caller's
+      // own parameters produce (unpriceable escrow, missed variance
+      // tolerance) forfeit `fromwire_revert_fee_bps` so revert churn cannot
+      // recycle for free.
+      auto refund_and_drop = [&](const char* why, uint32_t revert_fee_bps) {
          sysio::print("drainfwq: ", why, " — refunding queued swap ", row.id, "\n");
          action(
             permission_level{get_self(), "active"_n},
             RESERVE_ACCOUNT, "refundwire"_n,
-            std::make_tuple(row.user, row.wire_amount)
+            std::make_tuple(row.user, row.wire_amount, revert_fee_bps)
          ).send();
          q.erase(fw_key{row.id});
       };
 
       if (!depot_code) {
-         refund_and_drop("depot chain not registered");
+         refund_and_drop("depot chain not registered", REFUND_FEE_EXEMPT_BPS);
          continue;
       }
       auto r = find_reserve(row.dst_chain_code, row.dst_token_code, row.dst_reserve_code);
       if (!r || r->status != ReserveStatus::RESERVE_STATUS_ACTIVE) {
-         refund_and_drop("target reserve missing or not ACTIVE");
+         refund_and_drop("target reserve missing or not ACTIVE", REFUND_FEE_EXEMPT_BPS);
          continue;
       }
       if (r->is_private) {
-         refund_and_drop("target reserve is private (excluded from WIRE-endpoint swaps)");
+         refund_and_drop("target reserve is private (excluded from WIRE-endpoint swaps)",
+                         REFUND_FEE_EXEMPT_BPS);
          continue;
       }
       // Authoritative variance check. The target reserve is confirmed ACTIVE
@@ -1678,9 +1720,10 @@ void uwrit::drainfwq() {
       const uint64_t quote = swap_quote(*depot_code, WIRE_TOKEN, WIRE_TOKEN,
                                          row.dst_chain_code, row.dst_token_code,
                                          row.dst_reserve_code, row.wire_amount,
-                                         current_fee_bps(get_self()));
+                                         cfg.fee_bps);
       if (quote == 0) {
-         refund_and_drop("unpriceable target reserve: zero quote from an ACTIVE reserve");
+         refund_and_drop("unpriceable target reserve: zero quote from an ACTIVE reserve",
+                         cfg.fromwire_revert_fee_bps);
          continue;
       }
       {
@@ -1691,7 +1734,8 @@ void uwrit::drainfwq() {
          const uint128_t allowed = (static_cast<uint128_t>(row.target_amount)
                                        * row.variance_tolerance_bps) / 10000u;
          if (static_cast<uint128_t>(diff) > allowed) {
-            refund_and_drop("variance exceeded tolerance at drain");
+            refund_and_drop("variance exceeded tolerance at drain",
+                            cfg.fromwire_revert_fee_bps);
             continue;
          }
       }
@@ -1728,7 +1772,8 @@ void uwrit::drainfwq() {
       std::vector<char> encoded;
       auto out = zpp::bits::out{encoded, zpp::bits::no_size{}};
       if (out(sr) != zpp::bits::errc{}) {
-         refund_and_drop("failed to encode synthetic SwapRequest");
+         // Internal encode failure — not a caller-controlled revert cause.
+         refund_and_drop("failed to encode synthetic SwapRequest", REFUND_FEE_EXEMPT_BPS);
          continue;
       }
 

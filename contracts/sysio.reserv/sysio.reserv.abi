@@ -264,6 +264,10 @@
                 {
                     "name": "wire_amount",
                     "type": "uint64"
+                },
+                {
+                    "name": "revert_fee_bps",
+                    "type": "uint32"
                 }
             ]
         },

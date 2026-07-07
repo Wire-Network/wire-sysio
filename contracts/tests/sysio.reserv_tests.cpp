@@ -826,16 +826,46 @@ BOOST_FIXTURE_TEST_CASE(paywire_rejects_overdraw, sysio_reserve_tester) { try {
 
 BOOST_FIXTURE_TEST_CASE(refundwire_returns_escrow, sysio_reserve_tester) { try {
    // Seed custody via a bootstrap reserve (the refund itself touches no
-   // reserve row — it returns in-flight escrow).
+   // reserve row — it returns in-flight escrow). Zero revert fee: a no-fault
+   // refund returns the full escrow.
    BOOST_REQUIRE_EQUAL(success(),
       regreserve("ETH", "ETH", "PRIMARY", 1000, 1000));
 
    BOOST_REQUIRE_EQUAL(success(), push_action(UWRIT_ACCOUNT, "refundwire"_n, mvo()
-      ("recipient",   "alice")
-      ("wire_amount", 150)));
+      ("recipient",      "alice")
+      ("wire_amount",    150)
+      ("revert_fee_bps", 0)));
 
    BOOST_REQUIRE_EQUAL(150, wire_balance("alice"_n));
    BOOST_REQUIRE_EQUAL(850, wire_balance(RESERVE_ACCOUNT));
+
+   auto r = find_reserve("ETH", "ETH", "PRIMARY");
+   BOOST_REQUIRE_EQUAL(1000, r["reserve_wire_amount"].as_uint64());   // untouched
+
+   BOOST_REQUIRE(get_rewardbkt().is_null());   // no fee — nothing accrued
+} FC_LOG_AND_RETHROW() }
+
+// A nonzero revert fee (caller-fault drain revert) is taken out of the refund
+// and routed exactly like a settlement fee: rewards share into the bucket
+// (custody-internal), emissions share transferred to the treasury. Integer
+// split: 10% of 150 = 15 -> rewards floor(15/2) = 7, emissions 8; the shares
+// sum to the fee exactly.
+BOOST_FIXTURE_TEST_CASE(refundwire_routes_revert_fee, sysio_reserve_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(),
+      regreserve("ETH", "ETH", "PRIMARY", 1000, 1000));
+
+   BOOST_REQUIRE_EQUAL(success(), push_action(UWRIT_ACCOUNT, "refundwire"_n, mvo()
+      ("recipient",      "alice")
+      ("wire_amount",    150)
+      ("revert_fee_bps", 1000)));   // 10%
+
+   BOOST_REQUIRE_EQUAL(135, wire_balance("alice"_n));            // 150 - 15 fee
+   BOOST_REQUIRE_EQUAL(857, wire_balance(RESERVE_ACCOUNT));      // 1000 - 135 - 8 emissions
+
+   auto bkt = get_rewardbkt();
+   BOOST_REQUIRE(!bkt.is_null());
+   BOOST_REQUIRE_EQUAL(7u, bkt["balance"].as_uint64());
+   BOOST_REQUIRE_EQUAL(7u, bkt["lifetime_accrued"].as_uint64());
 
    auto r = find_reserve("ETH", "ETH", "PRIMARY");
    BOOST_REQUIRE_EQUAL(1000, r["reserve_wire_amount"].as_uint64());   // untouched

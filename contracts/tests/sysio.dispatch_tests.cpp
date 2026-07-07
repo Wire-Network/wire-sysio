@@ -2172,8 +2172,11 @@ BOOST_FIXTURE_TEST_CASE(drainfwq_bounds_rows_per_epoch, sysio_dispatch_tester) {
    bootstrap_for_dispatch();            // registers the ETH (EVM) outpost + epoch machinery
    setup_wire_token_and_reserves();     // sysio.token + ACTIVE public ETH/ETH/PRIMARY reserve
    register_wire_depot();               // so drainfwq's depot_chain_code() resolves
+   // Floor lowered to 1: this case exercises the drain BOUND with 40 cheap distinct rows; the
+   // default 5-WIRE floor and the revert fee have their own dedicated cases below.
    BOOST_REQUIRE_EQUAL(success(), push(UWRIT_ACCOUNT, uwrit_abi, UWRIT_ACCOUNT, "setconfig"_n, mvo()
-      ("fee_bps", 10)("collateral_lock_duration_ms", 120'000u)));
+      ("fee_bps", 10)("collateral_lock_duration_ms", 120'000u)
+      ("min_fromwire_amount", 1)("fromwire_revert_fee_bps", 0)));
 
    // A funded from-WIRE swap user (plain account, no ROA policy).
    create_account("swapuser"_n, config::system_account_name, /*multisig=*/false,
@@ -2225,6 +2228,165 @@ BOOST_FIXTURE_TEST_CASE(drainfwq_bounds_rows_per_epoch, sysio_dispatch_tester) {
    BOOST_REQUIRE_EQUAL(success(),
       push(UWRIT_ACCOUNT, uwrit_abi, EPOCH_ACCOUNT, "drainfwq"_n, mvo()));
    BOOST_REQUIRE_EQUAL(0u, count_queued());
+} FC_LOG_AND_RETHROW() }
+
+// The swapfromwire escrow floor prices fwqueue slots in locked capital: dust rows are refunded in
+// full at drain, so without the floor spam rows could hold drain slots while locking nothing. The
+// floor defaults to 5 WIRE and is retunable via setconfig without an upgrade.
+BOOST_FIXTURE_TEST_CASE(swapfromwire_enforces_min_amount, sysio_dispatch_tester) { try {
+   // Mirror of the contract default (contract headers are not host-compilable). Keep in sync with
+   // sysio.uwrit.hpp::DEFAULT_MIN_FROMWIRE_AMOUNT.
+   constexpr uint64_t DEFAULT_MIN_FROMWIRE_AMOUNT = 5'000'000'000ull; // 5 WIRE @ 9 decimals
+   constexpr uint64_t DEPOT_ORIGIN_ID_BASE        = 0x8000000000000000ull;
+
+   bootstrap_for_dispatch();
+   setup_wire_token_and_reserves();   // ACTIVE public ETH/ETH/PRIMARY destination reserve
+
+   create_account("swapuser"_n, config::system_account_name, /*multisig=*/false,
+                  /*include_code=*/true, /*include_roa_policy=*/false);
+   BOOST_REQUIRE_EQUAL(success(), push(TOKEN_ACCOUNT, token_abi, config::system_account_name,
+      "transfer"_n, mvo()("from", "sysio")("to", "swapuser")
+         ("quantity", "100.000000000 WIRE")("memo", "fund swap user")));
+
+   auto swap = [&](uint64_t wire_amount) {
+      return push(UWRIT_ACCOUNT, uwrit_abi, "swapuser"_n, "swapfromwire"_n, mvo()
+         ("user",                 "swapuser")
+         ("wire_amount",          wire_amount)
+         ("dst_chain_code",       codename_mvo("ETH"))
+         ("dst_token_code",       codename_mvo("ETH"))
+         ("dst_reserve_code",     codename_mvo("PRIMARY"))
+         ("target_amount",        uint64_t{1'000'000})
+         ("target_tolerance_bps", uint32_t{10000})
+         ("recipient_kind",       sysio::opp::types::ChainKind::CHAIN_KIND_EVM)
+         ("recipient_addr",       std::vector<char>(20, '\x0a')));
+   };
+   auto queued = [&](uint64_t seq) {
+      return !get_row_by_id(UWRIT_ACCOUNT, UWRIT_ACCOUNT, "fwqueue"_n,
+                            DEPOT_ORIGIN_ID_BASE | seq).empty();
+   };
+
+   // Default config (setconfig never pushed): one atom below the floor is rejected, the exact
+   // floor is accepted and lands in the queue.
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: swapfromwire: wire_amount below the configured minimum"),
+      swap(DEFAULT_MIN_FROMWIRE_AMOUNT - 1));
+   BOOST_REQUIRE_EQUAL(success(), swap(DEFAULT_MIN_FROMWIRE_AMOUNT));
+   BOOST_REQUIRE(queued(0));
+
+   // The floor is live config: lower it and the new boundary is enforced instead.
+   constexpr uint64_t LOWERED_FLOOR = 1'000'000;
+   BOOST_REQUIRE_EQUAL(success(), push(UWRIT_ACCOUNT, uwrit_abi, UWRIT_ACCOUNT, "setconfig"_n, mvo()
+      ("fee_bps", 10)("collateral_lock_duration_ms", 120'000u)
+      ("min_fromwire_amount", LOWERED_FLOOR)("fromwire_revert_fee_bps", 10)));
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: swapfromwire: wire_amount below the configured minimum"),
+      swap(LOWERED_FLOOR - 1));
+   BOOST_REQUIRE_EQUAL(success(), swap(LOWERED_FLOOR));
+   BOOST_REQUIRE(queued(1));
+} FC_LOG_AND_RETHROW() }
+
+// Caller-controlled drain-time reverts forfeit the configured revert fee: the refund returns the
+// escrow minus the fee, and the fee routes through the standard rewards/emissions split exactly
+// like a settlement fee — so revert churn pays the system instead of recycling for free.
+BOOST_FIXTURE_TEST_CASE(drainfwq_charges_revert_fee_on_caller_fault, sysio_dispatch_tester) { try {
+   constexpr uint64_t ESCROW              = 5'000'000'000ull; // the default floor exactly
+   constexpr uint32_t REVERT_FEE_BPS      = 100;              // 1%
+   constexpr uint64_t FEE                 = ESCROW * REVERT_FEE_BPS / 10000ull; // 0.05 WIRE
+   // Mirror of sysio.reserv.hpp::FEE_REWARD_SHARE_BPS (50% rewards / 50% emissions).
+   constexpr uint64_t REWARD_SHARE        = FEE / 2;
+   constexpr uint64_t DEPOT_ORIGIN_ID_0   = 0x8000000000000000ull;
+   const auto WIRE_SYM = symbol(9, "WIRE");
+
+   bootstrap_for_dispatch();
+   setup_wire_token_and_reserves();
+   register_wire_depot();             // depot registered => the drain reaches the variance check
+   BOOST_REQUIRE_EQUAL(success(), push(UWRIT_ACCOUNT, uwrit_abi, UWRIT_ACCOUNT, "setconfig"_n, mvo()
+      ("fee_bps", 10)("collateral_lock_duration_ms", 120'000u)
+      ("min_fromwire_amount", ESCROW)("fromwire_revert_fee_bps", REVERT_FEE_BPS)));
+
+   create_account("swapuser"_n, config::system_account_name, /*multisig=*/false,
+                  /*include_code=*/true, /*include_roa_policy=*/false);
+   BOOST_REQUIRE_EQUAL(success(), push(TOKEN_ACCOUNT, token_abi, config::system_account_name,
+      "transfer"_n, mvo()("from", "sysio")("to", "swapuser")
+         ("quantity", "10.000000000 WIRE")("memo", "fund swap user")));
+   const int64_t funded = get_currency_balance(TOKEN_ACCOUNT, WIRE_SYM, "swapuser"_n).get_amount();
+
+   // target_amount=1 with zero tolerance: the live quote against the seeded 1e12/1e12 pool is
+   // ~5e9, so |quote - 1| > 0 == allowed and the row reverts at drain — a failure produced
+   // entirely by the caller's own parameters.
+   BOOST_REQUIRE_EQUAL(success(),
+      push(UWRIT_ACCOUNT, uwrit_abi, "swapuser"_n, "swapfromwire"_n, mvo()
+         ("user",                 "swapuser")
+         ("wire_amount",          ESCROW)
+         ("dst_chain_code",       codename_mvo("ETH"))
+         ("dst_token_code",       codename_mvo("ETH"))
+         ("dst_reserve_code",     codename_mvo("PRIMARY"))
+         ("target_amount",        uint64_t{1})
+         ("target_tolerance_bps", uint32_t{0})
+         ("recipient_kind",       sysio::opp::types::ChainKind::CHAIN_KIND_EVM)
+         ("recipient_addr",       std::vector<char>(20, '\x0a'))));
+   BOOST_REQUIRE_EQUAL(funded - static_cast<int64_t>(ESCROW),
+      get_currency_balance(TOKEN_ACCOUNT, WIRE_SYM, "swapuser"_n).get_amount());
+
+   BOOST_REQUIRE_EQUAL(success(),
+      push(UWRIT_ACCOUNT, uwrit_abi, EPOCH_ACCOUNT, "drainfwq"_n, mvo()));
+
+   // Row consumed; escrow minus the fee came back; the fee split 50/50 into the reserv rewards
+   // bucket (custody-internal) and the sysio emissions treasury (real transfer).
+   BOOST_REQUIRE(get_row_by_id(UWRIT_ACCOUNT, UWRIT_ACCOUNT, "fwqueue"_n, DEPOT_ORIGIN_ID_0).empty());
+   BOOST_REQUIRE_EQUAL(funded - static_cast<int64_t>(FEE),
+      get_currency_balance(TOKEN_ACCOUNT, WIRE_SYM, "swapuser"_n).get_amount());
+   auto bkt_data = get_row_by_account(RESERV_ACCOUNT, RESERV_ACCOUNT, "rewardbkt"_n, "rewardbkt"_n);
+   BOOST_REQUIRE(!bkt_data.empty());
+   auto bkt = reserv_abi.binary_to_variant("rewards_bucket", bkt_data,
+      abi_serializer::create_yield_function(abi_serializer_max_time));
+   BOOST_REQUIRE_EQUAL(REWARD_SHARE, bkt["balance"].as_uint64());
+} FC_LOG_AND_RETHROW() }
+
+// Reverts caused by system state changes after enqueue refund in full even with a nonzero revert
+// fee configured — the caller did nothing wrong. Exercised via the cheapest system-fault branch:
+// no WIRE depot chain registered at drain time.
+BOOST_FIXTURE_TEST_CASE(drainfwq_full_refund_on_system_caused_revert, sysio_dispatch_tester) { try {
+   constexpr uint64_t ESCROW            = 5'000'000'000ull;
+   constexpr uint64_t DEPOT_ORIGIN_ID_0 = 0x8000000000000000ull;
+   const auto WIRE_SYM = symbol(9, "WIRE");
+
+   bootstrap_for_dispatch();
+   setup_wire_token_and_reserves();
+   // register_wire_depot() deliberately NOT called: drainfwq's depot_chain_code() comes back
+   // empty, which is a system-caused revert (the registry, not the caller's parameters).
+   BOOST_REQUIRE_EQUAL(success(), push(UWRIT_ACCOUNT, uwrit_abi, UWRIT_ACCOUNT, "setconfig"_n, mvo()
+      ("fee_bps", 10)("collateral_lock_duration_ms", 120'000u)
+      ("min_fromwire_amount", ESCROW)("fromwire_revert_fee_bps", 100)));
+
+   create_account("swapuser"_n, config::system_account_name, /*multisig=*/false,
+                  /*include_code=*/true, /*include_roa_policy=*/false);
+   BOOST_REQUIRE_EQUAL(success(), push(TOKEN_ACCOUNT, token_abi, config::system_account_name,
+      "transfer"_n, mvo()("from", "sysio")("to", "swapuser")
+         ("quantity", "10.000000000 WIRE")("memo", "fund swap user")));
+   const int64_t funded = get_currency_balance(TOKEN_ACCOUNT, WIRE_SYM, "swapuser"_n).get_amount();
+
+   BOOST_REQUIRE_EQUAL(success(),
+      push(UWRIT_ACCOUNT, uwrit_abi, "swapuser"_n, "swapfromwire"_n, mvo()
+         ("user",                 "swapuser")
+         ("wire_amount",          ESCROW)
+         ("dst_chain_code",       codename_mvo("ETH"))
+         ("dst_token_code",       codename_mvo("ETH"))
+         ("dst_reserve_code",     codename_mvo("PRIMARY"))
+         ("target_amount",        uint64_t{1'000'000})
+         ("target_tolerance_bps", uint32_t{10000})
+         ("recipient_kind",       sysio::opp::types::ChainKind::CHAIN_KIND_EVM)
+         ("recipient_addr",       std::vector<char>(20, '\x0a'))));
+
+   BOOST_REQUIRE_EQUAL(success(),
+      push(UWRIT_ACCOUNT, uwrit_abi, EPOCH_ACCOUNT, "drainfwq"_n, mvo()));
+
+   // Full escrow returned — no fee — and no rewards-bucket accrual.
+   BOOST_REQUIRE(get_row_by_id(UWRIT_ACCOUNT, UWRIT_ACCOUNT, "fwqueue"_n, DEPOT_ORIGIN_ID_0).empty());
+   BOOST_REQUIRE_EQUAL(funded,
+      get_currency_balance(TOKEN_ACCOUNT, WIRE_SYM, "swapuser"_n).get_amount());
+   BOOST_REQUIRE(get_row_by_account(RESERV_ACCOUNT, RESERV_ACCOUNT,
+                                    "rewardbkt"_n, "rewardbkt"_n).empty());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()
