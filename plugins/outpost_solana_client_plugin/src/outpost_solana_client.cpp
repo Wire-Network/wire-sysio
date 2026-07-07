@@ -141,11 +141,9 @@ void record_unique_pubkey(std::vector<fc::network::solana::solana_public_key>& p
 void record_unique_reserve_seed(std::vector<reserve_pda_seeds>& seeds,
                                 uint64_t token_code,
                                 uint64_t reserve_code) {
-   auto matches = [&](const reserve_pda_seeds& s) {
-      return s.token_code == token_code && s.reserve_code == reserve_code;
-   };
-   if (std::find_if(seeds.begin(), seeds.end(), matches) == seeds.end()) {
-      seeds.push_back(reserve_pda_seeds{token_code, reserve_code});
+   const reserve_pda_seeds candidate{token_code, reserve_code};
+   if (std::find(seeds.begin(), seeds.end(), candidate) == seeds.end()) {
+      seeds.push_back(candidate);
    }
 }
 
@@ -156,10 +154,10 @@ reserve_terminal_lookups_for_seeds(const fc::network::solana::solana_public_key&
                                    const std::vector<reserve_pda_seeds>& seeds) {
    std::vector<reserve_terminal_lookup> lookups;
    lookups.reserve(seeds.size());
+   // Linear de-dupe preserves first-seen account order; the manifest input is bounded by the OPP envelope cap.
    for (const auto& seeds_for_reserve : seeds) {
       auto matches = [&](const reserve_terminal_lookup& lookup) {
-         return lookup.seeds.token_code == seeds_for_reserve.token_code &&
-                lookup.seeds.reserve_code == seeds_for_reserve.reserve_code;
+         return lookup.seeds == seeds_for_reserve;
       };
       if (std::find_if(lookups.begin(), lookups.end(), matches) != lookups.end()) continue;
 
@@ -212,6 +210,27 @@ reserve_terminal_info_from_account(const reserve_pda_seeds& seeds,
              reserve_pda.to_string(fc::yield_function_t{}));
 
    return reserve_terminal_info_from_variant(decode_reserve(account_info->data));
+}
+
+reserve_terminal_info_cache reserve_terminal_info_cache_from_accounts(
+   const std::vector<reserve_terminal_lookup>& lookups,
+   const std::vector<std::optional<fc::network::solana::account_info>>& account_infos,
+   const reserve_account_decoder& decode_reserve,
+   std::string_view client_label) {
+   FC_ASSERT(account_infos.size() == lookups.size(),
+             "getMultipleAccounts returned {} values for {} Reserve PDA requests",
+             account_infos.size(),
+             lookups.size());
+
+   reserve_terminal_info_cache infos;
+   for (size_t i = 0; i < lookups.size(); ++i) {
+      const auto& lookup = lookups[i];
+      infos.emplace(
+         lookup.seeds,
+         reserve_terminal_info_from_account(lookup.seeds, lookup.reserve_pda, account_infos[i], decode_reserve,
+                                            client_label));
+   }
+   return infos;
 }
 
 terminal_manifest_sources extract_inbound_terminal_manifest_sources(const sysio::opp::Envelope& env) {
@@ -358,9 +377,7 @@ sysio::opp::types::ChainKind outpost_solana_client::chain_kind() const {
 outpost_solana_client_detail::reserve_terminal_info_cache
 outpost_solana_client::reserve_infos_for_lookups(
    const std::vector<outpost_solana_client_detail::reserve_terminal_lookup>& lookups) {
-   outpost_solana_client_detail::reserve_terminal_info_cache infos;
-
-   if (lookups.empty()) return infos;
+   if (lookups.empty()) return {};
 
    std::vector<fc::network::solana::solana_public_key> reserve_pdas;
    reserve_pdas.reserve(lookups.size());
@@ -369,25 +386,15 @@ outpost_solana_client::reserve_infos_for_lookups(
    }
 
    const auto account_infos = _entry->client->get_multiple_accounts(reserve_pdas);
-   FC_ASSERT(account_infos.size() == lookups.size(),
-             "getMultipleAccounts returned {} values for {} Reserve PDA requests",
-             account_infos.size(),
-             lookups.size());
 
    const auto client_label = to_string();
+   const auto reserve_account_name = std::string(RESERVE_ACCOUNT_NAME);
    auto decode_reserve = [&](const std::vector<uint8_t>& data) {
-      return _program_client->decode_account_info_data(std::string(RESERVE_ACCOUNT_NAME), data);
+      return _program_client->decode_account_info_data(reserve_account_name, data);
    };
 
-   for (size_t i = 0; i < lookups.size(); ++i) {
-      const auto& lookup = lookups[i];
-      infos.emplace(
-         lookup.seeds,
-         outpost_solana_client_detail::reserve_terminal_info_from_account(
-            lookup.seeds, lookup.reserve_pda, account_infos[i], decode_reserve, client_label));
-   }
-
-   return infos;
+   return outpost_solana_client_detail::reserve_terminal_info_cache_from_accounts(
+      lookups, account_infos, decode_reserve, client_label);
 }
 
 std::string outpost_solana_client::deliver_outbound_envelope(
@@ -427,8 +434,9 @@ std::string outpost_solana_client::deliver_outbound_envelope(
    };
    auto reserve_lookup_for = [&](uint64_t token_code, uint64_t reserve_code)
       -> const outpost_solana_client_detail::reserve_terminal_lookup& {
+      const outpost_solana_client_detail::reserve_pda_seeds key{token_code, reserve_code};
       auto it = std::find_if(reserve_lookups.begin(), reserve_lookups.end(), [&](const auto& lookup) {
-         return lookup.seeds.token_code == token_code && lookup.seeds.reserve_code == reserve_code;
+         return lookup.seeds == key;
       });
       FC_ASSERT(it != reserve_lookups.end(),
                 "Missing derived Reserve PDA lookup for Reserve({}, {})",
@@ -441,7 +449,7 @@ std::string outpost_solana_client::deliver_outbound_envelope(
    auto add_reserve_info_lookup = [&](uint64_t token_code, uint64_t reserve_code) {
       const auto& lookup = reserve_lookup_for(token_code, reserve_code);
       auto matches = [&](const auto& existing) {
-         return existing.seeds.token_code == token_code && existing.seeds.reserve_code == reserve_code;
+         return existing.seeds == lookup.seeds;
       };
       if (std::find_if(reserve_info_lookups.begin(), reserve_info_lookups.end(), matches) ==
           reserve_info_lookups.end()) {

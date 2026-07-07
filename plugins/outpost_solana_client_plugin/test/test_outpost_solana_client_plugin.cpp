@@ -17,8 +17,10 @@
 
 #include <algorithm>
 #include <filesystem>
+#include <limits>
 #include <map>
 #include <optional>
+#include <utility>
 
 using namespace std::literals;
 using namespace fc::network::solana;
@@ -665,12 +667,11 @@ solana_public_key expected_reserve_pda(const solana_public_key& program_id,
       program_id).first;
 }
 
-/// Assert one extracted Reserve seed pair without requiring an equality operator.
+/// Assert one extracted Reserve seed pair using the production value comparison.
 void check_seed_pair(const sysio::outpost_solana_client_detail::reserve_pda_seeds& seeds,
                      uint64_t token_code,
                      uint64_t reserve_code) {
-   BOOST_CHECK_EQUAL(seeds.token_code, token_code);
-   BOOST_CHECK_EQUAL(seeds.reserve_code, reserve_code);
+   BOOST_CHECK(seeds == (sysio::outpost_solana_client_detail::reserve_pda_seeds{token_code, reserve_code}));
 }
 
 /// Build the decoded Reserve account variant shape consumed by terminal manifest logic.
@@ -681,6 +682,30 @@ fc::variant reserve_variant(const solana_public_key& creator,
       (reserve_field_creator, creator.to_string(fc::yield_function_t{}))
       (reserve_field_custody_mint, custody_mint.to_string(fc::yield_function_t{}))
       (reserve_field_custody_decimals, custody_decimals);
+}
+
+/// Build a decoded Reserve account variant with one required field omitted.
+fc::variant reserve_variant_without_field(std::string_view omitted_field) {
+   const auto creator = measurement_pubkey(0x731);
+   const auto mint = measurement_pubkey(0x732);
+   fc::mutable_variant_object reserve;
+   if (omitted_field != reserve_field_creator) {
+      reserve(reserve_field_creator, creator.to_string(fc::yield_function_t{}));
+   }
+   if (omitted_field != reserve_field_custody_mint) {
+      reserve(reserve_field_custody_mint, mint.to_string(fc::yield_function_t{}));
+   }
+   if (omitted_field != reserve_field_custody_decimals) {
+      reserve(reserve_field_custody_decimals, 9u);
+   }
+   return reserve;
+}
+
+/// Build a fetched Solana account with caller-supplied Reserve data bytes.
+fc::network::solana::account_info reserve_account(std::vector<uint8_t> data) {
+   fc::network::solana::account_info account;
+   account.data = std::move(data);
+   return account;
 }
 
 } // anonymous namespace
@@ -979,8 +1004,7 @@ BOOST_AUTO_TEST_CASE(reserve_terminal_info_absent_account_returns_nullopt_withou
 
 BOOST_AUTO_TEST_CASE(reserve_terminal_info_decode_failure_propagates) try {
    const sysio::outpost_solana_client_detail::reserve_pda_seeds seeds{720u, 820u};
-   fc::network::solana::account_info account;
-   account.data = {0x01};
+   const auto account = reserve_account({0x01});
    auto decoder = [](const std::vector<uint8_t>&) -> fc::variant {
       FC_THROW("synthetic Reserve decode failure");
       return fc::variant();
@@ -1006,6 +1030,117 @@ BOOST_AUTO_TEST_CASE(reserve_terminal_info_decodes_required_fields) try {
    BOOST_CHECK(info.creator == creator);
    BOOST_CHECK(info.custody_mint == mint);
    BOOST_CHECK_EQUAL(info.custody_decimals, 9u);
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(reserve_terminal_info_decodes_max_custody_decimals) try {
+   const auto creator = measurement_pubkey(0x733);
+   const auto mint = system::program_ids::TOKEN_PROGRAM;
+
+   const auto info = sysio::outpost_solana_client_detail::reserve_terminal_info_from_variant(
+      reserve_variant(creator, mint, std::numeric_limits<uint8_t>::max()));
+
+   BOOST_CHECK(info.creator == creator);
+   BOOST_CHECK(info.custody_mint == mint);
+   BOOST_CHECK_EQUAL(static_cast<unsigned>(info.custody_decimals),
+                     static_cast<unsigned>(std::numeric_limits<uint8_t>::max()));
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(reserve_terminal_info_rejects_out_of_range_custody_decimals) try {
+   const auto creator = measurement_pubkey(0x734);
+   const auto mint = system::program_ids::TOKEN_PROGRAM;
+
+   BOOST_CHECK_THROW(
+      sysio::outpost_solana_client_detail::reserve_terminal_info_from_variant(
+         reserve_variant(creator, mint, static_cast<uint64_t>(std::numeric_limits<uint8_t>::max()) + 1u)),
+      fc::exception);
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(reserve_terminal_info_requires_all_fields) try {
+   BOOST_CHECK_THROW(
+      sysio::outpost_solana_client_detail::reserve_terminal_info_from_variant(
+         reserve_variant_without_field(reserve_field_creator)),
+      fc::exception);
+   BOOST_CHECK_THROW(
+      sysio::outpost_solana_client_detail::reserve_terminal_info_from_variant(
+         reserve_variant_without_field(reserve_field_custody_mint)),
+      fc::exception);
+   BOOST_CHECK_THROW(
+      sysio::outpost_solana_client_detail::reserve_terminal_info_from_variant(
+         reserve_variant_without_field(reserve_field_custody_decimals)),
+      fc::exception);
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(reserve_terminal_info_rejects_empty_account_data_without_decoding) try {
+   const sysio::outpost_solana_client_detail::reserve_pda_seeds seeds{735u, 835u};
+   bool decoder_called = false;
+   auto decoder = [&](const std::vector<uint8_t>&) -> fc::variant {
+      decoder_called = true;
+      return fc::variant();
+   };
+
+   BOOST_CHECK_THROW(
+      sysio::outpost_solana_client_detail::reserve_terminal_info_from_account(
+         seeds,
+         measurement_pubkey(0x735),
+         reserve_account({}),
+         decoder,
+         "test-client"),
+      fc::exception);
+   BOOST_CHECK(!decoder_called);
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(reserve_terminal_info_cache_from_accounts_preserves_lookup_results) try {
+   const sysio::outpost_solana_client_detail::reserve_pda_seeds absent_seeds{740u, 840u};
+   const sysio::outpost_solana_client_detail::reserve_pda_seeds decoded_seeds{741u, 841u};
+   const std::vector<sysio::outpost_solana_client_detail::reserve_terminal_lookup> lookups = {
+      {absent_seeds, measurement_pubkey(0x740)},
+      {decoded_seeds, measurement_pubkey(0x741)},
+   };
+
+   const auto creator = measurement_pubkey(0x742);
+   const auto mint = system::program_ids::TOKEN_PROGRAM;
+   size_t decode_count = 0;
+   auto decoder = [&](const std::vector<uint8_t>& data) -> fc::variant {
+      ++decode_count;
+      BOOST_REQUIRE_EQUAL(data.size(), 1u);
+      BOOST_CHECK_EQUAL(static_cast<unsigned>(data[0]), 0x42u);
+      return reserve_variant(creator, mint, 6u);
+   };
+   const std::vector<std::optional<fc::network::solana::account_info>> account_infos = {
+      std::nullopt,
+      reserve_account({0x42}),
+   };
+
+   const auto cache = sysio::outpost_solana_client_detail::reserve_terminal_info_cache_from_accounts(
+      lookups, account_infos, decoder, "test-client");
+
+   BOOST_REQUIRE_EQUAL(cache.size(), 2u);
+   const auto absent_it = cache.find(absent_seeds);
+   BOOST_REQUIRE(absent_it != cache.end());
+   BOOST_CHECK(!absent_it->second.has_value());
+
+   const auto decoded_it = cache.find(decoded_seeds);
+   BOOST_REQUIRE(decoded_it != cache.end());
+   BOOST_REQUIRE(decoded_it->second.has_value());
+   BOOST_CHECK(decoded_it->second->creator == creator);
+   BOOST_CHECK(decoded_it->second->custody_mint == mint);
+   BOOST_CHECK_EQUAL(static_cast<unsigned>(decoded_it->second->custody_decimals), 6u);
+   BOOST_CHECK_EQUAL(decode_count, 1u);
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(reserve_terminal_info_cache_from_accounts_rejects_mismatched_result_count) try {
+   const std::vector<sysio::outpost_solana_client_detail::reserve_terminal_lookup> lookups = {
+      {sysio::outpost_solana_client_detail::reserve_pda_seeds{750u, 850u}, measurement_pubkey(0x750)},
+   };
+   const std::vector<std::optional<fc::network::solana::account_info>> account_infos;
+   auto decoder = [](const std::vector<uint8_t>&) -> fc::variant {
+      return fc::variant();
+   };
+
+   BOOST_CHECK_THROW(
+      sysio::outpost_solana_client_detail::reserve_terminal_info_cache_from_accounts(
+         lookups, account_infos, decoder, "test-client"),
+      fc::exception);
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_SUITE_END()

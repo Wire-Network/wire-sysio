@@ -1,5 +1,6 @@
 #pragma once
 
+#include <compare>
 #include <functional>
 #include <map>
 #include <memory>
@@ -28,14 +29,11 @@ namespace outpost_solana_client_detail {
 struct reserve_pda_seeds {
    uint64_t token_code;
    uint64_t reserve_code;
-};
 
-/// Value ordering for Reserve seed pairs, allowing them to be used directly
-/// as cache keys without losing the domain meaning behind the two integers.
-inline bool operator<(const reserve_pda_seeds& lhs, const reserve_pda_seeds& rhs) {
-   if (lhs.token_code != rhs.token_code) return lhs.token_code < rhs.token_code;
-   return lhs.reserve_code < rhs.reserve_code;
-}
+   /// Value comparison for Reserve seed pairs, allowing them to be used directly
+   /// as cache keys without losing the domain meaning behind the two integers.
+   friend constexpr auto operator<=>(const reserve_pda_seeds&, const reserve_pda_seeds&) = default;
+};
 
 /// Pinned terminal-finalization facts decoded from a per-reserve Solana PDA.
 struct reserve_terminal_info {
@@ -170,6 +168,8 @@ void record_terminal_account(std::vector<fc::network::solana::account_meta>& met
 /// Exposed in this header (rather than the .cpp's anonymous namespace)
 /// so the plugin's unit tests can exercise the decoder against a
 /// synthesised Envelope without spinning up a full Solana client.
+/// Compatibility/test-facing wrapper over `extract_inbound_terminal_manifest_sources`;
+/// production delivery uses the manifest directly to avoid repeated walks.
 std::vector<fc::network::solana::solana_public_key>
 extract_inbound_recipient_pubkeys(const std::vector<char>& envelope_bytes);
 
@@ -191,8 +191,19 @@ reserve_terminal_info_from_account(const reserve_pda_seeds& seeds,
                                    const reserve_account_decoder& decode_reserve,
                                    std::string_view client_label);
 
+/// Interpret one batched Reserve account RPC response in lookup order. A
+/// null account is cached as `std::nullopt`; transport and decode failures
+/// are intentionally not caught so outbound delivery can retry.
+reserve_terminal_info_cache reserve_terminal_info_cache_from_accounts(
+   const std::vector<reserve_terminal_lookup>& lookups,
+   const std::vector<std::optional<fc::network::solana::account_info>>& account_infos,
+   const reserve_account_decoder& decode_reserve,
+   std::string_view client_label);
+
 /// Derive each unique Reserve PDA from seed pairs in first-seen order. The
-/// returned addresses are suitable for one `getMultipleAccounts` RPC call.
+/// function defensively dedupes caller input because test-facing wrappers can
+/// pass arbitrary seeds; `solana_client` chunks the returned addresses to the
+/// `getMultipleAccounts` RPC limit when needed.
 std::vector<reserve_terminal_lookup>
 reserve_terminal_lookups_for_seeds(const fc::network::solana::solana_public_key& program_id,
                                    const std::vector<reserve_pda_seeds>& seeds);
@@ -207,6 +218,8 @@ reserve_terminal_lookups_for_seeds(const fc::network::solana::solana_public_key&
 /// RESERVE_READY is single-shot (queued once at `matchreserve`); a
 /// missing PDA strands the outpost-local reserve in PENDING forever, so
 /// the lifecycle types are first-class here, not best-effort.
+/// Compatibility/test-facing wrapper over `extract_inbound_terminal_manifest_sources`;
+/// production delivery uses the manifest directly to avoid repeated walks.
 std::vector<reserve_pda_seeds>
 extract_inbound_swap_remit_reserve_seeds(const std::vector<char>& envelope_bytes);
 
@@ -215,6 +228,8 @@ extract_inbound_swap_remit_reserve_seeds(const std::vector<char>& envelope_bytes
 /// uses this narrower extractor after the Reserve PDA has been declared so
 /// it can append branch-specific refund/vault accounts from pinned reserve
 /// metadata.
+/// Compatibility/test-facing wrapper over `extract_inbound_terminal_manifest_sources`;
+/// production delivery uses the manifest directly to avoid repeated walks.
 std::vector<reserve_pda_seeds>
 extract_inbound_reserve_create_cancelled_seeds(const std::vector<char>& envelope_bytes);
 
@@ -257,12 +272,16 @@ terminal_manifest_sources extract_inbound_terminal_manifest_sources(const std::v
 /// the SPL-relevant tuple. Caller is responsible for resolving each
 /// `token_code` to a mint pubkey (cached from `OutpostConfig`) before
 /// deriving the recipient ATA + including it in `remaining_accounts`.
+/// Compatibility/test-facing wrapper over `extract_inbound_terminal_manifest_sources`;
+/// production delivery uses the manifest directly to avoid repeated walks.
 std::vector<swap_remit_spl_target>
 extract_inbound_swap_remit_spl_targets(const std::vector<char>& envelope_bytes);
 
 /// Walk every `SWAP_REVERT` attestation in `envelope_bytes` and collect the
 /// SPL-relevant tuple. The `recipient` field carries the depositor pubkey,
 /// because the SPL revert branch refunds into the depositor's ATA.
+/// Compatibility/test-facing wrapper over `extract_inbound_terminal_manifest_sources`;
+/// production delivery uses the manifest directly to avoid repeated walks.
 std::vector<swap_remit_spl_target>
 extract_inbound_swap_revert_spl_targets(const std::vector<char>& envelope_bytes);
 

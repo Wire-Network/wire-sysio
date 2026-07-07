@@ -1,12 +1,27 @@
 // SPDX-License-Identifier: MIT
 #include <boost/test/unit_test.hpp>
+#include <boost/asio.hpp>
+#include <fc/crypto/private_key.hpp>
 #include <fc/crypto/sha256.hpp>
 #include <fc/exception/exception.hpp>
+#include <fc/io/json.hpp>
 #include <fc/network/solana/solana_borsh.hpp>
 #include <fc/network/solana/solana_client.hpp>
 #include <fc/network/solana/solana_idl.hpp>
 #include <fc/network/solana/solana_system_programs.hpp>
 #include <fc/network/solana/solana_types.hpp>
+#include <fc/variant_object.hpp>
+
+#include <algorithm>
+#include <array>
+#include <exception>
+#include <iterator>
+#include <memory>
+#include <sstream>
+#include <string>
+#include <string_view>
+#include <thread>
+#include <utility>
 
 using namespace fc::network::solana;
 using namespace fc::crypto::solana;
@@ -14,6 +29,17 @@ using namespace fc::crypto::solana;
 BOOST_AUTO_TEST_SUITE(solana_client_tests)
 
 namespace {
+
+using tcp = boost::asio::ip::tcp;
+
+/// Solana JSON-RPC per-request account cap exercised by the chunking test.
+constexpr size_t SOLANA_GET_MULTIPLE_ACCOUNTS_RPC_LIMIT = 100;
+/// Number of accounts that requires three `getMultipleAccounts` RPC requests.
+constexpr size_t GET_MULTIPLE_ACCOUNTS_CHUNK_TEST_ADDRESSES = 205;
+/// Expected RPC request count for the chunking regression fixture.
+constexpr size_t GET_MULTIPLE_ACCOUNTS_CHUNK_TEST_REQUESTS = 3;
+/// Scratch buffer size used while reading loopback HTTP request bodies.
+constexpr size_t HTTP_BODY_READ_BUFFER_BYTES = 4096;
 
 /**
  * @brief Construct a deterministic Solana public key for serialization tests.
@@ -25,6 +51,196 @@ solana_public_key make_test_pubkey(uint16_t seed) {
    key._data[1] = static_cast<uint8_t>((seed >> 8) & 0xff);
    return key;
 }
+
+/**
+ * @brief Create a minimal ED25519 signature provider for RPC client tests.
+ */
+fc::crypto::signature_provider_ptr make_solana_signature_provider() {
+   auto key = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::ed);
+   auto provider = std::make_shared<fc::crypto::signature_provider_t>();
+   provider->target_chain = fc::crypto::chain_kind_solana;
+   provider->key_type = fc::crypto::chain_key_type_solana;
+   provider->key_name = "solana-rpc-test";
+   provider->public_key = key.get_public_key();
+   provider->private_key = key;
+   provider->sign = [key](const fc::sha256& d) { return key.sign(d); };
+   return provider;
+}
+
+/**
+ * @brief Loopback JSON-RPC endpoint that records Solana getMultipleAccounts batch sizes.
+ */
+class get_multiple_accounts_rpc_server {
+public:
+   /**
+    * @brief Start a server that will answer exactly `expected_requests` HTTP requests.
+    */
+   explicit get_multiple_accounts_rpc_server(size_t expected_requests)
+      : _expected_requests(expected_requests)
+      , _acceptor(_io, tcp::endpoint(boost::asio::ip::make_address("127.0.0.1"), 0))
+      , _port(_acceptor.local_endpoint().port())
+      , _worker([this] { serve(); }) {}
+
+   get_multiple_accounts_rpc_server(const get_multiple_accounts_rpc_server&) = delete;
+   get_multiple_accounts_rpc_server& operator=(const get_multiple_accounts_rpc_server&) = delete;
+
+   /**
+    * @brief Stop the server if the test exits before every request arrives.
+    */
+   ~get_multiple_accounts_rpc_server() {
+      close_acceptor();
+      unblock_accept();
+      if (_worker.joinable()) {
+         _worker.join();
+      }
+   }
+
+   /**
+    * @brief Return the loopback port assigned by the OS.
+    */
+   uint16_t port() const { return _port; }
+
+   /**
+    * @brief Wait for all expected requests and rethrow any worker-side parse failure.
+    */
+   void wait() {
+      if (_worker.joinable()) {
+         _worker.join();
+      }
+      if (_worker_error) {
+         std::rethrow_exception(_worker_error);
+      }
+   }
+
+   /**
+    * @brief Return the captured number of pubkeys from each RPC request.
+    */
+   const std::vector<size_t>& batch_sizes() const { return _batch_sizes; }
+
+private:
+   /**
+    * @brief Close the listening socket.
+    */
+   void close_acceptor() {
+      boost::system::error_code ec;
+      _acceptor.close(ec);
+   }
+
+   /**
+    * @brief Connect once so a blocked accept can observe shutdown.
+    */
+   void unblock_accept() {
+      boost::asio::io_context io;
+      tcp::socket socket(io);
+      boost::system::error_code ec;
+      socket.connect(tcp::endpoint(boost::asio::ip::make_address("127.0.0.1"), _port), ec);
+   }
+
+   /**
+    * @brief Read one complete HTTP request body from `socket`.
+    */
+   std::string read_request_body(tcp::socket& socket) {
+      boost::system::error_code ec;
+      boost::asio::streambuf request;
+      boost::asio::read_until(socket, request, "\r\n\r\n", ec);
+      if (ec) {
+         FC_THROW("Failed to read HTTP request header: {}", ec.message());
+      }
+
+      std::istream request_stream(&request);
+      std::string line;
+      std::getline(request_stream, line);
+
+      size_t content_length = 0;
+      while (std::getline(request_stream, line) && line != "\r") {
+         constexpr std::string_view CONTENT_LENGTH_HEADER = "Content-Length:";
+         if (line.rfind(CONTENT_LENGTH_HEADER, 0) == 0) {
+            content_length = static_cast<size_t>(std::stoull(line.substr(CONTENT_LENGTH_HEADER.size())));
+         }
+      }
+
+      std::string body((std::istreambuf_iterator<char>(request_stream)), std::istreambuf_iterator<char>());
+      while (body.size() < content_length) {
+         std::array<char, HTTP_BODY_READ_BUFFER_BYTES> buf{};
+         const auto bytes_read = socket.read_some(boost::asio::buffer(buf), ec);
+         if (ec) {
+            FC_THROW("Failed to read HTTP request body: {}", ec.message());
+         }
+         body.append(buf.data(), bytes_read);
+      }
+
+      return body;
+   }
+
+   /**
+    * @brief Write a JSON-RPC result containing `account_count` null account entries.
+    */
+   void write_response(tcp::socket& socket, const fc::variant& request, size_t account_count) {
+      fc::variants values;
+      values.resize(account_count);
+
+      auto result = fc::mutable_variant_object()
+         ("context", fc::mutable_variant_object()("slot", 1u))
+         ("value", values);
+      auto response = fc::mutable_variant_object()
+         ("jsonrpc", "2.0")
+         ("id", request.get_object()["id"])
+         ("result", result);
+      const auto response_body = fc::json::to_string(response, fc::time_point::maximum());
+
+      std::ostringstream http;
+      http << "HTTP/1.1 200 OK\r\n"
+           << "Content-Type: application/json\r\n"
+           << "Content-Length: " << response_body.size() << "\r\n"
+           << "Connection: close\r\n\r\n"
+           << response_body;
+
+      const auto response_text = http.str();
+      boost::system::error_code ec;
+      boost::asio::write(socket, boost::asio::buffer(response_text), ec);
+      if (ec) {
+         FC_THROW("Failed to write HTTP response: {}", ec.message());
+      }
+      socket.close(ec);
+   }
+
+   /**
+    * @brief Accept requests, capture pubkey counts, and answer with null account results.
+    */
+   void serve() {
+      try {
+         for (size_t i = 0; i < _expected_requests; ++i) {
+            boost::system::error_code ec;
+            tcp::socket socket(_io);
+            _acceptor.accept(socket, ec);
+            if (ec) {
+               return;
+            }
+
+            const auto body = read_request_body(socket);
+            const auto request = fc::json::from_string(body);
+            const auto& request_obj = request.get_object();
+            FC_ASSERT(request_obj["method"].as_string() == "getMultipleAccounts",
+                      "Unexpected JSON-RPC method: {}",
+                      request_obj["method"].as_string());
+
+            const auto account_count = request_obj["params"].get_array()[0].get_array().size();
+            _batch_sizes.push_back(account_count);
+            write_response(socket, request, account_count);
+         }
+      } catch (...) {
+         _worker_error = std::current_exception();
+      }
+   }
+
+   size_t                  _expected_requests = 0;
+   boost::asio::io_context _io;
+   tcp::acceptor           _acceptor;
+   uint16_t                _port;
+   std::vector<size_t>     _batch_sizes;
+   std::exception_ptr      _worker_error;
+   std::thread             _worker;
+};
 
 /**
  * @brief Build a minimal legacy message with a caller-selected account-key count.
@@ -86,6 +302,31 @@ BOOST_AUTO_TEST_CASE(test_pubkey_is_zero) {
    // Token program should NOT be zero
    auto token_pk = system::program_ids::TOKEN_PROGRAM;
    BOOST_CHECK(!fc::crypto::ed::is_zero(token_pk));
+}
+
+BOOST_AUTO_TEST_CASE(test_get_multiple_accounts_chunks_at_rpc_limit) {
+   get_multiple_accounts_rpc_server server(GET_MULTIPLE_ACCOUNTS_CHUNK_TEST_REQUESTS);
+   solana_client client(make_solana_signature_provider(),
+                        fc::url("http://127.0.0.1:" + std::to_string(server.port())));
+
+   std::vector<solana_public_key> addresses;
+   addresses.reserve(GET_MULTIPLE_ACCOUNTS_CHUNK_TEST_ADDRESSES);
+   for (uint16_t i = 0; i < GET_MULTIPLE_ACCOUNTS_CHUNK_TEST_ADDRESSES; ++i) {
+      addresses.push_back(make_test_pubkey(i));
+   }
+
+   const auto accounts = client.get_multiple_accounts(addresses);
+   server.wait();
+
+   BOOST_REQUIRE_EQUAL(accounts.size(), addresses.size());
+   BOOST_CHECK(std::ranges::all_of(accounts, [](const auto& account) { return !account.has_value(); }));
+
+   const std::vector<size_t> expected_batch_sizes = {
+      SOLANA_GET_MULTIPLE_ACCOUNTS_RPC_LIMIT,
+      SOLANA_GET_MULTIPLE_ACCOUNTS_RPC_LIMIT,
+      GET_MULTIPLE_ACCOUNTS_CHUNK_TEST_ADDRESSES - (2 * SOLANA_GET_MULTIPLE_ACCOUNTS_RPC_LIMIT),
+   };
+   BOOST_CHECK(server.batch_sizes() == expected_batch_sizes);
 }
 
 //=============================================================================
