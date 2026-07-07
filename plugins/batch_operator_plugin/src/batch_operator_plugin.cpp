@@ -2,6 +2,7 @@
 #include <fc/crypto/sha256.hpp>
 #include <fc/int128.hpp>
 #include <fc/io/json.hpp>
+#include <fc/slug_name.hpp>
 #include <fc/variant_object.hpp>
 #include <boost/endian/conversion.hpp>
 #include <algorithm>
@@ -13,6 +14,7 @@
 
 #include <sysio/batch_operator_plugin/batch_operator_plugin.hpp>
 #include <sysio/batch_operator_plugin/depot_ops.hpp>
+#include <sysio/batch_operator_plugin/outpost_binding.hpp>
 #include <sysio/batch_operator_plugin/outpost_epoch_lookup.hpp>
 #include <sysio/batch_operator_plugin/outpost_opp_job.hpp>
 #include <sysio/depot/opreg_status.hpp>
@@ -136,11 +138,14 @@ struct batch_operator_plugin::impl {
    bool         enabled             = false;
    uint32_t     epoch_poll_ms       = EPOCH_POLL_MS;
    uint32_t     delivery_timeout_ms = DELIVERY_TIMEOUT_MS;
-   std::string  eth_client_id;
+   // SVM RPC client id (one Solana cluster serves all SVM programs). The EVM
+   // client is selected per outpost by external_chain_id, and each outpost's
+   // OPP contract addresses come from its `--batch-outpost` binding — see
+   // build_opp_jobs.
    std::string  sol_client_id;
-   std::string  eth_opp_inbound_addr;  // hex address of OPPInbound on ETH
-   std::string  eth_opp_addr;          // hex address of OPP on ETH
-   std::string  sol_program_id;        // base58 address of opp-solana-outpost
+   /// Remote OPP contract bindings from `--batch-outpost`, keyed by packed
+   /// chain code (matches `outpost_descriptor::id`).
+   std::map<uint64_t, batch_operator_detail::outpost_binding> outpost_bindings;
 
    // Epoch state tracked across polls
    uint32_t                 current_epoch = 0;
@@ -577,11 +582,49 @@ struct batch_operator_plugin::impl {
          std::shared_ptr<sysio::outpost_client> client;
          try {
             if (op.chain_kind == CHAIN_KIND_EVM) {
-               client = eth_plug->create_outpost_client(eth_client_id, op.id, op.chain_id,
-                                                     eth_opp_addr, eth_opp_inbound_addr);
+               // Bind this exact outpost to its own remote identity: the RPC
+               // client is the one whose configured chain id matches this
+               // row's external_chain_id (never a shared per-kind tuple), and
+               // the OPP / OPPInbound contract addresses come from the row's
+               // `--batch-outpost` binding. Anything missing => skip the job
+               // (fail closed) so an outpost is never relayed through another
+               // chain's endpoint.
+               auto entry = eth_plug->get_client_by_chain_id(op.chain_id);
+               if (!entry) {
+                  wlog("batch_operator: no unique --outpost-ethereum-client for chain_id {} "
+                       "(outpost {}); skipping until one is configured",
+                       op.chain_id, fc::slug_name{op.id}.to_string());
+                  continue;
+               }
+               auto bound = outpost_bindings.find(op.id);
+               if (bound == outpost_bindings.end() || bound->second.opp_inbound_addr.empty()) {
+                  wlog("batch_operator: outpost {} (EVM) has no {}=<CODE>,<OPP>,<OPPInbound> "
+                       "binding; skipping until one is configured",
+                       fc::slug_name{op.id}.to_string(), batch_operator_detail::BATCH_OUTPOST_OPTION);
+                  continue;
+               }
+               client = eth_plug->create_outpost_client(entry->id, op.id, op.chain_id,
+                                                     bound->second.opp_addr,
+                                                     bound->second.opp_inbound_addr);
             } else if (op.chain_kind == CHAIN_KIND_SVM) {
+               // SVM: one Solana cluster (RPC client) serves every program, so
+               // the shared sol client is correct; the per-outpost identity is
+               // the program id from the row's `--batch-outpost` binding.
+               auto bound = outpost_bindings.find(op.id);
+               if (bound == outpost_bindings.end()) {
+                  wlog("batch_operator: outpost {} (SVM) has no {}=<CODE>,<program_id> binding; "
+                       "skipping until one is configured",
+                       fc::slug_name{op.id}.to_string(), batch_operator_detail::BATCH_OUTPOST_OPTION);
+                  continue;
+               }
+               if (!bound->second.opp_inbound_addr.empty()) {
+                  wlog("batch_operator: outpost {} (SVM) binding must not carry an inbound "
+                       "address (the single program serves both directions); skipping",
+                       fc::slug_name{op.id}.to_string());
+                  continue;
+               }
                client = sol_plug->create_outpost_client(sol_client_id, op.id, op.chain_id,
-                                                     sol_program_id);
+                                                     bound->second.opp_addr);
             } else {
                wlog("batch_operator: outpost {} has unsupported chain_kind, skipping job build",
                     op.id);
@@ -794,16 +837,18 @@ void batch_operator_plugin::set_program_options(options_description& cli,
         "Max time to wait for chain delivery confirmation (ms)");
    opts("batch-enabled", bpo::value<bool>()->default_value(false),
         "Enable batch operator functionality");
-   opts("batch-eth-client-id", bpo::value<std::string>()->default_value("eth-default"),
-        "Ethereum outpost client ID");
    opts("batch-sol-client-id", bpo::value<std::string>()->default_value("sol-default"),
-        "Solana outpost client ID");
-   opts("batch-eth-opp-inbound-addr", bpo::value<std::string>(),
-        "OPPInbound contract address on Ethereum (hex)");
-   opts("batch-eth-opp-addr", bpo::value<std::string>(),
-        "OPP contract address on Ethereum (hex)");
-   opts("batch-sol-program-id", bpo::value<std::string>(),
-        "opp-solana-outpost program ID (base58)");
+        "Solana outpost client ID (RPC connection) for SVM outpost rows");
+   // Help text must not contain a " --" sequence (or non-ASCII): the
+   // PerformanceHarness plugin-args generator splits nodeop's --help output on
+   // " --", so option names referenced below are spelled without the dashes.
+   opts(batch_operator_detail::BATCH_OUTPOST_OPTION, bpo::value<std::vector<std::string>>()->multitoken(),
+        "Remote OPP contract binding for one active sysio.chains row, repeatable once per "
+        "chain code. Spec: CHAIN_CODE,opp_addr[,opp_inbound_addr]. EVM rows require the OPP "
+        "and OPPInbound contract addresses (0x-hex); SVM rows require only the outpost "
+        "program id (base58). The Ethereum RPC client for a row is selected by matching the "
+        "row's external_chain_id against the chain ids of the outpost-ethereum-client specs; "
+        "an active row with no binding or no matching client is skipped (fail closed).");
 }
 
 void batch_operator_plugin::plugin_initialize(const variables_map& options) {
@@ -812,14 +857,16 @@ void batch_operator_plugin::plugin_initialize(const variables_map& options) {
    _impl->epoch_poll_ms       = options["batch-epoch-poll-ms"].as<uint32_t>();
    _impl->delivery_timeout_ms = options["batch-delivery-timeout-ms"].as<uint32_t>();
    _impl->enabled             = options["batch-enabled"].as<bool>();
-   _impl->eth_client_id       = options["batch-eth-client-id"].as<std::string>();
    _impl->sol_client_id       = options["batch-sol-client-id"].as<std::string>();
-   if (options.count("batch-eth-opp-inbound-addr"))
-      _impl->eth_opp_inbound_addr = options["batch-eth-opp-inbound-addr"].as<std::string>();
-   if (options.count("batch-eth-opp-addr"))
-      _impl->eth_opp_addr = options["batch-eth-opp-addr"].as<std::string>();
-   if (options.count("batch-sol-program-id"))
-      _impl->sol_program_id = options["batch-sol-program-id"].as<std::string>();
+   if (options.count(batch_operator_detail::BATCH_OUTPOST_OPTION)) {
+      for (const auto& spec :
+           options[batch_operator_detail::BATCH_OUTPOST_OPTION].as<std::vector<std::string>>()) {
+         auto [code, binding] = batch_operator_detail::parse_outpost_binding(spec);
+         FC_ASSERT(_impl->outpost_bindings.emplace(code, std::move(binding)).second,
+                   "Duplicate {} binding for chain code {}",
+                   batch_operator_detail::BATCH_OUTPOST_OPTION, fc::slug_name{code}.to_string());
+      }
+   }
 
    _impl->chain_plug = &app().get_plugin<chain_plugin>();
    _impl->cron_plug  = &app().get_plugin<cron_plugin>();
