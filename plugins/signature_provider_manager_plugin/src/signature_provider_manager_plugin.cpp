@@ -167,7 +167,7 @@ public:
 
       SYS_THROW(chain::plugin_config_exception,
                 "Unknown provider type \"{}\". Built-in types are KEY and KIOD; "
-                "additional types (e.g. KMS) must be registered by the host "
+                "additional types (e.g. KMS, SSM) must be registered by the host "
                 "application via register_spec_handler() before app().initialize() "
                 "-- this binary has no registration for \"{}\".",
                 spec_type_str, spec_type_str);
@@ -578,7 +578,10 @@ void signature_provider_manager_plugin::set_program_options(options_description&
    cfg.add_options()(
       "signature-provider", boost::program_options::value<std::vector<std::string>>()->multitoken(),
       "Signature provider spec formatted as (check docs for details): "
-      "`<name>,<chain-kind>,<key-type>,<public-key>,<private-key-provider-spec>`");;
+      "`<name>,<chain-kind>,<key-type>,<public-key>,<private-key-provider-spec>`. "
+      "Provider types KEY:<private-key> and KIOD:<url> are built in; host binaries "
+      "may register additional schemes (nodeop registers SSM:<region>:<parameter-name> "
+      "to fetch the key from AWS SSM Parameter Store at startup).");;
    cfg.add_options()(
       option_name_kms_startup_check,
       boost::program_options::value<bool>()->default_value(false),
@@ -600,10 +603,14 @@ const char* signature_provider_manager_plugin::signature_provider_help_text() co
       "   <public-key>           is a string form of a valid <key-type>\n\n"
       "   <provider-spec>        is a string in the form <provider-type>:<data>\n\n"
       "       <provider-type>    KEY and KIOD are built in. Additional types\n"
-      "                          (e.g. KMS) are registered by the host application;\n"
+      "                          (e.g. KMS, SSM) are registered by the host application;\n"
       "                          this binary supports only the types its main() registers.\n\n"
       "       KEY:<private-key>  is a string containing a private key of the key-type specified\n\n"
-      "       KIOD:<url>         is the URL where kiod is available and the appropriate wallet(s) are unlocked\n\n";
+      "       KIOD:<url>         is the URL where kiod is available and the appropriate wallet(s) are unlocked\n\n"
+      "       SSM:<param-ref>    fetches the private key once at startup from AWS SSM Parameter\n"
+      "                          Store (SecureString) and signs locally; <param-ref> is\n"
+      "                          <region>:<parameter-name> or a full parameter ARN. Registered\n"
+      "                          by nodeop.\n\n";
 }
 
 void signature_provider_manager_plugin::plugin_initialize(const variables_map& options) {
