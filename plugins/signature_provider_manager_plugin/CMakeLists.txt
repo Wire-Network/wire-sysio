@@ -48,3 +48,4 @@ target_link_libraries(signature_provider_manager_plugin_headers
 # (one process-wide owner of the AWS SDK lifecycle).
 add_subdirectory(aws)
 add_subdirectory(kms)
+add_subdirectory(ssm)

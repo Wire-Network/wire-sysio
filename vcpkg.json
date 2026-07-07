@@ -64,7 +64,8 @@
       "default-features": false,
       "version>=": "1.11.665",
       "features": [
-        "kms"
+        "kms",
+        "ssm"
       ]
     },
     "boost",
