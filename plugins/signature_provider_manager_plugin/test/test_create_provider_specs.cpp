@@ -9,7 +9,9 @@
 #include <fc/crypto/hex.hpp>
 #include <fc/io/fstream.hpp>
 #include <fc/io/json.hpp>
+#include <filesystem>
 #include <format>
+#include <fstream>
 #include <memory>
 #include <sodium.h>
 #include <string>
@@ -18,6 +20,7 @@
 
 #include <gsl-lite/gsl-lite.hpp>
 
+#include <sysio/chain/exceptions.hpp>
 #include <sysio/chain/types.hpp>
 #include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
 
@@ -337,6 +340,138 @@ BOOST_AUTO_TEST_CASE(solana_signature_provider_spec_options) {
    auto providers = mgr.query_providers(fixture1.key_name);
    BOOST_REQUIRE(!providers.empty());
    BOOST_TEST((providers[0]->key_type == chain_key_type_solana));
+}
+
+// A signature-provider spec must never be logged with its inline private key intact; `redact_signature_provider_spec`
+// masks only the final `KEY:<private-key>` field while leaving name/chain/type/public-key and non-KEY providers
+// (which reference external key material) untouched.
+BOOST_AUTO_TEST_CASE(redact_signature_provider_spec_masks_inline_private_key) {
+   using sysio::redact_signature_provider_spec;
+
+   // Full CSV spec with an inline KEY: private key -> only the private key is masked.
+   BOOST_CHECK_EQUAL(
+      redact_signature_provider_spec("wire-1,wire,wire,PUB_WA_pub,KEY:PVT_WA_secretkey"),
+      "wire-1,wire,wire,PUB_WA_pub,KEY:<redacted>");
+
+   // Ethereum-style hex key (no ':') is still fully masked.
+   BOOST_CHECK_EQUAL(
+      redact_signature_provider_spec("eth-1,ethereum,ethereum,0xabc,KEY:0xdeadbeef"),
+      "eth-1,ethereum,ethereum,0xabc,KEY:<redacted>");
+
+   // Bare provider spec (no CSV prefix) is masked too.
+   BOOST_CHECK_EQUAL(redact_signature_provider_spec("KEY:PVT_WA_secretkey"), "KEY:<redacted>");
+
+   // KIOD (and other non-KEY) providers reference external material -> returned unchanged.
+   BOOST_CHECK_EQUAL(
+      redact_signature_provider_spec("wire-1,wire,wire,PUB_WA_pub,KIOD:http://127.0.0.1:8888"),
+      "wire-1,wire,wire,PUB_WA_pub,KIOD:http://127.0.0.1:8888");
+
+   // Only the final field is inspected: a KEY:-prefixed *name* must not trigger false redaction.
+   BOOST_CHECK_EQUAL(
+      redact_signature_provider_spec("KEY:weird-name,wire,wire,PUB_WA_pub,KIOD:url"),
+      "KEY:weird-name,wire,wire,PUB_WA_pub,KIOD:url");
+}
+
+// The auto-generated default signature-provider file holds private keys and must be written owner-only (0600),
+// not left group/world readable under the process umask.
+BOOST_AUTO_TEST_CASE(default_signature_provider_file_is_owner_only) {
+   using namespace fc::crypto;
+   auto clean_app = gsl_lite::finally([]() { appbase::application::reset_app_singleton(); });
+
+   // Isolated, writable config-dir so the persisted key file is under our control.
+   auto config_dir = std::filesystem::temp_directory_path() / "sigprov_perms_test";
+   std::error_code ec;
+   std::filesystem::remove_all(config_dir, ec);
+   std::filesystem::create_directories(config_dir);
+   auto cleanup = gsl_lite::finally([&]() { std::error_code e; std::filesystem::remove_all(config_dir, e); });
+
+   std::vector<std::string> args = {"--config-dir", config_dir.string()};
+   auto tester = create_app(args);
+
+   // Generating + persisting a default provider must write the key file with owner-only permissions.
+   tester->plugin().register_default_signature_providers({chain_key_type_wire});
+
+   auto key_file = config_dir / "default_signature_providers.json";
+   BOOST_REQUIRE(std::filesystem::exists(key_file));
+
+   const auto perms = std::filesystem::status(key_file).permissions();
+   BOOST_CHECK((perms & std::filesystem::perms::owner_read)  != std::filesystem::perms::none);
+   BOOST_CHECK((perms & std::filesystem::perms::owner_write) != std::filesystem::perms::none);
+   BOOST_CHECK((perms & std::filesystem::perms::group_all)   == std::filesystem::perms::none);
+   BOOST_CHECK((perms & std::filesystem::perms::others_all)  == std::filesystem::perms::none);
+}
+
+// A default key file that predates the owner-only hardening was written under the process umask and may be
+// group/world readable. Loading such a file must bring it down to owner-only even when no new default key is
+// generated (`changed` stays false on that path, so nothing rewrites the file -- the load itself restricts it).
+BOOST_AUTO_TEST_CASE(pre_existing_default_key_file_restricted_on_load) {
+   using namespace fc::crypto;
+   auto clean_app = gsl_lite::finally([]() { appbase::application::reset_app_singleton(); });
+
+   // Isolated, writable config-dir so the persisted key file is under our control.
+   auto config_dir = std::filesystem::temp_directory_path() / "sigprov_legacy_perms_test";
+   std::error_code ec;
+   std::filesystem::remove_all(config_dir, ec);
+   std::filesystem::create_directories(config_dir);
+   auto cleanup = gsl_lite::finally([&]() { std::error_code e; std::filesystem::remove_all(config_dir, e); });
+
+   // Persist a valid default-provider key file the way the old, unhardened writer left it: world readable.
+   auto priv = fc::crypto::private_key::generate();
+   auto spec = fc::crypto::to_signature_provider_spec("wire-default", chain_kind_wire, chain_key_type_wire,
+                                                      priv.get_public_key().to_string({}),
+                                                      to_private_key_spec(priv.to_string({})));
+   fc::mutable_variant_object vo;
+   auto key_type_str = chain_key_type_reflector::to_string(chain_key_type_wire);
+   vo(key_type_str, spec);
+   const auto file_content = fc::json::to_string(vo, fc::time_point::maximum());
+   auto key_file = config_dir / "default_signature_providers.json";
+   {
+      std::ofstream out(key_file);
+      out << file_content;
+   }
+   std::filesystem::permissions(key_file,
+                                std::filesystem::perms::owner_read | std::filesystem::perms::owner_write |
+                                   std::filesystem::perms::group_read | std::filesystem::perms::others_read,
+                                std::filesystem::perm_options::replace);
+
+   std::vector<std::string> args = {"--config-dir", config_dir.string()};
+   auto tester = create_app(args);
+
+   // The pre-seeded spec satisfies the requested key type, so nothing new is generated and nothing is saved;
+   // the permission restriction must come from the load path.
+   tester->plugin().register_default_signature_providers({chain_key_type_wire});
+
+   const auto perms = std::filesystem::status(key_file).permissions();
+   BOOST_CHECK((perms & std::filesystem::perms::owner_read)  != std::filesystem::perms::none);
+   BOOST_CHECK((perms & std::filesystem::perms::owner_write) != std::filesystem::perms::none);
+   BOOST_CHECK((perms & std::filesystem::perms::group_all)   == std::filesystem::perms::none);
+   BOOST_CHECK((perms & std::filesystem::perms::others_all)  == std::filesystem::perms::none);
+
+   // Restricting must not rewrite or corrupt the key material, and the loaded key must be registered.
+   std::string after;
+   fc::read_file_contents(key_file.string(), after);
+   BOOST_CHECK_EQUAL(after, file_content);
+   BOOST_CHECK(tester->plugin().has_provider(priv.get_public_key()));
+}
+
+// A malformed spec that still carries an inline KEY:<private-key> must not leak the key through the
+// invalid-comma-count error message; the spec is redacted before it is formatted into the assertion.
+BOOST_AUTO_TEST_CASE(invalid_spec_error_redacts_inline_private_key) {
+   using namespace fc::crypto;
+
+   auto priv = fc::crypto::private_key::generate();
+   const auto priv_str = priv.to_string({});
+   // Only 3 of the expected 4-5 comma-separated fields, so create_provider rejects it on comma count alone.
+   const auto bad_spec = std::format("wire,{},{}", priv.get_public_key().to_string({}),
+                                     to_private_key_spec(priv_str));
+
+   auto tester = create_app();
+   BOOST_CHECK_EXCEPTION(tester->plugin().create_provider(bad_spec), sysio::chain::plugin_config_exception,
+                         [&](const sysio::chain::plugin_config_exception& e) {
+                            const auto detail = e.to_detail_string();
+                            return detail.find(priv_str) == std::string::npos &&
+                                   detail.find("KEY:<redacted>") != std::string::npos;
+                         });
 }
 
 BOOST_AUTO_TEST_SUITE_END()

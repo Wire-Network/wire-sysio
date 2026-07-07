@@ -67,12 +67,12 @@ inline constexpr size_t SOLANA_MAX_ENVELOPE_BYTES = OPP_MAX_ENVELOPE_BYTES;
 
 /// Per-`epoch_in` chunk payload limit. Mirrors `MAX_CHUNK_BYTES` on the
 /// Solana side. Solana's tx-packet MTU is 1 232 B raw. Tx overhead at the
-/// current full data-chunk shape is fixture-measured with explicit margin.
-/// Finalization now happens in a separate zero-data terminal call, so data
-/// chunks never share packet budget with dynamic effect accounts.
-/// Was 672, 704 (no pre-ixs), and 768 before that (when `EpochIn` had 7
-/// accounts pre-Task 54).
-inline constexpr size_t SOLANA_MAX_CHUNK_BYTES = 640;
+/// current full data-chunk shape is fixture-measured and must stay <= 1 232 B.
+/// Finalization happens in a separate zero-data terminal call, so data chunks
+/// do not reserve packet space for dynamic effect accounts. If the static
+/// `epoch_in` account list changes, the SEC-94 fixture/parity test must be
+/// regenerated and will catch any packet overflow.
+inline constexpr size_t SOLANA_MAX_CHUNK_BYTES = 672;
 
 /**
  * @brief Solana concrete `outpost_client`.

@@ -26,14 +26,14 @@
       "chunk_index": 0,
       "total_chunks": 4,
       "total_bytes": 2526,
-      "chunk_data_bytes": 640
+      "chunk_data_bytes": 672
     },
     "declared_idl_accounts": 12,
-    "instruction_data_bytes": 664,
+    "instruction_data_bytes": 696,
     "required_signatures": 1,
     "legacy_account_keys": 13,
     "loaded_accounts": 13,
-    "packet_bytes": 1198
+    "packet_bytes": 1230
   },
   "static": {
     "declared_idl_accounts": 12,

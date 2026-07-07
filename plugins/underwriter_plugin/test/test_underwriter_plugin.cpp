@@ -293,10 +293,15 @@ BOOST_AUTO_TEST_CASE(knapsack_fallback_threshold_is_documented) try {
 
 // ── B3: HTTP diagnostic endpoint plumbing ──────────────────────────────
 //
-// /v1/underwriter/stats + /v1/underwriter/commits are registered via
-// http_plugin during plugin_startup. Constructing http_plugin in
-// isolation from chain_plugin requires the appbase wiring. Stub here;
-// integration coverage via curl in the flow tests.
+// /v1/underwriter/stats + /v1/underwriter/commits register via
+// http_plugin during plugin_startup — UNCONDITIONALLY, before the sync
+// gate, because http_plugin's handler map is read lock-free once the
+// listener goes live. Until the deferred startup body completes the
+// handlers answer with the gate state (covered as the pure
+// `startup_gate_payload` cases in test_underwriter_sync.cpp).
+// Constructing http_plugin in isolation from chain_plugin requires the
+// appbase wiring. Stub here; integration coverage via curl in the flow
+// tests.
 BOOST_AUTO_TEST_CASE(http_endpoints_registered_at_startup) try {
    BOOST_CHECK(true);
 } FC_LOG_AND_RETHROW();

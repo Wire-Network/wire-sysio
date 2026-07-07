@@ -90,6 +90,16 @@ std::optional<opp::types::ChainKind> chain_kind_for_code(sysio::slug_name chain_
    return tbl.get(pk).kind;
 }
 
+/// Soft-gate never-throw msgch handlers before they can emit a queueout to an
+/// unregistered destination chain. `sysio.msgch::queueout` fails loudly for
+/// direct callers, but dispatch callbacks must log-and-skip instead of
+/// aborting the consensus-tipping delivery transaction.
+bool registered_chain_or_skip(sysio::slug_name chain_code, const char* handler) {
+   if (chain_kind_for_code(chain_code).has_value()) return true;
+   sysio::print(handler, ": chain_code is not registered; skipping\n");
+   return false;
+}
+
 /// Reconstruct a `sysio::public_key` variant from the raw creator-key
 /// bytes carried on a ReserveCreate attestation. EVM chains require the
 /// 33-byte compressed secp256k1 key in `creator_pub_key` (the EM variant,
@@ -249,6 +259,7 @@ void reserve::oncrtreserve(sysio::slug_name       chain_code,
                             bool                  is_private,
                             std::vector<char>     creator_pub_key) {
    require_auth(MSGCH_ACCOUNT);
+   if (!registered_chain_or_skip(chain_code, "oncrtreserve")) return;
 
    // Soft-validate; silent skip per feedback_opp_handlers_never_throw.
    if (connector_weight_bps == 0 || connector_weight_bps > MAX_CONNECTOR_WEIGHT_BPS) {
@@ -465,6 +476,7 @@ void reserve::oncnclrsv(sysio::slug_name       chain_code,
                          opp::types::ChainKind creator_chain_kind,
                          std::vector<char>     creator_chain_addr) {
    require_auth(MSGCH_ACCOUNT);
+   if (!registered_chain_or_skip(chain_code, "oncnclrsv")) return;
 
    reserves_t tbl(get_self());
    auto pk = make_key(chain_code, token_code, reserve_code);
@@ -496,8 +508,8 @@ void reserve::oncnclrsv(sysio::slug_name       chain_code,
    // the outpost so it refunds the creator's `external_token_amount`. The
    // destination `chain_code` is the reserve's owning `chain_code`. Per
    // `feedback_opp_handlers_never_throw.md` this handler still cannot
-   // throw; we only reach the queueout after all soft-validation checks
-   // above have silently returned, so the action is safe to send here.
+   // throw; the early chain-registration guard and the remaining
+   // soft-validation checks must all pass before queueout is sent.
    opp::attestations::ReserveCreateCancelled cancelled;
    cancelled.chain_code   = chain_code.value;
    cancelled.token_code   = token_code.value;
