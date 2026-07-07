@@ -436,6 +436,8 @@ namespace sysio { namespace chain {
                                     3110006, "Incorrect plugin configuration" )
       FC_DECLARE_DERIVED_EXCEPTION( missing_trace_api_plugin_exception,           plugin_exception,
                                     3110007, "Missing Trace API Plugin" )
+      FC_DECLARE_DERIVED_EXCEPTION( signing_transient_exception,                  plugin_exception,
+                                    3110008, "Transient signing-provider failure; the operation should be retried" )
 
 
    FC_DECLARE_DERIVED_EXCEPTION( wallet_exception, chain_exception,

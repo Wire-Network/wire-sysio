@@ -35,6 +35,16 @@ constexpr std::array public_key_string_lengths = {66,128,130};
 constexpr std::string_view crc155_message_prefix{"\x19" "Ethereum Signed Message:\n"};
 
 /**
+ * Pre-EIP-155 Ethereum signature `v` offset (Yellow Paper Appendix F): the
+ * recovery byte is `27 + recovery_id`. The raw signing path used by the
+ * cranker / outpost client and the AWS KMS signer both pack `v` this way; the
+ * EIP-1559 typed-tx encoder strips it back to the bare recovery id. Keep this
+ * the single definition of the offset so the packing and unpacking sides
+ * cannot drift apart.
+ */
+constexpr unsigned char v_offset = 27;
+
+/**
  * Removes '0x' prefix and leading zeros from a hex string
  * @param hex The hex string to trim
  * @return The trimmed hex string

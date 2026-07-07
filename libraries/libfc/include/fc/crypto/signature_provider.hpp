@@ -2,10 +2,43 @@
 #include <fc/crypto/private_key.hpp>
 #include <fc/crypto/public_key.hpp>
 
+#include <atomic>
+#include <memory>
+
 namespace fc::crypto {
 using signature_provider_id_t  = std::variant<std::string, fc::crypto::public_key>;
 
 /// Wire default signing function (sha256 digest)
+//  NOTE: Really this is a 256-bit hash value, that is either a sha256 hash or keccak256 hash
+//        the choice was made earlier to treat the payload as a 256-bit hash and changing all
+//        of the plumbing was considered out of scope.
+//
+//        Because `sha256` is reused to carry keccak-256 bytes, the type system no
+//        longer distinguishes the two digests at this boundary -- the Ethereum
+//        signing path (`fc::crypto::detail::em_sign_keccak` in signer.hpp)
+//        deliberately constructs a `sha256` from a keccak digest's bytes and hands
+//        it to this closure. What keeps that safe is the self-verify in
+//        `em_sign_keccak`: it recovers the public key from the produced signature
+//        and asserts it matches the provider's pinned key, so a closure wired to
+//        the wrong bytes (wrong digest, framing, or key) is rejected before its
+//        output is used. That recover-and-compare is the compensating control for
+//        the lost compile-time digest distinction -- DO NOT remove it as
+//        "redundant." It is distinct from the KMS provider's own `recover_v`,
+//        which runs inside the closure on every sign -- it picks the recovery id
+//        and also rejects a signature that does not recover to the pinned key;
+//        this self-verify instead runs once per provider and validates, from
+//        outside the closure, that the digest crossed the `sha256`-typed boundary
+//        uncorrupted.
+//
+//        It runs once per provider: a closure's key and framing are fixed, so the
+//        first signature is representative. `signature_provider_t::self_verified`
+//        gates it to the first sign and caches the result. The flag is set only
+//        AFTER the checks pass, so a transiently bad signer throws and is
+//        re-checked on the next sign. A plain atomic flag is used deliberately,
+//        NOT `std::call_once`: the checks throw on failure, and on glibc an
+//        exception unwinding through `call_once`'s `pthread_once` aborts the
+//        process. Concurrent first-signs may each run the cheap, side-effect-free
+//        recover, which is harmless.
 using sign_fn        = std::function<fc::crypto::signature(const sha256&)>;
 
 /**
@@ -29,6 +62,10 @@ struct signature_provider_t  {
 
    /// Wire default signing (always set for all key types)
    sign_fn        sign;
+
+   /// One-shot guard for the remote-signer self-verify in
+   /// `detail::em_sign_keccak` (signer.hpp). See note above for more detail.
+   std::shared_ptr<std::atomic<bool>> self_verified = std::make_shared<std::atomic<bool>>(false);
 };
 
 using signature_provider_ptr = std::shared_ptr<signature_provider_t>;

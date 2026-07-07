@@ -87,6 +87,8 @@ Elected via Appointed Proof of Stake (APoS). They validate transactions and prod
 - Building and submitting outbound envelopes to external chains
 - Responding to challenges if disputed
 
+Signing keys for outbound submissions can be held locally (`KEY:`) or in a `kiod` daemon (`KIOD:`) — both built into `signature_provider_manager_plugin`. AWS KMS support (`KMS:` — secp256k1 asymmetric keys) is provided by the `kms/` sub-library co-located with the plugin and is opted in by the host application: link `sigprov_kms` and call `signature_provider_manager_plugin::register_spec_handler("KMS", &sysio::sigprov::kms::create_kms_provider)` from `main()` before `app().initialize(...)`. See `plugins/signature_provider_manager_plugin/kms/test/README.md` for KMS key setup, IAM requirements, the `KMS:` spec format, and operational notes.
+
 ### Underwriters
 Independent operators running the `underwriter_plugin`. They provide collateral-backed liquidity for cross-chain swaps:
 1. Monitor `sysio.msgch` for `SWAP` attestations
