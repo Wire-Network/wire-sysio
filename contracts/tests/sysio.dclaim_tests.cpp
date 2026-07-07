@@ -162,6 +162,17 @@ BOOST_FIXTURE_TEST_CASE(setclmwindow_rejects_zero, sysio_dclaim_tester) { try {
    BOOST_REQUIRE_EQUAL(push_dclaim(DCLAIM_ACCOUNT, "setclmwindow"_n, mvo()("window_sec", 3600)), success());
 } FC_LOG_AND_RETHROW() }
 
+BOOST_FIXTURE_TEST_CASE(setclmwindow_rejects_excess_window, sysio_dclaim_tester) { try {
+   // The ten-year ceiling is accepted; one second beyond it is rejected before
+   // the window could overflow `now_sec() + window_sec` and mark fresh claims
+   // expired the moment they are written.
+   constexpr uint32_t ten_years_sec = 10u * 365 * 24 * 60 * 60;
+   BOOST_REQUIRE_EQUAL(success(),
+      push_dclaim(DCLAIM_ACCOUNT, "setclmwindow"_n, mvo()("window_sec", ten_years_sec)));
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("window_sec exceeds the ten-year ceiling"),
+      push_dclaim(DCLAIM_ACCOUNT, "setclmwindow"_n, mvo()("window_sec", ten_years_sec + 1)));
+} FC_LOG_AND_RETHROW() }
+
 BOOST_FIXTURE_TEST_CASE(setclmwindow_requires_self_auth, sysio_dclaim_tester) { try {
    BOOST_REQUIRE_NE(push_dclaim("alice"_n, "setclmwindow"_n, mvo()("window_sec", 3600)), success());
 } FC_LOG_AND_RETHROW() }

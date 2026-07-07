@@ -88,6 +88,14 @@ namespace sysio {
       // cap is 9999 (mirrors `sysio.reserv::MAX_CONNECTOR_WEIGHT_BPS`).
       static constexpr uint32_t MAX_FEE_BPS = 9999;
 
+      // Upper bound on the collateral lock duration. try_select_winner locks a
+      // winning underwriter's collateral until `now_ms + collateral_lock_duration_ms`;
+      // an unbounded duration near UINT64_MAX wraps that sum to a past timestamp,
+      // releasing the lock immediately. 365 days is far beyond any real settlement
+      // window yet leaves ~18 orders of magnitude of headroom below the wrap point.
+      static constexpr uint64_t MAX_COLLATERAL_LOCK_DURATION_MS =
+         365ull * 24ull * 60ull * 60ull * 1000ull;
+
       // -----------------------------------------------------------------------
       //  Actions
       // -----------------------------------------------------------------------

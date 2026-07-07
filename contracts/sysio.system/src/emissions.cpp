@@ -490,7 +490,16 @@ void system_contract::accrueepoch(uint32_t epoch_index,
 
    sysio::check(epoch_index > state.last_epoch_index, "accrueepoch epoch already accrued");
 
-   state.pending_emission_amount += per_epoch_emission;
+   // Saturating accumulate. accrueepoch runs as an inline action from
+   // sysio.epoch::advance, so this must never throw — a throw would abort epoch
+   // advancement chain-wide. Cap the running total at the asset maximum (2^62-1)
+   // instead: it is drained to zero every pay epoch and reaching the cap needs an
+   // absurdly misconfigured per-epoch emission, but capping keeps the sum from
+   // wrapping negative and corrupting the payout math either way.
+   {
+      const int64_t room = sysio::asset::max_amount - state.pending_emission_amount;
+      state.pending_emission_amount += (per_epoch_emission <= room ? per_epoch_emission : room);
+   }
 
    // Lazy-grow batch_group_epochs to fit batch_group_index. Pre-pay-cadence
    // chains see length 0 and grow on first epoch under the new schema.
@@ -620,8 +629,13 @@ void system_contract::payepoch(uint32_t epoch_index,
       // sysio.epoch (canonical source of truth) scaled by pay_cadence_epochs
       // because elig_rounds accumulates across all epochs in the period.
       const uint32_t epoch_duration_sec = get_epoch_duration_sec();
-      uint32_t expected_rounds =
-         (epoch_duration_sec * cfg.pay_cadence_epochs * 2) / TOTAL_BLOCKS_PER_ROUND;
+      // Compute in uint64: epoch_duration_sec (<= 30 days) * pay_cadence_epochs
+      // (<= uint16 max) * 2 overflows uint32 at the extremes, and a wrapped
+      // denominator would silently distort every producer's pay share. uint64
+      // holds the full product with room to spare; the result is a small round
+      // count that fits back into uint64 for the divide below.
+      uint64_t expected_rounds =
+         (static_cast<uint64_t>(epoch_duration_sec) * cfg.pay_cadence_epochs * 2) / TOTAL_BLOCKS_PER_ROUND;
       // Below ~126s of effective period duration (one full 21-producer round
       // at 0.5s/block), expected_rounds truncates to zero. Falling back to 1
       // keeps the pay formula well-defined -- producer pay collapses to
@@ -694,7 +708,7 @@ void system_contract::payepoch(uint32_t epoch_index,
                emis_pay = emis_share;
                fee_pay  = fee_share;
             } else {
-               uint32_t r = (pe.elig_rounds > expected_rounds) ? expected_rounds : pe.elig_rounds;
+               uint64_t r = (pe.elig_rounds > expected_rounds) ? expected_rounds : pe.elig_rounds;
                emis_pay = static_cast<int64_t>(
                   static_cast<__int128>(emis_share) * r / expected_rounds);
                fee_pay = static_cast<int64_t>(

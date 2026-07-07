@@ -238,7 +238,13 @@ void epoch::setconfig(uint32_t epoch_duration_sec,
          "epoch_duration_sec exceeds 30-day ceiling");
    check(operators_per_epoch > 0, "operators_per_epoch must be positive");
    check(batch_op_groups > 0, "batch_op_groups must be positive");
-   check(batch_operator_minimum_active == operators_per_epoch * batch_op_groups,
+   check(batch_op_groups <= MAX_BATCH_OP_GROUPS,
+         "batch_op_groups exceeds the uint8 group-index ceiling (255)");
+   // Widen the product to uint64 so a large operators_per_epoch cannot wrap the
+   // uint32 multiply into a small value that spuriously matches a small
+   // batch_operator_minimum_active; an honest product beyond uint32 simply fails
+   // the equality against the uint32 field, which is the intended rejection.
+   check(static_cast<uint64_t>(operators_per_epoch) * batch_op_groups == batch_operator_minimum_active,
          "batch_operator_minimum_active must equal operators_per_epoch * batch_op_groups");
    check(epoch_retention_envelope_log_count > 0,
          "epoch_retention_envelope_log_count must be positive");

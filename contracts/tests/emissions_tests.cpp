@@ -2128,6 +2128,28 @@ BOOST_FIXTURE_TEST_CASE( initt5_writes_state_and_blocks_reinit, sysio_emissions_
    require_substr( r, "t5 state already initialized" );
 } FC_LOG_AND_RETHROW()
 
+BOOST_FIXTURE_TEST_CASE( accrueepoch_saturates_pending_accumulator, sysio_emissions_tester ) try {
+   // accrueepoch runs as an inline action on sysio.epoch::advance, so it caps the
+   // pending accumulator at asset::max_amount rather than throwing or wrapping.
+   // Two near-max accruals would drive the raw int64 sum past the asset ceiling;
+   // assert the running total saturates there instead of overflowing negative.
+   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(head_secs()) ) );
+
+   const int64_t near_max = asset::max_amount - 10;  // 2^62 - 11
+   BOOST_REQUIRE_EQUAL( success(),
+      push_system_action( EPOCH, "accrueepoch"_n, mvo()
+         ("epoch_index", 1)("batch_group_index", 0)("per_epoch_emission", near_max) ) );
+   BOOST_REQUIRE_EQUAL( near_max,
+      get_t5_state()["pending_emission_amount"].as<int64_t>() );
+
+   // Second accrual: room is only 10, so the accumulator clamps to the ceiling.
+   BOOST_REQUIRE_EQUAL( success(),
+      push_system_action( EPOCH, "accrueepoch"_n, mvo()
+         ("epoch_index", 2)("batch_group_index", 0)("per_epoch_emission", near_max) ) );
+   BOOST_REQUIRE_EQUAL( asset::max_amount,
+      get_t5_state()["pending_emission_amount"].as<int64_t>() );
+} FC_LOG_AND_RETHROW()
+
 BOOST_FIXTURE_TEST_CASE( setemitcfg_post_initt5_rejects_brick_reduce, sysio_emissions_tester ) try {
    // After t5_state exists and epochs have run, setemitcfg must reject a
    // t5_distributable reduction that would make remaining (= distributable -
