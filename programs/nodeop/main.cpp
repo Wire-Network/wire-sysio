@@ -18,12 +18,15 @@
 #include <sysio/trace_api/trace_api_plugin.hpp>
 #include <sysio/underwriter_plugin/underwriter_plugin.hpp>
 
+#include <string>
+#include <string_view>
+
 using namespace appbase;
 using namespace sysio;
 
 namespace {
 /// Spec scheme nodeop registers for AWS SSM Parameter Store-backed keys.
-constexpr auto ssm_spec_scheme = "SSM";
+constexpr std::string_view ssm_spec_scheme = "SSM";
 } // namespace
 
 int main(int argc, char** argv)
@@ -53,7 +56,7 @@ int main(int argc, char** argv)
    // registration itself is inert -- a registry entry only, no AWS SDK init,
    // threads, or network -- unless a configured spec actually uses `SSM:`.
    app()._register_plugin<signature_provider_manager_plugin>().register_spec_handler(
-      ssm_spec_scheme, &sysio::sigprov::ssm::create_ssm_provider);
+      std::string{ssm_spec_scheme}, &sysio::sigprov::ssm::create_ssm_provider);
    auto r = exe.init<
       resource_monitor_plugin,
       chain_plugin,

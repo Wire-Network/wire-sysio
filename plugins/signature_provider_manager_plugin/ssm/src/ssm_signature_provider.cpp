@@ -231,8 +231,10 @@ sysio::provider_spec_result create_ssm_provider_with_fetcher(fc::crypto::chain_k
    case chain_key_type_solana:
       break;
    case chain_key_type_sui:
+      // to_fc_string throughout (here and the plugin's KEY: arms): unlike to_string, it is total --
+      // an out-of-range value formats as its number instead of throwing bad_enum_cast mid-throw.
       FC_THROW_EXCEPTION(chain::pending_impl_exception, "Key type needs to be implemented: {}",
-                         chain_key_type_reflector::to_string(key_type));
+                         chain_key_type_reflector::to_fc_string(key_type));
    default:
       FC_THROW_EXCEPTION(chain::config_parse_error, "Unknown or Unsupported chain kind: {}",
                          chain_key_type_reflector::to_fc_string(key_type));
@@ -266,7 +268,7 @@ sysio::provider_spec_result create_ssm_provider_with_fetcher(fc::crypto::chain_k
       FC_THROW_EXCEPTION(chain::plugin_config_exception,
                          "SSM parameter \"{}\" does not contain a valid {} private key "
                          "(parse failed with {}; the value is not shown because it is a secret)",
-                         ref.name, chain_key_type_reflector::to_string(key_type), e.name());
+                         ref.name, chain_key_type_reflector::to_fc_string(key_type), e.name());
    }
 
    // The plugin core verifies pinned-pubkey-vs-derived only for `KEY:`;

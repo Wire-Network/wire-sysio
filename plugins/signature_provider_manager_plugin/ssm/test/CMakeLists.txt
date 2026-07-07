@@ -13,14 +13,14 @@ target_link_libraries(${TARGET_NAME}
         signature_provider_manager_plugin
         sysio_testing
         sysio_chain_wrap
-        fc-test
+        fc-test)
         # NOTE: do not link Boost::unit_test_framework here. The test entry
         # point in main.cpp uses <boost/test/included/unit_test.hpp> (header-
         # only Boost.Test), matching the plugin's own test binary. Linking
         # the prebuilt library as well would pull in a second main() and a
-        # second `init_unit_test_suite` symbol.
-        Boost::process
-        Boost::dll)
+        # second `init_unit_test_suite` symbol. Unlike the kms sibling, no
+        # Boost::process / Boost::dll here: these tests only load keygen
+        # fixtures from disk, never spawn the keygen scripts.
 
 add_test(NAME ${TARGET_NAME}
          COMMAND ${CMAKE_BINARY_DIR}/plugins/signature_provider_manager_plugin/ssm/test/${TARGET_NAME}

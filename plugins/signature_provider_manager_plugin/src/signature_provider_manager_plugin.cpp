@@ -130,8 +130,10 @@ public:
             break;
          }
          case chain_key_type_sui: {
+            // to_fc_string throughout these arms: unlike to_string, it is total -- an out-of-range
+            // value formats as its number instead of throwing bad_enum_cast from inside the throw.
             FC_THROW_EXCEPTION(sysio::chain::pending_impl_exception, "Key type needs to be implemented: {}",
-                               chain_key_type_reflector::to_string(key_type));
+                               chain_key_type_reflector::to_fc_string(key_type));
          }
          default: {
             FC_THROW_EXCEPTION(sysio::chain::config_parse_error, "Unknown or Unsupported chain kind: {}",
@@ -413,7 +415,7 @@ public:
       }
       case chain_key_type_sui: {
          FC_THROW_EXCEPTION(sysio::chain::pending_impl_exception, "Key type: {}",
-                            chain_key_type_reflector::to_string(key_type));
+                            chain_key_type_reflector::to_fc_string(key_type));
       }
       default: {
          FC_THROW_EXCEPTION(sysio::chain::config_parse_error, "Unknown or Unsupported chain kind: {}",

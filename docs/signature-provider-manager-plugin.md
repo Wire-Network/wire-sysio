@@ -34,6 +34,16 @@ with varied key types.
                            Store SecureString that holds the private key (see below)
 ```
 
+## KMS: AWS KMS remote signing (not registered by nodeop)
+
+`KMS:<key-ref>` keeps the signing key in AWS KMS and issues a remote `Sign` call per signature —
+the key never appears on the host or in process memory. `<key-ref>` is a full key/alias ARN or
+`<region>:<key-id-or-alias>`. Scope is secp256k1/ethereum keys only, and the 30–100 ms
+per-signature latency makes it unsuitable for block production, which is why nodeop does not
+register it; a host application opts in by linking `sigprov_kms` and registering the handler from
+its `main()`. See `plugins/signature_provider_manager_plugin/kms/test/README.md` for key setup,
+IAM requirements, and operational notes.
+
 ## SSM: AWS SSM Parameter Store keys (registered by nodeop)
 
 `SSM:<param-ref>` fetches the private key from AWS SSM Parameter Store exactly once, when the
