@@ -194,6 +194,34 @@ BOOST_FIXTURE_TEST_CASE(setconfig_total_check_survives_uint32_wrap, sysio_epoch_
    );
 } FC_LOG_AND_RETHROW() }
 
+BOOST_FIXTURE_TEST_CASE(setconfig_rejects_oversized_operators_per_epoch, sysio_epoch_tester) { try {
+   // Group size drives advance()'s per-epoch inline fanout and vector reserves,
+   // so it carries a magnitude bound independent of the product equality: a
+   // window of UINT32_MAX operators in one group is internally consistent
+   // (UINT32_MAX * 1 == UINT32_MAX) yet must be rejected. 100 is the ceiling.
+   BOOST_REQUIRE_EQUAL(success(), setconfig(360, 100, 100, 1));
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: operators_per_epoch exceeds the per-epoch schedule ceiling (100)"),
+      setconfig(360, 101, 101, 1)
+   );
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: operators_per_epoch exceeds the per-epoch schedule ceiling (100)"),
+      setconfig(360, 0xFFFF'FFFFu, 0xFFFF'FFFFu, 1)
+   );
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(setconfig_rejects_oversized_schedule_window, sysio_epoch_tester) { try {
+   // The window total (batch_operator_minimum_active == operators_per_epoch *
+   // batch_op_groups) is carried in the epochstate row and in every per-outpost
+   // BatchOperatorGroups attestation, so it has its own ceiling (1000) even when
+   // the per-group size and group count are individually acceptable.
+   BOOST_REQUIRE_EQUAL(success(), setconfig(360, 100, 1000, 10));
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: batch_operator_minimum_active exceeds the schedule-window ceiling (1000)"),
+      setconfig(360, 100, 1100, 11)
+   );
+} FC_LOG_AND_RETHROW() }
+
 BOOST_FIXTURE_TEST_CASE(regchain_basic, sysio_epoch_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), regchain(ChainKind::CHAIN_KIND_EVM, "ETH", 1));
    produce_blocks();

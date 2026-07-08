@@ -106,7 +106,14 @@ emissions_gate_result check_emissions_ready(uint32_t epoch_duration_sec, uint32_
    // against sysio's balance. Non-pay epochs do not transfer, so no balance
    // check is needed; pending accumulates in t5state via accrueepoch.
    if (r.is_pay_epoch) {
-      r.period_emission = t5s.pending_emission_amount + r.emission_amount;
+      // Same saturating accumulation as sysio.system::accrueepoch (shared
+      // helper in emissions.hpp) so the gate's period total exactly matches
+      // what accrueepoch will store and payepoch will assert against. An
+      // unsaturated sum here could exceed asset::max_amount once the
+      // accumulator clamps, demanding a balance no account can hold and
+      // blocking epoch advancement permanently.
+      r.period_emission = sysiosystem::emissions::saturating_accrue(
+         t5s.pending_emission_amount, r.emission_amount);
 
       sysio::token::token::accounts acct_tbl(TOKEN_ACCOUNT, SYSTEM_ACCOUNT.value);
       sysio::token::token::acct_key key{WIRE_SYMBOL.code().raw()};
@@ -246,8 +253,36 @@ void epoch::setconfig(uint32_t epoch_duration_sec,
    // the equality against the uint32 field, which is the intended rejection.
    check(static_cast<uint64_t>(operators_per_epoch) * batch_op_groups == batch_operator_minimum_active,
          "batch_operator_minimum_active must equal operators_per_epoch * batch_op_groups");
+   // Magnitude bounds, checked after the relationship above so an inconsistent
+   // triple reports the equality error. The equality alone cannot reject an
+   // internally consistent but absurd size (UINT32_MAX groups of one), which
+   // would later abort advance() on its schedule-window vector reserves and
+   // halt epoch advancement chain-wide.
+   check(operators_per_epoch <= MAX_OPERATORS_PER_EPOCH,
+         "operators_per_epoch exceeds the per-epoch schedule ceiling (100)");
+   check(batch_operator_minimum_active <= MAX_SCHEDULED_BATCH_OPERATORS,
+         "batch_operator_minimum_active exceeds the schedule-window ceiling (1000)");
    check(epoch_retention_envelope_log_count > 0,
          "epoch_retention_envelope_log_count must be positive");
+
+   // The emissions pay-period accumulation bound (see emissions.hpp) depends
+   // on epoch_duration_sec: scale_annual_to_epoch is linear in the duration,
+   // so raising the duration raises the per-epoch emission ceiling that
+   // sysio.system::setemitcfg validated against the pay cadence. Re-validate
+   // against the stored emission config here so no ordering of the two setters
+   // can accept a period whose accumulation would saturate the pending
+   // accumulator and permanently block the readiness gate.
+   {
+      sysiosystem::emissions::emitcfg_t emit_cfg_tbl(SYSTEM_ACCOUNT);
+      if (emit_cfg_tbl.exists()) {
+         sysiosystem::emissions::t5state_t t5s_tbl(SYSTEM_ACCOUNT);
+         const int64_t pending =
+            t5s_tbl.exists() ? t5s_tbl.get().pending_emission_amount : 0;
+         check(sysiosystem::emissions::period_accrual_fits_asset_range(
+                  emit_cfg_tbl.get(), epoch_duration_sec, pending),
+               "per-epoch emission ceiling x pay_cadence_epochs exceeds the asset range at this epoch_duration_sec");
+      }
+   }
 
    epochcfg_t cfg_tbl(get_self());
    epoch_config cfg = cfg_tbl.get_or_default(epoch_config{});

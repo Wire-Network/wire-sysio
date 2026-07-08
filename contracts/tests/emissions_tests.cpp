@@ -2150,6 +2150,45 @@ BOOST_FIXTURE_TEST_CASE( accrueepoch_saturates_pending_accumulator, sysio_emissi
       get_t5_state()["pending_emission_amount"].as<int64_t>() );
 } FC_LOG_AND_RETHROW()
 
+BOOST_FIXTURE_TEST_CASE( setemitcfg_bounds_period_accrual_to_asset_range, sysio_emissions_tester ) try {
+   // The pending accumulator saturates at asset::max_amount (previous test), and
+   // a saturated accumulator leaves the pay-epoch readiness gate demanding a
+   // balance no account can hold -- permanently blocking epoch advancement. So
+   // setemitcfg must reject any config whose worst-case pay-period accumulation
+   // (per-epoch emission ceiling * pay_cadence_epochs) could reach the clamp.
+   //
+   // At a 30-day epoch the fixture's ANNUAL_MAX_EMISSION scales to exactly
+   // 9.0e16 per epoch (3.0e15 per day * 30 days), and the asset ceiling
+   // (2^62 - 1 ~= 4.61e18) divides to 51.24 epochs of headroom: cadence 51
+   // fits, cadence 52 must be rejected.
+   BOOST_REQUIRE_EQUAL( success(), init_epoch_state(2'592'000) ); // 30-day epochs
+
+   BOOST_REQUIRE_EQUAL( success(),
+      setemitcfg_with_cadence( config::system_account_name, uint16_t(51) ) );
+
+   auto r = setemitcfg_with_cadence( config::system_account_name, uint16_t(52) );
+   BOOST_REQUIRE( r != success() );
+   require_substr( r, "per-epoch emission ceiling x pay_cadence_epochs exceeds the asset range" );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( epoch_setconfig_rejects_duration_breaking_accrual_bound, sysio_emissions_tester ) try {
+   // Mirror of the previous test from the other config boundary:
+   // scale_annual_to_epoch is linear in epoch_duration_sec, so a duration raise
+   // can invalidate the period-accrual bound setemitcfg validated at the old
+   // duration. A maximal cadence accepted at 60s epochs (ceiling ~2.08e12 *
+   // 65535 ~= 1.4e17) must block a raise to 30-day epochs (9.0e16 * 65535
+   // ~= 5.9e21, far past 2^62), while a modest raise to 600s epochs
+   // (2.08e13 * 65535 ~= 1.4e18) still fits.
+   BOOST_REQUIRE_EQUAL( success(),
+      setemitcfg_with_cadence( config::system_account_name, uint16_t(65535) ) );
+
+   auto r = init_epoch_state(2'592'000);
+   BOOST_REQUIRE( r != success() );
+   require_substr( r, "per-epoch emission ceiling x pay_cadence_epochs exceeds the asset range" );
+
+   BOOST_REQUIRE_EQUAL( success(), init_epoch_state(600) );
+} FC_LOG_AND_RETHROW()
+
 BOOST_FIXTURE_TEST_CASE( setemitcfg_post_initt5_rejects_brick_reduce, sysio_emissions_tester ) try {
    // After t5_state exists and epochs have run, setemitcfg must reject a
    // t5_distributable reduction that would make remaining (= distributable -

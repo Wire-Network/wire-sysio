@@ -264,6 +264,12 @@ void system_contract::setemitcfg(const emissions::emission_config& cfg) {
    const bool epoch_configured = epoch_cfg_tbl.exists();
    const uint32_t epoch_secs   = epoch_configured ? epoch_cfg_tbl.get().epoch_duration_sec : 0;
 
+   // Single read of t5_state shared by the period-accrual bound (which needs
+   // the already-accrued pending amount) and the post-init brick guards below.
+   t5state_t t5s(get_self());
+   const bool t5_initialized = t5s.exists();
+   const t5_state t5now      = t5_initialized ? t5s.get() : t5_state{};
+
    // If sysio.epoch is configured, sanity-check that each nonzero annual
    // value scales to a non-zero per-epoch share at the canonical
    // epoch_duration_sec. Without this guard, a tiny annual value can round
@@ -283,20 +289,29 @@ void system_contract::setemitcfg(const emissions::emission_config& cfg) {
          sysio::check(emissions::scale_annual_to_epoch(cfg.annual_min_emission, epoch_secs) > 0,
                        "annual_min_emission per-epoch share rounds to 0 at current epoch_duration_sec");
       }
+
+      // Bound the pay-period accumulation: anything already pending plus a
+      // full cadence of ceiling-rate epochs must fit in the asset range.
+      // Without this, pending_emission_amount can saturate at asset::max_amount
+      // mid-period (see saturating_accrue), after which the pay-epoch readiness
+      // gate demands a balance no treasury can hold and epoch advancement
+      // blocks permanently. sysio.epoch::setconfig enforces the same bound when
+      // epoch_duration_sec changes.
+      sysio::check(
+         emissions::period_accrual_fits_asset_range(cfg, epoch_secs, t5now.pending_emission_amount),
+         "per-epoch emission ceiling x pay_cadence_epochs exceeds the asset range at current epoch_duration_sec");
    }
 
    // If t5_state already exists, prevent config changes that would brick future
    // emissions. Post-init, remaining distributable must still cover what's been
    // paid, and the per-epoch floor (derived from annual_min_emission and the
    // canonical epoch_duration_sec) can't exceed what's left to distribute.
-   // initt5 requires sysio.epoch to be configured, so t5s.exists() implies
+   // initt5 requires sysio.epoch to be configured, so t5_initialized implies
    // epoch_configured -- safe to use epoch_secs directly.
-   t5state_t t5s(get_self());
-   if (t5s.exists()) {
-      const auto state = t5s.get();
-      sysio::check(cfg.t5_distributable >= cfg.t5_floor + state.total_distributed,
+   if (t5_initialized) {
+      sysio::check(cfg.t5_distributable >= cfg.t5_floor + t5now.total_distributed,
                     "t5_distributable must cover floor + already-distributed");
-      const int64_t remaining = cfg.t5_distributable - cfg.t5_floor - state.total_distributed;
+      const int64_t remaining = cfg.t5_distributable - cfg.t5_floor - t5now.total_distributed;
       const int64_t per_epoch_min =
          emissions::scale_annual_to_epoch(cfg.annual_min_emission, epoch_secs);
       sysio::check(per_epoch_min <= remaining,
@@ -490,16 +505,16 @@ void system_contract::accrueepoch(uint32_t epoch_index,
 
    sysio::check(epoch_index > state.last_epoch_index, "accrueepoch epoch already accrued");
 
-   // Saturating accumulate. accrueepoch runs as an inline action from
-   // sysio.epoch::advance, so this must never throw — a throw would abort epoch
-   // advancement chain-wide. Cap the running total at the asset maximum (2^62-1)
-   // instead: it is drained to zero every pay epoch and reaching the cap needs an
-   // absurdly misconfigured per-epoch emission, but capping keeps the sum from
-   // wrapping negative and corrupting the payout math either way.
-   {
-      const int64_t room = sysio::asset::max_amount - state.pending_emission_amount;
-      state.pending_emission_amount += (per_epoch_emission <= room ? per_epoch_emission : room);
-   }
+   // Saturating accumulate (shared helper in emissions.hpp). accrueepoch runs
+   // as an inline action from sysio.epoch::advance, so this must never throw --
+   // a throw would abort epoch advancement chain-wide. The readiness gate
+   // precomputed the identical saturated total as period_emission and payepoch
+   // asserts equality against it, so the three sites cannot diverge. The
+   // period-accrual bound enforced by setemitcfg / sysio.epoch::setconfig keeps
+   // any accepted configuration from actually reaching the clamp; saturating
+   // here is defense-in-depth behind those boundary checks.
+   state.pending_emission_amount =
+      saturating_accrue(state.pending_emission_amount, per_epoch_emission);
 
    // Lazy-grow batch_group_epochs to fit batch_group_index. Pre-pay-cadence
    // chains see length 0 and grow on first epoch under the new schema.
