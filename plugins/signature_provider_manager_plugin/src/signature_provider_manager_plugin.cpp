@@ -78,10 +78,6 @@ public:
     */
    bool _startup_probe_enabled{false};
 
-   fc::crypto::sign_fn make_key_signature_provider(const chain::private_key_type& key) const {
-      return [key](const chain::digest_type& digest) { return key.sign(digest); };
-   }
-
    fc::crypto::sign_fn make_kiod_signature_provider(const string& url_str, const chain::public_key_type& pubkey) const {
       fc::url kiod_url;
       if (boost::algorithm::starts_with(url_str, "unix://"))
@@ -121,26 +117,23 @@ public:
          chain::private_key_type privkey;
 
          switch (key_type) {
-         case chain_key_type_wire: {
-            privkey = from_native_string_to_private_key<chain_key_type_wire>(spec_data);
-            break;
-         }
-         case chain_key_type_wire_bls: {
-            privkey = from_native_string_to_private_key<chain_key_type_wire_bls>(spec_data);
-            break;
-         }
-
-         case chain_key_type_ethereum: {
-            privkey = from_native_string_to_private_key<chain_key_type_ethereum>(spec_data);
-            break;
-         }
+         case chain_key_type_wire:
+         case chain_key_type_wire_bls:
+         case chain_key_type_ethereum:
          case chain_key_type_solana: {
-            privkey = from_native_string_to_private_key<chain_key_type_solana>(spec_data);
+            // Runtime dispatch over the per-type native parsers lives in libfc
+            // (fc/crypto/signature_provider.cpp) so extension handlers that
+            // also construct local-key providers (e.g. the ssm sub-library)
+            // share it. The sui / unknown arms stay here: libfc cannot throw
+            // the chain-level config exceptions this plugin's contract uses.
+            privkey = from_native_string_to_private_key(key_type, spec_data);
             break;
          }
          case chain_key_type_sui: {
+            // to_fc_string throughout these arms: unlike to_string, it is total -- an out-of-range
+            // value formats as its number instead of throwing bad_enum_cast from inside the throw.
             FC_THROW_EXCEPTION(sysio::chain::pending_impl_exception, "Key type needs to be implemented: {}",
-                               chain_key_type_reflector::to_string(key_type));
+                               chain_key_type_reflector::to_fc_string(key_type));
          }
          default: {
             FC_THROW_EXCEPTION(sysio::chain::config_parse_error, "Unknown or Unsupported chain kind: {}",
@@ -150,7 +143,7 @@ public:
 
          FC_ASSERT(public_key == privkey.get_public_key(), "Private key does not match given public key for {}",
                    fc::json::to_log_string(public_key));
-         return {.signer = make_key_signature_provider(privkey), .private_key = privkey};
+         return {.signer = fc::crypto::make_local_sign_fn(privkey), .private_key = privkey};
       }
 
       if (spec_type_str == "KIOD") {
@@ -176,7 +169,7 @@ public:
 
       SYS_THROW(chain::plugin_config_exception,
                 "Unknown provider type \"{}\". Built-in types are KEY and KIOD; "
-                "additional types (e.g. KMS) must be registered by the host "
+                "additional types (e.g. KMS, SSM) must be registered by the host "
                 "application via register_spec_handler() before app().initialize() "
                 "-- this binary has no registration for \"{}\".",
                 spec_type_str, spec_type_str);
@@ -410,25 +403,19 @@ public:
       chain::public_key_type pubkey;
 
       switch (key_type) {
-      case chain_key_type_wire: {
-         pubkey = from_native_string_to_public_key<chain_key_type_wire>(public_key_text);
-         break;
-      }
-      case chain_key_type_wire_bls: {
-         pubkey = from_native_string_to_public_key<chain_key_type_wire_bls>(public_key_text);
-         break;
-      }
-      case chain_key_type_ethereum: {
-         pubkey = from_native_string_to_public_key<chain_key_type_ethereum>(public_key_text);
-         break;
-      }
+      case chain_key_type_wire:
+      case chain_key_type_wire_bls:
+      case chain_key_type_ethereum:
       case chain_key_type_solana: {
-         pubkey = from_native_string_to_public_key<chain_key_type_solana>(public_key_text);
+         // Runtime dispatch lives in libfc (fc/crypto/signature_provider.cpp);
+         // the sui / unknown arms stay here for the chain-level exception
+         // taxonomy, same as the KEY: private-key parse.
+         pubkey = from_native_string_to_public_key(key_type, public_key_text);
          break;
       }
       case chain_key_type_sui: {
          FC_THROW_EXCEPTION(sysio::chain::pending_impl_exception, "Key type: {}",
-                            chain_key_type_reflector::to_string(key_type));
+                            chain_key_type_reflector::to_fc_string(key_type));
       }
       default: {
          FC_THROW_EXCEPTION(sysio::chain::config_parse_error, "Unknown or Unsupported chain kind: {}",
@@ -593,7 +580,10 @@ void signature_provider_manager_plugin::set_program_options(options_description&
    cfg.add_options()(
       "signature-provider", boost::program_options::value<std::vector<std::string>>()->multitoken(),
       "Signature provider spec formatted as (check docs for details): "
-      "`<name>,<chain-kind>,<key-type>,<public-key>,<private-key-provider-spec>`");;
+      "`<name>,<chain-kind>,<key-type>,<public-key>,<private-key-provider-spec>`. "
+      "Provider types KEY:<private-key> and KIOD:<url> are built in; host binaries "
+      "may register additional schemes (nodeop registers SSM:<region>:<parameter-name> "
+      "to fetch the key from AWS SSM Parameter Store at startup).");
    cfg.add_options()(
       option_name_kms_startup_check,
       boost::program_options::value<bool>()->default_value(false),
@@ -615,10 +605,14 @@ const char* signature_provider_manager_plugin::signature_provider_help_text() co
       "   <public-key>           is a string form of a valid <key-type>\n\n"
       "   <provider-spec>        is a string in the form <provider-type>:<data>\n\n"
       "       <provider-type>    KEY and KIOD are built in. Additional types\n"
-      "                          (e.g. KMS) are registered by the host application;\n"
+      "                          (e.g. KMS, SSM) are registered by the host application;\n"
       "                          this binary supports only the types its main() registers.\n\n"
       "       KEY:<private-key>  is a string containing a private key of the key-type specified\n\n"
-      "       KIOD:<url>         is the URL where kiod is available and the appropriate wallet(s) are unlocked\n\n";
+      "       KIOD:<url>         is the URL where kiod is available and the appropriate wallet(s) are unlocked\n\n"
+      "       SSM:<param-ref>    fetches the private key once at startup from AWS SSM Parameter\n"
+      "                          Store (SecureString) and signs locally; <param-ref> is\n"
+      "                          <region>:<parameter-name> or a full parameter ARN. Registered\n"
+      "                          by nodeop.\n\n";
 }
 
 void signature_provider_manager_plugin::plugin_initialize(const variables_map& options) {
@@ -660,7 +654,7 @@ fc::crypto::signature_provider_ptr signature_provider_manager_plugin::create_pro
 
 fc::crypto::sign_fn
 signature_provider_manager_plugin::create_anonymous_provider_from_private_key(chain::private_key_type priv) const {
-   return [priv](const fc::sha256& d) { return priv.sign(d); };
+   return fc::crypto::make_local_sign_fn(priv);
 }
 
 bool signature_provider_manager_plugin::has_provider(const fc::crypto::signature_provider_id_t& key) {

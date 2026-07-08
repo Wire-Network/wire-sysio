@@ -44,4 +44,8 @@ target_link_libraries(signature_provider_manager_plugin_headers
         custom_appbase
         fc)
 
+# Shared AWS glue first: the aws-backed sub-libraries link sigprov_aws_common
+# (one process-wide owner of the AWS SDK lifecycle).
+add_subdirectory(aws)
 add_subdirectory(kms)
+add_subdirectory(ssm)

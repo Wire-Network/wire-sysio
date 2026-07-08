@@ -79,6 +79,54 @@ namespace sysio {
       // requirement; covers SETTLED, REVERTED, EXPIRED uwreqs alike.
       static constexpr uint32_t UWREQ_RETENTION_EPOCHS = 10;
 
+      // Safety rails on the depot-originated swap-from-WIRE queue (SEC-77 /
+      // WSA-165). `swapfromwire` is public and escrows only the caller's WIRE,
+      // so without bounds a caller could split real WIRE into an unbounded
+      // number of system-paid `fwqueue` rows and force `drainfwq` to process
+      // them all inside one `sysio.epoch::advance` transaction. That
+      // transaction's CPU budget (~150 ms) is a hard, uncatchable deadline, so
+      // an oversized queue would abort every advance and permanently stall
+      // epoch progress chain-wide.
+      //
+      // MAX_FWQ_DRAIN_PER_EPOCH bounds the rows drained per advance; undrained
+      // rows stay queued (escrow safe in reserve custody) and drain a later
+      // epoch, converting a potential halt into bounded drain latency.
+      // Ingress is already throttled economically — every `swapfromwire` is a
+      // `require_auth(user)` transaction that bills the caller CPU/NET and
+      // escrows real WIRE per row — so the drain bound alone is the liveness
+      // rail; there is no per-caller row cap. Conservatively sized to stay well
+      // under the transaction CPU ceiling shared with chklocks / buildenv /
+      // emissions; raise it (contract upgrade) only if legitimate from-WIRE
+      // throughput approaches the bound.
+      static constexpr uint32_t MAX_FWQ_DRAIN_PER_EPOCH = 32;
+
+      // Economic ingress rails on `swapfromwire`, complementing the drain
+      // bound above. Both are live config (`uwconfig`) retunable via
+      // `setconfig` without a contract upgrade; the values here are only the
+      // defaults a fresh chain starts from.
+      //
+      // DEFAULT_MIN_FROMWIRE_AMOUNT floors the escrow per queued row (5 WIRE
+      // at 9 decimals). Dust rows are what made queue spam nearly free: the
+      // escrow comes back in full at drain, so 1-atomic rows could hold drain
+      // slots while locking no meaningful capital — and sat below the Bancor
+      // kernel's pricing floor, guaranteeing zero-quote refunds. With the
+      // floor, sustaining a D-row backlog keeps D x floor WIRE locked for the
+      // full queue latency the spammer themselves creates.
+      //
+      // DEFAULT_FROMWIRE_REVERT_FEE_BPS is charged on the refunded escrow
+      // when a queued row reverts at drain for a cause the caller controls
+      // (unpriceable target / variance tolerance exceeded). The fee is routed
+      // through the same rewards/emissions split as settlement fees
+      // (`opp::amm::split_wire_fee` + `sysio.reserv::route_wire_fee`), so
+      // revert churn pays the system instead of recycling for free. Reverts
+      // caused by system state changes after enqueue (reserve deactivated,
+      // flipped private, chain deregistered) refund in full — the caller did
+      // nothing wrong. Successful swaps are unaffected; they already pay
+      // `fee_bps` at settlement. The default mirrors `fee_bps` as a
+      // placeholder pending final fee calibration.
+      static constexpr uint64_t DEFAULT_MIN_FROMWIRE_AMOUNT     = 5'000'000'000; // 5 WIRE @ 9 decimals
+      static constexpr uint32_t DEFAULT_FROMWIRE_REVERT_FEE_BPS = 10;            // 0.1%
+
       // Maximum accepted swap fee, in basis points. A 100% fee (10000 bps)
       // would zero the post-fee WIRE leg of every swap (`net == 0` in
       // `opp::amm::split_wire_fee`), which let a from-WIRE or token-to-token
@@ -104,9 +152,18 @@ namespace sysio {
       ///     window: collateral stays locked for its full duration — it is
       ///     never released by delivery. Default 43,200,000 (12 hours);
       ///     test clusters shorten it via this action.
+      ///   * `min_fromwire_amount` — minimum WIRE escrow (9-decimal atomic
+      ///     units) `swapfromwire` accepts; rows below the floor are rejected
+      ///     at enqueue. Must be positive. Default 5 WIRE.
+      ///   * `fromwire_revert_fee_bps` — fee on the refunded escrow when a
+      ///     queued from-WIRE swap reverts at drain for a caller-controlled
+      ///     cause (see `drainfwq`); routed exactly like the settlement fee.
+      ///     Capped at MAX_FEE_BPS so the post-fee refund stays positive.
       [[sysio::action]]
       void setconfig(uint32_t fee_bps,
-                     uint64_t collateral_lock_duration_ms);
+                     uint64_t collateral_lock_duration_ms,
+                     uint64_t min_fromwire_amount,
+                     uint32_t fromwire_revert_fee_bps);
 
       /// Called inline from `sysio.msgch::dispatch` when a SWAP attestation
       /// arrives. Decodes the SwapRequest, runs the variance-tolerance check
@@ -175,8 +232,14 @@ namespace sysio {
       /// next `sysio.epoch::advance` drains the queue (`drainfwq`): the
       /// target reserve + variance are re-validated authoritatively and a
       /// PENDING uwreq with `src = (WIRE, WIRE)` is created for the normal
-      /// single-leg underwriter race (target leg only). Validation failures
-      /// at drain time refund the escrow in full.
+      /// single-leg underwriter race (target leg only).
+      ///
+      /// `wire_amount` must meet the configured `min_fromwire_amount` floor
+      /// (default 5 WIRE) — the floor prices queue slots in locked escrow so
+      /// dust rows cannot hold the drain hostage for free. Drain-time reverts
+      /// the caller controls (unpriceable target, variance exceeded) refund
+      /// the escrow minus `fromwire_revert_fee_bps`; reverts caused by system
+      /// state changes after enqueue refund in full.
       ///
       /// `recipient_kind` / `recipient_addr` name the payout address on the
       /// target chain (flattened ChainAddress — proto messages never appear
@@ -198,7 +261,9 @@ namespace sysio {
       /// `buildenv`). Per row: re-validate the target reserve (exists,
       /// ACTIVE, not private) and the variance tolerance against the live
       /// quote — on failure, refund the user's escrowed WIRE via
-      /// `reserv::refundwire` and drop the row; on success, emplace the
+      /// `reserv::refundwire` (minus `fromwire_revert_fee_bps` when the
+      /// revert cause is caller-controlled) and drop the row; on success,
+      /// emplace the
       /// PENDING uwreq (id = the queue row's depot-origin id) carrying a
       /// synthetic SwapRequest payload so the settlement tail
       /// (`emit_swap_remit`) can decode the recipient. NEVER throws.
@@ -496,7 +561,14 @@ namespace sysio {
          /// after creation and are swept by `chklocks` at epoch advance.
          /// Default 12 hours.
          uint64_t collateral_lock_duration_ms  = 43'200'000;
-         SYSLIB_SERIALIZE(uw_config, (fee_bps)(collateral_lock_duration_ms))
+         /// Minimum WIRE escrow accepted by `swapfromwire` (atomic units,
+         /// 9 decimals) — the queue-slot price floor.
+         uint64_t min_fromwire_amount          = DEFAULT_MIN_FROMWIRE_AMOUNT;
+         /// Fee (bps of the escrow) on caller-controlled drain-time reverts,
+         /// routed like the settlement fee. <= MAX_FEE_BPS.
+         uint32_t fromwire_revert_fee_bps      = DEFAULT_FROMWIRE_REVERT_FEE_BPS;
+         SYSLIB_SERIALIZE(uw_config, (fee_bps)(collateral_lock_duration_ms)
+                                     (min_fromwire_amount)(fromwire_revert_fee_bps))
       };
 
       using uwconfig_t = sysio::kv::global<"uwconfig"_n, uw_config>;
