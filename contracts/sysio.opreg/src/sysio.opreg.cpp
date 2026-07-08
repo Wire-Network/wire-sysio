@@ -111,6 +111,21 @@ void require_no_duplicate_chain_token(const std::vector<opreg::chain_min_bond>& 
    }
 }
 
+/// Reject a zero `min_bond` in any collateral-requirement entry. Eligibility
+/// evaluation gates an operator on `available >= req.min_bond`; a zero minimum
+/// makes that comparison vacuously true, so an operator could reach ACTIVE with
+/// no collateral posted, defeating the bond requirement entirely. An operator
+/// type that should carry no requirement is expressed by an empty requirement
+/// vector (which makes the type ineligible), never by a zero-valued entry.
+void require_positive_min_bond(const std::vector<opreg::chain_min_bond>& v,
+                               const char* role_label) {
+   for (const auto& entry : v) {
+      check(entry.min_bond > 0,
+            std::string(role_label) +
+               ": min_bond must be positive (an empty requirement set imposes no bond)");
+   }
+}
+
 } // anonymous namespace
 
 // ---------------------------------------------------------------------------
@@ -143,6 +158,10 @@ void opreg::setconfig(uint32_t max_available_producers,
    require_no_duplicate_chain_token(req_prod_collat,    "req_prod_collat");
    require_no_duplicate_chain_token(req_batchop_collat, "req_batchop_collat");
    require_no_duplicate_chain_token(req_uw_collat,      "req_uw_collat");
+
+   require_positive_min_bond(req_prod_collat,    "req_prod_collat");
+   require_positive_min_bond(req_batchop_collat, "req_batchop_collat");
+   require_positive_min_bond(req_uw_collat,      "req_uw_collat");
 
    // Stamp every entry's `config_timestamp_ms` with the on-chain time
    // so consumers can detect stale configuration without trusting the

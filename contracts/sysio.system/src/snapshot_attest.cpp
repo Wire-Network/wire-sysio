@@ -181,6 +181,14 @@ void snapshot_attest::setsnpcfg(uint32_t min_providers, uint32_t threshold_pct) 
 
    check(threshold_pct > 0 && threshold_pct <= 100, "threshold_pct must be between 1 and 100");
    check(min_providers > 0, "min_providers must be at least 1");
+   // The provider table is structurally capped at `max_snap_provider_rank`
+   // registered providers, so a `min_providers` above that ceiling can never be
+   // met and would make every attestation unreachable regardless of how many
+   // providers register. (This bounds the config; a min_providers set higher than
+   // the count actually registered at attestation time remains an operational
+   // concern the quorum math cannot resolve here.)
+   check(min_providers <= max_snap_provider_rank,
+         "min_providers exceeds the maximum registrable providers");
 
    snap_config_singleton cfg_singleton(get_self());
    cfg_singleton.set(snap_config{min_providers, threshold_pct}, get_self());

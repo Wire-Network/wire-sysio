@@ -197,6 +197,18 @@ BOOST_FIXTURE_TEST_CASE(setconfig_rejects_zero_lock_duration, sysio_uwrit_tester
    );
 } FC_LOG_AND_RETHROW() }
 
+BOOST_FIXTURE_TEST_CASE(setconfig_rejects_excess_lock_duration, sysio_uwrit_tester) { try {
+   // The one-year ceiling is accepted; one millisecond beyond it is rejected
+   // before the duration could wrap `now_ms + collateral_lock_duration_ms` and
+   // release the lock the instant it is placed.
+   constexpr uint64_t one_year_ms = 365ull * 24 * 60 * 60 * 1000;
+   BOOST_REQUIRE_EQUAL(success(), setconfig(/*fee_bps*/10, one_year_ms));
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: collateral_lock_duration_ms exceeds the one-year ceiling"),
+      setconfig(/*fee_bps*/10, one_year_ms + 1)
+   );
+} FC_LOG_AND_RETHROW() }
+
 BOOST_FIXTURE_TEST_CASE(createuwreq_requires_msgch_auth, sysio_uwrit_tester) { try {
    // createuwreq must be invoked by sysio.msgch (inline action). A direct
    // call from another account (uwrit.a here) is rejected.

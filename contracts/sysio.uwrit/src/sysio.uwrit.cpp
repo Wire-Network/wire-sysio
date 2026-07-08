@@ -688,6 +688,11 @@ void uwrit::setconfig(uint32_t fee_bps,
          "fee_bps must be below 10000 (100%): a 100% fee zeroes the post-fee WIRE leg");
    check(collateral_lock_duration_ms > 0,
          "collateral_lock_duration_ms must be positive");
+   // Reject a duration so large that `now_ms + collateral_lock_duration_ms`
+   // would wrap past UINT64_MAX and yield a lock that expires in the past,
+   // releasing collateral the instant it is placed.
+   check(collateral_lock_duration_ms <= MAX_COLLATERAL_LOCK_DURATION_MS,
+         "collateral_lock_duration_ms exceeds the one-year ceiling");
    // A zero floor would reopen free dust rows in the swap-from-WIRE queue —
    // the floor is the queue-slot price (see DEFAULT_MIN_FROMWIRE_AMOUNT).
    check(min_fromwire_amount > 0, "min_fromwire_amount must be positive");

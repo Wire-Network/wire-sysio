@@ -38,6 +38,9 @@ constexpr uint32_t kDisablingPctMisses24h = 100;
 /// Compact collateral amount used to activate non-bootstrapped batch operators.
 constexpr uint64_t kTestMinBond = 1;
 
+/// Rejected collateral minimum that would make eligibility checks vacuous.
+constexpr uint64_t kRejectedZeroMinBond = 0;
+
 /// Standard 24h rolling-window size used by opreg tests.
 constexpr uint64_t kTerminateWindowMs = 24ULL * 60 * 60 * 1000;
 
@@ -367,6 +370,26 @@ BOOST_FIXTURE_TEST_CASE(setconfig_rejects_disabling_consecutive_miss_threshold, 
       error("assertion failure with message: terminate_max_consecutive_misses must be in [1, 5]"),
       setconfig(21, 63, 21, kDefaultPruneDelayMs,
                 std::numeric_limits<uint32_t>::max(), kMaxAcceptedPctMisses24h, kTerminateWindowMs)
+   );
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(setconfig_rejects_zero_min_bond, sysio_opreg_tester) { try {
+   // A zero min_bond entry makes the `available >= min_bond` eligibility gate
+   // vacuously true, so an operator could reach ACTIVE with no collateral posted.
+   // The sane "no requirement" form is an empty vector, which stays accepted.
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: req_uw_collat: min_bond must be positive "
+            "(an empty requirement set imposes no bond)"),
+      setconfig(21, 63, 21, kDefaultPruneDelayMs,
+                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kTerminateWindowMs,
+                {}, {}, { make_chain_min_bond("ETH", "ETH", kRejectedZeroMinBond) })
+   );
+   // The identical shape with a positive min_bond is accepted.
+   BOOST_REQUIRE_EQUAL(
+      success(),
+      setconfig(21, 63, 21, kDefaultPruneDelayMs,
+                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kTerminateWindowMs,
+                {}, {}, { make_chain_min_bond("ETH", "ETH", kTestMinBond) })
    );
 } FC_LOG_AND_RETHROW() }
 
