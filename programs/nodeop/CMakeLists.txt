@@ -3,6 +3,12 @@ configure_file(config.hpp.in config.hpp ESCAPE_QUOTES)
 
 chain_target(${NODE_EXECUTABLE_NAME} SOURCE_FILES main.cpp)
 
+# nodeop opts into the `SSM:` signature-provider scheme (registration in
+# main.cpp). The sub-library carries the AWS SDK dependency, deliberately kept
+# out of `chain_target`'s shared link set so other chain-tool binaries
+# (sys-util, cranker-example) stay AWS-free unless they opt in themselves.
+target_link_libraries(${NODE_EXECUTABLE_NAME} PRIVATE sigprov_ssm)
+
 apply_malloc_config(${NODE_EXECUTABLE_NAME})
 
 macro(sysio_additional_plugin)
