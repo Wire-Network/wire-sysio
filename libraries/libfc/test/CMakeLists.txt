@@ -7,6 +7,7 @@ add_executable( test_fc
         crypto/test_hash_functions.cpp
         crypto/test_k1_recover.cpp
         crypto/test_modular_arithmetic.cpp
+        crypto/test_signature_provider.cpp
         crypto/test_webauthn.cpp
         io/test_cfile.cpp
         io/test_json.cpp

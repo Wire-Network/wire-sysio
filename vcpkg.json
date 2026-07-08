@@ -64,7 +64,8 @@
       "default-features": false,
       "version>=": "1.11.665",
       "features": [
-        "kms"
+        "kms",
+        "ssm"
       ]
     },
     "boost",
@@ -89,7 +90,7 @@
     },
     {
       "name": "boost",
-      "version": "1.89.0#3"
+      "version": "1.89.0#4"
     },
     {
       "name": "llvm",
@@ -101,11 +102,11 @@
     },
     {
       "name": "bls12-381",
-      "version": "1.0.0-wire"
+      "version": "1.0.0-wire#1"
     },
     {
       "name": "bn256",
-      "version": "2.0.1"
+      "version": "2.0.2#1"
     },
     {
       "name": "boringssl-custom",
@@ -117,15 +118,15 @@
     },
     {
       "name": "cli11",
-      "version": "2.4.2"
+      "version": "2.4.2#1"
     },
     {
       "name": "libsodium",
-      "version": "1.0.20-wire"
+      "version": "1.0.20-wire#1"
     },
     {
       "name": "secp256k1-internal",
-      "version": "0.7.0#1"
+      "version": "0.7.0#2"
     },
     {
       "name": "prometheus-cpp",
@@ -137,11 +138,11 @@
     },
     {
       "name": "softfloat",
-      "version": "3.0.0#1"
+      "version": "3.0.0#2"
     },
     {
       "name": "wire-sys-vm",
-      "version": "1.2.0"
+      "version": "1.2.0#1"
     },
     {
       "name": "nlohmann-json",

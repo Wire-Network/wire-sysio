@@ -1,0 +1,77 @@
+name: "Dependency audits"
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Weekly coverage for unchanged lockfiles; scheduled workflows run from the default branch.
+    - cron: "0 9 * * 1"
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  root-node-tooling:
+    name: Root Node tooling audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: package.json
+
+      - name: Validate root pnpm lockfile
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
+      - name: Audit root pnpm dependencies
+        run: pnpm audit --audit-level=moderate
+
+      - name: Load plop generators
+        run: |
+          node <<'NODE'
+          const plopfile = require("./plopfile.js")
+          const calls = { generators: [] }
+          const plop = {
+            setActionType() {},
+            setHelper() {},
+            setGenerator(name) { calls.generators.push(name) }
+          }
+          plopfile(plop)
+          const expected = ["create-cxx-library", "create-cxx-plugin"]
+          const missing = expected.filter(name => !calls.generators.includes(name))
+          if (missing.length) {
+            throw new Error(`Missing plop generators: ${missing.join(", ")}`)
+          }
+          NODE
+
+  opp-tools:
+    name: OPP tools audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: libraries/opp/tools/package.json
+
+      - name: Validate OPP tools pnpm lockfile
+        run: |
+          cd ./libraries/opp/tools
+          pnpm install --frozen-lockfile --ignore-scripts
+
+      - name: Audit OPP tools dependencies
+        run: |
+          cd ./libraries/opp/tools
+          pnpm audit --audit-level=moderate

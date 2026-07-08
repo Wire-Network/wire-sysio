@@ -288,12 +288,20 @@ namespace sysio {
 
       /// Auth=sysio.uwrit. Refund escrowed WIRE to a swap-FROM-WIRE user
       /// whose queued request failed drain-time validation (reserve
-      /// missing / not ACTIVE / private / variance drift). Touches no
-      /// reserve row — the escrow was never credited to any
-      /// `reserve_wire_amount`.
+      /// missing / not ACTIVE / private / variance drift) or whose uwreq was
+      /// rejected. Touches no reserve row — the escrow was never credited to
+      /// any `reserve_wire_amount`.
+      ///
+      /// `revert_fee_bps` is the caller-fault revert fee: the recipient gets
+      /// `wire_amount` minus the fee and the fee routes through the standard
+      /// rewards/emissions split (`route_wire_fee`), exactly like settlement
+      /// fees. Pass 0 for no-fault refunds (whole fee path no-ops). Callers
+      /// keep it below 100% (`sysio.uwrit::MAX_FEE_BPS`) so the post-fee
+      /// refund transfer stays positive.
       [[sysio::action]]
       void refundwire(sysio::name recipient,
-                      uint64_t   wire_amount);
+                      uint64_t   wire_amount,
+                      uint32_t   revert_fee_bps);
 
       // -----------------------------------------------------------------------
       //  Tables

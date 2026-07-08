@@ -1093,13 +1093,21 @@ void opreg::flushwtdw(uint32_t current_epoch) {
    wtdwqueue_t queue(get_self());
    auto idx = queue.get_index<"byeligible"_n>();
 
-   // Iterate matured rows. Erase as we go, hence the manual cursor.
+   // Iterate matured rows. Erase as we go, hence the manual cursor. Bounded to
+   // MAX_WTDW_FLUSH_PER_EPOCH rows per advance (SEC-78): the remaining matured
+   // rows flush on the next advance, which keeps this epoch-inline action inside
+   // the transaction CPU deadline it shares with the rest of advance's fan-out.
+   // `flushed` is incremented at the top of every iteration, before any of the
+   // per-row `continue` branches, so it counts every attempt.
+   uint32_t flushed = 0;
    auto it = idx.begin();
-   while (it != idx.end() && it->eligible_at_epoch <= current_epoch) {
+   while (it != idx.end() && it->eligible_at_epoch <= current_epoch &&
+          flushed < MAX_WTDW_FLUSH_PER_EPOCH) {
       auto row     = *it;          // copy out before erase
       auto wkey    = withdraw_key{row.request_id};
       // Advance index iterator BEFORE erasing the row.
       ++it;
+      ++flushed;
 
       auto op_pk = operator_key{row.account.value};
       // Per-row outcome lands in the operator's recent_actions log so the

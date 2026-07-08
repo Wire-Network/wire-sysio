@@ -71,6 +71,48 @@ struct signature_provider_t  {
 using signature_provider_ptr = std::shared_ptr<signature_provider_t>;
 
 /**
+ * Parse a private key from its chain-native string form, dispatching at runtime on `key_type`.
+ *
+ * Runtime counterpart of the compile-time `from_native_string_to_private_key<ChainKeyType>()`
+ * templates in `fc/crypto/key_serdes.hpp`, covering the chain key types with an implemented
+ * native form: `chain_key_type_wire` (WIF / `PVT_` forms), `chain_key_type_wire_bls`
+ * (`PVT_BLS_...`), `chain_key_type_ethereum` (`0x...` hex), and `chain_key_type_solana`
+ * (base58).
+ *
+ * @param key_type        chain key type selecting the native string format
+ * @param private_key_str the private key in that chain's native string form
+ * @throws fc::unsupported_exception for chain key types without an implemented native form
+ *         (e.g. `chain_key_type_sui`); callers owning a richer error taxonomy (such as the
+ *         signature-provider plugin's config exceptions) should pre-check the type
+ * @throws fc exceptions from the underlying parser on malformed input
+ * @return the parsed private key
+ */
+private_key from_native_string_to_private_key(chain_key_type_t key_type, const std::string& private_key_str);
+
+/**
+ * Parse a public key from its chain-native string form, dispatching at runtime on `key_type`.
+ * Runtime counterpart of the `from_native_string_to_public_key<ChainKeyType>()` templates in
+ * `fc/crypto/key_serdes.hpp`; same supported types and error behavior as
+ * `from_native_string_to_private_key(chain_key_type_t, ...)` above.
+ *
+ * @param key_type       chain key type selecting the native string format
+ * @param public_key_str the public key in that chain's native string form
+ * @throws fc::unsupported_exception for chain key types without an implemented native form
+ * @throws fc exceptions from the underlying parser on malformed input
+ * @return the parsed public key
+ */
+public_key from_native_string_to_public_key(chain_key_type_t key_type, const std::string& public_key_str);
+
+/**
+ * Build the local-key signing closure used by `KEY:`-style signature providers: signs the
+ * 256-bit digest (see the `sign_fn` note above on sha256-vs-keccak semantics) with `key`.
+ *
+ * @param key private key captured by value into the returned closure
+ * @return closure signing digests with `key`
+ */
+sign_fn make_local_sign_fn(const private_key& key);
+
+/**
  * Creates a signature provider specification string from individual components.
  *
  * ethereum examples:

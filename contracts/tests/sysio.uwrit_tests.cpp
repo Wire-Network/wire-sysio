@@ -82,10 +82,14 @@ public:
    }
 
    action_result setconfig(uint32_t fee_bps                     = 10,
-                           uint64_t collateral_lock_duration_ms = 43'200'000) {
+                           uint64_t collateral_lock_duration_ms = 43'200'000,
+                           uint64_t min_fromwire_amount         = 5'000'000'000ull,
+                           uint32_t fromwire_revert_fee_bps     = 10) {
       return push_uwrit_action(UWRIT_ACCOUNT, "setconfig"_n, mvo()
          ("fee_bps",                     fee_bps)
          ("collateral_lock_duration_ms", collateral_lock_duration_ms)
+         ("min_fromwire_amount",         min_fromwire_amount)
+         ("fromwire_revert_fee_bps",     fromwire_revert_fee_bps)
       );
    }
 
@@ -118,6 +122,8 @@ BOOST_FIXTURE_TEST_CASE(setconfig_basic, sysio_uwrit_tester) { try {
    auto cfg = get_uwconfig();
    BOOST_REQUIRE_EQUAL(25, cfg["fee_bps"].as_uint64());
    BOOST_REQUIRE_EQUAL(43'200'000u, cfg["collateral_lock_duration_ms"].as_uint64());
+   BOOST_REQUIRE_EQUAL(5'000'000'000u, cfg["min_fromwire_amount"].as_uint64());
+   BOOST_REQUIRE_EQUAL(10, cfg["fromwire_revert_fee_bps"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(setconfig_writes_custom_lock_duration, sysio_uwrit_tester) { try {
@@ -151,6 +157,37 @@ BOOST_FIXTURE_TEST_CASE(setconfig_rejects_full_fee, sysio_uwrit_tester) { try {
 BOOST_FIXTURE_TEST_CASE(setconfig_accepts_max_fee, sysio_uwrit_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), setconfig(9999));
    BOOST_REQUIRE_EQUAL(9999, get_uwconfig()["fee_bps"].as_uint64());
+} FC_LOG_AND_RETHROW() }
+
+// The swap-from-WIRE floor is the queue-slot price: a zero floor would reopen
+// free dust rows in the fwqueue, so setconfig rejects it.
+BOOST_FIXTURE_TEST_CASE(setconfig_rejects_zero_fromwire_minimum, sysio_uwrit_tester) { try {
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: min_fromwire_amount must be positive"),
+      setconfig(/*fee_bps*/10, /*lock_ms*/43'200'000, /*min_fromwire*/0)
+   );
+} FC_LOG_AND_RETHROW() }
+
+// A 100% revert fee would zero the post-fee refund transfer inside the
+// never-throw drainfwq drain, so the boundary is rejected exactly like
+// fee_bps.
+BOOST_FIXTURE_TEST_CASE(setconfig_rejects_full_revert_fee, sysio_uwrit_tester) { try {
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: fromwire_revert_fee_bps must be below 10000 (100%): "
+            "a 100% revert fee zeroes the refund"),
+      setconfig(/*fee_bps*/10, /*lock_ms*/43'200'000, /*min_fromwire*/5'000'000'000ull,
+                /*revert_fee_bps*/10000)
+   );
+} FC_LOG_AND_RETHROW() }
+
+// The largest sub-100% revert fee and a custom floor round-trip through the
+// config singleton.
+BOOST_FIXTURE_TEST_CASE(setconfig_accepts_max_revert_fee_and_custom_floor, sysio_uwrit_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(),
+      setconfig(/*fee_bps*/10, /*lock_ms*/43'200'000, /*min_fromwire*/1, /*revert_fee_bps*/9999));
+   auto cfg = get_uwconfig();
+   BOOST_REQUIRE_EQUAL(1u,   cfg["min_fromwire_amount"].as_uint64());
+   BOOST_REQUIRE_EQUAL(9999, cfg["fromwire_revert_fee_bps"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(setconfig_rejects_zero_lock_duration, sysio_uwrit_tester) { try {
@@ -232,15 +269,35 @@ BOOST_FIXTURE_TEST_CASE(swapfromwire_rejects_zero_wire_amount, sysio_uwrit_teste
    );
 } FC_LOG_AND_RETHROW() }
 
+// One atom below the configured floor is rejected before any chain/reserve
+// validation — the floor is the queue-slot price (default 5 WIRE).
+BOOST_FIXTURE_TEST_CASE(swapfromwire_rejects_below_minimum, sysio_uwrit_tester) { try {
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: swapfromwire: wire_amount below the configured minimum"),
+      push_uwrit_action("uwrit.a"_n, "swapfromwire"_n, mvo()
+         ("user",                 "uwrit.a")
+         ("wire_amount",          4'999'999'999ull)
+         ("dst_chain_code",       codename_mvo("SOLANA"))
+         ("dst_token_code",       codename_mvo("SOL"))
+         ("dst_reserve_code",     codename_mvo("PRIMARY"))
+         ("target_amount",        100)
+         ("target_tolerance_bps", 50)
+         ("recipient_kind",       sysio::opp::types::ChainKind::CHAIN_KIND_SVM)
+         ("recipient_addr",       std::vector<char>(32, '\x01'))
+      )
+   );
+} FC_LOG_AND_RETHROW() }
+
 BOOST_FIXTURE_TEST_CASE(swapfromwire_rejects_unregistered_target_chain, sysio_uwrit_tester) { try {
    // No sysio.chains rows exist in this fixture — the target chain cannot
-   // be registered+active, so the escrow never happens.
+   // be registered+active, so the escrow never happens. wire_amount sits at
+   // the default floor so the chain check (not the floor) is what fires.
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: swapfromwire: target chain not "
             "registered or not active"),
       push_uwrit_action("uwrit.a"_n, "swapfromwire"_n, mvo()
          ("user",                 "uwrit.a")
-         ("wire_amount",          1000)
+         ("wire_amount",          5'000'000'000ull)
          ("dst_chain_code",       codename_mvo("SOLANA"))
          ("dst_token_code",       codename_mvo("SOL"))
          ("dst_reserve_code",     codename_mvo("PRIMARY"))

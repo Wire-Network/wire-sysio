@@ -802,4 +802,53 @@ BOOST_FIXTURE_TEST_CASE(flushwtdw_terminated_operator_does_not_abort, sysio_opre
    BOOST_REQUIRE(get_wtdw(1).is_null());   // matured row erased, not stuck re-throwing every advance
 } FC_LOG_AND_RETHROW() }
 
+// SEC-78 / WSA-166: flushwtdw drains at most MAX_WTDW_FLUSH_PER_EPOCH matured rows per advance, so an
+// operator cannot split collateral into enough queued withdraws to blow the transaction CPU deadline
+// advance shares with the rest of its fan-out and stall epoch progress chain-wide. The remainder
+// flushes on the next advance. This drives a TERMINATED operator so every matured row takes the
+// erase-without-remit branch (no outpost/token infra needed) -- the bound lives at the top of the
+// loop, above the per-row branches, so it holds regardless of which branch each row takes.
+BOOST_FIXTURE_TEST_CASE(flushwtdw_bounds_rows_per_epoch, sysio_opreg_tester) { try {
+   // Mirror of the contract-internal cap (contract headers are not host-compilable, same convention
+   // as the msgch size-cap tests). Keep in sync with sysio.opreg.hpp::MAX_WTDW_FLUSH_PER_EPOCH.
+   constexpr uint32_t MAX_WTDW_FLUSH_PER_EPOCH = 32;
+   constexpr uint32_t N = MAX_WTDW_FLUSH_PER_EPOCH + 8;   // 40 > one epoch's flush budget
+
+   BOOST_REQUIRE_EQUAL(success(), setconfig());
+   BOOST_REQUIRE_EQUAL(success(),
+      regoperator("batchop.a"_n, OPERATOR_TYPE_BATCH, /*is_bootstrapped=*/false));
+   BOOST_REQUIRE_EQUAL(success(), depositinle("batchop.a"_n, "ETH", "ETH", 100'000));
+
+   // Queue N one-*ish*-unit withdraws. Amounts vary (i+1) only so each is a distinct transaction
+   // (identical actions in one block would be rejected as duplicates before the contract runs); the
+   // per-row amount is irrelevant to the bound. Sum stays well under the deposited balance.
+   for (uint32_t i = 0; i < N; ++i) {
+      BOOST_REQUIRE_EQUAL(success(),
+         withdrawinle("batchop.a"_n, "ETH", "ETH", i + 1));
+   }
+   // Terminate so every matured row takes flushwtdw's erase-without-remit branch.
+   BOOST_REQUIRE_EQUAL(success(), terminate("batchop.a"_n, "rolling-24h miss"));
+
+   // Count remaining queue rows by probing the monotonic ids 1..N (order-independent).
+   auto count_pending = [&]() {
+      uint32_t n = 0;
+      for (uint64_t id = 1; id <= N; ++id) if (!get_wtdw(id).is_null()) ++n;
+      return n;
+   };
+   BOOST_REQUIRE_EQUAL(N, count_pending());
+
+   // First flush drains exactly MAX_WTDW_FLUSH_PER_EPOCH rows; the remainder stays queued.
+   BOOST_REQUIRE_EQUAL(success(),
+      push_opreg_action(EPOCH_ACCOUNT, "flushwtdw"_n, mvo()("current_epoch", 1'000'000u)));
+   BOOST_REQUIRE_EQUAL(N - MAX_WTDW_FLUSH_PER_EPOCH, count_pending());
+
+   // Cross a block boundary so the second flush is a distinct transaction — an identical action in
+   // the same block is rejected as a duplicate before the contract runs, masking the guard under test.
+   produce_blocks();
+   // Second flush drains the rest -- progress resumes where the first stopped.
+   BOOST_REQUIRE_EQUAL(success(),
+      push_opreg_action(EPOCH_ACCOUNT, "flushwtdw"_n, mvo()("current_epoch", 1'000'000u)));
+   BOOST_REQUIRE_EQUAL(0u, count_pending());
+} FC_LOG_AND_RETHROW() }
+
 BOOST_AUTO_TEST_SUITE_END()
