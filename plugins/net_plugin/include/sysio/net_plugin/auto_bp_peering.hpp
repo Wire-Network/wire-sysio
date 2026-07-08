@@ -597,13 +597,19 @@ public:
                // do not hold mutexes when calling resolve_and_connect which acquires connections mutex since other threads
                // can be holding connections mutex when trying to acquire these mutexes
                address_set_t addresses = find_gossip_bp_addresses(pending_connections, "connect");
-               for (const auto& add : addresses) {
-                  self()->connections.resolve_and_connect(add, self()->get_first_p2p_address());
-               }
 
+               // publish the new pending set BEFORE dialing: a concurrent connection_monitor pass
+               // must see these producers in its keep set, otherwise it can prune the
+               // just-established pending-only connections as out-of-schedule — and with
+               // pending_schedule_version advanced below they would not be redialed until the
+               // schedule activates
                {
                   fc::lock_guard g(mtx);
                   pending_bps = std::move(pending_connections);
+               }
+
+               for (const auto& add : addresses) {
+                  self()->connections.resolve_and_connect(add, self()->get_first_p2p_address());
                }
 
                pending_schedule_version = schedule.version;

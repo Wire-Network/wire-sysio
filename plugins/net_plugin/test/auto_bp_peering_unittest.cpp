@@ -175,7 +175,12 @@ BOOST_AUTO_TEST_CASE(test_on_pending_schedule) {
 
    std::vector<std::string> connected_hosts;
 
-   plugin.connections.resolve_and_connect = [&connected_hosts](std::string host, std::string p2p_address) { connected_hosts.push_back(host); };
+   plugin.connections.resolve_and_connect = [&connected_hosts, &plugin](std::string host, std::string p2p_address) {
+      // the new pending set must be published before any dial goes out, otherwise a concurrent
+      // connection_monitor pass could prune the just-established pending-only connections
+      BOOST_TEST(plugin.get_pending_bps() == producers_minus_prodkt);
+      connected_hosts.push_back(host);
+   };
 
    // make sure nothing happens when it is not in_sync
    plugin.lib_catchup = true;
