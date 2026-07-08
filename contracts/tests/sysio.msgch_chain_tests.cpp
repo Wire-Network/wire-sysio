@@ -706,6 +706,46 @@ BOOST_FIXTURE_TEST_CASE(inbound_chain_tip_recorded_and_verified, sysio_msgch_cha
    BOOST_REQUIRE_EQUAL(opc["envelope_digest"].as_string(), n5_digest.str());
 } FC_LOG_AND_RETHROW() }
 
+/// INTERIM Solana cross-stream semantics: the Solana outpost stamps its outbound
+/// `previous_envelope_hash` from its single inbound tip slot, so its envelopes link to the digest
+/// of the last DEPOT envelope it accepted (the depot's own outbound emit) instead of its own
+/// previous emit. The depot accepts that link as an alternate continuation; remove this case when
+/// the outpost adopts per-stream chaining.
+BOOST_FIXTURE_TEST_CASE(inbound_accepts_cross_stream_link_to_depot_outbound,
+                        sysio_msgch_chain_tester) { try {
+   bootstrap();
+
+   // Establish an inbound tip for ETH (bootstrap accept), so the alternate link is what gets
+   // exercised on the next delivery rather than the no-tip bootstrap rule.
+   uint32_t epoch = current_epoch();
+   BOOST_REQUIRE_EQUAL(success(), deliver(ETH_OUTPOST_ID, encode_delivery(epoch, "xstream-a")));
+   produce_blocks();
+
+   // Next epoch: emit a depot outbound envelope, then deliver an inbound envelope whose prev is
+   // that emit's digest (NOT the inbound tip). Building the outbound envelope in the delivery
+   // epoch pins the one-deep outenvelopes row so no epoch-advance emission replaces it.
+   epoch = advance_one_epoch();
+   BOOST_REQUIRE_EQUAL(success(), queueout(ETH_OUTPOST_ID,
+      sysio::opp::types::ATTESTATION_TYPE_OPERATORS, std::vector<char>{0x0a}));
+   BOOST_REQUIRE_EQUAL(success(), buildenv(ETH_OUTPOST_ID));
+   auto out_row = find_outbound_envelope(ETH_OUTPOST_ID);
+   BOOST_REQUIRE(!out_row.is_null());
+   std::string outbound_digest_bytes(32, '\0');
+   BOOST_REQUIRE_EQUAL(32u, fc::from_hex(out_row["envelope_hash"].as_string(),
+                                         outbound_digest_bytes.data(),
+                                         outbound_digest_bytes.size()));
+
+   auto n2 = encode_delivery(epoch, "xstream-b", outbound_digest_bytes);
+   const auto n2_digest = oracle::epoch_digest(decode_envelope(n2));
+   BOOST_REQUIRE_EQUAL(success(), deliver(ETH_OUTPOST_ID, n2));
+   produce_blocks();
+
+   auto opc = get_outpcons(ETH_OUTPOST_ID);
+   BOOST_REQUIRE_EQUAL(opc["epoch_index"].as<uint32_t>(), epoch);
+   BOOST_REQUIRE_EQUAL(opc["envelope_digest"].as_string(), n2_digest.str());
+   BOOST_REQUIRE_EQUAL(attestation_count(ETH_OUTPOST_ID, epoch), 1u);
+} FC_LOG_AND_RETHROW() }
+
 BOOST_FIXTURE_TEST_CASE(inbound_bootstrap_accepts_unverifiable_prev, sysio_msgch_chain_tester) { try {
    bootstrap();
 

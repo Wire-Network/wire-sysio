@@ -913,6 +913,14 @@ void apply_consensus(name self, uint64_t chain_code, uint32_t epoch_index,
    // continue the recorded tip is a chain break and the envelope is dropped before any dispatch,
    // consensus record, or cleanup (delivery rows stay intact for audit/dispute), per the
    // never-throw handler convention.
+   //
+   // INTERIM, remove when the Solana outpost adopts per-stream chaining: the Solana outpost
+   // stamps its outbound `previous_envelope_hash` from its single `previous_epoch_hash` slot,
+   // which only its `epoch_in` advances, so its envelopes link to the digest of the last DEPOT
+   // envelope it accepted rather than to its own previous emit. That is still an exact digest
+   // binding the depot can verify locally: the linked digest is this contract's own last
+   // outbound emit for the outpost (the surviving one-deep `outenvelopes` row). Accept that
+   // link as an alternate continuation.
    const checksum256 envelope_digest = opp::canonical::epoch_digest(envelope);
    {
       msgch::outpost_consensus_t opcons(self);
@@ -926,7 +934,20 @@ void apply_consensus(name self, uint64_t chain_code, uint32_t epoch_index,
                            static_cast<unsigned long long>(chain_code), epoch_index);
          } else {
             const auto prev = to_checksum256_exact(envelope.previous_envelope_hash);
-            if (!prev || *prev != chain_tip) {
+            bool continues_chain = prev.has_value() && *prev == chain_tip;
+            if (!continues_chain && prev.has_value()) {
+               msgch::outenvelopes_t outenvs(self);
+               auto by_outpost = outenvs.get_index<"byoutpost"_n>();
+               auto out_it = by_outpost.lower_bound(chain_code);
+               if (out_it != by_outpost.end() && out_it->chain_code == chain_code &&
+                   *prev == out_it->envelope_hash) {
+                  continues_chain = true;
+                  sysio::print_f("apply_consensus: chain_code=%llu epoch=%u accepted via "
+                                 "cross-stream link to the depot's last outbound emit\n",
+                                 static_cast<unsigned long long>(chain_code), epoch_index);
+               }
+            }
+            if (!continues_chain) {
                sysio::print_f("DROP envelope chain break: chain_code=%llu epoch=%u "
                               "previous_envelope_hash does not continue the accepted chain\n",
                               static_cast<unsigned long long>(chain_code), epoch_index);
