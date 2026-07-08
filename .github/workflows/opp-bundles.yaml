@@ -25,19 +25,13 @@ jobs:
     name: Generate OPP Bundles
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # actions/checkout@v5
 
-      - name: Install fish shell
-        run: |
-          sudo apt-add-repository -y ppa:fish-shell/release-4
-          sudo apt-get update
-          sudo apt-get install -y fish
-
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # actions/setup-node@v4
         with:
           node-version: "24"
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # pnpm/action-setup@v4
         with:
           package_json_file: libraries/opp/tools/package.json
 
@@ -65,8 +59,8 @@ jobs:
           # the token confined to the push/dispatch publish step — it is never present
           # during pull_request validation or the dependency install step.
           echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> ~/.npmrc
-          fish ./libraries/opp/tools/scripts/generate-opp-bundles.fish --publish
+          ./libraries/opp/tools/scripts/generate-opp-bundles.sh --publish
 
       - name: Validate OPP Bundles
         if: github.event_name == 'pull_request'
-        run: fish ./libraries/opp/tools/scripts/generate-opp-bundles.fish
+        run: ./libraries/opp/tools/scripts/generate-opp-bundles.sh
