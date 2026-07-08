@@ -323,6 +323,10 @@
                 {
                     "name": "winning_checksum",
                     "type": "checksum256"
+                },
+                {
+                    "name": "envelope_digest",
+                    "type": "checksum256"
                 }
             ]
         },
