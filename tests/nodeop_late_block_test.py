@@ -4,6 +4,7 @@ import re
 import shutil
 import signal
 import time
+from datetime import datetime
 from TestHarness import Cluster, TestHelper, Utils, WalletMgr
 from TestHarness.Node import BlockType
 
@@ -139,27 +140,76 @@ try:
     # on exactly when the bridge reconnects and blocks propagate.
     switchForkLogPattern = re.compile(r"switching forks from \S+ \(block number (\d+) (defproducer[jkl])\)")
 
-    def partitionForkSwitches():
-        """Return node_03 producers abandoned after the partition, in log order."""
-        producers = []
+    def partitionForkSwitchLines():
+        """Return node_03 'switching forks' log lines that abandon a post-partition fork block."""
+        lines = []
         for line in node3.linesInLog("switching forks"):
             match = switchForkLogPattern.search(line)
             if match and int(match.group(1)) > firstIProdBlockNum:
-                producers.append(match.group(2))
-        return producers
-    switchedFrom = Utils.waitForObj(lambda: partitionForkSwitches() or None, timeout=forkSwitchLogTimeout)
-    assert switchedFrom, "Expected to find 'switching forks' from a node_03 producer in node_03 log"
+                lines.append(line)
+        return lines
 
-    # Verify the lockout-detection optimization fired: when the bridge reconnects, node_03
-    # is still inside its producing slot, and the rest of the network's blocks reach node_03's
-    # fork database. The producer plugin should apply blocks immediately rather than waiting
-    # for the slot to end. The block-ID assertion above verifies the externally visible result.
-    def findApplyDuringProducing():
-        """Return the log line number for the lockout fast-path diagnostic."""
-        return node3.findInLog("applying blocks while producing: head's branch is locked out")
-    applyDuringProducingLine = Utils.waitForObj(findApplyDuringProducing, timeout=forkSwitchLogTimeout)
-    assert applyDuringProducingLine, \
-        "Expected node_03 to apply blocks mid-slot upon detecting strong-QC lockout of its isolated fork"
+    def partitionForkSwitches():
+        """Return node_03 producers abandoned after the partition, in log order."""
+        return [switchForkLogPattern.search(line).group(2) for line in partitionForkSwitchLines()]
+
+    switchLines = Utils.waitForObj(lambda: partitionForkSwitchLines() or None, timeout=forkSwitchLogTimeout)
+    assert switchLines, "Expected to find 'switching forks' from a node_03 producer in node_03 log"
+
+    # Verify the lockout-detection optimization: when the canonical branch reaches node_03 while it
+    # is actively building a block on its isolated fork, the branch's strong QC locks node_03's head
+    # out of fork-choice and the producer plugin must apply the incoming blocks immediately
+    # ("applying blocks while producing") instead of deferring them to the end of the production
+    # round. The fast path can only run while a block is under construction, and every production
+    # round ends with a gap where none is: the produce-block-offset ramp completes a round's last
+    # block up to ~450ms before its slot time, and the next round's first block may not start before
+    # its slot begins ("Not starting block until"). A reconnect landing in such a gap - or past
+    # node_03's whole window - applies the blocks through the regular non-producing path and the
+    # diagnostic is legitimately absent. Decide which outcome to require from the producer state at
+    # the first post-partition fork switch: the fast-path line is required exactly when node_03 had
+    # started a block of its own that was still unfinished (never produced; the fast path itself
+    # aborts it) at switch time. The block-ID assertion above verifies convergence either way.
+    logTimePattern = re.compile(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+")
+
+    def logLineTime(line):
+        """Return the wall-clock time a nodeop log line was emitted at."""
+        match = logTimePattern.search(line)
+        assert match, f"expected a leading timestamp in node_03 log line: {line}"
+        return datetime.strptime(match.group(0), "%Y-%m-%dT%H:%M:%S.%f")
+
+    firstSwitchTime = min(logLineTime(line) for line in switchLines)
+
+    startingBlockPattern = re.compile(r"Starting block #(\d+) \S+ producer (defproducer[a-z]+),")
+    node3ProducerStarts = []
+    for line in node3.linesInLog("Starting block #"):
+        match = startingBlockPattern.search(line)
+        if match and match.group(2) in ("defproducerj", "defproducerk", "defproducerl") \
+                and logLineTime(line) < firstSwitchTime:
+            node3ProducerStarts.append((logLineTime(line), int(match.group(1))))
+    assert node3ProducerStarts, \
+        "node_03 log has no 'Starting block' entries before the fork switch; debug logging is required"
+    lastStartTime, lastStartBlockNum = max(node3ProducerStarts)
+
+    producedBlockPattern = re.compile(r"Produced block \S+ #(\d+) @")
+
+    def lastStartedBlockWasProduced():
+        """Return true when node_03 finished producing its last started block before the fork switch."""
+        for line in node3.linesInLog("Produced block "):
+            match = producedBlockPattern.search(line)
+            if match and int(match.group(1)) == lastStartBlockNum \
+                    and lastStartTime <= logLineTime(line) <= firstSwitchTime:
+                return True
+        return False
+
+    if lastStartedBlockWasProduced():
+        Print(f"Node_03 was between blocks at the fork switch (block #{lastStartBlockNum} already "
+              "produced); the lockout fast path was legitimately idle")
+    else:
+        Print(f"Node_03 was building block #{lastStartBlockNum} at the fork switch; requiring the "
+              "lockout fast-path log")
+        assert node3.findInLog("applying blocks while producing: head's branch is locked out"), \
+            "Expected node_03 to apply blocks mid-slot upon detecting strong-QC lockout of its " \
+            f"isolated fork while building block #{lastStartBlockNum}"
 
     Print("Wait until Node_00 to produce")
     node3.waitForProducer("defproducera")
