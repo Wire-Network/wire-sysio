@@ -49,14 +49,14 @@
     "typescript": "^6.0.2",
     "yargs": "^18.0.0",
     "@3fv/prelude-ts": "^0.8.37",
-    "lodash": "^4.17.21",
+    "lodash": "^4.18.1",
     "ts-pattern": "^5.7.1"
   },
   "devDependencies": {
     "@types/lodash": "^4.17.16",
     "@types/node": "^25.3.3",
     "@types/yargs": "^17.0.35",
-    "esbuild": "^0.27.3",
+    "esbuild": "^0.28.1",
     "prettier": "^3.8.1"
   },
   "engines": {
