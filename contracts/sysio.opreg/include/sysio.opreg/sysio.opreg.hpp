@@ -60,6 +60,25 @@ namespace sysio {
       // minimum is demoted before the funds physically leave.
       static constexpr uint32_t WITHDRAW_WAIT_EPOCHS = 2;
 
+      // Safety rails on the collateral withdraw queue (SEC-78 / WSA-166).
+      // `withdraw` / `withdrawinle` are operator-driven and bounded only by
+      // available collateral, so without a row cap an operator could split
+      // collateral into an unbounded number of system-paid `wtdwqueue` rows and
+      // force `flushwtdw` to process them all inside one `sysio.epoch::advance`
+      // transaction. That transaction's CPU budget (~150 ms) is a hard,
+      // uncatchable deadline, so an oversized queue would abort every advance
+      // and stall epoch progress chain-wide.
+      //
+      // MAX_WTDW_FLUSH_PER_EPOCH bounds the matured rows flushed per advance;
+      // undrained rows stay queued (collateral stays in the operator's balance
+      // until flushed) and flush a later epoch. Ingress is already bounded
+      // economically — withdraw rows can never exceed the operator's real
+      // deposited collateral, and direct `withdraw` bills the operator CPU/NET
+      // per call — so the flush bound alone is the liveness rail; there is no
+      // per-account row cap. Conservatively sized to stay well under the
+      // transaction CPU ceiling shared with the rest of advance's fan-out.
+      static constexpr uint32_t MAX_WTDW_FLUSH_PER_EPOCH = 32;
+
       // Rolling delivery-buffer thresholds for batch-op termination. Per the
       // plan §1: missing a delivery is NOT a slash; consistent missing IS
       // grounds for administrative termination.

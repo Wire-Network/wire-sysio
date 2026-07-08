@@ -781,18 +781,30 @@ void reserve::paywire(sysio::slug_name src_chain_code,
 }
 
 void reserve::refundwire(sysio::name recipient,
-                          uint64_t   wire_amount) {
+                          uint64_t   wire_amount,
+                          uint32_t   revert_fee_bps) {
    require_auth(UWRIT_ACCOUNT);
    sysio::check(wire_amount > 0, "refundwire: amount must be positive");
    sysio::check(is_account(recipient), "refundwire: recipient account does not exist");
+
+   // Caller-fault revert fee, routed exactly like a settlement fee (rewards
+   // share stays in custody, emissions share leaves). Zero bps (no-fault
+   // refund) makes both the split and the routing no-ops. For any positive
+   // amount and a fee below 100%, floor division leaves `net >= 1`, so the
+   // backstop below is unreachable given `sysio.uwrit::setconfig`'s
+   // MAX_FEE_BPS cap — same defense-in-depth pattern as `applyswap`. It must
+   // hold: this action is inlined from the never-throw `drainfwq` drain.
+   const auto fee = opp::amm::split_wire_fee(wire_amount, revert_fee_bps, FEE_REWARD_SHARE_BPS);
+   sysio::check(fee.net > 0, "refundwire: revert fee must be below 100%");
 
    action(
       permission_level{get_self(), "active"_n},
       TOKEN_ACCOUNT, "transfer"_n,
       std::make_tuple(get_self(), recipient,
-         asset(static_cast<int64_t>(wire_amount), WIRE_SYMBOL),
+         asset(static_cast<int64_t>(fee.net), WIRE_SYMBOL),
          std::string("sysio.reserv::refundwire swap-from-WIRE refund"))
    ).send();
+   route_wire_fee(get_self(), fee);
 }
 
 } // namespace sysio
