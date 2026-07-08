@@ -344,7 +344,7 @@ OPP is a protocol (encoding scheme) that uses protobufs; the library is located 
 The protobufs are located at [libraries/opp/proto](libraries/opp/proto).
 
 After updating the protobufs:
-- **TS/JS packages**: Run `cd wire-sysio/libraries/opp/tools && ./generate-opp-bundles.fish` to regenerate the TypeScript/Solidity/Solana model packages (`@wireio/opp-typescript-models`, etc.) consumed by `wire-e2e-tests`, `wire-ethereum`, and other JS/TS repos.
+- **TS/JS packages**: Run `cd wire-sysio/libraries/opp/tools && ./scripts/generate-opp-bundles.sh` to regenerate the TypeScript/Solidity/Solana model packages (`@wireio/opp-typescript-models`, etc.) consumed by `wire-e2e-tests`, `wire-ethereum`, and other JS/TS repos.
 - **C++ (host + CDT/WASM)**: Both host protobuf headers (`.pb.h` via `protoc`) and CDT contract headers (`.pb.hpp` via `protoc-gen-zpp`) are generated automatically by CMake `add_dependency` targets when the project is configured/built. No manual step required — just rebuild.
 
 ### Local OPP Model Location (Optional in development environments)
@@ -353,7 +353,7 @@ If you are developing on a local machine and `<wire-sysio>/../wire-opp` exists,
 then PNPM/NPM & other repos (i.e. `wire-ethereum`, `wire-e2e-tests`, etc.) will look for the OPP protobufs
 and generated types in that location.
 
-If the directory exists, when `./generate-opp-bundles.fish` is run, the generated protobuf bundles will be copied to
+If the directory exists, when `./scripts/generate-opp-bundles.sh` is run, the generated protobuf bundles will be copied to
 `<wire-sysio>/../wire-opp/{typescript,solidity,solana}/`.
 
 ## Docker Build

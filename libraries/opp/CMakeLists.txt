@@ -70,7 +70,7 @@ if(BUILD_OPP_BUNDLES)
     message(STATUS "BUILD_OPP_BUNDLES is enabled, checking for required programs to generate OPP bundles (TypeScript, Solidity, Solana) after protobuf generation.")
 
     # After protobuf generation, regenerate OPP bundles (TS/Solidity/Solana models)
-    set(_required_progs fish npm pnpm node)
+    set(_required_progs bash npm pnpm node)
     set(_missing_progs)
     foreach(_prog ${_required_progs})
         # Use a distinct cache variable per tool: find_program short-circuits when
@@ -141,7 +141,7 @@ if(BUILD_OPP_BUNDLES)
                 TARGET ${TARGET_NAME}
                 POST_BUILD
                 COMMENT "Generating OPP bundles (TypeScript, Solidity, Solana)"
-                COMMAND fish ${CMAKE_CURRENT_SOURCE_DIR}/tools/scripts/generate-opp-bundles.fish
+                COMMAND bash ${CMAKE_CURRENT_SOURCE_DIR}/tools/scripts/generate-opp-bundles.sh
                 WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tools
         )
     endif()

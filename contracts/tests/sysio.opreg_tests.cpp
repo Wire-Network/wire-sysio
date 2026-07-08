@@ -272,6 +272,24 @@ BOOST_FIXTURE_TEST_CASE(setconfig_rejects_zero_queue, sysio_opreg_tester) { try 
    );
 } FC_LOG_AND_RETHROW() }
 
+BOOST_FIXTURE_TEST_CASE(setconfig_rejects_zero_min_bond, sysio_opreg_tester) { try {
+   // A zero min_bond entry makes the `available >= min_bond` eligibility gate
+   // vacuously true, so an operator could reach ACTIVE with no collateral posted.
+   // The sane "no requirement" form is an empty vector, which stays accepted.
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: req_uw_collat: min_bond must be positive "
+            "(an empty requirement set imposes no bond)"),
+      setconfig(21, 63, 21, 600000, 5, 5, 24ULL * 60 * 60 * 1000,
+                {}, {}, { make_chain_min_bond("ETH", "ETH", 0) })
+   );
+   // The identical shape with a positive min_bond is accepted.
+   BOOST_REQUIRE_EQUAL(
+      success(),
+      setconfig(21, 63, 21, 600000, 5, 5, 24ULL * 60 * 60 * 1000,
+                {}, {}, { make_chain_min_bond("ETH", "ETH", 1) })
+   );
+} FC_LOG_AND_RETHROW() }
+
 // ── regoperator ──
 
 BOOST_FIXTURE_TEST_CASE(regoperator_bootstrapped_batch, sysio_opreg_tester) { try {

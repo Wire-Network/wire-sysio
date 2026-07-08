@@ -1,6 +1,7 @@
 // noinspection ExceptionCaughtLocallyJS
 
 import { execFileSync, execSync } from "node:child_process"
+import Crypto from "node:crypto"
 import Fs from "node:fs"
 import Path from "node:path"
 import Os from "node:os"
@@ -11,6 +12,11 @@ import { runProtoc } from "../steps/runProtoc.js"
 import { generatePackage } from "../steps/generatePackage.js"
 import { generateTypescript } from "../steps/generateTypescript.js"
 import { Target, PUBLISHABLE_TARGETS } from "../constants.js"
+
+const PROTO_DIR_NAME = "proto"
+const PROTO_FILE_EXTENSION = ".proto"
+const SHA256_ALGORITHM = "sha256"
+const UTF8_ENCODING = "utf-8"
 
 export interface BundleArgs {
   repo: string
@@ -74,6 +80,8 @@ export async function bundleCommand(args: BundleArgs): Promise<void> {
         })
       )
     }
+
+    validateBundledProtoProvenance(protoDir, resolvedOutputDirs, args.targets)
 
     log.info("Bundle complete → %s", resolvedOutputDirs.join(", "))
 
@@ -264,7 +272,7 @@ function copyProtoSources(
   protoDir: string,
   outputDir: string
 ): void {
-  const protoOutDir = Path.join(outputDir, "proto")
+  const protoOutDir = Path.join(outputDir, PROTO_DIR_NAME)
   Fs.mkdirSync(protoOutDir, { recursive: true })
   protoFiles.forEach(pf => {
     const relative = Path.relative(protoDir, pf),
@@ -272,6 +280,94 @@ function copyProtoSources(
     Fs.mkdirSync(Path.dirname(dest), { recursive: true })
     Fs.copyFileSync(pf, dest)
   })
+}
+
+interface ProtoManifestEntry {
+  relativePath: string
+  sha256: string
+}
+
+/**
+ * Verify every generated package carries the exact proto sources used as the
+ * code-generation input before publish can run.
+ */
+function validateBundledProtoProvenance(
+  sourceProtoDir: string,
+  outputDirs: string[],
+  targets: Target[]
+): void {
+  const expectedManifest = buildProtoManifest(sourceProtoDir),
+    expectedJson = JSON.stringify(expectedManifest),
+    expectedDigest = digestManifest(expectedManifest)
+
+  outputDirs.forEach(baseOutputDir => {
+    targets.forEach(target => {
+      const targetProtoDir = Path.join(baseOutputDir, target, PROTO_DIR_NAME),
+        actualManifest = buildProtoManifest(targetProtoDir),
+        actualJson = JSON.stringify(actualManifest)
+
+      if (actualJson !== expectedJson) {
+        throw new Error(
+          `Generated ${target} package proto provenance does not match source protos in ${targetProtoDir}`
+        )
+      }
+
+      log.info(
+        "Verified %s proto provenance in %s (%d files, sha256:%s)",
+        target,
+        targetProtoDir,
+        expectedManifest.length,
+        expectedDigest
+      )
+    })
+  })
+}
+
+/**
+ * Build a stable manifest of .proto files and their SHA-256 digests.
+ */
+function buildProtoManifest(protoDir: string): ProtoManifestEntry[] {
+  if (!Fs.existsSync(protoDir)) {
+    throw new Error(`Proto directory does not exist: ${protoDir}`)
+  }
+
+  return walkFiles(protoDir)
+    .filter(file => file.endsWith(PROTO_FILE_EXTENSION))
+    .map(file => ({
+      relativePath: Path.relative(protoDir, file).split(Path.sep).join("/"),
+      sha256: hashFile(file)
+    }))
+    .sort((a, b) => a.relativePath.localeCompare(b.relativePath))
+}
+
+/**
+ * Hash a file for proto provenance comparisons.
+ */
+function hashFile(file: string): string {
+  return Crypto.createHash(SHA256_ALGORITHM)
+    .update(Fs.readFileSync(file))
+    .digest("hex")
+}
+
+/**
+ * Hash a manifest for compact CI logs and reviewer provenance checks.
+ */
+function digestManifest(manifest: ProtoManifestEntry[]): string {
+  return Crypto.createHash(SHA256_ALGORITHM)
+    .update(JSON.stringify(manifest), UTF8_ENCODING)
+    .digest("hex")
+}
+
+/**
+ * List files recursively in deterministic order.
+ */
+function walkFiles(dir: string): string[] {
+  return Fs.readdirSync(dir, { withFileTypes: true })
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .flatMap(entry => {
+      const fullPath = Path.join(dir, entry.name)
+      return entry.isDirectory() ? walkFiles(fullPath) : [fullPath]
+    })
 }
 
 function publishPackage(dir: string): void {
