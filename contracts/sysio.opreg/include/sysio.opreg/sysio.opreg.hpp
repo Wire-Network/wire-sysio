@@ -60,35 +60,50 @@ namespace sysio {
       // minimum is demoted before the funds physically leave.
       static constexpr uint32_t WITHDRAW_WAIT_EPOCHS = 2;
 
-      // Safety rails on the collateral withdraw queue (SEC-78 / WSA-166).
-      // `withdraw` / `withdrawinle` are operator-driven and bounded only by
-      // available collateral, so without a row cap an operator could split
-      // collateral into an unbounded number of system-paid `wtdwqueue` rows and
-      // force `flushwtdw` to process them all inside one `sysio.epoch::advance`
-      // transaction. That transaction's CPU budget (~150 ms) is a hard,
-      // uncatchable deadline, so an oversized queue would abort every advance
-      // and stall epoch progress chain-wide.
-      //
-      // MAX_WTDW_FLUSH_PER_EPOCH bounds the matured rows flushed per advance;
-      // undrained rows stay queued (collateral stays in the operator's balance
-      // until flushed) and flush a later epoch. Ingress is already bounded
-      // economically — withdraw rows can never exceed the operator's real
-      // deposited collateral, and direct `withdraw` bills the operator CPU/NET
-      // per call — so the flush bound alone is the liveness rail; there is no
-      // per-account row cap. Conservatively sized to stay well under the
-      // transaction CPU ceiling shared with the rest of advance's fan-out.
+      /// Safety rails on the collateral withdraw queue (SEC-78 / WSA-166).
+      /// `withdraw` / `withdrawinle` are operator-driven and bounded only by
+      /// available collateral, so without a row cap an operator could split
+      /// collateral into an unbounded number of system-paid `wtdwqueue` rows and
+      /// force `flushwtdw` to process them all inside one `sysio.epoch::advance`
+      /// transaction. That transaction's CPU budget (~150 ms) is a hard,
+      /// uncatchable deadline, so an oversized queue would abort every advance
+      /// and stall epoch progress chain-wide.
+      ///
+      /// MAX_WTDW_FLUSH_PER_EPOCH bounds the matured rows flushed per advance;
+      /// undrained rows stay queued (collateral stays in the operator's balance
+      /// until flushed) and flush a later epoch. Ingress is already bounded
+      /// economically -- withdraw rows can never exceed the operator's real
+      /// deposited collateral, and direct `withdraw` bills the operator CPU/NET
+      /// per call -- so the flush bound alone is the liveness rail; there is no
+      /// per-account row cap. Conservatively sized to stay well under the
+      /// transaction CPU ceiling shared with the rest of advance's fan-out.
       static constexpr uint32_t MAX_WTDW_FLUSH_PER_EPOCH = 32;
 
-      // Rolling delivery-buffer thresholds for batch-op termination. Per the
-      // plan §1: missing a delivery is NOT a slash; consistent missing IS
-      // grounds for administrative termination.
-      //
-      // All three thresholds live in `op_config` so tests can override them
-      // without recompiling. These `DEFAULT_*` constants are the values
-      // production bootstrap should install.
+      /// Rolling delivery-buffer thresholds for batch-op termination. Per the
+      /// plan §1: missing a delivery is NOT a slash; consistent missing IS
+      /// grounds for administrative termination.
+      ///
+      /// All three thresholds live in `op_config` so tests can override them
+      /// without recompiling. These `DEFAULT_*` constants are the values
+      /// production bootstrap should install.
       static constexpr uint32_t DEFAULT_TERMINATE_MAX_CONSECUTIVE_MISSES = 5;
       static constexpr uint32_t DEFAULT_TERMINATE_MAX_PCT_MISSES_24H     = 5;   // percent
       static constexpr uint64_t DEFAULT_TERMINATE_WINDOW_MS              = 24ULL * 60 * 60 * 1000;
+
+      /// Lowest accepted threshold for consecutive miss termination.
+      static constexpr uint32_t MIN_TERMINATE_MAX_CONSECUTIVE_MISSES = 1;
+
+      /// Highest launch-approved consecutive-miss threshold; larger values can
+      /// make miss-based recovery unreachable within the intended operating envelope.
+      static constexpr uint32_t MAX_TERMINATE_MAX_CONSECUTIVE_MISSES =
+         DEFAULT_TERMINATE_MAX_CONSECUTIVE_MISSES;
+
+      /// Lowest accepted threshold for rolling-window percent-miss termination.
+      static constexpr uint32_t MIN_TERMINATE_MAX_PCT_MISSES_24H = 1;
+
+      /// Highest accepted percent-miss threshold. A 100% threshold can never be
+      /// exceeded by an all-miss window while `termcheck` uses strict breach semantics.
+      static constexpr uint32_t MAX_TERMINATE_MAX_PCT_MISSES_24H = 99;
 
       // Per-operator audit log: ring-buffer cap (newest-in / oldest-out) and
       // per-entry error_message length cap. Operators read recent_actions to
