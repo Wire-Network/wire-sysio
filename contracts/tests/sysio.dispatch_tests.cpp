@@ -101,7 +101,7 @@ std::vector<char> encode_envelope_with_one_attestation(
 /// Encode an Envelope wrapping N attestations of the same type. Used to fit
 /// multiple OPERATOR_ACTIONs into a single delivery, since the depot
 /// deduplicates per-(batch_op, outpost, epoch) — a second `deliver` from
-/// the same batch op in the same epoch is silently dropped.
+/// the same batch op in the same epoch reverts as a duplicate.
 std::vector<char> encode_envelope_with_attestations(
    uint32_t epoch_index,
    sysio::opp::types::AttestationType att_type,
@@ -124,6 +124,30 @@ std::vector<char> encode_envelope_with_attestations(
    std::vector<char> out(env.ByteSizeLong());
    env.SerializeToArray(out.data(), static_cast<int>(out.size()));
    return out;
+}
+
+/// Mirrors the contract-internal `MAX_ENVELOPE_BYTES` protocol cap (64 KiB, shared with the
+/// Ethereum and Solana outpost implementations). The contract constant lives in the msgch
+/// translation unit — contract headers are not host-compilable — so tests keep this manual
+/// mirror, same as the outbound packing tests in sysio.msgch_tests.cpp.
+constexpr size_t MAX_ENVELOPE_BYTES = 65'536;
+
+/// Encode a decodable envelope whose serialised size is EXACTLY `target_bytes`, padded with a
+/// single out-of-scope STAKE attestation (dispatch drops it with no value-bearing effect). Probe
+/// once with `target_bytes` of padding to measure the fixed protobuf overhead, then rebuild with
+/// the pad shrunk by that overhead: at sizes near the 64 KiB envelope cap every nested length
+/// prefix and the `data_size` varint sit in the same 3-byte width band (16 KiB .. 2 MiB), so the
+/// second pass lands exactly on target — the final REQUIRE pins it.
+std::vector<char> encode_envelope_padded_to(uint32_t epoch_index, size_t target_bytes) {
+   auto probe = encode_envelope_with_one_attestation(
+      epoch_index, sysio::opp::types::ATTESTATION_TYPE_STAKE, std::string(target_bytes, 'x'));
+   BOOST_REQUIRE_GT(probe.size(), target_bytes);
+   const size_t overhead = probe.size() - target_bytes;
+   auto padded = encode_envelope_with_one_attestation(
+      epoch_index, sysio::opp::types::ATTESTATION_TYPE_STAKE,
+      std::string(target_bytes - overhead, 'x'));
+   BOOST_REQUIRE_EQUAL(target_bytes, padded.size());
+   return padded;
 }
 
 /// Render an EM public key into its canonical contract string —
@@ -509,6 +533,14 @@ public:
          abi_serializer::create_yield_function(abi_serializer_max_time));
    }
 
+   /// Read a `sysio.msgch` inbound `envelopes` row (empty variant when absent).
+   fc::variant get_envelope(uint64_t id) {
+      auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "envelopes"_n, id);
+      return data.empty() ? fc::variant() : msgch_abi.binary_to_variant(
+         "envelope_entry", data,
+         abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
    /// Find an operator's balance entry for a (chain_code, token_code) pair.
    fc::variant find_balance(const fc::variant& op,
                             std::string_view chain_code,
@@ -815,9 +847,9 @@ BOOST_FIXTURE_TEST_CASE(dispatch_routes_withdraw_request_to_opreg, sysio_dispatc
    const auto eth_code = fc::slug_name{"ETH"}.value;
 
    // The depot dedups per-(batch_op, chain_code, epoch) — a second `deliver`
-   // from the same batch op in the same epoch is silently dropped. To exercise
-   // both dispatch branches in one test, both attestations ride a single
-   // envelope.
+   // from the same batch op in the same epoch reverts as a duplicate. To
+   // exercise both dispatch branches in one test, both attestations ride a
+   // single envelope.
    auto deposit_payload = encode_operator_action(
       sysio::opp::attestations::OperatorAction::ACTION_TYPE_DEPOSIT_REQUEST,
       sysio::opp::types::CHAIN_KIND_EVM,
@@ -1200,6 +1232,40 @@ BOOST_FIXTURE_TEST_CASE(deliver_duplicate_from_same_operator_reverts, sysio_disp
    BOOST_REQUIRE_EQUAL(
       wasm_assert_msg("operator already delivered for this outpost+epoch"),
       deliver(/*chain_code=*/eth_code, envelope));
+} FC_LOG_AND_RETHROW() }
+
+// The inbound `deliver` boundary enforces the same 64 KiB protocol envelope cap the outbound
+// `buildenv` packer obeys (and that the Ethereum/Solana outposts enforce on their side): a
+// decodable current-epoch envelope one byte over the cap must revert before anything is hashed
+// or stored. Without the contract-level cap, the generic chain ceilings (~512 KiB inline-action,
+// 256 KiB KV value) would admit inbound envelopes WIRE's own packer could never emit.
+BOOST_FIXTURE_TEST_CASE(deliver_oversized_envelope_reverts, sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+
+   const auto eth_code = fc::slug_name{"ETH"}.value;
+   auto oversized = encode_envelope_padded_to(current_epoch(), MAX_ENVELOPE_BYTES + 1);
+
+   BOOST_REQUIRE_EQUAL(
+      wasm_assert_msg("inbound envelope exceeds MAX_ENVELOPE_BYTES"),
+      deliver(/*chain_code=*/eth_code, oversized));
+   // Reverted before the emplace: no envelope row landed.
+   BOOST_REQUIRE(get_envelope(1).is_null());
+} FC_LOG_AND_RETHROW() }
+
+// Boundary companion: an envelope exactly AT the cap is accepted and stored (and, with this
+// suite's single-operator group, immediately reaches consensus and dispatches). Guards against
+// an off-by-one regression turning the cap check exclusive.
+BOOST_FIXTURE_TEST_CASE(deliver_envelope_at_size_cap_succeeds, sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+
+   const auto eth_code = fc::slug_name{"ETH"}.value;
+   auto boundary = encode_envelope_padded_to(current_epoch(), MAX_ENVELOPE_BYTES);
+
+   BOOST_REQUIRE_EQUAL(success(), deliver(/*chain_code=*/eth_code, boundary));
+   auto row = get_envelope(1);
+   BOOST_REQUIRE(!row.is_null());
+   BOOST_REQUIRE_EQUAL(BATCHOP.to_string(), row["batch_op_name"].as_string());
+   BOOST_REQUIRE_EQUAL(current_epoch(), row["epoch_index"].as<uint32_t>());
 } FC_LOG_AND_RETHROW() }
 
 // NodeOwnerRegistration: msgch decodes the attestation and inline-sends sysio.roa::newnameduser then
