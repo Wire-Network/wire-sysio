@@ -1417,24 +1417,54 @@ transaction solana_client::create_transaction(const std::vector<instruction>& in
    for (const auto& m : readonly_non_signers)
       tx.msg.account_keys.push_back(m.key);
 
+   FC_ASSERT(
+      tx.msg.account_keys.size() <= limits::LEGACY_ACCOUNT_KEY_LIMIT,
+      "Solana legacy transaction has {} account keys, exceeding the {} key uint8_t instruction-index limit",
+      tx.msg.account_keys.size(),
+      limits::LEGACY_ACCOUNT_KEY_LIMIT);
+
+   const auto max_u8_count = static_cast<size_t>(std::numeric_limits<uint8_t>::max());
+   FC_ASSERT(
+      writable_signers.size() + readonly_signers.size() <= max_u8_count,
+      "Solana legacy transaction has {} required signatures, exceeding the uint8_t header limit",
+      writable_signers.size() + readonly_signers.size());
+   FC_ASSERT(
+      readonly_signers.size() <= max_u8_count,
+      "Solana legacy transaction has {} readonly signers, exceeding the uint8_t header limit",
+      readonly_signers.size());
+   FC_ASSERT(
+      readonly_non_signers.size() <= max_u8_count,
+      "Solana legacy transaction has {} readonly unsigned accounts, exceeding the uint8_t header limit",
+      readonly_non_signers.size());
+
    // Set header
-   tx.msg.header.num_required_signatures = writable_signers.size() + readonly_signers.size();
-   tx.msg.header.num_readonly_signed_accounts = readonly_signers.size();
-   tx.msg.header.num_readonly_unsigned_accounts = readonly_non_signers.size();
+   tx.msg.header.num_required_signatures =
+      static_cast<uint8_t>(writable_signers.size() + readonly_signers.size());
+   tx.msg.header.num_readonly_signed_accounts = static_cast<uint8_t>(readonly_signers.size());
+   tx.msg.header.num_readonly_unsigned_accounts = static_cast<uint8_t>(readonly_non_signers.size());
 
    // Build account key index map
-   std::map<solana_public_key, uint8_t> key_index_map;
+   std::map<solana_public_key, size_t> key_index_map;
    for (size_t i = 0; i < tx.msg.account_keys.size(); ++i) {
-      key_index_map[tx.msg.account_keys[i]] = static_cast<uint8_t>(i);
+      key_index_map[tx.msg.account_keys[i]] = i;
    }
+
+   const auto checked_u8_index = [](size_t index, const char* label) -> uint8_t {
+      FC_ASSERT(
+         index < limits::LEGACY_ACCOUNT_KEY_LIMIT,
+         "Solana {} index {} exceeds the uint8_t instruction-index limit",
+         label,
+         index);
+      return static_cast<uint8_t>(index);
+   };
 
    // Compile instructions
    for (const auto& instr : instructions) {
       compiled_instruction compiled;
-      compiled.program_id_index = key_index_map[instr.program_id];
+      compiled.program_id_index = checked_u8_index(key_index_map.at(instr.program_id), "program id");
 
       for (const auto& meta : instr.accounts) {
-         compiled.account_indices.push_back(key_index_map[meta.key]);
+         compiled.account_indices.push_back(checked_u8_index(key_index_map.at(meta.key), "account"));
       }
 
       compiled.data = instr.data;

@@ -92,6 +92,19 @@ public:
       );
    }
 
+   action_result regchain(opp::types::ChainKind kind,
+                          std::string_view code,
+                          uint32_t chain_id) {
+      base_tester::push_action(CHAINS_ACCOUNT, "regchain"_n, CHAINS_ACCOUNT, mvo()
+         ("kind",              kind)
+         ("code",              codename_mvo(code))
+         ("external_chain_id", chain_id)
+         ("name",              std::string("outpost"))
+         ("description",       std::string{})
+      );
+      return success();
+   }
+
    action_result buildenv(uint64_t chain_code) {
       return push_msgch_action(MSGCH_ACCOUNT, "buildenv"_n, {{
          EPOCH_ACCOUNT, config::active_name
@@ -149,13 +162,12 @@ BOOST_FIXTURE_TEST_CASE(deliver_invalid_request, sysio_msgch_tester) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(queueout_basic, sysio_msgch_tester) { try {
-   // v6: chain_code is the chain's slug_name value. `queueout` doesn't itself
-   // look up the chain, so storing under an arbitrary slug_name works; the
-   // chain check happens at `buildenv` time. AttestationType: OPERATORS =
-   // 60947 — any in-range, non-removed enum value suffices here; the test
-   // only verifies the queueout/table mechanics.
+   // v6: chain_code is the chain's slug_name value. queueout now requires a
+   // registered chain row so Solana-bound account-estimator coverage is
+   // enforced before a READY row can be created.
    const uint64_t chain_code = fc::slug_name{"ETH"}.value;
-   BOOST_REQUIRE_EQUAL(success(), queueout(chain_code, 60947));
+   BOOST_REQUIRE_EQUAL(success(), regchain(opp::types::CHAIN_KIND_EVM, "ETH", 1));
+   BOOST_REQUIRE_EQUAL(success(), queueout(chain_code, opp::types::ATTESTATION_TYPE_OPERATORS));
 
    // `mint_att_id`'s first call returns id=1 — the `attseq` singleton at
    // pk=0 is the sequence row itself, so attestation ids start at 1 to
@@ -307,6 +319,18 @@ public:
       );
    }
 
+   /// Return the first outbound envelope row found in a small id scan.
+   fc::variant find_outbound_envelope(uint64_t scan_until = 16) {
+      for (uint64_t id = 0; id < scan_until; ++id) {
+         auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "outenvelopes"_n, id);
+         if (data.empty()) continue;
+         return msgch_abi.binary_to_variant(
+            "outbound_envelope", data,
+            abi_serializer::create_yield_function(abi_serializer_max_time));
+      }
+      return fc::variant{};
+   }
+
    /// Count populated `envlog` rows in the id range `[0, max_id_exclusive)`.
    /// Cheap enough for the test scales here (≤ a few thousand probes).
    uint32_t envlog_row_count_until(uint64_t max_id_exclusive) {
@@ -331,6 +355,22 @@ using fc::slug_name_literals::operator""_s;
 /// the spelling `"ETH"`. ETH_OUTPOST_ID is the slug_name's packed value.
 constexpr uint64_t ETH_OUTPOST_ID = "ETH"_s.value;
 
+/// Solana/SVM test outpost registered by `register_outpost(CHAIN_KIND_SVM, ...)`.
+constexpr uint64_t SOL_OUTPOST_ID = "SOL"_s.value;
+
+constexpr auto EVM_TEST_ATTESTATION_TYPE       = opp::types::ATTESTATION_TYPE_OPERATORS;
+constexpr auto SWAP_REMIT_ATTESTATION_TYPE    = opp::types::ATTESTATION_TYPE_SWAP_REMIT;
+constexpr auto UNCOVERED_TEST_ATTESTATION_TYPE = opp::types::ATTESTATION_TYPE_STAKING_REWARD;
+
+/// Decode the emitted OPP envelope and count attestations in its single message.
+uint32_t emitted_attestation_count(const fc::variant& emitted_row) {
+   const auto& raw = emitted_row["raw_envelope"].as<std::vector<char>>();
+   sysio::opp::Envelope env;
+   BOOST_REQUIRE(env.ParseFromArray(raw.data(), static_cast<int>(raw.size())));
+   BOOST_REQUIRE_EQUAL(env.messages_size(), 1);
+   return static_cast<uint32_t>(env.messages(0).payload().attestations_size());
+}
+
 } // anonymous namespace
 
 /// Smoke: queueout + buildenv writes one row to `envlog` with the
@@ -341,7 +381,7 @@ BOOST_FIXTURE_TEST_CASE(buildenv_writes_envlog_row, sysio_msgch_envlog_tester) {
    register_outpost(opp::types::CHAIN_KIND_EVM, 31337);
    produce_blocks();
 
-   BOOST_REQUIRE_EQUAL(success(), queueout(/*chain_code=*/ETH_OUTPOST_ID, /*type=*/60940));
+   BOOST_REQUIRE_EQUAL(success(), queueout(/*chain_code=*/ETH_OUTPOST_ID, EVM_TEST_ATTESTATION_TYPE));
    BOOST_REQUIRE_EQUAL(success(), buildenv(/*chain_code=*/ETH_OUTPOST_ID));
    produce_blocks();
 
@@ -378,7 +418,7 @@ BOOST_FIXTURE_TEST_CASE(envlog_evicts_oldest_epoch_on_overflow, sysio_msgch_envl
    // (or higher set, depending on cap arithmetic). cap = 1*2*2 = 4 →
    // when live_count = 5 (after 5th insert) the helper drops 2 rows.
    for (uint32_t i = 0; i < 5; ++i) {
-      BOOST_REQUIRE_EQUAL(success(), queueout(ETH_OUTPOST_ID, 60940));
+      BOOST_REQUIRE_EQUAL(success(), queueout(ETH_OUTPOST_ID, EVM_TEST_ATTESTATION_TYPE));
       BOOST_REQUIRE_EQUAL(success(), buildenv(ETH_OUTPOST_ID));
       produce_blocks();
    }
@@ -410,7 +450,7 @@ BOOST_FIXTURE_TEST_CASE(envlog_cap_tracks_outpost_count, sysio_msgch_envlog_test
    produce_blocks();
 
    for (uint32_t i = 0; i < 4; ++i) {
-      BOOST_REQUIRE_EQUAL(success(), queueout(ETH_OUTPOST_ID, 60940));
+      BOOST_REQUIRE_EQUAL(success(), queueout(ETH_OUTPOST_ID, EVM_TEST_ATTESTATION_TYPE));
       BOOST_REQUIRE_EQUAL(success(), buildenv(ETH_OUTPOST_ID));
       produce_blocks();
    }
@@ -428,7 +468,7 @@ BOOST_FIXTURE_TEST_CASE(envlog_cap_tracks_outpost_count, sysio_msgch_envlog_test
 
    // Three more rounds on outpost 0 → 7 rows total, still under cap=8.
    for (uint32_t i = 0; i < 3; ++i) {
-      BOOST_REQUIRE_EQUAL(success(), queueout(ETH_OUTPOST_ID, 60940));
+      BOOST_REQUIRE_EQUAL(success(), queueout(ETH_OUTPOST_ID, EVM_TEST_ATTESTATION_TYPE));
       BOOST_REQUIRE_EQUAL(success(), buildenv(ETH_OUTPOST_ID));
       produce_blocks();
    }
@@ -450,13 +490,13 @@ BOOST_FIXTURE_TEST_CASE(buildenv_drops_previous_outenvelopes, sysio_msgch_envlog
 
    // outenvelopes ids start at 1 (same `std::max<uint64_t>(1, ...)` pattern
    // as envlog / attestations).
-   BOOST_REQUIRE_EQUAL(success(), queueout(ETH_OUTPOST_ID, 60940));
+   BOOST_REQUIRE_EQUAL(success(), queueout(ETH_OUTPOST_ID, EVM_TEST_ATTESTATION_TYPE));
    BOOST_REQUIRE_EQUAL(success(), buildenv(ETH_OUTPOST_ID));
    produce_blocks();
    auto first = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "outenvelopes"_n, 1);
    BOOST_REQUIRE(!first.empty());
 
-   BOOST_REQUIRE_EQUAL(success(), queueout(ETH_OUTPOST_ID, 60940));
+   BOOST_REQUIRE_EQUAL(success(), queueout(ETH_OUTPOST_ID, EVM_TEST_ATTESTATION_TYPE));
    BOOST_REQUIRE_EQUAL(success(), buildenv(ETH_OUTPOST_ID));
    produce_blocks();
 
@@ -476,13 +516,13 @@ BOOST_FIXTURE_TEST_CASE(buildenv_drops_processed_attestations, sysio_msgch_envlo
    register_outpost(opp::types::CHAIN_KIND_EVM, 31337);
    produce_blocks();
 
-   BOOST_REQUIRE_EQUAL(success(), queueout(ETH_OUTPOST_ID, 60940));   // id 0, READY
+   BOOST_REQUIRE_EQUAL(success(), queueout(ETH_OUTPOST_ID, EVM_TEST_ATTESTATION_TYPE));   // id 0, READY
    BOOST_REQUIRE_EQUAL(success(), buildenv(ETH_OUTPOST_ID));          // → PROCESSED → erased
    produce_blocks();
    auto a0 = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "attestations"_n, 0);
    BOOST_REQUIRE(a0.empty());
 
-   BOOST_REQUIRE_EQUAL(success(), queueout(ETH_OUTPOST_ID, 60940));   // id 1 (or next), READY
+   BOOST_REQUIRE_EQUAL(success(), queueout(ETH_OUTPOST_ID, EVM_TEST_ATTESTATION_TYPE));   // id 1 (or next), READY
    produce_blocks();
    // Find the row at any id in [0..10) — `available_primary_key()` may
    // resume at 1 after a delete, but the precise value is an
@@ -531,7 +571,7 @@ BOOST_FIXTURE_TEST_CASE(buildenv_packs_until_cap_then_leaves_remainder,
       std::vector<char> payload(PER_ATTEST_BYTES, 0x42);
       payload[0] = static_cast<char>(i);
       BOOST_REQUIRE_EQUAL(success(),
-         queueout_with_data(/*chain_code=*/ETH_OUTPOST_ID, /*type=*/60940, payload));
+         queueout_with_data(/*chain_code=*/ETH_OUTPOST_ID, EVM_TEST_ATTESTATION_TYPE, payload));
    }
    produce_blocks();
 
@@ -592,6 +632,57 @@ BOOST_FIXTURE_TEST_CASE(buildenv_packs_until_cap_then_leaves_remainder,
    uint32_t still_ready_after_emit2 =
       count_ready_attestations(/*chain_code=*/ETH_OUTPOST_ID, /*scan_until=*/TOTAL_ATTESTATIONS + 4);
    BOOST_REQUIRE_EQUAL(still_ready_after_emit2, 0u);
+} FC_LOG_AND_RETHROW() }
+
+/// Solana/SVM buildenv must stop before the terminal transaction's dynamic
+/// account budget is exceeded. With the measured terminal packet baseline,
+/// the launch budget is 16 dynamic accounts; pessimistic SWAP_REMIT cost is
+/// 8 each, so two swap remits fit and the third stays READY for a later epoch.
+BOOST_FIXTURE_TEST_CASE(buildenv_svm_packs_until_terminal_budget_then_leaves_remainder,
+                        sysio_msgch_envlog_tester) { try {
+   bootstrap_epoch_config(/*retention=*/200);
+   register_outpost(opp::types::CHAIN_KIND_SVM, 101);
+   produce_blocks();
+
+   constexpr uint32_t TOTAL_ATTESTATIONS = 3;
+   for (uint32_t i = 0; i < TOTAL_ATTESTATIONS; ++i) {
+      std::vector<char> payload{static_cast<char>(0x30 + i)};
+      BOOST_REQUIRE_EQUAL(success(),
+         queueout_with_data(SOL_OUTPOST_ID, SWAP_REMIT_ATTESTATION_TYPE, payload));
+   }
+   produce_blocks();
+
+   BOOST_REQUIRE_EQUAL(success(), buildenv(SOL_OUTPOST_ID));
+   produce_blocks();
+
+   auto emitted = find_outbound_envelope();
+   BOOST_REQUIRE(!emitted.is_null());
+   BOOST_REQUIRE_EQUAL(emitted_attestation_count(emitted), 2u);
+   BOOST_REQUIRE_EQUAL(count_ready_attestations(SOL_OUTPOST_ID, TOTAL_ATTESTATIONS + 4), 1u);
+
+   BOOST_REQUIRE_EQUAL(success(), buildenv(SOL_OUTPOST_ID));
+   produce_blocks();
+
+   auto emitted_2 = find_outbound_envelope();
+   BOOST_REQUIRE(!emitted_2.is_null());
+   BOOST_REQUIRE_EQUAL(emitted_attestation_count(emitted_2), 1u);
+   BOOST_REQUIRE_EQUAL(count_ready_attestations(SOL_OUTPOST_ID, TOTAL_ATTESTATIONS + 4), 0u);
+} FC_LOG_AND_RETHROW() }
+
+/// An uncovered Solana-bound attestation type must fail at enqueue, before it
+/// can reach the READY queue and block later `buildenv` calls for that outpost.
+BOOST_FIXTURE_TEST_CASE(queueout_svm_rejects_uncovered_attestation_type,
+                        sysio_msgch_envlog_tester) { try {
+   bootstrap_epoch_config(/*retention=*/200);
+   register_outpost(opp::types::CHAIN_KIND_SVM, 101);
+   produce_blocks();
+
+   const auto result =
+      queueout_with_data(SOL_OUTPOST_ID, UNCOVERED_TEST_ATTESTATION_TYPE, std::vector<char>{0x01});
+   BOOST_REQUIRE_NE(result, success());
+   BOOST_REQUIRE(result.find("no Solana terminal account estimate") != std::string::npos);
+   BOOST_REQUIRE(find_outbound_envelope().is_null());
+   BOOST_REQUIRE_EQUAL(count_ready_attestations(SOL_OUTPOST_ID, 4), 0u);
 } FC_LOG_AND_RETHROW() }
 
 // queueout carries no ABI-level auth. Without the depot-contract gate, any account could call it

@@ -6,13 +6,20 @@ import shutil
 import signal
 
 from TestHarness import Cluster, TestHelper, Utils, WalletMgr
+from TestHarness.Node import BlockType
 
 ###############################################################################
 # ship_restart_test
-# 
+#
 # This test verifies SHiP shuts down gracefully or recovers when restarting
 # with various scenarios of corrupted log and/or index files.
-# 
+#
+# It also verifies restarting from a snapshot with pre-existing SHiP data:
+# a snapshot older than the SHiP head starts successfully, preserves the
+# existing log data and appends new blocks contiguously, while a snapshot
+# newer than the SHiP head is refused since writing the first post-snapshot
+# block would leave a gap in the logs.
+#
 ###############################################################################
 
 Print=Utils.Print
@@ -38,10 +45,12 @@ shipNodeId = 1
 # boundaries so the head log/index files the test operates on are never empty.
 shipStride = 200
 
+tmpDir                = None
 origStateHistoryLog   = ""
 stateHistoryLog       = ""
 origStateHistoryIndex = ""
 stateHistoryIndex     = ""
+origStateHistoryDir   = ""
 
 # Verifies that SHiP should fail to restart with a corrupted first entry header
 def corruptedHeaderTest(pos, corruptedValue, shipNode):
@@ -55,6 +64,21 @@ def corruptedHeaderTest(pos, corruptedValue, shipNode):
 
     isRelaunchSuccess = shipNode.relaunch()
     assert not isRelaunchSuccess, "SHiP node should have failed to relaunch"
+
+def isFilePrefix(prefixPath, fullPath):
+    """Return True if the content of the file at prefixPath is a byte-for-byte prefix of the file at fullPath."""
+    prefixSize = os.path.getsize(prefixPath)
+    if os.path.getsize(fullPath) < prefixSize:
+        return False
+    chunkSize = 1024*1024
+    with open(prefixPath, 'rb') as prefixFile, open(fullPath, 'rb') as fullFile:
+        remaining = prefixSize
+        while remaining > 0:
+            readSize = min(chunkSize, remaining)
+            if prefixFile.read(readSize) != fullFile.read(readSize):
+                return False
+            remaining -= readSize
+    return True
 
 try:
     TestHelper.printSystemInfo("BEGIN")
@@ -72,8 +96,10 @@ try:
         "--plugin sysio::net_api_plugin --plugin sysio::producer_api_plugin"
     )
 
+    # biosFinalizer=False keeps the bios node out of the finalizer policy so that finality
+    # (and with it snapshot completion in part 3) keeps working after bios is shut down
     if cluster.launch(topo="mesh", pnodes=totalProducerNodes, totalNodes=totalNodes,
-                      activateIF=True,
+                      activateIF=True, biosFinalizer=False,
                       specificExtraNodeopArgs=specificExtraNodeopArgs) is False:
         Utils.cmdError("launcher")
         Utils.errorExit("Failed to stand up cluster.")
@@ -113,6 +139,11 @@ try:
     Print("Save original SHiP log and index")
     shutil.copyfile(stateHistoryLog, origStateHistoryLog)
     shutil.copyfile(stateHistoryIndex, origStateHistoryIndex)
+
+    # save the whole state-history dir (all three logs and indexes) for the
+    # snapshot-newer-than-SHiP test in part 3
+    origStateHistoryDir = os.path.join(tmpDir, "state-history-orig")
+    shutil.copytree(shipDir, origStateHistoryDir)
 
     ############## Part 1: tests while producer node is down  #################
     
@@ -295,6 +326,87 @@ try:
     assert isRelaunchSuccess, "Failed to relaunch shipNode"
     assert shipNode.waitForHeadToAdvance(), "Head did not advance on shipNode"
     '''
+
+    ############## Part 3: restart from snapshot with pre-existing SHiP data  #################
+
+    # The producer node is running; the SHiP node is down with intact state-history files.
+
+    #-------- Restart from a snapshot older than the SHiP head. Replayed blocks the logs
+    #         already contain are no-op rewrites of identical block ids, so the node starts,
+    #         the pre-existing SHiP data is preserved, and new blocks append contiguously.
+    Print("Restart from snapshot older than SHiP head test")
+
+    isRelaunchSuccess = shipNode.relaunch()
+    assert isRelaunchSuccess, "Failed to relaunch shipNode"
+
+    # ensure the snapshot lands well past the SHiP data saved at the start of the test so
+    # the snapshot-newer-than-SHiP test below has a genuine gap to detect
+    assert shipNode.waitForBlock(blockNum + 10), "shipNode did not advance past the part 1 head"
+
+    ret = shipNode.createSnapshot()
+    assert ret is not None and "payload" in ret, f"Snapshot creation failed: {ret}"
+    snapshotHead = ret["payload"]["head_block_num"]
+    Print(f"Snapshot created at head block {snapshotHead}")
+
+    # the pending snapshot is written to disk once its block becomes irreversible; then
+    # advance SHiP data past the snapshot head so the snapshot is older than the logs
+    assert shipNode.waitForBlock(snapshotHead + 1, blockType=BlockType.lib), \
+        "snapshot block did not become irreversible"
+    assert shipNode.waitForBlock(snapshotHead + 10), "shipNode did not advance past the snapshot head"
+
+    # stop clear of a stride boundary with enough headroom that the append-only prefix
+    # comparison below is not invalidated by a head-log rotation during the short run
+    # after the snapshot restart
+    assert shipNode.waitForBlockClearOfStride(shipStride, upperMargin=60, timeout=60), \
+        "shipNode did not advance clear of a state-history-stride boundary"
+
+    shipNode.kill(signal.SIGTERM)
+
+    snapshotPath = shipNode.getLatestSnapshot()
+
+    # save the SHiP log and index as they exist before the snapshot restart; the restart
+    # must preserve this data byte-for-byte, only appending new blocks after it
+    preSnapshotLog   = os.path.join(tmpDir, "pre_snapshot_chain_state_history.log")
+    preSnapshotIndex = os.path.join(tmpDir, "pre_snapshot_chain_state_history.index")
+    shutil.copyfile(stateHistoryLog, preSnapshotLog)
+    shutil.copyfile(stateHistoryIndex, preSnapshotIndex)
+
+    # --snapshot requires an empty chainbase; keep blocks/ and state-history/
+    shipNode.removeState()
+
+    isRelaunchSuccess = shipNode.relaunch(chainArg=f"--snapshot {snapshotPath}")
+    assert isRelaunchSuccess, "Failed to relaunch shipNode from a snapshot older than the SHiP head"
+
+    # a block past the producer's current head cannot already be in the restored SHiP
+    # data, so reaching it proves SHiP appended new blocks after the overlap
+    assert shipNode.waitForBlock(prodNode.getHeadBlockNum() + 1), \
+        "Head did not advance past the pre-restart SHiP head after the snapshot restart"
+
+    shipNode.kill(signal.SIGTERM)
+
+    # pre-existing SHiP data must be retained unmodified as a prefix of the grown files
+    assert isFilePrefix(preSnapshotLog, stateHistoryLog), \
+        "SHiP log data from before the snapshot restart was modified"
+    assert isFilePrefix(preSnapshotIndex, stateHistoryIndex), \
+        "SHiP index data from before the snapshot restart was modified"
+
+    #-------- Restart from a snapshot newer than the SHiP head. Writing the first block
+    #         after the snapshot would leave a gap in the logs, so SHiP must refuse to
+    #         start rather than serve history with a hole in it.
+    Print("Restart from snapshot newer than SHiP head test")
+
+    # restore the state-history dir saved at the start of the test; its logs end far
+    # below the snapshot head
+    shutil.rmtree(shipDir)
+    shutil.copytree(origStateHistoryDir, shipDir)
+
+    shipNode.removeState()
+
+    isRelaunchSuccess = shipNode.relaunch(rmArgs=f"--snapshot {snapshotPath}",
+                                          chainArg=f"--snapshot {snapshotPath}")
+    assert not isRelaunchSuccess, "shipNode should have failed to relaunch from a snapshot newer than the SHiP head"
+    assert shipNode.findInLog("skips over block") is not None, \
+        "expected SHiP 'skips over block' gap error in shipNode log"
 
     testSuccessful = True
 finally:

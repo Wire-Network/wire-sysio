@@ -67,6 +67,7 @@ class Cluster(object):
     __finalizerCatchupMaxLagBlocks=2
     __finalizerCatchupStableRounds=3
     __finalizerCatchupReportInterval=5
+    __setFinalizerCpuRetryAttempts=30
 
     # pylint: disable=too-many-arguments
     def __init__(self, localCluster=True, host="localhost", port=None, walletHost="localhost", walletPort=None
@@ -1135,6 +1136,7 @@ class Cluster(object):
 
     # finalizerNames specifies non-default finalizer name for each node
     def setFinalizers(self, nodes, node=None, finalizerNames=None):
+        """Set the active finalizer policy, retrying transient CPU overages during bootstrap."""
         # finalizerNames, if present, must specify finalizer names for all the nodes
         assert(finalizerNames is None or len(nodes) == len(finalizerNames))
         if node is None:
@@ -1161,15 +1163,8 @@ class Cluster(object):
         if Utils.Debug: Utils.Print("setfinalizers: %s" % (setFinStr))
         Utils.Print("Setting finalizers")
         opts = "--permission sysio@active"
-        # setfinalizer can fail on ci/cd because it required too much CPU, try a few times
-        retries = 3
-        while retries > 0:
-            trans = node.pushMessage("sysio", "setfinalizer", setFinStr, opts)
-            if trans is None or not trans[0]:
-                retries = retries - 1
-                continue
-            else:
-                break
+        trans = node.pushMessage("sysio", "setfinalizer", setFinStr, opts,
+                                 cpuRetryAttempts=Cluster.__setFinalizerCpuRetryAttempts)
         if trans is None or not trans[0]:
             Utils.Print("ERROR: Failed to set finalizers")
             return None

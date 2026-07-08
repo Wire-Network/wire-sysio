@@ -15,6 +15,11 @@ struct ethereum_client_entry_t {
    std::string                        url;
    fc::crypto::signature_provider_ptr signature_provider;
    ethereum_client_ptr                client;
+   /// Numeric EVM chain id from the client spec's optional 4th field. Lets the
+   /// batch operator auto-select the client for an outpost row by matching the
+   /// row's `external_chain_id`, so multiple EVM outposts never share one
+   /// remote endpoint. `nullopt` when the spec omitted the chain id.
+   std::optional<uint64_t>            chain_id;
 };
 
 using ethereum_client_entry_ptr = std::shared_ptr<ethereum_client_entry_t>;
@@ -93,6 +98,15 @@ public:
 
    std::vector<ethereum_client_entry_ptr> get_clients();
    ethereum_client_entry_ptr get_client(const std::string& id);
+
+   /// Return the single configured client whose spec chain id equals
+   /// `chain_id`, or nullptr when none — or more than one — match. The batch
+   /// operator uses this to bind each EVM outpost row to its own RPC client by
+   /// `external_chain_id`; an ambiguous (duplicate chain id) or missing match
+   /// yields nullptr so the caller can fail closed rather than relay an
+   /// outpost through the wrong endpoint.
+   ethereum_client_entry_ptr get_client_by_chain_id(uint64_t chain_id);
+
    const std::vector<std::pair<std::filesystem::path, std::vector<fc::network::ethereum::abi::contract>>>& get_abi_files();
 
    /**
