@@ -547,7 +547,7 @@ public:
    uint64_t get_balance(const pubkey_compat_t& address, commitment_t commitment = commitment_t::confirmed);
 
    /**
-    * @brief Get multiple accounts in a single request
+    * @brief Get multiple accounts, chunking requests to Solana's 100-pubkey RPC limit
     */
    std::vector<std::optional<account_info>> get_multiple_accounts(const std::vector<solana_public_key>& addresses,
                                                                    commitment_t commitment = commitment_t::confirmed);

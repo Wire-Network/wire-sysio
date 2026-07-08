@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <bit>
 #include <cstring>
-#include <map>
+#include <limits>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -27,6 +27,10 @@ namespace {
 constexpr std::string_view OP_EPOCH_IN    = "deliver_outbound_envelope:epoch_in";
 constexpr std::string_view OP_READ_LATEST = "read_inbound_envelope:get_account_info";
 constexpr std::string_view OP_UW_COMMIT   = "uw_commit:commit_underwrite";
+constexpr std::string_view RESERVE_ACCOUNT_NAME = "Reserve";
+constexpr const char* RESERVE_FIELD_CREATOR = "creator";
+constexpr const char* RESERVE_FIELD_CUSTODY_MINT = "custody_mint";
+constexpr const char* RESERVE_FIELD_CUSTODY_DECIMALS = "custody_decimals";
 
 /// 8-byte Anchor discriminator that prefixes every `#[account]`-tagged
 /// account's serialized form.
@@ -125,27 +129,112 @@ fc::network::solana::solana_public_key derive_reserve_vault_pda(
       program_id).first;
 }
 
+/// Record a terminal recipient pubkey once, preserving first-seen order.
+void record_unique_pubkey(std::vector<fc::network::solana::solana_public_key>& pubkeys,
+                          const fc::network::solana::solana_public_key& pk) {
+   if (std::find(pubkeys.begin(), pubkeys.end(), pk) == pubkeys.end()) {
+      pubkeys.push_back(pk);
+   }
+}
+
+/// Record a terminal Reserve PDA seed pair once, preserving first-seen order.
+void record_unique_reserve_seed(std::vector<reserve_pda_seeds>& seeds,
+                                uint64_t token_code,
+                                uint64_t reserve_code) {
+   const reserve_pda_seeds candidate{token_code, reserve_code};
+   if (std::find(seeds.begin(), seeds.end(), candidate) == seeds.end()) {
+      seeds.push_back(candidate);
+   }
+}
+
 } // anonymous namespace (within outpost_solana_client_detail)
 
-std::vector<fc::network::solana::solana_public_key>
-extract_inbound_recipient_pubkeys(const std::vector<char>& envelope_bytes) {
-   std::vector<fc::network::solana::solana_public_key> recipients;
+std::vector<reserve_terminal_lookup>
+reserve_terminal_lookups_for_seeds(const fc::network::solana::solana_public_key& program_id,
+                                   const std::vector<reserve_pda_seeds>& seeds) {
+   std::vector<reserve_terminal_lookup> lookups;
+   lookups.reserve(seeds.size());
+   // Linear de-dupe preserves first-seen account order; the manifest input is bounded by the OPP envelope cap.
+   for (const auto& seeds_for_reserve : seeds) {
+      auto matches = [&](const reserve_terminal_lookup& lookup) {
+         return lookup.seeds == seeds_for_reserve;
+      };
+      if (std::find_if(lookups.begin(), lookups.end(), matches) != lookups.end()) continue;
 
-   sysio::opp::Envelope env;
-   if (!env.ParseFromArray(envelope_bytes.data(),
-                           static_cast<int>(envelope_bytes.size()))) {
-      wlog("outpost_solana_client: envelope decode for remaining-accounts "
-           "extraction failed; submitting epoch_in with no extras "
-           "(WITHDRAW_REMIT/DEPOSIT_REVERT/SWAP native transfers may "
-           "log-and-skip on-chain if any are present)");
-      return recipients;
+      lookups.push_back(reserve_terminal_lookup{
+         seeds_for_reserve,
+         derive_reserve_pda(program_id, seeds_for_reserve.token_code, seeds_for_reserve.reserve_code)
+      });
+   }
+   return lookups;
+}
+
+reserve_terminal_info reserve_terminal_info_from_variant(const fc::variant& reserve_v) {
+   const auto& reserve = reserve_v.get_object();
+   FC_ASSERT(reserve.contains(RESERVE_FIELD_CREATOR), "Reserve account missing creator field");
+   FC_ASSERT(reserve.contains(RESERVE_FIELD_CUSTODY_MINT), "Reserve account missing custody_mint field");
+   FC_ASSERT(reserve.contains(RESERVE_FIELD_CUSTODY_DECIMALS), "Reserve account missing custody_decimals field");
+
+   const auto custody_decimals = reserve[RESERVE_FIELD_CUSTODY_DECIMALS].as_uint64();
+   FC_ASSERT(custody_decimals <= std::numeric_limits<uint8_t>::max(),
+             "Reserve account custody_decimals {} exceeds uint8_t range",
+             custody_decimals);
+
+   return reserve_terminal_info{
+      fc::network::solana::solana_public_key::from_base58_string(reserve[RESERVE_FIELD_CREATOR].as_string()),
+      fc::network::solana::solana_public_key::from_base58_string(reserve[RESERVE_FIELD_CUSTODY_MINT].as_string()),
+      static_cast<uint8_t>(custody_decimals)
+   };
+}
+
+std::optional<reserve_terminal_info>
+reserve_terminal_info_from_account(const reserve_pda_seeds& seeds,
+                                   const fc::network::solana::solana_public_key& reserve_pda,
+                                   const std::optional<fc::network::solana::account_info>& account_info,
+                                   const reserve_account_decoder& decode_reserve,
+                                   std::string_view client_label) {
+   if (!account_info.has_value()) {
+      wlog("outpost_solana_client[{}]: Reserve({}, {}) absent at {}; "
+           "terminal manifest will omit branch-specific accounts for this reserve",
+           client_label,
+           seeds.token_code,
+           seeds.reserve_code,
+           reserve_pda.to_string(fc::yield_function_t{}));
+      return std::nullopt;
    }
 
-   auto record_unique = [&recipients](const fc::network::solana::solana_public_key& pk) {
-      if (std::find(recipients.begin(), recipients.end(), pk) == recipients.end()) {
-         recipients.push_back(pk);
-      }
-   };
+   FC_ASSERT(!account_info->data.empty(),
+             "Reserve({}, {}) at {} has no account data",
+             seeds.token_code,
+             seeds.reserve_code,
+             reserve_pda.to_string(fc::yield_function_t{}));
+
+   return reserve_terminal_info_from_variant(decode_reserve(account_info->data));
+}
+
+reserve_terminal_info_cache reserve_terminal_info_cache_from_accounts(
+   const std::vector<reserve_terminal_lookup>& lookups,
+   const std::vector<std::optional<fc::network::solana::account_info>>& account_infos,
+   const reserve_account_decoder& decode_reserve,
+   std::string_view client_label) {
+   FC_ASSERT(account_infos.size() == lookups.size(),
+             "getMultipleAccounts returned {} values for {} Reserve PDA requests",
+             account_infos.size(),
+             lookups.size());
+
+   reserve_terminal_info_cache infos;
+   for (size_t i = 0; i < lookups.size(); ++i) {
+      const auto& lookup = lookups[i];
+      infos.emplace(
+         lookup.seeds,
+         reserve_terminal_info_from_account(lookup.seeds, lookup.reserve_pda, account_infos[i], decode_reserve,
+                                            client_label));
+   }
+   return infos;
+}
+
+terminal_manifest_sources extract_inbound_terminal_manifest_sources(const sysio::opp::Envelope& env) {
+   terminal_manifest_sources sources;
 
    for (const auto& message : env.messages()) {
       for (const auto& entry : message.payload().attestations()) {
@@ -158,7 +247,7 @@ extract_inbound_recipient_pubkeys(const std::vector<char>& envelope_bytes) {
                   continue;
                }
                if (auto pk = sol_pubkey_from_chain_address(oa.op_address())) {
-                  record_unique(*pk);
+                  record_unique_pubkey(sources.recipient_pubkeys, *pk);
                }
                break;
             }
@@ -166,157 +255,50 @@ extract_inbound_recipient_pubkeys(const std::vector<char>& envelope_bytes) {
                sysio::opp::attestations::DepositRevert dr;
                if (!dr.ParseFromString(entry.data())) continue;
                if (auto pk = sol_pubkey_from_chain_address(dr.depositor())) {
-                  record_unique(*pk);
+                  record_unique_pubkey(sources.recipient_pubkeys, *pk);
                }
                break;
             }
             case sysio::opp::types::ATTESTATION_TYPE_SWAP_REMIT: {
                sysio::opp::attestations::SwapRemit sr;
                if (!sr.ParseFromString(entry.data())) continue;
-               if (auto pk = sol_pubkey_from_chain_address(sr.recipient())) {
-                  record_unique(*pk);
+               record_unique_reserve_seed(sources.reserve_seeds, sr.amount().token_code(), sr.reserve_code());
+               if (auto recipient = sol_pubkey_from_chain_address(sr.recipient())) {
+                  record_unique_pubkey(sources.recipient_pubkeys, *recipient);
+                  sources.swap_remit_spl_targets.push_back(swap_remit_spl_target{
+                     sr.amount().token_code(),
+                     sr.reserve_code(),
+                     *recipient
+                  });
                }
                break;
             }
             case sysio::opp::types::ATTESTATION_TYPE_SWAP_REVERT: {
                sysio::opp::attestations::SwapRevert sr;
                if (!sr.ParseFromString(entry.data())) continue;
-               if (auto pk = sol_pubkey_from_chain_address(sr.depositor())) {
-                  record_unique(*pk);
+               record_unique_reserve_seed(
+                  sources.reserve_seeds, sr.refund_amount().token_code(), sr.source_reserve_code());
+               if (auto depositor = sol_pubkey_from_chain_address(sr.depositor())) {
+                  record_unique_pubkey(sources.recipient_pubkeys, *depositor);
+                  sources.swap_revert_spl_targets.push_back(swap_remit_spl_target{
+                     sr.refund_amount().token_code(),
+                     sr.source_reserve_code(),
+                     *depositor
+                  });
                }
                break;
             }
-            default:
-               break;
-         }
-      }
-   }
-
-   return recipients;
-}
-
-std::vector<swap_remit_spl_target>
-extract_inbound_swap_remit_spl_targets(const std::vector<char>& envelope_bytes) {
-   std::vector<swap_remit_spl_target> targets;
-
-   sysio::opp::Envelope env;
-   if (!env.ParseFromArray(envelope_bytes.data(),
-                           static_cast<int>(envelope_bytes.size()))) {
-      wlog("outpost_solana_client: envelope decode for SPL swap-remit "
-           "target extraction failed; submitting epoch_in with no SPL "
-           "extras (any SPL SwapRemit attestations present will log-and-skip "
-           "if their effect accounts are missing)");
-      return targets;
-   }
-
-   for (const auto& message : env.messages()) {
-      for (const auto& entry : message.payload().attestations()) {
-         if (entry.type() != sysio::opp::types::ATTESTATION_TYPE_SWAP_REMIT) continue;
-         sysio::opp::attestations::SwapRemit sr;
-         if (!sr.ParseFromString(entry.data())) continue;
-         auto recipient = sol_pubkey_from_chain_address(sr.recipient());
-         if (!recipient) continue;  // not an SVM recipient
-         targets.push_back(swap_remit_spl_target{
-            sr.amount().token_code(),
-            sr.reserve_code(),
-            *recipient
-         });
-      }
-   }
-
-   return targets;
-}
-
-std::vector<swap_remit_spl_target>
-extract_inbound_swap_revert_spl_targets(const std::vector<char>& envelope_bytes) {
-   std::vector<swap_remit_spl_target> targets;
-
-   sysio::opp::Envelope env;
-   if (!env.ParseFromArray(envelope_bytes.data(),
-                           static_cast<int>(envelope_bytes.size()))) {
-      wlog("outpost_solana_client: envelope decode for SPL swap-revert "
-           "target extraction failed; submitting epoch_in with no SPL "
-           "revert extras (any SPL SwapRevert attestations present will "
-           "log-and-skip on-chain)");
-      return targets;
-   }
-
-   for (const auto& message : env.messages()) {
-      for (const auto& entry : message.payload().attestations()) {
-         if (entry.type() != sysio::opp::types::ATTESTATION_TYPE_SWAP_REVERT) continue;
-         sysio::opp::attestations::SwapRevert sr;
-         if (!sr.ParseFromString(entry.data())) continue;
-         auto depositor = sol_pubkey_from_chain_address(sr.depositor());
-         if (!depositor) continue;
-         targets.push_back(swap_remit_spl_target{
-            sr.refund_amount().token_code(),
-            sr.source_reserve_code(),
-            *depositor
-         });
-      }
-   }
-
-   return targets;
-}
-
-std::vector<reserve_pda_seeds>
-extract_inbound_swap_remit_reserve_seeds(const std::vector<char>& envelope_bytes) {
-   std::vector<reserve_pda_seeds> seeds;
-
-   sysio::opp::Envelope env;
-   if (!env.ParseFromArray(envelope_bytes.data(),
-                           static_cast<int>(envelope_bytes.size()))) {
-      wlog("outpost_solana_client: envelope decode for swap-remit reserve "
-           "seeds extraction failed; submitting epoch_in with no Reserve "
-           "PDAs (SWAP_REMIT lamport transfers will log-and-skip on-chain "
-           "if any are present)");
-      return seeds;
-   }
-
-   auto record_unique = [&seeds](uint64_t token_code, uint64_t reserve_code) {
-      auto matches = [&](const reserve_pda_seeds& s) {
-         return s.token_code == token_code && s.reserve_code == reserve_code;
-      };
-      if (std::find_if(seeds.begin(), seeds.end(), matches) == seeds.end()) {
-         seeds.push_back(reserve_pda_seeds{token_code, reserve_code});
-      }
-   };
-
-   for (const auto& message : env.messages()) {
-      for (const auto& entry : message.payload().attestations()) {
-         switch (entry.type()) {
-            case sysio::opp::types::ATTESTATION_TYPE_SWAP_REMIT: {
-               sysio::opp::attestations::SwapRemit sr;
-               if (!sr.ParseFromString(entry.data())) continue;
-               record_unique(sr.amount().token_code(), sr.reserve_code());
-               break;
-            }
-            case sysio::opp::types::ATTESTATION_TYPE_SWAP_REVERT: {
-               sysio::opp::attestations::SwapRevert sr;
-               if (!sr.ParseFromString(entry.data())) continue;
-               record_unique(sr.refund_amount().token_code(), sr.source_reserve_code());
-               break;
-            }
-            // The reserve-lifecycle round-trips need the per-(token, reserve)
-            // Reserve PDA in remaining_accounts too: `handle_reserve_ready`
-            // flips its status field, and `handle_reserve_create_cancelled`
-            // reads the refund amount/creator off it. RESERVE_READY rides
-            // exactly ONE envelope (queued once at `matchreserve`), so a
-            // missing PDA here doesn't defer the flip — it strands the
-            // reserve in PENDING permanently. (The cancel path's refund
-            // additionally needs creator/vault accounts on-chain; those are
-            // looked up from the PDA at dispatch and remain log-and-skip
-            // if the terminal manifest omits them.)
             case sysio::opp::types::ATTESTATION_TYPE_RESERVE_READY: {
                sysio::opp::attestations::ReserveReady rr;
                if (!rr.ParseFromString(entry.data())) continue;
-               record_unique(rr.token_code(), rr.reserve_code());
+               record_unique_reserve_seed(sources.reserve_seeds, rr.token_code(), rr.reserve_code());
                break;
             }
             case sysio::opp::types::ATTESTATION_TYPE_RESERVE_CREATE_CANCELLED: {
                sysio::opp::attestations::ReserveCreateCancelled rcc;
                if (!rcc.ParseFromString(entry.data())) continue;
-               record_unique(rcc.token_code(), rcc.reserve_code());
+               record_unique_reserve_seed(sources.reserve_seeds, rcc.token_code(), rcc.reserve_code());
+               record_unique_reserve_seed(sources.reserve_create_cancelled_seeds, rcc.token_code(), rcc.reserve_code());
                break;
             }
             default:
@@ -325,41 +307,45 @@ extract_inbound_swap_remit_reserve_seeds(const std::vector<char>& envelope_bytes
       }
    }
 
-   return seeds;
+   return sources;
+}
+
+terminal_manifest_sources extract_inbound_terminal_manifest_sources(const std::vector<char>& envelope_bytes) {
+   sysio::opp::Envelope env;
+   if (!env.ParseFromArray(envelope_bytes.data(),
+                           static_cast<int>(envelope_bytes.size()))) {
+      wlog("outpost_solana_client: envelope decode for terminal manifest "
+           "extraction failed; submitting epoch_in with no extras "
+           "(terminal handlers may log-and-skip if any effect accounts are missing)");
+      return {};
+   }
+
+   return extract_inbound_terminal_manifest_sources(env);
+}
+
+std::vector<fc::network::solana::solana_public_key>
+extract_inbound_recipient_pubkeys(const std::vector<char>& envelope_bytes) {
+   return extract_inbound_terminal_manifest_sources(envelope_bytes).recipient_pubkeys;
+}
+
+std::vector<swap_remit_spl_target>
+extract_inbound_swap_remit_spl_targets(const std::vector<char>& envelope_bytes) {
+   return extract_inbound_terminal_manifest_sources(envelope_bytes).swap_remit_spl_targets;
+}
+
+std::vector<swap_remit_spl_target>
+extract_inbound_swap_revert_spl_targets(const std::vector<char>& envelope_bytes) {
+   return extract_inbound_terminal_manifest_sources(envelope_bytes).swap_revert_spl_targets;
+}
+
+std::vector<reserve_pda_seeds>
+extract_inbound_swap_remit_reserve_seeds(const std::vector<char>& envelope_bytes) {
+   return extract_inbound_terminal_manifest_sources(envelope_bytes).reserve_seeds;
 }
 
 std::vector<reserve_pda_seeds>
 extract_inbound_reserve_create_cancelled_seeds(const std::vector<char>& envelope_bytes) {
-   std::vector<reserve_pda_seeds> seeds;
-
-   sysio::opp::Envelope env;
-   if (!env.ParseFromArray(envelope_bytes.data(),
-                           static_cast<int>(envelope_bytes.size()))) {
-      wlog("outpost_solana_client: envelope decode for reserve-cancel "
-           "target extraction failed; terminal manifest may omit refund "
-           "accounts");
-      return seeds;
-   }
-
-   auto record_unique = [&seeds](uint64_t token_code, uint64_t reserve_code) {
-      auto matches = [&](const reserve_pda_seeds& s) {
-         return s.token_code == token_code && s.reserve_code == reserve_code;
-      };
-      if (std::find_if(seeds.begin(), seeds.end(), matches) == seeds.end()) {
-         seeds.push_back(reserve_pda_seeds{token_code, reserve_code});
-      }
-   };
-
-   for (const auto& message : env.messages()) {
-      for (const auto& entry : message.payload().attestations()) {
-         if (entry.type() != sysio::opp::types::ATTESTATION_TYPE_RESERVE_CREATE_CANCELLED) continue;
-         sysio::opp::attestations::ReserveCreateCancelled rcc;
-         if (!rcc.ParseFromString(entry.data())) continue;
-         record_unique(rcc.token_code(), rcc.reserve_code());
-      }
-   }
-
-   return seeds;
+   return extract_inbound_terminal_manifest_sources(envelope_bytes).reserve_create_cancelled_seeds;
 }
 
 } // namespace outpost_solana_client_detail
@@ -388,39 +374,27 @@ sysio::opp::types::ChainKind outpost_solana_client::chain_kind() const {
    return sysio::opp::types::CHAIN_KIND_SVM;
 }
 
-std::optional<outpost_solana_client::reserve_terminal_info>
-outpost_solana_client::reserve_info_for_codes(uint64_t token_code, uint64_t reserve_code) {
-   const auto reserve_pda =
-      outpost_solana_client_detail::derive_reserve_pda(_program_id, token_code, reserve_code);
+outpost_solana_client_detail::reserve_terminal_info_cache
+outpost_solana_client::reserve_infos_for_lookups(
+   const std::vector<outpost_solana_client_detail::reserve_terminal_lookup>& lookups) {
+   if (lookups.empty()) return {};
 
-   const auto account_info = _entry->client->get_account_info(reserve_pda);
-   if (!account_info.has_value()) {
-      wlog("outpost_solana_client[{}]: Reserve({}, {}) absent at {}; "
-           "terminal manifest will omit branch-specific accounts for this reserve",
-           to_string(),
-           token_code,
-           reserve_code,
-           reserve_pda.to_string(fc::yield_function_t{}));
-      return std::nullopt;
+   std::vector<fc::network::solana::solana_public_key> reserve_pdas;
+   reserve_pdas.reserve(lookups.size());
+   for (const auto& lookup : lookups) {
+      reserve_pdas.push_back(lookup.reserve_pda);
    }
 
-   FC_ASSERT(!account_info->data.empty(),
-             "Reserve({}, {}) at {} has no account data",
-             token_code,
-             reserve_code,
-             reserve_pda.to_string(fc::yield_function_t{}));
+   const auto account_infos = _entry->client->get_multiple_accounts(reserve_pdas);
 
-   const auto reserve_v = _program_client->decode_account_info_data("Reserve", account_info->data);
-   const auto& reserve = reserve_v.get_object();
-   FC_ASSERT(reserve.contains("creator"), "Reserve account missing creator field");
-   FC_ASSERT(reserve.contains("custody_mint"), "Reserve account missing custody_mint field");
-   FC_ASSERT(reserve.contains("custody_decimals"), "Reserve account missing custody_decimals field");
-
-   return reserve_terminal_info{
-      fc::network::solana::solana_public_key::from_base58_string(reserve["creator"].as_string()),
-      fc::network::solana::solana_public_key::from_base58_string(reserve["custody_mint"].as_string()),
-      static_cast<uint8_t>(reserve["custody_decimals"].as_uint64())
+   const auto client_label = to_string();
+   const auto reserve_account_name = std::string(RESERVE_ACCOUNT_NAME);
+   auto decode_reserve = [&](const std::vector<uint8_t>& data) {
+      return _program_client->decode_account_info_data(reserve_account_name, data);
    };
+
+   return outpost_solana_client_detail::reserve_terminal_info_cache_from_accounts(
+      lookups, account_infos, decode_reserve, client_label);
 }
 
 std::string outpost_solana_client::deliver_outbound_envelope(
@@ -447,40 +421,73 @@ std::string outpost_solana_client::deliver_outbound_envelope(
    // here with the right writable flag. Reserve-backed effects fetch the
    // Reserve PDA first and use its pinned custody facts, not mutable
    // OutpostConfig token rows.
+   const auto manifest =
+      outpost_solana_client_detail::extract_inbound_terminal_manifest_sources(envelope_bytes);
+
    std::vector<fc::network::solana::account_meta> terminal_accounts;
-   std::map<std::pair<uint64_t, uint64_t>, std::optional<reserve_terminal_info>> reserve_info_cache;
+   const auto reserve_lookups =
+      outpost_solana_client_detail::reserve_terminal_lookups_for_seeds(_program_id, manifest.reserve_seeds);
 
    auto add_terminal_account = [&](const fc::network::solana::solana_public_key& key,
                                    bool is_writable) {
       outpost_solana_client_detail::record_terminal_account(terminal_accounts, key, is_writable);
    };
-   auto reserve_info = [&](uint64_t token_code, uint64_t reserve_code) -> std::optional<reserve_terminal_info> {
-      const auto cache_key = std::make_pair(token_code, reserve_code);
-      auto it = reserve_info_cache.find(cache_key);
-      if (it != reserve_info_cache.end()) return it->second;
+   auto reserve_lookup_for = [&](uint64_t token_code, uint64_t reserve_code)
+      -> const outpost_solana_client_detail::reserve_terminal_lookup& {
+      const outpost_solana_client_detail::reserve_pda_seeds key{token_code, reserve_code};
+      auto it = std::find_if(reserve_lookups.begin(), reserve_lookups.end(), [&](const auto& lookup) {
+         return lookup.seeds == key;
+      });
+      FC_ASSERT(it != reserve_lookups.end(),
+                "Missing derived Reserve PDA lookup for Reserve({}, {})",
+                token_code,
+                reserve_code);
+      return *it;
+   };
 
-      auto info = reserve_info_for_codes(token_code, reserve_code);
-      return reserve_info_cache.emplace(cache_key, std::move(info)).first->second;
+   std::vector<outpost_solana_client_detail::reserve_terminal_lookup> reserve_info_lookups;
+   auto add_reserve_info_lookup = [&](uint64_t token_code, uint64_t reserve_code) {
+      const auto& lookup = reserve_lookup_for(token_code, reserve_code);
+      auto matches = [&](const auto& existing) {
+         return existing.seeds == lookup.seeds;
+      };
+      if (std::find_if(reserve_info_lookups.begin(), reserve_info_lookups.end(), matches) ==
+          reserve_info_lookups.end()) {
+         reserve_info_lookups.push_back(lookup);
+      }
+   };
+   for (const auto& target : manifest.swap_remit_spl_targets) {
+      add_reserve_info_lookup(target.token_code, target.reserve_code);
+   }
+   for (const auto& target : manifest.swap_revert_spl_targets) {
+      add_reserve_info_lookup(target.token_code, target.reserve_code);
+   }
+   for (const auto& target : manifest.reserve_create_cancelled_seeds) {
+      add_reserve_info_lookup(target.token_code, target.reserve_code);
+   }
+
+   const auto reserve_info_cache = reserve_infos_for_lookups(reserve_info_lookups);
+   auto reserve_info = [&](uint64_t token_code, uint64_t reserve_code) -> std::optional<reserve_terminal_info> {
+      const outpost_solana_client_detail::reserve_pda_seeds cache_key{token_code, reserve_code};
+      auto it = reserve_info_cache.find(cache_key);
+      FC_ASSERT(it != reserve_info_cache.end(),
+                "Missing batched Reserve({}, {}) account result",
+                token_code,
+                reserve_code);
+      return it->second;
    };
    auto is_native_custody = [](const fc::network::solana::solana_public_key& mint) {
       return mint == fc::network::solana::system::program_ids::SYSTEM_PROGRAM;
    };
 
-   const auto recipient_pubkeys =
-      outpost_solana_client_detail::extract_inbound_recipient_pubkeys(envelope_bytes);
-   for (const auto& pk : recipient_pubkeys) {
+   for (const auto& pk : manifest.recipient_pubkeys) {
       add_terminal_account(pk, true);
    }
 
    // Every reserve-backed handler now loads the Reserve PDA first so it can
    // use pinned custody facts. Declare each deduped Reserve PDA once.
-   const auto reserve_seeds =
-      outpost_solana_client_detail::extract_inbound_swap_remit_reserve_seeds(envelope_bytes);
-   for (const auto& seeds : reserve_seeds) {
-      add_terminal_account(
-         outpost_solana_client_detail::derive_reserve_pda(
-            _program_id, seeds.token_code, seeds.reserve_code),
-         true);
+   for (const auto& lookup : reserve_lookups) {
+      add_terminal_account(lookup.reserve_pda, true);
    }
 
    size_t spl_accounts_added = 0;
@@ -491,9 +498,7 @@ std::string outpost_solana_client::deliver_outbound_envelope(
    const auto& system_program_id =
       fc::network::solana::system::program_ids::SYSTEM_PROGRAM;
 
-   const auto spl_targets =
-      outpost_solana_client_detail::extract_inbound_swap_remit_spl_targets(envelope_bytes);
-   for (const auto& target : spl_targets) {
+   for (const auto& target : manifest.swap_remit_spl_targets) {
       const auto info_opt = reserve_info(target.token_code, target.reserve_code);
       if (!info_opt.has_value()) continue;
       const auto& info = *info_opt;
@@ -514,9 +519,7 @@ std::string outpost_solana_client::deliver_outbound_envelope(
       spl_accounts_added += terminal_accounts.size() - before;
    }
 
-   const auto spl_reverts =
-      outpost_solana_client_detail::extract_inbound_swap_revert_spl_targets(envelope_bytes);
-   for (const auto& target : spl_reverts) {
+   for (const auto& target : manifest.swap_revert_spl_targets) {
       const auto info_opt = reserve_info(target.token_code, target.reserve_code);
       if (!info_opt.has_value()) continue;
       const auto& info = *info_opt;
@@ -541,9 +544,7 @@ std::string outpost_solana_client::deliver_outbound_envelope(
       spl_accounts_added += terminal_accounts.size() - before;
    }
 
-   const auto cancelled_reserves =
-      outpost_solana_client_detail::extract_inbound_reserve_create_cancelled_seeds(envelope_bytes);
-   for (const auto& target : cancelled_reserves) {
+   for (const auto& target : manifest.reserve_create_cancelled_seeds) {
       const auto info_opt = reserve_info(target.token_code, target.reserve_code);
       if (!info_opt.has_value()) continue;
       const auto& info = *info_opt;

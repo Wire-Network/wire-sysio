@@ -8,9 +8,40 @@
 #include <fc/network/solana/solana_client.hpp>
 #include <fc/task/retry.hpp>
 #include <magic_enum/magic_enum.hpp>
+#include <algorithm>
 #include <thread>
 
 namespace fc::network::solana {
+
+namespace {
+
+/// Solana JSON-RPC rejects `getMultipleAccounts` requests with more than 100 pubkeys.
+constexpr size_t GET_MULTIPLE_ACCOUNTS_MAX_PUBKEYS = 100;
+
+/// Decode the common JSON account object returned by `getAccountInfo` and `getMultipleAccounts`.
+account_info account_info_from_rpc_value(const fc::variant& account_value) {
+   auto value = account_value.get_object();
+   account_info info;
+   info.lamports = value["lamports"].as_uint64();
+   info.owner = solana_public_key::from_base58_string(value["owner"].as_string());
+   info.executable = value["executable"].as_bool();
+   info.rent_epoch = value["rentEpoch"].as_uint64();
+
+   // Decode base64 data.
+   auto data_arr = value["data"].get_array();
+   if (!data_arr.empty() && data_arr[0].is_string()) {
+      std::string data_b64 = data_arr[0].as_string();
+      if (!data_b64.empty()) {
+         auto decoded = fc::base64_decode(data_b64);
+         info.data.assign(reinterpret_cast<const uint8_t*>(decoded.data()),
+                          reinterpret_cast<const uint8_t*>(decoded.data()) + decoded.size());
+      }
+   }
+
+   return info;
+}
+
+} // anonymous namespace
 
 //=============================================================================
 // solana_program_data_client implementation
@@ -764,25 +795,7 @@ std::optional<account_info> solana_client::get_account_info(const pubkey_compat_
    if (!obj.contains("value") || obj["value"].is_null())
       return std::nullopt;
 
-   auto value = obj["value"].get_object();
-   account_info info;
-   info.lamports = value["lamports"].as_uint64();
-   info.owner = solana_public_key::from_base58_string(value["owner"].as_string());
-   info.executable = value["executable"].as_bool();
-   info.rent_epoch = value["rentEpoch"].as_uint64();
-
-   // Decode base64 data
-   auto data_arr = value["data"].get_array();
-   if (!data_arr.empty() && data_arr[0].is_string()) {
-      std::string data_b64 = data_arr[0].as_string();
-      if (!data_b64.empty()) {
-         auto decoded = fc::base64_decode(data_b64);
-         info.data.assign(reinterpret_cast<const uint8_t*>(decoded.data()),
-                          reinterpret_cast<const uint8_t*>(decoded.data()) + decoded.size());
-      }
-   }
-
-   return info;
+   return account_info_from_rpc_value(obj["value"]);
 }
 
 uint64_t solana_client::get_balance(const pubkey_compat_t& address, commitment_t commitment) {
@@ -796,45 +809,39 @@ uint64_t solana_client::get_balance(const pubkey_compat_t& address, commitment_t
 
 std::vector<std::optional<account_info>>
 solana_client::get_multiple_accounts(const std::vector<solana_public_key>& addresses, commitment_t commitment) {
-   fc::variants addr_list;
-   for (const auto& addr : addresses) {
-      addr_list.push_back(addr.to_string(fc::yield_function_t{}));
-   }
-
-   fc::mutable_variant_object config;
-   config("commitment", to_string(commitment));
-   config("encoding", "base64");
-
-   fc::variants params{addr_list, config};
-   auto result = execute("getMultipleAccounts", params);
-
    std::vector<std::optional<account_info>> results;
-   auto value_arr = result.get_object()["value"].get_array();
+   results.reserve(addresses.size());
 
-   for (const auto& v : value_arr) {
-      if (v.is_null()) {
-         results.push_back(std::nullopt);
-         continue;
+   for (size_t offset = 0; offset < addresses.size(); offset += GET_MULTIPLE_ACCOUNTS_MAX_PUBKEYS) {
+      const auto end = std::min(addresses.size(), offset + GET_MULTIPLE_ACCOUNTS_MAX_PUBKEYS);
+
+      fc::variants addr_list;
+      addr_list.reserve(end - offset);
+      for (size_t i = offset; i < end; ++i) {
+         addr_list.push_back(addresses[i].to_string(fc::yield_function_t{}));
       }
 
-      auto value = v.get_object();
-      account_info info;
-      info.lamports = value["lamports"].as_uint64();
-      info.owner = solana_public_key::from_base58_string(value["owner"].as_string());
-      info.executable = value["executable"].as_bool();
-      info.rent_epoch = value["rentEpoch"].as_uint64();
+      fc::mutable_variant_object config;
+      config("commitment", to_string(commitment));
+      config("encoding", "base64");
 
-      auto data_arr = value["data"].get_array();
-      if (!data_arr.empty() && data_arr[0].is_string()) {
-         std::string data_b64 = data_arr[0].as_string();
-         if (!data_b64.empty()) {
-            auto decoded = fc::base64_decode(data_b64);
-            info.data.assign(reinterpret_cast<const uint8_t*>(decoded.data()),
-                             reinterpret_cast<const uint8_t*>(decoded.data()) + decoded.size());
+      fc::variants params{addr_list, config};
+      auto result = execute("getMultipleAccounts", params);
+      auto value_arr = result.get_object()["value"].get_array();
+
+      FC_ASSERT(value_arr.size() == end - offset,
+                "getMultipleAccounts returned {} values for {} requested accounts",
+                value_arr.size(),
+                end - offset);
+
+      for (const auto& v : value_arr) {
+         if (v.is_null()) {
+            results.push_back(std::nullopt);
+            continue;
          }
-      }
 
-      results.push_back(info);
+         results.push_back(account_info_from_rpc_value(v));
+      }
    }
 
    return results;
