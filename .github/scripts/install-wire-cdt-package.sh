@@ -15,6 +15,8 @@ if [[ ! -f "$CDT_DEB" ]]; then
   exit 1
 fi
 
+echo "Wire CDT Debian package SHA-256: $(sha256sum "$CDT_DEB" | awk '{print $1}')"
+
 cdt_config_path="$(
   dpkg-deb --contents "$CDT_DEB" |
     awk '$NF ~ /\/lib\/cmake\/cdt\/cdt-config\.cmake$/ { path=$NF; sub(/^\.\//, "/", path); print path; exit }'
