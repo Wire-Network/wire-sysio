@@ -920,7 +920,15 @@ void apply_consensus(name self, uint64_t chain_code, uint32_t epoch_index,
    // envelope it accepted rather than to its own previous emit. That is still an exact digest
    // binding the depot can verify locally: the linked digest is this contract's own last
    // outbound emit for the outpost (the surviving one-deep `outenvelopes` row). Accept that
-   // link as an alternate continuation.
+   // link as an alternate continuation for SVM outposts ONLY; EVM outposts chain per-stream
+   // and get no fallback.
+   //
+   // The source chain row also feeds the audit-log endpoints projection below; `deliver`
+   // validated it at delivery time, and `resolvedisp` re-enters through the same registry.
+   const auto op_row = [&]() {
+      sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
+      return chains_tbl.get(sysio::chains::chain_key{sysio::slug_name{chain_code}});
+   }();
    const checksum256 envelope_digest = opp::canonical::epoch_digest(envelope);
    {
       msgch::outpost_consensus_t opcons(self);
@@ -935,7 +943,8 @@ void apply_consensus(name self, uint64_t chain_code, uint32_t epoch_index,
          } else {
             const auto prev = to_checksum256_exact(envelope.previous_envelope_hash);
             bool continues_chain = prev.has_value() && *prev == chain_tip;
-            if (!continues_chain && prev.has_value()) {
+            if (!continues_chain && prev.has_value() &&
+                op_row.kind == ChainKind::CHAIN_KIND_SVM) {
                msgch::outenvelopes_t outenvs(self);
                auto by_outpost = outenvs.get_index<"byoutpost"_n>();
                auto out_it = by_outpost.lower_bound(chain_code);
@@ -1003,11 +1012,6 @@ void apply_consensus(name self, uint64_t chain_code, uint32_t epoch_index,
 
    // Audit log + inline cleanup of working state.
    {
-      const auto op_row = [&]() {
-         sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
-         return chains_tbl.get(sysio::chains::chain_key{sysio::slug_name{chain_code}});
-      }();
-
       sysio::opp::Endpoints endpoints;
       endpoints.start.kind = op_row.kind;
       endpoints.start.id   = op_row.external_chain_id;
