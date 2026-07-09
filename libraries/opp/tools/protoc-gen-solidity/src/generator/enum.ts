@@ -70,6 +70,8 @@ export function genEnumDefinition(desc: EnumDescriptor): string {
 
   // Library with constants and checked conversions.
   lines.push(`library ${lib} {`)
+  lines.push(`    error InvalidEnumValue(uint64 raw);`)
+  lines.push(``)
 
   for (const val of desc.values) {
     lines.push(
@@ -77,9 +79,12 @@ export function genEnumDefinition(desc: EnumDescriptor): string {
     )
   }
 
-  const uniqueValues = [
-    ...new Map(desc.values.map(val => [val.number, val])).values()
-  ]
+  const seenNumbers = new Set<number>()
+  const uniqueValues = desc.values.filter(val => {
+    if (seenNumbers.has(val.number)) return false
+    seenNumbers.add(val.number)
+    return true
+  })
   const checks = uniqueValues.map(val => `_raw == ${val.number}`).join(" || ")
 
   lines.push(``)
@@ -95,7 +100,7 @@ export function genEnumDefinition(desc: EnumDescriptor): string {
   for (const val of uniqueValues) {
     lines.push(`        if (_raw == ${val.number}) return ${val.name};`)
   }
-  lines.push(`        revert("Invalid enum value");`)
+  lines.push(`        revert InvalidEnumValue(_raw);`)
   lines.push(`    }`)
 
   lines.push(`}`)

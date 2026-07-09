@@ -92,6 +92,7 @@ describe("genEnumDefinition", () => {
 
     // Library header
     expect(result).toContain("library RoleLib {")
+    expect(result).toContain("error InvalidEnumValue(uint64 raw);")
 
     // Constants
     expect(result).toContain("Role constant UNSPECIFIED = Role.wrap(0);")
@@ -112,7 +113,7 @@ describe("genEnumDefinition", () => {
     expect(result).toContain("if (_raw == 0) return UNSPECIFIED;")
     expect(result).toContain("if (_raw == 1) return ADMIN;")
     expect(result).toContain("if (_raw == 2) return USER;")
-    expect(result).toContain('revert("Invalid enum value");')
+    expect(result).toContain("revert InvalidEnumValue(_raw);")
   })
 
   it("uses protoNameToSol to extract name from fullName", () => {
@@ -146,7 +147,7 @@ describe("genEnumDefinition", () => {
     expect(result).toContain(
       "function fromRaw(uint64 _raw) internal pure returns (Empty)"
     )
-    expect(result).toContain('revert("Invalid enum value");')
+    expect(result).toContain("revert InvalidEnumValue(_raw);")
   })
 
   it("rejects sparse enum gaps instead of accepting every value up to max", () => {
@@ -164,6 +165,28 @@ describe("genEnumDefinition", () => {
     const result = genEnumDefinition(desc)
     expect(result).toContain("return _raw == 0 || _raw == 100 || _raw == 50;")
     expect(result).not.toContain("Priority.unwrap(_v) <= Priority.unwrap(HIGH)")
+  })
+
+  it("deduplicates aliased enum numbers while keeping alias constants", () => {
+    const desc: EnumDescriptor = {
+      name: "Status",
+      fullName: "Status",
+      values: [
+        { name: "UNKNOWN", number: 0 },
+        { name: "RUNNING", number: 1 },
+        { name: "STARTED", number: 1 }
+      ],
+      underlyingType: "uint8"
+    }
+
+    const result = genEnumDefinition(desc)
+
+    expect(result).toContain("Status constant RUNNING = Status.wrap(1);")
+    expect(result).toContain("Status constant STARTED = Status.wrap(1);")
+    expect(result).toContain("return _raw == 0 || _raw == 1;")
+    expect(result).toContain("if (_raw == 1) return RUNNING;")
+    expect(result).not.toContain("if (_raw == 1) return STARTED;")
+    expect(result.match(/if \(_raw == 1\)/g)).toHaveLength(1)
   })
 
   it("uses the descriptor underlyingType in the UDVT", () => {
