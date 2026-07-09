@@ -32,7 +32,7 @@
  * (and `types.proto`) for every message reachable from `Envelope`. The `static_assert`s at the
  * bottom of this file fail the build when a regenerated pb header changes a member count; a field
  * RENUMBERING is not detectable at compile time and is caught by the cross-language golden-vector
- * tests (`contracts/tests/sysio.msgch_tests.cpp`). Field numbers are pinned once in
+ * tests (`contracts/tests/sysio.msgch_chain_tests.cpp`). Field numbers are pinned once in
  * `sysio::opp::canonical::field` below.
  */
 

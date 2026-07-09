@@ -71,7 +71,7 @@ message Message {
 // depot, by `contracts/sysio.opp.common/include/sysio.opp.common/opp_canonical_codec.hpp`.
 // Any change to this message or the types it embeds (Endpoints, ChainId, Message, MessageHeader,
 // MessagePayload, AttestationEntry, EncodingFlags) MUST be mirrored there, and the cross-language
-// golden vectors in `contracts/tests/sysio.msgch_tests.cpp` regenerated.
+// golden vectors in `contracts/tests/sysio.msgch_chain_tests.cpp` regenerated.
 message Envelope {
    bytes          envelope_hash          = 1; // 32 bytes
    Endpoints      endpoints              = 2;
