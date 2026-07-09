@@ -147,10 +147,12 @@ void opreg::setconfig(uint32_t max_available_producers,
    check(max_available_batch_ops > 0, "max_available_batch_ops must be positive");
    check(max_available_underwriters > 0, "max_available_underwriters must be positive");
    check(terminate_prune_delay_ms > 0, "terminate_prune_delay_ms must be positive");
-   check(terminate_max_consecutive_misses > 0,
-         "terminate_max_consecutive_misses must be positive");
-   check(terminate_max_pct_misses_24h > 0 && terminate_max_pct_misses_24h <= 100,
-         "terminate_max_pct_misses_24h must be in (0, 100]");
+   check(terminate_max_consecutive_misses >= MIN_TERMINATE_MAX_CONSECUTIVE_MISSES &&
+         terminate_max_consecutive_misses <= MAX_TERMINATE_MAX_CONSECUTIVE_MISSES,
+         "terminate_max_consecutive_misses must be in [1, 5]");
+   check(terminate_max_pct_misses_24h >= MIN_TERMINATE_MAX_PCT_MISSES_24H &&
+         terminate_max_pct_misses_24h <= MAX_TERMINATE_MAX_PCT_MISSES_24H,
+         "terminate_max_pct_misses_24h must be in [1, 99]");
    check(terminate_window_ms > 0, "terminate_window_ms must be positive");
 
    require_no_duplicate_chain_token(req_prod_collat,    "req_prod_collat");

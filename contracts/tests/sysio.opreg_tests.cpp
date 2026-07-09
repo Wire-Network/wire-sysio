@@ -5,6 +5,8 @@
 #include <fc/variant_object.hpp>
 #include <fc/slug_name.hpp>
 
+#include <limits>
+
 #include "contracts.hpp"
 #include <sysio/opp/opp.hpp>
 
@@ -15,6 +17,34 @@ using namespace fc;
 using namespace sysio::opp::types;
 
 using mvo = fc::mutable_variant_object;
+
+namespace {
+
+/// Standard opreg prune delay used by focused setconfig tests.
+constexpr uint64_t kDefaultPruneDelayMs = 600000;
+
+/// Current production consecutive-miss threshold.
+constexpr uint32_t kDefaultMaxConsecutiveMisses = 5;
+
+/// Current production rolling-window miss-percentage threshold.
+constexpr uint32_t kDefaultMaxPctMisses24h = 5;
+
+/// Highest accepted miss percentage after SEC-28; 100% is intentionally rejected.
+constexpr uint32_t kMaxAcceptedPctMisses24h = 99;
+
+/// Disabling percent threshold rejected because an all-miss window cannot exceed it.
+constexpr uint32_t kDisablingPctMisses24h = 100;
+
+/// Compact collateral amount used to activate non-bootstrapped batch operators.
+constexpr uint64_t kTestMinBond = 1;
+
+/// Rejected collateral minimum that would make eligibility checks vacuous.
+constexpr uint64_t kRejectedZeroMinBond = 0;
+
+/// Standard 24h rolling-window size used by opreg tests.
+constexpr uint64_t kTerminateWindowMs = 24ULL * 60 * 60 * 1000;
+
+} // namespace
 
 /// v6 data-model: per-chain identity has moved from `ChainKind` enums to
 /// `sysio::slug_name`-keyed registries (`sysio.chains`, `sysio.tokens`,
@@ -157,6 +187,52 @@ public:
       return push_opreg_action(OPREG_ACCOUNT, "prune"_n, mvo());
    }
 
+   /// Record a delivery hit/miss through the same opreg action invoked by
+   /// `sysio.epoch::advance`.
+   action_result recorddel(name account, uint32_t epoch, bool delivered) {
+      return push_opreg_action(EPOCH_ACCOUNT, "recorddel"_n, mvo()
+         ("account",   account)
+         ("epoch",     epoch)
+         ("delivered", delivered));
+   }
+
+   /// Run opreg's rolling-window termination check through the epoch-authorized
+   /// action surface.
+   action_result termcheck(name account) {
+      return push_opreg_action(EPOCH_ACCOUNT, "termcheck"_n, mvo()
+         ("account", account));
+   }
+
+   /// Configure one ETH bond requirement and deposit it so a non-bootstrapped
+   /// batch operator becomes ACTIVE through the normal eligibility path.
+   void activate_batch_operator(name account,
+                                uint32_t max_consec_misses = kDefaultMaxConsecutiveMisses,
+                                uint32_t max_pct_misses_24h = kMaxAcceptedPctMisses24h) {
+      BOOST_REQUIRE_EQUAL(success(), setconfig(
+         /*max_prod=*/21,
+         /*max_batch=*/63,
+         /*max_uw=*/21,
+         /*prune_delay=*/kDefaultPruneDelayMs,
+         /*max_consec_misses=*/max_consec_misses,
+         /*max_pct_misses_24h=*/max_pct_misses_24h,
+         /*terminate_window_ms=*/kTerminateWindowMs,
+         /*req_prod_collat=*/{},
+         /*req_batchop_collat=*/{
+            make_chain_min_bond("ETH", "ETH", kTestMinBond),
+         },
+         /*req_uw_collat=*/{}));
+
+      BOOST_REQUIRE_EQUAL(success(),
+         regoperator(account, OPERATOR_TYPE_BATCH, /*is_bootstrapped=*/false));
+      BOOST_REQUIRE_EQUAL(success(),
+         depositinle(account, "ETH", "ETH", kTestMinBond));
+      produce_blocks();
+
+      auto op = get_operator(account);
+      BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE == op["status"].as<OperatorStatus>());
+      BOOST_REQUIRE_EQUAL(0, op["is_bootstrapped"].as_uint64());
+   }
+
    // ── Collateral-action helpers (msgch-dispatched paths, v6 codenames) ──
 
    /// `depositinle`: dispatched from sysio.msgch.
@@ -263,12 +339,37 @@ BOOST_FIXTURE_TEST_CASE(setconfig_basic, sysio_opreg_tester) { try {
    BOOST_REQUIRE_EQUAL(63, cfg["max_available_batch_ops"].as_uint64());
    BOOST_REQUIRE_EQUAL(21, cfg["max_available_underwriters"].as_uint64());
    BOOST_REQUIRE_EQUAL(600000, cfg["terminate_prune_delay_ms"].as_uint64());
+   BOOST_REQUIRE_EQUAL(kDefaultMaxConsecutiveMisses,
+                       cfg["terminate_max_consecutive_misses"].as_uint64());
+   BOOST_REQUIRE_EQUAL(kDefaultMaxPctMisses24h, cfg["terminate_max_pct_misses_24h"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(setconfig_rejects_zero_queue, sysio_opreg_tester) { try {
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: max_available_producers must be positive"),
       setconfig(0, 63, 21, 600000)
+   );
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(setconfig_rejects_disabling_percent_miss_threshold, sysio_opreg_tester) { try {
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: terminate_max_pct_misses_24h must be in [1, 99]"),
+      setconfig(21, 63, 21, kDefaultPruneDelayMs,
+                kDefaultMaxConsecutiveMisses, kDisablingPctMisses24h, kTerminateWindowMs)
+   );
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(setconfig_rejects_disabling_consecutive_miss_threshold, sysio_opreg_tester) { try {
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: terminate_max_consecutive_misses must be in [1, 5]"),
+      setconfig(21, 63, 21, kDefaultPruneDelayMs,
+                kDefaultMaxConsecutiveMisses + 1, kMaxAcceptedPctMisses24h, kTerminateWindowMs)
+   );
+
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: terminate_max_consecutive_misses must be in [1, 5]"),
+      setconfig(21, 63, 21, kDefaultPruneDelayMs,
+                std::numeric_limits<uint32_t>::max(), kMaxAcceptedPctMisses24h, kTerminateWindowMs)
    );
 } FC_LOG_AND_RETHROW() }
 
@@ -279,14 +380,16 @@ BOOST_FIXTURE_TEST_CASE(setconfig_rejects_zero_min_bond, sysio_opreg_tester) { t
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: req_uw_collat: min_bond must be positive "
             "(an empty requirement set imposes no bond)"),
-      setconfig(21, 63, 21, 600000, 5, 5, 24ULL * 60 * 60 * 1000,
-                {}, {}, { make_chain_min_bond("ETH", "ETH", 0) })
+      setconfig(21, 63, 21, kDefaultPruneDelayMs,
+                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kTerminateWindowMs,
+                {}, {}, { make_chain_min_bond("ETH", "ETH", kRejectedZeroMinBond) })
    );
    // The identical shape with a positive min_bond is accepted.
    BOOST_REQUIRE_EQUAL(
       success(),
-      setconfig(21, 63, 21, 600000, 5, 5, 24ULL * 60 * 60 * 1000,
-                {}, {}, { make_chain_min_bond("ETH", "ETH", 1) })
+      setconfig(21, 63, 21, kDefaultPruneDelayMs,
+                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kTerminateWindowMs,
+                {}, {}, { make_chain_min_bond("ETH", "ETH", kTestMinBond) })
    );
 } FC_LOG_AND_RETHROW() }
 
@@ -700,6 +803,62 @@ BOOST_FIXTURE_TEST_CASE(terminate_rejects_already_slashed_operator, sysio_opreg_
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: operator not in a terminable state"),
       terminate("batchop.a"_n, "post-slash terminate attempt"));
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(termcheck_terminates_all_miss_window_at_max_accepted_percent, sysio_opreg_tester) { try {
+   activate_batch_operator("batchop.a"_n);
+
+   BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, 1, /*delivered=*/false));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(success(), termcheck("batchop.a"_n));
+
+   auto op = get_operator("batchop.a"_n);
+   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_TERMINATED == op["status"].as<OperatorStatus>());
+   BOOST_REQUIRE_EQUAL("rolling-window: >99% miss rate", op["status_reason"].as_string());
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(termcheck_terminates_after_default_consecutive_boundary, sysio_opreg_tester) { try {
+   activate_batch_operator("batchop.a"_n);
+
+   BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, 1, /*delivered=*/true));
+   produce_blocks();
+
+   for (uint32_t epoch = 2; epoch <= 6; ++epoch) {
+      BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, epoch, /*delivered=*/false));
+      produce_blocks();
+   }
+   BOOST_REQUIRE_EQUAL(success(), termcheck("batchop.a"_n));
+   auto op = get_operator("batchop.a"_n);
+   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE == op["status"].as<OperatorStatus>());
+
+   BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, 7, /*delivered=*/false));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(success(), termcheck("batchop.a"_n));
+
+   op = get_operator("batchop.a"_n);
+   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_TERMINATED == op["status"].as<OperatorStatus>());
+   BOOST_REQUIRE_EQUAL("rolling-window: >5 consecutive misses", op["status_reason"].as_string());
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(termcheck_keeps_bootstrapped_operator_exempt, sysio_opreg_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), setconfig(
+      /*max_prod=*/21,
+      /*max_batch=*/63,
+      /*max_uw=*/21,
+      /*prune_delay=*/kDefaultPruneDelayMs,
+      /*max_consec_misses=*/1,
+      /*max_pct_misses_24h=*/kMaxAcceptedPctMisses24h,
+      /*terminate_window_ms=*/kTerminateWindowMs));
+   BOOST_REQUIRE_EQUAL(success(),
+      regoperator("batchop.a"_n, OPERATOR_TYPE_BATCH, /*is_bootstrapped=*/true));
+
+   BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, 1, /*delivered=*/false));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(success(), termcheck("batchop.a"_n));
+
+   auto op = get_operator("batchop.a"_n);
+   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE == op["status"].as<OperatorStatus>());
+   BOOST_REQUIRE_EQUAL(1, op["is_bootstrapped"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(releaselock_requires_uwrit_authority, sysio_opreg_tester) { try {
