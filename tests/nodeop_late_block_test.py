@@ -4,7 +4,7 @@ import re
 import shutil
 import signal
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 from TestHarness import Cluster, TestHelper, Utils, WalletMgr
 from TestHarness.Node import BlockType
 
@@ -33,6 +33,8 @@ expectedIProducerBlocks=9
 forkSwitchLogTimeout=30
 producerSlotBlockCount=12
 bridgeReconnectProducer="defproducerk"
+node3ProducerNames=("defproducerj", "defproducerk", "defproducerl")
+lockoutFastPathLogPrefix="applying blocks while producing: head's branch is locked out"
 delay=args.d
 debug=args.v
 dumpErrorDetails=args.dump_error_details
@@ -165,10 +167,9 @@ try:
     # block up to ~450ms before its slot time, and the next round's first block may not start before
     # its slot begins ("Not starting block until"). A reconnect landing in such a gap - or past
     # node_03's whole window - applies the blocks through the regular non-producing path and the
-    # diagnostic is legitimately absent. Decide which outcome to require from the producer state at
-    # the first post-partition fork switch: the fast-path line is required exactly when node_03 had
-    # started a block of its own that was still unfinished (never produced; the fast path itself
-    # aborts it) at switch time. The block-ID assertion above verifies convergence either way.
+    # diagnostic is legitimately absent. Prefer the direct fast-path diagnostic when present; fall
+    # back to producer-state inference only when it is absent so release-style CI logs that omit
+    # debug-only "Starting block" lines still validate the externally visible behavior above.
     logTimePattern = re.compile(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+")
 
     def logLineTime(line):
@@ -179,37 +180,73 @@ try:
 
     firstSwitchTime = min(logLineTime(line) for line in switchLines)
 
-    startingBlockPattern = re.compile(r"Starting block #(\d+) \S+ producer (defproducer[a-z]+),")
-    node3ProducerStarts = []
-    for line in node3.linesInLog("Starting block #"):
-        match = startingBlockPattern.search(line)
-        if match and match.group(2) in ("defproducerj", "defproducerk", "defproducerl") \
-                and logLineTime(line) < firstSwitchTime:
-            node3ProducerStarts.append((logLineTime(line), int(match.group(1))))
-    assert node3ProducerStarts, \
-        "node_03 log has no 'Starting block' entries before the fork switch; debug logging is required"
-    lastStartTime, lastStartBlockNum = max(node3ProducerStarts)
+    fastPathPattern = re.compile(
+        r"applying blocks while producing: head's branch is locked out .* fork-db head #(\d+)")
 
-    producedBlockPattern = re.compile(r"Produced block \S+ #(\d+) @")
+    def partitionFastPathLines():
+        """Return node_03 lockout fast-path diagnostics for the post-partition fork."""
+        lines = []
+        for line in node3.linesInLog(lockoutFastPathLogPrefix):
+            match = fastPathPattern.search(line)
+            if match and int(match.group(1)) > firstIProdBlockNum:
+                lines.append(line)
+        return lines
 
-    def lastStartedBlockWasProduced():
-        """Return true when node_03 finished producing its last started block before the fork switch."""
-        for line in node3.linesInLog("Produced block "):
-            match = producedBlockPattern.search(line)
-            if match and int(match.group(1)) == lastStartBlockNum \
-                    and lastStartTime <= logLineTime(line) <= firstSwitchTime:
-                return True
-        return False
-
-    if lastStartedBlockWasProduced():
-        Print(f"Node_03 was between blocks at the fork switch (block #{lastStartBlockNum} already "
-              "produced); the lockout fast path was legitimately idle")
+    fastPathLines = [line for line in partitionFastPathLines() if logLineTime(line) <= firstSwitchTime]
+    if fastPathLines:
+        Print("Node_03 applied canonical blocks while producing; lockout fast path observed")
     else:
-        Print(f"Node_03 was building block #{lastStartBlockNum} at the fork switch; requiring the "
-              "lockout fast-path log")
-        assert node3.findInLog("applying blocks while producing: head's branch is locked out"), \
-            "Expected node_03 to apply blocks mid-slot upon detecting strong-QC lockout of its " \
-            f"isolated fork while building block #{lastStartBlockNum}"
+        startingBlockPattern = re.compile(r"Starting block #(\d+) \S+ producer (defproducer[a-z]+),")
+        producedBlockPattern = re.compile(
+            r"Produced block \S+ #(\d+) @ .* signed by (defproducer[a-z]+).* producing time: (\d+) us")
+        node3ProducerStarts = []
+
+        for line in node3.linesInLog("Starting block #"):
+            match = startingBlockPattern.search(line)
+            if match and match.group(2) in node3ProducerNames \
+                    and logLineTime(line) < firstSwitchTime:
+                node3ProducerStarts.append((logLineTime(line), int(match.group(1))))
+
+        def lastStartedBlockWasProduced(lastStartTime, lastStartBlockNum):
+            """Return true when node_03 finished producing its last debug-started block before the fork switch."""
+            for line in node3.linesInLog("Produced block "):
+                match = producedBlockPattern.search(line)
+                if match and int(match.group(1)) == lastStartBlockNum \
+                        and lastStartTime <= logLineTime(line) <= firstSwitchTime:
+                    return True
+            return False
+
+        def producedBlockSpanningSwitch():
+            """Return the node_03 producer block whose info-level production interval spans the fork switch."""
+            for line in node3.linesInLog("Produced block "):
+                match = producedBlockPattern.search(line)
+                if not match or match.group(2) not in node3ProducerNames:
+                    continue
+
+                blockNum = int(match.group(1))
+                if blockNum <= firstIProdBlockNum:
+                    continue
+
+                endTime = logLineTime(line)
+                startTime = endTime - timedelta(microseconds=int(match.group(3)))
+                if startTime <= firstSwitchTime <= endTime:
+                    return blockNum
+            return None
+
+        if node3ProducerStarts:
+            lastStartTime, lastStartBlockNum = max(node3ProducerStarts)
+            assert lastStartedBlockWasProduced(lastStartTime, lastStartBlockNum), \
+                "Expected node_03 to apply blocks mid-slot upon detecting strong-QC lockout of its " \
+                f"isolated fork while building block #{lastStartBlockNum}"
+            Print(f"Node_03 was between blocks at the fork switch (block #{lastStartBlockNum} already "
+                  "produced); the lockout fast path was legitimately idle")
+        else:
+            spanningBlockNum = producedBlockSpanningSwitch()
+            assert spanningBlockNum is None, \
+                "Expected node_03 to apply blocks mid-slot upon detecting strong-QC lockout of its " \
+                f"isolated fork while producing block #{spanningBlockNum}"
+            Print("Node_03 log has no debug-only 'Starting block' entries; no info-level produced-block "
+                  "interval spans the fork switch, so the lockout fast path was not required")
 
     Print("Wait until Node_00 to produce")
     node3.waitForProducer("defproducera")
