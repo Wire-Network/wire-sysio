@@ -3,7 +3,7 @@ import {
   enumLibName,
   genEnumDefinition,
   EnumValueInfo,
-  EnumDescriptor,
+  EnumDescriptor
 } from "../src/generator/enum"
 
 describe("computeUnderlyingType", () => {
@@ -15,7 +15,7 @@ describe("computeUnderlyingType", () => {
     const values: EnumValueInfo[] = [
       { name: "A", number: 0 },
       { name: "B", number: 1 },
-      { name: "C", number: 255 },
+      { name: "C", number: 255 }
     ]
     expect(computeUnderlyingType(values)).toBe("uint8")
   })
@@ -23,7 +23,7 @@ describe("computeUnderlyingType", () => {
   it("returns uint16 when max value exceeds uint8", () => {
     const values: EnumValueInfo[] = [
       { name: "A", number: 0 },
-      { name: "B", number: 256 },
+      { name: "B", number: 256 }
     ]
     expect(computeUnderlyingType(values)).toBe("uint16")
   })
@@ -77,9 +77,9 @@ describe("genEnumDefinition", () => {
       values: [
         { name: "UNSPECIFIED", number: 0 },
         { name: "ADMIN", number: 1 },
-        { name: "USER", number: 2 },
+        { name: "USER", number: 2 }
       ],
-      underlyingType: "uint8",
+      underlyingType: "uint8"
     }
 
     const result = genEnumDefinition(desc)
@@ -92,15 +92,28 @@ describe("genEnumDefinition", () => {
 
     // Library header
     expect(result).toContain("library RoleLib {")
+    expect(result).toContain("error InvalidEnumValue(uint64 raw);")
 
     // Constants
     expect(result).toContain("Role constant UNSPECIFIED = Role.wrap(0);")
     expect(result).toContain("Role constant ADMIN = Role.wrap(1);")
     expect(result).toContain("Role constant USER = Role.wrap(2);")
 
-    // isValid checks against max value
-    expect(result).toContain("function isValid(Role _v) internal pure returns (bool)")
-    expect(result).toContain("return Role.unwrap(_v) <= Role.unwrap(USER);")
+    // isValid checks declared values exactly
+    expect(result).toContain(
+      "function isValid(Role _v) internal pure returns (bool)"
+    )
+    expect(result).toContain("uint64 _raw = uint64(Role.unwrap(_v));")
+    expect(result).toContain("return _raw == 0 || _raw == 1 || _raw == 2;")
+
+    // fromRaw validates before wrapping, so out-of-range values cannot narrow
+    expect(result).toContain(
+      "function fromRaw(uint64 _raw) internal pure returns (Role)"
+    )
+    expect(result).toContain("if (_raw == 0) return UNSPECIFIED;")
+    expect(result).toContain("if (_raw == 1) return ADMIN;")
+    expect(result).toContain("if (_raw == 2) return USER;")
+    expect(result).toContain("revert InvalidEnumValue(_raw);")
   })
 
   it("uses protoNameToSol to extract name from fullName", () => {
@@ -108,7 +121,7 @@ describe("genEnumDefinition", () => {
       name: "Status",
       fullName: "deep.nested.package.Status",
       values: [{ name: "OK", number: 0 }],
-      underlyingType: "uint8",
+      underlyingType: "uint8"
     }
 
     const result = genEnumDefinition(desc)
@@ -116,36 +129,64 @@ describe("genEnumDefinition", () => {
     expect(result).toContain("library StatusLib {")
   })
 
-  it("handles enum with no values (no isValid function body)", () => {
+  it("handles enum with no values by rejecting all raw values", () => {
     const desc: EnumDescriptor = {
       name: "Empty",
       fullName: "Empty",
       values: [],
-      underlyingType: "uint8",
+      underlyingType: "uint8"
     }
 
     const result = genEnumDefinition(desc)
     expect(result).toContain("type Empty is uint8;")
     expect(result).toContain("library EmptyLib {")
-    // The using statement is always emitted, but the function body is not
-    expect(result).not.toContain("function isValid")
+    expect(result).toContain(
+      "function isValid(Empty _v) internal pure returns (bool)"
+    )
+    expect(result).toContain("return false;")
+    expect(result).toContain(
+      "function fromRaw(uint64 _raw) internal pure returns (Empty)"
+    )
+    expect(result).toContain("revert InvalidEnumValue(_raw);")
   })
 
-  it("picks the correct max value for isValid", () => {
+  it("rejects sparse enum gaps instead of accepting every value up to max", () => {
     const desc: EnumDescriptor = {
       name: "Priority",
       fullName: "Priority",
       values: [
         { name: "LOW", number: 0 },
         { name: "HIGH", number: 100 },
-        { name: "MEDIUM", number: 50 },
+        { name: "MEDIUM", number: 50 }
       ],
-      underlyingType: "uint8",
+      underlyingType: "uint8"
     }
 
     const result = genEnumDefinition(desc)
-    // HIGH has the largest number (100), so isValid checks against HIGH
-    expect(result).toContain("return Priority.unwrap(_v) <= Priority.unwrap(HIGH);")
+    expect(result).toContain("return _raw == 0 || _raw == 100 || _raw == 50;")
+    expect(result).not.toContain("Priority.unwrap(_v) <= Priority.unwrap(HIGH)")
+  })
+
+  it("deduplicates aliased enum numbers while keeping alias constants", () => {
+    const desc: EnumDescriptor = {
+      name: "Status",
+      fullName: "Status",
+      values: [
+        { name: "UNKNOWN", number: 0 },
+        { name: "RUNNING", number: 1 },
+        { name: "STARTED", number: 1 }
+      ],
+      underlyingType: "uint8"
+    }
+
+    const result = genEnumDefinition(desc)
+
+    expect(result).toContain("Status constant RUNNING = Status.wrap(1);")
+    expect(result).toContain("Status constant STARTED = Status.wrap(1);")
+    expect(result).toContain("return _raw == 0 || _raw == 1;")
+    expect(result).toContain("if (_raw == 1) return RUNNING;")
+    expect(result).not.toContain("if (_raw == 1) return STARTED;")
+    expect(result.match(/if \(_raw == 1\)/g)).toHaveLength(1)
   })
 
   it("uses the descriptor underlyingType in the UDVT", () => {
@@ -153,7 +194,7 @@ describe("genEnumDefinition", () => {
       name: "Big",
       fullName: "Big",
       values: [{ name: "VAL", number: 0x10000 }],
-      underlyingType: "uint24",
+      underlyingType: "uint24"
     }
 
     const result = genEnumDefinition(desc)
