@@ -8,6 +8,8 @@
 #include <fc/network/solana/solana_system_programs.hpp>
 #include <fc/network/solana/solana_types.hpp>
 
+#include <limits>
+
 using namespace fc::network::solana;
 using namespace fc::crypto::solana;
 
@@ -43,6 +45,71 @@ message make_index_limit_message(size_t account_key_count) {
    instr.account_indices = {0};
    msg.instructions.push_back(instr);
    return msg;
+}
+
+/**
+ * @brief Append a little-endian u32 to a test byte buffer.
+ */
+void append_u32_le(std::vector<uint8_t>& out, uint32_t value) {
+   for (size_t i = 0; i < sizeof(value); ++i) {
+      out.push_back(static_cast<uint8_t>((value >> (i * 8)) & 0xff));
+   }
+}
+
+/**
+ * @brief Append a Borsh string to a test byte buffer.
+ */
+void append_borsh_string(std::vector<uint8_t>& out, const std::string& value) {
+   append_u32_le(out, static_cast<uint32_t>(value.size()));
+   out.insert(out.end(), value.begin(), value.end());
+}
+
+/**
+ * @brief Test adapter exposing protected decode helpers without RPC.
+ */
+struct test_solana_program_client : solana_program_client {
+   using solana_program_client::decode_account_data;
+
+   explicit test_solana_program_client(const std::vector<idl::program>& idls = {})
+      : solana_program_client(solana_client_ptr{}, make_test_pubkey(700), idls) {}
+};
+
+idl::program parse_empty_struct_vec_account_idl() {
+   std::string idl_json = R"({
+      "address": "11111111111111111111111111111111",
+      "metadata": {
+         "name": "empty_vec_account",
+         "version": "0.1.0",
+         "spec": "0.1.0"
+      },
+      "instructions": [],
+      "accounts": [
+         {
+            "name": "EmptyVecAccount",
+            "discriminator": [8, 7, 6, 5, 4, 3, 2, 1]
+         }
+      ],
+      "types": [
+         {
+            "name": "EmptyVecAccount",
+            "type": {
+               "kind": "struct",
+               "fields": [
+                  {"name": "empties", "type": {"vec": {"defined": {"name": "EmptyStruct"}}}}
+               ]
+            }
+         },
+         {
+            "name": "EmptyStruct",
+            "type": {
+               "kind": "struct",
+               "fields": []
+            }
+         }
+      ]
+   })";
+
+   return idl::parse_idl(fc::json::from_string(idl_json));
 }
 
 } // namespace
@@ -248,6 +315,14 @@ BOOST_AUTO_TEST_CASE(test_borsh_vec) {
    borsh::decoder dec(data);
    auto decoded = dec.read_vec<uint32_t>();
    BOOST_CHECK(decoded == test_vec);
+}
+
+BOOST_AUTO_TEST_CASE(test_borsh_vec_rejects_declared_length_before_reserve) {
+   std::vector<uint8_t> data;
+   append_u32_le(data, std::numeric_limits<uint32_t>::max());
+
+   borsh::decoder dec(data);
+   BOOST_CHECK_THROW(dec.read_vec<uint32_t>(), fc::assert_exception);
 }
 
 //=============================================================================
@@ -1217,6 +1292,114 @@ BOOST_AUTO_TEST_CASE(test_anchor_idl_account_fields_in_types_section) {
    // Verify decoded values
    BOOST_CHECK_EQUAL(result["count"].as_uint64(), 42u);
    BOOST_CHECK_EQUAL(result["bump"].as_uint64(), 253u);
+}
+
+BOOST_AUTO_TEST_CASE(test_anchor_idl_account_vec_rejects_declared_length_before_reserve) {
+   std::string idl_json = R"({
+      "address": "11111111111111111111111111111111",
+      "metadata": {
+         "name": "vec_account",
+         "version": "0.1.0",
+         "spec": "0.1.0"
+      },
+      "instructions": [],
+      "accounts": [
+         {
+            "name": "VecAccount",
+            "discriminator": [1, 2, 3, 4, 5, 6, 7, 8]
+         }
+      ],
+      "types": [
+         {
+            "name": "VecAccount",
+            "type": {
+               "kind": "struct",
+               "fields": [
+                  {"name": "scores", "type": {"vec": "u64"}}
+               ]
+            }
+         }
+      ]
+   })";
+
+   auto prog = idl::parse_idl(fc::json::from_string(idl_json));
+   test_solana_program_client client({prog});
+
+   std::vector<uint8_t> account_data = {1, 2, 3, 4, 5, 6, 7, 8};
+   append_u32_le(account_data, std::numeric_limits<uint32_t>::max());
+
+   BOOST_CHECK_THROW(client.decode_account_data(account_data, "VecAccount"), fc::assert_exception);
+}
+
+BOOST_AUTO_TEST_CASE(test_anchor_idl_account_vec_decodes_dynamic_elements) {
+   std::string idl_json = R"({
+      "address": "11111111111111111111111111111111",
+      "metadata": {
+         "name": "string_vec_account",
+         "version": "0.1.0",
+         "spec": "0.1.0"
+      },
+      "instructions": [],
+      "accounts": [
+         {
+            "name": "StringVecAccount",
+            "discriminator": [2, 4, 6, 8, 10, 12, 14, 16]
+         }
+      ],
+      "types": [
+         {
+            "name": "StringVecAccount",
+            "type": {
+               "kind": "struct",
+               "fields": [
+                  {"name": "labels", "type": {"vec": "string"}}
+               ]
+            }
+         }
+      ]
+   })";
+
+   auto prog = idl::parse_idl(fc::json::from_string(idl_json));
+   test_solana_program_client client({prog});
+
+   std::vector<uint8_t> account_data = {2, 4, 6, 8, 10, 12, 14, 16};
+   append_u32_le(account_data, 2);
+   append_borsh_string(account_data, "alpha");
+   append_borsh_string(account_data, "beta");
+
+   auto result = client.decode_account_data(account_data, "StringVecAccount").get_object();
+   auto labels = result["labels"].get_array();
+
+   BOOST_CHECK_EQUAL(labels.size(), 2u);
+   BOOST_CHECK_EQUAL(labels[0].as_string(), "alpha");
+   BOOST_CHECK_EQUAL(labels[1].as_string(), "beta");
+}
+
+BOOST_AUTO_TEST_CASE(test_anchor_idl_account_zero_sized_vec_decodes_small_length) {
+   auto prog = parse_empty_struct_vec_account_idl();
+   test_solana_program_client client({prog});
+
+   std::vector<uint8_t> account_data = {8, 7, 6, 5, 4, 3, 2, 1};
+   append_u32_le(account_data, 3);
+
+   auto result = client.decode_account_data(account_data, "EmptyVecAccount").get_object();
+   auto empties = result["empties"].get_array();
+
+   BOOST_CHECK_EQUAL(empties.size(), 3u);
+   for (const auto& empty : empties) {
+      BOOST_CHECK(empty.is_object());
+      BOOST_CHECK_EQUAL(empty.get_object().size(), 0u);
+   }
+}
+
+BOOST_AUTO_TEST_CASE(test_anchor_idl_account_zero_sized_vec_rejects_unbounded_length) {
+   auto prog = parse_empty_struct_vec_account_idl();
+   test_solana_program_client client({prog});
+
+   std::vector<uint8_t> account_data = {8, 7, 6, 5, 4, 3, 2, 1};
+   append_u32_le(account_data, std::numeric_limits<uint32_t>::max());
+
+   BOOST_CHECK_THROW(client.decode_account_data(account_data, "EmptyVecAccount"), fc::assert_exception);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

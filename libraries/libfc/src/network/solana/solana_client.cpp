@@ -8,9 +8,133 @@
 #include <fc/network/solana/solana_client.hpp>
 #include <fc/task/retry.hpp>
 #include <magic_enum/magic_enum.hpp>
+#include <limits>
+#include <optional>
 #include <thread>
 
 namespace fc::network::solana {
+
+namespace {
+
+/**
+ * @brief Maximum materialized elements for vectors whose element encoding can
+ * consume zero bytes.
+ */
+constexpr uint32_t max_zero_sized_idl_vector_elements = 64u * 1024u;
+
+/**
+ * @brief Checked size_t addition for conservative Borsh size estimates.
+ */
+std::optional<size_t> checked_add_size(size_t lhs, size_t rhs) {
+   if (lhs > std::numeric_limits<size_t>::max() - rhs)
+      return std::nullopt;
+   return lhs + rhs;
+}
+
+/**
+ * @brief Checked size_t multiplication for conservative Borsh size estimates.
+ */
+std::optional<size_t> checked_mul_size(size_t lhs, size_t rhs) {
+   if (lhs != 0 && rhs > std::numeric_limits<size_t>::max() / lhs)
+      return std::nullopt;
+   return lhs * rhs;
+}
+
+std::optional<size_t> min_borsh_encoded_size(const idl::idl_type& type, const idl::program* program);
+
+/**
+ * @brief Smallest Borsh byte count for a field sequence.
+ */
+std::optional<size_t> min_borsh_fields_encoded_size(const std::vector<idl::field>& fields,
+                                                    const idl::program* program) {
+   size_t total = 0;
+   for (const auto& field : fields) {
+      auto field_size = min_borsh_encoded_size(field.type, program);
+      if (!field_size)
+         return std::nullopt;
+      auto next_total = checked_add_size(total, *field_size);
+      if (!next_total)
+         return std::nullopt;
+      total = *next_total;
+   }
+   return total;
+}
+
+/**
+ * @brief Conservative lower bound for bytes consumed by an IDL type.
+ */
+std::optional<size_t> min_borsh_encoded_size(const idl::idl_type& type, const idl::program* program) {
+   if (type.is_primitive()) {
+      switch (type.get_primitive()) {
+      case idl::primitive_type::bool_t:
+      case idl::primitive_type::u8:
+      case idl::primitive_type::i8:
+         return sizeof(uint8_t);
+      case idl::primitive_type::u16:
+      case idl::primitive_type::i16:
+         return sizeof(uint16_t);
+      case idl::primitive_type::u32:
+      case idl::primitive_type::i32:
+      case idl::primitive_type::f32:
+         return sizeof(uint32_t);
+      case idl::primitive_type::u64:
+      case idl::primitive_type::i64:
+      case idl::primitive_type::f64:
+         return sizeof(uint64_t);
+      case idl::primitive_type::u128:
+      case idl::primitive_type::i128:
+         return sizeof(uint64_t) * 2;
+      case idl::primitive_type::u256:
+      case idl::primitive_type::i256:
+         return sizeof(uint64_t) * 4;
+      case idl::primitive_type::string:
+      case idl::primitive_type::bytes:
+         return sizeof(uint32_t);
+      case idl::primitive_type::pubkey:
+         return solana_public_key::size;
+      }
+   } else if (type.is_option()) {
+      return sizeof(uint8_t);
+   } else if (type.is_vec()) {
+      return sizeof(uint32_t);
+   } else if (type.is_array()) {
+      if (!type.array_element || !type.array_len)
+         return std::nullopt;
+      auto element_size = min_borsh_encoded_size(*type.array_element, program);
+      if (!element_size)
+         return std::nullopt;
+      return checked_mul_size(*element_size, *type.array_len);
+   } else if (type.is_tuple() && type.tuple_elements) {
+      size_t total = 0;
+      for (const auto& elem_type : *type.tuple_elements) {
+         auto elem_size = min_borsh_encoded_size(elem_type, program);
+         if (!elem_size)
+            return std::nullopt;
+         auto next_total = checked_add_size(total, *elem_size);
+         if (!next_total)
+            return std::nullopt;
+         total = *next_total;
+      }
+      return total;
+   } else if (type.is_defined()) {
+      if (!program)
+         return std::nullopt;
+
+      const idl::type_def* type_def = program->find_type(type.get_defined_name());
+      if (!type_def)
+         return std::nullopt;
+
+      if (type_def->is_struct() && type_def->struct_fields)
+         return min_borsh_fields_encoded_size(*type_def->struct_fields, program);
+
+      if (type_def->is_enum() && type_def->enum_variants)
+         return sizeof(uint8_t);
+   }
+
+   return std::nullopt;
+}
+
+}  // namespace
 
 //=============================================================================
 // solana_program_data_client implementation
@@ -435,6 +559,22 @@ fc::variant solana_program_client::decode_type(borsh::decoder& decoder, const id
       return decode_type(decoder, *type.option_inner);
    } else if (type.is_vec()) {
       uint32_t len = decoder.read_u32();
+      FC_ASSERT(type.vec_element, "Borsh decoder: Vec type is missing an element type");
+      const auto min_element_size = min_borsh_encoded_size(*type.vec_element, _program.get());
+      if (!min_element_size) {
+         FC_ASSERT(len == 0,
+                   "Borsh decoder: cannot safely bound vector element type '{}' before allocation",
+                   type.vec_element->to_string());
+      } else if (*min_element_size == 0) {
+         FC_ASSERT(len <= max_zero_sized_idl_vector_elements,
+                   "Borsh decoder: zero-sized vector length {} for element type '{}' exceeds decode cap {}",
+                   len, type.vec_element->to_string(), max_zero_sized_idl_vector_elements);
+      } else {
+         FC_ASSERT(len <= decoder.remaining() / *min_element_size,
+                   "Borsh decoder: vector length {} for element type '{}' exceeds remaining {} bytes",
+                   len, type.vec_element->to_string(), decoder.remaining());
+      }
+
       fc::variants arr;
       arr.reserve(len);
 
