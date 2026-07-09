@@ -63,6 +63,15 @@ message Message {
 // ---------------------------------------------------------------------------
 
 // Envelope that spans a range of messages within an epoch.
+//
+// Envelopes chain per (depot, outpost) stream: `previous_envelope_hash` carries the epoch digest
+// of the previously emitted envelope, defined as keccak256 over the FIELD-COMPLETE canonical
+// encoding (every singular field written, including proto3 defaults) with `envelope_hash` blanked.
+// That canonical encoding is produced by the generated Solidity/Solana codecs and, on the WIRE
+// depot, by `contracts/sysio.opp.common/include/sysio.opp.common/opp_canonical_codec.hpp`.
+// Any change to this message or the types it embeds (Endpoints, ChainId, Message, MessageHeader,
+// MessagePayload, AttestationEntry, EncodingFlags) MUST be mirrored there, and the cross-language
+// golden vectors in `contracts/tests/sysio.msgch_chain_tests.cpp` regenerated.
 message Envelope {
    bytes          envelope_hash          = 1; // 32 bytes
    Endpoints      endpoints              = 2;

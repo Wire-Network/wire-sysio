@@ -19,6 +19,8 @@ namespace sysio {
 struct outbound_envelope_record {
    uint64_t          chain_code        = 0;
    uint32_t          epoch_index       = 0;
+   /// Canonical epoch digest of the envelope (hex): keccak256 of `raw_envelope`, matching the
+   /// receiving outpost's consensus digest and the next emit's `previous_envelope_hash`.
    std::string       envelope_hash_hex;
    std::vector<char> raw_envelope;
 };

@@ -194,7 +194,16 @@ namespace sysio {
             sysio::const_mem_fun<attestation_entry, uint64_t, &attestation_entry::by_epoch>>
       >;
 
-      /// Outbound envelope table.
+      /// Outbound envelope table. One-deep per outpost: `buildenv` erases every older row for the
+      /// destination `chain_code` after inserting the new emit, so the surviving row doubles as the
+      /// per-outpost chain tip.
+      ///
+      /// `envelope_hash` is the canonical epoch digest: keccak256 over the canonical
+      /// field-complete encoding with the in-envelope `envelope_hash` field blanked (equal to
+      /// keccak256(`raw_envelope`), which is emitted in exactly that canonical form; see
+      /// opp_canonical_codec.hpp). It matches the digest the receiving outpost computes
+      /// (`OPPCommon.epochHash`) and is what the next emit for this outpost carries in its
+      /// `previous_envelope_hash`.
       struct [[sysio::table("outenvelopes")]] outbound_envelope {
          uint64_t    id;
          uint64_t    chain_code;
@@ -228,19 +237,27 @@ namespace sysio {
       /// Per-outpost consensus tracking for the current epoch.
       /// One row per outpost. Rows reused (not erased) to avoid RAM churn.
       ///
-      /// `winning_checksum` is the canonical envelope checksum for `epoch_index` — recorded when
-      /// consensus is reached (majority/unanimous path) or when a Tier-1 dispute vote resolves
-      /// (via `resolvedisp`). `sysio.epoch::advance` reads it to classify each operator's delivery:
-      /// a matching checksum is a hit, a non-matching delivered checksum is slashed. Zero until a
-      /// winner exists for the current epoch.
+      /// `winning_checksum` is the winning delivery checksum (sha256 of the raw delivered bytes)
+      /// for `epoch_index`, recorded when consensus is reached (majority/unanimous path) or when
+      /// a Tier-1 dispute vote resolves (via `resolvedisp`). `sysio.epoch::advance` reads it to
+      /// classify each operator's delivery: a matching checksum is a hit, a non-matching delivered
+      /// checksum is slashed. Zero until a winner exists for the current epoch.
+      ///
+      /// `envelope_digest` is the inbound chain tip: the canonical epoch digest (keccak256 over
+      /// the canonical field-complete encoding with `envelope_hash` blanked; see
+      /// opp_canonical_codec.hpp) of the last ACCEPTED envelope from this outpost. The next
+      /// accepted envelope's `previous_envelope_hash` must continue from it. Zero until the first
+      /// envelope from this outpost is accepted. Unlike `epoch_index`/`winning_checksum` it is a
+      /// running tip, not per-epoch state.
       struct [[sysio::table("outpcons")]] outpost_consensus_entry {
          uint64_t    chain_code;
          uint32_t    epoch_index;
          bool        consensus_reached;
          checksum256 winning_checksum;
+         checksum256 envelope_digest;
 
          SYSLIB_SERIALIZE(outpost_consensus_entry,
-            (chain_code)(epoch_index)(consensus_reached)(winning_checksum))
+            (chain_code)(epoch_index)(consensus_reached)(winning_checksum)(envelope_digest))
       };
 
       using outpost_consensus_t =
@@ -280,11 +297,12 @@ namespace sysio {
 
       /// Audit-trail row for the durable envelope log. Pure metadata —
       /// `endpoints` (start/end ChainId pair from the inbound or outbound
-      /// envelope), the `epoch_index` it corresponds to, the keccak/sha256
-      /// `checksum` of the encoded envelope bytes, and the `emitted_at`
-      /// timestamp. Raw payload is consumed inline by the consensus +
-      /// dispatch path and never stored. Off-chain audit reconstruction is
-      /// out of scope.
+      /// envelope), the `epoch_index` it corresponds to, the `checksum`
+      /// (the envelope's canonical epoch digest, keccak256 per
+      /// opp_canonical_codec.hpp, for outbound emits and accepted inbound
+      /// envelopes alike), and the `emitted_at` timestamp. Raw payload is
+      /// consumed inline by the consensus + dispatch path and never stored.
+      /// Off-chain audit reconstruction is out of scope.
       ///
       /// Total row count is capped at
       /// `active_outposts * 2 * epoch_retention_envelope_log_count`
