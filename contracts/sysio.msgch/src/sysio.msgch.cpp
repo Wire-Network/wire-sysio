@@ -903,25 +903,23 @@ void apply_consensus(name self, uint64_t chain_code, uint32_t epoch_index,
    auto decode_result = in(envelope);
    check(decode_result == zpp::bits::errc{}, "failed to decode inbound OPP Envelope");
 
-   // Inbound chain verification (staged). Outposts self-chain their outbound envelopes:
+   // Inbound chain verification (ENFORCED). Outposts self-chain their outbound envelopes:
    // `previous_envelope_hash` must continue from the canonical epoch digest of the envelope
    // accepted before it from the same outpost (`outpcons.envelope_digest`). The digest is
    // recomputed from the DECODED envelope (a defensive re-encode, exactly like the outposts'
    // `OPPCommon.epochHash`), so a byte-mutated but semantically identical delivery canonicalises
-   // to the same digest. Staging mirrors the Ethereum OPPInbound: an EMPTY prev-hash is accepted
-   // and logged, because not every outpost chains yet; a NON-empty prev-hash that does not
-   // continue the recorded tip is a chain break and the envelope is dropped before any dispatch,
+   // to the same digest. Both outposts now self-chain per stream — the EVM outpost via
+   // `OPP.prevEpochHash`, the SVM outpost via `previous_outbound_epoch_hash` (wire-solana
+   // SEC-114) — so once a chain tip is recorded for an outpost, a NON-continuing
+   // `previous_envelope_hash` is a chain break and the envelope is dropped before any dispatch,
    // consensus record, or cleanup (delivery rows stay intact for audit/dispute), per the
-   // never-throw handler convention.
-   //
-   // INTERIM, remove when the Solana outpost adopts per-stream chaining: the Solana outpost
-   // stamps its outbound `previous_envelope_hash` from its single `previous_epoch_hash` slot,
-   // which only its `epoch_in` advances, so its envelopes link to the digest of the last DEPOT
-   // envelope it accepted rather than to its own previous emit. That is still an exact digest
-   // binding the depot can verify locally: the linked digest is this contract's own last
-   // outbound emit for the outpost (the surviving one-deep `outenvelopes` row). Accept that
-   // link as an alternate continuation for SVM outposts ONLY; EVM outposts chain per-stream
-   // and get no fallback.
+   // never-throw handler convention. An EMPTY `previous_envelope_hash` is valid only at genesis,
+   // when the recorded tip itself is still empty; a non-empty value must be exactly the 32-byte
+   // tip (`to_checksum256_exact` rejects any other length, so a wrong-sized or all-zero field is
+   // a break, matching the outposts' canonical-form enforcement). The previous STAGED acceptance
+   // of an empty prev-hash for non-genesis epochs, and the INTERIM SVM cross-stream fallback that
+   // bridged the pre-SEC-114 Solana outpost, are both removed now that per-stream chaining is
+   // live on both chains.
    //
    // The source chain row also feeds the audit-log endpoints projection below; `deliver`
    // validated it at delivery time, and `resolvedisp` re-enters through the same registry.
@@ -936,32 +934,12 @@ void apply_consensus(name self, uint64_t chain_code, uint32_t epoch_index,
       const checksum256 chain_tip =
          opcons.contains(opc_pk) ? opcons.get(opc_pk).envelope_digest : checksum256{};
       if (chain_tip != checksum256{}) {
-         if (envelope.previous_envelope_hash.empty()) {
-            sysio::print_f("apply_consensus: chain_code=%llu epoch=%u accepted with empty "
-                           "previous_envelope_hash (staged chain enforcement)\n",
+         const auto prev = to_checksum256_exact(envelope.previous_envelope_hash);
+         if (!prev.has_value() || *prev != chain_tip) {
+            sysio::print_f("DROP envelope chain break: chain_code=%llu epoch=%u "
+                           "previous_envelope_hash does not continue the accepted chain\n",
                            static_cast<unsigned long long>(chain_code), epoch_index);
-         } else {
-            const auto prev = to_checksum256_exact(envelope.previous_envelope_hash);
-            bool continues_chain = prev.has_value() && *prev == chain_tip;
-            if (!continues_chain && prev.has_value() &&
-                op_row.kind == ChainKind::CHAIN_KIND_SVM) {
-               msgch::outenvelopes_t outenvs(self);
-               auto by_outpost = outenvs.get_index<"byoutpost"_n>();
-               auto out_it = by_outpost.lower_bound(chain_code);
-               if (out_it != by_outpost.end() && out_it->chain_code == chain_code &&
-                   *prev == out_it->envelope_hash) {
-                  continues_chain = true;
-                  sysio::print_f("apply_consensus: chain_code=%llu epoch=%u accepted via "
-                                 "cross-stream link to the depot's last outbound emit\n",
-                                 static_cast<unsigned long long>(chain_code), epoch_index);
-               }
-            }
-            if (!continues_chain) {
-               sysio::print_f("DROP envelope chain break: chain_code=%llu epoch=%u "
-                              "previous_envelope_hash does not continue the accepted chain\n",
-                              static_cast<unsigned long long>(chain_code), epoch_index);
-               return;
-            }
+            return;
          }
       }
    }
