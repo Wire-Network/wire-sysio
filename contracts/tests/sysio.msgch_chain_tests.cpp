@@ -8,10 +8,12 @@
 /// including proto3 defaults) that the outpost codecs (`OPPCommon.epochHash`) re-derive.
 ///
 /// Inbound: `apply_consensus` records the accepted envelope's canonical digest as the per-outpost
-/// chain tip (`outpcons.envelope_digest`) and verifies each envelope continues the chain. STAGED
-/// enforcement, mirroring the Ethereum `OPPInbound`: an empty `previous_envelope_hash` is accepted
-/// and logged (not every outpost chains yet); a non-empty one that does not match the tip drops
-/// the envelope without dispatching and without throwing.
+/// chain tip (`outpcons.envelope_digest`) and verifies each envelope continues the chain. ENFORCED
+/// (SEC-107 completion): both outposts self-chain per stream, so once a tip is recorded an empty
+/// `previous_envelope_hash` is a chain break (valid only at genesis, before any tip); a non-empty
+/// one must be exactly the 32-byte tip. Any other value — empty, wrong length, or non-matching —
+/// drops the envelope without dispatching and without throwing. An outpost's FIRST accepted
+/// envelope (no tip yet) still bootstraps regardless of its prev-hash.
 ///
 /// The oracle encoder in this file is an independent host-side reimplementation of the canonical
 /// encoding (the contract-side implementation is
@@ -676,24 +678,25 @@ BOOST_FIXTURE_TEST_CASE(inbound_chain_tip_recorded_and_verified, sysio_msgch_cha
    BOOST_REQUIRE_EQUAL(opc["envelope_digest"].as_string(), n2_digest.str()); // tip unchanged
    BOOST_REQUIRE_EQUAL(attestation_count(ETH_OUTPOST_ID, break_epoch), 0u);  // nothing dispatched
 
-   // Epoch E+3: staged enforcement: an EMPTY prev is still accepted (not every outpost chains
-   // yet) and re-tips the chain to the accepted envelope's digest.
-   const uint32_t staged_epoch = advance_one_epoch();
-   auto n4 = encode_delivery(staged_epoch, "delta");
-   const auto n4_digest = oracle::epoch_digest(decode_envelope(n4));
+   // Epoch E+3: enforcement (SEC-107 completion): an EMPTY prev on a non-genesis epoch is now a
+   // chain break. Both outposts self-chain per stream, so once a tip is recorded an empty
+   // prev-hash no longer bootstraps — it is dropped without throwing and the tip does not move.
+   const uint32_t empty_epoch = advance_one_epoch();
+   auto n4 = encode_delivery(empty_epoch, "delta");   // no prev => empty field
    BOOST_REQUIRE_EQUAL(success(), deliver(ETH_OUTPOST_ID, n4));
    produce_blocks();
 
    opc = get_outpcons(ETH_OUTPOST_ID);
-   BOOST_REQUIRE_EQUAL(opc["epoch_index"].as<uint32_t>(), staged_epoch);
-   BOOST_REQUIRE_EQUAL(opc["envelope_digest"].as_string(), n4_digest.str());
-   BOOST_REQUIRE_EQUAL(attestation_count(ETH_OUTPOST_ID, staged_epoch), 1u);
+   BOOST_REQUIRE_EQUAL(opc["epoch_index"].as<uint32_t>(), epoch);            // still E+1
+   BOOST_REQUIRE_EQUAL(opc["envelope_digest"].as_string(), n2_digest.str()); // tip unchanged
+   BOOST_REQUIRE_EQUAL(attestation_count(ETH_OUTPOST_ID, empty_epoch), 0u);  // nothing dispatched
 
    // Epoch E+4: a populated envelope_hash field is blanked out of the digest: the envelope is
    // byte-different but canonicalises to the same digest as its blank-hash twin, and a correctly
-   // chained prev keeps the chain moving.
+   // chained prev (from the still-current tip n2, since the empty E+3 delivery was dropped) keeps
+   // the chain moving.
    const uint32_t blank_epoch = advance_one_epoch();
-   auto n5 = encode_delivery(blank_epoch, "echo", oracle::digest_bytes(n4_digest),
+   auto n5 = encode_delivery(blank_epoch, "echo", oracle::digest_bytes(n2_digest),
                              /*env_hash=*/std::string(32, '\x22'));
    auto n5_env = decode_envelope(n5);
    BOOST_REQUIRE_EQUAL(n5_env.envelope_hash().size(), 32u);
@@ -706,20 +709,23 @@ BOOST_FIXTURE_TEST_CASE(inbound_chain_tip_recorded_and_verified, sysio_msgch_cha
    BOOST_REQUIRE_EQUAL(opc["envelope_digest"].as_string(), n5_digest.str());
 } FC_LOG_AND_RETHROW() }
 
-/// INTERIM Solana cross-stream semantics: the Solana outpost stamps its outbound
-/// `previous_envelope_hash` from its single inbound tip slot, so its envelopes link to the digest
-/// of the last DEPOT envelope it accepted (the depot's own outbound emit) instead of its own
-/// previous emit. The depot accepts that link as an alternate continuation for SVM outposts only;
-/// remove this case when the outpost adopts per-stream chaining.
-BOOST_FIXTURE_TEST_CASE(inbound_accepts_cross_stream_link_for_svm_outposts,
+/// SEC-107 completion: the SVM cross-stream alternate is REMOVED. The Solana outpost now
+/// self-chains per stream (wire-solana SEC-114 `previous_outbound_epoch_hash`), so an envelope
+/// linking to the depot's own outbound emit digest instead of the outpost's inbound tip is a
+/// chain break for SVM exactly as it is for EVM — the interim fallback no longer accepts it.
+BOOST_FIXTURE_TEST_CASE(inbound_rejects_cross_stream_link_for_svm_outposts,
                         sysio_msgch_chain_tester) { try {
    bootstrap();
 
-   // Establish an inbound tip for SOL (bootstrap accept), so the alternate link is what gets
+   // Establish an inbound tip for SOL (bootstrap accept), so the cross-stream link is what gets
    // exercised on the next delivery rather than the no-tip bootstrap rule.
    uint32_t epoch = current_epoch();
-   BOOST_REQUIRE_EQUAL(success(), deliver(SOL_OUTPOST_ID, encode_delivery(epoch, "xstream-a")));
+   auto n1 = encode_delivery(epoch, "xstream-a");
+   const auto n1_digest = oracle::epoch_digest(decode_envelope(n1));
+   BOOST_REQUIRE_EQUAL(success(), deliver(SOL_OUTPOST_ID, n1));
    produce_blocks();
+
+   const uint32_t tip_epoch = epoch;
 
    // Next epoch: emit a depot outbound envelope, then deliver an inbound envelope whose prev is
    // that emit's digest (NOT the inbound tip). Building the outbound envelope in the delivery
@@ -735,20 +741,20 @@ BOOST_FIXTURE_TEST_CASE(inbound_accepts_cross_stream_link_for_svm_outposts,
                                          outbound_digest_bytes.data(),
                                          outbound_digest_bytes.size()));
 
-   auto n2 = encode_delivery(epoch, "xstream-b", outbound_digest_bytes);
-   const auto n2_digest = oracle::epoch_digest(decode_envelope(n2));
-   BOOST_REQUIRE_EQUAL(success(), deliver(SOL_OUTPOST_ID, n2));
+   // Cross-stream link (prev = depot's outbound emit digest) is now a chain break: dropped
+   // without throwing, tip does not move, nothing dispatched.
+   BOOST_REQUIRE_EQUAL(success(),
+      deliver(SOL_OUTPOST_ID, encode_delivery(epoch, "xstream-b", outbound_digest_bytes)));
    produce_blocks();
 
    auto opc = get_outpcons(SOL_OUTPOST_ID);
-   BOOST_REQUIRE_EQUAL(opc["epoch_index"].as<uint32_t>(), epoch);
-   BOOST_REQUIRE_EQUAL(opc["envelope_digest"].as_string(), n2_digest.str());
-   BOOST_REQUIRE_EQUAL(attestation_count(SOL_OUTPOST_ID, epoch), 1u);
+   BOOST_REQUIRE_EQUAL(opc["epoch_index"].as<uint32_t>(), tip_epoch);          // not advanced
+   BOOST_REQUIRE_EQUAL(opc["envelope_digest"].as_string(), n1_digest.str());   // tip unchanged
+   BOOST_REQUIRE_EQUAL(attestation_count(SOL_OUTPOST_ID, epoch), 0u);          // nothing dispatched
 } FC_LOG_AND_RETHROW() }
 
-/// The cross-stream alternate is SVM-scoped: an EVM outpost chains per-stream, so an envelope
-/// linking to the depot's outbound emit digest instead of the inbound tip is a chain break and
-/// drops.
+/// EVM outposts chain per-stream, so an envelope linking to the depot's outbound emit digest
+/// instead of the inbound tip is a chain break and drops (same rule as SVM now).
 BOOST_FIXTURE_TEST_CASE(inbound_rejects_cross_stream_link_for_evm_outposts,
                         sysio_msgch_chain_tester) { try {
    bootstrap();
