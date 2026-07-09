@@ -1,0 +1,108 @@
+name: "Actions cache cleanup"
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "List eligible ccache entries without deleting them"
+        type: boolean
+        default: false
+      keep_per_prefix:
+        description: "Non-PR ccache entries to keep per platform prefix"
+        type: number
+        default: 2
+  schedule:
+    # Keep Actions cache usage below the repository cap so ccache families do not thrash each other.
+    - cron: "35 3 * * *"
+
+permissions:
+  actions: write
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  prune-ccache:
+    name: Prune ccache entries
+    runs-on: ubuntu-latest
+    env:
+      CACHE_CLEANUP_DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
+      GH_REPO: ${{ github.repository }}
+      GH_TOKEN: ${{ github.token }}
+      KEEP_PER_PREFIX: ${{ github.event.inputs.keep_per_prefix || '2' }}
+    steps:
+      - name: Delete stale ccache entries
+        run: |
+          set -euo pipefail
+
+          case "$KEEP_PER_PREFIX" in
+            ''|*[!0-9]*)
+              echo "::error::keep_per_prefix must be a non-negative integer"
+              exit 1
+              ;;
+          esac
+
+          caches_json="$(mktemp)"
+          delete_list="$(mktemp)"
+
+          # Collect ccache entries across all refs. PR-scoped entries are deleted first because
+          # PR jobs restore shared caches but no longer save new ccache blobs.
+          gh api --paginate "/repos/${GH_REPO}/actions/caches?per_page=100" \
+            --jq '.actions_caches[] | select(.key | startswith("ccache-"))' > "$caches_json"
+
+          jq -s -r --argjson keep "$KEEP_PER_PREFIX" '
+            def prefix:
+              if .key | startswith("ccache-macos-arm64-") then "ccache-macos-arm64"
+              elif .key | startswith("ccache-ubuntu24-") then "ccache-ubuntu24"
+              elif .key | startswith("ccache-asserton-") then "ccache-asserton"
+              elif .key | startswith("ccache-ubsan-") then "ccache-ubsan"
+              elif .key | startswith("ccache-asan-") then "ccache-asan"
+              elif .key | startswith("ccache-gcc-") then "ccache-gcc"
+              else empty
+              end;
+
+            def candidate:
+              . + {prefix: prefix};
+
+            [.[] | candidate] as $all
+            | (
+                $all[]
+                | select(.ref | startswith("refs/pull/"))
+                | . + {reason: "pull-request scope"}
+              ),
+              (
+                $all
+                | map(select((.ref | startswith("refs/pull/")) | not))
+                | sort_by(.prefix)
+                | group_by(.prefix)[]
+                | sort_by(.last_accessed_at // .created_at)
+                | reverse
+                | .[$keep:][]
+                | . + {reason: "older than keep_per_prefix"}
+              )
+            | [.id, .key, .ref, .reason, (.size_in_bytes | tostring)]
+            | @tsv
+          ' "$caches_json" > "$delete_list"
+
+          if [[ ! -s "$delete_list" ]]; then
+            echo "No ccache entries are eligible for deletion."
+            exit 0
+          fi
+
+          total_bytes="$(awk -F '\t' '{sum += $5} END {print sum + 0}' "$delete_list")"
+          total_mib="$((total_bytes / 1024 / 1024))"
+          echo "Eligible ccache entries:"
+          awk -F '\t' '{printf "- %s (%s, %s, %d MiB) [%s]\n", $2, $3, $4, $5 / 1024 / 1024, $1}' "$delete_list"
+          echo "Total eligible size: ${total_mib} MiB"
+
+          while IFS=$'\t' read -r cache_id cache_key cache_ref reason size_bytes; do
+            if [[ "$CACHE_CLEANUP_DRY_RUN" == "true" ]]; then
+              echo "Dry run: would delete ${cache_key} (${cache_ref}, ${reason})"
+              continue
+            fi
+
+            echo "Deleting ${cache_key} (${cache_ref}, ${reason})"
+            gh cache delete "$cache_id" --repo "$GH_REPO"
+          done < "$delete_list"

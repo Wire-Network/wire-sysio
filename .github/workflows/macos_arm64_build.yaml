@@ -136,7 +136,7 @@ jobs:
           key: ctest-cost-macos-arm64-${{ github.run_id }}-${{ github.run_attempt }}
 
       - name: Save ccache
-        if: ${{ always() && steps.restore-ccache.outputs.cache-hit != 'true' }}
+        if: ${{ always() && github.event_name != 'pull_request' && steps.restore-ccache.outputs.cache-hit != 'true' }}
         uses: actions/cache/save@caa296126883cff596d87d8935842f9db880ef25 # actions/cache/save@v5
         with:
           path: ${{ github.workspace }}/.ccache
