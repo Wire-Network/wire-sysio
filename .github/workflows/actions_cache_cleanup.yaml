@@ -19,6 +19,10 @@ permissions:
   actions: write
   contents: read
 
+concurrency:
+  group: actions-cache-cleanup
+  cancel-in-progress: false
+
 defaults:
   run:
     shell: bash
@@ -43,6 +47,10 @@ jobs:
               exit 1
               ;;
           esac
+          if (( KEEP_PER_PREFIX < 1 )); then
+            echo "::error::keep_per_prefix must be >= 1 to preserve the restore baseline"
+            exit 1
+          fi
 
           caches_json="$(mktemp)"
           delete_list="$(mktemp)"
@@ -54,14 +62,7 @@ jobs:
 
           jq -s -r --argjson keep "$KEEP_PER_PREFIX" '
             def prefix:
-              if .key | startswith("ccache-macos-arm64-") then "ccache-macos-arm64"
-              elif .key | startswith("ccache-ubuntu24-") then "ccache-ubuntu24"
-              elif .key | startswith("ccache-asserton-") then "ccache-asserton"
-              elif .key | startswith("ccache-ubsan-") then "ccache-ubsan"
-              elif .key | startswith("ccache-asan-") then "ccache-asan"
-              elif .key | startswith("ccache-gcc-") then "ccache-gcc"
-              else empty
-              end;
+              .key | sub("-[0-9a-f]{7,40}$"; "");
 
             def candidate:
               . + {prefix: prefix};
@@ -104,5 +105,7 @@ jobs:
             fi
 
             echo "Deleting ${cache_key} (${cache_ref}, ${reason})"
-            gh cache delete "$cache_id" --repo "$GH_REPO"
+            if ! gh cache delete "$cache_id" --repo "$GH_REPO"; then
+              echo "::warning::failed to delete ${cache_key} (${cache_ref}); continuing"
+            fi
           done < "$delete_list"
