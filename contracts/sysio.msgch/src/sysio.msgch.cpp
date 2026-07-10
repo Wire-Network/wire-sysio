@@ -1604,9 +1604,13 @@ void msgch::buildenv(uint64_t chain_code) {
       }
       header.timestamp = zpp::bits::vuint64_t{now_ms};
 
+      // The stored tip is always empty (genesis) or a full 32-byte id; a non-canonical length
+      // here means corrupted own-state and must fail loudly, unlike the inbound never-throw path.
+      const auto prev_sequence = opp::canonical::message_sequence(prev_message_id);
+      check(prev_sequence.has_value(),
+            "sysio.msgch::buildenv: stored outbound message tip is malformed");
       const checksum256 header_checksum = opp::canonical::header_digest(header);
-      message_id = opp::canonical::derive_message_id(
-         header_checksum, opp::canonical::message_sequence(prev_message_id) + 1);
+      message_id = opp::canonical::derive_message_id(header_checksum, *prev_sequence + 1);
       {
          const auto hc_bytes = header_checksum.extract_as_byte_array();
          header.header_checksum.assign(hc_bytes.begin(), hc_bytes.end());

@@ -44,6 +44,7 @@
 #include <magic_enum/magic_enum.hpp>
 
 #include <cstdint>
+#include <optional>
 #include <vector>
 
 namespace sysio::opp::canonical {
@@ -384,12 +385,18 @@ inline sysio::checksum256 derive_message_id(const sysio::checksum256& header_che
    return sysio::checksum256{bytes};
 }
 
-/// The big-endian sequence number carried in the first 8 bytes of a wire `message_id`. Empty
-/// (stream genesis) — and any out-of-spec id shorter than 8 bytes — reads as 0, so the successor
-/// message's sequence number is 1.
-inline uint64_t message_sequence(const std::vector<char>& message_id) {
-   if (message_id.size() < 8) {
+/// The big-endian sequence number carried in the first 8 bytes of a wire `message_id`, accepting
+/// only the two canonical forms: an EMPTY id (stream genesis) reads as 0, so the successor
+/// message's sequence number is 1, and a 32-byte id yields its first 8 bytes. Any other length
+/// is non-canonical and yields std::nullopt — verifiers treat it as a mismatch, never as genesis
+/// or as a sequence source (1-7 bytes would otherwise alias genesis, and any other length would
+/// alias a truncated or padded id).
+inline std::optional<uint64_t> message_sequence(const std::vector<char>& message_id) {
+   if (message_id.empty()) {
       return 0;
+   }
+   if (message_id.size() != 32) {
+      return std::nullopt;
    }
    uint64_t sequence = 0;
    for (size_t i = 0; i < 8; ++i) {
