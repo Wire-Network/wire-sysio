@@ -341,19 +341,33 @@ std::optional<checksum256> to_checksum256_exact(const std::vector<char>& bytes) 
 }
 
 /// Validate every message's semantic header (opp.proto MessageHeader) against the spec
-/// derivation shared by all three emitters: each attestation's `data_size` must equal its `data`
-/// length, `payload_size` / `payload_checksum` must recompute over the payload's canonical
-/// bytes, `header_checksum` must recompute over the field-complete header with `message_id` and
+/// derivation shared by all three emitters AND against the per-outpost inbound message chain.
+///
+/// Per-message self-consistency: each attestation's `data_size` must equal its `data` length,
+/// `payload_size` / `payload_checksum` must recompute over the payload's canonical bytes,
+/// `header_checksum` must recompute over the field-complete header with `message_id` and
 /// `header_checksum` blanked, and `message_id` must be that checksum with its first 8 bytes
 /// replaced by `previous_message_id`'s sequence number + 1.
 ///
-/// Every check is SELF-CONTAINED (no cross-envelope state): stream ordering is already enforced
-/// by the envelope-level chain in `apply_consensus`, so a per-outpost inbound message tip is
-/// deliberately not tracked here. A zero-message envelope is trivially valid -- the EVM outpost
-/// emits empty-messages envelopes as epoch acks. Returns false on the first mismatch; the caller
-/// drops the envelope without dispatching and without throwing, per the never-throw handler
-/// convention.
-[[nodiscard]] bool semantic_headers_ok(const opp::Envelope& envelope, uint64_t chain_code,
+/// Chain continuity: `inbound_message_tip` is the `message_id` of the last accepted message from
+/// this outpost (empty at stream genesis). The first message must continue it -- its
+/// `previous_message_id` must equal the tip -- and each subsequent message in the envelope must
+/// chain to the one before it (`previous_message_id` == the prior message's `message_id`). This
+/// is what stops replay: the envelope-level chain orders envelopes but does not bind the messages
+/// inside them, so without this a correctly envelope-chained successor could carry an earlier
+/// valid `Message` verbatim (self-consistent header and all) and re-dispatch its attestations --
+/// e.g. crediting one escrow deposit twice. As with the envelope chain, the FIRST message ever
+/// accepted for an outpost (empty tip) bootstraps regardless of its `previous_message_id`; from
+/// then on the stream is strictly chained.
+///
+/// On success `new_message_tip` is set to the last message's `message_id` (or left equal to
+/// `inbound_message_tip` for a zero-message envelope -- the EVM outpost emits empty-message epoch
+/// acks, which are valid and leave the tip unmoved). Returns false on the first violation; the
+/// caller drops the envelope without dispatching and without throwing, per the never-throw
+/// handler convention.
+[[nodiscard]] bool semantic_headers_ok(const opp::Envelope& envelope,
+                                       const checksum256& inbound_message_tip,
+                                       checksum256& new_message_tip, uint64_t chain_code,
                                        uint32_t epoch_index) {
    const auto drop = [&](size_t msg_index, const char* what) {
       sysio::print_f("DROP envelope semantic header: chain_code=%llu epoch=%u message=%llu %s\n",
@@ -361,6 +375,9 @@ std::optional<checksum256> to_checksum256_exact(const std::vector<char>& bytes) 
                      static_cast<unsigned long long>(msg_index), what);
       return false;
    };
+
+   checksum256 running_tip     = inbound_message_tip;
+   bool        have_predecessor = inbound_message_tip != checksum256{};
 
    for (size_t i = 0; i < envelope.messages.size(); ++i) {
       const auto& msg    = envelope.messages[i];
@@ -402,7 +419,24 @@ std::optional<checksum256> to_checksum256_exact(const std::vector<char>& bytes) 
       if (!claimed_id.has_value() || *claimed_id != expected_id) {
          return drop(i, "message_id does not derive from header_checksum and the sequence number");
       }
+
+      // Chain continuity: bind this message to the real predecessor (the stored inbound tip for
+      // the first message, the prior message's id for the rest). The self-consistency check above
+      // only proves `message_id` embeds `seq(previous_message_id) + 1`; without this a replayed
+      // message would carry a self-consistent header whose `previous_message_id` points at some
+      // OLD tip rather than the current one. Skipped only for the very first message ever accepted
+      // for the outpost (empty tip), matching the envelope-chain bootstrap.
+      if (have_predecessor) {
+         const auto claimed_prev = to_checksum256_exact(header.previous_message_id);
+         if (!claimed_prev.has_value() || *claimed_prev != running_tip) {
+            return drop(i, "previous_message_id does not continue the accepted message stream");
+         }
+      }
+      running_tip      = *claimed_id;
+      have_predecessor = true;
    }
+
+   new_message_tip = running_tip;
    return true;
 }
 
@@ -994,11 +1028,16 @@ void apply_consensus(name self, uint64_t chain_code, uint32_t epoch_index,
       return chains_tbl.get(sysio::chains::chain_key{sysio::slug_name{chain_code}});
    }();
    const checksum256 envelope_digest = opp::canonical::epoch_digest(envelope);
+   checksum256 inbound_message_tip{};
    {
       msgch::outpost_consensus_t opcons(self);
       auto opc_pk = msgch::outpost_consensus_key{chain_code};
-      const checksum256 chain_tip =
-         opcons.contains(opc_pk) ? opcons.get(opc_pk).envelope_digest : checksum256{};
+      checksum256 chain_tip{};
+      if (opcons.contains(opc_pk)) {
+         const auto row     = opcons.get(opc_pk);
+         chain_tip          = row.envelope_digest;
+         inbound_message_tip = row.message_tip;
+      }
       if (chain_tip != checksum256{}) {
          const auto prev = to_checksum256_exact(envelope.previous_envelope_hash);
          if (!prev.has_value() || *prev != chain_tip) {
@@ -1011,10 +1050,16 @@ void apply_consensus(name self, uint64_t chain_code, uint32_t epoch_index,
    }
 
    // Semantic-header enforcement: every message's checksums and ids must recompute per the
-   // opp.proto MessageHeader spec, which all three emitters populate identically. A mismatch is
-   // a malformed or forged envelope -- dropped before any dispatch, consensus record, or cleanup
-   // (delivery rows stay intact for audit/dispute), per the never-throw handler convention.
-   if (!semantic_headers_ok(envelope, chain_code, epoch_index)) {
+   // opp.proto MessageHeader spec (which all three emitters populate identically), AND each
+   // message must continue the per-outpost inbound message chain from `inbound_message_tip` --
+   // this is what prevents replay of an earlier valid message inside a correctly envelope-chained
+   // successor. A violation is a malformed, forged, or replayed envelope -- dropped before any
+   // dispatch, consensus record, or cleanup (delivery rows stay intact for audit/dispute), per
+   // the never-throw handler convention. `new_message_tip` becomes the outpost's message tip on
+   // acceptance (unchanged for a zero-message ack).
+   checksum256 new_message_tip{};
+   if (!semantic_headers_ok(envelope, inbound_message_tip, new_message_tip, chain_code,
+                            epoch_index)) {
       return;
    }
 
@@ -1088,8 +1133,9 @@ void apply_consensus(name self, uint64_t chain_code, uint32_t epoch_index,
       }
    }
 
-   // Record per-outpost consensus: the winning delivery checksum (slash classification) and the
-   // accepted envelope's canonical epoch digest (the new inbound chain tip).
+   // Record per-outpost consensus: the winning delivery checksum (slash classification), the
+   // accepted envelope's canonical epoch digest (the new inbound ENVELOPE tip), and the last
+   // accepted message's id (the new inbound MESSAGE tip -- unchanged for a zero-message ack).
    msgch::outpost_consensus_t opcons(self);
    auto opc_pk = msgch::outpost_consensus_key{chain_code};
    if (!opcons.contains(opc_pk)) {
@@ -1099,6 +1145,7 @@ void apply_consensus(name self, uint64_t chain_code, uint32_t epoch_index,
          .consensus_reached = true,
          .winning_checksum  = winning_checksum,
          .envelope_digest   = envelope_digest,
+         .message_tip       = new_message_tip,
       });
    } else {
       opcons.modify(same_payer, opc_pk, [&](auto& r) {
@@ -1106,6 +1153,7 @@ void apply_consensus(name self, uint64_t chain_code, uint32_t epoch_index,
          r.consensus_reached = true;
          r.winning_checksum  = winning_checksum;
          r.envelope_digest   = envelope_digest;
+         r.message_tip       = new_message_tip;
       });
    }
 }

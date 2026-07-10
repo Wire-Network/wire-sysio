@@ -248,21 +248,32 @@ namespace sysio {
       /// classify each operator's delivery: a matching checksum is a hit, a non-matching delivered
       /// checksum is slashed. Zero until a winner exists for the current epoch.
       ///
-      /// `envelope_digest` is the inbound chain tip: the canonical epoch digest (keccak256 over
-      /// the canonical field-complete encoding with `envelope_hash` blanked; see
+      /// `envelope_digest` is the inbound ENVELOPE chain tip: the canonical epoch digest (keccak256
+      /// over the canonical field-complete encoding with `envelope_hash` blanked; see
       /// opp_canonical_codec.hpp) of the last ACCEPTED envelope from this outpost. The next
       /// accepted envelope's `previous_envelope_hash` must continue from it. Zero until the first
       /// envelope from this outpost is accepted. Unlike `epoch_index`/`winning_checksum` it is a
       /// running tip, not per-epoch state.
+      ///
+      /// `message_tip` is the inbound MESSAGE chain tip: the `message_id` of the last ACCEPTED
+      /// message from this outpost. The next accepted message's `previous_message_id` must equal
+      /// it, which — with the per-message sequence splice validated in `semantic_headers_ok` —
+      /// makes the message stream strictly monotonic and non-replayable. The envelope chain orders
+      /// envelopes but does not by itself bind the messages inside them, so without this a
+      /// correctly envelope-chained successor could replay an earlier valid `Message` verbatim and
+      /// re-dispatch its attestations. Zero until the first message from this outpost is accepted
+      /// (which may lag `envelope_digest` if the first accepted envelopes are empty-message acks).
       struct [[sysio::table("outpcons")]] outpost_consensus_entry {
          uint64_t    chain_code;
          uint32_t    epoch_index;
          bool        consensus_reached;
          checksum256 winning_checksum;
          checksum256 envelope_digest;
+         checksum256 message_tip;
 
          SYSLIB_SERIALIZE(outpost_consensus_entry,
-            (chain_code)(epoch_index)(consensus_reached)(winning_checksum)(envelope_digest))
+            (chain_code)(epoch_index)(consensus_reached)(winning_checksum)(envelope_digest)
+            (message_tip))
       };
 
       using outpost_consensus_t =
