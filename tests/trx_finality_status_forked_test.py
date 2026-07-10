@@ -15,9 +15,17 @@ from TestHarness.Node import BlockType
 #
 #  Test to verify that transaction finality status feature is
 #  working appropriately when forks occur.
-#  Note this test does not use transaction retry as forked out
-#  transactions should always make it into a block unless they
-#  expire.
+#  Note this test does not use the transaction retry feature.
+#  A forked out transaction is re-applied by the producer and
+#  normally makes it into a later block, but the producer may
+#  subjectively drop the re-applied transaction, for example
+#  when re-execution exceeds the speculative-retry CPU cap on
+#  a heavily loaded or sanitizer build. Forked out transactions
+#  are never rebroadcast, so such a drop is permanent and the
+#  status decays to FAILED once the transaction expires and to
+#  UNKNOWN once the failure duration purge runs. When that
+#  happens the test re-submits the transfer just like a real
+#  client would and tracks the replacement instead.
 #
 ###############################################################
 Print=Utils.Print
@@ -137,7 +145,7 @@ try:
         return status["head_id"]
 
     transferAmount = 10
-    # Does not use transaction retry (not needed)
+    # Does not use the transaction retry feature; see the resubmit note in the header comment
     transfer = prodD.transferFunds(cluster.sysioAccount, cluster.defproduceraAccount, f"{transferAmount}.0000 {CORE_SYMBOL}", "fund account")
     transBlockNum = transfer['processed']['block_num']
     transId = prodD.getLastTrackedTransactionId()
@@ -149,6 +157,40 @@ try:
     irreversibleState = "IRREVERSIBLE"
     forkedOutState = "FORKED_OUT"
     unknownState = "UNKNOWN"
+    failedState = "FAILED"
+
+    # The producer protects itself against expensive re-execution: a re-applied forked out transaction
+    # that exceeds the speculative-retry CPU cap is subjectively dropped, and since forked out
+    # transactions are never rebroadcast the drop is permanent. The status then decays to FAILED once the
+    # transaction expires and to UNKNOWN once the failure duration purge runs. Neither state can ever
+    # progress, so polling for IN_BLOCK/IRREVERSIBLE would hang forever. Recover the way a real client
+    # would: re-submit the transfer and track the replacement.
+    maxResubmits = 3
+    resubmitCount = 0
+    resubmitted = False
+
+    def resubmitIfDropped(status):
+        """Re-submit the tracked transfer if its status decayed to FAILED or UNKNOWN.
+
+        Returns True when a replacement transfer was submitted, with the module level transId and
+        transBlockNum updated to track it. Returns False when the status is still viable. Exits the test
+        with an error when the resubmit budget is exhausted.
+        """
+        global transId, transBlockNum, resubmitCount, resubmitted
+        state = getState(status)
+        if state != failedState and state != unknownState:
+            return False
+        resubmitCount += 1
+        if resubmitCount > maxResubmits:
+            errorExit(f"Transaction {transId} was dropped (state \"{state}\") and the resubmit budget of " + \
+                      f"{maxResubmits} is exhausted.\n\nstatus: {json.dumps(status, indent=1)}")
+        Print(f"Transaction {transId} was dropped by the producer (state \"{state}\"). Re-submitting the " + \
+              f"transfer as a real client would, resubmit {resubmitCount} of {maxResubmits}.")
+        replacement = prodD.transferFunds(cluster.sysioAccount, cluster.defproduceraAccount, f"{transferAmount}.0000 {CORE_SYMBOL}", "fund account")
+        transBlockNum = replacement['processed']['block_num']
+        transId = prodD.getLastTrackedTransactionId()
+        resubmitted = True
+        return True
 
     assert state == localState or state == inBlockState, \
         f"ERROR: getTransactionStatus didn't return \"{localState}\" or \"{inBlockState}\" state.\n\nstatus: {json.dumps(retStatus, indent=1)}"
@@ -180,6 +222,9 @@ try:
     while True:
         info = prodD.getInfo()
         retStatus = prodD.getTransactionStatus(transId)
+        if resubmitIfDropped(retStatus):
+            prodD.waitForNextBlock()
+            continue
         state = getState(retStatus)
         blockNum = getBlockNum(retStatus)
         if state == forkedOutState or ( info['head_block_producer'] == 'defproducerd' and info['last_irreversible_block_num'] > blockNum ):
@@ -191,9 +236,13 @@ try:
         testSuccessful = True
         sys.exit(0)
 
-    assert state == forkedOutState, \
-        f"ERROR: getTransactionStatus didn't return \"{forkedOutState}\" state.\n\nstatus: {json.dumps(retStatus, indent=1)}" + \
-        f"\n\nprod A info: {json.dumps(prodA.getInfo(), indent=1)}\n\nprod D info: {json.dumps(prodD.getInfo(), indent=1)}"
+    if resubmitted:
+        Print("Skipping the forked out check: the original transaction was dropped and its replacement was " + \
+              "submitted after the fork switch, so the replacement is not expected to fork out.")
+    else:
+        assert state == forkedOutState, \
+            f"ERROR: getTransactionStatus didn't return \"{forkedOutState}\" state.\n\nstatus: {json.dumps(retStatus, indent=1)}" + \
+            f"\n\nprod A info: {json.dumps(prodA.getInfo(), indent=1)}\n\nprod D info: {json.dumps(prodD.getInfo(), indent=1)}"
 
     for prodNode in prodNodes:
         info=prodNode.getInfo()
@@ -206,11 +255,15 @@ try:
     retStatus = prodD.getTransactionStatus(transId)
     state = getState(retStatus)
 
-    # it is possible for another fork switch to cause the trx to be forked out again
-    if state == forkedOutState or state == localState:
+    # it is possible for another fork switch to cause the trx to be forked out again, or for the producer
+    # to have subjectively dropped it (see the resubmit note above)
+    if state == forkedOutState or state == localState or state == failedState or state == unknownState:
         while True:
             info = prodD.getInfo()
             retStatus = prodD.getTransactionStatus(transId)
+            if resubmitIfDropped(retStatus):
+                prodD.waitForNextBlock()
+                continue
             state = getState(retStatus)
             if state == forkedOutState:
                 prodD.waitForNextBlock()
@@ -233,8 +286,11 @@ try:
         f"ERROR: Block never finalized.\n\nprod A info: {json.dumps(prodA.getInfo(), indent=1)}\n\nprod C info: {json.dumps(prodD.getInfo(), indent=1)}" + \
         f"\n\nafter fork in block state: {json.dumps(afterForkInBlockState, indent=1)}"
 
-    while True: # might have been forked out, if so wait for new block to become LIB
+    while True: # might have been forked out or dropped, if so wait for new block to become LIB
         retStatus = prodD.getTransactionStatus(transId)
+        if resubmitIfDropped(retStatus):
+            prodD.waitForNextBlock()
+            continue
         currentBlockId = getBlockID(retStatus)
         currentBlockNum = getBlockNum(retStatus)
         if afterForkBlockId == currentBlockId:
@@ -247,11 +303,15 @@ try:
     retStatus = prodD.getTransactionStatus(transId)
     state = getState(retStatus)
 
-    # it is possible for another fork switch to cause the trx to be forked out again
-    if state == forkedOutState:
+    # it is possible for another fork switch to cause the trx to be forked out again, or for the producer
+    # to have subjectively dropped it (see the resubmit note above)
+    if state == forkedOutState or state == failedState or state == unknownState:
         while True:
             info = prodD.getInfo()
             retStatus = prodD.getTransactionStatus(transId)
+            if resubmitIfDropped(retStatus):
+                prodD.waitForNextBlock()
+                continue
             state = getState(retStatus)
             blockNum = getBlockNum(retStatus)
             if state == irreversibleState or ( info['head_block_producer'] == 'defproducerd' and info['last_irreversible_block_num'] > blockNum ):
