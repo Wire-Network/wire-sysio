@@ -75,6 +75,7 @@ namespace sysio {
       if (name == "prometheus") return api_category::prometheus;
       if (name == "test_control") return api_category::test_control;
       if (name == "snapshot_ro") return api_category::snapshot_ro;
+      if (name == "underwriter") return api_category::underwriter;
       return api_category::unknown;
    }
 
@@ -91,6 +92,7 @@ namespace sysio {
       if (category == api_category::prometheus) return "prometheus";
       if (category == api_category::test_control) return "test_control";
       if (category == api_category::snapshot_ro) return "snapshot_ro";
+      if (category == api_category::underwriter) return "underwriter";
       if (category == api_category::node) return "node";
       // It's a programming error when the control flow reaches this point, 
       // please make sure all the category names are returned from above statements.
@@ -116,6 +118,8 @@ namespace sysio {
          return "sysio::producer_api_plugin";
       if (category == api_category::snapshot_ro)
          return "sysio::snapshot_api_plugin";
+      if (category == api_category::underwriter)
+         return "sysio::underwriter_plugin";
       // It's a programming error when the control flow reaches this point,
       // please make sure all the plugin names are returned from above statements.
       assert(false && "No corresponding plugin for the category value");
@@ -125,7 +129,7 @@ namespace sysio {
    std::string category_names(api_category_set set) {
       if (set == api_category_set::all()) return "all";
       std::string result;
-      for (uint32_t i = 1; i <= static_cast<uint32_t>(api_category::snapshot_ro); i<<=1) {
+      for (uint32_t i = 1; i <= static_cast<uint32_t>(api_category::underwriter); i<<=1) {
          if (set.contains(api_category(i))) {
             result += from_category(api_category(i));
             result += " ";
@@ -338,7 +342,7 @@ namespace sysio {
              "    in addition, unix socket path must starts with '/', './' or '../'. When relative path\n"
              "    is used, it is relative to the data path.\n\n"
              "    Valid categories include chain_ro, chain_rw, db_size, net_ro, net_rw, producer_ro\n"
-             "    producer_rw, snapshot, trace_api, prometheus, test_control, and snapshot_ro.\n\n"
+             "    producer_rw, snapshot, trace_api, prometheus, test_control, snapshot_ro, and underwriter.\n\n"
              "    A single `hostname:port` specification can be used by multiple categories\n" 
              "    However, two specifications having the same port with different hostname strings\n" 
              "    are always considered as configuration error regardless of whether they can be resolved\n"

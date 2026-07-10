@@ -106,6 +106,72 @@ verifies the signature against every permission on `uw_account` via the
 > the underwriter's per-chain contract / program address now lives in that
 > entry rather than in a per-family scalar option.
 
+## HTTP diagnostics
+
+Read-only diagnostic endpoints, served by `http_plugin` on the
+read-only exec queue:
+
+- `/v1/underwriter/stats` — session counters + config snapshot:
+  underwriter account, enabled/active flags, scan + timeout intervals,
+  per-chain outpost wiring (`chain_code`, `kind`, `client_id`,
+  `commit_addr`, `source_deposit_addr`), uwreq/commit/failure/mismatch
+  counters, outstanding-commit count, SOL source-deposit cursor health.
+- `/v1/underwriter/commits` — outstanding confirmed commits, one entry
+  per leg: `uwreq_id`, `chain_code`, `token_code`, `reserve_code`.
+
+Both carry a `status` discriminator. Until the deferred startup body
+completes they report the startup-gate state instead of the payload
+(`waiting_for_sync` with `head_behind_sec` / `lib_behind_sec`,
+`preflight_retrying`, or a terminal `preflight_failed` /
+`wiring_failed` / `startup_failed` with `detail`); once the gate opens
+they serve the payloads above with `status: "active"`.
+
+The endpoints are registered only when the underwriter is enabled:
+with the plugin loaded but `--underwriter-enabled false` (the
+default), `plugin_startup` skips endpoint registration and every
+listener returns 404 for these routes.
+
+### Listener exposure
+
+The endpoints live in the dedicated `underwriter` HTTP API category —
+not the always-on `node` category — because they expose operator
+metadata (account identity, client ids, outpost contract addresses,
+the outstanding-commit ledger).
+
+Default deployments are unchanged: the all-category listeners
+(`--http-server-address`, `--unix-socket-path`) serve
+`/v1/underwriter/*` as before.
+
+Category-isolated deployments
+(`--http-server-address http-category-address`) must opt in
+explicitly: listeners without the `underwriter` category return 404
+for these routes and omit them from `/v1/node/get_supported_apis`.
+Bind the category to loopback or a private management network:
+
+```
+nodeop \
+  --http-server-address http-category-address \
+  --http-category-address underwriter,127.0.0.1:8890 \
+  --plugin sysio::underwriter_plugin \
+  --underwriter-enabled true \
+  ...
+```
+
+The listener also serves the node-global endpoints, which are
+reachable on every listener by design: `/v1/node/get_supported_apis`
+(always registered) and `/v1/chain/get_info` when
+`sysio::chain_api_plugin` is loaded — the underwriter depends only on
+`chain_plugin`, so the example above does not load it. Like every
+category,
+`underwriter` is validated against its owning plugin: naming it in
+`--http-category-address` without `--plugin sysio::underwriter_plugin`
+is a startup configuration error. Binding it to a non-loopback address
+logs a startup warning (the same pattern as the `snapshot_ro` exposure
+notice).
+
+Query them directly over HTTP, e.g.
+`curl http://127.0.0.1:8890/v1/underwriter/stats`.
+
 ## Dependencies
 
 - `chain_plugin` — read-only table access against `sysio.opreg`, `sysio.uwrit`, `sysio.authex`, `sysio.chains`.
@@ -131,5 +197,3 @@ for a follow-up:
 - **Outstanding-commits tracking + one-leg-stuck retry** — persistent
   in-process map of submitted commits, with retry of a missing leg
   after `max_partial_landing_wait_epochs`.
-- **Diagnostic `clio` query** — read-only HTTP endpoint exposing
-  outstanding-commit state + counters.

@@ -40,6 +40,7 @@ constexpr uint32_t category_ro_index = 2;
 constexpr uint32_t bytes_in_flight_index = 3;
 constexpr uint32_t requests_in_flight_index = 4;
 constexpr uint32_t request_body_bytes_in_flight_index = 5;
+constexpr uint32_t category_uw_index = 6;
 // Keeps unsharded IPv6 probe coverage on the historical port 9999.
 constexpr uint32_t ipv6_probe_index = 2;
 
@@ -276,9 +277,19 @@ class producer_api_plugin : public appbase::plugin<producer_api_plugin> {
    void         plugin_shutdown() {}
 };
 
+class underwriter_plugin : public appbase::plugin<underwriter_plugin> {
+ public:
+   APPBASE_PLUGIN_REQUIRES();
+   virtual void set_program_options(options_description& cli, options_description& cfg) override {}
+   void         plugin_initialize(const variables_map& options) {}
+   void         plugin_startup() {}
+   void         plugin_shutdown() {}
+};
+
 static auto _chain_api_plugin    = application::register_plugin<chain_api_plugin>();
 static auto _net_api_plugin      = application::register_plugin<net_api_plugin>();
 static auto _producer_api_plugin = application::register_plugin<producer_api_plugin>();
+static auto _underwriter_plugin  = application::register_plugin<underwriter_plugin>();
 } // namespace sysio
 
 struct http_plugin_test_fixture {
@@ -434,6 +445,11 @@ BOOST_AUTO_TEST_CASE(invalid_category_addresses) {
                                  "http-category-address", "--http-category-address", chain_ro_localhost.c_str()})
                   .contains("--plugin=sysio::chain_api_plugin is required"));
 
+   const std::string underwriter_localhost = "underwriter," + localhost_rw;
+   BOOST_TEST(app_log({test_name, "--plugin=sysio::chain_api_plugin", "--http-server-address",
+                                 "http-category-address", "--http-category-address", underwriter_localhost.c_str()})
+                  .contains("--plugin=sysio::underwriter_plugin is required"));
+
    BOOST_TEST(app_log({test_name, "--plugin=sysio::chain_api_plugin", "--http-category-address", chain_ro_localhost.c_str()})
                   .contains("http-server-address must be set as `http-category-address`"));
 
@@ -503,10 +519,12 @@ BOOST_FIXTURE_TEST_CASE(valid_category_addresses, http_plugin_test_fixture) {
    const std::string ro_localhost = test_http_endpoint("localhost", category_ro_index);
    const std::string rw_loopback = test_http_endpoint("127.0.0.1", category_rw_index);
    const std::string rw_any = ":" + rw_port;
+   const std::string uw_loopback = test_http_endpoint("127.0.0.1", category_uw_index);
    const std::string chain_ro = "chain_ro," + ro_loopback;
    const std::string chain_rw = "chain_rw," + rw_any;
    const std::string net_ro = "net_ro," + ro_loopback;
    const std::string net_rw = "net_rw," + rw_any;
+   const std::string underwriter = "underwriter," + uw_loopback;
    const std::string ipv6_rw = "[::1]:" + rw_port;
 
    // clang-format off
@@ -515,11 +533,13 @@ BOOST_FIXTURE_TEST_CASE(valid_category_addresses, http_plugin_test_fixture) {
                       "--plugin=sysio::chain_api_plugin",
                       "--plugin=sysio::net_api_plugin",
                       "--plugin=sysio::producer_api_plugin",
+                      "--plugin=sysio::underwriter_plugin",
                       "--http-server-address", "http-category-address",
                       "--http-category-address", chain_ro.c_str(),
                       "--http-category-address", chain_rw.c_str(),
                       "--http-category-address", net_ro.c_str(),
                       "--http-category-address", net_rw.c_str(),
+                      "--http-category-address", underwriter.c_str(),
                       "--http-category-address", "producer_ro,./producer_ro.sock",
                       "--http-category-address", "producer_rw,../producer_rw.sock"
                       });
@@ -554,6 +574,10 @@ BOOST_FIXTURE_TEST_CASE(valid_category_addresses, http_plugin_test_fixture) {
                          {std::string("/v1/producer_rw/hello"), api_category::producer_rw,
                           [&](string&&, string&& body, url_response_callback&& cb) {
                              cb(200, fc::variant("world!"));
+                          }},
+                         {std::string("/v1/underwriter/hello"), api_category::underwriter,
+                          [&](string&&, string&& body, url_response_callback&& cb) {
+                             cb(200, fc::variant("world!"));
                           }}},
                         appbase::exec_queue::read_write);
 
@@ -561,6 +585,7 @@ BOOST_FIXTURE_TEST_CASE(valid_category_addresses, http_plugin_test_fixture) {
    BOOST_CHECK(http_plugin->is_on_loopback(api_category::net_ro));
    BOOST_CHECK(http_plugin->is_on_loopback(api_category::producer_ro));
    BOOST_CHECK(http_plugin->is_on_loopback(api_category::producer_rw));
+   BOOST_CHECK(http_plugin->is_on_loopback(api_category::underwriter));
    BOOST_CHECK(!http_plugin->is_on_loopback(api_category::chain_rw));
    BOOST_CHECK(!http_plugin->is_on_loopback(api_category::net_rw));
 
@@ -596,6 +621,14 @@ BOOST_FIXTURE_TEST_CASE(valid_category_addresses, http_plugin_test_fixture) {
    BOOST_CHECK_EQUAL(http_response_for(rw_loopback.c_str(), "/v1/chain_rw/hello").body(), world_string);
    BOOST_CHECK_EQUAL(http_response_for(rw_loopback.c_str(), "/v1/net_rw/hello").body(), world_string);
 
+   // The dedicated underwriter category serves its own listener (where node
+   // handlers stay reachable, node being all categories) and is NOT served
+   // by other category-isolated listeners.
+   BOOST_CHECK_EQUAL(http_response_for(uw_loopback.c_str(), "/v1/underwriter/hello").body(), world_string);
+   BOOST_CHECK_EQUAL(http_response_for(uw_loopback.c_str(), "/v1/node/hello").body(), world_string);
+   BOOST_CHECK_EQUAL(http_response_for(ro_loopback.c_str(), "/v1/underwriter/hello").status(), http::status::not_found);
+   BOOST_CHECK_EQUAL(http_response_for(rw_loopback.c_str(), "/v1/underwriter/hello").status(), http::status::not_found);
+
    BOOST_CHECK_EQUAL(http_response_for(data_dir / "./producer_ro.sock", "/v1/producer_ro/hello").body(), world_string);
    BOOST_CHECK_EQUAL(http_response_for(data_dir / "../producer_rw.sock", "/v1/producer_rw/hello").body(), world_string);
 
@@ -604,6 +637,9 @@ BOOST_FIXTURE_TEST_CASE(valid_category_addresses, http_plugin_test_fixture) {
 
    BOOST_CHECK_EQUAL(http_response_for(rw_loopback.c_str(), "/v1/node/get_supported_apis").body(),
                      R"({"apis":["/v1/chain_rw/hello","/v1/net_rw/hello","/v1/node/hello"]})");
+
+   BOOST_CHECK_EQUAL(http_response_for(uw_loopback.c_str(), "/v1/node/get_supported_apis").body(),
+                     R"({"apis":["/v1/node/hello","/v1/underwriter/hello"]})");
 }
 
 
