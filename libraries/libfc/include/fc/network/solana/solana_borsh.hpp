@@ -197,12 +197,18 @@ private:
    size_t _pos;
 
    void ensure_remaining(size_t n) const {
-      FC_ASSERT(_pos + n <= _size, "Borsh decoder: not enough data, need {} bytes, have {}", n, remaining());
+      FC_ASSERT(n <= remaining(), "Borsh decoder: not enough data, need {} bytes, have {}", n, remaining());
    }
 
    // Helper to read primitive type
    template <typename T>
    T read_primitive();
+
+   /**
+    * @brief Smallest Borsh byte count for a supported Vec<T> element.
+    */
+   template <typename T>
+   static constexpr size_t min_vec_element_size();
 };
 
 //=============================================================================
@@ -353,6 +359,11 @@ std::optional<T> decoder::read_option() {
 template <typename T>
 std::vector<T> decoder::read_vec() {
    uint32_t len = read_u32();
+   constexpr size_t min_element_size = min_vec_element_size<T>();
+   FC_ASSERT(len <= remaining() / min_element_size,
+             "Borsh decoder: vector length {} with minimum element size {} exceeds remaining {} bytes",
+             len, min_element_size, remaining());
+
    std::vector<T> result;
    result.reserve(len);
 
@@ -385,6 +396,25 @@ std::vector<T> decoder::read_vec() {
    }
 
    return result;
+}
+
+template <typename T>
+constexpr size_t decoder::min_vec_element_size() {
+   if constexpr (std::is_same_v<T, uint8_t> || std::is_same_v<T, int8_t> || std::is_same_v<T, bool>) {
+      return 1;
+   } else if constexpr (std::is_same_v<T, uint16_t> || std::is_same_v<T, int16_t>) {
+      return 2;
+   } else if constexpr (std::is_same_v<T, uint32_t> || std::is_same_v<T, int32_t>) {
+      return 4;
+   } else if constexpr (std::is_same_v<T, uint64_t> || std::is_same_v<T, int64_t>) {
+      return 8;
+   } else if constexpr (std::is_same_v<T, std::string>) {
+      return sizeof(uint32_t);
+   } else if constexpr (std::is_same_v<T, solana_public_key>) {
+      return solana_public_key::size;
+   } else {
+      static_assert(sizeof(T) == 0, "Unsupported type for read_vec");
+   }
 }
 
 template <typename T, size_t N>
