@@ -1471,6 +1471,11 @@ void msgch::buildenv(uint64_t chain_code) {
    uint32_t epoch = current_epoch_index();
    attestations_t atts(get_self());
    auto now_sec = static_cast<uint64_t>(current_time_point().sec_since_epoch());
+   // OPP wire timestamps (`MessageHeader.timestamp`, `Envelope.epoch_timestamp`) are milliseconds
+   // since the Unix epoch (opp.proto). WIRE's half-second blocks make sub-second resolution
+   // meaningful, so emit real milliseconds; `now_sec` stays for the seconds-unit table columns.
+   const uint64_t now_ms =
+      static_cast<uint64_t>(current_time_point().time_since_epoch().count()) / 1000;
 
    // ── Phase 1: collect candidate READY attestations for this outpost.
    //    Order is the secondary index's natural order, which is stable across
@@ -1546,18 +1551,22 @@ void msgch::buildenv(uint64_t chain_code) {
       candidate_ids.begin(),
       candidate_ids.begin() + included_count);
 
-   // Chain link: the previous envelope emitted for this outpost. `outenvelopes` is one-deep per
-   // outpost (see the cleanup below), so the single surviving row is the previous emit and its
-   // `envelope_hash` is that envelope's epoch digest. The first emit for an outpost has no row and
-   // chains from the empty hash (genesis), matching the outpost contracts' zero genesis tip.
+   // Chain links: the previous envelope emitted for this outpost. `outenvelopes` is one-deep per
+   // outpost (see the cleanup below), so the single surviving row is the previous emit; its
+   // `envelope_hash` is that envelope's epoch digest and its `last_message_id` is this outpost's
+   // message-stream tip. The first emit for an outpost has no row and chains both links from
+   // empty (genesis), matching the outpost contracts' zero genesis tip.
    outenvelopes_t envelopes(get_self());
    std::vector<char> prev_envelope_digest;
+   std::vector<char> prev_message_id;
    {
       auto by_outpost = envelopes.get_index<"byoutpost"_n>();
       auto prev_it = by_outpost.lower_bound(chain_code);
       if (prev_it != by_outpost.end() && prev_it->chain_code == chain_code) {
          const auto digest_bytes = prev_it->envelope_hash.extract_as_byte_array();
          prev_envelope_digest.assign(digest_bytes.begin(), digest_bytes.end());
+         const auto tip_bytes = prev_it->last_message_id.extract_as_byte_array();
+         prev_message_id.assign(tip_bytes.begin(), tip_bytes.end());
       }
    }
 
@@ -1565,16 +1574,45 @@ void msgch::buildenv(uint64_t chain_code) {
    // format (opp_canonical_codec.hpp; no size prefix). Because `envelope_hash` is empty on the
    // wire, the packed bytes are exactly the epoch-digest preimage: keccak256(packed) is this
    // envelope's epoch digest, which the NEXT envelope for this outpost carries in
-   // `previous_envelope_hash`. Pulled into a lambda so the trim loop below can re-run it after
-   // popping an entry. `src` is copied (not moved) because the trim loop may need to rebuild from
-   // a shorter prefix of `entries`.
+   // `previous_envelope_hash`.
+   //
+   // The semantic header (opp.proto MessageHeader) is derived on every (re)build:
+   // `payload_size` / `payload_checksum` over the payload's canonical bytes, `header_checksum`
+   // over the field-complete header with `message_id`/`header_checksum` blanked, and
+   // `message_id` — that checksum with its first 8 bytes replaced by the message's big-endian
+   // sequence number, continuing this outpost's stream from `prev_message_id`.
+   //
+   // Pulled into a lambda so the trim loop below can re-run it after popping an entry. `src` is
+   // copied (not moved) because the trim loop may need to rebuild from a shorter prefix of
+   // `entries`. `message_id` holds the last build's derived id; after the trim loop converges it
+   // is this outpost's new message-stream tip, stored on the outbound row below.
+   checksum256 message_id{};
    auto build_packed = [&](const std::vector<opp::AttestationEntry>& src) {
       opp::MessagePayload payload;
       payload.version = zpp::bits::vuint32_t{1};
       payload.attestations = src;
 
+      const std::vector<char> payload_bytes = opp::canonical::encode(payload);
+      const checksum256 payload_checksum = keccak(payload_bytes.data(), payload_bytes.size());
+
       opp::MessageHeader header;
-      header.timestamp = zpp::bits::vuint64_t{now_sec};
+      header.previous_message_id = prev_message_id;
+      header.payload_size = zpp::bits::vuint32_t{static_cast<uint32_t>(payload_bytes.size())};
+      {
+         const auto pc_bytes = payload_checksum.extract_as_byte_array();
+         header.payload_checksum.assign(pc_bytes.begin(), pc_bytes.end());
+      }
+      header.timestamp = zpp::bits::vuint64_t{now_ms};
+
+      const checksum256 header_checksum = opp::canonical::header_digest(header);
+      message_id = opp::canonical::derive_message_id(
+         header_checksum, opp::canonical::message_sequence(prev_message_id) + 1);
+      {
+         const auto hc_bytes = header_checksum.extract_as_byte_array();
+         header.header_checksum.assign(hc_bytes.begin(), hc_bytes.end());
+         const auto mid_bytes = message_id.extract_as_byte_array();
+         header.message_id.assign(mid_bytes.begin(), mid_bytes.end());
+      }
 
       opp::Message msg;
       msg.header = std::move(header);
@@ -1582,7 +1620,7 @@ void msgch::buildenv(uint64_t chain_code) {
 
       opp::Envelope env;
       env.epoch_index = zpp::bits::vuint32_t{epoch};
-      env.epoch_timestamp = zpp::bits::vuint64_t{now_sec};
+      env.epoch_timestamp = zpp::bits::vuint64_t{now_ms};
       env.previous_envelope_hash = prev_envelope_digest;
       env.messages.push_back(std::move(msg));
 
@@ -1629,12 +1667,13 @@ void msgch::buildenv(uint64_t chain_code) {
    uint64_t out_id = std::max<uint64_t>(1, envelopes.available_primary_key());
 
    envelopes.emplace(ram_payer, id_key{out_id}, outbound_envelope{
-      .id            = out_id,
-      .chain_code    = chain_code,
-      .epoch_index   = epoch,
-      .envelope_hash = envelope_digest,
-      .status        = EnvelopeStatus::ENVELOPE_STATUS_PENDING_DELIVERY,
-      .raw_envelope  = packed,
+      .id              = out_id,
+      .chain_code      = chain_code,
+      .epoch_index     = epoch,
+      .envelope_hash   = envelope_digest,
+      .status          = EnvelopeStatus::ENVELOPE_STATUS_PENDING_DELIVERY,
+      .raw_envelope    = packed,
+      .last_message_id = message_id,
    });
 
    // === AUDIT LOG + INLINE CLEANUP OF WORKING STATE ===

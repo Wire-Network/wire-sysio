@@ -301,6 +301,10 @@
                 {
                     "name": "raw_envelope",
                     "type": "bytes"
+                },
+                {
+                    "name": "last_message_id",
+                    "type": "checksum256"
                 }
             ]
         },

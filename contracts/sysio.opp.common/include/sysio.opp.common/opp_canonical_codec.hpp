@@ -84,7 +84,7 @@ namespace field {
       constexpr uint32_t endpoints           = 1;
       constexpr uint32_t message_id          = 2;
       constexpr uint32_t previous_message_id = 3;
-      constexpr uint32_t encoding_flags      = 4;
+      // Slot 4 was `encoding_flags` — removed from opp.proto; reserved, do not reuse.
       constexpr uint32_t payload_size        = 5;
       constexpr uint32_t payload_checksum    = 6;
       constexpr uint32_t timestamp           = 7;
@@ -99,11 +99,6 @@ namespace field {
       constexpr uint32_t data_size = 2;
       constexpr uint32_t data      = 3;
    } // namespace attestation_entry
-   namespace encoding_flags {
-      constexpr uint32_t endianness      = 1;
-      constexpr uint32_t hash_algorithm  = 2;
-      constexpr uint32_t length_encoding = 3;
-   } // namespace encoding_flags
 } // namespace field
 
 namespace detail {
@@ -199,21 +194,6 @@ inline void encode_into(std::vector<char>& out, const types::ChainId& m) {
 }
 /// @}
 
-/// @{ sysio.opp.types.EncodingFlags
-inline size_t encoded_size(const types::EncodingFlags& m) {
-   return detail::varint_field_size(field::encoding_flags::endianness, detail::enum_wire_value(m.endianness)) +
-          detail::varint_field_size(field::encoding_flags::hash_algorithm,
-                                    detail::enum_wire_value(m.hash_algorithm)) +
-          detail::varint_field_size(field::encoding_flags::length_encoding,
-                                    detail::enum_wire_value(m.length_encoding));
-}
-inline void encode_into(std::vector<char>& out, const types::EncodingFlags& m) {
-   detail::put_varint_field(out, field::encoding_flags::endianness, detail::enum_wire_value(m.endianness));
-   detail::put_varint_field(out, field::encoding_flags::hash_algorithm, detail::enum_wire_value(m.hash_algorithm));
-   detail::put_varint_field(out, field::encoding_flags::length_encoding, detail::enum_wire_value(m.length_encoding));
-}
-/// @}
-
 /// @{ sysio.opp.Endpoints
 inline size_t encoded_size(const Endpoints& m) {
    return detail::submessage_field_size(field::endpoints::start, encoded_size(m.start)) +
@@ -232,7 +212,6 @@ inline size_t encoded_size(const MessageHeader& m) {
    return detail::submessage_field_size(field::message_header::endpoints, encoded_size(m.endpoints)) +
           detail::bytes_field_size(field::message_header::message_id, m.message_id) +
           detail::bytes_field_size(field::message_header::previous_message_id, m.previous_message_id) +
-          detail::submessage_field_size(field::message_header::encoding_flags, encoded_size(m.encoding_flags)) +
           detail::varint_field_size(field::message_header::payload_size, static_cast<uint32_t>(m.payload_size)) +
           detail::bytes_field_size(field::message_header::payload_checksum, m.payload_checksum) +
           detail::varint_field_size(field::message_header::timestamp, static_cast<uint64_t>(m.timestamp)) +
@@ -243,8 +222,6 @@ inline void encode_into(std::vector<char>& out, const MessageHeader& m) {
    encode_into(out, m.endpoints);
    detail::put_bytes_field(out, field::message_header::message_id, m.message_id);
    detail::put_bytes_field(out, field::message_header::previous_message_id, m.previous_message_id);
-   detail::put_submessage_prefix(out, field::message_header::encoding_flags, encoded_size(m.encoding_flags));
-   encode_into(out, m.encoding_flags);
    detail::put_varint_field(out, field::message_header::payload_size, static_cast<uint32_t>(m.payload_size));
    detail::put_bytes_field(out, field::message_header::payload_checksum, m.payload_checksum);
    detail::put_varint_field(out, field::message_header::timestamp, static_cast<uint64_t>(m.timestamp));
@@ -364,6 +341,63 @@ inline sysio::checksum256 epoch_digest(const Envelope& env) {
    return sysio::keccak(preimage.data(), preimage.size());
 }
 
+/// Canonical field-complete bytes of a standalone MessagePayload — the sub-message bytes exactly
+/// as embedded inside an Envelope, minus the enclosing field tag + length prefix. Feeds
+/// `MessageHeader.payload_size` and `MessageHeader.payload_checksum`.
+inline std::vector<char> encode(const MessagePayload& payload) {
+   std::vector<char> out;
+   out.reserve(encoded_size(payload));
+   encode_into(out, payload);
+   return out;
+}
+
+/// Canonical field-complete bytes of a standalone MessageHeader (same sub-message form as
+/// `encode(MessagePayload)`).
+inline std::vector<char> encode(const MessageHeader& header) {
+   std::vector<char> out;
+   out.reserve(encoded_size(header));
+   encode_into(out, header);
+   return out;
+}
+
+/// The `MessageHeader.header_checksum` value: keccak256 over the canonical encoding of `header`
+/// with `message_id` and `header_checksum` blanked. Takes a copy so callers can pass the header
+/// they are about to finalize without pre-blanking either field. Matches the generated Solidity
+/// `OPPCommon.headerChecksum`.
+inline sysio::checksum256 header_digest(MessageHeader header) {
+   header.message_id.clear();
+   header.header_checksum.clear();
+   const std::vector<char> preimage = encode(header);
+   return sysio::keccak(preimage.data(), preimage.size());
+}
+
+/// The `MessageHeader.message_id` value: `header_checksum` with its first 8 bytes replaced by the
+/// message's big-endian sequence number (the previous message's sequence number + 1; a stream's
+/// first message is sequence number 1). Mirrors the Solidity `OPPCommon.getMessageID` /
+/// `setMessageNumber` splice.
+inline sysio::checksum256 derive_message_id(const sysio::checksum256& header_checksum,
+                                            uint64_t                  sequence) {
+   auto bytes = header_checksum.extract_as_byte_array();
+   for (size_t i = 0; i < 8; ++i) {
+      bytes[i] = static_cast<uint8_t>(sequence >> (8 * (7 - i)));
+   }
+   return sysio::checksum256{bytes};
+}
+
+/// The big-endian sequence number carried in the first 8 bytes of a wire `message_id`. Empty
+/// (stream genesis) — and any out-of-spec id shorter than 8 bytes — reads as 0, so the successor
+/// message's sequence number is 1.
+inline uint64_t message_sequence(const std::vector<char>& message_id) {
+   if (message_id.size() < 8) {
+      return 0;
+   }
+   uint64_t sequence = 0;
+   for (size_t i = 0; i < 8; ++i) {
+      sequence = (sequence << 8) | static_cast<uint8_t>(message_id[i]);
+   }
+   return sequence;
+}
+
 // -------------------------------------------------------------------------------------------------
 //  Drift guards: fail the build when a regenerated pb header changes a member count, forcing this
 //  encoder (and the pinned field numbers above) to be revisited. Field renumbering without a count
@@ -375,7 +409,7 @@ static_assert(zpp::bits::access::number_of_members<Endpoints>() == 2,
               "opp.proto Endpoints changed; update opp_canonical_codec.hpp to match");
 static_assert(zpp::bits::access::number_of_members<Message>() == 2,
               "opp.proto Message changed; update opp_canonical_codec.hpp to match");
-static_assert(zpp::bits::access::number_of_members<MessageHeader>() == 8,
+static_assert(zpp::bits::access::number_of_members<MessageHeader>() == 7,
               "opp.proto MessageHeader changed; update opp_canonical_codec.hpp to match");
 static_assert(zpp::bits::access::number_of_members<MessagePayload>() == 2,
               "opp.proto MessagePayload changed; update opp_canonical_codec.hpp to match");
@@ -383,7 +417,5 @@ static_assert(zpp::bits::access::number_of_members<AttestationEntry>() == 3,
               "opp.proto AttestationEntry changed; update opp_canonical_codec.hpp to match");
 static_assert(zpp::bits::access::number_of_members<types::ChainId>() == 2,
               "types.proto ChainId changed; update opp_canonical_codec.hpp to match");
-static_assert(zpp::bits::access::number_of_members<types::EncodingFlags>() == 3,
-              "types.proto EncodingFlags changed; update opp_canonical_codec.hpp to match");
 
 } // namespace sysio::opp::canonical

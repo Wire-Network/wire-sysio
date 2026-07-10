@@ -211,6 +211,11 @@ namespace sysio {
          checksum256 envelope_hash;
          opp::types::EnvelopeStatus status;
          std::vector<char> raw_envelope;
+         /// The `message_id` of the last (today: only) message in this envelope — the message
+         /// stream tip for this outpost. The next `buildenv` for the outpost carries it in its
+         /// header's `previous_message_id` and continues the big-endian sequence number embedded
+         /// in its first 8 bytes (see opp_canonical_codec.hpp `derive_message_id`).
+         checksum256 last_message_id;
 
          uint64_t by_outpost() const { return chain_code; }
          uint128_t by_outpost_epoch() const {
@@ -218,7 +223,7 @@ namespace sysio {
          }
 
          SYSLIB_SERIALIZE(outbound_envelope,
-            (id)(chain_code)(epoch_index)(envelope_hash)(status)(raw_envelope))
+            (id)(chain_code)(epoch_index)(envelope_hash)(status)(raw_envelope)(last_message_id))
       };
 
       using outenvelopes_t = sysio::kv::table<"outenvelopes"_n, id_key, outbound_envelope,
