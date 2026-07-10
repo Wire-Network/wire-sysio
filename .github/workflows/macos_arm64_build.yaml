@@ -26,6 +26,7 @@ on:
       - "vcpkg.json"
       - "vcpkg-configuration.json"
   pull_request:
+    types: [opened, synchronize, reopened]
     paths:
       - ".github/workflows/macos_arm64_build.yaml"
       - ".github/vcpkg-triplets/**"

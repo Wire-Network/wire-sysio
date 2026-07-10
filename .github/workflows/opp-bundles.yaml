@@ -11,7 +11,7 @@ on:
     paths:
       - "libraries/opp/**"
   pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
+    types: [opened, synchronize, reopened]
     branches:
       - master
     paths:
