@@ -126,6 +126,11 @@ completes they report the startup-gate state instead of the payload
 `wiring_failed` / `startup_failed` with `detail`); once the gate opens
 they serve the payloads above with `status: "active"`.
 
+The endpoints are registered only when the underwriter is enabled:
+with the plugin loaded but `--underwriter-enabled false` (the
+default), `plugin_startup` skips endpoint registration and every
+listener returns 404 for these routes.
+
 ### Listener exposure
 
 The endpoints live in the dedicated `underwriter` HTTP API category —
@@ -148,12 +153,16 @@ nodeop \
   --http-server-address http-category-address \
   --http-category-address underwriter,127.0.0.1:8890 \
   --plugin sysio::underwriter_plugin \
+  --underwriter-enabled true \
   ...
 ```
 
-The listener also serves the node-global endpoints
-(`/v1/chain/get_info`, `/v1/node/get_supported_apis`), which are
-reachable on every listener by design. Like every category,
+The listener also serves the node-global endpoints, which are
+reachable on every listener by design: `/v1/node/get_supported_apis`
+(always registered) and `/v1/chain/get_info` when
+`sysio::chain_api_plugin` is loaded — the underwriter depends only on
+`chain_plugin`, so the example above does not load it. Like every
+category,
 `underwriter` is validated against its owning plugin: naming it in
 `--http-category-address` without `--plugin sysio::underwriter_plugin`
 is a startup configuration error. Binding it to a non-loopback address

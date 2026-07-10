@@ -2578,7 +2578,7 @@ struct underwriter_plugin::impl {
    }
 
    /// Register the `/v1/underwriter/*` HTTP endpoints. Called once from
-   /// `plugin_startup`, UNCONDITIONALLY and BEFORE the sync gate:
+   /// `plugin_startup` when the underwriter is enabled, BEFORE the sync gate:
    /// `http_plugin`'s handler map is read lock-free by the HTTP worker
    /// threads, so every registration must happen during plugin startup —
    /// before the posted listener creation runs — never from a task queued
@@ -2757,12 +2757,12 @@ void underwriter_plugin::plugin_startup() {
 
    ilog("underwriter_plugin: starting for account {}", _impl->underwriter_account.to_string());
 
-   // Register the `/v1/underwriter/*` endpoints FIRST, unconditionally:
-   // handler registration must complete during plugin startup (before the
-   // posted HTTP listener goes live) because the handler map is read
-   // lock-free by the HTTP threads — it must never ride the deferred
-   // startup body below. Until that body completes, the handlers answer
-   // with the gate state, so a cold-booting (or permanently-disabled)
+   // Register the `/v1/underwriter/*` endpoints FIRST, before the sync
+   // gate: handler registration must complete during plugin startup
+   // (before the posted HTTP listener goes live) because the handler map
+   // is read lock-free by the HTTP threads — it must never ride the
+   // deferred startup body below. Until that body completes, the handlers
+   // answer with the gate state, so a cold-booting (or terminally-failed)
    // underwriter is diagnosable over HTTP instead of a single ilog.
    _impl->register_http_endpoints();
 
