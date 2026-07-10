@@ -347,15 +347,16 @@ json_rpc_client json_rpc_client::create(const std::variant<std::string, fc::url>
 }
 
 // json_rpc_client
-json_rpc_client::json_rpc_client(fc::url                           url,
-                                 const std::optional<std::string>& user_agent)
+json_rpc_client::json_rpc_client(fc::url url, const std::optional<std::string>& user_agent,
+                                 endpoint_refresh_policy refresh_policy)
    : _url(std::move(url))
-     , _host()
-     , _port()
-     , _user_agent(user_agent.value_or(BOOST_BEAST_VERSION_STRING))
-     , _next_id(1)
-     , _resolved_endpoints()
-     , _resolved_endpoints_stale(false) {
+   , _host()
+   , _port()
+   , _user_agent(user_agent.value_or(BOOST_BEAST_VERSION_STRING))
+   , _next_id(1)
+   , _resolved_endpoints()
+   , _resolved_endpoints_stale(false)
+   , _refresh_policy(refresh_policy) {
    const auto scheme = _url.proto();
    FC_ASSERT(scheme == HTTP_SCHEME || scheme == HTTPS_SCHEME, "Unsupported URL scheme: {}", scheme);
    FC_ASSERT(_url.host(), "JSON-RPC URL is missing host");
@@ -376,7 +377,9 @@ void json_rpc_client::refresh_resolved_endpoints_with_active_deadline() {
 }
 
 void json_rpc_client::mark_resolved_endpoints_stale() {
-   _resolved_endpoints_stale = true;
+   if (_refresh_policy == endpoint_refresh_policy::on_connection_failure) {
+      _resolved_endpoints_stale = true;
+   }
 }
 
 const json_rpc_client::tcp::resolver::results_type& json_rpc_client::resolved_endpoints() {

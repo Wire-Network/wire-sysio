@@ -240,6 +240,25 @@ BOOST_AUTO_TEST_CASE(stale_endpoint_refresh_respects_expired_deadline) {
       is_resolve_timeout_error);
 }
 
+/// Callers that require bounded runtime behavior can retain the startup DNS result
+/// instead of re-entering platform DNS after a connection failure.
+BOOST_AUTO_TEST_CASE(endpoint_refresh_can_be_disabled) {
+   fc::network::json_rpc::json_rpc_client client(fc::url("http://localhost:" + std::to_string(closed_loopback_port())),
+                                                 std::nullopt, fc::network::json_rpc::endpoint_refresh_policy::never);
+
+   BOOST_CHECK_THROW(client.call("wire_cached_endpoint_probe"), fc::exception);
+
+   BOOST_CHECK_EXCEPTION(
+      [&] {
+         fc::task::deadline_scope deadline(fc::time_point::now() - fc::milliseconds(1));
+         client.call("wire_cached_endpoint_probe");
+      }(),
+      fc::timeout_exception,
+      [](const fc::exception& e) {
+         return e.to_detail_string().find("JSON-RPC connect timed out") != std::string::npos;
+      });
+}
+
 /// A peer that completes HTTP 200 with an oversized body must be rejected by
 /// the transport parser before JSON parsing or outpost envelope decoding.
 BOOST_AUTO_TEST_CASE(call_rejects_oversized_response_body) {
