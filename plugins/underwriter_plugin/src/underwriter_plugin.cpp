@@ -208,8 +208,7 @@ struct underwriter_plugin::impl {
    std::vector<uint8_t> resolved_eth_source_deposit_selector;
    std::vector<uint8_t> resolved_sol_source_deposit_discriminator;
 
-   // ── Diagnostic counters surfaced via the `/v1/underwriter/*` HTTP API
-   //   (and the future `clio opp uw stats` wrapper).
+   // ── Diagnostic counters surfaced via the `/v1/underwriter/*` HTTP API.
    //
    //   `source_deposit_mismatch_count` increments every time a source-
    //   deposit verification fails for a uwreq the plugin tried to cover.
@@ -2485,10 +2484,6 @@ struct underwriter_plugin::impl {
    // `head_behind_sec`/`lib_behind_sec`, `preflight_retrying`, or a terminal
    // `preflight_failed`/`wiring_failed`/`startup_failed` with `detail`);
    // once active they serve the payloads below with `status:"active"`.
-   //
-   // The matching `clio opp uw <stats|commits>` CLI wrapper is planned in
-   // a follow-up; today the endpoints are addressable via `curl` against
-   // the nodeop HTTP port.
 
    fc::variant build_stats_response() {
       std::lock_guard lk{stats_mutex};
