@@ -400,8 +400,10 @@ try:
         json.dumps({"account": snapProv2.name}),
         f"--permission {snapProv2.name}@active")
     assert success, f"Failed to deregister provider: {trans}"
+    delSnapProvTransId = node0.getTransId(trans)
 
-    assert node0.waitForHeadToAdvance(), "Head did not advance after deregistration"
+    assert node0.waitForTransactionsInBlock([delSnapProvTransId], timeout=60), \
+        "delsnapprov transaction did not make it into a block before provider table check"
 
     providers = node0.getTableRows("sysio", "sysio", "snapprovs")
     assert len(providers) == 1, f"Expected 1 provider after deregistration, got {len(providers)}"
