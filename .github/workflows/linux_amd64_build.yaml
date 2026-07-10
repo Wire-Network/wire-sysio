@@ -46,6 +46,9 @@ jobs:
     steps:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # actions/checkout@v5
 
+      - name: Validate coredump isolation policy
+        run: python3 .github/scripts/check-coredump-policy.py
+
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # actions/setup-node@v4
         with:
           node-version: "24"
@@ -91,7 +94,7 @@ jobs:
 
   build-test-package:
     name: Build, test, and package (${{matrix.platform}})
-    needs: [platform-cache, v]
+    needs: [platform-cache, root-node-tooling, v]
     strategy:
       fail-fast: false
       matrix:
@@ -120,7 +123,14 @@ jobs:
       credentials:
         username: dev-wire
         password: ${{ secrets.GH_TOKEN_DEV }}
-      options: --security-opt seccomp=unconfined --mount type=bind,source=/var/lib/systemd/coredump,target=/cores
+      # Fork PR code must not see the shared runner's host dumps; same-repository and non-PR runs retain debug access.
+      # SEC-112 tracks enforcing the protected workflow revision at the runner-group boundary.
+      options: >-
+        --security-opt seccomp=unconfined
+        ${{ (github.event_name != 'pull_request' ||
+             github.event.pull_request.head.repo.full_name == github.repository)
+            && '--mount type=bind,source=/var/lib/systemd/coredump,target=/cores'
+            || '' }}
       volumes:
       - ${{ github.workspace }}:/__w/wire-sysio/wire-sysio
     env:
@@ -304,17 +314,27 @@ jobs:
           path: ${{ github.workspace }}/.ccache
           key: ccache-${{ matrix.platform }}-${{ github.sha }}
 
-      - name: Upload core files from failed tests
+      - name: Upload logs from failed tests
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # actions/upload-artifact@v6
         if: failure()
         with:
           name: ${{matrix.platform}}-tests-logs
           if-no-files-found: warn
           path: |
-              /cores
               build/Testing/Temporary/
               build/TestLogs/
               build/PerformanceHarnessScenarioRunnerLogs/
+
+      - name: Upload core files from failed tests
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # actions/upload-artifact@v6
+        if: >-
+          ${{ failure() &&
+              (github.event_name != 'pull_request' ||
+               github.event.pull_request.head.repo.full_name == github.repository) }}
+        with:
+          name: ${{matrix.platform}}-test-cores
+          if-no-files-found: warn
+          path: /cores
 
       - name: Check CPU Features
         if: ${{ steps.build.outcome == 'success' && !cancelled() }}
