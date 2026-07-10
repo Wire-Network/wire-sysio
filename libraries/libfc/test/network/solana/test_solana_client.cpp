@@ -9,6 +9,7 @@
 #include <fc/network/solana/solana_types.hpp>
 
 #include <limits>
+#include <string_view>
 
 using namespace fc::network::solana;
 using namespace fc::crypto::solana;
@@ -16,6 +17,16 @@ using namespace fc::crypto::solana;
 BOOST_AUTO_TEST_SUITE(solana_client_tests)
 
 namespace {
+
+constexpr std::array<uint8_t, 8> vec_account_discriminator = {1, 2, 3, 4, 5, 6, 7, 8};
+constexpr std::array<uint8_t, 8> empty_vec_account_discriminator = {8, 7, 6, 5, 4, 3, 2, 1};
+constexpr std::array<uint8_t, 8> nested_account_discriminator = {3, 1, 4, 1, 5, 9, 2, 6};
+constexpr std::array<uint8_t, 8> cyclic_account_discriminator = {2, 7, 1, 8, 2, 8, 1, 8};
+constexpr std::string_view vec_account_name = "VecAccount";
+constexpr std::string_view empty_vec_account_name = "EmptyVecAccount";
+constexpr std::string_view nested_account_name = "NestedAccount";
+constexpr std::string_view cyclic_account_name = "CyclicAccount";
+constexpr std::string_view idl_depth_error = "Solana IDL type nesting exceeds maximum depth";
 
 /**
  * @brief Construct a deterministic Solana public key for serialization tests.
@@ -57,6 +68,15 @@ void append_u32_le(std::vector<uint8_t>& out, uint32_t value) {
 }
 
 /**
+ * @brief Append a little-endian u64 to a test byte buffer.
+ */
+void append_u64_le(std::vector<uint8_t>& out, uint64_t value) {
+   for (size_t i = 0; i < sizeof(value); ++i) {
+      out.push_back(static_cast<uint8_t>((value >> (i * 8)) & 0xff));
+   }
+}
+
+/**
  * @brief Append a Borsh string to a test byte buffer.
  */
 void append_borsh_string(std::vector<uint8_t>& out, const std::string& value) {
@@ -73,6 +93,40 @@ struct test_solana_program_client : solana_program_client {
    explicit test_solana_program_client(const std::vector<idl::program>& idls = {})
       : solana_program_client(solana_client_ptr{}, make_test_pubkey(700), idls) {}
 };
+
+/**
+ * @brief Parse an Anchor account containing a Vec<u64> field.
+ */
+idl::program parse_u64_vec_account_idl() {
+   std::string idl_json = R"({
+      "address": "11111111111111111111111111111111",
+      "metadata": {
+         "name": "vec_account",
+         "version": "0.1.0",
+         "spec": "0.1.0"
+      },
+      "instructions": [],
+      "accounts": [
+         {
+            "name": "VecAccount",
+            "discriminator": [1, 2, 3, 4, 5, 6, 7, 8]
+         }
+      ],
+      "types": [
+         {
+            "name": "VecAccount",
+            "type": {
+               "kind": "struct",
+               "fields": [
+                  {"name": "scores", "type": {"vec": "u64"}}
+               ]
+            }
+         }
+      ]
+   })";
+
+   return idl::parse_idl(fc::json::from_string(idl_json));
+}
 
 idl::program parse_empty_struct_vec_account_idl() {
    std::string idl_json = R"({
@@ -110,6 +164,86 @@ idl::program parse_empty_struct_vec_account_idl() {
    })";
 
    return idl::parse_idl(fc::json::from_string(idl_json));
+}
+
+/**
+ * @brief Build an account IDL with a caller-selected chain of defined struct types.
+ */
+idl::program make_nested_defined_account_idl(size_t defined_type_count) {
+   constexpr std::string_view nested_type_prefix = "NestedType";
+   constexpr std::string_view nested_field_name = "nested";
+   constexpr std::string_view terminal_field_name = "value";
+
+   auto type_name = [nested_type_prefix](size_t index) {
+      return std::string(nested_type_prefix) + std::to_string(index);
+   };
+
+   idl::program program;
+   idl::account account;
+   account.name = nested_account_name;
+   account.discriminator = nested_account_discriminator;
+   account.fields.push_back(
+      {std::string(nested_field_name), idl::idl_type::make_defined(type_name(0))});
+   program.accounts.push_back(std::move(account));
+
+   for (size_t index = 0; index < defined_type_count; ++index) {
+      idl::type_def type_def;
+      type_def.name = type_name(index);
+
+      idl::field field;
+      if (index + 1 < defined_type_count) {
+         field.name = nested_field_name;
+         field.type = idl::idl_type::make_defined(type_name(index + 1));
+      } else {
+         field.name = terminal_field_name;
+         field.type = idl::idl_type::make_primitive(idl::primitive_type::u8);
+      }
+      type_def.struct_fields = std::vector<idl::field>{std::move(field)};
+      program.types.push_back(std::move(type_def));
+   }
+
+   return program;
+}
+
+/**
+ * @brief Build an account IDL whose defined structs form an unproductive A-B cycle.
+ */
+idl::program make_cyclic_defined_account_idl(bool vector_root) {
+   constexpr std::string_view cycle_a_name = "CycleA";
+   constexpr std::string_view cycle_b_name = "CycleB";
+   constexpr std::string_view cyclic_field_name = "cycle";
+
+   auto root_type = idl::idl_type::make_defined(std::string(cycle_a_name));
+   if (vector_root)
+      root_type = idl::idl_type::make_vec(std::move(root_type));
+
+   idl::program program;
+   idl::account account;
+   account.name = cyclic_account_name;
+   account.discriminator = cyclic_account_discriminator;
+   account.fields.push_back({std::string(cyclic_field_name), std::move(root_type)});
+   program.accounts.push_back(std::move(account));
+
+   idl::type_def cycle_a;
+   cycle_a.name = cycle_a_name;
+   cycle_a.struct_fields = std::vector<idl::field>{
+      {std::string(cyclic_field_name), idl::idl_type::make_defined(std::string(cycle_b_name))}};
+   program.types.push_back(std::move(cycle_a));
+
+   idl::type_def cycle_b;
+   cycle_b.name = cycle_b_name;
+   cycle_b.struct_fields = std::vector<idl::field>{
+      {std::string(cyclic_field_name), idl::idl_type::make_defined(std::string(cycle_a_name))}};
+   program.types.push_back(std::move(cycle_b));
+
+   return program;
+}
+
+/**
+ * @brief Return true when an assertion reports the shared IDL nesting limit.
+ */
+bool is_idl_depth_exception(const fc::assert_exception& error) {
+   return error.to_detail_string().find(idl_depth_error) != std::string::npos;
 }
 
 } // namespace
@@ -312,9 +446,23 @@ BOOST_AUTO_TEST_CASE(test_borsh_vec) {
 
    auto data = enc.finish();
 
+   // The declared length exactly consumes every remaining byte.
    borsh::decoder dec(data);
    auto decoded = dec.read_vec<uint32_t>();
    BOOST_CHECK(decoded == test_vec);
+}
+
+BOOST_AUTO_TEST_CASE(test_borsh_vec_rejects_one_past_remaining_boundary) {
+   constexpr uint32_t declared_elements = 2;
+   constexpr uint32_t encoded_elements = declared_elements - 1;
+
+   std::vector<uint8_t> data;
+   append_u32_le(data, declared_elements);
+   for (uint32_t value = 0; value < encoded_elements; ++value)
+      append_u32_le(data, value);
+
+   borsh::decoder dec(data);
+   BOOST_CHECK_THROW(dec.read_vec<uint32_t>(), fc::assert_exception);
 }
 
 BOOST_AUTO_TEST_CASE(test_borsh_vec_rejects_declared_length_before_reserve) {
@@ -1295,40 +1443,42 @@ BOOST_AUTO_TEST_CASE(test_anchor_idl_account_fields_in_types_section) {
 }
 
 BOOST_AUTO_TEST_CASE(test_anchor_idl_account_vec_rejects_declared_length_before_reserve) {
-   std::string idl_json = R"({
-      "address": "11111111111111111111111111111111",
-      "metadata": {
-         "name": "vec_account",
-         "version": "0.1.0",
-         "spec": "0.1.0"
-      },
-      "instructions": [],
-      "accounts": [
-         {
-            "name": "VecAccount",
-            "discriminator": [1, 2, 3, 4, 5, 6, 7, 8]
-         }
-      ],
-      "types": [
-         {
-            "name": "VecAccount",
-            "type": {
-               "kind": "struct",
-               "fields": [
-                  {"name": "scores", "type": {"vec": "u64"}}
-               ]
-            }
-         }
-      ]
-   })";
-
-   auto prog = idl::parse_idl(fc::json::from_string(idl_json));
+   auto prog = parse_u64_vec_account_idl();
    test_solana_program_client client({prog});
 
-   std::vector<uint8_t> account_data = {1, 2, 3, 4, 5, 6, 7, 8};
+   std::vector<uint8_t> account_data(vec_account_discriminator.begin(), vec_account_discriminator.end());
    append_u32_le(account_data, std::numeric_limits<uint32_t>::max());
 
-   BOOST_CHECK_THROW(client.decode_account_data(account_data, "VecAccount"), fc::assert_exception);
+   BOOST_CHECK_THROW(client.decode_account_data(account_data, std::string(vec_account_name)), fc::assert_exception);
+}
+
+BOOST_AUTO_TEST_CASE(test_anchor_idl_account_vec_checks_remaining_byte_boundary) {
+   constexpr uint32_t encoded_elements = 2;
+   constexpr uint64_t first_score = 11;
+   constexpr uint64_t second_score = 22;
+
+   auto prog = parse_u64_vec_account_idl();
+   test_solana_program_client client({prog});
+
+   std::vector<uint8_t> exact_data(vec_account_discriminator.begin(), vec_account_discriminator.end());
+   append_u32_le(exact_data, encoded_elements);
+   append_u64_le(exact_data, first_score);
+   append_u64_le(exact_data, second_score);
+
+   auto result = client.decode_account_data(exact_data, std::string(vec_account_name)).get_object();
+   auto scores = result["scores"].get_array();
+   BOOST_REQUIRE_EQUAL(scores.size(), encoded_elements);
+   BOOST_CHECK_EQUAL(scores[0].as_uint64(), first_score);
+   BOOST_CHECK_EQUAL(scores[1].as_uint64(), second_score);
+
+   auto one_past_data = exact_data;
+   const auto one_past_length = encoded_elements + 1;
+   for (size_t index = 0; index < sizeof(one_past_length); ++index)
+      one_past_data[vec_account_discriminator.size() + index] =
+         static_cast<uint8_t>((one_past_length >> (index * 8)) & 0xff);
+
+   BOOST_CHECK_THROW(client.decode_account_data(one_past_data, std::string(vec_account_name)),
+                     fc::assert_exception);
 }
 
 BOOST_AUTO_TEST_CASE(test_anchor_idl_account_vec_decodes_dynamic_elements) {
@@ -1375,31 +1525,74 @@ BOOST_AUTO_TEST_CASE(test_anchor_idl_account_vec_decodes_dynamic_elements) {
    BOOST_CHECK_EQUAL(labels[1].as_string(), "beta");
 }
 
-BOOST_AUTO_TEST_CASE(test_anchor_idl_account_zero_sized_vec_decodes_small_length) {
+BOOST_AUTO_TEST_CASE(test_anchor_idl_account_zero_sized_vec_accepts_materialization_cap) {
    auto prog = parse_empty_struct_vec_account_idl();
    test_solana_program_client client({prog});
 
-   std::vector<uint8_t> account_data = {8, 7, 6, 5, 4, 3, 2, 1};
-   append_u32_le(account_data, 3);
+   std::vector<uint8_t> account_data(empty_vec_account_discriminator.begin(),
+                                     empty_vec_account_discriminator.end());
+   append_u32_le(account_data, max_zero_sized_idl_vector_elements);
 
-   auto result = client.decode_account_data(account_data, "EmptyVecAccount").get_object();
+   auto result = client.decode_account_data(account_data, std::string(empty_vec_account_name)).get_object();
    auto empties = result["empties"].get_array();
 
-   BOOST_CHECK_EQUAL(empties.size(), 3u);
-   for (const auto& empty : empties) {
-      BOOST_CHECK(empty.is_object());
-      BOOST_CHECK_EQUAL(empty.get_object().size(), 0u);
-   }
+   BOOST_REQUIRE_EQUAL(empties.size(), max_zero_sized_idl_vector_elements);
+   BOOST_CHECK(empties.front().is_object());
+   BOOST_CHECK(empties.back().is_object());
 }
 
-BOOST_AUTO_TEST_CASE(test_anchor_idl_account_zero_sized_vec_rejects_unbounded_length) {
+BOOST_AUTO_TEST_CASE(test_anchor_idl_account_zero_sized_vec_rejects_one_past_materialization_cap) {
    auto prog = parse_empty_struct_vec_account_idl();
    test_solana_program_client client({prog});
 
-   std::vector<uint8_t> account_data = {8, 7, 6, 5, 4, 3, 2, 1};
-   append_u32_le(account_data, std::numeric_limits<uint32_t>::max());
+   std::vector<uint8_t> account_data(empty_vec_account_discriminator.begin(),
+                                     empty_vec_account_discriminator.end());
+   append_u32_le(account_data, max_zero_sized_idl_vector_elements + 1);
 
-   BOOST_CHECK_THROW(client.decode_account_data(account_data, "EmptyVecAccount"), fc::assert_exception);
+   BOOST_CHECK_THROW(client.decode_account_data(account_data, std::string(empty_vec_account_name)),
+                     fc::assert_exception);
+}
+
+BOOST_AUTO_TEST_CASE(test_anchor_idl_account_accepts_maximum_type_nesting) {
+   auto prog = make_nested_defined_account_idl(max_idl_type_nesting_depth);
+   test_solana_program_client client({prog});
+
+   std::vector<uint8_t> account_data(nested_account_discriminator.begin(), nested_account_discriminator.end());
+   account_data.push_back(42);
+
+   BOOST_CHECK_NO_THROW(client.decode_account_data(account_data, std::string(nested_account_name)));
+}
+
+BOOST_AUTO_TEST_CASE(test_anchor_idl_account_rejects_one_past_maximum_type_nesting) {
+   auto prog = make_nested_defined_account_idl(max_idl_type_nesting_depth + 1);
+   test_solana_program_client client({prog});
+
+   std::vector<uint8_t> account_data(nested_account_discriminator.begin(), nested_account_discriminator.end());
+   account_data.push_back(42);
+
+   BOOST_CHECK_EXCEPTION(client.decode_account_data(account_data, std::string(nested_account_name)),
+                         fc::assert_exception, is_idl_depth_exception);
+}
+
+BOOST_AUTO_TEST_CASE(test_anchor_idl_account_rejects_cyclic_defined_type_during_decode) {
+   auto prog = make_cyclic_defined_account_idl(false);
+   test_solana_program_client client({prog});
+
+   std::vector<uint8_t> account_data(cyclic_account_discriminator.begin(), cyclic_account_discriminator.end());
+
+   BOOST_CHECK_EXCEPTION(client.decode_account_data(account_data, std::string(cyclic_account_name)),
+                         fc::assert_exception, is_idl_depth_exception);
+}
+
+BOOST_AUTO_TEST_CASE(test_anchor_idl_account_rejects_cyclic_vector_bound_computation) {
+   auto prog = make_cyclic_defined_account_idl(true);
+   test_solana_program_client client({prog});
+
+   std::vector<uint8_t> account_data(cyclic_account_discriminator.begin(), cyclic_account_discriminator.end());
+   append_u32_le(account_data, 1);
+
+   BOOST_CHECK_EXCEPTION(client.decode_account_data(account_data, std::string(cyclic_account_name)),
+                         fc::assert_exception, is_idl_depth_exception);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
