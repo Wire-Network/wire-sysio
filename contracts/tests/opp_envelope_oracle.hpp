@@ -12,6 +12,7 @@
 
 #include <magic_enum/magic_enum.hpp>
 
+#include <optional>
 #include <span>
 #include <string>
 #include <vector>
@@ -155,11 +156,15 @@ namespace oracle {
       return id;
    }
 
-   /// Big-endian sequence number in the first 8 bytes of a wire message id; 0 when empty
-   /// (stream genesis) or out-of-spec short.
-   inline uint64_t message_sequence(const std::string& message_id) {
-      if (message_id.size() < 8) {
+   /// Big-endian sequence number in the first 8 bytes of a wire message id, in its two canonical
+   /// forms only: empty (stream genesis) reads 0, a 32-byte id yields its first 8 bytes, and any
+   /// other length is non-canonical std::nullopt (mirrors `opp::canonical::message_sequence`).
+   inline std::optional<uint64_t> message_sequence(const std::string& message_id) {
+      if (message_id.empty()) {
          return 0;
+      }
+      if (message_id.size() != 32) {
+         return std::nullopt;
       }
       uint64_t sequence = 0;
       for (size_t i = 0; i < 8; ++i) {
@@ -182,7 +187,8 @@ namespace oracle {
       header->set_timestamp(timestamp_ms);
       const auto checksum = header_checksum(*header);
       header->set_header_checksum(digest_bytes(checksum));
-      header->set_message_id(derive_message_id(checksum, message_sequence(prev_message_id) + 1));
+      header->set_message_id(
+         derive_message_id(checksum, message_sequence(prev_message_id).value() + 1));
    }
 
 } // namespace oracle

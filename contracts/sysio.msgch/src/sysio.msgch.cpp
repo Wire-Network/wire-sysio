@@ -388,8 +388,16 @@ std::optional<checksum256> to_checksum256_exact(const std::vector<char>& bytes) 
          return drop(i, "header_checksum does not recompute");
       }
 
-      const checksum256 expected_id = opp::canonical::derive_message_id(
-         header_checksum, opp::canonical::message_sequence(header.previous_message_id) + 1);
+      // `previous_message_id` has exactly two canonical forms -- empty at stream genesis or a
+      // full 32-byte id; `message_sequence` yields nullopt for anything else, so a truncated or
+      // padded value can never alias genesis or a valid sequence source, even when the checksum
+      // and id were re-derived over it by a colluding emitter.
+      const auto prev_sequence = opp::canonical::message_sequence(header.previous_message_id);
+      if (!prev_sequence.has_value()) {
+         return drop(i, "previous_message_id is neither empty nor 32 bytes");
+      }
+      const checksum256 expected_id =
+         opp::canonical::derive_message_id(header_checksum, *prev_sequence + 1);
       const auto claimed_id = to_checksum256_exact(header.message_id);
       if (!claimed_id.has_value() || *claimed_id != expected_id) {
          return drop(i, "message_id does not derive from header_checksum and the sequence number");

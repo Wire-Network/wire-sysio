@@ -515,8 +515,9 @@ BOOST_FIXTURE_TEST_CASE(buildenv_chains_consecutive_envelopes, sysio_msgch_chain
          oracle::header_checksum(header).str());
       BOOST_REQUIRE_EQUAL(
          header.message_id(),
-         oracle::derive_message_id(oracle::header_checksum(header),
-                                   oracle::message_sequence(header.previous_message_id()) + 1));
+         oracle::derive_message_id(
+            oracle::header_checksum(header),
+            oracle::message_sequence(header.previous_message_id()).value() + 1));
 
       // Message chain link: previous_message_id carries the predecessor row's stream tip, and
       // the new row's `last_message_id` records this emit's id for the next link.
@@ -555,7 +556,7 @@ BOOST_FIXTURE_TEST_CASE(buildenv_first_emit_chains_from_empty, sysio_msgch_chain
    BOOST_REQUIRE_EQUAL(env.messages_size(), 1);
    const auto& header = env.messages(0).header();
    BOOST_REQUIRE_EQUAL(header.previous_message_id().size(), 0u);
-   BOOST_REQUIRE_EQUAL(oracle::message_sequence(header.message_id()), 1u);
+   BOOST_REQUIRE_EQUAL(oracle::message_sequence(header.message_id()).value(), 1u);
    BOOST_REQUIRE_EQUAL(row["last_message_id"].as_string(),
                        fc::to_hex(header.message_id().data(), header.message_id().size()));
 } FC_LOG_AND_RETHROW() }
@@ -692,6 +693,16 @@ BOOST_FIXTURE_TEST_CASE(inbound_semantic_header_forgeries_dropped, sysio_msgch_c
    forged_delivery_dropped("ds", [](sysio::opp::Envelope& env) {
       auto* a = env.mutable_messages(0)->mutable_payload()->mutable_attestations(0);
       a->set_data_size(a->data_size() + 1);
+   });
+   forged_delivery_dropped("prevlen", [](sysio::opp::Envelope& env) {
+      // Non-canonical previous_message_id length (neither empty nor 32 bytes), with the checksum
+      // and id honestly re-derived over it the way a colluding emitter would -- the drop must
+      // come from the length rule alone, not from a checksum mismatch.
+      auto* h = env.mutable_messages(0)->mutable_header();
+      h->set_previous_message_id(std::string(5, '\x07'));
+      const auto checksum = oracle::header_checksum(*h);
+      h->set_header_checksum(oracle::digest_bytes(checksum));
+      h->set_message_id(oracle::derive_message_id(checksum, 1));
    });
 
    // The stream resumes: a well-formed, correctly chained envelope is accepted and advances the
