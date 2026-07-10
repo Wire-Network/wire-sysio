@@ -32,6 +32,9 @@
 #include <fc/crypto/sha256.hpp>
 
 #include "contracts.hpp"
+// Canonical-encoding + header-derivation oracle: inbound envelopes must carry
+// spec-derived semantic headers or apply_consensus drops them before dispatch.
+#include "opp_envelope_oracle.hpp"
 
 using namespace sysio::testing;
 using namespace sysio;
@@ -77,6 +80,8 @@ std::vector<char> encode_envelope(uint32_t epoch_index, const std::string& tag) 
    att->set_type(AttestationType::ATTESTATION_TYPE_UNSPECIFIED);  // benign: dispatch is a no-op
    att->set_data(tag);
    att->set_data_size(static_cast<uint32_t>(tag.size()));
+
+   oracle::finalize_header(*env.mutable_messages(0), {}, 1'775'612'516'983ULL);
 
    std::vector<char> out(env.ByteSizeLong());
    env.SerializeToArray(out.data(), static_cast<int>(out.size()));

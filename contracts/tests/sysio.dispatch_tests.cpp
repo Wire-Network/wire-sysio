@@ -30,6 +30,9 @@
 #include <magic_enum/magic_enum.hpp>
 
 #include "contracts.hpp"
+// Canonical-encoding + header-derivation oracle: inbound envelopes must carry
+// spec-derived semantic headers or apply_consensus drops them before dispatch.
+#include "opp_envelope_oracle.hpp"
 
 using namespace sysio::testing;
 using namespace sysio;
@@ -93,6 +96,8 @@ std::vector<char> encode_envelope_with_one_attestation(
    att->set_data(att_data);
    att->set_data_size(static_cast<uint32_t>(att_data.size()));
 
+   oracle::finalize_header(*env.mutable_messages(0), {}, 1'775'612'516'983ULL);
+
    std::vector<char> out(env.ByteSizeLong());
    env.SerializeToArray(out.data(), static_cast<int>(out.size()));
    return out;
@@ -120,6 +125,8 @@ std::vector<char> encode_envelope_with_attestations(
       att->set_data(d);
       att->set_data_size(static_cast<uint32_t>(d.size()));
    }
+
+   oracle::finalize_header(*env.mutable_messages(0), {}, 1'775'612'516'983ULL);
 
    std::vector<char> out(env.ByteSizeLong());
    env.SerializeToArray(out.data(), static_cast<int>(out.size()));

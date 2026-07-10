@@ -328,6 +328,76 @@ name resolve_account_from_op_address(const opp::types::ChainAddress& op_address)
    return false;
 }
 
+/// Reinterpret an exactly-32-byte protobuf `bytes` field as a checksum256. Returns std::nullopt
+/// for any other length; chain and header verification treat a malformed hash as a mismatch,
+/// never as a match or a wildcard.
+std::optional<checksum256> to_checksum256_exact(const std::vector<char>& bytes) {
+   if (bytes.size() != 32)
+      return std::nullopt;
+   std::array<uint8_t, 32> raw{};
+   for (size_t i = 0; i < 32; ++i)
+      raw[i] = static_cast<uint8_t>(bytes[i]);
+   return checksum256{raw};
+}
+
+/// Validate every message's semantic header (opp.proto MessageHeader) against the spec
+/// derivation shared by all three emitters: each attestation's `data_size` must equal its `data`
+/// length, `payload_size` / `payload_checksum` must recompute over the payload's canonical
+/// bytes, `header_checksum` must recompute over the field-complete header with `message_id` and
+/// `header_checksum` blanked, and `message_id` must be that checksum with its first 8 bytes
+/// replaced by `previous_message_id`'s sequence number + 1.
+///
+/// Every check is SELF-CONTAINED (no cross-envelope state): stream ordering is already enforced
+/// by the envelope-level chain in `apply_consensus`, so a per-outpost inbound message tip is
+/// deliberately not tracked here. A zero-message envelope is trivially valid -- the EVM outpost
+/// emits empty-messages envelopes as epoch acks. Returns false on the first mismatch; the caller
+/// drops the envelope without dispatching and without throwing, per the never-throw handler
+/// convention.
+[[nodiscard]] bool semantic_headers_ok(const opp::Envelope& envelope, uint64_t chain_code,
+                                       uint32_t epoch_index) {
+   const auto drop = [&](size_t msg_index, const char* what) {
+      sysio::print_f("DROP envelope semantic header: chain_code=%llu epoch=%u message=%llu %s\n",
+                     static_cast<unsigned long long>(chain_code), epoch_index,
+                     static_cast<unsigned long long>(msg_index), what);
+      return false;
+   };
+
+   for (size_t i = 0; i < envelope.messages.size(); ++i) {
+      const auto& msg    = envelope.messages[i];
+      const auto& header = msg.header;
+
+      for (const auto& entry : msg.payload.attestations) {
+         if (static_cast<uint32_t>(entry.data_size) != entry.data.size()) {
+            return drop(i, "attestation data_size does not match data length");
+         }
+      }
+
+      const std::vector<char> payload_bytes = opp::canonical::encode(msg.payload);
+      if (static_cast<uint32_t>(header.payload_size) != payload_bytes.size()) {
+         return drop(i, "payload_size does not match the canonical payload bytes");
+      }
+      const checksum256 payload_checksum = keccak(payload_bytes.data(), payload_bytes.size());
+      const auto claimed_payload_checksum = to_checksum256_exact(header.payload_checksum);
+      if (!claimed_payload_checksum.has_value() || *claimed_payload_checksum != payload_checksum) {
+         return drop(i, "payload_checksum does not recompute");
+      }
+
+      const checksum256 header_checksum = opp::canonical::header_digest(header);
+      const auto claimed_header_checksum = to_checksum256_exact(header.header_checksum);
+      if (!claimed_header_checksum.has_value() || *claimed_header_checksum != header_checksum) {
+         return drop(i, "header_checksum does not recompute");
+      }
+
+      const checksum256 expected_id = opp::canonical::derive_message_id(
+         header_checksum, opp::canonical::message_sequence(header.previous_message_id) + 1);
+      const auto claimed_id = to_checksum256_exact(header.message_id);
+      if (!claimed_id.has_value() || *claimed_id != expected_id) {
+         return drop(i, "message_id does not derive from header_checksum and the sequence number");
+      }
+   }
+   return true;
+}
+
 /// Decode an OperatorAction sub-message and dispatch to the appropriate
 /// sysio.opreg action. Called from the inbound dispatch loop in `evalcons`.
 ///
@@ -844,18 +914,6 @@ void dispatch_attestation(name self, uint64_t attestation_id,
    }
 }
 
-/// Reinterpret an exactly-32-byte protobuf `bytes` field as a checksum256. Returns std::nullopt
-/// for any other length; chain verification treats a malformed hash as a mismatch, never as a
-/// match or a wildcard.
-std::optional<checksum256> to_checksum256_exact(const std::vector<char>& bytes) {
-   if (bytes.size() != 32)
-      return std::nullopt;
-   std::array<uint8_t, 32> raw{};
-   for (size_t i = 0; i < 32; ++i)
-      raw[i] = static_cast<uint8_t>(bytes[i]);
-   return checksum256{raw};
-}
-
 /// Apply a consensus-reached inbound envelope for one (outpost, epoch): decode it, verify it
 /// continues the per-outpost envelope chain, store and dispatch its attestations, write the
 /// audit-log row, drain the working envelope rows, and record per-outpost consensus. Shared by
@@ -942,6 +1000,14 @@ void apply_consensus(name self, uint64_t chain_code, uint32_t epoch_index,
             return;
          }
       }
+   }
+
+   // Semantic-header enforcement: every message's checksums and ids must recompute per the
+   // opp.proto MessageHeader spec, which all three emitters populate identically. A mismatch is
+   // a malformed or forged envelope -- dropped before any dispatch, consensus record, or cleanup
+   // (delivery rows stay intact for audit/dispute), per the never-throw handler convention.
+   if (!semantic_headers_ok(envelope, chain_code, epoch_index)) {
+      return;
    }
 
    // The `messages` row is intentionally not written here. The raw envelope bytes have already served

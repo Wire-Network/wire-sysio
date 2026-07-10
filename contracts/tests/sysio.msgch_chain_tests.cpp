@@ -44,178 +44,10 @@ using namespace sysio::chain;
 
 using mvo = fc::mutable_variant_object;
 
+// Canonical-encoding + header-derivation oracle shared across the contract tests.
+#include "opp_envelope_oracle.hpp"
+
 namespace {
-
-// ---------------------------------------------------------------------------
-//  Canonical field-complete encoding oracle (host side, over the Google
-//  protobuf classes). Field numbers and presence rules mirror
-//  opp_canonical_codec.hpp; see that header for the encoding definition.
-// ---------------------------------------------------------------------------
-namespace oracle {
-
-   void put_varint(std::vector<char>& out, uint64_t v) {
-      while (v >= 0x80) {
-         out.push_back(static_cast<char>(static_cast<uint8_t>(v) | 0x80));
-         v >>= 7;
-      }
-      out.push_back(static_cast<char>(static_cast<uint8_t>(v)));
-   }
-
-   /// wire type 0 = varint, 2 = length-delimited
-   void put_tag(std::vector<char>& out, uint32_t field, uint32_t wire) {
-      put_varint(out, (static_cast<uint64_t>(field) << 3) | wire);
-   }
-
-   void put_varint_field(std::vector<char>& out, uint32_t field, uint64_t v) {
-      put_tag(out, field, 0);
-      put_varint(out, v);
-   }
-
-   void put_bytes_field(std::vector<char>& out, uint32_t field, const std::string& v) {
-      put_tag(out, field, 2);
-      put_varint(out, v.size());
-      out.insert(out.end(), v.begin(), v.end());
-   }
-
-   void put_submessage(std::vector<char>& out, uint32_t field, const std::vector<char>& body) {
-      put_tag(out, field, 2);
-      put_varint(out, body.size());
-      out.insert(out.end(), body.begin(), body.end());
-   }
-
-   std::vector<char> encode(const sysio::opp::types::ChainId& m) {
-      std::vector<char> out;
-      put_varint_field(out, 1, magic_enum::enum_integer(m.kind()));
-      put_varint_field(out, 2, m.id());
-      return out;
-   }
-
-   std::vector<char> encode(const sysio::opp::Endpoints& m) {
-      std::vector<char> out;
-      put_submessage(out, 1, encode(m.start()));
-      put_submessage(out, 2, encode(m.end()));
-      return out;
-   }
-
-   std::vector<char> encode(const sysio::opp::MessageHeader& m) {
-      std::vector<char> out;
-      put_submessage(out, 1, encode(m.endpoints()));
-      put_bytes_field(out, 2, m.message_id());
-      put_bytes_field(out, 3, m.previous_message_id());
-      // Slot 4 was `encoding_flags` — removed from opp.proto; reserved, do not reuse.
-      put_varint_field(out, 5, m.payload_size());
-      put_bytes_field(out, 6, m.payload_checksum());
-      put_varint_field(out, 7, m.timestamp());
-      put_bytes_field(out, 8, m.header_checksum());
-      return out;
-   }
-
-   std::vector<char> encode(const sysio::opp::AttestationEntry& m) {
-      std::vector<char> out;
-      put_varint_field(out, 1, magic_enum::enum_integer(m.type()));
-      put_varint_field(out, 2, m.data_size());
-      put_bytes_field(out, 3, m.data());
-      return out;
-   }
-
-   std::vector<char> encode(const sysio::opp::MessagePayload& m) {
-      std::vector<char> out;
-      put_varint_field(out, 1, m.version());
-      for (const auto& a : m.attestations())
-         put_submessage(out, 2, encode(a));
-      return out;
-   }
-
-   std::vector<char> encode(const sysio::opp::Message& m) {
-      std::vector<char> out;
-      put_submessage(out, 1, encode(m.header()));
-      put_submessage(out, 2, encode(m.payload()));
-      return out;
-   }
-
-   std::vector<char> encode(const sysio::opp::Envelope& m, bool blank_envelope_hash = false) {
-      std::vector<char> out;
-      put_bytes_field(out, 1, blank_envelope_hash ? std::string{} : m.envelope_hash());
-      put_submessage(out, 2, encode(m.endpoints()));
-      put_varint_field(out, 5, m.epoch_timestamp());
-      put_varint_field(out, 6, m.epoch_index());
-      put_varint_field(out, 7, m.epoch_envelope_index());
-      put_bytes_field(out, 20, m.previous_envelope_hash());
-      for (const auto& msg : m.messages())
-         put_submessage(out, 40, encode(msg));
-      return out;
-   }
-
-   /// keccak256 over the canonical encoding with `envelope_hash` blanked: the cross-chain epoch
-   /// digest (`OPPCommon.epochHash` on the outposts, `opp::canonical::epoch_digest` in the depot).
-   fc::crypto::keccak256 epoch_digest(const sysio::opp::Envelope& env) {
-      const auto preimage = encode(env, /*blank_envelope_hash=*/true);
-      return fc::crypto::keccak256::hash(std::span<const uint8_t>(
-         reinterpret_cast<const uint8_t*>(preimage.data()), preimage.size()));
-   }
-
-   /// The digest as the raw 32-byte string a protobuf `bytes` field carries.
-   std::string digest_bytes(const fc::crypto::keccak256& d) {
-      return std::string(reinterpret_cast<const char*>(d.data()), d.data_size());
-   }
-
-   fc::crypto::keccak256 keccak_of(const std::vector<char>& bytes) {
-      return fc::crypto::keccak256::hash(std::span<const uint8_t>(
-         reinterpret_cast<const uint8_t*>(bytes.data()), bytes.size()));
-   }
-
-   /// The spec derivation of `MessageHeader.header_checksum`: keccak256 over the canonical
-   /// header with `message_id` and `header_checksum` blanked (mirrors
-   /// `opp::canonical::header_digest` and Solidity `OPPCommon.headerChecksum`).
-   fc::crypto::keccak256 header_checksum(const sysio::opp::MessageHeader& header) {
-      sysio::opp::MessageHeader blanked = header;
-      blanked.set_message_id("");
-      blanked.set_header_checksum("");
-      return keccak_of(encode(blanked));
-   }
-
-   /// The spec derivation of `MessageHeader.message_id`: the header checksum with its first 8
-   /// bytes replaced by the message's big-endian sequence number (mirrors
-   /// `opp::canonical::derive_message_id` and Solidity `OPPCommon.getMessageID`).
-   std::string derive_message_id(const fc::crypto::keccak256& checksum, uint64_t sequence) {
-      std::string id = digest_bytes(checksum);
-      for (size_t i = 0; i < 8; ++i) {
-         id[i] = static_cast<char>(static_cast<uint8_t>(sequence >> (8 * (7 - i))));
-      }
-      return id;
-   }
-
-   /// Big-endian sequence number in the first 8 bytes of a wire message id; 0 when empty
-   /// (stream genesis) or out-of-spec short.
-   uint64_t message_sequence(const std::string& message_id) {
-      if (message_id.size() < 8) {
-         return 0;
-      }
-      uint64_t sequence = 0;
-      for (size_t i = 0; i < 8; ++i) {
-         sequence = (sequence << 8) | static_cast<uint8_t>(message_id[i]);
-      }
-      return sequence;
-   }
-
-   /// Populate `msg`'s semantic header per the spec derivation from its payload and stream
-   /// predecessor: `payload_size` / `payload_checksum` over the payload's canonical bytes, then
-   /// `header_checksum` over the blanked header, then `message_id` at the predecessor's sequence
-   /// number + 1. Mirrors what `sysio.msgch::buildenv` derives on emit.
-   void finalize_header(sysio::opp::Message& msg, const std::string& prev_message_id,
-                        uint64_t timestamp_ms) {
-      auto* header = msg.mutable_header();
-      header->set_previous_message_id(prev_message_id);
-      const auto payload_bytes = encode(msg.payload());
-      header->set_payload_size(static_cast<uint32_t>(payload_bytes.size()));
-      header->set_payload_checksum(digest_bytes(keccak_of(payload_bytes)));
-      header->set_timestamp(timestamp_ms);
-      const auto checksum = header_checksum(*header);
-      header->set_header_checksum(digest_bytes(checksum));
-      header->set_message_id(derive_message_id(checksum, message_sequence(prev_message_id) + 1));
-   }
-
-} // namespace oracle
 
 inline fc::mutable_variant_object codename_mvo(std::string_view s) {
    return mvo()("value", fc::slug_name{s}.value);
@@ -502,7 +334,9 @@ public:
 
    /// Encode a deliverable envelope carrying one out-of-scope STAKE attestation (dispatch drops
    /// the attestation silently; acceptance is still fully observable via `outpcons` and the
-   /// stored attestation row). `prev` / `env_hash` are raw 32-byte strings (or empty).
+   /// stored attestation row). The semantic header is derived per the spec — `apply_consensus`
+   /// drops envelopes whose header fields do not recompute. `prev` / `env_hash` are raw 32-byte
+   /// strings (or empty).
    std::vector<char> encode_delivery(uint32_t epoch_index, const std::string& att_data,
                                      const std::string& prev = {},
                                      const std::string& env_hash = {}) {
@@ -516,6 +350,7 @@ public:
       att->set_type(sysio::opp::types::ATTESTATION_TYPE_STAKE);
       att->set_data(att_data);
       att->set_data_size(static_cast<uint32_t>(att_data.size()));
+      oracle::finalize_header(*env.mutable_messages(0), {}, 1'775'612'516'983ULL);
       std::vector<char> out(env.ByteSizeLong());
       env.SerializeToArray(out.data(), static_cast<int>(out.size()));
       return out;
@@ -798,6 +633,78 @@ BOOST_FIXTURE_TEST_CASE(inbound_chain_tip_recorded_and_verified, sysio_msgch_cha
    opc = get_outpcons(ETH_OUTPOST_ID);
    BOOST_REQUIRE_EQUAL(opc["epoch_index"].as<uint32_t>(), blank_epoch);
    BOOST_REQUIRE_EQUAL(opc["envelope_digest"].as_string(), n5_digest.str());
+} FC_LOG_AND_RETHROW() }
+
+/// Semantic-header enforcement: every header field must recompute per the spec derivation; a
+/// forged field drops the envelope before dispatch -- no attestation rows, no consensus record,
+/// no chain-tip movement -- without throwing. Each forgery is exercised at its own epoch on a
+/// correctly CHAINED envelope, so the drop is attributable to the header check rather than the
+/// envelope-chain check; a final well-formed delivery proves the stream resumes.
+BOOST_FIXTURE_TEST_CASE(inbound_semantic_header_forgeries_dropped, sysio_msgch_chain_tester) { try {
+   bootstrap();
+
+   // Establish a tip so every subsequent forgery chains correctly at the envelope level.
+   uint32_t epoch = current_epoch();
+   auto base = encode_delivery(epoch, "alpha");
+   const auto tip = oracle::epoch_digest(decode_envelope(base));
+   BOOST_REQUIRE_EQUAL(success(), deliver(ETH_OUTPOST_ID, base));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(attestation_count(ETH_OUTPOST_ID, epoch), 1u);
+   const uint32_t accepted_epoch = epoch;
+
+   // Deliver a correctly-chained envelope whose decoded form was altered by `mutate`, then
+   // assert it was dropped: deliver itself succeeds (never-throw), no attestation row for its
+   // epoch, the consensus record stays at the last accepted epoch, the tip does not move.
+   auto forged_delivery_dropped = [&](const char* tag,
+                                      const std::function<void(sysio::opp::Envelope&)>& mutate) {
+      const uint32_t e = advance_one_epoch();
+      auto env = decode_envelope(encode_delivery(e, tag, oracle::digest_bytes(tip)));
+      mutate(env);
+      std::vector<char> out(env.ByteSizeLong());
+      env.SerializeToArray(out.data(), static_cast<int>(out.size()));
+      BOOST_REQUIRE_EQUAL(success(), deliver(ETH_OUTPOST_ID, out));
+      produce_blocks();
+      BOOST_REQUIRE_EQUAL(attestation_count(ETH_OUTPOST_ID, e), 0u);
+      auto opc = get_outpcons(ETH_OUTPOST_ID);
+      BOOST_REQUIRE(!opc.is_null());
+      BOOST_REQUIRE_EQUAL(opc["epoch_index"].as<uint32_t>(), accepted_epoch);
+      BOOST_REQUIRE_EQUAL(opc["envelope_digest"].as_string(), tip.str());
+   };
+
+   forged_delivery_dropped("pc", [](sysio::opp::Envelope& env) {
+      auto* h = env.mutable_messages(0)->mutable_header();
+      std::string c = h->payload_checksum(); c[0] ^= 0x01; h->set_payload_checksum(c);
+   });
+   forged_delivery_dropped("hc", [](sysio::opp::Envelope& env) {
+      auto* h = env.mutable_messages(0)->mutable_header();
+      std::string c = h->header_checksum(); c[31] ^= 0x01; h->set_header_checksum(c);
+   });
+   forged_delivery_dropped("ps", [](sysio::opp::Envelope& env) {
+      auto* h = env.mutable_messages(0)->mutable_header();
+      h->set_payload_size(h->payload_size() + 1);
+   });
+   forged_delivery_dropped("seq", [](sysio::opp::Envelope& env) {
+      // Correct checksum tail, wrong embedded sequence number (2 where the derivation demands
+      // previous_message_id's sequence + 1 = 1).
+      auto* h = env.mutable_messages(0)->mutable_header();
+      h->set_message_id(oracle::derive_message_id(oracle::header_checksum(*h), 2));
+   });
+   forged_delivery_dropped("ds", [](sysio::opp::Envelope& env) {
+      auto* a = env.mutable_messages(0)->mutable_payload()->mutable_attestations(0);
+      a->set_data_size(a->data_size() + 1);
+   });
+
+   // The stream resumes: a well-formed, correctly chained envelope is accepted and advances the
+   // tip past all the dropped epochs.
+   const uint32_t resume_epoch = advance_one_epoch();
+   auto resume = encode_delivery(resume_epoch, "omega", oracle::digest_bytes(tip));
+   const auto resume_digest = oracle::epoch_digest(decode_envelope(resume));
+   BOOST_REQUIRE_EQUAL(success(), deliver(ETH_OUTPOST_ID, resume));
+   produce_blocks();
+   auto opc = get_outpcons(ETH_OUTPOST_ID);
+   BOOST_REQUIRE_EQUAL(opc["epoch_index"].as<uint32_t>(), resume_epoch);
+   BOOST_REQUIRE_EQUAL(opc["envelope_digest"].as_string(), resume_digest.str());
+   BOOST_REQUIRE_EQUAL(attestation_count(ETH_OUTPOST_ID, resume_epoch), 1u);
 } FC_LOG_AND_RETHROW() }
 
 /// SEC-107 completion: the SVM cross-stream alternate is REMOVED. The Solana outpost now
