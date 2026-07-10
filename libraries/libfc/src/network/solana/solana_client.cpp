@@ -17,12 +17,6 @@ namespace fc::network::solana {
 namespace {
 
 /**
- * @brief Maximum materialized elements for vectors whose element encoding can
- * consume zero bytes.
- */
-constexpr uint32_t max_zero_sized_idl_vector_elements = 64u * 1024u;
-
-/**
  * @brief Checked size_t addition for conservative Borsh size estimates.
  */
 std::optional<size_t> checked_add_size(size_t lhs, size_t rhs) {
@@ -40,16 +34,28 @@ std::optional<size_t> checked_mul_size(size_t lhs, size_t rhs) {
    return lhs * rhs;
 }
 
-std::optional<size_t> min_borsh_encoded_size(const idl::idl_type& type, const idl::program* program);
+/**
+ * @brief Return the next nested IDL type depth or reject excessive recursion.
+ */
+size_t next_idl_type_depth(size_t type_depth) {
+   FC_ASSERT(type_depth < max_idl_type_nesting_depth,
+             "Solana IDL type nesting exceeds maximum depth {}",
+             max_idl_type_nesting_depth);
+   return type_depth + 1;
+}
+
+std::optional<size_t> min_borsh_encoded_size(const idl::idl_type& type, const idl::program* program,
+                                             size_t type_depth);
 
 /**
  * @brief Smallest Borsh byte count for a field sequence.
  */
 std::optional<size_t> min_borsh_fields_encoded_size(const std::vector<idl::field>& fields,
-                                                    const idl::program* program) {
+                                                    const idl::program* program,
+                                                    size_t type_depth) {
    size_t total = 0;
    for (const auto& field : fields) {
-      auto field_size = min_borsh_encoded_size(field.type, program);
+      auto field_size = min_borsh_encoded_size(field.type, program, type_depth);
       if (!field_size)
          return std::nullopt;
       auto next_total = checked_add_size(total, *field_size);
@@ -63,7 +69,8 @@ std::optional<size_t> min_borsh_fields_encoded_size(const std::vector<idl::field
 /**
  * @brief Conservative lower bound for bytes consumed by an IDL type.
  */
-std::optional<size_t> min_borsh_encoded_size(const idl::idl_type& type, const idl::program* program) {
+std::optional<size_t> min_borsh_encoded_size(const idl::idl_type& type, const idl::program* program,
+                                             size_t type_depth) {
    if (type.is_primitive()) {
       switch (type.get_primitive()) {
       case idl::primitive_type::bool_t:
@@ -100,14 +107,15 @@ std::optional<size_t> min_borsh_encoded_size(const idl::idl_type& type, const id
    } else if (type.is_array()) {
       if (!type.array_element || !type.array_len)
          return std::nullopt;
-      auto element_size = min_borsh_encoded_size(*type.array_element, program);
+      auto element_size = min_borsh_encoded_size(*type.array_element, program, next_idl_type_depth(type_depth));
       if (!element_size)
          return std::nullopt;
       return checked_mul_size(*element_size, *type.array_len);
    } else if (type.is_tuple() && type.tuple_elements) {
       size_t total = 0;
+      const auto element_depth = next_idl_type_depth(type_depth);
       for (const auto& elem_type : *type.tuple_elements) {
-         auto elem_size = min_borsh_encoded_size(elem_type, program);
+         auto elem_size = min_borsh_encoded_size(elem_type, program, element_depth);
          if (!elem_size)
             return std::nullopt;
          auto next_total = checked_add_size(total, *elem_size);
@@ -125,7 +133,8 @@ std::optional<size_t> min_borsh_encoded_size(const idl::idl_type& type, const id
          return std::nullopt;
 
       if (type_def->is_struct() && type_def->struct_fields)
-         return min_borsh_fields_encoded_size(*type_def->struct_fields, program);
+         return min_borsh_fields_encoded_size(*type_def->struct_fields, program,
+                                              next_idl_type_depth(type_depth));
 
       if (type_def->is_enum() && type_def->enum_variants)
          return sizeof(uint8_t);
@@ -505,6 +514,11 @@ std::vector<uint8_t> solana_program_client::extract_return_data(const fc::varian
 }
 
 fc::variant solana_program_client::decode_type(borsh::decoder& decoder, const idl::idl_type& type) {
+   return decode_type(decoder, type, 0);
+}
+
+fc::variant solana_program_client::decode_type(borsh::decoder& decoder, const idl::idl_type& type,
+                                               size_t type_depth) {
    if (type.is_primitive()) {
       switch (type.get_primitive()) {
       case idl::primitive_type::bool_t:
@@ -556,11 +570,12 @@ fc::variant solana_program_client::decode_type(borsh::decoder& decoder, const id
       }
       FC_ASSERT(has_value == 1, "Invalid option discriminator: {}", has_value);
       // Recursively decode the inner type
-      return decode_type(decoder, *type.option_inner);
+      return decode_type(decoder, *type.option_inner, next_idl_type_depth(type_depth));
    } else if (type.is_vec()) {
       uint32_t len = decoder.read_u32();
       FC_ASSERT(type.vec_element, "Borsh decoder: Vec type is missing an element type");
-      const auto min_element_size = min_borsh_encoded_size(*type.vec_element, _program.get());
+      const auto element_depth = next_idl_type_depth(type_depth);
+      const auto min_element_size = min_borsh_encoded_size(*type.vec_element, _program.get(), element_depth);
       if (!min_element_size) {
          FC_ASSERT(len == 0,
                    "Borsh decoder: cannot safely bound vector element type '{}' before allocation",
@@ -580,25 +595,27 @@ fc::variant solana_program_client::decode_type(borsh::decoder& decoder, const id
 
       // Decode each element
       for (uint32_t i = 0; i < len; ++i) {
-         arr.push_back(decode_type(decoder, *type.vec_element));
+         arr.push_back(decode_type(decoder, *type.vec_element, element_depth));
       }
       return fc::variant(arr);
    } else if (type.is_array()) {
       fc::variants arr;
       arr.reserve(*type.array_len);
+      const auto element_depth = next_idl_type_depth(type_depth);
 
       // Decode each element (no length prefix for fixed arrays)
       for (size_t i = 0; i < *type.array_len; ++i) {
-         arr.push_back(decode_type(decoder, *type.array_element));
+         arr.push_back(decode_type(decoder, *type.array_element, element_depth));
       }
       return fc::variant(arr);
    } else if (type.is_tuple() && type.tuple_elements) {
       fc::variants arr;
       arr.reserve(type.tuple_elements->size());
+      const auto element_depth = next_idl_type_depth(type_depth);
 
       // Decode each tuple element
       for (const auto& elem_type : *type.tuple_elements) {
-         arr.push_back(decode_type(decoder, elem_type));
+         arr.push_back(decode_type(decoder, elem_type, element_depth));
       }
       return fc::variant(arr);
    } else if (type.is_defined()) {
@@ -609,7 +626,7 @@ fc::variant solana_program_client::decode_type(borsh::decoder& decoder, const id
       FC_ASSERT(type_def, "Type '{}' not found in IDL", type.get_defined_name());
 
       if (type_def->is_struct() && type_def->struct_fields) {
-         return decode_fields(decoder, *type_def->struct_fields);
+         return decode_fields(decoder, *type_def->struct_fields, next_idl_type_depth(type_depth));
       } else if (type_def->is_enum() && type_def->enum_variants) {
          // Decode enum variant index
          uint8_t variant_idx = decoder.read_u8();
@@ -623,7 +640,7 @@ fc::variant solana_program_client::decode_type(borsh::decoder& decoder, const id
 
          // Decode variant fields if present
          if (variant.fields && !variant.fields->empty()) {
-            obj("fields", decode_fields(decoder, *variant.fields));
+            obj("fields", decode_fields(decoder, *variant.fields, next_idl_type_depth(type_depth)));
          }
          return fc::variant(obj);
       } else {
@@ -635,9 +652,14 @@ fc::variant solana_program_client::decode_type(borsh::decoder& decoder, const id
 }
 
 fc::variant solana_program_client::decode_fields(borsh::decoder& decoder, const std::vector<idl::field>& fields) {
+   return decode_fields(decoder, fields, 0);
+}
+
+fc::variant solana_program_client::decode_fields(borsh::decoder& decoder, const std::vector<idl::field>& fields,
+                                                 size_t type_depth) {
    fc::mutable_variant_object obj;
    for (const auto& field : fields) {
-      obj(field.name, decode_type(decoder, field.type));
+      obj(field.name, decode_type(decoder, field.type, type_depth));
    }
    return fc::variant(obj);
 }
