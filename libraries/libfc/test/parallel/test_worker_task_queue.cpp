@@ -71,8 +71,64 @@ BOOST_AUTO_TEST_CASE(push_after_stop_is_noop) {
    q->stop();
    q->push(1);
    q->push(2);
+   BOOST_TEST(!q->try_push(3));
    BOOST_TEST(processed.load() == 0);
    BOOST_TEST(q->size() == 0u);
+}
+
+/// Appending capacity to the public aggregate preserves the meaning of legacy
+/// five-field positional initializers.
+BOOST_AUTO_TEST_CASE(config_positional_initialization_remains_compatible) {
+   const worker_task_queue_config config{false, true, 1, false, true};
+
+   BOOST_TEST(!config.dynamic_size);
+   BOOST_TEST(config.reuse_thread);
+   BOOST_TEST(config.max_threads == 1u);
+   BOOST_TEST(!config.prune_threads);
+   BOOST_TEST(config.skip_autostart);
+   BOOST_TEST(!config.max_pending_items.has_value());
+}
+
+BOOST_AUTO_TEST_CASE(bounded_queue_rejects_items_beyond_pending_limit) {
+   auto q =
+      worker_task_queue<int>::create({.max_threads = 1, .skip_autostart = true, .max_pending_items = 2}, [](int&) {});
+
+   BOOST_TEST(q->try_push(1));
+   BOOST_TEST(q->try_push(2));
+   BOOST_TEST(!q->try_push(3));
+   BOOST_TEST(q->size() == 2u);
+
+   q->stop();
+}
+
+/// A callback already in progress does not consume pending capacity, while a stalled callback
+/// cannot allow the waiting queue to grow past its configured bound.
+BOOST_AUTO_TEST_CASE(bounded_queue_stays_bounded_behind_blocked_worker) {
+   constexpr std::size_t pending_limit = 2;
+   std::atomic<int> processed{0};
+   std::latch callback_started(1);
+   std::latch release_callback(1);
+
+   auto q = worker_task_queue<int>::create({.max_threads = 1, .max_pending_items = pending_limit}, [&](int&) {
+      callback_started.count_down();
+      release_callback.wait();
+      ++processed;
+   });
+
+   BOOST_REQUIRE(q->try_push(0));
+   callback_started.wait();
+
+   BOOST_TEST(q->try_push(1));
+   BOOST_TEST(q->try_push(2));
+   BOOST_TEST(!q->try_push(3));
+   BOOST_TEST(q->size() == pending_limit);
+
+   release_callback.count_down();
+   while (processed.load() < 3)
+      std::this_thread::sleep_for(std::chrono::milliseconds(1));
+
+   q->stop();
+   BOOST_TEST(processed.load() == 3);
 }
 
 BOOST_AUTO_TEST_CASE(skip_autostart_requires_manual_start) {

@@ -23,6 +23,9 @@ namespace asio = boost::asio;
 // -----------------------------------------------------------------------
 enum class http_verb { GET, PUT, POST, DELETE_ };
 
+/// Control whether connection failures invalidate the client's startup DNS result.
+enum class endpoint_refresh_policy { on_connection_failure, never };
+
 // JSON-RPC error type
 struct json_rpc_error : fc::exception {
    int      code;
@@ -35,8 +38,8 @@ struct json_rpc_error : fc::exception {
 // raw HTTP verb support for REST-style endpoints.
 class json_rpc_client {
 public:
-   explicit json_rpc_client(fc::url                           url,
-                            const std::optional<std::string>& user_agent = std::nullopt);
+   explicit json_rpc_client(fc::url url, const std::optional<std::string>& user_agent = std::nullopt,
+                            endpoint_refresh_policy refresh_policy = endpoint_refresh_policy::on_connection_failure);
 
    // -----------------------------------------------------------------------
    //  JSON-RPC 2.0 methods (unchanged, backwards compatible)
@@ -76,6 +79,7 @@ private:
    std::int64_t _next_id;
    tcp::resolver::results_type _resolved_endpoints;
    bool                        _resolved_endpoints_stale;
+   endpoint_refresh_policy _refresh_policy;
 
    // Perform HTTP POST with JSON payload; optionally parse JSON body.
    variant send_json(const variant& payload, bool expect_json_body = true);
