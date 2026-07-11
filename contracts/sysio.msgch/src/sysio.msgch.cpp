@@ -966,8 +966,17 @@ void dispatch_attestation(name self, uint64_t attestation_id,
 /// so `sysio.epoch::advance` can classify each operator's delivery as canonical or slashable.
 /// Acceptance also records the envelope's canonical epoch digest on `outpcons.envelope_digest`,
 /// the inbound chain tip the next envelope from this outpost must continue from.
-void apply_consensus(name self, uint64_t chain_code, uint32_t epoch_index,
-                     const std::vector<char>& raw, const checksum256& winning_checksum) {
+///
+/// Returns true iff the winner was ACCEPTED (`outpcons` written, or an idempotent re-fire of an
+/// already-recorded winner); false iff it was DROPPED (envelope-chain break or semantic-header
+/// failure). The two callers treat a drop differently and MUST NOT ignore the result:
+/// `evalcons` soft-drops (the epoch simply stays un-consensused until a valid delivery or a
+/// dispute — never throw on the deliver/evalcons path), whereas `resolvedisp` `check()`s it so a
+/// rejected dispute WINNER reverts the enclosing `chkdispute` crank, leaving the dispute
+/// OPEN/paused rather than stranding the epoch unpaused with no consensus row.
+[[nodiscard]] bool apply_consensus(name self, uint64_t chain_code, uint32_t epoch_index,
+                                   const std::vector<char>& raw,
+                                   const checksum256& winning_checksum) {
    const uint128_t composite = opp::outpost_epoch_key(chain_code, epoch_index);
 
    // Idempotency guard, keyed off the DURABLE per-outpost consensus row. `outpcons.epoch_index` is
@@ -989,7 +998,7 @@ void apply_consensus(name self, uint64_t chain_code, uint32_t epoch_index,
             sysio::print_f("apply_consensus: chain_code=%llu epoch=%u already dispatched, "
                            "treating as benign no-op\n",
                            static_cast<unsigned long long>(chain_code), epoch_index);
-            return;
+            return true;   // winner already recorded for this epoch -- an accepted state
          }
       }
    }
@@ -1044,7 +1053,7 @@ void apply_consensus(name self, uint64_t chain_code, uint32_t epoch_index,
             sysio::print_f("DROP envelope chain break: chain_code=%llu epoch=%u "
                            "previous_envelope_hash does not continue the accepted chain\n",
                            static_cast<unsigned long long>(chain_code), epoch_index);
-            return;
+            return false;
          }
       }
    }
@@ -1060,7 +1069,7 @@ void apply_consensus(name self, uint64_t chain_code, uint32_t epoch_index,
    checksum256 new_message_tip{};
    if (!semantic_headers_ok(envelope, inbound_message_tip, new_message_tip, chain_code,
                             epoch_index)) {
-      return;
+      return false;
    }
 
    // The `messages` row is intentionally not written here. The raw envelope bytes have already served
@@ -1156,6 +1165,7 @@ void apply_consensus(name self, uint64_t chain_code, uint32_t epoch_index,
          r.message_tip       = new_message_tip;
       });
    }
+   return true;
 }
 
 /// Evaluate the dispute trigger and, if met, open a Tier-1 dispute vote via sysio.chalg. Trigger:
@@ -1418,9 +1428,12 @@ void msgch::evalcons(uint64_t chain_code, uint32_t epoch_index) {
 
    // Consensus reached: store + dispatch the winning envelope and record the per-outpost winner
    // (so sysio.epoch::advance can classify each delivery). advance itself is triggered by chkcons
-   // once next_epoch_start has passed.
-   apply_consensus(get_self(), chain_code, epoch_index,
-                   checksum_data[consensus_group], seen_checksums[consensus_group]);
+   // once next_epoch_start has passed. On the evalcons path a rejected winner is a SOFT drop: the
+   // result is intentionally discarded and the epoch simply stays un-consensused (no outpcons row)
+   // until a valid delivery arrives or the split opens a dispute -- never throw here, a throw
+   // reverts the delivering operator's tx and stalls consensus chain-wide.
+   (void)apply_consensus(get_self(), chain_code, epoch_index,
+                         checksum_data[consensus_group], seen_checksums[consensus_group]);
 }
 
 // ---------------------------------------------------------------------------
@@ -1523,7 +1536,16 @@ void msgch::resolvedisp(uint64_t chain_code, uint32_t epoch_index, checksum256 w
    // safe stall, not state corruption.
    check(found, "resolvedisp: winning envelope not found for this outpost+epoch");
 
-   apply_consensus(get_self(), chain_code, epoch_index, raw, winning_checksum);
+   // Unlike the evalcons path, a rejected winner here MUST throw. `chkdispute` (chalg) marks the
+   // dispute RESOLVED and then unpauses the epoch in the SAME transaction that inline-calls this
+   // action; if `apply_consensus` soft-dropped the voted winner (envelope-chain break or semantic-
+   // header failure), it would report success without writing `outpcons`, leaving the epoch
+   // unpaused with no consensus row -- `chkcons` waits forever for that row while `evalcons`
+   // no-ops on the lingering (now RESOLVED) dispute. Asserting rolls the whole `chkdispute` crank
+   // back, so the dispute stays OPEN/paused and recoverable -- the same safe-stall contract as the
+   // `check(found, ...)` above. A voted winner should never fail validation in normal operation.
+   check(apply_consensus(get_self(), chain_code, epoch_index, raw, winning_checksum),
+         "resolvedisp: winning envelope failed depot validation; dispute left OPEN");
 }
 
 // ---------------------------------------------------------------------------
