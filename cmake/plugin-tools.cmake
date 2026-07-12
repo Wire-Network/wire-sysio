@@ -66,15 +66,10 @@ macro(plugin_target TARGET_NAME)
             ${ARG_LIBRARIES}
     )
 
-    # Install headers
-    install(
-            TARGETS ${TARGET_NAME}
-            ARCHIVE DESTINATION lib
-            LIBRARY DESTINATION lib
-            RUNTIME DESTINATION bin
-            INCLUDES DESTINATION include
-
-    )
+    # Plugins are internal static libraries linked whole-archive into nodeop;
+    # they are not standalone products, so their archives are intentionally
+    # NOT installed (a TARGETS install here also breaks packaging whenever a
+    # plugin target exists but is not part of the default build).
 
     set(PLUGIN_TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR}/test)
     if(NOT ARG_SKIP_TEST_CONFIG AND ENABLE_TESTS AND IS_DIRECTORY ${PLUGIN_TEST_DIR})
