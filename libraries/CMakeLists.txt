@@ -8,6 +8,8 @@ add_subdirectory(libfc-test)
 add_subdirectory(wasm-jit)
 add_subdirectory(chaindb)
 set(APPBASE_ENABLE_AUTO_VERSION OFF CACHE BOOL "enable automatic discovery of version via 'git describe'")
+# Route appbase lib/header installs into the dev packaging component.
+set(APPBASE_INSTALL_COMPONENT dev)
 add_subdirectory(appbase)
 add_subdirectory(custom_appbase)
 add_subdirectory(chain)

@@ -18,11 +18,13 @@ endif ()
 # Installation: headers to include/fc-lite
 install(
   DIRECTORY include/fc-lite
-  DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR}
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+  COMPONENT dev
 )
 
 # Install the INTERFACE target for completeness (no artifacts produced)
 install(
   TARGETS fc-lite
   EXPORT fc-lite-targets
+  COMPONENT dev
 )

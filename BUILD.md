@@ -258,3 +258,30 @@ After the script finishes, you will have a Docker image with Wire Sysio built in
 Using the Docker build is particularly useful if you are on a host that is not Ubuntu 24/25 or if you want to avoid installing compilers and dependencies on your system. The Docker environment ensures a consistent, reproducible build.
 
 ---
+
+## Packaging
+
+From a configured Release build tree (any install prefix — packages are
+prefix-independent):
+
+    cd $BUILD_DIR
+    cpack -G TGZ    # portable tarball wire-sysio.tar.gz: top-level wire-sysio/, extract to /opt
+    cmake --build . --target package-tgz   # same tarball, versioned artifact name
+    cpack -G DEB    # Debian/Ubuntu package (requires dpkg); installs under /usr
+    cpack -G RPM    # RHEL/Fedora package (requires rpmbuild); installs under /usr
+
+The DEB asks (via debconf) whether to register the wire-sysio-nodeop systemd
+service and whether to enable it; enabling also starts it immediately.
+Noninteractive installs default to yes/yes (register + enable + start). The
+RPM registers, enables, and starts the service on fresh install. Log rotation
+is 5 x 1G via /etc/logrotate.d/wire-sysio-nodeop (a conffile — edit the
+installed copy to change thresholds). Chain data (/var/lib/wire/sysio) and
+logs (/var/log/wire/sysio) are never removed by package removal or purge.
+
+Verification: `tools/packaging/tests/` contains the packaging gate scripts —
+`verify-tgz.sh` (tarball layout), `verify-deb.sh` / `verify-rpm.sh` (payload,
+control files, containerized install, plus a systemd-in-container runtime
+stage proving the service enables, starts, and stays up), 
+`verify-install-manifest.sh` (install regression vs a baseline), and
+`verify-scripts.sh` (static lint). The deb/rpm verifiers require docker; the
+runtime stage builds a cached systemd-enabled test image on first use.
