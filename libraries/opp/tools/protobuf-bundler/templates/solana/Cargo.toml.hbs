@@ -12,6 +12,9 @@ repository = "{{repository}}"
 {{#if authors}}
 authors = [{{#each authors}}"{{this}}"{{#unless @last}}, {{/unless}}{{/each}}]
 {{/if}}
+{{#if publishRegistries}}
+publish = [{{#each publishRegistries}}"{{this}}"{{#unless @last}}, {{/unless}}{{/each}}]
+{{/if}}
 
 [features]
 default = []
