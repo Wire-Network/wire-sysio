@@ -8,10 +8,70 @@
 #include <fc/crypto/signature.hpp>
 #include <fc/crypto/signature_provider.hpp>
 
+#include <string>
+#include <string_view>
+
 namespace sysio {
 
 using namespace appbase;
 
+/**
+ * Result of building a signing provider from a `<provider-type>:<spec_data>`
+ * spec body.
+ *
+ *   - `signer`: the signing closure (required).
+ *   - `private_key`: a local private key, if the scheme exposes one
+ *     (e.g. `KEY:`); empty for remote signers (`KIOD:`, `KMS:`, ...).
+ *   - `startup_probe`: an optional one-shot callback the plugin runs from
+ *     `plugin_startup()` after the provider has been successfully inserted
+ *     into the registry -- e.g. a KMS `GetPublicKey` credential check. The
+ *     plugin defers appending the probe until insertion succeeds, so a
+ *     provider rejected as a duplicate leaves no orphan probe behind.
+ */
+struct provider_spec_result {
+   fc::crypto::sign_fn                    signer;
+   std::optional<fc::crypto::private_key> private_key;
+   std::function<void()>                  startup_probe;  ///< empty if not applicable
+};
+
+/**
+ * Handler invoked when the plugin encounters an unrecognised
+ * `<provider-type>:` scheme in a signature-provider spec. The handler owns
+ * parsing of its own `spec_data` and returns a built `provider_spec_result`.
+ *
+ * Register handlers via
+ * `signature_provider_manager_plugin::register_spec_handler(scheme, handler)`
+ * from the host application's `main()` before `app().initialize(...)`. The
+ * built-in `KEY:` and `KIOD:` schemes are not registrable -- they are handled
+ * directly by the plugin.
+ */
+using spec_handler = std::function<provider_spec_result(
+   fc::crypto::chain_key_type_t,
+   const fc::crypto::public_key&,
+   std::string_view /*spec_data*/)>;
+
+/**
+ * Redact any inline private key from a signature-provider spec so it can be safely logged.
+ *
+ * A spec has the form `<name>,<chain-kind>,<key-type>,<public-key>,<provider>`, where the final
+ * comma-separated field is the provider. Only a `KEY:<private-key>` provider embeds secret key material;
+ * `KIOD:`/other providers reference external material and malformed specs carry no inline secret, so both are
+ * returned unchanged. When the provider field is `KEY:...`, everything after the `KEY:` marker is replaced
+ * with `<redacted>`. Only the final field is inspected, so a `KEY:`-prefixed name never triggers redaction.
+ *
+ * @param spec the signature-provider spec, exactly as supplied to `--signature-provider`.
+ * @return a copy of @p spec with any inline private key masked.
+ */
+inline std::string redact_signature_provider_spec(const std::string& spec) {
+   constexpr std::string_view key_provider_prefix = "KEY:";
+   const std::string::size_type last_comma = spec.rfind(',');
+   const std::string::size_type provider_start = (last_comma == std::string::npos) ? 0 : last_comma + 1;
+   const std::string_view provider{spec.data() + provider_start, spec.size() - provider_start};
+   if (provider.substr(0, key_provider_prefix.size()) == key_provider_prefix) {
+      return spec.substr(0, provider_start + key_provider_prefix.size()) + "<redacted>";
+   }
+   return spec;
+}
 
 /**
  * Plugin responsible for managing signature providers.
@@ -38,7 +98,20 @@ public:
                                     boost::program_options::options_description& cfg) override;
 
    void plugin_initialize(const variables_map& options);
-   void plugin_startup() {}
+
+   /**
+    * Plugin startup hook.
+    *
+    * Runs the opt-in startup-probe pass: any provider whose `spec_handler`
+    * supplied a `startup_probe` in its `provider_spec_result` (today this is
+    * only the KMS handler, which issues `GetPublicKey` to validate
+    * credentials, region, IAM, and pinned key) has that probe invoked here.
+    * Aborts startup loudly on permanent misconfiguration; transient errors
+    * are logged and deferred to the first sign. A no-op when the opt-in
+    * flag (`signature-provider-kms-startup-check`) is off or no probes were
+    * registered.
+    */
+   void plugin_startup();
    void plugin_shutdown() {}
 
    const char* signature_provider_help_text() const;
@@ -129,6 +202,34 @@ public:
 
    void register_default_signature_providers(
       const std::vector<fc::crypto::chain_key_type_t>& key_types);
+
+   /**
+    * Register a handler for an unrecognised `<provider-type>:` scheme.
+    *
+    * Built-in schemes (`KEY:`, `KIOD:`) are not registrable -- attempting to
+    * register them throws. Each non-built-in scheme may be registered at
+    * most once. Host applications register their extension handlers (e.g.
+    * the `kms` sub-library's `create_kms_provider`) in `main()` BEFORE
+    * `app().initialize(...)`, so the registration is in place by the time
+    * `plugin_initialize()` parses each `--signature-provider` option.
+    *
+    * Example (host application's main.cpp):
+    *   auto& plugin = app()._register_plugin<signature_provider_manager_plugin>();
+    *   plugin.register_spec_handler(
+    *      "KMS", &sysio::sigprov::kms::create_kms_provider);
+    *
+    * `register_plugin<>` (static, used elsewhere in main()) only enqueues
+    * the plugin name in the static registration list; it does NOT
+    * construct the plugin instance. Use `_register_plugin<>` (instance
+    * method, idempotent) to construct or fetch the instance before calling
+    * `register_spec_handler`.
+    *
+    * @param scheme  the `<provider-type>` token (e.g. "KMS"); case-sensitive
+    * @param handler the parser/builder for `scheme:<spec_data>` specs
+    * @throws fc::exception if `scheme` is empty, names a built-in, has
+    *         already been registered, or `handler` is empty
+    */
+   void register_spec_handler(std::string scheme, sysio::spec_handler handler);
 
 private:
    std::unique_ptr<class signature_provider_manager_plugin_impl> my;

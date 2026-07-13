@@ -18,7 +18,7 @@ namespace sysio { namespace chain { namespace webassembly {
       [&]() { context.console_append( static_cast<const char*>(str.data()) ); });
    }
 
-   void interface::prints_l(legacy_span<const char> str ) {
+   void interface::prints_l(span<const char> str ) {
 		predicated_print(context,
       [&]() { context.console_append(std::string_view(str.data(), str.size())); });
    }
@@ -41,7 +41,7 @@ namespace sysio { namespace chain { namespace webassembly {
       });
    }
 
-   void interface::printi128(legacy_ptr<const __int128> val) {
+   void interface::printi128(aligned_ptr<const __int128> val) {
 		predicated_print(context,
       [&]() {
 			bool is_negative = (*val < 0);
@@ -65,7 +65,7 @@ namespace sysio { namespace chain { namespace webassembly {
       });
    }
 
-   void interface::printui128(legacy_ptr<const unsigned __int128> val) {
+   void interface::printui128(aligned_ptr<const unsigned __int128> val) {
 		predicated_print(context,
       [&]() {
 			fc::uint128 v = fc::to_uint128(*val>>64, static_cast<uint64_t>(*val) );
@@ -73,7 +73,7 @@ namespace sysio { namespace chain { namespace webassembly {
       });
    }
 
-   void interface::printsf( float32_t val ) {
+   void interface::printsf( softfloat32_t val ) {
 		predicated_print(context,
       [&]() {
 			// Assumes float representation on native side is the same as on the WASM side
@@ -85,7 +85,7 @@ namespace sysio { namespace chain { namespace webassembly {
       });
    }
 
-   void interface::printdf( float64_t val ) {
+   void interface::printdf( softfloat64_t val ) {
 		predicated_print(context,
       [&]() {
 			// Assumes double representation on native side is the same as on the WASM side
@@ -97,7 +97,7 @@ namespace sysio { namespace chain { namespace webassembly {
       });
    }
 
-   void interface::printqf( legacy_ptr<const float128_t> val ) {
+   void interface::printqf( aligned_ptr<const softfloat128_t> val ) {
       /*
        * Native-side long double uses an 80-bit extended-precision floating-point number.
        * The easiest solution for now was to use the Berkeley softfloat library to round the 128-bit
@@ -135,7 +135,7 @@ namespace sysio { namespace chain { namespace webassembly {
 		predicated_print(context, [&]() { context.console_append(value.to_string()); });
    }
 
-   void interface::printhex(legacy_span<const char> data ) {
+   void interface::printhex(span<const char> data ) {
       predicated_print(context, [&]() { context.console_append(fc::to_hex(data.data(), data.size())); });
    }
 }}} // ns sysio::chain::webassembly

@@ -1,0 +1,384 @@
+{
+    "____comment": "This file was generated with sysio-abigen. DO NOT EDIT ",
+    "version": "sysio::abi/1.2",
+    "types": [],
+    "structs": [
+        {
+            "name": "cap_config",
+            "base": "",
+            "fields": [
+                {
+                    "name": "imported_complete",
+                    "type": "bool"
+                },
+                {
+                    "name": "claim_window_sec",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "cap_counters",
+            "base": "",
+            "fields": [
+                {
+                    "name": "next_unmapped_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "next_cursor_id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "claim",
+            "base": "",
+            "fields": [
+                {
+                    "name": "wire_account",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "flushexpired",
+            "base": "",
+            "fields": [
+                {
+                    "name": "max_rows",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "import_credit",
+            "base": "",
+            "fields": [
+                {
+                    "name": "native_address",
+                    "type": "bytes"
+                },
+                {
+                    "name": "wire_atomic",
+                    "type": "int64"
+                }
+            ]
+        },
+        {
+            "name": "importdone",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "importseed",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "credits",
+                    "type": "import_credit[]"
+                }
+            ]
+        },
+        {
+            "name": "linkswept",
+            "base": "",
+            "fields": [
+                {
+                    "name": "wire_account",
+                    "type": "name"
+                },
+                {
+                    "name": "chain",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "native_pubkey",
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "onreward",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "uint64"
+                },
+                {
+                    "name": "staker_wire_account",
+                    "type": "string"
+                },
+                {
+                    "name": "reward_chain",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "staker_native_addr",
+                    "type": "bytes"
+                },
+                {
+                    "name": "reward_amount",
+                    "type": "uint64"
+                },
+                {
+                    "name": "reward_epoch_index",
+                    "type": "uint32"
+                },
+                {
+                    "name": "external_epoch_ref",
+                    "type": "uint64"
+                },
+                {
+                    "name": "share_bps",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "pclaim_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "wire_account",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "pending_claim",
+            "base": "",
+            "fields": [
+                {
+                    "name": "wire_account",
+                    "type": "name"
+                },
+                {
+                    "name": "balance",
+                    "type": "asset"
+                },
+                {
+                    "name": "expires_at_sec",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "reward_cursor",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "chain_code",
+                    "type": "uint64"
+                },
+                {
+                    "name": "chain",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "native_pubkey",
+                    "type": "bytes"
+                },
+                {
+                    "name": "last_external_epoch_ref",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "rwdcur_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "setclmwindow",
+            "base": "",
+            "fields": [
+                {
+                    "name": "window_sec",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "setconfig",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "unmapped_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "unmapped_token",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "chain_kind",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "native_pubkey",
+                    "type": "bytes"
+                },
+                {
+                    "name": "balance",
+                    "type": "asset"
+                },
+                {
+                    "name": "expires_at_sec",
+                    "type": "uint32"
+                }
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "name": "claim",
+            "type": "claim",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "flushexpired",
+            "type": "flushexpired",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "importdone",
+            "type": "importdone",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "importseed",
+            "type": "importseed",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "linkswept",
+            "type": "linkswept",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "onreward",
+            "type": "onreward",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "setclmwindow",
+            "type": "setclmwindow",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "setconfig",
+            "type": "setconfig",
+            "ricardian_contract": ""
+        }
+    ],
+    "tables": [
+        {
+            "name": "capcfg",
+            "type": "cap_config",
+            "index_type": "i64",
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 41893
+        },
+        {
+            "name": "capcounters",
+            "type": "cap_counters",
+            "index_type": "i64",
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 40418
+        },
+        {
+            "name": "pclaims",
+            "type": "pending_claim",
+            "index_type": "i64",
+            "key_names": ["wire_account"],
+            "key_types": ["uint64"],
+            "table_id": 16291
+        },
+        {
+            "name": "rwdcursors",
+            "type": "reward_cursor",
+            "index_type": "i64",
+            "key_names": ["id"],
+            "key_types": ["uint64"],
+            "table_id": 64468,
+            "secondary_indexes": [
+                {
+                    "name": "bychaincode",
+                    "key_type": "uint128",
+                    "table_id": 60686
+                }
+            ]
+        },
+        {
+            "name": "unmapped",
+            "type": "unmapped_token",
+            "index_type": "i64",
+            "key_names": ["id"],
+            "key_types": ["uint64"],
+            "table_id": 60901,
+            "secondary_indexes": [
+                {
+                    "name": "bychainad",
+                    "key_type": "uint128",
+                    "table_id": 48559
+                }
+            ]
+        }
+    ],
+    "ricardian_clauses": [],
+    "variants": [],
+    "action_results": [],
+    "enums": [
+        {
+            "name": "ChainKind",
+            "type": "int32",
+            "values": [
+                {
+                    "name": "CHAIN_KIND_UNKNOWN",
+                    "value": 0
+                },
+                {
+                    "name": "CHAIN_KIND_WIRE",
+                    "value": 1
+                },
+                {
+                    "name": "CHAIN_KIND_EVM",
+                    "value": 2
+                },
+                {
+                    "name": "CHAIN_KIND_SVM",
+                    "value": 3
+                }
+            ]
+        }
+    ]
+}

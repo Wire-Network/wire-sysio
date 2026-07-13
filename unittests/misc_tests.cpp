@@ -1,6 +1,8 @@
 #include <sysio/chain/asset.hpp>
 #include <sysio/chain/authority.hpp>
 #include <sysio/chain/authority_checker.hpp>
+#include <sysio/chain/exceptions.hpp>
+#include <sysio/chain/trace.hpp>
 #include <sysio/chain/types.hpp>
 #include <sysio/chain/thread_utils.hpp>
 #include <sysio/testing/tester.hpp>
@@ -86,70 +88,6 @@ BOOST_AUTO_TEST_CASE(reverse_endian_tests)
     BOOST_CHECK_EQUAL( endian_reverse_u64(0x0102030405060708), 0x0807060504030201u );
     BOOST_CHECK_EQUAL( endian_reverse_u32(0x01234567), 0x67452301u );
     BOOST_CHECK_EQUAL( endian_reverse_u32(0x01020304), 0x04030201u );
-}
-
-BOOST_AUTO_TEST_CASE(name_suffix_tests)
-{
-   BOOST_CHECK_EQUAL( name(0).suffix(), name{0} );
-   BOOST_CHECK_EQUAL( name{"sysio"_n}.suffix(), name{"sysio"_n} );
-   BOOST_CHECK_EQUAL( name{"sysio.any"_n}.suffix(), name{"any"_n} );
-   BOOST_CHECK_EQUAL( name{"abcdehijklmn"_n}.suffix(), name{"abcdehijklmn"_n} );
-   BOOST_CHECK_EQUAL( name{"abcdehijklmn1"_n}.suffix(), name{"abcdehijklmn1"_n} );
-   BOOST_CHECK_EQUAL( name{"abc.def"_n}.suffix(), name{"def"_n} );
-   BOOST_CHECK_EQUAL( name{".abc.def"_n}.suffix(), name{"def"_n} );
-   BOOST_CHECK_EQUAL( name{"..abc.def"_n}.suffix(), name{"def"_n} );
-   BOOST_CHECK_EQUAL( name{"abc..def"_n}.suffix(), name{"def"_n} );
-   BOOST_CHECK_EQUAL( name{"abc.def.ghi"_n}.suffix(), name{"ghi"_n} );
-   BOOST_CHECK_EQUAL( name{".abcdefghij"_n}.suffix(), name{"abcdefghij"_n} );
-   BOOST_CHECK_EQUAL( name{".abcdefghij.1"_n}.suffix(), name{"1"_n} );
-   BOOST_CHECK_EQUAL( name{"a.bcdefghij"_n}.suffix(), name{"bcdefghij"_n} );
-   BOOST_CHECK_EQUAL( name{"a.bcdefghij.1"_n}.suffix(), name{"1"_n} );
-   BOOST_CHECK_EQUAL( name{"......a.b.c"_n}.suffix(), name{"c"_n} );
-   BOOST_CHECK_EQUAL( name{"abcdefhi.123"_n}.suffix(), name{"123"_n} );
-   BOOST_CHECK_EQUAL( name{"abcdefhij.123"_n}.suffix(), name{"123"_n} );
-}
-
-BOOST_AUTO_TEST_CASE(name_suffix_additional_tests) {
-   // ----------------------------
-   // constexpr name suffix()const
-   BOOST_CHECK_EQUAL( name{".sysioaccounj"}.suffix(), name{"sysioaccounj"} );
-   BOOST_CHECK_EQUAL( name{"s.osioaccounj"}.suffix(), name{"osioaccounj"} );
-   BOOST_CHECK_EQUAL( name{"sy.sioaccounj"}.suffix(), name{"sioaccounj"} );
-   BOOST_CHECK_EQUAL( name{"sys.ioaccounj"}.suffix(), name{"ioaccounj"} );
-   BOOST_CHECK_EQUAL( name{"sysi.oaccounj"}.suffix(), name{"oaccounj"} );
-   BOOST_CHECK_EQUAL( name{"sysio.accounj"}.suffix(), name{"accounj"} );
-   BOOST_CHECK_EQUAL( name{"sysioa.ccounj"}.suffix(), name{"ccounj"} );
-   BOOST_CHECK_EQUAL( name{"sysioac.counj"}.suffix(), name{"counj"} );
-   BOOST_CHECK_EQUAL( name{"sysioacc.ounj"}.suffix(), name{"ounj"} );
-   BOOST_CHECK_EQUAL( name{"sysioacco.unj"}.suffix(), name{"unj"} );
-   BOOST_CHECK_EQUAL( name{"sysioaccou.nj"}.suffix(), name{"nj"} );
-   BOOST_CHECK_EQUAL( name{"sysioaccoun.j"}.suffix(), name{"j"} );
-   BOOST_CHECK_EQUAL( name{"sysioaccounja"}.suffix(), name{"sysioaccounja"} );
-   BOOST_CHECK_EQUAL( name{"sysioaccounj"}.suffix(),  name{"sysioaccounj"} );
-
-   BOOST_CHECK_EQUAL( name{"s.y.s.i.o.a.c"}.suffix(), name{"c"} );
-   BOOST_CHECK_EQUAL( name{"sys.ioa.cco"}.suffix(), name{"cco"} );
-}
-
-BOOST_AUTO_TEST_CASE(name_prefix_tests)
-{
-   BOOST_CHECK_EQUAL("e"_n.prefix(), "e"_n);
-   BOOST_CHECK_EQUAL(""_n.prefix(), ""_n);
-   BOOST_CHECK_EQUAL("abcdefghijklm"_n.prefix(), "abcdefghijklm"_n);
-   BOOST_CHECK_EQUAL("abcdefghijkl"_n.prefix(), "abcdefghijkl"_n);
-   BOOST_CHECK_EQUAL("abc.xyz"_n.prefix(), "abc"_n);
-   BOOST_CHECK_EQUAL("abc.xyz.qrt"_n.prefix(), "abc.xyz"_n);
-   BOOST_CHECK_EQUAL("."_n.prefix(), ""_n);
-
-   BOOST_CHECK_EQUAL("sysio.any"_n.prefix(), "sysio"_n);
-   BOOST_CHECK_EQUAL("sysio"_n.prefix(), "sysio"_n);
-   BOOST_CHECK_EQUAL("sysio"_n.prefix(), config::system_account_name);
-   BOOST_CHECK_EQUAL("sysio."_n.prefix(), "sysio"_n);
-   BOOST_CHECK_EQUAL("sysio.evm"_n.prefix(), "sysio"_n);
-   BOOST_CHECK_EQUAL(".sysio"_n.prefix(), ""_n);
-   BOOST_CHECK_NE("sysi"_n.prefix(), "sysio"_n);
-   BOOST_CHECK_NE("sysiosysio"_n.prefix(), "sysio"_n);
-   BOOST_CHECK_NE("sysioe"_n.prefix(), "sysio"_n);
 }
 
 /// Test processing of unbalanced strings
@@ -442,6 +380,45 @@ BOOST_AUTO_TEST_CASE( authority_checker )
    BOOST_TEST(make_auth_checker(GetNullAuthority, 2, {a}).satisfied(A));
    BOOST_TEST(make_auth_checker(GetNullAuthority, 2, {b}).satisfied(A));
    BOOST_TEST(!make_auth_checker(GetNullAuthority, 2, {c}).satisfied(A));
+
+   // The keys-only threshold-1 fast path must mark the same used key as the
+   // general weight-tally path: the highest-weight provided key, with
+   // declaration order breaking ties.
+   {
+      // higher weight declared second: b must be the used key
+      A = authority(1, {key_weight{a, 1}, key_weight{b, 2}});
+      auto checker = make_auth_checker(GetNullAuthority, 2, {a, b});
+      BOOST_TEST(checker.satisfied(A));
+      BOOST_TEST(checker.used_keys().size() == 1u);
+      BOOST_TEST(checker.used_keys().count(b) == 1u);
+      BOOST_TEST(checker.unused_keys().count(a) == 1u);
+   }
+   {
+      // higher weight declared first: a must be the used key
+      A = authority(1, {key_weight{a, 2}, key_weight{b, 1}});
+      auto checker = make_auth_checker(GetNullAuthority, 2, {a, b});
+      BOOST_TEST(checker.satisfied(A));
+      BOOST_TEST(checker.used_keys().size() == 1u);
+      BOOST_TEST(checker.used_keys().count(a) == 1u);
+      BOOST_TEST(checker.unused_keys().count(b) == 1u);
+   }
+   {
+      // equal weights: the first declared key wins, matching the general
+      // path's stable (weight, declaration order) visitation
+      A = authority(1, {key_weight{a, 1}, key_weight{b, 1}});
+      auto checker = make_auth_checker(GetNullAuthority, 2, {a, b});
+      BOOST_TEST(checker.satisfied(A));
+      BOOST_TEST(checker.used_keys().size() == 1u);
+      BOOST_TEST(checker.used_keys().count(a) == 1u);
+   }
+   {
+      // the highest-weight key is not provided: the best provided key is used
+      A = authority(1, {key_weight{a, 1}, key_weight{b, 2}});
+      auto checker = make_auth_checker(GetNullAuthority, 2, {a});
+      BOOST_TEST(checker.satisfied(A));
+      BOOST_TEST(checker.used_keys().size() == 1u);
+      BOOST_TEST(checker.used_keys().count(a) == 1u);
+   }
 
    const authority c_authority = authority(1, {key_weight{c, 1}});
    auto GetCAuthority = [&c_authority](auto){
@@ -1282,6 +1259,40 @@ BOOST_AUTO_TEST_CASE(public_key_from_hash) {
    fc::ecc::public_key_shim shim(data);
    fc::crypto::public_key sys_unknown_pk(std::move(shim));
    ilog( "public key with no known private key: {}", sys_unknown_pk.to_string({}, true) );
+}
+
+/**
+ * transaction_trace::except must retain the original dynamic exception type: the controller stores
+ * a dynamic copy (fc::exception::dynamic_copy_exception) rather than a sliced fc::exception value,
+ * so failure consumers (transaction acks, API error responses) can rethrow or dynamic_pointer_cast
+ * to the precise type the transaction failed with.
+ */
+BOOST_AUTO_TEST_CASE(transaction_trace_except_preserves_type) {
+   tester chain;
+   chain.create_account("alice"_n);
+   chain.produce_block();
+
+   // attempt to create the same account again; the controller captures the failure on the trace
+   signed_transaction trx;
+   trx.actions.emplace_back( vector<permission_level>{{config::system_account_name, config::active_name}},
+                             newaccount{
+                                .creator = config::system_account_name,
+                                .name    = "alice"_n,
+                                .owner   = authority( chain.get_public_key( "alice"_n, "owner" ) ),
+                                .active  = authority( chain.get_public_key( "alice"_n, "active" ) ),
+                             });
+   chain.set_transaction_headers(trx);
+   trx.sign( chain.get_private_key( config::system_account_name, "active" ), chain.get_chain_id() );
+   auto trace = chain.push_transaction( trx, fc::time_point::maximum(), base_tester::DEFAULT_BILLED_CPU_TIME_US,
+                                        true /* no_throw */ );
+
+   BOOST_REQUIRE(!!trace);
+   BOOST_REQUIRE(!!trace->except);
+   BOOST_CHECK_EQUAL(trace->except->code(), account_name_exists_exception::code_value);
+   // the stored copy retains the original dynamic exception type...
+   BOOST_CHECK(!!std::dynamic_pointer_cast<account_name_exists_exception>(trace->except));
+   // ...so typed catch sites see the type the transaction actually failed with
+   BOOST_CHECK_THROW(trace->except->rethrow(), account_name_exists_exception);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -13,6 +13,9 @@ namespace sysio {
    using connection_id_t = uint32_t;
    using vote_id_type = fc::sha256;
 
+   /// Base Wire net protocol version accepted by the P2P handshake.
+   inline constexpr uint16_t wire_protocol_base_version = 1;
+
    /// Compute a deterministic vote ID from the non-signature fields of a vote_message.
    /// vote_id = SHA-256(block_id || strong || serialized_finalizer_key)
    inline vote_id_type compute_vote_id(const vote_message& v) {
@@ -196,6 +199,19 @@ namespace sysio {
    constexpr uint32_t to_index(msg_type_t net_msg) {
       static_assert( std::variant_size_v<net_message> == static_cast<uint32_t>(msg_type_t::unknown));
       return static_cast<uint32_t>(net_msg);
+   }
+
+   /// Returns true when a message is safe to process before the peer session is established.
+   constexpr bool is_pre_session_control_message(msg_type_t net_msg) {
+      switch( net_msg ) {
+      case msg_type_t::handshake_message:
+      case msg_type_t::go_away_message:
+      case msg_type_t::time_message:
+      case msg_type_t::peer_auth_message:
+         return true;
+      default:
+         return false;
+      }
    }
 
    constexpr msg_type_t to_msg_type_t(size_t v) {

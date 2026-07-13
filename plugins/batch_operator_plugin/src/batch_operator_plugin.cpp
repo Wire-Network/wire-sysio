@@ -1,14 +1,23 @@
 #include <fc/log/logger.hpp>
 #include <fc/crypto/sha256.hpp>
+#include <fc/int128.hpp>
 #include <fc/io/json.hpp>
+#include <fc/slug_name.hpp>
 #include <fc/variant_object.hpp>
 #include <boost/endian/conversion.hpp>
+#include <algorithm>
+#include <format>
 #include <functional>
+#include <map>
 #include <optional>
+#include <string_view>
 
 #include <sysio/batch_operator_plugin/batch_operator_plugin.hpp>
 #include <sysio/batch_operator_plugin/depot_ops.hpp>
+#include <sysio/batch_operator_plugin/outpost_binding.hpp>
+#include <sysio/batch_operator_plugin/outpost_epoch_lookup.hpp>
 #include <sysio/batch_operator_plugin/outpost_opp_job.hpp>
+#include <sysio/depot/opreg_status.hpp>
 #include <sysio/chain/abi_serializer.hpp>
 #include <sysio/chain/transaction.hpp>
 #include <sysio/chain_plugin/chain_plugin.hpp>
@@ -33,15 +42,15 @@ namespace {
    /// discovered at startup — keeps `epoch_tick` viable so a cold-sync node
    /// that finds outposts later still responds.
    constexpr std::size_t MIN_CRON_THREADS = 5;
+   /// Inbound plus outbound cron entries for each active outpost.
+   constexpr std::size_t OPP_CRON_JOBS_PER_OUTPOST = 2;
+   /// The plugin-wide epoch polling cron entry.
+   constexpr std::size_t EPOCH_TICK_CRON_JOBS = 1;
+   /// Exact secondary-index lookups should return at most the matching row.
+   constexpr uint32_t EXACT_LOOKUP_LIMIT = 1;
 
    /// my_group sentinel meaning "we are not in any batch-op group".
    constexpr uint8_t GROUP_NONE = 255;
-
-   /// Rolling window size for the outbound-envelope lookup. Covers ~4 epochs
-   /// across up to 2 outposts (`DEPOT → OUTPOST` pair each epoch) plus a
-   /// slack row, so `read_pending_outbound` always sees the current epoch
-   /// without paying for a full-table scan as `outenvelopes` grows.
-   constexpr uint32_t OUTBOUND_LOOKUP_WINDOW = 8;
 
    // ── WIRE contract identifiers (actions, tables, indexes, field names) ──
    // Centralised so a contract rename/refactor shows up as one search hit,
@@ -52,13 +61,12 @@ namespace {
       constexpr auto account             = "sysio.msgch";
       constexpr auto table_envelopes     = "envelopes";
       constexpr auto table_outenvelopes  = "outenvelopes";
-      constexpr auto index_byoutepoch    = "byoutepoch";
       constexpr auto action_deliver      = "deliver";
       constexpr auto action_chkcons      = "chkcons";
       constexpr auto action_bootstrap    = "bootstrap";
       /// Field names on `envelope_entry` / `outbound_envelope` rows.
       namespace field {
-         constexpr auto outpost_id     = "outpost_id";
+         constexpr auto chain_code     = "chain_code";
          constexpr auto epoch_index    = "epoch_index";
          constexpr auto status         = "status";
          constexpr auto raw_envelope   = "raw_envelope";
@@ -68,10 +76,22 @@ namespace {
       }
    }
 
+   namespace opreg {
+      constexpr auto account            = "sysio.opreg";
+      constexpr auto table_operators    = "operators";
+      /// Field names on `operator_entry` rows. Used by the awareness poll
+      /// that gates the relay loop on a SLASHED / TERMINATED status flip.
+      namespace field {
+         constexpr auto status = "status";
+      }
+      // `OperatorStatus` enum spellings + the `is_active` decision live
+      // in `sysio/depot/opreg_status.hpp` so underwriter_plugin can pull
+      // the same source of truth without a cross-plugin dependency.
+   }
+
    namespace epoch {
       constexpr auto account            = "sysio.epoch";
       constexpr auto table_epochstate   = "epochstate";
-      constexpr auto table_outposts     = "outposts";
       /// Field names on `epoch_state` singleton.
       namespace field {
          constexpr auto current_epoch_index    = "current_epoch_index";
@@ -81,11 +101,21 @@ namespace {
          constexpr auto current_epoch_start    = "current_epoch_start";
          constexpr auto next_epoch_start       = "next_epoch_start";
       }
-      /// Field names on `outpost_info` rows.
-      namespace outpost_field {
-         constexpr auto id         = "id";
-         constexpr auto chain_kind = "chain_kind";
-         constexpr auto chain_id   = "chain_id";
+   }
+
+   /// v6: chain registry was split out of `sysio.epoch` onto its own
+   /// `sysio.chains` contract. The `outposts` table was replaced by the
+   /// `chains` KV table, keyed by slug_name (uint64 packed).
+   namespace chains {
+      constexpr auto account       = "sysio.chains";
+      constexpr auto table_chains  = "chains";
+      /// Field names on `Chain` row (proto-mirror schema).
+      namespace field {
+         constexpr auto code              = "code";              // {value: uint64} slug_name
+         constexpr auto kind              = "kind";              // ChainKind enum (string spelling)
+         constexpr auto external_chain_id = "external_chain_id"; // uint32
+         constexpr auto is_depot          = "is_depot";          // bool — the single WIRE-self row
+         constexpr auto active            = "active";            // bool
       }
    }
 }
@@ -108,11 +138,14 @@ struct batch_operator_plugin::impl {
    bool         enabled             = false;
    uint32_t     epoch_poll_ms       = EPOCH_POLL_MS;
    uint32_t     delivery_timeout_ms = DELIVERY_TIMEOUT_MS;
-   std::string  eth_client_id;
+   // SVM RPC client id (one Solana cluster serves all SVM programs). The EVM
+   // client is selected per outpost by external_chain_id, and each outpost's
+   // OPP contract addresses come from its `--batch-outpost` binding — see
+   // build_opp_jobs.
    std::string  sol_client_id;
-   std::string  eth_opp_inbound_addr;  // hex address of OPPInbound on ETH
-   std::string  eth_opp_addr;          // hex address of OPP on ETH
-   std::string  sol_program_id;        // base58 address of opp-solana-outpost
+   /// Remote OPP contract bindings from `--batch-outpost`, keyed by packed
+   /// chain code (matches `outpost_descriptor::id`).
+   std::map<uint64_t, batch_operator_detail::outpost_binding> outpost_bindings;
 
    // Epoch state tracked across polls
    uint32_t                 current_epoch = 0;
@@ -122,6 +155,13 @@ struct batch_operator_plugin::impl {
    fc::time_point           next_epoch_start;
    std::vector<chain::name> current_group_members;
    std::vector<outpost_descriptor> outposts;
+
+   // Operator awareness — set by `poll_own_status()` from sysio.opreg::operators.
+   // SLASHED / TERMINATED operators MUST stop relaying: continued deliveries
+   // would be wasted CPU on the WIRE chain (msgch's deliver action will reject
+   // since the operator no longer holds bond) AND a TERMINATED operator's
+   // bond is already remitted, so any continued participation is misleading.
+   bool                     is_active = true;
 
    // Plugin references
    chain_plugin*                     chain_plug = nullptr;
@@ -134,11 +174,17 @@ struct batch_operator_plugin::impl {
    signal<void(const opp::debugging::DebugEnvelopeEvent&)> debug_envelope_signal;
 
    /// Private cron_service owned by this plugin. Sized from the outpost
-   /// count at plugin_startup so per-outpost jobs run in parallel without
-   /// fighting over the shared cron_plugin pool. Lifecycle tied to the
+   /// count at plugin_startup and accepts dynamic per-outpost jobs as
+   /// `refresh_outposts` observes governance changes. Lifecycle tied to the
    /// plugin's startup/shutdown.
    sysio::services::cron_service_ptr cron_svc;
    std::vector<cron_service::job_id_t> cron_job_ids;
+   /// Cron job IDs for a scheduled outpost relay pair.
+   struct scheduled_opp_job_ids {
+      cron_service::job_id_t outbound = 0;
+      cron_service::job_id_t inbound  = 0;
+   };
+   std::map<uint64_t, scheduled_opp_job_ids> scheduled_opp_jobs;
    std::atomic<bool>                 shutting_down{false};
 
    // -----------------------------------------------------------------------
@@ -155,30 +201,29 @@ struct batch_operator_plugin::impl {
       explicit depot_ops_impl_t(impl& i) : _impl(i) {}
 
       std::optional<sysio::outbound_envelope_record>
-      read_pending_outbound(uint64_t outpost_id, uint32_t epoch_index) override {
-         // Reverse-iterate the latest `OUTBOUND_LOOKUP_WINDOW` rows. The primary
-         // key is auto-incrementing `id`, so reverse + small window gives the
-         // most recent epochs' envelopes without scanning the whole table (which
-         // grows unbounded until cleanup). Filtering by (outpost_id, epoch_index)
-         // after the fact is O(window), not O(rows).
+      read_pending_outbound(uint64_t chain_code, uint32_t epoch_index) override {
+         // Exact-match the `(chain_code, epoch_index)` secondary index. A fixed
+         // latest-N primary-key scan can hide an active outpost behind unrelated
+         // rows when the deployment has many outposts or bursty outbound emits.
          sysio::chain_apis::read_only::get_table_rows_params p;
          p.code        = chain::name(msgch::account);
          p.scope       = msgch::account;
          p.table       = msgch::table_outenvelopes;
-         p.reverse     = true;
-         p.limit       = OUTBOUND_LOOKUP_WINDOW;
+         p.find        = batch_operator_detail::byoutepoch_find_bound(chain_code, epoch_index);
+         p.index_name  = batch_operator_detail::byoutepoch_index_name;
+         p.limit       = EXACT_LOOKUP_LIMIT;
          p.values_only = true;
          auto rows = _impl.read_table(std::move(p));
          for (auto& row : rows.rows) {
             auto     obj         = row.get_object();
-            uint64_t row_outpost = obj[msgch::field::outpost_id].as_uint64();
+            uint64_t row_outpost = obj[msgch::field::chain_code].as_uint64();
             auto     row_epoch   = static_cast<uint32_t>(obj[msgch::field::epoch_index].as_uint64());
             auto     status      = obj[msgch::field::status].as<EnvelopeStatus>();
-            if (row_outpost != outpost_id || row_epoch != epoch_index
+            if (row_outpost != chain_code || row_epoch != epoch_index
                 || status != ENVELOPE_STATUS_PENDING_DELIVERY) continue;
 
             sysio::outbound_envelope_record rec;
-            rec.outpost_id        = row_outpost;
+            rec.chain_code        = row_outpost;
             rec.epoch_index       = row_epoch;
             rec.envelope_hash_hex = obj[msgch::field::envelope_hash].as_string();
             auto raw_bytes        = fc::from_hex(obj[msgch::field::raw_envelope].as_string());
@@ -188,17 +233,17 @@ struct batch_operator_plugin::impl {
          return std::nullopt;
       }
 
-      bool has_delivered_envelope(uint64_t outpost_id, uint32_t epoch_index) override {
-         return _impl.has_delivered_envelope(outpost_id, epoch_index);
+      bool has_delivered_envelope(uint64_t chain_code, uint32_t epoch_index) override {
+         return _impl.has_delivered_envelope(chain_code, epoch_index);
       }
 
-      void deliver_to_depot(uint64_t outpost_id,
+      void deliver_to_depot(uint64_t chain_code,
                             const std::vector<char>& raw_messages) override {
          _impl.push_action(
             msgch::account, msgch::action_deliver, _impl.operator_account,
             fc::mutable_variant_object()
                (msgch::field::batch_op_name, _impl.operator_account.to_string())
-               (msgch::field::outpost_id,    outpost_id)
+               (msgch::field::chain_code,    chain_code)
                (msgch::field::data,          raw_messages));
       }
 
@@ -214,6 +259,14 @@ struct batch_operator_plugin::impl {
       bool     within_epoch_window() const override { return _impl.within_epoch_window(); }
       bool     is_elected()         const override { return _impl.is_elected; }
       uint32_t current_epoch()      const override { return _impl.current_epoch; }
+      bool     is_epoch_boundary_past() const override {
+         // `next_epoch_start` is cached on `_impl` from
+         // `sysio.epoch::epochstate`. Empty time_point = no cache yet
+         // (pre-bootstrap) → conservative `false`. Otherwise compare
+         // against wall clock.
+         if (_impl.next_epoch_start == fc::time_point()) return false;
+         return fc::time_point::now() >= _impl.next_epoch_start;
+      }
    };
 
    std::unique_ptr<depot_ops_impl_t>                              depot_ops_backing{
@@ -235,8 +288,11 @@ struct batch_operator_plugin::impl {
    /// Check if this operator already delivered an envelope for the
    /// given outpost + epoch by querying msgch::envelopes via the
    /// byoutepoch secondary index.
-   bool has_delivered_envelope(uint64_t outpost_id, uint32_t epoch_index) {
-      uint64_t key = (static_cast<uint64_t>(outpost_id) << 32) | epoch_index;
+   bool has_delivered_envelope(uint64_t chain_code, uint32_t epoch_index) {
+      // Canonical (outpost, epoch) packing per sysio.opp.common/opp_keys.hpp —
+      // chain_code (a slug_name, up to 48 bits) occupies bits 32-79, epoch bits 0-31.
+      // The byoutepoch index is uint128; serialize the bound as a decimal string so
+      // the JSON round-trip stays lossless past 2^64.
       auto op_account = operator_account;
       // chain_plugin::get_table_rows forwards secondary-index bounds through
       // be_key_codec::encode_key, which unconditionally calls get_object() on
@@ -250,8 +306,8 @@ struct batch_operator_plugin::impl {
       p.code        = chain::name(msgch::account);
       p.scope       = msgch::account;
       p.table       = msgch::table_envelopes;
-      p.find        = std::format("{{\"{}\":{}}}", msgch::index_byoutepoch, key);
-      p.index_name  = msgch::index_byoutepoch;
+      p.find        = batch_operator_detail::byoutepoch_find_bound(chain_code, epoch_index);
+      p.index_name  = batch_operator_detail::byoutepoch_index_name;
       p.values_only = true;
       p.filter      = [op_account](const fc::variant& row) {
          return chain::name(row[msgch::field::batch_op_name].as_string()) == op_account;
@@ -269,6 +325,13 @@ struct batch_operator_plugin::impl {
       try {
          do_poll_epoch_state();
       } FC_LOG_AND_DROP();
+      // Awareness: refresh own status from the depot's bond ledger. SLASHED
+      // / TERMINATED operators short-circuit the relay loop below.
+      try {
+         poll_own_status();
+      } FC_LOG_AND_DROP();
+      if (!is_active) return;
+
       // chkcons advances the epoch on consensus. Only the elected operator
       // should push it — the contract verifies authorization regardless,
       // but pushing from every batch op wastes trx slots.
@@ -279,6 +342,62 @@ struct batch_operator_plugin::impl {
          } catch (const fc::exception& e) {
             dlog("batch_operator: chkcons: {}", e.to_string());
          }
+      }
+   }
+
+   /**
+    * Refresh `is_active` from `sysio.opreg::operators[operator_account]`.
+    *
+    * Reads the row's `status` field and sets `is_active` per:
+    *   * OPERATOR_STATUS_ACTIVE      -> true  (relay loop runs normally)
+    *   * OPERATOR_STATUS_SLASHED     -> false (halt; operator forfeit bond)
+    *   * OPERATOR_STATUS_TERMINATED  -> false (halt; bond remitted, slot freed)
+    *   * other / row missing         -> retain previous value (don't toggle on
+    *                                    transient table-read failure)
+    *
+    * Logs once per status transition so cluster operators can see the flip
+    * in the batch-op log without grep'ing every poll.
+    */
+   void poll_own_status() {
+      // v6: `sysio.opreg::operators` is a KV table whose PK is a struct
+      // `{account: name}`; the chain_plugin's `lower_bound` / `upper_bound`
+      // expects JSON-shaped key bounds for KV tables, not the bare name
+      // string the v5 multi_index path accepted. Easiest robust fix: scan
+      // all rows and filter in-plugin — the operator count stays bounded
+      // by `op_config.max_available_*` (capped at ~100 for the lifetime
+      // of this plugin), so a linear scan once per `poll_own_status`
+      // period is cheap.
+      sysio::chain_apis::read_only::get_table_rows_params p;
+      p.code        = chain::name(opreg::account);
+      p.scope       = opreg::account;
+      p.table       = opreg::table_operators;
+      p.all_rows    = true;
+      p.values_only = true;
+      auto rows = read_table(std::move(p));
+      if (rows.rows.empty()) return;
+
+      auto self = operator_account.to_string();
+      fc::variant_object obj;
+      bool found = false;
+      for (auto& r : rows.rows) {
+         auto row_obj = r.get_object();
+         auto acct_it = row_obj.find("account");
+         if (acct_it != row_obj.end() && acct_it->value().as_string() == self) {
+            obj = row_obj;
+            found = true;
+            break;
+         }
+      }
+      if (!found) return;
+      auto status = obj[opreg::field::status].as_string();
+
+      bool was_active = is_active;
+      is_active = sysio::depot::opreg_status::compute_is_active(status, was_active);
+
+      if (was_active && !is_active) {
+         elog("batch_operator: own status flipped to {} — halting relay loop", status);
+      } else if (!was_active && is_active) {
+         ilog("batch_operator: own status flipped to ACTIVE — resuming relay loop");
       }
    }
 
@@ -376,8 +495,8 @@ struct batch_operator_plugin::impl {
       }
       current_epoch = epoch_index;
       // Refresh the outpost list so governance-added outposts become visible.
-      // Job scheduling is fixed at plugin_startup; a genuine governance change
-      // still requires a batch_operator restart to size the cron pool.
+      // `build_opp_jobs` and `schedule_opp_jobs` are idempotent, so newly
+      // active outposts start relaying without a batch-operator restart.
       refresh_outposts();
    }
 
@@ -386,32 +505,75 @@ struct batch_operator_plugin::impl {
    // -----------------------------------------------------------------------
 
    void refresh_outposts() {
-      outposts.clear();
-      // `all_rows` walks every row in one call. The outpost count should stay tiny (one per external chain), but
-      // don't bake in a scan cap that would stall the batch operator if governance adds more than the default bound.
+      // v6: chain registry lives on `sysio.chains::chains` (replaces the
+      // removed `sysio.epoch::outposts` table). Each row carries the
+      // chain's slug_name + kind + external_chain_id + is_depot + active.
+      // Outposts are the non-depot, active rows; the single is_depot=true
+      // row is the WIRE chain itself and is skipped.
+      //
+      // Startup race: in a multi-node cluster the batch-op node replays
+      // blocks from the producer asynchronously. There's a brief window
+      // where `sysio.chains` exists on the producer but the local node
+      // hasn't replayed far enough to see it — `read_table` throws
+      // `Account Query Exception (3060002)` / `Contract Table Query
+      // Exception (3060003)` during that window. Catch + return; the
+      // outer cron tick re-enters every poll interval and self-heals.
       sysio::chain_apis::read_only::get_table_rows_params p;
-      p.code        = chain::name(epoch::account);
-      p.scope       = epoch::account;
-      p.table       = epoch::table_outposts;
+      p.code        = chain::name(chains::account);
+      p.scope       = chains::account;
+      p.table       = chains::table_chains;
       p.all_rows    = true;
       p.values_only = true;
-      auto rows = read_table(std::move(p));
+      sysio::chain_apis::read_only::get_table_rows_result rows;
+      try {
+         rows = read_table(std::move(p));
+      } catch (const fc::exception& e) {
+         // Transient (cold-start replay, account not yet visible).
+         // Don't clear `outposts` — keep the last-known set so jobs
+         // built from earlier reads continue to work; the next tick
+         // will refresh once the table is reachable.
+         static fc::time_point last_warn;
+         auto now = fc::time_point::now();
+         if (now > last_warn + fc::seconds(30)) {
+            wlog("batch_operator: refresh_outposts deferred — sysio.chains read failed: {}",
+                 ("e", e.top_message()));
+            last_warn = now;
+         }
+         return;
+      }
+      outposts.clear();
       for (auto& row : rows.rows) {
          auto obj = row.get_object();
+         // The `code` field on the Chain proto is a `slug_name` struct
+         // wrapping a uint64 (see slug_name.hpp). The JSON view exposes
+         // it as `{value: <uint64>}`. Unpack defensively.
+         uint64_t code_val = 0;
+         if (auto code_obj = obj.find(chains::field::code); code_obj != obj.end()) {
+            if (code_obj->value().is_object()) {
+               code_val = code_obj->value().get_object()["value"].as_uint64();
+            } else {
+               code_val = code_obj->value().as_uint64();
+            }
+         }
+         bool is_depot = obj[chains::field::is_depot].as_bool();
+         bool active   = obj[chains::field::active].as_bool();
+         if (is_depot || !active) continue;
          outpost_descriptor od;
-         od.id         = obj[epoch::outpost_field::id].as_uint64();
-         od.chain_kind = obj[epoch::outpost_field::chain_kind].as<ChainKind>();
-         od.chain_id   = static_cast<uint32_t>(obj[epoch::outpost_field::chain_id].as_uint64());
+         od.id         = code_val;  // slug_name uint64 doubles as outpost id
+         od.chain_kind = obj[chains::field::kind].as<ChainKind>();
+         od.chain_id   = static_cast<uint32_t>(obj[chains::field::external_chain_id].as_uint64());
          outposts.push_back(std::move(od));
       }
-      ilog("batch_operator: loaded {} outposts", outposts.size());
+      ilog("batch_operator: loaded {} outposts (v6 sysio.chains)", outposts.size());
+      prune_inactive_opp_jobs();
       build_opp_jobs();
+      schedule_opp_jobs();
    }
 
    /// Construct an `outpost_opp_job` per registered outpost using the
    /// chain-specific plugin factories. Idempotent: already-built jobs stay.
-   /// Called from `refresh_outposts`; jobs only run if USE_OUTPOST_OPP_JOB
-   /// is on (guarded at each use site).
+   /// Called from `refresh_outposts`; scheduling is handled separately so
+   /// startup-created jobs and governance-added jobs share the same path.
    void build_opp_jobs() {
       if (!depot_ops_backing) return; // plugin not initialized yet
       for (auto& op : outposts) {
@@ -419,12 +581,50 @@ struct batch_operator_plugin::impl {
 
          std::shared_ptr<sysio::outpost_client> client;
          try {
-            if (op.chain_kind == CHAIN_KIND_ETHEREUM) {
-               client = eth_plug->create_outpost_client(eth_client_id, op.id, op.chain_id,
-                                                     eth_opp_addr, eth_opp_inbound_addr);
-            } else if (op.chain_kind == CHAIN_KIND_SOLANA) {
+            if (op.chain_kind == CHAIN_KIND_EVM) {
+               // Bind this exact outpost to its own remote identity: the RPC
+               // client is the one whose configured chain id matches this
+               // row's external_chain_id (never a shared per-kind tuple), and
+               // the OPP / OPPInbound contract addresses come from the row's
+               // `--batch-outpost` binding. Anything missing => skip the job
+               // (fail closed) so an outpost is never relayed through another
+               // chain's endpoint.
+               auto entry = eth_plug->get_client_by_chain_id(op.chain_id);
+               if (!entry) {
+                  wlog("batch_operator: no unique --outpost-ethereum-client for chain_id {} "
+                       "(outpost {}); skipping until one is configured",
+                       op.chain_id, fc::slug_name{op.id}.to_string());
+                  continue;
+               }
+               auto bound = outpost_bindings.find(op.id);
+               if (bound == outpost_bindings.end() || bound->second.opp_inbound_addr.empty()) {
+                  wlog("batch_operator: outpost {} (EVM) has no {}=<CODE>,<OPP>,<OPPInbound> "
+                       "binding; skipping until one is configured",
+                       fc::slug_name{op.id}.to_string(), batch_operator_detail::BATCH_OUTPOST_OPTION);
+                  continue;
+               }
+               client = eth_plug->create_outpost_client(entry->id, op.id, op.chain_id,
+                                                     bound->second.opp_addr,
+                                                     bound->second.opp_inbound_addr);
+            } else if (op.chain_kind == CHAIN_KIND_SVM) {
+               // SVM: one Solana cluster (RPC client) serves every program, so
+               // the shared sol client is correct; the per-outpost identity is
+               // the program id from the row's `--batch-outpost` binding.
+               auto bound = outpost_bindings.find(op.id);
+               if (bound == outpost_bindings.end()) {
+                  wlog("batch_operator: outpost {} (SVM) has no {}=<CODE>,<program_id> binding; "
+                       "skipping until one is configured",
+                       fc::slug_name{op.id}.to_string(), batch_operator_detail::BATCH_OUTPOST_OPTION);
+                  continue;
+               }
+               if (!bound->second.opp_inbound_addr.empty()) {
+                  wlog("batch_operator: outpost {} (SVM) binding must not carry an inbound "
+                       "address (the single program serves both directions); skipping",
+                       fc::slug_name{op.id}.to_string());
+                  continue;
+               }
                client = sol_plug->create_outpost_client(sol_client_id, op.id, op.chain_id,
-                                                     sol_program_id);
+                                                     bound->second.opp_addr);
             } else {
                wlog("batch_operator: outpost {} has unsupported chain_kind, skipping job build",
                     op.id);
@@ -440,6 +640,87 @@ struct batch_operator_plugin::impl {
             client, *depot_ops_backing, fc::milliseconds(delivery_timeout_ms));
          opp_jobs.emplace(op.id, std::move(job));
          ilog("batch_operator: built outpost_opp_job for {}", client->to_string());
+      }
+   }
+
+   /// Returns true when a chain code is present in the latest active outpost list.
+   bool is_current_outpost(uint64_t chain_code) const {
+      for (const auto& outpost : outposts) {
+         if (outpost.id == chain_code) return true;
+      }
+      return false;
+   }
+
+   /// Forget a cron job ID after the job has been cancelled individually.
+   void forget_cron_job_id(cron_service::job_id_t id) {
+      cron_job_ids.erase(std::remove(cron_job_ids.begin(), cron_job_ids.end(), id),
+                         cron_job_ids.end());
+   }
+
+   /// Cancel the inbound/outbound cron entries for one outpost, if they exist.
+   void cancel_scheduled_opp_job(uint64_t chain_code) {
+      auto sched_it = scheduled_opp_jobs.find(chain_code);
+      if (sched_it == scheduled_opp_jobs.end()) return;
+      if (cron_svc) {
+         cron_svc->cancel(sched_it->second.outbound);
+         cron_svc->cancel(sched_it->second.inbound);
+      }
+      forget_cron_job_id(sched_it->second.outbound);
+      forget_cron_job_id(sched_it->second.inbound);
+      scheduled_opp_jobs.erase(sched_it);
+   }
+
+   /// Remove relay jobs for outposts that are no longer active on `sysio.chains`.
+   void prune_inactive_opp_jobs() {
+      for (auto it = opp_jobs.begin(); it != opp_jobs.end(); ) {
+         if (is_current_outpost(it->first)) {
+            ++it;
+            continue;
+         }
+         cancel_scheduled_opp_job(it->first);
+         ilog("batch_operator: removed outpost_opp_job for inactive outpost {}", it->first);
+         it = opp_jobs.erase(it);
+      }
+   }
+
+   /// Schedule one cron direction for an outpost relay job.
+   cron_service::job_id_t schedule_opp_job_direction(uint64_t chain_code,
+                                                     const std::shared_ptr<sysio::outpost_opp_job>& job,
+                                                     std::string_view direction,
+                                                     void (sysio::outpost_opp_job::*runner)()) {
+      sysio::services::cron_service::job_schedule sched;
+      sched.milliseconds = {sysio::services::cron_service::job_schedule::step_value{epoch_poll_ms}};
+      sysio::services::cron_service::job_metadata_t meta;
+      meta.label         = std::format("outpost_opp_{}_{}", direction, chain_code);
+      meta.one_at_a_time = true;
+      auto id = cron_svc->add(sched,
+                              [job_wp = std::weak_ptr<sysio::outpost_opp_job>(job), runner]() {
+                                 if (auto j = job_wp.lock()) ((*j).*runner)();
+                              },
+                              meta);
+      cron_job_ids.push_back(id);
+      ilog("batch_operator_plugin: scheduled {} for {} (id={}, every {}ms)",
+           meta.label, job->client().to_string(), id, epoch_poll_ms);
+      return id;
+   }
+
+   /// Schedule inbound and outbound cron jobs for a single active outpost.
+   void schedule_opp_job(uint64_t chain_code, const std::shared_ptr<sysio::outpost_opp_job>& job) {
+      if (!cron_svc || shutting_down || scheduled_opp_jobs.contains(chain_code)) return;
+      auto outbound_id = schedule_opp_job_direction(chain_code, job, "outbound",
+                                                    &sysio::outpost_opp_job::run_outbound);
+      auto inbound_id = schedule_opp_job_direction(chain_code, job, "inbound",
+                                                   &sysio::outpost_opp_job::run_inbound);
+      scheduled_opp_jobs.emplace(chain_code, scheduled_opp_job_ids{
+         .outbound = outbound_id,
+         .inbound  = inbound_id,
+      });
+   }
+
+   /// Schedule every built active outpost job that does not already have cron entries.
+   void schedule_opp_jobs() {
+      for (const auto& [chain_code, job] : opp_jobs) {
+         schedule_opp_job(chain_code, job);
       }
    }
 
@@ -556,16 +837,18 @@ void batch_operator_plugin::set_program_options(options_description& cli,
         "Max time to wait for chain delivery confirmation (ms)");
    opts("batch-enabled", bpo::value<bool>()->default_value(false),
         "Enable batch operator functionality");
-   opts("batch-eth-client-id", bpo::value<std::string>()->default_value("eth-default"),
-        "Ethereum outpost client ID");
    opts("batch-sol-client-id", bpo::value<std::string>()->default_value("sol-default"),
-        "Solana outpost client ID");
-   opts("batch-eth-opp-inbound-addr", bpo::value<std::string>(),
-        "OPPInbound contract address on Ethereum (hex)");
-   opts("batch-eth-opp-addr", bpo::value<std::string>(),
-        "OPP contract address on Ethereum (hex)");
-   opts("batch-sol-program-id", bpo::value<std::string>(),
-        "opp-solana-outpost program ID (base58)");
+        "Solana outpost client ID (RPC connection) for SVM outpost rows");
+   // Help text must not contain a " --" sequence (or non-ASCII): the
+   // PerformanceHarness plugin-args generator splits nodeop's --help output on
+   // " --", so option names referenced below are spelled without the dashes.
+   opts(batch_operator_detail::BATCH_OUTPOST_OPTION, bpo::value<std::vector<std::string>>()->multitoken(),
+        "Remote OPP contract binding for one active sysio.chains row, repeatable once per "
+        "chain code. Spec: CHAIN_CODE,opp_addr[,opp_inbound_addr]. EVM rows require the OPP "
+        "and OPPInbound contract addresses (0x-hex); SVM rows require only the outpost "
+        "program id (base58). The Ethereum RPC client for a row is selected by matching the "
+        "row's external_chain_id against the chain ids of the outpost-ethereum-client specs; "
+        "an active row with no binding or no matching client is skipped (fail closed).");
 }
 
 void batch_operator_plugin::plugin_initialize(const variables_map& options) {
@@ -574,14 +857,16 @@ void batch_operator_plugin::plugin_initialize(const variables_map& options) {
    _impl->epoch_poll_ms       = options["batch-epoch-poll-ms"].as<uint32_t>();
    _impl->delivery_timeout_ms = options["batch-delivery-timeout-ms"].as<uint32_t>();
    _impl->enabled             = options["batch-enabled"].as<bool>();
-   _impl->eth_client_id       = options["batch-eth-client-id"].as<std::string>();
    _impl->sol_client_id       = options["batch-sol-client-id"].as<std::string>();
-   if (options.count("batch-eth-opp-inbound-addr"))
-      _impl->eth_opp_inbound_addr = options["batch-eth-opp-inbound-addr"].as<std::string>();
-   if (options.count("batch-eth-opp-addr"))
-      _impl->eth_opp_addr = options["batch-eth-opp-addr"].as<std::string>();
-   if (options.count("batch-sol-program-id"))
-      _impl->sol_program_id = options["batch-sol-program-id"].as<std::string>();
+   if (options.count(batch_operator_detail::BATCH_OUTPOST_OPTION)) {
+      for (const auto& spec :
+           options[batch_operator_detail::BATCH_OUTPOST_OPTION].as<std::vector<std::string>>()) {
+         auto [code, binding] = batch_operator_detail::parse_outpost_binding(spec);
+         FC_ASSERT(_impl->outpost_bindings.emplace(code, std::move(binding)).second,
+                   "Duplicate {} binding for chain code {}",
+                   batch_operator_detail::BATCH_OUTPOST_OPTION, fc::slug_name{code}.to_string());
+      }
+   }
 
    _impl->chain_plug = &app().get_plugin<chain_plugin>();
    _impl->cron_plug  = &app().get_plugin<cron_plugin>();
@@ -597,22 +882,21 @@ void batch_operator_plugin::plugin_startup() {
 
    ilog("batch_operator_plugin: starting for account {}", _impl->operator_account.to_string());
 
-   // Discover outposts once so we can size the private cron_service thread
-   // pool to match. A governance change that adds or removes an outpost
-   // requires a batch operator restart — the set is fixed here.
+   // Discover outposts before the private cron_service starts. Later refresh
+   // ticks add/remove per-outpost cron jobs as the active chain set changes.
    try {
       _impl->refresh_outposts();
    } catch (const fc::exception& e) {
       wlog("batch_operator_plugin: initial outpost discovery failed: {}. "
-           "Starting with 0 per-outpost jobs; restart batch_operator after "
+           "Starting with 0 per-outpost jobs; refresh ticks will retry after "
            "the chain has caught up.", e.to_string());
    }
 
-   // Size the pool: two jobs per outpost (outbound + inbound) plus one
-   // epoch_tick. A minimum floor of 3 keeps the service viable even when
-   // no outposts are known yet (so epoch_tick can still run).
+   // Size the pool for startup outposts. Later dynamic outposts are added to
+   // the same queued cron service; the minimum keeps epoch_tick viable even
+   // when no outposts are known yet.
    const std::size_t outpost_count   = _impl->opp_jobs.size();
-   const std::size_t required_threads = outpost_count * 2 + 1;
+   const std::size_t required_threads = outpost_count * OPP_CRON_JOBS_PER_OUTPOST + EPOCH_TICK_CRON_JOBS;
    const std::size_t thread_count    = std::max(required_threads, MIN_CRON_THREADS);
 
    sysio::services::cron_service::options svc_opts;
@@ -641,42 +925,7 @@ void batch_operator_plugin::plugin_startup() {
       ilog("batch_operator_plugin: scheduled {} (id={}, every {}ms)", meta.label, id, poll_ms);
    }
 
-   // Per-outpost outbound + inbound. Each pair targets the same
-   // outpost_opp_job instance; the job's internal mutex serializes them
-   // when they run on different worker threads concurrently.
-   for (auto& [outpost_id, job] : _impl->opp_jobs) {
-      const auto identifier = job->client().to_string();
-      {
-         sysio::services::cron_service::job_schedule sched;
-         sched.milliseconds = {sysio::services::cron_service::job_schedule::step_value{poll_ms}};
-         sysio::services::cron_service::job_metadata_t meta;
-         meta.label         = std::format("outpost_opp_outbound_{}", outpost_id);
-         meta.one_at_a_time = true;
-         auto id = _impl->cron_svc->add(sched,
-                                        [job_wp = std::weak_ptr(job)]() {
-                                           if (auto j = job_wp.lock()) j->run_outbound();
-                                        },
-                                        meta);
-         _impl->cron_job_ids.push_back(id);
-         ilog("batch_operator_plugin: scheduled {} for {} (id={}, every {}ms)",
-              meta.label, identifier, id, poll_ms);
-      }
-      {
-         sysio::services::cron_service::job_schedule sched;
-         sched.milliseconds = {sysio::services::cron_service::job_schedule::step_value{poll_ms}};
-         sysio::services::cron_service::job_metadata_t meta;
-         meta.label         = std::format("outpost_opp_inbound_{}", outpost_id);
-         meta.one_at_a_time = true;
-         auto id = _impl->cron_svc->add(sched,
-                                        [job_wp = std::weak_ptr(job)]() {
-                                           if (auto j = job_wp.lock()) j->run_inbound();
-                                        },
-                                        meta);
-         _impl->cron_job_ids.push_back(id);
-         ilog("batch_operator_plugin: scheduled {} for {} (id={}, every {}ms)",
-              meta.label, identifier, id, poll_ms);
-      }
-   }
+   _impl->schedule_opp_jobs();
 }
 
 void batch_operator_plugin::plugin_shutdown() {
@@ -686,6 +935,7 @@ void batch_operator_plugin::plugin_shutdown() {
       _impl->cron_svc->stop();
       _impl->cron_svc.reset();
    }
+   _impl->scheduled_opp_jobs.clear();
    _impl->cron_job_ids.clear();
    ilog("batch_operator_plugin: shutdown complete");
 }

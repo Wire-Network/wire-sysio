@@ -57,21 +57,32 @@ BOOST_AUTO_TEST_CASE(string_source_with_valid_integer_text) {
 }
 
 BOOST_AUTO_TEST_CASE(string_source_with_invalid_text_throws_runtime_error) {
-   // Phase A item 3 will replace stoll+catch with from_chars; the
-   // observable behaviour (throws std::runtime_error) is preserved.
    BOOST_CHECK_THROW(variant{std::string{"not_a_number"}}.as_enum_value<color>(),
                      std::runtime_error);
    BOOST_CHECK_THROW(variant{std::string{""}}.as_enum_value<color>(),
                      std::runtime_error);
 }
 
-BOOST_AUTO_TEST_CASE(string_source_with_trailing_garbage_should_reject) {
-   // "12abc" -- stoll today reads 12 and silently ignores the suffix.
-   // from_chars also reads 12 and stops at 'a'; the helper does not
-   // currently validate that the entire string was consumed.  This
-   // test documents the lenient behaviour so the Phase A swap is
-   // observably equivalent.  Tighten in a follow-up if desired.
+BOOST_AUTO_TEST_CASE(string_source_with_trailing_garbage_accepted) {
+   // "1abc" -- from_chars reads 1, stops at 'a', returns ec=std::errc{}.  The helper does not validate that the
+   // entire string was consumed, matching the previous std::stoll behaviour (which silently ignored the suffix too).
    BOOST_CHECK(variant{std::string{"1abc"}}.as_enum_value<color>() == color::green);
+}
+
+BOOST_AUTO_TEST_CASE(string_source_with_leading_whitespace_throws) {
+   // Stricter than the previous std::stoll-based code, which accepted leading whitespace and returned 1 for " 1".
+   // std::from_chars rejects whitespace; the ABI serializer never emits such input.
+   BOOST_CHECK_THROW(variant{std::string{" 1"}}.as_enum_value<color>(),
+                     std::runtime_error);
+   BOOST_CHECK_THROW(variant{std::string{"\t1"}}.as_enum_value<color>(),
+                     std::runtime_error);
+}
+
+BOOST_AUTO_TEST_CASE(string_source_with_leading_plus_throws) {
+   // Stricter than the previous std::stoll-based code, which accepted "+1" and returned 1.  std::from_chars rejects
+   // a leading '+'; the ABI serializer never emits such input.
+   BOOST_CHECK_THROW(variant{std::string{"+1"}}.as_enum_value<color>(),
+                     std::runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE(object_source_throws) {

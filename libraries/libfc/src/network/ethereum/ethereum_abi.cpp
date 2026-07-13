@@ -421,6 +421,39 @@ size_t abi_head_size(const abi::component_type& component) {
    return 32;
 }
 
+namespace {
+   // ABI encodes every head slot, length prefix, and static value as a single 32-byte word.
+   constexpr size_t abi_word_size = 32;
+
+   // Overflow-safe bounds check for the half-open span [offset, offset + need) within an
+   // attacker-supplied buffer of `data_size` bytes. `offset + need` can wrap around on 64-bit when
+   // offset/need are decoded from untrusted ABI data, so the test is written with subtraction
+   // (offset <= data_size is established first).
+   void require_abi_span(size_t offset, size_t need, size_t data_size, const char* what) {
+      FC_ASSERT(offset <= data_size && data_size - offset >= need,
+                "Not enough data for {}: need {} bytes at offset {} (data_size {})",
+                what, need, offset, data_size);
+   }
+
+   // Reads the 32-byte big-endian ABI word at `at` and returns it as a size_t offset/length,
+   // rejecting values that cannot index the buffer. This bounds-checks the read of the word itself
+   // and prevents an out-of-range pointer/length — the >2^64 values std::stoull throws on, and the
+   // large-but-representable values that overflow when added to a base offset — from reaching the
+   // downstream pointer arithmetic that previously read out of bounds.
+   size_t read_abi_word_as_size(const uint8_t* data, size_t at, size_t data_size, const char* what) {
+      require_abi_span(at, abi_word_size, data_size, what);
+      const std::string dec = be_uint_to_decimal(data + at);
+      size_t value = 0;
+      try {
+         value = std::stoull(dec);
+      } catch (const std::out_of_range&) {
+         FC_THROW_EXCEPTION(fc::out_of_range_exception, "ABI {} exceeds representable range", what);
+      }
+      FC_ASSERT(value <= data_size, "ABI {} value {} exceeds data size {}", what, value, data_size);
+      return value;
+   }
+} // anonymous namespace
+
 /**
  * @brief Forward declaration for decode_value
  */
@@ -434,13 +467,17 @@ fc::variant decode_value(const abi::component_type& component, const uint8_t* da
  * @param offset Current offset in the data (will be advanced by 32)
  * @return Decoded value as fc::variant
  */
-fc::variant decode_static_value(const abi::component_type& component, const uint8_t* data, size_t& offset) {
+fc::variant decode_static_value(const abi::component_type& component, const uint8_t* data, size_t data_size,
+                                size_t& offset) {
    using dt = abi::data_type;
    const auto type = component.type;
 
-   FC_ASSERT(offset + 32 <= SIZE_MAX, "Offset overflow");
+   // A static value occupies one 32-byte word; bound the read against the actual buffer rather
+   // than the previous tautological `offset + 32 <= SIZE_MAX`, which never caught a short buffer
+   // and allowed a 32-byte out-of-bounds read.
+   require_abi_span(offset, abi_word_size, data_size, "static value");
    const uint8_t* value_data = data + offset;
-   offset += 32;
+   offset += abi_word_size;
 
    // Numeric types
    if (abi::is_data_type_numeric(type)) {
@@ -493,13 +530,11 @@ fc::variant decode_dynamic_data(const abi::component_type& component, const uint
    using dt = abi::data_type;
    const auto type = component.type;
 
-   // Read length (32 bytes)
-   FC_ASSERT(offset + 32 <= data_size, "Not enough data for dynamic length");
-   auto length_str = be_uint_to_decimal(data + offset);
-   offset += 32;
+   // Read length (32-byte word), bounded so a forged length cannot index past the buffer.
+   size_t length = read_abi_word_as_size(data, offset, data_size, "dynamic length");
+   offset += abi_word_size;
 
-   size_t length = std::stoull(length_str);
-   FC_ASSERT(offset + length <= data_size, "Not enough data for dynamic content");
+   require_abi_span(offset, length, data_size, "dynamic content");
 
    switch (type) {
    case dt::string: {
@@ -539,10 +574,13 @@ fc::variant decode_list(const abi::component_type& component, const uint8_t* dat
 
    // Read array length for dynamic arrays
    if (lc.is_dynamic_list()) {
-      FC_ASSERT(offset + 32 <= data_size, "Not enough data for array length");
-      auto length_str = be_uint_to_decimal(data + offset);
-      offset += 32;
-      array_length = std::stoull(length_str);
+      array_length = read_abi_word_as_size(data, offset, data_size, "array length");
+      offset += abi_word_size;
+      // Each element consumes at least one 32-byte word (a head offset slot for dynamic elements,
+      // or >=32 bytes of inline data for static ones), so the element count cannot exceed the
+      // remaining words. Bounds both the reserve() calls and the decode loops below.
+      FC_ASSERT(array_length <= (data_size - offset) / abi_word_size,
+                "ABI array length {} exceeds remaining data", array_length);
    } else {
       array_length = lc.size;
    }
@@ -563,10 +601,8 @@ fc::variant decode_list(const abi::component_type& component, const uint8_t* dat
       size_t base_offset = offset;
 
       for (size_t i = 0; i < array_length; ++i) {
-         FC_ASSERT(offset + 32 <= data_size, "Not enough data for array element offset");
-         auto offset_str = be_uint_to_decimal(data + offset);
-         offsets.push_back(base_offset + std::stoull(offset_str));
-         offset += 32;
+         offsets.push_back(base_offset + read_abi_word_as_size(data, offset, data_size, "array element offset"));
+         offset += abi_word_size;
       }
 
       // Decode elements from tail
@@ -610,12 +646,10 @@ fc::variant decode_tuple(const abi::component_type& component, const uint8_t* da
    // First pass: decode static fields and collect dynamic field offsets
    for (const auto& child : children) {
       if (child.is_dynamic()) {
-         // Read offset pointer (32 bytes)
-         FC_ASSERT(offset + 32 <= data_size, "Not enough data for tuple field offset");
-         auto offset_str = be_uint_to_decimal(data + offset);
-         size_t field_offset = base_offset + std::stoull(offset_str);
+         // Read offset pointer (32-byte word), bounded against the buffer.
+         size_t field_offset = base_offset + read_abi_word_as_size(data, offset, data_size, "tuple field offset");
          dynamic_fields.emplace_back(child.name, field_offset);
-         offset += 32;
+         offset += abi_word_size;
       } else {
          // Decode static field directly
          result[child.name] = decode_value(child, data, data_size, offset);
@@ -656,7 +690,7 @@ fc::variant decode_value(const abi::component_type& component, const uint8_t* da
       return decode_dynamic_data(component, data, data_size, offset);
    }
 
-   return decode_static_value(component, data, offset);
+   return decode_static_value(component, data, data_size, offset);
 }
 
 } // anonymous namespace
@@ -679,14 +713,13 @@ std::string abi::to_contract_component_signature(const component_type& component
    if (component.is_container()) {
       ss << '(';
 
-      std::ranges::for_each(component.components | std::views::enumerate, [&](auto&& enum_item) {
-         auto& [i, child_comp] = enum_item;
-         if (i) {
+      for (size_t i = 0; i < component.components.size(); ++i) {
+         if (i != 0) {
             ss << ',';
          }
 
-         ss << abi::to_contract_component_signature(child_comp);
-      });
+         ss << abi::to_contract_component_signature(component.components[i]);
+      }
 
       ss << ')';
    }
@@ -718,14 +751,13 @@ std::string abi::to_contract_function_signature(const contract& contract) {
    FC_ASSERT(contract.type == invoke_target_type::function, "ABI contract must be a function");
    std::stringstream ss;
    ss << contract.name << '(';
-   std::ranges::for_each(contract.inputs | std::views::enumerate, [&](auto&& enum_item) {
-      auto& [i, input_comp] = enum_item;
-      if (i) {
+   for (size_t i = 0; i < contract.inputs.size(); ++i) {
+      if (i != 0) {
          ss << ',';
       }
 
-      ss << abi::to_contract_component_signature(input_comp);
-   });
+      ss << abi::to_contract_component_signature(contract.inputs[i]);
+   }
    ss << ')';
    return ss.str();
 }
@@ -760,13 +792,12 @@ std::string abi::to_event_signature(const contract& contract) {
    FC_ASSERT(contract.type == invoke_target_type::event, "ABI contract must be an event");
    std::stringstream ss;
    ss << contract.name << '(';
-   std::ranges::for_each(contract.inputs | std::views::enumerate, [&](auto&& enum_item) {
-      auto& [i, input_comp] = enum_item;
-      if (i) {
+   for (size_t i = 0; i < contract.inputs.size(); ++i) {
+      if (i != 0) {
          ss << ',';
       }
-      ss << abi::to_contract_component_signature(input_comp);
-   });
+      ss << abi::to_contract_component_signature(contract.inputs[i]);
+   }
    ss << ')';
    return ss.str();
 }
@@ -931,9 +962,7 @@ fc::variant contract_decode_data(const abi::contract& contract, const std::strin
       const auto& comp = components[0];
       // For dynamic or list components, we need to read the offset pointer first
       if (comp.is_dynamic() || comp.is_list()) {
-         FC_ASSERT(offset + 32 <= data_size, "Not enough data for parameter offset");
-         auto offset_str = be_uint_to_decimal(data + offset);
-         size_t actual_offset = offset + std::stoull(offset_str);
+         size_t actual_offset = offset + read_abi_word_as_size(data, offset, data_size, "parameter offset");
          return decode_value(comp, data, data_size, actual_offset);
       }
       return decode_value(comp, data, data_size, offset);
@@ -952,11 +981,9 @@ fc::variant contract_decode_data(const abi::contract& contract, const std::strin
    for (const auto& comp : components) {
 
       if (comp.is_dynamic()) {
-         // Dynamic component: read offset pointer (always 32 bytes)
-         FC_ASSERT(offset + 32 <= data_size, "Not enough data for parameter offset");
-         auto offset_str = be_uint_to_decimal(data + offset);
-         offsets.push_back(base_offset + std::stoull(offset_str));
-         offset += 32;
+         // Dynamic component: read offset pointer (always a 32-byte word), bounded against buffer.
+         offsets.push_back(base_offset + read_abi_word_as_size(data, offset, data_size, "parameter offset"));
+         offset += abi_word_size;
       } else {
          // Static component: inline data occupies its full encoded size
          // (e.g., a static tuple of 4 fields occupies 4 × 32 = 128 bytes)
@@ -1011,7 +1038,13 @@ void fc::from_variant(const fc::variant& var, fc::network::ethereum::abi::compon
              data_type_str);
 
    auto base_type_str = data_type_match[1].str();
-   vo.name = obj["name"].as_string();
+   // ABI components on anonymous parameters (e.g. event params declared
+   // without an identifier, return values without a name, struct fields
+   // whose intermediate codec strips the name) emit `{"type": "...", ...}`
+   // with no `name` field. Leave `vo.name` at its default empty string
+   // rather than throwing `key_not_found_exception` — the unnamed slot
+   // is still structurally valid and the rest of the entry parses.
+   if (obj.contains("name")) vo.name = obj["name"].as_string();
    vo.type = fc::reflector<data_type>::from_string(base_type_str);
    bool is_list = data_type_match[2].str().starts_with("[");
    if (is_list) {
@@ -1058,7 +1091,11 @@ void fc::from_variant(const fc::variant& var, fc::network::ethereum::abi::contra
 
    FC_ASSERT(var.is_object(), "Variant must be an object to deserialize ABI contract");
    auto& obj = var.get_object();
-   vo.name = obj["name"].as_string();
+   // Solidity's `receive()` and `fallback()` ABI entries omit the
+   // `name` field entirely — they're matched by `"type"` alone. Read
+   // defensively so the contract parser doesn't throw
+   // `key_not_found_exception` on those entries.
+   if (obj.contains("name")) vo.name = obj["name"].as_string();
    auto type_str = obj["type"].as_string();
    vo.type = fc::reflector<fc::network::ethereum::abi::invoke_target_type>::from_string(type_str.c_str());
 

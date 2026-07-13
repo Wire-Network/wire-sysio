@@ -13,6 +13,7 @@
 #include <sysio/chain/webassembly/sys-vm-oc/code_cache.hpp>
 #include <sysio/chain/webassembly/sys-vm-oc/config.hpp>
 #include <sysio/chain/webassembly/sys-vm-oc/intrinsic.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/thread_exec_mem.hpp>
 
 #include <boost/hana/string.hpp>
 
@@ -36,12 +37,12 @@ class sysvmoc_runtime : public sysio::chain::wasm_runtime_interface {
 
       friend sysvmoc_instantiated_module;
       sysvmoc::code_cache_sync cc;
-      sysvmoc::executor exec;
-      sysvmoc::memory mem;
 
-      // Defined in sys-vm-oc.cpp. Used for non-main thread in multi-threaded execution
-      thread_local static std::unique_ptr<sysvmoc::executor> exec_thread_local;
-      thread_local static std::unique_ptr<sysvmoc::memory> mem_thread_local;
+      // Per-thread executor/memory, always paired with this runtime's code cache. Multiple
+      // runtimes can exist in one process (one per controller, e.g. in a validating tester); an
+      // executor's mapping of one runtime's cache file must never execute another runtime's
+      // descriptor offsets.
+      sysvmoc::thread_exec_mem exec_mem;
 };
 
 /**
@@ -278,8 +279,8 @@ struct sys_vm_oc_type_converter : public sysio::vm::type_converter<webassembly::
    vm::wasm_ptr_t to_wasm(void*&& ptr) {
       return convert_native_to_wasm(static_cast<char*>(ptr));
    }
-   SYS_VM_FROM_WASM(float32_t, (float f)) { return ::to_softfloat32(f); }
-   SYS_VM_FROM_WASM(float64_t, (double f)) { return ::to_softfloat64(f); }
+   SYS_VM_FROM_WASM(softfloat32_t, (float f)) { return ::to_softfloat32(f); }
+   SYS_VM_FROM_WASM(softfloat64_t, (double f)) { return ::to_softfloat64(f); }
 
    template<typename T>
    inline decltype(auto) as_value(const vm::native_value& val) const {
@@ -340,7 +341,7 @@ auto fn(A... a) {
    try {
       if constexpr(!is_injected) {
          constexpr int cb_current_call_depth_remaining_segment_offset = OFFSET_OF_CONTROL_BLOCK_MEMBER(current_call_depth_remaining);
-         constexpr int depth_assertion_intrinsic_offset = OFFSET_OF_FIRST_INTRINSIC - (int) find_intrinsic_index("sysvmoc_internal.depth_assert") * 8;
+         constexpr int depth_assertion_intrinsic_offset = OFFSET_OF_FIRST_INTRINSIC - (int) require_intrinsic_index<find_intrinsic_index("sysvmoc_internal.depth_assert")>::value * 8;
 
          asm volatile("cmpl   $1,%%gs:%c[callDepthRemainOffset]\n"
                       "jne    1f\n"
@@ -393,7 +394,7 @@ void register_sysvm_oc(Name n) {
    // Has special handling
    if(n == BOOST_HANA_STRING("env.sysio_exit")) return;
    constexpr auto fn = create_function<F, Preconditions, injected>();
-   constexpr auto index = find_intrinsic_index(n.c_str());
+   constexpr auto index = require_intrinsic_index<find_intrinsic_index(n.c_str())>::value;
    [[maybe_unused]] intrinsic the_intrinsic(
       n.c_str(),
       wasm_function_type_provider<std::remove_pointer_t<decltype(fn)>>::type(),

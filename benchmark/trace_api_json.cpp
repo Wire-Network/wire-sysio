@@ -79,7 +79,6 @@ block_trace_v0 make_synthetic_block_trace(size_t num_trxs, size_t actions_per_tr
          act.return_value    = {};
          trx.actions.push_back(std::move(act));
       }
-      trx.status          = chain::transaction_receipt_header::executed;
       trx.cpu_usage_us    = 150;
       trx.net_usage_words = fc::unsigned_int{16};
       trx.signatures.push_back(fake_signature());
@@ -103,6 +102,12 @@ data_handler_function make_noop_data_handler() {
    };
 }
 
+// Streaming counterpart: emits no params/return_data keys, mirroring the variant noop above so
+// both measured paths skip the same ABI-decode work.
+stream_data_handler_function make_noop_stream_data_handler() {
+   return [](const std::variant<action_trace_v0>&, fc::json_writer&) {};
+}
+
 } // namespace
 
 void trace_api_json_benchmarking() {
@@ -119,7 +124,8 @@ void trace_api_json_benchmarking() {
       { 1'000,  4,   128 },  // complex trxs, modest block
    };
 
-   const auto noop_handler = make_noop_data_handler();
+   const auto noop_handler        = make_noop_data_handler();
+   const auto noop_stream_handler = make_noop_stream_data_handler();
    const bool irreversible = true;
 
    for (const auto& s : shapes) {
@@ -154,7 +160,7 @@ void trace_api_json_benchmarking() {
       // This is the proposed new main-thread cost (no variant intermediate, no
       // separate HTTP-thread serialization step).
       benchmarking("stream:       " + label_prefix, [&]() {
-         std::string out = detail::response_formatter::process_block_to_json(entry, irreversible, noop_handler);
+         std::string out = detail::response_formatter::process_block_to_json(entry, irreversible, noop_stream_handler);
          asm volatile("" : : "g"(out.size()) : "memory");
       });
 

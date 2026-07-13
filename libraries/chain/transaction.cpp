@@ -11,7 +11,6 @@
 #include <sysio/chain/exceptions.hpp>
 #include <sysio/chain/transaction.hpp>
 
-#include <fc/static_variant.hpp>
 #include <fc/crypto/signature.hpp>
 namespace sysio { namespace chain {
 
@@ -176,7 +175,7 @@ uint32_t packed_transaction::get_action_billable_size(size_t action_index)const 
 
    uint32_t size = billable_net_per_action_overhead;
    if (action_index < unpacked_trx.context_free_actions.size()) {
-      // asserted to be less than or equal to context_free_actions.size()
+      // init() enforces: context_free_data is empty or its size equals context_free_actions.size()
       if (unpacked_trx.context_free_data.size() > action_index) {
          size += unpacked_trx.context_free_data[action_index].size();
       }
@@ -364,6 +363,9 @@ void packed_transaction::decompress() {
 
 void packed_transaction::init()
 {
+   // Reject CFA-only transactions. Regular actions are required so that
+   // total_actions() >= 1, which billable_net_per_action_overhead relies on to
+   // avoid divide-by-zero, and so that every trx has at least one authorization.
    SYS_ASSERT( !unpacked_trx.actions.empty(), tx_no_action, "packed_transaction contains no actions" );
    SYS_ASSERT( unpacked_trx.context_free_data.empty() || unpacked_trx.context_free_data.size() == unpacked_trx.context_free_actions.size(), transaction_exception,
               "Context free data size {} not equal to context free actions size {}",
@@ -375,6 +377,8 @@ void packed_transaction::init()
    size += fc::raw::pack_size(static_cast<const transaction_header&>(unpacked_trx));
    SYS_ASSERT( size + packed_trx.size() + packed_context_free_data.size() <= std::numeric_limits<uint32_t>::max(),
                tx_too_big, "packed_transaction is too big" );
+   // +1 rounds up so per-action shares sum to at least total overhead; may over-bill
+   // by up to total_actions() bytes per trx (negligible).
    billable_net_per_action_overhead = (size / unpacked_trx.total_actions()) + 1;
 }
 

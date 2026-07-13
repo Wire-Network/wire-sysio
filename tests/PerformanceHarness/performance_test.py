@@ -103,7 +103,7 @@ class PerformanceTest:
         self.testsStart = datetime.now(UTC)
 
         self.loggingConfig = PerformanceTest.LoggingConfig(logDirBase=Path(self.ptConfig.logDirRoot)/f"PHSRLogs",
-                                                           logDirTimestamp=f"{self.testsStart.strftime('%Y-%m-%d_%H-%M-%S')}")
+                                                           logDirTimestamp=f"{self.testsStart.strftime('%Y-%m-%d_%H-%M-%S-%f')}-{os.getpid()}")
 
     def performPtbBinarySearch(self, clusterConfig: PerformanceTestBasic.ClusterConfig, logDirRoot: Path, delReport: bool, quiet: bool, delPerfLogs: bool, saveState: bool) -> TpsTestResult.PerfTestSearchResults:
         floor = self.ptConfig.minTpsToTest
@@ -314,10 +314,10 @@ class PerformanceTest:
     def testDirsSetup(self):
         try:
             def createArtifactsDir(path):
+                """Create a performance artifact directory without failing if a parallel test wins the race."""
                 print(f"Checking if test artifacts dir exists: {path}")
-                if not Path(path).is_dir():
-                    print(f"Creating test artifacts dir: {path}")
-                    os.mkdir(f"{path}")
+                print(f"Creating test artifacts dir: {path}")
+                Path(path).mkdir(parents=True, exist_ok=True)
 
             createArtifactsDir(self.loggingConfig.logDirBase)
             createArtifactsDir(self.loggingConfig.logDirPath)

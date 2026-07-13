@@ -299,6 +299,27 @@ BOOST_AUTO_TEST_CASE(test_em_is_canonical) try {
    BOOST_TEST(!em::public_key::is_canonical(non_canonical.get<em::signature_shim>()._data));
 } FC_LOG_AND_RETHROW();
 
+// public_key::operator< must order key bytes UNSIGNED (it routes through
+// less_comparator -> std::memcmp). authority validate() relies on this exact
+// ordering, and CDT-side contract code sorts keys with the same semantics, so a
+// regression to signed-char comparison here would silently disagree with the
+// contract for any key byte >= 0x80 and make valid authorities look unsorted.
+// Two EM keys (same variant index) differing first at a high-bit byte pin it.
+BOOST_AUTO_TEST_CASE(test_em_ordering_is_unsigned) try {
+   auto make_em = [](unsigned char second_byte) {
+      std::array<char, 33> d{};
+      d[0] = static_cast<char>(0x02);          // compressed-point prefix
+      d[1] = static_cast<char>(second_byte);   // first differing byte
+      return public_key(em::public_key_shim(d));
+   };
+   const auto k_hi = make_em(0x80);  // 128 unsigned, -128 if compared as signed char
+   const auto k_lo = make_em(0x01);  //   1 unsigned,    1 signed
+
+   // memcmp orders 0x80 (128) after 0x01 (1); signed char would invert both.
+   BOOST_TEST(  (k_lo < k_hi) );
+   BOOST_TEST( !(k_hi < k_lo) );
+} FC_LOG_AND_RETHROW();
+
 BOOST_AUTO_TEST_CASE(test_ed_pub_str) try {
    auto pub_str = "5oNDL3swdJJF1g9DzJiZ4ynHXgszjAEpUkxVYejchzrY";
    auto pub_key = fc::crypto::public_key::from_string(pub_str, public_key::key_type::ed);
@@ -344,6 +365,35 @@ BOOST_AUTO_TEST_CASE(test_ed_sig_str) try {
    fc::variant test_sig_variant{sig};
    signature test_sig2 = test_sig_variant.as<signature>();
    BOOST_CHECK_EQUAL(sig.to_string({}), test_sig2.to_string({}));
+} FC_LOG_AND_RETHROW();
+
+// --- ed25519 recovery KAT: public_key::recover is the single verification path shared by
+// transaction authorization, the recover_key intrinsic, and the assert_recover_key intrinsic.
+// Pins that (a) recover returns the signer's embedded pub, (b) the payload actually signed is
+// the HEX-ENCODED digest (Phantom-wallet compatibility -- see ed::private_key_shim::sign_sha256),
+// not the raw 32 digest bytes, and (c) recovery against a different digest throws rather than
+// returning a key. A host-side ed verify that disagrees on (b) -- as assert_recover_key once
+// did by verifying over the raw bytes -- rejects every signature this path accepts.
+BOOST_AUTO_TEST_CASE(test_ed_recovery) try {
+   auto priv = private_key::generate(private_key::key_type::ed);
+   auto pub = priv.get_public_key();
+   auto digest = sha256::hash(std::string("wire ed recovery payload"));
+   auto sig = priv.sign(digest);
+
+   // (a) full-path recovery agrees with the signer's public key
+   auto recovered = public_key::recover(sig, digest);
+   BOOST_CHECK_EQUAL(recovered.to_string({}), pub.to_string({}));
+
+   // (b) the signed payload is the hex-encoded digest, not the raw digest bytes
+   auto& ed_sig = sig.get<ed::signature_shim>();
+   auto& ed_pub = pub.get<ed::public_key_shim>();
+   const std::string hex = fc::to_hex(digest.data(), digest.data_size());
+   BOOST_TEST( ed_sig.verify_solana(reinterpret_cast<const uint8_t*>(hex.data()), hex.size(), ed_pub));
+   BOOST_TEST(!ed_sig.verify_solana(reinterpret_cast<const uint8_t*>(digest.data()), digest.data_size(), ed_pub));
+
+   // (c) a mismatched digest must not recover
+   auto wrong_digest = sha256::hash(std::string("some other payload"));
+   BOOST_CHECK_THROW(public_key::recover(sig, wrong_digest), fc::exception);
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(test_bls_pub_str) try {
@@ -643,6 +693,179 @@ BOOST_AUTO_TEST_CASE(test_signer_rejects_wrong_key_type) try {
 
    // Trying to use a K1 provider with eth_client_signer should fail
    BOOST_CHECK_THROW(eth_client_signer{provider}, fc::exception);
+} FC_LOG_AND_RETHROW();
+
+// ===========================================================================
+// Remote-signer support — eth_client_signer / wire_eth_signer driving a
+// signature_provider_t that has no local private key (e.g. an AWS KMS key),
+// where the `sign` closure is the signer.
+// ===========================================================================
+
+BOOST_AUTO_TEST_CASE(test_eth_client_signer_signs_via_closure_without_private_key) try {
+   // A provider with no local private key — its `sign` closure does the
+   // signing, mirroring an AWS KMS-backed provider.
+   auto key    = private_key::generate(private_key::key_type::em);
+   auto pub    = key.get_public_key();
+   auto em_key = key.get<em::private_key_shim>();
+
+   auto payload = ethereum::to_uint8_span("eth transaction bytes");
+   auto kc      = keccak256::hash(payload);
+
+   signature_provider_t remote;
+   remote.key_type   = chain_key_type_ethereum;
+   remote.public_key = pub;
+   // remote.private_key intentionally left empty.
+   remote.sign = [em_key, kc](const sha256&) {
+      // A KMS-style raw signer: a recoverable signature over the 32-byte
+      // digest it is handed (here the known keccak digest of `payload`).
+      return signature(signature::storage_type(em_key.sign_keccak256(kc)));
+   };
+   BOOST_REQUIRE(!remote.private_key.has_value());
+
+   eth_client_signer s(remote);
+   auto sig       = s.sign(payload);
+   auto recovered = s.recover(sig, payload);
+   BOOST_CHECK_EQUAL(recovered.to_string({}), pub.to_string({}));
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(test_eth_client_signer_closure_matches_local_key) try {
+   // The remote-signer path must produce the identical signature the local-key
+   // path produces — libsecp256k1 ECDSA is RFC-6979 deterministic.
+   auto key    = private_key::generate(private_key::key_type::em);
+   auto em_key = key.get<em::private_key_shim>();
+
+   auto payload = ethereum::to_uint8_span("eth transaction bytes");
+   auto kc      = keccak256::hash(payload);
+
+   auto local = make_provider(key, chain_key_type_ethereum); // has private_key
+
+   signature_provider_t remote;
+   remote.key_type   = chain_key_type_ethereum;
+   remote.public_key = key.get_public_key();
+   remote.sign = [em_key, kc](const sha256&) {
+      return signature(signature::storage_type(em_key.sign_keccak256(kc)));
+   };
+
+   auto local_sig  = eth_client_signer(local).sign(payload);
+   auto remote_sig = eth_client_signer(remote).sign(payload);
+   BOOST_CHECK_EQUAL(local_sig.to_string({}), remote_sig.to_string({}));
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(test_eth_client_signer_rejects_remote_signature_for_wrong_key) try {
+   // A remote signer whose closure signs with a different key than the provider
+   // advertises must be rejected by the self-verifying recover check, rather
+   // than emitting a transaction with an invalid signature.
+   auto key_a = private_key::generate(private_key::key_type::em);
+   auto key_b = private_key::generate(private_key::key_type::em);
+   auto em_b  = key_b.get<em::private_key_shim>();
+
+   auto payload = ethereum::to_uint8_span("eth transaction bytes");
+   auto kc      = keccak256::hash(payload);
+
+   signature_provider_t bad;
+   bad.key_type   = chain_key_type_ethereum;
+   bad.public_key = key_a.get_public_key();   // provider advertises key A
+   bad.sign = [em_b, kc](const sha256&) {     // but the closure signs with key B
+      return signature(signature::storage_type(em_b.sign_keccak256(kc)));
+   };
+
+   eth_client_signer s(bad);
+   BOOST_CHECK_THROW(s.sign(payload), fc::exception);
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(test_wire_eth_signer_signs_via_closure_without_private_key) try {
+   // wire_eth_signer shares the same remote-signer path; its EIP-191 framing is
+   // applied in `prepare`, so the closure still just raw-signs the digest.
+   auto key    = private_key::generate(private_key::key_type::em);
+   auto pub    = key.get_public_key();
+   auto em_key = key.get<em::private_key_shim>();
+
+   auto digest   = sha256::hash("wire transaction digest");
+   auto prepared = ethereum::hash_user_message(digest.to_uint8_span());
+
+   signature_provider_t remote;
+   remote.key_type   = chain_key_type_ethereum;
+   remote.public_key = pub;
+   remote.sign = [em_key, prepared](const sha256&) {
+      return signature(signature::storage_type(em_key.sign_keccak256(prepared)));
+   };
+
+   wire_eth_signer s(remote);
+   auto sig       = s.sign(digest);
+   auto recovered = s.recover(sig, digest);
+   BOOST_CHECK_EQUAL(recovered.to_string({}), pub.to_string({}));
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(test_eth_client_signer_passes_keccak_bytes_to_closure) try {
+   // Offline guard for the remote-signer path: em_sign_keccak must hand the
+   // closure the exact 32 keccak bytes it is meant to sign. The other
+   // remote-signer cases sign a digest they captured themselves and ignore the
+   // closure's argument, so without this only the env-gated live KMS test ever
+   // exercises the real argument. Capture the sha256 the closure receives and
+   // assert it is byte-for-byte the keccak digest of the payload.
+   auto key    = private_key::generate(private_key::key_type::em);
+   auto pub    = key.get_public_key();
+   auto em_key = key.get<em::private_key_shim>();
+
+   auto payload = ethereum::to_uint8_span("eth transaction bytes");
+   auto kc      = keccak256::hash(payload);
+
+   bool   closure_called = false;
+   sha256 received;
+   signature_provider_t remote;
+   remote.key_type   = chain_key_type_ethereum;
+   remote.public_key = pub;
+   remote.sign = [&closure_called, &received, em_key, kc](const sha256& d) {
+      closure_called = true;
+      received       = d;
+      return signature(signature::storage_type(em_key.sign_keccak256(kc)));
+   };
+
+   eth_client_signer s(remote);
+   auto sig = s.sign(payload);
+
+   BOOST_TEST(closure_called);
+   const auto kc_bytes  = kc.to_uint8_span();
+   const auto got_bytes = received.to_uint8_span();
+   BOOST_TEST(std::equal(kc_bytes.begin(), kc_bytes.end(), got_bytes.begin()));
+
+   // The self-verifying path still returns a signature that recovers correctly.
+   BOOST_CHECK_EQUAL(s.recover(sig, payload).to_string({}), pub.to_string({}));
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(test_eth_client_signer_self_verify_runs_once_per_provider) try {
+   // The remote-signer self-verify (recover + compare to the provider's key) is
+   // gated to the first sign per provider via signature_provider_t::self_verify_once:
+   // a closure's key and digest framing are fixed for the provider's lifetime, so
+   // re-checking every signature is unnecessary. Pin that behavior here -- sign
+   // correctly on the first call (passes the check and latches the once-flag), then
+   // with the WRONG key on later calls, which must NOT throw because the check no
+   // longer runs. Under the previous per-signature behavior the second sign would
+   // have thrown, so this case is a regression guard for the once-per-provider gate.
+   auto good    = private_key::generate(private_key::key_type::em);
+   auto bad     = private_key::generate(private_key::key_type::em);
+   auto em_good = good.get<em::private_key_shim>();
+   auto em_bad  = bad.get<em::private_key_shim>();
+
+   auto payload = ethereum::to_uint8_span("eth transaction bytes");
+   auto kc      = keccak256::hash(payload);
+
+   int calls = 0;
+   signature_provider_t provider;
+   provider.key_type   = chain_key_type_ethereum;
+   provider.public_key = good.get_public_key();   // provider advertises `good`
+   provider.sign = [&calls, em_good, em_bad, kc](const sha256&) {
+      // First call signs with the advertised key; later calls sign with the
+      // wrong key. Only the first signature is self-verified.
+      const auto& key = (calls++ == 0) ? em_good : em_bad;
+      return signature(signature::storage_type(key.sign_keccak256(kc)));
+   };
+
+   eth_client_signer s(provider);
+   BOOST_CHECK_NO_THROW(s.sign(payload));  // first sign: verified, passes, latches
+   BOOST_CHECK_NO_THROW(s.sign(payload));  // wrong key, but the check is now skipped
+   BOOST_CHECK_NO_THROW(s.sign(payload));  // still skipped
+   BOOST_CHECK_GE(calls, 3);
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_SUITE_END()

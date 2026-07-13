@@ -1,5 +1,11 @@
 cmake_minimum_required(VERSION 3.19)
 
+# CMake 4 rejects dependency config files that still declare compatibility
+# with policy versions older than 3.5. Some vcpkg packages used by WIRE still
+# ship those legacy config files, so provide a floor while upstream ports catch
+# up.
+set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
+
 # Set vcpkg toolchain if not already set
 if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
     set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake"
@@ -49,8 +55,8 @@ set(SYS_UTIL_EXECUTABLE_NAME sys-util)
 
 # http://stackoverflow.com/a/18369825
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-  if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 10.2)
-    message(FATAL_ERROR "GCC version must be at least 10.2.0!")
+  if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 11.4)
+    message(FATAL_ERROR "GCC version must be at least 11.4.0!")
   endif()
 endif()
 
@@ -74,15 +80,17 @@ if(ENABLE_OC AND CMAKE_SIZEOF_VOID_P EQUAL 8 AND NOT WIN32)
 endif()
 
 if(CMAKE_SIZEOF_VOID_P EQUAL 8 AND NOT WIN32)
-  if(CMAKE_SYSTEM_PROCESSOR STREQUAL x86_64 OR CMAKE_SYSTEM_PROCESSOR STREQUAL amd64)
+  if(CMAKE_SYSTEM_PROCESSOR STREQUAL x86_64 OR CMAKE_SYSTEM_PROCESSOR STREQUAL amd64 OR
+     (APPLE AND (CMAKE_SYSTEM_PROCESSOR STREQUAL arm64 OR CMAKE_SYSTEM_PROCESSOR STREQUAL aarch64)))
     list(APPEND SYSIO_WASM_RUNTIMES sys-vm sys-vm-jit)
   else()
     list(APPEND SYSIO_WASM_RUNTIMES sys-vm)
   endif()
 endif()
 
-# Native-module runtime: only in Debug builds (used for debugger-attached contract execution)
-if(DEBUG_ENABLED AND CMAKE_SIZEOF_VOID_P EQUAL 8 AND NOT WIN32)
+# Native-module runtime: only in Debug builds on hosts that can load native contract modules.
+if(DEBUG_ENABLED AND CMAKE_SIZEOF_VOID_P EQUAL 8 AND
+   (CMAKE_SYSTEM_NAME STREQUAL "Linux" OR APPLE))
   list(APPEND SYSIO_WASM_RUNTIMES native-module)
 endif()
 

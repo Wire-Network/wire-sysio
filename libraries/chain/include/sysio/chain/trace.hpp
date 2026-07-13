@@ -36,8 +36,8 @@ namespace sysio::chain {
       action                          act;
       bool                            context_free = false;
       fc::microseconds                elapsed;
-      std::optional<fc::unsigned_int> cpu_usage_us = 0; // only populated for input action
-      std::optional<fc::unsigned_int> net_usage = 0;    // only populated for input action
+      std::optional<fc::unsigned_int> cpu_usage_us; // only populated for input action
+      std::optional<fc::unsigned_int> net_usage;    // only populated for input action
       string                          console;
       transaction_id_type             trx_id; ///< the transaction that generated this action
       uint32_t                        block_num = 0;
@@ -90,8 +90,13 @@ namespace sysio::chain {
       vector<action_trace>                       action_traces;
       std::optional<account_delta>               account_ram_delta;
 
-      std::optional<fc::exception>               except;
+      /// Copy of the failure exception, if any. Stored as a dynamic copy (fc::exception::dynamic_copy_exception)
+      /// so the pointer retains the original derived exception type; rethrowing or dynamic_pointer_cast on it
+      /// sees the same type the transaction failed with. Serializes like the exception value itself.
+      fc::exception_ptr                          except;
       std::optional<uint64_t>                    error_code;
+      /// The original exception as captured by std::current_exception(); preferred for faithful rethrow
+      /// (also covers non-fc exceptions). Not serialized.
       std::exception_ptr                         except_ptr;
    };
 

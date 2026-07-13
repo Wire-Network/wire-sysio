@@ -12,6 +12,7 @@
 #include <fc/io/fstream.hpp>
 #include <fc/io/json.hpp>
 #include <fc/network/ethereum/ethereum_abi.hpp>
+#include <fc/network/ethereum/ethereum_client.hpp>
 #include <fc/network/ethereum/ethereum_rlp_encoder.hpp>
 #include <format>
 #include <gsl-lite/gsl-lite.hpp>
@@ -82,6 +83,21 @@ BOOST_AUTO_TEST_CASE(can_encode_list_of_strings) try {
       auto actual_hex = rlp::to_hex(actual, false);
       BOOST_CHECK_EQUAL(actual_hex, expected);
    }
+}
+FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(block_tag_wire_spelling) try {
+   // The enumerator spelling IS the wire format — `to_string` goes through `magic_enum::enum_name`,
+   // so these literals pin the JSON-RPC execution-apis spellings against any enum rename.
+   BOOST_CHECK_EQUAL(eth::to_string(eth::block_tag_t::earliest), "earliest");
+   BOOST_CHECK_EQUAL(eth::to_string(eth::block_tag_t::finalized), "finalized");
+   BOOST_CHECK_EQUAL(eth::to_string(eth::block_tag_t::safe), "safe");
+   BOOST_CHECK_EQUAL(eth::to_string(eth::block_tag_t::latest), "latest");
+   BOOST_CHECK_EQUAL(eth::to_string(eth::block_tag_t::pending), "pending");
+
+   // Explicit block numbers pass through unchanged; named tags render their wire spelling.
+   BOOST_CHECK_EQUAL(eth::to_block_tag(std::string{"0x1b4"}), "0x1b4");
+   BOOST_CHECK_EQUAL(eth::to_block_tag(eth::block_tag_t::finalized), "finalized");
 }
 FC_LOG_AND_RETHROW();
 
@@ -301,6 +317,46 @@ BOOST_AUTO_TEST_CASE(validate_contract_invoke_encode_decode) try {
       BOOST_CHECK_EQUAL(decoded_inner_order2["salt"].as_string(), "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
    }
 
+}
+FC_LOG_AND_RETHROW();
+
+// Malformed/adversarial ABI return data must be rejected with a clean fc::exception, never an
+// out-of-bounds read. These exercise the overflow-safe bounds checks in the decoder: a 256-bit
+// offset/length word that (a) exceeds 2^64, (b) is large-but-representable so that `base + offset`
+// previously wrapped size_t and bypassed the `offset + 32 <= data_size` check, or (c) declares more
+// array elements than the buffer can hold. See the pre-launch audit findings on ethereum_abi.cpp.
+BOOST_AUTO_TEST_CASE(decode_rejects_malicious_offsets_and_lengths) try {
+   auto abi_filename = fc::test::get_test_fixtures_path() / bfs::path(test_contract_abi_json_file_01);
+   auto contract_abis =
+      eth::abi::parse_contracts(fs::path(abi_filename.generic_string())) |
+      std::views::filter([&](auto& contract) { return contract.type == eth::abi::invoke_target_type::function; }) |
+      std::ranges::to<std::vector>();
+   BOOST_REQUIRE(contract_abis.size() >= 3);
+   // contract_abis[2] == submitOrders((address,uint256,bytes32)[]) — a single dynamic-array param.
+   const auto& orders_abi = contract_abis[2];
+   const std::string selector = "034918bd";
+
+   // (a) Parameter offset word > 2^64-1: previously std::stoull threw std::out_of_range (not an
+   //     fc::exception); now converted to a clean fc::out_of_range_exception.
+   {
+      const std::string encoded = selector + std::string(64, 'f');         // offset word = 2^256-1
+      BOOST_CHECK_THROW(eth::contract_decode_data(orders_abi, encoded, true), fc::exception);
+   }
+   // (b) Parameter offset word = 2^64-16: representable in uint64 and, added to the base offset,
+   //     used to wrap size_t so `offset + 32 <= data_size` passed and a wild pointer was read.
+   {
+      const std::string encoded = selector +
+         "000000000000000000000000000000000000000000000000fffffffffffffff0"; // 2^64-16
+      BOOST_CHECK_THROW(eth::contract_decode_data(orders_abi, encoded, true), fc::exception);
+   }
+   // (c) Valid array offset (0x20) but an element count (0x40) larger than the remaining buffer can
+   //     hold; the static-tuple element loop previously read 32 bytes per element past the buffer.
+   {
+      const std::string encoded = selector +
+         "0000000000000000000000000000000000000000000000000000000000000020"  // offset to array = 32
+         "0000000000000000000000000000000000000000000000000000000000000040"; // array length = 64
+      BOOST_CHECK_THROW(eth::contract_decode_data(orders_abi, encoded, true), fc::exception);
+   }
 }
 FC_LOG_AND_RETHROW();
 

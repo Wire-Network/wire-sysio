@@ -18,6 +18,20 @@ The native-module runtime lets you debug smart contracts with standard C/C++ deb
    the native-module runtime is enabled. CDT's `add_native_contract()` macro
    handles compiling sysiolib sources with the host compiler.
 
+   On macOS Apple Silicon, point CMake at the macOS-capable CDT build or install:
+   ```bash
+   cmake -B build/macos-native-debug -S . -G Ninja \
+     -DCMAKE_BUILD_TYPE=Debug \
+     -DVCPKG_TARGET_TRIPLET=arm64-osx \
+     -DBUILD_SYSTEM_CONTRACTS=ON \
+     -DBUILD_TEST_CONTRACTS=ON \
+     -DENABLE_TESTS=ON \
+     -DENABLE_JEMALLOC=OFF \
+     -DCDT_ROOT=/path/to/wire-cdt/install-or-build \
+     -DCMAKE_PREFIX_PATH=/path/to/wire-cdt/install-or-build \
+     -DCMAKE_TOOLCHAIN_FILE=$PWD/vcpkg/scripts/buildsystems/vcpkg.cmake
+   ```
+
 3. **Build** the test executables and native contracts:
    ```bash
    # Build all native contracts + both test executables
@@ -32,6 +46,8 @@ The native-module runtime lets you debug smart contracts with standard C/C++ deb
 
 ## LLDB Setup (required)
 
+On Linux, configure LLDB to pass through the real-time signal used for transaction deadlines.
+
 The blockchain uses a real-time signal (`SIG34` / `SIGRTMIN`) for transaction deadline enforcement. LLDB stops on this signal by default, which makes debugging impossible.
 
 Add this to `~/.lldbinit`:
@@ -41,6 +57,9 @@ process handle SIG34 --notify false --pass true --stop false
 ```
 
 This tells LLDB to silently pass the signal through to the process.
+
+On macOS, use LLDB as usual unless a local test path reports a specific signal stop. The kqueue timer path does not use
+Linux `SIGRTMIN`, so the Linux `SIG34` setup is not part of the macOS baseline.
 
 ## How It Works
 
@@ -66,8 +85,10 @@ The host `CXX` compiler (whatever is configured for the wire-sysio build) is use
 | **Compile definitions** | `__sysio_cdt_native__`, `SYSIO_NATIVE`, `uint128_t=unsigned __int128`, `int128_t=__int128` |
 | **Compile flags** | `-Wno-unknown-attributes`, `-fPIC` |
 | **Force-included headers** | `cstdint`, `cstdlib`, `cstring`, `memory` (via `-include`) |
-| **Linker flags** | `--allow-shlib-undefined` (intrinsics resolved at dlopen time) |
-| **Linked libraries** | Shared `libgcc_s`, `libstdc++` (for cross-`.so` exception unwinding) |
+| **Linux linker flags** | `--allow-shlib-undefined` (intrinsics resolved at dlopen time) |
+| **macOS linker flags** | `-bundle -undefined dynamic_lookup` with `_native.so` suffix |
+| **Linux linked libraries** | Shared `libgcc_s`, `libstdc++` (for cross-`.so` exception unwinding) |
+| **macOS linked libraries** | AppleClang/libc++ system libraries |
 
 ### Include Paths
 
@@ -103,8 +124,18 @@ The dispatch file is regenerated whenever the ABI changes.
 The ~149 blockchain intrinsic symbols (`db_store_i64`, `require_auth`, `prints`, etc.) are **not** linked into the `.so` at build time. Instead:
 
 1. `native_intrinsic_exports.cpp` defines all intrinsic symbols in the test executable
-2. `cmake/native-exports.cmake` links them with `--whole-archive` and generates a `--dynamic-list` so the linker exports them
+2. `cmake/native-exports.cmake` links them with the platform whole-archive mechanism and generates the linker export
+   list: Linux `--dynamic-list`, macOS `-exported_symbols_list`
 3. At runtime, `dlopen()` resolves the `.so`'s undefined intrinsic references against the executable's exported symbols
+
+On macOS, verify the host export list and exported executable symbols with:
+
+```bash
+head build/macos-native-debug/native_intrinsic_exports.list
+nm -gU build/macos-native-debug/unittests/unit_test | rg '(_db_store_i64|_require_auth|_prints)'
+```
+
+The export list should contain underscore-prefixed symbols such as `_require_auth`.
 
 ## Running Tests
 
@@ -377,11 +408,19 @@ This is normal before the `.so` is loaded. The breakpoint resolves when `dlopen`
 **SIGABRT during exception handling**
 Both the test executable and the `.so` must link against shared `libgcc_s.so` for C++ exception unwinding to work across the dlopen boundary. This is handled automatically by `cmake/test-tools.cmake` and `cmake/contract-tools.cmake`. If you see this, check that the CMake configuration is correct.
 
+On macOS, exception unwinding uses AppleClang/libc++ system libraries. The Linux `libgcc_s.so` requirement does not apply.
+
 **Tests pass with `--sys-vm` but crash with `--native-module`**
 The contract is compiled as native x86-64 code where `sizeof(void*)` is 8, not 4 as in WASM. Watch for CDT code that assumes 32-bit pointer arithmetic — e.g., negating a `uint32_t` used in `std::advance()` wraps to a large positive value on 64-bit instead of the expected negative offset.
 
 **`dlopen failed` errors**
-Check that the `.so` was built and the symlink exists. Run `ls -la /tmp/wire-sysio-native-contracts/` to verify. Also check `ldd cmake-build-debug/contracts/sysio.bios/sysio.bios_native.so` to ensure all shared library dependencies are available.
+Check that the `.so` was built and the symlink exists. Run `ls -la /tmp/wire-sysio-native-contracts/` to verify. On Linux, check `ldd cmake-build-debug/contracts/sysio.bios/sysio.bios_native.so` to ensure all shared library dependencies are available. On macOS, use:
+
+```bash
+file build/macos-native-debug/contracts/sysio.token/sysio.token_native.so
+otool -L build/macos-native-debug/contracts/sysio.token/sysio.token_native.so
+nm -gU build/macos-native-debug/contracts/sysio.token/sysio.token_native.so | rg '_apply'
+```
 
 ## End-to-End Example: Debugging sysio.token on a Live Node
 

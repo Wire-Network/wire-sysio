@@ -1,6 +1,7 @@
 #pragma once
 #include <sysio/state_history/log.hpp>
 #include <sysio/state_history/serialization.hpp>
+#include <sysio/state_history/status_request_queue.hpp>
 #include <sysio/state_history/types.hpp>
 
 #include <sysio/chain/types.hpp>
@@ -12,6 +13,8 @@
 #include <boost/asio/error.hpp>
 #include <boost/beast/websocket.hpp>
 #include <memory>
+#include <stdexcept>
+#include <string>
 
 extern const char* const state_history_plugin_abi;
 
@@ -145,31 +148,34 @@ private:
             co_await stream.async_read(b);
             const state_request req = fc::raw::unpack<std::remove_const_t<decltype(req)>>(static_cast<const char*>(b.cdata().data()), b.size());
 
-            auto& self = *this; //gcc10 ICE workaround wrt capturing 'this' in a coro
             co_await boost::asio::co_spawn(app().get_io_context(), [&]() -> boost::asio::awaitable<void> {
                /**
                 * This lambda executes on the main thread; upon returning, the enclosing coroutine continues execution on the connection's strand
                 */
                std::visit(chain::overloaded {
-                  [&self]<typename GetStatusRequestV0orV1, typename = std::enable_if_t<std::is_base_of_v<get_status_request_v0, GetStatusRequestV0orV1>>>(const GetStatusRequestV0orV1&) {
-                     self.queued_status_requests.emplace_back(std::is_same_v<GetStatusRequestV0orV1, get_status_request_v1>);
+                  [&]<typename GetStatusRequestV0orV1, typename = std::enable_if_t<std::is_base_of_v<get_status_request_v0, GetStatusRequestV0orV1>>>(const GetStatusRequestV0orV1&) {
+                     constexpr status_request_version request_version =
+                           std::is_same_v<GetStatusRequestV0orV1, get_status_request_v1> ? status_request_version::v1 :
+                                                                                             status_request_version::v0;
+                     if(!queued_status_requests.try_append(request_version))
+                        throw std::runtime_error(std::string(status_request_queue_limit_exceeded));
                   },
-                  [&self]<typename GetBlocksRequestV0orV1, typename = std::enable_if_t<std::is_base_of_v<get_blocks_request_v0, GetBlocksRequestV0orV1>>>(const GetBlocksRequestV0orV1& gbr) {
-                     self.current_blocks_request_v1_finality.reset();
-                     self.current_blocks_request = gbr;
+                  [&]<typename GetBlocksRequestV0orV1, typename = std::enable_if_t<std::is_base_of_v<get_blocks_request_v0, GetBlocksRequestV0orV1>>>(const GetBlocksRequestV0orV1& gbr) {
+                     current_blocks_request_v1_finality.reset();
+                     current_blocks_request = gbr;
                      if constexpr(std::is_same_v<GetBlocksRequestV0orV1, get_blocks_request_v1>)
-                        self.current_blocks_request_v1_finality = gbr.fetch_finality_data;
+                        current_blocks_request_v1_finality = gbr.fetch_finality_data;
 
-                     for(const block_position& haveit : self.current_blocks_request.have_positions) {
-                        if(self.current_blocks_request.start_block_num <= haveit.block_num)
+                     for(const block_position& haveit : current_blocks_request.have_positions) {
+                        if(current_blocks_request.start_block_num <= haveit.block_num)
                            continue;
-                        if(const std::optional<chain::block_id_type> id = self.get_block_id(haveit.block_num); !id || *id != haveit.block_id)
-                           self.current_blocks_request.start_block_num = std::min(self.current_blocks_request.start_block_num, haveit.block_num);
+                        if(const std::optional<chain::block_id_type> id = get_block_id(haveit.block_num); !id || *id != haveit.block_id)
+                           current_blocks_request.start_block_num = std::min(current_blocks_request.start_block_num, haveit.block_num);
                      }
-                     self.current_blocks_request.have_positions.clear();
+                     current_blocks_request.have_positions.clear();
                   },
-                  [&self](const get_blocks_ack_request_v0& gbar0) {
-                     self.send_credits += gbar0.num_messages;
+                  [&](const get_blocks_ack_request_v0& gbar0) {
+                     send_credits += gbar0.num_messages;
                   }
                }, req);
                co_return;
@@ -232,49 +238,48 @@ private:
             if(!stream.is_open())
                break;
 
-            std::deque<bool>             status_requests;
-            std::optional<block_package> block_to_send;
+            pending_status_request_counts status_requests;
+            std::optional<block_package>  block_to_send;
 
-            auto& self = *this; //gcc10 ICE workaround wrt capturing 'this' in a coro
             co_await boost::asio::co_spawn(app().get_io_context(), [&]() -> boost::asio::awaitable<void> {
                /**
                 * This lambda executes on the main thread; upon returning, the enclosing coroutine continues execution on the connection's strand
                 */
-               status_requests = std::move(self.queued_status_requests);
+               status_requests = queued_status_requests.pop_all();
 
                //decide what block -- if any -- to send out
-               const chain::block_num_type latest_to_consider = self.current_blocks_request.irreversible_only ?
-                                                                self.controller.fork_db_root().block_num() : self.controller.head().block_num();
-               if(self.send_credits && self.next_block_cursor <= latest_to_consider && self.next_block_cursor < self.current_blocks_request.end_block_num) {
+               const chain::block_num_type latest_to_consider = current_blocks_request.irreversible_only ?
+                                                                controller.fork_db_root().block_num() : controller.head().block_num();
+               if(send_credits && next_block_cursor <= latest_to_consider && next_block_cursor < current_blocks_request.end_block_num) {
                   block_to_send.emplace( block_package{
                      .blocks_result_base = {
-                        .head = {self.controller.head().block_num(), self.controller.head().id()},
-                        .last_irreversible = {self.controller.fork_db_root().block_num(), self.controller.fork_db_root().id()}
+                        .head = {controller.head().block_num(), controller.head().id()},
+                        .last_irreversible = {controller.fork_db_root().block_num(), controller.fork_db_root().id()}
                      },
-                     .is_v1_request = self.current_blocks_request_v1_finality.has_value()
+                     .is_v1_request = current_blocks_request_v1_finality.has_value()
                   });
-                  if(const std::optional<chain::block_id_type> this_block_id = self.get_block_id(self.next_block_cursor)) {
-                     block_to_send->blocks_result_base.this_block  = {self.current_blocks_request.start_block_num, *this_block_id};
-                     if(const std::optional<chain::block_id_type> last_block_id = self.get_block_id(self.next_block_cursor - 1))
-                        block_to_send->blocks_result_base.prev_block = {self.next_block_cursor - 1, *last_block_id};
-                     if (self.current_blocks_request.fetch_block) {
+                  if(const std::optional<chain::block_id_type> this_block_id = get_block_id(next_block_cursor)) {
+                     block_to_send->blocks_result_base.this_block  = {current_blocks_request.start_block_num, *this_block_id};
+                     if(const std::optional<chain::block_id_type> last_block_id = get_block_id(next_block_cursor - 1))
+                        block_to_send->blocks_result_base.prev_block = {next_block_cursor - 1, *last_block_id};
+                     if (current_blocks_request.fetch_block) {
                         if (chain::signed_block_ptr sbp = get_block(*this_block_id)) {
                            block_to_send->blocks_result_base.block = fc::raw::pack(*sbp);
                         }
                      }
-                     if(self.current_blocks_request.fetch_traces && self.trace_log)
-                        block_to_send->trace_entry = self.trace_log->get_entry(self.next_block_cursor);
-                     if(self.current_blocks_request.fetch_deltas && self.chain_state_log)
-                        block_to_send->state_entry = self.chain_state_log->get_entry(self.next_block_cursor);
-                     if(block_to_send->is_v1_request && *self.current_blocks_request_v1_finality && self.finality_data_log)
-                        block_to_send->finality_entry = self.finality_data_log->get_entry(self.next_block_cursor);
+                     if(current_blocks_request.fetch_traces && trace_log)
+                        block_to_send->trace_entry = trace_log->get_entry(next_block_cursor);
+                     if(current_blocks_request.fetch_deltas && chain_state_log)
+                        block_to_send->state_entry = chain_state_log->get_entry(next_block_cursor);
+                     if(block_to_send->is_v1_request && *current_blocks_request_v1_finality && finality_data_log)
+                        block_to_send->finality_entry = finality_data_log->get_entry(next_block_cursor);
                   }
                   // increment next_block_cursor even if unable to retrieve block to avoid tight busy loop
-                  ++self.next_block_cursor;
-                  --self.send_credits;
+                  ++next_block_cursor;
+                  --send_credits;
                }
 
-               if(status_requests.size())
+               if(!status_requests.empty())
                   current_status_result = fill_current_status_result();
                co_return;
             }, boost::asio::use_awaitable);
@@ -285,13 +290,12 @@ private:
                continue;
             }
 
-            //send replies to all send status requests first
-            for(const bool status_request_is_v1 : status_requests) {
-               if(status_request_is_v1 == false) //v0 status request, gets a v0 status result
-                  co_await stream.async_write(boost::asio::buffer(fc::raw::pack(state_result((get_status_result_v0)current_status_result))));
-               else
-                  co_await stream.async_write(boost::asio::buffer(fc::raw::pack(state_result(current_status_result))));
-            }
+            // Send status responses first; a session uses one status version, so counted drains can write by batch.
+            for(std::size_t i = 0; i < status_requests.v0; ++i)
+               co_await stream.async_write(
+                     boost::asio::buffer(fc::raw::pack(state_result((get_status_result_v0)current_status_result))));
+            for(std::size_t i = 0; i < status_requests.v1; ++i)
+               co_await stream.async_write(boost::asio::buffer(fc::raw::pack(state_result(current_status_result))));
 
             //and then send the block
             if(block_to_send) {
@@ -321,7 +325,7 @@ private:
    std::atomic_flag                  has_logged_exception;  //left as atomic_flag for useful test_and_set() interface
 
    ///these items must only ever be touched on the main thread
-   std::deque<bool>                  queued_status_requests;  //false for v0, true for v1
+   status_request_queue              queued_status_requests;
 
    get_blocks_request_v0             current_blocks_request;
    std::optional<bool>               current_blocks_request_v1_finality; //unset: current request is v0; set means v1; true/false is if finality requested

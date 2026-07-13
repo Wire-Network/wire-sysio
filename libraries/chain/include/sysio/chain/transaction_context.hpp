@@ -190,16 +190,16 @@ namespace sysio::chain {
          /// was called, both sessions are automatically undone.
          struct trx_session {
             chainbase::database::session db_session;
-            controller&                  ctrl;
-            bool                         active = true;
 
-            trx_session(chainbase::database& db, controller& c)
-               : db_session(db.start_undo_session(true)), ctrl(c) { ctrl.push_dedup_session(); }
+            explicit trx_session(chainbase::database& db)
+               : db_session(db.start_undo_session(true)) {}
             trx_session(trx_session&&) = delete;
 
-            void squash() { db_session.squash(); ctrl.squash_dedup_session(); active = false; }
-            void undo()   { db_session.undo();   ctrl.undo_dedup_session();   active = false; }
-            ~trx_session() { if (active) ctrl.undo_dedup_session(); }
+            // The dedup is a registered chainbase undo participant, so the database session drives
+            // its add_undo_session / squash / undo automatically -- including the implicit undo from
+            // db_session's destructor when neither squash() nor undo() is called.
+            void squash() { db_session.squash(); }
+            void undo()   { db_session.undo();   }
          };
 
          controller&                    control;
@@ -236,7 +236,6 @@ namespace sysio::chain {
 
          uint64_t                      trx_net_limit = 0;
          bool                          net_limit_due_to_block = true;
-         uint64_t                      leeway_trx_net_limit = 0;
 
          bool                          cpu_limit_due_to_greylist = false;
          fc::microseconds              subjective_cpu_bill;
@@ -257,7 +256,7 @@ namespace sysio::chain {
             on_chain_consensus_max_transaction_cpu_usage,
             user_specified_trx_max_cpu_usage_ms,
             node_configured_max_transaction_time,
-            speculative_executed_adjusted_max_transaction_time // prev_billed_cpu_time_us > 0
+            speculative_executed_adjusted_max_transaction_time // !prev_accounts_billing.empty()
          };
          tx_cpu_usage_exceeded_reason  tx_cpu_usage_reason = tx_cpu_usage_exceeded_reason::account_cpu_limit;
    };

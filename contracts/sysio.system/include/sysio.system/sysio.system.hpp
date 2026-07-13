@@ -12,13 +12,14 @@
 #include <sysio/time.hpp>
 #include <sysio/instant_finality.hpp>
 
+#include <sysio.system/emissions.hpp>
 #include <sysio.system/native.hpp>
+#include <sysio.system/snapshot_attest.hpp>
 
 #include <limits>
 #include <optional>
 #include <string>
 #include <type_traits>
-#include <unordered_set>
 
 namespace sysiosystem {
 
@@ -57,6 +58,15 @@ namespace sysiosystem {
 
 
    static constexpr size_t   max_producers         = 21;
+   /// Minimum number of producers -- and, in lock-step, finalizers -- that
+   /// update_ranked_producers will ever publish. Savanna's finality threshold
+   /// is (N*2)/3 + 1, so remaining live with at least one faulty finalizer
+   /// requires N >= 4 (N=4 -> threshold 3 tolerates 1 fault; N=3 -> threshold 3
+   /// tolerates 0). When fewer producers than this are collateral-eligible the
+   /// last good schedule is retained rather than concentrating consensus onto
+   /// too few nodes. Raising it trades more aggressive removal of ineligible
+   /// producers for a stronger anti-concentration floor.
+   static constexpr size_t   min_schedule_size     = 4;
    static constexpr uint32_t seconds_per_year      = 52 * 7 * 24 * 3600;
    static constexpr uint32_t seconds_per_day       = 24 * 3600;
    static constexpr uint32_t seconds_per_hour      = 3600;
@@ -64,6 +74,9 @@ namespace sysiosystem {
    static constexpr int64_t  useconds_per_day      = int64_t(seconds_per_day) * 1000'000ll;
    static constexpr int64_t  useconds_per_hour     = int64_t(seconds_per_hour) * 1000'000ll;
    static constexpr uint32_t blocks_per_day        = 2 * seconds_per_day; // half seconds per day
+   static constexpr uint32_t blocks_per_round      = 12; // sysio::chain::config::producer_repetitions
+   static constexpr uint32_t min_blocks_per_round_for_pay = 6;
+   static constexpr uint32_t no_prev_block        = std::numeric_limits<uint32_t>::max(); // sentinel: no previous block
 
    // All fields (including max_action_return_value_size, KV limits) are now
    // in the base sysio::blockchain_parameters struct.
@@ -109,6 +122,9 @@ namespace sysiosystem {
       time_point                                               last_claim_time;
       uint16_t                                                 location = 0;
       sysio::block_signing_authority                           producer_authority; // added in version 1.9.0
+      uint32_t                                                 last_block_num = no_prev_block;
+      uint16_t                                                 current_round_blocks = 0;   // blocks in current (in-progress) round
+      uint32_t                                                 eligible_rounds      = 0;   // rounds meeting >= min_blocks threshold (per epoch)
 
       uint64_t by_rank()const     { return rank; }
       bool     active()const      { return is_active;                               }
@@ -118,7 +134,8 @@ namespace sysiosystem {
          return producer_authority;
       }
 
-      SYSLIB_SERIALIZE( producer_info, (owner)(producer_key)(rank)(is_active)(url)(unpaid_blocks)(last_claim_time)(location)(producer_authority) )
+      SYSLIB_SERIALIZE( producer_info, (owner)(producer_key)(rank)(is_active)(url)(unpaid_blocks)(last_claim_time)(location)(producer_authority)
+                         (last_block_num)(current_round_blocks)(eligible_rounds) )
    };
 
    using producers_table = sysio::kv::table< "producers"_n, producer_key_t, producer_info,
@@ -343,6 +360,13 @@ namespace sysiosystem {
           * @param url - the url of the block producer, normally the url of the block producer presentation website,
           * @param location - is the country code as defined in the ISO 3166, https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes
           *
+          * @note Registration alone does not schedule the producer. To be placed
+          *       in the active schedule the account must also be an ACTIVE
+          *       OPERATOR_TYPE_PRODUCER operator in sysio.opreg (i.e. have posted
+          *       the required slashable collateral). Eligibility is enforced when
+          *       the schedule is built, so withdrawing that collateral -- or
+          *       being slashed or terminated -- drops the producer.
+          *
           * @pre Producer to register is an account
           * @pre Authority of producer to register
           */
@@ -358,6 +382,13 @@ namespace sysiosystem {
           * @param producer_authority - the weighted threshold multisig block signing authority of the block producer used to sign blocks,
           * @param url - the url of the block producer, normally the url of the block producer presentation website,
           * @param location - is the country code as defined in the ISO 3166, https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes
+          *
+          * @note Registration alone does not schedule the producer. To be placed
+          *       in the active schedule the account must also be an ACTIVE
+          *       OPERATOR_TYPE_PRODUCER operator in sysio.opreg (i.e. have posted
+          *       the required slashable collateral). Eligibility is enforced when
+          *       the schedule is built, so withdrawing that collateral -- or
+          *       being slashed or terminated -- drops the producer.
           *
           * @pre Producer to register is an account
           * @pre Authority of producer to register
@@ -376,7 +407,7 @@ namespace sysiosystem {
 
          /**
           * Set the rank of an individual producer. Rank determines scheduling
-          * priority — lower rank values are scheduled first. Producers with
+          * priority -- lower rank values are scheduled first. Producers with
           * rank > 21 are considered standby.
           *
           * @param producer - registered producer account,
@@ -496,24 +527,125 @@ namespace sysiosystem {
          void limitauthchg( const name& account, const std::vector<name>& allow_perms, const std::vector<name>& disallow_perms );
 
          /**
-          * Expand the authority of a permission by adding keys and/or account permissions.
-          * Can only be called by the system contract itself (privileged).
-          *
-          * @param account - the account whose permission to expand
-          * @param permission - the permission name to expand
-          * @param keys - vector of key_weight entries to add
-          * @param accounts - vector of permission_level_weight entries to add
-          */
-         [[sysio::action]]
-         void expandauth( const name& account, const name& permission,
-                          const std::vector<key_weight>& keys,
-                          const std::vector<permission_level_weight>& accounts );
-
-         /**
           * On Link Auth notify to catch auth.ext stuff for sig-em
           */
          [[sysio::on_notify("auth.msg::onlinkauth")]]
          void onlinkauth(const name &user, const name &permission, const sysio::public_key &pub_key);
+
+         // ---- Emissions actions (defined in emissions.cpp) ----
+
+         /**
+          * Set or update emission configuration parameters.
+          * Must be called before any other emissions actions.
+          */
+         [[sysio::action]]
+         void setemitcfg(const emissions::emission_config& cfg);
+
+         /**
+          * Sets the starting time for Node Owner distributions.
+          */
+         [[sysio::action]]
+         void setinittime(const sysio::time_point_sec& no_reward_init_time);
+
+         /**
+          * Called inline by sysio.roa when a Node Owner is registered.
+          */
+         [[sysio::action]]
+         void addnodeowner(const sysio::name& account_name, uint8_t tier);
+
+         /**
+          * Claim vested Node Owner distribution.
+          */
+         [[sysio::action]]
+         void claimnodedis(const sysio::name& account_name);
+
+         /**
+          * Read-only: view claimable Node Owner distributions.
+          */
+         [[sysio::action, sysio::read_only]]
+         emissions::node_claim_result viewnodedist(const sysio::name& account_name);
+
+         /**
+          * Initialize the T5 treasury emissions system.
+          */
+         [[sysio::action]]
+         void initt5(const sysio::time_point_sec& start_time);
+
+         /**
+          * Pay emissions for the given sysio.epoch index. Called inline by
+          * sysio.epoch::advance on a pay-epoch (i.e., the period boundary
+          * defined by emit_cfg.pay_cadence_epochs). Auth: require_auth(
+          * "sysio.epoch").
+          *
+          * `period_emission` is the gate-computed sum of pending accrued
+          * emissions plus this epoch's per-epoch share. payepoch trusts that
+          * value (single-trx semantics make recomputation unnecessary) and
+          * distributes it across producer / batch / capital / capex / gov
+          * pools as today, scaled to the period.
+          *
+          * `batch_op_groups` is the full state.batch_op_groups vector from
+          * sysio.epoch; payepoch reads t5state.batch_group_epochs to weight
+          * the batch pool proportionally to each group's active-epoch count
+          * over the period (groups that were active in zero epochs are
+          * skipped, which can only happen when pay_cadence_epochs <
+          * batch_op_groups.size()).
+          *
+          * Runtime conditions (config missing, treasury exhausted, balance
+          * insufficient) are caught upstream by the gate, which emits an
+          * EmissionsBlocked attestation and prevents advance from proceeding.
+          */
+         [[sysio::action]]
+         void payepoch(uint32_t epoch_index,
+                       std::vector<std::vector<sysio::name>> batch_op_groups,
+                       int64_t period_emission);
+
+         /**
+          * Accrue this epoch's per-epoch emission share onto t5state, without
+          * paying. Called inline by sysio.epoch::advance on every non-pay
+          * epoch (the cadence-1..cadence-2 epochs of each pay period). Auth:
+          * require_auth("sysio.epoch").
+          *
+          * Increments t5state.pending_emission_amount by `per_epoch_emission`
+          * and bumps t5state.batch_group_epochs[batch_group_index] by 1, so
+          * the next payepoch sees the period total + per-group counts.
+          *
+          * No transfers happen here. Treasury / balance gating is the
+          * gate's responsibility upstream.
+          */
+         [[sysio::action]]
+         void accrueepoch(uint32_t epoch_index,
+                          uint8_t  batch_group_index,
+                          int64_t  per_epoch_emission);
+
+         /**
+          * Fund a sysio.dclaim capital draw against the T5 drainable pool.
+          * Called inline by sysio.dclaim::onreward as each STAKING_REWARD
+          * lands, so dclaim is funded the moment the claim ledger row is
+          * written and the staker can claim immediately. Auth: dclaim.
+          *
+          * Never throws (OPP-handler never-throw contract): if the pool
+          * cannot cover `amount`, the transfer caps at what's available
+          * and the unfunded delta is accrued to t5state.capital_shortfall_total
+          * for operator visibility.
+          *
+          * Amounts actually transferred count toward t5state.total_distributed
+          * so the emission curve auto-throttles via its remaining-headroom
+          * clamp.
+          */
+         [[sysio::action]]
+         void fundclaim(int64_t amount);
+
+         /**
+          * Read-only: current T5 treasury emission state.
+          */
+         [[sysio::action, sysio::read_only]]
+         emissions::epoch_info_result viewepoch();
+
+         /**
+          * Read-only: all emission configuration values.
+          */
+         [[sysio::action, sysio::read_only]]
+         emissions::emission_config viewemitcfg();
 
          using init_action = sysio::action_wrapper<"init"_n, &system_contract::init>;
          using setacctram_action = sysio::action_wrapper<"setacctram"_n, &system_contract::setacctram>;
@@ -528,7 +660,6 @@ namespace sysiosystem {
          using setpriv_action = sysio::action_wrapper<"setpriv"_n, &system_contract::setpriv>;
          using setalimits_action = sysio::action_wrapper<"setalimits"_n, &system_contract::setalimits>;
          using setparams_action = sysio::action_wrapper<"setparams"_n, &system_contract::setparams>;
-         using expandauth_action = sysio::action_wrapper<"expandauth"_n, &system_contract::expandauth>;
 
       private:
          // Implementation details:

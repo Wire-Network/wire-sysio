@@ -18,7 +18,8 @@ std::map<std::string, std::function<void()>> features {
    { "bls", bls_benchmarking },
    { "merkle", merkle_benchmarking },
    { "trace_api_json", trace_api_json_benchmarking },
-   { "abi_serializer", abi_serializer_benchmarking }
+   { "abi_serializer", abi_serializer_benchmarking },
+   { "auth", auth_benchmarking }
 };
 
 // values to control cout format

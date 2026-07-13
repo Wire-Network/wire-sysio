@@ -3,12 +3,15 @@
 #include <fc/variant.hpp>
 #include <fc/variant_object.hpp>
 #include <fc/io/json.hpp>
+#include <fc/time.hpp>
 #include <boost/asio/io_context.hpp>
+#include <boost/asio/ip/tcp.hpp>
 
+#include <functional>
+#include <optional>
 #include <string>
 #include <variant>
 #include <vector>
-#include <optional>
 #include <fc/network/url.hpp>
 
 namespace fc::network::json_rpc {
@@ -22,6 +25,9 @@ namespace asio = boost::asio;
 // -----------------------------------------------------------------------
 enum class http_verb { GET, PUT, POST, DELETE_ };
 
+/// Control whether connection failures invalidate the client's startup DNS result.
+enum class endpoint_refresh_policy { on_connection_failure, never };
+
 // JSON-RPC error type
 struct json_rpc_error : fc::exception {
    int      code;
@@ -34,8 +40,8 @@ struct json_rpc_error : fc::exception {
 // raw HTTP verb support for REST-style endpoints.
 class json_rpc_client {
 public:
-   explicit json_rpc_client(fc::url                           url,
-                            const std::optional<std::string>& user_agent = std::nullopt);
+   explicit json_rpc_client(fc::url url, const std::optional<std::string>& user_agent = std::nullopt,
+                            endpoint_refresh_policy refresh_policy = endpoint_refresh_policy::on_connection_failure);
 
    // -----------------------------------------------------------------------
    //  JSON-RPC 2.0 methods (unchanged, backwards compatible)
@@ -65,13 +71,47 @@ public:
    static json_rpc_client create(const std::variant<std::string, fc::url>& source);
 
 private:
+   using tcp = boost::asio::ip::tcp;
+
+   /** Completion callback supplied to an asynchronous endpoint resolver. */
+   using resolver_complete_fn =
+      std::function<void(const boost::system::error_code&, tcp::resolver::results_type)>;
+
+   /** Cancellation callback returned by an asynchronous endpoint resolver. */
+   using resolver_cancel_fn = std::function<void()>;
+
+   /** Start an asynchronous endpoint lookup and return its cancellation callback. */
+   using resolver_start_fn =
+      std::function<resolver_cancel_fn(const std::string&, const std::string&, fc::time_point, resolver_complete_fn)>;
+
+   friend struct json_rpc_client_test_access;
+
+   /** Construct with an optional asynchronous resolver starter used by transport regression tests. */
+   json_rpc_client(fc::url url, const std::optional<std::string>& user_agent,
+                   endpoint_refresh_policy refresh_policy, resolver_start_fn resolver_start);
+
    asio::io_context _io_ctx{};
    fc::url      _url;
+   std::string  _host;
+   std::string  _port;
    std::string  _user_agent;
    std::int64_t _next_id;
+   tcp::resolver::results_type _resolved_endpoints;
+   bool                        _resolved_endpoints_stale;
+   endpoint_refresh_policy _refresh_policy;
+   resolver_start_fn _resolver_start;
 
    // Perform HTTP POST with JSON payload; optionally parse JSON body.
    variant send_json(const variant& payload, bool expect_json_body = true);
+
+   /// Resolve the configured host and replace the cached endpoint set using the active deadline when one exists.
+   void refresh_resolved_endpoints();
+
+   /// Mark cached endpoints stale after a connection failure.
+   void mark_resolved_endpoints_stale();
+
+   /// Return cached endpoints, refreshing only after a previous connection failure.
+   const tcp::resolver::results_type& resolved_endpoints();
 
    static void validate_basic_response(const variant& response);
 };

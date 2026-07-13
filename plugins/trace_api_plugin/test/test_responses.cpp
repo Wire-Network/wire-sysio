@@ -140,20 +140,20 @@ BOOST_AUTO_TEST_SUITE(trace_responses)
 
    BOOST_FIXTURE_TEST_CASE(basic_block_response, response_test_fixture)
    {
-      auto action_trace = action_trace_v0 {
-         0,
-         "receiver"_n, "contract"_n, "action"_n,
-         {{ "alice"_n, "active"_n }},
-         { 0x00, 0x01, 0x02, 0x03 },
-         { 0x04, 0x05, 0x06, 0x07 }
-      };
+      action_trace_v0 action_trace{};
+      action_trace.global_sequence = 0;
+      action_trace.receiver        = "receiver"_n;
+      action_trace.account         = "contract"_n;
+      action_trace.action          = "action"_n;
+      action_trace.authorization   = {{ "alice"_n, "active"_n }};
+      action_trace.data            = { 0x00, 0x01, 0x02, 0x03 };
+      action_trace.return_value    = { 0x04, 0x05, 0x06, 0x07 };
 
       auto transaction_trace = transaction_trace_v0 {
          "0000000000000000000000000000000000000000000000000000000000000001"_h,
          std::vector<action_trace_v0> {
             action_trace
          },
-         fc::enum_type<uint8_t, chain::transaction_receipt_header::status_enum>{chain::transaction_receipt_header::status_enum::executed},
          10,
          5,
          std::vector<chain::signature_type>{ chain::signature_type() },
@@ -193,13 +193,19 @@ BOOST_AUTO_TEST_SUITE(trace_responses)
                ("producer_block_id", fc::variant())
                ("actions", fc::variants({
                   fc::mutable_variant_object()
+                     ("action_ordinal", 0)
+                     ("creator_action_ordinal", 0)
+                     ("closest_unnotified_ancestor_action_ordinal", 0)
                      ("global_sequence", 0)
+                     ("recv_sequence", 0)
+                     ("code_sequence", 0)
+                     ("abi_sequence", 0)
                      ("receiver", "receiver")
                      ("account", "contract")
-                     ("action", "action")
+                     ("name", "action")
                      ("authorization", fc::variants({
                         fc::mutable_variant_object()
-                           ("account", "alice")
+                           ("actor", "alice")
                            ("permission", "active")
                      }))
                      ("data", "00010203")
@@ -209,7 +215,6 @@ BOOST_AUTO_TEST_SUITE(trace_responses)
                      ("return_data", fc::mutable_variant_object()
                         ("hex", "04050607"))
                }))
-               ("status", "executed")
                ("cpu_usage_us", 10)
                ("net_usage_words", 5)
                ("signatures", fc::variants({"SIG_K1_111111111111111111111111111111111111111111111111111111111111111116uk5ne"}))
@@ -236,6 +241,15 @@ BOOST_AUTO_TEST_SUITE(trace_responses)
 
    BOOST_FIXTURE_TEST_CASE(basic_block_response_no_params, response_test_fixture)
    {
+      action_trace_v0 inner_action{};
+      inner_action.global_sequence = 0;
+      inner_action.receiver        = "receiver"_n;
+      inner_action.account         = "contract"_n;
+      inner_action.action          = "action"_n;
+      inner_action.authorization   = {{ "alice"_n, "active"_n }};
+      inner_action.data            = { 0x00, 0x01, 0x02, 0x03 };
+      inner_action.return_value    = { 0x04, 0x05, 0x06, 0x07 };
+
       auto block_trace = block_trace_v0 {
          "b000000000000000000000000000000000000000000000000000000000000001"_h,
          1,
@@ -248,15 +262,8 @@ BOOST_AUTO_TEST_SUITE(trace_responses)
             {
                "0000000000000000000000000000000000000000000000000000000000000001"_h,
                std::vector<action_trace_v0> {
-                  {
-                     0,
-                     "receiver"_n, "contract"_n, "action"_n,
-                     {{ "alice"_n, "active"_n }},
-                     { 0x00, 0x01, 0x02, 0x03 },
-                     { 0x04, 0x05, 0x06, 0x07 }
-                  }
+                  inner_action
                },
-               fc::enum_type<uint8_t, chain::transaction_receipt_header::status_enum>{chain::transaction_receipt_header::status_enum::executed},
                10,
                5,
                std::vector<chain::signature_type>{ chain::signature_type() },
@@ -285,19 +292,24 @@ BOOST_AUTO_TEST_SUITE(trace_responses)
                ("producer_block_id", fc::variant())
                ("actions", fc::variants({
                   fc::mutable_variant_object()
+                     ("action_ordinal", 0)
+                     ("creator_action_ordinal", 0)
+                     ("closest_unnotified_ancestor_action_ordinal", 0)
                      ("global_sequence", 0)
+                     ("recv_sequence", 0)
+                     ("code_sequence", 0)
+                     ("abi_sequence", 0)
                      ("receiver", "receiver")
                      ("account", "contract")
-                     ("action", "action")
+                     ("name", "action")
                      ("authorization", fc::variants({
                         fc::mutable_variant_object()
-                           ("account", "alice")
+                           ("actor", "alice")
                            ("permission", "active")
                      }))
                      ("data", "00010203")
                      ("return_value", "04050607")
                }))
-               ("status", "executed")
                ("cpu_usage_us", 10)
                ("net_usage_words", 5)
                ("signatures", fc::variants({"SIG_K1_111111111111111111111111111111111111111111111111111111111111111116uk5ne"}))
@@ -329,34 +341,38 @@ BOOST_AUTO_TEST_SUITE(trace_responses)
 
    BOOST_FIXTURE_TEST_CASE(basic_block_response_unsorted, response_test_fixture)
    {
-      std::vector<action_trace_v0> actions = {
-         {
-            1,
-            "receiver"_n, "contract"_n, "action"_n,
-            {{ "alice"_n, "active"_n }},
-            { 0x01, 0x01, 0x01, 0x01 },
-            { 0x05, 0x05, 0x05, 0x05 }
-         },
-         {
-            0,
-            "receiver"_n, "contract"_n, "action"_n,
-            {{ "alice"_n, "active"_n }},
-            { 0x00, 0x00, 0x00, 0x00 },
-            { 0x04, 0x04, 0x04, 0x04 }
-         },
-         {
-            2,
-            "receiver"_n, "contract"_n, "action"_n,
-            {{ "alice"_n, "active"_n }},
-            { 0x02, 0x02, 0x02, 0x02 },
-            { 0x06, 0x06, 0x06, 0x06 }
-         }
-      };
+      action_trace_v0 at1{};
+      at1.global_sequence = 1;
+      at1.receiver        = "receiver"_n;
+      at1.account         = "contract"_n;
+      at1.action          = "action"_n;
+      at1.authorization   = {{ "alice"_n, "active"_n }};
+      at1.data            = { 0x01, 0x01, 0x01, 0x01 };
+      at1.return_value    = { 0x05, 0x05, 0x05, 0x05 };
+
+      action_trace_v0 at0{};
+      at0.global_sequence = 0;
+      at0.receiver        = "receiver"_n;
+      at0.account         = "contract"_n;
+      at0.action          = "action"_n;
+      at0.authorization   = {{ "alice"_n, "active"_n }};
+      at0.data            = { 0x00, 0x00, 0x00, 0x00 };
+      at0.return_value    = { 0x04, 0x04, 0x04, 0x04 };
+
+      action_trace_v0 at2{};
+      at2.global_sequence = 2;
+      at2.receiver        = "receiver"_n;
+      at2.account         = "contract"_n;
+      at2.action          = "action"_n;
+      at2.authorization   = {{ "alice"_n, "active"_n }};
+      at2.data            = { 0x02, 0x02, 0x02, 0x02 };
+      at2.return_value    = { 0x06, 0x06, 0x06, 0x06 };
+
+      std::vector<action_trace_v0> actions = { at1, at0, at2 };
 
       auto transaction_trace = transaction_trace_v0 {
          "0000000000000000000000000000000000000000000000000000000000000001"_h,
          actions,
-         fc::enum_type<uint8_t, chain::transaction_receipt_header::status_enum>{chain::transaction_receipt_header::status_enum::executed},
          10,
          5,
          { chain::signature_type() },
@@ -396,45 +412,62 @@ BOOST_AUTO_TEST_SUITE(trace_responses)
             ("producer_block_id", fc::variant())
             ("actions", fc::variants({
                fc::mutable_variant_object()
+                  ("action_ordinal", 0)
+                  ("creator_action_ordinal", 0)
+                  ("closest_unnotified_ancestor_action_ordinal", 0)
                   ("global_sequence", 0)
+                  ("recv_sequence", 0)
+                  ("code_sequence", 0)
+                  ("abi_sequence", 0)
                   ("receiver", "receiver")
                   ("account", "contract")
-                  ("action", "action")
+                  ("name", "action")
                   ("authorization", fc::variants({
                      fc::mutable_variant_object()
-                        ("account", "alice")
+                        ("actor", "alice")
                         ("permission", "active")
                      }))
                   ("data", "00000000")
                   ("return_value", "04040404")
                ,
                fc::mutable_variant_object()
+                  ("action_ordinal", 0)
+                  ("creator_action_ordinal", 0)
+                  ("closest_unnotified_ancestor_action_ordinal", 0)
                   ("global_sequence", 1)
+                  ("recv_sequence", 0)
+                  ("code_sequence", 0)
+                  ("abi_sequence", 0)
                   ("receiver", "receiver")
                   ("account", "contract")
-                  ("action", "action")
+                  ("name", "action")
                   ("authorization", fc::variants({
                      fc::mutable_variant_object()
-                        ("account", "alice")
+                        ("actor", "alice")
                         ("permission", "active")
                      }))
                   ("data", "01010101")
                   ("return_value", "05050505")
                ,
                fc::mutable_variant_object()
+                  ("action_ordinal", 0)
+                  ("creator_action_ordinal", 0)
+                  ("closest_unnotified_ancestor_action_ordinal", 0)
                   ("global_sequence", 2)
+                  ("recv_sequence", 0)
+                  ("code_sequence", 0)
+                  ("abi_sequence", 0)
                   ("receiver", "receiver")
                   ("account", "contract")
-                  ("action", "action")
+                  ("name", "action")
                   ("authorization", fc::variants({
                      fc::mutable_variant_object()
-                        ("account", "alice")
+                        ("actor", "alice")
                         ("permission", "active")
                         }))
                   ("data", "02020202")
                   ("return_value", "06060606")
                   }))
-               ("status", "executed")
                ("cpu_usage_us", 10)
                ("net_usage_words", 5)
                ("signatures", fc::variants({"SIG_K1_111111111111111111111111111111111111111111111111111111111111111116uk5ne"}))
@@ -528,6 +561,15 @@ BOOST_AUTO_TEST_SUITE(trace_responses)
    // status: "executed" -> 0 or block_time: {"slot":N} -> N.
    BOOST_FIXTURE_TEST_CASE(streaming_vs_variant_block_response_parity, response_test_fixture)
    {
+      action_trace_v0 action_trace{};
+      action_trace.global_sequence = 0;
+      action_trace.receiver        = "receiver"_n;
+      action_trace.account         = "contract"_n;
+      action_trace.action          = "action"_n;
+      action_trace.authorization   = {{ "alice"_n, "active"_n }};
+      action_trace.data            = { 0x00, 0x01, 0x02, 0x03 };
+      action_trace.return_value    = { 0x04, 0x05, 0x06, 0x07 };
+
       auto block_trace = block_trace_v0 {
          "b000000000000000000000000000000000000000000000000000000000000001"_h,
          1,
@@ -539,16 +581,7 @@ BOOST_AUTO_TEST_SUITE(trace_responses)
          std::vector<transaction_trace_v0> {
             {
                "0000000000000000000000000000000000000000000000000000000000000001"_h,
-               std::vector<action_trace_v0> {
-                  {
-                     0,
-                     "receiver"_n, "contract"_n, "action"_n,
-                     {{ "alice"_n, "active"_n }},
-                     { 0x00, 0x01, 0x02, 0x03 },
-                     { 0x04, 0x05, 0x06, 0x07 }
-                  }
-               },
-               fc::enum_type<uint8_t, chain::transaction_receipt_header::status_enum>{chain::transaction_receipt_header::status_enum::executed},
+               std::vector<action_trace_v0> { action_trace },
                10,
                5,
                std::vector<chain::signature_type>{ chain::signature_type() },
@@ -580,6 +613,35 @@ BOOST_AUTO_TEST_SUITE(trace_responses)
       auto trx_id_a = "0000000000000000000000000000000000000000000000000000000000000001"_h;
       auto trx_id_b = "0000000000000000000000000000000000000000000000000000000000000002"_h;
 
+      action_trace_v0 action_a{};
+      action_a.global_sequence = 0;
+      action_a.receiver        = "receiver"_n;
+      action_a.account         = "contract"_n;
+      action_a.action          = "action"_n;
+      action_a.authorization   = {{ "alice"_n, "active"_n }};
+      action_a.data            = { 0x00, 0x01, 0x02, 0x03 };
+      action_a.return_value    = { 0x04, 0x05, 0x06, 0x07 };
+
+      // Populate every optional / container field the full variant shape emits, so the
+      // parity assertion also covers the ordinal, auth_sequence, ram-delta and usage paths.
+      action_trace_v0 action_b{};
+      action_b.action_ordinal                             = 2;
+      action_b.creator_action_ordinal                     = 1;
+      action_b.closest_unnotified_ancestor_action_ordinal = 1;
+      action_b.global_sequence                            = 1;
+      action_b.recv_sequence                              = 7;
+      action_b.auth_sequence                              = {{ "bob"_n, 3 }};
+      action_b.code_sequence                              = 2;
+      action_b.abi_sequence                               = 4;
+      action_b.receiver                                   = "receiver"_n;
+      action_b.account                                    = "contract"_n;
+      action_b.action                                     = "action"_n;
+      action_b.authorization                              = {{ "bob"_n, "active"_n }};
+      action_b.data                                       = { 0x10, 0x11 };
+      action_b.account_ram_deltas                         = {{ "bob"_n, 240 }};
+      action_b.cpu_usage_us                               = 11;
+      action_b.net_usage                                  = 8;
+
       auto block_trace = block_trace_v0 {
          "b000000000000000000000000000000000000000000000000000000000000001"_h,
          1,
@@ -591,16 +653,7 @@ BOOST_AUTO_TEST_SUITE(trace_responses)
          std::vector<transaction_trace_v0> {
             {
                trx_id_a,
-               std::vector<action_trace_v0> {
-                  {
-                     0,
-                     "receiver"_n, "contract"_n, "action"_n,
-                     {{ "alice"_n, "active"_n }},
-                     { 0x00, 0x01, 0x02, 0x03 },
-                     { 0x04, 0x05, 0x06, 0x07 }
-                  }
-               },
-               fc::enum_type<uint8_t, chain::transaction_receipt_header::status_enum>{chain::transaction_receipt_header::status_enum::executed},
+               std::vector<action_trace_v0> { action_a },
                10,
                5,
                std::vector<chain::signature_type>{ chain::signature_type() },
@@ -611,16 +664,7 @@ BOOST_AUTO_TEST_SUITE(trace_responses)
             },
             {
                trx_id_b,
-               std::vector<action_trace_v0> {
-                  {
-                     1,
-                     "receiver"_n, "contract"_n, "action"_n,
-                     {{ "bob"_n, "active"_n }},
-                     { 0x10, 0x11 },
-                     {}
-                  }
-               },
-               fc::enum_type<uint8_t, chain::transaction_receipt_header::status_enum>{chain::transaction_receipt_header::status_enum::executed},
+               std::vector<action_trace_v0> { action_b },
                20,
                6,
                std::vector<chain::signature_type>{ chain::signature_type() },

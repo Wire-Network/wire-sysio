@@ -12,6 +12,10 @@ from .testUtils import Utils
 
 class Transactions(NodeopQueries):
     retry_num_blocks_default = 1
+    # Default clio action-push subprocess timeout, in seconds, used to bound a stuck push.
+    push_message_timeout_default = 45
+    # Default number of clio action-push attempts for transient subjective CPU overages.
+    push_message_cpu_retry_attempts_default = 5
 
     def __init__(self, host, port, walletMgr=None):
         super().__init__(host, port, walletMgr)
@@ -121,7 +125,7 @@ class Transactions(NodeopQueries):
                 self.trackCmdTransaction(trans, reportStatus=reportStatus)
         except subprocess.CalledProcessError as ex:
             end=time.perf_counter()
-            msg=ex.stderr.decode("utf-8")
+            msg=Utils.decodeProcessOutput(ex.stderr)
             Utils.Print("ERROR: Exception during funds transfer.  cmd Duration: %.3f sec.  %s" % (end-start, msg))
             if exitOnError:
                 Utils.cmdError("could not transfer \"%s\" from %s to %s" % (amountStr, source, destination))
@@ -261,7 +265,14 @@ class Transactions(NodeopQueries):
             return (False, msg)
 
     # returns tuple with transaction execution status and transaction
-    def pushMessage(self, account, action, data, opts, silentErrors=False, signatures=None, expectTrxTrace=True):
+    def pushMessage(self, account, action, data, opts, silentErrors=False, signatures=None, expectTrxTrace=True,
+                    timeout=None, cpuRetryAttempts=None):
+        """Push an action with clio, retrying transient subjective CPU failures."""
+        if timeout is None:
+            timeout = self.push_message_timeout_default
+        if cpuRetryAttempts is None:
+            cpuRetryAttempts = self.push_message_cpu_retry_attempts_default
+        assert(isinstance(cpuRetryAttempts, int) and cpuRetryAttempts > 0)
         cmd="%s %s push action -j %s %s" % (Utils.SysClientPath, self.sysClientArgs(), account, action)
         cmdArr=cmd.split()
         # not using sign_str, since cmdArr messes up the string
@@ -273,26 +284,37 @@ class Transactions(NodeopQueries):
         if opts is not None:
             cmdArr += opts.split()
         if Utils.Debug: Utils.Print("cmd: %s" % (cmdArr))
-        retries = 5
+        retries = cpuRetryAttempts
         start=time.perf_counter()
         while retries > 0:
             retries -= 1
             try:
-                trans=Utils.runCmdArrReturnJson(cmdArr)
+                trans=Utils.runCmdArrReturnJson(cmdArr, timeout=timeout)
                 self.trackCmdTransaction(trans, ignoreNonTrans=True)
                 if Utils.Debug:
                     end=time.perf_counter()
                     Utils.Print("cmd Duration: %.3f sec" % (end-start))
                 return (NodeopQueries.getTransStatus(trans) == 'executed' if expectTrxTrace else True, trans)
             except subprocess.CalledProcessError as ex:
-                msg=ex.stderr.decode("utf-8")
-                output=ex.output.decode("utf-8")
+                msg=Utils.decodeProcessOutput(ex.stderr)
+                output=Utils.decodeProcessOutput(ex.output)
                 if not silentErrors:
                     end=time.perf_counter()
                     Utils.Print("ERROR: Exception during push message. retry %s. stderr: %s. stdout: %s.  cmd Duration=%.3f sec." % (retries, msg, output, end - start))
                 if retries > 0 and "tx_cpu_usage_exceeded" in output:
                     Utils.Print(f"Retrying {cmd} due to: tx_cpu_usage_exceeded")
                     continue # try again
+                return (False, msg)
+            except subprocess.TimeoutExpired as ex:
+                msg=str(ex)
+                output=Utils.decodeProcessOutput(ex.output)
+                error=Utils.decodeProcessOutput(ex.stderr)
+                if not silentErrors:
+                    end=time.perf_counter()
+                    Utils.Print(
+                        "ERROR: Timeout during push message. retry %s. cmd timeout=%s. stderr: %s. stdout: %s. cmd Duration=%.3f sec." %
+                        (retries, ex.timeout, error, output, end - start))
+                # The killed clio process may have already broadcast the transaction before timing out; do not retry.
                 return (False, msg)
 
     def setPermission(self, account, code, pType, requirement, waitForTransBlock=False, exitOnError=False, sign=False):
@@ -324,7 +346,15 @@ class Transactions(NodeopQueries):
         signStr = NodeopQueries.sign_str(sign, [owner.activePublicKey])
         cmdDesc="push action"
         time_block = self.getHeadBlockNum()
-        argsStr = "{" + f'"issuer":"{issuer.name}", "owner":"{owner.name}", "net_weight":"{net} SYS", "cpu_weight":"{cpu} SYS", "ram_weight":"{ram} SYS", "time_block":{time_block}, "network_gen":0' + "}"
+        # sysio.roa::addpolicy requires every weight in the core SYS symbol (4-precision); a bare
+        # "{net} SYS" renders as a 0-precision asset and is rejected ("policy weights must be
+        # denominated in the core SYS symbol"). net/cpu/ram are smallest-unit integers, so format them
+        # with currencyIntToStr exactly like every other currency value in the harness -- this yields
+        # the correct 4-precision symbol while preserving the raw amounts (e.g. 10000 -> "1.0000 SYS").
+        netStr = NodeopQueries.currencyIntToStr(net, CORE_SYMBOL)
+        cpuStr = NodeopQueries.currencyIntToStr(cpu, CORE_SYMBOL)
+        ramStr = NodeopQueries.currencyIntToStr(ram, CORE_SYMBOL)
+        argsStr = "{" + f'"issuer":"{issuer.name}", "owner":"{owner.name}", "net_weight":"{netStr}", "cpu_weight":"{cpuStr}", "ram_weight":"{ramStr}", "time_block":{time_block}, "network_gen":0' + "}"
         cmd = (f"{cmdDesc} -j {signStr} sysio.roa addpolicy  '{argsStr}' -p {issuer.name}@active")
         trans=self.processClioCmd(cmd, cmdDesc, silentErrors=False, exitOnError=exitOnError)
         self.trackCmdTransaction(trans)

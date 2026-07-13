@@ -8,79 +8,631 @@
   "instructions": [
     {
       "name": "initialize",
-      "discriminator": [175, 175, 109, 31, 13, 152, 155, 237],
+      "discriminator": [
+        175,
+        175,
+        109,
+        31,
+        13,
+        152,
+        155,
+        237
+      ],
       "accounts": [
-        { "name": "authority", "writable": true, "signer": true },
-        { "name": "config", "writable": true, "pda": { "seeds": [{ "kind": "const", "value": [111, 117, 116, 112, 111, 115, 116, 95, 99, 111, 110, 102, 105, 103] }] } },
-        { "name": "message_buffer", "writable": true, "pda": { "seeds": [{ "kind": "const", "value": [109, 101, 115, 115, 97, 103, 101, 95, 98, 117, 102, 102, 101, 114] }] } },
-        { "name": "operator_registry", "writable": true, "pda": { "seeds": [{ "kind": "const", "value": [111, 112, 101, 114, 97, 116, 111, 114, 95, 114, 101, 103, 105, 115, 116, 114, 121] }] } },
-        { "name": "system_program" }
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  111,
+                  117,
+                  116,
+                  112,
+                  111,
+                  115,
+                  116,
+                  95,
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "message_buffer",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  101,
+                  115,
+                  115,
+                  97,
+                  103,
+                  101,
+                  95,
+                  98,
+                  117,
+                  102,
+                  102,
+                  101,
+                  114
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "operator_registry",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  111,
+                  112,
+                  101,
+                  114,
+                  97,
+                  116,
+                  111,
+                  114,
+                  95,
+                  114,
+                  101,
+                  103,
+                  105,
+                  115,
+                  116,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program"
+        }
       ],
       "args": [
-        { "name": "consensus_threshold", "type": "u32" }
+        {
+          "name": "consensus_threshold",
+          "type": "u32"
+        }
       ]
     },
     {
       "name": "epoch_in",
-      "discriminator": [85, 70, 55, 132, 50, 198, 135, 115],
+      "docs": [
+        "Accept one chunk of an inbound epoch envelope from a batch operator.",
+        "",
+        "Solana's 1 232-byte transaction MTU forces production-scale OPP",
+        "envelopes (multi-KB) to stream in pieces; the program assembles",
+        "each operator's chunks in a per-(epoch, operator) staging PDA. A",
+        "final zero-data call (`chunk_index == total_chunks`) finalizes the",
+        "already-uploaded bytes. Once consensus is reached across the active",
+        "group, the enclosed attestations are processed inline and the epoch",
+        "cursor advances. A 1-chunk envelope is the degenerate data-upload",
+        "case followed by the same terminal call."
+      ],
+      "discriminator": [
+        85,
+        70,
+        55,
+        132,
+        50,
+        198,
+        135,
+        115
+      ],
       "accounts": [
-        { "name": "operator", "writable": true, "signer": true },
-        { "name": "config", "writable": true, "pda": { "seeds": [{ "kind": "const", "value": [111, 117, 116, 112, 111, 115, 116, 95, 99, 111, 110, 102, 105, 103] }] } },
-        { "name": "operator_registry", "writable": true, "pda": { "seeds": [{ "kind": "const", "value": [111, 112, 101, 114, 97, 116, 111, 114, 95, 114, 101, 103, 105, 115, 116, 114, 121] }] } },
-        { "name": "epoch_deliveries", "writable": true },
-        { "name": "system_program" }
+        {
+          "name": "operator",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "config",
+          "writable": true
+        },
+        {
+          "name": "operator_registry",
+          "writable": true
+        },
+        {
+          "name": "epoch_deliveries",
+          "docs": [
+            "Per-epoch consensus tracker. Lazily inited on the first delivery",
+            "(i.e. the first operator to land their terminal call for this epoch)."
+          ],
+          "writable": true
+        },
+        {
+          "name": "chunk_buffer",
+          "docs": [
+            "Per-(epoch, operator) staging buffer. Same `init_if_needed` +",
+            "`payer = operator` pattern the program already uses for",
+            "`EpochDeliveries`. Closed by the handler when the operator's",
+            "zero-data terminal call finalizes the envelope, returning the",
+            "rent lamports — net cost to the operator across the full epoch is zero."
+          ],
+          "writable": true
+        },
+        {
+          "name": "inbound_envelopes",
+          "docs": [
+            "Singleton inbound-envelope log. Append-and-prune on every",
+            "consensus-reach (see `finalize_envelope`)."
+          ],
+          "writable": true
+        },
+        {
+          "name": "outbound_message_buffer",
+          "writable": true
+        },
+        {
+          "name": "outbound_envelopes",
+          "writable": true
+        },
+        {
+          "name": "latest_outbound_envelope",
+          "writable": true
+        },
+        {
+          "name": "vault",
+          "writable": true
+        },
+        {
+          "name": "reserve_aggregate",
+          "writable": true
+        },
+        {
+          "name": "system_program"
+        }
       ],
       "args": [
-        { "name": "envelope_data", "type": "bytes" }
+        {
+          "name": "epoch_index",
+          "type": "u32"
+        },
+        {
+          "name": "chunk_index",
+          "type": "u16"
+        },
+        {
+          "name": "total_chunks",
+          "type": "u16"
+        },
+        {
+          "name": "total_bytes",
+          "type": "u32"
+        },
+        {
+          "name": "chunk_data",
+          "type": "bytes"
+        }
       ]
     },
     {
       "name": "emit_outbound_envelope",
-      "discriminator": [142, 109, 163, 152, 3, 80, 224, 157],
+      "discriminator": [
+        142,
+        109,
+        163,
+        152,
+        3,
+        80,
+        224,
+        157
+      ],
       "accounts": [
-        { "name": "caller", "signer": true },
-        { "name": "config", "writable": true, "pda": { "seeds": [{ "kind": "const", "value": [111, 117, 116, 112, 111, 115, 116, 95, 99, 111, 110, 102, 105, 103] }] } },
-        { "name": "message_buffer", "writable": true, "pda": { "seeds": [{ "kind": "const", "value": [109, 101, 115, 115, 97, 103, 101, 95, 98, 117, 102, 102, 101, 114] }] } }
+        {
+          "name": "caller",
+          "signer": true
+        },
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  111,
+                  117,
+                  116,
+                  112,
+                  111,
+                  115,
+                  116,
+                  95,
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "message_buffer",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  101,
+                  115,
+                  115,
+                  97,
+                  103,
+                  101,
+                  95,
+                  98,
+                  117,
+                  102,
+                  102,
+                  101,
+                  114
+                ]
+              }
+            ]
+          }
+        }
       ],
       "args": [
-        { "name": "wire_epoch_index", "type": "u32" }
+        {
+          "name": "wire_epoch_index",
+          "type": "u32"
+        }
       ]
     },
     {
       "name": "add_attestation",
-      "discriminator": [206, 82, 129, 170, 54, 159, 161, 156],
+      "discriminator": [
+        206,
+        82,
+        129,
+        170,
+        54,
+        159,
+        161,
+        156
+      ],
       "accounts": [
-        { "name": "authority", "signer": true },
-        { "name": "config", "pda": { "seeds": [{ "kind": "const", "value": [111, 117, 116, 112, 111, 115, 116, 95, 99, 111, 110, 102, 105, 103] }] } },
-        { "name": "message_buffer", "writable": true, "pda": { "seeds": [{ "kind": "const", "value": [109, 101, 115, 115, 97, 103, 101, 95, 98, 117, 102, 102, 101, 114] }] } }
+        {
+          "name": "authority",
+          "signer": true
+        },
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  111,
+                  117,
+                  116,
+                  112,
+                  111,
+                  115,
+                  116,
+                  95,
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "message_buffer",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  101,
+                  115,
+                  115,
+                  97,
+                  103,
+                  101,
+                  95,
+                  98,
+                  117,
+                  102,
+                  102,
+                  101,
+                  114
+                ]
+              }
+            ]
+          }
+        }
       ],
       "args": [
-        { "name": "attestation_type", "type": "i32" },
-        { "name": "data", "type": "bytes" }
+        {
+          "name": "attestation_type",
+          "type": "i32"
+        },
+        {
+          "name": "data",
+          "type": "bytes"
+        }
       ]
     },
     {
       "name": "deposit",
-      "discriminator": [242, 35, 198, 137, 82, 225, 242, 182],
+      "discriminator": [
+        242,
+        35,
+        198,
+        137,
+        82,
+        225,
+        242,
+        182
+      ],
       "accounts": [
-        { "name": "depositor", "writable": true, "signer": true },
-        { "name": "config", "pda": { "seeds": [{ "kind": "const", "value": [111, 117, 116, 112, 111, 115, 116, 95, 99, 111, 110, 102, 105, 103] }] } },
-        { "name": "message_buffer", "writable": true, "pda": { "seeds": [{ "kind": "const", "value": [109, 101, 115, 115, 97, 103, 101, 95, 98, 117, 102, 102, 101, 114] }] } },
-        { "name": "vault", "writable": true, "pda": { "seeds": [{ "kind": "const", "value": [111, 117, 116, 112, 111, 115, 116, 95, 118, 97, 117, 108, 116] }] } },
-        { "name": "system_program" }
+        {
+          "name": "depositor",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  111,
+                  117,
+                  116,
+                  112,
+                  111,
+                  115,
+                  116,
+                  95,
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "message_buffer",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  101,
+                  115,
+                  115,
+                  97,
+                  103,
+                  101,
+                  95,
+                  98,
+                  117,
+                  102,
+                  102,
+                  101,
+                  114
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  111,
+                  117,
+                  116,
+                  112,
+                  111,
+                  115,
+                  116,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program"
+        }
       ],
       "args": [
-        { "name": "operator_type", "type": "u8" },
-        { "name": "wire_account_name", "type": "string" },
-        { "name": "amount", "type": "u64" }
+        {
+          "name": "operator_type",
+          "type": "u8"
+        },
+        {
+          "name": "wire_account_name",
+          "type": "string"
+        },
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "cleanup_envelope_chunks",
+      "docs": [
+        "Permissionless reaper for `EnvelopeChunks` PDAs an operator started",
+        "but never finished. Callable once the chain has advanced past",
+        "`epoch_index` (consensus reached); rent returns to the original",
+        "uploader. The caller pays only the tx fee."
+      ],
+      "discriminator": [
+        224,
+        118,
+        156,
+        99,
+        9,
+        136,
+        14,
+        207
+      ],
+      "accounts": [
+        {
+          "name": "reaper",
+          "docs": [
+            "Anyone can invoke. Pays the tx fee, gets nothing in return."
+          ],
+          "signer": true
+        },
+        {
+          "name": "config"
+        },
+        {
+          "name": "latest_outbound_envelope"
+        },
+        {
+          "name": "chunk_buffer",
+          "docs": [
+            "The stale buffer to close. The seeds constraint pins the PDA's",
+            "third seed to `uploader.key()`, so Anchor's PDA derivation is",
+            "itself the proof that `uploader` IS the operator that originally",
+            "opened this buffer. `close = uploader` returns rent to that key."
+          ],
+          "writable": true
+        },
+        {
+          "name": "uploader",
+          "docs": [
+            "The original uploader. Receives the reclaimed rent. Must be `mut`",
+            "so Anchor's `close` can credit lamports."
+          ],
+          "writable": true
+        }
+      ],
+      "args": [
+        {
+          "name": "epoch_index",
+          "type": "u32"
+        }
       ]
     }
   ],
   "accounts": [
-    { "name": "OutpostConfig", "discriminator": [211, 233, 11, 174, 26, 119, 188, 182] },
-    { "name": "MessageBuffer", "discriminator": [25, 244, 3, 5, 225, 165, 29, 250] },
-    { "name": "OperatorRegistry", "discriminator": [194, 188, 172, 240, 220, 209, 36, 100] },
-    { "name": "EpochDeliveries", "discriminator": [134, 83, 77, 28, 26, 189, 174, 190] }
+    {
+      "name": "OutpostConfig",
+      "discriminator": [
+        211,
+        233,
+        11,
+        174,
+        26,
+        119,
+        188,
+        182
+      ]
+    },
+    {
+      "name": "Reserve",
+      "discriminator": [
+        43,
+        242,
+        204,
+        202,
+        26,
+        247,
+        59,
+        127
+      ]
+    },
+    {
+      "name": "MessageBuffer",
+      "discriminator": [
+        25,
+        244,
+        3,
+        5,
+        225,
+        165,
+        29,
+        250
+      ]
+    },
+    {
+      "name": "OperatorRegistry",
+      "discriminator": [
+        194,
+        188,
+        172,
+        240,
+        220,
+        209,
+        36,
+        100
+      ]
+    },
+    {
+      "name": "EpochDeliveries",
+      "discriminator": [
+        134,
+        83,
+        77,
+        28,
+        26,
+        189,
+        174,
+        190
+      ]
+    }
   ],
   "types": [
     {
@@ -88,14 +640,143 @@
       "type": {
         "kind": "struct",
         "fields": [
-          { "name": "authority", "type": "pubkey" },
-          { "name": "next_epoch_index", "type": "u32" },
-          { "name": "previous_epoch_hash", "type": { "array": ["u8", 32] } },
-          { "name": "consensus_threshold", "type": "u32" },
-          { "name": "registry_initialized", "type": "bool" },
-          { "name": "last_message_id", "type": { "array": ["u8", 32] } },
-          { "name": "last_message_timestamp", "type": "u64" },
-          { "name": "bump", "type": "u8" }
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "next_epoch_index",
+            "type": "u32"
+          },
+          {
+            "name": "previous_epoch_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "consensus_threshold",
+            "type": "u32"
+          },
+          {
+            "name": "registry_initialized",
+            "type": "bool"
+          },
+          {
+            "name": "last_message_id",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "last_message_timestamp",
+            "type": "u64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Reserve",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "token_code",
+            "type": "u64"
+          },
+          {
+            "name": "reserve_code",
+            "type": "u64"
+          },
+          {
+            "name": "external_token_amount",
+            "type": "u64"
+          },
+          {
+            "name": "requested_wire_amount",
+            "type": "u64"
+          },
+          {
+            "name": "connector_weight_bps",
+            "type": "u32"
+          },
+          {
+            "name": "status",
+            "type": {
+              "defined": {
+                "name": "ReserveStatus"
+              }
+            }
+          },
+          {
+            "name": "creator",
+            "type": "pubkey"
+          },
+          {
+            "name": "custody_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "custody_decimals",
+            "type": "u8"
+          },
+          {
+            "name": "name_len",
+            "type": "u8"
+          },
+          {
+            "name": "name_bytes",
+            "type": {
+              "array": [
+                "u8",
+                64
+              ]
+            }
+          },
+          {
+            "name": "description_len",
+            "type": "u16"
+          },
+          {
+            "name": "description_bytes",
+            "type": {
+              "array": [
+                "u8",
+                256
+              ]
+            }
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ReserveStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Pending"
+          },
+          {
+            "name": "Active"
+          },
+          {
+            "name": "Cancelled"
+          }
         ]
       }
     }

@@ -5,6 +5,7 @@
 
 #include <fc/log/logger_config.hpp>
 
+#include <atomic>
 #include <thread>
 #include <iostream>
 
@@ -67,7 +68,7 @@ private:
 
 
 std::thread start_read_thread(scoped_app_thread& app) {
-   static int num = 0;
+   static std::atomic<int> num = 0; // read threads of one test start concurrently; plain int is a data race
    std::thread read_thread( [&]() {
       std::string name ="read-" + std::to_string(num++);
       fc::set_thread_name(name);
@@ -260,11 +261,15 @@ BOOST_AUTO_TEST_CASE( exec_with_handler_id ) {
 
 // verify functions only from read_only queue are processed during read window on the main thread
 BOOST_AUTO_TEST_CASE( execute_from_read_only_queue ) {
-   scoped_app_thread app;
+   // Delay exec() so the read window is established before the main thread enters its exec() loop;
+   // exec_window_ is plain data published to the main thread by the start_exec promise/future. See
+   // execute_many_from_read_only_and_read_exclusive_queues below for the full analysis.
+   scoped_app_thread app(true);
 
    // set to run functions from read_only queue only
    app->executor().init_read_threads(1);
    app->executor().set_to_read_window([](){return false;});
+   app.start_exec();
 
    // post functions
    std::map<int, int> rslts {};
@@ -307,11 +312,14 @@ BOOST_AUTO_TEST_CASE( execute_from_read_only_queue ) {
 
 // verify no functions are executed during read window if read_only & read_exclusive queue is empty
 BOOST_AUTO_TEST_CASE( execute_from_empty_read_only_queue ) {
-   scoped_app_thread app;
+   // Delay exec() so the read window is established before the main thread enters its exec() loop;
+   // see execute_from_read_only_queue above.
+   scoped_app_thread app(true);
 
    // set to run functions from read_only & read_exclusive queues only
    app->executor().init_read_threads(1);
    app->executor().set_to_read_window([](){return false;});
+   app.start_exec();
 
    // post functions
    std::map<int, int> rslts {};
@@ -501,9 +509,12 @@ BOOST_AUTO_TEST_CASE( execute_from_read_only_and_read_exclusive_queues ) {
 
    // Use lowest at the end to make sure this executes the last
    app->executor().post( priority::lowest, exec_queue::read_exclusive, [&]() {
-      BOOST_REQUIRE_EQUAL( app->executor().read_only_queue_size(), 0u); // pop()s before execute
-      BOOST_REQUIRE_EQUAL( app->executor().read_exclusive_queue_size(), 0u);
-      BOOST_REQUIRE_EQUAL( app->executor().read_write_queue_size(), 3u );
+      // executes on a read thread while other threads may still push/pop under the queue mutex;
+      // readable_queue() returns a view that holds that mutex for the duration of the checks
+      auto read_queue = app->executor().readable_queue();
+      BOOST_REQUIRE_EQUAL( read_queue.size(exec_queue::read_only), 0u); // pop()s before execute
+      BOOST_REQUIRE_EQUAL( read_queue.size(exec_queue::read_exclusive), 0u);
+      BOOST_REQUIRE_EQUAL( read_queue.size(exec_queue::read_write), 3u );
       } );
 
    auto work = make_work_guard(app->get_io_context());
@@ -567,11 +578,44 @@ BOOST_AUTO_TEST_CASE( execute_from_read_only_and_read_exclusive_queues ) {
 
 // verify tasks from both queues (read_only, read_exclusive) are processed in read window
 BOOST_AUTO_TEST_CASE( execute_many_from_read_only_and_read_exclusive_queues ) {
-   scoped_app_thread app;
+   // Delay exec() so the read window is established before the main thread enters its exec() loop.
+   //
+   // priority_queue_executor::exec_window_ is plain, non-atomic data, and the executor relies on it being
+   // owned by the main exec thread: it is read only in execute_highest() (driven by application_base::exec()
+   // on the main thread) and never read by execute_highest_read() (the read-thread pool path). In production
+   // it is also written only on the main thread -- producer_plugin posts switch_to_read_window() to the
+   // read_write queue, and posts switch_to_write_window() to read_only only after every read task has
+   // returned, so the main thread is the sole io_context poller that runs it. The read window's lock-free
+   // write phase is therefore safe because the read pool is provably idle whenever the main thread takes it.
+   //
+   // This test instead flips the window from a third thread. With immediate exec() the constructor releases
+   // the start_exec future before set_to_read_window() runs, so there is no happens-before edge between the
+   // flip here and the main thread's reads of exec_window_. The main thread can keep observing the stale
+   // write window and run the lock-free execute_highest() path on the read_only heap while a read thread
+   // pops that same heap under the lock, corrupting the priority queue (observed as a SEGV in
+   // binomial_heap::pop() under ASan). Establishing the window before start_exec() makes the start_exec
+   // promise/future the publishing edge and leaves exec_window_ unmodified for the rest of the run, so the
+   // main thread sees a stable read window -- matching production and the execute_from_read_only_and_
+   // read_exclusive_queues sibling test.
+   scoped_app_thread app(true);
 
    // set to run functions from read_only & read_exclusive queues only
    app->executor().init_read_threads(3);
    app->executor().set_to_read_window([](){return false;});
+
+   // Hold a work guard so the io_context cannot run out of work before the main thread enters exec()
+   // and installs its own guard. The read threads below call get_io_context().poll() in their loop; a
+   // poll() that drains the last queued handler while no work guard exists flags the io_context
+   // stopped, which makes exec() break out of its loop immediately and run its UNLOCKED shutdown
+   // clear() of the priority queues concurrently with this thread's posts and the read threads' pops,
+   // corrupting the queues (observed as a SEGV in binomial_heap::pop() on a read thread, or as posted
+   // tasks vanishing so fewer than num_expected results are recorded). The sibling test above holds
+   // the same guard for the same reason.
+   auto work = make_work_guard(app->get_io_context());
+
+   // enter exec() now that the read window (and its locking) is published to the main thread, before any
+   // read threads start and before any tasks are posted
+   app.start_exec();
 
    // post functions
    constexpr int num_expected = 600;
@@ -607,9 +651,12 @@ BOOST_AUTO_TEST_CASE( execute_many_from_read_only_and_read_exclusive_queues ) {
 
    // Use lowest at the end to make sure this executes the last
    app->executor().post( priority::lowest, exec_queue::read_exclusive, [&]() {
-      BOOST_REQUIRE_EQUAL( app->executor().read_only_queue_size(), 0u); // pop()s before execute
-      BOOST_REQUIRE_EQUAL( app->executor().read_exclusive_queue_size(), 0u);
-      BOOST_REQUIRE_EQUAL( app->executor().read_write_queue_size(), 0u );
+      // executes on a read thread while other threads may still push/pop under the queue mutex;
+      // readable_queue() returns a view that holds that mutex for the duration of the checks
+      auto read_queue = app->executor().readable_queue();
+      BOOST_REQUIRE_EQUAL( read_queue.size(exec_queue::read_only), 0u); // pop()s before execute
+      BOOST_REQUIRE_EQUAL( read_queue.size(exec_queue::read_exclusive), 0u);
+      BOOST_REQUIRE_EQUAL( read_queue.size(exec_queue::read_write), 0u );
       } );
 
    read_thread1.join();
@@ -623,6 +670,7 @@ BOOST_AUTO_TEST_CASE( execute_many_from_read_only_and_read_exclusive_queues ) {
          break;
    };
 
+   work.reset();
    app->quit();
    app.join();
 

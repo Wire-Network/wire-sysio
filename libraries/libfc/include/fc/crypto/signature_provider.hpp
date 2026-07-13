@@ -2,10 +2,43 @@
 #include <fc/crypto/private_key.hpp>
 #include <fc/crypto/public_key.hpp>
 
+#include <atomic>
+#include <memory>
+
 namespace fc::crypto {
 using signature_provider_id_t  = std::variant<std::string, fc::crypto::public_key>;
 
 /// Wire default signing function (sha256 digest)
+//  NOTE: Really this is a 256-bit hash value, that is either a sha256 hash or keccak256 hash
+//        the choice was made earlier to treat the payload as a 256-bit hash and changing all
+//        of the plumbing was considered out of scope.
+//
+//        Because `sha256` is reused to carry keccak-256 bytes, the type system no
+//        longer distinguishes the two digests at this boundary -- the Ethereum
+//        signing path (`fc::crypto::detail::em_sign_keccak` in signer.hpp)
+//        deliberately constructs a `sha256` from a keccak digest's bytes and hands
+//        it to this closure. What keeps that safe is the self-verify in
+//        `em_sign_keccak`: it recovers the public key from the produced signature
+//        and asserts it matches the provider's pinned key, so a closure wired to
+//        the wrong bytes (wrong digest, framing, or key) is rejected before its
+//        output is used. That recover-and-compare is the compensating control for
+//        the lost compile-time digest distinction -- DO NOT remove it as
+//        "redundant." It is distinct from the KMS provider's own `recover_v`,
+//        which runs inside the closure on every sign -- it picks the recovery id
+//        and also rejects a signature that does not recover to the pinned key;
+//        this self-verify instead runs once per provider and validates, from
+//        outside the closure, that the digest crossed the `sha256`-typed boundary
+//        uncorrupted.
+//
+//        It runs once per provider: a closure's key and framing are fixed, so the
+//        first signature is representative. `signature_provider_t::self_verified`
+//        gates it to the first sign and caches the result. The flag is set only
+//        AFTER the checks pass, so a transiently bad signer throws and is
+//        re-checked on the next sign. A plain atomic flag is used deliberately,
+//        NOT `std::call_once`: the checks throw on failure, and on glibc an
+//        exception unwinding through `call_once`'s `pthread_once` aborts the
+//        process. Concurrent first-signs may each run the cheap, side-effect-free
+//        recover, which is harmless.
 using sign_fn        = std::function<fc::crypto::signature(const sha256&)>;
 
 /**
@@ -29,9 +62,55 @@ struct signature_provider_t  {
 
    /// Wire default signing (always set for all key types)
    sign_fn        sign;
+
+   /// One-shot guard for the remote-signer self-verify in
+   /// `detail::em_sign_keccak` (signer.hpp). See note above for more detail.
+   std::shared_ptr<std::atomic<bool>> self_verified = std::make_shared<std::atomic<bool>>(false);
 };
 
 using signature_provider_ptr = std::shared_ptr<signature_provider_t>;
+
+/**
+ * Parse a private key from its chain-native string form, dispatching at runtime on `key_type`.
+ *
+ * Runtime counterpart of the compile-time `from_native_string_to_private_key<ChainKeyType>()`
+ * templates in `fc/crypto/key_serdes.hpp`, covering the chain key types with an implemented
+ * native form: `chain_key_type_wire` (WIF / `PVT_` forms), `chain_key_type_wire_bls`
+ * (`PVT_BLS_...`), `chain_key_type_ethereum` (`0x...` hex), and `chain_key_type_solana`
+ * (base58).
+ *
+ * @param key_type        chain key type selecting the native string format
+ * @param private_key_str the private key in that chain's native string form
+ * @throws fc::unsupported_exception for chain key types without an implemented native form
+ *         (e.g. `chain_key_type_sui`); callers owning a richer error taxonomy (such as the
+ *         signature-provider plugin's config exceptions) should pre-check the type
+ * @throws fc exceptions from the underlying parser on malformed input
+ * @return the parsed private key
+ */
+private_key from_native_string_to_private_key(chain_key_type_t key_type, const std::string& private_key_str);
+
+/**
+ * Parse a public key from its chain-native string form, dispatching at runtime on `key_type`.
+ * Runtime counterpart of the `from_native_string_to_public_key<ChainKeyType>()` templates in
+ * `fc/crypto/key_serdes.hpp`; same supported types and error behavior as
+ * `from_native_string_to_private_key(chain_key_type_t, ...)` above.
+ *
+ * @param key_type       chain key type selecting the native string format
+ * @param public_key_str the public key in that chain's native string form
+ * @throws fc::unsupported_exception for chain key types without an implemented native form
+ * @throws fc exceptions from the underlying parser on malformed input
+ * @return the parsed public key
+ */
+public_key from_native_string_to_public_key(chain_key_type_t key_type, const std::string& public_key_str);
+
+/**
+ * Build the local-key signing closure used by `KEY:`-style signature providers: signs the
+ * 256-bit digest (see the `sign_fn` note above on sha256-vs-keccak semantics) with `key`.
+ *
+ * @param key private key captured by value into the returned closure
+ * @return closure signing digests with `key`
+ */
+sign_fn make_local_sign_fn(const private_key& key);
 
 /**
  * Creates a signature provider specification string from individual components.

@@ -6,6 +6,7 @@
 
 #include <sysio/sysio.hpp>
 #include <sysio/crypto.hpp>
+#include <sysio/kv_table.hpp>
 
 
 namespace sysio {
@@ -96,6 +97,32 @@ class [[sysio::contract]] get_table_test : public sysio::contract {
                             indexed_by<"bysec2"_n, const_mem_fun<hashobj, checksum256, &hashobj::sec160_key>>
                             > hashobjs;
 
+    // Struct-keyed kv::table — drives the ABI-aware BE key codec's struct
+    // expansion on the live get_table_rows path. Mirrors the v6 registry
+    // tables (e.g. sysio.chains `chains`), whose primary key is the reflected
+    // struct `slug_name { value: uint64 }`. abigen emits
+    // `key_types: ["code"->"slug_name"]` for this table, so JSON bounds and
+    // `next_key` pagination must round-trip the nested `{ "code": { "value": N } }`
+    // key shape — coverage a flat scalar key cannot provide.
+    struct slug_name {
+        uint64_t value = 0;
+        SYSLIB_SERIALIZE(slug_name, (value))
+    };
+
+    struct structobj_key {
+        slug_name code;
+        uint64_t primary_key() const { return code.value; }
+        SYSLIB_SERIALIZE(structobj_key, (code))
+    };
+
+    struct [[sysio::table("structobjs")]] structobj {
+        slug_name code;
+        uint64_t  payload = 0;
+        SYSLIB_SERIALIZE(structobj, (code)(payload))
+    };
+
+    typedef sysio::kv::table< "structobjs"_n, structobj_key, structobj > structobjs;
+
    [[sysio::action]]
    void addnumobj(uint64_t input);
 
@@ -108,6 +135,12 @@ class [[sysio::contract]] get_table_test : public sysio::contract {
 
    [[sysio::action]]
    void addhashobj(std::string hashinput);
+
+   /// Insert a row into the struct-keyed kv::table `structobjs`.
+   /// @param code     the slug_name value forming the struct primary key
+   /// @param payload  arbitrary row payload
+   [[sysio::action]]
+   void addstruct(uint64_t code, uint64_t payload);
 
 
 };

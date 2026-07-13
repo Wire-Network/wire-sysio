@@ -234,49 +234,237 @@ BOOST_AUTO_TEST_CASE(kv_index_object_crud) {
    session.undo();
 }
 
-BOOST_AUTO_TEST_CASE(kv_iterator_pool_basic) {
-   kv_iterator_pool pool;
+// Verify that db.modify() correctly rebalances AVL trees when a composite
+// index key field (sec_key) changes, as an alternative to remove+create.
+BOOST_AUTO_TEST_CASE(kv_index_modify_rekeys_correctly) {
+   validating_tester t( flat_set<account_name>(), nullptr, setup_policy::none );
+   auto& db = const_cast<chainbase::database&>(t.control->db());
 
-   // Allocate primary
-   uint32_t h1 = pool.allocate_primary(uint16_t(0), "test"_n, "prefix", 6);
-   BOOST_CHECK_EQUAL(h1, 0u);
-   auto& slot1 = pool.get(h1);
-   BOOST_CHECK(slot1.is_primary);
-   BOOST_CHECK_EQUAL(slot1.code, "test"_n);
+   auto session = db.start_undo_session(true);
 
-   // Allocate secondary
-   uint32_t h2 = pool.allocate_secondary("test"_n, uint16_t(100));
-   BOOST_CHECK_EQUAL(h2, 1u);
-   auto& slot2 = pool.get(h2);
-   BOOST_CHECK(!slot2.is_primary);
+   const uint16_t users_idx = compute_table_id("users.byname");
 
-   // Release and reuse
-   pool.release(h1);
-   uint32_t h3 = pool.allocate_primary(uint16_t(0), "other"_n, "", 0);
-   BOOST_CHECK_EQUAL(h3, 0u); // reuses slot 0
+   // Create three entries: alice, bob, charlie
+   const auto& alice = db.create<kv_index_object>([&](auto& o) {
+      o.code = "test"_n;
+      o.table_id = users_idx;
+      o.sec_key.assign("alice", 5);
+      o.pri_key.assign("\x00\x01", 2);
+   });
+   db.create<kv_index_object>([&](auto& o) {
+      o.code = "test"_n;
+      o.table_id = users_idx;
+      o.sec_key.assign("bob", 3);
+      o.pri_key.assign("\x00\x02", 2);
+   });
+   db.create<kv_index_object>([&](auto& o) {
+      o.code = "test"_n;
+      o.table_id = users_idx;
+      o.sec_key.assign("charlie", 7);
+      o.pri_key.assign("\x00\x03", 2);
+   });
 
-   pool.release(h2);
-   pool.release(h3);
+   // Modify alice's sec_key to "zebra" -- should move to end of ordering
+   db.modify(alice, [](auto& o) {
+      o.sec_key.assign("zebra", 5);
+   });
+
+   // Verify ordering in by_code_table_id_seckey: bob < charlie < zebra
+   auto& sec_idx = db.get_index<kv_index_index, by_code_table_id_seckey>();
+   auto itr = sec_idx.lower_bound(boost::make_tuple(name("test"), users_idx));
+   BOOST_REQUIRE(itr != sec_idx.end());
+   BOOST_CHECK_EQUAL(itr->sec_key_view(), "bob");
+   ++itr;
+   BOOST_REQUIRE(itr != sec_idx.end());
+   BOOST_CHECK_EQUAL(itr->sec_key_view(), "charlie");
+   ++itr;
+   BOOST_REQUIRE(itr != sec_idx.end());
+   BOOST_CHECK_EQUAL(itr->sec_key_view(), "zebra");
+   // Verify pri_key is preserved
+   BOOST_CHECK_EQUAL(itr->pri_key_view(), std::string_view("\x00\x01", 2));
+
+   // Lookup by full composite key (sec_key + pri_key) finds the modified object.
+   auto pitr = sec_idx.find(boost::make_tuple(
+      name("test"), users_idx,
+      std::string_view("zebra", 5),
+      std::string_view("\x00\x01", 2)));
+   BOOST_REQUIRE(pitr != sec_idx.end());
+   BOOST_CHECK_EQUAL(pitr->sec_key_view(), "zebra");
+
+   // Old sec_key no longer resolves.
+   auto old_itr = sec_idx.find(boost::make_tuple(
+      name("test"), users_idx,
+      std::string_view("alice", 5),
+      std::string_view("\x00\x01", 2)));
+   BOOST_CHECK(old_itr == sec_idx.end());
+
+   // Verify undo restores original ordering
+   session.undo();
+
+   auto& sec_idx2 = db.get_index<kv_index_index, by_code_table_id_seckey>();
+   auto itr2 = sec_idx2.lower_bound(boost::make_tuple(name("test"), users_idx));
+   // After undo, all 3 entries should be gone (session created them all)
+   BOOST_CHECK(itr2 == sec_idx2.end() || itr2->code != name("test"));
 }
 
-BOOST_AUTO_TEST_CASE(kv_iterator_pool_exhaustion) {
-   kv_iterator_pool pool;
+BOOST_AUTO_TEST_CASE(kv_iterator_pool_basic) {
+   kv_primary_iterator_pool prim_pool;
+   kv_secondary_iterator_pool sec_pool;
 
-   // Allocate all 16 slots
+   // Treat the value returned by primary allocate() as a contract-facing handle and route every access via the
+   // handle helpers so the test does not bake in the current "primary handle == slot index" detail.
+   uint32_t h1 = prim_pool.allocate(uint16_t(0), "test"_n, "prefix", 6);
+   BOOST_CHECK(!kv_handle_is_secondary(h1));
+   auto& slot1 = prim_pool.get(kv_handle_slot_index(h1));
+   BOOST_CHECK_EQUAL(slot1.code, "test"_n);
+   BOOST_CHECK_EQUAL(slot1.prefix.size(), 6u);
+
+   // Secondary: wrap the slot index with the tag bit, then verify round-trip through the helpers.
+   uint32_t s2 = sec_pool.allocate("test"_n, uint16_t(100));
+   uint32_t h2 = kv_make_secondary_handle(s2);
+   BOOST_CHECK(kv_handle_is_secondary(h2));
+   BOOST_CHECK_EQUAL(kv_handle_slot_index(h2), s2);
+   auto& slot2 = sec_pool.get(kv_handle_slot_index(h2));
+   BOOST_CHECK_EQUAL(slot2.code, "test"_n);
+
+   // Each pool has its own free-list. A primary release does not affect the secondary, and vice versa.
+   prim_pool.release(kv_handle_slot_index(h1));
+   uint32_t h3 = prim_pool.allocate(uint16_t(0), "other"_n, "", 0);
+   BOOST_CHECK_EQUAL(kv_handle_slot_index(h3), kv_handle_slot_index(h1)); // reuses the freed slot
+
+   sec_pool.release(kv_handle_slot_index(h2));
+   prim_pool.release(kv_handle_slot_index(h3));
+}
+
+BOOST_AUTO_TEST_CASE(kv_validate_handle_dispatch) {
+   // validate_primary_handle: well-formed primary returns its slot index; wrong-pool tag and reserved bits throw.
+   BOOST_CHECK_EQUAL(validate_primary_handle(0u, "op"), 0u);
+   BOOST_CHECK_EQUAL(validate_primary_handle(1023u, "op"), 1023u);
+   BOOST_CHECK_THROW(validate_primary_handle(kv_make_secondary_handle(5u), "op"), kv_invalid_iterator);
+   BOOST_CHECK_THROW(validate_primary_handle(0x00000400u, "op"), kv_invalid_iterator); // bit 10 reserved
+   BOOST_CHECK_THROW(validate_primary_handle(0x00020000u, "op"), kv_invalid_iterator); // bit 17 reserved
+   BOOST_CHECK_THROW(validate_primary_handle(0x80000000u, "op"), kv_invalid_iterator); // bit 31 reserved (sign)
+
+   // validate_secondary_handle: well-formed secondary returns its slot index; primary handles and reserved bits throw.
+   uint32_t sec_handle = kv_make_secondary_handle(5u);
+   BOOST_CHECK_EQUAL(validate_secondary_handle(sec_handle, "op"), 5u);
+   BOOST_CHECK_THROW(validate_secondary_handle(5u, "op"), kv_invalid_iterator);        // primary
+   BOOST_CHECK_THROW(validate_secondary_handle(0u, "op"), kv_invalid_iterator);        // primary, slot 0
+   BOOST_CHECK_THROW(validate_secondary_handle(sec_handle | 0x00000400u, "op"),
+                     kv_invalid_iterator); // sec + bit 10
+   BOOST_CHECK_THROW(validate_secondary_handle(sec_handle | 0x80000000u, "op"),
+                     kv_invalid_iterator); // sec + bit 31
+}
+
+BOOST_AUTO_TEST_CASE(kv_check_prefix_size_bounds) {
+   BOOST_CHECK_NO_THROW(kv_check_prefix_size(0));
+   BOOST_CHECK_NO_THROW(kv_check_prefix_size(8));
+   BOOST_CHECK_NO_THROW(kv_check_prefix_size(config::max_kv_key_size_limit));
+   BOOST_CHECK_THROW(kv_check_prefix_size(config::max_kv_key_size_limit + 1), kv_key_too_large);
+   BOOST_CHECK_THROW(kv_check_prefix_size(std::numeric_limits<uint32_t>::max()), kv_key_too_large);
+}
+
+BOOST_AUTO_TEST_CASE(kv_iterator_pool_independent_exhaustion) {
+   kv_primary_iterator_pool prim_pool;
+   kv_secondary_iterator_pool sec_pool;
+
+   // Exhausting one pool must not consume slots in the other.
    for (uint32_t i = 0; i < config::max_kv_iterators; ++i) {
-      pool.allocate_primary(uint16_t(0), "test"_n, "", 0);
+      prim_pool.allocate(uint16_t(0), "test"_n, "", 0);
    }
-
-   // 17th should throw
    BOOST_CHECK_THROW(
-      pool.allocate_primary(uint16_t(0), "test"_n, "", 0),
+      prim_pool.allocate(uint16_t(0), "test"_n, "", 0),
       kv_iterator_limit_exceeded
    );
 
-   // Release one and try again
-   pool.release(5);
-   uint32_t h = pool.allocate_primary(uint16_t(0), "test"_n, "", 0);
-   BOOST_CHECK_EQUAL(h, 5u);
+   // Secondary pool is still empty -- can allocate the full budget.
+   for (uint32_t i = 0; i < config::max_kv_iterators; ++i) {
+      sec_pool.allocate("test"_n, uint16_t(0));
+   }
+   BOOST_CHECK_THROW(
+      sec_pool.allocate("test"_n, uint16_t(0)),
+      kv_iterator_limit_exceeded
+   );
+
+   // Release one slot in each pool and verify reuse.
+   prim_pool.release(5);
+   BOOST_CHECK_EQUAL(prim_pool.allocate(uint16_t(0), "test"_n, "", 0), 5u);
+   sec_pool.release(7);
+   BOOST_CHECK_EQUAL(sec_pool.allocate("test"_n, uint16_t(0)), 7u);
+}
+
+BOOST_AUTO_TEST_CASE(kv_iterator_handle_encoding) {
+   // Round-trip: tag a slot index, recover it via the helpers.
+   for (uint32_t slot : {uint32_t{0}, uint32_t{1}, uint32_t{17}, uint32_t{1023}}) {
+      uint32_t handle = kv_make_secondary_handle(slot);
+      BOOST_CHECK(kv_handle_is_secondary(handle));
+      BOOST_CHECK_EQUAL(kv_handle_slot_index(handle), slot);
+      // Reserved bits 10..15 and 17..31 must all be zero in a freshly-encoded handle.
+      BOOST_CHECK_EQUAL(handle & ~(kv_handle_slot_index_mask | kv_secondary_handle_tag),
+                        0u);
+   }
+
+   // Primary handles carry no tag.
+   BOOST_CHECK(!kv_handle_is_secondary(0u));
+   BOOST_CHECK(!kv_handle_is_secondary(1u));
+   BOOST_CHECK(!kv_handle_is_secondary(1023u));
+
+   // Reserved-bit guard: a fabricated handle with any reserved bit set throws.
+   BOOST_CHECK_NO_THROW(kv_handle_check_reserved_zero(0u));
+   BOOST_CHECK_NO_THROW(kv_handle_check_reserved_zero(1023u));
+   BOOST_CHECK_NO_THROW(kv_handle_check_reserved_zero(kv_make_secondary_handle(5u)));
+   BOOST_CHECK_THROW(kv_handle_check_reserved_zero(0x00000400u), kv_invalid_iterator); // bit 10
+   BOOST_CHECK_THROW(kv_handle_check_reserved_zero(0x00020000u), kv_invalid_iterator); // bit 17
+   BOOST_CHECK_THROW(kv_handle_check_reserved_zero(0x40000000u), kv_invalid_iterator); // bit 30
+}
+
+// kv_idx_update uses db.modify, which preserves the chainbase id but can move
+// the object's sort position. Verify that invalidate_cache clears cached_id
+// only on the matching secondary slot and leaves stored key bytes and status
+// intact for the slow re-seek path.
+BOOST_AUTO_TEST_CASE(kv_secondary_iterator_pool_invalidate_cache) {
+   kv_secondary_iterator_pool pool;
+
+   const uint16_t users_idx       = compute_table_id("users.byname");
+   const uint16_t users_idx_other = compute_table_id("users.byage");
+   const uint16_t things_idx      = compute_table_id("things.byname");
+
+   uint32_t h_sec          = pool.allocate("test"_n, users_idx);
+   uint32_t h_other_idx_a  = pool.allocate("test"_n, things_idx);
+   uint32_t h_other_idx_b  = pool.allocate("test"_n, users_idx_other);
+   uint32_t h_other_code   = pool.allocate("alt"_n,  users_idx);
+   uint32_t h_other_id     = pool.allocate("test"_n, users_idx);
+
+   const int64_t target_id = 42;
+   const int64_t other_id  = 99;
+
+   auto seed = [](kv_secondary_slot& s, int64_t id) {
+      s.status = kv_it_stat::iterator_ok;
+      s.current_sec_key.assign({'a','l','i','c','e'});
+      s.current_pri_key.assign({'\x00','\x01'});
+      s.cached_id = id;
+   };
+
+   seed(pool.get(h_sec),          target_id);
+   seed(pool.get(h_other_idx_a),  target_id);
+   seed(pool.get(h_other_idx_b),  target_id);
+   seed(pool.get(h_other_code),   target_id);
+   seed(pool.get(h_other_id),     other_id);
+
+   pool.invalidate_cache("test"_n, users_idx, target_id);
+
+   // Matching slot: cached_id cleared, key bytes and status preserved.
+   const auto& matched = pool.get(h_sec);
+   BOOST_CHECK_EQUAL(matched.cached_id, -1);
+   BOOST_CHECK(matched.status == kv_it_stat::iterator_ok);
+   BOOST_CHECK_EQUAL(matched.current_sec_key.size(), 5u);
+   BOOST_CHECK_EQUAL(matched.current_pri_key.size(), 2u);
+
+   // Slots that differ in any of code/table_id/id are untouched.
+   BOOST_CHECK_EQUAL(pool.get(h_other_idx_a).cached_id, target_id);
+   BOOST_CHECK_EQUAL(pool.get(h_other_idx_b).cached_id, target_id);
+   BOOST_CHECK_EQUAL(pool.get(h_other_code).cached_id,  target_id);
+   BOOST_CHECK_EQUAL(pool.get(h_other_id).cached_id,    other_id);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

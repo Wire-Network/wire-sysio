@@ -2,6 +2,7 @@
 #include <sysio/producer_plugin/block_timing_util.hpp>
 #include <sysio/producer_plugin/production_pause_vote_tracker.hpp>
 #include <sysio/producer_plugin/trx_priority_db.hpp>
+#include <sysio/chain/authorization_manager.hpp>
 #include <sysio/chain/plugin_interface.hpp>
 #include <sysio/chain/global_property_object.hpp>
 #include <sysio/chain/snapshot.hpp>
@@ -100,6 +101,10 @@ public:
       reset_window_size_in_num_blocks = size;
    }
 
+   // Blame every per-action first-authorizer for a failed trx — shared authorization
+   // over multi-action trxs implies shared responsibility for the failure. This is
+   // broader than the legacy single-blame model (trx-level first_authorizer only) and
+   // intentionally mirrors the per-action shared-billing design.
    void add(const action_payers_t& payers, const fc::exception& e) {
       for (const auto& p: payers) {
          auto& fa = failed_accounts[p];
@@ -110,6 +115,10 @@ public:
 
 
    // return true if exceeds max_failures_per_account and should be dropped
+   // Incrementing num_failures on a trx we're already dropping is intentional: it
+   // tracks the magnitude of abusive traffic within the reset window so that
+   // report_and_clear can log proportionally. The cap against max_failures_per_account
+   // only gates whether the trx is dropped, not whether the counter continues.
    account_name failure_limit(const action_payers_t& payers) {
       for (const auto& payer : payers) {
          auto fitr = failed_accounts.find(payer);
@@ -658,21 +667,101 @@ public:
       return {chain.head().id(), chain.calculate_integrity_hash()};
    }
 
-   void create_snapshot(producer_plugin::next_function<chain::snapshot_scheduler::snapshot_information> next) {
-      chain::controller& chain = chain_plug->chain();
+   void submit_snapshot_vote(const snapshot_scheduler::snapshot_information& si) {
+      if (_snapshot_provider_account.empty()) return;
 
-      auto reschedule = fc::make_scoped_exit([this]() { schedule_production_loop(); });
+      try {
+         chain::controller& chain = chain_plug->chain();
 
-      auto predicate = [&]() -> void {
-         if (chain.is_building_block()) {
-            // abort the pending block
-            abort_block();
-         } else {
-            reschedule.cancel();
+         auto snap_account_name = chain::name(_snapshot_provider_account);
+
+         // Build the votesnaphash action
+         chain::action vote_action;
+         vote_action.account = chain::config::system_account_name;
+         vote_action.name = chain::name("votesnaphash");
+         vote_action.authorization = {{snap_account_name, chain::config::active_name}};
+         // Parameter order must match votesnaphash(name, checksum256, checksum256) in snapshot_attest.hpp.
+         // root_hash is fc::crypto::blake3 (32 bytes) which is binary-compatible with checksum256.
+         vote_action.data = fc::raw::pack(
+            std::make_tuple(snap_account_name, si.head_block_id, si.root_hash));
+
+         // Build the transaction
+         chain::signed_transaction trx;
+         trx.actions.emplace_back(std::move(vote_action));
+         trx.expiration = fc::time_point_sec(chain.head().block_time() + fc::seconds(30));
+         trx.set_reference_block(chain.head().id());
+
+         // Determine the required signing keys for the snapshot provider account's active authority
+         auto& sig_plug = app().get_plugin<signature_provider_manager_plugin>();
+         auto wire_sig_providers = sig_plug.query_providers(
+            std::nullopt, std::nullopt, chain::crypto::chain_key_type_wire);
+
+         // Collect available public keys
+         flat_set<chain::public_key_type> candidate_keys;
+         std::map<chain::public_key_type, fc::crypto::private_key> key_map;
+         for (auto& sig_prov : wire_sig_providers) {
+            if (sig_prov->private_key.has_value()) {
+               candidate_keys.insert(sig_prov->public_key);
+               key_map[sig_prov->public_key] = *sig_prov->private_key;
+            }
          }
-      };
 
-      _snapshot_scheduler.create_snapshot(std::move(next), chain, predicate);
+         // Use authorization_manager to find which keys satisfy snap_account@active
+         auto required_keys = chain.get_authorization_manager().get_required_keys(
+            trx, candidate_keys);
+
+         if (required_keys.empty()) {
+            elog("Snapshot provider: no signing key available for {}@active votesnaphash transaction",
+                 _snapshot_provider_account);
+            return;
+         }
+
+         for (const auto& key : required_keys) {
+            trx.sign(key_map.at(key), chain.get_chain_id());
+         }
+
+         auto packed_trx = std::make_shared<chain::packed_transaction>(std::move(trx));
+
+         // Submit via incoming transaction async method.
+         // return_failure_traces=true so we can inspect trace->error_code on assertion failures.
+         app().get_method<chain::plugin_interface::incoming::methods::transaction_async>()(
+            packed_trx, true /*api_trx*/,
+            chain::transaction_metadata::trx_type::input,
+            true /*return_failure_traces*/,
+            [](const chain::next_function_variant<chain::transaction_trace_ptr>& result) {
+               if (std::holds_alternative<fc::exception_ptr>(result)) {
+                  auto& ex = std::get<fc::exception_ptr>(result);
+                  fc_elog(_log, "Snapshot provider: votesnaphash transaction failed: {}", ex->to_detail_string());
+               } else {
+                  auto trace = std::get<chain::transaction_trace_ptr>(result);
+                  if (trace && trace->except) {
+                     // Check for snapshot hash disagreement via error code.
+                     // snap_hash_disagreement_error (9001) is defined in snapshot_attest.hpp
+                     // and emitted by the votesnaphash action's check() call.
+                     constexpr uint64_t snap_hash_disagreement_error = 9001;
+                     if (trace->error_code && *trace->error_code == snap_hash_disagreement_error) {
+                        fc_elog(_log, "FATAL: Snapshot hash disagreement detected (error code {})! "
+                                      "This node's snapshot differs from the attested record. Shutting down.",
+                                      snap_hash_disagreement_error);
+                        app().quit();
+                     } else {
+                        fc_elog(_log, "Snapshot provider: votesnaphash transaction failed: {}",
+                                 trace->except->to_detail_string());
+                     }
+                  } else if (trace && trace->receipt) {
+                     fc_ilog(_log, "Snapshot provider: votesnaphash submitted successfully for block {}", trace->block_num);
+                  }
+               }
+            });
+
+         ilog("Snapshot provider: submitting votesnaphash for block {} with root hash {}",
+              si.head_block_num, si.root_hash.str());
+
+      } catch (const fc::exception& e) {
+         elog("Snapshot provider: failed to submit vote: {}", e.to_detail_string());
+      } catch (const std::exception& e) {
+         elog("Snapshot provider: failed to submit vote: {}", e.what());
+      }
    }
 
    void update_runtime_options(const producer_plugin::runtime_options& options);
@@ -710,9 +799,25 @@ public:
    std::set<chain::account_name>                     _producers;
    chain::db_read_mode                               _db_read_mode = db_read_mode::HEAD;
    pending_block_mode                                _pending_block_mode = pending_block_mode::speculating;
+   // Tracks blocks signed during the current producing round so we can summarize on-head-vs-orphaned at round exit.
+   struct producing_round_state {
+      account_name                producer;
+      block_timestamp_type        round_start;
+      block_num_type              first_block_num{};
+      std::vector<block_id_type>  signed_blocks;
+   };
+   std::optional<producing_round_state>              _producing_round;
    unapplied_transaction_queue                       _unapplied_transactions;
    alignas(hardware_destructive_interference_sz)
    std::atomic<int32_t>                              _max_transaction_time_ms; // modified by app thread, read by net_plugin thread pool
+   // Floor for the speculative-retry CPU cap applied in push_transaction(). That cap is normally
+   // 2x the transaction's previously measured wall-clock cost, which guards against "producer bombs"
+   // (transactions that speculate cheaply but consume large CPU when produced into a block). For very
+   // cheap transactions, however, 2x prev_elapsed can fall below the run-to-run wall-clock variance of
+   // re-execution during fork catch-up or node load, dropping a valid forked-out transaction (the only
+   // copy on this node, never rebroadcast) instead of re-applying it. Flooring the cap lets cheap
+   // transactions absorb that variance while still bounding the CPU a bomb can consume before rejection.
+   static constexpr fc::microseconds                 _speculative_retry_min_cpu_cap{5000}; // 5 ms
    alignas(hardware_destructive_interference_sz)
    std::atomic<uint32_t>                             _received_block{0};       // modified by net_plugin thread pool
    implicit_production_pause_vote_tracker            _implicit_pause_vote_tracker;
@@ -764,6 +869,10 @@ public:
 
    // async snapshot scheduler
    snapshot_scheduler _snapshot_scheduler;
+
+   // snapshot provider configuration
+   std::string _snapshot_provider_account;
+   static constexpr uint32_t _snapshot_provider_block_spacing = 25000;
 
    std::function<void(speculative_block_metrics)> _update_speculative_block_metrics;
 
@@ -927,20 +1036,28 @@ public:
 
       auto& chain = chain_plug->chain();
 
+      const block_handle fhead = chain.fork_db_head();
+
+      // While producing our own block, normally defer applying incoming blocks to avoid disrupting
+      // production mid-block. Exception: if the fork-database best head carries a strong QC for a
+      // block not in our applied head's ancestry, our head's branch can no longer form a QC that
+      // wins fork-choice -- continuing to produce on it is pointless and the resulting blocks would
+      // be orphaned at the next fork switch. In that case fall through and apply blocks now.
       if (in_producing_mode()) {
-         if (_log.is_enabled(fc::log_level::info)) {
-            auto fhead = chain.fork_db_head();
+         if (!fhead.locks_out_branch_of(chain.head())) {
             fc_ilog(_log, "producing, fork database head at: #{} id: {}",
                     fhead.block_num(), fhead.id());
+            _time_tracker.add_other_time();
+            // return complete as we are producing and don't want to be interrupted right now. Next start_block will
+            // give an opportunity for this incoming block to be processed.
+            return {};
          }
-         _time_tracker.add_other_time();
-         // return complete as we are producing and don't want to be interrupted right now. Next start_block will
-         // give an opportunity for this incoming block to be processed.
-         return {};
+         fc_ilog(_log, "applying blocks while producing: head's branch is locked out of fork-choice by a strong QC at fork-db head #{} {}",
+                 fhead.block_num(), fhead.id());
       }
 
       // no reason to abort_block if we have nothing ready to process
-      if (chain.head().id() == chain.fork_db_head().id()) {
+      if (chain.head().id() == fhead.id()) {
          return {}; // nothing to do
       }
 
@@ -1062,17 +1179,16 @@ public:
       auto is_transient = (trx_type == transaction_metadata::trx_type::read_only || trx_type == transaction_metadata::trx_type::dry_run);
       if (!is_transient) {
          next = [this, trx, next{std::move(next)}](next_function_variant<transaction_trace_ptr>&& response) {
-            // Extract the ack metadata (cheap shared_ptr copies) before moving the
-            // variant into the inner next; that keeps both consumers correct under
-            // the rvalue-only contract without an extra variant copy.
+            // Publish before invoking next so the one-shot callback is the wrapper's last act; a throw from publish
+            // would otherwise re-enter next via the outer CATCH_AND_CALL after captures were already consumed.
             fc::exception_ptr except_ptr; // rejected
             if (std::holds_alternative<fc::exception_ptr>(response)) {
                except_ptr = std::get<fc::exception_ptr>(response);
             } else if (std::get<transaction_trace_ptr>(response)->except) {
-               except_ptr = std::get<transaction_trace_ptr>(response)->except->dynamic_copy_exception();
+               except_ptr = std::get<transaction_trace_ptr>(response)->except;
             }
-            next(std::move(response));
             _transaction_ack_channel.publish(priority::low, std::pair<fc::exception_ptr, packed_transaction_ptr>(except_ptr, trx));
+            next(std::move(response));
          };
       }
 
@@ -1354,6 +1470,8 @@ void producer_plugin::set_program_options(
           "Disable subjective CPU billing for API transactions")
          ("snapshots-dir", bpo::value<std::filesystem::path>()->default_value("snapshots"),
           "the location of the snapshots directory (absolute path or relative to application data dir)")
+         ("snapshot-provider-account", bpo::value<std::string>()->default_value(""),
+          "Account name used to sign and submit votesnaphash transactions. When set, enables snapshot provider mode. Cannot be used alongside producer-name.")
          ("read-only-threads", bpo::value<uint32_t>(),
          ("Number of worker threads in read-only execution thread pool. Defaults to 0 if configured as producer, otherwise defaults to "s + std::to_string(producer_plugin_impl::_ro_default_threads_nonproducer) + ". Max "s + std::to_string(producer_plugin_impl::_ro_max_threads_allowed) + "."s).c_str())
          ("read-only-write-window-time-us", bpo::value<uint32_t>()->default_value(my->_ro_write_window_time_us.count()),
@@ -1598,6 +1716,18 @@ void producer_plugin_impl::plugin_initialize(const boost::program_options::varia
    _snapshot_scheduler.set_db_path(_snapshots_dir);
    _snapshot_scheduler.set_snapshots_path(_snapshots_dir);
 
+   // Snapshot provider configuration
+   _snapshot_provider_account = options.at("snapshot-provider-account").as<std::string>();
+   if (!_snapshot_provider_account.empty()) {
+      SYS_ASSERT(!is_configured_producer(), plugin_config_exception,
+                 "snapshot-provider-account cannot be used alongside producer-name");
+
+      _snapshot_scheduler.add_snapshot_finalized_callback(
+         [this](const snapshot_scheduler::snapshot_information& si) {
+            submit_snapshot_vote(si);
+         });
+   }
+
    SYS_ASSERT(!is_configured_producer() || !irreversible_mode(), plugin_config_exception,
               "node cannot have any producer-name configured because block production is impossible when read_mode is \"irreversible\"");
 
@@ -1647,6 +1777,33 @@ void producer_plugin_impl::plugin_startup() {
             app().quit();
          }
       }));
+
+      // Auto-schedule periodic snapshots for snapshot provider mode.
+      // All providers use the same block_spacing so they snapshot at identical heights.
+      // The scheduler fires when (height - start_block_num - 1) % block_spacing == 0,
+      // so set start_block_num = block_spacing - 1 to trigger at exact multiples:
+      // blocks 25000, 50000, 75000, ...
+      if (!_snapshot_provider_account.empty()) {
+         snapshot_scheduler::snapshot_request_information sri;
+         sri.block_spacing = _snapshot_provider_block_spacing;
+         sri.start_block_num = _snapshot_provider_block_spacing - 1;
+         sri.end_block_num = std::numeric_limits<uint32_t>::max();
+         sri.snapshot_description = "snapshot-provider auto";
+
+         // The auto-schedule is persisted to snapshot-schedule.json and reloaded by set_db_path()
+         // on restart, so only schedule it when an identical request is not already present;
+         // otherwise schedule_snapshot() would throw duplicate_snapshot_request on every restart.
+         if (auto existing = _snapshot_scheduler.find_snapshot_request(sri.block_spacing, sri.start_block_num, sri.end_block_num)) {
+            ilog("Snapshot provider mode: reusing persisted auto-schedule for every {} blocks (request id {})",
+                 _snapshot_provider_block_spacing, *existing);
+         } else {
+            // scheduled (non create_snapshot) requests store no completion callback; the produced
+            // snapshots are observed through add_snapshot_finalized_callback (provider-mode voting)
+            auto result = _snapshot_scheduler.schedule_snapshot(sri, {});
+            ilog("Snapshot provider mode: auto-scheduled snapshots every {} blocks (request id {})",
+                 _snapshot_provider_block_spacing, result.snapshot_request_id);
+         }
+      }
 
       if (is_configured_producer()) { // track votes if producer to verify votes are being processed
          auto on_vote_signal = [this]( const vote_signal_params& vote_signal ) {
@@ -1845,7 +2002,34 @@ producer_plugin::integrity_hash_information producer_plugin::get_integrity_hash(
 }
 
 void producer_plugin::create_snapshot(producer_plugin::next_function<chain::snapshot_scheduler::snapshot_information> next) {
-   my->create_snapshot(std::move(next));
+   chain::controller& chain = my->chain_plug->chain();
+   const auto head_block_num = chain.head().block_num();
+
+   auto reschedule = fc::make_scoped_exit([my=my]() { my->schedule_production_loop(); });
+
+   if (chain.is_building_block()) {
+      // abort the pending block
+      my->abort_block();
+   } else {
+      reschedule.cancel();
+   }
+
+   if(chain.get_read_mode() == db_read_mode::IRREVERSIBLE) {
+      // /v1/producer/create_snapshot is expected to immediately create a snapshot. When in irreversible mode this
+      // can't be completely faked by scheduling to create on the next start_block as a start_block might never happen.
+      // Create snapshot directly. Since in irreversible mode it can't be forked out there is no need to have the
+      // snapshot scheduler schedule the snapshot, just create it here and now.
+      my->_snapshot_scheduler.create_snapshot(std::move(next), chain);
+   } else {
+      // setup for execute on the next start block
+      chain::snapshot_scheduler::snapshot_request_information sri = {
+         .block_spacing   = 0,
+         .start_block_num = head_block_num + 1,
+         .end_block_num   = std::numeric_limits<uint32_t>::max(),
+         .snapshot_description = ""
+      };
+      my->_snapshot_scheduler.schedule_snapshot(sri, std::move(next));
+   }
 }
 
 chain::snapshot_scheduler::snapshot_schedule_result
@@ -1864,7 +2048,10 @@ producer_plugin::schedule_snapshot(const chain::snapshot_scheduler::snapshot_req
    if(sri.end_block_num == 0)
       sri.end_block_num = std::numeric_limits<uint32_t>::max();
 
-   return my->_snapshot_scheduler.schedule_snapshot(sri);
+   // validation errors are thrown to the HTTP caller; store no completion callback so execution
+   // results of scheduled snapshots are logged by the scheduler as before (only create_snapshot
+   // requests carry a response callback)
+   return my->_snapshot_scheduler.schedule_snapshot(sri, {});
 }
 
 chain::snapshot_scheduler::snapshot_schedule_result
@@ -1874,6 +2061,14 @@ producer_plugin::unschedule_snapshot(const chain::snapshot_scheduler::snapshot_r
 
 chain::snapshot_scheduler::get_snapshot_requests_result producer_plugin::get_snapshot_requests() const {
    return my->_snapshot_scheduler.get_snapshot_requests();
+}
+
+void producer_plugin::add_snapshot_finalized_callback(chain::snapshot_scheduler::snapshot_finalized_callback_t cb) {
+   my->_snapshot_scheduler.add_snapshot_finalized_callback(std::move(cb));
+}
+
+std::filesystem::path producer_plugin::get_snapshots_dir() const {
+   return my->_snapshots_dir;
 }
 
 producer_plugin::scheduled_protocol_feature_activations producer_plugin::get_scheduled_protocol_feature_activations() const {
@@ -2170,7 +2365,7 @@ producer_plugin_impl::determine_pending_block_mode(const fc::time_point& now,
          if (now < start_block_time) {
             _pending_block_mode = pending_block_mode::speculating;
             fc_dlog(_log, "Not starting block until {}", start_block_time);
-            schedule_delayed_production_loop(weak_from_this(), start_block_time);
+            schedule_delayed_production_loop(this->weak_from_this(), start_block_time);
             return start_block_result::waiting_for_production;
          }
       }
@@ -2227,13 +2422,27 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block() {
 
       // producers need to be able to start producing on schedule, do not apply blocks as it might take a long time to apply
       // unless head not a child of pending lib, as there is no reason ever to produce on a branch that is not a child of pending lib
-      while (in_speculating_mode() || !chain.is_head_descendant_of_pending_lib()) {
+      // also apply when fork_db head is ahead of our applied head on the same chain -- producing on a stale head when the
+      // canonical chain has already moved on just orphans our blocks at the next fork switch (under Savanna fork choice
+      // by latest_qc_block_timestamp, the chain that finalized first wins regardless of who built locally)
+      auto fork_db_ahead_on_same_chain = [&]() {
+         return chain.fork_db_head().extends(head.id());
+      };
+      while (in_speculating_mode() || !chain.is_head_descendant_of_pending_lib() || fork_db_ahead_on_same_chain()) {
          if (is_configured_producer())
-            schedule_delayed_production_loop(weak_from_this(), _pending_block_deadline); // interrupt apply_blocks at deadline
+            schedule_delayed_production_loop(this->weak_from_this(), _pending_block_deadline); // interrupt apply_blocks at deadline
 
          auto result = apply_blocks();
-         if (result.status == controller::apply_blocks_result_t::status_t::complete && result.num_blocks_applied == 0)
+         if (result.num_blocks_applied == 0) {
+            // No progress: either nothing to apply (status complete), or apply was interrupted on a block that
+            // cannot complete within deadline (e.g., infinite trx). Exit the loop -- retrying would hit the same
+            // wall, blocking the main thread from servicing net_plugin and fork-choice updates that could deliver
+            // a better head. In producing mode, fall through to produce on the current head (a competing block at
+            // the same height, which fork choice can then prefer over the unapplyable one by timestamp).
+            if (in_speculating_mode() && result.status != controller::apply_blocks_result_t::status_t::complete)
+               return start_block_result::waiting_for_block;
             return start_block_result::succeeded;
+         }
 
          head = chain.head();
          if (head.block_num() == chain.get_pause_at_block_num())
@@ -2265,6 +2474,34 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block() {
    }
 
    _time_tracker.clear(); // make sure we start tracking block time after `apply_blocks()`
+
+   // Round transition diagnostics: at round-start slots, summarize the previous round (if any) and log entry for the
+   // new one. On-head check uses head.extends, valid for blocks still above LIB which is true at next-round-start;
+   // sub-second fork switches after round end could shift the count by a block or two.
+   const bool round_start_slot =
+      (block_timestamp_type(block_time).slot % chain::config::producer_repetitions) == 0;
+   if (round_start_slot) {
+      if (_producing_round) {
+         size_t on_head = 0;
+         for (const auto& id : _producing_round->signed_blocks) {
+            if (head.id() == id || head.extends(id))
+               ++on_head;
+         }
+         const auto signed_count = _producing_round->signed_blocks.size();
+         ilog("Round complete for {} starting #{} at {}: signed {}, on head {}, orphaned {}",
+              _producing_round->producer, _producing_round->first_block_num, _producing_round->round_start,
+              signed_count, on_head, signed_count - on_head);
+         _producing_round.reset();
+      }
+      if (in_producing_mode()) {
+         const auto fhead = chain.fork_db_head();
+         ilog("Entering producing round for {} at {}: head #{} {}, fhead #{} {}, {} blocks unapplied",
+              scheduled_producer.producer_name, block_time, head.block_num(), head.id().short_id(),
+              fhead.block_num(), fhead.id().short_id(), fhead.block_num() - head.block_num());
+         _producing_round.emplace(scheduled_producer.producer_name, block_time, head.block_num() + 1);
+         _producing_round->signed_blocks.reserve(config::producer_repetitions);
+      }
+   }
 
    const auto& preprocess_deadline = _pending_block_deadline;
 
@@ -2534,6 +2771,14 @@ producer_plugin_impl::push_result producer_plugin_impl::push_transaction(const f
    auto start = fc::time_point::now();
    SYS_ASSERT(!trx->is_read_only(), producer_exception, "Unexpected read-only trx");
 
+   // The subjective_billing::_disabled flag is temporarily mutated below to pass
+   // per-trx context into transaction_context without changing chain APIs. This is
+   // safe only while all mutations happen on a single thread and there is no
+   // re-entrance. Read-only trx threads do NOT reach this path (they assert
+   // !is_read_only() above and take the ro path in handle_push_result with
+   // disable_subjective_enforcement set explicitly).
+   assert(app().executor().get_main_thread_id() == std::this_thread::get_id());
+
    chain::controller&         chain           = chain_plug->chain();
    chain::subjective_billing& subjective_bill = chain.get_mutable_subjective_billing();
 
@@ -2591,6 +2836,15 @@ producer_plugin_impl::push_result producer_plugin_impl::push_transaction(const f
                  chain.head().block_num() + 1, get_pending_block_producer(), prev_elapsed, block_cpu_limit, trx->id());
          return pr;
       }
+
+      // elapsed can be set on failure, but prev_succeeded indicates a real cost
+      // measurement -- only then is 2x prev_elapsed a sound cap on this retry.
+      // Floor the cap at _speculative_retry_min_cpu_cap: for very cheap trxs, 2x prev_elapsed is below
+      // the wall-clock variance of re-execution during fork catch-up / node load and would otherwise
+      // drop a valid forked-out trx; the floor still bounds the CPU a producer bomb can consume.
+      if (trx->prev_succeeded) {
+         max_trx_time = std::min(max_trx_time, std::max(prev_elapsed * 2, _speculative_retry_min_cpu_cap));
+      }
    }
 
    auto trace = chain.push_transaction(trx, block_deadline, max_trx_time);
@@ -2645,8 +2899,7 @@ producer_plugin_impl::handle_push_result(const transaction_metadata_ptr&        
             if (return_failure_trace) {
                next(trace);
             } else {
-               auto e_ptr = trace->except->dynamic_copy_exception();
-               next(e_ptr);
+               next(trace->except);
             }
          }
       }
@@ -2775,7 +3028,13 @@ void producer_plugin_impl::schedule_production_loop() {
       _timer.async_wait([this, cid = ++_timer_corelation_id](const boost::system::error_code& ec) {
          if (ec != boost::asio::error::operation_aborted && cid == _timer_corelation_id) {
             interrupt_transaction(controller::interrupt_t::all_trx);
-            app().executor().post(priority::high, exec_queue::read_write, [this]() {
+            // Recheck cid in the posted lambda: another schedule_* call may have bumped _timer_corelation_id between the
+            // timer firing and the post running. Same pattern as schedule_maybe_produce_block / schedule_delayed_production_loop.
+            app().executor().post(priority::high, exec_queue::read_write, [this, cid]() {
+               if (cid != _timer_corelation_id) {
+                  fc_dlog(_log, "Failed-start retry timer expired, skipping");
+                  return;
+               }
                schedule_production_loop();
             });
          }
@@ -2786,7 +3045,7 @@ void producer_plugin_impl::schedule_production_loop() {
          fc_dlog(_log, "Waiting till another block is received and scheduling Speculative/Production Change");
          auto wake_time = block_timing_util::calculate_producer_wake_up_time(_produce_block_cpu_effort, chain.head().block_num(), calculate_pending_block_time(),
                                                                              _producers, chain.head_active_producers().producers);
-         schedule_delayed_production_loop(weak_from_this(), wake_time);
+         schedule_delayed_production_loop(this->weak_from_this(), wake_time);
       } else {
          fc_tlog(_log, "Waiting till another block is received");
          // nothing to do until more blocks arrive
@@ -2808,7 +3067,7 @@ void producer_plugin_impl::schedule_production_loop() {
          // if wake time has already passed then use the block deadline instead
          wake_time = _pending_block_deadline;
       }
-      schedule_delayed_production_loop(weak_from_this(), wake_time);
+      schedule_delayed_production_loop(this->weak_from_this(), wake_time);
    } else {
       fc_dlog(_log, "Speculative Block Created");
    }
@@ -2826,8 +3085,7 @@ void producer_plugin_impl::schedule_maybe_produce_block(bool exhausted) {
    if (!exhausted && deadline > fc::time_point::now()) {
       // ship this block off no later than its deadline
       SYS_ASSERT(chain.is_building_block(), missing_pending_block_state, "producing without pending_block_state, start_block succeeded");
-      std::chrono::time_point<std::chrono::system_clock> wake_time{std::chrono::microseconds{deadline.time_since_epoch().count()}};
-      _timer.expires_at(wake_time);
+      _timer.expires_at(deadline.to_system_clock());
       fc_dlog(_log, "Scheduling Block Production on Normal Block #{} for {}",
               chain.head().block_num() + 1, deadline);
    } else {
@@ -2862,12 +3120,21 @@ void producer_plugin_impl::schedule_delayed_production_loop(const std::weak_ptr<
                                                             std::optional<fc::time_point>              wake_up_time) {
    if (wake_up_time) {
       fc_dlog(_log, "Scheduling Speculative/Production Change at {}", *wake_up_time);
-      std::chrono::time_point<std::chrono::system_clock> wake_time{std::chrono::microseconds{wake_up_time->time_since_epoch().count()}};
-      _timer.expires_at(wake_time);
+      _timer.expires_at(wake_up_time->to_system_clock());
       _timer.async_wait([this, cid = ++_timer_corelation_id](const boost::system::error_code& ec) {
          if (ec != boost::asio::error::operation_aborted && cid == _timer_corelation_id) {
             interrupt_transaction(controller::interrupt_t::all_trx);
-            app().executor().post(priority::high, exec_queue::read_write, [this]() {
+            // Recheck cid inside the posted lambda: between the timer callback firing and the executor
+            // running this lambda, another schedule_* call may have bumped _timer_corelation_id (typically
+            // the schedule_maybe_produce_block invoked after the next start_block). If we ran
+            // schedule_production_loop unconditionally here, the inner schedule_delayed_production_loop
+            // call would bump cid again and starve the just-scheduled produce_block timer. Mirrors the
+            // pattern schedule_maybe_produce_block uses.
+            app().executor().post(priority::high, exec_queue::read_write, [this, cid]() {
+               if (cid != _timer_corelation_id) {
+                  fc_dlog(_log, "Speculative/Production Change timer expired, skipping");
+                  return;
+               }
                schedule_production_loop();
             });
          }
@@ -2894,7 +3161,7 @@ bool producer_plugin_impl::maybe_produce_block() {
    // block failed to produce, wait until the next block to try again
    block_timestamp_type block_time = calculate_pending_block_time();
    fc_dlog(_log, "Not starting block until {}", block_time);
-   schedule_delayed_production_loop(weak_from_this(), block_time);
+   schedule_delayed_production_loop(this->weak_from_this(), block_time);
 
    return false;
 }
@@ -2960,6 +3227,8 @@ void producer_plugin_impl::produce_block() {
    chain.commit_block();
 
    const signed_block_ptr new_b = chain.head().block();
+   if (_producing_round)
+      _producing_round->signed_blocks.push_back(chain.head().id());
    fc::time_point now = fc::time_point::now();
    _time_tracker.add_other_time(now);
    _time_tracker.report(new_b->block_num(), new_b->producer, now);
@@ -3122,8 +3391,7 @@ void producer_plugin_impl::switch_to_read_window() {
             // https://github.com/Wire-Network/wire-sysio/pull/202. Keep a large timeout with error
             // to provide an error if this does ever hang/timeout again.
             const fc::time_point safe_guard_deadline = _ro_window_deadline + fc::seconds(3); // give plenty of time for slow ci
-            const std::chrono::time_point<std::chrono::system_clock> deadline{
-               std::chrono::microseconds{safe_guard_deadline.time_since_epoch().count()}};
+            const auto deadline = safe_guard_deadline.to_system_clock();
             // use future to make sure all read-only tasks finished before switching to write window
             for (auto& task : _ro_exec_tasks_fut) {
                if (std::future_status::timeout != task.wait_until(deadline)) {

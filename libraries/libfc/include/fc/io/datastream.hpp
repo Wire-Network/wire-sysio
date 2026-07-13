@@ -211,6 +211,52 @@ private:
    std::vector<char> mirror;
 };
 
+/**
+ * Datastream wrapper that confines reads to an upper bound of bytes taken from the underlying
+ * stream. A read or skip that would cross the bound throws a range error instead of consuming
+ * bytes beyond it, leaving the underlying stream untouched for that read.
+ *
+ * The motivating use is a length-prefixed frame parser reading from a buffer that may already
+ * hold the next, pipelined frame. Without a bound, an under-length frame can satisfy missing
+ * fields from bytes belonging to the following frame (a cross-frame overread). Wrapping the
+ * underlying stream in a bounded_datastream sized to the declared frame length isolates the
+ * parser to its own payload: any attempt to read past the declared length throws rather than
+ * silently spilling into the next frame.
+ *
+ * @tparam DataStream datastream to wrap
+ */
+template <typename DataStream>
+class bounded_datastream {
+public:
+   bounded_datastream( DataStream& ds, size_t limit ) : ds(ds), remaining_(limit) {}
+
+   void skip( size_t s ) {
+      if( s > remaining_ )
+         detail::throw_datastream_range_error( "skip", remaining_, int64_t(s - remaining_) );
+      ds.skip(s);
+      remaining_ -= s;
+   }
+   bool read( char* d, size_t s ) {
+      if( s > remaining_ )
+         detail::throw_datastream_range_error( "read", remaining_, int64_t(s - remaining_) );
+      if( ds.read(d, s) ) {
+         remaining_ -= s;
+         return true;
+      }
+      return false;
+   }
+
+   bool get( unsigned char& c ) { return read( (char*)&c, 1 ); }
+   bool get( char& c ) { return read( &c, 1 ); }
+
+   /// Bytes still readable before the bound is reached.
+   size_t remaining() const { return remaining_; }
+
+private:
+   DataStream& ds;
+   size_t      remaining_;
+};
+
 
 template<typename ST>
 inline datastream<ST>& operator<<(datastream<ST>& ds, const __int128& d) {

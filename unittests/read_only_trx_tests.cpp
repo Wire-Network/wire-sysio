@@ -2,6 +2,7 @@
 #include <boost/test/unit_test.hpp>
 #include <sysio/testing/tester.hpp>
 #include <sysio/chain/global_property_object.hpp>
+#include <sysio/chain/subjective_billing.hpp>
 #include <fc/variant_object.hpp>
 #include <test_contracts.hpp>
 
@@ -145,7 +146,7 @@ BOOST_FIXTURE_TEST_CASE(linkauth_test, read_only_trx_tester) { try {
    produce_blocks( 1 );
 
    name account = "alice"_n;
-   name code = "sysio_token"_n;
+   name code = "sysio.token"_n;
    name type = "transfer"_n;
    name requirement = "first"_n;
    action act = {
@@ -160,7 +161,7 @@ BOOST_FIXTURE_TEST_CASE(unlinkauth_test, read_only_trx_tester) { try {
    produce_blocks( 1 );
 
    name account = "alice"_n;
-   name code = "sysio_token"_n;
+   name code = "sysio.token"_n;
    name type = "transfer"_n;
    action act = {
       vector<permission_level>{{config::system_account_name,config::active_name}},
@@ -317,6 +318,40 @@ BOOST_FIXTURE_TEST_CASE(sequence_numbers_test, read_only_trx_tester) { try {
    BOOST_CHECK_EQUAL( prev_global_action_sequence, p.global_action_sequence );
    BOOST_CHECK_EQUAL( prev_recv_sequence, receiver_account->recv_sequence );
    BOOST_CHECK_EQUAL( prev_auth_sequence, amo->auth_sequence );
+} FC_LOG_AND_RETHROW() }
+
+// Read-only trxs that throw inside the contract must NOT add to subjective billing.
+// Pre-fix the exception handler in controller_impl::push_transaction called
+// transaction_context::update_billed_cpu_time, which fired
+// `assert(!first_auth.empty())` before reaching the read-only / implicit guard
+// at the bottom of the function.  The fix hoists the gating predicate to the
+// top so read-only trxs short-circuit billing entirely (objective and subjective);
+// this test locks in the invariant by sending a read-only trx with empty auths
+// that throws inside the contract and asserting subjective billing stays at zero.
+BOOST_FIXTURE_TEST_CASE(read_only_throw_no_subjective_billing, read_only_trx_tester) { try {
+   set_up_test_contract();
+
+   const auto& subj_bill = control->get_subjective_billing();
+   const auto now = fc::time_point::now();
+
+   // Baseline: no subjective billing for any account that could plausibly be billed
+   // (alice as the test signer for non-read-only trxs, noauthtable as the contract).
+   BOOST_CHECK_EQUAL( 0, subj_bill.get_subjective_bill("alice"_n,       now).count() );
+   BOOST_CHECK_EQUAL( 0, subj_bill.get_subjective_bill("noauthtable"_n, now).count() );
+
+   // Read-only `getage` against a non-existent record throws inside the contract with
+   // an empty trx-level and action-level first_authorizer.  Pre-fix this aborted via
+   // assertion failure inside the controller's exception handler.
+   BOOST_CHECK_EXCEPTION(
+      send_db_api_transaction("getage"_n, getage_data, {}, transaction_metadata::trx_type::read_only),
+      fc::exception, [](const fc::exception& e) {
+         return expect_assert_message(e, "Record does not exist");
+      });
+
+   // After the read-only failure, subjective billing must still be zero: read-only
+   // trxs are never billed (objective or subjective), even when they fail.
+   BOOST_CHECK_EQUAL( 0, subj_bill.get_subjective_bill("alice"_n,       now).count() );
+   BOOST_CHECK_EQUAL( 0, subj_bill.get_subjective_bill("noauthtable"_n, now).count() );
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()

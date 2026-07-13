@@ -68,7 +68,7 @@ This allows a single unified message format across all supported chains.
 | Category | Types | Purpose |
 |----------|-------|---------|
 | **Operator Management** | `OPERATOR_ACTION`, `BATCH_OPERATOR_NEXT_GROUP`, `SLASH_OPERATOR` | Operator registration, rotation, penalties |
-| **Staking** | `STAKE_UPDATE`, `PRETOKEN_STAKE_CHANGE`, `NATIVE_YIELD_REWARD` | Cross-chain staking and yield distribution |
+| **Staking** | `STAKING_REWARD` | Per-staker cross-chain yield distribution (validator-staking lifecycle types are reserved but deferred post-launch) |
 | **Swaps & Liquidity** | `SWAP`, `UNDERWRITE_INTENT`, `UNDERWRITE_CONFIRM`, `REMIT` | Cross-chain swaps backed by underwriter collateral |
 | **Governance** | `CHALLENGE_REQUEST`, `CHALLENGE_RESPONSE`, `EPOCH_SYNC`, `ROSTER_UPDATE` | Dispute resolution and epoch synchronization |
 | **Reserves** | `RESERVE_BALANCE_SHEET` | Collateral snapshots across chains |
@@ -86,6 +86,8 @@ Elected via Appointed Proof of Stake (APoS). They validate transactions and prod
 - Delivering inbound envelopes to `sysio.msgch`
 - Building and submitting outbound envelopes to external chains
 - Responding to challenges if disputed
+
+Signing keys for outbound submissions can be held locally (`KEY:`) or in a `kiod` daemon (`KIOD:`) — both built into `signature_provider_manager_plugin`. AWS KMS support (`KMS:` — secp256k1 asymmetric keys) is provided by the `kms/` sub-library co-located with the plugin and is opted in by the host application: link `sigprov_kms` and call `signature_provider_manager_plugin::register_spec_handler("KMS", &sysio::sigprov::kms::create_kms_provider)` from `main()` before `app().initialize(...)`. See `plugins/signature_provider_manager_plugin/kms/test/README.md` for KMS key setup, IAM requirements, the `KMS:` spec format, and operational notes. AWS SSM Parameter Store support (`SSM:` — all key types) is the same pattern via the sibling `ssm/` sub-library: the private key is fetched from a KMS-encrypted `SecureString` parameter once at startup and signing is local thereafter, fast enough for every signing path including block production. `nodeop` registers it out of the box. See `plugins/signature_provider_manager_plugin/ssm/test/README.md` for parameter setup, IAM requirements, the `SSM:` spec format, and rotation notes.
 
 ### Underwriters
 Independent operators running the `underwriter_plugin`. They provide collateral-backed liquidity for cross-chain swaps:
@@ -114,7 +116,7 @@ Independent operators running the `underwriter_plugin`. They provide collateral-
 | **OPP.sol** | Message sender — collects attestations in send mode, builds merkle trees, emits `OPPMessage` / `OPPEpoch` events |
 | **OPPInbound.sol** | Message receiver — validates consensus, verifies merkle proofs, routes attestations to handlers |
 | **OperatorRegistry.sol** | Maps operators to roles, keys, and status for identity validation |
-| **BAR.sol** (Bond Agreement Registry) | Receives collateral bonds, emits `OPERATOR_ACTION` attestations |
+| **BAR.sol** (Bond Agreement Registry) | Records validator / node-owner bonds; operator-collateral `OPERATOR_ACTION` emission has moved to `OperatorRegistry.sol` |
 | **IOPPReceiver implementations** | Domain-specific handlers (Depositor, Pool, Pretoken) that process individual attestation types |
 
 ---

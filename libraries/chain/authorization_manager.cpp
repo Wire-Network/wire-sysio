@@ -81,25 +81,48 @@ namespace sysio { namespace chain {
                              "Permission {}@{} contains unactivated key type", row.owner, row.name);
                }
 
-               if (row.parent != permission_name()) {
-                  const auto& parent = db.get<permission_object, by_owner>(boost::make_tuple(row.owner, row.parent));
-                  SYS_ASSERT(parent.id != 0, snapshot_exception, "Unexpected mapping to reserved permission 0");
-                  value.parent = parent.id;
+               // Reject structurally invalid authorities: unsorted or duplicate keys/accounts, or a
+               // threshold no weight combination can satisfy. newaccount and updateauth enforce the
+               // same predicate at creation, so any row failing it is corrupt or hand-crafted --
+               // except the three permissions genesis deliberately creates permanently unsatisfiable:
+               // sysio.null@owner, sysio.null@active, and sysio.prods@owner, each holding exactly
+               // genesis_empty_authority(), which validate() rejects as threshold-unreachable. Their
+               // unsatisfiability means updateauth can never have altered them, so the exemption is
+               // scoped to exactly those rows with exactly that value; an empty authority anywhere
+               // else (or any other invalid value on these rows) fails the check like the corrupt
+               // row it is.
+               const bool deliberately_empty =
+                  row.auth == genesis_empty_authority() &&
+                  ((row.owner == config::null_account_name &&
+                    (row.name == config::owner_name || row.name == config::active_name)) ||
+                   (row.owner == config::producers_account_name && row.name == config::owner_name));
+               SYS_ASSERT(deliberately_empty || validate(row.auth), snapshot_exception,
+                          "Permission {}@{} has invalid authority", row.owner, row.name);
 
-                  // Walk parent chain to root -- parents have lower IDs so are already loaded
-                  uint32_t depth = 1;
-                  auto cur_parent = parent.parent;
-                  while (cur_parent._id != 0) {
-                     ++depth;
-                     SYS_ASSERT(depth <= config::default_max_auth_depth, snapshot_exception, // 6
-                                "Permission {}@{} exceeds max authority depth -- possible circular parent",
-                                row.owner, row.name);
-                     const auto* pp = db.find<permission_object>(cur_parent);
-                     SYS_ASSERT(pp != nullptr, snapshot_exception,
-                                "Permission {}@{} parent chain references non-existent permission",
-                                row.owner, row.name);
-                     cur_parent = pp->parent;
-                  }
+               if (row.parent != permission_name()) {
+                  // Parents resolve by (owner, name) against rows already inserted, so a row whose
+                  // parent is not yet present is corrupt: either it references a permission that
+                  // exists nowhere (dangling), or the rows form a parent cycle (in a valid snapshot
+                  // ids strictly decrease toward the root, so every ancestor precedes its children;
+                  // a cycle necessarily places some parent after its child). This is O(1) per row --
+                  // a previous per-row ancestry walk made snapshot load quadratic in an account's
+                  // permission-chain depth. Chain depth itself is intentionally NOT capped: nothing
+                  // limits it at creation (updateauth builds arbitrarily deep trees), so a load-time
+                  // depth cap would reject snapshots of honest chains. config::default_max_auth_depth
+                  // seeds max_authority_depth, which bounds authority *satisfaction* recursion -- a
+                  // different axis -- and must not be reused here.
+                  const auto* parent = db.find<permission_object, by_owner>(boost::make_tuple(row.owner, row.parent));
+                  SYS_ASSERT(parent != nullptr, snapshot_exception,
+                             "Permission {}@{} references parent {} not loaded earlier in the snapshot"
+                             " -- dangling parent or parent cycle",
+                             row.owner, row.name, row.parent);
+                  SYS_ASSERT(parent->id != 0, snapshot_exception, "Unexpected mapping to reserved permission 0");
+                  // Rows insert in id order, so a resolved parent always carries a lower id than the
+                  // row being loaded. Guards the ordering assumption above against future loader changes.
+                  SYS_ASSERT(parent->id < value.id, snapshot_exception,
+                             "Permission {}@{} resolved a parent with a higher id -- snapshot rows are"
+                             " not in creation order", row.owner, row.name);
+                  value.parent = parent->id;
                }
             }
          }
@@ -133,6 +156,7 @@ namespace sysio { namespace chain {
          using section_t = typename decltype(utils)::index_t::value_type;
 
          snapshot->read_section<section_t>([this, &read_row_count]( auto& section ) {
+            decltype(utils)::preallocate(_db, section.row_count());
             bool more = !section.empty();
             while(more) {
                decltype(utils)::create(_db, [this, &section, &more]( auto &row ) {
@@ -319,24 +343,19 @@ namespace sysio { namespace chain {
       const auto& auth = auths[0];
 
 
-      // Prevents users from updating / adding protected 'ex.*' permissions.
-      if(update.permission.prefix() == name("ex")) {
-         SYS_ASSERT( auth.actor == name("sysio") || auth.actor == name("sysio.authex"), invalid_permission, "Protected permission namespace. Only 'sysio' can update or add 'ex.*' permissions." );
-      } else {
-         SYS_ASSERT( (auth.actor == update.account), irrelevant_auth_exception,
-                     "the owner of the affected permission needs to be the actor of the declared authorization" );
+      SYS_ASSERT( (auth.actor == update.account), irrelevant_auth_exception,
+                  "the owner of the affected permission needs to be the actor of the declared authorization" );
 
-         const auto* min_permission = find_permission({update.account, update.permission});
-         if( !min_permission ) { // creating a new permission
-            min_permission = &get_permission({update.account, update.parent});
-         }
-
-         SYS_ASSERT( get_permission(auth).satisfies( *min_permission,
-                                                   _db.get_index<permission_index>().indices() ),
-                     irrelevant_auth_exception,
-                     "updateauth action declares irrelevant authority '{}'; minimum authority is {}",
-                     auth, permission_level{update.account, min_permission->name} );
+      const auto* min_permission = find_permission({update.account, update.permission});
+      if( !min_permission ) { // creating a new permission
+         min_permission = &get_permission({update.account, update.parent});
       }
+
+      SYS_ASSERT( get_permission(auth).satisfies( *min_permission,
+                                                  _db.get_index<permission_index>().indices() ),
+                  irrelevant_auth_exception,
+                  "updateauth action declares irrelevant authority '{}'; minimum authority is {}",
+                  auth, permission_level{update.account, min_permission->name} );
    }
 
    void authorization_manager::check_deleteauth_authorization( const deleteauth& del,
@@ -467,7 +486,8 @@ namespace sysio { namespace chain {
          }
 
          account_name payer;
-         for( const auto& [i, declared_auth] : std::views::enumerate(act.authorization) ) {
+         for( size_t i = 0; i < act.authorization.size(); ++i ) {
+            const auto& declared_auth = act.authorization[i];
 
             checktime();
 
@@ -482,12 +502,15 @@ namespace sysio { namespace chain {
             if( !special_case ) {
                auto min_permission_name = lookup_minimum_permission(declared_auth.actor, act.account, act.name);
                if( min_permission_name ) { // since special cases were already handled, it should only be false if the permission is sysio.any
-                  const auto& min_permission = get_permission({declared_auth.actor, *min_permission_name});
-                  SYS_ASSERT( get_permission(declared_auth).satisfies( min_permission,
-                                                                       _db.get_index<permission_index>().indices() ),
-                              irrelevant_auth_exception,
-                              "action declares irrelevant authority '{}'; minimum authority is {}",
-                              declared_auth, permission_level{min_permission.owner, min_permission.name} );
+                  // If the declared permission matches the minimum, it trivially satisfies — skip DB lookups and hierarchy walk
+                  if( declared_auth.permission != *min_permission_name ) {
+                     const auto& min_permission = get_permission({declared_auth.actor, *min_permission_name});
+                     SYS_ASSERT( get_permission(declared_auth).satisfies( min_permission,
+                                                                          _db.get_index<permission_index>().indices() ),
+                                 irrelevant_auth_exception,
+                                 "action declares irrelevant authority '{}'; minimum authority is {}",
+                                 declared_auth, permission_level{min_permission.owner, min_permission.name} );
+                  }
                }
             }
 

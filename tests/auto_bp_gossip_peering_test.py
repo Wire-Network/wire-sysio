@@ -46,23 +46,21 @@ cluster = Cluster(unshared=args.unshared, keepRunning=args.leave_running, keepLo
 cluster.setWalletMgr(walletMgr)
 
 def getHostName(nodeId):
-    port = cluster.p2pBasePort + nodeId
     if producer_name == 'defproducerf':
         hostname = 'ext-ip0:9999'
     else:
-        hostname = "localhost:" + str(port)
+        hostname = cluster.getNodeP2pEndpoint(nodeId)
     return hostname
 
 peer_names = {}
 for nodeId in range(0, producerNodes):
     producer_name = "defproducer" + chr(ord('a') + nodeId)
-    port = cluster.p2pBasePort + nodeId
     hostname = getHostName(nodeId)
     peer_names[hostname] = producer_name
 
-auto_bp_peer_arg = f" --p2p-auto-bp-peer defproducera,localhost:{cluster.p2pBasePort}"
+auto_bp_peer_arg = f" --p2p-auto-bp-peer defproducera,{cluster.getNodeP2pEndpoint(0)}"
 
-peer_names["localhost:9776"] = "bios"
+peer_names[cluster.getBiosP2pEndpoint()] = "bios"
 
 testSuccessful = False
 try:
@@ -87,7 +85,7 @@ try:
     extraNodeopArgs = " --production-pause-vote-timeout-ms 0 --plugin sysio::net_api_plugin "
 
     TestHelper.printSystemInfo("BEGIN")
-    cluster.launch(
+    if not cluster.launch(
         prodCount=producerCountInEachNode,
         totalNodes=totalNodes,
         pnodes=producerNodes,
@@ -96,7 +94,8 @@ try:
         topo="./tests/auto_bp_peering_test_shape.json",
         extraNodeopArgs=extraNodeopArgs,
         specificExtraNodeopArgs=specificNodeopArgs,
-    )
+    ):
+        errorExit("Failed to stand up cluster.")
 
     testWalletName="test"
     Print("Creating wallet \"%s\"" % (testWalletName))
@@ -218,7 +217,7 @@ try:
         "Timed out waiting for all gossip connections to be established"
 
     Print("Manual connect node_19 defproducert to node_04 defproducere")
-    cluster.nodes[19].processUrllibRequest("net", "connect", payload="localhost:9880", exitOnError=True)
+    cluster.nodes[19].processUrllibRequest("net", "connect", payload=cluster.getNodeP2pEndpoint(4), exitOnError=True)
 
     Print("Set new producers b,h,m,r")
     assert cluster.setProds(["defproducerb", "defproducerh", "defproducerm", "defproducerr"]), "setprods failed"

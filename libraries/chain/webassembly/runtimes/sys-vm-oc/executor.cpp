@@ -1,6 +1,7 @@
 #include <sysio/chain/webassembly/sys-vm-oc/executor.hpp>
 #include <sysio/chain/webassembly/sys-vm-oc/code_cache.hpp>
 #include <sysio/chain/webassembly/sys-vm-oc/memory.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/thread_exec_mem.hpp>
 #include <sysio/chain/webassembly/sys-vm-oc/intrinsic_mapping.hpp>
 #include <sysio/chain/webassembly/sys-vm-oc/intrinsic.hpp>
 #include <sysio/chain/webassembly/sys-vm-oc/sys-vm-oc.h>
@@ -75,7 +76,7 @@ notus:
 
 static intrinsic grow_memory_intrinsic SYSVMOC_INTRINSIC_INIT_PRIORITY("sysvmoc_internal.grow_memory", IR::FunctionType::get(IR::ResultType::i32,{IR::ValueType::i32,IR::ValueType::i32}),
   (void*)&sys_vm_oc_grow_memory,
-  std::integral_constant<std::size_t, find_intrinsic_index("sysvmoc_internal.grow_memory")>::value
+  require_intrinsic_index<find_intrinsic_index("sysvmoc_internal.grow_memory")>::value
 );
 
 //This is effectively overriding the sysio_exit intrinsic in wasm_interface
@@ -84,7 +85,7 @@ static void sysio_exit(int32_t code) {
    __builtin_unreachable();
 }
 static intrinsic sysio_exit_intrinsic("env.sysio_exit", IR::FunctionType::get(IR::ResultType::none,{IR::ValueType::i32}), (void*)&sysio_exit,
-  std::integral_constant<std::size_t, find_intrinsic_index("env.sysio_exit")>::value
+  require_intrinsic_index<find_intrinsic_index("env.sysio_exit")>::value
 );
 
 template <typename E>
@@ -97,7 +98,7 @@ static void throw_internal_exception(const E& e) {
 #define DEFINE_SYSVMOC_TRAP_INTRINSIC(module,name) \
 	void name(); \
 	static intrinsic name##Function SYSVMOC_INTRINSIC_INIT_PRIORITY(#module "." #name,IR::FunctionType::get(),(void*)&name, \
-     std::integral_constant<std::size_t, find_intrinsic_index(#module "." #name)>::value \
+     require_intrinsic_index<find_intrinsic_index(#module "." #name)>::value \
    ); \
 	void name()
 
@@ -135,7 +136,7 @@ static void sys_vm_oc_check_memcpy_params(int32_t dest, int32_t src, int32_t len
 
 static intrinsic check_memcpy_params_intrinsic("sysvmoc_internal.check_memcpy_params", IR::FunctionType::get(IR::ResultType::none,{IR::ValueType::i32,IR::ValueType::i32,IR::ValueType::i32}),
   (void*)&sys_vm_oc_check_memcpy_params,
-  std::integral_constant<std::size_t, find_intrinsic_index("sysvmoc_internal.check_memcpy_params")>::value
+  require_intrinsic_index<find_intrinsic_index("sysvmoc_internal.check_memcpy_params")>::value
 );
 
 struct executor_signal_init {
@@ -280,5 +281,7 @@ executor::~executor() {
    sys_vm_oc_setgs(0);
    munmap(code_mapping, code_mapping_size);
 }
+
+thread_local thread_exec_mem::ro_thread_exec_mem thread_exec_mem::ro_thread_state{};
 
 } // namespace sysio::chain::sysvmoc

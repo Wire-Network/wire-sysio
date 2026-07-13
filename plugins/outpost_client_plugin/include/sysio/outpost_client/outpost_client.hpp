@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
 #include <format>
 #include <memory>
@@ -12,6 +13,11 @@
 #include <sysio/opp/opp.hpp>
 
 namespace sysio {
+
+/// Cross-chain hard cap for a serialized OPP envelope accepted from an outpost.
+/// This mirrors the Solana program's `MAX_ENVELOPE_BYTES` and the e2e-supported
+/// WIRE / Ethereum / Solana envelope boundary.
+inline constexpr size_t OPP_MAX_ENVELOPE_BYTES = 65'536;
 
 /**
  * @brief Chain-agnostic facade for OPP delivery on a single external outpost.
@@ -36,7 +42,7 @@ public:
    virtual sysio::opp::types::ChainKind chain_kind() const = 0;
 
    /// Outpost id assigned by `sysio.epoch::regoutpost`.
-   virtual uint64_t outpost_id() const = 0;
+   virtual uint64_t chain_code() const = 0;
 
    /// Numeric chain id on the target chain. Anvil = 31337, ETH mainnet = 1,
    /// Solana = 0 (Solana has no numeric chain id; clusters are identified by
@@ -44,15 +50,15 @@ public:
    virtual uint32_t chain_id() const = 0;
 
    /// Human-readable identifier safe to embed in log lines and metrics.
-   /// Canonical format: `{outpost_id}:{ChainKind_Name}:{chain_id}`
-   /// e.g. `"0:CHAIN_KIND_ETHEREUM:31337"` or `"1:CHAIN_KIND_SOLANA:0"`.
+   /// Canonical format: `{chain_code}:{ChainKind_Name}:{chain_id}`
+   /// e.g. `"0:CHAIN_KIND_EVM:31337"` or `"1:CHAIN_KIND_SVM:0"`.
    ///
    /// The default implementation derives the string from the other three
    /// getters — concretes only override when they want a chain-specific
    /// supplement (e.g. cluster name for Solana). Virtual, not pure.
    virtual std::string to_string() const {
       return std::format("{}:{}:{}",
-                         outpost_id(),
+                         chain_code(),
                          sysio::opp::types::ChainKind_Name(chain_kind()),
                          chain_id());
    }
@@ -95,6 +101,39 @@ public:
     */
    virtual std::vector<char> read_inbound_envelope(uint32_t         epoch_index,
                                                    fc::microseconds deadline) = 0;
+
+   /**
+    * @brief UNDERWRITER COMMIT — relay a signed `UnderwriteIntentCommit` (UIC)
+    *        to this outpost as an opaque bytes blob.
+    *
+    * Called by the underwriter plugin (or any future plugin that issues
+    * outpost-side commits) to deliver a signed intent without the caller
+    * knowing the outpost's contract surface, ABI / IDL layout, or message
+    * encoding. The chain-specific concrete resolves which contract or
+    * program action to invoke, how to encode the bytes for the wire, and
+    * how to await on-chain confirmation.
+    *
+    * Returns only after on-chain inclusion + confirmations — the caller
+    * uses the return value as a "this leg landed" signal before recording
+    * the commit locally. Late-arriving commits (after consensus has already
+    * been reached for the underlying envelope) are benign no-ops on the
+    * outpost side per `opp-consensus.md`; they still confirm here.
+    *
+    * @param uw_request_id  The depot's `sysio.uwrit::uwreqs` row id this
+    *                       UIC is committing to. Used only for log
+    *                       correlation; the on-chain call carries only
+    *                       the opaque bytes.
+    * @param uic_bytes      Serialized `UnderwriteIntentCommit` (protobuf
+    *                       encoded, signed by the underwriter's WIRE K1
+    *                       key).
+    * @param deadline       Upper bound on the total time spent talking to
+    *                       the remote chain for this call.
+    * @return Chain-native tx id / signature suitable for logs.
+    * @throws fc::exception on RPC failure, tx revert, or deadline expiry.
+    */
+   virtual std::string uw_commit(uint64_t                 uw_request_id,
+                                 const std::vector<char>& uic_bytes,
+                                 fc::microseconds         deadline) = 0;
 
 protected:
    /// Throw `fc::timeout_exception` if the wall-clock has crossed `deadline_abs`.

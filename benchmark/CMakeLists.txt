@@ -17,3 +17,8 @@ target_compile_definitions( benchmark
       TOKEN_ABI_PATH="${CMAKE_SOURCE_DIR}/contracts/sysio.token/sysio.token.abi"
       SYSTEM_ABI_PATH="${CMAKE_SOURCE_DIR}/contracts/sysio.system/sysio.system.abi"
 )
+
+# Standalone dedup head-to-head benchmark. Links only sysio_chain + chainbase (no testing
+# harness / contracts), so it builds without the system-contract WASMs. Not built by default.
+add_executable( dedup_bench EXCLUDE_FROM_ALL dedup/dedup_bench.cpp )
+target_link_libraries( dedup_bench sysio_chain chainbase fc )

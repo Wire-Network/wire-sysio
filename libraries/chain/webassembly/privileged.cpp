@@ -22,7 +22,7 @@ namespace sysio { namespace chain { namespace webassembly {
       SYS_ASSERT( false, unsupported_feature, "Unsupported Hardfork Detected" );
    }
 
-   void interface::preactivate_feature( legacy_ptr<const digest_type> feature_digest ) {
+   void interface::preactivate_feature( aligned_ptr<const digest_type> feature_digest ) {
       SYS_ASSERT(!context.trx_context.is_read_only(), wasm_execution_error, "preactivate_feature not allowed in a readonly transaction");
       context.control.preactivate_feature( *feature_digest, context.trx_context.is_transient() );
    }
@@ -37,50 +37,48 @@ namespace sysio { namespace chain { namespace webassembly {
       }
    }
 
-   void interface::get_resource_limits( account_name account, legacy_ptr<int64_t> ram_bytes, legacy_ptr<int64_t> net_weight, legacy_ptr<int64_t> cpu_weight ) const {
+   void interface::get_resource_limits( account_name account, aligned_ptr<int64_t> ram_bytes, aligned_ptr<int64_t> net_weight, aligned_ptr<int64_t> cpu_weight ) const {
       context.control.get_resource_limits_manager().get_account_limits( account, *ram_bytes, *net_weight, *cpu_weight);
-      (void)legacy_ptr<int64_t>(std::move(ram_bytes));
-      (void)legacy_ptr<int64_t>(std::move(net_weight));
-      (void)legacy_ptr<int64_t>(std::move(cpu_weight));
+      (void)aligned_ptr<int64_t>(std::move(ram_bytes));
+      (void)aligned_ptr<int64_t>(std::move(net_weight));
+      (void)aligned_ptr<int64_t>(std::move(cpu_weight));
    }
 
    int64_t set_proposed_producers_common( apply_context& context, vector<producer_authority>&& producers ) {
-      SYS_ASSERT(producers.size() <= config::max_producers, wasm_execution_error, "Producer schedule exceeds the maximum producer count for this chain");
-      SYS_ASSERT( producers.size() > 0, wasm_execution_error, "Producer schedule cannot be empty" );
-
-      using key_type = fc::crypto::public_key::key_type;
-
-      // check that producers are unique
-      std::set<account_name> unique_producers;
-      for (const auto& p: producers) {
-         SYS_ASSERT( context.is_account(p.producer_name), wasm_execution_error, "producer schedule includes a nonexisting account" );
-         std::visit([&p](const auto& a) {
-            uint32_t sum_weights = 0;
-            std::set<public_key_type> unique_keys;
-            for (const auto& kw: a.keys ) {
-               SYS_ASSERT( kw.key.contains_type(key_type::k1, key_type::r1), unactivated_key_type,
-                           "Unactivated key type used in proposed producer schedule");
-               SYS_ASSERT( kw.key.valid(), wasm_execution_error, "producer schedule includes an invalid key" );
-
-               if (std::numeric_limits<uint32_t>::max() - sum_weights <= kw.weight) {
-                  sum_weights = std::numeric_limits<uint32_t>::max();
-               } else {
-                  sum_weights += kw.weight;
-               }
-
-               unique_keys.insert(kw.key);
-            }
-
-            SYS_ASSERT( a.keys.size() == unique_keys.size(), wasm_execution_error, "producer schedule includes a duplicated key for {}", p.producer_name);
-            SYS_ASSERT( a.threshold > 0, wasm_execution_error, "producer schedule includes an authority with a threshold of 0 for {}", p.producer_name);
-            SYS_ASSERT( sum_weights >= a.threshold, wasm_execution_error, "producer schedule includes an unsatisfiable authority for {}", p.producer_name);
-         }, p.authority);
-
-         unique_producers.insert(p.producer_name);
+      // Structural validation (bounds, uniqueness, per-authority key/threshold sanity)
+      // lives on proposer_policy::validate() so the snapshot-load path and this
+      // intrinsic enforce identical invariants. Move the producers into a policy
+      // shell for validation and re-use the shell's vector for the subsequent
+      // per-producer checks and the final downstream call — avoids a copy.
+      proposer_policy candidate;
+      candidate.proposer_schedule.producers = std::move(producers);
+      try {
+         candidate.validate();
+      } catch (const producer_schedule_exception& e) {
+         SYS_THROW(wasm_execution_error, "set_proposed_producers: {}", e.top_message());
       }
-      SYS_ASSERT( producers.size() == unique_producers.size(), wasm_execution_error, "duplicate producer name in producer schedule" );
 
-      return context.control.set_proposed_producers( context.trx_context, std::move(producers) );
+      // Remaining checks that don't belong in proposer_policy::validate():
+      //   - account existence (requires apply_context)
+      //   - K1/R1 key type enforcement (uses unactivated_key_type to convey
+      //     that non-K1/R1 keys need a protocol feature to be activated — a
+      //     distinct category from structural validation errors)
+      //   - key.valid() semantics
+      using key_type = fc::crypto::public_key::key_type;
+      for (const auto& p : candidate.proposer_schedule.producers) {
+         SYS_ASSERT(context.is_account(p.producer_name), wasm_execution_error,
+                    "producer schedule includes a nonexisting account");
+         std::visit([](const auto& a) {
+            for (const auto& kw : a.keys) {
+               SYS_ASSERT(kw.key.contains_type(key_type::k1, key_type::r1), unactivated_key_type,
+                          "Unactivated key type used in proposed producer schedule");
+               SYS_ASSERT(kw.key.valid(), wasm_execution_error, "producer schedule includes an invalid key");
+            }
+         }, p.authority);
+      }
+
+      return context.control.set_proposed_producers( context.trx_context,
+                                                     std::move(candidate.proposer_schedule.producers) );
    }
 
    uint32_t interface::get_wasm_parameters_packed( span<char> packed_parameters, uint32_t max_version ) const {
@@ -114,7 +112,7 @@ namespace sysio { namespace chain { namespace webassembly {
          }
       );
    }
-   int64_t interface::set_proposed_producers( legacy_span<const char> packed_producer_schedule) {
+   int64_t interface::set_proposed_producers( span<const char> packed_producer_schedule) {
       SYS_ASSERT(!context.trx_context.is_read_only(), wasm_execution_error, "set_proposed_producers not allowed in a readonly transaction");
       fc::datastream<const char*> ds( packed_producer_schedule.data(), packed_producer_schedule.size() );
       std::vector<producer_authority> producers;
@@ -131,7 +129,7 @@ namespace sysio { namespace chain { namespace webassembly {
       return set_proposed_producers_common( context, std::move(producers) );
    }
 
-   int64_t interface::set_proposed_producers_ex( uint64_t packed_producer_format, legacy_span<const char> packed_producer_schedule) {
+   int64_t interface::set_proposed_producers_ex( uint64_t packed_producer_format, span<const char> packed_producer_schedule) {
       SYS_ASSERT(!context.trx_context.is_read_only(), wasm_execution_error, "set_proposed_producers_ex not allowed in a readonly transaction");
       if (packed_producer_format == 0) {
          return set_proposed_producers(std::move(packed_producer_schedule));
@@ -168,42 +166,33 @@ namespace sysio { namespace chain { namespace webassembly {
       finalizer_policy abi_finpol;
       fc::raw::unpack(ds, abi_finpol);
 
-      std::vector<finalizer_authority>& finalizers = abi_finpol.finalizers;
-
-      SYS_ASSERT( finalizers.size() <= config::max_finalizers, wasm_execution_error,
-                  "Finalizer policy exceeds the maximum finalizer count for this chain" );
-      SYS_ASSERT( finalizers.size() > 0, wasm_execution_error, "Finalizers cannot be empty" );
-
-      std::set<fc::crypto::bls::public_key> unique_finalizer_keys;
-
-      uint64_t weight_sum = 0;
-
+      // Transform the ABI-provided payload into the chain-level finalizer_policy.
+      // The per-key length check stays here because it is a wire-format guard on the
+      // ABI input shape, not a property of the stored policy (the chain-level
+      // bls_public_key type enforces size=96 at construction).
       chain::finalizer_policy finpol;
       finpol.threshold = abi_finpol.threshold;
-      for (auto& f: finalizers) {
-         SYS_ASSERT( f.description.size() <= config::max_finalizer_description_size, wasm_execution_error,
-                     "Finalizer description greater than {}", config::max_finalizer_description_size );
-         SYS_ASSERT(std::numeric_limits<uint64_t>::max() - weight_sum >= f.weight, wasm_execution_error,
-                    "sum of weights causes uint64_t overflow");
-         weight_sum += f.weight;
+      finpol.finalizers.reserve(abi_finpol.finalizers.size());
+      for (auto& f: abi_finpol.finalizers) {
          SYS_ASSERT(f.public_key.size() == 96, wasm_execution_error, "Invalid bls public key length");
          fc::crypto::bls::public_key pk(std::span<const uint8_t,96>(f.public_key.data(), 96));
-         SYS_ASSERT( unique_finalizer_keys.insert(pk).second, wasm_execution_error,
-                     "Duplicate public key: {}", fc::json::to_log_string(pk) );
          finpol.finalizers.push_back(chain::finalizer_authority{.description = std::move(f.description),
                                                                 .weight = f.weight,
                                                                 .public_key{pk}});
       }
 
-      SYS_ASSERT( weight_sum >= finpol.threshold && finpol.threshold > weight_sum / 2, wasm_execution_error,
-                  "Finalizer policy threshold ({}) must be greater than half of the sum of the weights ({}), "
-                  "and less than or equal to the sum of the weights",
-                  finpol.threshold, weight_sum );
+      // Structural validation is factored into finalizer_policy::validate() so the
+      // snapshot-load path and this intrinsic enforce identical invariants.
+      try {
+         finpol.validate();
+      } catch (const invalid_finalizer_policy_exception& e) {
+         SYS_THROW(wasm_execution_error, "set_finalizers: {}", e.top_message());
+      }
 
       context.trx_context.set_proposed_finalizers( std::move(finpol) );
    }
 
-   uint32_t interface::get_blockchain_parameters_packed( legacy_span<char> packed_blockchain_parameters ) const {
+   uint32_t interface::get_blockchain_parameters_packed( span<char> packed_blockchain_parameters ) const {
       auto& gpo = context.control.get_global_properties();
 
       const chain::chain_config_v0& cfg = gpo.configuration;
@@ -218,7 +207,7 @@ namespace sysio { namespace chain { namespace webassembly {
       return 0;
    }
 
-   void interface::set_blockchain_parameters_packed( legacy_span<const char> packed_blockchain_parameters ) {
+   void interface::set_blockchain_parameters_packed( span<const char> packed_blockchain_parameters ) {
       SYS_ASSERT(!context.trx_context.is_read_only(), wasm_execution_error, "set_blockchain_parameters_packed not allowed in a readonly transaction");
       fc::datastream<const char*> ds( packed_blockchain_parameters.data(), packed_blockchain_parameters.size() );
       chain::chain_config_v0 cfg;

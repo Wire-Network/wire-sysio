@@ -6,7 +6,7 @@ void payloadless::doit() {
    print("Im a payloadless action");
 }
 
-constexpr size_t cpu_prime_max = 15375u;
+constexpr size_t cpu_prime_max = 1024u;
 
 bool is_prime(int p) {
    if (p == 2) {
@@ -42,10 +42,10 @@ bool is_mersenne_prime(int p) {
 void payloadless::doitslow() {
    print("Im a payloadless slow action");
 
+   volatile size_t cpu_work_sink = 0;
    for (size_t p = 2; p <= cpu_prime_max; p += 1) {
       if (is_prime(p) && is_mersenne_prime(p)) {
-         // We need to keep an eye on this to make sure it doesn't get optimized out. So far so good.
-         //sysio::print_f(" %u", p);
+         cpu_work_sink += p;
       }
    }
 }
@@ -55,12 +55,11 @@ void payloadless::doitforever() {
    constexpr size_t max_cpu_prime = std::numeric_limits<size_t>::max();
 
    while (true) {
+      volatile size_t cpu_work_sink = 0;
       for (size_t p = 2; p <= max_cpu_prime; p += 1) {
          if (is_prime(p) && is_mersenne_prime(p)) {
-            // We need to keep an eye on this to make sure it doesn't get optimized out. So far so good.
-            //sysio::print_f(" %u", p);
+            cpu_work_sink += p;
          }
       }
    }
 }
-

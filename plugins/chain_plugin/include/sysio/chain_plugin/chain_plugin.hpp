@@ -12,6 +12,7 @@
 #include <sysio/chain/account_object.hpp>
 #include <sysio/chain/block.hpp>
 #include <sysio/chain/controller.hpp>
+#include <sysio/chain/database_utils.hpp>
 #include <sysio/chain/kv_table_objects.hpp>
 #include <sysio/chain/resource_limits.hpp>
 #include <sysio/chain/transaction.hpp>
@@ -264,8 +265,9 @@ class read_only : public api_base {
    struct table_rows_phase1 {
       chain::abi_def              abi;
       std::string                 tbl_name;
-      std::vector<std::string>    key_names;
-      std::vector<std::string>    key_types;
+      /// Resolved BE-key decode plan (one shape per declared key field); unset when the
+      /// table's key type is unrepresentable, in which case Phase 2 emits hex keys.
+      std::optional<std::vector<chain::be_key_codec::key_shape>> key_shapes;
       size_t                      scope_key_count = 0;
       bool                        json            = true;
       bool                        show_payer      = false;

@@ -43,19 +43,42 @@ jobs:
     steps:
       - name: Setup Input Params
         id: overrides
+        env:
+          # Untrusted workflow_dispatch overrides are passed as environment variables and are NEVER
+          # interpolated into the script body. GitHub expands ${{ }} before bash parses the script,
+          # so interpolating an override directly would let a value such as $(...) run as shell code.
+          # As env vars the values are inert data: bash does not re-evaluate command substitution
+          # found inside a variable's value. Mirrors the hardened wire-sysio build.yaml (WSA-094).
+          OVERRIDE_TEST_PARAMS: ${{ inputs.override-test-params }}
+          OVERRIDE_SYSIO: ${{ inputs.override-sysio }}
+          OVERRIDE_SYSIO_PRERELEASE: ${{ inputs.override-sysio-prerelease }}
         run: |
-          echo test-params=findMax testBpOpMode >> $GITHUB_OUTPUT
-          echo sysio-target="DEFAULT" >> $GITHUB_OUTPUT
-          echo sysio-prerelease="false" >> $GITHUB_OUTPUT
+          # Defense in depth: reject overrides carrying shell metacharacters. The sysio target is a
+          # ref/version (single token); test params are a space-separated argv string, so it gets a
+          # wider allow-list that still blocks every shell metacharacter, glob, quote and newline.
+          ref_re='^[A-Za-z0-9._/+-]+$'
+          params_re='^[A-Za-z0-9 ._/=:,+-]*$'
+          if [[ -n "$OVERRIDE_SYSIO" && ! "$OVERRIDE_SYSIO" =~ $ref_re ]]; then
+            echo "::error::Invalid override-sysio '$OVERRIDE_SYSIO'; only [A-Za-z0-9._/+-] are allowed." >&2
+            exit 1
+          fi
+          if [[ -n "$OVERRIDE_TEST_PARAMS" && ! "$OVERRIDE_TEST_PARAMS" =~ $params_re ]]; then
+            echo "::error::Invalid override-test-params '$OVERRIDE_TEST_PARAMS'; shell metacharacters are not allowed." >&2
+            exit 1
+          fi
 
-          if [[ "${{inputs.override-test-params}}" != "" ]]; then
-            echo test-params=${{inputs.override-test-params}} >> $GITHUB_OUTPUT
+          echo "test-params=findMax testBpOpMode" >> "$GITHUB_OUTPUT"
+          echo "sysio-target=DEFAULT" >> "$GITHUB_OUTPUT"
+          echo "sysio-prerelease=false" >> "$GITHUB_OUTPUT"
+
+          if [[ -n "$OVERRIDE_TEST_PARAMS" ]]; then
+            echo "test-params=$OVERRIDE_TEST_PARAMS" >> "$GITHUB_OUTPUT"
           fi
-          if [[ "${{inputs.override-sysio}}" != "" ]]; then
-            echo sysio-target=${{inputs.override-sysio}} >> $GITHUB_OUTPUT
+          if [[ -n "$OVERRIDE_SYSIO" ]]; then
+            echo "sysio-target=$OVERRIDE_SYSIO" >> "$GITHUB_OUTPUT"
           fi
-          if [[ "${{inputs.override-sysio-prerelease}}" == +(true|false) ]]; then
-            echo sysio-prerelease=${{inputs.override-sysio-prerelease}} >> $GITHUB_OUTPUT
+          if [[ "$OVERRIDE_SYSIO_PRERELEASE" == "true" || "$OVERRIDE_SYSIO_PRERELEASE" == "false" ]]; then
+            echo "sysio-prerelease=$OVERRIDE_SYSIO_PRERELEASE" >> "$GITHUB_OUTPUT"
           fi
 
   platform-cache:
@@ -139,9 +162,14 @@ jobs:
           ./build/bin/nodeop --full-version
           ./build/bin/clio version full
       - name: Run Performance Test
+        env:
+          # test-params is allow-list validated at the `v` job (no shell metacharacters) and passed
+          # via env; left UNQUOTED below so it still word-splits into the script's argv, without
+          # ${{ }} ever being expanded into the shell as code.
+          TEST_PARAMS: ${{needs.v.outputs.test-params}}
         run: |
           cd build
-          ./tests/PerformanceHarnessScenarioRunner.py ${{needs.v.outputs.test-params}}
+          ./tests/PerformanceHarnessScenarioRunner.py $TEST_PARAMS
       - name: Prepare results
         id: prep-results
         run: |

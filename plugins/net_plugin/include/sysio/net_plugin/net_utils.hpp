@@ -6,9 +6,12 @@
 
 #include <boost/asio/ip/address_v6.hpp>
 
+#include <set>
 #include <string>
+#include <string_view>
 #include <sstream>
 #include <regex>
+#include <vector>
 
 namespace sysio::net_utils {
 
@@ -20,6 +23,12 @@ namespace sysio::net_utils {
 // Allow for future extentions as well, hence 384.
 constexpr size_t max_p2p_address_length = 253 + 6 + 30;
 constexpr size_t max_handshake_str_length = 384;
+/// Address suffix for transaction-only p2p connections.
+inline constexpr std::string_view trx_connection_type = "trx";
+/// Address suffix for block-only p2p connections.
+inline constexpr std::string_view blk_connection_type = "blk";
+/// Length of a recognized p2p connection type suffix.
+inline constexpr size_t connection_type_length = 3;
 
 namespace detail {
 
@@ -134,11 +143,54 @@ namespace detail {
       if (host.empty() || port.empty()) return {};
 
       std::string type;
-      if (remainder.starts_with("blk") || remainder.starts_with("trx")) {
-         type = remainder.substr(0, 3);
+      if (remainder.starts_with(blk_connection_type) || remainder.starts_with(trx_connection_type)) {
+         type = remainder.substr(0, connection_type_length);
       }
 
       return {std::move(host), std::move(port), std::move(type)};
+   }
+
+   /// Connection traffic classes requested by local configuration or a peer's advertised endpoint.
+   enum class connection_type : char {
+      both,
+      transactions_only,
+      blocks_only
+   };
+
+   /// De-duplicate listen endpoints while preserving first-seen order so positionally paired
+   /// p2p-server-address values remain aligned with their p2p-listen-endpoint.
+   inline std::vector<std::string> dedupe_preserve_order(const std::vector<std::string>& addresses) {
+      std::vector<std::string> result;
+      result.reserve(addresses.size());
+      std::set<std::string> seen;
+      for (const auto& addr : addresses) {
+         if (seen.insert(addr).second) {
+            result.emplace_back(addr);
+         }
+      }
+      return result;
+   }
+
+   /// Return the requested connection type encoded in an address, or both when the address is invalid
+   /// or does not explicitly select transaction-only or block-only traffic.
+   inline connection_type type_from_address(const std::string& addr) {
+      const auto& [host, port, type] = split_host_port_type(addr);
+      if (host.empty() || type.empty()) {
+         return connection_type::both;
+      }
+      if (type == trx_connection_type) {
+         return connection_type::transactions_only;
+      }
+      if (type == blk_connection_type) {
+         return connection_type::blocks_only;
+      }
+      return connection_type::both;
+   }
+
+   /// Apply a peer's advertised type only when the local configuration has not already selected
+   /// transaction-only or block-only traffic.
+   inline connection_type narrow_connection_type(connection_type current, const std::string& peer_addr) {
+      return current == connection_type::both ? type_from_address(peer_addr) : current;
    }
 
    /// @return listen address and block sync rate limit (in bytes/sec) of address string

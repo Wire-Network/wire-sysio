@@ -21,7 +21,6 @@
 #include <fc/io/raw.hpp>
 
 #include <softfloat/softfloat.hpp>
-#include <compiler_builtins.hpp>
 #include <boost/asio.hpp>
 #include <fstream>
 #include <string.h>
@@ -92,11 +91,6 @@ namespace sysio { namespace chain {
 
    wasm_instantiated_module_interface::~wasm_instantiated_module_interface() = default;
    wasm_runtime_interface::~wasm_runtime_interface() = default;
-
-#ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
-   thread_local std::unique_ptr<sysvmoc::executor> wasm_interface_impl::sysvmoc_tier::exec{};
-   thread_local std::unique_ptr<sysvmoc::memory>   wasm_interface_impl::sysvmoc_tier::mem{};
-#endif
 
 std::istream& operator>>(std::istream& in, wasm_interface::vm_type& runtime) {
    std::string s;

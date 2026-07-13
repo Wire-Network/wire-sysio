@@ -17,8 +17,10 @@ namespace sysio {
  * concrete `outpost_client::deliver_outbound_envelope`.
  */
 struct outbound_envelope_record {
-   uint64_t          outpost_id        = 0;
+   uint64_t          chain_code        = 0;
    uint32_t          epoch_index       = 0;
+   /// Canonical epoch digest of the envelope (hex): keccak256 of `raw_envelope`, matching the
+   /// receiving outpost's consensus digest and the next emit's `previous_envelope_hash`.
    std::string       envelope_hash_hex;
    std::vector<char> raw_envelope;
 };
@@ -43,21 +45,21 @@ struct depot_ops {
     * holds no matching row (no outbound traffic this cycle).
     */
    virtual std::optional<outbound_envelope_record>
-   read_pending_outbound(uint64_t outpost_id, uint32_t epoch_index) = 0;
+   read_pending_outbound(uint64_t chain_code, uint32_t epoch_index) = 0;
 
    /**
     * Ask `sysio.msgch::envelopes` whether we already pushed a
     * `sysio.msgch::deliver` for this outpost in this epoch. Used to guard the
     * inbound path so a retrying cron job does not double-deliver.
     */
-   virtual bool has_delivered_envelope(uint64_t outpost_id, uint32_t epoch_index) = 0;
+   virtual bool has_delivered_envelope(uint64_t chain_code, uint32_t epoch_index) = 0;
 
    /**
     * Push `sysio.msgch::deliver` with the concatenated inbound envelope bytes.
     * Synchronous — blocks on the action's future until the configured
     * delivery timeout elapses.
     */
-   virtual void deliver_to_depot(uint64_t                 outpost_id,
+   virtual void deliver_to_depot(uint64_t                 chain_code,
                                  const std::vector<char>& raw_messages) = 0;
 
    /**
@@ -86,6 +88,24 @@ struct depot_ops {
     * Cached by the depot implementation; refreshed on the `epoch_tick` job.
     */
    virtual uint32_t current_epoch() const = 0;
+
+   /**
+    * True when wall-clock has advanced past the depot's `next_epoch_start` for
+    * the currently-cached epoch. Used by the outpost cranker to decide when
+    * a consensus-retry re-delivery is warranted on a stuck path-2 fallback
+    * case: once the WIRE depot's boundary has elapsed, the outpost-side
+    * boundary (same `epoch_duration_sec`) is also definitively past, so a
+    * re-delivery from an already-delivered operator can re-trigger the
+    * outpost's consensus evaluation and tip path-2 fallback. Without this
+    * gate the cranker would have to either re-deliver every tick (gas
+    * waste) or never re-deliver (chain stalls when initial deliveries fall
+    * short of unanimous). Mirrors the WIRE-side `sysio.msgch::chkcons`
+    * "time gate passed" check.
+    *
+    * Returns false when the cache is empty (pre-bootstrap) or when the
+    * boundary has not yet elapsed for the current epoch.
+    */
+   virtual bool is_epoch_boundary_past() const = 0;
 };
 
 } // namespace sysio

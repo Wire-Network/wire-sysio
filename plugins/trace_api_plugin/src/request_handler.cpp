@@ -3,10 +3,62 @@
 #include <algorithm>
 #include <numeric>
 
+#include <fc/container/flat.hpp>
 #include <fc/crypto/hex.hpp>
 #include <fc/io/json_stream.hpp>
 #include <fc/reflect/json_stream.hpp>
 #include <fc/variant_object.hpp>
+
+namespace sysio::trace_api {
+
+fc::mutable_variant_object build_action_variant(const action_trace_v0& a,
+                                                const decoded_action& decoded,
+                                                variant_shape shape) {
+   fc::mutable_variant_object v;
+   // Fields common to all shapes.
+   v("global_sequence",  a.global_sequence)
+    ("receiver",         a.receiver.to_string())
+    ("account",          a.account.to_string())
+    ("name",             a.action.to_string())
+    ("authorization",    serialize_authorizations(a.authorization))
+    ("data",             fc::to_hex(a.data.data(), a.data.size()))
+    ("return_value",     fc::to_hex(a.return_value.data(), a.return_value.size()));
+
+   if (shape == variant_shape::full) {
+      v("action_ordinal",                             a.action_ordinal)
+       ("creator_action_ordinal",                     a.creator_action_ordinal)
+       ("closest_unnotified_ancestor_action_ordinal", a.closest_unnotified_ancestor_action_ordinal)
+       ("recv_sequence",                              a.recv_sequence)
+       ("auth_sequence",                              a.auth_sequence)
+       ("code_sequence",                              a.code_sequence)
+       ("abi_sequence",                               a.abi_sequence);
+
+      fc::variants deltas;
+      deltas.reserve(a.account_ram_deltas.size());
+      for (const auto& d : a.account_ram_deltas) {
+         deltas.emplace_back(fc::mutable_variant_object()
+            ("account", d.account.to_string())
+            ("delta",   d.delta));
+      }
+      v("account_ram_deltas", std::move(deltas));
+
+      if (a.cpu_usage_us.has_value())
+         v("cpu_usage_us", *a.cpu_usage_us);
+      if (a.net_usage.has_value())
+         v("net_usage", *a.net_usage);
+   }
+
+   if (!decoded.params.is_null())
+      v("params", decoded.params);
+   if (decoded.return_data.has_value())
+      v("return_data", *decoded.return_data);
+   if (!decoded.error_message.empty())
+      v("decode_error", decoded.error_message);
+
+   return v;
+}
+
+} // namespace sysio::trace_api
 
 namespace {
    using namespace sysio::trace_api;
@@ -15,48 +67,27 @@ namespace {
       return t.to_iso_string() + "Z";
    }
 
-   fc::variants process_authorizations(const std::vector<authorization_trace_v0>& authorizations) {
-      fc::variants result;
-      result.reserve(authorizations.size());
-      for ( const auto& a: authorizations) {
-         result.emplace_back(fc::mutable_variant_object()
-            ("account", a.account.to_string())
-            ("permission", a.permission.to_string())
-         );
-      }
-
-      return result;
-
-   }
-
    fc::variants process_actions(const std::vector<action_trace_v0>& actions, const data_handler_function& data_handler) {
       fc::variants result;
       result.reserve(actions.size());
-      std::vector<int> indices(actions.size());
-      std::iota(indices.begin(), indices.end(), 0);
-      std::sort(indices.begin(), indices.end(), [&actions](const int& lhs, const int& rhs) -> bool {
-         return actions.at(lhs).global_sequence < actions.at(rhs).global_sequence;
+      // global_sequence is unique per action (chain invariant), so sort stability is not required.
+      std::vector<const action_trace_v0*> sorted;
+      sorted.reserve(actions.size());
+      for (const auto& a : actions) sorted.push_back(&a);
+      std::sort(sorted.begin(), sorted.end(), [](const auto* l, const auto* r){
+         return l->global_sequence < r->global_sequence;
       });
-      for ( int index : indices) {
-         const auto& a = actions.at(index);
-         auto action_variant = fc::mutable_variant_object();
 
-         action_variant("global_sequence", a.global_sequence)
-               ("receiver", a.receiver.to_string())
-               ("account", a.account.to_string())
-               ("action", a.action.to_string())
-               ("authorization", process_authorizations(a.authorization))
-               ("data", fc::to_hex(a.data.data(), a.data.size()));
-
-         action_variant("return_value", fc::to_hex(a.return_value.data(), a.return_value.size()));
+      for (const action_trace_v0* ap : sorted) {
+         const auto& a = *ap;
          auto [params, return_data] = data_handler(a);
-         if (!params.is_null()) {
-            action_variant("params", params);
-         }
-         if(return_data.has_value()){
-            action_variant("return_data", *return_data);
-         }
+         decoded_action decoded{std::move(params), std::move(return_data), {}};
+         // legacy process_block path used serialize_to_variant's tuple which doesn't
+         // convey decode_error, so leave the field empty here; callers that want the
+         // error path should go through get_actions instead.
 
+         fc::mutable_variant_object action_variant = build_action_variant(a, decoded, variant_shape::full);
+         // block-trace-local fields (populated by the enclosing transaction, not here)
          result.emplace_back( std::move(action_variant) );
       }
       return result;
@@ -73,7 +104,6 @@ namespace {
                ("block_time", t.block_time)
                ("producer_block_id", t.producer_block_id)
                ("actions", process_actions(t.actions, data_handler))
-               ("status", t.status)
                ("cpu_usage_us", t.cpu_usage_us)
                ("net_usage_words", t.net_usage_words)
                ("signatures", t.signatures)
@@ -119,7 +149,7 @@ namespace {
       w.begin_array();
       for (const auto& a : auths) {
          w.begin_object();
-         w.set("account",    a.account.to_string())
+         w.set("actor",      a.actor.to_string())
           .set("permission", a.permission.to_string());
          w.end_object();
       }
@@ -142,13 +172,39 @@ namespace {
       for (int idx : indices) {
          const auto& a = actions.at(idx);
          w.begin_object();
+         // Field set and order mirror build_action_variant's variant_shape::full shape --
+         // the streaming and variant paths must emit identical JSON (pinned by the
+         // streaming_vs_variant_* parity tests).
          w.set("global_sequence", a.global_sequence)
           .set("receiver",        a.receiver.to_string())
           .set("account",         a.account.to_string())
-          .set("action",          a.action.to_string());
+          .set("name",            a.action.to_string());
          w.key("authorization");   write_authorizations(w, a.authorization);
          w.key("data");            w.value_hex(a.data.data(), a.data.size());
          w.key("return_value");    w.value_hex(a.return_value.data(), a.return_value.size());
+         w.set("action_ordinal",                             a.action_ordinal.value)
+          .set("creator_action_ordinal",                     a.creator_action_ordinal.value)
+          .set("closest_unnotified_ancestor_action_ordinal", a.closest_unnotified_ancestor_action_ordinal.value)
+          .set("recv_sequence",                              a.recv_sequence);
+         // fc/container/flat.hpp co-locates to_json_stream(flat_map) with its to_variant
+         // sibling, so the streaming and variant paths emit the same map shape by design.
+         w.key("auth_sequence");
+         fc::to_json_stream(a.auth_sequence, w);
+         w.set("code_sequence", a.code_sequence.value)
+          .set("abi_sequence",  a.abi_sequence.value);
+         w.key("account_ram_deltas");
+         w.begin_array();
+         for (const auto& d : a.account_ram_deltas) {
+            w.begin_object();
+            w.set("account", d.account.to_string())
+             .set("delta",   d.delta);
+            w.end_object();
+         }
+         w.end_array();
+         if (a.cpu_usage_us.has_value())
+            w.set("cpu_usage_us", a.cpu_usage_us->value);
+         if (a.net_usage.has_value())
+            w.set("net_usage", a.net_usage->value);
          // ABI-decoded "params" / "return_data" are emitted directly into w by the streaming
          // data_handler -- no fc::variant tree, no fc::json::to_string splice.  The handler
          // is responsible for emitting zero, one, or both keys depending on what's available
@@ -170,9 +226,7 @@ namespace {
        .set("block_time",        t.block_time)
        .set("producer_block_id", t.producer_block_id);
       w.key("actions");          write_actions(w, t.actions, data_handler);
-      // FC_REFLECT_ENUM-reflected; emits the member-name string via to_json_stream(enum_type).
-      w.set("status",          t.status)
-       .set("cpu_usage_us",    t.cpu_usage_us)
+      w.set("cpu_usage_us",    t.cpu_usage_us)
        .set("net_usage_words", t.net_usage_words.value)
        .set("signatures",      t.signatures);
       // transaction_header is a reflected struct composed of fc::time_point_sec,

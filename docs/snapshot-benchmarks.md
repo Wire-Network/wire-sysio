@@ -5,7 +5,7 @@
 The snapshot format uses **sequential writes** with **buffered inline BLAKE3 hashing**
 via a custom `std::streambuf`. Per-section hashes are computed during writes with
 zero post-write overhead. Per-section BLAKE3 hashes are stored for future
-BLS-signed snapshot verification (see `docs/snapshot-serving-plan.md`).
+BLS-signed snapshot verification (see `docs/snapshot-attestation.md`).
 
 ## Final Results (33 GB, realistic Vaulta/EOS mainnet distribution, release build)
 

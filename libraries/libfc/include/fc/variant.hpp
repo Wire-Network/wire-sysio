@@ -333,13 +333,15 @@ namespace fc
            if (is_integer() || is_numeric())
               return static_cast<EnumType>(as_int64());
            if (is_string()) {
-              // std::from_chars is non-throwing: avoids the stoll exception
-              // round-trip on the invalid-text fallback path, which was the
-              // dominant cost on bad input (~4 us per call) and ~25% of the
-              // valid-text path too.  Behaviour matches stoll for the
-              // domain we hit: leading minus accepted, leading whitespace
-              // and leading '+' rejected, suffix garbage silently ignored
-              // (so "1abc" still yields 1, matching the prior behaviour).
+              // std::from_chars is non-throwing: avoids the stoll exception round-trip on the invalid-text fallback
+              // (the dominant cost on bad input -- ~4 us per call -- and ~25% of the valid-text path too).
+              // Intentionally STRICTER than the previous std::stoll-based code:
+              //   - leading minus accepted (matches stoll)
+              //   - leading '+' REJECTED (stoll accepted, e.g. "+1")
+              //   - leading whitespace REJECTED (stoll accepted, e.g. " 1")
+              //   - suffix garbage silently ignored, e.g. "1abc" yields 1 (matches stoll)
+              // The ABI serializer never emits whitespace- or sign-prefixed enum strings, so the stricter contract
+              // surfaces malformed input as an exception rather than silently parsing it.
               std::string_view s = get_string();
               int64_t parsed = 0;
               auto [ptr, ec] = std::from_chars(s.data(), s.data() + s.size(), parsed);
@@ -429,6 +431,9 @@ namespace fc
         {
            return *this = variant( fc::forward<T>(v) );
         }
+
+        // Aliasing detector for operator=(const variant&); exposed for unit testing.
+        static bool _rhs_not_aliased( const variant* lhs, const variant& v );
 
         template<typename T>
         explicit variant( const std::optional<T>& v )

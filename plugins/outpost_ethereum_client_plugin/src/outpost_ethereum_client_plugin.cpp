@@ -48,6 +48,17 @@ public:
       return _clients.at(id);
    }
 
+   ethereum_client_entry_ptr get_client_by_chain_id(uint64_t chain_id) {
+      ethereum_client_entry_ptr match;
+      for (auto& [id, entry] : _clients) {
+         if (entry->chain_id && *entry->chain_id == chain_id) {
+            if (match) return nullptr;  // ambiguous: >1 client on this chain id
+            match = entry;
+         }
+      }
+      return match;  // nullptr when none matched
+   }
+
    void add_client(const std::string& id, ethereum_client_entry_ptr client) {
       FC_ASSERT(client, "Client cannot be null");
       FC_ASSERT(!_clients.contains(id), "Client with id {} already exists", id);
@@ -74,10 +85,13 @@ void outpost_ethereum_client_plugin::plugin_initialize(const variables_map& opti
       auto& id           = parts[0];
       auto& url          = parts[2];
       auto& sig_id       = parts[1];
-      fc::ostring chain_id_str = parts[3];
+      fc::ostring chain_id_str = parts.size() == 4 ? fc::ostring{parts[3]} : fc::ostring{};
       std::optional<fc::uint256> chain_id;
-      if (chain_id_str.has_value())
-         chain_id = std::make_optional<fc::uint256>(fc::to_uint256(chain_id_str.value()));
+      std::optional<uint64_t>    chain_id_num;
+      if (chain_id_str.has_value()) {
+         chain_id     = std::make_optional<fc::uint256>(fc::to_uint256(chain_id_str.value()));
+         chain_id_num = chain_id->convert_to<uint64_t>();
+      }
 
       auto  sig_provider = plug_sig->get_provider(sig_id);
       my->add_client(id,
@@ -86,7 +100,8 @@ void outpost_ethereum_client_plugin::plugin_initialize(const variables_map& opti
                         url,
                         sig_provider,
                         std::make_shared<ethereum_client>(sig_provider, url,
-                           chain_id)));
+                           chain_id),
+                        chain_id_num));
 
       ilog("Added ethereum client (id={},sig_id={},chainId={},url={})",
            id,sig_id,url,chain_id_str.value_or("none"));
@@ -126,16 +141,21 @@ ethereum_client_entry_ptr outpost_ethereum_client_plugin::get_client(const std::
    return my->get_client(id);
 }
 
+ethereum_client_entry_ptr outpost_ethereum_client_plugin::get_client_by_chain_id(uint64_t chain_id) {
+   return my->get_client_by_chain_id(chain_id);
+}
+
 const std::vector<std::pair<std::filesystem::path, std::vector<fc::network::ethereum::abi::contract>>>& outpost_ethereum_client_plugin::get_abi_files() {
    return my->get_abi_files();
 }
 
 std::shared_ptr<outpost_client>
 outpost_ethereum_client_plugin::create_outpost_client(const std::string& eth_client_id,
-                                                    uint64_t           outpost_id,
+                                                    uint64_t           chain_code,
                                                     uint32_t           chain_id,
                                                     const std::string& opp_addr,
-                                                    const std::string& opp_inbound_addr) {
+                                                    const std::string& opp_inbound_addr,
+                                                    const std::string& operator_registry_addr) {
    auto entry = my->get_client(eth_client_id);
    FC_ASSERT(entry, "Unknown ethereum client id: {}", eth_client_id);
 
@@ -146,8 +166,9 @@ outpost_ethereum_client_plugin::create_outpost_client(const std::string& eth_cli
    return std::make_shared<outpost_ethereum_client>(entry,
                                                     opp_addr,
                                                     opp_inbound_addr,
+                                                    operator_registry_addr,
                                                     std::move(all_abis),
-                                                    outpost_id,
+                                                    chain_code,
                                                     chain_id);
 }
 

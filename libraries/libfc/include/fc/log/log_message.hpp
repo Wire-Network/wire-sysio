@@ -53,6 +53,21 @@ namespace fc
    void from_variant( const variant& e, log_level& ll );
 
    /**
+    * Map an fc::log_level to the corresponding spdlog severity.
+    */
+   inline spdlog::level::level_enum to_spdlog_level( log_level ll ) {
+      switch( ll.value ) {
+         case log_level::all:   return spdlog::level::trace;
+         case log_level::debug: return spdlog::level::debug;
+         case log_level::info:  return spdlog::level::info;
+         case log_level::warn:  return spdlog::level::warn;
+         case log_level::error: return spdlog::level::err;
+         case log_level::off:   return spdlog::level::off;
+      }
+      return spdlog::level::info;
+   }
+
+   /**
     *  @brief provides information about where and when a log message was generated.
     *  @ingroup AthenaSerializable
     *

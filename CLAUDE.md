@@ -101,9 +101,44 @@ Wire Sysio is a C++ implementation of the AntelopeIO protocol (a fork of Spring)
 sudo apt-get install -y build-essential binutils ccache cmake curl git ninja-build \
     libcurl4-openssl-dev libgmp-dev zlib1g-dev python3 python3-pip clang-18 libclang-18-dev
 
+# Initialize required submodules
+git submodule update --init --recursive vcpkg libraries/appbase
+
 # Bootstrap vcpkg
 ./vcpkg/bootstrap-vcpkg.sh
 ```
+
+### macOS Apple Silicon phase-one build
+
+Apple Silicon developer builds use vcpkg's `arm64-osx` triplet and the interpreted `sys-vm` runtime only. Contract
+rebuilds through CDT, `sys-vm-jit`, `sys-vm-oc`, and `native-module` are out of scope for the phase-one macOS path.
+
+```bash
+brew install cmake ninja ccache pkgconf autoconf automake libtool
+git submodule update --init --recursive vcpkg libraries/appbase
+./vcpkg/bootstrap-vcpkg.sh
+
+export BUILD_DIR=$PWD/build/macos-arm64
+export NUM_JOBS=$(sysctl -n hw.logicalcpu)
+
+cmake \
+-B $BUILD_DIR \
+-S . \
+-G Ninja \
+-DCMAKE_BUILD_TYPE=Debug \
+-DVCPKG_TARGET_TRIPLET=arm64-osx \
+-DBUILD_SYSTEM_CONTRACTS=OFF \
+-DBUILD_TEST_CONTRACTS=OFF \
+-DENABLE_CCACHE=ON \
+-DENABLE_DISTCC=OFF \
+-DENABLE_TESTS=ON \
+-DENABLE_JEMALLOC=OFF \
+-DDISABLE_WASM_SPEC_TESTS=OFF \
+-DCMAKE_TOOLCHAIN_FILE=$PWD/vcpkg/scripts/buildsystems/vcpkg.cmake
+
+cmake --build $BUILD_DIR --target fc nodeop clio kiod sys-util unit_test plugin_test test_fc -- -j${NUM_JOBS}
+```
+
 
 ### Configure and Build
 ```bash
@@ -309,7 +344,7 @@ OPP is a protocol (encoding scheme) that uses protobufs; the library is located 
 The protobufs are located at [libraries/opp/proto](libraries/opp/proto).
 
 After updating the protobufs:
-- **TS/JS packages**: Run `cd wire-sysio/libraries/opp/tools && ./generate-opp-bundles.fish` to regenerate the TypeScript/Solidity/Solana model packages (`@wireio/opp-typescript-models`, etc.) consumed by `wire-e2e-tests`, `wire-ethereum`, and other JS/TS repos.
+- **TS/JS packages**: Run `cd wire-sysio/libraries/opp/tools && ./scripts/generate-opp-bundles.sh` to regenerate the TypeScript/Solidity/Solana model packages (`@wireio/opp-typescript-models`, etc.) consumed by `wire-e2e-tests`, `wire-ethereum`, and other JS/TS repos.
 - **C++ (host + CDT/WASM)**: Both host protobuf headers (`.pb.h` via `protoc`) and CDT contract headers (`.pb.hpp` via `protoc-gen-zpp`) are generated automatically by CMake `add_dependency` targets when the project is configured/built. No manual step required — just rebuild.
 
 ### Local OPP Model Location (Optional in development environments)
@@ -318,7 +353,7 @@ If you are developing on a local machine and `<wire-sysio>/../wire-opp` exists,
 then PNPM/NPM & other repos (i.e. `wire-ethereum`, `wire-e2e-tests`, etc.) will look for the OPP protobufs
 and generated types in that location.
 
-If the directory exists, when `./generate-opp-bundles.fish` is run, the generated protobuf bundles will be copied to
+If the directory exists, when `./scripts/generate-opp-bundles.sh` is run, the generated protobuf bundles will be copied to
 `<wire-sysio>/../wire-opp/{typescript,solidity,solana}/`.
 
 ## Docker Build
@@ -378,13 +413,13 @@ done
 
 To generate the client types for the system contracts,run the following commands.
 
-`<wire-sysio>/contracts/tools/generate-system-contract-types.py -B . -O /tmp/ctt -P snake -f` then `cp
-  /tmp/ctt/typescript/SystemContractTypes.ts  <wire-libraries-ts>/packages/sdk-core/src/types/` and lastly run `cd <wire-libraries-ts> &&
+`<wire-sysio>/contracts/tools/generate-sysio-contract-types.py -B . -O /tmp/ctt -P snake -f` then `cp
+  /tmp/ctt/typescript/SysioContractTypes.ts  <wire-libraries-ts>/packages/sdk-core/src/types/` and lastly run `cd <wire-libraries-ts> &&
   pnpm build`
 
 This makes the types available in the SDK as:
 ```ts
-import { SystemContracts } from '@wire-libraries/sdk-core';
+import { SysioContracts } from '@wire-libraries/sdk-core';
 ```
 
 

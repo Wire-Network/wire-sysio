@@ -207,10 +207,10 @@ void test_crypto::test_recover_key_assert_true() {
    auto sh = (const sig_hash_key_header*)buffer;
 
    checksum256 digest(sh->hash.hash);
-   ecc_signature ecc_sig = sysio::unpack<ecc_signature>(&sh->sig_base()[1], sh->sig_len);
+   ecc_signature ecc_sig = sysio::unpack<ecc_signature>(&sh->sig_base()[1], sh->sig_len - 1);
    signature sig(std::in_place_index<0>, ecc_sig);
 
-   ecc_public_key ecc_pubkey = sysio::unpack<ecc_public_key>(&sh->pk_base()[1], sh->pk_len);
+   ecc_public_key ecc_pubkey = sysio::unpack<ecc_public_key>(&sh->pk_base()[1], sh->pk_len - 1);
    public_key pubkey(std::in_place_index<0>, ecc_pubkey);
 
    assert_recover_key( sh->hash.hash, sig, pubkey );
@@ -222,7 +222,7 @@ void test_crypto::test_recover_key_assert_false() {
    auto sh = (const sig_hash_key_header*)buffer;
 
    checksum256 digest(sh->hash.hash);
-   ecc_signature ecc_sig = sysio::unpack<ecc_signature>(&sh->sig_base()[1], sh->sig_len);
+   ecc_signature ecc_sig = sysio::unpack<ecc_signature>(&sh->sig_base()[1], sh->sig_len - 1);
    signature sig(std::in_place_index<0>, ecc_sig);
 
    ecc_public_key ecc_pubkey;
@@ -238,14 +238,14 @@ void test_crypto::test_recover_key() {
    auto sh = (const sig_hash_key_header*)buffer;
 
    checksum256 digest(sh->hash.hash);
-   ecc_signature ecc_sig = sysio::unpack<ecc_signature>(&sh->sig_base()[1], sh->sig_len);
+   ecc_signature ecc_sig = sysio::unpack<ecc_signature>(&sh->sig_base()[1], sh->sig_len - 1);
    signature sig(std::in_place_index<0>, ecc_sig);
 
    auto pubkey = recover_key( digest, sig );
    auto ecc_pubkey = std::get<0>(pubkey);
    sysio_assert(ecc_pubkey.size() == sh->pk_len - 1, "public key does not match");
    for ( uint32_t i=0; i < sh->pk_len - 1; i++ )
-     if ( ecc_pubkey[i] != sh->pk_base()[i+1] )
+     if ( ecc_pubkey[i] != static_cast<uint8_t>(sh->pk_base()[i+1]) )
         sysio_assert( false, "public key does not match" );
 }
 

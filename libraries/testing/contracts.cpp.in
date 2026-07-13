@@ -3,6 +3,8 @@
 #include <cstdint>
 #include <vector>
 
+/// Silence incbin's Apple bitcode warning for local contract fixture embedding.
+#define INCBIN_SILENCE_BITCODE_WARNING
 #define INCBIN_STYLE INCBIN_STYLE_SNAKE
 #include <fc/io/incbin.h>
 

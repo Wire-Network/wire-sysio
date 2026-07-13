@@ -4,6 +4,9 @@
 #include <sysio/chain/snapshot.hpp>
 #include <fc/bitutil.hpp>
 
+#include <algorithm>
+#include <vector>
+
 namespace sysio { namespace chain {
 
 using block_root_index_set = index_set<
@@ -21,7 +24,21 @@ bool block_root_processor::calculate_root_blocks(uint32_t block_num)
 {
    bool stored = false;
    root_storage root_transactions = _processor->retrieve_root_transactions(block_num);
+   // root_storage is an unordered_map; iterating it directly would assign
+   // contract_root_object ids for (contract, root) pairs first seen in the same
+   // block in hash-table iteration order, which is standard-library dependent.
+   // Object ids feed chainbase state (snapshots, integrity hash), so process the
+   // instances in (contract, root) order to keep id assignment identical on
+   // every node.
+   std::vector<root_storage::value_type*> ordered_instances;
+   ordered_instances.reserve(root_transactions.size());
    for(auto& instance : root_transactions) {
+      ordered_instances.push_back(&instance);
+   }
+   std::sort(ordered_instances.begin(), ordered_instances.end(),
+             [](const auto* lhs, const auto* rhs) { return lhs->first < rhs->first; });
+   for(auto* instance_ptr : ordered_instances) {
+      auto& instance = *instance_ptr;
       const auto& contract = instance.first;
       auto& transactions = instance.second;
       if (transactions.empty()) {

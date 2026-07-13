@@ -1,31 +1,12 @@
 #include <cstdint>
 #include <sysio.authex/sysio.authex.hpp>
-#include <sysio.system/native.hpp>
 #include <sysio/print.hpp>
 
 namespace {
 using namespace sysio;
 
-constexpr name ex_eth = "ex.eth"_n;
-constexpr name ex_sol = "ex.sol"_n;
-constexpr name ex_sui = "ex.sui"_n;
-
-/**
- * Duplicated struct representing ABI of the `updateauth` action.
- */
-struct updateauth {
-   name account;
-   name permission;
-   name parent;
-   sysiosystem::authority auth;
-};
-
-struct expandauth {
-   name account;
-   name permission;
-   std::vector<key_weight> new_keys;
-   std::vector<sysiosystem::permission_level_weight> new_accounts;
-};
+// sysio funds the RAM for every link row (system-paid) -- createlink and recordlink alike.
+constexpr name link_row_payer = "sysio"_n;
 
 using ed_raw_key_t = std::array<uint8_t, 32>;
 
@@ -37,73 +18,29 @@ using ed_raw_key_t = std::array<uint8_t, 32>;
 }
 
 
-/**
- * Bitcoin base58 alphabet
- */
-constexpr char base58_alphabet[] = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
-
-/**
- * Encodes a given byte array into a Base58 encoded string using the Bitcoin Base58
- * alphabet ("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz").
- *
- * Base58 encoding provides a compact, human-readable textual representation of binary
- * data. It avoids visually ambiguous characters, such as '0' (zero) and 'O' (uppercase
- * o), making it suitable for use in financial identifiers, cryptocurrency addresses,
- * and similar contexts.
- *
- * @param bytes Pointer to the byte array to be encoded.
- * @param data_len Length of the byte array to be encoded.
- * @return A Base58 encoded string representation of the input byte array.
- */
-std::string base58_encode(const unsigned char* bytes, uint32_t data_len) {
-   uint32_t leading_zeros = 0;
-   while (leading_zeros < data_len && bytes[leading_zeros] == 0)
-      ++leading_zeros;
-
-   uint32_t max_len = data_len * 138 / 100 + 2;
-   std::vector<uint8_t> b58(max_len, 0);
-
-   for (uint32_t i = leading_zeros; i < data_len; ++i) {
-      uint32_t carry = bytes[i];
-      for (int32_t j = static_cast<int32_t>(max_len) - 1; j >= 0; --j) {
-         carry += 256u * b58[j];
-         b58[j] = static_cast<uint8_t>(carry % 58);
-         carry /= 58;
-      }
-   }
-
-   uint32_t start = 0;
-   while (start < max_len && b58[start] == 0)
-      ++start;
-
-   std::string result;
-   result.reserve(leading_zeros + (max_len - start));
-   result.append(leading_zeros, '1');
-   for (uint32_t i = start; i < max_len; ++i)
-      result += base58_alphabet[b58[i]];
-
-   return result;
-}
 } // anonymous namespace
 
 
 namespace sysio {
 
 // ----- PUBLIC ACTIONS -----
-[[sysio::action]] void authex::createlink(const fc::crypto::chain_kind_t chain_kind, const name& account,
+[[sysio::action]] void authex::createlink(const opp::types::ChainKind chain_kind, const name& account,
                                           const signature& sig, const public_key& pub_key, const uint64_t nonce) {
-   using namespace fc::crypto;
+   using ChainKind = opp::types::ChainKind;
+
    // Require caller authorization
    require_auth(account);
 
    // ——— Chain kind validation ———
-   check(chain_kind == chain_kind_ethereum || chain_kind == chain_kind_solana || chain_kind == chain_kind_sui,
-         "Invalid chain_kind. Supported: chain_kind_ethereum(2), chain_kind_solana(3), chain_kind_sui(4).");
+   // TODO @jglanz: SUI removed in v6; restore when SUI outpost is added.
+   check(chain_kind == ChainKind::CHAIN_KIND_EVM
+         || chain_kind == ChainKind::CHAIN_KIND_SVM,
+         "Invalid chain_kind. Supported: CHAIN_KIND_EVM(2), CHAIN_KIND_SVM(3).");
 
    // ——— Table & indices ———
    links_t links(get_self());
    auto by_namechain = links.get_index<"bynamechain"_n>();
-   uint128_t name_chain = (static_cast<uint128_t>(account.value) << 64) | static_cast<uint64_t>(chain_kind);
+   uint128_t name_chain = to_namechain_key(account, chain_kind);
    check(by_namechain.find(name_chain) == by_namechain.end(), "Account already has a link for this chain.");
 
    auto by_pubkey = links.get_index<"bypubkey"_n>();
@@ -116,19 +53,24 @@ namespace sysio {
    check(nonce <= now_ms && now_ms - nonce <= TEN_MIN_MS, "Invalid nonce: must be within the last 10 minutes");
 
    // ——— Build the message string ———
+   //
+   // Wire format: the chain identifier is serialised as the decimal of
+   // its proto numeric value (EVM=2, SVM=3). `magic_enum::enum_integer`
+   // extracts the underlying value type-safely; off-chain signers
+   // reconstruct the same string from their generated `ChainKind` enum's
+   // numeric value.
    static constexpr const char* DIGEST_TAIL = "createlink auth";
-   std::string chain_kind_str = std::to_string(static_cast<uint8_t>(chain_kind));
+   std::string chain_kind_str = std::to_string(magic_enum::enum_integer(chain_kind));
    std::string msg = pubkey_to_string(pub_key) + "|" + account.to_string() + "|" + chain_kind_str + "|" +
                      std::to_string(nonce) + "|" + DIGEST_TAIL;
 
-   std::optional<name> ex_permission = std::nullopt;
    // For EM keys, recover_key returns the real y-parity prefix.
    // Store it so downstream consumers (advance → OPERATORS attestation)
    // get the correct compressed key for ETH address derivation.
    public_key verified_pub_key = pub_key;
 
    // ——— Curve-specific signing & address derivation ———
-   if (chain_kind == chain_kind_ethereum) {
+   if (chain_kind == ChainKind::CHAIN_KIND_EVM) {
       // 1) keccak(msg) — use the pubkey string as the contract sees it
       //    (fc/CDT may normalize the compression prefix byte)
       auto eth_hash = sysio::keccak(msg.c_str(), msg.size());
@@ -148,9 +90,8 @@ namespace sysio {
             "EM key recovery failed: x-coordinate mismatch");
 
       verified_pub_key = recovered;
-      ex_permission = ex_eth;
 
-   } else if (chain_kind == chain_kind_solana) {
+   } else if (chain_kind == ChainKind::CHAIN_KIND_SVM) {
       checksum256 hash256;
       // 1) sha256(msg) → returns a checksum256
       checksum256 raw_digest = sysio::sha256(msg.c_str(), msg.size());
@@ -165,24 +106,7 @@ namespace sysio {
       // 3) pack into checksum256
       std::memcpy(hash256.data(), mapped, 32);
       assert_recover_key(hash256, sig, pub_key);
-
-      ex_permission = ex_sol;
-   } else if (chain_kind == chain_kind_sui) { // sui
-      std::vector<uint8_t> bcs;
-      bcs.reserve(4 + msg.size());
-      bcs.insert(bcs.end(), {3, 0, 0, static_cast<uint8_t>(msg.size())});
-      bcs.insert(bcs.end(), msg.begin(), msg.end());
-
-      unsigned char raw_digest[32];
-      check(sysio::blake2b_256(reinterpret_cast<const char*>(bcs.data()), bcs.size(),
-                               reinterpret_cast<char*>(raw_digest), sizeof(raw_digest)) == 0,
-            "blake2b_256 failed");
-
-      ex_permission = ex_sui;
    }
-
-   // MAKE SURE WE MAPPED TO A SUPPORTED PERMISSION
-   sysio::check(ex_permission.has_value(), "Internal error: ex_permission not set");
 
    // CREATE LINK RECORD — use verified_pub_key which has the real y-parity
    // prefix from recovery (for EM) rather than the potentially ambiguous input.
@@ -191,35 +115,18 @@ namespace sysio {
       auto last = --links.cend();
       next_key = last->key + 1;
    }
-   links.emplace("sysio"_n, links_key{next_key}, links_s{
+   links.emplace(link_row_payer, links_key{next_key}, links_s{
       .key = next_key,
       .username = account,
       .chain_kind = chain_kind,
       .pub_key = verified_pub_key,
    });
 
-   // PUSH `ex.<chain_prefix>` TO PERMISSIONS
-   action(
-      permission_level{
-         get_self(), "owner"_n
-   },
-      "sysio"_n, "updateauth"_n,
-      updateauth{account,
-                 ex_permission.value(),
-                 "active"_n,
-                 {
-                    1,
-                    {{verified_pub_key, 1}},
-                 }})
-      .send();
-
-   // AMEND `active` PERMISSIONS
-   action(permission_level{"sysio"_n, "active"_n}, "sysio"_n, "expandauth"_n,
-          expandauth{account, "active"_n,
-
-                     std::vector<key_weight>{key_weight{verified_pub_key, 1}},
-                     std::vector<sysiosystem::permission_level_weight>{}})
-      .send();
+   // The verified key is recorded in the links table only; it is NOT added to the
+   // account's `active` (or any) permission, so the link grants no Wire signing
+   // authority. Downstream consumers (OPERATORS attestation, ETH address derivation)
+   // read the link record. The row is billed to sysio (links.emplace above), so
+   // createlink charges the account no RAM -- no gift is needed.
 }
 
 
@@ -237,36 +144,41 @@ namespace sysio {
 };
 
 
-// TODO: Adjust this logic need to handle removal of ex.eth or ex.sol respectively.
-void authex::onmanualrmv(const name& account, const name& permission) {
-   using namespace fc::crypto;
+// Trusted depot-only link insert -- the counterpart to createlink that skips signature/nonce
+// verification. The OPP NodeOwnerRegistration attestation is the proof; the chain accepts this
+// inline send because sysio.authex.active trusts the caller (sysio.roa@sysio.code). Idempotent and
+// non-throwing so the trust-OPP dispatch never aborts.
+[[sysio::action]] void authex::recordlink(const name& account, const opp::types::ChainKind chain_kind,
+                                          const public_key& pub_key) {
+   require_auth(get_self());
 
-   chain_kind_t kind;
-   switch (permission.value) {
-   case ex_sol.value:
-      kind = chain_kind_solana;
-      break;
-   case ex_eth.value:
-      kind = chain_kind_ethereum;
-      break;
-   case ex_sui.value:
-      kind = chain_kind_sui;
-      break;
-   default:
-      sysio::check(false, "Invalid permission for removal.");
-      return; // unreachable, silences uninitialized warning
-   }
-
-   // Find reference to 'account' in links table via namechain index
    links_t links(get_self());
    auto by_namechain = links.get_index<"bynamechain"_n>();
-   uint128_t name_chain = to_namechain_key(account, kind);
-   auto itr = by_namechain.find(name_chain);
-   if (itr == by_namechain.end())
-      return;
+   // Idempotent: if this account already has a link for this chain, leave the table unchanged and
+   // return (never throw -- the trust-OPP depot dispatch must not abort).
+   //
+   // We deliberately do NOT reject when `pub_key` is already linked to a *different* account: one
+   // external wallet can hold several WireNodes NFTs and therefore legitimately back several Wire
+   // accounts, so one ETH key -> many accounts is allowed on this path. The operator path
+   // (createlink) keeps its 1:1 `bypubkey` check, which also guarantees an operator's link is the
+   // lowest-primary-key row for that key; sysio.msgch's resolve_account_from_op_address does a single
+   // `bypubkey.find()` (lowest-primary-key match), so it still lands on the operator's account rather
+   // than a later node-owner duplicate.
+   if (by_namechain.find(to_namechain_key(account, chain_kind)) != by_namechain.end()) return;
 
-   by_namechain.erase(std::move(itr));
-};
+   uint64_t next_key = 0;
+   if (links.cbegin() != links.cend()) {
+      auto last = --links.cend();
+      next_key = last->key + 1;
+   }
+   links.emplace(link_row_payer, links_key{next_key}, links_s{
+      .key = next_key,
+      .username = account,
+      .chain_kind = chain_kind,
+      .pub_key = pub_key,
+   });
+}
+
 
 // ----- PRIVATE HELPER METHODS -----
 
@@ -295,28 +207,4 @@ std::array<uint8_t, 4> authex::digestSuffixRipemd160(const std::array<char, 33>&
    return result;
 };
 
-std::string authex::pubkey_to_string(const sysio::public_key& pk) {
-   switch (pk.index()) {
-   case fc::crypto::key_type_em: { // PUB_EM_
-
-      auto raw = std::get<3>(pk);
-
-      return "PUB_EM_" + sysio::to_hex(reinterpret_cast<const char*>(raw.data()), raw.size());
-   }
-
-   case 4: { // PUB_ED_
-      // raw is std::array<char,32> — plain base58, no checksum (matches fc)
-      auto raw = std::get<4>(pk);
-      std::array<uint8_t, 32> key_bytes;
-      for (size_t i = 0; i < 32; ++i)
-         key_bytes[i] = static_cast<uint8_t>(raw[i]);
-
-      return "PUB_ED_" + base58_encode(key_bytes.data(), key_bytes.size());
-   }
-
-   default:
-      sysio::check(false, "pubkey_to_string only supports EM (3) and ED (4)");
-      return {};
-   }
-}
 } // namespace sysio

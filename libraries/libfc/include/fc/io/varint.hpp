@@ -1,5 +1,6 @@
 #pragma once
 #include <stdint.h>
+#include <type_traits>
 
 namespace fc {
 
@@ -7,7 +8,10 @@ struct unsigned_int {
     using base_uint = uint32_t;
     constexpr unsigned_int( base_uint v = 0 ):value(v){}
 
-    template<typename T>
+    // Constrained so this converting ctor is SFINAE-friendly: an unconstrained
+    // template ctor poisons overload resolution (e.g. fmt's has_format_as probe)
+    // for any non-convertible type that reaches namespace fc via ADL.
+    template<typename T, typename = std::enable_if_t<std::is_convertible_v<T, base_uint>>>
     constexpr unsigned_int( T v ):value(v){}
 
     constexpr operator uint32_t()const { return value; }

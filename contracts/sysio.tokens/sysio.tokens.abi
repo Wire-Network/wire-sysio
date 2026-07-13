@@ -1,0 +1,341 @@
+{
+    "____comment": "This file was generated with sysio-abigen. DO NOT EDIT ",
+    "version": "sysio::abi/1.2",
+    "types": [],
+    "structs": [
+        {
+            "name": "ChainAddress",
+            "base": "",
+            "fields": [
+                {
+                    "name": "kind",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "address",
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "activctok",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                }
+            ]
+        },
+        {
+            "name": "activtoken",
+            "base": "",
+            "fields": [
+                {
+                    "name": "code",
+                    "type": "slug_name"
+                }
+            ]
+        },
+        {
+            "name": "chain_token_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                }
+            ]
+        },
+        {
+            "name": "chain_token_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "contract_addr",
+                    "type": "bytes"
+                },
+                {
+                    "name": "is_native",
+                    "type": "bool"
+                },
+                {
+                    "name": "active",
+                    "type": "bool"
+                },
+                {
+                    "name": "registered_at_ms",
+                    "type": "uint64"
+                },
+                {
+                    "name": "activated_at_ms",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "regctok",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "contract_addr",
+                    "type": "bytes"
+                },
+                {
+                    "name": "is_native",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "regtoken",
+            "base": "",
+            "fields": [
+                {
+                    "name": "kind",
+                    "type": "TokenKind"
+                },
+                {
+                    "name": "code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "symbol_name",
+                    "type": "string"
+                },
+                {
+                    "name": "description",
+                    "type": "string"
+                },
+                {
+                    "name": "precision",
+                    "type": "uint32"
+                },
+                {
+                    "name": "address",
+                    "type": "ChainAddress"
+                }
+            ]
+        },
+        {
+            "name": "slug_name",
+            "base": "",
+            "fields": [
+                {
+                    "name": "value",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "token_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "code",
+                    "type": "slug_name"
+                }
+            ]
+        },
+        {
+            "name": "token_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "kind",
+                    "type": "TokenKind"
+                },
+                {
+                    "name": "symbol_name",
+                    "type": "string"
+                },
+                {
+                    "name": "description",
+                    "type": "string"
+                },
+                {
+                    "name": "precision",
+                    "type": "uint32"
+                },
+                {
+                    "name": "address",
+                    "type": "ChainAddress"
+                },
+                {
+                    "name": "active",
+                    "type": "bool"
+                },
+                {
+                    "name": "registered_at_ms",
+                    "type": "uint64"
+                },
+                {
+                    "name": "activated_at_ms",
+                    "type": "uint64"
+                }
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "name": "activctok",
+            "type": "activctok",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "activtoken",
+            "type": "activtoken",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "regctok",
+            "type": "regctok",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "regtoken",
+            "type": "regtoken",
+            "ricardian_contract": ""
+        }
+    ],
+    "tables": [
+        {
+            "name": "chaintokens",
+            "type": "chain_token_row",
+            "index_type": "i64",
+            "key_names": ["chain_code","token_code"],
+            "key_types": ["slug_name","slug_name"],
+            "table_id": 33655,
+            "secondary_indexes": [
+                {
+                    "name": "bychain",
+                    "key_type": "uint64",
+                    "table_id": 18611
+                },
+                {
+                    "name": "bytoken",
+                    "key_type": "uint64",
+                    "table_id": 65435
+                },
+                {
+                    "name": "byactive",
+                    "key_type": "uint64",
+                    "table_id": 58835
+                }
+            ]
+        },
+        {
+            "name": "tokens",
+            "type": "token_row",
+            "index_type": "i64",
+            "key_names": ["code"],
+            "key_types": ["slug_name"],
+            "table_id": 40315,
+            "secondary_indexes": [
+                {
+                    "name": "bykind",
+                    "key_type": "uint64",
+                    "table_id": 61863
+                },
+                {
+                    "name": "byactive",
+                    "key_type": "uint64",
+                    "table_id": 50135
+                }
+            ]
+        }
+    ],
+    "ricardian_clauses": [],
+    "variants": [],
+    "action_results": [],
+    "enums": [
+        {
+            "name": "ChainKind",
+            "type": "int32",
+            "values": [
+                {
+                    "name": "CHAIN_KIND_UNKNOWN",
+                    "value": 0
+                },
+                {
+                    "name": "CHAIN_KIND_WIRE",
+                    "value": 1
+                },
+                {
+                    "name": "CHAIN_KIND_EVM",
+                    "value": 2
+                },
+                {
+                    "name": "CHAIN_KIND_SVM",
+                    "value": 3
+                }
+            ]
+        },
+        {
+            "name": "TokenKind",
+            "type": "int32",
+            "values": [
+                {
+                    "name": "TOKEN_KIND_UNKNOWN",
+                    "value": 0
+                },
+                {
+                    "name": "TOKEN_KIND_NATIVE",
+                    "value": 1
+                },
+                {
+                    "name": "TOKEN_KIND_ERC20",
+                    "value": 2
+                },
+                {
+                    "name": "TOKEN_KIND_ERC721",
+                    "value": 3
+                },
+                {
+                    "name": "TOKEN_KIND_ERC1155",
+                    "value": 4
+                },
+                {
+                    "name": "TOKEN_KIND_SPL",
+                    "value": 5
+                },
+                {
+                    "name": "TOKEN_KIND_SPL_NFT",
+                    "value": 6
+                },
+                {
+                    "name": "TOKEN_KIND_LIQ",
+                    "value": 7
+                }
+            ]
+        }
+    ]
+}

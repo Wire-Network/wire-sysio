@@ -1,37 +1,31 @@
 #pragma once
 #include "base_actions.hpp"
 
-constexpr std::array<std::string,1> chain_configure_template_names = {"aio"};
-constexpr std::string wallet_default_name = "default";
-
+/**
+ * Options backing the `chain-state` subcommand group.
+ */
 struct chain_options {
-  bool build_just_print = false;
-  std::string build_output_file = "";
-  std::string sstate_state_dir = "";
-
-  // Configure options
-  std::string configure_target_root = ""; // directory to write resulting data
-  std::string configure_contracts_path = "";
-  bool configure_overwrite = false; // force overwrite existing files
-  bool configure_skip_genesis = false; // skip writing genesis.json and/or creating key pairs
-  bool configure_skip_ini = false; // skip writing config.ini
-  std::string configure_template = chain_configure_template_names[0];
-  std::string configure_genesis_override_file = ""; // optional override JSON file path
-  std::string configure_ini_override_file = ""; // optional override JSON file path
+  bool build_just_print = false;      ///< `build-info --print`: dump build environment JSON to stdout
+  std::string build_output_file = ""; ///< `build-info --output-file`: write build environment JSON here
+  std::string sstate_state_dir = "";  ///< `--state-dir` override for `last-shutdown-state`
 };
 
+/**
+ * sys-util `chain-state` diagnostics: build environment information and
+ * last-shutdown (clean/dirty) database state detection.
+ */
 class chain_actions : public base_actions<chain_options> {
   public:
 
     chain_actions() : base_actions() {
     }
 
+    /// Register the `chain-state` subcommand tree on @p app.
     void setup(CLI::App& app);
 
-    // callbacks
+    /// `chain-state build-info`: emit the build environment as JSON. Returns a process exit code.
     int run_subcommand_build_info();
 
+    /// `chain-state last-shutdown-state`: report whether the last shutdown was clean. Returns a process exit code.
     int run_subcommand_sstate();
-
-    int run_subcommand_configure();
 };

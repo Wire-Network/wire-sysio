@@ -13,6 +13,7 @@
 #include <sysio/chain/protocol_state_object.hpp>
 #include <sysio/chain/kv_table_objects.hpp>
 #include <sysio/chain/transaction_dedup.hpp>
+#include <sysio/chain/transaction_dedup_undo_index.hpp>
 #include <sysio/chain/genesis_intrinsics.hpp>
 #include <sysio/chain/whitelisted_intrinsics.hpp>
 #include <sysio/chain/database_header_object.hpp>
@@ -729,8 +730,18 @@ struct controller_impl {
    controller::config              conf;
    // persist chain_head after vote_processor shutdown, avoids concurrent access, after chain_head & conf since this uses them
    fc::scoped_exit<std::function<void()>> write_chain_head = [&]() { chain_head.write(conf.state_dir / config::chain_head_filename); };
+   // Set true by init() once trx_dedup has been registered as an undo participant and is consistent
+   // with the database. Until then trx_dedup is empty at revision 0; writing it over a good file
+   // would brick the next existing_state restart (the empty range no longer matches the database).
+   bool                            okay_to_persist_dedup = false;
    transaction_dedup               trx_dedup;
-   fc::scoped_exit<std::function<void()>> write_trx_dedup = [&]() { trx_dedup.write_to_file(conf.state_dir / config::transaction_dedup_filename); };
+   // Persist the dedup undo stack only after a successful start (see okay_to_persist_dedup). A
+   // startup that aborts before init() registers the dedup -- e.g. a corrupt SHiP log failing
+   // state_history_plugin::plugin_initialize before chain_plugin::plugin_startup runs -- must NOT
+   // overwrite the previous good file with the still-empty revision-0 dedup.
+   fc::scoped_exit<std::function<void()>> write_trx_dedup = [&]() {
+      if( okay_to_persist_dedup ) trx_dedup.write_to_file(conf.state_dir / config::transaction_dedup_filename);
+   };
    const chain_id_type             chain_id; // read by thread_pool threads, value will not be changed
    std::atomic<bool>               replaying = false;
    bool                            is_producer_node = false; // true if node is configured as a block producer
@@ -743,7 +754,6 @@ struct controller_impl {
    struct chain; // chain is a namespace so use an embedded type for the named_thread_pool tag
    named_thread_pool<chain>        thread_pool;
    deep_mind_handler*              deep_mind_logger = nullptr;
-   fc::time_point                  pending_lib_time;  // used to skip dedup for expired trxs
    bool                            okay_to_print_integrity_hash_on_stop = false;
    bool                            testing_allow_voting = false; // used in unit tests to create long forks or simulate not getting votes
    async_t                         async_voting = async_t::yes;  // by default we post `create_and_send_vote_msg()` calls, used in tester
@@ -917,8 +927,7 @@ struct controller_impl {
 
    void pop_block() {
       uint32_t prev_block_num = pop_prev_block();
-      db.undo();
-      trx_dedup.pop_block_revision();
+      db.undo();   // drives the registered dedup participant to revert this block's reversible changes
       protocol_features.popped_blocks_to(prev_block_num);
    }
 
@@ -971,7 +980,7 @@ struct controller_impl {
          if( trace->except_ptr )
             std::rethrow_exception(trace->except_ptr);
          if( trace->except)
-            throw *trace->except;
+            assert(trace->except_ptr); // except/except_ptr always set together
          getpeerkeys_res_t res;
          if (!trace->action_traces.empty()) {
             const auto& act_trace = trace->action_traces[0];
@@ -980,6 +989,17 @@ struct controller_impl {
                // in some tests, the system contract is not set and the return value is empty.
                fc::datastream<const char*> ds(retval.data(), retval.size());
                fc::raw::unpack(ds, res);
+            } else {
+               // Action executed but returned no value: deployed system contract on `sysio`
+               // does not handle getpeerkeys (or its dispatcher doesn't propagate the return).
+               // BP peer-key gossip cannot bootstrap without this; warn once so the cause is
+               // visible (this path is otherwise silent and update_peer_keys() will keep retrying).
+               static std::atomic<bool> warned{false};
+               if (!warned.exchange(true)) {
+                  wlog("getpeerkeys inline read-only action returned empty payload. "
+                       "Deployed system contract on `sysio` may be missing the getpeerkeys handler "
+                       "or its return value. BP peer-key updates and BP-gossip peering will not function.");
+               }
             }
          }
 
@@ -1047,9 +1067,8 @@ struct controller_impl {
    }
 
    void dmlog_applied_transaction(const transaction_trace_ptr& t, const signed_transaction* trx = nullptr) {
-      // dmlog_applied_transaction is called by push_scheduled_transaction
-      // where transient transactions are not possible, and by push_transaction
-      // only when the transaction is not transient
+      // dmlog_applied_transaction is called by push_transaction only when the
+      // transaction is not transient
       if (auto dm_logger = get_deep_mind_logger(false)) {
          if (trx && is_onblock(*t))
             dm_logger->on_onblock(*trx);
@@ -1076,10 +1095,7 @@ struct controller_impl {
                      lib_num, fork_db_root_block_num() );
       }
 
-      auto [pending_lib_id, pending_lib_ts] = fork_db_.pending_savanna_lib();
-      pending_lib_time = pending_lib_ts.to_time_point();
-
-      const block_id_type new_lib_id = pending_lib_id;
+      const block_id_type new_lib_id = fork_db_.pending_savanna_lib().first;
       const block_num_type new_lib_num = block_header::num_from_id(new_lib_id);
 
       if( new_lib_num <= lib_num )
@@ -1127,8 +1143,7 @@ struct controller_impl {
             // Do it before commit so that in case it throws, DB can be rolled back.
             blog.append( (*bitr)->block, (*bitr)->id(), (*bitr)->block->packed_signed_block() );
 
-            db.commit( (*bitr)->block_num() );
-            trx_dedup.commit_to_lib( (*bitr)->block_num() );
+            db.commit( (*bitr)->block_num() );   // drives the dedup participant's commit (revision == block num)
             root_id = (*bitr)->id();
 
             if (irreversible_mode()) {
@@ -1477,6 +1492,47 @@ struct controller_impl {
          db.undo();
       }
 
+      // Register the transaction dedup as a chainbase undo participant, so the database drives its
+      // undo lifecycle (add_undo_session / squash / undo / commit) in lockstep with the segment
+      // indices -- the controller no longer hand-pairs dedup undo calls with the database's. The db
+      // is now at head revision and is the authoritative source of the reversible revision range;
+      // align the dedup to it before registering:
+      //  - genesis/snapshot loaded membership only (revision 0); a snapshot is an irreversible root,
+      //    so the db has no reversible undo sessions and a plain set_revision matches it.
+      //  - existing_state restored the dedup's revision and undo stack from its on-disk file. That
+      //    file is a best-effort cache, NOT an authoritative store like chainbase's mmap'd segment:
+      //    it can legitimately be missing (first start after upgrading to dedup persistence), stale,
+      //    or empty at revision 0 (a startup that aborts before the chain loads -- e.g. a corrupt
+      //    SHiP log failing another plugin's initialize -- still runs the write-on-exit; the guard on
+      //    write_trx_dedup prevents most such clobbers, but an older build or external tooling could
+      //    still leave one). If the loaded range does not match the db exactly, discard it and
+      //    rebuild an empty undo stack aligned to the db: the node starts with degraded dedup memory
+      //    (self-healing as reversible blocks become irreversible) instead of refusing to start. A
+      //    clean restart matches and keeps the full set -- the fast path.
+      // add_undo_participant re-validates the range, so a logic error here still fails loud rather
+      // than registering a divergent participant.
+      if (startup == startup_t::existing_state) {
+         const auto db_range = db.undo_stack_revision_range();
+         if (trx_dedup.undo_stack_revision_range() != db_range) {
+            const auto dedup_range = trx_dedup.undo_stack_revision_range();
+            wlog( "transaction dedup file revision range [{},{}] does not match database [{},{}]; "
+                  "rebuilding empty dedup aligned to the database (dedup replay protection over the "
+                  "reversible window is rebuilt as those blocks become irreversible)",
+                  dedup_range.first, dedup_range.second, db_range.first, db_range.second );
+            trx_dedup.reset();
+            trx_dedup.set_revision( db_range.first );
+            for( uint64_t r = db_range.first; r < db_range.second; ++r )
+               trx_dedup.add_undo_session();
+         }
+      } else {
+         trx_dedup.set_revision(static_cast<uint64_t>(db.revision()));
+      }
+      db.add_undo_participant(std::make_unique<dedup_undo_index>(trx_dedup));
+      // The dedup is now registered and consistent with the database; from here a clean shutdown (or
+      // an abort after this point) may safely persist it. Before this point trx_dedup is empty at
+      // revision 0 and must never be written over a good file.
+      okay_to_persist_dedup = true;
+
       SYS_ASSERT(conf.terminate_at_block == 0 || conf.terminate_at_block > chain_head.block_num(),
                  plugin_config_exception, "--terminate-at-block {} not greater than chain head {}",
                  conf.terminate_at_block, chain_head.block_num());
@@ -1566,6 +1622,7 @@ struct controller_impl {
          using utils_t = decltype(utils);
          using value_t = typename decltype(utils)::index_t::value_type;
          snapshot->read_section<value_t>([this, &read_row_count]( auto& section ) {
+            utils_t::preallocate(db, section.row_count());
             bool more = !section.empty();
             while (more) {
                utils_t::create(db, [this, &section, &more](auto& row) {
@@ -1688,6 +1745,7 @@ struct controller_impl {
             // TODO:
          }
          snapshot->read_section<value_t>([this,&rows_loaded]( auto& section ) {
+            decltype(utils)::preallocate(db, section.row_count());
             bool more = !section.empty();
             while(more) {
                decltype(utils)::create(db, [this, &section, &more]( auto &row ) {
@@ -1844,7 +1902,7 @@ struct controller_impl {
       authority system_auth(genesis.initial_key);
       create_native_account( genesis.initial_timestamp, sysio::chain::config::system_account_name, system_auth, system_auth, true );
 
-      auto empty_authority = authority(1, {}, {});
+      auto empty_authority = genesis_empty_authority();
       auto active_producers_authority = authority(1, {}, {});
       active_producers_authority.accounts.push_back({{sysio::chain::config::system_account_name, sysio::chain::config::active_name}, 1});
 
@@ -1902,8 +1960,7 @@ struct controller_impl {
    /**
     *  Adds the transaction receipt to the pending block and returns it.
     */
-   template<typename T>
-   const transaction_receipt& push_receipt( const T& trx, const cpu_usage_t& cpu_usage_us ) {
+   const transaction_receipt& push_receipt( const packed_transaction& trx, const cpu_usage_t& cpu_usage_us ) {
       auto& bb = std::get<building_block>(pending->_block_stage);
       auto& receipts = bb.pending_trx_receipts();
       receipts.emplace_back( trx );
@@ -1965,7 +2022,7 @@ struct controller_impl {
          auto handle_exception =[&](const auto& e)
          {
             trace->error_code = controller::convert_exception_to_error_code( e );
-            trace->except = e;
+            trace->except = e.dynamic_copy_exception(); // virtual copy preserves the dynamic exception type
             trace->except_ptr = std::current_exception();
             auto now = fc::time_point::now();
             trx_context.update_billed_cpu_time(now);
@@ -1999,6 +2056,7 @@ struct controller_impl {
 
             trx->prev_accounts_billing = trx_context.accounts_billing;
             trx->elapsed = std::max(trx->elapsed, trace->elapsed);
+            trx->prev_succeeded = true;
             if (!trx->implicit() && !trx->is_read_only()) {
                trace->receipt = push_receipt(*trx->packed_trx(), trx_context.billed_cpu_us);
                bb.pending_trx_metas().emplace_back(trx);
@@ -2059,13 +2117,12 @@ struct controller_impl {
 
          // this code is hit if an exception was thrown, and handled by `handle_exception`
          // ------------------------------------------------------------------------------
+         // _block_report describes block contents on both producer (log_applied + produced_block_metrics) and
+         // receiver (Received log + incoming_block_metrics) paths.  A rejected trx is dropped from the block,
+         // so do not roll its net/cpu/elapsed in -- producer and receiver totals must agree.
          if (!trx->is_transient()) {
             dmlog_applied_transaction(trace);
             emit( applied_transaction, std::tie(trace, trx->packed_trx()), __FILE__, __LINE__ );
-
-            pending->_block_report.total_net_usage += trace->net_usage;
-            if( trace->receipt ) pending->_block_report.total_cpu_usage_us += trace->total_cpu_usage_us;
-            pending->_block_report.total_elapsed_time += trace->elapsed;
          }
 
          return trace;
@@ -2089,8 +2146,7 @@ struct controller_impl {
       }
 
       auto guard_pending = fc::make_scoped_exit([this, head_block_num=chain_head.block_num()]() {
-         trx_dedup.abort_block_revision(); // no-op if no pending revision
-         pending.reset();
+         pending.reset();   // destroying the unpushed block session drives the dedup participant's undo
          protocol_features.popped_blocks_to( head_block_num );
       });
 
@@ -2098,9 +2154,10 @@ struct controller_impl {
                   "db revision {} is not on par with head block {}, fork db head {}",
                   db.revision(), chain_head.block_num(), fork_db_head().block_num() );
 
+      // Opening the block's db undo session drives the dedup participant's add_undo_session; for
+      // skip_db_sessions blocks (irreversible/ephemeral) there is no session and the dedup records
+      // permanently, matching the database.
       maybe_session        session = skip_db_sessions(s) ? maybe_session() : maybe_session(db);
-      if (!skip_db_sessions(s))
-         trx_dedup.start_block_revision(chain_head.block_num() + 1);
       building_block_input bbi{chain_head.id(), chain_head.timestamp(), when, chain_head.internal()->get_producer_for_block_at(when).producer_name,
                                new_protocol_feature_activations};
       pending.emplace(std::move(session), *chain_head.internal(), bbi);
@@ -2198,7 +2255,8 @@ struct controller_impl {
             if( onblock_trace->except ) {
                if (onblock_trace->except->code() == interrupt_exception::code_value) {
                   ilog("Interrupt of onblock {}", chain_head.block_num() + 1);
-                  throw *onblock_trace->except;
+                  assert(onblock_trace->except_ptr); // always set together
+                  std::rethrow_exception(onblock_trace->except_ptr);
                }
                wlog("onblock {} is REJECTING: {}", chain_head.block_num() + 1, fc::json::to_log_string(*onblock_trace));
             }
@@ -2375,9 +2433,9 @@ struct controller_impl {
          throw;
       }
 
-      // push the state for pending.
+      // push the state for pending. The block's db undo session is kept (not undone), so the dedup
+      // participant's matching undo session likewise remains on its stack until LIB advances.
       pending->push();
-      trx_dedup.commit_block_revision();
    }
 
    void log_applied(controller::block_status s) const {
@@ -2412,12 +2470,17 @@ struct controller_impl {
          return;
       }
 
+      // wire latency is block_timestamp -> first network arrival at this node (received_time, set by net_plugin),
+      // distinct from latency which is block_timestamp -> apply complete. Their difference is the local apply-queue
+      // / in-producing-mode delay. wire latency is 0 when received_time is unset (replay, loaded from disk).
+      const auto& received_time = chain_head.internal()->received_time;
       ilog("Received block {}... #{} @ {} signed by {} " // "Received" instead of "Applied" so it matches existing log output
-           "[trxs: {}, lib: {}, net: {}, cpu: {} us, elapsed: {} us, applying time: {} us, latency: {} ms]",
+           "[trxs: {}, lib: {}, net: {}, cpu: {} us, elapsed: {} us, applying time: {} us, wire latency: {} ms, latency: {} ms]",
            chain_head.id().short_id(), chain_head.block_num(), chain_head.timestamp(), chain_head.producer(),
            chain_head.block()->transactions.size(), chain_head.irreversible_blocknum(),
-           br.total_net_usage, br.total_cpu_usage_us,
-           br.total_elapsed_time, now - br.start_time, (now - chain_head.timestamp()).count() / 1000);
+           br.total_net_usage, br.total_cpu_usage_us, br.total_elapsed_time, now - br.start_time,
+           received_time != fc::time_point() ? (received_time - chain_head.block_time()).count() / 1000 : 0,
+           (now - chain_head.timestamp()).count() / 1000);
 
       if (_update_incoming_block_metrics) {
          _update_incoming_block_metrics({.trxs_incoming_total   = chain_head.block()->transactions.size(),
@@ -2456,6 +2519,13 @@ struct controller_impl {
    {
       const auto& pfs = protocol_features.get_protocol_feature_set();
 
+      // Track digests seen earlier in this activation list so duplicates fail here rather than
+      // later in start_block (which only catches duplicates of preactivated features). A duplicate
+      // that wasn't preactivated would otherwise re-run trigger_activation_handler and increment
+      // num_new_protocol_features_activated twice, diverging side effects from a legitimate block.
+      flat_set<digest_type> seen_in_this_activation;
+      seen_in_this_activation.reserve( new_protocol_features.size() );
+
       for( auto itr = new_protocol_features.begin(); itr != new_protocol_features.end(); ++itr ) {
          const auto& f = *itr;
 
@@ -2484,6 +2554,10 @@ struct controller_impl {
          SYS_ASSERT( currently_activated_protocol_features.find( f ) == currently_activated_protocol_features.end(),
                      protocol_feature_exception,
                      "protocol feature with digest '{}' has already been activated", f
+         );
+
+         SYS_ASSERT( seen_in_this_activation.insert( f ).second, protocol_feature_exception,
+                     "protocol feature with digest '{}' appears more than once in the activation list", f
          );
 
          auto dependency_checker = [&currently_activated_protocol_features, &new_protocol_features, &itr]
@@ -2578,7 +2652,7 @@ struct controller_impl {
             } else {
                trx_metas.reserve( b->transactions.size() );
                for( const auto& receipt : b->transactions ) {
-                  const auto& pt =receipt.trx;
+                  const auto& pt = receipt.trx;
                   transaction_metadata_ptr trx_meta_ptr = trx_lookup ? trx_lookup( pt.id() ) : transaction_metadata_ptr{};
                   if( trx_meta_ptr && *trx_meta_ptr->packed_trx() != pt ) trx_meta_ptr = nullptr;
                   if( trx_meta_ptr && ( skip_auth_checks || !trx_meta_ptr->recovered_keys().empty() ) ) {
@@ -2619,7 +2693,8 @@ struct controller_impl {
                   } else {
                      elog("{}", fc::json::to_log_string(*trace));
                   }
-                  throw *trace->except;
+                  assert(trace->except_ptr); // always set together
+                  std::rethrow_exception(trace->except_ptr);
                }
 
                SYS_ASSERT(trx_receipts.size() > 0, block_validate_exception,
@@ -2664,43 +2739,7 @@ struct controller_impl {
             }
 
             if( are_multiple_state_roots_supported() ) {
-               // New: Process the s_header from block header extensions
-               auto rcvd_it = b->header_extensions.begin();
-               const auto next_rcvd = [&itr=rcvd_it, end=b->header_extensions.end()](bool include_start) {
-                  if( !include_start ) ++itr;
-                  // find the first s_root_extension in the received block header extensions
-                  return std::find_if(itr, end,
-                     [](const auto& ext) { return ext.first == s_root_extension::extension_id(); }); };
-               auto crtd_it = ab.header().header_extensions.begin();
-               const auto next_crtd = [&itr=crtd_it, end=ab.header().header_extensions.end()](bool include_start) {
-                  if( !include_start ) ++itr;
-                  // find the first s_root_extension in the locally constructed block header extensions
-                  // (which should be the same as the received block header extensions)
-                  return std::find_if(itr, end,
-                     [](const auto& ext) { return ext.first == s_root_extension::extension_id(); }); };
-               uint32_t count = 0;
-               bool rcvd = true;
-               bool crtd = true;
-               bool include_start = true;
-               while( rcvd ) {
-                  rcvd_it = next_rcvd(include_start);
-                  crtd_it = next_crtd(include_start);
-                  ++count;
-                  include_start = false; // only include start for the first iteration
-                  rcvd = rcvd_it != b->header_extensions.end();
-                  crtd = crtd_it != ab.header().header_extensions.end();
-                  SYS_ASSERT( rcvd == crtd, block_validate_exception,
-                              "The received block did{} have {} root header extensions, but the locally constructed one did{}",
-                              (rcvd ? "" : " not"), count, (crtd ? "" : " not") );
-                  if( rcvd && rcvd_it->second != crtd_it->second ) {
-                     s_header rcvd_s_header = fc::raw::unpack<s_header>(rcvd_it->second);
-                     s_header crtd_s_header = fc::raw::unpack<s_header>(crtd_it->second);
-                     SYS_THROW( block_validate_exception,
-                                "The received block root header extension, at slot number {}: {}; and the locally "
-                                "constructed one: {}; don't match!",
-                                count, rcvd_s_header.to_string(), crtd_s_header.to_string() );
-                  }
-               }
+               validate_s_root_extensions_match(b->header_extensions, ab.header().header_extensions);
             }
 
             if( !use_bsp_cached ) {
@@ -2795,9 +2834,6 @@ struct controller_impl {
    // -----------------------------------------------------------------------------
    std::optional<qc_t> verify_basic_proper_block_invariants( const block_id_type& id, const signed_block_ptr& b,
                                                              const block_state& prev ) {
-      if (prev.block_num() <= 1u)
-         return std::nullopt;
-
       SYS_ASSERT( b->block_extensions.empty(), invalid_block_extension, "No block extensions currently supported");
 
       const auto  new_qc_claim = b->qc_claim;
@@ -2813,7 +2849,12 @@ struct controller_impl {
          }
       }
 
-      const auto& prev_qc_claim = prev.header.qc_claim;
+      // Use prev.core.latest_qc_claim() rather than prev.header.qc_claim: for every non-genesis
+      // block they are equal by construction (finality_core::next sets latest_qc_claim from the
+      // header's claim), but genesis intentionally differs (core is {1, false}, header is {0, false}).
+      // The core is the authoritative source, so block 2 can validate cleanly with this reference.
+      // Snapshot-loaded block_state enforces this invariant in block_state(snapshot).
+      const qc_claim_t prev_qc_claim = prev.core.latest_qc_claim();
 
       // validate QC claim against previous block QC info
 
@@ -2886,7 +2927,8 @@ struct controller_impl {
 
    // thread safe, expected to be called from thread other than the main thread
    // tuple<bool best_head, block_handle new_block_handle>
-   controller::accepted_block_result create_block_state_i( const block_id_type& id, const signed_block_ptr& b, const block_state& prev ) {
+   controller::accepted_block_result create_block_state_i( const block_id_type& id, const signed_block_ptr& b, const block_state& prev,
+                                                           fc::time_point received_time ) {
       std::optional<qc_t> qc = verify_basic_block_invariants(id, b, prev);
       log_and_drop_future<void> verify_qc_future;
       if (qc) {
@@ -2917,6 +2959,8 @@ struct controller_impl {
       SYS_ASSERT( id == bsp->id(), block_validate_exception,
                   "provided id {} does not match block id {}", id, bsp->id() );
 
+      bsp->received_time = received_time;
+
       assert(!!qc == verify_qc_future.valid());
       if (qc) {
          verify_qc_future.get();
@@ -2940,7 +2984,8 @@ struct controller_impl {
    }
 
    // thread safe, expected to be called from thread other than the main thread
-   controller::accepted_block_result create_block_handle( const block_id_type& id, const signed_block_ptr& b ) {
+   controller::accepted_block_result create_block_handle( const block_id_type& id, const signed_block_ptr& b,
+                                                          fc::time_point received_time ) {
       SYS_ASSERT( b, block_validate_exception, "null block" );
 
       if (auto bsp = fork_db_.get_block(id, include_root_t::yes))
@@ -2950,7 +2995,7 @@ struct controller_impl {
       if( !prev )
          return controller::accepted_block_result{.add_result = fork_db_add_t::failure, .block{}};
 
-      return create_block_state_i( id, b, *prev );
+      return create_block_state_i( id, b, *prev, received_time );
    }
 
    // thread safe, QC already verified by verify_proper_block_exts
@@ -3048,8 +3093,7 @@ struct controller_impl {
             emit( irreversible_block, std::tie(bsp->block, bsp->id()), __FILE__, __LINE__ );
 
             if (!skip_db_sessions(controller::block_status::irreversible)) {
-               db.commit(bsp->block_num());
-               trx_dedup.commit_to_lib(bsp->block_num());
+               db.commit(bsp->block_num());   // drives the dedup participant's commit (revision == block num)
             }
          }
 
@@ -3219,8 +3263,7 @@ struct controller_impl {
       deque<transaction_metadata_ptr> applied_trxs;
       if( pending ) {
          applied_trxs = pending->extract_trx_metas();
-         trx_dedup.abort_block_revision();
-         pending.reset();
+         pending.reset();   // destroying the unpushed block session drives the dedup participant's undo
          protocol_features.popped_blocks_to( chain_head.block_num() );
       }
       return applied_trxs;
@@ -3254,7 +3297,7 @@ struct controller_impl {
    static checksum256_type calculate_trx_merkle( const deque<transaction_receipt>& trxs) {
       deque<digest_type> trx_digests;
       for( const auto& a : trxs ) {
-         trx_digests.emplace_back( (a.digest)() );
+         trx_digests.emplace_back( a.digest() );
       }
 
       return calc_merkle(std::move(trx_digests));
@@ -3466,7 +3509,12 @@ struct controller_impl {
    }
 
    bool is_head_descendant_of_pending_lib() const {
-      return fork_db_.is_descendant_of_pending_savanna_lib(chain_head.id());
+      // True if pending_savanna_lib is on the chain from chain_head back to fork_db root: pending_savanna_lib is an
+      // ancestor of chain_head, or is chain_head itself. Answered from the head's finality_core, which tracks the
+      // canonical block_ref at each height across [last_final, head). No fork_db walk or mutex required.
+      const auto [pending_id, pending_timestamp] = fork_db_.pending_savanna_lib();
+      if (chain_head.id() == pending_id) return true;
+      return chain_head.extends(pending_id);
    }
 
    void set_savanna_lib(const block_id_type& id, block_timestamp_type timestamp) {
@@ -3955,8 +4003,9 @@ boost::asio::io_context& controller::get_thread_pool() {
    return my->thread_pool.get_executor();
 }
 
-controller::accepted_block_result controller::accept_block( const block_id_type& id, const signed_block_ptr& b ) const {
-   return my->create_block_handle( id, b );
+controller::accepted_block_result controller::accept_block( const block_id_type& id, const signed_block_ptr& b,
+                                                             fc::time_point received_time ) const {
+   return my->create_block_handle( id, b, received_time );
 }
 
 transaction_trace_ptr controller::push_transaction( const transaction_metadata_ptr& trx,
@@ -4095,10 +4144,6 @@ block_timestamp_type controller::pending_block_timestamp()const {
 
 time_point controller::pending_block_time()const {
    return my->pending_block_time();
-}
-
-time_point controller::pending_lib_time()const {
-   return my->pending_lib_time;
 }
 
 uint32_t controller::pending_block_num()const {
@@ -4487,17 +4532,6 @@ void controller::record_transaction( const transaction_id_type& id, fc::time_poi
    my->trx_dedup.record(id, expire);
 }
 
-void controller::push_dedup_session() {
-   my->trx_dedup.push_session();
-}
-
-void controller::squash_dedup_session() {
-   my->trx_dedup.squash_session();
-}
-
-void controller::undo_dedup_session() {
-   my->trx_dedup.undo_session();
-}
 
 void controller::set_subjective_cpu_leeway(fc::microseconds leeway) {
    my->subjective_cpu_leeway = leeway;

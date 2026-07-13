@@ -132,6 +132,42 @@ BOOST_FIXTURE_TEST_CASE(all_rows_walks_every_row, validating_tester) try {
    }
 } FC_LOG_AND_RETHROW()
 
+// A finite deadline clamps the caller's `limit` to `api_base::max_return_items`, matching get_table_by_scope,
+// so one HTTP page cannot stage an unbounded number of KV rows before the response byte budget is enforced.
+// The remainder stays reachable through the returned `more`/`next_key` cursor. An unlimited deadline (the
+// `-1` http-max-response-time-ms operator opt-in, modeled here by the fixture's `maximum()` deadline) is
+// exempt, as is `all_rows` (asserted above) -- both leave `params_deadline` at `maximum()`. Only the deadline
+// differs between the two runs below, so the differing outcomes isolate the clamp.
+BOOST_FIXTURE_TEST_CASE(finite_deadline_clamps_limit_to_max_return_items, validating_tester) try {
+   deploy_contract(*this);
+   // A handful of rows past the cap is enough to prove the page stops at max_return_items with `more` set.
+   constexpr uint32_t OVER_CAP  = read_only::max_return_items + 10;
+   constexpr uint32_t BIG_LIMIT = 100'000; // far above both the cap and the populated row count
+   populate_numobjs(*this, OVER_CAP);
+
+   auto ro = make_read_only(*this);
+
+   // Finite deadline -> clamp to max_return_items. `time_limit_ms` makes `params_deadline` finite even though
+   // the fixture's HTTP deadline is `maximum()`; the generous 60s budget guarantees the count cap -- not the
+   // clock -- is what stops the scan.
+   auto capped = numobjs_params();
+   capped.limit         = BIG_LIMIT;
+   capped.time_limit_ms = 60'000;
+   auto capped_res = run(ro, capped);
+   BOOST_REQUIRE_EQUAL(capped_res.rows.size(), static_cast<size_t>(read_only::max_return_items));
+   BOOST_CHECK(capped_res.more);
+   BOOST_CHECK(!capped_res.next_key.empty());
+
+   // Unlimited deadline (no `time_limit_ms` -> `params_deadline` stays `maximum()`): the same over-cap limit is
+   // NOT clamped, so every populated row comes back in one page. Had the clamp wrongly engaged here it would
+   // return max_return_items rows with `more` set.
+   auto unbounded = numobjs_params();
+   unbounded.limit = BIG_LIMIT;
+   auto unbounded_res = run(ro, unbounded);
+   BOOST_REQUIRE_EQUAL(unbounded_res.rows.size(), static_cast<size_t>(OVER_CAP));
+   BOOST_CHECK(!unbounded_res.more);
+} FC_LOG_AND_RETHROW()
+
 // `values_only` strips the `{key, value, payer}` wrapper, leaving just the contract-side value. Default stays
 // wrapped (asserted above) so HTTP clients are unaffected.
 BOOST_FIXTURE_TEST_CASE(values_only_strips_wrapper, validating_tester) try {

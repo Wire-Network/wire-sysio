@@ -54,21 +54,31 @@ void qc_t::verify_basic(const finalizer_policies_t& policies) const {
       SYS_ASSERT(policies.pending_finalizer_policy, invalid_qc,
                  "qc {} contains pending policy signature for nonexistent pending finalizer policy", block_num);
 
-      // verify that every finalizer included in both policies voted the same
-      verify_dual_finalizers_votes(policies, active_policy_sig, *pending_policy_sig, block_num);
-
       pending_policy_sig->verify_vote_format(policies.pending_finalizer_policy);
       pending_policy_sig->verify_weights(policies.pending_finalizer_policy);
+
+      // verify that every finalizer included in both policies voted the same
+      verify_dual_finalizers_votes(policies, active_policy_sig, *pending_policy_sig, block_num);
    } else {
       SYS_ASSERT(!policies.pending_finalizer_policy, invalid_qc,
                  "qc {} does not contain pending policy signature for pending finalizer policy", block_num);
    }
 }
 
-// returns true iff the other and I voted in the same way.
+// Returns true iff the other and I voted in the same way.
+//
+// Precondition chain: both *this and `other` must have passed verify_vote_format()
+// before reaching this function. verify_vote_format asserts each qc_sig_t has at
+// least one of strong_votes/weak_votes and that each present bitset's size matches
+// the corresponding policy's finalizer count. Callers (qc_t::verify_basic ->
+// verify_dual_finalizers_votes) run verify_vote_format on both qc_sigs first, so
+// the index-in-range asserts below are coding-error guards, not attacker-input
+// guards.
 bool qc_sig_t::vote_same_at(const qc_sig_t& other, uint32_t my_vote_index, uint32_t other_vote_index) const {
    assert(!strong_votes || my_vote_index < strong_votes->size());
-   assert(!weak_votes || my_vote_index < weak_votes->size());
+   assert(!weak_votes   || my_vote_index < weak_votes->size());
+   assert(!other.strong_votes || other_vote_index < other.strong_votes->size());
+   assert(!other.weak_votes   || other_vote_index < other.weak_votes->size());
 
    // We have already verified the same index has not voted both strong
    // and weak for a given qc_sig_t (I or other).
@@ -293,7 +303,12 @@ vote_result_t aggregating_qc_sig_t::add_weak_vote(size_t index, const bls_signat
       break;
 
    case state_t::weak_achieved:
-      if (weak_sum >= max_weak_sum_before_weak_final)
+      // Use strict '>' to match the unrestricted/restricted arm above. weak_final means a strong
+      // QC can no longer form; the max achievable strong sum is (sum - weak_sum), so strong is
+      // still possible while weak_sum == max_weak_sum_before_weak_final (== sum - threshold), where
+      // the achievable strong sum equals exactly the threshold. '>=' declared weak_final one
+      // weight-unit early.
+      if (weak_sum > max_weak_sum_before_weak_final)
          aggregating_state = state_t::weak_final;
       break;
 
@@ -326,7 +341,7 @@ vote_result_t aggregating_qc_sig_t::add_vote(uint32_t connection_id, block_num_t
    return s;
 }
 
-// called by get_best_qc which acquires a mutex
+// called by aggregated_qc_sig which acquires a mutex
 qc_sig_t aggregating_qc_sig_t::extract_qc_sig_from_aggregating() const {
    qc_sig_t qc_sig;
 
@@ -344,38 +359,27 @@ qc_sig_t aggregating_qc_sig_t::extract_qc_sig_from_aggregating() const {
    return qc_sig;
 }
 
-std::optional<qc_sig_t> aggregating_qc_sig_t::get_best_qc() const {
+std::optional<qc_sig_t> aggregating_qc_sig_t::received_qc_sig_copy() const {
    std::lock_guard g(*_mtx);
-   // if this does not have a valid QC, consider received_qc_sig only
-   if( !is_quorum_met_no_lock() ) {
-      if( received_qc_sig ) {
-         return std::optional{*received_qc_sig};
-      }
-      return {};
-   }
-
-   qc_sig_t qc_sig_from_agg = extract_qc_sig_from_aggregating();
-
-   // if received_qc_sig does not have value, consider qc_sig_from_agg only
-   if( !received_qc_sig ) {
-      return std::optional{std::move(qc_sig_from_agg)};
-   }
-
-   // Both received_qc_sig and qc_sig_from_agg have value. Compare them and select a better one.
-   // Strong beats weak. Tie-break by received_qc_sig, strong beats weak
-   if (received_qc_sig->is_strong() || qc_sig_from_agg.is_weak()) {
-      return std::optional{qc_sig_t{ *received_qc_sig }};
-   }
-   return std::optional{qc_sig_t{ std::move(qc_sig_from_agg) }};
+   return received_qc_sig;
 }
 
-bool aggregating_qc_sig_t::set_received_qc_sig(const qc_sig_t& qc) {
+std::optional<qc_sig_t> aggregating_qc_sig_t::aggregated_qc_sig() const {
    std::lock_guard g(*_mtx);
-   if (!received_qc_sig || (received_qc_sig->is_weak() && qc.is_strong())) {
-      received_qc_sig = qc;
-      return true;
+   if( !is_quorum_met_no_lock() ) {
+      return {};
    }
-   return false;
+   return extract_qc_sig_from_aggregating();
+}
+
+bool aggregating_qc_sig_t::has_received_qc_sig() const {
+   std::lock_guard g(*_mtx);
+   return received_qc_sig.has_value();
+}
+
+void aggregating_qc_sig_t::set_received_qc_sig(const qc_sig_t& qc) {
+   std::lock_guard g(*_mtx);
+   received_qc_sig = qc;
 }
 
 bool aggregating_qc_sig_t::received_qc_sig_is_strong() const {
@@ -388,20 +392,60 @@ bool aggregating_qc_sig_t::is_quorum_met_no_lock() const {
 }
 
 std::optional<qc_t> aggregating_qc_t::get_best_qc(block_num_type block_num) const {
+   // Hold the outer mutex so each candidate qc_t is a consistent cross-policy
+   // snapshot (aggregate_vote applies a dual finalizer's vote to both policies
+   // under this mutex).
    std::lock_guard g(*_mtx);
-   std::optional<qc_sig_t> active_best_qc = active_policy_sig.get_best_qc();
-   if (!active_best_qc) // active is always required
-      return {};
 
-   if (pending_policy_sig) {
-      std::optional<qc_sig_t> pending_best_qc = pending_policy_sig->get_best_qc();
-      if (pending_best_qc)
-         return std::optional<qc_t>{qc_t{block_num, std::move(*active_best_qc), std::move(pending_best_qc)}};
-      return {}; // no quorum on pending_policy_sig so no qc for this block
-   }
+   // The active and pending parts of a qc_t must come from a SINGLE source:
+   //  - received:   both parts of one network-received qc_t that passed verify_qc
+   //                (set_received_qc stores and replaces them as a unit), or
+   //  - aggregated: locally aggregated votes, applied to both policies atomically.
+   // Mixing sources can pair a dual finalizer's vote in one part with its absence
+   // (or a different strength) in the other part. Such a qc_t fails
+   // verify_dual_finalizers_votes on every receiving node, so a producer that
+   // includes it in a block gets that block rejected network-wide.
+   auto make_received = [&]() -> std::optional<qc_t> {
+      std::optional<qc_sig_t> active = active_policy_sig.received_qc_sig_copy();
+      if (!active)
+         return {};
+      if (pending_policy_sig) {
+         std::optional<qc_sig_t> pending = pending_policy_sig->received_qc_sig_copy();
+         // set_received_qc stores both parts of one verified qc_t together
+         assert(pending);
+         if (!pending)
+            return {};
+         return qc_t{block_num, std::move(*active), std::move(pending)};
+      }
+      return qc_t{block_num, std::move(*active), {}};
+   };
 
-   // no pending_policy_sig so only need active
-   return std::optional<qc_t>{qc_t{block_num, std::move(*active_best_qc), {}}};
+   auto make_aggregated = [&]() -> std::optional<qc_t> {
+      std::optional<qc_sig_t> active = active_policy_sig.aggregated_qc_sig();
+      if (!active) // active is always required
+         return {};
+      if (pending_policy_sig) {
+         std::optional<qc_sig_t> pending = pending_policy_sig->aggregated_qc_sig();
+         if (!pending)
+            return {}; // no quorum on pending_policy_sig so no aggregated qc for this block
+         return qc_t{block_num, std::move(*active), std::move(pending)};
+      }
+      return qc_t{block_num, std::move(*active), {}};
+   };
+
+   std::optional<qc_t> received   = make_received();
+   std::optional<qc_t> aggregated = make_aggregated();
+
+   if (!received)
+      return aggregated;
+   if (!aggregated)
+      return received;
+
+   // Both candidates available: a strong qc beats a weak one, tie-break in
+   // favor of received (same preference the per-policy selection used).
+   if (received->is_strong() || aggregated->is_weak())
+      return received;
+   return aggregated;
 }
 
 bool aggregating_qc_t::set_received_qc(const qc_t& qc) {
@@ -409,12 +453,22 @@ bool aggregating_qc_t::set_received_qc(const qc_t& qc) {
    // qc should have already been verified via verify_qc, this SYS_ASSERT should never fire
    SYS_ASSERT(!pending_policy_sig || qc.pending_policy_sig, invalid_qc,
               "qc {} expected to have a pending policy signature", qc.block_num);
-   bool active_better = active_policy_sig.set_received_qc_sig(qc.active_policy_sig);
-   bool pending_better = false;
+   // Replace the stored received parts as a unit so they always originate from a
+   // single verified qc_t. Replacing the parts independently could interleave two
+   // received QCs into an (active, pending) pair that no peer ever produced or
+   // verified — e.g. a dual finalizer strong in one part and weak in the other —
+   // which fails verify_dual_finalizers_votes on every receiving node.
+   // A new qc replaces the stored one only when it is strictly better as a unit:
+   // nothing stored yet, or stored unit weak and the new unit strong.
+   // received_qc_is_strong() only takes the per-policy mutexes, preserving the
+   // outer -> inner lock order.
+   if (active_policy_sig.has_received_qc_sig() && (received_qc_is_strong() || qc.is_weak()))
+      return false;
+   active_policy_sig.set_received_qc_sig(qc.active_policy_sig);
    if (pending_policy_sig) {
-      pending_better = pending_policy_sig->set_received_qc_sig(*qc.pending_policy_sig);
+      pending_policy_sig->set_received_qc_sig(*qc.pending_policy_sig);
    }
-   return active_better || pending_better;
+   return true;
 }
 
 bool aggregating_qc_t::received_qc_is_strong() const {
@@ -454,9 +508,14 @@ aggregate_vote_result_t aggregating_qc_t::aggregate_vote(uint32_t connection_id,
       return r;
    }
 
-   // Check has_voted, return duplicate if the vote is already present in both policies.
+   // Fast-path dedup hint: lock-free atomic reads on has_voted filter out most duplicates
+   // before the expensive BLS verify. This is a performance optimization, NOT the
+   // authoritative dedup — two voters racing here may both pass and both do the BLS verify.
+   // The authoritative check is aggregating_qc_sig_t::check_duplicate() called under the
+   // outer lock from add_vote() below, which ensures no double-counting of weight.
+   //
    // For dual finalizers both policies must have the vote; for single-policy finalizers only
-   // the applicable policy is checked. This rejects duplicates before the expensive BLS verify.
+   // the applicable policy is checked.
    bool active_dup  = active_index  < 0 || active_policy_sig.has_voted(active_index);
    bool pending_dup = pending_index < 0 || pending_policy_sig->has_voted(pending_index);
    if (active_dup && pending_dup) {

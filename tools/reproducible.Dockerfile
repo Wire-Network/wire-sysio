@@ -113,7 +113,7 @@ FROM builder AS build
 
 ARG SYSIO_BUILD_JOBS
 
-# Yuck: This places the source at the same location as wire-sysio's CI (build.yaml, build_base.yaml). Unfortunately this location only matches
+# Yuck: This places the source at the same location as wire-sysio's CI. Unfortunately this location only matches
 #       when build.yaml etc are being run from a repository named wire-sysio.
 COPY / /__w/sysio/sysio
 RUN cmake -S /__w/sysio/sysio -B build -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release -GNinja && \

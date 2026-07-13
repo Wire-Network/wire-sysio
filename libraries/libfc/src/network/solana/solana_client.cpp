@@ -6,9 +6,144 @@
 #include <fc/log/logger.hpp>
 #include <fc/network/solana/solana_borsh.hpp>
 #include <fc/network/solana/solana_client.hpp>
+#include <fc/task/retry.hpp>
+#include <magic_enum/magic_enum.hpp>
+#include <limits>
+#include <optional>
 #include <thread>
 
 namespace fc::network::solana {
+
+namespace {
+
+/**
+ * @brief Checked size_t addition for conservative Borsh size estimates.
+ */
+std::optional<size_t> checked_add_size(size_t lhs, size_t rhs) {
+   if (lhs > std::numeric_limits<size_t>::max() - rhs)
+      return std::nullopt;
+   return lhs + rhs;
+}
+
+/**
+ * @brief Checked size_t multiplication for conservative Borsh size estimates.
+ */
+std::optional<size_t> checked_mul_size(size_t lhs, size_t rhs) {
+   if (lhs != 0 && rhs > std::numeric_limits<size_t>::max() / lhs)
+      return std::nullopt;
+   return lhs * rhs;
+}
+
+/**
+ * @brief Return the next nested IDL type depth or reject excessive recursion.
+ */
+size_t next_idl_type_depth(size_t type_depth) {
+   FC_ASSERT(type_depth < max_idl_type_nesting_depth,
+             "Solana IDL type nesting exceeds maximum depth {}",
+             max_idl_type_nesting_depth);
+   return type_depth + 1;
+}
+
+std::optional<size_t> min_borsh_encoded_size(const idl::idl_type& type, const idl::program* program,
+                                             size_t type_depth);
+
+/**
+ * @brief Smallest Borsh byte count for a field sequence.
+ */
+std::optional<size_t> min_borsh_fields_encoded_size(const std::vector<idl::field>& fields,
+                                                    const idl::program* program,
+                                                    size_t type_depth) {
+   size_t total = 0;
+   for (const auto& field : fields) {
+      auto field_size = min_borsh_encoded_size(field.type, program, type_depth);
+      if (!field_size)
+         return std::nullopt;
+      auto next_total = checked_add_size(total, *field_size);
+      if (!next_total)
+         return std::nullopt;
+      total = *next_total;
+   }
+   return total;
+}
+
+/**
+ * @brief Conservative lower bound for bytes consumed by an IDL type.
+ */
+std::optional<size_t> min_borsh_encoded_size(const idl::idl_type& type, const idl::program* program,
+                                             size_t type_depth) {
+   if (type.is_primitive()) {
+      switch (type.get_primitive()) {
+      case idl::primitive_type::bool_t:
+      case idl::primitive_type::u8:
+      case idl::primitive_type::i8:
+         return sizeof(uint8_t);
+      case idl::primitive_type::u16:
+      case idl::primitive_type::i16:
+         return sizeof(uint16_t);
+      case idl::primitive_type::u32:
+      case idl::primitive_type::i32:
+      case idl::primitive_type::f32:
+         return sizeof(uint32_t);
+      case idl::primitive_type::u64:
+      case idl::primitive_type::i64:
+      case idl::primitive_type::f64:
+         return sizeof(uint64_t);
+      case idl::primitive_type::u128:
+      case idl::primitive_type::i128:
+         return sizeof(uint64_t) * 2;
+      case idl::primitive_type::u256:
+      case idl::primitive_type::i256:
+         return sizeof(uint64_t) * 4;
+      case idl::primitive_type::string:
+      case idl::primitive_type::bytes:
+         return sizeof(uint32_t);
+      case idl::primitive_type::pubkey:
+         return solana_public_key::size;
+      }
+   } else if (type.is_option()) {
+      return sizeof(uint8_t);
+   } else if (type.is_vec()) {
+      return sizeof(uint32_t);
+   } else if (type.is_array()) {
+      if (!type.array_element || !type.array_len)
+         return std::nullopt;
+      auto element_size = min_borsh_encoded_size(*type.array_element, program, next_idl_type_depth(type_depth));
+      if (!element_size)
+         return std::nullopt;
+      return checked_mul_size(*element_size, *type.array_len);
+   } else if (type.is_tuple() && type.tuple_elements) {
+      size_t total = 0;
+      const auto element_depth = next_idl_type_depth(type_depth);
+      for (const auto& elem_type : *type.tuple_elements) {
+         auto elem_size = min_borsh_encoded_size(elem_type, program, element_depth);
+         if (!elem_size)
+            return std::nullopt;
+         auto next_total = checked_add_size(total, *elem_size);
+         if (!next_total)
+            return std::nullopt;
+         total = *next_total;
+      }
+      return total;
+   } else if (type.is_defined()) {
+      if (!program)
+         return std::nullopt;
+
+      const idl::type_def* type_def = program->find_type(type.get_defined_name());
+      if (!type_def)
+         return std::nullopt;
+
+      if (type_def->is_struct() && type_def->struct_fields)
+         return min_borsh_fields_encoded_size(*type_def->struct_fields, program,
+                                              next_idl_type_depth(type_depth));
+
+      if (type_def->is_enum() && type_def->enum_variants)
+         return sizeof(uint8_t);
+   }
+
+   return std::nullopt;
+}
+
+}  // namespace
 
 //=============================================================================
 // solana_program_data_client implementation
@@ -379,6 +514,11 @@ std::vector<uint8_t> solana_program_client::extract_return_data(const fc::varian
 }
 
 fc::variant solana_program_client::decode_type(borsh::decoder& decoder, const idl::idl_type& type) {
+   return decode_type(decoder, type, 0);
+}
+
+fc::variant solana_program_client::decode_type(borsh::decoder& decoder, const idl::idl_type& type,
+                                               size_t type_depth) {
    if (type.is_primitive()) {
       switch (type.get_primitive()) {
       case idl::primitive_type::bool_t:
@@ -430,33 +570,52 @@ fc::variant solana_program_client::decode_type(borsh::decoder& decoder, const id
       }
       FC_ASSERT(has_value == 1, "Invalid option discriminator: {}", has_value);
       // Recursively decode the inner type
-      return decode_type(decoder, *type.option_inner);
+      return decode_type(decoder, *type.option_inner, next_idl_type_depth(type_depth));
    } else if (type.is_vec()) {
       uint32_t len = decoder.read_u32();
+      FC_ASSERT(type.vec_element, "Borsh decoder: Vec type is missing an element type");
+      const auto element_depth = next_idl_type_depth(type_depth);
+      const auto min_element_size = min_borsh_encoded_size(*type.vec_element, _program.get(), element_depth);
+      if (!min_element_size) {
+         FC_ASSERT(len == 0,
+                   "Borsh decoder: cannot safely bound vector element type '{}' before allocation",
+                   type.vec_element->to_string());
+      } else if (*min_element_size == 0) {
+         FC_ASSERT(len <= max_zero_sized_idl_vector_elements,
+                   "Borsh decoder: zero-sized vector length {} for element type '{}' exceeds decode cap {}",
+                   len, type.vec_element->to_string(), max_zero_sized_idl_vector_elements);
+      } else {
+         FC_ASSERT(len <= decoder.remaining() / *min_element_size,
+                   "Borsh decoder: vector length {} for element type '{}' exceeds remaining {} bytes",
+                   len, type.vec_element->to_string(), decoder.remaining());
+      }
+
       fc::variants arr;
       arr.reserve(len);
 
       // Decode each element
       for (uint32_t i = 0; i < len; ++i) {
-         arr.push_back(decode_type(decoder, *type.vec_element));
+         arr.push_back(decode_type(decoder, *type.vec_element, element_depth));
       }
       return fc::variant(arr);
    } else if (type.is_array()) {
       fc::variants arr;
       arr.reserve(*type.array_len);
+      const auto element_depth = next_idl_type_depth(type_depth);
 
       // Decode each element (no length prefix for fixed arrays)
       for (size_t i = 0; i < *type.array_len; ++i) {
-         arr.push_back(decode_type(decoder, *type.array_element));
+         arr.push_back(decode_type(decoder, *type.array_element, element_depth));
       }
       return fc::variant(arr);
    } else if (type.is_tuple() && type.tuple_elements) {
       fc::variants arr;
       arr.reserve(type.tuple_elements->size());
+      const auto element_depth = next_idl_type_depth(type_depth);
 
       // Decode each tuple element
       for (const auto& elem_type : *type.tuple_elements) {
-         arr.push_back(decode_type(decoder, elem_type));
+         arr.push_back(decode_type(decoder, elem_type, element_depth));
       }
       return fc::variant(arr);
    } else if (type.is_defined()) {
@@ -467,7 +626,7 @@ fc::variant solana_program_client::decode_type(borsh::decoder& decoder, const id
       FC_ASSERT(type_def, "Type '{}' not found in IDL", type.get_defined_name());
 
       if (type_def->is_struct() && type_def->struct_fields) {
-         return decode_fields(decoder, *type_def->struct_fields);
+         return decode_fields(decoder, *type_def->struct_fields, next_idl_type_depth(type_depth));
       } else if (type_def->is_enum() && type_def->enum_variants) {
          // Decode enum variant index
          uint8_t variant_idx = decoder.read_u8();
@@ -481,7 +640,7 @@ fc::variant solana_program_client::decode_type(borsh::decoder& decoder, const id
 
          // Decode variant fields if present
          if (variant.fields && !variant.fields->empty()) {
-            obj("fields", decode_fields(decoder, *variant.fields));
+            obj("fields", decode_fields(decoder, *variant.fields, next_idl_type_depth(type_depth)));
          }
          return fc::variant(obj);
       } else {
@@ -493,9 +652,14 @@ fc::variant solana_program_client::decode_type(borsh::decoder& decoder, const id
 }
 
 fc::variant solana_program_client::decode_fields(borsh::decoder& decoder, const std::vector<idl::field>& fields) {
+   return decode_fields(decoder, fields, 0);
+}
+
+fc::variant solana_program_client::decode_fields(borsh::decoder& decoder, const std::vector<idl::field>& fields,
+                                                 size_t type_depth) {
    fc::mutable_variant_object obj;
    for (const auto& field : fields) {
-      obj(field.name, decode_type(decoder, field.type));
+      obj(field.name, decode_type(decoder, field.type, type_depth));
    }
    return fc::variant(obj);
 }
@@ -568,6 +732,34 @@ std::string solana_program_client::execute_tx(const idl::instruction& instr, con
    auto tx = client->create_transaction({instruction}, client->get_pubkey());
    client->sign_transaction(tx);
    return client->send_transaction(tx);
+}
+
+std::string solana_program_client::execute_tx_and_confirm(const idl::instruction& instr,
+                                                           const std::vector<account_meta>& accounts,
+                                                           const program_invoke_data_items& params,
+                                                           const solana_confirm_options& opts) {
+   // Delegate to the pre-instructions overload with an empty prefix so we
+   // have a single tx-build path; both overloads stay source-compatible
+   // for every existing caller.
+   return execute_tx_and_confirm(instr, accounts, params, {}, opts);
+}
+
+std::string solana_program_client::execute_tx_and_confirm(const idl::instruction& instr,
+                                                           const std::vector<account_meta>& accounts,
+                                                           const program_invoke_data_items& params,
+                                                           const std::vector<instruction>& pre_instructions,
+                                                           const solana_confirm_options& opts) {
+   auto idl_instruction = build_instruction(instr, accounts, params);
+
+   std::vector<instruction> all_instructions;
+   all_instructions.reserve(pre_instructions.size() + 1);
+   all_instructions.insert(all_instructions.end(),
+                           pre_instructions.begin(), pre_instructions.end());
+   all_instructions.push_back(std::move(idl_instruction));
+
+   auto tx = client->create_transaction(all_instructions, client->get_pubkey());
+   client->sign_transaction(tx);
+   return client->send_transaction_and_confirm(tx, opts);
 }
 
 std::pair<solana_public_key, uint8_t> solana_program_client::derive_pda(const std::vector<idl::pda_seed>& pda_seeds,
@@ -1247,7 +1439,7 @@ fc::variant solana_client::get_vote_accounts(commitment_t commitment) {
 //=============================================================================
 
 uint64_t solana_client::get_minimum_balance_for_rent_exemption(size_t data_length, commitment_t commitment) {
-   fc::variants params{data_length, build_config(commitment)};
+   fc::variants params{static_cast<uint64_t>(data_length), build_config(commitment)};
    return execute("getMinimumBalanceForRentExemption", params).as_uint64();
 }
 
@@ -1256,7 +1448,7 @@ uint64_t solana_client::get_minimum_balance_for_rent_exemption(size_t data_lengt
 //=============================================================================
 
 fc::variant solana_client::get_recent_performance_samples(size_t limit) {
-   fc::variants params{limit};
+   fc::variants params{static_cast<uint64_t>(limit)};
    return execute("getRecentPerformanceSamples", params);
 }
 
@@ -1387,24 +1579,54 @@ transaction solana_client::create_transaction(const std::vector<instruction>& in
    for (const auto& m : readonly_non_signers)
       tx.msg.account_keys.push_back(m.key);
 
+   FC_ASSERT(
+      tx.msg.account_keys.size() <= limits::LEGACY_ACCOUNT_KEY_LIMIT,
+      "Solana legacy transaction has {} account keys, exceeding the {} key uint8_t instruction-index limit",
+      tx.msg.account_keys.size(),
+      limits::LEGACY_ACCOUNT_KEY_LIMIT);
+
+   const auto max_u8_count = static_cast<size_t>(std::numeric_limits<uint8_t>::max());
+   FC_ASSERT(
+      writable_signers.size() + readonly_signers.size() <= max_u8_count,
+      "Solana legacy transaction has {} required signatures, exceeding the uint8_t header limit",
+      writable_signers.size() + readonly_signers.size());
+   FC_ASSERT(
+      readonly_signers.size() <= max_u8_count,
+      "Solana legacy transaction has {} readonly signers, exceeding the uint8_t header limit",
+      readonly_signers.size());
+   FC_ASSERT(
+      readonly_non_signers.size() <= max_u8_count,
+      "Solana legacy transaction has {} readonly unsigned accounts, exceeding the uint8_t header limit",
+      readonly_non_signers.size());
+
    // Set header
-   tx.msg.header.num_required_signatures = writable_signers.size() + readonly_signers.size();
-   tx.msg.header.num_readonly_signed_accounts = readonly_signers.size();
-   tx.msg.header.num_readonly_unsigned_accounts = readonly_non_signers.size();
+   tx.msg.header.num_required_signatures =
+      static_cast<uint8_t>(writable_signers.size() + readonly_signers.size());
+   tx.msg.header.num_readonly_signed_accounts = static_cast<uint8_t>(readonly_signers.size());
+   tx.msg.header.num_readonly_unsigned_accounts = static_cast<uint8_t>(readonly_non_signers.size());
 
    // Build account key index map
-   std::map<solana_public_key, uint8_t> key_index_map;
+   std::map<solana_public_key, size_t> key_index_map;
    for (size_t i = 0; i < tx.msg.account_keys.size(); ++i) {
-      key_index_map[tx.msg.account_keys[i]] = static_cast<uint8_t>(i);
+      key_index_map[tx.msg.account_keys[i]] = i;
    }
+
+   const auto checked_u8_index = [](size_t index, const char* label) -> uint8_t {
+      FC_ASSERT(
+         index < limits::LEGACY_ACCOUNT_KEY_LIMIT,
+         "Solana {} index {} exceeds the uint8_t instruction-index limit",
+         label,
+         index);
+      return static_cast<uint8_t>(index);
+   };
 
    // Compile instructions
    for (const auto& instr : instructions) {
       compiled_instruction compiled;
-      compiled.program_id_index = key_index_map[instr.program_id];
+      compiled.program_id_index = checked_u8_index(key_index_map.at(instr.program_id), "program id");
 
       for (const auto& meta : instr.accounts) {
-         compiled.account_indices.push_back(key_index_map[meta.key]);
+         compiled.account_indices.push_back(checked_u8_index(key_index_map.at(meta.key), "account"));
       }
 
       compiled.data = instr.data;
@@ -1469,6 +1691,55 @@ std::string solana_client::send_and_confirm_transaction(const transaction& tx, c
    }
 
    FC_THROW("Transaction confirmation timeout");
+}
+
+namespace {
+   /// True when `confirmation_status` string from `getSignatureStatuses` is
+   /// at least as advanced as the requested `target`. Commitment ordering is
+   /// `processed < confirmed < finalized`; an RPC reporting "finalized"
+   /// satisfies every lesser target. Empty status string means the cluster
+   /// has not observed the tx yet — never sufficient.
+   bool has_reached_commitment(const std::string& confirmation_status, commitment_t target) {
+      if (confirmation_status.empty()) return false;
+
+      // Map the RPC's string back to the enum. Unknown strings are treated
+      // as "not yet confirmed" — safer than guessing.
+      auto observed = magic_enum::enum_cast<commitment_t>(confirmation_status);
+      if (!observed.has_value()) return false;
+
+      // Enum declaration order (processed=0, confirmed=1, finalized=2) encodes
+      // the monotonic commitment strength we compare against.
+      return magic_enum::enum_integer(*observed) >= magic_enum::enum_integer(target);
+   }
+} // namespace
+
+std::string solana_client::send_transaction_and_confirm(const transaction& tx,
+                                                         const solana_confirm_options& opts) {
+   // Submit once — send_transaction is fire-and-forget by design. We wrap
+   // the poll-until-confirmed step in `fc::task::retry_until` so backoff +
+   // deadline semantics are shared with the Ethereum client.
+   const std::string sig = send_transaction(tx, /*skip_preflight=*/false, opts.commitment);
+
+   return fc::task::retry_until<std::string>(
+      "solana:send_transaction_and_confirm",
+      opts.retry,
+      [this, sig, target = opts.commitment]() -> std::optional<std::string> {
+         auto statuses = get_signature_statuses({sig}, false);
+         if (statuses.value.empty() || !statuses.value[0].has_value()) {
+            return std::nullopt; // cluster hasn't observed the tx yet — retry
+         }
+         const auto& s = *statuses.value[0];
+         if (s.err.has_value()) {
+            // Fatal: the tx ran and failed. No amount of waiting fixes that;
+            // propagate so the caller's retry logic (at the batch-op layer)
+            // can re-submit with a fresh blockhash / nonce.
+            FC_THROW("Transaction failed: {}", *s.err);
+         }
+         if (has_reached_commitment(s.confirmation_status, target)) {
+            return sig; // done — reached the requested commitment level
+         }
+         return std::nullopt; // seen, not yet at target commitment — retry
+      });
 }
 
 } // namespace fc::network::solana

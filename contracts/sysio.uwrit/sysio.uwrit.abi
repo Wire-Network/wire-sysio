@@ -1,82 +1,52 @@
 {
     "____comment": "This file was generated with sysio-abigen. DO NOT EDIT ",
     "version": "sysio::abi/1.2",
-    "types": [
-        {
-            "new_type_name": "vint64_t",
-            "type": "varint_int64"
-        },
-        {
-            "new_type_name": "vuint32_t",
-            "type": "varint_uint32"
-        }
-    ],
+    "types": [],
     "structs": [
         {
-            "name": "ChainId",
+            "name": "chklocks",
             "base": "",
-            "fields": [
-                {
-                    "name": "kind",
-                    "type": "ChainKind"
-                },
-                {
-                    "name": "id",
-                    "type": "vuint32_t"
-                }
-            ]
+            "fields": []
         },
         {
-            "name": "TokenAmount",
+            "name": "commit_entry",
             "base": "",
             "fields": [
-                {
-                    "name": "kind",
-                    "type": "TokenKind"
-                },
-                {
-                    "name": "amount",
-                    "type": "vint64_t"
-                }
-            ]
-        },
-        {
-            "name": "collateral_entry",
-            "base": "",
-            "fields": [
-                {
-                    "name": "id",
-                    "type": "uint64"
-                },
                 {
                     "name": "underwriter",
                     "type": "name"
                 },
                 {
-                    "name": "chain_kind",
-                    "type": "chain_kind_t"
-                },
-                {
-                    "name": "staked_amount",
-                    "type": "asset"
-                },
-                {
-                    "name": "locked_amount",
-                    "type": "asset"
-                },
-                {
-                    "name": "available_amount",
-                    "type": "asset"
-                }
-            ]
-        },
-        {
-            "name": "confirmuw",
-            "base": "",
-            "fields": [
-                {
-                    "name": "uw_entry_id",
+                    "name": "source_received_at_ms",
                     "type": "uint64"
+                },
+                {
+                    "name": "source_outpost_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "source_uic_bytes",
+                    "type": "bytes"
+                },
+                {
+                    "name": "dest_received_at_ms",
+                    "type": "uint64"
+                },
+                {
+                    "name": "dest_outpost_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "dest_uic_bytes",
+                    "type": "bytes"
+                },
+                {
+                    "name": "status",
+                    "type": "UnderwriteStatus"
+                },
+                {
+                    "name": "reason",
+                    "type": "string"
                 }
             ]
         },
@@ -93,27 +63,76 @@
                     "type": "AttestationType"
                 },
                 {
+                    "name": "chain_code",
+                    "type": "uint64"
+                },
+                {
                     "name": "data",
                     "type": "bytes"
                 }
             ]
         },
         {
-            "name": "distfee",
+            "name": "drainfwq",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "fromwire_q",
             "base": "",
             "fields": [
                 {
-                    "name": "uw_entry_id",
+                    "name": "id",
                     "type": "uint64"
+                },
+                {
+                    "name": "user",
+                    "type": "name"
+                },
+                {
+                    "name": "wire_amount",
+                    "type": "uint64"
+                },
+                {
+                    "name": "dst_chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "dst_token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "dst_reserve_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "target_amount",
+                    "type": "uint64"
+                },
+                {
+                    "name": "variance_tolerance_bps",
+                    "type": "uint32"
+                },
+                {
+                    "name": "recipient_kind",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "recipient_addr",
+                    "type": "bytes"
+                },
+                {
+                    "name": "created_at_epoch",
+                    "type": "uint32"
                 }
             ]
         },
         {
-            "name": "expirelock",
+            "name": "fw_key",
             "base": "",
             "fields": [
                 {
-                    "name": "uw_entry_id",
+                    "name": "id",
                     "type": "uint64"
                 }
             ]
@@ -129,24 +148,88 @@
             ]
         },
         {
-            "name": "locked_amount_t",
+            "name": "lock_entry",
             "base": "",
             "fields": [
                 {
-                    "name": "chain_id",
-                    "type": "ChainId"
+                    "name": "lock_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "uwreq_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "underwriter",
+                    "type": "name"
+                },
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "reserve_code",
+                    "type": "slug_name"
                 },
                 {
                     "name": "amount",
-                    "type": "TokenAmount"
+                    "type": "uint64"
                 },
+                {
+                    "name": "created_at_ms",
+                    "type": "uint64"
+                },
+                {
+                    "name": "expires_at_ms",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "lock_key",
+            "base": "",
+            "fields": [
                 {
                     "name": "lock_id",
-                    "type": "uint128"
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "rcrdcommit",
+            "base": "",
+            "fields": [
+                {
+                    "name": "uwreq_id",
+                    "type": "uint64"
                 },
                 {
-                    "name": "lock_timestamp",
+                    "name": "underwriter",
+                    "type": "name"
+                },
+                {
+                    "name": "chain_code",
                     "type": "uint64"
+                },
+                {
+                    "name": "from_chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "from_token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "reserve_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "uic_bytes",
+                    "type": "bytes"
                 }
             ]
         },
@@ -159,25 +242,31 @@
                     "type": "uint32"
                 },
                 {
-                    "name": "confirm_lock_sec",
-                    "type": "uint32"
+                    "name": "collateral_lock_duration_ms",
+                    "type": "uint64"
                 },
                 {
-                    "name": "uw_fee_share_pct",
-                    "type": "uint32"
+                    "name": "min_fromwire_amount",
+                    "type": "uint64"
                 },
                 {
-                    "name": "other_uw_share_pct",
-                    "type": "uint32"
-                },
-                {
-                    "name": "batch_op_share_pct",
+                    "name": "fromwire_revert_fee_bps",
                     "type": "uint32"
                 }
             ]
         },
         {
-            "name": "slash",
+            "name": "slug_name",
+            "base": "",
+            "fields": [
+                {
+                    "name": "value",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "sumlocks",
             "base": "",
             "fields": [
                 {
@@ -185,110 +274,54 @@
                     "type": "name"
                 },
                 {
-                    "name": "reason",
-                    "type": "string"
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
                 }
             ]
         },
         {
-            "name": "submituw",
+            "name": "swapfromwire",
             "base": "",
             "fields": [
                 {
-                    "name": "underwriter",
+                    "name": "user",
                     "type": "name"
                 },
                 {
-                    "name": "msg_id",
+                    "name": "wire_amount",
                     "type": "uint64"
                 },
                 {
-                    "name": "source_sig",
-                    "type": "checksum256"
+                    "name": "dst_chain_code",
+                    "type": "slug_name"
                 },
                 {
-                    "name": "target_sig",
-                    "type": "checksum256"
-                }
-            ]
-        },
-        {
-            "name": "underwriting_entry",
-            "base": "",
-            "fields": [
-                {
-                    "name": "id",
-                    "type": "uint64"
+                    "name": "dst_token_code",
+                    "type": "slug_name"
                 },
                 {
-                    "name": "underwriter",
-                    "type": "name"
-                },
-                {
-                    "name": "message_id",
-                    "type": "uint64"
-                },
-                {
-                    "name": "status",
-                    "type": "UnderwriteStatus"
-                },
-                {
-                    "name": "source_amount",
-                    "type": "asset"
+                    "name": "dst_reserve_code",
+                    "type": "slug_name"
                 },
                 {
                     "name": "target_amount",
-                    "type": "asset"
+                    "type": "uint64"
                 },
                 {
-                    "name": "source_chain",
-                    "type": "chain_kind_t"
+                    "name": "target_tolerance_bps",
+                    "type": "uint32"
                 },
                 {
-                    "name": "target_chain",
-                    "type": "chain_kind_t"
+                    "name": "recipient_kind",
+                    "type": "ChainKind"
                 },
                 {
-                    "name": "intent_time",
-                    "type": "time_point"
-                },
-                {
-                    "name": "unlock_time",
-                    "type": "time_point"
-                },
-                {
-                    "name": "fee_earned",
-                    "type": "asset"
-                },
-                {
-                    "name": "source_sig",
-                    "type": "checksum256"
-                },
-                {
-                    "name": "target_sig",
-                    "type": "checksum256"
-                }
-            ]
-        },
-        {
-            "name": "updcltrl",
-            "base": "",
-            "fields": [
-                {
-                    "name": "underwriter",
-                    "type": "name"
-                },
-                {
-                    "name": "chain_kind",
-                    "type": "chain_kind_t"
-                },
-                {
-                    "name": "amount",
-                    "type": "asset"
-                },
-                {
-                    "name": "is_increase",
-                    "type": "bool"
+                    "name": "recipient_addr",
+                    "type": "bytes"
                 }
             ]
         },
@@ -301,20 +334,30 @@
                     "type": "uint32"
                 },
                 {
-                    "name": "confirm_lock_sec",
-                    "type": "uint32"
+                    "name": "collateral_lock_duration_ms",
+                    "type": "uint64"
                 },
                 {
-                    "name": "uw_fee_share_pct",
-                    "type": "uint32"
+                    "name": "min_fromwire_amount",
+                    "type": "uint64"
                 },
                 {
-                    "name": "other_uw_share_pct",
+                    "name": "fromwire_revert_fee_bps",
                     "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "uw_counters",
+            "base": "",
+            "fields": [
+                {
+                    "name": "next_lock_id",
+                    "type": "uint64"
                 },
                 {
-                    "name": "batch_op_share_pct",
-                    "type": "uint32"
+                    "name": "next_fromwire_seq",
+                    "type": "uint64"
                 }
             ]
         },
@@ -335,52 +378,84 @@
                     "type": "UnderwriteRequestStatus"
                 },
                 {
-                    "name": "uw_name",
+                    "name": "src_chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "src_token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "src_reserve_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "src_amount",
+                    "type": "uint64"
+                },
+                {
+                    "name": "dst_chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "dst_token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "dst_reserve_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "dst_amount",
+                    "type": "uint64"
+                },
+                {
+                    "name": "variance_tolerance_bps",
+                    "type": "uint32"
+                },
+                {
+                    "name": "source_tx_id",
+                    "type": "bytes"
+                },
+                {
+                    "name": "depositor",
+                    "type": "bytes"
+                },
+                {
+                    "name": "commits_by",
+                    "type": "commit_entry[]"
+                },
+                {
+                    "name": "winner",
                     "type": "name"
                 },
                 {
-                    "name": "locked_amounts",
-                    "type": "locked_amount_t[]"
-                },
-                {
-                    "name": "unlock_timestamp",
+                    "name": "committed_at_ms",
                     "type": "uint64"
                 },
                 {
-                    "name": "released_timestamp",
+                    "name": "settled_at_ms",
                     "type": "uint64"
                 },
                 {
-                    "name": "slashed_timestamp",
-                    "type": "uint64"
-                }
-            ]
-        },
-        {
-            "name": "varint_int64",
-            "base": "",
-            "fields": [
-                {
-                    "name": "value",
-                    "type": "int64"
-                }
-            ]
-        },
-        {
-            "name": "varint_uint32",
-            "base": "",
-            "fields": [
-                {
-                    "name": "value",
+                    "name": "expires_at_epoch",
                     "type": "uint32"
+                },
+                {
+                    "name": "attestation_inbound_data",
+                    "type": "bytes"
+                },
+                {
+                    "name": "attestation_outbound_data",
+                    "type": "bytes"
                 }
             ]
         }
     ],
     "actions": [
         {
-            "name": "confirmuw",
-            "type": "confirmuw",
+            "name": "chklocks",
+            "type": "chklocks",
             "ricardian_contract": ""
         },
         {
@@ -389,13 +464,13 @@
             "ricardian_contract": ""
         },
         {
-            "name": "distfee",
-            "type": "distfee",
+            "name": "drainfwq",
+            "type": "drainfwq",
             "ricardian_contract": ""
         },
         {
-            "name": "expirelock",
-            "type": "expirelock",
+            "name": "rcrdcommit",
+            "type": "rcrdcommit",
             "ricardian_contract": ""
         },
         {
@@ -404,39 +479,54 @@
             "ricardian_contract": ""
         },
         {
-            "name": "slash",
-            "type": "slash",
+            "name": "sumlocks",
+            "type": "sumlocks",
             "ricardian_contract": ""
         },
         {
-            "name": "submituw",
-            "type": "submituw",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "updcltrl",
-            "type": "updcltrl",
+            "name": "swapfromwire",
+            "type": "swapfromwire",
             "ricardian_contract": ""
         }
     ],
     "tables": [
         {
-            "name": "collateral",
-            "type": "collateral_entry",
+            "name": "fwqueue",
+            "type": "fromwire_q",
             "index_type": "i64",
             "key_names": ["id"],
             "key_types": ["uint64"],
-            "table_id": 16976,
+            "table_id": 19551,
             "secondary_indexes": [
                 {
-                    "name": "byuwchain",
-                    "key_type": "uint128",
-                    "table_id": 31810
-                },
+                    "name": "byepoch",
+                    "key_type": "uint64",
+                    "table_id": 10478
+                }
+            ]
+        },
+        {
+            "name": "locks",
+            "type": "lock_entry",
+            "index_type": "i64",
+            "key_names": ["lock_id"],
+            "key_types": ["uint64"],
+            "table_id": 31311,
+            "secondary_indexes": [
                 {
                     "name": "byuw",
                     "key_type": "uint64",
-                    "table_id": 25316
+                    "table_id": 10723
+                },
+                {
+                    "name": "byuwreq",
+                    "key_type": "uint64",
+                    "table_id": 30520
+                },
+                {
+                    "name": "byexpire",
+                    "key_type": "uint64",
+                    "table_id": 53377
                 }
             ]
         },
@@ -449,34 +539,12 @@
             "table_id": 7727
         },
         {
-            "name": "uwledger",
-            "type": "underwriting_entry",
+            "name": "uwcounters",
+            "type": "uw_counters",
             "index_type": "i64",
-            "key_names": ["id"],
-            "key_types": ["uint64"],
-            "table_id": 53738,
-            "secondary_indexes": [
-                {
-                    "name": "byuw",
-                    "key_type": "uint64",
-                    "table_id": 60542
-                },
-                {
-                    "name": "bymessage",
-                    "key_type": "uint64",
-                    "table_id": 6421
-                },
-                {
-                    "name": "bystatus",
-                    "key_type": "uint64",
-                    "table_id": 62060
-                },
-                {
-                    "name": "byunlock",
-                    "key_type": "uint64",
-                    "table_id": 7767
-                }
-            ]
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 5169
         },
         {
             "name": "uwreqs",
@@ -492,16 +560,21 @@
                     "table_id": 60695
                 },
                 {
-                    "name": "byuw",
+                    "name": "bywinner",
                     "key_type": "uint64",
-                    "table_id": 59177
+                    "table_id": 29561
                 }
             ]
         }
     ],
     "ricardian_clauses": [],
     "variants": [],
-    "action_results": [],
+    "action_results": [
+        {
+            "name": "sumlocks",
+            "result_type": "uint64"
+        }
+    ],
     "enums": [
         {
             "name": "AttestationType",
@@ -540,10 +613,6 @@
                     "value": 60928
                 },
                 {
-                    "name": "ATTESTATION_TYPE_NATIVE_YIELD_REWARD",
-                    "value": 60929
-                },
-                {
                     "name": "ATTESTATION_TYPE_WIRE_TOKEN_PURCHASE",
                     "value": 60930
                 },
@@ -552,31 +621,11 @@
                     "value": 60932
                 },
                 {
-                    "name": "ATTESTATION_TYPE_SLASH_OPERATOR",
-                    "value": 60933
-                },
-                {
-                    "name": "ATTESTATION_TYPE_SWAP",
+                    "name": "ATTESTATION_TYPE_SWAP_REQUEST",
                     "value": 60934
                 },
                 {
-                    "name": "ATTESTATION_TYPE_UNDERWRITE_INTENT",
-                    "value": 60935
-                },
-                {
-                    "name": "ATTESTATION_TYPE_UNDERWRITE_CONFIRM",
-                    "value": 60936
-                },
-                {
-                    "name": "ATTESTATION_TYPE_UNDERWRITE_REJECT",
-                    "value": 60937
-                },
-                {
-                    "name": "ATTESTATION_TYPE_UNDERWRITE_UNLOCK",
-                    "value": 60938
-                },
-                {
-                    "name": "ATTESTATION_TYPE_REMIT",
+                    "name": "ATTESTATION_TYPE_SWAP_REMIT",
                     "value": 60944
                 },
                 {
@@ -584,16 +633,8 @@
                     "value": 60945
                 },
                 {
-                    "name": "ATTESTATION_TYPE_EPOCH_SYNC",
-                    "value": 60946
-                },
-                {
                     "name": "ATTESTATION_TYPE_OPERATORS",
                     "value": 60947
-                },
-                {
-                    "name": "ATTESTATION_TYPE_REMIT_CONFIRM",
-                    "value": 60948
                 },
                 {
                     "name": "ATTESTATION_TYPE_BATCH_OPERATOR_GROUPS",
@@ -614,6 +655,38 @@
                 {
                     "name": "ATTESTATION_TYPE_ATTESTATION_PROCESSING_ERROR",
                     "value": 60952
+                },
+                {
+                    "name": "ATTESTATION_TYPE_UNDERWRITE_INTENT_COMMIT",
+                    "value": 60953
+                },
+                {
+                    "name": "ATTESTATION_TYPE_SWAP_REVERT",
+                    "value": 60955
+                },
+                {
+                    "name": "ATTESTATION_TYPE_DEPOSIT_REVERT",
+                    "value": 60956
+                },
+                {
+                    "name": "ATTESTATION_TYPE_RESERVE_CREATE",
+                    "value": 60958
+                },
+                {
+                    "name": "ATTESTATION_TYPE_RESERVE_CREATE_CANCEL",
+                    "value": 60959
+                },
+                {
+                    "name": "ATTESTATION_TYPE_RESERVE_CREATE_CANCELLED",
+                    "value": 60960
+                },
+                {
+                    "name": "ATTESTATION_TYPE_RESERVE_READY",
+                    "value": 60961
+                },
+                {
+                    "name": "ATTESTATION_TYPE_EMISSIONS_BLOCKED",
+                    "value": 60962
                 }
             ]
         },
@@ -630,54 +703,12 @@
                     "value": 1
                 },
                 {
-                    "name": "CHAIN_KIND_ETHEREUM",
+                    "name": "CHAIN_KIND_EVM",
                     "value": 2
                 },
                 {
-                    "name": "CHAIN_KIND_SOLANA",
+                    "name": "CHAIN_KIND_SVM",
                     "value": 3
-                },
-                {
-                    "name": "CHAIN_KIND_SUI",
-                    "value": 4
-                }
-            ]
-        },
-        {
-            "name": "TokenKind",
-            "type": "int32",
-            "values": [
-                {
-                    "name": "TOKEN_KIND_WIRE",
-                    "value": 0
-                },
-                {
-                    "name": "TOKEN_KIND_ETH",
-                    "value": 256
-                },
-                {
-                    "name": "TOKEN_KIND_ERC20",
-                    "value": 257
-                },
-                {
-                    "name": "TOKEN_KIND_ERC721",
-                    "value": 258
-                },
-                {
-                    "name": "TOKEN_KIND_ERC1155",
-                    "value": 259
-                },
-                {
-                    "name": "TOKEN_KIND_LIQETH",
-                    "value": 496
-                },
-                {
-                    "name": "TOKEN_KIND_SOL",
-                    "value": 512
-                },
-                {
-                    "name": "TOKEN_KIND_LIQSOL",
-                    "value": 752
                 }
             ]
         },
@@ -734,32 +765,10 @@
                 {
                     "name": "UNDERWRITE_STATUS_SLASHED",
                     "value": 10
-                }
-            ]
-        },
-        {
-            "name": "chain_kind_t",
-            "type": "uint8",
-            "values": [
-                {
-                    "name": "chain_kind_unknown",
-                    "value": 0
                 },
                 {
-                    "name": "chain_kind_wire",
-                    "value": 1
-                },
-                {
-                    "name": "chain_kind_ethereum",
-                    "value": 2
-                },
-                {
-                    "name": "chain_kind_solana",
-                    "value": 3
-                },
-                {
-                    "name": "chain_kind_sui",
-                    "value": 4
+                    "name": "UNDERWRITE_STATUS_DISQUALIFIED",
+                    "value": 11
                 }
             ]
         }

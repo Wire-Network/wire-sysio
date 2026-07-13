@@ -1,0 +1,524 @@
+name: "Linux amd64 build & tests"
+
+on:
+  push:
+    branches:
+      - master
+      - "release/*"
+    tags:
+      - "v*"
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - master
+  workflow_dispatch:
+    inputs:
+      override-cdt:
+        description: 'Override cdt target'
+        type: string
+      override-cdt-prerelease:
+        type: choice
+        description: Override cdt prelease
+        options:
+        - default
+        - true
+        - false
+      override-sys-system-contracts:
+        description: 'Override sys-system-contracts ref'
+        type: string
+
+permissions:
+  actions: read
+  packages: read
+  contents: read
+
+env:
+  WORKFLOW_NAME: "Build & Test Workflow"
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  root-node-tooling:
+    name: Root Node tooling audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # actions/checkout@v5
+
+      - name: Validate coredump isolation policy
+        run: python3 .github/scripts/check-coredump-policy.py
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # pnpm/action-setup@v4
+        with:
+          package_json_file: package.json
+
+      - name: Validate root pnpm lockfile
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
+      - name: Audit root pnpm dependencies
+        run: pnpm audit --audit-level=moderate
+
+      - name: Load plop generators
+        run: |
+          node <<'NODE'
+          const plopfile = require("./plopfile.js")
+          const calls = { generators: [] }
+          const plop = {
+            setActionType() {},
+            setHelper() {},
+            setGenerator(name) { calls.generators.push(name) }
+          }
+          plopfile(plop)
+          const expected = ["create-cxx-library", "create-cxx-plugin"]
+          const missing = expected.filter(name => !calls.generators.includes(name))
+          if (missing.length) {
+            throw new Error(`Missing plop generators: ${missing.join(", ")}`)
+          }
+          NODE
+
+  platform-cache:
+    name: Platform Cache
+    uses: Wire-Network/platform-cache-workflow/.github/workflows/platformcache.yaml@8ef11452f85e0accaf8e68e6cc42c54fb890be14 # Wire-Network/platform-cache-workflow@v2
+    permissions:
+      packages: write
+      contents: read
+    with:
+      runs-on: '{"group": "core-repo-group"}'
+      platform-files: |
+        .cicd/platforms
+
+  build-test-package:
+    name: Build, test, and package (${{matrix.platform}})
+    needs: [platform-cache, root-node-tooling, v]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: ubuntu24
+            build_jobs: 11
+            run_sharded_np_lr: true
+          - platform: ubsan
+            build_jobs: 11
+            run_sharded_np_lr: true
+          - platform: asan
+            build_jobs: 11
+            run_sharded_np_lr: false
+          - platform: asserton
+            build_jobs: 11
+            run_sharded_np_lr: true
+          - platform: gcc
+            build_jobs: 8
+            run_sharded_np_lr: true
+    runs-on:
+      group: core-repo-group
+    # Full-job ceiling for build, package, parallel tests, and sharded NP/LR tests whose per-test timeout is 45 minutes.
+    timeout-minutes: 360
+    container:
+      image: ${{fromJSON(needs.platform-cache.outputs.platforms)[matrix.platform].image}}
+      credentials:
+        username: dev-wire
+        password: ${{ secrets.GH_TOKEN_DEV }}
+      # Fork PR code must not see the shared runner's host dumps; same-repository and non-PR runs retain debug access.
+      # SEC-112 tracks enforcing the protected workflow revision at the runner-group boundary.
+      options: >-
+        --security-opt seccomp=unconfined
+        ${{ (github.event_name != 'pull_request' ||
+             github.event.pull_request.head.repo.full_name == github.repository)
+            && '--mount type=bind,source=/var/lib/systemd/coredump,target=/cores'
+            || '' }}
+      volumes:
+      - ${{ github.workspace }}:/__w/wire-sysio/wire-sysio
+    env:
+      CCACHE_MAXSIZE: "10G"
+      CCACHE_COMPRESS: "true"
+      CCACHE_COMPRESSLEVEL: "6"
+    steps:
+      - name: Allow safe directories
+        run: git config --global --add safe.directory '*'
+
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # actions/checkout@v5
+        with:
+          submodules: recursive
+
+      - name: Restore vcpkg binary cache
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # actions/cache@v5
+        with:
+          path: ${{ github.workspace }}/vcpkg-binary-cache
+          key: vcpkg-binaries-${{ matrix.platform }}-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json', '.github/vcpkg-triplets/**') }}
+          restore-keys: |
+            vcpkg-binaries-${{ matrix.platform }}-
+
+      - name: Restore ccache
+        id: restore-ccache
+        uses: actions/cache/restore@caa296126883cff596d87d8935842f9db880ef25 # actions/cache/restore@v5
+        with:
+          path: ${{ github.workspace }}/.ccache
+          key: ccache-${{ matrix.platform }}-${{ github.sha }}
+          restore-keys: |
+            ccache-${{ matrix.platform }}-
+
+      - name: Download Wire CDT package for release tag
+        if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # actions/download-artifact@v8.0.1
+        with:
+          name: cdt_ubuntu_package_amd64
+          path: cdt-package
+          github-token: ${{ secrets.GH_TOKEN_DEV }}
+          repository: Wire-Network/wire-cdt
+          run-id: ${{ needs.v.outputs.cdt-artifact-run-id }}
+
+      - name: Install Wire CDT package for release tag
+        if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+        env:
+          CDT_ARTIFACT_ID: ${{ needs.v.outputs.cdt-artifact-id }}
+          CDT_ARTIFACT_NAME: ${{ needs.v.outputs.cdt-artifact-name }}
+          CDT_ARTIFACT_RUN_URL: ${{ needs.v.outputs.cdt-artifact-run-url }}
+          CDT_ARTIFACT_SHA: ${{ needs.v.outputs.cdt-artifact-sha }}
+        run: |
+          cdt_deb="$(find cdt-package -type f -name 'cdt_*_amd64.deb' -print -quit)"
+          if [[ -z "$cdt_deb" ]]; then
+            echo "::error::No Wire CDT Debian package was downloaded."
+            find cdt-package -maxdepth 3 -type f -print || true
+            exit 1
+          fi
+          echo "Installing Wire CDT artifact ${CDT_ARTIFACT_NAME} (${CDT_ARTIFACT_ID})"
+          echo "Wire CDT artifact run: ${CDT_ARTIFACT_RUN_URL}"
+          echo "Wire CDT source commit: ${CDT_ARTIFACT_SHA}"
+          sha256sum "$cdt_deb"
+          bash .github/scripts/install-wire-cdt-package.sh "$cdt_deb"
+
+      - name: Build
+        id: build
+        env:
+          SYSIO_PLATFORM_NAME: ${{ matrix.platform }}
+          SYSIO_BUILD_SYSTEM_CONTRACTS: ${{ startsWith(github.ref, 'refs/tags/v') && 'ON' || 'OFF' }}
+          SYSIO_BUILD_TEST_CONTRACTS: "OFF"
+          VCPKG_TARGET_TRIPLET: x64-linux-release
+          VCPKG_HOST_TRIPLET: x64-linux-release
+        run: |
+          chown -R "$(id -u):$(id -g)" "$PWD"
+          bash .github/scripts/build-sysio.sh "${{ matrix.build_jobs }}"
+
+      - name: Show vcpkg logs if failure
+        if: failure()
+        run: |
+          echo "$PWD"
+          echo "=== vcpkg-manifest-install.log ==="
+          cat build/vcpkg-manifest-install.log || true
+
+      - name: Debug environment and workspace
+        if: ${{ runner.debug == '1' }}
+        run: |
+          echo "=== SYSTEM INFO ==="
+          whoami
+          id
+          hostname
+
+          echo
+          echo "=== ENVIRONMENT ==="
+          env | sort
+
+          echo
+          echo "=== DOCKER CONTEXT INFO ==="
+          docker context ls || true
+          echo "Current DOCKER_HOST: $DOCKER_HOST"
+          echo "Current DOCKER_CONTEXT: $DOCKER_CONTEXT"
+
+          echo
+          echo "=== GITHUB WORKSPACE ==="
+          echo "GITHUB_WORKSPACE: $GITHUB_WORKSPACE"
+          echo "Current directory: $PWD"
+          ls -la "$GITHUB_WORKSPACE" || true
+
+          echo
+          echo "=== PATHS & PERMISSIONS ==="
+          echo "--- /github ---"
+          ls -ld /github || true
+          echo "--- /github/home ---"
+          ls -ld /github/home || true
+          echo "--- Current workspace ---"
+          ls -ld "$GITHUB_WORKSPACE" || true
+          echo "--- ./build ---"
+          ls -ld build || true
+          ls -ld "$GITHUB_WORKSPACE/build" || true
+          echo "--- ./build/Testing ---"
+          ls -ld build/Testing || true
+          echo "--- ./build/Testing/Temporary ---"
+          ls -ld build/Testing/Temporary || true
+
+          echo
+          echo "=== FILE OWNERSHIP TOP 20 ==="
+          find "$GITHUB_WORKSPACE" -maxdepth 2 -type d -printf '%u:%g %p\n' 2>/dev/null | sort | uniq -c | sort -nr | head -n 20
+
+          echo
+          echo "=== MOUNTED FILESYSTEMS ==="
+          df -h
+          mount | grep "$GITHUB_WORKSPACE" || true
+
+          echo
+          echo "=== GIT CONFIG LOCATIONS ==="
+          git config --list --show-origin || true
+
+          echo
+          echo "=== CHECK WRITABILITY OF BUILD DIR ==="
+          touch build/debug_write_test 2>&1 || echo "Cannot write to build/"
+          rm -f build/debug_write_test || true
+
+      - name: Restore CTest cost data
+        uses: actions/cache/restore@caa296126883cff596d87d8935842f9db880ef25 # actions/cache/restore@v5
+        with:
+          # CTest uses this file to schedule higher-cost tests first when running with -j.
+          path: build/Testing/Temporary/CTestCostData.txt
+          key: ctest-cost-${{ matrix.platform }}-${{ github.sha }}
+          restore-keys: |
+            ctest-cost-${{ matrix.platform }}-
+
+      - name: Run Parallel Tests
+        if: ${{ steps.build.outcome == 'success' && !cancelled() }}
+        env:
+          DOCKER_HOST: ${{ env.DOCKER_HOST }}
+          DOCKER_CONTEXT: ${{ env.DOCKER_CONTEXT }}
+        run: |
+          cd build
+          ctest --output-on-failure -j $(nproc) -LE "(nonparallelizable_tests|long_running_tests)" --timeout 1000
+
+      - name: Run Sharded NP/LR Tests
+        if: ${{ steps.build.outcome == 'success' && matrix.run_sharded_np_lr && !cancelled() }}
+        run: |
+          cd build
+          # Run against all CPUs available to the CI container. These NP/LR tests are
+          # expected to be deterministic under CI scheduling pressure; flakes caused
+          # by host load, sanitizer overhead, or process interleaving are test bugs
+          # that should remain visible instead of being hidden by an artificial cap.
+          test_jobs="$(nproc)"
+          echo "Running sharded NP/LR tests with ${test_jobs} jobs"
+          ctest --output-on-failure -j "${test_jobs}" -L "(nonparallelizable_tests|long_running_tests)" --timeout 2700
+
+      - name: Save CTest cost data
+        if: ${{ always() && hashFiles('build/Testing/Temporary/CTestCostData.txt') != '' }}
+        uses: actions/cache/save@caa296126883cff596d87d8935842f9db880ef25 # actions/cache/save@v5
+        with:
+          # Caches are immutable, so save each run under a unique key and restore by platform prefix.
+          path: build/Testing/Temporary/CTestCostData.txt
+          key: ctest-cost-${{ matrix.platform }}-${{ github.run_id }}-${{ github.run_attempt }}
+
+      - name: Save ccache
+        if: ${{ always() && github.event_name != 'pull_request' && steps.restore-ccache.outputs.cache-hit != 'true' }}
+        uses: actions/cache/save@caa296126883cff596d87d8935842f9db880ef25 # actions/cache/save@v5
+        with:
+          path: ${{ github.workspace }}/.ccache
+          key: ccache-${{ matrix.platform }}-${{ github.sha }}
+
+      - name: Upload logs from failed tests
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # actions/upload-artifact@v6
+        if: failure()
+        with:
+          name: ${{matrix.platform}}-tests-logs
+          if-no-files-found: warn
+          path: |
+              build/Testing/Temporary/
+              build/TestLogs/
+              build/PerformanceHarnessScenarioRunnerLogs/
+
+      - name: Upload core files from failed tests
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # actions/upload-artifact@v6
+        if: >-
+          ${{ failure() &&
+              (github.event_name != 'pull_request' ||
+               github.event.pull_request.head.repo.full_name == github.repository) }}
+        with:
+          name: ${{matrix.platform}}-test-cores
+          if-no-files-found: warn
+          path: /cores
+
+      - name: Check CPU Features
+        if: ${{ steps.build.outcome == 'success' && !cancelled() }}
+        run: |
+          awk 'BEGIN {err = 1} /bmi2/ && /adx/ {err = 0} END {exit err}' /proc/cpuinfo
+          build/tools/fsgsbase-enabled
+
+      - name: Build packages
+        if: ${{ steps.build.outcome == 'success' && !cancelled() }}
+        run: |
+          cd build
+          if [[ "${GITHUB_REF:-}" == refs/tags/v* ]]; then
+            bash ../.github/scripts/assert-system-contract-build.sh .
+          fi
+          cpack
+          ../tools/tweak-deb.sh wire-sysio_*.deb
+
+      - name: Install dev package
+        if: ${{ steps.build.outcome == 'success' && !cancelled() }}
+        run: |
+          apt-get update
+          apt-get install -y ./build/wire-sysio_*.deb
+
+      - name: Upload dev package
+        if: ${{ steps.build.outcome == 'success' && !cancelled() }}
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # actions/upload-artifact@v6
+        with:
+          name: wire-sysio-dev-${{matrix.platform}}-amd64
+          path: build/wire-sysio_*.deb
+
+  v:
+    name: Discover Versions
+    runs-on: ubuntu-latest
+    outputs:
+      cdt-target: ${{steps.versions.outputs.cdt-target}}
+      cdt-prerelease: ${{steps.versions.outputs.cdt-prerelease}}
+      cdt-artifact-run-id: ${{steps.cdt-artifact.outputs.run-id}}
+      cdt-artifact-id: ${{steps.cdt-artifact.outputs.artifact-id}}
+      cdt-artifact-name: ${{steps.cdt-artifact.outputs.artifact-name}}
+      cdt-artifact-run-url: ${{steps.cdt-artifact.outputs.run-url}}
+      cdt-artifact-sha: ${{steps.cdt-artifact.outputs.commit-sha}}
+      wire-system-contracts-ref: ${{steps.versions.outputs.wire-system-contracts-ref}}
+    steps:
+      - name: Setup wire-cdt and wire-system-contracts versions
+        id: versions
+        env:
+          GH_TOKEN: ${{secrets.GH_TOKEN_DEV}}
+          # Untrusted workflow_dispatch overrides are passed as environment variables and are
+          # NEVER interpolated into the script body. GitHub expands ${{ }} before bash parses the
+          # script, so interpolating an override directly would let a value such as $(...) run as
+          # shell code in trusted CI that holds GH_TOKEN_DEV (WSA-094 / SEC-094). As env vars the
+          # values are inert data: bash does not re-evaluate command substitution found inside a
+          # variable's value. github.repository / github.sha are likewise read via env and quoted.
+          OVERRIDE_CDT: ${{ inputs.override-cdt }}
+          OVERRIDE_CDT_PRERELEASE: ${{ inputs.override-cdt-prerelease }}
+          OVERRIDE_SYS_SYSTEM_CONTRACTS: ${{ inputs.override-sys-system-contracts }}
+          REPO: ${{ github.repository }}
+          REF_SHA: ${{ github.sha }}
+        run: |
+          # Defense in depth: reject ref/target overrides containing anything outside a conservative
+          # allowlist. This blocks every shell metacharacter and newline (so an override can never
+          # break out of $GITHUB_OUTPUT's "name=value" line either) while still accepting real values
+          # such as "4.1.0" and "release/4.0". The pattern is held in a variable so [[ =~ ]] treats it
+          # as a regex, and the candidate matched is only ever the variable's literal value.
+          ref_re='^[A-Za-z0-9._/+-]+$'
+          for ov in "$OVERRIDE_CDT" "$OVERRIDE_SYS_SYSTEM_CONTRACTS"; do
+            if [[ -n "$ov" && ! "$ov" =~ $ref_re ]]; then
+              echo "::error::Invalid override ref '$ov'; only [A-Za-z0-9._/+-] are allowed." >&2
+              exit 1
+            fi
+          done
+
+          DEFAULTS_JSON=$(curl -sSfL "$(gh api "https://api.github.com/repos/${REPO}/contents/.cicd/defaults.json?ref=${REF_SHA}" --jq .download_url)")
+          echo "cdt-target=$(echo "$DEFAULTS_JSON" | jq -r '.wirecdt.target')" >> "$GITHUB_OUTPUT"
+          echo "cdt-prerelease=$(echo "$DEFAULTS_JSON" | jq -r '.wirecdt.prerelease')" >> "$GITHUB_OUTPUT"
+          echo "wire-system-contracts-ref=$(echo "$DEFAULTS_JSON" | jq -r '.wiresystemcontracts.ref')" >> "$GITHUB_OUTPUT"
+
+          if [[ -n "$OVERRIDE_CDT" ]]; then
+            echo "cdt-target=$OVERRIDE_CDT" >> "$GITHUB_OUTPUT"
+          fi
+          if [[ "$OVERRIDE_CDT_PRERELEASE" == "true" || "$OVERRIDE_CDT_PRERELEASE" == "false" ]]; then
+            echo "cdt-prerelease=$OVERRIDE_CDT_PRERELEASE" >> "$GITHUB_OUTPUT"
+          fi
+          if [[ -n "$OVERRIDE_SYS_SYSTEM_CONTRACTS" ]]; then
+            echo "wire-system-contracts-ref=$OVERRIDE_SYS_SYSTEM_CONTRACTS" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Resolve Wire CDT package artifact run
+        id: cdt-artifact
+        if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+        env:
+          GH_TOKEN: ${{secrets.GH_TOKEN_DEV}}
+          CDT_TARGET: ${{steps.versions.outputs.cdt-target}}
+        run: |
+          set -euo pipefail
+
+          cdt_ref="$CDT_TARGET"
+          if [[ "$cdt_ref" =~ ^[0-9]+\.[0-9]+\.[0-9]+([-+._A-Za-z0-9]*)?$ ]]; then
+            cdt_ref="v$cdt_ref"
+          fi
+
+          cdt_sha="$(gh api "repos/Wire-Network/wire-cdt/commits/${cdt_ref}" --jq .sha)"
+          echo "Resolved Wire CDT target ${CDT_TARGET} to ${cdt_sha}"
+
+          for attempt in {1..30}; do
+            runs_json="$(gh api "repos/Wire-Network/wire-cdt/actions/workflows/build.yaml/runs?head_sha=${cdt_sha}&event=push&per_page=10")"
+            run_json="$(
+              jq -c '[.workflow_runs[]
+                | select(.status == "completed" and .conclusion == "success")]
+                | .[0] // empty' <<<"$runs_json"
+            )"
+            run_id=""
+            if [[ -n "$run_json" ]]; then
+              run_id="$(jq -r '.id // empty' <<<"$run_json")"
+            fi
+
+            if [[ -n "$run_id" ]]; then
+              run_url="$(jq -r '.html_url' <<<"$run_json")"
+              run_head_sha="$(jq -r '.head_sha' <<<"$run_json")"
+              if [[ "$run_head_sha" != "$cdt_sha" ]]; then
+                echo "::error::Wire CDT build run ${run_id} resolved to ${run_head_sha}, expected ${cdt_sha}" >&2
+                exit 1
+              fi
+
+              artifact_json="$(
+                gh api "repos/Wire-Network/wire-cdt/actions/runs/${run_id}/artifacts" |
+                  jq -c '[.artifacts[]
+                    | select(.name == "cdt_ubuntu_package_amd64" and .expired == false)]
+                    | .[0] // empty'
+              )"
+              artifact_id=""
+              if [[ -n "$artifact_json" ]]; then
+                artifact_id="$(jq -r '.id // empty' <<<"$artifact_json")"
+              fi
+              if [[ -n "$artifact_id" ]]; then
+                artifact_name="$(jq -r '.name' <<<"$artifact_json")"
+                artifact_size="$(jq -r '.size_in_bytes' <<<"$artifact_json")"
+                echo "run-id=$run_id" >> "$GITHUB_OUTPUT"
+                echo "artifact-id=$artifact_id" >> "$GITHUB_OUTPUT"
+                echo "artifact-name=$artifact_name" >> "$GITHUB_OUTPUT"
+                echo "run-url=$run_url" >> "$GITHUB_OUTPUT"
+                echo "commit-sha=$cdt_sha" >> "$GITHUB_OUTPUT"
+                echo "Resolved Wire CDT target ${CDT_TARGET} to commit ${cdt_sha}"
+                echo "Resolved Wire CDT artifact run ${run_id}: ${run_url}"
+                echo "Resolved Wire CDT artifact ${artifact_name} (${artifact_id}, ${artifact_size} bytes)"
+                exit 0
+              fi
+
+              echo "::error::Wire CDT build run ${run_id} did not publish a non-expired cdt_ubuntu_package_amd64 artifact" >&2
+              exit 1
+            fi
+
+            failed_run_url="$(
+              jq -r '[.workflow_runs[]
+                | select(.status == "completed" and .conclusion != "success")]
+                | .[0].html_url // empty' <<<"$runs_json"
+            )"
+            if [[ -n "$failed_run_url" ]]; then
+              echo "::error::Wire CDT build run for ${cdt_sha} did not succeed: ${failed_run_url}" >&2
+              exit 1
+            fi
+
+            echo "Waiting for Wire CDT package artifact for ${cdt_sha} (attempt ${attempt}/30)"
+            sleep 60
+          done
+
+          echo "::error::Timed out waiting for Wire CDT package artifact for ${cdt_sha}" >&2
+          exit 1
+
+  all-passing:
+    name: All Required Tests Passed
+    needs: [ build-test-package, root-node-tooling ]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Notification
+        if: always()
+        uses: Wire-Network/notification-action@1c7a5e0e881f7560c4fab64db9676036bf8b017f # Wire-Network/notification-action@v1
+        with:
+          webhook-url: ${{ secrets.WEBHOOK_URL }}
+          notification-type: 1
+          workflow-name: "Build & Test Workflow"
+          job-results: "build-test-package:${{ needs.build-test-package.result }},root-node-tooling:${{ needs.root-node-tooling.result }}"
+          github-context: ${{ toJSON(github) }}
+
+      - if: needs.build-test-package.result != 'success' || needs.root-node-tooling.result != 'success'
+        run: false

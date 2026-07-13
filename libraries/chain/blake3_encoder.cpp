@@ -1,5 +1,12 @@
 #include <sysio/chain/blake3_encoder.hpp>
-#include <llvm-c/blake3.h>
+// Use the standalone BLAKE3 library rather than the copy LLVM bundles
+// (llvm-c/blake3.h). LLVM is only linked when the sys-vm-oc runtime is enabled,
+// so depending on its BLAKE3 made non-OC builds fail to link
+// (undefined reference to llvm_blake3_hasher_init). Both are the same upstream
+// BLAKE3 reference implementation, so the digest bytes are identical regardless
+// of build configuration — which matters because this hash feeds snapshot
+// identity that nodes compare across the network.
+#include <blake3.h>
 
 #include <cstring>
 
@@ -8,18 +15,18 @@ namespace sysio { namespace chain {
 struct blake3_encoder::impl {
    static constexpr size_t buf_size = 64 * 1024; // 64 KB
 
-   llvm_blake3_hasher hasher;
+   blake3_hasher hasher;
    char   buf[buf_size];
    size_t pos = 0;
 
-   impl() { llvm_blake3_hasher_init(&hasher); }
+   impl() { blake3_hasher_init(&hasher); }
 
    void write(const char* d, size_t len) {
       // Large write: flush buffer, then hash directly (avoids double-buffering
       // when called from hashing_streambuf which already sends 1 MB chunks).
       if(len >= buf_size) {
          flush();
-         llvm_blake3_hasher_update(&hasher, d, len);
+         blake3_hasher_update(&hasher, d, len);
          return;
       }
       while(len > 0) {
@@ -36,7 +43,7 @@ struct blake3_encoder::impl {
 
    void flush() {
       if(pos > 0) {
-         llvm_blake3_hasher_update(&hasher, buf, pos);
+         blake3_hasher_update(&hasher, buf, pos);
          pos = 0;
       }
    }
@@ -53,13 +60,13 @@ void blake3_encoder::write(const char* d, size_t len) {
 
 void blake3_encoder::reset() {
    my->pos = 0;
-   llvm_blake3_hasher_init(&my->hasher);
+   blake3_hasher_init(&my->hasher);
 }
 
 fc::crypto::blake3 blake3_encoder::result() {
    my->flush();
    fc::crypto::blake3 h;
-   llvm_blake3_hasher_finalize(&my->hasher, h.data(), h.data_size());
+   blake3_hasher_finalize(&my->hasher, h.data(), h.data_size());
    return h;
 }
 

@@ -2,6 +2,8 @@
 
 #include <fc/io/cfile.hpp>
 
+#include <cerrno>
+
 using namespace fc;
 
 BOOST_AUTO_TEST_SUITE(cfile_test_suite)
@@ -14,6 +16,22 @@ BOOST_AUTO_TEST_SUITE(cfile_test_suite)
       t.open( "ab+" );
       BOOST_CHECK( t.is_open() );
       BOOST_CHECK( std::filesystem::exists( tempdir.path() / "test") );
+
+      cfile exclusive;
+      exclusive.set_file_path( tempdir.path() / "exclusive" );
+      exclusive.open( cfile::create_new_rw_mode );
+      BOOST_CHECK( exclusive.is_open() );
+      exclusive.close();
+      BOOST_CHECK_EXCEPTION( exclusive.open( cfile::create_new_rw_mode ), std::ios_base::failure,
+                             [](const std::ios_base::failure& e) { return e.code().value() == EEXIST; } );
+
+      cfile open_or_create;
+      open_or_create.set_file_path( tempdir.path() / "open_or_create" );
+      BOOST_CHECK( !open_or_create.open_existing_or_create_new() );
+      BOOST_CHECK( open_or_create.is_open() );
+      open_or_create.close();
+      BOOST_CHECK( open_or_create.open_existing_or_create_new() );
+      open_or_create.close();
 
       t.open( "rb+" );
       BOOST_CHECK( t.is_open() );
@@ -54,7 +72,47 @@ BOOST_AUTO_TEST_SUITE(cfile_test_suite)
 
       t.close();
       std::filesystem::remove_all( t.get_file_path() );
+      std::filesystem::remove_all( exclusive.get_file_path() );
+      std::filesystem::remove_all( open_or_create.get_file_path() );
       BOOST_CHECK( !std::filesystem::exists( tempdir.path() / "test") );
+      BOOST_CHECK( !std::filesystem::exists( tempdir.path() / "exclusive") );
+      BOOST_CHECK( !std::filesystem::exists( tempdir.path() / "open_or_create") );
+   }
+
+   BOOST_AUTO_TEST_CASE(test_positional_io)
+   {
+      fc::temp_directory tempdir;
+
+      cfile t;
+      t.set_file_path( tempdir.path() / "test_positional" );
+      t.open( cfile::truncate_rw_mode );
+
+      // pwrite/pread bypass the FILE* buffer and the shared position indicator.
+      t.pwrite( "abcdef", 6, 0 );
+      std::vector<char> v(6);
+      t.pread( &v[0], 6, 0 );
+      BOOST_CHECK_EQUAL( std::string( v.begin(), v.end() ), "abcdef" );
+
+      // Overwrite mid-file at an explicit offset; surrounding bytes stay intact.
+      t.pwrite( "XY", 2, 2 );
+      t.pread( &v[0], 6, 0 );
+      BOOST_CHECK_EQUAL( std::string( v.begin(), v.end() ), "abXYef" );
+
+      // Positional reads do not move the stream position used by read()/write().
+      t.seek( 0 );
+      BOOST_CHECK_EQUAL( t.tellp(), 0u );
+      t.pread( &v[0], 2, 4 );
+      BOOST_CHECK_EQUAL( t.tellp(), 0u );
+      BOOST_CHECK_EQUAL( v[0], 'e' );
+      BOOST_CHECK_EQUAL( v[1], 'f' );
+
+      // Reading past EOF throws (short read).
+      BOOST_CHECK_THROW( t.pread( &v[0], 6, 4 ), std::ios_base::failure );
+
+      // pwrite() rejects O_APPEND descriptors via assert(); this suite avoids an aborting death
+      // test because there is no local Boost.Test pattern for native assert death checks.
+      t.close();
+      std::filesystem::remove_all( t.get_file_path() );
    }
 
    BOOST_AUTO_TEST_CASE(test_hole_punching)

@@ -107,13 +107,29 @@ try:
     Print("push create action to %s contract" % (contract))
     action="store"
     numAmount=5000
-    keepProcessing=True
-    count=0
-    while keepProcessing:
+    successfulStoreActions=0
+    # Safety ceiling for the RAM-pressure phase; when the guard works, all nodes exit well before this.
+    maxStoreActions=80
+    failedPushAttempts=0
+    # Each failed push can wait about 6 seconds, so this allows roughly a minute of transient shutdown churn.
+    maxFailedPushAttempts=12
+    attemptedStoreActions=0
+    lastFromIndex=0
+
+    def getLiveNodeIndexesOrFail(sentStoreActions):
+        """Return live node indexes, failing only while live nodes remain past the pressure ceiling."""
+        liveNodeIndexes=[i for i, node in enumerate(nodes) if node.verifyAlive(silent=True)]
+        if liveNodeIndexes and sentStoreActions>=maxStoreActions:
+            Utils.cmdError("Was able to send %d store actions without all nodes exiting" % (sentStoreActions))
+            errorExit("Failure - All Nodes should have died")
+        return liveNodeIndexes
+
+    while True:
         numAmount+=1
-        timeOutCount=0
         for fromIndex in range(namedAccounts.numAccounts):
-            count+=1
+            liveNodeIndexes=getLiveNodeIndexesOrFail(successfulStoreActions)
+            if not liveNodeIndexes:
+                break
             toIndex=fromIndex+1
             if toIndex==namedAccounts.numAccounts:
                 toIndex=0
@@ -122,32 +138,37 @@ try:
             data="{\"from\":\"%s\",\"to\":\"%s\",\"num\":%d}" % (fromAccount.name, toAccount.name, numAmount)
             opts="--permission %s@active --permission %s@active --expiration 90 --payer %s" % (contract, fromAccount.name, fromAccount.name)
             try:
-                trans=nodes[count % numNodes].pushMessage(contract, action, data, opts)
+                nodeIndex=liveNodeIndexes[attemptedStoreActions % len(liveNodeIndexes)]
+                attemptedStoreActions+=1
+                trans=nodes[nodeIndex].pushMessage(contract, action, data, opts)
                 if trans is None or not trans[0]:
-                    timeOutCount+=1
-                    if timeOutCount>=3:
-                        Print("Failed to push create action to sysio contract for %d consecutive times, looks like nodeop already exited." % (timeOutCount))
-                        keepProcessing=False
-                        break
-
-                    Print("Failed to push create action to sysio contract. sleep for 5 seconds")
-                    count-=1 # failed attempt shouldn't be counted
+                    Print("Failed to push store action to sysio contract. sleep before retrying")
+                    failedPushAttempts+=1
+                    if failedPushAttempts>=maxFailedPushAttempts:
+                        Utils.cmdError("Failed to push %d consecutive store actions" % (failedPushAttempts))
+                        errorExit("Failure - unable to keep applying RAM pressure to live nodes")
                     time.sleep(5)
                 else:
-                    timeOutCount=0
+                    successfulStoreActions+=1
+                    failedPushAttempts=0
+                    lastFromIndex=fromIndex
                 time.sleep(1)
             except TypeError as ex:
-                keepProcessing=False
-                break
+                Print("Failed to send %s action, nodeop may have exited" % (action))
+                failedPushAttempts+=1
+                if failedPushAttempts>=maxFailedPushAttempts:
+                    Utils.cmdError("Failed to push %d consecutive store actions" % (failedPushAttempts))
+                    errorExit("Failure - unable to keep applying RAM pressure to live nodes")
+                time.sleep(5)
+        if not liveNodeIndexes:
+            break
 
     #spread the actions to all accounts, to use each accounts tps bandwidth
-    fromIndexStart=fromIndex+1 if fromIndex+1<namedAccounts.numAccounts else 0
+    fromIndexStart=lastFromIndex+1 if lastFromIndex+1<namedAccounts.numAccounts else 0
 
-    # min and max are subjective, just assigned to make sure that many small changes in nodeop don't
-    # result in the test not correctly validating behavior
-    if count < 12 or count > 24:
-        strMsg="little" if count < 25 else "much"
-        Utils.cmdError("Was able to send %d store actions which was too %s" % (count, strMsg))
+    # The minimum is subjective, but catches changes that make nodeop exit before real RAM pressure is applied.
+    if successfulStoreActions < 12:
+        Utils.cmdError("Was able to send %d store actions which was too little" % (successfulStoreActions))
         errorExit("Incorrect number of store actions sent")
 
     # Make sure all the nodes are shutdown (may take a little while for this to happen, so making multiple passes)
@@ -221,7 +242,7 @@ try:
             try:
                 trans=nodes[count % numNodes].pushMessage(contract, action, data, opts)
                 if trans is None or not trans[0]:
-                    Print("Failed to push create action to sysio contract. sleep for 60 seconds")
+                    Print("Failed to push store action to sysio contract. sleep for 60 seconds")
                     time.sleep(60)
                 time.sleep(1)
             except TypeError as ex:
@@ -280,7 +301,7 @@ try:
         try:
             trans=node.pushMessage(contract, action, data, opts)
             if trans is None or not trans[0]:
-                Print("Failed to push create action to sysio contract. sleep for 60 seconds")
+                Print("Failed to push store action to sysio contract. sleep for 60 seconds")
                 time.sleep(60)
                 continue
             time.sleep(1)

@@ -1,5 +1,7 @@
 add_executable( test_net_plugin
         auto_bp_peering_unittest.cpp
+        connection_type_unittest.cpp
+        local_txn_cache_unittest.cpp
         rate_limit_parse_unittest.cpp
         net_msg_wire_unittest.cpp
         peer_auth_unittest.cpp

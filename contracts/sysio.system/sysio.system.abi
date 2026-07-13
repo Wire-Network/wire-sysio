@@ -3,6 +3,10 @@
     "version": "sysio::abi/1.2",
     "types": [
         {
+            "new_type_name": "B_vector_name_E",
+            "type": "name[]"
+        },
+        {
             "new_type_name": "block_signing_authority",
             "type": "variant_block_signing_authority_v0"
         },
@@ -41,6 +45,24 @@
             ]
         },
         {
+            "name": "accrueepoch",
+            "base": "",
+            "fields": [
+                {
+                    "name": "epoch_index",
+                    "type": "uint32"
+                },
+                {
+                    "name": "batch_group_index",
+                    "type": "uint8"
+                },
+                {
+                    "name": "per_epoch_emission",
+                    "type": "int64"
+                }
+            ]
+        },
+        {
             "name": "actfinkey",
             "base": "",
             "fields": [
@@ -61,6 +83,20 @@
                 {
                     "name": "feature_digest",
                     "type": "checksum256"
+                }
+            ]
+        },
+        {
+            "name": "addnodeowner",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account_name",
+                    "type": "name"
+                },
+                {
+                    "name": "tier",
+                    "type": "uint8"
                 }
             ]
         },
@@ -249,6 +285,16 @@
             ]
         },
         {
+            "name": "claimnodedis",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account_name",
+                    "type": "name"
+                }
+            ]
+        },
+        {
             "name": "deleteauth",
             "base": "",
             "fields": [
@@ -281,24 +327,198 @@
             ]
         },
         {
-            "name": "expandauth",
+            "name": "delsnapprov",
             "base": "",
             "fields": [
                 {
                     "name": "account",
                     "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "emission_config",
+            "base": "",
+            "fields": [
+                {
+                    "name": "t1_allocation",
+                    "type": "int64"
                 },
                 {
-                    "name": "permission",
-                    "type": "name"
+                    "name": "t2_allocation",
+                    "type": "int64"
                 },
                 {
-                    "name": "keys",
-                    "type": "key_weight[]"
+                    "name": "t3_allocation",
+                    "type": "int64"
                 },
                 {
-                    "name": "accounts",
-                    "type": "permission_level_weight[]"
+                    "name": "t1_duration",
+                    "type": "uint32"
+                },
+                {
+                    "name": "t2_duration",
+                    "type": "uint32"
+                },
+                {
+                    "name": "t3_duration",
+                    "type": "uint32"
+                },
+                {
+                    "name": "min_claimable",
+                    "type": "int64"
+                },
+                {
+                    "name": "t5_distributable",
+                    "type": "int64"
+                },
+                {
+                    "name": "t5_floor",
+                    "type": "int64"
+                },
+                {
+                    "name": "target_annual_decay_bps",
+                    "type": "uint16"
+                },
+                {
+                    "name": "annual_initial_emission",
+                    "type": "int64"
+                },
+                {
+                    "name": "annual_max_emission",
+                    "type": "int64"
+                },
+                {
+                    "name": "annual_min_emission",
+                    "type": "int64"
+                },
+                {
+                    "name": "compute_bps",
+                    "type": "uint16"
+                },
+                {
+                    "name": "capex_bps",
+                    "type": "uint16"
+                },
+                {
+                    "name": "governance_bps",
+                    "type": "uint16"
+                },
+                {
+                    "name": "producer_bps",
+                    "type": "uint16"
+                },
+                {
+                    "name": "batch_op_bps",
+                    "type": "uint16"
+                },
+                {
+                    "name": "standby_end_rank",
+                    "type": "uint32"
+                },
+                {
+                    "name": "epoch_log_retention_count",
+                    "type": "uint32"
+                },
+                {
+                    "name": "pay_cadence_epochs",
+                    "type": "uint16"
+                }
+            ]
+        },
+        {
+            "name": "emission_state",
+            "base": "",
+            "fields": [
+                {
+                    "name": "node_rewards_start",
+                    "type": "time_point_sec"
+                }
+            ]
+        },
+        {
+            "name": "epoch_info_result",
+            "base": "",
+            "fields": [
+                {
+                    "name": "epoch_count",
+                    "type": "uint64"
+                },
+                {
+                    "name": "last_epoch_index",
+                    "type": "uint32"
+                },
+                {
+                    "name": "last_epoch_time",
+                    "type": "time_point_sec"
+                },
+                {
+                    "name": "last_epoch_emission",
+                    "type": "int64"
+                },
+                {
+                    "name": "total_distributed",
+                    "type": "int64"
+                },
+                {
+                    "name": "treasury_remaining",
+                    "type": "int64"
+                },
+                {
+                    "name": "next_emission_est",
+                    "type": "int64"
+                },
+                {
+                    "name": "seconds_until_next",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "epoch_log",
+            "base": "",
+            "fields": [
+                {
+                    "name": "sysio_epoch_index",
+                    "type": "uint32"
+                },
+                {
+                    "name": "epoch_count",
+                    "type": "uint64"
+                },
+                {
+                    "name": "timestamp",
+                    "type": "time_point_sec"
+                },
+                {
+                    "name": "total_emission",
+                    "type": "int64"
+                },
+                {
+                    "name": "compute_amount",
+                    "type": "int64"
+                },
+                {
+                    "name": "capex_amount",
+                    "type": "int64"
+                },
+                {
+                    "name": "governance_amount",
+                    "type": "int64"
+                },
+                {
+                    "name": "fee_distributed",
+                    "type": "int64"
+                }
+            ]
+        },
+        {
+            "name": "epochlog_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "sysio_epoch_index",
+                    "type": "uint64"
                 }
             ]
         },
@@ -409,6 +629,26 @@
             ]
         },
         {
+            "name": "fundclaim",
+            "base": "",
+            "fields": [
+                {
+                    "name": "amount",
+                    "type": "int64"
+                }
+            ]
+        },
+        {
+            "name": "getsnaphash",
+            "base": "",
+            "fields": [
+                {
+                    "name": "block_num",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
             "name": "init",
             "base": "",
             "fields": [
@@ -419,6 +659,16 @@
                 {
                     "name": "core",
                     "type": "symbol"
+                }
+            ]
+        },
+        {
+            "name": "initt5",
+            "base": "",
+            "fields": [
+                {
+                    "name": "start_time",
+                    "type": "time_point_sec"
                 }
             ]
         },
@@ -513,12 +763,102 @@
             ]
         },
         {
+            "name": "node_claim_result",
+            "base": "",
+            "fields": [
+                {
+                    "name": "total_allocation",
+                    "type": "asset"
+                },
+                {
+                    "name": "claimed",
+                    "type": "asset"
+                },
+                {
+                    "name": "claimable",
+                    "type": "asset"
+                },
+                {
+                    "name": "can_claim",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "node_count_state",
+            "base": "",
+            "fields": [
+                {
+                    "name": "t1_count",
+                    "type": "uint32"
+                },
+                {
+                    "name": "t2_count",
+                    "type": "uint32"
+                },
+                {
+                    "name": "t3_count",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "node_owner_distribution",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account_name",
+                    "type": "name"
+                },
+                {
+                    "name": "total_allocation",
+                    "type": "asset"
+                },
+                {
+                    "name": "claimed",
+                    "type": "asset"
+                },
+                {
+                    "name": "total_duration",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "nodedist_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account_name",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "onblock",
             "base": "",
             "fields": [
                 {
                     "name": "header",
                     "type": "block_header"
+                }
+            ]
+        },
+        {
+            "name": "payepoch",
+            "base": "",
+            "fields": [
+                {
+                    "name": "epoch_index",
+                    "type": "uint32"
+                },
+                {
+                    "name": "batch_op_groups",
+                    "type": "B_vector_name_E[]"
+                },
+                {
+                    "name": "period_emission",
+                    "type": "int64"
                 }
             ]
         },
@@ -603,6 +943,18 @@
                 {
                     "name": "producer_authority",
                     "type": "block_signing_authority"
+                },
+                {
+                    "name": "last_block_num",
+                    "type": "uint32"
+                },
+                {
+                    "name": "current_round_blocks",
+                    "type": "uint16"
+                },
+                {
+                    "name": "eligible_rounds",
+                    "type": "uint32"
                 }
             ]
         },
@@ -703,6 +1055,20 @@
                 {
                     "name": "location",
                     "type": "uint16"
+                }
+            ]
+        },
+        {
+            "name": "regsnapprov",
+            "base": "",
+            "fields": [
+                {
+                    "name": "producer",
+                    "type": "name"
+                },
+                {
+                    "name": "snap_account",
+                    "type": "name"
                 }
             ]
         },
@@ -825,6 +1191,26 @@
             ]
         },
         {
+            "name": "setemitcfg",
+            "base": "",
+            "fields": [
+                {
+                    "name": "cfg",
+                    "type": "emission_config"
+                }
+            ]
+        },
+        {
+            "name": "setinittime",
+            "base": "",
+            "fields": [
+                {
+                    "name": "no_reward_init_time",
+                    "type": "time_point_sec"
+                }
+            ]
+        },
+        {
             "name": "setparams",
             "base": "",
             "fields": [
@@ -893,6 +1279,126 @@
             ]
         },
         {
+            "name": "setsnpcfg",
+            "base": "",
+            "fields": [
+                {
+                    "name": "min_providers",
+                    "type": "uint32"
+                },
+                {
+                    "name": "threshold_pct",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "snap_config",
+            "base": "",
+            "fields": [
+                {
+                    "name": "min_providers",
+                    "type": "uint32"
+                },
+                {
+                    "name": "threshold_pct",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "snap_provider",
+            "base": "",
+            "fields": [
+                {
+                    "name": "snap_account",
+                    "type": "name"
+                },
+                {
+                    "name": "producer",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "snap_provider_key_t",
+            "base": "",
+            "fields": [
+                {
+                    "name": "snap_account",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "snap_record",
+            "base": "",
+            "fields": [
+                {
+                    "name": "block_num",
+                    "type": "uint32"
+                },
+                {
+                    "name": "block_id",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "snapshot_hash",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "attested_at_block",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "snap_record_key_t",
+            "base": "",
+            "fields": [
+                {
+                    "name": "block_num",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "snap_vote",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "block_num",
+                    "type": "uint32"
+                },
+                {
+                    "name": "block_id",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "snapshot_hash",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "voters",
+                    "type": "name[]"
+                }
+            ]
+        },
+        {
+            "name": "snap_vote_key_t",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "sysio_global_state",
             "base": "blockchain_parameters",
             "fields": [
@@ -919,6 +1425,52 @@
                 {
                     "name": "last_producer_schedule_size",
                     "type": "uint16"
+                }
+            ]
+        },
+        {
+            "name": "t5_state",
+            "base": "",
+            "fields": [
+                {
+                    "name": "start_time",
+                    "type": "time_point_sec"
+                },
+                {
+                    "name": "epoch_count",
+                    "type": "uint64"
+                },
+                {
+                    "name": "last_epoch_index",
+                    "type": "uint32"
+                },
+                {
+                    "name": "last_epoch_time",
+                    "type": "time_point_sec"
+                },
+                {
+                    "name": "last_epoch_emission",
+                    "type": "int64"
+                },
+                {
+                    "name": "total_distributed",
+                    "type": "int64"
+                },
+                {
+                    "name": "pending_emission_amount",
+                    "type": "int64"
+                },
+                {
+                    "name": "period_start_epoch",
+                    "type": "uint32"
+                },
+                {
+                    "name": "batch_group_epochs",
+                    "type": "uint32[]"
+                },
+                {
+                    "name": "capital_shortfall_total",
+                    "type": "int64"
                 }
             ]
         },
@@ -977,6 +1529,44 @@
                 {
                     "name": "authorized_by",
                     "type": "name$"
+                }
+            ]
+        },
+        {
+            "name": "viewemitcfg",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "viewepoch",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "viewnodedist",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account_name",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "votesnaphash",
+            "base": "",
+            "fields": [
+                {
+                    "name": "snap_account",
+                    "type": "name"
+                },
+                {
+                    "name": "block_id",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "snapshot_hash",
+                    "type": "checksum256"
                 }
             ]
         },
@@ -1180,6 +1770,11 @@
     ],
     "actions": [
         {
+            "name": "accrueepoch",
+            "type": "accrueepoch",
+            "ricardian_contract": ""
+        },
+        {
             "name": "actfinkey",
             "type": "actfinkey",
             "ricardian_contract": ""
@@ -1187,6 +1782,16 @@
         {
             "name": "activate",
             "type": "activate",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "addnodeowner",
+            "type": "addnodeowner",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "claimnodedis",
+            "type": "claimnodedis",
             "ricardian_contract": ""
         },
         {
@@ -1200,13 +1805,28 @@
             "ricardian_contract": ""
         },
         {
-            "name": "expandauth",
-            "type": "expandauth",
+            "name": "delsnapprov",
+            "type": "delsnapprov",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "fundclaim",
+            "type": "fundclaim",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "getsnaphash",
+            "type": "getsnaphash",
             "ricardian_contract": ""
         },
         {
             "name": "init",
             "type": "init",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "initt5",
+            "type": "initt5",
             "ricardian_contract": ""
         },
         {
@@ -1230,6 +1850,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "payepoch",
+            "type": "payepoch",
+            "ricardian_contract": ""
+        },
+        {
             "name": "regfinkey",
             "type": "regfinkey",
             "ricardian_contract": ""
@@ -1242,6 +1867,11 @@
         {
             "name": "regproducer2",
             "type": "regproducer2",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "regsnapprov",
+            "type": "regsnapprov",
             "ricardian_contract": ""
         },
         {
@@ -1280,6 +1910,16 @@
             "ricardian_contract": ""
         },
         {
+            "name": "setemitcfg",
+            "type": "setemitcfg",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "setinittime",
+            "type": "setinittime",
+            "ricardian_contract": ""
+        },
+        {
             "name": "setparams",
             "type": "setparams",
             "ricardian_contract": ""
@@ -1310,6 +1950,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "setsnpcfg",
+            "type": "setsnpcfg",
+            "ricardian_contract": ""
+        },
+        {
             "name": "unlinkauth",
             "type": "unlinkauth",
             "ricardian_contract": ""
@@ -1322,6 +1967,26 @@
         {
             "name": "updateauth",
             "type": "updateauth",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "viewemitcfg",
+            "type": "viewemitcfg",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "viewepoch",
+            "type": "viewepoch",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "viewnodedist",
+            "type": "viewnodedist",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "votesnaphash",
+            "type": "votesnaphash",
             "ricardian_contract": ""
         },
         {
@@ -1371,6 +2036,30 @@
             "key_names": ["block_height"],
             "key_types": ["uint64"],
             "table_id": 21782
+        },
+        {
+            "name": "emissionmngr",
+            "type": "emission_state",
+            "index_type": "i64",
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 22828
+        },
+        {
+            "name": "emitcfg",
+            "type": "emission_config",
+            "index_type": "i64",
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 25207
+        },
+        {
+            "name": "epochlog",
+            "type": "epoch_log",
+            "index_type": "i64",
+            "key_names": ["sysio_epoch_index"],
+            "key_types": ["uint64"],
+            "table_id": 42042
         },
         {
             "name": "finalizers",
@@ -1425,6 +2114,22 @@
             "table_id": 13870
         },
         {
+            "name": "nodecount",
+            "type": "node_count_state",
+            "index_type": "i64",
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 60614
+        },
+        {
+            "name": "nodedist",
+            "type": "node_owner_distribution",
+            "index_type": "i64",
+            "key_names": ["account_name"],
+            "key_types": ["uint64"],
+            "table_id": 49260
+        },
+        {
             "name": "producers",
             "type": "producer_info",
             "index_type": "i64",
@@ -1438,6 +2143,60 @@
                     "table_id": 31113
                 }
             ]
+        },
+        {
+            "name": "snapconfig",
+            "type": "snap_config",
+            "index_type": "i64",
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 45242
+        },
+        {
+            "name": "snapprovs",
+            "type": "snap_provider",
+            "index_type": "i64",
+            "key_names": ["snap_account"],
+            "key_types": ["uint64"],
+            "table_id": 42185,
+            "secondary_indexes": [
+                {
+                    "name": "byproducer",
+                    "key_type": "uint64",
+                    "table_id": 27665
+                }
+            ]
+        },
+        {
+            "name": "snaprecords",
+            "type": "snap_record",
+            "index_type": "i64",
+            "key_names": ["block_num"],
+            "key_types": ["uint64"],
+            "table_id": 43128
+        },
+        {
+            "name": "snapvotes",
+            "type": "snap_vote",
+            "index_type": "i64",
+            "key_names": ["id"],
+            "key_types": ["uint64"],
+            "table_id": 6736,
+            "secondary_indexes": [
+                {
+                    "name": "byblocknum",
+                    "key_type": "uint64",
+                    "table_id": 8321
+                }
+            ]
+        },
+        {
+            "name": "t5state",
+            "type": "t5_state",
+            "index_type": "i64",
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 22391
         },
         {
             "name": "limitauthchg",
@@ -1484,6 +2243,22 @@
         }
     ],
     "action_results": [
+        {
+            "name": "getsnaphash",
+            "result_type": "snap_record"
+        },
+        {
+            "name": "viewemitcfg",
+            "result_type": "emission_config"
+        },
+        {
+            "name": "viewepoch",
+            "result_type": "epoch_info_result"
+        },
+        {
+            "name": "viewnodedist",
+            "result_type": "node_claim_result"
+        },
         {
             "name": "getpeerkeys",
             "result_type": "getpeerkeys_res_t"

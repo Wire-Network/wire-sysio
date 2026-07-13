@@ -3,12 +3,14 @@
 #include <boost/asio/post.hpp>
 #include <boost/asio/thread_pool.hpp>
 #include <condition_variable>
+#include <cstddef>
 #include <cstdint>
 #include <functional>
 #include <memory>
 #include <mutex>
 #include <optional>
 #include <queue>
+#include <utility>
 
 namespace fc::parallel {
 
@@ -18,6 +20,8 @@ struct worker_task_queue_config {
    uint64_t max_threads    = 1;
    bool     prune_threads  = false;
    bool     skip_autostart = false;
+   /// Maximum waiting items, excluding callbacks already in progress. Null means unbounded.
+   std::optional<std::size_t> max_pending_items;
 };
 
 /// Thread-pool-backed work queue that delivers items of type T to a callback.
@@ -51,27 +55,19 @@ public:
 
    ~worker_task_queue() { stop(); }
 
-   /// Enqueue an item. No-op if the queue has been stopped.
-   void push(const T& item) {
-      {
-         std::lock_guard<std::mutex> lock(_mtx);
-         if (_stopped)
-            return;
-         _queue.push(item);
-      }
-      _cv.notify_one();
-   }
+   /// Enqueue an item. No-op if the queue has been stopped or is at capacity.
+   void push(const T& item) { (void)try_push(item); }
 
-   /// Enqueue an item (move). No-op if the queue has been stopped.
-   void push(T&& item) {
-      {
-         std::lock_guard<std::mutex> lock(_mtx);
-         if (_stopped)
-            return;
-         _queue.push(std::move(item));
-      }
-      _cv.notify_one();
-   }
+   /// Enqueue an item (move). No-op if the queue has been stopped or is at capacity.
+   void push(T&& item) { (void)try_push(std::move(item)); }
+
+   /// Attempt to enqueue a copied item.
+   /// @return True when admitted; false when stopped or at the pending-item limit.
+   bool try_push(const T& item) { return try_push_impl(item); }
+
+   /// Attempt to enqueue a moved item.
+   /// @return True when admitted; false when stopped or at the pending-item limit.
+   bool try_push(T&& item) { return try_push_impl(std::move(item)); }
 
    /// Start the thread pool and worker loops.
    /// Called automatically by create() unless skip_autostart is set.
@@ -117,10 +113,35 @@ public:
       return _queue.size();
    }
 
+   /// Remove and return the number of pending items without affecting an active callback.
+   std::size_t discard_pending() {
+      std::queue<T> discarded;
+      {
+         std::lock_guard<std::mutex> lock(_mtx);
+         _queue.swap(discarded);
+      }
+      const auto count = discarded.size();
+      return count;
+   }
+
 private:
    worker_task_queue(worker_task_queue_config config, callback_t cb)
       : _config(std::move(config))
       , _callback(std::move(cb)) {}
+
+   /// Admit an item while holding the capacity check and queue mutation under the same lock.
+   template <typename U>
+   bool try_push_impl(U&& item) {
+      {
+         std::lock_guard<std::mutex> lock(_mtx);
+         if (_stopped || (_config.max_pending_items && _queue.size() >= *_config.max_pending_items)) {
+            return false;
+         }
+         _queue.push(std::forward<U>(item));
+      }
+      _cv.notify_one();
+      return true;
+   }
 
    void worker_loop() {
       while (true) {

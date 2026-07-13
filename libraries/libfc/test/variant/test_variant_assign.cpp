@@ -24,7 +24,8 @@ BOOST_AUTO_TEST_CASE(self_assign_copy) {
 
 BOOST_AUTO_TEST_CASE(self_assign_move) {
    variant v{std::string{"y"}};
-   v = std::move(v);
+   variant& same = v;
+   v = std::move(same);
    BOOST_CHECK(v.is_string());
    BOOST_CHECK_EQUAL(v.get_string(), "y");
 }
@@ -92,15 +93,47 @@ BOOST_AUTO_TEST_CASE(cross_type_assign_string_to_null) {
    BOOST_CHECK(v.is_null());
 }
 
-BOOST_AUTO_TEST_CASE(self_assign_aliased_subvariant_same_type) {
-   // Self-assignment via aliased same-type sub-variant: the rhs is a reference
-   // into the lhs's heap object.  The same-type op= fast path reuses lhs's
-   // existing heap object, which means the assignment writes through the rhs's
-   // backing storage simultaneously.  Verify the content survives intact.
-   variant v{variant_object{mutable_variant_object("k", std::string{"hello"})}};
-   v = v.get_object()["k"];
-   BOOST_CHECK(v.is_string());
-   BOOST_CHECK_EQUAL(v.get_string(), "hello");
+// fc::variant operator=(const variant&) treats aliased rhs (rhs referring to storage owned by lhs, e.g.
+// v = v.get_array()[i] / v = v.get_object()["k"]) as undefined behaviour, matching the previous clear()-then-new
+// pattern.  Debug builds catch the common direct-aliasing cases via an assertion that calls
+// variant::_rhs_not_aliased.  The tests below exercise the detector directly -- the helper only reads pointer
+// addresses, so calling it on aliased inputs is well-defined; the UB lives in the operator= flow that follows
+// the assert when the helper is bypassed.
+
+BOOST_AUTO_TEST_CASE(rhs_not_aliased_array_element_is_aliased) {
+   variant a = variants{ variant(1), variant(2), variant(3) };
+   BOOST_CHECK( !variant::_rhs_not_aliased( &a, a.get_array()[0] ) );
+   BOOST_CHECK( !variant::_rhs_not_aliased( &a, a.get_array()[1] ) );
+   BOOST_CHECK( !variant::_rhs_not_aliased( &a, a.get_array()[2] ) );
+}
+
+BOOST_AUTO_TEST_CASE(rhs_not_aliased_object_value_is_aliased) {
+   variant a = variant_object{ mutable_variant_object("k", 42)("j", "hello") };
+   BOOST_CHECK( !variant::_rhs_not_aliased( &a, a.get_object()["k"] ) );
+   BOOST_CHECK( !variant::_rhs_not_aliased( &a, a.get_object()["j"] ) );
+}
+
+BOOST_AUTO_TEST_CASE(rhs_not_aliased_unrelated_variant) {
+   variant a = variants{ variant(1), variant(2) };
+   variant b = variants{ variant(3), variant(4) };
+   BOOST_CHECK( variant::_rhs_not_aliased( &a, b ) );
+   BOOST_CHECK( variant::_rhs_not_aliased( &a, b.get_array()[0] ) );
+}
+
+BOOST_AUTO_TEST_CASE(rhs_not_aliased_empty_array_lhs) {
+   // Empty-array lhs has no storage to alias against; any rhs is non-aliased.
+   variant a = variants{};
+   variant b{42};
+   BOOST_CHECK( variant::_rhs_not_aliased( &a, b ) );
+   BOOST_CHECK( variant::_rhs_not_aliased( &a, a ) ); // self-ref still non-aliased: a's vector is empty
+}
+
+BOOST_AUTO_TEST_CASE(rhs_not_aliased_non_array_non_object_lhs) {
+   // Non-container lhs: detector trivially returns true (no storage to alias).
+   variant a{42};
+   variant b{43};
+   BOOST_CHECK( variant::_rhs_not_aliased( &a, b ) );
+   BOOST_CHECK( variant::_rhs_not_aliased( &a, a ) );
 }
 
 BOOST_AUTO_TEST_CASE(same_type_string_reassign) {
@@ -154,36 +187,37 @@ BOOST_AUTO_TEST_CASE(int128_copy_ctor_deep_copies) {
    }
 }
 
-BOOST_AUTO_TEST_CASE(int128_op_assign_aliased_subvariant) {
-   // Aliased self-assign for int128 source: lhs is object_type, rhs is int128
-   // entry inside lhs.  op=(const&) different-type path must deep-copy via
-   // copy ctor BEFORE clearing lhs (variant tmp(v); clear(); take(tmp)).
-   // If copy ctor was shallow for int128, the deep-copy step would silently
-   // share the pointer, and clear() would later free the object frame whose
-   // entry owned the heap string -- use-after-free on take.
+BOOST_AUTO_TEST_CASE(int128_op_assign_same_and_cross_type) {
+   // Non-aliased same-type op= for the four std::string-backed multi-precision types: pins the same-type fast path's
+   // heap-string reuse.  The aliased-self-assign variant of this case (lhs object containing rhs as an entry value)
+   // is UB and intentionally not exercised here.
    {
-      variant v{variant_object{mutable_variant_object("k", fc::int128{99})}};
-      v = v.get_object()["k"];
-      BOOST_CHECK(v.get_type() == variant::int128_type);
-      BOOST_CHECK_EQUAL(v.as_string(), "99");
+      variant a{fc::int128{42}};
+      a = variant{fc::int128{99}};
+      BOOST_CHECK(a.get_type() == variant::int128_type);
+      BOOST_CHECK_EQUAL(a.as_string(), "99");
    }
    {
-      variant v{variant_object{mutable_variant_object("k", fc::uint128{77})}};
-      v = v.get_object()["k"];
-      BOOST_CHECK(v.get_type() == variant::uint128_type);
-      BOOST_CHECK_EQUAL(v.as_string(), "77");
+      variant a{fc::uint128{1}};
+      a = variant{fc::uint128{0xABCD}};
+      BOOST_CHECK(a.get_type() == variant::uint128_type);
    }
    {
-      variant v{variant_object{mutable_variant_object("k", fc::int256{-55})}};
-      v = v.get_object()["k"];
-      BOOST_CHECK(v.get_type() == variant::int256_type);
-      BOOST_CHECK_EQUAL(v.as_string(), "-55");
+      variant a{fc::int256{-1}};
+      a = variant{fc::int256{-12345}};
+      BOOST_CHECK(a.get_type() == variant::int256_type);
+      BOOST_CHECK_EQUAL(a.as_string(), "-12345");
    }
    {
-      variant v{variant_object{mutable_variant_object("k", fc::uint256{33})}};
-      v = v.get_object()["k"];
-      BOOST_CHECK(v.get_type() == variant::uint256_type);
-      BOOST_CHECK_EQUAL(v.as_string(), "33");
+      variant a{fc::uint256{0}};
+      a = variant{fc::uint256{0xDEADBEEF}};
+      BOOST_CHECK(a.get_type() == variant::uint256_type);
+   }
+   // Cross-type op= TO int128/etc exercises the clear()+new heap-string allocation.
+   {
+      variant a{int64_t{1}};
+      a = variant{fc::uint256{0xABCDEF}};
+      BOOST_CHECK(a.get_type() == variant::uint256_type);
    }
 }
 

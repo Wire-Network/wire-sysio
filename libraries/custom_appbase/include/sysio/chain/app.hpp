@@ -260,6 +260,9 @@ public:
       try {
          app_->startup();
          app_->set_thread_priority_max();
+         // Capture this thread as the loop thread so executor.get_main_thread_id() reflects
+         // the thread driving exec(), not whichever thread happened to construct the app.
+         app_->executor().set_main_thread_id();
          app_->exec();
       } catch (...) {
          return handle_exception();

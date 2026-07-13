@@ -23,11 +23,8 @@ bool valid_filename(const string& name) {
 }
 
 wallet_manager::wallet_manager() {
-#ifdef __APPLE__
-   try {
-      wallets.emplace("SecureEnclave", std::make_unique<se_wallet>());
-   } catch(const std::exception& ) {}
-#endif
+   // Secure Enclave wallet support is intentionally not registered in this developer build path until the
+   // Apple-specific key backend is available here.
 }
 
 wallet_manager::~wallet_manager() {
@@ -339,7 +336,7 @@ void wallet_manager::own_and_use_wallet(const string& name, std::unique_ptr<wall
    wallets.emplace(name, std::move(wallet));
 }
 
-void wallet_manager::start_lock_watch(std::shared_ptr<boost::asio::deadline_timer> t)
+void wallet_manager::start_lock_watch(std::shared_ptr<boost::asio::steady_timer> t)
 {
    t->async_wait([t, this](const boost::system::error_code& /*ec*/)
    {
@@ -351,7 +348,7 @@ void wallet_manager::start_lock_watch(std::shared_ptr<boost::asio::deadline_time
             SYS_THROW(wallet_exception, "Lock file removed while kiod still running.  Terminating.");
          }
       }
-      t->expires_from_now(boost::posix_time::seconds(1));
+      t->expires_after(std::chrono::seconds(1));
       start_lock_watch(t);
    });
 }
@@ -369,7 +366,7 @@ void wallet_manager::initialize_lock() {
       wallet_dir_lock.reset();
       SYS_THROW(wallet_exception, "Failed to lock access to wallet directory; is another kiod running?");
    }
-   auto timer = std::make_shared<boost::asio::deadline_timer>(appbase::app().get_io_context(), boost::posix_time::seconds(1));
+   auto timer = std::make_shared<boost::asio::steady_timer>(appbase::app().get_io_context(), std::chrono::seconds(1));
    start_lock_watch(timer);
 }
 

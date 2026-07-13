@@ -1,72 +1,47 @@
 #pragma once
-#include <string>
+#include <fc/basic_name.hpp>
 #include <fc/serialize_as_string.hpp>
 #include <fc/reflect/reflect.hpp>
-#include <iosfwd>
+
+#include <cstdint>
+#include <string>
+#include <string_view>
+#include <type_traits>
 
 namespace sysio::chain {
-   inline constexpr uint64_t char_to_symbol( char c ) {
-      if( c >= 'a' && c <= 'z' )
-         return (c - 'a') + 6;
-      if( c >= '1' && c <= '5' )
-         return (c - '1') + 1;
-      return 0;
-   }
 
-   inline constexpr uint64_t string_to_uint64_t( std::string_view str ) {
-      uint64_t n = 0;
-      size_t i = 0;
-      for ( ; i < str.size() && i < 12; ++i) {
-         // NOTE: char_to_symbol() returns char type, and without this explicit
-         // expansion to uint64 type, the compilation fails at the point of usage
-         // of string_to_name(), where the usage requires constant (compile time) expression.
-         n |= (char_to_symbol(str[i]) & 0x1f) << (64 - 5 * (i + 1));
-      }
+   /// Alphabet + length traits for the SYSIO account-name encoding: up to 13
+   /// base-32 symbols over ".12345a-z". Drives fc::basic_name; see that header.
+   struct sysio_name_traits {
+      static constexpr int              max_len  = 13;
+      static constexpr std::string_view alphabet = ".12345abcdefghijklmnopqrstuvwxyz";
 
-      // The for-loop encoded up to 60 high bits into uint64 'name' variable,
-      // if (strlen(str) > 12) then encode str[12] into the low (remaining)
-      // 4 bits of 'name'
-      if (i < str.size() && i == 12)
-         n |= char_to_symbol(str[12]) & 0x0F;
-      return n;
-   }
+      // Symbol 0 ('.') is an ordinary interior character, not a terminator:
+      // to_string() keeps interior dots and only trims trailing padding.
+      static constexpr bool             zero_terminates = false;
 
-   /// Immutable except for fc::from_variant.
-   struct name {
-   private:
-      uint64_t value = 0;
+      // MSB-first packing: the first symbol of "sysio" occupies bits [59..63].
+      // Pinned in name_tests.cpp::encoding_golden_values.
+      static constexpr fc::basic_name_endianness packing = fc::basic_name_endianness::MSB;
 
-      friend struct fc::reflector<name>;
+      // Declared here, defined in name.cpp — keeps <sysio/chain/exceptions.hpp>
+      // and the SYS_ASSERT machinery out of this very widely-included header.
+      [[noreturn]] static void throw_invalid( std::string_view in, const char* why );
+   };
 
-      void set( std::string_view str );
-
-   public:
-      constexpr bool empty()const { return 0 == value; }
-      constexpr bool good()const  { return !empty();   }
-
-      explicit name( std::string_view str ) { set( str ); }
-      constexpr explicit name( uint64_t v ) : value(v) {}
+   /// A 64-bit packed identifier — account, table, action, permission, ...
+   ///
+   /// The packed encoding and all value semantics live in fc::basic_name; name
+   /// adds only the dotted-namespace helpers prefix()/suffix(). Immutable except
+   /// via assignment (e.g. fc::from_variant).
+   struct name : fc::basic_name<sysio_name_traits> {
+      using base = fc::basic_name<sysio_name_traits>;
+      using base::base;                  // inherits name(uint64_t), name(std::string_view)
       constexpr name() = default;
 
-      std::string to_string()const;
+      /// Factory used by the FC_SERIALIZE_AS_STRING trait: parses through the
+      /// validating string_view constructor inherited from fc::basic_name.
       static name from_string( std::string_view str ) { return name(str); }
-      constexpr uint64_t to_uint64_t()const { return value; }
-
-      friend std::ostream& operator << ( std::ostream& out, const name& n ) {
-         return out << n.to_string();
-      }
-
-      friend constexpr bool operator < ( const name& a, const name& b ) { return a.value < b.value; }
-      friend constexpr bool operator > ( const name& a, const name& b ) { return a.value > b.value; }
-      friend constexpr bool operator <= ( const name& a, const name& b ) { return a.value <= b.value; }
-      friend constexpr bool operator >= ( const name& a, const name& b ) { return a.value >= b.value; }
-      friend constexpr bool operator == ( const name& a, const name& b ) { return a.value == b.value; }
-      friend constexpr bool operator != ( const name& a, const name& b ) { return a.value != b.value; }
-
-      friend constexpr bool operator == ( const name& a, uint64_t b ) { return a.value == b; }
-      friend constexpr bool operator != ( const name& a, uint64_t b ) { return a.value != b; }
-
-      constexpr explicit operator bool()const { return value != 0; }
 
       /**
        *  Returns the prefix.
@@ -142,12 +117,15 @@ namespace sysio::chain {
       }
    };
 
-   // Each char of the string is encoded into 5-bit chunk and left-shifted
-   // to its 5-bit slot starting with the highest slot for the first char.
-   // The 13th char, if str is long enough, is encoded into 4-bit chunk
-   // and placed in the lowest 4 bits. 64 = 12 * 5 + 4
-   inline constexpr name string_to_name( std::string_view str )
-   {
+   // Each char of the string is encoded into a 5-bit chunk and left-shifted to
+   // its slot starting with the highest slot for the first char. The 13th char,
+   // if the string is long enough, is encoded into a 4-bit chunk in the lowest
+   // 4 bits. 64 = 12 * 5 + 4. Non-validating — see fc::basic_name::pack.
+   inline constexpr uint64_t string_to_uint64_t( std::string_view str ) {
+      return name::pack( str );
+   }
+
+   inline constexpr name string_to_name( std::string_view str ) {
       return name( string_to_uint64_t( str ) );
    }
 
@@ -159,16 +137,14 @@ namespace sysio::chain {
       template <typename T, T... Str>
       inline constexpr name operator""_n() {
          constexpr const char buf[] = {Str...};
+         static_assert(name::is_valid_literal(std::string_view{buf, sizeof(buf)}),
+                       "invalid _n literal: character not in .12345a-z, or longer than 13");
          return name{std::integral_constant<uint64_t, string_to_uint64_t(std::string_view{buf, sizeof(buf)})>::value};
       }
 #if defined(__clang__)
 # pragma clang diagnostic pop
 #endif
    } // namespace literals
-
-   constexpr auto format_as(const name& n) {
-      return n.to_string();
-   }
 
 } // sysio::chain
 
@@ -183,5 +159,5 @@ namespace std {
    };
 };
 
-FC_REFLECT( sysio::chain::name, (value) )
+FC_REFLECT_DERIVED_EMPTY( sysio::chain::name, (fc::basic_name<sysio::chain::sysio_name_traits>) )
 FC_SERIALIZE_AS_STRING(sysio::chain::name)

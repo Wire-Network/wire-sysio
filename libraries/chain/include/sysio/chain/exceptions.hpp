@@ -115,8 +115,9 @@
        :BASE(c){} \
        TYPE():BASE(CODE, BOOST_PP_STRINGIZE(TYPE), WHAT){}\
        \
-       virtual std::shared_ptr<fc::exception> dynamic_copy_exception()const\
+       std::shared_ptr<fc::exception> dynamic_copy_exception()const override\
        { return std::make_shared<TYPE>( *this ); } \
+       void rethrow() const override { assert(typeid(*this) == typeid(TYPE)); throw *this; } \
        std::optional<uint64_t> error_code; \
    };
 
@@ -435,6 +436,8 @@ namespace sysio { namespace chain {
                                     3110006, "Incorrect plugin configuration" )
       FC_DECLARE_DERIVED_EXCEPTION( missing_trace_api_plugin_exception,           plugin_exception,
                                     3110007, "Missing Trace API Plugin" )
+      FC_DECLARE_DERIVED_EXCEPTION( signing_transient_exception,                  plugin_exception,
+                                    3110008, "Transient signing-provider failure; the operation should be retried" )
 
 
    FC_DECLARE_DERIVED_EXCEPTION( wallet_exception, chain_exception,
@@ -531,7 +534,8 @@ namespace sysio { namespace chain {
 
    FC_DECLARE_DERIVED_EXCEPTION( contract_exception,           chain_exception,
                                  3160000, "Contract exception" )
-      // invalid_table_payer       3160001  (removed: legacy db_* only)
+      FC_DECLARE_DERIVED_EXCEPTION( invalid_table_payer,             contract_exception,
+                                    3160001, "Must specify a valid account to pay for new record" )
       FC_DECLARE_DERIVED_EXCEPTION( table_access_violation,          contract_exception,
                                     3160002, "Table access violation" )
       // invalid_table_iterator    3160003  (removed: legacy db_* only)
@@ -669,6 +673,8 @@ namespace sysio { namespace chain {
                                  3260000, "Finalizer exception" )
       FC_DECLARE_DERIVED_EXCEPTION( finalizer_safety_exception, finalizer_exception,
                                     3260001, "Finalizer safety file exception" )
+      FC_DECLARE_DERIVED_EXCEPTION( invalid_finalizer_policy_exception, finalizer_exception,
+                                    3260002, "Invalid finalizer policy" )
 
    /// @return true if exception requires transaction to be retried in the next block
    inline bool exception_is_exhausted(const fc::exception& e) {

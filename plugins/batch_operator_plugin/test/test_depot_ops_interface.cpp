@@ -2,10 +2,25 @@
 
 #include "mocks/mock_depot_ops.hpp"
 
+#include <sysio/batch_operator_plugin/outpost_epoch_lookup.hpp>
+
 using sysio::outbound_envelope_record;
 using sysio::test::mock_depot_ops;
 
 BOOST_AUTO_TEST_SUITE(depot_ops_interface_tests)
+
+/// Regression coverage for SEC-7: high-bit slug chain codes must not truncate
+/// when building the `byoutepoch` secondary-index exact-match bound.
+BOOST_AUTO_TEST_CASE(byoutepoch_find_bound_preserves_slug_high_bits) {
+   constexpr uint64_t chain_code = 1ull << 42;
+   constexpr uint32_t epoch_index = 9;
+   constexpr auto expected_key = "18889465931478580854793";
+
+   BOOST_CHECK_EQUAL(fc::to_string(sysio::batch_operator_detail::outpost_epoch_key(chain_code, epoch_index)),
+                     expected_key);
+   BOOST_CHECK_EQUAL(sysio::batch_operator_detail::byoutepoch_find_bound(chain_code, epoch_index),
+                     "{\"byoutepoch\":\"18889465931478580854793\"}");
+}
 
 BOOST_AUTO_TEST_CASE(defaults) {
    mock_depot_ops d;
@@ -15,7 +30,7 @@ BOOST_AUTO_TEST_CASE(defaults) {
    BOOST_CHECK_EQUAL(d.has_delivered_envelope(0, 1), false);
 
    BOOST_REQUIRE_EQUAL(d.read_pending_calls.size(), 1u);
-   BOOST_CHECK_EQUAL(d.read_pending_calls[0].outpost_id, 0u);
+   BOOST_CHECK_EQUAL(d.read_pending_calls[0].chain_code, 0u);
    BOOST_CHECK_EQUAL(d.read_pending_calls[0].epoch_index, 1u);
    BOOST_REQUIRE_EQUAL(d.has_delivered_calls.size(), 1u);
 }
@@ -23,7 +38,7 @@ BOOST_AUTO_TEST_CASE(defaults) {
 BOOST_AUTO_TEST_CASE(outbound_envelope_record_round_trip) {
    mock_depot_ops d;
    outbound_envelope_record rec;
-   rec.outpost_id        = 4;
+   rec.chain_code        = 4;
    rec.epoch_index       = 9;
    rec.envelope_hash_hex = "deadbeef";
    rec.raw_envelope      = {'p', 'b'};
@@ -34,7 +49,7 @@ BOOST_AUTO_TEST_CASE(outbound_envelope_record_round_trip) {
 
    auto got = d.read_pending_outbound(4, 9);
    BOOST_REQUIRE(got.has_value());
-   BOOST_CHECK_EQUAL(got->outpost_id, 4u);
+   BOOST_CHECK_EQUAL(got->chain_code, 4u);
    BOOST_CHECK_EQUAL(got->epoch_index, 9u);
    BOOST_CHECK_EQUAL(got->envelope_hash_hex, "deadbeef");
    BOOST_CHECK(got->raw_envelope == rec.raw_envelope);
@@ -43,9 +58,9 @@ BOOST_AUTO_TEST_CASE(outbound_envelope_record_round_trip) {
 BOOST_AUTO_TEST_CASE(deliver_to_depot_records_payload) {
    mock_depot_ops d;
    std::vector<char> payload{'h', 'i'};
-   d.deliver_to_depot(/*outpost_id=*/2, payload);
+   d.deliver_to_depot(/*chain_code=*/2, payload);
    BOOST_REQUIRE_EQUAL(d.deliver_calls.size(), 1u);
-   BOOST_CHECK_EQUAL(d.deliver_calls[0].outpost_id, 2u);
+   BOOST_CHECK_EQUAL(d.deliver_calls[0].chain_code, 2u);
    BOOST_CHECK(d.deliver_calls[0].raw_messages == payload);
 }
 

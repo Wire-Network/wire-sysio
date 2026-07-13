@@ -1,33 +1,490 @@
 // Implementation file for JSON-RPC client
 #include <fc/network/json_rpc/json_rpc_client.hpp>
+#include <fc/task/deadline.hpp>
 
 #include <boost/asio.hpp>
+#include <boost/asio/thread_pool.hpp>
 #include <boost/beast/core.hpp>
 #include <boost/beast/http.hpp>
 #include <boost/beast/ssl.hpp>
 #include <boost/beast/version.hpp>
+#include <boost/system/system_error.hpp>
 
-#include <format>
+#include <chrono>
+#include <condition_variable>
+#include <cstdint>
+#include <functional>
+#include <memory>
+#include <mutex>
 #include <ranges>
-#include <gsl-lite/gsl-lite.hpp>
-
-#define HTTP_VERSION 11
+#include <semaphore>
+#include <string_view>
+#include <utility>
+#include <vector>
 
 namespace fc::network::json_rpc {
 
-using namespace std::literals;
 namespace beast = boost::beast;
 namespace http = beast::http;
 namespace asio = boost::asio;
 using tcp = asio::ip::tcp;
 
+namespace {
+
+constexpr int HTTP_VERSION = 11;
+
+constexpr std::string_view HTTP_SCHEME        = "http";
+constexpr std::string_view HTTPS_SCHEME       = "https";
+constexpr std::string_view DEFAULT_HTTP_PATH  = "/";
+constexpr std::string_view OP_RESOLVE         = "JSON-RPC resolve";
+constexpr std::string_view OP_CONNECT         = "JSON-RPC connect";
+constexpr std::string_view OP_TLS_SNI         = "JSON-RPC TLS SNI";
+constexpr std::string_view OP_TLS_HANDSHAKE   = "JSON-RPC TLS handshake";
+constexpr std::string_view OP_TLS_SHUTDOWN    = "JSON-RPC TLS shutdown";
+constexpr std::string_view OP_HTTP_WRITE      = "JSON-RPC HTTP write";
+constexpr std::string_view OP_HTTP_READ       = "JSON-RPC HTTP read";
+constexpr std::uint64_t    MAX_RESPONSE_BODY_BYTES = 1ULL * 1024ULL * 1024ULL;
+
+/// Return the explicit URL port or the scheme's default JSON-RPC transport port.
+std::string default_port_for(const fc::url& url, std::string_view scheme) {
+   return std::to_string(url.port().value_or(scheme == HTTPS_SCHEME ? 443 : 80));
+}
+
+/// Return the caller-scoped transport deadline, treating maximum as unbounded.
+std::optional<fc::time_point> active_transport_deadline() {
+   auto deadline = fc::task::current_deadline();
+   if (deadline && *deadline < fc::time_point::maximum()) {
+      return deadline;
+   }
+   // Preserve legacy behavior for generic callers; outpost paths install a
+   // deadline_scope before entering retry and JSON-RPC transport code.
+   return std::nullopt;
+}
+
+/// Throw the fc timeout type expected by retry and batch-job callers.
+void throw_transport_timeout(std::string_view op_label) {
+   FC_THROW_EXCEPTION(fc::timeout_exception, "{} timed out", std::string(op_label));
+}
+
+/// Compute remaining time for an async operation or throw if the budget expired.
+std::chrono::microseconds remaining_until(fc::time_point deadline_abs,
+                                          std::string_view op_label) {
+   const auto now = fc::time_point::now();
+   if (now >= deadline_abs) {
+      throw_transport_timeout(op_label);
+   }
+   return std::chrono::microseconds((deadline_abs - now).count());
+}
+
+/// Identify timeout error codes returned by Beast/Asio cancellation paths.
+bool is_timeout_error(const boost::system::error_code& ec) {
+   return ec == beast::error::timeout ||
+          ec == asio::error::timed_out ||
+          ec == boost::system::errc::make_error_code(boost::system::errc::timed_out);
+}
+
+/// Identify Beast parser admission failures for oversized response bodies.
+bool is_body_limit_error(const boost::system::error_code& ec) {
+   return ec == http::error::body_limit;
+}
+
+/// Convert a low-level transport error into an fc exception.
+void throw_transport_error(const boost::system::error_code& ec,
+                           std::string_view op_label) {
+   if (is_timeout_error(ec)) {
+      throw_transport_timeout(op_label);
+   }
+   if (is_body_limit_error(ec)) {
+      FC_THROW("{} exceeded {} byte response body limit",
+               std::string(op_label),
+               MAX_RESPONSE_BODY_BYTES);
+   }
+   FC_THROW("{} failed: {}", std::string(op_label), ec.message());
+}
+
+using async_complete_fn = std::function<void(const boost::system::error_code&)>;
+
+/** Process-lifetime state that bounds platform DNS execution to one in-flight lookup. */
+struct platform_resolver_runtime {
+   asio::thread_pool executor{1};
+   std::binary_semaphore in_flight{1};
+};
+
+/** Cross-thread-safe permit that prevents platform resolver work from queuing behind a stalled lookup. */
+class platform_resolver_permit {
+public:
+   platform_resolver_permit(std::binary_semaphore& semaphore, std::chrono::microseconds wait_for)
+      : _semaphore(semaphore) {
+      if (!_semaphore.try_acquire_for(wait_for)) {
+         throw_transport_timeout(OP_RESOLVE);
+      }
+   }
+
+   platform_resolver_permit(const platform_resolver_permit&) = delete;
+   platform_resolver_permit& operator=(const platform_resolver_permit&) = delete;
+
+   ~platform_resolver_permit() { _semaphore.release(); }
+
+private:
+   std::binary_semaphore& _semaphore;
+};
+
+/**
+ * Return resolver state that intentionally survives static teardown.
+ *
+ * Destroying an Asio execution context joins its resolver worker. If platform getaddrinfo is stuck,
+ * joining here would reintroduce the unbounded process-exit wait that the startup deadline prevents.
+ */
+platform_resolver_runtime& resolver_runtime() {
+   static auto* runtime = new platform_resolver_runtime;
+   return *runtime;
+}
+
+/** Start one platform resolver operation without tying its lifetime to a JSON-RPC client. */
+template <typename CompleteFn>
+std::function<void()> start_platform_resolution(const std::string& host,
+                                                const std::string& port,
+                                                fc::time_point deadline_abs,
+                                                CompleteFn&& complete) {
+   (void)remaining_until(deadline_abs, OP_RESOLVE);
+
+   auto& runtime = resolver_runtime();
+   auto permit =
+      std::make_shared<platform_resolver_permit>(runtime.in_flight, remaining_until(deadline_abs, OP_RESOLVE));
+
+   (void)remaining_until(deadline_abs, OP_RESOLVE);
+   auto resolver = std::make_shared<tcp::resolver>(runtime.executor);
+   resolver->async_resolve(
+      host, port,
+      [resolver, permit, complete = std::forward<CompleteFn>(complete)](
+         const boost::system::error_code& ec, tcp::resolver::results_type results) mutable {
+         (void)permit;
+         complete(ec, std::move(results));
+      });
+   return [resolver] { resolver->cancel(); };
+}
+
+/** Completion state that may outlive a caller whose DNS deadline expires. */
+struct deadline_resolution_state {
+   std::mutex                  mutex;
+   std::condition_variable     completed;
+   bool                        done = false;
+   boost::system::error_code   error_code;
+   tcp::resolver::results_type endpoints;
+};
+
+/** Cancel an asynchronous resolver operation on every exceptional exit after it starts. */
+class resolver_cancel_guard {
+public:
+   explicit resolver_cancel_guard(std::function<void()> cancel)
+      : _cancel(std::move(cancel)) {}
+
+   resolver_cancel_guard(const resolver_cancel_guard&) = delete;
+   resolver_cancel_guard& operator=(const resolver_cancel_guard&) = delete;
+
+   ~resolver_cancel_guard() { cancel(); }
+
+   /** Cancel the resolver once without allowing cancellation failure to mask the transport result. */
+   void cancel() noexcept {
+      if (!_cancel) {
+         return;
+      }
+
+      auto cancel = std::move(_cancel);
+      try {
+         cancel();
+      } catch (...) {
+      }
+   }
+
+   /** Disarm cancellation after the resolver has completed. */
+   void release() noexcept { _cancel = {}; }
+
+private:
+   std::function<void()> _cancel;
+};
+
+/// Run one async operation synchronously, cancelling it when the deadline expires.
+template <typename StartFn, typename CancelFn>
+void run_async_op(asio::io_context& ioc,
+                  const std::optional<fc::time_point>& deadline_abs,
+                  std::string_view op_label,
+                  StartFn&& start,
+                  CancelFn&& cancel) {
+   boost::system::error_code op_ec;
+   bool                      op_done    = false;
+   bool                      timer_done = !deadline_abs;
+   bool                      timed_out  = false;
+
+   ioc.restart();
+   std::optional<asio::steady_timer> timer;
+   if (deadline_abs) {
+      timer.emplace(ioc);
+      timer->expires_after(remaining_until(*deadline_abs, op_label));
+      timer->async_wait([&](const boost::system::error_code& ec) {
+         timer_done = true;
+         if (!ec && !op_done) {
+            timed_out = true;
+            cancel();
+         }
+      });
+   }
+
+   start([&](const boost::system::error_code& ec) {
+      op_done = true;
+      op_ec   = ec;
+      if (timer) {
+         timer->cancel();
+      }
+   });
+
+   while (!(op_done && timer_done)) {
+      ioc.run_one();
+   }
+
+   if (timed_out) {
+      throw_transport_timeout(op_label);
+   }
+   if (op_ec) {
+      throw_transport_error(op_ec, op_label);
+   }
+}
+
+/** Resolve DNS on the shared platform worker while bounding how long the caller waits. */
+template <typename ResolverStartFn>
+tcp::resolver::results_type resolve_endpoints_with_deadline(
+   const std::string& host,
+   const std::string& port,
+   fc::time_point deadline_abs,
+   const ResolverStartFn& resolver_start) {
+   (void)remaining_until(deadline_abs, OP_RESOLVE);
+
+   auto state = std::make_shared<deadline_resolution_state>();
+   resolver_cancel_guard cancel_guard(resolver_start(
+      host, port, deadline_abs,
+      [state](const boost::system::error_code& ec, tcp::resolver::results_type endpoints) {
+         {
+            std::lock_guard lock(state->mutex);
+            state->error_code = ec;
+            state->endpoints  = std::move(endpoints);
+            state->done       = true;
+         }
+         state->completed.notify_one();
+      }));
+
+   std::unique_lock lock(state->mutex);
+   if (!state->completed.wait_for(lock, remaining_until(deadline_abs, OP_RESOLVE), [&] { return state->done; })) {
+      lock.unlock();
+      cancel_guard.cancel();
+      throw_transport_timeout(OP_RESOLVE);
+   }
+   cancel_guard.release();
+
+   if (state->error_code) {
+      throw_transport_error(state->error_code, OP_RESOLVE);
+   }
+   if (state->endpoints.empty()) {
+      FC_THROW("{} failed: resolver returned no endpoints", std::string(OP_RESOLVE));
+   }
+
+   return std::move(state->endpoints);
+}
+
+/// Resolve DNS for the long-lived client cache, using the shared resolver only when the caller supplied a deadline.
+template <typename ResolverStartFn>
+tcp::resolver::results_type resolve_endpoints(asio::io_context& ioc,
+                                              const std::string& host,
+                                              const std::string& port,
+                                              const std::optional<fc::time_point>& deadline_abs,
+                                              const ResolverStartFn& resolver_start) {
+   if (deadline_abs) {
+      return resolve_endpoints_with_deadline(host, port, *deadline_abs, resolver_start);
+   }
+
+   tcp::resolver resolver{ioc};
+   tcp::resolver::results_type results;
+
+   run_async_op(ioc, deadline_abs, OP_RESOLVE,
+      [&](const async_complete_fn& complete) {
+         resolver.async_resolve(host, port,
+            [&results, complete](const boost::system::error_code& ec, tcp::resolver::results_type resolved) {
+               if (!ec) {
+                  results = std::move(resolved);
+               }
+               complete(ec);
+            });
+      },
+      [&] { resolver.cancel(); });
+
+   return results;
+}
+
+/// Convert the public HTTP verb enum into the Boost.Beast request verb.
+http::verb to_beast_verb(http_verb v) {
+   switch (v) {
+      case http_verb::GET:     return http::verb::get;
+      case http_verb::PUT:     return http::verb::put;
+      case http_verb::POST:    return http::verb::post;
+      case http_verb::DELETE_: return http::verb::delete_;
+   }
+   FC_THROW("Unknown http_verb value: {}", static_cast<int>(v));
+}
+
+/// Run a connection attempt and mark cached endpoints stale if the peer set fails.
+template <typename StartFn, typename CancelFn, typename MarkStaleFn>
+void connect_with_deadline(asio::io_context& ioc,
+                           const std::optional<fc::time_point>& deadline_abs,
+                           StartFn&& start,
+                           CancelFn&& cancel,
+                           MarkStaleFn&& mark_stale) {
+   try {
+      run_async_op(ioc,
+                   deadline_abs,
+                   OP_CONNECT,
+                   std::forward<StartFn>(start),
+                   std::forward<CancelFn>(cancel));
+   } catch (const fc::timeout_exception&) {
+      throw;
+   } catch (const fc::exception&) {
+      mark_stale();
+      throw;
+   }
+}
+
+/// Read an HTTP response through a parser with a fixed response body limit.
+template <typename Stream, typename CancelFn>
+http::response<http::string_body> read_response_with_deadline(
+   asio::io_context& ioc,
+   const std::optional<fc::time_point>& deadline_abs,
+   Stream& stream,
+   beast::flat_buffer& buffer,
+   CancelFn&& cancel) {
+   http::response_parser<http::string_body> parser;
+   parser.body_limit(MAX_RESPONSE_BODY_BYTES);
+
+   run_async_op(ioc, deadline_abs, OP_HTTP_READ,
+      [&](const async_complete_fn& complete) {
+         http::async_read(stream, buffer, parser,
+            [complete](const boost::system::error_code& ec, std::size_t) {
+               complete(ec);
+            });
+      },
+      std::forward<CancelFn>(cancel));
+
+   return parser.release();
+}
+
+/// Execute a single HTTP/HTTPS request and return the raw Beast response.
+template <typename MarkStaleFn>
+http::response<http::string_body> send_request(asio::io_context& ioc,
+                                               const fc::url& url,
+                                               const tcp::resolver::results_type& dest,
+                                               http::request<http::string_body>& req,
+                                               MarkStaleFn&& mark_stale) {
+   const auto scheme = url.proto();
+   FC_ASSERT(scheme == HTTP_SCHEME || scheme == HTTPS_SCHEME, "Unsupported URL scheme: {}", scheme);
+   FC_ASSERT(url.host(), "JSON-RPC URL is missing host");
+
+   const auto host = *url.host();
+   const auto deadline_abs = active_transport_deadline();
+
+   beast::flat_buffer                buffer;
+   http::response<http::string_body> res;
+
+   if (scheme == HTTPS_SCHEME) {
+      asio::ssl::context ctx{asio::ssl::context::tlsv12_client};
+      beast::ssl_stream<beast::tcp_stream> stream(ioc, ctx);
+
+      if (!SSL_set_tlsext_host_name(stream.native_handle(), host.c_str())) {
+         auto ec = beast::error_code(static_cast<int>(::ERR_get_error()),
+                                     asio::error::get_ssl_category());
+         throw_transport_error(ec, OP_TLS_SNI);
+      }
+
+      connect_with_deadline(ioc, deadline_abs,
+         [&](const async_complete_fn& complete) {
+            beast::get_lowest_layer(stream).async_connect(dest,
+               [complete](const boost::system::error_code& ec, const tcp::endpoint&) {
+                  complete(ec);
+               });
+         },
+         [&] { beast::get_lowest_layer(stream).close(); },
+         mark_stale);
+      run_async_op(ioc, deadline_abs, OP_TLS_HANDSHAKE,
+         [&](const async_complete_fn& complete) {
+            stream.async_handshake(asio::ssl::stream_base::client, complete);
+         },
+         [&] { beast::get_lowest_layer(stream).close(); });
+      run_async_op(ioc, deadline_abs, OP_HTTP_WRITE,
+         [&](const async_complete_fn& complete) {
+            http::async_write(stream, req,
+               [complete](const boost::system::error_code& ec, std::size_t) {
+                  complete(ec);
+               });
+         },
+         [&] { beast::get_lowest_layer(stream).close(); });
+      res = read_response_with_deadline(ioc, deadline_abs, stream, buffer,
+         [&] { beast::get_lowest_layer(stream).close(); });
+
+      try {
+         run_async_op(ioc, deadline_abs, OP_TLS_SHUTDOWN,
+            [&](const async_complete_fn& complete) {
+               stream.async_shutdown(complete);
+            },
+            [&] { beast::get_lowest_layer(stream).close(); });
+      } catch (const fc::exception&) {
+         // The response has already been read; shutdown only needs to be bounded.
+      }
+      beast::get_lowest_layer(stream).close();
+   } else {
+      beast::tcp_stream stream{ioc};
+
+      connect_with_deadline(ioc, deadline_abs,
+         [&](const async_complete_fn& complete) {
+            stream.async_connect(dest,
+               [complete](const boost::system::error_code& ec, const tcp::endpoint&) {
+                  complete(ec);
+               });
+         },
+         [&] { stream.close(); },
+         mark_stale);
+      run_async_op(ioc, deadline_abs, OP_HTTP_WRITE,
+         [&](const async_complete_fn& complete) {
+            http::async_write(stream, req,
+               [complete](const boost::system::error_code& ec, std::size_t) {
+                  complete(ec);
+               });
+         },
+         [&] { stream.close(); });
+      res = read_response_with_deadline(ioc, deadline_abs, stream, buffer,
+         [&] { stream.close(); });
+
+      beast::error_code ec;
+      stream.socket().shutdown(tcp::socket::shutdown_both, ec);
+      stream.close();
+   }
+
+   return res;
+}
+
+} // namespace
+
 // json_rpc_error
 json_rpc_error::json_rpc_error(const std::string& message) : json_rpc_error(0, message, {}) {}
 
 json_rpc_error::json_rpc_error(int code_in, const std::string& message, const variant& data_in)
-   : fc::exception(code_in, message)
+   : fc::exception(code_in, "json_rpc_error", message)
      , code(code_in)
-     , data(data_in) {}
+     , data(data_in) {
+   // Push the server-supplied message into the fc::exception log_messages
+   // collection so `top_message()` and the FC_LOG_AND_RETHROW family see
+   // the actual reason rather than an empty string. fc::exception stores
+   // the constructor `message` as the *description*, but `top_message()`
+   // reads from `log_messages` — without this append, downstream callers
+   // that diagnose JSON-RPC failures get `code=… message=''` and lose the
+   // server's diagnostic text.
+   append_log( FC_LOG_MESSAGE( error, "{}", message ) );
+}
 
 json_rpc_client json_rpc_client::create(const std::variant<std::string, fc::url>& source) {
    fc::url url;
@@ -42,11 +499,54 @@ json_rpc_client json_rpc_client::create(const std::variant<std::string, fc::url>
 }
 
 // json_rpc_client
-json_rpc_client::json_rpc_client(fc::url                           url,
-                                 const std::optional<std::string>& user_agent)
+json_rpc_client::json_rpc_client(fc::url url, const std::optional<std::string>& user_agent,
+                                 endpoint_refresh_policy refresh_policy)
+   : json_rpc_client(std::move(url), user_agent, refresh_policy, resolver_start_fn{}) {}
+
+json_rpc_client::json_rpc_client(fc::url url, const std::optional<std::string>& user_agent,
+                                 endpoint_refresh_policy refresh_policy,
+                                 resolver_start_fn resolver_start)
    : _url(std::move(url))
-     , _user_agent(user_agent.value_or(BOOST_BEAST_VERSION_STRING))
-     , _next_id(1) {}
+   , _host()
+   , _port()
+   , _user_agent(user_agent.value_or(BOOST_BEAST_VERSION_STRING))
+   , _next_id(1)
+   , _resolved_endpoints()
+   , _resolved_endpoints_stale(false)
+   , _refresh_policy(refresh_policy)
+   , _resolver_start(std::move(resolver_start)) {
+   const auto scheme = _url.proto();
+   FC_ASSERT(scheme == HTTP_SCHEME || scheme == HTTPS_SCHEME, "Unsupported URL scheme: {}", scheme);
+   FC_ASSERT(_url.host(), "JSON-RPC URL is missing host");
+
+   _host = *_url.host();
+   _port = default_port_for(_url, scheme);
+   if (!_resolver_start) {
+      _resolver_start = [](const std::string& host, const std::string& port, fc::time_point deadline_abs,
+                           resolver_complete_fn complete) {
+         return start_platform_resolution(host, port, deadline_abs, std::move(complete));
+      };
+   }
+   refresh_resolved_endpoints();
+}
+
+void json_rpc_client::refresh_resolved_endpoints() {
+   _resolved_endpoints = resolve_endpoints(_io_ctx, _host, _port, active_transport_deadline(), _resolver_start);
+   _resolved_endpoints_stale = false;
+}
+
+void json_rpc_client::mark_resolved_endpoints_stale() {
+   if (_refresh_policy == endpoint_refresh_policy::on_connection_failure) {
+      _resolved_endpoints_stale = true;
+   }
+}
+
+const json_rpc_client::tcp::resolver::results_type& json_rpc_client::resolved_endpoints() {
+   if (_resolved_endpoints_stale || _resolved_endpoints.empty()) {
+      refresh_resolved_endpoints();
+   }
+   return _resolved_endpoints;
+}
 
 variant json_rpc_client::call(const std::string& method, const fc::variant& params) {
    const auto id = _next_id++;
@@ -146,81 +646,20 @@ fc::variant json_rpc_client::call_batch(const std::vector<fc::variant>& requests
 }
 
 variant json_rpc_client::send_json(const variant& payload, bool expect_json_body) {
-   auto& ioc  = _io_ctx;
    auto  body = fc::json::to_string(payload, fc::json::yield_function_t{});
 
-   auto        scheme = _url.proto();
-   auto        host   = _url.host().value();
-   auto        port   = std::to_string(_url.port().value_or(scheme == "https" ? 443 : 80));
-   std::string path   = _url.path().value_or("/");
-
-   asio::ssl::context ctx{asio::ssl::context::tlsv12_client};
-   tcp::resolver      resolver{_io_ctx};
-
-   // Resolve and connect
-   auto dest = resolver.resolve(
-      host,
-      port);
-
+   std::string path   = _url.path().value_or(std::string(DEFAULT_HTTP_PATH));
 
    // Build HTTP request
    http::request<http::string_body> req{http::verb::post, path, HTTP_VERSION};
-   req.set(http::field::host, host);
+   req.set(http::field::host, _host);
    req.set(http::field::user_agent, _user_agent);
    req.set(http::field::content_type, "application/json");
    req.body() = body;
    req.prepare_payload();
-   beast::flat_buffer                buffer;
-   http::response<http::string_body> res;
-   if (scheme == "https") {
-      // ---------------- HTTPS ----------------
-
-      beast::ssl_stream<beast::tcp_stream> stream(ioc, ctx);
-
-      // SNI required for most servers
-      if (!SSL_set_tlsext_host_name(stream.native_handle(), host.c_str())) {
-         throw beast::system_error(
-            beast::error_code(static_cast<int>(::ERR_get_error()),
-                              asio::error::get_ssl_category()));
-      }
-
-      beast::get_lowest_layer(stream).connect(dest);
-      stream.handshake(asio::ssl::stream_base::client);
-
-      http::write(stream, req);
-
-
-      http::read(stream, buffer, res);
-
-      // Shutdown TLS
-      beast::error_code ec;
-      stream.shutdown(ec);
-
-
-   } else if (scheme == "http") {
-      beast::tcp_stream stream{_io_ctx};
-
-      auto stream_cleaner = gsl_lite::finally([&stream] {
-         stream.close();
-         // stream.socket().shutdown(tcp::socket::shutdown_both);
-      });
-
-      stream.connect(dest);
-      // Send request
-      http::write(stream, req);
-
-      // Receive response
-      http::read(stream, buffer, res);
-
-      // Gracefully close the socket
-      beast::error_code ec;
-      stream.socket().shutdown(tcp::socket::shutdown_both, ec);
-
-
-   } else {
-      throw std::runtime_error("Unsupported URL scheme: " + scheme);
-   }
-   // ignore ec on shutdown
+   auto res = send_request(_io_ctx, _url, resolved_endpoints(), req, [this] {
+      mark_resolved_endpoints_stale();
+   });
 
    // Check HTTP status
    if (res.result() != http::status::ok) {
@@ -248,33 +687,11 @@ variant json_rpc_client::send_json(const variant& payload, bool expect_json_body
 //  wrap in JSON-RPC envelope or validate JSON-RPC response structure.
 // -----------------------------------------------------------------------
 
-namespace {
-   http::verb to_beast_verb(http_verb v) {
-      switch (v) {
-         case http_verb::GET:     return http::verb::get;
-         case http_verb::PUT:     return http::verb::put;
-         case http_verb::POST:    return http::verb::post;
-         case http_verb::DELETE_: return http::verb::delete_;
-      }
-      FC_THROW("Unknown http_verb value: {}", static_cast<int>(v));
-   }
-} // anonymous namespace
-
 std::string json_rpc_client::send_http(http_verb verb, const std::string& path,
                                        const std::string& body,
                                        const std::string& content_type) {
-   auto& ioc = _io_ctx;
-
-   auto scheme = _url.proto();
-   auto host   = _url.host().value();
-   auto port   = std::to_string(_url.port().value_or(scheme == "https" ? 443 : 80));
-
-   asio::ssl::context ctx{asio::ssl::context::tlsv12_client};
-   tcp::resolver      resolver{_io_ctx};
-   auto               dest = resolver.resolve(host, port);
-
    http::request<http::string_body> req{to_beast_verb(verb), path, HTTP_VERSION};
-   req.set(http::field::host, host);
+   req.set(http::field::host, _host);
    req.set(http::field::user_agent, _user_agent);
    if (!body.empty()) {
       req.set(http::field::content_type, content_type);
@@ -282,33 +699,9 @@ std::string json_rpc_client::send_http(http_verb verb, const std::string& path,
    }
    req.prepare_payload();
 
-   beast::flat_buffer                buffer;
-   http::response<http::string_body> res;
-
-   if (scheme == "https") {
-      beast::ssl_stream<beast::tcp_stream> stream(ioc, ctx);
-      if (!SSL_set_tlsext_host_name(stream.native_handle(), host.c_str())) {
-         throw beast::system_error(
-            beast::error_code(static_cast<int>(::ERR_get_error()),
-                              asio::error::get_ssl_category()));
-      }
-      beast::get_lowest_layer(stream).connect(dest);
-      stream.handshake(asio::ssl::stream_base::client);
-      http::write(stream, req);
-      http::read(stream, buffer, res);
-      beast::error_code ec;
-      stream.shutdown(ec);
-   } else if (scheme == "http") {
-      beast::tcp_stream stream{_io_ctx};
-      auto stream_cleaner = gsl_lite::finally([&stream] { stream.close(); });
-      stream.connect(dest);
-      http::write(stream, req);
-      http::read(stream, buffer, res);
-      beast::error_code ec;
-      stream.socket().shutdown(tcp::socket::shutdown_both, ec);
-   } else {
-      throw std::runtime_error("Unsupported URL scheme: " + scheme);
-   }
+   auto res = send_request(_io_ctx, _url, resolved_endpoints(), req, [this] {
+      mark_resolved_endpoints_stale();
+   });
 
    if (res.result() != http::status::ok) {
       FC_THROW("HTTP {} {} failed ({}): {}",

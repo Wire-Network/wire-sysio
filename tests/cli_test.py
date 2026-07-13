@@ -14,7 +14,7 @@ import shutil
 import signal
 from pathlib import Path
 
-from TestHarness import Account, Node, ReturnType, Utils, WalletMgr
+from TestHarness import Account, Node, ReturnType, TestHelper, Utils, WalletMgr
 
 testSuccessful=False
 
@@ -322,8 +322,12 @@ def clio_abi_file_test():
     assert(b'"memo": "hello"' in outs)
 
 def abi_file_with_nodeop_test():
+    """Verify --abi-file is honored when clio submits actions through nodeop."""
     # push action token transfer with option `--abi-file`
     global testSuccessful
+    malicious_token_abi_path = None
+    node = None
+    walletMgr = None
     try:
         biosDir = os.path.abspath(os.getcwd() + "/libraries/testing/contracts/sysio.bios")
         contractDir = os.path.abspath(os.getcwd() + "/contracts/sysio.token")
@@ -342,8 +346,10 @@ def abi_file_with_nodeop_test():
                 f.truncate()
 
         tries = 30
-        while not Utils.arePortsAvailable(set(range(8888, 8889))):
-            Utils.Print("ERROR: Another process is listening on nodeop test port 8888. wait...")
+        nodeopPort = TestHelper.DEFAULT_PORT
+        p2pPort = Utils.getPort(Utils.PortBiosP2P)
+        while not Utils.arePortsAvailable({nodeopPort, p2pPort}):
+            Utils.Print(f"ERROR: Another process is listening on nodeop test port {nodeopPort}. wait...")
             if tries == 0:
                 assert False
             tries -= 1
@@ -353,8 +359,8 @@ def abi_file_with_nodeop_test():
         os.makedirs(data_dir, exist_ok=True)
         walletMgr = WalletMgr(True)
         walletMgr.launch()
-        cmd = "./programs/nodeop/nodeop -e -p sysio --signature-provider wire-1,wire,wire,SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV,KEY:5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3 --plugin sysio::trace_api_plugin --trace-no-abis --plugin sysio::producer_plugin --plugin sysio::producer_api_plugin --plugin sysio::chain_api_plugin --plugin sysio::chain_plugin --plugin sysio::http_plugin --access-control-allow-origin=* --http-validate-host=false --max-transaction-time=-1 --resource-monitor-not-shutdown-on-threshold-exceeded " + "--data-dir " + data_dir + " --config-dir " + data_dir
-        node = Node('localhost', 8888, nodeId, data_dir=Path(data_dir), config_dir=Path(data_dir), cmd=shlex.split(cmd), launch_time=datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S'), walletMgr=walletMgr)
+        cmd = f"./programs/nodeop/nodeop -e -p sysio --signature-provider wire-1,wire,wire,SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV,KEY:5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3 --plugin sysio::trace_api_plugin --plugin sysio::producer_plugin --plugin sysio::producer_api_plugin --plugin sysio::chain_api_plugin --plugin sysio::chain_plugin --plugin sysio::http_plugin --access-control-allow-origin=* --http-validate-host=false --p2p-listen-endpoint=0.0.0.0:{p2pPort} --http-server-address=localhost:{nodeopPort} --max-transaction-time=-1 --resource-monitor-not-shutdown-on-threshold-exceeded " + "--data-dir " + data_dir + " --config-dir " + data_dir
+        node = Node('localhost', nodeopPort, nodeId, data_dir=Path(data_dir), config_dir=Path(data_dir), cmd=shlex.split(cmd), launch_time=datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S'), walletMgr=walletMgr)
         if not node or not Utils.waitForBool(node.checkPulse, timeout=15):
             Utils.Print("ERROR: node doesn't appear to be running...")
             assert False, "node doesn't appear to be running"
@@ -424,7 +430,8 @@ def abi_file_with_nodeop_test():
             if os.path.exists(malicious_token_abi_path):
                 os.remove(malicious_token_abi_path)
 
-        walletMgr.testFailed = not testSuccessful
+        if walletMgr:
+            walletMgr.testFailed = not testSuccessful
 
 def clio_protobuf_abi_test():
     """Test that clio can pack/unpack protobuf action data using --abi-file"""

@@ -440,8 +440,8 @@ namespace sysio::testing {
             cpu_usage_t billed_cpu_us(trx.total_actions(), DEFAULT_BILLED_CPU_TIME_US);
             auto trace = control->test_push_transaction( itr->trx_meta, fc::time_point::maximum(), fc::microseconds::maximum(), billed_cpu_us, true );
             if(!no_throw && trace->except) {
-               // this always throws an fc::exception, since the original exception is copied into an fc::exception
-               throw *trace->except;
+               assert(trace->except_ptr);
+               std::rethrow_exception(trace->except_ptr);
             }
             itr = unapplied_transactions.erase( itr );
             res.unapplied_transaction_traces.emplace_back( std::move(trace) );
@@ -783,7 +783,6 @@ namespace sysio::testing {
          billed_cpu_us.insert(billed_cpu_us.end(), trx.get_transaction().total_actions(), billed_cpu_time_us/trx.get_transaction().total_actions());
       auto r = control->test_push_transaction( fut.get(), deadline, fc::microseconds::maximum(), billed_cpu_us, explicit_billed_cpu_time );
       if( r->except_ptr ) std::rethrow_exception( r->except_ptr );
-      if( r->except ) throw *r->except;
       return r;
    } FC_RETHROW_EXCEPTIONS( warn, "transaction_header: {}", fc::json::to_log_string(transaction_header(trx.get_transaction())) ) }
 
@@ -818,7 +817,6 @@ namespace sysio::testing {
       auto r = control->test_push_transaction( fut.get(), deadline, fc::microseconds::maximum(), billed_cpu_us, explicit_billed_cpu_time );
       if (no_throw) return r;
       if( r->except_ptr ) std::rethrow_exception( r->except_ptr );
-      if( r->except)  throw *r->except;
       return r;
    } FC_RETHROW_EXCEPTIONS( warn, "transaction_header: {}, billed_cpu_time_us: {}",
                             fc::json::to_log_string(transaction_header(trx)), billed_cpu_time_us )

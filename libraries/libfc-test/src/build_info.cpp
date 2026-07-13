@@ -67,10 +67,9 @@ bfs::path get_source_root_path() {
 
    auto current_path = get_build_root_path();
    while (current_path != current_path.root_path()) {
-      // .git is a directory in a normal clone, but a regular file (containing
-      // `gitdir: ...`) when this checkout is a git worktree -- accept either.
-      const auto git_marker = current_path / ".git";
-      if (bfs::is_directory(git_marker) || bfs::is_regular_file(git_marker)) {
+      // .git is a directory in a primary checkout but a FILE in a linked git worktree; accept both
+      // so tests that load fixtures from the source tree run in worktree checkouts too.
+      if (bfs::exists(current_path / ".git")) {
          source_root_path = current_path;
          return current_path;
       }

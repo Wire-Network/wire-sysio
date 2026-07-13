@@ -110,6 +110,10 @@ try:
 
     assert node0.waitForHeadToAdvance(blocksToAdvance=2), "Head should advance after regproducer"
 
+    # The bootstrap deploys sysio.opreg and registers every producer as an ACTIVE
+    # OPERATOR_TYPE_PRODUCER operator, so update_ranked_producers' collateral gate is
+    # satisfied and scheduling turns purely on rank + finalizer key below.
+
     # ----------------------------------------------------------------
     # Phase 2: Assign ranks to only rankedCount producers via setrank
     # ----------------------------------------------------------------

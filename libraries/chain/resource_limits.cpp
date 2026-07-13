@@ -94,6 +94,7 @@ void resource_limits_manager::add_to_snapshot( const snapshot_writer_ptr& snapsh
 void resource_limits_manager::read_from_snapshot( const snapshot_reader_ptr& snapshot, std::atomic_size_t& read_row_count, boost::asio::io_context& ctx ) {
    resource_index_set::walk_indices_via_post(ctx, [this, &snapshot, &read_row_count]( auto utils ){
       snapshot->read_section<typename decltype(utils)::index_t::value_type>([this, &read_row_count]( auto& section ) {
+         decltype(utils)::preallocate(_db, section.row_count());
          bool more = !section.empty();
          while(more) {
             decltype(utils)::create(_db, [this, &section, &more]( auto &row ) {
