@@ -1,21 +1,24 @@
 #!/bin/bash
 set -euo pipefail
 
-# Tweaks a couple aspects of the built .deb's control file:
-# 1. Removes Installed-Size field; this isn't reproducible for some reason, possibly different filesystems
-#    reporting different sizes for directories?
-# 2. Removes all but the first libc Depends rule as the rest are unnecessarily restrictive. The original was being
-#    generated as,
-#       libc6 (>= 2.27), libc6 (>> 2.28), libc6 (<< 2.29), libcurl4 (>= 7.16.2), libgcc1 (>= 1:3.3), libgmp10, zlib1g (>= 1:1.2.0)
-#    and the included sed rule within this script will reduce it to
-#       libc6 (>= 2.27), libcurl4 (>= 7.16.2), libgcc1 (>= 1:3.3), libgmp10, zlib1g (>= 1:1.2.0)
-#    This may need to be tweaked in the future further; clearly not ideal.
+# Post-processes a built .deb's control archive:
+# 1. Removes the Installed-Size field; it is not reproducible across
+#    filesystems.
+# 2. Collapses redundant multi-clause libc6 Depends down to the first clause
+#    (historically emitted as e.g.
+#       libc6 (>= 2.27), libc6 (>> 2.28), libc6 (<< 2.29), ...
+#    which is unnecessarily restrictive).
+#
+# The control archive is fully unpacked and repacked with deterministic
+# metadata instead of being patched in place: GNU tar's --delete/--update
+# cannot edit the pax-format archives CPack emits ("Skipping to next
+# header"), while a fresh GNU-format repack is portable and reproducible.
 
 WORKDIR="$(mktemp -d)"
 trap 'rm -rf -- "${WORKDIR}"' EXIT
 
 if [ $# -lt 1 ]; then
-   echo "Must specify .deb file to tweak as argument to script"
+   echo "Must specify .deb file to postprocess as argument to script"
    exit 1
 fi
 
@@ -24,14 +27,17 @@ if [ ! -f "$1" ]; then
    exit 1
 fi
 
-DEB_PATH="$(realpath ${1})"
+DEB_PATH="$(realpath "${1}")"
 cd "${WORKDIR}"
 
 ar x "${DEB_PATH}" control.tar.gz
 gzip -d control.tar.gz
-tar xf control.tar ./control
-tar --delete -f control.tar ./control
-sed -i -E -e '/Installed-Size/d' -e 's/, libc6[^,]+//g' control
-tar --update --mtime "@0" --owner=0 --group=0 --numeric-owner -f control.tar ./control
+mkdir ctrl
+tar xf control.tar -C ctrl
+sed -i -E -e '/Installed-Size/d' -e 's/, libc6[^,]+//g' ctrl/control
+(cd ctrl && find . -mindepth 1 -maxdepth 1 -type f -printf './%f\n' | LC_ALL=C sort) > members.txt
+rm -f control.tar
+tar cf control.tar --format=gnu --mtime=@0 --owner=0 --group=0 --numeric-owner \
+    --no-recursion -C ctrl -T members.txt
 gzip -n control.tar
 ar rD "${DEB_PATH}" control.tar.gz
