@@ -1,53 +1,120 @@
-name: Release Actions
+name: "Release Actions"
 
 on:
   release:
     types: [published]
+  # Validation path: release-published events always run the DEFAULT branch's
+  # workflow file, so pre-merge testing (and re-runs against an existing
+  # release) go through manual dispatch with the tag as input.
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing release tag to verify and populate (e.g. v1.0.0-rc1)"
+        type: string
+        required: true
+
+permissions:
+  contents: write
+  packages: write
+  actions: read
+
+defaults:
+  run:
+    shell: bash
 
 jobs:
-  eb:
-    name: experimental-binaries
+  publish-assets:
+    name: Verify & attach release artifacts
+    runs-on: ubuntu-latest
+    outputs:
+      run-id: ${{ steps.run.outputs.run-id }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TAG: ${{ inputs.tag || github.ref_name }}
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # actions/checkout@v5
+
+      - name: Resolve build run for the released commit
+        id: run
+        run: |
+          # The release points at a tag; the tag build (linux_amd64_build.yaml,
+          # push: tags v*) produced wire-sysio-packages-amd64 for exactly this
+          # commit. Same resolution pattern as the wire-cdt artifact lookup.
+          sha=$(gh api "repos/${GITHUB_REPOSITORY}/commits/${TAG}" --jq .sha)
+          run_id=""
+          for attempt in {1..30}; do
+            run_id=$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/linux_amd64_build.yaml/runs?head_sha=${sha}&event=push&per_page=10" \
+              --jq '[.workflow_runs[] | select(.status=="completed" and .conclusion=="success")][0].id // empty')
+            [[ -n "$run_id" ]] && break
+            echo "Waiting for successful tag build of ${sha} (attempt ${attempt}/30)"
+            sleep 60
+          done
+          [[ -n "$run_id" ]] || { echo "::error::No successful build run found for ${sha}"; exit 1; }
+          echo "run-id=$run_id" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # actions/download-artifact@v8.0.1
+        with:
+          name: wire-sysio-packages-amd64
+          path: dist
+          run-id: ${{ steps.run.outputs.run-id }}
+          github-token: ${{ github.token }}
+
+      - name: Guard release tag matches artifact version
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          ls -la dist/
+          [[ -f "dist/wire-sysio_${tag}_amd64.deb" ]] \
+            || { echo "::error::Release tag v${tag} does not match the artifact version (bump VERSION_* in CMakeLists.txt to match the tag before tagging)"; exit 1; }
+
+      - name: Verify packages (S1-S6)
+        run: |
+          tools/packaging/tests/verify-tgz.sh dist/wire-sysio-*.tar.gz
+          tools/packaging/tests/verify-deb.sh dist/wire-sysio_*.deb dist/wire-sysio-dev_*.deb
+          # wire-sysio-[0-9]* matches the base rpm only (the dev rpm is wire-sysio-dev-*).
+          tools/packaging/tests/verify-rpm.sh dist/wire-sysio-[0-9]*.rpm dist/wire-sysio-dev-*.rpm
+
+      - name: Attach artifacts to the release
+        run: |
+          sha256sum dist/* > "wire-sysio-${GITHUB_REF_NAME#v}-checksums.txt"
+          mv "wire-sysio-${GITHUB_REF_NAME#v}-checksums.txt" dist/
+          gh release upload "$GITHUB_REF_NAME" dist/* --clobber
+
+  experimental-binaries:
+    name: experimental-binaries (ghcr mirror)
+    needs: [publish-assets]
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
       actions: read
     steps:
-      - name: Get ubuntu20 sysio-dev.deb
-        uses: AntelopeIO/asset-artifact-download-action@v3
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # actions/download-artifact@v8.0.1
         with:
-          owner: ${{github.repository_owner}}
-          repo: ${{github.event.repository.name}}
-          file: 'sysio-dev.*amd64.deb'
-          target: ${{github.sha}}
-          artifact-name: sysio-dev-ubuntu20-amd64
-          wait-for-exact-target: true
-      - name: Get ubuntu22 sysio-dev.deb
-        uses: AntelopeIO/asset-artifact-download-action@v3
-        with:
-          owner: ${{github.repository_owner}}
-          repo: ${{github.event.repository.name}}
-          file: 'sysio-dev.*amd64.deb'
-          target: ${{github.sha}}
-          artifact-name: sysio-dev-ubuntu22-amd64
-          wait-for-exact-target: true
+          name: wire-sysio-packages-amd64
+          path: .
+          run-id: ${{ needs.publish-assets.outputs.run-id }}
+          github-token: ${{ github.token }}
+
       - name: Create Dockerfile
         run: |
-          cat <<EOF > Dockerfile
+          cat <<DOCKEREOF > Dockerfile
           FROM scratch
           LABEL org.opencontainers.image.description="A collection of experimental Wire binary packages"
           COPY *.deb /
-          EOF
+          DOCKEREOF
+
       - name: Login to ghcr
-        uses: docker/login-action@v3
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # docker/login-action@v3
         with:
           registry: ghcr.io
-          username: ${{github.repository_owner}}
-          password: ${{github.token}}
+          username: ${{ github.repository_owner }}
+          password: ${{ github.token }}
+
       - run: echo "REPOSITORY_OWNER_LOWER=${GITHUB_REPOSITORY_OWNER,,}" >> "${GITHUB_ENV}"
+
       - name: Build and push wire-sysio-experimental-binaries
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # docker/build-push-action@v6
         with:
           push: true
-          tags: ghcr.io/${{env.REPOSITORY_OWNER_LOWER}}/wire-sysio-experimental-binaries:${{github.ref_name}}
+          tags: ghcr.io/${{ env.REPOSITORY_OWNER_LOWER }}/wire-sysio-experimental-binaries:${{ inputs.tag || github.ref_name }}
           context: .
