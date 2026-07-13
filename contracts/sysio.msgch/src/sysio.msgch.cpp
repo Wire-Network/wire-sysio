@@ -956,6 +956,52 @@ void dispatch_attestation(name self, uint64_t attestation_id,
    }
 }
 
+/// Validate an inbound envelope against the per-outpost chains for `chain_code` at `epoch_index`:
+/// the envelope-level chain (`previous_envelope_hash` continues `outpcons.envelope_digest`) and the
+/// per-message semantic headers + inbound message chain (`semantic_headers_ok`). Pure read + compute
+/// -- writes no state. On success `out_envelope_digest` is the envelope's canonical epoch digest and
+/// `out_new_message_tip` the message tip the outpost advances to on acceptance; returns false (with a
+/// diagnostic, never throwing) on any chain break or header violation.
+///
+/// Run at BOTH ingress and acceptance: `deliver` `check()`s it, rejecting the operator's own
+/// malformed / forged / stale envelope before it is ever recorded, while `apply_consensus` soft-drops
+/// on it as defense in depth. Within an epoch the tip is stable -- it only advances when that epoch's
+/// winner is accepted -- so a deliver-accepted envelope validates identically at acceptance. Ingress
+/// rejection is what stops a majority-relayed invalid envelope from reaching consensus and stranding
+/// the epoch: a reverted `deliver` records no row, so no invalid version can win the tally (and the
+/// operator can re-deliver a corrected envelope), whereas a recorded-then-soft-dropped winner would
+/// leave `consensus_reached` true, no `outpcons` row, and no dispute or re-delivery path -- a
+/// permanent stall.
+[[nodiscard]] bool inbound_envelope_valid(name self, const opp::Envelope& envelope,
+                                          uint64_t chain_code, uint32_t epoch_index,
+                                          checksum256& out_envelope_digest,
+                                          checksum256& out_new_message_tip) {
+   out_envelope_digest = opp::canonical::epoch_digest(envelope);
+   checksum256 inbound_message_tip{};
+   {
+      msgch::outpost_consensus_t opcons(self);
+      auto opc_pk = msgch::outpost_consensus_key{chain_code};
+      checksum256 chain_tip{};
+      if (opcons.contains(opc_pk)) {
+         const auto row      = opcons.get(opc_pk);
+         chain_tip           = row.envelope_digest;
+         inbound_message_tip = row.message_tip;
+      }
+      if (chain_tip != checksum256{}) {
+         const auto prev = to_checksum256_exact(envelope.previous_envelope_hash);
+         if (!prev.has_value() || *prev != chain_tip) {
+            sysio::print_f("DROP envelope chain break: chain_code=%llu epoch=%u "
+                           "previous_envelope_hash does not continue the accepted chain\n",
+                           static_cast<unsigned long long>(chain_code), epoch_index);
+            return false;
+         }
+      }
+   }
+   out_new_message_tip = checksum256{};
+   return semantic_headers_ok(envelope, inbound_message_tip, out_new_message_tip, chain_code,
+                              epoch_index);
+}
+
 /// Apply a consensus-reached inbound envelope for one (outpost, epoch): decode it, verify it
 /// continues the per-outpost envelope chain, store and dispatch its attestations, write the
 /// audit-log row, drain the working envelope rows, and record per-outpost consensus. Shared by
@@ -1012,63 +1058,24 @@ void dispatch_attestation(name self, uint64_t attestation_id,
    auto decode_result = in(envelope);
    check(decode_result == zpp::bits::errc{}, "failed to decode inbound OPP Envelope");
 
-   // Inbound chain verification (ENFORCED). Outposts self-chain their outbound envelopes:
-   // `previous_envelope_hash` must continue from the canonical epoch digest of the envelope
-   // accepted before it from the same outpost (`outpcons.envelope_digest`). The digest is
-   // recomputed from the DECODED envelope (a defensive re-encode, exactly like the outposts'
-   // `OPPCommon.epochHash`), so a byte-mutated but semantically identical delivery canonicalises
-   // to the same digest. Both outposts now self-chain per stream — the EVM outpost via
-   // `OPP.prevEpochHash`, the SVM outpost via `previous_outbound_epoch_hash` (wire-solana
-   // SEC-114) — so once a chain tip is recorded for an outpost, a NON-continuing
-   // `previous_envelope_hash` is a chain break and the envelope is dropped before any dispatch,
-   // consensus record, or cleanup (delivery rows stay intact for audit/dispute), per the
-   // never-throw handler convention. An EMPTY `previous_envelope_hash` is valid only at genesis,
-   // when the recorded tip itself is still empty; a non-empty value must be exactly the 32-byte
-   // tip (`to_checksum256_exact` rejects any other length, so a wrong-sized or all-zero field is
-   // a break, matching the outposts' canonical-form enforcement). The previous STAGED acceptance
-   // of an empty prev-hash for non-genesis epochs, and the INTERIM SVM cross-stream fallback that
-   // bridged the pre-SEC-114 Solana outpost, are both removed now that per-stream chaining is
-   // live on both chains.
-   //
-   // The source chain row also feeds the audit-log endpoints projection below; `deliver`
-   // validated it at delivery time, and `resolvedisp` re-enters through the same registry.
+   // The source chain row feeds the audit-log endpoints projection below; `deliver` validated the
+   // outpost at delivery time and `resolvedisp` re-enters through the same registry. The inbound
+   // envelope-chain + semantic-header verification (ENFORCED since SEC-102) lives in
+   // `inbound_envelope_valid`, which `deliver` already ran at ingress and which is re-checked below.
    const auto op_row = [&]() {
       sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
       return chains_tbl.get(sysio::chains::chain_key{sysio::slug_name{chain_code}});
    }();
-   const checksum256 envelope_digest = opp::canonical::epoch_digest(envelope);
-   checksum256 inbound_message_tip{};
-   {
-      msgch::outpost_consensus_t opcons(self);
-      auto opc_pk = msgch::outpost_consensus_key{chain_code};
-      checksum256 chain_tip{};
-      if (opcons.contains(opc_pk)) {
-         const auto row     = opcons.get(opc_pk);
-         chain_tip          = row.envelope_digest;
-         inbound_message_tip = row.message_tip;
-      }
-      if (chain_tip != checksum256{}) {
-         const auto prev = to_checksum256_exact(envelope.previous_envelope_hash);
-         if (!prev.has_value() || *prev != chain_tip) {
-            sysio::print_f("DROP envelope chain break: chain_code=%llu epoch=%u "
-                           "previous_envelope_hash does not continue the accepted chain\n",
-                           static_cast<unsigned long long>(chain_code), epoch_index);
-            return false;
-         }
-      }
-   }
-
-   // Semantic-header enforcement: every message's checksums and ids must recompute per the
-   // opp.proto MessageHeader spec (which all three emitters populate identically), AND each
-   // message must continue the per-outpost inbound message chain from `inbound_message_tip` --
-   // this is what prevents replay of an earlier valid message inside a correctly envelope-chained
-   // successor. A violation is a malformed, forged, or replayed envelope -- dropped before any
-   // dispatch, consensus record, or cleanup (delivery rows stay intact for audit/dispute), per
-   // the never-throw handler convention. `new_message_tip` becomes the outpost's message tip on
-   // acceptance (unchanged for a zero-message ack).
+   // Validate the envelope-level chain + per-message semantic headers -- the SAME check `deliver`
+   // runs at ingress (see `inbound_envelope_valid`), re-run here as defense in depth. A drop is a
+   // SOFT return, never a throw: on the evalcons path one operator's bad envelope must not revert a
+   // consensus-eval tx (`resolvedisp` `check()`s the result instead; see the callers). With ingress
+   // validation in place this should not fail for a recorded delivery -- the tip is stable across an
+   // epoch's deliveries -- but the guard stays as the authoritative acceptance point.
+   checksum256 envelope_digest{};
    checksum256 new_message_tip{};
-   if (!semantic_headers_ok(envelope, inbound_message_tip, new_message_tip, chain_code,
-                            epoch_index)) {
+   if (!inbound_envelope_valid(self, envelope, chain_code, epoch_index, envelope_digest,
+                               new_message_tip)) {
       return false;
    }
 
@@ -1279,10 +1286,11 @@ void msgch::deliver(name batch_op_name, uint64_t chain_code, std::vector<char> d
    check(!op_row.is_depot, "deliver: chain_code refers to the depot self-row");
    check(op_row.active, "deliver: outpost is not active");
 
-   // Decode envelope to validate epoch_index matches current WIRE epoch
+   // Decode envelope to validate epoch_index matches current WIRE epoch. The decoded envelope is
+   // re-used by the semantic-header/chain validation below (after the duplicate check).
    uint32_t epoch = current_epoch_index();
+   opp::Envelope env_check;
    {
-      opp::Envelope env_check;
       auto in = zpp::bits::in{std::span{data.data(), data.size()}, zpp::bits::no_size{}};
       auto result = in(env_check);
       check(result == zpp::bits::errc{}, "failed to decode inbound envelope");
@@ -1312,6 +1320,22 @@ void msgch::deliver(name batch_op_name, uint64_t chain_code, std::vector<char> d
         it != oe_idx.end() && it->by_outpost_epoch() == composite; ++it) {
       check(it->batch_op_name != batch_op_name,
             "operator already delivered for this outpost+epoch");
+   }
+
+   // Reject a forged, malformed, or stale (chain-breaking / replayed) envelope at ingress by
+   // REVERTING -- see `inbound_envelope_valid`. Runs AFTER the duplicate check, so a same-operator
+   // re-delivery reports "already delivered" rather than a chain break once its first delivery has
+   // reached consensus and advanced the tip. Validating here, rather than only soft-dropping at
+   // consensus, keeps an invalid envelope from ever being recorded: a post-boundary majority
+   // relaying the same invalid envelope can no longer reach consensus only to be soft-dropped, which
+   // would strand the epoch with no `outpcons` row and no dispute path (consensus_reached stays
+   // true). A reverted tx records nothing, so the operator can immediately deliver a corrected one.
+   {
+      checksum256 ingress_digest{};
+      checksum256 ingress_message_tip{};
+      check(inbound_envelope_valid(get_self(), env_check, chain_code, epoch, ingress_digest,
+                                   ingress_message_tip),
+            "delivered envelope failed inbound-chain or semantic-header validation");
    }
 
    // Store envelope
@@ -1543,7 +1567,10 @@ void msgch::resolvedisp(uint64_t chain_code, uint32_t epoch_index, checksum256 w
    // unpaused with no consensus row -- `chkcons` waits forever for that row while `evalcons`
    // no-ops on the lingering (now RESOLVED) dispute. Asserting rolls the whole `chkdispute` crank
    // back, so the dispute stays OPEN/paused and recoverable -- the same safe-stall contract as the
-   // `check(found, ...)` above. A voted winner should never fail validation in normal operation.
+   // `check(found, ...)` above. In practice this cannot trigger: `deliver`'s ingress validation
+   // (`inbound_envelope_valid`) rejects a forged or chain-breaking envelope before it is ever
+   // recorded, so it can never become a dispute candidate or voted winner -- this guard is defense
+   // in depth for that invariant.
    check(apply_consensus(get_self(), chain_code, epoch_index, raw, winning_checksum),
          "resolvedisp: winning envelope failed depot validation; dispute left OPEN");
 }

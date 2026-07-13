@@ -12,8 +12,8 @@
 /// (SEC-107 completion): both outposts self-chain per stream, so once a tip is recorded an empty
 /// `previous_envelope_hash` is a chain break (valid only at genesis, before any tip); a non-empty
 /// one must be exactly the 32-byte tip. Any other value — empty, wrong length, or non-matching —
-/// drops the envelope without dispatching and without throwing. An outpost's FIRST accepted
-/// envelope (no tip yet) still bootstraps regardless of its prev-hash.
+/// is rejected at ingress: `deliver` reverts, so nothing is recorded or dispatched. An outpost's
+/// FIRST accepted envelope (no tip yet) still bootstraps regardless of its prev-hash.
 ///
 /// The oracle encoder in this file is an independent host-side reimplementation of the canonical
 /// encoding (the contract-side implementation is
@@ -604,11 +604,15 @@ BOOST_FIXTURE_TEST_CASE(inbound_chain_tip_recorded_and_verified, sysio_msgch_cha
    BOOST_REQUIRE_EQUAL(opc["envelope_digest"].as_string(), n2_digest.str());
    BOOST_REQUIRE_EQUAL(attestation_count(ETH_OUTPOST_ID, epoch), 1u);
 
-   // Epoch E+2: chain break: a non-empty prev that does not continue the tip is dropped
-   // without throwing: deliver succeeds, nothing is dispatched, the tip does not move.
+   // Epoch E+2: chain break: a non-empty prev that does not continue the tip is REJECTED at
+   // ingress -- deliver reverts (see msgch::deliver's inbound_envelope_valid gate), so no row is
+   // recorded, nothing is dispatched, and the tip does not move.
    const uint32_t break_epoch = advance_one_epoch();
    auto n3 = encode_delivery(break_epoch, "charlie", std::string(32, '\x11'));
-   BOOST_REQUIRE_EQUAL(success(), deliver(ETH_OUTPOST_ID, n3));
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: delivered envelope failed inbound-chain or "
+            "semantic-header validation"),
+      deliver(ETH_OUTPOST_ID, n3));
    produce_blocks();
 
    opc = get_outpcons(ETH_OUTPOST_ID);
@@ -616,12 +620,15 @@ BOOST_FIXTURE_TEST_CASE(inbound_chain_tip_recorded_and_verified, sysio_msgch_cha
    BOOST_REQUIRE_EQUAL(opc["envelope_digest"].as_string(), n2_digest.str()); // tip unchanged
    BOOST_REQUIRE_EQUAL(attestation_count(ETH_OUTPOST_ID, break_epoch), 0u);  // nothing dispatched
 
-   // Epoch E+3: enforcement (SEC-107 completion): an EMPTY prev on a non-genesis epoch is now a
-   // chain break. Both outposts self-chain per stream, so once a tip is recorded an empty
-   // prev-hash no longer bootstraps — it is dropped without throwing and the tip does not move.
+   // Epoch E+3: enforcement (SEC-107 completion): an EMPTY prev on a non-genesis epoch is a chain
+   // break. Both outposts self-chain per stream, so once a tip is recorded an empty prev-hash no
+   // longer bootstraps — it is REJECTED at ingress (deliver reverts) and the tip does not move.
    const uint32_t empty_epoch = advance_one_epoch();
    auto n4 = encode_delivery(empty_epoch, "delta");   // no prev => empty field
-   BOOST_REQUIRE_EQUAL(success(), deliver(ETH_OUTPOST_ID, n4));
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: delivered envelope failed inbound-chain or "
+            "semantic-header validation"),
+      deliver(ETH_OUTPOST_ID, n4));
    produce_blocks();
 
    opc = get_outpcons(ETH_OUTPOST_ID);
@@ -648,10 +655,11 @@ BOOST_FIXTURE_TEST_CASE(inbound_chain_tip_recorded_and_verified, sysio_msgch_cha
 } FC_LOG_AND_RETHROW() }
 
 /// Semantic-header enforcement: every header field must recompute per the spec derivation; a
-/// forged field drops the envelope before dispatch -- no attestation rows, no consensus record,
-/// no chain-tip movement -- without throwing. Each forgery is exercised at its own epoch on a
-/// correctly CHAINED envelope, so the drop is attributable to the header check rather than the
-/// envelope-chain check; a final well-formed delivery proves the stream resumes.
+/// forged field is REJECTED at ingress -- `deliver` reverts (the header check runs there), so no
+/// envelope row is recorded, no attestation, no consensus record, no chain-tip movement. Each
+/// forgery is exercised at its own epoch on a correctly CHAINED envelope, so the rejection is
+/// attributable to the header check rather than the envelope-chain check; a final well-formed
+/// delivery proves the stream resumes.
 BOOST_FIXTURE_TEST_CASE(inbound_semantic_header_forgeries_dropped, sysio_msgch_chain_tester) { try {
    bootstrap();
 
@@ -667,8 +675,10 @@ BOOST_FIXTURE_TEST_CASE(inbound_semantic_header_forgeries_dropped, sysio_msgch_c
    const uint32_t accepted_epoch = epoch;
 
    // Deliver a correctly-chained envelope whose decoded form was altered by `mutate`, then
-   // assert it was dropped: deliver itself succeeds (never-throw), no attestation row for its
-   // epoch, the consensus record stays at the last accepted epoch, the tip does not move.
+   // assert it was REJECTED at ingress: `deliver` reverts (the semantic-header check runs there,
+   // see msgch::deliver's inbound_envelope_valid gate), so no envelope row is recorded, no
+   // attestation lands for its epoch, the consensus record stays at the last accepted epoch, and
+   // the tip does not move.
    auto forged_delivery_dropped = [&](const char* tag,
                                       const std::function<void(sysio::opp::Envelope&)>& mutate) {
       const uint32_t e = advance_one_epoch();
@@ -676,7 +686,10 @@ BOOST_FIXTURE_TEST_CASE(inbound_semantic_header_forgeries_dropped, sysio_msgch_c
       mutate(env);
       std::vector<char> out(env.ByteSizeLong());
       env.SerializeToArray(out.data(), static_cast<int>(out.size()));
-      BOOST_REQUIRE_EQUAL(success(), deliver(ETH_OUTPOST_ID, out));
+      BOOST_REQUIRE_EQUAL(
+         error("assertion failure with message: delivered envelope failed inbound-chain or "
+               "semantic-header validation"),
+         deliver(ETH_OUTPOST_ID, out));
       produce_blocks();
       BOOST_REQUIRE_EQUAL(attestation_count(ETH_OUTPOST_ID, e), 0u);
       auto opc = get_outpcons(ETH_OUTPOST_ID);
@@ -755,7 +768,7 @@ BOOST_FIXTURE_TEST_CASE(inbound_message_replay_dropped, sysio_msgch_chain_tester
    // Epoch E+1: a fresh envelope, correctly chained at the ENVELOPE level (previous_envelope_hash
    // = E's digest), but carrying M1 replayed verbatim. M1's previous_message_id is empty (it was
    // the stream's genesis message), which no longer continues the recorded message tip, so the
-   // envelope is dropped: no new attestation row, the tip does not move.
+   // envelope is REJECTED at ingress: deliver reverts, no new attestation row, the tip does not move.
    const uint32_t replay_epoch = advance_one_epoch();
    auto replay = [&]() {
       sysio::opp::Envelope env;
@@ -768,7 +781,10 @@ BOOST_FIXTURE_TEST_CASE(inbound_message_replay_dropped, sysio_msgch_chain_tester
       env.SerializeToArray(out.data(), static_cast<int>(out.size()));
       return out;
    }();
-   BOOST_REQUIRE_EQUAL(success(), deliver(ETH_OUTPOST_ID, replay));
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: delivered envelope failed inbound-chain or "
+            "semantic-header validation"),
+      deliver(ETH_OUTPOST_ID, replay));
    produce_blocks();
 
    auto opc = get_outpcons(ETH_OUTPOST_ID);
@@ -808,9 +824,11 @@ BOOST_FIXTURE_TEST_CASE(inbound_rejects_cross_stream_link_for_svm_outposts,
                                          outbound_digest_bytes.data(),
                                          outbound_digest_bytes.size()));
 
-   // Cross-stream link (prev = depot's outbound emit digest) is now a chain break: dropped
-   // without throwing, tip does not move, nothing dispatched.
-   BOOST_REQUIRE_EQUAL(success(),
+   // Cross-stream link (prev = depot's outbound emit digest) is a chain break: REJECTED at ingress
+   // (deliver reverts), tip does not move, nothing recorded or dispatched.
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: delivered envelope failed inbound-chain or "
+            "semantic-header validation"),
       deliver(SOL_OUTPOST_ID, encode_delivery(epoch, "xstream-b", outbound_digest_bytes)));
    produce_blocks();
 
@@ -844,7 +862,9 @@ BOOST_FIXTURE_TEST_CASE(inbound_rejects_cross_stream_link_for_evm_outposts,
                                          outbound_digest_bytes.data(),
                                          outbound_digest_bytes.size()));
 
-   BOOST_REQUIRE_EQUAL(success(),
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: delivered envelope failed inbound-chain or "
+            "semantic-header validation"),
       deliver(ETH_OUTPOST_ID, encode_delivery(epoch, "evm-xstream-b", outbound_digest_bytes)));
    produce_blocks();
 
