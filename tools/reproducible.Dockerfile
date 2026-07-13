@@ -118,7 +118,7 @@ ARG SYSIO_BUILD_JOBS
 COPY / /__w/sysio/sysio
 RUN cmake -S /__w/sysio/sysio -B build -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release -GNinja && \
     cmake --build build -t package -- ${SYSIO_BUILD_JOBS:+-j$SYSIO_BUILD_JOBS} && \
-    /__w/sysio/sysio/tools/tweak-deb.sh build/wire-sysio_*.deb
+    /__w/sysio/sysio/tools/packaging/scripts/deb-postprocess.sh build/wire-sysio_*.deb
 
 FROM scratch AS exporter
 COPY --from=build /build/*.deb /build/*.tar.* /

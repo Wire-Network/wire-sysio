@@ -285,3 +285,15 @@ stage proving the service enables, starts, and stays up),
 `verify-install-manifest.sh` (install regression vs a baseline), and
 `verify-scripts.sh` (static lint). The deb/rpm verifiers require docker; the
 runtime stage builds a cached systemd-enabled test image on first use.
+
+### Release flow
+
+1. Bump `VERSION_MAJOR/MINOR/PATCH/SUFFIX` in `CMakeLists.txt` (PR to master).
+2. Push tag `v<version>` — the tag build installs the Wire CDT package, builds
+   and asserts system contracts, assembles the full package set, and verifies
+   it (S1-S6, including the systemd service-start gate).
+3. Publish the GitHub Release for the tag — the `Release Actions` workflow
+   locates the successful tag build, re-verifies the artifacts, fails fast if
+   the tag does not match the artifact version, attaches the packages plus a
+   sha256 checksums file to the release, and refreshes the
+   `wire-sysio-experimental-binaries` ghcr image.
