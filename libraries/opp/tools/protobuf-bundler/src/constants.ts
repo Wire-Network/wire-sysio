@@ -13,6 +13,22 @@ export const PUBLISHABLE_TARGETS: Target[] = [
   Target.Solidity
 ]
 
+/** Targets that are published to the WIRE CodeArtifact cargo registry (solana). */
+export const CARGO_PUBLISHABLE_TARGETS: Target[] = [Target.Solana]
+
+/**
+ * Cargo registry name for the WIRE CodeArtifact repository. The publish
+ * environment supplies `CARGO_REGISTRIES_WIRE_INDEX` / `_TOKEN`
+ * (see libraries/opp/tools/scripts/generate-opp-bundles.sh).
+ */
+export const CARGO_REGISTRY_NAME = "wire"
+
+/** SPDX license expression stamped into the generated Rust crate. */
+export const CRATE_LICENSE = "LicenseRef-Wire-Proprietary"
+
+/** Canonical repository URL stamped into the generated Rust crate. */
+export const CRATE_REPOSITORY_URL = "https://github.com/Wire-Network/wire-sysio"
+
 /**
  * Canonical build order — typescript before solidity (dependency).
  * Solana is independent so its position doesn't matter.

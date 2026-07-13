@@ -5,18 +5,18 @@ one build tree (see `BUILD.md` → Packaging). Version shown as `<v>` (e.g.
 `1.0.0-dev`; dpkg/rpm metadata uses the tilde form `1.0.0~dev` so pre-release
 suffixes sort before the final release).
 
-| Artifact | Name | Install prefix |
-|---|---|---|
-| Portable tarball | `wire-sysio-<v>-<arch>.tar.gz` | none — self-contained tree |
-| Debian/Ubuntu | `wire-sysio_<v>_<debarch>.deb` + `wire-sysio-dev_<v>_<debarch>.deb` | `/usr` |
-| RHEL/Fedora | `wire-sysio-<v>-<arch>.rpm` + `wire-sysio-dev-<v>-<arch>.rpm` | `/usr` |
+| Artifact         | Name                                                                | Install prefix             |
+| ---------------- | ------------------------------------------------------------------- | -------------------------- |
+| Portable tarball | `wire-sysio-<v>-<arch>.tar.gz`                                      | none — self-contained tree |
+| Debian/Ubuntu    | `wire-sysio_<v>_<debarch>.deb` + `wire-sysio-dev_<v>_<debarch>.deb` | `/usr`                     |
+| RHEL/Fedora      | `wire-sysio-<v>-<arch>.rpm` + `wire-sysio-dev-<v>-<arch>.rpm`       | `/usr`                     |
 
 ## Portable tarball (`.tar.gz`)
 
 Runtime payload only (the base component), rooted at a plain `wire-sysio/`
 directory so that extraction into `/opt` yields `/opt/wire-sysio/bin/nodeop`:
 
-```
+```tree
 wire-sysio/
 ├── bin/
 │   ├── clio
@@ -66,11 +66,11 @@ restart a running node; removal stops/disables the unit but **never deletes**
 Runtime directories (created by `systemd-tmpfiles` at install and every boot,
 matching the unit's command line — nodeop's internal defaults are unchanged):
 
-| Purpose | Path |
-|---|---|
-| Config (`--config-dir`) | `/etc/wire/sysio` |
-| Data (`--data-dir`) | `/var/lib/wire/sysio/data` |
-| Logs (unit `append:`) | `/var/log/wire/sysio` (rotated 5 x 1G, copytruncate) |
+| Purpose                 | Path                                                 |
+| ----------------------- | ---------------------------------------------------- |
+| Config (`--config-dir`) | `/etc/wire/sysio`                                    |
+| Data (`--data-dir`)     | `/var/lib/wire/sysio/data`                           |
+| Logs (unit `append:`)   | `/var/log/wire/sysio` (rotated 5 x 1G, copytruncate) |
 
 ### `wire-sysio-dev` (headers/libraries/testing; depends on exact base version)
 
