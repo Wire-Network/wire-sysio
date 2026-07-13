@@ -33,12 +33,15 @@ repo_root="$(cd -- "$tools_root/../../.." && pwd -P)"
 
 # WIRE CodeArtifact cargo registry (provisioned by wire-infra
 # ArtifactManagementStack). The generated wire-opp-solana-models crate is
-# published here; the registry name "wire" must match CARGO_REGISTRY_NAME in
-# protobuf-bundler/src/constants.ts.
+# published to the PUBLIC repository — consumers (wire-solana et al) read it
+# anonymously via https://public.crates.pkgs.wire-dev.com with no AWS auth.
+# The registry name "wire" must match CARGO_REGISTRY_NAME in
+# protobuf-bundler/src/constants.ts. Publishing still authenticates against
+# the native CodeArtifact endpoint (GitHub OIDC publisher role).
 codeartifact_domain="wire-pkg"
 codeartifact_domain_owner="619322354039"
 codeartifact_region="us-east-1"
-cargo_registry_repository="wire-pkg-rust-private"
+cargo_registry_repository="wire-pkg-rust-public"
 cargo_registry_index="sparse+https://${codeartifact_domain}-${codeartifact_domain_owner}.d.codeartifact.${codeartifact_region}.amazonaws.com/cargo/${cargo_registry_repository}/"
 # Minimum cargo with sparse-registry + registry-token auth support.
 cargo_minimum_version="1.74.0"
