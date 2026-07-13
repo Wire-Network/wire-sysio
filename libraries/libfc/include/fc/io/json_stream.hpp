@@ -1,5 +1,6 @@
 #pragma once
 
+#include <fc/exception/exception.hpp>
 #include <fc/io/json_escape.hpp>
 
 #include <cassert>
@@ -8,12 +9,32 @@
 #include <cstdint>
 #include <functional>
 #include <limits>
-#include <stdexcept>
 #include <string>
 #include <string_view>
 #include <vector>
 
 namespace fc {
+
+/// Slack the writer guarantees in the output buffer at construction so typical responses
+/// append without an early reallocation.
+inline constexpr size_t json_writer_initial_reserve = 4096;
+
+/// Decimal-digit buffer that fits any int64/uint64 (uint64 max = 20 digits, plus sign and slack).
+inline constexpr size_t int64_decimal_buf_size = std::numeric_limits<int64_t>::digits10 + 3;
+static_assert(int64_decimal_buf_size >= std::numeric_limits<uint64_t>::digits10 + 1);
+
+/// Shortest-roundtrip std::to_chars of a finite double fits well within this.
+inline constexpr size_t double_shortest_buf_size = 32;
+
+/// 64-bit integers whose magnitude exceeds this are emitted as quoted JSON strings to
+/// preserve precision past JS's 2^53 mantissa.  Single source of truth for the streaming
+/// emitters; matches fc::json::to_string's emission (libfc/src/io/json.cpp int64/uint64 cases).
+inline constexpr int64_t json_integer_quote_magnitude = 0xffffffff;
+
+/// Depth cap for the fc::variant / variant_object streaming walkers; matches
+/// DEFAULT_MAX_RECURSION_DEPTH in fc/io/json.hpp so the streaming path throws where
+/// fc::json::to_string's yield would.
+inline constexpr uint32_t json_stream_max_depth = 200;
 
 /**
  *  Streaming JSON writer that emits tokens directly into an output std::string.
@@ -42,8 +63,8 @@ public:
       // Enough room for a reasonable response without reallocation; callers that know
       // the expected size can reserve() themselves before constructing the writer.
       // Skip if the caller already has slack so we don't risk a spec-permitted shrink.
-      if (out_.capacity() - out_.size() < 4096) {
-         out_.reserve(out_.size() + 4096);
+      if (out_.capacity() - out_.size() < json_writer_initial_reserve) {
+         out_.reserve(out_.size() + json_writer_initial_reserve);
       }
    }
 
@@ -110,16 +131,14 @@ public:
       // NaN / +-inf have no JSON representation: any encoder would emit non-conforming
       // tokens that no parser will accept.  Reject before mutating the output buffer
       // so the writer's frame state stays consistent on throw.
-      if (!std::isfinite(d)) {
-         throw std::invalid_argument("fc::json_writer::value_double: non-finite double cannot be JSON-encoded");
-      }
+      FC_ASSERT(std::isfinite(d), "fc::json_writer::value_double: non-finite double cannot be JSON-encoded");
       value_prefix();
       // std::to_chars is locale-independent (period radix always) and shortest-roundtrip:
       // the parsed-back double is bit-identical to the input.  snprintf with %g would
       // honor LC_NUMERIC and emit comma radix in non-C locales -- invalid JSON.
-      char buf[32];
+      char buf[double_shortest_buf_size];
       auto r = std::to_chars(buf, buf + sizeof(buf), d);
-      assert(r.ec == std::errc{}); // unreachable: finite double + 32-byte buffer always succeeds
+      assert(r.ec == std::errc{}); // unreachable: finite double + buffer sized for shortest-roundtrip
       out_.append(buf, static_cast<size_t>(r.ptr - buf));
    }
 
@@ -215,6 +234,11 @@ public:
       };
    }
    void rewind(const checkpoint_t& cp) noexcept {
+      // rewind() only discards tokens APPENDED since checkpoint(); a caller that closed
+      // frames past the checkpoint and re-opened new ones would resize the stack UP here
+      // with value-initialized frames -- silent corruption, so the contract is asserted.
+      assert(out_.size() >= cp.buf_size);
+      assert(stack_.size() >= cp.stack_size);
       out_.resize(cp.buf_size);
       stack_.resize(cp.stack_size);
       if (!stack_.empty()) stack_.back().has_item = cp.surviving_top_has_item;
@@ -224,8 +248,8 @@ public:
 private:
    enum class context : uint8_t { object, array };
    struct frame {
-      context ctx;
-      bool    has_item; // true once one element or key:value has been emitted in this frame
+      context ctx      = context::object;
+      bool    has_item = false; // true once one element or key:value has been emitted in this frame
    };
 
    void value_prefix() {
@@ -248,18 +272,17 @@ private:
    }
 
    // std::to_chars is non-throwing, locale-independent, and avoids the format-string
-   // parsing overhead that snprintf pays on every call.  Buffer sized for the longest
-   // possible decimal of int64/uint64 (digits10+1 plus sign plus slack).
-   static constexpr size_t int64_decimal_buf = std::numeric_limits<int64_t>::digits10 + 3;
-   static_assert(int64_decimal_buf >= std::numeric_limits<uint64_t>::digits10 + 1);
+   // parsing overhead that snprintf pays on every call.
    void append_signed(int64_t n) {
-      char buf[int64_decimal_buf];
+      char buf[int64_decimal_buf_size];
       auto r = std::to_chars(buf, buf + sizeof(buf), n);
+      assert(r.ec == std::errc{}); // unreachable: buffer sized for any int64 decimal
       out_.append(buf, static_cast<size_t>(r.ptr - buf));
    }
    void append_unsigned(uint64_t n) {
-      char buf[int64_decimal_buf];
+      char buf[int64_decimal_buf_size];
       auto r = std::to_chars(buf, buf + sizeof(buf), n);
+      assert(r.ec == std::errc{}); // unreachable: buffer sized for any uint64 decimal
       out_.append(buf, static_cast<size_t>(r.ptr - buf));
    }
 

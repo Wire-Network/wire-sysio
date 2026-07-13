@@ -3257,7 +3257,7 @@ void read_only::convert_block_stream( const chain::signed_block_ptr& block, abi_
    sink.begin_object();
    chain::impl::abi_to_variant::emit_signed_block_body(sink, *block, resolver, ctx);
    sink.key("id");
-   sink.template emit<chain::block_id_type>(block_id);
+   sink.emit<chain::block_id_type>(block_id);
    sink.key("block_num");
    sink.value_uint64(block->block_num());
    sink.key("ref_block_prefix");

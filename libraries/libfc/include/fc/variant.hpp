@@ -51,10 +51,12 @@ namespace fc
    // variant.cpp / variant_object.cpp.  Walks the variant tree directly into the writer
    // -- no intermediate fc::json::to_string string allocation.  Lets reflected structs
    // that embed a variant or variant_object field stream through the same writer as
-   // their other members.
-   void to_json_stream( const variant& v, json_writer& w );
-   void to_json_stream( const variant_object& vo, json_writer& w );
-   void to_json_stream( const mutable_variant_object& vo, json_writer& w );
+   // their other members.  `max_depth` bounds the recursion the same way
+   // fc::json::to_string's yield does; a deeper tree throws instead of overflowing the
+   // stack.
+   void to_json_stream( const variant& v, json_writer& w, uint32_t max_depth = json_stream_max_depth );
+   void to_json_stream( const variant_object& vo, json_writer& w, uint32_t max_depth = json_stream_max_depth );
+   void to_json_stream( const mutable_variant_object& vo, json_writer& w, uint32_t max_depth = json_stream_max_depth );
 
    struct blob { std::vector<char> data; };
 

@@ -45,15 +45,12 @@ inline void to_json_stream(int16_t n, json_writer& w)              { w.value_int
 inline void to_json_stream(uint16_t n, json_writer& w)             { w.value_uint16(n); }
 inline void to_json_stream(int32_t n, json_writer& w)              { w.value_int32(n); }
 inline void to_json_stream(uint32_t n, json_writer& w)             { w.value_uint32(n); }
-// 64-bit integers with magnitude > 0xffffffff are emitted as JSON strings to
-// preserve precision past JS's 2^53 mantissa.  Matches fc::variant's emission
-// (libfc/src/io/json.cpp, int64_type / uint64_type cases).  Writers stay raw;
-// callers that want a literal big number use value_int64 / value_uint64 directly.
-// Buffer size: 20 digits (uint64 max) + sign + slack.
-inline constexpr size_t int64_decimal_buf_size = std::numeric_limits<int64_t>::digits10 + 3;
-
+// 64-bit integers with magnitude > json_integer_quote_magnitude are emitted as JSON
+// strings to preserve precision past JS's 2^53 mantissa.  Matches fc::variant's emission
+// (libfc/src/io/json.cpp, int64_type / uint64_type cases).  Writers stay raw; callers
+// that want a literal big number use value_int64 / value_uint64 directly.
 inline void to_json_stream(int64_t n, json_writer& w) {
-   if (n > 0xffffffffLL || n < -0xffffffffLL) {
+   if (n > json_integer_quote_magnitude || n < -json_integer_quote_magnitude) {
       char buf[int64_decimal_buf_size];
       auto r = std::to_chars(buf, buf + sizeof(buf), n);
       w.value_string(std::string_view(buf, r.ptr - buf));
@@ -62,7 +59,7 @@ inline void to_json_stream(int64_t n, json_writer& w) {
    }
 }
 inline void to_json_stream(uint64_t n, json_writer& w) {
-   if (n > 0xffffffffULL) {
+   if (n > static_cast<uint64_t>(json_integer_quote_magnitude)) {
       char buf[int64_decimal_buf_size];
       auto r = std::to_chars(buf, buf + sizeof(buf), n);
       w.value_string(std::string_view(buf, r.ptr - buf));

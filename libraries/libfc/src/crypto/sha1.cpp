@@ -6,6 +6,7 @@
 #include <fc/variant.hpp>
 #include <vector>
 #include "_digest_common.hpp"
+#include <fc/exception/exception.hpp>
 
 namespace fc
 {
@@ -85,5 +86,13 @@ bool operator != ( const sha1& h1, const sha1& h2 ) {
 bool operator == ( const sha1& h1, const sha1& h2 ) {
   return memcmp( h1._hash, h2._hash, sizeof(h1._hash) ) == 0;
 }
+
+  sha1 sha1::from_string(std::string_view s) {
+    // The pre-trait from_variant path (vector<char>) rejected odd-length hex;
+    // keep that strictness so a trailing lone nibble is malformed input, not
+    // silently zero-extended.
+    FC_ASSERT(s.size() % 2 == 0, "sha1 hex string length must be even, got {}", s.size());
+    return sha1(s);
+  }
 
 } // fc

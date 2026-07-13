@@ -35,7 +35,13 @@ public:
 
    std::string str() const { return to_hex(to_char_span()); }
    std::string to_string() const { return str(); }
-   static blake3 from_string(std::string_view s) { return blake3(s); }
+   /// Validating parse used by the FC_SERIALIZE_AS_STRING trait: rejects odd-length
+   /// hex (a 63-char string would otherwise round up to 32 decoded bytes and pass the
+   /// constructor's size check with a zero-extended final nibble).
+   static blake3 from_string(std::string_view s) {
+      FC_ASSERT(s.size() % 2 == 0, "blake3 hex string length must be even, got {}", s.size());
+      return blake3(s);
+   }
 
    uint8_t*       data()       { return _hash; }
    const uint8_t* data() const { return _hash; }

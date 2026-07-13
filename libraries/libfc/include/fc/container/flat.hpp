@@ -146,10 +146,7 @@ namespace fc {
 
    template<typename T, typename... U>
    void to_json_stream( const flat_set< T, U... >& s, json_writer& w ) {
-      FC_ASSERT( s.size() <= MAX_NUM_ARRAY_ELEMENTS );
-      w.begin_array();
-      for( const auto& e : s ) to_json_stream( e, w );
-      w.end_array();
+      detail::to_json_stream_from_set( s, w );
    }
    template<typename T, typename... U>
    void to_variant( const flat_set< T, U... >& s, fc::variant& vo ) {
@@ -162,10 +159,7 @@ namespace fc {
 
    template<typename T, typename... U>
    void to_json_stream( const flat_multiset< T, U... >& s, json_writer& w ) {
-      FC_ASSERT( s.size() <= MAX_NUM_ARRAY_ELEMENTS );
-      w.begin_array();
-      for( const auto& e : s ) to_json_stream( e, w );
-      w.end_array();
+      detail::to_json_stream_from_set( s, w );
    }
    template<typename T, typename... U>
    void to_variant( const flat_multiset< T, U... >& s, fc::variant& vo ) {

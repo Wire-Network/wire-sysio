@@ -6,6 +6,7 @@
 #include <fc/crypto/sha512.hpp>
 #include <fc/variant.hpp>
 #include "_digest_common.hpp"
+#include <fc/exception/exception.hpp>
 
 namespace fc {
 
@@ -90,4 +91,12 @@ namespace fc {
 
     template<>
     unsigned int hmac<sha512>::internal_block_size() const { return 128; }
+  sha512 sha512::from_string(std::string_view s) {
+    // The pre-trait from_variant path (vector<char>) rejected odd-length hex;
+    // keep that strictness so a trailing lone nibble is malformed input, not
+    // silently zero-extended.
+    FC_ASSERT(s.size() % 2 == 0, "sha512 hex string length must be even, got {}", s.size());
+    return sha512(s);
+  }
+
 }

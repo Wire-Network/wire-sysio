@@ -25,7 +25,9 @@ public:
    // in hex
    std::string str() const;
    std::string to_string() const { return str(); }
-   static keccak256 from_string(std::string_view s) { return keccak256(s); }
+   /// Validating parse used by the FC_SERIALIZE_AS_STRING trait: rejects odd-length
+   /// hex (the strictness the pre-trait from_variant vector<char> path enforced).
+   static keccak256 from_string(std::string_view s);
 
    const uint8_t* data() const { return _hash; }
    constexpr size_t data_size() const { return byte_size; }

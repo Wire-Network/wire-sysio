@@ -41,7 +41,7 @@ namespace fc {
 
       operator std::string()const;
       std::string to_string() const { return std::string(*this); }
-      static url from_string(const std::string& s) { return url(s); }
+      static url from_string(std::string_view s) { return url(std::string(s)); }
 
       //// file, ssh, tcp, http, ssl, etc...
       std::string               proto()const;

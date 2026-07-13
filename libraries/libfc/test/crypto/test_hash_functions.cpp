@@ -46,6 +46,13 @@ namespace {
 
       const std::string expected_json = std::string{ "\"" } + std::string{ hex } + "\"";
       BOOST_CHECK_EQUAL(fc::to_json_string(h), expected_json);
+
+      // Odd-length hex is malformed input: from_string (and therefore the trait-routed
+      // fc::from_variant) must reject it rather than zero-extend the trailing nibble.
+      const std::string odd{ hex.substr(0, hex.size() - 1) };
+      BOOST_CHECK_THROW(Hash::from_string(odd), fc::assert_exception);
+      Hash h4;
+      BOOST_CHECK_THROW(fc::from_variant(fc::variant{ odd }, h4), fc::assert_exception);
    }
 }
 

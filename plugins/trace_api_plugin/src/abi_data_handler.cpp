@@ -12,7 +12,7 @@ namespace sysio::trace_api {
       auto make_abi_yield() {
          return [](size_t recursion_depth) {
             SYS_ASSERT( recursion_depth < chain::abi_serializer::max_recursion_depth, chain::abi_recursion_depth_exception,
-                        "exceeded max_recursion_depth {} ", chain::abi_serializer::max_recursion_depth );
+                        "exceeded max_recursion_depth {}", chain::abi_serializer::max_recursion_depth );
          };
       }
    }

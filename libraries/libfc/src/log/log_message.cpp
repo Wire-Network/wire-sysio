@@ -114,11 +114,6 @@ namespace fc
       to_json_stream(v, w);
    }
 
-   void to_json_stream( const log_context& l, json_writer& w )
-   {
-      to_json_stream(l.to_variant(), w);
-   }
-
    void  to_variant( log_level e, variant& v )
    {
       switch( e )

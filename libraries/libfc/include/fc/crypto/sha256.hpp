@@ -29,7 +29,9 @@ class sha256 : public add_packhash_to_hash<sha256>
 
     std::string str()const;
     std::string to_string() const { return str(); }
-    static sha256 from_string(std::string_view s) { return sha256(s); }
+    /// Validating parse used by the FC_SERIALIZE_AS_STRING trait: rejects odd-length
+    /// hex (the strictness the pre-trait from_variant vector<char> path enforced).
+    static sha256 from_string(std::string_view s);
     std::string short_id()const;
 
     const char* data()const;

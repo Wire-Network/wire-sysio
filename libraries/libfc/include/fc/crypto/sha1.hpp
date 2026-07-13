@@ -14,7 +14,9 @@ class sha1 : public add_packhash_to_hash<sha1>
 
     std::string str()const;
     std::string to_string() const { return str(); }
-    static sha1 from_string(std::string_view s) { return sha1(s); }
+    /// Validating parse used by the FC_SERIALIZE_AS_STRING trait: rejects odd-length
+    /// hex (the strictness the pre-trait from_variant vector<char> path enforced).
+    static sha1 from_string(std::string_view s);
     operator std::string()const;
 
     char*       data();

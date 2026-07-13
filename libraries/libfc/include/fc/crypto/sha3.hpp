@@ -20,7 +20,9 @@ public:
 
 	std::string str() const;
 	std::string to_string() const { return str(); }
-	static sha3 from_string(std::string_view s) { return sha3(s); }
+	/// Validating parse used by the FC_SERIALIZE_AS_STRING trait: rejects odd-length
+	/// hex (the strictness the pre-trait from_variant vector<char> path enforced).
+	static sha3 from_string(std::string_view s);
 	operator std::string() const;
 
 	const char *data() const;

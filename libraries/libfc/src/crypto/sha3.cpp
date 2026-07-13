@@ -283,4 +283,12 @@ bool operator==(const sha3 &h1, const sha3 &h2)
 			 h1._hash[3] == h2._hash[3];
 }
 
+  sha3 sha3::from_string(std::string_view s) {
+    // The pre-trait from_variant path (vector<char>) rejected odd-length hex;
+    // keep that strictness so a trailing lone nibble is malformed input, not
+    // silently zero-extended.
+    FC_ASSERT(s.size() % 2 == 0, "sha3 hex string length must be even, got {}", s.size());
+    return sha3(s);
+  }
+
 } // namespace fc

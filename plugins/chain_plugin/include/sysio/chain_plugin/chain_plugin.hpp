@@ -134,9 +134,9 @@ namespace sysio {
    /// Parses each captured `abi` byte-string into an `abi_serializer` and returns
    /// the resolver.  CPU-bound; safe to run on any thread (no chainbase access).
    /// On a per-account basis, an exception during `to_abi` / `abi_serializer` is
-   /// swallowed and the account's slot is left empty -- callers fall back to the
-   /// hex representation for actions with un-decodable ABI, matching the prior
-   /// `make_resolver(throw_on_yield::no)` behaviour.
+   /// logged at debug level and the account's slot is left empty -- callers fall
+   /// back to the hex representation for actions with un-decodable ABI, matching
+   /// the prior `make_resolver(throw_on_yield::no)` behaviour.
    inline abi_resolver build_resolver_from_captured_abis(const captured_abis& cache,
                                                          const fc::microseconds& max_time) {
       chain::abi_serializer_cache_t serializers;
@@ -155,7 +155,14 @@ namespace sysio {
             } else {
                serializers.emplace(name, std::nullopt);
             }
+         } catch (const fc::exception& e) {
+            dlog("failed to build abi_serializer for {}: {}", name, e.to_detail_string());
+            serializers.emplace(name, std::nullopt);
+         } catch (const std::exception& e) {
+            dlog("failed to build abi_serializer for {}: {}", name, e.what());
+            serializers.emplace(name, std::nullopt);
          } catch (...) {
+            dlog("failed to build abi_serializer for {}: unknown exception", name);
             serializers.emplace(name, std::nullopt);
          }
       }

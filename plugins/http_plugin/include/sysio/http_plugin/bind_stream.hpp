@@ -285,13 +285,18 @@ api_entry_stream bind_stream(http_plugin& http, Handle handle,
 
          try {
             // ---- Parse params (if the method takes any) ----
-            [[maybe_unused]] params_t params;
-            if constexpr (has_params) {
-               params = parse_params_rt<params_t>(body, pt);
-            } else {
-               // No params expected -- still validate the body per `pt`.
-               (void)parse_params_rt<std::string>(body, pt);
-            }
+            // Immediately-invoked initializer so `params` is constructed directly from the
+            // parse result (no default-construct-then-assign, and param structs need not be
+            // default-constructible).  The no-params arm still validates the body per `pt`
+            // and yields the std::monostate placeholder.
+            [[maybe_unused]] params_t params = [&]() -> params_t {
+               if constexpr (has_params) {
+                  return parse_params_rt<params_t>(body, pt);
+               } else {
+                  (void)parse_params_rt<std::string>(body, pt);
+                  return {};
+               }
+            }();
 
             // ---- Dispatch on Kind --------------------------------------
             if constexpr (Kind == dispatch::sync) {

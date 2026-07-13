@@ -17,7 +17,9 @@ class sha224 : public add_packhash_to_hash<sha224>
 
     std::string str()const;
     std::string to_string() const { return str(); }
-    static sha224 from_string(std::string_view s) { return sha224(s); }
+    /// Validating parse used by the FC_SERIALIZE_AS_STRING trait: rejects odd-length
+    /// hex (the strictness the pre-trait from_variant vector<char> path enforced).
+    static sha224 from_string(std::string_view s);
     operator std::string()const;
 
     char*       data();

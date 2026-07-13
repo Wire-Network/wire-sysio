@@ -131,12 +131,28 @@ namespace fc {
       }
 
       /// JSON shape mirrors to_variant_from_map: an array of [key, value] pairs.
+      /// The element emit is deliberately UNQUALIFIED: a qualified fc::to_json_stream
+      /// call would fix the overload set at this header's definition point and
+      /// suppress ADL, so element types whose overload is declared later (e.g.
+      /// fc::crypto::public_key) would wrongly fall into the reflector primary.
       template<template<typename...> class Map, typename K, typename V, typename... U >
       void to_json_stream_from_map( const Map< K, V, U... >& m, fc::json_writer& w ) {
          FC_ASSERT( m.size() <= MAX_NUM_ARRAY_ELEMENTS );
          w.begin_array();
          for( const auto& item : m ) {
-            fc::to_json_stream( item, w );
+            to_json_stream( item, w );
+         }
+         w.end_array();
+      }
+
+      /// JSON shape mirrors to_variant_from_set: an array of elements.  Same
+      /// unqualified-emit rule as to_json_stream_from_map above.
+      template<template<typename...> class Set, typename T, typename... U>
+      void to_json_stream_from_set( const Set<T, U...>& s, fc::json_writer& w ) {
+         FC_ASSERT( s.size() <= MAX_NUM_ARRAY_ELEMENTS );
+         w.begin_array();
+         for( const auto& item : s ) {
+            to_json_stream( item, w );
          }
          w.end_array();
       }

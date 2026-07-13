@@ -156,15 +156,6 @@ namespace sysio::chain {
                                                          const abi_serializer::yield_function_t&,
                                                          fc::json_writer&)>;
 
-   // Format double with the same fixed-precision spelling used by `variant::as_string()`
-   // for double_type variants (digits10 + 2, std::fixed).  The variant path emits this
-   // form quoted via to_json_stream(variant) -> w.value_string(v.as_string()).
-   inline std::string double_as_string_for_abi(double d) {
-      std::stringstream ss;
-      ss << std::setprecision(std::numeric_limits<double>::digits10 + 2) << std::fixed << d;
-      return ss.str();
-   }
-
    // Static dispatch table for the streaming side of `unpack_built_in`.  Built once on
    // first access and then read-only.  Variant-side overrides via
    // `add_specialized_unpack_pack` are not reflected here; the streaming consumers
@@ -173,28 +164,10 @@ namespace sysio::chain {
       static const auto map = []() {
          std::map<std::string, built_in_stream_unpack_fn, std::less<>> m;
 
+         // fc::to_json_stream provides the variant-path shapes for every scalar here:
+         // int64/uint64 quote past fc::json_integer_quote_magnitude, float32/float64
+         // quote with the digits10+2 fixed-precision to_chars form.
          auto generic = [](const auto& v, fc::json_writer& w) { fc::to_json_stream(v, w); };
-
-         // int64/uint64: variant path quotes when |v| > 0xffffffff (JS precision guard).
-         constexpr int64_t  i64_quote_above =  0xffffffffLL;
-         constexpr int64_t  i64_quote_below = -0xffffffffLL;
-         constexpr uint64_t u64_quote_above =  0xffffffffULL;
-         auto emit_int64 = [=](int64_t v, fc::json_writer& w) {
-            if( v > i64_quote_above || v < i64_quote_below ) w.value_string(std::to_string(v));
-            else                                              w.value_int64(v);
-         };
-         auto emit_uint64 = [=](uint64_t v, fc::json_writer& w) {
-            if( v > u64_quote_above ) w.value_string(std::to_string(v));
-            else                      w.value_uint64(v);
-         };
-
-         // float / double: variant path always quotes with digits10+2 fixed precision.
-         auto emit_double = [](double v, fc::json_writer& w) {
-            w.value_string(double_as_string_for_abi(v));
-         };
-         auto emit_float = [](float v, fc::json_writer& w) {
-            w.value_string(double_as_string_for_abi(static_cast<double>(v)));
-         };
 
          m.emplace("bool",                 pack_unpack_stream<uint8_t>(generic));
          m.emplace("int8",                 pack_unpack_stream<int8_t>(generic));
@@ -203,15 +176,15 @@ namespace sysio::chain {
          m.emplace("uint16",               pack_unpack_stream<uint16_t>(generic));
          m.emplace("int32",                pack_unpack_stream<int32_t>(generic));
          m.emplace("uint32",               pack_unpack_stream<uint32_t>(generic));
-         m.emplace("int64",                pack_unpack_stream<int64_t>(emit_int64));
-         m.emplace("uint64",               pack_unpack_stream<uint64_t>(emit_uint64));
+         m.emplace("int64",                pack_unpack_stream<int64_t>(generic));
+         m.emplace("uint64",               pack_unpack_stream<uint64_t>(generic));
          m.emplace("int128",               pack_unpack_stream<int128_t>(generic));
          m.emplace("uint128",              pack_unpack_stream<uint128_t>(generic));
          m.emplace("varint32",             pack_unpack_stream<fc::signed_int>(generic));
          m.emplace("varuint32",            pack_unpack_stream<fc::unsigned_int>(generic));
 
-         m.emplace("float32",              pack_unpack_stream<float>(emit_float));
-         m.emplace("float64",              pack_unpack_stream<double>(emit_double));
+         m.emplace("float32",              pack_unpack_stream<float>(generic));
+         m.emplace("float64",              pack_unpack_stream<double>(generic));
          m.emplace("float128",             pack_unpack_stream<softfloat128_t>(generic));
 
          m.emplace("time_point",           pack_unpack_stream<fc::time_point>(generic));
@@ -254,19 +227,6 @@ namespace sysio::chain {
    void abi_serializer::add_specialized_unpack_pack( const string& name,
                                                      std::pair<abi_serializer::unpack_function, abi_serializer::pack_function> unpack_pack ) {
       built_in_types[name] = std::move( unpack_pack );
-   }
-
-   void abi_serializer::add_specialized_stream_unpack( const string& /*name*/,
-                                                       stream_unpack_function /*unpack*/ ) {
-      // The streaming dispatch (get_built_in_stream_unpacks) is a static const map shared across
-      // instances.  Wiring per-instance overrides would require restructuring that into an
-      // instance-owned map plus a fallback-to-static lookup, plus a parallel change in
-      // stream_sink::unpack_built_in to consult the instance map first.  No callers need this
-      // today (add_specialized_unpack_pack itself has zero in-tree callers); intentional fail-loud
-      // until a real use case shows up.
-      FC_ASSERT(false, "abi_serializer::add_specialized_stream_unpack is not yet implemented: "
-                       "the streaming dispatch is a static const map; per-instance overrides "
-                       "require restructuring it into an instance-owned map with a static fallback");
    }
 
    const std::pair<abi_serializer::unpack_function, abi_serializer::pack_function>*
@@ -1365,7 +1325,6 @@ void variant_sink::key(std::string_view k) {
 void variant_sink::value_string(std::string_view s) { emit_value(fc::variant(s)); }
 void variant_sink::value_int64(int64_t n)           { emit_value(fc::variant(n)); }
 void variant_sink::value_uint64(uint64_t n)         { emit_value(fc::variant(n)); }
-void variant_sink::value_double(double d)           { emit_value(fc::variant(d)); }
 void variant_sink::value_bool(bool b)               { emit_value(fc::variant(b)); }
 void variant_sink::value_null()                     { emit_value(fc::variant()); }
 
@@ -1475,7 +1434,6 @@ void stream_sink::key(std::string_view k) { w_.key(k); }
 void stream_sink::value_string(std::string_view s) { w_.value_string(s); on_value_emitted(); }
 void stream_sink::value_int64(int64_t n)           { w_.value_int64(n);  on_value_emitted(); }
 void stream_sink::value_uint64(uint64_t n)         { w_.value_uint64(n); on_value_emitted(); }
-void stream_sink::value_double(double d)           { w_.value_double(d); on_value_emitted(); }
 void stream_sink::value_bool(bool b)               { w_.value_bool(b);   on_value_emitted(); }
 void stream_sink::value_null()                     { w_.value_null();    on_value_emitted(); }
 

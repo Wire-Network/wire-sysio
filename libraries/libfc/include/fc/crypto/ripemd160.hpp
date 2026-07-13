@@ -18,7 +18,9 @@ class ripemd160 : public add_packhash_to_hash<ripemd160>
 
     std::string str()const;
     std::string to_string() const { return str(); }
-    static ripemd160 from_string(std::string_view s) { return ripemd160(s); }
+    /// Validating parse used by the FC_SERIALIZE_AS_STRING trait: rejects odd-length
+    /// hex (the strictness the pre-trait from_variant vector<char> path enforced).
+    static ripemd160 from_string(std::string_view s);
 
     char*    data()const;
     size_t data_size()const { return 160/8; }

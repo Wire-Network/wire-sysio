@@ -157,13 +157,13 @@ BOOST_AUTO_TEST_CASE(value_double_rejects_non_finite) {
    std::string out;
    {
       fc::json_writer w(out);
-      BOOST_CHECK_THROW(w.value_double(nan),     std::invalid_argument);
+      BOOST_CHECK_THROW(w.value_double(nan),     fc::assert_exception);
    }
    BOOST_CHECK(out.empty()); // nothing written, frame state untouched
    {
       fc::json_writer w(out);
-      BOOST_CHECK_THROW(w.value_double(pos_inf), std::invalid_argument);
-      BOOST_CHECK_THROW(w.value_double(neg_inf), std::invalid_argument);
+      BOOST_CHECK_THROW(w.value_double(pos_inf), fc::assert_exception);
+      BOOST_CHECK_THROW(w.value_double(neg_inf), fc::assert_exception);
    }
    // Finite values: to_json_stream(double) emits the quoted fixed-precision form
    // matching the variant path's emission shape.
@@ -322,6 +322,33 @@ BOOST_AUTO_TEST_CASE(fc_variant_object_fallback) {
    fc::variant as_var = fc::variant(mvo);
    BOOST_CHECK_EQUAL(fc::to_json_string(mvo),
                      fc::json::to_string(as_var, fc::json::yield_function_t()));
+}
+
+// The variant walker bounds recursion the way fc::json::to_string's yield does: a tree
+// nested deeper than fc::json_stream_max_depth throws instead of overflowing the stack.
+BOOST_AUTO_TEST_CASE(fc_variant_walker_depth_guard) {
+   // json_stream_max_depth - 1 array wraps around a leaf emit cleanly (the leaf itself
+   // consumes the final depth level).
+   fc::variant nested{ std::string("leaf") };
+   for (uint32_t i = 0; i < fc::json_stream_max_depth - 1; ++i) {
+      fc::variants wrap;
+      wrap.emplace_back(std::move(nested));
+      nested = fc::variant(std::move(wrap));
+   }
+   std::string out;
+   {
+      fc::json_writer w(out);
+      fc::to_json_stream(nested, w);
+      BOOST_REQUIRE(w.balanced());
+   }
+
+   // One more level pushes the leaf past the cap.
+   fc::variants wrap;
+   wrap.emplace_back(std::move(nested));
+   fc::variant deep{ std::move(wrap) };
+   std::string out2;
+   fc::json_writer w2(out2);
+   BOOST_CHECK_THROW(fc::to_json_stream(deep, w2), fc::assert_exception);
 }
 
 // Composition test: a reflected struct that has fc::time_point and fc::sha256 fields.

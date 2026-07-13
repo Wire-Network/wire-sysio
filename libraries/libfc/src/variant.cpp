@@ -1274,18 +1274,18 @@ std::string format_string( const std::string& frmt, const variant_object& args, 
    }
 
 
-   void to_json_stream( const variant& v, json_writer& w ) {
+   void to_json_stream( const variant& v, json_writer& w, uint32_t max_depth ) {
       // Walk the variant tree token-by-token directly into json_writer instead of
       // building a JSON string via fc::json::to_string and splicing it back in.  Mirrors
       // the compact (indent=0) form of fc::json::to_string for byte-identical output.
+      FC_ASSERT( max_depth > 0, "to_json_stream: variant nesting exceeds max depth" );
       switch( v.get_type() ) {
          case variant::null_type:
             w.value_null();
             return;
          case variant::int64_type: {
             int64_t i = v.as_int64();
-            constexpr int64_t max_value(0xffffffff);
-            if( i > max_value || i < -max_value ) {
+            if( i > json_integer_quote_magnitude || i < -json_integer_quote_magnitude ) {
                // Quote out-of-range integers so 64-bit JS clients don't lose precision.
                w.value_string( v.as_string() );
             } else {
@@ -1295,7 +1295,7 @@ std::string format_string( const std::string& frmt, const variant_object& args, 
          }
          case variant::uint64_type: {
             uint64_t i = v.as_uint64();
-            if( i > 0xffffffff ) {
+            if( i > static_cast<uint64_t>(json_integer_quote_magnitude) ) {
                w.value_string( v.as_string() );
             } else {
                w.value_uint64( i );
@@ -1328,12 +1328,12 @@ std::string format_string( const std::string& frmt, const variant_object& args, 
          case variant::array_type: {
             const variants& a = v.get_array();
             w.begin_array();
-            for( const auto& e : a ) to_json_stream( e, w );
+            for( const auto& e : a ) to_json_stream( e, w, max_depth - 1 );
             w.end_array();
             return;
          }
          case variant::object_type:
-            to_json_stream( v.get_object(), w );
+            to_json_stream( v.get_object(), w, max_depth - 1 );
             return;
          default:
             FC_THROW_EXCEPTION( fc::invalid_arg_exception, "Unsupported variant type: {}", std::to_string( v.get_type() ) );

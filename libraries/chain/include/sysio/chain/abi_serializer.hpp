@@ -149,16 +149,13 @@ struct abi_serializer {
    typedef std::function<fc::variant(fc::datastream<const char*>&, bool, bool, const abi_serializer::yield_function_t&)>  unpack_function;
    typedef std::function<void(const fc::variant&, fc::datastream<char*>&, bool, bool, const abi_serializer::yield_function_t&)>  pack_function;
 
+   /// Registers a per-instance (unpack, pack) override for a built-in type on the
+   /// VARIANT dispatch only.  The streaming dispatch (`binary_to_json_stream`) uses a
+   /// static table consulted first, so an override registered here for a type that
+   /// table covers is NOT reflected on the streaming path -- the two paths would emit
+   /// different shapes for that type.  No in-tree callers exist today; if one appears,
+   /// the streaming dispatch needs a per-instance map with a static fallback first.
    void add_specialized_unpack_pack( const string& name, std::pair<abi_serializer::unpack_function, abi_serializer::pack_function> unpack_pack );
-
-   /// Streaming-side companion to `add_specialized_unpack_pack`.  Currently asserts
-   /// not-implemented: the streaming dispatch is a static const map and registering
-   /// per-instance overrides would require restructuring it into a per-instance map.
-   /// Surfaced now so future callers see the gap at the API level rather than getting
-   /// a silent variant-fallback (slow path) for their override.
-   using stream_unpack_function = std::function<void(fc::datastream<const char*>&, bool, bool,
-                                                     const yield_function_t&, fc::json_writer&)>;
-   void add_specialized_stream_unpack( const string& name, stream_unpack_function unpack );
 
    /// Lookup helper used by the streaming walker sinks.  Returns a pointer to the
    /// (unpack, pack) entry registered for `type`, or `nullptr` if it is not a

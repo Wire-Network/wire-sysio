@@ -156,7 +156,6 @@ namespace fc
    /// (log_message has a private impl pointer rather than reflected fields, so we can't walk it directly).
    class json_writer;
    void    to_json_stream( const log_message& m, json_writer& w );
-   void    to_json_stream( const log_context& l, json_writer& w );
 
    typedef std::vector<log_message> log_messages;
 

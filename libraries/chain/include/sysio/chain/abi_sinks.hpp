@@ -18,6 +18,7 @@
 #include <cstdint>
 #include <string>
 #include <string_view>
+#include <vector>
 
 namespace sysio::chain {
    struct abi_serializer;
@@ -74,7 +75,6 @@ public:
    void value_uint16(uint16_t n) { value_uint64(n); }
    void value_int8(int8_t n)     { value_int64(n); }
    void value_uint8(uint8_t n)   { value_uint64(n); }
-   void value_double(double d);
    void value_bool(bool b);
    void value_null();
    void value_hex(const char* data, size_t size);
@@ -173,7 +173,6 @@ public:
    void value_uint16(uint16_t n) { value_uint64(n); }
    void value_int8(int8_t n)     { value_int64(n); }
    void value_uint8(uint8_t n)   { value_uint64(n); }
-   void value_double(double d);
    void value_bool(bool b);
    void value_null();
    void value_hex(const char* data, size_t size);
