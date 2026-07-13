@@ -384,4 +384,49 @@ BOOST_FIXTURE_TEST_CASE(stream_direct_vs_variant_byte_identical, validating_test
    }
 } FC_LOG_AND_RETHROW()
 
+// A row whose value fails ABI decode mid-emission must fall back to a hex string without
+// corrupting the response.  The streaming path writes tokens as it walks the ABI, so a decode
+// failure after some fields were already emitted has to rewind before the hex fallback -- a
+// regression here produces structurally invalid JSON on the wire (a hex token appended after a
+// half-written value object).  Force the failure by re-setting the contract ABI with an extra
+// trailing field on `numobj`: stored rows then under-run the declared struct and throw
+// "stream unexpectedly ended" after the five real fields were emitted.
+BOOST_FIXTURE_TEST_CASE(stream_decode_failure_falls_back_to_hex_valid_json, validating_tester) try {
+   deploy_contract(*this);
+   populate_numobjs(*this, 3);
+
+   abi_def abi = fc::json::from_string(
+      std::string(test_contracts::get_table_test_abi().begin(),
+                  test_contracts::get_table_test_abi().end())).as<abi_def>();
+   for (auto& st : abi.structs) {
+      if (st.name == "numobj") {
+         st.fields.push_back({"extra_field", "uint64"});
+      }
+   }
+   set_abi("test"_n, fc::json::to_string(fc::variant(abi), fc::time_point::maximum()));
+   produce_block();
+
+   auto ro = make_read_only(*this);
+   auto p  = numobjs_params();
+   p.show_payer = true;
+
+   // The streamed body must be parseable JSON even though every row's value decode threw.
+   const std::string stream_json = run_stream(ro, p);
+   fc::variant parsed;
+   BOOST_REQUIRE_NO_THROW(parsed = fc::json::from_string(stream_json));
+
+   // Every row fell back to the bare hex-string form (not a half-decoded object).
+   const auto& rows = parsed.get_object()["rows"].get_array();
+   BOOST_REQUIRE_EQUAL(rows.size(), 3u);
+   for (const auto& row : rows) {
+      BOOST_CHECK(row.get_object()["value"].is_string());
+   }
+
+   // And the fallback shape stays byte-identical to the variant path's fallback.
+   auto via_variant = run(ro, p);
+   const std::string variant_json =
+      fc::json::to_string(fc::variant(via_variant), fc::time_point::maximum());
+   BOOST_CHECK_EQUAL(variant_json, stream_json);
+} FC_LOG_AND_RETHROW()
+
 BOOST_AUTO_TEST_SUITE_END()

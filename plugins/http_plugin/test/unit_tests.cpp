@@ -1,6 +1,10 @@
 #include <sysio/chain/application.hpp>
 #include <sysio/http_plugin/http_plugin.hpp>
 #include <sysio/http_plugin/common.hpp>
+#include <sysio/http_plugin/bind_stream.hpp>
+#include <sysio/chain/exceptions.hpp>
+
+#include <fc/io/json_stream.hpp>
 
 #include <boost/asio.hpp>
 #include <boost/beast/core.hpp>
@@ -41,6 +45,8 @@ constexpr uint32_t bytes_in_flight_index = 3;
 constexpr uint32_t requests_in_flight_index = 4;
 constexpr uint32_t request_body_bytes_in_flight_index = 5;
 constexpr uint32_t category_uw_index = 6;
+constexpr uint32_t stream_status_codes_index = 7;
+constexpr uint32_t stream_request_body_index = 8;
 // Keeps unsharded IPv6 probe coverage on the historical port 9999.
 constexpr uint32_t ipv6_probe_index = 2;
 
@@ -914,6 +920,142 @@ BOOST_FIXTURE_TEST_CASE(requests_in_flight, http_plugin_test_fixture) {
    BOOST_REQUIRE_EQUAL(r[boost::beast::http::status::ok], 8u);
    connections.clear();
    wait_for_no_requests_in_flight();
+}
+
+namespace {
+   /// Minimal api handle for driving bind_stream's stored-exception delivery paths end-to-end.
+   /// Both methods deliver a DERIVED exception through the stored fc::exception_ptr alternative
+   /// (never a live throw), which is the path where a `throw *ptr` would slice the dynamic type
+   /// and defeat classify_current_exception's specific-type -> status-code mapping.
+   struct stored_exception_api {
+      /// dispatch::async -- stored tx_duplicate must classify as 409 Conflict.
+      void duplicate_trx(sysio::chain::plugin_interface::next_function<int> next) {
+         next(sysio::chain::plugin_interface::next_function_variant<int>{
+            fc::exception_ptr{std::make_shared<sysio::chain::tx_duplicate>(
+               FC_LOG_MESSAGE(error, "duplicate transaction"))}});
+      }
+
+      /// dispatch::post -- Phase-2 closure returning a stored unknown_block_exception must
+      /// classify as 400 Unknown Block.
+      std::function<sysio::chain::t_or_exception<int>()> missing_block() {
+         return []() -> sysio::chain::t_or_exception<int> {
+            return fc::exception_ptr{std::make_shared<sysio::chain::unknown_block_exception>(
+               FC_LOG_MESSAGE(error, "no such block"))};
+         };
+      }
+   };
+}
+
+// Stored exceptions delivered through bind_stream (async next_function and post http_fwd
+// alternatives) must reach classify_current_exception with their dynamic type intact so the
+// specific-type catches map them to the right HTTP status. A regression to `throw *ptr`
+// (slicing to fc::exception) turns both of these into 500 Internal Service Error.
+BOOST_FIXTURE_TEST_CASE(stream_stored_exception_status_codes, http_plugin_test_fixture) {
+   const std::string endpoint = test_http_endpoint("127.0.0.1", stream_status_codes_index);
+   const std::string server_address = "--http-server-address=" + endpoint;
+   const std::string port = test_http_port(stream_status_codes_index);
+
+   http_plugin* http_plugin = init({"--plugin=sysio::http_plugin", server_address.c_str()});
+   BOOST_REQUIRE(http_plugin);
+
+   http_plugin->add_api_stream({
+      bind_stream<&stored_exception_api::duplicate_trx, dispatch::async>(
+         *http_plugin, stored_exception_api{}, "/v1/test/duplicate_trx",
+         api_category::node, http_params_types::no_params, 200),
+      bind_stream<&stored_exception_api::missing_block, dispatch::post>(
+         *http_plugin, stored_exception_api{}, "/v1/test/missing_block",
+         api_category::node, http_params_types::no_params, 200),
+   }, appbase::exec_queue::read_write);
+
+   boost::asio::io_context ctx;
+   boost::asio::ip::tcp::resolver resolver(ctx);
+
+   auto get_status = [&](const char* path) {
+      boost::asio::ip::tcp::socket s(ctx, boost::asio::ip::tcp::v4());
+      boost::asio::connect(s, resolver.resolve("127.0.0.1", port));
+      boost::beast::http::request<boost::beast::http::empty_body> req(boost::beast::http::verb::get, path, 11);
+      req.set(http::field::host, endpoint);
+      boost::beast::http::write(s, req);
+
+      boost::beast::http::response<boost::beast::http::string_body> resp;
+      boost::beast::flat_buffer buffer;
+      boost::beast::http::read(s, buffer, resp);
+      return resp.result();
+   };
+
+   BOOST_CHECK(get_status("/v1/test/duplicate_trx") == boost::beast::http::status::conflict);     // 409
+   BOOST_CHECK(get_status("/v1/test/missing_block") == boost::beast::http::status::bad_request);  // 400
+}
+
+// Streaming-path twin of request_body_bytes_in_flight: request bodies queued to the app thread
+// through the streaming-cb registration path (make_app_thread_url_handler_stream) must take the
+// same bytes_in_flight reservation the variant path takes. Without it the sampled value below
+// reads 0 (queued streaming bodies uncounted -- the WSA-176 vector); with it, >= body size. The
+// budget must also drain to zero afterwards, proving the reservation releases exactly once.
+BOOST_FIXTURE_TEST_CASE(request_body_bytes_in_flight_stream, http_plugin_test_fixture) {
+   const std::string endpoint = test_http_endpoint("127.0.0.1", stream_request_body_index);
+   const std::string server_address = "--http-server-address=" + endpoint;
+   const std::string port = test_http_port(stream_request_body_index);
+
+   http_plugin* http_plugin = init({"--plugin=sysio::http_plugin",
+                                    server_address.c_str(),
+                                    "--http-max-bytes-in-flight-mb=64"});
+   BOOST_REQUIRE(http_plugin);
+
+   std::atomic<size_t> observed_body_size{0};
+   std::atomic<size_t> observed_bytes_in_flight{0};
+   http_plugin->add_api_stream({{std::string("/echo_body_stream"), api_category::node,
+                                 [&](string&&, string&& body, url_response_stream_callback&& cb) {
+                                    // Sampled on the app thread while the request body is still in
+                                    // flight and before any response bytes are accounted, so it
+                                    // reflects only the request-body reservation.
+                                    observed_body_size.store(body.size());
+                                    observed_bytes_in_flight.store(http_plugin->bytes_in_flight());
+                                    cb(200, [](fc::json_writer& w) { w.value_string("ok"); });
+                                 }}}, appbase::exec_queue::read_write);
+
+   boost::asio::io_context ctx;
+   boost::asio::ip::tcp::resolver resolver(ctx);
+
+   // 1 MiB body: comfortably under the 2 MiB max-body-size and the 64 MiB in-flight budget.
+   const size_t body_size = 1024 * 1024;
+
+   auto post_body = [&]() {
+      boost::asio::ip::tcp::socket s(ctx, boost::asio::ip::tcp::v4());
+      boost::asio::connect(s, resolver.resolve("127.0.0.1", port));
+      boost::beast::http::request<boost::beast::http::string_body> req(boost::beast::http::verb::post, "/echo_body_stream", 11);
+      req.keep_alive(true);
+      req.set(http::field::host, endpoint);
+      req.body() = std::string(body_size, 'x');
+      req.prepare_payload();
+      boost::beast::http::write(s, req);
+
+      boost::beast::http::response<boost::beast::http::string_body> resp;
+      boost::beast::flat_buffer buffer;
+      boost::beast::http::read(s, buffer, resp);
+      return resp.result();
+   };
+
+   auto wait_for_no_bytes_in_flight = [&]() {
+      uint16_t max = std::numeric_limits<uint16_t>::max();
+      while (http_plugin->requests_in_flight() > 0 && --max)
+         std::this_thread::sleep_for(std::chrono::milliseconds(5));
+      BOOST_CHECK(max > 0);
+      BOOST_CHECK_EQUAL(http_plugin->bytes_in_flight(), 0u);
+   };
+
+   BOOST_REQUIRE(post_body() == boost::beast::http::status::ok);
+   BOOST_CHECK_EQUAL(observed_body_size.load(), body_size);
+   // Regression assertion: 0 without the reservation in make_app_thread_url_handler_stream.
+   BOOST_CHECK_GE(observed_bytes_in_flight.load(), body_size);
+   wait_for_no_bytes_in_flight();
+
+   // A second request must be admitted and counted the same way: no leaked or double-counted
+   // reservation.
+   observed_bytes_in_flight.store(0);
+   BOOST_REQUIRE(post_body() == boost::beast::http::status::ok);
+   BOOST_CHECK_GE(observed_bytes_in_flight.load(), body_size);
+   wait_for_no_bytes_in_flight();
 }
 
 //A warning for future tests: destruction of http_plugin_test_fixture sometimes does not destroy http_plugin's listeners. Tests

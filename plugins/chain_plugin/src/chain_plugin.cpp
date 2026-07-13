@@ -2640,13 +2640,19 @@ read_only::get_table_rows_stream( const read_only::get_table_rows_params& p, con
              (fc::json_writer& w) mutable {
          auto emit_value = [&](const std::vector<char>& data) {
             if (hp.json && !value_type.empty() && !data.empty()) {
+               // binary_to_json_stream writes tokens into `w` as it walks the ABI, so a
+               // mid-decode throw (truncated value, ABI/type drift) leaves a half-written
+               // fragment behind.  Rewind every byte written before falling back so the hex
+               // string below lands at a clean value position instead of producing
+               // structurally invalid JSON on the wire.
+               const auto cp = w.checkpoint();
                try {
                   abis->binary_to_json_stream(value_type, data, w,
                                               abi_serializer::create_yield_function(abi_serializer_max_time),
                                               shorten_abi_errors);
                   return;
                } catch (...) {
-                  // fall through to hex
+                  w.rewind(cp);
                }
             }
             // Empty value or non-json mode: emit hex (matches the variant path's

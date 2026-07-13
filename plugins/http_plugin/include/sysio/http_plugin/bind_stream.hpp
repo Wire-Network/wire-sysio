@@ -2,6 +2,10 @@
 
 #include <sysio/http_plugin/http_plugin.hpp>
 #include <sysio/chain/exceptions.hpp>
+// controller.hpp must precede plugin_interface.hpp: the latter uses block_signal_params
+// (declared in controller.hpp) without including it, so this header includes it to stay
+// self-contained regardless of the caller's include order.
+#include <sysio/chain/controller.hpp>
 #include <sysio/chain/plugin_interface.hpp>
 
 #include <fc/io/json_stream.hpp>
@@ -318,7 +322,11 @@ api_entry_stream bind_stream(http_plugin& http, Handle handle,
                      try {
                         chain::t_or_exception<payload_t> result = http_fwd();
                         if (std::holds_alternative<fc::exception_ptr>(result)) {
-                           try { throw *std::get<fc::exception_ptr>(result); }
+                           // rethrow() (virtual) preserves the stored exception's dynamic type so
+                           // classify_current_exception's specific-type catches map it to the right
+                           // status code (tx_duplicate -> 409, unknown_block -> 400, ...).  A plain
+                           // `throw *ptr` would slice to fc::exception and turn them all into 500s.
+                           try { std::get<fc::exception_ptr>(result)->rethrow(); }
                            catch (...) {
                               http_plugin::handle_exception_stream(
                                  api_name.c_str(), call_name.c_str(), body, cb);
@@ -344,7 +352,7 @@ api_entry_stream bind_stream(http_plugin& http, Handle handle,
                      try {
                         chain::t_or_exception<emit_fn_t> result = http_fwd();
                         if (std::holds_alternative<fc::exception_ptr>(result)) {
-                           try { throw *std::get<fc::exception_ptr>(result); }
+                           try { std::get<fc::exception_ptr>(result)->rethrow(); }
                            catch (...) {
                               http_plugin::handle_exception_stream(
                                  api_name.c_str(), call_name.c_str(), body, cb);
@@ -372,7 +380,7 @@ api_entry_stream bind_stream(http_plugin& http, Handle handle,
                             api_name, call_name, resp_code]
                   (chain::plugin_interface::next_function_variant<payload_t>&& result) mutable {
                      if (std::holds_alternative<fc::exception_ptr>(result)) {
-                        try { throw *std::get<fc::exception_ptr>(result); }
+                        try { std::get<fc::exception_ptr>(result)->rethrow(); }
                         catch (...) {
                            http_plugin::handle_exception_stream(
                               api_name.c_str(), call_name.c_str(), body, cb);
@@ -389,7 +397,7 @@ api_entry_stream bind_stream(http_plugin& http, Handle handle,
                               try {
                                  chain::t_or_exception<payload_t> r = http_fwd();
                                  if (std::holds_alternative<fc::exception_ptr>(r)) {
-                                    try { throw *std::get<fc::exception_ptr>(r); }
+                                    try { std::get<fc::exception_ptr>(r)->rethrow(); }
                                     catch (...) {
                                        http_plugin::handle_exception_stream(
                                           api_name.c_str(), call_name.c_str(), body, cb);

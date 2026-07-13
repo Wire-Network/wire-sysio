@@ -246,8 +246,15 @@ namespace sysio {
                   return;
                }
 
+               // Mirror the variant-cb handler above: the body is about to sit in the (unbounded)
+               // app-thread queue, so reserve its bytes against bytes_in_flight until the posted
+               // work is destroyed (run, thrown, or discarded).  Without this, queued streaming
+               // request bodies accumulate uncounted and evade verify_max_bytes_in_flight.
+               auto body_in_flight_guard = std::make_shared<bytes_in_flight_reservation>(conn, b.size());
+
                app().executor().post( priority, to_queue,
-                  [next_ptr, conn=std::move(conn), r=std::move(r), b=std::move(b), then=std::move(then)]() mutable {
+                  [next_ptr, conn=std::move(conn), r=std::move(r), b=std::move(b), then=std::move(then),
+                   body_in_flight_guard=std::move(body_in_flight_guard)]() mutable {
                      try {
                         if( app().is_quiting() ) return;
                         (*next_ptr)( std::move(r), std::move(b), std::move(then) );
