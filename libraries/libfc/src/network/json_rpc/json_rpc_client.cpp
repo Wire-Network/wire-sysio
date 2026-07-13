@@ -2,8 +2,8 @@
 #include <fc/network/json_rpc/json_rpc_client.hpp>
 #include <fc/task/deadline.hpp>
 
-#include <ares.h>
 #include <boost/asio.hpp>
+#include <boost/asio/thread_pool.hpp>
 #include <boost/beast/core.hpp>
 #include <boost/beast/http.hpp>
 #include <boost/beast/ssl.hpp>
@@ -13,12 +13,11 @@
 #include <chrono>
 #include <condition_variable>
 #include <cstdint>
-#include <cstring>
-#include <exception>
 #include <functional>
 #include <memory>
 #include <mutex>
 #include <ranges>
+#include <semaphore>
 #include <string_view>
 #include <utility>
 #include <vector>
@@ -105,112 +104,105 @@ void throw_transport_error(const boost::system::error_code& ec,
 
 using async_complete_fn = std::function<void(const boost::system::error_code&)>;
 
-/** Own the process-wide c-ares library initialization. */
-class cares_library {
+/** Process-lifetime state that bounds platform DNS execution to one in-flight lookup. */
+struct platform_resolver_runtime {
+   asio::thread_pool executor{1};
+   std::binary_semaphore in_flight{1};
+};
+
+/** Cross-thread-safe permit that prevents platform resolver work from queuing behind a stalled lookup. */
+class platform_resolver_permit {
 public:
-   cares_library() noexcept
-      : _status(ares_library_init(ARES_LIB_INIT_ALL))
-      , _thread_safe(_status == ARES_SUCCESS && ares_threadsafety()) {}
-
-   cares_library(const cares_library&) = delete;
-   cares_library& operator=(const cares_library&) = delete;
-
-   ~cares_library() {
-      if (_status == ARES_SUCCESS) {
-         ares_library_cleanup();
+   platform_resolver_permit(std::binary_semaphore& semaphore, std::chrono::microseconds wait_for)
+      : _semaphore(semaphore) {
+      if (!_semaphore.try_acquire_for(wait_for)) {
+         throw_transport_timeout(OP_RESOLVE);
       }
    }
 
-   /** Throw a normal transport exception if deadline-aware resolution is unavailable. */
-   void require_event_thread_support() const {
-      if (_status != ARES_SUCCESS) {
-         FC_THROW("c-ares library initialization failed: {}", ares_strerror(_status));
-      }
-      if (!_thread_safe) {
-         FC_THROW("c-ares was built without thread-safe event support");
-      }
-   }
+   platform_resolver_permit(const platform_resolver_permit&) = delete;
+   platform_resolver_permit& operator=(const platform_resolver_permit&) = delete;
+
+   ~platform_resolver_permit() { _semaphore.release(); }
 
 private:
-   int  _status;
-   bool _thread_safe;
+   std::binary_semaphore& _semaphore;
 };
 
-// c-ares requires global initialization before the process starts any other thread.
-const cares_library process_cares_library;
+/**
+ * Return resolver state that intentionally survives static teardown.
+ *
+ * Destroying an Asio execution context joins its resolver worker. If platform getaddrinfo is stuck,
+ * joining here would reintroduce the unbounded process-exit wait that the startup deadline prevents.
+ */
+platform_resolver_runtime& resolver_runtime() {
+   static auto* runtime = new platform_resolver_runtime;
+   return *runtime;
+}
 
-/** Destroy a c-ares channel after its query and event thread have stopped. */
-struct cares_channel_deleter {
-   void operator()(ares_channel_t* channel) const {
-      if (channel) {
-         ares_destroy(channel);
+/** Start one platform resolver operation without tying its lifetime to a JSON-RPC client. */
+template <typename CompleteFn>
+std::function<void()> start_platform_resolution(const std::string& host,
+                                                const std::string& port,
+                                                fc::time_point deadline_abs,
+                                                CompleteFn&& complete) {
+   (void)remaining_until(deadline_abs, OP_RESOLVE);
+
+   auto& runtime = resolver_runtime();
+   auto permit =
+      std::make_shared<platform_resolver_permit>(runtime.in_flight, remaining_until(deadline_abs, OP_RESOLVE));
+
+   (void)remaining_until(deadline_abs, OP_RESOLVE);
+   auto resolver = std::make_shared<tcp::resolver>(runtime.executor);
+   resolver->async_resolve(
+      host, port,
+      [resolver, permit, complete = std::forward<CompleteFn>(complete)](
+         const boost::system::error_code& ec, tcp::resolver::results_type results) mutable {
+         (void)permit;
+         complete(ec, std::move(results));
+      });
+   return [resolver] { resolver->cancel(); };
+}
+
+/** Completion state that may outlive a caller whose DNS deadline expires. */
+struct deadline_resolution_state {
+   std::mutex                  mutex;
+   std::condition_variable     completed;
+   bool                        done = false;
+   boost::system::error_code   error_code;
+   tcp::resolver::results_type endpoints;
+};
+
+/** Cancel an asynchronous resolver operation on every exceptional exit after it starts. */
+class resolver_cancel_guard {
+public:
+   explicit resolver_cancel_guard(std::function<void()> cancel)
+      : _cancel(std::move(cancel)) {}
+
+   resolver_cancel_guard(const resolver_cancel_guard&) = delete;
+   resolver_cancel_guard& operator=(const resolver_cancel_guard&) = delete;
+
+   ~resolver_cancel_guard() { cancel(); }
+
+   /** Cancel the resolver once without allowing cancellation failure to mask the transport result. */
+   void cancel() noexcept {
+      if (!_cancel) {
+         return;
       }
-   }
-};
 
-using cares_channel_ptr = std::unique_ptr<ares_channel_t, cares_channel_deleter>;
-
-/** Completion state shared with the c-ares event-thread callback. */
-struct cares_resolution_state {
-   std::mutex                 mutex;
-   std::condition_variable    completed;
-   bool                       done = false;
-   int                        status = ARES_EDESTRUCTION;
-   std::exception_ptr         error;
-   std::vector<tcp::endpoint> endpoints;
-};
-
-/** Copy a c-ares address result into Boost.Asio endpoints and wake the waiting caller. */
-void complete_cares_resolution(void* arg, int status, int, ares_addrinfo* result) noexcept {
-   std::unique_ptr<ares_addrinfo, decltype(&ares_freeaddrinfo)> result_owner(result, &ares_freeaddrinfo);
-   auto& state = *static_cast<cares_resolution_state*>(arg);
-
-   {
-      std::lock_guard lock(state.mutex);
-      state.status = status;
+      auto cancel = std::move(_cancel);
       try {
-         if (status == ARES_SUCCESS && result) {
-            for (auto* node = result->nodes; node; node = node->ai_next) {
-               if (node->ai_family != AF_INET && node->ai_family != AF_INET6) {
-                  continue;
-               }
-
-               tcp::endpoint endpoint;
-               endpoint.resize(static_cast<std::size_t>(node->ai_addrlen));
-               std::memcpy(endpoint.data(), node->ai_addr, node->ai_addrlen);
-               state.endpoints.push_back(endpoint);
-            }
-         }
+         cancel();
       } catch (...) {
-         state.error = std::current_exception();
-      }
-      state.done = true;
-   }
-   state.completed.notify_one();
-}
-
-/** Create a c-ares channel whose internal event thread can be cancelled without waiting on getaddrinfo. */
-cares_channel_ptr create_cares_channel(const std::optional<std::string>& resolver_servers_override) {
-   process_cares_library.require_event_thread_support();
-
-   ares_options options{};
-   options.evsys = ARES_EVSYS_DEFAULT;
-
-   ares_channel_t* raw_channel = nullptr;
-   const auto init_status = ares_init_options(&raw_channel, &options, ARES_OPT_EVENT_THREAD);
-   if (init_status != ARES_SUCCESS) {
-      FC_THROW("c-ares channel initialization failed: {}", ares_strerror(init_status));
-   }
-
-   cares_channel_ptr channel(raw_channel);
-   if (resolver_servers_override) {
-      const auto server_status = ares_set_servers_ports_csv(channel.get(), resolver_servers_override->c_str());
-      if (server_status != ARES_SUCCESS) {
-         FC_THROW("c-ares DNS server override failed: {}", ares_strerror(server_status));
       }
    }
-   return channel;
-}
+
+   /** Disarm cancellation after the resolver has completed. */
+   void release() noexcept { _cancel = {}; }
+
+private:
+   std::function<void()> _cancel;
+};
 
 /// Run one async operation synchronously, cancelling it when the deadline expires.
 template <typename StartFn, typename CancelFn>
@@ -258,53 +250,55 @@ void run_async_op(asio::io_context& ioc,
    }
 }
 
-/** Resolve DNS through c-ares so an in-flight query can be cancelled at the active deadline. */
+/** Resolve DNS on the shared platform worker while bounding how long the caller waits. */
+template <typename ResolverStartFn>
 tcp::resolver::results_type resolve_endpoints_with_deadline(
    const std::string& host,
    const std::string& port,
    fc::time_point deadline_abs,
-   const std::optional<std::string>& resolver_servers_override) {
+   const ResolverStartFn& resolver_start) {
    (void)remaining_until(deadline_abs, OP_RESOLVE);
 
-   cares_resolution_state state;
-   auto                   channel = create_cares_channel(resolver_servers_override);
-   ares_addrinfo_hints     hints{};
-   hints.ai_flags    = ARES_AI_NUMERICSERV;
-   hints.ai_family   = AF_UNSPEC;
-   hints.ai_socktype = SOCK_STREAM;
-   hints.ai_protocol = IPPROTO_TCP;
+   auto state = std::make_shared<deadline_resolution_state>();
+   resolver_cancel_guard cancel_guard(resolver_start(
+      host, port, deadline_abs,
+      [state](const boost::system::error_code& ec, tcp::resolver::results_type endpoints) {
+         {
+            std::lock_guard lock(state->mutex);
+            state->error_code = ec;
+            state->endpoints  = std::move(endpoints);
+            state->done       = true;
+         }
+         state->completed.notify_one();
+      }));
 
-   (void)remaining_until(deadline_abs, OP_RESOLVE);
-   ares_getaddrinfo(channel.get(), host.c_str(), port.c_str(), &hints, complete_cares_resolution, &state);
-
-   std::unique_lock lock(state.mutex);
-   if (!state.completed.wait_for(lock, remaining_until(deadline_abs, OP_RESOLVE), [&] { return state.done; })) {
+   std::unique_lock lock(state->mutex);
+   if (!state->completed.wait_for(lock, remaining_until(deadline_abs, OP_RESOLVE), [&] { return state->done; })) {
       lock.unlock();
-      ares_cancel(channel.get());
+      cancel_guard.cancel();
       throw_transport_timeout(OP_RESOLVE);
    }
+   cancel_guard.release();
 
-   if (state.error) {
-      std::rethrow_exception(state.error);
+   if (state->error_code) {
+      throw_transport_error(state->error_code, OP_RESOLVE);
    }
-   if (state.status != ARES_SUCCESS) {
-      FC_THROW("{} failed: {}", std::string(OP_RESOLVE), ares_strerror(state.status));
-   }
-   if (state.endpoints.empty()) {
+   if (state->endpoints.empty()) {
       FC_THROW("{} failed: resolver returned no endpoints", std::string(OP_RESOLVE));
    }
 
-   return tcp::resolver::results_type::create(state.endpoints.begin(), state.endpoints.end(), host, port);
+   return std::move(state->endpoints);
 }
 
-/// Resolve DNS for the long-lived client cache, using c-ares only when the caller supplied a deadline.
+/// Resolve DNS for the long-lived client cache, using the shared resolver only when the caller supplied a deadline.
+template <typename ResolverStartFn>
 tcp::resolver::results_type resolve_endpoints(asio::io_context& ioc,
                                               const std::string& host,
                                               const std::string& port,
                                               const std::optional<fc::time_point>& deadline_abs,
-                                              const std::optional<std::string>& resolver_servers_override) {
+                                              const ResolverStartFn& resolver_start) {
    if (deadline_abs) {
-      return resolve_endpoints_with_deadline(host, port, *deadline_abs, resolver_servers_override);
+      return resolve_endpoints_with_deadline(host, port, *deadline_abs, resolver_start);
    }
 
    tcp::resolver resolver{ioc};
@@ -507,11 +501,11 @@ json_rpc_client json_rpc_client::create(const std::variant<std::string, fc::url>
 // json_rpc_client
 json_rpc_client::json_rpc_client(fc::url url, const std::optional<std::string>& user_agent,
                                  endpoint_refresh_policy refresh_policy)
-   : json_rpc_client(std::move(url), user_agent, refresh_policy, std::nullopt) {}
+   : json_rpc_client(std::move(url), user_agent, refresh_policy, resolver_start_fn{}) {}
 
 json_rpc_client::json_rpc_client(fc::url url, const std::optional<std::string>& user_agent,
                                  endpoint_refresh_policy refresh_policy,
-                                 std::optional<std::string> resolver_servers_override)
+                                 resolver_start_fn resolver_start)
    : _url(std::move(url))
    , _host()
    , _port()
@@ -520,19 +514,24 @@ json_rpc_client::json_rpc_client(fc::url url, const std::optional<std::string>& 
    , _resolved_endpoints()
    , _resolved_endpoints_stale(false)
    , _refresh_policy(refresh_policy)
-   , _resolver_servers_override(std::move(resolver_servers_override)) {
+   , _resolver_start(std::move(resolver_start)) {
    const auto scheme = _url.proto();
    FC_ASSERT(scheme == HTTP_SCHEME || scheme == HTTPS_SCHEME, "Unsupported URL scheme: {}", scheme);
    FC_ASSERT(_url.host(), "JSON-RPC URL is missing host");
 
    _host = *_url.host();
    _port = default_port_for(_url, scheme);
+   if (!_resolver_start) {
+      _resolver_start = [](const std::string& host, const std::string& port, fc::time_point deadline_abs,
+                           resolver_complete_fn complete) {
+         return start_platform_resolution(host, port, deadline_abs, std::move(complete));
+      };
+   }
    refresh_resolved_endpoints();
 }
 
 void json_rpc_client::refresh_resolved_endpoints() {
-   _resolved_endpoints =
-      resolve_endpoints(_io_ctx, _host, _port, active_transport_deadline(), _resolver_servers_override);
+   _resolved_endpoints = resolve_endpoints(_io_ctx, _host, _port, active_transport_deadline(), _resolver_start);
    _resolved_endpoints_stale = false;
 }
 

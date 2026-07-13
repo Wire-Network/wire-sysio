@@ -74,7 +74,6 @@ set(fc_sources
 )
 
 find_package(fmt CONFIG REQUIRED)
-find_package(c-ares CONFIG REQUIRED)
 
 file(GLOB_RECURSE fc_headers src/*.hpp src/*.h include/*.hpp include/*.h)
 add_library(fc ${fc_sources} ${fc_headers})
@@ -125,8 +124,6 @@ target_link_libraries(
         fmt::fmt
         ${PLATFORM_SPECIFIC_LIBS}
         ${CMAKE_DL_LIBS}
-        PRIVATE
-        c-ares::cares
 )
 
 target_compile_definitions(fc PUBLIC -DFC_AVAILABLE=1)
