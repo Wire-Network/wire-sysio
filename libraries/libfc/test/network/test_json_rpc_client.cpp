@@ -9,10 +9,13 @@
 #include <boost/asio.hpp>
 #include <boost/test/unit_test.hpp>
 
+#include <array>
 #include <atomic>
 #include <chrono>
+#include <cstddef>
 #include <sstream>
 #include <string>
+#include <string_view>
 #include <thread>
 #include <utility>
 
@@ -21,8 +24,12 @@ using namespace std::chrono_literals;
 namespace {
 
 using tcp = boost::asio::ip::tcp;
+using udp = boost::asio::ip::udp;
 
 constexpr size_t OVERSIZED_RESPONSE_BODY_BYTES = 2 * 1024 * 1024;
+constexpr int64_t STALLED_RESOLVE_TIMEOUT_MS = 200;
+constexpr int64_t STALLED_RESOLVE_MAX_ELAPSED_MS = 1'500;
+constexpr std::string_view STALLED_RESOLVE_HOST = "startup-resolve.invalid";
 
 /**
  * Return a loopback port that has no listener after this function returns.
@@ -35,6 +42,69 @@ uint16_t closed_loopback_port() {
    acceptor.close(ec);
    return port;
 }
+
+/** UDP DNS endpoint that receives queries without sending a response. */
+class hanging_dns_server {
+public:
+   /** Start the blackhole server on an ephemeral loopback port. */
+   hanging_dns_server()
+      : _socket(_io, udp::endpoint(boost::asio::ip::address_v4::loopback(), 0))
+      , _port(_socket.local_endpoint().port())
+      , _worker([this] { serve(); }) {}
+
+   hanging_dns_server(const hanging_dns_server&) = delete;
+   hanging_dns_server& operator=(const hanging_dns_server&) = delete;
+
+   /** Stop the receive loop and join its worker. */
+   ~hanging_dns_server() {
+      _stop = true;
+      unblock_receive();
+      if (_worker.joinable()) {
+         _worker.join();
+      }
+   }
+
+   /** Return the c-ares server-list entry for this endpoint. */
+   std::string server_address() const { return "127.0.0.1:" + std::to_string(_port); }
+
+   /** Return how many DNS datagrams reached the blackhole. */
+   std::size_t queries_received() const { return _queries_received.load(); }
+
+private:
+   /** Send one datagram so a blocked receive can observe shutdown. */
+   void unblock_receive() {
+      boost::asio::io_context io;
+      udp::socket             socket(io);
+      boost::system::error_code ec;
+      socket.open(udp::v4(), ec);
+      const std::byte byte{};
+      socket.send_to(boost::asio::buffer(&byte, sizeof(byte)),
+                     udp::endpoint(boost::asio::ip::address_v4::loopback(), _port), 0, ec);
+   }
+
+   /** Receive and discard DNS datagrams until shutdown. */
+   void serve() {
+      std::array<std::byte, 512> data{};
+      while (!_stop.load()) {
+         udp::endpoint remote;
+         boost::system::error_code ec;
+         _socket.receive_from(boost::asio::buffer(data), remote, 0, ec);
+         if (ec) {
+            return;
+         }
+         if (!_stop.load()) {
+            ++_queries_received;
+         }
+      }
+   }
+
+   boost::asio::io_context _io;
+   udp::socket             _socket;
+   uint16_t                _port;
+   std::atomic_bool        _stop{false};
+   std::atomic_size_t      _queries_received{0};
+   std::thread             _worker;
+};
 
 /**
  * HTTP endpoint that reads one request and deliberately withholds the response.
@@ -195,13 +265,26 @@ bool is_response_body_limit_error(const fc::exception& e) {
 }
 
 /**
- * Return true when the exception came from bounded DNS refresh.
+ * Return true when the exception came from deadline-bound DNS resolution.
  */
 bool is_resolve_timeout_error(const fc::exception& e) {
    return e.to_detail_string().find("JSON-RPC resolve timed out") != std::string::npos;
 }
 
 } // namespace
+
+namespace fc::network::json_rpc {
+
+/** Private-constructor access for DNS transport regression tests. */
+struct json_rpc_client_test_access {
+   /** Construct a client using a caller-supplied c-ares server list. */
+   static json_rpc_client create(fc::url url, std::string resolver_servers_override) {
+      return json_rpc_client(std::move(url), std::nullopt, endpoint_refresh_policy::never,
+                             std::move(resolver_servers_override));
+   }
+};
+
+} // namespace fc::network::json_rpc
 
 BOOST_AUTO_TEST_SUITE(json_rpc_client_tests)
 
@@ -222,6 +305,43 @@ BOOST_AUTO_TEST_CASE(call_times_out_when_http_response_hangs) {
    const auto elapsed = fc::time_point::now() - start;
 
    BOOST_CHECK_LT(elapsed.count(), 1500 * 1000);
+}
+
+/// Initial endpoint resolution must cancel an in-flight DNS query at the caller's startup deadline.
+BOOST_AUTO_TEST_CASE(initial_endpoint_resolution_cancels_stalled_query) {
+   hanging_dns_server server;
+   const auto url = fc::url("http://" + std::string(STALLED_RESOLVE_HOST) + ":9876");
+   const auto start = fc::time_point::now();
+
+   BOOST_CHECK_EXCEPTION(
+      [&] {
+         fc::task::deadline_scope deadline(fc::time_point::now() + fc::milliseconds(STALLED_RESOLVE_TIMEOUT_MS));
+         auto client = fc::network::json_rpc::json_rpc_client_test_access::create(url, server.server_address());
+         (void)client;
+      }(),
+      fc::timeout_exception,
+      is_resolve_timeout_error);
+
+   const auto elapsed = fc::time_point::now() - start;
+   BOOST_CHECK_GT(server.queries_received(), 0u);
+   BOOST_CHECK_LT(elapsed.count(), STALLED_RESOLVE_MAX_ELAPSED_MS * 1'000);
+}
+
+/// An expired startup budget must fail before opening a resolver channel or sending a DNS query.
+BOOST_AUTO_TEST_CASE(initial_endpoint_resolution_rejects_expired_deadline) {
+   hanging_dns_server server;
+   const auto url = fc::url("http://" + std::string(STALLED_RESOLVE_HOST) + ":9876");
+
+   BOOST_CHECK_EXCEPTION(
+      [&] {
+         fc::task::deadline_scope deadline(fc::time_point::now() - fc::milliseconds(1));
+         auto client = fc::network::json_rpc::json_rpc_client_test_access::create(url, server.server_address());
+         (void)client;
+      }(),
+      fc::timeout_exception,
+      is_resolve_timeout_error);
+
+   BOOST_CHECK_EQUAL(server.queries_received(), 0u);
 }
 
 /// Refreshing stale cached endpoints must observe the active RPC deadline.

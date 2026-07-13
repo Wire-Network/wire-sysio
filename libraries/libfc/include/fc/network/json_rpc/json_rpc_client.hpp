@@ -71,6 +71,12 @@ public:
 private:
    using tcp = boost::asio::ip::tcp;
 
+   friend struct json_rpc_client_test_access;
+
+   /** Construct with an optional DNS server override used by transport regression tests. */
+   json_rpc_client(fc::url url, const std::optional<std::string>& user_agent,
+                   endpoint_refresh_policy refresh_policy, std::optional<std::string> resolver_servers_override);
+
    asio::io_context _io_ctx{};
    fc::url      _url;
    std::string  _host;
@@ -80,15 +86,13 @@ private:
    tcp::resolver::results_type _resolved_endpoints;
    bool                        _resolved_endpoints_stale;
    endpoint_refresh_policy _refresh_policy;
+   std::optional<std::string> _resolver_servers_override;
 
    // Perform HTTP POST with JSON payload; optionally parse JSON body.
    variant send_json(const variant& payload, bool expect_json_body = true);
 
-   /// Resolve the configured host and replace the cached endpoint set without a per-RPC deadline.
+   /// Resolve the configured host and replace the cached endpoint set using the active deadline when one exists.
    void refresh_resolved_endpoints();
-
-   /// Refresh stale cached endpoints using the active RPC deadline when one exists.
-   void refresh_resolved_endpoints_with_active_deadline();
 
    /// Mark cached endpoints stale after a connection failure.
    void mark_resolved_endpoints_stale();

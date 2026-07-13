@@ -10,6 +10,7 @@
     "bls12-381",
     "bn256",
     "boringssl-custom",
+    "c-ares",
     "cli11",
     "gmp",
     "protobuf",
