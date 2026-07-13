@@ -3,13 +3,15 @@
 #include <fc/variant.hpp>
 #include <fc/variant_object.hpp>
 #include <fc/io/json.hpp>
+#include <fc/time.hpp>
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/ip/tcp.hpp>
 
+#include <functional>
+#include <optional>
 #include <string>
 #include <variant>
 #include <vector>
-#include <optional>
 #include <fc/network/url.hpp>
 
 namespace fc::network::json_rpc {
@@ -71,6 +73,23 @@ public:
 private:
    using tcp = boost::asio::ip::tcp;
 
+   /** Completion callback supplied to an asynchronous endpoint resolver. */
+   using resolver_complete_fn =
+      std::function<void(const boost::system::error_code&, tcp::resolver::results_type)>;
+
+   /** Cancellation callback returned by an asynchronous endpoint resolver. */
+   using resolver_cancel_fn = std::function<void()>;
+
+   /** Start an asynchronous endpoint lookup and return its cancellation callback. */
+   using resolver_start_fn =
+      std::function<resolver_cancel_fn(const std::string&, const std::string&, fc::time_point, resolver_complete_fn)>;
+
+   friend struct json_rpc_client_test_access;
+
+   /** Construct with an optional asynchronous resolver starter used by transport regression tests. */
+   json_rpc_client(fc::url url, const std::optional<std::string>& user_agent,
+                   endpoint_refresh_policy refresh_policy, resolver_start_fn resolver_start);
+
    asio::io_context _io_ctx{};
    fc::url      _url;
    std::string  _host;
@@ -80,15 +99,13 @@ private:
    tcp::resolver::results_type _resolved_endpoints;
    bool                        _resolved_endpoints_stale;
    endpoint_refresh_policy _refresh_policy;
+   resolver_start_fn _resolver_start;
 
    // Perform HTTP POST with JSON payload; optionally parse JSON body.
    variant send_json(const variant& payload, bool expect_json_body = true);
 
-   /// Resolve the configured host and replace the cached endpoint set without a per-RPC deadline.
+   /// Resolve the configured host and replace the cached endpoint set using the active deadline when one exists.
    void refresh_resolved_endpoints();
-
-   /// Refresh stale cached endpoints using the active RPC deadline when one exists.
-   void refresh_resolved_endpoints_with_active_deadline();
 
    /// Mark cached endpoints stale after a connection failure.
    void mark_resolved_endpoints_stale();

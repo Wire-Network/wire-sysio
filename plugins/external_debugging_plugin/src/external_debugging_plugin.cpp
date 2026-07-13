@@ -124,14 +124,16 @@ void external_debugging_plugin::plugin_startup() {
       return;
    }
 
-   // Create RPC client pointed at the OPP base path —
-   // json_rpc_client::call() POSTs JSON-RPC 2.0 to this URL
-   auto rpc_url = _impl->server_url + debugging::rpc_client::api_paths::opp_base;
-   _impl->rpc_client =
-      std::make_unique<rpc::json_rpc_client>(fc::url(rpc_url), std::nullopt, rpc::endpoint_refresh_policy::never);
+   // Create and validate the RPC client under one startup deadline. The nested validation deadline
+   // clamps to this outer scope, so DNS resolution and the ping share the configured request budget.
+   {
+      fc::task::deadline_scope startup_deadline(_impl->next_request_deadline());
+      auto rpc_url = _impl->server_url + debugging::rpc_client::api_paths::opp_base;
+      _impl->rpc_client =
+         std::make_unique<rpc::json_rpc_client>(fc::url(rpc_url), std::nullopt, rpc::endpoint_refresh_policy::never);
 
-   // Validate server connectivity
-   FC_ASSERT(_impl->validate_server(), "External debugging server not reachable at {}", _impl->server_url);
+      FC_ASSERT(_impl->validate_server(), "External debugging server not reachable at {}", _impl->server_url);
+   }
 
    // Start the bounded asynchronous event sink
    _impl->event_sink = std::make_shared<external_debugging::debug_envelope_event_sink>(
