@@ -3,7 +3,8 @@
 Council election contract. Fills 21 council seats — one per tier-1 node owner — by electing a
 candidate from a shared pool. The right to *propose* a seat's slate of 3 candidates starts with
 that seat's tier-1 owner and **escalates** through tier-2 and tier-3 node owners if the earlier
-tier fails to elect anyone, so every seat is guaranteed to fill. See
+tier fails to elect anyone, ending in a governance backstop that can fill every seat. Final
+completion requires governance to act at that backstop. See
 [DESIGN.md](DESIGN.md) for the full model and rationale.
 
 > Implemented against the modern KV table stack (`kv::table` / `kv::scoped_table` / `kv::global`)
@@ -30,8 +31,8 @@ tier fails to elect anyone, so every seat is guaranteed to fill. See
 | Elimination | a candidate is out at `ceil(N/3)` NO (can no longer reach the threshold) |
 | Tier-1 | `N = 20` (the other tier-1 owners); the seat owner does not vote, no auto-yes |
 | Tier-2 / Tier-3 | `N =` full tier size; the proposer auto-yes counts for all 3 candidates; all other tier members vote |
-| Timing | one `time_slot_sec` per attempt for both the nomination window and the voting window |
-| Randomness | SHA-256 entropy accumulator over contract activity (block number excluded — "Variant B"); folds in seat + round for collision-free retries |
+| Timing | one inclusive `time_slot_sec` window per nomination and vote; bounded to 30 days |
+| Randomness | SHA-256 accumulator over authenticated election activity (block number and timestamp excluded); folds in seat + round for retries |
 
 ## Actions
 
@@ -42,30 +43,36 @@ tier fails to elect anyone, so every seat is guaranteed to fill. See
 | `startinit(time_slot_sec, ordered_owners[21])` | contract | Freeze the tier-1 roster; close registration. |
 | `loadtier(tier, max_rows)` | contract | Batch-load the tier-2/3 snapshot from roa (resumable). |
 | `finalizeinit()` | contract | Verify snapshots vs `sysio.system::nodecount`; open seat 0. |
-| `reset()` | contract | After DONE: bump the generation and reopen registration. |
+| `reset()` | contract | After DONE: begin staged cleanup of ephemeral generation state. |
+| `purge(max_rows)` | contract | Delete bounded cleanup batches; advance generation and reopen registration when complete. |
 | `repcandidate(proposer, c1, c2, c3)` | `proposer` | The active proposer nominates a 3-candidate slate. |
 | `vote(voter, v1, v2, v3)` | `voter` | Independent yes/no on each slate candidate. |
-| `settle()` | anyone | Push a timed-out attempt forward; stir entropy. |
+| `settle(caller)` | `caller` | Push a timed-out attempt forward; mix the authenticated caller into entropy. |
+| `forceback()` | contract | Recovery path: move an elapsed active attempt directly to BACKSTOP. |
 | `forceassign(member)` | contract | Governance backstop when tier-3 is exhausted. |
-| `stir()` | anyone | Advance the entropy accumulator. |
+| `stir(caller)` | `caller` | Advance entropy and lazily settle elapsed state. |
 
 ## Tables (KV)
 
 | Table | Type | Scope | Contents |
 |-------|------|-------|----------|
-| `config` | global | — | init progress, `time_slot_sec`, generation, tier sizes, load cursors |
+| `config` | global | — | init progress, `time_slot_sec`, generation, tier sizes, loaded-row counts/next snapshot indices |
 | `state` | global | — | live cursor (seat/tier/phase/proposer), current slate + tallies, entropy accumulator |
 | `candidates` | scoped | generation | `account`, `handle`, `elected` |
 | `roster` / `tier2` / `tier3` | scoped | generation | frozen ordered node-owner snapshots (by-owner secondary index) |
-| `ballots` | scoped | (generation, round) | one row per voter per attempt |
-| `tried3` | scoped | (generation, seat) | tier-3 proposers already attempted for a seat |
+| `state.voted_bitmap` | global field | — | bounded duplicate-vote bitmap (at most one bit per tier member) |
+| `tier3remap` | scoped | (generation, seat) | lazy Fisher-Yates remap for O(1) no-repeat tier-3 selection |
 | `council` | scoped | generation | the 21 filled seats (owner, tier, proposer, member) |
 
 ## Lifecycle
 
 `addcandidate*` → `startinit` → `loadtier*` → `finalizeinit` → per seat
-`repcandidate` + `vote*` (with `settle` cranks) escalating T1→T2→T3→`forceassign` as needed →
-all 21 seats filled → `DONE` → optional `reset` for a new generation.
+`repcandidate` + `vote*` (with authenticated cranks) escalating T1→T2→T3→`forceassign` as needed →
+all 21 seats filled → `DONE` → `reset` → `purge*` → registration for the next generation.
+
+Candidate rows are billed to the self-registering candidate and registrations are capped at 1,000
+per generation. Council results are retained permanently; candidates, snapshots, and tier-3 remap
+state are removed in bounded cleanup batches before the next generation opens.
 
 ## Build / status
 

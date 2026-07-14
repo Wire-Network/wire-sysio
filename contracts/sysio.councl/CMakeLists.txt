@@ -6,6 +6,7 @@ if(BUILD_SYSTEM_CONTRACTS)
     file(GLOB_RECURSE SOURCES src/*.cpp)
     file(GLOB_RECURSE HEADERS include/*.hpp)
     add_contract(${contract_name} ${contract_name} ${SOURCES})
+    target_ricardian_directory(${contract_name} ${CMAKE_CURRENT_SOURCE_DIR}/ricardian)
     set(targets ${contract_name})
 
     if("native-module" IN_LIST SYSIO_WASM_RUNTIMES)
@@ -37,8 +38,11 @@ if(BUILD_SYSTEM_CONTRACTS)
         )
 
         target_link_libraries(${target}
-                INTERFACE
+                PRIVATE
                 magic_enum::magic_enum
         )
+        # cdt-cpp intentionally drops host system include paths. Treat the imported header-only
+        # target as a normal include so its contract-compatible headers reach the WASM compiler.
+        set_target_properties(${target} PROPERTIES NO_SYSTEM_FROM_IMPORTED TRUE)
     endforeach()
 endif()

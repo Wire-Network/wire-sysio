@@ -18,28 +18,6 @@
             ]
         },
         {
-            "name": "ballot_row",
-            "base": "",
-            "fields": [
-                {
-                    "name": "voter",
-                    "type": "name"
-                },
-                {
-                    "name": "v1",
-                    "type": "bool"
-                },
-                {
-                    "name": "v2",
-                    "type": "bool"
-                },
-                {
-                    "name": "v3",
-                    "type": "bool"
-                }
-            ]
-        },
-        {
             "name": "cand_key",
             "base": "",
             "fields": [
@@ -72,16 +50,8 @@
             "base": "",
             "fields": [
                 {
-                    "name": "initialized",
-                    "type": "bool"
-                },
-                {
                     "name": "init_phase",
-                    "type": "uint8"
-                },
-                {
-                    "name": "reg_open",
-                    "type": "bool"
+                    "type": "init_phase"
                 },
                 {
                     "name": "time_slot_sec",
@@ -114,6 +84,14 @@
                 {
                     "name": "cand_count",
                     "type": "uint32"
+                },
+                {
+                    "name": "cleanup_stage",
+                    "type": "cleanup_stage"
+                },
+                {
+                    "name": "cleanup_seat",
+                    "type": "uint8"
                 }
             ]
         },
@@ -131,7 +109,7 @@
                 },
                 {
                     "name": "filled_tier",
-                    "type": "uint8"
+                    "type": "election_tier"
                 },
                 {
                     "name": "proposer",
@@ -149,7 +127,7 @@
             "fields": [
                 {
                     "name": "phase",
-                    "type": "uint8"
+                    "type": "election_phase"
                 },
                 {
                     "name": "active_seat",
@@ -157,7 +135,7 @@
                 },
                 {
                     "name": "tier",
-                    "type": "uint8"
+                    "type": "election_tier"
                 },
                 {
                     "name": "proposer",
@@ -177,7 +155,7 @@
                 },
                 {
                     "name": "elect_N",
-                    "type": "uint64"
+                    "type": "uint32"
                 },
                 {
                     "name": "eligible_voters",
@@ -188,12 +166,16 @@
                     "type": "uint32"
                 },
                 {
-                    "name": "tried_count",
+                    "name": "tier3_available",
                     "type": "uint32"
                 },
                 {
                     "name": "seats_filled",
                     "type": "uint8"
+                },
+                {
+                    "name": "voted_bitmap",
+                    "type": "bytes"
                 },
                 {
                     "name": "c1",
@@ -209,27 +191,27 @@
                 },
                 {
                     "name": "yes1",
-                    "type": "uint64"
+                    "type": "uint32"
                 },
                 {
                     "name": "yes2",
-                    "type": "uint64"
+                    "type": "uint32"
                 },
                 {
                     "name": "yes3",
-                    "type": "uint64"
+                    "type": "uint32"
                 },
                 {
                     "name": "no1",
-                    "type": "uint64"
+                    "type": "uint32"
                 },
                 {
                     "name": "no2",
-                    "type": "uint64"
+                    "type": "uint32"
                 },
                 {
                     "name": "no3",
-                    "type": "uint64"
+                    "type": "uint32"
                 },
                 {
                     "name": "acc",
@@ -257,6 +239,11 @@
             ]
         },
         {
+            "name": "forceback",
+            "base": "",
+            "fields": []
+        },
+        {
             "name": "index_key",
             "base": "",
             "fields": [
@@ -277,6 +264,30 @@
                 {
                     "name": "max_rows",
                     "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "purge",
+            "base": "",
+            "fields": [
+                {
+                    "name": "max_rows",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "remap_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "virtual_idx",
+                    "type": "uint64"
+                },
+                {
+                    "name": "actual_idx",
+                    "type": "uint64"
                 }
             ]
         },
@@ -334,7 +345,12 @@
         {
             "name": "settle",
             "base": "",
-            "fields": []
+            "fields": [
+                {
+                    "name": "caller",
+                    "type": "name"
+                }
+            ]
         },
         {
             "name": "startinit",
@@ -353,7 +369,12 @@
         {
             "name": "stir",
             "base": "",
-            "fields": []
+            "fields": [
+                {
+                    "name": "caller",
+                    "type": "name"
+                }
+            ]
         },
         {
             "name": "tier2_row",
@@ -384,16 +405,6 @@
             ]
         },
         {
-            "name": "tried_row",
-            "base": "",
-            "fields": [
-                {
-                    "name": "idx",
-                    "type": "uint64"
-                }
-            ]
-        },
-        {
             "name": "vote",
             "base": "",
             "fields": [
@@ -414,84 +425,76 @@
                     "type": "bool"
                 }
             ]
-        },
-        {
-            "name": "voter_key",
-            "base": "",
-            "fields": [
-                {
-                    "name": "voter",
-                    "type": "uint64"
-                }
-            ]
         }
     ],
     "actions": [
         {
             "name": "addcandidate",
             "type": "addcandidate",
-            "ricardian_contract": ""
+            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Add Council Candidate\nsummary: '{{nowrap account}} registers as a council candidate.'\n---\n\n{{account}} registers as a candidate for the council election with the short handle {{handle}} and\npays the RAM for that candidate row. A generation accepts at most 1,000 candidates.\n\n## Preconditions\n- The caller must be authorized as {{account}}.\n- Candidate registration must be open (before the election has started).\n- {{account}} must not already be a candidate.\n- The handle must use the contract's allowed 1–32-byte ASCII character set."
         },
         {
             "name": "finalizeinit",
             "type": "finalizeinit",
-            "ricardian_contract": ""
+            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Finalize Election Initialization\nsummary: 'Verify the tier snapshots and open the first seat.'\n---\n\nThe contract owner finalizes initialization: the tier-2 and tier-3 snapshots are verified complete\nagainst the live node counts, and the first council seat's nomination window opens."
         },
         {
             "name": "forceassign",
             "type": "forceassign",
-            "ricardian_contract": ""
+            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Governance Seat Assignment\nsummary: 'Assign {{nowrap member}} to the current seat.'\n---\n\nThe contract owner seats {{member}} for the current seat. Valid only at the governance backstop,\nreached either after tier-3 exhaustion or through `forceback` recovery of an elapsed attempt."
+        },
+        {
+            "name": "forceback",
+            "type": "forceback",
+            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Governance Recovery Backstop\nsummary: 'Move an elapsed active attempt to governance backstop.'\n---\n\nThe contract owner moves an elapsed nomination or voting attempt directly to BACKSTOP. This is an\nexceptional recovery path for an operationally stalled election and cannot be used before the\nactive attempt's inclusive deadline has passed."
         },
         {
             "name": "loadtier",
             "type": "loadtier",
-            "ricardian_contract": ""
+            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Load Tier Snapshot\nsummary: 'Append tier-{{nowrap tier}} node owners into the frozen snapshot.'\n---\n\nThe contract owner appends up to {{max_rows}} tier-{{tier}} node owners from sysio.roa into the\nfrozen escalation snapshot. Resume is identity-based, so newly observed owners are appended without\nduplicating owners already loaded. Called repeatedly until complete."
+        },
+        {
+            "name": "purge",
+            "type": "purge",
+            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Purge Election State\nsummary: 'Delete up to {{max_rows}} ephemeral rows from the completed generation.'\n---\n\nThe contract owner deletes at most {{max_rows}} candidates, roster entries, tier snapshots, and\ntier-3 remap entries from the completed generation. When all ephemeral rows have been removed, the\ngeneration advances and registration reopens. Council result rows are retained."
         },
         {
             "name": "repcandidate",
             "type": "repcandidate",
-            "ricardian_contract": ""
+            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Nominate a Candidate Slate\nsummary: '{{nowrap proposer}} nominates a slate of three candidates.'\n---\n\n{{proposer}} nominates a slate of three distinct, un-elected candidates ({{c1}}, {{c2}}, and\n{{c3}}) for the current seat, opening the voting round.\n\n## Preconditions\n- The caller must be authorized as {{proposer}}.\n- {{proposer}} must be the active proposer for the current seat.\n- The nomination window must not have elapsed.\n- The three candidates must be distinct, registered, and not already elected."
         },
         {
             "name": "reset",
             "type": "reset",
-            "ricardian_contract": ""
+            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Begin Election Reset\nsummary: 'Begin staged cleanup of the completed election generation.'\n---\n\nThe contract owner starts cleanup of ephemeral rows from a completed election. Council result rows\nremain as permanent history. The contract owner must call `purge` until cleanup completes and\ncandidate registration reopens."
         },
         {
             "name": "rmcandidate",
             "type": "rmcandidate",
-            "ricardian_contract": ""
+            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Remove Council Candidate\nsummary: 'Remove candidate {{nowrap account}} before the election starts.'\n---\n\nThe contract owner removes {{account}} from the candidate pool. Allowed only while registration is open."
         },
         {
             "name": "settle",
             "type": "settle",
-            "ricardian_contract": ""
+            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Settle Election State\nsummary: '{{nowrap caller}} advances timed-out election state and stirs entropy.'\n---\n\n{{caller}} authorizes a public crank that resolves an elapsed attempt and advances the\nelection while mixing the authenticated caller into the accumulator."
         },
         {
             "name": "startinit",
             "type": "startinit",
-            "ricardian_contract": ""
+            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Start Election Initialization\nsummary: 'Freeze the tier-1 roster and begin an election.'\n---\n\nThe contract owner begins an election: registration closes, the ordered list of 21 tier-1 node\nowners is frozen as the seat roster, and the roa network generation is captured.\n\n## Preconditions\n- The caller must have contract-owner authorization.\n- At least 23 candidates must be registered.\n- `time_slot_sec` must be between one second and 30 days, inclusive.\n- `ordered_owners` must be a permutation of exactly the 21 tier-1 node owners in sysio.roa."
         },
         {
             "name": "stir",
             "type": "stir",
-            "ricardian_contract": ""
+            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Stir Entropy\nsummary: '{{nowrap caller}} advances entropy and settles elapsed election state.'\n---\n\n{{caller}} authorizes a public crank that mixes the authenticated caller into the entropy\naccumulator and also advances an elapsed election attempt. Block number and block timestamp are not\nentropy inputs."
         },
         {
             "name": "vote",
             "type": "vote",
-            "ricardian_contract": ""
+            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Vote on the Current Slate\nsummary: '{{nowrap voter}} votes on the three current-slate candidates.'\n---\n\n{{voter}} casts an independent yes/no vote on each of the three candidates in the current slate.\n\n## Preconditions\n- The caller must be authorized as {{voter}}.\n- Voting must be open for the current slate.\n- {{voter}} must be an eligible voter for the active tier and must not be the proposer.\n- {{voter}} must not have already voted in this round."
         }
     ],
     "tables": [
-        {
-            "name": "ballots",
-            "type": "ballot_row",
-            "index_type": "i64",
-            "key_names": ["scope","voter"],
-            "key_types": ["name","uint64"],
-            "table_id": 23362
-        },
         {
             "name": "candidates",
             "type": "candidate_row",
@@ -570,15 +573,113 @@
             ]
         },
         {
-            "name": "tried3",
-            "type": "tried_row",
+            "name": "tier3remap",
+            "type": "remap_row",
             "index_type": "i64",
             "key_names": ["scope","idx"],
             "key_types": ["name","uint64"],
-            "table_id": 26046
+            "table_id": 27642
         }
     ],
     "ricardian_clauses": [],
     "variants": [],
-    "action_results": []
+    "action_results": [],
+    "enums": [
+        {
+            "name": "cleanup_stage",
+            "type": "uint8",
+            "values": [
+                {
+                    "name": "CANDIDATES",
+                    "value": 0
+                },
+                {
+                    "name": "ROSTER",
+                    "value": 1
+                },
+                {
+                    "name": "TIER2",
+                    "value": 2
+                },
+                {
+                    "name": "TIER3",
+                    "value": 3
+                },
+                {
+                    "name": "REMAP",
+                    "value": 4
+                },
+                {
+                    "name": "COMPLETE",
+                    "value": 5
+                }
+            ]
+        },
+        {
+            "name": "election_phase",
+            "type": "uint8",
+            "values": [
+                {
+                    "name": "AWAIT_REP",
+                    "value": 0
+                },
+                {
+                    "name": "VOTING",
+                    "value": 1
+                },
+                {
+                    "name": "BACKSTOP",
+                    "value": 2
+                },
+                {
+                    "name": "DONE",
+                    "value": 3
+                }
+            ]
+        },
+        {
+            "name": "election_tier",
+            "type": "uint8",
+            "values": [
+                {
+                    "name": "GOVERNANCE",
+                    "value": 0
+                },
+                {
+                    "name": "T1",
+                    "value": 1
+                },
+                {
+                    "name": "T2",
+                    "value": 2
+                },
+                {
+                    "name": "T3",
+                    "value": 3
+                }
+            ]
+        },
+        {
+            "name": "init_phase",
+            "type": "uint8",
+            "values": [
+                {
+                    "name": "REG",
+                    "value": 0
+                },
+                {
+                    "name": "LOADING",
+                    "value": 1
+                },
+                {
+                    "name": "READY",
+                    "value": 2
+                },
+                {
+                    "name": "CLEANING",
+                    "value": 3
+                }
+            ]
+        }
+    ]
 }
