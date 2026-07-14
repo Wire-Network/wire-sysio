@@ -78,6 +78,18 @@ Loads one or more Anchor IDL JSON files for use with `solana_program_client`:
 --solana-idl-file /path/to/counter.json /path/to/another_program.json
 ```
 
+#### `--solana-outpost-program-name` (optional, default `opp_outpost`)
+
+Anchor IDL program name of the Solana OPP outpost. When an outpost client is
+constructed, the loaded `--solana-idl-file` set is filtered to programs whose
+IDL name matches this value. The default targets the standalone `opp_outpost`
+program; the clean-room outpost implementation is hosted inside the
+`liqsol-core` program, whose generated IDL is named `liqsol_core`:
+
+```
+--solana-outpost-program-name liqsol_core
+```
+
 ### Full Example
 
 ```bash
