@@ -48,6 +48,9 @@ constexpr uint64_t kTerminateWindowMs = 24ULL * 60 * 60 * 1000;
 /// includable from native test code).
 constexpr uint32_t kDellogPrunePerWrite = 4;
 
+/// Mirrors opreg's MAX_DELLOG_PRUNE_PER_CRANK.
+constexpr uint32_t kDellogPrunePerCrank = 64;
+
 } // namespace
 
 /// v6 data-model: per-chain identity has moved from `ChainKind` enums to
@@ -930,16 +933,25 @@ BOOST_FIXTURE_TEST_CASE(recorddel_prune_is_bounded_per_write, sysio_opreg_tester
 BOOST_FIXTURE_TEST_CASE(prune_sweeps_expired_dellog_rows, sysio_opreg_tester) { try {
    activate_batch_operator("batchop.a"_n);
 
-   for (uint32_t epoch = 1; epoch <= 5; ++epoch) {
+   // One more expired row than a single crank may remove.
+   constexpr uint32_t SEEDED_ROWS = kDellogPrunePerCrank + 1;
+   for (uint32_t epoch = 1; epoch <= SEEDED_ROWS; ++epoch) {
       BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, epoch, /*delivered=*/false));
       produce_blocks();
    }
    produce_block(fc::hours(25));
 
+   // First crank removes exactly kDellogPrunePerCrank rows, oldest first.
    BOOST_REQUIRE_EQUAL(success(), prune());
    produce_blocks();
-   for (uint64_t id = 1; id <= 5; ++id)
+   for (uint64_t id = 1; id <= kDellogPrunePerCrank; ++id)
       BOOST_REQUIRE(get_dellog_entry(id).is_null());
+   BOOST_REQUIRE(!get_dellog_entry(SEEDED_ROWS).is_null());
+
+   // Second crank clears the remainder.
+   BOOST_REQUIRE_EQUAL(success(), prune());
+   produce_blocks();
+   BOOST_REQUIRE(get_dellog_entry(SEEDED_ROWS).is_null());
 
    // With no rows left in the window the operator stays ACTIVE.
    BOOST_REQUIRE_EQUAL(success(), termcheck("batchop.a"_n));
