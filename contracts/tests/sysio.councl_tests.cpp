@@ -27,6 +27,7 @@
 
 #include <fc/variant_object.hpp>
 
+#include <set>
 #include <string>
 #include <vector>
 
@@ -252,6 +253,15 @@ public:
       return name(v["member"].as_string());
    }
 
+   /// Owner of tier-2 snapshot row `idx`, or the empty name if the row is absent.
+   name tier2_owner(uint64_t idx) {
+      auto data = get_row_by_id(COUNCL_ACCOUNT, name(GEN0), "tier2"_n, idx);
+      if (data.empty()) return name{};
+      auto v = councl_abi.binary_to_variant("tier2_row", data,
+         abi_serializer::create_yield_function(abi_serializer_max_time));
+      return name(v["owner"].as_string());
+   }
+
    /// Elapse one full attempt window so a nomination/voting deadline passes, then settle.
    void elapse_and_settle() {
       produce_block(fc::seconds(TIME_SLOT + 1));
@@ -330,6 +340,45 @@ BOOST_FIXTURE_TEST_CASE(staged_load_and_finalize, sysio_councl_tester) { try {
    BOOST_REQUIRE_EQUAL(phase(), PH_AWAIT_REP);
    BOOST_REQUIRE_EQUAL(active_seat(), 0);
    BOOST_REQUIRE_EQUAL(proposer().to_string(), t1_owners[0].to_string());
+} FC_LOG_AND_RETHROW() }
+
+// ── staged load: roa tier churn between loadtier batches ──────────────────
+/// REGRESSION (known bug, currently FAILS): loadtier resumes by *position* (skip-count over the
+/// live bytier enumeration), not by identity. A tier-2 owner forcereg'd between batches that
+/// sorts before an already-loaded owner shifts the enumeration, so the resumed batch re-writes
+/// an already-snapshotted owner (duplicate) and never writes the newcomer — while finalizeinit's
+/// count cross-check still passes. The frozen snapshot must be a faithful, duplicate-free copy
+/// of roa's tier-2 set (DESIGN.md §11: the election is immune to roa churn only if the snapshot
+/// itself is sound).
+BOOST_FIXTURE_TEST_CASE(loadtier_roa_churn_mid_load, sysio_councl_tester) { try {
+   register_candidates(23);
+   register_tiers();                                  // the 21 tier-1 owners only
+
+   // Two tier-2 owners present at startinit; bytier enumerates them in name order.
+   name twob{"twob"}, twoc{"twoc"};
+   mk(twob); register_node_owner(twob, 2);
+   mk(twoc); register_node_owner(twoc, 2);
+
+   BOOST_REQUIRE_EQUAL(success(), startinit(TIME_SLOT, t1_owners));
+   BOOST_REQUIRE_EQUAL(success(), loadtier(2, 1));    // snapshots "twob" into idx 0
+
+   // Churn mid-load: a new tier-2 owner that sorts BEFORE the already-loaded "twob".
+   name twoa{"twoa"};
+   mk(twoa); register_node_owner(twoa, 2);
+
+   BOOST_REQUIRE_EQUAL(success(), loadtier(2, 1000)); // resumes by skip-count past "twoa"
+   BOOST_REQUIRE_EQUAL(success(), loadtier(3, 1000));
+   BOOST_REQUIRE_EQUAL(success(), finalizeinit());    // t2_loaded == nodecount either way
+
+   // Faithful snapshot: rows 0..2 hold exactly {twoa, twob, twoc}, no duplicates.
+   std::set<name> snapshot;
+   for (uint64_t i = 0; i < 3; ++i) {
+      name o = tier2_owner(i);
+      BOOST_REQUIRE_MESSAGE(snapshot.insert(o).second,
+                            "duplicate owner in tier-2 snapshot: " + o.to_string());
+   }
+   BOOST_CHECK_MESSAGE(snapshot == std::set<name>({twoa, twob, twoc}),
+                       "tier-2 snapshot is not the roa tier-2 set");
 } FC_LOG_AND_RETHROW() }
 
 // ── tier-1 happy path: 14 yes on c1 fills seat 0 ──────────────────────────
