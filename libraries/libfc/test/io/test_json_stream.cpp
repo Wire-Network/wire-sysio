@@ -64,6 +64,18 @@ struct block_like_t {
    std::string    producer;
 };
 
+// int64_t/uint64_t alias different concrete types per platform (long on 64-bit Linux, long long
+// on macOS), so exactly one of {size_t, long long, unsigned long long} is NOT one of the aliased
+// fixed-width overloads on any given platform.  A struct carrying all three exercises the
+// platform-specific integer to_json_stream overload wherever the build runs (size_t on macOS;
+// long long / unsigned long long on Linux) -- pins the fix for the get_unapplied_transactions_result
+// size_t field that failed the macOS build.
+struct platform_ints_t {
+   size_t             sz  = 0;
+   long long          ll  = 0;
+   unsigned long long ull = 0;
+};
+
 } // namespace
 
 FC_REFLECT(point_t, (x)(y)(label))
@@ -72,6 +84,7 @@ FC_REFLECT_ENUM(color_t, (red)(green)(blue))
 FC_REFLECT(with_optional_t, (id)(note))
 FC_REFLECT(with_map_t, (counts))
 FC_REFLECT(block_like_t, (timestamp)(digest)(producer))
+FC_REFLECT(platform_ints_t, (sz)(ll)(ull))
 
 BOOST_AUTO_TEST_SUITE(json_stream_test)
 
@@ -192,6 +205,17 @@ BOOST_AUTO_TEST_CASE(vector_and_optional) {
 BOOST_AUTO_TEST_CASE(reflected_struct) {
    point_t p{.x = 3, .y = -4, .label = "origin"};
    BOOST_CHECK_EQUAL(fc::to_json_string(p), "{\"x\":3,\"y\":-4,\"label\":\"origin\"}");
+}
+
+// The size_t / long long / unsigned long long fields must stream identically to the variant
+// path, including the >2^32 quoting rule.  Whichever of the three is the platform's "extra"
+// 64-bit integer type hits the guarded overload in reflect/json_stream.hpp.
+BOOST_AUTO_TEST_CASE(reflected_struct_platform_ints) {
+   platform_ints_t v{ .sz = 5, .ll = -8'000'000'000LL, .ull = 20'000'000'000ULL };
+   fc::variant as_var;
+   fc::to_variant(v, as_var);
+   BOOST_CHECK_EQUAL(fc::to_json_string(v),
+                     fc::json::to_string(as_var, fc::json::yield_function_t()));
 }
 
 BOOST_AUTO_TEST_CASE(nested_struct) {

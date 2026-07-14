@@ -67,6 +67,16 @@ inline void to_json_stream(uint64_t n, json_writer& w) {
       w.value_uint64(n);
    }
 }
+// int64_t / uint64_t are aliases of different concrete types per platform (long on 64-bit Linux,
+// long long on macOS), so one of the standard 64-bit integer types is left without an overload
+// above.  Mirror to_variant's platform guard (fc/variant.hpp) so reflected fields of that type
+// (e.g. a size_t member on macOS) stream instead of falling through to the reflector primary.
+#ifdef __APPLE__
+inline void to_json_stream(size_t n, json_writer& w)             { to_json_stream(static_cast<uint64_t>(n), w); }
+#elif !defined(_MSC_VER)
+inline void to_json_stream(long long int n, json_writer& w)          { to_json_stream(static_cast<int64_t>(n), w); }
+inline void to_json_stream(unsigned long long int n, json_writer& w) { to_json_stream(static_cast<uint64_t>(n), w); }
+#endif
 // double / float emit as a JSON-quoted fixed-precision string to match fc::variant's emission shape
 // (variant.cpp s_fc_to_string + json.cpp double_type case).  Reflector-driven struct fields (e.g.
 // get_producers_result.total_producer_vote_weight) depend on this shape; emitting a bare JSON number
