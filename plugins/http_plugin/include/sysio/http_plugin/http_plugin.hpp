@@ -5,6 +5,7 @@
 #include <sysio/http_plugin/api_category.hpp>
 #include <sysio/http_plugin/abstract_conn_fwd.hpp>
 #include <fc/exception/exception.hpp>
+#include <fc/move_only_function.hpp>
 #include <fc/reflect/reflect.hpp>
 #include <fc/io/json.hpp>
 #include <fc/io/json_stream_fwd.hpp>
@@ -56,8 +57,8 @@ namespace sysio {
     * have to satisfy CopyConstructible; pass the typed struct directly without
     * round-tripping through fc::variant.
     */
-   using stream_emitter               = std::move_only_function<void(fc::json_writer&)>;
-   using url_response_stream_callback = std::move_only_function<void(int, stream_emitter)>;
+   using stream_emitter               = fc::move_only_function<void(fc::json_writer&)>;
+   using url_response_stream_callback = fc::move_only_function<void(int, stream_emitter)>;
    using url_handler_stream           = std::function<void(string&&, string&&, url_response_stream_callback&&)>;
 
    /**
@@ -199,7 +200,7 @@ namespace sysio {
         // Accepts a move-only callable so streaming-cb macros can capture
         // url_response_stream_callback (move_only_function) into the closure.
         // std::function values implicitly convert and so are still accepted.
-        void post_http_thread_pool(std::move_only_function<void()> f);
+        void post_http_thread_pool(fc::move_only_function<void()> f);
 
         bool is_on_loopback(api_category category) const;
 

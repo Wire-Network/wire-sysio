@@ -395,9 +395,8 @@ BOOST_FIXTURE_TEST_CASE(stream_decode_failure_falls_back_to_hex_valid_json, vali
    deploy_contract(*this);
    populate_numobjs(*this, 3);
 
-   abi_def abi = fc::json::from_string(
-      std::string(test_contracts::get_table_test_abi().begin(),
-                  test_contracts::get_table_test_abi().end())).as<abi_def>();
+   const std::string abi_json = test_contracts::get_table_test_abi();
+   abi_def abi = fc::json::from_string(abi_json).as<abi_def>();
    for (auto& st : abi.structs) {
       if (st.name == "numobj") {
          st.fields.push_back({"extra_field", "uint64"});

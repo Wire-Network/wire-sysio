@@ -698,7 +698,7 @@ namespace sysio {
       SYS_ASSERT(p.second, chain::plugin_config_exception, "http url {} is not unique", p.first->first);
    }
 
-   void http_plugin::post_http_thread_pool(std::move_only_function<void()> f) {
+   void http_plugin::post_http_thread_pool(fc::move_only_function<void()> f) {
       if( f )
          boost::asio::post( my->plugin_state->thread_pool.get_executor(), std::move(f) );
    }

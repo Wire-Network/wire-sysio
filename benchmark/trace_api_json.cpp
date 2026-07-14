@@ -192,7 +192,7 @@ void trace_api_json_benchmarking() {
       });
       benchmarking("struct-pass (mof): " + label_prefix, [&]() {
          data_log_entry e = std::move(fresh_b[fresh_idx_b++ % pool_size]);
-         std::move_only_function<void(fc::json_writer&)> body =
+         fc::move_only_function<void(fc::json_writer&)> body =
             [e = std::move(e)](fc::json_writer& w) mutable {
                asm volatile("" : : "g"(&e) : "memory");
             };
