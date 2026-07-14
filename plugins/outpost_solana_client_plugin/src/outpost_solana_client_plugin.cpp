@@ -7,8 +7,9 @@
 namespace sysio {
 
 namespace {
-constexpr auto option_name_client = "outpost-solana-client";
-constexpr auto option_idl_file    = "solana-idl-file";
+constexpr auto option_name_client          = "outpost-solana-client";
+constexpr auto option_idl_file             = "solana-idl-file";
+constexpr auto option_outpost_program_name = "solana-outpost-program-name";
 
 [[maybe_unused]] inline fc::logger& logger() {
    static fc::logger log{"outpost_solana_client_plugin"};
@@ -20,8 +21,18 @@ class outpost_solana_client_plugin_impl {
    std::map<std::string, solana_client_entry_ptr> _clients{};
    using file_idl_programs_t = std::pair<std::filesystem::path, std::vector<fc::network::solana::idl::program>>;
    std::vector<file_idl_programs_t> _idl_files{};
+   std::string _outpost_program_name{OPP_SOLANA_OUTPOST_PROGRAM_NAME};
 
 public:
+   void set_outpost_program_name(std::string name) {
+      FC_ASSERT(!name.empty(), "--{} cannot be empty", option_outpost_program_name);
+      _outpost_program_name = std::move(name);
+   }
+
+   const std::string& outpost_program_name() const {
+      return _outpost_program_name;
+   }
+
    std::vector<file_idl_programs_t> load_idl_files(const std::vector<std::filesystem::path>& file_names) {
       static std::mutex mutex;
       std::scoped_lock lock(mutex);
@@ -68,6 +79,8 @@ void outpost_solana_client_plugin::plugin_initialize(const variables_map& option
       auto& idl_files = options.at(option_idl_file).as<std::vector<std::filesystem::path>>();
       my->load_idl_files(idl_files);
    }
+   my->set_outpost_program_name(options.at(option_outpost_program_name).as<std::string>());
+   ilog("Solana OPP outpost program name: {}", my->outpost_program_name());
    FC_ASSERT(options.count(option_name_client),
              "At least one solana client argument is required {}",
              option_name_client);
@@ -109,7 +122,13 @@ void outpost_solana_client_plugin::set_program_options(options_description& cli,
       "Format: `<sol-client-id>,<sig-provider-id>,<rpc-url>`")(
       option_idl_file,
       boost::program_options::value<std::vector<std::filesystem::path>>()->multitoken(),
-      "Solana program IDL file(s). Expects each file to be a JSON IDL (Anchor format) program definition.");
+      "Solana program IDL file(s). Expects each file to be a JSON IDL (Anchor format) program definition.")(
+      option_outpost_program_name,
+      boost::program_options::value<std::string>()->default_value(OPP_SOLANA_OUTPOST_PROGRAM_NAME),
+      "Anchor IDL program name of the Solana OPP outpost. The loaded --solana-idl-file set is filtered to "
+      "programs with this name when constructing outpost clients. The default targets the standalone "
+      "opp_outpost program; pass liqsol_core when the outpost interface is hosted inside the liqsol-core "
+      "program (clean-room layout).");
 }
 
 void outpost_solana_client_plugin::plugin_shutdown() {
@@ -140,22 +159,32 @@ outpost_solana_client_plugin::create_outpost_client(const std::string& sol_clien
 
    auto program_key = fc::crypto::solana::solana_public_key::from_base58_string(program_id);
 
-   // Filter the loaded IDL set down to programs whose name matches the OPP
-   // outpost program so we don't construct a client around an unrelated IDL.
+   // Filter the loaded IDL set down to programs whose name matches the
+   // configured OPP outpost program name so we don't construct a client
+   // around an unrelated IDL.
+   auto program_idls = filter_outpost_program_idls(my->get_idl_files(), my->outpost_program_name());
+   FC_ASSERT(!program_idls.empty(),
+             "IDL for program '{}' not loaded — pass --solana-idl-file (and --{} when the outpost "
+             "IDL uses a different program name)",
+             my->outpost_program_name(),
+             option_outpost_program_name);
+
+   return std::make_shared<outpost_solana_client>(
+      entry, program_key, std::move(program_idls), chain_code, chain_id);
+}
+
+std::vector<fc::network::solana::idl::program> filter_outpost_program_idls(
+   const std::vector<std::pair<std::filesystem::path, std::vector<fc::network::solana::idl::program>>>& idl_files,
+   std::string_view program_name) {
    std::vector<fc::network::solana::idl::program> program_idls;
-   for (auto& [path, programs] : my->get_idl_files()) {
+   for (auto& [path, programs] : idl_files) {
       for (auto& p : programs) {
-         if (p.name == OPP_SOLANA_OUTPOST_PROGRAM_NAME) {
+         if (p.name == program_name) {
             program_idls.push_back(p);
          }
       }
    }
-   FC_ASSERT(!program_idls.empty(),
-             "IDL for program '{}' not loaded — pass --solana-idl-file",
-             OPP_SOLANA_OUTPOST_PROGRAM_NAME);
-
-   return std::make_shared<outpost_solana_client>(
-      entry, program_key, std::move(program_idls), chain_code, chain_id);
+   return program_idls;
 }
 
 } // namespace sysio
