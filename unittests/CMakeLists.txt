@@ -51,7 +51,7 @@ add_custom_command(
 message(STATUS "Using libsodium from vcpkg")
 
 ### BUILD UNIT TEST EXECUTABLE ###
-file(GLOB UNIT_TESTS "*.cpp") # find all unit test suites
+file(GLOB UNIT_TESTS CONFIGURE_DEPENDS "*.cpp") # find all unit test suites
 unittest_target(
   unit_test
   SOURCE_FILES

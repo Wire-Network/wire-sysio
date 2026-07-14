@@ -1,5 +1,5 @@
 
-file(GLOB_RECURSE SRC_FILES *.cpp *.hpp)
+file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS *.cpp *.hpp)
 
 add_executable(test_fc_lite
         ${SRC_FILES}
