@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
   "description": "SEC-94 terminal epoch_in legacy-transaction budget fixture. The dynamic accounts are modeled as distinct remaining_accounts, which upper-bounds packet/account-key growth when shared programs dedupe with the static IDL accounts.",
-  "program": "opp_outpost",
+  "program": "liqsol_core",
   "instruction": "epoch_in",
-  "program_id": "2FcAgnSdn29VXZ3eF2jS4U4KzGaYm5M9Wha1CtArm9EU",
+  "program_id": "5nBtmutQLrRKBUxNfHJPDjiW5u8id6QM9Hhjg1D1g1XH",
   "legacy_packet_limit_bytes": 1232,
   "runtime_account_limit": 64,
   "legacy_account_key_limit": 256,

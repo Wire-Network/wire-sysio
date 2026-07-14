@@ -291,6 +291,92 @@ BOOST_AUTO_TEST_CASE(can_load_opp_outpost_idl) try {
    BOOST_CHECK(has_emit);
 } FC_LOG_AND_RETHROW();
 
+BOOST_AUTO_TEST_CASE(filter_outpost_program_idls_selects_configured_name) try {
+   std::vector<std::pair<std::filesystem::path, std::vector<idl::program>>> idl_files;
+   idl_files.emplace_back("counter.json",
+                          std::vector<idl::program>{load_idl_fixture(counter_anchor_idl_fixture)});
+   idl_files.emplace_back("outpost.json",
+                          std::vector<idl::program>{load_idl_fixture(opp_outpost_idl_fixture)});
+
+   // The default constant selects the standalone outpost program's IDL only.
+   auto defaults =
+      sysio::filter_outpost_program_idls(idl_files, sysio::OPP_SOLANA_OUTPOST_PROGRAM_NAME);
+   BOOST_REQUIRE_EQUAL(defaults.size(), 1u);
+   BOOST_CHECK_EQUAL(defaults.front().name, "opp_outpost");
+
+   // A configured `--solana-outpost-program-name` override (e.g. liqsol_core
+   // hosting the outpost interface) selects by the overridden name instead.
+   auto counter = sysio::filter_outpost_program_idls(idl_files, "counter_anchor");
+   BOOST_REQUIRE_EQUAL(counter.size(), 1u);
+   BOOST_CHECK_EQUAL(counter.front().name, "counter_anchor");
+
+   // No loaded IDL with the configured name -> empty (create_outpost_client
+   // FC_ASSERTs on this with a remediation message).
+   BOOST_CHECK(sysio::filter_outpost_program_idls(idl_files, "liqsol_core").empty());
+   BOOST_CHECK(sysio::filter_outpost_program_idls({}, sysio::OPP_SOLANA_OUTPOST_PROGRAM_NAME).empty());
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(outpost_program_name_default_is_opp_outpost) try {
+   // The option default is back-compat load-bearing: pre-cleanroom deployments
+   // pass no --solana-outpost-program-name and must keep matching opp_outpost.
+   BOOST_CHECK_EQUAL(std::string{sysio::OPP_SOLANA_OUTPOST_PROGRAM_NAME}, "opp_outpost");
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(resolve_token_custody_reads_outpost_config_maps) try {
+   using sysio::outpost_solana_client_detail::resolve_token_custody;
+
+   const auto spl_mint      = measurement_pubkey(77);
+   const auto native_marker = system::program_ids::SYSTEM_PROGRAM;
+
+   fc::variants addresses;
+   addresses.push_back(fc::mutable_variant_object("token_code", 111)(
+      "mint", spl_mint.to_string(fc::yield_function_t{})));
+   addresses.push_back(fc::mutable_variant_object("token_code", 222)(
+      "mint", native_marker.to_string(fc::yield_function_t{})));
+   fc::variants precisions;
+   precisions.push_back(fc::mutable_variant_object("token_code", 111)("decimals", 6));
+   precisions.push_back(fc::mutable_variant_object("token_code", 222)("decimals", 9));
+
+   const fc::variant_object config =
+      fc::mutable_variant_object("token_addresses_by_code", std::move(addresses))(
+         "precision_by_token_code", std::move(precisions));
+
+   // SPL binding: configured mint + configured decimals.
+   const auto spl = resolve_token_custody(config, 111);
+   BOOST_CHECK(spl.mint == spl_mint);
+   BOOST_CHECK_EQUAL(static_cast<unsigned>(spl.decimals), 6u);
+
+   // Explicit zero-mint binding (the harness registers native SOL this way):
+   // native custody + its configured precision.
+   const auto native = resolve_token_custody(config, 222);
+   BOOST_CHECK(native.mint == native_marker);
+   BOOST_CHECK_EQUAL(static_cast<unsigned>(native.decimals), 9u);
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(resolve_token_custody_requires_both_config_entries) try {
+   using sysio::outpost_solana_client_detail::resolve_token_custody;
+
+   const auto spl_mint = measurement_pubkey(78);
+   fc::variants addresses;
+   addresses.push_back(fc::mutable_variant_object("token_code", 111)(
+      "mint", spl_mint.to_string(fc::yield_function_t{})));
+
+   // Address bound but precision missing -> throws (wire-ethereum
+   // WIRE_TokenPrecisionUnset parity; program PrecisionUnconfigured parity).
+   const fc::variant_object address_only =
+      fc::mutable_variant_object("token_addresses_by_code", addresses)(
+         "precision_by_token_code", fc::variants{});
+   BOOST_CHECK_THROW(resolve_token_custody(address_only, 111), fc::assert_exception);
+
+   // Unknown token_code entirely -> throws on the address requirement.
+   BOOST_CHECK_THROW(resolve_token_custody(address_only, 999), fc::assert_exception);
+
+   // Config carrying no maps at all -> throws.
+   BOOST_CHECK_THROW(
+      resolve_token_custody(fc::variant_object{fc::mutable_variant_object{}}, 111),
+      fc::assert_exception);
+} FC_LOG_AND_RETHROW();
+
 BOOST_AUTO_TEST_CASE(opp_outpost_epoch_in_has_chunked_args) try {
    auto prog = load_idl_fixture(opp_outpost_idl_fixture);
 

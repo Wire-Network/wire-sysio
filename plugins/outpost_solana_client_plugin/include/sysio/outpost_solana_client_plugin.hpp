@@ -11,9 +11,12 @@
 namespace sysio {
 using namespace fc::network::solana;
 
-/// Program name used in the Anchor IDL for the Solana OPP outpost. Shared
-/// between the outpost_solana_client_plugin and the batch_operator_plugin so
-/// both speak a single constant when locating the program's IDL entry.
+/// Default program name used in the Anchor IDL for the Solana OPP outpost.
+/// Shared between the outpost_solana_client_plugin and the batch_operator_plugin
+/// so both speak a single constant when locating the program's IDL entry.
+/// Overridable at runtime via `--solana-outpost-program-name`: the clean-room
+/// outpost implementation is hosted inside the `liqsol_core` program, whose
+/// generated IDL carries that name instead of `opp_outpost`.
 inline constexpr const char* OPP_SOLANA_OUTPOST_PROGRAM_NAME = "opp_outpost";
 
 /// Interval between successive `getSignaturesForAddress` + log-scan attempts
@@ -45,6 +48,23 @@ struct solana_client_entry_t {
 
 using solana_client_entry_ptr = std::shared_ptr<solana_client_entry_t>;
 
+/**
+ * @brief Filter loaded IDL definitions down to the OPP outpost program.
+ *
+ * Walks `idl_files` (shaped like `outpost_solana_client_plugin::get_idl_files()`)
+ * and returns every program definition whose IDL name equals `program_name`, so
+ * an outpost client is never constructed around an unrelated IDL.
+ *
+ * @param idl_files    Loaded IDL files: one `(path, programs)` pair per file.
+ * @param program_name IDL program name to match — the configured
+ *                     `--solana-outpost-program-name` (default
+ *                     `OPP_SOLANA_OUTPOST_PROGRAM_NAME`).
+ * @return Matching program definitions (empty when none match).
+ */
+std::vector<fc::network::solana::idl::program> filter_outpost_program_idls(
+   const std::vector<std::pair<std::filesystem::path, std::vector<fc::network::solana::idl::program>>>& idl_files,
+   std::string_view program_name);
+
 /// Typed program client for the Solana OPP outpost program. Mirrors the
 /// Ethereum `opp_contract_client` / `opp_inbound_contract_client` pattern —
 /// each `solana_program_tx_fn<RT, Args...>` is a strongly-typed wrapper that
@@ -54,8 +74,10 @@ using solana_client_entry_ptr = std::shared_ptr<solana_client_entry_t>;
 /// list, so the static PDAs are pre-derived from the program ID at construction
 /// and injected via account_overrides on every call.
 ///
-/// These signatures must stay in sync with `wire-solana/programs/opp-outpost/`
-/// (see its generated IDL at `wire-solana/target/idl/opp_outpost.json`).
+/// These signatures must stay in sync with the Solana OPP outpost program —
+/// since the clean-room rewrite it is hosted inside
+/// `wire-solana/programs/liqsol-core/` (`src/instructions/opp/`; generated IDL
+/// at `wire-solana/target/idl/liqsol_core.json`).
 struct opp_solana_outpost_client : fc::network::solana::solana_program_client {
    // Pre-computed static PDAs (deterministic from program_id).
    fc::network::solana::solana_public_key config_pda;
@@ -351,7 +373,8 @@ public:
     * @brief Build an `outpost_client` concrete for a Solana outpost.
     *
     * Resolves the shared chain-connection entry by id, filters the plugin's
-    * loaded IDLs down to those matching `OPP_SOLANA_OUTPOST_PROGRAM_NAME`,
+    * loaded IDLs down to those matching the configured
+    * `--solana-outpost-program-name` (default `OPP_SOLANA_OUTPOST_PROGRAM_NAME`),
     * and constructs an `outpost_solana_client` bound to the given program id.
     *
     * @param sol_client_id  Id passed to `--outpost-solana-client`.
