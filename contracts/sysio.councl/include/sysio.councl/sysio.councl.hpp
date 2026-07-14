@@ -77,7 +77,9 @@ public:
    void startinit(uint64_t time_slot_sec, std::vector<name> ordered_owners);
 
    /// Append up to `max_rows` of roa's tier-`tier` (2 or 3) owners into the frozen snapshot,
-   /// resuming from the load cursor. Call repeatedly until complete. Governance only.
+   /// skipping owners already snapshotted (identity-based resume, so owners forcereg'd in roa
+   /// mid-load are absorbed by a later batch). Call repeatedly until `finalizeinit`'s count
+   /// cross-check passes. Idempotent. Governance only.
    [[sysio::action]]
    void loadtier(uint8_t tier, uint32_t max_rows);
 

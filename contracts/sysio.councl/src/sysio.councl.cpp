@@ -293,23 +293,31 @@ void council::loadtier(uint8_t tier, uint32_t max_rows) {
 
    roa::nodeowners_t no(councl::ROA_ACCOUNT, cfg.network_gen);
    auto idx = no.get_index<"bytier"_n>();
+   // Resume by identity, not position: an owner is skipped iff it is already in the snapshot
+   // (byowner lookup). A positional (skip-count) cursor mis-resumes when roa's tier set grows
+   // between batches — a newcomer sorting before the cursor shifts the enumeration, duplicating
+   // one owner and dropping another while finalizeinit's count cross-check still passes.
+   // Identity dedup also absorbs such newcomers: whichever batch encounters them appends them,
+   // so t{2,3}_loaded converges on the live nodecount and finalizeinit stays reachable.
    const uint32_t already = (tier == 2) ? cfg.t2_loaded : cfg.t3_loaded;
-   uint32_t seen = 0, written = 0;
+   uint32_t written = 0;
 
    if (tier == 2) {
       tier2_t t2(get_self(), cfg.election_gen);
+      auto by_owner = t2.get_index<"byowner"_n>();
       for (auto it = idx.lower_bound(static_cast<uint64_t>(2)); it != idx.end() && written < max_rows; ++it) {
          if (it->tier != 2) break;
-         if (seen < already) { ++seen; continue; }
+         if (by_owner.find(it->owner.value) != by_owner.end()) continue; // already snapshotted
          t2.emplace(ram_payer, index_key{already + written}, tier2_row{already + written, it->owner});
          ++written;
       }
       cfg.t2_loaded += written;
    } else {
       tier3_t t3(get_self(), cfg.election_gen);
+      auto by_owner = t3.get_index<"byowner"_n>();
       for (auto it = idx.lower_bound(static_cast<uint64_t>(3)); it != idx.end() && written < max_rows; ++it) {
          if (it->tier != 3) break;
-         if (seen < already) { ++seen; continue; }
+         if (by_owner.find(it->owner.value) != by_owner.end()) continue; // already snapshotted
          t3.emplace(ram_payer, index_key{already + written}, tier3_row{already + written, it->owner});
          ++written;
       }

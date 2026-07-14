@@ -343,13 +343,13 @@ BOOST_FIXTURE_TEST_CASE(staged_load_and_finalize, sysio_councl_tester) { try {
 } FC_LOG_AND_RETHROW() }
 
 // ── staged load: roa tier churn between loadtier batches ──────────────────
-/// REGRESSION (known bug, currently FAILS): loadtier resumes by *position* (skip-count over the
-/// live bytier enumeration), not by identity. A tier-2 owner forcereg'd between batches that
-/// sorts before an already-loaded owner shifts the enumeration, so the resumed batch re-writes
-/// an already-snapshotted owner (duplicate) and never writes the newcomer — while finalizeinit's
-/// count cross-check still passes. The frozen snapshot must be a faithful, duplicate-free copy
-/// of roa's tier-2 set (DESIGN.md §11: the election is immune to roa churn only if the snapshot
-/// itself is sound).
+/// REGRESSION: loadtier must resume by *identity* (skip owners already snapshotted), not by
+/// position. A skip-count cursor mis-resumed when a tier-2 owner forcereg'd between batches
+/// sorted before an already-loaded owner: the shifted enumeration re-wrote a snapshotted owner
+/// (duplicate) and never wrote the newcomer, while finalizeinit's count cross-check still
+/// passed. Identity-based dedup instead absorbs the newcomer in the next batch, keeping the
+/// frozen snapshot a faithful, duplicate-free copy of roa's tier-2 set (DESIGN.md §11: the
+/// election is immune to roa churn only if the snapshot itself is sound).
 BOOST_FIXTURE_TEST_CASE(loadtier_roa_churn_mid_load, sysio_councl_tester) { try {
    register_candidates(23);
    register_tiers();                                  // the 21 tier-1 owners only
