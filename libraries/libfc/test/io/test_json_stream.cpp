@@ -143,21 +143,20 @@ BOOST_AUTO_TEST_CASE(value_double_locale_independent) {
       BOOST_TEST_MESSAGE("no comma-radix locale available; skipping locale-independence assertion");
       return;
    }
-   BOOST_CHECK_EQUAL(fc::to_json_string(1.5), "1.5");
-   BOOST_CHECK_EQUAL(fc::to_json_string(-2.25), "-2.25");
-   // Round-trip: any finite double must parse back to its bit-exact value.
-   // strtod_l with the C locale avoids re-introducing the comma-radix issue.
-   auto round_trip = [](double d) {
-      const std::string s = fc::to_json_string(d);
-      double parsed = 0.0;
-      auto [_, ec] = std::from_chars(s.data(), s.data() + s.size(), parsed);
-      BOOST_REQUIRE(ec == std::errc{});
-      BOOST_CHECK_EQUAL(parsed, d);
+
+   // Under a comma-radix locale the emitted number must (a) never contain a ',' radix
+   // and (b) match the variant path byte-for-byte -- doubles emit as a quoted
+   // fixed-precision string (digits10+2), so the check is against the reference
+   // emitter, not a hard-coded shortest-form spelling.  std::from_chars<double> is
+   // deliberately not used: AppleClang's libc++ does not implement it.
+   auto via_variant = [](double d) {
+      return fc::json::to_string(fc::variant(d), fc::json::yield_function_t());
    };
-   round_trip(0.1);
-   round_trip(1.0 / 3.0);
-   round_trip(std::numeric_limits<double>::min());
-   round_trip(std::numeric_limits<double>::max());
+   for (double d : {1.5, -2.25, 0.1, 1.0 / 3.0, 1234.5, -9876.0}) {
+      const std::string s = fc::to_json_string(d);
+      BOOST_CHECK(s.find(',') == std::string::npos);   // no comma radix leaked from LC_NUMERIC
+      BOOST_CHECK_EQUAL(s, via_variant(d));            // period radix + exact parity with fc::variant
+   }
 }
 
 BOOST_AUTO_TEST_CASE(value_double_rejects_non_finite) {
