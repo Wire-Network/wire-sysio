@@ -499,6 +499,26 @@ uint64_t next_dellog_id() {
    return id;
 }
 
+/// Opening edge of the rolling termination window: dellog rows whose `ts_ms`
+/// is strictly below this are invisible to `termcheck` and safe to discard.
+uint64_t termination_window_open_ms(uint64_t now_ms, const opreg::op_config& cfg) {
+   return now_ms > cfg.terminate_window_ms ? now_ms - cfg.terminate_window_ms : 0;
+}
+
+/// Bounded oldest-first sweep of dellog rows that have aged out of the
+/// rolling termination window. `log_id` allocation order matches `ts_ms`
+/// order (both are monotonic), so the primary index walks oldest-first and
+/// the sweep stops at the first still-in-window row.
+void prune_dellog(uint64_t window_open_ms, uint32_t max_rows) {
+   opreg::dellog_t log(name{"sysio.opreg"_n});
+   uint32_t removed = 0;
+   for (auto it = log.begin();
+        it != log.end() && removed < max_rows && it->ts_ms < window_open_ms; ) {
+      it = log.erase(std::move(it));
+      ++removed;
+   }
+}
+
 /// Get the current epoch index from sysio.epoch's epochstate singleton.
 /// Returns 0 if epochstate isn't initialized yet (cluster bootstrap).
 uint32_t get_current_epoch() {
@@ -1450,6 +1470,14 @@ void opreg::terminate(name account, std::string reason) {
 void opreg::recorddel(name account, uint32_t epoch, bool delivered) {
    require_auth(EPOCH_ACCOUNT);
 
+   uint64_t now_ms = current_time_ms();
+
+   // On-write half of the dellog retention contract: sweep a bounded number
+   // of rows that have aged out of the rolling window before adding one.
+   opconfig_t cfg_tbl(get_self());
+   const auto cfg = cfg_tbl.get_or_default(op_config{});
+   prune_dellog(termination_window_open_ms(now_ms, cfg), MAX_DELLOG_PRUNE_PER_WRITE);
+
    dellog_t log(get_self());
    uint64_t id = next_dellog_id();
    log.emplace(ram_payer, delivery_key{id}, delivery_log_entry{
@@ -1457,7 +1485,7 @@ void opreg::recorddel(name account, uint32_t epoch, bool delivered) {
       .account   = account,
       .epoch     = epoch,
       .delivered = delivered,
-      .ts_ms     = current_time_ms(),
+      .ts_ms     = now_ms,
    });
 }
 
@@ -1489,7 +1517,7 @@ void opreg::termcheck(name account) {
    const auto cfg = cfg_tbl.get_or_default(op_config{});
 
    uint64_t now_ms      = current_time_ms();
-   uint64_t window_open = now_ms > cfg.terminate_window_ms ? now_ms - cfg.terminate_window_ms : 0;
+   uint64_t window_open = termination_window_open_ms(now_ms, cfg);
 
    dellog_t log(get_self());
    auto idx = log.get_index<"byaccountts"_n>();
@@ -1528,7 +1556,7 @@ void opreg::termcheck(name account) {
 }
 
 // ---------------------------------------------------------------------------
-//  prune — remove terminated operator rows past the delay
+//  prune — remove terminated operator rows past the delay + expired dellog rows
 // ---------------------------------------------------------------------------
 void opreg::prune() {
    opconfig_t cfg_tbl(get_self());
@@ -1551,6 +1579,10 @@ void opreg::prune() {
          ++it;
       }
    }
+
+   // Crank half of the dellog retention contract: clear delivery-log rows
+   // that have aged out of the rolling termination window.
+   prune_dellog(termination_window_open_ms(now, cfg), MAX_DELLOG_PRUNE_PER_CRANK);
 }
 
 } // namespace sysio
