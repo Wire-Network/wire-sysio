@@ -965,13 +965,16 @@ void dispatch_attestation(name self, uint64_t attestation_id,
 ///
 /// Run at BOTH ingress and acceptance: `deliver` `check()`s it, rejecting the operator's own
 /// malformed / forged / stale envelope before it is ever recorded, while `apply_consensus` soft-drops
-/// on it as defense in depth. Within an epoch the tip is stable -- it only advances when that epoch's
-/// winner is accepted -- so a deliver-accepted envelope validates identically at acceptance. Ingress
-/// rejection is what stops a majority-relayed invalid envelope from reaching consensus and stranding
-/// the epoch: a reverted `deliver` records no row, so no invalid version can win the tally (and the
-/// operator can re-deliver a corrected envelope), whereas a recorded-then-soft-dropped winner would
-/// leave `consensus_reached` true, no `outpcons` row, and no dispute or re-delivery path -- a
-/// permanent stall.
+/// on it as defense in depth. Within an epoch the tip is stable UNTIL that epoch's winner is
+/// accepted -- so a deliver-accepted envelope validates identically at acceptance. Once accepted,
+/// the tip has advanced past the winner itself; `deliver` therefore bypasses this validation for a
+/// LATE CONFIRMATION (an envelope byte-identical to the recorded winner, see the bypass in
+/// `deliver`) instead of mis-classifying it as a chain break. Ingress rejection is what stops a
+/// majority-relayed invalid envelope from reaching consensus and stranding the epoch: a reverted
+/// `deliver` records no row, so no invalid version can win the tally (and the operator can
+/// re-deliver a corrected envelope), whereas a recorded-then-soft-dropped winner would leave
+/// `consensus_reached` true, no `outpcons` row, and no dispute or re-delivery path -- a permanent
+/// stall.
 [[nodiscard]] bool inbound_envelope_valid(name self, const opp::Envelope& envelope,
                                           uint64_t chain_code, uint32_t epoch_index,
                                           checksum256& out_envelope_digest,
@@ -1330,12 +1333,36 @@ void msgch::deliver(name batch_op_name, uint64_t chain_code, std::vector<char> d
    // relaying the same invalid envelope can no longer reach consensus only to be soft-dropped, which
    // would strand the epoch with no `outpcons` row and no dispute path (consensus_reached stays
    // true). A reverted tx records nothing, so the operator can immediately deliver a corrected one.
+   //
+   // LATE CONFIRMATION bypass: once this epoch's winner is accepted, `outpcons.envelope_digest`
+   // advances to the accepted envelope's own digest, so the winner no longer "continues" the chain
+   // it just extended -- validating it against the advanced tip would revert every remaining
+   // operator's delivery of the exact accepted bytes. Those rows are protocol-relevant:
+   // `sysio.epoch::advance` classifies each operator's delivery as canonical or slashable, and a
+   // reverted delivery would instead mark the confirmer as a non-deliverer. An envelope whose
+   // sha256 equals the recorded `winning_checksum` for THIS epoch is byte-identical to the winner
+   // that already passed full validation at ingress and acceptance, so it is recorded without
+   // re-validation. Anything else -- including a divergent envelope arriving after acceptance --
+   // still validates against the advanced tip and reverts (fail closed: post-acceptance divergence
+   // cannot open a dispute, so there is nothing to record it for).
    {
-      checksum256 ingress_digest{};
-      checksum256 ingress_message_tip{};
-      check(inbound_envelope_valid(get_self(), env_check, chain_code, epoch, ingress_digest,
-                                   ingress_message_tip),
-            "delivered envelope failed inbound-chain or semantic-header validation");
+      bool late_confirmation = false;
+      {
+         msgch::outpost_consensus_t opcons(get_self());
+         auto opc_pk = msgch::outpost_consensus_key{chain_code};
+         if (opcons.contains(opc_pk)) {
+            const auto row    = opcons.get(opc_pk);
+            late_confirmation = row.epoch_index == epoch && row.consensus_reached &&
+                                row.winning_checksum == cs;
+         }
+      }
+      if (!late_confirmation) {
+         checksum256 ingress_digest{};
+         checksum256 ingress_message_tip{};
+         check(inbound_envelope_valid(get_self(), env_check, chain_code, epoch, ingress_digest,
+                                      ingress_message_tip),
+               "delivered envelope failed inbound-chain or semantic-header validation");
+      }
    }
 
    // Store envelope

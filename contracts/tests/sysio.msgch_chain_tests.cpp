@@ -76,6 +76,8 @@ public:
    static constexpr auto CHAINS_ACCOUNT = "sysio.chains"_n;
    static constexpr auto UWRIT_ACCOUNT  = "sysio.uwrit"_n;
    static constexpr auto BATCHOP        = "batchop.a"_n;
+   static constexpr auto BATCHOP_B      = "batchop.b"_n;
+   static constexpr auto BATCHOP_C      = "batchop.c"_n;
 
    static constexpr uint32_t EPOCH_DURATION_SEC = 60;
 
@@ -87,7 +89,7 @@ public:
       // pay-epoch transfers. Same bootstrap rationale as sysio_epoch_flushwtdw_tester.
       create_accounts({
          TOKEN_ACCOUNT, EPOCH_ACCOUNT, OPREG_ACCOUNT, MSGCH_ACCOUNT,
-         CHALG_ACCOUNT, CHAINS_ACCOUNT, UWRIT_ACCOUNT, BATCHOP,
+         CHALG_ACCOUNT, CHAINS_ACCOUNT, UWRIT_ACCOUNT, BATCHOP, BATCHOP_B, BATCHOP_C,
          "sysio.dclaim"_n, "sysio.gov"_n, "sysio.ops"_n
       });
       produce_blocks(2);
@@ -190,14 +192,18 @@ public:
             ("pay_cadence_epochs",     uint16_t(1))));
    }
 
-   /// Epoch + opreg config, one bootstrapped batch op, ETH + SOL chain rows, group schedule,
-   /// genesis advance.
-   void bootstrap() {
+   /// Epoch + opreg config, bootstrapped batch ops (`BATCHOP` always; `BATCHOP_B`/`BATCHOP_C` when
+   /// `n_batch_ops` is 3 -- a single group of three, so consensus needs more than one delivery),
+   /// ETH + SOL chain rows, group schedule, genesis advance.
+   void bootstrap(uint32_t n_batch_ops = 1) {
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT,
          "setconfig"_n, mvo()
             ("epoch_duration_sec",                  EPOCH_DURATION_SEC)
-            ("operators_per_epoch",                 1)
-            ("batch_operator_minimum_active",       1)
+            // Consensus group size: evalcons' unanimous/majority thresholds derive from
+            // `epochcfg.operators_per_epoch` (see msgch's epoch_operators_per_group). The epoch
+            // contract enforces minimum_active == operators_per_epoch * batch_op_groups.
+            ("operators_per_epoch",                 n_batch_ops)
+            ("batch_operator_minimum_active",       n_batch_ops)
             ("batch_op_groups",                     1)
             ("epoch_retention_envelope_log_count",  200)));
 
@@ -219,11 +225,18 @@ public:
             ("req_batchop_collat",               fc::variants{})
             ("req_uw_collat",                    fc::variants{})));
 
-      BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT,
-         "regoperator"_n, mvo()
-            ("account",          BATCHOP.to_string())
-            ("type",             opp::types::OperatorType::OPERATOR_TYPE_BATCH)
-            ("is_bootstrapped",  true)));
+      std::vector<name> batch_ops{BATCHOP};
+      if (n_batch_ops == 3) {
+         batch_ops.push_back(BATCHOP_B);
+         batch_ops.push_back(BATCHOP_C);
+      }
+      for (const auto& op : batch_ops) {
+         BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT,
+            "regoperator"_n, mvo()
+               ("account",          op.to_string())
+               ("type",             opp::types::OperatorType::OPERATOR_TYPE_BATCH)
+               ("is_bootstrapped",  true)));
+      }
 
       register_chain(opp::types::ChainKind::CHAIN_KIND_EVM, "ETH", 31337);
       register_chain(opp::types::ChainKind::CHAIN_KIND_SVM, "SOL", 1);
@@ -269,10 +282,23 @@ public:
    // -- msgch actions --
 
    action_result deliver(uint64_t chain_code, const std::vector<char>& data) {
-      return push(MSGCH_ACCOUNT, msgch_abi, BATCHOP, "deliver"_n, mvo()
-         ("batch_op_name", BATCHOP.to_string())
+      return deliver_as(BATCHOP, chain_code, data);
+   }
+
+   action_result deliver_as(name op, uint64_t chain_code, const std::vector<char>& data) {
+      return push(MSGCH_ACCOUNT, msgch_abi, op, "deliver"_n, mvo()
+         ("batch_op_name", op.to_string())
          ("chain_code",    chain_code)
          ("data",          data));
+   }
+
+   /// Let the consensus boundary elapse WITHOUT advancing the epoch: evalcons' fallback
+   /// (majority) path opens once `epoch_duration_sec` has passed since the epoch started,
+   /// while `deliver`'s epoch gate keeps accepting envelopes for the still-current epoch.
+   void elapse_epoch_boundary() {
+      for (uint32_t i = 0; i < EPOCH_DURATION_SEC * 2 + 1; ++i) {
+         produce_block();
+      }
    }
 
    action_result queueout(uint64_t chain_code, uint32_t attest_type,
@@ -891,6 +917,73 @@ BOOST_FIXTURE_TEST_CASE(inbound_bootstrap_accepts_unverifiable_prev, sysio_msgch
    BOOST_REQUIRE_EQUAL(opc["epoch_index"].as<uint32_t>(), epoch);
    BOOST_REQUIRE_EQUAL(opc["envelope_digest"].as_string(), n1_digest.str());
    BOOST_REQUIRE_EQUAL(attestation_count(SOL_OUTPOST_ID, epoch), 1u);
+} FC_LOG_AND_RETHROW() }
+
+/// Late confirmation: once an epoch's winner is accepted, the per-stream tip advances to the
+/// winner's own digest, so the winner no longer "continues" the chain it just extended. The
+/// remaining operators of the group still deliver the exact accepted bytes (`sysio.epoch::advance`
+/// classifies every operator's delivery as canonical or slashable), and `deliver` must record --
+/// not chain-break-revert -- them. A three-operator group reaches majority consensus at the second
+/// post-boundary delivery; the third operator's byte-identical delivery is the late confirmation.
+/// A DIVERGENT post-acceptance delivery still reverts (fail closed): post-acceptance divergence
+/// cannot open a dispute, so nothing legitimate is lost by rejecting it at ingress.
+BOOST_FIXTURE_TEST_CASE(late_confirmation_after_consensus_recorded, sysio_msgch_chain_tester) { try {
+   bootstrap(/*n_batch_ops=*/3);
+
+   const uint32_t epoch = current_epoch();
+   auto winner = encode_delivery(epoch, "late-confirm");
+   const auto winner_digest = oracle::epoch_digest(decode_envelope(winner));
+
+   // First delivery: group of three, boundary not elapsed -- no consensus yet.
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, winner));
+   produce_blocks();
+   {
+      auto opc = get_outpcons(ETH_OUTPOST_ID);
+      BOOST_REQUIRE(opc.is_null() || !opc["consensus_reached"].as<bool>());
+   }
+
+   // Second delivery after the boundary: majority (2 of 3) tips consensus and advances the tip
+   // to the winner's own digest.
+   elapse_epoch_boundary();
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, winner));
+   produce_blocks();
+   {
+      auto opc = get_outpcons(ETH_OUTPOST_ID);
+      BOOST_REQUIRE(!opc.is_null());
+      BOOST_REQUIRE_EQUAL(opc["consensus_reached"].as<bool>(), true);
+      BOOST_REQUIRE_EQUAL(opc["epoch_index"].as<uint32_t>(), epoch);
+      BOOST_REQUIRE_EQUAL(opc["envelope_digest"].as_string(), winner_digest.str());
+   }
+
+   // A post-acceptance DIVERGENT envelope is not a late confirmation: its bytes differ from the
+   // recorded winner, so it validates against the advanced tip and reverts as a chain break.
+   auto divergent = encode_delivery(epoch, "late-diverge");
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: delivered envelope failed inbound-chain or "
+            "semantic-header validation"),
+      deliver_as(BATCHOP_C, ETH_OUTPOST_ID, divergent));
+   produce_blocks();
+
+   // The third operator's byte-identical delivery IS a late confirmation: recorded, not reverted.
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, ETH_OUTPOST_ID, winner));
+   produce_blocks();
+
+   // The duplicate guard now proves the confirmation row exists: a re-delivery from the same
+   // operator reports "already delivered" (it would report a chain break if the row had not been
+   // recorded).
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: operator already delivered for this outpost+epoch"),
+      deliver_as(BATCHOP_C, ETH_OUTPOST_ID, winner));
+
+   // Acceptance state is untouched by the late confirmation: same tip, same epoch, attestations
+   // dispatched exactly once.
+   {
+      auto opc = get_outpcons(ETH_OUTPOST_ID);
+      BOOST_REQUIRE_EQUAL(opc["consensus_reached"].as<bool>(), true);
+      BOOST_REQUIRE_EQUAL(opc["epoch_index"].as<uint32_t>(), epoch);
+      BOOST_REQUIRE_EQUAL(opc["envelope_digest"].as_string(), winner_digest.str());
+      BOOST_REQUIRE_EQUAL(attestation_count(ETH_OUTPOST_ID, epoch), 1u);
+   }
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()
