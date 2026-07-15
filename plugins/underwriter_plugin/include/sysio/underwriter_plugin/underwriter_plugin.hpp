@@ -23,14 +23,10 @@ namespace sysio {
       constexpr uint32_t scan_interval_ms    = 5000;
       constexpr uint32_t action_timeout_ms   = 15000;
       constexpr bool     enabled             = false;
-      /// Behind-now gap (ms) under which the node counts as synced. Measured
-      /// against the LAST IRREVERSIBLE block's time — the state the plugin's
-      /// table reads actually serve (operator daemons run read-mode =
-      /// irreversible). Gates the deferred startup (preflight → cron) on
-      /// cold-booting operator nodes; see `sync_detail.hpp::block_time_is_recent`.
-      /// Must exceed steady-state finality lag (a few blocks) and stay well
-      /// under one epoch.
-      constexpr uint32_t sync_recency_ms     = 5000;
+      // The sync-recency window moved to `chain_apis::default_sync_recency_ms`
+      // (sysio/chain_plugin/sync_gate.hpp) — the gate is a first-class
+      // chain_plugin API (`is_synced()` / `synced()`) shared by every
+      // operator-daemon plugin.
       /// How long after the sync gate arms a failing preflight keeps
       /// RETRYING before the failure is terminal. Rows the harness confirmed
       /// final on the producer can land in the LOCAL irreversible state a

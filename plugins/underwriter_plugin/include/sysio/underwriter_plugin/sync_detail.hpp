@@ -1,17 +1,19 @@
 #pragma once
 /**
  * @file sync_detail.hpp
- * @brief Pure sync-gate predicate for the underwriter plugin, lifted out of the
- *        `.cpp`-private impl so it is unit-testable without standing up a chain.
+ * @brief Pure gate-lifecycle machinery for the underwriter plugin — the deferred-
+ *        startup states and the `/v1/underwriter/*` gate payloads — lifted out of
+ *        the `.cpp`-private impl so they are unit-testable without standing up a
+ *        chain.
  *
  * The underwriter's startup preflight validates depot-side state (opreg
  * registration, chain registry, authex links) via LOCAL table reads. On a
  * cold-booting operator node those reads see mid-sync (possibly genesis)
  * state and fail spuriously, so the plugin must not begin underwriting until
- * the node is synced. "Synced" here means the LAST IRREVERSIBLE block's time
- * is within a small window of wall-clock now — the irreversible state is what
- * the plugin's table reads actually serve (operator daemons run read-mode =
- * irreversible).
+ * the node is synced. The sync predicate itself is the first-class chain_plugin
+ * gate — `chain_plugin::is_synced()` / `synced()` backed by
+ * `sysio/chain_plugin/sync_gate.hpp` — shared by every operator-daemon plugin;
+ * this header carries only the underwriter's OWN gate lifecycle surface.
  */
 
 #include <fc/time.hpp>
@@ -22,26 +24,6 @@
 #include <optional>
 
 namespace sysio::underwriter_detail {
-
-/**
- * @brief True when a block time is recent enough to treat the node as synced.
- *
- * While a cold-booting node syncs blocks the tested time trails `now` by the
- * catch-up gap; once caught up, it tracks `now` to within finality-lag
- * jitter. The window must exceed that jitter (plus scheduling slack) but stay
- * well under one epoch so underwriting never starts against stale state.
- *
- * @param block_time     The block timestamp to test — the caller's sync
- *                       criterion (the underwriter feeds the LAST IRREVERSIBLE
- *                       block's time, since that is the state its reads serve).
- * @param now            Wall-clock now.
- * @param recency_window Maximum behind-now gap still considered synced.
- * @return True when `block_time >= now - recency_window`.
- */
-inline bool block_time_is_recent(fc::time_point block_time, fc::time_point now,
-                                 fc::microseconds recency_window) {
-   return block_time >= now - recency_window;
-}
 
 /// JSON field keys shared by the gate payloads below, the post-startup
 /// response builders in `underwriter_plugin.cpp`, and their tests — one

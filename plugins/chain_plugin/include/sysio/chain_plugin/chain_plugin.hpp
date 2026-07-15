@@ -5,6 +5,7 @@
 #include <sysio/chain_plugin/trx_finality_status_processing.hpp>
 #include <sysio/chain_plugin/tracked_votes.hpp>
 #include <sysio/chain_plugin/get_info_db.hpp>
+#include <sysio/chain_plugin/sync_gate.hpp>
 
 #include <sysio/chain/application.hpp>
 #include <sysio/chain/asset.hpp>
@@ -22,6 +23,7 @@
 
 #include <boost/container/flat_set.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
+#include <boost/signals2/signal.hpp>
 
 #include <fc/time.hpp>
 
@@ -687,6 +689,33 @@ public:
                    fc::microseconds timeout,
                    std::string_view log_prefix,
                    const std::atomic<bool>& shutdown_flag);
+
+   /// The "node is synced" predicate: true when the LAST IRREVERSIBLE block's time is
+   /// within `recency` of wall-clock now (see `chain_apis::lib_time_is_recent`). LIB
+   /// recency, not head recency, deliberately — operator daemons run read-mode =
+   /// irreversible, so this is the state their table reads actually serve. False while
+   /// no irreversible root exists (fresh boot, mid-replay, snapshot catch-up).
+   ///
+   /// Only call this after plugin_initialize()!
+   bool is_synced(fc::microseconds recency =
+                     fc::milliseconds(chain_apis::default_sync_recency_ms)) const;
+
+   /// Signal emitted on each transition of {@link is_synced} from stale to synced
+   /// (evaluated per accepted block at the default recency; startup replay is skipped).
+   ///
+   /// Contract:
+   ///  - Slots run on the main thread FROM THE APPLICATION EXECUTOR QUEUE (medium
+   ///    priority), AFTER the triggering block has fully committed — never mid
+   ///    block-application — so they may read chain state (tables, fork_db) directly.
+   ///  - Emitted once per stale→synced transition, not once per process: a node that
+   ///    stalls and re-syncs fires again. Consumers wanting one-shot delivery
+   ///    disconnect inside their slot (resetting the owning `scoped_connection` from
+   ///    within the slot is safe).
+   ///  - Consumers gating deferred startup use the two-branch idiom: check
+   ///    {@link is_synced} first and run inline when already synced; otherwise connect.
+   ///    Both plugin_startup and emission run on the main thread, so check-then-connect
+   ///    cannot miss a transition.
+   boost::signals2::signal<void()>& synced();
 
    void accept_transaction(const chain::packed_transaction_ptr& trx, chain::plugin_interface::next_function<chain::transaction_trace_ptr> next);
 

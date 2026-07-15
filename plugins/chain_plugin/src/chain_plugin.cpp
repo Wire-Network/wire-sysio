@@ -259,11 +259,20 @@ public:
    chain_apis::trx_finality_status_processing_ptr                     _trx_finality_status_processing;
    std::optional<chain_apis::tracked_votes>                           _last_tracked_votes;
 
+   // Sync gate: stale→synced edge detector feeding the `synced()` signal (see
+   // sync_gate.hpp and check_synced_transition below). Main thread only.
+   chain_apis::sync_transition                                        synced_transition;
+   boost::signals2::signal<void()>                                    synced_signal;
+
    static void handle_guard_exception(const chain::guard_exception& e);
    void do_hard_replay(const variables_map& options);
    void enable_accept_transactions();
    void plugin_initialize(const variables_map& options);
    void plugin_startup();
+   /// Evaluate the sync predicate for the just-accepted block and, on a stale→synced
+   /// transition, emit the `synced()` signal via a posted task (see the call site in
+   /// the accepted_block handler and the signal's contract in chain_plugin.hpp).
+   void check_synced_transition();
    /// Verify the loaded snapshot against its on-chain attestation. Invoked from the
    /// irreversible-block handler with the just-finalized block; retries on later finalized
    /// blocks until the attestation record appears or the node catches up to the chain tip.
@@ -1219,6 +1228,8 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
             _get_info_db->on_accepted_block();
          }
 
+         check_synced_transition();
+
          accepted_block_channel.publish( priority::high, t );
       } );
 
@@ -1372,6 +1383,29 @@ void chain_plugin_impl::plugin_startup()
 
 } FC_CAPTURE_AND_RETHROW("") }
 
+void chain_plugin_impl::check_synced_transition() {
+   // Skip during startup replay: replayed blocks are almost never recent, and the
+   // per-block predicate would only add fork_db mutex traffic to the replay loop. A
+   // log that ends near now is covered by consumers' is_synced() fast path instead.
+   if (chain->is_replaying()) {
+      return;
+   }
+   const bool now_synced = chain_apis::lib_time_is_recent(
+      *chain, fc::time_point::now(), fc::milliseconds(chain_apis::default_sync_recency_ms));
+   if (!synced_transition.update(now_synced)) {
+      return;
+   }
+   ilog("node is synced — last-irreversible block time within {}ms of now",
+        chain_apis::default_sync_recency_ms);
+   // Emit from the executor queue, not inline: accepted_block fires MID
+   // block-application, where table reads observe an incomplete view. The posted task
+   // runs after the block fully commits, so slots may read chain state directly (the
+   // synced() signal's documented contract). Capturing `this` raw is safe: appbase
+   // drains queued tasks without executing them between shutdown_plugins() and
+   // destroy_plugins() (see application_base.hpp).
+   app().executor().post(appbase::priority::medium, [this]() { synced_signal(); });
+}
+
 void chain_plugin::plugin_startup() {
    my->plugin_startup();
 }
@@ -1498,6 +1532,14 @@ void chain_plugin::accept_transaction(const chain::packed_transaction_ptr& trx, 
 
 controller& chain_plugin::chain() { return *my->chain; }
 const controller& chain_plugin::chain() const { return *my->chain; }
+
+bool chain_plugin::is_synced(fc::microseconds recency) const {
+   return chain_apis::lib_time_is_recent(chain(), fc::time_point::now(), recency);
+}
+
+boost::signals2::signal<void()>& chain_plugin::synced() {
+   return my->synced_signal;
+}
 
 chain::chain_id_type chain_plugin::get_chain_id()const {
    return my->chain->get_chain_id();

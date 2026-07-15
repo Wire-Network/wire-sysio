@@ -187,6 +187,12 @@ struct batch_operator_plugin::impl {
    std::map<uint64_t, scheduled_opp_job_ids> scheduled_opp_jobs;
    std::atomic<bool>                 shutting_down{false};
 
+   /// Sync gate: `chain_plugin::synced()` subscription that arms
+   /// {@link run_deferred_startup_contained} once the local irreversible state
+   /// is current (see `sysio/chain_plugin/sync_gate.hpp`). Disconnected after
+   /// arming; reset on shutdown.
+   std::optional<boost::signals2::scoped_connection> sync_gate_connection;
+
    // -----------------------------------------------------------------------
    //  Chain-agnostic orchestration layer
    // -----------------------------------------------------------------------
@@ -812,6 +818,85 @@ struct batch_operator_plugin::impl {
          elog("batch_operator: push {}::{} timed out", contract, action_name);
       }
    }
+
+   // -----------------------------------------------------------------------
+   //  Sync-gated startup
+   // -----------------------------------------------------------------------
+
+   /// The startup body deferred behind the chain_plugin sync gate: outpost
+   /// discovery → private cron_service creation (sized from the discovered
+   /// outposts) → epoch_tick scheduling → per-outpost relay jobs. Runs on the
+   /// main thread, either directly from `plugin_startup` when the node is
+   /// already synced (an escape then aborts node startup — fail-fast,
+   /// supervisor-visible) or via {@link run_deferred_startup_contained} from
+   /// the `chain_plugin::synced()` slot. Deferral exists because
+   /// `refresh_outposts` reads `sysio.chains` LOCALLY: on a cold-booting
+   /// operator node still replaying toward the deploy blocks the read throws
+   /// Account/Contract Query Exceptions (3060002/3060003) — spurious
+   /// boot-window errors the gate removes.
+   void run_deferred_startup() {
+      if (shutting_down) {
+         return;
+      }
+
+      // Discover outposts before the private cron_service starts. Later refresh
+      // ticks add/remove per-outpost cron jobs as the active chain set changes.
+      try {
+         refresh_outposts();
+      } catch (const fc::exception& e) {
+         wlog("batch_operator_plugin: initial outpost discovery failed: {}. "
+              "Starting with 0 per-outpost jobs; refresh ticks will retry after "
+              "the chain has caught up.", e.to_string());
+      }
+
+      // Size the pool for startup outposts. Later dynamic outposts are added to
+      // the same queued cron service; the minimum keeps epoch_tick viable even
+      // when no outposts are known yet.
+      const std::size_t outpost_count   = opp_jobs.size();
+      const std::size_t required_threads = outpost_count * OPP_CRON_JOBS_PER_OUTPOST + EPOCH_TICK_CRON_JOBS;
+      const std::size_t thread_count    = std::max(required_threads, MIN_CRON_THREADS);
+
+      sysio::services::cron_service::options svc_opts;
+      svc_opts.name        = "batch_operator";
+      svc_opts.num_threads = thread_count;
+      svc_opts.autostart   = true;
+
+      cron_svc = sysio::services::cron_service::create(svc_opts);
+      ilog("batch_operator_plugin: cron_service started with {} thread(s) ({} outpost(s) discovered)",
+           thread_count, outpost_count);
+
+      const auto poll_ms = epoch_poll_ms;
+
+      // epoch_tick — refresh epoch state + election. Keeps `current_epoch`
+      // and `within_epoch_window` accurate for every per-outpost job.
+      {
+         sysio::services::cron_service::job_schedule sched;
+         sched.milliseconds = {sysio::services::cron_service::job_schedule::step_value{poll_ms}};
+         sysio::services::cron_service::job_metadata_t meta;
+         meta.label          = "batch_operator_epoch_tick";
+         meta.one_at_a_time  = true;
+         auto id = cron_svc->add(sched,
+                                 [this]() { poll_epoch_state(); },
+                                 meta);
+         cron_job_ids.push_back(id);
+         ilog("batch_operator_plugin: scheduled {} (id={}, every {}ms)", meta.label, id, poll_ms);
+      }
+
+      schedule_opp_jobs();
+   }
+
+   /// {@link run_deferred_startup} for the `chain_plugin::synced()` slot
+   /// context: an exception escaping a posted task would make appbase quit and
+   /// tear down a node that may be serving other roles, so the escape is
+   /// CONTAINED as a terminal, loudly-logged "not running" state instead
+   /// (mirrors the underwriter's escape_policy::contain_escapes branch).
+   void run_deferred_startup_contained() {
+      try {
+         run_deferred_startup();
+         return;
+      } FC_LOG_AND_DROP("batch_operator_plugin: deferred startup failed unexpectedly:");
+      elog("batch_operator_plugin: deferred startup failed — batch operator NOT running (see log above)");
+   }
 };
 
 // ---------------------------------------------------------------------------
@@ -882,54 +967,50 @@ void batch_operator_plugin::plugin_startup() {
 
    ilog("batch_operator_plugin: starting for account {}", _impl->operator_account.to_string());
 
-   // Discover outposts before the private cron_service starts. Later refresh
-   // ticks add/remove per-outpost cron jobs as the active chain set changes.
-   try {
-      _impl->refresh_outposts();
-   } catch (const fc::exception& e) {
-      wlog("batch_operator_plugin: initial outpost discovery failed: {}. "
-           "Starting with 0 per-outpost jobs; refresh ticks will retry after "
-           "the chain has caught up.", e.to_string());
+   // The startup body's outpost discovery reads `sysio.chains` LOCALLY. On a
+   // cold-booting operator node those reads see mid-sync (possibly genesis)
+   // state and throw spuriously, so the whole body (discovery → cron_service →
+   // epoch_tick → relay jobs) is DEFERRED until the node is synced — the
+   // first-class chain_plugin gate: `is_synced()` measures the LAST
+   // IRREVERSIBLE block's recency (the state the reads actually serve under
+   // read-mode = irreversible), and the `synced()` signal delivers the
+   // stale→synced transition AFTER the triggering block commits (see
+   // sysio/chain_plugin/sync_gate.hpp).
+   auto& chain = _impl->chain_plug->chain();
+   if (_impl->chain_plug->is_synced()) {
+      // Synchronous boot path: an escape aborts node startup (fail-fast,
+      // supervisor-visible) rather than booting with the relay silently
+      // disabled.
+      _impl->run_deferred_startup();
+      return;
    }
 
-   // Size the pool for startup outposts. Later dynamic outposts are added to
-   // the same queued cron service; the minimum keeps epoch_tick viable even
-   // when no outposts are known yet.
-   const std::size_t outpost_count   = _impl->opp_jobs.size();
-   const std::size_t required_threads = outpost_count * OPP_CRON_JOBS_PER_OUTPOST + EPOCH_TICK_CRON_JOBS;
-   const std::size_t thread_count    = std::max(required_threads, MIN_CRON_THREADS);
-
-   sysio::services::cron_service::options svc_opts;
-   svc_opts.name        = "batch_operator";
-   svc_opts.num_threads = thread_count;
-   svc_opts.autostart   = true;
-
-   _impl->cron_svc = sysio::services::cron_service::create(svc_opts);
-   ilog("batch_operator_plugin: cron_service started with {} thread(s) ({} outpost(s) discovered)",
-        thread_count, outpost_count);
-
-   const auto poll_ms = _impl->epoch_poll_ms;
-
-   // epoch_tick — refresh epoch state + election. Keeps `current_epoch`
-   // and `within_epoch_window` accurate for every per-outpost job.
-   {
-      sysio::services::cron_service::job_schedule sched;
-      sched.milliseconds = {sysio::services::cron_service::job_schedule::step_value{poll_ms}};
-      sysio::services::cron_service::job_metadata_t meta;
-      meta.label          = "batch_operator_epoch_tick";
-      meta.one_at_a_time  = true;
-      auto id = _impl->cron_svc->add(sched,
-                                     [impl = _impl.get()]() { impl->poll_epoch_state(); },
-                                     meta);
-      _impl->cron_job_ids.push_back(id);
-      ilog("batch_operator_plugin: scheduled {} (id={}, every {}ms)", meta.label, id, poll_ms);
-   }
-
-   _impl->schedule_opp_jobs();
+   ilog("batch_operator_plugin: waiting for chain sync before outpost discovery "
+        "(head {} is {}s behind now; irreversible state is {}s behind)",
+        chain.head().block_num(),
+        (fc::time_point::now() - chain.head().block_time()).to_seconds(),
+        chain.fork_db_has_root()
+           ? (fc::time_point::now() - chain.fork_db_root().block_time()).to_seconds()
+           : -1);
+   _impl->sync_gate_connection.emplace(
+      _impl->chain_plug->synced().connect([impl = _impl.get()]() {
+         if (impl->shutting_down) {
+            return;
+         }
+         // One-shot consumption: disconnect the gate (safe from within the
+         // slot) and run the startup body directly — the synced() signal is
+         // delivered from a posted task AFTER the triggering block commits
+         // (chain_plugin's contract), so the discovery reads see a complete
+         // view.
+         impl->sync_gate_connection.reset();
+         ilog("batch_operator_plugin: chain synced — starting deferred startup");
+         impl->run_deferred_startup_contained();
+      }));
 }
 
 void batch_operator_plugin::plugin_shutdown() {
    _impl->shutting_down = true;
+   _impl->sync_gate_connection.reset();
    if (_impl->cron_svc) {
       _impl->cron_svc->cancel_all();
       _impl->cron_svc->stop();

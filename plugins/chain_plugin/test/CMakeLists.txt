@@ -1,5 +1,6 @@
 add_executable( test_chain_plugin
         test_account_query_db.cpp
+        test_sync_gate.cpp
         test_trx_retry_db.cpp
         test_trx_finality_status_processing.cpp
         plugin_config_test.cpp
@@ -9,6 +10,7 @@ target_link_libraries( test_chain_plugin chain_plugin sysio_testing sysio_chain_
 set(CHAIN_PLUGIN_TEST_CASES
         chain_plugin_default_tests
         account_query_db_tests
+        sync_gate_tests
         trx_finality_status_processing_test
         trx_retry_db_test
         )

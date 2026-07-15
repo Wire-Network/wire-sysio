@@ -245,10 +245,10 @@ struct underwriter_plugin::impl {
    cron_service::job_id_t            scan_job_id = 0;
    std::atomic<bool>                 shutting_down{false};
 
-   /// Sync gate: `accepted_block` subscription that arms {@link run_deferred_startup}
-   /// once the local irreversible state is current (see
-   /// `sync_detail.hpp::block_time_is_recent`). Disconnected after arming; reset on
-   /// shutdown.
+   /// Sync gate: `chain_plugin::synced()` subscription that arms
+   /// {@link run_deferred_startup} once the local irreversible state is current
+   /// (see `sysio/chain_plugin/sync_gate.hpp`). Disconnected after arming; reset
+   /// on shutdown.
    std::optional<boost::signals2::scoped_connection> sync_gate_connection;
    /// When the sync gate armed — bounds the preflight retry grace window.
    fc::time_point                    startup_armed_at;
@@ -749,26 +749,6 @@ struct underwriter_plugin::impl {
    //  Sync-gated startup
    // -----------------------------------------------------------------------
 
-   /// The "node is synced" predicate: the LAST IRREVERSIBLE block's time
-   /// within `underwriter_defaults::sync_recency_ms` of wall-clock now.
-   /// The plugin's table reads serve the IRREVERSIBLE state (operator
-   /// daemons run read-mode = irreversible), so the gate must measure LIB
-   /// recency — head-time recency armed the gate while the local LIB still
-   /// trailed the rows the preflight needs (observed live: a registration
-   /// in block N was readable only 50ms after a preflight read at LIB N−3).
-   /// While a cold-booting operator node syncs blocks, LIB trails `now` by
-   /// the catch-up gap and every local table read sees stale (possibly
-   /// genesis) state — preflight must not run until this is true.
-   bool chain_is_synced() const {
-      auto& chain = chain_plug->chain();
-      if (!chain.fork_db_has_root()) {
-         return false;
-      }
-      return underwriter_detail::block_time_is_recent(
-         chain.fork_db_root().block_time(), fc::time_point::now(),
-         fc::milliseconds(underwriter_defaults::sync_recency_ms));
-   }
-
    /// What an exception escaping the deferred startup body does. The
    /// synchronous `plugin_startup` path must ABORT node startup — fail-fast,
    /// supervisor-visible; booting without underwriting would hide a broken
@@ -781,13 +761,13 @@ struct underwriter_plugin::impl {
    /// Arm the deferred startup: runs AT MOST once (re-entry is guarded by
    /// {@link startup_attempted}), on the main thread (either directly from
    /// `plugin_startup` when the node is already synced, or from the
-   /// `accepted_block` signal once it becomes synced). The body itself lives
-   /// in {@link attempt_deferred_startup}, which may retry the preflight
+   /// `chain_plugin::synced()` signal once it becomes synced). The body itself
+   /// lives in {@link attempt_deferred_startup}, which may retry the preflight
    /// within a bounded grace.
    void run_deferred_startup(escape_policy policy) {
       startup_armed_at = fc::time_point::now();
-      // Release the gate slot; the callback already disconnected it before
-      // posting, so this is an idempotent cleanup, not the load-bearing
+      // Release the gate slot; the slot already disconnected itself before
+      // calling here, so this is an idempotent cleanup, not the load-bearing
       // disconnect.
       sync_gate_connection.reset();
       attempt_deferred_startup(policy);
@@ -2770,16 +2750,17 @@ void underwriter_plugin::plugin_startup() {
    // registry, authex links) via LOCAL table reads. On a cold-booting
    // operator node those reads see mid-sync (possibly genesis) state and
    // would fail spuriously, so the whole startup body (preflight → outpost
-   // client wiring → cron) is DEFERRED until the node is synced — the LAST
-   // IRREVERSIBLE block's time within `underwriter_defaults::sync_recency_ms`
-   // of now (the state the reads actually serve under read-mode =
-   // irreversible), observed via the controller's `accepted_block` signal.
-   // Post-arming, the preflight retries within a bounded grace (see
-   // attempt_deferred_startup) to absorb the LIB boundary race; a genuinely
-   // incomplete bootstrap still fails loudly once the grace expires — there
-   // remains no dev escape hatch.
+   // client wiring → cron) is DEFERRED until the node is synced — the
+   // first-class chain_plugin gate: `is_synced()` measures the LAST
+   // IRREVERSIBLE block's recency (the state the reads actually serve under
+   // read-mode = irreversible), and the `synced()` signal delivers the
+   // stale→synced transition AFTER the triggering block commits (see
+   // sysio/chain_plugin/sync_gate.hpp). Post-arming, the preflight retries
+   // within a bounded grace (see attempt_deferred_startup) to absorb the LIB
+   // boundary race; a genuinely incomplete bootstrap still fails loudly once
+   // the grace expires — there remains no dev escape hatch.
    auto& chain = _impl->chain_plug->chain();
-   if (_impl->chain_is_synced()) {
+   if (_impl->chain_plug->is_synced()) {
       // Synchronous boot path: an escape aborts node startup (fail-fast,
       // supervisor-visible) rather than booting with underwriting silently
       // disabled.
@@ -2795,28 +2776,18 @@ void underwriter_plugin::plugin_startup() {
            ? (fc::time_point::now() - chain.fork_db_root().block_time()).to_seconds()
            : -1);
    _impl->sync_gate_connection.emplace(
-      chain.accepted_block().connect([this](const chain::block_signal_params&) {
+      _impl->chain_plug->synced().connect([this]() {
          if (_impl->startup_attempted() || _impl->shutting_down) {
             return;
          }
-         if (!_impl->chain_is_synced()) {
-            return;
-         }
-         // Detected sync — disconnect the gate (safe mid-invocation) and POST
-         // the startup body to the app queue. It must NOT run inline here:
-         // the accepted_block signal fires mid block-application, where the
-         // chain API table reads see an incomplete view (observed live: a
-         // registered operator row read back EMPTY → spurious preflight
-         // failure). The posted task runs after the block commits, in the
-         // same main-thread context plugin_startup itself runs in.
-         _impl->sync_gate_connection->disconnect();
-         ilog("underwriter_plugin: chain synced — scheduling deferred startup");
-         app().executor().post(appbase::priority::medium, [this]() {
-            if (_impl->startup_attempted() || _impl->shutting_down) {
-               return;
-            }
-            _impl->run_deferred_startup(impl::escape_policy::contain_escapes);
-         });
+         // One-shot consumption: disconnect the gate (safe from within the
+         // slot) and run the startup body directly — the synced() signal is
+         // already delivered from a posted task AFTER the triggering block
+         // commits (chain_plugin's contract), the exact context the old
+         // accepted_block gate had to post itself into.
+         _impl->sync_gate_connection.reset();
+         ilog("underwriter_plugin: chain synced — starting deferred startup");
+         _impl->run_deferred_startup(impl::escape_policy::contain_escapes);
       }));
 }
 
