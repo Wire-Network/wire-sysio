@@ -362,6 +362,46 @@ extract_inbound_reserve_create_cancelled_seeds(const std::vector<char>& envelope
    return seeds;
 }
 
+token_custody_info resolve_token_custody(const fc::variant_object& outpost_config,
+                                         uint64_t token_code) {
+   token_custody_info custody;
+   bool address_found   = false;
+   bool precision_found = false;
+
+   if (outpost_config.contains("token_addresses_by_code")) {
+      for (const auto& entry_v : outpost_config["token_addresses_by_code"].get_array()) {
+         const auto& entry = entry_v.get_object();
+         if (entry["token_code"].as_uint64() == token_code) {
+            custody.mint =
+               fc::network::solana::solana_public_key::from_base58_string(entry["mint"].as_string());
+            address_found = true;
+            break;
+         }
+      }
+   }
+   FC_ASSERT(address_found,
+             "token address binding unconfigured for token_code {} — the outpost's "
+             "token_addresses_by_code map must carry an explicit entry (zero mint = native)",
+             token_code);
+
+   if (outpost_config.contains("precision_by_token_code")) {
+      for (const auto& entry_v : outpost_config["precision_by_token_code"].get_array()) {
+         const auto& entry = entry_v.get_object();
+         if (entry["token_code"].as_uint64() == token_code) {
+            custody.decimals  = static_cast<uint8_t>(entry["decimals"].as_uint64());
+            precision_found = true;
+            break;
+         }
+      }
+   }
+   FC_ASSERT(precision_found,
+             "token precision unconfigured for token_code {} — required, same as "
+             "wire-ethereum's WIRE_TokenPrecisionUnset and the program's PrecisionUnconfigured",
+             token_code);
+
+   return custody;
+}
+
 } // namespace outpost_solana_client_detail
 
 outpost_solana_client::outpost_solana_client(
@@ -377,8 +417,7 @@ outpost_solana_client::outpost_solana_client(
    FC_ASSERT(_entry && _entry->client,
              "solana_client_entry must carry a client");
    FC_ASSERT(!program_idls.empty(),
-             "Solana outpost requires at least one IDL for program '{}'",
-             OPP_SOLANA_OUTPOST_PROGRAM_NAME);
+             "Solana outpost requires at least one program IDL");
 
    _program_client = std::make_shared<opp_solana_outpost_client>(
       _entry->client, _program_id, program_idls);
@@ -413,13 +452,24 @@ outpost_solana_client::reserve_info_for_codes(uint64_t token_code, uint64_t rese
    const auto reserve_v = _program_client->decode_account_info_data("Reserve", account_info->data);
    const auto& reserve = reserve_v.get_object();
    FC_ASSERT(reserve.contains("creator"), "Reserve account missing creator field");
-   FC_ASSERT(reserve.contains("custody_mint"), "Reserve account missing custody_mint field");
-   FC_ASSERT(reserve.contains("custody_decimals"), "Reserve account missing custody_decimals field");
+
+   // Custody (mint / decimals) lives on the OutpostConfig maps keyed by
+   // token_code — the clean-room program resolves it there at dispatch time,
+   // so the relay mirrors that lookup to stay account-consistent with the
+   // on-chain handlers.
+   const auto config_info = _entry->client->get_account_info(_program_client->config_pda);
+   FC_ASSERT(config_info.has_value() && !config_info->data.empty(),
+             "OutpostConfig account missing at {} — outpost not initialized",
+             _program_client->config_pda.to_string(fc::yield_function_t{}));
+   const auto config_v =
+      _program_client->decode_account_info_data("OutpostConfig", config_info->data);
+   const auto custody =
+      outpost_solana_client_detail::resolve_token_custody(config_v.get_object(), token_code);
 
    return reserve_terminal_info{
       fc::network::solana::solana_public_key::from_base58_string(reserve["creator"].as_string()),
-      fc::network::solana::solana_public_key::from_base58_string(reserve["custody_mint"].as_string()),
-      static_cast<uint8_t>(reserve["custody_decimals"].as_uint64())
+      custody.mint,
+      custody.decimals
    };
 }
 
