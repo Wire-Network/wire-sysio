@@ -377,7 +377,6 @@ class cluster_generator:
                             'max_block_net_usage': 1048576,
                             'target_block_net_usage_pct': 10000,
                             'max_transaction_net_usage': 524288,
-                            'base_per_transaction_net_usage': 12,
                             'net_usage_leeway': 500,
                             'context_free_discount_net_usage_num': 0,
                             'context_free_discount_net_usage_den': 1,
