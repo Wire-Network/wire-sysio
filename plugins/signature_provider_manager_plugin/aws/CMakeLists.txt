@@ -28,13 +28,10 @@ target_link_libraries(${TARGET_NAME}
         sysio_chain
         aws-cpp-sdk-core)
 
-install(
-        TARGETS ${TARGET_NAME}
-        LIBRARY DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}
-)
+# Internal plugin support library: linked into nodeop, never shipped as a
+# standalone artifact (see cmake/plugin-tools.cmake for rationale).
 
 install(
         DIRECTORY include/sysio
-        DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR}
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} COMPONENT dev
 )

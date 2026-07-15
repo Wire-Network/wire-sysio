@@ -57,7 +57,8 @@ nodeop \
 
 In this setup:
 - Port **8888** (loopback only) serves chain, producer, net, and admin snapshot APIs
-- Port **9090** (public) serves **only** the read-only snapshot endpoints
+- Port **9090** (public) serves the read-only snapshot endpoints plus the node-global endpoints —
+  `/v1/chain/get_info` and `/v1/node/get_supported_apis` are reachable on every listener by design
 
 When using `--http-category-address`, the `--http-server-address` must be set to the literal string `http-category-address` and `--unix-socket-path` must not be set.
 
@@ -73,7 +74,9 @@ nodeop \
   ...
 ```
 
-Only the three snapshot read-only endpoints will be reachable.
+Only the three snapshot read-only endpoints will be reachable, along with the node-global
+`/v1/node/get_supported_apis` (always served) and `/v1/chain/get_info` when `sysio::chain_api_plugin`
+is loaded — node-global endpoints are reachable on every listener by design.
 
 ## Full Provider Setup
 

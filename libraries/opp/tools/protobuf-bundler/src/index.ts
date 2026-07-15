@@ -71,7 +71,7 @@ async function main(): Promise<void> {
       type: "boolean",
       default: false,
       describe:
-        "Publish typescript/solidity packages to npm after generation."
+        "Publish typescript/solidity packages to npm and the solana crate to the WIRE cargo registry after generation."
     })
     .option("verbose", {
       type: "boolean",

@@ -8,7 +8,7 @@ on:
     tags:
       - "v*"
   pull_request:
-    types: [ opened, synchronize, reopened, ready_for_review ]
+    types: [opened, synchronize, reopened]
     branches:
       - master
   workflow_dispatch:
@@ -45,6 +45,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # actions/checkout@v5
+
+      - name: Validate coredump isolation policy
+        run: python3 .github/scripts/check-coredump-policy.py
 
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # actions/setup-node@v4
         with:
@@ -91,7 +94,7 @@ jobs:
 
   build-test-package:
     name: Build, test, and package (${{matrix.platform}})
-    needs: [platform-cache, v]
+    needs: [platform-cache, root-node-tooling, v]
     strategy:
       fail-fast: false
       matrix:
@@ -120,7 +123,14 @@ jobs:
       credentials:
         username: dev-wire
         password: ${{ secrets.GH_TOKEN_DEV }}
-      options: --security-opt seccomp=unconfined --mount type=bind,source=/var/lib/systemd/coredump,target=/cores
+      # Fork PR code must not see the shared runner's host dumps; same-repository and non-PR runs retain debug access.
+      # SEC-112 tracks enforcing the protected workflow revision at the runner-group boundary.
+      options: >-
+        --security-opt seccomp=unconfined
+        ${{ (github.event_name != 'pull_request' ||
+             github.event.pull_request.head.repo.full_name == github.repository)
+            && '--mount type=bind,source=/var/lib/systemd/coredump,target=/cores'
+            || '' }}
       volumes:
       - ${{ github.workspace }}:/__w/wire-sysio/wire-sysio
     env:
@@ -304,17 +314,27 @@ jobs:
           path: ${{ github.workspace }}/.ccache
           key: ccache-${{ matrix.platform }}-${{ github.sha }}
 
-      - name: Upload core files from failed tests
+      - name: Upload logs from failed tests
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # actions/upload-artifact@v6
         if: failure()
         with:
           name: ${{matrix.platform}}-tests-logs
           if-no-files-found: warn
           path: |
-              /cores
               build/Testing/Temporary/
               build/TestLogs/
               build/PerformanceHarnessScenarioRunnerLogs/
+
+      - name: Upload core files from failed tests
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # actions/upload-artifact@v6
+        if: >-
+          ${{ failure() &&
+              (github.event_name != 'pull_request' ||
+               github.event.pull_request.head.repo.full_name == github.repository) }}
+        with:
+          name: ${{matrix.platform}}-test-cores
+          if-no-files-found: warn
+          path: /cores
 
       - name: Check CPU Features
         if: ${{ steps.build.outcome == 'success' && !cancelled() }}
@@ -329,21 +349,35 @@ jobs:
           if [[ "${GITHUB_REF:-}" == refs/tags/v* ]]; then
             bash ../.github/scripts/assert-system-contract-build.sh .
           fi
-          cpack
-          ../tools/tweak-deb.sh wire-sysio_*.deb
+          cpack -G DEB
+          ../tools/packaging/scripts/deb-postprocess.sh wire-sysio_*.deb
 
-      - name: Install dev package
+      - name: Install base package
         if: ${{ steps.build.outcome == 'success' && !cancelled() }}
         run: |
           apt-get update
           apt-get install -y ./build/wire-sysio_*.deb
 
-      - name: Upload dev package
-        if: ${{ steps.build.outcome == 'success' && !cancelled() }}
+      - name: Assemble release package set (tgz + deb + rpm, base + dev)
+        if: ${{ steps.build.outcome == 'success' && matrix.platform == 'ubuntu24' && !cancelled() }}
+        run: |
+          # The RPM generator needs rpmbuild; the Debian-based platform image does not ship it.
+          command -v rpmbuild >/dev/null || { apt-get update && apt-get install -y rpm; }
+          cd build
+          cpack -G RPM
+          cmake --build . --target package-tgz
+
+      - name: Upload release package set
+        if: ${{ steps.build.outcome == 'success' && matrix.platform == 'ubuntu24' && !cancelled() }}
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # actions/upload-artifact@v6
         with:
-          name: wire-sysio-dev-${{matrix.platform}}-amd64
-          path: build/wire-sysio_*.deb
+          name: wire-sysio-packages-amd64
+          if-no-files-found: error
+          path: |
+            build/wire-sysio_*.deb
+            build/wire-sysio-dev_*.deb
+            build/wire-sysio-*.rpm
+            build/wire-sysio-*.tar.gz
 
   v:
     name: Discover Versions
@@ -484,9 +518,30 @@ jobs:
           echo "::error::Timed out waiting for Wire CDT package artifact for ${cdt_sha}" >&2
           exit 1
 
+  verify-packages:
+    name: Verify packages (S1-S6)
+    needs: [build-test-package]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # actions/checkout@v5
+
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # actions/download-artifact@v8.0.1
+        with:
+          name: wire-sysio-packages-amd64
+          path: artifacts
+
+      - name: Run packaging verification suite
+        run: |
+          ls -la artifacts/
+          tools/packaging/tests/verify-scripts.sh
+          tools/packaging/tests/verify-tgz.sh artifacts/wire-sysio-*.tar.gz
+          tools/packaging/tests/verify-deb.sh artifacts/wire-sysio_*.deb artifacts/wire-sysio-dev_*.deb
+          # wire-sysio-[0-9]* matches the base rpm only (the dev rpm is wire-sysio-dev-*).
+          tools/packaging/tests/verify-rpm.sh artifacts/wire-sysio-[0-9]*.rpm artifacts/wire-sysio-dev-*.rpm
+
   all-passing:
     name: All Required Tests Passed
-    needs: [ build-test-package, root-node-tooling ]
+    needs: [ build-test-package, root-node-tooling, verify-packages ]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -497,8 +552,8 @@ jobs:
           webhook-url: ${{ secrets.WEBHOOK_URL }}
           notification-type: 1
           workflow-name: "Build & Test Workflow"
-          job-results: "build-test-package:${{ needs.build-test-package.result }},root-node-tooling:${{ needs.root-node-tooling.result }}"
+          job-results: "build-test-package:${{ needs.build-test-package.result }},root-node-tooling:${{ needs.root-node-tooling.result }},verify-packages:${{ needs.verify-packages.result }}"
           github-context: ${{ toJSON(github) }}
 
-      - if: needs.build-test-package.result != 'success' || needs.root-node-tooling.result != 'success'
+      - if: needs.build-test-package.result != 'success' || needs.root-node-tooling.result != 'success' || needs.verify-packages.result != 'success'
         run: false

@@ -231,12 +231,14 @@ endif()
 # Installation: headers to include/sysio
 install(
         DIRECTORY include/sysio
-        DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR}
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+        COMPONENT dev
 )
 
 install(
         DIRECTORY ${PROTO_GEN_DIR}/
-        DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR}
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+        COMPONENT dev
         FILES_MATCHING PATTERN "*.pb.h"
 )
 
@@ -244,4 +246,5 @@ install(
 install(
         TARGETS ${TARGET_NAME}
         EXPORT ${TARGET_NAME}-targets
+        COMPONENT dev
 )

@@ -208,8 +208,7 @@ struct underwriter_plugin::impl {
    std::vector<uint8_t> resolved_eth_source_deposit_selector;
    std::vector<uint8_t> resolved_sol_source_deposit_discriminator;
 
-   // ── Diagnostic counters surfaced via the `/v1/underwriter/*` HTTP API
-   //   (and the future `clio opp uw stats` wrapper).
+   // ── Diagnostic counters surfaced via the `/v1/underwriter/*` HTTP API.
    //
    //   `source_deposit_mismatch_count` increments every time a source-
    //   deposit verification fails for a uwreq the plugin tried to cover.
@@ -2485,10 +2484,6 @@ struct underwriter_plugin::impl {
    // `head_behind_sec`/`lib_behind_sec`, `preflight_retrying`, or a terminal
    // `preflight_failed`/`wiring_failed`/`startup_failed` with `detail`);
    // once active they serve the payloads below with `status:"active"`.
-   //
-   // The matching `clio opp uw <stats|commits>` CLI wrapper is planned in
-   // a follow-up; today the endpoints are addressable via `curl` against
-   // the nodeop HTTP port.
 
    fc::variant build_stats_response() {
       std::lock_guard lk{stats_mutex};
@@ -2583,16 +2578,24 @@ struct underwriter_plugin::impl {
    }
 
    /// Register the `/v1/underwriter/*` HTTP endpoints. Called once from
-   /// `plugin_startup`, UNCONDITIONALLY and BEFORE the sync gate:
+   /// `plugin_startup` when the underwriter is enabled, BEFORE the sync gate:
    /// `http_plugin`'s handler map is read lock-free by the HTTP worker
    /// threads, so every registration must happen during plugin startup —
    /// before the posted listener creation runs — never from a task queued
    /// after `exec()` is live. Until the deferred startup body completes the
    /// handlers report the gate state (see {@link respond_if_gated}).
+   ///
+   /// Both endpoints live in the dedicated `api_category::underwriter`, NOT
+   /// `api_category::node`: they expose operator metadata (account identity,
+   /// client ids, outpost contract addresses, outstanding commits) that must
+   /// not ride the always-on node category onto category-isolated public
+   /// listeners. They remain reachable on the default all-category listeners
+   /// (`http-server-address` / `unix-socket-path`); on category-isolated
+   /// setups the operator opts in with `--http-category-address=underwriter,<addr>`.
    void register_http_endpoints() {
       auto& hp = app().get_plugin<http_plugin>();
       hp.add_api({
-         {"/v1/underwriter/stats", api_category::node,
+         {"/v1/underwriter/stats", api_category::underwriter,
             [this](std::string&& /*url*/,
                     std::string&& /*body*/,
                     url_response_callback&& cb) {
@@ -2606,7 +2609,7 @@ struct underwriter_plugin::impl {
                      ("error", e.to_detail_string())));
                }
             }},
-         {"/v1/underwriter/commits", api_category::node,
+         {"/v1/underwriter/commits", api_category::underwriter,
             [this](std::string&& /*url*/,
                     std::string&& /*body*/,
                     url_response_callback&& cb) {
@@ -2621,6 +2624,13 @@ struct underwriter_plugin::impl {
                }
             }},
       }, appbase::exec_queue::read_only);
+
+      // Operator metadata should normally stay on loopback / private
+      // management networks; a public bind is a deliberate choice worth a
+      // startup warning (same pattern as the snapshot_ro exposure notice).
+      if (!hp.is_on_loopback(api_category::underwriter)) {
+         wlog("underwriter diagnostics API (/v1/underwriter/*) exposed on a non-loopback address");
+      }
    }
 };
 
@@ -2747,12 +2757,12 @@ void underwriter_plugin::plugin_startup() {
 
    ilog("underwriter_plugin: starting for account {}", _impl->underwriter_account.to_string());
 
-   // Register the `/v1/underwriter/*` endpoints FIRST, unconditionally:
-   // handler registration must complete during plugin startup (before the
-   // posted HTTP listener goes live) because the handler map is read
-   // lock-free by the HTTP threads — it must never ride the deferred
-   // startup body below. Until that body completes, the handlers answer
-   // with the gate state, so a cold-booting (or permanently-disabled)
+   // Register the `/v1/underwriter/*` endpoints FIRST, before the sync
+   // gate: handler registration must complete during plugin startup
+   // (before the posted HTTP listener goes live) because the handler map
+   // is read lock-free by the HTTP threads — it must never ride the
+   // deferred startup body below. Until that body completes, the handlers
+   // answer with the gate state, so a cold-booting (or terminally-failed)
    // underwriter is diagnosable over HTTP instead of a single ilog.
    _impl->register_http_endpoints();
 

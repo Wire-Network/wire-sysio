@@ -9,10 +9,13 @@
 #include <boost/asio.hpp>
 #include <boost/test/unit_test.hpp>
 
+#include <array>
 #include <atomic>
 #include <chrono>
+#include <functional>
 #include <sstream>
 #include <string>
+#include <string_view>
 #include <thread>
 #include <utility>
 
@@ -23,6 +26,18 @@ namespace {
 using tcp = boost::asio::ip::tcp;
 
 constexpr size_t OVERSIZED_RESPONSE_BODY_BYTES = 2 * 1024 * 1024;
+constexpr int64_t STALLED_RESOLVE_TIMEOUT_MS = 200;
+constexpr int64_t STALLED_RESOLVE_MAX_ELAPSED_MS = 1'500;
+constexpr int64_t CONSUMED_RESOLVE_TIMEOUT_MS = 20;
+constexpr int64_t CONSUMED_RESOLVE_DELAY_MS = 40;
+constexpr int64_t LOCAL_RESOLVE_TIMEOUT_MS = 1'000;
+constexpr std::string_view STALLED_RESOLVE_HOST = "startup-resolve.invalid";
+constexpr uint16_t RESOLVE_TEST_PORT = 9'876;
+
+/** Return the non-routable URL used by injected resolver tests. */
+fc::url resolve_test_url() {
+   return fc::url("http://" + std::string(STALLED_RESOLVE_HOST) + ":" + std::to_string(RESOLVE_TEST_PORT));
+}
 
 /**
  * Return a loopback port that has no listener after this function returns.
@@ -195,13 +210,28 @@ bool is_response_body_limit_error(const fc::exception& e) {
 }
 
 /**
- * Return true when the exception came from bounded DNS refresh.
+ * Return true when the exception came from deadline-bound DNS resolution.
  */
 bool is_resolve_timeout_error(const fc::exception& e) {
    return e.to_detail_string().find("JSON-RPC resolve timed out") != std::string::npos;
 }
 
 } // namespace
+
+namespace fc::network::json_rpc {
+
+/** Private-constructor access for DNS transport regression tests. */
+struct json_rpc_client_test_access {
+   /** Construct a client using a caller-supplied asynchronous resolver starter. */
+   template <typename ResolverStartFn>
+   static json_rpc_client create(fc::url url, ResolverStartFn&& resolver_start) {
+      return json_rpc_client(
+         std::move(url), std::nullopt, endpoint_refresh_policy::never,
+         json_rpc_client::resolver_start_fn(std::forward<ResolverStartFn>(resolver_start)));
+   }
+};
+
+} // namespace fc::network::json_rpc
 
 BOOST_AUTO_TEST_SUITE(json_rpc_client_tests)
 
@@ -224,6 +254,105 @@ BOOST_AUTO_TEST_CASE(call_times_out_when_http_response_hangs) {
    BOOST_CHECK_LT(elapsed.count(), 1500 * 1000);
 }
 
+/// Initial endpoint resolution must cancel an incomplete platform lookup at the caller's startup deadline.
+BOOST_AUTO_TEST_CASE(initial_endpoint_resolution_cancels_stalled_query) {
+   std::atomic_bool resolver_started{false};
+   std::atomic_bool cancel_called{false};
+   std::function<void(const boost::system::error_code&, tcp::resolver::results_type)> late_completion;
+   auto stalled_resolver = [&](const std::string&, const std::string&, fc::time_point, auto complete) {
+      resolver_started = true;
+      late_completion = std::move(complete);
+      return [&] { cancel_called = true; };
+   };
+   const auto start = fc::time_point::now();
+
+   BOOST_CHECK_EXCEPTION(
+      [&] {
+         fc::task::deadline_scope deadline(fc::time_point::now() + fc::milliseconds(STALLED_RESOLVE_TIMEOUT_MS));
+         auto client =
+            fc::network::json_rpc::json_rpc_client_test_access::create(resolve_test_url(), stalled_resolver);
+         (void)client;
+      }(),
+      fc::timeout_exception,
+      is_resolve_timeout_error);
+
+   const auto elapsed = fc::time_point::now() - start;
+   BOOST_CHECK(resolver_started.load());
+   BOOST_CHECK(cancel_called.load());
+   BOOST_CHECK_LT(elapsed.count(), STALLED_RESOLVE_MAX_ELAPSED_MS * 1'000);
+
+   BOOST_REQUIRE(late_completion);
+   late_completion(boost::asio::error::operation_aborted, {});
+}
+
+/// An expired startup budget must fail before starting a platform resolver operation.
+BOOST_AUTO_TEST_CASE(initial_endpoint_resolution_rejects_expired_deadline) {
+   bool resolver_started = false;
+   auto resolver = [&](const std::string&, const std::string&, fc::time_point, auto) {
+      resolver_started = true;
+      return [] {};
+   };
+
+   BOOST_CHECK_EXCEPTION(
+      [&] {
+         fc::task::deadline_scope deadline(fc::time_point::now() - fc::milliseconds(1));
+         auto client = fc::network::json_rpc::json_rpc_client_test_access::create(resolve_test_url(), resolver);
+         (void)client;
+      }(),
+      fc::timeout_exception,
+      is_resolve_timeout_error);
+
+   BOOST_CHECK(!resolver_started);
+}
+
+/// A deadline-bound lookup must preserve a successful asynchronous resolver result.
+BOOST_AUTO_TEST_CASE(initial_endpoint_resolution_accepts_completed_lookup) {
+   bool resolver_started = false;
+   auto resolver = [&](const std::string& host, const std::string& port, fc::time_point, auto complete) {
+      resolver_started = true;
+      const std::array endpoints{tcp::endpoint(boost::asio::ip::address_v4::loopback(), RESOLVE_TEST_PORT)};
+      complete(boost::system::error_code{},
+               tcp::resolver::results_type::create(endpoints.begin(), endpoints.end(), host, port));
+      return [] {};
+   };
+
+   fc::task::deadline_scope deadline(fc::time_point::now() + fc::milliseconds(STALLED_RESOLVE_TIMEOUT_MS));
+   auto client = fc::network::json_rpc::json_rpc_client_test_access::create(resolve_test_url(), resolver);
+   (void)client;
+
+   BOOST_CHECK(resolver_started);
+}
+
+/// Cancellation must remain armed when resolver startup itself consumes the remaining deadline.
+BOOST_AUTO_TEST_CASE(initial_endpoint_resolution_cancels_after_starter_consumes_deadline) {
+   bool cancel_called = false;
+   auto resolver = [&](const std::string&, const std::string&, fc::time_point, auto) {
+      std::this_thread::sleep_for(std::chrono::milliseconds(CONSUMED_RESOLVE_DELAY_MS));
+      return [&] { cancel_called = true; };
+   };
+
+   BOOST_CHECK_EXCEPTION(
+      [&] {
+         fc::task::deadline_scope deadline(
+            fc::time_point::now() + fc::milliseconds(CONSUMED_RESOLVE_TIMEOUT_MS));
+         auto client = fc::network::json_rpc::json_rpc_client_test_access::create(resolve_test_url(), resolver);
+         (void)client;
+      }(),
+      fc::timeout_exception,
+      is_resolve_timeout_error);
+
+   BOOST_CHECK(cancel_called);
+}
+
+/// The production Boost.Asio resolver path must complete a local hostname lookup under a deadline.
+BOOST_AUTO_TEST_CASE(initial_endpoint_resolution_resolves_localhost_with_deadline) {
+   fc::task::deadline_scope deadline(fc::time_point::now() + fc::milliseconds(LOCAL_RESOLVE_TIMEOUT_MS));
+   fc::network::json_rpc::json_rpc_client client(
+      fc::url("http://localhost:" + std::to_string(RESOLVE_TEST_PORT)), std::nullopt,
+      fc::network::json_rpc::endpoint_refresh_policy::never);
+   (void)client;
+}
+
 /// Refreshing stale cached endpoints must observe the active RPC deadline.
 BOOST_AUTO_TEST_CASE(stale_endpoint_refresh_respects_expired_deadline) {
    fc::network::json_rpc::json_rpc_client client(
@@ -238,6 +367,25 @@ BOOST_AUTO_TEST_CASE(stale_endpoint_refresh_respects_expired_deadline) {
       }(),
       fc::timeout_exception,
       is_resolve_timeout_error);
+}
+
+/// Callers that require bounded runtime behavior can retain the startup DNS result
+/// instead of re-entering platform DNS after a connection failure.
+BOOST_AUTO_TEST_CASE(endpoint_refresh_can_be_disabled) {
+   fc::network::json_rpc::json_rpc_client client(fc::url("http://localhost:" + std::to_string(closed_loopback_port())),
+                                                 std::nullopt, fc::network::json_rpc::endpoint_refresh_policy::never);
+
+   BOOST_CHECK_THROW(client.call("wire_cached_endpoint_probe"), fc::exception);
+
+   BOOST_CHECK_EXCEPTION(
+      [&] {
+         fc::task::deadline_scope deadline(fc::time_point::now() - fc::milliseconds(1));
+         client.call("wire_cached_endpoint_probe");
+      }(),
+      fc::timeout_exception,
+      [](const fc::exception& e) {
+         return e.to_detail_string().find("JSON-RPC connect timed out") != std::string::npos;
+      });
 }
 
 /// A peer that completes HTTP 200 with an oversized body must be rejected by
