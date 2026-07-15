@@ -32,6 +32,9 @@
 #include <fc/crypto/sha256.hpp>
 
 #include "contracts.hpp"
+// Canonical-encoding + header-derivation oracle: inbound envelopes must carry
+// spec-derived semantic headers or apply_consensus drops them before dispatch.
+#include "opp_envelope_oracle.hpp"
 
 using namespace sysio::testing;
 using namespace sysio;
@@ -77,6 +80,8 @@ std::vector<char> encode_envelope(uint32_t epoch_index, const std::string& tag) 
    att->set_type(AttestationType::ATTESTATION_TYPE_UNSPECIFIED);  // benign: dispatch is a no-op
    att->set_data(tag);
    att->set_data_size(static_cast<uint32_t>(tag.size()));
+
+   oracle::finalize_header(*env.mutable_messages(0), {}, 1'775'612'516'983ULL);
 
    std::vector<char> out(env.ByteSizeLong());
    env.SerializeToArray(out.data(), static_cast<int>(out.size()));
@@ -578,6 +583,42 @@ BOOST_FIXTURE_TEST_CASE(chkdispute_fast_path_resolves, sysio_dispute_tester) { t
    BOOST_REQUIRE_EQUAL("DISPUTE_STATUS_RESOLVED", d["status"].as_string());
    BOOST_REQUIRE_EQUAL(cs_win.str(), d["winning_checksum"].as_string());
    BOOST_REQUIRE(!epoch_paused());
+} FC_LOG_AND_RETHROW() }
+
+// SEC-102 (huang): a dispute whose voted winner FAILS depot semantic validation must not
+// resolve-and-strand. chkdispute marks the dispute RESOLVED and unpauses in the same tx that
+// inline-calls resolvedisp -> apply_consensus; if apply_consensus soft-dropped the winner it would
+// report success with no outpcons row, freezing the epoch (chkcons waits for the row forever while
+// evalcons no-ops on the lingering RESOLVED dispute). apply_consensus now returns false on a drop
+// and resolvedisp asserts on it, so the whole chkdispute crank rolls back: the dispute stays
+// OPEN/paused and recoverable.
+// A dispute winner whose header is forged can never reach resolvedisp: since SEC-102's semantic-
+// header check runs at INGRESS (msgch::deliver's inbound_envelope_valid gate), a forged envelope is
+// rejected on delivery and is never recorded, so it cannot become a dispute candidate or a voted
+// winner. This is the root-cause prevention for the resolvedisp-stranding scenario; resolvedisp's
+// own `check(apply_consensus(...))` guard remains as defense in depth (unreachable via this path,
+// so it is not exercised here -- chkdispute_fast_path_resolves covers valid resolution).
+BOOST_FIXTURE_TEST_CASE(forged_dispute_winner_rejected_at_delivery, sysio_dispute_tester) { try {
+   const uint32_t epoch = current_epoch();
+
+   // Forge `payload_checksum` so the header no longer recomputes over the payload.
+   auto winner_valid = encode_envelope(epoch, "winner");
+   sysio::opp::Envelope env;
+   BOOST_REQUIRE(env.ParseFromArray(winner_valid.data(), static_cast<int>(winner_valid.size())));
+   {
+      auto* h = env.mutable_messages(0)->mutable_header();
+      std::string c = h->payload_checksum();
+      c[0] ^= 0x01;
+      h->set_payload_checksum(c);
+   }
+   std::vector<char> winner_bytes(env.ByteSizeLong());
+   env.SerializeToArray(winner_bytes.data(), static_cast<int>(winner_bytes.size()));
+
+   // Rejected at ingress -- never recorded, so it can never be voted into a dispute resolution.
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: delivered envelope failed inbound-chain or "
+            "semantic-header validation"),
+      deliver(eth_code(), winner_bytes));
 } FC_LOG_AND_RETHROW() }
 
 // Sub-quorum: with N=3 (Q=2), a single vote never resolves before the deadline.

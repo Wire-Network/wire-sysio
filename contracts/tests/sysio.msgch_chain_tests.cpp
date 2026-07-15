@@ -12,8 +12,8 @@
 /// (SEC-107 completion): both outposts self-chain per stream, so once a tip is recorded an empty
 /// `previous_envelope_hash` is a chain break (valid only at genesis, before any tip); a non-empty
 /// one must be exactly the 32-byte tip. Any other value — empty, wrong length, or non-matching —
-/// drops the envelope without dispatching and without throwing. An outpost's FIRST accepted
-/// envelope (no tip yet) still bootstraps regardless of its prev-hash.
+/// is rejected at ingress: `deliver` reverts, so nothing is recorded or dispatched. An outpost's
+/// FIRST accepted envelope (no tip yet) still bootstraps regardless of its prev-hash.
 ///
 /// The oracle encoder in this file is an independent host-side reimplementation of the canonical
 /// encoding (the contract-side implementation is
@@ -44,178 +44,10 @@ using namespace sysio::chain;
 
 using mvo = fc::mutable_variant_object;
 
+// Canonical-encoding + header-derivation oracle shared across the contract tests.
+#include "opp_envelope_oracle.hpp"
+
 namespace {
-
-// ---------------------------------------------------------------------------
-//  Canonical field-complete encoding oracle (host side, over the Google
-//  protobuf classes). Field numbers and presence rules mirror
-//  opp_canonical_codec.hpp; see that header for the encoding definition.
-// ---------------------------------------------------------------------------
-namespace oracle {
-
-   void put_varint(std::vector<char>& out, uint64_t v) {
-      while (v >= 0x80) {
-         out.push_back(static_cast<char>(static_cast<uint8_t>(v) | 0x80));
-         v >>= 7;
-      }
-      out.push_back(static_cast<char>(static_cast<uint8_t>(v)));
-   }
-
-   /// wire type 0 = varint, 2 = length-delimited
-   void put_tag(std::vector<char>& out, uint32_t field, uint32_t wire) {
-      put_varint(out, (static_cast<uint64_t>(field) << 3) | wire);
-   }
-
-   void put_varint_field(std::vector<char>& out, uint32_t field, uint64_t v) {
-      put_tag(out, field, 0);
-      put_varint(out, v);
-   }
-
-   void put_bytes_field(std::vector<char>& out, uint32_t field, const std::string& v) {
-      put_tag(out, field, 2);
-      put_varint(out, v.size());
-      out.insert(out.end(), v.begin(), v.end());
-   }
-
-   void put_submessage(std::vector<char>& out, uint32_t field, const std::vector<char>& body) {
-      put_tag(out, field, 2);
-      put_varint(out, body.size());
-      out.insert(out.end(), body.begin(), body.end());
-   }
-
-   std::vector<char> encode(const sysio::opp::types::ChainId& m) {
-      std::vector<char> out;
-      put_varint_field(out, 1, magic_enum::enum_integer(m.kind()));
-      put_varint_field(out, 2, m.id());
-      return out;
-   }
-
-   std::vector<char> encode(const sysio::opp::Endpoints& m) {
-      std::vector<char> out;
-      put_submessage(out, 1, encode(m.start()));
-      put_submessage(out, 2, encode(m.end()));
-      return out;
-   }
-
-   std::vector<char> encode(const sysio::opp::MessageHeader& m) {
-      std::vector<char> out;
-      put_submessage(out, 1, encode(m.endpoints()));
-      put_bytes_field(out, 2, m.message_id());
-      put_bytes_field(out, 3, m.previous_message_id());
-      // Slot 4 was `encoding_flags` — removed from opp.proto; reserved, do not reuse.
-      put_varint_field(out, 5, m.payload_size());
-      put_bytes_field(out, 6, m.payload_checksum());
-      put_varint_field(out, 7, m.timestamp());
-      put_bytes_field(out, 8, m.header_checksum());
-      return out;
-   }
-
-   std::vector<char> encode(const sysio::opp::AttestationEntry& m) {
-      std::vector<char> out;
-      put_varint_field(out, 1, magic_enum::enum_integer(m.type()));
-      put_varint_field(out, 2, m.data_size());
-      put_bytes_field(out, 3, m.data());
-      return out;
-   }
-
-   std::vector<char> encode(const sysio::opp::MessagePayload& m) {
-      std::vector<char> out;
-      put_varint_field(out, 1, m.version());
-      for (const auto& a : m.attestations())
-         put_submessage(out, 2, encode(a));
-      return out;
-   }
-
-   std::vector<char> encode(const sysio::opp::Message& m) {
-      std::vector<char> out;
-      put_submessage(out, 1, encode(m.header()));
-      put_submessage(out, 2, encode(m.payload()));
-      return out;
-   }
-
-   std::vector<char> encode(const sysio::opp::Envelope& m, bool blank_envelope_hash = false) {
-      std::vector<char> out;
-      put_bytes_field(out, 1, blank_envelope_hash ? std::string{} : m.envelope_hash());
-      put_submessage(out, 2, encode(m.endpoints()));
-      put_varint_field(out, 5, m.epoch_timestamp());
-      put_varint_field(out, 6, m.epoch_index());
-      put_varint_field(out, 7, m.epoch_envelope_index());
-      put_bytes_field(out, 20, m.previous_envelope_hash());
-      for (const auto& msg : m.messages())
-         put_submessage(out, 40, encode(msg));
-      return out;
-   }
-
-   /// keccak256 over the canonical encoding with `envelope_hash` blanked: the cross-chain epoch
-   /// digest (`OPPCommon.epochHash` on the outposts, `opp::canonical::epoch_digest` in the depot).
-   fc::crypto::keccak256 epoch_digest(const sysio::opp::Envelope& env) {
-      const auto preimage = encode(env, /*blank_envelope_hash=*/true);
-      return fc::crypto::keccak256::hash(std::span<const uint8_t>(
-         reinterpret_cast<const uint8_t*>(preimage.data()), preimage.size()));
-   }
-
-   /// The digest as the raw 32-byte string a protobuf `bytes` field carries.
-   std::string digest_bytes(const fc::crypto::keccak256& d) {
-      return std::string(reinterpret_cast<const char*>(d.data()), d.data_size());
-   }
-
-   fc::crypto::keccak256 keccak_of(const std::vector<char>& bytes) {
-      return fc::crypto::keccak256::hash(std::span<const uint8_t>(
-         reinterpret_cast<const uint8_t*>(bytes.data()), bytes.size()));
-   }
-
-   /// The spec derivation of `MessageHeader.header_checksum`: keccak256 over the canonical
-   /// header with `message_id` and `header_checksum` blanked (mirrors
-   /// `opp::canonical::header_digest` and Solidity `OPPCommon.headerChecksum`).
-   fc::crypto::keccak256 header_checksum(const sysio::opp::MessageHeader& header) {
-      sysio::opp::MessageHeader blanked = header;
-      blanked.set_message_id("");
-      blanked.set_header_checksum("");
-      return keccak_of(encode(blanked));
-   }
-
-   /// The spec derivation of `MessageHeader.message_id`: the header checksum with its first 8
-   /// bytes replaced by the message's big-endian sequence number (mirrors
-   /// `opp::canonical::derive_message_id` and Solidity `OPPCommon.getMessageID`).
-   std::string derive_message_id(const fc::crypto::keccak256& checksum, uint64_t sequence) {
-      std::string id = digest_bytes(checksum);
-      for (size_t i = 0; i < 8; ++i) {
-         id[i] = static_cast<char>(static_cast<uint8_t>(sequence >> (8 * (7 - i))));
-      }
-      return id;
-   }
-
-   /// Big-endian sequence number in the first 8 bytes of a wire message id; 0 when empty
-   /// (stream genesis) or out-of-spec short.
-   uint64_t message_sequence(const std::string& message_id) {
-      if (message_id.size() < 8) {
-         return 0;
-      }
-      uint64_t sequence = 0;
-      for (size_t i = 0; i < 8; ++i) {
-         sequence = (sequence << 8) | static_cast<uint8_t>(message_id[i]);
-      }
-      return sequence;
-   }
-
-   /// Populate `msg`'s semantic header per the spec derivation from its payload and stream
-   /// predecessor: `payload_size` / `payload_checksum` over the payload's canonical bytes, then
-   /// `header_checksum` over the blanked header, then `message_id` at the predecessor's sequence
-   /// number + 1. Mirrors what `sysio.msgch::buildenv` derives on emit.
-   void finalize_header(sysio::opp::Message& msg, const std::string& prev_message_id,
-                        uint64_t timestamp_ms) {
-      auto* header = msg.mutable_header();
-      header->set_previous_message_id(prev_message_id);
-      const auto payload_bytes = encode(msg.payload());
-      header->set_payload_size(static_cast<uint32_t>(payload_bytes.size()));
-      header->set_payload_checksum(digest_bytes(keccak_of(payload_bytes)));
-      header->set_timestamp(timestamp_ms);
-      const auto checksum = header_checksum(*header);
-      header->set_header_checksum(digest_bytes(checksum));
-      header->set_message_id(derive_message_id(checksum, message_sequence(prev_message_id) + 1));
-   }
-
-} // namespace oracle
 
 inline fc::mutable_variant_object codename_mvo(std::string_view s) {
    return mvo()("value", fc::slug_name{s}.value);
@@ -244,6 +76,8 @@ public:
    static constexpr auto CHAINS_ACCOUNT = "sysio.chains"_n;
    static constexpr auto UWRIT_ACCOUNT  = "sysio.uwrit"_n;
    static constexpr auto BATCHOP        = "batchop.a"_n;
+   static constexpr auto BATCHOP_B      = "batchop.b"_n;
+   static constexpr auto BATCHOP_C      = "batchop.c"_n;
 
    static constexpr uint32_t EPOCH_DURATION_SEC = 60;
 
@@ -255,7 +89,7 @@ public:
       // pay-epoch transfers. Same bootstrap rationale as sysio_epoch_flushwtdw_tester.
       create_accounts({
          TOKEN_ACCOUNT, EPOCH_ACCOUNT, OPREG_ACCOUNT, MSGCH_ACCOUNT,
-         CHALG_ACCOUNT, CHAINS_ACCOUNT, UWRIT_ACCOUNT, BATCHOP,
+         CHALG_ACCOUNT, CHAINS_ACCOUNT, UWRIT_ACCOUNT, BATCHOP, BATCHOP_B, BATCHOP_C,
          "sysio.dclaim"_n, "sysio.gov"_n, "sysio.ops"_n
       });
       produce_blocks(2);
@@ -358,14 +192,18 @@ public:
             ("pay_cadence_epochs",     uint16_t(1))));
    }
 
-   /// Epoch + opreg config, one bootstrapped batch op, ETH + SOL chain rows, group schedule,
-   /// genesis advance.
-   void bootstrap() {
+   /// Epoch + opreg config, bootstrapped batch ops (`BATCHOP` always; `BATCHOP_B`/`BATCHOP_C` when
+   /// `n_batch_ops` is 3 -- a single group of three, so consensus needs more than one delivery),
+   /// ETH + SOL chain rows, group schedule, genesis advance.
+   void bootstrap(uint32_t n_batch_ops = 1) {
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT,
          "setconfig"_n, mvo()
             ("epoch_duration_sec",                  EPOCH_DURATION_SEC)
-            ("operators_per_epoch",                 1)
-            ("batch_operator_minimum_active",       1)
+            // Consensus group size: evalcons' unanimous/majority thresholds derive from
+            // `epochcfg.operators_per_epoch` (see msgch's epoch_operators_per_group). The epoch
+            // contract enforces minimum_active == operators_per_epoch * batch_op_groups.
+            ("operators_per_epoch",                 n_batch_ops)
+            ("batch_operator_minimum_active",       n_batch_ops)
             ("batch_op_groups",                     1)
             ("epoch_retention_envelope_log_count",  200)));
 
@@ -387,11 +225,18 @@ public:
             ("req_batchop_collat",               fc::variants{})
             ("req_uw_collat",                    fc::variants{})));
 
-      BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT,
-         "regoperator"_n, mvo()
-            ("account",          BATCHOP.to_string())
-            ("type",             opp::types::OperatorType::OPERATOR_TYPE_BATCH)
-            ("is_bootstrapped",  true)));
+      std::vector<name> batch_ops{BATCHOP};
+      if (n_batch_ops == 3) {
+         batch_ops.push_back(BATCHOP_B);
+         batch_ops.push_back(BATCHOP_C);
+      }
+      for (const auto& op : batch_ops) {
+         BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT,
+            "regoperator"_n, mvo()
+               ("account",          op.to_string())
+               ("type",             opp::types::OperatorType::OPERATOR_TYPE_BATCH)
+               ("is_bootstrapped",  true)));
+      }
 
       register_chain(opp::types::ChainKind::CHAIN_KIND_EVM, "ETH", 31337);
       register_chain(opp::types::ChainKind::CHAIN_KIND_SVM, "SOL", 1);
@@ -437,10 +282,23 @@ public:
    // -- msgch actions --
 
    action_result deliver(uint64_t chain_code, const std::vector<char>& data) {
-      return push(MSGCH_ACCOUNT, msgch_abi, BATCHOP, "deliver"_n, mvo()
-         ("batch_op_name", BATCHOP.to_string())
+      return deliver_as(BATCHOP, chain_code, data);
+   }
+
+   action_result deliver_as(name op, uint64_t chain_code, const std::vector<char>& data) {
+      return push(MSGCH_ACCOUNT, msgch_abi, op, "deliver"_n, mvo()
+         ("batch_op_name", op.to_string())
          ("chain_code",    chain_code)
          ("data",          data));
+   }
+
+   /// Let the consensus boundary elapse WITHOUT advancing the epoch: evalcons' fallback
+   /// (majority) path opens once `epoch_duration_sec` has passed since the epoch started,
+   /// while `deliver`'s epoch gate keeps accepting envelopes for the still-current epoch.
+   void elapse_epoch_boundary() {
+      for (uint32_t i = 0; i < EPOCH_DURATION_SEC * 2 + 1; ++i) {
+         produce_block();
+      }
    }
 
    action_result queueout(uint64_t chain_code, uint32_t attest_type,
@@ -502,9 +360,13 @@ public:
 
    /// Encode a deliverable envelope carrying one out-of-scope STAKE attestation (dispatch drops
    /// the attestation silently; acceptance is still fully observable via `outpcons` and the
-   /// stored attestation row). `prev` / `env_hash` are raw 32-byte strings (or empty).
+   /// stored attestation row). The semantic header is derived per the spec — `apply_consensus`
+   /// drops envelopes whose header fields do not recompute or whose message does not continue the
+   /// per-outpost message chain. `prev` (previous_envelope_hash), `prev_message_id`, and
+   /// `env_hash` are raw 32-byte strings (or empty for stream genesis).
    std::vector<char> encode_delivery(uint32_t epoch_index, const std::string& att_data,
                                      const std::string& prev = {},
+                                     const std::string& prev_message_id = {},
                                      const std::string& env_hash = {}) {
       sysio::opp::Envelope env;
       env.set_epoch_index(epoch_index);
@@ -516,6 +378,7 @@ public:
       att->set_type(sysio::opp::types::ATTESTATION_TYPE_STAKE);
       att->set_data(att_data);
       att->set_data_size(static_cast<uint32_t>(att_data.size()));
+      oracle::finalize_header(*env.mutable_messages(0), prev_message_id, 1'775'612'516'983ULL);
       std::vector<char> out(env.ByteSizeLong());
       env.SerializeToArray(out.data(), static_cast<int>(out.size()));
       return out;
@@ -526,6 +389,12 @@ public:
       sysio::opp::Envelope env;
       BOOST_REQUIRE(env.ParseFromArray(raw.data(), static_cast<int>(raw.size())));
       return env;
+   }
+
+   /// The raw 32-byte `message_id` of a delivery's single message — the value the NEXT delivery
+   /// on the same outpost stream must carry in `previous_message_id`.
+   std::string delivery_message_id(const std::vector<char>& raw) {
+      return decode_envelope(raw).messages(0).header().message_id();
    }
 
    abi_serializer sysio_abi, token_abi, epoch_abi, opreg_abi, msgch_abi, chains_abi, uwrit_abi;
@@ -680,8 +549,9 @@ BOOST_FIXTURE_TEST_CASE(buildenv_chains_consecutive_envelopes, sysio_msgch_chain
          oracle::header_checksum(header).str());
       BOOST_REQUIRE_EQUAL(
          header.message_id(),
-         oracle::derive_message_id(oracle::header_checksum(header),
-                                   oracle::message_sequence(header.previous_message_id()) + 1));
+         oracle::derive_message_id(
+            oracle::header_checksum(header),
+            oracle::message_sequence(header.previous_message_id()).value() + 1));
 
       // Message chain link: previous_message_id carries the predecessor row's stream tip, and
       // the new row's `last_message_id` records this emit's id for the next link.
@@ -720,7 +590,7 @@ BOOST_FIXTURE_TEST_CASE(buildenv_first_emit_chains_from_empty, sysio_msgch_chain
    BOOST_REQUIRE_EQUAL(env.messages_size(), 1);
    const auto& header = env.messages(0).header();
    BOOST_REQUIRE_EQUAL(header.previous_message_id().size(), 0u);
-   BOOST_REQUIRE_EQUAL(oracle::message_sequence(header.message_id()), 1u);
+   BOOST_REQUIRE_EQUAL(oracle::message_sequence(header.message_id()).value(), 1u);
    BOOST_REQUIRE_EQUAL(row["last_message_id"].as_string(),
                        fc::to_hex(header.message_id().data(), header.message_id().size()));
 } FC_LOG_AND_RETHROW() }
@@ -735,7 +605,8 @@ BOOST_FIXTURE_TEST_CASE(inbound_chain_tip_recorded_and_verified, sysio_msgch_cha
    // Epoch E: first envelope from ETH: no tip exists yet, accepted (bootstrap), tip recorded.
    uint32_t epoch = current_epoch();
    auto n1 = encode_delivery(epoch, "alpha");
-   const auto n1_digest = oracle::epoch_digest(decode_envelope(n1));
+   const auto n1_digest  = oracle::epoch_digest(decode_envelope(n1));
+   const auto n1_msg_id  = delivery_message_id(n1);
    BOOST_REQUIRE_EQUAL(success(), deliver(ETH_OUTPOST_ID, n1));
    produce_blocks();
 
@@ -745,10 +616,12 @@ BOOST_FIXTURE_TEST_CASE(inbound_chain_tip_recorded_and_verified, sysio_msgch_cha
    BOOST_REQUIRE_EQUAL(opc["envelope_digest"].as_string(), n1_digest.str());
    BOOST_REQUIRE_EQUAL(attestation_count(ETH_OUTPOST_ID, epoch), 1u);
 
-   // Epoch E+1: correctly chained envelope (prev = tip) is accepted and advances the tip.
+   // Epoch E+1: correctly chained envelope (prev = tip at BOTH the envelope and message level) is
+   // accepted and advances both tips.
    epoch = advance_one_epoch();
-   auto n2 = encode_delivery(epoch, "bravo", oracle::digest_bytes(n1_digest));
+   auto n2 = encode_delivery(epoch, "bravo", oracle::digest_bytes(n1_digest), n1_msg_id);
    const auto n2_digest = oracle::epoch_digest(decode_envelope(n2));
+   const auto n2_msg_id = delivery_message_id(n2);
    BOOST_REQUIRE_EQUAL(success(), deliver(ETH_OUTPOST_ID, n2));
    produce_blocks();
 
@@ -757,11 +630,15 @@ BOOST_FIXTURE_TEST_CASE(inbound_chain_tip_recorded_and_verified, sysio_msgch_cha
    BOOST_REQUIRE_EQUAL(opc["envelope_digest"].as_string(), n2_digest.str());
    BOOST_REQUIRE_EQUAL(attestation_count(ETH_OUTPOST_ID, epoch), 1u);
 
-   // Epoch E+2: chain break: a non-empty prev that does not continue the tip is dropped
-   // without throwing: deliver succeeds, nothing is dispatched, the tip does not move.
+   // Epoch E+2: chain break: a non-empty prev that does not continue the tip is REJECTED at
+   // ingress -- deliver reverts (see msgch::deliver's inbound_envelope_valid gate), so no row is
+   // recorded, nothing is dispatched, and the tip does not move.
    const uint32_t break_epoch = advance_one_epoch();
    auto n3 = encode_delivery(break_epoch, "charlie", std::string(32, '\x11'));
-   BOOST_REQUIRE_EQUAL(success(), deliver(ETH_OUTPOST_ID, n3));
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: delivered envelope failed inbound-chain or "
+            "semantic-header validation"),
+      deliver(ETH_OUTPOST_ID, n3));
    produce_blocks();
 
    opc = get_outpcons(ETH_OUTPOST_ID);
@@ -769,12 +646,15 @@ BOOST_FIXTURE_TEST_CASE(inbound_chain_tip_recorded_and_verified, sysio_msgch_cha
    BOOST_REQUIRE_EQUAL(opc["envelope_digest"].as_string(), n2_digest.str()); // tip unchanged
    BOOST_REQUIRE_EQUAL(attestation_count(ETH_OUTPOST_ID, break_epoch), 0u);  // nothing dispatched
 
-   // Epoch E+3: enforcement (SEC-107 completion): an EMPTY prev on a non-genesis epoch is now a
-   // chain break. Both outposts self-chain per stream, so once a tip is recorded an empty
-   // prev-hash no longer bootstraps — it is dropped without throwing and the tip does not move.
+   // Epoch E+3: enforcement (SEC-107 completion): an EMPTY prev on a non-genesis epoch is a chain
+   // break. Both outposts self-chain per stream, so once a tip is recorded an empty prev-hash no
+   // longer bootstraps — it is REJECTED at ingress (deliver reverts) and the tip does not move.
    const uint32_t empty_epoch = advance_one_epoch();
    auto n4 = encode_delivery(empty_epoch, "delta");   // no prev => empty field
-   BOOST_REQUIRE_EQUAL(success(), deliver(ETH_OUTPOST_ID, n4));
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: delivered envelope failed inbound-chain or "
+            "semantic-header validation"),
+      deliver(ETH_OUTPOST_ID, n4));
    produce_blocks();
 
    opc = get_outpcons(ETH_OUTPOST_ID);
@@ -787,7 +667,7 @@ BOOST_FIXTURE_TEST_CASE(inbound_chain_tip_recorded_and_verified, sysio_msgch_cha
    // chained prev (from the still-current tip n2, since the empty E+3 delivery was dropped) keeps
    // the chain moving.
    const uint32_t blank_epoch = advance_one_epoch();
-   auto n5 = encode_delivery(blank_epoch, "echo", oracle::digest_bytes(n2_digest),
+   auto n5 = encode_delivery(blank_epoch, "echo", oracle::digest_bytes(n2_digest), n2_msg_id,
                              /*env_hash=*/std::string(32, '\x22'));
    auto n5_env = decode_envelope(n5);
    BOOST_REQUIRE_EQUAL(n5_env.envelope_hash().size(), 32u);
@@ -798,6 +678,144 @@ BOOST_FIXTURE_TEST_CASE(inbound_chain_tip_recorded_and_verified, sysio_msgch_cha
    opc = get_outpcons(ETH_OUTPOST_ID);
    BOOST_REQUIRE_EQUAL(opc["epoch_index"].as<uint32_t>(), blank_epoch);
    BOOST_REQUIRE_EQUAL(opc["envelope_digest"].as_string(), n5_digest.str());
+} FC_LOG_AND_RETHROW() }
+
+/// Semantic-header enforcement: every header field must recompute per the spec derivation; a
+/// forged field is REJECTED at ingress -- `deliver` reverts (the header check runs there), so no
+/// envelope row is recorded, no attestation, no consensus record, no chain-tip movement. Each
+/// forgery is exercised at its own epoch on a correctly CHAINED envelope, so the rejection is
+/// attributable to the header check rather than the envelope-chain check; a final well-formed
+/// delivery proves the stream resumes.
+BOOST_FIXTURE_TEST_CASE(inbound_semantic_header_forgeries_dropped, sysio_msgch_chain_tester) { try {
+   bootstrap();
+
+   // Establish a tip so every subsequent forgery chains correctly at the envelope AND message
+   // level -- so each drop is attributable to the mutated field, not the chain checks.
+   uint32_t epoch = current_epoch();
+   auto base = encode_delivery(epoch, "alpha");
+   const auto tip        = oracle::epoch_digest(decode_envelope(base));
+   const auto tip_msg_id = delivery_message_id(base);
+   BOOST_REQUIRE_EQUAL(success(), deliver(ETH_OUTPOST_ID, base));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(attestation_count(ETH_OUTPOST_ID, epoch), 1u);
+   const uint32_t accepted_epoch = epoch;
+
+   // Deliver a correctly-chained envelope whose decoded form was altered by `mutate`, then
+   // assert it was REJECTED at ingress: `deliver` reverts (the semantic-header check runs there,
+   // see msgch::deliver's inbound_envelope_valid gate), so no envelope row is recorded, no
+   // attestation lands for its epoch, the consensus record stays at the last accepted epoch, and
+   // the tip does not move.
+   auto forged_delivery_dropped = [&](const char* tag,
+                                      const std::function<void(sysio::opp::Envelope&)>& mutate) {
+      const uint32_t e = advance_one_epoch();
+      auto env = decode_envelope(encode_delivery(e, tag, oracle::digest_bytes(tip), tip_msg_id));
+      mutate(env);
+      std::vector<char> out(env.ByteSizeLong());
+      env.SerializeToArray(out.data(), static_cast<int>(out.size()));
+      BOOST_REQUIRE_EQUAL(
+         error("assertion failure with message: delivered envelope failed inbound-chain or "
+               "semantic-header validation"),
+         deliver(ETH_OUTPOST_ID, out));
+      produce_blocks();
+      BOOST_REQUIRE_EQUAL(attestation_count(ETH_OUTPOST_ID, e), 0u);
+      auto opc = get_outpcons(ETH_OUTPOST_ID);
+      BOOST_REQUIRE(!opc.is_null());
+      BOOST_REQUIRE_EQUAL(opc["epoch_index"].as<uint32_t>(), accepted_epoch);
+      BOOST_REQUIRE_EQUAL(opc["envelope_digest"].as_string(), tip.str());
+   };
+
+   forged_delivery_dropped("pc", [](sysio::opp::Envelope& env) {
+      auto* h = env.mutable_messages(0)->mutable_header();
+      std::string c = h->payload_checksum(); c[0] ^= 0x01; h->set_payload_checksum(c);
+   });
+   forged_delivery_dropped("hc", [](sysio::opp::Envelope& env) {
+      auto* h = env.mutable_messages(0)->mutable_header();
+      std::string c = h->header_checksum(); c[31] ^= 0x01; h->set_header_checksum(c);
+   });
+   forged_delivery_dropped("ps", [](sysio::opp::Envelope& env) {
+      auto* h = env.mutable_messages(0)->mutable_header();
+      h->set_payload_size(h->payload_size() + 1);
+   });
+   forged_delivery_dropped("seq", [](sysio::opp::Envelope& env) {
+      // Correct checksum tail, wrong embedded sequence number: the derivation demands
+      // previous_message_id's sequence + 1, so + 2 (skipping one) is always wrong regardless of
+      // where the base sits in the stream.
+      auto* h = env.mutable_messages(0)->mutable_header();
+      const uint64_t wrong_seq =
+         oracle::message_sequence(h->previous_message_id()).value() + 2;
+      h->set_message_id(oracle::derive_message_id(oracle::header_checksum(*h), wrong_seq));
+   });
+   forged_delivery_dropped("ds", [](sysio::opp::Envelope& env) {
+      auto* a = env.mutable_messages(0)->mutable_payload()->mutable_attestations(0);
+      a->set_data_size(a->data_size() + 1);
+   });
+   forged_delivery_dropped("prevlen", [](sysio::opp::Envelope& env) {
+      // Non-canonical previous_message_id length (neither empty nor 32 bytes), with the checksum
+      // and id honestly re-derived over it the way a colluding emitter would -- the drop must
+      // come from the length rule alone, not from a checksum mismatch.
+      auto* h = env.mutable_messages(0)->mutable_header();
+      h->set_previous_message_id(std::string(5, '\x07'));
+      const auto checksum = oracle::header_checksum(*h);
+      h->set_header_checksum(oracle::digest_bytes(checksum));
+      h->set_message_id(oracle::derive_message_id(checksum, 1));
+   });
+
+   // The stream resumes: a well-formed envelope, chained from the still-current tip at both the
+   // envelope and message level, is accepted and advances the tip past all the dropped epochs.
+   const uint32_t resume_epoch = advance_one_epoch();
+   auto resume = encode_delivery(resume_epoch, "omega", oracle::digest_bytes(tip), tip_msg_id);
+   const auto resume_digest = oracle::epoch_digest(decode_envelope(resume));
+   BOOST_REQUIRE_EQUAL(success(), deliver(ETH_OUTPOST_ID, resume));
+   produce_blocks();
+   auto opc = get_outpcons(ETH_OUTPOST_ID);
+   BOOST_REQUIRE_EQUAL(opc["epoch_index"].as<uint32_t>(), resume_epoch);
+   BOOST_REQUIRE_EQUAL(opc["envelope_digest"].as_string(), resume_digest.str());
+   BOOST_REQUIRE_EQUAL(attestation_count(ETH_OUTPOST_ID, resume_epoch), 1u);
+} FC_LOG_AND_RETHROW() }
+
+/// SEC-102 P1 (huang): the message chain stops replay of an earlier valid message inside a
+/// correctly ENVELOPE-chained successor. The envelope chain orders envelopes but does not bind
+/// the messages they carry, so without the per-outpost message tip a malicious batch-operator
+/// quorum could re-emit an old `Message` verbatim -- self-consistent header and all -- in a fresh,
+/// correctly-chained envelope and re-dispatch its attestations (e.g. crediting one escrow deposit
+/// twice). Here the replay carries a value-bearing OPERATOR_ACTION so the double-dispatch would be
+/// financially real; the message-tip check drops it before any dispatch.
+BOOST_FIXTURE_TEST_CASE(inbound_message_replay_dropped, sysio_msgch_chain_tester) { try {
+   bootstrap();
+
+   // Epoch E: accept a genesis envelope carrying message M1. The message tip becomes M1's id.
+   uint32_t epoch = current_epoch();
+   auto e1 = encode_delivery(epoch, "m1");
+   const auto e1_digest = oracle::epoch_digest(decode_envelope(e1));
+   BOOST_REQUIRE_EQUAL(success(), deliver(ETH_OUTPOST_ID, e1));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(attestation_count(ETH_OUTPOST_ID, epoch), 1u);
+
+   // Epoch E+1: a fresh envelope, correctly chained at the ENVELOPE level (previous_envelope_hash
+   // = E's digest), but carrying M1 replayed verbatim. M1's previous_message_id is empty (it was
+   // the stream's genesis message), which no longer continues the recorded message tip, so the
+   // envelope is REJECTED at ingress: deliver reverts, no new attestation row, the tip does not move.
+   const uint32_t replay_epoch = advance_one_epoch();
+   auto replay = [&]() {
+      sysio::opp::Envelope env;
+      env.set_epoch_index(replay_epoch);
+      env.set_epoch_envelope_index(1);
+      env.set_epoch_timestamp(1'775'612'516'983ULL);
+      env.set_previous_envelope_hash(oracle::digest_bytes(e1_digest));
+      *env.add_messages() = decode_envelope(e1).messages(0);   // M1 verbatim
+      std::vector<char> out(env.ByteSizeLong());
+      env.SerializeToArray(out.data(), static_cast<int>(out.size()));
+      return out;
+   }();
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: delivered envelope failed inbound-chain or "
+            "semantic-header validation"),
+      deliver(ETH_OUTPOST_ID, replay));
+   produce_blocks();
+
+   auto opc = get_outpcons(ETH_OUTPOST_ID);
+   BOOST_REQUIRE_EQUAL(opc["epoch_index"].as<uint32_t>(), epoch);            // still E
+   BOOST_REQUIRE_EQUAL(attestation_count(ETH_OUTPOST_ID, replay_epoch), 0u); // replay not dispatched
 } FC_LOG_AND_RETHROW() }
 
 /// SEC-107 completion: the SVM cross-stream alternate is REMOVED. The Solana outpost now
@@ -832,9 +850,11 @@ BOOST_FIXTURE_TEST_CASE(inbound_rejects_cross_stream_link_for_svm_outposts,
                                          outbound_digest_bytes.data(),
                                          outbound_digest_bytes.size()));
 
-   // Cross-stream link (prev = depot's outbound emit digest) is now a chain break: dropped
-   // without throwing, tip does not move, nothing dispatched.
-   BOOST_REQUIRE_EQUAL(success(),
+   // Cross-stream link (prev = depot's outbound emit digest) is a chain break: REJECTED at ingress
+   // (deliver reverts), tip does not move, nothing recorded or dispatched.
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: delivered envelope failed inbound-chain or "
+            "semantic-header validation"),
       deliver(SOL_OUTPOST_ID, encode_delivery(epoch, "xstream-b", outbound_digest_bytes)));
    produce_blocks();
 
@@ -868,7 +888,9 @@ BOOST_FIXTURE_TEST_CASE(inbound_rejects_cross_stream_link_for_evm_outposts,
                                          outbound_digest_bytes.data(),
                                          outbound_digest_bytes.size()));
 
-   BOOST_REQUIRE_EQUAL(success(),
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: delivered envelope failed inbound-chain or "
+            "semantic-header validation"),
       deliver(ETH_OUTPOST_ID, encode_delivery(epoch, "evm-xstream-b", outbound_digest_bytes)));
    produce_blocks();
 
@@ -895,6 +917,73 @@ BOOST_FIXTURE_TEST_CASE(inbound_bootstrap_accepts_unverifiable_prev, sysio_msgch
    BOOST_REQUIRE_EQUAL(opc["epoch_index"].as<uint32_t>(), epoch);
    BOOST_REQUIRE_EQUAL(opc["envelope_digest"].as_string(), n1_digest.str());
    BOOST_REQUIRE_EQUAL(attestation_count(SOL_OUTPOST_ID, epoch), 1u);
+} FC_LOG_AND_RETHROW() }
+
+/// Late confirmation: once an epoch's winner is accepted, the per-stream tip advances to the
+/// winner's own digest, so the winner no longer "continues" the chain it just extended. The
+/// remaining operators of the group still deliver the exact accepted bytes (`sysio.epoch::advance`
+/// classifies every operator's delivery as canonical or slashable), and `deliver` must record --
+/// not chain-break-revert -- them. A three-operator group reaches majority consensus at the second
+/// post-boundary delivery; the third operator's byte-identical delivery is the late confirmation.
+/// A DIVERGENT post-acceptance delivery still reverts (fail closed): post-acceptance divergence
+/// cannot open a dispute, so nothing legitimate is lost by rejecting it at ingress.
+BOOST_FIXTURE_TEST_CASE(late_confirmation_after_consensus_recorded, sysio_msgch_chain_tester) { try {
+   bootstrap(/*n_batch_ops=*/3);
+
+   const uint32_t epoch = current_epoch();
+   auto winner = encode_delivery(epoch, "late-confirm");
+   const auto winner_digest = oracle::epoch_digest(decode_envelope(winner));
+
+   // First delivery: group of three, boundary not elapsed -- no consensus yet.
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, winner));
+   produce_blocks();
+   {
+      auto opc = get_outpcons(ETH_OUTPOST_ID);
+      BOOST_REQUIRE(opc.is_null() || !opc["consensus_reached"].as<bool>());
+   }
+
+   // Second delivery after the boundary: majority (2 of 3) tips consensus and advances the tip
+   // to the winner's own digest.
+   elapse_epoch_boundary();
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, winner));
+   produce_blocks();
+   {
+      auto opc = get_outpcons(ETH_OUTPOST_ID);
+      BOOST_REQUIRE(!opc.is_null());
+      BOOST_REQUIRE_EQUAL(opc["consensus_reached"].as<bool>(), true);
+      BOOST_REQUIRE_EQUAL(opc["epoch_index"].as<uint32_t>(), epoch);
+      BOOST_REQUIRE_EQUAL(opc["envelope_digest"].as_string(), winner_digest.str());
+   }
+
+   // A post-acceptance DIVERGENT envelope is not a late confirmation: its bytes differ from the
+   // recorded winner, so it validates against the advanced tip and reverts as a chain break.
+   auto divergent = encode_delivery(epoch, "late-diverge");
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: delivered envelope failed inbound-chain or "
+            "semantic-header validation"),
+      deliver_as(BATCHOP_C, ETH_OUTPOST_ID, divergent));
+   produce_blocks();
+
+   // The third operator's byte-identical delivery IS a late confirmation: recorded, not reverted.
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, ETH_OUTPOST_ID, winner));
+   produce_blocks();
+
+   // The duplicate guard now proves the confirmation row exists: a re-delivery from the same
+   // operator reports "already delivered" (it would report a chain break if the row had not been
+   // recorded).
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: operator already delivered for this outpost+epoch"),
+      deliver_as(BATCHOP_C, ETH_OUTPOST_ID, winner));
+
+   // Acceptance state is untouched by the late confirmation: same tip, same epoch, attestations
+   // dispatched exactly once.
+   {
+      auto opc = get_outpcons(ETH_OUTPOST_ID);
+      BOOST_REQUIRE_EQUAL(opc["consensus_reached"].as<bool>(), true);
+      BOOST_REQUIRE_EQUAL(opc["epoch_index"].as<uint32_t>(), epoch);
+      BOOST_REQUIRE_EQUAL(opc["envelope_digest"].as_string(), winner_digest.str());
+      BOOST_REQUIRE_EQUAL(attestation_count(ETH_OUTPOST_ID, epoch), 1u);
+   }
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()

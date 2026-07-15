@@ -30,6 +30,9 @@
 #include <magic_enum/magic_enum.hpp>
 
 #include "contracts.hpp"
+// Canonical-encoding + header-derivation oracle: inbound envelopes must carry
+// spec-derived semantic headers or apply_consensus drops them before dispatch.
+#include "opp_envelope_oracle.hpp"
 
 using namespace sysio::testing;
 using namespace sysio;
@@ -93,6 +96,8 @@ std::vector<char> encode_envelope_with_one_attestation(
    att->set_data(att_data);
    att->set_data_size(static_cast<uint32_t>(att_data.size()));
 
+   oracle::finalize_header(*env.mutable_messages(0), {}, 1'775'612'516'983ULL);
+
    std::vector<char> out(env.ByteSizeLong());
    env.SerializeToArray(out.data(), static_cast<int>(out.size()));
    return out;
@@ -120,6 +125,8 @@ std::vector<char> encode_envelope_with_attestations(
       att->set_data(d);
       att->set_data_size(static_cast<uint32_t>(d.size()));
    }
+
+   oracle::finalize_header(*env.mutable_messages(0), {}, 1'775'612'516'983ULL);
 
    std::vector<char> out(env.ByteSizeLong());
    env.SerializeToArray(out.data(), static_cast<int>(out.size()));
@@ -1430,6 +1437,72 @@ BOOST_FIXTURE_TEST_CASE(chkcons_survives_non_advancing_advance, sysio_dispatch_t
    produce_blocks();
    BOOST_REQUIRE_EQUAL(current_epoch(), epoch0);
    BOOST_REQUIRE_EQUAL(retry_count(), rc1 + 1);
+} FC_LOG_AND_RETHROW() }
+
+// A forged/invalid delivery cannot strand the epoch. SEC-102's semantic-header check runs at
+// INGRESS (msgch::deliver's inbound_envelope_valid gate), so a forged envelope reverts on delivery
+// and records no envelope row -- it can never reach the consensus tally and leave a phantom
+// consensus_reached with no outpcons row. A subsequent VALID delivery reaches consensus normally and
+// chkcons proceeds to ATTEMPT advance (retry_count bumps) rather than waiting forever for a consensus
+// row that an accepted-then-soft-dropped invalid winner would have left missing. Drives the
+// production chkcons gate, not a direct epoch::advance.
+BOOST_FIXTURE_TEST_CASE(forged_delivery_does_not_strand_chkcons, sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+   const auto eth_code = fc::slug_name{"ETH"}.value;
+   const uint32_t epoch0 = current_epoch();
+   const uint32_t target = epoch0 + 1;
+
+   auto operator_payload = encode_operator_action(
+      sysio::opp::attestations::OperatorAction::ACTION_TYPE_DEPOSIT_REQUEST,
+      sysio::opp::types::CHAIN_KIND_EVM,
+      uwrit_op_eth_pubkey,
+      /*chain_code_v=*/ eth_code,
+      /*token_code_v=*/ eth_code,
+      /*amount=*/ 1'000'000);
+   const auto valid = encode_envelope_with_one_attestation(
+      epoch0,
+      sysio::opp::types::ATTESTATION_TYPE_OPERATOR_ACTION,
+      operator_payload);
+
+   // A forged copy: corrupt payload_checksum so the semantic header no longer recomputes.
+   std::vector<char> forged;
+   {
+      sysio::opp::Envelope env;
+      BOOST_REQUIRE(env.ParseFromArray(valid.data(), static_cast<int>(valid.size())));
+      auto* h = env.mutable_messages(0)->mutable_header();
+      std::string c = h->payload_checksum();
+      c[0] ^= 0x01;
+      h->set_payload_checksum(c);
+      forged.resize(env.ByteSizeLong());
+      env.SerializeToArray(forged.data(), static_cast<int>(forged.size()));
+   }
+
+   // Forged delivery is rejected at ingress -- nothing recorded, no phantom consensus.
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: delivered envelope failed inbound-chain or "
+            "semantic-header validation"),
+      deliver(eth_code, forged));
+   produce_blocks();
+
+   auto retry_count = [&]() -> uint32_t {
+      auto bl = get_blocklog(target);
+      return bl.is_null() ? 0u : bl["retry_count"].as<uint32_t>();
+   };
+
+   // The valid delivery (operators_per_epoch == 1 => Option-A unanimous) reaches consensus normally.
+   BOOST_REQUIRE_EQUAL(success(), deliver(eth_code, valid));
+   produce_blocks();
+   const uint32_t rc0 = retry_count();
+
+   // Pass the wall clock so chkcons fires advance; confirm it ATTEMPTED advance (retry_count bumps),
+   // i.e. it was NOT stranded waiting on a missing consensus row. Advance itself gate-blocks on
+   // emissions (this fixture deploys no sysio.system), exactly as in chkcons_survives_non_advancing_advance.
+   produce_block(fc::seconds(120));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(success(), chkcons());
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(current_epoch(), epoch0);
+   BOOST_REQUIRE_EQUAL(retry_count(), rc0 + 1);
 } FC_LOG_AND_RETHROW() }
 
 // #5-residual: a race winner lacking a destination-chain authex link must be
