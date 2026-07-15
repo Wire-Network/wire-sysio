@@ -156,7 +156,6 @@ public:
          ("max_block_net_usage", 10000000 + n )
          ("target_block_net_usage_pct", 10 + n )
          ("max_transaction_net_usage", 1000000 + n )
-         ("base_per_transaction_net_usage", 100 + n)
          ("net_usage_leeway", 500 + n )
          ("context_free_discount_net_usage_num", 1 + n )
          ("context_free_discount_net_usage_den", 100 + n )

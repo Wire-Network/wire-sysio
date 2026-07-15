@@ -221,9 +221,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(chain_config_packed_stability, T, validating_teste
 
    // Verify packed size is stable.
    // If this changes, the packed WASM intrinsic format has changed.
-   // 80 = 8 (uint64) + 10×4 (uint32) + 4 (lifetime) + 4 (delay) + 4 (inline_size)
-   //    + 2 (inline_depth) + 2 (auth_depth) + 4×4 (action_return, kv_key, kv_value, kv_sec_key)
-   BOOST_CHECK_EQUAL(packed.size(), 80u);
+   // 76 = 8 (uint64) + 9x4 (uint32) + 4 (lifetime) + 4 (delay) + 4 (inline_size)
+   //    + 2 (inline_depth) + 2 (auth_depth) + 4x4 (action_return, kv_key, kv_value, kv_sec_key)
+   BOOST_CHECK_EQUAL(packed.size(), 76u);
 
    // Round-trip: unpack and verify all fields match
    chain_config_v0 unpacked;
@@ -233,7 +233,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(chain_config_packed_stability, T, validating_teste
    BOOST_CHECK_EQUAL(unpacked.max_block_net_usage, v0.max_block_net_usage);
    BOOST_CHECK_EQUAL(unpacked.target_block_net_usage_pct, v0.target_block_net_usage_pct);
    BOOST_CHECK_EQUAL(unpacked.max_transaction_net_usage, v0.max_transaction_net_usage);
-   BOOST_CHECK_EQUAL(unpacked.base_per_transaction_net_usage, v0.base_per_transaction_net_usage);
    BOOST_CHECK_EQUAL(unpacked.net_usage_leeway, v0.net_usage_leeway);
    BOOST_CHECK_EQUAL(unpacked.context_free_discount_net_usage_num, v0.context_free_discount_net_usage_num);
    BOOST_CHECK_EQUAL(unpacked.context_free_discount_net_usage_den, v0.context_free_discount_net_usage_den);

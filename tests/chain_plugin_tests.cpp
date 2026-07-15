@@ -148,7 +148,6 @@ BOOST_AUTO_TEST_CASE( get_consensus_parameters ) try {
    BOOST_TEST(v0config.max_block_cpu_usage == t.control->get_global_properties().configuration.max_block_cpu_usage);
    BOOST_TEST(v0config.target_block_net_usage_pct == t.control->get_global_properties().configuration.target_block_net_usage_pct);
    BOOST_TEST(v0config.max_transaction_net_usage == t.control->get_global_properties().configuration.max_transaction_net_usage);
-   BOOST_TEST(v0config.base_per_transaction_net_usage == t.control->get_global_properties().configuration.base_per_transaction_net_usage);
    BOOST_TEST(v0config.net_usage_leeway == t.control->get_global_properties().configuration.net_usage_leeway);
    BOOST_TEST(v0config.context_free_discount_net_usage_num == t.control->get_global_properties().configuration.context_free_discount_net_usage_num);
    BOOST_TEST(v0config.context_free_discount_net_usage_den == t.control->get_global_properties().configuration.context_free_discount_net_usage_den);
