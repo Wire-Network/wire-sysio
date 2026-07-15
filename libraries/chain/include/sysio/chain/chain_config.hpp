@@ -20,7 +20,6 @@ struct chain_config_v0 {
       max_block_net_usage_id,
       target_block_net_usage_pct_id,
       max_transaction_net_usage_id,
-      base_per_transaction_net_usage_id,
       net_usage_leeway_id,
       context_free_discount_net_usage_num_id,
       context_free_discount_net_usage_den_id,
@@ -43,7 +42,6 @@ struct chain_config_v0 {
    uint64_t   max_block_net_usage;                 ///< the maxiumum net usage in instructions for a block
    uint32_t   target_block_net_usage_pct;          ///< the target percent (1% == 100, 100%= 10,000) of maximum net usage; exceeding this triggers congestion handling
    uint32_t   max_transaction_net_usage;           ///< the maximum objectively measured net usage that the chain will allow regardless of account limits
-   uint32_t   base_per_transaction_net_usage;      ///< the base amount of net usage billed for a transaction to cover incidentals
    uint32_t   net_usage_leeway;
    uint32_t   context_free_discount_net_usage_num; ///< the numerator for the discount on net usage of context-free data
    uint32_t   context_free_discount_net_usage_den; ///< the denominator for the discount on net usage of context-free data
@@ -79,7 +77,6 @@ struct chain_config_v0 {
       return   std::tie(   lhs.max_block_net_usage,
                            lhs.target_block_net_usage_pct,
                            lhs.max_transaction_net_usage,
-                           lhs.base_per_transaction_net_usage,
                            lhs.net_usage_leeway,
                            lhs.context_free_discount_net_usage_num,
                            lhs.context_free_discount_net_usage_den,
@@ -101,7 +98,6 @@ struct chain_config_v0 {
                std::tie(   rhs.max_block_net_usage,
                            rhs.target_block_net_usage_pct,
                            rhs.max_transaction_net_usage,
-                           rhs.base_per_transaction_net_usage,
                            rhs.net_usage_leeway,
                            rhs.context_free_discount_net_usage_num,
                            rhs.context_free_discount_net_usage_den,
@@ -129,7 +125,6 @@ protected:
       return out << "Max Block Net Usage: " << max_block_net_usage << ", "
                      << "Target Block Net Usage Percent: " << ((double)target_block_net_usage_pct / (double)config::percent_1) << "%, "
                      << "Max Transaction Net Usage: " << max_transaction_net_usage << ", "
-                     << "Base Per-Transaction Net Usage: " << base_per_transaction_net_usage << ", "
                      << "Net Usage Leeway: " << net_usage_leeway << ", "
                      << "Context-Free Data Net Usage Discount: " << (double)context_free_discount_net_usage_num * 100.0 / (double)context_free_discount_net_usage_den << "% , "
 
@@ -167,7 +162,7 @@ using config_range = data_range<chain_config, config_entry_validator>;
 
 FC_REFLECT(sysio::chain::chain_config_v0,
            (max_block_net_usage)(target_block_net_usage_pct)
-           (max_transaction_net_usage)(base_per_transaction_net_usage)(net_usage_leeway)
+           (max_transaction_net_usage)(net_usage_leeway)
            (context_free_discount_net_usage_num)(context_free_discount_net_usage_den)
 
            (max_block_cpu_usage)(target_block_cpu_usage_pct)
@@ -206,9 +201,6 @@ inline DataStream &operator<<(DataStream &s, const sysio::chain::data_entry<sysi
       break;
       case chain_config_v0::max_transaction_net_usage_id:
       fc::raw::pack(s, entry.config.max_transaction_net_usage);
-      break;
-      case chain_config_v0::base_per_transaction_net_usage_id:
-      fc::raw::pack(s, entry.config.base_per_transaction_net_usage);
       break;
       case chain_config_v0::net_usage_leeway_id:
       fc::raw::pack(s, entry.config.net_usage_leeway);
@@ -286,9 +278,6 @@ inline DataStream &operator>>(DataStream &s, sysio::chain::data_entry<sysio::cha
       break;
       case chain_config_v0::max_transaction_net_usage_id:
       fc::raw::unpack(s, entry.config.max_transaction_net_usage);
-      break;
-      case chain_config_v0::base_per_transaction_net_usage_id:
-      fc::raw::unpack(s, entry.config.base_per_transaction_net_usage);
       break;
       case chain_config_v0::net_usage_leeway_id:
       fc::raw::unpack(s, entry.config.net_usage_leeway);

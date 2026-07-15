@@ -50,8 +50,8 @@ class [[sysio::contract]] action_results : public contract {
          datastream<char*> ds((char*)&buffer, sizeof(buffer));
          //20mb is MAX_SIZE_OF_BYTE_ARRAYS that is defined in fc.
          //we don't use fc in contracts so using hardcode here.
-         // ID 16 = max_action_return_value_size
-         ds << unsigned_int(uint32_t(1)) << unsigned_int(uint32_t(16)) << uint32_t(20*1024*1024);
+         // ID 15 = max_action_return_value_size
+         ds << unsigned_int(uint32_t(1)) << unsigned_int(uint32_t(15)) << uint32_t(20*1024*1024);
          set_parameters_packed(buffer, ds.tellp());
 
          vector<char> ret_vec(20*1024*1024, '1');
@@ -64,8 +64,8 @@ class [[sysio::contract]] action_results : public contract {
 
          char buffer[12];
          datastream<char*> ds((char*)&buffer, sizeof(buffer));
-         // ID 16 = max_action_return_value_size
-         ds << unsigned_int(uint32_t(1)) << unsigned_int(uint32_t(16)) << uint32_t(20*1024*1024 + 1);
+         // ID 15 = max_action_return_value_size
+         ds << unsigned_int(uint32_t(1)) << unsigned_int(uint32_t(15)) << uint32_t(20*1024*1024 + 1);
          //trying to set limit too large
          set_parameters_packed(buffer, ds.tellp());
       }

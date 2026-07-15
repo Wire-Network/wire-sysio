@@ -56,7 +56,6 @@ namespace sysio::chain::config {
   static constexpr uint32_t   default_max_block_net_usage                  = 1024 * 1024; /// at 500ms blocks and 200byte trx, this enables ~10,000 TPS burst
   static constexpr uint32_t   default_target_block_net_usage_pct           = 10 * percent_1; /// we target 1000 TPS
   static constexpr uint32_t   default_max_transaction_net_usage            = default_max_block_net_usage / 2;
-  static constexpr uint32_t   default_base_per_transaction_net_usage       = 12;  // retained for chain_config compat; no longer used in billing (see billable_net_per_action_overhead)
   static constexpr uint32_t   default_net_usage_leeway                     = 500; // bytes of NET leeway for transactions
   static constexpr uint32_t   default_context_free_discount_net_usage_num  = 0; // Wire does not support discount of context free data
   static constexpr uint32_t   default_context_free_discount_net_usage_den  = 1; // Wire does not support discount of context free data
@@ -100,9 +99,11 @@ namespace sysio::chain::config {
   static constexpr uint32_t default_max_wasm_pages                = 528;
   static constexpr uint32_t default_max_wasm_call_depth           = 251;
 
-  static constexpr uint32_t   min_net_usage_delta_between_base_and_max_for_trx  = 10*1024;
-  // Should be large enough to allow recovery from badly set blockchain parameters without a hard fork
-  // (unless net_usage_leeway is set to 0 and so are the net limits of all accounts that can help with resetting blockchain parameters).
+  static constexpr uint32_t   min_max_transaction_net_usage  = 10*1024;
+  // Lower bound enforced on max_transaction_net_usage by chain_config::validate(). Should be large
+  // enough that a corrective setparams transaction always fits, allowing recovery from badly set
+  // blockchain parameters without a hard fork (unless net_usage_leeway is set to 0 and so are the
+  // net limits of all accounts that can help with resetting blockchain parameters).
 
   static constexpr uint32_t   fixed_net_overhead_of_packed_trx = 16; // fixed NET overhead per packed_transaction (sigs, extensions, header)
 
