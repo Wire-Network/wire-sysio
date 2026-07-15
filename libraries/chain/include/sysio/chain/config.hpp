@@ -99,6 +99,12 @@ namespace sysio::chain::config {
   static constexpr uint32_t default_max_wasm_pages                = 528;
   static constexpr uint32_t default_max_wasm_call_depth           = 251;
 
+  static constexpr uint32_t   min_max_transaction_net_usage  = 10*1024;
+  // Lower bound enforced on max_transaction_net_usage by chain_config::validate(). Should be large
+  // enough that a corrective setparams transaction always fits, allowing recovery from badly set
+  // blockchain parameters without a hard fork (unless net_usage_leeway is set to 0 and so are the
+  // net limits of all accounts that can help with resetting blockchain parameters).
+
   static constexpr uint32_t   fixed_net_overhead_of_packed_trx = 16; // fixed NET overhead per packed_transaction (sigs, extensions, header)
 
   static constexpr uint32_t   fixed_overhead_shared_vector_ram_bytes = 16; ///< overhead accounts for fixed portion of size of shared_vector field
