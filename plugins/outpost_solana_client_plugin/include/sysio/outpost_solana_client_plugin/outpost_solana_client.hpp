@@ -80,9 +80,13 @@ private:
       uint8_t                                custody_decimals = 0;
    };
 
-   /// Resolve the pinned terminal-finalization facts stored on a per-reserve
-   /// PDA. Reserve-backed effects must not infer native-vs-SPL or decimals
-   /// from mutable `OutpostConfig` rows after the reserve has been created.
+   /// Resolve the terminal-finalization facts for a per-reserve PDA:
+   /// `creator` from the `Reserve` account, custody (mint / decimals) from
+   /// the `OutpostConfig` maps keyed by `token_code`. The clean-room outpost
+   /// program resolves custody from `config.token_addresses_by_code` at
+   /// dispatch time (`Reserve` carries no custody fields), so the relay
+   /// mirrors that lookup to stay account-consistent with the on-chain
+   /// handlers.
    std::optional<reserve_terminal_info>
    reserve_info_for_codes(uint64_t token_code, uint64_t reserve_code);
 
@@ -97,6 +101,27 @@ private:
 using outpost_solana_client_ptr = std::shared_ptr<outpost_solana_client>;
 
 namespace outpost_solana_client_detail {
+
+/// Custody binding for a `token_code`, resolved from the outpost's
+/// `OutpostConfig` maps. The clean-room program pins custody on the config
+/// (`token_addresses_by_code` / `precision_by_token_code`) instead of
+/// denormalizing it onto each `Reserve` account.
+struct token_custody_info {
+   /// SPL mint for the token, or the all-zero system-program key when the
+   /// token is native lamports (the on-chain zero-marker convention).
+   fc::network::solana::solana_public_key mint;
+   /// Chain-native decimals for the token.
+   uint8_t decimals = 0;
+};
+
+/// Resolve `token_code`'s custody binding from a decoded `OutpostConfig`
+/// account object. BOTH entries are required — same contract as
+/// wire-ethereum's `ReserveManager` (`WIRE_TokenPrecisionUnset`) and the
+/// program's own `PrecisionUnconfigured` / `TokenCodeNotConfigured` gates:
+/// a missing address or precision entry throws instead of silently
+/// defaulting. Native custody is expressed by an EXPLICIT zero-mint entry.
+token_custody_info resolve_token_custody(const fc::variant_object& outpost_config,
+                                         uint64_t token_code);
 
 /// Append `key` to `metas`, or merge its writable flag into the existing
 /// entry when an earlier terminal effect already required the same account.
