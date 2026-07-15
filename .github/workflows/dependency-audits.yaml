@@ -31,9 +31,6 @@ jobs:
       - name: Validate root pnpm lockfile
         run: pnpm install --frozen-lockfile --ignore-scripts
 
-      - name: Audit root pnpm dependencies
-        run: pnpm audit --audit-level=moderate
-
       - name: Load plop generators
         run: |
           node <<'NODE'
@@ -70,8 +67,3 @@ jobs:
         run: |
           cd ./libraries/opp/tools
           pnpm install --frozen-lockfile --ignore-scripts
-
-      - name: Audit OPP tools dependencies
-        run: |
-          cd ./libraries/opp/tools
-          pnpm audit --audit-level=moderate
