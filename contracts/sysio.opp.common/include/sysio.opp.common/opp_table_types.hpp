@@ -132,16 +132,6 @@ DataStream& operator>>(DataStream& ds, WirePermission& t) {
    return ds >> t.account >> t.permission;
 }
 
-// EncodingFlags: { Endianness; HashAlgorithm; LengthEncoding; }
-template <typename DataStream>
-DataStream& operator<<(DataStream& ds, const EncodingFlags& t) {
-   return ds << t.endianness << t.hash_algorithm << t.length_encoding;
-}
-template <typename DataStream>
-DataStream& operator>>(DataStream& ds, EncodingFlags& t) {
-   return ds >> t.endianness >> t.hash_algorithm >> t.length_encoding;
-}
-
 // ---------------------------------------------------------------------------
 //  v6 registry-entity messages (Chain / Token / ChainToken / Reserve / ReserveAmount)
 // ---------------------------------------------------------------------------
@@ -242,17 +232,17 @@ DataStream& operator>>(DataStream& ds, MessagePayload& t) {
    return ds >> t.version >> t.attestations;
 }
 
-// MessageHeader: all 8 fields
+// MessageHeader: all 7 fields
 template <typename DataStream>
 DataStream& operator<<(DataStream& ds, const MessageHeader& t) {
    return ds << t.endpoints << t.message_id << t.previous_message_id
-             << t.encoding_flags << t.payload_size << t.payload_checksum
+             << t.payload_size << t.payload_checksum
              << t.timestamp << t.header_checksum;
 }
 template <typename DataStream>
 DataStream& operator>>(DataStream& ds, MessageHeader& t) {
    return ds >> t.endpoints >> t.message_id >> t.previous_message_id
-             >> t.encoding_flags >> t.payload_size >> t.payload_checksum
+             >> t.payload_size >> t.payload_checksum
              >> t.timestamp >> t.header_checksum;
 }
 

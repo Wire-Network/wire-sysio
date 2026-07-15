@@ -20,15 +20,49 @@ message Endpoints {
 //  Message header
 // ---------------------------------------------------------------------------
 
+// Semantic header carried by every Message.
+//
+// Every checksum / id below is keccak256 over the FIELD-COMPLETE canonical encoding of the
+// respective sub-message — the same canonical form the envelope epoch digest uses (produced by
+// the generated Solidity/Solana codecs and, on the WIRE depot, by `opp_canonical_codec.hpp`).
+// Every emitter (the WIRE depot's `sysio.msgch::buildenv`, the Ethereum outpost, the Solana
+// outpost) populates these fields identically; the depot drops inbound envelopes whose fields
+// do not recompute.
 message MessageHeader {
-   Endpoints               endpoints           = 1;
-   bytes                          message_id          = 2; // 32 bytes; last 8 bytes = sequence number
-   bytes                          previous_message_id = 3; // 32 bytes
-   sysio.opp.types.EncodingFlags  encoding_flags      = 4;
-   uint32                         payload_size        = 5;
-   bytes                          payload_checksum    = 6; // 32 bytes
-   uint64                         timestamp           = 7; // milliseconds since epoch
-   bytes                          header_checksum     = 8; // 32 bytes
+   // Reserved in this revision: emitters leave `endpoints` at its proto3 default. Routing
+   // derives from the proven delivery chain (`sysio.chains`), never from self-declared header
+   // fields.
+   Endpoints endpoints           = 1;
+
+   // 32 bytes: `header_checksum` with its FIRST 8 bytes (big-endian) replaced by this message's
+   // sequence number, defined as the previous message's sequence number + 1. A message with an
+   // empty `previous_message_id` starts its stream at sequence number 1.
+   bytes     message_id          = 2;
+
+   // 32 bytes; the `message_id` of the previous message emitted on this stream. Empty at
+   // genesis.
+   bytes     previous_message_id = 3;
+
+   // Slot 4 was `sysio.opp.types.EncodingFlags encoding_flags` — removed. The canonical
+   // encoding is normative and singular; per-chain hash selection, if ever needed, belongs on
+   // the `sysio.chains` registry row, not on a self-declared per-message field.
+   reserved 4;
+   reserved "encoding_flags";
+
+   // Byte length of the canonical encoding of the sibling `payload`.
+   uint32    payload_size        = 5;
+
+   // 32 bytes; keccak256 over the canonical encoding of the sibling `payload`.
+   bytes     payload_checksum    = 6;
+
+   // Milliseconds since the Unix epoch, at the emitting chain's native clock resolution.
+   // Sub-second precision is only meaningful from the WIRE depot (half-second blocks); EVM and
+   // SVM platform clocks are whole seconds, emitted as seconds * 1000.
+   uint64    timestamp           = 7;
+
+   // 32 bytes; keccak256 over the canonical encoding of this header with `message_id` and
+   // `header_checksum` blanked (empty bytes).
+   bytes     header_checksum     = 8;
 }
 
 // ---------------------------------------------------------------------------
@@ -44,6 +78,8 @@ message MessagePayload {
 // Single attestation within a payload.
 message AttestationEntry {
    sysio.opp.types.AttestationType type      = 1;
+   // MUST equal the byte length of `data`. Canonical-form field only: receivers size the
+   // attestation by `data` itself and never trust `data_size` for allocation or bounds.
    uint32                          data_size = 2;
    bytes                           data      = 3;
 }
@@ -70,21 +106,24 @@ message Message {
 // That canonical encoding is produced by the generated Solidity/Solana codecs and, on the WIRE
 // depot, by `contracts/sysio.opp.common/include/sysio.opp.common/opp_canonical_codec.hpp`.
 // Any change to this message or the types it embeds (Endpoints, ChainId, Message, MessageHeader,
-// MessagePayload, AttestationEntry, EncodingFlags) MUST be mirrored there, and the cross-language
-// golden vectors in `contracts/tests/sysio.msgch_chain_tests.cpp` regenerated.
+// MessagePayload, AttestationEntry) MUST be mirrored there, and the cross-language golden
+// vectors in `contracts/tests/sysio.msgch_chain_tests.cpp` regenerated.
 message Envelope {
    bytes          envelope_hash          = 1; // 32 bytes
    Endpoints      endpoints              = 2;
-   uint64         epoch_timestamp        = 5;
+   uint64         epoch_timestamp        = 5; // milliseconds since the Unix epoch (see MessageHeader.timestamp)
    uint32         epoch_index            = 6;
    uint32         epoch_envelope_index   = 7;
 
    // Slot 15 was `bytes merkle` — removed; do not reuse.
+   reserved 15;
+   reserved "merkle";
 
    bytes          previous_envelope_hash = 20; // 32 bytes
 
-   // Slot 30 was `bytes start_message_id` — removed; do not reuse.
-   // Slot 31 was `bytes end_message_id`   — removed; do not reuse.
+   // Slots 30/31 were `bytes start_message_id` / `bytes end_message_id` — removed; do not reuse.
+   reserved 30, 31;
+   reserved "start_message_id", "end_message_id";
 
    repeated Message messages             = 40;
 }

@@ -18,11 +18,12 @@
 /// The oracle encoder in this file is an independent host-side reimplementation of the canonical
 /// encoding (the contract-side implementation is
 /// `contracts/sysio.opp.common/include/sysio.opp.common/opp_canonical_codec.hpp`). The golden
-/// vectors pin BOTH implementations to the deployed Solidity codec: the encoding hex and keccak
-/// digests below were produced by `OPPCommon.epochHash` (via the `OPPEpochHashHelper` trampoline)
-/// in the wire-ethereum test suite for the same logical envelopes, so
-/// oracle == Solidity (golden vectors) and contract == oracle (round-trip assertions) together
-/// give contract == Solidity.
+/// vectors pin the canonical encoding — including the semantic-header derivation — across
+/// languages: the identical hex/digest values are pinned in the wire-solana and wire-ethereum
+/// vector suites, where the Rust and Solidity implementations (`OPPCommon.epochHash` via the
+/// `OPPEpochHashHelper` trampoline on the Solidity side) must reproduce them independently, so
+/// oracle == Solidity/Rust (golden vectors) and contract == oracle (round-trip assertions)
+/// together give contract == outposts.
 #include <boost/test/unit_test.hpp>
 #include <sysio/testing/tester.hpp>
 #include <sysio/chain/abi_serializer.hpp>
@@ -96,20 +97,12 @@ namespace oracle {
       return out;
    }
 
-   std::vector<char> encode(const sysio::opp::types::EncodingFlags& m) {
-      std::vector<char> out;
-      put_varint_field(out, 1, magic_enum::enum_integer(m.endianness()));
-      put_varint_field(out, 2, magic_enum::enum_integer(m.hash_algorithm()));
-      put_varint_field(out, 3, magic_enum::enum_integer(m.length_encoding()));
-      return out;
-   }
-
    std::vector<char> encode(const sysio::opp::MessageHeader& m) {
       std::vector<char> out;
       put_submessage(out, 1, encode(m.endpoints()));
       put_bytes_field(out, 2, m.message_id());
       put_bytes_field(out, 3, m.previous_message_id());
-      put_submessage(out, 4, encode(m.encoding_flags()));
+      // Slot 4 was `encoding_flags` — removed from opp.proto; reserved, do not reuse.
       put_varint_field(out, 5, m.payload_size());
       put_bytes_field(out, 6, m.payload_checksum());
       put_varint_field(out, 7, m.timestamp());
@@ -169,6 +162,57 @@ namespace oracle {
    fc::crypto::keccak256 keccak_of(const std::vector<char>& bytes) {
       return fc::crypto::keccak256::hash(std::span<const uint8_t>(
          reinterpret_cast<const uint8_t*>(bytes.data()), bytes.size()));
+   }
+
+   /// The spec derivation of `MessageHeader.header_checksum`: keccak256 over the canonical
+   /// header with `message_id` and `header_checksum` blanked (mirrors
+   /// `opp::canonical::header_digest` and Solidity `OPPCommon.headerChecksum`).
+   fc::crypto::keccak256 header_checksum(const sysio::opp::MessageHeader& header) {
+      sysio::opp::MessageHeader blanked = header;
+      blanked.set_message_id("");
+      blanked.set_header_checksum("");
+      return keccak_of(encode(blanked));
+   }
+
+   /// The spec derivation of `MessageHeader.message_id`: the header checksum with its first 8
+   /// bytes replaced by the message's big-endian sequence number (mirrors
+   /// `opp::canonical::derive_message_id` and Solidity `OPPCommon.getMessageID`).
+   std::string derive_message_id(const fc::crypto::keccak256& checksum, uint64_t sequence) {
+      std::string id = digest_bytes(checksum);
+      for (size_t i = 0; i < 8; ++i) {
+         id[i] = static_cast<char>(static_cast<uint8_t>(sequence >> (8 * (7 - i))));
+      }
+      return id;
+   }
+
+   /// Big-endian sequence number in the first 8 bytes of a wire message id; 0 when empty
+   /// (stream genesis) or out-of-spec short.
+   uint64_t message_sequence(const std::string& message_id) {
+      if (message_id.size() < 8) {
+         return 0;
+      }
+      uint64_t sequence = 0;
+      for (size_t i = 0; i < 8; ++i) {
+         sequence = (sequence << 8) | static_cast<uint8_t>(message_id[i]);
+      }
+      return sequence;
+   }
+
+   /// Populate `msg`'s semantic header per the spec derivation from its payload and stream
+   /// predecessor: `payload_size` / `payload_checksum` over the payload's canonical bytes, then
+   /// `header_checksum` over the blanked header, then `message_id` at the predecessor's sequence
+   /// number + 1. Mirrors what `sysio.msgch::buildenv` derives on emit.
+   void finalize_header(sysio::opp::Message& msg, const std::string& prev_message_id,
+                        uint64_t timestamp_ms) {
+      auto* header = msg.mutable_header();
+      header->set_previous_message_id(prev_message_id);
+      const auto payload_bytes = encode(msg.payload());
+      header->set_payload_size(static_cast<uint32_t>(payload_bytes.size()));
+      header->set_payload_checksum(digest_bytes(keccak_of(payload_bytes)));
+      header->set_timestamp(timestamp_ms);
+      const auto checksum = header_checksum(*header);
+      header->set_header_checksum(digest_bytes(checksum));
+      header->set_message_id(derive_message_id(checksum, message_sequence(prev_message_id) + 1));
    }
 
 } // namespace oracle
@@ -493,21 +537,25 @@ public:
 
 BOOST_AUTO_TEST_SUITE(sysio_msgch_chain_tests)
 
-/// The encoding hex and keccak256 digests below are authoritative outputs of the deployed
-/// Solidity codec: computed by `OPPCommon.epochHash` through the `OPPEpochHashHelper` test
-/// trampoline in wire-ethereum (hardhat) for these exact logical envelopes. Two consecutive
-/// depot-shape epochs (B chains from A's digest) plus the wire-ethereum test-fixture shape.
+/// The encoding hex and keccak256 digests below pin the canonical encoding of these exact
+/// logical envelopes for cross-language agreement: the identical values are pinned in the
+/// wire-solana and wire-ethereum vector suites, where the Rust and Solidity implementations
+/// must reproduce them independently (Solidity via `OPPCommon.epochHash` through the
+/// `OPPEpochHashHelper` hardhat trampoline). Two consecutive depot-shape epochs — B chains from
+/// A at BOTH levels (envelope digest and message id) — plus the wire-ethereum test-fixture
+/// shape. The depot-shape headers are DERIVED per the spec (`oracle::finalize_header`), so the
+/// pins cover the full semantic-header derivation, not just the byte layout.
 BOOST_AUTO_TEST_CASE(canonical_oracle_matches_solidity_golden_vectors) { try {
-   constexpr uint64_t GOLDEN_TS = 1'775'612'516ULL;
+   constexpr uint64_t GOLDEN_TS_MS = 1'775'612'516'983ULL;
 
    auto depot_shape = [&](uint32_t epoch_index, const std::string& prev,
+                          const std::string& prev_message_id,
                           const std::vector<std::string>& att_datas) {
       sysio::opp::Envelope env;
-      env.set_epoch_timestamp(GOLDEN_TS);
+      env.set_epoch_timestamp(GOLDEN_TS_MS);
       env.set_epoch_index(epoch_index);
       if (!prev.empty()) env.set_previous_envelope_hash(prev);
       auto* msg = env.add_messages();
-      msg->mutable_header()->set_timestamp(GOLDEN_TS);
       auto* payload = msg->mutable_payload();
       payload->set_version(1);
       for (const auto& d : att_datas) {
@@ -516,31 +564,40 @@ BOOST_AUTO_TEST_CASE(canonical_oracle_matches_solidity_golden_vectors) { try {
          att->set_data(d);
          att->set_data_size(static_cast<uint32_t>(d.size()));
       }
+      oracle::finalize_header(*msg, prev_message_id, GOLDEN_TS_MS);
       return env;
    };
 
-   // Vector A: depot shape, epoch 7, genesis (empty prev), one attestation 0xdeadbeef.
-   const auto env_a = depot_shape(7, {}, { std::string("\xde\xad\xbe\xef", 4) });
+   // Vector A: depot shape, epoch 7, stream genesis (empty envelope prev + empty message prev,
+   // sequence number 1), one attestation 0xdeadbeef.
+   const auto env_a = depot_shape(7, {}, {}, { std::string("\xde\xad\xbe\xef", 4) });
    const auto enc_a = oracle::encode(env_a);
    BOOST_REQUIRE_EQUAL(fc::to_hex(enc_a.data(), enc_a.size()),
-      "0a00120c0a040800100012040800100028e4e4d6ce0630073800a20100c202390a260a0c0a0408001000"
-      "12040800100012001a0022060800100018002800320038e4e4d6ce064200120f0801120b08d10f10041a"
-      "04deadbeef");
+      "0a00120c0a040800100012040800100028f7b483d6d63330073800a20100c20292010a7f0a0c0a040800"
+      "100012040800100012200000000000000001210103982d1ae1f083b047bde00e77e4a337f3b31c8d223c"
+      "1a00280f32206429fe11b290953c3e28e6ed7887059307329591c6296d6e41d27e4e6ddcae9938f7b483"
+      "d6d6334220fb2b80f90bf26934210103982d1ae1f083b047bde00e77e4a337f3b31c8d223c120f080112"
+      "0b08d10f10041a04deadbeef");
    const auto digest_a = oracle::epoch_digest(env_a);
    BOOST_REQUIRE_EQUAL(digest_a.str(),
-      "28ccf00f6852162f6cfcc262f7b6dad43d7aabb40846b12c91515fcd4ce8cc41");
+      "c7c6502a5b047c0742c887122350c0b6731c60f3f5f9d48cdde9d4f2b6b8880a");
 
-   // Vector B: depot shape, epoch 8, chained from A's digest, two attestations.
+   // Vector B: depot shape, epoch 8, chained from A at both levels (envelope digest + message
+   // id, so B's message carries sequence number 2), two attestations.
    const auto env_b = depot_shape(8, oracle::digest_bytes(digest_a),
+      env_a.messages(0).header().message_id(),
       { std::string("\xde\xad\xbe\xef", 4), std::string("\xca\xfe\xba\xbe\x01", 5) });
    const auto enc_b = oracle::encode(env_b);
    BOOST_REQUIRE_EQUAL(fc::to_hex(enc_b.data(), enc_b.size()),
-      "0a00120c0a040800100012040800100028e4e4d6ce0630083800a2012028ccf00f6852162f6cfcc262f7"
-      "b6dad43d7aabb40846b12c91515fcd4ce8cc41c202470a260a0c0a04080010001204080010001200"
-      "1a0022060800100018002800320038e4e4d6ce064200121d0801120b08d10f10041a04deadbeef120c08"
-      "d10f10051a05cafebabe01");
+      "0a00120c0a040800100012040800100028f7b483d6d63330083800a20120c7c6502a5b047c0742c88712"
+      "2350c0b6731c60f3f5f9d48cdde9d4f2b6b8880ac202c1010a9f010a0c0a040800100012040800100012"
+      "2000000000000000022437e72cf67a093c4c5753cbb3ce71b76c890da8f9965c351a2000000000000000"
+      "01210103982d1ae1f083b047bde00e77e4a337f3b31c8d223c281d3220fdbcffc45ad50a6a2d1376af8c"
+      "498d86910751868ae7e14fe909477b319ec98d38f7b483d6d63342208d135355c556a6ed2437e72cf67a"
+      "093c4c5753cbb3ce71b76c890da8f9965c35121d0801120b08d10f10041a04deadbeef120c08d10f1005"
+      "1a05cafebabe01");
    BOOST_REQUIRE_EQUAL(oracle::epoch_digest(env_b).str(),
-      "b1dfe8c944b05364d56eccdbba2c6e43d0a2112ab23a5c0487fb0907813d73f0");
+      "c7e7d905b6c87a209fde8319701a5a7d95350c989e234eedb26bdeb14cd5bddd");
 
    // Vector C: wire-ethereum test-fixture shape: WIRE(1) -> EVM(31337) endpoints, message-free.
    sysio::opp::Envelope env_c;
@@ -549,13 +606,13 @@ BOOST_AUTO_TEST_CASE(canonical_oracle_matches_solidity_golden_vectors) { try {
    eps->mutable_start()->set_id(1);
    eps->mutable_end()->set_kind(sysio::opp::types::CHAIN_KIND_EVM);
    eps->mutable_end()->set_id(31337);
-   env_c.set_epoch_timestamp(GOLDEN_TS);
+   env_c.set_epoch_timestamp(GOLDEN_TS_MS);
    env_c.set_epoch_index(1);
    const auto enc_c = oracle::encode(env_c);
    BOOST_REQUIRE_EQUAL(fc::to_hex(enc_c.data(), enc_c.size()),
-      "0a00120e0a04080110011206080210e9f40128e4e4d6ce0630013800a20100");
+      "0a00120e0a04080110011206080210e9f40128f7b483d6d63330013800a20100");
    BOOST_REQUIRE_EQUAL(oracle::epoch_digest(env_c).str(),
-      "8df462b6ed2e2a15b91c65faece549f26eee5b430581a883ae82d630cdbf5438");
+      "dc4f4d15bd8c5e9685e2c8e2bf9d52c736bd158dd3fc67f0afbe585e2e0a5fa6");
 
    // The digest must blank a populated envelope_hash: setting it changes the exact encoding but
    // not the epoch digest.
@@ -608,6 +665,32 @@ BOOST_FIXTURE_TEST_CASE(buildenv_chains_consecutive_envelopes, sysio_msgch_chain
       BOOST_REQUIRE_EQUAL(
          fc::to_hex(env.previous_envelope_hash().data(), env.previous_envelope_hash().size()),
          predecessor["envelope_hash"].as_string());
+
+      // Semantic header (opp.proto MessageHeader): every field the contract derived on emit
+      // recomputes identically through the independent oracle.
+      BOOST_REQUIRE_EQUAL(env.messages_size(), 1);
+      const auto& header  = env.messages(0).header();
+      const auto  payload_bytes = oracle::encode(env.messages(0).payload());
+      BOOST_REQUIRE_EQUAL(header.payload_size(), static_cast<uint32_t>(payload_bytes.size()));
+      BOOST_REQUIRE_EQUAL(
+         fc::to_hex(header.payload_checksum().data(), header.payload_checksum().size()),
+         oracle::keccak_of(payload_bytes).str());
+      BOOST_REQUIRE_EQUAL(
+         fc::to_hex(header.header_checksum().data(), header.header_checksum().size()),
+         oracle::header_checksum(header).str());
+      BOOST_REQUIRE_EQUAL(
+         header.message_id(),
+         oracle::derive_message_id(oracle::header_checksum(header),
+                                   oracle::message_sequence(header.previous_message_id()) + 1));
+
+      // Message chain link: previous_message_id carries the predecessor row's stream tip, and
+      // the new row's `last_message_id` records this emit's id for the next link.
+      BOOST_REQUIRE_EQUAL(
+         fc::to_hex(header.previous_message_id().data(), header.previous_message_id().size()),
+         predecessor["last_message_id"].as_string());
+      BOOST_REQUIRE_EQUAL(
+         row["last_message_id"].as_string(),
+         fc::to_hex(header.message_id().data(), header.message_id().size()));
    }
 } FC_LOG_AND_RETHROW() }
 
@@ -632,6 +715,14 @@ BOOST_FIXTURE_TEST_CASE(buildenv_first_emit_chains_from_empty, sysio_msgch_chain
    auto env = decode_envelope(raw);
    BOOST_REQUIRE_EQUAL(env.previous_envelope_hash().size(), 0u);
    BOOST_REQUIRE_EQUAL(row["envelope_hash"].as_string(), oracle::keccak_of(raw).str());
+
+   // Message-stream genesis: empty previous_message_id, sequence number 1, tip recorded.
+   BOOST_REQUIRE_EQUAL(env.messages_size(), 1);
+   const auto& header = env.messages(0).header();
+   BOOST_REQUIRE_EQUAL(header.previous_message_id().size(), 0u);
+   BOOST_REQUIRE_EQUAL(oracle::message_sequence(header.message_id()), 1u);
+   BOOST_REQUIRE_EQUAL(row["last_message_id"].as_string(),
+                       fc::to_hex(header.message_id().data(), header.message_id().size()));
 } FC_LOG_AND_RETHROW() }
 
 // ---------------------------------------------------------------------------
