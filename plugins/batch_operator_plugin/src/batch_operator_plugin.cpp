@@ -63,7 +63,6 @@ namespace {
       constexpr auto table_outenvelopes  = "outenvelopes";
       constexpr auto action_deliver      = "deliver";
       constexpr auto action_chkcons      = "chkcons";
-      constexpr auto action_bootstrap    = "bootstrap";
       /// Field names on `envelope_entry` / `outbound_envelope` rows.
       namespace field {
          constexpr auto chain_code     = "chain_code";
@@ -470,19 +469,15 @@ struct batch_operator_plugin::impl {
       auto [ok, epoch_index] = parse_epoch_state();
       if (!ok) return;
 
-      // Genesis bootstrap: if epoch has never been advanced (epoch == 0),
-      // trigger the first advance via msgch::bootstrap.
-      // Post-genesis: advance is triggered by evalcons consensus, not by batch operators.
-      if (epoch_index == 0) {
-         try {
-            push_action(msgch::account, msgch::action_bootstrap, operator_account,
-                        fc::mutable_variant_object());
-            auto [ok2, epoch_index2] = parse_epoch_state();
-            if (ok2) epoch_index = epoch_index2;
-         } catch (const fc::exception& e) {
-            dlog("batch_operator: bootstrap skipped — {}", e.to_string());
-         }
-      }
+      // The genesis advance (epoch 0 -> 1) is a SYSTEM responsibility, not a
+      // batch operator's: `sysio.msgch::bootstrap` gates on
+      // `require_auth(get_self())`, so only the holder of `sysio.msgch`'s own
+      // authority (the genesis / bootstrap process) can trigger it. A batch
+      // operator signs with its own account authority, so an operator-side push
+      // fails unconditionally with `missing authority of sysio.msgch` before the
+      // epoch check — it never advanced anything, it only produced boot-window
+      // error-log noise. From epoch 1 onward, `advance` re-arms itself via
+      // `evalcons` consensus; batch operators never trigger it.
 
       if (!is_elected) {
          if (epoch_index != current_epoch) {
