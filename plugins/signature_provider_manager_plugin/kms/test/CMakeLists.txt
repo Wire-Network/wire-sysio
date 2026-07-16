@@ -1,4 +1,4 @@
-file(GLOB_RECURSE SRC_FILES *.cpp)
+file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS *.cpp)
 set(TARGET_NAME test_sigprov_kms)
 
 add_executable(${TARGET_NAME} ${SRC_FILES})

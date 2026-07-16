@@ -1,4 +1,4 @@
-file(GLOB_RECURSE SRC_FILES *.cpp)
+file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS *.cpp)
 set(TARGET_NAME test_signature_provider_manager_plugin)
 add_executable(
         ${TARGET_NAME}
