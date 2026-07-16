@@ -247,10 +247,9 @@ struct underwriter_plugin::impl {
    std::atomic<bool>                 shutting_down{false};
 
    /// Sync gate: `channels::irreversible_block` subscription that arms
-   /// {@link run_deferred_startup} once `chain_plugin::is_synced()` holds — a LIB
-   /// advance is the only event that can turn the predicate true (see
-   /// `sysio/chain_plugin/sync_gate.hpp`). Unsubscribed after arming; released on
-   /// shutdown.
+   /// {@link run_deferred_startup} once `controller::is_synced()` holds — a LIB
+   /// advance is the only event that can turn the predicate true. Unsubscribed
+   /// after arming; released on shutdown.
    chain::plugin_interface::channels::irreversible_block::channel_type::handle sync_gate_subscription;
    /// When the sync gate armed — bounds the preflight retry grace window.
    fc::time_point                    startup_armed_at;
@@ -753,7 +752,7 @@ struct underwriter_plugin::impl {
 
    /// Arm the deferred startup: runs AT MOST once (re-entry is guarded by
    /// {@link startup_attempted}), on the main thread from the sync-gate channel
-   /// callback once `chain_plugin::is_synced()` holds. The body itself lives
+   /// callback once `controller::is_synced()` holds. The body itself lives
    /// in {@link attempt_deferred_startup}, which may retry the preflight
    /// within a bounded grace and shuts the node down on terminal failure
    /// (fail-fast).
@@ -2733,6 +2732,15 @@ void underwriter_plugin::plugin_initialize(const variables_map& options) {
    _impl->cron_plug  = &app().get_plugin<cron_plugin>();
    _impl->eth_plug   = &app().get_plugin<outpost_ethereum_client_plugin>();
    _impl->sol_plug   = &app().get_plugin<outpost_solana_client_plugin>();
+
+   // Operator daemons are designed for read-mode = irreversible: the sync gate
+   // (controller::is_synced) measures LIB recency and every local table read the
+   // preflight and scan cycle perform serves the irreversible view. Any other read
+   // mode would validate/underwrite against state that can still fork out.
+   FC_ASSERT(!_impl->enabled ||
+                _impl->chain_plug->chain().get_read_mode() == chain::db_read_mode::IRREVERSIBLE,
+             "underwriter_plugin requires read-mode = irreversible (configured read-mode = {})",
+             magic_enum::enum_name(_impl->chain_plug->chain().get_read_mode()));
 }
 
 void underwriter_plugin::plugin_startup() {
@@ -2757,8 +2765,8 @@ void underwriter_plugin::plugin_startup() {
    // operator node those reads see mid-sync (possibly genesis) state and
    // would fail spuriously, so the whole startup body (preflight → outpost
    // client wiring → cron) is DEFERRED until the node is synced —
-   // `chain_plugin::is_synced()`: the LAST IRREVERSIBLE block's time within
-   // `chain_apis::default_sync_recency_ms` of now (the state the reads
+   // `controller::is_synced()`: the LAST IRREVERSIBLE block's time within
+   // `controller::default_sync_recency_ms` of now (the state the reads
    // actually serve under read-mode = irreversible). The wake-up is the
    // existing `irreversible_block` channel: a LIB advance is the only event
    // that can turn the predicate true, and channel deliveries are posted to
@@ -2773,11 +2781,6 @@ void underwriter_plugin::plugin_startup() {
    // loudly once the grace expires and shuts the node down (fail-fast) —
    // there remains no dev escape hatch.
    auto& chain = _impl->chain_plug->chain();
-   if (chain.get_read_mode() != chain::db_read_mode::IRREVERSIBLE) {
-      wlog("underwriter_plugin: node runs read-mode = {}, but operator daemons are designed "
-           "for read-mode = irreversible — the sync gate and every local table read serve "
-           "the irreversible state", magic_enum::enum_name(chain.get_read_mode()));
-   }
    ilog("underwriter_plugin: waiting for chain sync before preflight "
         "(head {} is {}s behind now; irreversible state is {}s behind)",
         chain.head().block_num(),
@@ -2789,7 +2792,7 @@ void underwriter_plugin::plugin_startup() {
       app().get_channel<chain::plugin_interface::channels::irreversible_block>().subscribe(
          [this](const chain::block_signal_params&) {
             if (_impl->startup_attempted() || _impl->shutting_down ||
-                !_impl->chain_plug->is_synced()) {
+                !_impl->chain_plug->chain().is_synced()) {
                return;
             }
             // One-shot consumption: unsubscribe (safe from within the slot) and

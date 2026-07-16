@@ -358,6 +358,45 @@ namespace sysio::chain {
          // thread-safe
          size_t       fork_db_size() const;
 
+         /// Behind-now gap (ms) under which {@link is_synced} counts the node as synced.
+         /// Must exceed steady-state finality lag (a few blocks) plus scheduling slack, and
+         /// stay well under one epoch so consumers gating work on the predicate never start
+         /// against stale state. Not an operator tunable.
+         static constexpr uint32_t default_sync_recency_ms = 5000;
+
+         /**
+          * @brief The "node is synced" predicate: the LAST IRREVERSIBLE block's time is
+          *        within `recency_window` of `now`.
+          *
+          * LIB recency, not head recency, deliberately: consumers of this predicate
+          * (operator daemons run read-mode = irreversible) read the IRREVERSIBLE state, and
+          * head-time recency reports synced while the local LIB still trails the rows those
+          * reads need (observed live: a registration in block N was readable only 50ms after
+          * a read at LIB N-3). While a cold-booting node syncs blocks, LIB trails `now` by
+          * the catch-up gap; once caught up it tracks `now` to within finality-lag jitter. A
+          * LIB ahead of `now` (clock skew) counts as synced. False while no irreversible
+          * root exists (fresh boot, mid-replay, snapshot catch-up).
+          *
+          * Evaluated on demand, never cached — a cached flag updated on block events would
+          * go stale-TRUE the moment the chain stalls. There is deliberately no push
+          * mechanism: the predicate is a LEVEL, and the wake-up a gated consumer needs
+          * already exists as the `plugin_interface::channels::irreversible_block` channel —
+          * a LIB advance is the only event that can turn the predicate true, and channel
+          * deliveries are posted to the application executor (main thread, AFTER the
+          * triggering block fully commits). Consumers subscribe, re-check per delivery, and
+          * unsubscribe once it holds.
+          *
+          * @param now            The instant to measure against (wall-clock in production;
+          *                       explicit here so boundary behavior is unit-testable).
+          * @param recency_window Maximum behind-`now` gap still considered synced.
+          * @return True when an irreversible root exists and its block time is recent.
+          */
+         // thread-safe
+         bool is_synced(fc::time_point now, fc::microseconds recency_window) const;
+         /// {@link is_synced} against wall-clock now at {@link default_sync_recency_ms}.
+         // thread-safe
+         bool is_synced() const;
+
          // thread-safe, retrieves block according to fork db best branch which can change at any moment
          signed_block_ptr fetch_block_by_number( uint32_t block_num )const;
          // thread-safe

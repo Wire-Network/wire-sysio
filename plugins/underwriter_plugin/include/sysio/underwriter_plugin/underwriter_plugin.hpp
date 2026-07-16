@@ -23,9 +23,8 @@ namespace sysio {
       constexpr uint32_t scan_interval_ms    = 5000;
       constexpr uint32_t action_timeout_ms   = 15000;
       constexpr bool     enabled             = false;
-      // The sync-recency window moved to `chain_apis::default_sync_recency_ms`
-      // (sysio/chain_plugin/sync_gate.hpp) — the sync predicate is the
-      // first-class chain_plugin API (`is_synced()`), shared by every
+      // The sync-recency window moved to `controller::default_sync_recency_ms`
+      // — the sync predicate is `controller::is_synced()`, shared by every
       // operator-daemon plugin.
       /// How long after the sync gate arms a failing preflight keeps
       /// RETRYING before the failure is terminal. Rows the harness confirmed

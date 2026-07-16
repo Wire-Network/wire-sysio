@@ -190,10 +190,9 @@ struct batch_operator_plugin::impl {
    std::atomic<bool>                 shutting_down{false};
 
    /// Sync gate: `channels::irreversible_block` subscription that arms
-   /// {@link run_deferred_startup_or_quit} once `chain_plugin::is_synced()`
+   /// {@link run_deferred_startup_or_quit} once `controller::is_synced()`
    /// holds — a LIB advance is the only event that can turn the predicate
-   /// true (see `sysio/chain_plugin/sync_gate.hpp`). Unsubscribed after
-   /// arming; released on shutdown.
+   /// true. Unsubscribed after arming; released on shutdown.
    chain::plugin_interface::channels::irreversible_block::channel_type::handle sync_gate_subscription;
 
    // -----------------------------------------------------------------------
@@ -826,7 +825,7 @@ struct batch_operator_plugin::impl {
    //  Sync-gated startup
    // -----------------------------------------------------------------------
 
-   /// The startup body deferred behind the chain_plugin sync gate: outpost
+   /// The startup body deferred behind the sync gate: outpost
    /// discovery → private cron_service creation (sized from the discovered
    /// outposts) → epoch_tick scheduling → per-outpost relay jobs. Runs on the
    /// main thread from {@link run_deferred_startup_or_quit} once the node is
@@ -964,6 +963,15 @@ void batch_operator_plugin::plugin_initialize(const variables_map& options) {
    _impl->cron_plug  = &app().get_plugin<cron_plugin>();
    _impl->eth_plug   = &app().get_plugin<outpost_ethereum_client_plugin>();
    _impl->sol_plug   = &app().get_plugin<outpost_solana_client_plugin>();
+
+   // Operator daemons are designed for read-mode = irreversible: the sync gate
+   // (controller::is_synced) measures LIB recency and every local table read the
+   // relay performs serves the irreversible view. Any other read mode would relay
+   // envelopes derived from state that can still fork out.
+   FC_ASSERT(!_impl->enabled ||
+                _impl->chain_plug->chain().get_read_mode() == chain::db_read_mode::IRREVERSIBLE,
+             "batch_operator_plugin requires read-mode = irreversible (configured read-mode = {})",
+             magic_enum::enum_name(_impl->chain_plug->chain().get_read_mode()));
 }
 
 void batch_operator_plugin::plugin_startup() {
@@ -978,8 +986,8 @@ void batch_operator_plugin::plugin_startup() {
    // cold-booting operator node those reads see mid-sync (possibly genesis)
    // state and throw spuriously, so the whole body (discovery → cron_service →
    // epoch_tick → relay jobs) is DEFERRED until the node is synced —
-   // `chain_plugin::is_synced()`: the LAST IRREVERSIBLE block's time within
-   // `chain_apis::default_sync_recency_ms` of now (the state the reads
+   // `controller::is_synced()`: the LAST IRREVERSIBLE block's time within
+   // `controller::default_sync_recency_ms` of now (the state the reads
    // actually serve under read-mode = irreversible). The wake-up is the
    // existing `irreversible_block` channel: a LIB advance is the only event
    // that can turn the predicate true, and channel deliveries are posted to
@@ -990,11 +998,6 @@ void batch_operator_plugin::plugin_startup() {
    // with a producer), and a node that somehow is synced at startup is
    // released by the next LIB advance.
    auto& chain = _impl->chain_plug->chain();
-   if (chain.get_read_mode() != chain::db_read_mode::IRREVERSIBLE) {
-      wlog("batch_operator_plugin: node runs read-mode = {}, but operator daemons are designed "
-           "for read-mode = irreversible — the sync gate and every local table read serve "
-           "the irreversible state", magic_enum::enum_name(chain.get_read_mode()));
-   }
    ilog("batch_operator_plugin: waiting for chain sync before outpost discovery "
         "(head {} is {}s behind now; irreversible state is {}s behind)",
         chain.head().block_num(),
@@ -1005,7 +1008,7 @@ void batch_operator_plugin::plugin_startup() {
    _impl->sync_gate_subscription =
       app().get_channel<chain::plugin_interface::channels::irreversible_block>().subscribe(
          [impl = _impl.get()](const chain::block_signal_params&) {
-            if (impl->shutting_down || !impl->chain_plug->is_synced()) {
+            if (impl->shutting_down || !impl->chain_plug->chain().is_synced()) {
                return;
             }
             // One-shot consumption: unsubscribe (safe from within the slot) and

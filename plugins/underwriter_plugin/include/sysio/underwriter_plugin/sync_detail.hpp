@@ -10,11 +10,10 @@
  * registration, chain registry, authex links) via LOCAL table reads. On a
  * cold-booting operator node those reads see mid-sync (possibly genesis)
  * state and fail spuriously, so the plugin must not begin underwriting until
- * the node is synced. The sync predicate itself is the first-class chain_plugin
- * API — `chain_plugin::is_synced()`, backed by
- * `sysio/chain_plugin/sync_gate.hpp` and woken by the `irreversible_block`
- * channel — shared by every operator-daemon plugin; this header carries only
- * the underwriter's OWN gate lifecycle surface.
+ * the node is synced. The sync predicate itself is `controller::is_synced()`
+ * (LIB recency, woken by the `irreversible_block` channel), shared by every
+ * operator-daemon plugin; this header carries only the underwriter's OWN gate
+ * lifecycle surface.
  */
 
 #include <fc/time.hpp>
