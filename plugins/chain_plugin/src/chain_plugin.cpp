@@ -1,4 +1,5 @@
 #include <sysio/chain_plugin/chain_plugin.hpp>
+#include <sysio/chain_plugin/sync_gate.hpp>
 #include <sysio/chain_plugin/trx_retry_db.hpp>
 #include <sysio/chain_plugin/tracked_votes.hpp>
 #include <sysio/chain/block_log.hpp>
@@ -1498,6 +1499,11 @@ void chain_plugin::accept_transaction(const chain::packed_transaction_ptr& trx, 
 
 controller& chain_plugin::chain() { return *my->chain; }
 const controller& chain_plugin::chain() const { return *my->chain; }
+
+bool chain_plugin::is_synced() const {
+   return chain_apis::lib_time_is_recent(chain(), fc::time_point::now(),
+                                         fc::milliseconds(chain_apis::default_sync_recency_ms));
+}
 
 chain::chain_id_type chain_plugin::get_chain_id()const {
    return my->chain->get_chain_id();

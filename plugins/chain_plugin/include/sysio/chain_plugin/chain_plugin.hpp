@@ -695,6 +695,25 @@ public:
    // Only call this after plugin_initialize()!
    const controller& chain() const;
 
+   /// The "node is synced" predicate: true when the LAST IRREVERSIBLE block's time is
+   /// within `chain_apis::default_sync_recency_ms` of wall-clock now (see
+   /// `sysio/chain_plugin/sync_gate.hpp`). LIB recency, not head recency, deliberately —
+   /// the operator-daemon plugins this gates run read-mode = irreversible, so the
+   /// irreversible state is what their table reads actually serve. False while no
+   /// irreversible root exists (fresh boot, mid-replay, snapshot catch-up). Computed on
+   /// demand, never cached, so a stalled chain reads as NOT synced as soon as its LIB
+   /// leaves the window.
+   ///
+   /// Consumers deferring startup until the node is synced subscribe to the existing
+   /// `chain::plugin_interface::channels::irreversible_block` channel (a LIB advance is
+   /// the only event that can turn this predicate true), re-check per delivery, and
+   /// unsubscribe once it holds. Channel deliveries are posted to the application
+   /// executor, so they run on the main thread AFTER the triggering block fully
+   /// commits — never mid block-application — and may read chain state directly.
+   ///
+   /// Only call this after plugin_initialize()!
+   bool is_synced() const;
+
    chain::chain_id_type get_chain_id() const;
    fc::microseconds get_abi_serializer_max_time() const;
    bool api_accept_transactions() const;
