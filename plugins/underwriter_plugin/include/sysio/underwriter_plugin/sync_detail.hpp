@@ -1,17 +1,19 @@
 #pragma once
 /**
  * @file sync_detail.hpp
- * @brief Pure sync-gate predicate for the underwriter plugin, lifted out of the
- *        `.cpp`-private impl so it is unit-testable without standing up a chain.
+ * @brief Pure gate-lifecycle machinery for the underwriter plugin — the deferred-
+ *        startup states and the `/v1/underwriter/*` gate payloads — lifted out of
+ *        the `.cpp`-private impl so they are unit-testable without standing up a
+ *        chain.
  *
  * The underwriter's startup preflight validates depot-side state (opreg
  * registration, chain registry, authex links) via LOCAL table reads. On a
  * cold-booting operator node those reads see mid-sync (possibly genesis)
  * state and fail spuriously, so the plugin must not begin underwriting until
- * the node is synced. "Synced" here means the LAST IRREVERSIBLE block's time
- * is within a small window of wall-clock now — the irreversible state is what
- * the plugin's table reads actually serve (operator daemons run read-mode =
- * irreversible).
+ * the node is synced. The sync predicate itself is `controller::is_synced()`
+ * (LIB recency, woken by the `irreversible_block` channel), shared by every
+ * operator-daemon plugin; this header carries only the underwriter's OWN gate
+ * lifecycle surface.
  */
 
 #include <fc/time.hpp>
@@ -22,26 +24,6 @@
 #include <optional>
 
 namespace sysio::underwriter_detail {
-
-/**
- * @brief True when a block time is recent enough to treat the node as synced.
- *
- * While a cold-booting node syncs blocks the tested time trails `now` by the
- * catch-up gap; once caught up, it tracks `now` to within finality-lag
- * jitter. The window must exceed that jitter (plus scheduling slack) but stay
- * well under one epoch so underwriting never starts against stale state.
- *
- * @param block_time     The block timestamp to test — the caller's sync
- *                       criterion (the underwriter feeds the LAST IRREVERSIBLE
- *                       block's time, since that is the state its reads serve).
- * @param now            Wall-clock now.
- * @param recency_window Maximum behind-now gap still considered synced.
- * @return True when `block_time >= now - recency_window`.
- */
-inline bool block_time_is_recent(fc::time_point block_time, fc::time_point now,
-                                 fc::microseconds recency_window) {
-   return block_time >= now - recency_window;
-}
 
 /// JSON field keys shared by the gate payloads below, the post-startup
 /// response builders in `underwriter_plugin.cpp`, and their tests — one
@@ -73,12 +55,29 @@ enum class startup_state : uint8_t {
    wiring_failed,      ///< Preflight passed but outpost client wiring threw (terminal).
    startup_failed,     ///< The deferred startup body threw past the specific
                        ///< failure paths above (terminal). Exists so an escaping
-                       ///< exception is contained as a diagnosable gate state
-                       ///< instead of unwinding the app executor — which would
-                       ///< tear down the whole node — with the gate still
-                       ///< claiming `waiting_for_sync`.
+                       ///< exception is contained as a diagnosable gate state —
+                       ///< stored and logged BEFORE the fail-fast shutdown — instead
+                       ///< of unwinding the app executor mid-task with the gate
+                       ///< still claiming `waiting_for_sync`.
    active              ///< Deferred startup completed — the scan cron is scheduled.
 };
+
+/**
+ * @brief True for the terminal deferred-startup FAILURE states — the states the
+ *        uniform fail-fast policy shuts the node down on (see
+ *        `underwriter_plugin.cpp`'s `quit_if_startup_failed_terminally`).
+ *
+ * `active` is terminal success, not failure; `preflight_retrying` is transient by
+ * definition (bounded by the retry grace). Kept beside the enum so a new state
+ * cannot be added without deciding its fail-fast classification here.
+ *
+ * @param s The deferred-startup lifecycle state to classify.
+ * @return True when `s` is a terminal failure state.
+ */
+inline constexpr bool is_terminal_failure(startup_state s) {
+   return s == startup_state::preflight_failed || s == startup_state::wiring_failed ||
+          s == startup_state::startup_failed;
+}
 
 /// The wire `status` spelling of {@link startup_state::active} — shared by the
 /// post-startup response builders so the value has one authority beside the
@@ -91,15 +90,15 @@ static_assert(active_status == "active");
 /// `detail` carried by the {@link startup_state::preflight_failed} gate payload.
 inline constexpr std::string_view preflight_failed_detail =
    "startup preflight failed after sync — depot-side state for this underwriter "
-   "is incomplete; underwriting is disabled (see node log)";
+   "is incomplete; the node is shutting down (fail-fast; see node log)";
 /// `detail` carried by the {@link startup_state::wiring_failed} gate payload.
 inline constexpr std::string_view wiring_failed_detail =
-   "outpost client wiring failed after preflight; underwriting is disabled "
-   "(see node log)";
+   "outpost client wiring failed after preflight; the node is shutting down "
+   "(fail-fast; see node log)";
 /// `detail` carried by the {@link startup_state::startup_failed} gate payload.
 inline constexpr std::string_view startup_failed_detail =
-   "deferred startup failed unexpectedly; underwriting is disabled "
-   "(see node log)";
+   "deferred startup failed unexpectedly; the node is shutting down "
+   "(fail-fast; see node log)";
 
 /**
  * @brief The JSON body a `/v1/underwriter/...` endpoint answers with for `state`.
