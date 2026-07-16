@@ -480,8 +480,12 @@ struct batch_operator_plugin::impl {
       // operator signs with its own account authority, so an operator-side push
       // fails unconditionally with `missing authority of sysio.msgch` before the
       // epoch check — it never advanced anything, it only produced boot-window
-      // error-log noise. From epoch 1 onward, `advance` re-arms itself via
-      // `evalcons` consensus; batch operators never trigger it.
+      // error-log noise. From epoch 1 onward batch operators still TRIGGER
+      // advancement — the elected operator's poll cranks `msgch::chkcons`
+      // (see poll_epoch_state), which sends the inline `sysio.epoch::advance`
+      // (again under msgch's own authority) once the per-outpost consensus
+      // recorded during `evalcons` dispatch and the epoch time gate are met —
+      // but they never AUTHORIZE bootstrap or advance directly.
 
       if (!is_elected) {
          if (epoch_index != current_epoch) {
