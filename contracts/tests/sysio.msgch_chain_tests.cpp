@@ -413,7 +413,10 @@ BOOST_AUTO_TEST_SUITE(sysio_msgch_chain_tests)
 /// `OPPEpochHashHelper` hardhat trampoline). Two consecutive depot-shape epochs — B chains from
 /// A at BOTH levels (envelope digest and message id) — plus the wire-ethereum test-fixture
 /// shape. The depot-shape headers are DERIVED per the spec (`oracle::finalize_header`), so the
-/// pins cover the full semantic-header derivation, not just the byte layout.
+/// pins cover the full semantic-header derivation, not just the byte layout. Depot-shape
+/// envelopes carry populated route endpoints (`buildenv` stamps them from the destination's
+/// `sysio.chains` row): WIRE(1) → EVM(31337), the local-devnet chain id the outpost fixtures
+/// verify against.
 BOOST_AUTO_TEST_CASE(canonical_oracle_matches_solidity_golden_vectors) { try {
    constexpr uint64_t GOLDEN_TS_MS = 1'775'612'516'983ULL;
 
@@ -421,6 +424,11 @@ BOOST_AUTO_TEST_CASE(canonical_oracle_matches_solidity_golden_vectors) { try {
                           const std::string& prev_message_id,
                           const std::vector<std::string>& att_datas) {
       sysio::opp::Envelope env;
+      auto* eps = env.mutable_endpoints();
+      eps->mutable_start()->set_kind(sysio::opp::types::CHAIN_KIND_WIRE);
+      eps->mutable_start()->set_id(1);
+      eps->mutable_end()->set_kind(sysio::opp::types::CHAIN_KIND_EVM);
+      eps->mutable_end()->set_id(31337);
       env.set_epoch_timestamp(GOLDEN_TS_MS);
       env.set_epoch_index(epoch_index);
       if (!prev.empty()) env.set_previous_envelope_hash(prev);
@@ -442,14 +450,14 @@ BOOST_AUTO_TEST_CASE(canonical_oracle_matches_solidity_golden_vectors) { try {
    const auto env_a = depot_shape(7, {}, {}, { std::string("\xde\xad\xbe\xef", 4) });
    const auto enc_a = oracle::encode(env_a);
    BOOST_REQUIRE_EQUAL(fc::to_hex(enc_a.data(), enc_a.size()),
-      "0a00120c0a040800100012040800100028f7b483d6d63330073800a20100c20292010a7f0a0c0a040800"
-      "100012040800100012200000000000000001210103982d1ae1f083b047bde00e77e4a337f3b31c8d223c"
-      "1a00280f32206429fe11b290953c3e28e6ed7887059307329591c6296d6e41d27e4e6ddcae9938f7b483"
-      "d6d6334220fb2b80f90bf26934210103982d1ae1f083b047bde00e77e4a337f3b31c8d223c120f080112"
-      "0b08d10f10041a04deadbeef");
+      "0a00120e0a04080110011206080210e9f40128f7b483d6d63330073800a20100c20292010a7f0a0c0a04"
+      "0800100012040800100012200000000000000001210103982d1ae1f083b047bde00e77e4a337f3b31c8d"
+      "223c1a00280f32206429fe11b290953c3e28e6ed7887059307329591c6296d6e41d27e4e6ddcae9938f7"
+      "b483d6d6334220fb2b80f90bf26934210103982d1ae1f083b047bde00e77e4a337f3b31c8d223c120f08"
+      "01120b08d10f10041a04deadbeef");
    const auto digest_a = oracle::epoch_digest(env_a);
    BOOST_REQUIRE_EQUAL(digest_a.str(),
-      "c7c6502a5b047c0742c887122350c0b6731c60f3f5f9d48cdde9d4f2b6b8880a");
+      "f2e3eaf3c62600a753b8207577f4b20554b2b4a9073cb732a3aeb63416bd90ac");
 
    // Vector B: depot shape, epoch 8, chained from A at both levels (envelope digest + message
    // id, so B's message carries sequence number 2), two attestations.
@@ -458,15 +466,15 @@ BOOST_AUTO_TEST_CASE(canonical_oracle_matches_solidity_golden_vectors) { try {
       { std::string("\xde\xad\xbe\xef", 4), std::string("\xca\xfe\xba\xbe\x01", 5) });
    const auto enc_b = oracle::encode(env_b);
    BOOST_REQUIRE_EQUAL(fc::to_hex(enc_b.data(), enc_b.size()),
-      "0a00120c0a040800100012040800100028f7b483d6d63330083800a20120c7c6502a5b047c0742c88712"
-      "2350c0b6731c60f3f5f9d48cdde9d4f2b6b8880ac202c1010a9f010a0c0a040800100012040800100012"
-      "2000000000000000022437e72cf67a093c4c5753cbb3ce71b76c890da8f9965c351a2000000000000000"
-      "01210103982d1ae1f083b047bde00e77e4a337f3b31c8d223c281d3220fdbcffc45ad50a6a2d1376af8c"
-      "498d86910751868ae7e14fe909477b319ec98d38f7b483d6d63342208d135355c556a6ed2437e72cf67a"
-      "093c4c5753cbb3ce71b76c890da8f9965c35121d0801120b08d10f10041a04deadbeef120c08d10f1005"
-      "1a05cafebabe01");
+      "0a00120e0a04080110011206080210e9f40128f7b483d6d63330083800a20120f2e3eaf3c62600a753b8"
+      "207577f4b20554b2b4a9073cb732a3aeb63416bd90acc202c1010a9f010a0c0a04080010001204080010"
+      "00122000000000000000022437e72cf67a093c4c5753cbb3ce71b76c890da8f9965c351a200000000000"
+      "000001210103982d1ae1f083b047bde00e77e4a337f3b31c8d223c281d3220fdbcffc45ad50a6a2d1376"
+      "af8c498d86910751868ae7e14fe909477b319ec98d38f7b483d6d63342208d135355c556a6ed2437e72c"
+      "f67a093c4c5753cbb3ce71b76c890da8f9965c35121d0801120b08d10f10041a04deadbeef120c08d10f"
+      "10051a05cafebabe01");
    BOOST_REQUIRE_EQUAL(oracle::epoch_digest(env_b).str(),
-      "c7e7d905b6c87a209fde8319701a5a7d95350c989e234eedb26bdeb14cd5bddd");
+      "11f1b9c451e62a63e0b903d49d4358ba65994670d33d3775408a89e9690434e3");
 
    // Vector C: wire-ethereum test-fixture shape: WIRE(1) -> EVM(31337) endpoints, message-free.
    sysio::opp::Envelope env_c;
@@ -528,6 +536,14 @@ BOOST_FIXTURE_TEST_CASE(buildenv_chains_consecutive_envelopes, sysio_msgch_chain
       // oracle re-encodes the decoded envelope to the identical byte stream.
       BOOST_REQUIRE(oracle::encode(env) == raw);
 
+      // Destination binding: the envelope names its route endpoints from the destination's
+      // `sysio.chains` row (the fixture registers ETH as EVM/31337); the receiving outpost
+      // verifies `end` against its own chain identity.
+      BOOST_REQUIRE(env.endpoints().start().kind() == sysio::opp::types::CHAIN_KIND_WIRE);
+      BOOST_REQUIRE_EQUAL(env.endpoints().start().id(), 1u);
+      BOOST_REQUIRE(env.endpoints().end().kind() == sysio::opp::types::CHAIN_KIND_EVM);
+      BOOST_REQUIRE_EQUAL(env.endpoints().end().id(), 31337u);
+
       // Chain link: previous_envelope_hash carries the digest of the envelope that was the
       // surviving row when buildenv ran.
       BOOST_REQUIRE(!predecessor.is_null());
@@ -585,6 +601,10 @@ BOOST_FIXTURE_TEST_CASE(buildenv_first_emit_chains_from_empty, sysio_msgch_chain
    auto env = decode_envelope(raw);
    BOOST_REQUIRE_EQUAL(env.previous_envelope_hash().size(), 0u);
    BOOST_REQUIRE_EQUAL(row["envelope_hash"].as_string(), oracle::keccak_of(raw).str());
+
+   // Destination binding follows the freshly-registered row, not a fixture constant.
+   BOOST_REQUIRE(env.endpoints().end().kind() == sysio::opp::types::CHAIN_KIND_EVM);
+   BOOST_REQUIRE_EQUAL(env.endpoints().end().id(), 56u);
 
    // Message-stream genesis: empty previous_message_id, sequence number 1, tip recorded.
    BOOST_REQUIRE_EQUAL(env.messages_size(), 1);

@@ -246,6 +246,28 @@ BOOST_FIXTURE_TEST_CASE(regchain_basic, sysio_epoch_tester) { try {
    BOOST_REQUIRE(ChainKind::CHAIN_KIND_SVM == row2["kind"].as<ChainKind>());
 } FC_LOG_AND_RETHROW() }
 
+/// EVM rows must not share an `external_chain_id`: the pair (kind, external_chain_id) is the
+/// outbound envelope's destination binding (`sysio.msgch::buildenv` stamps it into the route
+/// endpoints, and EVM outposts verify it against their own block.chainid), so it must stay
+/// injective across EVM rows. SVM rows are exempt — Solana clusters have no numeric chain id.
+BOOST_FIXTURE_TEST_CASE(regchain_evm_external_id_unique, sysio_epoch_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), regchain(ChainKind::CHAIN_KIND_EVM, "ETH", 1));
+   produce_blocks();
+
+   // A second EVM chain cannot reuse a registered EVM external_chain_id.
+   BOOST_REQUIRE(regchain(ChainKind::CHAIN_KIND_EVM, "POLYGON", 1)
+      .find("an EVM chain with this external_chain_id already exists") != std::string::npos);
+
+   // A distinct id registers fine.
+   BOOST_REQUIRE_EQUAL(success(), regchain(ChainKind::CHAIN_KIND_EVM, "POLYGON", 137));
+   produce_blocks();
+
+   // SVM rows may share numeric ids with anything, including each other.
+   BOOST_REQUIRE_EQUAL(success(), regchain(ChainKind::CHAIN_KIND_SVM, "SOL", 1));
+   BOOST_REQUIRE_EQUAL(success(), regchain(ChainKind::CHAIN_KIND_SVM, "SOLDEV", 1));
+   produce_blocks();
+} FC_LOG_AND_RETHROW() }
+
 BOOST_FIXTURE_TEST_CASE(advance_before_config, sysio_epoch_tester) { try {
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: epoch config not initialized"),

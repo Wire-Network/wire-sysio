@@ -54,6 +54,20 @@ void chains::regchain(opp::types::ChainKind kind,
                    "sysio.chains: a WIRE chain (depot self-row) already exists");
    }
 
+   // Enforce: EVM rows are unique per `external_chain_id`. The pair (kind, external_chain_id)
+   // is stamped into every outbound envelope's route endpoints (`sysio.msgch::buildenv`) and is
+   // what an EVM outpost verifies against its own `block.chainid`, so it must stay injective
+   // across EVM rows. SVM rows are exempt: Solana clusters have no numeric chain id (rows carry
+   // a nominal value) and are disambiguated by `code` alone.
+   if (kind == opp::types::CHAIN_KIND_EVM) {
+      auto by_extid_idx = tbl.template get_index<"byextid"_n>();
+      for (auto it = by_extid_idx.lower_bound(external_chain_id);
+           it != by_extid_idx.end() && it->external_chain_id == external_chain_id; ++it) {
+         sysio::check(it->kind != opp::types::CHAIN_KIND_EVM,
+                      "sysio.chains: an EVM chain with this external_chain_id already exists");
+      }
+   }
+
    const auto now = current_time_ms();
    const bool bootstrap = is_bootstrap_window();
 
