@@ -5,7 +5,6 @@
 #include <fc/slug_name.hpp>
 #include <fc/variant_object.hpp>
 #include <boost/endian/conversion.hpp>
-#include <magic_enum/magic_enum.hpp>
 #include <algorithm>
 #include <format>
 #include <functional>
@@ -897,7 +896,9 @@ struct batch_operator_plugin::impl {
    /// (outpost discovery against a not-yet-deployed registry) are already
    /// absorbed inside {@link run_deferred_startup} and retried by the refresh
    /// ticks; what reaches here is structural (cron_service creation or job
-   /// scheduling failed).
+   /// scheduling failed). FC_LOG_AND_DROP deliberately rethrows
+   /// boost::interprocess::bad_alloc — chainbase shared-memory exhaustion
+   /// stays immediately fatal.
    void run_deferred_startup_or_quit() {
       try {
          run_deferred_startup();
@@ -970,11 +971,13 @@ void batch_operator_plugin::plugin_initialize(const variables_map& options) {
    // Operator daemons are designed for read-mode = irreversible: the sync gate
    // (controller::is_synced) measures LIB recency and every local table read the
    // relay performs serves the irreversible view. Any other read mode would relay
-   // envelopes derived from state that can still fork out.
+   // envelopes derived from state that can still fork out. Together with
+   // producer_plugin's inverse assert (no producer-name under irreversible
+   // read-mode), this also makes co-hosting a producer with an operator daemon
+   // impossible by configuration.
    FC_ASSERT(!_impl->enabled ||
                 _impl->chain_plug->chain().get_read_mode() == chain::db_read_mode::IRREVERSIBLE,
-             "batch_operator_plugin requires read-mode = irreversible (configured read-mode = {})",
-             magic_enum::enum_name(_impl->chain_plug->chain().get_read_mode()));
+             "batch_operator_plugin requires read-mode = irreversible");
 }
 
 void batch_operator_plugin::plugin_startup() {
@@ -997,8 +1000,9 @@ void batch_operator_plugin::plugin_startup() {
    // the application executor — main thread, AFTER the triggering block fully
    // commits — so the callback may run the startup body directly. There is
    // deliberately no already-synced fast path: operator daemons boot with
-   // genesis-stale LIB in every deployment topology (they are never co-hosted
-   // with a producer), and a node that somehow is synced at startup is
+   // genesis-stale LIB in every deployment topology (producer co-hosting is
+   // impossible by configuration — see the read-mode requirement in
+   // plugin_initialize), and a node that somehow is synced at startup is
    // released by the next LIB advance.
    auto& chain = _impl->chain_plug->chain();
    ilog("batch_operator_plugin: waiting for chain sync before outpost discovery "
@@ -1006,8 +1010,8 @@ void batch_operator_plugin::plugin_startup() {
         chain.head().block_num(),
         (fc::time_point::now() - chain.head().block_time()).to_seconds(),
         chain.fork_db_has_root()
-           ? (fc::time_point::now() - chain.fork_db_root().block_time()).to_seconds()
-           : -1);
+           ? std::to_string((fc::time_point::now() - chain.fork_db_root().block_time()).to_seconds())
+           : "n/a");
    _impl->sync_gate_subscription =
       app().get_channel<chain::plugin_interface::channels::irreversible_block>().subscribe(
          [impl = _impl.get()](const chain::block_signal_params&) {

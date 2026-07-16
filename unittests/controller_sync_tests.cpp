@@ -18,15 +18,13 @@ using namespace sysio::testing;
 
 BOOST_AUTO_TEST_SUITE(controller_sync_tests)
 
-/// The default gate window the operator-daemon plugins run with.
-static const fc::microseconds default_window =
-   fc::milliseconds(controller::default_sync_recency_ms);
-
 /// A produced tester chain plus its last-irreversible block time — the reference instant
 /// every boundary case below offsets `now` from.
 struct lib_fixture {
    tester         chain;
    fc::time_point lib_time;
+   /// The default gate window the operator-daemon plugins run with.
+   fc::microseconds default_window = fc::milliseconds(controller::default_sync_recency_ms);
 
    lib_fixture() {
       chain.produce_blocks(4);
@@ -36,6 +34,7 @@ struct lib_fixture {
 };
 
 BOOST_FIXTURE_TEST_CASE(lib_at_now_is_synced, lib_fixture) { try {
+   // The identity point of the window arithmetic: now == LIB time (zero gap).
    BOOST_TEST(chain.control->is_synced(lib_time, default_window));
 } FC_LOG_AND_RETHROW() }
 

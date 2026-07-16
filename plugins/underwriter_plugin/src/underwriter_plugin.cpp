@@ -2738,11 +2738,13 @@ void underwriter_plugin::plugin_initialize(const variables_map& options) {
    // Operator daemons are designed for read-mode = irreversible: the sync gate
    // (controller::is_synced) measures LIB recency and every local table read the
    // preflight and scan cycle perform serves the irreversible view. Any other read
-   // mode would validate/underwrite against state that can still fork out.
+   // mode would validate/underwrite against state that can still fork out. Together
+   // with producer_plugin's inverse assert (no producer-name under irreversible
+   // read-mode), this also makes co-hosting a producer with an operator daemon
+   // impossible by configuration.
    FC_ASSERT(!_impl->enabled ||
                 _impl->chain_plug->chain().get_read_mode() == chain::db_read_mode::IRREVERSIBLE,
-             "underwriter_plugin requires read-mode = irreversible (configured read-mode = {})",
-             magic_enum::enum_name(_impl->chain_plug->chain().get_read_mode()));
+             "underwriter_plugin requires read-mode = irreversible");
 }
 
 void underwriter_plugin::plugin_startup() {
@@ -2775,8 +2777,9 @@ void underwriter_plugin::plugin_startup() {
    // the application executor — main thread, AFTER the triggering block
    // fully commits — so the callback may run the startup body directly.
    // There is deliberately no already-synced fast path: operator daemons
-   // boot with genesis-stale LIB in every deployment topology (they are
-   // never co-hosted with a producer), and a node that somehow is synced at
+   // boot with genesis-stale LIB in every deployment topology (producer
+   // co-hosting is impossible by configuration — see the read-mode
+   // requirement in plugin_initialize), and a node that somehow is synced at
    // startup is released by the next LIB advance. Post-arming, the preflight
    // retries within a bounded grace (see attempt_deferred_startup) to absorb
    // the LIB boundary race; a genuinely incomplete bootstrap still fails
@@ -2788,13 +2791,13 @@ void underwriter_plugin::plugin_startup() {
         chain.head().block_num(),
         (fc::time_point::now() - chain.head().block_time()).to_seconds(),
         chain.fork_db_has_root()
-           ? (fc::time_point::now() - chain.fork_db_root().block_time()).to_seconds()
-           : -1);
+           ? std::to_string((fc::time_point::now() - chain.fork_db_root().block_time()).to_seconds())
+           : "n/a");
    _impl->sync_gate_subscription =
       app().get_channel<chain::plugin_interface::channels::irreversible_block>().subscribe(
-         [this](const chain::block_signal_params&) {
-            if (_impl->startup_attempted() || _impl->shutting_down ||
-                !_impl->chain_plug->chain().is_synced()) {
+         [impl = _impl.get()](const chain::block_signal_params&) {
+            if (impl->startup_attempted() || impl->shutting_down ||
+                !impl->chain_plug->chain().is_synced()) {
                return;
             }
             // One-shot consumption: unsubscribe (safe from within the slot) and
@@ -2805,9 +2808,9 @@ void underwriter_plugin::plugin_startup() {
             // block-application, table reads see an incomplete view — observed
             // live: a registered operator row read back EMPTY → spurious
             // preflight failure).
-            _impl->sync_gate_subscription.unsubscribe();
+            impl->sync_gate_subscription.unsubscribe();
             ilog("underwriter_plugin: chain synced — starting deferred startup");
-            _impl->run_deferred_startup();
+            impl->run_deferred_startup();
          });
 }
 
