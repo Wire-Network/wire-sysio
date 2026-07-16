@@ -95,8 +95,9 @@ namespace sysio {
 
       /// Highest launch-approved consecutive-miss threshold; larger values can
       /// make miss-based recovery unreachable within the intended operating envelope.
-      static constexpr uint32_t MAX_TERMINATE_MAX_CONSECUTIVE_MISSES =
-         DEFAULT_TERMINATE_MAX_CONSECUTIVE_MISSES;
+      /// Deliberately an independent literal: bumping the production default must
+      /// not silently widen this security ceiling.
+      static constexpr uint32_t MAX_TERMINATE_MAX_CONSECUTIVE_MISSES = 5;
 
       /// Lowest accepted threshold for rolling-window percent-miss termination.
       static constexpr uint32_t MIN_TERMINATE_MAX_PCT_MISSES_24H = 1;
@@ -104,6 +105,20 @@ namespace sysio {
       /// Highest accepted percent-miss threshold. A 100% threshold can never be
       /// exceeded by an all-miss window while `termcheck` uses strict breach semantics.
       static constexpr uint32_t MAX_TERMINATE_MAX_PCT_MISSES_24H = 99;
+
+      static_assert(MIN_TERMINATE_MAX_CONSECUTIVE_MISSES <= DEFAULT_TERMINATE_MAX_CONSECUTIVE_MISSES &&
+                    DEFAULT_TERMINATE_MAX_CONSECUTIVE_MISSES <= MAX_TERMINATE_MAX_CONSECUTIVE_MISSES,
+                    "production default consecutive-miss threshold must lie inside the accepted bounds");
+      static_assert(MIN_TERMINATE_MAX_PCT_MISSES_24H <= DEFAULT_TERMINATE_MAX_PCT_MISSES_24H &&
+                    DEFAULT_TERMINATE_MAX_PCT_MISSES_24H <= MAX_TERMINATE_MAX_PCT_MISSES_24H,
+                    "production default percent-miss threshold must lie inside the accepted bounds");
+
+      /// Bounded sweep sizes for delivery-log rows that have aged out of the
+      /// rolling termination window. The write-path cap only has to outpace
+      /// insertion (each `recorddel` adds one row); the `prune` cap clears
+      /// backlog faster when cranked.
+      static constexpr uint32_t MAX_DELLOG_PRUNE_PER_WRITE = 4;
+      static constexpr uint32_t MAX_DELLOG_PRUNE_PER_CRANK = 64;
 
       // Per-operator audit log: ring-buffer cap (newest-in / oldest-out) and
       // per-entry error_message length cap. Operators read recent_actions to
@@ -277,6 +292,9 @@ namespace sysio {
 
       /// Record per-batch-op delivery hit/miss for the rolling 24h buffer.
       /// Called inline from `sysio.epoch::advance` after each delivery cycle.
+      /// Each write also sweeps up to `MAX_DELLOG_PRUNE_PER_WRITE` rows that
+      /// have aged out of the rolling termination window, keeping the buffer
+      /// bounded without a dedicated crank.
       [[sysio::action]]
       void recorddel(name account, uint32_t epoch, bool delivered);
 
@@ -295,7 +313,9 @@ namespace sysio {
       [[sysio::action]]
       void terminate(name account, std::string reason);
 
-      /// Prune terminated operator rows past the delay. Permissionless.
+      /// Prune terminated operator rows past the delay, plus delivery-log
+      /// rows that have aged out of the rolling termination window.
+      /// Permissionless.
       [[sysio::action]]
       void prune();
 

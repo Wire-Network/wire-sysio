@@ -44,6 +44,13 @@ constexpr uint64_t kRejectedZeroMinBond = 0;
 /// Standard 24h rolling-window size used by opreg tests.
 constexpr uint64_t kTerminateWindowMs = 24ULL * 60 * 60 * 1000;
 
+/// Mirrors opreg's MAX_DELLOG_PRUNE_PER_WRITE (the contract header is not
+/// includable from native test code).
+constexpr uint32_t kDellogPrunePerWrite = 4;
+
+/// Mirrors opreg's MAX_DELLOG_PRUNE_PER_CRANK.
+constexpr uint32_t kDellogPrunePerCrank = 64;
+
 } // namespace
 
 /// v6 data-model: per-chain identity has moved from `ChainKind` enums to
@@ -309,6 +316,14 @@ public:
       auto data = get_row_by_account(OPREG_ACCOUNT, OPREG_ACCOUNT, "operators"_n, account);
       return data.empty() ? fc::variant() : opreg_abi_ser.binary_to_variant(
          "operator_entry", data,
+         abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
+   /// Raw dellog row by log_id; empty variant when the row does not exist.
+   fc::variant get_dellog_entry(uint64_t log_id) {
+      auto data = get_row_by_account(OPREG_ACCOUNT, OPREG_ACCOUNT, "dellog"_n, name{log_id});
+      return data.empty() ? fc::variant() : opreg_abi_ser.binary_to_variant(
+         "delivery_log_entry", data,
          abi_serializer::create_yield_function(abi_serializer_max_time));
    }
 
@@ -859,6 +874,124 @@ BOOST_FIXTURE_TEST_CASE(termcheck_keeps_bootstrapped_operator_exempt, sysio_opre
    auto op = get_operator("batchop.a"_n);
    BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE == op["status"].as<OperatorStatus>());
    BOOST_REQUIRE_EQUAL(1, op["is_bootstrapped"].as_uint64());
+} FC_LOG_AND_RETHROW() }
+
+// ---- dellog retention: bounded pruning of rows outside the rolling window ----
+
+BOOST_FIXTURE_TEST_CASE(recorddel_prunes_rows_that_aged_out_of_window, sysio_opreg_tester) { try {
+   activate_batch_operator("batchop.a"_n);
+
+   for (uint32_t epoch = 1; epoch <= 3; ++epoch) {
+      BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, epoch, /*delivered=*/true));
+      produce_blocks();
+   }
+   for (uint64_t id = 1; id <= 3; ++id)
+      BOOST_REQUIRE(!get_dellog_entry(id).is_null());
+
+   // Push chain time past the 24h window so rows 1..3 age out.
+   produce_block(fc::hours(25));
+
+   BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, 4, /*delivered=*/true));
+   produce_blocks();
+
+   for (uint64_t id = 1; id <= 3; ++id)
+      BOOST_REQUIRE(get_dellog_entry(id).is_null());
+   auto row = get_dellog_entry(4);
+   BOOST_REQUIRE(!row.is_null());
+   BOOST_REQUIRE_EQUAL("batchop.a", row["account"].as_string());
+   BOOST_REQUIRE_EQUAL(4, row["epoch"].as_uint64());
+   BOOST_REQUIRE_EQUAL(true, row["delivered"].as_bool());
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(recorddel_prune_is_bounded_per_write, sysio_opreg_tester) { try {
+   activate_batch_operator("batchop.a"_n);
+
+   for (uint32_t epoch = 1; epoch <= 6; ++epoch) {
+      BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, epoch, /*delivered=*/true));
+      produce_blocks();
+   }
+   produce_block(fc::hours(25));
+
+   // First write past the window sweeps at most kDellogPrunePerWrite rows.
+   BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, 7, /*delivered=*/true));
+   produce_blocks();
+   for (uint64_t id = 1; id <= kDellogPrunePerWrite; ++id)
+      BOOST_REQUIRE(get_dellog_entry(id).is_null());
+   BOOST_REQUIRE(!get_dellog_entry(5).is_null());
+   BOOST_REQUIRE(!get_dellog_entry(6).is_null());
+   BOOST_REQUIRE(!get_dellog_entry(7).is_null());
+
+   // Second write clears the remaining two and stops at the in-window row.
+   BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, 8, /*delivered=*/true));
+   produce_blocks();
+   BOOST_REQUIRE(get_dellog_entry(5).is_null());
+   BOOST_REQUIRE(get_dellog_entry(6).is_null());
+   BOOST_REQUIRE(!get_dellog_entry(7).is_null());
+   BOOST_REQUIRE(!get_dellog_entry(8).is_null());
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(prune_sweeps_expired_dellog_rows, sysio_opreg_tester) { try {
+   activate_batch_operator("batchop.a"_n);
+
+   // One more expired row than a single crank may remove.
+   constexpr uint32_t SEEDED_ROWS = kDellogPrunePerCrank + 1;
+   for (uint32_t epoch = 1; epoch <= SEEDED_ROWS; ++epoch) {
+      BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, epoch, /*delivered=*/false));
+      produce_blocks();
+   }
+   produce_block(fc::hours(25));
+
+   // First crank removes exactly kDellogPrunePerCrank rows, oldest first.
+   BOOST_REQUIRE_EQUAL(success(), prune());
+   produce_blocks();
+   for (uint64_t id = 1; id <= kDellogPrunePerCrank; ++id)
+      BOOST_REQUIRE(get_dellog_entry(id).is_null());
+   BOOST_REQUIRE(!get_dellog_entry(SEEDED_ROWS).is_null());
+
+   // Second crank clears the remainder.
+   BOOST_REQUIRE_EQUAL(success(), prune());
+   produce_blocks();
+   BOOST_REQUIRE(get_dellog_entry(SEEDED_ROWS).is_null());
+
+   // With no rows left in the window the operator stays ACTIVE.
+   BOOST_REQUIRE_EQUAL(success(), termcheck("batchop.a"_n));
+   auto op = get_operator("batchop.a"_n);
+   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE == op["status"].as<OperatorStatus>());
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(termcheck_unaffected_by_on_write_pruning, sysio_opreg_tester) { try {
+   activate_batch_operator("batchop.a"_n);
+
+   // Six misses that age out before they are ever evaluated.
+   for (uint32_t epoch = 1; epoch <= 6; ++epoch) {
+      BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, epoch, /*delivered=*/false));
+      produce_blocks();
+   }
+   produce_block(fc::hours(25));
+
+   // Six fresh misses; their writes also sweep the six expired rows.
+   for (uint32_t epoch = 7; epoch <= 12; ++epoch) {
+      BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, epoch, /*delivered=*/false));
+      produce_blocks();
+   }
+   for (uint64_t id = 1; id <= 6; ++id)
+      BOOST_REQUIRE(get_dellog_entry(id).is_null());
+   for (uint64_t id = 7; id <= 12; ++id)
+      BOOST_REQUIRE(!get_dellog_entry(id).is_null());
+
+   // The in-window rows still drive the consecutive-miss rail as before.
+   BOOST_REQUIRE_EQUAL(success(), termcheck("batchop.a"_n));
+   auto op = get_operator("batchop.a"_n);
+   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_TERMINATED == op["status"].as<OperatorStatus>());
+   BOOST_REQUIRE_EQUAL("rolling-window: >5 consecutive misses", op["status_reason"].as_string());
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(recorddel_succeeds_without_opconfig, sysio_opreg_tester) { try {
+   // No setconfig installed: the on-write sweep falls back to default
+   // thresholds via get_or_default instead of asserting.
+   BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, 1, /*delivered=*/true));
+   produce_blocks();
+   BOOST_REQUIRE(!get_dellog_entry(1).is_null());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(releaselock_requires_uwrit_authority, sysio_opreg_tester) { try {
