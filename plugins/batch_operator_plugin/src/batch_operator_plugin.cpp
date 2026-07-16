@@ -1003,7 +1003,11 @@ void batch_operator_plugin::plugin_startup() {
    // genesis-stale LIB in every deployment topology (producer co-hosting is
    // impossible by configuration — see the read-mode requirement in
    // plugin_initialize), and a node that somehow is synced at startup is
-   // released by the next LIB advance.
+   // released by the next LIB advance. That advance is also the relay's WORK
+   // SUPPLY — everything here acts on newly-finalized state — so a finality
+   // stall that spans startup (the classic lost-wakeup case) is one with
+   // nothing to relay: the first finalized block re-arms the gate and
+   // creates the first actionable state at the same instant.
    auto& chain = _impl->chain_plug->chain();
    ilog("batch_operator_plugin: waiting for chain sync before outpost discovery "
         "(head {} is {}s behind now; irreversible state is {}s behind)",

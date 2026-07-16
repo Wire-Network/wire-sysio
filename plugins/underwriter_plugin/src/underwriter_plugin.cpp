@@ -2780,7 +2780,12 @@ void underwriter_plugin::plugin_startup() {
    // boot with genesis-stale LIB in every deployment topology (producer
    // co-hosting is impossible by configuration — see the read-mode
    // requirement in plugin_initialize), and a node that somehow is synced at
-   // startup is released by the next LIB advance. Post-arming, the preflight
+   // startup is released by the next LIB advance. That advance is also the
+   // underwriter's WORK SUPPLY — everything here acts on newly-finalized
+   // state — so a finality stall that spans startup (the classic lost-wakeup
+   // case) is one with nothing to underwrite: the first finalized block
+   // re-arms the gate and creates the first actionable state at the same
+   // instant. Post-arming, the preflight
    // retries within a bounded grace (see attempt_deferred_startup) to absorb
    // the LIB boundary race; a genuinely incomplete bootstrap still fails
    // loudly once the grace expires and shuts the node down (fail-fast) —
