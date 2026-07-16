@@ -249,7 +249,9 @@ struct underwriter_plugin::impl {
    /// Sync gate: `channels::irreversible_block` subscription that arms
    /// {@link run_deferred_startup} once `controller::is_synced()` holds — a LIB
    /// advance is the only event that can turn the predicate true. Unsubscribed
-   /// after arming; released on shutdown.
+   /// after arming; otherwise the handle's destructor releases it (no shutdown
+   /// unsubscribe needed: posted channel deliveries are drained without
+   /// executing after quit, and the slot checks `shutting_down` first).
    chain::plugin_interface::channels::irreversible_block::channel_type::handle sync_gate_subscription;
    /// When the sync gate armed — bounds the preflight retry grace window.
    fc::time_point                    startup_armed_at;
@@ -2811,7 +2813,6 @@ void underwriter_plugin::plugin_startup() {
 
 void underwriter_plugin::plugin_shutdown() {
    _impl->shutting_down = true;
-   _impl->sync_gate_subscription.unsubscribe();
    if (_impl->preflight_retry_timer) {
       _impl->preflight_retry_timer->cancel();
    }

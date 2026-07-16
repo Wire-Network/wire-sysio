@@ -192,7 +192,10 @@ struct batch_operator_plugin::impl {
    /// Sync gate: `channels::irreversible_block` subscription that arms
    /// {@link run_deferred_startup_or_quit} once `controller::is_synced()`
    /// holds — a LIB advance is the only event that can turn the predicate
-   /// true. Unsubscribed after arming; released on shutdown.
+   /// true. Unsubscribed after arming; otherwise the handle's destructor
+   /// releases it (no shutdown unsubscribe needed: posted channel deliveries
+   /// are drained without executing after quit, and the slot checks
+   /// `shutting_down` first).
    chain::plugin_interface::channels::irreversible_block::channel_type::handle sync_gate_subscription;
 
    // -----------------------------------------------------------------------
@@ -1024,7 +1027,6 @@ void batch_operator_plugin::plugin_startup() {
 
 void batch_operator_plugin::plugin_shutdown() {
    _impl->shutting_down = true;
-   _impl->sync_gate_subscription.unsubscribe();
    if (_impl->cron_svc) {
       _impl->cron_svc->cancel_all();
       _impl->cron_svc->stop();
