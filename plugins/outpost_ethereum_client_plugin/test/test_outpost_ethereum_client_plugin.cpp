@@ -157,6 +157,35 @@ namespace {
 
 constexpr std::string_view opp_abi_fixture = "ethereum-abi-opp-current.json";
 constexpr std::string_view opp_inbound_abi_fixture = "ethereum-abi-opp-inbound-current.json";
+constexpr std::string_view hex_prefix = "0x";
+constexpr std::string_view emit_outbound_envelope_abi_name = "emitOutboundEnvelope";
+constexpr std::string_view emit_outbound_envelope_selector = "a3ad9cc3";
+constexpr std::string_view test_opp_address = "5FbDB2315678afecb367f032d93F642f64180aa3";
+constexpr std::string_view latest_slot_test_rpc_url = "http://127.0.0.1:1";
+constexpr std::string_view latest_slot_test_entry_id = "latest-slot-test";
+constexpr std::string_view latest_slot_test_private_key =
+   "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80";
+constexpr std::string_view latest_slot_test_public_key =
+   "0x8318535b54105d4a7aae60c08fc45f9687181b4fdfc625bd1a753fa7397fed7535"
+   "47f11ca8696646f2f3acb08e31016afac23e630c5d11f59f61fef57b0d2aa5";
+constexpr size_t evm_abi_word_bytes = 32;
+constexpr size_t hex_chars_per_byte = 2;
+constexpr size_t evm_abi_word_hex_chars = evm_abi_word_bytes * hex_chars_per_byte;
+constexpr size_t evm_function_selector_bytes = 4;
+constexpr size_t evm_function_selector_hex_chars = evm_function_selector_bytes * hex_chars_per_byte;
+constexpr size_t latest_outbound_return_head_words = 2;
+constexpr uint64_t latest_outbound_data_offset_bytes = latest_outbound_return_head_words * evm_abi_word_bytes;
+constexpr size_t emit_outbound_envelope_call_hex_chars =
+   evm_function_selector_hex_chars + evm_abi_word_hex_chars;
+constexpr uint64_t test_outpost_chain_code = 1;
+constexpr uint32_t test_evm_chain_id = 31337;
+constexpr uint32_t test_wire_epoch = 7;
+constexpr uint32_t test_stale_wire_epoch = test_wire_epoch - 1;
+constexpr uint32_t test_different_wire_epoch = test_wire_epoch + 1;
+constexpr int64_t test_rpc_deadline_seconds = 1;
+constexpr size_t rpc_length_oversized_envelope_bytes = sysio::OPP_MAX_ENVELOPE_BYTES + 1;
+constexpr char malformed_envelope_byte = static_cast<char>(0xff);
+constexpr char oversized_envelope_fill_byte = static_cast<char>(0x01);
 
 auto load_abi_fixture(std::string_view filename) {
    auto path = fc::test::get_test_fixtures_path() / bfs::path(filename);
@@ -166,15 +195,18 @@ auto load_abi_fixture(std::string_view filename) {
 /// Encode an unsigned integer as one 32-byte Ethereum ABI word.
 std::string abi_word(uint64_t value) {
    std::ostringstream stream;
-   stream << std::hex << std::setfill('0') << std::setw(64) << value;
+   stream << std::hex << std::setfill('0') << std::setw(evm_abi_word_hex_chars) << value;
    return stream.str();
 }
 
 /// Encode the raw return bytes for `getLatestOutboundEnvelope()`.
 std::string encode_latest_outbound_result(uint32_t epoch, const std::vector<char>& data) {
    auto data_hex = data.empty() ? std::string{} : fc::to_hex(data.data(), data.size());
-   data_hex.append((64 - (data_hex.size() % 64)) % 64, '0');
-   return "0x" + abi_word(epoch) + abi_word(64) + abi_word(data.size()) + data_hex;
+   data_hex.append(
+      (evm_abi_word_hex_chars - (data_hex.size() % evm_abi_word_hex_chars)) % evm_abi_word_hex_chars,
+      '0');
+   return std::string(hex_prefix) + abi_word(epoch) + abi_word(latest_outbound_data_offset_bytes) +
+          abi_word(data.size()) + data_hex;
 }
 
 /// Serialize a minimal protobuf envelope carrying only its epoch index.
@@ -201,7 +233,7 @@ BOOST_AUTO_TEST_CASE(opp_contract_client_construction) try {
    // sufficient here because the generated callables are not invoked.
    auto client = std::make_shared<sysio::opp_contract_client>(
       ethereum_client_ptr{},
-      address_compat_type{"5FbDB2315678afecb367f032d93F642f64180aa3"},
+      address_compat_type{std::string(test_opp_address)},
       abis);
    BOOST_REQUIRE(client);
    BOOST_CHECK(client->emit_outbound_envelope);
@@ -210,7 +242,7 @@ BOOST_AUTO_TEST_CASE(opp_contract_client_construction) try {
    // Verify the live relay surface is present and the retired finalizer is not.
    bool has_emit = false, has_latest = false, has_finalize = false;
    for (auto& c : abis) {
-      if (c.name == "emitOutboundEnvelope") has_emit = true;
+      if (c.name == emit_outbound_envelope_abi_name) has_emit = true;
       if (c.name == "getLatestOutboundEnvelope") has_latest = true;
       if (c.name == "finalizeEpoch") has_finalize = true;
    }
@@ -264,17 +296,50 @@ BOOST_AUTO_TEST_CASE(emit_outbound_envelope_abi_encoding_wire_epoch) try {
 
    const eth::abi::contract* emit_abi = nullptr;
    for (auto& c : abis) {
-      if (c.name == "emitOutboundEnvelope") { emit_abi = &c; break; }
+      if (c.name == emit_outbound_envelope_abi_name) { emit_abi = &c; break; }
    }
    BOOST_REQUIRE(emit_abi != nullptr);
    BOOST_REQUIRE_EQUAL(emit_abi->inputs.size(), 1u);
    BOOST_CHECK(emit_abi->inputs[0].type == eth::abi::data_type::uint32);
 
    // Encoding carries the WIRE epoch expected by the Solidity recovery call.
-   auto encoded = contract_encode_data(*emit_abi, std::vector<fc::variant>{fc::variant(uint64_t{7})});
+   auto encoded = contract_encode_data(
+      *emit_abi,
+      std::vector<fc::variant>{fc::variant(uint64_t{test_wire_epoch})});
    BOOST_CHECK(!encoded.empty());
-   BOOST_CHECK(encoded.substr(0, 8) == "a3ad9cc3");
-   BOOST_CHECK_EQUAL(encoded.size(), 72u); // selector + one 32-byte ABI word
+   BOOST_CHECK(encoded.substr(0, evm_function_selector_hex_chars) == emit_outbound_envelope_selector);
+   BOOST_CHECK_EQUAL(encoded.size(), emit_outbound_envelope_call_hex_chars);
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(emit_outbound_envelope_recovery_wrapper_forwards_wire_epoch) try {
+   auto abis = load_abi_fixture(opp_abi_fixture);
+   auto client = std::make_shared<sysio::opp_contract_client>(
+      ethereum_client_ptr{},
+      address_compat_type{std::string(test_opp_address)},
+      abis);
+
+   uint32_t observed_epoch = 0;
+   std::string observed_call_data;
+   client->emit_outbound_envelope =
+      [&](uint32_t& wire_epoch) -> fc::variant {
+         observed_epoch = wire_epoch;
+         observed_call_data = contract_encode_data(
+            client->get_abi(std::string(emit_outbound_envelope_abi_name)),
+            std::vector<fc::variant>{fc::variant(uint64_t{wire_epoch})});
+         return fc::variant(observed_call_data);
+      };
+
+   // Replace network submission at the typed callable boundary, then invoke
+   // the recovery surface exposed for operator tooling. The mock sink encodes
+   // with the production ABI so the assertion covers both argument forwarding
+   // and the exact transaction call data without requiring a live EVM node.
+   uint32_t wire_epoch = test_wire_epoch;
+   const auto result = client->emit_outbound_envelope(wire_epoch);
+   const auto expected_call_data =
+      std::string(emit_outbound_envelope_selector) + abi_word(test_wire_epoch);
+   BOOST_CHECK_EQUAL(observed_epoch, test_wire_epoch);
+   BOOST_CHECK_EQUAL(observed_call_data, expected_call_data);
+   BOOST_CHECK_EQUAL(result.as_string(), expected_call_data);
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(read_inbound_envelope_validates_latest_slot) try {
@@ -282,30 +347,29 @@ BOOST_AUTO_TEST_CASE(read_inbound_envelope_validates_latest_slot) try {
       appbase::application::reset_app_singleton();
    });
    auto tester = create_app();
-   auto private_key_spec = to_private_key_spec(
-      "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80");
+   auto private_key_spec = to_private_key_spec(std::string(latest_slot_test_private_key));
    auto sig_provider = tester->plugin().create_provider(
-      "eth-latest-slot",
+      std::string(latest_slot_test_entry_id),
       chain_kind_ethereum,
       chain_key_type_ethereum,
-      "0x8318535b54105d4a7aae60c08fc45f9687181b4fdfc625bd1a753fa7397fed753547f11ca8696646f2f3acb08e31016afac23e630c5d11f59f61fef57b0d2aa5",
+      std::string(latest_slot_test_public_key),
       private_key_spec);
 
-   const std::string rpc_url = "http://127.0.0.1:1";
+   const std::string rpc_url{latest_slot_test_rpc_url};
    auto eth_client = std::make_shared<ethereum_client>(
       sig_provider,
       std::variant<std::string, fc::url>{rpc_url},
-      fc::uint256{31337});
+      fc::uint256{test_evm_chain_id});
    auto abis = load_abi_fixture(opp_abi_fixture);
-   const std::string opp_address = "5FbDB2315678afecb367f032d93F642f64180aa3";
+   const std::string opp_address{test_opp_address};
    auto typed_opp = eth_client->get_contract<sysio::opp_contract_client>(opp_address, abis);
 
    auto entry = std::make_shared<sysio::ethereum_client_entry_t>();
-   entry->id = "latest-slot-test";
+   entry->id = latest_slot_test_entry_id;
    entry->url = rpc_url;
    entry->signature_provider = sig_provider;
    entry->client = eth_client;
-   entry->chain_id = 31337;
+   entry->chain_id = test_evm_chain_id;
 
    sysio::outpost_ethereum_client outpost(
       entry,
@@ -313,8 +377,8 @@ BOOST_AUTO_TEST_CASE(read_inbound_envelope_validates_latest_slot) try {
       "",
       "",
       abis,
-      1,
-      31337);
+      test_outpost_chain_code,
+      test_evm_chain_id);
 
    auto set_response = [&](std::string response) {
       typed_opp->get_latest_outbound_envelope =
@@ -325,25 +389,47 @@ BOOST_AUTO_TEST_CASE(read_inbound_envelope_validates_latest_slot) try {
          };
    };
 
-   const auto matching = serialize_envelope(7);
-   set_response(encode_latest_outbound_result(7, matching));
-   BOOST_CHECK(outpost.read_inbound_envelope(7, fc::seconds(1)) == matching);
+   const auto matching = serialize_envelope(test_wire_epoch);
+   set_response(encode_latest_outbound_result(test_wire_epoch, matching));
+   BOOST_CHECK(outpost.read_inbound_envelope(
+      test_wire_epoch,
+      fc::seconds(test_rpc_deadline_seconds)) == matching);
 
-   set_response(encode_latest_outbound_result(6, matching));
-   BOOST_CHECK(outpost.read_inbound_envelope(7, fc::seconds(1)).empty());
+   set_response(encode_latest_outbound_result(test_stale_wire_epoch, matching));
+   BOOST_CHECK(outpost.read_inbound_envelope(
+      test_wire_epoch,
+      fc::seconds(test_rpc_deadline_seconds)).empty());
 
-   set_response(encode_latest_outbound_result(7, {}));
-   BOOST_CHECK(outpost.read_inbound_envelope(7, fc::seconds(1)).empty());
+   set_response(encode_latest_outbound_result(test_wire_epoch, {}));
+   BOOST_CHECK(outpost.read_inbound_envelope(
+      test_wire_epoch,
+      fc::seconds(test_rpc_deadline_seconds)).empty());
 
-   set_response(encode_latest_outbound_result(7, std::vector<char>{char(0xff)}));
-   BOOST_CHECK(outpost.read_inbound_envelope(7, fc::seconds(1)).empty());
+   set_response(encode_latest_outbound_result(
+      test_wire_epoch,
+      std::vector<char>{malformed_envelope_byte}));
+   BOOST_CHECK(outpost.read_inbound_envelope(
+      test_wire_epoch,
+      fc::seconds(test_rpc_deadline_seconds)).empty());
 
-   set_response(encode_latest_outbound_result(7, serialize_envelope(8)));
-   BOOST_CHECK(outpost.read_inbound_envelope(7, fc::seconds(1)).empty());
+   set_response(encode_latest_outbound_result(
+      test_wire_epoch,
+      serialize_envelope(test_different_wire_epoch)));
+   BOOST_CHECK(outpost.read_inbound_envelope(
+      test_wire_epoch,
+      fc::seconds(test_rpc_deadline_seconds)).empty());
 
-   std::vector<char> oversized(sysio::OPP_MAX_ENVELOPE_BYTES + 1, char(0x01));
-   set_response(encode_latest_outbound_result(7, oversized));
-   BOOST_CHECK(outpost.read_inbound_envelope(7, fc::seconds(1)).empty());
+   // A bytes value one byte over the envelope cap necessarily makes the
+   // complete `(uint32, bytes)` ABI result exceed the RPC hex-length cap.
+   // This case therefore verifies the pre-decode RPC boundary, not the later
+   // decoded-byte defense-in-depth check.
+   std::vector<char> rpc_length_oversized(
+      rpc_length_oversized_envelope_bytes,
+      oversized_envelope_fill_byte);
+   set_response(encode_latest_outbound_result(test_wire_epoch, rpc_length_oversized));
+   BOOST_CHECK(outpost.read_inbound_envelope(
+      test_wire_epoch,
+      fc::seconds(test_rpc_deadline_seconds)).empty());
 } FC_LOG_AND_RETHROW();
 
 // ---------------------------------------------------------------------------

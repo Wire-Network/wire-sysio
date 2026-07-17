@@ -131,6 +131,9 @@ struct opp_solana_outpost_client : fc::network::solana::solana_program_client {
    /// `epoch_index`. Rent returns to the original uploader.
    solana_program_tx_fn<std::string, uint32_t>             cleanup_envelope_chunks;
    /// `emit_outbound_envelope(wire_epoch_index: u32) -> signature`.
+   /// Recovery/admin escape hatch only. The steady-state batch-operator relay
+   /// never calls it because the consensus-reaching terminal `epoch_in` emits
+   /// the outbound envelope inline.
    solana_program_tx_fn<std::string, uint32_t>             emit_outbound_envelope;
    /// `add_attestation(attestation_type: i32, data: bytes) -> signature`.
    solana_program_tx_fn<std::string, int32_t, std::vector<uint8_t>> add_attestation;
@@ -321,6 +324,8 @@ struct opp_solana_outpost_client : fc::network::solana::solana_program_client {
            program_invoke_data_items params = {fc::variant(epoch_index)};
            return execute_tx_and_confirm(instr, resolve_accounts(instr, params, overrides), params);
         })
+      // Retained as the program's explicit recovery/admin escape hatch. The
+      // steady-state relay intentionally uses only terminal `epoch_in`.
       , emit_outbound_envelope([this](uint32_t wire_epoch_index) -> std::string {
            account_overrides_t overrides = {
               {"config",                    config_pda},

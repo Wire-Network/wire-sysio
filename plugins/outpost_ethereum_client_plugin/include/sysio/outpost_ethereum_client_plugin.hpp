@@ -30,7 +30,10 @@ using ethereum_client_entry_ptr = std::shared_ptr<ethereum_client_entry_t>;
 /// awaits `eth_getTransactionReceipt` + N blocks before returning.
 struct opp_contract_client : ethereum_contract_client {
    /// Recovery-only write matching `emitOutboundEnvelope(uint32)` on the
-   /// Ethereum outpost. Normal operation emits during inbound consensus.
+   /// Ethereum outpost. No in-tree steady-state caller invokes this wrapper:
+   /// normal operation emits during inbound consensus. It remains available
+   /// for explicit operator recovery tooling that must advance a stalled
+   /// outpost with the expected WIRE epoch.
    ethereum_contract_tx_fn<fc::variant, uint32_t> emit_outbound_envelope;
    /// View: latest outbound envelope's raw bytes + epoch — overwritten
    /// on every `emitOutboundEnvelope`. Read by the WIRE batch operator
