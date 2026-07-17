@@ -10,7 +10,7 @@
 #include <sysio/producer_plugin/producer_plugin.hpp>
 #include <sysio/prometheus_plugin/prometheus_plugin.hpp>
 #include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
-#include <sysio/signature_provider_manager_plugin/ssm/ssm_signature_provider.hpp>
+#include <sysio/signature_provider_manager_plugin/ssm_signature_provider.hpp>
 #include <sysio/snapshot_api_plugin/snapshot_api_plugin.hpp>
 #include <sysio/state_history_plugin/state_history_plugin.hpp>
 #include <sysio/test_control_api_plugin/test_control_api_plugin.hpp>

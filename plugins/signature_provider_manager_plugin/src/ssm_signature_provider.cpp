@@ -1,6 +1,6 @@
-#include <sysio/signature_provider_manager_plugin/ssm/ssm_signature_provider.hpp>
+#include <sysio/signature_provider_manager_plugin/ssm_signature_provider.hpp>
 
-#include <sysio/signature_provider_manager_plugin/aws/aws_common.hpp>
+#include <sysio/signature_provider_manager_plugin/aws_common.hpp>
 
 #include <sysio/chain/exceptions.hpp>
 #include <sysio/chain/types.hpp>
@@ -40,7 +40,7 @@ namespace {
 
 /// Anchor for ARN detection. Parameter ARNs always start with `arn:aws:ssm:`
 /// (non-`aws` partitions such as `aws-cn` / `aws-us-gov` are out of scope,
-/// same boundary as the `kms/` sibling). The service-agnostic ARN pieces
+/// same boundary as the `sigprov_kms` sibling). The service-agnostic ARN pieces
 /// (`arn:` lead-in, segment count / indices, the case-insensitive prefix
 /// test) come from `sysio::sigprov::aws` (aws_common.hpp).
 constexpr std::string_view ssm_arn_prefix = "arn:aws:ssm:";
@@ -121,7 +121,7 @@ ssm_param_ref parse_ssm_spec(std::string_view spec_data) {
 
       // Hand SSM the full ARN, not a stripped path: GetParameter accepts a
       // parameter ARN as `Name`, and the intact ARN preserves the account id
-      // (same account-identity reasoning as the kms/ sibling's key ARNs).
+      // (same account-identity reasoning as the sigprov_kms sibling's key ARNs).
       // `region` is still taken from the ARN to build the regional client; it
       // matches the region embedded in the ARN we pass through.
       return ssm_param_ref{region, std::string{spec_data}};

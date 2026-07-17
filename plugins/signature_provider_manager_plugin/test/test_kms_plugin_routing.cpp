@@ -12,7 +12,7 @@
 
 #include <sysio/chain/exceptions.hpp>
 #include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
-#include <sysio/signature_provider_manager_plugin/kms/kms_signature_provider.hpp>
+#include <sysio/signature_provider_manager_plugin/kms_signature_provider.hpp>
 
 #include <fc/crypto/chain_types_reflect.hpp>
 #include <fc-test/crypto_utils.hpp>

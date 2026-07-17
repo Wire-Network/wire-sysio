@@ -29,7 +29,7 @@ with varied key types.
         `<private-key>`    string representation of a key in the format of the key type for `KEY` provider type
         `<url>`            is the URL where kiod is available and the appropriate wallet(s) for `KIOD` provider type
         `<key-ref>`        for `KMS`: an ARN or `<region>:<key-id-or-alias>` naming the AWS KMS key that
-                           signs remotely (see plugins/signature_provider_manager_plugin/kms/test/README.md)
+                           signs remotely (see plugins/signature_provider_manager_plugin/test/README-kms.md)
         `<param-ref>`      for `SSM`: an ARN or `<region>:<parameter-name>` naming the AWS SSM Parameter
                            Store SecureString that holds the private key (see below)
 ```
@@ -41,7 +41,7 @@ the key never appears on the host or in process memory. `<key-ref>` is a full ke
 `<region>:<key-id-or-alias>`. Scope is secp256k1/ethereum keys only, and the 30–100 ms
 per-signature latency makes it unsuitable for block production, which is why nodeop does not
 register it; a host application opts in by linking `sigprov_kms` and registering the handler from
-its `main()`. See `plugins/signature_provider_manager_plugin/kms/test/README.md` for key setup,
+its `main()`. See `plugins/signature_provider_manager_plugin/test/README-kms.md` for key setup,
 IAM requirements, and operational notes.
 
 ## SSM: AWS SSM Parameter Store keys (registered by nodeop)
@@ -79,7 +79,7 @@ Requirements and failure behavior:
 bp1,wire,wire,SYS7AzqPxqfoEigXBefEo6efsCZszLzwv4vCdWqTt6s6zSnDELSmm,SSM:us-east-1:/wire/prod/bp1
 ```
 
-See `plugins/signature_provider_manager_plugin/ssm/test/README.md` for the full operator
+See `plugins/signature_provider_manager_plugin/test/README-ssm.md` for the full operator
 runbook (IAM policy, rotation, live-test setup).
 
 

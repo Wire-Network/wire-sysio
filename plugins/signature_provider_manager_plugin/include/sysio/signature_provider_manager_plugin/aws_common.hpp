@@ -1,8 +1,9 @@
 #pragma once
 
 /**
- * Shared AWS SDK glue for the signature-provider sub-libraries (`kms/`, `ssm/`),
- * installed at `sysio/signature_provider_manager_plugin/aws/`.
+ * Shared AWS SDK glue for the signature-provider sub-libraries (`sigprov_kms`,
+ * `sigprov_ssm`), installed at
+ * `sysio/signature_provider_manager_plugin/aws_common.hpp`.
  *
  * Everything here is service-agnostic: SDK lifecycle, the per-region client
  * cache, the transient-vs-permanent error split, and the generic pieces of ARN

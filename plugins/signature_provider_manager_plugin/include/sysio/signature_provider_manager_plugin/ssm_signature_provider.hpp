@@ -2,11 +2,11 @@
 
 /**
  * AWS SSM Parameter Store-backed signature provider -- public header for the
- * `ssm` sub-library of `signature_provider_manager_plugin`, installed at
- * `sysio/signature_provider_manager_plugin/ssm/`.
+ * `sigprov_ssm` sub-library of `signature_provider_manager_plugin`, installed
+ * at `sysio/signature_provider_manager_plugin/ssm_signature_provider.hpp`.
  *
  * The library implements the `SSM:<param-ref>` spec grammar -- a sibling of
- * the built-in `KEY:` / `KIOD:` forms and the `kms/` sub-library's `KMS:` --
+ * the built-in `KEY:` / `KIOD:` forms and the `sigprov_kms` sub-library's `KMS:` --
  * where the private key is fetched from AWS SSM Parameter Store (a
  * KMS-encrypted `SecureString` parameter) exactly once, when the provider is
  * created, and signing is local thereafter. Semantically this is `KEY:`
@@ -164,7 +164,7 @@ using parameter_fetcher = std::function<fetched_parameter(const ssm_param_ref&)>
  * @brief Get (or lazily create) a process-wide `SSMClient` for `region`.
  *
  * Shares the process-wide AWS SDK lifecycle and the per-region cache
- * semantics with the `kms/` sub-library (see
+ * semantics with the `sigprov_kms` sub-library (see
  * `sysio::sigprov::aws::region_client_cache`). Construction is offline: no
  * credential resolution, no network. Credentials resolve via the standard AWS
  * provider chain on the first API call.

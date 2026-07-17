@@ -108,7 +108,7 @@ export SSM_LIVE_SPEC='us-east-1:/wire/ci/test-key'   # or the full parameter ARN
 export SSM_LIVE_PUBKEY='SYS...'                       # native-form public key
 export SSM_LIVE_KEY_TYPE='wire'                       # optional; default wire
 
-$BUILD_DIR/plugins/signature_provider_manager_plugin/ssm/test/test_sigprov_ssm \
+$BUILD_DIR/plugins/signature_provider_manager_plugin/test/test_sigprov_ssm \
     --run_test=ssm_live
 ```
 

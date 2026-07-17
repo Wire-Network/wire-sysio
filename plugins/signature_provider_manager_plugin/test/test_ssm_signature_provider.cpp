@@ -9,7 +9,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include <sysio/chain/exceptions.hpp>
-#include <sysio/signature_provider_manager_plugin/ssm/ssm_signature_provider.hpp>
+#include <sysio/signature_provider_manager_plugin/ssm_signature_provider.hpp>
 
 #include <fc/crypto/chain_types_reflect.hpp>
 #include <fc/crypto/key_serdes.hpp>
@@ -454,7 +454,7 @@ BOOST_AUTO_TEST_SUITE(ssm_live)
 //
 // Requires AWS credentials in the runner's environment (env, ~/.aws/, IRSA,
 // or IMDS) with ssm:GetParameter on the parameter and kms:Decrypt on its key.
-// See README.md in this directory for the one-time parameter setup.
+// See README-ssm.md in this directory for the one-time parameter setup.
 // ---------------------------------------------------------------------------
 BOOST_AUTO_TEST_CASE(ssm_live_fetch_round_trip) {
    const auto* spec_env = std::getenv("SSM_LIVE_SPEC");

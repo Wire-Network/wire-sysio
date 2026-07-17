@@ -15,7 +15,7 @@
 
 #include <sysio/chain/exceptions.hpp>
 #include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
-#include <sysio/signature_provider_manager_plugin/ssm/ssm_signature_provider.hpp>
+#include <sysio/signature_provider_manager_plugin/ssm_signature_provider.hpp>
 
 #include <fc/crypto/chain_types_reflect.hpp>
 #include <fc/crypto/key_serdes.hpp>

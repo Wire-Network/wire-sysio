@@ -1,4 +1,4 @@
-#include <sysio/signature_provider_manager_plugin/aws/aws_common.hpp>
+#include <sysio/signature_provider_manager_plugin/aws_common.hpp>
 
 #include <aws/core/Aws.h>
 

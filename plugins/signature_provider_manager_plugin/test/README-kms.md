@@ -128,7 +128,7 @@ export KMS_LIVE_SPEC='us-east-1:alias/wire-ci-test-secp256k1'
 # export KMS_LIVE_SPEC='arn:aws:kms:us-east-1:111122223333:alias/wire-ci-test-secp256k1'
 export KMS_LIVE_PUBKEY='045a87...eef3'
 
-$BUILD_DIR/plugins/signature_provider_manager_plugin/kms/test/test_sigprov_kms \
+$BUILD_DIR/plugins/signature_provider_manager_plugin/test/test_sigprov_kms \
    --run_test=kms_signature_provider_tests/kms_live_sign_round_trip \
    --log_level=test_suite
 ```

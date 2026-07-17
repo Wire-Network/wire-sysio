@@ -1,9 +1,9 @@
 #pragma once
 
 /**
- * AWS KMS-backed signature provider -- public header for the `kms` sub-library
- * of `signature_provider_manager_plugin`, installed at
- * `sysio/signature_provider_manager_plugin/kms/`.
+ * AWS KMS-backed signature provider -- public header for the `sigprov_kms`
+ * sub-library of `signature_provider_manager_plugin`, installed at
+ * `sysio/signature_provider_manager_plugin/kms_signature_provider.hpp`.
  *
  * The library implements the `KMS:<key-ref>` spec grammar -- a third form
  * alongside the built-in `KEY:` and `KIOD:` -- where the signing key never
