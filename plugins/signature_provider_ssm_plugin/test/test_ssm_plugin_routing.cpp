@@ -125,11 +125,9 @@ BOOST_AUTO_TEST_CASE(create_provider_malformed_ssm_spec_throws_through_dispatch)
 }
 
 BOOST_AUTO_TEST_CASE(unenabled_ssm_scheme_names_the_plugin) {
-   // The plugin is linked (its constructor registers the SSM handler) but the
-   // operator did not enable it via --plugin: an SSM: spec fails with an error
-   // naming the exact `plugin =` line to add. Construct the plugin explicitly
-   // so the sigprov registry has SSM regardless of test order; do NOT pass
-   // --plugin, so it stays unenabled.
+   // The plugin is linked (its constructor registers the SSM handler) but the operator did not enable it via --plugin:
+   // an SSM: spec fails with an error naming the exact `plugin =` line to add. Construct the plugin explicitly so the
+   // sigprov registry has SSM regardless of test order; do NOT pass --plugin, so it stays unenabled.
    ssm_routing_tester tester;
    tester.app->_register_plugin<sysio::signature_provider_manager_plugin>();
    tester.app->_register_plugin<sysio::signature_provider_ssm_plugin>();

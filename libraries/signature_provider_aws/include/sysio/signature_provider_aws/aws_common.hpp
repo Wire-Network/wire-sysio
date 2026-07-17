@@ -1,20 +1,17 @@
 #pragma once
 
 /**
- * Shared AWS SDK glue for the AWS-backed signature-provider plugins
- * (`signature_provider_kms_plugin`, `signature_provider_ssm_plugin`),
- * installed at `sysio/signature_provider_aws/aws_common.hpp`.
+ * Shared AWS SDK glue for the AWS-backed signature-provider plugins (`signature_provider_kms_plugin`,
+ * `signature_provider_ssm_plugin`), installed at `sysio/signature_provider_aws/aws_common.hpp`.
  *
- * Everything here is service-agnostic: SDK lifecycle, the per-region client
- * cache, the transient-vs-permanent error split, and the generic pieces of ARN
- * parsing. Service-specific code (the KMS Sign/GetPublicKey plumbing, the SSM
+ * Everything here is service-agnostic: SDK lifecycle, the per-region client cache, the transient-vs-permanent error
+ * split, and the generic pieces of ARN parsing. Service-specific code (the KMS Sign/GetPublicKey plumbing, the SSM
  * GetParameter fetch, their spec grammars) stays in the respective plugin.
  *
- * This library exists for one correctness-critical reason beyond code reuse:
- * `Aws::InitAPI` / `Aws::ShutdownAPI` must be called exactly once per process.
- * When more than one provider plugin is linked into the same binary, each
- * owning its own lifecycle singleton would double-init / double-shutdown the
- * SDK. `ensure_aws_sdk_initialized()` is the single process-wide owner.
+ * This library exists for one correctness-critical reason beyond code reuse: `Aws::InitAPI` / `Aws::ShutdownAPI` must
+ * be called exactly once per process. When more than one provider plugin is linked into the same binary, each owning
+ * its own lifecycle singleton would double-init / double-shutdown the SDK. `ensure_aws_sdk_initialized()` is the single
+ * process-wide owner.
  */
 
 #include <sysio/chain/exceptions.hpp>
@@ -53,26 +50,19 @@ void ensure_aws_sdk_initialized();
 /**
  * @brief Process-wide, per-region cache of AWS service clients.
  *
- * One instance per service client type, held as a function-local static by the
- * owning provider (see `get_kms_client` / `get_ssm_client`). Lookups are
- * unsynchronized on purpose: they happen only while providers are created --
- * during the sequential, main-thread initialize phase -- and the signer
- * closures capture their `shared_ptr<Client>` then. The thread-safety that
- * matters at runtime lives inside the AWS client itself: the SDK's HTTP pool
- * is thread-safe, so multiple closures sharing a client may submit requests
- * concurrently.
+ * One instance per service client type, held as a function-local static by the owning provider (see `get_kms_client` /
+ * `get_ssm_client`). Lookups are unsynchronized on purpose: they happen only while providers are created -- during the
+ * sequential, main-thread initialize phase -- and the signer closures capture their `shared_ptr<Client>` then. The
+ * thread-safety that matters at runtime lives inside the AWS client itself: the SDK's HTTP pool is thread-safe, so
+ * multiple closures sharing a client may submit requests concurrently.
  *
- * Construction of a client is offline: no credential resolution, no network.
- * Credentials are looked up via the standard AWS provider chain on the first
- * API call, not here. The client configuration carries the region and nothing
- * else -- region comes only from the provider spec, never from `AWS_REGION` or
- * shared-config fallbacks, so a misconfiguration fails as a parse error rather
- * than as a mysterious wrong-region API call.
+ * Construction of a client is offline: no credential resolution, no network. Credentials are looked up via the standard
+ * AWS provider chain on the first API call, not here. The client configuration carries the region and nothing else --
+ * region comes only from the provider spec, never from `AWS_REGION` or shared-config fallbacks, so a misconfiguration
+ * fails as a parse error rather than as a mysterious wrong-region API call.
  *
- * The constructor runs `ensure_aws_sdk_initialized()`: wherever an instance of
- * this cache is created, the SDK lifecycle singleton is thereby the older
- * static and `Aws::ShutdownAPI` runs only after this cache has released its
- * clients.
+ * The constructor runs `ensure_aws_sdk_initialized()`: wherever an instance of this cache is created, the SDK lifecycle
+ * singleton is thereby the older static and `Aws::ShutdownAPI` runs only after this cache has released its clients.
  */
 template<typename Client>
 class region_client_cache {

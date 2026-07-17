@@ -36,13 +36,11 @@ using sysio::sigprov::test::sig_provider_tester;
 namespace {
 
 /**
- * Build and initialize a tester with a `PROBE:` spec handler whose returned
- * provider carries `probe_body` as its `startup_probe`. The handler's signer
- * is a trivial stub (never invoked by these tests).
+ * Build and initialize a tester with a `PROBE:` spec handler whose returned provider carries `probe_body` as its
+ * `startup_probe`. The handler's signer is a trivial stub (never invoked by these tests).
  *
- * The handler is registered via `_register_plugin<>` BEFORE `initialize<>`, so
- * it is in place by the time any provider spec is parsed -- mirroring how a
- * host application registers a real extension handler in `main()`.
+ * The handler is registered via `_register_plugin<>` BEFORE `initialize<>`, so it is in place by the time any provider
+ * spec is parsed -- mirroring how a host application registers a real extension handler in `main()`.
  *
  * @param probe_body callback the registered provider's startup probe runs
  * @return an initialized tester ready for `create_provider` / `plugin_startup`
@@ -441,12 +439,10 @@ BOOST_AUTO_TEST_CASE(register_spec_handler_rejects_builtin_and_duplicates) {
 // ---------------------------------------------------------------------------
 // Startup-probe pass (plugin_startup -> run_startup_probes)
 //
-// A spec handler may attach a `startup_probe` to its result; the plugin runs
-// every attached probe from plugin_startup() unconditionally -- attaching a
-// probe IS the opt-in, there is no enable flag. These cases drive that
-// machinery with a mock handler -- no AWS, no network -- to pin its control
-// flow: transient failures are deferred, permanent failures abort startup,
-// and the probe list is one-shot.
+// A spec handler may attach a `startup_probe` to its result; the plugin runs every attached probe from
+// plugin_startup() unconditionally -- attaching a probe IS the opt-in, there is no enable flag. These cases drive that
+// machinery with a mock handler -- no AWS, no network -- to pin its control flow: transient failures are deferred,
+// permanent failures abort startup, and the probe list is one-shot.
 // ---------------------------------------------------------------------------
 
 BOOST_AUTO_TEST_CASE(startup_probe_transient_failure_is_deferred_not_fatal) {

@@ -1,13 +1,11 @@
 #pragma once
 
 /**
- * Shared appbase fixture for the signature_provider_manager_plugin test
- * suites (test_create_provider_specs.cpp, test_spec_retain_claim.cpp -- one
- * binary, multiple TUs, so the fixture lives here instead of being repeated
- * per-TU in anonymous namespaces).
+ * Shared appbase fixture for the signature_provider_manager_plugin test suites (test_create_provider_specs.cpp,
+ * test_spec_retain_claim.cpp -- one binary, multiple TUs, so the fixture lives here instead of being repeated per-TU in
+ * anonymous namespaces).
  *
- * Each test case owns one `sig_provider_tester` (a `scoped_app` + accessor)
- * and must pair it with
+ * Each test case owns one `sig_provider_tester` (a `scoped_app` + accessor) and must pair it with
  *   auto clean_app = gsl_lite::finally([] { appbase::application::reset_app_singleton(); });
  * because `app()` is process-global.
  */

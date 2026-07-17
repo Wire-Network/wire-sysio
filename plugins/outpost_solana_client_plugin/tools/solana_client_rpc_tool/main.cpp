@@ -301,10 +301,9 @@ int main(int argc, char* argv[]) {
 
       auto& sol_plug = app->get_plugin<sysio::outpost_solana_client_plugin>();
 
-      // Clients are constructed at plugin_startup (provider resolution is
-      // deferred past the initialize phase); this tool never enters the
-      // appbase exec loop, so start the plugin subtree explicitly --
-      // dependency-ordered, exactly as production startup would.
+      // Clients are constructed at plugin_startup (provider resolution is deferred past the initialize phase); this
+      // tool never enters the appbase exec loop, so start the plugin subtree explicitly -- dependency-ordered, exactly
+      // as production startup would.
       sol_plug.startup();
 
       // Get the first client

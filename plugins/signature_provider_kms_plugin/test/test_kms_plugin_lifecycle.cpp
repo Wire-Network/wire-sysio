@@ -11,12 +11,10 @@
 
 #include <format>
 
-// ---------------------------------------------------------------------------
-// Plugin wiring: what constructing signature_provider_kms_plugin does. All
-// offline -- no AWS, no network. The manager-side create/gate mechanics are
-// covered with mock handlers in the manager's test binary
-// (test_extension_schemes.cpp); the probe wiring here uses a mock PROBE
-// handler so the startup pass runs no real GetPublicKey.
+// --------------------------------------------------------------------------- Plugin wiring: what constructing
+// signature_provider_kms_plugin does. All offline -- no AWS, no network. The manager-side create/gate mechanics are
+// covered with mock handlers in the manager's test binary (test_extension_schemes.cpp); the probe wiring here uses a
+// mock PROBE handler so the startup pass runs no real GetPublicKey.
 // ---------------------------------------------------------------------------
 
 using sysio::signature_provider_kms_plugin;
@@ -32,10 +30,8 @@ BOOST_AUTO_TEST_CASE(constructor_registers_scheme_handler) {
    BOOST_REQUIRE((app->initialize<signature_provider_manager_plugin, signature_provider_kms_plugin>(
       argv.size(), const_cast<char**>(argv.data()))));
 
-   // The plugin's constructor registered the KMS handler in the process-wide
-   // sigprov registry, tagged with the plugin's demangled name -- the exact
-   // string an operator passes to `plugin =`, and the string the manager gates
-   // on.
+   // The plugin's constructor registered the KMS handler in the process-wide sigprov registry, tagged with the plugin's
+   // demangled name -- the exact string an operator passes to `plugin =`, and the string the manager gates on.
    const auto* entry = sysio::sigprov::find_scheme_handler("KMS");
    BOOST_REQUIRE(entry != nullptr);
    BOOST_CHECK_EQUAL(entry->plugin_name, "sysio::signature_provider_kms_plugin");
@@ -43,11 +39,9 @@ BOOST_AUTO_TEST_CASE(constructor_registers_scheme_handler) {
 }
 
 BOOST_AUTO_TEST_CASE(attached_probes_run_at_manager_startup) {
-   // Attaching a startup probe IS the opt-in -- there is no enable flag. A
-   // provider created with a probe (mock PROBE scheme registered pre-init on
-   // the manager; the real KMS handler attaches one per created key) must have
-   // that probe run at manager plugin_startup with no probe-related
-   // configuration at all.
+   // Attaching a startup probe IS the opt-in -- there is no enable flag. A provider created with a probe (mock PROBE
+   // scheme registered pre-init on the manager; the real KMS handler attaches one per created key) must have that probe
+   // run at manager plugin_startup with no probe-related configuration at all.
    using namespace fc::crypto;
    auto clean_app = gsl_lite::finally([] { appbase::application::reset_app_singleton(); });
 

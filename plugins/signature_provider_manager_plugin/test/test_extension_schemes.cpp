@@ -15,19 +15,16 @@
 
 #include "sig_provider_tester.hpp"
 
-// ---------------------------------------------------------------------------
-// Extension-scheme resolution.
+// --------------------------------------------------------------------------- Extension-scheme resolution.
 //
-// The manager creates every configured provider eagerly at its own
-// plugin_initialize. A non-built-in scheme resolves through a handler from one
-// of two sources:
+// The manager creates every configured provider eagerly at its own plugin_initialize. A non-built-in scheme resolves
+// through a handler from one of two sources:
 //   - register_spec_handler() directly on the manager -- the explicit host /
 //     test path, ungated.
 //   - sigprov::register_scheme_handler() (a provider plugin's constructor),
 //     gated on the plugin being enabled via --plugin.
-// These cases drive both paths with mock handlers -- no AWS, no network. The
-// sigprov registry is process-static, so each case uses a case-unique scheme
-// name to stay independent of other cases' registrations.
+// These cases drive both paths with mock handlers -- no AWS, no network. The sigprov registry is process-static, so
+// each case uses a case-unique scheme name to stay independent of other cases' registrations.
 // ---------------------------------------------------------------------------
 
 using sysio::signature_provider_manager_plugin;
@@ -37,12 +34,11 @@ using sysio::sigprov::test::sig_provider_tester;
 
 namespace {
 
-// A real registered plugin name usable as an --plugin value in this binary,
-// to exercise the "plugin enabled" gate without needing a second plugin.
+// A real registered plugin name usable as an --plugin value in this binary, to exercise the "plugin enabled" gate
+// without needing a second plugin.
 constexpr auto manager_plugin_name = "sysio::signature_provider_manager_plugin";
 
-/// A handler whose provider signs with a trivial stub; records the spec_data
-/// it saw into @p seen (when non-null).
+/// A handler whose provider signs with a trivial stub; records the spec_data it saw into @p seen (when non-null).
 sysio::spec_handler make_stub_handler(std::string* seen = nullptr) {
    return [seen](fc::crypto::chain_key_type_t, const fc::crypto::public_key&,
                  std::string_view spec_data) -> sysio::provider_spec_result {
@@ -63,8 +59,8 @@ std::string make_spec(const std::string& name, const std::string& pubkey, const 
 BOOST_AUTO_TEST_SUITE(signature_provider_extension_schemes)
 
 BOOST_AUTO_TEST_CASE(host_registered_scheme_creates_eagerly) {
-   // A scheme registered directly on the manager (host/test path) is ungated:
-   // a matching spec is created eagerly at plugin_initialize.
+   // A scheme registered directly on the manager (host/test path) is ungated: a matching spec is created eagerly at
+   // plugin_initialize.
    auto clean_app = gsl_lite::finally([] { appbase::application::reset_app_singleton(); });
 
    keygen_result fixture = fc::test::load_keygen_fixture("ethereum", 1);
@@ -84,8 +80,8 @@ BOOST_AUTO_TEST_CASE(host_registered_scheme_creates_eagerly) {
 }
 
 BOOST_AUTO_TEST_CASE(plugin_scheme_created_when_enabled) {
-   // A scheme registered in the sigprov registry (provider-plugin path) is
-   // created when its owning plugin is enabled via --plugin.
+   // A scheme registered in the sigprov registry (provider-plugin path) is created when its owning plugin is enabled
+   // via --plugin.
    auto clean_app = gsl_lite::finally([] { appbase::application::reset_app_singleton(); });
 
    std::string seen;
@@ -101,8 +97,8 @@ BOOST_AUTO_TEST_CASE(plugin_scheme_created_when_enabled) {
 }
 
 BOOST_AUTO_TEST_CASE(plugin_scheme_error_when_not_enabled) {
-   // Same registry entry, but the owning plugin is NOT enabled: creation must
-   // fail at init with an error naming the exact `plugin =` line to add.
+   // Same registry entry, but the owning plugin is NOT enabled: creation must fail at init with an error naming the
+   // exact `plugin =` line to add.
    auto clean_app = gsl_lite::finally([] { appbase::application::reset_app_singleton(); });
 
    sysio::sigprov::register_scheme_handler("PLUGOFF", make_stub_handler(),
@@ -125,8 +121,8 @@ BOOST_AUTO_TEST_CASE(plugin_scheme_error_when_not_enabled) {
 }
 
 BOOST_AUTO_TEST_CASE(unknown_scheme_error) {
-   // A scheme no linked plugin provides fails at init with a "no plugin
-   // provides this" error that still names the built-ins.
+   // A scheme no linked plugin provides fails at init with a "no plugin provides this" error that still names the
+   // built-ins.
    auto clean_app = gsl_lite::finally([] { appbase::application::reset_app_singleton(); });
 
    keygen_result fixture = fc::test::load_keygen_fixture("ethereum", 1);
@@ -146,8 +142,8 @@ BOOST_AUTO_TEST_CASE(unknown_scheme_error) {
 }
 
 BOOST_AUTO_TEST_CASE(plugin_scheme_creation_error_propagates) {
-   // When the handler itself throws (bad pubkey / failed remote fetch stand-in),
-   // the error surfaces from the manager's init and aborts the boot.
+   // When the handler itself throws (bad pubkey / failed remote fetch stand-in), the error surfaces from the manager's
+   // init and aborts the boot.
    auto clean_app = gsl_lite::finally([] { appbase::application::reset_app_singleton(); });
 
    sysio::sigprov::register_scheme_handler(
@@ -174,8 +170,8 @@ BOOST_AUTO_TEST_CASE(plugin_scheme_creation_error_propagates) {
 
 BOOST_AUTO_TEST_CASE(scheme_handler_registry_is_queryable_and_idempotent) {
    sysio::sigprov::register_scheme_handler("REGX", make_stub_handler(), "sysio::first_plugin");
-   // Re-register (as repeated plugin construction across scoped_app instances
-   // does): insert-or-assign, the latest wins, no throw.
+   // Re-register (as repeated plugin construction across scoped_app instances does): insert-or-assign, the latest wins,
+   // no throw.
    sysio::sigprov::register_scheme_handler("REGX", make_stub_handler(), "sysio::second_plugin");
 
    const auto* entry = sysio::sigprov::find_scheme_handler("REGX");

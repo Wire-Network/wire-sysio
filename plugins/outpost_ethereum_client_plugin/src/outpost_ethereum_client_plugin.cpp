@@ -23,8 +23,7 @@ class outpost_ethereum_client_plugin_impl {
    std::vector<file_abi_contracts_t> _abi_files{};
 
 public:
-   // Called only from plugin_initialize -- sequential, main-thread -- so the
-   // ABI list needs no synchronization.
+   // Called only from plugin_initialize -- sequential, main-thread -- so the ABI list needs no synchronization.
    std::vector<file_abi_contracts_t> load_abi_files(const std::vector<std::filesystem::path>& file_names) {
       for (auto& filename : file_names) {
          FC_ASSERT_FMT(exists(filename), "File does not exist: {}", filename.string());
@@ -69,14 +68,12 @@ public:
    };
 
    /**
-    * A client spec parsed and validated at plugin_initialize, awaiting
-    * signature-provider resolution. Client construction happens at
-    * plugin_startup so the provider set is complete first: the provider
-    * plugins (e.g. signature_provider_ssm_plugin) are `--plugin` peers of
-    * this plugin, and resolving at initialize would make boot success depend
-    * on their relative order in the config. By startup, dependency ordering
-    * has already run the manager's unclaimed-spec check, so a misconfigured
-    * scheme fails with its precise error before the lookup here ever runs.
+    * A client spec parsed and validated at plugin_initialize, awaiting signature-provider resolution. Client
+    * construction happens at plugin_startup so the provider set is complete first: the provider plugins (e.g.
+    * signature_provider_ssm_plugin) are `--plugin` peers of this plugin, and resolving at initialize would make boot
+    * success depend on their relative order in the config. By the time any startup runs, the manager has already
+    * created every provider at its own init (failing the boot there on a misconfigured or not-enabled scheme), so the
+    * get_provider lookup here only ever runs against a complete set.
     */
    struct pending_client_t {
       std::string                id;
@@ -90,9 +87,8 @@ public:
    std::vector<pending_client_t> _pending_clients{};
 
    /**
-    * Queue a parsed client spec, preserving initialize-time duplicate-id
-    * detection (the `add_client` assert would otherwise not fire until
-    * startup).
+    * Queue a parsed client spec, preserving initialize-time duplicate-id detection (the `add_client` assert would
+    * otherwise not fire until startup).
     */
    void add_pending_client(pending_client_t pending) {
       const bool duplicate_id =
@@ -140,9 +136,8 @@ void outpost_ethereum_client_plugin::plugin_initialize(const variables_map& opti
          chain_id_num = chain_id->convert_to<uint64_t>();
       }
 
-      // Pure-config validation only at initialize; the signature provider is
-      // resolved -- and the client constructed -- at plugin_startup, once the
-      // provider plugins have all initialized (see pending_client_t).
+      // Pure-config validation only at initialize; the signature provider is resolved -- and the client constructed --
+      // at plugin_startup, once the provider plugins have all initialized (see pending_client_t).
       my->add_pending_client({.id           = id,
                               .sig_id       = sig_id,
                               .url          = url,

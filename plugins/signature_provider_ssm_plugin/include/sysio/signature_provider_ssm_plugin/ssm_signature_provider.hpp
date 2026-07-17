@@ -1,53 +1,39 @@
 #pragma once
 
 /**
- * AWS SSM Parameter Store-backed signature provider -- provider machinery of
- * `signature_provider_ssm_plugin`, installed at
- * `sysio/signature_provider_ssm_plugin/ssm_signature_provider.hpp`.
+ * AWS SSM Parameter Store-backed signature provider -- provider machinery of `signature_provider_ssm_plugin`, installed
+ * at `sysio/signature_provider_ssm_plugin/ssm_signature_provider.hpp`.
  *
- * This implements the `SSM:<param-ref>` spec grammar -- a sibling of the
- * built-in `KEY:` / `KIOD:` forms and the kms plugin's `KMS:` -- where the
- * private key is fetched from AWS SSM Parameter Store (a KMS-encrypted
- * `SecureString` parameter) exactly once, when the provider is created, and
- * signing is local thereafter. Semantically this is `KEY:` without the key
- * material ever appearing in config files, command lines, process listings,
- * or shell history:
+ * This implements the `SSM:<param-ref>` spec grammar -- a sibling of the built-in `KEY:` / `KIOD:` forms and the kms
+ * plugin's `KMS:` -- where the private key is fetched from AWS SSM Parameter Store (a KMS-encrypted `SecureString`
+ * parameter) exactly once, when the provider is created, and signing is local thereafter. Semantically this is `KEY:`
+ * without the key material ever appearing in config files, command lines, process listings, or shell history:
  *
- *   - The parameter's value is exactly the string that would follow `KEY:`
- *     (WIF / `PVT_...` for wire, `PVT_BLS_...`, `0x...` hex for ethereum,
- *     base58 for solana), so every chain key type with a `KEY:` form works.
- *   - After the one startup fetch the signer is a local-key closure and
- *     `provider_spec_result::private_key` is populated -- full `KEY:` parity
- *     for every downstream consumer, including the Solana path that requires
- *     a raw local key. Signing latency is identical to `KEY:`, which is what
- *     makes `SSM:` suitable for producer block signing where `KMS:` is not.
- *   - Rotation: the spec pins the public key, so rotating the parameter to a
- *     new keypair inherently requires a config edit + restart; there is
- *     nothing useful a re-fetch could do. Fetch-once is semantically forced.
+ *   - The parameter's value is exactly the string that would follow `KEY:` (WIF / `PVT_...` for wire, `PVT_BLS_...`,
+ *     `0x...` hex for ethereum, base58 for solana), so every chain key type with a `KEY:` form works.
+ *   - After the one startup fetch the signer is a local-key closure and `provider_spec_result::private_key` is
+ *     populated -- full `KEY:` parity for every downstream consumer, including the Solana path that requires a raw
+ *     local key. Signing latency is identical to `KEY:`, which is what makes `SSM:` suitable for producer block signing
+ *     where `KMS:` is not.
+ *   - Rotation: the spec pins the public key, so rotating the parameter to a new keypair inherently requires a config
+ *     edit + restart; there is nothing useful a re-fetch could do. Fetch-once is semantically forced.
  *
- * The fetch happens inside the spec handler, i.e. during
- * `signature_provider_ssm_plugin::plugin_initialize`'s claim of the
- * configured `SSM:` specs. This is the first blocking network I/O at
- * plugin-initialize time in the tree (the KMS provider deliberately stays
- * offline until its opt-in startup probe) -- a deliberate departure: the
- * provider cannot exist without the key material, and a boot-time failure
- * with a precise error is the intended behavior for a misconfigured signer.
- * The block is bounded by the AWS SDK's connect / request timeouts and its
- * default retry strategy.
+ * The fetch happens inside the spec handler, i.e. when the manager's `plugin_initialize` creates the configured `SSM:`
+ * providers. This is the first blocking network I/O at plugin-initialize time in the tree (the KMS provider
+ * deliberately stays offline until its opt-in startup probe) -- a deliberate departure: the provider cannot exist
+ * without the key material, and a boot-time failure with a precise error is the intended behavior for a misconfigured
+ * signer. The block is bounded by the AWS SDK's connect / request timeouts and its default retry strategy.
  *
- * The manager plugin never links this code; `SSM:` support is enabled per
- * binary+config with `plugin = sysio::signature_provider_ssm_plugin` (nodeop
- * links the plugin; enablement is the operator's choice). A host application
- * that does not use the plugin can instead link this code and call
+ * The manager plugin never links this code; `SSM:` support is enabled per binary+config with
+ * `plugin = sysio::signature_provider_ssm_plugin` (nodeop links the plugin; enablement is the operator's choice). A
+ * host application that does not use the plugin can instead link this code and call
  *   plugin.register_spec_handler("SSM", &sysio::sigprov::ssm::create_ssm_provider);
  * from `main()` before `app().initialize(...)`.
  *
- * The lower-level helpers (`parse_ssm_spec`, `fetch_ssm_parameter`,
- * `get_ssm_client`, `throw_ssm_error`, `create_ssm_provider_with_fetcher`)
- * are exposed both because they are well-defined operations on SSM-shaped
- * data and so the test suite can exercise them directly -- in particular the
- * fetcher seam lets the entire provider-construction path run offline with a
- * fake fetch.
+ * The lower-level helpers (`parse_ssm_spec`, `fetch_ssm_parameter`, `get_ssm_client`, `throw_ssm_error`,
+ * `create_ssm_provider_with_fetcher`) are exposed both because they are well-defined operations on SSM-shaped data and
+ * so the test suite can exercise them directly -- in particular the fetcher seam lets the entire provider-construction
+ * path run offline with a fake fetch.
  */
 
 #include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>

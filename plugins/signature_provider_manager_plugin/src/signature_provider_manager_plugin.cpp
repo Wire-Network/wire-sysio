@@ -26,8 +26,8 @@ namespace sysio {
 namespace {
 constexpr auto option_name_kiod_timeout = "signature-provider-kiod-timeout";
 
-/// The two built-in `<provider-type>:` schemes, handled directly by this
-/// plugin (never through the handler registries, never registrable).
+/// The two built-in `<provider-type>:` schemes, handled directly by this plugin (never through the handler registries,
+/// never registrable).
 constexpr std::string_view scheme_key  = "KEY";
 constexpr std::string_view scheme_kiod = "KIOD";
 
@@ -38,11 +38,10 @@ std::filesystem::path default_signature_provider_spec_file() {
 /**
  * Restrict a file to owner read/write only (0600).
  *
- * Used to bring pre-existing key files that predate the owner-only hardening (and were therefore created
- * group/world readable under the process umask) down to owner-only when they are loaded. New key files are
- * instead written through `fc::write_secure_file`, which creates them owner-only from the start. Best-effort:
- * a failure to set permissions is logged, not fatal, so loading still succeeds on platforms/filesystems that
- * do not support POSIX permission bits.
+ * Used to bring pre-existing key files that predate the owner-only hardening (and were therefore created group/world
+ * readable under the process umask) down to owner-only when they are loaded. New key files are instead written through
+ * `fc::write_secure_file`, which creates them owner-only from the start. Best-effort: a failure to set permissions is
+ * logged, not fatal, so loading still succeeds on platforms/filesystems that do not support POSIX permission bits.
  *
  * @param file_path the file to restrict; it must already exist.
  */
@@ -60,18 +59,13 @@ void restrict_file_to_owner(const std::filesystem::path& file_path) {
 namespace sigprov {
 namespace {
 /**
- * Backing store for scheme -> {handler, providing-plugin} registrations. A
- * Meyers static rather than plugin-instance state: provider-plugin
- * constructors run while appbase is still constructing registered plugins --
- * possibly before the manager instance exists -- and the mapping is a fact
- * about the binary, not about any one application instance (test binaries
- * tear applications down and reconstruct plugins; the registration
- * legitimately survives).
+ * Backing store for scheme -> {handler, providing-plugin} registrations. A Meyers static rather than plugin-instance
+ * state: provider-plugin constructors run while appbase is still constructing registered plugins -- possibly before the
+ * manager instance exists -- and the mapping is a fact about the binary, not about any one application instance (test
+ * binaries tear applications down and reconstruct plugins; the registration legitimately survives).
  *
- * Unsynchronized on purpose: every access is on the main thread in
- * sequential appbase lifecycle phases -- writes from plugin constructors
- * (processed one at a time inside `initialize<>`), reads from the manager's
- * `plugin_initialize`.
+ * Unsynchronized on purpose: every access is on the main thread in sequential appbase lifecycle phases -- writes from
+ * plugin constructors (processed one at a time inside `initialize<>`), reads from the manager's `plugin_initialize`.
  */
 std::map<std::string, scheme_handler_entry, std::less<>>& scheme_handler_registry() {
    static std::map<std::string, scheme_handler_entry, std::less<>> registry;
@@ -81,7 +75,8 @@ std::map<std::string, scheme_handler_entry, std::less<>>& scheme_handler_registr
 
 void register_scheme_handler(std::string_view scheme, spec_handler handler, std::string_view plugin_name) {
    scheme_handler_registry().insert_or_assign(
-      std::string{scheme}, scheme_handler_entry{.handler = std::move(handler), .plugin_name = std::string{plugin_name}});
+      std::string{scheme},
+      scheme_handler_entry{.handler = std::move(handler), .plugin_name = std::string{plugin_name}});
 }
 
 const scheme_handler_entry* find_scheme_handler(std::string_view scheme) {
@@ -102,11 +97,10 @@ public:
    fc::microseconds _kiod_provider_timeout_us;
 
    /**
-    * Record which optional provider plugins the operator enabled, parsed from
-    * `options["plugin"]` exactly as appbase's own --plugin handling (a
-    * composing option whose values may each carry several names split on
-    * space/tab/comma). Gates the process-wide `sigprov` handler registry: an
-    * extension scheme is honored only when its owning plugin is enabled.
+    * Record which optional provider plugins the operator enabled, parsed from `options["plugin"]` exactly as appbase's
+    * own --plugin handling (a composing option whose values may each carry several names split on space/tab/comma).
+    * Gates the process-wide `sigprov` handler registry: an extension scheme is honored only when its owning plugin is
+    * enabled.
     */
    void record_enabled_plugins(const variables_map& options) {
       if (!options.count("plugin"))
@@ -161,17 +155,15 @@ public:
          case chain_key_type_wire_bls:
          case chain_key_type_ethereum:
          case chain_key_type_solana: {
-            // Runtime dispatch over the per-type native parsers lives in libfc
-            // (fc/crypto/signature_provider.cpp) so extension handlers that
-            // also construct local-key providers (e.g. the ssm sub-library)
-            // share it. The sui / unknown arms stay here: libfc cannot throw
-            // the chain-level config exceptions this plugin's contract uses.
+            // Runtime dispatch over the per-type native parsers lives in libfc (fc/crypto/signature_provider.cpp) so
+            // extension handlers that also construct local-key providers (e.g. the ssm sub-library) share it. The sui /
+            // unknown arms stay here: libfc cannot throw the chain-level config exceptions this plugin's contract uses.
             privkey = from_native_string_to_private_key(key_type, spec_data);
             break;
          }
          case chain_key_type_sui: {
-            // to_fc_string throughout these arms: unlike to_string, it is total -- an out-of-range
-            // value formats as its number instead of throwing bad_enum_cast from inside the throw.
+            // to_fc_string throughout these arms: unlike to_string, it is total -- an out-of-range value formats as its
+            // number instead of throwing bad_enum_cast from inside the throw.
             FC_THROW_EXCEPTION(sysio::chain::pending_impl_exception, "Key type needs to be implemented: {}",
                                chain_key_type_reflector::to_fc_string(key_type));
          }
@@ -190,16 +182,13 @@ public:
          return {.signer = make_kiod_signature_provider(spec_data, public_key)};
       }
 
-      // Any other scheme resolves through a registered handler, from one of
-      // two sources. First, `_spec_handlers`: handlers a host application (or
-      // a test) registered directly via `register_spec_handler` -- explicit,
-      // so ungated. Second, the process-wide `sigprov` registry a provider
-      // plugin populated from its constructor: honored only when that plugin
-      // is enabled via `--plugin` (recorded in `_enabled_plugins`). The
-      // handler owns parsing its own `spec_data`; if it returns a
-      // `startup_probe`, the caller (`create_provider`) appends it to
-      // `_startup_probes` only after `set_provider` succeeds, so a provider
-      // rejected as a duplicate never leaves an orphan probe behind.
+      // Any other scheme resolves through a registered handler, from one of two sources. First, `_spec_handlers`:
+      // handlers a host application (or a test) registered directly via `register_spec_handler` -- explicit, so
+      // ungated. Second, the process-wide `sigprov` registry a provider plugin populated from its constructor: honored
+      // only when that plugin is enabled via `--plugin` (recorded in `_enabled_plugins`). The handler owns parsing its
+      // own `spec_data`; if it returns a `startup_probe`, the caller (`create_provider`) appends it to
+      // `_startup_probes` only after `set_provider` succeeds, so a provider rejected as a duplicate never leaves an
+      // orphan probe behind.
       if (auto it = _spec_handlers.find(spec_type_str); it != _spec_handlers.end()) {
          return it->second(key_type, public_key, spec_data);
       }
@@ -305,16 +294,15 @@ public:
 
       auto file_content = fc::json::to_string(vo, fc::time_point::maximum());
 
-      // This file persists private signing keys: publish it through the secure-file helper so the content
-      // is written to an owner-only temporary file and atomically renamed into place (fsync'd), never
-      // passing through a group/world-readable window under the process umask.
+      // This file persists private signing keys: publish it through the secure-file helper so the content is written to
+      // an owner-only temporary file and atomically renamed into place (fsync'd), never passing through a
+      // group/world-readable window under the process umask.
       fc::write_secure_file(def_sig_prov_file, file_content);
    }
 
    void load_default_signature_provider_specs() {
-      // Idempotence guard: this is an initialize-phase function (see
-      // register_default_signature_providers), called at most a handful of
-      // times on the main thread.
+      // Idempotence guard: this is an initialize-phase function (see register_default_signature_providers), called at
+      // most a handful of times on the main thread.
       if (_default_signature_providers_loaded) {
          return;
       }
@@ -325,9 +313,9 @@ public:
          return;
       }
 
-      // Key files that predate the owner-only hardening were written under the process umask and may be
-      // group/world readable. Bring any such pre-existing file down to owner-only before its specs are
-      // registered; a freshly generated file is already owner-only, so leave it untouched.
+      // Key files that predate the owner-only hardening were written under the process umask and may be group/world
+      // readable. Bring any such pre-existing file down to owner-only before its specs are registered; a freshly
+      // generated file is already owner-only, so leave it untouched.
       std::error_code perm_ec;
       const auto perms = std::filesystem::status(def_sig_prov_file, perm_ec).permissions();
       if (perm_ec || (perms & (std::filesystem::perms::group_all | std::filesystem::perms::others_all)) !=
@@ -339,10 +327,9 @@ public:
       fc::read_file_contents(def_sig_prov_file.string(), json_data);
       auto vo = fc::json::from_string(json_data, fc::json::parse_type::relaxed_parser).as<fc::variant_object>();
 
-      // Record every parsed spec before creating any provider, so a creation
-      // failure part-way through never leaves the specs map missing entries
-      // that were present on disk (the guard above proves the member is empty
-      // on entry, so these inserts are the whole map).
+      // Record every parsed spec before creating any provider, so a creation failure part-way through never leaves the
+      // specs map missing entries that were present on disk (the guard above proves the member is empty on entry, so
+      // these inserts are the whole map).
       for (const auto& item : vo) {
          auto spec = item.value().as_string();
          auto key_type = fc::crypto::chain_key_type_reflector::from_string(item.key().c_str());
@@ -358,16 +345,15 @@ public:
       static constexpr std::array supported_key_types = {fc::crypto::chain_key_type_wire,
                                                          fc::crypto::chain_key_type_wire_bls};
 
-      // Initialize-phase API: called from chain_plugin's plugin_initialize, and
-      // appbase runs plugin initializes sequentially on the main thread, so the
-      // check-then-create sequence below needs no synchronization.
+      // Initialize-phase API: called from chain_plugin's plugin_initialize, and appbase runs plugin initializes
+      // sequentially on the main thread, so the check-then-create sequence below needs no synchronization.
       load_default_signature_provider_specs();
       bool changed = false;
       for (const auto& key_type : key_types) {
          FC_ASSERT(fc::contains(supported_key_types, key_type),
                    "Unsupported key type: {}", key_type);
-         // A stored default spec was already created by load_default_signature_provider_specs,
-         // and a configured provider of this key type makes a default redundant.
+         // A stored default spec was already created by load_default_signature_provider_specs, and a configured
+         // provider of this key type makes a default redundant.
          if (_default_signature_provider_specs.contains(key_type) ||
              query_providers(std::nullopt, std::nullopt, key_type).size())
             continue;
@@ -404,8 +390,7 @@ public:
          create_provider(spec);
       }
 
-      // IF EVERYTHING HAS SUCCEEDED TO THIS POINT
-      // THEN WRITE THE CHANGED DEFAULT KEYS
+      // IF EVERYTHING HAS SUCCEEDED TO THIS POINT THEN WRITE THE CHANGED DEFAULT KEYS
       if (changed) {
          save_default_signature_provider_specs();
       }
@@ -454,9 +439,8 @@ public:
       case chain_key_type_wire_bls:
       case chain_key_type_ethereum:
       case chain_key_type_solana: {
-         // Runtime dispatch lives in libfc (fc/crypto/signature_provider.cpp);
-         // the sui / unknown arms stay here for the chain-level exception
-         // taxonomy, same as the KEY: private-key parse.
+         // Runtime dispatch lives in libfc (fc/crypto/signature_provider.cpp); the sui / unknown arms stay here for the
+         // chain-level exception taxonomy, same as the KEY: private-key parse.
          pubkey = from_native_string_to_public_key(key_type, public_key_text);
          break;
       }
@@ -476,11 +460,9 @@ public:
          signature_provider_t{target_chain, key_type, key_name, pubkey, privkey, signer}
          );
 
-      // Register first. set_provider() throws plugin_config_exception on a
-      // duplicate key_name / public_key; reaching the statement after it means
-      // the provider is in the maps. Only then is the startup probe (if any)
-      // retained -- a rejected provider leaves nothing behind for
-      // plugin_startup() to probe.
+      // Register first. set_provider() throws plugin_config_exception on a duplicate key_name / public_key; reaching
+      // the statement after it means the provider is in the maps. Only then is the startup probe (if any) retained -- a
+      // rejected provider leaves nothing behind for plugin_startup() to probe.
       set_provider(provider);
 
       if (startup_probe) {
@@ -492,12 +474,10 @@ public:
    /**
     * Register a `<provider-type>:` scheme handler directly on this instance.
     *
-    * Built-in `KEY` and `KIOD` are not registrable. Each non-built-in scheme
-    * may be registered at most once. This is the explicit host-application /
-    * test path: a handler registered here is ungated (no `--plugin` check).
-    * Provider PLUGINS do not use this -- they register in the process-wide
-    * `sigprov` registry from their constructor, which the manager gates on
-    * the `--plugin` enable list.
+    * Built-in `KEY` and `KIOD` are not registrable. Each non-built-in scheme may be registered at most once. This is
+    * the explicit host-application / test path: a handler registered here is ungated (no `--plugin` check). Provider
+    * PLUGINS do not use this -- they register in the process-wide `sigprov` registry from their constructor, which the
+    * manager gates on the `--plugin` enable list.
     */
    void register_spec_handler(std::string scheme, sysio::spec_handler handler) {
       FC_ASSERT(!scheme.empty(), "spec handler scheme must not be empty");
@@ -512,32 +492,24 @@ public:
    /**
     * Run the opt-in startup-probe pass.
     *
-    * For every provider whose handler attached a `startup_probe`, invoke
-    * that probe. Today only the KMS handler (the `kms` sub-library) does so
-    * -- the probe issues a single `GetPublicKey` call that resolves AWS
-    * credentials, warms the client, and verifies the KMS key matches the
-    * pinned public key.
+    * For every provider whose handler attached a `startup_probe`, invoke that probe. Today only the KMS handler (the
+    * `kms` sub-library) does so -- the probe issues a single `GetPublicKey` call that resolves AWS credentials, warms
+    * the client, and verifies the KMS key matches the pinned public key.
     *
-    * A permanent misconfiguration thrown by any probe propagates out of
-    * `plugin_startup()` and aborts startup loudly instead of failing on the
-    * first production sign. A transient error (e.g. KMS throttle / timeout)
-    * is logged and skipped -- the lazy first-sign check is left to retry it
-    * rather than killing node startup. That transient/permanent split is
-    * what makes running the probes unconditionally safe: an AWS blip at
-    * restart can never brick a boot, only a configuration that could never
-    * sign. A handler attaching a probe IS the opt-in; there is deliberately
-    * no separate enable flag. A no-op when no probes were attached.
+    * A permanent misconfiguration thrown by any probe propagates out of `plugin_startup()` and aborts startup loudly
+    * instead of failing on the first production sign. A transient error (e.g. KMS throttle / timeout) is logged and
+    * skipped -- the lazy first-sign check is left to retry it rather than killing node startup. That
+    * transient/permanent split is what makes running the probes unconditionally safe: an AWS blip at restart can never
+    * brick a boot, only a configuration that could never sign. A handler attaching a probe IS the opt-in; there is
+    * deliberately no separate enable flag. A no-op when no probes were attached.
     *
-    * The probe list is one-shot: this drains it so it never lingers as a
-    * misleading registry of signers. A provider registered after
-    * `plugin_startup()` -- e.g. via a future runtime spec reload -- is not
-    * retroactively probed; its pinning check (if any) still runs lazily on
-    * the first sign through whatever one-shot guard the handler attaches.
+    * The probe list is one-shot: this drains it so it never lingers as a misleading registry of signers. A provider
+    * registered after `plugin_startup()` -- e.g. via a future runtime spec reload -- is not retroactively probed; its
+    * pinning check (if any) still runs lazily on the first sign through whatever one-shot guard the handler attaches.
     */
    void run_startup_probes() {
-      // Move the probe list out before running it, so the one-shot nature of
-      // the startup check is structural (the member is emptied) rather than
-      // just documented -- a second plugin_startup runs nothing.
+      // Move the probe list out before running it, so the one-shot nature of the startup check is structural (the
+      // member is emptied) rather than just documented -- a second plugin_startup runs nothing.
       auto probes = std::exchange(_startup_probes, {});
       if (probes.empty()) {
          return;
@@ -549,17 +521,16 @@ public:
          try {
             probe();
          } catch (const chain::signing_transient_exception& e) {
-            // A transient signing error (e.g. KMS throttle / KMSInternal /
-            // timeout) at startup is not a misconfiguration -- don't abort the
-            // node over it. Log and continue; the lazy first-sign path
-            // re-runs the same probe.
+            // A transient signing error (e.g. KMS throttle / KMSInternal / timeout) at startup is not a
+            // misconfiguration -- don't abort the node over it. Log and continue; the lazy first-sign path re-runs the
+            // same probe.
             ++deferred;
             wlog("Signature-provider startup probe: transient error for one "
                  "key, deferring its check to the first sign: {}",
                  e.to_detail_string());
          }
-         // A permanent misconfiguration throws chain::plugin_config_exception,
-         // which propagates out of plugin_startup() and aborts startup loudly.
+         // A permanent misconfiguration throws chain::plugin_config_exception, which propagates out of plugin_startup()
+         // and aborts startup loudly.
       }
       if (deferred == 0) {
          ilog("Signature-provider startup probes passed");
@@ -572,15 +543,12 @@ public:
 
 private:
    /**
-    * Concurrency contract: the provider set is IMMUTABLE AFTER STARTUP, so
-    * every member below is unsynchronized on purpose. All mutation -- spec
-    * parsing, retained-spec claims, handler registration, the defaults
-    * machinery, the probe drain -- runs on the main thread during the
-    * sequential initialize/startup phases; the plugin's public mutators
-    * enforce this with `assert_pre_startup()`. Runtime access from other
-    * threads (producer, batch-operator, underwriter lookups) is read-only,
-    * and those threads are spawned by dependent plugins' startups, i.e.
-    * after every write here has completed.
+    * Concurrency contract: the provider set is IMMUTABLE AFTER STARTUP, so every member below is unsynchronized on
+    * purpose. All mutation -- spec parsing, retained-spec claims, handler registration, the defaults machinery, the
+    * probe drain -- runs on the main thread during the sequential initialize/startup phases; the plugin's public
+    * mutators enforce this with `assert_pre_startup()`. Runtime access from other threads (producer, batch-operator,
+    * underwriter lookups) is read-only, and those threads are spawned by dependent plugins' startups, i.e. after every
+    * write here has completed.
     */
    std::uint32_t _anon_key_counter{0};
 
@@ -588,11 +556,10 @@ private:
    std::map<fc::crypto::chain_key_type_t, std::string> _default_signature_provider_specs{};
 
    /**
-    * The provider plugins the operator enabled via `--plugin`, populated at
-    * `plugin_initialize` from `options["plugin"]`. An extension scheme
-    * registered in the process-wide `sigprov` handler registry (from a
-    * provider plugin's constructor) is honored only when its owning plugin is
-    * in this set -- that is the `--plugin` gate.
+    * The provider plugins the operator enabled via `--plugin`, populated at `plugin_initialize` from
+    * `options["plugin"]`. An extension scheme registered in the process-wide `sigprov` handler registry (from a
+    * provider plugin's constructor) is honored only when its owning plugin is in this set -- that is the `--plugin`
+    * gate.
     */
    std::set<std::string> _enabled_plugins{};
 
@@ -603,18 +570,15 @@ private:
    std::map<chain::public_key_type, fc::crypto::signature_provider_ptr> _signing_providers_by_pubkey{};
 
    /**
-    * One-shot startup probes, one per provider whose handler attached one
-    * (today: KMS). Collected as providers are created, run unconditionally
-    * by `run_startup_probes()` at plugin_startup.
+    * One-shot startup probes, one per provider whose handler attached one (today: KMS). Collected as providers are
+    * created, run unconditionally by `run_startup_probes()` at plugin_startup.
     */
    std::vector<std::function<void()>> _startup_probes{};
 
    /**
-    * Non-built-in `<provider-type>:` handlers registered directly on this
-    * instance via `register_spec_handler()` -- the explicit host-application
-    * / test path (ungated). Provider PLUGINS instead register in the
-    * process-wide `sigprov` registry from their constructor;
-    * `create_provider_from_spec` consults this map first, then that registry.
+    * Non-built-in `<provider-type>:` handlers registered directly on this instance via `register_spec_handler()` -- the
+    * explicit host-application / test path (ungated). Provider PLUGINS instead register in the process-wide `sigprov`
+    * registry from their constructor; `create_provider_from_spec` consults this map first, then that registry.
     */
    std::map<std::string, sysio::spec_handler> _spec_handlers{};
 };
@@ -676,16 +640,14 @@ void signature_provider_manager_plugin::plugin_initialize(const variables_map& o
    if (options.contains(option_name_kiod_timeout))
       my->_kiod_provider_timeout_us = fc::milliseconds(options.at(option_name_kiod_timeout).as<int32_t>());
 
-   // Record which optional provider plugins the operator enabled, so an
-   // extension scheme (SSM/KMS) is honored only when its plugin is enabled.
+   // Record which optional provider plugins the operator enabled, so an extension scheme (SSM/KMS) is honored only when
+   // its plugin is enabled.
    my->record_enabled_plugins(options);
 
-   // Create every configured provider now, eagerly. This runs before any
-   // consumer (they all APPBASE_PLUGIN_REQUIRES this plugin), so the full
-   // provider set exists by the time chain_plugin / producer_plugin / the
-   // outposts look -- independent of --plugin order. A malformed spec,
-   // unknown scheme, not-enabled provider plugin, or provider-construction
-   // failure throws here and aborts the boot.
+   // Create every configured provider now, eagerly. This runs before any consumer (they all APPBASE_PLUGIN_REQUIRES
+   // this plugin), so the full provider set exists by the time chain_plugin / producer_plugin / the outposts look --
+   // independent of --plugin order. A malformed spec, unknown scheme, not-enabled provider plugin, or
+   // provider-construction failure throws here and aborts the boot.
    if (options.contains(option_name_provider)) {
       auto specs = options.at(option_name_provider).as<std::vector<std::string>>();
       for (const auto& spec : specs) {
@@ -698,9 +660,8 @@ void signature_provider_manager_plugin::plugin_initialize(const variables_map& o
 }
 
 void signature_provider_manager_plugin::plugin_startup() {
-   // Startup-probe pass for any provider whose handler attached a probe
-   // (today: KMS). A permanent probe failure throws here and aborts startup
-   // loudly; transient failures defer to the lazy first-sign check.
+   // Startup-probe pass for any provider whose handler attached a probe (today: KMS). A permanent probe failure throws
+   // here and aborts startup loudly; transient failures defer to the lazy first-sign check.
    my->run_startup_probes();
 }
 
