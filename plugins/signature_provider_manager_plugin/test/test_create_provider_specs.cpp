@@ -1,6 +1,3 @@
-#include <boost/dll.hpp>
-#include <boost/process/v1/io.hpp>
-#include <boost/process/v1/spawn.hpp>
 #include <boost/test/unit_test.hpp>
 #include <fc/crypto/chain_types_reflect.hpp>
 #include <fc/crypto/elliptic_ed.hpp>
@@ -37,9 +34,6 @@ using sysio::sigprov::test::create_app;
 using sysio::sigprov::test::sig_provider_tester;
 
 namespace {
-
-namespace bp = boost::process;
-namespace bfs = boost::filesystem;
 
 /**
  * Build and initialize a tester with a `PROBE:` spec handler whose returned
