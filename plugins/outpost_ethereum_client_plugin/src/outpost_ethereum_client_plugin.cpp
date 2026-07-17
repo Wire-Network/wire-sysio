@@ -23,10 +23,9 @@ class outpost_ethereum_client_plugin_impl {
    std::vector<file_abi_contracts_t> _abi_files{};
 
 public:
+   // Called only from plugin_initialize -- sequential, main-thread -- so the
+   // ABI list needs no synchronization.
    std::vector<file_abi_contracts_t> load_abi_files(const std::vector<std::filesystem::path>& file_names) {
-      static std::mutex mutex;
-      std::scoped_lock lock(mutex);
-
       for (auto& filename : file_names) {
          FC_ASSERT_FMT(exists(filename), "File does not exist: {}", filename.string());
          auto file_path = std::filesystem::absolute(filename);

@@ -40,16 +40,6 @@ int main(int argc, char** argv)
    application_base::register_plugin<prometheus_plugin>();
    application_base::register_plugin<chain_api_plugin>();
    application_base::register_plugin<signature_provider_manager_plugin>();
-   // The AWS-backed signature-provider schemes ship as optional plugins:
-   // registering them here only constructs the plugin objects (announcing
-   // their scheme for the manager's boot diagnostics) -- an operator opts in
-   // per config with `plugin = sysio::signature_provider_ssm_plugin` (SSM:
-   // key fetched once from Parameter Store, local signing -- fine for every
-   // signing path including block production) or
-   // `plugin = sysio::signature_provider_kms_plugin` (KMS: remote signing,
-   // ethereum keys only). Not in the init<> autostart set below: without the
-   // `plugin =` line neither initializes, and an `SSM:`/`KMS:` spec then
-   // fails the boot with an error naming the missing plugin.
    application_base::register_plugin<signature_provider_ssm_plugin>();
    application_base::register_plugin<signature_provider_kms_plugin>();
    application_base::register_plugin<batch_operator_plugin>();

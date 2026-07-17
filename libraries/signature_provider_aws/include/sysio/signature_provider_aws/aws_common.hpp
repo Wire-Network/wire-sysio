@@ -31,7 +31,6 @@
 #include <cctype>
 #include <map>
 #include <memory>
-#include <mutex>
 #include <string>
 #include <string_view>
 
@@ -55,9 +54,13 @@ void ensure_aws_sdk_initialized();
  * @brief Process-wide, per-region cache of AWS service clients.
  *
  * One instance per service client type, held as a function-local static by the
- * owning sub-library (see `get_kms_client` / `get_ssm_client`). Lock once on
- * lookup; the SDK's HTTP pool inside a client is itself thread-safe, so
- * multiple closures sharing a client may submit requests concurrently.
+ * owning provider (see `get_kms_client` / `get_ssm_client`). Lookups are
+ * unsynchronized on purpose: they happen only while providers are created --
+ * during the sequential, main-thread initialize phase -- and the signer
+ * closures capture their `shared_ptr<Client>` then. The thread-safety that
+ * matters at runtime lives inside the AWS client itself: the SDK's HTTP pool
+ * is thread-safe, so multiple closures sharing a client may submit requests
+ * concurrently.
  *
  * Construction of a client is offline: no credential resolution, no network.
  * Credentials are looked up via the standard AWS provider chain on the first
@@ -85,7 +88,6 @@ public:
    std::shared_ptr<Client> get(const std::string& region) {
       SYS_ASSERT(!region.empty(), chain::plugin_config_exception,
                  "AWS client cache lookup requires a non-empty region");
-      std::scoped_lock lock{_mutex};
       auto& slot = _by_region[region];
       if (!slot) {
          Aws::Client::ClientConfiguration cfg;
@@ -96,7 +98,6 @@ public:
    }
 
 private:
-   std::mutex                                       _mutex;
    std::map<std::string, std::shared_ptr<Client>>   _by_region;
 };
 

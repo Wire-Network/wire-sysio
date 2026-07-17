@@ -33,10 +33,9 @@ public:
       return _outpost_program_name;
    }
 
+   // Called only from plugin_initialize -- sequential, main-thread -- so the
+   // IDL list needs no synchronization.
    std::vector<file_idl_programs_t> load_idl_files(const std::vector<std::filesystem::path>& file_names) {
-      static std::mutex mutex;
-      std::scoped_lock lock(mutex);
-
       for (auto& filename : file_names) {
          auto file_path = std::filesystem::absolute(filename);
          ilog("Loading IDL file: {}", file_path.string());

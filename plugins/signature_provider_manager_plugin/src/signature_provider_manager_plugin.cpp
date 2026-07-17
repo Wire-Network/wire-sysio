@@ -13,9 +13,8 @@
 #include <fc/io/secure_file.hpp>
 
 #include <algorithm>
+#include <cstdint>
 #include <filesystem>
-#include <mutex>
-#include <set>
 
 #include <sysio/chain/types.hpp>
 #include <sysio/chain/exceptions.hpp>
@@ -88,31 +87,29 @@ void restrict_file_to_owner(const std::filesystem::path& file_path) {
 namespace sigprov {
 namespace {
 /**
- * Backing store for the scheme -> providing-plugin announcements. Meyers
- * statics rather than plugin-instance state: provider-plugin constructors run
+ * Backing store for the scheme -> providing-plugin announcements. A Meyers
+ * static rather than plugin-instance state: provider-plugin constructors run
  * while appbase is still constructing registered plugins -- possibly before
  * the manager instance exists -- and the mapping is a fact about the binary,
  * not about any one application instance (test binaries tear applications
  * down and reconstruct plugins; the announcement legitimately survives).
+ *
+ * Unsynchronized on purpose: every access is on the main thread in
+ * sequential appbase lifecycle phases -- writes from plugin constructors
+ * (processed one at a time inside `initialize<>`), reads from the manager's
+ * boot diagnostics at initialize/startup.
  */
 std::map<std::string, std::string>& scheme_plugin_registry() {
    static std::map<std::string, std::string> registry;
    return registry;
 }
-
-std::mutex& scheme_plugin_registry_mutex() {
-   static std::mutex m;
-   return m;
-}
 } // namespace
 
 void announce_scheme_plugin(const std::string& scheme, const std::string& plugin_name) {
-   std::scoped_lock lock(scheme_plugin_registry_mutex());
    scheme_plugin_registry().insert_or_assign(scheme, plugin_name);
 }
 
 std::optional<std::string> announced_scheme_plugin(const std::string& scheme) {
-   std::scoped_lock lock(scheme_plugin_registry_mutex());
    const auto& registry = scheme_plugin_registry();
    if (auto it = registry.find(scheme); it != registry.end())
       return it->second;
@@ -208,22 +205,14 @@ public:
       // `startup_probe`, the caller (`create_provider`) appends it to
       // `_startup_probes` only after `set_provider` succeeds, so a provider
       // rejected as a duplicate never leaves an orphan probe behind.
-      sysio::spec_handler handler;
-      {
-         std::scoped_lock lock(_signing_providers_mutex);
-         if (auto it = _spec_handlers.find(spec_type_str); it != _spec_handlers.end()) {
-            handler = it->second;
-         }
-      }
-      if (handler) {
-         return handler(key_type, public_key, spec_data);
+      if (auto it = _spec_handlers.find(spec_type_str); it != _spec_handlers.end()) {
+         return it->second(key_type, public_key, spec_data);
       }
 
       SYS_THROW(chain::plugin_config_exception,
                 "Unknown provider type \"{}\". Built-in types are KEY and KIOD; "
                 "additional types (e.g. KMS, SSM) are provided by optional "
-                "signature-provider plugins (enable with `plugin = ...`) or "
-                "registered by the host application via register_spec_handler() "
+                "signature-provider plugins (enable with `plugin = ...`) "
                 "-- this binary has no registration for \"{}\".",
                 spec_type_str, spec_type_str);
    }
@@ -241,7 +230,6 @@ public:
     * @param provider to set
     */
    fc::crypto::signature_provider_ptr set_provider(const fc::crypto::signature_provider_ptr& provider) {
-      std::scoped_lock lock(_signing_providers_mutex);
       SYS_ASSERT(!_signing_providers_by_pubkey.contains(provider->public_key) &&
                  !_signing_providers_by_name.contains(provider->key_name),
                  chain::plugin_config_exception,
@@ -256,7 +244,6 @@ public:
 
 
    bool has_provider(const fc::crypto::signature_provider_id_t& key) {
-      std::scoped_lock lock(_signing_providers_mutex);
       if (holds_alternative<std::string>(key)) {
          return _signing_providers_by_name.contains(std::get<std::string>(key));
       }
@@ -265,7 +252,6 @@ public:
    }
 
    fc::crypto::signature_provider_ptr get_provider(const fc::crypto::signature_provider_id_t& key) {
-      std::scoped_lock lock(_signing_providers_mutex);
       if (holds_alternative<std::string>(key)) {
          auto& keyName = std::get<std::string>(key);
          SYS_ASSERT(_signing_providers_by_name.contains(keyName), chain::plugin_config_exception,
@@ -285,7 +271,6 @@ public:
       const std::optional<fc::crypto::signature_provider_id_t>& id_opt,
       std::optional<fc::crypto::chain_kind_t> target_chain,
       std::optional<fc::crypto::chain_key_type_t> target_key_type) {
-      std::scoped_lock lock(_signing_providers_mutex);
       return std::views::values(_signing_providers_by_pubkey) | std::views::filter([&](const auto& entry) {
                 if (target_chain.has_value() && entry->target_chain != target_chain.value()) {
                    return false;
@@ -306,20 +291,13 @@ public:
    }
 
    void save_default_signature_provider_specs() {
-      // Ensure any on-disk specs were merged before snapshotting (idempotent,
-      // takes its own leaf locks -- never called under the mutex).
+      // Ensure any on-disk specs were merged before serializing (idempotent).
       load_default_signature_provider_specs();
-
-      std::map<fc::crypto::chain_key_type_t, std::string> specs_snapshot;
-      {
-         std::scoped_lock lock(_signing_providers_mutex);
-         specs_snapshot = _default_signature_provider_specs;
-      }
 
       auto def_sig_prov_file = default_signature_provider_spec_file();
 
       fc::mutable_variant_object vo;
-      for (const auto& [key_type, spec] : specs_snapshot) {
+      for (const auto& [key_type, spec] : _default_signature_provider_specs) {
          auto key_type_str = fc::crypto::chain_key_type_reflector::to_string(key_type);
          vo(key_type_str, spec);
       }
@@ -333,13 +311,13 @@ public:
    }
 
    void load_default_signature_provider_specs() {
-      // Idempotence guard only: this is an initialize-phase function (see
-      // register_default_signature_providers), so the atomic exchange keeps
-      // repeat calls cheap without holding any lock across the file I/O and
-      // provider creation below.
-      if (_default_signature_providers_loaded.exchange(true)) {
+      // Idempotence guard: this is an initialize-phase function (see
+      // register_default_signature_providers), called at most a handful of
+      // times on the main thread.
+      if (_default_signature_providers_loaded) {
          return;
       }
+      _default_signature_providers_loaded = true;
 
       auto def_sig_prov_file = default_signature_provider_spec_file();
       if (!std::filesystem::exists(def_sig_prov_file)) {
@@ -360,22 +338,16 @@ public:
       fc::read_file_contents(def_sig_prov_file.string(), json_data);
       auto vo = fc::json::from_string(json_data, fc::json::parse_type::relaxed_parser).as<fc::variant_object>();
 
-      // Parse into a local map first, merge under a brief lock, then create
-      // the providers unlocked: create_provider takes its own leaf locks and
-      // may invoke a spec handler (network I/O for remote-backed schemes).
+      // Record every parsed spec before creating any provider, so a creation
+      // failure part-way through never leaves the specs map missing entries
+      // that were present on disk.
       std::map<fc::crypto::chain_key_type_t, std::string> loaded;
       for (const auto& item : vo) {
          auto key_type_str = item.key();
          auto spec = item.value().as_string();
          auto key_type = fc::crypto::chain_key_type_reflector::from_string(key_type_str.c_str());
          loaded[key_type] = spec;
-      }
-
-      {
-         std::scoped_lock lock(_signing_providers_mutex);
-         for (const auto& [key_type, spec] : loaded) {
-            _default_signature_provider_specs[key_type] = spec;
-         }
+         _default_signature_provider_specs[key_type] = spec;
       }
 
       for (const auto& [key_type, spec] : loaded) {
@@ -395,22 +367,16 @@ public:
 
       // Initialize-phase API: called from chain_plugin's plugin_initialize, and
       // appbase runs plugin initializes sequentially on the main thread, so the
-      // check-then-create sequence below needs no cross-thread atomicity. The
-      // container mutex still guards each individual access against runtime
-      // reader threads; no lock is held across create_provider or the file save.
+      // check-then-create sequence below needs no synchronization.
       load_default_signature_provider_specs();
       bool changed = false;
       for (const auto& key_type : key_types) {
          FC_ASSERT(fc::contains(supported_key_types, key_type),
                    "Unsupported key type: {}", key_type);
-         bool have_default_spec;
-         {
-            std::scoped_lock lock(_signing_providers_mutex);
-            have_default_spec = _default_signature_provider_specs.contains(key_type);
-         }
          // A stored default spec was already created by load_default_signature_provider_specs,
          // and a configured provider of this key type makes a default redundant.
-         if (have_default_spec || query_providers(std::nullopt, std::nullopt, key_type).size())
+         if (_default_signature_provider_specs.contains(key_type) ||
+             query_providers(std::nullopt, std::nullopt, key_type).size())
             continue;
 
          // create anonymous key
@@ -437,10 +403,7 @@ public:
                                                             pub_key_str,
                                                             std::format("KEY:{}", privkey.to_string({})));
 
-         {
-            std::scoped_lock lock(_signing_providers_mutex);
-            _default_signature_provider_specs[key_type] = spec;
-         }
+         _default_signature_provider_specs[key_type] = spec;
          changed = true;
 
          dlog("Registering default signature provider spec (type={})",
@@ -495,7 +458,6 @@ public:
     */
    fc::crypto::signature_provider_ptr create_or_retain_provider(const std::string& spec) {
       if (auto scheme = extract_extension_scheme(spec)) {
-         std::scoped_lock lock(_signing_providers_mutex);
          if (!_spec_handlers.contains(*scheme)) {
             dlog("Retaining signature provider spec until a \"{}\" handler is registered: {}",
                  *scheme, redact_signature_provider_spec(spec));
@@ -507,17 +469,14 @@ public:
    }
 
    std::vector<fc::crypto::signature_provider_ptr> create_configured_providers(const std::string& scheme) {
-      // Consume the matching retained specs under a brief lock, then create
-      // unlocked: creation may invoke the scheme's handler, which for
-      // remote-backed schemes (e.g. SSM's one-time GetParameter fetch) does
-      // network I/O that must never run under the providers mutex.
+      // Consume the matching retained specs first, then create: creation can
+      // throw (bad pubkey, failed remote fetch), and a spec that reached its
+      // owning plugin must not linger to be double-reported by the startup
+      // accounting -- the creation error itself aborts the boot.
       std::vector<unclaimed_spec> to_create;
-      {
-         std::scoped_lock lock(_signing_providers_mutex);
-         auto matches = [&](const unclaimed_spec& s) { return s.scheme == scheme; };
-         std::ranges::copy_if(_unclaimed_specs, std::back_inserter(to_create), matches);
-         std::erase_if(_unclaimed_specs, matches);
-      }
+      auto matches = [&](const unclaimed_spec& s) { return s.scheme == scheme; };
+      std::ranges::copy_if(_unclaimed_specs, std::back_inserter(to_create), matches);
+      std::erase_if(_unclaimed_specs, matches);
 
       std::vector<fc::crypto::signature_provider_ptr> created;
       created.reserve(to_create.size());
@@ -539,23 +498,14 @@ public:
     * this binary provides the scheme at all.
     */
    void throw_if_unclaimed_specs() {
-      std::vector<unclaimed_spec> unclaimed;
-      std::set<std::string> registered_schemes;
-      {
-         std::scoped_lock lock(_signing_providers_mutex);
-         if (_unclaimed_specs.empty()) {
-            return;
-         }
-         unclaimed = _unclaimed_specs;
-         for (const auto& [scheme, handler] : _spec_handlers) {
-            registered_schemes.insert(scheme);
-         }
+      if (_unclaimed_specs.empty()) {
+         return;
       }
 
       std::string detail;
-      for (const auto& s : unclaimed) {
+      for (const auto& s : _unclaimed_specs) {
          const auto redacted = redact_signature_provider_spec(s.raw_spec);
-         if (registered_schemes.contains(s.scheme)) {
+         if (_spec_handlers.contains(s.scheme)) {
             detail += std::format(
                "  - scheme \"{}\" (spec: {}): its handler is registered, but the providing plugin "
                "never created the configured providers (missing create_configured_providers(\"{}\") "
@@ -576,7 +526,7 @@ public:
       }
       SYS_THROW(chain::plugin_config_exception,
                 "{} --signature-provider spec(s) name a provider scheme with no created provider:\n{}",
-                unclaimed.size(), detail);
+                _unclaimed_specs.size(), detail);
    }
 
    fc::crypto::signature_provider_ptr create_provider(const std::string& key_name,
@@ -625,7 +575,6 @@ public:
       set_provider(provider);
 
       if (startup_probe) {
-         std::scoped_lock lock(_signing_providers_mutex);
          _startup_probes.push_back(std::move(startup_probe));
       }
       return provider;
@@ -647,7 +596,6 @@ public:
                 "Cannot override built-in spec handler \"{}\"", scheme);
       FC_ASSERT(static_cast<bool>(handler),
                 "spec handler for \"{}\" must not be empty", scheme);
-      std::scoped_lock lock(_signing_providers_mutex);
       auto [it, inserted] = _spec_handlers.try_emplace(std::move(scheme), std::move(handler));
       FC_ASSERT(inserted, "spec handler \"{}\" already registered", it->first);
    }
@@ -682,11 +630,7 @@ public:
       // network-bound probes a private copy to run without holding the
       // providers mutex, and empties the member so the one-shot nature of
       // the startup check is structural rather than just documented.
-      std::vector<std::function<void()>> probes;
-      {
-         std::scoped_lock lock(_signing_providers_mutex);
-         probes = std::exchange(_startup_probes, {});
-      }
+      auto probes = std::exchange(_startup_probes, {});
       if (probes.empty()) {
          return;
       }
@@ -719,26 +663,20 @@ public:
    }
 
 private:
-   std::atomic_uint32_t _anon_key_counter{0};
-
    /**
-    * Guards ONLY the container members below (`_spec_handlers`, the two
-    * provider maps, `_startup_probes`, `_unclaimed_specs`,
-    * `_default_signature_provider_specs`).
-    *
-    * Lock discipline -- deliberately a plain (non-recursive) mutex: every
-    * critical section is leaf-level. Snapshot/copy under the lock, then
-    * invoke handlers/probes/signers or do file/network I/O unlocked; no
-    * function that holds the lock may call another function that acquires
-    * it. A would-be re-entrant path means restructuring the code
-    * (gather-then-act, snapshot-then-run), never a recursive mutex. The
-    * leaf-only rule also keeps a future reader/writer (`std::shared_mutex`,
-    * equally non-recursive) swap mechanical, should contention ever warrant
-    * one.
+    * Concurrency contract: the provider set is IMMUTABLE AFTER STARTUP, so
+    * every member below is unsynchronized on purpose. All mutation -- spec
+    * parsing, retained-spec claims, handler registration, the defaults
+    * machinery, the probe drain -- runs on the main thread during the
+    * sequential initialize/startup phases; the plugin's public mutators
+    * enforce this with `assert_pre_startup()`. Runtime access from other
+    * threads (producer, batch-operator, underwriter lookups) is read-only,
+    * and those threads are spawned by dependent plugins' startups, i.e.
+    * after every write here has completed.
     */
-   std::mutex _signing_providers_mutex{};
+   std::uint32_t _anon_key_counter{0};
 
-   std::atomic_bool _default_signature_providers_loaded{false};
+   bool _default_signature_providers_loaded{false};
    std::map<fc::crypto::chain_key_type_t, std::string> _default_signature_provider_specs{};
 
    /**
@@ -756,7 +694,7 @@ private:
 
    /**
     * Retained specs awaiting their scheme's provider plugin, in config
-    * order. Guarded by `_signing_providers_mutex`.
+    * order.
     */
    std::vector<unclaimed_spec> _unclaimed_specs{};
    /**
@@ -768,17 +706,16 @@ private:
    /**
     * One-shot startup probes, one per provider whose handler attached one
     * (today: KMS). Collected as providers are created, run unconditionally
-    * by `run_startup_probes()` at plugin_startup. Guarded by
-    * `_signing_providers_mutex`.
+    * by `run_startup_probes()` at plugin_startup.
     */
    std::vector<std::function<void()>> _startup_probes{};
 
    /**
     * Spec-handler registry for non-built-in `<provider-type>:` schemes.
-    * Populated by the host application's `register_spec_handler()` calls
-    * before `app().initialize(...)`. Looked up in `create_provider_from_spec`
-    * when the scheme is neither `KEY` nor `KIOD`. Guarded by
-    * `_signing_providers_mutex`.
+    * Populated by `register_spec_handler()` -- from a provider plugin's
+    * `plugin_initialize` or a host application's `main()`. Looked up in
+    * `create_provider_from_spec` when the scheme is neither `KEY` nor
+    * `KIOD`.
     */
    std::map<std::string, sysio::spec_handler> _spec_handlers{};
 };
@@ -787,6 +724,14 @@ signature_provider_manager_plugin::signature_provider_manager_plugin()
    : my(std::make_unique<signature_provider_manager_plugin_impl>()) {}
 
 signature_provider_manager_plugin::~signature_provider_manager_plugin() {}
+
+void signature_provider_manager_plugin::assert_pre_startup(std::string_view operation) const {
+   const auto current_state = get_state();
+   SYS_ASSERT(current_state == registered || current_state == initialized, chain::plugin_config_exception,
+              "signature_provider_manager_plugin::{} called after startup: the provider set is immutable "
+              "once the node is running -- all mutation happens during the initialize phase",
+              operation);
+}
 
 void signature_provider_manager_plugin::set_program_options(options_description&, options_description& cfg) {
    cfg.add_options()(
@@ -815,7 +760,7 @@ const char* signature_provider_manager_plugin::signature_provider_help_text() co
       "   <provider-spec>        is a string in the form <provider-type>:<data>\n\n"
       "       <provider-type>    KEY and KIOD are built in. Additional types are provided\n"
       "                          by optional signature-provider plugins (enable with\n"
-      "                          `plugin = ...`) or registered by the host application.\n\n"
+      "                          `plugin = ...`).\n\n"
       "       KEY:<private-key>  is a string containing a private key of the key-type specified\n\n"
       "       KIOD:<url>         is the URL where kiod is available and the appropriate wallet(s) are unlocked\n\n"
       "       SSM:<param-ref>    fetches the private key once at startup from AWS SSM Parameter\n"
@@ -858,6 +803,7 @@ void signature_provider_manager_plugin::plugin_startup() {
 }
 
 fc::crypto::signature_provider_ptr signature_provider_manager_plugin::create_provider(const std::string& spec) {
+   assert_pre_startup("create_provider");
    return my->create_provider(spec);
 }
 
@@ -865,6 +811,7 @@ fc::crypto::signature_provider_ptr signature_provider_manager_plugin::create_pro
 fc::crypto::signature_provider_ptr signature_provider_manager_plugin::create_provider(
    const std::string& key_name, fc::crypto::chain_kind_t target_chain, fc::crypto::chain_key_type_t key_type,
    const std::string& public_key_text, const std::string& private_key_provider_spec) {
+   assert_pre_startup("create_provider");
    return my->create_provider(key_name, target_chain, key_type, public_key_text, private_key_provider_spec);
 }
 
@@ -891,16 +838,19 @@ signature_provider_manager_plugin::query_providers(const std::optional<fc::crypt
 
 void signature_provider_manager_plugin::register_default_signature_providers(
    const std::vector<fc::crypto::chain_key_type_t>& key_types) {
+   assert_pre_startup("register_default_signature_providers");
    my->register_default_signature_providers(key_types);
 }
 
 void signature_provider_manager_plugin::register_spec_handler(
    std::string scheme, sysio::spec_handler handler) {
+   assert_pre_startup("register_spec_handler");
    my->register_spec_handler(std::move(scheme), std::move(handler));
 }
 
 std::vector<fc::crypto::signature_provider_ptr>
 signature_provider_manager_plugin::create_configured_providers(const std::string& scheme) {
+   assert_pre_startup("create_configured_providers");
    return my->create_configured_providers(scheme);
 }
 

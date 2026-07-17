@@ -222,6 +222,34 @@ BOOST_AUTO_TEST_CASE(unclaimed_spec_startup_error_registered_but_never_claimed) 
                          });
 }
 
+BOOST_AUTO_TEST_CASE(mutators_rejected_after_startup) {
+   // The provider set is immutable after startup (that is what lets the
+   // manager's containers go unsynchronized while runtime threads read
+   // them): once the plugin reaches the started state, every public mutator
+   // must be rejected at the boundary.
+   auto clean_app = gsl_lite::finally([] { appbase::application::reset_app_singleton(); });
+
+   fc::test::keygen_result fixture = fc::test::load_keygen_fixture("ethereum", 1);
+   auto tester = create_app(std::vector<std::string>{});
+
+   // The state-transitioning wrapper (dependency-ordered, as production
+   // startup runs it), not the bare plugin_startup() body.
+   tester->plugin().startup();
+
+   auto expect_immutable = [](const fc::exception& e) {
+      return e.to_detail_string().find("immutable") != std::string::npos;
+   };
+   BOOST_CHECK_EXCEPTION(tester->plugin().register_spec_handler("T10LATE", make_stub_handler()),
+                         sysio::chain::plugin_config_exception, expect_immutable);
+   BOOST_CHECK_EXCEPTION(tester->plugin().create_provider(
+                            make_spec("t10key", fixture.public_key, "T10LATE", "x")),
+                         sysio::chain::plugin_config_exception, expect_immutable);
+   BOOST_CHECK_EXCEPTION(tester->plugin().create_configured_providers("T10LATE"),
+                         sysio::chain::plugin_config_exception, expect_immutable);
+   BOOST_CHECK_EXCEPTION(tester->plugin().register_default_signature_providers({fc::crypto::chain_key_type_wire}),
+                         sysio::chain::plugin_config_exception, expect_immutable);
+}
+
 BOOST_AUTO_TEST_CASE(announcement_registry_is_idempotent_and_queryable) {
    sysio::sigprov::announce_scheme_plugin("T8SCHEME", "sysio::first_plugin");
    // Re-announce (as repeated plugin construction across scoped_app instances

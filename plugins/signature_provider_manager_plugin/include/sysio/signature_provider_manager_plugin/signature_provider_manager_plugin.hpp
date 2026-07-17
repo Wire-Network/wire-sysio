@@ -90,6 +90,14 @@ inline std::string redact_signature_provider_spec(const std::string& spec) {
  * - Management of named and anonymous providers
  * - Query interface for finding providers by various criteria
  * - Support for multiple chain types and key formats
+ *
+ * Concurrency contract: the provider set is IMMUTABLE AFTER STARTUP. Every
+ * mutator (`create_provider`, `register_spec_handler`,
+ * `create_configured_providers`, `register_default_signature_providers`)
+ * asserts it is called before this plugin has started; all mutation happens
+ * on the main thread during the sequential initialize/startup phases.
+ * Runtime access from other threads is read-only and therefore needs no
+ * synchronization.
  */
 class signature_provider_manager_plugin : public appbase::plugin<signature_provider_manager_plugin> {
 public:
@@ -283,6 +291,17 @@ public:
    std::vector<fc::crypto::signature_provider_ptr> create_configured_providers(const std::string& scheme);
 
 private:
+   /**
+    * Enforce the immutable-after-startup contract at the mutator boundary:
+    * throws `plugin_config_exception` unless this plugin is still in the
+    * `registered` or `initialized` state. A future runtime spec-reload
+    * feature must remove this (and add the synchronization the containers
+    * currently need none of) rather than work around it.
+    *
+    * @param operation the public mutator's name, for the error message
+    */
+   void assert_pre_startup(std::string_view operation) const;
+
    std::unique_ptr<class signature_provider_manager_plugin_impl> my;
 };
 
@@ -296,10 +315,12 @@ namespace sigprov {
  * present even for plugins that are never enabled -- which is exactly when
  * they matter, letting the manager's unclaimed-spec boot error name the
  * `plugin =` line the operator forgot. Process-wide (a static registry, NOT
- * per-application state -- the mapping is a fact about the binary), thread-
- * safe, and idempotent via insert-or-assign because test binaries construct
- * plugin objects repeatedly across scoped_app instances. Used ONLY to improve
- * error text; never for control flow.
+ * per-application state -- the mapping is a fact about the binary) and
+ * idempotent via insert-or-assign because test binaries construct plugin
+ * objects repeatedly across scoped_app instances. Deliberately
+ * unsynchronized: writes (plugin construction) and reads (boot diagnostics)
+ * all happen on the main thread in sequential appbase lifecycle phases. Used
+ * ONLY to improve error text; never for control flow.
  *
  * @param scheme      the `<provider-type>` token (e.g. "SSM"); case-sensitive
  * @param plugin_name the providing plugin's demangled name as `--plugin`
