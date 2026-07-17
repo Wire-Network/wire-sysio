@@ -9,28 +9,21 @@ constexpr std::string_view ssm_spec_scheme = "SSM";
 } // namespace
 
 signature_provider_ssm_plugin::signature_provider_ssm_plugin() {
-   // Constructor-time announcement: appbase constructs every registered
-   // plugin before any plugin_initialize runs, so this executes even when the
-   // plugin is never enabled -- which is when it matters, letting the
-   // manager's unclaimed-spec boot error name the missing `plugin =` line.
-   // Error-text only; the handler registration happens in plugin_initialize.
-   sigprov::announce_scheme_plugin(ssm_spec_scheme, name());
+   // Register the SSM handler at construction. appbase constructs every
+   // registered plugin before it initializes any, so the manager sees this
+   // handler at its own plugin_initialize and creates the configured SSM
+   // providers there -- before any consumer -- if this plugin is enabled via
+   // --plugin. Registering is cheap and side-effect-free (no AWS, no
+   // network): the SecureString fetch happens only when the manager actually
+   // creates a provider from an SSM: spec.
+   sigprov::register_scheme_handler(ssm_spec_scheme, &sysio::sigprov::ssm::create_ssm_provider, name());
 }
 
 signature_provider_ssm_plugin::~signature_provider_ssm_plugin() = default;
 
 void signature_provider_ssm_plugin::set_program_options(options_description&, options_description&) {}
 
-void signature_provider_ssm_plugin::plugin_initialize(const variables_map&) {
-   // Dependency-first initialization guarantees the manager has already
-   // parsed --signature-provider and retained any SSM: specs; register the
-   // scheme, then claim those specs. The claim performs the one-time
-   // SecureString fetch per spec -- a fetch or validation failure throws out
-   // of this plugin's initialize and aborts boot with the AWS error.
-   auto& manager = app().get_plugin<signature_provider_manager_plugin>();
-   manager.register_spec_handler(std::string{ssm_spec_scheme}, &sysio::sigprov::ssm::create_ssm_provider);
-   manager.create_configured_providers(ssm_spec_scheme);
-}
+void signature_provider_ssm_plugin::plugin_initialize(const variables_map&) {}
 
 void signature_provider_ssm_plugin::plugin_startup() {}
 

@@ -15,6 +15,7 @@
 
 #include <sysio/chain/exceptions.hpp>
 #include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
+#include <sysio/signature_provider_ssm_plugin/signature_provider_ssm_plugin.hpp>
 #include <sysio/signature_provider_ssm_plugin/ssm_signature_provider.hpp>
 
 #include <fc/crypto/chain_types_reflect.hpp>
@@ -123,11 +124,15 @@ BOOST_AUTO_TEST_CASE(create_provider_malformed_ssm_spec_throws_through_dispatch)
    BOOST_CHECK_THROW(tester->plugin().create_provider(spec), chain::plugin_config_exception);
 }
 
-BOOST_AUTO_TEST_CASE(unregistered_ssm_scheme_is_unknown_provider_type) {
-   // Without a registration (the state of any binary whose main() does not
-   // opt in), an SSM: spec fails with the unknown-scheme hint.
+BOOST_AUTO_TEST_CASE(unenabled_ssm_scheme_names_the_plugin) {
+   // The plugin is linked (its constructor registers the SSM handler) but the
+   // operator did not enable it via --plugin: an SSM: spec fails with an error
+   // naming the exact `plugin =` line to add. Construct the plugin explicitly
+   // so the sigprov registry has SSM regardless of test order; do NOT pass
+   // --plugin, so it stays unenabled.
    ssm_routing_tester tester;
    tester.app->_register_plugin<sysio::signature_provider_manager_plugin>();
+   tester.app->_register_plugin<sysio::signature_provider_ssm_plugin>();
    std::vector<const char*> argv{"test_signature_provider_ssm_plugin"};
    BOOST_CHECK(tester.app->initialize<sysio::signature_provider_manager_plugin>(
       argv.size(), const_cast<char**>(argv.data())));
@@ -138,7 +143,8 @@ BOOST_AUTO_TEST_CASE(unregistered_ssm_scheme_is_unknown_provider_type) {
                                                    "SSM:us-east-1:/wire/test/bp1");
    BOOST_CHECK_EXCEPTION(tester.plugin().create_provider(spec), chain::plugin_config_exception,
                          [](const fc::exception& e) {
-                            return e.to_detail_string().find("Unknown provider type") != std::string::npos;
+                            return e.to_detail_string().find(
+                                      "plugin = sysio::signature_provider_ssm_plugin") != std::string::npos;
                          });
 }
 

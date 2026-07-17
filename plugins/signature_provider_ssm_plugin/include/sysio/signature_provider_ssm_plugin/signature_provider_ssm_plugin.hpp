@@ -16,14 +16,13 @@ using namespace appbase;
  *
  *   plugin = sysio::signature_provider_ssm_plugin
  *
- * `plugin_initialize` registers the `SSM` spec handler with the manager and
- * then claims the configured `SSM:` specs (the one-time Parameter Store
- * fetch happens inside that claim; a fetch or validation failure aborts boot
- * here, attributed to this plugin). The constructor announces the scheme so
- * the manager's unclaimed-spec boot error can name this plugin -- and the
- * exact `plugin =` line to add -- even when it is registered but not
- * enabled. See `ssm_signature_provider.hpp` for the provider machinery and
- * `test/README.md` for the operator runbook.
+ * The constructor registers the `SSM` handler with the manager (via
+ * `sigprov::register_scheme_handler`); the manager creates the configured
+ * `SSM:` providers at its own init when this plugin is enabled, so the
+ * one-time Parameter Store fetch happens there and a fetch/validation failure
+ * aborts boot with the AWS error. `plugin_initialize` is empty. See
+ * `ssm_signature_provider.hpp` for the provider machinery and `test/README.md`
+ * for the operator runbook.
  */
 class signature_provider_ssm_plugin : public appbase::plugin<signature_provider_ssm_plugin> {
 public:

@@ -16,19 +16,17 @@ using namespace appbase;
  *
  *   plugin = sysio::signature_provider_kms_plugin
  *
- * `plugin_initialize` registers the `KMS` spec handler with the manager and
- * then claims the configured `KMS:` specs. Claiming stays offline; every
- * claimed key attaches a startup probe -- a (free) `GetPublicKey` call the
- * manager runs at startup -- so a credentials / region / IAM / pinned-key
- * misconfiguration fails at boot instead of on the first sign. There is
- * deliberately no flag to skip the probe: a transient AWS error at startup
- * is logged and deferred to the lazy first-sign check (a blip never blocks
- * a boot), and a permanent one means the configured signer could never
- * sign. The constructor announces the scheme so the manager's
- * unclaimed-spec boot error can name this plugin -- and the exact
- * `plugin =` line to add -- even when it is registered but not enabled. See
- * `kms_signature_provider.hpp` for the provider machinery and
- * `test/README.md` for the operator runbook.
+ * The constructor registers the `KMS` handler with the manager (via
+ * `sigprov::register_scheme_handler`); the manager creates the configured
+ * `KMS:` providers at its own init when this plugin is enabled. Creation is
+ * offline, and every created key attaches a startup probe -- a (free)
+ * `GetPublicKey` call the manager runs at startup -- so a credentials /
+ * region / IAM / pinned-key misconfiguration fails at boot instead of on the
+ * first sign. There is deliberately no flag to skip the probe: a transient
+ * AWS error is logged and deferred to the lazy first-sign check (a blip never
+ * blocks a boot), and a permanent one means the signer could never sign.
+ * `plugin_initialize` is empty. See `kms_signature_provider.hpp` for the
+ * provider machinery and `test/README.md` for the operator runbook.
  */
 class signature_provider_kms_plugin : public appbase::plugin<signature_provider_kms_plugin> {
 public:

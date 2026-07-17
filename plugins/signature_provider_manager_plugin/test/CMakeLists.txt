@@ -10,7 +10,7 @@ add_executable(
         ${TARGET_NAME}
         main.cpp
         test_create_provider_specs.cpp
-        test_spec_retain_claim.cpp
+        test_extension_schemes.cpp
 )
-target_link_libraries(${TARGET_NAME} PRIVATE signature_provider_manager_plugin sysio_testing sysio_chain_wrap Boost::process Boost::dll)
+target_link_libraries(${TARGET_NAME} PRIVATE signature_provider_manager_plugin sysio_testing sysio_chain_wrap)
 add_test(NAME ${TARGET_NAME} COMMAND ${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})

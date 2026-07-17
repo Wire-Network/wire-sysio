@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <cstdint>
 #include <filesystem>
+#include <set>
 
 #include <sysio/chain/types.hpp>
 #include <sysio/chain/exceptions.hpp>
@@ -26,37 +27,9 @@ namespace {
 constexpr auto option_name_kiod_timeout = "signature-provider-kiod-timeout";
 
 /// The two built-in `<provider-type>:` schemes, handled directly by this
-/// plugin (never through `_spec_handlers`, never registrable).
+/// plugin (never through the handler registries, never registrable).
 constexpr std::string_view scheme_key  = "KEY";
 constexpr std::string_view scheme_kiod = "KIOD";
-
-/**
- * Best-effort extraction of a spec's non-built-in `<provider-type>` scheme.
- *
- * Splits the 4/5-field `--signature-provider` spec, takes the final
- * (provider) field, and returns the token before its first `:`. Returns
- * nullopt for the built-in `KEY`/`KIOD` schemes and for ANY malformation
- * (wrong field count, missing/empty scheme) -- malformed specs must fall
- * through to the eager `create_provider` path so they throw today's
- * canonical errors, not a retained-spec error.
- *
- * @param spec the full spec exactly as configured
- * @return the extension scheme token, or nullopt (built-in or malformed)
- */
-std::optional<std::string> extract_extension_scheme(const std::string& spec) {
-   constexpr std::size_t max_spec_fields = 5;
-   auto parts = fc::split(spec, ',', max_spec_fields);
-   if (parts.size() != 4 && parts.size() != max_spec_fields)
-      return std::nullopt;
-   const auto& provider = parts.back();
-   const auto colon = provider.find(':');
-   if (colon == std::string::npos || colon == 0)
-      return std::nullopt;
-   auto scheme = provider.substr(0, colon);
-   if (scheme == scheme_key || scheme == scheme_kiod)
-      return std::nullopt;
-   return scheme;
-}
 
 std::filesystem::path default_signature_provider_spec_file() {
    return app().config_dir() / "default_signature_providers.json";
@@ -87,33 +60,35 @@ void restrict_file_to_owner(const std::filesystem::path& file_path) {
 namespace sigprov {
 namespace {
 /**
- * Backing store for the scheme -> providing-plugin announcements. A Meyers
- * static rather than plugin-instance state: provider-plugin constructors run
- * while appbase is still constructing registered plugins -- possibly before
- * the manager instance exists -- and the mapping is a fact about the binary,
- * not about any one application instance (test binaries tear applications
- * down and reconstruct plugins; the announcement legitimately survives).
+ * Backing store for scheme -> {handler, providing-plugin} registrations. A
+ * Meyers static rather than plugin-instance state: provider-plugin
+ * constructors run while appbase is still constructing registered plugins --
+ * possibly before the manager instance exists -- and the mapping is a fact
+ * about the binary, not about any one application instance (test binaries
+ * tear applications down and reconstruct plugins; the registration
+ * legitimately survives).
  *
  * Unsynchronized on purpose: every access is on the main thread in
  * sequential appbase lifecycle phases -- writes from plugin constructors
  * (processed one at a time inside `initialize<>`), reads from the manager's
- * boot diagnostics at initialize/startup.
+ * `plugin_initialize`.
  */
-std::map<std::string, std::string, std::less<>>& scheme_plugin_registry() {
-   static std::map<std::string, std::string, std::less<>> registry;
+std::map<std::string, scheme_handler_entry, std::less<>>& scheme_handler_registry() {
+   static std::map<std::string, scheme_handler_entry, std::less<>> registry;
    return registry;
 }
 } // namespace
 
-void announce_scheme_plugin(std::string_view scheme, std::string_view plugin_name) {
-   scheme_plugin_registry().insert_or_assign(std::string{scheme}, std::string{plugin_name});
+void register_scheme_handler(std::string_view scheme, spec_handler handler, std::string_view plugin_name) {
+   scheme_handler_registry().insert_or_assign(
+      std::string{scheme}, scheme_handler_entry{.handler = std::move(handler), .plugin_name = std::string{plugin_name}});
 }
 
-std::optional<std::string> announced_scheme_plugin(std::string_view scheme) {
-   const auto& registry = scheme_plugin_registry();
+const scheme_handler_entry* find_scheme_handler(std::string_view scheme) {
+   const auto& registry = scheme_handler_registry();
    if (auto it = registry.find(scheme); it != registry.end())
-      return it->second;
-   return std::nullopt;
+      return &it->second;
+   return nullptr;
 }
 } // namespace sigprov
 
@@ -125,6 +100,23 @@ public:
     * `kiod` request timeout
     */
    fc::microseconds _kiod_provider_timeout_us;
+
+   /**
+    * Record which optional provider plugins the operator enabled, parsed from
+    * `options["plugin"]` exactly as appbase's own --plugin handling (a
+    * composing option whose values may each carry several names split on
+    * space/tab/comma). Gates the process-wide `sigprov` handler registry: an
+    * extension scheme is honored only when its owning plugin is enabled.
+    */
+   void record_enabled_plugins(const variables_map& options) {
+      if (!options.count("plugin"))
+         return;
+      for (const auto& arg : options.at("plugin").as<std::vector<std::string>>()) {
+         std::vector<std::string> names;
+         boost::split(names, arg, boost::is_any_of(" \t,"));
+         _enabled_plugins.insert(names.begin(), names.end());
+      }
+   }
 
    fc::crypto::sign_fn make_kiod_signature_provider(const string& url_str, const chain::public_key_type& pubkey) const {
       fc::url kiod_url;
@@ -198,22 +190,31 @@ public:
          return {.signer = make_kiod_signature_provider(spec_data, public_key)};
       }
 
-      // Any other scheme resolves through `_spec_handlers` -- populated by a
-      // provider plugin's `plugin_initialize` (the packaged path) or by a
-      // host application's `main()` before `app().initialize(...)`. The
-      // handler owns parsing its own `spec_data`. If a handler returns a
+      // Any other scheme resolves through a registered handler, from one of
+      // two sources. First, `_spec_handlers`: handlers a host application (or
+      // a test) registered directly via `register_spec_handler` -- explicit,
+      // so ungated. Second, the process-wide `sigprov` registry a provider
+      // plugin populated from its constructor: honored only when that plugin
+      // is enabled via `--plugin` (recorded in `_enabled_plugins`). The
+      // handler owns parsing its own `spec_data`; if it returns a
       // `startup_probe`, the caller (`create_provider`) appends it to
       // `_startup_probes` only after `set_provider` succeeds, so a provider
       // rejected as a duplicate never leaves an orphan probe behind.
       if (auto it = _spec_handlers.find(spec_type_str); it != _spec_handlers.end()) {
          return it->second(key_type, public_key, spec_data);
       }
+      if (const auto* entry = sigprov::find_scheme_handler(spec_type_str)) {
+         SYS_ASSERT(_enabled_plugins.contains(entry->plugin_name), chain::plugin_config_exception,
+                    "Signature-provider scheme \"{}\" is provided by plugin \"{}\", which is built into this "
+                    "binary but not enabled. Add \"plugin = {}\" to the config file (or pass --plugin {}).",
+                    spec_type_str, entry->plugin_name, entry->plugin_name, entry->plugin_name);
+         return entry->handler(key_type, public_key, spec_data);
+      }
 
       SYS_THROW(chain::plugin_config_exception,
-                "Unknown provider type \"{}\". Built-in types are KEY and KIOD; "
-                "additional types (e.g. KMS, SSM) are provided by optional "
-                "signature-provider plugins (enable with `plugin = ...`) "
-                "-- this binary has no registration for \"{}\".",
+                "Unknown provider type \"{}\". Built-in types are KEY and KIOD; additional types "
+                "(e.g. KMS, SSM) are provided by optional signature-provider plugins (enable with "
+                "`plugin = ...`) -- no plugin in this binary provides \"{}\".",
                 spec_type_str, spec_type_str);
    }
 
@@ -340,17 +341,15 @@ public:
 
       // Record every parsed spec before creating any provider, so a creation
       // failure part-way through never leaves the specs map missing entries
-      // that were present on disk.
-      std::map<fc::crypto::chain_key_type_t, std::string> loaded;
+      // that were present on disk (the guard above proves the member is empty
+      // on entry, so these inserts are the whole map).
       for (const auto& item : vo) {
-         auto key_type_str = item.key();
          auto spec = item.value().as_string();
-         auto key_type = fc::crypto::chain_key_type_reflector::from_string(key_type_str.c_str());
-         loaded[key_type] = spec;
+         auto key_type = fc::crypto::chain_key_type_reflector::from_string(item.key().c_str());
          _default_signature_provider_specs[key_type] = spec;
       }
 
-      for (const auto& [key_type, spec] : loaded) {
+      for (const auto& [key_type, spec] : _default_signature_provider_specs) {
          create_provider(spec);
       }
    }
@@ -358,12 +357,6 @@ public:
    void register_default_signature_providers(const vector<fc::crypto::chain_key_type_t>& key_types) {
       static constexpr std::array supported_key_types = {fc::crypto::chain_key_type_wire,
                                                          fc::crypto::chain_key_type_wire_bls};
-
-      // A retained spec means this boot is already doomed (throw_if_unclaimed_specs
-      // fails plugin_startup); bail out BEFORE the default-generation below can
-      // create -- and persist to default_signature_providers.json -- an anonymous
-      // key the operator never asked for and later boots would silently re-load.
-      throw_if_unclaimed_specs();
 
       // Initialize-phase API: called from chain_plugin's plugin_initialize, and
       // appbase runs plugin initializes sequentially on the main thread, so the
@@ -445,90 +438,6 @@ public:
       return create_provider(key_name, kind, key_type, public_key_text, private_key_provider_spec);
    }
 
-   /**
-    * `plugin_initialize`'s per-spec entry point: create the provider when the
-    * spec's scheme is resolvable now (built-in, or registered pre-init by a
-    * host `main()`), otherwise retain it for the scheme's provider plugin to
-    * claim via `create_configured_providers()`. Malformed specs are NOT
-    * retained -- `extract_extension_scheme` returns nullopt for them, so they
-    * fall through to `create_provider` and throw its canonical errors.
-    *
-    * @param spec the full spec exactly as configured
-    * @return the created provider, or null when the spec was retained
-    */
-   fc::crypto::signature_provider_ptr create_or_retain_provider(const std::string& spec) {
-      if (auto scheme = extract_extension_scheme(spec)) {
-         if (!_spec_handlers.contains(*scheme)) {
-            dlog("Retaining signature provider spec until a \"{}\" handler is registered: {}",
-                 *scheme, redact_signature_provider_spec(spec));
-            _unclaimed_specs.push_back({.scheme = std::move(*scheme), .raw_spec = spec});
-            return nullptr;
-         }
-      }
-      return create_provider(spec);
-   }
-
-   std::vector<fc::crypto::signature_provider_ptr> create_configured_providers(std::string_view scheme) {
-      // Consume the matching retained specs first, then create: creation can
-      // throw (bad pubkey, failed remote fetch), and a spec that reached its
-      // owning plugin must not linger to be double-reported by the startup
-      // accounting -- the creation error itself aborts the boot.
-      std::vector<unclaimed_spec> to_create;
-      auto matches = [&](const unclaimed_spec& s) { return s.scheme == scheme; };
-      std::ranges::copy_if(_unclaimed_specs, std::back_inserter(to_create), matches);
-      std::erase_if(_unclaimed_specs, matches);
-
-      std::vector<fc::crypto::signature_provider_ptr> created;
-      created.reserve(to_create.size());
-      for (const auto& s : to_create) {
-         dlog("Creating retained \"{}\" signature provider spec: {}",
-              scheme, redact_signature_provider_spec(s.raw_spec));
-         created.push_back(create_provider(s.raw_spec));
-      }
-      return created;
-   }
-
-   /**
-    * Fail the boot if any retained spec was never claimed. Called from
-    * `plugin_startup()` and -- earlier, to prevent the anonymous-default-key
-    * side effect -- from `register_default_signature_providers()`. Three
-    * diagnoses per spec: the scheme's handler is registered but its plugin
-    * never claimed (plugin bug); the scheme was announced by a plugin that
-    * is not enabled (names the exact `plugin =` remediation); or nothing in
-    * this binary provides the scheme at all.
-    */
-   void throw_if_unclaimed_specs() {
-      if (_unclaimed_specs.empty()) {
-         return;
-      }
-
-      std::string detail;
-      for (const auto& s : _unclaimed_specs) {
-         const auto redacted = redact_signature_provider_spec(s.raw_spec);
-         if (_spec_handlers.contains(s.scheme)) {
-            detail += std::format(
-               "  - scheme \"{}\" (spec: {}): its handler is registered, but the providing plugin "
-               "never created the configured providers (missing create_configured_providers(\"{}\") "
-               "call).\n",
-               s.scheme, redacted, s.scheme);
-         } else if (auto owner = sigprov::announced_scheme_plugin(s.scheme)) {
-            detail += std::format(
-               "  - scheme \"{}\" (spec: {}) is provided by plugin \"{}\", which is built into this "
-               "binary but not enabled. Add \"plugin = {}\" to the config file (or pass "
-               "--plugin {}).\n",
-               s.scheme, redacted, *owner, *owner, *owner);
-         } else {
-            detail += std::format(
-               "  - scheme \"{}\" (spec: {}): no plugin in this binary provides this scheme "
-               "(built-in schemes are KEY and KIOD).\n",
-               s.scheme, redacted);
-         }
-      }
-      SYS_THROW(chain::plugin_config_exception,
-                "{} --signature-provider spec(s) name a provider scheme with no created provider:\n{}",
-                _unclaimed_specs.size(), detail);
-   }
-
    fc::crypto::signature_provider_ptr create_provider(const std::string& key_name,
                                                       fc::crypto::chain_kind_t target_chain,
                                                       fc::crypto::chain_key_type_t key_type,
@@ -581,14 +490,14 @@ public:
    }
 
    /**
-    * Register a `<provider-type>:` scheme handler.
+    * Register a `<provider-type>:` scheme handler directly on this instance.
     *
     * Built-in `KEY` and `KIOD` are not registrable. Each non-built-in scheme
-    * may be registered at most once. A pure map insert with no side effects:
-    * provider plugins pair it with `create_configured_providers()` from
-    * their `plugin_initialize`; host applications may instead call it from
-    * `main()` before `app().initialize(...)`, in which case matching specs
-    * create eagerly at parse time and no claim step is involved.
+    * may be registered at most once. This is the explicit host-application /
+    * test path: a handler registered here is ungated (no `--plugin` check).
+    * Provider PLUGINS do not use this -- they register in the process-wide
+    * `sigprov` registry from their constructor, which the manager gates on
+    * the `--plugin` enable list.
     */
    void register_spec_handler(std::string scheme, sysio::spec_handler handler) {
       FC_ASSERT(!scheme.empty(), "spec handler scheme must not be empty");
@@ -626,10 +535,9 @@ public:
     * the first sign through whatever one-shot guard the handler attaches.
     */
    void run_startup_probes() {
-      // Drain the probe list under the lock. Moving it out both hands the
-      // network-bound probes a private copy to run without holding the
-      // providers mutex, and empties the member so the one-shot nature of
-      // the startup check is structural rather than just documented.
+      // Move the probe list out before running it, so the one-shot nature of
+      // the startup check is structural (the member is emptied) rather than
+      // just documented -- a second plugin_startup runs nothing.
       auto probes = std::exchange(_startup_probes, {});
       if (probes.empty()) {
          return;
@@ -680,23 +588,14 @@ private:
    std::map<fc::crypto::chain_key_type_t, std::string> _default_signature_provider_specs{};
 
    /**
-    * A `--signature-provider` spec whose `<provider-type>` scheme had no
-    * registered handler when `plugin_initialize` parsed it. Retained instead
-    * of thrown: the provider plugin that supplies the scheme initializes
-    * after this plugin (it depends on it) and claims its specs via
-    * `create_configured_providers()`. Anything still here after the
-    * initialize phase fails the boot (see `throw_if_unclaimed_specs`).
+    * The provider plugins the operator enabled via `--plugin`, populated at
+    * `plugin_initialize` from `options["plugin"]`. An extension scheme
+    * registered in the process-wide `sigprov` handler registry (from a
+    * provider plugin's constructor) is honored only when its owning plugin is
+    * in this set -- that is the `--plugin` gate.
     */
-   struct unclaimed_spec {
-      std::string scheme;   ///< extracted `<provider-type>`, e.g. "SSM"
-      std::string raw_spec; ///< the full spec exactly as configured
-   };
+   std::set<std::string> _enabled_plugins{};
 
-   /**
-    * Retained specs awaiting their scheme's provider plugin, in config
-    * order.
-    */
-   std::vector<unclaimed_spec> _unclaimed_specs{};
    /**
     * Internal map for storing signature providers
     */
@@ -711,11 +610,11 @@ private:
    std::vector<std::function<void()>> _startup_probes{};
 
    /**
-    * Spec-handler registry for non-built-in `<provider-type>:` schemes.
-    * Populated by `register_spec_handler()` -- from a provider plugin's
-    * `plugin_initialize` or a host application's `main()`. Looked up in
-    * `create_provider_from_spec` when the scheme is neither `KEY` nor
-    * `KIOD`.
+    * Non-built-in `<provider-type>:` handlers registered directly on this
+    * instance via `register_spec_handler()` -- the explicit host-application
+    * / test path (ungated). Provider PLUGINS instead register in the
+    * process-wide `sigprov` registry from their constructor;
+    * `create_provider_from_spec` consults this map first, then that registry.
     */
    std::map<std::string, sysio::spec_handler> _spec_handlers{};
 };
@@ -777,25 +676,28 @@ void signature_provider_manager_plugin::plugin_initialize(const variables_map& o
    if (options.contains(option_name_kiod_timeout))
       my->_kiod_provider_timeout_us = fc::milliseconds(options.at(option_name_kiod_timeout).as<int32_t>());
 
+   // Record which optional provider plugins the operator enabled, so an
+   // extension scheme (SSM/KMS) is honored only when its plugin is enabled.
+   my->record_enabled_plugins(options);
+
+   // Create every configured provider now, eagerly. This runs before any
+   // consumer (they all APPBASE_PLUGIN_REQUIRES this plugin), so the full
+   // provider set exists by the time chain_plugin / producer_plugin / the
+   // outposts look -- independent of --plugin order. A malformed spec,
+   // unknown scheme, not-enabled provider plugin, or provider-construction
+   // failure throws here and aborts the boot.
    if (options.contains(option_name_provider)) {
       auto specs = options.at(option_name_provider).as<std::vector<std::string>>();
       for (const auto& spec : specs) {
          dlog("Registering signature provider from spec: {}", redact_signature_provider_spec(spec));
-         if (auto provider = my->create_or_retain_provider(spec)) {
-            dlog("Registered signature provider ({}): {}",
-                 provider->key_name, provider->public_key.to_string({}));
-         }
+         auto provider = my->create_provider(spec);
+         dlog("Registered signature provider ({}): {}",
+              provider->key_name, provider->public_key.to_string({}));
       }
    }
 }
 
 void signature_provider_manager_plugin::plugin_startup() {
-   // Unclaimed-spec accounting first: every retained spec must have been
-   // claimed by its scheme's provider plugin during the initialize phase;
-   // anything left here is a misconfiguration (typically a missing
-   // `plugin =` line, which the error names) and fails the boot.
-   my->throw_if_unclaimed_specs();
-
    // Startup-probe pass for any provider whose handler attached a probe
    // (today: KMS). A permanent probe failure throws here and aborts startup
    // loudly; transient failures defer to the lazy first-sign check.
@@ -846,12 +748,6 @@ void signature_provider_manager_plugin::register_spec_handler(
    std::string scheme, sysio::spec_handler handler) {
    assert_pre_startup("register_spec_handler");
    my->register_spec_handler(std::move(scheme), std::move(handler));
-}
-
-std::vector<fc::crypto::signature_provider_ptr>
-signature_provider_manager_plugin::create_configured_providers(std::string_view scheme) {
-   assert_pre_startup("create_configured_providers");
-   return my->create_configured_providers(scheme);
 }
 
 
