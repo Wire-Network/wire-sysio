@@ -605,10 +605,10 @@ void signature_provider_manager_plugin::set_program_options(options_description&
       "Signature provider spec formatted as (check docs for details): "
       "`<name>,<chain-kind>,<key-type>,<public-key>,<private-key-provider-spec>`. "
       "Provider types KEY:<private-key> and KIOD:<url> are built in; additional "
-      "schemes are provided by optional signature-provider plugins -- e.g. "
-      "`plugin = sysio::signature_provider_ssm_plugin` for SSM:<region>:<parameter-name> "
-      "(key fetched once from AWS SSM Parameter Store at startup) and "
-      "`plugin = sysio::signature_provider_kms_plugin` for KMS:<key-ref> "
+      "schemes are provided by optional signature-provider plugins, enabled with a "
+      "`plugin =` line: `plugin = sysio::signature_provider_ssm_plugin` for "
+      "SSM:<region>:<parameter-name> (key fetched once from AWS SSM Parameter Store "
+      "at startup); `plugin = sysio::signature_provider_kms_plugin` for KMS:<key-ref> "
       "(remote signing via AWS KMS).");
 }
 
