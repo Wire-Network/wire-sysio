@@ -27,10 +27,14 @@
 #include <fc-test/build_info.hpp>
 #include <fc-test/crypto_utils.hpp>
 
+#include "sig_provider_tester.hpp"
+
 using sysio::signature_provider_manager_plugin;
 using sysio::chain::private_key_type;
 using sysio::chain::public_key_type;
 using namespace fc::test;
+using sysio::sigprov::test::create_app;
+using sysio::sigprov::test::sig_provider_tester;
 
 namespace {
 
@@ -38,59 +42,20 @@ namespace bp = boost::process;
 namespace bfs = boost::filesystem;
 
 /**
- * Sig provider tester app resources
- */
-struct sig_provider_tester {
-
-   appbase::scoped_app app{};
-
-   signature_provider_manager_plugin& plugin() { return app->get_plugin<signature_provider_manager_plugin>(); }
-};
-
-/**
- * Creates a tester/app scoped instance
- *
- * @tparam args additional args to pass to `scoped_app`
- * @return `unique_ptr<sig_provider_tester>`
- */
-
-// Overload that accepts a vector of strings for arguments
-std::unique_ptr<sig_provider_tester> create_app(const std::vector<std::string>& args) {
-   auto tester = std::make_unique<sig_provider_tester>();
-
-   // Build argv as vector<char*> pointing to the underlying string buffers
-   std::vector<const char*> argv;
-   argv.reserve(args.size() + 1);
-   argv.push_back("test_signature_provider_manager_plugin"); // program name
-   for (auto& s : args) {
-      argv.push_back(s.c_str());
-   }
-
-   BOOST_CHECK(tester->app->initialize<sysio::signature_provider_manager_plugin>(argv.size(), const_cast<char**>(argv.data())));
-
-   return tester;
-}
-
-template <typename... Args>
-   requires((std::same_as<std::decay_t<Args>, std::string>) && ...)
-std::unique_ptr<sig_provider_tester> create_app(Args&&... extra_args) {
-   std::vector<std::string> args_vec = {std::forward<Args>(extra_args)...};
-   return create_app(args_vec);
-}
-
-/**
  * Build and initialize a tester with a `PROBE:` spec handler whose returned
  * provider carries `probe_body` as its `startup_probe`. The handler's signer
  * is a trivial stub (never invoked by these tests). `enable_startup_check`
- * toggles the `signature-provider-kms-startup-check` option so the caller can
- * exercise both the enabled and the disabled `plugin_startup()` paths.
+ * calls `enable_startup_probes()` -- the same manager entry point the kms
+ * plugin invokes when its `signature-provider-kms-startup-check` option is
+ * set -- so the caller can exercise both the enabled and the disabled
+ * `plugin_startup()` paths.
  *
  * The handler is registered via `_register_plugin<>` BEFORE `initialize<>`, so
  * it is in place by the time any provider spec is parsed -- mirroring how a
  * host application registers a real extension handler in `main()`.
  *
  * @param probe_body          callback the registered provider's startup probe runs
- * @param enable_startup_check pass the startup-check option when true
+ * @param enable_startup_check enable the manager's startup-probe pass when true
  * @return an initialized tester ready for `create_provider` / `plugin_startup`
  */
 std::unique_ptr<sig_provider_tester> make_probe_tester(std::function<void()> probe_body,
@@ -105,11 +70,11 @@ std::unique_ptr<sig_provider_tester> make_probe_tester(std::function<void()> pro
                  .private_key   = std::nullopt,
                  .startup_probe = body};
       });
+   if (enable_startup_check) {
+      mgr.enable_startup_probes();
+   }
 
    std::vector<const char*> argv{"test_signature_provider_manager_plugin"};
-   if (enable_startup_check) {
-      argv.push_back("--signature-provider-kms-startup-check=1");
-   }
    BOOST_CHECK(tester->app->initialize<signature_provider_manager_plugin>(
       argv.size(), const_cast<char**>(argv.data())));
    return tester;
@@ -492,11 +457,13 @@ BOOST_AUTO_TEST_CASE(register_spec_handler_rejects_builtin_and_duplicates) {
 // Startup-probe pass (plugin_startup -> run_startup_probes)
 //
 // A spec handler may attach a `startup_probe` to its result; the plugin runs
-// every such probe from plugin_startup() when the opt-in
-// `signature-provider-kms-startup-check` option is set. These cases drive that
-// machinery with a mock handler -- no AWS, no network -- to pin its branchy
-// control flow: transient failures are deferred, permanent failures abort
-// startup, a disabled check skips the probes, and the probe list is one-shot.
+// every such probe from plugin_startup() when a probe-owning caller enabled
+// the pass via enable_startup_probes() (the kms plugin does so when its
+// `signature-provider-kms-startup-check` option is set). These cases drive
+// that machinery with a mock handler -- no AWS, no network -- to pin its
+// branchy control flow: transient failures are deferred, permanent failures
+// abort startup, a disabled check skips the probes, and the probe list is
+// one-shot.
 // ---------------------------------------------------------------------------
 
 BOOST_AUTO_TEST_CASE(startup_probe_transient_failure_is_deferred_not_fatal) {

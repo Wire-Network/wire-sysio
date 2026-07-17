@@ -33,7 +33,9 @@ scheme. The parameter's **value** is exactly the string that would follow
 base58 for solana. Leading/trailing whitespace (a trailing newline from
 `put-parameter --value "$(cat key.txt)"`) is trimmed.
 
-nodeop registers the scheme; nothing AWS runs unless a spec uses `SSM:`.
+Enable the scheme with `plugin = sysio::signature_provider_ssm_plugin` (or
+`--plugin` on the command line); an `SSM:` spec without the plugin line fails
+the boot with an error naming it. Nothing AWS runs unless a spec uses `SSM:`.
 
 ## One-time parameter setup
 
@@ -108,7 +110,7 @@ export SSM_LIVE_SPEC='us-east-1:/wire/ci/test-key'   # or the full parameter ARN
 export SSM_LIVE_PUBKEY='SYS...'                       # native-form public key
 export SSM_LIVE_KEY_TYPE='wire'                       # optional; default wire
 
-$BUILD_DIR/plugins/signature_provider_manager_plugin/test/test_sigprov_ssm \
+$BUILD_DIR/plugins/signature_provider_ssm_plugin/test/test_signature_provider_ssm_plugin \
     --run_test=ssm_live
 ```
 

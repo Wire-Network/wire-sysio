@@ -99,6 +99,11 @@ int main(int argc, char* argv[]) {
 
       // auto& sig_plug = app->get_plugin<sysio::signature_provider_manager_plugin>();
       auto& eth_plug = app().get_plugin<sysio::outpost_ethereum_client_plugin>();
+      // Clients are constructed at plugin_startup (provider resolution is
+      // deferred past the initialize phase); this tool never enters the
+      // appbase exec loop, so start the plugin subtree explicitly --
+      // dependency-ordered, exactly as production startup would.
+      eth_plug.startup();
       auto client_entry = eth_plug.get_clients()[0];
       auto& client = client_entry->client;
 

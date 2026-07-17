@@ -15,7 +15,7 @@
 
 #include <sysio/chain/exceptions.hpp>
 #include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
-#include <sysio/signature_provider_manager_plugin/ssm_signature_provider.hpp>
+#include <sysio/signature_provider_ssm_plugin/ssm_signature_provider.hpp>
 
 #include <fc/crypto/chain_types_reflect.hpp>
 #include <fc/crypto/key_serdes.hpp>
@@ -65,7 +65,7 @@ std::unique_ptr<ssm_routing_tester> create_ssm_routing_app(std::string value) {
             });
       });
 
-   std::vector<const char*> argv{"test_sigprov_ssm"};
+   std::vector<const char*> argv{"test_signature_provider_ssm_plugin"};
    BOOST_CHECK(tester->app->initialize<sysio::signature_provider_manager_plugin>(
       argv.size(), const_cast<char**>(argv.data())));
    return tester;
@@ -128,7 +128,7 @@ BOOST_AUTO_TEST_CASE(unregistered_ssm_scheme_is_unknown_provider_type) {
    // opt in), an SSM: spec fails with the unknown-scheme hint.
    ssm_routing_tester tester;
    tester.app->_register_plugin<sysio::signature_provider_manager_plugin>();
-   std::vector<const char*> argv{"test_sigprov_ssm"};
+   std::vector<const char*> argv{"test_signature_provider_ssm_plugin"};
    BOOST_CHECK(tester.app->initialize<sysio::signature_provider_manager_plugin>(
       argv.size(), const_cast<char**>(argv.data())));
 

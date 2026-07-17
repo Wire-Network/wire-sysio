@@ -1,17 +1,17 @@
 #pragma once
 
 /**
- * AWS SSM Parameter Store-backed signature provider -- public header for the
- * `sigprov_ssm` sub-library of `signature_provider_manager_plugin`, installed
- * at `sysio/signature_provider_manager_plugin/ssm_signature_provider.hpp`.
+ * AWS SSM Parameter Store-backed signature provider -- provider machinery of
+ * `signature_provider_ssm_plugin`, installed at
+ * `sysio/signature_provider_ssm_plugin/ssm_signature_provider.hpp`.
  *
- * The library implements the `SSM:<param-ref>` spec grammar -- a sibling of
- * the built-in `KEY:` / `KIOD:` forms and the `sigprov_kms` sub-library's `KMS:` --
- * where the private key is fetched from AWS SSM Parameter Store (a
- * KMS-encrypted `SecureString` parameter) exactly once, when the provider is
- * created, and signing is local thereafter. Semantically this is `KEY:`
- * without the key material ever appearing in config files, command lines,
- * process listings, or shell history:
+ * This implements the `SSM:<param-ref>` spec grammar -- a sibling of the
+ * built-in `KEY:` / `KIOD:` forms and the kms plugin's `KMS:` -- where the
+ * private key is fetched from AWS SSM Parameter Store (a KMS-encrypted
+ * `SecureString` parameter) exactly once, when the provider is created, and
+ * signing is local thereafter. Semantically this is `KEY:` without the key
+ * material ever appearing in config files, command lines, process listings,
+ * or shell history:
  *
  *   - The parameter's value is exactly the string that would follow `KEY:`
  *     (WIF / `PVT_...` for wire, `PVT_BLS_...`, `0x...` hex for ethereum,
@@ -25,8 +25,9 @@
  *     new keypair inherently requires a config edit + restart; there is
  *     nothing useful a re-fetch could do. Fetch-once is semantically forced.
  *
- * The fetch happens inside the spec handler, i.e. during the plugin's
- * `plugin_initialize` spec parsing. This is the first blocking network I/O at
+ * The fetch happens inside the spec handler, i.e. during
+ * `signature_provider_ssm_plugin::plugin_initialize`'s claim of the
+ * configured `SSM:` specs. This is the first blocking network I/O at
  * plugin-initialize time in the tree (the KMS provider deliberately stays
  * offline until its opt-in startup probe) -- a deliberate departure: the
  * provider cannot exist without the key material, and a boot-time failure
@@ -34,11 +35,12 @@
  * The block is bounded by the AWS SDK's connect / request timeouts and its
  * default retry strategy.
  *
- * The library is NOT linked by the plugin itself; a host application that
- * wants SSM support links this library and calls
+ * The manager plugin never links this code; `SSM:` support is enabled per
+ * binary+config with `plugin = sysio::signature_provider_ssm_plugin` (nodeop
+ * links the plugin; enablement is the operator's choice). A host application
+ * that does not use the plugin can instead link this code and call
  *   plugin.register_spec_handler("SSM", &sysio::sigprov::ssm::create_ssm_provider);
- * from `main()` before `app().initialize(...)`. `nodeop` does so; see
- * `programs/nodeop/main.cpp`.
+ * from `main()` before `app().initialize(...)`.
  *
  * The lower-level helpers (`parse_ssm_spec`, `fetch_ssm_parameter`,
  * `get_ssm_client`, `throw_ssm_error`, `create_ssm_provider_with_fetcher`)
@@ -164,7 +166,7 @@ using parameter_fetcher = std::function<fetched_parameter(const ssm_param_ref&)>
  * @brief Get (or lazily create) a process-wide `SSMClient` for `region`.
  *
  * Shares the process-wide AWS SDK lifecycle and the per-region cache
- * semantics with the `sigprov_kms` sub-library (see
+ * semantics with the kms plugin (see
  * `sysio::sigprov::aws::region_client_cache`). Construction is offline: no
  * credential resolution, no network. Credentials resolve via the standard AWS
  * provider chain on the first API call.

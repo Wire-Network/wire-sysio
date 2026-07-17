@@ -40,10 +40,14 @@ struct provider_spec_result {
  * parsing of its own `spec_data` and returns a built `provider_spec_result`.
  *
  * Register handlers via
- * `signature_provider_manager_plugin::register_spec_handler(scheme, handler)`
- * from the host application's `main()` before `app().initialize(...)`. The
- * built-in `KEY:` and `KIOD:` schemes are not registrable -- they are handled
- * directly by the plugin.
+ * `signature_provider_manager_plugin::register_spec_handler(scheme, handler)`.
+ * The packaged way to ship a scheme is a provider plugin (e.g.
+ * `signature_provider_ssm_plugin`) that registers from its
+ * `plugin_initialize` and then claims its configured specs via
+ * `create_configured_providers(scheme)`; host applications that do not use
+ * the plugins may instead register from `main()` before
+ * `app().initialize(...)`. The built-in `KEY:` and `KIOD:` schemes are not
+ * registrable -- they are handled directly by the plugin.
  */
 using spec_handler = std::function<provider_spec_result(
    fc::crypto::chain_key_type_t,
@@ -100,16 +104,28 @@ public:
    void plugin_initialize(const variables_map& options);
 
    /**
-    * Plugin startup hook.
+    * Plugin startup hook. Two passes, in order:
     *
-    * Runs the opt-in startup-probe pass: any provider whose `spec_handler`
-    * supplied a `startup_probe` in its `provider_spec_result` (today this is
-    * only the KMS handler, which issues `GetPublicKey` to validate
-    * credentials, region, IAM, and pinned key) has that probe invoked here.
-    * Aborts startup loudly on permanent misconfiguration; transient errors
-    * are logged and deferred to the first sign. A no-op when the opt-in
-    * flag (`signature-provider-kms-startup-check`) is off or no probes were
-    * registered.
+    * 1. Unclaimed-spec accounting: every `--signature-provider` spec whose
+    *    scheme had no registered handler at parse time was retained (not
+    *    thrown); by startup each such spec must have been claimed by its
+    *    provider plugin via `create_configured_providers()`. Any spec still
+    *    unclaimed aborts startup with an error naming the plugin that
+    *    provides the scheme (when announced -- see
+    *    `sigprov::announce_scheme_plugin`) and the exact `plugin =` line to
+    *    add. `register_default_signature_providers()` runs the same check
+    *    earlier, during chain_plugin's initialize, so a doomed boot cannot
+    *    generate and persist anonymous default keys as a side effect.
+    *
+    * 2. The opt-in startup-probe pass: any provider whose `spec_handler`
+    *    supplied a `startup_probe` in its `provider_spec_result` (today this
+    *    is only the KMS handler, which issues `GetPublicKey` to validate
+    *    credentials, region, IAM, and pinned key) has that probe invoked
+    *    here. Aborts startup loudly on permanent misconfiguration; transient
+    *    errors are logged and deferred to the first sign. A no-op unless a
+    *    probe-owning plugin called `enable_startup_probes()` (the kms
+    *    plugin does so when `signature-provider-kms-startup-check` is set)
+    *    or no probes were registered.
     */
    void plugin_startup();
    void plugin_shutdown() {}
@@ -208,15 +224,22 @@ public:
     *
     * Built-in schemes (`KEY:`, `KIOD:`) are not registrable -- attempting to
     * register them throws. Each non-built-in scheme may be registered at
-    * most once. Host applications register their extension handlers (e.g.
-    * the `kms` sub-library's `create_kms_provider`) in `main()` BEFORE
-    * `app().initialize(...)`, so the registration is in place by the time
-    * `plugin_initialize()` parses each `--signature-provider` option.
+    * most once. Registration is a pure map insert with no side effects; it
+    * does NOT create providers for retained specs -- pair it with
+    * `create_configured_providers()` for that. Two supported call sites:
     *
-    * Example (host application's main.cpp):
-    *   auto& plugin = app()._register_plugin<signature_provider_manager_plugin>();
-    *   plugin.register_spec_handler(
-    *      "KMS", &sysio::sigprov::kms::create_kms_provider);
+    *   - A provider plugin's `plugin_initialize` (the packaged path):
+    *       auto& mgr = app().get_plugin<signature_provider_manager_plugin>();
+    *       mgr.register_spec_handler("SSM", &sysio::sigprov::ssm::create_ssm_provider);
+    *       mgr.create_configured_providers("SSM");
+    *
+    *   - A host application's `main()` BEFORE `app().initialize(...)`, so the
+    *     handler is already in place when `plugin_initialize()` parses each
+    *     `--signature-provider` option and every matching spec creates
+    *     eagerly (no claim step needed):
+    *       auto& plugin = app()._register_plugin<signature_provider_manager_plugin>();
+    *       plugin.register_spec_handler(
+    *          "KMS", &sysio::sigprov::kms::create_kms_provider);
     *
     * `register_plugin<>` (static, used elsewhere in main()) only enqueues
     * the plugin name in the static registration list; it does NOT
@@ -231,9 +254,79 @@ public:
     */
    void register_spec_handler(std::string scheme, sysio::spec_handler handler);
 
+   /**
+    * Create providers for every retained `--signature-provider` spec of
+    * @p scheme, consuming those specs from the retained store.
+    *
+    * `plugin_initialize()` retains (rather than throws on) any configured
+    * spec whose scheme has no registered handler at parse time -- the
+    * provider plugins that supply those schemes initialize AFTER this
+    * plugin, since they depend on it. Each provider plugin claims its own
+    * scheme's specs by calling this immediately after its
+    * `register_spec_handler()` call. Creation runs the full
+    * `create_provider()` path, so validation and errors are identical to an
+    * eagerly-created spec; a creation failure (bad pubkey, provider fetch
+    * failure, duplicate name) propagates out of the calling plugin's
+    * `plugin_initialize` and aborts boot there, attributing the error to
+    * the plugin that owns the scheme.
+    *
+    * Anonymous retained specs draw their `key-N` names when claimed, so
+    * numbering can interleave differently than pure config order;
+    * deterministic for a given config, and names were never contractual.
+    *
+    * Specs still unclaimed after the initialize phase fail the boot -- see
+    * `plugin_startup()`.
+    *
+    * @param scheme the `<provider-type>` token whose retained specs to create
+    * @return the created providers (empty if no spec of @p scheme was retained)
+    */
+   std::vector<fc::crypto::signature_provider_ptr> create_configured_providers(const std::string& scheme);
+
+   /**
+    * Enable the startup-probe pass that `plugin_startup()` runs.
+    *
+    * Called during the initialize phase by a probe-owning provider plugin
+    * (the kms plugin calls this when its
+    * `signature-provider-kms-startup-check` option is set) or by tests.
+    * Initialize and startup are sequential in the appbase lifecycle, so no
+    * synchronization is involved.
+    */
+   void enable_startup_probes();
+
 private:
    std::unique_ptr<class signature_provider_manager_plugin_impl> my;
 };
+
+namespace sigprov {
+
+/**
+ * Record that @p plugin_name is the plugin providing `<scheme>:` specs.
+ *
+ * Call from a provider plugin's constructor: appbase constructs every
+ * registered plugin before any `plugin_initialize` runs, so announcements are
+ * present even for plugins that are never enabled -- which is exactly when
+ * they matter, letting the manager's unclaimed-spec boot error name the
+ * `plugin =` line the operator forgot. Process-wide (a static registry, NOT
+ * per-application state -- the mapping is a fact about the binary), thread-
+ * safe, and idempotent via insert-or-assign because test binaries construct
+ * plugin objects repeatedly across scoped_app instances. Used ONLY to improve
+ * error text; never for control flow.
+ *
+ * @param scheme      the `<provider-type>` token (e.g. "SSM"); case-sensitive
+ * @param plugin_name the providing plugin's demangled name as `--plugin`
+ *                    expects it (e.g. "sysio::signature_provider_ssm_plugin")
+ */
+void announce_scheme_plugin(const std::string& scheme, const std::string& plugin_name);
+
+/**
+ * The plugin previously announced for @p scheme, if any.
+ *
+ * @param scheme the `<provider-type>` token to look up
+ * @return the announced plugin name, or nullopt if none was announced
+ */
+std::optional<std::string> announced_scheme_plugin(const std::string& scheme);
+
+} // namespace sigprov
 
 /**
  * @brief Get a signature provider

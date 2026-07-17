@@ -1,4 +1,4 @@
-# `test_sigprov_kms` — running the live AWS KMS round-trip
+# `test_signature_provider_kms_plugin` — running the live AWS KMS round-trip
 
 This directory hosts the Boost.Test suite for the signature-provider plugin,
 including the AWS KMS provider tests. Most of those cases are offline — they
@@ -114,7 +114,7 @@ The live case lives in the same binary as the parser tests. Build only what
 you need (substitute your own `$BUILD_DIR`, e.g. `build/claude`):
 
 ```bash
-ninja -C $BUILD_DIR test_sigprov_kms
+ninja -C $BUILD_DIR test_signature_provider_kms_plugin
 ```
 
 ## Run
@@ -128,7 +128,7 @@ export KMS_LIVE_SPEC='us-east-1:alias/wire-ci-test-secp256k1'
 # export KMS_LIVE_SPEC='arn:aws:kms:us-east-1:111122223333:alias/wire-ci-test-secp256k1'
 export KMS_LIVE_PUBKEY='045a87...eef3'
 
-$BUILD_DIR/plugins/signature_provider_manager_plugin/test/test_sigprov_kms \
+$BUILD_DIR/plugins/signature_provider_kms_plugin/test/test_signature_provider_kms_plugin \
    --run_test=kms_signature_provider_tests/kms_live_sign_round_trip \
    --log_level=test_suite
 ```

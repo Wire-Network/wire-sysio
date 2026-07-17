@@ -29,7 +29,7 @@ set(PLUGIN_DEFAULT_DEPENDENCIES
 
 macro(plugin_target TARGET_NAME)
 
-    cmake_parse_arguments(ARG "SKIP_TEST_CONFIG" "" "LIBRARIES;SOURCE_FILES;SOURCE_GLOBS;EXCLUDE_SOURCE_REGEX;TEST_SOURCE_FILES;TEST_SOURCE_GLOBS" ${ARGN})
+    cmake_parse_arguments(ARG "SKIP_TEST_CONFIG" "" "LIBRARIES;SOURCE_FILES;SOURCE_GLOBS;TEST_SOURCE_FILES;TEST_SOURCE_GLOBS" ${ARGN})
 
     set(PLUGIN_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
     message(STATUS "Building plugin ${TARGET_NAME} @ ${CMAKE_CURRENT_SOURCE_DIR}")
@@ -44,19 +44,6 @@ macro(plugin_target TARGET_NAME)
         foreach (GLOB_PATTERN ${ARG_SOURCE_GLOBS})
             file(GLOB_RECURSE GLOB_FILES ${GLOB_PATTERN})
             list(APPEND SRC_FILES ${GLOB_FILES})
-        endforeach ()
-    endif ()
-
-    # EXCLUDE_SOURCE_REGEX drops matching paths from the collected sources
-    # (both the implicit recursive src/ glob above and any SOURCE_GLOBS
-    # results). Needed by plugins whose src/ tree also hosts sources for
-    # co-located support libraries that must NOT compile into the plugin
-    # archive itself -- e.g. signature_provider_manager_plugin keeps the
-    # sources of its AWS-backed provider sub-libraries alongside its own in
-    # src/ while the plugin target deliberately stays AWS-free.
-    if (ARG_EXCLUDE_SOURCE_REGEX)
-        foreach (EXCLUDE_REGEX ${ARG_EXCLUDE_SOURCE_REGEX})
-            list(FILTER SRC_FILES EXCLUDE REGEX "${EXCLUDE_REGEX}")
         endforeach ()
     endif ()
 

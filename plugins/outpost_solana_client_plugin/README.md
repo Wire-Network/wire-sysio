@@ -389,14 +389,28 @@ activate Plugin
 Plugin -> Plugin : load IDL files\n(--solana-idl-file)
 
 loop for each --outpost-solana-client spec
+   Plugin -> Plugin : parse + validate spec\nqueue pending client
+end
+
+Plugin --> Main : initialized
+deactivate Plugin
+
+Main -> Plugin : plugin_startup()
+activate Plugin
+note right of Plugin
+  provider resolution is deferred to
+  startup so the signature-provider
+  plugins (--plugin peers) have all
+  initialized first
+end note
+
+loop for each pending client
    Plugin -> SigMgr : get_provider(sig_id)
    SigMgr --> Plugin : signature_provider_ptr
 
    Plugin -> Client ** : new solana_client(sig_provider, rpc_url)
    Plugin -> Plugin : add_client(id, entry)
 end
-
-Plugin --> Main : initialized
 deactivate Plugin
 
 Main -> Plugin : get_client("sol-local")
@@ -811,6 +825,11 @@ int main(int argc, char* argv[]) {
       }
 
       auto& sol_plug = app->get_plugin<sysio::outpost_solana_client_plugin>();
+
+      // Clients are constructed at plugin_startup (provider resolution is
+      // deferred past the initialize phase); a tool that never enters the
+      // appbase exec loop starts the plugin subtree explicitly.
+      sol_plug.startup();
 
       // Get the first configured client
       auto clients = sol_plug.get_clients();

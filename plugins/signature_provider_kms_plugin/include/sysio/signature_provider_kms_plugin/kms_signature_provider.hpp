@@ -1,18 +1,19 @@
 #pragma once
 
 /**
- * AWS KMS-backed signature provider -- public header for the `sigprov_kms`
- * sub-library of `signature_provider_manager_plugin`, installed at
- * `sysio/signature_provider_manager_plugin/kms_signature_provider.hpp`.
+ * AWS KMS-backed signature provider -- provider machinery of
+ * `signature_provider_kms_plugin`, installed at
+ * `sysio/signature_provider_kms_plugin/kms_signature_provider.hpp`.
  *
- * The library implements the `KMS:<key-ref>` spec grammar -- a third form
- * alongside the built-in `KEY:` and `KIOD:` -- where the signing key never
- * leaves AWS. The library is NOT linked by the plugin itself; a host
- * application that wants KMS support links this library and calls
+ * This implements the `KMS:<key-ref>` spec grammar -- a third form alongside
+ * the built-in `KEY:` and `KIOD:` -- where the signing key never leaves AWS.
+ * The manager plugin never links this code, so it carries no compile-time
+ * dependency on the AWS SDK; `KMS:` support is enabled per binary+config with
+ * `plugin = sysio::signature_provider_kms_plugin` (nodeop links the plugin;
+ * enablement is the operator's choice). A host application that does not use
+ * the plugin can instead link this code and call
  *   plugin.register_spec_handler("KMS", &sysio::sigprov::kms::create_kms_provider);
- * from `main()` before `app().initialize(...)`. The plugin then dispatches
- * `KMS:` specs through the registered handler with no compile-time dependency
- * on the AWS SDK.
+ * from `main()` before `app().initialize(...)`.
  *
  * The lower-level helpers (`parse_kms_spec`, `der_to_compact`, `recover_v`,
  * `spki_der_to_public_key`, `throw_kms_error`, `make_kms_signature_provider`)

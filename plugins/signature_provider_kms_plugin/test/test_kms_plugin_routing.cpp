@@ -12,7 +12,7 @@
 
 #include <sysio/chain/exceptions.hpp>
 #include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
-#include <sysio/signature_provider_manager_plugin/kms_signature_provider.hpp>
+#include <sysio/signature_provider_kms_plugin/kms_signature_provider.hpp>
 
 #include <fc/crypto/chain_types_reflect.hpp>
 #include <fc-test/crypto_utils.hpp>
@@ -51,7 +51,7 @@ std::unique_ptr<kms_routing_tester> create_kms_routing_app() {
    plug.register_spec_handler(
       "KMS", &sysio::sigprov::kms::create_kms_provider);
 
-   std::vector<const char*> argv{"test_sigprov_kms"};
+   std::vector<const char*> argv{"test_signature_provider_kms_plugin"};
    BOOST_CHECK(tester->app->initialize<sysio::signature_provider_manager_plugin>(
       argv.size(), const_cast<char**>(argv.data())));
    return tester;

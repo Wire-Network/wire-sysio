@@ -69,6 +69,50 @@ public:
    const std::vector<file_idl_programs_t>& get_idl_files() {
       return _idl_files;
    }
+
+   /**
+    * A client spec parsed and validated at plugin_initialize, awaiting
+    * signature-provider resolution. Client construction happens at
+    * plugin_startup so the provider set is complete first: the provider
+    * plugins (e.g. signature_provider_ssm_plugin) are `--plugin` peers of
+    * this plugin, and resolving at initialize would make boot success depend
+    * on their relative order in the config. By startup, dependency ordering
+    * has already run the manager's unclaimed-spec check, so a misconfigured
+    * scheme fails with its precise error before the lookup here ever runs.
+    */
+   struct pending_client_t {
+      std::string id;
+      std::string sig_id;
+      std::string url;
+   };
+
+   /** Specs validated at initialize, consumed by `resolve_pending_clients`. */
+   std::vector<pending_client_t> _pending_clients{};
+
+   /**
+    * Queue a parsed client spec, preserving initialize-time duplicate-id
+    * detection (the `add_client` assert would otherwise not fire until
+    * startup).
+    */
+   void add_pending_client(pending_client_t pending) {
+      const bool duplicate_id =
+         std::ranges::any_of(_pending_clients, [&](const auto& p) { return p.id == pending.id; });
+      FC_ASSERT(!duplicate_id, "Client with id {} already exists", pending.id);
+      _pending_clients.push_back(std::move(pending));
+   }
+
+   /** Resolve each pending spec's provider and construct its client. */
+   void resolve_pending_clients() {
+      auto& sig_mgr = app().get_plugin<signature_provider_manager_plugin>();
+      for (auto& pending : _pending_clients) {
+         auto sig_provider = sig_mgr.get_provider(pending.sig_id);
+         add_client(pending.id, std::make_shared<solana_client_entry_t>(
+                                   pending.id, pending.url, sig_provider,
+                                   std::make_shared<solana_client>(sig_provider, pending.url)));
+         ilog("Added solana client (id={},sig_id={},url={})", pending.id, pending.sig_id, pending.url);
+      }
+      _pending_clients.clear();
+   }
 };
 
 outpost_solana_client_plugin::outpost_solana_client_plugin()
@@ -85,33 +129,24 @@ void outpost_solana_client_plugin::plugin_initialize(const variables_map& option
              "At least one solana client argument is required {}",
              option_name_client);
 
-   auto plug_sig      = app().find_plugin<signature_provider_manager_plugin>();
    auto client_specs  = options.at(option_name_client).as<std::vector<std::string>>();
 
    for (auto& client_spec : client_specs) {
-      dlog("Adding solana client with spec: {}", client_spec);
+      dlog("Queueing solana client with spec: {}", client_spec);
       auto parts = fc::split(client_spec, ',');
       FC_ASSERT(parts.size() == 3, "Invalid spec {} (expected: <client-id>,<sig-provider-id>,<rpc-url>)",
                 client_spec);
 
-      auto& id     = parts[0];
-      auto& sig_id = parts[1];
-      auto& url    = parts[2];
-
-      auto sig_provider = plug_sig->get_provider(sig_id);
-      my->add_client(id,
-                     std::make_shared<solana_client_entry_t>(
-                        id,
-                        url,
-                        sig_provider,
-                        std::make_shared<solana_client>(sig_provider, url)));
-
-      ilog("Added solana client (id={},sig_id={},url={})", id, sig_id, url);
+      // Pure-config validation only at initialize; the signature provider is
+      // resolved -- and the client constructed -- at plugin_startup, once the
+      // provider plugins have all initialized (see pending_client_t).
+      my->add_pending_client({.id = parts[0], .sig_id = parts[1], .url = parts[2]});
    }
 }
 
 void outpost_solana_client_plugin::plugin_startup() {
    ilog("Starting outpost solana client plugin");
+   my->resolve_pending_clients();
 }
 
 void outpost_solana_client_plugin::set_program_options(options_description& cli, options_description& cfg) {

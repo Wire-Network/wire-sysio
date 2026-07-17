@@ -9,8 +9,9 @@
 #include <sysio/producer_api_plugin/producer_api_plugin.hpp>
 #include <sysio/producer_plugin/producer_plugin.hpp>
 #include <sysio/prometheus_plugin/prometheus_plugin.hpp>
+#include <sysio/signature_provider_kms_plugin/signature_provider_kms_plugin.hpp>
 #include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
-#include <sysio/signature_provider_manager_plugin/ssm_signature_provider.hpp>
+#include <sysio/signature_provider_ssm_plugin/signature_provider_ssm_plugin.hpp>
 #include <sysio/snapshot_api_plugin/snapshot_api_plugin.hpp>
 #include <sysio/state_history_plugin/state_history_plugin.hpp>
 #include <sysio/test_control_api_plugin/test_control_api_plugin.hpp>
@@ -19,15 +20,9 @@
 #include <sysio/underwriter_plugin/underwriter_plugin.hpp>
 
 #include <string>
-#include <string_view>
 
 using namespace appbase;
 using namespace sysio;
-
-namespace {
-/// Spec scheme nodeop registers for AWS SSM Parameter Store-backed keys.
-constexpr std::string_view ssm_spec_scheme = "SSM";
-} // namespace
 
 int main(int argc, char** argv)
 {
@@ -45,18 +40,21 @@ int main(int argc, char** argv)
    application_base::register_plugin<prometheus_plugin>();
    application_base::register_plugin<chain_api_plugin>();
    application_base::register_plugin<signature_provider_manager_plugin>();
+   // The AWS-backed signature-provider schemes ship as optional plugins:
+   // registering them here only constructs the plugin objects (announcing
+   // their scheme for the manager's boot diagnostics) -- an operator opts in
+   // per config with `plugin = sysio::signature_provider_ssm_plugin` (SSM:
+   // key fetched once from Parameter Store, local signing -- fine for every
+   // signing path including block production) or
+   // `plugin = sysio::signature_provider_kms_plugin` (KMS: remote signing,
+   // ethereum keys only). Not in the init<> autostart set below: without the
+   // `plugin =` line neither initializes, and an `SSM:`/`KMS:` spec then
+   // fails the boot with an error naming the missing plugin.
+   application_base::register_plugin<signature_provider_ssm_plugin>();
+   application_base::register_plugin<signature_provider_kms_plugin>();
    application_base::register_plugin<batch_operator_plugin>();
    application_base::register_plugin<external_debugging_plugin>();
    application_base::register_plugin<underwriter_plugin>();
-   // Opt nodeop into the `SSM:` signature-provider scheme: the private key is
-   // fetched once from AWS SSM Parameter Store (SecureString) at startup and
-   // signing is local thereafter, so it is suitable for every signing path
-   // including block production. Registration must precede exe.init(), which
-   // parses --signature-provider specs during plugin initialization. The
-   // registration itself is inert -- a registry entry only, no AWS SDK init,
-   // threads, or network -- unless a configured spec actually uses `SSM:`.
-   app()._register_plugin<signature_provider_manager_plugin>().register_spec_handler(
-      std::string{ssm_spec_scheme}, &sysio::sigprov::ssm::create_ssm_provider);
    auto r = exe.init<
       resource_monitor_plugin,
       chain_plugin,

@@ -1,6 +1,6 @@
-#include <sysio/signature_provider_manager_plugin/kms_signature_provider.hpp>
+#include <sysio/signature_provider_kms_plugin/kms_signature_provider.hpp>
 
-#include <sysio/signature_provider_manager_plugin/aws_common.hpp>
+#include <sysio/signature_provider_aws/aws_common.hpp>
 
 #include <sysio/chain/exceptions.hpp>
 #include <sysio/chain/types.hpp>

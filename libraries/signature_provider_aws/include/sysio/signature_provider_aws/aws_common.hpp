@@ -1,20 +1,20 @@
 #pragma once
 
 /**
- * Shared AWS SDK glue for the signature-provider sub-libraries (`sigprov_kms`,
- * `sigprov_ssm`), installed at
- * `sysio/signature_provider_manager_plugin/aws_common.hpp`.
+ * Shared AWS SDK glue for the AWS-backed signature-provider plugins
+ * (`signature_provider_kms_plugin`, `signature_provider_ssm_plugin`),
+ * installed at `sysio/signature_provider_aws/aws_common.hpp`.
  *
  * Everything here is service-agnostic: SDK lifecycle, the per-region client
  * cache, the transient-vs-permanent error split, and the generic pieces of ARN
  * parsing. Service-specific code (the KMS Sign/GetPublicKey plumbing, the SSM
- * GetParameter fetch, their spec grammars) stays in the respective sub-library.
+ * GetParameter fetch, their spec grammars) stays in the respective plugin.
  *
  * This library exists for one correctness-critical reason beyond code reuse:
  * `Aws::InitAPI` / `Aws::ShutdownAPI` must be called exactly once per process.
- * When more than one sub-library is linked into the same binary, each owning
- * its own lifecycle singleton would double-init / double-shutdown the SDK.
- * `ensure_aws_sdk_initialized()` is the single process-wide owner.
+ * When more than one provider plugin is linked into the same binary, each
+ * owning its own lifecycle singleton would double-init / double-shutdown the
+ * SDK. `ensure_aws_sdk_initialized()` is the single process-wide owner.
  */
 
 #include <sysio/chain/exceptions.hpp>
