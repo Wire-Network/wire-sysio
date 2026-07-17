@@ -129,19 +129,6 @@ public:
     */
    fc::microseconds _kiod_provider_timeout_us;
 
-   /**
-    * When true, `plugin_startup()` runs the opt-in startup-probe pass. Set
-    * via `enable_startup_probes()` by a probe-owning provider plugin during
-    * its `plugin_initialize` (the kms plugin does so when its
-    * `signature-provider-kms-startup-check` option is set) or by tests. The
-    * mechanism is generic: any registered handler may attach a probe.
-    *
-    * Intentionally a plain `bool`, unlike the atomic members below: it is
-    * written during the initialize phase and read once in `plugin_startup`,
-    * which run sequentially in the appbase lifecycle.
-    */
-   bool _startup_probe_enabled{false};
-
    fc::crypto::sign_fn make_kiod_signature_provider(const string& url_str, const chain::public_key_type& pubkey) const {
       fc::url kiod_url;
       if (boost::algorithm::starts_with(url_str, "unix://"))
@@ -678,17 +665,17 @@ public:
     * `plugin_startup()` and aborts startup loudly instead of failing on the
     * first production sign. A transient error (e.g. KMS throttle / timeout)
     * is logged and skipped -- the lazy first-sign check is left to retry it
-    * rather than killing node startup.
+    * rather than killing node startup. That transient/permanent split is
+    * what makes running the probes unconditionally safe: an AWS blip at
+    * restart can never brick a boot, only a configuration that could never
+    * sign. A handler attaching a probe IS the opt-in; there is deliberately
+    * no separate enable flag. A no-op when no probes were attached.
     *
-    * A no-op unless `_startup_probe_enabled` is set, and a no-op when no
-    * probes were registered.
-    *
-    * The probe list is one-shot: this drains it (whether or not the check is
-    * enabled) so it never lingers as a misleading registry of signers. A
-    * provider registered after `plugin_startup()` -- e.g. via a future
-    * runtime spec reload -- is not retroactively probed; its pinning check
-    * (if any) still runs lazily on the first sign through whatever one-shot
-    * guard the handler attaches.
+    * The probe list is one-shot: this drains it so it never lingers as a
+    * misleading registry of signers. A provider registered after
+    * `plugin_startup()` -- e.g. via a future runtime spec reload -- is not
+    * retroactively probed; its pinning check (if any) still runs lazily on
+    * the first sign through whatever one-shot guard the handler attaches.
     */
    void run_startup_probes() {
       // Drain the probe list under the lock. Moving it out both hands the
@@ -700,7 +687,7 @@ public:
          std::scoped_lock lock(_signing_providers_mutex);
          probes = std::exchange(_startup_probes, {});
       }
-      if (!_startup_probe_enabled || probes.empty()) {
+      if (probes.empty()) {
          return;
       }
 
@@ -780,8 +767,8 @@ private:
 
    /**
     * One-shot startup probes, one per provider whose handler attached one
-    * (today: KMS). Collected as providers are created, run by
-    * `run_startup_probes()` when `_startup_probe_enabled` is set. Guarded by
+    * (today: KMS). Collected as providers are created, run unconditionally
+    * by `run_startup_probes()` at plugin_startup. Guarded by
     * `_signing_providers_mutex`.
     */
    std::vector<std::function<void()>> _startup_probes{};
@@ -864,10 +851,9 @@ void signature_provider_manager_plugin::plugin_startup() {
    // `plugin =` line, which the error names) and fails the boot.
    my->throw_if_unclaimed_specs();
 
-   // Opt-in startup-probe pass for any provider whose handler attached a
-   // probe (today: KMS). A no-op unless a probe-owning plugin called
-   // enable_startup_probes(); when enabled, a permanent probe failure throws
-   // here and aborts startup loudly.
+   // Startup-probe pass for any provider whose handler attached a probe
+   // (today: KMS). A permanent probe failure throws here and aborts startup
+   // loudly; transient failures defer to the lazy first-sign check.
    my->run_startup_probes();
 }
 
@@ -918,9 +904,6 @@ signature_provider_manager_plugin::create_configured_providers(const std::string
    return my->create_configured_providers(scheme);
 }
 
-void signature_provider_manager_plugin::enable_startup_probes() {
-   my->_startup_probe_enabled = true;
-}
 
 std::vector<fc::crypto::signature_provider_ptr> query_signature_providers(
    const std::optional<fc::crypto::signature_provider_id_t>& id_opt,

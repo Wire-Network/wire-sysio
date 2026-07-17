@@ -117,15 +117,15 @@ public:
     *    earlier, during chain_plugin's initialize, so a doomed boot cannot
     *    generate and persist anonymous default keys as a side effect.
     *
-    * 2. The opt-in startup-probe pass: any provider whose `spec_handler`
-    *    supplied a `startup_probe` in its `provider_spec_result` (today this
-    *    is only the KMS handler, which issues `GetPublicKey` to validate
+    * 2. The startup-probe pass: any provider whose `spec_handler` supplied a
+    *    `startup_probe` in its `provider_spec_result` (today this is only
+    *    the KMS handler, which issues a free `GetPublicKey` to validate
     *    credentials, region, IAM, and pinned key) has that probe invoked
     *    here. Aborts startup loudly on permanent misconfiguration; transient
-    *    errors are logged and deferred to the first sign. A no-op unless a
-    *    probe-owning plugin called `enable_startup_probes()` (the kms
-    *    plugin does so when `signature-provider-kms-startup-check` is set)
-    *    or no probes were registered.
+    *    errors are logged and deferred to the first sign, so an AWS blip at
+    *    restart never blocks a boot. Attaching a probe IS the opt-in --
+    *    there is deliberately no enable flag. A no-op when no probes were
+    *    attached.
     */
    void plugin_startup();
    void plugin_shutdown() {}
@@ -281,17 +281,6 @@ public:
     * @return the created providers (empty if no spec of @p scheme was retained)
     */
    std::vector<fc::crypto::signature_provider_ptr> create_configured_providers(const std::string& scheme);
-
-   /**
-    * Enable the startup-probe pass that `plugin_startup()` runs.
-    *
-    * Called during the initialize phase by a probe-owning provider plugin
-    * (the kms plugin calls this when its
-    * `signature-provider-kms-startup-check` option is set) or by tests.
-    * Initialize and startup are sequential in the appbase lifecycle, so no
-    * synchronization is involved.
-    */
-   void enable_startup_probes();
 
 private:
    std::unique_ptr<class signature_provider_manager_plugin_impl> my;

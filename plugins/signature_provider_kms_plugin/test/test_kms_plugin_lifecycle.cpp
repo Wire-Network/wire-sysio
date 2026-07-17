@@ -50,11 +50,12 @@ BOOST_AUTO_TEST_CASE(initialize_registers_scheme_and_announces_plugin) {
    BOOST_CHECK_EQUAL(*announced, "sysio::signature_provider_kms_plugin");
 }
 
-BOOST_AUTO_TEST_CASE(startup_check_option_enables_manager_probe_pass) {
-   // The relocated `signature-provider-kms-startup-check` option lives on this
-   // plugin; when set, its initialize must flip the manager's probe pass on.
-   // Wiring is proven with a mock PROBE-schemed provider registered pre-init
-   // (eager path), whose probe must then run at manager plugin_startup.
+BOOST_AUTO_TEST_CASE(attached_probes_run_at_manager_startup) {
+   // Attaching a startup probe IS the opt-in -- there is no enable flag. A
+   // provider created with a probe (mock PROBE scheme registered pre-init,
+   // eager path; the real KMS handler attaches one per claimed key) must have
+   // that probe run at manager plugin_startup with the kms plugin enabled and
+   // no probe-related configuration at all.
    using namespace fc::crypto;
    auto clean_app = gsl_lite::finally([] { appbase::application::reset_app_singleton(); });
 
@@ -72,14 +73,13 @@ BOOST_AUTO_TEST_CASE(startup_check_option_enables_manager_probe_pass) {
       });
 
    auto spec = std::format("probe-key,ethereum,ethereum,{},PROBE:x", fixture.public_key);
-   std::vector<const char*> argv{"test_signature_provider_kms_plugin", "--signature-provider", spec.c_str(),
-                                 "--signature-provider-kms-startup-check=1"};
+   std::vector<const char*> argv{"test_signature_provider_kms_plugin", "--signature-provider", spec.c_str()};
    BOOST_REQUIRE((app->initialize<signature_provider_manager_plugin, signature_provider_kms_plugin>(
       argv.size(), const_cast<char**>(argv.data()))));
 
-   BOOST_CHECK_EQUAL(probe_calls, 0);
+   BOOST_CHECK_EQUAL(probe_calls, 0);              // probes run at startup, not initialize
    BOOST_CHECK_NO_THROW(manager.plugin_startup());
-   BOOST_CHECK_EQUAL(probe_calls, 1); // kms plugin's option flipped the manager's probe pass on
+   BOOST_CHECK_EQUAL(probe_calls, 1);              // no flag needed: attached probe ran
 }
 
 BOOST_AUTO_TEST_SUITE_END()

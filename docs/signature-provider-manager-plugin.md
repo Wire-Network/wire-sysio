@@ -46,10 +46,10 @@ the key never appears on the host or in process memory. `<key-ref>` is a full ke
 `<region>:<key-id-or-alias>`. Scope is secp256k1/ethereum keys only — the provider hard-rejects
 every other key type at boot, so a `KMS:` key can never back wire producer or BLS finalizer
 signing; the 30–100 ms per-signature latency therefore only touches ethereum-side submission
-paths, which run at seconds cadence. The plugin also owns the
-`signature-provider-kms-startup-check` option: when set, every `KMS:` key is probed at startup
-with a (free) `GetPublicKey` call so a credentials / region / IAM / pinned-key misconfiguration
-fails at boot instead of on the first sign. See
+paths, which run at seconds cadence. Every `KMS:` key is probed at startup with a (free)
+`GetPublicKey` call, so a credentials / region / IAM / pinned-key misconfiguration fails at boot
+instead of on the first sign; a transient AWS error at startup is logged and deferred to the
+lazy first-sign check, so an AWS blip never blocks a boot. See
 `plugins/signature_provider_kms_plugin/test/README.md` for key setup, IAM requirements, and
 operational notes.
 
@@ -99,9 +99,9 @@ runbook (IAM policy, rotation, live-test setup).
   `plugin = sysio::signature_provider_ssm_plugin` in the config (or `--plugin` on the command
   line). A config with an `SSM:`/`KMS:` spec and no matching plugin line fails the boot with an
   error naming the exact line to add.
-- `signature-provider-kms-startup-check` moved from the manager to
-  `signature_provider_kms_plugin`. nodeop still parses it either way (appbase collects options
-  from every linked plugin), but it only takes effect when the kms plugin is enabled.
+- `signature-provider-kms-startup-check` was removed: every `KMS:` key is now probed at startup
+  unconditionally (transient AWS errors defer to the first sign, so boots never block on a
+  blip). A config still setting the option fails option parsing — delete the line.
 
 
 ## Examples
