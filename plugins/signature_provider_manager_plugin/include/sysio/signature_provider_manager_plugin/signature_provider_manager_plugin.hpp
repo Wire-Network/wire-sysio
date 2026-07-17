@@ -288,7 +288,7 @@ public:
     * @param scheme the `<provider-type>` token whose retained specs to create
     * @return the created providers (empty if no spec of @p scheme was retained)
     */
-   std::vector<fc::crypto::signature_provider_ptr> create_configured_providers(const std::string& scheme);
+   std::vector<fc::crypto::signature_provider_ptr> create_configured_providers(std::string_view scheme);
 
 private:
    /**
@@ -326,7 +326,7 @@ namespace sigprov {
  * @param plugin_name the providing plugin's demangled name as `--plugin`
  *                    expects it (e.g. "sysio::signature_provider_ssm_plugin")
  */
-void announce_scheme_plugin(const std::string& scheme, const std::string& plugin_name);
+void announce_scheme_plugin(std::string_view scheme, std::string_view plugin_name);
 
 /**
  * The plugin previously announced for @p scheme, if any.
@@ -334,7 +334,7 @@ void announce_scheme_plugin(const std::string& scheme, const std::string& plugin
  * @param scheme the `<provider-type>` token to look up
  * @return the announced plugin name, or nullopt if none was announced
  */
-std::optional<std::string> announced_scheme_plugin(const std::string& scheme);
+std::optional<std::string> announced_scheme_plugin(std::string_view scheme);
 
 } // namespace sigprov
 

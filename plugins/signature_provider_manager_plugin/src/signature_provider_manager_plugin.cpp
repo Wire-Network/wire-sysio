@@ -99,17 +99,17 @@ namespace {
  * (processed one at a time inside `initialize<>`), reads from the manager's
  * boot diagnostics at initialize/startup.
  */
-std::map<std::string, std::string>& scheme_plugin_registry() {
-   static std::map<std::string, std::string> registry;
+std::map<std::string, std::string, std::less<>>& scheme_plugin_registry() {
+   static std::map<std::string, std::string, std::less<>> registry;
    return registry;
 }
 } // namespace
 
-void announce_scheme_plugin(const std::string& scheme, const std::string& plugin_name) {
-   scheme_plugin_registry().insert_or_assign(scheme, plugin_name);
+void announce_scheme_plugin(std::string_view scheme, std::string_view plugin_name) {
+   scheme_plugin_registry().insert_or_assign(std::string{scheme}, std::string{plugin_name});
 }
 
-std::optional<std::string> announced_scheme_plugin(const std::string& scheme) {
+std::optional<std::string> announced_scheme_plugin(std::string_view scheme) {
    const auto& registry = scheme_plugin_registry();
    if (auto it = registry.find(scheme); it != registry.end())
       return it->second;
@@ -468,7 +468,7 @@ public:
       return create_provider(spec);
    }
 
-   std::vector<fc::crypto::signature_provider_ptr> create_configured_providers(const std::string& scheme) {
+   std::vector<fc::crypto::signature_provider_ptr> create_configured_providers(std::string_view scheme) {
       // Consume the matching retained specs first, then create: creation can
       // throw (bad pubkey, failed remote fetch), and a spec that reached its
       // owning plugin must not linger to be double-reported by the startup
@@ -849,7 +849,7 @@ void signature_provider_manager_plugin::register_spec_handler(
 }
 
 std::vector<fc::crypto::signature_provider_ptr>
-signature_provider_manager_plugin::create_configured_providers(const std::string& scheme) {
+signature_provider_manager_plugin::create_configured_providers(std::string_view scheme) {
    assert_pre_startup("create_configured_providers");
    return my->create_configured_providers(scheme);
 }

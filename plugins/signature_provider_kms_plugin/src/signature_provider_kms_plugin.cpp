@@ -5,7 +5,7 @@ namespace sysio {
 
 namespace {
 /// The `<provider-type>` scheme this plugin supplies.
-constexpr auto kms_spec_scheme = "KMS";
+constexpr std::string_view kms_spec_scheme = "KMS";
 } // namespace
 
 signature_provider_kms_plugin::signature_provider_kms_plugin() {
@@ -30,7 +30,7 @@ void signature_provider_kms_plugin::plugin_initialize(const variables_map&) {
    // which the manager runs unconditionally at its plugin_startup -- see the
    // class doc for why there is no skip flag.
    auto& manager = app().get_plugin<signature_provider_manager_plugin>();
-   manager.register_spec_handler(kms_spec_scheme, &sysio::sigprov::kms::create_kms_provider);
+   manager.register_spec_handler(std::string{kms_spec_scheme}, &sysio::sigprov::kms::create_kms_provider);
    manager.create_configured_providers(kms_spec_scheme);
 }
 

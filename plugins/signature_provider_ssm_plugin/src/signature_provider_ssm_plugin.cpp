@@ -5,7 +5,7 @@ namespace sysio {
 
 namespace {
 /// The `<provider-type>` scheme this plugin supplies.
-constexpr auto ssm_spec_scheme = "SSM";
+constexpr std::string_view ssm_spec_scheme = "SSM";
 } // namespace
 
 signature_provider_ssm_plugin::signature_provider_ssm_plugin() {
@@ -28,7 +28,7 @@ void signature_provider_ssm_plugin::plugin_initialize(const variables_map&) {
    // SecureString fetch per spec -- a fetch or validation failure throws out
    // of this plugin's initialize and aborts boot with the AWS error.
    auto& manager = app().get_plugin<signature_provider_manager_plugin>();
-   manager.register_spec_handler(ssm_spec_scheme, &sysio::sigprov::ssm::create_ssm_provider);
+   manager.register_spec_handler(std::string{ssm_spec_scheme}, &sysio::sigprov::ssm::create_ssm_provider);
    manager.create_configured_providers(ssm_spec_scheme);
 }
 
