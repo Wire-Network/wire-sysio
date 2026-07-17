@@ -67,9 +67,9 @@ public:
     * @brief OPP OUTBOUND — submit a single envelope to the remote chain.
     *
     * Must enforce `deadline` internally; a hung chain RPC must not block the
-    * caller beyond this duration. Implementations that issue multiple chain
-    * transactions (e.g. Solana's `epoch_in` + `emit_outbound_envelope` pair)
-    * apply the deadline to the overall sequence.
+    * caller beyond this duration. Solana may chunk one envelope across
+    * multiple `epoch_in` transactions; the consensus-reaching transaction
+    * performs the outpost's outbound emit internally.
     *
     * @param epoch_index     The current WIRE epoch this envelope belongs to.
     * @param envelope_bytes  Raw protobuf `opp::Envelope` bytes.
@@ -83,20 +83,21 @@ public:
                                                  fc::microseconds         deadline) = 0;
 
    /**
-    * @brief OPP INBOUND — pull envelope(s) the remote chain has produced for
-    *        this epoch and return the concatenated raw protobuf bytes.
+    * @brief OPP INBOUND — pull the envelope the remote chain has produced for
+    *        this epoch and return its raw protobuf bytes.
     *
-    * Filters by `epoch_index` internally — both ETH's event log and Solana's
-    * signature history retain stale envelopes from prior epochs, and delivering
-    * a stale envelope to `sysio.msgch::deliver` trips an
+    * Filters by `epoch_index` internally. Ethereum and Solana each expose a
+    * single latest-outbound storage slot, so a poll may still observe the
+    * preceding epoch until the consensus-reaching delivery overwrites it.
+    * Delivering that stale envelope to `sysio.msgch::deliver` trips an
     * `envelope epoch_index mismatch` assertion.
     *
     * @param epoch_index  Only envelopes whose `epoch_index` field matches this
     *                     value are returned; all others are silently dropped.
     * @param deadline     Upper bound on the total time spent talking to the
     *                     remote chain for this call.
-    * @return Concatenated raw `opp::Envelope` bytes ready for
-    *         `sysio.msgch::deliver`, or an empty vector if none matched.
+    * @return Raw `opp::Envelope` bytes ready for `sysio.msgch::deliver`, or an
+    *         empty vector if the latest slot did not match.
     * @throws fc::exception on RPC failure or deadline expiry.
     */
    virtual std::vector<char> read_inbound_envelope(uint32_t         epoch_index,

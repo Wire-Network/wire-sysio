@@ -29,8 +29,9 @@ using ethereum_client_entry_ptr = std::shared_ptr<ethereum_client_entry_t>;
 /// not silently drop (see epoch-859 stall RCA); the confirmed factory
 /// awaits `eth_getTransactionReceipt` + N blocks before returning.
 struct opp_contract_client : ethereum_contract_client {
-   ethereum_contract_tx_fn<fc::variant> emit_outbound_envelope;
-   ethereum_contract_tx_fn<fc::variant> finalize_epoch;
+   /// Recovery-only write matching `emitOutboundEnvelope(uint32)` on the
+   /// Ethereum outpost. Normal operation emits during inbound consensus.
+   ethereum_contract_tx_fn<fc::variant, uint32_t> emit_outbound_envelope;
    /// View: latest outbound envelope's raw bytes + epoch — overwritten
    /// on every `emitOutboundEnvelope`. Read by the WIRE batch operator
    /// to relay the envelope back to WIRE.
@@ -40,8 +41,7 @@ struct opp_contract_client : ethereum_contract_client {
                        const address_compat_type& contract_address,
                        const std::vector<fc::network::ethereum::abi::contract>& contracts)
       : ethereum_contract_client(client, contract_address, contracts)
-      , emit_outbound_envelope(create_tx_and_confirm<fc::variant>(get_abi("emitOutboundEnvelope")))
-      , finalize_epoch(create_tx_and_confirm<fc::variant>(get_abi("finalizeEpoch")))
+      , emit_outbound_envelope(create_tx_and_confirm<fc::variant, uint32_t>(get_abi("emitOutboundEnvelope")))
       , get_latest_outbound_envelope(create_call<fc::variant>(get_abi("getLatestOutboundEnvelope"))) {}
 };
 

@@ -35,11 +35,10 @@ inline constexpr size_t SOLANA_MAX_CHUNK_BYTES = 672;
  * signature provider) with the outpost program id + IDL to implement the
  * chain-agnostic SPI.
  *
- * The `deliver_outbound_envelope` implementation preserves the two-step
- * Solana pattern: call `epoch_in` to stage the incoming envelope, then
- * `emit_outbound_envelope` so the outpost emits any queued outgoing ones —
- * the return value is the signature of the second call (the one that signals
- * "work done for this epoch").
+ * `deliver_outbound_envelope` stages chunks through `epoch_in`, then sends a
+ * zero-data terminal `epoch_in` call. When that call reaches consensus the
+ * program emits its queued outbound envelope inline; the return value is the
+ * terminal call's signature.
  *
  * Constructed by `outpost_solana_client_plugin::create_outpost_client` —
  * `batch_operator_plugin` never builds one directly.
