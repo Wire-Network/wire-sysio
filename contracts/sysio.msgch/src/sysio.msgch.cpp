@@ -40,8 +40,9 @@ constexpr auto     ROA_ACCOUNT     = "sysio.roa"_n;
 // model, as sysio.token uses): the account stays finite at code+abi size; growth draws from the pool.
 constexpr name     ram_payer       = "sysio"_n;
 
-/// WIRE chain numeric id used in `opp::Endpoints` rows on the audit log.
-/// One end of every cross-chain envelope is always WIRE.
+/// WIRE chain numeric id used in `opp::Endpoints` — on the outbound wire envelope's
+/// route endpoints and on the audit log. One end of every cross-chain envelope is
+/// always WIRE.
 constexpr uint32_t WIRE_CHAIN_ID  = 1;
 
 using sysio::slug_name_literals::operator""_s;
@@ -1662,6 +1663,13 @@ void msgch::queueout(uint64_t chain_code,
 //  blanked; see opp_canonical_codec.hpp), the same digest the receiving
 //  outpost computes as its consensus tip. The first emit for an outpost
 //  chains from the empty hash (genesis).
+//
+//  The envelope's route endpoints are stamped from the destination's
+//  `sysio.chains` row (start = WIRE, end = {kind, external_chain_id}). The
+//  endpoints ride inside the epoch-digest preimage, so the receiving outpost
+//  can verify `end` against the chain it actually runs on (EVM outposts
+//  compare `block.chainid`) and reject an envelope that a misconfigured
+//  relay delivered to the wrong same-kind outpost.
 // ---------------------------------------------------------------------------
 void msgch::buildenv(uint64_t chain_code) {
    require_auth(EPOCH_ACCOUNT);
@@ -1704,6 +1712,18 @@ void msgch::buildenv(uint64_t chain_code) {
       return chains_tbl.get(sysio::chains::chain_key{sysio::slug_name{chain_code}});
    }();
    const bool is_svm_destination = op_row.kind == ChainKind::CHAIN_KIND_SVM;
+
+   // Route endpoints, stamped into the wire envelope below and mirrored on the envlog audit
+   // row (symmetric with the evalcons inbound projection: `kind` → ChainId.kind,
+   // `external_chain_id` → ChainId.id). `end` is the envelope's destination binding: it rides
+   // inside the epoch-digest preimage, so the receiving outpost can reject a cross-delivered
+   // envelope by comparing it against its own chain identity. Routing still derives from the
+   // chains registry row, never from these wire fields.
+   opp::Endpoints route_endpoints;
+   route_endpoints.start.kind = ChainKind::CHAIN_KIND_WIRE;
+   route_endpoints.start.id   = WIRE_CHAIN_ID;
+   route_endpoints.end.kind   = op_row.kind;
+   route_endpoints.end.id     = op_row.external_chain_id;
 
    // Phase 2: estimator-based initial pick. Walk candidates in order, accumulating a conservative byte
    // estimate; stop once the next one would push the envelope over MAX_ENVELOPE_BYTES. The trim loop
@@ -1821,6 +1841,7 @@ void msgch::buildenv(uint64_t chain_code) {
       msg.payload = std::move(payload);
 
       opp::Envelope env;
+      env.endpoints = route_endpoints;
       env.epoch_index = zpp::bits::vuint32_t{epoch};
       env.epoch_timestamp = zpp::bits::vuint64_t{now_ms};
       env.previous_envelope_hash = prev_envelope_digest;
@@ -1886,16 +1907,9 @@ void msgch::buildenv(uint64_t chain_code) {
    // the just-PROCESSED attestations for this outpost (their bytes are
    // now baked into `packed` above).
    {
-      // Resolve the destination chain row on `sysio.chains` (PK = slug_name
-      // value). Symmetric with the evalcons inbound endpoints projection
-      // — `kind` → `ChainId.kind`, `external_chain_id` → `ChainId.id`.
-      sysio::opp::Endpoints endpoints;
-      endpoints.start.kind = ChainKind::CHAIN_KIND_WIRE;
-      endpoints.start.id   = WIRE_CHAIN_ID;
-      endpoints.end.kind   = op_row.kind;
-      endpoints.end.id     = op_row.external_chain_id;
-
-      write_envelope_log(get_self(), endpoints, epoch, envelope_digest);
+      // Same endpoints the wire envelope carries (derived above from the
+      // destination's `sysio.chains` row).
+      write_envelope_log(get_self(), route_endpoints, epoch, envelope_digest);
 
       // Drop previous outpost emits — keep only the row we just inserted.
       auto by_outpost = envelopes.get_index<"byoutpost"_n>();

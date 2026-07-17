@@ -89,6 +89,10 @@ namespace sysio {
 
       /// Build outbound envelope from READY attestations for an outpost.
       /// Collects attestations, packs into OPP Envelope, stores in outenvelopes.
+      /// Stamps the envelope's route endpoints (start = WIRE, end = the
+      /// destination's `sysio.chains` `{kind, external_chain_id}`) so the
+      /// receiving outpost can reject an envelope a misconfigured relay
+      /// delivered to the wrong same-kind chain.
       [[sysio::action]]
       void buildenv(uint64_t chain_code);
 
