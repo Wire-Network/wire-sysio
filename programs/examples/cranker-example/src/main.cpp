@@ -18,10 +18,8 @@ int main(int argc, char** argv) {
    try {
       auto& cron_plug = app().get_plugin<cron_plugin>();
       auto& eth_plug = app().get_plugin<outpost_ethereum_client_plugin>();
-      // Ethereum clients are constructed at plugin_startup (provider resolution is deferred past the initialize phase);
-      // this example never enters the appbase exec loop before reading clients, so start the plugin subtree explicitly
-      // -- dependency-ordered, exactly as production startup would.
-      eth_plug.startup();
+      // Ethereum clients are constructed at plugin_initialize (the signature_provider_manager_plugin creates every
+      // provider at its own init, before this plugin initializes), so they are ready to read immediately after init<>.
       auto eth_clients = eth_plug.get_clients();
       FC_ASSERT(!eth_clients.empty(), "At least 1 ethereum client must be configured");
       auto eth_client = eth_clients[0];
