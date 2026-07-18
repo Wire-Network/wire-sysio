@@ -1,10 +1,10 @@
 # The manager plugin carries NO AWS dependency. The built-in `KEY:` / `KIOD:`
 # schemes live here; the AWS-backed `SSM:` / `KMS:` schemes are supplied by
 # the sibling signature_provider_ssm_plugin / signature_provider_kms_plugin,
-# which register their spec handler and claim their configured specs when
-# enabled via `plugin = ...`. A spec whose scheme has no handler at parse
-# time is retained for the owning plugin to claim; specs still unclaimed at
-# startup fail the boot with an error naming the plugin to enable.
+# which register their scheme handler from their constructor and are enabled
+# via `plugin = ...`. The manager creates every configured provider at its own
+# plugin_initialize, gated on the owning plugin being enabled; a spec whose
+# plugin is not enabled fails the boot with an error naming the plugin to add.
 plugin_target(
         signature_provider_manager_plugin
 

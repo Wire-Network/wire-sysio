@@ -170,13 +170,18 @@ BOOST_AUTO_TEST_CASE(plugin_scheme_creation_error_propagates) {
 
 BOOST_AUTO_TEST_CASE(scheme_handler_registry_is_queryable_and_idempotent) {
    sysio::sigprov::register_scheme_handler("REGX", make_stub_handler(), "sysio::first_plugin");
-   // Re-register (as repeated plugin construction across scoped_app instances does): insert-or-assign, the latest wins,
-   // no throw.
-   sysio::sigprov::register_scheme_handler("REGX", make_stub_handler(), "sysio::second_plugin");
+   // Re-registration by the SAME plugin is idempotent (repeated plugin construction across scoped_app instances does
+   // exactly this): no throw, the entry remains.
+   sysio::sigprov::register_scheme_handler("REGX", make_stub_handler(), "sysio::first_plugin");
 
    const auto* entry = sysio::sigprov::find_scheme_handler("REGX");
    BOOST_REQUIRE(entry != nullptr);
-   BOOST_CHECK_EQUAL(entry->plugin_name, "sysio::second_plugin");
+   BOOST_CHECK_EQUAL(entry->plugin_name, "sysio::first_plugin");
+
+   // A DIFFERENT plugin claiming an already-registered scheme is a wiring bug and fails loudly rather than shadowing.
+   BOOST_CHECK_EXCEPTION(
+      sysio::sigprov::register_scheme_handler("REGX", make_stub_handler(), "sysio::second_plugin"), fc::exception,
+      [](const auto& e) { return e.to_detail_string().find("already registered by plugin") != std::string::npos; });
 
    BOOST_CHECK(sysio::sigprov::find_scheme_handler("REGNEVER") == nullptr);
 }

@@ -26,6 +26,12 @@ namespace sysio {
 namespace {
 constexpr auto option_name_kiod_timeout = "signature-provider-kiod-timeout";
 
+/// The appbase option that lists enabled plugins (`--plugin` on the command line, `plugin =` in the config file). The
+/// manager reads it to learn which optional provider plugins are enabled; it is the same key appbase itself uses to
+/// drive plugin enablement. Kept a `const char*` (not `std::string_view`) because program_options lookups take a
+/// `const std::string&`.
+constexpr auto option_name_plugin = "plugin";
+
 /// The two built-in `<provider-type>:` schemes, handled directly by this plugin (never through the handler registries,
 /// never registrable).
 constexpr std::string_view scheme_key  = "KEY";
@@ -74,9 +80,27 @@ std::map<std::string, scheme_handler_entry, std::less<>>& scheme_handler_registr
 } // namespace
 
 void register_scheme_handler(std::string_view scheme, spec_handler handler, std::string_view plugin_name) {
-   scheme_handler_registry().insert_or_assign(
-      std::string{scheme},
-      scheme_handler_entry{.handler = std::move(handler), .plugin_name = std::string{plugin_name}});
+   // Mirror the validation the instance-side register_spec_handler enforces: this constructor-time path is the one
+   // every provider plugin uses, so an empty or built-in registration -- both programmer errors -- must fail as loudly
+   // here as there rather than being silently accepted.
+   FC_ASSERT(!scheme.empty(), "signature-provider scheme must not be empty");
+   FC_ASSERT(scheme != scheme_key && scheme != scheme_kiod,
+             "Cannot register built-in signature-provider scheme \"{}\"", scheme);
+   FC_ASSERT(static_cast<bool>(handler), "signature-provider handler for \"{}\" must not be empty", scheme);
+   FC_ASSERT(!plugin_name.empty(), "signature-provider scheme \"{}\" must name its providing plugin", scheme);
+   auto& registry = scheme_handler_registry();
+   // Re-registration by the SAME plugin is idempotent: appbase constructs a provider plugin once per application, and
+   // test binaries build several applications in one process, so a plugin's constructor legitimately re-registers its
+   // scheme across cases. A DIFFERENT plugin claiming an already-registered scheme is a build/wiring bug -- two
+   // providers cannot own one scheme -- and fails here rather than silently shadowing the first.
+   if (auto it = registry.find(scheme); it != registry.end()) {
+      FC_ASSERT(it->second.plugin_name == plugin_name,
+                "signature-provider scheme \"{}\" already registered by plugin \"{}\"; \"{}\" cannot also provide it",
+                scheme, it->second.plugin_name, plugin_name);
+   }
+   registry.insert_or_assign(std::string{scheme},
+                             scheme_handler_entry{.handler     = std::move(handler),
+                                                  .plugin_name = std::string{plugin_name}});
 }
 
 const scheme_handler_entry* find_scheme_handler(std::string_view scheme) {
@@ -97,15 +121,21 @@ public:
    fc::microseconds _kiod_provider_timeout_us;
 
    /**
-    * Record which optional provider plugins the operator enabled, parsed from `options["plugin"]` exactly as appbase's
-    * own --plugin handling (a composing option whose values may each carry several names split on space/tab/comma).
+    * Record which optional provider plugins the operator enabled, parsed from the `plugin` option exactly as appbase's
+    * own `--plugin` handling (a composing option whose values may each carry several names split on space/tab/comma).
     * Gates the process-wide `sigprov` handler registry: an extension scheme is honored only when its owning plugin is
     * enabled.
+    *
+    * This is the enablement path nodeop uses: provider plugins are `register_plugin<>`'d (available but off by default)
+    * and turned on with a `plugin =` line, never placed in appbase's `initialize<>` autostart set. appbase does not
+    * expose that autostart list at manager-initialize time, so autostart-based enablement (embedders only) is
+    * intentionally out of scope here; the gate error names the `plugin =` remedy, which is the supported way to enable
+    * a scheme.
     */
    void record_enabled_plugins(const variables_map& options) {
-      if (!options.count("plugin"))
+      if (!options.count(option_name_plugin))
          return;
-      for (const auto& arg : options.at("plugin").as<std::vector<std::string>>()) {
+      for (const auto& arg : options.at(option_name_plugin).as<std::vector<std::string>>()) {
          std::vector<std::string> names;
          boost::split(names, arg, boost::is_any_of(" \t,"));
          _enabled_plugins.insert(names.begin(), names.end());
@@ -194,8 +224,8 @@ public:
       }
       if (const auto* entry = sigprov::find_scheme_handler(spec_type_str)) {
          SYS_ASSERT(_enabled_plugins.contains(entry->plugin_name), chain::plugin_config_exception,
-                    "Signature-provider scheme \"{}\" is provided by plugin \"{}\", which is built into this "
-                    "binary but not enabled. Add \"plugin = {}\" to the config file (or pass --plugin {}).",
+                    "Signature-provider scheme \"{}\" is provided by plugin \"{}\". Enable it with a "
+                    "`plugin = {}` line in the config file (or pass `--plugin {}`).",
                     spec_type_str, entry->plugin_name, entry->plugin_name, entry->plugin_name);
          return entry->handler(key_type, public_key, spec_data);
       }
@@ -333,7 +363,9 @@ public:
       for (const auto& item : vo) {
          auto spec = item.value().as_string();
          auto key_type = fc::crypto::chain_key_type_reflector::from_string(item.key().c_str());
-         _default_signature_provider_specs[key_type] = spec;
+         auto [it, inserted] = _default_signature_provider_specs.try_emplace(key_type, spec);
+         FC_ASSERT(inserted, "corrupt {}: duplicate default for key type \"{}\"", def_sig_prov_file.string(),
+                   fc::crypto::chain_key_type_reflector::to_string(key_type));
       }
 
       for (const auto& [key_type, spec] : _default_signature_provider_specs) {
@@ -544,11 +576,11 @@ public:
 private:
    /**
     * Concurrency contract: the provider set is IMMUTABLE AFTER STARTUP, so every member below is unsynchronized on
-    * purpose. All mutation -- spec parsing, retained-spec claims, handler registration, the defaults machinery, the
-    * probe drain -- runs on the main thread during the sequential initialize/startup phases; the plugin's public
-    * mutators enforce this with `assert_pre_startup()`. Runtime access from other threads (producer, batch-operator,
-    * underwriter lookups) is read-only, and those threads are spawned by dependent plugins' startups, i.e. after every
-    * write here has completed.
+    * purpose. All mutation -- spec parsing, eager provider creation for enabled plugins, handler registration, the
+    * defaults machinery, the probe drain -- runs on the main thread during the sequential initialize/startup phases.
+    * The plugin's public mutators enforce this with `assert_pre_startup()`. Runtime access from other threads
+    * (producer, batch-operator, underwriter lookups) is read-only, and those threads are spawned by dependent plugins'
+    * startups, i.e. after every write here has completed.
     */
    std::uint32_t _anon_key_counter{0};
 
