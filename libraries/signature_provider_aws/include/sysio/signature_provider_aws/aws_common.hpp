@@ -28,6 +28,7 @@
 #include <cctype>
 #include <map>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <string_view>
 
@@ -87,10 +88,13 @@ std::string resolve_default_region();
  * @brief Process-wide, per-region cache of AWS service clients.
  *
  * One instance per service client type, held as a function-local static by the owning provider (see `get_kms_client` /
- * `get_ssm_client`). Lookups are unsynchronized on purpose: they happen only while providers are created -- during the
- * sequential, main-thread initialize phase -- and the signer closures capture their `shared_ptr<Client>` then. The
- * thread-safety that matters at runtime lives inside the AWS client itself: the SDK's HTTP pool is thread-safe, so
- * multiple closures sharing a client may submit requests concurrently.
+ * `get_ssm_client`). Lookups are serialized by an internal mutex: today every creation happens during the sequential,
+ * main-thread initialize phase, but the owning helpers are public and documented threadsafe, so the cache does not
+ * lean on that phase discipline. The mutex covers map lookup/insertion and client construction; the region resolution
+ * for an empty `region` runs before the lock is taken -- it reads no cache state, and its IMDS step may perform
+ * bounded network I/O that has no business holding the lock. At runtime the thread-safety that matters lives inside
+ * the AWS client itself: the SDK's HTTP pool is thread-safe, so multiple closures sharing a client may submit
+ * requests concurrently.
  *
  * Construction of a client is offline: no credential resolution, no network. Credentials are looked up via the standard
  * AWS provider chain on the first API call, not here. The client configuration carries the region and nothing else. An
@@ -117,6 +121,7 @@ public:
     */
    std::shared_ptr<Client> get(const std::string& region) {
       const std::string effective = region.empty() ? resolve_default_region() : region;
+      const std::lock_guard<std::mutex> lock{_mutex};
       auto& slot = _by_region[effective];
       if (!slot) {
          Aws::Client::ClientConfiguration cfg;
@@ -127,6 +132,7 @@ public:
    }
 
 private:
+   std::mutex                                       _mutex;
    std::map<std::string, std::shared_ptr<Client>>   _by_region;
 };
 
