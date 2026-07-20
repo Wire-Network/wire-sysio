@@ -11,9 +11,26 @@
 #include <fc/network/url.hpp>
 #include <fc/crypto/blake3.hpp>
 
+#include <cstdint>
 #include <filesystem>
 
 namespace fc {
+
+/** Resource and deadline limits for a streamed HTTP file download. */
+struct http_file_download_options {
+   /// Maximum time allowed to establish the connection.
+   microseconds connect_timeout;
+   /// Maximum time allowed to receive the response header after sending the request.
+   microseconds response_header_timeout;
+   /// Maximum time allowed without decoded response-body progress.
+   microseconds idle_read_timeout;
+   /// Maximum time allowed for the complete request and download.
+   microseconds total_timeout;
+   /// Maximum accepted response-body size in bytes.
+   uint64_t max_response_body_bytes;
+   /// Free bytes that must remain on the destination filesystem.
+   uint64_t min_free_disk_space_bytes;
+};
 
 class http_client {
    public:
@@ -36,6 +53,17 @@ class http_client {
                         const variant& payload,
                         const std::filesystem::path& output,
                         const time_point& deadline = time_point::maximum());
+
+      /**
+       * Download a binary POST response using explicit phase deadlines and resource limits.
+       *
+       * The response is written to a temporary sibling of @p output and renamed only after
+       * the complete bounded body has been persisted successfully.
+       */
+      void post_to_file(const url& dest,
+                        const variant& payload,
+                        const std::filesystem::path& output,
+                        const http_file_download_options& options);
 
       void add_cert(const std::string& cert_pem_string);
       void set_verify_peers(bool enabled);

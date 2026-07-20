@@ -38,6 +38,8 @@
 #include <fc/network/url.hpp>
 #include <fc/crypto/hex.hpp>
 #include <cstdlib>
+#include <limits>
+#include <string_view>
 
 
 const std::string deep_mind_logger_name("dmlog");
@@ -62,6 +64,37 @@ namespace snapshot_attest {
 /// missing record at the tip is not immediately conclusive. Half of producer_plugin's 25,000-block
 /// provider snapshot interval (_snapshot_provider_block_spacing).
 constexpr uint32_t snapshot_attestation_grace_blocks = 12500;
+
+constexpr std::string_view snapshot_connect_timeout_option = "snapshot-endpoint-connect-timeout-ms";
+constexpr std::string_view snapshot_header_timeout_option = "snapshot-endpoint-header-timeout-ms";
+constexpr std::string_view snapshot_idle_timeout_option = "snapshot-endpoint-idle-timeout-ms";
+constexpr std::string_view snapshot_total_timeout_option = "snapshot-endpoint-total-timeout-ms";
+constexpr std::string_view snapshot_max_download_size_option = "snapshot-endpoint-max-download-size-mb";
+constexpr std::string_view snapshot_min_disk_free_option = "snapshot-endpoint-min-disk-free-mb";
+
+constexpr uint64_t default_snapshot_connect_timeout_ms = 10'000;
+constexpr uint64_t default_snapshot_header_timeout_ms = 30'000;
+constexpr uint64_t default_snapshot_idle_timeout_ms = 60'000;
+constexpr uint64_t default_snapshot_total_timeout_ms = 24 * 60 * 60 * 1000;
+constexpr uint64_t bytes_per_mebibyte = 1024 * 1024;
+
+/// Read a positive millisecond option and convert it without overflowing fc::microseconds.
+fc::microseconds checked_milliseconds(const boost::program_options::variables_map& options,
+                                      std::string_view option_name) {
+   const auto value = options.at(std::string(option_name)).as<uint64_t>();
+   constexpr auto max_milliseconds = static_cast<uint64_t>(std::numeric_limits<int64_t>::max() / 1000);
+   SYS_ASSERT(value > 0 && value <= max_milliseconds, sysio::chain::plugin_config_exception,
+              "{} must be between 1 and {} milliseconds", option_name, max_milliseconds);
+   return fc::milliseconds(static_cast<int64_t>(value));
+}
+
+/// Convert a positive MiB option value to bytes without overflowing uint64_t.
+uint64_t checked_mebibytes(uint64_t value, std::string_view option_name) {
+   constexpr auto max_mebibytes = std::numeric_limits<uint64_t>::max() / bytes_per_mebibyte;
+   SYS_ASSERT(value > 0 && value <= max_mebibytes, sysio::chain::plugin_config_exception,
+              "{} must be between 1 and {} MiB", option_name, max_mebibytes);
+   return value * bytes_per_mebibyte;
+}
 
 } // anonymous namespace
 
@@ -268,9 +301,10 @@ public:
    /// irreversible-block handler with the just-finalized block; retries on later finalized
    /// blocks until the attestation record appears or the node catches up to the chain tip.
    void verify_snapshot_attestation(const signed_block_ptr& lib_block);
-   /// Download and hash-check a snapshot from a remote provider, leaving snapshot_path
+   /// Download and hash-check a bounded snapshot from a remote provider, leaving snapshot_path
    /// pointing at the downloaded file for the normal snapshot-load path to consume.
-   void fetch_snapshot_from_endpoint(const std::string& endpoint_url);
+   void fetch_snapshot_from_endpoint(const std::string& endpoint_url,
+                                     const fc::http_file_download_options& download_options);
 
 private:
    static void log_guard_exception(const chain::guard_exception& e);
@@ -478,6 +512,22 @@ void chain_plugin::set_program_options(options_description& cli, options_descrip
           "  http://host:port          - fetches latest snapshot\n"
           "  http://host:port/50000    - fetches snapshot at block 50000\n"
           "Requires empty database (use --delete-all-blocks to clear existing data).")
+         (snapshot_connect_timeout_option.data(),
+          bpo::value<uint64_t>()->default_value(default_snapshot_connect_timeout_ms),
+          "Maximum time in milliseconds to establish the snapshot download connection.")
+         (snapshot_header_timeout_option.data(),
+          bpo::value<uint64_t>()->default_value(default_snapshot_header_timeout_ms),
+          "Maximum time in milliseconds to receive snapshot endpoint response headers.")
+         (snapshot_idle_timeout_option.data(),
+          bpo::value<uint64_t>()->default_value(default_snapshot_idle_timeout_ms),
+          "Maximum time in milliseconds without snapshot response-body progress.")
+         (snapshot_total_timeout_option.data(),
+          bpo::value<uint64_t>()->default_value(default_snapshot_total_timeout_ms),
+          "Maximum total time in milliseconds for the snapshot file download.")
+         (snapshot_max_download_size_option.data(), bpo::value<uint64_t>(),
+          "Maximum snapshot response size in MiB. Defaults to chain-state-db-size-mb.")
+         (snapshot_min_disk_free_option.data(), bpo::value<uint64_t>(),
+          "Free disk space in MiB that must remain during download. Defaults to chain-state-db-guard-size-mb.")
          ;
 
 }
@@ -882,7 +932,30 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
       if (options.count("snapshot-endpoint")) {
          SYS_ASSERT(!options.contains("snapshot"), plugin_config_exception,
                     "--snapshot-endpoint is incompatible with --snapshot; use one or the other");
-         fetch_snapshot_from_endpoint(options.at("snapshot-endpoint").as<std::string>());
+
+         const auto max_download_bytes = checked_mebibytes(
+            options.contains(std::string(snapshot_max_download_size_option))
+               ? options.at(std::string(snapshot_max_download_size_option)).as<uint64_t>()
+               : options.at("chain-state-db-size-mb").as<uint64_t>(),
+            options.contains(std::string(snapshot_max_download_size_option))
+               ? snapshot_max_download_size_option
+               : std::string_view{"chain-state-db-size-mb"});
+         const auto min_free_disk_bytes = checked_mebibytes(
+            options.contains(std::string(snapshot_min_disk_free_option))
+               ? options.at(std::string(snapshot_min_disk_free_option)).as<uint64_t>()
+               : options.at("chain-state-db-guard-size-mb").as<uint64_t>(),
+            options.contains(std::string(snapshot_min_disk_free_option))
+               ? snapshot_min_disk_free_option
+               : std::string_view{"chain-state-db-guard-size-mb"});
+         const fc::http_file_download_options download_options{
+            .connect_timeout = checked_milliseconds(options, snapshot_connect_timeout_option),
+            .response_header_timeout = checked_milliseconds(options, snapshot_header_timeout_option),
+            .idle_read_timeout = checked_milliseconds(options, snapshot_idle_timeout_option),
+            .total_timeout = checked_milliseconds(options, snapshot_total_timeout_option),
+            .max_response_body_bytes = max_download_bytes,
+            .min_free_disk_space_bytes = min_free_disk_bytes,
+         };
+         fetch_snapshot_from_endpoint(options.at("snapshot-endpoint").as<std::string>(), download_options);
       }
 
       std::optional<chain_id_type> chain_id;
@@ -1515,7 +1588,8 @@ bool chain_plugin::accept_transactions() const {
    return my->accept_transactions;
 }
 
-void chain_plugin_impl::fetch_snapshot_from_endpoint(const std::string& endpoint_url) {
+void chain_plugin_impl::fetch_snapshot_from_endpoint(
+   const std::string& endpoint_url, const fc::http_file_download_options& download_options) {
    // Check for existing chain data
    auto shared_mem_path = chain_config->state_dir / "shared_memory.bin";
    auto chain_head_path = chain_config->state_dir / chain_head_filename;
@@ -1545,16 +1619,20 @@ void chain_plugin_impl::fetch_snapshot_from_endpoint(const std::string& endpoint
 
    ilog("Fetching snapshot metadata from endpoint: {}", endpoint_url);
 
-   fc::http_client http_client;
+   fc::http_client metadata_http_client;
+   auto metadata_deadline = fc::time_point::now();
+   metadata_deadline.safe_add(download_options.connect_timeout);
+   metadata_deadline.safe_add(download_options.response_header_timeout);
    fc::variant metadata_response;
    if (request_block_num) {
       auto url = fc::url(base_url + "/v1/snapshot/by_block");
       fc::mutable_variant_object payload;
       payload("block_num", *request_block_num);
-      metadata_response = http_client.post_sync(url, fc::variant(payload));
+      metadata_response = metadata_http_client.post_sync(url, fc::variant(payload), metadata_deadline);
    } else {
       auto url = fc::url(base_url + "/v1/snapshot/latest");
-      metadata_response = http_client.post_sync(url, fc::variant(fc::mutable_variant_object()));
+      metadata_response = metadata_http_client.post_sync(
+         url, fc::variant(fc::mutable_variant_object()), metadata_deadline);
    }
 
    auto snap_block_num = metadata_response["block_num"].as<uint32_t>();
@@ -1576,7 +1654,9 @@ void chain_plugin_impl::fetch_snapshot_from_endpoint(const std::string& endpoint
       auto download_url = fc::url(base_url + "/v1/snapshot/download");
       fc::mutable_variant_object download_payload;
       download_payload("block_num", snap_block_num);
-      http_client.post_to_file(download_url, fc::variant(download_payload), download_dest);
+      fc::http_client download_http_client;
+      download_http_client.post_to_file(
+         download_url, fc::variant(download_payload), download_dest, download_options);
    }
 
    // Quick check: compare the root hash stored in the snapshot footer against

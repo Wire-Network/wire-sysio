@@ -252,7 +252,7 @@ The peers endpoint is a separate feature and was not implemented in this phase.
 
 ### Configuration
 
-A single CLI-only option (not config file — single-use bootstrap):
+The endpoint and its resource limits are CLI-only because bootstrap is a single-use operation:
 
 ```
 --snapshot-endpoint URL    Fetch snapshot from URL and bootstrap.
@@ -260,6 +260,12 @@ A single CLI-only option (not config file — single-use bootstrap):
                              https://snap.example.com          → fetches latest
                              https://snap.example.com/50000    → fetches block 50000
 ```
+
+The bounded download options are `--snapshot-endpoint-connect-timeout-ms`,
+`--snapshot-endpoint-header-timeout-ms`, `--snapshot-endpoint-idle-timeout-ms`,
+`--snapshot-endpoint-total-timeout-ms`, `--snapshot-endpoint-max-download-size-mb`, and
+`--snapshot-endpoint-min-disk-free-mb`. They enforce finite phase/total deadlines, fixed-length and chunked response
+ceilings, and reserved filesystem headroom while retaining atomic temporary-file cleanup.
 
 The block number is encoded as a trailing path component of the URL. If the last path segment is a decimal number, it's treated as a specific block request (POST to `/v1/snapshot/by_block`); otherwise POST to `/v1/snapshot/latest`.
 
@@ -281,7 +287,9 @@ The block number is encoded as a trailing path component of the URL. If the last
    ```
    This works naturally with `--delete-all-blocks` which clears state before snapshot handling.
 3. **Fetch metadata:** POST to `/v1/snapshot/latest` or `/v1/snapshot/by_block` depending on URL format.
-4. **Download snapshot:** Uses `fc::http_client::post_to_file()` to POST to `/v1/snapshot/download` and save binary response to local snapshots directory.
+4. **Download snapshot:** Uses bounded `fc::http_client::post_to_file()` streaming to POST to
+   `/v1/snapshot/download`, enforce deadlines/size/disk headroom, and atomically save the response to the local
+   snapshots directory.
 5. **Root hash verification:** Uses `threaded_snapshot_reader::load_index()` to read the footer and compare the stored root hash against the advertised `root_hash`. This is a fast metadata-only check that catches download corruption. Full integrity verification (re-hashing all sections) happens during snapshot loading, and on-chain attestation verification happens after syncing.
 6. **Continue normal loading:** Sets `snapshot_path` to downloaded file and `snapshot_auto_fetched = true`. No `--genesis-json` needed — snapshot contains genesis.
 

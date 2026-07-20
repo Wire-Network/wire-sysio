@@ -453,11 +453,21 @@ try:
     endpointUrl = node0.endpointHttp
     Print(f"Restart bootstrap node with --snapshot-endpoint {endpointUrl}")
 
+    # Exercise the bounded-download CLI options with a finite cap just above the
+    # snapshot being bootstrapped and a small deterministic test headroom.
+    snap2FileSize = os.path.getsize(node0.getLatestSnapshot())
+    bytesPerMiB = 1024 * 1024
+    downloadLimitMiB = (snap2FileSize + bytesPerMiB - 1) // bytesPerMiB + 1
+    downloadLimits = (
+        f"--snapshot-endpoint-max-download-size-mb {downloadLimitMiB} "
+        "--snapshot-endpoint-min-disk-free-mb 1"
+    )
+
     # Fetches latest snapshot (snap2). The attestation is NOT in the snapshot —
     # it's in blocks after snap2BlockNum. The bootstrap node syncs forward and
     # finds the attestation record once it reaches those blocks.
     isRelaunchSuccess = bootstrapNode.relaunch(
-        chainArg=f"--delete-all-blocks --snapshot-endpoint {endpointUrl}")
+        chainArg=f"--delete-all-blocks --snapshot-endpoint {endpointUrl} {downloadLimits}")
     assert isRelaunchSuccess, "Failed to relaunch bootstrap node from snapshot endpoint"
 
     # The attestation is in blocks after the snapshot height, so wait for the bootstrap
