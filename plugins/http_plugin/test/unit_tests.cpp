@@ -47,6 +47,8 @@ constexpr uint32_t request_body_bytes_in_flight_index = 5;
 constexpr uint32_t category_uw_index = 6;
 constexpr uint32_t stream_status_codes_index = 7;
 constexpr uint32_t stream_request_body_index = 8;
+constexpr uint32_t stream_response_bytes_index = 9;
+constexpr uint32_t stream_over_budget_index = 10;
 // Keeps unsharded IPv6 probe coverage on the historical port 9999.
 constexpr uint32_t ipv6_probe_index = 2;
 
@@ -1056,6 +1058,137 @@ BOOST_FIXTURE_TEST_CASE(request_body_bytes_in_flight_stream, http_plugin_test_fi
    BOOST_REQUIRE(post_body() == boost::beast::http::status::ok);
    BOOST_CHECK_GE(observed_bytes_in_flight.load(), body_size);
    wait_for_no_bytes_in_flight();
+}
+
+// Streaming responses must be charged against bytes_in_flight WHILE the emitter runs, not only
+// after the body is fully materialized: json_writer's growth guard settles the buffer into the
+// budget every stride. The emitter below samples the budget mid-emission; without incremental
+// accounting the sampled value reads 0 (the response was invisible to the budget until complete).
+BOOST_FIXTURE_TEST_CASE(stream_response_bytes_in_flight, http_plugin_test_fixture) {
+   const std::string endpoint = test_http_endpoint("127.0.0.1", stream_response_bytes_index);
+   const std::string server_address = "--http-server-address=" + endpoint;
+   const std::string port = test_http_port(stream_response_bytes_index);
+
+   http_plugin* http_plugin = init({"--plugin=sysio::http_plugin",
+                                    server_address.c_str(),
+                                    "--http-max-bytes-in-flight-mb=64"});
+   BOOST_REQUIRE(http_plugin);
+
+   // 32 x 64KiB chunks ~= 2 MiB emitted; sample the budget halfway through emission.
+   constexpr size_t chunk_size  = 64 * 1024;
+   constexpr size_t chunk_count = 32;
+   std::atomic<size_t> observed_bytes_in_flight{0};
+   http_plugin->add_api_stream({{std::string("/2megabyte_stream"), api_category::node,
+                                 [&](string&&, string&&, url_response_stream_callback&& cb) {
+                                    cb(200, [&](fc::json_writer& w) {
+                                       w.begin_array();
+                                       for (size_t i = 0; i < chunk_count; ++i) {
+                                          w.value_string(std::string(chunk_size, 'x'));
+                                          if (i == chunk_count / 2)
+                                             observed_bytes_in_flight.store(http_plugin->bytes_in_flight());
+                                       }
+                                       w.end_array();
+                                    });
+                                 }}}, appbase::exec_queue::read_write);
+
+   boost::asio::io_context ctx;
+   boost::asio::ip::tcp::resolver resolver(ctx);
+
+   auto get_response = [&]() {
+      boost::asio::ip::tcp::socket s(ctx, boost::asio::ip::tcp::v4());
+      boost::asio::connect(s, resolver.resolve("127.0.0.1", port));
+      boost::beast::http::request<boost::beast::http::empty_body> req(boost::beast::http::verb::get, "/2megabyte_stream", 11);
+      req.set(http::field::host, endpoint);
+      boost::beast::http::write(s, req);
+
+      boost::beast::http::response<boost::beast::http::string_body> resp;
+      boost::beast::flat_buffer buffer;
+      boost::beast::http::read(s, buffer, resp);
+      return resp;
+   };
+
+   auto resp = get_response();
+   BOOST_REQUIRE(resp.result() == boost::beast::http::status::ok);
+   BOOST_CHECK_GT(resp.body().size(), chunk_size * chunk_count);
+   // Regression assertion: 0 without the growth guard's incremental settle. At the halfway
+   // sample ~1 MiB has been emitted; charging lags by at most one stride, so half that is a
+   // safely conservative floor.
+   BOOST_CHECK_GE(observed_bytes_in_flight.load(), chunk_size * chunk_count / 4);
+
+   uint16_t max = std::numeric_limits<uint16_t>::max();
+   while (http_plugin->requests_in_flight() > 0 && --max)
+      std::this_thread::sleep_for(std::chrono::milliseconds(5));
+   BOOST_CHECK(max > 0);
+   BOOST_CHECK_EQUAL(http_plugin->bytes_in_flight(), 0u);
+}
+
+// Over-budget streaming responses must abort DURING emission (503 busy) instead of
+// materializing in full and only then being rejected: the growth guard throws once
+// verify_max_bytes_in_flight rejects the incrementally-charged buffer. The chunk counter
+// proves early abort; the follow-up request proves the budget released and the plugin
+// still serves.
+BOOST_FIXTURE_TEST_CASE(stream_response_over_budget_aborts_early, http_plugin_test_fixture) {
+   const std::string endpoint = test_http_endpoint("127.0.0.1", stream_over_budget_index);
+   const std::string server_address = "--http-server-address=" + endpoint;
+   const std::string port = test_http_port(stream_over_budget_index);
+
+   http_plugin* http_plugin = init({"--plugin=sysio::http_plugin",
+                                    server_address.c_str(),
+                                    "--http-max-bytes-in-flight-mb=1"});
+   BOOST_REQUIRE(http_plugin);
+
+   // Attempts 32 MiB against a 1 MiB budget; the guard must stop it within a stride or two
+   // past the budget.
+   constexpr size_t chunk_size  = 64 * 1024;
+   constexpr size_t chunk_count = 512;
+   std::atomic<size_t> chunks_emitted{0};
+   http_plugin->add_api_stream({{std::string("/32megabyte_stream"), api_category::node,
+                                 [&](string&&, string&&, url_response_stream_callback&& cb) {
+                                    cb(200, [&](fc::json_writer& w) {
+                                       w.begin_array();
+                                       for (size_t i = 0; i < chunk_count; ++i) {
+                                          w.value_string(std::string(chunk_size, 'x'));
+                                          chunks_emitted.fetch_add(1);
+                                       }
+                                       w.end_array();
+                                    });
+                                 },
+                                },
+                                {std::string("/small_stream"), api_category::node,
+                                 [&](string&&, string&&, url_response_stream_callback&& cb) {
+                                    cb(200, [](fc::json_writer& w) { w.value_string("ok"); });
+                                 }}}, appbase::exec_queue::read_write);
+
+   boost::asio::io_context ctx;
+   boost::asio::ip::tcp::resolver resolver(ctx);
+
+   auto get_status = [&](const char* path) {
+      boost::asio::ip::tcp::socket s(ctx, boost::asio::ip::tcp::v4());
+      boost::asio::connect(s, resolver.resolve("127.0.0.1", port));
+      boost::beast::http::request<boost::beast::http::empty_body> req(boost::beast::http::verb::get, path, 11);
+      req.set(http::field::host, endpoint);
+      boost::beast::http::write(s, req);
+
+      boost::beast::http::response<boost::beast::http::string_body> resp;
+      boost::beast::flat_buffer buffer;
+      boost::beast::http::read(s, buffer, resp);
+      return resp.result();
+   };
+
+   BOOST_CHECK(get_status("/32megabyte_stream") == boost::beast::http::status::service_unavailable);
+   // Early abort: the guard threw within a couple of strides past the 1 MiB budget, far
+   // short of the 512 chunks the emitter would produce unguarded.
+   BOOST_CHECK_LT(chunks_emitted.load(), 64u);
+   BOOST_CHECK_GT(chunks_emitted.load(), 0u);
+
+   uint16_t max = std::numeric_limits<uint16_t>::max();
+   while (http_plugin->requests_in_flight() > 0 && --max)
+      std::this_thread::sleep_for(std::chrono::milliseconds(5));
+   BOOST_CHECK(max > 0);
+   BOOST_CHECK_EQUAL(http_plugin->bytes_in_flight(), 0u);
+
+   // The budget drained: a small streaming response is admitted and served normally.
+   BOOST_CHECK(get_status("/small_stream") == boost::beast::http::status::ok);
 }
 
 //A warning for future tests: destruction of http_plugin_test_fixture sometimes does not destroy http_plugin's listeners. Tests

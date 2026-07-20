@@ -21,6 +21,7 @@
 #include <fc/int128.hpp>
 #include <fc/int256_fwd.hpp>
 #include <fc/io/json_stream.hpp>
+#include <fc/nullable.hpp>
 #include <fc/string.hpp>
 #include <fc/time.hpp>
 
@@ -505,6 +506,34 @@ namespace fc
           vo = T();
           from_variant( var, *vo );
       }
+   }
+
+   /** @ingroup Serializable
+    *  fc::nullable<T> trio -- like std::optional<T> except a disengaged value serializes
+    *  as an explicit JSON null under its key instead of being omitted by the reflector
+    *  visitors (see fc/nullable.hpp).  Kept adjacent to the std::optional overloads so
+    *  the two families' engaged-value shapes cannot drift.
+    */
+   template<typename T>
+   void to_variant( const nullable<T>& n, variant& vo )
+   {
+      if( n.value ) to_variant( *n.value, vo );
+      else          vo = variant();
+   }
+
+   template<typename T>
+   void from_variant( const variant& var, nullable<T>& n )
+   {
+      if( var.is_null() ) { n.value.reset(); return; }
+      n.value = T();
+      from_variant( var, *n.value );
+   }
+
+   template<typename T>
+   void to_json_stream( const nullable<T>& n, json_writer& w )
+   {
+      if( n.value ) to_json_stream( *n.value, w );
+      else          w.value_null();
    }
 
    template<typename T>

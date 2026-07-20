@@ -1432,8 +1432,15 @@ void stream_sink::end_array() {
 void stream_sink::key(std::string_view k) { w_.key(k); }
 
 void stream_sink::value_string(std::string_view s) { w_.value_string(s); on_value_emitted(); }
-void stream_sink::value_int64(int64_t n)           { w_.value_int64(n);  on_value_emitted(); }
-void stream_sink::value_uint64(uint64_t n)         { w_.value_uint64(n); on_value_emitted(); }
+// 64-bit integers route through the guarded fc::to_json_stream overloads (not the writer's
+// raw value_* emitters) so magnitudes past json_integer_quote_magnitude emit quoted, exactly
+// as variant_sink::value_int64's fc::variant(n) renders through fc::json::to_string.  ABI
+// built-in int64/uint64 fields already stream through the guarded generic in
+// get_built_in_stream_unpacks; this pins the same quoting for the sink interface itself, so
+// direct sink callers (the bytes size field today, any future caller) cannot diverge
+// between the two sinks.
+void stream_sink::value_int64(int64_t n)           { fc::to_json_stream(n, w_);  on_value_emitted(); }
+void stream_sink::value_uint64(uint64_t n)         { fc::to_json_stream(n, w_); on_value_emitted(); }
 void stream_sink::value_bool(bool b)               { w_.value_bool(b);   on_value_emitted(); }
 void stream_sink::value_null()                     { w_.value_null();    on_value_emitted(); }
 

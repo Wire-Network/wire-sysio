@@ -752,6 +752,73 @@ BOOST_AUTO_TEST_CASE(uint_types)
 
 } FC_LOG_AND_RETHROW() }
 
+// int64/uint64 quoting boundaries through the ABI paths: values with magnitude past
+// fc::json_integer_quote_magnitude (0xffffffff) emit as quoted JSON strings, values at the
+// boundary stay bare -- and binary_to_json_stream must agree byte-for-byte with
+// binary_to_variant + json::to_string (verify_byte_round_trip_conversion runs
+// verify_stream_matches_variant on every case).
+BOOST_AUTO_TEST_CASE(large_int_quoting_boundaries)
+{ try {
+
+   const char* test_abi = R"=====(
+   {
+       "version": "sysio::abi/1.0",
+       "types": [],
+       "structs": [{
+           "name": "int_boundaries",
+           "base": "",
+           "fields": [{
+               "name": "i64_bare_max",
+               "type": "int64"
+           },{
+               "name": "i64_quoted",
+               "type": "int64"
+           },{
+               "name": "i64_neg_bare",
+               "type": "int64"
+           },{
+               "name": "i64_neg_quoted",
+               "type": "int64"
+           },{
+               "name": "u64_bare",
+               "type": "uint64"
+           },{
+               "name": "u64_quoted",
+               "type": "uint64"
+           }]
+       }],
+       "actions": [],
+       "tables": [],
+       "ricardian_clauses": []
+   }
+   )=====";
+
+   abi_serializer abis(fc::json::from_string(test_abi).as<abi_def>(), yield_fn());
+
+   const char* test_data = R"=====(
+   {
+     "i64_bare_max"   : 4294967295,
+     "i64_quoted"     : "4294967296",
+     "i64_neg_bare"   : -4294967295,
+     "i64_neg_quoted" : "-4294967296",
+     "u64_bare"       : 4294967295,
+     "u64_quoted"     : "18446744073709551615"
+   }
+   )=====";
+
+   auto var2 = verify_byte_round_trip_conversion(abis, "int_boundaries", fc::json::from_string(test_data));
+
+   // Pin the emitted shapes: at the quote magnitude stays bare, one past it emits quoted.
+   const std::string json = fc::json::to_string(var2, get_deadline());
+   BOOST_CHECK(json.find("\"i64_bare_max\":4294967295") != std::string::npos);
+   BOOST_CHECK(json.find("\"i64_quoted\":\"4294967296\"") != std::string::npos);
+   BOOST_CHECK(json.find("\"i64_neg_bare\":-4294967295") != std::string::npos);
+   BOOST_CHECK(json.find("\"i64_neg_quoted\":\"-4294967296\"") != std::string::npos);
+   BOOST_CHECK(json.find("\"u64_bare\":4294967295") != std::string::npos);
+   BOOST_CHECK(json.find("\"u64_quoted\":\"18446744073709551615\"") != std::string::npos);
+
+} FC_LOG_AND_RETHROW() }
+
 
 // Shared fixture for `general` and the streaming-parity test.  Top-level fields
 // cover every built-in plus inherited base structs, large-int quoting boundaries,

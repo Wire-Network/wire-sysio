@@ -3060,7 +3060,7 @@ read_only::get_finalizer_info_result read_only::get_finalizer_info( const read_o
 
    // Populate a particular finalizer policy
    auto add_policy_to_result = [&](const finalizer_policy_ptr& from_policy,
-                                   std::optional<chain::finalizer_policy>& to_policy) {
+                                   fc::nullable<chain::finalizer_policy>& to_policy) {
       if (from_policy) {
          to_policy = *from_policy;
          for (const auto& f: from_policy->finalizers) {

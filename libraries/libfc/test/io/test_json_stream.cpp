@@ -54,6 +54,11 @@ struct with_optional_t {
    std::optional<std::string> note;
 };
 
+struct with_nullable_t {
+   int32_t               id = 0;
+   fc::nullable<point_t> maybe_point;
+};
+
 struct with_map_t {
    std::map<std::string, int32_t> counts;
 };
@@ -82,6 +87,7 @@ FC_REFLECT(point_t, (x)(y)(label))
 FC_REFLECT(nested_t, (name)(values)(maybe)(where))
 FC_REFLECT_ENUM(color_t, (red)(green)(blue))
 FC_REFLECT(with_optional_t, (id)(note))
+FC_REFLECT(with_nullable_t, (id)(maybe_point))
 FC_REFLECT(with_map_t, (counts))
 FC_REFLECT(block_like_t, (timestamp)(digest)(producer))
 FC_REFLECT(platform_ints_t, (sz)(ll)(ull))
@@ -248,6 +254,40 @@ BOOST_AUTO_TEST_CASE(enum_value) {
    BOOST_CHECK_EQUAL(fc::to_json_string(color_t::green), "\"green\"");
 }
 
+BOOST_AUTO_TEST_CASE(nullable_field_emits_explicit_null) {
+   // fc::nullable pins "key always present": a disengaged value serializes as an explicit
+   // JSON null under its key on BOTH paths, where a reflected std::optional omits the key
+   // entirely (see optional_field_omitted below).  Endpoint schemas like get_finalizer_info
+   // depend on this shape.
+   auto via_variant = [](const with_nullable_t& v) {
+      fc::variant var;
+      fc::to_variant(v, var);
+      return fc::json::to_string(var, fc::json::yield_function_t());
+   };
+
+   const with_nullable_t absent{.id = 1, .maybe_point = {}};
+   BOOST_CHECK_EQUAL(fc::to_json_string(absent), R"({"id":1,"maybe_point":null})");
+   BOOST_CHECK_EQUAL(fc::to_json_string(absent), via_variant(absent));
+
+   const with_nullable_t present{.id = 2, .maybe_point = point_t{.x = 3, .y = 4, .label = "p"}};
+   BOOST_CHECK_EQUAL(fc::to_json_string(present), R"({"id":2,"maybe_point":{"x":3,"y":4,"label":"p"}})");
+   BOOST_CHECK_EQUAL(fc::to_json_string(present), via_variant(present));
+
+   // from_variant mirrors the emission: null resets an engaged value, an object engages it.
+   fc::variant var;
+   fc::to_variant(absent, var);
+   with_nullable_t back{.id = 9, .maybe_point = point_t{}};
+   fc::from_variant(var, back);
+   BOOST_CHECK_EQUAL(back.id, 1);
+   BOOST_CHECK(!back.maybe_point.has_value());
+
+   fc::to_variant(present, var);
+   fc::from_variant(var, back);
+   BOOST_REQUIRE(back.maybe_point.has_value());
+   BOOST_CHECK_EQUAL(back.maybe_point->x, 3);
+   BOOST_CHECK_EQUAL(back.maybe_point->label, "p");
+}
+
 BOOST_AUTO_TEST_CASE(optional_field_omitted) {
    // Unset optional field on a reflected struct is omitted entirely.
    with_optional_t o{.id = 1, .note = std::nullopt};
@@ -296,6 +336,25 @@ BOOST_AUTO_TEST_CASE(fc_microseconds) {
    BOOST_CHECK_EQUAL(fc::to_json_string(fc::microseconds{0}),        "0");
    BOOST_CHECK_EQUAL(fc::to_json_string(fc::microseconds{1'234'567}), "1234567");
    BOOST_CHECK_EQUAL(fc::to_json_string(fc::microseconds{-5}),       "-5");
+
+   // Counts with magnitude past json_integer_quote_magnitude must emit quoted, exactly as
+   // the variant path renders the int64 count through fc::json::to_string.  Boundary on
+   // both sides of +-0xffffffff (decimal literals: hex would be unsigned and break negation).
+   BOOST_CHECK_EQUAL(fc::to_json_string(fc::microseconds{4294967295}),  "4294967295");
+   BOOST_CHECK_EQUAL(fc::to_json_string(fc::microseconds{4294967296}),  "\"4294967296\"");
+   BOOST_CHECK_EQUAL(fc::to_json_string(fc::microseconds{-4294967295}), "-4294967295");
+   BOOST_CHECK_EQUAL(fc::to_json_string(fc::microseconds{-4294967296}), "\"-4294967296\"");
+
+   auto via_variant = [](const fc::microseconds& us) {
+      fc::variant v;
+      fc::to_variant(us, v);
+      return fc::json::to_string(v, fc::json::yield_function_t());
+   };
+   for (int64_t count : {int64_t{0}, int64_t{4294967295}, int64_t{4294967296},
+                         int64_t{-4294967295}, int64_t{-4294967296},
+                         std::numeric_limits<int64_t>::min(), std::numeric_limits<int64_t>::max()}) {
+      BOOST_CHECK_EQUAL(fc::to_json_string(fc::microseconds{count}), via_variant(fc::microseconds{count}));
+   }
 }
 
 BOOST_AUTO_TEST_CASE(fc_time_point_roundtrip_vs_variant) {
@@ -552,6 +611,77 @@ BOOST_AUTO_TEST_CASE(set_raw_splices_preformatted_fragment) {
       w.end_object();
    }
    BOOST_CHECK_EQUAL(out, R"({"name":"alice","payload":{"a":1,"b":"two"},"done":true})");
+}
+
+// -- growth guard -------------------------------------------------------------------------
+
+namespace {
+/// Foreign (non-fc, non-std) exception type: models the http layer's budget abort
+/// (sysio::detail::stream_response_budget_exceeded), which must fly through serializer
+/// catch(fc::exception&) handlers untouched.
+struct test_budget_abort {};
+} // namespace
+
+BOOST_AUTO_TEST_CASE(growth_guard_fires_each_stride) {
+   // The guard is consulted at token boundaries once the buffer has grown one stride past
+   // the previous invocation: observed sizes are strictly increasing by at least a stride.
+   std::string out;
+   std::vector<size_t> observed;
+   {
+      fc::json_writer w(out, [&](size_t sz) { observed.push_back(sz); }, 16);
+      w.begin_array();
+      for (int i = 0; i < 100; ++i) w.value_string("0123456789");
+      w.end_array();
+   }
+   BOOST_REQUIRE(!observed.empty());
+   for (size_t i = 1; i < observed.size(); ++i) {
+      BOOST_CHECK_GE(observed[i], observed[i - 1] + 16);
+   }
+
+   // Emissions smaller than one stride never invoke the guard: zero overhead for the
+   // typical small response.
+   std::string small;
+   size_t calls = 0;
+   {
+      fc::json_writer w(small, [&](size_t) { ++calls; }, 1u << 20);
+      w.value_string("tiny");
+   }
+   BOOST_CHECK_EQUAL(calls, 0u);
+}
+
+BOOST_AUTO_TEST_CASE(growth_guard_throw_aborts_emission) {
+   // A guard throw propagates out of the token call and stops the buffer growing: the
+   // emission loop below would append ~13KB unguarded, but aborts within a token or two
+   // of the guard's threshold.
+   std::string out;
+   fc::json_writer w(out, [&](size_t sz) { if (sz > 64) throw test_budget_abort{}; }, 8);
+   w.begin_array();
+   auto emit_many = [&] { for (int i = 0; i < 1000; ++i) w.value_string("xxxxxxxxxx"); };
+   BOOST_CHECK_THROW(emit_many(), test_budget_abort);
+   BOOST_CHECK_LT(out.size(), 200u);
+}
+
+BOOST_AUTO_TEST_CASE(growth_guard_rearms_after_throw) {
+   // A catch-and-continue serializer (eg the abi_serializer hex-fallback path) absorbing
+   // the guard's throw must NOT disable the guard: the very next token re-invokes it
+   // regardless of stride, so the abort re-raises until it unwinds out of the emitter.
+   // Once the guard passes again (budget freed), emission resumes normally.
+   std::string out;
+   bool reject = true;
+   size_t calls = 0;
+   fc::json_writer w(out, [&](size_t) { ++calls; if (reject) throw test_budget_abort{}; }, 4);
+   w.begin_array();
+   w.value_string("aaaaaaaaaa");                                 // grows past the stride; guard fires on the NEXT token
+   BOOST_CHECK_THROW(w.value_string("bbb"), test_budget_abort);  // stride crossed -> guard throws, nothing appended
+   BOOST_CHECK_EQUAL(calls, 1u);
+   BOOST_CHECK_THROW(w.value_string("ccc"), test_budget_abort);  // absorbed upstream? re-fires immediately
+   BOOST_CHECK_EQUAL(calls, 2u);
+   reject = false;                                               // budget freed: same retry now passes
+   w.value_string("ddd");
+   w.end_array();
+   BOOST_CHECK_EQUAL(calls, 3u);
+   BOOST_CHECK(w.balanced());
+   BOOST_CHECK_EQUAL(out, R"(["aaaaaaaaaa","ddd"])");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

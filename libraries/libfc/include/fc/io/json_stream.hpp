@@ -36,6 +36,13 @@ inline constexpr int64_t json_integer_quote_magnitude = 0xffffffff;
 /// fc::json::to_string's yield would.
 inline constexpr uint32_t json_stream_max_depth = 200;
 
+/// Default byte-growth stride between growth-guard invocations (see json_writer's guarded
+/// constructor).  Small enough that a caller enforcing a memory budget observes emission
+/// growth promptly; large enough that the guard is a negligible fraction of emission cost
+/// (one invocation per ~64 KiB appended).  Responses smaller than one stride never invoke
+/// the guard mid-emission.
+inline constexpr size_t json_writer_default_guard_stride = 64 * 1024;
+
 /**
  *  Streaming JSON writer that emits tokens directly into an output std::string.
  *
@@ -57,9 +64,32 @@ inline constexpr uint32_t json_stream_max_depth = 200;
  */
 class json_writer {
 public:
-   explicit json_writer(std::string& out)
+   /// Growth-guard callback: invoked with the output buffer's current size (bytes) each time
+   /// the buffer has grown one stride past the previous invocation.  The guard may throw to
+   /// abort emission -- eg an HTTP memory-budget enforcer rejecting a response mid-serialize.
+   /// The guard must not emit through the writer it guards.
+   using growth_guard_t = std::function<void(size_t buffer_size)>;
+
+   /// @param out          buffer tokens are appended to; also the guard's measured quantity.
+   /// @param growth_guard optional guard consulted as the buffer grows (empty = never).
+   /// @param guard_stride minimum byte growth between guard invocations; a stride of 0
+   ///                     re-checks on every token (test hook, not for production use).
+   ///
+   /// Guard-throw semantics: if the guard throws, the writer re-arms so the NEXT token
+   /// emitted re-invokes the guard immediately (regardless of stride).  Mid-emission
+   /// rollback handlers (eg abi_serializer's catch-rewind-hex-fallback path) legitimately
+   /// swallow exceptions from nested serializers; re-arming guarantees a guard abort
+   /// re-raises out of every such handler instead of being silently absorbed -- unless the
+   /// guard's condition has cleared, in which case emission resumes legitimately.
+   explicit json_writer(std::string& out, growth_guard_t growth_guard = {},
+                        size_t guard_stride = json_writer_default_guard_stride)
    : out_(out)
+   , guard_(std::move(growth_guard))
+   , guard_stride_(guard_stride)
    {
+      if (guard_) {
+         next_guard_check_ = out_.size() + guard_stride_;
+      }
       // Enough room for a reasonable response without reallocation; callers that know
       // the expected size can reserve() themselves before constructing the writer.
       // Skip if the caller already has slack so we don't risk a spec-permitted shrink.
@@ -94,6 +124,7 @@ public:
    }
 
    void key(std::string_view k) {
+      guard_check();
       assert(!stack_.empty() && stack_.back().ctx == context::object);
       assert(!awaiting_value_); // two key() calls in a row would produce "a":,"b": (invalid JSON)
       if (stack_.back().has_item) {
@@ -252,7 +283,25 @@ private:
       bool    has_item = false; // true once one element or key:value has been emitted in this frame
    };
 
+   /// Consult the growth guard if the buffer has crossed the next stride boundary (or on
+   /// every token once a prior guard invocation threw -- see the constructor contract).
+   /// Called from the head of key() and value_prefix(), which between them front every
+   /// token-emitting entry point except end_object/end_array (1 byte each; the final
+   /// buffer size is the caller's to observe after emission completes).
+   void guard_check() {
+      if (out_.size() < next_guard_check_) {
+         return;
+      }
+      // Re-arm across a guard throw: 0 makes every subsequent token re-enter here while
+      // the guard keeps throwing, so a catch-and-continue serializer upstream cannot
+      // absorb the abort.  Restored to a real stride only when the guard returns cleanly.
+      next_guard_check_ = 0;
+      guard_(out_.size());
+      next_guard_check_ = out_.size() + guard_stride_;
+   }
+
    void value_prefix() {
+      guard_check();
       if (awaiting_value_) {
          // Value right after a key() - no separator, first-item bookkeeping already set.
          awaiting_value_ = false;
@@ -288,6 +337,9 @@ private:
 
    std::string&             out_;
    std::vector<frame>       stack_;            // small; vector is fine and avoids extra deps
+   growth_guard_t           guard_;            // empty unless the guarded constructor form was used
+   size_t                   guard_stride_     = json_writer_default_guard_stride;
+   size_t                   next_guard_check_ = std::numeric_limits<size_t>::max(); // SIZE_MAX = no guard
    bool                     awaiting_value_ = false;
 };
 

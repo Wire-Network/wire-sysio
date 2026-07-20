@@ -24,6 +24,7 @@
 #include <boost/container/flat_set.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
 
+#include <fc/nullable.hpp>
 #include <fc/time.hpp>
 
 #include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
@@ -668,8 +669,13 @@ public:
    };
 
    struct get_finalizer_info_result {
-      std::optional<chain::finalizer_policy> active_finalizer_policy;  // current active policy
-      std::optional<chain::finalizer_policy> pending_finalizer_policy; // current pending policy. Empty if not existing
+      // fc::nullable (not std::optional) pins the endpoint schema: both keys are always
+      // present and serialize as an explicit JSON null when the policy does not exist,
+      // matching the shape the earlier fc::variant-typed fields emitted.  A reflected
+      // std::optional would omit the key entirely when disengaged, breaking clients that
+      // access the key before testing it for null.
+      fc::nullable<chain::finalizer_policy> active_finalizer_policy;  // current active policy. null if not existing
+      fc::nullable<chain::finalizer_policy> pending_finalizer_policy; // current pending policy. null if not existing
 
       // Last tracked vote information for each of the finalizers in
       // active_finalizer_policy and pending_finalizer_policy.

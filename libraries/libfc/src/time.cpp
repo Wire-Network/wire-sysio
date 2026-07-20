@@ -2,6 +2,7 @@
 #include <fc/mock_time.hpp>
 #include <fc/variant.hpp>
 #include <fc/io/json_stream.hpp>
+#include <fc/reflect/json_stream.hpp>
 #include <boost/chrono/system_clocks.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <sstream>
@@ -174,7 +175,10 @@ namespace fc {
   }
   void to_json_stream( const microseconds& us, json_writer& w )
   {
-    w.value_int64( us.count() );
+    // Delegate to the guarded int64_t overload (fc/reflect/json_stream.hpp) so counts with
+    // magnitude past json_integer_quote_magnitude emit as quoted strings, exactly as the
+    // to_variant -> fc::json::to_string path renders the int64 count.
+    to_json_stream( us.count(), w );
   }
   void from_variant( const variant& input_variant,  microseconds& output_microseconds )
   {

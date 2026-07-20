@@ -197,4 +197,29 @@ BOOST_FIXTURE_TEST_CASE(get_block_streaming_vs_variant_byte_identical, chain_plu
    BOOST_CHECK_EQUAL(variant_path, stream_path);
 } FC_LOG_AND_RETHROW() }
 
+// get_finalizer_info absent-policy schema: both policy keys are ALWAYS present and emit an
+// explicit JSON null when the policy does not exist (fc::nullable fields).  A fresh chain
+// has an active policy (Savanna activates at genesis) and no pending policy, so this pins
+// the disengaged shape end-to-end plus byte parity between the variant and streaming paths.
+// A reflected std::optional would omit the pending key entirely -- the regression this
+// guards against.
+BOOST_FIXTURE_TEST_CASE(get_finalizer_info_absent_policy_emits_null, chain_plugin_tester) { try {
+   produce_blocks(2);
+
+   std::optional<sysio::chain_apis::tracked_votes> _tracked_votes;
+   read_only ro(*control, {}, {}, _tracked_votes,
+                fc::microseconds::maximum(), fc::microseconds::maximum(), {});
+
+   const read_only::get_finalizer_info_result result = ro.get_finalizer_info({}, fc::time_point::maximum());
+   BOOST_REQUIRE(result.active_finalizer_policy.has_value());
+   BOOST_REQUIRE(!result.pending_finalizer_policy.has_value());
+
+   const std::string variant_path = fc::json::to_string(fc::variant(result), fc::time_point::maximum());
+   const std::string stream_path  = fc::to_json_string(result);
+
+   BOOST_CHECK_EQUAL(variant_path, stream_path);
+   BOOST_CHECK(stream_path.find("\"pending_finalizer_policy\":null") != std::string::npos);
+   BOOST_CHECK(stream_path.find("\"active_finalizer_policy\":{") != std::string::npos);
+} FC_LOG_AND_RETHROW() }
+
 BOOST_AUTO_TEST_SUITE_END()

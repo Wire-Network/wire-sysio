@@ -137,6 +137,21 @@ static size_t in_flight_sizeof(const std::optional<T>& o) {
    return 0;
 }
 
+/**
+* Thrown by the streaming-response growth guard when the incrementally-charged response
+* buffer pushes bytes_in_flight past the configured budget (--http-max-bytes-in-flight-mb).
+*
+* Deliberately NOT derived from fc::exception or std::exception: mid-emission rollback
+* handlers (eg abi_serializer's catch-rewind-hex-fallback path) catch and absorb serializer
+* exceptions to keep emitting, and absorbing a budget abort would defeat the cap.  A foreign
+* type dodges their typed catches, and json_writer re-fires the guard on the next token
+* after a throw so even a catch(...) absorber re-raises this until it unwinds out of the
+* emitter (see json_writer's guarded-constructor contract).
+*/
+struct stream_response_budget_exceeded {
+   std::string error; ///< busy-response text produced by verify_max_bytes_in_flight
+};
+
 }// namespace detail
 
 // key -> priority, url_handler
@@ -249,11 +264,15 @@ inline auto make_http_response_handler(http_plugin_state& plugin_state, detail::
 * the api thread (read_only / read_write queue) never pays the per-field
 * allocation cost the variant tree built.
 *
-* Backpressure note: bytes_in_flight tracking happens after the emitter runs (we
-* don't know the body size until the buffer is full), so this path differs from
-* the variant path's pre-post estimate.  Net effect is "verify_max_bytes_in_flight
-* checks the actual produced body size before send_response," which is the same
-* end-state check the variant path performs.
+* Backpressure note: the response buffer is charged against bytes_in_flight
+* incrementally WHILE the emitter runs -- json_writer's growth guard settles the
+* buffer's size into the budget every json_writer_default_guard_stride bytes and
+* throws stream_response_budget_exceeded (mapped to the busy response) once
+* verify_max_bytes_in_flight rejects.  Concurrent large streaming responses are
+* therefore visible to --http-max-bytes-in-flight-mb during serialization, and
+* over-budget emissions abort early instead of materializing in full; the variant
+* path achieves the analogous mid-flight visibility by pre-charging its
+* in_flight_sizeof estimate of the response variant tree.
 */
 inline auto make_http_stream_response_handler(http_plugin_state& plugin_state, detail::abstract_conn_ptr session_ptr) {
    return url_response_stream_callback{
@@ -272,19 +291,37 @@ inline auto make_http_stream_response_handler(http_plugin_state& plugin_state, d
          // I/O onto the http thread pool.
          boost::asio::dispatch(plugin_state.thread_pool.get_executor(),
             [&plugin_state, session_ptr{std::move(session_ptr)}, code, emitter{std::move(emitter)}]() mutable {
+               // `charged` mirrors what this response has contributed to the shared
+               // bytes_in_flight budget; settle_to trues the contribution up against the
+               // buffer's actual size at guard checkpoints, after emission completes, and
+               // (via the scoped_exit) on every exit path -- including rewinds that SHRANK
+               // the buffer below an earlier checkpoint, hence the signed reconciliation.
+               size_t charged = 0;
+               auto settle_to = [&plugin_state, &charged](size_t actual) {
+                  if (actual >= charged)
+                     plugin_state.bytes_in_flight += actual - charged;
+                  else
+                     plugin_state.bytes_in_flight -= charged - actual;
+                  charged = actual;
+               };
+               auto on_exit = fc::make_scoped_exit([&settle_to]() { settle_to(0); });
                try {
                   std::string body;
                   {
-                     fc::json_writer w(body);
+                     fc::json_writer w(body, [&settle_to, &session_ptr](size_t buffer_size) {
+                        settle_to(buffer_size);
+                        if (auto error_str = session_ptr->verify_max_bytes_in_flight(0); !error_str.empty())
+                           throw detail::stream_response_budget_exceeded{std::move(error_str)};
+                     });
                      emitter(w);
                   }
-                  plugin_state.bytes_in_flight += body.size();
-                  auto on_exit = fc::make_scoped_exit([&, sz=body.size()]() { plugin_state.bytes_in_flight -= sz; });
-
+                  settle_to(body.size());
                   if (auto error_str = session_ptr->verify_max_bytes_in_flight(0); !error_str.empty())
                      session_ptr->send_busy_response(std::move(error_str));
                   else
                      session_ptr->send_response(std::move(body), code);
+               } catch (detail::stream_response_budget_exceeded& e) {
+                  session_ptr->send_busy_response(std::move(e.error));
                } catch (...) {
                   session_ptr->handle_exception();
                }
