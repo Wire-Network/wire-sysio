@@ -255,7 +255,7 @@ can be tuned for the expected provider latency, snapshot size, and available sto
 | Option | Default | Purpose |
 |---|---:|---|
 | `--snapshot-endpoint-connect-timeout-ms` | `10000` | Maximum time to establish the download connection |
-| `--snapshot-endpoint-header-timeout-ms` | `30000` | Maximum time to receive response headers |
+| `--snapshot-endpoint-header-timeout-ms` | `30000` | Maximum time for each request-write and response-header phase |
 | `--snapshot-endpoint-idle-timeout-ms` | `60000` | Maximum time without response-body progress |
 | `--snapshot-endpoint-total-timeout-ms` | `86400000` | Maximum total snapshot file download time (24 hours) |
 | `--snapshot-endpoint-max-download-size-mb` | `chain-state-db-size-mb` | Maximum accepted snapshot response size |
@@ -264,6 +264,8 @@ can be tuned for the expected provider latency, snapshot size, and available sto
 All limits must be positive. A fixed-length response that exceeds the maximum is rejected from its `Content-Length`
 before a temporary file is opened. Chunked or lengthless responses are stopped at the same byte ceiling. Available
 disk space is checked before and throughout the transfer, and a failed transfer removes its `.downloading` file.
+Long transfers recheck after at most 64 MiB or five seconds of progress and retain an additional 64 MiB safety margin
+to bound interference from concurrent disk consumers between probes.
 
 ## Reverse Proxy Considerations
 

@@ -20,7 +20,7 @@ namespace fc {
 struct http_file_download_options {
    /// Maximum time allowed to establish the connection.
    microseconds connect_timeout;
-   /// Maximum time allowed to receive the response header after sending the request.
+   /// Maximum time allowed for each of the request-write and response-header phases.
    microseconds response_header_timeout;
    /// Maximum time allowed without decoded response-body progress.
    microseconds idle_read_timeout;
@@ -30,6 +30,8 @@ struct http_file_download_options {
    uint64_t max_response_body_bytes;
    /// Free bytes that must remain on the destination filesystem.
    uint64_t min_free_disk_space_bytes;
+   /// Retry a failed request once when it used a cached connection. Only enable for idempotent requests.
+   bool retry_failed_reused_connection = false;
 };
 
 class http_client {
@@ -45,14 +47,6 @@ class http_client {
          to_variant(payload, payload_v);
          return post_sync(dest, payload_v, deadline);
       }
-
-      /// Download binary response from a POST request to a file.
-      /// Uses a temp file during download and renames on completion.
-      /// Clean up on failure.
-      void post_to_file(const url& dest,
-                        const variant& payload,
-                        const std::filesystem::path& output,
-                        const time_point& deadline = time_point::maximum());
 
       /**
        * Download a binary POST response using explicit phase deadlines and resource limits.

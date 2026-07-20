@@ -4,9 +4,11 @@
 #include <fc/static_variant.hpp>
 
 #include <algorithm>
+#include <chrono>
 #include <filesystem>
 #include <fstream>
 #include <limits>
+#include <memory>
 #include <vector>
 
 #include <boost/beast/core.hpp>
@@ -27,6 +29,9 @@ namespace {
 
 constexpr size_t download_read_buffer_bytes = 1024 * 1024;
 constexpr size_t download_parser_buffer_bytes = 64 * 1024;
+constexpr uint64_t disk_space_check_interval_bytes = 64 * 1024 * 1024;
+constexpr uint64_t disk_space_concurrency_margin_bytes = 64 * 1024 * 1024;
+constexpr auto disk_space_check_interval = std::chrono::seconds(5);
 
 } // namespace
 
@@ -175,6 +180,17 @@ public:
       return std::min(deadline.to_system_clock(), total_deadline);
    }
 
+   /// Return whether @p ec can indicate that a cached peer connection closed before reuse.
+   static bool is_stale_connection_error(const error_code& ec) {
+      return ec == boost::asio::error::eof ||
+             ec == boost::asio::error::connection_reset ||
+             ec == boost::asio::error::connection_aborted ||
+             ec == boost::asio::error::broken_pipe ||
+             ec == boost::asio::error::not_connected ||
+             ec == boost::asio::error::shut_down ||
+             ec == http::error::end_of_stream;
+   }
+
    /// Return a path on the destination filesystem that can be queried for free space.
    static std::filesystem::path space_query_path(const std::filesystem::path& destination) {
       if (destination.has_parent_path()) {
@@ -187,9 +203,13 @@ public:
       return current;
    }
 
-   /// Require enough free space for @p next_write_bytes while retaining @p reserved_bytes.
-   static void require_disk_space(const std::filesystem::path& destination, uint64_t next_write_bytes,
-                                  uint64_t reserved_bytes) {
+   /**
+    * Require enough free space for @p next_write_bytes while retaining @p reserved_bytes.
+    *
+    * @return Bytes currently available for writes after retaining the requested reserve.
+    */
+   static uint64_t require_disk_space(const std::filesystem::path& destination, uint64_t next_write_bytes,
+                                      uint64_t reserved_bytes) {
       const auto query_path = space_query_path(destination);
       std::error_code ec;
       const auto space = std::filesystem::space(query_path, ec);
@@ -198,6 +218,27 @@ public:
                 "Insufficient disk space at {} for HTTP download: {} bytes available, {} bytes required for the "
                 "next write, and {} bytes reserved as headroom",
                 query_path.string(), space.available, next_write_bytes, reserved_bytes);
+      return space.available - reserved_bytes;
+   }
+
+   /**
+    * Verify and return the next cached write budget.
+    *
+    * Each budget is capped at 64 MiB and requires a separate 64 MiB concurrency margin.
+    * The margin bounds headroom exposure if another process consumes space between probes;
+    * slow transfers also refresh the probe every five seconds.
+    */
+   static uint64_t refresh_disk_space_write_budget(const std::filesystem::path& destination,
+                                                   uint64_t remaining_body_bytes,
+                                                   uint64_t reserved_bytes) {
+      const auto write_budget = std::min(remaining_body_bytes, disk_space_check_interval_bytes);
+      if (write_budget == 0) {
+         require_disk_space(destination, 0, reserved_bytes);
+         return 0;
+      }
+
+      require_disk_space(destination, write_budget + disk_space_concurrency_margin_bytes, reserved_bytes);
+      return write_budget;
    }
 
    host_key url_to_host_key( const url& dest ) {
@@ -268,12 +309,19 @@ public:
       }
    }
 
-   connection_map::iterator get_connection( const url& dest, const deadline_type& deadline ) {
+   connection_map::iterator get_connection(const url& dest, const deadline_type& deadline,
+                                           bool* reused_connection = nullptr) {
       auto key = url_to_host_key(dest);
       auto conn_itr = _connections.find(key);
       if (conn_itr == _connections.end() || check_closed(conn_itr)) {
+         if (reused_connection) {
+            *reused_connection = false;
+         }
          return create_connection(dest, deadline);
       } else {
+         if (reused_connection) {
+            *reused_connection = true;
+         }
          return conn_itr;
       }
    }
@@ -459,45 +507,88 @@ public:
       req.body() = json::to_string(payload, total_deadline_time);
       req.prepare_payload();
 
-      auto conn_iter = get_connection(dest, phase_deadline(options.connect_timeout, total_deadline));
-      auto eraser = make_scoped_exit([this, &conn_iter](){
-         _connections.erase(conn_iter);
+      bool reused_connection = false;
+      auto conn_iter = get_connection(
+         dest, phase_deadline(options.connect_timeout, total_deadline), &reused_connection);
+      const auto connection_key = url_to_host_key(dest);
+      auto eraser = make_scoped_exit([this, connection_key](){
+         _connections.erase(connection_key);
       });
 
-      error_code ec = std::visit(write_request_visitor(this, req, total_deadline), conn_iter->second);
-      FC_ASSERT(!ec, "Failed to send POST request: {}", ec.message());
+      std::unique_ptr<boost::beast::flat_buffer> buffer;
+      std::unique_ptr<http::response_parser<http::buffer_body>> parser;
+      error_code ec;
+      bool retried_stale_connection = false;
+      while (true) {
+         ec = std::visit(
+            write_request_visitor(this, req, phase_deadline(options.response_header_timeout, total_deadline)),
+            conn_iter->second);
+         if (ec) {
+            if (options.retry_failed_reused_connection && reused_connection && !retried_stale_connection &&
+                is_stale_connection_error(ec)) {
+               _connections.erase(conn_iter);
+               conn_iter = get_connection(
+                  dest, phase_deadline(options.connect_timeout, total_deadline), &reused_connection);
+               retried_stale_connection = true;
+               continue;
+            }
+            FC_ASSERT(false, "Failed to send POST request: {}", ec.message());
+         }
 
-      // Parse into a bounded caller-owned buffer so every write can enforce the byte ceiling,
-      // idle deadline, and filesystem headroom before bytes reach disk.
-      boost::beast::flat_buffer buffer(download_parser_buffer_bytes);
-      http::response_parser<http::buffer_body> parser;
-      parser.body_limit(options.max_response_body_bytes);
+         // Parse into a bounded caller-owned buffer so every write can enforce the byte ceiling,
+         // idle deadline, and filesystem headroom before bytes reach disk.
+         buffer = std::make_unique<boost::beast::flat_buffer>(download_parser_buffer_bytes);
+         parser = std::make_unique<http::response_parser<http::buffer_body>>();
+         parser->body_limit(options.max_response_body_bytes);
 
-      ec = std::visit([&](auto& stream) {
-         return sync_read_header_with_timeout(
-            *stream, buffer, parser, phase_deadline(options.response_header_timeout, total_deadline));
-      }, conn_iter->second);
-      if (ec == http::error::body_limit) {
-         FC_THROW("HTTP response body exceeds configured maximum of {} bytes", options.max_response_body_bytes);
+         ec = std::visit([&](auto& stream) {
+            return sync_read_header_with_timeout(
+               *stream, *buffer, *parser, phase_deadline(options.response_header_timeout, total_deadline));
+         }, conn_iter->second);
+         if (!ec) {
+            break;
+         }
+         if (ec == http::error::body_limit) {
+            FC_THROW("HTTP response body exceeds configured maximum of {} bytes", options.max_response_body_bytes);
+         }
+         if (options.retry_failed_reused_connection && reused_connection && !retried_stale_connection &&
+             is_stale_connection_error(ec)) {
+            _connections.erase(conn_iter);
+            conn_iter = get_connection(
+               dest, phase_deadline(options.connect_timeout, total_deadline), &reused_connection);
+            retried_stale_connection = true;
+            continue;
+         }
+         FC_ASSERT(false, "Failed to read response header: {}", ec.message());
       }
-      FC_ASSERT(!ec, "Failed to read response header: {}", ec.message());
 
       // Require exactly 200 OK: this client never sends Range requests, so 206 Partial Content
       // can only come from a broken or hostile endpoint/proxy, and renaming a partial body into
       // the final destination would hand the caller a truncated file.
-      const auto status = parser.get().result();
+      const auto status = parser->get().result();
       if (status != http::status::ok) {
-         FC_THROW("HTTP POST failed with status {}", parser.get().result_int());
+         FC_THROW("HTTP POST failed with status {}", parser->get().result_int());
       }
 
-      if (const auto content_length = parser.content_length()) {
+      const auto content_length = parser->content_length();
+      uint64_t disk_space_write_budget = 0;
+      if (content_length) {
          FC_ASSERT(*content_length <= options.max_response_body_bytes,
                    "HTTP response Content-Length {} exceeds configured maximum of {} bytes",
                    *content_length, options.max_response_body_bytes);
-         require_disk_space(final_dest, *content_length, options.min_free_disk_space_bytes);
+         FC_ASSERT(*content_length <= std::numeric_limits<uint64_t>::max() - disk_space_concurrency_margin_bytes,
+                   "HTTP response Content-Length {} is too large for the {}-byte disk safety margin",
+                   *content_length, disk_space_concurrency_margin_bytes);
+         const auto preflight_bytes = *content_length == 0
+                                         ? 0
+                                         : *content_length + disk_space_concurrency_margin_bytes;
+         require_disk_space(final_dest, preflight_bytes, options.min_free_disk_space_bytes);
+         disk_space_write_budget = std::min(*content_length, disk_space_check_interval_bytes);
       } else {
-         require_disk_space(final_dest, 0, options.min_free_disk_space_bytes);
+         disk_space_write_budget = refresh_disk_space_write_budget(
+            final_dest, options.max_response_body_bytes, options.min_free_disk_space_bytes);
       }
+      auto next_disk_space_check = std::chrono::steady_clock::now() + disk_space_check_interval;
 
       // Write to temp file then rename
       auto temp_path = final_dest;
@@ -513,11 +604,11 @@ public:
       std::vector<char> read_buffer(download_read_buffer_bytes);
       uint64_t downloaded_bytes = 0;
       auto idle_deadline = phase_deadline(options.idle_read_timeout, total_deadline);
-      while (!parser.is_done()) {
-         parser.get().body().data = read_buffer.data();
-         parser.get().body().size = read_buffer.size();
+      while (!parser->is_done()) {
+         parser->get().body().data = read_buffer.data();
+         parser->get().body().size = read_buffer.size();
          ec = std::visit([&](auto& stream) {
-            return sync_read_parser_some_with_timeout(*stream, buffer, parser, idle_deadline);
+            return sync_read_parser_some_with_timeout(*stream, *buffer, *parser, idle_deadline);
          }, conn_iter->second);
          if (ec == http::error::need_buffer) {
             ec = {};
@@ -527,7 +618,7 @@ public:
          }
          FC_ASSERT(!ec, "Failed to read response body: {}", ec.message());
 
-         const auto chunk_bytes = read_buffer.size() - parser.get().body().size;
+         const auto chunk_bytes = read_buffer.size() - parser->get().body().size;
          FC_ASSERT(chunk_bytes <= options.max_response_body_bytes &&
                       downloaded_bytes <= options.max_response_body_bytes - chunk_bytes,
                    "HTTP response body exceeds configured maximum of {} bytes", options.max_response_body_bytes);
@@ -535,10 +626,20 @@ public:
             continue;
          }
 
-         require_disk_space(final_dest, chunk_bytes, options.min_free_disk_space_bytes);
+         // Amortize filesystem-space queries while bounding concurrent-consumption exposure with
+         // a separate safety margin. Recheck after 64 MiB or five seconds, whichever comes first.
+         if (disk_space_write_budget < chunk_bytes ||
+             std::chrono::steady_clock::now() >= next_disk_space_check) {
+            const auto response_size_limit = content_length.value_or(options.max_response_body_bytes);
+            const auto remaining_body_bytes = response_size_limit - downloaded_bytes;
+            disk_space_write_budget = refresh_disk_space_write_budget(
+               final_dest, remaining_body_bytes, options.min_free_disk_space_bytes);
+            next_disk_space_check = std::chrono::steady_clock::now() + disk_space_check_interval;
+         }
          file.write(read_buffer.data(), static_cast<std::streamsize>(chunk_bytes));
          FC_ASSERT(file.good(), "Failed to write {} bytes to temp file {}", chunk_bytes, temp_path.string());
          downloaded_bytes += chunk_bytes;
+         disk_space_write_budget -= chunk_bytes;
          idle_deadline = phase_deadline(options.idle_read_timeout, total_deadline);
       }
 
@@ -549,23 +650,6 @@ public:
       std::filesystem::rename(temp_path, final_dest, rename_ec);
       FC_ASSERT(!rename_ec, "Failed to rename downloaded file: {}", rename_ec.message());
       cleanup.cancel();
-   }
-
-   void post_to_file(const url& dest, const variant& payload, const std::filesystem::path& final_dest,
-                     const fc::time_point& deadline_time) {
-      const auto now = fc::time_point::now();
-      const auto remaining = deadline_time == fc::time_point::maximum()
-                                ? fc::microseconds::maximum()
-                                : deadline_time - now;
-      const http_file_download_options options{
-         .connect_timeout = remaining,
-         .response_header_timeout = remaining,
-         .idle_read_timeout = remaining,
-         .total_timeout = remaining,
-         .max_response_body_bytes = std::numeric_limits<uint64_t>::max(),
-         .min_free_disk_space_bytes = 0,
-      };
-      post_to_file(dest, payload, final_dest, options, deadline_time);
    }
 
    void post_to_file(const url& dest, const variant& payload, const std::filesystem::path& final_dest,
@@ -585,10 +669,6 @@ http_client::http_client()
 :_my(new http_client_impl())
 {
 
-}
-
-void http_client::post_to_file(const url& dest, const variant& payload, const std::filesystem::path& output, const fc::time_point& deadline) {
-   _my->post_to_file(dest, payload, output, deadline);
 }
 
 void http_client::post_to_file(const url& dest, const variant& payload, const std::filesystem::path& output,
