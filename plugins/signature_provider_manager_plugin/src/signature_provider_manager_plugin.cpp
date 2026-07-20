@@ -28,9 +28,8 @@ constexpr auto option_name_kiod_timeout = "signature-provider-kiod-timeout";
 
 /// The appbase option that lists enabled plugins (`--plugin` on the command line, `plugin =` in the config file). The
 /// manager reads it to learn which optional provider plugins are enabled; it is the same key appbase itself uses to
-/// drive plugin enablement. Kept a `const char*` (not `std::string_view`) because program_options lookups take a
-/// `const std::string&`.
-constexpr auto option_name_plugin = "plugin";
+/// drive plugin enablement.
+constexpr std::string_view option_name_plugin = "plugin";
 
 /// The two built-in `<provider-type>:` schemes, handled directly by this plugin (never through the handler registries,
 /// never registrable).
@@ -133,9 +132,11 @@ public:
     * a scheme.
     */
    void record_enabled_plugins(const variables_map& options) {
-      if (!options.count(option_name_plugin))
+      // variables_map keys on std::string with a non-transparent comparator, so materialize the view once for lookup.
+      const std::string plugin_option{option_name_plugin};
+      if (!options.count(plugin_option))
          return;
-      for (const auto& arg : options.at(option_name_plugin).as<std::vector<std::string>>()) {
+      for (const auto& arg : options.at(plugin_option).as<std::vector<std::string>>()) {
          std::vector<std::string> names;
          boost::split(names, arg, boost::is_any_of(" \t,"));
          _enabled_plugins.insert(names.begin(), names.end());

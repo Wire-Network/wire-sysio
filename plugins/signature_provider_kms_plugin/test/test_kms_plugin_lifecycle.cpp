@@ -11,10 +11,11 @@
 
 #include <format>
 
-// --------------------------------------------------------------------------- Plugin wiring: what constructing
-// signature_provider_kms_plugin does. All offline -- no AWS, no network. The manager-side create/gate mechanics are
-// covered with mock handlers in the manager's test binary (test_extension_schemes.cpp); the probe wiring here uses a
-// mock PROBE handler so the startup pass runs no real GetPublicKey.
+// ---------------------------------------------------------------------------
+// Plugin wiring: what constructing signature_provider_kms_plugin does. All offline -- no AWS, no network. The
+// manager-side create/gate mechanics are covered with mock handlers in the manager's test binary
+// (test_extension_schemes.cpp); the probe wiring here uses a mock PROBE handler so the startup pass runs no real
+// GetPublicKey.
 // ---------------------------------------------------------------------------
 
 using sysio::signature_provider_kms_plugin;
