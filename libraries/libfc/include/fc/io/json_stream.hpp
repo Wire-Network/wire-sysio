@@ -44,12 +44,6 @@ inline constexpr uint32_t json_stream_max_depth = 200;
 /// the guard mid-emission.
 inline constexpr size_t json_writer_default_guard_stride = 64 * 1024;
 
-/// Output-byte chunk size for guarded emission of single large tokens (value_hex /
-/// raw_value).  A guarded writer breaks the append loop at this granularity and consults
-/// the guard between chunks, so one oversized blob cannot materialize past the budget
-/// behind a single token-boundary check.  Unguarded writers keep the single tight loop.
-inline constexpr size_t json_writer_guarded_chunk_bytes = 64 * 1024;
-
 /**
  *  Streaming JSON writer that emits tokens directly into an output std::string.
  *
@@ -91,12 +85,12 @@ public:
    ///
    /// Intra-token checks: guarded writers also consult the guard WHILE a single large
    /// token streams -- every escape_string_yield_check_count input chars of a string value
-   /// or key (measuring the output buffer, so escape expansion counts) and every
-   /// json_writer_guarded_chunk_bytes appended by value_hex / raw_value -- so one
-   /// oversized token cannot materialize past the budget behind a single token-boundary
-   /// check.  A guard throw mid-token leaves a partial token in the buffer; the writer's
-   /// re-arm plus the caller's checkpoint()/rewind() (or wholesale abandonment of the
-   /// buffer, as the http handler does) keep that safe.
+   /// or key (measuring the output buffer, so escape expansion counts) and every stride of
+   /// bytes appended by value_hex / raw_value (their append loops chunk at guard_stride) --
+   /// so one oversized token cannot materialize past the budget behind a single
+   /// token-boundary check.  A guard throw mid-token leaves a partial token in the buffer;
+   /// the writer's re-arm plus the caller's checkpoint()/rewind() (or wholesale abandonment
+   /// of the buffer, as the http handler does) keep that safe.
    explicit json_writer(std::string& out, growth_guard_t growth_guard = {},
                         size_t guard_stride = json_writer_default_guard_stride)
    : out_(out)
@@ -217,10 +211,11 @@ public:
       out_.push_back('"');
       static constexpr char digits[] = "0123456789abcdef";
       const auto* p = reinterpret_cast<const uint8_t*>(data);
-      // Guarded writers emit in bounded chunks and consult the guard between them, so a
-      // single large blob is budget-checked while it streams; unguarded writers keep the
-      // one tight loop (chunk_end = size on the first pass).
-      constexpr size_t src_chunk = json_writer_guarded_chunk_bytes / 2; // 2 hex chars per source byte
+      // Guarded writers emit in stride-sized chunks and consult the guard between them, so
+      // a single large blob is budget-checked at the writer's configured granularity while
+      // it streams; unguarded writers keep the one tight loop (chunk_end = size on the
+      // first pass).
+      const size_t src_chunk = std::max<size_t>(1, guard_stride_ / 2); // 2 hex chars per source byte
       size_t i = 0;
       while (i < size) {
          const size_t chunk_end = guard_ ? std::min(size, i + src_chunk) : size;
@@ -244,10 +239,12 @@ public:
          out_.append(raw.data(), raw.size());
          return;
       }
-      // Guarded writers splice in bounded chunks and consult the guard between them, so a
-      // single large preformatted fragment is budget-checked while it streams.
+      // Guarded writers splice in stride-sized chunks and consult the guard between them,
+      // so a single large preformatted fragment is budget-checked at the writer's
+      // configured granularity while it streams.
+      const size_t chunk = std::max<size_t>(1, guard_stride_);
       for (size_t off = 0; off < raw.size();) {
-         const size_t n = std::min(raw.size() - off, json_writer_guarded_chunk_bytes);
+         const size_t n = std::min(raw.size() - off, chunk);
          out_.append(raw.data() + off, n);
          off += n;
          guard_check();

@@ -667,9 +667,10 @@ BOOST_AUTO_TEST_CASE(growth_guard_intra_token_abort) {
    // of the guard's threshold instead of materializing the full token behind one
    // token-boundary pre-check.
    constexpr size_t threshold = 64 * 1024;
-   // Abort bound: threshold + one guarded-emission chunk + escape/stride slack -- far
-   // below the full token size.
-   constexpr size_t abort_bound = threshold + fc::json_writer_guarded_chunk_bytes + 8 * 1024;
+   // Abort bound: threshold + one stride of guarded emission (hex/raw chunk at the
+   // writer's stride; the escape loop yields every 128 input chars) + slack -- far below
+   // the full token size.
+   constexpr size_t abort_bound = threshold + 8 * 1024;
    const std::string big(1u << 20, 'x'); // 1 MiB payload; hex form is 2 MiB
 
    {
