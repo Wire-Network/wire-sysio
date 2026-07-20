@@ -155,19 +155,24 @@ void opreg::setconfig(uint32_t max_available_producers,
          "terminate_max_pct_misses_24h must be in [1, 99]");
    check(terminate_window_ms > 0, "terminate_window_ms must be positive");
 
-   // SEC-28 residual: a rolling window narrower than the full consecutive-miss
-   // run makes the consecutive rail structurally vacuous (records age out
-   // before `termcheck` can observe the run) and leaves only the hair-trigger
-   // percent rail. Validate against the live epoch duration. Bootstrap
-   // installs opreg config before sysio.epoch is configured, so an absent
-   // epochcfg skips the check here; sysio.epoch::setconfig performs the mirror
-   // validation, so no ordering of the two setters can accept a vacuous pair.
+   // SEC-28 residual: delivery records accrue only on duty epochs -- one per
+   // `batch_op_groups`-epoch rotation for a resident operator -- so a rolling
+   // window narrower than the full consecutive-miss run of duty epochs makes
+   // the consecutive rail structurally vacuous (records age out and are
+   // pruned before `termcheck` can observe the run) and leaves only the
+   // hair-trigger percent rail. Validate against the live epoch schedule.
+   // Bootstrap installs opreg config before sysio.epoch is configured, so an
+   // absent epochcfg skips the check here; sysio.epoch::setconfig performs
+   // the mirror validation, so no ordering of the two setters can accept a
+   // vacuous pair.
    {
       sysio::epoch::epochcfg_t epoch_cfg_tbl(EPOCH_ACCOUNT);
       if (epoch_cfg_tbl.exists()) {
+         const auto epoch_cfg = epoch_cfg_tbl.get();
          check(terminate_window_ms >= min_terminate_window_ms(terminate_max_consecutive_misses,
-                                                              epoch_cfg_tbl.get().epoch_duration_sec),
-               "terminate_window_ms must span at least terminate_max_consecutive_misses + 1 epochs");
+                                                              epoch_cfg.epoch_duration_sec,
+                                                              epoch_cfg.batch_op_groups),
+               "terminate_window_ms must span at least terminate_max_consecutive_misses + 1 duty rotations");
       }
    }
 
