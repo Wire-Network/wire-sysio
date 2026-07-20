@@ -250,8 +250,9 @@ parse_spki_ec_point(std::span<const unsigned char> spki_der) {
 /// non-billable `GetPublicKey` API, decode its SubjectPublicKeyInfo, and assert
 /// it matches the key the operator pinned in the spec. On mismatch this throws
 /// `plugin_config_exception` early -- before any billable `Sign` -- with a
-/// message that names the misconfiguration directly. Invoked at most once per
-/// closure through `ensure_kms_pubkey_pinned`.
+/// message that names the misconfiguration directly. Invoked through
+/// `ensure_kms_pubkey_pinned`, which caches the first success per closure and
+/// retries after a failed attempt.
 void verify_kms_pubkey(kms_signer_state& state) {
    Aws::KMS::Model::GetPublicKeyRequest req;
    req.SetKeyId(Aws::String{state.key_id});
@@ -273,13 +274,14 @@ void verify_kms_pubkey(kms_signer_state& state) {
               state.key_id);
 }
 
-/// Run the public-key pinning check at most once per `state`. Both the first
-/// `Sign` and the startup probe funnel through here. A successful check
-/// sets `pinned` so subsequent calls are a cheap no-op; a throwing check (a
-/// permanent misconfiguration or a transient API error) leaves `pinned` false
-/// so the next call retries -- and, crucially, the exception propagates to the
-/// caller rather than aborting the process (see `pin_mutex`). The mutex
-/// serialises concurrent first-signs so only one GetPublicKey round-trip runs.
+/// Run the public-key pinning check until it first succeeds for `state`. Both
+/// the `Sign` path and the startup probe funnel through here. A successful
+/// check sets `pinned`, caching the result so every later call is a cheap
+/// no-op; a throwing check (a permanent misconfiguration or a transient API
+/// error) leaves `pinned` false so the next probe/sign attempt retries -- and,
+/// crucially, the exception propagates to the caller rather than aborting the
+/// process (see `pin_mutex`). The mutex serialises concurrent unpinned signs
+/// so only one GetPublicKey round-trip runs at a time.
 void ensure_kms_pubkey_pinned(kms_signer_state& state) {
    std::scoped_lock lock(state.pin_mutex);
    if (!state.pinned) {
@@ -538,14 +540,14 @@ kms_signer make_kms_signature_provider(const kms_key_ref&             ref,
       get_kms_client(ref.region), ref.key_id, shim.unwrapped());
 
    fc::crypto::sign_fn sign = [state](const chain::digest_type& digest) -> chain::signature_type {
-      // Public-key pinning. Before the first -- and only the first -- billable
-      // Sign, fetch the KMS key's own public key with the free GetPublicKey
-      // API and assert it matches the key pinned in the spec. This turns the
-      // common "wrong <public-key> in the spec" mistake into a fast, direct
-      // error instead of an opaque recovery failure that would otherwise
-      // surface only after a paid Sign. If the startup probe already ran the
-      // check, this is a no-op -- both paths share `state`'s pinning guard
-      // through `ensure_kms_pubkey_pinned`.
+      // Public-key pinning. Before any billable Sign, fetch the KMS key's own
+      // public key with the free GetPublicKey API and assert it matches the
+      // key pinned in the spec; the first success is cached, so later signs
+      // skip the round-trip. This turns the common "wrong <public-key> in the
+      // spec" mistake into a fast, direct error instead of an opaque recovery
+      // failure that would otherwise surface only after a paid Sign. If the
+      // startup probe already pinned successfully, this is a no-op -- both
+      // paths share `state`'s pinning guard through `ensure_kms_pubkey_pinned`.
       ensure_kms_pubkey_pinned(*state);
 
       // Build a Sign request. MessageType=DIGEST tells KMS the 32 bytes are
@@ -603,8 +605,9 @@ kms_signer make_kms_signature_provider(const kms_key_ref&             ref,
          fc::crypto::signature::storage_type{fc::em::signature_shim{compact}});
    };
 
-   // Startup probe: runs the same one-shot pinning check as the first Sign,
-   // but issues only the free GetPublicKey -- no billable Sign. The manager
+   // Startup probe: runs the same pinning check as the sign path (cached
+   // after its first success), issuing only the free GetPublicKey -- no
+   // billable Sign. The manager
    // invokes every attached probe at its plugin_startup (attaching IS the
    // opt-in; this provider always attaches -- there is no enable flag), so a
    // missing credential, bad region, absent IAM grant, or wrong pinned key

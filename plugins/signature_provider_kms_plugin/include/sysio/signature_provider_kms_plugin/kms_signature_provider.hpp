@@ -254,19 +254,20 @@ std::shared_ptr<Aws::KMS::KMSClient> get_kms_client(const std::string& region);
                                   const Aws::Client::AWSError<Aws::KMS::KMSErrors>& err);
 
 /**
- * @brief A KMS-backed signer: the signing closure plus its one-shot startup
- *        probe.
+ * @brief A KMS-backed signer: the signing closure plus its startup probe.
  *
  * `make_kms_signature_provider` returns this pair so a caller can choose to
  * validate the KMS key eagerly at startup instead of lazily on the first sign.
  * Both members share the same underlying state, so the public-key pinning
- * check runs at most once regardless of which one triggers it.
+ * check runs until its first success -- cached from then on -- regardless of
+ * which member triggers it.
  */
 struct kms_signer {
    /// Signing closure, usable wherever `fc::crypto::sign_fn` is expected. Each
-   /// call issues one `KMS::Sign`; the first call also runs the public-key
-   /// pinning check, unless `warm_up` has already run it. A transient KMS
-   /// failure throws `sysio::chain::signing_transient_exception` (safe to retry
+   /// call issues one `KMS::Sign`; until the pinning check has succeeded once
+   /// (whether here or via `warm_up`), a call first runs that check. A
+   /// transient KMS failure throws
+   /// `sysio::chain::signing_transient_exception` (safe to retry
    /// with backoff); a permanent one throws
    /// `sysio::chain::plugin_config_exception` (fatal -- fix the configuration).
    fc::crypto::sign_fn sign;
@@ -274,9 +275,10 @@ struct kms_signer {
    /// Eagerly run the startup probe: a single `KMS::GetPublicKey`
    /// that resolves AWS credentials, warms the client, and verifies the KMS
    /// key matches the pinned public key -- without signing. Optional; if never
-   /// called, the same check happens lazily on the first `sign`. Idempotent --
-   /// it shares the closure's one-shot guard, so calling it never makes the
-   /// check run twice. A permanent misconfiguration (missing credential, bad
+   /// called, the same check happens lazily on the first `sign`. Idempotent
+   /// after success -- it shares the closure's pinning guard, so once the
+   /// check has succeeded no later call runs it again. A permanent
+   /// misconfiguration (missing credential, bad
    /// region, absent IAM grant, mismatched key) throws
    /// `sysio::chain::plugin_config_exception`; a transient failure (throttle,
    /// timeout, `KMSInternal`) throws `sysio::chain::signing_transient_exception`
@@ -293,14 +295,15 @@ struct kms_signer {
  * happens here; the first KMS request occurs only when the closure -- or the
  * returned `warm_up` probe -- is invoked.
  *
- * On its first invocation the closure performs public-key pinning: it calls
- * `KMSClient::GetPublicKey` exactly once, decodes the returned X.509
+ * Until a pin has succeeded, the closure performs public-key pinning before
+ * signing: it calls `KMSClient::GetPublicKey`, decodes the returned X.509
  * SubjectPublicKeyInfo via `spki_der_to_public_key`, and asserts the KMS
  * key's public key matches `expected_pubkey`. A mismatch
  * throws `chain::plugin_config_exception` immediately -- before any billable
  * `Sign` -- so a spec that pins the wrong `<public-key>` fails fast with a
- * direct error. The pinning check runs once on success; a transient
- * `GetPublicKey` failure is retried on the next `Sign`.
+ * direct error. The first successful check is cached for the provider's
+ * lifetime; a failed attempt (e.g. a transient `GetPublicKey` error) is
+ * retried on the next `Sign`.
  *
  * Each invocation sends an `ECDSA_SHA_256` `Sign` request with
  * `MessageType=DIGEST` so KMS signs the 32-byte digest as-is rather than
