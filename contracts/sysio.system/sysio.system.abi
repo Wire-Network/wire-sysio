@@ -205,10 +205,6 @@
                     "type": "uint32"
                 },
                 {
-                    "name": "base_per_transaction_net_usage",
-                    "type": "uint32"
-                },
-                {
                     "name": "net_usage_leeway",
                     "type": "uint32"
                 },

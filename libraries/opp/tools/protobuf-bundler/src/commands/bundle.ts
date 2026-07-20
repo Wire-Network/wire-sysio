@@ -11,7 +11,12 @@ import { fetchProtos } from "../steps/fetchProtos.js"
 import { runProtoc } from "../steps/runProtoc.js"
 import { generatePackage } from "../steps/generatePackage.js"
 import { generateTypescript } from "../steps/generateTypescript.js"
-import { Target, PUBLISHABLE_TARGETS } from "../constants.js"
+import {
+  Target,
+  PUBLISHABLE_TARGETS,
+  CARGO_PUBLISHABLE_TARGETS,
+  CARGO_REGISTRY_NAME
+} from "../constants.js"
 
 const PROTO_DIR_NAME = "proto"
 const PROTO_FILE_EXTENSION = ".proto"
@@ -385,6 +390,58 @@ function publishPackage(dir: string): void {
   }
 }
 
+/**
+ * Publish the generated Rust crate to the WIRE CodeArtifact cargo registry.
+ *
+ * Registry wiring comes from the environment (`CARGO_REGISTRIES_WIRE_INDEX` /
+ * `_TOKEN`, exported by generate-opp-bundles.sh --publish); no config file is
+ * written and no token touches disk. A duplicate-version rejection is treated
+ * as success so a previous run that published the crate but failed the npm
+ * side (or vice versa) self-heals on the next synchronized version.
+ */
+function publishCargoCrate(dir: string): void {
+  const registryEnvPrefix = `CARGO_REGISTRIES_${CARGO_REGISTRY_NAME.toUpperCase()}`,
+    indexEnvVar = `${registryEnvPrefix}_INDEX`,
+    tokenEnvVar = `${registryEnvPrefix}_TOKEN`
+  if (!process.env[indexEnvVar] || !process.env[tokenEnvVar]) {
+    throw new Error(
+      `cargo publish requires ${indexEnvVar} and ${tokenEnvVar} in the environment ` +
+        `(generate-opp-bundles.sh --publish exports them from the CodeArtifact token)`
+    )
+  }
+
+  log.info(
+    "Publishing cargo crate from %s to registry '%s'…",
+    dir,
+    CARGO_REGISTRY_NAME
+  )
+  try {
+    // --allow-dirty: the output dir lives inside the wire-sysio checkout.
+    // --no-verify: skip the local crate build; consumers compile it and the
+    //   proto provenance gate has already validated the sources.
+    const result = execFileSync(
+      "cargo",
+      ["publish", "--registry", CARGO_REGISTRY_NAME, "--allow-dirty", "--no-verify"],
+      {
+        cwd: dir,
+        encoding: "utf-8",
+        stdio: ["pipe", "pipe", "pipe"]
+      }
+    )
+    log.info("Published cargo crate successfully: %s", result.trim())
+  } catch (err: any) {
+    const stderr: string = err.stderr?.toString() ?? ""
+    if (/already exist|already uploaded|conflict/i.test(stderr)) {
+      log.warn(
+        "Cargo crate version already published — treating as success: %s",
+        stderr.trim()
+      )
+      return
+    }
+    throw new Error(`cargo publish failed: ${stderr || err.message}`)
+  }
+}
+
 async function handlePublish(
   args: BundleArgs,
   baseOutputDir: string
@@ -393,6 +450,12 @@ async function handlePublish(
     .filter(t => PUBLISHABLE_TARGETS.includes(t))
     .forEach(target => {
       publishPackage(Path.join(baseOutputDir, target))
+    })
+
+  args.targets
+    .filter(t => CARGO_PUBLISHABLE_TARGETS.includes(t))
+    .forEach(target => {
+      publishCargoCrate(Path.join(baseOutputDir, target))
     })
 }
 

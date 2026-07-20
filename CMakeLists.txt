@@ -150,16 +150,16 @@ add_subdirectory(contracts)
 add_subdirectory(contracts/tests)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sysio.version.in ${CMAKE_CURRENT_BINARY_DIR}/sysio.version.hpp)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/sysio.version.hpp DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR})
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/sysio.version.hpp DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} COMPONENT dev)
 
 set(SYSIO_ROOT_DIR "${CMAKE_INSTALL_FULL_LIBDIR}")
 configure_file(${CMAKE_SOURCE_DIR}/cmake/sysio-config.cmake.in ${CMAKE_BINARY_DIR}/lib/cmake/sysio/sysio-config.cmake @ONLY)
 configure_file(${CMAKE_SOURCE_DIR}/cmake/SysioTester.cmake.in ${CMAKE_BINARY_DIR}/lib/cmake/sysio/SysioTester.cmake @ONLY)
 configure_file(${CMAKE_SOURCE_DIR}/cmake/SysioCheckVersion.cmake ${CMAKE_BINARY_DIR}/lib/cmake/sysio/SysioCheckVersion.cmake COPYONLY)
 
-install(FILES ${CMAKE_BINARY_DIR}/lib/cmake/sysio/sysio-config.cmake DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}/cmake/sysio)
-install(FILES ${CMAKE_BINARY_DIR}/lib/cmake/sysio/SysioTester.cmake DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}/cmake/sysio)
-install(FILES ${CMAKE_BINARY_DIR}/lib/cmake/sysio/SysioCheckVersion.cmake DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}/cmake/sysio)
+install(FILES ${CMAKE_BINARY_DIR}/lib/cmake/sysio/sysio-config.cmake DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/sysio COMPONENT dev)
+install(FILES ${CMAKE_BINARY_DIR}/lib/cmake/sysio/SysioTester.cmake DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/sysio COMPONENT dev)
+install(FILES ${CMAKE_BINARY_DIR}/lib/cmake/sysio/SysioCheckVersion.cmake DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/sysio COMPONENT dev)
 
 include(cmake/licenses.cmake)
 
@@ -167,17 +167,17 @@ include(cmake/licenses.cmake)
 # project's database so that IDEs (CLion, clangd) can navigate contract sources.
 add_merged_compile_commands_target()
 
-install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/licenses/sysio" DESTINATION "${CMAKE_INSTALL_FULL_DATAROOTDIR}/licenses/")
+install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/licenses/sysio" DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/licenses/" COMPONENT base)
 
-install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/libraries/testing/contracts DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/sysio_testing/libraries/testing COMPONENT dev EXCLUDE_FROM_ALL
+install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/libraries/testing/contracts DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/sysio_testing/libraries/testing OPTIONAL COMPONENT dev EXCLUDE_FROM_ALL
   PATTERN "CMakeFiles" EXCLUDE
   PATTERN "*.cmake" EXCLUDE
   PATTERN "Makefile" EXCLUDE)
-install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/unittests/system-test-contracts DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/sysio_testing/unittests COMPONENT dev EXCLUDE_FROM_ALL
+install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/unittests/system-test-contracts DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/sysio_testing/unittests OPTIONAL COMPONENT dev EXCLUDE_FROM_ALL
   PATTERN "CMakeFiles" EXCLUDE
   PATTERN "*.cmake" EXCLUDE
   PATTERN "Makefile" EXCLUDE)
-install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/tests/TestHarness DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/sysio_testing/tests COMPONENT dev EXCLUDE_FROM_ALL
+install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/tests/TestHarness DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/sysio_testing/tests OPTIONAL COMPONENT dev EXCLUDE_FROM_ALL
   FILES_MATCHING
   PATTERN "*.py"
   PATTERN "*.json"
@@ -196,14 +196,14 @@ if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.21)
     COMMAND ${CMAKE_COMMAND} -E make_directory share/sysio_testing
     COMMAND ${CMAKE_COMMAND} -E create_symlink ../../bin share/sysio_testing/bin)
 
-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/lib/python3/dist-packages/TestHarness DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}/python3/dist-packages COMPONENT dev EXCLUDE_FROM_ALL)
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/lib/python3/dist-packages/TestHarness DESTINATION ${CMAKE_INSTALL_LIBDIR}/python3/dist-packages COMPONENT dev EXCLUDE_FROM_ALL)
   install(PROGRAMS
           ${CMAKE_CURRENT_BINARY_DIR}/bin/clio
           ${CMAKE_CURRENT_BINARY_DIR}/bin/kiod
           ${CMAKE_CURRENT_BINARY_DIR}/bin/nodeop
           ${CMAKE_CURRENT_BINARY_DIR}/bin/sys-util
           ${CMAKE_CURRENT_BINARY_DIR}/bin/trace_api_util
-          DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/sysio_testing/bin
+          DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/sysio_testing/bin
           COMPONENT dev
           EXCLUDE_FROM_ALL)
 else()

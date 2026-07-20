@@ -66,15 +66,10 @@ macro(plugin_target TARGET_NAME)
             ${ARG_LIBRARIES}
     )
 
-    # Install headers
-    install(
-            TARGETS ${TARGET_NAME}
-            ARCHIVE DESTINATION lib
-            LIBRARY DESTINATION lib
-            RUNTIME DESTINATION bin
-            INCLUDES DESTINATION include
-
-    )
+    # Plugins are internal static libraries linked whole-archive into nodeop;
+    # they are not standalone products, so their archives are intentionally
+    # NOT installed (a TARGETS install here also breaks packaging whenever a
+    # plugin target exists but is not part of the default build).
 
     set(PLUGIN_TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR}/test)
     if(NOT ARG_SKIP_TEST_CONFIG AND ENABLE_TESTS AND IS_DIRECTORY ${PLUGIN_TEST_DIR})
@@ -87,14 +82,14 @@ macro(plugin_target TARGET_NAME)
 
             set(TEST_FILES "")
             if (IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/test)
-                file(GLOB_RECURSE TEST_FILES ${CMAKE_CURRENT_SOURCE_DIR}/test/*.cpp)
+                file(GLOB_RECURSE TEST_FILES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/test/*.cpp)
             endif ()
             if (ARG_TEST_SOURCE_FILES)
                 list(APPEND TEST_FILES ${ARG_TEST_SOURCE_FILES})
             endif ()
             if (ARG_TEST_SOURCE_GLOBS)
                 foreach (GLOB_PATTERN ${ARG_TEST_SOURCE_GLOBS})
-                    file(GLOB_RECURSE GLOB_FILES ${GLOB_PATTERN})
+                    file(GLOB_RECURSE GLOB_FILES CONFIGURE_DEPENDS ${GLOB_PATTERN})
                     list(APPEND TEST_FILES ${GLOB_FILES})
                 endforeach ()
             endif ()

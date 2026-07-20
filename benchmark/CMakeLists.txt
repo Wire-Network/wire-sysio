@@ -1,4 +1,4 @@
-file(GLOB BENCHMARK "*.cpp")
+file(GLOB BENCHMARK CONFIGURE_DEPENDS "*.cpp")
 add_executable( benchmark ${BENCHMARK} )
 
 # trace_api_plugin brings the process_block / process_block_to_json implementations

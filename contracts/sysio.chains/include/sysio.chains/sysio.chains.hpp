@@ -51,6 +51,13 @@ namespace sysio {
       ///     deserialization (alphabet `[A-Z0-9_]+`, ≤8 chars).
       ///  * `code` must be unique.
       ///  * `kind=WIRE` may appear at most once (the depot self-row).
+      ///  * `kind=EVM` rows must carry a unique `external_chain_id` — the pair
+      ///    `(kind, external_chain_id)` is the outbound envelope's destination
+      ///    binding (see `sysio.msgch::buildenv`), verified by EVM outposts
+      ///    against their own `block.chainid`.
+      ///  * `kind=SVM` may appear at most once — Solana clusters have no
+      ///    numeric chain id, so the wire binding is kind-only for SVM and a
+      ///    second row would be indistinguishable at the outpost.
       [[sysio::action]]
       void regchain(opp::types::ChainKind kind,
                     sysio::slug_name       code,

@@ -1,0 +1,20 @@
+Template: wire-sysio/install-service
+Type: boolean
+Default: true
+Description: Register the wire-sysio-nodeop systemd service?
+ Registers the packaged wire-sysio-nodeop unit with systemd and creates the
+ service directories (/etc/wire/sysio, /var/lib/wire/sysio/data,
+ /var/log/wire/sysio).
+ .
+ If you decline, the unit file remains available under
+ /usr/lib/systemd/system but nothing is registered or created.
+
+Template: wire-sysio/enable-service
+Type: boolean
+Default: true
+Description: Enable and start wire-sysio-nodeop?
+ Adds wire-sysio-nodeop to the default boot target and starts it
+ immediately (systemctl enable --now).
+ .
+ If you decline, the service is registered but neither enabled at boot
+ nor started.

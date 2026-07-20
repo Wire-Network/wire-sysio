@@ -203,7 +203,7 @@ if(TARGET cdt::protoc-gen-zpp)
 endif()
 
 if(ENABLE_TESTS)
-    file(GLOB_RECURSE TEST_FILES test/*.cpp test/*.hpp)
+    file(GLOB_RECURSE TEST_FILES CONFIGURE_DEPENDS test/*.cpp test/*.hpp)
     set(TEST_TARGET_NAME test_opp)
     add_executable(
             ${TEST_TARGET_NAME}
@@ -231,12 +231,14 @@ endif()
 # Installation: headers to include/sysio
 install(
         DIRECTORY include/sysio
-        DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR}
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+        COMPONENT dev
 )
 
 install(
         DIRECTORY ${PROTO_GEN_DIR}/
-        DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR}
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+        COMPONENT dev
         FILES_MATCHING PATTERN "*.pb.h"
 )
 
@@ -244,4 +246,5 @@ install(
 install(
         TARGETS ${TARGET_NAME}
         EXPORT ${TARGET_NAME}-targets
+        COMPONENT dev
 )
