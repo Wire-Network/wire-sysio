@@ -117,10 +117,10 @@ BOOST_AUTO_TEST_CASE(create_provider_malformed_ssm_spec_throws_through_dispatch)
    const auto pub_str = priv.get_public_key().to_string({});
 
    auto tester = create_ssm_routing_app(priv.to_string({}));
-   // Missing region: the handler's parser must reject it through the plugin's
-   // dispatch path.
+   // A bare region with no parameter name is malformed: the handler's parser
+   // must reject it through the plugin's dispatch path.
    const auto spec = to_signature_provider_spec("ssm-bad-01", chain_kind_wire, chain_key_type_wire, pub_str,
-                                                "SSM:/wire/test/no-region");
+                                                "SSM:us-east-1");
    BOOST_CHECK_THROW(tester->plugin().create_provider(spec), chain::plugin_config_exception);
 }
 

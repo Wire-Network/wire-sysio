@@ -301,7 +301,8 @@ void ensure_kms_pubkey_pinned(kms_signer_state& state) {
 
 kms_key_ref parse_kms_spec(std::string_view spec_data) {
    SYS_ASSERT(!spec_data.empty(), chain::plugin_config_exception,
-              "KMS spec body is empty; expected an ARN or '<region>:<key-id-or-alias>'");
+              "KMS spec body is empty; expected an ARN, '<region>:<key-id-or-alias>', or a region-less "
+              "'<key-id-or-alias>'");
 
    if (spec_data.starts_with(kms_arn_prefix)) {
       // Full ARN form. Split into exactly `aws::arn_segment_count` parts so
@@ -378,23 +379,41 @@ kms_key_ref parse_kms_spec(std::string_view spec_data) {
                          spec_data, partition, service);
    }
 
-   // Shorthand `<region>:<key-id-or-alias>`. We only split on the first colon
-   // so aliases that themselves contain colons round-trip unchanged (KMS
-   // alias names are operator-chosen, and while AWS docs disallow colons in
-   // alias names today, the parser should not be the layer that depends on
-   // that constraint).
+   // Shorthand: `<region>:<key-id-or-alias>`, or a bare `<key-id-or-alias>` with no colon at all -- the
+   // region-less form, whose client region resolves from the environment (env vars -> shared config -> IMDS;
+   // see `sigprov::aws::resolve_default_region`). The region-optional grammar leans on AWS's KeyId constraint
+   // that key ids (uuids, `mrk-...`) and alias names can never contain ':' -- so a colon always means an
+   // explicit region is intended, and the split on the FIRST colon still passes any further colons through to
+   // the key id untouched. (The one spelling this grammar cannot express is a region-less reference to a
+   // hypothetical colon-bearing alias; AWS forbids creating such aliases, and the regional and ARN forms
+   // remain available regardless.)
    const auto colon = spec_data.find(':');
-   SYS_ASSERT(colon != std::string_view::npos,
-              chain::plugin_config_exception,
-              "KMS spec \"{}\" must include a region: expected '<region>:<key-id-or-alias>' "
-              "or a full 'arn:aws:kms:...' ARN", spec_data);
+   if (colon == std::string_view::npos) {
+      // A bare token that itself looks like a region is the likely "region without key id" typo; reject it
+      // with the fix rather than handing a region code to KMS as a KeyId.
+      SYS_ASSERT(!sigprov::aws::looks_like_aws_region(spec_data), chain::plugin_config_exception,
+                 "KMS spec \"{}\" looks like a bare region with no key id; expected "
+                 "'<region>:<key-id-or-alias>', a region-less '<key-id-or-alias>', or a full "
+                 "'arn:aws:kms:...' ARN",
+                 spec_data);
+      return kms_key_ref{{}, std::string{spec_data}};
+   }
    SYS_ASSERT(colon > 0, chain::plugin_config_exception,
-              "KMS spec \"{}\" has empty region", spec_data);
+              "KMS spec \"{}\" has empty region; drop the leading ':' for a region-less spec", spec_data);
    SYS_ASSERT(colon + 1 < spec_data.size(), chain::plugin_config_exception,
               "KMS spec \"{}\" has empty key id", spec_data);
 
+   const auto region = spec_data.substr(0, colon);
+   // Because a key id or alias cannot contain ':', a colon-bearing spec whose leading token is not shaped
+   // like a region has no valid reading -- it is malformed (e.g. `alias/x:y`). Reject it here with the two
+   // valid spellings rather than letting the SDK fail against a nonsense regional endpoint.
+   SYS_ASSERT(sigprov::aws::looks_like_aws_region(region), chain::plugin_config_exception,
+              "KMS spec \"{}\": leading segment \"{}\" is not shaped like an AWS region; give "
+              "'<region>:<key-id-or-alias>' or a region-less '<key-id-or-alias>' with no ':'",
+              spec_data, region);
+
    return kms_key_ref{
-      std::string{spec_data.substr(0, colon)},
+      std::string{region},
       std::string{spec_data.substr(colon + 1)},
    };
 }
@@ -596,13 +615,12 @@ kms_signer make_kms_signature_provider(const kms_key_ref&             ref,
 }
 
 std::shared_ptr<Aws::KMS::KMSClient> get_kms_client(const std::string& region) {
-   SYS_ASSERT(!region.empty(), chain::plugin_config_exception,
-              "get_kms_client: region must not be empty");
-
    // Function-local static, constructed on first use. Its constructor runs
    // `ensure_aws_sdk_initialized()`, pinning the SDK lifecycle singleton as
    // the older static so Aws::ShutdownAPI runs only after this cache has
-   // released its KMSClient shared_ptrs.
+   // released its KMSClient shared_ptrs. An empty `region` (a region-less
+   // spec) resolves through the cache's environment chain, which throws when
+   // nothing resolves.
    static sigprov::aws::region_client_cache<Aws::KMS::KMSClient> cache;
    return cache.get(region);
 }

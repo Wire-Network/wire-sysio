@@ -640,9 +640,11 @@ void signature_provider_manager_plugin::set_program_options(options_description&
       "Provider types KEY:<private-key> and KIOD:<url> are built in; additional "
       "schemes are provided by optional signature-provider plugins, enabled with a "
       "`plugin =` line: `plugin = sysio::signature_provider_ssm_plugin` for "
-      "SSM:<region>:<parameter-name> (key fetched once from AWS SSM Parameter Store "
+      "SSM:[<region>:]<parameter-name> (key fetched once from AWS SSM Parameter Store "
       "at startup); `plugin = sysio::signature_provider_kms_plugin` for KMS:<key-ref> "
-      "(remote signing via AWS KMS).");
+      "(remote signing via AWS KMS). When a spec omits its region, the region resolves "
+      "from the environment (AWS_DEFAULT_REGION / AWS_REGION, shared config, then "
+      "IMDS on AWS compute).");
 }
 
 const char* signature_provider_manager_plugin::signature_provider_help_text() const {
@@ -661,12 +663,15 @@ const char* signature_provider_manager_plugin::signature_provider_help_text() co
       "       KIOD:<url>         is the URL where kiod is available and the appropriate wallet(s) are unlocked\n\n"
       "       SSM:<param-ref>    fetches the private key once at startup from AWS SSM Parameter\n"
       "                          Store (SecureString) and signs locally; <param-ref> is\n"
-      "                          <region>:<parameter-name> or a full parameter ARN. Enable with\n"
+      "                          [<region>:]<parameter-name> or a full parameter ARN. Enable with\n"
       "                          `plugin = sysio::signature_provider_ssm_plugin`.\n\n"
       "       KMS:<key-ref>      signs remotely via AWS KMS (secp256k1/ethereum keys only; the\n"
-      "                          key never leaves KMS); <key-ref> is <region>:<key-id-or-alias>\n"
+      "                          key never leaves KMS); <key-ref> is [<region>:]<key-id-or-alias>\n"
       "                          or a full key/alias ARN. Enable with\n"
-      "                          `plugin = sysio::signature_provider_kms_plugin`.\n\n";
+      "                          `plugin = sysio::signature_provider_kms_plugin`.\n\n"
+      "       A spec that omits its region resolves one from the environment at startup:\n"
+      "       AWS_DEFAULT_REGION / AWS_REGION, the shared-config profile, then IMDS on AWS\n"
+      "       compute. An unresolvable region fails the boot; there is no silent default.\n\n";
 }
 
 void signature_provider_manager_plugin::plugin_initialize(const variables_map& options) {

@@ -29,9 +29,9 @@ with varied key types.
    `<data>`                is provided to the key provider based on the type
         `<private-key>`    string representation of a key in the format of the key type for `KEY` provider type
         `<url>`            is the URL where kiod is available and the appropriate wallet(s) for `KIOD` provider type
-        `<key-ref>`        for `KMS`: an ARN or `<region>:<key-id-or-alias>` naming the AWS KMS key that
+        `<key-ref>`        for `KMS`: an ARN or `[<region>:]<key-id-or-alias>` naming the AWS KMS key that
                            signs remotely (see plugins/signature_provider_kms_plugin/test/README.md)
-        `<param-ref>`      for `SSM`: an ARN or `<region>:<parameter-name>` naming the AWS SSM Parameter
+        `<param-ref>`      for `SSM`: an ARN or `[<region>:]<parameter-name>` naming the AWS SSM Parameter
                            Store SecureString that holds the private key (see below)
 ```
 
@@ -42,8 +42,9 @@ register a handler from `main()` before `app().initialize(...)` via `register_sp
 ## KMS: AWS KMS remote signing (`plugin = sysio::signature_provider_kms_plugin`)
 
 `KMS:<key-ref>` keeps the signing key in AWS KMS and issues a remote `Sign` call per signature —
-the key never appears on the host or in process memory. `<key-ref>` is a full key/alias ARN or
-`<region>:<key-id-or-alias>`. Scope is secp256k1/ethereum keys only — the provider hard-rejects
+the key never appears on the host or in process memory. `<key-ref>` is a full key/alias ARN,
+`<region>:<key-id-or-alias>`, or a region-less `<key-id-or-alias>` (see "Region resolution"
+below). Scope is secp256k1/ethereum keys only — the provider hard-rejects
 every other key type at boot, so a `KMS:` key can never back wire producer or BLS finalizer
 signing; the 30–100 ms per-signature latency therefore only touches ethereum-side submission
 paths, which run at seconds cadence. Every `KMS:` key is probed at startup with a (free)
@@ -63,10 +64,15 @@ would follow `KEY:`), and local signing makes it suitable for all signing paths 
 producer block signing -- unlike `KMS:`, whose per-signature network round-trip is too slow for
 block production (and whose ethereum-only key scope rules that out anyway).
 
-`<param-ref>` is either the shorthand `<region>:<parameter-name>` (everything after the first
-colon passes to GetParameter verbatim, so SSM's native `:version` / `:label` selectors work) or a
-full `arn:aws:ssm:<region>:<account>:parameter/<path>` ARN. The region is mandatory -- there is
-no `AWS_REGION` fallback.
+`<param-ref>` is the shorthand `<region>:<parameter-name>` (everything after the first colon
+passes to GetParameter verbatim, so SSM's native `:version` / `:label` selectors work), a
+region-less `<parameter-name>` (see "Region resolution" below), or a full
+`arn:aws:ssm:<region>:<account>:parameter/<path>` ARN. The two shorthand forms are told apart by
+the leading token: one shaped like an AWS region (`us-east-1`, `eu-west-2`, ...) means the
+explicit-region form; anything else makes the whole body the parameter name, selector colons
+included. The one ambiguous corner is a region-less *selector* reference to a parameter whose own
+name is shaped like a region (`SSM:my-param-2:label` parses as region `my-param-2`, name
+`label`) -- address such a parameter with an explicit region or the ARN form.
 
 Requirements and failure behavior:
 
@@ -92,6 +98,18 @@ signature-provider = bp1,wire,wire,SYS7AzqPxqfoEigXBefEo6efsCZszLzwv4vCdWqTt6s6z
 
 See `plugins/signature_provider_ssm_plugin/test/README.md` for the full operator
 runbook (IAM policy, rotation, live-test setup).
+
+## Region resolution (`KMS:` and `SSM:`)
+
+A spec may name its region explicitly (`<region>:` prefix, or embedded in an ARN) or omit it.
+When omitted, the region resolves at provider creation through the same chain the AWS SDK itself
+uses: `AWS_DEFAULT_REGION`, then `AWS_REGION`, then the shared-config profile's `region`
+(`~/.aws/config`), then the EC2 instance-metadata service — any process on AWS compute can learn
+its own instance's region from IMDS, so on EC2/ECS a region-less spec works with zero
+configuration. Two deliberate differences from stock SDK behavior: resolution never silently
+falls back to `us-east-1` (an unresolvable region fails the boot with a precise error instead of
+signing against a region the operator didn't choose), and an explicit spec region always wins
+over the environment. IMDS is skipped when `AWS_EC2_METADATA_DISABLED=true`.
 
 ## Config migration
 

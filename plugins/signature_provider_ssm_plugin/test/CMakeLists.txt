@@ -20,6 +20,9 @@ target_link_libraries(${TARGET_NAME}
         # and (transitively) the manager plugin the routing/lifecycle suites
         # drive directly.
         signature_provider_ssm_plugin
+        # Shared RAII env fixtures for the region-resolution cases
+        # (libraries/signature_provider_aws/test).
+        signature_provider_aws_test
         sysio_testing
         sysio_chain_wrap
         fc-test)

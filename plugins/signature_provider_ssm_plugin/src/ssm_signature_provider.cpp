@@ -88,7 +88,8 @@ parameter_type to_parameter_type(Aws::SSM::Model::ParameterType t) {
 
 ssm_param_ref parse_ssm_spec(std::string_view spec_data) {
    SYS_ASSERT(!spec_data.empty(), chain::plugin_config_exception,
-              "SSM spec body is empty; expected an ARN or '<region>:<parameter-name>'");
+              "SSM spec body is empty; expected an ARN, '<region>:<parameter-name>', or a region-less "
+              "'<parameter-name>'");
 
    if (spec_data.starts_with(ssm_arn_prefix)) {
       // Full ARN form. Split into exactly `aws::arn_segment_count` parts so
@@ -149,33 +150,50 @@ ssm_param_ref parse_ssm_spec(std::string_view spec_data) {
                          spec_data, partition, service);
    }
 
-   // Shorthand `<region>:<parameter-name>`. Split on the first colon only:
-   // parameter names cannot contain `:`, so anything after a further colon is
-   // SSM's own `name:version` / `name:label` selector syntax and passes
-   // through to GetParameter unchanged.
-   const auto colon = spec_data.find(':');
-   SYS_ASSERT(colon != std::string_view::npos, chain::plugin_config_exception,
-              "SSM spec \"{}\" must include a region: expected '<region>:<parameter-name>' "
-              "or a full 'arn:aws:ssm:...' ARN", spec_data);
-   SYS_ASSERT(colon > 0, chain::plugin_config_exception,
-              "SSM spec \"{}\" has empty region", spec_data);
-   SYS_ASSERT(colon + 1 < spec_data.size(), chain::plugin_config_exception,
-              "SSM spec \"{}\" has empty parameter name", spec_data);
+   // Shorthand: `<region>:<parameter-name>` or a region-less `<parameter-name>`. Parameter names cannot
+   // contain `:`, but SSM's own `name:version` / `name:label` selector syntax puts colons AFTER the name --
+   // so unlike the kms plugin's grammar, "contains a colon" does not by itself mean "has a region". The
+   // tiebreak: a leading token shaped like an AWS region (`sigprov::aws::looks_like_aws_region`) is an
+   // explicit region; anything else makes the whole body a region-less parameter name, selector colons and
+   // all, with the client region resolving from the environment (env vars -> shared config -> IMDS; see
+   // `sigprov::aws::resolve_default_region`).
+   //
+   // The one ambiguous corner: a region-less selector reference to a parameter whose own name is shaped like
+   // a region (`my-param-2:label` parses as region `my-param-2`, name `label`). Region-shaped-wins is
+   // deliberate -- the explicit-region form is the primary spelling and must never silently degrade -- and
+   // such a parameter stays addressable via the explicit-region or ARN forms. Path-style names (`/wire/...`)
+   // never collide: a region cannot contain `/`.
+   SYS_ASSERT(spec_data.front() != ':', chain::plugin_config_exception,
+              "SSM spec \"{}\" has empty region; drop the leading ':' for a region-less spec", spec_data);
 
-   return ssm_param_ref{
-      std::string{spec_data.substr(0, colon)},
-      std::string{spec_data.substr(colon + 1)},
-   };
+   const auto colon = spec_data.find(':');
+   if (colon != std::string_view::npos && sigprov::aws::looks_like_aws_region(spec_data.substr(0, colon))) {
+      SYS_ASSERT(colon + 1 < spec_data.size(), chain::plugin_config_exception,
+                 "SSM spec \"{}\" has empty parameter name", spec_data);
+      return ssm_param_ref{
+         std::string{spec_data.substr(0, colon)},
+         std::string{spec_data.substr(colon + 1)},
+      };
+   }
+
+   // A bare token that itself looks like a region is the likely "region without parameter name" typo; reject
+   // it with the fix rather than fetching a parameter literally named like a region from the default region.
+   SYS_ASSERT(!sigprov::aws::looks_like_aws_region(spec_data), chain::plugin_config_exception,
+              "SSM spec \"{}\" looks like a bare region with no parameter name; expected "
+              "'<region>:<parameter-name>', a region-less '<parameter-name>', or a full "
+              "'arn:aws:ssm:...' ARN",
+              spec_data);
+
+   return ssm_param_ref{{}, std::string{spec_data}};
 }
 
 std::shared_ptr<Aws::SSM::SSMClient> get_ssm_client(const std::string& region) {
-   SYS_ASSERT(!region.empty(), chain::plugin_config_exception,
-              "get_ssm_client: region must not be empty");
-
    // Function-local static, constructed on first use. Its constructor runs
    // `ensure_aws_sdk_initialized()`, pinning the SDK lifecycle singleton as
    // the older static so Aws::ShutdownAPI runs only after this cache has
-   // released its SSMClient shared_ptrs.
+   // released its SSMClient shared_ptrs. An empty `region` (a region-less
+   // spec) resolves through the cache's environment chain, which throws when
+   // nothing resolves.
    static sigprov::aws::region_client_cache<Aws::SSM::SSMClient> cache;
    return cache.get(region);
 }

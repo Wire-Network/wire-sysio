@@ -19,16 +19,22 @@ variables below are unset.
 --signature-provider <name>,<chain>,<key-type>,<public-key>,SSM:<param-ref>
 ```
 
-`<param-ref>` is either:
+`<param-ref>` is one of:
 
 - shorthand `<region>:<parameter-name>`, e.g. `us-east-1:/wire/prod/bp1`.
   Everything after the first `:` is passed to `GetParameter` verbatim, so
   SSM's native version / label selectors work: `us-east-1:/wire/prod/bp1:3`.
+- region-less `<parameter-name>`, e.g. `/wire/prod/bp1`. The region resolves
+  at startup from `AWS_DEFAULT_REGION` / `AWS_REGION`, the shared-config
+  profile, then IMDS on AWS compute — matching the `KMS:` scheme. An
+  unresolvable region fails the boot; there is no silent `us-east-1` default.
+  (A leading token shaped like a region selects the explicit-region form, so
+  a parameter whose own name is shaped like a region needs an explicit region
+  or an ARN when combined with a `:version` / `:label` selector.)
 - a full parameter ARN, e.g.
   `arn:aws:ssm:us-east-1:111122223333:parameter/wire/prod/bp1`.
 
-The region is mandatory (no `AWS_REGION` fallback), matching the `KMS:`
-scheme. The parameter's **value** is exactly the string that would follow
+The parameter's **value** is exactly the string that would follow
 `KEY:` — WIF / `PVT_...` for wire, `PVT_BLS_...`, `0x...` hex for ethereum,
 base58 for solana. Leading/trailing whitespace (a trailing newline from
 `put-parameter --value "$(cat key.txt)"`) is trimmed.

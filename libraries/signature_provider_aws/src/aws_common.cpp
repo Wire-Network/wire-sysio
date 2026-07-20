@@ -1,6 +1,10 @@
 #include <sysio/signature_provider_aws/aws_common.hpp>
 
 #include <aws/core/Aws.h>
+#include <aws/core/config/ConfigAndCredentialsCacheManager.h>
+#include <aws/core/internal/AWSHttpResourceClient.h>
+#include <aws/core/platform/Environment.h>
+#include <aws/core/utils/StringUtils.h>
 
 namespace sysio::sigprov::aws {
 
@@ -46,6 +50,39 @@ private:
 
 void ensure_aws_sdk_initialized() {
    (void)aws_sdk_lifecycle::instance();
+}
+
+std::string resolve_default_region() {
+   // The shared-config cache and the process-wide EC2 metadata client are owned by the SDK lifecycle; make
+   // sure it exists before consulting either.
+   ensure_aws_sdk_initialized();
+
+   auto region = Aws::Environment::GetEnv(env_default_region);
+   if (region.empty())
+      region = Aws::Environment::GetEnv(env_region);
+   if (region.empty())
+      region = Aws::Config::GetCachedConfigValue(config_key_region);
+
+   const bool imds_disabled =
+      Aws::Utils::StringUtils::ToLower(Aws::Environment::GetEnv(env_ec2_metadata_disabled).c_str()) ==
+      metadata_disabled_true;
+   if (region.empty() && !imds_disabled) {
+      // The "magic network address": on AWS compute the link-local instance-metadata service knows the
+      // instance's own region. `GetCurrentRegion` returns an empty string on any failure (off-AWS, IMDS
+      // unreachable), which falls through to the assertion below.
+      if (const auto metadata_client = Aws::Internal::GetEC2MetadataClient())
+         region = metadata_client->GetCurrentRegion();
+   }
+
+   SYS_ASSERT(!region.empty(), chain::plugin_config_exception,
+              "The signature-provider spec omits an AWS region and none could be resolved from the "
+              "environment: checked {} / {}, the shared-config profile's '{}', and the EC2 instance-metadata "
+              "service{}. Either prefix the spec with '<region>:', set {}, or run on AWS compute with IMDS "
+              "reachable.",
+              env_default_region, env_region, config_key_region,
+              imds_disabled ? " (disabled via AWS_EC2_METADATA_DISABLED)" : "", env_region);
+
+   return std::string{region.c_str(), region.size()};
 }
 
 } // namespace sysio::sigprov::aws

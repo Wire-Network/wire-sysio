@@ -33,6 +33,18 @@
 
 namespace sysio::sigprov::aws {
 
+/// Environment / shared-config keys consulted by `resolve_default_region`, listed in the order they are
+/// consulted -- the same order the AWS SDK's own `ClientConfiguration` constructors use. Exposed so the test
+/// fixtures pin the exact same spellings the production chain reads.
+inline constexpr const char* env_default_region        = "AWS_DEFAULT_REGION";
+inline constexpr const char* env_region                = "AWS_REGION";
+inline constexpr const char* config_key_region         = "region";
+inline constexpr const char* env_ec2_metadata_disabled = "AWS_EC2_METADATA_DISABLED";
+
+/// The value `AWS_EC2_METADATA_DISABLED` must carry (compared case-insensitively, matching the SDK's own
+/// check) for the IMDS step of `resolve_default_region` to be skipped.
+inline constexpr const char* metadata_disabled_true    = "true";
+
 /**
  * @brief Construct the process-wide AWS SDK lifecycle if it has not been
  *        constructed yet.
@@ -48,6 +60,30 @@ namespace sysio::sigprov::aws {
 void ensure_aws_sdk_initialized();
 
 /**
+ * @brief Resolve the AWS region to use when a provider spec does not name one.
+ *
+ * Mirrors the resolution chain the AWS SDK's own `ClientConfiguration` constructors run -- environment
+ * (`AWS_DEFAULT_REGION`, then `AWS_REGION`), then the shared-config profile's `region`, then the EC2
+ * instance-metadata service (IMDS, skipped when `AWS_EC2_METADATA_DISABLED=true`) -- with one deliberate
+ * difference: where the SDK silently falls back to `us-east-1` when nothing resolves, this throws. A signing
+ * key must never be looked up in a region the operator didn't choose; "no region anywhere" is a boot-time
+ * configuration error, not a default.
+ *
+ * The IMDS step is network I/O (a link-local HTTP round-trip, bounded by the SDK's short metadata timeouts):
+ * on AWS compute it answers in milliseconds; elsewhere it fails fast and resolution falls through to the
+ * throw. It runs only when the spec omitted its region AND neither the environment nor the shared config
+ * supplied one.
+ *
+ * The result is deliberately not memoized -- region-less lookups happen a handful of times at
+ * plugin-initialize, and `region_client_cache` memoizes the *client* under the resolved region, which is the
+ * cache that matters.
+ *
+ * @throws sysio::chain::plugin_config_exception when no region can be resolved
+ * @return the resolved region; never empty
+ */
+std::string resolve_default_region();
+
+/**
  * @brief Process-wide, per-region cache of AWS service clients.
  *
  * One instance per service client type, held as a function-local static by the owning provider (see `get_kms_client` /
@@ -57,9 +93,12 @@ void ensure_aws_sdk_initialized();
  * multiple closures sharing a client may submit requests concurrently.
  *
  * Construction of a client is offline: no credential resolution, no network. Credentials are looked up via the standard
- * AWS provider chain on the first API call, not here. The client configuration carries the region and nothing else --
- * region comes only from the provider spec, never from `AWS_REGION` or shared-config fallbacks, so a misconfiguration
- * fails as a parse error rather than as a mysterious wrong-region API call.
+ * AWS provider chain on the first API call, not here. The client configuration carries the region and nothing else. An
+ * explicit region comes from the provider spec; a spec that omitted its region resolves one through
+ * `resolve_default_region()` -- whose IMDS step is the one exception to "no network" on this path -- and the client is
+ * then cached under the *resolved* region, so an explicit `us-east-1` spec and a region-less spec resolving to
+ * `us-east-1` share one client. Resolution never silently defaults: an unresolvable region throws here, at provider
+ * creation, not as a mysterious wrong-region API call later.
  *
  * The constructor runs `ensure_aws_sdk_initialized()`: wherever an instance of this cache is created, the SDK lifecycle
  * singleton is thereby the older static and `Aws::ShutdownAPI` runs only after this cache has released its clients.
@@ -72,16 +111,16 @@ public:
    /**
     * Get (or lazily create) the shared client for `region`.
     *
-    * @param region AWS region (e.g. `us-east-1`); must be non-empty
-    * @return shared client configured for `region`
+    * @param region AWS region (e.g. `us-east-1`), or empty to use the environment-resolved default region
+    *               (see `resolve_default_region()`, which throws when nothing resolves)
+    * @return shared client configured for the effective region
     */
    std::shared_ptr<Client> get(const std::string& region) {
-      SYS_ASSERT(!region.empty(), chain::plugin_config_exception,
-                 "AWS client cache lookup requires a non-empty region");
-      auto& slot = _by_region[region];
+      const std::string effective = region.empty() ? resolve_default_region() : region;
+      auto& slot = _by_region[effective];
       if (!slot) {
          Aws::Client::ClientConfiguration cfg;
-         cfg.region = Aws::String{region};
+         cfg.region = Aws::String{effective};
          slot = std::make_shared<Client>(cfg);
       }
       return slot;
@@ -182,6 +221,42 @@ inline bool starts_with_ci(std::string_view s, std::string_view prefix) {
                      [](unsigned char a, unsigned char b) {
                         return std::tolower(a) == std::tolower(b);
                      });
+}
+
+/// True when `s` is shaped like an AWS region code -- `us-east-1`, `ap-southeast-3`, `us-gov-west-1`,
+/// `us-isob-east-1`: three or more hyphen-separated segments, the first all lowercase ASCII alpha (at least two
+/// characters), the last all ASCII digits, any between lowercase alphanumeric. Every region of every current AWS
+/// partition matches; KMS key ids (uuids, `mrk-...`), alias names (`alias/...`), and path-style SSM parameter names
+/// do not. The spec parsers use this to decide whether a shorthand's leading token is an explicit region or part of
+/// a region-less key/parameter reference. Character classes are spelled out (not `std::isalpha`/`std::isdigit`) so
+/// classification cannot follow the process locale.
+inline bool looks_like_aws_region(std::string_view s) {
+   constexpr std::size_t minimum_lead_segment_size = 2;
+   constexpr std::size_t minimum_segment_count     = 3;
+   constexpr auto is_lower_alpha = [](char c) { return c >= 'a' && c <= 'z'; };
+   constexpr auto is_digit       = [](char c) { return c >= '0' && c <= '9'; };
+   constexpr auto is_lower_alnum = [](char c) { return (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9'); };
+
+   std::size_t segment_count = 0;
+   for (std::size_t start = 0;;) {
+      const auto hyphen  = s.find('-', start);
+      const bool is_last = hyphen == std::string_view::npos;
+      const auto segment = is_last ? s.substr(start) : s.substr(start, hyphen - start);
+      ++segment_count;
+      if (segment.empty())
+         return false;
+      if (is_last)
+         return segment_count >= minimum_segment_count &&
+                std::all_of(segment.begin(), segment.end(), is_digit);
+      if (segment_count == 1) {
+         if (segment.size() < minimum_lead_segment_size ||
+             !std::all_of(segment.begin(), segment.end(), is_lower_alpha))
+            return false;
+      } else if (!std::all_of(segment.begin(), segment.end(), is_lower_alnum)) {
+         return false;
+      }
+      start = hyphen + 1;
+   }
 }
 
 } // namespace sysio::sigprov::aws

@@ -33,10 +33,12 @@
 
 #include <aws/kms/KMSErrors.h>
 
+#include <sysio/signature_provider_aws/test/env_fixtures.hpp>
 #include <sysio/signature_provider_kms_plugin/kms_signature_provider.hpp>
 
 using sysio::sigprov::kms::kms_key_ref;
 using sysio::sigprov::kms::parse_kms_spec;
+namespace sigaws = sysio::sigprov::aws;
 
 namespace {
 
@@ -186,9 +188,37 @@ BOOST_AUTO_TEST_CASE(parse_kms_spec_rejects_empty) {
    BOOST_CHECK_THROW(parse_kms_spec(""), sysio::chain::plugin_config_exception);
 }
 
-BOOST_AUTO_TEST_CASE(parse_kms_spec_rejects_no_region_no_arn) {
-   // Bare key id -- ambiguous about which region the key lives in. Must throw.
-   BOOST_CHECK_THROW(parse_kms_spec("1234abcd-12ab-34cd-56ef-1234567890ab"),
+BOOST_AUTO_TEST_CASE(parse_kms_spec_regionless_uuid) {
+   // No colon anywhere = the region-less form: `region` parses empty and the client region resolves from
+   // the environment (env vars -> shared config -> IMDS on AWS compute) when the provider is created.
+   const auto ref = parse_kms_spec("1234abcd-12ab-34cd-56ef-1234567890ab");
+   BOOST_CHECK_EQUAL(ref.region, "");
+   BOOST_CHECK_EQUAL(ref.key_id, "1234abcd-12ab-34cd-56ef-1234567890ab");
+}
+
+BOOST_AUTO_TEST_CASE(parse_kms_spec_regionless_alias) {
+   const auto ref = parse_kms_spec("alias/wire-cranker-eth-01");
+   BOOST_CHECK_EQUAL(ref.region, "");
+   BOOST_CHECK_EQUAL(ref.key_id, "alias/wire-cranker-eth-01");
+}
+
+BOOST_AUTO_TEST_CASE(parse_kms_spec_regionless_multi_region_key) {
+   // `mrk-` multi-Region key ids are two hyphen-separated segments -- never region-shaped.
+   const auto ref = parse_kms_spec("mrk-1234abcd12ab34cd56ef1234567890ab");
+   BOOST_CHECK_EQUAL(ref.region, "");
+   BOOST_CHECK_EQUAL(ref.key_id, "mrk-1234abcd12ab34cd56ef1234567890ab");
+}
+
+BOOST_AUTO_TEST_CASE(parse_kms_spec_rejects_bare_region) {
+   // A bare token shaped like a region is the likely "region without key id" typo, not a plausible KeyId --
+   // fail at parse time with the fix rather than handing a region code to KMS.
+   BOOST_CHECK_THROW(parse_kms_spec("us-east-1"), sysio::chain::plugin_config_exception);
+}
+
+BOOST_AUTO_TEST_CASE(parse_kms_spec_rejects_colon_with_non_region_lead) {
+   // Key ids and aliases can never contain ':', so a colon-bearing spec whose leading token is not shaped
+   // like a region has no valid reading -- neither an explicit-region form nor a region-less one.
+   BOOST_CHECK_THROW(parse_kms_spec("alias/wire-cranker-eth-01:junk"),
                      sysio::chain::plugin_config_exception);
 }
 
@@ -578,7 +608,10 @@ BOOST_AUTO_TEST_CASE(spki_der_to_public_key_pinning_rejects_mismatched_key) {
 // `get_kms_client` is offline: it only touches the AWS SDK to construct
 // `Aws::KMS::KMSClient`, which does not resolve credentials or open
 // connections at construction time. These tests therefore run without AWS
-// creds.
+// creds. The empty-region cases pin the resolution environment (env vars,
+// shared config, IMDS off) via the shared fixtures so they stay offline and
+// deterministic regardless of the host's AWS setup; the resolution chain
+// itself is unit-tested in the signature_provider_aws library's own suite.
 // ---------------------------------------------------------------------------
 
 BOOST_AUTO_TEST_CASE(get_kms_client_caches_per_region) {
@@ -597,7 +630,21 @@ BOOST_AUTO_TEST_CASE(get_kms_client_distinct_per_region) {
    BOOST_CHECK_NE(east.get(), west.get());
 }
 
-BOOST_AUTO_TEST_CASE(get_kms_client_rejects_empty_region) {
+BOOST_AUTO_TEST_CASE(get_kms_client_empty_region_resolves_from_env) {
+   // A region-less spec resolves the client region from the environment and is cached under the RESOLVED
+   // region, so the equivalent explicit-region lookup shares the client.
+   const sigaws::test::scoped_env_var default_region{sigaws::env_default_region, nullptr};
+   const sigaws::test::scoped_env_var region{sigaws::env_region, "eu-north-1"};
+   const auto resolved      = sysio::sigprov::kms::get_kms_client("");
+   const auto explicit_look = sysio::sigprov::kms::get_kms_client("eu-north-1");
+   BOOST_REQUIRE(resolved);
+   BOOST_CHECK_EQUAL(resolved.get(), explicit_look.get());
+}
+
+BOOST_AUTO_TEST_CASE(get_kms_client_empty_region_unresolvable_throws) {
+   // With nothing to resolve from (no env, no shared config, IMDS disabled), a region-less lookup must
+   // throw -- never silently default to a region the operator didn't choose.
+   const sigaws::test::scoped_unresolvable_region_env pinned;
    BOOST_CHECK_THROW(sysio::sigprov::kms::get_kms_client(""),
                      sysio::chain::plugin_config_exception);
 }
@@ -621,6 +668,25 @@ BOOST_AUTO_TEST_CASE(make_kms_signature_provider_returns_callable_for_ethereum) 
 
    // Both the signing closure and the startup probe must be set; we deliberately
    // invoke neither here (either would hit live KMS).
+   BOOST_CHECK(static_cast<bool>(kms.sign));
+   BOOST_CHECK(static_cast<bool>(kms.warm_up));
+}
+
+BOOST_AUTO_TEST_CASE(make_kms_signature_provider_regionless_resolves_from_env) {
+   // A region-less ref constructs end-to-end: the client region resolves from the environment at
+   // construction (pinned here so the case stays offline and deterministic), and the closures come back set
+   // exactly as in the explicit-region case. Neither closure is invoked -- either would hit live KMS.
+   const sigaws::test::scoped_env_var default_region{sigaws::env_default_region, nullptr};
+   const sigaws::test::scoped_env_var region{sigaws::env_region, "eu-north-1"};
+
+   const auto chain_pub =
+      fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em).get_public_key();
+
+   const auto kms = sysio::sigprov::kms::make_kms_signature_provider(
+      kms_key_ref{{}, "alias/wire-cranker-eth-01"},
+      fc::crypto::chain_key_type_ethereum,
+      chain_pub);
+
    BOOST_CHECK(static_cast<bool>(kms.sign));
    BOOST_CHECK(static_cast<bool>(kms.warm_up));
 }

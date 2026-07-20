@@ -28,3 +28,7 @@ install(
         DIRECTORY include/sysio
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} COMPONENT dev
 )
+
+if (ENABLE_TESTS)
+    add_subdirectory(test)
+endif ()

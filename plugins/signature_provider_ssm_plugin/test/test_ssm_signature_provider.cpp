@@ -22,13 +22,16 @@
 #include <aws/ssm/SSMClient.h>
 #include <aws/ssm/SSMErrors.h>
 
+#include <sysio/signature_provider_aws/test/env_fixtures.hpp>
+
 #include <cstdlib>
 #include <memory>
 #include <string>
 
 using namespace sysio::sigprov::ssm;
 using namespace fc::crypto;
-namespace chain = sysio::chain;
+namespace chain  = sysio::chain;
+namespace sigaws = sysio::sigprov::aws;
 
 namespace {
 
@@ -141,9 +144,43 @@ BOOST_AUTO_TEST_CASE(parse_shorthand_version_selector_passthrough) {
    BOOST_CHECK_EQUAL(ref.name, "/wire/prod/bp1:3");
 }
 
-BOOST_AUTO_TEST_CASE(parse_rejects_missing_region) {
-   BOOST_CHECK_EXCEPTION(parse_ssm_spec("/wire/prod/bp1"),
-                         chain::plugin_config_exception, detail_contains("must include a region"));
+BOOST_AUTO_TEST_CASE(parse_regionless_path) {
+   // A leading token not shaped like an AWS region = the region-less form: `region` parses empty and the
+   // client region resolves from the environment (env vars -> shared config -> IMDS on AWS compute) when
+   // the provider is created. Path-style names can never collide with a region -- regions cannot contain '/'.
+   const auto ref = parse_ssm_spec("/wire/prod/bp1");
+   BOOST_CHECK_EQUAL(ref.region, "");
+   BOOST_CHECK_EQUAL(ref.name, "/wire/prod/bp1");
+}
+
+BOOST_AUTO_TEST_CASE(parse_regionless_bare_name) {
+   const auto ref = parse_ssm_spec("bp1key");
+   BOOST_CHECK_EQUAL(ref.region, "");
+   BOOST_CHECK_EQUAL(ref.name, "bp1key");
+}
+
+BOOST_AUTO_TEST_CASE(parse_regionless_version_selector_passthrough) {
+   // `/wire/prod/bp1` is not region-shaped, so the whole body -- selector colon included -- is the Name.
+   const auto ref = parse_ssm_spec("/wire/prod/bp1:3");
+   BOOST_CHECK_EQUAL(ref.region, "");
+   BOOST_CHECK_EQUAL(ref.name, "/wire/prod/bp1:3");
+}
+
+BOOST_AUTO_TEST_CASE(parse_rejects_bare_region) {
+   // A bare token shaped like a region is the likely "region without parameter name" typo. A parameter
+   // genuinely named like a region stays addressable via the explicit-region or ARN forms.
+   BOOST_CHECK_EXCEPTION(parse_ssm_spec("us-east-1"),
+                         chain::plugin_config_exception, detail_contains("bare region"));
+}
+
+BOOST_AUTO_TEST_CASE(parse_region_shaped_lead_wins) {
+   // The documented ambiguous corner: a region-less *selector* reference to a parameter whose own name is
+   // shaped like a region parses as the explicit-region form instead (region-shaped-wins precedence, so the
+   // primary spelling never silently degrades). Such a parameter must be addressed with an explicit region
+   // or an ARN.
+   const auto ref = parse_ssm_spec("my-param-2:label");
+   BOOST_CHECK_EQUAL(ref.region, "my-param-2");
+   BOOST_CHECK_EQUAL(ref.name, "label");
 }
 
 BOOST_AUTO_TEST_CASE(parse_rejects_empty_region_shorthand) {
@@ -233,6 +270,24 @@ BOOST_AUTO_TEST_CASE(solana_key_round_trip) {
 
    const auto digest = fc::sha256::hash(std::string{"ssm sigprov solana round trip"});
    BOOST_CHECK(result.signer(digest) == result.private_key->sign(digest));
+}
+
+BOOST_AUTO_TEST_CASE(regionless_spec_reaches_fetcher_with_empty_region) {
+   // A region-less spec flows through provider construction unchanged: the fetcher sees the empty region and
+   // the whole name (selector colons included). Region resolution happens only inside the real fetcher's
+   // client lookup, so this case is fully offline.
+   const auto priv = private_key::generate();
+   const auto pub  = from_native_string_to_public_key<chain_key_type_wire>(priv.get_public_key().to_string({}));
+
+   ssm_param_ref seen;
+   const parameter_fetcher capturing = [&seen, value = priv.to_string({})](const ssm_param_ref& ref) {
+      seen = ref;
+      return fetched_parameter{value, parameter_type::SecureString};
+   };
+   const auto result = create_ssm_provider_with_fetcher(chain_key_type_wire, pub, "/wire/test/key:3", capturing);
+   BOOST_CHECK(static_cast<bool>(result.signer));
+   BOOST_CHECK_EQUAL(seen.region, "");
+   BOOST_CHECK_EQUAL(seen.name, "/wire/test/key:3");
 }
 
 BOOST_AUTO_TEST_CASE(value_whitespace_is_trimmed) {
@@ -330,8 +385,10 @@ BOOST_AUTO_TEST_CASE(malformed_spec_fails_before_fetching) {
    const auto priv = private_key::generate();
    const auto pub  = from_native_string_to_public_key<chain_key_type_wire>(priv.get_public_key().to_string({}));
 
+   // A bare region with no parameter name is malformed; the parse failure must land before the network
+   // round-trip is reached.
    counting_fetcher fetcher{priv.to_string({})};
-   BOOST_CHECK_THROW(create_ssm_provider_with_fetcher(chain_key_type_wire, pub, "no-region-here", fetcher),
+   BOOST_CHECK_THROW(create_ssm_provider_with_fetcher(chain_key_type_wire, pub, "us-east-1", fetcher),
                      chain::plugin_config_exception);
    BOOST_CHECK_EQUAL(*fetcher.calls, 0);
 }
@@ -432,7 +489,22 @@ BOOST_AUTO_TEST_CASE(get_ssm_client_caches_per_region) {
    BOOST_CHECK(a1.get() != b.get());
 }
 
-BOOST_AUTO_TEST_CASE(get_ssm_client_rejects_empty_region) {
+BOOST_AUTO_TEST_CASE(get_ssm_client_empty_region_resolves_from_env) {
+   // A region-less spec resolves the client region from the environment and is cached under the RESOLVED
+   // region, so the equivalent explicit-region lookup shares the client. The resolution chain itself is
+   // unit-tested in the signature_provider_aws library's own suite; this pins the plugin wiring.
+   const sigaws::test::scoped_env_var default_region{sigaws::env_default_region, nullptr};
+   const sigaws::test::scoped_env_var region{sigaws::env_region, "eu-north-1"};
+   const auto resolved      = get_ssm_client("");
+   const auto explicit_look = get_ssm_client("eu-north-1");
+   BOOST_REQUIRE(resolved != nullptr);
+   BOOST_CHECK(resolved.get() == explicit_look.get());
+}
+
+BOOST_AUTO_TEST_CASE(get_ssm_client_empty_region_unresolvable_throws) {
+   // With nothing to resolve from (no env, no shared config, IMDS disabled), a region-less lookup must
+   // throw -- never silently default to a region the operator didn't choose.
+   const sigaws::test::scoped_unresolvable_region_env pinned;
    BOOST_CHECK_THROW(get_ssm_client(""), chain::plugin_config_exception);
 }
 

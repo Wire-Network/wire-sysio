@@ -70,9 +70,11 @@ namespace sysio::sigprov::ssm {
 /**
  * @brief Parsed SSM parameter reference.
  *
- * `region` selects the regional `SSMClient`. `name` is handed verbatim to the
- * `Name` field of SSM `GetParameter`, which accepts a parameter name, a full
- * parameter ARN, and the native `name:version` / `name:label` selector forms.
+ * `region` selects the regional `SSMClient`; empty means the spec omitted it, and the client region resolves
+ * from the environment (env vars -> shared config -> IMDS on AWS compute; see
+ * `sigprov::aws::resolve_default_region`). `name` is handed verbatim to the `Name` field of SSM
+ * `GetParameter`, which accepts a parameter name, a full parameter ARN, and the native `name:version` /
+ * `name:label` selector forms.
  *
  *   - For an ARN spec, `name` is the full ARN, unmodified. Keeping the ARN
  *     intact preserves the account id (same reasoning as the `kms/` library:
@@ -82,6 +84,10 @@ namespace sysio::sigprov::ssm {
  *     everything after the first `:`, passed through verbatim -- so SSM's
  *     native version / label selectors work with no extra grammar here
  *     (`SSM:us-east-1:/wire/prod/bp1:3` selects version 3).
+ *   - For the region-less `<parameter-name>` spec, `name` is the whole body,
+ *     again with selector colons passing through
+ *     (`SSM:/wire/prod/bp1:3` selects version 3 in the environment-resolved
+ *     region).
  */
 struct ssm_param_ref {
    std::string region;
@@ -99,14 +105,29 @@ struct ssm_param_ref {
  *     Region is the leading token; everything after the first `:` is `name`
  *     (parameter names cannot contain `:`, so any further colons are SSM's
  *     own `:version` / `:label` selector syntax and pass through unchanged).
+ *   - Region-less: `<parameter-name>`
+ *     `region` parses as empty, and the client region resolves from the
+ *     environment when the provider is created: `AWS_DEFAULT_REGION` /
+ *     `AWS_REGION`, then the shared-config profile, then IMDS on AWS compute
+ *     (see `sigprov::aws::resolve_default_region`). Resolution never falls
+ *     back silently -- when nothing resolves, provider creation throws at
+ *     boot rather than fetching from a region the operator didn't choose.
  *
- * Region must always be present in the spec. We do not silently fall back to
- * `AWS_REGION` env or shared-config lookups because misconfiguration there is
- * harder to diagnose than a parse error here.
+ * The two shorthand forms are told apart by the leading token: one shaped
+ * like an AWS region (`sigprov::aws::looks_like_aws_region`) means the
+ * explicit-region form; anything else makes the whole body a region-less
+ * name, selector colons included. A bare token shaped like a region is
+ * rejected as the likely "region without parameter name" typo. The one
+ * ambiguous corner is a region-less *selector* reference to a parameter whose
+ * own name is shaped like a region (`my-param-2:label` parses as region
+ * `my-param-2`); region-shaped-wins is deliberate, and such a parameter stays
+ * addressable via the explicit-region or ARN forms. Path-style names
+ * (`/wire/...`) never collide -- a region cannot contain `/`.
  *
- * @param spec_data the spec body, e.g. `us-east-1:/wire/prod/bp1`
- * @throws sysio::chain::plugin_config_exception if the form is empty,
- *         malformed, or omits region
+ * @param spec_data the spec body, e.g. `us-east-1:/wire/prod/bp1` or
+ *                  `/wire/prod/bp1`
+ * @throws sysio::chain::plugin_config_exception if the form is empty or
+ *         malformed
  * @return parsed `ssm_param_ref` ready to hand to the AWS SDK
  */
 ssm_param_ref parse_ssm_spec(std::string_view spec_data);
@@ -155,10 +176,14 @@ using parameter_fetcher = std::function<fetched_parameter(const ssm_param_ref&)>
  * semantics with the kms plugin (see
  * `sysio::sigprov::aws::region_client_cache`). Construction is offline: no
  * credential resolution, no network. Credentials resolve via the standard AWS
- * provider chain on the first API call.
+ * provider chain on the first API call. The one exception is an empty
+ * `region` (a region-less spec): the effective region then resolves via
+ * `sigprov::aws::resolve_default_region`, whose IMDS step may touch the
+ * instance-metadata endpoint, and which throws when nothing resolves.
  *
- * @param region AWS region (e.g. `us-east-1`)
- * @return shared `SSMClient` configured for `region`
+ * @param region AWS region (e.g. `us-east-1`), or empty to use the
+ *               environment-resolved default region
+ * @return shared `SSMClient` configured for the effective region
  */
 std::shared_ptr<Aws::SSM::SSMClient> get_ssm_client(const std::string& region);
 

@@ -62,8 +62,10 @@ namespace sysio::sigprov::kms {
 /**
  * @brief Parsed KMS key reference.
  *
- * `region` selects the regional `KMSClient`. `key_id` is handed verbatim to
- * the `KeyId` field of KMS `Sign` / `GetPublicKey`.
+ * `region` selects the regional `KMSClient`; empty means the spec omitted it, and the client region resolves
+ * from the environment (env vars -> shared config -> IMDS on AWS compute; see
+ * `sigprov::aws::resolve_default_region`). `key_id` is handed verbatim to the `KeyId` field of KMS `Sign` /
+ * `GetPublicKey`.
  *
  * AWS KMS accepts four `KeyId` forms -- a bare key id, a key ARN, an alias
  * name (`alias/<name>`), or an alias ARN -- but NOT the bare `key/<uuid>`
@@ -72,9 +74,10 @@ namespace sysio::sigprov::kms {
  *     intact preserves the account id; stripping an alias ARN down to the
  *     bare `alias/<name>` would resolve the alias in the *caller's* account
  *     and could silently bind a same-named alias for a different key.
- *   - For the shorthand `<region>:<key-id-or-alias>` spec, `key_id` is the
- *     bare key id or `alias/<name>` the operator supplied; that form
- *     deliberately resolves within the caller's own account.
+ *   - For the shorthand `<region>:<key-id-or-alias>` and region-less
+ *     `<key-id-or-alias>` specs, `key_id` is the bare key id or
+ *     `alias/<name>` the operator supplied; those forms deliberately resolve
+ *     within the caller's own account.
  */
 struct kms_key_ref {
    std::string region;
@@ -90,14 +93,24 @@ struct kms_key_ref {
  *     itself, passed to KMS verbatim so the account id is preserved.
  *   - Shorthand: `<region>:<key-id-or-alias>`
  *     Region is the leading token; everything after the first `:` is `key_id`.
+ *   - Region-less: `<key-id-or-alias>` (no `:` anywhere)
+ *     `region` parses as empty, and the client region resolves from the
+ *     environment when the provider is created: `AWS_DEFAULT_REGION` /
+ *     `AWS_REGION`, then the shared-config profile, then IMDS on AWS compute
+ *     (see `sigprov::aws::resolve_default_region`). Resolution never falls
+ *     back silently -- when nothing resolves, provider creation throws at
+ *     boot rather than signing against a region the operator didn't choose.
  *
- * Region must always be present in the spec. We do not silently fall back to
- * `AWS_REGION` env or shared-config lookups because misconfiguration there is
- * harder to diagnose than a parse error here.
+ * Because a KMS key id or alias name can never contain `:`, a colon always
+ * marks an explicit region: a colon-bearing spec whose leading token is not
+ * shaped like an AWS region is rejected as malformed, and a bare token that
+ * IS shaped like a region is rejected as the likely "region without key id"
+ * typo.
  *
  * @param spec_data the spec body, e.g. `us-east-1:alias/wire-cranker-eth-01`
- * @throws sysio::chain::plugin_config_exception if the form is empty,
- *         malformed, or omits region
+ *                  or `alias/wire-cranker-eth-01`
+ * @throws sysio::chain::plugin_config_exception if the form is empty or
+ *         malformed
  * @return parsed `kms_key_ref` ready to hand to the AWS SDK
  */
 kms_key_ref parse_kms_spec(std::string_view spec_data);
@@ -202,10 +215,14 @@ fc::em::public_key spki_der_to_public_key(std::span<const unsigned char> spki_de
  *
  * Construction is offline: no credential resolution, no network. Credentials
  * are looked up via the standard AWS provider chain on the first KMS API
- * call, not here.
+ * call, not here. The one exception is an empty `region` (a region-less
+ * spec): the effective region then resolves via
+ * `sigprov::aws::resolve_default_region`, whose IMDS step may touch the
+ * instance-metadata endpoint, and which throws when nothing resolves.
  *
- * @param region AWS region (e.g. `us-east-1`)
- * @return shared `KMSClient` configured for `region`
+ * @param region AWS region (e.g. `us-east-1`), or empty to use the
+ *               environment-resolved default region
+ * @return shared `KMSClient` configured for the effective region
  */
 std::shared_ptr<Aws::KMS::KMSClient> get_kms_client(const std::string& region);
 
