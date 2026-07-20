@@ -636,7 +636,9 @@ std::string outpost_solana_client::deliver_outbound_envelope(
    // attestations into a packed envelope and writes it to the
    // `latest_outbound_envelope` PDA), and (c) self-closes this
    // operator's chunk_buffer. No separate `emit_outbound_envelope` or
-   // `cleanup_envelope_chunks` tx is needed in the relay.
+   // `cleanup_envelope_chunks` tx is needed in the steady-state relay; the
+   // typed program client retains them as explicit recovery and maintenance
+   // surfaces.
    std::string last_sig;
    for (uint16_t i = 0; i < total_chunks; ++i) {
       throw_if_past_deadline(deadline_abs, OP_EPOCH_IN);

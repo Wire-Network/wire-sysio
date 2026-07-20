@@ -15,9 +15,9 @@ All 21 batch operators run this plugin in perpetuity. The epoch scheduler (`sysi
 4. All 7 independently verify the delivered chain
 
 **Phase 2 — Inbound (Outposts → WIRE):**
-1. Crank Outpost to finalize epoch (`OPP.finalizeEpoch()` / `finalize_epoch`)
-2. Read inbound chain from Outpost (ETH: event logs, SOL: transaction logs)
-3. Deliver to Depot (`sysio.msgch::deliver`) with chain hash
+1. The consensus-reaching delivery emits the outpost's outbound envelope
+2. Read the latest outbound envelope from Outpost storage
+3. Deliver its raw protobuf bytes to Depot (`sysio.msgch::deliver`)
 4. Depot evaluates consensus across all 7 deliveries
 
 ## Configuration
