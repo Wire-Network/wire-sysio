@@ -274,7 +274,7 @@ void verify_kms_pubkey(kms_signer_state& state) {
 }
 
 /// Run the public-key pinning check at most once per `state`. Both the first
-/// `Sign` and the opt-in startup probe funnel through here. A successful check
+/// `Sign` and the startup probe funnel through here. A successful check
 /// sets `pinned` so subsequent calls are a cheap no-op; a throwing check (a
 /// permanent misconfiguration or a transient API error) leaves `pinned` false
 /// so the next call retries -- and, crucially, the exception propagates to the
@@ -543,9 +543,9 @@ kms_signer make_kms_signature_provider(const kms_key_ref&             ref,
       // API and assert it matches the key pinned in the spec. This turns the
       // common "wrong <public-key> in the spec" mistake into a fast, direct
       // error instead of an opaque recovery failure that would otherwise
-      // surface only after a paid Sign. If the opt-in startup probe already
-      // ran the check, this is a no-op -- both paths share `state`'s pinning
-      // guard through `ensure_kms_pubkey_pinned`.
+      // surface only after a paid Sign. If the startup probe already ran the
+      // check, this is a no-op -- both paths share `state`'s pinning guard
+      // through `ensure_kms_pubkey_pinned`.
       ensure_kms_pubkey_pinned(*state);
 
       // Build a Sign request. MessageType=DIGEST tells KMS the 32 bytes are
@@ -604,11 +604,13 @@ kms_signer make_kms_signature_provider(const kms_key_ref&             ref,
    };
 
    // Startup probe: runs the same one-shot pinning check as the first Sign,
-   // but issues only the free GetPublicKey -- no billable Sign. An opt-in
-   // plugin_startup() calls this so a missing credential, bad region, absent
-   // IAM grant, or wrong pinned key fails loudly at boot instead of deep in
-   // production. It shares `state` (hence the pinning guard) with `sign`, so
-   // enabling the probe never doubles the check.
+   // but issues only the free GetPublicKey -- no billable Sign. The manager
+   // invokes every attached probe at its plugin_startup (attaching IS the
+   // opt-in; this provider always attaches -- there is no enable flag), so a
+   // missing credential, bad region, absent IAM grant, or wrong pinned key
+   // fails loudly at boot instead of deep in production. It shares `state`
+   // (hence the pinning guard) with `sign`, so the probe never doubles the
+   // check.
    std::function<void()> warm_up = [state] { ensure_kms_pubkey_pinned(*state); };
 
    return kms_signer{.sign = std::move(sign), .warm_up = std::move(warm_up)};
@@ -632,8 +634,9 @@ sysio::provider_spec_result create_kms_provider(
    // Parse the `KMS:`-spec body, build the signer (key-type / pubkey pairing
    // is validated up front; no KMS network I/O), and package the two closures
    // into the shape the plugin's registry expects. The `warm_up` callback
-   // becomes the generic `startup_probe`, which the plugin runs from
-   // `plugin_startup()` when its opt-in startup-probe flag is enabled.
+   // becomes the generic `startup_probe`; the manager invokes every attached
+   // probe at its plugin_startup (a transient AWS failure there is logged and
+   // deferred to the lazy first-sign check rather than blocking the boot).
    auto ref = parse_kms_spec(spec_data);
    auto kms = make_kms_signature_provider(ref, key_type, expected_pub);
    return {.signer        = std::move(kms.sign),

@@ -56,12 +56,13 @@ aws kms create-alias \
 
 The principal whose credentials the test runs under needs both `kms:Sign`
 and `kms:GetPublicKey` on the key. `kms:GetPublicKey` is required at runtime,
-not just for setup: on the first sign of each key — and again from the
-optional startup probe — the plugin calls `GetPublicKey` exactly once to pin
-the operator-supplied public key against the one KMS actually holds. Without
-that grant the lazy pin and the startup probe both fail with
-`AccessDeniedException` on first use. The same call is also how you extract
-the matching pubkey hex for the spec (Prereq #4). Minimum inline policy:
+not just for setup: the plugin calls `GetPublicKey` exactly once per key to
+pin the operator-supplied public key against the one KMS actually holds —
+from the startup probe the manager always runs at boot (there is no enable
+flag), or lazily before the first sign when a transient AWS error deferred
+the probe. Without that grant the startup probe and the lazy pin both fail
+with `AccessDeniedException`. The same call is also how you extract the
+matching pubkey hex for the spec (Prereq #4). Minimum inline policy:
 
 ```json
 {

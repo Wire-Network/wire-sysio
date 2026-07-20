@@ -20,7 +20,7 @@
  *
  * The fetch happens inside the spec handler, i.e. when the manager's `plugin_initialize` creates the configured `SSM:`
  * providers. This is the first blocking network I/O at plugin-initialize time in the tree (the KMS provider
- * deliberately stays offline until its opt-in startup probe) -- a deliberate departure: the provider cannot exist
+ * deliberately stays offline until its startup probe) -- a deliberate departure: the provider cannot exist
  * without the key material, and a boot-time failure with a precise error is the intended behavior for a misconfigured
  * signer. The block is bounded by the AWS SDK's connect / request timeouts and its default retry strategy.
  *
