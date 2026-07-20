@@ -661,6 +661,49 @@ BOOST_AUTO_TEST_CASE(growth_guard_throw_aborts_emission) {
    BOOST_CHECK_LT(out.size(), 200u);
 }
 
+BOOST_AUTO_TEST_CASE(growth_guard_intra_token_abort) {
+   // A single oversized token must be budget-checked WHILE it streams: value_string (via
+   // the escape loop's periodic yield), value_hex, and raw_value all abort within a chunk
+   // of the guard's threshold instead of materializing the full token behind one
+   // token-boundary pre-check.
+   constexpr size_t threshold = 64 * 1024;
+   // Abort bound: threshold + one guarded-emission chunk + escape/stride slack -- far
+   // below the full token size.
+   constexpr size_t abort_bound = threshold + fc::json_writer_guarded_chunk_bytes + 8 * 1024;
+   const std::string big(1u << 20, 'x'); // 1 MiB payload; hex form is 2 MiB
+
+   {
+      std::string out;
+      fc::json_writer w(out, [&](size_t sz) { if (sz > threshold) throw test_budget_abort{}; }, 1024);
+      BOOST_CHECK_THROW(w.value_string(big), test_budget_abort);
+      BOOST_CHECK_LT(out.size(), abort_bound);
+   }
+   {
+      std::string out;
+      fc::json_writer w(out, [&](size_t sz) { if (sz > threshold) throw test_budget_abort{}; }, 1024);
+      BOOST_CHECK_THROW(w.value_hex(big.data(), big.size()), test_budget_abort);
+      BOOST_CHECK_LT(out.size(), abort_bound);
+   }
+   {
+      std::string out;
+      fc::json_writer w(out, [&](size_t sz) { if (sz > threshold) throw test_budget_abort{}; }, 1024);
+      BOOST_CHECK_THROW(w.raw_value(big), test_budget_abort);
+      BOOST_CHECK_LT(out.size(), abort_bound);
+   }
+}
+
+BOOST_AUTO_TEST_CASE(growth_guard_measures_escape_expansion) {
+   // 32 KiB of control characters escape to ~192 KiB of output (6 bytes per input byte).
+   // A guard threshold above the input size but below the expanded size must still fire,
+   // proving the guard measures emitted bytes, not input consumed.
+   const std::string ctrl(32 * 1024, '\x01');
+   std::string out;
+   fc::json_writer w(out, [&](size_t sz) { if (sz > 100 * 1024) throw test_budget_abort{}; }, 1024);
+   BOOST_CHECK_THROW(w.value_string(ctrl), test_budget_abort);
+   BOOST_CHECK_GT(out.size(), 100 * 1024); // the expanded output crossed a threshold the raw input never reaches
+   BOOST_CHECK_LT(out.size(), 128 * 1024);
+}
+
 BOOST_AUTO_TEST_CASE(growth_guard_rearms_after_throw) {
    // A catch-and-continue serializer (eg the abi_serializer hex-fallback path) absorbing
    // the guard's throw must NOT disable the guard: the very next token re-invokes it

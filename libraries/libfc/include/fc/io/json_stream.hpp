@@ -3,6 +3,7 @@
 #include <fc/exception/exception.hpp>
 #include <fc/io/json_escape.hpp>
 
+#include <algorithm>
 #include <cassert>
 #include <charconv>
 #include <cmath>
@@ -43,6 +44,12 @@ inline constexpr uint32_t json_stream_max_depth = 200;
 /// the guard mid-emission.
 inline constexpr size_t json_writer_default_guard_stride = 64 * 1024;
 
+/// Output-byte chunk size for guarded emission of single large tokens (value_hex /
+/// raw_value).  A guarded writer breaks the append loop at this granularity and consults
+/// the guard between chunks, so one oversized blob cannot materialize past the budget
+/// behind a single token-boundary check.  Unguarded writers keep the single tight loop.
+inline constexpr size_t json_writer_guarded_chunk_bytes = 64 * 1024;
+
 /**
  *  Streaming JSON writer that emits tokens directly into an output std::string.
  *
@@ -81,6 +88,15 @@ public:
    /// swallow exceptions from nested serializers; re-arming guarantees a guard abort
    /// re-raises out of every such handler instead of being silently absorbed -- unless the
    /// guard's condition has cleared, in which case emission resumes legitimately.
+   ///
+   /// Intra-token checks: guarded writers also consult the guard WHILE a single large
+   /// token streams -- every escape_string_yield_check_count input chars of a string value
+   /// or key (measuring the output buffer, so escape expansion counts) and every
+   /// json_writer_guarded_chunk_bytes appended by value_hex / raw_value -- so one
+   /// oversized token cannot materialize past the budget behind a single token-boundary
+   /// check.  A guard throw mid-token leaves a partial token in the buffer; the writer's
+   /// re-arm plus the caller's checkpoint()/rewind() (or wholesale abandonment of the
+   /// buffer, as the http handler does) keep that safe.
    explicit json_writer(std::string& out, growth_guard_t growth_guard = {},
                         size_t guard_stride = json_writer_default_guard_stride)
    : out_(out)
@@ -89,6 +105,10 @@ public:
    {
       if (guard_) {
          next_guard_check_ = out_.size() + guard_stride_;
+         // Consulted by escape_string every escape_string_yield_check_count input chars;
+         // routes the escape loop's periodic yield into the same stride-gated guard check
+         // the token boundaries use.
+         escape_yield_ = [this](size_t) { guard_check(); };
       }
       // Enough room for a reasonable response without reallocation; callers that know
       // the expected size can reserve() themselves before constructing the writer.
@@ -135,7 +155,7 @@ public:
       out_.push_back('"');
       // key strings must also be escaped (eg field names containing special chars are rare,
       // but correctness matters on untrusted input echoed into error messages).
-      fc::escape_string(k, out_, json_yield_function_t(), true);
+      fc::escape_string(k, out_, escape_yield_, true);
       out_.push_back('"');
       out_.push_back(':');
       // A key mandates a value follows; suppress the comma from value_prefix for that value.
@@ -145,7 +165,9 @@ public:
    void value_string(std::string_view s) {
       value_prefix();
       out_.push_back('"');
-      fc::escape_string(s, out_, json_yield_function_t(), true);
+      // escape_yield_ runs the growth guard periodically inside the escape loop, so a
+      // single oversized string value is budget-checked while it streams.
+      fc::escape_string(s, out_, escape_yield_, true);
       out_.push_back('"');
    }
 
@@ -195,9 +217,20 @@ public:
       out_.push_back('"');
       static constexpr char digits[] = "0123456789abcdef";
       const auto* p = reinterpret_cast<const uint8_t*>(data);
-      for (size_t i = 0; i < size; ++i) {
-         out_.push_back(digits[p[i] >> 4]);
-         out_.push_back(digits[p[i] & 0x0f]);
+      // Guarded writers emit in bounded chunks and consult the guard between them, so a
+      // single large blob is budget-checked while it streams; unguarded writers keep the
+      // one tight loop (chunk_end = size on the first pass).
+      constexpr size_t src_chunk = json_writer_guarded_chunk_bytes / 2; // 2 hex chars per source byte
+      size_t i = 0;
+      while (i < size) {
+         const size_t chunk_end = guard_ ? std::min(size, i + src_chunk) : size;
+         for (; i < chunk_end; ++i) {
+            out_.push_back(digits[p[i] >> 4]);
+            out_.push_back(digits[p[i] & 0x0f]);
+         }
+         if (guard_) {
+            guard_check();
+         }
       }
       out_.push_back('"');
    }
@@ -207,7 +240,18 @@ public:
    /// without an additional parse/re-emit cycle.
    void raw_value(std::string_view raw) {
       value_prefix();
-      out_.append(raw.data(), raw.size());
+      if (!guard_) {
+         out_.append(raw.data(), raw.size());
+         return;
+      }
+      // Guarded writers splice in bounded chunks and consult the guard between them, so a
+      // single large preformatted fragment is budget-checked while it streams.
+      for (size_t off = 0; off < raw.size();) {
+         const size_t n = std::min(raw.size() - off, json_writer_guarded_chunk_bytes);
+         out_.append(raw.data() + off, n);
+         off += n;
+         guard_check();
+      }
    }
 
    /// Fused key + value emitter; the streaming-JSON counterpart to
@@ -287,7 +331,9 @@ private:
    /// every token once a prior guard invocation threw -- see the constructor contract).
    /// Called from the head of key() and value_prefix(), which between them front every
    /// token-emitting entry point except end_object/end_array (1 byte each; the final
-   /// buffer size is the caller's to observe after emission completes).
+   /// buffer size is the caller's to observe after emission completes) -- and, for guarded
+   /// writers, WITHIN large tokens: from escape_yield_ inside the string-escape loop and
+   /// between chunks in value_hex / raw_value, so no single token outruns the budget.
    void guard_check() {
       if (out_.size() < next_guard_check_) {
          return;
@@ -338,6 +384,7 @@ private:
    std::string&             out_;
    std::vector<frame>       stack_;            // small; vector is fine and avoids extra deps
    growth_guard_t           guard_;            // empty unless the guarded constructor form was used
+   json_yield_function_t    escape_yield_;     // guarded: runs guard_check inside escape_string loops
    size_t                   guard_stride_     = json_writer_default_guard_stride;
    size_t                   next_guard_check_ = std::numeric_limits<size_t>::max(); // SIZE_MAX = no guard
    bool                     awaiting_value_ = false;

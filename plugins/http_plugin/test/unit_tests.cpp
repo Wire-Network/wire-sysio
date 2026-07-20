@@ -49,6 +49,7 @@ constexpr uint32_t stream_status_codes_index = 7;
 constexpr uint32_t stream_request_body_index = 8;
 constexpr uint32_t stream_response_bytes_index = 9;
 constexpr uint32_t stream_over_budget_index = 10;
+constexpr uint32_t stream_single_token_index = 11;
 // Keeps unsharded IPv6 probe coverage on the historical port 9999.
 constexpr uint32_t ipv6_probe_index = 2;
 
@@ -1189,6 +1190,56 @@ BOOST_FIXTURE_TEST_CASE(stream_response_over_budget_aborts_early, http_plugin_te
 
    // The budget drained: a small streaming response is admitted and served normally.
    BOOST_CHECK(get_status("/small_stream") == boost::beast::http::status::ok);
+}
+
+// One oversized token -- a single 32 MiB string value -- must abort mid-token against the
+// budget: the growth guard fires inside the escape loop, so the emitter's post-token
+// statement never runs. Distinguishes intra-token enforcement from token-boundary-only
+// checks, which would materialize the full token first and only then reject (same 503, but
+// token_completed would read true).
+BOOST_FIXTURE_TEST_CASE(stream_response_single_token_over_budget, http_plugin_test_fixture) {
+   const std::string endpoint = test_http_endpoint("127.0.0.1", stream_single_token_index);
+   const std::string server_address = "--http-server-address=" + endpoint;
+   const std::string port = test_http_port(stream_single_token_index);
+
+   http_plugin* http_plugin = init({"--plugin=sysio::http_plugin",
+                                    server_address.c_str(),
+                                    "--http-max-bytes-in-flight-mb=1"});
+   BOOST_REQUIRE(http_plugin);
+
+   std::atomic<bool> token_completed{false};
+   http_plugin->add_api_stream({{std::string("/one_giant_token"), api_category::node,
+                                 [&](string&&, string&&, url_response_stream_callback&& cb) {
+                                    cb(200, [&](fc::json_writer& w) {
+                                       w.value_string(std::string(32u * 1024 * 1024, 'x'));
+                                       token_completed.store(true);
+                                    });
+                                 }}}, appbase::exec_queue::read_write);
+
+   boost::asio::io_context ctx;
+   boost::asio::ip::tcp::resolver resolver(ctx);
+
+   auto get_status = [&](const char* path) {
+      boost::asio::ip::tcp::socket s(ctx, boost::asio::ip::tcp::v4());
+      boost::asio::connect(s, resolver.resolve("127.0.0.1", port));
+      boost::beast::http::request<boost::beast::http::empty_body> req(boost::beast::http::verb::get, path, 11);
+      req.set(http::field::host, endpoint);
+      boost::beast::http::write(s, req);
+
+      boost::beast::http::response<boost::beast::http::string_body> resp;
+      boost::beast::flat_buffer buffer;
+      boost::beast::http::read(s, buffer, resp);
+      return resp.result();
+   };
+
+   BOOST_CHECK(get_status("/one_giant_token") == boost::beast::http::status::service_unavailable);
+   BOOST_CHECK(!token_completed.load());
+
+   uint16_t max = std::numeric_limits<uint16_t>::max();
+   while (http_plugin->requests_in_flight() > 0 && --max)
+      std::this_thread::sleep_for(std::chrono::milliseconds(5));
+   BOOST_CHECK(max > 0);
+   BOOST_CHECK_EQUAL(http_plugin->bytes_in_flight(), 0u);
 }
 
 //A warning for future tests: destruction of http_plugin_test_fixture sometimes does not destroy http_plugin's listeners. Tests
