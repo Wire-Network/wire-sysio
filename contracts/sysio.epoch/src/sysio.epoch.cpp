@@ -284,6 +284,24 @@ void epoch::setconfig(uint32_t epoch_duration_sec,
       }
    }
 
+   // sysio.opreg's consecutive-miss termination rail requires its rolling
+   // window to span the full miss run at the CURRENT epoch duration (see
+   // opreg::min_terminate_window_ms). Raising the duration can silently
+   // vacate a previously valid window, so re-validate the stored opreg config
+   // against the new duration; opreg::setconfig performs the same check
+   // against the stored duration, so no ordering of the two setters can
+   // accept a vacuous pair (SEC-28 residual).
+   {
+      opreg::opconfig_t op_cfg_tbl(OPREG_ACCOUNT);
+      if (op_cfg_tbl.exists()) {
+         const auto op_cfg = op_cfg_tbl.get();
+         check(op_cfg.terminate_window_ms >=
+                  opreg::min_terminate_window_ms(op_cfg.terminate_max_consecutive_misses,
+                                                 epoch_duration_sec),
+               "epoch_duration_sec would leave sysio.opreg's terminate_window_ms narrower than the consecutive-miss run");
+      }
+   }
+
    epochcfg_t cfg_tbl(get_self());
    epoch_config cfg = cfg_tbl.get_or_default(epoch_config{});
    cfg.epoch_duration_sec = epoch_duration_sec;

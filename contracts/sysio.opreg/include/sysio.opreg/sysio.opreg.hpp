@@ -113,6 +113,23 @@ namespace sysio {
                     DEFAULT_TERMINATE_MAX_PCT_MISSES_24H <= MAX_TERMINATE_MAX_PCT_MISSES_24H,
                     "production default percent-miss threshold must lie inside the accepted bounds");
 
+      /// Minimum accepted `terminate_window_ms` for a given consecutive-miss
+      /// threshold and epoch duration: the rolling window must span the full
+      /// terminating run -- `consecutive_misses` per-epoch delivery records --
+      /// plus one epoch of boundary slack, or records age out of the window
+      /// before `termcheck` can observe the run, leaving the consecutive rail
+      /// structurally vacuous and only the percent rail live (SEC-28 residual).
+      /// Enforced from both `opreg::setconfig` (against the stored epoch
+      /// duration) and `sysio.epoch::setconfig` (against the stored opreg
+      /// config) so no ordering of the two setters can accept a vacuous pair.
+      /// Inputs are pre-bounded by those setters (misses <= 5, duration <= 30
+      /// days), so the product cannot overflow uint64.
+      static constexpr uint64_t min_terminate_window_ms(uint32_t consecutive_misses,
+                                                        uint32_t epoch_duration_sec) {
+         constexpr uint64_t ms_per_sec = 1000;
+         return (uint64_t{consecutive_misses} + 1) * epoch_duration_sec * ms_per_sec;
+      }
+
       /// Bounded sweep sizes for delivery-log rows that have aged out of the
       /// rolling termination window. The write-path cap only has to outpace
       /// insertion (each `recorddel` adds one row); the `prune` cap clears

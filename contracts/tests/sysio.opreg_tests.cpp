@@ -44,6 +44,15 @@ constexpr uint64_t kRejectedZeroMinBond = 0;
 /// Standard 24h rolling-window size used by opreg tests.
 constexpr uint64_t kTerminateWindowMs = 24ULL * 60 * 60 * 1000;
 
+/// Epoch duration installed by the SEC-28 window-span tests (seconds).
+constexpr uint32_t kWindowBoundEpochDurationSec = 360;
+
+/// Smallest `terminate_window_ms` the SEC-28 span bound accepts at
+/// kWindowBoundEpochDurationSec with the production consecutive-miss
+/// threshold: (5 + 1) * 360 s, expressed in milliseconds.
+constexpr uint64_t kMinWindowMsAtDefaults =
+   (uint64_t{kDefaultMaxConsecutiveMisses} + 1) * kWindowBoundEpochDurationSec * 1000;
+
 /// Mirrors opreg's MAX_DELLOG_PRUNE_PER_WRITE (the contract header is not
 /// includable from native test code).
 constexpr uint32_t kDellogPrunePerWrite = 4;
@@ -137,6 +146,18 @@ public:
       } catch (const fc::exception& ex) {
          return error(ex.top_message());
       }
+   }
+
+   /// Push `sysio.epoch::setconfig` with the standard 7x3 schedule shape and
+   /// the given duration — installs the epochcfg row the SEC-28 window-span
+   /// validation reads.
+   action_result set_epoch_config(uint32_t epoch_duration_sec) {
+      return push_epoch_action(EPOCH_ACCOUNT, "setconfig"_n, mvo()
+         ("epoch_duration_sec",                 epoch_duration_sec)
+         ("operators_per_epoch",                7)
+         ("batch_operator_minimum_active",      21)
+         ("batch_op_groups",                    3)
+         ("epoch_retention_envelope_log_count", 200));
    }
 
    /// Build a single `chain_min_bond` entry as an fc::variant suitable for
@@ -406,6 +427,56 @@ BOOST_FIXTURE_TEST_CASE(setconfig_rejects_zero_min_bond, sysio_opreg_tester) { t
                 kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kTerminateWindowMs,
                 {}, {}, { make_chain_min_bond("ETH", "ETH", kTestMinBond) })
    );
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(setconfig_rejects_window_narrower_than_consecutive_run, sysio_opreg_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), set_epoch_config(kWindowBoundEpochDurationSec));
+   produce_blocks();
+
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: terminate_window_ms must span at least "
+            "terminate_max_consecutive_misses + 1 epochs"),
+      setconfig(21, 63, 21, kDefaultPruneDelayMs,
+                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h,
+                kMinWindowMsAtDefaults - 1)
+   );
+
+   // The exact span boundary is the smallest accepted window.
+   BOOST_REQUIRE_EQUAL(success(),
+      setconfig(21, 63, 21, kDefaultPruneDelayMs,
+                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h,
+                kMinWindowMsAtDefaults));
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(setconfig_window_unchecked_before_epoch_config, sysio_opreg_tester) { try {
+   // Bootstrap installs opreg config before sysio.epoch is configured; the
+   // span bound must not reject it. sysio.epoch::setconfig's mirror check
+   // closes the gap when the epoch duration arrives.
+   BOOST_REQUIRE_EQUAL(success(),
+      setconfig(21, 63, 21, kDefaultPruneDelayMs,
+                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h,
+                /*terminate_window_ms=*/1));
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(epoch_setconfig_rejects_duration_that_vacates_stored_window, sysio_opreg_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), set_epoch_config(kWindowBoundEpochDurationSec));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(success(),
+      setconfig(21, 63, 21, kDefaultPruneDelayMs,
+                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h,
+                kMinWindowMsAtDefaults));
+   produce_blocks();
+
+   // Raising the duration by one second leaves the stored window narrower
+   // than the terminating run — the mirror validation must reject it.
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: epoch_duration_sec would leave "
+            "sysio.opreg's terminate_window_ms narrower than the consecutive-miss run"),
+      set_epoch_config(kWindowBoundEpochDurationSec + 1));
+
+   // Unchanged and shorter durations keep the stored window valid.
+   BOOST_REQUIRE_EQUAL(success(), set_epoch_config(kWindowBoundEpochDurationSec));
+   BOOST_REQUIRE_EQUAL(success(), set_epoch_config(kWindowBoundEpochDurationSec / 2));
 } FC_LOG_AND_RETHROW() }
 
 // ── regoperator ──
