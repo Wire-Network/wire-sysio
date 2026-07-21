@@ -10,8 +10,11 @@
 #include <fc/exception/exception.hpp>
 #include <fc/int256.hpp>
 #include <fc/network/ethereum/ethereum_abi.hpp>
+#include <fc/network/ethereum/ethereum_transaction_policy.hpp>
 #include <fc/network/json_rpc/json_rpc_client.hpp>
 #include <fc/task/retry.hpp>
+
+#include <string_view>
 
 namespace fc::network::ethereum {
 using namespace fc::crypto;
@@ -328,10 +331,13 @@ public:
     * @brief Constructs an EthereumClient instance.
     * @param sig_provider `signature_provider` shared pointer
     * @param url_source The URL of the Ethereum node (e.g., Infura, local node).
-    * @param chain_id optional uint256 encapsulating the chain id
+    * @param transaction_policy Required local expenditure policy and authoritative chain id
     */
    ethereum_client(const signature_provider_ptr& sig_provider, const std::variant<std::string, fc::url>& url_source,
-                   std::optional<fc::uint256> chain_id = std::nullopt);
+                   ethereum_transaction_policy transaction_policy);
+
+   /** Virtual destructor supporting deterministic RPC fakes in client tests. */
+   virtual ~ethereum_client() = default;
 
    /**
     * @brief General method to send RPC requests.
@@ -339,7 +345,7 @@ public:
     * @param params The parameters for the RPC method (as a JSON object).
     * @return The raw JSON response as a string, wrapped in std::optional.
     */
-   fc::variant execute(const std::string& method, const fc::variant& params);
+   virtual fc::variant execute(const std::string& method, const fc::variant& params);
 
    fc::variant execute_contract_view_fn(const address& contract_address, const abi::contract& abi,
                                         const block_number_or_tag_t& block, const contract_invoke_data_items& params);
@@ -518,7 +524,7 @@ public:
     * @brief Retrieves the chain ID of the connected Ethereum network.
     * @return The chain ID.
     */
-   fc::uint256 get_chain_id();
+   fc::uint256 get_chain_id() const;
 
    /**
     * @brief Retrieves the version of the connected Ethereum network.
@@ -545,6 +551,9 @@ public:
     * @return The Ethereum address used for signing transactions
     */
    ethereum::address get_signer_address() const { return _address; };
+
+   /** Return the immutable local transaction policy attached at construction. */
+   const ethereum_transaction_policy& transaction_policy() const { return _transaction_policy; }
 
    /**
     * @brief Creates a default EIP-1559 transaction with estimated gas and current fees
@@ -580,6 +589,13 @@ public:
    }
 
 private:
+   /** Fetch and validate fee suggestions without logging a duplicate rejection. */
+   gas_config_t get_gas_config_unlogged();
+
+   /** Emit one sanitized high-severity record for a policy rejection. */
+   void log_policy_rejection(const ethereum_transaction_policy_exception& rejection,
+                             std::string_view                              operation_type) const;
+
    /**
     * @brief Signature provider for signing transactions
     */
@@ -595,10 +611,8 @@ private:
     */
    json_rpc_client _client;
 
-   /**
-    * @brief Cached chain ID (fetched once and reused)
-    */
-   std::optional<fc::uint256> _chain_id;
+   /** Required immutable policy, including the locally configured chain ID. */
+   const ethereum_transaction_policy _transaction_policy;
 
    /**
     * @brief Mutex for thread-safe access to _contracts_map

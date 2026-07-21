@@ -79,7 +79,7 @@ bytes encode_uint(T value) {
       bytes buf;
       bool started = false;
 
-      for (int shift = 56; shift >= 0; shift -= 8) {
+      for (int shift = 248; shift >= 0; shift -= 8) {
          std::uint8_t byte = static_cast<std::uint8_t>((value >> shift) & 0xff);
          if (byte == 0 && !started)
             continue;

@@ -6,23 +6,34 @@
 #include <fc/network/ethereum/ethereum_abi.hpp>
 #include <fc/network/ethereum/ethereum_client.hpp>
 
+#include <cstdint>
+#include <filesystem>
+#include <map>
+#include <memory>
+#include <string>
+#include <vector>
+
 namespace sysio {
 using namespace fc::crypto::ethereum;
 using namespace fc::network::ethereum;
 
 struct ethereum_client_entry_t {
+   /** Configuration identifier used to select this connection. */
    std::string                        id;
-   std::string                        url;
+   /** Provider used by the policy-enforcing client at the final signing boundary. */
    fc::crypto::signature_provider_ptr signature_provider;
+   /** Ethereum JSON-RPC client with its immutable local transaction policy. */
    ethereum_client_ptr                client;
-   /// Numeric EVM chain id from the client spec's optional 4th field. Lets the
-   /// batch operator auto-select the client for an outpost row by matching the
-   /// row's `external_chain_id`, so multiple EVM outposts never share one
-   /// remote endpoint. `nullopt` when the spec omitted the chain id.
-   std::optional<uint64_t>            chain_id;
+   /** Authoritative EVM chain id from the client's policy. */
+   uint32_t                           chain_id;
 };
 
 using ethereum_client_entry_ptr = std::shared_ptr<ethereum_client_entry_t>;
+using ethereum_transaction_policy_map = std::map<std::string, ethereum_transaction_policy>;
+
+/** Load and strictly validate a versioned per-client Ethereum transaction-policy file. */
+ethereum_transaction_policy_map
+load_ethereum_transaction_policy_file(const std::filesystem::path& policy_file);
 
 /// Typed contract client for OPP.sol. State-changing calls go through
 /// `create_tx_and_confirm` — OPP writes are consensus-critical and must
@@ -102,12 +113,9 @@ public:
    std::vector<ethereum_client_entry_ptr> get_clients();
    ethereum_client_entry_ptr get_client(const std::string& id);
 
-   /// Return the single configured client whose spec chain id equals
-   /// `chain_id`, or nullptr when none — or more than one — match. The batch
-   /// operator uses this to bind each EVM outpost row to its own RPC client by
-   /// `external_chain_id`; an ambiguous (duplicate chain id) or missing match
-   /// yields nullptr so the caller can fail closed rather than relay an
-   /// outpost through the wrong endpoint.
+   /// Return the single configured client whose policy chain id equals `chain_id`, or nullptr when
+   /// none — or more than one — match. Ambiguous same-chain clients fail closed because this lookup
+   /// has no separate endpoint-selection signal.
    ethereum_client_entry_ptr get_client_by_chain_id(uint64_t chain_id);
 
    const std::vector<std::pair<std::filesystem::path, std::vector<fc::network::ethereum::abi::contract>>>& get_abi_files();

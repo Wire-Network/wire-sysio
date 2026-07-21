@@ -9,8 +9,40 @@ The Ethereum client plugin is configured via program options as follows:
 ```sh
 --signature-provider "eth-01,ethereum,ethereum,0x8318535b54105d4a7aae60c08fc45f9687181b4fdfc625bd1a753fa7397fed753547f11ca8696646f2f3acb08e31016afac23e630c5d11f59f61fef57b0d2aa5,KEY:0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
 --outpost-ethereum-client eth-anvil-local,eth-01,http://localhost:8545,31337
+--outpost-ethereum-transaction-policy-file /etc/wire/ethereum-transaction-policy.json
 ```
-> NOTE:  If you look closely, the reference to `eth-01` in the Ethereum client config, matches the signature provider configured for `Ethereum`.  This mapping is what enables `1..n` clients in a single process
+
+The policy file is required whenever the plugin is configured. A minimal file is:
+
+```json
+{
+  "version": 1,
+  "policies": [
+    {
+      "client_id": "eth-anvil-local",
+      "chain_id": "31337",
+      "max_priority_fee_per_gas_wei": "2000000000",
+      "max_fee_per_gas_wei": "100000000000",
+      "max_gas_limit": "2000000",
+      "max_total_native_cost_wei": "250000000000000000"
+    }
+  ]
+}
+```
+
+All policy integers are positive canonical decimal strings. Strings avoid JSON number precision loss for values up to `uint256`. The loader rejects unknown or duplicate fields, unsupported versions, invalid or zero limits, duplicate client ids, policies without a configured client, clients without a policy, and chain-id mismatches. There is no unlimited default.
+
+Immediately before signing, the client requires:
+
+- `maxPriorityFeePerGas <= max_priority_fee_per_gas_wei`
+- `maxFeePerGas <= max_fee_per_gas_wei`
+- `gasLimit <= max_gas_limit`
+- `maxFeePerGas >= maxPriorityFeePerGas`
+- `gasLimit * maxFeePerGas + value <= max_total_native_cost_wei`
+
+All arithmetic is checked for `uint256` overflow. Limits are inclusive: a value equal to a cap is allowed and cap plus one is rejected. Rejected transactions are not clamped, signed, or broadcast. The policy's `chain_id` is authoritative for signing; an optional chain id in `--outpost-ethereum-client` is only a startup cross-check, and the RPC endpoint cannot select the replay-protection domain.
+
+The `eth-01` reference in the client configuration matches the Ethereum signature provider. A process needs more than one `client_id` only when it serves multiple distinct EVM outposts or chains, with one policy per client. Multiple same-chain RPC endpoints are not automatic failover: chain-id lookup becomes ambiguous and fails closed unless a caller selects a client id explicitly.
 
 With the above configuration and the appropriate `app` & `plugin` config, you can access the `outpost-ethereum-client` configured with name/id == `eth-anvil-local` as follows
 
@@ -24,7 +56,7 @@ auto  client_entry = eth_plug.get_clients()[0];
 // CLIENT IS A `std::shared_ptr<ethereum_client>`
 auto& client       = client_entry->client;
 
-// GET CHAIN ID, JUST AN EXAMPLE
+// GET THE AUTHORITATIVE POLICY CHAIN ID, JUST AN EXAMPLE
 // `chain_id` will have the type `fc::uint256`
 auto chain_id = client->get_chain_id();
 ```

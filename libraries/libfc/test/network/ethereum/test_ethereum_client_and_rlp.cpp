@@ -381,6 +381,34 @@ BOOST_AUTO_TEST_CASE(can_encode_tx_01) try {
 }
 FC_LOG_AND_RETHROW();
 
+BOOST_AUTO_TEST_CASE(eip1559_rlp_preserves_transaction_fields_above_uint64) try {
+   const fc::uint256 two_to_64{"18446744073709551616"};
+   auto wide_tx = test_tx_01;
+   wide_tx.chain_id = two_to_64 + 1;
+   wide_tx.nonce = two_to_64 + 2;
+   wide_tx.max_priority_fee_per_gas = two_to_64 + 3;
+   wide_tx.max_fee_per_gas = two_to_64 + 4;
+   wide_tx.gas_limit = two_to_64 + 5;
+   wide_tx.value = two_to_64 + 6;
+   wide_tx.data.clear();
+   wide_tx.v = 0;
+   wide_tx.r = {};
+   wide_tx.s = {};
+
+   const auto encoded_hex = rlp::to_hex(rlp::encode_eip1559_signed_typed(wide_tx), false);
+   const std::string expected_fields =
+      "89010000000000000001"
+      "89010000000000000002"
+      "89010000000000000003"
+      "89010000000000000004"
+      "89010000000000000005"
+      "945fbdb2315678afecb367f032d93f642f64180aa3"
+      "89010000000000000006"
+      "80c0";
+   BOOST_CHECK(encoded_hex.contains(expected_fields));
+}
+FC_LOG_AND_RETHROW();
+
 // Signed EIP-1559 r/s must be encoded as minimal big-endian integers.
 // Strict RLP decoders (alloy-rs used by reth/anvil) reject non-minimal
 // fixed-width 32-byte string encodings of r/s with "leading zero" when the
