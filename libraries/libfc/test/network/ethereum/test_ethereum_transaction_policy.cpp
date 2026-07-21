@@ -2,8 +2,10 @@
 
 #include <fc/network/ethereum/ethereum_transaction_policy.hpp>
 
+#include <cstdint>
 #include <functional>
 #include <string>
+#include <type_traits>
 
 using namespace fc::crypto::ethereum;
 using namespace fc::network::ethereum;
@@ -14,6 +16,8 @@ constexpr std::string_view max_uint256_decimal =
    "115792089237316195423570985008687907853269984665640564039457584007913129639935";
 constexpr std::string_view above_max_uint256_decimal =
    "115792089237316195423570985008687907853269984665640564039457584007913129639936";
+
+static_assert(std::is_same_v<decltype(ethereum_transaction_policy::chain_id), uint32_t>);
 
 ethereum_transaction_policy bounded_policy() {
    return ethereum_transaction_policy{
@@ -161,6 +165,24 @@ BOOST_AUTO_TEST_CASE(policy_configuration_requires_positive_consistent_limits) {
    check_rejection_reason(
       [&] { validate_transaction_policy_configuration(policy); },
       ethereum_transaction_policy_reason::fee_relationship_invalid);
+}
+
+BOOST_AUTO_TEST_CASE(fee_caps_document_dynamic_base_fee_headroom) {
+   auto policy = bounded_policy();
+   policy.max_priority_fee_per_gas = 3;
+   policy.max_fee_per_gas = 4;
+   BOOST_CHECK_NO_THROW(validate_transaction_policy_configuration(policy));
+
+   try {
+      derive_max_fee_per_gas(policy, 3, 1);
+      BOOST_FAIL("expected insufficient fee-cap headroom rejection");
+   } catch (const ethereum_transaction_policy_exception& rejection) {
+      BOOST_CHECK(rejection.reason() == ethereum_transaction_policy_reason::max_fee_cap_exceeded);
+      BOOST_CHECK_EQUAL(rejection.field(), "max_fee_per_gas_wei");
+      BOOST_CHECK_EQUAL(rejection.observed(), "5");
+      BOOST_REQUIRE(rejection.allowed().has_value());
+      BOOST_CHECK_EQUAL(*rejection.allowed(), "4");
+   }
 }
 
 BOOST_AUTO_TEST_CASE(exact_caps_pass_and_each_cap_plus_one_rejects) {

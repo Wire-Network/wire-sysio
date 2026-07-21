@@ -6,6 +6,7 @@
 
 #include <magic_enum/magic_enum.hpp>
 
+#include <cstdint>
 #include <memory>
 #include <optional>
 #include <string>
@@ -85,10 +86,17 @@ private:
    std::optional<std::string>         _allowed;
 };
 
-/** Immutable local expenditure policy for one configured Ethereum client and chain. */
+/** Throw a structured transaction-policy exception from shared library or plugin validation. */
+[[noreturn]] void throw_transaction_policy_exception(
+   ethereum_transaction_policy_reason reason,
+   std::string_view                    field,
+   std::string                         observed,
+   std::optional<std::string>          allowed = std::nullopt);
+
+/** Immutable local expenditure policy for one configured Ethereum client and uint32 outpost chain. */
 struct ethereum_transaction_policy {
    std::string client_id;
-   fc::uint256 chain_id;
+   uint32_t chain_id;
    fc::uint256 max_priority_fee_per_gas;
    fc::uint256 max_fee_per_gas;
    fc::uint256 max_gas_limit;

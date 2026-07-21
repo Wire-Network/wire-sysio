@@ -30,7 +30,7 @@ The policy file is required whenever the plugin is configured. A minimal file is
 }
 ```
 
-All policy integers are positive canonical decimal strings. Strings avoid JSON number precision loss for values up to `uint256`. The loader rejects unknown or duplicate fields, unsupported versions, invalid or zero limits, duplicate client ids, policies without a configured client, clients without a policy, and chain-id mismatches. There is no unlimited default.
+The chain id is a positive canonical decimal string in the external outpost domain `1..UINT32_MAX`. The four policy limits are positive canonical decimal strings up to `uint256`; strings avoid JSON number precision loss. The loader rejects unknown or duplicate fields, unsupported versions, invalid or zero limits, duplicate client ids, policies without a configured client, clients without a policy, and chain-id mismatches. There is no unlimited default.
 
 Immediately before signing, the client requires:
 
@@ -41,6 +41,8 @@ Immediately before signing, the client requires:
 - `gasLimit * maxFeePerGas + value <= max_total_native_cost_wei`
 
 All arithmetic is checked for `uint256` overflow. Limits are inclusive: a value equal to a cap is allowed and cap plus one is rejected. Rejected transactions are not clamped, signed, or broadcast. The policy's `chain_id` is authoritative for signing; an optional chain id in `--outpost-ethereum-client` is only a startup cross-check, and the RPC endpoint cannot select the replay-protection domain.
+
+Fee-cap sizing must account for the EIP-1559 derivation `maxFeePerGas = 2 * baseFeePerGas + maxPriorityFeePerGas`. Startup can validate the two configured caps, but it cannot choose a minimum base fee because base fees are dynamic and chain-specific. For an actual priority fee `p`, the largest base fee admitted by the policy is `floor((max_fee_per_gas_wei - p) / 2)`. Operators should size the two caps for the intended chain; insufficient headroom fails closed with reason code `max_fee_cap_exceeded`, field `max_fee_per_gas_wei`, and numeric derived/configured values.
 
 The `eth-01` reference in the client configuration matches the Ethereum signature provider. A process needs more than one `client_id` only when it serves multiple distinct EVM outposts or chains, with one policy per client. Multiple same-chain RPC endpoints are not automatic failover: chain-id lookup becomes ambiguous and fails closed unless a caller selects a client id explicitly.
 

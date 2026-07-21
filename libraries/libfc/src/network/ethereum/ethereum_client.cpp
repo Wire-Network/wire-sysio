@@ -112,7 +112,7 @@ void ethereum_client::log_policy_rejection(const ethereum_transaction_policy_exc
         "field={} observed={} allowed={}",
         reason_code_name(rejection.reason()),
         _transaction_policy.client_id,
-        _transaction_policy.chain_id.str(),
+        _transaction_policy.chain_id,
         safe_operation_type,
         rejection.field(),
         rejection.observed(),
@@ -389,7 +389,7 @@ fc::variant ethereum_client::get_transaction_by_hash(const std::string& tx_hash)
 fc::uint256 ethereum_client::get_base_fee_per_gas() {
    auto block = get_block_by_number(block_tag_t::latest);
    if (!block.contains("baseFeePerGas")) {
-      throw ethereum_transaction_policy_exception(
+      throw_transaction_policy_exception(
          ethereum_transaction_policy_reason::rpc_quantity_invalid,
          "base_fee_per_gas",
          "<missing>");

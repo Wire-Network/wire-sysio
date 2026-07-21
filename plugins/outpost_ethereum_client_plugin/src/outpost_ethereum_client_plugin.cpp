@@ -53,15 +53,6 @@ struct ethereum_client_spec {
    std::optional<uint32_t> chain_id;
 };
 
-/** Throw a structured, sanitized plugin-configuration rejection. */
-[[noreturn]] void reject_configuration(ethereum_transaction_policy_reason reason,
-                                       std::string_view                    field,
-                                       std::string                         observed,
-                                       std::optional<std::string>          allowed = std::nullopt) {
-   throw ethereum_transaction_policy_exception(
-      reason, std::string(field), std::move(observed), std::move(allowed));
-}
-
 /** Require an object to contain each expected field exactly once and no unknown fields. */
 template <size_t FieldCount>
 void validate_exact_fields(const fc::variant_object&                    object,
@@ -71,22 +62,25 @@ void validate_exact_fields(const fc::variant_object&                    object,
    for (const auto& entry : object) {
       const bool known = std::ranges::find(expected, entry.key()) != expected.end();
       if (!known) {
-         reject_configuration(ethereum_transaction_policy_reason::configuration_schema_invalid,
-                              context,
-                              "<unknown-field>");
+         throw_transaction_policy_exception(
+            ethereum_transaction_policy_reason::configuration_schema_invalid,
+            context,
+            "<unknown-field>");
       }
       if (!observed_fields.insert(entry.key()).second) {
-         reject_configuration(ethereum_transaction_policy_reason::configuration_schema_invalid,
-                              context,
-                              "<duplicate-field>");
+         throw_transaction_policy_exception(
+            ethereum_transaction_policy_reason::configuration_schema_invalid,
+            context,
+            "<duplicate-field>");
       }
    }
 
    for (const auto field : expected) {
       if (!observed_fields.contains(std::string(field))) {
-         reject_configuration(ethereum_transaction_policy_reason::configuration_schema_invalid,
-                              context,
-                              "missing=" + std::string(field));
+         throw_transaction_policy_exception(
+            ethereum_transaction_policy_reason::configuration_schema_invalid,
+            context,
+            "missing=" + std::string(field));
       }
    }
 }
@@ -95,22 +89,21 @@ void validate_exact_fields(const fc::variant_object&                    object,
 std::string require_string_field(const fc::variant_object& object, std::string_view field) {
    const auto& value = object[std::string(field)];
    if (!value.is_string()) {
-      reject_configuration(ethereum_transaction_policy_reason::configuration_schema_invalid,
-                           field,
-                           "<non-string>");
+      throw_transaction_policy_exception(
+         ethereum_transaction_policy_reason::configuration_schema_invalid, field, "<non-string>");
    }
    return value.as_string();
 }
 
 /** Parse an externally registered chain id without truncation, then enforce its uint32 domain. */
-uint32_t require_external_chain_id(std::string_view value, std::string_view field) {
+[[nodiscard]] uint32_t require_external_chain_id(std::string_view value, std::string_view field) {
    const fc::uint256 chain_id = parse_canonical_uint256_decimal(value, field);
    constexpr auto max_external_chain_id = std::numeric_limits<uint32_t>::max();
    if (chain_id > max_external_chain_id) {
-      reject_configuration(ethereum_transaction_policy_reason::configuration_value_invalid,
-                           field,
-                           chain_id.str(),
-                           std::to_string(max_external_chain_id));
+      throw_transaction_policy_exception(ethereum_transaction_policy_reason::configuration_value_invalid,
+                                         field,
+                                         chain_id.str(),
+                                         std::to_string(max_external_chain_id));
    }
    return chain_id.convert_to<uint32_t>();
 }
@@ -119,20 +112,21 @@ uint32_t require_external_chain_id(std::string_view value, std::string_view fiel
 ethereum_client_spec parse_client_spec(const std::string& encoded_spec) {
    auto parts = fc::split(encoded_spec, ',');
    if (parts.size() != 3 && parts.size() != 4) {
-      reject_configuration(ethereum_transaction_policy_reason::configuration_schema_invalid,
-                           option_name_client,
-                           "field_count=" + std::to_string(parts.size()),
-                           "3 or 4");
+      throw_transaction_policy_exception(ethereum_transaction_policy_reason::configuration_schema_invalid,
+                                         option_name_client,
+                                         "field_count=" + std::to_string(parts.size()),
+                                         "3 or 4");
    }
    if (parts[0].empty() || parts[1].empty() || parts[2].empty()) {
-      reject_configuration(ethereum_transaction_policy_reason::configuration_value_invalid,
-                           option_name_client,
-                           "<empty-required-field>");
+      throw_transaction_policy_exception(
+         ethereum_transaction_policy_reason::configuration_value_invalid,
+         option_name_client,
+         "<empty-required-field>");
    }
    if (!is_safe_transaction_policy_identifier(parts[0])) {
-      reject_configuration(ethereum_transaction_policy_reason::configuration_value_invalid,
-                           policy_field_client_id,
-                           "<invalid>");
+      throw_transaction_policy_exception(ethereum_transaction_policy_reason::configuration_value_invalid,
+                                         policy_field_client_id,
+                                         "<invalid>");
    }
 
    ethereum_client_spec result{
@@ -157,65 +151,71 @@ ethereum_transaction_policy_map
 load_ethereum_transaction_policy_file(const std::filesystem::path& policy_file) {
    std::ifstream readable_policy_file{policy_file};
    if (!readable_policy_file.is_open()) {
-      reject_configuration(ethereum_transaction_policy_reason::configuration_file_unreadable,
-                           option_name_transaction_policy_file,
-                           "<unreadable>");
+      throw_transaction_policy_exception(
+         ethereum_transaction_policy_reason::configuration_file_unreadable,
+         option_name_transaction_policy_file,
+         "<unreadable>");
    }
 
    fc::variant document;
    try {
       document = fc::json::from_file(policy_file, fc::json::parse_type::strict_parser);
    } catch (const fc::exception&) {
-      reject_configuration(ethereum_transaction_policy_reason::configuration_schema_invalid,
-                           option_name_transaction_policy_file,
-                           "<invalid-json>");
+      throw_transaction_policy_exception(
+         ethereum_transaction_policy_reason::configuration_schema_invalid,
+         option_name_transaction_policy_file,
+         "<invalid-json>");
    } catch (const std::exception&) {
-      reject_configuration(ethereum_transaction_policy_reason::configuration_schema_invalid,
-                           option_name_transaction_policy_file,
-                           "<invalid-json>");
+      throw_transaction_policy_exception(
+         ethereum_transaction_policy_reason::configuration_schema_invalid,
+         option_name_transaction_policy_file,
+         "<invalid-json>");
    }
 
    if (!document.is_object()) {
-      reject_configuration(ethereum_transaction_policy_reason::configuration_schema_invalid,
-                           "root",
-                           "<non-object>");
+      throw_transaction_policy_exception(
+         ethereum_transaction_policy_reason::configuration_schema_invalid, "root", "<non-object>");
    }
    const auto root = document.get_object();
    validate_exact_fields(root, root_fields, "root");
 
    const auto& version = root[root_field_version];
+   // Accept either integer representation: parser inputs and test-built variants do not share one signedness tag.
    const bool supported_version =
       (version.is_uint64() && version.as_uint64() == transaction_policy_schema_version) ||
       (version.is_int64() && version.as_int64() == transaction_policy_schema_version);
    if (!supported_version) {
-      reject_configuration(ethereum_transaction_policy_reason::configuration_version_unsupported,
-                           root_field_version,
-                           "<unsupported>",
-                           std::to_string(transaction_policy_schema_version));
+      throw_transaction_policy_exception(
+         ethereum_transaction_policy_reason::configuration_version_unsupported,
+         root_field_version,
+         "<unsupported>",
+         std::to_string(transaction_policy_schema_version));
    }
 
    const auto& policies_value = root[root_field_policies];
    if (!policies_value.is_array()) {
-      reject_configuration(ethereum_transaction_policy_reason::configuration_schema_invalid,
-                           root_field_policies,
-                           "<non-array>");
+      throw_transaction_policy_exception(ethereum_transaction_policy_reason::configuration_schema_invalid,
+                                         root_field_policies,
+                                         "<non-array>");
    }
 
    ethereum_transaction_policy_map result;
    for (const auto& policy_value : policies_value.get_array()) {
       if (!policy_value.is_object()) {
-         reject_configuration(ethereum_transaction_policy_reason::configuration_schema_invalid,
-                              "policy",
-                              "<non-object>");
+         throw_transaction_policy_exception(
+            ethereum_transaction_policy_reason::configuration_schema_invalid,
+            "policy",
+            "<non-object>");
       }
       const auto policy_object = policy_value.get_object();
       validate_exact_fields(policy_object, policy_fields, "policy");
 
       const auto client_id = require_string_field(policy_object, policy_field_client_id);
+      const auto chain_id = require_external_chain_id(
+         require_string_field(policy_object, policy_field_chain_id), policy_field_chain_id);
       ethereum_transaction_policy policy{
          .client_id = client_id,
-         .chain_id = parse_canonical_uint256_decimal(
-            require_string_field(policy_object, policy_field_chain_id), policy_field_chain_id),
+         .chain_id = chain_id,
          .max_priority_fee_per_gas = parse_canonical_uint256_decimal(
             require_string_field(policy_object, policy_field_max_priority_fee_per_gas_wei),
             policy_field_max_priority_fee_per_gas_wei),
@@ -229,12 +229,12 @@ load_ethereum_transaction_policy_file(const std::filesystem::path& policy_file) 
             policy_field_max_total_native_cost_wei),
       };
       validate_transaction_policy_configuration(policy);
-      require_external_chain_id(policy.chain_id.str(), policy_field_chain_id);
 
       if (!result.emplace(client_id, std::move(policy)).second) {
-         reject_configuration(ethereum_transaction_policy_reason::configuration_client_duplicate,
-                              policy_field_client_id,
-                              client_id);
+         throw_transaction_policy_exception(
+            ethereum_transaction_policy_reason::configuration_client_duplicate,
+            policy_field_client_id,
+            client_id);
       }
    }
    return result;
@@ -299,14 +299,16 @@ void outpost_ethereum_client_plugin::plugin_initialize(const variables_map& opti
          my->load_abi_files(abi_files);
       }
       if (!options.contains(option_name_client)) {
-         reject_configuration(ethereum_transaction_policy_reason::configuration_client_missing,
-                              option_name_client,
-                              "<missing>");
+         throw_transaction_policy_exception(
+            ethereum_transaction_policy_reason::configuration_client_missing,
+            option_name_client,
+            "<missing>");
       }
       if (!options.contains(option_name_transaction_policy_file)) {
-         reject_configuration(ethereum_transaction_policy_reason::configuration_file_unreadable,
-                              option_name_transaction_policy_file,
-                              "<missing>");
+         throw_transaction_policy_exception(
+            ethereum_transaction_policy_reason::configuration_file_unreadable,
+            option_name_transaction_policy_file,
+            "<missing>");
       }
 
       const auto policy_file = options.at(option_name_transaction_policy_file).as<std::filesystem::path>();
@@ -316,9 +318,10 @@ void outpost_ethereum_client_plugin::plugin_initialize(const variables_map& opti
       auto& signature_manager = app().get_plugin<signature_provider_manager_plugin>();
       const auto encoded_client_specs = options.at(option_name_client).as<std::vector<std::string>>();
       if (encoded_client_specs.empty()) {
-         reject_configuration(ethereum_transaction_policy_reason::configuration_client_missing,
-                              option_name_client,
-                              "<empty>");
+         throw_transaction_policy_exception(
+            ethereum_transaction_policy_reason::configuration_client_missing,
+            option_name_client,
+            "<empty>");
       }
 
       std::vector<ethereum_client_spec> client_specs;
@@ -327,61 +330,68 @@ void outpost_ethereum_client_plugin::plugin_initialize(const variables_map& opti
       for (const auto& encoded_spec : encoded_client_specs) {
          auto spec = parse_client_spec(encoded_spec);
          if (!configured_client_ids.insert(spec.id).second) {
-            reject_configuration(ethereum_transaction_policy_reason::configuration_client_duplicate,
-                                 policy_field_client_id,
-                                 spec.id);
+            throw_transaction_policy_exception(
+               ethereum_transaction_policy_reason::configuration_client_duplicate,
+               policy_field_client_id,
+               spec.id);
          }
          client_specs.emplace_back(std::move(spec));
       }
 
       for (const auto& [client_id, policy] : policies) {
          if (!configured_client_ids.contains(client_id)) {
-            reject_configuration(ethereum_transaction_policy_reason::configuration_client_unknown,
-                                 policy_field_client_id,
-                                 client_id);
+            throw_transaction_policy_exception(
+               ethereum_transaction_policy_reason::configuration_client_unknown,
+               policy_field_client_id,
+               client_id);
          }
       }
 
       for (const auto& spec : client_specs) {
          const auto policy_iterator = policies.find(spec.id);
          if (policy_iterator == policies.end()) {
-            reject_configuration(ethereum_transaction_policy_reason::configuration_client_missing,
-                                 policy_field_client_id,
-                                 spec.id);
+            throw_transaction_policy_exception(
+               ethereum_transaction_policy_reason::configuration_client_missing,
+               policy_field_client_id,
+               spec.id);
          }
          const auto& policy = policy_iterator->second;
-         if (spec.chain_id && fc::uint256{*spec.chain_id} != policy.chain_id) {
-            reject_configuration(ethereum_transaction_policy_reason::configuration_chain_id_mismatch,
-                                 "client_spec.chain_id",
-                                 std::to_string(*spec.chain_id),
-                                 policy.chain_id.str());
+         if (spec.chain_id && *spec.chain_id != policy.chain_id) {
+            throw_transaction_policy_exception(
+               ethereum_transaction_policy_reason::configuration_chain_id_mismatch,
+               "client_spec.chain_id",
+               std::to_string(*spec.chain_id),
+               std::to_string(policy.chain_id));
          }
 
          if (!signature_manager.has_provider(spec.signature_provider_id)) {
-            reject_configuration(ethereum_transaction_policy_reason::configuration_schema_invalid,
-                                 "signature_provider",
-                                 "<unavailable>");
+            throw_transaction_policy_exception(
+               ethereum_transaction_policy_reason::configuration_schema_invalid,
+               "signature_provider",
+               "<unavailable>");
          }
          const auto signature_provider = signature_manager.get_provider(spec.signature_provider_id);
-         const auto chain_id = policy.chain_id.convert_to<uint32_t>();
          ethereum_client_ptr client;
          try {
             client = std::make_shared<ethereum_client>(signature_provider, spec.url, policy);
          } catch (const ethereum_transaction_policy_exception&) {
             throw;
          } catch (const std::exception&) {
-            reject_configuration(ethereum_transaction_policy_reason::configuration_schema_invalid,
-                                 "client_spec.url",
-                                 "<invalid>");
+            throw_transaction_policy_exception(
+               ethereum_transaction_policy_reason::configuration_schema_invalid,
+               "client_spec.url",
+               "<invalid>");
          }
          my->add_client(spec.id,
                         std::make_shared<ethereum_client_entry_t>(
                            spec.id,
                            signature_provider,
                            std::move(client),
-                           chain_id));
+                           policy.chain_id));
 
-         ilog("Added policy-constrained ethereum client client_id={} chain_id={}", spec.id, chain_id);
+         ilog("Added policy-constrained ethereum client client_id={} chain_id={}",
+              spec.id,
+              policy.chain_id);
       }
    } catch (const ethereum_transaction_policy_exception& rejection) {
       elog("Ethereum transaction policy configuration rejected reason_code={} field={} observed={} allowed={}",
