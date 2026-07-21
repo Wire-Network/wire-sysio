@@ -1,7 +1,6 @@
 #include <sysio.chalg/sysio.chalg.hpp>
 
-#include <sysio.roa.hpp>                 // T1 voter eligibility: sysio.roa::nodeowners / roastate
-#include <sysio.system/emissions.hpp>    // live Tier-1 count: sysio.system::nodecount
+#include <sysio.roa.hpp>   // T1 electorate snapshot at opendispute: sysio.roa::nodeowners / roastate
 #include <magic_enum/magic_enum.hpp>
 
 #include <algorithm>
@@ -57,6 +56,30 @@ void chalg::opendispute(uint64_t chain_code,
    check(oe_idx.find(composite) == oe_idx.end(),
          "a dispute already exists for this outpost+epoch");
 
+   // Snapshot the electorate: the Tier-1 rows of sysio.roa::nodeowners for the active network
+   // generation, walked via the `bytier` index (bounded by the Tier-1 registration cap). Voter
+   // eligibility (votedispute) and the tally quorum (chkdispute) are both served from this
+   // snapshot for the dispute's whole life, so they cannot diverge from each other, and later
+   // registrations or a generation rotation cannot change an in-flight dispute's electorate or
+   // quorum.
+   roa::roastate_t roastate(ROA_ACCOUNT);
+   check(roastate.exists(), "roa state not initialized");
+   const uint8_t network_gen = roastate.get().network_gen;
+
+   roa::nodeowners_t nodeowners(ROA_ACCOUNT, network_gen);
+   auto by_tier = nodeowners.get_index<"bytier"_n>();
+   const uint64_t t1_tier = magic_enum::enum_integer(NodeOwnerTier::NODE_OWNER_TIER_T1);
+   std::vector<name> electorate;
+   for (auto it = by_tier.lower_bound(t1_tier); it != by_tier.end() && it->by_tier() == t1_tier; ++it) {
+      electorate.push_back(it->owner);
+   }
+
+   // An empty electorate could never vote, so the dispute could never resolve and the epoch pause
+   // below would hold forever. Refuse to open instead -- the conflicting deliveries keep this
+   // epoch from reaching consensus regardless, and the failure then names the actual problem.
+   check(!electorate.empty(), "cannot open a dispute with no registered tier-1 node owners");
+   const uint32_t quorum = static_cast<uint32_t>(electorate.size()) / 2 + 1;
+
    auto     now     = current_time_point();
    uint64_t next_id = std::max<uint64_t>(1, disputes.available_primary_key());
 
@@ -69,9 +92,19 @@ void chalg::opendispute(uint64_t chain_code,
       .opened_at        = now,
       .deadline         = now + sysio::seconds(dispute_deadline_sec),
       .candidates       = std::move(candidates),
+      .network_gen      = network_gen,
+      .electorate       = std::move(electorate),
+      .quorum           = quorum,
    });
 
-   // Pause epoch advancement until the dispute resolves.
+   chalgstate_t chalgstate(get_self());
+   auto st = chalgstate.get_or_default(chalg_state{});
+   ++st.open_disputes;
+   chalgstate.set(st, ram_payer);
+
+   // Pause epoch advancement until every open dispute resolves. chkdispute releases the pause when
+   // the last open dispute goes RESOLVED; re-sending pause for a second concurrent dispute is an
+   // idempotent flag set.
    action(
       permission_level{get_self(), "active"_n},
       EPOCH_ACCOUNT,
@@ -97,17 +130,11 @@ void chalg::votedispute(name owner, uint64_t dispute_id, checksum256 chosen_chec
    }
    check(is_candidate, "chosen checksum is not a candidate in this dispute");
 
-   // Voter eligibility: a Tier-1 node owner in sysio.roa::nodeowners, scoped by the active
-   // network generation. Point lookup — no enumeration of the owner set.
-   roa::roastate_t roastate(ROA_ACCOUNT);
-   check(roastate.exists(), "roa state not initialized");
-   const uint8_t network_gen = roastate.get().network_gen;
-
-   roa::nodeowners_t nodeowners(ROA_ACCOUNT, network_gen);
-   auto no = nodeowners.get(roa::nodeowner_key{owner.value},
-                            "voter is not a registered node owner");
-   check(no.tier == magic_enum::enum_integer(NodeOwnerTier::NODE_OWNER_TIER_T1),
-         "only tier-1 node owners may vote on a dispute");
+   // Voter eligibility: membership in the dispute's snapshotted Tier-1 electorate. The snapshot is
+   // the same list chkdispute's quorum is measured against, so a voter the tally would not count
+   // can never cast a vote, and an owner registered after the dispute opened cannot join it.
+   check(std::find(d.electorate.begin(), d.electorate.end(), owner) != d.electorate.end(),
+         "voter is not in the dispute's tier-1 electorate");
 
    // One vote per owner (the vote table is scoped by dispute_id).
    disputevotes_t votes(get_self(), dispute_id);
@@ -131,11 +158,13 @@ void chalg::chkdispute(uint64_t dispute_id) {
    auto d = disputes.get(d_pk, "dispute not found");
    check(d.status == DisputeStatus::DISPUTE_STATUS_OPEN, "dispute is not open");
 
-   // N = live Tier-1 node-owner count; Q = floor(N/2)+1.
-   sysiosystem::emissions::nodecountstate_t nodecount(SYSTEM_ACCOUNT);
-   const uint32_t N = nodecount.exists() ? nodecount.get().t1_count : 0;
-   check(N > 0, "no tier-1 node owners are registered");
-   const uint32_t Q = N / 2 + 1;
+   // N = the dispute's snapshotted Tier-1 electorate size; Q = its quorum, both fixed when the
+   // dispute opened, so registry changes while it is open can never raise, lower, or zero the
+   // threshold. opendispute guarantees a non-empty snapshot; the invariant check guards rows
+   // written before electorate snapshots existed from silently resolving with Q == 0.
+   const uint32_t N = static_cast<uint32_t>(d.electorate.size());
+   const uint32_t Q = d.quorum;
+   check(Q > 0 && Q <= N, "dispute has no electorate snapshot");
 
    // Tally the cast votes by chosen checksum (parallel vectors; the set is <= 21).
    disputevotes_t votes(get_self(), dispute_id);
@@ -151,9 +180,9 @@ void chalg::chkdispute(uint64_t dispute_id) {
       ++cast;
    }
 
-   // Resolve per the tally rule. Fast path (any time): a checksum reaches a majority of ALL live
-   // Tier-1 owners. After the deadline: a quorum of cast votes AND a strict majority of cast votes.
-   // No plurality / tie-break — an unresolved tally just keeps waiting for more votes.
+   // Resolve per the tally rule. Fast path (any time): a checksum reaches a majority of the
+   // snapshotted electorate. After the deadline: a quorum of cast votes AND a strict majority of
+   // cast votes. No plurality / tie-break — an unresolved tally just keeps waiting for more votes.
    const bool  past_deadline = current_time_point() >= d.deadline;
    bool        resolved      = false;
    checksum256 winner{};
@@ -170,21 +199,34 @@ void chalg::chkdispute(uint64_t dispute_id) {
       r.winning_checksum = winner;
    });
 
-   // Dispatch the winning envelope via sysio.msgch (it still holds the raw bytes), then release the
-   // paused epoch. The next chkcons advances the epoch, where the single-path slash of every
-   // non-canonical deliverer runs in sysio.epoch::advance.
+   // This dispute leaves OPEN: drop the open-dispute count. The decrement is guarded so a row
+   // written before the counter existed cannot underflow it.
+   chalgstate_t chalgstate(get_self());
+   auto st = chalgstate.get_or_default(chalg_state{});
+   if (st.open_disputes > 0) --st.open_disputes;
+   chalgstate.set(st, ram_payer);
+
+   // Dispatch the winning envelope via sysio.msgch (it still holds the raw bytes). The next
+   // chkcons advances the epoch, where the single-path slash of every non-canonical deliverer
+   // runs in sysio.epoch::advance.
    action(
       permission_level{get_self(), "active"_n},
       MSGCH_ACCOUNT,
       "resolvedisp"_n,
       std::make_tuple(d.chain_code, d.epoch_index, winner)
    ).send();
-   action(
-      permission_level{get_self(), "active"_n},
-      EPOCH_ACCOUNT,
-      "unpause"_n,
-      std::make_tuple()
-   ).send();
+
+   // Release the epoch pause only when no other dispute remains open -- sysio.epoch::is_paused is
+   // a single flag shared by every dispute, so an earlier resolution must not resume advancement
+   // while another (outpost, epoch) dispute is still voting.
+   if (st.open_disputes == 0) {
+      action(
+         permission_level{get_self(), "active"_n},
+         EPOCH_ACCOUNT,
+         "unpause"_n,
+         std::make_tuple()
+      ).send();
+   }
 }
 
 } // namespace sysio
