@@ -63,6 +63,7 @@ set(fc_sources
         src/network/ethereum/ethereum_abi.cpp
         src/network/ethereum/ethereum_client.cpp
         src/network/ethereum/ethereum_rlp_encoder.cpp
+        src/network/ethereum/ethereum_transaction_policy.cpp
         src/network/http/http_client.cpp
         src/network/json_rpc/json_rpc_client.cpp
         src/network/solana/solana_types.cpp

@@ -187,6 +187,18 @@ constexpr size_t rpc_length_oversized_envelope_bytes = sysio::OPP_MAX_ENVELOPE_B
 constexpr char malformed_envelope_byte = static_cast<char>(0xff);
 constexpr char oversized_envelope_fill_byte = static_cast<char>(0x01);
 
+ethereum_transaction_policy test_transaction_policy(std::string client_id,
+                                                     uint32_t    chain_id = test_evm_chain_id) {
+   return ethereum_transaction_policy{
+      .client_id = std::move(client_id),
+      .chain_id = chain_id,
+      .max_priority_fee_per_gas = 100000000000,
+      .max_fee_per_gas = 1000000000000,
+      .max_gas_limit = 10000000,
+      .max_total_native_cost = fc::uint256{"1000000000000000000"},
+   };
+}
+
 auto load_abi_fixture(std::string_view filename) {
    auto path = fc::test::get_test_fixtures_path() / bfs::path(filename);
    return fc::network::ethereum::abi::parse_contracts(std::filesystem::path(path.generic_string()));
@@ -359,14 +371,13 @@ BOOST_AUTO_TEST_CASE(read_inbound_envelope_validates_latest_slot) try {
    auto eth_client = std::make_shared<ethereum_client>(
       sig_provider,
       std::variant<std::string, fc::url>{rpc_url},
-      fc::uint256{test_evm_chain_id});
+      test_transaction_policy(std::string(latest_slot_test_entry_id)));
    auto abis = load_abi_fixture(opp_abi_fixture);
    const std::string opp_address{test_opp_address};
    auto typed_opp = eth_client->get_contract<sysio::opp_contract_client>(opp_address, abis);
 
    auto entry = std::make_shared<sysio::ethereum_client_entry_t>();
    entry->id = latest_slot_test_entry_id;
-   entry->url = rpc_url;
    entry->signature_provider = sig_provider;
    entry->client = eth_client;
    entry->chain_id = test_evm_chain_id;
