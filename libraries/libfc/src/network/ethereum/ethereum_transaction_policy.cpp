@@ -24,12 +24,6 @@ constexpr uint64_t gas_headroom_multiplier = 6;
 constexpr uint64_t gas_headroom_divisor = 5;
 constexpr uint64_t max_fee_base_multiplier = 2;
 
-/** Return the largest uint256 value without relying on a narrowing intermediate. */
-const fc::uint256& max_uint256() {
-   static const fc::uint256 value{std::string(max_uint256_decimal)};
-   return value;
-}
-
 /** Bound untrusted diagnostic strings so malformed configuration cannot flood logs. */
 std::string diagnostic_value(std::string_view value) {
    if (value.size() <= max_diagnostic_value_chars) return std::string(value);
@@ -49,6 +43,11 @@ bool is_hexadecimal(std::string_view value) {
 }
 
 } // namespace
+
+const fc::uint256& maximum_ethereum_transaction_policy_value() {
+   static const fc::uint256 value{std::string(max_uint256_decimal)};
+   return value;
+}
 
 bool is_safe_transaction_policy_identifier(std::string_view identifier) {
    return !identifier.empty() && identifier.size() <= max_client_id_chars &&
@@ -198,22 +197,24 @@ fc::uint256 derive_max_fee_per_gas(const ethereum_transaction_policy& policy,
                                          policy.max_priority_fee_per_gas.str());
    }
 
-   const fc::uint256 maximum_base_fee = max_uint256() / max_fee_base_multiplier;
+   const fc::uint256 maximum_base_fee =
+      maximum_ethereum_transaction_policy_value() / max_fee_base_multiplier;
    if (base_fee > maximum_base_fee) {
       throw_transaction_policy_exception(
          ethereum_transaction_policy_reason::max_fee_derivation_overflow,
          "max_fee_per_gas",
          "base_fee=" + base_fee.str() + ",multiplier=" + std::to_string(max_fee_base_multiplier),
-         max_uint256().str());
+         maximum_ethereum_transaction_policy_value().str());
    }
    const fc::uint256 doubled_base_fee = base_fee * max_fee_base_multiplier;
-   const fc::uint256 remaining_fee_capacity = max_uint256() - doubled_base_fee;
+   const fc::uint256 remaining_fee_capacity =
+      maximum_ethereum_transaction_policy_value() - doubled_base_fee;
    if (priority_fee > remaining_fee_capacity) {
       throw_transaction_policy_exception(
          ethereum_transaction_policy_reason::max_fee_derivation_overflow,
          "max_fee_per_gas",
          "doubled_base_fee=" + doubled_base_fee.str() + ",priority_fee=" + priority_fee.str(),
-         max_uint256().str());
+         maximum_ethereum_transaction_policy_value().str());
    }
 
    const fc::uint256 max_fee = doubled_base_fee + priority_fee;
@@ -237,14 +238,15 @@ fc::uint256 derive_buffered_gas_limit(const ethereum_transaction_policy& policy,
                                          policy.max_gas_limit.str());
    }
 
-   const fc::uint256 maximum_estimate = max_uint256() / gas_headroom_multiplier;
+   const fc::uint256 maximum_estimate =
+      maximum_ethereum_transaction_policy_value() / gas_headroom_multiplier;
    if (estimated_gas > maximum_estimate) {
       throw_transaction_policy_exception(
          ethereum_transaction_policy_reason::gas_limit_derivation_overflow,
          "gas_limit",
          "estimated_gas=" + estimated_gas.str() +
             ",multiplier=" + std::to_string(gas_headroom_multiplier),
-         max_uint256().str());
+         maximum_ethereum_transaction_policy_value().str());
    }
 
    const fc::uint256 gas_limit = (estimated_gas * gas_headroom_multiplier) / gas_headroom_divisor;
@@ -291,23 +293,26 @@ void validate_transaction_against_policy(const ethereum_transaction_policy&     
    }
 
    const fc::uint256 maximum_fee_without_overflow =
-      transaction.gas_limit == 0 ? max_uint256() : fc::uint256{max_uint256() / transaction.gas_limit};
+      transaction.gas_limit == 0
+         ? maximum_ethereum_transaction_policy_value()
+         : fc::uint256{maximum_ethereum_transaction_policy_value() / transaction.gas_limit};
    if (transaction.max_fee_per_gas > maximum_fee_without_overflow) {
       throw_transaction_policy_exception(
          ethereum_transaction_policy_reason::total_cost_multiplication_overflow,
          "max_total_native_cost",
          "gas_limit=" + transaction.gas_limit.str() +
             ",max_fee_per_gas=" + transaction.max_fee_per_gas.str(),
-         max_uint256().str());
+         maximum_ethereum_transaction_policy_value().str());
    }
    const fc::uint256 maximum_gas_cost = transaction.gas_limit * transaction.max_fee_per_gas;
-   const fc::uint256 remaining_total_capacity = max_uint256() - maximum_gas_cost;
+   const fc::uint256 remaining_total_capacity =
+      maximum_ethereum_transaction_policy_value() - maximum_gas_cost;
    if (transaction.value > remaining_total_capacity) {
       throw_transaction_policy_exception(
          ethereum_transaction_policy_reason::total_cost_addition_overflow,
          "max_total_native_cost",
          "maximum_gas_cost=" + maximum_gas_cost.str() + ",value=" + transaction.value.str(),
-         max_uint256().str());
+         maximum_ethereum_transaction_policy_value().str());
    }
 
    const fc::uint256 maximum_total_cost = maximum_gas_cost + transaction.value;

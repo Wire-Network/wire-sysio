@@ -11,8 +11,7 @@ To run `cranker-example`, you need to provide at least one Ethereum signature pr
 ```shell
 cranker-example \
   --signature-provider eth-01,ethereum,ethereum,0x8318535b54105d4a7aae60c08fc45f9687181b4fdfc625bd1a753fa7397fed753547f11ca8696646f2f3acb08e31016afac23e630c5d11f59f61fef57b0d2aa5,KEY:0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 \
-  --outpost-ethereum-client eth-anvil-local,eth-01,http://localhost:8545,31337 \
-  --outpost-ethereum-transaction-policy-file docs/ethereum-transaction-policy.example.json \
+  --outpost-ethereum-client-config-file docs/ethereum-client-config.example.json \
   --ethereum-abi-file tests/fixtures/ethereum-abi-counter-01.json
 ```
 
@@ -28,18 +27,17 @@ Defines a signature provider. The format is:
 - **public-key**: The public key string.
 - **private-key-provider-spec**: Specifier for the private key, typically `KEY:<private-key>`.
 
-#### Outpost Ethereum Client (`--outpost-ethereum-client`)
-Defines an Ethereum client connection. The format is:
-`<eth-client-id>,<sig-provider-id>,<eth-node-url>[,<eth-chain-id>]`
+#### Outpost Ethereum Clients (`--outpost-ethereum-client-config-file`)
 
-- **eth-client-id**: Unique identifier for this client.
-- **sig-provider-id**: The name of the signature provider to use (must match a name defined in `--signature-provider`).
-- **eth-node-url**: The URL of the Ethereum JSON-RPC endpoint.
-- **eth-chain-id**: (Optional) A startup cross-check against the policy chain ID. The policy chain ID is authoritative.
+Path to a versioned JSON file containing client ids, signature-provider references, RPC URLs, authoritative chain ids,
+and optional per-client transaction policies. See
+[`docs/ethereum-client-config.example.json`](../../../docs/ethereum-client-config.example.json) and the
+[outpost client configuration guide](../../../docs/outpost-client-plugins.md).
 
-#### Transaction Policy (`--outpost-ethereum-transaction-policy-file`)
-
-Path to a versioned JSON file containing exactly one finite policy for every configured Ethereum client. See [`docs/ethereum-transaction-policy.example.json`](../../../docs/ethereum-transaction-policy.example.json) and the [outpost client configuration guide](../../../docs/outpost-client-plugins.md) for the schema and enforced invariants.
+The legacy
+`--outpost-ethereum-client <eth-client-id>,<sig-provider-id>,<eth-node-url>[,<eth-chain-id>]` option remains
+available. It assigns maximum-value policy defaults and cannot be combined with
+`--outpost-ethereum-client-config-file`.
 
 #### Ethereum ABI File (`--ethereum-abi-file`)
 Path to an Ethereum contract ABI file (relative from current working directory or absolute path). The file should contain a JSON array of ABI-compliant contract definitions.
@@ -47,6 +45,5 @@ Path to an Ethereum contract ABI file (relative from current working directory o
 ## Minimum Configuration
 To successfully start the application, the following are required:
 1.  At least **one** Ethereum signature provider.
-2.  At least **one** Ethereum outpost client.
-3.  One transaction-policy file covering every Ethereum client.
-4.  At least **one** Ethereum ABI file reference.
+2.  At least **one** Ethereum outpost client, from the unified file or legacy option.
+3.  At least **one** Ethereum ABI file reference.

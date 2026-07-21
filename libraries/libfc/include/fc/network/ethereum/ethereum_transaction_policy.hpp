@@ -103,6 +103,9 @@ struct ethereum_transaction_policy {
    fc::uint256 max_total_native_cost;
 };
 
+/** Return the maximum value accepted by any uint256 transaction-policy cap. */
+const fc::uint256& maximum_ethereum_transaction_policy_value();
+
 /**
  * Parse a canonical unsigned decimal uint256 configuration value.
  *
