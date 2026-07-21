@@ -306,8 +306,8 @@ struct kms_signer {
  * lifetime; a failed attempt (e.g. a transient `GetPublicKey` error) is
  * retried on the next `Sign`.
  *
- * Each invocation sends an `ECDSA_SHA_256` `Sign` request with
- * `MessageType=DIGEST` so KMS signs the 32-byte digest as-is rather than
+ * Each invocation that passes pinning sends an `ECDSA_SHA_256` `Sign` request
+ * with `MessageType=DIGEST` so KMS signs the 32-byte digest as-is rather than
  * re-hashing it. (Why `ECDSA_SHA_256` does not imply a second hash is the
  * subtle part; the signing-closure implementation in the `.cpp` carries that
  * full wire-format rationale as the single source of truth, so it is not
@@ -331,9 +331,10 @@ struct kms_signer {
  *
  * @param ref parsed `(region, key_id)` pair
  * @param key_type chain key type; must be `chain_key_type_ethereum`
- * @param expected_pubkey public key the operator pinned in the spec; used at
- *        each sign call to recover the `v` byte and to assert that the
- *        signature KMS produced matches that key
+ * @param expected_pubkey public key the operator pinned in the spec; checked
+ *        against `GetPublicKey` until pinning first passes, then used on each
+ *        signature KMS produces to recover the `v` byte and to assert the
+ *        signature matches that key
  * @return a `kms_signer` bundling the signing closure and the startup probe
  */
 kms_signer make_kms_signature_provider(
