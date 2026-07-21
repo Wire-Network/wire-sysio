@@ -222,8 +222,7 @@ fc::uint256 derive_max_fee_per_gas(const ethereum_transaction_policy& policy,
                                          "max_fee_per_gas",
                                          "derived_max_fee_per_gas=" + max_fee.str() +
                                             ",formula=2*base_fee_per_gas(" + base_fee.str() +
-                                            ")+max_priority_fee_per_gas(" + priority_fee.str() +
-                                            "),policy_field=max_fee_per_gas_wei",
+                                            ")+max_priority_fee_per_gas(" + priority_fee.str() + ")",
                                          policy.max_fee_per_gas.str());
    }
    return max_fee;

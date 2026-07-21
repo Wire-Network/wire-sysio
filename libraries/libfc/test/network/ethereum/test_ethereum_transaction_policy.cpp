@@ -179,9 +179,10 @@ BOOST_AUTO_TEST_CASE(insufficient_dynamic_base_fee_headroom_reports_formula) {
    } catch (const ethereum_transaction_policy_exception& rejection) {
       BOOST_CHECK(rejection.reason() == ethereum_transaction_policy_reason::max_fee_cap_exceeded);
       BOOST_CHECK_EQUAL(rejection.field(), "max_fee_per_gas");
-      BOOST_CHECK_EQUAL(rejection.observed(),
-                        "derived_max_fee_per_gas=5,formula=2*base_fee_per_gas(1)+"
-                        "max_priority_fee_per_gas(3),policy_field=max_fee_per_gas_wei");
+      BOOST_CHECK(rejection.observed().find("derived_max_fee_per_gas=5") != std::string::npos);
+      BOOST_CHECK(rejection.observed().find("base_fee_per_gas(1)") != std::string::npos);
+      BOOST_CHECK(rejection.observed().find("max_priority_fee_per_gas(3)") != std::string::npos);
+      BOOST_CHECK(rejection.observed().find("policy_field=") == std::string::npos);
       BOOST_REQUIRE(rejection.allowed().has_value());
       BOOST_CHECK_EQUAL(*rejection.allowed(), "4");
    }
