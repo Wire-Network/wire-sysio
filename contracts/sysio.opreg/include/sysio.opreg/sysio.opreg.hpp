@@ -113,6 +113,31 @@ namespace sysio {
                     DEFAULT_TERMINATE_MAX_PCT_MISSES_24H <= MAX_TERMINATE_MAX_PCT_MISSES_24H,
                     "production default percent-miss threshold must lie inside the accepted bounds");
 
+      /// Minimum accepted `terminate_window_ms` for a given consecutive-miss
+      /// threshold and epoch schedule. Delivery records accrue only on an
+      /// operator's DUTY epochs: `sysio.epoch::advance` runs `recorddel` for
+      /// the expiring group alone, and the schedule is a sliding window of
+      /// `batch_op_groups` groups, so a resident operator's duty interval is
+      /// `batch_op_groups` epochs. The rolling window must span the full
+      /// terminating run -- `consecutive_misses` duty-epoch records -- plus
+      /// one duty interval of boundary slack, or records age out (and are
+      /// pruned) before `termcheck` can observe the run, leaving the
+      /// consecutive rail structurally vacuous (SEC-28 residual). Operators
+      /// benched by a surplus roster accrue no records while benched, so no
+      /// finite window observes them; the bound governs resident operators,
+      /// whose duty interval the sliding schedule pins at `batch_op_groups`
+      /// epochs. Enforced from both `opreg::setconfig` (against the stored
+      /// epoch config) and `sysio.epoch::setconfig` (against the stored opreg
+      /// config) so no ordering of the two setters can accept a vacuous pair.
+      /// Inputs are pre-bounded by those setters (misses <= 5, duration <= 30
+      /// days, groups <= 255), so the product cannot overflow uint64.
+      static constexpr uint64_t min_terminate_window_ms(uint32_t consecutive_misses,
+                                                        uint32_t epoch_duration_sec,
+                                                        uint32_t batch_op_groups) {
+         constexpr uint64_t ms_per_sec = 1000;
+         return (uint64_t{consecutive_misses} + 1) * batch_op_groups * epoch_duration_sec * ms_per_sec;
+      }
+
       /// Bounded sweep sizes for delivery-log rows that have aged out of the
       /// rolling termination window. The write-path cap only has to outpace
       /// insertion (each `recorddel` adds one row); the `prune` cap clears
