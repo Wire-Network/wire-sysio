@@ -397,6 +397,125 @@ public:
       return decode_envelope(raw).messages(0).header().message_id();
    }
 
+   // -- SEC-28 rotation-termination helpers (drive recorddel/termcheck through the REAL advance) --
+
+   /// The opreg operator row for `account` (status + status_reason), or null when absent.
+   fc::variant get_operator(name account) {
+      auto data = get_row_by_account(OPREG_ACCOUNT, OPREG_ACCOUNT, "operators"_n, account);
+      return data.empty() ? fc::variant() : opreg_abi.binary_to_variant(
+         "operator_entry", data, abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
+   fc::variant read_epoch_state() {
+      auto data = get_row_by_account(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "epochstate"_n, "epochstate"_n);
+      return data.empty() ? fc::variant() : epoch_abi.binary_to_variant(
+         "epoch_state", data, abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
+   /// The single batch operator on duty for the CURRENT epoch (rotation setup runs one op per
+   /// group); name{} when the schedule is empty.
+   name duty_member() {
+      auto st = read_epoch_state();
+      if (st.is_null()) return name{};
+      auto groups = st["batch_op_groups"].get_array();
+      uint64_t cur = st["current_batch_op_group"].as_uint64();
+      if (cur >= groups.size()) return name{};
+      auto members = groups[cur].get_array();
+      return members.empty() ? name{} : name(members[0].as_string());
+   }
+
+   /// Advance exactly one epoch, landing the advance at the fixed-cadence next_epoch_start. Because
+   /// next_epoch_start is a fixed cadence (advance sets current_epoch_start = prior next_epoch_start,
+   /// never `now`) and recorddel stamps at one-second granularity, running the advance in the second
+   /// of next_epoch_start spaces every epoch's records exactly epoch_duration apart -- the exact-span
+   /// timing the SEC-28 window bound is defined against, with no block-granularity drift.
+   uint32_t advance_to_next_epoch() {
+      auto st = read_epoch_state();
+      BOOST_REQUIRE(!st.is_null());
+      auto next  = st["next_epoch_start"].as<fc::time_point>();
+      auto delta = next - control->head().block_time();
+      if (delta.count() > 0) produce_block(delta);
+      BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, MSGCH_ACCOUNT, "advance"_n, mvo()));
+      produce_blocks();
+      return current_epoch();
+   }
+
+   static fc::variant make_chain_min_bond(std::string_view chain_code, std::string_view token_code,
+                                          uint64_t min_bond) {
+      return fc::variant(mvo()
+         ("chain_code",          codename_mvo(chain_code))
+         ("token_code",          codename_mvo(token_code))
+         ("min_bond",            min_bond)
+         ("config_timestamp_ms", uint64_t{0}));
+   }
+
+   /// Inline collateral credit (the path sysio.msgch drives in production; pushed directly here) that
+   /// lifts a non-bootstrapped operator to ACTIVE once its bond meets the configured minimum.
+   action_result depositinle(name account, std::string_view chain_code, std::string_view token_code,
+                             uint64_t amount) {
+      return push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "depositinle"_n, mvo()
+         ("account",             account.to_string())
+         ("chain_code",          codename_mvo(chain_code))
+         ("token_code",          codename_mvo(token_code))
+         ("amount",              amount)
+         ("actor_chain",         opp::types::ChainKind::CHAIN_KIND_EVM)
+         ("actor_address",       std::vector<char>{})
+         ("original_message_id", std::string(64, '0')));
+   }
+
+   /// bootstrap() variant for a real rotation: THREE single-operator groups (so a resident op is on
+   /// duty once per 3-epoch rotation), the SEC-28 percent rail disabled up to its accepted ceiling
+   /// (99, so an anchored run terminates on the CONSECUTIVE rail), and `terminate_window_ms` set by
+   /// the caller (the exact span bound for this schedule). ETH outpost registered; genesis advance run.
+   void bootstrap_rotation(uint64_t terminate_window_ms) {
+      BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "setconfig"_n, mvo()
+         ("epoch_duration_sec",                 EPOCH_DURATION_SEC)
+         ("operators_per_epoch",                1)
+         ("batch_operator_minimum_active",      3)
+         ("batch_op_groups",                    3)
+         ("epoch_retention_envelope_log_count", 200)));
+
+      BOOST_REQUIRE_EQUAL(success(), setemitcfg_defaults());
+      BOOST_REQUIRE_EQUAL(success(), push(SYSIO_ACCOUNT, sysio_abi, SYSIO_ACCOUNT, "initt5"_n, mvo()
+         ("start_time", fc::time_point_sec(control->head().block_time()))));
+
+      BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "setconfig"_n, mvo()
+         ("max_available_producers",          21)
+         ("max_available_batch_ops",          63)
+         ("max_available_underwriters",       21)
+         ("terminate_prune_delay_ms",         600000)
+         ("terminate_max_consecutive_misses", 5)
+         ("terminate_max_pct_misses_24h",     99)
+         ("terminate_window_ms",              terminate_window_ms)
+         ("req_prod_collat",                  fc::variants{})
+         ("req_batchop_collat",               fc::variants{ make_chain_min_bond("ETH", "ETH", 1) })
+         ("req_uw_collat",                    fc::variants{})));
+
+      register_chain(opp::types::ChainKind::CHAIN_KIND_EVM, "ETH", 31337);
+
+      // BATCHOP is the termination target: NON-bootstrapped (bootstrapped operators are exempt from
+      // rolling-window termination -- see opreg::termcheck) and collateralized so it activates.
+      // BATCHOP_B / BATCHOP_C are bootstrapped fillers for the other two groups. schbatchgps sorts
+      // non-bootstrapped first, so BATCHOP lands in group 0 (on duty at epochs 1, 4, 7, ...).
+      BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "regoperator"_n, mvo()
+         ("account", BATCHOP.to_string())("type", opp::types::OperatorType::OPERATOR_TYPE_BATCH)
+         ("is_bootstrapped", false)));
+      BOOST_REQUIRE_EQUAL(success(), depositinle(BATCHOP, "ETH", "ETH", 1));
+      for (const auto& op : {BATCHOP_B, BATCHOP_C}) {
+         BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "regoperator"_n, mvo()
+            ("account", op.to_string())("type", opp::types::OperatorType::OPERATOR_TYPE_BATCH)
+            ("is_bootstrapped", true)));
+      }
+      BOOST_REQUIRE(!get_operator(BATCHOP).is_null());
+      BOOST_REQUIRE(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE ==
+                    get_operator(BATCHOP)["status"].as<opp::types::OperatorStatus>());
+      BOOST_REQUIRE_EQUAL(0, get_operator(BATCHOP)["is_bootstrapped"].as_uint64());
+
+      BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "schbatchgps"_n, mvo()));
+      BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "advance"_n, mvo()));
+      produce_blocks();
+   }
+
    abi_serializer sysio_abi, token_abi, epoch_abi, opreg_abi, msgch_abi, chains_abi, uwrit_abi;
 };
 
@@ -1004,6 +1123,63 @@ BOOST_FIXTURE_TEST_CASE(late_confirmation_after_consensus_recorded, sysio_msgch_
       BOOST_REQUIRE_EQUAL(opc["envelope_digest"].as_string(), winner_digest.str());
       BOOST_REQUIRE_EQUAL(attestation_count(ETH_OUTPOST_ID, epoch), 1u);
    }
+} FC_LOG_AND_RETHROW() }
+
+// SEC-28 (huang review): terminate on the CONSECUTIVE-miss rail through the REAL rotation -- a
+// materialized three-group schedule driven by advance() with one outpost, at exactly the minimum
+// window the span bound accepts. A resident operator is on duty once per three-epoch rotation, and
+// the window spans exactly (max_consecutive_misses + 1) rotations, so the delivered anchor that
+// keeps the percent rail below its ceiling sits exactly on the window edge at the terminating miss.
+// If the bound (or the window scan) were off by one rotation the anchor would age out, the window
+// would be all-miss (100% > 99), and the operator would terminate early on the PERCENT rail -- so
+// requiring termination on the sixth consecutive miss with the consecutive reason pins the exact
+// span, driven end to end by advance()'s inline recorddel/termcheck rather than fabricated timing.
+BOOST_FIXTURE_TEST_CASE(terminate_at_duty_rotation_via_advance, sysio_msgch_chain_tester) { try {
+   constexpr uint32_t kGroups          = 3;
+   constexpr uint32_t kMaxConsecMisses = 5;
+   // Exact minimum the SEC-28 bound accepts for this schedule: (misses + 1) duty rotations.
+   const uint64_t window_ms =
+      (uint64_t{kMaxConsecMisses} + 1) * kGroups * EPOCH_DURATION_SEC * 1000ULL;
+
+   bootstrap_rotation(window_ms);
+
+   // Walk the rotation via advance(). BATCHOP delivers on its first duty epoch (the anchor) and
+   // never again; every later duty epoch is a miss recorded by advance()'s inline recorddel. The
+   // sixth consecutive miss is BATCHOP's 7th duty (anchor + 6 misses).
+   constexpr uint32_t kTerminatingDuty = kMaxConsecMisses + 2;
+   uint32_t batchop_duties = 0;
+   bool     terminated     = false;
+   for (uint32_t epoch = 0; epoch < kGroups * (kMaxConsecMisses + 4) && !terminated; ++epoch) {
+      if (duty_member() == BATCHOP) {
+         ++batchop_duties;
+         if (batchop_duties == 1) {
+            // Anchor: one delivered inbound envelope (stream genesis) for the current epoch.
+            BOOST_REQUIRE_EQUAL(success(),
+               deliver_as(BATCHOP, ETH_OUTPOST_ID,
+                          encode_delivery(current_epoch(), std::string("\x01", 1))));
+            // Finalize the delivery before advance_to_next_epoch's epoch-length jump, or the pending
+            // transaction expires across it.
+            produce_blocks();
+         }
+         // otherwise: withhold delivery, so advance() records this duty epoch as a miss
+      }
+      advance_to_next_epoch();
+
+      auto op = get_operator(BATCHOP);
+      BOOST_REQUIRE(!op.is_null());
+      const auto status = op["status"].as<opp::types::OperatorStatus>();
+      if (status == opp::types::OperatorStatus::OPERATOR_STATUS_TERMINATED) {
+         terminated = true;
+         BOOST_REQUIRE_EQUAL(kTerminatingDuty, batchop_duties);
+         BOOST_REQUIRE_EQUAL("rolling-window: >5 consecutive misses",
+                             op["status_reason"].as_string());
+      } else {
+         // Still ACTIVE: BATCHOP must not terminate before its sixth miss (its 7th duty).
+         BOOST_REQUIRE(status == opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE);
+         BOOST_REQUIRE_LT(batchop_duties, kTerminatingDuty);
+      }
+   }
+   BOOST_REQUIRE(terminated);
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()
