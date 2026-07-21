@@ -219,8 +219,11 @@ fc::uint256 derive_max_fee_per_gas(const ethereum_transaction_policy& policy,
    const fc::uint256 max_fee = doubled_base_fee + priority_fee;
    if (max_fee > policy.max_fee_per_gas) {
       throw_transaction_policy_exception(ethereum_transaction_policy_reason::max_fee_cap_exceeded,
-                                         "max_fee_per_gas_wei",
-                                         max_fee.str(),
+                                         "max_fee_per_gas",
+                                         "derived_max_fee_per_gas=" + max_fee.str() +
+                                            ",formula=2*base_fee_per_gas(" + base_fee.str() +
+                                            ")+max_priority_fee_per_gas(" + priority_fee.str() +
+                                            "),policy_field=max_fee_per_gas_wei",
                                          policy.max_fee_per_gas.str());
    }
    return max_fee;

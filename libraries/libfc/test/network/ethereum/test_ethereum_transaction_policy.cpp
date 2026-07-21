@@ -167,7 +167,7 @@ BOOST_AUTO_TEST_CASE(policy_configuration_requires_positive_consistent_limits) {
       ethereum_transaction_policy_reason::fee_relationship_invalid);
 }
 
-BOOST_AUTO_TEST_CASE(fee_caps_document_dynamic_base_fee_headroom) {
+BOOST_AUTO_TEST_CASE(insufficient_dynamic_base_fee_headroom_reports_formula) {
    auto policy = bounded_policy();
    policy.max_priority_fee_per_gas = 3;
    policy.max_fee_per_gas = 4;
@@ -178,8 +178,10 @@ BOOST_AUTO_TEST_CASE(fee_caps_document_dynamic_base_fee_headroom) {
       BOOST_FAIL("expected insufficient fee-cap headroom rejection");
    } catch (const ethereum_transaction_policy_exception& rejection) {
       BOOST_CHECK(rejection.reason() == ethereum_transaction_policy_reason::max_fee_cap_exceeded);
-      BOOST_CHECK_EQUAL(rejection.field(), "max_fee_per_gas_wei");
-      BOOST_CHECK_EQUAL(rejection.observed(), "5");
+      BOOST_CHECK_EQUAL(rejection.field(), "max_fee_per_gas");
+      BOOST_CHECK_EQUAL(rejection.observed(),
+                        "derived_max_fee_per_gas=5,formula=2*base_fee_per_gas(1)+"
+                        "max_priority_fee_per_gas(3),policy_field=max_fee_per_gas_wei");
       BOOST_REQUIRE(rejection.allowed().has_value());
       BOOST_CHECK_EQUAL(*rejection.allowed(), "4");
    }
