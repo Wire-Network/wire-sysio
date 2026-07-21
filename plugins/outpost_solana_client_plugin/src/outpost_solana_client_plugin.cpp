@@ -33,10 +33,8 @@ public:
       return _outpost_program_name;
    }
 
+   // Called only from plugin_initialize -- sequential, main-thread -- so the IDL list needs no synchronization.
    std::vector<file_idl_programs_t> load_idl_files(const std::vector<std::filesystem::path>& file_names) {
-      static std::mutex mutex;
-      std::scoped_lock lock(mutex);
-
       for (auto& filename : file_names) {
          auto file_path = std::filesystem::absolute(filename);
          ilog("Loading IDL file: {}", file_path.string());
@@ -69,6 +67,7 @@ public:
    const std::vector<file_idl_programs_t>& get_idl_files() {
       return _idl_files;
    }
+
 };
 
 outpost_solana_client_plugin::outpost_solana_client_plugin()
@@ -85,7 +84,11 @@ void outpost_solana_client_plugin::plugin_initialize(const variables_map& option
              "At least one solana client argument is required {}",
              option_name_client);
 
-   auto plug_sig      = app().find_plugin<signature_provider_manager_plugin>();
+   // This plugin APPBASE_PLUGIN_REQUIRES the signature_provider_manager_plugin, which creates every configured provider
+   // at its own plugin_initialize (failing the boot there on a misconfigured or not-enabled scheme). So by the time
+   // this runs, every provider already exists regardless of `--plugin` ordering, and clients can be resolved and
+   // constructed here rather than deferred to startup.
+   auto& sig_mgr      = app().get_plugin<signature_provider_manager_plugin>();
    auto client_specs  = options.at(option_name_client).as<std::vector<std::string>>();
 
    for (auto& client_spec : client_specs) {
@@ -97,15 +100,10 @@ void outpost_solana_client_plugin::plugin_initialize(const variables_map& option
       auto& id     = parts[0];
       auto& sig_id = parts[1];
       auto& url    = parts[2];
-
-      auto sig_provider = plug_sig->get_provider(sig_id);
-      my->add_client(id,
-                     std::make_shared<solana_client_entry_t>(
-                        id,
-                        url,
-                        sig_provider,
-                        std::make_shared<solana_client>(sig_provider, url)));
-
+      auto sig_provider = sig_mgr.get_provider(sig_id);
+      my->add_client(id, std::make_shared<solana_client_entry_t>(
+                            id, url, sig_provider,
+                            std::make_shared<solana_client>(sig_provider, url)));
       ilog("Added solana client (id={},sig_id={},url={})", id, sig_id, url);
    }
 }

@@ -3,11 +3,14 @@ configure_file(config.hpp.in config.hpp ESCAPE_QUOTES)
 
 chain_target(${NODE_EXECUTABLE_NAME} SOURCE_FILES main.cpp)
 
-# nodeop opts into the `SSM:` signature-provider scheme (registration in
-# main.cpp). The sub-library carries the AWS SDK dependency, deliberately kept
-# out of `chain_target`'s shared link set so other chain-tool binaries
-# (sys-util, cranker-example) stay AWS-free unless they opt in themselves.
-target_link_libraries(${NODE_EXECUTABLE_NAME} PRIVATE sigprov_ssm)
+# The AWS-backed signature-provider plugins (registered in main.cpp, enabled
+# per config via `plugin = ...`) link into nodeop ONLY. They carry the AWS SDK
+# dependency, deliberately kept out of `chain_target`'s shared link set so the
+# other chain-tool binaries (sys-util, cranker-example, the outpost RPC tools)
+# stay AWS-free unless they opt in themselves.
+target_link_libraries(${NODE_EXECUTABLE_NAME} PRIVATE
+        signature_provider_ssm_plugin
+        signature_provider_kms_plugin)
 
 apply_malloc_config(${NODE_EXECUTABLE_NAME})
 

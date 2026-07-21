@@ -23,10 +23,8 @@ class outpost_ethereum_client_plugin_impl {
    std::vector<file_abi_contracts_t> _abi_files{};
 
 public:
+   // Called only from plugin_initialize -- sequential, main-thread -- so the ABI list needs no synchronization.
    std::vector<file_abi_contracts_t> load_abi_files(const std::vector<std::filesystem::path>& file_names) {
-      static std::mutex mutex;
-      std::scoped_lock lock(mutex);
-
       for (auto& filename : file_names) {
          FC_ASSERT_FMT(exists(filename), "File does not exist: {}", filename.string());
          auto file_path = std::filesystem::absolute(filename);
@@ -68,6 +66,7 @@ public:
    const std::vector<file_abi_contracts_t>& get_abi_files() {
       return _abi_files;
    };
+
 };
 
 void outpost_ethereum_client_plugin::plugin_initialize(const variables_map& options) {
@@ -76,15 +75,20 @@ void outpost_ethereum_client_plugin::plugin_initialize(const variables_map& opti
       my->load_abi_files(abi_files);
    }
    FC_ASSERT(options.count(option_name_client), "At least one ethereum client argument is required {}", option_name_client);
-   auto plug_sig = app().find_plugin<signature_provider_manager_plugin>();
+
+   // This plugin APPBASE_PLUGIN_REQUIRES the signature_provider_manager_plugin, which creates every configured provider
+   // at its own plugin_initialize (failing the boot there on a misconfigured or not-enabled scheme). So by the time
+   // this runs, every provider already exists regardless of `--plugin` ordering, and clients can be resolved and
+   // constructed here rather than deferred to startup.
+   auto& sig_mgr        = app().get_plugin<signature_provider_manager_plugin>();
    auto client_specs    = options.at(option_name_client).as<std::vector<std::string>>();
    for (auto& client_spec : client_specs) {
       dlog("Adding ethereum client with spec: {}", client_spec);
       auto parts = fc::split(client_spec, ',');
       FC_ASSERT(parts.size() == 3 || parts.size() == 4, "Invalid spec {}", client_spec);
       auto& id           = parts[0];
-      auto& url          = parts[2];
       auto& sig_id       = parts[1];
+      auto& url          = parts[2];
       fc::ostring chain_id_str = parts.size() == 4 ? fc::ostring{parts[3]} : fc::ostring{};
       std::optional<fc::uint256> chain_id;
       std::optional<uint64_t>    chain_id_num;
@@ -93,18 +97,14 @@ void outpost_ethereum_client_plugin::plugin_initialize(const variables_map& opti
          chain_id_num = chain_id->convert_to<uint64_t>();
       }
 
-      auto  sig_provider = plug_sig->get_provider(sig_id);
+      auto sig_provider = sig_mgr.get_provider(sig_id);
       my->add_client(id,
                      std::make_shared<ethereum_client_entry_t>(
-                        id,
-                        url,
-                        sig_provider,
-                        std::make_shared<ethereum_client>(sig_provider, url,
-                           chain_id),
+                        id, url, sig_provider,
+                        std::make_shared<ethereum_client>(sig_provider, url, chain_id),
                         chain_id_num));
-
-      ilog("Added ethereum client (id={},sig_id={},chainId={},url={})",
-           id,sig_id,url,chain_id_str.value_or("none"));
+      ilog("Added ethereum client (id={},sig_id={},url={},chainId={})", id, sig_id, url,
+           chain_id_num ? std::to_string(*chain_id_num) : "none");
    }
 }
 

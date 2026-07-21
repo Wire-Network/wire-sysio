@@ -99,6 +99,9 @@ int main(int argc, char* argv[]) {
 
       // auto& sig_plug = app->get_plugin<sysio::signature_provider_manager_plugin>();
       auto& eth_plug = app().get_plugin<sysio::outpost_ethereum_client_plugin>();
+      // Clients are constructed at plugin_initialize (the signature-provider manager creates every provider at
+      // its own init, before this plugin initializes), so they are ready to read immediately after init -- no
+      // explicit startup of the plugin subtree is needed.
       auto client_entry = eth_plug.get_clients()[0];
       auto& client = client_entry->client;
 
