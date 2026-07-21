@@ -607,13 +607,13 @@ kms_signer make_kms_signature_provider(const kms_key_ref&             ref,
 
    // Startup probe: runs the same pinning check as the sign path (cached
    // after its first success), issuing only the free GetPublicKey -- no
-   // billable Sign. The manager
-   // invokes every attached probe at its plugin_startup (attaching IS the
-   // opt-in; this provider always attaches -- there is no enable flag), so a
-   // missing credential, bad region, absent IAM grant, or wrong pinned key
-   // fails loudly at boot instead of deep in production. It shares `state`
-   // (hence the pinning guard) with `sign`, so the probe never doubles the
-   // check.
+   // billable Sign. The manager invokes every attached probe at its
+   // plugin_startup (attaching IS the opt-in; this provider always attaches --
+   // there is no enable flag), so a missing credential, bad region, absent IAM
+   // grant, or wrong pinned key fails loudly at boot instead of deep in
+   // production. It shares `state` (hence the pinning guard) with `sign`, so a
+   // successful probe spares the first Sign the check; a transient probe
+   // failure leaves it pending, and the first Sign runs it.
    std::function<void()> warm_up = [state] { ensure_kms_pubkey_pinned(*state); };
 
    return kms_signer{.sign = std::move(sign), .warm_up = std::move(warm_up)};

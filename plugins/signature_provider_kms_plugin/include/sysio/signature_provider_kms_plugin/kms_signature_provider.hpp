@@ -263,9 +263,10 @@ std::shared_ptr<Aws::KMS::KMSClient> get_kms_client(const std::string& region);
  * which member triggers it.
  */
 struct kms_signer {
-   /// Signing closure, usable wherever `fc::crypto::sign_fn` is expected. Each
-   /// call issues one `KMS::Sign`; until the pinning check has succeeded once
-   /// (whether here or via `warm_up`), a call first runs that check. A
+   /// Signing closure, usable wherever `fc::crypto::sign_fn` is expected. Until
+   /// the pinning check has succeeded once (whether here or via `warm_up`), a
+   /// call runs that check first, and a failed check throws before any
+   /// `KMS::Sign` is built; a call that passes pinning issues one `KMS::Sign`. A
    /// transient KMS failure throws
    /// `sysio::chain::signing_transient_exception` (safe to retry
    /// with backoff); a permanent one throws
