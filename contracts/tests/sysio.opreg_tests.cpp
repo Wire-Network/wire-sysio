@@ -549,6 +549,57 @@ BOOST_FIXTURE_TEST_CASE(termcheck_terminates_at_duty_rotation_cadence, sysio_opr
    BOOST_REQUIRE_EQUAL("rolling-window: >5 consecutive misses", op["status_reason"].as_string());
 } FC_LOG_AND_RETHROW() }
 
+// SEC-28 residual (schedule drift): the live rotation (epoch_state.batch_op_groups)
+// is sized from batch_op_groups once at schbatchgps and advance() then preserves
+// its length, so the config count must stay pinned to the live rotation. Lowering
+// it after the schedule exists would let a later opreg update narrow the window to
+// a span that no longer covers the (wider) duty cadence -- the exact vacuous rail
+// this bound prevents -- so epoch::setconfig rejects any group-count change once
+// the schedule is materialized, while an unchanged count still passes.
+BOOST_FIXTURE_TEST_CASE(epoch_setconfig_locks_batch_op_groups_after_schedule, sysio_opreg_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), setconfig());
+   produce_blocks();
+
+   BOOST_REQUIRE_EQUAL(success(), regoperator("batchop.a"_n, OPERATOR_TYPE_BATCH, true));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(success(), regoperator("batchop.b"_n, OPERATOR_TYPE_BATCH, true));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(success(), regoperator("batchop.c"_n, OPERATOR_TYPE_BATCH, true));
+   produce_blocks();
+
+   auto epoch_setconfig = [&](uint32_t groups, uint32_t min_active) {
+      return push_epoch_action(EPOCH_ACCOUNT, "setconfig"_n, mvo()
+         ("epoch_duration_sec",                 90)
+         ("operators_per_epoch",                1)
+         ("batch_operator_minimum_active",      min_active)
+         ("batch_op_groups",                    groups)
+         ("epoch_retention_envelope_log_count", 200));
+   };
+
+   // Before the schedule exists the group count is free; land on 3 and materialize.
+   BOOST_REQUIRE_EQUAL(success(), epoch_setconfig(3, 3));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(success(), push_epoch_action(EPOCH_ACCOUNT, "schbatchgps"_n, mvo()));
+   produce_blocks();
+
+   // Decreasing the group count is now rejected -- before the window check, so the
+   // guard's message (not the window bound's) is what surfaces.
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: batch_op_groups cannot change once "
+            "the rotation schedule is materialized"),
+      epoch_setconfig(2, 2));
+
+   // Increasing it is rejected the same way (no fourth operator needed -- the guard
+   // fires before schbatchgps would re-materialize).
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: batch_op_groups cannot change once "
+            "the rotation schedule is materialized"),
+      epoch_setconfig(4, 4));
+
+   // Re-issuing the same group count still succeeds.
+   BOOST_REQUIRE_EQUAL(success(), epoch_setconfig(3, 3));
+} FC_LOG_AND_RETHROW() }
+
 // ── regoperator ──
 
 BOOST_FIXTURE_TEST_CASE(regoperator_bootstrapped_batch, sysio_opreg_tester) { try {
