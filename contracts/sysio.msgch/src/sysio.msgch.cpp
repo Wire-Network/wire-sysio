@@ -1498,7 +1498,7 @@ void msgch::chkcons() {
    // Two overlapping holds protect a disputed epoch: `sysio.epoch::is_paused` (set by opendispute)
    // is the hard stop -- advance() itself throws while paused -- and this gate is the soft one that
    // returns BEFORE chkcons triggers advance, so it never hits that throw mid-dispute. chkdispute
-   // clears both on resolution (resolvedisp + unpause).
+   // resolves each dispute (resolvedisp) and lifts the pause once the LAST open dispute resolves.
    {
       chalg::disputes_t disputes(CHALG_ACCOUNT);
       auto ep_idx = disputes.get_index<"byepoch"_n>();
