@@ -406,6 +406,21 @@ public:
          "operator_entry", data, abi_serializer::create_yield_function(abi_serializer_max_time));
    }
 
+   /// Count DELIVERED dellog rows still present for `account`. recorddel PRUNES (erases) rows that
+   /// have aged out of the rolling window, so a surviving delivered row proves that record is still
+   /// inside the window -- the direct check that the edge anchor was not pruned.
+   uint32_t delivered_dellog_count(name account, uint64_t scan_until = 64) {
+      uint32_t n = 0;
+      for (uint64_t id = 0; id < scan_until; ++id) {
+         auto data = get_row_by_account(OPREG_ACCOUNT, OPREG_ACCOUNT, "dellog"_n, name{id});
+         if (data.empty()) continue;
+         auto row = opreg_abi.binary_to_variant("delivery_log_entry", data,
+            abi_serializer::create_yield_function(abi_serializer_max_time));
+         if (row["account"].as_string() == account.to_string() && row["delivered"].as<bool>()) ++n;
+      }
+      return n;
+   }
+
    fc::variant read_epoch_state() {
       auto data = get_row_by_account(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "epochstate"_n, "epochstate"_n);
       return data.empty() ? fc::variant() : epoch_abi.binary_to_variant(
@@ -1130,10 +1145,11 @@ BOOST_FIXTURE_TEST_CASE(late_confirmation_after_consensus_recorded, sysio_msgch_
 // window the span bound accepts. A resident operator is on duty once per three-epoch rotation, and
 // the window spans exactly (max_consecutive_misses + 1) rotations, so the delivered anchor that
 // keeps the percent rail below its ceiling sits exactly on the window edge at the terminating miss.
-// If the bound (or the window scan) were off by one rotation the anchor would age out, the window
-// would be all-miss (100% > 99), and the operator would terminate early on the PERCENT rail -- so
-// requiring termination on the sixth consecutive miss with the consecutive reason pins the exact
-// span, driven end to end by advance()'s inline recorddel/termcheck rather than fabricated timing.
+// Termination alone does NOT pin that edge: the six miss rows fire the consecutive rail whether or
+// not the anchor is pruned, and termcheck prefers the consecutive reason over percent. So the test
+// asserts the anchor's delivered dellog row SURVIVES the terminating advance -- an off-by-one in the
+// span (or the prune/scan bound) ages it out, failing that assertion. Driven end to end by
+// advance()'s inline recorddel/termcheck rather than fabricated timing.
 BOOST_FIXTURE_TEST_CASE(terminate_at_duty_rotation_via_advance, sysio_msgch_chain_tester) { try {
    constexpr uint32_t kGroups          = 3;
    constexpr uint32_t kMaxConsecMisses = 5;
@@ -1173,6 +1189,12 @@ BOOST_FIXTURE_TEST_CASE(terminate_at_duty_rotation_via_advance, sysio_msgch_chai
          BOOST_REQUIRE_EQUAL(kTerminatingDuty, batchop_duties);
          BOOST_REQUIRE_EQUAL("rolling-window: >5 consecutive misses",
                              op["status_reason"].as_string());
+         // The delivered anchor sits exactly on the window edge at this miss and MUST survive the
+         // terminating advance's prune. This is what pins the exact boundary: an off-by-one in the
+         // span or the prune bound would erase this row (the surviving window would then be all-miss),
+         // whereas termination + reason hold either way. BATCHOP delivered exactly once, so exactly
+         // one delivered row must remain.
+         BOOST_REQUIRE_EQUAL(1u, delivered_dellog_count(BATCHOP));
       } else {
          // Still ACTIVE: BATCHOP must not terminate before its sixth miss (its 7th duty).
          BOOST_REQUIRE(status == opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE);
