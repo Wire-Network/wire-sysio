@@ -69,8 +69,6 @@ namespace snapshot_attest {
 /// provider snapshot interval (_snapshot_provider_block_spacing).
 constexpr uint32_t snapshot_attestation_grace_blocks = 12500;
 
-constexpr std::string_view snapshot_min_disk_free_option = "snapshot-endpoint-min-disk-free-mb";
-
 constexpr uint64_t bytes_per_mebibyte = 1024 * 1024;
 
 /// Convert a positive MiB option value to bytes without overflowing uint64_t.
@@ -578,8 +576,6 @@ void chain_plugin::set_program_options(options_description& cli, options_descrip
           "  http://host:port          - fetches latest snapshot\n"
           "  http://host:port/50000    - fetches snapshot at block 50000\n"
           "Requires empty database (use --delete-all-blocks to clear existing data).")
-         (snapshot_min_disk_free_option.data(), bpo::value<uint64_t>(),
-          "Free disk space in MiB that must remain during download. Defaults to chain-state-db-guard-size-mb.")
          ;
 
 }
@@ -987,16 +983,11 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
 
          const auto max_download_bytes = checked_mebibytes(
             options.at("chain-state-db-size-mb").as<uint64_t>(), "chain-state-db-size-mb");
-         const std::string min_disk_free_option_name{snapshot_min_disk_free_option};
-         const bool has_min_disk_free = options.contains(min_disk_free_option_name);
-         const auto min_free_disk_bytes = checked_mebibytes(
-            has_min_disk_free
-               ? options.at(min_disk_free_option_name).as<uint64_t>()
-               : options.at("chain-state-db-guard-size-mb").as<uint64_t>(),
-            has_min_disk_free ? snapshot_min_disk_free_option : std::string_view{"chain-state-db-guard-size-mb"});
          const fc::http_file_download_options download_options{
             .max_response_body_bytes = max_download_bytes,
-            .min_free_disk_space_bytes = min_free_disk_bytes,
+            // Do not add a snapshot-specific reserve option. The HTTP client still checks that
+            // each bounded write fits on disk with its internal concurrent-consumer margin.
+            .min_free_disk_space_bytes = 0,
             .retry_failed_reused_connection = true,
             .status_callback = [logger = snapshot_download_progress_logger{}](
                                   const fc::http_file_download_status& status) mutable { logger(status); },

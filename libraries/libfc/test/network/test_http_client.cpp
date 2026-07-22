@@ -139,10 +139,10 @@ bool write_bytes(tcp::socket& socket, std::string_view bytes) {
    return !ec;
 }
 
-/** Return a complete 200 response header for a fixed-length body. */
-std::string fixed_length_header(uint64_t body_bytes) {
+/** Return a complete fixed-length response header. */
+std::string fixed_length_header(uint64_t body_bytes, std::string_view status = "200 OK") {
    std::ostringstream response;
-   response << "HTTP/1.1 200 OK\r\n"
+   response << "HTTP/1.1 " << status << "\r\n"
             << "Content-Type: application/octet-stream\r\n"
             << "Content-Length: " << body_bytes << "\r\n"
             << "Connection: close\r\n\r\n";
@@ -199,7 +199,7 @@ bool write_chunked_body(tcp::socket& socket, uint64_t body_bytes) {
 fc::http_file_download_options download_options(uint64_t max_body_bytes) {
    return fc::http_file_download_options{
       .max_response_body_bytes = max_body_bytes,
-      .min_free_disk_space_bytes = 1,
+      .min_free_disk_space_bytes = 0,
       .retry_failed_reused_connection = false,
    };
 }
@@ -481,6 +481,28 @@ BOOST_AUTO_TEST_CASE(oversized_fixed_length_response_is_rejected_before_write) {
    const auto output = temp.path() / "oversized-fixed.bin";
 
    BOOST_CHECK_THROW(download(server, output, download_options(exact_body_bytes)), fc::exception);
+   check_download_files_removed(output);
+}
+
+/// A non-success response includes only a small bounded prefix of its diagnostic body.
+BOOST_AUTO_TEST_CASE(error_response_includes_bounded_body_diagnostic) {
+   const std::string error_prefix = "snapshot not ready: ";
+   const std::string omitted_suffix = "omitted-tail";
+   const std::string error_body = error_prefix + std::string(256, 'x') + omitted_suffix;
+   scripted_http_server server([&](tcp::socket& socket, const std::atomic_bool&) {
+      write_bytes(socket, fixed_length_header(error_body.size(), "409 Conflict") + error_body);
+   });
+   fc::temp_directory temp;
+   const auto output = temp.path() / "error-response.bin";
+
+   BOOST_CHECK_EXCEPTION(
+      download(server, output, download_options(error_body.size())),
+      fc::exception,
+      [&](const fc::exception& error) {
+         const auto detail = error.to_detail_string();
+         return detail.find("HTTP POST failed with status 409: " + error_prefix) != std::string::npos &&
+                detail.find(omitted_suffix) == std::string::npos;
+      });
    check_download_files_removed(output);
 }
 

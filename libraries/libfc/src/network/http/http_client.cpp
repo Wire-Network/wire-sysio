@@ -28,8 +28,10 @@ namespace fc {
 
 namespace {
 
-constexpr size_t download_read_buffer_bytes = 1024 * 1024;
+// Beast limits an individual parser read to roughly 64 KiB, so a larger body buffer is unused.
+constexpr size_t download_read_buffer_bytes = 64 * 1024;
 constexpr size_t download_parser_buffer_bytes = 64 * 1024;
+constexpr size_t max_error_response_body_bytes = 200;
 constexpr uint64_t disk_space_check_interval_bytes = 64 * 1024 * 1024;
 constexpr uint64_t disk_space_concurrency_margin_bytes = 64 * 1024 * 1024;
 constexpr auto disk_space_check_interval = std::chrono::seconds(5);
@@ -667,7 +669,24 @@ public:
       // the final destination would hand the caller a truncated file.
       const auto status = parser->get().result();
       if (status != http::status::ok) {
-         FC_THROW("HTTP POST failed with status {}", parser->get().result_int());
+         // Preserve a useful endpoint diagnostic without buffering an unbounded error response.
+         // One parser increment is enough for the first 200 decoded bytes and remains cancellable.
+         std::string error_body(max_error_response_body_bytes, '\0');
+         parser->get().body().data = error_body.data();
+         parser->get().body().size = error_body.size();
+         if (!parser->is_done()) {
+            ec = std::visit([&](auto& stream) {
+               return sync_read_parser_some_with_timeout(*stream, *buffer, *parser, no_deadline, monitor);
+            }, conn_iter->second);
+            if (ec == http::error::need_buffer) {
+               ec = {};
+            }
+         }
+         error_body.resize(error_body.size() - parser->get().body().size);
+         if (error_body.empty()) {
+            FC_THROW("HTTP POST failed with status {}", parser->get().result_int());
+         }
+         FC_THROW("HTTP POST failed with status {}: {}", parser->get().result_int(), error_body);
       }
 
       const auto content_length = parser->content_length();
@@ -676,9 +695,6 @@ public:
       }
       uint64_t disk_space_write_budget = 0;
       if (content_length) {
-         FC_ASSERT(*content_length <= options.max_response_body_bytes,
-                   "HTTP response Content-Length {} exceeds configured maximum of {} bytes",
-                   *content_length, options.max_response_body_bytes);
          FC_ASSERT(*content_length <= std::numeric_limits<uint64_t>::max() - disk_space_concurrency_margin_bytes,
                    "HTTP response Content-Length {} is too large for the {}-byte disk safety margin",
                    *content_length, disk_space_concurrency_margin_bytes);
@@ -713,6 +729,8 @@ public:
             return sync_read_parser_some_with_timeout(*stream, *buffer, *parser, no_deadline, monitor);
          }, conn_iter->second);
          if (ec == http::error::need_buffer) {
+            // buffer_body reports need_buffer when this caller-owned output buffer is filled;
+            // the decoded bytes are valid and the next loop iteration supplies a fresh buffer.
             ec = {};
          }
          if (ec == http::error::body_limit) {

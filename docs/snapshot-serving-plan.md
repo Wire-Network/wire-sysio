@@ -252,7 +252,7 @@ The peers endpoint is a separate feature and was not implemented in this phase.
 
 ### Configuration
 
-The endpoint and its resource limits are CLI-only because bootstrap is a single-use operation:
+The endpoint is CLI-only because bootstrap is a single-use operation:
 
 ```
 --snapshot-endpoint URL    Fetch snapshot from URL and bootstrap.
@@ -264,8 +264,8 @@ The endpoint and its resource limits are CLI-only because bootstrap is a single-
 Snapshot bootstrap is an attended operation against an operator-selected endpoint. It reports connection/request phases
 and, every five seconds during transfer, downloaded bytes, percentage, rate, and ETA when `Content-Length` is available.
 SIGINT cancels pending resolver or socket work and retains atomic temporary-file cleanup. The existing
-`chain-state-db-size-mb` setting bounds both fixed-length and chunked response bodies; the only snapshot-specific
-resource override is `--snapshot-endpoint-min-disk-free-mb` for reserved filesystem headroom.
+`chain-state-db-size-mb` setting bounds both fixed-length and chunked response bodies. No snapshot-specific resource
+options are added.
 
 The block number is encoded as a trailing path component of the URL. If the last path segment is a decimal number, it's treated as a specific block request (POST to `/v1/snapshot/by_block`); otherwise POST to `/v1/snapshot/latest`.
 

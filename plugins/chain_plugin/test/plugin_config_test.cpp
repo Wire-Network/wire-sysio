@@ -11,9 +11,9 @@
 
 namespace {
 
-/** Initialize chain_plugin with one snapshot-endpoint limit override. */
-sysio::chain::exit_code::exit_code initialize_with_snapshot_limit(std::string_view option_name,
-                                                                  std::string_view option_value) {
+/** Initialize chain_plugin with one snapshot response-size limit override. */
+sysio::chain::exit_code::exit_code initialize_with_snapshot_size_limit(std::string_view option_name,
+                                                                       std::string_view option_value) {
    fc::temp_directory tmp;
    sysio::chain::application exe({.enable_resource_monitor = false});
 
@@ -61,7 +61,7 @@ BOOST_AUTO_TEST_CASE(chain_plugin_default_tests) {
 
 }
 
-/** Verify the sole snapshot-specific resource option and removal of endpoint timeout/size knobs. */
+/** Verify snapshot endpoint registration and removal of endpoint-specific resource knobs. */
 BOOST_AUTO_TEST_CASE(chain_plugin_snapshot_endpoint_option_registration) {
    sysio::chain::application exe({.enable_resource_monitor = false});
    sysio::chain_plugin plugin;
@@ -74,7 +74,6 @@ BOOST_AUTO_TEST_CASE(chain_plugin_snapshot_endpoint_option_registration) {
    std::array arguments{
       "test_chain_plugin",
       "--snapshot-endpoint", "http://127.0.0.1:1",
-      "--snapshot-endpoint-min-disk-free-mb", "16",
    };
    boost::program_options::variables_map variables;
    boost::program_options::store(
@@ -83,7 +82,6 @@ BOOST_AUTO_TEST_CASE(chain_plugin_snapshot_endpoint_option_registration) {
    boost::program_options::notify(variables);
 
    BOOST_CHECK_EQUAL(variables.at("snapshot-endpoint").as<std::string>(), "http://127.0.0.1:1");
-   BOOST_CHECK_EQUAL(variables.at("snapshot-endpoint-min-disk-free-mb").as<uint64_t>(), 16);
 
    constexpr std::array removed_options{
       "snapshot-endpoint-connect-timeout-ms",
@@ -91,25 +89,23 @@ BOOST_AUTO_TEST_CASE(chain_plugin_snapshot_endpoint_option_registration) {
       "snapshot-endpoint-idle-timeout-ms",
       "snapshot-endpoint-total-timeout-ms",
       "snapshot-endpoint-max-download-size-mb",
+      "snapshot-endpoint-min-disk-free-mb",
    };
    for (const auto* option_name : removed_options) {
       BOOST_CHECK(options.find_nothrow(option_name, false) == nullptr);
    }
 }
 
-/** Verify that snapshot endpoint resource limits reject zero and overflow-prone values before connecting. */
+/** Verify that the snapshot response-size limit rejects zero and overflow before connecting. */
 BOOST_AUTO_TEST_CASE(chain_plugin_snapshot_endpoint_option_validation) {
    constexpr std::array invalid_options{
-      std::pair{"snapshot-endpoint-min-disk-free-mb", "0"},
       std::pair{"chain-state-db-size-mb", "0"},
       std::pair{"chain-state-db-size-mb", "17592186044416"},
-      std::pair{"chain-state-db-guard-size-mb", "0"},
-      std::pair{"chain-state-db-guard-size-mb", "17592186044416"},
    };
 
    for (const auto& [option_name, option_value] : invalid_options) {
       BOOST_TEST_CONTEXT(option_name << '=' << option_value) {
-         BOOST_CHECK(initialize_with_snapshot_limit(option_name, option_value) != sysio::chain::exit_code::SUCCESS);
+         BOOST_CHECK(initialize_with_snapshot_size_limit(option_name, option_value) != sysio::chain::exit_code::SUCCESS);
       }
    }
 }

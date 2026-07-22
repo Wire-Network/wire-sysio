@@ -254,18 +254,16 @@ the active operation; the file transfer then reports phase changes and, every fi
 percentage, transfer rate, and ETA when the response supplies `Content-Length`. Pressing Ctrl+C cancels pending
 resolver or socket work and removes the partial file.
 
-The existing chain database settings supply the download ceiling and default disk reserve. Only the disk reserve has a
-snapshot-specific override:
+The existing chain database size setting supplies the download ceiling:
 
 | Option | Default | Purpose |
 |---|---:|---|
 | `--chain-state-db-size-mb` | `1024` | Maximum accepted snapshot response size and chain-state database size |
-| `--chain-state-db-guard-size-mb` | build default | Default free-space reserve during snapshot download |
-| `--snapshot-endpoint-min-disk-free-mb` | `chain-state-db-guard-size-mb` | Free space retained on the snapshots filesystem |
 
-Resource limits must be positive. A fixed-length response that exceeds the maximum is rejected from its `Content-Length`
-before a temporary file is opened. Chunked or lengthless responses are stopped at the same byte ceiling. Available
-disk space is checked before and throughout the transfer, and a failed transfer removes its `.downloading` file.
+The response-size limit must be positive. A fixed-length response that exceeds the maximum is rejected from its
+`Content-Length` before a temporary file is opened. Chunked or lengthless responses are stopped at the same byte
+ceiling. Available disk space is checked before and throughout the transfer, and a failed transfer removes its
+`.downloading` file.
 Long transfers recheck after at most 64 MiB or five seconds of progress and retain an additional 64 MiB safety margin
 to bound interference from concurrent disk consumers between probes.
 
