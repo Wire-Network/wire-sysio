@@ -985,9 +985,6 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
             options.at("chain-state-db-size-mb").as<uint64_t>(), "chain-state-db-size-mb");
          const fc::http_file_download_options download_options{
             .max_response_body_bytes = max_download_bytes,
-            // Do not add a snapshot-specific reserve option. The HTTP client still checks that
-            // each bounded write fits on disk with its internal concurrent-consumer margin.
-            .min_free_disk_space_bytes = 0,
             .retry_failed_reused_connection = true,
             .status_callback = [logger = snapshot_download_progress_logger{}](
                                   const fc::http_file_download_status& status) mutable { logger(status); },

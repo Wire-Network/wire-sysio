@@ -73,6 +73,11 @@ public:
       _cancel_check = std::move(cancel_check);
    }
 
+   void set_space_available_provider_for_testing(
+      std::function<uint64_t(const std::filesystem::path&)> provider) {
+      _space_available_provider = std::move(provider);
+   }
+
    /** Return whether the caller requested cancellation of the active HTTP operation. */
    bool is_cancelled() const {
       return _cancel_check && _cancel_check();
@@ -284,22 +289,25 @@ public:
       return current;
    }
 
-   /**
-    * Require enough free space for @p next_write_bytes while retaining @p reserved_bytes.
-    *
-    * @return Bytes currently available for writes after retaining the requested reserve.
-    */
-   static uint64_t require_disk_space(const std::filesystem::path& destination, uint64_t next_write_bytes,
-                                      uint64_t reserved_bytes) {
-      const auto query_path = space_query_path(destination);
+   /// Return available bytes on the destination filesystem, using the test seam when configured.
+   uint64_t available_disk_space(const std::filesystem::path& query_path) const {
+      if (_space_available_provider) {
+         return _space_available_provider(query_path);
+      }
+
       std::error_code ec;
       const auto space = std::filesystem::space(query_path, ec);
       FC_ASSERT(!ec, "Failed to query free disk space at {}: {}", query_path.string(), ec.message());
-      FC_ASSERT(space.available >= reserved_bytes && next_write_bytes <= space.available - reserved_bytes,
-                "Insufficient disk space at {} for HTTP download: {} bytes available, {} bytes required for the "
-                "next write, and {} bytes reserved as headroom",
-                query_path.string(), space.available, next_write_bytes, reserved_bytes);
-      return space.available - reserved_bytes;
+      return space.available;
+   }
+
+   /** Require enough free space for @p next_write_bytes. */
+   void require_disk_space(const std::filesystem::path& destination, uint64_t next_write_bytes) const {
+      const auto query_path = space_query_path(destination);
+      const auto available_bytes = available_disk_space(query_path);
+      FC_ASSERT(next_write_bytes <= available_bytes,
+                "Insufficient disk space at {} for HTTP download: {} bytes available and {} bytes required",
+                query_path.string(), available_bytes, next_write_bytes);
    }
 
    /**
@@ -309,16 +317,15 @@ public:
     * The margin bounds headroom exposure if another process consumes space between probes;
     * slow transfers also refresh the probe every five seconds.
     */
-   static uint64_t refresh_disk_space_write_budget(const std::filesystem::path& destination,
-                                                   uint64_t remaining_body_bytes,
-                                                   uint64_t reserved_bytes) {
+   uint64_t refresh_disk_space_write_budget(const std::filesystem::path& destination,
+                                            uint64_t remaining_body_bytes) const {
       const auto write_budget = std::min(remaining_body_bytes, disk_space_check_interval_bytes);
       if (write_budget == 0) {
-         require_disk_space(destination, 0, reserved_bytes);
+         require_disk_space(destination, 0);
          return 0;
       }
 
-      require_disk_space(destination, write_budget + disk_space_concurrency_margin_bytes, reserved_bytes);
+      require_disk_space(destination, write_budget + disk_space_concurrency_margin_bytes);
       return write_budget;
    }
 
@@ -717,11 +724,10 @@ public:
          const auto preflight_bytes = *content_length == 0
                                          ? 0
                                          : *content_length + disk_space_concurrency_margin_bytes;
-         require_disk_space(final_dest, preflight_bytes, options.min_free_disk_space_bytes);
+         require_disk_space(final_dest, preflight_bytes);
          disk_space_write_budget = std::min(*content_length, disk_space_check_interval_bytes);
       } else {
-         disk_space_write_budget = refresh_disk_space_write_budget(
-            final_dest, options.max_response_body_bytes, options.min_free_disk_space_bytes);
+         disk_space_write_budget = refresh_disk_space_write_budget(final_dest, options.max_response_body_bytes);
       }
       auto next_disk_space_check = std::chrono::steady_clock::now() + disk_space_check_interval;
 
@@ -760,8 +766,7 @@ public:
              std::chrono::steady_clock::now() >= next_disk_space_check) {
             const auto response_size_limit = content_length.value_or(options.max_response_body_bytes);
             const auto remaining_body_bytes = response_size_limit - downloaded_bytes;
-            disk_space_write_budget = refresh_disk_space_write_budget(
-               final_dest, remaining_body_bytes, options.min_free_disk_space_bytes);
+            disk_space_write_budget = refresh_disk_space_write_budget(final_dest, remaining_body_bytes);
             next_disk_space_check = std::chrono::steady_clock::now() + disk_space_check_interval;
          }
          file.write(read_buffer.data(), static_cast<std::streamsize>(chunk_bytes));
@@ -786,6 +791,7 @@ public:
    connection_map           _connections;
    unix_url_split_map       _unix_url_paths;
    std::function<bool()>     _cancel_check;
+   std::function<uint64_t(const std::filesystem::path&)> _space_available_provider;
 };
 
 
@@ -802,6 +808,11 @@ void http_client::post_to_file(const url& dest, const variant& payload, const st
 
 void http_client::set_cancel_check(std::function<bool()> cancel_check) {
    _my->set_cancel_check(std::move(cancel_check));
+}
+
+void http_client::set_space_available_provider_for_testing(
+   std::function<uint64_t(const std::filesystem::path&)> provider) {
+   _my->set_space_available_provider_for_testing(std::move(provider));
 }
 
 variant http_client::post_sync(const url& dest, const variant& payload, const fc::time_point& deadline) {

@@ -43,8 +43,6 @@ struct http_file_download_status {
 struct http_file_download_options {
    /// Maximum accepted response-body size in bytes.
    uint64_t max_response_body_bytes;
-   /// Free bytes that must remain on the destination filesystem.
-   uint64_t min_free_disk_space_bytes;
    /// Retry a failed request once when it used a cached connection. Only enable for idempotent requests.
    bool retry_failed_reused_connection = false;
    /// Receive phase transitions and periodic transfer status. The callback must not throw.
@@ -88,6 +86,12 @@ class http_client {
       void set_verify_peers(bool enabled);
 
 private:
+   friend struct http_client_test_access;
+
+   /// Override the filesystem free-space query for deterministic transport tests.
+   void set_space_available_provider_for_testing(
+      std::function<uint64_t(const std::filesystem::path&)> provider);
+
    std::unique_ptr<class http_client_impl> _my;
 };
 

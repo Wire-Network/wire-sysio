@@ -16,7 +16,6 @@
 #include <fstream>
 #include <functional>
 #include <iterator>
-#include <limits>
 #include <sstream>
 #include <string>
 #include <string_view>
@@ -25,6 +24,18 @@
 #include <vector>
 
 using namespace std::chrono_literals;
+
+namespace fc {
+
+/** Private free-space-query injection for HTTP download tests. */
+struct http_client_test_access {
+   static void set_available_disk_space(http_client& client, uint64_t available_bytes) {
+      client.set_space_available_provider_for_testing(
+         [available_bytes](const std::filesystem::path&) { return available_bytes; });
+   }
+};
+
+} // namespace fc
 
 namespace {
 
@@ -199,7 +210,6 @@ bool write_chunked_body(tcp::socket& socket, uint64_t body_bytes) {
 fc::http_file_download_options download_options(uint64_t max_body_bytes) {
    return fc::http_file_download_options{
       .max_response_body_bytes = max_body_bytes,
-      .min_free_disk_space_bytes = 0,
       .retry_failed_reused_connection = false,
    };
 }
@@ -215,6 +225,16 @@ void download(const scripted_http_server& server, const std::filesystem::path& o
               std::function<bool()> cancel_check = {}) {
    fc::http_client client;
    client.set_cancel_check(std::move(cancel_check));
+   client.post_to_file(server_url(server), fc::variant(fc::mutable_variant_object()), output, options);
+}
+
+/** Invoke a download with a deterministic free-space query result. */
+void download_with_available_disk_space(const scripted_http_server& server,
+                                        const std::filesystem::path& output,
+                                        const fc::http_file_download_options& options,
+                                        uint64_t available_bytes) {
+   fc::http_client client;
+   fc::http_client_test_access::set_available_disk_space(client, available_bytes);
    client.post_to_file(server_url(server), fc::variant(fc::mutable_variant_object()), output, options);
 }
 
@@ -632,17 +652,16 @@ BOOST_AUTO_TEST_CASE(chunked_response_refills_disk_space_budget) {
    BOOST_CHECK_EQUAL(std::filesystem::file_size(output), response_bytes);
 }
 
-/// A reserved-headroom requirement larger than the filesystem capacity must fail before writing.
-BOOST_AUTO_TEST_CASE(insufficient_disk_headroom_is_rejected_before_write) {
+/// A response that cannot fit on the destination filesystem must fail before writing.
+BOOST_AUTO_TEST_CASE(insufficient_disk_space_is_rejected_before_write) {
    scripted_http_server server([](tcp::socket& socket, const std::atomic_bool&) {
       write_bytes(socket, fixed_length_header(1) + "1");
    });
    fc::temp_directory temp;
    const auto output = temp.path() / "disk-headroom.bin";
    auto options = download_options(exact_body_bytes);
-   options.min_free_disk_space_bytes = std::numeric_limits<uint64_t>::max();
 
-   BOOST_CHECK_THROW(download(server, output, options), fc::exception);
+   BOOST_CHECK_THROW(download_with_available_disk_space(server, output, options, 0), fc::exception);
    check_download_files_removed(output);
 }
 
@@ -653,14 +672,10 @@ BOOST_AUTO_TEST_CASE(disk_space_budget_requires_concurrency_margin) {
    });
    fc::temp_directory temp;
    const auto output = temp.path() / "disk-concurrency-margin.bin";
-   std::error_code ec;
-   const auto space = std::filesystem::space(temp.path(), ec);
-   BOOST_REQUIRE(!ec);
-   BOOST_REQUIRE_GT(space.available, exact_body_bytes);
    auto options = download_options(exact_body_bytes);
-   options.min_free_disk_space_bytes = space.available - exact_body_bytes;
 
-   BOOST_CHECK_THROW(download(server, output, options), fc::exception);
+   BOOST_CHECK_THROW(
+      download_with_available_disk_space(server, output, options, exact_body_bytes), fc::exception);
    check_download_files_removed(output);
 }
 
@@ -673,16 +688,11 @@ BOOST_AUTO_TEST_CASE(fixed_length_preflight_includes_concurrency_margin) {
    });
    fc::temp_directory temp;
    const auto output = temp.path() / "fixed-preflight-margin.bin";
-   std::error_code ec;
-   const auto space = std::filesystem::space(temp.path(), ec);
-   BOOST_REQUIRE(!ec);
-   BOOST_REQUIRE_GT(space.available, response_bytes + headroom_without_full_margin);
    auto options = download_options(response_bytes);
-   options.min_free_disk_space_bytes =
-      space.available - response_bytes - headroom_without_full_margin;
 
    BOOST_CHECK_EXCEPTION(
-      download(server, output, options),
+      download_with_available_disk_space(
+         server, output, options, response_bytes + headroom_without_full_margin),
       fc::exception,
       [](const fc::exception& error) {
          return error.to_detail_string().find("Insufficient disk space") != std::string::npos;
