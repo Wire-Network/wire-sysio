@@ -240,6 +240,27 @@ public:
       }, monitor);
    }
 
+   /**
+    * Read one decoded response-body increment into caller-owned storage.
+    *
+    * @p ec retains transport and parser failures for the caller, while need_buffer is normalized
+    * because it only means the supplied buffer_body storage was filled successfully.
+    */
+   size_t read_body_increment(connection& conn, boost::beast::flat_buffer& buffer,
+                              http::response_parser<http::buffer_body>& parser, char* sink, size_t sink_size,
+                              const operation_monitor& monitor, error_code& ec) {
+      parser.get().body().data = sink;
+      parser.get().body().size = sink_size;
+      ec = std::visit([&](auto& stream) {
+         return sync_read_parser_some_with_timeout(
+            *stream, buffer, parser, deadline_type::max(), monitor);
+      }, conn);
+      if (ec == http::error::need_buffer) {
+         ec = {};
+      }
+      return sink_size - parser.get().body().size;
+   }
+
    /// Return whether @p ec can indicate that a cached peer connection closed before reuse.
    static bool is_stale_connection_error(const error_code& ec) {
       return ec == boost::asio::error::eof ||
@@ -672,17 +693,12 @@ public:
          // Preserve a useful endpoint diagnostic without buffering an unbounded error response.
          // One parser increment is enough for the first 200 decoded bytes and remains cancellable.
          std::string error_body(max_error_response_body_bytes, '\0');
-         parser->get().body().data = error_body.data();
-         parser->get().body().size = error_body.size();
          if (!parser->is_done()) {
-            ec = std::visit([&](auto& stream) {
-               return sync_read_parser_some_with_timeout(*stream, *buffer, *parser, no_deadline, monitor);
-            }, conn_iter->second);
-            if (ec == http::error::need_buffer) {
-               ec = {};
-            }
+            error_body.resize(read_body_increment(conn_iter->second, *buffer, *parser, error_body.data(),
+                                                  error_body.size(), monitor, ec));
+         } else {
+            error_body.clear();
          }
-         error_body.resize(error_body.size() - parser->get().body().size);
          if (error_body.empty()) {
             FC_THROW("HTTP POST failed with status {}", parser->get().result_int());
          }
@@ -723,22 +739,13 @@ public:
       std::vector<char> read_buffer(download_read_buffer_bytes);
       transition_to(http_file_download_phase::downloading);
       while (!parser->is_done()) {
-         parser->get().body().data = read_buffer.data();
-         parser->get().body().size = read_buffer.size();
-         ec = std::visit([&](auto& stream) {
-            return sync_read_parser_some_with_timeout(*stream, *buffer, *parser, no_deadline, monitor);
-         }, conn_iter->second);
-         if (ec == http::error::need_buffer) {
-            // buffer_body reports need_buffer when this caller-owned output buffer is filled;
-            // the decoded bytes are valid and the next loop iteration supplies a fresh buffer.
-            ec = {};
-         }
+         const auto chunk_bytes = read_body_increment(conn_iter->second, *buffer, *parser, read_buffer.data(),
+                                                      read_buffer.size(), monitor, ec);
          if (ec == http::error::body_limit) {
             FC_THROW("HTTP response body exceeds configured maximum of {} bytes", options.max_response_body_bytes);
          }
          FC_ASSERT(!ec, "Failed to read response body: {}", ec.message());
 
-         const auto chunk_bytes = read_buffer.size() - parser->get().body().size;
          FC_ASSERT(chunk_bytes <= options.max_response_body_bytes &&
                       downloaded_bytes <= options.max_response_body_bytes - chunk_bytes,
                    "HTTP response body exceeds configured maximum of {} bytes", options.max_response_body_bytes);
