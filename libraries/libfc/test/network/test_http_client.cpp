@@ -484,6 +484,21 @@ BOOST_AUTO_TEST_CASE(oversized_fixed_length_response_is_rejected_before_write) {
    check_download_files_removed(output);
 }
 
+/// A fixed-length response that ends early must fail without retaining either output file.
+BOOST_AUTO_TEST_CASE(truncated_fixed_length_response_is_rejected_and_removed) {
+   scripted_http_server server([](tcp::socket& socket, const std::atomic_bool&) {
+      write_bytes(socket, fixed_length_header(exact_body_bytes) + "short");
+      boost::system::error_code ec;
+      socket.shutdown(tcp::socket::shutdown_send, ec);
+      socket.close(ec);
+   });
+   fc::temp_directory temp;
+   const auto output = temp.path() / "truncated-fixed.bin";
+
+   BOOST_CHECK_THROW(download(server, output, download_options(exact_body_bytes)), fc::exception);
+   check_download_files_removed(output);
+}
+
 /// A chunked response that exceeds the configured maximum is aborted and its temp file is removed.
 BOOST_AUTO_TEST_CASE(oversized_chunked_response_is_rejected_and_removed) {
    scripted_http_server server([](tcp::socket& socket, const std::atomic_bool&) {

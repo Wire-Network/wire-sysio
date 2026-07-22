@@ -288,7 +288,7 @@ The block number is encoded as a trailing path component of the URL. If the last
    This works naturally with `--delete-all-blocks` which clears state before snapshot handling.
 3. **Fetch metadata:** POST to `/v1/snapshot/latest` or `/v1/snapshot/by_block` depending on URL format.
 4. **Download snapshot:** Uses bounded `fc::http_client::post_to_file()` streaming to POST to
-   `/v1/snapshot/download`, enforce deadlines/size/disk headroom, and atomically save the response to the local
+   `/v1/snapshot/download`, enforce size and disk-headroom bounds, and atomically save the response to the local
    snapshots directory.
 5. **Root hash verification:** Uses `threaded_snapshot_reader::load_index()` to read the footer and compare the stored root hash against the advertised `root_hash`. This is a fast metadata-only check that catches download corruption. Full integrity verification (re-hashing all sections) happens during snapshot loading, and on-chain attestation verification happens after syncing.
 6. **Continue normal loading:** Sets `snapshot_path` to downloaded file and `snapshot_auto_fetched = true`. No `--genesis-json` needed — snapshot contains genesis.
