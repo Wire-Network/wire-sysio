@@ -61,7 +61,7 @@ BOOST_AUTO_TEST_CASE(chain_plugin_default_tests) {
 
 }
 
-/** Verify that every bounded snapshot-download command-line option is registered and parsed. */
+/** Verify the sole snapshot-specific resource option and removal of endpoint timeout/size knobs. */
 BOOST_AUTO_TEST_CASE(chain_plugin_snapshot_endpoint_option_registration) {
    sysio::chain::application exe({.enable_resource_monitor = false});
    sysio::chain_plugin plugin;
@@ -74,11 +74,6 @@ BOOST_AUTO_TEST_CASE(chain_plugin_snapshot_endpoint_option_registration) {
    std::array arguments{
       "test_chain_plugin",
       "--snapshot-endpoint", "http://127.0.0.1:1",
-      "--snapshot-endpoint-connect-timeout-ms", "11",
-      "--snapshot-endpoint-header-timeout-ms", "12",
-      "--snapshot-endpoint-idle-timeout-ms", "13",
-      "--snapshot-endpoint-total-timeout-ms", "14",
-      "--snapshot-endpoint-max-download-size-mb", "15",
       "--snapshot-endpoint-min-disk-free-mb", "16",
    };
    boost::program_options::variables_map variables;
@@ -88,25 +83,24 @@ BOOST_AUTO_TEST_CASE(chain_plugin_snapshot_endpoint_option_registration) {
    boost::program_options::notify(variables);
 
    BOOST_CHECK_EQUAL(variables.at("snapshot-endpoint").as<std::string>(), "http://127.0.0.1:1");
-   BOOST_CHECK_EQUAL(variables.at("snapshot-endpoint-connect-timeout-ms").as<uint64_t>(), 11);
-   BOOST_CHECK_EQUAL(variables.at("snapshot-endpoint-header-timeout-ms").as<uint64_t>(), 12);
-   BOOST_CHECK_EQUAL(variables.at("snapshot-endpoint-idle-timeout-ms").as<uint64_t>(), 13);
-   BOOST_CHECK_EQUAL(variables.at("snapshot-endpoint-total-timeout-ms").as<uint64_t>(), 14);
-   BOOST_CHECK_EQUAL(variables.at("snapshot-endpoint-max-download-size-mb").as<uint64_t>(), 15);
    BOOST_CHECK_EQUAL(variables.at("snapshot-endpoint-min-disk-free-mb").as<uint64_t>(), 16);
+
+   constexpr std::array removed_options{
+      "snapshot-endpoint-connect-timeout-ms",
+      "snapshot-endpoint-header-timeout-ms",
+      "snapshot-endpoint-idle-timeout-ms",
+      "snapshot-endpoint-total-timeout-ms",
+      "snapshot-endpoint-max-download-size-mb",
+   };
+   for (const auto* option_name : removed_options) {
+      BOOST_CHECK(options.find_nothrow(option_name, false) == nullptr);
+   }
 }
 
-/** Verify that snapshot endpoint limits reject zero and overflow-prone values before connecting. */
+/** Verify that snapshot endpoint resource limits reject zero and overflow-prone values before connecting. */
 BOOST_AUTO_TEST_CASE(chain_plugin_snapshot_endpoint_option_validation) {
    constexpr std::array invalid_options{
-      std::pair{"snapshot-endpoint-connect-timeout-ms", "0"},
-      std::pair{"snapshot-endpoint-header-timeout-ms", "0"},
-      std::pair{"snapshot-endpoint-idle-timeout-ms", "0"},
-      std::pair{"snapshot-endpoint-total-timeout-ms", "0"},
-      std::pair{"snapshot-endpoint-max-download-size-mb", "0"},
       std::pair{"snapshot-endpoint-min-disk-free-mb", "0"},
-      std::pair{"snapshot-endpoint-total-timeout-ms", "9223372036854776"},
-      std::pair{"snapshot-endpoint-max-download-size-mb", "17592186044416"},
       std::pair{"chain-state-db-size-mb", "0"},
       std::pair{"chain-state-db-size-mb", "17592186044416"},
       std::pair{"chain-state-db-guard-size-mb", "0"},

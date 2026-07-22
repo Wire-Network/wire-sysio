@@ -16,6 +16,7 @@
 #include <boost/beast/version.hpp>
 #include <boost/asio/connect.hpp>
 #include <boost/asio/ip/tcp.hpp>
+#include <boost/asio/steady_timer.hpp>
 #include <boost/asio/system_timer.hpp>
 #include <boost/asio/local/stream_protocol.hpp>
 
@@ -32,6 +33,8 @@ constexpr size_t download_parser_buffer_bytes = 64 * 1024;
 constexpr uint64_t disk_space_check_interval_bytes = 64 * 1024 * 1024;
 constexpr uint64_t disk_space_concurrency_margin_bytes = 64 * 1024 * 1024;
 constexpr auto disk_space_check_interval = std::chrono::seconds(5);
+constexpr auto operation_monitor_interval = std::chrono::milliseconds(100);
+constexpr auto download_status_interval = std::chrono::seconds(5);
 
 } // namespace
 
@@ -52,6 +55,7 @@ public:
    using unix_url_split_map = std::map<std::string, fc::url>;
    using error_code = boost::system::error_code;
    using deadline_type = std::chrono::system_clock::time_point;
+   using operation_monitor = std::function<void()>;
 
    http_client_impl()
    :_ioc()
@@ -63,121 +67,175 @@ public:
 
    void set_verify_peers(bool enabled) {}
 
+   void set_cancel_check(std::function<bool()> cancel_check) {
+      _cancel_check = std::move(cancel_check);
+   }
+
+   /** Return whether the caller requested cancellation of the active HTTP operation. */
+   bool is_cancelled() const {
+      return _cancel_check && _cancel_check();
+   }
+
    template<typename SyncReadStream, typename Fn, typename CancelFn>
-   error_code sync_do_with_deadline( SyncReadStream& s, deadline_type deadline, Fn f, CancelFn cf ) {
-      bool timer_expired = false;
-      boost::asio::system_timer timer(_ioc);
+   error_code sync_do_with_deadline_impl(SyncReadStream& s, deadline_type deadline, Fn f, CancelFn cf,
+                                         const operation_monitor& monitor = {}) {
+      if (is_cancelled()) {
+         return boost::asio::error::operation_aborted;
+      }
 
-      timer.expires_at(deadline);
-      bool timer_cancelled = false;
-      timer.async_wait([&timer_expired, &timer_cancelled] (const error_code&) {
-         // the only non-success error_code this is called with is operation_aborted but since
-         // we could have queued "success" when we cancelled the timer, we set a flag at the
-         // safer scope and only respect that.
-         if (!timer_cancelled) {
-            timer_expired = true;
-         }
-      });
+      const bool has_deadline = deadline != deadline_type::max();
+      bool deadline_expired = false;
+      bool deadline_cancelled = false;
+      boost::asio::system_timer deadline_timer(_ioc);
+      if (has_deadline) {
+         deadline_timer.expires_at(deadline);
+         deadline_timer.async_wait([&deadline_expired, &deadline_cancelled](const error_code&) {
+            // The only non-success error_code expected here is operation_aborted. A success
+            // completion may already be queued when cancellation occurs, so use the explicit
+            // flag to decide whether the deadline still applies.
+            if (!deadline_cancelled) {
+               deadline_expired = true;
+            }
+         });
+      }
 
+      bool operation_cancelled = false;
+      boost::asio::steady_timer monitor_timer(_ioc);
       std::optional<error_code> f_result;
+      std::function<void()> arm_monitor;
+      if (_cancel_check || monitor) {
+         arm_monitor = [&]() {
+            monitor_timer.expires_after(operation_monitor_interval);
+            monitor_timer.async_wait([&](const error_code& ec) {
+               if (ec == boost::asio::error::operation_aborted || f_result) {
+                  return;
+               }
+               if (is_cancelled()) {
+                  operation_cancelled = true;
+                  cf();
+                  return;
+               }
+               if (monitor) {
+                  monitor();
+               }
+               arm_monitor();
+            });
+         };
+         arm_monitor();
+      }
+
       f(f_result);
 
       _ioc.restart();
-      while (_ioc.run_one())
-      {
+      while (_ioc.run_one()) {
          if (f_result) {
-            timer_cancelled = true;
-            timer.cancel();
-         } else if (timer_expired) {
+            deadline_cancelled = true;
+            if (has_deadline) {
+               deadline_timer.cancel();
+            }
+            monitor_timer.cancel();
+         } else if (deadline_expired) {
             cf();
          }
       }
 
-      if (!timer_expired) {
-         return *f_result;
-      } else {
+      if (operation_cancelled) {
+         return boost::asio::error::operation_aborted;
+      }
+      if (deadline_expired) {
          return error_code(boost::system::errc::timed_out, boost::system::system_category());
       }
+      return *f_result;
    }
 
    template<typename SyncReadStream, typename Fn>
-   error_code sync_do_with_deadline( SyncReadStream& s, deadline_type deadline, Fn f) {
-      return sync_do_with_deadline(s, deadline, f, [&s](){
-         s.lowest_layer().cancel();
-      });
-   };
+   error_code sync_do_with_deadline(SyncReadStream& s, deadline_type deadline, Fn f,
+                                    const operation_monitor& monitor = {}) {
+      return sync_do_with_deadline_impl(s, deadline, f, [&s]() {
+         error_code ec;
+         s.lowest_layer().cancel(ec);
+      }, monitor);
+   }
 
    template<typename SyncReadStream>
-   error_code sync_connect_with_timeout( SyncReadStream& s, const std::string& host, const std::string& port,  const deadline_type& deadline ) {
+   error_code sync_connect_with_timeout(SyncReadStream& s, const std::string& host, const std::string& port,
+                                        const deadline_type& deadline, const operation_monitor& monitor = {}) {
       tcp::resolver local_resolver(_ioc);
       bool cancelled = false;
 
-      auto res = sync_do_with_deadline(s, deadline, [&local_resolver, &cancelled, &s, &host, &port](std::optional<error_code>& final_ec){
-         local_resolver.async_resolve(host, port, [&cancelled, &s, &final_ec](const error_code& ec, tcp::resolver::results_type resolved ){
-            if (ec) {
-               final_ec.emplace(ec);
-               return;
-            }
+      auto res = sync_do_with_deadline_impl(
+         s, deadline,
+         [&local_resolver, &cancelled, &s, &host, &port](std::optional<error_code>& final_ec) {
+            local_resolver.async_resolve(
+               host, port,
+               [&cancelled, &s, &final_ec](const error_code& ec, tcp::resolver::results_type resolved) {
+                  if (ec) {
+                     final_ec.emplace(ec);
+                     return;
+                  }
 
-            if (!cancelled) {
-               boost::asio::async_connect(s, resolved.begin(), resolved.end(), [&final_ec](const error_code& ec, auto ){
-                  final_ec.emplace(ec);
+                  if (!cancelled) {
+                     boost::asio::async_connect(
+                        s, resolved.begin(), resolved.end(),
+                        [&final_ec](const error_code& ec, auto) { final_ec.emplace(ec); });
+                  }
                });
-            }
-         });
-      },[&local_resolver, &cancelled](){
-         cancelled = true;
-         local_resolver.cancel();
-      });
+         },
+         [&local_resolver, &cancelled, &s]() {
+            cancelled = true;
+            local_resolver.cancel();
+            error_code ec;
+            s.lowest_layer().cancel(ec);
+         },
+         monitor);
 
       return res;
    };
 
    template<typename SyncReadStream>
-   error_code sync_write_with_timeout(SyncReadStream& s, http::request<http::string_body>& req, const deadline_type& deadline ) {
+   error_code sync_write_with_timeout(SyncReadStream& s, http::request<http::string_body>& req,
+                                      const deadline_type& deadline, const operation_monitor& monitor = {}) {
       return sync_do_with_deadline(s, deadline, [&s, &req](std::optional<error_code>& final_ec){
          http::async_write(s, req, [&final_ec]( const error_code& ec, std::size_t ) {
             final_ec.emplace(ec);
          });
-      });
+      }, monitor);
    }
 
    template<typename SyncReadStream>
-   error_code sync_read_with_timeout(SyncReadStream& s, boost::beast::flat_buffer& buffer, http::response<http::string_body>& res, const deadline_type& deadline ) {
+   error_code sync_read_with_timeout(SyncReadStream& s, boost::beast::flat_buffer& buffer,
+                                     http::response<http::string_body>& res, const deadline_type& deadline,
+                                     const operation_monitor& monitor = {}) {
       return sync_do_with_deadline(s, deadline, [&s, &buffer, &res](std::optional<error_code>& final_ec){
          http::async_read(s, buffer, res, [&final_ec]( const error_code& ec, std::size_t ) {
             final_ec.emplace(ec);
          });
-      });
+      }, monitor);
    }
 
    /// Read only the response header into @p parser, honoring @p deadline. Used by the
    /// streaming download path to inspect the status line before committing the body to a file.
    template<typename SyncReadStream, typename Parser>
-   error_code sync_read_header_with_timeout(SyncReadStream& s, boost::beast::flat_buffer& buffer, Parser& parser, const deadline_type& deadline ) {
+   error_code sync_read_header_with_timeout(SyncReadStream& s, boost::beast::flat_buffer& buffer, Parser& parser,
+                                            const deadline_type& deadline,
+                                            const operation_monitor& monitor = {}) {
       return sync_do_with_deadline(s, deadline, [&s, &buffer, &parser](std::optional<error_code>& final_ec){
          http::async_read_header(s, buffer, parser, [&final_ec]( const error_code& ec, std::size_t ) {
             final_ec.emplace(ec);
          });
-      });
+      }, monitor);
    }
 
    /// Read one increment of a streaming response body into @p parser, honoring @p deadline.
    template<typename SyncReadStream, typename Parser>
    error_code sync_read_parser_some_with_timeout(SyncReadStream& s, boost::beast::flat_buffer& buffer,
-                                                 Parser& parser, const deadline_type& deadline) {
+                                                 Parser& parser, const deadline_type& deadline,
+                                                 const operation_monitor& monitor = {}) {
       return sync_do_with_deadline(s, deadline, [&s, &buffer, &parser](std::optional<error_code>& final_ec) {
          http::async_read_some(s, buffer, parser, [&final_ec](const error_code& ec, std::size_t) {
             final_ec.emplace(ec);
          });
-      });
-   }
-
-   /// Return the earlier of the total deadline and a relative phase timeout from now.
-   static deadline_type phase_deadline(const fc::microseconds& timeout, const deadline_type& total_deadline) {
-      auto deadline = fc::time_point::now();
-      deadline.safe_add(timeout);
-      return std::min(deadline.to_system_clock(), total_deadline);
+      }, monitor);
    }
 
    /// Return whether @p ec can indicate that a cached peer connection closed before reuse.
@@ -266,11 +324,13 @@ public:
       return res.first;
    }
 
-   connection_map::iterator create_raw_connection( const url& dest, const deadline_type& deadline ) {
+   connection_map::iterator create_raw_connection(const url& dest, const deadline_type& deadline,
+                                                  const operation_monitor& monitor = {}) {
       auto key = url_to_host_key(dest);
       auto socket = std::make_unique<tcp::socket>(_ioc);
 
-      error_code ec = sync_connect_with_timeout(*socket, *dest.host(), dest.port() ? std::to_string(*dest.port()) : "80", deadline);
+      error_code ec = sync_connect_with_timeout(
+         *socket, *dest.host(), dest.port() ? std::to_string(*dest.port()) : "80", deadline, monitor);
       FC_ASSERT(!ec, "Failed to connect: {}", ec.message());
 
       auto res = _connections.emplace(std::piecewise_construct,
@@ -280,9 +340,10 @@ public:
       return res.first;
    }
 
-   connection_map::iterator create_connection( const url& dest, const deadline_type& deadline ) {
+   connection_map::iterator create_connection(const url& dest, const deadline_type& deadline,
+                                              const operation_monitor& monitor = {}) {
       if (dest.proto() == "http") {
-         return create_raw_connection(dest, deadline);
+         return create_raw_connection(dest, deadline, monitor);
       } else if (dest.proto() == "unix") {
          return create_unix_connection(dest, deadline);
       } else {
@@ -310,14 +371,15 @@ public:
    }
 
    connection_map::iterator get_connection(const url& dest, const deadline_type& deadline,
-                                           bool* reused_connection = nullptr) {
+                                           bool* reused_connection = nullptr,
+                                           const operation_monitor& monitor = {}) {
       auto key = url_to_host_key(dest);
       auto conn_itr = _connections.find(key);
       if (conn_itr == _connections.end() || check_closed(conn_itr)) {
          if (reused_connection) {
             *reused_connection = false;
          }
-         return create_connection(dest, deadline);
+         return create_connection(dest, deadline, monitor);
       } else {
          if (reused_connection) {
             *reused_connection = true;
@@ -327,39 +389,46 @@ public:
    }
 
    struct write_request_visitor : visitor<error_code> {
-      write_request_visitor(http_client_impl* that, http::request<http::string_body>& req, const deadline_type& deadline)
+      write_request_visitor(http_client_impl* that, http::request<http::string_body>& req,
+                            const deadline_type& deadline, const operation_monitor& monitor = {})
       :that(that)
       ,req(req)
       ,deadline(deadline)
+      ,monitor(monitor)
       {}
 
       template<typename S>
       error_code operator() ( S& stream ) const {
-         return that->sync_write_with_timeout(*stream, req, deadline);
+         return that->sync_write_with_timeout(*stream, req, deadline, monitor);
       }
 
       http_client_impl*                 that;
       http::request<http::string_body>& req;
       const deadline_type&              deadline;
+      operation_monitor                 monitor;
    };
 
    struct read_response_visitor : visitor<error_code> {
-      read_response_visitor(http_client_impl* that, boost::beast::flat_buffer& buffer, http::response<http::string_body>& res, const deadline_type& deadline)
+      read_response_visitor(http_client_impl* that, boost::beast::flat_buffer& buffer,
+                            http::response<http::string_body>& res, const deadline_type& deadline,
+                            const operation_monitor& monitor = {})
       :that(that)
       ,buffer(buffer)
       ,res(res)
       ,deadline(deadline)
+      ,monitor(monitor)
       {}
 
       template<typename S>
       error_code operator() ( S& stream ) const {
-         return that->sync_read_with_timeout(*stream, buffer, res, deadline);
+         return that->sync_read_with_timeout(*stream, buffer, res, deadline, monitor);
       }
 
       http_client_impl*                  that;
       boost::beast::flat_buffer&         buffer;
       http::response<http::string_body>& res;
       const deadline_type&               deadline;
+      operation_monitor                  monitor;
    };
 
    variant post_sync(const url& dest, const variant& payload, const fc::time_point& _deadline) {
@@ -481,8 +550,7 @@ public:
    }
 
    void post_to_file(const url& dest, const variant& payload, const std::filesystem::path& final_dest,
-                     const http_file_download_options& options, const fc::time_point& total_deadline_time) {
-      const auto total_deadline = total_deadline_time.to_system_clock();
+                     const http_file_download_options& options) {
       FC_ASSERT(dest.host(), "No host set on URL");
 
       std::string path = dest.path() ? dest.path()->generic_string() : "/";
@@ -504,12 +572,44 @@ public:
       req.set(http::field::user_agent, BOOST_BEAST_VERSION_STRING);
       req.set(http::field::content_type, "application/json");
       req.keep_alive(false);
-      req.body() = json::to_string(payload, total_deadline_time);
+      req.body() = json::to_string(payload, fc::time_point::maximum());
       req.prepare_payload();
 
+      const auto request_started = std::chrono::steady_clock::now();
+      auto next_status_report = request_started;
+      auto download_phase = http_file_download_phase::connecting;
+      uint64_t downloaded_bytes = 0;
+      std::optional<uint64_t> response_body_bytes;
+      auto report_status = [&](bool force) {
+         if (!options.status_callback) {
+            return;
+         }
+         const auto now = std::chrono::steady_clock::now();
+         if (!force && now < next_status_report) {
+            return;
+         }
+         const auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(now - request_started);
+         options.status_callback(http_file_download_status{
+            .phase = download_phase,
+            .downloaded_bytes = downloaded_bytes,
+            .total_bytes = response_body_bytes,
+            .elapsed = fc::microseconds(elapsed.count()),
+         });
+         next_status_report = now + download_status_interval;
+      };
+      auto transition_to = [&](http_file_download_phase phase) {
+         download_phase = phase;
+         report_status(true);
+      };
+      operation_monitor monitor;
+      if (options.status_callback) {
+         monitor = [&]() { report_status(false); };
+      }
+      const auto no_deadline = deadline_type::max();
+
       bool reused_connection = false;
-      auto conn_iter = get_connection(
-         dest, phase_deadline(options.connect_timeout, total_deadline), &reused_connection);
+      transition_to(http_file_download_phase::connecting);
+      auto conn_iter = get_connection(dest, no_deadline, &reused_connection, monitor);
       const auto connection_key = url_to_host_key(dest);
       auto eraser = make_scoped_exit([this, connection_key](){
          _connections.erase(connection_key);
@@ -520,15 +620,15 @@ public:
       error_code ec;
       bool retried_stale_connection = false;
       while (true) {
+         transition_to(http_file_download_phase::sending_request);
          ec = std::visit(
-            write_request_visitor(this, req, phase_deadline(options.response_header_timeout, total_deadline)),
-            conn_iter->second);
+            write_request_visitor(this, req, no_deadline, monitor), conn_iter->second);
          if (ec) {
             if (options.retry_failed_reused_connection && reused_connection && !retried_stale_connection &&
                 is_stale_connection_error(ec)) {
                _connections.erase(conn_iter);
-               conn_iter = get_connection(
-                  dest, phase_deadline(options.connect_timeout, total_deadline), &reused_connection);
+               transition_to(http_file_download_phase::connecting);
+               conn_iter = get_connection(dest, no_deadline, &reused_connection, monitor);
                retried_stale_connection = true;
                continue;
             }
@@ -536,14 +636,14 @@ public:
          }
 
          // Parse into a bounded caller-owned buffer so every write can enforce the byte ceiling,
-         // idle deadline, and filesystem headroom before bytes reach disk.
+         // cancellation checks, and filesystem headroom before bytes reach disk.
          buffer = std::make_unique<boost::beast::flat_buffer>(download_parser_buffer_bytes);
          parser = std::make_unique<http::response_parser<http::buffer_body>>();
          parser->body_limit(options.max_response_body_bytes);
 
+         transition_to(http_file_download_phase::waiting_for_response);
          ec = std::visit([&](auto& stream) {
-            return sync_read_header_with_timeout(
-               *stream, *buffer, *parser, phase_deadline(options.response_header_timeout, total_deadline));
+            return sync_read_header_with_timeout(*stream, *buffer, *parser, no_deadline, monitor);
          }, conn_iter->second);
          if (!ec) {
             break;
@@ -554,8 +654,8 @@ public:
          if (options.retry_failed_reused_connection && reused_connection && !retried_stale_connection &&
              is_stale_connection_error(ec)) {
             _connections.erase(conn_iter);
-            conn_iter = get_connection(
-               dest, phase_deadline(options.connect_timeout, total_deadline), &reused_connection);
+            transition_to(http_file_download_phase::connecting);
+            conn_iter = get_connection(dest, no_deadline, &reused_connection, monitor);
             retried_stale_connection = true;
             continue;
          }
@@ -571,6 +671,9 @@ public:
       }
 
       const auto content_length = parser->content_length();
+      if (content_length) {
+         response_body_bytes = *content_length;
+      }
       uint64_t disk_space_write_budget = 0;
       if (content_length) {
          FC_ASSERT(*content_length <= options.max_response_body_bytes,
@@ -602,13 +705,12 @@ public:
       FC_ASSERT(file.is_open(), "Failed to open temp file {} for writing", temp_path.string());
 
       std::vector<char> read_buffer(download_read_buffer_bytes);
-      uint64_t downloaded_bytes = 0;
-      auto idle_deadline = phase_deadline(options.idle_read_timeout, total_deadline);
+      transition_to(http_file_download_phase::downloading);
       while (!parser->is_done()) {
          parser->get().body().data = read_buffer.data();
          parser->get().body().size = read_buffer.size();
          ec = std::visit([&](auto& stream) {
-            return sync_read_parser_some_with_timeout(*stream, *buffer, *parser, idle_deadline);
+            return sync_read_parser_some_with_timeout(*stream, *buffer, *parser, no_deadline, monitor);
          }, conn_iter->second);
          if (ec == http::error::need_buffer) {
             ec = {};
@@ -623,6 +725,7 @@ public:
                       downloaded_bytes <= options.max_response_body_bytes - chunk_bytes,
                    "HTTP response body exceeds configured maximum of {} bytes", options.max_response_body_bytes);
          if (chunk_bytes == 0) {
+            report_status(false);
             continue;
          }
 
@@ -640,9 +743,10 @@ public:
          FC_ASSERT(file.good(), "Failed to write {} bytes to temp file {}", chunk_bytes, temp_path.string());
          downloaded_bytes += chunk_bytes;
          disk_space_write_budget -= chunk_bytes;
-         idle_deadline = phase_deadline(options.idle_read_timeout, total_deadline);
+         report_status(false);
       }
 
+      FC_ASSERT(!is_cancelled(), "HTTP file download cancelled");
       file.close();
       FC_ASSERT(file.good(), "Failed to close temp file {} after HTTP download", temp_path.string());
 
@@ -650,18 +754,13 @@ public:
       std::filesystem::rename(temp_path, final_dest, rename_ec);
       FC_ASSERT(!rename_ec, "Failed to rename downloaded file: {}", rename_ec.message());
       cleanup.cancel();
-   }
-
-   void post_to_file(const url& dest, const variant& payload, const std::filesystem::path& final_dest,
-                     const http_file_download_options& options) {
-      auto total_deadline = fc::time_point::now();
-      total_deadline.safe_add(options.total_timeout);
-      post_to_file(dest, payload, final_dest, options, total_deadline);
+      transition_to(http_file_download_phase::complete);
    }
 
    boost::asio::io_context  _ioc;
    connection_map           _connections;
    unix_url_split_map       _unix_url_paths;
+   std::function<bool()>     _cancel_check;
 };
 
 
@@ -674,6 +773,10 @@ http_client::http_client()
 void http_client::post_to_file(const url& dest, const variant& payload, const std::filesystem::path& output,
                                const http_file_download_options& options) {
    _my->post_to_file(dest, payload, output, options);
+}
+
+void http_client::set_cancel_check(std::function<bool()> cancel_check) {
+   _my->set_cancel_check(std::move(cancel_check));
 }
 
 variant http_client::post_sync(const url& dest, const variant& payload, const fc::time_point& deadline) {

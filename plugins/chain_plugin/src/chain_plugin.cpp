@@ -37,8 +37,12 @@
 #include <fc/network/http/http_client.hpp>
 #include <fc/network/url.hpp>
 #include <fc/crypto/hex.hpp>
+#include <magic_enum/magic_enum.hpp>
+
+#include <cmath>
 #include <cstdlib>
 #include <limits>
+#include <optional>
 #include <string_view>
 
 
@@ -65,28 +69,9 @@ namespace snapshot_attest {
 /// provider snapshot interval (_snapshot_provider_block_spacing).
 constexpr uint32_t snapshot_attestation_grace_blocks = 12500;
 
-constexpr std::string_view snapshot_connect_timeout_option = "snapshot-endpoint-connect-timeout-ms";
-constexpr std::string_view snapshot_header_timeout_option = "snapshot-endpoint-header-timeout-ms";
-constexpr std::string_view snapshot_idle_timeout_option = "snapshot-endpoint-idle-timeout-ms";
-constexpr std::string_view snapshot_total_timeout_option = "snapshot-endpoint-total-timeout-ms";
-constexpr std::string_view snapshot_max_download_size_option = "snapshot-endpoint-max-download-size-mb";
 constexpr std::string_view snapshot_min_disk_free_option = "snapshot-endpoint-min-disk-free-mb";
 
-constexpr uint64_t default_snapshot_connect_timeout_ms = 10'000;
-constexpr uint64_t default_snapshot_header_timeout_ms = 30'000;
-constexpr uint64_t default_snapshot_idle_timeout_ms = 60'000;
-constexpr uint64_t default_snapshot_total_timeout_ms = 24 * 60 * 60 * 1000;
 constexpr uint64_t bytes_per_mebibyte = 1024 * 1024;
-
-/// Read a positive millisecond option and convert it without overflowing fc::microseconds.
-fc::microseconds checked_milliseconds(const boost::program_options::variables_map& options,
-                                      std::string_view option_name) {
-   const auto value = options.at(std::string(option_name)).as<uint64_t>();
-   constexpr auto max_milliseconds = static_cast<uint64_t>(std::numeric_limits<int64_t>::max() / 1000);
-   SYS_ASSERT(value > 0 && value <= max_milliseconds, sysio::chain::plugin_config_exception,
-              "{} must be between 1 and {} milliseconds", option_name, max_milliseconds);
-   return fc::milliseconds(static_cast<int64_t>(value));
-}
 
 /// Convert a positive MiB option value to bytes without overflowing uint64_t.
 uint64_t checked_mebibytes(uint64_t value, std::string_view option_name) {
@@ -95,6 +80,87 @@ uint64_t checked_mebibytes(uint64_t value, std::string_view option_name) {
               "{} must be between 1 and {} MiB", option_name, max_mebibytes);
    return value * bytes_per_mebibyte;
 }
+
+/** Log attended snapshot-bootstrap phase changes, transfer rate, percentage, and ETA. */
+class snapshot_download_progress_logger {
+public:
+   /** Consume one transport status event. */
+   void operator()(const fc::http_file_download_status& status) {
+      const auto elapsed_seconds = static_cast<double>(status.elapsed.count()) / microseconds_per_second;
+      if (status.phase != fc::http_file_download_phase::downloading &&
+          status.phase != fc::http_file_download_phase::complete) {
+         ilog("Snapshot download phase: {} (elapsed {:.1f}s; press Ctrl+C to cancel)",
+              magic_enum::enum_name(status.phase), elapsed_seconds);
+         return;
+      }
+
+      if (!_body_started_at) {
+         _body_started_at = status.elapsed;
+         _previous_status_at = status.elapsed;
+         _previous_downloaded_bytes = status.downloaded_bytes;
+      }
+
+      const auto body_elapsed = status.elapsed - *_body_started_at;
+      if (status.phase == fc::http_file_download_phase::complete) {
+         const auto average_rate = rate_bytes_per_second(status.downloaded_bytes, body_elapsed);
+         ilog("Snapshot download complete: {} bytes ({:.2f} MiB) in {:.1f}s, average {:.2f} MiB/s",
+              status.downloaded_bytes, to_mebibytes(status.downloaded_bytes),
+              static_cast<double>(body_elapsed.count()) / microseconds_per_second,
+              to_mebibytes(average_rate));
+         return;
+      }
+
+      const auto interval = status.elapsed - _previous_status_at;
+      const auto interval_bytes = status.downloaded_bytes - _previous_downloaded_bytes;
+      const auto current_rate = rate_bytes_per_second(interval_bytes, interval);
+      _previous_status_at = status.elapsed;
+      _previous_downloaded_bytes = status.downloaded_bytes;
+
+      if (!status.total_bytes) {
+         ilog("Downloaded {} bytes ({:.2f} MiB) at {:.2f} MiB/s; response size and ETA unavailable",
+              status.downloaded_bytes, to_mebibytes(status.downloaded_bytes), to_mebibytes(current_rate));
+         return;
+      }
+
+      const auto total_bytes = *status.total_bytes;
+      const auto percentage = total_bytes == 0
+                                 ? 100.0
+                                 : 100.0 * static_cast<double>(status.downloaded_bytes) /
+                                      static_cast<double>(total_bytes);
+      if (current_rate == 0 || status.downloaded_bytes >= total_bytes) {
+         ilog("Downloaded {} / {} bytes ({:.1f}%) at {:.2f} MiB/s; ETA unavailable",
+              status.downloaded_bytes, total_bytes, percentage, to_mebibytes(current_rate));
+         return;
+      }
+
+      const auto remaining_bytes = total_bytes - status.downloaded_bytes;
+      const auto eta_seconds = static_cast<uint64_t>(
+         std::ceil(static_cast<double>(remaining_bytes) / static_cast<double>(current_rate)));
+      ilog("Downloaded {} / {} bytes ({:.1f}%) at {:.2f} MiB/s, ETA {}s",
+           status.downloaded_bytes, total_bytes, percentage, to_mebibytes(current_rate), eta_seconds);
+   }
+
+private:
+   static constexpr double microseconds_per_second = 1'000'000.0;
+
+   /** Convert a byte count to MiB for operator-facing logs. */
+   static double to_mebibytes(uint64_t bytes) {
+      return static_cast<double>(bytes) / static_cast<double>(bytes_per_mebibyte);
+   }
+
+   /** Calculate whole bytes per second without overflowing intermediate integer arithmetic. */
+   static uint64_t rate_bytes_per_second(uint64_t bytes, const fc::microseconds& elapsed) {
+      if (bytes == 0 || elapsed.count() <= 0) {
+         return 0;
+      }
+      return static_cast<uint64_t>(
+         static_cast<double>(bytes) * microseconds_per_second / static_cast<double>(elapsed.count()));
+   }
+
+   std::optional<fc::microseconds> _body_started_at;
+   fc::microseconds _previous_status_at;
+   uint64_t _previous_downloaded_bytes = 0;
+};
 
 } // anonymous namespace
 
@@ -512,20 +578,6 @@ void chain_plugin::set_program_options(options_description& cli, options_descrip
           "  http://host:port          - fetches latest snapshot\n"
           "  http://host:port/50000    - fetches snapshot at block 50000\n"
           "Requires empty database (use --delete-all-blocks to clear existing data).")
-         (snapshot_connect_timeout_option.data(),
-          bpo::value<uint64_t>()->default_value(default_snapshot_connect_timeout_ms),
-          "Maximum time in milliseconds to establish the snapshot download connection.")
-         (snapshot_header_timeout_option.data(),
-          bpo::value<uint64_t>()->default_value(default_snapshot_header_timeout_ms),
-          "Maximum time in milliseconds for each snapshot request-write and response-header phase.")
-         (snapshot_idle_timeout_option.data(),
-          bpo::value<uint64_t>()->default_value(default_snapshot_idle_timeout_ms),
-          "Maximum time in milliseconds without snapshot response-body progress.")
-         (snapshot_total_timeout_option.data(),
-          bpo::value<uint64_t>()->default_value(default_snapshot_total_timeout_ms),
-          "Maximum total time in milliseconds for the snapshot file download.")
-         (snapshot_max_download_size_option.data(), bpo::value<uint64_t>(),
-          "Maximum snapshot response size in MiB. Defaults to chain-state-db-size-mb.")
          (snapshot_min_disk_free_option.data(), bpo::value<uint64_t>(),
           "Free disk space in MiB that must remain during download. Defaults to chain-state-db-guard-size-mb.")
          ;
@@ -933,13 +985,8 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
          SYS_ASSERT(!options.contains("snapshot"), plugin_config_exception,
                     "--snapshot-endpoint is incompatible with --snapshot; use one or the other");
 
-         const std::string max_download_size_option_name{snapshot_max_download_size_option};
-         const bool has_max_download_size = options.contains(max_download_size_option_name);
          const auto max_download_bytes = checked_mebibytes(
-            has_max_download_size
-               ? options.at(max_download_size_option_name).as<uint64_t>()
-               : options.at("chain-state-db-size-mb").as<uint64_t>(),
-            has_max_download_size ? snapshot_max_download_size_option : std::string_view{"chain-state-db-size-mb"});
+            options.at("chain-state-db-size-mb").as<uint64_t>(), "chain-state-db-size-mb");
          const std::string min_disk_free_option_name{snapshot_min_disk_free_option};
          const bool has_min_disk_free = options.contains(min_disk_free_option_name);
          const auto min_free_disk_bytes = checked_mebibytes(
@@ -948,15 +995,20 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
                : options.at("chain-state-db-guard-size-mb").as<uint64_t>(),
             has_min_disk_free ? snapshot_min_disk_free_option : std::string_view{"chain-state-db-guard-size-mb"});
          const fc::http_file_download_options download_options{
-            .connect_timeout = checked_milliseconds(options, snapshot_connect_timeout_option),
-            .response_header_timeout = checked_milliseconds(options, snapshot_header_timeout_option),
-            .idle_read_timeout = checked_milliseconds(options, snapshot_idle_timeout_option),
-            .total_timeout = checked_milliseconds(options, snapshot_total_timeout_option),
             .max_response_body_bytes = max_download_bytes,
             .min_free_disk_space_bytes = min_free_disk_bytes,
             .retry_failed_reused_connection = true,
+            .status_callback = [logger = snapshot_download_progress_logger{}](
+                                  const fc::http_file_download_status& status) mutable { logger(status); },
          };
-         fetch_snapshot_from_endpoint(options.at("snapshot-endpoint").as<std::string>(), download_options);
+         try {
+            fetch_snapshot_from_endpoint(options.at("snapshot-endpoint").as<std::string>(), download_options);
+         } catch (...) {
+            if (app().is_quiting()) {
+               SYS_THROW(chain::interrupt_exception, "Snapshot endpoint bootstrap interrupted");
+            }
+            throw;
+         }
       }
 
       std::optional<chain_id_type> chain_id;
@@ -1621,19 +1673,16 @@ void chain_plugin_impl::fetch_snapshot_from_endpoint(
    ilog("Fetching snapshot metadata from endpoint: {}", endpoint_url);
 
    fc::http_client http_client;
-   auto metadata_deadline = fc::time_point::now();
-   metadata_deadline.safe_add(download_options.connect_timeout);
-   metadata_deadline.safe_add(download_options.response_header_timeout);
+   http_client.set_cancel_check([]() { return app().is_quiting(); });
    fc::variant metadata_response;
    if (request_block_num) {
       auto url = fc::url(base_url + "/v1/snapshot/by_block");
       fc::mutable_variant_object payload;
       payload("block_num", *request_block_num);
-      metadata_response = http_client.post_sync(url, fc::variant(payload), metadata_deadline);
+      metadata_response = http_client.post_sync(url, fc::variant(payload));
    } else {
       auto url = fc::url(base_url + "/v1/snapshot/latest");
-      metadata_response = http_client.post_sync(
-         url, fc::variant(fc::mutable_variant_object()), metadata_deadline);
+      metadata_response = http_client.post_sync(url, fc::variant(fc::mutable_variant_object()));
    }
 
    auto snap_block_num = metadata_response["block_num"].as<uint32_t>();

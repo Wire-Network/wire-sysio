@@ -453,15 +453,9 @@ try:
     endpointUrl = node0.endpointHttp
     Print(f"Restart bootstrap node with --snapshot-endpoint {endpointUrl}")
 
-    # Exercise the bounded-download CLI options with a finite cap just above the
-    # snapshot being bootstrapped and a small deterministic test headroom.
-    snap2FileSize = os.path.getsize(node0.getLatestSnapshot())
-    bytesPerMiB = 1024 * 1024
-    downloadLimitMiB = (snap2FileSize + bytesPerMiB - 1) // bytesPerMiB + 1
-    downloadLimits = (
-        f"--snapshot-endpoint-max-download-size-mb {downloadLimitMiB} "
-        "--snapshot-endpoint-min-disk-free-mb 1"
-    )
+    # Exercise the snapshot-specific disk-headroom override. Download size is
+    # bounded by the existing chain-state-db-size-mb setting.
+    downloadLimits = "--snapshot-endpoint-min-disk-free-mb 1"
 
     # Fetches latest snapshot (snap2). The attestation is NOT in the snapshot —
     # it's in blocks after snap2BlockNum. The bootstrap node syncs forward and

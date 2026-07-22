@@ -22,6 +22,7 @@
 #include <string_view>
 #include <thread>
 #include <utility>
+#include <vector>
 
 using namespace std::chrono_literals;
 
@@ -29,10 +30,9 @@ namespace {
 
 using tcp = boost::asio::ip::tcp;
 
-constexpr int64_t short_timeout_ms = 100;
 constexpr int64_t normal_timeout_ms = 2'000;
+constexpr int64_t cancellation_delay_ms = 100;
 constexpr int64_t max_test_elapsed_ms = 1'500;
-constexpr int64_t framing_delay_ms = 70;
 constexpr size_t exact_body_bytes = 8;
 constexpr size_t blocked_request_body_bytes = 16 * 1024 * 1024;
 constexpr size_t disk_space_budget_bytes = 64 * 1024 * 1024;
@@ -198,10 +198,6 @@ bool write_chunked_body(tcp::socket& socket, uint64_t body_bytes) {
 /** Return finite test limits with a caller-selected response-body maximum. */
 fc::http_file_download_options download_options(uint64_t max_body_bytes) {
    return fc::http_file_download_options{
-      .connect_timeout = fc::milliseconds(normal_timeout_ms),
-      .response_header_timeout = fc::milliseconds(normal_timeout_ms),
-      .idle_read_timeout = fc::milliseconds(normal_timeout_ms),
-      .total_timeout = fc::milliseconds(normal_timeout_ms),
       .max_response_body_bytes = max_body_bytes,
       .min_free_disk_space_bytes = 1,
       .retry_failed_reused_connection = false,
@@ -215,10 +211,41 @@ fc::url server_url(const scripted_http_server& server) {
 
 /** Invoke a bounded empty-payload download into @p output. */
 void download(const scripted_http_server& server, const std::filesystem::path& output,
-              const fc::http_file_download_options& options) {
+              const fc::http_file_download_options& options,
+              std::function<bool()> cancel_check = {}) {
    fc::http_client client;
+   client.set_cancel_check(std::move(cancel_check));
    client.post_to_file(server_url(server), fc::variant(fc::mutable_variant_object()), output, options);
 }
+
+/** Request cancellation after a short deterministic delay. */
+class delayed_cancellation {
+public:
+   delayed_cancellation()
+      : _worker([this]() {
+           std::this_thread::sleep_for(std::chrono::milliseconds(cancellation_delay_ms));
+           _requested = true;
+        }) {}
+
+   delayed_cancellation(const delayed_cancellation&) = delete;
+   delayed_cancellation& operator=(const delayed_cancellation&) = delete;
+
+   /** Join the worker that publishes the cancellation request. */
+   ~delayed_cancellation() {
+      if (_worker.joinable()) {
+         _worker.join();
+      }
+   }
+
+   /** Return a predicate suitable for http_client::set_cancel_check(). */
+   std::function<bool()> check() {
+      return [this]() { return _requested.load(); };
+   }
+
+private:
+   std::atomic_bool _requested{false};
+   std::thread _worker;
+};
 
 /** Return the temporary sibling used while @p output is being downloaded. */
 std::filesystem::path partial_path(const std::filesystem::path& output) {
@@ -243,23 +270,26 @@ std::string read_file(const std::filesystem::path& path) {
 
 BOOST_AUTO_TEST_SUITE(http_client_file_download_tests)
 
-/// A peer that accepts but does not read the request must hit the request-write phase deadline.
-BOOST_AUTO_TEST_CASE(request_write_timeout_precedes_total_timeout) {
-   scripted_http_server server([](tcp::socket&, const std::atomic_bool& stop) {
+/// An attended caller can cancel while a peer accepts but does not read the request.
+BOOST_AUTO_TEST_CASE(request_write_can_be_cancelled) {
+   std::atomic_bool cancellation_requested{false};
+   scripted_http_server server([&cancellation_requested](tcp::socket&, const std::atomic_bool& stop) {
+      std::this_thread::sleep_for(std::chrono::milliseconds(cancellation_delay_ms));
+      cancellation_requested = true;
       while (!stop.load()) {
          std::this_thread::sleep_for(10ms);
       }
    }, false);
    fc::temp_directory temp;
-   const auto output = temp.path() / "request-write-timeout.bin";
+   const auto output = temp.path() / "request-write-cancelled.bin";
    auto options = download_options(exact_body_bytes);
-   options.response_header_timeout = fc::milliseconds(short_timeout_ms);
+   const fc::variant payload(std::string(blocked_request_body_bytes, 'a'));
 
    const auto start = std::chrono::steady_clock::now();
    fc::http_client client;
+   client.set_cancel_check([&cancellation_requested]() { return cancellation_requested.load(); });
    BOOST_CHECK_EXCEPTION(
-      client.post_to_file(server_url(server), fc::variant(std::string(blocked_request_body_bytes, 'a')),
-                          output, options),
+      client.post_to_file(server_url(server), payload, output, options),
       fc::exception,
       [](const fc::exception& error) {
          return error.to_detail_string().find("Failed to send POST request") != std::string::npos;
@@ -268,6 +298,29 @@ BOOST_AUTO_TEST_CASE(request_write_timeout_precedes_total_timeout) {
 
    BOOST_CHECK_LT(std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count(), max_test_elapsed_ms);
    check_download_files_removed(output);
+}
+
+/// Metadata requests using the default unlimited deadline remain interruptible.
+BOOST_AUTO_TEST_CASE(unbounded_post_sync_can_be_cancelled) {
+   scripted_http_server server([](tcp::socket&, const std::atomic_bool& stop) {
+      while (!stop.load()) {
+         std::this_thread::sleep_for(10ms);
+      }
+   });
+   delayed_cancellation cancellation;
+   fc::http_client client;
+   client.set_cancel_check(cancellation.check());
+
+   const auto start = std::chrono::steady_clock::now();
+   BOOST_CHECK_EXCEPTION(
+      client.post_sync(server_url(server), fc::variant(fc::mutable_variant_object())),
+      fc::exception,
+      [](const fc::exception& error) {
+         return error.to_detail_string().find("Failed to read response") != std::string::npos;
+      });
+   const auto elapsed = std::chrono::steady_clock::now() - start;
+
+   BOOST_CHECK_LT(std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count(), max_test_elapsed_ms);
 }
 
 /// Metadata and download requests should reuse one healthy keep-alive connection.
@@ -358,28 +411,28 @@ BOOST_AUTO_TEST_CASE(stale_metadata_reconnect_failure_cleans_up_safely) {
    check_download_files_removed(output);
 }
 
-/// A peer that never sends a response header must hit the configured header deadline.
-BOOST_AUTO_TEST_CASE(response_header_timeout_removes_partial_file) {
+/// An attended caller can cancel while a peer never sends a response header.
+BOOST_AUTO_TEST_CASE(response_header_wait_can_be_cancelled) {
    scripted_http_server server([](tcp::socket&, const std::atomic_bool& stop) {
       while (!stop.load()) {
          std::this_thread::sleep_for(10ms);
       }
    });
    fc::temp_directory temp;
-   const auto output = temp.path() / "header-timeout.bin";
+   const auto output = temp.path() / "header-cancelled.bin";
    auto options = download_options(exact_body_bytes);
-   options.response_header_timeout = fc::milliseconds(short_timeout_ms);
+   delayed_cancellation cancellation;
 
    const auto start = std::chrono::steady_clock::now();
-   BOOST_CHECK_THROW(download(server, output, options), fc::exception);
+   BOOST_CHECK_THROW(download(server, output, options, cancellation.check()), fc::exception);
    const auto elapsed = std::chrono::steady_clock::now() - start;
 
    BOOST_CHECK_LT(std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count(), max_test_elapsed_ms);
    check_download_files_removed(output);
 }
 
-/// A body that stops after partial progress must hit the reset-on-progress idle deadline.
-BOOST_AUTO_TEST_CASE(idle_body_timeout_removes_partial_file) {
+/// An attended caller can cancel a body that stops after partial progress.
+BOOST_AUTO_TEST_CASE(stalled_body_can_be_cancelled_and_removes_partial_file) {
    scripted_http_server server([](tcp::socket& socket, const std::atomic_bool& stop) {
       if (!write_bytes(socket, fixed_length_header(2)) || !write_bytes(socket, "1")) {
          return;
@@ -389,38 +442,16 @@ BOOST_AUTO_TEST_CASE(idle_body_timeout_removes_partial_file) {
       }
    });
    fc::temp_directory temp;
-   const auto output = temp.path() / "idle-timeout.bin";
+   const auto output = temp.path() / "body-cancelled.bin";
    auto options = download_options(exact_body_bytes);
-   options.idle_read_timeout = fc::milliseconds(short_timeout_ms);
+   delayed_cancellation cancellation;
 
-   BOOST_CHECK_THROW(download(server, output, options), fc::exception);
+   BOOST_CHECK_THROW(download(server, output, options, cancellation.check()), fc::exception);
    check_download_files_removed(output);
 }
 
-/// Chunk framing without decoded body bytes must not refresh the response-progress deadline.
-BOOST_AUTO_TEST_CASE(chunk_framing_does_not_reset_idle_timeout) {
-   scripted_http_server server([](tcp::socket& socket, const std::atomic_bool&) {
-      if (!write_bytes(socket, chunked_header())) {
-         return;
-      }
-      std::this_thread::sleep_for(std::chrono::milliseconds(framing_delay_ms));
-      if (!write_bytes(socket, "1\r\n")) {
-         return;
-      }
-      std::this_thread::sleep_for(std::chrono::milliseconds(framing_delay_ms));
-      write_bytes(socket, "1\r\n0\r\n\r\n");
-   });
-   fc::temp_directory temp;
-   const auto output = temp.path() / "framing-idle-timeout.bin";
-   auto options = download_options(exact_body_bytes);
-   options.idle_read_timeout = fc::milliseconds(short_timeout_ms);
-
-   BOOST_CHECK_THROW(download(server, output, options), fc::exception);
-   check_download_files_removed(output);
-}
-
-/// Continuous sub-idle progress must still stop at the independent total deadline.
-BOOST_AUTO_TEST_CASE(total_timeout_stops_trickled_body_and_removes_partial_file) {
+/// A continuously progressing transfer has no total deadline but remains interruptible.
+BOOST_AUTO_TEST_CASE(progressing_body_has_no_total_deadline_and_can_be_cancelled) {
    scripted_http_server server([](tcp::socket& socket, const std::atomic_bool& stop) {
       if (!write_bytes(socket, fixed_length_header(1'000))) {
          return;
@@ -433,12 +464,11 @@ BOOST_AUTO_TEST_CASE(total_timeout_stops_trickled_body_and_removes_partial_file)
       }
    });
    fc::temp_directory temp;
-   const auto output = temp.path() / "total-timeout.bin";
+   const auto output = temp.path() / "progressing-body-cancelled.bin";
    auto options = download_options(1'000);
-   options.idle_read_timeout = fc::milliseconds(short_timeout_ms);
-   options.total_timeout = fc::milliseconds(250);
+   delayed_cancellation cancellation;
 
-   BOOST_CHECK_THROW(download(server, output, options), fc::exception);
+   BOOST_CHECK_THROW(download(server, output, options, cancellation.check()), fc::exception);
    check_download_files_removed(output);
 }
 
@@ -477,7 +507,6 @@ BOOST_AUTO_TEST_CASE(oversized_chunk_extension_is_bounded_and_removed) {
    fc::temp_directory temp;
    const auto output = temp.path() / "oversized-chunk-extension.bin";
    auto options = download_options(exact_body_bytes);
-   options.idle_read_timeout = fc::milliseconds(short_timeout_ms);
 
    const auto start = std::chrono::steady_clock::now();
    BOOST_CHECK_EXCEPTION(download(server, output, options), fc::exception,
@@ -497,11 +526,42 @@ BOOST_AUTO_TEST_CASE(exact_maximum_response_succeeds) {
    });
    fc::temp_directory temp;
    const auto output = temp.path() / "exact-maximum.bin";
+   std::vector<fc::http_file_download_status> statuses;
+   auto options = download_options(exact_body_bytes);
+   options.status_callback = [&](const fc::http_file_download_status& status) { statuses.push_back(status); };
 
-   BOOST_CHECK_NO_THROW(download(server, output, download_options(exact_body_bytes)));
+   BOOST_CHECK_NO_THROW(download(server, output, options));
    BOOST_CHECK(std::filesystem::exists(output));
    BOOST_CHECK(!std::filesystem::exists(partial_path(output)));
    BOOST_CHECK_EQUAL(read_file(output), exact_body);
+   BOOST_REQUIRE(!statuses.empty());
+   BOOST_CHECK(std::any_of(statuses.begin(), statuses.end(), [](const auto& status) {
+      return status.phase == fc::http_file_download_phase::downloading;
+   }));
+   const auto& final_status = statuses.back();
+   BOOST_CHECK(final_status.phase == fc::http_file_download_phase::complete);
+   BOOST_CHECK_EQUAL(final_status.downloaded_bytes, exact_body_bytes);
+   BOOST_REQUIRE(final_status.total_bytes);
+   BOOST_CHECK_EQUAL(*final_status.total_bytes, exact_body_bytes);
+}
+
+/// Chunked downloads report progress without inventing a total byte count or ETA basis.
+BOOST_AUTO_TEST_CASE(chunked_response_reports_unknown_total) {
+   scripted_http_server server([](tcp::socket& socket, const std::atomic_bool&) {
+      write_bytes(socket, chunked_header() + "8\r\n" + std::string(exact_body) + "\r\n0\r\n\r\n");
+   });
+   fc::temp_directory temp;
+   const auto output = temp.path() / "chunked-progress.bin";
+   std::vector<fc::http_file_download_status> statuses;
+   auto options = download_options(exact_body_bytes);
+   options.status_callback = [&](const fc::http_file_download_status& status) { statuses.push_back(status); };
+
+   BOOST_REQUIRE_NO_THROW(download(server, output, options));
+   BOOST_REQUIRE(!statuses.empty());
+   const auto& final_status = statuses.back();
+   BOOST_CHECK(final_status.phase == fc::http_file_download_phase::complete);
+   BOOST_CHECK_EQUAL(final_status.downloaded_bytes, exact_body_bytes);
+   BOOST_CHECK(!final_status.total_bytes);
 }
 
 /// A fixed-length response exactly one disk-check budget wide should not require a refill.
@@ -514,8 +574,6 @@ BOOST_AUTO_TEST_CASE(exact_disk_space_budget_response_succeeds) {
    fc::temp_directory temp;
    const auto output = temp.path() / "exact-disk-budget.bin";
    auto options = download_options(disk_space_budget_bytes);
-   options.idle_read_timeout = fc::milliseconds(30'000);
-   options.total_timeout = fc::milliseconds(30'000);
 
    BOOST_REQUIRE_NO_THROW(download(server, output, options));
    BOOST_CHECK_EQUAL(std::filesystem::file_size(output), disk_space_budget_bytes);
@@ -532,8 +590,6 @@ BOOST_AUTO_TEST_CASE(chunked_response_refills_disk_space_budget) {
    fc::temp_directory temp;
    const auto output = temp.path() / "refilled-disk-budget.bin";
    auto options = download_options(response_bytes);
-   options.idle_read_timeout = fc::milliseconds(30'000);
-   options.total_timeout = fc::milliseconds(30'000);
 
    BOOST_REQUIRE_NO_THROW(download(server, output, options));
    BOOST_CHECK_EQUAL(std::filesystem::file_size(output), response_bytes);

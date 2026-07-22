@@ -261,11 +261,11 @@ The endpoint and its resource limits are CLI-only because bootstrap is a single-
                              https://snap.example.com/50000    → fetches block 50000
 ```
 
-The bounded download options are `--snapshot-endpoint-connect-timeout-ms`,
-`--snapshot-endpoint-header-timeout-ms`, `--snapshot-endpoint-idle-timeout-ms`,
-`--snapshot-endpoint-total-timeout-ms`, `--snapshot-endpoint-max-download-size-mb`, and
-`--snapshot-endpoint-min-disk-free-mb`. They enforce finite phase/total deadlines, fixed-length and chunked response
-ceilings, and reserved filesystem headroom while retaining atomic temporary-file cleanup.
+Snapshot bootstrap is an attended operation against an operator-selected endpoint. It reports connection/request phases
+and, every five seconds during transfer, downloaded bytes, percentage, rate, and ETA when `Content-Length` is available.
+SIGINT cancels pending resolver or socket work and retains atomic temporary-file cleanup. The existing
+`chain-state-db-size-mb` setting bounds both fixed-length and chunked response bodies; the only snapshot-specific
+resource override is `--snapshot-endpoint-min-disk-free-mb` for reserved filesystem headroom.
 
 The block number is encoded as a trailing path component of the URL. If the last path segment is a decimal number, it's treated as a specific block request (POST to `/v1/snapshot/by_block`); otherwise POST to `/v1/snapshot/latest`.
 
