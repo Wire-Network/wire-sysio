@@ -4,6 +4,9 @@
 #include <sysio.opp.common/opp_keys.hpp>
 #include <sysio.authex/sysio.authex.hpp>
 #include <sysio.token/sysio.token.hpp>
+// For uwrit::MAX_UWREQ_PRUNE_PER_EPOCH — the per-epoch budget advance hands
+// to the inline `pruneuwreqs` sweep (the constant is owned by sysio.uwrit).
+#include <sysio.uwrit/sysio.uwrit.hpp>
 // Canonical sysio.system emissions types + compute_epoch_emission. The
 // [[sysio::contract("sysio.system")]] attribute on emission_config / t5_state
 // pins them to sysio.system's ABI; no readonly mirror needed here.
@@ -392,6 +395,20 @@ void epoch::advance() {
       UWRIT_ACCOUNT,
       "chklocks"_n,
       std::make_tuple()
+   ).send();
+
+   // Bounded UWREQ lifecycle sweep (SEC-129 / WSA-223): erase terminal
+   // uwreqs whose retention window elapsed; expire + refund PENDING uwreqs
+   // whose race never resolved inside the pending timeout. Runs after
+   // chklocks so both uwrit maintenance sweeps stay adjacent, and before
+   // buildenv so any SWAP_REVERT the expiry path emits rides THIS epoch's
+   // outbound envelopes. Budget-bounded (never throws) — a backlog simply
+   // drains across subsequent epochs.
+   action(
+      permission_level{get_self(), "owner"_n},
+      UWRIT_ACCOUNT,
+      "pruneuwreqs"_n,
+      std::make_tuple(uwrit::MAX_UWREQ_PRUNE_PER_EPOCH)
    ).send();
 
    // Before incrementing: evaluate per-op delivery state for the EXPIRING
