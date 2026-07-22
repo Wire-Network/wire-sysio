@@ -301,6 +301,10 @@ int main(int argc, char* argv[]) {
 
       auto& sol_plug = app->get_plugin<sysio::outpost_solana_client_plugin>();
 
+      // Clients are constructed at plugin_initialize (the signature-provider manager creates every provider at
+      // its own init, before this plugin initializes), so they are ready to read immediately after init -- no
+      // explicit startup of the plugin subtree is needed.
+
       // Get the first client
       auto clients = sol_plug.get_clients();
       FC_ASSERT(!clients.empty(), "No Solana clients configured");

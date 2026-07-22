@@ -388,7 +388,17 @@ activate Plugin
 
 Plugin -> Plugin : load IDL files\n(--solana-idl-file)
 
+note right of Plugin
+  the signature_provider_manager -- an
+  APPBASE_PLUGIN_REQUIRES dependency --
+  created every configured provider at its
+  own plugin_initialize, before this runs,
+  so providers resolve here regardless of
+  --plugin ordering
+end note
+
 loop for each --outpost-solana-client spec
+   Plugin -> Plugin : parse + validate spec
    Plugin -> SigMgr : get_provider(sig_id)
    SigMgr --> Plugin : signature_provider_ptr
 
@@ -811,6 +821,10 @@ int main(int argc, char* argv[]) {
       }
 
       auto& sol_plug = app->get_plugin<sysio::outpost_solana_client_plugin>();
+
+      // Clients are constructed at plugin_initialize (the signature-provider
+      // manager creates every provider at its own init, before this plugin
+      // initializes), so they are ready to read immediately after init.
 
       // Get the first configured client
       auto clients = sol_plug.get_clients();

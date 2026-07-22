@@ -284,6 +284,48 @@ void epoch::setconfig(uint32_t epoch_duration_sec,
       }
    }
 
+   // The materialized rotation schedule (epoch_state.batch_op_groups) is
+   // sized from batch_op_groups once, at schbatchgps; advance() thereafter
+   // preserves its length (pop-front / push-back) and never re-reads the
+   // config to resize it. Every downstream invariant -- advance()'s
+   // scheduling horizon (current_epoch_index + batch_op_groups - 1) and
+   // sysio.opreg's termination window -- assumes cfg.batch_op_groups equals
+   // the live rotation length, so once a schedule exists the group count is
+   // fixed. Reject a change rather than let the config drift from the live
+   // rotation (which would mis-date newly scheduled groups and let opreg
+   // accept a window validated against the stale count). Reshaping the
+   // rotation is a fresh schbatchgps, a bootstrap-time operation.
+   {
+      epochstate_t state_tbl(get_self());
+      if (state_tbl.exists()) {
+         const auto state = state_tbl.get();
+         if (!state.batch_op_groups.empty()) {
+            check(batch_op_groups == state.batch_op_groups.size(),
+                  "batch_op_groups cannot change once the rotation schedule is materialized");
+         }
+      }
+   }
+
+   // sysio.opreg's consecutive-miss termination rail requires its rolling
+   // window to span the full miss run of DUTY epochs at the CURRENT schedule
+   // (see opreg::min_terminate_window_ms; a resident operator is on duty once
+   // per `batch_op_groups`-epoch rotation). Raising the duration or the group
+   // count can silently vacate a previously valid window, so re-validate the
+   // stored opreg config against the new schedule; opreg::setconfig performs
+   // the same check against the stored schedule, so no ordering of the two
+   // setters can accept a vacuous pair (SEC-28 residual).
+   {
+      opreg::opconfig_t op_cfg_tbl(OPREG_ACCOUNT);
+      if (op_cfg_tbl.exists()) {
+         const auto op_cfg = op_cfg_tbl.get();
+         check(op_cfg.terminate_window_ms >=
+                  opreg::min_terminate_window_ms(op_cfg.terminate_max_consecutive_misses,
+                                                 epoch_duration_sec,
+                                                 batch_op_groups),
+               "epoch schedule would leave sysio.opreg's terminate_window_ms narrower than the consecutive-miss run");
+      }
+   }
+
    epochcfg_t cfg_tbl(get_self());
    epoch_config cfg = cfg_tbl.get_or_default(epoch_config{});
    cfg.epoch_duration_sec = epoch_duration_sec;
