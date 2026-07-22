@@ -12,6 +12,14 @@ The Ethereum client plugin is configured via program options as follows:
 ```
 > NOTE:  If you look closely, the reference to `eth-01` in the Ethereum client config, matches the signature provider configured for `Ethereum`.  This mapping is what enables `1..n` clients in a single process
 
+The signer reference is validated during startup. Each
+`--outpost-ethereum-client` must reference the explicit, non-empty name of a
+configured `--signature-provider`; anonymous signature-provider specs cannot be
+referenced by an Ethereum client. When the optional Ethereum chain ID is
+present, startup also calls `eth_chainId` on the configured RPC endpoint and
+fails if the endpoint is unavailable, returns an invalid value, or reports a
+different chain ID.
+
 With the above configuration and the appropriate `app` & `plugin` config, you can access the `outpost-ethereum-client` configured with name/id == `eth-anvil-local` as follows
 
 ```cpp

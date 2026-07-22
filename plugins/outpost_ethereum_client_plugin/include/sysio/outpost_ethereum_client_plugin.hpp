@@ -19,7 +19,7 @@ struct ethereum_client_entry_t {
    /// batch operator auto-select the client for an outpost row by matching the
    /// row's `external_chain_id`, so multiple EVM outposts never share one
    /// remote endpoint. `nullopt` when the spec omitted the chain id.
-   std::optional<uint64_t>            chain_id;
+   std::optional<uint32_t>            chain_id;
 };
 
 using ethereum_client_entry_ptr = std::shared_ptr<ethereum_client_entry_t>;
@@ -108,7 +108,7 @@ public:
    /// `external_chain_id`; an ambiguous (duplicate chain id) or missing match
    /// yields nullptr so the caller can fail closed rather than relay an
    /// outpost through the wrong endpoint.
-   ethereum_client_entry_ptr get_client_by_chain_id(uint64_t chain_id);
+   ethereum_client_entry_ptr get_client_by_chain_id(uint32_t chain_id);
 
    const std::vector<std::pair<std::filesystem::path, std::vector<fc::network::ethereum::abi::contract>>>& get_abi_files();
 

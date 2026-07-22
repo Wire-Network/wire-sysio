@@ -272,6 +272,14 @@ public:
       return _signing_providers_by_pubkey.contains(std::get<chain::public_key_type>(key));
    }
 
+   void mark_explicitly_configured_provider(const std::string& key_name) {
+      _explicitly_configured_provider_names.insert(key_name);
+   }
+
+   bool is_explicitly_configured_provider(const std::string& key_name) const {
+      return _explicitly_configured_provider_names.contains(key_name);
+   }
+
    fc::crypto::signature_provider_ptr get_provider(const fc::crypto::signature_provider_id_t& key) {
       if (holds_alternative<std::string>(key)) {
          auto& keyName = std::get<std::string>(key);
@@ -429,7 +437,16 @@ public:
       }
    }
 
-   fc::crypto::signature_provider_ptr create_provider(const string& spec) {
+   struct parsed_provider_spec {
+      std::string                        key_name;
+      fc::crypto::chain_kind_t           target_chain;
+      fc::crypto::chain_key_type_t       key_type;
+      std::string                        public_key_text;
+      std::string                        private_key_provider_spec;
+      bool                               has_explicit_name;
+   };
+
+   parsed_provider_spec parse_provider_spec(const string& spec) const {
       using namespace fc::crypto;
       //<name>,<chain-kind>,<key-type>,<public-key>,<private-key-provider-spec>
       auto spec_parts = fc::split(spec, ',', 5);
@@ -449,11 +466,40 @@ public:
       auto public_key_text = spec_parts[target_chain_idx + 2];
       auto private_key_provider_spec = spec_parts[target_chain_idx + 3];
 
-      if (key_name.empty()) {
-         key_name = std::format("key-{}", next_anon_key_counter());
+      return {
+         .key_name = key_name,
+         .target_chain = kind,
+         .key_type = key_type,
+         .public_key_text = std::move(public_key_text),
+         .private_key_provider_spec = std::move(private_key_provider_spec),
+         .has_explicit_name = num_parts == 5 && !key_name.empty(),
+      };
+   }
+
+   fc::crypto::signature_provider_ptr create_provider(parsed_provider_spec parsed) {
+      if (parsed.key_name.empty()) {
+         parsed.key_name = std::format("key-{}", next_anon_key_counter());
       }
 
-      return create_provider(key_name, kind, key_type, public_key_text, private_key_provider_spec);
+      return create_provider(parsed.key_name,
+                             parsed.target_chain,
+                             parsed.key_type,
+                             parsed.public_key_text,
+                             parsed.private_key_provider_spec);
+   }
+
+   fc::crypto::signature_provider_ptr create_provider(const string& spec) {
+      return create_provider(parse_provider_spec(spec));
+   }
+
+   fc::crypto::signature_provider_ptr create_configured_provider(const string& spec) {
+      auto parsed = parse_provider_spec(spec);
+      const bool has_explicit_name = parsed.has_explicit_name;
+      auto provider = create_provider(std::move(parsed));
+      if (has_explicit_name) {
+         mark_explicitly_configured_provider(provider->key_name);
+      }
+      return provider;
    }
 
    fc::crypto::signature_provider_ptr create_provider(const std::string& key_name,
@@ -601,6 +647,7 @@ private:
     */
    std::map<std::string, fc::crypto::signature_provider_ptr> _signing_providers_by_name{};
    std::map<chain::public_key_type, fc::crypto::signature_provider_ptr> _signing_providers_by_pubkey{};
+   std::set<std::string> _explicitly_configured_provider_names{};
 
    /**
     * One-shot startup probes, one per provider whose handler attached one (today: KMS). Collected as providers are
@@ -690,7 +737,7 @@ void signature_provider_manager_plugin::plugin_initialize(const variables_map& o
       auto specs = options.at(option_name_provider).as<std::vector<std::string>>();
       for (const auto& spec : specs) {
          dlog("Registering signature provider from spec: {}", redact_signature_provider_spec(spec));
-         auto provider = my->create_provider(spec);
+         auto provider = my->create_configured_provider(spec);
          dlog("Registered signature provider ({}): {}",
               provider->key_name, provider->public_key.to_string({}));
       }
@@ -723,6 +770,10 @@ signature_provider_manager_plugin::create_anonymous_provider_from_private_key(ch
 
 bool signature_provider_manager_plugin::has_provider(const fc::crypto::signature_provider_id_t& key) {
    return my->has_provider(key);
+}
+
+bool signature_provider_manager_plugin::is_explicitly_configured_provider(const std::string& key_name) {
+   return my->is_explicitly_configured_provider(key_name);
 }
 
 fc::crypto::signature_provider_ptr signature_provider_manager_plugin::get_provider(
