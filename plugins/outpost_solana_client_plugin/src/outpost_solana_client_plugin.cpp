@@ -149,10 +149,11 @@ outpost_solana_client_plugin::get_idl_files() {
 }
 
 std::shared_ptr<outpost_client>
-outpost_solana_client_plugin::create_outpost_client(const std::string& sol_client_id,
-                                                  uint64_t           chain_code,
-                                                  uint32_t           chain_id,
-                                                  const std::string& program_id) {
+outpost_solana_client_plugin::create_outpost_client(const std::string&  sol_client_id,
+                                                  uint64_t            chain_code,
+                                                  uint32_t            chain_id,
+                                                  const std::string&  program_id,
+                                                  solana_outpost_role role) {
    auto entry = my->get_client(sol_client_id);
    FC_ASSERT(entry, "Unknown solana client id: {}", sol_client_id);
    FC_ASSERT(!program_id.empty(), "Solana program id is required");
@@ -170,7 +171,7 @@ outpost_solana_client_plugin::create_outpost_client(const std::string& sol_clien
              option_outpost_program_name);
 
    return std::make_shared<outpost_solana_client>(
-      entry, program_key, std::move(program_idls), chain_code, chain_id);
+      entry, program_key, std::move(program_idls), chain_code, chain_id, role);
 }
 
 std::vector<fc::network::solana::idl::program> filter_outpost_program_idls(

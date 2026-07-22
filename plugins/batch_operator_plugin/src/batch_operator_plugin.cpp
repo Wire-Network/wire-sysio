@@ -633,7 +633,8 @@ struct batch_operator_plugin::impl {
                   continue;
                }
                client = sol_plug->create_outpost_client(sol_client_id, op.id, op.chain_id,
-                                                     bound->second.opp_addr);
+                                                     bound->second.opp_addr,
+                                                     solana_outpost_role::batch_operator);
             } else {
                wlog("batch_operator: outpost {} has unsupported chain_kind, skipping job build",
                     op.id);
