@@ -807,6 +807,87 @@ public:
       BOOST_REQUIRE(!get_uwreq(att_id).is_null());
    }
 
+   // ── SEC-129 / WSA-223: real epoch-aging helpers ──────────────────────────
+   //
+   // The bootstrap advance gate-blocks on missing emissions state, so every
+   // dispatch test normally runs at epoch 0. The UWREQ lifecycle sweep is
+   // trigger-driven off real advances, so its tests configure emissions the
+   // way emissions_tests.cpp does and then genuinely advance the epoch index.
+
+   /// Push a sysio.system action (ABI resolved from chain state — the system
+   /// account runs this build's genesis code, like sysio.roa above).
+   action_result push_system(name signer, name action_name, const fc::variant_object& data) {
+      try {
+         base_tester::push_action(config::system_account_name, action_name, signer, data);
+         return success();
+      } catch (const fc::exception& ex) {
+         return error(ex.top_message());
+      }
+   }
+
+   /// Make `sysio.epoch::advance` genuinely advance: the genesis `sysio`
+   /// account runs only the boot contract, so the full sysio.system (where
+   /// the emissions gate's config + t5 state live) is deployed first — the
+   /// same sequence as emissions_tests.cpp's fixture — then the emission
+   /// config + t5 state are initialized and the T5 holding accounts payepoch
+   /// transfers WIRE to are created. Values mirror emissions_tests.cpp's
+   /// defaults. Requires setup_wire_token_and_reserves() first (payepoch pays
+   /// WIRE out of sysio's token balance).
+   void enable_epoch_advancement() {
+      set_code(config::system_account_name, contracts::system_wasm());
+      set_abi(config::system_account_name, contracts::system_abi().data());
+      BOOST_REQUIRE_EQUAL(success(), push_system(config::system_account_name, "init"_n,
+         mvo()("version", 0)("core", "4,SYS")));
+      produce_blocks();
+      for (auto a : {"sysio.dclaim"_n, "sysio.gov"_n, "sysio.batch"_n, "sysio.ops"_n}) {
+         if (!control->db().find<account_object, by_name>(a)) {
+            create_accounts({a}, /*multisig=*/false, /*include_code=*/false,
+                            /*include_roa_policy=*/false, /*include_ram_gift=*/true);
+         }
+      }
+      produce_blocks();
+      constexpr uint32_t seconds_per_month = 30u * 24u * 60u * 60u;
+      BOOST_REQUIRE_EQUAL(success(), push_system(config::system_account_name, "setemitcfg"_n,
+         mvo()("cfg", mvo()
+            ("t1_allocation",             int64_t{7'500'000'000'000'000LL})
+            ("t2_allocation",             int64_t{1'000'000'000'000'000LL})
+            ("t3_allocation",             int64_t{100'000'000'000'000LL})
+            ("t1_duration",               12u * seconds_per_month)
+            ("t2_duration",               24u * seconds_per_month)
+            ("t3_duration",               36u * seconds_per_month)
+            ("min_claimable",             int64_t{10'000'000'000LL})
+            ("t5_distributable",          int64_t{375'000'000'000'000'000LL})
+            ("t5_floor",                  int64_t{125'000'000'000'000'000LL})
+            ("target_annual_decay_bps",   uint16_t(6940))
+            ("annual_initial_emission",   int64_t{563'150'000'000'000LL} * 365)
+            ("annual_max_emission",       int64_t{3'000'000'000'000'000LL} * 365)
+            ("annual_min_emission",       int64_t{100'000'000'000'000LL} * 365)
+            ("compute_bps",               uint16_t(4000))
+            ("capex_bps",                 uint16_t(2000))
+            ("governance_bps",            uint16_t(1000))
+            ("producer_bps",              uint16_t(7000))
+            ("batch_op_bps",              uint16_t(3000))
+            ("standby_end_rank",          uint32_t(28))
+            ("epoch_log_retention_count", uint32_t(8640))
+            ("pay_cadence_epochs",        uint16_t(1)))));
+      BOOST_REQUIRE_EQUAL(success(), push_system(config::system_account_name, "initt5"_n,
+         mvo()("start_time", time_point_sec(control->head().block_time()))));
+      produce_blocks();
+   }
+
+   /// Cross one epoch boundary and advance. epoch_duration_sec is 60 in this
+   /// fixture (bootstrap_for_dispatch); 124 half-second blocks = 62s crosses
+   /// it. advance is pushed with the epoch contract's own authority (advance
+   /// accepts sysio.msgch OR sysio.epoch post-genesis). Each successful
+   /// advance fires the real inline maintenance chain — chklocks,
+   /// pruneuwreqs(MAX_UWREQ_PRUNE_PER_EPOCH), drainfwq, buildenv — exactly as
+   /// in production.
+   void age_one_epoch() {
+      produce_blocks(124);
+      BOOST_REQUIRE_EQUAL(success(),
+         push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "advance"_n, mvo()));
+   }
+
    abi_serializer msgch_abi, opreg_abi, uwrit_abi, epoch_abi, reserv_abi, authex_abi, chains_abi, roa_abi,
                   token_abi;
 
@@ -2315,7 +2396,8 @@ BOOST_FIXTURE_TEST_CASE(drainfwq_bounds_rows_per_epoch, sysio_dispatch_tester) {
    // default 5-WIRE floor and the revert fee have their own dedicated cases below.
    BOOST_REQUIRE_EQUAL(success(), push(UWRIT_ACCOUNT, uwrit_abi, UWRIT_ACCOUNT, "setconfig"_n, mvo()
       ("fee_bps", 10)("collateral_lock_duration_ms", 120'000u)
-      ("min_fromwire_amount", 1)("fromwire_revert_fee_bps", 0)));
+      ("min_fromwire_amount", 1)("fromwire_revert_fee_bps", 0)
+      ("uwreq_pending_timeout_epochs", 10)("uwreq_retention_epochs", 10)));
 
    // A funded from-WIRE swap user (plain account, no ROA policy).
    create_account("swapuser"_n, config::system_account_name, /*multisig=*/false,
@@ -2416,7 +2498,8 @@ BOOST_FIXTURE_TEST_CASE(swapfromwire_enforces_min_amount, sysio_dispatch_tester)
    constexpr uint64_t LOWERED_FLOOR = 1'000'000;
    BOOST_REQUIRE_EQUAL(success(), push(UWRIT_ACCOUNT, uwrit_abi, UWRIT_ACCOUNT, "setconfig"_n, mvo()
       ("fee_bps", 10)("collateral_lock_duration_ms", 120'000u)
-      ("min_fromwire_amount", LOWERED_FLOOR)("fromwire_revert_fee_bps", 10)));
+      ("min_fromwire_amount", LOWERED_FLOOR)("fromwire_revert_fee_bps", 10)
+      ("uwreq_pending_timeout_epochs", 10)("uwreq_retention_epochs", 10)));
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: swapfromwire: wire_amount below the configured minimum"),
       swap(LOWERED_FLOOR - 1));
@@ -2441,7 +2524,8 @@ BOOST_FIXTURE_TEST_CASE(drainfwq_charges_revert_fee_on_caller_fault, sysio_dispa
    register_wire_depot();             // depot registered => the drain reaches the variance check
    BOOST_REQUIRE_EQUAL(success(), push(UWRIT_ACCOUNT, uwrit_abi, UWRIT_ACCOUNT, "setconfig"_n, mvo()
       ("fee_bps", 10)("collateral_lock_duration_ms", 120'000u)
-      ("min_fromwire_amount", ESCROW)("fromwire_revert_fee_bps", REVERT_FEE_BPS)));
+      ("min_fromwire_amount", ESCROW)("fromwire_revert_fee_bps", REVERT_FEE_BPS)
+      ("uwreq_pending_timeout_epochs", 10)("uwreq_retention_epochs", 10)));
 
    create_account("swapuser"_n, config::system_account_name, /*multisig=*/false,
                   /*include_code=*/true, /*include_roa_policy=*/false);
@@ -2496,7 +2580,8 @@ BOOST_FIXTURE_TEST_CASE(drainfwq_full_refund_on_system_caused_revert, sysio_disp
    // empty, which is a system-caused revert (the registry, not the caller's parameters).
    BOOST_REQUIRE_EQUAL(success(), push(UWRIT_ACCOUNT, uwrit_abi, UWRIT_ACCOUNT, "setconfig"_n, mvo()
       ("fee_bps", 10)("collateral_lock_duration_ms", 120'000u)
-      ("min_fromwire_amount", ESCROW)("fromwire_revert_fee_bps", 100)));
+      ("min_fromwire_amount", ESCROW)("fromwire_revert_fee_bps", 100)
+      ("uwreq_pending_timeout_epochs", 10)("uwreq_retention_epochs", 10)));
 
    create_account("swapuser"_n, config::system_account_name, /*multisig=*/false,
                   /*include_code=*/true, /*include_roa_policy=*/false);
@@ -2526,6 +2611,346 @@ BOOST_FIXTURE_TEST_CASE(drainfwq_full_refund_on_system_caused_revert, sysio_disp
       get_currency_balance(TOKEN_ACCOUNT, WIRE_SYM, "swapuser"_n).get_amount());
    BOOST_REQUIRE(get_row_by_account(RESERV_ACCOUNT, RESERV_ACCOUNT,
                                     "rewardbkt"_n, "rewardbkt"_n).empty());
+} FC_LOG_AND_RETHROW() }
+
+// ═════════════════════════════════════════════════════════════════════════
+// SEC-129 / WSA-223 — UWREQ lifecycle: expiry is enforced by triggers.
+//
+// `expires_at_epoch` is passive row data; the `pruneuwreqs` sweep inlined in
+// every real `sysio.epoch::advance` is the only thing that evaluates it. The
+// cases below drive genuine advances (emissions gate satisfied) and assert
+// the full lifecycle: PENDING deadline → EXPIRED + refund + compaction →
+// retention → erased; CONFIRMED → COMPLETED (chklocks) → retention → erased;
+// the per-epoch budget; and the rcrdcommit row-growth rails.
+// ═════════════════════════════════════════════════════════════════════════
+
+// A PENDING uwreq whose underwriter race never resolves survives pre-deadline
+// advances untouched, is expired by the first advance at/past its deadline
+// (EXPIRED + payload compaction), and is erased once retention elapses.
+BOOST_FIXTURE_TEST_CASE(uwreq_pending_timeout_expires_then_retention_erases,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+   // Pending timeout 2 epochs + retention 1 epoch — the shortest schedule
+   // that still proves the pre-deadline advance is a no-op for the row.
+   BOOST_REQUIRE_EQUAL(success(), push(UWRIT_ACCOUNT, uwrit_abi, UWRIT_ACCOUNT, "setconfig"_n, mvo()
+      ("fee_bps", 10)("collateral_lock_duration_ms", 120'000u)
+      ("min_fromwire_amount", 1)("fromwire_revert_fee_bps", 10)
+      ("uwreq_pending_timeout_epochs", 2)("uwreq_retention_epochs", 1)));
+   constexpr uint64_t ATT_ID = 9100;
+   setup_eth_to_sol_uwreq(ATT_ID);        // PENDING, no commits, deadline = 0 + 2
+   enable_epoch_advancement();
+
+   {
+      const auto req = get_uwreq(ATT_ID);
+      BOOST_REQUIRE_EQUAL(2u, req["expires_at_epoch"].as<uint32_t>());
+      BOOST_REQUIRE(req["attestation_inbound_data"].as_string().size() > 0);
+   }
+
+   // Epoch 1 < deadline 2 — the row is inert data; the sweep leaves it alone.
+   age_one_epoch();
+   BOOST_REQUIRE_EQUAL(1u, current_epoch());
+   BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_PENDING",
+                       get_uwreq(ATT_ID)["status"].as_string());
+
+   // Epoch 2 == deadline — the same advance's inline sweep expires it.
+   age_one_epoch();
+   BOOST_REQUIRE_EQUAL(2u, current_epoch());
+   {
+      const auto req = get_uwreq(ATT_ID);
+      BOOST_REQUIRE(!req.is_null());
+      BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_EXPIRED", req["status"].as_string());
+      BOOST_REQUIRE(req["settled_at_ms"].as_uint64() > 0);
+      // Terminal compaction: the inbound attestation copy is gone; the
+      // compact audit metadata (codes, amounts, timestamps) is retained.
+      BOOST_REQUIRE_EQUAL(0u, req["attestation_inbound_data"].as_string().size());
+      // Retention window re-stamped: epoch 2 + 1.
+      BOOST_REQUIRE_EQUAL(3u, req["expires_at_epoch"].as<uint32_t>());
+   }
+
+   // Epoch 3 — retention elapsed; the row is erased outright.
+   age_one_epoch();
+   BOOST_REQUIRE_EQUAL(3u, current_epoch());
+   BOOST_REQUIRE(get_uwreq(ATT_ID).is_null());
+} FC_LOG_AND_RETHROW() }
+
+// A queued swap-from-WIRE whose race never resolves refunds the user's FULL
+// escrow at expiry (expiry is not a caller-controlled revert cause — no
+// revert fee) and follows the same EXPIRED → retention → erased lifecycle.
+BOOST_FIXTURE_TEST_CASE(uwreq_from_wire_pending_timeout_refunds_escrow,
+                        sysio_dispatch_tester) { try {
+   constexpr uint64_t DEPOT_ORIGIN_ID_0 = 0x8000000000000000ull;
+   constexpr uint64_t ESCROW            = 1'000'000;
+   const auto WIRE_SYM = symbol(9, "WIRE");
+
+   bootstrap_for_dispatch();
+   setup_wire_token_and_reserves();
+   register_wire_depot();
+   // Non-zero revert fee configured on purpose: the full refund below proves
+   // the expiry path is fee-exempt even when a fee is configured.
+   BOOST_REQUIRE_EQUAL(success(), push(UWRIT_ACCOUNT, uwrit_abi, UWRIT_ACCOUNT, "setconfig"_n, mvo()
+      ("fee_bps", 10)("collateral_lock_duration_ms", 120'000u)
+      ("min_fromwire_amount", 1)("fromwire_revert_fee_bps", 100)
+      ("uwreq_pending_timeout_epochs", 1)("uwreq_retention_epochs", 1)));
+
+   // Created + funded before the full system contract lands on `sysio`, the
+   // same way every other from-WIRE case provisions its user.
+   create_account("swapuser"_n, config::system_account_name, /*multisig=*/false,
+                  /*include_code=*/true, /*include_roa_policy=*/false);
+   BOOST_REQUIRE_EQUAL(success(), push(TOKEN_ACCOUNT, token_abi, config::system_account_name,
+      "transfer"_n, mvo()("from", "sysio")("to", "swapuser")
+         ("quantity", "10.000000000 WIRE")("memo", "fund swap user")));
+   const int64_t funded =
+      get_currency_balance(TOKEN_ACCOUNT, WIRE_SYM, "swapuser"_n).get_amount();
+
+   enable_epoch_advancement();
+
+   // target == wire_amount with 100% tolerance prices within variance against
+   // the balanced 1e12/1e12 reserve, so the drain emplaces the uwreq (no
+   // refund at drain) — same recipe as drainfwq_bounds_rows_per_epoch.
+   BOOST_REQUIRE_EQUAL(success(), push(UWRIT_ACCOUNT, uwrit_abi, "swapuser"_n,
+      "swapfromwire"_n, mvo()
+         ("user",                 "swapuser")
+         ("wire_amount",          ESCROW)
+         ("dst_chain_code",       codename_mvo("ETH"))
+         ("dst_token_code",       codename_mvo("ETH"))
+         ("dst_reserve_code",     codename_mvo("PRIMARY"))
+         ("target_amount",        uint64_t{1'000'000})
+         ("target_tolerance_bps", uint32_t{10000})
+         ("recipient_kind",       ChainKind::CHAIN_KIND_EVM)
+         ("recipient_addr",       std::vector<char>(20, '\x0a'))));
+   BOOST_REQUIRE_EQUAL(funded - int64_t(ESCROW),
+      get_currency_balance(TOKEN_ACCOUNT, WIRE_SYM, "swapuser"_n).get_amount());
+
+   // Advance #1: drainfwq (inline, post-increment) creates the PENDING uwreq
+   // at epoch 1 with deadline 1 + 1 = 2.
+   age_one_epoch();
+   {
+      const auto req = get_uwreq(DEPOT_ORIGIN_ID_0);
+      BOOST_REQUIRE(!req.is_null());
+      BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_PENDING", req["status"].as_string());
+      BOOST_REQUIRE_EQUAL(2u, req["expires_at_epoch"].as<uint32_t>());
+   }
+
+   // Advance #2 (epoch 2 == deadline): the sweep expires the row and refunds
+   // the FULL escrow via reserv::refundwire.
+   age_one_epoch();
+   BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_EXPIRED",
+                       get_uwreq(DEPOT_ORIGIN_ID_0)["status"].as_string());
+   BOOST_REQUIRE_EQUAL(funded,
+      get_currency_balance(TOKEN_ACCOUNT, WIRE_SYM, "swapuser"_n).get_amount());
+
+   // Advance #3 (epoch 3): retention elapsed — erased.
+   age_one_epoch();
+   BOOST_REQUIRE(get_uwreq(DEPOT_ORIGIN_ID_0).is_null());
+} FC_LOG_AND_RETHROW() }
+
+// A settled swap's row is compacted at COMPLETED (chklocks closes the
+// challenge window) and erased once retention elapses — the full happy-path
+// lifecycle driven end to end by real advances. Winner selection itself
+// zeroes the deadline (the lock window owns a CONFIRMED row).
+BOOST_FIXTURE_TEST_CASE(uwreq_completed_row_erased_after_retention,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+   setup_wire_token_and_reserves();
+   BOOST_REQUIRE_EQUAL(success(), regreserve_active("ETH", "ETH", "SECOND"));
+   // 60s challenge window (== one epoch) + 1-epoch retention; the pending
+   // timeout stays clear of the race so only the lock machinery drives it.
+   BOOST_REQUIRE_EQUAL(success(), push(UWRIT_ACCOUNT, uwrit_abi, UWRIT_ACCOUNT, "setconfig"_n, mvo()
+      ("fee_bps", 10)("collateral_lock_duration_ms", 60'000u)
+      ("min_fromwire_amount", 1)("fromwire_revert_fee_bps", 10)
+      ("uwreq_pending_timeout_epochs", 5)("uwreq_retention_epochs", 1)));
+   enable_epoch_advancement();
+
+   const uint64_t eth       = fc::slug_name{"ETH"}.value;
+   const uint64_t primary   = fc::slug_name{"PRIMARY"}.value;
+   const uint64_t secondary = fc::slug_name{"SECOND"}.value;
+   constexpr uint64_t ATT_ID = 9200;
+
+   // Same-chain double-leg winner recipe as swap_same_token_legs_exact_balance_wins.
+   BOOST_REQUIRE_EQUAL(success(), depositinle_credit(UWRIT_OP, "ETH", "ETH", 200));
+   const auto sr = encode_swap_request(
+      ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
+      eth, eth, primary,   /*src_amount*/ 100,
+      eth, eth, secondary, /*dst_amount*/ 100,
+      /*tolerance_bps*/ 1'000'000, ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0b'));
+   BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, eth, sr));
+   BOOST_REQUIRE_EQUAL(success(),
+      rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY",
+                        make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary)));
+   BOOST_REQUIRE_EQUAL(success(),
+      rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "SECOND",
+                        make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, secondary)));
+   {
+      const auto req = get_uwreq(ATT_ID);
+      BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_CONFIRMED", req["status"].as_string());
+      // Winner selection cleared the deadline — chklocks owns the row now.
+      BOOST_REQUIRE_EQUAL(0u, req["expires_at_epoch"].as<uint32_t>());
+   }
+
+   // Advance #1 (62s elapsed > the 60s lock window): chklocks sweeps both
+   // locks, flips COMPLETED, stamps retention 1 + 1 = 2, and clears the
+   // remaining heavy payloads. The same advance's sweep (epoch 1 < 2) must
+   // NOT touch the freshly-completed row.
+   age_one_epoch();
+   {
+      const auto req = get_uwreq(ATT_ID);
+      BOOST_REQUIRE(!req.is_null());
+      BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_COMPLETED", req["status"].as_string());
+      BOOST_REQUIRE_EQUAL(2u, req["expires_at_epoch"].as<uint32_t>());
+      BOOST_REQUIRE_EQUAL(0u, req["attestation_inbound_data"].as_string().size());
+      for (const auto& c : req["commits_by"].get_array()) {
+         BOOST_REQUIRE_EQUAL(0u, c["source_uic_bytes"].as_string().size());
+         BOOST_REQUIRE_EQUAL(0u, c["dest_uic_bytes"].as_string().size());
+      }
+   }
+
+   // Advance #2 (epoch 2): retention elapsed — erased. Steady state: the
+   // table carries nothing from a fully-settled swap.
+   age_one_epoch();
+   BOOST_REQUIRE(get_uwreq(ATT_ID).is_null());
+} FC_LOG_AND_RETHROW() }
+
+// The per-epoch budget bounds the sweep's work: with more due rows than
+// MAX_UWREQ_PRUNE_PER_EPOCH (32), one advance handles exactly 32 and the
+// backlog drains the next epoch — advance's CPU stays bounded, nothing is
+// lost, nothing is double-handled.
+BOOST_FIXTURE_TEST_CASE(pruneuwreqs_budget_bounds_rows_per_epoch,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+   // Retention kept long (100) so the second advance only expires the
+   // leftover PENDING row instead of competing with 32 fresh erases.
+   BOOST_REQUIRE_EQUAL(success(), push(UWRIT_ACCOUNT, uwrit_abi, UWRIT_ACCOUNT, "setconfig"_n, mvo()
+      ("fee_bps", 10)("collateral_lock_duration_ms", 120'000u)
+      ("min_fromwire_amount", 1)("fromwire_revert_fee_bps", 10)
+      ("uwreq_pending_timeout_epochs", 1)("uwreq_retention_epochs", 100)));
+   constexpr uint64_t FIRST_ATT_ID = 9300;
+   constexpr uint32_t ROWS = 33;              // MAX_UWREQ_PRUNE_PER_EPOCH + 1
+   setup_eth_to_sol_uwreq(FIRST_ATT_ID);      // registers SOLANA + reserves once
+   const uint64_t eth       = fc::slug_name{"ETH"}.value;
+   const uint64_t sol_chain = fc::slug_name{"SOLANA"}.value;
+   const uint64_t sol_token = fc::slug_name{"SOL"}.value;
+   const uint64_t primary   = fc::slug_name{"PRIMARY"}.value;
+   for (uint32_t i = 1; i < ROWS; ++i) {
+      const auto sr = encode_swap_request(
+         ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
+         eth, eth, primary, 100, sol_chain, sol_token, primary, 100,
+         5000, ChainKind::CHAIN_KIND_SVM, std::vector<char>(32, '\x0b'));
+      BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(FIRST_ATT_ID + i, eth, sr));
+      if (i % 8 == 7) produce_blocks();   // spread across blocks (per-block CPU)
+   }
+   produce_blocks();
+   enable_epoch_advancement();
+
+   // Advance #1 (epoch 1 == every row's deadline): exactly the budgeted 32
+   // rows are expired; one stays PENDING for the next epoch.
+   age_one_epoch();
+   uint32_t expired = 0, pending = 0;
+   for (uint32_t i = 0; i < ROWS; ++i) {
+      const auto req = get_uwreq(FIRST_ATT_ID + i);
+      BOOST_REQUIRE(!req.is_null());
+      const auto st = req["status"].as_string();
+      if (st == "UNDERWRITE_REQUEST_STATUS_EXPIRED") ++expired;
+      else if (st == "UNDERWRITE_REQUEST_STATUS_PENDING") ++pending;
+   }
+   BOOST_REQUIRE_EQUAL(32u, expired);
+   BOOST_REQUIRE_EQUAL(1u, pending);
+
+   // Advance #2 drains the backlog: every row is now EXPIRED.
+   age_one_epoch();
+   expired = 0;
+   for (uint32_t i = 0; i < ROWS; ++i) {
+      const auto req = get_uwreq(FIRST_ATT_ID + i);
+      BOOST_REQUIRE(!req.is_null());
+      if (req["status"].as_string() == "UNDERWRITE_REQUEST_STATUS_EXPIRED") ++expired;
+   }
+   BOOST_REQUIRE_EQUAL(ROWS, expired);
+} FC_LOG_AND_RETHROW() }
+
+// ── rcrdcommit row-growth rails (SEC-129 / WSA-223) ──
+
+// An oversized UIC payload is refused at the door: no candidate entry, no
+// stored bytes, no throw. At the cap, the commit records normally.
+BOOST_FIXTURE_TEST_CASE(rcrdcommit_oversized_uic_leg_is_dropped,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+   constexpr uint64_t ATT_ID = 9400;
+   setup_eth_to_sol_uwreq(ATT_ID);
+   const uint64_t eth = fc::slug_name{"ETH"}.value;
+
+   // One byte past MAX_UIC_LEG_BYTES (2048) — dropped with no mutation.
+   BOOST_REQUIRE_EQUAL(success(),
+      rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY",
+                        std::vector<char>(2049, '\x01')));
+   BOOST_REQUIRE_EQUAL(0u, get_uwreq(ATT_ID)["commits_by"].get_array().size());
+
+   // At the cap the commit records (bytes are stored verbatim; nothing
+   // decodes them until winner selection, which this single leg never arms).
+   BOOST_REQUIRE_EQUAL(success(),
+      rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY",
+                        std::vector<char>(2048, '\x01')));
+   BOOST_REQUIRE_EQUAL(1u, get_uwreq(ATT_ID)["commits_by"].get_array().size());
+} FC_LOG_AND_RETHROW() }
+
+// The candidate roster is capped at MAX_UWREQ_CANDIDATES (32): the 33rd
+// distinct ACTIVE underwriter is refused with no row growth, while an
+// existing candidate still updates its entry at the cap (dedupe, not append).
+BOOST_FIXTURE_TEST_CASE(rcrdcommit_candidate_cap_bounds_row,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+   constexpr uint64_t ATT_ID = 9500;
+   setup_eth_to_sol_uwreq(ATT_ID);
+   const uint64_t eth = fc::slug_name{"ETH"}.value;
+
+   // Provision 33 ACTIVE underwriters (register + meet the 1-unit ETH/ETH
+   // minimum from bootstrap_for_dispatch's opreg config). UWRIT_OP stays out
+   // of this roster.
+   std::vector<name> uws;
+   for (uint32_t i = 0; i < 33; ++i) {
+      std::string s = "uwcap";
+      s += static_cast<char>('a' + i / 26);
+      s += static_cast<char>('a' + i % 26);
+      uws.emplace_back(s);
+   }
+   create_accounts(uws);
+   produce_blocks();
+   // Blocks are produced along the way — 33 registrations + credits + 33
+   // commits in one block would exhaust the per-block billable CPU.
+   for (uint32_t i = 0; i < uws.size(); ++i) {
+      BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT,
+         "regoperator"_n, mvo()
+            ("account",         uws[i].to_string())
+            ("type",            OperatorType::OPERATOR_TYPE_UNDERWRITER)
+            ("is_bootstrapped", false)));
+      BOOST_REQUIRE_EQUAL(success(), depositinle_credit(uws[i], "ETH", "ETH", 1'000));
+      if (i % 8 == 7) produce_blocks();
+   }
+   produce_blocks();
+
+   // 32 distinct candidates record; the 33rd is refused at the cap.
+   for (uint32_t i = 0; i < 32; ++i) {
+      BOOST_REQUIRE_EQUAL(success(),
+         rcrdcommit_direct(ATT_ID, uws[i], eth, "ETH", "ETH", "PRIMARY",
+                           std::vector<char>{1, 2, 3}));
+      if (i % 8 == 7) produce_blocks();
+   }
+   BOOST_REQUIRE_EQUAL(32u, get_uwreq(ATT_ID)["commits_by"].get_array().size());
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(success(),
+      rcrdcommit_direct(ATT_ID, uws[32], eth, "ETH", "ETH", "PRIMARY",
+                        std::vector<char>{1, 2, 3}));
+   {
+      const auto req = get_uwreq(ATT_ID);
+      BOOST_REQUIRE_EQUAL(32u, req["commits_by"].get_array().size());
+      for (const auto& c : req["commits_by"].get_array()) {
+         BOOST_REQUIRE(c["underwriter"].as_string() != uws[32].to_string());
+      }
+   }
+
+   // An EXISTING candidate still updates its entry at the cap.
+   BOOST_REQUIRE_EQUAL(success(),
+      rcrdcommit_direct(ATT_ID, uws[0], eth, "ETH", "ETH", "PRIMARY",
+                        std::vector<char>{4, 5, 6}));
+   BOOST_REQUIRE_EQUAL(32u, get_uwreq(ATT_ID)["commits_by"].get_array().size());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()

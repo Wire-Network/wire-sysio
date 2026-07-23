@@ -57,6 +57,13 @@ constexpr sysio::symbol WIRE_SYMBOL{"WIRE", 9};
 /// from 1 and can never reach 2^63, so the two id spaces are disjoint.
 constexpr uint64_t DEPOT_ORIGIN_ID_BASE = 0x8000000000000000ULL;
 
+/// Fixed serialized-size allowance for a NEW `commit_entry`'s non-vector
+/// fields (underwriter name, two timestamp/outpost-id pairs, status, empty
+/// reason + the vectors' length prefixes) in rcrdcommit's projected-row-size
+/// guard. The true packed size is ~50 bytes; 128 over-counts on purpose —
+/// the guard may only ever be tighter than reality, never looser.
+constexpr size_t COMMIT_ENTRY_PACK_ALLOWANCE_BYTES = 128;
+
 uint64_t current_time_ms() {
    return static_cast<uint64_t>(current_time_point().sec_since_epoch()) * 1000;
 }
@@ -678,7 +685,9 @@ uint64_t next_fromwire_id(name self) {
 void uwrit::setconfig(uint32_t fee_bps,
                       uint64_t collateral_lock_duration_ms,
                       uint64_t min_fromwire_amount,
-                      uint32_t fromwire_revert_fee_bps) {
+                      uint32_t fromwire_revert_fee_bps,
+                      uint32_t uwreq_pending_timeout_epochs,
+                      uint32_t uwreq_retention_epochs) {
    require_auth(get_self());
    // Reject a 100% (or higher) fee: it zeroes the post-fee WIRE leg
    // (`net == 0`), which let a swap debit destination reserve liquidity while
@@ -701,13 +710,28 @@ void uwrit::setconfig(uint32_t fee_bps,
    // the never-throw drainfwq drain (`refundwire` rejects zero transfers).
    check(fromwire_revert_fee_bps <= MAX_FEE_BPS,
          "fromwire_revert_fee_bps must be below 10000 (100%): a 100% revert fee zeroes the refund");
+   // A zero pending timeout would expire every uwreq the epoch it is created —
+   // no race could ever resolve; a zero retention would erase terminal rows
+   // before the audit window they exist for. The shared ceiling prevents a
+   // near-UINT32_MAX knob from wrapping the `current_epoch + knob` deadline
+   // stamp to a tiny epoch index (instant expiry).
+   check(uwreq_pending_timeout_epochs > 0,
+         "uwreq_pending_timeout_epochs must be positive");
+   check(uwreq_pending_timeout_epochs <= MAX_UWREQ_LIFECYCLE_EPOCHS,
+         "uwreq_pending_timeout_epochs exceeds the lifecycle ceiling");
+   check(uwreq_retention_epochs > 0,
+         "uwreq_retention_epochs must be positive");
+   check(uwreq_retention_epochs <= MAX_UWREQ_LIFECYCLE_EPOCHS,
+         "uwreq_retention_epochs exceeds the lifecycle ceiling");
 
    uwconfig_t cfg_tbl(get_self());
    uw_config cfg = cfg_tbl.get_or_default(uw_config{});
-   cfg.fee_bps                     = fee_bps;
-   cfg.collateral_lock_duration_ms = collateral_lock_duration_ms;
-   cfg.min_fromwire_amount         = min_fromwire_amount;
-   cfg.fromwire_revert_fee_bps     = fromwire_revert_fee_bps;
+   cfg.fee_bps                       = fee_bps;
+   cfg.collateral_lock_duration_ms   = collateral_lock_duration_ms;
+   cfg.min_fromwire_amount           = min_fromwire_amount;
+   cfg.fromwire_revert_fee_bps       = fromwire_revert_fee_bps;
+   cfg.uwreq_pending_timeout_epochs  = uwreq_pending_timeout_epochs;
+   cfg.uwreq_retention_epochs        = uwreq_retention_epochs;
    cfg_tbl.set(cfg, ram_payer);
 }
 
@@ -762,6 +786,10 @@ void uwrit::createuwreq(uint64_t attestation_id,
          return;
       }
    }
+
+   // One config snapshot for the whole ingestion: the variance quote and the
+   // PENDING deadline stamp below must read one consistent config.
+   const uw_config cfg = read_config(get_self());
 
    // Pull the slug_name triples + amounts out of the decoded SwapRequest.
    // The source token's code lives on the TokenAmount; the source chain
@@ -854,6 +882,22 @@ void uwrit::createuwreq(uint64_t attestation_id,
       return;
    }
 
+   // Row-growth rails (SEC-129 / WSA-223): the row stores these payloads
+   // verbatim and every later `modify` re-serializes the whole row inside the
+   // never-throw dispatch surfaces, so oversized inputs are refused at the
+   // door. All caps sit far above legitimate traffic; a violation is a
+   // malformed/hostile outpost payload — refund it like every other
+   // structural rejection, never check().
+   if (data.size() > MAX_ATTESTATION_INBOUND_DATA_BYTES ||
+       sr.source_tx_id.size() > MAX_SOURCE_TX_ID_BYTES ||
+       sr.actor.address.size() > MAX_DEPOSITOR_BYTES) {
+      emit_swap_revert(get_self(), chain_code, attestation_id, sr,
+                       src_chain_code, src_reserve_code,
+                       "SwapRequest rejected: payload exceeds a size cap "
+                       "(attestation data / source_tx_id / depositor address)");
+      return;
+   }
+
    // Privacy gate — a private reserve only swaps against a counterpart
    // reserve owned by the same WIRE account (the authex-linked matcher
    // recorded at match time), and is excluded from WIRE-endpoint swaps
@@ -898,7 +942,7 @@ void uwrit::createuwreq(uint64_t attestation_id,
    // matching reserves are present.
    const uint64_t current_quote = swap_quote(src_chain_code, src_token_code, src_reserve_code,
                                               dst_chain_code, dst_token_code, dst_reserve_code,
-                                              src_amount, current_fee_bps(get_self()));
+                                              src_amount, cfg.fee_bps);
    if (sr.target_amount != 0) {
       if (current_quote == 0) {
          // Zero quote: skip only when a required reserve is genuinely
@@ -949,7 +993,12 @@ void uwrit::createuwreq(uint64_t attestation_id,
       .winner                    = name{},
       .committed_at_ms           = 0,
       .settled_at_ms             = 0,
-      .expires_at_epoch          = 0,
+      // The PENDING deadline (SEC-129 / WSA-223): if no underwriter wins the
+      // race within this many epochs, `pruneuwreqs` expires the row and
+      // refunds the source side. No trigger ever announces "no winner is
+      // coming" — commits are external and optional — so the deadline is what
+      // converts a later epoch advance into the recovery trigger.
+      .expires_at_epoch          = get_current_epoch() + cfg.uwreq_pending_timeout_epochs,
       .attestation_inbound_data  = std::move(data),
       .attestation_outbound_data = {},
    });
@@ -995,20 +1044,29 @@ void disqualify_candidate(uwrit::uwreqs_t& reqs, const uwrit::id_key& pk,
    });
 }
 
-/// Terminally reject a uwreq that can never settle: refund the source side
-/// and mark the row REJECTED, releasing any in-flight commits. **Non-throwing**
-/// — safe inside the evalcons dispatch chain (a `check()` here would stall OPP
-/// consensus chain-wide). The refund routes by source-leg kind:
+/// Terminally close a uwreq that can never settle: refund the source side and
+/// mark the row with `terminal_status` (REJECTED for active rejections — the
+/// default; EXPIRED when `pruneuwreqs` abandons a PENDING race past its
+/// deadline), releasing any in-flight commits. **Non-throwing** — safe inside
+/// the evalcons dispatch chain (a `check()` here would stall OPP consensus
+/// chain-wide). The refund routes by source-leg kind:
 ///   * outpost source (`src_needed`): best-effort SWAP_REVERT back to the
 ///     source outpost (requires the stored SwapRequest to decode; a depot
 ///     source has no outpost to route to, so `find_outpost_id_for_chain`
 ///     returns nullopt and the revert is skipped).
 ///   * depot source   (from-WIRE):    refund the escrowed WIRE to the
 ///     depositor via `reserv::refundwire`.
+/// The terminal modify also stamps the retention deadline
+/// (`uwconfig.uwreq_retention_epochs`) and clears the row's heavy payloads
+/// (inbound attestation copy + every stored UIC byte blob) — they were only
+/// needed to reach this decision; the compact audit metadata (ids, codes,
+/// amounts, statuses, reasons, timestamps) is what retention keeps.
 void reject_and_refund(name self, uwrit::uwreqs_t& reqs, const uwrit::id_key& pk,
                        const uwrit::uw_request_t& req, bool src_needed,
                        const std::string& revert_reason,
-                       const std::string& commit_reason) {
+                       const std::string& commit_reason,
+                       UnderwriteRequestStatus terminal_status =
+                          UnderwriteRequestStatus::UNDERWRITE_REQUEST_STATUS_REJECTED) {
    if (src_needed) {
       opp::attestations::SwapRequest sr;
       auto in = zpp::bits::in{
@@ -1036,15 +1094,23 @@ void reject_and_refund(name self, uwrit::uwreqs_t& reqs, const uwrit::id_key& pk
                    "refund on uwreq ", req.id, "\n");
    }
    reqs.modify(same_payer, pk, [&](auto& r) {
-      r.status           = UnderwriteRequestStatus::UNDERWRITE_REQUEST_STATUS_REJECTED;
+      r.status           = terminal_status;
       r.settled_at_ms    = current_time_ms();
-      r.expires_at_epoch = get_current_epoch() + uwrit::UWREQ_RETENTION_EPOCHS;
+      r.expires_at_epoch = get_current_epoch() + read_config(self).uwreq_retention_epochs;
       for (auto& c : r.commits_by) {
          if (c.status == UnderwriteStatus::UNDERWRITE_STATUS_INTENT_SUBMITTED) {
             c.status = UnderwriteStatus::UNDERWRITE_STATUS_RELEASED;
             c.reason = commit_reason;
          }
+         // Terminal compaction (SEC-129 / WSA-223): the raw UIC blobs were
+         // only needed to resolve the race; retention keeps the compact
+         // audit metadata, not the payload bytes.
+         c.source_uic_bytes.clear();
+         c.dest_uic_bytes.clear();
       }
+      // The refund above already decoded the snapshot's copy; the stored
+      // bytes have no remaining reader on a terminal row.
+      r.attestation_inbound_data.clear();
    });
 }
 
@@ -1403,6 +1469,11 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
       r.status          = UnderwriteRequestStatus::UNDERWRITE_REQUEST_STATUS_CONFIRMED;
       r.winner          = candidate;
       r.committed_at_ms = current_time_ms();
+      // Deadline cleared (SEC-129 / WSA-223): a CONFIRMED row is owned by the
+      // wall-clock lock window — `chklocks` is guaranteed to terminalize it
+      // once the locks expire, so a second (epoch-count) deadline would just
+      // race the first. 0 excludes the row from the `pruneuwreqs` sweep.
+      r.expires_at_epoch = 0;
       // Mark the winner's commit_entry CONFIRMED, others RELEASED (loser).
       for (auto& c : r.commits_by) {
          if (c.underwriter == candidate) {
@@ -1411,6 +1482,14 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
             // Eligible loser — promote to RELEASED for retention/debugging.
             c.status = UnderwriteStatus::UNDERWRITE_STATUS_RELEASED;
             c.reason = "lost the COMMIT race";
+         }
+         // Race resolved — non-winner UIC blobs have no remaining reader
+         // (re-arm via rcrdcommit is PENDING-gated, and only PENDING rows
+         // re-evaluate). The winner's bytes stay through the lock window as
+         // the challenge-evidence trail; `chklocks` clears them at COMPLETED.
+         if (c.underwriter != candidate) {
+            c.source_uic_bytes.clear();
+            c.dest_uic_bytes.clear();
          }
       }
    });
@@ -1520,6 +1599,40 @@ void uwrit::rcrdcommit(uint64_t uwreq_id,
    if (!is_active_underwriter(underwriter)) {
       sysio::print("rcrdcommit: uwreq ", uwreq_id, " underwriter ", underwriter,
                    " is not an ACTIVE underwriter, skipping\n");
+      return;
+   }
+
+   // Row-growth rails (SEC-129 / WSA-223) — every rail fails closed with no
+   // mutation, never check() (we are inside the evalcons dispatch chain).
+   // A stored UIC leg is capped so a hostile relay cannot inflate the row
+   // with an oversized blob…
+   if (uic_bytes.size() > MAX_UIC_LEG_BYTES) {
+      sysio::print("rcrdcommit: uwreq ", uwreq_id, " UIC payload of ",
+                   uic_bytes.size(), " bytes exceeds the per-leg cap, skipping\n");
+      return;
+   }
+   // …the candidate roster is capped so the ACTIVE-underwriter population
+   // bounds scan cost but not row size…
+   const bool existing_entry =
+      std::any_of(req_snapshot.commits_by.begin(), req_snapshot.commits_by.end(),
+                  [&](const commit_entry& c) { return c.underwriter == underwriter; });
+   if (!existing_entry && req_snapshot.commits_by.size() >= MAX_UWREQ_CANDIDATES) {
+      sysio::print("rcrdcommit: uwreq ", uwreq_id, " already carries ",
+                   req_snapshot.commits_by.size(),
+                   " candidates (cap reached), skipping new candidate\n");
+      return;
+   }
+   // …and the projected whole-row size is guarded so THIS modify — and every
+   // later consensus-dispatched one — stays clear of chain KV value limits.
+   // Conservative projection: current packed row + the incoming leg bytes +
+   // a fixed allowance for a new entry's non-vector fields (replaced bytes,
+   // if any, are ignored — over-counting only tightens the guard).
+   const size_t projected_row_bytes = pack_size(req_snapshot)
+                                    + uic_bytes.size()
+                                    + (existing_entry ? 0 : COMMIT_ENTRY_PACK_ALLOWANCE_BYTES);
+   if (projected_row_bytes > MAX_UWREQ_ROW_BYTES) {
+      sysio::print("rcrdcommit: uwreq ", uwreq_id, " projected row size ",
+                   projected_row_bytes, " bytes exceeds the row cap, skipping\n");
       return;
    }
 
@@ -1807,7 +1920,10 @@ void uwrit::drainfwq() {
          .winner                    = name{},
          .committed_at_ms           = 0,
          .settled_at_ms             = 0,
-         .expires_at_epoch          = 0,
+         // Same PENDING deadline as createuwreq (SEC-129 / WSA-223): a
+         // from-WIRE race that never resolves is expired by `pruneuwreqs`,
+         // which refunds the escrow in full via `refundwire`.
+         .expires_at_epoch          = get_current_epoch() + cfg.uwreq_pending_timeout_epochs,
          .attestation_inbound_data  = std::move(encoded),
          .attestation_outbound_data = {},
       });
@@ -1880,10 +1996,15 @@ void uwrit::chklocks() {
    }
 
    // COMPLETED flip — a CONFIRMED uwreq whose final lock just swept has
-   // exited its challenge window.
+   // exited its challenge window. The flip stamps the retention deadline
+   // (`pruneuwreqs` erases the row once it elapses) and clears the remaining
+   // heavy payloads: with the challenge window closed, the winner's UIC
+   // evidence and the inbound attestation copy have no remaining reader —
+   // retention keeps the compact audit metadata only (SEC-129 / WSA-223).
    uwreqs_t reqs(get_self());
    auto byuwreq = locks.get_index<"byuwreq"_n>();
    const uint32_t now_ep = get_current_epoch();
+   const uint32_t retention_epochs = read_config(get_self()).uwreq_retention_epochs;
    for (uint64_t id : affected) {
       auto lit = byuwreq.lower_bound(id);
       if (lit != byuwreq.end() && lit->uwreq_id == id) continue;   // locks remain
@@ -1894,8 +2015,88 @@ void uwrit::chklocks() {
       reqs.modify(same_payer, pk, [&](auto& row) {
          row.status           = UnderwriteRequestStatus::UNDERWRITE_REQUEST_STATUS_COMPLETED;
          row.settled_at_ms    = current_time_ms();
-         row.expires_at_epoch = now_ep + UWREQ_RETENTION_EPOCHS;
+         row.expires_at_epoch = now_ep + retention_epochs;
+         row.attestation_inbound_data.clear();
+         for (auto& c : row.commits_by) {
+            c.source_uic_bytes.clear();
+            c.dest_uic_bytes.clear();
+         }
       });
+   }
+}
+
+// ---------------------------------------------------------------------------
+//  pruneuwreqs — bounded UWREQ lifecycle sweep (SEC-129 / WSA-223)
+// ---------------------------------------------------------------------------
+//
+// The enforcement half of `uw_request_t.expires_at_epoch`: every deadline is
+// stamped by the lifecycle writes (createuwreq / drainfwq / reject_and_refund
+// / chklocks) and evaluated only HERE, lazily, when the epoch machinery
+// triggers this action. Nothing is scheduled; a row past its deadline is
+// inert data until the sweep fires. NEVER throws past the auth gate: it runs
+// inline inside `sysio.epoch::advance`, where an abort stalls epoch progress
+// chain-wide. The per-call `max_rows` budget keeps the sweep inside advance's
+// transaction CPU deadline (same rationale as MAX_FWQ_DRAIN_PER_EPOCH); a
+// backlog drains across subsequent epochs.
+void uwrit::pruneuwreqs(uint32_t max_rows) {
+   // Two valid callers, mirroring chklocks / drainfwq:
+   //   * sysio.epoch::advance — inlined each epoch with MAX_UWREQ_PRUNE_PER_EPOCH.
+   //   * sysio.uwrit — manual backlog drain with a caller-chosen budget.
+   check(has_auth(EPOCH_ACCOUNT) || has_auth(get_self()),
+         "pruneuwreqs requires sysio.epoch or sysio.uwrit authority");
+   if (max_rows == 0) return;
+
+   const uint32_t now_ep = get_current_epoch();
+   uwreqs_t reqs(get_self());
+   auto idx = reqs.get_index<"byexpire"_n>();
+
+   // Collect-then-act, bounded to `max_rows` copies: a modify/erase
+   // invalidates the index cursor (same two-pass shape as chklocks), and the
+   // bounded copy keeps the scan cost budgeted. `lower_bound(1)` skips the
+   // `expires_at_epoch == 0` population — rows with no deadline (CONFIRMED,
+   // owned by the wall-clock lock window) are never swept.
+   std::vector<uw_request_t> due;
+   for (auto it = idx.lower_bound(uint64_t{1});
+        it != idx.end() && it->expires_at_epoch <= now_ep && due.size() < max_rows;
+        ++it) {
+      due.push_back(*it);
+   }
+   if (due.empty()) return;
+
+   for (const auto& req : due) {
+      auto pk = id_key{req.id};
+      switch (req.status) {
+         case UnderwriteRequestStatus::UNDERWRITE_REQUEST_STATUS_PENDING: {
+            // The race never resolved inside the pending timeout — abandon
+            // it: refund the source side (SWAP_REVERT to the source outpost,
+            // or the full from-WIRE escrow via refundwire — expiry is not a
+            // caller-controlled revert cause), flip to EXPIRED, and start the
+            // terminal retention window. PENDING rows hold no locks (locks
+            // are first written in the same modify that flips CONFIRMED), so
+            // there is nothing to release.
+            const bool src_needed = !leg_is_depot(req.src_chain_code);
+            reject_and_refund(get_self(), reqs, pk, req, src_needed,
+               "underwrite request expired: no underwriter resolved the race "
+               "within the pending timeout",
+               "uwreq expired: pending deadline elapsed before the race resolved",
+               UnderwriteRequestStatus::UNDERWRITE_REQUEST_STATUS_EXPIRED);
+            break;
+         }
+         case UnderwriteRequestStatus::UNDERWRITE_REQUEST_STATUS_REJECTED:
+         case UnderwriteRequestStatus::UNDERWRITE_REQUEST_STATUS_COMPLETED:
+         case UnderwriteRequestStatus::UNDERWRITE_REQUEST_STATUS_EXPIRED:
+            // Terminal row past its retention window — remove it.
+            reqs.erase(pk);
+            break;
+         default:
+            // CONFIRMED (or a future status) with a live deadline should be
+            // unreachable — winner selection zeroes the deadline. Defensive
+            // skip + log; never throw inside advance.
+            sysio::print("pruneuwreqs: uwreq ", req.id, " in status ",
+                         magic_enum::enum_integer(req.status),
+                         " unexpectedly carries an elapsed deadline, skipping\n");
+            break;
+      }
    }
 }
 
