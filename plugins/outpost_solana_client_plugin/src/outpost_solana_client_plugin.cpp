@@ -1,4 +1,5 @@
 #include <ranges>
+
 #include <fc/log/logger.hpp>
 
 #include <sysio/outpost_solana_client_plugin.hpp>
@@ -94,13 +95,36 @@ void outpost_solana_client_plugin::plugin_initialize(const variables_map& option
    for (auto& client_spec : client_specs) {
       dlog("Adding solana client with spec: {}", client_spec);
       auto parts = fc::split(client_spec, ',');
-      FC_ASSERT(parts.size() == 3, "Invalid spec {} (expected: <client-id>,<sig-provider-id>,<rpc-url>)",
-                client_spec);
+      SYS_ASSERT(parts.size() == 3,
+                 chain::plugin_config_exception,
+                 "Invalid {} spec '{}' (expected: <client-id>,<sig-provider-id>,<rpc-url>)",
+                 option_name_client,
+                 client_spec);
 
       auto& id     = parts[0];
       auto& sig_id = parts[1];
       auto& url    = parts[2];
+      SYS_ASSERT(!id.empty(), chain::plugin_config_exception,
+                 "Invalid {} spec: Solana client id must not be empty", option_name_client);
+      SYS_ASSERT(!sig_id.empty(), chain::plugin_config_exception,
+                 "Invalid {} spec for client '{}': signer name must not be empty", option_name_client, id);
+      SYS_ASSERT(!url.empty(), chain::plugin_config_exception,
+                 "Invalid {} spec for client '{}': RPC URL must not be empty", option_name_client, id);
+      SYS_ASSERT(sig_mgr.is_explicitly_configured_provider(sig_id),
+                 chain::plugin_config_exception,
+                 "Outpost Solana client '{}' references signer '{}', but no explicitly named "
+                 "--signature-provider with that name was specified",
+                 id,
+                 sig_id);
+
       auto sig_provider = sig_mgr.get_provider(sig_id);
+      SYS_ASSERT(sig_provider->target_chain == fc::crypto::chain_kind_solana &&
+                    sig_provider->key_type == fc::crypto::chain_key_type_solana,
+                 chain::plugin_config_exception,
+                 "Outpost Solana client '{}' signer '{}' must use chain=solana and key-type=solana",
+                 id,
+                 sig_id);
+
       my->add_client(id, std::make_shared<solana_client_entry_t>(
                             id, url, sig_provider,
                             std::make_shared<solana_client>(sig_provider, url)));
@@ -117,7 +141,8 @@ void outpost_solana_client_plugin::set_program_options(options_description& cli,
       option_name_client,
       boost::program_options::value<std::vector<std::string>>()->multitoken(),
       "Outpost Solana Client spec, the plugin supports 1 to many clients in a given process. "
-      "Format: `<sol-client-id>,<sig-provider-id>,<rpc-url>`")(
+      "Format: `<sol-client-id>,<sig-provider-id>,<rpc-url>`. The signer id must "
+      "match an explicitly named --signature-provider with the Solana target chain and key type")(
       option_idl_file,
       boost::program_options::value<std::vector<std::filesystem::path>>()->multitoken(),
       "Solana program IDL file(s). Expects each file to be a JSON IDL (Anchor format) program definition.")(

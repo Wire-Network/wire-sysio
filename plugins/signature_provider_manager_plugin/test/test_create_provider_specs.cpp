@@ -81,6 +81,10 @@ BOOST_AUTO_TEST_CASE(create_provider_wire_key_from_example_spec) {
 
    auto provider = mgr.create_provider(provider_spec);
 
+   // A named provider created through the public API was not supplied through
+   // --signature-provider and must not satisfy another plugin's config reference.
+   BOOST_CHECK(!mgr.is_explicitly_configured_provider(provider->key_name));
+
    // Public key should match the one provided in spec
    BOOST_CHECK_EQUAL(provider->public_key.to_string({}), pub.to_string({}));
    BOOST_CHECK_EQUAL(provider->public_key, pub);
@@ -196,8 +200,10 @@ BOOST_AUTO_TEST_CASE(ethereum_signature_provider_spec_options) {
 
    // Provider 1 should be retrievable
    BOOST_CHECK(!mgr.query_providers(fixture1.key_name).empty());
+   BOOST_CHECK(mgr.is_explicitly_configured_provider(fixture1.key_name));
    // Provider 2 should be retrievable
    BOOST_CHECK(!mgr.query_providers(fixture2.key_name).empty());
+   BOOST_CHECK(mgr.is_explicitly_configured_provider(fixture2.key_name));
 }
 
 BOOST_AUTO_TEST_CASE(wire_signature_provider_spec_options) {

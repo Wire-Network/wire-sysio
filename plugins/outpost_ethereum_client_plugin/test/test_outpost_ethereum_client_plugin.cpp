@@ -24,6 +24,7 @@
 #include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
 #include <fc-test/build_info.hpp>
 #include <fc-test/crypto_utils.hpp>
+#include <fc-test/one_shot_http_server.hpp>
 
 #include <sysio/outpost_ethereum_client_plugin.hpp>
 #include <sysio/outpost_ethereum_client_plugin/outpost_ethereum_client.hpp>
@@ -187,6 +188,46 @@ constexpr size_t rpc_length_oversized_envelope_bytes = sysio::OPP_MAX_ENVELOPE_B
 constexpr char malformed_envelope_byte = static_cast<char>(0xff);
 constexpr char oversized_envelope_fill_byte = static_cast<char>(0x01);
 
+/** Build a one-shot JSON-RPC endpoint reporting Anvil's chain id (31337). */
+fc::test::one_shot_http_server chain_id_rpc_server(std::string result_json = "\"0x7a69\"") {
+   return fc::test::one_shot_http_server{
+      R"json({"jsonrpc":"2.0","id":1,"result":)json" + result_json + "}",
+      "eth_chainId"};
+}
+
+/** Build the canonical named Ethereum signature-provider test spec. */
+std::string named_ethereum_signature_provider(std::string name = "signer-a",
+                                              std::string chain_kind = "ethereum") {
+   return name + "," + chain_kind + ",ethereum," + std::string(latest_slot_test_public_key) +
+          ",KEY:" + std::string(latest_slot_test_private_key);
+}
+
+/** Build a provider with Ethereum targeting but a valid non-Ethereum key type. */
+std::string ethereum_target_with_wire_key_provider() {
+   const auto fixture = fc::test::load_keygen_fixture("wire", 1);
+   return fc::crypto::to_signature_provider_spec(
+      "signer-a",
+      fc::crypto::chain_kind_ethereum,
+      fixture.chain_key_type,
+      fixture.public_key,
+      fc::test::to_private_key_spec(fixture.private_key));
+}
+
+/** Initialize the complete outpost plugin with the supplied configuration arguments. */
+void initialize_outpost_plugin(const std::vector<std::string>& configuration_arguments) {
+   appbase::scoped_app test_application{};
+   std::vector<std::string> arguments{"test_outpost_ethereum_client_plugin"};
+   arguments.insert(arguments.end(), configuration_arguments.begin(), configuration_arguments.end());
+
+   std::vector<char*> argv;
+   argv.reserve(arguments.size());
+   for (auto& argument : arguments) {
+      argv.emplace_back(argument.data());
+   }
+
+   BOOST_REQUIRE(test_application->initialize<sysio::outpost_ethereum_client_plugin>(argv.size(), argv.data()));
+}
+
 auto load_abi_fixture(std::string_view filename) {
    auto path = fc::test::get_test_fixtures_path() / bfs::path(filename);
    return fc::network::ethereum::abi::parse_contracts(std::filesystem::path(path.generic_string()));
@@ -220,6 +261,161 @@ std::vector<char> serialize_envelope(uint32_t epoch) {
 } // anonymous namespace
 
 BOOST_AUTO_TEST_SUITE(outpost_ethereum_client_plugin)
+
+// ---------------------------------------------------------------------------
+//  Startup configuration validation
+// ---------------------------------------------------------------------------
+
+BOOST_AUTO_TEST_CASE(startup_accepts_matching_named_signer_and_remote_chain_id) {
+   auto rpc_server = chain_id_rpc_server();
+   BOOST_CHECK_NO_THROW(initialize_outpost_plugin({
+      "--signature-provider",
+      named_ethereum_signature_provider(),
+      "--outpost-ethereum-client",
+      "client-a,signer-a," + rpc_server.url() + ",31337",
+   }));
+}
+
+BOOST_AUTO_TEST_CASE(startup_accepts_three_field_client_without_remote_chain_id_check) {
+   fc::test::connection_closing_http_server rpc_server;
+   BOOST_CHECK_NO_THROW(initialize_outpost_plugin({
+      "--signature-provider",
+      named_ethereum_signature_provider(),
+      "--outpost-ethereum-client",
+      "client-a,signer-a," + rpc_server.url(),
+   }));
+}
+
+BOOST_AUTO_TEST_CASE(startup_accepts_maximum_registered_chain_id) {
+   auto rpc_server = chain_id_rpc_server("\"0xffffffff\"");
+   BOOST_CHECK_NO_THROW(initialize_outpost_plugin({
+      "--signature-provider",
+      named_ethereum_signature_provider(),
+      "--outpost-ethereum-client",
+      "client-a,signer-a," + rpc_server.url() + ",4294967295",
+   }));
+}
+
+BOOST_AUTO_TEST_CASE(startup_rejects_client_without_matching_named_signature_provider) {
+   auto rpc_server = chain_id_rpc_server();
+   BOOST_CHECK_THROW(initialize_outpost_plugin({
+      "--signature-provider",
+      named_ethereum_signature_provider("other-signer"),
+      "--outpost-ethereum-client",
+      "client-a,signer-a," + rpc_server.url() + ",31337",
+   }), sysio::chain::plugin_config_exception);
+}
+
+BOOST_AUTO_TEST_CASE(startup_rejects_anonymous_signature_provider_reference) {
+   auto rpc_server = chain_id_rpc_server();
+   const std::string anonymous_provider =
+      "ethereum,ethereum," + std::string(latest_slot_test_public_key) +
+      ",KEY:" + std::string(latest_slot_test_private_key);
+   BOOST_CHECK_THROW(initialize_outpost_plugin({
+      "--signature-provider",
+      anonymous_provider,
+      "--outpost-ethereum-client",
+      "client-a,key-0," + rpc_server.url() + ",31337",
+   }), sysio::chain::plugin_config_exception);
+}
+
+BOOST_AUTO_TEST_CASE(startup_rejects_named_signer_for_wrong_chain) {
+   auto rpc_server = chain_id_rpc_server();
+   BOOST_CHECK_THROW(initialize_outpost_plugin({
+      "--signature-provider",
+      named_ethereum_signature_provider("signer-a", "wire"),
+      "--outpost-ethereum-client",
+      "client-a,signer-a," + rpc_server.url() + ",31337",
+   }), sysio::chain::plugin_config_exception);
+}
+
+BOOST_AUTO_TEST_CASE(startup_rejects_named_signer_with_wrong_key_type) {
+   auto rpc_server = chain_id_rpc_server();
+   BOOST_CHECK_THROW(initialize_outpost_plugin({
+      "--signature-provider",
+      ethereum_target_with_wire_key_provider(),
+      "--outpost-ethereum-client",
+      "client-a,signer-a," + rpc_server.url() + ",31337",
+   }), sysio::chain::plugin_config_exception);
+}
+
+BOOST_AUTO_TEST_CASE(startup_rejects_chain_id_mismatch_with_rpc_endpoint) {
+   auto rpc_server = chain_id_rpc_server();
+   BOOST_CHECK_THROW(initialize_outpost_plugin({
+      "--signature-provider",
+      named_ethereum_signature_provider(),
+      "--outpost-ethereum-client",
+      "client-a,signer-a," + rpc_server.url() + ",1",
+   }), sysio::chain::plugin_config_exception);
+}
+
+BOOST_AUTO_TEST_CASE(startup_rejects_unavailable_rpc_when_chain_id_is_explicit) {
+   fc::test::connection_closing_http_server rpc_server;
+   BOOST_CHECK_THROW(initialize_outpost_plugin({
+      "--signature-provider",
+      named_ethereum_signature_provider(),
+      "--outpost-ethereum-client",
+      "client-a,signer-a," + rpc_server.url() + ",31337",
+   }), sysio::chain::plugin_config_exception);
+}
+
+BOOST_AUTO_TEST_CASE(startup_rejects_invalid_remote_chain_id) {
+   auto rpc_server = chain_id_rpc_server("\"not-a-chain-id\"");
+   BOOST_CHECK_THROW(initialize_outpost_plugin({
+      "--signature-provider",
+      named_ethereum_signature_provider(),
+      "--outpost-ethereum-client",
+      "client-a,signer-a," + rpc_server.url() + ",31337",
+   }), sysio::chain::plugin_config_exception);
+}
+
+BOOST_AUTO_TEST_CASE(startup_rejects_malformed_configured_chain_id_as_plugin_configuration) {
+   auto rpc_server = chain_id_rpc_server();
+   BOOST_CHECK_THROW(initialize_outpost_plugin({
+      "--signature-provider",
+      named_ethereum_signature_provider(),
+      "--outpost-ethereum-client",
+      "client-a,signer-a," + rpc_server.url() + ",not-a-chain-id",
+   }), sysio::chain::plugin_config_exception);
+}
+
+BOOST_AUTO_TEST_CASE(startup_rejects_chain_id_that_cannot_match_registered_outpost_id) {
+   auto rpc_server = chain_id_rpc_server();
+   BOOST_CHECK_THROW(initialize_outpost_plugin({
+      "--signature-provider",
+      named_ethereum_signature_provider(),
+      "--outpost-ethereum-client",
+      "client-a,signer-a," + rpc_server.url() + ",4294998633",
+   }), sysio::chain::plugin_config_exception);
+}
+
+BOOST_AUTO_TEST_CASE(startup_rejects_configured_chain_id_wider_than_uint256_without_wraparound) {
+   auto rpc_server = chain_id_rpc_server();
+   BOOST_CHECK_THROW(initialize_outpost_plugin({
+      "--signature-provider",
+      named_ethereum_signature_provider(),
+      "--outpost-ethereum-client",
+      "client-a,signer-a," + rpc_server.url() +
+         ",115792089237316195423570985008687907853269984665640564039457584007913129671273",
+   }), sysio::chain::plugin_config_exception);
+}
+
+BOOST_AUTO_TEST_CASE(startup_rejects_remote_chain_id_wider_than_uint256_without_wraparound) {
+   auto rpc_server = chain_id_rpc_server(
+      "\"0x10000000000000000000000000000000000000000000000000000000000007a69\"");
+   BOOST_CHECK_THROW(initialize_outpost_plugin({
+      "--signature-provider",
+      named_ethereum_signature_provider(),
+      "--outpost-ethereum-client",
+      "client-a,signer-a," + rpc_server.url() + ",31337",
+   }), sysio::chain::plugin_config_exception);
+}
+
+BOOST_AUTO_TEST_CASE(one_shot_http_server_destruction_without_request_does_not_block) {
+   fc::test::one_shot_http_server unused_server{
+      R"json({"jsonrpc":"2.0","id":1,"result":"0x1"})json",
+      "eth_chainId"};
+}
 
 // ---------------------------------------------------------------------------
 //  OPP typed contract client tests

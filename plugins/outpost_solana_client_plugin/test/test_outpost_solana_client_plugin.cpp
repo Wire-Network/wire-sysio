@@ -1,6 +1,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include <fc-test/build_info.hpp>
+#include <fc-test/crypto_utils.hpp>
 #include <fc/crypto/base64.hpp>
 #include <fc/crypto/keccak256.hpp>
 #include <fc/io/json.hpp>
@@ -31,6 +32,46 @@ namespace {
 constexpr std::string_view counter_anchor_idl_fixture = "solana-idl-counter-anchor.json";
 constexpr std::string_view opp_outpost_idl_fixture = "solana-idl-opp-outpost-stub.json";
 constexpr std::string_view sec94_terminal_budget_fixture = "sec-94-solana-terminal-budget.json";
+constexpr std::string_view startup_test_rpc_url = "http://127.0.0.1:1";
+
+/** Build a named Solana signature-provider spec from the canonical fixture. */
+std::string named_solana_signature_provider(
+   std::string name = "signer-a",
+   fc::crypto::chain_kind_t chain_kind = fc::crypto::chain_kind_solana) {
+   const auto fixture = fc::test::load_keygen_fixture("solana", 1);
+   return fc::crypto::to_signature_provider_spec(
+      name,
+      chain_kind,
+      fixture.chain_key_type,
+      fixture.public_key,
+      fc::test::to_private_key_spec(fixture.private_key));
+}
+
+/** Build a provider with Solana targeting but a valid non-Solana key type. */
+std::string solana_target_with_wire_key_provider() {
+   const auto fixture = fc::test::load_keygen_fixture("wire", 1);
+   return fc::crypto::to_signature_provider_spec(
+      "signer-a",
+      fc::crypto::chain_kind_solana,
+      fixture.chain_key_type,
+      fixture.public_key,
+      fc::test::to_private_key_spec(fixture.private_key));
+}
+
+/** Initialize the complete Solana outpost plugin with supplied configuration arguments. */
+void initialize_outpost_plugin(const std::vector<std::string>& configuration_arguments) {
+   appbase::scoped_app test_application{};
+   std::vector<std::string> arguments{"test_outpost_solana_client_plugin"};
+   arguments.insert(arguments.end(), configuration_arguments.begin(), configuration_arguments.end());
+
+   std::vector<char*> argv;
+   argv.reserve(arguments.size());
+   for (auto& argument : arguments) {
+      argv.emplace_back(argument.data());
+   }
+
+   BOOST_REQUIRE(test_application->initialize<sysio::outpost_solana_client_plugin>(argv.size(), argv.data()));
+}
 
 /// Measured legacy transaction dimensions for a terminal Solana `epoch_in` call.
 struct terminal_tx_measurement {
@@ -271,6 +312,91 @@ void check_measurement_matches_fixture(const terminal_tx_measurement& measured,
 } // anonymous namespace
 
 BOOST_AUTO_TEST_SUITE(outpost_solana_client_plugin)
+
+// ---------------------------------------------------------------------------
+//  Startup configuration validation
+// ---------------------------------------------------------------------------
+
+BOOST_AUTO_TEST_CASE(startup_accepts_matching_named_signer) {
+   BOOST_CHECK_NO_THROW(initialize_outpost_plugin({
+      "--signature-provider",
+      named_solana_signature_provider(),
+      "--outpost-solana-client",
+      "client-a,signer-a," + std::string(startup_test_rpc_url),
+   }));
+}
+
+BOOST_AUTO_TEST_CASE(startup_rejects_client_without_matching_named_signature_provider) {
+   BOOST_CHECK_THROW(initialize_outpost_plugin({
+      "--signature-provider",
+      named_solana_signature_provider("other-signer"),
+      "--outpost-solana-client",
+      "client-a,signer-a," + std::string(startup_test_rpc_url),
+   }), sysio::chain::plugin_config_exception);
+}
+
+BOOST_AUTO_TEST_CASE(startup_rejects_anonymous_signature_provider_reference) {
+   BOOST_CHECK_THROW(initialize_outpost_plugin({
+      "--signature-provider",
+      named_solana_signature_provider(""),
+      "--outpost-solana-client",
+      "client-a,key-0," + std::string(startup_test_rpc_url),
+   }), sysio::chain::plugin_config_exception);
+}
+
+BOOST_AUTO_TEST_CASE(startup_rejects_named_signer_for_wrong_chain) {
+   BOOST_CHECK_THROW(initialize_outpost_plugin({
+      "--signature-provider",
+      named_solana_signature_provider("signer-a", fc::crypto::chain_kind_wire),
+      "--outpost-solana-client",
+      "client-a,signer-a," + std::string(startup_test_rpc_url),
+   }), sysio::chain::plugin_config_exception);
+}
+
+BOOST_AUTO_TEST_CASE(startup_rejects_named_signer_with_wrong_key_type) {
+   BOOST_CHECK_THROW(initialize_outpost_plugin({
+      "--signature-provider",
+      solana_target_with_wire_key_provider(),
+      "--outpost-solana-client",
+      "client-a,signer-a," + std::string(startup_test_rpc_url),
+   }), sysio::chain::plugin_config_exception);
+}
+
+BOOST_AUTO_TEST_CASE(startup_rejects_empty_client_id) {
+   BOOST_CHECK_THROW(initialize_outpost_plugin({
+      "--signature-provider",
+      named_solana_signature_provider(),
+      "--outpost-solana-client",
+      ",signer-a," + std::string(startup_test_rpc_url),
+   }), sysio::chain::plugin_config_exception);
+}
+
+BOOST_AUTO_TEST_CASE(startup_rejects_empty_signer_name) {
+   BOOST_CHECK_THROW(initialize_outpost_plugin({
+      "--signature-provider",
+      named_solana_signature_provider(),
+      "--outpost-solana-client",
+      "client-a,," + std::string(startup_test_rpc_url),
+   }), sysio::chain::plugin_config_exception);
+}
+
+BOOST_AUTO_TEST_CASE(startup_rejects_empty_rpc_url) {
+   BOOST_CHECK_THROW(initialize_outpost_plugin({
+      "--signature-provider",
+      named_solana_signature_provider(),
+      "--outpost-solana-client",
+      "client-a,signer-a,",
+   }), sysio::chain::plugin_config_exception);
+}
+
+BOOST_AUTO_TEST_CASE(startup_rejects_four_field_client_spec) {
+   BOOST_CHECK_THROW(initialize_outpost_plugin({
+      "--signature-provider",
+      named_solana_signature_provider(),
+      "--outpost-solana-client",
+      "client-a,signer-a," + std::string(startup_test_rpc_url) + ",unexpected-fourth-field",
+   }), sysio::chain::plugin_config_exception);
+}
 
 BOOST_AUTO_TEST_CASE(can_load_counter_anchor_idl) try {
    auto prog = load_idl_fixture(counter_anchor_idl_fixture);
