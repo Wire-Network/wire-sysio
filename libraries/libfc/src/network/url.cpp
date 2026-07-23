@@ -2,7 +2,10 @@
 #include <fc/string.hpp>
 #include <fc/exception/exception.hpp>
 #include <fc/log/logger.hpp>
+#include <algorithm>
+#include <limits>
 #include <sstream>
+#include <string_view>
 
 namespace fc
 {
@@ -11,59 +14,91 @@ namespace fc
     class url_impl
     {
       public:
+         /** Parse an authority while preserving bracketed IPv6 hosts and optional credentials. */
          void parse( const std::string& s )
          {
-           std::stringstream ss(s);
-           std::string skip,_lpath,_largs,luser,lpass;
-           std::getline( ss, _proto, ':' );
-           std::getline( ss, skip, '/' );
-           std::getline( ss, skip, '/' );
+           const auto scheme_end = s.find("://");
+           FC_ASSERT(scheme_end != std::string::npos && scheme_end != 0,
+                     "Unable to parse URL scheme");
+           _proto = s.substr(0, scheme_end);
 
-           if( s.find('@') != size_t(std::string::npos) ) {
-             std::string user_pass;
-             std::getline( ss, user_pass, '@' );
-             std::stringstream upss(user_pass);
-             if( user_pass.find( ':' ) != size_t(std::string::npos) ) {
-                std::getline( upss, luser, ':' );
-                std::getline( upss, lpass, ':' );
-                _user = std::move(luser);
-                _pass = std::move(lpass);
-             } else {
-                _user = std::move(user_pass);
-             }
+           const auto authority_start = scheme_end + 3;
+           const auto authority_end = s.find_first_of("/?", authority_start);
+           std::string_view authority(s.data() + authority_start,
+                                      (authority_end == std::string::npos ? s.size() : authority_end) -
+                                         authority_start);
+           const bool authority_is_safe =
+              std::none_of(authority.begin(), authority.end(),
+                           [](unsigned char character) {
+                              return character <= 0x20 || character == 0x7f;
+                           });
+           FC_ASSERT(authority_is_safe,
+                     "Unable to parse URL authority");
+           if (const auto userinfo_end = authority.rfind('@');
+               userinfo_end != std::string_view::npos) {
+              const auto userinfo = authority.substr(0, userinfo_end);
+              const auto separator = userinfo.find(':');
+              _user = std::string(userinfo.substr(0, separator));
+              if (separator != std::string_view::npos)
+                 _pass = std::string(userinfo.substr(separator + 1));
+              authority.remove_prefix(userinfo_end + 1);
            }
-           std::string host_port;
-           std::getline( ss, host_port, '/' );
-           auto pos = host_port.find( ':' );
-           if( pos != std::string::npos ) {
-              try {
-              _port = static_cast<uint16_t>(to_uint64( host_port.substr( pos+1 ) ));
-              } catch ( ... ) {
-                FC_THROW_EXCEPTION( parse_error_exception, "Unable to parse port field in url",( "url", s ) );
-              }
-              _host = host_port.substr(0,pos);
+
+           std::string_view port_text;
+           if (!authority.empty() && authority.front() == '[') {
+              const auto bracket = authority.find(']');
+              FC_ASSERT(bracket != std::string_view::npos,
+                        "Unable to parse bracketed IPv6 host in URL");
+              _host = std::string(authority.substr(1, bracket - 1));
+              const auto suffix = authority.substr(bracket + 1);
+              FC_ASSERT(suffix.empty() || suffix.front() == ':',
+                        "Unable to parse URL authority after bracketed IPv6 host");
+              if (!suffix.empty())
+                 port_text = suffix.substr(1);
            } else {
-              _host = std::move(host_port);
+              const auto separator = authority.rfind(':');
+              if (separator != std::string_view::npos &&
+                  authority.find(':') == separator) {
+                 _host = std::string(authority.substr(0, separator));
+                 port_text = authority.substr(separator + 1);
+              } else {
+                 _host = std::string(authority);
+              }
            }
-           std::getline( ss, _lpath, '?' );
+           if (!port_text.empty()) {
+              try {
+                 const auto port = to_uint64(std::string(port_text));
+                 FC_ASSERT(port <= std::numeric_limits<uint16_t>::max(),
+                           "URL port is out of range");
+                 _port = static_cast<uint16_t>(port);
+              } catch (...) {
+                 FC_THROW_EXCEPTION(parse_error_exception,
+                                    "Unable to parse port field in URL");
+              }
+           }
+
+           const auto path_start =
+              authority_end == std::string::npos ? s.size() : authority_end;
+           const auto query_start = s.find('?', path_start);
+           const auto path_end =
+              query_start == std::string::npos ? s.size() : query_start;
+           const auto path_text = s.substr(path_start, path_end - path_start);
 #ifdef WIN32
            // On windows, a URL like file:///c:/autoexec.bat would result in _lpath = c:/autoexec.bat
            // which is what we really want (it's already an absolute path)
            if (!stricmp(_proto.c_str(), "file"))
-              _path = _lpath;
+              _path = path_text;
            else
-              _path = std::filesystem::path( "/" ) / _lpath; // let other schemes behave like unix
+              _path = path_text.empty() ? std::filesystem::path("/")
+                                        : std::filesystem::path(path_text);
 #else
            // On unix, a URL like file:///etc/rc.local would result in _lpath = etc/rc.local
            // but we really want to make it the absolute path /etc/rc.local
-           _path = std::filesystem::path( "/" ) / _lpath;
+           _path = path_text.empty() ? std::filesystem::path("/")
+                                     : std::filesystem::path(path_text);
 #endif
-           std::getline( ss, _largs );
-           if( _args && _args->size() )
-           {
-             // TODO: args = std::move(_args);
-              _query = std::move(_largs);
-           }
+           if (query_start != std::string::npos)
+              _query = s.substr(query_start + 1);
          }
 
          std::string               _proto;
@@ -97,7 +132,12 @@ namespace fc
         }
         ss<<"@";
       }
-      if( my->_host ) ss<<*my->_host;
+      if( my->_host ) {
+        if (my->_host->find(':') != std::string::npos)
+          ss<<"["<<*my->_host<<"]";
+        else
+          ss<<*my->_host;
+      }
       if( my->_port ) ss<<":"<<*my->_port;
       if( my->_path ) ss<<my->_path->generic_string();
       if( my->_query ) ss<<"?"<<*my->_query;
