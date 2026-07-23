@@ -54,7 +54,7 @@ Example using the repository's public test fixture key:
 Registers a Solana RPC client instance. Format:
 
 ```
-<client-id>,<sig-provider-id>,<rpc-url>[,<genesis-hash>]
+<client-id>,<sig-provider-id>,<rpc-url>
 ```
 
 | Field | Description |
@@ -62,13 +62,10 @@ Registers a Solana RPC client instance. Format:
 | `client-id` | Unique identifier for this client instance |
 | `sig-provider-id` | Explicit, non-empty name of a registered `--signature-provider` |
 | `rpc-url` | Solana JSON-RPC endpoint URL |
-| `genesis-hash` | Optional expected base58 genesis hash for exact cluster identity |
 
 Startup resolves the signer reference exactly and requires it to use the
 Solana chain and key type. Anonymous signature-provider aliases cannot be
-referenced. Every configured endpoint must return a valid `getGenesisHash`
-response within five seconds. When `genesis-hash` is present, that response
-must match it exactly or startup fails.
+referenced.
 
 Multiple clients can be configured:
 

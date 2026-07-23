@@ -1,7 +1,6 @@
 #include <ranges>
 
 #include <fc/log/logger.hpp>
-#include <fc/task/deadline.hpp>
 
 #include <sysio/outpost_solana_client_plugin.hpp>
 #include <sysio/outpost_solana_client_plugin/outpost_solana_client.hpp>
@@ -12,76 +11,10 @@ namespace {
 constexpr auto option_name_client          = "outpost-solana-client";
 constexpr auto option_idl_file             = "solana-idl-file";
 constexpr auto option_outpost_program_name = "solana-outpost-program-name";
-constexpr auto genesis_hash_validation_timeout = fc::seconds(5);
 
 [[maybe_unused]] inline fc::logger& logger() {
    static fc::logger log{"outpost_solana_client_plugin"};
    return log;
-}
-
-/** Construct the client and validate its cluster identity within one startup deadline. */
-std::pair<solana_client_ptr, std::string> create_validated_client(
-   const std::string&                client_id,
-   const fc::crypto::signature_provider_ptr& signature_provider,
-   const std::string&                url,
-   const std::optional<std::string>& expected_genesis_hash) {
-   if (expected_genesis_hash) {
-      try {
-         fc::crypto::solana::solana_public_key::from_base58_string(*expected_genesis_hash);
-      } catch (const fc::exception&) {
-         FC_THROW_EXCEPTION(
-            chain::plugin_config_exception,
-            "Invalid expected genesis hash for outpost Solana client '{}': expected a base58-encoded 32-byte hash",
-            client_id);
-      } catch (const std::exception&) {
-         FC_THROW_EXCEPTION(
-            chain::plugin_config_exception,
-            "Invalid expected genesis hash for outpost Solana client '{}': expected a base58-encoded 32-byte hash",
-            client_id);
-      }
-   }
-
-   fc::task::deadline_scope deadline(fc::time_point::now() + genesis_hash_validation_timeout);
-   solana_client_ptr client;
-   try {
-      client = std::make_shared<solana_client>(signature_provider, url);
-   } catch (const fc::exception&) {
-      FC_THROW_EXCEPTION(
-         chain::plugin_config_exception,
-         "Unable to initialize outpost Solana client '{}': the configured RPC endpoint is invalid or could not be resolved",
-         client_id);
-   } catch (const std::exception&) {
-      FC_THROW_EXCEPTION(
-         chain::plugin_config_exception,
-         "Unable to initialize outpost Solana client '{}': the configured RPC endpoint is invalid or could not be resolved",
-         client_id);
-   }
-
-   std::string remote_genesis_hash;
-   try {
-      remote_genesis_hash = client->get_genesis_hash();
-      fc::crypto::solana::solana_public_key::from_base58_string(remote_genesis_hash);
-   } catch (const fc::exception&) {
-      FC_THROW_EXCEPTION(
-         chain::plugin_config_exception,
-         "Unable to validate outpost Solana client '{}': the configured RPC endpoint did not "
-         "return a valid getGenesisHash result",
-         client_id);
-   } catch (const std::exception&) {
-      FC_THROW_EXCEPTION(
-         chain::plugin_config_exception,
-         "Unable to validate outpost Solana client '{}': the configured RPC endpoint did not "
-         "return a valid getGenesisHash result",
-         client_id);
-   }
-
-   SYS_ASSERT(!expected_genesis_hash || remote_genesis_hash == *expected_genesis_hash,
-              chain::plugin_config_exception,
-              "Genesis hash mismatch for outpost Solana client '{}': configured {}, RPC endpoint reports {}",
-              client_id,
-              expected_genesis_hash.value_or("none"),
-              remote_genesis_hash);
-   return {std::move(client), std::move(remote_genesis_hash)};
 }
 } // namespace
 
@@ -162,9 +95,10 @@ void outpost_solana_client_plugin::plugin_initialize(const variables_map& option
    for (auto& client_spec : client_specs) {
       dlog("Adding solana client with spec: {}", client_spec);
       auto parts = fc::split(client_spec, ',');
-      SYS_ASSERT(parts.size() == 3 || parts.size() == 4,
+      SYS_ASSERT(parts.size() == 3,
                  chain::plugin_config_exception,
-                 "Invalid spec {} (expected: <client-id>,<sig-provider-id>,<rpc-url>[,<genesis-hash>])",
+                 "Invalid {} spec '{}' (expected: <client-id>,<sig-provider-id>,<rpc-url>)",
+                 option_name_client,
                  client_spec);
 
       auto& id     = parts[0];
@@ -183,13 +117,6 @@ void outpost_solana_client_plugin::plugin_initialize(const variables_map& option
                  id,
                  sig_id);
 
-      std::optional<std::string> expected_genesis_hash;
-      if (parts.size() == 4) {
-         SYS_ASSERT(!parts[3].empty(), chain::plugin_config_exception,
-                    "Invalid {} spec for client '{}': genesis hash must not be empty", option_name_client, id);
-         expected_genesis_hash = parts[3];
-      }
-
       auto sig_provider = sig_mgr.get_provider(sig_id);
       SYS_ASSERT(sig_provider->target_chain == fc::crypto::chain_kind_solana &&
                     sig_provider->key_type == fc::crypto::chain_key_type_solana,
@@ -198,12 +125,10 @@ void outpost_solana_client_plugin::plugin_initialize(const variables_map& option
                  id,
                  sig_id);
 
-      auto [sol_client, genesis_hash] = create_validated_client(id, sig_provider, url, expected_genesis_hash);
       my->add_client(id, std::make_shared<solana_client_entry_t>(
                             id, url, sig_provider,
-                            std::move(sol_client)));
-      ilog("Added solana client (id={},sig_id={},genesisHash={},url={})",
-           id, sig_id, genesis_hash, url);
+                            std::make_shared<solana_client>(sig_provider, url)));
+      ilog("Added solana client (id={},sig_id={},url={})", id, sig_id, url);
    }
 }
 
@@ -216,9 +141,8 @@ void outpost_solana_client_plugin::set_program_options(options_description& cli,
       option_name_client,
       boost::program_options::value<std::vector<std::string>>()->multitoken(),
       "Outpost Solana Client spec, the plugin supports 1 to many clients in a given process. "
-      "Format: `<sol-client-id>,<sig-provider-id>,<rpc-url>[,<genesis-hash>]`. The signer id must "
-      "match an explicitly named --signature-provider. Startup validates getGenesisHash, and an "
-      "explicit genesis hash must match the endpoint's response")(
+      "Format: `<sol-client-id>,<sig-provider-id>,<rpc-url>`. The signer id must "
+      "match an explicitly named --signature-provider with the Solana target chain and key type")(
       option_idl_file,
       boost::program_options::value<std::vector<std::filesystem::path>>()->multitoken(),
       "Solana program IDL file(s). Expects each file to be a JSON IDL (Anchor format) program definition.")(

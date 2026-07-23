@@ -2,7 +2,6 @@
 
 #include <fc-test/build_info.hpp>
 #include <fc-test/crypto_utils.hpp>
-#include <fc-test/one_shot_http_server.hpp>
 #include <fc/io/json.hpp>
 #include <fc/network/solana/solana_client.hpp>
 #include <fc/network/solana/solana_idl.hpp>
@@ -28,16 +27,7 @@ namespace {
 constexpr std::string_view counter_anchor_idl_fixture = "solana-idl-counter-anchor.json";
 constexpr std::string_view opp_outpost_idl_fixture = "solana-idl-opp-outpost-stub.json";
 constexpr std::string_view sec94_terminal_budget_fixture = "sec-94-solana-terminal-budget.json";
-constexpr std::string_view test_genesis_hash = "11111111111111111111111111111111";
-constexpr std::string_view different_genesis_hash = "SysvarC1ock11111111111111111111111111111111";
-
-/** Build a one-shot JSON-RPC endpoint returning the supplied genesis hash. */
-fc::test::one_shot_http_server genesis_hash_rpc_server(
-   std::string genesis_hash = std::string(test_genesis_hash)) {
-   return fc::test::one_shot_http_server{
-      R"json({"jsonrpc":"2.0","id":1,"result":")json" + genesis_hash + R"json("})json",
-      "getGenesisHash"};
-}
+constexpr std::string_view startup_test_rpc_url = "http://127.0.0.1:1";
 
 /** Build a named Solana signature-provider spec from the canonical fixture. */
 std::string named_solana_signature_provider(
@@ -322,103 +312,84 @@ BOOST_AUTO_TEST_SUITE(outpost_solana_client_plugin)
 //  Startup configuration validation
 // ---------------------------------------------------------------------------
 
-BOOST_AUTO_TEST_CASE(startup_accepts_matching_named_signer_and_genesis_hash) {
-   auto rpc_server = genesis_hash_rpc_server();
+BOOST_AUTO_TEST_CASE(startup_accepts_matching_named_signer) {
    BOOST_CHECK_NO_THROW(initialize_outpost_plugin({
       "--signature-provider",
       named_solana_signature_provider(),
       "--outpost-solana-client",
-      "client-a,signer-a," + rpc_server.url() + "," + std::string(test_genesis_hash),
-   }));
-}
-
-BOOST_AUTO_TEST_CASE(startup_validates_rpc_without_configured_genesis_hash) {
-   auto rpc_server = genesis_hash_rpc_server();
-   BOOST_CHECK_NO_THROW(initialize_outpost_plugin({
-      "--signature-provider",
-      named_solana_signature_provider(),
-      "--outpost-solana-client",
-      "client-a,signer-a," + rpc_server.url(),
+      "client-a,signer-a," + std::string(startup_test_rpc_url),
    }));
 }
 
 BOOST_AUTO_TEST_CASE(startup_rejects_client_without_matching_named_signature_provider) {
-   auto rpc_server = genesis_hash_rpc_server();
    BOOST_CHECK_THROW(initialize_outpost_plugin({
       "--signature-provider",
       named_solana_signature_provider("other-signer"),
       "--outpost-solana-client",
-      "client-a,signer-a," + rpc_server.url() + "," + std::string(test_genesis_hash),
+      "client-a,signer-a," + std::string(startup_test_rpc_url),
    }), sysio::chain::plugin_config_exception);
 }
 
 BOOST_AUTO_TEST_CASE(startup_rejects_anonymous_signature_provider_reference) {
-   auto rpc_server = genesis_hash_rpc_server();
    BOOST_CHECK_THROW(initialize_outpost_plugin({
       "--signature-provider",
       named_solana_signature_provider(""),
       "--outpost-solana-client",
-      "client-a,key-0," + rpc_server.url() + "," + std::string(test_genesis_hash),
+      "client-a,key-0," + std::string(startup_test_rpc_url),
    }), sysio::chain::plugin_config_exception);
 }
 
 BOOST_AUTO_TEST_CASE(startup_rejects_named_signer_for_wrong_chain) {
-   auto rpc_server = genesis_hash_rpc_server();
    BOOST_CHECK_THROW(initialize_outpost_plugin({
       "--signature-provider",
       named_solana_signature_provider("signer-a", fc::crypto::chain_kind_wire),
       "--outpost-solana-client",
-      "client-a,signer-a," + rpc_server.url() + "," + std::string(test_genesis_hash),
+      "client-a,signer-a," + std::string(startup_test_rpc_url),
    }), sysio::chain::plugin_config_exception);
 }
 
 BOOST_AUTO_TEST_CASE(startup_rejects_named_signer_with_wrong_key_type) {
-   auto rpc_server = genesis_hash_rpc_server();
    BOOST_CHECK_THROW(initialize_outpost_plugin({
       "--signature-provider",
       solana_target_with_wire_key_provider(),
       "--outpost-solana-client",
-      "client-a,signer-a," + rpc_server.url() + "," + std::string(test_genesis_hash),
+      "client-a,signer-a," + std::string(startup_test_rpc_url),
    }), sysio::chain::plugin_config_exception);
 }
 
-BOOST_AUTO_TEST_CASE(startup_rejects_genesis_hash_mismatch_with_rpc_endpoint) {
-   auto rpc_server = genesis_hash_rpc_server();
+BOOST_AUTO_TEST_CASE(startup_rejects_empty_client_id) {
    BOOST_CHECK_THROW(initialize_outpost_plugin({
       "--signature-provider",
       named_solana_signature_provider(),
       "--outpost-solana-client",
-      "client-a,signer-a," + rpc_server.url() + "," + std::string(different_genesis_hash),
+      ",signer-a," + std::string(startup_test_rpc_url),
    }), sysio::chain::plugin_config_exception);
 }
 
-BOOST_AUTO_TEST_CASE(startup_rejects_unavailable_solana_rpc) {
-   fc::test::connection_closing_http_server rpc_server;
+BOOST_AUTO_TEST_CASE(startup_rejects_empty_signer_name) {
    BOOST_CHECK_THROW(initialize_outpost_plugin({
       "--signature-provider",
       named_solana_signature_provider(),
       "--outpost-solana-client",
-      "client-a,signer-a," + rpc_server.url(),
+      "client-a,," + std::string(startup_test_rpc_url),
    }), sysio::chain::plugin_config_exception);
 }
 
-BOOST_AUTO_TEST_CASE(startup_rejects_invalid_remote_genesis_hash) {
-   auto rpc_server = genesis_hash_rpc_server("not-a-genesis-hash");
+BOOST_AUTO_TEST_CASE(startup_rejects_empty_rpc_url) {
    BOOST_CHECK_THROW(initialize_outpost_plugin({
       "--signature-provider",
       named_solana_signature_provider(),
       "--outpost-solana-client",
-      "client-a,signer-a," + rpc_server.url(),
+      "client-a,signer-a,",
    }), sysio::chain::plugin_config_exception);
 }
 
-BOOST_AUTO_TEST_CASE(startup_rejects_invalid_configured_genesis_hash) {
-   auto rpc_server = genesis_hash_rpc_server();
+BOOST_AUTO_TEST_CASE(startup_rejects_four_field_client_spec) {
    BOOST_CHECK_THROW(initialize_outpost_plugin({
       "--signature-provider",
       named_solana_signature_provider(),
       "--outpost-solana-client",
-      "client-a,signer-a," + rpc_server.url() + ",not-a-genesis-hash",
+      "client-a,signer-a," + std::string(startup_test_rpc_url) + ",unexpected-fourth-field",
    }), sysio::chain::plugin_config_exception);
 }
 

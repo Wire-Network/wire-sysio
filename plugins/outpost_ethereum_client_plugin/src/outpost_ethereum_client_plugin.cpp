@@ -58,6 +58,23 @@ std::optional<uint32_t> parse_chain_id(std::string_view text) {
    return value == 0 ? std::nullopt : std::optional<uint32_t>{value};
 }
 
+/** Report a neutral configuration error after client construction fails. */
+[[noreturn]] void throw_client_initialization_failure(const std::string& client_id) {
+   FC_THROW_EXCEPTION(
+      chain::plugin_config_exception,
+      "Failed to initialize outpost Ethereum client '{}'",
+      client_id);
+}
+
+/** Report a stable configuration error when the explicit chain ID cannot be verified. */
+[[noreturn]] void throw_chain_id_validation_failure(const std::string& client_id) {
+   FC_THROW_EXCEPTION(
+      chain::plugin_config_exception,
+      "Unable to validate chain id for outpost Ethereum client '{}': "
+      "the configured RPC endpoint did not return a valid eth_chainId",
+      client_id);
+}
+
 /** Construct the client and verify any explicit chain id within one startup deadline. */
 ethereum_client_ptr create_validated_client(
    const std::string&                         client_id,
@@ -73,15 +90,9 @@ ethereum_client_ptr create_validated_client(
          : std::nullopt;
       client = std::make_shared<ethereum_client>(signature_provider, url, client_chain_id);
    } catch (const fc::exception&) {
-      FC_THROW_EXCEPTION(
-         chain::plugin_config_exception,
-         "Unable to initialize outpost Ethereum client '{}': the configured RPC endpoint is invalid or could not be resolved",
-         client_id);
+      throw_client_initialization_failure(client_id);
    } catch (const std::exception&) {
-      FC_THROW_EXCEPTION(
-         chain::plugin_config_exception,
-         "Unable to initialize outpost Ethereum client '{}': the configured RPC endpoint is invalid or could not be resolved",
-         client_id);
+      throw_client_initialization_failure(client_id);
    }
 
    if (configured_chain_id) {
@@ -89,17 +100,9 @@ ethereum_client_ptr create_validated_client(
       try {
          remote_chain_id_text = client->execute("eth_chainId", fc::variants{}).as_string();
       } catch (const fc::exception&) {
-         FC_THROW_EXCEPTION(
-            chain::plugin_config_exception,
-            "Unable to validate chain id for outpost Ethereum client '{}': "
-            "the configured RPC endpoint did not return a valid eth_chainId",
-            client_id);
+         throw_chain_id_validation_failure(client_id);
       } catch (const std::exception&) {
-         FC_THROW_EXCEPTION(
-            chain::plugin_config_exception,
-            "Unable to validate chain id for outpost Ethereum client '{}': "
-            "the configured RPC endpoint did not return a valid eth_chainId",
-            client_id);
+         throw_chain_id_validation_failure(client_id);
       }
 
       const auto remote_chain_id = parse_chain_id(remote_chain_id_text);
