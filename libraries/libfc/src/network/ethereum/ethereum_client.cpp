@@ -76,13 +76,15 @@ const abi::contract& ethereum_contract_client::get_abi(const std::string& contra
  * @param sig_provider Signature provider for signing transactions
  * @param url_source URL of the Ethereum node (string or fc::url)
  * @param chain_id Optional chain ID (if not provided, will be fetched from the node)
+ * @param rpc_options Authenticated transport and bounded request policy
  */
 ethereum_client::ethereum_client(const signature_provider_ptr& sig_provider,
                                  const std::variant<std::string, fc::url>& url_source,
-                                 std::optional<fc::uint256> chain_id)
+                                 std::optional<fc::uint256> chain_id,
+                                 client_options rpc_options)
    : _signature_provider(sig_provider)
    , _address(to_address(_signature_provider->public_key))
-   , _client(json_rpc_client::create(url_source))
+   , _client(json_rpc_client::create(url_source, std::move(rpc_options)))
    , _chain_id(chain_id) {}
 
 /**

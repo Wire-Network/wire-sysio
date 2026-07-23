@@ -886,10 +886,11 @@ std::vector<account_meta> solana_program_client::resolve_accounts(const idl::ins
 //=============================================================================
 
 solana_client::solana_client(const signature_provider_ptr& sig_provider,
-                             const std::variant<std::string, fc::url>& url_source)
+                             const std::variant<std::string, fc::url>& url_source,
+                             client_options rpc_options)
    : _signature_provider(sig_provider)
    , _pubkey(from_fc_public_key(_signature_provider->public_key))
-   , _client(json_rpc_client::create(url_source)) {}
+   , _client(json_rpc_client::create(url_source, std::move(rpc_options))) {}
 
 fc::variant solana_client::execute(const std::string& method, const fc::variant& params) {
    return _client.call(method, params);

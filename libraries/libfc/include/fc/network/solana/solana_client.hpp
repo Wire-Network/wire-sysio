@@ -546,8 +546,11 @@ public:
     *
     * @param sig_provider Signature provider for signing transactions (ED25519)
     * @param url_source The URL of the Solana RPC node
+    * @param rpc_options authenticated transport and bounded request policy
     */
-   solana_client(const signature_provider_ptr& sig_provider, const std::variant<std::string, fc::url>& url_source);
+   solana_client(const signature_provider_ptr& sig_provider,
+                 const std::variant<std::string, fc::url>& url_source,
+                 client_options rpc_options = {});
 
    /**
     * @brief Execute a raw JSON-RPC method call

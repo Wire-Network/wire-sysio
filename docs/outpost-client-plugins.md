@@ -10,6 +10,14 @@ The Ethereum client plugin is configured via program options as follows:
 --signature-provider "eth-01,ethereum,ethereum,0x8318535b54105d4a7aae60c08fc45f9687181b4fdfc625bd1a753fa7397fed753547f11ca8696646f2f3acb08e31016afac23e630c5d11f59f61fef57b0d2aa5,KEY:0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
 --outpost-ethereum-client eth-anvil-local,eth-01,http://localhost:8545,31337
 ```
+
+HTTPS endpoints use system CA roots and mandatory DNS/IP identity verification. Private PKI can be added with
+`--outpost-ethereum-additional-ca-file` or `--outpost-ethereum-additional-ca-path`; an explicit proxy can be set
+with `--outpost-ethereum-proxy`. The equivalent Solana options are
+`--outpost-solana-additional-ca-file`, `--outpost-solana-additional-ca-path`, and
+`--outpost-solana-proxy`. See [Outbound HTTP transport](outbound-http-transport.md) for the complete security and
+resource policy.
+
 > NOTE:  If you look closely, the reference to `eth-01` in the Ethereum client config, matches the signature provider configured for `Ethereum`.  This mapping is what enables `1..n` clients in a single process
 
 The signer reference is validated during startup. Each

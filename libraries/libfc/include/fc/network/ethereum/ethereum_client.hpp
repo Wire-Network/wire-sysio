@@ -329,9 +329,11 @@ public:
     * @param sig_provider `signature_provider` shared pointer
     * @param url_source The URL of the Ethereum node (e.g., Infura, local node).
     * @param chain_id optional uint256 encapsulating the chain id
+    * @param rpc_options authenticated transport and bounded request policy
     */
    ethereum_client(const signature_provider_ptr& sig_provider, const std::variant<std::string, fc::url>& url_source,
-                   std::optional<fc::uint256> chain_id = std::nullopt);
+                   std::optional<fc::uint256> chain_id = std::nullopt,
+                   client_options rpc_options = {});
 
    /**
     * @brief General method to send RPC requests.

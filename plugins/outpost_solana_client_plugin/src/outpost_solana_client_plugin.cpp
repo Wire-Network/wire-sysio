@@ -11,10 +11,43 @@ namespace {
 constexpr auto option_name_client          = "outpost-solana-client";
 constexpr auto option_idl_file             = "solana-idl-file";
 constexpr auto option_outpost_program_name = "solana-outpost-program-name";
+constexpr auto option_additional_ca_file   = "outpost-solana-additional-ca-file";
+constexpr auto option_additional_ca_path   = "outpost-solana-additional-ca-path";
+constexpr auto option_proxy                = "outpost-solana-proxy";
+constexpr uint64_t solana_rpc_max_request_bytes = 1ULL * 1024ULL * 1024ULL;
+constexpr uint64_t solana_rpc_max_response_bytes = 4ULL * 1024ULL * 1024ULL;
 
 [[maybe_unused]] inline fc::logger& logger() {
    static fc::logger log{"outpost_solana_client_plugin"};
    return log;
+}
+
+/** Build the named bounded transport policy shared by configured Solana RPC clients. */
+fc::network::json_rpc::client_options solana_rpc_options(const variables_map& options) {
+   fc::network::json_rpc::client_options result{
+      .request =
+         fc::http::request_options{
+            .max_request_body_bytes = solana_rpc_max_request_bytes,
+            .max_response_body_bytes = solana_rpc_max_response_bytes,
+            .timeouts =
+               fc::http::timeout_options{
+                  .connect = fc::seconds(10),
+                  .header = fc::seconds(30),
+                  .read = fc::seconds(30),
+                  .idle = fc::seconds(30),
+                  .total = fc::seconds(30),
+               },
+         },
+   };
+   if (options.contains(option_additional_ca_file))
+      result.transport.additional_ca_file =
+         options.at(option_additional_ca_file).as<std::filesystem::path>();
+   if (options.contains(option_additional_ca_path))
+      result.transport.additional_ca_path =
+         options.at(option_additional_ca_path).as<std::filesystem::path>();
+   if (options.contains(option_proxy))
+      result.transport.proxy = options.at(option_proxy).as<std::string>();
+   return result;
 }
 } // namespace
 
@@ -74,6 +107,8 @@ public:
 outpost_solana_client_plugin::outpost_solana_client_plugin()
    : my(std::make_unique<outpost_solana_client_plugin_impl>()) {}
 
+outpost_solana_client_plugin::~outpost_solana_client_plugin() = default;
+
 void outpost_solana_client_plugin::plugin_initialize(const variables_map& options) {
    if (options.contains(option_idl_file)) {
       auto& idl_files = options.at(option_idl_file).as<std::vector<std::filesystem::path>>();
@@ -91,9 +126,10 @@ void outpost_solana_client_plugin::plugin_initialize(const variables_map& option
    // constructed here rather than deferred to startup.
    auto& sig_mgr      = app().get_plugin<signature_provider_manager_plugin>();
    auto client_specs  = options.at(option_name_client).as<std::vector<std::string>>();
+   const auto rpc_options = solana_rpc_options(options);
 
    for (auto& client_spec : client_specs) {
-      dlog("Adding solana client with spec: {}", client_spec);
+      dlog("Adding configured Solana client");
       auto parts = fc::split(client_spec, ',');
       SYS_ASSERT(parts.size() == 3,
                  chain::plugin_config_exception,
@@ -127,8 +163,9 @@ void outpost_solana_client_plugin::plugin_initialize(const variables_map& option
 
       my->add_client(id, std::make_shared<solana_client_entry_t>(
                             id, url, sig_provider,
-                            std::make_shared<solana_client>(sig_provider, url)));
-      ilog("Added solana client (id={},sig_id={},url={})", id, sig_id, url);
+                            std::make_shared<solana_client>(sig_provider, url, rpc_options)));
+      ilog("Added solana client (id={},sig_id={},endpoint={})",
+           id, sig_id, fc::http::sanitized_endpoint(fc::url(url)));
    }
 }
 
@@ -151,7 +188,16 @@ void outpost_solana_client_plugin::set_program_options(options_description& cli,
       "Anchor IDL program name of the Solana OPP outpost. The loaded --solana-idl-file set is filtered to "
       "programs with this name when constructing outpost clients. The default targets the standalone "
       "opp_outpost program; pass liqsol_core when the outpost interface is hosted inside the liqsol-core "
-      "program (clean-room layout).");
+      "program (clean-room layout).")(
+      option_additional_ca_file,
+      boost::program_options::value<std::filesystem::path>(),
+      "PEM CA bundle added to system trust for Solana RPC HTTPS clients.")(
+      option_additional_ca_path,
+      boost::program_options::value<std::filesystem::path>(),
+      "Hashed CA directory added to system trust for Solana RPC HTTPS clients.")(
+      option_proxy,
+      boost::program_options::value<std::string>(),
+      "Explicit proxy URL for Solana RPC HTTP clients.");
 }
 
 void outpost_solana_client_plugin::plugin_shutdown() {
