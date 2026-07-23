@@ -662,14 +662,14 @@ BOOST_AUTO_TEST_CASE(growth_guard_throw_aborts_emission) {
 }
 
 BOOST_AUTO_TEST_CASE(growth_guard_intra_token_abort) {
-   // A single oversized token must be budget-checked WHILE it streams: value_string (via
-   // the escape loop's periodic yield), value_hex, and raw_value all abort within a chunk
-   // of the guard's threshold instead of materializing the full token behind one
-   // token-boundary pre-check.
+   // A single oversized token must not materialize behind one token-boundary check.
+   // value_string pre-checks its known input length with the guard and aborts BEFORE
+   // emitting (or allocating) anything; value_hex and raw_value abort within a chunk of
+   // the guard's threshold while they stream.  (Mid-loop coverage for string escaping --
+   // where the output size is NOT known up front -- is growth_guard_measures_escape_expansion.)
    constexpr size_t threshold = 64 * 1024;
-   // Abort bound: threshold + one stride of guarded emission (hex/raw chunk at the
-   // writer's stride; the escape loop yields every 128 input chars) + slack -- far below
-   // the full token size.
+   // Abort bound for the chunked emitters: threshold + one stride of guarded emission +
+   // slack -- far below the full token size.
    constexpr size_t abort_bound = threshold + 8 * 1024;
    const std::string big(1u << 20, 'x'); // 1 MiB payload; hex form is 2 MiB
 
@@ -677,7 +677,7 @@ BOOST_AUTO_TEST_CASE(growth_guard_intra_token_abort) {
       std::string out;
       fc::json_writer w(out, [&](size_t sz) { if (sz > threshold) throw test_budget_abort{}; }, 1024);
       BOOST_CHECK_THROW(w.value_string(big), test_budget_abort);
-      BOOST_CHECK_LT(out.size(), abort_bound);
+      BOOST_CHECK_EQUAL(out.size(), 0u); // rejected by the size pre-check: nothing emitted at all
    }
    {
       std::string out;
@@ -693,37 +693,83 @@ BOOST_AUTO_TEST_CASE(growth_guard_intra_token_abort) {
    }
 }
 
+BOOST_AUTO_TEST_CASE(growth_guard_bounds_allocation) {
+   // A rejected token must not ALLOCATE its full size either: value_string / key pre-check
+   // the known input length with the guard BEFORE escape_string reserves capacity for it,
+   // so a 32 MiB string under a 64 KiB budget aborts with the buffer's capacity still at
+   // its initial slack -- not a ~32 MiB reservation that out.size() never reflects.
+   constexpr size_t threshold = 64 * 1024;
+   const std::string big(32u << 20, 'x'); // 32 MiB
+   {
+      std::string out;
+      fc::json_writer w(out, [&](size_t sz) { if (sz > threshold) throw test_budget_abort{}; }, 1024);
+      BOOST_CHECK_THROW(w.value_string(big), test_budget_abort);
+      BOOST_CHECK_LT(out.capacity(), threshold); // ~32 MiB before the size pre-check existed
+      BOOST_CHECK_EQUAL(out.size(), 0u);
+   }
+   { // oversized keys take the same pre-check path
+      std::string out;
+      fc::json_writer w(out, [&](size_t sz) { if (sz > threshold) throw test_budget_abort{}; }, 1024);
+      w.begin_object();
+      BOOST_CHECK_THROW(w.key(big), test_budget_abort);
+      BOOST_CHECK_LT(out.capacity(), threshold);
+   }
+   { // an approved string keeps the single full-size reserve: no growth tax on the legit path
+      std::string out;
+      fc::json_writer w(out, [](size_t) { /* generous budget: never rejects */ });
+      w.value_string(big);
+      BOOST_CHECK_EQUAL(out.size(), big.size() + 2);
+      BOOST_CHECK_GE(out.capacity(), big.size());
+   }
+   { // unguarded writers are untouched: same output, same full reserve
+      std::string out;
+      fc::json_writer w(out);
+      w.value_string(big);
+      BOOST_CHECK_EQUAL(out.size(), big.size() + 2);
+      BOOST_CHECK_GE(out.capacity(), big.size());
+   }
+}
+
 BOOST_AUTO_TEST_CASE(growth_guard_measures_escape_expansion) {
    // 32 KiB of control characters escape to ~192 KiB of output (6 bytes per input byte).
-   // A guard threshold above the input size but below the expanded size must still fire,
-   // proving the guard measures emitted bytes, not input consumed.
+   // The size pre-check approves the 32 KiB input (it is below the threshold), so this
+   // exercises the mid-loop machinery: a guard threshold above the input size but below
+   // the expanded size must still fire, proving the guard measures emitted bytes, not
+   // input consumed.
    const std::string ctrl(32 * 1024, '\x01');
    std::string out;
    fc::json_writer w(out, [&](size_t sz) { if (sz > 100 * 1024) throw test_budget_abort{}; }, 1024);
    BOOST_CHECK_THROW(w.value_string(ctrl), test_budget_abort);
    BOOST_CHECK_GT(out.size(), 100 * 1024); // the expanded output crossed a threshold the raw input never reaches
    BOOST_CHECK_LT(out.size(), 128 * 1024);
+   // Allocation tracks the abort point, not some larger pre-computed estimate: capacity is
+   // the escape reserve for the approved input plus geometric growth to the abort.
+   BOOST_CHECK_LT(out.capacity(), 256 * 1024);
 }
 
 BOOST_AUTO_TEST_CASE(growth_guard_rearms_after_throw) {
    // A catch-and-continue serializer (eg the abi_serializer hex-fallback path) absorbing
    // the guard's throw must NOT disable the guard: the very next token re-invokes it
    // regardless of stride, so the abort re-raises until it unwinds out of the emitter.
-   // Once the guard passes again (budget freed), emission resumes normally.
+   // Once the guard passes again (budget freed), emission resumes normally.  A rejected
+   // value_string mutates nothing (the size pre-check runs ahead of the separator), so
+   // absorb-and-continue leaves the buffer well-formed.
    std::string out;
-   bool reject = true;
+   bool reject = false;
    size_t calls = 0;
    fc::json_writer w(out, [&](size_t) { ++calls; if (reject) throw test_budget_abort{}; }, 4);
    w.begin_array();
-   w.value_string("aaaaaaaaaa");                                 // grows past the stride; guard fires on the NEXT token
-   BOOST_CHECK_THROW(w.value_string("bbb"), test_budget_abort);  // stride crossed -> guard throws, nothing appended
+   w.value_string("aaaaaaaaaa");                                 // pre-check crosses the stride; guard approves
    BOOST_CHECK_EQUAL(calls, 1u);
-   BOOST_CHECK_THROW(w.value_string("ccc"), test_budget_abort);  // absorbed upstream? re-fires immediately
+   reject = true;                                                // budget exhausted
+   BOOST_CHECK_THROW(w.value_string("bbb"), test_budget_abort);  // pre-check throws, nothing appended
    BOOST_CHECK_EQUAL(calls, 2u);
+   BOOST_CHECK_THROW(w.value_string("ccc"), test_budget_abort);  // absorbed upstream? re-fires immediately
+   BOOST_CHECK_EQUAL(calls, 3u);
    reject = false;                                               // budget freed: same retry now passes
    w.value_string("ddd");
    w.end_array();
-   BOOST_CHECK_EQUAL(calls, 3u);
+   BOOST_CHECK_EQUAL(calls, 4u);
    BOOST_CHECK(w.balanced());
    BOOST_CHECK_EQUAL(out, R"(["aaaaaaaaaa","ddd"])");
 }

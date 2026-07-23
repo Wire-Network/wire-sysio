@@ -65,10 +65,14 @@ inline constexpr size_t json_writer_default_guard_stride = 64 * 1024;
  */
 class json_writer {
 public:
-   /// Growth-guard callback: invoked with the output buffer's current size (bytes) each time
-   /// the buffer has grown one stride past the previous invocation.  The guard may throw to
-   /// abort emission -- eg an HTTP memory-budget enforcer rejecting a response mid-serialize.
-   /// The guard must not emit through the writer it guards.
+   /// Growth-guard callback: invoked with the output buffer's size (bytes) each time the
+   /// buffer has grown one stride past the previous invocation.  Before a string value or
+   /// key is escaped into the buffer, the guard instead receives the PROSPECTIVE size --
+   /// current size plus the token's input length, a lower bound on the token's peak -- so
+   /// it can reject (and a budget enforcer charge) the bytes before any capacity is
+   /// reserved for them; actual growth reconciles at the next invocation.  The guard may
+   /// throw to abort emission -- eg an HTTP memory-budget enforcer rejecting a response
+   /// mid-serialize.  The guard must not emit through the writer it guards.
    using growth_guard_t = std::function<void(size_t buffer_size)>;
 
    /// @param out          buffer tokens are appended to; also the guard's measured quantity.
@@ -88,9 +92,12 @@ public:
    /// or key (measuring the output buffer, so escape expansion counts) and every stride of
    /// bytes appended by value_hex / raw_value (their append loops chunk at guard_stride) --
    /// so one oversized token cannot materialize past the budget behind a single
-   /// token-boundary check.  A guard throw mid-token leaves a partial token in the buffer;
-   /// the writer's re-arm plus the caller's checkpoint()/rewind() (or wholesale abandonment
-   /// of the buffer, as the http handler does) keep that safe.
+   /// token-boundary check.  String values and keys additionally pre-check their known
+   /// input length with the guard BEFORE escape_string reserves capacity for it, so an
+   /// over-budget string aborts with zero allocation (see guard_check_pending).  A guard
+   /// throw mid-token leaves a partial token in the buffer; the writer's re-arm plus the
+   /// caller's checkpoint()/rewind() (or wholesale abandonment of the buffer, as the http
+   /// handler does) keep that safe.
    explicit json_writer(std::string& out, growth_guard_t growth_guard = {},
                         size_t guard_stride = json_writer_default_guard_stride)
    : out_(out)
@@ -138,7 +145,9 @@ public:
    }
 
    void key(std::string_view k) {
-      guard_check();
+      // Subsumes the plain token-boundary guard_check() and additionally approves the
+      // key's input length before escape_string reserves capacity for it.
+      guard_check_pending(k.size());
       assert(!stack_.empty() && stack_.back().ctx == context::object);
       assert(!awaiting_value_); // two key() calls in a row would produce "a":,"b": (invalid JSON)
       if (stack_.back().has_item) {
@@ -157,10 +166,14 @@ public:
    }
 
    void value_string(std::string_view s) {
+      // Approve the string's input length with the guard BEFORE escape_string reserves
+      // capacity for it: an over-budget value aborts here with zero allocation.  Runs
+      // ahead of value_prefix so a rejection mutates nothing (no dangling separator for
+      // absorb-and-continue callers); the escape loop's periodic escape_yield_ then
+      // covers expansion beyond the approval.
+      guard_check_pending(s.size());
       value_prefix();
       out_.push_back('"');
-      // escape_yield_ runs the growth guard periodically inside the escape loop, so a
-      // single oversized string value is budget-checked while it streams.
       fc::escape_string(s, out_, escape_yield_, true);
       out_.push_back('"');
    }
@@ -326,11 +339,12 @@ private:
 
    /// Consult the growth guard if the buffer has crossed the next stride boundary (or on
    /// every token once a prior guard invocation threw -- see the constructor contract).
-   /// Called from the head of key() and value_prefix(), which between them front every
-   /// token-emitting entry point except end_object/end_array (1 byte each; the final
-   /// buffer size is the caller's to observe after emission completes) -- and, for guarded
-   /// writers, WITHIN large tokens: from escape_yield_ inside the string-escape loop and
-   /// between chunks in value_hex / raw_value, so no single token outruns the budget.
+   /// Called from value_prefix(), which -- together with the guard_check_pending calls
+   /// fronting key() and value_string() -- fronts every token-emitting entry point except
+   /// end_object/end_array (1 byte each; the final buffer size is the caller's to observe
+   /// after emission completes).  For guarded writers it also runs WITHIN large tokens:
+   /// from escape_yield_ inside the string-escape loop and between chunks in value_hex /
+   /// raw_value, so no single token outruns the budget.
    void guard_check() {
       if (out_.size() < next_guard_check_) {
          return;
@@ -341,6 +355,27 @@ private:
       next_guard_check_ = 0;
       guard_(out_.size());
       next_guard_check_ = out_.size() + guard_stride_;
+   }
+
+   /// Consult the growth guard with the buffer's PROSPECTIVE size before `pending` bytes
+   /// are appended.  Escaped string output is at least one byte per input byte (pre
+   /// UTF-8-prune), so a string token's input length is a guaranteed lower bound on the
+   /// buffer growth it is about to cause; checking it first lets the guard reject -- and
+   /// a budget enforcer charge -- those bytes before escape_string reserves capacity for
+   /// them, so an over-budget string aborts with zero allocation instead of after a
+   /// full-size reserve.  With pending == 0 this is exactly guard_check(), including the
+   /// re-arm-across-throw contract.  On clean approval the next check is deferred until
+   /// the buffer grows a stride PAST the approved size: approved bytes do not re-fire the
+   /// guard, while escape expansion beyond them still does (via escape_yield_).  A
+   /// prune-shrunk token that never reaches the approved size simply reconciles downward
+   /// at the guard's next invocation.
+   void guard_check_pending(size_t pending) {
+      if (out_.size() + pending < next_guard_check_) {
+         return;
+      }
+      next_guard_check_ = 0;
+      guard_(out_.size() + pending);
+      next_guard_check_ = out_.size() + pending + guard_stride_;
    }
 
    void value_prefix() {
