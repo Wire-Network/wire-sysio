@@ -2,6 +2,8 @@
 
 #include <fc-test/build_info.hpp>
 #include <fc-test/crypto_utils.hpp>
+#include <fc/crypto/base64.hpp>
+#include <fc/crypto/keccak256.hpp>
 #include <fc/io/json.hpp>
 #include <fc/network/solana/solana_client.hpp>
 #include <fc/network/solana/solana_idl.hpp>
@@ -16,8 +18,11 @@
 #include <sysio/opp/types/types.pb.h>
 
 #include <algorithm>
+#include <array>
+#include <cstring>
 #include <filesystem>
 #include <map>
+#include <span>
 
 using namespace std::literals;
 using namespace fc::network::solana;
@@ -658,9 +663,11 @@ BOOST_AUTO_TEST_CASE(opp_outpost_emit_has_wire_epoch_arg) try {
    BOOST_CHECK_EQUAL(emit->args[0].name, "wire_epoch_index");
 } FC_LOG_AND_RETHROW();
 
-BOOST_AUTO_TEST_CASE(opp_outpost_has_initialize_and_add_attestation) try {
+BOOST_AUTO_TEST_CASE(opp_outpost_has_initialize_and_deposit) try {
    auto prog = load_idl_fixture(opp_outpost_idl_fixture);
 
+   // `add_attestation` was retired from the client (attestations flow through
+   // `commit_underwrite` / `epoch_in`); the fixture must not resurrect it.
    bool has_initialize = false, has_add = false, has_deposit = false;
    for (auto& instr : prog.instructions) {
       if (instr.name == "initialize")       has_initialize = true;
@@ -668,7 +675,7 @@ BOOST_AUTO_TEST_CASE(opp_outpost_has_initialize_and_add_attestation) try {
       if (instr.name == "deposit")          has_deposit    = true;
    }
    BOOST_CHECK(has_initialize);
-   BOOST_CHECK(has_add);
+   BOOST_CHECK(!has_add);
    BOOST_CHECK(has_deposit);
 } FC_LOG_AND_RETHROW();
 
@@ -1066,6 +1073,414 @@ BOOST_AUTO_TEST_CASE(extract_swap_revert_spl_targets_uses_depositor_pubkey) try 
    BOOST_CHECK_EQUAL(targets[0].token_code, 301u);
    BOOST_CHECK_EQUAL(targets[0].reserve_code, 401u);
    BOOST_CHECK(targets[0].recipient.serialize() == depositor);
+} FC_LOG_AND_RETHROW();
+
+// ── LatestOutboundEnvelope inbound-read path. The epoch=511 RCA was
+//    hardcoded STANDALONE offsets (epoch@8) silently misreading the
+//    INTEGRATED account (`bump`=0xFF at byte 8, `epoch_index`=1 at byte 9 ⇒
+//    u32@8 = 0xFF | 1<<8 = 511), stalling the relay without an error. The
+//    reader now decodes the whole account through libfc's IDL-driven
+//    `decode_account_data` (declared field order + Anchor discriminator) and
+//    validates the stored keccak256 checksum, so these tests drive the
+//    complete post-fetch read path against synthesized accounts for BOTH
+//    program layouts, plus every reject path.
+
+namespace {
+
+using sysio::outpost_solana_client_detail::assert_latest_envelope_shape;
+using sysio::outpost_solana_client_detail::borsh_payload_bytes;
+using sysio::outpost_solana_client_detail::decode_latest_envelope_account;
+using sysio::outpost_solana_client_detail::select_program_idls_matching;
+
+/// Shorthand for a primitive IDL type.
+idl::idl_type prim(idl::primitive_type p) { return idl::idl_type::make_primitive(p); }
+
+/// `[u8; 32]` — the checksum field's declared shape in both known layouts.
+idl::idl_type u8_32_array() { return idl::idl_type::make_array(prim(idl::primitive_type::u8), 32); }
+
+/// Field list of the standalone `opp_outpost` layout:
+/// {epoch_index, checksum, data(bytes), bump}.
+std::vector<idl::field> standalone_latest_fields() {
+   return {{"epoch_index", prim(idl::primitive_type::u32)},
+           {"checksum", u8_32_array()},
+           {"data", prim(idl::primitive_type::bytes)},
+           {"bump", prim(idl::primitive_type::u8)}};
+}
+
+/// Field list of the integrated `liqsol_core` layout:
+/// {bump, epoch_index, checksum, data(Vec<u8>)}. Declaring `data` as
+/// `Vec<u8>` (vs the standalone `bytes`) also exercises the second decoded
+/// payload shape (integer array vs base64 string).
+std::vector<idl::field> integrated_latest_fields() {
+   return {{"bump", prim(idl::primitive_type::u8)},
+           {"epoch_index", prim(idl::primitive_type::u32)},
+           {"checksum", u8_32_array()},
+           {"data", idl::idl_type::make_vec(prim(idl::primitive_type::u8))}};
+}
+
+/// Declare `LatestOutboundEnvelope` with `fields` on `prog` — inline on the
+/// account (legacy IDL shape) or via the `types` section (Anchor IDL v2
+/// keeps account struct fields there).
+void declare_latest_envelope(idl::program& prog, std::vector<idl::field> fields,
+                             bool fields_in_types_section) {
+   idl::account account;
+   account.name = "LatestOutboundEnvelope";
+   account.compute_discriminator();
+   if (fields_in_types_section) {
+      idl::type_def def;
+      def.name          = account.name;
+      def.struct_fields = std::move(fields);
+      prog.types.push_back(std::move(def));
+   } else {
+      account.fields = std::move(fields);
+   }
+   prog.accounts.push_back(std::move(account));
+}
+
+/// Build a minimal synthetic program declaring only `LatestOutboundEnvelope`.
+idl::program latest_envelope_program(std::vector<idl::field> fields, bool fields_in_types_section) {
+   idl::program prog;
+   prog.name = "layout_fixture";
+   declare_latest_envelope(prog, std::move(fields), fields_in_types_section);
+   return prog;
+}
+
+/// Stub outpost program (real instruction set, so `opp_solana_outpost_client`
+/// constructs) + a synthesized `LatestOutboundEnvelope` declaration.
+idl::program outpost_program_with_latest(std::vector<idl::field> fields) {
+   auto prog = load_idl_fixture(opp_outpost_idl_fixture);
+   declare_latest_envelope(prog, std::move(fields), /*fields_in_types_section=*/true);
+   return prog;
+}
+
+/// Serialized protobuf Envelope carrying `epoch` — the payload the outpost
+/// program stores in `LatestOutboundEnvelope.data`.
+std::vector<uint8_t> envelope_payload_bytes(uint32_t epoch) {
+   sysio::opp::Envelope env;
+   env.set_epoch_index(epoch);
+   std::string buf;
+   env.SerializeToString(&buf);
+   return std::vector<uint8_t>(buf.begin(), buf.end());
+}
+
+/// `keccak256(payload)` — the checksum both program versions store.
+std::array<uint8_t, 32> keccak_checksum(const std::vector<uint8_t>& payload) {
+   const auto hash =
+      fc::crypto::keccak256::hash(std::span<const uint8_t>(payload.data(), payload.size()));
+   std::array<uint8_t, 32> out{};
+   std::memcpy(out.data(), hash.data(), out.size());
+   return out;
+}
+
+/// Serialize a STANDALONE-layout account: disc + {epoch, checksum, data, bump}.
+std::vector<uint8_t> standalone_latest_account(uint32_t epoch,
+                                               const std::vector<uint8_t>& payload,
+                                               const std::array<uint8_t, 32>& checksum) {
+   borsh::encoder enc;
+   const auto disc = idl::compute_account_discriminator("LatestOutboundEnvelope");
+   enc.write_fixed_bytes(disc.data(), disc.size());
+   enc.write_u32(epoch);
+   enc.write_fixed_bytes(checksum.data(), checksum.size());
+   enc.write_bytes(payload);
+   enc.write_u8(0xFF); // bump
+   return enc.data();
+}
+
+/// Serialize an INTEGRATED-layout account: disc + {bump, epoch, checksum, data}.
+/// `bump`=0xFF reproduces the epoch=511 RCA input when misread as standalone.
+std::vector<uint8_t> integrated_latest_account(uint32_t epoch,
+                                               const std::vector<uint8_t>& payload,
+                                               const std::array<uint8_t, 32>& checksum) {
+   borsh::encoder enc;
+   const auto disc = idl::compute_account_discriminator("LatestOutboundEnvelope");
+   enc.write_fixed_bytes(disc.data(), disc.size());
+   enc.write_u8(0xFF); // bump
+   enc.write_u32(epoch);
+   enc.write_fixed_bytes(checksum.data(), checksum.size());
+   enc.write_bytes(payload);
+   return enc.data();
+}
+
+/// Drive the complete post-fetch read path: construct the typed outpost
+/// client around a stub program declaring `fields`, then decode
+/// `account_bytes` asking for `requested_epoch`. No RPC endpoint is needed —
+/// decode is pure and the null client is never dereferenced.
+std::vector<char> decode_with_layout(std::vector<idl::field>     fields,
+                                     const std::vector<uint8_t>& account_bytes,
+                                     uint32_t                    requested_epoch) {
+   const auto prog = outpost_program_with_latest(std::move(fields));
+   sysio::opp_solana_outpost_client program_client(
+      solana_client_ptr{}, measurement_pubkey(42), {prog});
+   return decode_latest_envelope_account(program_client, account_bytes, requested_epoch, "test");
+}
+
+/// Compare a decoded envelope byte vector against the synthesized payload.
+bool bytes_equal(const std::vector<char>& actual, const std::vector<uint8_t>& expected) {
+   return actual.size() == expected.size() &&
+          std::equal(actual.begin(), actual.end(), expected.begin(),
+                     [](char a, uint8_t b) { return static_cast<uint8_t>(a) == b; });
+}
+
+/// Name-and-address-only IDL program for selection tests.
+idl::program named_program(std::string address) {
+   idl::program prog;
+   prog.name    = "opp_outpost";
+   prog.address = std::move(address);
+   return prog;
+}
+
+} // anonymous namespace
+
+BOOST_AUTO_TEST_CASE(latest_envelope_shape_accepts_known_layouts) try {
+   // Field ORDER is unconstrained — the reader decodes through the IDL at
+   // runtime — so both known layouts pass, in both IDL field homes.
+   for (bool in_types : {false, true}) {
+      BOOST_TEST_CONTEXT("fields_in_types_section=" << in_types) {
+         BOOST_CHECK_NO_THROW(
+            assert_latest_envelope_shape(latest_envelope_program(standalone_latest_fields(), in_types)));
+         BOOST_CHECK_NO_THROW(
+            assert_latest_envelope_shape(latest_envelope_program(integrated_latest_fields(), in_types)));
+         // The IDL-driven decoder follows the declared field order at runtime,
+         // so a variable-length field ahead of the payload or an epoch-after-
+         // data order still decodes: the shape check validates field TYPES,
+         // never field ORDER, and must accept these.
+         BOOST_CHECK_NO_THROW(assert_latest_envelope_shape(latest_envelope_program(
+            {{"note", prim(idl::primitive_type::string)},
+             {"data", prim(idl::primitive_type::bytes)},
+             {"epoch_index", prim(idl::primitive_type::u32)}},
+            in_types)));
+      }
+   }
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(latest_envelope_shape_rejects_misdeclared_idls) try {
+   struct reject_case {
+      const char*             name;
+      std::vector<idl::field> fields;
+   };
+
+   std::vector<reject_case> cases;
+   cases.push_back({"missing epoch_index field",
+                    {{"bump", prim(idl::primitive_type::u8)},
+                     {"checksum", u8_32_array()},
+                     {"data", prim(idl::primitive_type::bytes)}}});
+   cases.push_back({"missing data field",
+                    {{"epoch_index", prim(idl::primitive_type::u32)},
+                     {"checksum", u8_32_array()},
+                     {"bump", prim(idl::primitive_type::u8)}}});
+   // A wrong declared width means the IDL disagrees with the on-chain u32.
+   cases.push_back({"epoch_index declared u16",
+                    {{"epoch_index", prim(idl::primitive_type::u16)},
+                     {"data", prim(idl::primitive_type::bytes)}}});
+   cases.push_back({"epoch_index declared u64",
+                    {{"epoch_index", prim(idl::primitive_type::u64)},
+                     {"data", prim(idl::primitive_type::bytes)}}});
+   // A fixed `[u8; N]` payload cannot represent the variable-length envelope.
+   cases.push_back({"data declared fixed [u8; 64] array",
+                    {{"epoch_index", prim(idl::primitive_type::u32)},
+                     {"data", idl::idl_type::make_array(prim(idl::primitive_type::u8), 64)}}});
+   // A malformed type object (primitive kind without a primitive value) must
+   // hit the per-field diagnostic, not crash formatting it.
+   cases.push_back({"data declared with malformed type object",
+                    {{"epoch_index", prim(idl::primitive_type::u32)},
+                     {"data", idl::idl_type{}}}});
+
+   for (const auto& c : cases) {
+      BOOST_TEST_CONTEXT(c.name) {
+         for (bool in_types : {false, true}) {
+            BOOST_CHECK_THROW(
+               assert_latest_envelope_shape(latest_envelope_program(c.fields, in_types)),
+               fc::assert_exception);
+         }
+      }
+   }
+
+   // No `LatestOutboundEnvelope` account declared at all.
+   BOOST_CHECK_THROW(assert_latest_envelope_shape(idl::program{}), fc::assert_exception);
+   // Account declared but with no field definition anywhere (inline or types).
+   BOOST_CHECK_THROW(assert_latest_envelope_shape(latest_envelope_program({}, false)),
+                     fc::assert_exception);
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(decode_latest_envelope_reads_both_known_layouts) try {
+   constexpr uint32_t epoch = 7;
+   const auto payload  = envelope_payload_bytes(epoch);
+   const auto checksum = keccak_checksum(payload);
+
+   // Standalone layout (data declared `bytes` → base64-string decode path).
+   const auto standalone = decode_with_layout(
+      standalone_latest_fields(), standalone_latest_account(epoch, payload, checksum), epoch);
+   BOOST_CHECK(bytes_equal(standalone, payload));
+
+   // Integrated layout (data declared `Vec<u8>` → integer-array decode path).
+   // Byte-identical result from a DIFFERENT serialized field order is the
+   // property the epoch=511 RCA violated.
+   const auto integrated = decode_with_layout(
+      integrated_latest_fields(), integrated_latest_account(epoch, payload, checksum), epoch);
+   BOOST_CHECK(bytes_equal(integrated, payload));
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(decode_latest_envelope_catches_field_order_drift) try {
+   // The epoch=511 RCA input: an INTEGRATED account (bump=0xFF first) read
+   // by a client whose loaded IDL declares the STANDALONE field order. The
+   // decode either trips a Borsh bound (vec length read from misaligned
+   // bytes) or yields stored_epoch=511 ≠ requested — both must reject.
+   constexpr uint32_t epoch = 1;
+   const auto payload  = envelope_payload_bytes(epoch);
+   const auto checksum = keccak_checksum(payload);
+   const auto integrated_account = integrated_latest_account(epoch, payload, checksum);
+
+   BOOST_CHECK(decode_with_layout(standalone_latest_fields(), integrated_account, epoch).empty());
+   // Even a caller asking for exactly the misread value (511 = 0xFF | 1<<8)
+   // must not be handed drift-garbage bytes.
+   BOOST_CHECK(decode_with_layout(standalone_latest_fields(), integrated_account, 511).empty());
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(decode_latest_envelope_rejects_invalid_accounts) try {
+   constexpr uint32_t epoch = 7;
+   const auto payload  = envelope_payload_bytes(epoch);
+   const auto checksum = keccak_checksum(payload);
+   const auto valid    = integrated_latest_account(epoch, payload, checksum);
+
+   // Wrong Anchor discriminator (foreign or re-homed account bytes).
+   {
+      auto corrupted = valid;
+      corrupted[0] ^= 0x01;
+      BOOST_CHECK(decode_with_layout(integrated_latest_fields(), corrupted, epoch).empty());
+   }
+   // Truncated account.
+   {
+      auto truncated = valid;
+      truncated.resize(truncated.size() / 2);
+      BOOST_CHECK(decode_with_layout(integrated_latest_fields(), truncated, epoch).empty());
+   }
+   // Unwritten sentinel (epoch=0) and stale/ahead epochs.
+   BOOST_CHECK(decode_with_layout(integrated_latest_fields(),
+                                  integrated_latest_account(0, payload, checksum), 0).empty());
+   BOOST_CHECK(decode_with_layout(integrated_latest_fields(), valid, epoch + 1).empty());
+   BOOST_CHECK(decode_with_layout(integrated_latest_fields(), valid, epoch - 1).empty());
+   // Stored checksum disagreeing with keccak256(data) — the drift tripwire.
+   {
+      auto bad_checksum = checksum;
+      bad_checksum[0] ^= 0x01;
+      BOOST_CHECK(decode_with_layout(integrated_latest_fields(),
+                                     integrated_latest_account(epoch, payload, bad_checksum),
+                                     epoch).empty());
+   }
+   // Payload that is not a protobuf Envelope (checksum matches the garbage,
+   // so this exercises the protobuf gate, not the checksum gate).
+   {
+      const std::vector<uint8_t> garbage = {0xFF, 0xFF, 0xFF, 0xFF};
+      BOOST_CHECK(decode_with_layout(integrated_latest_fields(),
+                                     integrated_latest_account(epoch, garbage, keccak_checksum(garbage)),
+                                     epoch).empty());
+   }
+   // Envelope whose INNER epoch disagrees with the stored account epoch.
+   {
+      const auto inner_mismatch = envelope_payload_bytes(epoch + 1);
+      BOOST_CHECK(decode_with_layout(integrated_latest_fields(),
+                                     integrated_latest_account(epoch, inner_mismatch,
+                                                               keccak_checksum(inner_mismatch)),
+                                     epoch).empty());
+   }
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(borsh_payload_bytes_accepts_both_decoded_shapes) try {
+   const std::vector<uint8_t> payload = {0x12, 0x00, 0xFF, 0x42};
+
+   // `bytes` decodes to a base64 string variant.
+   const auto b64 = fc::base64_encode(reinterpret_cast<const char*>(payload.data()),
+                                      static_cast<unsigned int>(payload.size()));
+   BOOST_CHECK(bytes_equal(borsh_payload_bytes(fc::variant(b64)), payload));
+
+   // `Vec<u8>` decodes to an integer array variant.
+   fc::variants arr;
+   for (auto b : payload) arr.push_back(fc::variant(static_cast<uint64_t>(b)));
+   BOOST_CHECK(bytes_equal(borsh_payload_bytes(fc::variant(arr)), payload));
+
+   // Out-of-byte-range element and non-payload shapes must throw.
+   fc::variants oversized = {fc::variant(static_cast<uint64_t>(256))};
+   BOOST_CHECK_THROW(borsh_payload_bytes(fc::variant(oversized)), fc::assert_exception);
+   BOOST_CHECK_THROW(borsh_payload_bytes(fc::variant(static_cast<uint64_t>(7))), fc::assert_exception);
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(libfc_decode_renders_bytes_base64_and_vec_u8_as_array) try {
+   // `borsh_payload_bytes` depends on HOW libfc's IDL decoder renders the
+   // payload field into a variant: `bytes` as a base64 STRING, `Vec<u8>` as
+   // an integer ARRAY. That rendering is an internal libfc convention, not a
+   // documented contract - this test pins it against `decode_account_info_data`
+   // itself so a future libfc rendering change fails HERE at test time
+   // instead of silently breaking the envelope reader at runtime.
+   constexpr uint32_t epoch = 7;
+   const auto payload  = envelope_payload_bytes(epoch);
+   const auto checksum = keccak_checksum(payload);
+
+   // `bytes` spelling (standalone layout) -> base64 string variant.
+   {
+      const auto prog = outpost_program_with_latest(standalone_latest_fields());
+      sysio::opp_solana_outpost_client program_client(
+         solana_client_ptr{}, measurement_pubkey(42), {prog});
+      const auto decoded = program_client.decode_account_info_data(
+         "LatestOutboundEnvelope", standalone_latest_account(epoch, payload, checksum));
+      const auto& obj = decoded.get_object();
+      BOOST_CHECK_EQUAL(obj["epoch_index"].as_uint64(), epoch);
+      BOOST_REQUIRE(obj["data"].is_string());
+      BOOST_CHECK_EQUAL(obj["data"].as_string(),
+                        fc::base64_encode(reinterpret_cast<const char*>(payload.data()),
+                                          static_cast<unsigned int>(payload.size())));
+   }
+   // `Vec<u8>` spelling (integrated layout) -> per-element integer array.
+   {
+      const auto prog = outpost_program_with_latest(integrated_latest_fields());
+      sysio::opp_solana_outpost_client program_client(
+         solana_client_ptr{}, measurement_pubkey(42), {prog});
+      const auto decoded = program_client.decode_account_info_data(
+         "LatestOutboundEnvelope", integrated_latest_account(epoch, payload, checksum));
+      const auto& obj = decoded.get_object();
+      BOOST_CHECK_EQUAL(obj["epoch_index"].as_uint64(), epoch);
+      BOOST_REQUIRE(obj["data"].is_array());
+      const auto& arr = obj["data"].get_array();
+      BOOST_REQUIRE_EQUAL(arr.size(), payload.size());
+      for (size_t i = 0; i < arr.size(); ++i) {
+         BOOST_CHECK_EQUAL(arr[i].as_uint64(), static_cast<uint64_t>(payload[i]));
+      }
+   }
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(select_program_idls_prefers_declared_address_match) try {
+   const auto deployed = measurement_pubkey(90);
+   const auto other    = measurement_pubkey(91);
+   const auto deployed_b58 = deployed.to_string(fc::yield_function_t{});
+   const auto other_b58    = other.to_string(fc::yield_function_t{});
+
+   // Two same-named IDL versions loaded; the SECOND matches the deployed
+   // program id. File order must not decide — only the match survives.
+   {
+      const auto selected =
+         select_program_idls_matching({named_program(other_b58), named_program(deployed_b58)}, deployed);
+      BOOST_REQUIRE_EQUAL(selected.size(), 1u);
+      BOOST_CHECK_EQUAL(selected.front().address, deployed_b58);
+   }
+   // An unparseable declared address is skipped, not fatal, when another
+   // candidate matches.
+   {
+      const auto selected =
+         select_program_idls_matching({named_program("not-base58!"), named_program(deployed_b58)}, deployed);
+      BOOST_REQUIRE_EQUAL(selected.size(), 1u);
+      BOOST_CHECK_EQUAL(selected.front().address, deployed_b58);
+   }
+   // A single candidate stays usable without a declared address (stub/dev
+   // IDLs) and — with a warning — with a mismatched one.
+   BOOST_CHECK_EQUAL(select_program_idls_matching({named_program("")}, deployed).size(), 1u);
+   BOOST_CHECK_EQUAL(select_program_idls_matching({named_program(other_b58)}, deployed).size(), 1u);
+   // Multiple candidates with no address match would make the pick
+   // order-dependent — exactly the silent-misread risk — so it throws.
+   BOOST_CHECK_THROW(
+      select_program_idls_matching({named_program(other_b58), named_program("")}, deployed),
+      fc::assert_exception);
+   BOOST_CHECK_THROW(
+      select_program_idls_matching({named_program(""), named_program("")}, deployed),
+      fc::assert_exception);
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -37,7 +37,13 @@
 #include <fc/network/http/http_client.hpp>
 #include <fc/network/url.hpp>
 #include <fc/crypto/hex.hpp>
+#include <magic_enum/magic_enum.hpp>
+
+#include <cmath>
 #include <cstdlib>
+#include <limits>
+#include <optional>
+#include <string_view>
 
 
 const std::string deep_mind_logger_name("dmlog");
@@ -62,6 +68,97 @@ namespace snapshot_attest {
 /// missing record at the tip is not immediately conclusive. Half of producer_plugin's 25,000-block
 /// provider snapshot interval (_snapshot_provider_block_spacing).
 constexpr uint32_t snapshot_attestation_grace_blocks = 12500;
+
+constexpr uint64_t bytes_per_mebibyte = 1024 * 1024;
+
+/// Convert a positive MiB option value to bytes without overflowing uint64_t.
+uint64_t checked_mebibytes(uint64_t value, std::string_view option_name) {
+   constexpr auto max_mebibytes = std::numeric_limits<uint64_t>::max() / bytes_per_mebibyte;
+   SYS_ASSERT(value > 0 && value <= max_mebibytes, sysio::chain::plugin_config_exception,
+              "{} must be between 1 and {} MiB", option_name, max_mebibytes);
+   return value * bytes_per_mebibyte;
+}
+
+/** Log attended snapshot-bootstrap phase changes, transfer rate, percentage, and ETA. */
+class snapshot_download_progress_logger {
+public:
+   /** Consume one transport status event. */
+   void operator()(const fc::http_file_download_status& status) {
+      const auto elapsed_seconds = static_cast<double>(status.elapsed.count()) / microseconds_per_second;
+      if (status.phase != fc::http_file_download_phase::downloading &&
+          status.phase != fc::http_file_download_phase::complete) {
+         ilog("Snapshot download phase: {} (elapsed {:.1f}s; press Ctrl+C to cancel)",
+              magic_enum::enum_name(status.phase), elapsed_seconds);
+         return;
+      }
+
+      if (!_body_started_at) {
+         _body_started_at = status.elapsed;
+         _previous_status_at = status.elapsed;
+         _previous_downloaded_bytes = status.downloaded_bytes;
+      }
+
+      const auto body_elapsed = status.elapsed - *_body_started_at;
+      if (status.phase == fc::http_file_download_phase::complete) {
+         const auto average_rate = rate_bytes_per_second(status.downloaded_bytes, body_elapsed);
+         ilog("Snapshot download complete: {} bytes ({:.2f} MiB) in {:.1f}s, average {:.2f} MiB/s",
+              status.downloaded_bytes, to_mebibytes(status.downloaded_bytes),
+              static_cast<double>(body_elapsed.count()) / microseconds_per_second,
+              to_mebibytes(average_rate));
+         return;
+      }
+
+      const auto interval = status.elapsed - _previous_status_at;
+      const auto interval_bytes = status.downloaded_bytes - _previous_downloaded_bytes;
+      const auto current_rate = rate_bytes_per_second(interval_bytes, interval);
+      _previous_status_at = status.elapsed;
+      _previous_downloaded_bytes = status.downloaded_bytes;
+
+      if (!status.total_bytes) {
+         ilog("Downloaded {} bytes ({:.2f} MiB) at {:.2f} MiB/s; response size and ETA unavailable",
+              status.downloaded_bytes, to_mebibytes(status.downloaded_bytes), to_mebibytes(current_rate));
+         return;
+      }
+
+      const auto total_bytes = *status.total_bytes;
+      const auto percentage = total_bytes == 0
+                                 ? 100.0
+                                 : 100.0 * static_cast<double>(status.downloaded_bytes) /
+                                      static_cast<double>(total_bytes);
+      if (current_rate == 0 || status.downloaded_bytes >= total_bytes) {
+         ilog("Downloaded {} / {} bytes ({:.1f}%) at {:.2f} MiB/s; ETA unavailable",
+              status.downloaded_bytes, total_bytes, percentage, to_mebibytes(current_rate));
+         return;
+      }
+
+      const auto remaining_bytes = total_bytes - status.downloaded_bytes;
+      const auto eta_seconds = static_cast<uint64_t>(
+         std::ceil(static_cast<double>(remaining_bytes) / static_cast<double>(current_rate)));
+      ilog("Downloaded {} / {} bytes ({:.1f}%) at {:.2f} MiB/s, ETA {}s",
+           status.downloaded_bytes, total_bytes, percentage, to_mebibytes(current_rate), eta_seconds);
+   }
+
+private:
+   static constexpr double microseconds_per_second = 1'000'000.0;
+
+   /** Convert a byte count to MiB for operator-facing logs. */
+   static double to_mebibytes(uint64_t bytes) {
+      return static_cast<double>(bytes) / static_cast<double>(bytes_per_mebibyte);
+   }
+
+   /** Calculate whole bytes per second without overflowing intermediate integer arithmetic. */
+   static uint64_t rate_bytes_per_second(uint64_t bytes, const fc::microseconds& elapsed) {
+      if (bytes == 0 || elapsed.count() <= 0) {
+         return 0;
+      }
+      return static_cast<uint64_t>(
+         static_cast<double>(bytes) * microseconds_per_second / static_cast<double>(elapsed.count()));
+   }
+
+   std::optional<fc::microseconds> _body_started_at;
+   fc::microseconds _previous_status_at;
+   uint64_t _previous_downloaded_bytes = 0;
+};
 
 } // anonymous namespace
 
@@ -268,9 +365,10 @@ public:
    /// irreversible-block handler with the just-finalized block; retries on later finalized
    /// blocks until the attestation record appears or the node catches up to the chain tip.
    void verify_snapshot_attestation(const signed_block_ptr& lib_block);
-   /// Download and hash-check a snapshot from a remote provider, leaving snapshot_path
+   /// Download and hash-check a bounded snapshot from a remote provider, leaving snapshot_path
    /// pointing at the downloaded file for the normal snapshot-load path to consume.
-   void fetch_snapshot_from_endpoint(const std::string& endpoint_url);
+   void fetch_snapshot_from_endpoint(const std::string& endpoint_url,
+                                     const fc::http_file_download_options& download_options);
 
 private:
    static void log_guard_exception(const chain::guard_exception& e);
@@ -882,7 +980,23 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
       if (options.count("snapshot-endpoint")) {
          SYS_ASSERT(!options.contains("snapshot"), plugin_config_exception,
                     "--snapshot-endpoint is incompatible with --snapshot; use one or the other");
-         fetch_snapshot_from_endpoint(options.at("snapshot-endpoint").as<std::string>());
+
+         const auto max_download_bytes = checked_mebibytes(
+            options.at("chain-state-db-size-mb").as<uint64_t>(), "chain-state-db-size-mb");
+         const fc::http_file_download_options download_options{
+            .max_response_body_bytes = max_download_bytes,
+            .retry_failed_reused_connection = true,
+            .status_callback = [logger = snapshot_download_progress_logger{}](
+                                  const fc::http_file_download_status& status) mutable { logger(status); },
+         };
+         try {
+            fetch_snapshot_from_endpoint(options.at("snapshot-endpoint").as<std::string>(), download_options);
+         } catch (...) {
+            if (app().is_quiting()) {
+               SYS_THROW(chain::interrupt_exception, "Snapshot endpoint bootstrap interrupted");
+            }
+            throw;
+         }
       }
 
       std::optional<chain_id_type> chain_id;
@@ -1515,7 +1629,8 @@ bool chain_plugin::accept_transactions() const {
    return my->accept_transactions;
 }
 
-void chain_plugin_impl::fetch_snapshot_from_endpoint(const std::string& endpoint_url) {
+void chain_plugin_impl::fetch_snapshot_from_endpoint(
+   const std::string& endpoint_url, const fc::http_file_download_options& download_options) {
    // Check for existing chain data
    auto shared_mem_path = chain_config->state_dir / "shared_memory.bin";
    auto chain_head_path = chain_config->state_dir / chain_head_filename;
@@ -1546,6 +1661,7 @@ void chain_plugin_impl::fetch_snapshot_from_endpoint(const std::string& endpoint
    ilog("Fetching snapshot metadata from endpoint: {}", endpoint_url);
 
    fc::http_client http_client;
+   http_client.set_cancel_check([]() { return app().is_quiting(); });
    fc::variant metadata_response;
    if (request_block_num) {
       auto url = fc::url(base_url + "/v1/snapshot/by_block");
@@ -1576,7 +1692,8 @@ void chain_plugin_impl::fetch_snapshot_from_endpoint(const std::string& endpoint
       auto download_url = fc::url(base_url + "/v1/snapshot/download");
       fc::mutable_variant_object download_payload;
       download_payload("block_num", snap_block_num);
-      http_client.post_to_file(download_url, fc::variant(download_payload), download_dest);
+      http_client.post_to_file(
+         download_url, fc::variant(download_payload), download_dest, download_options);
    }
 
    // Quick check: compare the root hash stored in the snapshot footer against

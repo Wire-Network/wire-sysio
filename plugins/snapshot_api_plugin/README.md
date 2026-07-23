@@ -247,6 +247,26 @@ The bootstrap process:
 
 `--delete-all-blocks` is required when existing chain data is present. The `--snapshot-endpoint` option is incompatible with `--snapshot` (local file).
 
+### Bootstrap download status and limits
+
+Snapshot bootstrap is attended and has no automatic network deadlines. While metadata is fetched, the node identifies
+the active operation; the file transfer then reports phase changes and, every five seconds, downloaded bytes,
+percentage, transfer rate, and ETA when the response supplies `Content-Length`. Pressing Ctrl+C cancels pending
+resolver or socket work and removes the partial file.
+
+The existing chain database size setting supplies the download ceiling:
+
+| Option | Default | Purpose |
+|---|---:|---|
+| `--chain-state-db-size-mb` | `1024` | Maximum accepted snapshot response size and chain-state database size |
+
+The response-size limit must be positive. A fixed-length response that exceeds the maximum is rejected from its
+`Content-Length` before a temporary file is opened. Chunked or lengthless responses are stopped at the same byte
+ceiling. Available disk space is checked before and throughout the transfer, and a failed transfer removes its
+`.downloading` file.
+Long transfers recheck after at most 64 MiB or five seconds of progress and retain an additional 64 MiB safety margin
+to bound interference from concurrent disk consumers between probes.
+
 ## Reverse Proxy Considerations
 
 For production deployments, consider placing a reverse proxy (nginx, caddy) in front of the snapshot endpoint:
@@ -255,5 +275,9 @@ For production deployments, consider placing a reverse proxy (nginx, caddy) in f
 - **TLS termination** — serve snapshots over HTTPS
 - **Caching / CDN** — offload download bandwidth from the node
 - **Access control** — restrict by IP or authentication
+
+Configure the proxy with response-size, idle, and total-transfer limits that are no weaker than the origin node's
+bootstrap limits. Proxy authentication and TLS reduce interception and unauthorized access risk, but they do not
+replace the origin-side resource bounds.
 
 The snapshot files are served uncompressed via zero-copy `sendfile()`. If bandwidth is a concern, configure compression at the proxy layer (e.g., `gzip_static` or `zstd_static` in nginx with pre-compressed files).
