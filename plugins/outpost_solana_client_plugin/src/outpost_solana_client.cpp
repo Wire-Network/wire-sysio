@@ -1,13 +1,15 @@
 #include <sysio/outpost_solana_client_plugin/outpost_solana_client.hpp>
 
 #include <algorithm>
-#include <bit>
 #include <cstring>
 #include <map>
 #include <optional>
+#include <span>
 #include <string>
 #include <string_view>
 
+#include <fc/crypto/base64.hpp>
+#include <fc/crypto/keccak256.hpp>
 #include <fc/crypto/sha256.hpp>
 #include <fc/exception/exception.hpp>
 #include <fc/log/logger.hpp>
@@ -28,30 +30,29 @@ constexpr std::string_view OP_EPOCH_IN    = "deliver_outbound_envelope:epoch_in"
 constexpr std::string_view OP_READ_LATEST = "read_inbound_envelope:get_account_info";
 constexpr std::string_view OP_UW_COMMIT   = "uw_commit:commit_underwrite";
 
-/// 8-byte Anchor discriminator that prefixes every `#[account]`-tagged
-/// account's serialized form.
-constexpr size_t ANCHOR_DISCRIMINATOR_LEN = 8;
+/// Byte width the on-chain `LatestOutboundEnvelope.checksum` field decodes
+/// to: `keccak256(encoded_envelope)`, written identically by both program
+/// versions (standalone `opp_outpost` and integrated `liqsol_core`).
+constexpr size_t LATEST_ENVELOPE_CHECKSUM_BYTES = fc::crypto::keccak256::byte_size;
 
-/// Borsh layout of `LatestOutboundEnvelope`:
-///   epoch_index: u32         (4)
-///   checksum:    [u8; 32]    (32)
-///   data:        Vec<u8>     (4 + N)
-///   bump:        u8          (1)
-constexpr size_t LATEST_HEADER_LEN  = ANCHOR_DISCRIMINATOR_LEN + 4 + 32;
-constexpr size_t LATEST_VEC_LEN_OFF = LATEST_HEADER_LEN;
-constexpr size_t LATEST_DATA_OFF    = LATEST_HEADER_LEN + 4;
-constexpr size_t LATEST_EPOCH_OFF   = ANCHOR_DISCRIMINATOR_LEN;
-
-/// Read a little-endian u32 from `buf` at `off`. Borsh is little-endian on the wire; the native-endian
-/// `memcpy` below is correct only on a little-endian host. WIRE is x86_64-only today; the static_assert
-/// documents that dependency and fails the build if a future port to a big-endian host removes it.
-uint32_t read_u32_le(const std::vector<uint8_t>& buf, size_t off) {
-   static_assert(std::endian::native == std::endian::little, "read_u32_le assumes a little-endian host");
-   if (off + 4 > buf.size()) FC_THROW("LatestOutboundEnvelope: truncated u32 at {}", off);
-   uint32_t v;
-   std::memcpy(&v, buf.data() + off, 4);
-   return v;
-}
+/// Identifiers of the `LatestOutboundEnvelope` account + the fields the
+/// inbound reader consumes. The two program versions declare the struct's
+/// fields in a DIFFERENT ORDER:
+///   * standalone `opp_outpost`  - {epoch_index, checksum, data, bump}
+///   * integrated  `liqsol_core` - {bump, epoch_index, checksum, data}
+/// so the reader decodes the WHOLE account through libfc's IDL-driven
+/// `decode_account_data` (which follows the loaded IDL's declared field order
+/// and verifies the Anchor discriminator) instead of hand-deriving byte
+/// offsets. Historical context: hardcoded STANDALONE offsets (epoch@8)
+/// decoding the INTEGRATED account produced the epoch=511 RCA - the
+/// integrated layout puts `bump`=0xFF at byte 8 and `epoch_index`=1 at byte
+/// 9, so a u32 read at byte 8 yields 0xFF | (1<<8) = 511.
+namespace latest_envelope {
+   constexpr auto account_name   = "LatestOutboundEnvelope";
+   constexpr auto field_epoch    = "epoch_index";
+   constexpr auto field_data     = "data";
+   constexpr auto field_checksum = "checksum";
+} // namespace latest_envelope
 
 } // anonymous namespace
 
@@ -74,6 +75,258 @@ std::optional<fc::network::solana::solana_public_key> sol_pubkey_from_chain_addr
 }
 
 } // anonymous namespace (within outpost_solana_client_detail)
+
+namespace {
+
+/// Render an IDL type for diagnostics. `idl_type::to_string()` assumes the
+/// per-kind payload members are populated (it dereferences them without
+/// checking), so a malformed type object must be reported instead of
+/// formatted - the diagnostic path is exactly where malformed inputs appear.
+std::string describe_idl_type(const fc::network::solana::idl::idl_type& type) {
+   if ((type.is_primitive() && !type.primitive) ||
+       (type.is_defined()   && !type.defined_name) ||
+       (type.is_option()    && !type.option_inner) ||
+       (type.is_vec()       && !type.vec_element) ||
+       (type.is_array()     && (!type.array_element || !type.array_len)) ||
+       (type.is_tuple()     && !type.tuple_elements)) {
+      return "<malformed idl type>";
+   }
+   return type.to_string();
+}
+
+} // anonymous namespace (within outpost_solana_client_detail)
+
+/// Assert the loaded IDL declares `LatestOutboundEnvelope` with the field
+/// types the inbound reader relies on. Field order is unconstrained (the
+/// reader decodes through the IDL at runtime). Full contract on the header
+/// declaration.
+void assert_latest_envelope_shape(const fc::network::solana::idl::program& program) {
+   namespace idl = fc::network::solana::idl;
+   const idl::account* account = program.find_account(latest_envelope::account_name);
+   FC_ASSERT(account, "IDL has no '{}' account definition", latest_envelope::account_name);
+
+   // Anchor IDL v2 keeps the struct's fields in the `types` section; the
+   // `accounts` entry carries only name + discriminator. Mirror
+   // `solana_program_client::decode_account_data`'s inline-then-types fallback.
+   const std::vector<idl::field>* fields = &account->fields;
+   if (fields->empty()) {
+      const idl::type_def* type_def = program.find_type(latest_envelope::account_name);
+      FC_ASSERT(type_def && type_def->is_struct() && type_def->struct_fields,
+                "IDL '{}' has no struct field definition", latest_envelope::account_name);
+      fields = &(*type_def->struct_fields);
+   }
+
+   bool has_epoch = false;
+   bool has_data  = false;
+   for (const auto& field : *fields) {
+      // Compare against the optional member directly: a malformed type object
+      // (kind==primitive but no primitive value) must produce the per-field
+      // diagnostic below, not `get_primitive()`'s generic throw.
+      if (field.name == latest_envelope::field_epoch) {
+         // The reader narrows the decoded value to uint32; a differently
+         // declared width means the IDL disagrees with the on-chain struct.
+         FC_ASSERT(field.type.is_primitive() && field.type.primitive == idl::primitive_type::u32,
+                   "LatestOutboundEnvelope '{}' must be declared u32, got '{}'",
+                   latest_envelope::field_epoch, describe_idl_type(field.type));
+         has_epoch = true;
+      } else if (field.name == latest_envelope::field_data) {
+         // The payload must be length-prefixed `bytes` / `Vec<u8>`. A fixed
+         // `[u8; N]` array would decode, but cannot represent the on-chain
+         // variable-length envelope - such an IDL disagrees with both known
+         // program versions, so refuse it at boot.
+         const bool is_bytes = field.type.is_primitive() &&
+                               field.type.primitive == idl::primitive_type::bytes;
+         const bool is_vec_u8 = field.type.is_vec() && field.type.vec_element &&
+                                field.type.vec_element->is_primitive() &&
+                                field.type.vec_element->primitive == idl::primitive_type::u8;
+         FC_ASSERT(is_bytes || is_vec_u8,
+                   "LatestOutboundEnvelope '{}' must be declared bytes/Vec<u8>, got '{}'",
+                   latest_envelope::field_data, describe_idl_type(field.type));
+         has_data = true;
+      }
+   }
+   FC_ASSERT(has_epoch, "LatestOutboundEnvelope IDL missing '{}' field", latest_envelope::field_epoch);
+   FC_ASSERT(has_data, "LatestOutboundEnvelope IDL missing '{}' field", latest_envelope::field_data);
+}
+
+/// Keep only the candidate IDLs whose declared address matches the deployed
+/// program id, so `--solana-idl-file` ORDER can never decide which same-named
+/// IDL version's field order drives account decoding. Full contract on the
+/// header declaration.
+std::vector<fc::network::solana::idl::program>
+select_program_idls_matching(std::vector<fc::network::solana::idl::program> program_idls,
+                             const fc::network::solana::solana_public_key&  program_id) {
+   namespace idl = fc::network::solana::idl;
+   std::vector<idl::program> matching;
+   size_t declared_addresses = 0;
+   for (auto& candidate : program_idls) {
+      if (candidate.address.empty())
+         continue;
+      ++declared_addresses;
+      try {
+         if (fc::network::solana::solana_public_key::from_base58_string(candidate.address) == program_id) {
+            // Moved-from entries are only left behind when `matching` is
+            // non-empty, in which case `program_idls` is never returned.
+            matching.push_back(std::move(candidate));
+         }
+      } catch (const fc::exception&) {
+         wlog("IDL '{}' declares unparseable program address '{}'; treating as non-matching",
+              candidate.name, candidate.address);
+      }
+   }
+   if (!matching.empty()) {
+      if (matching.size() < program_idls.size()) {
+         ilog("selected {} of {} loaded IDL(s) whose declared address matches program id {}",
+              matching.size(), program_idls.size(),
+              program_id.to_string(fc::yield_function_t{}));
+      }
+      return matching;
+   }
+   if (program_idls.size() == 1) {
+      // Address-less stub/dev IDLs stay usable; a declared-but-mismatched
+      // address is suspicious but unambiguous, so warn instead of refusing.
+      if (declared_addresses > 0) {
+         wlog("the single loaded IDL '{}' declares address {} which does not match the configured "
+              "program id {}; using it anyway - verify --solana-idl-file matches the deployment",
+              program_idls.front().name, program_idls.front().address,
+              program_id.to_string(fc::yield_function_t{}));
+      }
+      return program_idls;
+   }
+   FC_ASSERT(false,
+             "{} IDLs are loaded for this program name but none declares address {}; "
+             "which one to trust would depend on --solana-idl-file order, and a wrong pick "
+             "silently misreads accounts. Load only the IDL generated from the deployed "
+             "program, or ensure it declares the deployed address",
+             program_idls.size(), program_id.to_string(fc::yield_function_t{}));
+}
+
+/// Extract raw payload bytes from a decoded `bytes` (base64 string variant)
+/// or `Vec<u8>` (integer array variant) field. Full contract on the header
+/// declaration.
+std::vector<char> borsh_payload_bytes(const fc::variant& field_value) {
+   if (field_value.is_string())
+      return fc::base64_decode(field_value.as_string());
+   FC_ASSERT(field_value.is_array(),
+             "payload field decoded to neither a base64 string (bytes) nor a byte array (Vec<u8>)");
+   const auto& arr = field_value.get_array();
+   std::vector<char> out;
+   out.reserve(arr.size());
+   for (const auto& element : arr) {
+      const auto value = element.as_uint64();
+      FC_ASSERT(value <= 0xFF, "payload array element {} is out of byte range", value);
+      out.push_back(static_cast<char>(value));
+   }
+   return out;
+}
+
+/// Decode + validate a fetched `LatestOutboundEnvelope` account through the
+/// loaded IDL. Full contract on the header declaration.
+std::vector<char> decode_latest_envelope_account(opp_solana_outpost_client&  program_client,
+                                                 const std::vector<uint8_t>& account_data,
+                                                 uint32_t                    epoch_index,
+                                                 const std::string&          log_label) {
+   uint32_t          stored_epoch = 0;
+   std::vector<char> envelope_bytes;
+   bool              checksum_ok = true;
+   try {
+      // IDL-driven decode: verifies the 8-byte Anchor discriminator and
+      // follows the loaded IDL's declared field order, so the standalone and
+      // integrated `LatestOutboundEnvelope` layouts both decode value-exactly.
+      const auto decoded = program_client.decode_account_info_data(latest_envelope::account_name,
+                                                                   account_data);
+      const auto& obj = decoded.get_object();
+      stored_epoch    = static_cast<uint32_t>(obj[latest_envelope::field_epoch].as_uint64());
+      if (stored_epoch != 0 && stored_epoch == epoch_index) {
+         envelope_bytes = borsh_payload_bytes(obj[latest_envelope::field_data]);
+         // Both program versions store `checksum = keccak256(encoded_envelope)`.
+         // Verifying it proves the bytes extracted as `data` are the bytes the
+         // program hashed - i.e. the IDL's field order matches the deployment.
+         // An IDL that omits the field (or declares an unrecognized shape)
+         // skips the check rather than failing envelopes it cannot verify.
+         if (obj.contains(latest_envelope::field_checksum)) {
+            const auto& checksum_v = obj[latest_envelope::field_checksum];
+            if (checksum_v.is_array() && checksum_v.get_array().size() == LATEST_ENVELOPE_CHECKSUM_BYTES) {
+               const auto& stored = checksum_v.get_array();
+               const auto  actual = fc::crypto::keccak256::hash(std::span<const uint8_t>(
+                  reinterpret_cast<const uint8_t*>(envelope_bytes.data()), envelope_bytes.size()));
+               for (size_t i = 0; i < LATEST_ENVELOPE_CHECKSUM_BYTES; ++i) {
+                  if (static_cast<uint8_t>(stored[i].as_uint64()) != actual.data()[i]) {
+                     checksum_ok = false;
+                     break;
+                  }
+               }
+            }
+         }
+      }
+   } catch (const fc::exception& e) {
+      // Permanently undecodable account bytes are an IDL-vs-deployment drift
+      // signal, not a transient condition - keep this visible at default log
+      // level so a stalled relay is diagnosable.
+      wlog("outpost_solana_client[{}]: cannot decode latest_outbound_envelope account "
+           "({} bytes) through the loaded IDL - IDL/deployment drift? {}",
+           log_label, account_data.size(), e.to_detail_string());
+      return {};
+   }
+
+   if (stored_epoch == 0) {
+      // Initialized state: outpost has not emitted any envelope yet.
+      // Expected during cluster warm-up; resolves on the next emit.
+      dlog("outpost_solana_client[{}]: latest_outbound_envelope unwritten (epoch=0)", log_label);
+      return {};
+   }
+   if (stored_epoch != epoch_index) {
+      if (stored_epoch > epoch_index) {
+         // The outpost claims an epoch AHEAD of the one this relay is trying
+         // to read - either the account is being misread (IDL/deployment
+         // field-order drift; the epoch=511 RCA surfaced exactly here) or the
+         // relay's WIRE view is far behind. Neither self-heals quickly, so
+         // stay visible at default log level.
+         wlog("outpost_solana_client[{}]: latest_outbound_envelope stored_epoch={} is AHEAD of "
+              "requested {} - possible IDL/deployment drift misreading the account",
+              log_label, stored_epoch, epoch_index);
+      } else {
+         // Timing skew between the WIRE batch op and the outpost's emit
+         // cadence. Resolves on the next poll once the outpost catches up;
+         // kept at debug so steady-state polling isn't noisy (matches the
+         // ethereum sibling's identical branch).
+         dlog("outpost_solana_client[{}]: latest_outbound_envelope stored_epoch={} != requested {}",
+              log_label, stored_epoch, epoch_index);
+      }
+      return {};
+   }
+   if (!checksum_ok) {
+      wlog("outpost_solana_client[{}]: latest_outbound_envelope checksum does not match "
+           "keccak256 of the decoded payload ({} bytes) - IDL/deployment drift?",
+           log_label, envelope_bytes.size());
+      return {};
+   }
+   if (envelope_bytes.size() > SOLANA_MAX_ENVELOPE_BYTES) {
+      wlog("outpost_solana_client[{}]: latest_outbound_envelope data length "
+           "{} exceeds envelope cap of {} bytes",
+           log_label, envelope_bytes.size(), SOLANA_MAX_ENVELOPE_BYTES);
+      return {};
+   }
+
+   sysio::opp::Envelope envelope;
+   if (!envelope.ParseFromArray(envelope_bytes.data(),
+                                static_cast<int>(envelope_bytes.size()))) {
+      wlog("outpost_solana_client[{}]: latest_outbound_envelope did not "
+           "decode as a protobuf Envelope ({} bytes)",
+           log_label, envelope_bytes.size());
+      return {};
+   }
+   if (static_cast<uint32_t>(envelope.epoch_index()) != epoch_index) {
+      wlog("outpost_solana_client[{}]: latest_outbound_envelope inner "
+           "epoch={} != requested epoch={}",
+           log_label, envelope.epoch_index(), epoch_index);
+      return {};
+   }
+
+   ilog("outpost_solana_client[{}]: read inbound envelope for epoch {} ({} bytes)",
+        log_label, epoch_index, envelope_bytes.size());
+   return envelope_bytes;
+}
 
 /// Append a terminal remaining-account meta, merging permissions when a
 /// previous effect branch already added the same pubkey.
@@ -409,7 +662,8 @@ outpost_solana_client::outpost_solana_client(
    fc::network::solana::solana_public_key         program_id,
    std::vector<fc::network::solana::idl::program> program_idls,
    uint64_t                                       chain_code,
-   uint32_t                                       chain_id)
+   uint32_t                                       chain_id,
+   solana_outpost_role                            role)
    : _entry(std::move(entry))
    , _program_id(program_id)
    , _outpost_id(chain_code)
@@ -419,8 +673,28 @@ outpost_solana_client::outpost_solana_client(
    FC_ASSERT(!program_idls.empty(),
              "Solana outpost requires at least one program IDL");
 
+   // Reduce same-named IDL versions to the one(s) whose declared address
+   // matches the deployed program id BEFORE the program client caches its
+   // decode-driving IDL, so `--solana-idl-file` order can never decide which
+   // field order accounts are decoded with.
+   program_idls =
+      outpost_solana_client_detail::select_program_idls_matching(std::move(program_idls), _program_id);
+
    _program_client = std::make_shared<opp_solana_outpost_client>(
       _entry->client, _program_id, program_idls);
+
+   // Role-gated boot validation: only roles that read inbound envelopes need
+   // a decodable `LatestOutboundEnvelope` in the IDL. For those roles the
+   // shape is asserted HERE so a misshaped IDL throws at boot
+   // (`create_outpost_client`) rather than on the first inbound poll - the
+   // poll loop wlogs and retries forever, which would hide the misconfig.
+   // The IDL is immutable after construction, so the check can never go stale.
+   if (role == solana_outpost_role::batch_operator) {
+      FC_ASSERT(_program_client->get_program(),
+                "outpost_solana_client: no IDL program loaded; cannot validate "
+                "the LatestOutboundEnvelope declaration");
+      outpost_solana_client_detail::assert_latest_envelope_shape(*_program_client->get_program());
+   }
 }
 
 sysio::opp::types::ChainKind outpost_solana_client::chain_kind() const {
@@ -699,7 +973,7 @@ std::vector<char> outpost_solana_client::read_inbound_envelope(
       _program_client->latest_outbound_envelope_pda,
       fc::network::solana::commitment_t::finalized);
    if (!info.has_value()) {
-      // PDA was init'd at outpost initialize — absence here means the
+      // PDA was init'd at outpost initialize - absence here means the
       // RPC is out of sync or the program redeployed mid-run. Surface.
       wlog("outpost_solana_client[{}]: latest_outbound_envelope PDA absent",
            to_string());
@@ -710,69 +984,26 @@ std::vector<char> outpost_solana_client::read_inbound_envelope(
            to_string());
       return {};
    }
-
-   const auto& buf = info->data;
-   dlog("outpost_solana_client[{}]: latest_outbound_envelope account_size={}",
-        to_string(), buf.size());
-   if (buf.size() < LATEST_DATA_OFF) {
-      wlog("outpost_solana_client[{}]: latest_outbound_envelope account is "
-           "smaller than expected header ({} bytes)",
-           to_string(), buf.size());
+   if (info->owner != _program_id) {
+      // A program upgrade that re-homed the seed (or an RPC serving a stale
+      // fork) would otherwise decode foreign account bytes into an
+      // undiagnosable stall - cheap defense-in-depth before decoding.
+      wlog("outpost_solana_client[{}]: latest_outbound_envelope PDA is owned by {} "
+           "instead of program {}; refusing to decode",
+           to_string(), info->owner.to_string(fc::yield_function_t{}),
+           _program_id.to_string(fc::yield_function_t{}));
       return {};
    }
 
-   const uint32_t stored_epoch = read_u32_le(buf, LATEST_EPOCH_OFF);
-   if (stored_epoch == 0) {
-      // Initialized state: outpost has not emitted any envelope yet.
-      // Expected during cluster warm-up; resolves on the next emit.
-      dlog("outpost_solana_client[{}]: latest_outbound_envelope unwritten (epoch=0)",
-           to_string());
-      return {};
-   }
-   if (stored_epoch != epoch_index) {
-      // Timing skew between the WIRE batch op and the outpost's emit
-      // cadence. Resolves on the next poll once the outpost catches up.
-      dlog("outpost_solana_client[{}]: latest_outbound_envelope stored_epoch={} != requested {}",
-           to_string(), stored_epoch, epoch_index);
-      return {};
-   }
-
-   const uint32_t data_len = read_u32_le(buf, LATEST_VEC_LEN_OFF);
-   if (data_len > SOLANA_MAX_ENVELOPE_BYTES) {
-      wlog("outpost_solana_client[{}]: latest_outbound_envelope data length "
-           "{} exceeds envelope cap of {} bytes",
-           to_string(), data_len, SOLANA_MAX_ENVELOPE_BYTES);
-      return {};
-   }
-   if (LATEST_DATA_OFF + data_len > buf.size()) {
-      wlog("outpost_solana_client[{}]: latest_outbound_envelope data length "
-           "{} exceeds account size {}",
-           to_string(), data_len, buf.size());
-      return {};
-   }
-
-   std::vector<char> envelope_bytes(
-      reinterpret_cast<const char*>(buf.data() + LATEST_DATA_OFF),
-      reinterpret_cast<const char*>(buf.data() + LATEST_DATA_OFF + data_len));
-
-   sysio::opp::Envelope envelope;
-   if (!envelope.ParseFromArray(envelope_bytes.data(),
-                                static_cast<int>(envelope_bytes.size()))) {
-      wlog("outpost_solana_client[{}]: latest_outbound_envelope did not "
-           "decode as a protobuf Envelope ({} bytes)",
-           to_string(), envelope_bytes.size());
-      return {};
-   }
-   if (static_cast<uint32_t>(envelope.epoch_index()) != epoch_index) {
-      wlog("outpost_solana_client[{}]: latest_outbound_envelope inner "
-           "epoch={} != requested epoch={}",
-           to_string(), envelope.epoch_index(), epoch_index);
-      return {};
-   }
-
-   ilog("outpost_solana_client[{}]: read inbound envelope for epoch {} ({} bytes)",
-        to_string(), epoch_index, envelope_bytes.size());
-   return envelope_bytes;
+   // Decode the fetched account through the loaded IDL: the IDL's declared
+   // field order drives the decode, so the same nodeop reads both the
+   // standalone `opp_outpost` and integrated `liqsol_core`
+   // `LatestOutboundEnvelope` layouts value-exactly (same path the class
+   // already uses for `Reserve` / `OutpostConfig`). For inbound-reading roles
+   // the account declaration was validated at boot, so a decode failure here
+   // signals IDL-vs-deployment drift and is logged at warning level.
+   return outpost_solana_client_detail::decode_latest_envelope_account(
+      *_program_client, info->data, epoch_index, to_string());
 }
 
 std::string outpost_solana_client::uw_commit(

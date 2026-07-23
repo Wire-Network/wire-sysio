@@ -39,6 +39,23 @@ inline constexpr auto SOL_SWAP_DEPOSIT_POLL_INTERVAL = fc::seconds(15);
 ///     this horizon) and a production RPC (≥ 2 epochs of tx history).
 inline constexpr auto SOL_SWAP_DEPOSIT_TOTAL_TIMEOUT = fc::seconds(120);
 
+/// Consumer role a Solana `outpost_client` is constructed for. Boot-time IDL
+/// validation is role-aware: only roles that call `read_inbound_envelope`
+/// require the loaded IDL to declare a decodable `LatestOutboundEnvelope`
+/// account, so an instructions-only IDL keeps working for roles that never
+/// read inbound. A new role must pick the variant matching whether it reads
+/// inbound envelopes.
+enum class solana_outpost_role {
+   /// Delivers outbound envelopes AND polls `read_inbound_envelope` - the
+   /// IDL must declare a readable `LatestOutboundEnvelope`, asserted at boot.
+   batch_operator,
+   /// Only submits `uw_commit`; never reads inbound envelopes, so the
+   /// `LatestOutboundEnvelope` boot assertion is skipped. If such a client
+   /// ever does call `read_inbound_envelope` against an IDL without the
+   /// account, the read logs a warning and yields no envelope.
+   underwriter
+};
+
 struct solana_client_entry_t {
    std::string                        id;
    std::string                        url;
@@ -135,8 +152,6 @@ struct opp_solana_outpost_client : fc::network::solana::solana_program_client {
    /// never calls it because the consensus-reaching terminal `epoch_in` emits
    /// the outbound envelope inline.
    solana_program_tx_fn<std::string, uint32_t>             emit_outbound_envelope;
-   /// `add_attestation(attestation_type: i32, data: bytes) -> signature`.
-   solana_program_tx_fn<std::string, int32_t, std::vector<uint8_t>> add_attestation;
    /// `deposit(operator_type: u8, wire_account_name: string, amount: u64) -> signature`.
    solana_program_tx_fn<std::string, uint8_t, std::string, uint64_t> deposit;
    /// `commit_underwrite(uic_bytes: bytes) -> signature`.
@@ -337,7 +352,6 @@ struct opp_solana_outpost_client : fc::network::solana::solana_program_client {
            program_invoke_data_items params = {fc::variant(wire_epoch_index)};
            return execute_tx_and_confirm(instr, resolve_accounts(instr, params, overrides), params);
         })
-      , add_attestation(create_tx_and_confirm<std::string, int32_t, std::vector<uint8_t>>(get_idl("add_attestation")))
       , deposit(create_tx_and_confirm<std::string, uint8_t, std::string, uint64_t>(get_idl("deposit")))
       // commit_underwrite is `(uic_bytes: bytes) -> signature`. The IDL declares
       // three accounts — `underwriter` (signer, default-resolved from the
@@ -386,12 +400,16 @@ public:
     * @param chain_code     Outpost id from `sysio.epoch::outposts`.
     * @param chain_id       Numeric chain id from the outpost row (Solana = 0).
     * @param program_id     Base58 address of the deployed OPP outpost program.
-    * @throws fc::exception if the client id is unknown or no matching IDL is loaded.
+    * @param role           Consumer role; gates the role-specific boot-time
+    *                       IDL validation (see `solana_outpost_role`).
+    * @throws fc::exception if the client id is unknown, no matching IDL is
+    *         loaded, or the role's boot-time IDL validation fails.
     */
-   std::shared_ptr<outpost_client> create_outpost_client(const std::string& sol_client_id,
-                                                       uint64_t           chain_code,
-                                                       uint32_t           chain_id,
-                                                       const std::string& program_id);
+   std::shared_ptr<outpost_client> create_outpost_client(const std::string&  sol_client_id,
+                                                       uint64_t            chain_code,
+                                                       uint32_t            chain_id,
+                                                       const std::string&  program_id,
+                                                       solana_outpost_role role);
 
 private:
    std::unique_ptr<class outpost_solana_client_plugin_impl> my;
