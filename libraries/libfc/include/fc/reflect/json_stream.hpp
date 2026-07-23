@@ -87,10 +87,11 @@ inline constexpr int    double_fixed_precision = std::numeric_limits<double>::di
 inline constexpr size_t double_fixed_buf_size  = std::numeric_limits<double>::max_exponent10 + double_fixed_precision + 8;
 inline void to_json_stream(double d, json_writer& w) {
    if (!std::isfinite(d)) {
-      // Variant (stringstream << std::fixed, delegating to the C library) emits the literal
-      // "nan" / "-nan" / "inf" / "-inf" strings for non-finite doubles; match that shape.
-      // NaN never compares, so its sign must come from signbit -- arbitrary ABI float bit
-      // patterns reach here and negative NaN must round-trip byte-identically.
+      // Variant (s_fc_to_string, variant.cpp) emits the explicit "nan" / "-nan" / "inf" /
+      // "-inf" spellings for non-finite doubles -- deliberately NOT the C library's, whose
+      // negative-NaN formatting is platform-dependent (glibc "-nan", Apple "nan").  Match
+      // that shape.  NaN never compares, so its sign must come from signbit -- arbitrary
+      // ABI float bit patterns reach here and negative NaN must round-trip byte-identically.
       w.value_string(std::isnan(d) ? (std::signbit(d) ? "-nan" : "nan")
                                    : (std::signbit(d) ? "-inf" : "inf"));
       return;

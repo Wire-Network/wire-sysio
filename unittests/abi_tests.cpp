@@ -823,11 +823,12 @@ BOOST_AUTO_TEST_CASE(large_int_quoting_boundaries)
 } FC_LOG_AND_RETHROW() }
 
 // Non-finite float32/float64 bit patterns through the ABI paths: the variant path
-// (stringstream << std::fixed, delegating to the C library) prints "nan" / "-nan" /
-// "inf" / "-inf", and binary_to_json_stream must agree byte-for-byte.  NaN never
-// compares, so its sign only survives via signbit -- and since no JSON input can
-// produce a NaN, the packed bytes are built directly from raw bit patterns, exactly
-// as an arbitrary on-chain payload could.
+// (s_fc_to_string) formats non-finite doubles explicitly as "nan" / "-nan" / "inf" /
+// "-inf" -- platform-independent, unlike the C library formatting it bypasses (glibc
+// prints "-nan" where Apple prints "nan") -- and binary_to_json_stream must agree
+// byte-for-byte.  NaN never compares, so its sign only survives via signbit -- and
+// since no JSON input can produce a NaN, the packed bytes are built directly from raw
+// bit patterns, exactly as an arbitrary on-chain payload could.
 BOOST_AUTO_TEST_CASE(non_finite_float_sign_parity)
 { try {
 

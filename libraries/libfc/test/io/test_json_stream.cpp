@@ -558,10 +558,11 @@ BOOST_AUTO_TEST_CASE(streaming_vs_variant_parity_libfc_leaf_types) {
       check_streaming_matches_variant(double{1e10},                     "double 1e10");
       check_streaming_matches_variant(double{0.0},                      "double 0.0");
       check_streaming_matches_variant(float{3.5f},                      "float 3.5");
-      // Non-finite doubles: the legacy path (stringstream << std::fixed, delegating to the
-      // C library) prints "nan" / "-nan" / "inf" / "-inf".  NaN never compares, so its sign
-      // only reaches the output via signbit -- and arbitrary ABI float bit patterns can
-      // carry either sign.
+      // Non-finite doubles: the variant path (s_fc_to_string) formats these explicitly as
+      // "nan" / "-nan" / "inf" / "-inf", platform-independent -- unlike the C library
+      // formatting it bypasses, which drops negative NaN's sign on Apple.  NaN never
+      // compares, so its sign only reaches the output via signbit -- and arbitrary ABI
+      // float bit patterns can carry either sign.
       const double quiet_nan = std::numeric_limits<double>::quiet_NaN();
       const double inf       = std::numeric_limits<double>::infinity();
       check_streaming_matches_variant(quiet_nan,                        "double nan");
@@ -570,6 +571,11 @@ BOOST_AUTO_TEST_CASE(streaming_vs_variant_parity_libfc_leaf_types) {
       check_streaming_matches_variant(-inf,                             "double -inf");
       check_streaming_matches_variant(std::copysign(std::numeric_limits<float>::quiet_NaN(), -1.0f),
                                                                         "float -nan");
+      // Absolute pins on top of the parity checks: both paths must produce this exact
+      // spelling on every platform, not merely agree with each other.
+      BOOST_CHECK_EQUAL(fc::to_json_string(std::copysign(quiet_nan, -1.0)), "\"-nan\"");
+      BOOST_CHECK_EQUAL(fc::json::to_string(fc::variant(std::copysign(quiet_nan, -1.0)),
+                                            fc::json::yield_function_t()), "\"-nan\"");
    }
    // bls public_key + signature: derived from a deterministic seed via private_key::generate().
    // private_key itself has =delete'd to_json_stream so we don't include it here.

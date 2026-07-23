@@ -12,6 +12,7 @@
 #include <fc/utf8.hpp>
 #include <algorithm>
 #include <cassert>
+#include <cmath>
 #include <functional>
 #include <fc/int256.hpp>
 
@@ -786,6 +787,15 @@ bool  variant::as_bool()const
 
 static std::string s_fc_to_string(double d)
 {
+   // Non-finite spellings are formatted explicitly rather than left to the C library the
+   // stringstream delegates to: glibc prints "-nan" for a negative NaN while Apple's libc
+   // drops the sign and prints "nan", so platform formatting would make the emitted bytes
+   // differ across platforms and diverge from the streaming path (fc/reflect/json_stream.hpp),
+   // which pins these exact shapes.  NaN never compares, so its sign must come from signbit.
+   if( std::isnan( d ) )
+      return std::signbit( d ) ? "-nan" : "nan";
+   if( std::isinf( d ) )
+      return std::signbit( d ) ? "-inf" : "inf";
    // +2 is required to ensure that the double is rounded correctly when read back in.  http://docs.oracle.com/cd/E19957-01/806-3568/ncg_goldberg.html
    std::stringstream ss;
    ss << std::setprecision(std::numeric_limits<double>::digits10 + 2) << std::fixed << d;
