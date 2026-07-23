@@ -4,6 +4,8 @@
 #include <sysio/chain/types.hpp>
 #include <sysio/chain_plugin/chain_plugin.hpp>
 #include <sysio/chain/abi_serializer.hpp>
+#include <fc/io/json_stream.hpp>
+#include <fc/reflect/json_stream.hpp>
 #include <fc/variant_object.hpp>
 #include <contracts.hpp>
 #include <test_contracts.hpp>
@@ -17,7 +19,6 @@ using namespace sysio;
 using namespace sysio::chain;
 using namespace sysio::chain_apis;
 using namespace sysio::testing;
-using namespace sysio::chain_apis;
 using namespace fc;
 
 using mvo = fc::mutable_variant_object;
@@ -135,6 +136,90 @@ BOOST_FIXTURE_TEST_CASE(account_results_total_resources_test, chain_plugin_teste
     BOOST_CHECK_EQUAL(core_from_string("0.0010"), results.total_resources["cpu_weight"].as<asset>());
     BOOST_CHECK_EQUAL(results.total_resources["ram_bytes"].as_int64(), 10401144); // 100000*104+newaccount_ram(1144)
 
+} FC_LOG_AND_RETHROW() }
+
+// Byte-identical compat between the variant-cb path (fc::variant +
+// fc::json::to_string) and the streaming-cb path (fc::to_json_stream via
+// reflector dispatch + per-type overrides for chain::name / asset / symbol).
+// Pins the parity that get_account's add_api_stream registration depends on.
+BOOST_FIXTURE_TEST_CASE(get_account_streaming_vs_variant_byte_identical, chain_plugin_tester) { try {
+   produce_blocks(10);
+   setup_system_accounts();
+   produce_blocks();
+   create_account("alice1111111"_n, config::system_account_name);
+   transfer(name("sysio"), name("alice1111111"), core_from_string("650000000.0000"), name("sysio"));
+
+   read_only::get_account_results results = get_account_info(name("alice1111111"));
+
+   const std::string variant_path =
+      fc::json::to_string(fc::variant(results), fc::time_point::maximum());
+   const std::string stream_path = fc::to_json_string(results);
+
+   BOOST_CHECK_EQUAL(variant_path, stream_path);
+} FC_LOG_AND_RETHROW() }
+
+// Byte-identical compat for the new get_block_stream direct path.  Builds a
+// populated block (account creation + a transfer; both decode through the
+// resolver-located sysio.token / system ABI), then compares
+// `to_string(convert_block(block))` against the streaming
+// `convert_block_stream(block, json_writer)` output.  Drives the
+// abi_serializer::to_json_stream<signed_block> template -- any drift in the
+// ABI-aware stream path's token order, quoting, or action data form would
+// surface here.
+BOOST_FIXTURE_TEST_CASE(get_block_streaming_vs_variant_byte_identical, chain_plugin_tester) { try {
+   produce_blocks(10);
+   setup_system_accounts();
+   produce_blocks();
+   create_account("alice1111111"_n, config::system_account_name);
+   transfer(name("sysio"), name("alice1111111"), core_from_string("100.0000"), name("sysio"));
+   produce_block();
+
+   auto signed_block = control->fetch_block_by_number(control->head().block_num());
+   BOOST_REQUIRE(signed_block);
+
+   std::optional<sysio::chain_apis::tracked_votes> _tracked_votes;
+   read_only ro(*control, {}, {}, _tracked_votes,
+                fc::microseconds::maximum(), fc::microseconds::maximum(), {});
+
+   auto resolver_v = ro.get_block_serializers(signed_block, fc::microseconds::maximum());
+   auto resolver_s = ro.get_block_serializers(signed_block, fc::microseconds::maximum());
+
+   const fc::variant variant_block = ro.convert_block(signed_block, resolver_v);
+   const std::string variant_path = fc::json::to_string(variant_block, fc::time_point::maximum());
+
+   std::string stream_path;
+   {
+      fc::json_writer w(stream_path);
+      ro.convert_block_stream(signed_block, resolver_s, w);
+      BOOST_REQUIRE(w.balanced());
+   }
+
+   BOOST_CHECK_EQUAL(variant_path, stream_path);
+} FC_LOG_AND_RETHROW() }
+
+// get_finalizer_info absent-policy schema: both policy keys are ALWAYS present and emit an
+// explicit JSON null when the policy does not exist (fc::nullable fields).  A fresh chain
+// has an active policy (Savanna activates at genesis) and no pending policy, so this pins
+// the disengaged shape end-to-end plus byte parity between the variant and streaming paths.
+// A reflected std::optional would omit the pending key entirely -- the regression this
+// guards against.
+BOOST_FIXTURE_TEST_CASE(get_finalizer_info_absent_policy_emits_null, chain_plugin_tester) { try {
+   produce_blocks(2);
+
+   std::optional<sysio::chain_apis::tracked_votes> _tracked_votes;
+   read_only ro(*control, {}, {}, _tracked_votes,
+                fc::microseconds::maximum(), fc::microseconds::maximum(), {});
+
+   const read_only::get_finalizer_info_result result = ro.get_finalizer_info({}, fc::time_point::maximum());
+   BOOST_REQUIRE(result.active_finalizer_policy.has_value());
+   BOOST_REQUIRE(!result.pending_finalizer_policy.has_value());
+
+   const std::string variant_path = fc::json::to_string(fc::variant(result), fc::time_point::maximum());
+   const std::string stream_path  = fc::to_json_string(result);
+
+   BOOST_CHECK_EQUAL(variant_path, stream_path);
+   BOOST_CHECK(stream_path.find("\"pending_finalizer_policy\":null") != std::string::npos);
+   BOOST_CHECK(stream_path.find("\"active_finalizer_policy\":{") != std::string::npos);
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()

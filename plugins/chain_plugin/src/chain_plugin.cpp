@@ -2123,8 +2123,8 @@ fc::variant strip_scope_fields(fc::variant&& full_key, size_t count) {
    return fc::variant(std::move(stripped));
 }
 
-read_only::get_table_rows_return_t
-read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::time_point& deadline ) const {
+read_only::table_rows_phase1
+read_only::collect_table_rows_phase1( const read_only::get_table_rows_params& p, const fc::time_point& deadline ) const {
    abi_def abi = sysio::chain_apis::get_abi( db, p.code );
    const auto& tbl = get_kv_table_def( abi, p.table );
 
@@ -2216,23 +2216,15 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
       // else: scope is empty — iterate ALL scopes (no prefix filtering)
    }
 
-   // Phase 1: Collect raw rows on the main thread.
-   // Phase 2 (the returned lambda): ABI-decode on the http thread pool.
-   struct raw_row {
-      std::vector<char> key;
-      std::vector<char> value;
-      name              payer;
-   };
-   struct http_params_t {
-      bool json;
-      bool show_payer;
-      bool more;
-      std::string next_key;
-      std::vector<raw_row> rows;
-   };
+   // Phase 1: Collect raw rows on the main thread; the caller's Phase 2 closure
+   // ABI-decodes on the http thread pool.
+   using raw_row       = raw_table_row;
+   using http_params_t = table_rows_phase1;
 
    bool show_payer = p.show_payer.has_value() && *p.show_payer;
-   http_params_t hp{ p.json, show_payer, false, {}, {} };
+   http_params_t hp;
+   hp.json       = p.json;
+   hp.show_payer = show_payer;
 
    const auto& d = db.db();
    const auto& kv_idx = d.get_index<chain::kv_index, chain::by_code_key>();
@@ -2524,73 +2516,11 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
          }
       }
 
-      // Phase 2: ABI decode on http thread pool
-      return [p = std::move(hp), abi = std::move(abi), table_name = p.table,
-              key_shapes = std::move(key_shapes),
-              scope_key_count,
-              abi_serializer_max_time = abi_serializer_max_time,
-              shorten_abi_errors = shorten_abi_errors,
-              all_rows    = p.all_rows,
-              values_only = p.values_only.value_or(false),
-              filter      = p.filter]() mutable ->
-         chain::t_or_exception<read_only::get_table_rows_result> {
-         get_table_rows_result result;
-         result.more = p.more;
-         result.next_key = std::move(p.next_key);
-
-         abi_serializer abis;
-         abis.set_abi(std::move(abi), abi_serializer::create_yield_function(abi_serializer_max_time));
-         auto table_type = abis.get_table_type(table_name);
-
-         for (auto& row : p.rows) {
-            fc::mutable_variant_object obj;
-            // For secondary queries, decode the primary key as the key field
-            if (p.json) {
-               try {
-                  FC_ASSERT(key_shapes, "be_key_codec: key shape unresolved (unrepresentable key type); falling back to hex");
-                  auto full_key = chain::be_key_codec::decode_key(
-                     row.key.data(), row.key.size(), *key_shapes);
-                  obj["key"] = strip_scope_fields(std::move(full_key), scope_key_count);
-               } catch (...) {
-                  obj["key"] = fc::to_hex(row.key.data(), row.key.size());
-               }
-            } else {
-               obj["key"] = fc::to_hex(row.key.data(), row.key.size());
-            }
-            // Decode value
-            if (p.json && !table_type.empty() && !row.value.empty()) {
-               try {
-                  obj["value"] = abis.binary_to_variant(table_type, row.value,
-                     abi_serializer::create_yield_function(abi_serializer_max_time),
-                     shorten_abi_errors);
-               } catch (...) {
-                  obj["value"] = fc::to_hex(row.value.data(), row.value.size());
-               }
-            } else {
-               obj["value"] = fc::to_hex(row.value.data(), row.value.size());
-            }
-            if (p.show_payer)
-               obj["payer"] = row.payer.to_string();
-            result.rows.push_back(std::move(obj));
-         }
-
-         // --- Post-pass: C++-only wrapper behaviors. Same shape as the primary-path Phase 2 below.
-         if (all_rows) { result.more = false; result.next_key.clear(); }
-         if (values_only) {
-            for (auto& row : result.rows) {
-               if (!row.is_object()) continue;
-               const auto& row_obj = row.get_object();
-               if (!row_obj.contains("value")) continue;
-               fc::variant value{row_obj["value"]};
-               row = std::move(value);
-            }
-         }
-         if (filter.has_value()) {
-            const auto& predicate = *filter;
-            std::erase_if(result.rows, [&](const fc::variant& row) { return !predicate(row); });
-         }
-         return result;
-      };
+      hp.abi             = std::move(abi);
+      hp.tbl_name        = p.table;
+      hp.key_shapes      = std::move(key_shapes);
+      hp.scope_key_count = scope_key_count;
+      return hp;
    }
 
    // --- Primary key query path ---
@@ -2702,20 +2632,28 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
       }
    }
 
-   return [hp = std::move(hp), abi = std::move(abi), tbl_name = p.table,
-           key_shapes = std::move(key_shapes),
-           scope_key_count,
+   hp.abi             = std::move(abi);
+   hp.tbl_name        = p.table;
+   hp.key_shapes      = std::move(key_shapes);
+   hp.scope_key_count = scope_key_count;
+   return hp;
+}
+
+read_only::get_table_rows_return_t
+read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::time_point& deadline ) const {
+   auto hp = collect_table_rows_phase1(p, deadline);
+   return [hp = std::move(hp),
            abi_serializer_max_time = abi_serializer_max_time,
-           shorten_abi_errors = shorten_abi_errors,
-           all_rows    = p.all_rows,
-           values_only = p.values_only.value_or(false),
-           filter      = p.filter]() mutable
+           shorten_abi_errors      = shorten_abi_errors,
+           all_rows                = p.all_rows,
+           values_only             = p.values_only.value_or(false),
+           filter                  = p.filter]() mutable
       -> chain::t_or_exception<read_only::get_table_rows_result> {
       read_only::get_table_rows_result result;
 
       abi_serializer abis;
-      abis.set_abi(std::move(abi), abi_serializer::create_yield_function(abi_serializer_max_time));
-      auto value_type = abis.get_table_type(tbl_name);
+      abis.set_abi(std::move(hp.abi), abi_serializer::create_yield_function(abi_serializer_max_time));
+      auto value_type = abis.get_table_type(hp.tbl_name);
 
       for (auto& row : hp.rows) {
          fc::mutable_variant_object obj;
@@ -2723,10 +2661,10 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
          // Decode key -- fall back to hex if BE decode fails
          if (hp.json) {
             try {
-               FC_ASSERT(key_shapes, "be_key_codec: key shape unresolved (unrepresentable key type); falling back to hex");
+               FC_ASSERT(hp.key_shapes, "be_key_codec: key shape unresolved (unrepresentable key type); falling back to hex");
                auto full_key = chain::be_key_codec::decode_key(
-                  row.key.data(), row.key.size(), *key_shapes);
-               obj("key", strip_scope_fields(std::move(full_key), scope_key_count));
+                  row.key.data(), row.key.size(), *hp.key_shapes);
+               obj("key", strip_scope_fields(std::move(full_key), hp.scope_key_count));
             } catch (...) {
                obj("key", fc::to_hex(row.key.data(), static_cast<uint32_t>(row.key.size())));
             }
@@ -2735,7 +2673,7 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
          }
 
          // Decode value -- fall back to hex if ABI decode fails
-         if (hp.json) {
+         if (hp.json && !value_type.empty() && !row.value.empty()) {
             try {
                obj("value", abis.binary_to_variant(value_type, row.value,
                                                     abi_serializer::create_yield_function(abi_serializer_max_time),
@@ -2753,8 +2691,8 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
          result.rows.emplace_back(std::move(obj));
       }
 
-      result.more = hp.more;
-      result.next_key = hp.next_key;
+      result.more     = hp.more;
+      result.next_key = std::move(hp.next_key);
 
       // --- Post-pass: C++-only wrapper behaviors ---
       // `all_rows` walked the whole scan; a resume cursor is meaningless on the way out.
@@ -2785,6 +2723,97 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
       }
 
       return result;
+   };
+}
+
+read_only::get_table_rows_stream_return_t
+read_only::get_table_rows_stream( const read_only::get_table_rows_params& p, const fc::time_point& deadline ) const {
+   SYS_ASSERT( !p.filter.has_value(), chain::contract_table_query_exception,
+               "get_table_rows_stream does not support the 'filter' predicate; use get_table_rows() instead" );
+   auto hp = collect_table_rows_phase1(p, deadline);
+   return [hp = std::move(hp),
+           abi_serializer_max_time = abi_serializer_max_time,
+           shorten_abi_errors      = shorten_abi_errors,
+           all_rows                = p.all_rows,
+           values_only             = p.values_only.value_or(false)]() mutable
+      -> chain::t_or_exception<get_table_rows_stream_emit_fn> {
+      // Build the abi_serializer on the http thread pool so the on-wire emit
+      // closure doesn't pay the abi_def move-construction cost during emission.
+      auto abis = std::make_shared<abi_serializer>();
+      abis->set_abi(std::move(hp.abi), abi_serializer::create_yield_function(abi_serializer_max_time));
+      auto value_type = abis->get_table_type(hp.tbl_name);
+
+      const bool effective_more = !all_rows && hp.more;
+      std::string effective_next_key = all_rows ? std::string{} : std::move(hp.next_key);
+
+      return [hp                      = std::move(hp),
+              abis                    = std::move(abis),
+              value_type              = std::move(value_type),
+              abi_serializer_max_time,
+              shorten_abi_errors,
+              values_only,
+              effective_more,
+              effective_next_key      = std::move(effective_next_key)]
+             (fc::json_writer& w) mutable {
+         auto emit_value = [&](const std::vector<char>& data) {
+            if (hp.json && !value_type.empty() && !data.empty()) {
+               // binary_to_json_stream writes tokens into `w` as it walks the ABI, so a
+               // mid-decode throw (truncated value, ABI/type drift) leaves a half-written
+               // fragment behind.  Rewind every byte written before falling back so the hex
+               // string below lands at a clean value position instead of producing
+               // structurally invalid JSON on the wire.
+               const auto cp = w.checkpoint();
+               try {
+                  abis->binary_to_json_stream(value_type, data, w,
+                                              abi_serializer::create_yield_function(abi_serializer_max_time),
+                                              shorten_abi_errors);
+                  return;
+               } catch (...) {
+                  w.rewind(cp);
+               }
+            }
+            // Empty value or non-json mode: emit hex (matches the variant path's
+            // fc::variant(vector<char>) -> to_hex on emit).
+            w.value_hex(data.data(), data.size());
+         };
+
+         w.begin_object();
+         w.key("rows");
+         w.begin_array();
+         for (auto& row : hp.rows) {
+            if (values_only) {
+               emit_value(row.value);
+               continue;
+            }
+            w.begin_object();
+            w.key("key");
+            if (hp.json) {
+               try {
+                  FC_ASSERT(hp.key_shapes, "be_key_codec: key shape unresolved (unrepresentable key type); falling back to hex");
+                  auto full_key = chain::be_key_codec::decode_key(
+                     row.key.data(), row.key.size(), *hp.key_shapes);
+                  fc::to_json_stream(strip_scope_fields(std::move(full_key), hp.scope_key_count), w);
+               } catch (...) {
+                  w.value_hex(row.key.data(), row.key.size());
+               }
+            } else {
+               w.value_hex(row.key.data(), row.key.size());
+            }
+            w.key("value");
+            emit_value(row.value);
+            if (hp.show_payer) {
+               w.key("payer");
+               w.value_string(row.payer.to_string());
+            }
+            w.end_object();
+         }
+         w.end_array();
+         w.key("more");
+         w.value_bool(effective_more);
+         w.key("next_key");
+         w.value_string(effective_next_key);
+         w.end_object();
+      };
    };
 }
 
@@ -3147,11 +3176,10 @@ read_only::get_finalizer_info_result read_only::get_finalizer_info( const read_o
    std::set<fc::crypto::bls::public_key> finalizer_keys;
 
    // Populate a particular finalizer policy
-   auto add_policy_to_result = [&](const finalizer_policy_ptr& from_policy, fc::variant& to_policy) {
+   auto add_policy_to_result = [&](const finalizer_policy_ptr& from_policy,
+                                   fc::nullable<chain::finalizer_policy>& to_policy) {
       if (from_policy) {
-         // Use string format of public key for easy uses
-         to_variant(*from_policy, to_policy);
-
+         to_policy = *from_policy;
          for (const auto& f: from_policy->finalizers) {
             finalizer_keys.insert(f.public_key);
          }
@@ -3237,17 +3265,47 @@ chain::signed_block_ptr read_only::get_raw_block(const read_only::get_raw_block_
    return block;
 }
 
-std::function<chain::t_or_exception<fc::variant>()> read_only::get_block(const get_raw_block_params& params, const fc::time_point& deadline) const {
-   chain::signed_block_ptr block = get_raw_block(params, deadline);
+void read_only::get_block_stream_async(get_block_params params,
+                                        chain::next_function<get_block_stream_emit_fn> next) const {
+   try {
+      // Phase 0 (http thread pool):  block fetch.  get_raw_block is thread-safe per
+      // controller.  The deadline argument is unused by the current get_raw_block
+      // body; pass time_point::maximum so it's a no-op.
+      chain::signed_block_ptr block = get_raw_block(params, fc::time_point::maximum());
 
-   using return_type = t_or_exception<fc::variant>;
-   return [this,
-           resolver = get_serializers_cache(db, block, abi_serializer_max_time),
-           block    = std::move(block)]() mutable -> return_type {
-      try {
-         return convert_block(block, resolver);
-      } CATCH_AND_RETURN(return_type);
-   };
+      // Hop 1:  post the chainbase abi capture onto the read-only queue.  Phase 2
+      // (parse + emit_fn build) returns to the http pool via the http_fwd alternative
+      // of next_function_variant.
+      app().executor().post(appbase::priority::medium_low,
+                            appbase::exec_queue::read_only,
+         [this, block = std::move(block),
+          max_time = abi_serializer_max_time,
+          next = std::move(next)]() mutable {
+            try {
+               captured_abis abi_bytes = capture_abis(db, block);
+
+               // Fire next with an http_fwd that builds Phase 2 + the emit_fn on
+               // the http pool.  bind_stream::async sees the http_fwd alternative
+               // and posts it via post_http_thread_pool().
+               next(std::function<chain::t_or_exception<get_block_stream_emit_fn>()>{
+                  [this, block = std::move(block),
+                   abi_bytes = std::move(abi_bytes),
+                   max_time]() mutable
+                  -> chain::t_or_exception<get_block_stream_emit_fn> {
+                     try {
+                        auto resolver = build_resolver_from_captured_abis(std::move(abi_bytes),
+                                                                          max_time);
+                        return get_block_stream_emit_fn{
+                           [this, block = std::move(block),
+                            resolver = std::move(resolver)]
+                           (fc::json_writer& w) mutable {
+                              convert_block_stream(block, resolver, w);
+                           }};
+                     } CATCH_AND_RETURN(chain::t_or_exception<get_block_stream_emit_fn>);
+                  }});
+            } CATCH_AND_CALL(next);
+         });
+   } CATCH_AND_CALL(next);
 }
 
 read_only::get_block_header_result read_only::get_block_header(const read_only::get_block_header_params& params, const fc::time_point& deadline) const{
@@ -3273,7 +3331,7 @@ read_only::get_block_header_result read_only::get_block_header(const read_only::
          } SYS_RETHROW_EXCEPTIONS(chain::block_id_type_exception, "Invalid block ID: {}", params.block_num_or_id)
       }
       SYS_ASSERT( header, unknown_block_exception, "Could not find block header: {}", params.block_num_or_id);
-      return { header->calculate_id(), fc::variant{*header}, {}};
+      return { header->calculate_id(), std::move(*header), {}};
    } else {
       signed_block_ptr block;
       if( block_num ) {
@@ -3284,7 +3342,7 @@ read_only::get_block_header_result read_only::get_block_header(const read_only::
          } SYS_RETHROW_EXCEPTIONS(chain::block_id_type_exception, "Invalid block ID: {}", params.block_num_or_id)
       }
       SYS_ASSERT( block, unknown_block_exception, "Could not find block header: {}", params.block_num_or_id);
-      return { block->calculate_id(), fc::variant{static_cast<signed_block_header>(*block)}, block->block_extensions};
+      return { block->calculate_id(), static_cast<const signed_block_header&>(*block), block->block_extensions };
    }
 }
 
@@ -3306,32 +3364,56 @@ fc::variant read_only::convert_block( const chain::signed_block_ptr& block, abi_
          ( "ref_block_prefix", ref_block_prefix );
 }
 
-fc::variant read_only::get_block_info(const read_only::get_block_info_params& params, const fc::time_point&) const {
+void read_only::convert_block_stream( const chain::signed_block_ptr& block, abi_resolver& resolver, fc::json_writer& w ) const {
+   chain::impl::stream_sink sink(w);
+   chain::impl::abi_traverse_context ctx(abi_serializer::create_depth_yield_function(), abi_serializer_max_time);
 
-   std::optional<signed_block_header> block;
+   const auto block_id          = block->calculate_id();
+   const uint32_t ref_block_pfx = block_id._hash[1];
+
+   sink.begin_object();
+   chain::impl::abi_to_variant::emit_signed_block_body(sink, *block, resolver, ctx);
+   sink.key("id");
+   sink.emit<chain::block_id_type>(block_id);
+   sink.key("block_num");
+   sink.value_uint64(block->block_num());
+   sink.key("ref_block_prefix");
+   sink.value_uint64(ref_block_pfx);
+   sink.end_object();
+}
+
+void read_only::get_block_info_async(get_block_info_params params,
+                                      chain::next_function<get_block_info_results> next) const {
    try {
-         block = db.fetch_block_header_by_number( params.block_num );
-   } catch (...)   {
-      // assert below will handle the invalid block num
-   }
+      // Runs on the http thread pool (registered via add_async_api_stream).
+      // fetch_block_header_by_number is thread-safe per controller, so the entire
+      // body stays off the read-only queue.
+      std::optional<signed_block_header> block;
+      try {
+         block = db.fetch_block_header_by_number(params.block_num);
+      } catch (...) {
+         // assert below will handle the invalid block num
+      }
 
-   SYS_ASSERT( block, unknown_block_exception, "Could not find block: {}", params.block_num);
+      SYS_ASSERT(block, unknown_block_exception, "Could not find block: {}", params.block_num);
 
-   const auto id = block->calculate_id();
-   const uint32_t ref_block_prefix = id._hash[1];
+      const auto id = block->calculate_id();
+      const uint32_t ref_block_prefix = id._hash[1];
 
-   return fc::mutable_variant_object ()
-         ("block_num", block->block_num())
-         ("ref_block_num", static_cast<uint16_t>(block->block_num()))
-         ("id", id)
-         ("timestamp", block->timestamp)
-         ("producer", block->producer)
-         ("previous", block->previous)
-         ("transaction_mroot", block->transaction_mroot)
-         ("finality_mroot", block->finality_mroot)
-         ("qc_claim", block->qc_claim)
-         ("producer_signatures", block->producer_signatures)
-         ("ref_block_prefix", ref_block_prefix);
+      next(get_block_info_results{
+         .block_num           = block->block_num(),
+         .ref_block_num       = static_cast<uint16_t>(block->block_num()),
+         .id                  = id,
+         .timestamp           = block->timestamp,
+         .producer            = block->producer,
+         .previous            = block->previous,
+         .transaction_mroot   = block->transaction_mroot,
+         .finality_mroot      = block->finality_mroot,
+         .qc_claim            = block->qc_claim,
+         .producer_signatures = block->producer_signatures,
+         .ref_block_prefix    = ref_block_prefix,
+      });
+   } CATCH_AND_CALL(next);
 }
 
 fc::variant read_only::get_block_header_state(const get_block_header_state_params& params, const fc::time_point&) const {
@@ -3447,22 +3529,27 @@ void read_write::push_transaction(const read_write::push_transaction_params& par
 }
 
 static void push_recurse(read_write* rw, int index, const std::shared_ptr<read_write::push_transactions_params>& params, const std::shared_ptr<read_write::push_transactions_results>& results, const next_function<read_write::push_transactions_results>& next) {
-   auto wrapped_next = [=](const next_function_variant<read_write::push_transaction_results>& result) {
+   auto wrapped_next = [=](next_function_variant<read_write::push_transaction_results>&& result) {
       if (std::holds_alternative<fc::exception_ptr>(result)) {
          const auto& e = std::get<fc::exception_ptr>(result);
          results->emplace_back( read_write::push_transaction_results{ transaction_id_type(), fc::mutable_variant_object( "error", e->to_detail_string() ) } );
       } else if (std::holds_alternative<read_write::push_transaction_results>(result)) {
-         const auto& r = std::get<read_write::push_transaction_results>(result);
-         results->emplace_back( r );
+         results->emplace_back( std::get<read_write::push_transaction_results>(std::move(result)) );
       } else {
-         assert(0);
+         // push_transaction's next_function carries an http_fwd alternative for the streaming
+         // dispatch path; push_transaction itself has not been migrated to emit one, so reaching
+         // this branch indicates a future API change that broke this assumption.  Throw rather
+         // than assert so the failure is visible in NDEBUG builds.
+         SYS_THROW(plugin_exception,
+                   "push_recurse: unsupported next_function_variant alternative (http_fwd). "
+                   "push_transaction must emit either a fc::exception_ptr or push_transaction_results.");
       }
 
       size_t next_index = index + 1;
       if (next_index < params->size()) {
          push_recurse(rw, next_index, params, results, next );
       } else {
-         next(*results);
+         next(read_write::push_transactions_results{*results});
       }
    };
 
@@ -3521,12 +3608,12 @@ void api_base::send_transaction_gen(API &api, send_transaction_params_t params, 
                      if( retry && api.trx_retry.has_value() && !trx_trace_ptr->except) {
                         // will be ack'ed via next later
                         api.trx_retry->track_transaction( ptrx, retry_num_blocks,
-                             [ptrx, next](const next_function_variant<std::unique_ptr<fc::variant>>& result ) {
+                             [ptrx, next](const next_function_variant<std::unique_ptr<chain_apis::streamed_processed_trace>>& result ) {
                                 if( std::holds_alternative<fc::exception_ptr>( result ) ) {
                                    next( std::get<fc::exception_ptr>( result ) );
                                 } else {
-                                   fc::variant& output = *std::get<std::unique_ptr<fc::variant>>( result );
-                                   next( Result{ptrx->id(), std::move( output )} );
+                                   auto& processed = *std::get<std::unique_ptr<chain_apis::streamed_processed_trace>>( result );
+                                   next( Result{ptrx->id(), std::move( processed )} );
                                 }
                              } );
                         retried = true;
@@ -3537,20 +3624,20 @@ void api_base::send_transaction_gen(API &api, send_transaction_params_t params, 
                      (void)retry_num_blocks; // ref variable to avoid compilation warning
                   }
                   if (!retried) {
-                     // we are still on main thread here. The lambda passed to `next()` below will be executed on the http thread pool
+                     // we are still on main thread here. The lambda passed to `next()` below will be executed on the
+                     // http thread pool.  Phase 1 (here, main thread): copy raw ABI bytes for accounts referenced
+                     // in the trace.  Phase 2 (http pool): build the streamed_processed_trace which defers ABI
+                     // parsing + JSON emission to response-emit time.
                      using return_type = t_or_exception<Result>;
                      next([&api,
                            trx_trace_ptr,
-                           resolver = get_serializers_cache(api.db, trx_trace_ptr, api.abi_serializer_max_time)]() mutable {
+                           raw_abis = sysio::capture_abis(api.db, trx_trace_ptr)]() mutable {
                         try {
-                           fc::variant output;
-                           try {
-                              abi_serializer::to_variant(*trx_trace_ptr, output, resolver, api.abi_serializer_max_time);
-                           } catch( abi_exception& ) {
-                              output = *trx_trace_ptr;
-                           }
                            const transaction_id_type& id = trx_trace_ptr->id;
-                           return return_type(Result{id, std::move( output )});
+                           return return_type(Result{id,
+                              chain_apis::streamed_processed_trace{ std::move(trx_trace_ptr),
+                                                                     std::move(raw_abis),
+                                                                     api.abi_serializer_max_time }});
                         } CATCH_AND_RETURN(return_type);
                      });
                   }
@@ -3767,7 +3854,11 @@ read_only::get_account_return_t read_only::get_account( const get_account_params
    };
    http_params_t http_params;
 
-   if( abi_def abi; code_account != nullptr && abi_serializer::to_abi(code_account->abi, abi) ) {
+   // Phase 1 gate: ROA contract loaded with at least some abi bytes.  We don't parse the
+   // abi here -- to_abi (deserialize) and abi_serializer construction both move to Phase 2
+   // so the read-only queue isn't blocked on the ROA abi parse.  The content lookups below
+   // (sysio.token balance + reslimit row) only need the raw bytes plus chainbase access.
+   if (code_account != nullptr && code_account->abi.size() > 0) {
 
       const auto token_code = "sysio.token"_n;
 
@@ -3806,16 +3897,39 @@ read_only::get_account_return_t read_only::get_account( const get_account_params
          return {};
       };
 
-      http_params.total_resources          = lookup_object("reslimit"_n, params.account_name);
+      http_params.total_resources = lookup_object("reslimit"_n, params.account_name);
 
-      return [http_params = std::move(http_params), result = std::move(result), abi=std::move(abi), shorten_abi_errors=shorten_abi_errors,
-              abi_serializer_max_time=abi_serializer_max_time]() mutable ->  chain::t_or_exception<read_only::get_account_results> {
-         auto yield = [&]() { return abi_serializer::create_yield_function(abi_serializer_max_time); };
-         abi_serializer abis(std::move(abi), yield());
+      // Capture raw ABI bytes for Phase 2; both to_abi (deserialize) and abi_serializer
+      // construction will run on the http thread pool.  If parsing fails there, we skip
+      // the reslimit decode and return result with total_resources unset (preserving
+      // pre-refactor behaviour for the corrupt-abi case).
+      vector<char> abi_bytes(code_account->abi.data(),
+                             code_account->abi.data() + code_account->abi.size());
 
-         if (http_params.total_resources)
-            result.total_resources = abis.binary_to_variant("reslimit", *http_params.total_resources, yield(), shorten_abi_errors);
-         return std::move(result);
+      return [http_params = std::move(http_params), result = std::move(result),
+              abi_bytes = std::move(abi_bytes),
+              shorten_abi_errors = shorten_abi_errors,
+              abi_serializer_max_time = abi_serializer_max_time]() mutable
+                 -> chain::t_or_exception<read_only::get_account_results> {
+         try {
+            // Mirror the outer SYS_RETHROW_EXCEPTIONS(account_query_exception, ...) so that a throw
+            // on the http thread is reported to the client with the same exception class clients
+            // were seeing pre-refactor.  Without the inner wrap, CATCH_AND_RETURN would surface
+            // raw abi_exception / abi_serialization_deadline_exception instead.
+            try {
+               abi_def abi;
+               if (abi_serializer::to_abi(abi_bytes, abi)) {
+                  auto yield = [&]() { return abi_serializer::create_yield_function(abi_serializer_max_time); };
+                  abi_serializer abis(std::move(abi), yield());
+                  if (http_params.total_resources) {
+                     result.total_resources = abis.binary_to_variant("reslimit",
+                                                                     *http_params.total_resources,
+                                                                     yield(), shorten_abi_errors);
+                  }
+               }
+               return std::move(result);
+            } SYS_RETHROW_EXCEPTIONS(chain::account_query_exception, "unable to retrieve account info")
+         } CATCH_AND_RETURN(chain::t_or_exception<read_only::get_account_results>);
       };
    }
    return [result = std::move(result)]() mutable -> chain::t_or_exception<read_only::get_account_results> {
@@ -3927,6 +4041,29 @@ read_only::get_consensus_parameters(const get_consensus_parameters_params&, cons
    return results;
 }
 
+namespace {
+   /// Dominant retained memory of a transaction trace held by a queued response closure:
+   /// per-action payload bytes, console output, and return values.  A reservation-grade
+   /// estimate, deliberately ignoring small fixed-size fields -- same semantics as
+   /// detail::in_flight_sizeof.
+   size_t trace_retained_size(const chain::transaction_trace& trace) {
+      size_t sz = sizeof(trace);
+      for (const auto& at : trace.action_traces) {
+         sz += sizeof(at) + at.act.data.size() + at.console.size() + at.return_value.size();
+      }
+      return sz;
+   }
+}
+
+size_t queued_payload_size(const streamed_processed_trace& t) {
+   size_t sz = 0;
+   if (t.trace)
+      sz += trace_retained_size(*t.trace);
+   for (const auto& [account, abi] : t.raw_abis.raw_abis)
+      sz += abi.size();
+   return sz;
+}
+
 } // namespace chain_apis
 
 fc::variant chain_plugin::get_log_trx_trace(const transaction_trace_ptr& trx_trace ) const {
@@ -3958,5 +4095,28 @@ const controller::config& chain_plugin::chain_config() const {
    return *my->chain_config;
 }
 } // namespace sysio
+
+namespace fc {
+void to_json_stream(const sysio::chain_apis::streamed_processed_trace& t, fc::json_writer& w) {
+   if (!t.trace) {
+      w.value_null();
+      return;
+   }
+   // Checkpoint before the streaming attempt so a mid-emit throw can rewind the writer
+   // (truncate buffer + restore frame state) before the reflector-only fallback runs.
+   // Without this, the fallback would continue writing into a partially-emitted object,
+   // producing malformed JSON.
+   const auto cp = w.checkpoint();
+   try {
+      auto resolver = sysio::build_resolver_from_captured_abis(t.raw_abis, t.max_serialization_time);
+      sysio::chain::abi_serializer::to_json_stream(*t.trace, w, resolver, t.max_serialization_time);
+   } catch (sysio::chain::abi_exception&) {
+      w.rewind(cp);
+      // Fall back: emit via reflector with no ABI-aware action data decode.  Matches the prior variant path's
+      // `output = *trx_trace_ptr;` fallback.
+      to_json_stream(*t.trace, w);
+   }
+}
+} // namespace fc
 
 FC_REFLECT( sysio::chain_apis::detail::ram_market_exchange_state_t, (ignore1)(ignore2)(ignore3)(core_symbol)(ignore4) )

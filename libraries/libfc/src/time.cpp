@@ -1,6 +1,8 @@
 #include <fc/time.hpp>
 #include <fc/mock_time.hpp>
 #include <fc/variant.hpp>
+#include <fc/io/json_stream.hpp>
+#include <fc/reflect/json_stream.hpp>
 #include <boost/chrono/system_clocks.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <sstream>
@@ -87,11 +89,17 @@ namespace fc {
   void from_variant( const fc::variant& v, fc::time_point& t ) {
     t = fc::time_point::from_iso_string( v.as_string() );
   }
+  void to_json_stream( const fc::time_point& t, json_writer& w ) {
+    w.value_string( t.to_iso_string() );
+  }
   void to_variant( const fc::time_point_sec& t, variant& v ) {
     v = t.to_iso_string();
   }
   void from_variant( const fc::variant& v, fc::time_point_sec& t ) {
     t = fc::time_point_sec::from_iso_string( v.as_string() );
+  }
+  void to_json_stream( const fc::time_point_sec& t, json_writer& w ) {
+    w.value_string( t.to_iso_string() );
   }
 
   // inspired by show_date_relative() in git's date.c
@@ -164,6 +172,13 @@ namespace fc {
   void to_variant( const microseconds& input_microseconds,  variant& output_variant )
   {
     output_variant = input_microseconds.count();
+  }
+  void to_json_stream( const microseconds& us, json_writer& w )
+  {
+    // Delegate to the guarded int64_t overload (fc/reflect/json_stream.hpp) so counts with
+    // magnitude past json_integer_quote_magnitude emit as quoted strings, exactly as the
+    // to_variant -> fc::json::to_string path renders the int64 count.
+    to_json_stream( us.count(), w );
   }
   void from_variant( const variant& input_variant,  microseconds& output_microseconds )
   {

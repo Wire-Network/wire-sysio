@@ -1,5 +1,6 @@
 #pragma once
 #include <fc/reflect/reflect.hpp>
+#include <fc/reflect/json_stream.hpp>
 #include <fc/io/raw_fwd.hpp>
 #include <fc/variant.hpp>
 
@@ -56,6 +57,16 @@ namespace fc
   void from_variant( const variant& var,  enum_type<IntType,EnumType>& vo )
   {
     vo.value = var.as<EnumType>();
+  }
+
+  /// JSON shape mirrors to_variant: forward to the EnumType's own to_json_stream
+  /// so FC_REFLECT_ENUM-reflected enums emit as their member-name strings (not
+  /// the underlying integer).  Bare numeric enums fall through to the primitive
+  /// overloads via integer promotion.
+  template<typename IntType, typename EnumType>
+  void to_json_stream( const enum_type<IntType,EnumType>& var, json_writer& w )
+  {
+    fc::to_json_stream(static_cast<EnumType>(var.value), w);
   }
 
 

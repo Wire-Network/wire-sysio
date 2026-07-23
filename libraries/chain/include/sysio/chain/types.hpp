@@ -5,6 +5,7 @@
 #include <chainbase/chainbase.hpp>
 
 #include <fc/interprocess/container.hpp>
+#include <fc/move_only_function.hpp>
 #include <fc/io/varint.hpp>
 #include <fc/io/enum_type.hpp>
 #include <fc/crypto/sha224.hpp>
@@ -13,7 +14,6 @@
 #include <fc/io/raw.hpp>
 #include <fc/static_variant.hpp>
 #include <fc/crypto/ripemd160.hpp>
-#include <fc/fixed_string.hpp>
 #include <fc/crypto/private_key.hpp>
 
 #include <boost/version.hpp>
@@ -518,7 +518,7 @@ namespace sysio::chain {
    // The third option is a function which can be executed in a multithreaded context (likely on the
    // http_plugin thread pool) and which completes the API processing and returns the result T.
    //
-   // The user-provided callable is held inside a std::move_only_function so consume-on-call captures
+   // The user-provided callable is held inside an fc::move_only_function so consume-on-call captures
    // (e.g. [cb = std::move(cb)] mutable {...}) work correctly. The outer wrapper is copyable via a
    // shared_ptr indirection - required because the callback travels through paths that copy
    // (boost::signals2 slot dispatch, boost::multi_index value storage, lambdas captured by [=],
@@ -542,68 +542,11 @@ namespace sysio::chain {
    using next_function_variant = std::variant<fc::exception_ptr, T, std::function<t_or_exception<T>()>>;
 
    namespace detail {
-      /**
-       * @brief Move-only callable storage for standard libraries without std::move_only_function.
-       *
-       * libc++ versions shipped with current AppleClang do not always provide the C++23
-       * std::move_only_function API. This wrapper preserves the same move-only capture support
-       * needed by next_function without requiring that library feature.
-       *
-       * This is intentionally a narrow polyfill for next_function's current
-       * `void(T&&)` storage shape, not a general std::move_only_function
-       * replacement. If next_function starts storing another callable
-       * signature, extend this wrapper alongside that change.
-       */
+      // Portable move-only callable storage; fc::move_only_function selects
+      // std::move_only_function where the standard library provides it and a
+      // general type-erased polyfill otherwise (AppleClang's libc++ lacks it).
       template<typename Signature>
-      class move_only_function;
-
-      template<typename Arg>
-      class move_only_function<void(Arg&&)> {
-      public:
-         move_only_function() = default;
-         move_only_function(std::nullptr_t) noexcept {}
-
-         template<typename F>
-            requires (!std::is_same_v<std::decay_t<F>, move_only_function> &&
-                      std::is_invocable_r_v<void, std::decay_t<F>&, Arg&&>)
-         move_only_function(F&& f)
-            : _callable(std::make_unique<callable<std::decay_t<F>>>(std::forward<F>(f))) {}
-
-         move_only_function(move_only_function&&) noexcept = default;
-         move_only_function& operator=(move_only_function&&) noexcept = default;
-         move_only_function(const move_only_function&) = delete;
-         move_only_function& operator=(const move_only_function&) = delete;
-
-         void operator()(Arg&& arg) { _callable->invoke(std::forward<Arg>(arg)); }
-         explicit operator bool() const noexcept { return static_cast<bool>(_callable); }
-
-      private:
-         struct callable_base {
-            virtual ~callable_base() = default;
-            virtual void invoke(Arg&& arg) = 0;
-         };
-
-         template<typename F>
-         struct callable final : callable_base {
-            template<typename Fn>
-            explicit callable(Fn&& fn)
-               : f(std::forward<Fn>(fn)) {}
-
-            void invoke(Arg&& arg) override { f(std::forward<Arg>(arg)); }
-
-            F f;
-         };
-
-         std::unique_ptr<callable_base> _callable;
-      };
-
-      template<typename Signature>
-      using next_move_only_function =
-#if defined(__cpp_lib_move_only_function) && __cpp_lib_move_only_function >= 202110L
-         std::move_only_function<Signature>;
-#else
-         move_only_function<Signature>;
-#endif
+      using next_move_only_function = fc::move_only_function<Signature>;
    }
 
    template<typename T>

@@ -1,8 +1,21 @@
 #include <sysio/trace_api/abi_data_handler.hpp>
 #include <sysio/chain/abi_serializer.hpp>
+#include <fc/io/json_stream.hpp>
 #include <fc/io/raw.hpp>
 
 namespace sysio::trace_api {
+
+   namespace {
+      // ABIs are user-provided; the yield function only enforces the recursion-depth cap and
+      // intentionally has no wall-clock deadline.  Shared between the variant and streaming paths
+      // so they stay in lock-step on what counts as "too deep".
+      auto make_abi_yield() {
+         return [](size_t recursion_depth) {
+            SYS_ASSERT( recursion_depth < chain::abi_serializer::max_recursion_depth, chain::abi_recursion_depth_exception,
+                        "exceeded max_recursion_depth {}", chain::abi_serializer::max_recursion_depth );
+         };
+      }
+   }
 
    std::shared_ptr<chain::abi_serializer> abi_data_handler::get_serializer(chain::name account, uint64_t action_global_seq) {
       if (!_abi_seq_resolver) return nullptr;
@@ -73,12 +86,7 @@ namespace sysio::trace_api {
       auto type_name = serializer->get_action_type(a.action);
       if (type_name.empty()) return result;
 
-      // abis are user provided, do not use a deadline
-      auto abi_yield = [](size_t recursion_depth) {
-         SYS_ASSERT( recursion_depth < chain::abi_serializer::max_recursion_depth,
-                     chain::abi_recursion_depth_exception,
-                     "exceeded max_recursion_depth {}", chain::abi_serializer::max_recursion_depth );
-      };
+      auto abi_yield = make_abi_yield();
 
       // Separate try blocks so that a failure decoding return_value does not
       // discard successfully-decoded params (and vice versa).
@@ -126,6 +134,45 @@ namespace sysio::trace_api {
             return {std::move(r.params), std::move(r.return_data)};
          // failed or not_attempted -> legacy empty shape
          return {};
+      }, action);
+   }
+
+   void abi_data_handler::serialize_to_json_stream(const std::variant<action_trace_v0>& action, fc::json_writer& w) {
+      std::visit([&](const auto& a) {
+         auto serializer = get_serializer(a.account, a.global_sequence);
+         if (!serializer) return;
+         auto type_name = serializer->get_action_type(a.action);
+         if (type_name.empty()) return;
+
+         auto abi_yield = make_abi_yield();
+
+         // Kept in lock-step with decode() + serialize_to_variant: the get_block /
+         // get_transaction_trace pipeline emits params/return_data all-or-nothing.  Any decode
+         // failure rewinds every byte this function wrote so the streamed shape matches the
+         // variant path's legacy empty shape (no params, no return_data).
+         auto cp = w.checkpoint();
+         try {
+            w.key("params");
+            serializer->binary_to_json_stream(type_name, a.data, w, abi_yield);
+         } catch (...) {
+            w.rewind(cp);
+            except_handler(MAKE_EXCEPTION_WITH_CONTEXT(std::current_exception()));
+            return;
+         }
+
+         if (a.return_value.empty()) return;
+         auto return_type_name = serializer->get_action_result_type(a.action);
+         if (return_type_name.empty()) return;
+
+         try {
+            w.key("return_data");
+            serializer->binary_to_json_stream(return_type_name, a.return_value, w, abi_yield);
+         } catch (...) {
+            // Roll back params as well: the variant path returns the legacy empty shape when
+            // return_value fails to decode, and the two paths must emit identical JSON.
+            w.rewind(cp);
+            except_handler(MAKE_EXCEPTION_WITH_CONTEXT(std::current_exception()));
+         }
       }, action);
    }
 }

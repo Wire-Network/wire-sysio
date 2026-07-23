@@ -12,6 +12,7 @@
 #include <sysio/chain/account_object.hpp>
 #include <sysio/chain/block.hpp>
 #include <sysio/chain/controller.hpp>
+#include <sysio/chain/database_utils.hpp>
 #include <sysio/chain/kv_table_objects.hpp>
 #include <sysio/chain/resource_limits.hpp>
 #include <sysio/chain/transaction.hpp>
@@ -23,6 +24,7 @@
 #include <boost/container/flat_set.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
 
+#include <fc/nullable.hpp>
 #include <fc/time.hpp>
 
 #include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
@@ -81,8 +83,122 @@ namespace sysio {
       return abi_resolver(abi_serializer_cache_builder(make_resolver(db, max_time, throw_on_yield::no)).add_serializers(obj).get());
    }
 
+   /// Phase-split abi capture for the streaming-cb response path.  `captured_abis`
+   /// holds the raw `abi` byte-string for every account referenced in a block /
+   /// trace, copied out of chainbase on the calling (read-only-queue) thread.
+   /// Parsing the bytes into `abi_serializer` instances is the slow part and
+   /// happens later in `build_resolver_from_captured_abis`, which can run on any
+   /// thread (typically the http thread pool) since it does not touch chainbase.
+   ///
+   /// Empty entries (`raw_abis[name] == {}`) record "we looked, no abi" so that
+   /// we don't re-walk chainbase off the read-only queue if the same account
+   /// appears multiple times.
+   struct captured_abis {
+      std::unordered_map<account_name, chain::vector<char>> raw_abis;
+   };
+
+   /// Walks the actions in `obj` (a `signed_block_ptr` or `transaction_trace_ptr`)
+   /// and copies each unique action.account's `abi` bytes out of chainbase.
+   /// Must be called from an `exec_queue::read_only` (or `read_write`) task so
+   /// that chainbase is not being mutated concurrently.
+   template<class T>
+   inline captured_abis capture_abis(const controller& control, const T& obj) {
+      captured_abis cache;
+      auto add = [&](const account_name& name) {
+         if (!name.good()) return;
+         if (cache.raw_abis.find(name) != cache.raw_abis.end()) return;
+         const auto* accnt = control.find_account_metadata(name);
+         if (accnt && accnt->abi.size() > 0) {
+            cache.raw_abis.emplace(name,
+                                   chain::vector<char>{accnt->abi.data(),
+                                                       accnt->abi.data() + accnt->abi.size()});
+         } else {
+            cache.raw_abis.emplace(name, chain::vector<char>{});
+         }
+      };
+      auto visit_actions = [&](const auto& actions) {
+         for (const auto& a : actions) add(a.account);
+      };
+      if constexpr (std::is_same_v<T, chain::signed_block_ptr>) {
+         for (const auto& receipt : obj->transactions) {
+            const auto& t = receipt.trx.get_transaction();
+            visit_actions(t.actions);
+            visit_actions(t.context_free_actions);
+         }
+      } else {
+         // transaction_trace_ptr
+         for (const auto& trace : obj->action_traces) add(trace.act.account);
+      }
+      return cache;
+   }
+
+   /// Parses each captured `abi` byte-string into an `abi_serializer` and returns
+   /// the resolver.  CPU-bound; safe to run on any thread (no chainbase access).
+   /// On a per-account basis, an exception during `to_abi` / `abi_serializer` is
+   /// logged at debug level and the account's slot is left empty -- callers fall
+   /// back to the hex representation for actions with un-decodable ABI, matching
+   /// the prior `make_resolver(throw_on_yield::no)` behaviour.
+   inline abi_resolver build_resolver_from_captured_abis(const captured_abis& cache,
+                                                         const fc::microseconds& max_time) {
+      chain::abi_serializer_cache_t serializers;
+      serializers.reserve(cache.raw_abis.size());
+      for (const auto& [name, raw] : cache.raw_abis) {
+         if (raw.empty()) {
+            serializers.emplace(name, std::nullopt);
+            continue;
+         }
+         try {
+            chain::abi_def abi;
+            if (chain::abi_serializer::to_abi(raw, abi)) {
+               serializers.emplace(name,
+                                   chain::abi_serializer(std::move(abi),
+                                      chain::abi_serializer::create_yield_function(max_time)));
+            } else {
+               serializers.emplace(name, std::nullopt);
+            }
+         } catch (const fc::exception& e) {
+            dlog("failed to build abi_serializer for {}: {}", name, e.to_detail_string());
+            serializers.emplace(name, std::nullopt);
+         } catch (const std::exception& e) {
+            dlog("failed to build abi_serializer for {}: {}", name, e.what());
+            serializers.emplace(name, std::nullopt);
+         } catch (...) {
+            dlog("failed to build abi_serializer for {}: unknown exception", name);
+            serializers.emplace(name, std::nullopt);
+         }
+      }
+      return abi_resolver(std::move(serializers));
+   }
+
+   /// Heuristic byte-size estimate for memory budgeting.  Counts the captured
+   /// raw-ABI bytes plus a small per-entry overhead -- close enough for the
+   /// trx_retry_db memory accounting without parsing each ABI eagerly.
+   inline size_t estimated_size(const captured_abis& cache) {
+      size_t total = 0;
+      for (const auto& [name, raw] : cache.raw_abis) {
+         total += sizeof(name) + raw.size();
+      }
+      return total;
+   }
+
 namespace chain_apis {
 struct empty{};
+
+/// Holds a transaction trace plus the ABI bytes captured at the moment the trace was produced.  The trace's action data
+/// is not eagerly serialized to JSON or to a variant tree -- instead, when the result is emitted, the captured ABI
+/// bytes are parsed into an `abi_serializer` resolver on the http thread pool and the trace is emitted directly via
+/// `abi_serializer::to_json_stream<transaction_trace>`.  Compared to the prior `fc::variant processed` field this:
+///   - moves the ABI parse + JSON emission off the main / chain thread;
+///   - skips the intermediate variant tree allocation per response;
+///   - preserves "ABIs at apply time, not fire time" semantics for `trx_retry_db` (the captured bytes are the
+///     apply-time snapshot).
+/// On individual actions whose contract has a corrupt ABI, the abi_serializer's streaming path falls back to hex for
+/// that action's data -- same per-action fallback used by `signed_block`.
+struct streamed_processed_trace {
+   chain::transaction_trace_ptr trace;
+   captured_abis                raw_abis;
+   fc::microseconds             max_serialization_time;
+};
 
 struct linked_action {
    name                account;
@@ -144,6 +260,29 @@ class read_only : public api_base {
    bool  shorten_abi_errors = true;
    const trx_finality_status_processing* trx_finality_status_proc;
    friend class api_base;
+
+   /// Phase-1 result for `get_table_rows` / `get_table_rows_stream`: the raw KV rows
+   /// collected from chainbase plus the metadata Phase 2 needs to ABI-decode them.
+   /// Kept as a private impl detail; the public interface returns variant- or
+   /// stream-emitting closures built around this struct.
+   struct raw_table_row {
+      std::vector<char> key;
+      std::vector<char> value;
+      chain::name       payer;
+   };
+   struct table_rows_phase1 {
+      chain::abi_def              abi;
+      std::string                 tbl_name;
+      /// Resolved BE-key decode plan (one shape per declared key field); unset when the
+      /// table's key type is unrepresentable, in which case Phase 2 emits hex keys.
+      std::optional<std::vector<chain::be_key_codec::key_shape>> key_shapes;
+      size_t                      scope_key_count = 0;
+      bool                        json            = true;
+      bool                        show_payer      = false;
+      bool                        more            = false;
+      std::string                 next_key;
+      std::vector<raw_table_row>  rows;
+   };
 
 public:
    static const string KEYi64;
@@ -361,7 +500,23 @@ public:
    chain::signed_block_ptr get_raw_block(const get_raw_block_params& params, const fc::time_point& deadline) const;
 
    using get_block_params = get_raw_block_params;
-   std::function<chain::t_or_exception<fc::variant>()> get_block(const get_block_params& params, const fc::time_point& deadline) const;
+
+   using get_block_stream_emit_fn = std::function<void(fc::json_writer&)>;
+
+   /// Async streaming `/v1/chain/get_block` handler.  Runs `get_raw_block` on the http thread pool instead of the
+   /// read-only queue.  Threading sequence:
+   ///   - Phase 0 (http thread pool): registration uses `add_async_api_stream`, so the api method body runs on the
+   ///     http worker that handled the request.  Does only `get_raw_block`, which is thread-safe per controller.
+   ///   - Hop 1: the method posts onto `exec_queue::read_only` for the chainbase abi reads.
+   ///   - Phase 1 (read-only queue): `capture_abis(block)` copies each unique account's raw `abi` bytes, then fires
+   ///     the next callback with an http_fwd Phase-2 closure.
+   ///   - Hop 2: bind_stream::async posts the http_fwd back to the http thread pool.
+   ///   - Phase 2 (http thread pool): `build_resolver_from_captured_abis` parses the bytes (CPU-only) and constructs
+   ///     the emit_fn.
+   ///   - Phase 3 (http thread pool, asio-inlined): bind_stream wraps the emit_fn in a `to_json_stream(emit_fn, w)`
+   ///     adapter and hands it to `cb`; emit_fn walks the block + emits JSON.
+   void get_block_stream_async(get_block_params params,
+                                chain::next_function<get_block_stream_emit_fn> next) const;
 
    // call from app() thread
    abi_resolver get_block_serializers( const chain::signed_block_ptr& block, const fc::microseconds& max_time ) const;
@@ -369,6 +524,8 @@ public:
    // call from any thread
    fc::variant convert_block( const chain::signed_block_ptr& block,
                               abi_resolver& resolver ) const;
+   void        convert_block_stream( const chain::signed_block_ptr& block,
+                                     abi_resolver& resolver, fc::json_writer& w ) const;
 
    struct get_block_header_params {
       string block_num_or_id;
@@ -376,8 +533,8 @@ public:
    };
 
    struct get_block_header_result {
-      chain::block_id_type  id;
-      fc::variant           signed_block_header;
+      chain::block_id_type                  id;
+      chain::signed_block_header            signed_block_header;
       std::optional<chain::extensions_type> block_extensions;
    };
 
@@ -387,7 +544,27 @@ public:
       uint32_t block_num = 0;
    };
 
-   fc::variant get_block_info(const get_block_info_params& params, const fc::time_point& deadline) const;
+   /// Typed result for `/v1/chain/get_block_info`.  Field order matches the previous mutable_variant_object
+   /// shape so the streaming JSON output is byte-identical to the prior variant path.
+   struct get_block_info_results {
+      uint32_t                                block_num            = 0;
+      uint16_t                                ref_block_num        = 0;
+      chain::block_id_type                    id;
+      chain::block_timestamp_type             timestamp;
+      chain::account_name                     producer;
+      chain::block_id_type                    previous;
+      chain::checksum256_type                 transaction_mroot;
+      chain::checksum256_type                 finality_mroot;
+      chain::qc_claim_t                       qc_claim;
+      std::vector<chain::signature_type>      producer_signatures;
+      uint32_t                                ref_block_prefix     = 0;
+   };
+
+   /// `/v1/chain/get_block_info` -- async streaming so the body runs on the http thread pool, not the read-only queue.
+   /// `fetch_block_header_by_number` is thread-safe per controller and the rest is just CPU (id calc + struct build),
+   /// so the entire body is safe off the read-only queue.
+   void get_block_info_async(get_block_info_params params,
+                              chain::next_function<get_block_info_results> next) const;
 
    struct get_block_header_state_params {
       string block_num_or_id;
@@ -436,6 +613,15 @@ public:
    /// `values_only` (strip the `{key, value, payer?}` wrapper).
    get_table_rows_return_t get_table_rows( const get_table_rows_params& params, const fc::time_point& deadline )const;
 
+   /// Streaming counterpart to `get_table_rows`.  Phase 1 (main thread) runs the same row-collection
+   /// logic; Phase 2 (http thread pool) returns a closure that emits the response JSON directly into
+   /// an `fc::json_writer` via `abi_serializer::binary_to_json_stream`, eliminating per-row variant
+   /// allocations.  `filter` is intentionally not honored on this path since it is in-tree-only and
+   /// requires a `fc::variant` to evaluate; in-tree callers continue using `get_table_rows()`.
+   using get_table_rows_stream_emit_fn = std::function<void(fc::json_writer&)>;
+   using get_table_rows_stream_return_t = std::function<chain::t_or_exception<get_table_rows_stream_emit_fn>()>;
+   get_table_rows_stream_return_t get_table_rows_stream( const get_table_rows_params& params, const fc::time_point& deadline )const;
+
    struct get_table_by_scope_params {
       name                 code; // mandatory
       name                 table; // optional, act as filter
@@ -483,8 +669,13 @@ public:
    };
 
    struct get_finalizer_info_result {
-      fc::variant                            active_finalizer_policy;  // current active policy
-      fc::variant                            pending_finalizer_policy; // current pending policy. Empty if not existing
+      // fc::nullable (not std::optional) pins the endpoint schema: both keys are always
+      // present and serialize as an explicit JSON null when the policy does not exist,
+      // matching the shape the earlier fc::variant-typed fields emitted.  A reflected
+      // std::optional would omit the key entirely when disengaged, breaking clients that
+      // access the key before testing it for null.
+      fc::nullable<chain::finalizer_policy> active_finalizer_policy;  // current active policy. null if not existing
+      fc::nullable<chain::finalizer_policy> pending_finalizer_policy; // current pending policy. null if not existing
 
       // Last tracked vote information for each of the finalizers in
       // active_finalizer_policy and pending_finalizer_policy.
@@ -521,8 +712,8 @@ public:
    get_producer_schedule_result get_producer_schedule( const get_producer_schedule_params& params, const fc::time_point& deadline )const;
 
    struct compute_transaction_results {
-       chain::transaction_id_type  transaction_id;
-       fc::variant                 processed; // "processed" is expected JSON for trxs in clio
+       chain::transaction_id_type           transaction_id;
+       chain_apis::streamed_processed_trace processed; // "processed" is expected JSON for trxs in clio
     };
 
    struct compute_transaction_params {
@@ -532,8 +723,8 @@ public:
    void compute_transaction(compute_transaction_params params, chain::plugin_interface::next_function<compute_transaction_results> next );
 
    struct send_read_only_transaction_results {
-      chain::transaction_id_type  transaction_id;
-      fc::variant                 processed;
+      chain::transaction_id_type           transaction_id;
+      chain_apis::streamed_processed_trace processed;
    };
    struct send_read_only_transaction_params {
       fc::variant transaction;
@@ -589,6 +780,12 @@ public:
      std::optional<chain::wasm_config> wasm_config;
    };
    get_consensus_parameters_results get_consensus_parameters(const get_consensus_parameters_params&, const fc::time_point& deadline) const;
+
+private:
+   /// Phase 1 of `get_table_rows` / `get_table_rows_stream`: scans chainbase on the
+   /// main thread and returns the raw KV rows plus the ABI metadata Phase 2 needs.
+   /// Filter/post-pass options are applied by the caller's Phase 2 closure.
+   table_rows_phase1 collect_table_rows_phase1(const get_table_rows_params& params, const fc::time_point& deadline) const;
 };
 
 class read_write : public api_base {
@@ -625,7 +822,13 @@ public:
    void push_transactions(const push_transactions_params& params, chain::plugin_interface::next_function<push_transactions_results> next);
 
    using send_transaction_params = push_transaction_params;
-   using send_transaction_results = push_transaction_results;
+   /// Distinct from `push_transaction_results` -- send_transaction's `processed` is emitted via streaming directly
+   /// from the trace + captured ABIs.  push_transaction stays on `fc::variant` because it post-processes the variant
+   /// tree (inline_traces tree restructuring) before returning.
+   struct send_transaction_results {
+      chain::transaction_id_type           transaction_id;
+      chain_apis::streamed_processed_trace processed;
+   };
    void send_transaction(send_transaction_params params, chain::plugin_interface::next_function<send_transaction_results> next);
 
    struct send_transaction2_params {
@@ -648,6 +851,17 @@ public:
  constexpr const char ripemd160[] = "ripemd160";
  constexpr const char dec[]       = "dec";
  constexpr const char hex[]       = "hex";
+
+/// Queued-payload size (http_detail::source_size_estimate ADL customization point) for
+/// trace-bearing results: the generic reflected raw-pack cannot traverse
+/// streamed_processed_trace (it is emitted, never wire-packed), so report the dominant
+/// retained memory directly -- per-action payload bytes plus the captured ABI bytes.
+/// Keeps the results visible to --http-max-bytes-in-flight-mb while they sit captured in
+/// a queued stream_emitter.
+size_t queued_payload_size(const streamed_processed_trace& t);
+inline size_t queued_payload_size(const read_only::compute_transaction_results& r)        { return queued_payload_size(r.processed); }
+inline size_t queued_payload_size(const read_only::send_read_only_transaction_results& r) { return queued_payload_size(r.processed); }
+inline size_t queued_payload_size(const read_write::send_transaction_results& r)          { return queued_payload_size(r.processed); }
 
 } // namespace chain_apis
 
@@ -733,11 +947,16 @@ FC_REFLECT(sysio::chain_apis::read_only::get_activated_protocol_features_params,
 FC_REFLECT(sysio::chain_apis::read_only::get_activated_protocol_features_results, (activated_protocol_features)(more) )
 FC_REFLECT(sysio::chain_apis::read_only::get_raw_block_params, (block_num_or_id))
 FC_REFLECT(sysio::chain_apis::read_only::get_block_info_params, (block_num))
+FC_REFLECT(sysio::chain_apis::read_only::get_block_info_results,
+           (block_num)(ref_block_num)(id)(timestamp)(producer)(previous)
+           (transaction_mroot)(finality_mroot)(qc_claim)
+           (producer_signatures)(ref_block_prefix))
 FC_REFLECT(sysio::chain_apis::read_only::get_block_header_state_params, (block_num_or_id))
 FC_REFLECT(sysio::chain_apis::read_only::get_block_header_params, (block_num_or_id)(include_extensions))
 FC_REFLECT(sysio::chain_apis::read_only::get_block_header_result, (id)(signed_block_header)(block_extensions))
 
 FC_REFLECT( sysio::chain_apis::read_write::push_transaction_results, (transaction_id)(processed) )
+FC_REFLECT( sysio::chain_apis::read_write::send_transaction_results, (transaction_id)(processed) )
 FC_REFLECT( sysio::chain_apis::read_write::send_transaction2_params, (return_failure_trace)(retry_trx)(retry_trx_num_blocks)(transaction) )
 
 // `all_rows` and `filter` deliberately excluded -- gated to in-process callers so HTTP cannot trigger a full-table walk
@@ -788,3 +1007,10 @@ FC_REFLECT( sysio::chain_apis::read_only::compute_transaction_results, (transact
 FC_REFLECT( sysio::chain_apis::read_only::send_read_only_transaction_params, (transaction))
 FC_REFLECT( sysio::chain_apis::read_only::send_read_only_transaction_results, (transaction_id)(processed) )
 FC_REFLECT( sysio::chain_apis::read_only::get_consensus_parameters_results, (chain_config)(wasm_config))
+
+namespace fc {
+   /// JSON shape: emits the trace's reflected fields with action data decoded ABI-aware via the captured ABI bytes.
+   /// Builds a fresh `abi_resolver` from `t.raw_abis` and calls `abi_serializer::to_json_stream<transaction_trace>` --
+   /// matching the prior `abi_serializer::to_variant<transaction_trace>` output but skipping the variant tree.
+   void to_json_stream(const sysio::chain_apis::streamed_processed_trace& t, fc::json_writer& w);
+} // namespace fc

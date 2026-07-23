@@ -152,6 +152,11 @@ namespace fc
    void    to_variant( const log_message& l, variant& v );
    void    from_variant( const variant& l, log_message& c );
 
+   /// JSON shape mirrors `to_variant(log_message)`; uses a per-message variant intermediate as the streaming form
+   /// (log_message has a private impl pointer rather than reflected fields, so we can't walk it directly).
+   class json_writer;
+   void    to_json_stream( const log_message& m, json_writer& w );
+
    typedef std::vector<log_message> log_messages;
 
    template<typename S, typename... T>

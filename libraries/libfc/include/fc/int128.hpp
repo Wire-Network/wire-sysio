@@ -18,6 +18,7 @@ namespace fc
   __int128 int128_from_string( const std::string& s );
 
   class variant;
+  class json_writer;
 
   fc::uint128 to_uint128(std::uint64_t hi, uint64_t lo);
   fc::uint128 to_uint128(const fc::variant& v);
@@ -28,6 +29,11 @@ namespace fc
   void from_variant( const variant& var,  uint128& vo );
   void to_variant( const int128& var,  variant& vo );
   void from_variant( const variant& var,  int128& vo );
+
+  /// JSON shape: always-quoted decimal string, matching to_json_stream(variant, w)
+  /// for int128_type / uint128_type variants.
+  void to_json_stream( const uint128& var, json_writer& w );
+  void to_json_stream( const int128& var,  json_writer& w );
 
   namespace raw
   {

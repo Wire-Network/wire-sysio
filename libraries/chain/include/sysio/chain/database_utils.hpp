@@ -4,6 +4,7 @@
 #include <sysio/chain/abi_def.hpp>
 #include <fc/int128.hpp>
 #include <fc/io/raw.hpp>
+#include <fc/io/json_stream.hpp>
 #include <fc/crypto/base64.hpp>
 #include <softfloat/softfloat.hpp>
 
@@ -657,14 +658,29 @@ namespace fc {
       double_to_float64(double_f, f);
    }
 
+   namespace detail {
+      /// fc's canonical softfloat128 spelling: "0x" + 16 little-endian hex bytes.
+      /// Assumes platform is little endian and hex representation of the 128-bit
+      /// integer is in little endian order.  Shared by to_variant / to_json_stream
+      /// so the two emission paths cannot drift.
+      inline std::string softfloat128_to_hex_string( const softfloat128_t& f ) {
+         char as_bytes[sizeof(sysio::chain::uint128_t)];
+         memcpy(as_bytes, &f, sizeof(as_bytes));
+         std::string s = "0x";
+         s.append( to_hex( as_bytes, sizeof(as_bytes) ) );
+         return s;
+      }
+   }
+
    inline
    void to_variant( const softfloat128_t& f, variant& v ) {
-      // Assumes platform is little endian and hex representation of 128-bit integer is in little endian order.	
-      char as_bytes[sizeof(sysio::chain::uint128_t)];
-      memcpy(as_bytes, &f, sizeof(as_bytes));
-      std::string s = "0x";	
-      s.append( to_hex( as_bytes, sizeof(as_bytes) ) );
-      v = s;
+      v = detail::softfloat128_to_hex_string( f );
+   }
+
+   /// JSON shape mirrors to_variant: "0x<hex>" with little-endian bytes.
+   inline
+   void to_json_stream( const softfloat128_t& f, json_writer& w ) {
+      w.value_string( detail::softfloat128_to_hex_string( f ) );
    }
 
    inline

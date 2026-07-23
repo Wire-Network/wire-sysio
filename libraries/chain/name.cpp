@@ -1,5 +1,4 @@
 #include <sysio/chain/name.hpp>
-#include <fc/variant.hpp>
 #include <fc/exception/exception.hpp>
 #include <sysio/chain/exceptions.hpp>
 
@@ -13,10 +12,3 @@ namespace sysio::chain {
    }
 
 } // namespace sysio::chain
-
-namespace fc {
-   void to_variant(const sysio::chain::name& c, fc::variant& v) { v = c.to_string(); }
-   void from_variant(const fc::variant& v, sysio::chain::name& check) {
-      check = sysio::chain::name{ v.get_string() };
-   }
-} // fc

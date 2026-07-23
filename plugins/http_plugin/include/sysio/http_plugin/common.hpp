@@ -3,6 +3,7 @@
 #include <sysio/chain/thread_utils.hpp>// for thread pool
 #include <sysio/http_plugin/http_plugin.hpp>
 
+#include <fc/io/json_stream.hpp>
 #include <fc/io/raw.hpp>
 #include <fc/log/logger_config.hpp>
 #include <fc/time.hpp>
@@ -94,6 +95,19 @@ struct internal_url_handler {
    api_category category;
    http_content_type content_type = http_content_type::json;
 };
+
+/**
+* Streaming counterpart of internal_url_handler.  Endpoints registered via
+* http_plugin::add_handler_stream / add_async_handler_stream live in the parallel
+* url_handlers_stream map; the beast dispatch checks both maps and routes to whichever
+* one owns the URL.  No content_type slot - the streaming cb always emits
+* application/json directly into the response buffer.
+*/
+using internal_url_handler_stream_fn = std::function<void(abstract_conn_ptr, string&&, string&&, url_response_stream_callback&&)>;
+struct internal_url_handler_stream {
+   internal_url_handler_stream_fn fn;
+   api_category category;
+};
 /**
 * Helper method to calculate the "in flight" size of a fc::variant
 * This is an estimate based on fc::raw::pack if that process can be successfully executed
@@ -123,10 +137,29 @@ static size_t in_flight_sizeof(const std::optional<T>& o) {
    return 0;
 }
 
+/**
+* Thrown by the streaming-response growth guard when the incrementally-charged response
+* buffer pushes bytes_in_flight past the configured budget (--http-max-bytes-in-flight-mb).
+*
+* Deliberately NOT derived from fc::exception or std::exception: mid-emission rollback
+* handlers (eg abi_serializer's catch-rewind-hex-fallback path) catch and absorb serializer
+* exceptions to keep emitting, and absorbing a budget abort would defeat the cap.  A foreign
+* type dodges their typed catches, and json_writer re-fires the guard on the next token
+* after a throw so even a catch(...) absorber re-raises this until it unwinds out of the
+* emitter (see json_writer's guarded-constructor contract).
+*/
+struct stream_response_budget_exceeded {
+   std::string error; ///< busy-response text produced by verify_max_bytes_in_flight
+};
+
 }// namespace detail
 
 // key -> priority, url_handler
 typedef map<string, detail::internal_url_handler> url_handlers_type;
+
+// Streaming-cb counterpart of url_handlers_type.  Disjoint URL-set from the variant
+// path; an endpoint registers either form, never both.
+typedef map<string, detail::internal_url_handler_stream> url_handlers_stream_type;
 
 struct http_plugin_state {
    string access_control_allow_origin;
@@ -147,6 +180,7 @@ struct http_plugin_state {
    string server_header;
 
    url_handlers_type url_handlers;
+   url_handlers_stream_type url_handlers_stream;
    bool keep_alive = false;
 
    uint16_t thread_pool_size = 2;
@@ -189,7 +223,22 @@ inline auto make_http_response_handler(http_plugin_state& plugin_state, detail::
 
                            try {
                               if (response.has_value()) {
-                                 std::string json = (content_type == http_content_type::plaintext) ? response->as_string() : fc::json::to_string(*response, fc::time_point::maximum());
+                                 // plaintext path: the variant's string payload is the literal
+                                 // response body.
+                                 // json_raw path: the variant's string payload is pre-serialized
+                                 // JSON (built via fc::json_writer) and passed through as-is.
+                                 // json_raw still tolerates non-string variants (eg error
+                                 // responses produced by http_plugin::handle_exception) by
+                                 // falling through to fc::json::to_string; the content-type
+                                 // header stays "application/json" either way.
+                                 std::string json;
+                                 if (content_type == http_content_type::plaintext) {
+                                    json = response->as_string();
+                                 } else if (content_type == http_content_type::json_raw && response->is_string()) {
+                                    json = response->as_string();
+                                 } else {
+                                    json = fc::json::to_string(*response, fc::time_point::maximum());
+                                 }
                                  if (auto error_str = session_ptr->verify_max_bytes_in_flight(json.size()); error_str.empty())
                                     session_ptr->send_response(std::move(json), code);
                                  else
@@ -203,6 +252,98 @@ inline auto make_http_response_handler(http_plugin_state& plugin_state, detail::
                         });
    };// end lambda
 
+}
+
+/**
+* Construct a url_response_stream_callback that runs the emitter on the http_plugin
+* thread pool and sends the produced JSON as the response body.
+*
+* The api lambda is responsible for capturing whatever it wants to serialize into
+* the emitter closure (typically the typed result struct, by-move).  All JSON
+* serialization happens inside the dispatched lambda on the http thread pool, so
+* the api thread (read_only / read_write queue) never pays the per-field
+* allocation cost the variant tree built.
+*
+* Backpressure note: the response buffer is charged against bytes_in_flight
+* incrementally WHILE the emitter runs -- json_writer's growth guard settles the
+* buffer's size into the budget every json_writer_default_guard_stride bytes and
+* throws stream_response_budget_exceeded (mapped to the busy response) once
+* verify_max_bytes_in_flight rejects.  Concurrent large streaming responses are
+* therefore visible to --http-max-bytes-in-flight-mb during serialization, and
+* over-budget emissions abort early instead of materializing in full; the variant
+* path achieves the analogous mid-flight visibility by pre-charging its
+* in_flight_sizeof estimate of the response variant tree.
+*
+* The captured source payload is accounted for separately: bind_stream reserves its
+* packed-size estimate (http_plugin::reserve_bytes_in_flight) when it captures a typed
+* result into the emitter, and that reservation rides the closure across this queue --
+* so results waiting here for a pool thread are already visible to the budget, exactly
+* like the variant path's queued response variants.  The dispatched lambda below
+* re-checks the budget before emitting and drains over-budget work with the busy
+* response without running the emitter at all.
+*/
+inline auto make_http_stream_response_handler(http_plugin_state& plugin_state, detail::abstract_conn_ptr session_ptr) {
+   return url_response_stream_callback{
+      [&plugin_state, session_ptr{std::move(session_ptr)}]
+      (int code, stream_emitter emitter) mutable {
+
+         // Note on threading: boost::asio::dispatch on a thread_pool executor runs
+         // the function inline when called from a thread already inside the pool
+         // (impl/thread_pool.hpp `do_execute`: "Invoke immediately if the
+         // blocking.possibly property is enabled and we are already inside the
+         // thread pool").  So when this cb is fired from a `post_http_thread_pool`
+         // task -- e.g. the Phase 2 closure of a `dispatch::post_direct` registration
+         // -- the dispatch below is a function-call short-circuit, not a real post.
+         // For sync / sync_void / async-immediate paths (cb invoked on read-only
+         // or read-write queue), it correctly bounces JSON serialization + socket
+         // I/O onto the http thread pool.
+         boost::asio::dispatch(plugin_state.thread_pool.get_executor(),
+            [&plugin_state, session_ptr{std::move(session_ptr)}, code, emitter{std::move(emitter)}]() mutable {
+               // `charged` mirrors what this response has contributed to the shared
+               // bytes_in_flight budget; settle_to trues the contribution up against the
+               // buffer's actual size at guard checkpoints, after emission completes, and
+               // (via the scoped_exit) on every exit path -- including rewinds that SHRANK
+               // the buffer below an earlier checkpoint, hence the signed reconciliation.
+               size_t charged = 0;
+               auto settle_to = [&plugin_state, &charged](size_t actual) {
+                  if (actual >= charged)
+                     plugin_state.bytes_in_flight += actual - charged;
+                  else
+                     plugin_state.bytes_in_flight -= charged - actual;
+                  charged = actual;
+               };
+               auto on_exit = fc::make_scoped_exit([&settle_to]() { settle_to(0); });
+               try {
+                  // Queued-payload reservations (bind_stream's source_size_estimate, still
+                  // held by the emitter) and every other request's charges are visible here:
+                  // reject over-budget work before emitting anything, mirroring the variant
+                  // path's pre-serialization verify.
+                  if (auto error_str = session_ptr->verify_max_bytes_in_flight(0); !error_str.empty()) {
+                     session_ptr->send_busy_response(std::move(error_str));
+                     return;
+                  }
+                  std::string body;
+                  {
+                     fc::json_writer w(body, [&settle_to, &session_ptr](size_t buffer_size) {
+                        settle_to(buffer_size);
+                        if (auto error_str = session_ptr->verify_max_bytes_in_flight(0); !error_str.empty())
+                           throw detail::stream_response_budget_exceeded{std::move(error_str)};
+                     });
+                     emitter(w);
+                  }
+                  settle_to(body.size());
+                  if (auto error_str = session_ptr->verify_max_bytes_in_flight(0); !error_str.empty())
+                     session_ptr->send_busy_response(std::move(error_str));
+                  else
+                     session_ptr->send_response(std::move(body), code);
+               } catch (detail::stream_response_budget_exceeded& e) {
+                  session_ptr->send_busy_response(std::move(e.error));
+               } catch (...) {
+                  session_ptr->handle_exception();
+               }
+            });
+      }
+   };
 }
 
 inline bool host_is_valid(const http_plugin_state& plugin_state,
