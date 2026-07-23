@@ -1,7 +1,10 @@
 #include <algorithm>
+#include <bit>
+#include <cmath>
 #include <vector>
 #include <iterator>
 #include <cstdlib>
+#include <limits>
 
 #include <boost/test/unit_test.hpp>
 
@@ -816,6 +819,69 @@ BOOST_AUTO_TEST_CASE(large_int_quoting_boundaries)
    BOOST_CHECK(json.find("\"i64_neg_quoted\":\"-4294967296\"") != std::string::npos);
    BOOST_CHECK(json.find("\"u64_bare\":4294967295") != std::string::npos);
    BOOST_CHECK(json.find("\"u64_quoted\":\"18446744073709551615\"") != std::string::npos);
+
+} FC_LOG_AND_RETHROW() }
+
+// Non-finite float32/float64 bit patterns through the ABI paths: the variant path
+// (stringstream << std::fixed, delegating to the C library) prints "nan" / "-nan" /
+// "inf" / "-inf", and binary_to_json_stream must agree byte-for-byte.  NaN never
+// compares, so its sign only survives via signbit -- and since no JSON input can
+// produce a NaN, the packed bytes are built directly from raw bit patterns, exactly
+// as an arbitrary on-chain payload could.
+BOOST_AUTO_TEST_CASE(non_finite_float_sign_parity)
+{ try {
+
+   const char* test_abi = R"=====(
+   {
+       "version": "sysio::abi/1.0",
+       "types": [],
+       "structs": [{
+           "name": "floats",
+           "base": "",
+           "fields": [{
+               "name": "f64_pos_nan",
+               "type": "float64"
+           },{
+               "name": "f64_neg_nan",
+               "type": "float64"
+           },{
+               "name": "f64_neg_inf",
+               "type": "float64"
+           },{
+               "name": "f32_neg_nan",
+               "type": "float32"
+           }]
+       }],
+       "actions": [],
+       "tables": [],
+       "ricardian_clauses": []
+   }
+   )=====";
+
+   abi_serializer abis(fc::json::from_string(test_abi).as<abi_def>(), yield_fn());
+
+   const double f64_pos_nan = std::bit_cast<double>(uint64_t{0x7FF8000000000000ULL});
+   const double f64_neg_nan = std::bit_cast<double>(uint64_t{0xFFF8000000000000ULL});
+   const double f64_neg_inf = -std::numeric_limits<double>::infinity();
+   const float  f32_neg_nan = std::bit_cast<float>(uint32_t{0xFFC00000u});
+
+   bytes packed(3 * sizeof(double) + sizeof(float));
+   fc::datastream<char*> ds(packed.data(), packed.size());
+   fc::raw::pack(ds, f64_pos_nan);
+   fc::raw::pack(ds, f64_neg_nan);
+   fc::raw::pack(ds, f64_neg_inf);
+   fc::raw::pack(ds, f32_neg_nan);
+
+   const std::string variant_json =
+      fc::json::to_string(abis.binary_to_variant("floats", packed, yield_fn()), get_deadline());
+
+   // Pin the legacy shapes, sign included.
+   BOOST_CHECK(variant_json.find("\"f64_pos_nan\":\"nan\"") != std::string::npos);
+   BOOST_CHECK(variant_json.find("\"f64_neg_nan\":\"-nan\"") != std::string::npos);
+   BOOST_CHECK(variant_json.find("\"f64_neg_inf\":\"-inf\"") != std::string::npos);
+   BOOST_CHECK(variant_json.find("\"f32_neg_nan\":\"-nan\"") != std::string::npos);
+
+   verify_stream_matches_variant(abis, "floats", packed, variant_json);
 
 } FC_LOG_AND_RETHROW() }
 
