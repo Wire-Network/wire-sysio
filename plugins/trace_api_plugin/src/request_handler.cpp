@@ -249,9 +249,7 @@ namespace {
 }
 
 namespace sysio::trace_api::detail {
-   std::string response_formatter::process_block_to_json( const data_log_entry& trace, bool irreversible, const stream_data_handler_function& data_handler ) {
-      std::string out;
-      fc::json_writer w(out);
+   void response_formatter::process_block_to_stream( const data_log_entry& trace, bool irreversible, const stream_data_handler_function& data_handler, fc::json_writer& w ) {
       std::visit([&](auto&& bt) {
          w.begin_object();
          w.set("id",                bt.id)
@@ -266,20 +264,44 @@ namespace sysio::trace_api::detail {
          w.key("transactions");     write_transactions(w, bt.transactions, data_handler);
          w.end_object();
       }, trace);
+   }
+
+   std::string response_formatter::process_block_to_json( const data_log_entry& trace, bool irreversible, const stream_data_handler_function& data_handler ) {
+      std::string out;
+      fc::json_writer w(out);
+      process_block_to_stream(trace, irreversible, data_handler, w);
       return out;
+   }
+
+   bool response_formatter::contains_transaction( const data_log_entry& trace, const chain::transaction_id_type& trxid ) {
+      return std::visit([&](auto&& bt) {
+         for (const auto& t : bt.transactions) {
+            if (t.id == trxid)
+               return true;
+         }
+         return false;
+      }, trace);
+   }
+
+   bool response_formatter::process_transaction_to_stream( const data_log_entry& trace, const chain::transaction_id_type& trxid, const stream_data_handler_function& data_handler, fc::json_writer& w ) {
+      return std::visit([&](auto&& bt) {
+         for (const auto& t : bt.transactions) {
+            if (t.id == trxid) {
+               write_transaction(w, t, data_handler);
+               return true;
+            }
+         }
+         return false;
+      }, trace);
    }
 
    std::string response_formatter::process_transaction_to_json( const data_log_entry& trace, const chain::transaction_id_type& trxid, const stream_data_handler_function& data_handler ) {
       std::string out;
-      std::visit([&](auto&& bt) {
-         for (const auto& t : bt.transactions) {
-            if (t.id == trxid) {
-               fc::json_writer w(out);
-               write_transaction(w, t, data_handler);
-               return;
-            }
-         }
-      }, trace);
+      {
+         fc::json_writer w(out);
+         if (!process_transaction_to_stream(trace, trxid, data_handler, w))
+            return {}; // miss: preserve the empty-string contract (out holds only the writer's reserve)
+      }
       return out;
    }
 }

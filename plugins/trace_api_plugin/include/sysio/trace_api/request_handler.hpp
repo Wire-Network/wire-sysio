@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <cassert>
 #include <limits>
 #include <optional>
 #include <type_traits>
@@ -28,16 +29,31 @@ namespace sysio::trace_api {
       public:
          static fc::variant process_block( const data_log_entry& trace, bool irreversible, const data_handler_function& data_handler );
 
-         // Streaming counterpart: emit the same JSON payload as process_block but write it
-         // directly into an output std::string via fc::json_writer, skipping the
-         // fc::mutable_variant_object tree entirely.  Output is byte-for-byte identical
-         // to fc::json::to_string(process_block(...)).
+         // Streaming counterpart: emit the same JSON payload as process_block directly into the
+         // caller-provided fc::json_writer, skipping the fc::mutable_variant_object tree entirely.
+         // Output is byte-for-byte identical to fc::json::to_string(process_block(...)).  The HTTP
+         // path passes the guarded writer the streaming callback provides, so the memory budget
+         // observes the response while it serializes.
+         static void process_block_to_stream( const data_log_entry& trace, bool irreversible, const stream_data_handler_function& data_handler, fc::json_writer& w );
+
+         // Buffer-building wrapper over process_block_to_stream (unguarded writer into a local
+         // string).  Used by tests and the trace_api_json benchmark.
          static std::string process_block_to_json( const data_log_entry& trace, bool irreversible, const stream_data_handler_function& data_handler );
 
-         // Streaming counterpart for a single transaction inside a block trace.  Walks the block's transaction list and,
-         // for the first entry whose id matches trxid, emits just that transaction's JSON object (no surrounding block
-         // wrapper).  Returns an empty string if no transaction in the block matches.  Output for a matching trx is
-         // byte-for-byte identical to fc::json::to_string(get_transaction_trace(...)).
+         // True iff the block trace contains a transaction with the given id.  Lets the HTTP layer
+         // resolve its 404 before committing to a 200 emitter -- a streaming response cannot signal
+         // "not found" after emission has begun.
+         static bool contains_transaction( const data_log_entry& trace, const chain::transaction_id_type& trxid );
+
+         // Streaming counterpart for a single transaction inside a block trace.  Walks the block's
+         // transaction list and, for the first entry whose id matches trxid, emits just that
+         // transaction's JSON object (no surrounding block wrapper) into the caller-provided writer.
+         // Returns false (and emits nothing) if no transaction in the block matches.  Output for a
+         // matching trx is byte-for-byte identical to fc::json::to_string(get_transaction_trace(...)).
+         static bool process_transaction_to_stream( const data_log_entry& trace, const chain::transaction_id_type& trxid, const stream_data_handler_function& data_handler, fc::json_writer& w );
+
+         // Buffer-building wrapper over process_transaction_to_stream; returns an empty string on a
+         // miss.  Used by tests.
          static std::string process_transaction_to_json( const data_log_entry& trace, const chain::transaction_id_type& trxid, const stream_data_handler_function& data_handler );
       };
    }
@@ -215,27 +231,47 @@ namespace sysio::trace_api {
       }
 
       /**
-       * Streaming variant of get_block_trace: emits the JSON response body directly into
-       * a std::string via fc::json_writer instead of building an intermediate
-       * fc::mutable_variant_object tree.  Returned string is empty if the block does not
-       * exist; callers should check empty() before dispatching the 200 response.
-       * Skips the fc::variant -> fc::json::to_string copy on the response path when paired
-       * with http_content_type::json_raw.
+       * Streaming variant of get_block_trace for the HTTP streaming-callback path.
+       *
+       * Resolves block existence up front so the caller can produce its 404 before
+       * committing to a 200 emitter; the returned closure (owning the block's decoded
+       * trace data) emits the response body into the caller-provided fc::json_writer.
+       * The HTTP layer passes its guarded writer, so the memory budget observes -- and
+       * can abort -- the response while it serializes instead of after it is allocated.
+       *
+       * @param block_height - the height of the block whose trace is requested
+       * @return an emitter for the block's trace, or std::nullopt if the block does not exist
+       * @throws bad_data_exception when there are issues with the underlying data preventing processing.
        */
-      std::string get_block_trace_json( uint32_t block_height ) {
+      std::optional<std::function<void(fc::json_writer&)>> get_block_trace_emitter( uint32_t block_height ) {
          auto data = logfile_provider.get_block(block_height);
          if (!data) {
             _log("No block found at block height " + std::to_string(block_height) );
-            return {};
+            return std::nullopt;
          }
 
-         auto data_handler = [this](const std::variant<action_trace_v0>& action, fc::json_writer& w) {
-            std::visit([&](const auto& a) {
-               data_handler_provider.serialize_to_json_stream(a, w);
-            }, action);
+         return [this, data = std::move(*data)](fc::json_writer& w) {
+            detail::response_formatter::process_block_to_stream(std::get<0>(data), std::get<1>(data),
+                                                                make_stream_data_handler(), w);
          };
+      }
 
-         return detail::response_formatter::process_block_to_json(std::get<0>(*data), std::get<1>(*data), data_handler);
+      /**
+       * Buffer-building wrapper over get_block_trace_emitter: emits into a local string via
+       * an unguarded writer.  Returned string is empty if the block does not exist.  Kept
+       * for direct (non-HTTP) callers and tests; the HTTP path uses the emitter form so the
+       * guarded writer's budget applies.
+       */
+      std::string get_block_trace_json( uint32_t block_height ) {
+         auto emit = get_block_trace_emitter(block_height);
+         if (!emit)
+            return {};
+         std::string out;
+         {
+            fc::json_writer w(out);
+            (*emit)(w);
+         }
+         return out;
       }
 
       /**
@@ -307,31 +343,54 @@ namespace sysio::trace_api {
       }
 
       /**
-       * Streaming variant of get_transaction_trace: emits the matching transaction's JSON directly into a std::string
-       * via fc::json_writer instead of building the full block's fc::variant tree only to extract one transaction.
-       * Returned string is empty if the block does not exist or the trxid is not present in the block; callers should
-       * check empty() before dispatching the 200 response.  Skips the fc::variant -> fc::json::to_string copy on the
-       * response path when paired with http_content_type::json_raw.
+       * Streaming variant of get_transaction_trace for the HTTP streaming-callback path.
+       *
+       * Resolves both misses up front -- block absent, or trxid not present in the block
+       * (via response_formatter::contains_transaction) -- so the caller can produce its
+       * 404 before committing to a 200 emitter; the returned closure emits just the
+       * matching transaction's JSON into the caller-provided (guarded) fc::json_writer.
+       *
+       * @param trxid - the transaction id whose trace is requested
+       * @param block_height - the height of the block whose trace contains the transaction
+       * @return an emitter for the transaction's trace, or std::nullopt on either miss
+       * @throws bad_data_exception when there are issues with the underlying data preventing processing.
        */
-      std::string get_transaction_trace_json( const chain::transaction_id_type& trxid, uint32_t block_height ) {
-         _log("get_transaction_trace_json called");
+      std::optional<std::function<void(fc::json_writer&)>> get_transaction_trace_emitter( const chain::transaction_id_type& trxid, uint32_t block_height ) {
+         _log("get_transaction_trace_emitter called");
          auto data = logfile_provider.get_block(block_height);
          if (!data) {
             _log("No block found at block height " + std::to_string(block_height));
-            return {};
+            return std::nullopt;
          }
-
-         auto data_handler = [this](const std::variant<action_trace_v0>& action, fc::json_writer& w) {
-            std::visit([&](const auto& a) {
-               data_handler_provider.serialize_to_json_stream(a, w);
-            }, action);
-         };
-
-         auto resp = detail::response_formatter::process_transaction_to_json(std::get<0>(*data), trxid, data_handler);
-         if (resp.empty()) {
+         if (!detail::response_formatter::contains_transaction(std::get<0>(*data), trxid)) {
             _log("No transaction with id " + trxid.str() + " found in block " + std::to_string(block_height));
+            return std::nullopt;
          }
-         return resp;
+
+         return [this, data = std::move(*data), trxid](fc::json_writer& w) {
+            [[maybe_unused]] const bool found = detail::response_formatter::process_transaction_to_stream(
+               std::get<0>(data), trxid, make_stream_data_handler(), w);
+            assert(found); // contains_transaction gated emitter creation
+         };
+      }
+
+      /**
+       * Buffer-building wrapper over get_transaction_trace_emitter: emits into a local
+       * string via an unguarded writer.  Returned string is empty if the block does not
+       * exist or the trxid is not present in the block.  Kept for direct (non-HTTP)
+       * callers and tests; the HTTP path uses the emitter form so the guarded writer's
+       * budget applies.
+       */
+      std::string get_transaction_trace_json( const chain::transaction_id_type& trxid, uint32_t block_height ) {
+         auto emit = get_transaction_trace_emitter(trxid, block_height);
+         if (!emit)
+            return {};
+         std::string out;
+         {
+            fc::json_writer w(out);
+            (*emit)(w);
+         }
+         return out;
       }
 
       /**
@@ -359,6 +418,17 @@ namespace sysio::trace_api {
       }
 
    private:
+      /// Adapter from the provider's per-action streaming serializer to the
+      /// stream_data_handler_function shape the response_formatter consumes.  Shared by
+      /// both emitter factories; binds `this`, so emitters must not outlive the handler.
+      stream_data_handler_function make_stream_data_handler() {
+         return [this](const std::variant<action_trace_v0>& action, fc::json_writer& w) {
+            std::visit([&](const auto& a) {
+               data_handler_provider.serialize_to_json_stream(a, w);
+            }, action);
+         };
+      }
+
       actions_result get_actions_impl(const action_query& query, variant_shape shape) {
          actions_result result;
 

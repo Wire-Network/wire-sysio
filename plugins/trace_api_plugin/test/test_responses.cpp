@@ -94,6 +94,14 @@ struct response_test_fixture {
       return response_impl.get_transaction_trace_json( trxid, block_height );
    }
 
+   std::optional<std::function<void(fc::json_writer&)>> get_block_trace_emitter( uint32_t block_height ) {
+      return response_impl.get_block_trace_emitter( block_height );
+   }
+
+   std::optional<std::function<void(fc::json_writer&)>> get_transaction_trace_emitter( const chain::transaction_id_type& trxid, uint32_t block_height ) {
+      return response_impl.get_transaction_trace_emitter( trxid, block_height );
+   }
+
    // fixture data and methods
    std::function<get_block_t(uint32_t)> mock_get_block;
    std::function<std::tuple<fc::variant, std::optional<fc::variant>>(const action_trace_v0&)> mock_data_handler = default_mock_data_handler;
@@ -698,6 +706,143 @@ BOOST_AUTO_TEST_SUITE(trace_responses)
          BOOST_TEST(variant_response.is_null());
          BOOST_TEST(streamed_response.empty());
       }
+   }
+
+   // The HTTP layer commits to a 200 before the emitter runs, so both emitter factories must
+   // resolve every miss (absent block, absent trxid) to nullopt up front -- and an engaged
+   // emitter must produce exactly the bytes the buffer-building wrappers produce.
+   BOOST_FIXTURE_TEST_CASE(streaming_emitter_miss_resolution_and_parity, response_test_fixture)
+   {
+      auto trx_id = "0000000000000000000000000000000000000000000000000000000000000001"_h;
+
+      action_trace_v0 action_trace{};
+      action_trace.global_sequence = 0;
+      action_trace.receiver        = "receiver"_n;
+      action_trace.account         = "contract"_n;
+      action_trace.action          = "action"_n;
+      action_trace.authorization   = {{ "alice"_n, "active"_n }};
+      action_trace.data            = { 0x00, 0x01, 0x02, 0x03 };
+
+      auto block_trace = block_trace_v0 {
+         "b000000000000000000000000000000000000000000000000000000000000001"_h,
+         1,
+         "0000000000000000000000000000000000000000000000000000000000000000"_h,
+         chain::block_timestamp_type(0),
+         "bp.one"_n,
+         "0000000000000000000000000000000000000000000000000000000000000000"_h,
+         "0000000000000000000000000000000000000000000000000000000000000000"_h,
+         std::vector<transaction_trace_v0> {
+            {
+               trx_id,
+               std::vector<action_trace_v0> { action_trace },
+               10,
+               5,
+               std::vector<chain::signature_type>{ chain::signature_type() },
+               { chain::time_point_sec(), 1, 0, 100, 50, 0 },
+               1,
+               chain::block_timestamp_type(0),
+               std::optional<chain::block_id_type>{}
+            }
+         }
+      };
+
+      mock_get_block = [&block_trace]( uint32_t height ) -> get_block_t {
+         if (height != 1) {
+            return {};
+         }
+         return std::make_tuple(data_log_entry(block_trace), false);
+      };
+
+      auto drive = [](const std::function<void(fc::json_writer&)>& emit) {
+         std::string out;
+         {
+            fc::json_writer w(out);
+            emit(w);
+         }
+         return out;
+      };
+
+      // Engaged emitters emit byte-identically to the wrappers.
+      auto block_emitter = get_block_trace_emitter( 1 );
+      BOOST_REQUIRE(block_emitter.has_value());
+      BOOST_CHECK_EQUAL(drive(*block_emitter), get_block_trace_json( 1 ));
+
+      auto trx_emitter = get_transaction_trace_emitter( trx_id, 1 );
+      BOOST_REQUIRE(trx_emitter.has_value());
+      BOOST_CHECK_EQUAL(drive(*trx_emitter), get_transaction_trace_json( trx_id, 1 ));
+
+      // Misses resolve before any emitter exists: absent block, and absent trxid in a
+      // present block (contains_transaction gating).
+      BOOST_CHECK(!get_block_trace_emitter( 2 ).has_value());
+      auto missing_id = "00000000000000000000000000000000000000000000000000000000000000ff"_h;
+      BOOST_CHECK(!get_transaction_trace_emitter( missing_id, 1 ).has_value());
+      BOOST_CHECK(!get_transaction_trace_emitter( trx_id, 2 ).has_value());
+   }
+
+   // Trace responses must be abortable by the http layer's memory budget WHILE they
+   // serialize: driving the block emitter into a small-threshold guarded writer (the shape
+   // make_http_stream_response_handler provides) must throw the guard's abort partway
+   // through emission, with the buffer far below the full body size -- the old json_raw
+   // path materialized the entire body before the budget ever saw a byte.
+   BOOST_FIXTURE_TEST_CASE(streaming_block_response_budget_abort, response_test_fixture)
+   {
+      // 32 transactions x 4 KiB action payload: full body far exceeds the 8 KiB threshold
+      // below (each payload alone hex-expands past it).
+      constexpr size_t payload_bytes    = 4 * 1024;
+      constexpr size_t transaction_count = 32;
+      std::vector<transaction_trace_v0> transactions;
+      transactions.reserve(transaction_count);
+      for (size_t i = 0; i < transaction_count; ++i) {
+         action_trace_v0 action_trace{};
+         action_trace.global_sequence = i;
+         action_trace.receiver        = "receiver"_n;
+         action_trace.account         = "contract"_n;
+         action_trace.action          = "action"_n;
+         action_trace.authorization   = {{ "alice"_n, "active"_n }};
+         action_trace.data.assign(payload_bytes, static_cast<char>(i));
+         transactions.push_back(transaction_trace_v0{
+            fc::sha256::hash(static_cast<uint64_t>(i)),
+            std::vector<action_trace_v0> { std::move(action_trace) },
+            10,
+            5,
+            std::vector<chain::signature_type>{ chain::signature_type() },
+            { chain::time_point_sec(), 1, 0, 100, 50, 0 },
+            1,
+            chain::block_timestamp_type(0),
+            std::optional<chain::block_id_type>{}
+         });
+      }
+
+      auto block_trace = block_trace_v0 {
+         "b000000000000000000000000000000000000000000000000000000000000001"_h,
+         1,
+         "0000000000000000000000000000000000000000000000000000000000000000"_h,
+         chain::block_timestamp_type(0),
+         "bp.one"_n,
+         "0000000000000000000000000000000000000000000000000000000000000000"_h,
+         "0000000000000000000000000000000000000000000000000000000000000000"_h,
+         std::move(transactions)
+      };
+
+      mock_get_block = [&block_trace]( uint32_t height ) -> get_block_t {
+         return std::make_tuple(data_log_entry(block_trace), false);
+      };
+
+      const std::string full_body = get_block_trace_json( 1 );
+
+      /// Foreign (non-fc, non-std) exception type modeling the http layer's budget abort
+      /// (sysio::detail::stream_response_budget_exceeded).
+      struct budget_abort {};
+      constexpr size_t threshold = 8 * 1024;
+
+      auto emitter = get_block_trace_emitter( 1 );
+      BOOST_REQUIRE(emitter.has_value());
+      std::string out;
+      fc::json_writer w(out, [](size_t sz) { if (sz > threshold) throw budget_abort{}; }, 256);
+      BOOST_CHECK_THROW((*emitter)(w), budget_abort);
+      // Aborted within a token or two of the threshold; nowhere near the full body.
+      BOOST_CHECK_LT(out.size(), 2 * threshold);
+      BOOST_CHECK_GT(full_body.size(), 8 * threshold);
    }
 
 BOOST_AUTO_TEST_SUITE_END()
