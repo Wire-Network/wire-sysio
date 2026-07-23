@@ -50,6 +50,7 @@ constexpr uint32_t stream_request_body_index = 8;
 constexpr uint32_t stream_response_bytes_index = 9;
 constexpr uint32_t stream_over_budget_index = 10;
 constexpr uint32_t stream_single_token_index = 11;
+constexpr uint32_t stream_queued_payload_index = 12;
 // Keeps unsharded IPv6 probe coverage on the historical port 9999.
 constexpr uint32_t ipv6_probe_index = 2;
 
@@ -1234,6 +1235,135 @@ BOOST_FIXTURE_TEST_CASE(stream_response_single_token_over_budget, http_plugin_te
 
    BOOST_CHECK(get_status("/one_giant_token") == boost::beast::http::status::service_unavailable);
    BOOST_CHECK(!token_completed.load());
+
+   uint16_t max = std::numeric_limits<uint16_t>::max();
+   while (http_plugin->requests_in_flight() > 0 && --max)
+      std::this_thread::sleep_for(std::chrono::milliseconds(5));
+   BOOST_CHECK(max > 0);
+   BOOST_CHECK_EQUAL(http_plugin->bytes_in_flight(), 0u);
+}
+
+namespace {
+   /// FC_REFLECT'd payload big enough that its packed-size reservation is unmistakable in
+   /// the bytes_in_flight sample (and comfortably below the test budget).
+   struct queued_payload_result {
+      std::vector<char> data;
+   };
+
+   /// Minimal api handle for driving bind_stream's dispatch::sync queued-payload
+   /// reservation end-to-end.  The method blocks (on the app thread) until the test has
+   /// stalled the single http pool thread, so the emitter -- and the typed result it
+   /// captures -- must sit queued behind the stall the moment it is produced.
+   struct queued_payload_api {
+      std::atomic<bool>* entered;
+      std::atomic<bool>* proceed;
+      size_t             payload_size;
+
+      queued_payload_result make_big() {
+         entered->store(true);
+         while (!proceed->load())
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+         return queued_payload_result{std::vector<char>(payload_size, 'q')};
+      }
+   };
+}
+FC_REFLECT(queued_payload_result, (data))
+
+// Typed results captured into a stream_emitter and queued to the http pool must be charged
+// against bytes_in_flight for the time they sit in the queue -- the variant path charges its
+// in_flight_sizeof estimate before dispatch, and the streaming path must not be blinder.
+// With --http-threads=1, /stall_stream parks the only pool thread inside a latched emitter
+// while the bind_stream endpoint's result is produced on the app thread; the peak sampled
+// below reads ~0 without the source-size reservation and >= the payload size with it.  The
+// budget must then drain to zero, proving the reservation releases exactly once.
+BOOST_FIXTURE_TEST_CASE(stream_queued_payload_reserved, http_plugin_test_fixture) {
+   const std::string endpoint = test_http_endpoint("127.0.0.1", stream_queued_payload_index);
+   const std::string server_address = "--http-server-address=" + endpoint;
+   const std::string port = test_http_port(stream_queued_payload_index);
+
+   http_plugin* http_plugin = init({"--plugin=sysio::http_plugin",
+                                    server_address.c_str(),
+                                    "--http-threads=1",
+                                    "--http-max-bytes-in-flight-mb=64"});
+   BOOST_REQUIRE(http_plugin);
+
+   constexpr size_t payload_size = 1024 * 1024;
+   std::atomic<bool> entered{false};
+   std::atomic<bool> proceed{false};
+   std::atomic<bool> stalled{false};
+   std::atomic<bool> release{false};
+
+   http_plugin->add_api_stream({
+      bind_stream<&queued_payload_api::make_big, dispatch::sync>(
+         *http_plugin, queued_payload_api{&entered, &proceed, payload_size},
+         "/v1/test/queued_payload", api_category::node, http_params_types::no_params, 200),
+   }, appbase::exec_queue::read_write);
+
+   // Async streaming handlers run inline on the pool thread that read the request, and the
+   // response dispatch short-circuits on that same thread -- so this emitter's latch parks
+   // the pool's only thread.
+   http_plugin->add_async_api_stream({{std::string("/stall_stream"), api_category::node,
+                                       [&](string&&, string&&, url_response_stream_callback&& cb) {
+                                          cb(200, [&](fc::json_writer& w) {
+                                             stalled.store(true);
+                                             while (!release.load())
+                                                std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                                             w.value_string("ok");
+                                          });
+                                       }}});
+
+   boost::asio::io_context ctx;
+   boost::asio::ip::tcp::resolver resolver(ctx);
+
+   auto send_request = [&](const char* path) {
+      auto s = std::make_shared<boost::asio::ip::tcp::socket>(ctx, boost::asio::ip::tcp::v4());
+      boost::asio::connect(*s, resolver.resolve("127.0.0.1", port));
+      boost::beast::http::request<boost::beast::http::empty_body> req(boost::beast::http::verb::get, path, 11);
+      req.set(http::field::host, endpoint);
+      boost::beast::http::write(*s, req);
+      return s;
+   };
+   auto read_response = [&](boost::asio::ip::tcp::socket& s) {
+      boost::beast::http::response_parser<boost::beast::http::string_body> parser;
+      parser.body_limit(16 * 1024 * 1024); // hex-encoded payload is ~2x its byte size
+      boost::beast::flat_buffer buffer;
+      boost::beast::http::read(s, buffer, parser);
+      return parser.release();
+   };
+   auto wait_for = [](auto&& pred) { // ~10s cap: pool scheduling is slow under sanitizers
+      for (int i = 0; i < 10000; ++i) {
+         if (pred())
+            return true;
+         std::this_thread::sleep_for(std::chrono::milliseconds(1));
+      }
+      return pred();
+   };
+
+   auto payload_socket = send_request("/v1/test/queued_payload");
+   BOOST_REQUIRE(wait_for([&] { return entered.load(); }));  // request read; app thread inside make_big
+   auto stall_socket = send_request("/stall_stream");
+   BOOST_REQUIRE(wait_for([&] { return stalled.load(); }));  // pool's only thread now parked
+   proceed.store(true);                                      // result produced -> emitter queued behind the stall
+
+   // Regression sample: reads ~0 without the reservation riding the queued emitter closure.
+   size_t peak = 0;
+   wait_for([&] {
+      peak = std::max(peak, http_plugin->bytes_in_flight());
+      return peak >= payload_size;
+   });
+   BOOST_CHECK_GE(peak, payload_size);
+
+   release.store(true);
+   auto stall_resp = read_response(*stall_socket);
+   BOOST_CHECK(stall_resp.result() == boost::beast::http::status::ok);
+   auto payload_resp = read_response(*payload_socket);
+   BOOST_CHECK(payload_resp.result() == boost::beast::http::status::ok);
+   BOOST_CHECK_GT(payload_resp.body().size(), 2 * payload_size); // hex-encoded vector<char>
+
+   // requests_in_flight tracks session lifetime, so the keep-alive sockets must close
+   // before the drain below can reach zero.
+   stall_socket.reset();
+   payload_socket.reset();
 
    uint16_t max = std::numeric_limits<uint16_t>::max();
    while (http_plugin->requests_in_flight() > 0 && --max)

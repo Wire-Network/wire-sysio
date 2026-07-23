@@ -9,6 +9,7 @@
 #include <sysio/chain/plugin_interface.hpp>
 
 #include <fc/io/json_stream.hpp>
+#include <fc/io/raw.hpp>
 #include <fc/reflect/json_stream.hpp>
 #include <fc/time.hpp>
 
@@ -19,6 +20,7 @@
 #include <type_traits>
 #include <utility>
 #include <variant>
+#include <vector>
 
 namespace sysio {
 
@@ -184,6 +186,40 @@ namespace http_detail {
       }
    }
 
+   /// Packed-size estimate of a typed response payload, used to reserve bytes-in-flight
+   /// (http_plugin::reserve_bytes_in_flight) for as long as the payload sits captured in a
+   /// stream_emitter on the http thread pool queue.  fc::raw::pack_size is an
+   /// allocation-free byte count over the same data the variant path estimates via
+   /// detail::in_flight_sizeof (pack_size of the response variant tree).
+   ///
+   /// Payload types the generic reflected pack cannot traverse (eg results embedding
+   /// streamed_processed_trace, which is emitted but never wire-packed) provide an
+   /// ADL-visible `queued_payload_size(const T&)` overload instead -- checked first.
+   /// Anything neither customized, reflected, nor a variant (emit-closure payloads)
+   /// returns 0: those are produced on the http pool and handed to the response callback
+   /// inline, so no queue window exists to charge, and a std::function cannot be packed.
+   template<typename T>
+   inline size_t source_size_estimate(const T& r) {
+      if constexpr (requires { { queued_payload_size(r) } -> std::convertible_to<size_t>; }) {
+         return queued_payload_size(r);
+      } else if constexpr (fc::reflector<T>::is_defined::value || std::is_same_v<T, fc::variant>) {
+         try {
+            return fc::raw::pack_size(r);
+         } catch (...) {}
+      }
+      return 0;
+   }
+
+   /// Batch results (eg push_transactions' vector of per-transaction results) size as the
+   /// sum of their elements' estimates.
+   template<typename T>
+   inline size_t source_size_estimate(const std::vector<T>& v) {
+      size_t sz = 0;
+      for (const auto& e : v)
+         sz += source_size_estimate(e);
+      return sz;
+   }
+
 } // namespace http_detail
 
 
@@ -301,7 +337,13 @@ api_entry_stream bind_stream(http_plugin& http, Handle handle,
             // ---- Dispatch on Kind --------------------------------------
             if constexpr (Kind == dispatch::sync) {
                auto result = invoke_sync<MethodPtr>(handle, std::move(params), deadline);
-               cb(resp_code, [r = std::move(result)](fc::json_writer& w) mutable {
+               // Reserve the typed result's packed size for as long as it rides the emitter
+               // closure across the queue to the http pool -- the streaming analogue of the
+               // variant path's pre-dispatch in_flight_sizeof charge.  Released when the
+               // emitter (and with it the captured result) is destroyed after emission.
+               auto reservation = http.reserve_bytes_in_flight(source_size_estimate(result));
+               cb(resp_code,
+                  [r = std::move(result), reservation = std::move(reservation)](fc::json_writer& w) mutable {
                   fc::to_json_stream(r, w);
                });
 
@@ -391,8 +433,13 @@ api_entry_stream bind_stream(http_plugin& http, Handle handle,
                               api_name.c_str(), call_name.c_str(), body, cb);
                         }
                      } else if (std::holds_alternative<payload_t>(result)) {
+                        // Same queued-payload reservation as dispatch::sync: the typed result
+                        // is produced on whichever queue invoked the next_function and rides
+                        // the emitter closure across to the http pool.
+                        auto reservation =
+                           http.reserve_bytes_in_flight(source_size_estimate(std::get<payload_t>(result)));
                         cb(resp_code,
-                           [r = std::get<payload_t>(std::move(result))]
+                           [r = std::get<payload_t>(std::move(result)), reservation = std::move(reservation)]
                            (fc::json_writer& w) mutable { fc::to_json_stream(r, w); });
                      } else {
                         http.post_http_thread_pool(

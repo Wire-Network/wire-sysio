@@ -824,6 +824,17 @@ namespace sysio {
       return my->plugin_state->bytes_in_flight;
    }
 
+   std::shared_ptr<void> http_plugin::reserve_bytes_in_flight(size_t size) {
+      if (size == 0)
+         return {};
+      my->plugin_state->bytes_in_flight += size;
+      // Deleter-only token: the null pointer carries no object, but the deleter still runs
+      // exactly once when the last copy is destroyed, releasing the charge.  Capturing the
+      // plugin_state shared_ptr keeps the counter alive past plugin shutdown.
+      return std::shared_ptr<void>(static_cast<void*>(nullptr),
+                                   [state = my->plugin_state, size](void*) { state->bytes_in_flight -= size; });
+   }
+
    std::atomic<bool>& http_plugin::listening() {
       return my->listening;
    }

@@ -273,6 +273,14 @@ inline auto make_http_response_handler(http_plugin_state& plugin_state, detail::
 * over-budget emissions abort early instead of materializing in full; the variant
 * path achieves the analogous mid-flight visibility by pre-charging its
 * in_flight_sizeof estimate of the response variant tree.
+*
+* The captured source payload is accounted for separately: bind_stream reserves its
+* packed-size estimate (http_plugin::reserve_bytes_in_flight) when it captures a typed
+* result into the emitter, and that reservation rides the closure across this queue --
+* so results waiting here for a pool thread are already visible to the budget, exactly
+* like the variant path's queued response variants.  The dispatched lambda below
+* re-checks the budget before emitting and drains over-budget work with the busy
+* response without running the emitter at all.
 */
 inline auto make_http_stream_response_handler(http_plugin_state& plugin_state, detail::abstract_conn_ptr session_ptr) {
    return url_response_stream_callback{
@@ -306,6 +314,14 @@ inline auto make_http_stream_response_handler(http_plugin_state& plugin_state, d
                };
                auto on_exit = fc::make_scoped_exit([&settle_to]() { settle_to(0); });
                try {
+                  // Queued-payload reservations (bind_stream's source_size_estimate, still
+                  // held by the emitter) and every other request's charges are visible here:
+                  // reject over-budget work before emitting anything, mirroring the variant
+                  // path's pre-serialization verify.
+                  if (auto error_str = session_ptr->verify_max_bytes_in_flight(0); !error_str.empty()) {
+                     session_ptr->send_busy_response(std::move(error_str));
+                     return;
+                  }
                   std::string body;
                   {
                      fc::json_writer w(body, [&settle_to, &session_ptr](size_t buffer_size) {

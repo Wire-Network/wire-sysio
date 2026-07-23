@@ -3924,6 +3924,29 @@ read_only::get_consensus_parameters(const get_consensus_parameters_params&, cons
    return results;
 }
 
+namespace {
+   /// Dominant retained memory of a transaction trace held by a queued response closure:
+   /// per-action payload bytes, console output, and return values.  A reservation-grade
+   /// estimate, deliberately ignoring small fixed-size fields -- same semantics as
+   /// detail::in_flight_sizeof.
+   size_t trace_retained_size(const chain::transaction_trace& trace) {
+      size_t sz = sizeof(trace);
+      for (const auto& at : trace.action_traces) {
+         sz += sizeof(at) + at.act.data.size() + at.console.size() + at.return_value.size();
+      }
+      return sz;
+   }
+}
+
+size_t queued_payload_size(const streamed_processed_trace& t) {
+   size_t sz = 0;
+   if (t.trace)
+      sz += trace_retained_size(*t.trace);
+   for (const auto& [account, abi] : t.raw_abis.raw_abis)
+      sz += abi.size();
+   return sz;
+}
+
 } // namespace chain_apis
 
 fc::variant chain_plugin::get_log_trx_trace(const transaction_trace_ptr& trx_trace ) const {

@@ -852,6 +852,17 @@ public:
  constexpr const char dec[]       = "dec";
  constexpr const char hex[]       = "hex";
 
+/// Queued-payload size (http_detail::source_size_estimate ADL customization point) for
+/// trace-bearing results: the generic reflected raw-pack cannot traverse
+/// streamed_processed_trace (it is emitted, never wire-packed), so report the dominant
+/// retained memory directly -- per-action payload bytes plus the captured ABI bytes.
+/// Keeps the results visible to --http-max-bytes-in-flight-mb while they sit captured in
+/// a queued stream_emitter.
+size_t queued_payload_size(const streamed_processed_trace& t);
+inline size_t queued_payload_size(const read_only::compute_transaction_results& r)        { return queued_payload_size(r.processed); }
+inline size_t queued_payload_size(const read_only::send_read_only_transaction_results& r) { return queued_payload_size(r.processed); }
+inline size_t queued_payload_size(const read_write::send_transaction_results& r)          { return queued_payload_size(r.processed); }
+
 } // namespace chain_apis
 
 class chain_plugin : public plugin<chain_plugin> {

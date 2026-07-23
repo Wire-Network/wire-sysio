@@ -228,6 +228,18 @@ namespace sysio {
 
         size_t bytes_in_flight() const;
 
+        /**
+         * @brief RAII charge against --http-max-bytes-in-flight-mb for a payload captured
+         * into a queued response closure.
+         *
+         * The charge is taken immediately and released when the returned token is
+         * destroyed -- so a typed result captured into a stream_emitter is accounted for
+         * exactly as long as it is alive, including the time it sits on the http thread
+         * pool queue before emission (the streaming analogue of the variant path's
+         * pre-dispatch in_flight_sizeof charge).  Returns an empty token for size 0.
+         */
+        std::shared_ptr<void> reserve_bytes_in_flight(size_t size);
+
         std::atomic<bool>& listening();
    private:
         std::shared_ptr<class http_plugin_impl> my;
