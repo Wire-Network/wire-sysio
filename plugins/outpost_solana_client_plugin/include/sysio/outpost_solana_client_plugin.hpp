@@ -374,7 +374,7 @@ class outpost_solana_client_plugin : public appbase::plugin<outpost_solana_clien
 public:
    APPBASE_PLUGIN_REQUIRES((outpost_client_plugin)(signature_provider_manager_plugin))
    outpost_solana_client_plugin();
-   virtual ~outpost_solana_client_plugin() = default;
+   virtual ~outpost_solana_client_plugin();
 
    virtual void set_program_options(options_description& cli, options_description& cfg) override;
 

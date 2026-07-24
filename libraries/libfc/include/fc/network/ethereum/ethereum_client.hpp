@@ -329,9 +329,11 @@ public:
     * @param sig_provider `signature_provider` shared pointer
     * @param url_source The URL of the Ethereum node (e.g., Infura, local node).
     * @param chain_id optional uint256 encapsulating the chain id
+    * @param rpc_options authenticated transport and bounded request policy
     */
    ethereum_client(const signature_provider_ptr& sig_provider, const std::variant<std::string, fc::url>& url_source,
-                   std::optional<fc::uint256> chain_id = std::nullopt);
+                   std::optional<fc::uint256> chain_id = std::nullopt,
+                   client_options rpc_options = {});
 
    /**
     * @brief General method to send RPC requests.
@@ -340,6 +342,14 @@ public:
     * @return The raw JSON response as a string, wrapped in std::optional.
     */
    fc::variant execute(const std::string& method, const fc::variant& params);
+
+   /**
+    * @brief Execute an explicitly read-only RPC with stale-connection recovery.
+    *
+    * The request may be replayed once only when an existing cached connection
+    * proves stale. Transaction-submission methods must use `execute`.
+    */
+   fc::variant execute_idempotent(const std::string& method, const fc::variant& params);
 
    fc::variant execute_contract_view_fn(const address& contract_address, const abi::contract& abi,
                                         const block_number_or_tag_t& block, const contract_invoke_data_items& params);

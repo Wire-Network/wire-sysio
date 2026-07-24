@@ -7,12 +7,13 @@
 #include <fc/task/deadline.hpp>
 
 #include <boost/asio.hpp>
+#include <boost/beast/core/flat_buffer.hpp>
+#include <boost/beast/http.hpp>
 #include <boost/test/unit_test.hpp>
 
-#include <array>
 #include <atomic>
 #include <chrono>
-#include <functional>
+#include <optional>
 #include <sstream>
 #include <string>
 #include <string_view>
@@ -26,30 +27,6 @@ namespace {
 using tcp = boost::asio::ip::tcp;
 
 constexpr size_t OVERSIZED_RESPONSE_BODY_BYTES = 2 * 1024 * 1024;
-constexpr int64_t STALLED_RESOLVE_TIMEOUT_MS = 200;
-constexpr int64_t STALLED_RESOLVE_MAX_ELAPSED_MS = 1'500;
-constexpr int64_t CONSUMED_RESOLVE_TIMEOUT_MS = 20;
-constexpr int64_t CONSUMED_RESOLVE_DELAY_MS = 40;
-constexpr int64_t LOCAL_RESOLVE_TIMEOUT_MS = 1'000;
-constexpr std::string_view STALLED_RESOLVE_HOST = "startup-resolve.invalid";
-constexpr uint16_t RESOLVE_TEST_PORT = 9'876;
-
-/** Return the non-routable URL used by injected resolver tests. */
-fc::url resolve_test_url() {
-   return fc::url("http://" + std::string(STALLED_RESOLVE_HOST) + ":" + std::to_string(RESOLVE_TEST_PORT));
-}
-
-/**
- * Return a loopback port that has no listener after this function returns.
- */
-uint16_t closed_loopback_port() {
-   boost::asio::io_context io;
-   tcp::acceptor acceptor(io, tcp::endpoint(boost::asio::ip::make_address("127.0.0.1"), 0));
-   const auto port = acceptor.local_endpoint().port();
-   boost::system::error_code ec;
-   acceptor.close(ec);
-   return port;
-}
 
 /**
  * HTTP endpoint that reads one request and deliberately withholds the response.
@@ -203,37 +180,261 @@ private:
 };
 
 /**
+ * JSON-RPC endpoint that either serves two calls on one connection or closes
+ * the first keep-alive connection before accepting the second call.
+ */
+class reusable_json_rpc_server {
+public:
+   /** Connection behavior exercised by one server instance. */
+   enum class behavior {
+      healthy_keep_alive,
+      stale_after_first_response,
+   };
+
+   /** Start the scripted endpoint on an ephemeral loopback port. */
+   explicit reusable_json_rpc_server(behavior selected_behavior)
+      : _acceptor(_io, tcp::endpoint(boost::asio::ip::make_address("127.0.0.1"), 0))
+      , _port(_acceptor.local_endpoint().port())
+      , _behavior(selected_behavior)
+      , _worker([this] { serve(); }) {}
+
+   reusable_json_rpc_server(const reusable_json_rpc_server&) = delete;
+   reusable_json_rpc_server& operator=(const reusable_json_rpc_server&) = delete;
+
+   /** Stop a blocked accept and join the endpoint worker. */
+   ~reusable_json_rpc_server() {
+      _stop = true;
+      boost::system::error_code error;
+      _acceptor.close(error);
+      unblock_accept();
+      if (_worker.joinable())
+         _worker.join();
+   }
+
+   /** Return the TCP port assigned by the OS. */
+   uint16_t port() const { return _port; }
+
+   /** Return how many TCP connections the endpoint accepted. */
+   size_t connection_count() const { return _connection_count.load(); }
+
+   /** Return how many complete JSON-RPC requests the endpoint received. */
+   size_t request_count() const { return _request_count.load(); }
+
+private:
+   /** Connect once so a blocked accept can observe shutdown. */
+   void unblock_accept() {
+      boost::asio::io_context io;
+      tcp::socket socket(io);
+      boost::system::error_code error;
+      socket.connect(
+         tcp::endpoint(
+            boost::asio::ip::make_address("127.0.0.1"),
+            _port),
+         error);
+   }
+
+   /** Accept one connection unless shutdown has started. */
+   std::optional<tcp::socket> accept_connection() {
+      tcp::socket socket(_io);
+      boost::system::error_code error;
+      _acceptor.accept(socket, error);
+      if (error || _stop.load())
+         return std::nullopt;
+      _connection_count.fetch_add(1);
+      return socket;
+   }
+
+   /** Read one complete request and send the matching JSON-RPC response. */
+   bool serve_request(
+      tcp::socket& socket,
+      int64_t response_id,
+      std::string_view result,
+      bool keep_alive) {
+      boost::beast::flat_buffer request_buffer;
+      boost::beast::http::request<boost::beast::http::string_body> request;
+      boost::system::error_code error;
+      boost::beast::http::read(
+         socket,
+         request_buffer,
+         request,
+         error);
+      if (error)
+         return false;
+      _request_count.fetch_add(1);
+
+      boost::beast::http::response<boost::beast::http::string_body> response{
+         boost::beast::http::status::ok,
+         11};
+      response.set(
+         boost::beast::http::field::content_type,
+         "application/json");
+      response.keep_alive(keep_alive);
+      response.body() =
+         "{\"jsonrpc\":\"2.0\",\"id\":" +
+         std::to_string(response_id) +
+         ",\"result\":\"" +
+         std::string(result) +
+         "\"}";
+      response.prepare_payload();
+      boost::beast::http::write(socket, response, error);
+      return !error;
+   }
+
+   /** Execute the selected two-call connection script. */
+   void serve() {
+      auto first = accept_connection();
+      if (!first)
+         return;
+      if (!serve_request(*first, 1, "first", true))
+         return;
+
+      if (_behavior == behavior::healthy_keep_alive) {
+         (void)serve_request(*first, 2, "second", false);
+         return;
+      }
+
+      boost::system::error_code error;
+      first->shutdown(tcp::socket::shutdown_both, error);
+      first->close(error);
+      auto second = accept_connection();
+      if (!second)
+         return;
+      (void)serve_request(*second, 2, "second", false);
+   }
+
+   boost::asio::io_context _io;
+   tcp::acceptor _acceptor;
+   uint16_t _port;
+   behavior _behavior;
+   std::atomic_bool _stop{false};
+   std::atomic_size_t _connection_count{0};
+   std::atomic_size_t _request_count{0};
+   std::thread _worker;
+};
+
+/**
  * Return true when the exception came from the transport response body limit.
  */
 bool is_response_body_limit_error(const fc::exception& e) {
-   return e.to_detail_string().find("response body limit") != std::string::npos;
-}
-
-/**
- * Return true when the exception came from deadline-bound DNS resolution.
- */
-bool is_resolve_timeout_error(const fc::exception& e) {
-   return e.to_detail_string().find("JSON-RPC resolve timed out") != std::string::npos;
+   return e.to_detail_string().find("response_limit") != std::string::npos;
 }
 
 } // namespace
 
-namespace fc::network::json_rpc {
-
-/** Private-constructor access for DNS transport regression tests. */
-struct json_rpc_client_test_access {
-   /** Construct a client using a caller-supplied asynchronous resolver starter. */
-   template <typename ResolverStartFn>
-   static json_rpc_client create(fc::url url, ResolverStartFn&& resolver_start) {
-      return json_rpc_client(
-         std::move(url), std::nullopt, endpoint_refresh_policy::never,
-         json_rpc_client::resolver_start_fn(std::forward<ResolverStartFn>(resolver_start)));
-   }
-};
-
-} // namespace fc::network::json_rpc
-
 BOOST_AUTO_TEST_SUITE(json_rpc_client_tests)
+
+/// Legacy JSON-RPC clients retain startup DNS until a connection failure invalidates it.
+BOOST_AUTO_TEST_CASE(default_endpoint_refresh_policy_is_preserved) {
+   const fc::network::json_rpc::client_options options;
+
+   BOOST_CHECK_EQUAL(
+      options.transport.dns_cache_timeout_seconds,
+      -1);
+   BOOST_CHECK(
+      options.transport.refresh_dns_on_connection_failure);
+}
+
+/// Explicitly idempotent calls reuse one healthy connection.
+BOOST_AUTO_TEST_CASE(idempotent_calls_reuse_a_healthy_connection) {
+   reusable_json_rpc_server server(
+      reusable_json_rpc_server::behavior::healthy_keep_alive);
+   fc::network::json_rpc::json_rpc_client client(
+      fc::url(
+         "http://127.0.0.1:" +
+         std::to_string(server.port())));
+
+   BOOST_CHECK_EQUAL(
+      client.call_idempotent("wire_first_probe").as_string(),
+      "first");
+   BOOST_CHECK_EQUAL(
+      client.call_idempotent("wire_second_probe").as_string(),
+      "second");
+   BOOST_CHECK_EQUAL(server.connection_count(), 1U);
+   BOOST_CHECK_EQUAL(server.request_count(), 2U);
+}
+
+/// An idempotent call retries once when its cached connection has gone stale.
+BOOST_AUTO_TEST_CASE(idempotent_call_recovers_from_a_stale_cached_connection) {
+   reusable_json_rpc_server server(
+      reusable_json_rpc_server::behavior::stale_after_first_response);
+   fc::network::json_rpc::json_rpc_client client(
+      fc::url(
+         "http://127.0.0.1:" +
+         std::to_string(server.port())));
+
+   BOOST_CHECK_EQUAL(
+      client.call_idempotent("wire_first_probe").as_string(),
+      "first");
+   BOOST_CHECK_EQUAL(
+      client.call_idempotent("wire_second_probe").as_string(),
+      "second");
+   BOOST_CHECK_EQUAL(server.connection_count(), 2U);
+   BOOST_CHECK_EQUAL(server.request_count(), 2U);
+}
+
+/// Caller-supplied retry options cannot make a default call replay.
+BOOST_AUTO_TEST_CASE(default_call_enforces_single_attempt) {
+   reusable_json_rpc_server server(
+      reusable_json_rpc_server::behavior::stale_after_first_response);
+   fc::network::json_rpc::client_options options;
+   options.request.retry.max_attempts = 3;
+   options.request.retry.initial_backoff = fc::microseconds(0);
+   options.request.retry.max_backoff = fc::microseconds(0);
+   options.request.idempotent = true;
+   options.request.retry_only_reused_connection = true;
+   fc::network::json_rpc::json_rpc_client client(
+      fc::url(
+         "http://127.0.0.1:" +
+         std::to_string(server.port())),
+      std::nullopt,
+      fc::network::json_rpc::endpoint_refresh_policy::on_connection_failure,
+      std::move(options));
+
+   BOOST_CHECK_EQUAL(
+      client.call_idempotent("wire_first_probe").as_string(),
+      "first");
+   BOOST_CHECK_THROW(
+      client.call("wire_side_effect_probe"),
+      fc::exception);
+   BOOST_CHECK_EQUAL(server.connection_count(), 1U);
+   BOOST_CHECK_EQUAL(server.request_count(), 1U);
+}
+
+/// URL parsing preserves bracketed IPv6 identity, credentials, path, query, and port.
+BOOST_AUTO_TEST_CASE(url_round_trips_ipv6_authority_and_query) {
+   const fc::url parsed("https://operator:secret@[2001:db8::1]:8443/rpc?commitment=finalized");
+
+   BOOST_REQUIRE(parsed.host());
+   BOOST_CHECK_EQUAL(*parsed.host(), "2001:db8::1");
+   BOOST_REQUIRE(parsed.port());
+   BOOST_CHECK_EQUAL(*parsed.port(), 8443U);
+   BOOST_REQUIRE(parsed.path());
+   BOOST_CHECK_EQUAL(parsed.path()->generic_string(), "/rpc");
+   BOOST_REQUIRE(parsed.query());
+   BOOST_CHECK_EQUAL(*parsed.query(), "commitment=finalized");
+   BOOST_CHECK_EQUAL(
+      static_cast<std::string>(parsed),
+      "https://operator:secret@[2001:db8::1]:8443/rpc?commitment=finalized");
+}
+
+/// Diagnostic endpoint labels omit URL credentials, paths, and queries.
+BOOST_AUTO_TEST_CASE(endpoint_diagnostics_are_credential_free) {
+   const fc::url endpoint(
+      "https://operator:secret@[2001:db8::1]:8443/"
+      "private/token?authorization=hidden");
+
+   const auto sanitized =
+      fc::http::sanitized_endpoint(endpoint);
+   BOOST_CHECK_EQUAL(
+      sanitized,
+      "https://[2001:db8::1]:8443");
+   BOOST_CHECK(
+      sanitized.find("operator") == std::string::npos);
+   BOOST_CHECK(
+      sanitized.find("secret") == std::string::npos);
+   BOOST_CHECK(
+      sanitized.find("authorization") == std::string::npos);
+}
 
 /// A peer that accepts the TCP request but withholds the HTTP response must
 /// release the caller within the active RPC deadline.
@@ -254,138 +455,16 @@ BOOST_AUTO_TEST_CASE(call_times_out_when_http_response_hangs) {
    BOOST_CHECK_LT(elapsed.count(), 1500 * 1000);
 }
 
-/// Initial endpoint resolution must cancel an incomplete platform lookup at the caller's startup deadline.
-BOOST_AUTO_TEST_CASE(initial_endpoint_resolution_cancels_stalled_query) {
-   std::atomic_bool resolver_started{false};
-   std::atomic_bool cancel_called{false};
-   std::function<void(const boost::system::error_code&, tcp::resolver::results_type)> late_completion;
-   auto stalled_resolver = [&](const std::string&, const std::string&, fc::time_point, auto complete) {
-      resolver_started = true;
-      late_completion = std::move(complete);
-      return [&] { cancel_called = true; };
-   };
-   const auto start = fc::time_point::now();
+/// An already-expired ambient deadline must fail before network I/O starts.
+BOOST_AUTO_TEST_CASE(call_rejects_expired_ambient_deadline) {
+   fc::network::json_rpc::json_rpc_client client(fc::url("http://localhost:9876"));
 
-   BOOST_CHECK_EXCEPTION(
-      [&] {
-         fc::task::deadline_scope deadline(fc::time_point::now() + fc::milliseconds(STALLED_RESOLVE_TIMEOUT_MS));
-         auto client =
-            fc::network::json_rpc::json_rpc_client_test_access::create(resolve_test_url(), stalled_resolver);
-         (void)client;
-      }(),
-      fc::timeout_exception,
-      is_resolve_timeout_error);
-
-   const auto elapsed = fc::time_point::now() - start;
-   BOOST_CHECK(resolver_started.load());
-   BOOST_CHECK(cancel_called.load());
-   BOOST_CHECK_LT(elapsed.count(), STALLED_RESOLVE_MAX_ELAPSED_MS * 1'000);
-
-   BOOST_REQUIRE(late_completion);
-   late_completion(boost::asio::error::operation_aborted, {});
-}
-
-/// An expired startup budget must fail before starting a platform resolver operation.
-BOOST_AUTO_TEST_CASE(initial_endpoint_resolution_rejects_expired_deadline) {
-   bool resolver_started = false;
-   auto resolver = [&](const std::string&, const std::string&, fc::time_point, auto) {
-      resolver_started = true;
-      return [] {};
-   };
-
-   BOOST_CHECK_EXCEPTION(
+   BOOST_CHECK_THROW(
       [&] {
          fc::task::deadline_scope deadline(fc::time_point::now() - fc::milliseconds(1));
-         auto client = fc::network::json_rpc::json_rpc_client_test_access::create(resolve_test_url(), resolver);
-         (void)client;
+         client.call("wire_expired_deadline_probe");
       }(),
-      fc::timeout_exception,
-      is_resolve_timeout_error);
-
-   BOOST_CHECK(!resolver_started);
-}
-
-/// A deadline-bound lookup must preserve a successful asynchronous resolver result.
-BOOST_AUTO_TEST_CASE(initial_endpoint_resolution_accepts_completed_lookup) {
-   bool resolver_started = false;
-   auto resolver = [&](const std::string& host, const std::string& port, fc::time_point, auto complete) {
-      resolver_started = true;
-      const std::array endpoints{tcp::endpoint(boost::asio::ip::address_v4::loopback(), RESOLVE_TEST_PORT)};
-      complete(boost::system::error_code{},
-               tcp::resolver::results_type::create(endpoints.begin(), endpoints.end(), host, port));
-      return [] {};
-   };
-
-   fc::task::deadline_scope deadline(fc::time_point::now() + fc::milliseconds(STALLED_RESOLVE_TIMEOUT_MS));
-   auto client = fc::network::json_rpc::json_rpc_client_test_access::create(resolve_test_url(), resolver);
-   (void)client;
-
-   BOOST_CHECK(resolver_started);
-}
-
-/// Cancellation must remain armed when resolver startup itself consumes the remaining deadline.
-BOOST_AUTO_TEST_CASE(initial_endpoint_resolution_cancels_after_starter_consumes_deadline) {
-   bool cancel_called = false;
-   auto resolver = [&](const std::string&, const std::string&, fc::time_point, auto) {
-      std::this_thread::sleep_for(std::chrono::milliseconds(CONSUMED_RESOLVE_DELAY_MS));
-      return [&] { cancel_called = true; };
-   };
-
-   BOOST_CHECK_EXCEPTION(
-      [&] {
-         fc::task::deadline_scope deadline(
-            fc::time_point::now() + fc::milliseconds(CONSUMED_RESOLVE_TIMEOUT_MS));
-         auto client = fc::network::json_rpc::json_rpc_client_test_access::create(resolve_test_url(), resolver);
-         (void)client;
-      }(),
-      fc::timeout_exception,
-      is_resolve_timeout_error);
-
-   BOOST_CHECK(cancel_called);
-}
-
-/// The production Boost.Asio resolver path must complete a local hostname lookup under a deadline.
-BOOST_AUTO_TEST_CASE(initial_endpoint_resolution_resolves_localhost_with_deadline) {
-   fc::task::deadline_scope deadline(fc::time_point::now() + fc::milliseconds(LOCAL_RESOLVE_TIMEOUT_MS));
-   fc::network::json_rpc::json_rpc_client client(
-      fc::url("http://localhost:" + std::to_string(RESOLVE_TEST_PORT)), std::nullopt,
-      fc::network::json_rpc::endpoint_refresh_policy::never);
-   (void)client;
-}
-
-/// Refreshing stale cached endpoints must observe the active RPC deadline.
-BOOST_AUTO_TEST_CASE(stale_endpoint_refresh_respects_expired_deadline) {
-   fc::network::json_rpc::json_rpc_client client(
-      fc::url("http://127.0.0.1:" + std::to_string(closed_loopback_port())));
-
-   BOOST_CHECK_THROW(client.call("wire_stale_cache_probe"), fc::exception);
-
-   BOOST_CHECK_EXCEPTION(
-      [&] {
-         fc::task::deadline_scope deadline(fc::time_point::now() - fc::milliseconds(1));
-         client.call("wire_stale_cache_probe");
-      }(),
-      fc::timeout_exception,
-      is_resolve_timeout_error);
-}
-
-/// Callers that require bounded runtime behavior can retain the startup DNS result
-/// instead of re-entering platform DNS after a connection failure.
-BOOST_AUTO_TEST_CASE(endpoint_refresh_can_be_disabled) {
-   fc::network::json_rpc::json_rpc_client client(fc::url("http://localhost:" + std::to_string(closed_loopback_port())),
-                                                 std::nullopt, fc::network::json_rpc::endpoint_refresh_policy::never);
-
-   BOOST_CHECK_THROW(client.call("wire_cached_endpoint_probe"), fc::exception);
-
-   BOOST_CHECK_EXCEPTION(
-      [&] {
-         fc::task::deadline_scope deadline(fc::time_point::now() - fc::milliseconds(1));
-         client.call("wire_cached_endpoint_probe");
-      }(),
-      fc::timeout_exception,
-      [](const fc::exception& e) {
-         return e.to_detail_string().find("JSON-RPC connect timed out") != std::string::npos;
-      });
+      fc::timeout_exception);
 }
 
 /// A peer that completes HTTP 200 with an oversized body must be rejected by

@@ -94,4 +94,17 @@ BOOST_AUTO_TEST_CASE(stale_series_removed_on_churn) {
    }
 }
 
+/// Outbound transport failures expose only the closed enum category set.
+BOOST_AUTO_TEST_CASE(outbound_http_failure_labels_have_fixed_cardinality) {
+   catalog_type cat;
+   const std::string out = cat.report();
+
+   for (const auto failure : magic_enum::enum_values<fc::http::failure_kind>()) {
+      const auto expected =
+         "nodeop_outbound_http_failures_total{category=\"" +
+         std::string(fc::http::failure_kind_name(failure)) + "\"}";
+      BOOST_CHECK(out.find(expected) != std::string::npos);
+   }
+}
+
 BOOST_AUTO_TEST_SUITE_END()

@@ -14,6 +14,11 @@ namespace {
 constexpr auto option_name_client         = "outpost-ethereum-client";
 constexpr auto option_abi_file            = "ethereum-abi-file";
 constexpr auto chain_id_validation_timeout = fc::seconds(5);
+constexpr auto option_additional_ca_file = "outpost-ethereum-additional-ca-file";
+constexpr auto option_additional_ca_path = "outpost-ethereum-additional-ca-path";
+constexpr auto option_proxy = "outpost-ethereum-proxy";
+constexpr uint64_t ethereum_rpc_max_request_bytes = 1ULL * 1024ULL * 1024ULL;
+constexpr uint64_t ethereum_rpc_max_response_bytes = 4ULL * 1024ULL * 1024ULL;
 
 [[maybe_unused]] inline fc::logger& logger() {
    static fc::logger log{"outpost_ethereum_client_plugin"};
@@ -80,7 +85,8 @@ ethereum_client_ptr create_validated_client(
    const std::string&                         client_id,
    const fc::crypto::signature_provider_ptr& signature_provider,
    const std::string&                         url,
-   const std::optional<uint32_t>&              configured_chain_id) {
+   const std::optional<uint32_t>&              configured_chain_id,
+   const fc::network::json_rpc::client_options& rpc_options) {
    fc::task::deadline_scope deadline(fc::time_point::now() + chain_id_validation_timeout);
 
    ethereum_client_ptr client;
@@ -88,7 +94,11 @@ ethereum_client_ptr create_validated_client(
       const auto client_chain_id = configured_chain_id
          ? std::optional<fc::uint256>{fc::uint256{*configured_chain_id}}
          : std::nullopt;
-      client = std::make_shared<ethereum_client>(signature_provider, url, client_chain_id);
+      client = std::make_shared<ethereum_client>(
+         signature_provider,
+         url,
+         client_chain_id,
+         rpc_options);
    } catch (const fc::exception&) {
       throw_client_initialization_failure(client_id);
    } catch (const std::exception&) {
@@ -98,7 +108,8 @@ ethereum_client_ptr create_validated_client(
    if (configured_chain_id) {
       std::string remote_chain_id_text;
       try {
-         remote_chain_id_text = client->execute("eth_chainId", fc::variants{}).as_string();
+         remote_chain_id_text =
+            client->execute_idempotent("eth_chainId", fc::variants{}).as_string();
       } catch (const fc::exception&) {
          throw_chain_id_validation_failure(client_id);
       } catch (const std::exception&) {
@@ -121,6 +132,34 @@ ethereum_client_ptr create_validated_client(
    }
 
    return client;
+}
+
+/** Build the named bounded transport policy shared by configured Ethereum RPC clients. */
+fc::network::json_rpc::client_options ethereum_rpc_options(const variables_map& options) {
+   fc::network::json_rpc::client_options result{
+      .request =
+         fc::http::request_options{
+            .max_request_body_bytes = ethereum_rpc_max_request_bytes,
+            .max_response_body_bytes = ethereum_rpc_max_response_bytes,
+            .timeouts =
+               fc::http::timeout_options{
+                  .connect = fc::seconds(10),
+                  .header = fc::seconds(30),
+                  .read = fc::seconds(30),
+                  .idle = fc::seconds(30),
+                  .total = fc::seconds(30),
+               },
+         },
+   };
+   if (options.contains(option_additional_ca_file))
+      result.transport.additional_ca_file =
+         options.at(option_additional_ca_file).as<std::filesystem::path>();
+   if (options.contains(option_additional_ca_path))
+      result.transport.additional_ca_path =
+         options.at(option_additional_ca_path).as<std::filesystem::path>();
+   if (options.contains(option_proxy))
+      result.transport.proxy = options.at(option_proxy).as<std::string>();
+   return result;
 }
 }
 
@@ -189,8 +228,9 @@ void outpost_ethereum_client_plugin::plugin_initialize(const variables_map& opti
    // constructed here rather than deferred to startup.
    auto& sig_mgr        = app().get_plugin<signature_provider_manager_plugin>();
    auto client_specs    = options.at(option_name_client).as<std::vector<std::string>>();
+   const auto rpc_options = ethereum_rpc_options(options);
    for (auto& client_spec : client_specs) {
-      dlog("Adding ethereum client with spec: {}", client_spec);
+      dlog("Adding configured Ethereum client");
       auto parts = fc::split(client_spec, ',');
       SYS_ASSERT(parts.size() == 3 || parts.size() == 4,
                  chain::plugin_config_exception,
@@ -234,13 +274,19 @@ void outpost_ethereum_client_plugin::plugin_initialize(const variables_map& opti
                  id,
                  sig_id);
 
-      auto eth_client = create_validated_client(id, sig_provider, url, chain_id);
+      auto eth_client = create_validated_client(
+         id,
+         sig_provider,
+         url,
+         chain_id,
+         rpc_options);
       my->add_client(id,
                      std::make_shared<ethereum_client_entry_t>(
                         id, url, sig_provider,
                         std::move(eth_client),
                         chain_id));
-      ilog("Added ethereum client (id={},sig_id={},url={},chainId={})", id, sig_id, url,
+      ilog("Added ethereum client (id={},sig_id={},endpoint={},chainId={})",
+           id, sig_id, fc::http::sanitized_endpoint(fc::url(url)),
            chain_id ? std::to_string(*chain_id) : "none");
    }
 }
@@ -253,6 +299,8 @@ void outpost_ethereum_client_plugin::plugin_startup() {
 outpost_ethereum_client_plugin::outpost_ethereum_client_plugin() : my(
    std::make_unique<outpost_ethereum_client_plugin_impl>()) {}
 
+outpost_ethereum_client_plugin::~outpost_ethereum_client_plugin() = default;
+
 void outpost_ethereum_client_plugin::set_program_options(options_description& cli, options_description& cfg) {
    cfg.add_options()(
       option_name_client,
@@ -264,7 +312,16 @@ void outpost_ethereum_client_plugin::set_program_options(options_description& cl
       option_abi_file,
       boost::program_options::value<std::vector<std::filesystem::path>>()->multitoken(),
       "Ethereum contract ABI file(s).  Expects the file to have a JSON array of ABI complient contract definitions."
-      );
+      )(
+      option_additional_ca_file,
+      boost::program_options::value<std::filesystem::path>(),
+      "PEM CA bundle added to system trust for Ethereum RPC HTTPS clients.")(
+      option_additional_ca_path,
+      boost::program_options::value<std::filesystem::path>(),
+      "Hashed CA directory added to system trust for Ethereum RPC HTTPS clients.")(
+      option_proxy,
+      boost::program_options::value<std::string>(),
+      "Explicit proxy URL for Ethereum RPC HTTP clients.");
 }
 
 
