@@ -1291,8 +1291,9 @@ public:
                   auto current = weak.lock();
                   if (!current)
                      return;
+                  auto executor = current->timer.get_executor();
                   asio::post(
-                     current->timer.get_executor(),
+                     std::move(executor),
                      [current = std::move(current),
                       error = std::move(error),
                       endpoints = std::move(endpoints)]() mutable {
@@ -2250,8 +2251,9 @@ asio::awaitable<size_t>
 response_reader::async_read_some(asio::mutable_buffer output) {
    FC_ASSERT(_impl, "Outbound HTTP response reader is empty");
    auto impl = _impl;
+   auto executor = impl->client->strand;
    return asio::co_spawn(
-      impl->client->strand,
+      std::move(executor),
       async_read_some_public(std::move(impl), output),
       asio::use_awaitable);
 }
