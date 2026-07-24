@@ -120,16 +120,18 @@ struct transport_options {
 
 /** Per-request phase and total deadlines. */
 struct timeout_options {
-   /// Maximum DNS and connection-establishment time.
-   microseconds connect = seconds(10);
-   /// Maximum time waiting for complete response headers after request upload.
-   microseconds header = seconds(30);
+   /// Maximum DNS and connection-establishment time. nullopt is a reviewed exemption.
+   std::optional<microseconds> connect = seconds(10);
+   /// Maximum time waiting for complete response headers after request upload. nullopt is a reviewed exemption.
+   std::optional<microseconds> header = seconds(30);
    /// Maximum aggregate response-body read time. nullopt is an explicitly reviewed exemption.
    std::optional<microseconds> read = seconds(30);
-   /// Maximum time without upload or download progress after response headers.
-   microseconds idle = seconds(30);
+   /// Maximum time without upload or download progress after response headers. nullopt is a reviewed exemption.
+   std::optional<microseconds> idle = seconds(30);
    /// Overall request budget. nullopt is permitted only for a reviewed attended operation.
    std::optional<microseconds> total = seconds(30);
+   /// Whether an active fc task deadline further bounds this request.
+   bool inherit_task_deadline = true;
 };
 
 /** Explicit bounded retry policy. */
@@ -408,13 +410,14 @@ struct http_file_download_options {
    uint64_t max_response_body_bytes;
    /// Retry a failed request once when it used a cached connection. Only enable for idempotent requests.
    bool retry_failed_reused_connection = false;
-   /// Explicit phase deadlines. The attended snapshot download intentionally has no total deadline.
+   /// The attended snapshot file transfer intentionally has no transport deadlines.
    http::timeout_options timeouts{
-      .connect = seconds(10),
-      .header = seconds(30),
+      .connect = std::nullopt,
+      .header = std::nullopt,
       .read = std::nullopt,
-      .idle = seconds(30),
+      .idle = std::nullopt,
       .total = std::nullopt,
+      .inherit_task_deadline = false,
    };
    /// Receive phase transitions and periodic transfer status. The callback must not throw.
    std::function<void(const http_file_download_status&)> status_callback;

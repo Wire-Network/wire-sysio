@@ -5,6 +5,7 @@
 
 #include <fc/filesystem.hpp>
 #include <fc/network/http/http_client.hpp>
+#include <fc/task/deadline.hpp>
 
 #include <boost/asio.hpp>
 #include <boost/asio/ssl.hpp>
@@ -69,6 +70,8 @@ using tcp = boost::asio::ip::tcp;
 constexpr int64_t normal_timeout_ms = 2'000;
 constexpr int64_t cancellation_delay_ms = 100;
 constexpr int64_t max_test_elapsed_ms = 1'500;
+constexpr int64_t reuse_metadata_deadline_ms = 500;
+constexpr int64_t reuse_after_deadline_wait_ms = 600;
 constexpr size_t exact_body_bytes = 8;
 constexpr size_t blocked_request_body_bytes = 16 * 1024 * 1024;
 constexpr size_t disk_space_budget_bytes = 64 * 1024 * 1024;
@@ -341,7 +344,7 @@ bool write_chunked_body(tcp::socket& socket, uint64_t body_bytes) {
    return write_bytes(socket, "0\r\n\r\n");
 }
 
-/** Return finite test limits with a caller-selected response-body maximum. */
+/** Return snapshot-style download limits with a caller-selected response-body maximum. */
 fc::http_file_download_options download_options(uint64_t max_body_bytes) {
    return fc::http_file_download_options{
       .max_response_body_bytes = max_body_bytes,
@@ -1057,7 +1060,7 @@ BOOST_AUTO_TEST_CASE(dns_resolution_is_deadline_bounded) {
       {});
 }
 
-/// Cancellation remains live while a resolver callback is pending.
+/// Cancellation remains live while an unbounded resolver callback is pending.
 BOOST_AUTO_TEST_CASE(dns_resolution_is_cancellable) {
    std::atomic_bool cancel_called{false};
    delayed_cancellation cancellation;
@@ -1070,6 +1073,9 @@ BOOST_AUTO_TEST_CASE(dns_resolution_is_cancellable) {
          return [&] { cancel_called = true; };
       });
    auto options = tls_request_options();
+   options.timeouts.connect = std::nullopt;
+   options.timeouts.total = std::nullopt;
+   options.timeouts.inherit_task_deadline = false;
    options.cancel_check = cancellation.check();
 
    BOOST_CHECK_EXCEPTION(
@@ -1796,6 +1802,33 @@ BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(http_client_file_download_tests)
 
+/// Snapshot file transfers retain their pre-refactor unbounded deadline behavior.
+BOOST_AUTO_TEST_CASE(snapshot_file_download_has_no_transport_deadlines) {
+   const auto options = download_options(exact_body_bytes);
+
+   BOOST_CHECK(!options.timeouts.connect);
+   BOOST_CHECK(!options.timeouts.header);
+   BOOST_CHECK(!options.timeouts.read);
+   BOOST_CHECK(!options.timeouts.idle);
+   BOOST_CHECK(!options.timeouts.total);
+   BOOST_CHECK(!options.timeouts.inherit_task_deadline);
+}
+
+/// Snapshot file transfers are not capped by an ambient task deadline.
+BOOST_AUTO_TEST_CASE(snapshot_file_download_ignores_ambient_task_deadline) {
+   scripted_http_server server([](tcp::socket& socket, const std::atomic_bool&) {
+      write_bytes(socket, fixed_length_header(exact_body_bytes) + std::string(exact_body));
+   });
+   fc::temp_directory temp;
+   const auto output = temp.path() / "unbounded-deadline.bin";
+   fc::task::deadline_scope expired_deadline(
+      fc::time_point::now() - fc::milliseconds(1));
+
+   BOOST_CHECK_NO_THROW(
+      download(server, output, download_options(exact_body_bytes)));
+   BOOST_CHECK_EQUAL(read_file(output), exact_body);
+}
+
 /// A request above its caller budget is rejected before any network write.
 BOOST_AUTO_TEST_CASE(oversized_request_body_is_rejected_before_send) {
    std::atomic_bool cancellation_requested{false};
@@ -1849,7 +1882,7 @@ BOOST_AUTO_TEST_CASE(post_sync_can_be_cancelled) {
    BOOST_CHECK_LT(std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count(), max_test_elapsed_ms);
 }
 
-/// Metadata and download requests should reuse one healthy keep-alive connection.
+/// An unbounded download clears an expired metadata deadline before reusing the connection.
 BOOST_AUTO_TEST_CASE(healthy_metadata_connection_is_reused_for_download) {
    scripted_http_server server([](tcp::socket& socket, const std::atomic_bool&) {
       if (!write_bytes(socket, keep_alive_metadata_response())) {
@@ -1866,10 +1899,12 @@ BOOST_AUTO_TEST_CASE(healthy_metadata_connection_is_reused_for_download) {
    const auto output = temp.path() / "reused-connection.bin";
    fc::http_client client;
    auto metadata_deadline = fc::time_point::now();
-   metadata_deadline.safe_add(fc::milliseconds(normal_timeout_ms));
+   metadata_deadline.safe_add(fc::milliseconds(reuse_metadata_deadline_ms));
 
    BOOST_REQUIRE_NO_THROW(
       client.post_sync(server_url(server), fc::variant(fc::mutable_variant_object()), metadata_deadline));
+   std::this_thread::sleep_for(
+      std::chrono::milliseconds(reuse_after_deadline_wait_ms));
    auto options = download_options(exact_body_bytes);
    options.retry_failed_reused_connection = true;
    BOOST_REQUIRE_NO_THROW(

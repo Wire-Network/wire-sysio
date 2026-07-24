@@ -129,10 +129,12 @@ std::optional<time_point> effective_total_deadline(const request_options& option
    std::optional<time_point> result;
    if (options.timeouts.total)
       result = time_point::now().safe_add(*options.timeouts.total);
-   if (auto task_deadline = fc::task::current_deadline();
-       task_deadline && *task_deadline < time_point::maximum() &&
-       (!result || *task_deadline < *result)) {
-      result = *task_deadline;
+   if (options.timeouts.inherit_task_deadline) {
+      if (auto task_deadline = fc::task::current_deadline();
+          task_deadline && *task_deadline < time_point::maximum() &&
+          (!result || *task_deadline < *result)) {
+         result = *task_deadline;
+      }
    }
    return result;
 }
@@ -143,21 +145,27 @@ struct operation_deadline {
    failure_kind timeout_kind;
 };
 
-/** Clamp one phase timeout to the request's total deadline. */
-operation_deadline phase_deadline(microseconds phase_timeout,
-                                  failure_kind phase_failure,
-                                  const std::optional<time_point>& total_deadline) {
+/** Clamp an optional phase timeout to the request's optional total deadline. */
+std::optional<operation_deadline>
+phase_deadline(const std::optional<microseconds>& phase_timeout,
+               failure_kind phase_failure,
+               const std::optional<time_point>& total_deadline) {
    auto now = time_point::now();
-   auto phase_end = now;
-   phase_end.safe_add(phase_timeout);
    if (total_deadline && *total_deadline <= now) {
       throw transport_failure(
          failure_kind::timeout_total,
          "total request deadline expired");
    }
+   if (!phase_timeout) {
+      if (total_deadline)
+         return operation_deadline{*total_deadline, failure_kind::timeout_total};
+      return std::nullopt;
+   }
+   auto phase_end = now;
+   phase_end.safe_add(*phase_timeout);
    if (total_deadline && *total_deadline < phase_end)
-      return {*total_deadline, failure_kind::timeout_total};
-   return {phase_end, phase_failure};
+      return operation_deadline{*total_deadline, failure_kind::timeout_total};
+   return operation_deadline{phase_end, phase_failure};
 }
 
 /** Reject control characters in caller-controlled HTTP header material. */
@@ -1053,17 +1061,17 @@ public:
          policy.max_response_header_bytes > 0,
          "Outbound HTTP response-header limit must be positive");
       FC_ASSERT(
-         policy.timeouts.connect.count() > 0,
-         "Outbound HTTP connect timeout must be positive");
+         !policy.timeouts.connect || policy.timeouts.connect->count() > 0,
+         "Outbound HTTP connect timeout must be positive when present");
       FC_ASSERT(
-         policy.timeouts.header.count() > 0,
-         "Outbound HTTP header timeout must be positive");
+         !policy.timeouts.header || policy.timeouts.header->count() > 0,
+         "Outbound HTTP header timeout must be positive when present");
       FC_ASSERT(
          !policy.timeouts.read || policy.timeouts.read->count() > 0,
          "Outbound HTTP read timeout must be positive when present");
       FC_ASSERT(
-         policy.timeouts.idle.count() > 0,
-         "Outbound HTTP idle timeout must be positive");
+         !policy.timeouts.idle || policy.timeouts.idle->count() > 0,
+         "Outbound HTTP idle timeout must be positive when present");
       FC_ASSERT(
          !policy.timeouts.total || policy.timeouts.total->count() > 0,
          "Outbound HTTP total timeout must be positive when present");
@@ -1225,15 +1233,19 @@ public:
       return result;
    }
 
-   /** Set a Beast logical-operation deadline, rejecting an expired phase. */
+   /** Set or clear a Beast logical-operation deadline, rejecting an expired phase. */
    template <typename Stream>
    static void arm_operation_deadline(
       Stream& stream,
-      const operation_deadline& deadline) {
-      const auto remaining = deadline.when - time_point::now();
+      const std::optional<operation_deadline>& deadline) {
+      if (!deadline) {
+         beast::get_lowest_layer(stream).expires_never();
+         return;
+      }
+      const auto remaining = deadline->when - time_point::now();
       if (remaining.count() <= 0) {
          throw transport_failure(
-            deadline.timeout_kind,
+            deadline->timeout_kind,
             "request deadline expired");
       }
       beast::get_lowest_layer(stream).expires_after(
@@ -1243,22 +1255,23 @@ public:
    /** Convert a Beast/Asio timeout into the selected phase category. */
    static void throw_if_operation_failed(
       const error_code& error,
-      const operation_deadline& deadline,
+      const std::optional<operation_deadline>& deadline,
       const std::shared_ptr<request_control>& control) {
       control->throw_if_cancelled();
-      if (error == beast::error::timeout ||
-          error == asio::error::timed_out) {
+      if (deadline &&
+          (error == beast::error::timeout ||
+           error == asio::error::timed_out)) {
          throw transport_failure(
-            deadline.timeout_kind,
+            deadline->timeout_kind,
             "request deadline expired");
       }
    }
 
-   /** Resolve one host under the connection deadline with a bounded cache. */
+   /** Resolve one host under an optional connection deadline with a bounded cache. */
    asio::awaitable<std::vector<tcp::endpoint>>
    resolve(const std::string& host,
            const std::string& service,
-           const operation_deadline& deadline,
+           std::optional<operation_deadline> deadline,
            const std::shared_ptr<request_control>& control) {
       const auto cache_key = host + "|" + service;
       if (auto found = dns_cache.find(cache_key);
@@ -1273,9 +1286,9 @@ public:
       detail::resolver_cancel_fn cancel_resolution;
       auto state = std::make_shared<async_resolution_state>(strand);
       for (;;) {
-         if (deadline.when <= time_point::now()) {
+         if (deadline && deadline->when <= time_point::now()) {
             throw transport_failure(
-               deadline.timeout_kind,
+               deadline->timeout_kind,
                "DNS resolution deadline expired");
          }
          bool capacity_unavailable = false;
@@ -1284,7 +1297,7 @@ public:
             cancel_resolution = resolver_start(
                host,
                service,
-               deadline.when,
+               deadline ? deadline->when : time_point::maximum(),
                [weak](
                   std::optional<std::string> error,
                   std::vector<detail::resolved_endpoint> endpoints) mutable {
@@ -1317,16 +1330,19 @@ public:
                true);
          }
          if (capacity_unavailable) {
-            const auto remaining = deadline.when - time_point::now();
-            if (remaining.count() <= 0) {
-               throw transport_failure(
-                  deadline.timeout_kind,
-                  "DNS resolution deadline expired");
+            auto wait_for = std::chrono::duration_cast<std::chrono::microseconds>(
+               cancellation_poll_interval);
+            if (deadline) {
+               const auto remaining = deadline->when - time_point::now();
+               if (remaining.count() <= 0) {
+                  throw transport_failure(
+                     deadline->timeout_kind,
+                     "DNS resolution deadline expired");
+               }
+               wait_for = std::min(
+                  wait_for,
+                  std::chrono::microseconds(remaining.count()));
             }
-            const auto wait_for = std::min(
-               std::chrono::duration_cast<std::chrono::microseconds>(
-                  cancellation_poll_interval),
-               std::chrono::microseconds(remaining.count()));
             auto delay = std::make_shared<asio::steady_timer>(strand);
             delay->expires_after(wait_for);
             active_cancel_guard cancel_guard(
@@ -1340,16 +1356,21 @@ public:
       }
 
       state->cancel = std::move(cancel_resolution);
-      const auto remaining = deadline.when - time_point::now();
-      if (remaining.count() <= 0) {
-         if (state->cancel)
-            state->cancel();
-         throw transport_failure(
-            deadline.timeout_kind,
-            "DNS resolution deadline expired");
+      if (deadline) {
+         const auto remaining = deadline->when - time_point::now();
+         if (remaining.count() <= 0) {
+            if (state->cancel)
+               state->cancel();
+            throw transport_failure(
+               deadline->timeout_kind,
+               "DNS resolution deadline expired");
+         }
+         state->timer.expires_after(
+            std::chrono::microseconds(remaining.count()));
+      } else {
+         state->timer.expires_at(
+            std::chrono::steady_clock::time_point::max());
       }
-      state->timer.expires_after(
-         std::chrono::microseconds(remaining.count()));
       active_cancel_guard cancel_guard(
          control,
          [state] {
@@ -1365,9 +1386,15 @@ public:
          state->complete = true;
          if (state->cancel)
             state->cancel();
+         if (deadline) {
+            throw transport_failure(
+               deadline->timeout_kind,
+               "DNS resolution deadline expired");
+         }
          throw transport_failure(
-            deadline.timeout_kind,
-            "DNS resolution deadline expired");
+            failure_kind::dns,
+            "DNS resolution wait ended before completion",
+            true);
       }
       state->cancel = {};
       if (state->error) {
@@ -1417,7 +1444,7 @@ public:
                const std::vector<tcp::endpoint>& endpoints,
                const std::string& host,
                const std::string& service,
-               const operation_deadline& deadline,
+               std::optional<operation_deadline> deadline,
                const std::shared_ptr<request_control>& control) {
       arm_operation_deadline(stream, deadline);
       active_cancel_guard cancel_guard(
@@ -1438,22 +1465,14 @@ public:
       }
    }
 
-   /** Write one complete request under an idle, total, or connect deadline. */
+   /** Write one complete request under an optional idle, total, or connect deadline. */
    template <typename Stream, typename Body>
    asio::awaitable<void>
    write_request(const std::shared_ptr<connection_state>& connection,
                  Stream& stream,
                  beast_http::request<Body>& request_message,
-                 const request_options& policy,
-                 const std::optional<time_point>& total_deadline,
-                 const std::shared_ptr<request_control>& control,
-                 std::optional<operation_deadline> deadline_override = {}) {
-      const auto deadline =
-         deadline_override.value_or(
-            phase_deadline(
-               policy.timeouts.idle,
-               failure_kind::timeout_idle,
-               total_deadline));
+                 std::optional<operation_deadline> deadline,
+                 const std::shared_ptr<request_control>& control) {
       arm_operation_deadline(stream, deadline);
       active_cancel_guard cancel_guard(
          control,
@@ -1480,15 +1499,8 @@ public:
                beast::flat_buffer& buffer,
                Parser& parser,
                const request_options& policy,
-               const std::optional<time_point>& total_deadline,
-               const std::shared_ptr<request_control>& control,
-               std::optional<operation_deadline> deadline_override = {}) {
-      const auto deadline =
-         deadline_override.value_or(
-            phase_deadline(
-               policy.timeouts.header,
-               failure_kind::timeout_header,
-               total_deadline));
+               std::optional<operation_deadline> deadline,
+               const std::shared_ptr<request_control>& control) {
       arm_operation_deadline(stream, deadline);
       active_cancel_guard cancel_guard(
          control,
@@ -1537,7 +1549,8 @@ public:
          policy.timeouts.idle,
          failure_kind::timeout_idle,
          total_deadline);
-      if (read_deadline && read_deadline->when < deadline.when)
+      if (read_deadline &&
+          (!deadline || read_deadline->when < deadline->when))
          deadline = *read_deadline;
       arm_operation_deadline(stream, deadline);
       active_cancel_guard cancel_guard(
@@ -1610,8 +1623,7 @@ public:
       connection_state::tcp_stream& stream,
       const target_info& target,
       const request_options& policy,
-      const std::optional<time_point>& total_deadline,
-      const operation_deadline& connect_deadline,
+      std::optional<operation_deadline> connect_deadline,
       const std::shared_ptr<request_control>& control) {
       const bool ipv6 = target.host.find(':') != std::string::npos;
       const auto connect_authority =
@@ -1629,10 +1641,8 @@ public:
          connection,
          stream,
          connect_request,
-         policy,
-         total_deadline,
-         control,
-         connect_deadline);
+         connect_deadline,
+         control);
 
       beast::flat_buffer buffer(policy.max_response_header_bytes);
       beast_http::response_parser<beast_http::empty_body> parser;
@@ -1643,9 +1653,8 @@ public:
          buffer,
          parser,
          policy,
-         total_deadline,
-         control,
-         connect_deadline);
+         connect_deadline,
+         control);
       if (parser.get().result() != beast_http::status::ok) {
          throw transport_failure(
             failure_kind::connect,
@@ -1739,7 +1748,6 @@ public:
             stream.next_layer(),
             target,
             policy,
-            total_deadline,
             connect_deadline,
             control);
       }
@@ -1958,7 +1966,7 @@ public:
          value_head.content_length = *length;
       if (policy.timeouts.read) {
          read_deadline = phase_deadline(
-            *policy.timeouts.read,
+            policy.timeouts.read,
             failure_kind::timeout_read,
             total_deadline);
       }
@@ -2129,8 +2137,10 @@ client_impl::async_open(
                   connection,
                   *stream,
                   request_message,
-                  policy,
-                  total_deadline,
+                  phase_deadline(
+                     policy.timeouts.idle,
+                     failure_kind::timeout_idle,
+                     total_deadline),
                   control);
             },
             connection->stream);
@@ -2156,7 +2166,10 @@ client_impl::async_open(
                   reader->buffer,
                   reader->parser,
                   policy,
-                  total_deadline,
+                  phase_deadline(
+                     policy.timeouts.header,
+                     failure_kind::timeout_header,
+                     total_deadline),
                   control);
             },
             connection->stream);

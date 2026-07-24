@@ -37,7 +37,8 @@ enforce single-attempt behavior even if a caller supplies permissive base retry 
 explicit idempotent API to receive the stale-connection retry.
 
 JSON-RPC clients warm their configured endpoint at construction and retain the resolved address until a connection
-failure invalidates it. The process-wide resolver uses one deadline-bounded worker with no unbounded work queue.
+failure invalidates it. The process-wide resolver admits one platform lookup at a time with no unbounded work queue.
+Ordinary callers bound their wait with the connection deadline; the unbounded snapshot exception remains cancellable.
 
 ## Limits, cancellation, and snapshot downloads
 
@@ -46,10 +47,10 @@ total deadlines. Wire's predicate-based cancellation remains connected through t
 and socket operations.
 
 Snapshot bootstrap is the reviewed long-running exception. Metadata requests retain a finite total deadline.
-The streamed file transfer has finite connect, response-header, and no-progress deadlines but no aggregate read or
-total deadline, allowing a large progressing download to finish. It remains cancellable, checks available disk
-space before and during transfer, writes to a temporary sibling, atomically publishes only a complete response, and
-removes partial files on failure.
+The streamed snapshot file transfer has no DNS/connect, request-upload, response-header, response-body, idle, total,
+or inherited task deadline, preserving its pre-refactor behavior for large or temporarily stalled downloads. It
+remains cancellable, checks available disk space before and during transfer, writes to a temporary sibling, atomically
+publishes only a complete response, and removes partial files on failure.
 
 ## Metrics
 
