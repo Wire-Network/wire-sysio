@@ -1424,7 +1424,7 @@ BOOST_AUTO_TEST_CASE(slow_progressing_response_body_times_out) {
    fc::http::transport transport;
    auto options = tls_request_options();
    options.timeouts.read = fc::milliseconds(200);
-   options.timeouts.idle = fc::milliseconds(100);
+   options.timeouts.idle = std::nullopt;
    options.timeouts.total = std::nullopt;
    const auto start = std::chrono::steady_clock::now();
 
