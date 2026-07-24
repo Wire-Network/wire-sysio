@@ -2087,10 +2087,6 @@ client_impl::async_open(
       metrics->finish_failure(failure_kind::request_limit);
       throw;
    }
-   shared_metrics().request_bytes.fetch_add(
-      req.body.size(),
-      std::memory_order_relaxed);
-
    const auto total_deadline = effective_total_deadline(policy);
    target_info target;
    try {
@@ -2137,6 +2133,9 @@ client_impl::async_open(
                   control);
             },
             connection->stream);
+         shared_metrics().request_bytes.fetch_add(
+            req.body.size(),
+            std::memory_order_relaxed);
 
          auto reader = std::make_shared<response_reader_impl>(
             shared_from_this(),

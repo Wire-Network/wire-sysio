@@ -54,15 +54,30 @@ public:
    //  JSON-RPC 2.0 methods (unchanged, backwards compatible)
    // -----------------------------------------------------------------------
 
-   // Perform a JSON-RPC request and return the "result" member.
-   // Throws json_rpc_error for JSON-RPC error and std::runtime_error for transport/protocol issues.
+   /**
+    * Perform one non-replaying JSON-RPC request and return its `result`.
+    *
+    * This call is always single-attempt even when the client's base request
+    * policy enables retries.
+    */
    fc::variant call(const std::string& method, const fc::variant& params = variants{});
 
-   // JSON-RPC notification (no "id", no response expected).
-   // This still uses HTTP/1.1 and reads the HTTP response; it just ignores JSON body.
+   /**
+    * Perform a read-only call that may be replayed once when a cached
+    * connection proves stale.
+    */
+   fc::variant call_idempotent(
+      const std::string& method,
+      const fc::variant& params = variants{});
+
+   /**
+    * Send one non-replaying notification and consume its HTTP response.
+    *
+    * A JSON-RPC notification has no `id`; the response body is ignored.
+    */
    void notify(const std::string& method, const fc::variant& params = variants{});
 
-   // Batch call. 'requests' is an array of JSON-RPC request/notification objects.
+   /** Perform one non-replaying JSON-RPC batch request. */
    variant call_batch(const std::vector<variant>& requests);
 
    // -----------------------------------------------------------------------
@@ -85,8 +100,17 @@ private:
    client_options _options;
    fc::http::transport _transport;
 
-   // Perform HTTP POST with JSON payload; optionally parse JSON body.
-   variant send_json(const variant& payload, bool expect_json_body = true);
+   /** Build and perform one call with an explicit replay policy. */
+   variant call_with_policy(
+      const std::string& method,
+      const fc::variant& params,
+      fc::http::request_options request_options);
+
+   /** Perform HTTP POST with JSON payload and an explicit replay policy. */
+   variant send_json(
+      const variant& payload,
+      bool expect_json_body,
+      fc::http::request_options request_options);
 
    static void validate_basic_response(const variant& response);
 };

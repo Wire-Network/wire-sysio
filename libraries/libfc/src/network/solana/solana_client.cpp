@@ -896,6 +896,10 @@ fc::variant solana_client::execute(const std::string& method, const fc::variant&
    return _client.call(method, params);
 }
 
+fc::variant solana_client::execute_idempotent(const std::string& method, const fc::variant& params) {
+   return _client.call_idempotent(method, params);
+}
+
 fc::variant solana_client::build_config(commitment_t commitment, const std::optional<fc::variant_object>& extra) {
    fc::mutable_variant_object config;
    config("commitment", to_string(commitment));
@@ -918,7 +922,7 @@ std::optional<account_info> solana_client::get_account_info(const pubkey_compat_
    config("encoding", "base64");
 
    fc::variants params{addr.to_string(fc::yield_function_t{}), config};
-   auto result = execute("getAccountInfo", params);
+   auto result = execute_idempotent("getAccountInfo", params);
 
    if (result.is_null() || !result.is_object())
       return std::nullopt;
@@ -951,7 +955,7 @@ std::optional<account_info> solana_client::get_account_info(const pubkey_compat_
 uint64_t solana_client::get_balance(const pubkey_compat_t& address, commitment_t commitment) {
    auto addr = to_pubkey(address);
    fc::variants params{addr.to_string(fc::yield_function_t{}), build_config(commitment)};
-   auto result = execute("getBalance", params);
+   auto result = execute_idempotent("getBalance", params);
 
    auto obj = result.get_object();
    return obj["value"].as_uint64();
@@ -969,7 +973,7 @@ solana_client::get_multiple_accounts(const std::vector<solana_public_key>& addre
    config("encoding", "base64");
 
    fc::variants params{addr_list, config};
-   auto result = execute("getMultipleAccounts", params);
+   auto result = execute_idempotent("getMultipleAccounts", params);
 
    std::vector<std::optional<account_info>> results;
    auto value_arr = result.get_object()["value"].get_array();
@@ -1009,7 +1013,7 @@ solana_client::get_multiple_accounts(const std::vector<solana_public_key>& addre
 
 uint64_t solana_client::get_block_height(commitment_t commitment) {
    fc::variants params{build_config(commitment)};
-   return execute("getBlockHeight", params).as_uint64();
+   return execute_idempotent("getBlockHeight", params).as_uint64();
 }
 
 fc::variant solana_client::get_block(uint64_t slot, commitment_t commitment) {
@@ -1020,12 +1024,12 @@ fc::variant solana_client::get_block(uint64_t slot, commitment_t commitment) {
    config("rewards", true);
 
    fc::variants params{slot, config};
-   return execute("getBlock", params);
+   return execute_idempotent("getBlock", params);
 }
 
 fc::variant solana_client::get_block_commitment(uint64_t slot) {
    fc::variants params{slot};
-   return execute("getBlockCommitment", params);
+   return execute_idempotent("getBlockCommitment", params);
 }
 
 std::vector<uint64_t> solana_client::get_blocks(uint64_t start_slot, std::optional<uint64_t> end_slot) {
@@ -1033,7 +1037,7 @@ std::vector<uint64_t> solana_client::get_blocks(uint64_t start_slot, std::option
    if (end_slot)
       params.push_back(*end_slot);
 
-   auto result = execute("getBlocks", params);
+   auto result = execute_idempotent("getBlocks", params);
    std::vector<uint64_t> blocks;
    for (const auto& b : result.get_array()) {
       blocks.push_back(b.as_uint64());
@@ -1043,7 +1047,7 @@ std::vector<uint64_t> solana_client::get_blocks(uint64_t start_slot, std::option
 
 std::vector<uint64_t> solana_client::get_blocks_with_limit(uint64_t start_slot, uint64_t limit) {
    fc::variants params{start_slot, limit};
-   auto result = execute("getBlocksWithLimit", params);
+   auto result = execute_idempotent("getBlocksWithLimit", params);
 
    std::vector<uint64_t> blocks;
    for (const auto& b : result.get_array()) {
@@ -1054,7 +1058,7 @@ std::vector<uint64_t> solana_client::get_blocks_with_limit(uint64_t start_slot, 
 
 std::optional<int64_t> solana_client::get_block_time(uint64_t slot) {
    fc::variants params{slot};
-   auto result = execute("getBlockTime", params);
+   auto result = execute_idempotent("getBlockTime", params);
    if (result.is_null())
       return std::nullopt;
    return result.as_int64();
@@ -1066,7 +1070,7 @@ std::optional<int64_t> solana_client::get_block_time(uint64_t slot) {
 
 blockhash_info solana_client::get_latest_blockhash(commitment_t commitment) {
    fc::variants params{build_config(commitment)};
-   auto result = execute("getLatestBlockhash", params);
+   auto result = execute_idempotent("getLatestBlockhash", params);
 
    auto value = result.get_object()["value"].get_object();
    blockhash_info info;
@@ -1077,7 +1081,7 @@ blockhash_info solana_client::get_latest_blockhash(commitment_t commitment) {
 
 bool solana_client::is_blockhash_valid(const std::string& blockhash, commitment_t commitment) {
    fc::variants params{blockhash, build_config(commitment)};
-   auto result = execute("isBlockhashValid", params);
+   auto result = execute_idempotent("isBlockhashValid", params);
    return result.get_object()["value"].as_bool();
 }
 
@@ -1087,27 +1091,27 @@ bool solana_client::is_blockhash_valid(const std::string& blockhash, commitment_
 
 fc::variant solana_client::get_cluster_nodes() {
    fc::variants params;
-   return execute("getClusterNodes", params);
+   return execute_idempotent("getClusterNodes", params);
 }
 
 std::string solana_client::get_genesis_hash() {
    fc::variants params;
-   return execute("getGenesisHash", params).as_string();
+   return execute_idempotent("getGenesisHash", params).as_string();
 }
 
 std::string solana_client::get_health() {
    fc::variants params;
-   return execute("getHealth", params).as_string();
+   return execute_idempotent("getHealth", params).as_string();
 }
 
 fc::variant solana_client::get_highest_snapshot_slot() {
    fc::variants params;
-   return execute("getHighestSnapshotSlot", params);
+   return execute_idempotent("getHighestSnapshotSlot", params);
 }
 
 std::string solana_client::get_identity() {
    fc::variants params;
-   auto result = execute("getIdentity", params);
+   auto result = execute_idempotent("getIdentity", params);
    return result.get_object()["identity"].as_string();
 }
 
@@ -1115,22 +1119,22 @@ fc::variant solana_client::get_leader_schedule(std::optional<uint64_t> slot) {
    fc::variants params;
    if (slot)
       params.push_back(*slot);
-   return execute("getLeaderSchedule", params);
+   return execute_idempotent("getLeaderSchedule", params);
 }
 
 uint64_t solana_client::get_slot(commitment_t commitment) {
    fc::variants params{build_config(commitment)};
-   return execute("getSlot", params).as_uint64();
+   return execute_idempotent("getSlot", params).as_uint64();
 }
 
 std::string solana_client::get_slot_leader(commitment_t commitment) {
    fc::variants params{build_config(commitment)};
-   return execute("getSlotLeader", params).as_string();
+   return execute_idempotent("getSlotLeader", params).as_string();
 }
 
 std::vector<std::string> solana_client::get_slot_leaders(uint64_t start_slot, uint64_t limit) {
    fc::variants params{start_slot, limit};
-   auto result = execute("getSlotLeaders", params);
+   auto result = execute_idempotent("getSlotLeaders", params);
 
    std::vector<std::string> leaders;
    for (const auto& l : result.get_array()) {
@@ -1141,7 +1145,7 @@ std::vector<std::string> solana_client::get_slot_leaders(uint64_t start_slot, ui
 
 fc::variant solana_client::get_version() {
    fc::variants params;
-   return execute("getVersion", params);
+   return execute_idempotent("getVersion", params);
 }
 
 //=============================================================================
@@ -1150,12 +1154,12 @@ fc::variant solana_client::get_version() {
 
 fc::variant solana_client::get_epoch_info(commitment_t commitment) {
    fc::variants params{build_config(commitment)};
-   return execute("getEpochInfo", params);
+   return execute_idempotent("getEpochInfo", params);
 }
 
 fc::variant solana_client::get_epoch_schedule() {
    fc::variants params;
-   return execute("getEpochSchedule", params);
+   return execute_idempotent("getEpochSchedule", params);
 }
 
 //=============================================================================
@@ -1164,7 +1168,7 @@ fc::variant solana_client::get_epoch_schedule() {
 
 std::optional<uint64_t> solana_client::get_fee_for_message(const std::string& message_base64, commitment_t commitment) {
    fc::variants params{message_base64, build_config(commitment)};
-   auto result = execute("getFeeForMessage", params);
+   auto result = execute_idempotent("getFeeForMessage", params);
 
    auto value = result.get_object()["value"];
    if (value.is_null())
@@ -1182,7 +1186,7 @@ std::vector<fc::variant> solana_client::get_recent_prioritization_fees(const std
    if (!addr_list.empty())
       params.push_back(addr_list);
 
-   auto result = execute("getRecentPrioritizationFees", params);
+   auto result = execute_idempotent("getRecentPrioritizationFees", params);
    return result.get_array();
 }
 
@@ -1192,12 +1196,12 @@ std::vector<fc::variant> solana_client::get_recent_prioritization_fees(const std
 
 fc::variant solana_client::get_inflation_governor(commitment_t commitment) {
    fc::variants params{build_config(commitment)};
-   return execute("getInflationGovernor", params);
+   return execute_idempotent("getInflationGovernor", params);
 }
 
 fc::variant solana_client::get_inflation_rate() {
    fc::variants params;
-   return execute("getInflationRate", params);
+   return execute_idempotent("getInflationRate", params);
 }
 
 fc::variant solana_client::get_inflation_reward(const std::vector<solana_public_key>& addresses,
@@ -1215,7 +1219,7 @@ fc::variant solana_client::get_inflation_reward(const std::vector<solana_public_
    if (epoch)
       params.push_back(config);
 
-   return execute("getInflationReward", params);
+   return execute_idempotent("getInflationReward", params);
 }
 
 //=============================================================================
@@ -1224,12 +1228,12 @@ fc::variant solana_client::get_inflation_reward(const std::vector<solana_public_
 
 fc::variant solana_client::get_supply(commitment_t commitment) {
    fc::variants params{build_config(commitment)};
-   return execute("getSupply", params);
+   return execute_idempotent("getSupply", params);
 }
 
 fc::variant solana_client::get_largest_accounts(commitment_t commitment) {
    fc::variants params{build_config(commitment)};
-   return execute("getLargestAccounts", params);
+   return execute_idempotent("getLargestAccounts", params);
 }
 
 //=============================================================================
@@ -1238,7 +1242,7 @@ fc::variant solana_client::get_largest_accounts(commitment_t commitment) {
 
 uint64_t solana_client::get_stake_minimum_delegation(commitment_t commitment) {
    fc::variants params{build_config(commitment)};
-   auto result = execute("getStakeMinimumDelegation", params);
+   auto result = execute_idempotent("getStakeMinimumDelegation", params);
    return result.get_object()["value"].as_uint64();
 }
 
@@ -1249,7 +1253,7 @@ uint64_t solana_client::get_stake_minimum_delegation(commitment_t commitment) {
 fc::variant solana_client::get_token_account_balance(const pubkey_compat_t& token_account, commitment_t commitment) {
    auto addr = to_pubkey(token_account);
    fc::variants params{addr.to_string(fc::yield_function_t{}), build_config(commitment)};
-   return execute("getTokenAccountBalance", params);
+   return execute_idempotent("getTokenAccountBalance", params);
 }
 
 fc::variant solana_client::get_token_accounts_by_delegate(const pubkey_compat_t& delegate, const fc::variant& filter,
@@ -1260,7 +1264,7 @@ fc::variant solana_client::get_token_accounts_by_delegate(const pubkey_compat_t&
    config("encoding", "jsonParsed");
 
    fc::variants params{addr.to_string(fc::yield_function_t{}), filter, config};
-   return execute("getTokenAccountsByDelegate", params);
+   return execute_idempotent("getTokenAccountsByDelegate", params);
 }
 
 fc::variant solana_client::get_token_accounts_by_owner(const pubkey_compat_t& owner, const fc::variant& filter,
@@ -1271,19 +1275,19 @@ fc::variant solana_client::get_token_accounts_by_owner(const pubkey_compat_t& ow
    config("encoding", "jsonParsed");
 
    fc::variants params{addr.to_string(fc::yield_function_t{}), filter, config};
-   return execute("getTokenAccountsByOwner", params);
+   return execute_idempotent("getTokenAccountsByOwner", params);
 }
 
 fc::variant solana_client::get_token_largest_accounts(const pubkey_compat_t& mint, commitment_t commitment) {
    auto addr = to_pubkey(mint);
    fc::variants params{addr.to_string(fc::yield_function_t{}), build_config(commitment)};
-   return execute("getTokenLargestAccounts", params);
+   return execute_idempotent("getTokenLargestAccounts", params);
 }
 
 fc::variant solana_client::get_token_supply(const pubkey_compat_t& mint, commitment_t commitment) {
    auto addr = to_pubkey(mint);
    fc::variants params{addr.to_string(fc::yield_function_t{}), build_config(commitment)};
-   return execute("getTokenSupply", params);
+   return execute_idempotent("getTokenSupply", params);
 }
 
 //=============================================================================
@@ -1296,12 +1300,12 @@ fc::variant solana_client::get_transaction(const std::string& signature, commitm
    config("encoding", "json");
 
    fc::variants params{signature, config};
-   return execute("getTransaction", params);
+   return execute_idempotent("getTransaction", params);
 }
 
 uint64_t solana_client::get_transaction_count(commitment_t commitment) {
    fc::variants params{build_config(commitment)};
-   return execute("getTransactionCount", params).as_uint64();
+   return execute_idempotent("getTransactionCount", params).as_uint64();
 }
 
 std::vector<fc::variant> solana_client::get_signatures_for_address(const pubkey_compat_t& address,
@@ -1316,7 +1320,7 @@ std::vector<fc::variant> solana_client::get_signatures_for_address(const pubkey_
       config("until", *until);
 
    fc::variants params{addr.to_string(fc::yield_function_t{}), config};
-   return execute("getSignaturesForAddress", params).get_array();
+   return execute_idempotent("getSignaturesForAddress", params).get_array();
 }
 
 rpc_response<std::vector<std::optional<signature_status>>>
@@ -1330,7 +1334,7 @@ solana_client::get_signature_statuses(const std::vector<std::string>& signatures
    config("searchTransactionHistory", search_transaction_history);
 
    fc::variants params{sig_list, config};
-   auto result = execute("getSignatureStatuses", params);
+   auto result = execute_idempotent("getSignatureStatuses", params);
 
    rpc_response<std::vector<std::optional<signature_status>>> response;
    auto obj = result.get_object();
@@ -1398,7 +1402,7 @@ fc::variant solana_client::simulate_transaction(const transaction& tx, commitmen
    config("sigVerify", false);
 
    fc::variants params{tx_base64, config};
-   return execute("simulateTransaction", params);
+   return execute_idempotent("simulateTransaction", params);
 }
 
 std::string solana_client::request_airdrop(const pubkey_compat_t& address, uint64_t lamports, commitment_t commitment) {
@@ -1423,7 +1427,7 @@ fc::variant solana_client::get_program_accounts(const pubkey_compat_t& program_i
    }
 
    fc::variants params{addr.to_string(fc::yield_function_t{}), config};
-   return execute("getProgramAccounts", params);
+   return execute_idempotent("getProgramAccounts", params);
 }
 
 //=============================================================================
@@ -1432,7 +1436,7 @@ fc::variant solana_client::get_program_accounts(const pubkey_compat_t& program_i
 
 fc::variant solana_client::get_vote_accounts(commitment_t commitment) {
    fc::variants params{build_config(commitment)};
-   return execute("getVoteAccounts", params);
+   return execute_idempotent("getVoteAccounts", params);
 }
 
 //=============================================================================
@@ -1441,7 +1445,7 @@ fc::variant solana_client::get_vote_accounts(commitment_t commitment) {
 
 uint64_t solana_client::get_minimum_balance_for_rent_exemption(size_t data_length, commitment_t commitment) {
    fc::variants params{static_cast<uint64_t>(data_length), build_config(commitment)};
-   return execute("getMinimumBalanceForRentExemption", params).as_uint64();
+   return execute_idempotent("getMinimumBalanceForRentExemption", params).as_uint64();
 }
 
 //=============================================================================
@@ -1450,7 +1454,7 @@ uint64_t solana_client::get_minimum_balance_for_rent_exemption(size_t data_lengt
 
 fc::variant solana_client::get_recent_performance_samples(size_t limit) {
    fc::variants params{static_cast<uint64_t>(limit)};
-   return execute("getRecentPerformanceSamples", params);
+   return execute_idempotent("getRecentPerformanceSamples", params);
 }
 
 //=============================================================================
@@ -1459,22 +1463,22 @@ fc::variant solana_client::get_recent_performance_samples(size_t limit) {
 
 uint64_t solana_client::get_first_available_block() {
    fc::variants params;
-   return execute("getFirstAvailableBlock", params).as_uint64();
+   return execute_idempotent("getFirstAvailableBlock", params).as_uint64();
 }
 
 uint64_t solana_client::minimum_ledger_slot() {
    fc::variants params;
-   return execute("minimumLedgerSlot", params).as_uint64();
+   return execute_idempotent("minimumLedgerSlot", params).as_uint64();
 }
 
 uint64_t solana_client::get_max_retransmit_slot() {
    fc::variants params;
-   return execute("getMaxRetransmitSlot", params).as_uint64();
+   return execute_idempotent("getMaxRetransmitSlot", params).as_uint64();
 }
 
 uint64_t solana_client::get_max_shred_insert_slot() {
    fc::variants params;
-   return execute("getMaxShredInsertSlot", params).as_uint64();
+   return execute_idempotent("getMaxShredInsertSlot", params).as_uint64();
 }
 
 //=============================================================================
@@ -1496,7 +1500,7 @@ fc::variant solana_client::get_block_production(std::optional<uint64_t> first_sl
    if (first_slot || last_slot)
       params.push_back(config);
 
-   return execute("getBlockProduction", params);
+   return execute_idempotent("getBlockProduction", params);
 }
 
 //=============================================================================

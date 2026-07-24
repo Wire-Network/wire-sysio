@@ -210,10 +210,15 @@ struct download_options {
 
 /** Process-wide monotonic transport metrics with fixed cardinality. */
 struct metrics_snapshot {
+   /// Logical requests started, independent of retry attempts.
    uint64_t requests = 0;
+   /// Logical requests whose final HTTP response had a successful status.
    uint64_t successes = 0;
+   /// Complete request-body uploads, including completed retry attempts.
    uint64_t request_bytes = 0;
+   /// Response-body bytes accepted across final logical request outcomes.
    uint64_t response_bytes = 0;
+   /// Final logical request failures by fixed category.
    std::array<uint64_t, failure_kind_count> failures{};
 };
 

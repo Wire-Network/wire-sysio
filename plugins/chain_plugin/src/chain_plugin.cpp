@@ -367,8 +367,10 @@ public:
    void verify_snapshot_attestation(const signed_block_ptr& lib_block);
    /// Download and hash-check a bounded snapshot from a remote provider, leaving snapshot_path
    /// pointing at the downloaded file for the normal snapshot-load path to consume.
-   void fetch_snapshot_from_endpoint(const std::string& endpoint_url,
-                                     const fc::http_file_download_options& download_options);
+   void fetch_snapshot_from_endpoint(
+      const std::string& endpoint_url,
+      const fc::http_file_download_options& download_options,
+      fc::http::transport_options transport_options);
 
 private:
    static void log_guard_exception(const chain::guard_exception& e);
@@ -573,9 +575,20 @@ void chain_plugin::set_program_options(options_description& cli, options_descrip
          ("snapshot-endpoint", bpo::value<std::string>(),
           "Fetch snapshot from URL and bootstrap.\n"
           "URL formats:\n"
-          "  http://host:port          - fetches latest snapshot\n"
-          "  http://host:port/50000    - fetches snapshot at block 50000\n"
+          "  http://host:port           - fetches latest snapshot\n"
+          "  http://host:port/50000     - fetches snapshot at block 50000\n"
+          "  https://host:port          - fetches latest snapshot\n"
+          "  https://host:port/50000    - fetches snapshot at block 50000\n"
           "Requires empty database (use --delete-all-blocks to clear existing data).")
+         ("snapshot-endpoint-additional-ca-file",
+          bpo::value<std::filesystem::path>(),
+          "PEM CA bundle added to system trust for snapshot endpoint HTTPS requests.")
+         ("snapshot-endpoint-additional-ca-path",
+          bpo::value<std::filesystem::path>(),
+          "Hashed CA directory added to system trust for snapshot endpoint HTTPS requests.")
+         ("snapshot-endpoint-proxy",
+          bpo::value<std::string>(),
+          "Explicit proxy URL for snapshot endpoint HTTP requests.")
          ;
 
 }
@@ -989,8 +1002,21 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
             .status_callback = [logger = snapshot_download_progress_logger{}](
                                   const fc::http_file_download_status& status) mutable { logger(status); },
          };
+         fc::http::transport_options transport_options;
+         if (options.contains("snapshot-endpoint-additional-ca-file"))
+            transport_options.additional_ca_file =
+               options.at("snapshot-endpoint-additional-ca-file").as<std::filesystem::path>();
+         if (options.contains("snapshot-endpoint-additional-ca-path"))
+            transport_options.additional_ca_path =
+               options.at("snapshot-endpoint-additional-ca-path").as<std::filesystem::path>();
+         if (options.contains("snapshot-endpoint-proxy"))
+            transport_options.proxy =
+               options.at("snapshot-endpoint-proxy").as<std::string>();
          try {
-            fetch_snapshot_from_endpoint(options.at("snapshot-endpoint").as<std::string>(), download_options);
+            fetch_snapshot_from_endpoint(
+               options.at("snapshot-endpoint").as<std::string>(),
+               download_options,
+               std::move(transport_options));
          } catch (...) {
             if (app().is_quiting()) {
                SYS_THROW(chain::interrupt_exception, "Snapshot endpoint bootstrap interrupted");
@@ -1630,7 +1656,9 @@ bool chain_plugin::accept_transactions() const {
 }
 
 void chain_plugin_impl::fetch_snapshot_from_endpoint(
-   const std::string& endpoint_url, const fc::http_file_download_options& download_options) {
+   const std::string& endpoint_url,
+   const fc::http_file_download_options& download_options,
+   fc::http::transport_options transport_options) {
    // Check for existing chain data
    auto shared_mem_path = chain_config->state_dir / "shared_memory.bin";
    auto chain_head_path = chain_config->state_dir / chain_head_filename;
@@ -1658,9 +1686,10 @@ void chain_plugin_impl::fetch_snapshot_from_endpoint(
       }
    }
 
-   ilog("Fetching snapshot metadata from endpoint: {}", endpoint_url);
+   ilog("Fetching snapshot metadata from endpoint: {}",
+        fc::http::sanitized_endpoint(fc::url(base_url)));
 
-   fc::http_client http_client;
+   fc::http_client http_client(std::move(transport_options));
    http_client.set_cancel_check([]() { return app().is_quiting(); });
    fc::variant metadata_response;
    if (request_block_num) {

@@ -16,6 +16,28 @@ namespace {
 constexpr std::string_view http_scheme = "http";
 constexpr std::string_view https_scheme = "https";
 constexpr std::string_view default_http_path = "/";
+constexpr uint32_t single_attempt = 1;
+constexpr uint32_t stale_connection_max_attempts = 2;
+
+/** Prevent implicit replay through caller-supplied base request options. */
+fc::http::request_options
+non_replaying_request_options(fc::http::request_options options) {
+   options.retry.max_attempts = single_attempt;
+   options.idempotent = false;
+   options.retry_only_reused_connection = false;
+   return options;
+}
+
+/** Allow one immediate replay only after a cached connection proves stale. */
+fc::http::request_options
+stale_connection_retry_options(fc::http::request_options options) {
+   options.retry.max_attempts = stale_connection_max_attempts;
+   options.retry.initial_backoff = fc::microseconds(0);
+   options.retry.max_backoff = fc::microseconds(0);
+   options.idempotent = true;
+   options.retry_only_reused_connection = true;
+   return options;
+}
 
 /** Return transport options adjusted for the legacy endpoint-refresh contract. */
 client_options normalize_options(endpoint_refresh_policy refresh_policy, client_options options) {
@@ -116,6 +138,25 @@ json_rpc_client::json_rpc_client(fc::url url,
 }
 
 variant json_rpc_client::call(const std::string& method, const fc::variant& params) {
+   return call_with_policy(
+      method,
+      params,
+      non_replaying_request_options(_options.request));
+}
+
+variant json_rpc_client::call_idempotent(
+   const std::string& method,
+   const fc::variant& params) {
+   return call_with_policy(
+      method,
+      params,
+      stale_connection_retry_options(_options.request));
+}
+
+variant json_rpc_client::call_with_policy(
+   const std::string& method,
+   const fc::variant& params,
+   fc::http::request_options request_options) {
    const auto id = _next_id++;
 
    mutable_variant_object obj;
@@ -124,7 +165,11 @@ variant json_rpc_client::call(const std::string& method, const fc::variant& para
       ("params", params)
       ("id", id);
 
-   variant response = send_json(variant(obj));
+   variant response =
+      send_json(
+         variant(obj),
+         true,
+         std::move(request_options));
    validate_basic_response(response);
 
    const auto& object = response.get_object();
@@ -173,7 +218,10 @@ variant json_rpc_client::call(const std::string& method, const fc::variant& para
 void json_rpc_client::notify(const std::string& method, const fc::variant& params) {
    mutable_variant_object obj;
    obj("jsonrpc", "2.0")("method", method)("params", params);
-   send_json(fc::variant(obj), false);
+   send_json(
+      fc::variant(obj),
+      false,
+      non_replaying_request_options(_options.request));
 }
 
 fc::variant json_rpc_client::call_batch(const std::vector<fc::variant>& requests) {
@@ -190,13 +238,20 @@ fc::variant json_rpc_client::call_batch(const std::vector<fc::variant>& requests
       payload.emplace_back(std::move(object));
    }
 
-   variant response = send_json(variant(payload));
+   variant response =
+      send_json(
+         variant(payload),
+         true,
+         non_replaying_request_options(_options.request));
    if (!response.is_array())
       throw json_rpc_error("JSON-RPC batch: server did not return an array");
    return response;
 }
 
-variant json_rpc_client::send_json(const variant& payload, bool expect_json_body) {
+variant json_rpc_client::send_json(
+   const variant& payload,
+   bool expect_json_body,
+   fc::http::request_options request_options) {
    const auto body = fc::json::to_string(payload, fc::json::yield_function_t{});
    fc::http::request request{
       .method = fc::http::request_method::post,
@@ -205,7 +260,10 @@ variant json_rpc_client::send_json(const variant& payload, bool expect_json_body
       .content_type = "application/json",
       .user_agent = _user_agent,
    };
-   const auto response = _transport.perform(request, _options.request);
+   const auto response =
+      _transport.perform(
+         request,
+         std::move(request_options));
    require_ok(response, "JSON-RPC request");
 
    if (!expect_json_body)
@@ -226,7 +284,10 @@ std::string json_rpc_client::send_http(http_verb verb,
       .content_type = content_type,
       .user_agent = _user_agent,
    };
-   const auto response = _transport.perform(request, _options.request);
+   const auto response =
+      _transport.perform(
+         request,
+         non_replaying_request_options(_options.request));
    require_ok(response, "HTTP request");
    return response.body;
 }

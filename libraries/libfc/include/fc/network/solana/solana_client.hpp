@@ -558,6 +558,15 @@ public:
    fc::variant execute(const std::string& method, const fc::variant& params);
 
    /**
+    * @brief Execute an explicitly read-only RPC with stale-connection recovery.
+    *
+    * The request may be replayed once only when an existing cached connection
+    * proves stale. Transaction submission and airdrop methods must use
+    * `execute`.
+    */
+   fc::variant execute_idempotent(const std::string& method, const fc::variant& params);
+
+   /**
     * @brief Get the signer's public key
     */
    solana_public_key get_pubkey() const { return _pubkey; }

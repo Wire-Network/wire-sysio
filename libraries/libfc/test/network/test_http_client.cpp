@@ -14,6 +14,7 @@
 #include <openssl/ssl.h>
 
 #include <algorithm>
+#include <array>
 #include <atomic>
 #include <chrono>
 #include <cstdio>
@@ -1718,8 +1719,25 @@ BOOST_AUTO_TEST_CASE(header_retry_records_only_the_final_outcome) {
    std::atomic_uint32_t connection_index{0};
    scripted_http_server server(
       [&](tcp::socket& socket, const std::atomic_bool&) {
+         const auto request = read_request_header(socket);
+         const auto header_end = request.find("\r\n\r\n");
+         if (header_end == std::string::npos)
+            return;
+         const auto buffered_body_bytes =
+            request.size() - header_end - 4;
+         boost::system::error_code error;
+         if (buffered_body_bytes < exact_body.size()) {
+            std::array<char, exact_body_bytes> remaining_body{};
+            boost::asio::read(
+               socket,
+               boost::asio::buffer(
+                  remaining_body.data(),
+                  exact_body.size() - buffered_body_bytes),
+               error);
+            if (error)
+               return;
+         }
          if (connection_index.fetch_add(1) == 0) {
-            boost::system::error_code error;
             socket.shutdown(tcp::socket::shutdown_both, error);
             return;
          }
@@ -1728,7 +1746,7 @@ BOOST_AUTO_TEST_CASE(header_retry_records_only_the_final_outcome) {
             fixed_length_header(exact_body.size()) +
                std::string(exact_body));
       },
-      true,
+      false,
       2);
 
    const auto before = fc::http::get_metrics_snapshot();
@@ -1745,8 +1763,9 @@ BOOST_AUTO_TEST_CASE(header_retry_records_only_the_final_outcome) {
          const auto response =
             co_await client.async_request(
                fc::http::request{
-                  .method = fc::http::request_method::get,
+                  .method = fc::http::request_method::post,
                   .target = server_url(server),
+                  .body = std::string(exact_body),
                },
                options);
          BOOST_CHECK_EQUAL(response.status, 200);
@@ -1763,6 +1782,9 @@ BOOST_AUTO_TEST_CASE(header_retry_records_only_the_final_outcome) {
    BOOST_CHECK_EQUAL(connection_index.load(), 2U);
    BOOST_CHECK_EQUAL(after.requests, before.requests + 1);
    BOOST_CHECK_EQUAL(after.successes, before.successes + 1);
+   BOOST_CHECK_EQUAL(
+      after.request_bytes,
+      before.request_bytes + exact_body.size() * 2);
    BOOST_CHECK_EQUAL_COLLECTIONS(
       after.failures.begin(),
       after.failures.end(),

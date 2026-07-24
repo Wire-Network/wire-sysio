@@ -82,6 +82,9 @@ BOOST_AUTO_TEST_CASE(chain_plugin_snapshot_endpoint_option_registration) {
    boost::program_options::notify(variables);
 
    BOOST_CHECK_EQUAL(variables.at("snapshot-endpoint").as<std::string>(), "http://127.0.0.1:1");
+   BOOST_CHECK(options.find_nothrow("snapshot-endpoint-additional-ca-file", false) != nullptr);
+   BOOST_CHECK(options.find_nothrow("snapshot-endpoint-additional-ca-path", false) != nullptr);
+   BOOST_CHECK(options.find_nothrow("snapshot-endpoint-proxy", false) != nullptr);
 
    constexpr std::array removed_options{
       "snapshot-endpoint-connect-timeout-ms",

@@ -343,6 +343,14 @@ public:
     */
    fc::variant execute(const std::string& method, const fc::variant& params);
 
+   /**
+    * @brief Execute an explicitly read-only RPC with stale-connection recovery.
+    *
+    * The request may be replayed once only when an existing cached connection
+    * proves stale. Transaction-submission methods must use `execute`.
+    */
+   fc::variant execute_idempotent(const std::string& method, const fc::variant& params);
+
    fc::variant execute_contract_view_fn(const address& contract_address, const abi::contract& abi,
                                         const block_number_or_tag_t& block, const contract_invoke_data_items& params);
 

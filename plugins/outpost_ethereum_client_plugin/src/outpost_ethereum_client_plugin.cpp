@@ -108,7 +108,8 @@ ethereum_client_ptr create_validated_client(
    if (configured_chain_id) {
       std::string remote_chain_id_text;
       try {
-         remote_chain_id_text = client->execute("eth_chainId", fc::variants{}).as_string();
+         remote_chain_id_text =
+            client->execute_idempotent("eth_chainId", fc::variants{}).as_string();
       } catch (const fc::exception&) {
          throw_chain_id_validation_failure(client_id);
       } catch (const std::exception&) {

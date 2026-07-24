@@ -249,10 +249,15 @@ The bootstrap process:
 
 ### Bootstrap download status and limits
 
-Snapshot bootstrap is attended and has no automatic network deadlines. While metadata is fetched, the node identifies
-the active operation; the file transfer then reports phase changes and, every five seconds, downloaded bytes,
-percentage, transfer rate, and ETA when the response supplies `Content-Length`. Pressing Ctrl+C cancels pending
-resolver or socket work and removes the partial file.
+Snapshot bootstrap is attended. Metadata has a finite total deadline. The file transfer has finite connect,
+response-header, and no-progress deadlines, while its aggregate read and total deadlines are explicitly exempt so
+large progressing downloads can finish. The transfer reports phase changes and, every five seconds, downloaded
+bytes, percentage, transfer rate, and ETA when the response supplies `Content-Length`. Pressing Ctrl+C cancels
+pending resolver or socket work and removes the partial file.
+
+HTTPS endpoints use system CA roots and mandatory DNS/IP identity verification. Private roots can be added with
+`--snapshot-endpoint-additional-ca-file` or `--snapshot-endpoint-additional-ca-path`; use
+`--snapshot-endpoint-proxy http://host:port` for an explicit proxy.
 
 The existing chain database size setting supplies the download ceiling:
 
