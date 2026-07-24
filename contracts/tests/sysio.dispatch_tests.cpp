@@ -1439,6 +1439,19 @@ BOOST_FIXTURE_TEST_CASE(chkcons_survives_non_advancing_advance, sysio_dispatch_t
    BOOST_REQUIRE_EQUAL(retry_count(), rc1 + 1);
 } FC_LOG_AND_RETHROW() }
 
+// msgch::bootstrap refuses to start a chain whose emissions are not configured. This fixture
+// deploys no sysio.system at all (setemitcfg / initt5 never ran), which is exactly the
+// misconfigured-deployment shape: without the guard, bootstrap's inline genesis advance would
+// gate-block SILENTLY (the emissions gate never throws, by design) and the defect would surface
+// only as "epoch stuck at 0". advance()'s own soft block-and-retry behavior for the ECONOMIC gate
+// reasons is covered above (chkcons_survives_non_advancing_advance) and in emissions_tests.
+BOOST_FIXTURE_TEST_CASE(bootstrap_requires_emissions_config, sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+   BOOST_REQUIRE_EQUAL(
+      wasm_assert_msg("msgch::bootstrap: emissions config missing -- sysio.system::setemitcfg must run before bootstrap"),
+      push(MSGCH_ACCOUNT, msgch_abi, MSGCH_ACCOUNT, "bootstrap"_n, mvo()));
+} FC_LOG_AND_RETHROW() }
+
 // A forged/invalid delivery cannot strand the epoch. SEC-102's semantic-header check runs at
 // INGRESS (msgch::deliver's inbound_envelope_valid gate), so a forged envelope reverts on delivery
 // and records no envelope row -- it can never reach the consensus tally and leave a phantom

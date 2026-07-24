@@ -276,12 +276,16 @@ enum AttestationType {
   ATTESTATION_TYPE_RESERVE_CREATE_CANCEL    = 60959; // 0xEE1F  outpost → depot
   ATTESTATION_TYPE_RESERVE_CREATE_CANCELLED = 60960; // 0xEE20  depot   → outpost
   ATTESTATION_TYPE_RESERVE_READY            = 60961; // 0xEE21  depot   → outpost
+  // DEPRECATED — no longer emitted; do not use in new code. The emissions
+  // gate state is depot-local (sysio.epoch::blocklog); no outpost consumes
+  // a cross-chain notification of it. Slot retained; do not reuse.
   ATTESTATION_TYPE_EMISSIONS_BLOCKED        = 60962; // 0xEE22
 }
 
-// Reason codes for ATTESTATION_TYPE_EMISSIONS_BLOCKED. Emitted by
-// sysio.epoch::advance when its emissions readiness gate cannot pay
-// the next epoch.
+// Reason codes recorded by sysio.epoch::advance's emissions readiness gate
+// in the depot-local sysio.epoch::blocklog table when it cannot pay the
+// next epoch. (Formerly also carried by the retired EMISSIONS_BLOCKED
+// attestation.)
 enum EmissionsBlockReason {
   EMISSIONS_BLOCK_REASON_UNSPECIFIED          = 0;
   EMISSIONS_BLOCK_REASON_CONFIG_MISSING       = 1; // sysio.system::setemitcfg not called

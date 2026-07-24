@@ -2299,9 +2299,9 @@ BOOST_FIXTURE_TEST_CASE( advance_gate_blocks_before_initt5, sysio_emissions_test
 
 BOOST_FIXTURE_TEST_CASE( gate_block_dedup_same_reason, sysio_emissions_tester ) try {
    // Two consecutive gate-block attempts with the same reason: blocklog row
-   // exists, retry_count increments, last_retry_at advances. No outbound
-   // queueout is attempted on the second call (reason unchanged), so the
-   // trx still succeeds even without sysio.msgch deployed.
+   // exists, retry_count increments, last_retry_at advances. The gate state
+   // is depot-local (no cross-chain broadcast), so the trx succeeds even
+   // without sysio.msgch deployed.
    create_t5_holding_accounts();
 
    produce_blocks(130);
