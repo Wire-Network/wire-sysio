@@ -21,10 +21,15 @@ using opp::types::EmissionsBlockReason;
 // ---------------------------------------------------------------------------
 // Emissions readiness gate. Runs in advance() before any state mutation:
 // reads sysio.system::emitcfg + t5state and sysio.token::accounts to compute
-// whether emissions can pay this epoch. If not, advance emits an
-// EmissionsBlocked attestation per outpost (deduped by the local blocklog
-// table) and returns without state change. The wall clock for the current
-// epoch effectively extends until conditions allow a successful gate pass.
+// whether emissions can pay this epoch. If not, advance records the block in
+// the depot-local blocklog table (+ a greppable console diagnostic) and
+// returns without state change. The wall clock for the current epoch
+// effectively extends until conditions allow a successful gate pass. The
+// gate state is deliberately NOT broadcast cross-chain: outposts take no
+// action on a depot pause (envelopes simply stop until the gate passes), so
+// the blocklog is the single ops surface. Missing-config reasons hard-fail
+// the production bootstrap entry (sysio.msgch::bootstrap) instead, so on a
+// properly-bootstrapped chain only the economic reasons are reachable.
 // ---------------------------------------------------------------------------
 
 namespace {
@@ -122,9 +127,8 @@ emissions_gate_result check_emissions_ready(uint32_t epoch_duration_sec, uint32_
       }
 
       // emission_amount / period_emission is retained on the
-      // BALANCE_INSUFFICIENT path so the blocklog row + cross-chain
-      // EmissionsBlocked attestation report the real shortfall (period
-      // total vs. available balance), not zero.
+      // BALANCE_INSUFFICIENT path so the blocklog row reports the real
+      // shortfall (period total vs. available balance), not zero.
       if (r.sysio_balance < r.period_emission) {
          r.reason = opp::types::EMISSIONS_BLOCK_REASON_BALANCE_INSUFFICIENT;
          return r;
@@ -135,49 +139,14 @@ emissions_gate_result check_emissions_ready(uint32_t epoch_duration_sec, uint32_
    return r;
 }
 
-// Broadcast an EmissionsBlocked attestation to every active outpost.
-// Called from record_gate_block on the first block for a given epoch_index
-// or when the reason changes since the previous attempt. The
-// first_blocked_at_secs argument is the original blocking time -- on a
-// reason-change rebroadcast the caller passes the existing row's
-// first_blocked_at so the timestamp tracks the original block, not "now".
-void emit_emissions_block_attestation(name self,
-                                      uint32_t epoch_index,
-                                      const emissions_gate_result& gate,
-                                      uint32_t first_blocked_at_secs) {
-   opp::attestations::EmissionsBlocked msg;
-   msg.epoch_index        = epoch_index;
-   msg.reason             = gate.reason;
-   msg.attempted_emission = gate.emission_amount;
-   msg.treasury_remaining = gate.treasury_remaining;
-   msg.sysio_balance      = gate.sysio_balance;
-   msg.first_blocked_at   = first_blocked_at_secs;
-
-   std::vector<char> encoded;
-   auto out = zpp::bits::out{encoded, zpp::bits::no_size{}};
-   (void)out(msg);
-
-   sysio::chains::chains_t chains_tbl(epoch::CHAINS_ACCOUNT);
-   for (auto it = chains_tbl.begin(); it != chains_tbl.end(); ++it) {
-      if (!is_active_outpost(*it)) continue;
-      action(
-         permission_level{self, "owner"_n},
-         epoch::MSGCH_ACCOUNT,
-         "queueout"_n,
-         std::make_tuple(
-            it->code.value,
-            opp::types::ATTESTATION_TYPE_EMISSIONS_BLOCKED,
-            encoded
-         )
-      ).send();
-   }
-}
-
-// Inserts or updates the local blocklog row for a gate-block on epoch_index.
-// On INSERT (first block for this epoch_index) OR when the reason has changed
-// since the previous attempt, also broadcasts an EmissionsBlocked attestation
-// per outpost. On UPDATE with same reason, only bumps last_retry_at and
-// retry_count -- no outbound emission (dedup).
+// Inserts or updates the local blocklog row for a gate-block on epoch_index —
+// the depot-side record of why the epoch is not advancing (read via the
+// blocklog table; also surfaced by advance()'s console diagnostic). On UPDATE,
+// refreshes the reason + amounts and bumps last_retry_at / retry_count. The
+// gate state is deliberately not broadcast cross-chain: no outpost consumes
+// it (a depot pause needs no outpost cooperation — envelopes simply stop
+// until the gate passes), and an unconsumed attestation type is a liveness
+// hazard on outposts that reject unknown types.
 void record_gate_block(name self, uint32_t epoch_index, const emissions_gate_result& gate) {
    epoch::blocklog_t log_tbl(self);
    epoch::blocklog_key pk{epoch_index};
@@ -195,12 +164,8 @@ void record_gate_block(name self, uint32_t epoch_index, const emissions_gate_res
          .last_retry_at      = now_secs,
          .retry_count        = 1,
       });
-      emit_emissions_block_attestation(self, epoch_index, gate, now_secs);
       return;
    }
-
-   const auto existing = log_tbl.get(pk);
-   const bool reason_changed = existing.reason != gate.reason;
 
    log_tbl.modify(ram_payer, pk, [&](auto& row) {
       row.reason             = gate.reason;
@@ -211,10 +176,6 @@ void record_gate_block(name self, uint32_t epoch_index, const emissions_gate_res
       row.retry_count       += 1;
       // first_blocked_at intentionally unchanged: tracks the original block.
    });
-
-   if (reason_changed) {
-      emit_emissions_block_attestation(self, epoch_index, gate, existing.first_blocked_at);
-   }
 }
 
 // Removes the blocklog row for epoch_index if present. Called on the gate
@@ -361,16 +322,20 @@ void epoch::advance() {
    if (now < state.next_epoch_start) return;
 
    // Emissions readiness gate: epochs are never partially-advanced. If the
-   // sysio.system treasury cannot pay this epoch, record the block locally,
-   // emit an EmissionsBlocked attestation per outpost (deduped), and return
-   // without mutating state. The wall clock for the current epoch effectively
-   // extends until the gate eventually passes on a subsequent chkcons retry.
+   // sysio.system treasury cannot pay this epoch, record the block locally
+   // (blocklog + console diagnostic) and return without mutating state. The
+   // wall clock for the current epoch effectively extends until the gate
+   // eventually passes on a subsequent chkcons retry.
    const uint32_t target_epoch = state.current_epoch_index + 1;
    const auto gate = check_emissions_ready(cfg.epoch_duration_sec, target_epoch);
    if (!gate.ready) {
       // OPP silent-return diagnostic: the epoch silently does NOT advance when the
-      // emissions gate is not ready. Also recorded to blocklog + EmissionsBlocked,
-      // but a console line makes "epoch stuck, no advance" greppable in cluster logs.
+      // emissions gate is not ready. Also recorded to blocklog, but a console
+      // line makes "epoch stuck, no advance" greppable in cluster logs.
+      // (Missing-config reasons additionally hard-fail the PRODUCTION bootstrap
+      // entry, sysio.msgch::bootstrap, so a misconfigured chain refuses to start;
+      // the gate itself stays never-throwing so unit fixtures and chkcons retries
+      // can run against a blocked gate at any epoch.)
       sysio::print_f("epoch::advance: epoch %u NOT advanced -- emissions gate not ready; retries on next chkcons\n",
                      target_epoch);
       record_gate_block(get_self(), target_epoch, gate);
