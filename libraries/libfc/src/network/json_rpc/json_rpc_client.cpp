@@ -213,7 +213,7 @@ variant json_rpc_client::call_then(const std::string& method, const fc::variant&
                   make_call_payload(
                      std::move(next.method),
                      std::move(next.params),
-                  next_id)),
+                     next_id)),
             .options = request_options_for(_options.request, next.options),
          };
       });

@@ -56,11 +56,16 @@ enum class solana_outpost_role {
    underwriter
 };
 
+/**
+ * Immutable published binding for one configured Solana client.
+ *
+ * The raw signature provider is deliberately not exposed: every signing path
+ * must remain inside the bound solana_client so pinned mode cannot be bypassed.
+ */
 struct solana_client_entry_t {
-   std::string                        id;
-   std::string                        url;
-   fc::crypto::signature_provider_ptr signature_provider;
-   solana_client_ptr                  client;
+   const std::string       id;
+   const std::string       url;
+   const solana_client_ptr client;
 };
 
 using solana_client_entry_ptr = std::shared_ptr<solana_client_entry_t>;

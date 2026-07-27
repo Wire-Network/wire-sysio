@@ -33,7 +33,6 @@ outpost-solana-cluster-identity = <client-id>,<expected-genesis-hash>
 Optional policy:
 
 ```ini
-outpost-solana-cluster-identity-max-age-ms = 30000
 outpost-solana-cluster-identity-probe-timeout-ms = 5000
 ```
 
@@ -54,8 +53,14 @@ and publishes no clients unless all probes match.
 - Signing always performs a fresh bounded probe immediately before invoking
   the local signer. Transaction submission performs its verification and
   `sendTransaction` call on one exact connection.
-- The configured maximum age bounds reported verification freshness. Every
-  protected JSON-RPC operation is stricter and performs a peer-bound preflight.
+- Operation-gate queueing shares the configured RPC total-timeout budget.
+  Startup and signing gate waits share the identity-probe timeout, so a stalled
+  concurrent operation cannot create an unbounded wait.
+- Solana clients always honor an earlier active task deadline. The lower-level
+  transport inheritance switch cannot disable these fail-closed client budgets.
+- Verification age is telemetry showing time since the latest successful
+  probe. It is not an authorization cache; every protected JSON-RPC operation
+  performs a new peer-bound preflight.
 - A follow-up transport failure cannot reuse the completed preflight. The next
   operation independently re-resolves when needed and reverifies.
 - Timeout, RPC, and malformed-response failures block the current operation
@@ -87,7 +92,8 @@ Recommended initial alerts:
 - any client with `status="mismatch"`;
 - sustained `status="error"` or increasing verification failures;
 - increasing blocked signing or submission operations;
-- verification age above the configured maximum plus normal scrape delay.
+- unexpectedly old verification age while protected operations should be
+  active.
 
 Metric labels are bounded to configured client IDs and closed enum values.
 Expected/observed hashes and endpoint URLs are deliberately excluded.

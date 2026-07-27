@@ -127,9 +127,9 @@ std::vector<char> decode_latest_envelope_account(opp_solana_outpost_client&  pro
 /**
  * @brief Solana concrete `outpost_client`.
  *
- * Composes the plugin-owned `solana_client_entry_t` (shared chain connection +
- * signature provider) with the outpost program id + IDL to implement the
- * chain-agnostic SPI.
+ * Composes the plugin-owned immutable `solana_client_entry_t` binding (shared
+ * pinned-or-legacy chain client) with the outpost program id + IDL to implement
+ * the chain-agnostic SPI.
  *
  * `deliver_outbound_envelope` stages chunks through `epoch_in`, then sends a
  * zero-data terminal `epoch_in` call. When that call reaches consensus the

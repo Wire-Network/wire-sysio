@@ -522,7 +522,6 @@ BOOST_AUTO_TEST_CASE(authenticated_transport_options_are_registered) {
    BOOST_CHECK(option_names.contains("outpost-solana-additional-ca-path"));
    BOOST_CHECK(option_names.contains("outpost-solana-proxy"));
    BOOST_CHECK(option_names.contains("outpost-solana-cluster-identity"));
-   BOOST_CHECK(option_names.contains("outpost-solana-cluster-identity-max-age-ms"));
    BOOST_CHECK(option_names.contains("outpost-solana-cluster-identity-probe-timeout-ms"));
 }
 

@@ -91,7 +91,7 @@ solana_genesis_hash parse_solana_genesis_hash(const std::string& value);
 enum class solana_cluster_identity_mode { unpinned, pinned };
 
 /// Durable verification status for a signing-capable Solana client.
-enum class solana_cluster_identity_status { unpinned, unverified, verified, mismatch, error, stale };
+enum class solana_cluster_identity_status { unpinned, unverified, verified, mismatch, error };
 
 /// Stable reason codes exposed through sanitized logs and metrics.
 enum class solana_cluster_identity_reason {
@@ -102,7 +102,6 @@ enum class solana_cluster_identity_reason {
    rpc_error,
    malformed_observed_identity,
    identity_mismatch,
-   verification_stale,
    verification_recovered
 };
 
@@ -123,9 +122,7 @@ enum class solana_cluster_identity_operation {
 struct solana_cluster_identity_config {
    std::string client_id;
    solana_genesis_hash expected_genesis_hash;
-   fc::microseconds maximum_verification_age = fc::seconds(30);
    fc::microseconds probe_timeout = fc::seconds(5);
-   std::function<fc::time_point()> verification_clock = [] { return fc::time_point::now(); };
 };
 
 /**
@@ -633,7 +630,9 @@ public:
     *
     * @param sig_provider Signature provider for signing transactions (ED25519)
     * @param url_source The URL of the Solana RPC node
-    * @param rpc_options authenticated transport and bounded request policy
+    * @param rpc_options authenticated transport and bounded request policy.
+    *                    Solana clients always inherit active task deadlines so
+    *                    their internal operation budgets remain enforceable.
     */
    solana_client(const signature_provider_ptr& sig_provider, const std::variant<std::string, fc::url>& url_source,
                  client_options rpc_options = {});
@@ -647,11 +646,13 @@ public:
     *
     * @param sig_provider Signature provider for signing transactions.
     * @param url_source Configured Solana RPC endpoint.
-    * @param identity_config Independently sourced expected cluster identity
-    *                        and freshness policy.
+    * @param rpc_options authenticated transport and bounded request policy.
+    *                    Solana clients always inherit active task deadlines so
+    *                    their internal operation budgets remain enforceable.
+    * @param identity_config Independently sourced expected cluster identity.
     */
    solana_client(const signature_provider_ptr& sig_provider, const std::variant<std::string, fc::url>& url_source,
-                 solana_cluster_identity_config identity_config, client_options rpc_options = {});
+                 client_options rpc_options, solana_cluster_identity_config identity_config);
 
    /**
     * @brief Execute a raw JSON-RPC method call
@@ -1082,6 +1083,8 @@ private:
    const solana_public_key _pubkey;
    const std::optional<solana_cluster_identity_config> _cluster_identity;
    const std::string _sanitized_endpoint;
+   /// Configured whole-operation budget, including operation-gate queueing.
+   const std::optional<fc::microseconds> _rpc_total_timeout;
    json_rpc_client _client;
    /// Serializes JSON-RPC, verification state changes, signing, and submission.
    mutable std::timed_mutex _operation_mutex;
@@ -1115,26 +1118,26 @@ private:
    /** Acquire the serialized operation gate within the caller's active deadline. */
    operation_lock lock_operation() const;
    /** Execute one RPC method while the operation gate is already held. */
-   fc::variant execute_locked(const std::string& method, const fc::variant& params);
-   /** Return whether a probe is required after applying sticky/stale state transitions. */
-   bool cluster_verification_required_locked(solana_cluster_identity_operation operation, bool force_fresh);
+   fc::variant execute_locked(const std::string& method, const fc::variant& params, bool idempotent);
+   /** Reject an operation after a sticky cluster-identity mismatch. */
+   void throw_if_cluster_identity_mismatched_locked(solana_cluster_identity_operation operation);
    /** Record one transport-level probe failure without exposing request data. */
    void record_cluster_verification_failure_locked(solana_cluster_identity_operation operation,
                                                    solana_cluster_identity_reason reason);
-   /** Validate and record one `getGenesisHash` result. */
-   void record_cluster_identity_observation_locked(solana_cluster_identity_operation operation,
-                                                   const fc::variant& observed_result,
+   /** Record one already parsed `getGenesisHash` result and return whether it matched. */
+   bool record_cluster_identity_observation_locked(solana_cluster_identity_operation operation,
+                                                   const solana_genesis_hash& observed,
                                                    solana_cluster_identity_status previous_status);
-   /** Reverify pinned identity when required or block the protected operation. */
-   void ensure_cluster_verified_locked(solana_cluster_identity_operation operation, bool force_fresh);
+   /** Perform a fresh standalone verification or block the protected operation. */
+   void ensure_cluster_verified_locked(solana_cluster_identity_operation operation);
    /** Publish verification state without holding the RPC gate during later scrapes. */
    void publish_cluster_identity_snapshot_locked();
    /** Call `getGenesisHash` without recursively entering the public verification gate. */
    fc::variant fetch_genesis_hash_unchecked_locked();
    /** Count one operation rejected before RPC or signing. */
    void record_blocked_operation_locked(solana_cluster_identity_operation operation);
-   /** Map raw RPC names onto the closed telemetry operation vocabulary. */
-   static solana_cluster_identity_operation operation_for_rpc_method(const std::string& method);
+   /** Map RPC names and replay semantics onto the closed telemetry operation vocabulary. */
+   static solana_cluster_identity_operation operation_for_rpc_method(const std::string& method, bool idempotent);
 };
 
 //=============================================================================

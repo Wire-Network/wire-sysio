@@ -103,16 +103,19 @@ The expected hash must be canonical base58 encoding of exactly 32 bytes. Source
 it from a trusted deployment manifest or another control-plane source; do not
 derive the configured expectation from the same RPC URL being pinned.
 
-Two optional bounded-verification settings apply in pinned mode:
+One optional bounded-verification setting applies in pinned mode:
 
 | Option | Default | Description |
 |---|---:|---|
-| `--outpost-solana-cluster-identity-max-age-ms` | `30000` | Maximum successful-verification age used for freshness telemetry; protected RPCs still preflight every call |
 | `--outpost-solana-cluster-identity-probe-timeout-ms` | `5000` | Deadline for startup and runtime `getGenesisHash` probes |
 
 Signing and submission always force a fresh identity probe. A mismatch is
 sticky until process restart and blocks reads, transaction construction,
 simulation, fee estimation, signing, and submission.
+Operation-gate queueing is included in the configured RPC total timeout;
+startup and signing use the identity-probe timeout.
+Solana clients also always honor an earlier active task deadline; lower-level
+transport configuration cannot disable these fail-closed budgets.
 
 #### `--solana-idl-file` (optional, multi-token)
 
@@ -170,11 +173,11 @@ reads, transaction construction, simulation, fee estimation, and submission.
 Signing independently forces a fresh bounded observation immediately before
 the signer is invoked. Identity mismatch is sticky for the process lifetime.
 
-Prometheus exposes bounded-cardinality state, verification age,
-attempt/success/mismatch/failure/recovery counters, and blocked-operation
-counters. Labels contain only configured client IDs and fixed enums; URL
-credentials, signer IDs, expected/observed hashes, transactions, and account
-payloads are not metric labels.
+Prometheus exposes bounded-cardinality state, time since the latest successful
+verification, attempt/success/mismatch/failure/recovery counters, and
+blocked-operation counters. Labels contain only configured client IDs and fixed
+enums; URL credentials, signer IDs, expected/observed hashes, transactions, and
+account payloads are not metric labels.
 
 The absent-option legacy mode is a compatibility window for the initial
 release. Operators should add identities for all clients together. A later
@@ -213,7 +216,6 @@ package "sysio" {
    class solana_client_entry_t <<struct>> {
       + id : string
       + url : string
-      + signature_provider : signature_provider_ptr
       + client : solana_client_ptr
    }
 
@@ -264,7 +266,6 @@ package "fc::crypto" {
    }
 }
 
-solana_client_entry_t o-- signature_provider_ptr : signature_provider >
 solana_client --> signature_provider_ptr : signs with >
 
 @enduml

@@ -13,7 +13,6 @@ namespace sysio {
 namespace {
 constexpr auto option_name_client = "outpost-solana-client";
 constexpr auto option_name_cluster_identity = "outpost-solana-cluster-identity";
-constexpr auto option_name_identity_max_age = "outpost-solana-cluster-identity-max-age-ms";
 constexpr auto option_name_identity_timeout = "outpost-solana-cluster-identity-probe-timeout-ms";
 constexpr auto option_idl_file = "solana-idl-file";
 constexpr auto option_outpost_program_name = "solana-outpost-program-name";
@@ -25,7 +24,6 @@ constexpr outbound_http::transport_option_names
          "outpost-solana-additional-ca-path",
       .proxy = "outpost-solana-proxy",
    };
-constexpr uint32_t default_identity_max_age_ms = 30'000;
 constexpr uint32_t default_identity_probe_timeout_ms = 5'000;
 
 /** Credential-bearing client configuration parsed before any client is published. */
@@ -208,10 +206,7 @@ void outpost_solana_client_plugin::plugin_initialize(const variables_map& option
       }
    }
 
-   const auto maximum_age = fc::milliseconds(options.at(option_name_identity_max_age).as<uint32_t>());
    const auto probe_timeout = fc::milliseconds(options.at(option_name_identity_timeout).as<uint32_t>());
-   SYS_ASSERT(maximum_age.count() > 0, chain::plugin_config_exception, "--{} must be greater than zero",
-              option_name_identity_max_age);
    SYS_ASSERT(probe_timeout.count() > 0, chain::plugin_config_exception, "--{} must be greater than zero",
               option_name_identity_timeout);
 
@@ -224,14 +219,13 @@ void outpost_solana_client_plugin::plugin_initialize(const variables_map& option
       auto sig_provider = sig_mgr.get_provider(client.signature_provider_id);
       solana_client_ptr rpc_client;
       if (pinning_enabled) {
-         rpc_client = std::make_shared<solana_client>(sig_provider, client.parsed_rpc_url,
-                                                      solana_cluster_identity_config{
-                                                         .client_id = client.id,
-                                                         .expected_genesis_hash = expected_identities.at(client.id),
-                                                         .maximum_verification_age = maximum_age,
-                                                         .probe_timeout = probe_timeout,
-                                                      },
-                                                      rpc_options);
+         rpc_client = std::make_shared<solana_client>(
+            sig_provider, client.parsed_rpc_url, rpc_options,
+            solana_cluster_identity_config{
+               .client_id = client.id,
+               .expected_genesis_hash = expected_identities.at(client.id),
+               .probe_timeout = probe_timeout,
+            });
       } else {
          rpc_client = std::make_shared<solana_client>(sig_provider, client.parsed_rpc_url, rpc_options);
          wlog("SEC-139 staged rollout: Solana client '{}' is running without cluster identity "
@@ -241,7 +235,7 @@ void outpost_solana_client_plugin::plugin_initialize(const variables_map& option
               option_name_cluster_identity);
       }
       pending_clients.push_back(
-         std::make_shared<solana_client_entry_t>(client.id, client.rpc_url, sig_provider, std::move(rpc_client)));
+         std::make_shared<solana_client_entry_t>(client.id, client.rpc_url, std::move(rpc_client)));
    }
 
    for (std::size_t i = 0; i < pending_clients.size(); ++i) {
@@ -270,10 +264,6 @@ void outpost_solana_client_plugin::set_program_options(options_description& cli,
       "every configured Solana client must have exactly one canonical 32-byte "
       "base58 genesis hash; when absent, legacy unpinned behavior is preserved "
       "with a prominent security warning")(
-      option_name_identity_max_age,
-      boost::program_options::value<uint32_t>()->default_value(default_identity_max_age_ms),
-      "Maximum successful Solana cluster identity age in milliseconds used for freshness telemetry; protected RPCs "
-      "still preflight every call")(
       option_name_identity_timeout,
       boost::program_options::value<uint32_t>()->default_value(default_identity_probe_timeout_ms),
       "Maximum duration in milliseconds of each Solana cluster identity probe")(
