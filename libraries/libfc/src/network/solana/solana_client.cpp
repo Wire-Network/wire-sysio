@@ -1033,10 +1033,16 @@ fc::variant solana_client::execute_locked(const std::string& method, const fc::v
    } catch (const fc::timeout_exception&) {
       if (!observation_received) {
          record_cluster_verification_failure_locked(operation, solana_cluster_identity_reason::rpc_timeout);
+      } else if (_cluster_identity_status == solana_cluster_identity_status::verified &&
+                 _client.last_transport_session_id() == 0) {
+         record_cluster_verification_failure_locked(operation, solana_cluster_identity_reason::rpc_timeout);
       }
       throw;
    } catch (const std::exception&) {
       if (!observation_received) {
+         record_cluster_verification_failure_locked(operation, solana_cluster_identity_reason::rpc_error);
+      } else if (_cluster_identity_status == solana_cluster_identity_status::verified &&
+                 _client.last_transport_session_id() == 0) {
          record_cluster_verification_failure_locked(operation, solana_cluster_identity_reason::rpc_error);
       }
       throw;
@@ -1118,10 +1124,9 @@ void solana_client::record_cluster_identity_observation_locked(
       ++_verification_mismatches;
       record_blocked_operation_locked(operation);
       elog("Solana cluster identity mismatch "
-           "(client_id={},endpoint={},expected_genesis_hash={},observed_genesis_hash={},"
-           "status={},reason={},operation={})",
-           _cluster_identity->client_id, _sanitized_endpoint, _cluster_identity->expected_genesis_hash.canonical,
-           observed.canonical, magic_enum::enum_name(_cluster_identity_status),
+           "(client_id={},endpoint={},status={},reason={},operation={})",
+           _cluster_identity->client_id, _sanitized_endpoint,
+           magic_enum::enum_name(_cluster_identity_status),
            magic_enum::enum_name(_cluster_identity_reason), magic_enum::enum_name(operation));
       publish_cluster_identity_snapshot_locked();
       FC_THROW("Solana cluster identity mismatch for client '{}'", _cluster_identity->client_id);
@@ -1140,8 +1145,8 @@ void solana_client::record_cluster_identity_observation_locked(
    if (recovered) {
       ++_verification_recoveries;
       wlog("Solana cluster identity verification recovered "
-           "(client_id={},endpoint={},observed_genesis_hash={},status={},reason={},operation={})",
-           _cluster_identity->client_id, _sanitized_endpoint, observed.canonical,
+           "(client_id={},endpoint={},status={},reason={},operation={})",
+           _cluster_identity->client_id, _sanitized_endpoint,
            magic_enum::enum_name(_cluster_identity_status), magic_enum::enum_name(_cluster_identity_reason),
            magic_enum::enum_name(operation));
    }
