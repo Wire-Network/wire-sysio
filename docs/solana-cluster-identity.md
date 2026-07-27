@@ -53,11 +53,11 @@ and publishes no clients unless all probes match.
   covers successful fallback between multiple DNS addresses.
 - Signing always performs a fresh bounded probe immediately before invoking
   the local signer. Transaction submission performs its verification and
-  `sendTransaction` call on one transport session.
-- The configured maximum age remains an upper bound on reusable identity
-  evidence; the per-session JSON-RPC check is intentionally stricter.
-- A JSON-RPC transport failure invalidates the verified transport session. The
-  next operation re-resolves and reverifies before continuing.
+  `sendTransaction` call on one exact connection.
+- The configured maximum age bounds reported verification freshness. Every
+  protected JSON-RPC operation is stricter and performs a peer-bound preflight.
+- A follow-up transport failure cannot reuse the completed preflight. The next
+  operation independently re-resolves when needed and reverifies.
 - Timeout, RPC, and malformed-response failures block the current operation
   but can recover after a later matching probe.
 - An identity mismatch is sticky for the process lifetime. All later protected
@@ -74,7 +74,6 @@ The Prometheus plugin exports:
 
 - `nodeop_solana_cluster_identity{client_id,mode,status,reason}`
 - `nodeop_solana_cluster_identity_verification_age_seconds`
-- `nodeop_solana_cluster_identity_transport_session_id`
 - `nodeop_solana_cluster_identity_verification_attempts_total`
 - `nodeop_solana_cluster_identity_verification_successes_total`
 - `nodeop_solana_cluster_identity_verification_mismatches_total`

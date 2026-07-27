@@ -1,22 +1,20 @@
 #pragma once
 
-#include <sysio/http_plugin/http_plugin.hpp>
-#include <sysio/net_plugin/net_plugin.hpp>
-#include <sysio/producer_plugin/producer_plugin.hpp>
-#include <sysio/chain_plugin/tracked_votes.hpp>
-
+#include <array>
+#include <fc/log/logger.hpp>
 #include <fc/network/http/http_client.hpp>
 #include <fc/network/solana/solana_client.hpp>
 #include <magic_enum/magic_enum.hpp>
+#include <map>
 #include <prometheus/counter.h>
 #include <prometheus/info.h>
 #include <prometheus/registry.h>
 #include <prometheus/text_serializer.h>
-#include <fc/log/logger.hpp>
-
-#include <array>
-#include <map>
 #include <string>
+#include <sysio/chain_plugin/tracked_votes.hpp>
+#include <sysio/http_plugin/http_plugin.hpp>
+#include <sysio/net_plugin/net_plugin.hpp>
+#include <sysio/producer_plugin/producer_plugin.hpp>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
@@ -26,7 +24,7 @@ namespace sysio::metrics {
 
 struct catalog_type {
 
-   using Gauge   = prometheus::Gauge;
+   using Gauge = prometheus::Gauge;
    using Counter = prometheus::Counter;
 
    template <typename T>
@@ -96,7 +94,7 @@ struct catalog_type {
 
    struct block_metrics {
       Counter& num_blocks_created;
-      Gauge&   current_block_num;
+      Gauge& current_block_num;
       Counter& block_total_time_us_block;
       Counter& block_idle_time_us_block;
       Counter& block_num_success_trx_block;
@@ -139,7 +137,6 @@ struct catalog_type {
    struct solana_cluster_identity_metrics {
       prometheus::Family<Gauge>& state;
       prometheus::Family<Gauge>& verification_age_seconds;
-      prometheus::Family<Gauge>& transport_session_id;
       prometheus::Family<Counter>& verification_attempts;
       prometheus::Family<Counter>& verification_successes;
       prometheus::Family<Counter>& verification_mismatches;
@@ -153,7 +150,6 @@ struct catalog_type {
    struct tracked_solana_identity_series {
       Gauge* state = nullptr;
       Gauge* verification_age_seconds = nullptr;
-      Gauge* transport_session_id = nullptr;
       Counter* verification_attempts = nullptr;
       Counter* verification_successes = nullptr;
       Counter* verification_mismatches = nullptr;
@@ -162,8 +158,7 @@ struct catalog_type {
       std::map<fc::network::solana::solana_cluster_identity_operation, Counter*> blocked_operations;
       fc::network::solana::solana_cluster_identity_snapshot previous;
    };
-   std::unordered_map<std::string, tracked_solana_identity_series>
-      tracked_solana_identity_series_by_client;
+   std::unordered_map<std::string, tracked_solana_identity_series> tracked_solana_identity_series_by_client;
 
    catalog_type()
        : info(family<prometheus::Info>("nodeop", "static information about the server"))
@@ -261,9 +256,6 @@ struct catalog_type {
           , .verification_age_seconds{family<Gauge>(
                "nodeop_solana_cluster_identity_verification_age_seconds",
                "Age of the last successful Solana cluster identity verification; -1 when never verified")}
-          , .transport_session_id{family<Gauge>(
-               "nodeop_solana_cluster_identity_transport_session_id",
-               "Process-local authenticated transport session used for the last Solana identity verification")}
           , .verification_attempts{family<Counter>(
                "nodeop_solana_cluster_identity_verification_attempts_total",
                "Total Solana cluster identity verification attempts")}
@@ -286,15 +278,16 @@ struct catalog_type {
       for (const auto failure : magic_enum::enum_values<fc::http::failure_kind>()) {
          const auto index = magic_enum::enum_index(failure);
          FC_ASSERT(index, "Unknown outbound HTTP failure kind");
-         outbound_http_failure_counts[*index] =
-            &outbound_http_failures.Add({{"category", std::string(fc::http::failure_kind_name(failure))}});
+         outbound_http_failure_counts[*index] = &outbound_http_failures.Add({
+            {"category", std::string(fc::http::failure_kind_name(failure))}
+         });
       }
    }
 
    std::string report() {
       update_outbound_http_metrics();
       const prometheus::TextSerializer serializer;
-      auto                             result = serializer.Serialize(registry.Collect());
+      auto result = serializer.Serialize(registry.Collect());
       bytes_transferred.Increment(result.size());
       num_scrapes.Increment(1);
       return result;
@@ -305,21 +298,23 @@ struct catalog_type {
       const auto current = fc::http::get_metrics_snapshot();
       outbound_http_requests.Increment(current.requests - last_outbound_http_metrics.requests);
       outbound_http_successes.Increment(current.successes - last_outbound_http_metrics.successes);
-      outbound_http_request_bytes.Increment(
-         current.request_bytes - last_outbound_http_metrics.request_bytes);
-      outbound_http_response_bytes.Increment(
-         current.response_bytes - last_outbound_http_metrics.response_bytes);
+      outbound_http_request_bytes.Increment(current.request_bytes - last_outbound_http_metrics.request_bytes);
+      outbound_http_response_bytes.Increment(current.response_bytes - last_outbound_http_metrics.response_bytes);
       for (const auto failure : magic_enum::enum_values<fc::http::failure_kind>()) {
          const auto index = magic_enum::enum_index(failure);
          FC_ASSERT(index, "Unknown outbound HTTP failure kind");
-         outbound_http_failure_counts[*index]->Increment(
-            current.failures[*index] - last_outbound_http_metrics.failures[*index]);
+         outbound_http_failure_counts[*index]->Increment(current.failures[*index] -
+                                                         last_outbound_http_metrics.failures[*index]);
       }
       last_outbound_http_metrics = current;
    }
 
    void update(const http_plugin::metrics& metrics) {
-      http_request_counts.Add({{"handler", metrics.target}}).Increment(1);
+      http_request_counts
+         .Add({
+            {"handler", metrics.target}
+      })
+         .Increment(1);
    }
 
    void update(const net_plugin::p2p_connections_metrics& metrics) {
@@ -335,12 +330,15 @@ struct catalog_type {
 
       for (const auto& peer : metrics.stats.peers) {
          const std::string remote_ip = boost::asio::ip::make_address_v6(peer.address).to_string();
-         const std::string conn_num  = std::to_string(peer.connection_id);
-         const std::string key       = remote_ip + '|' + conn_num;
+         const std::string conn_num = std::to_string(peer.connection_id);
+         const std::string key = remote_ip + '|' + conn_num;
          live_keys.insert(key);
 
-         const prometheus::Labels labels{{"remote_ip", remote_ip}, {"connection_id", conn_num}};
-         auto&      handles    = tracked_p2p_series[key];
+         const prometheus::Labels labels{
+            {"remote_ip",     remote_ip},
+            {"connection_id", conn_num }
+         };
+         auto& handles = tracked_p2p_series[key];
          const bool first_seen = handles.empty();
 
          auto add_and_set_gauge = [&](prometheus::Family<Gauge>& fam, const auto& value) {
@@ -395,32 +393,24 @@ struct catalog_type {
 
       for (const auto& snapshot : snapshots) {
          live_clients.insert(snapshot.client_id);
-         auto [it, inserted] =
-            tracked_solana_identity_series_by_client.try_emplace(snapshot.client_id);
+         auto [it, inserted] = tracked_solana_identity_series_by_client.try_emplace(snapshot.client_id);
          auto& series = it->second;
-         const prometheus::Labels client_labels{{"client_id", snapshot.client_id}};
+         const prometheus::Labels client_labels{
+            {"client_id", snapshot.client_id}
+         };
 
          if (inserted) {
-            series.verification_age_seconds =
-               &solana_identity_metrics.verification_age_seconds.Add(client_labels);
-            series.transport_session_id =
-               &solana_identity_metrics.transport_session_id.Add(client_labels);
-            series.verification_attempts =
-               &solana_identity_metrics.verification_attempts.Add(client_labels);
-            series.verification_successes =
-               &solana_identity_metrics.verification_successes.Add(client_labels);
-            series.verification_mismatches =
-               &solana_identity_metrics.verification_mismatches.Add(client_labels);
-            series.verification_failures =
-               &solana_identity_metrics.verification_failures.Add(client_labels);
-            series.verification_recoveries =
-               &solana_identity_metrics.verification_recoveries.Add(client_labels);
-            for (const auto operation :
-                 magic_enum::enum_values<solana_cluster_identity_operation>()) {
+            series.verification_age_seconds = &solana_identity_metrics.verification_age_seconds.Add(client_labels);
+            series.verification_attempts = &solana_identity_metrics.verification_attempts.Add(client_labels);
+            series.verification_successes = &solana_identity_metrics.verification_successes.Add(client_labels);
+            series.verification_mismatches = &solana_identity_metrics.verification_mismatches.Add(client_labels);
+            series.verification_failures = &solana_identity_metrics.verification_failures.Add(client_labels);
+            series.verification_recoveries = &solana_identity_metrics.verification_recoveries.Add(client_labels);
+            for (const auto operation : magic_enum::enum_values<solana_cluster_identity_operation>()) {
                auto operation_labels = client_labels;
                operation_labels.emplace("operation", std::string(magic_enum::enum_name(operation)));
-               series.blocked_operations.emplace(
-                  operation, &solana_identity_metrics.blocked_operations.Add(operation_labels));
+               series.blocked_operations.emplace(operation,
+                                                 &solana_identity_metrics.blocked_operations.Add(operation_labels));
             }
          } else {
             solana_identity_metrics.state.Remove(series.state);
@@ -433,10 +423,7 @@ struct catalog_type {
          series.state = &solana_identity_metrics.state.Add(state_labels);
          series.state->Set(1);
          series.verification_age_seconds->Set(
-            snapshot.verification_age
-               ? static_cast<double>(snapshot.verification_age->count()) / 1'000'000.0
-               : -1.0);
-         series.transport_session_id->Set(snapshot.transport_session_id);
+            snapshot.verification_age ? static_cast<double>(snapshot.verification_age->count()) / 1'000'000.0 : -1.0);
 
          increment_from_snapshot(*series.verification_attempts, snapshot.verification_attempts,
                                  series.previous.verification_attempts);
@@ -448,11 +435,9 @@ struct catalog_type {
                                  series.previous.verification_failures);
          increment_from_snapshot(*series.verification_recoveries, snapshot.verification_recoveries,
                                  series.previous.verification_recoveries);
-         for (const auto operation :
-              magic_enum::enum_values<solana_cluster_identity_operation>()) {
-            const auto current = snapshot.blocked_operations.contains(operation)
-                                    ? snapshot.blocked_operations.at(operation)
-                                    : 0;
+         for (const auto operation : magic_enum::enum_values<solana_cluster_identity_operation>()) {
+            const auto current =
+               snapshot.blocked_operations.contains(operation) ? snapshot.blocked_operations.at(operation) : 0;
             const auto previous = series.previous.blocked_operations.contains(operation)
                                      ? series.previous.blocked_operations.at(operation)
                                      : 0;
@@ -471,7 +456,6 @@ struct catalog_type {
          auto& series = it->second;
          solana_identity_metrics.state.Remove(series.state);
          solana_identity_metrics.verification_age_seconds.Remove(series.verification_age_seconds);
-         solana_identity_metrics.transport_session_id.Remove(series.transport_session_id);
          solana_identity_metrics.verification_attempts.Remove(series.verification_attempts);
          solana_identity_metrics.verification_successes.Remove(series.verification_successes);
          solana_identity_metrics.verification_mismatches.Remove(series.verification_mismatches);
@@ -515,9 +499,7 @@ struct catalog_type {
       head_block_num.Set(metrics.head_block_num);
    }
 
-   void update(const speculative_block_metrics& metrics) {
-      update(speculative_metrics, metrics);
-   }
+   void update(const speculative_block_metrics& metrics) { update(speculative_metrics, metrics); }
 
    void update(const incoming_block_metrics& metrics) {
       trxs_incoming_total.Increment(metrics.trxs_incoming_total);
@@ -534,17 +516,19 @@ struct catalog_type {
 
    void update_prometheus_info() {
       info_details = info.Add({
-            {"server_version", fc::itoh(static_cast<uint32_t>(app().version()))},
-            {"chain_id", app().get_plugin<chain_plugin>().get_chain_id().str()},
-            {"server_version_string", app().version_string()},
-            {"server_full_version_string", app().full_version_string()},
-            {"earliest_available_block_num", to_string(app().get_plugin<chain_plugin>().chain().earliest_available_block_num())}
-         });
+         {"server_version",               fc::itoh(static_cast<uint32_t>(app().version()))     },
+         {"chain_id",                     app().get_plugin<chain_plugin>().get_chain_id().str()},
+         {"server_version_string",        app().version_string()                               },
+         {"server_full_version_string",   app().full_version_string()                          },
+         {"earliest_available_block_num",
+          to_string(app().get_plugin<chain_plugin>().chain().earliest_available_block_num())   }
+      });
    }
    void register_update_handlers(boost::asio::io_context::strand& strand) {
       auto& http = app().get_plugin<http_plugin>();
-      http.register_update_metrics(
-          [&strand, this](http_plugin::metrics metrics) { boost::asio::post(strand, [metrics = std::move(metrics), this]() { update(metrics); }); });
+      http.register_update_metrics([&strand, this](http_plugin::metrics metrics) {
+         boost::asio::post(strand, [metrics = std::move(metrics), this]() { update(metrics); });
+      });
 
       auto& net = app().get_plugin<net_plugin>();
 
@@ -556,26 +540,23 @@ struct catalog_type {
          // Increment is thread safe
          failed_p2p_connections.Increment(1);
       });
-      net.register_increment_dropped_trxs([this]() { 
+      net.register_increment_dropped_trxs([this]() {
          // Increment is thread safe
          dropped_trxs_total.Increment(1);
       });
 
       auto& producer = app().get_plugin<producer_plugin>();
-      producer.register_update_speculative_block_metrics(
-              [&strand, this](const speculative_block_metrics& metrics) {
-                 boost::asio::post(strand,[metrics, this]() { update(metrics); });
-              });
+      producer.register_update_speculative_block_metrics([&strand, this](const speculative_block_metrics& metrics) {
+         boost::asio::post(strand, [metrics, this]() { update(metrics); });
+      });
 
       auto& chain = app().get_plugin<chain_plugin>().chain();
-      chain.register_update_produced_block_metrics(
-          [&strand, this](const produced_block_metrics& metrics) {
-             boost::asio::post(strand, [metrics, this]() { update(metrics); });
-          });
-      chain.register_update_incoming_block_metrics(
-          [&strand, this](const incoming_block_metrics& metrics) {
-             boost::asio::post(strand, [metrics, this]() { update(metrics); });
-          });
+      chain.register_update_produced_block_metrics([&strand, this](const produced_block_metrics& metrics) {
+         boost::asio::post(strand, [metrics, this]() { update(metrics); });
+      });
+      chain.register_update_incoming_block_metrics([&strand, this](const incoming_block_metrics& metrics) {
+         boost::asio::post(strand, [metrics, this]() { update(metrics); });
+      });
    }
 };
 

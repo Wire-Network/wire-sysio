@@ -107,7 +107,7 @@ Two optional bounded-verification settings apply in pinned mode:
 
 | Option | Default | Description |
 |---|---:|---|
-| `--outpost-solana-cluster-identity-max-age-ms` | `30000` | Maximum successful-verification age before reads reverify |
+| `--outpost-solana-cluster-identity-max-age-ms` | `30000` | Maximum successful-verification age used for freshness telemetry; protected RPCs still preflight every call |
 | `--outpost-solana-cluster-identity-probe-timeout-ms` | `5000` | Deadline for startup and runtime `getGenesisHash` probes |
 
 Signing and submission always force a fresh identity probe. A mismatch is
@@ -161,20 +161,20 @@ solana-idl-file = ./idl/counter_anchor.json
 
 Pinned clients verify `getGenesisHash` during construction before the plugin
 publishes any client. Runtime verification and each protected JSON-RPC call use
-the same authenticated HTTP transport session. If the verified session closes,
-the protected operation fails closed instead of falling back to another cached
-connection.
+one exact authenticated HTTP/TLS connection. If that connection closes before
+the follow-up, the protected operation fails closed instead of reconnecting or
+falling back to another cached connection.
 
-Read operations may reuse a successful observation only up to the configured
-maximum age. Every state-changing path forces a fresh observation before
-transaction construction, simulation, fee estimation, signing, or submission.
-Identity mismatch is sticky for the process lifetime.
+Every protected JSON-RPC operation performs a peer-bound preflight, including
+reads, transaction construction, simulation, fee estimation, and submission.
+Signing independently forces a fresh bounded observation immediately before
+the signer is invoked. Identity mismatch is sticky for the process lifetime.
 
-Prometheus exposes bounded-cardinality state, verification age, transport
-session id, attempt/success/mismatch/failure/recovery counters, and blocked
-operation counters. Labels contain only configured client IDs and fixed enums;
-URL credentials, signer IDs, expected/observed hashes, transactions, and
-account payloads are not metric labels.
+Prometheus exposes bounded-cardinality state, verification age,
+attempt/success/mismatch/failure/recovery counters, and blocked-operation
+counters. Labels contain only configured client IDs and fixed enums; URL
+credentials, signer IDs, expected/observed hashes, transactions, and account
+payloads are not metric labels.
 
 The absent-option legacy mode is a compatibility window for the initial
 release. Operators should add identities for all clients together. A later

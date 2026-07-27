@@ -831,12 +831,8 @@ BOOST_AUTO_TEST_CASE(continuation_followup_has_independent_total_timeout) {
 
 /// An idempotent call retries once when its cached connection has gone stale.
 BOOST_AUTO_TEST_CASE(idempotent_call_recovers_from_a_stale_cached_connection) {
-   reusable_json_rpc_server server(
-      reusable_json_rpc_server::behavior::stale_after_first_response);
-   fc::network::json_rpc::json_rpc_client client(
-      fc::url(
-         "http://127.0.0.1:" +
-         std::to_string(server.port())));
+   reusable_json_rpc_server server(reusable_json_rpc_server::behavior::stale_after_first_response);
+   fc::network::json_rpc::json_rpc_client client(fc::url("http://127.0.0.1:" + std::to_string(server.port())));
 
    BOOST_CHECK_EQUAL(
       client.call_idempotent("wire_first_probe").as_string(),

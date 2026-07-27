@@ -103,7 +103,6 @@ enum class solana_cluster_identity_reason {
    malformed_observed_identity,
    identity_mismatch,
    verification_stale,
-   transport_session_changed,
    verification_recovered
 };
 
@@ -145,7 +144,6 @@ struct solana_cluster_identity_snapshot {
    std::optional<std::string> observed_genesis_hash;
    std::optional<fc::time_point> verified_at;
    std::optional<fc::microseconds> verification_age;
-   std::uint64_t transport_session_id = 0;
    std::uint64_t verification_attempts = 0;
    std::uint64_t verification_successes = 0;
    std::uint64_t verification_mismatches = 0;
@@ -637,8 +635,7 @@ public:
     * @param url_source The URL of the Solana RPC node
     * @param rpc_options authenticated transport and bounded request policy
     */
-   solana_client(const signature_provider_ptr& sig_provider,
-                 const std::variant<std::string, fc::url>& url_source,
+   solana_client(const signature_provider_ptr& sig_provider, const std::variant<std::string, fc::url>& url_source,
                  client_options rpc_options = {});
 
    /**
@@ -654,8 +651,7 @@ public:
     *                        and freshness policy.
     */
    solana_client(const signature_provider_ptr& sig_provider, const std::variant<std::string, fc::url>& url_source,
-                 solana_cluster_identity_config identity_config,
-                 client_options rpc_options = {});
+                 solana_cluster_identity_config identity_config, client_options rpc_options = {});
 
    /**
     * @brief Execute a raw JSON-RPC method call
@@ -1096,7 +1092,6 @@ private:
    solana_cluster_identity_reason _cluster_identity_reason;
    std::optional<solana_genesis_hash> _last_observed_genesis_hash;
    std::optional<fc::time_point> _last_verified_at;
-   std::uint64_t _verified_transport_session_id = 0;
    std::uint64_t _verification_attempts = 0;
    std::uint64_t _verification_successes = 0;
    std::uint64_t _verification_mismatches = 0;
@@ -1129,8 +1124,7 @@ private:
    /** Validate and record one `getGenesisHash` result. */
    void record_cluster_identity_observation_locked(solana_cluster_identity_operation operation,
                                                    const fc::variant& observed_result,
-                                                   solana_cluster_identity_status previous_status,
-                                                   solana_cluster_identity_reason previous_reason);
+                                                   solana_cluster_identity_status previous_status);
    /** Reverify pinned identity when required or block the protected operation. */
    void ensure_cluster_verified_locked(solana_cluster_identity_operation operation, bool force_fresh);
    /** Publish verification state without holding the RPC gate during later scrapes. */

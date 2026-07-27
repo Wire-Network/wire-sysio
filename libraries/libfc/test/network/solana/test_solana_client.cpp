@@ -323,6 +323,10 @@ BOOST_AUTO_TEST_CASE(test_genesis_hash_requires_canonical_base58_and_exact_lengt
    std::vector<char> long_bytes(33, 1);
    BOOST_CHECK_THROW(parse_solana_genesis_hash(fc::to_base58(short_bytes, fc::yield_function_t{})), fc::exception);
    BOOST_CHECK_THROW(parse_solana_genesis_hash(fc::to_base58(long_bytes, fc::yield_function_t{})), fc::exception);
+   BOOST_CHECK_EXCEPTION(
+      parse_solana_genesis_hash(std::string(45, 'z')), fc::exception, [](const fc::exception& error) {
+         return error.to_detail_string().find("must not exceed 44 encoded bytes") != std::string::npos;
+      });
 }
 
 BOOST_AUTO_TEST_CASE(test_legacy_client_performs_no_identity_probe) {
@@ -380,6 +384,21 @@ BOOST_AUTO_TEST_CASE(test_pinned_client_rejects_startup_mismatch) {
 
    BOOST_CHECK_THROW(solana_client(test_solana_signature_provider(), server.url(), test_identity_config(expected)),
                      fc::exception);
+   BOOST_CHECK_EQUAL(server.request_count(), 1u);
+}
+
+/// An oversized RPC identity is rejected before the quadratic base58 decoder.
+BOOST_AUTO_TEST_CASE(test_pinned_client_rejects_oversized_observed_identity) {
+   const auto expected = test_genesis_hash(1);
+   fc::test::scripted_json_rpc_server server({
+      fc::test::scripted_json_rpc_response::result(std::string(4096, 'z')),
+   });
+
+   BOOST_CHECK_EXCEPTION(solana_client(test_solana_signature_provider(), server.url(), test_identity_config(expected)),
+                         fc::exception, [](const fc::exception& error) {
+                            return error.to_detail_string().find("must not exceed 44 encoded bytes") !=
+                                   std::string::npos;
+                         });
    BOOST_CHECK_EQUAL(server.request_count(), 1u);
 }
 
@@ -455,7 +474,7 @@ BOOST_AUTO_TEST_CASE(test_rpc_verification_is_peer_bound_even_while_cached_ident
    BOOST_CHECK_EQUAL(std::ranges::count(server.request_methods(), "getGenesisHash"), 4);
 }
 
-BOOST_AUTO_TEST_CASE(test_transport_failure_invalidates_identity_and_matching_probe_recovers) {
+BOOST_AUTO_TEST_CASE(test_followup_transport_failure_requires_a_new_peer_bound_probe) {
    const auto expected = test_genesis_hash(1);
    fc::test::scripted_json_rpc_server server({
       fc::test::scripted_json_rpc_response::result(expected),
@@ -471,8 +490,8 @@ BOOST_AUTO_TEST_CASE(test_transport_failure_invalidates_identity_and_matching_pr
 
    const auto snapshot = client.get_cluster_identity_snapshot();
    BOOST_CHECK(snapshot.status == solana_cluster_identity_status::verified);
-   BOOST_CHECK(snapshot.reason == solana_cluster_identity_reason::verification_recovered);
-   BOOST_CHECK_EQUAL(snapshot.verification_recoveries, 1u);
+   BOOST_CHECK(snapshot.reason == solana_cluster_identity_reason::none);
+   BOOST_CHECK_EQUAL(snapshot.verification_recoveries, 0u);
 }
 
 BOOST_AUTO_TEST_CASE(test_hanging_runtime_probe_times_out_before_signing) {
@@ -494,7 +513,7 @@ BOOST_AUTO_TEST_CASE(test_hanging_runtime_probe_times_out_before_signing) {
    BOOST_CHECK(snapshot.reason == solana_cluster_identity_reason::rpc_timeout);
 }
 
-BOOST_AUTO_TEST_CASE(test_concurrent_reads_each_bind_identity_to_their_transport_session) {
+BOOST_AUTO_TEST_CASE(test_concurrent_reads_each_bind_identity_to_their_exact_connection) {
    constexpr size_t caller_count = 4;
    const auto expected = test_genesis_hash(1);
    auto clock = std::make_shared<fc::time_point>(fc::time_point::now());
@@ -527,8 +546,7 @@ BOOST_AUTO_TEST_CASE(test_concurrent_reads_each_bind_identity_to_their_transport
 
 BOOST_AUTO_TEST_CASE(test_operation_gate_uses_real_clock_for_task_deadline) {
    const auto expected = test_genesis_hash(1);
-   auto freshness_clock =
-      std::make_shared<fc::time_point>(fc::time_point::now() + fc::seconds(60));
+   auto freshness_clock = std::make_shared<fc::time_point>(fc::time_point::now() + fc::seconds(60));
    fc::test::scripted_json_rpc_server server({
       fc::test::scripted_json_rpc_response::result(expected),
       fc::test::scripted_json_rpc_response::result(expected),
@@ -546,8 +564,7 @@ BOOST_AUTO_TEST_CASE(test_probe_timeout_does_not_cap_verified_protected_response
    fc::test::scripted_json_rpc_server server({
       fc::test::scripted_json_rpc_response::result(expected),
       fc::test::scripted_json_rpc_response::result(expected),
-      fc::test::scripted_json_rpc_response::delayed_result(
-         "ok", std::chrono::milliseconds(125)),
+      fc::test::scripted_json_rpc_response::delayed_result("ok", std::chrono::milliseconds(125)),
    });
    solana_client client(test_solana_signature_provider(), server.url(),
                         test_identity_config(expected, fc::seconds(30), fc::milliseconds(50)));

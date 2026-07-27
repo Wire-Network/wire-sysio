@@ -35,8 +35,7 @@ std::string sanitize_endpoint(const std::variant<std::string, fc::url>& source) 
  * Construct a transport while the configured startup deadline is active.
  */
 json_rpc_client create_pinned_rpc_client(const std::variant<std::string, fc::url>& source,
-                                         fc::microseconds probe_timeout,
-                                         client_options rpc_options) {
+                                         fc::microseconds probe_timeout, client_options rpc_options) {
    FC_ASSERT(probe_timeout.count() > 0, "Solana cluster identity probe timeout must be positive");
    fc::task::deadline_scope deadline(fc::task::clamp_to_current_deadline(fc::time_point::now() + probe_timeout));
    return json_rpc_client::create(source, std::move(rpc_options));
@@ -168,7 +167,11 @@ std::optional<size_t> min_borsh_encoded_size(const idl::idl_type& type, const id
 } // namespace
 
 solana_genesis_hash parse_solana_genesis_hash(const std::string& value) {
+   constexpr size_t maximum_encoded_genesis_hash_bytes = 44;
+
    FC_ASSERT(!value.empty(), "Solana genesis hash must not be empty");
+   FC_ASSERT(value.size() <= maximum_encoded_genesis_hash_bytes, "Solana genesis hash must not exceed {} encoded bytes",
+             maximum_encoded_genesis_hash_bytes);
 
    std::vector<char> decoded;
    try {
@@ -927,8 +930,7 @@ std::vector<account_meta> solana_program_client::resolve_accounts(const idl::ins
 //=============================================================================
 
 solana_client::solana_client(const signature_provider_ptr& sig_provider,
-                             const std::variant<std::string, fc::url>& url_source,
-                             client_options rpc_options)
+                             const std::variant<std::string, fc::url>& url_source, client_options rpc_options)
    : _signature_provider(sig_provider)
    , _pubkey(from_fc_public_key(_signature_provider->public_key))
    , _cluster_identity(std::nullopt)
@@ -941,16 +943,12 @@ solana_client::solana_client(const signature_provider_ptr& sig_provider,
 
 solana_client::solana_client(const signature_provider_ptr& sig_provider,
                              const std::variant<std::string, fc::url>& url_source,
-                             solana_cluster_identity_config identity_config,
-                             client_options rpc_options)
+                             solana_cluster_identity_config identity_config, client_options rpc_options)
    : _signature_provider(sig_provider)
    , _pubkey(from_fc_public_key(_signature_provider->public_key))
    , _cluster_identity(std::move(identity_config))
    , _sanitized_endpoint(sanitize_endpoint(url_source))
-   , _client(create_pinned_rpc_client(
-        url_source,
-        _cluster_identity->probe_timeout,
-        std::move(rpc_options)))
+   , _client(create_pinned_rpc_client(url_source, _cluster_identity->probe_timeout, std::move(rpc_options)))
    , _cluster_identity_status(solana_cluster_identity_status::unverified)
    , _cluster_identity_reason(solana_cluster_identity_reason::none) {
    FC_ASSERT(!_cluster_identity->client_id.empty(), "Solana cluster identity client id must not be empty");
@@ -1013,36 +1011,34 @@ fc::variant solana_client::execute_locked(const std::string& method, const fc::v
    }
 
    // Every protected RPC is preceded by getGenesisHash on the exact same
-   // HTTP/TLS connection. A cached observation can describe telemetry and
-   // signing freshness, but it cannot authorize a new transport session.
+   // opaque HTTP/TLS connection. Cached evidence remains telemetry only.
    (void)cluster_verification_required_locked(operation, true);
    const auto previous_status = _cluster_identity_status;
-   const auto previous_reason = _cluster_identity_reason;
    ++_verification_attempts;
 
    bool observation_received = false;
    try {
-      return _client.call_after_verification(
-         "getGenesisHash", fc::variants{},
-         [&](const fc::variant& observed_result) {
-            observation_received = true;
-            record_cluster_identity_observation_locked(operation, observed_result, previous_status, previous_reason);
-         },
-         _cluster_identity->probe_timeout,
-         method, params);
+      return _client.call_then("getGenesisHash", fc::variants{},
+                               continuation_options{
+                                  .initial_timeout = _cluster_identity->probe_timeout,
+                                  .initial_idempotent = true,
+                               },
+                               [&](const fc::variant& observed_result) {
+                                  observation_received = true;
+                                  record_cluster_identity_observation_locked(operation, observed_result,
+                                                                             previous_status);
+                                  return continuation_call{
+                                     .method = method,
+                                     .params = params,
+                                  };
+                               });
    } catch (const fc::timeout_exception&) {
       if (!observation_received) {
-         record_cluster_verification_failure_locked(operation, solana_cluster_identity_reason::rpc_timeout);
-      } else if (_cluster_identity_status == solana_cluster_identity_status::verified &&
-                 _client.last_transport_session_id() == 0) {
          record_cluster_verification_failure_locked(operation, solana_cluster_identity_reason::rpc_timeout);
       }
       throw;
    } catch (const std::exception&) {
       if (!observation_received) {
-         record_cluster_verification_failure_locked(operation, solana_cluster_identity_reason::rpc_error);
-      } else if (_cluster_identity_status == solana_cluster_identity_status::verified &&
-                 _client.last_transport_session_id() == 0) {
          record_cluster_verification_failure_locked(operation, solana_cluster_identity_reason::rpc_error);
       }
       throw;
@@ -1073,13 +1069,6 @@ bool solana_client::cluster_verification_required_locked(solana_cluster_identity
    }
 
    const auto now = _cluster_identity->verification_clock();
-   const auto current_transport_session_id = _client.last_transport_session_id();
-   if (_cluster_identity_status == solana_cluster_identity_status::verified &&
-       _verified_transport_session_id != current_transport_session_id) {
-      _cluster_identity_status = solana_cluster_identity_status::stale;
-      _cluster_identity_reason = solana_cluster_identity_reason::transport_session_changed;
-   }
-
    if (_cluster_identity_status == solana_cluster_identity_status::verified && _last_verified_at &&
        now - *_last_verified_at >= _cluster_identity->maximum_verification_age) {
       _cluster_identity_status = solana_cluster_identity_status::stale;
@@ -1102,18 +1091,16 @@ void solana_client::record_cluster_verification_failure_locked(solana_cluster_id
    publish_cluster_identity_snapshot_locked();
 }
 
-void solana_client::record_cluster_identity_observation_locked(
-   solana_cluster_identity_operation operation,
-   const fc::variant& observed_result,
-   solana_cluster_identity_status previous_status,
-   solana_cluster_identity_reason previous_reason) {
+void solana_client::record_cluster_identity_observation_locked(solana_cluster_identity_operation operation,
+                                                               const fc::variant& observed_result,
+                                                               solana_cluster_identity_status previous_status) {
    solana_genesis_hash observed;
    try {
       FC_ASSERT(observed_result.is_string(), "Solana getGenesisHash result must be a string");
       observed = parse_solana_genesis_hash(observed_result.as_string());
    } catch (const std::exception&) {
-      record_cluster_verification_failure_locked(
-         operation, solana_cluster_identity_reason::malformed_observed_identity);
+      record_cluster_verification_failure_locked(operation,
+                                                 solana_cluster_identity_reason::malformed_observed_identity);
       throw;
    }
 
@@ -1125,30 +1112,25 @@ void solana_client::record_cluster_identity_observation_locked(
       record_blocked_operation_locked(operation);
       elog("Solana cluster identity mismatch "
            "(client_id={},endpoint={},status={},reason={},operation={})",
-           _cluster_identity->client_id, _sanitized_endpoint,
-           magic_enum::enum_name(_cluster_identity_status),
+           _cluster_identity->client_id, _sanitized_endpoint, magic_enum::enum_name(_cluster_identity_status),
            magic_enum::enum_name(_cluster_identity_reason), magic_enum::enum_name(operation));
       publish_cluster_identity_snapshot_locked();
       FC_THROW("Solana cluster identity mismatch for client '{}'", _cluster_identity->client_id);
    }
 
-   const bool recovered = previous_status == solana_cluster_identity_status::error ||
-                          (previous_status == solana_cluster_identity_status::stale &&
-                           previous_reason == solana_cluster_identity_reason::transport_session_changed);
+   const bool recovered = previous_status == solana_cluster_identity_status::error;
    _cluster_identity_status = solana_cluster_identity_status::verified;
    _cluster_identity_reason =
       recovered ? solana_cluster_identity_reason::verification_recovered : solana_cluster_identity_reason::none;
    _last_verified_at = _cluster_identity->verification_clock();
-   _verified_transport_session_id = _client.last_transport_session_id();
    ++_verification_successes;
 
    if (recovered) {
       ++_verification_recoveries;
       wlog("Solana cluster identity verification recovered "
            "(client_id={},endpoint={},status={},reason={},operation={})",
-           _cluster_identity->client_id, _sanitized_endpoint,
-           magic_enum::enum_name(_cluster_identity_status), magic_enum::enum_name(_cluster_identity_reason),
-           magic_enum::enum_name(operation));
+           _cluster_identity->client_id, _sanitized_endpoint, magic_enum::enum_name(_cluster_identity_status),
+           magic_enum::enum_name(_cluster_identity_reason), magic_enum::enum_name(operation));
    }
    publish_cluster_identity_snapshot_locked();
 }
@@ -1159,7 +1141,6 @@ void solana_client::ensure_cluster_verified_locked(solana_cluster_identity_opera
    }
 
    const auto previous_status = _cluster_identity_status;
-   const auto previous_reason = _cluster_identity_reason;
    ++_verification_attempts;
 
    fc::variant observed_result;
@@ -1175,7 +1156,7 @@ void solana_client::ensure_cluster_verified_locked(solana_cluster_identity_opera
       throw;
    }
 
-   record_cluster_identity_observation_locked(operation, observed_result, previous_status, previous_reason);
+   record_cluster_identity_observation_locked(operation, observed_result, previous_status);
 }
 
 void solana_client::publish_cluster_identity_snapshot_locked() {
@@ -1191,7 +1172,6 @@ void solana_client::publish_cluster_identity_snapshot_locked() {
          _last_observed_genesis_hash ? std::optional(_last_observed_genesis_hash->canonical) : std::nullopt,
       .verified_at = _last_verified_at,
       .verification_age = std::nullopt,
-      .transport_session_id = _client.last_transport_session_id(),
       .verification_attempts = _verification_attempts,
       .verification_successes = _verification_successes,
       .verification_mismatches = _verification_mismatches,
@@ -1210,13 +1190,6 @@ solana_cluster_identity_snapshot solana_client::get_cluster_identity_snapshot() 
       snapshot = _published_identity_snapshot;
    }
 
-   const auto current_transport_session_id = _client.last_transport_session_id();
-   if (snapshot.status == solana_cluster_identity_status::verified &&
-       snapshot.transport_session_id != current_transport_session_id) {
-      snapshot.status = solana_cluster_identity_status::stale;
-      snapshot.reason = solana_cluster_identity_reason::transport_session_changed;
-   }
-   snapshot.transport_session_id = current_transport_session_id;
    if (snapshot.verified_at) {
       const auto now = _cluster_identity ? _cluster_identity->verification_clock() : fc::time_point::now();
       snapshot.verification_age = now - *snapshot.verified_at;

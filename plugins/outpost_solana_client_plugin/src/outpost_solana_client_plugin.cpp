@@ -1,6 +1,5 @@
 #include <fc/log/logger.hpp>
 #include <magic_enum/magic_enum.hpp>
-
 #include <ranges>
 #include <set>
 
@@ -12,11 +11,11 @@
 namespace sysio {
 
 namespace {
-constexpr auto option_name_client          = "outpost-solana-client";
+constexpr auto option_name_client = "outpost-solana-client";
 constexpr auto option_name_cluster_identity = "outpost-solana-cluster-identity";
 constexpr auto option_name_identity_max_age = "outpost-solana-cluster-identity-max-age-ms";
 constexpr auto option_name_identity_timeout = "outpost-solana-cluster-identity-probe-timeout-ms";
-constexpr auto option_idl_file             = "solana-idl-file";
+constexpr auto option_idl_file = "solana-idl-file";
 constexpr auto option_outpost_program_name = "solana-outpost-program-name";
 constexpr outbound_http::transport_option_names
    transport_option_names{
@@ -34,7 +33,7 @@ struct parsed_client_spec {
    std::string id;
    std::string signature_provider_id;
    std::string rpc_url;
-   fc::url     parsed_rpc_url;
+   fc::url parsed_rpc_url;
 };
 
 [[maybe_unused]] inline fc::logger& logger() {
@@ -56,9 +55,7 @@ public:
       _outpost_program_name = std::move(name);
    }
 
-   const std::string& outpost_program_name() const {
-      return _outpost_program_name;
-   }
+   const std::string& outpost_program_name() const { return _outpost_program_name; }
 
    // Called only from plugin_initialize -- sequential, main-thread -- so the IDL list needs no synchronization.
    std::vector<file_idl_programs_t> load_idl_files(const std::vector<std::filesystem::path>& file_names) {
@@ -93,9 +90,7 @@ public:
       return snapshots;
    }
 
-   solana_client_entry_ptr get_client(const std::string& id) {
-      return _clients.at(id);
-   }
+   solana_client_entry_ptr get_client(const std::string& id) { return _clients.at(id); }
 
    void add_client(const std::string& id, solana_client_entry_ptr client) {
       FC_ASSERT(client, "Client cannot be null");
@@ -103,10 +98,7 @@ public:
       _clients.emplace(id, client);
    }
 
-   const std::vector<file_idl_programs_t>& get_idl_files() {
-      return _idl_files;
-   }
-
+   const std::vector<file_idl_programs_t>& get_idl_files() { return _idl_files; }
 };
 
 outpost_solana_client_plugin::outpost_solana_client_plugin()
@@ -121,8 +113,7 @@ void outpost_solana_client_plugin::plugin_initialize(const variables_map& option
    }
    my->set_outpost_program_name(options.at(option_outpost_program_name).as<std::string>());
    ilog("Solana OPP outpost program name: {}", my->outpost_program_name());
-   FC_ASSERT(options.count(option_name_client),
-             "At least one solana client argument is required {}",
+   FC_ASSERT(options.count(option_name_client), "At least one solana client argument is required {}",
              option_name_client);
 
    // This plugin APPBASE_PLUGIN_REQUIRES the signature_provider_manager_plugin, which creates every configured provider
@@ -141,48 +132,42 @@ void outpost_solana_client_plugin::plugin_initialize(const variables_map& option
 
    for (const auto& client_spec : client_specs) {
       auto parts = fc::split(client_spec, ',');
-      SYS_ASSERT(parts.size() == 3,
-                 chain::plugin_config_exception,
-                 "Invalid {} spec (expected exactly: <client-id>,<sig-provider-id>,<rpc-url>)",
-                 option_name_client);
+      SYS_ASSERT(parts.size() == 3, chain::plugin_config_exception,
+                 "Invalid {} spec (expected exactly: <client-id>,<sig-provider-id>,<rpc-url>)", option_name_client);
 
-      auto& id     = parts[0];
+      auto& id = parts[0];
       auto& sig_id = parts[1];
-      auto& url    = parts[2];
-      SYS_ASSERT(!id.empty(), chain::plugin_config_exception,
-                 "Invalid {} spec: Solana client id must not be empty", option_name_client);
+      auto& url = parts[2];
+      SYS_ASSERT(!id.empty(), chain::plugin_config_exception, "Invalid {} spec: Solana client id must not be empty",
+                 option_name_client);
       SYS_ASSERT(!sig_id.empty(), chain::plugin_config_exception,
-                 "Invalid {} spec for client '{}': signature provider reference must not be empty",
-                 option_name_client, id);
+                 "Invalid {} spec for client '{}': signature provider reference must not be empty", option_name_client,
+                 id);
       SYS_ASSERT(!url.empty(), chain::plugin_config_exception,
                  "Invalid {} spec for client '{}': RPC URL must not be empty", option_name_client, id);
-      SYS_ASSERT(client_ids.emplace(id).second, chain::plugin_config_exception,
-                 "Duplicate {} client id '{}'", option_name_client, id);
-      SYS_ASSERT(sig_mgr.is_explicitly_configured_provider(sig_id),
-                 chain::plugin_config_exception,
-                 "Outpost Solana client '{}' does not reference an explicitly configured signature provider",
-                 id);
+      SYS_ASSERT(client_ids.emplace(id).second, chain::plugin_config_exception, "Duplicate {} client id '{}'",
+                 option_name_client, id);
+      SYS_ASSERT(sig_mgr.is_explicitly_configured_provider(sig_id), chain::plugin_config_exception,
+                 "Outpost Solana client '{}' does not reference an explicitly configured signature provider", id);
 
       auto sig_provider = sig_mgr.get_provider(sig_id);
       SYS_ASSERT(sig_provider->target_chain == fc::crypto::chain_kind_solana &&
                     sig_provider->key_type == fc::crypto::chain_key_type_solana,
                  chain::plugin_config_exception,
-                 "Outpost Solana client '{}' signature provider must use chain=solana and key-type=solana",
-                 id);
+                 "Outpost Solana client '{}' signature provider must use chain=solana and key-type=solana", id);
 
       fc::url parsed_rpc_url;
       try {
          parsed_rpc_url = fc::url(url);
       } catch (const std::exception&) {
-         SYS_ASSERT(false, chain::plugin_config_exception,
-                    "Invalid {} spec for client '{}': RPC URL is malformed",
+         SYS_ASSERT(false, chain::plugin_config_exception, "Invalid {} spec for client '{}': RPC URL is malformed",
                     option_name_client, id);
       }
-      SYS_ASSERT((parsed_rpc_url.proto() == "http" || parsed_rpc_url.proto() == "https") &&
-                    parsed_rpc_url.host() && !parsed_rpc_url.host()->empty(),
+      SYS_ASSERT((parsed_rpc_url.proto() == "http" || parsed_rpc_url.proto() == "https") && parsed_rpc_url.host() &&
+                    !parsed_rpc_url.host()->empty(),
                  chain::plugin_config_exception,
-                 "Invalid {} spec for client '{}': RPC URL must contain an HTTP(S) scheme and host",
-                 option_name_client, id);
+                 "Invalid {} spec for client '{}': RPC URL must contain an HTTP(S) scheme and host", option_name_client,
+                 id);
 
       parsed_clients.push_back(parsed_client_spec{id, sig_id, url, std::move(parsed_rpc_url)});
    }
@@ -210,8 +195,7 @@ void outpost_solana_client_plugin::plugin_initialize(const variables_map& option
          try {
             expected_identities.emplace(client_id, parse_solana_genesis_hash(expected_hash));
          } catch (const std::exception&) {
-            SYS_ASSERT(false, chain::plugin_config_exception,
-                       "Invalid {} spec for client '{}': reason={}",
+            SYS_ASSERT(false, chain::plugin_config_exception, "Invalid {} spec for client '{}': reason={}",
                        option_name_cluster_identity, client_id,
                        magic_enum::enum_name(solana_cluster_identity_reason::malformed_expected_identity));
          }
@@ -219,17 +203,17 @@ void outpost_solana_client_plugin::plugin_initialize(const variables_map& option
 
       for (const auto& client : parsed_clients) {
          SYS_ASSERT(expected_identities.contains(client.id), chain::plugin_config_exception,
-                    "Pinned Solana configuration is missing {} for client '{}'",
-                    option_name_cluster_identity, client.id);
+                    "Pinned Solana configuration is missing {} for client '{}'", option_name_cluster_identity,
+                    client.id);
       }
    }
 
    const auto maximum_age = fc::milliseconds(options.at(option_name_identity_max_age).as<uint32_t>());
    const auto probe_timeout = fc::milliseconds(options.at(option_name_identity_timeout).as<uint32_t>());
-   SYS_ASSERT(maximum_age.count() > 0, chain::plugin_config_exception,
-              "--{} must be greater than zero", option_name_identity_max_age);
-   SYS_ASSERT(probe_timeout.count() > 0, chain::plugin_config_exception,
-              "--{} must be greater than zero", option_name_identity_timeout);
+   SYS_ASSERT(maximum_age.count() > 0, chain::plugin_config_exception, "--{} must be greater than zero",
+              option_name_identity_max_age);
+   SYS_ASSERT(probe_timeout.count() > 0, chain::plugin_config_exception, "--{} must be greater than zero",
+              option_name_identity_timeout);
 
    // Construct every client before publishing any of them. If a pinned startup
    // probe fails, the plugin exits with an empty registry rather than exposing
@@ -240,34 +224,32 @@ void outpost_solana_client_plugin::plugin_initialize(const variables_map& option
       auto sig_provider = sig_mgr.get_provider(client.signature_provider_id);
       solana_client_ptr rpc_client;
       if (pinning_enabled) {
-         rpc_client = std::make_shared<solana_client>(
-            sig_provider, client.parsed_rpc_url,
-            solana_cluster_identity_config{
-               .client_id = client.id,
-               .expected_genesis_hash = expected_identities.at(client.id),
-               .maximum_verification_age = maximum_age,
-               .probe_timeout = probe_timeout,
-            },
-            rpc_options);
+         rpc_client = std::make_shared<solana_client>(sig_provider, client.parsed_rpc_url,
+                                                      solana_cluster_identity_config{
+                                                         .client_id = client.id,
+                                                         .expected_genesis_hash = expected_identities.at(client.id),
+                                                         .maximum_verification_age = maximum_age,
+                                                         .probe_timeout = probe_timeout,
+                                                      },
+                                                      rpc_options);
       } else {
-         rpc_client = std::make_shared<solana_client>(
-            sig_provider, client.parsed_rpc_url, rpc_options);
+         rpc_client = std::make_shared<solana_client>(sig_provider, client.parsed_rpc_url, rpc_options);
          wlog("SEC-139 staged rollout: Solana client '{}' is running without cluster identity "
               "pinning (reason={}). Supply --{} for every configured Solana client to enable "
               "strict pinned mode.",
               client.id, magic_enum::enum_name(solana_cluster_identity_reason::missing_expected_identity),
               option_name_cluster_identity);
       }
-      pending_clients.push_back(std::make_shared<solana_client_entry_t>(
-         client.id, client.rpc_url, sig_provider, std::move(rpc_client)));
+      pending_clients.push_back(
+         std::make_shared<solana_client_entry_t>(client.id, client.rpc_url, sig_provider, std::move(rpc_client)));
    }
 
    for (std::size_t i = 0; i < pending_clients.size(); ++i) {
       auto& entry = pending_clients[i];
       const auto client_id = entry->id;
       my->add_client(client_id, std::move(entry));
-      ilog("Added Solana client (id={},endpoint={},cluster_identity_mode={})",
-           client_id, fc::http::sanitized_endpoint(parsed_clients[i].parsed_rpc_url),
+      ilog("Added Solana client (id={},endpoint={},cluster_identity_mode={})", client_id,
+           fc::http::sanitized_endpoint(parsed_clients[i].parsed_rpc_url),
            pinning_enabled ? magic_enum::enum_name(solana_cluster_identity_mode::pinned)
                            : magic_enum::enum_name(solana_cluster_identity_mode::unpinned));
    }
@@ -278,14 +260,11 @@ void outpost_solana_client_plugin::plugin_startup() {
 }
 
 void outpost_solana_client_plugin::set_program_options(options_description& cli, options_description& cfg) {
-   cfg.add_options()(
-      option_name_client,
-      boost::program_options::value<std::vector<std::string>>()->multitoken(),
-      "Outpost Solana Client spec, the plugin supports 1 to many clients in a given process. "
-      "Format: `<sol-client-id>,<sig-provider-id>,<rpc-url>`. The signer id must "
-      "match an explicitly named --signature-provider with the Solana target chain and key type")(
-      option_name_cluster_identity,
-      boost::program_options::value<std::vector<std::string>>()->multitoken(),
+   cfg.add_options()(option_name_client, boost::program_options::value<std::vector<std::string>>()->multitoken(),
+                     "Outpost Solana Client spec, the plugin supports 1 to many clients in a given process. "
+                     "Format: `<sol-client-id>,<sig-provider-id>,<rpc-url>`. The signer id must "
+                     "match an explicitly named --signature-provider with the Solana target chain and key type")(
+      option_name_cluster_identity, boost::program_options::value<std::vector<std::string>>()->multitoken(),
       "Optional staged Solana cluster identity pin. Format: "
       "`<sol-client-id>,<expected-genesis-hash>`. When this option is present, "
       "every configured Solana client must have exactly one canonical 32-byte "
@@ -293,13 +272,12 @@ void outpost_solana_client_plugin::set_program_options(options_description& cli,
       "with a prominent security warning")(
       option_name_identity_max_age,
       boost::program_options::value<uint32_t>()->default_value(default_identity_max_age_ms),
-      "Maximum age in milliseconds of a successful Solana cluster identity "
-      "observation before a protected read must reverify")(
+      "Maximum successful Solana cluster identity age in milliseconds used for freshness telemetry; protected RPCs "
+      "still preflight every call")(
       option_name_identity_timeout,
       boost::program_options::value<uint32_t>()->default_value(default_identity_probe_timeout_ms),
       "Maximum duration in milliseconds of each Solana cluster identity probe")(
-      option_idl_file,
-      boost::program_options::value<std::vector<std::filesystem::path>>()->multitoken(),
+      option_idl_file, boost::program_options::value<std::vector<std::filesystem::path>>()->multitoken(),
       "Solana program IDL file(s). Expects each file to be a JSON IDL (Anchor format) program definition.")(
       option_outpost_program_name,
       boost::program_options::value<std::string>()->default_value(OPP_SOLANA_OUTPOST_PROGRAM_NAME),
@@ -321,8 +299,7 @@ std::vector<solana_client_entry_ptr> outpost_solana_client_plugin::get_clients()
    return my->get_clients();
 }
 
-std::vector<solana_cluster_identity_snapshot>
-outpost_solana_client_plugin::get_cluster_identity_snapshots() {
+std::vector<solana_cluster_identity_snapshot> outpost_solana_client_plugin::get_cluster_identity_snapshots() {
    return my->get_cluster_identity_snapshots();
 }
 
@@ -335,12 +312,11 @@ outpost_solana_client_plugin::get_idl_files() {
    return my->get_idl_files();
 }
 
-std::shared_ptr<outpost_client>
-outpost_solana_client_plugin::create_outpost_client(const std::string&  sol_client_id,
-                                                  uint64_t            chain_code,
-                                                  uint32_t            chain_id,
-                                                  const std::string&  program_id,
-                                                  solana_outpost_role role) {
+std::shared_ptr<outpost_client> outpost_solana_client_plugin::create_outpost_client(const std::string& sol_client_id,
+                                                                                    uint64_t chain_code,
+                                                                                    uint32_t chain_id,
+                                                                                    const std::string& program_id,
+                                                                                    solana_outpost_role role) {
    auto entry = my->get_client(sol_client_id);
    FC_ASSERT(entry, "Unknown solana client id: {}", sol_client_id);
    FC_ASSERT(!program_id.empty(), "Solana program id is required");
@@ -354,11 +330,10 @@ outpost_solana_client_plugin::create_outpost_client(const std::string&  sol_clie
    FC_ASSERT(!program_idls.empty(),
              "IDL for program '{}' not loaded — pass --solana-idl-file (and --{} when the outpost "
              "IDL uses a different program name)",
-             my->outpost_program_name(),
-             option_outpost_program_name);
+             my->outpost_program_name(), option_outpost_program_name);
 
-   return std::make_shared<outpost_solana_client>(
-      entry, program_key, std::move(program_idls), chain_code, chain_id, role);
+   return std::make_shared<outpost_solana_client>(entry, program_key, std::move(program_idls), chain_code, chain_id,
+                                                  role);
 }
 
 std::vector<fc::network::solana::idl::program> filter_outpost_program_idls(
