@@ -71,6 +71,7 @@ struct transport_test_access {
 namespace {
 
 using tcp = boost::asio::ip::tcp;
+using local_protocol = boost::asio::local::stream_protocol;
 
 constexpr int64_t normal_timeout_ms = 2'000;
 constexpr int64_t cancellation_delay_ms = 100;
@@ -83,6 +84,9 @@ constexpr size_t disk_space_budget_bytes = 64 * 1024 * 1024;
 constexpr size_t large_body_chunk_bytes = 1024 * 1024;
 constexpr size_t oversized_chunk_extension_bytes = 128 * 1024;
 constexpr std::string_view exact_body = "12345678";
+
+/** Return finite policy used by deterministic shared-transport tests. */
+fc::http::request_options tls_request_options();
 
 /** A loopback HTTP server driven by a caller-supplied script for each accepted connection. */
 class scripted_http_server {
@@ -175,6 +179,116 @@ private:
    std::atomic_bool _finished{false};
    std::thread _worker;
 };
+
+/** One-request Unix-socket HTTP server that records the exact request head. */
+class scripted_unix_http_server {
+public:
+   /** Bind @p socket_path and start accepting one HTTP request. */
+   explicit scripted_unix_http_server(
+      const std::filesystem::path& socket_path)
+      : _socket_path(socket_path)
+      , _acceptor(
+           _io,
+           local_protocol::endpoint(
+              _socket_path.string()))
+      , _socket(_io)
+      , _worker([this] { serve(); }) {}
+
+   scripted_unix_http_server(
+      const scripted_unix_http_server&) = delete;
+   scripted_unix_http_server&
+   operator=(
+      const scripted_unix_http_server&) = delete;
+
+   /** Stop a pending accept and join the server worker. */
+   ~scripted_unix_http_server() {
+      _stop = true;
+      unblock_accept();
+      if (_worker.joinable())
+         _worker.join();
+   }
+
+   /** Join the completed request and return its exact serialized head. */
+   const std::string& wait_for_request() {
+      if (_worker.joinable())
+         _worker.join();
+      return _observed_request;
+   }
+
+private:
+   /** Connect to the listener so synchronous accept exits on every supported platform. */
+   void unblock_accept() {
+      boost::asio::io_context io;
+      local_protocol::socket socket(io);
+      boost::system::error_code error;
+      socket.connect(
+         local_protocol::endpoint(
+            _socket_path.string()),
+         error);
+   }
+
+   /** Accept one request, record it, and return a successful empty object. */
+   void serve() {
+      boost::system::error_code error;
+      _acceptor.accept(_socket, error);
+      if (error || _stop)
+         return;
+
+      boost::asio::streambuf request;
+      boost::asio::read_until(
+         _socket,
+         request,
+         "\r\n\r\n",
+         error);
+      if (error)
+         return;
+      _observed_request.assign(
+         boost::asio::buffers_begin(request.data()),
+         boost::asio::buffers_end(request.data()));
+
+      constexpr std::string_view response =
+         "HTTP/1.1 200 OK\r\n"
+         "Content-Length: 2\r\n"
+         "Connection: close\r\n\r\n{}";
+      boost::asio::write(
+         _socket,
+         boost::asio::buffer(
+            response.data(),
+            response.size()),
+         error);
+   }
+
+   std::filesystem::path _socket_path;
+   boost::asio::io_context _io;
+   local_protocol::acceptor _acceptor;
+   local_protocol::socket _socket;
+   std::string _observed_request;
+   std::atomic_bool _stop{false};
+   std::thread _worker;
+};
+
+/** Send one POST request to @p endpoint through a Unix socket. */
+fc::http::response
+perform_unix_request(
+   const std::filesystem::path& endpoint) {
+   fc::http::transport transport;
+   return transport.perform(
+      fc::http::request{
+         .method =
+            fc::http::request_method::post,
+         .target =
+            fc::url(
+               "unix",
+               fc::ostring{endpoint.string()},
+               {},
+               {},
+               {},
+               {},
+               {},
+               std::nullopt),
+      },
+      tls_request_options());
+}
 
 /** One-request HTTPS server backed by deterministic private-CA test fixtures. */
 class https_response_server {
@@ -1683,76 +1797,46 @@ BOOST_AUTO_TEST_CASE(nonexistent_unix_socket_path_is_bounded) {
 
 /// A KIOD-style exact Unix route is preserved without an added trailing slash.
 BOOST_AUTO_TEST_CASE(unix_socket_exact_request_target_is_preserved) {
-   using local_protocol =
-      boost::asio::local::stream_protocol;
    fc::temp_directory temp;
    const auto socket_path =
       temp.path() / "kiod.sock";
-   boost::asio::io_context io;
-   local_protocol::acceptor acceptor(
-      io,
-      local_protocol::endpoint(
-         socket_path.string()));
-   std::string observed_request;
-   std::jthread server([&] {
-      local_protocol::socket socket(io);
-      acceptor.accept(socket);
-      boost::asio::streambuf request;
-      boost::asio::read_until(
-         socket,
-         request,
-         "\r\n\r\n");
-      observed_request.assign(
-         boost::asio::buffers_begin(request.data()),
-         boost::asio::buffers_end(request.data()));
-      const auto exact_route =
-         observed_request.starts_with(
-            "POST /v1/wallet/sign_transaction HTTP/1.1\r\n");
-      const std::string_view response =
-         exact_route
-            ? "HTTP/1.1 200 OK\r\n"
-              "Content-Length: 2\r\n"
-              "Connection: close\r\n\r\n{}"
-            : "HTTP/1.1 404 Not Found\r\n"
-              "Content-Length: 0\r\n"
-              "Connection: close\r\n\r\n";
-      boost::asio::write(
-         socket,
-         boost::asio::buffer(
-            response.data(),
-            response.size()));
-   });
-
+   scripted_unix_http_server server(socket_path);
    const auto endpoint =
-      socket_path.string() +
-      "/v1/wallet/sign_transaction";
-   fc::http::transport transport;
+      socket_path /
+      "v1/wallet/sign_transaction";
    const auto response =
-      transport.perform(
-         fc::http::request{
-            .method =
-               fc::http::request_method::post,
-            .target =
-               fc::url(
-                  "unix",
-                  fc::ostring{endpoint},
-                  {},
-                  {},
-                  {},
-                  {},
-                  {},
-                  std::nullopt),
-         },
-         tls_request_options());
-   server.join();
+      perform_unix_request(endpoint);
+   const auto& observed_request =
+      server.wait_for_request();
 
    BOOST_CHECK_EQUAL(
-      response.status,
-      static_cast<uint32_t>(
-         boost::beast::http::status::ok));
+      boost::beast::http::int_to_status(
+         response.status),
+      boost::beast::http::status::ok);
    BOOST_CHECK(
       observed_request.starts_with(
          "POST /v1/wallet/sign_transaction HTTP/1.1\r\n"));
+}
+
+/// A Unix URL naming only its socket addresses the HTTP root.
+BOOST_AUTO_TEST_CASE(unix_socket_root_request_target_is_preserved) {
+   fc::temp_directory temp;
+   const auto socket_path =
+      temp.path() / "root.sock";
+   scripted_unix_http_server server(socket_path);
+
+   const auto response =
+      perform_unix_request(socket_path);
+   const auto& observed_request =
+      server.wait_for_request();
+
+   BOOST_CHECK_EQUAL(
+      boost::beast::http::int_to_status(
+         response.status),
+      boost::beast::http::status::ok);
+   BOOST_CHECK(
+      observed_request.starts_with(
+         "POST / HTTP/1.1\r\n"));
 }
 
 /// TLS failures do not disclose URL credentials in their diagnostic text.

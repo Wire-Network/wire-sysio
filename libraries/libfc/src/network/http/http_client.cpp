@@ -73,6 +73,7 @@ constexpr uint16_t default_http_port = 80;
 constexpr uint16_t default_https_port = 443;
 constexpr std::string_view default_http_service = "80";
 constexpr std::string_view default_https_service = "443";
+constexpr std::string_view filesystem_current_directory = ".";
 constexpr std::string_view scheme_http = "http";
 constexpr std::string_view scheme_https = "https";
 constexpr std::string_view scheme_unix = "unix";
@@ -336,6 +337,35 @@ bool write_resolver_signal(WriteOnce&& write_once) {
    }
 }
 
+/** Create a non-blocking close-on-exec pipe without an inheritance race where supported. */
+bool create_resolver_pipe(std::array<int, 2>& descriptors) {
+#if defined(__linux__)
+   return ::pipe2(descriptors.data(), O_CLOEXEC | O_NONBLOCK) == 0;
+#else
+   if (::pipe(descriptors.data()) != 0)
+      return false;
+   for (const auto descriptor : descriptors) {
+      const auto status_flags =
+         ::fcntl(descriptor, F_GETFL, 0);
+      const auto descriptor_flags =
+         ::fcntl(descriptor, F_GETFD, 0);
+      if (status_flags < 0 ||
+          descriptor_flags < 0 ||
+          ::fcntl(
+             descriptor,
+             F_SETFL,
+             status_flags | O_NONBLOCK) != 0 ||
+          ::fcntl(
+             descriptor,
+             F_SETFD,
+             descriptor_flags | FD_CLOEXEC) != 0) {
+         return false;
+      }
+   }
+   return true;
+#endif
+}
+
 /**
  * One process-lifetime resolver service with its own platform lookup thread.
  *
@@ -468,26 +498,8 @@ public:
    explicit resolver_event(asio::any_io_executor executor)
       : event(std::move(executor)) {
       std::array<int, 2> descriptors{-1, -1};
-      bool configured = ::pipe(descriptors.data()) == 0;
-      for (const auto descriptor : descriptors) {
-         if (!configured)
-            break;
-         const auto status_flags =
-            ::fcntl(descriptor, F_GETFL, 0);
-         const auto descriptor_flags =
-            ::fcntl(descriptor, F_GETFD, 0);
-         configured =
-            status_flags >= 0 &&
-            descriptor_flags >= 0 &&
-            ::fcntl(
-               descriptor,
-               F_SETFL,
-               status_flags | O_NONBLOCK) == 0 &&
-            ::fcntl(
-               descriptor,
-               F_SETFD,
-               descriptor_flags | FD_CLOEXEC) == 0;
-      }
+      const bool configured =
+         create_resolver_pipe(descriptors);
       if (!configured) {
          for (const auto descriptor : descriptors) {
             if (descriptor >= 0)
@@ -1085,10 +1097,13 @@ struct connection_state {
    stream_variant stream;
 };
 
+/** Monotonic clock used for connection-pool residence time. */
+using idle_clock = std::chrono::steady_clock;
+
 /** One persistent connection and the time it entered the idle cache. */
 struct idle_connection {
    std::shared_ptr<connection_state> connection;
-   time_point idle_since;
+   idle_clock::time_point idle_since;
 };
 
 /** Opaque in-process lease retained across a connection-affine continuation. */
@@ -1549,8 +1564,12 @@ public:
          result.host_header = "localhost";
          const auto request_path =
             complete_path.lexically_relative(socket_file);
+         const bool root_request =
+            request_path.empty() ||
+            request_path ==
+               std::filesystem::path{filesystem_current_directory};
          result.request_target =
-            request_path.empty()
+            root_request
                ? "/"
                : "/" + request_path.generic_string();
          result.connection_key = "unix|" + *result.unix_socket_path;
@@ -2280,7 +2299,10 @@ public:
 
    /** Close idle connections that exceeded the configured reuse age. */
    void prune_expired_idle_connections() {
-      const auto now = time_point::now();
+      const auto now = idle_clock::now();
+      const auto max_idle_age =
+         std::chrono::microseconds{
+            options.max_idle_connection_age.count()};
       for (auto entry = idle_connections.begin();
            entry != idle_connections.end();) {
          auto& connections = entry->second;
@@ -2288,7 +2310,7 @@ public:
               connection != connections.end();) {
             if (!connection->connection->open() ||
                 now - connection->idle_since >
-                   options.max_idle_connection_age) {
+                   max_idle_age) {
                connection->connection->close();
                connection = connections.erase(connection);
                FC_ASSERT(
@@ -2360,7 +2382,7 @@ public:
       idle_connections[key].push_back(
          idle_connection{
             .connection = std::move(connection),
-            .idle_since = time_point::now(),
+            .idle_since = idle_clock::now(),
          });
       ++idle_connection_count;
    }
