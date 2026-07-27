@@ -134,6 +134,16 @@ struct timeout_options {
    bool inherit_task_deadline = true;
 };
 
+/** Context supplied when transport-classified retryable work may be replayed. */
+struct retry_context {
+   /// Stable category of the transport failure eligible for retry.
+   failure_kind failure;
+   /// One-based attempt number that just failed.
+   uint32_t attempt = 0;
+   /// Whether the failed attempt used a connection from the idle cache.
+   bool reused_connection = false;
+};
+
 /** Explicit bounded retry policy. */
 struct retry_options {
    /// Total attempts including the first request.
@@ -142,6 +152,13 @@ struct retry_options {
    microseconds initial_backoff = milliseconds(100);
    /// Maximum delay between attempts.
    microseconds max_backoff = seconds(1);
+   /**
+    * Optionally narrow transport-classified retryable failures.
+    *
+    * This hook cannot make a non-retryable failure retryable and must not
+    * throw. Returning false stops before the next attempt.
+    */
+   std::function<bool(const retry_context&)> allow_retry;
 };
 
 /** Resource, deadline, cancellation, and retry policy for one request. */
@@ -160,8 +177,6 @@ struct request_options {
    retry_options retry;
    /// Whether replaying this request is safe.
    bool idempotent = false;
-   /// Restrict retryable failures to attempts made on an existing cached connection.
-   bool retry_only_reused_connection = false;
    /// Blocking-adapter cancellation predicate; asynchronous client operations ignore this field.
    std::function<bool()> cancel_check;
 };
@@ -191,6 +206,26 @@ struct response {
    /// Decoded response body.
    std::string body;
 };
+
+/**
+ * One request selected by a connection-affine continuation hook.
+ *
+ * The request must target the same transport endpoint as the completed
+ * request. It is sent on that exact HTTP/TLS connection without pooling,
+ * reconnecting, or retrying.
+ */
+struct continuation_request {
+   request next_request;
+   request_options options;
+};
+
+/**
+ * Inspect one complete response and select a same-connection follow-up.
+ *
+ * The hook may throw to reject the continuation. It must not block.
+ */
+using continuation_hook =
+   std::function<continuation_request(const response&)>;
 
 /** Response metadata available before a streamed body is consumed. */
 struct response_head {
@@ -298,6 +333,22 @@ public:
                  request_options options,
                  boost::asio::cancellation_slot cancellation = {});
 
+   /**
+    * Buffer one response, invoke @p continue_with, and send its selected
+    * request over the exact same connection.
+    *
+    * The first request retains its final successful connection across the
+    * hook. A hook failure, closed peer, endpoint change, or follow-up
+    * transport failure closes that connection and never falls back to
+    * another connection.
+    */
+   boost::asio::awaitable<response>
+   async_request_then(
+      request req,
+      request_options options,
+      continuation_hook continue_with,
+      boost::asio::cancellation_slot cancellation = {});
+
    /** Resolve and cache one endpoint without opening a connection. */
    boost::asio::awaitable<void>
    async_warm_up(const url& target,
@@ -354,6 +405,18 @@ public:
 
    /** Execute one bounded request and buffer its bounded response body. */
    response perform(const request& req, const request_options& options);
+
+   /**
+    * Execute one request and a hook-selected follow-up on the exact same
+    * connection.
+    *
+    * Each request has its own limits and deadline budget. The follow-up is
+    * single-attempt and never falls back to another connection.
+    */
+   response perform_then(
+      const request& req,
+      const request_options& options,
+      const continuation_hook& continue_with);
 
    /** Resolve and cache one endpoint under the same DNS/connect deadline policy. */
    void prime_endpoint(const url& target,

@@ -380,8 +380,11 @@ BOOST_AUTO_TEST_CASE(default_call_enforces_single_attempt) {
    options.request.retry.max_attempts = 3;
    options.request.retry.initial_backoff = fc::microseconds(0);
    options.request.retry.max_backoff = fc::microseconds(0);
+   options.request.retry.allow_retry =
+      [](const fc::http::retry_context& context) {
+         return context.reused_connection;
+      };
    options.request.idempotent = true;
-   options.request.retry_only_reused_connection = true;
    fc::network::json_rpc::json_rpc_client client(
       fc::url(
          "http://127.0.0.1:" +

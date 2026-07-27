@@ -23,8 +23,8 @@ constexpr uint32_t stale_connection_max_attempts = 2;
 fc::http::request_options
 non_replaying_request_options(fc::http::request_options options) {
    options.retry.max_attempts = single_attempt;
+   options.retry.allow_retry = {};
    options.idempotent = false;
-   options.retry_only_reused_connection = false;
    return options;
 }
 
@@ -34,8 +34,11 @@ stale_connection_retry_options(fc::http::request_options options) {
    options.retry.max_attempts = stale_connection_max_attempts;
    options.retry.initial_backoff = fc::microseconds(0);
    options.retry.max_backoff = fc::microseconds(0);
+   options.retry.allow_retry =
+      [](const fc::http::retry_context& context) {
+         return context.reused_connection;
+      };
    options.idempotent = true;
-   options.retry_only_reused_connection = true;
    return options;
 }
 
