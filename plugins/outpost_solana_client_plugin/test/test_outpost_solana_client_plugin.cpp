@@ -2,6 +2,8 @@
 
 #include <fc-test/build_info.hpp>
 #include <fc-test/crypto_utils.hpp>
+#include <fc-test/scripted_json_rpc_server.hpp>
+#include <fc/crypto/base58.hpp>
 #include <fc/crypto/base64.hpp>
 #include <fc/crypto/keccak256.hpp>
 #include <fc/io/json.hpp>
@@ -35,6 +37,12 @@ constexpr std::string_view counter_anchor_idl_fixture = "solana-idl-counter-anch
 constexpr std::string_view opp_outpost_idl_fixture = "solana-idl-opp-outpost-stub.json";
 constexpr std::string_view sec94_terminal_budget_fixture = "sec-94-solana-terminal-budget.json";
 constexpr std::string_view startup_test_rpc_url = "http://127.0.0.1:1";
+
+/** Return a deterministic canonical 32-byte Solana genesis hash. */
+std::string startup_test_genesis_hash(uint8_t seed) {
+   std::vector<char> bytes(32, static_cast<char>(seed));
+   return fc::to_base58(bytes, fc::yield_function_t{});
+}
 
 /** Build a named Solana signature-provider spec from the canonical fixture. */
 std::string named_solana_signature_provider(
@@ -328,6 +336,107 @@ BOOST_AUTO_TEST_CASE(startup_accepts_matching_named_signer) {
    }));
 }
 
+BOOST_AUTO_TEST_CASE(startup_accepts_complete_matching_cluster_identity) {
+   const auto genesis_hash = startup_test_genesis_hash(1);
+   fc::test::scripted_json_rpc_server server({
+      fc::test::scripted_json_rpc_response::result(genesis_hash),
+   });
+
+   BOOST_CHECK_NO_THROW(initialize_outpost_plugin({
+      "--signature-provider",
+      named_solana_signature_provider(),
+      "--outpost-solana-client",
+      "client-a,signer-a," + server.url(),
+      "--outpost-solana-cluster-identity",
+      "client-a," + genesis_hash,
+   }));
+   BOOST_CHECK_EQUAL(server.request_count(), 1u);
+}
+
+BOOST_AUTO_TEST_CASE(startup_rejects_partial_cluster_identity_configuration) {
+   const auto genesis_hash = startup_test_genesis_hash(1);
+   BOOST_CHECK_THROW(initialize_outpost_plugin({
+      "--signature-provider",
+      named_solana_signature_provider(),
+      "--outpost-solana-client",
+      "client-a,signer-a," + std::string(startup_test_rpc_url),
+      "client-b,signer-a," + std::string(startup_test_rpc_url),
+      "--outpost-solana-cluster-identity",
+      "client-a," + genesis_hash,
+   }), sysio::chain::plugin_config_exception);
+}
+
+BOOST_AUTO_TEST_CASE(startup_rejects_unknown_cluster_identity_client) {
+   const auto genesis_hash = startup_test_genesis_hash(1);
+   BOOST_CHECK_THROW(initialize_outpost_plugin({
+      "--signature-provider",
+      named_solana_signature_provider(),
+      "--outpost-solana-client",
+      "client-a,signer-a," + std::string(startup_test_rpc_url),
+      "--outpost-solana-cluster-identity",
+      "client-b," + genesis_hash,
+   }), sysio::chain::plugin_config_exception);
+}
+
+BOOST_AUTO_TEST_CASE(startup_rejects_duplicate_cluster_identity) {
+   const auto genesis_hash = startup_test_genesis_hash(1);
+   BOOST_CHECK_THROW(initialize_outpost_plugin({
+      "--signature-provider",
+      named_solana_signature_provider(),
+      "--outpost-solana-client",
+      "client-a,signer-a," + std::string(startup_test_rpc_url),
+      "--outpost-solana-cluster-identity",
+      "client-a," + genesis_hash,
+      "client-a," + genesis_hash,
+   }), sysio::chain::plugin_config_exception);
+}
+
+BOOST_AUTO_TEST_CASE(startup_rejects_malformed_expected_cluster_identity) {
+   BOOST_CHECK_THROW(initialize_outpost_plugin({
+      "--signature-provider",
+      named_solana_signature_provider(),
+      "--outpost-solana-client",
+      "client-a,signer-a," + std::string(startup_test_rpc_url),
+      "--outpost-solana-cluster-identity",
+      "client-a,not-a-solana-genesis-hash",
+   }), sysio::chain::plugin_config_exception);
+}
+
+BOOST_AUTO_TEST_CASE(startup_rejects_mismatched_observed_cluster_identity) {
+   const auto expected_hash = startup_test_genesis_hash(1);
+   const auto observed_hash = startup_test_genesis_hash(2);
+   fc::test::scripted_json_rpc_server server({
+      fc::test::scripted_json_rpc_response::result(observed_hash),
+   });
+
+   BOOST_CHECK_THROW(initialize_outpost_plugin({
+      "--signature-provider",
+      named_solana_signature_provider(),
+      "--outpost-solana-client",
+      "client-a,signer-a," + server.url(),
+      "--outpost-solana-cluster-identity",
+      "client-a," + expected_hash,
+   }), fc::exception);
+}
+
+BOOST_AUTO_TEST_CASE(startup_hanging_cluster_identity_probe_obeys_deadline) {
+   const auto expected_hash = startup_test_genesis_hash(1);
+   fc::test::scripted_json_rpc_server server({
+      fc::test::scripted_json_rpc_response::hanging(),
+   });
+
+   BOOST_CHECK_THROW(initialize_outpost_plugin({
+      "--signature-provider",
+      named_solana_signature_provider(),
+      "--outpost-solana-client",
+      "client-a,signer-a," + server.url(),
+      "--outpost-solana-cluster-identity",
+      "client-a," + expected_hash,
+      "--outpost-solana-cluster-identity-probe-timeout-ms",
+      "50",
+   }), fc::timeout_exception);
+}
+
 BOOST_AUTO_TEST_CASE(startup_rejects_client_without_matching_named_signature_provider) {
    BOOST_CHECK_THROW(initialize_outpost_plugin({
       "--signature-provider",
@@ -412,6 +521,30 @@ BOOST_AUTO_TEST_CASE(authenticated_transport_options_are_registered) {
    BOOST_CHECK(option_names.contains("outpost-solana-additional-ca-file"));
    BOOST_CHECK(option_names.contains("outpost-solana-additional-ca-path"));
    BOOST_CHECK(option_names.contains("outpost-solana-proxy"));
+   BOOST_CHECK(option_names.contains("outpost-solana-cluster-identity"));
+   BOOST_CHECK(option_names.contains("outpost-solana-cluster-identity-max-age-ms"));
+   BOOST_CHECK(option_names.contains("outpost-solana-cluster-identity-probe-timeout-ms"));
+}
+
+BOOST_AUTO_TEST_CASE(startup_redacts_malformed_credential_bearing_rpc_url) {
+   const std::string credential = "sec139-secret-value";
+   const std::string malformed_url =
+      "http://rpc-user:" + credential + "@127.0.0.1:not-a-port/private?api-key=" + credential;
+
+   try {
+      initialize_outpost_plugin({
+         "--signature-provider",
+         named_solana_signature_provider(),
+         "--outpost-solana-client",
+         "client-a,signer-a," + malformed_url,
+      });
+      BOOST_FAIL("Expected malformed RPC URL configuration to fail");
+   } catch (const sysio::chain::plugin_config_exception& error) {
+      const auto detail = error.to_detail_string();
+      BOOST_CHECK(detail.find("client-a") != std::string::npos);
+      BOOST_CHECK(detail.find(credential) == std::string::npos);
+      BOOST_CHECK(detail.find(malformed_url) == std::string::npos);
+   }
 }
 
 /** Caller overrides do not replace JSON-RPC's retain-until-failure DNS policy. */

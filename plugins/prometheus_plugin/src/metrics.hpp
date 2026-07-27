@@ -6,6 +6,8 @@
 #include <sysio/chain_plugin/tracked_votes.hpp>
 
 #include <fc/network/http/http_client.hpp>
+#include <fc/network/solana/solana_client.hpp>
+#include <magic_enum/magic_enum.hpp>
 #include <prometheus/counter.h>
 #include <prometheus/info.h>
 #include <prometheus/registry.h>
@@ -13,6 +15,7 @@
 #include <fc/log/logger.hpp>
 
 #include <array>
+#include <map>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -132,6 +135,35 @@ struct catalog_type {
    Counter& bytes_transferred;
    Counter& num_scrapes;
 
+   /** Families exposing bounded-cardinality Solana identity verification telemetry. */
+   struct solana_cluster_identity_metrics {
+      prometheus::Family<Gauge>& state;
+      prometheus::Family<Gauge>& verification_age_seconds;
+      prometheus::Family<Gauge>& transport_session_id;
+      prometheus::Family<Counter>& verification_attempts;
+      prometheus::Family<Counter>& verification_successes;
+      prometheus::Family<Counter>& verification_mismatches;
+      prometheus::Family<Counter>& verification_failures;
+      prometheus::Family<Counter>& verification_recoveries;
+      prometheus::Family<Counter>& blocked_operations;
+   };
+   solana_cluster_identity_metrics solana_identity_metrics;
+
+   /** Live Prometheus handles and previous cumulative values for one configured client. */
+   struct tracked_solana_identity_series {
+      Gauge* state = nullptr;
+      Gauge* verification_age_seconds = nullptr;
+      Gauge* transport_session_id = nullptr;
+      Counter* verification_attempts = nullptr;
+      Counter* verification_successes = nullptr;
+      Counter* verification_mismatches = nullptr;
+      Counter* verification_failures = nullptr;
+      Counter* verification_recoveries = nullptr;
+      std::map<fc::network::solana::solana_cluster_identity_operation, Counter*> blocked_operations;
+      fc::network::solana::solana_cluster_identity_snapshot previous;
+   };
+   std::unordered_map<std::string, tracked_solana_identity_series>
+      tracked_solana_identity_series_by_client;
 
    catalog_type()
        : info(family<prometheus::Info>("nodeop", "static information about the server"))
@@ -221,7 +253,36 @@ struct catalog_type {
        , blocks_incoming(build<Counter>("nodeop_blocks_incoming", "number of incoming blocks"))
        , bytes_transferred(build<Counter>("exposer_transferred_bytes_total",
                                           "total number of bytes for responses to prometheus scrape requests"))
-       , num_scrapes(build<Counter>("exposer_scrapes_total", "total number of prometheus scrape requests received")) {
+       , num_scrapes(build<Counter>("exposer_scrapes_total", "total number of prometheus scrape requests received"))
+       , solana_identity_metrics{
+            .state{family<Gauge>(
+               "nodeop_solana_cluster_identity",
+               "Current Solana cluster identity mode, status, and reason (always 1)")}
+          , .verification_age_seconds{family<Gauge>(
+               "nodeop_solana_cluster_identity_verification_age_seconds",
+               "Age of the last successful Solana cluster identity verification; -1 when never verified")}
+          , .transport_session_id{family<Gauge>(
+               "nodeop_solana_cluster_identity_transport_session_id",
+               "Process-local authenticated transport session used for the last Solana identity verification")}
+          , .verification_attempts{family<Counter>(
+               "nodeop_solana_cluster_identity_verification_attempts_total",
+               "Total Solana cluster identity verification attempts")}
+          , .verification_successes{family<Counter>(
+               "nodeop_solana_cluster_identity_verification_successes_total",
+               "Total successful Solana cluster identity verifications")}
+          , .verification_mismatches{family<Counter>(
+               "nodeop_solana_cluster_identity_verification_mismatches_total",
+               "Total Solana cluster identity mismatches")}
+          , .verification_failures{family<Counter>(
+               "nodeop_solana_cluster_identity_verification_failures_total",
+               "Total Solana cluster identity verification transport or format failures")}
+          , .verification_recoveries{family<Counter>(
+               "nodeop_solana_cluster_identity_verification_recoveries_total",
+               "Total Solana cluster identity verification recoveries")}
+          , .blocked_operations{family<Counter>(
+               "nodeop_solana_cluster_identity_blocked_operations_total",
+               "Total protected Solana operations blocked by cluster identity verification")}
+         } {
       for (const auto failure : magic_enum::enum_values<fc::http::failure_kind>()) {
          const auto index = magic_enum::enum_index(failure);
          FC_ASSERT(index, "Unknown outbound HTTP failure kind");
@@ -318,6 +379,109 @@ struct catalog_type {
          } else {
             ++it;
          }
+      }
+   }
+
+   /** Refresh credential-free Solana identity series from plugin snapshots. */
+   void update(const std::vector<fc::network::solana::solana_cluster_identity_snapshot>& snapshots) {
+      using namespace fc::network::solana;
+
+      std::unordered_set<std::string> live_clients;
+      live_clients.reserve(snapshots.size());
+
+      auto increment_from_snapshot = [](Counter& counter, std::uint64_t current, std::uint64_t previous) {
+         counter.Increment(current >= previous ? current - previous : current);
+      };
+
+      for (const auto& snapshot : snapshots) {
+         live_clients.insert(snapshot.client_id);
+         auto [it, inserted] =
+            tracked_solana_identity_series_by_client.try_emplace(snapshot.client_id);
+         auto& series = it->second;
+         const prometheus::Labels client_labels{{"client_id", snapshot.client_id}};
+
+         if (inserted) {
+            series.verification_age_seconds =
+               &solana_identity_metrics.verification_age_seconds.Add(client_labels);
+            series.transport_session_id =
+               &solana_identity_metrics.transport_session_id.Add(client_labels);
+            series.verification_attempts =
+               &solana_identity_metrics.verification_attempts.Add(client_labels);
+            series.verification_successes =
+               &solana_identity_metrics.verification_successes.Add(client_labels);
+            series.verification_mismatches =
+               &solana_identity_metrics.verification_mismatches.Add(client_labels);
+            series.verification_failures =
+               &solana_identity_metrics.verification_failures.Add(client_labels);
+            series.verification_recoveries =
+               &solana_identity_metrics.verification_recoveries.Add(client_labels);
+            for (const auto operation :
+                 magic_enum::enum_values<solana_cluster_identity_operation>()) {
+               auto operation_labels = client_labels;
+               operation_labels.emplace("operation", std::string(magic_enum::enum_name(operation)));
+               series.blocked_operations.emplace(
+                  operation, &solana_identity_metrics.blocked_operations.Add(operation_labels));
+            }
+         } else {
+            solana_identity_metrics.state.Remove(series.state);
+         }
+
+         auto state_labels = client_labels;
+         state_labels.emplace("mode", std::string(magic_enum::enum_name(snapshot.mode)));
+         state_labels.emplace("status", std::string(magic_enum::enum_name(snapshot.status)));
+         state_labels.emplace("reason", std::string(magic_enum::enum_name(snapshot.reason)));
+         series.state = &solana_identity_metrics.state.Add(state_labels);
+         series.state->Set(1);
+         series.verification_age_seconds->Set(
+            snapshot.verification_age
+               ? static_cast<double>(snapshot.verification_age->count()) / 1'000'000.0
+               : -1.0);
+         series.transport_session_id->Set(snapshot.transport_session_id);
+
+         increment_from_snapshot(*series.verification_attempts, snapshot.verification_attempts,
+                                 series.previous.verification_attempts);
+         increment_from_snapshot(*series.verification_successes, snapshot.verification_successes,
+                                 series.previous.verification_successes);
+         increment_from_snapshot(*series.verification_mismatches, snapshot.verification_mismatches,
+                                 series.previous.verification_mismatches);
+         increment_from_snapshot(*series.verification_failures, snapshot.verification_failures,
+                                 series.previous.verification_failures);
+         increment_from_snapshot(*series.verification_recoveries, snapshot.verification_recoveries,
+                                 series.previous.verification_recoveries);
+         for (const auto operation :
+              magic_enum::enum_values<solana_cluster_identity_operation>()) {
+            const auto current = snapshot.blocked_operations.contains(operation)
+                                    ? snapshot.blocked_operations.at(operation)
+                                    : 0;
+            const auto previous = series.previous.blocked_operations.contains(operation)
+                                     ? series.previous.blocked_operations.at(operation)
+                                     : 0;
+            increment_from_snapshot(*series.blocked_operations.at(operation), current, previous);
+         }
+         series.previous = snapshot;
+      }
+
+      for (auto it = tracked_solana_identity_series_by_client.begin();
+           it != tracked_solana_identity_series_by_client.end();) {
+         if (live_clients.contains(it->first)) {
+            ++it;
+            continue;
+         }
+
+         auto& series = it->second;
+         solana_identity_metrics.state.Remove(series.state);
+         solana_identity_metrics.verification_age_seconds.Remove(series.verification_age_seconds);
+         solana_identity_metrics.transport_session_id.Remove(series.transport_session_id);
+         solana_identity_metrics.verification_attempts.Remove(series.verification_attempts);
+         solana_identity_metrics.verification_successes.Remove(series.verification_successes);
+         solana_identity_metrics.verification_mismatches.Remove(series.verification_mismatches);
+         solana_identity_metrics.verification_failures.Remove(series.verification_failures);
+         solana_identity_metrics.verification_recoveries.Remove(series.verification_recoveries);
+         for (const auto& [operation, counter] : series.blocked_operations) {
+            (void)operation;
+            solana_identity_metrics.blocked_operations.Remove(counter);
+         }
+         it = tracked_solana_identity_series_by_client.erase(it);
       }
    }
 

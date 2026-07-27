@@ -5,6 +5,7 @@ The `outpost_solana_client_plugin` provides Solana JSON-RPC client integration f
 ## Table of Contents
 
 - [Plugin Configuration](#plugin-configuration)
+- [Solana Cluster Identity Pinning](#solana-cluster-identity-pinning)
 - [Class Diagrams](#class-diagrams)
 - [Client Architecture](#client-architecture)
 - [solana_client (RPC Client)](#solana_client-rpc-client)
@@ -80,6 +81,39 @@ HTTPS RPC endpoints use system CA roots and mandatory DNS/IP identity verificati
 `--outpost-solana-proxy http://host:port` for an explicit proxy. Verification cannot be disabled, and proxy
 environment variables are not applied implicitly.
 
+#### `--outpost-solana-cluster-identity` (optional for the initial release, multi-token)
+
+Pins each configured client to an independently obtained Solana genesis hash:
+
+```
+<client-id>,<expected-genesis-hash>
+```
+
+The initial release has two configuration modes:
+
+- If the option is absent, every client preserves the legacy unpinned behavior.
+  Startup emits a security warning and Prometheus reports
+  `mode="unpinned"` with `reason="missing_expected_identity"`.
+- If the option is present at least once, strict pinned mode applies to the
+  whole process. Every `--outpost-solana-client` must have exactly one matching
+  identity entry. Partial, duplicate, unknown-client, malformed, and
+  non-canonical hashes fail startup.
+
+The expected hash must be canonical base58 encoding of exactly 32 bytes. Source
+it from a trusted deployment manifest or another control-plane source; do not
+derive the configured expectation from the same RPC URL being pinned.
+
+Two optional bounded-verification settings apply in pinned mode:
+
+| Option | Default | Description |
+|---|---:|---|
+| `--outpost-solana-cluster-identity-max-age-ms` | `30000` | Maximum successful-verification age before reads reverify |
+| `--outpost-solana-cluster-identity-probe-timeout-ms` | `5000` | Deadline for startup and runtime `getGenesisHash` probes |
+
+Signing and submission always force a fresh identity probe. A mismatch is
+sticky until process restart and blocks reads, transaction construction,
+simulation, fee estimation, signing, and submission.
+
 #### `--solana-idl-file` (optional, multi-token)
 
 Loads one or more Anchor IDL JSON files for use with `solana_program_client`:
@@ -106,6 +140,7 @@ program; the clean-room outpost implementation is hosted inside the
 ./outpost_solana_client_tool \
    --signature-provider sol-signer,solana,solana,FDkbys9aWZSSCMYmstq948DfFmjxY69x4qUj7KSr7LCa,KEY:5pNoVifxrWsaAPDyaKGPoKiPjhhbHGaEFdTVmjx9qZJKS472eGsA5118YqEf2m7xUreC2kv6TDq9sssRceeQXHrJ \
    --outpost-solana-client my-client,sol-signer,https://api.devnet.solana.com \
+   --outpost-solana-cluster-identity my-client,<expected-genesis-hash> \
    --solana-idl-file ./idl/counter_anchor.json
 ```
 
@@ -116,8 +151,38 @@ The same options work in a config `.ini` file:
 ```ini
 signature-provider = sol-signer,solana,solana,FDkbys9aWZSSCMYmstq948DfFmjxY69x4qUj7KSr7LCa,KEY:5pNoVifxrWsaAPDyaKGPoKiPjhhbHGaEFdTVmjx9qZJKS472eGsA5118YqEf2m7xUreC2kv6TDq9sssRceeQXHrJ
 outpost-solana-client = my-client,sol-signer,https://api.devnet.solana.com
+outpost-solana-cluster-identity = my-client,<expected-genesis-hash>
 solana-idl-file = ./idl/counter_anchor.json
 ```
+
+---
+
+## Solana Cluster Identity Pinning
+
+Pinned clients verify `getGenesisHash` during construction before the plugin
+publishes any client. Runtime verification and each protected JSON-RPC call use
+the same authenticated HTTP transport session. If the verified session closes,
+the protected operation fails closed instead of falling back to another cached
+connection.
+
+Read operations may reuse a successful observation only up to the configured
+maximum age. Every state-changing path forces a fresh observation before
+transaction construction, simulation, fee estimation, signing, or submission.
+Identity mismatch is sticky for the process lifetime.
+
+Prometheus exposes bounded-cardinality state, verification age, transport
+session id, attempt/success/mismatch/failure/recovery counters, and blocked
+operation counters. Labels contain only configured client IDs and fixed enums;
+URL credentials, signer IDs, expected/observed hashes, transactions, and
+account payloads are not metric labels.
+
+The absent-option legacy mode is a compatibility window for the initial
+release. Operators should add identities for all clients together. A later
+release can make pinning mandatory after deployment tooling supplies the
+independent hashes.
+
+See [Solana cluster identity operations](../../docs/solana-cluster-identity.md)
+for rollout, alerting, and failure-response guidance.
 
 ---
 

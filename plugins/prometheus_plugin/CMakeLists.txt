@@ -7,5 +7,5 @@ plugin_target(
         http_plugin
         chain_plugin
         net_plugin
+        outpost_solana_client_plugin
 )
-

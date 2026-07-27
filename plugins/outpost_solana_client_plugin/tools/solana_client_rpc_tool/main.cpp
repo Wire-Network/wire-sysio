@@ -8,6 +8,7 @@
 #include <fc/time.hpp>
 
 #include <fc/log/logger_config.hpp>
+#include <magic_enum/magic_enum.hpp>
 #include <sysio/outpost_client_plugin.hpp>
 #include <sysio/outpost_solana_client_plugin.hpp>
 #include <sysio/version/version.hpp>
@@ -312,7 +313,11 @@ int main(int argc, char* argv[]) {
       auto client_entry = clients[0];
       auto& client = client_entry->client;
 
-      ilog("Connected to Solana RPC: {}", client_entry->url);
+      const auto identity = client_entry->client->get_cluster_identity_snapshot();
+      ilog("Connected to Solana RPC (client_id={},endpoint={},cluster_identity_mode={})",
+           client_entry->id,
+           identity.sanitized_endpoint,
+           magic_enum::enum_name(identity.mode));
       ilog("Signer public key: {}", client->get_pubkey().to_string(fc::yield_function_t{}));
 
       // Query basic chain information

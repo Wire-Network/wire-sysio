@@ -1,8 +1,10 @@
 // SPDX-License-Identifier: MIT
 #pragma once
 
+#include <array>
+#include <boost/core/demangle.hpp>
+#include <cstdint>
 #include <fc-lite/threadsafe_map.hpp>
-
 #include <fc/crypto/signature_provider.hpp>
 #include <fc/network/json_rpc/json_rpc_client.hpp>
 #include <fc/network/solana/solana_borsh.hpp>
@@ -10,10 +12,10 @@
 #include <fc/network/solana/solana_system_programs.hpp>
 #include <fc/network/solana/solana_types.hpp>
 #include <fc/task/retry.hpp>
-
-#include <boost/core/demangle.hpp>
+#include <functional>
 #include <map>
 #include <memory>
+#include <mutex>
 #include <optional>
 #include <string>
 #include <typeinfo>
@@ -42,11 +44,11 @@ struct solana_confirm_options {
    /// mis-confirmation. Use `confirmed` when the caller needs reorg-
    /// resistance within the same tx, `finalized` only for cross-chain
    /// checkpoints where the wait cost is acceptable.
-   commitment_t              commitment = commitment_t::processed;
+   commitment_t commitment = commitment_t::processed;
 
    /// Retry / backoff / deadline envelope — shared with the Ethereum client.
    /// See `fc::task::retry_options` for per-field semantics.
-   fc::task::retry_options   retry      = fc::task::retry_option_defaults;
+   fc::task::retry_options retry = fc::task::retry_option_defaults;
 };
 
 inline constexpr solana_confirm_options solana_confirm_option_defaults{};
@@ -60,6 +62,97 @@ inline constexpr size_t max_idl_type_nesting_depth = 32;
  * @brief Maximum materialized elements for an IDL vector whose element encoding can consume zero bytes.
  */
 inline constexpr uint32_t max_zero_sized_idl_vector_elements = 64u * 1024u;
+
+/**
+ * Canonical Solana cluster genesis hash.
+ *
+ * `parse_solana_genesis_hash` is the only supported construction path from
+ * text. It rejects non-canonical base58 and any decoded length other than 32
+ * bytes so configuration and RPC observations share identical validation.
+ */
+struct solana_genesis_hash {
+   std::array<uint8_t, 32> bytes{};
+   std::string canonical;
+
+   bool operator==(const solana_genesis_hash&) const = default;
+};
+
+/**
+ * Parse a canonical base58-encoded 32-byte Solana genesis hash.
+ *
+ * @param value Operator configuration or RPC result to validate.
+ * @return Parsed bytes and their canonical base58 representation.
+ * @throws fc::exception when the value is empty, malformed, non-canonical, or
+ *         does not decode to exactly 32 bytes.
+ */
+solana_genesis_hash parse_solana_genesis_hash(const std::string& value);
+
+/// Runtime mode for the staged Solana cluster-identity rollout.
+enum class solana_cluster_identity_mode { unpinned, pinned };
+
+/// Durable verification status for a signing-capable Solana client.
+enum class solana_cluster_identity_status { unpinned, unverified, verified, mismatch, error, stale };
+
+/// Stable reason codes exposed through sanitized logs and metrics.
+enum class solana_cluster_identity_reason {
+   none,
+   missing_expected_identity,
+   malformed_expected_identity,
+   rpc_timeout,
+   rpc_error,
+   malformed_observed_identity,
+   identity_mismatch,
+   verification_stale,
+   transport_session_changed,
+   verification_recovered
+};
+
+/// Bounded protected-operation categories used in verification telemetry.
+enum class solana_cluster_identity_operation {
+   startup,
+   rpc_read,
+   transaction_build,
+   simulation,
+   fee_estimation,
+   signing,
+   submission
+};
+
+/**
+ * Operator-supplied pinning configuration for one Solana client.
+ */
+struct solana_cluster_identity_config {
+   std::string client_id;
+   solana_genesis_hash expected_genesis_hash;
+   fc::microseconds maximum_verification_age = fc::seconds(30);
+   fc::microseconds probe_timeout = fc::seconds(5);
+   std::function<fc::time_point()> verification_clock = [] { return fc::time_point::now(); };
+};
+
+/**
+ * Sanitized point-in-time verification state for logs and metrics.
+ *
+ * RPC credentials, signature-provider identifiers, transactions, and account
+ * payloads are deliberately absent.
+ */
+struct solana_cluster_identity_snapshot {
+   std::string client_id;
+   std::string sanitized_endpoint;
+   solana_cluster_identity_mode mode = solana_cluster_identity_mode::unpinned;
+   solana_cluster_identity_status status = solana_cluster_identity_status::unpinned;
+   solana_cluster_identity_reason reason = solana_cluster_identity_reason::missing_expected_identity;
+   std::optional<std::string> expected_genesis_hash;
+   std::optional<std::string> observed_genesis_hash;
+   std::optional<fc::time_point> verified_at;
+   std::optional<fc::microseconds> verification_age;
+   std::uint64_t transport_session_id = 0;
+   std::uint64_t verification_attempts = 0;
+   std::uint64_t verification_successes = 0;
+   std::uint64_t verification_mismatches = 0;
+   std::uint64_t verification_failures = 0;
+   std::uint64_t verification_recoveries = 0;
+   std::map<solana_cluster_identity_operation, std::uint64_t> blocked_operations;
+};
 
 class solana_client;
 using solana_client_ptr = std::shared_ptr<solana_client>;
@@ -281,11 +374,9 @@ public:
     * @return Confirmed transaction signature.
     * @throws fc::timeout_exception on deadline expiry; fc::exception on tx error.
     */
-   std::string execute_tx_and_confirm(const idl::instruction& instr,
-                                      const std::vector<account_meta>& accounts,
+   std::string execute_tx_and_confirm(const idl::instruction& instr, const std::vector<account_meta>& accounts,
                                       const program_invoke_data_items& params = {},
-                                      const solana_confirm_options& opts =
-                                         solana_confirm_option_defaults);
+                                      const solana_confirm_options& opts = solana_confirm_option_defaults);
 
    /**
     * @brief Same as `execute_tx_and_confirm` above, but prepends the supplied
@@ -305,12 +396,10 @@ public:
     * @return Confirmed transaction signature.
     * @throws fc::timeout_exception on deadline expiry; fc::exception on tx error.
     */
-   std::string execute_tx_and_confirm(const idl::instruction& instr,
-                                      const std::vector<account_meta>& accounts,
+   std::string execute_tx_and_confirm(const idl::instruction& instr, const std::vector<account_meta>& accounts,
                                       const program_invoke_data_items& params,
                                       const std::vector<instruction>& pre_instructions,
-                                      const solana_confirm_options& opts =
-                                         solana_confirm_option_defaults);
+                                      const solana_confirm_options& opts = solana_confirm_option_defaults);
 
    /**
     * @brief Resolve accounts for an instruction based on IDL
@@ -376,9 +465,8 @@ protected:
     * @param opts Commitment + retry envelope captured into the callable
     */
    template <typename RT, typename... Args>
-   solana_program_tx_fn<RT, Args...> create_tx_and_confirm(
-      const idl::instruction&  instr,
-      solana_confirm_options   opts = solana_confirm_option_defaults);
+   solana_program_tx_fn<RT, Args...>
+   create_tx_and_confirm(const idl::instruction& instr, solana_confirm_options opts = solana_confirm_option_defaults);
 
    /**
     * @brief Creates a typed account data getter function
@@ -393,7 +481,8 @@ protected:
     * @return Callable function object that fetches and decodes the account data
     */
    template <typename RT>
-   solana_program_account_data_fn<RT> create_account_data_get(const std::string& idl_type_name, const solana_public_key& pda);
+   solana_program_account_data_fn<RT> create_account_data_get(const std::string& idl_type_name,
+                                                              const solana_public_key& pda);
 
    /**
     * @brief Encode a value to Borsh format using IDL type information
@@ -444,7 +533,7 @@ protected:
     * @return Pair of (pubkey, bump)
     */
    std::pair<solana_public_key, uint8_t> derive_pda(const std::vector<idl::pda_seed>& pda_seeds,
-                                          const program_invoke_data_items& params = {});
+                                                    const program_invoke_data_items& params = {});
 
    /**
     * @brief Decode a value from Borsh-encoded data using IDL type information
@@ -553,6 +642,22 @@ public:
                  client_options rpc_options = {});
 
    /**
+    * Construct a cluster-pinned client and verify it before returning.
+    *
+    * The JSON-RPC transport, expected hash, and initial observation are bound
+    * into this instance. Construction throws before the client can be exposed
+    * when the bounded startup probe does not produce an exact canonical match.
+    *
+    * @param sig_provider Signature provider for signing transactions.
+    * @param url_source Configured Solana RPC endpoint.
+    * @param identity_config Independently sourced expected cluster identity
+    *                        and freshness policy.
+    */
+   solana_client(const signature_provider_ptr& sig_provider, const std::variant<std::string, fc::url>& url_source,
+                 solana_cluster_identity_config identity_config,
+                 client_options rpc_options = {});
+
+   /**
     * @brief Execute a raw JSON-RPC method call
     */
    fc::variant execute(const std::string& method, const fc::variant& params);
@@ -565,6 +670,16 @@ public:
     * `execute`.
     */
    fc::variant execute_idempotent(const std::string& method, const fc::variant& params);
+
+   /**
+    * Return sanitized cluster-verification state and counters.
+    */
+   solana_cluster_identity_snapshot get_cluster_identity_snapshot() const;
+
+   /**
+    * Return true when this client enforces an operator-supplied genesis hash.
+    */
+   bool cluster_identity_pinning_enabled() const noexcept { return _cluster_identity.has_value(); }
 
    /**
     * @brief Get the signer's public key
@@ -583,7 +698,7 @@ public:
     * @return Account info or nullopt if account doesn't exist
     */
    std::optional<account_info> get_account_info(const pubkey_compat_t& address,
-                                                 commitment_t commitment = commitment_t::confirmed);
+                                                commitment_t commitment = commitment_t::confirmed);
 
    /**
     * @brief Get account balance in lamports
@@ -594,7 +709,7 @@ public:
     * @brief Get multiple accounts in a single request
     */
    std::vector<std::optional<account_info>> get_multiple_accounts(const std::vector<solana_public_key>& addresses,
-                                                                   commitment_t commitment = commitment_t::confirmed);
+                                                                  commitment_t commitment = commitment_t::confirmed);
 
    //=========================================================================
    // Block Methods
@@ -724,7 +839,7 @@ public:
     * @return Fee in lamports or nullopt if blockhash expired
     */
    std::optional<uint64_t> get_fee_for_message(const std::string& message_base64,
-                                                commitment_t commitment = commitment_t::confirmed);
+                                               commitment_t commitment = commitment_t::confirmed);
 
    /**
     * @brief Get recent prioritization fees
@@ -737,7 +852,8 @@ public:
 
    fc::variant get_inflation_governor(commitment_t commitment = commitment_t::confirmed);
    fc::variant get_inflation_rate();
-   fc::variant get_inflation_reward(const std::vector<solana_public_key>& addresses, std::optional<uint64_t> epoch = std::nullopt);
+   fc::variant get_inflation_reward(const std::vector<solana_public_key>& addresses,
+                                    std::optional<uint64_t> epoch = std::nullopt);
 
    //=========================================================================
    // Supply Methods
@@ -757,13 +873,13 @@ public:
    //=========================================================================
 
    fc::variant get_token_account_balance(const pubkey_compat_t& token_account,
-                                          commitment_t commitment = commitment_t::confirmed);
+                                         commitment_t commitment = commitment_t::confirmed);
    fc::variant get_token_accounts_by_delegate(const pubkey_compat_t& delegate, const fc::variant& filter,
-                                               commitment_t commitment = commitment_t::confirmed);
+                                              commitment_t commitment = commitment_t::confirmed);
    fc::variant get_token_accounts_by_owner(const pubkey_compat_t& owner, const fc::variant& filter,
-                                            commitment_t commitment = commitment_t::confirmed);
-   fc::variant get_token_largest_accounts(const pubkey_compat_t& mint,
                                            commitment_t commitment = commitment_t::confirmed);
+   fc::variant get_token_largest_accounts(const pubkey_compat_t& mint,
+                                          commitment_t commitment = commitment_t::confirmed);
    fc::variant get_token_supply(const pubkey_compat_t& mint, commitment_t commitment = commitment_t::confirmed);
 
    //=========================================================================
@@ -784,9 +900,9 @@ public:
     * @brief Get signatures for an address
     */
    std::vector<fc::variant> get_signatures_for_address(const pubkey_compat_t& address,
-                                                        std::optional<std::string> before = std::nullopt,
-                                                        std::optional<std::string> until = std::nullopt,
-                                                        size_t limit = 1000);
+                                                       std::optional<std::string> before = std::nullopt,
+                                                       std::optional<std::string> until = std::nullopt,
+                                                       size_t limit = 1000);
 
    /**
     * @brief Get signature statuses
@@ -849,7 +965,8 @@ public:
    /**
     * @brief Get minimum balance for rent exemption
     */
-   uint64_t get_minimum_balance_for_rent_exemption(size_t data_length, commitment_t commitment = commitment_t::confirmed);
+   uint64_t get_minimum_balance_for_rent_exemption(size_t data_length,
+                                                   commitment_t commitment = commitment_t::confirmed);
 
    //=========================================================================
    // Performance Methods
@@ -908,8 +1025,7 @@ public:
     * @param commitment Commitment level to wait for
     * @return Transaction signature
     */
-   std::string send_and_confirm_transaction(const transaction& tx,
-                                             commitment_t commitment = commitment_t::confirmed);
+   std::string send_and_confirm_transaction(const transaction& tx, commitment_t commitment = commitment_t::confirmed);
 
    /**
     * @brief Submit a signed transaction and await confirmation with
@@ -930,8 +1046,7 @@ public:
     * @return Confirmed transaction signature.
     */
    std::string send_transaction_and_confirm(const transaction& tx,
-                                             const solana_confirm_options& opts =
-                                                solana_confirm_option_defaults);
+                                            const solana_confirm_options& opts = solana_confirm_option_defaults);
 
    //=========================================================================
    // Program Client Support
@@ -969,7 +1084,27 @@ public:
 private:
    const signature_provider_ptr _signature_provider;
    const solana_public_key _pubkey;
+   const std::optional<solana_cluster_identity_config> _cluster_identity;
+   const std::string _sanitized_endpoint;
    json_rpc_client _client;
+   /// Serializes JSON-RPC, verification state changes, signing, and submission.
+   mutable std::timed_mutex _operation_mutex;
+   /// Protects the published non-blocking telemetry snapshot.
+   mutable std::mutex _snapshot_mutex;
+
+   solana_cluster_identity_status _cluster_identity_status;
+   solana_cluster_identity_reason _cluster_identity_reason;
+   std::optional<solana_genesis_hash> _last_observed_genesis_hash;
+   std::optional<fc::time_point> _last_verified_at;
+   std::uint64_t _verified_transport_session_id = 0;
+   std::uint64_t _verification_attempts = 0;
+   std::uint64_t _verification_successes = 0;
+   std::uint64_t _verification_mismatches = 0;
+   std::uint64_t _verification_failures = 0;
+   std::uint64_t _verification_recoveries = 0;
+   std::map<solana_cluster_identity_operation, std::uint64_t> _blocked_operations;
+   /// Latest immutable-by-convention state copied for logs and metric scrapes.
+   solana_cluster_identity_snapshot _published_identity_snapshot;
 
    using program_key_t = std::pair<solana_public_key, std::string>;
    fc::threadsafe_map<program_key_t, std::shared_ptr<solana_program_client>> _programs_map{};
@@ -979,6 +1114,33 @@ private:
     * @brief Build config object for RPC calls
     */
    fc::variant build_config(commitment_t commitment, const std::optional<fc::variant_object>& extra = std::nullopt);
+
+   using operation_lock = std::unique_lock<std::timed_mutex>;
+
+   /** Acquire the serialized operation gate within the caller's active deadline. */
+   operation_lock lock_operation() const;
+   /** Execute one RPC method while the operation gate is already held. */
+   fc::variant execute_locked(const std::string& method, const fc::variant& params);
+   /** Return whether a probe is required after applying sticky/stale state transitions. */
+   bool cluster_verification_required_locked(solana_cluster_identity_operation operation, bool force_fresh);
+   /** Record one transport-level probe failure without exposing request data. */
+   void record_cluster_verification_failure_locked(solana_cluster_identity_operation operation,
+                                                   solana_cluster_identity_reason reason);
+   /** Validate and record one `getGenesisHash` result. */
+   void record_cluster_identity_observation_locked(solana_cluster_identity_operation operation,
+                                                   const fc::variant& observed_result,
+                                                   solana_cluster_identity_status previous_status,
+                                                   solana_cluster_identity_reason previous_reason);
+   /** Reverify pinned identity when required or block the protected operation. */
+   void ensure_cluster_verified_locked(solana_cluster_identity_operation operation, bool force_fresh);
+   /** Publish verification state without holding the RPC gate during later scrapes. */
+   void publish_cluster_identity_snapshot_locked();
+   /** Call `getGenesisHash` without recursively entering the public verification gate. */
+   fc::variant fetch_genesis_hash_unchecked_locked();
+   /** Count one operation rejected before RPC or signing. */
+   void record_blocked_operation_locked(solana_cluster_identity_operation operation);
+   /** Map raw RPC names onto the closed telemetry operation vocabulary. */
+   static solana_cluster_identity_operation operation_for_rpc_method(const std::string& method);
 };
 
 //=============================================================================
@@ -1036,8 +1198,8 @@ solana_program_tx_fn<RT, Args...> solana_program_client::create_tx(const idl::in
 }
 
 template <typename RT, typename... Args>
-solana_program_tx_fn<RT, Args...> solana_program_client::create_tx_and_confirm(
-   const idl::instruction& instr, solana_confirm_options opts) {
+solana_program_tx_fn<RT, Args...> solana_program_client::create_tx_and_confirm(const idl::instruction& instr,
+                                                                               solana_confirm_options opts) {
    auto idl_map = _idl_map.writeable();
    if (!idl_map.contains(instr.name)) {
       idl_map[instr.name] = instr;
@@ -1049,8 +1211,7 @@ solana_program_tx_fn<RT, Args...> solana_program_client::create_tx_and_confirm(
 
       // Execute + await confirmation. Throws on timeout or RPC-reported
       // tx failure, so callers never see a "success" for a dropped tx.
-      std::string signature = execute_tx_and_confirm(
-         idl, resolve_accounts(idl, params), params, opts);
+      std::string signature = execute_tx_and_confirm(idl, resolve_accounts(idl, params), params, opts);
 
       // Result coercion matches create_tx above so callers of either
       // factory see identical return-type behaviour.
@@ -1067,7 +1228,7 @@ solana_program_tx_fn<RT, Args...> solana_program_client::create_tx_and_confirm(
 
 template <typename RT>
 RT solana_program_client::get_account_data(const std::string& account_name, const solana_public_key& address,
-                                            commitment_t commitment) {
+                                           commitment_t commitment) {
    // Fetch account info from the network
    auto account_info = client->get_account_info(address, commitment);
    FC_ASSERT(account_info.has_value(), "Account not found: {}", address.to_string(fc::yield_function_t{}));
@@ -1086,7 +1247,7 @@ RT solana_program_client::get_account_data(const std::string& account_name, cons
 
 template <typename RT>
 solana_program_account_data_fn<RT> solana_program_client::create_account_data_get(const std::string& idl_type_name,
-                                                                                    const solana_public_key& pda) {
+                                                                                  const solana_public_key& pda) {
    // Capture type name and address by value for the lambda
    std::string type_name = idl_type_name;
    solana_public_key address = pda;
@@ -1109,4 +1270,4 @@ solana_program_account_data_fn<RT> solana_program_client::create_account_data_ge
    };
 }
 
-}  // namespace fc::network::solana
+} // namespace fc::network::solana

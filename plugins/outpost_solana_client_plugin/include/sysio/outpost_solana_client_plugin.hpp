@@ -385,6 +385,14 @@ public:
    virtual void plugin_shutdown();
 
    std::vector<solana_client_entry_ptr> get_clients();
+
+   /**
+    * Return credential-free cluster-identity snapshots for every configured
+    * client. The client ID is supplied by the plugin for legacy unpinned
+    * instances whose common-client constructor predates named connections.
+    */
+   std::vector<solana_cluster_identity_snapshot> get_cluster_identity_snapshots();
+
    solana_client_entry_ptr get_client(const std::string& id);
    const std::vector<std::pair<std::filesystem::path, std::vector<fc::network::solana::idl::program>>>& get_idl_files();
 

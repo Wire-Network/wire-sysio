@@ -1,4 +1,6 @@
 // SPDX-License-Identifier: MIT
+#include <chrono>
+#include <fc/crypto/base58.hpp>
 #include <fc/crypto/base64.hpp>
 #include <fc/crypto/signer.hpp>
 #include <fc/int256.hpp>
@@ -6,15 +8,39 @@
 #include <fc/log/logger.hpp>
 #include <fc/network/solana/solana_borsh.hpp>
 #include <fc/network/solana/solana_client.hpp>
+#include <fc/task/deadline.hpp>
 #include <fc/task/retry.hpp>
-#include <magic_enum/magic_enum.hpp>
 #include <limits>
+#include <magic_enum/magic_enum.hpp>
 #include <optional>
 #include <thread>
 
 namespace fc::network::solana {
 
 namespace {
+
+/**
+ * Return a credential-free endpoint label.
+ *
+ * Hosted RPC API keys commonly appear in URL userinfo, query strings, or path
+ * segments, so telemetry deliberately retains only scheme, host, and port.
+ */
+std::string sanitize_endpoint(const std::variant<std::string, fc::url>& source) {
+   const fc::url endpoint =
+      std::holds_alternative<std::string>(source) ? fc::url(std::get<std::string>(source)) : std::get<fc::url>(source);
+   return fc::http::sanitized_endpoint(endpoint);
+}
+
+/**
+ * Construct a transport while the configured startup deadline is active.
+ */
+json_rpc_client create_pinned_rpc_client(const std::variant<std::string, fc::url>& source,
+                                         fc::microseconds probe_timeout,
+                                         client_options rpc_options) {
+   FC_ASSERT(probe_timeout.count() > 0, "Solana cluster identity probe timeout must be positive");
+   fc::task::deadline_scope deadline(fc::task::clamp_to_current_deadline(fc::time_point::now() + probe_timeout));
+   return json_rpc_client::create(source, std::move(rpc_options));
+}
 
 /**
  * @brief Checked size_t addition for conservative Borsh size estimates.
@@ -38,20 +64,17 @@ std::optional<size_t> checked_mul_size(size_t lhs, size_t rhs) {
  * @brief Return the next nested IDL type depth or reject excessive recursion.
  */
 size_t next_idl_type_depth(size_t type_depth) {
-   FC_ASSERT(type_depth < max_idl_type_nesting_depth,
-             "Solana IDL type nesting exceeds maximum depth {}",
+   FC_ASSERT(type_depth < max_idl_type_nesting_depth, "Solana IDL type nesting exceeds maximum depth {}",
              max_idl_type_nesting_depth);
    return type_depth + 1;
 }
 
-std::optional<size_t> min_borsh_encoded_size(const idl::idl_type& type, const idl::program* program,
-                                             size_t type_depth);
+std::optional<size_t> min_borsh_encoded_size(const idl::idl_type& type, const idl::program* program, size_t type_depth);
 
 /**
  * @brief Smallest Borsh byte count for a field sequence.
  */
-std::optional<size_t> min_borsh_fields_encoded_size(const std::vector<idl::field>& fields,
-                                                    const idl::program* program,
+std::optional<size_t> min_borsh_fields_encoded_size(const std::vector<idl::field>& fields, const idl::program* program,
                                                     size_t type_depth) {
    size_t total = 0;
    for (const auto& field : fields) {
@@ -133,8 +156,7 @@ std::optional<size_t> min_borsh_encoded_size(const idl::idl_type& type, const id
          return std::nullopt;
 
       if (type_def->is_struct() && type_def->struct_fields)
-         return min_borsh_fields_encoded_size(*type_def->struct_fields, program,
-                                              next_idl_type_depth(type_depth));
+         return min_borsh_fields_encoded_size(*type_def->struct_fields, program, next_idl_type_depth(type_depth));
 
       if (type_def->is_enum() && type_def->enum_variants)
          return sizeof(uint8_t);
@@ -143,7 +165,29 @@ std::optional<size_t> min_borsh_encoded_size(const idl::idl_type& type, const id
    return std::nullopt;
 }
 
-}  // namespace
+} // namespace
+
+solana_genesis_hash parse_solana_genesis_hash(const std::string& value) {
+   FC_ASSERT(!value.empty(), "Solana genesis hash must not be empty");
+
+   std::vector<char> decoded;
+   try {
+      decoded = fc::from_base58(value);
+   } catch (const fc::exception&) {
+      FC_THROW("Solana genesis hash is not valid base58");
+   } catch (const std::exception&) {
+      FC_THROW("Solana genesis hash is not valid base58");
+   }
+
+   FC_ASSERT(decoded.size() == 32, "Solana genesis hash must decode to exactly 32 bytes, got {}", decoded.size());
+   const auto canonical = fc::to_base58(decoded, fc::yield_function_t{});
+   FC_ASSERT(canonical == value, "Solana genesis hash must use canonical base58 encoding");
+
+   solana_genesis_hash result;
+   std::ranges::transform(decoded, result.bytes.begin(), [](char byte) { return static_cast<uint8_t>(byte); });
+   result.canonical = canonical;
+   return result;
+}
 
 //=============================================================================
 // solana_program_data_client implementation
@@ -517,8 +561,7 @@ fc::variant solana_program_client::decode_type(borsh::decoder& decoder, const id
    return decode_type(decoder, type, 0);
 }
 
-fc::variant solana_program_client::decode_type(borsh::decoder& decoder, const idl::idl_type& type,
-                                               size_t type_depth) {
+fc::variant solana_program_client::decode_type(borsh::decoder& decoder, const idl::idl_type& type, size_t type_depth) {
    if (type.is_primitive()) {
       switch (type.get_primitive()) {
       case idl::primitive_type::bool_t:
@@ -577,17 +620,16 @@ fc::variant solana_program_client::decode_type(borsh::decoder& decoder, const id
       const auto element_depth = next_idl_type_depth(type_depth);
       const auto min_element_size = min_borsh_encoded_size(*type.vec_element, _program.get(), element_depth);
       if (!min_element_size) {
-         FC_ASSERT(len == 0,
-                   "Borsh decoder: cannot safely bound vector element type '{}' before allocation",
+         FC_ASSERT(len == 0, "Borsh decoder: cannot safely bound vector element type '{}' before allocation",
                    type.vec_element->to_string());
       } else if (*min_element_size == 0) {
          FC_ASSERT(len <= max_zero_sized_idl_vector_elements,
-                   "Borsh decoder: zero-sized vector length {} for element type '{}' exceeds decode cap {}",
-                   len, type.vec_element->to_string(), max_zero_sized_idl_vector_elements);
+                   "Borsh decoder: zero-sized vector length {} for element type '{}' exceeds decode cap {}", len,
+                   type.vec_element->to_string(), max_zero_sized_idl_vector_elements);
       } else {
          FC_ASSERT(len <= decoder.remaining() / *min_element_size,
-                   "Borsh decoder: vector length {} for element type '{}' exceeds remaining {} bytes",
-                   len, type.vec_element->to_string(), decoder.remaining());
+                   "Borsh decoder: vector length {} for element type '{}' exceeds remaining {} bytes", len,
+                   type.vec_element->to_string(), decoder.remaining());
       }
 
       fc::variants arr;
@@ -735,9 +777,9 @@ std::string solana_program_client::execute_tx(const idl::instruction& instr, con
 }
 
 std::string solana_program_client::execute_tx_and_confirm(const idl::instruction& instr,
-                                                           const std::vector<account_meta>& accounts,
-                                                           const program_invoke_data_items& params,
-                                                           const solana_confirm_options& opts) {
+                                                          const std::vector<account_meta>& accounts,
+                                                          const program_invoke_data_items& params,
+                                                          const solana_confirm_options& opts) {
    // Delegate to the pre-instructions overload with an empty prefix so we
    // have a single tx-build path; both overloads stay source-compatible
    // for every existing caller.
@@ -745,16 +787,15 @@ std::string solana_program_client::execute_tx_and_confirm(const idl::instruction
 }
 
 std::string solana_program_client::execute_tx_and_confirm(const idl::instruction& instr,
-                                                           const std::vector<account_meta>& accounts,
-                                                           const program_invoke_data_items& params,
-                                                           const std::vector<instruction>& pre_instructions,
-                                                           const solana_confirm_options& opts) {
+                                                          const std::vector<account_meta>& accounts,
+                                                          const program_invoke_data_items& params,
+                                                          const std::vector<instruction>& pre_instructions,
+                                                          const solana_confirm_options& opts) {
    auto idl_instruction = build_instruction(instr, accounts, params);
 
    std::vector<instruction> all_instructions;
    all_instructions.reserve(pre_instructions.size() + 1);
-   all_instructions.insert(all_instructions.end(),
-                           pre_instructions.begin(), pre_instructions.end());
+   all_instructions.insert(all_instructions.end(), pre_instructions.begin(), pre_instructions.end());
    all_instructions.push_back(std::move(idl_instruction));
 
    auto tx = client->create_transaction(all_instructions, client->get_pubkey());
@@ -854,10 +895,10 @@ std::vector<account_meta> solana_program_client::resolve_accounts(const idl::ins
       // a built-in table so callers don't have to override every instruction.
       else {
          static const std::map<std::string, solana_public_key> well_known = {
-            {"system_program",             system::program_ids::SYSTEM_PROGRAM},
-            {"token_program",              system::program_ids::TOKEN_PROGRAM},
-            {"associated_token_program",   system::program_ids::ASSOCIATED_TOKEN_PROGRAM},
-            {"compute_budget_program",     system::program_ids::COMPUTE_BUDGET_PROGRAM},
+            {"system_program",           system::program_ids::SYSTEM_PROGRAM          },
+            {"token_program",            system::program_ids::TOKEN_PROGRAM           },
+            {"associated_token_program", system::program_ids::ASSOCIATED_TOKEN_PROGRAM},
+            {"compute_budget_program",   system::program_ids::COMPUTE_BUDGET_PROGRAM  },
          };
          auto it = well_known.find(acct.name);
          if (it != well_known.end()) {
@@ -890,14 +931,300 @@ solana_client::solana_client(const signature_provider_ptr& sig_provider,
                              client_options rpc_options)
    : _signature_provider(sig_provider)
    , _pubkey(from_fc_public_key(_signature_provider->public_key))
-   , _client(json_rpc_client::create(url_source, std::move(rpc_options))) {}
+   , _cluster_identity(std::nullopt)
+   , _sanitized_endpoint(sanitize_endpoint(url_source))
+   , _client(json_rpc_client::create(url_source, std::move(rpc_options)))
+   , _cluster_identity_status(solana_cluster_identity_status::unpinned)
+   , _cluster_identity_reason(solana_cluster_identity_reason::missing_expected_identity) {
+   publish_cluster_identity_snapshot_locked();
+}
+
+solana_client::solana_client(const signature_provider_ptr& sig_provider,
+                             const std::variant<std::string, fc::url>& url_source,
+                             solana_cluster_identity_config identity_config,
+                             client_options rpc_options)
+   : _signature_provider(sig_provider)
+   , _pubkey(from_fc_public_key(_signature_provider->public_key))
+   , _cluster_identity(std::move(identity_config))
+   , _sanitized_endpoint(sanitize_endpoint(url_source))
+   , _client(create_pinned_rpc_client(
+        url_source,
+        _cluster_identity->probe_timeout,
+        std::move(rpc_options)))
+   , _cluster_identity_status(solana_cluster_identity_status::unverified)
+   , _cluster_identity_reason(solana_cluster_identity_reason::none) {
+   FC_ASSERT(!_cluster_identity->client_id.empty(), "Solana cluster identity client id must not be empty");
+   FC_ASSERT(_cluster_identity->maximum_verification_age.count() > 0,
+             "Solana cluster identity maximum verification age must be positive");
+   FC_ASSERT(static_cast<bool>(_cluster_identity->verification_clock),
+             "Solana cluster identity verification clock must be configured");
+   const auto reparsed = parse_solana_genesis_hash(_cluster_identity->expected_genesis_hash.canonical);
+   FC_ASSERT(reparsed == _cluster_identity->expected_genesis_hash,
+             "Solana expected genesis hash bytes do not match their canonical representation");
+
+   auto operation_guard = lock_operation();
+   ensure_cluster_verified_locked(solana_cluster_identity_operation::startup, true);
+}
 
 fc::variant solana_client::execute(const std::string& method, const fc::variant& params) {
-   return _client.call(method, params);
+   auto operation_guard = lock_operation();
+   return execute_locked(method, params);
+}
+
+solana_client::operation_lock solana_client::lock_operation() const {
+   operation_lock lock(_operation_mutex, std::defer_lock);
+   const auto deadline = fc::task::current_deadline();
+   if (!deadline || *deadline == fc::time_point::maximum()) {
+      lock.lock();
+      return lock;
+   }
+
+   const auto now = fc::time_point::now();
+   if (now >= *deadline) {
+      FC_THROW_EXCEPTION(fc::timeout_exception, "Timed out waiting for the Solana client operation gate");
+   }
+   const auto remaining = *deadline - now;
+   if (!lock.try_lock_for(std::chrono::microseconds(remaining.count()))) {
+      FC_THROW_EXCEPTION(fc::timeout_exception, "Timed out waiting for the Solana client operation gate");
+   }
+   return lock;
+}
+
+solana_cluster_identity_operation solana_client::operation_for_rpc_method(const std::string& method) {
+   if (method == "sendTransaction") {
+      return solana_cluster_identity_operation::submission;
+   }
+   if (method == "getLatestBlockhash") {
+      return solana_cluster_identity_operation::transaction_build;
+   }
+   if (method == "simulateTransaction") {
+      return solana_cluster_identity_operation::simulation;
+   }
+   if (method == "getFeeForMessage" || method == "getRecentPrioritizationFees") {
+      return solana_cluster_identity_operation::fee_estimation;
+   }
+   return solana_cluster_identity_operation::rpc_read;
+}
+
+fc::variant solana_client::execute_locked(const std::string& method, const fc::variant& params) {
+   const auto operation = operation_for_rpc_method(method);
+   if (!_cluster_identity) {
+      return _client.call(method, params);
+   }
+
+   // Every protected RPC is preceded by getGenesisHash on the exact same
+   // HTTP/TLS connection. A cached observation can describe telemetry and
+   // signing freshness, but it cannot authorize a new transport session.
+   (void)cluster_verification_required_locked(operation, true);
+   const auto previous_status = _cluster_identity_status;
+   const auto previous_reason = _cluster_identity_reason;
+   ++_verification_attempts;
+
+   bool observation_received = false;
+   try {
+      return _client.call_after_verification(
+         "getGenesisHash", fc::variants{},
+         [&](const fc::variant& observed_result) {
+            observation_received = true;
+            record_cluster_identity_observation_locked(operation, observed_result, previous_status, previous_reason);
+         },
+         _cluster_identity->probe_timeout,
+         method, params);
+   } catch (const fc::timeout_exception&) {
+      if (!observation_received) {
+         record_cluster_verification_failure_locked(operation, solana_cluster_identity_reason::rpc_timeout);
+      }
+      throw;
+   } catch (const std::exception&) {
+      if (!observation_received) {
+         record_cluster_verification_failure_locked(operation, solana_cluster_identity_reason::rpc_error);
+      }
+      throw;
+   }
+}
+
+fc::variant solana_client::fetch_genesis_hash_unchecked_locked() {
+   return _client.call("getGenesisHash", fc::variants{});
+}
+
+void solana_client::record_blocked_operation_locked(solana_cluster_identity_operation operation) {
+   ++_blocked_operations[operation];
+}
+
+bool solana_client::cluster_verification_required_locked(solana_cluster_identity_operation operation,
+                                                         bool force_fresh) {
+   if (!_cluster_identity) {
+      return false;
+   }
+
+   if (_cluster_identity_status == solana_cluster_identity_status::mismatch) {
+      record_blocked_operation_locked(operation);
+      publish_cluster_identity_snapshot_locked();
+      FC_THROW("Solana cluster identity verification blocked client '{}' "
+               "(status={}, reason={}, operation={})",
+               _cluster_identity->client_id, magic_enum::enum_name(_cluster_identity_status),
+               magic_enum::enum_name(_cluster_identity_reason), magic_enum::enum_name(operation));
+   }
+
+   const auto now = _cluster_identity->verification_clock();
+   const auto current_transport_session_id = _client.last_transport_session_id();
+   if (_cluster_identity_status == solana_cluster_identity_status::verified &&
+       _verified_transport_session_id != current_transport_session_id) {
+      _cluster_identity_status = solana_cluster_identity_status::stale;
+      _cluster_identity_reason = solana_cluster_identity_reason::transport_session_changed;
+   }
+
+   if (_cluster_identity_status == solana_cluster_identity_status::verified && _last_verified_at &&
+       now - *_last_verified_at >= _cluster_identity->maximum_verification_age) {
+      _cluster_identity_status = solana_cluster_identity_status::stale;
+      _cluster_identity_reason = solana_cluster_identity_reason::verification_stale;
+   }
+
+   return force_fresh || _cluster_identity_status != solana_cluster_identity_status::verified;
+}
+
+void solana_client::record_cluster_verification_failure_locked(solana_cluster_identity_operation operation,
+                                                               solana_cluster_identity_reason reason) {
+   _cluster_identity_status = solana_cluster_identity_status::error;
+   _cluster_identity_reason = reason;
+   ++_verification_failures;
+   record_blocked_operation_locked(operation);
+   wlog("Solana cluster identity verification failed "
+        "(client_id={},endpoint={},status={},reason={},operation={})",
+        _cluster_identity->client_id, _sanitized_endpoint, magic_enum::enum_name(_cluster_identity_status),
+        magic_enum::enum_name(_cluster_identity_reason), magic_enum::enum_name(operation));
+   publish_cluster_identity_snapshot_locked();
+}
+
+void solana_client::record_cluster_identity_observation_locked(
+   solana_cluster_identity_operation operation,
+   const fc::variant& observed_result,
+   solana_cluster_identity_status previous_status,
+   solana_cluster_identity_reason previous_reason) {
+   solana_genesis_hash observed;
+   try {
+      FC_ASSERT(observed_result.is_string(), "Solana getGenesisHash result must be a string");
+      observed = parse_solana_genesis_hash(observed_result.as_string());
+   } catch (const std::exception&) {
+      record_cluster_verification_failure_locked(
+         operation, solana_cluster_identity_reason::malformed_observed_identity);
+      throw;
+   }
+
+   _last_observed_genesis_hash = observed;
+   if (observed != _cluster_identity->expected_genesis_hash) {
+      _cluster_identity_status = solana_cluster_identity_status::mismatch;
+      _cluster_identity_reason = solana_cluster_identity_reason::identity_mismatch;
+      ++_verification_mismatches;
+      record_blocked_operation_locked(operation);
+      elog("Solana cluster identity mismatch "
+           "(client_id={},endpoint={},expected_genesis_hash={},observed_genesis_hash={},"
+           "status={},reason={},operation={})",
+           _cluster_identity->client_id, _sanitized_endpoint, _cluster_identity->expected_genesis_hash.canonical,
+           observed.canonical, magic_enum::enum_name(_cluster_identity_status),
+           magic_enum::enum_name(_cluster_identity_reason), magic_enum::enum_name(operation));
+      publish_cluster_identity_snapshot_locked();
+      FC_THROW("Solana cluster identity mismatch for client '{}'", _cluster_identity->client_id);
+   }
+
+   const bool recovered = previous_status == solana_cluster_identity_status::error ||
+                          (previous_status == solana_cluster_identity_status::stale &&
+                           previous_reason == solana_cluster_identity_reason::transport_session_changed);
+   _cluster_identity_status = solana_cluster_identity_status::verified;
+   _cluster_identity_reason =
+      recovered ? solana_cluster_identity_reason::verification_recovered : solana_cluster_identity_reason::none;
+   _last_verified_at = _cluster_identity->verification_clock();
+   _verified_transport_session_id = _client.last_transport_session_id();
+   ++_verification_successes;
+
+   if (recovered) {
+      ++_verification_recoveries;
+      wlog("Solana cluster identity verification recovered "
+           "(client_id={},endpoint={},observed_genesis_hash={},status={},reason={},operation={})",
+           _cluster_identity->client_id, _sanitized_endpoint, observed.canonical,
+           magic_enum::enum_name(_cluster_identity_status), magic_enum::enum_name(_cluster_identity_reason),
+           magic_enum::enum_name(operation));
+   }
+   publish_cluster_identity_snapshot_locked();
+}
+
+void solana_client::ensure_cluster_verified_locked(solana_cluster_identity_operation operation, bool force_fresh) {
+   if (!cluster_verification_required_locked(operation, force_fresh)) {
+      return;
+   }
+
+   const auto previous_status = _cluster_identity_status;
+   const auto previous_reason = _cluster_identity_reason;
+   ++_verification_attempts;
+
+   fc::variant observed_result;
+   try {
+      fc::task::deadline_scope probe_deadline(
+         fc::task::clamp_to_current_deadline(fc::time_point::now() + _cluster_identity->probe_timeout));
+      observed_result = fetch_genesis_hash_unchecked_locked();
+   } catch (const fc::timeout_exception&) {
+      record_cluster_verification_failure_locked(operation, solana_cluster_identity_reason::rpc_timeout);
+      throw;
+   } catch (const std::exception&) {
+      record_cluster_verification_failure_locked(operation, solana_cluster_identity_reason::rpc_error);
+      throw;
+   }
+
+   record_cluster_identity_observation_locked(operation, observed_result, previous_status, previous_reason);
+}
+
+void solana_client::publish_cluster_identity_snapshot_locked() {
+   solana_cluster_identity_snapshot snapshot{
+      .client_id = _cluster_identity ? _cluster_identity->client_id : std::string{},
+      .sanitized_endpoint = _sanitized_endpoint,
+      .mode = _cluster_identity ? solana_cluster_identity_mode::pinned : solana_cluster_identity_mode::unpinned,
+      .status = _cluster_identity_status,
+      .reason = _cluster_identity_reason,
+      .expected_genesis_hash =
+         _cluster_identity ? std::optional(_cluster_identity->expected_genesis_hash.canonical) : std::nullopt,
+      .observed_genesis_hash =
+         _last_observed_genesis_hash ? std::optional(_last_observed_genesis_hash->canonical) : std::nullopt,
+      .verified_at = _last_verified_at,
+      .verification_age = std::nullopt,
+      .transport_session_id = _client.last_transport_session_id(),
+      .verification_attempts = _verification_attempts,
+      .verification_successes = _verification_successes,
+      .verification_mismatches = _verification_mismatches,
+      .verification_failures = _verification_failures,
+      .verification_recoveries = _verification_recoveries,
+      .blocked_operations = _blocked_operations,
+   };
+   std::lock_guard snapshot_guard(_snapshot_mutex);
+   _published_identity_snapshot = std::move(snapshot);
+}
+
+solana_cluster_identity_snapshot solana_client::get_cluster_identity_snapshot() const {
+   solana_cluster_identity_snapshot snapshot;
+   {
+      std::lock_guard snapshot_guard(_snapshot_mutex);
+      snapshot = _published_identity_snapshot;
+   }
+
+   const auto current_transport_session_id = _client.last_transport_session_id();
+   if (snapshot.status == solana_cluster_identity_status::verified &&
+       snapshot.transport_session_id != current_transport_session_id) {
+      snapshot.status = solana_cluster_identity_status::stale;
+      snapshot.reason = solana_cluster_identity_reason::transport_session_changed;
+   }
+   snapshot.transport_session_id = current_transport_session_id;
+   if (snapshot.verified_at) {
+      const auto now = _cluster_identity ? _cluster_identity->verification_clock() : fc::time_point::now();
+      snapshot.verification_age = now - *snapshot.verified_at;
+   }
+   return snapshot;
 }
 
 fc::variant solana_client::execute_idempotent(const std::string& method, const fc::variant& params) {
-   return _client.call_idempotent(method, params);
+   auto operation_guard = lock_operation();
+   if (!_cluster_identity) {
+      return _client.call_idempotent(method, params);
+   }
+   return execute_locked(method, params);
 }
 
 fc::variant solana_client::build_config(commitment_t commitment, const std::optional<fc::variant_object>& extra) {
@@ -1584,29 +1911,23 @@ transaction solana_client::create_transaction(const std::vector<instruction>& in
    for (const auto& m : readonly_non_signers)
       tx.msg.account_keys.push_back(m.key);
 
-   FC_ASSERT(
-      tx.msg.account_keys.size() <= limits::LEGACY_ACCOUNT_KEY_LIMIT,
-      "Solana legacy transaction has {} account keys, exceeding the {} key uint8_t instruction-index limit",
-      tx.msg.account_keys.size(),
-      limits::LEGACY_ACCOUNT_KEY_LIMIT);
+   FC_ASSERT(tx.msg.account_keys.size() <= limits::LEGACY_ACCOUNT_KEY_LIMIT,
+             "Solana legacy transaction has {} account keys, exceeding the {} key uint8_t instruction-index limit",
+             tx.msg.account_keys.size(), limits::LEGACY_ACCOUNT_KEY_LIMIT);
 
    const auto max_u8_count = static_cast<size_t>(std::numeric_limits<uint8_t>::max());
-   FC_ASSERT(
-      writable_signers.size() + readonly_signers.size() <= max_u8_count,
-      "Solana legacy transaction has {} required signatures, exceeding the uint8_t header limit",
-      writable_signers.size() + readonly_signers.size());
-   FC_ASSERT(
-      readonly_signers.size() <= max_u8_count,
-      "Solana legacy transaction has {} readonly signers, exceeding the uint8_t header limit",
-      readonly_signers.size());
-   FC_ASSERT(
-      readonly_non_signers.size() <= max_u8_count,
-      "Solana legacy transaction has {} readonly unsigned accounts, exceeding the uint8_t header limit",
-      readonly_non_signers.size());
+   FC_ASSERT(writable_signers.size() + readonly_signers.size() <= max_u8_count,
+             "Solana legacy transaction has {} required signatures, exceeding the uint8_t header limit",
+             writable_signers.size() + readonly_signers.size());
+   FC_ASSERT(readonly_signers.size() <= max_u8_count,
+             "Solana legacy transaction has {} readonly signers, exceeding the uint8_t header limit",
+             readonly_signers.size());
+   FC_ASSERT(readonly_non_signers.size() <= max_u8_count,
+             "Solana legacy transaction has {} readonly unsigned accounts, exceeding the uint8_t header limit",
+             readonly_non_signers.size());
 
    // Set header
-   tx.msg.header.num_required_signatures =
-      static_cast<uint8_t>(writable_signers.size() + readonly_signers.size());
+   tx.msg.header.num_required_signatures = static_cast<uint8_t>(writable_signers.size() + readonly_signers.size());
    tx.msg.header.num_readonly_signed_accounts = static_cast<uint8_t>(readonly_signers.size());
    tx.msg.header.num_readonly_unsigned_accounts = static_cast<uint8_t>(readonly_non_signers.size());
 
@@ -1617,11 +1938,8 @@ transaction solana_client::create_transaction(const std::vector<instruction>& in
    }
 
    const auto checked_u8_index = [](size_t index, const char* label) -> uint8_t {
-      FC_ASSERT(
-         index < limits::LEGACY_ACCOUNT_KEY_LIMIT,
-         "Solana {} index {} exceeds the uint8_t instruction-index limit",
-         label,
-         index);
+      FC_ASSERT(index < limits::LEGACY_ACCOUNT_KEY_LIMIT,
+                "Solana {} index {} exceeds the uint8_t instruction-index limit", label, index);
       return static_cast<uint8_t>(index);
    };
 
@@ -1645,6 +1963,9 @@ transaction solana_client::create_transaction(const std::vector<instruction>& in
 }
 
 transaction solana_client::sign_transaction(transaction& tx) {
+   auto operation_guard = lock_operation();
+   ensure_cluster_verified_locked(solana_cluster_identity_operation::signing, true);
+
    auto msg_bytes = tx.msg.serialize();
 
    fc::crypto::sol_client_signer signer(*_signature_provider);
@@ -1699,52 +2020,51 @@ std::string solana_client::send_and_confirm_transaction(const transaction& tx, c
 }
 
 namespace {
-   /// True when `confirmation_status` string from `getSignatureStatuses` is
-   /// at least as advanced as the requested `target`. Commitment ordering is
-   /// `processed < confirmed < finalized`; an RPC reporting "finalized"
-   /// satisfies every lesser target. Empty status string means the cluster
-   /// has not observed the tx yet — never sufficient.
-   bool has_reached_commitment(const std::string& confirmation_status, commitment_t target) {
-      if (confirmation_status.empty()) return false;
+/// True when `confirmation_status` string from `getSignatureStatuses` is
+/// at least as advanced as the requested `target`. Commitment ordering is
+/// `processed < confirmed < finalized`; an RPC reporting "finalized"
+/// satisfies every lesser target. Empty status string means the cluster
+/// has not observed the tx yet — never sufficient.
+bool has_reached_commitment(const std::string& confirmation_status, commitment_t target) {
+   if (confirmation_status.empty())
+      return false;
 
-      // Map the RPC's string back to the enum. Unknown strings are treated
-      // as "not yet confirmed" — safer than guessing.
-      auto observed = magic_enum::enum_cast<commitment_t>(confirmation_status);
-      if (!observed.has_value()) return false;
+   // Map the RPC's string back to the enum. Unknown strings are treated
+   // as "not yet confirmed" — safer than guessing.
+   auto observed = magic_enum::enum_cast<commitment_t>(confirmation_status);
+   if (!observed.has_value())
+      return false;
 
-      // Enum declaration order (processed=0, confirmed=1, finalized=2) encodes
-      // the monotonic commitment strength we compare against.
-      return magic_enum::enum_integer(*observed) >= magic_enum::enum_integer(target);
-   }
+   // Enum declaration order (processed=0, confirmed=1, finalized=2) encodes
+   // the monotonic commitment strength we compare against.
+   return magic_enum::enum_integer(*observed) >= magic_enum::enum_integer(target);
+}
 } // namespace
 
-std::string solana_client::send_transaction_and_confirm(const transaction& tx,
-                                                         const solana_confirm_options& opts) {
+std::string solana_client::send_transaction_and_confirm(const transaction& tx, const solana_confirm_options& opts) {
    // Submit once — send_transaction is fire-and-forget by design. We wrap
    // the poll-until-confirmed step in `fc::task::retry_until` so backoff +
    // deadline semantics are shared with the Ethereum client.
    const std::string sig = send_transaction(tx, /*skip_preflight=*/false, opts.commitment);
 
-   return fc::task::retry_until<std::string>(
-      "solana:send_transaction_and_confirm",
-      opts.retry,
-      [this, sig, target = opts.commitment]() -> std::optional<std::string> {
-         auto statuses = get_signature_statuses({sig}, false);
-         if (statuses.value.empty() || !statuses.value[0].has_value()) {
-            return std::nullopt; // cluster hasn't observed the tx yet — retry
-         }
-         const auto& s = *statuses.value[0];
-         if (s.err.has_value()) {
-            // Fatal: the tx ran and failed. No amount of waiting fixes that;
-            // propagate so the caller's retry logic (at the batch-op layer)
-            // can re-submit with a fresh blockhash / nonce.
-            FC_THROW("Transaction failed: {}", *s.err);
-         }
-         if (has_reached_commitment(s.confirmation_status, target)) {
-            return sig; // done — reached the requested commitment level
-         }
-         return std::nullopt; // seen, not yet at target commitment — retry
-      });
+   return fc::task::retry_until<std::string>("solana:send_transaction_and_confirm", opts.retry,
+                                             [this, sig, target = opts.commitment]() -> std::optional<std::string> {
+                                                auto statuses = get_signature_statuses({sig}, false);
+                                                if (statuses.value.empty() || !statuses.value[0].has_value()) {
+                                                   return std::nullopt; // cluster hasn't observed the tx yet — retry
+                                                }
+                                                const auto& s = *statuses.value[0];
+                                                if (s.err.has_value()) {
+                                                   // Fatal: the tx ran and failed. No amount of waiting fixes that;
+                                                   // propagate so the caller's retry logic (at the batch-op layer)
+                                                   // can re-submit with a fresh blockhash / nonce.
+                                                   FC_THROW("Transaction failed: {}", *s.err);
+                                                }
+                                                if (has_reached_commitment(s.confirmation_status, target)) {
+                                                   return sig; // done — reached the requested commitment level
+                                                }
+                                                return std::nullopt; // seen, not yet at target commitment — retry
+                                             });
 }
 
 } // namespace fc::network::solana

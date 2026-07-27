@@ -4,6 +4,7 @@
 #include <sysio/chain/thread_utils.hpp>
 #include <sysio/http_plugin/macros.hpp>
 #include <sysio/http_plugin/http_plugin.hpp>
+#include <sysio/outpost_solana_client_plugin.hpp>
 
 #include <fc/log/logger.hpp>
 
@@ -39,6 +40,9 @@ namespace sysio {
 
       void metrics(const fc::variant_object&, chain::plugin_interface::next_function<std::string> results) {
          boost::asio::post(_impl->_prometheus_strand, [this, results=std::move(results)]() {
+            if (auto* solana_plugin = app().find_plugin<outpost_solana_client_plugin>()) {
+               _impl->_catalog.update(solana_plugin->get_cluster_identity_snapshots());
+            }
             results(_impl->_catalog.report());
          });
       }
