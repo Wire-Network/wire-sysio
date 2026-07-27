@@ -1,7 +1,7 @@
 # Outbound HTTP transport
 
-The SEC-134 nodeop/libfc HTTP paths—Ethereum and Solana JSON-RPC/REST, KIOD, external debugging, and snapshot
-bootstrap—use one Boost.Beast/Boost.Asio transport core. The existing synchronous `fc::http::transport`,
+The SEC-134 nodeop/libfc HTTP paths -- Ethereum and Solana JSON-RPC/REST, KIOD, external debugging, and snapshot
+bootstrap -- use one Boost.Beast/Boost.Asio transport core. The existing synchronous `fc::http::transport`,
 `fc::network::json_rpc::json_rpc_client`, and `fc::http_client` APIs are blocking facades over that core; they do
 not implement separate DNS, socket, TLS, HTTP parsing, retry, or download stacks.
 
@@ -10,10 +10,15 @@ boundary.
 
 ## HTTPS trust and routing
 
-HTTPS always loads the platform trust store, verifies the peer certificate chain, and verifies the original URL
-DNS name or IP address. Private roots augment system trust; there is no option that disables verification.
-Proxy environment variables are ignored. A proxy is used only when its caller-specific option is configured,
-using the supported `http://host:port` form without embedded credentials.
+HTTPS always loads the OpenSSL platform trust store, verifies the peer certificate chain, and verifies the original
+URL DNS name or IP address. OpenSSL's normal `SSL_CERT_FILE` and `SSL_CERT_DIR` trust-store overrides remain active.
+Private roots augment that trust; there is no option that disables verification. Proxy environment variables are
+intentionally ignored so routing changes require an explicit node option. A proxy uses the supported
+`http://host:port` form without embedded credentials.
+
+The process-wide fallbacks are `--outbound-http-additional-ca-file`,
+`--outbound-http-additional-ca-path`, and `--outbound-http-proxy`. A caller-specific value in the table below
+overrides its process-wide fallback.
 
 | Caller | Additional CA file | Additional CA directory | Explicit proxy |
 |---|---|---|---|
@@ -39,9 +44,16 @@ Side-effecting calls such as `eth_sendTransaction`, `eth_sendRawTransaction`, So
 enforce single-attempt behavior even if a caller supplies permissive base retry options. A caller must select the
 explicit idempotent API to receive the stale-connection retry.
 
-JSON-RPC clients warm their configured endpoint at construction and retain the resolved address until a connection
-failure invalidates it. The process-wide resolver admits one platform lookup at a time with no unbounded work queue.
-Ordinary callers bound their wait with the connection deadline; the unbounded snapshot exception remains cancellable.
+JSON-RPC construction performs no DNS or network I/O. Resolution happens on the first request and the result is
+retained until a connection failure invalidates it. The process-wide resolver runs at most four platform lookups at
+once on four independent resolver services; up to 256 additional callers wait through an event-driven admission gate
+under their connection/task deadlines rather than queueing platform work or polling. Further callers fail admission
+immediately. The unbounded snapshot exception remains cancellable.
+
+The idle connection pool is capped at 32 connections per client. Connections idle for more than 15 seconds are
+closed before reuse, which keeps the reuse window below common provider keep-alive limits and bounds stale or
+peer-closed sockets retained by the process. A non-blocking socket peek also rejects a cached connection when a
+peer FIN/reset or unexpected unread bytes are already observable.
 
 ## Connection-affine continuations
 
@@ -55,12 +67,24 @@ validation exception, peer close, endpoint change, cancellation, or follow-up tr
 connection. The follow-up is single-attempt and never reconnects or falls back to another pooled connection. Each
 request has its own limits and total-deadline budget. This supports generic challenge/response, preflight/action, and
 endpoint-identity/action flows without embedding a caller-specific verification field in `request_options`.
+Continuation hooks execute synchronously on the client executor. They must be non-blocking and must not re-enter the
+same client; synchronous re-entry fails immediately instead of deadlocking.
+
+The JSON-RPC facade exposes the same mechanism through `call_then`. Its hook receives the validated first call's
+`result` and returns a method, parameters, and follow-up deadline policy. Replay policy is explicit:
+`stale_reused_connection_once` permits only the initial call to recover once when an idle cached connection proves
+stale. The follow-up options type has no replay setting because a connection-affine follow-up is unconditionally
+single-attempt. An optional per-call total-timeout cap can shorten the client's configured total timeout but cannot
+lengthen it or replace stricter connect, header, read, or idle limits. The first and follow-up calls each start an
+independent total-timeout budget and remain bounded by an active task deadline.
 
 ## Limits, cancellation, and snapshot downloads
 
-The shared transport bounds request and response headers and bodies and applies connect, header, read, idle, and
-total deadlines. Wire's predicate-based cancellation remains connected through the synchronous facades to resolver
-and socket operations.
+The shared transport bounds request and response headers and bodies. The total deadline covers queueing, DNS,
+connection setup, request upload, and the complete response. Connect and header deadlines bound their named phases;
+the read deadline bounds aggregate response-body time; the idle deadline is reset for each response-body read after
+headers arrive. It is not described or applied as a request-upload inactivity timer. Wire's predicate-based
+cancellation remains connected through the synchronous facades to resolver and socket operations.
 
 Snapshot bootstrap is the reviewed long-running exception. Metadata requests retain a finite total deadline.
 The streamed snapshot file transfer has no DNS/connect, request-upload, response-header, response-body, idle, total,

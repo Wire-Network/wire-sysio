@@ -7,6 +7,7 @@
 #include <sysio/external_debugging_plugin/debug_envelope_event_sink.hpp>
 #include <sysio/external_debugging_plugin/external_debugging_plugin.hpp>
 #include <sysio/external_debugging_plugin/external_debugging_rpc_client.hpp>
+#include <sysio/http_client_plugin/http_client_options.hpp>
 #include <sysio/opp/debugging/debugging.pb.h>
 #include <sysio/opp/opp.pb.h>
 
@@ -19,9 +20,14 @@ namespace {
 constexpr auto option_name_ext_debugging_server = "ext-debugging-server";
 constexpr auto option_name_ext_debugging_max_pending_envelopes = "ext-debugging-max-pending-envelopes";
 constexpr auto option_name_ext_debugging_request_timeout_ms = "ext-debugging-request-timeout-ms";
-constexpr auto option_name_ext_debugging_additional_ca_file = "ext-debugging-additional-ca-file";
-constexpr auto option_name_ext_debugging_additional_ca_path = "ext-debugging-additional-ca-path";
-constexpr auto option_name_ext_debugging_proxy = "ext-debugging-proxy";
+constexpr outbound_http::transport_option_names
+   transport_option_names{
+      .additional_ca_file =
+         "ext-debugging-additional-ca-file",
+      .additional_ca_path =
+         "ext-debugging-additional-ca-path",
+      .proxy = "ext-debugging-proxy",
+   };
 constexpr uint32_t default_max_pending_envelopes = 16;
 constexpr uint32_t default_request_timeout_ms = 5'000;
 constexpr uint64_t max_debugging_request_bytes = 1ULL * 1024ULL * 1024ULL;
@@ -133,15 +139,10 @@ void external_debugging_plugin::set_program_options(options_description& cli, op
         "Maximum debugging envelopes waiting behind the active server request.");
    opts(option_name_ext_debugging_request_timeout_ms, bpo::value<uint32_t>()->default_value(default_request_timeout_ms),
         "Maximum time in milliseconds for each debugging-server request.");
-   opts(option_name_ext_debugging_additional_ca_file,
-        bpo::value<std::filesystem::path>(),
-        "PEM CA bundle added to system trust for external-debugging HTTPS requests.");
-   opts(option_name_ext_debugging_additional_ca_path,
-        bpo::value<std::filesystem::path>(),
-        "Hashed CA directory added to system trust for external-debugging HTTPS requests.");
-   opts(option_name_ext_debugging_proxy,
-        bpo::value<std::string>(),
-        "Explicit proxy URL for external-debugging HTTP requests.");
+   outbound_http::add_transport_program_options(
+      cfg,
+      transport_option_names,
+      "external-debugging");
 }
 
 void external_debugging_plugin::plugin_initialize(const variables_map& options) {
@@ -151,15 +152,10 @@ void external_debugging_plugin::plugin_initialize(const variables_map& options) 
    if (options.contains(option_name_ext_debugging_request_timeout_ms)) {
       _impl->request_timeout_ms = options[option_name_ext_debugging_request_timeout_ms].as<uint32_t>();
    }
-   if (options.contains(option_name_ext_debugging_additional_ca_file))
-      _impl->transport_options.additional_ca_file =
-         options.at(option_name_ext_debugging_additional_ca_file).as<std::filesystem::path>();
-   if (options.contains(option_name_ext_debugging_additional_ca_path))
-      _impl->transport_options.additional_ca_path =
-         options.at(option_name_ext_debugging_additional_ca_path).as<std::filesystem::path>();
-   if (options.contains(option_name_ext_debugging_proxy))
-      _impl->transport_options.proxy =
-         options.at(option_name_ext_debugging_proxy).as<std::string>();
+   _impl->transport_options =
+      outbound_http::read_transport_options(
+         options,
+         transport_option_names);
 
    SYS_ASSERT(_impl->max_pending_envelopes > 0, chain::plugin_config_exception, "--{} must be greater than 0",
               option_name_ext_debugging_max_pending_envelopes);

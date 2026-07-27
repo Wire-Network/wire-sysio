@@ -5,9 +5,12 @@
 #include <boost/asio/awaitable.hpp>
 #include <boost/asio/cancellation_type.hpp>
 #include <boost/asio/co_spawn.hpp>
+#include <boost/asio/executor_work_guard.hpp>
 #include <boost/asio/ip/address.hpp>
 #include <boost/asio/ip/tcp.hpp>
+#include <boost/asio/io_context.hpp>
 #include <boost/asio/local/stream_protocol.hpp>
+#include <boost/asio/posix/stream_descriptor.hpp>
 #include <boost/asio/post.hpp>
 #include <boost/asio/redirect_error.hpp>
 #include <boost/asio/ssl/context.hpp>
@@ -15,7 +18,6 @@
 #include <boost/asio/ssl/stream.hpp>
 #include <boost/asio/steady_timer.hpp>
 #include <boost/asio/strand.hpp>
-#include <boost/asio/thread_pool.hpp>
 #include <boost/asio/use_awaitable.hpp>
 #include <boost/beast/core/basic_stream.hpp>
 #include <boost/beast/core/flat_buffer.hpp>
@@ -29,6 +31,7 @@
 #include <algorithm>
 #include <array>
 #include <atomic>
+#include <cerrno>
 #include <chrono>
 #include <cctype>
 #include <filesystem>
@@ -36,11 +39,15 @@
 #include <limits>
 #include <map>
 #include <mutex>
-#include <semaphore>
 #include <stdexcept>
+#include <thread>
 #include <utility>
 #include <variant>
 #include <vector>
+
+#include <fcntl.h>
+#include <sys/socket.h>
+#include <unistd.h>
 
 namespace fc {
 namespace http {
@@ -59,7 +66,13 @@ constexpr size_t body_read_buffer_bytes = 64ULL * 1024ULL;
 constexpr size_t max_error_response_body_bytes = 200;
 constexpr auto disk_space_check_interval = std::chrono::seconds(5);
 constexpr auto download_status_interval = std::chrono::seconds(5);
-constexpr auto cancellation_poll_interval = std::chrono::milliseconds(50);
+constexpr size_t platform_resolver_workers = 4;
+constexpr size_t max_resolver_capacity_waiters = 256;
+constexpr unsigned http_version_1_1 = 11;
+constexpr uint16_t default_http_port = 80;
+constexpr uint16_t default_https_port = 443;
+constexpr std::string_view default_http_service = "80";
+constexpr std::string_view default_https_service = "443";
 constexpr std::string_view scheme_http = "http";
 constexpr std::string_view scheme_https = "https";
 constexpr std::string_view scheme_unix = "unix";
@@ -209,19 +222,15 @@ bool is_retryable_connection_error(const boost::system::error_code& error) {
           error == beast_http::error::end_of_stream;
 }
 
-/** Classify a TLS handshake error without including endpoint or credential data. */
-failure_kind classify_tls_error(const boost::system::error_code& error) {
-   std::string detail = error.message();
-   std::transform(
-      detail.begin(),
-      detail.end(),
-      detail.begin(),
-      [](unsigned char value) { return static_cast<char>(std::tolower(value)); });
-   return detail.find("certificate") != std::string::npos ||
-                detail.find("hostname") != std::string::npos ||
-                detail.find("verify") != std::string::npos
-             ? failure_kind::tls_verification
-             : failure_kind::tls_handshake;
+/** Return whether @p status belongs to the HTTP successful response class. */
+bool is_success_status(uint32_t status) {
+   return beast_http::to_status_class(status) ==
+          beast_http::status_class::successful;
+}
+
+/** Return the integer value of a named HTTP status. */
+constexpr uint32_t status_value(beast_http::status status) {
+   return static_cast<uint32_t>(status);
 }
 
 /** Return whether @p host is safe to serialize into an HTTP authority and TLS identity. */
@@ -311,37 +320,278 @@ std::chrono::microseconds resolver_time_remaining(time_point deadline) {
    return std::chrono::microseconds((deadline - now).count());
 }
 
-/** Process-lifetime worker state that admits at most one platform DNS lookup. */
-struct platform_resolver_runtime {
-   asio::thread_pool executor{1};
-   std::binary_semaphore in_flight{1};
+class resolver_notifier;
+
+/** Publish one resolver signal, retrying an interrupted descriptor write. */
+template <typename WriteOnce>
+bool write_resolver_signal(WriteOnce&& write_once) {
+   for (;;) {
+      const auto written = std::invoke(write_once);
+      if (written == 1)
+         return true;
+      if (written < 0 && errno == EINTR)
+         continue;
+      return written < 0 &&
+             (errno == EAGAIN || errno == EWOULDBLOCK);
+   }
+}
+
+/**
+ * One process-lifetime resolver service with its own platform lookup thread.
+ *
+ * Boost.Asio serializes getaddrinfo work within one execution_context even
+ * when that context has several executor threads. Separate contexts preserve
+ * the intended four-way lookup isolation.
+ */
+struct platform_resolver_worker {
+   platform_resolver_worker()
+      : context(std::make_shared<asio::io_context>())
+      , work(asio::make_work_guard(*context)) {
+      std::thread(
+         [context = context] {
+            context->run();
+         })
+         .detach();
+   }
+
+   std::shared_ptr<asio::io_context> context;
+   asio::executor_work_guard<asio::io_context::executor_type> work;
 };
 
-/** Internal signal that the single platform resolver worker is currently occupied. */
+/** Process-lifetime worker state with bounded concurrent platform DNS work. */
+struct platform_resolver_runtime {
+   platform_resolver_runtime() {
+      for (auto& worker : workers)
+         worker = std::make_unique<platform_resolver_worker>();
+   }
+
+   std::mutex mutex;
+   std::array<std::unique_ptr<platform_resolver_worker>, platform_resolver_workers> workers;
+   std::array<bool, platform_resolver_workers> active{};
+   std::vector<std::weak_ptr<resolver_notifier>> waiters;
+
+   /** Reserve one resolver worker without queueing behind a stalled lookup. */
+   std::optional<size_t> try_acquire() {
+      std::scoped_lock lock(mutex);
+      const auto available =
+         std::find(
+            active.begin(),
+            active.end(),
+            false);
+      if (available == active.end())
+         return std::nullopt;
+      *available = true;
+      return static_cast<size_t>(
+         std::distance(
+            active.begin(),
+            available));
+   }
+
+   /** Register an executor-independent waiter, closing the release-before-register race. */
+   bool wait_for_capacity(
+      const std::shared_ptr<resolver_notifier>& waiter);
+
+   /** Release one worker and wake waiters without polling. */
+   void release(size_t worker);
+
+   /** Return the independent executor reserved for @p worker. */
+   asio::any_io_executor executor(size_t worker) const {
+      FC_ASSERT(worker < workers.size(), "Platform resolver worker index is invalid");
+      return workers[worker]->context->get_executor();
+   }
+};
+
+/** Internal signal that every platform resolver worker is currently occupied. */
 class resolver_capacity_unavailable : public std::runtime_error {
 public:
    resolver_capacity_unavailable()
       : std::runtime_error("platform resolver worker is busy") {}
 };
 
-/** Permit preventing unbounded work from queuing behind a stalled platform lookup. */
+/**
+ * Executor-independent writer for one pipe notification.
+ *
+ * Resolver threads may retain this object after the client executor is gone.
+ * It therefore owns only a pipe writer and plain atomic state.
+ */
+class resolver_notifier {
+public:
+   explicit resolver_notifier(int descriptor)
+      : descriptor_number(descriptor) {}
+
+   resolver_notifier(const resolver_notifier&) = delete;
+   resolver_notifier& operator=(const resolver_notifier&) = delete;
+
+   ~resolver_notifier() { disable(); }
+
+   /** Wake the waiting coroutine once. */
+   void notify() {
+      std::scoped_lock lock(mutex);
+      if (descriptor_number < 0 ||
+          notified.load(std::memory_order_acquire))
+         return;
+      constexpr uint8_t signal = 1;
+      if (write_resolver_signal(
+             [&] {
+                return ::write(
+                   descriptor_number,
+                   &signal,
+                   sizeof(signal));
+             })) {
+         notified.store(true, std::memory_order_release);
+      }
+   }
+
+   /** Prevent late background completions from writing after the reader closes. */
+   void disable() {
+      std::scoped_lock lock(mutex);
+      if (descriptor_number < 0)
+         return;
+      ::close(descriptor_number);
+      descriptor_number = -1;
+   }
+
+   /** Return whether this notifier has published its one signal. */
+   bool was_notified() const {
+      return notified.load(std::memory_order_acquire);
+   }
+
+private:
+   mutable std::mutex mutex;
+   int descriptor_number = -1;
+   std::atomic_bool notified{false};
+};
+
+/** Executor-bound reader paired with an executor-independent notifier. */
+class resolver_event {
+public:
+   explicit resolver_event(asio::any_io_executor executor)
+      : event(std::move(executor)) {
+      std::array<int, 2> descriptors{-1, -1};
+      bool configured = ::pipe(descriptors.data()) == 0;
+      for (const auto descriptor : descriptors) {
+         if (!configured)
+            break;
+         const auto status_flags =
+            ::fcntl(descriptor, F_GETFL, 0);
+         const auto descriptor_flags =
+            ::fcntl(descriptor, F_GETFD, 0);
+         configured =
+            status_flags >= 0 &&
+            descriptor_flags >= 0 &&
+            ::fcntl(
+               descriptor,
+               F_SETFL,
+               status_flags | O_NONBLOCK) == 0 &&
+            ::fcntl(
+               descriptor,
+               F_SETFD,
+               descriptor_flags | FD_CLOEXEC) == 0;
+      }
+      if (!configured) {
+         for (const auto descriptor : descriptors) {
+            if (descriptor >= 0)
+               ::close(descriptor);
+         }
+      }
+      FC_ASSERT(
+         configured,
+         "Failed to create resolver notification pipe");
+      notifier =
+         std::make_shared<resolver_notifier>(
+            descriptors[1]);
+
+      boost::system::error_code error;
+      event.assign(descriptors[0], error);
+      if (error) {
+         ::close(descriptors[0]);
+         notifier.reset();
+      }
+      FC_ASSERT(
+         !error,
+         "Failed to attach resolver event: {}",
+         error.message());
+   }
+
+   /** Disable the writer while the executor-bound read descriptor still exists. */
+   ~resolver_event() {
+      if (notifier)
+         notifier->disable();
+   }
+
+   asio::posix::stream_descriptor event;
+   std::shared_ptr<resolver_notifier> notifier;
+};
+
+bool platform_resolver_runtime::wait_for_capacity(
+   const std::shared_ptr<resolver_notifier>& waiter) {
+   bool notify_now = false;
+   {
+      std::scoped_lock lock(mutex);
+      std::erase_if(
+         waiters,
+         [](const auto& candidate) {
+            return candidate.expired();
+         });
+      if (std::find(active.begin(), active.end(), false) != active.end())
+         notify_now = true;
+      else if (
+         waiters.size() <
+         max_resolver_capacity_waiters)
+         waiters.emplace_back(waiter);
+      else
+         return false;
+   }
+   if (notify_now)
+      waiter->notify();
+   return true;
+}
+
+void platform_resolver_runtime::release(size_t worker) {
+   std::vector<std::shared_ptr<resolver_notifier>> live_waiters;
+   {
+      std::scoped_lock lock(mutex);
+      FC_ASSERT(
+         worker < active.size() && active[worker],
+         "Platform resolver permit underflow");
+      active[worker] = false;
+      live_waiters.reserve(waiters.size());
+      for (auto& weak : waiters) {
+         if (auto waiter = weak.lock())
+            live_waiters.push_back(std::move(waiter));
+      }
+      waiters.clear();
+   }
+   for (const auto& waiter : live_waiters)
+      waiter->notify();
+}
+
+/** Permit preventing unbounded work from queuing behind stalled platform lookups. */
 class platform_resolver_permit {
 public:
-   /** Acquire the single platform resolver slot without blocking an I/O executor. */
-   explicit platform_resolver_permit(std::binary_semaphore& semaphore)
-      : _semaphore(semaphore) {
-      if (!_semaphore.try_acquire())
+   /** Acquire one platform resolver slot without blocking an I/O executor. */
+   explicit platform_resolver_permit(platform_resolver_runtime& runtime)
+      : _runtime(runtime) {
+      const auto worker = _runtime.try_acquire();
+      if (!worker)
          throw resolver_capacity_unavailable();
+      _worker = *worker;
    }
 
    platform_resolver_permit(const platform_resolver_permit&) = delete;
    platform_resolver_permit& operator=(const platform_resolver_permit&) = delete;
 
    /** Release the resolver slot after the platform lookup really completes. */
-   ~platform_resolver_permit() { _semaphore.release(); }
+   ~platform_resolver_permit() { _runtime.release(_worker); }
+
+   /** Return this permit's independently serviced resolver executor. */
+   asio::any_io_executor executor() const {
+      return _runtime.executor(_worker);
+   }
 
 private:
-   std::binary_semaphore& _semaphore;
+   platform_resolver_runtime& _runtime;
+   size_t _worker = 0;
 };
 
 /**
@@ -364,11 +614,11 @@ detail::resolver_cancel_fn start_platform_resolution(
    auto& runtime = resolver_runtime();
    auto permit =
       std::make_shared<platform_resolver_permit>(
-         runtime.in_flight);
+         runtime);
    (void)resolver_time_remaining(deadline);
 
    auto resolver =
-      std::make_shared<tcp::resolver>(runtime.executor);
+      std::make_shared<tcp::resolver>(permit->executor());
    resolver->async_resolve(
       host,
       service,
@@ -397,7 +647,11 @@ detail::resolver_cancel_fn start_platform_resolution(
          }
          complete(std::nullopt, std::move(endpoints));
       });
-   return [resolver] { resolver->cancel(); };
+   return [resolver] {
+      asio::post(
+         resolver->get_executor(),
+         [resolver] { resolver->cancel(); });
+   };
 }
 
 /** Convert the public request method enum to a Beast verb by enum spelling. */
@@ -476,7 +730,7 @@ public:
             "response body exceeds configured maximum of " +
                std::to_string(_max_response_body_bytes) + " bytes");
       }
-      if (_status != 200)
+      if (_status != status_value(beast_http::status::ok))
          return;
 
       if (_content_length) {
@@ -511,7 +765,7 @@ public:
    /** Consume one decoded response-body block; false stops a bounded error response. */
    bool body(const char* data, size_t bytes) {
       std::scoped_lock lock(_mutex);
-      if (_status != 200) {
+      if (_status != status_value(beast_http::status::ok)) {
          const auto room = max_error_response_body_bytes - _error_body.size();
          _error_body.append(data, std::min(bytes, room));
          return _error_body.size() < max_error_response_body_bytes;
@@ -551,7 +805,7 @@ public:
    /** Validate status, atomically publish a completed file, and report completion. */
    void finish() {
       std::scoped_lock lock(_mutex);
-      if (_status != 200) {
+      if (_status != status_value(beast_http::status::ok)) {
          auto message =
             "HTTP POST failed with status " + std::to_string(_status);
          if (!_error_body.empty())
@@ -574,7 +828,9 @@ public:
    /** Return decoded response bytes retained or written by this sink. */
    uint64_t received_bytes() const {
       std::scoped_lock lock(_mutex);
-      return _status == 200 ? _downloaded_bytes : _error_body.size();
+      return _status == status_value(beast_http::status::ok)
+                ? _downloaded_bytes
+                : _error_body.size();
    }
 
 private:
@@ -770,6 +1026,42 @@ struct connection_state {
          stream);
    }
 
+   /**
+    * Return whether an idle socket has no peer close or unexpected input ready.
+    *
+    * A locally open descriptor does not reveal a peer FIN. A non-blocking
+    * peek distinguishes an actually idle socket from FIN/reset and also
+    * rejects unsolicited bytes that cannot belong to a fully consumed HTTP
+    * response.
+    */
+   bool healthy_for_reuse() {
+      if (!open())
+         return false;
+      return std::visit(
+         [](auto& value) {
+            const auto descriptor =
+               beast::get_lowest_layer(*value)
+                  .socket()
+                  .native_handle();
+            char byte = 0;
+            for (;;) {
+               const auto result =
+                  ::recv(
+                     descriptor,
+                     &byte,
+                     sizeof(byte),
+                     MSG_DONTWAIT | MSG_PEEK);
+               if (result >= 0)
+                  return false;
+               if (errno == EINTR)
+                  continue;
+               return errno == EAGAIN ||
+                      errno == EWOULDBLOCK;
+            }
+         },
+         stream);
+   }
+
    /** Cancel the active operation without releasing this connection object. */
    void cancel() {
       std::visit(
@@ -791,6 +1083,12 @@ struct connection_state {
    }
 
    stream_variant stream;
+};
+
+/** One persistent connection and the time it entered the idle cache. */
+struct idle_connection {
+   std::shared_ptr<connection_state> connection;
+   time_point idle_since;
 };
 
 /** Opaque in-process lease retained across a connection-affine continuation. */
@@ -924,7 +1222,7 @@ struct request_metrics_state {
       shared_metrics().response_bytes.fetch_add(
          response_bytes.load(std::memory_order_relaxed),
          std::memory_order_relaxed);
-      if (status >= 200 && status < 300)
+      if (is_success_status(status))
          shared_metrics().successes.fetch_add(1, std::memory_order_relaxed);
       else
          record_failure(failure_kind::http_status);
@@ -943,19 +1241,45 @@ struct request_metrics_state {
    std::atomic_bool finalized{false};
 };
 
-/** Result of an executor-safe resolver completion. */
-struct async_resolution_state {
-   explicit async_resolution_state(asio::any_io_executor executor)
-      : timer(std::move(executor)) {}
-
-   asio::steady_timer timer;
+/** Executor-independent result that may briefly outlive its requesting client. */
+struct async_resolution_result {
+   std::mutex mutex;
    bool complete = false;
+   bool deadline_expired = false;
    std::optional<std::string> error;
    std::vector<detail::resolved_endpoint> endpoints;
+};
+
+/** Resolver wait state whose Asio objects remain owned by the client executor. */
+struct async_resolution_state {
+   explicit async_resolution_state(asio::any_io_executor executor)
+      : notification(executor)
+      , deadline_timer(std::move(executor)) {}
+
+   resolver_event notification;
+   asio::steady_timer deadline_timer;
+   std::shared_ptr<async_resolution_result> result =
+      std::make_shared<async_resolution_result>();
    detail::resolver_cancel_fn cancel;
 };
 
 } // namespace
+
+void detail::post_platform_resolver_worker_task_for_testing(
+   size_t worker,
+   std::function<void()> task) {
+   FC_ASSERT(
+      worker < platform_resolver_workers,
+      "Platform resolver test worker index is invalid");
+   asio::post(
+      resolver_runtime().executor(worker),
+      std::move(task));
+}
+
+bool detail::write_resolver_signal_for_testing(
+   const std::function<int64_t()>& write_once) {
+   return write_resolver_signal(write_once);
+}
 
 class response_reader_impl;
 
@@ -991,8 +1315,12 @@ public:
       , tls_context(asio::ssl::context::tls_client)
       , resolver_start(std::move(resolver_start_in)) {
       FC_ASSERT(
-         options.dns_cache_timeout_seconds >= -1,
-         "Outbound HTTP DNS cache timeout must be -1 or non-negative");
+         !options.dns_cache_timeout ||
+            options.dns_cache_timeout->count() >= 0,
+         "Outbound HTTP DNS cache timeout cannot be negative");
+      FC_ASSERT(
+         options.max_idle_connection_age.count() > 0,
+         "Outbound HTTP idle connection age must be positive");
       tls_context.set_verify_mode(asio::ssl::verify_peer);
       error_code error;
       tls_context.set_default_verify_paths(error);
@@ -1038,7 +1366,10 @@ public:
             !parsed.user() && !parsed.pass(),
             "Outbound HTTP proxy credentials are not supported");
          proxy_host = *parsed.host();
-         proxy_service = parsed.port() ? std::to_string(*parsed.port()) : "80";
+         proxy_service =
+            parsed.port()
+               ? std::to_string(*parsed.port())
+               : std::string(default_http_service);
       }
       if (!resolver_start)
          resolver_start = start_platform_resolution;
@@ -1048,7 +1379,7 @@ public:
       for (auto& [key, connections] : idle_connections) {
          (void)key;
          for (auto& connection : connections)
-            connection->close();
+            connection.connection->close();
       }
    }
 
@@ -1058,9 +1389,11 @@ public:
    detail::resolver_start_fn resolver_start;
    std::optional<std::string> proxy_host;
    std::optional<std::string> proxy_service;
-   std::map<std::string, std::vector<std::shared_ptr<connection_state>>>
+   std::map<std::string, std::vector<idle_connection>>
       idle_connections;
+   size_t idle_connection_count = 0;
    std::map<std::string, dns_entry> dns_cache;
+   std::map<std::string, target_info> unix_target_cache;
 
    /** Validate request budgets and explicit retry safety. */
    static void validate_policy(const request_options& policy) {
@@ -1172,18 +1505,27 @@ public:
    }
 
    /** Parse an HTTP, HTTPS, or Unix target into connection-safe components. */
-   target_info normalize_target(const url& target) const {
+   target_info normalize_target(const url& target) {
       FC_ASSERT(target.host(), "Outbound HTTP URL is missing a host");
       target_info result{
          .scheme = target.proto(),
          .host = *target.host(),
       };
       if (result.scheme == scheme_unix) {
+         if (auto found = unix_target_cache.find(result.host);
+             found != unix_target_cache.end()) {
+            result = found->second;
+            if (target.query())
+               result.request_target += "?" + *target.query();
+            return result;
+         }
+
+         const auto complete_path =
+            std::filesystem::path(result.host);
          std::filesystem::path socket_file(result.host);
          FC_ASSERT(
             socket_file.is_absolute(),
             "Unix-socket URL cannot be relative");
-         std::filesystem::path request_path;
          while (!socket_file.empty()) {
             std::error_code socket_error;
             if (std::filesystem::is_socket(socket_file, socket_error) &&
@@ -1195,7 +1537,6 @@ public:
                socket_file.clear();
                break;
             }
-            request_path = socket_file.filename() / request_path;
             socket_file = parent;
          }
          if (socket_file.empty()) {
@@ -1206,8 +1547,14 @@ public:
          result.unix_socket_path = socket_file.string();
          result.host = "localhost";
          result.host_header = "localhost";
-         result.request_target = "/" + request_path.generic_string();
+         const auto request_path =
+            complete_path.lexically_relative(socket_file);
+         result.request_target =
+            request_path.empty()
+               ? "/"
+               : "/" + request_path.generic_string();
          result.connection_key = "unix|" + *result.unix_socket_path;
+         unix_target_cache.emplace(*target.host(), result);
       } else {
          FC_ASSERT(
             result.scheme == scheme_http || result.scheme == scheme_https,
@@ -1221,14 +1568,19 @@ public:
          result.tls = result.scheme == scheme_https;
          result.service = target.port()
                              ? std::to_string(*target.port())
-                             : (result.tls ? "443" : "80");
+                             : std::string(
+                                  result.tls
+                                     ? default_https_service
+                                     : default_http_service);
          const bool ipv6 = result.host.find(':') != std::string::npos;
          result.host_header =
             ipv6 ? "[" + result.host + "]" : result.host;
          const bool default_port =
             !target.port() ||
-            (result.tls && *target.port() == 443) ||
-            (!result.tls && *target.port() == 80);
+            (result.tls &&
+             *target.port() == default_https_port) ||
+            (!result.tls &&
+             *target.port() == default_http_port);
          if (!default_port)
             result.host_header += ":" + result.service;
          result.request_target =
@@ -1286,7 +1638,7 @@ public:
       const auto cache_key = host + "|" + service;
       if (auto found = dns_cache.find(cache_key);
           found != dns_cache.end() &&
-          (options.dns_cache_timeout_seconds == -1 ||
+          (!options.dns_cache_timeout ||
            found->second.expires > std::chrono::steady_clock::now())) {
          co_return found->second.endpoints;
       }
@@ -1303,30 +1655,34 @@ public:
          }
          bool capacity_unavailable = false;
          try {
-            auto weak = std::weak_ptr<async_resolution_state>(state);
+            auto weak_result =
+               std::weak_ptr<async_resolution_result>(
+                  state->result);
+            auto weak_notifier =
+               std::weak_ptr<resolver_notifier>(
+                  state->notification.notifier);
             cancel_resolution = resolver_start(
                host,
                service,
                deadline ? deadline->when : time_point::maximum(),
-               [weak](
+               [weak_result,
+                weak_notifier](
                   std::optional<std::string> error,
                   std::vector<detail::resolved_endpoint> endpoints) mutable {
-                  auto current = weak.lock();
-                  if (!current)
+                  auto result = weak_result.lock();
+                  auto notifier = weak_notifier.lock();
+                  if (!result || !notifier)
                      return;
-                  auto executor = current->timer.get_executor();
-                  asio::post(
-                     std::move(executor),
-                     [current = std::move(current),
-                      error = std::move(error),
-                      endpoints = std::move(endpoints)]() mutable {
-                        if (current->complete)
-                           return;
-                        current->complete = true;
-                        current->error = std::move(error);
-                        current->endpoints = std::move(endpoints);
-                        current->timer.cancel();
-                     });
+                  {
+                     std::scoped_lock lock(result->mutex);
+                     if (result->complete)
+                        return;
+                     result->complete = true;
+                     result->error = std::move(error);
+                     result->endpoints =
+                        std::move(endpoints);
+                  }
+                  notifier->notify();
                });
             break;
          } catch (const resolver_capacity_unavailable&) {
@@ -1340,8 +1696,15 @@ public:
                true);
          }
          if (capacity_unavailable) {
-            auto wait_for = std::chrono::duration_cast<std::chrono::microseconds>(
-               cancellation_poll_interval);
+            auto waiter =
+               std::make_shared<resolver_event>(
+                  strand);
+            auto timeout =
+               std::make_shared<asio::steady_timer>(
+                  strand);
+            auto timed_out =
+               std::make_shared<std::atomic_bool>(
+                  false);
             if (deadline) {
                const auto remaining = deadline->when - time_point::now();
                if (remaining.count() <= 0) {
@@ -1349,19 +1712,54 @@ public:
                      deadline->timeout_kind,
                      "DNS resolution deadline expired");
                }
-               wait_for = std::min(
-                  wait_for,
-                  std::chrono::microseconds(remaining.count()));
+               timeout->expires_after(
+                  std::chrono::microseconds(
+                     remaining.count()));
+               timeout->async_wait(
+                  [waiter, timed_out](
+                     const error_code& error) {
+                     if (error)
+                        return;
+                     timed_out->store(
+                        true,
+                        std::memory_order_release);
+                     waiter->event.cancel();
+                  });
             }
-            auto delay = std::make_shared<asio::steady_timer>(strand);
-            delay->expires_after(wait_for);
+            if (!resolver_runtime()
+                    .wait_for_capacity(
+                       waiter->notifier)) {
+               throw transport_failure(
+                  failure_kind::dns,
+                  "DNS resolver admission queue is full",
+                  true);
+            }
             active_cancel_guard cancel_guard(
                control,
-               [delay] { delay->cancel(); });
+               [waiter, timeout] {
+                  timeout->cancel();
+                  waiter->event.cancel();
+               });
+            uint8_t signal = 0;
             error_code error;
-            co_await delay->async_wait(
+            (void)co_await waiter->event.async_read_some(
+               asio::buffer(&signal, sizeof(signal)),
                asio::redirect_error(asio::use_awaitable, error));
+            timeout->cancel();
             control->throw_if_cancelled("DNS resolution");
+            if (timed_out->load(
+                   std::memory_order_acquire)) {
+               throw transport_failure(
+                  deadline->timeout_kind,
+                  "DNS resolution deadline expired");
+            }
+            if (!waiter->notifier
+                    ->was_notified()) {
+               throw transport_failure(
+                  failure_kind::dns,
+                  "DNS resolver capacity wait ended",
+                  true);
+            }
          }
       }
 
@@ -1375,25 +1773,71 @@ public:
                deadline->timeout_kind,
                "DNS resolution deadline expired");
          }
-         state->timer.expires_after(
+         state->deadline_timer.expires_after(
             std::chrono::microseconds(remaining.count()));
-      } else {
-         state->timer.expires_at(
-            std::chrono::steady_clock::time_point::max());
+         auto weak =
+            std::weak_ptr<async_resolution_state>(
+               state);
+         state->deadline_timer.async_wait(
+            [weak](const error_code& error) {
+               if (error)
+                  return;
+               auto current = weak.lock();
+               if (!current)
+                  return;
+               {
+                  std::scoped_lock lock(
+                     current->result->mutex);
+                  if (current->result->complete)
+                     return;
+                  current->result->complete = true;
+                  current->result->deadline_expired = true;
+               }
+               if (current->cancel)
+                  current->cancel();
+               current->notification.event.cancel();
+            });
       }
       active_cancel_guard cancel_guard(
          control,
          [state] {
             if (state->cancel)
                state->cancel();
-            state->timer.cancel();
+            state->deadline_timer.cancel();
+            state->notification.event.cancel();
          });
+      uint8_t signal = 0;
       error_code wait_error;
-      co_await state->timer.async_wait(
+      (void)co_await
+         state->notification.event.async_read_some(
+            asio::buffer(&signal, sizeof(signal)),
          asio::redirect_error(asio::use_awaitable, wait_error));
+      state->deadline_timer.cancel();
       control->throw_if_cancelled("DNS resolution");
-      if (!state->complete) {
-         state->complete = true;
+      std::optional<std::string> resolution_error;
+      std::vector<detail::resolved_endpoint>
+         resolved_endpoints;
+      bool resolution_complete = false;
+      bool deadline_expired = false;
+      {
+         std::scoped_lock lock(state->result->mutex);
+         resolution_complete = state->result->complete;
+         deadline_expired =
+            state->result->deadline_expired;
+         if (resolution_complete) {
+            resolution_error = state->result->error;
+            resolved_endpoints =
+               std::move(state->result->endpoints);
+         } else {
+            state->result->complete = true;
+         }
+      }
+      if (deadline_expired) {
+         throw transport_failure(
+            deadline->timeout_kind,
+            "DNS resolution deadline expired");
+      }
+      if (!resolution_complete) {
          if (state->cancel)
             state->cancel();
          if (deadline) {
@@ -1407,13 +1851,13 @@ public:
             true);
       }
       state->cancel = {};
-      if (state->error) {
+      if (resolution_error) {
          throw transport_failure(
             failure_kind::dns,
             "DNS resolution failed",
             true);
       }
-      if (state->endpoints.empty()) {
+      if (resolved_endpoints.empty()) {
          throw transport_failure(
             failure_kind::dns,
             "DNS resolution returned no endpoints",
@@ -1421,8 +1865,8 @@ public:
       }
 
       std::vector<tcp::endpoint> endpoints;
-      endpoints.reserve(state->endpoints.size());
-      for (const auto& entry : state->endpoints) {
+      endpoints.reserve(resolved_endpoints.size());
+      for (const auto& entry : resolved_endpoints) {
          error_code address_error;
          const auto address =
             asio::ip::make_address(entry.address, address_error);
@@ -1434,12 +1878,14 @@ public:
          }
          endpoints.emplace_back(address, entry.port);
       }
-      if (options.dns_cache_timeout_seconds != 0) {
+      if (!options.dns_cache_timeout ||
+          options.dns_cache_timeout->count() != 0) {
          const auto expires =
-            options.dns_cache_timeout_seconds == -1
+            !options.dns_cache_timeout
                ? std::chrono::steady_clock::time_point::max()
                : std::chrono::steady_clock::now() +
-                    std::chrono::seconds(options.dns_cache_timeout_seconds);
+                    std::chrono::microseconds(
+                       options.dns_cache_timeout->count());
          dns_cache.insert_or_assign(
             cache_key,
             dns_entry{endpoints, expires});
@@ -1475,7 +1921,7 @@ public:
       }
    }
 
-   /** Write one complete request under an optional idle, total, or connect deadline. */
+   /** Write one complete request under an optional total or connect deadline. */
    template <typename Stream, typename Body>
    asio::awaitable<void>
    write_request(const std::shared_ptr<connection_state>& connection,
@@ -1611,7 +2057,7 @@ public:
       beast_http::request<beast_http::string_body> result{
          to_beast_verb(req.method),
          request_target,
-         11};
+         http_version_1_1};
       result.set(beast_http::field::host, target.host_header);
       result.set(
          beast_http::field::user_agent,
@@ -1642,7 +2088,7 @@ public:
       beast_http::request<beast_http::empty_body> connect_request{
          beast_http::verb::connect,
          connect_authority,
-         11};
+         http_version_1_1};
       connect_request.set(beast_http::field::host, connect_authority);
       connect_request.set(
          beast_http::field::user_agent,
@@ -1778,14 +2224,23 @@ public:
       }
       stream.set_verify_mode(asio::ssl::verify_peer);
       auto identity_failure = std::make_shared<bool>(false);
+      auto chain_failure =
+         std::make_shared<bool>(false);
+      auto verification_observed =
+         std::make_shared<bool>(false);
       stream.set_verify_callback(
          [verify_identity =
              asio::ssl::host_name_verification(target.host),
-          identity_failure](
+          identity_failure,
+          chain_failure,
+          verification_observed](
              bool preverified,
              asio::ssl::verify_context& context) mutable {
-            if (!preverified)
+            *verification_observed = true;
+            if (!preverified) {
+               *chain_failure = true;
                return false;
+            }
             const bool verified = verify_identity(preverified, context);
             if (!verified &&
                 X509_STORE_CTX_get_error_depth(
@@ -1810,7 +2265,12 @@ public:
                ? (ip_literal
                      ? failure_kind::tls_ip
                      : failure_kind::tls_hostname)
-               : classify_tls_error(error);
+               : (*verification_observed &&
+                  (*chain_failure ||
+                   SSL_get_verify_result(
+                      stream.native_handle()) != X509_V_OK))
+                    ? failure_kind::tls_verification
+                    : failure_kind::tls_handshake;
          throw transport_failure(
             failure,
             "TLS handshake or peer verification failed");
@@ -1818,7 +2278,35 @@ public:
       co_return connection;
    }
 
-   /** Lease a healthy idle connection, or create a fresh connection. */
+   /** Close idle connections that exceeded the configured reuse age. */
+   void prune_expired_idle_connections() {
+      const auto now = time_point::now();
+      for (auto entry = idle_connections.begin();
+           entry != idle_connections.end();) {
+         auto& connections = entry->second;
+         for (auto connection = connections.begin();
+              connection != connections.end();) {
+            if (!connection->connection->open() ||
+                now - connection->idle_since >
+                   options.max_idle_connection_age) {
+               connection->connection->close();
+               connection = connections.erase(connection);
+               FC_ASSERT(
+                  idle_connection_count > 0,
+                  "Outbound HTTP idle connection count underflow");
+               --idle_connection_count;
+            } else {
+               ++connection;
+            }
+         }
+         if (connections.empty())
+            entry = idle_connections.erase(entry);
+         else
+            ++entry;
+      }
+   }
+
+   /** Lease a recent locally-open idle connection, or create a fresh connection. */
    asio::awaitable<std::pair<std::shared_ptr<connection_state>, bool>>
    acquire_connection(
       const target_info& target,
@@ -1827,14 +2315,20 @@ public:
       const std::shared_ptr<request_control>& control,
       bool force_fresh) {
       if (!force_fresh) {
+         prune_expired_idle_connections();
          auto found = idle_connections.find(target.connection_key);
          while (found != idle_connections.end() &&
                 !found->second.empty()) {
-            auto connection = std::move(found->second.back());
+            auto connection =
+               std::move(found->second.back().connection);
             found->second.pop_back();
+            FC_ASSERT(
+               idle_connection_count > 0,
+               "Outbound HTTP idle connection count underflow");
+            --idle_connection_count;
             if (found->second.empty())
                idle_connections.erase(found);
-            if (connection->open())
+            if (connection->healthy_for_reuse())
                co_return std::pair{std::move(connection), true};
             connection->close();
             found = idle_connections.find(target.connection_key);
@@ -1853,11 +2347,22 @@ public:
    void release_connection(
       const std::string& key,
       std::shared_ptr<connection_state> connection) {
+      prune_expired_idle_connections();
       if (!connection->open()) {
          connection->close();
          return;
       }
-      idle_connections[key].push_back(std::move(connection));
+      if (idle_connection_count >=
+          options.max_idle_connections) {
+         connection->close();
+         return;
+      }
+      idle_connections[key].push_back(
+         idle_connection{
+            .connection = std::move(connection),
+            .idle_since = time_point::now(),
+         });
+      ++idle_connection_count;
    }
 
    /** Sleep through one bounded, cancellable exponential retry backoff. */
@@ -1967,7 +2472,7 @@ public:
       if (!opened.load(std::memory_order_acquire))
          return;
       metrics->finish_failure(
-         value_head.status >= 200 && value_head.status < 300
+         is_success_status(value_head.status)
             ? failure_kind::io
             : failure_kind::http_status);
    }
@@ -2055,8 +2560,8 @@ public:
                return;
             self->connection->close();
             self->metrics->finish_failure(
-               self->value_head.status >= 200 &&
-                     self->value_head.status < 300
+               is_success_status(
+                  self->value_head.status)
                   ? failure_kind::io
                   : failure_kind::http_status);
          });
@@ -2191,14 +2696,20 @@ client_impl::async_open(
                : "request send");
          co_await std::visit(
             [&](auto& stream) {
+               const auto upload_deadline =
+                  total_deadline
+                     ? std::optional<operation_deadline>{
+                          operation_deadline{
+                             .when = *total_deadline,
+                             .timeout_kind =
+                                failure_kind::timeout_total,
+                          }}
+                     : std::nullopt;
                return write_request(
                   connection,
                   *stream,
                   request_message,
-                  phase_deadline(
-                     policy.timeouts.idle,
-                     failure_kind::timeout_idle,
-                     total_deadline),
+                  upload_deadline,
                   control);
             },
             connection->stream);
@@ -2365,6 +2876,14 @@ async_buffer_response(response_reader& reader) {
    co_return result;
 }
 
+/** Invoke one continuation hook on the client executor. */
+asio::awaitable<continuation_request>
+async_select_continuation(
+   continuation_hook continue_with,
+   response first_response) {
+   co_return continue_with(first_response);
+}
+
 /** Close one retained connection on its owning strand. */
 asio::awaitable<void>
 async_close_retained_response(
@@ -2462,7 +2981,13 @@ client::async_request_then(
    std::optional<continuation_request> continuation;
    std::exception_ptr continuation_failure;
    try {
-      continuation.emplace(continue_with(first_response));
+      continuation.emplace(
+         co_await asio::co_spawn(
+            _impl->strand,
+            async_select_continuation(
+               std::move(continue_with),
+               std::move(first_response)),
+            asio::use_awaitable));
       FC_ASSERT(
          continuation->options.retry.max_attempts == 1,
          "Outbound HTTP connection-affine follow-up cannot retry");

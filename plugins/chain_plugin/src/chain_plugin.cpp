@@ -38,6 +38,7 @@
 #include <fc/network/url.hpp>
 #include <fc/crypto/hex.hpp>
 #include <magic_enum/magic_enum.hpp>
+#include <sysio/http_client_plugin/http_client_options.hpp>
 
 #include <cmath>
 #include <cstdlib>
@@ -50,6 +51,15 @@ const std::string deep_mind_logger_name("dmlog");
 sysio::chain::deep_mind_handler _deep_mind_log;
 
 namespace {
+
+constexpr sysio::outbound_http::transport_option_names
+   snapshot_transport_option_names{
+      .additional_ca_file =
+         "snapshot-endpoint-additional-ca-file",
+      .additional_ca_path =
+         "snapshot-endpoint-additional-ca-path",
+      .proxy = "snapshot-endpoint-proxy",
+   };
 
 /// sysio.system snapshot-attestation contract identifiers
 /// (see contracts/sysio.system/include/sysio.system/snapshot_attest.hpp).
@@ -580,16 +590,11 @@ void chain_plugin::set_program_options(options_description& cli, options_descrip
           "  https://host:port          - fetches latest snapshot\n"
           "  https://host:port/50000    - fetches snapshot at block 50000\n"
           "Requires empty database (use --delete-all-blocks to clear existing data).")
-         ("snapshot-endpoint-additional-ca-file",
-          bpo::value<std::filesystem::path>(),
-          "PEM CA bundle added to system trust for snapshot endpoint HTTPS requests.")
-         ("snapshot-endpoint-additional-ca-path",
-          bpo::value<std::filesystem::path>(),
-          "Hashed CA directory added to system trust for snapshot endpoint HTTPS requests.")
-         ("snapshot-endpoint-proxy",
-          bpo::value<std::string>(),
-          "Explicit proxy URL for snapshot endpoint HTTP requests.")
          ;
+      sysio::outbound_http::add_transport_program_options(
+         cfg,
+         snapshot_transport_option_names,
+         "snapshot endpoint");
 
 }
 
@@ -1002,16 +1007,10 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
             .status_callback = [logger = snapshot_download_progress_logger{}](
                                   const fc::http_file_download_status& status) mutable { logger(status); },
          };
-         fc::http::transport_options transport_options;
-         if (options.contains("snapshot-endpoint-additional-ca-file"))
-            transport_options.additional_ca_file =
-               options.at("snapshot-endpoint-additional-ca-file").as<std::filesystem::path>();
-         if (options.contains("snapshot-endpoint-additional-ca-path"))
-            transport_options.additional_ca_path =
-               options.at("snapshot-endpoint-additional-ca-path").as<std::filesystem::path>();
-         if (options.contains("snapshot-endpoint-proxy"))
-            transport_options.proxy =
-               options.at("snapshot-endpoint-proxy").as<std::string>();
+         auto transport_options =
+            sysio::outbound_http::read_transport_options(
+               options,
+               snapshot_transport_option_names);
          try {
             fetch_snapshot_from_endpoint(
                options.at("snapshot-endpoint").as<std::string>(),

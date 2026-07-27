@@ -3,6 +3,7 @@
 #include <boost/test/unit_test.hpp>
 #include <sysio/chain/app.hpp>
 #include <sysio/chain_plugin/chain_plugin.hpp>
+#include <sysio/http_client_plugin/http_client_options.hpp>
 #include <stdint.h>
 #include <string>
 #include <string_view>
@@ -97,6 +98,75 @@ BOOST_AUTO_TEST_CASE(chain_plugin_snapshot_endpoint_option_registration) {
    for (const auto* option_name : removed_options) {
       BOOST_CHECK(options.find_nothrow(option_name, false) == nullptr);
    }
+}
+
+/** Process-wide transport fallbacks remain unambiguous after caller option sets are aggregated. */
+BOOST_AUTO_TEST_CASE(outbound_http_global_option_registration) {
+   namespace bpo = boost::program_options;
+   bpo::options_description global;
+   bpo::options_description ethereum;
+   bpo::options_description solana;
+   bpo::options_description debugging;
+   bpo::options_description signing;
+   bpo::options_description snapshot;
+   bpo::options_description options;
+
+   sysio::outbound_http::add_global_transport_program_options(global);
+   sysio::outbound_http::add_transport_program_options(
+      ethereum,
+      {"outpost-ethereum-additional-ca-file", "outpost-ethereum-additional-ca-path", "outpost-ethereum-proxy"},
+      "Ethereum RPC");
+   sysio::outbound_http::add_transport_program_options(
+      solana,
+      {"outpost-solana-additional-ca-file", "outpost-solana-additional-ca-path", "outpost-solana-proxy"},
+      "Solana RPC");
+   sysio::outbound_http::add_transport_program_options(
+      debugging,
+      {"ext-debugging-additional-ca-file", "ext-debugging-additional-ca-path", "ext-debugging-proxy"},
+      "external-debugging");
+   sysio::outbound_http::add_transport_program_options(
+      signing,
+      {"http-client-additional-ca-file", "http-client-additional-ca-path", "http-client-proxy"},
+      "shared KIOD/signing");
+   sysio::outbound_http::add_transport_program_options(
+      snapshot,
+      {"snapshot-endpoint-additional-ca-file", "snapshot-endpoint-additional-ca-path", "snapshot-endpoint-proxy"},
+      "snapshot endpoint");
+   options.add(global).add(ethereum).add(solana).add(debugging).add(signing).add(snapshot);
+
+   std::array arguments{
+      "test_chain_plugin",
+      "--outbound-http-additional-ca-file", "/tmp/wire-global-ca.pem",
+      "--outbound-http-additional-ca-path", "/tmp/wire-global-ca",
+      "--outbound-http-proxy", "http://127.0.0.1:3128",
+      "--outpost-solana-additional-ca-file", "/tmp/wire-solana-ca.pem",
+   };
+   bpo::variables_map variables;
+   bpo::store(
+      bpo::parse_command_line(arguments.size(), const_cast<char**>(arguments.data()), options),
+      variables);
+   bpo::notify(variables);
+
+   BOOST_CHECK_EQUAL(
+      variables.at("outbound-http-additional-ca-file").as<std::filesystem::path>(),
+      std::filesystem::path("/tmp/wire-global-ca.pem"));
+   BOOST_CHECK_EQUAL(
+      variables.at("outbound-http-additional-ca-path").as<std::filesystem::path>(),
+      std::filesystem::path("/tmp/wire-global-ca"));
+   BOOST_CHECK_EQUAL(
+      variables.at("outbound-http-proxy").as<std::string>(),
+      "http://127.0.0.1:3128");
+
+   const auto solana_options =
+      sysio::outbound_http::read_transport_options(
+         variables,
+         {"outpost-solana-additional-ca-file", "outpost-solana-additional-ca-path", "outpost-solana-proxy"});
+   BOOST_REQUIRE(solana_options.additional_ca_file);
+   BOOST_CHECK_EQUAL(*solana_options.additional_ca_file, std::filesystem::path("/tmp/wire-solana-ca.pem"));
+   BOOST_REQUIRE(solana_options.additional_ca_path);
+   BOOST_CHECK_EQUAL(*solana_options.additional_ca_path, std::filesystem::path("/tmp/wire-global-ca"));
+   BOOST_REQUIRE(solana_options.proxy);
+   BOOST_CHECK_EQUAL(*solana_options.proxy, "http://127.0.0.1:3128");
 }
 
 /** Verify that the snapshot response-size limit rejects zero and overflow before connecting. */

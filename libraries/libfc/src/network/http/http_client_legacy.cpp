@@ -1,10 +1,12 @@
 #include <fc/network/http/http_client.hpp>
 
 #include <fc/io/json.hpp>
+#include <fc/task/deadline.hpp>
 
 #include <boost/asio/co_spawn.hpp>
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/steady_timer.hpp>
+#include <boost/beast/http/status.hpp>
 
 #include <chrono>
 #include <exception>
@@ -22,6 +24,13 @@ namespace {
 
 constexpr auto cancellation_poll_interval =
    std::chrono::milliseconds(50);
+constexpr uint32_t internal_server_error_status =
+   static_cast<uint32_t>(
+      boost::beast::http::status::internal_server_error);
+constexpr uint32_t not_found_status =
+   static_cast<uint32_t>(
+      boost::beast::http::status::not_found);
+thread_local const void* active_transport = nullptr;
 
 } // namespace
 
@@ -42,11 +51,118 @@ public:
            std::move(resolver_start))
       , poll_timer(io) {}
 
+   /**
+    * Serialize access to the private event loop within the caller's budget.
+    *
+    * The synchronous facade cannot safely run nested operations on the same
+    * io_context. Same-thread re-entry therefore fails before lock acquisition,
+    * while ordinary contention consumes the request's total/task budget.
+    */
+   class use_guard {
+   public:
+      use_guard(transport_impl& owner,
+                request_options& options)
+         : _owner(owner)
+         , _lock(owner.use_mutex, std::defer_lock)
+         , _previous(active_transport) {
+         if (active_transport == &_owner) {
+            FC_THROW(
+               "Outbound HTTP synchronous transport cannot be re-entered");
+         }
+
+         const auto started = time_point::now();
+         std::optional<time_point> deadline;
+         if (options.timeouts.total) {
+            auto configured_deadline = started;
+            configured_deadline.safe_add(
+               *options.timeouts.total);
+            deadline = configured_deadline;
+         }
+         if (options.timeouts.inherit_task_deadline) {
+            if (const auto task_deadline =
+                   fc::task::current_deadline();
+                task_deadline &&
+                (!deadline || *task_deadline < *deadline)) {
+               deadline = task_deadline;
+            }
+         }
+
+         if (!deadline && !options.cancel_check) {
+            if (!_lock.try_lock()) {
+               FC_THROW(
+                  "Outbound HTTP synchronous transport is busy and the request has no queue deadline");
+            }
+         } else {
+            while (!_lock.owns_lock()) {
+               bool cancelled = false;
+               try {
+                  cancelled =
+                     options.cancel_check &&
+                     options.cancel_check();
+               } catch (...) {
+                  cancelled = true;
+               }
+               if (cancelled) {
+                  FC_THROW_EXCEPTION(
+                     fc::canceled_exception,
+                     "Outbound HTTP request cancelled while waiting for the synchronous transport");
+               }
+
+               auto wait_for = cancellation_poll_interval;
+               if (deadline) {
+                  const auto remaining =
+                     *deadline - time_point::now();
+                  if (remaining.count() <= 0) {
+                     FC_THROW_EXCEPTION(
+                        fc::timeout_exception,
+                        "Outbound HTTP total request deadline expired while waiting for the synchronous transport");
+                  }
+                  wait_for = std::min(
+                     wait_for,
+                     std::chrono::duration_cast<
+                        std::chrono::milliseconds>(
+                        std::chrono::microseconds(
+                           remaining.count())));
+                  if (wait_for.count() <= 0)
+                     wait_for =
+                        std::chrono::milliseconds(1);
+               }
+               (void)_lock.try_lock_for(wait_for);
+            }
+         }
+
+         if (options.timeouts.total) {
+            const auto elapsed =
+               time_point::now() - started;
+            if (elapsed >= *options.timeouts.total) {
+               FC_THROW_EXCEPTION(
+                  fc::timeout_exception,
+                  "Outbound HTTP total request deadline expired while waiting for the synchronous transport");
+            }
+            options.timeouts.total =
+               *options.timeouts.total - elapsed;
+         }
+         active_transport = &_owner;
+      }
+
+      use_guard(const use_guard&) = delete;
+      use_guard& operator=(const use_guard&) = delete;
+
+      ~use_guard() {
+         active_transport = _previous;
+      }
+
+   private:
+      transport_impl& _owner;
+      std::unique_lock<std::timed_mutex> _lock;
+      const void* _previous;
+   };
+
    /** Buffer one asynchronous request while polling a legacy cancellation predicate. */
    response perform(const request& req,
                     const request_options& options) {
-      std::scoped_lock lock(use_mutex);
       auto async_options = options;
+      use_guard guard(*this, async_options);
       async_options.cancel_check = {};
       return run<response>(
          [&](asio::cancellation_slot slot) {
@@ -63,8 +179,8 @@ public:
       const request& req,
       const request_options& options,
       const continuation_hook& continue_with) {
-      std::scoped_lock lock(use_mutex);
       auto async_options = options;
+      use_guard guard(*this, async_options);
       async_options.cancel_check = {};
       auto active_cancel =
          std::make_shared<std::function<bool()>>(
@@ -125,8 +241,8 @@ public:
    /** Resolve one endpoint through the same asynchronous core. */
    void prime_endpoint(const url& target,
                        const request_options& options) {
-      std::scoped_lock lock(use_mutex);
       auto async_options = options;
+      use_guard guard(*this, async_options);
       async_options.cancel_check = {};
       run_void(
          [&](asio::cancellation_slot slot) {
@@ -147,8 +263,8 @@ public:
          status_callback,
       const std::function<uint64_t(const std::filesystem::path&)>&
          space_available_provider) {
-      std::scoped_lock lock(use_mutex);
       auto async_options = options;
+      use_guard guard(*this, async_options);
       async_options.cancel_check = {};
       run_void(
          [&](asio::cancellation_slot slot) {
@@ -253,7 +369,7 @@ private:
    asio::io_context io;
    client async_client;
    asio::steady_timer poll_timer;
-   std::mutex use_mutex;
+   std::timed_mutex use_mutex;
 };
 
 transport::transport(transport_options options)
@@ -436,7 +552,8 @@ variant http_client::post_sync(
       } catch (...) {
       }
    }
-   if (response.status == 500) {
+   if (response.status ==
+       http::internal_server_error_status) {
       exception_ptr remote;
       try {
          const auto error =
@@ -463,10 +580,11 @@ variant http_client::post_sync(
       FC_THROW(
          "Request failed with 500 response, but response was not parseable");
    }
-   if (response.status == 404)
+   if (response.status == http::not_found_status)
       FC_THROW("URL not found");
-   if (response.status < 200 ||
-       response.status >= 300) {
+   if (boost::beast::http::to_status_class(
+          response.status) !=
+       boost::beast::http::status_class::successful) {
       FC_THROW(
          "HTTP POST failed with status {}",
          response.status);
@@ -478,6 +596,13 @@ void http_client::set_verify_peers(bool enabled) {
    FC_ASSERT(
       enabled,
       "Outbound HTTPS peer and hostname verification cannot be disabled");
+}
+
+void http_client::set_transport_options(
+   http::transport_options options) {
+   _transport =
+      std::make_unique<http::transport>(
+         std::move(options));
 }
 
 } // namespace fc

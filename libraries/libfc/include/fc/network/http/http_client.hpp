@@ -16,6 +16,7 @@
 #include <boost/asio/buffer.hpp>
 #include <boost/asio/cancellation_signal.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <array>
 #include <filesystem>
@@ -57,6 +58,15 @@ using resolver_start_fn =
                                     const std::string&,
                                     time_point,
                                     resolver_complete_fn)>;
+
+/** Schedule a regression-test task on one independent platform resolver service. */
+void post_platform_resolver_worker_task_for_testing(
+   size_t worker,
+   std::function<void()> task);
+
+/** Exercise the resolver notification write loop with an injected write operation. */
+bool write_resolver_signal_for_testing(
+   const std::function<int64_t()>& write_once);
 
 } // namespace detail
 
@@ -112,10 +122,14 @@ struct transport_options {
    std::optional<std::filesystem::path> additional_ca_path;
    /// Explicit outbound proxy. Environment proxy variables are ignored when absent.
    std::optional<std::string> proxy;
-   /// Resolver cache lifetime in seconds; -1 retains entries for the client lifetime.
-   int64_t dns_cache_timeout_seconds = 60;
+   /// Resolver cache lifetime. nullopt retains entries for the client lifetime; zero disables caching.
+   std::optional<microseconds> dns_cache_timeout = seconds(60);
    /// Invalidate a cached resolver result after connection establishment fails.
    bool refresh_dns_on_connection_failure = true;
+   /// Maximum total number of idle persistent connections retained by one client.
+   size_t max_idle_connections = 32;
+   /// Maximum time a persistent connection may remain idle before reuse.
+   microseconds max_idle_connection_age = seconds(15);
 };
 
 /** Per-request phase and total deadlines. */
@@ -126,7 +140,7 @@ struct timeout_options {
    std::optional<microseconds> header = seconds(30);
    /// Maximum aggregate response-body read time. nullopt is an explicitly reviewed exemption.
    std::optional<microseconds> read = seconds(30);
-   /// Maximum time without upload or download progress after response headers. nullopt is a reviewed exemption.
+   /// Maximum time without response-body progress after response headers. nullopt is a reviewed exemption.
    std::optional<microseconds> idle = seconds(30);
    /// Overall request budget. nullopt is permitted only for a reviewed attended operation.
    std::optional<microseconds> total = seconds(30);
@@ -222,7 +236,8 @@ struct continuation_request {
 /**
  * Inspect one complete response and select a same-connection follow-up.
  *
- * The hook may throw to reject the continuation. It must not block.
+ * The hook may throw to reject the continuation. It must not block or
+ * re-enter the same client.
  */
 using continuation_hook =
    std::function<continuation_request(const response&)>;
@@ -340,7 +355,8 @@ public:
     * The first request retains its final successful connection across the
     * hook. A hook failure, closed peer, endpoint change, or follow-up
     * transport failure closes that connection and never falls back to
-    * another connection.
+    * another connection. The hook runs synchronously on the client executor:
+    * it must not block or re-enter the same client.
     */
    boost::asio::awaitable<response>
    async_request_then(
@@ -411,7 +427,8 @@ public:
     * connection.
     *
     * Each request has its own limits and deadline budget. The follow-up is
-    * single-attempt and never falls back to another connection.
+    * single-attempt and never falls back to another connection. The hook
+    * must not block or re-enter this transport; re-entry fails immediately.
     */
    response perform_then(
       const request& req,
@@ -527,6 +544,13 @@ class http_client {
       void set_cancel_check(std::function<bool()> cancel_check);
 
       void set_verify_peers(bool enabled);
+
+      /**
+       * Replace transport configuration while preserving this facade object's identity.
+       *
+       * This must be called during single-threaded initialization, before requests begin.
+       */
+      void set_transport_options(http::transport_options options);
 
 private:
    friend struct http_client_test_access;

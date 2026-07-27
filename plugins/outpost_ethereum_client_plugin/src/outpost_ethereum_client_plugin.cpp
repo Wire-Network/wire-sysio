@@ -4,8 +4,10 @@
 #include <fc/log/logger.hpp>
 #include <fc/task/deadline.hpp>
 
+#include <sysio/http_client_plugin/http_client_options.hpp>
 #include <sysio/outpost_ethereum_client_plugin.hpp>
 #include <sysio/outpost_ethereum_client_plugin/outpost_ethereum_client.hpp>
+#include <sysio/outpost_client/rpc_options.hpp>
 
 namespace sysio {
 // using namespace outpost_client::ethereum;
@@ -14,11 +16,14 @@ namespace {
 constexpr auto option_name_client         = "outpost-ethereum-client";
 constexpr auto option_abi_file            = "ethereum-abi-file";
 constexpr auto chain_id_validation_timeout = fc::seconds(5);
-constexpr auto option_additional_ca_file = "outpost-ethereum-additional-ca-file";
-constexpr auto option_additional_ca_path = "outpost-ethereum-additional-ca-path";
-constexpr auto option_proxy = "outpost-ethereum-proxy";
-constexpr uint64_t ethereum_rpc_max_request_bytes = 1ULL * 1024ULL * 1024ULL;
-constexpr uint64_t ethereum_rpc_max_response_bytes = 4ULL * 1024ULL * 1024ULL;
+constexpr outbound_http::transport_option_names
+   transport_option_names{
+      .additional_ca_file =
+         "outpost-ethereum-additional-ca-file",
+      .additional_ca_path =
+         "outpost-ethereum-additional-ca-path",
+      .proxy = "outpost-ethereum-proxy",
+   };
 
 [[maybe_unused]] inline fc::logger& logger() {
    static fc::logger log{"outpost_ethereum_client_plugin"};
@@ -134,33 +139,6 @@ ethereum_client_ptr create_validated_client(
    return client;
 }
 
-/** Build the named bounded transport policy shared by configured Ethereum RPC clients. */
-fc::network::json_rpc::client_options ethereum_rpc_options(const variables_map& options) {
-   fc::network::json_rpc::client_options result{
-      .request =
-         fc::http::request_options{
-            .max_request_body_bytes = ethereum_rpc_max_request_bytes,
-            .max_response_body_bytes = ethereum_rpc_max_response_bytes,
-            .timeouts =
-               fc::http::timeout_options{
-                  .connect = fc::seconds(10),
-                  .header = fc::seconds(30),
-                  .read = fc::seconds(30),
-                  .idle = fc::seconds(30),
-                  .total = fc::seconds(30),
-               },
-         },
-   };
-   if (options.contains(option_additional_ca_file))
-      result.transport.additional_ca_file =
-         options.at(option_additional_ca_file).as<std::filesystem::path>();
-   if (options.contains(option_additional_ca_path))
-      result.transport.additional_ca_path =
-         options.at(option_additional_ca_path).as<std::filesystem::path>();
-   if (options.contains(option_proxy))
-      result.transport.proxy = options.at(option_proxy).as<std::string>();
-   return result;
-}
 }
 
 class outpost_ethereum_client_plugin_impl {
@@ -228,7 +206,10 @@ void outpost_ethereum_client_plugin::plugin_initialize(const variables_map& opti
    // constructed here rather than deferred to startup.
    auto& sig_mgr        = app().get_plugin<signature_provider_manager_plugin>();
    auto client_specs    = options.at(option_name_client).as<std::vector<std::string>>();
-   const auto rpc_options = ethereum_rpc_options(options);
+   const auto rpc_options =
+      outpost_rpc::rpc_options(
+         options,
+         transport_option_names);
    for (auto& client_spec : client_specs) {
       dlog("Adding configured Ethereum client");
       auto parts = fc::split(client_spec, ',');
@@ -312,16 +293,11 @@ void outpost_ethereum_client_plugin::set_program_options(options_description& cl
       option_abi_file,
       boost::program_options::value<std::vector<std::filesystem::path>>()->multitoken(),
       "Ethereum contract ABI file(s).  Expects the file to have a JSON array of ABI complient contract definitions."
-      )(
-      option_additional_ca_file,
-      boost::program_options::value<std::filesystem::path>(),
-      "PEM CA bundle added to system trust for Ethereum RPC HTTPS clients.")(
-      option_additional_ca_path,
-      boost::program_options::value<std::filesystem::path>(),
-      "Hashed CA directory added to system trust for Ethereum RPC HTTPS clients.")(
-      option_proxy,
-      boost::program_options::value<std::string>(),
-      "Explicit proxy URL for Ethereum RPC HTTP clients.");
+      );
+   outbound_http::add_transport_program_options(
+      cfg,
+      transport_option_names,
+      "Ethereum RPC");
 }
 
 

@@ -15,7 +15,8 @@ HTTPS endpoints use system CA roots and mandatory DNS/IP identity verification. 
 `--outpost-ethereum-additional-ca-file` or `--outpost-ethereum-additional-ca-path`; an explicit proxy can be set
 with `--outpost-ethereum-proxy`. The equivalent Solana options are
 `--outpost-solana-additional-ca-file`, `--outpost-solana-additional-ca-path`, and
-`--outpost-solana-proxy`. See [Outbound HTTP transport](outbound-http-transport.md) for the complete security and
+`--outpost-solana-proxy`. The `--outbound-http-*` options provide process-wide fallbacks; chain-specific values
+take precedence. See [Outbound HTTP transport](outbound-http-transport.md) for the complete security and
 resource policy.
 
 > NOTE:  If you look closely, the reference to `eth-01` in the Ethereum client config, matches the signature provider configured for `Ethereum`.  This mapping is what enables `1..n` clients in a single process
