@@ -62,11 +62,12 @@ namespace fc
   /// JSON shape mirrors to_variant: forward to the EnumType's own to_json_stream
   /// so FC_REFLECT_ENUM-reflected enums emit as their member-name strings (not
   /// the underlying integer).  Bare numeric enums fall through to the primitive
-  /// overloads via integer promotion.
+  /// overloads via integer promotion.  Dispatched unqualified so an EnumType whose
+  /// serializer is declared after this header still resolves (see static_variant.hpp).
   template<typename IntType, typename EnumType>
   void to_json_stream( const enum_type<IntType,EnumType>& var, json_writer& w )
   {
-    fc::to_json_stream(static_cast<EnumType>(var.value), w);
+    to_json_stream(static_cast<EnumType>(var.value), w);
   }
 
 

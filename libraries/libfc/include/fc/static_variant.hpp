@@ -82,11 +82,18 @@ template<typename... T> void to_variant( const std::variant<T...>& s, fc::varian
 }
 
 /// JSON shape: 2-element array `[index, value]` matching the to_variant form.
+///
+/// The alternative's serializer is dispatched UNQUALIFIED, like the container helpers in
+/// variant.hpp: a qualified `fc::to_json_stream` binds its overload set where this template is
+/// defined, which hides every serializer declared by a header included after this one -- eg
+/// `std::variant<fc::sha256>` in a TU that includes static_variant.hpp before crypto/sha256.hpp
+/// would fall through to the reflector primary and fail its static_assert.  Unqualified lookup
+/// keeps ADL open at the point of instantiation.
 template<typename... T> void to_json_stream( const std::variant<T...>& s, json_writer& w )
 {
    w.begin_array();
    w.value_uint64(static_cast<uint64_t>(s.index()));
-   std::visit([&w](const auto& v) { fc::to_json_stream(v, w); }, s);
+   std::visit([&w](const auto& v) { to_json_stream(v, w); }, s);
    w.end_array();
 }
 

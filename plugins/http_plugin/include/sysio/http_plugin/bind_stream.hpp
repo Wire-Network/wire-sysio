@@ -213,6 +213,19 @@ namespace http_detail {
       return 0;
    }
 
+   /// Emit a response payload through fc's streaming serializers.
+   ///
+   /// Two-step ADL dispatch (using-declaration plus an unqualified call) rather than a qualified
+   /// `fc::to_json_stream`: a qualified call fixes its overload set where this header is parsed, so
+   /// a result type whose serializer is declared by a header included later falls through to the
+   /// reflector primary and fails its static_assert.  The using-declaration is what makes the
+   /// unqualified form work at all from namespace sysio, where ordinary lookup does not reach fc.
+   template<typename T>
+   inline void emit_json(const T& r, fc::json_writer& w) {
+      using fc::to_json_stream;
+      to_json_stream(r, w);
+   }
+
    /// Charge a queued Phase-2 `chain::deferred_call` against bytes-in-flight for the whole time
    /// it is on the http thread pool queue.
    ///
@@ -363,7 +376,7 @@ api_entry_stream bind_stream(http_plugin& http, Handle handle,
                auto reservation = http.reserve_bytes_in_flight(source_size_estimate(result));
                cb(resp_code,
                   [r = std::move(result), reservation = std::move(reservation)](fc::json_writer& w) mutable {
-                  fc::to_json_stream(r, w);
+                  emit_json(r, w);
                });
 
             } else if constexpr (Kind == dispatch::sync_void) {
@@ -374,7 +387,7 @@ api_entry_stream bind_stream(http_plugin& http, Handle handle,
                }
                cb(resp_code, [](fc::json_writer& w) {
                   ok_response r;
-                  fc::to_json_stream(r, w);
+                  emit_json(r, w);
                });
 
             } else if constexpr (Kind == dispatch::post) {
@@ -401,7 +414,7 @@ api_entry_stream bind_stream(http_plugin& http, Handle handle,
                         } else {
                            cb(resp_code,
                               [r = std::get<payload_t>(std::move(result))]
-                              (fc::json_writer& w) mutable { fc::to_json_stream(r, w); });
+                              (fc::json_writer& w) mutable { emit_json(r, w); });
                         }
                      } catch (...) {
                         http_plugin::handle_exception_stream(
@@ -461,7 +474,7 @@ api_entry_stream bind_stream(http_plugin& http, Handle handle,
                            http.reserve_bytes_in_flight(source_size_estimate(std::get<payload_t>(result)));
                         cb(resp_code,
                            [r = std::get<payload_t>(std::move(result)), reservation = std::move(reservation)]
-                           (fc::json_writer& w) mutable { fc::to_json_stream(r, w); });
+                           (fc::json_writer& w) mutable { emit_json(r, w); });
                      } else {
                         auto& fwd = std::get<http_fwd_t>(result);
                         auto reservation = deferred_reservation(http, fwd);
@@ -481,7 +494,7 @@ api_entry_stream bind_stream(http_plugin& http, Handle handle,
                                     cb(resp_code,
                                        [v = std::get<payload_t>(std::move(r))]
                                        (fc::json_writer& w) mutable {
-                                          fc::to_json_stream(v, w);
+                                          emit_json(v, w);
                                        });
                                  }
                               } catch (...) {
