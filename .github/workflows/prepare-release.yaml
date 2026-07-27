@@ -1,0 +1,174 @@
+name: "Prepare Release"
+
+# Gate 1 of the Strategy-C release path (docs/release-workflow.md): produce the
+# version-bump PR a human reviews and merges. Nothing is tagged or published here.
+#
+# `version` is the SOLE input -- its suffix IS the channel everywhere downstream:
+# a suffix (-dev, -rcN, ...) means prerelease, no suffix means stable.
+#
+# Post-bump mode is the same dispatch: after a stable release lands, dispatch this
+# workflow again with the next `-dev` version to restore the development suffix on
+# master. The workflow labels the PR accordingly.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to prepare, without a leading v (e.g. 1.0.0-dev, 1.1.0-rc1, 1.1.0)"
+        type: string
+        required: true
+
+permissions:
+  contents: write
+  pull-requests: write
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  prepare:
+    name: Open the version-bump PR
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      # Untrusted dispatch input: passed as an environment variable and NEVER
+      # interpolated into a script body, so a value such as $(...) stays inert data.
+      VERSION: ${{ inputs.version }}
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # actions/checkout@v5
+        with:
+          ref: master
+          # Unshallowed so the remote-tracking refs exist: `git push
+          # --force-with-lease` below needs origin/<prep-branch> to compare
+          # against, and on a shallow clone with no such ref it fails with
+          # "stale info" whenever a previous prep attempt already pushed it.
+          fetch-depth: 0
+
+      - name: Validate version and derive the channel
+        id: version
+        run: |
+          set -euo pipefail
+
+          # Conservative allowlist -- the same grammar cmake-version.py enforces.
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z]+(\.[0-9A-Za-z]+)*)?$ ]]; then
+            echo "::error::'${VERSION}' is not <major>.<minor>.<patch>[-<suffix>] (no leading v)" >&2
+            exit 1
+          fi
+
+          previous="$(python3 .github/scripts/cmake-version.py read)"
+
+          # Nothing to do: master already carries this version, so the bump would
+          # be an empty commit and the PR would have no diff to review. Fail here
+          # with the reason rather than at `git commit` with "nothing to commit".
+          if [[ "$previous" == "$VERSION" ]]; then
+            echo "::error::master is already at ${VERSION}; nothing to prepare. Dispatch with the NEXT version instead." >&2
+            exit 1
+          fi
+
+          if [[ "$VERSION" == *-* ]]; then
+            channel="prerelease"
+            prerelease="true"
+          else
+            channel="stable"
+            prerelease="false"
+          fi
+
+          # A suffixed version replacing an unsuffixed one is the post-stable
+          # restoration of the development suffix, not a release preparation.
+          if [[ "$previous" != *-* && "$VERSION" == *-* ]]; then
+            mode="post-bump"
+          else
+            mode="release-prep"
+          fi
+
+          {
+            echo "previous=$previous"
+            echo "channel=$channel"
+            echo "prerelease=$prerelease"
+            echo "mode=$mode"
+            echo "branch=release/prep-v${VERSION}"
+          } >> "$GITHUB_OUTPUT"
+
+          echo "Preparing ${previous} -> ${VERSION} (channel ${channel}, mode ${mode})"
+
+      - name: Write the version into CMakeLists.txt
+        run: |
+          python3 .github/scripts/cmake-version.py write "$VERSION"
+
+      - name: Pin the latest published wire-cdt release for the channel
+        id: cdt
+        env:
+          CDT_PRERELEASE: ${{ steps.version.outputs.prerelease }}
+          CDT_CHANNEL: ${{ steps.version.outputs.channel }}
+        run: |
+          set -euo pipefail
+
+          # Resolve-at-prepare, pin-at-build: the tag build downloads exactly this
+          # release's asset, so re-runs are reproducible, the CDT version is
+          # reviewable at gate 1, and there is no publish-order race at release time.
+          #
+          # There is no first-class "latest prerelease" endpoint, so the release list
+          # is filtered by draft/prerelease and the newest by creation date wins.
+          releases_json="$(
+            gh api "repos/Wire-Network/wire-cdt/releases?per_page=100" \
+              -H "X-GitHub-Api-Version: 2022-11-28"
+          )"
+          cdt_release="$(
+            jq -r --argjson pre "$CDT_PRERELEASE" '
+              [.[] | select(.draft == false and .prerelease == $pre)]
+              | sort_by(.created_at)
+              | last
+              | .tag_name // empty' <<<"$releases_json"
+          )"
+          if [[ -z "$cdt_release" ]]; then
+            echo "::error::No published wire-cdt release found for channel ${CDT_CHANNEL}" >&2
+            exit 1
+          fi
+
+          jq --indent 2 --arg release "$cdt_release" --arg channel "$CDT_CHANNEL" \
+            '.wirecdt.release = $release | .wirecdt.channel = $channel' \
+            .cicd/defaults.json > .cicd/defaults.json.next
+          mv .cicd/defaults.json.next .cicd/defaults.json
+
+          echo "release=$cdt_release" >> "$GITHUB_OUTPUT"
+          echo "Pinned wire-cdt ${cdt_release} (channel ${CDT_CHANNEL})"
+
+      - name: Open the bump PR
+        env:
+          BRANCH: ${{ steps.version.outputs.branch }}
+          PREVIOUS: ${{ steps.version.outputs.previous }}
+          CHANNEL: ${{ steps.version.outputs.channel }}
+          MODE: ${{ steps.version.outputs.mode }}
+          CDT_RELEASE: ${{ steps.cdt.outputs.release }}
+        run: |
+          set -euo pipefail
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          git add CMakeLists.txt .cicd/defaults.json
+          git commit -m "chore(release): ${MODE} ${PREVIOUS} -> ${VERSION}"
+          # --force-with-lease, not a bare push: re-dispatching the prep for the
+          # same version (a fixed pin, a re-resolved CDT release) must be able to
+          # replace the previous attempt's branch tip instead of failing
+          # non-fast-forward, while still refusing to clobber a tip that someone
+          # else moved since this run's fetch.
+          git push --force-with-lease origin "$BRANCH"
+
+          # NOTE: a PR opened with GITHUB_TOKEN starts its `pull_request` checks in
+          # an approval-required state -- gate 1 includes an "Approve and run" click.
+          # printf, not an indented heredoc: every body line must start at column 0
+          # or GitHub renders the whole description as a code block.
+          body="$(printf '%s\n' \
+            "${MODE}: \`${PREVIOUS}\` -> \`${VERSION}\` (channel: **${CHANNEL}**)." \
+            "" \
+            "- \`CMakeLists.txt\`: \`VERSION_*\` set to \`${VERSION}\`." \
+            "- \`.cicd/defaults.json\`: \`wirecdt.release\` pinned to \`${CDT_RELEASE}\`, \`wirecdt.channel\` set to \`${CHANNEL}\`." \
+            "" \
+            "Review the pinned Wire CDT release, then merge. Tagging is a separate," \
+            "approval-gated dispatch of \`tag-release.yaml\` with the same version.")"
+          gh pr create \
+            --base master \
+            --head "$BRANCH" \
+            --title "chore(release): ${MODE} v${VERSION}" \
+            --body "$body"

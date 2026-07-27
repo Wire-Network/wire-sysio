@@ -48,19 +48,37 @@ else()
 endif()
 string(REGEX REPLACE "^${CMAKE_PROJECT_NAME}-(.*)$" "${CMAKE_PROJECT_NAME}_\\1_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}" CPACK_DEBIAN_FILE_NAME "${CPACK_PACKAGE_FILE_NAME}")
 
-string(APPEND CPACK_PACKAGE_FILE_NAME "-${CMAKE_SYSTEM_PROCESSOR}")
+# Architecture tag embedded in artifact file names. Linux keeps the bare
+# processor name so existing artifact names stay BYTE-IDENTICAL
+# (wire-sysio-<version>-x86_64.*); Apple builds are additionally qualified as
+# `macos-<processor>` so a macOS tarball can never be confused with -- or
+# glob-matched as -- the Linux one when both hang off the same release.
+# Deliberately NOT CPACK_SYSTEM_NAME: that would rename the Linux artifacts too.
+if(APPLE)
+   set(WIRE_ARCH_TAG "macos-${CMAKE_SYSTEM_PROCESSOR}")
+else()
+   set(WIRE_ARCH_TAG "${CMAKE_SYSTEM_PROCESSOR}")
+endif()
+string(APPEND CPACK_PACKAGE_FILE_NAME "-${WIRE_ARCH_TAG}")
 
 # ── Packaged service assets (systemd unit, tmpfiles.d, logrotate policy) ──
-# Literal `lib/...` on purpose (NOT ${CMAKE_INSTALL_LIBDIR}): systemd units and
-# tmpfiles.d fragments live in /usr/lib/systemd/system and /usr/lib/tmpfiles.d
-# on every supported distro -- never lib64/ or lib/<multiarch>/.
-install(FILES "${CMAKE_SOURCE_DIR}/tools/packaging/systemd/wire-sysio-nodeop.service"
-        DESTINATION lib/systemd/system COMPONENT base)
-install(FILES "${CMAKE_SOURCE_DIR}/tools/packaging/systemd/wire-sysio.conf"
-        DESTINATION lib/tmpfiles.d COMPONENT base)
-# logrotate policies are only read from /etc/logrotate.d -- absolute on purpose.
-install(FILES "${CMAKE_SOURCE_DIR}/tools/packaging/logrotate/wire-sysio-nodeop"
-        DESTINATION /etc/logrotate.d COMPONENT base)
+# Linux-only payload: systemd, tmpfiles.d and logrotate do not exist on macOS,
+# and the macOS portable tarball must ship the binaries alone (asserted by
+# `verify-tgz.sh --no-service`). Gating the install rules -- rather than moving
+# them to a new component -- keeps the TGZ pinned to the `base` component; a new
+# component would leak a third deb/rpm package on Linux.
+if(NOT APPLE)
+   # Literal `lib/...` on purpose (NOT ${CMAKE_INSTALL_LIBDIR}): systemd units and
+   # tmpfiles.d fragments live in /usr/lib/systemd/system and /usr/lib/tmpfiles.d
+   # on every supported distro -- never lib64/ or lib/<multiarch>/.
+   install(FILES "${CMAKE_SOURCE_DIR}/tools/packaging/systemd/wire-sysio-nodeop.service"
+           DESTINATION lib/systemd/system COMPONENT base)
+   install(FILES "${CMAKE_SOURCE_DIR}/tools/packaging/systemd/wire-sysio.conf"
+           DESTINATION lib/tmpfiles.d COMPONENT base)
+   # logrotate policies are only read from /etc/logrotate.d -- absolute on purpose.
+   install(FILES "${CMAKE_SOURCE_DIR}/tools/packaging/logrotate/wire-sysio-nodeop"
+           DESTINATION /etc/logrotate.d COMPONENT base)
+endif()
 
 # Per-generator staging/prefix/top-dir configuration, evaluated at cpack time.
 set(CPACK_PROJECT_CONFIG_FILE "${CMAKE_SOURCE_DIR}/cmake/cpack-project-config.cmake")

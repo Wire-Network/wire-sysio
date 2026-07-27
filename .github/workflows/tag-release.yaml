@@ -1,0 +1,156 @@
+name: "Tag Release"
+
+# Gate 2 of the Strategy-C release path (docs/release-workflow.md). The job runs
+# under the `release` Environment, so it PAUSES for a required reviewer before it
+# creates anything. After approval it tags master, opens a DRAFT release, and
+# dispatches the platform builds plus the asset workflow.
+#
+# `version` is the SOLE input; its suffix IS the channel (suffix => prerelease).
+#
+# Structurally identical to wire-cdt/.github/workflows/tag-release.yaml -- the two
+# repos run the same release path, so the two files are kept in lock-step.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to tag, without a leading v (e.g. 1.0.0-dev, 1.1.0-rc1, 1.1.0). Must already be master's version."
+        type: string
+        required: true
+
+permissions:
+  contents: write
+  # `gh workflow run` dispatches the build + release workflows.
+  actions: write
+
+concurrency:
+  # One tagging run per version, and never cancel one mid-flight: a cancelled run
+  # can leave a tag without its draft release, which the next attempt would then
+  # refuse (never re-tag).
+  group: tag-release-${{ inputs.version }}
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  tag:
+    name: Tag master and start the release builds
+    runs-on: ubuntu-latest
+    # Required reviewers on this Environment are gate 2 -- nothing below runs until
+    # a human approves the deployment.
+    environment: release
+    env:
+      GH_TOKEN: ${{ github.token }}
+      # Untrusted dispatch input: environment variable only, never interpolated
+      # into a script body.
+      VERSION: ${{ inputs.version }}
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # actions/checkout@v5
+        with:
+          ref: master
+
+      - name: Assert master HEAD carries the requested version
+        id: assert
+        run: |
+          set -euo pipefail
+
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z]+(\.[0-9A-Za-z]+)*)?$ ]]; then
+            echo "::error::'${VERSION}' is not <major>.<minor>.<patch>[-<suffix>] (no leading v)" >&2
+            exit 1
+          fi
+
+          # The same parser prepare-release.yaml writes with and release.yaml
+          # cross-checks the tag against.
+          head_version="$(python3 .github/scripts/cmake-version.py read)"
+          if [[ "$head_version" != "$VERSION" ]]; then
+            echo "::error::master HEAD is version ${head_version}, not ${VERSION}. Merge the prepare-release PR first." >&2
+            exit 1
+          fi
+
+          # The suffix decides the channel for the whole downstream path.
+          if [[ "$VERSION" == *-* ]]; then
+            prerelease="true"
+          else
+            prerelease="false"
+          fi
+
+          tag="v${VERSION}"
+          if gh api "repos/${GITHUB_REPOSITORY}/git/ref/tags/${tag}" >/dev/null 2>&1; then
+            echo "::error::Tag ${tag} already exists. Never re-tag -- cut the next -rcN instead." >&2
+            exit 1
+          fi
+
+          {
+            echo "tag=$tag"
+            echo "sha=$(git rev-parse HEAD)"
+            echo "prerelease=$prerelease"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create the annotated tag
+        env:
+          TAG: ${{ steps.assert.outputs.tag }}
+          SHA: ${{ steps.assert.outputs.sha }}
+        run: |
+          set -euo pipefail
+
+          # An annotated tag is TWO API calls, in this order: the tag object first,
+          # then the ref that points at it. `gh release create --verify-tag` needs
+          # the ref to exist, so the ref call must come second.
+          tag_sha="$(
+            gh api "repos/${GITHUB_REPOSITORY}/git/tags" -X POST \
+              -f tag="$TAG" \
+              -f message="$TAG" \
+              -f object="$SHA" \
+              -f type=commit \
+              --jq .sha
+          )"
+          gh api "repos/${GITHUB_REPOSITORY}/git/refs" -X POST \
+            -f ref="refs/tags/${TAG}" \
+            -f sha="$tag_sha" > /dev/null
+          echo "Created annotated tag ${TAG} -> ${SHA} (tag object ${tag_sha})"
+
+      - name: Create the draft release
+        env:
+          TAG: ${{ steps.assert.outputs.tag }}
+          PRERELEASE: ${{ steps.assert.outputs.prerelease }}
+        run: |
+          set -euo pipefail
+
+          # Draft, so no half-populated release is ever public: release.yaml flips
+          # the draft only after every artifact has been verified and attached.
+          # The notes and the prerelease flag are set HERE -- release.yaml never
+          # creates the release on this path.
+          args=(--draft --verify-tag --title "$TAG" --generate-notes)
+          if [[ "$PRERELEASE" == "true" ]]; then
+            args+=(--prerelease)
+          fi
+          gh release create "$TAG" "${args[@]}"
+
+      - name: Dispatch the platform builds on the tag ref
+        env:
+          TAG: ${{ steps.assert.outputs.tag }}
+        run: |
+          set -euo pipefail
+
+          # A tag created with GITHUB_TOKEN fires NO push event, so the tag builds
+          # must be dispatched explicitly. `--ref "$TAG"` (the bare tag name, which
+          # gh resolves to the tag ref) makes `github.ref` inside those runs the tag
+          # ref, so the existing startsWith(github.ref, 'refs/tags/v') gates --
+          # system-contract build, Wire CDT install, contracts bundle -- behave
+          # exactly as on a tag push.
+          gh workflow run linux_amd64_build.yaml --ref "$TAG"
+          gh workflow run macos_arm64_build.yaml --ref "$TAG"
+          echo "Dispatched linux_amd64_build.yaml and macos_arm64_build.yaml on ${TAG}"
+
+      - name: Dispatch the release asset workflow
+        env:
+          TAG: ${{ steps.assert.outputs.tag }}
+        run: |
+          set -euo pipefail
+
+          # Dispatched on master (the workflow file's home); the tag travels as the
+          # input. release.yaml waits for both tag-ref builds to finish, verifies
+          # every artifact, attaches them, then flips the draft.
+          gh workflow run release.yaml --ref master -f tag="$TAG"
+          echo "Dispatched release.yaml for ${TAG}"
