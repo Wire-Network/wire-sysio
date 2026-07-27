@@ -850,11 +850,10 @@ BOOST_AUTO_TEST_CASE(idempotent_call_recovers_from_a_stale_cached_connection) {
 
 /// Caller-supplied retry options cannot make a default call replay.
 BOOST_AUTO_TEST_CASE(default_call_enforces_single_attempt) {
-   auto stale =
+   auto warm =
       continuation_json_rpc_response::result("warm");
-   stale.reset_after_response = true;
    continuation_json_rpc_server server({
-      std::move(stale),
+      std::move(warm),
       continuation_json_rpc_response::close(),
       continuation_json_rpc_response::result("replayed"),
    });
@@ -879,8 +878,17 @@ BOOST_AUTO_TEST_CASE(default_call_enforces_single_attempt) {
    BOOST_CHECK_THROW(
       client.call("wire_side_effect_probe"),
       fc::exception);
-   BOOST_CHECK_EQUAL(server.connection_count(), 2U);
-   BOOST_CHECK_EQUAL(server.requests().size(), 2U);
+   BOOST_CHECK_EQUAL(
+      server.connection_count(),
+      1U);
+   const auto requests = server.requests();
+   BOOST_REQUIRE_EQUAL(requests.size(), 2U);
+   BOOST_CHECK_EQUAL(
+      requests.front().method,
+      "wire_first_probe");
+   BOOST_CHECK_EQUAL(
+      requests.back().method,
+      "wire_side_effect_probe");
 }
 
 /// URL parsing preserves bracketed IPv6 identity, credentials, path, query, and port.
