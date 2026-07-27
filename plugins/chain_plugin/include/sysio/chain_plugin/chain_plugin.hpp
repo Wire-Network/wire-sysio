@@ -97,6 +97,16 @@ namespace sysio {
       std::unordered_map<account_name, chain::vector<char>> raw_abis;
    };
 
+   /// Reservation-grade retained size of a capture (see `chain::deferred_call` and
+   /// `chain_apis::queued_payload_size`): the copied byte-strings dominate, the map's own
+   /// nodes are small fixed-size overhead and are ignored.
+   inline size_t queued_payload_size(const captured_abis& c) {
+      size_t sz = 0;
+      for (const auto& [account, abi] : c.raw_abis)
+         sz += abi.size();
+      return sz;
+   }
+
    /// Walks the actions in `obj` (a `signed_block_ptr` or `transaction_trace_ptr`)
    /// and copies each unique action.account's `abi` bytes out of chainbase.
    /// Must be called from an `exec_queue::read_only` (or `read_write`) task so
@@ -284,6 +294,12 @@ class read_only : public api_base {
       std::vector<raw_table_row>  rows;
    };
 
+   /// Reservation-grade retained size of a Phase-1 collection held alive by a queued Phase-2
+   /// `chain::deferred_call`: the raw row bytes and the parsed abi_def dominate.  Named apart
+   /// from the `queued_payload_size` customization point on purpose -- a member of that name
+   /// would hide the free overloads from unqualified calls inside read_only, ADL included.
+   static size_t phase1_retained_size(const table_rows_phase1& hp);
+
 public:
    static const string KEYi64;
 
@@ -413,7 +429,7 @@ public:
       name                  account_name;
       std::optional<symbol> expected_core_symbol;
    };
-   using get_account_return_t = std::function<chain::t_or_exception<get_account_results>()>;
+   using get_account_return_t = chain::deferred_call<get_account_results>;
    get_account_return_t get_account( const get_account_params& params, const fc::time_point& deadline )const;
 
 
@@ -605,7 +621,7 @@ public:
       string               next_key;                  ///< scope-stripped key for pagination
    };
 
-   using get_table_rows_return_t = std::function<chain::t_or_exception<get_table_rows_result>()>;
+   using get_table_rows_return_t = chain::deferred_call<get_table_rows_result>;
 
    /// Public table-rows query. Honors the per-caller scan bounds on `get_table_rows_params` (`limit`,
    /// `time_limit_ms`, `lower/upper_bound`, `find`, `index_name`, `reverse`) plus the C++-only behaviours
@@ -619,7 +635,7 @@ public:
    /// allocations.  `filter` is intentionally not honored on this path since it is in-tree-only and
    /// requires a `fc::variant` to evaluate; in-tree callers continue using `get_table_rows()`.
    using get_table_rows_stream_emit_fn = std::function<void(fc::json_writer&)>;
-   using get_table_rows_stream_return_t = std::function<chain::t_or_exception<get_table_rows_stream_emit_fn>()>;
+   using get_table_rows_stream_return_t = chain::deferred_call<get_table_rows_stream_emit_fn>;
    get_table_rows_stream_return_t get_table_rows_stream( const get_table_rows_params& params, const fc::time_point& deadline )const;
 
    struct get_table_by_scope_params {

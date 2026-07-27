@@ -278,7 +278,10 @@ inline auto make_http_response_handler(http_plugin_state& plugin_state, detail::
 * packed-size estimate (http_plugin::reserve_bytes_in_flight) when it captures a typed
 * result into the emitter, and that reservation rides the closure across this queue --
 * so results waiting here for a pool thread are already visible to the budget, exactly
-* like the variant path's queued response variants.  The dispatched lambda below
+* like the variant path's queued response variants.  Two-phase endpoints charge the
+* mirror image of that: bind_stream reserves a queued chain::deferred_call's
+* retained_size() before posting it, so the Phase-1 data it captured (copied ABI bytes,
+* collected rows, a block, a trace) is charged while the call waits.  The dispatched lambda below
 * re-checks the budget before emitting and drains over-budget work with the busy
 * response without running the emitter at all.
 */

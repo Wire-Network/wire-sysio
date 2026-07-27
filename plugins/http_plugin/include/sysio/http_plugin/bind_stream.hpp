@@ -15,6 +15,7 @@
 
 #include <cassert>
 #include <functional>
+#include <memory>
 #include <string>
 #include <tuple>
 #include <type_traits>
@@ -31,17 +32,17 @@ namespace sysio {
  *                    json_writer-emitting closure handed to the streaming cb.
  *  - `sync_void`   : `void api.method(args...)` -- emits the convention `{"result":"ok"}`
  *                    response, matching the producer_api / net_api void-method pattern.
- *  - `post`        : `function<t_or_exception<T>()> api.method(args...)` -- Phase 1
- *                    runs on the calling queue and returns a closure (`http_fwd`) that
- *                    will produce the typed result; Phase 2 runs `http_fwd` on the http
- *                    thread pool and emits via `to_json_stream(result)`.
- *  - `post_direct` : `function<t_or_exception<emit_fn_t>()> api.method(args...)` -- like
- *                    `post`, but Phase 2 hands the emit closure straight to the cb.
+ *  - `post`        : `deferred_call<T> api.method(args...)` -- Phase 1 runs on the calling
+ *                    queue and returns a callable (`http_fwd`) that will produce the typed
+ *                    result; Phase 2 runs `http_fwd` on the http thread pool and emits via
+ *                    `to_json_stream(result)`.
+ *  - `post_direct` : `deferred_call<emit_fn_t> api.method(args...)` -- like `post`, but
+ *                    Phase 2 hands the emit closure straight to the cb.
  *                    Used when the api builds and emits its JSON without an
  *                    intermediate reflected struct (eg per-row binary decode).
  *  - `async`       : `void api.method(args..., next_function<T>)` -- the api invokes
  *                    the callback later with either a typed result, an exception, or a
- *                    Phase-2 `http_fwd` closure (mirroring the variant-cb semantics).
+ *                    Phase-2 `deferred_call` (mirroring the variant-cb semantics).
  */
 enum class dispatch { sync, sync_void, post, post_direct, async };
 
@@ -77,10 +78,10 @@ namespace http_detail {
       static constexpr size_t arity = sizeof...(A);
    };
 
-   /// @brief Detects `function<t_or_exception<T>()>` (the Phase-2 closure shape).
+   /// @brief Detects `chain::deferred_call<T>` (the Phase-2 callable shape).
    template<typename T> struct is_typed_fwd : std::false_type {};
    template<typename T>
-   struct is_typed_fwd<std::function<chain::t_or_exception<T>()>> : std::true_type {
+   struct is_typed_fwd<chain::deferred_call<T>> : std::true_type {
       using payload = T;
    };
 
@@ -198,6 +199,8 @@ namespace http_detail {
    /// Anything neither customized, reflected, nor a variant (emit-closure payloads)
    /// returns 0: those are produced on the http pool and handed to the response callback
    /// inline, so no queue window exists to charge, and a std::function cannot be packed.
+   /// The Phase-1 data a queued `chain::deferred_call` holds is charged separately by
+   /// `deferred_reservation` below, since it is not reachable from the result type.
    template<typename T>
    inline size_t source_size_estimate(const T& r) {
       if constexpr (requires { { queued_payload_size(r) } -> std::convertible_to<size_t>; }) {
@@ -208,6 +211,22 @@ namespace http_detail {
          } catch (...) {}
       }
       return 0;
+   }
+
+   /// Charge a queued Phase-2 `chain::deferred_call` against bytes-in-flight for the whole time
+   /// it is on the http thread pool queue.
+   ///
+   /// The callable owns the Phase-1 data it captured -- copied ABI blobs, collected table rows, a
+   /// fetched block, a transaction trace -- which is exactly the memory the two-phase split moved
+   /// off the read-only queue, and which `source_size_estimate` cannot see through a type-erased
+   /// callable.  The producer reports it via `deferred_call::retained_size()`; the returned RAII
+   /// token is captured by the posted lambda, so the charge lasts until that lambda is destroyed.
+   /// It deliberately outlives Phase 2 rather than being swapped for a result-sized charge: the
+   /// captures are consumed into the result, which the post arms hand to the response callback
+   /// inline, so one conservative charge covers the whole window with no double counting.
+   template<typename T>
+   inline std::shared_ptr<void> deferred_reservation(http_plugin& http, const chain::deferred_call<T>& fwd) {
+      return http.reserve_bytes_in_flight(fwd.retained_size());
    }
 
    /// Batch results (eg push_transactions' vector of per-transaction results) size as the
@@ -263,18 +282,18 @@ api_entry_stream bind_stream(http_plugin& http, Handle handle,
       static_assert(!std::is_void_v<ret_t>,
          "dispatch::sync expects T return; method returns void (use dispatch::sync_void).");
       static_assert(!is_typed_fwd<ret_t>::value,
-         "dispatch::sync method returns function<t_or_exception<T>()>; use dispatch::post or dispatch::post_direct.");
+         "dispatch::sync method returns deferred_call<T>; use dispatch::post or dispatch::post_direct.");
    } else if constexpr (Kind == dispatch::sync_void) {
       static_assert(std::is_void_v<ret_t>,
          "dispatch::sync_void expects void return; method returns a value.");
    } else if constexpr (Kind == dispatch::post) {
       static_assert(is_typed_fwd<ret_t>::value,
-         "dispatch::post expects function<t_or_exception<T>()> return.");
+         "dispatch::post expects deferred_call<T> return.");
       static_assert(!std::is_same_v<typename is_typed_fwd<ret_t>::payload, emit_fn_t>,
          "dispatch::post payload is emit_fn_t; use dispatch::post_direct instead.");
    } else if constexpr (Kind == dispatch::post_direct) {
-      static_assert(std::is_same_v<ret_t, std::function<chain::t_or_exception<emit_fn_t>()>>,
-         "dispatch::post_direct expects function<t_or_exception<emit_fn_t>()> return.");
+      static_assert(std::is_same_v<ret_t, chain::deferred_call<emit_fn_t>>,
+         "dispatch::post_direct expects deferred_call<emit_fn_t> return.");
    } else { // dispatch::async
       static_assert(std::is_void_v<ret_t>,
          "dispatch::async expects void return.");
@@ -360,11 +379,12 @@ api_entry_stream bind_stream(http_plugin& http, Handle handle,
 
             } else if constexpr (Kind == dispatch::post) {
                using payload_t = typename is_typed_fwd<ret_t>::payload;
-               using http_fwd_t = std::function<chain::t_or_exception<payload_t>()>;
+               using http_fwd_t = chain::deferred_call<payload_t>;
                http_fwd_t http_fwd = invoke_sync<MethodPtr>(handle, std::move(params), deadline);
+               auto reservation = deferred_reservation(http, http_fwd);
                http.post_http_thread_pool(
                   [resp_code, cb = std::move(cb), body = std::move(body),
-                   api_name, call_name,
+                   api_name, call_name, reservation = std::move(reservation),
                    http_fwd = std::move(http_fwd)]() mutable {
                      try {
                         chain::t_or_exception<payload_t> result = http_fwd();
@@ -390,11 +410,12 @@ api_entry_stream bind_stream(http_plugin& http, Handle handle,
                   });
 
             } else if constexpr (Kind == dispatch::post_direct) {
-               using http_fwd_t = std::function<chain::t_or_exception<emit_fn_t>()>;
+               using http_fwd_t = chain::deferred_call<emit_fn_t>;
                http_fwd_t http_fwd = invoke_sync<MethodPtr>(handle, std::move(params), deadline);
+               auto reservation = deferred_reservation(http, http_fwd);
                http.post_http_thread_pool(
                   [resp_code, cb = std::move(cb), body = std::move(body),
-                   api_name, call_name,
+                   api_name, call_name, reservation = std::move(reservation),
                    http_fwd = std::move(http_fwd)]() mutable {
                      try {
                         chain::t_or_exception<emit_fn_t> result = http_fwd();
@@ -416,7 +437,7 @@ api_entry_stream bind_stream(http_plugin& http, Handle handle,
             } else { // dispatch::async
                using payload_t = typename is_next_fn<
                   std::remove_cvref_t<typename mf::template arg_t<mf::arity - 1>>>::payload;
-               using http_fwd_t = std::function<chain::t_or_exception<payload_t>()>;
+               using http_fwd_t = chain::deferred_call<payload_t>;
                // The next_function operator() is rvalue-only; move out of the variant into
                // the response closure so the heavy payload (raw ABIs, traces) is moved, not
                // copied, before the closure runs on the http pool.
@@ -442,10 +463,12 @@ api_entry_stream bind_stream(http_plugin& http, Handle handle,
                            [r = std::get<payload_t>(std::move(result)), reservation = std::move(reservation)]
                            (fc::json_writer& w) mutable { fc::to_json_stream(r, w); });
                      } else {
+                        auto& fwd = std::get<http_fwd_t>(result);
+                        auto reservation = deferred_reservation(http, fwd);
                         http.post_http_thread_pool(
                            [resp_code, cb = std::move(cb), body = std::move(body),
-                            api_name, call_name,
-                            http_fwd = std::get<http_fwd_t>(std::move(result))]() mutable {
+                            api_name, call_name, reservation = std::move(reservation),
+                            http_fwd = std::move(fwd)]() mutable {
                               try {
                                  chain::t_or_exception<payload_t> r = http_fwd();
                                  if (std::holds_alternative<fc::exception_ptr>(r)) {

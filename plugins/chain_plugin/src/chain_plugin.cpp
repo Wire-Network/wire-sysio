@@ -1822,6 +1822,30 @@ namespace chain_apis {
 
 const string read_only::KEYi64 = "i64";
 
+namespace {
+   /// Dominant retained memory of a transaction trace held by a queued response closure:
+   /// per-action payload bytes, console output, and return values.  A reservation-grade
+   /// estimate, deliberately ignoring small fixed-size fields -- same semantics as
+   /// detail::in_flight_sizeof.
+   size_t trace_retained_size(const chain::transaction_trace& trace) {
+      size_t sz = sizeof(trace);
+      for (const auto& at : trace.action_traces) {
+         sz += sizeof(at) + at.act.data.size() + at.console.size() + at.return_value.size();
+      }
+      return sz;
+   }
+
+   /// Same for a block held alive by a queued response closure.  Each receipt's
+   /// packed_transaction already knows its own byte count, so this is a cheap walk over the
+   /// receipt list rather than a full pack of the block.
+   size_t block_retained_size(const chain::signed_block& block) {
+      size_t sz = sizeof(block);
+      for (const auto& receipt : block.transactions)
+         sz += receipt.trx.get_estimated_size();
+      return sz;
+   }
+}
+
 get_info_db::get_info_results read_only::get_info(const read_only::get_info_params&, const fc::time_point&) const {
    SYS_ASSERT(gidb, plugin_config_exception, "get_info being accessed when not enabled");
 
@@ -2004,6 +2028,13 @@ fc::variant strip_scope_fields(fc::variant&& full_key, size_t count) {
          stripped(it->key(), it->value());
    }
    return fc::variant(std::move(stripped));
+}
+
+size_t read_only::phase1_retained_size(const read_only::table_rows_phase1& hp) {
+   size_t sz = fc::raw::pack_size(hp.abi) + hp.next_key.size();
+   for (const auto& row : hp.rows)
+      sz += row.key.size() + row.value.size();
+   return sz;
 }
 
 read_only::table_rows_phase1
@@ -2525,12 +2556,13 @@ read_only::collect_table_rows_phase1( const read_only::get_table_rows_params& p,
 read_only::get_table_rows_return_t
 read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::time_point& deadline ) const {
    auto hp = collect_table_rows_phase1(p, deadline);
-   return [hp = std::move(hp),
-           abi_serializer_max_time = abi_serializer_max_time,
-           shorten_abi_errors      = shorten_abi_errors,
-           all_rows                = p.all_rows,
-           values_only             = p.values_only.value_or(false),
-           filter                  = p.filter]() mutable
+   const size_t retained = phase1_retained_size(hp);
+   auto phase2 = [hp = std::move(hp),
+                  abi_serializer_max_time = abi_serializer_max_time,
+                  shorten_abi_errors      = shorten_abi_errors,
+                  all_rows                = p.all_rows,
+                  values_only             = p.values_only.value_or(false),
+                  filter                  = p.filter]() mutable
       -> chain::t_or_exception<read_only::get_table_rows_result> {
       read_only::get_table_rows_result result;
 
@@ -2607,6 +2639,7 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
 
       return result;
    };
+   return {std::move(phase2), retained};
 }
 
 read_only::get_table_rows_stream_return_t
@@ -2614,11 +2647,12 @@ read_only::get_table_rows_stream( const read_only::get_table_rows_params& p, con
    SYS_ASSERT( !p.filter.has_value(), chain::contract_table_query_exception,
                "get_table_rows_stream does not support the 'filter' predicate; use get_table_rows() instead" );
    auto hp = collect_table_rows_phase1(p, deadline);
-   return [hp = std::move(hp),
-           abi_serializer_max_time = abi_serializer_max_time,
-           shorten_abi_errors      = shorten_abi_errors,
-           all_rows                = p.all_rows,
-           values_only             = p.values_only.value_or(false)]() mutable
+   const size_t retained = phase1_retained_size(hp);
+   auto phase2 = [hp = std::move(hp),
+                  abi_serializer_max_time = abi_serializer_max_time,
+                  shorten_abi_errors      = shorten_abi_errors,
+                  all_rows                = p.all_rows,
+                  values_only             = p.values_only.value_or(false)]() mutable
       -> chain::t_or_exception<get_table_rows_stream_emit_fn> {
       // Build the abi_serializer on the http thread pool so the on-wire emit
       // closure doesn't pay the abi_def move-construction cost during emission.
@@ -2698,6 +2732,7 @@ read_only::get_table_rows_stream( const read_only::get_table_rows_params& p, con
          w.end_object();
       };
    };
+   return {std::move(phase2), retained};
 }
 
 read_only::get_table_by_scope_result read_only::get_table_by_scope( const read_only::get_table_by_scope_params& p,
@@ -3167,10 +3202,14 @@ void read_only::get_block_stream_async(get_block_params params,
             try {
                captured_abis abi_bytes = capture_abis(db, block);
 
-               // Fire next with an http_fwd that builds Phase 2 + the emit_fn on
-               // the http pool.  bind_stream::async sees the http_fwd alternative
+               // The deferred call holds the block and the copied ABI bytes alive while it waits
+               // on the http pool queue; report that so the transport can charge it.
+               const size_t retained = block_retained_size(*block) + sysio::queued_payload_size(abi_bytes);
+
+               // Fire next with a deferred_call that builds Phase 2 + the emit_fn on
+               // the http pool.  bind_stream::async sees the deferred alternative
                // and posts it via post_http_thread_pool().
-               next(std::function<chain::t_or_exception<get_block_stream_emit_fn>()>{
+               next(chain::deferred_call<get_block_stream_emit_fn>{
                   [this, block = std::move(block),
                    abi_bytes = std::move(abi_bytes),
                    max_time]() mutable
@@ -3185,7 +3224,8 @@ void read_only::get_block_stream_async(get_block_params params,
                               convert_block_stream(block, resolver, w);
                            }};
                      } CATCH_AND_RETURN(chain::t_or_exception<get_block_stream_emit_fn>);
-                  }});
+                  },
+                  retained});
             } CATCH_AND_CALL(next);
          });
    } CATCH_AND_CALL(next);
@@ -3512,17 +3552,24 @@ void api_base::send_transaction_gen(API &api, send_transaction_params_t params, 
                      // in the trace.  Phase 2 (http pool): build the streamed_processed_trace which defers ABI
                      // parsing + JSON emission to response-emit time.
                      using return_type = t_or_exception<Result>;
-                     next([&api,
-                           trx_trace_ptr,
-                           raw_abis = sysio::capture_abis(api.db, trx_trace_ptr)]() mutable {
-                        try {
-                           const transaction_id_type& id = trx_trace_ptr->id;
-                           return return_type(Result{id,
-                              chain_apis::streamed_processed_trace{ std::move(trx_trace_ptr),
-                                                                     std::move(raw_abis),
-                                                                     api.abi_serializer_max_time }});
-                        } CATCH_AND_RETURN(return_type);
-                     });
+                     auto raw_abis = sysio::capture_abis(api.db, trx_trace_ptr);
+                     // The deferred call holds the trace and the copied ABI bytes alive while it
+                     // waits on the http pool queue; report that so the transport can charge it.
+                     const size_t retained = trace_retained_size(*trx_trace_ptr)
+                                             + sysio::queued_payload_size(raw_abis);
+                     next(chain::deferred_call<Result>{
+                        [&api,
+                         trx_trace_ptr,
+                         raw_abis = std::move(raw_abis)]() mutable {
+                           try {
+                              const transaction_id_type& id = trx_trace_ptr->id;
+                              return return_type(Result{id,
+                                 chain_apis::streamed_processed_trace{ std::move(trx_trace_ptr),
+                                                                        std::move(raw_abis),
+                                                                        api.abi_serializer_max_time }});
+                           } CATCH_AND_RETURN(return_type);
+                        },
+                        retained});
                   }
                } CATCH_AND_CALL( next );
             }
@@ -3789,10 +3836,16 @@ read_only::get_account_return_t read_only::get_account( const get_account_params
       vector<char> abi_bytes(code_account->abi.data(),
                              code_account->abi.data() + code_account->abi.size());
 
-      return [http_params = std::move(http_params), result = std::move(result),
-              abi_bytes = std::move(abi_bytes),
-              shorten_abi_errors = shorten_abi_errors,
-              abi_serializer_max_time = abi_serializer_max_time]() mutable
+      // Dominant memory the deferred call holds while it waits on the http pool queue: the ABI
+      // copy and the raw reslimit row.  The typed result it also carries is account metadata and
+      // a bounded permission list -- small fixed-size fields, ignored per the estimate's semantics.
+      const size_t retained = abi_bytes.size()
+                              + (http_params.total_resources ? http_params.total_resources->size() : 0);
+
+      auto phase2 = [http_params = std::move(http_params), result = std::move(result),
+                     abi_bytes = std::move(abi_bytes),
+                     shorten_abi_errors = shorten_abi_errors,
+                     abi_serializer_max_time = abi_serializer_max_time]() mutable
                  -> chain::t_or_exception<read_only::get_account_results> {
          try {
             // Mirror the outer SYS_RETHROW_EXCEPTIONS(account_query_exception, ...) so that a throw
@@ -3814,10 +3867,13 @@ read_only::get_account_return_t read_only::get_account( const get_account_params
             } SYS_RETHROW_EXCEPTIONS(chain::account_query_exception, "unable to retrieve account info")
          } CATCH_AND_RETURN(chain::t_or_exception<read_only::get_account_results>);
       };
+      return {std::move(phase2), retained};
    }
-   return [result = std::move(result)]() mutable -> chain::t_or_exception<read_only::get_account_results> {
-      return std::move(result);
-   };
+   // No contract abi to decode: nothing heavy rides the queue, only the account metadata result.
+   return {[result = std::move(result)]() mutable -> chain::t_or_exception<read_only::get_account_results> {
+              return std::move(result);
+           },
+           0};
    } SYS_RETHROW_EXCEPTIONS(chain::account_query_exception, "unable to retrieve account info")
 }
 
@@ -3924,26 +3980,10 @@ read_only::get_consensus_parameters(const get_consensus_parameters_params&, cons
    return results;
 }
 
-namespace {
-   /// Dominant retained memory of a transaction trace held by a queued response closure:
-   /// per-action payload bytes, console output, and return values.  A reservation-grade
-   /// estimate, deliberately ignoring small fixed-size fields -- same semantics as
-   /// detail::in_flight_sizeof.
-   size_t trace_retained_size(const chain::transaction_trace& trace) {
-      size_t sz = sizeof(trace);
-      for (const auto& at : trace.action_traces) {
-         sz += sizeof(at) + at.act.data.size() + at.console.size() + at.return_value.size();
-      }
-      return sz;
-   }
-}
-
 size_t queued_payload_size(const streamed_processed_trace& t) {
-   size_t sz = 0;
+   size_t sz = sysio::queued_payload_size(t.raw_abis);
    if (t.trace)
       sz += trace_retained_size(*t.trace);
-   for (const auto& [account, abi] : t.raw_abis.raw_abis)
-      sz += abi.size();
    return sz;
 }
 

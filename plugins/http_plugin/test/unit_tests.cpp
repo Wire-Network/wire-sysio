@@ -51,6 +51,7 @@ constexpr uint32_t stream_response_bytes_index = 9;
 constexpr uint32_t stream_over_budget_index = 10;
 constexpr uint32_t stream_single_token_index = 11;
 constexpr uint32_t stream_queued_payload_index = 12;
+constexpr uint32_t stream_deferred_payload_index = 13;
 // Keeps unsharded IPv6 probe coverage on the historical port 9999.
 constexpr uint32_t ipv6_probe_index = 2;
 
@@ -939,13 +940,15 @@ namespace {
                FC_LOG_MESSAGE(error, "duplicate transaction"))}});
       }
 
-      /// dispatch::post -- Phase-2 closure returning a stored unknown_block_exception must
-      /// classify as 400 Unknown Block.
-      std::function<sysio::chain::t_or_exception<int>()> missing_block() {
-         return []() -> sysio::chain::t_or_exception<int> {
-            return fc::exception_ptr{std::make_shared<sysio::chain::unknown_block_exception>(
-               FC_LOG_MESSAGE(error, "no such block"))};
-         };
+      /// dispatch::post -- Phase-2 call returning a stored unknown_block_exception must
+      /// classify as 400 Unknown Block.  Captures nothing, hence a zero retained size.
+      sysio::chain::deferred_call<int> missing_block() {
+         return sysio::chain::deferred_call<int>{
+            []() -> sysio::chain::t_or_exception<int> {
+               return fc::exception_ptr{std::make_shared<sysio::chain::unknown_block_exception>(
+                  FC_LOG_MESSAGE(error, "no such block"))};
+            },
+            0};
       }
    };
 }
@@ -1362,6 +1365,133 @@ BOOST_FIXTURE_TEST_CASE(stream_queued_payload_reserved, http_plugin_test_fixture
 
    // requests_in_flight tracks session lifetime, so the keep-alive sockets must close
    // before the drain below can reach zero.
+   stall_socket.reset();
+   payload_socket.reset();
+
+   uint16_t max = std::numeric_limits<uint16_t>::max();
+   while (http_plugin->requests_in_flight() > 0 && --max)
+      std::this_thread::sleep_for(std::chrono::milliseconds(5));
+   BOOST_CHECK(max > 0);
+   BOOST_CHECK_EQUAL(http_plugin->bytes_in_flight(), 0u);
+}
+
+namespace {
+   /// Minimal api handle for driving bind_stream's dispatch::post reservation end-to-end.
+   /// Phase 1 "collects" raw bytes the way the real two-phase endpoints do (copied ABI blobs,
+   /// table rows, a block, a trace) and hands them to the deferred call, which then has to
+   /// wait on the http pool queue holding all of it.  Phase 1 blocks until the test has
+   /// stalled the pool's only thread, so the call is guaranteed to be queued, never inlined.
+   struct deferred_payload_api {
+      std::atomic<bool>* entered;
+      std::atomic<bool>* proceed;
+      size_t             payload_size;
+
+      sysio::chain::deferred_call<queued_payload_result> make_big_deferred() {
+         std::vector<char> collected(payload_size, 'd');
+         const size_t retained = collected.size();
+
+         entered->store(true);
+         while (!proceed->load())
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+
+         return sysio::chain::deferred_call<queued_payload_result>{
+            [collected = std::move(collected)]() mutable
+               -> sysio::chain::t_or_exception<queued_payload_result> {
+                  return queued_payload_result{std::move(collected)};
+               },
+            retained};
+      }
+   };
+}
+
+// The Phase-1 data a two-phase endpoint captures into its deferred call is charged for the whole
+// time the call sits on the http thread pool queue.  That data is exactly what the two-phase split
+// moved off the read-only queue -- copied ABI bytes, collected rows, a fetched block, a trace -- and
+// it is invisible to the result-side estimate, since a type-erased callable cannot be measured.
+// With --http-threads=1, /stall_stream parks the only pool thread while the deferred call is posted
+// behind it; the peak sampled below reads ~0 without the reservation and >= the retained size with
+// it.  The budget must then drain to zero, proving the reservation releases exactly once.
+BOOST_FIXTURE_TEST_CASE(stream_deferred_payload_reserved, http_plugin_test_fixture) {
+   const std::string endpoint = test_http_endpoint("127.0.0.1", stream_deferred_payload_index);
+   const std::string server_address = "--http-server-address=" + endpoint;
+   const std::string port = test_http_port(stream_deferred_payload_index);
+
+   http_plugin* http_plugin = init({"--plugin=sysio::http_plugin",
+                                    server_address.c_str(),
+                                    "--http-threads=1",
+                                    "--http-max-bytes-in-flight-mb=64"});
+   BOOST_REQUIRE(http_plugin);
+
+   constexpr size_t payload_size = 1024 * 1024;
+   std::atomic<bool> entered{false};
+   std::atomic<bool> proceed{false};
+   std::atomic<bool> stalled{false};
+   std::atomic<bool> release{false};
+
+   http_plugin->add_api_stream({
+      bind_stream<&deferred_payload_api::make_big_deferred, dispatch::post>(
+         *http_plugin, deferred_payload_api{&entered, &proceed, payload_size},
+         "/v1/test/deferred_payload", api_category::node, http_params_types::no_params, 200),
+   }, appbase::exec_queue::read_write);
+
+   http_plugin->add_async_api_stream({{std::string("/stall_stream"), api_category::node,
+                                       [&](string&&, string&&, url_response_stream_callback&& cb) {
+                                          cb(200, [&](fc::json_writer& w) {
+                                             stalled.store(true);
+                                             while (!release.load())
+                                                std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                                             w.value_string("ok");
+                                          });
+                                       }}});
+
+   boost::asio::io_context ctx;
+   boost::asio::ip::tcp::resolver resolver(ctx);
+
+   auto send_request = [&](const char* path) {
+      auto s = std::make_shared<boost::asio::ip::tcp::socket>(ctx, boost::asio::ip::tcp::v4());
+      boost::asio::connect(*s, resolver.resolve("127.0.0.1", port));
+      boost::beast::http::request<boost::beast::http::empty_body> req(boost::beast::http::verb::get, path, 11);
+      req.set(http::field::host, endpoint);
+      boost::beast::http::write(*s, req);
+      return s;
+   };
+   auto read_response = [&](boost::asio::ip::tcp::socket& s) {
+      boost::beast::http::response_parser<boost::beast::http::string_body> parser;
+      parser.body_limit(16 * 1024 * 1024); // hex-encoded payload is ~2x its byte size
+      boost::beast::flat_buffer buffer;
+      boost::beast::http::read(s, buffer, parser);
+      return parser.release();
+   };
+   auto wait_for = [](auto&& pred) { // ~10s cap: pool scheduling is slow under sanitizers
+      for (int i = 0; i < 10000; ++i) {
+         if (pred())
+            return true;
+         std::this_thread::sleep_for(std::chrono::milliseconds(1));
+      }
+      return pred();
+   };
+
+   auto payload_socket = send_request("/v1/test/deferred_payload");
+   BOOST_REQUIRE(wait_for([&] { return entered.load(); }));  // request read; app thread inside Phase 1
+   auto stall_socket = send_request("/stall_stream");
+   BOOST_REQUIRE(wait_for([&] { return stalled.load(); }));  // pool's only thread now parked
+   proceed.store(true);                                      // Phase 1 returns -> call queued behind the stall
+
+   // Regression sample: reads ~0 without the reservation riding the posted lambda.
+   size_t peak = 0;
+   wait_for([&] {
+      peak = std::max(peak, http_plugin->bytes_in_flight());
+      return peak >= payload_size;
+   });
+   BOOST_CHECK_GE(peak, payload_size);
+
+   release.store(true);
+   auto stall_resp = read_response(*stall_socket);
+   BOOST_CHECK(stall_resp.result() == boost::beast::http::status::ok);
+   auto payload_resp = read_response(*payload_socket);
+   BOOST_CHECK(payload_resp.result() == boost::beast::http::status::ok);
+   BOOST_CHECK_GT(payload_resp.body().size(), 2 * payload_size); // hex-encoded vector<char>
+
    stall_socket.reset();
    payload_socket.reset();
 

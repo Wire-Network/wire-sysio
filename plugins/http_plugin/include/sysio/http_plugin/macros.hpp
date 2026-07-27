@@ -11,7 +11,7 @@
      api_handle.start();                                                                                        \
      try {                                                                                                      \
         auto params = parse_params<api_namespace::call_name ## _params, params_type>(body);                     \
-        using http_fwd_t = std::function<chain::t_or_exception<call_result>()>;                                 \
+        using http_fwd_t = chain::deferred_call<call_result>;                                                   \
         api_handle.call_name( std::move(params), /* called on main application thread */                        \
            [&_http_plugin, cb=std::move(cb), body=std::move(body)]                                              \
            (const chain::next_function_variant<call_result>& result) mutable {                                  \
@@ -24,11 +24,15 @@
               } else if (std::holds_alternative<call_result>(result)) {                                         \
                  cb(http_resp_code, fc::variant(std::get<call_result>(std::move(result))));                     \
               } else {                                                                                          \
-                 /* api returned a function to be processed on the http_plugin thread pool */                   \
+                 /* api returned a call to be processed on the http_plugin thread pool; charge the */           \
+                 /* Phase-1 data it captured for as long as it waits on that queue */                           \
                  assert(std::holds_alternative<http_fwd_t>(result));                                            \
+                 const http_fwd_t& fwd = std::get<http_fwd_t>(result);                                          \
                  _http_plugin.post_http_thread_pool([resp_code=http_resp_code, cb=std::move(cb),                \
                                                      body=std::move(body),                                      \
-                                                     http_fwd = std::get<http_fwd_t>(std::move(result))]() {    \
+                                                     reservation = _http_plugin.reserve_bytes_in_flight(        \
+                                                        fwd.retained_size()),                                   \
+                                                     http_fwd = fwd]() {                                        \
                     chain::t_or_exception<call_result> result = http_fwd();                                     \
                     if (std::holds_alternative<fc::exception_ptr>(result)) {                                    \
                        try {                                                                                    \
