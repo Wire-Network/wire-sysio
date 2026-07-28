@@ -39,12 +39,25 @@ jobs:
     # itself 360 minutes). Kept under the 6h GitHub-hosted job ceiling.
     timeout-minutes: 350
     outputs:
-      linux-run-id: ${{ steps.run.outputs.linux-run-id }}
-      macos-run-id: ${{ steps.run.outputs.macos-run-id }}
+      # The step output names are derived from the workflow file names by
+      # resolve-build-run.sh; the JOB output names stay platform-flavoured for
+      # the experimental-binaries consumer below.
+      linux-run-id: ${{ steps.run.outputs.linux_amd64_build-run-id }}
+      macos-run-id: ${{ steps.run.outputs.macos_arm64_build-run-id }}
     env:
       GH_TOKEN: ${{ github.token }}
       TAG: ${{ inputs.tag || github.ref_name }}
     steps:
+      # Check out the TAG's tree, not the workflow ref's. On the Strategy-C path
+      # this workflow is dispatched with --ref master, so a bare checkout would
+      # verify a tag's artifacts with MASTER's verifier scripts -- and a retry
+      # against an older tag would verify it with whatever the scripts have since
+      # become. The tag's own verifiers are the ones that describe its packages.
+      # (`github.ref` is refs/tags/<tag> on the `release: published` path.)
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # actions/checkout@v5
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+
       - name: Validate the tag
         run: |
           set -euo pipefail
@@ -52,82 +65,46 @@ jobs:
           # TAG comes from a workflow_dispatch input on the Strategy-C path, so it
           # is untrusted text that is about to be spliced into API paths, file
           # names and a `gh release` target. Pin its shape before anything uses it.
-          if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?$ ]]; then
-            echo "::error::'${TAG}' is not a release tag (expected vX.Y.Z or vX.Y.Z-suffix)" >&2
-            exit 1
-          fi
+          # The grammar is cmake-version.py's VERSION_RE -- the ONE definition the
+          # prepare/tag workflows validate against too. NOTE this TIGHTENS the
+          # previous inline pattern, which also accepted an empty-ish or dotted
+          # suffix (v1.0.0-. / v1.0.0-a..b); the canonical grammar is
+          # dot-separated alphanumerics only.
+          python3 .github/scripts/cmake-version.py validate --tag "$TAG" >/dev/null \
+            || { echo "::error::'${TAG}' is not a release tag (expected vX.Y.Z or vX.Y.Z-suffix)" >&2; exit 1; }
           echo "Publishing assets for ${TAG}"
-
-      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # actions/checkout@v5
 
       - name: Resolve build runs for the released commit
         id: run
         run: |
           set -euo pipefail
 
-          # Both platform builds must have run AT THE TAG REF. Filtering on
-          # head_branch == "$TAG" is load-bearing: the master-push build sits at the
-          # same commit SHA but builds WITHOUT the system contracts, so matching it
-          # would attach a package set with no contracts bundle. Tag builds reach
-          # this workflow either as `push` (a human-pushed tag) or as
-          # `workflow_dispatch` (tag-release.yaml dispatching on refs/tags/<tag>) --
-          # both are accepted.
           sha=$(gh api "repos/${GITHUB_REPOSITORY}/commits/${TAG}" --jq .sha)
           echo "Released commit: ${sha}"
 
-          log_candidates=1
-          resolve_run() {
-            local workflow="$1" runs_json
-            runs_json="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/${workflow}/runs?head_sha=${sha}&per_page=50")"
-            if [[ "$log_candidates" == "1" ]]; then
-              # First attempt only: dump what the API actually returned. A
-              # head_branch-semantics mismatch (the classic resolver failure) is
-              # then visible in minute one instead of after 5.5 hours of polling.
-              {
-                echo "--- ${workflow} candidate runs at ${sha} (want head_branch == ${TAG}) ---"
-                jq -r '.workflow_runs | length | "candidates: \(.)"' <<<"$runs_json"
-                jq -c '.workflow_runs[] | {id, head_branch, event, status, conclusion}' <<<"$runs_json"
-              } >&2
-            fi
-            jq -r --arg tag "$TAG" '
-              [.workflow_runs[]
-                | select(.status == "completed" and .conclusion == "success")
-                | select(.event == "push" or .event == "workflow_dispatch")
-                | select(.head_branch == $tag)]
-              | .[0].id // empty' <<<"$runs_json"
-          }
-
-          # 330 minute-spaced attempts: this workflow is dispatched alongside the
-          # builds, so it must outlast a cold full build, not just the artifact
-          # upload that follows one.
-          linux_run_id=""
-          macos_run_id=""
-          for attempt in {1..330}; do
-            [[ -n "$linux_run_id" ]] || linux_run_id="$(resolve_run linux_amd64_build.yaml)"
-            [[ -n "$macos_run_id" ]] || macos_run_id="$(resolve_run macos_arm64_build.yaml)"
-            log_candidates=0
-            [[ -n "$linux_run_id" && -n "$macos_run_id" ]] && break
-            echo "Waiting for tag-ref builds of ${sha} (linux=${linux_run_id:-pending} macos=${macos_run_id:-pending}, attempt ${attempt}/330)"
-            sleep 60
-          done
-
-          [[ -n "$linux_run_id" ]] || { echo "::error::No successful linux_amd64_build run at ${TAG} (${sha})"; exit 1; }
-          [[ -n "$macos_run_id" ]] || { echo "::error::No successful macos_arm64_build run at ${TAG} (${sha})"; exit 1; }
-          echo "linux-run-id=$linux_run_id" >> "$GITHUB_OUTPUT"
-          echo "macos-run-id=$macos_run_id" >> "$GITHUB_OUTPUT"
+          # The resolver (poll loop, tag-ref filtering, candidate dump, budgets)
+          # is byte-identical with wire-cdt's copy of this script; only the
+          # workflows to wait for differ, so they are the arguments. Filtering on
+          # the tag ref is what the script does and it is load-bearing here: the
+          # master-push build sits at the same commit SHA but builds WITHOUT the
+          # system contracts, so matching it would attach a package set with no
+          # contracts bundle. Progress goes to stderr, so this redirect cannot
+          # corrupt $GITHUB_OUTPUT.
+          .github/scripts/resolve-build-run.sh "$TAG" "$sha" \
+            linux_amd64_build.yaml macos_arm64_build.yaml >> "$GITHUB_OUTPUT"
 
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # actions/download-artifact@v8.0.1
         with:
           name: wire-sysio-packages-amd64
           path: dist
-          run-id: ${{ steps.run.outputs.linux-run-id }}
+          run-id: ${{ steps.run.outputs.linux_amd64_build-run-id }}
           github-token: ${{ github.token }}
 
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # actions/download-artifact@v8.0.1
         with:
           name: wire-sysio-packages-macos-arm64
           path: dist
-          run-id: ${{ steps.run.outputs.macos-run-id }}
+          run-id: ${{ steps.run.outputs.macos_arm64_build-run-id }}
           github-token: ${{ github.token }}
 
       - name: Guard release tag matches artifact version
@@ -138,17 +115,14 @@ jobs:
           [[ -f "dist/wire-sysio_${version}_amd64.deb" ]] \
             || { echo "::error::Release tag ${TAG} does not match the artifact version (bump VERSION_* in CMakeLists.txt to match the tag before tagging)"; exit 1; }
 
-      # Every verification names its artifact EXPLICITLY. A `wire-sysio-*.tar.gz`
-      # glob would hand verify-tgz whichever of the three tarballs (linux, macOS,
-      # system contracts) sorted first -- a silent wrong-artifact verification.
       - name: Verify packages (S1-S6)
         run: |
           set -euo pipefail
           version="${TAG#v}"
-          tools/packaging/tests/verify-tgz.sh "dist/wire-sysio-${version}-x86_64.tar.gz"
-          tools/packaging/tests/verify-tgz.sh --no-service "dist/wire-sysio-${version}-macos-arm64.tar.gz"
-          tools/packaging/tests/verify-deb.sh "dist/wire-sysio_${version}_amd64.deb" "dist/wire-sysio-dev_${version}_amd64.deb"
-          tools/packaging/tests/verify-rpm.sh "dist/wire-sysio-${version}-x86_64.rpm" "dist/wire-sysio-dev-${version}-x86_64.rpm"
+          # Passing the version selects the explicit-names mode: the suite owns
+          # the artifact list and the no-bare-tgz-glob rule in one place, shared
+          # with linux_amd64_build.yaml's verification of the same package set.
+          tools/packaging/tests/verify-all.sh dist "$version"
 
       - name: Verify system contracts bundle
         run: |

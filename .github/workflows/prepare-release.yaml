@@ -25,6 +25,13 @@ defaults:
   run:
     shell: bash
 
+# One prep run per version, and never cancel one mid-flight: a cancelled run can
+# leave a pushed prep branch with no PR opened for it. Matches wire-cdt's
+# prepare-release.yaml.
+concurrency:
+  group: prepare-release-${{ inputs.version }}
+  cancel-in-progress: false
+
 jobs:
   prepare:
     name: Open the version-bump PR
@@ -49,11 +56,11 @@ jobs:
         run: |
           set -euo pipefail
 
-          # Conservative allowlist -- the same grammar cmake-version.py enforces.
-          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z]+(\.[0-9A-Za-z]+)*)?$ ]]; then
-            echo "::error::'${VERSION}' is not <major>.<minor>.<patch>[-<suffix>] (no leading v)" >&2
-            exit 1
-          fi
+          # The grammar is cmake-version.py's VERSION_RE, asserted by the parser
+          # itself rather than re-spelled here: an inline copy is one edit away
+          # from accepting a version the `write` below would then reject.
+          python3 .github/scripts/cmake-version.py validate "$VERSION" \
+            || { echo "::error::'${VERSION}' is not <major>.<minor>.<patch>[-<suffix>] (no leading v)" >&2; exit 1; }
 
           previous="$(python3 .github/scripts/cmake-version.py read)"
 
