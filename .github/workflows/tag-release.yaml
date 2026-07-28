@@ -55,10 +55,11 @@ jobs:
         run: |
           set -euo pipefail
 
-          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z]+(\.[0-9A-Za-z]+)*)?$ ]]; then
-            echo "::error::'${VERSION}' is not <major>.<minor>.<patch>[-<suffix>] (no leading v)" >&2
-            exit 1
-          fi
+          # The grammar is cmake-version.py's VERSION_RE, asserted by the parser
+          # itself rather than re-spelled here -- the same check prepare-release
+          # ran on this version before it reached master.
+          python3 .github/scripts/cmake-version.py validate "$VERSION" \
+            || { echo "::error::'${VERSION}' is not <major>.<minor>.<patch>[-<suffix>] (no leading v)" >&2; exit 1; }
 
           # The same parser prepare-release.yaml writes with and release.yaml
           # cross-checks the tag against.

@@ -566,14 +566,11 @@ jobs:
 
       - name: Run packaging verification suite
         run: |
-          ls -la artifacts/
-          tools/packaging/tests/verify-scripts.sh
-          # Arch-suffixed on purpose: a bare wire-sysio-*.tar.gz would also match the
-          # system-contracts bundle that tag builds add to this artifact.
-          tools/packaging/tests/verify-tgz.sh artifacts/wire-sysio-*-x86_64.tar.gz
-          tools/packaging/tests/verify-deb.sh artifacts/wire-sysio_*.deb artifacts/wire-sysio-dev_*.deb
-          # wire-sysio-[0-9]* matches the base rpm only (the dev rpm is wire-sysio-dev-*).
-          tools/packaging/tests/verify-rpm.sh artifacts/wire-sysio-[0-9]*.rpm artifacts/wire-sysio-dev-*.rpm
+          # No version argument: on this path the artifact names carry a version
+          # this job does not know, so the suite uses its documented safe globs.
+          # The suite owns the artifact list and the no-bare-tgz-glob rule, shared
+          # with release.yaml's verification of the same package set.
+          tools/packaging/tests/verify-all.sh artifacts
 
   all-passing:
     name: All Required Tests Passed
