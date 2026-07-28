@@ -39,7 +39,12 @@ struct client_options {
 enum class replay_policy {
    /// Never replay the call.
    never,
-   /// Replay once only when an idle cached connection proves stale.
+   /**
+    * Replay once only when an idle cached connection proves stale.
+    *
+    * This policy is restricted to semantically idempotent calls. Reusing a
+    * connection does not prove a failed write transmitted no request bytes.
+    */
    stale_reused_connection_once,
 };
 
