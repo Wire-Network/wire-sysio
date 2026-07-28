@@ -67,6 +67,23 @@ if [[ "$cdt_root" != "$CDT_EXPECTED_ROOT" ]]; then
   exit 1
 fi
 
+# The derived home must be the tree that actually CARRIES the toolchain, not
+# merely a directory that happens to contain a cdt-config.cmake. cdt.imports
+# alone cannot distinguish those, so the home is confirmed by the presence of
+# the compiler driver beneath it.
+#
+# This is the consumer-side guard against the ambiguity class: the deb ships TWO
+# files matching */lib/cmake/cdt/cdt-config.cmake -- the home's own and the
+# CMake-discoverable duplicate at /usr/lib/cmake/cdt. Selecting by "first match
+# in the archive listing" would be one archive-ordering change away from
+# resolving CDT_ROOT=/usr, after which every ${CDT_ROOT}/lib/cmake/cdt/... path
+# this repo builds points at a file that does not exist.
+if ! printf '%s\n' "$cdt_payload" | grep -qx ".${cdt_root}/bin/cdt-cc"; then
+  echo "Wire CDT toolchain home '$cdt_root' does not contain bin/cdt-cc" >&2
+  echo "The derived root must be the self-contained toolchain tree, not a directory that merely holds a cdt-config.cmake." >&2
+  exit 1
+fi
+
 # Payload-shape assertions, before anything is installed.
 for required in \
   "./usr/lib/cdt/bin/cdt-cc" \
@@ -124,6 +141,34 @@ for required in \
     exit 1
   fi
 done
+
+# The binutils aliases CDTWasmToolchain.cmake bakes as CMAKE_AR / CMAKE_RANLIB.
+# `-x` follows the symlink onto its llvm-* target, so a dangling alias fails here
+# rather than mid-build. They were absent from every wire-cdt artifact until the
+# install rules were added, and the symptom was remote from the cause: contracts
+# compiled fine and only a STATIC library failed, at the archive step, with
+# "Error running link command: No such file or directory". This is the
+# consumer-side regression guard for that class.
+for alias in cdt-ar cdt-ranlib cdt-nm cdt-objcopy cdt-objdump cdt-readobj cdt-readelf cdt-strip; do
+  if [[ ! -x "$cdt_root/bin/$alias" ]]; then
+    echo "Wire CDT package did not install a resolvable $cdt_root/bin/$alias" >&2
+    echo "CDTWasmToolchain.cmake bakes CMAKE_AR/CMAKE_RANLIB to these paths; static-library builds fail without them." >&2
+    exit 1
+  fi
+done
+
+# The two cdt-config.cmake copies -- the home's own and the CMake-discoverable
+# one -- must be byte-identical. They are generated from ONE template with ONE
+# baked root, so any divergence means the packaging duplicated them from
+# different sources, and which one a consumer picks up would then change
+# find_package(cdt)'s answer depending only on search order.
+if ! cmp -s "$cdt_root/lib/cmake/cdt/cdt-config.cmake" /usr/lib/cmake/cdt/cdt-config.cmake; then
+  echo "The two installed cdt-config.cmake copies differ:" >&2
+  echo "  $cdt_root/lib/cmake/cdt/cdt-config.cmake" >&2
+  echo "  /usr/lib/cmake/cdt/cdt-config.cmake" >&2
+  echo "Both must be the same generated file, or find_package(cdt) resolves differently by search order." >&2
+  exit 1
+fi
 
 if ! grep -Rq 'cdt::protoc-gen-zpp' "$cdt_root/lib/cmake/cdt"; then
   echo "Wire CDT package does not expose cdt::protoc-gen-zpp to CMake" >&2
