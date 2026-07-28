@@ -16,9 +16,6 @@ on:
       override-cdt-release:
         description: 'Override the pinned wire-cdt RELEASE tag for this one build (e.g. v1.0.0-rc2). Its channel is then derived from the release itself instead of being asserted against .cicd/defaults.json.'
         type: string
-      override-sys-system-contracts:
-        description: 'Override sys-system-contracts ref'
-        type: string
 
 permissions:
   actions: read
@@ -513,9 +510,8 @@ jobs:
       # once CDT moved to release assets.)
       cdt-release: ${{steps.versions.outputs.cdt-release}}
       cdt-channel: ${{steps.versions.outputs.cdt-channel}}
-      wire-system-contracts-ref: ${{steps.versions.outputs.wire-system-contracts-ref}}
     steps:
-      - name: Setup wire-cdt and wire-system-contracts versions
+      - name: Setup wire-cdt version
         id: versions
         env:
           GH_TOKEN: ${{secrets.GH_TOKEN_DEV}}
@@ -526,7 +522,6 @@ jobs:
           # values are inert data: bash does not re-evaluate command substitution found inside a
           # variable's value. github.repository / github.sha are likewise read via env and quoted.
           OVERRIDE_CDT_RELEASE: ${{ inputs.override-cdt-release }}
-          OVERRIDE_SYS_SYSTEM_CONTRACTS: ${{ inputs.override-sys-system-contracts }}
           REPO: ${{ github.repository }}
           REF_SHA: ${{ github.sha }}
         run: |
@@ -536,17 +531,14 @@ jobs:
           # such as "4.1.0" and "release/4.0". The pattern is held in a variable so [[ =~ ]] treats it
           # as a regex, and the candidate matched is only ever the variable's literal value.
           ref_re='^[A-Za-z0-9._/+-]+$'
-          for ov in "$OVERRIDE_CDT_RELEASE" "$OVERRIDE_SYS_SYSTEM_CONTRACTS"; do
-            if [[ -n "$ov" && ! "$ov" =~ $ref_re ]]; then
-              echo "::error::Invalid override ref '$ov'; only [A-Za-z0-9._/+-] are allowed." >&2
-              exit 1
-            fi
-          done
+          if [[ -n "$OVERRIDE_CDT_RELEASE" && ! "$OVERRIDE_CDT_RELEASE" =~ $ref_re ]]; then
+            echo "::error::Invalid override ref '$OVERRIDE_CDT_RELEASE'; only [A-Za-z0-9._/+-] are allowed." >&2
+            exit 1
+          fi
 
           DEFAULTS_JSON=$(curl -sSfL "$(gh api "https://api.github.com/repos/${REPO}/contents/.cicd/defaults.json?ref=${REF_SHA}" --jq .download_url)")
           echo "cdt-release=$(echo "$DEFAULTS_JSON" | jq -r '.wirecdt.release')" >> "$GITHUB_OUTPUT"
           echo "cdt-channel=$(echo "$DEFAULTS_JSON" | jq -r '.wirecdt.channel')" >> "$GITHUB_OUTPUT"
-          echo "wire-system-contracts-ref=$(echo "$DEFAULTS_JSON" | jq -r '.wiresystemcontracts.ref')" >> "$GITHUB_OUTPUT"
 
           # A one-off build against a different wire-cdt release. The pinned
           # channel no longer describes it, so the channel is set to the `derive`
@@ -558,9 +550,6 @@ jobs:
               echo "cdt-release=$OVERRIDE_CDT_RELEASE"
               echo "cdt-channel=derive"
             } >> "$GITHUB_OUTPUT"
-          fi
-          if [[ -n "$OVERRIDE_SYS_SYSTEM_CONTRACTS" ]]; then
-            echo "wire-system-contracts-ref=$OVERRIDE_SYS_SYSTEM_CONTRACTS" >> "$GITHUB_OUTPUT"
           fi
 
   verify-packages:
