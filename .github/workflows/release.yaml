@@ -168,7 +168,12 @@ jobs:
           # tag-release.yaml creates the release as a DRAFT so no half-populated
           # release is ever visible. Flipping the draft with GITHUB_TOKEN does NOT
           # re-fire `release: published`, so this cannot recurse into this workflow.
-          gh release edit "$TAG" --draft=false
+          # Stable releases (no version suffix) are explicitly marked `latest`
+          # rather than relying on the API's make_latest default; prereleases
+          # can never hold the latest label, so no flag is passed for them.
+          latest_flag=""
+          [[ "$TAG" != *-* ]] && latest_flag="--latest"
+          gh release edit "$TAG" --draft=false $latest_flag
 
   experimental-binaries:
     name: experimental-binaries (ghcr mirror)
