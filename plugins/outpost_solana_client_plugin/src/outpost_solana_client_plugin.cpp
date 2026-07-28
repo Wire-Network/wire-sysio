@@ -2,8 +2,10 @@
 
 #include <fc/log/logger.hpp>
 
+#include <sysio/http_client_plugin/http_client_options.hpp>
 #include <sysio/outpost_solana_client_plugin.hpp>
 #include <sysio/outpost_solana_client_plugin/outpost_solana_client.hpp>
+#include <sysio/outpost_client/rpc_options.hpp>
 
 namespace sysio {
 
@@ -11,11 +13,20 @@ namespace {
 constexpr auto option_name_client          = "outpost-solana-client";
 constexpr auto option_idl_file             = "solana-idl-file";
 constexpr auto option_outpost_program_name = "solana-outpost-program-name";
+constexpr outbound_http::transport_option_names
+   transport_option_names{
+      .additional_ca_file =
+         "outpost-solana-additional-ca-file",
+      .additional_ca_path =
+         "outpost-solana-additional-ca-path",
+      .proxy = "outpost-solana-proxy",
+   };
 
 [[maybe_unused]] inline fc::logger& logger() {
    static fc::logger log{"outpost_solana_client_plugin"};
    return log;
 }
+
 } // namespace
 
 class outpost_solana_client_plugin_impl {
@@ -74,6 +85,8 @@ public:
 outpost_solana_client_plugin::outpost_solana_client_plugin()
    : my(std::make_unique<outpost_solana_client_plugin_impl>()) {}
 
+outpost_solana_client_plugin::~outpost_solana_client_plugin() = default;
+
 void outpost_solana_client_plugin::plugin_initialize(const variables_map& options) {
    if (options.contains(option_idl_file)) {
       auto& idl_files = options.at(option_idl_file).as<std::vector<std::filesystem::path>>();
@@ -91,9 +104,13 @@ void outpost_solana_client_plugin::plugin_initialize(const variables_map& option
    // constructed here rather than deferred to startup.
    auto& sig_mgr      = app().get_plugin<signature_provider_manager_plugin>();
    auto client_specs  = options.at(option_name_client).as<std::vector<std::string>>();
+   const auto rpc_options =
+      outpost_rpc::rpc_options(
+         options,
+         transport_option_names);
 
    for (auto& client_spec : client_specs) {
-      dlog("Adding solana client with spec: {}", client_spec);
+      dlog("Adding configured Solana client");
       auto parts = fc::split(client_spec, ',');
       SYS_ASSERT(parts.size() == 3,
                  chain::plugin_config_exception,
@@ -127,8 +144,9 @@ void outpost_solana_client_plugin::plugin_initialize(const variables_map& option
 
       my->add_client(id, std::make_shared<solana_client_entry_t>(
                             id, url, sig_provider,
-                            std::make_shared<solana_client>(sig_provider, url)));
-      ilog("Added solana client (id={},sig_id={},url={})", id, sig_id, url);
+                            std::make_shared<solana_client>(sig_provider, url, rpc_options)));
+      ilog("Added solana client (id={},sig_id={},endpoint={})",
+           id, sig_id, fc::http::sanitized_endpoint(fc::url(url)));
    }
 }
 
@@ -152,6 +170,10 @@ void outpost_solana_client_plugin::set_program_options(options_description& cli,
       "programs with this name when constructing outpost clients. The default targets the standalone "
       "opp_outpost program; pass liqsol_core when the outpost interface is hosted inside the liqsol-core "
       "program (clean-room layout).");
+   outbound_http::add_transport_program_options(
+      cfg,
+      transport_option_names,
+      "Solana RPC");
 }
 
 void outpost_solana_client_plugin::plugin_shutdown() {

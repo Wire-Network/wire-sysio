@@ -9,6 +9,7 @@ target_link_libraries( test_chain_plugin chain_plugin sysio_testing sysio_chain_
 set(CHAIN_PLUGIN_TEST_CASES
         chain_plugin_default_tests
         chain_plugin_snapshot_endpoint_option_registration
+        outbound_http_global_option_registration
         chain_plugin_snapshot_endpoint_option_validation
         account_query_db_tests
         trx_finality_status_processing_test

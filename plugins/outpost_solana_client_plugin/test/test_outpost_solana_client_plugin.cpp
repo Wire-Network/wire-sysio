@@ -11,6 +11,7 @@
 
 #include <sysio/outpost_solana_client_plugin.hpp>
 #include <sysio/outpost_solana_client_plugin/outpost_solana_client.hpp>
+#include <sysio/outpost_client/rpc_options.hpp>
 #include <sysio.msgch/solana_terminal_budget.hpp>
 
 #include <sysio/opp/opp.pb.h>
@@ -22,6 +23,7 @@
 #include <cstring>
 #include <filesystem>
 #include <map>
+#include <set>
 #include <span>
 
 using namespace std::literals;
@@ -396,6 +398,66 @@ BOOST_AUTO_TEST_CASE(startup_rejects_four_field_client_spec) {
       "--outpost-solana-client",
       "client-a,signer-a," + std::string(startup_test_rpc_url) + ",unexpected-fourth-field",
    }), sysio::chain::plugin_config_exception);
+}
+
+BOOST_AUTO_TEST_CASE(authenticated_transport_options_are_registered) {
+   sysio::outpost_solana_client_plugin plugin;
+   boost::program_options::options_description cli, cfg;
+   plugin.set_program_options(cli, cfg);
+
+   std::set<std::string> option_names;
+   for (const auto& option : cfg.options())
+      option_names.insert(option->long_name());
+
+   BOOST_CHECK(option_names.contains("outpost-solana-additional-ca-file"));
+   BOOST_CHECK(option_names.contains("outpost-solana-additional-ca-path"));
+   BOOST_CHECK(option_names.contains("outpost-solana-proxy"));
+}
+
+/** Caller overrides do not replace JSON-RPC's retain-until-failure DNS policy. */
+BOOST_AUTO_TEST_CASE(rpc_transport_overrides_preserve_json_rpc_dns_policy) {
+   namespace bpo = boost::program_options;
+   constexpr sysio::outbound_http::transport_option_names transport_names{
+      .additional_ca_file = "outpost-solana-additional-ca-file",
+      .additional_ca_path = "outpost-solana-additional-ca-path",
+      .proxy = "outpost-solana-proxy",
+   };
+
+   bpo::options_description options;
+   sysio::outbound_http::add_global_transport_program_options(options);
+   sysio::outbound_http::add_transport_program_options(
+      options,
+      transport_names,
+      "Solana RPC");
+   std::array arguments{
+      "test_outpost_solana_client_plugin",
+      "--outbound-http-additional-ca-path",
+      "/tmp/wire-global-ca",
+      "--outpost-solana-proxy",
+      "http://127.0.0.1:3128",
+   };
+   bpo::variables_map variables;
+   bpo::store(
+      bpo::parse_command_line(
+         arguments.size(),
+         const_cast<char**>(arguments.data()),
+         options),
+      variables);
+   bpo::notify(variables);
+
+   const auto rpc_options =
+      sysio::outpost_rpc::rpc_options(
+         variables,
+         transport_names);
+   BOOST_CHECK(!rpc_options.transport.dns_cache_timeout);
+   BOOST_REQUIRE(rpc_options.transport.additional_ca_path);
+   BOOST_CHECK_EQUAL(
+      *rpc_options.transport.additional_ca_path,
+      std::filesystem::path("/tmp/wire-global-ca"));
+   BOOST_REQUIRE(rpc_options.transport.proxy);
+   BOOST_CHECK_EQUAL(
+      *rpc_options.transport.proxy,
+      "http://127.0.0.1:3128");
 }
 
 BOOST_AUTO_TEST_CASE(can_load_counter_anchor_idl) try {

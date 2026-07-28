@@ -74,6 +74,12 @@ Multiple clients can be configured:
 --outpost-solana-client mainnet-client,sol-mainnet-signer,https://api.mainnet-beta.solana.com
 ```
 
+HTTPS RPC endpoints use system CA roots and mandatory DNS/IP identity verification. Use
+`--outpost-solana-additional-ca-file <bundle.pem>` or
+`--outpost-solana-additional-ca-path <hashed-directory>` to add private trust roots. Use
+`--outpost-solana-proxy http://host:port` for an explicit proxy. Verification cannot be disabled, and proxy
+environment variables are not applied implicitly.
+
 #### `--solana-idl-file` (optional, multi-token)
 
 Loads one or more Anchor IDL JSON files for use with `solana_program_client`:
