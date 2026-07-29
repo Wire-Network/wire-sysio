@@ -13,8 +13,8 @@ on:
       - master
   workflow_dispatch:
     inputs:
-      override-cdt-release:
-        description: 'Override the pinned wire-cdt RELEASE tag for this one build (e.g. v1.0.0-rc2). Its channel is then derived from the release itself instead of being asserted against .cicd/defaults.json.'
+      wire-cdt-release:
+        description: 'Explicit wire-cdt RELEASE tag to build against (e.g. v1.0.0-rc2). Its channel is then derived from the release itself. When omitted, a tag build resolves the latest published wire-cdt release in the same channel as the version being built.'
         type: string
 
 permissions:
@@ -155,10 +155,13 @@ jobs:
           restore-keys: |
             ccache-${{ matrix.platform }}-
 
-      # Wire CDT is acquired from a pinned GitHub RELEASE asset, not from a CI
+      # Wire CDT is acquired from a GitHub RELEASE asset, not from a CI
       # artifact: CI artifacts expire after 30 days, so an old tag could no longer
-      # be rebuilt reproducibly. The release is pinned in .cicd/defaults.json
-      # (wirecdt.release + wirecdt.channel) and resolved by the `v` job.
+      # be rebuilt reproducibly. The release is resolved by the `v` job — an
+      # explicit `wire-cdt-release` dispatch input, or the latest published
+      # wire-cdt release in the same channel as the version being built. The
+      # resolved tag is recorded in build-metadata.json and, downstream, in the
+      # release's wire-sysio-versions-<version>.json.
       #
       # Wire-Network/wire-cdt is public, so no GH_TOKEN_DEV is required here; the
       # workflow's own GITHUB_TOKEN is passed as GH_TOKEN purely to lift the
@@ -176,20 +179,20 @@ jobs:
           set -euo pipefail
 
           if [[ -z "$CDT_RELEASE" || "$CDT_RELEASE" == "null" ]]; then
-            echo "::error::.cicd/defaults.json does not pin wirecdt.release" >&2
+            echo "::error::The v job did not resolve a wire-cdt release for this build" >&2
             exit 1
           fi
 
           not_published_hint() {
             echo "::error::Wire CDT release ${CDT_RELEASE} could not be read from Wire-Network/wire-cdt." >&2
-            echo "The pinned release may not be PUBLISHED YET: tag-release.yaml creates wire-cdt releases as DRAFTS, and a draft is invisible to this build (as is a deleted or renamed tag). Check https://github.com/Wire-Network/wire-cdt/releases against wirecdt.release in .cicd/defaults.json, and publish the wire-cdt release before re-running this build." >&2
+            echo "The resolved release may not be PUBLISHED YET: tag-release.yaml creates wire-cdt releases as DRAFTS, and a draft is invisible to this build (as is a deleted or renamed tag). Check https://github.com/Wire-Network/wire-cdt/releases, and publish the wire-cdt release (or dispatch with an explicit wire-cdt-release) before re-running this build." >&2
           }
 
-          # The pinned release's channel must agree with the pin, otherwise the
-          # prepare-release resolution and the build disagree about what shipped.
-          # `derive` is the one-off override path (workflow_dispatch
-          # override-cdt-release): there is no pin to agree with, so the release's
-          # own flag is reported rather than asserted.
+          # The resolved release's channel must agree with the v job's
+          # resolution, otherwise the resolution and the build disagree about
+          # what shipped. `derive` is the explicit-input path (workflow_dispatch
+          # wire-cdt-release): there is no resolved channel to agree with, so
+          # the release's own flag is reported rather than asserted.
           if ! release_view="$(gh release view "$CDT_RELEASE" -R Wire-Network/wire-cdt --json tagName,isDraft,isPrerelease 2>&1)"; then
             not_published_hint
             echo "$release_view" >&2
@@ -208,16 +211,16 @@ jobs:
             prerelease) expected_prerelease="true" ;;
             stable)     expected_prerelease="false" ;;
             derive)
-              echo "Wire CDT release ${CDT_RELEASE} supplied by override-cdt-release; derived channel: $([[ "$release_prerelease" == "true" ]] && echo prerelease || echo stable)"
+              echo "Wire CDT release ${CDT_RELEASE} supplied by wire-cdt-release; derived channel: $([[ "$release_prerelease" == "true" ]] && echo prerelease || echo stable)"
               expected_prerelease="$release_prerelease"
               ;;
             *)
-              echo "::error::Unknown wirecdt.channel '${CDT_CHANNEL}' (expected 'prerelease' or 'stable')" >&2
+              echo "::error::Unknown cdt-channel '${CDT_CHANNEL}' (expected 'prerelease' or 'stable')" >&2
               exit 1
               ;;
           esac
           if [[ "$release_prerelease" != "$expected_prerelease" ]]; then
-            echo "::error::Wire CDT release ${CDT_RELEASE} has prerelease=${release_prerelease}, but .cicd/defaults.json pins channel '${CDT_CHANNEL}'" >&2
+            echo "::error::Wire CDT release ${CDT_RELEASE} has prerelease=${release_prerelease}, but the v job resolved channel '${CDT_CHANNEL}'" >&2
             exit 1
           fi
 
@@ -484,6 +487,25 @@ jobs:
           rm -rf "$PWD/system-contracts-stage"
           echo "Bundled ${#artifacts[@]} system-contract artifacts into ${bundle}.tar.gz"
 
+      # The resolved wire-cdt release travels with the package set so
+      # release.yaml can record it in wire-sysio-versions-<version>.json without
+      # re-resolving (the "latest in channel" answer is time-dependent; the
+      # build's answer is the authoritative one). Transport metadata only —
+      # release.yaml reads it and drops it before attaching assets.
+      - name: Record build metadata
+        if: ${{ steps.build.outcome == 'success' && matrix.platform == 'ubuntu24' && startsWith(github.ref, 'refs/tags/v') && !cancelled() }}
+        env:
+          CDT_RELEASE: ${{ needs.v.outputs.cdt-release }}
+          CDT_CHANNEL: ${{ needs.v.outputs.cdt-channel }}
+        run: |
+          set -euo pipefail
+          jq -n \
+            --arg cdt_release "$CDT_RELEASE" \
+            --arg cdt_channel "$CDT_CHANNEL" \
+            '{ "wire-cdt": { "release": $cdt_release, "channel": $cdt_channel } }' \
+            > build/build-metadata.json
+          cat build/build-metadata.json
+
       - name: Upload release package set
         if: ${{ steps.build.outcome == 'success' && matrix.platform == 'ubuntu24' && !cancelled() }}
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # actions/upload-artifact@v6
@@ -492,25 +514,34 @@ jobs:
           if-no-files-found: error
           # Explicit per-artifact globs: the platform tarball is arch-suffixed and the
           # system-contracts bundle is matched by its own name, so neither can be
-          # picked up as the other by glob order.
+          # picked up as the other by glob order. build-metadata.json only exists
+          # on tag builds (upload-artifact skips a missing entry when others match).
           path: |
             build/wire-sysio_*.deb
             build/wire-sysio-dev_*.deb
             build/wire-sysio-*.rpm
             build/wire-sysio-*-x86_64.tar.gz
             build/wire-sysio-system-contracts-*.tar.gz
+            build/build-metadata.json
 
   v:
     name: Discover Versions
     runs-on: ubuntu-latest
     outputs:
-      # `cdt-release` / `cdt-channel` pin the RELEASE whose asset a tag build
-      # installs. (The former `cdt-target` / `cdt-prerelease` outputs went with
-      # the CI-artifact acquisition path they served -- nothing consumed them
-      # once CDT moved to release assets.)
+      # `cdt-release` / `cdt-channel` name the RELEASE whose asset a tag build
+      # installs. The former `.cicd/defaults.json` pin is gone: an explicit
+      # `wire-cdt-release` input wins (channel `derive`); otherwise a tag build
+      # resolves the LATEST PUBLISHED wire-cdt release in the SAME channel as
+      # the version being built. The resolved value is recorded in the build's
+      # `build-metadata.json` artifact and lands in the release's
+      # `wire-sysio-versions-<version>.json` — the durable record.
       cdt-release: ${{steps.versions.outputs.cdt-release}}
       cdt-channel: ${{steps.versions.outputs.cdt-channel}}
     steps:
+      # The version being built (and therefore the channel to resolve wire-cdt
+      # in) comes from this ref's CMakeLists.txt via cmake-version.py.
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # actions/checkout@v5
+
       - name: Setup wire-cdt version
         id: versions
         env:
@@ -520,37 +551,81 @@ jobs:
           # script, so interpolating an override directly would let a value such as $(...) run as
           # shell code in trusted CI that holds GH_TOKEN_DEV (WSA-094 / SEC-094). As env vars the
           # values are inert data: bash does not re-evaluate command substitution found inside a
-          # variable's value. github.repository / github.sha are likewise read via env and quoted.
-          OVERRIDE_CDT_RELEASE: ${{ inputs.override-cdt-release }}
-          REPO: ${{ github.repository }}
-          REF_SHA: ${{ github.sha }}
+          # variable's value. github.ref is likewise read via env and quoted.
+          WIRE_CDT_RELEASE: ${{ inputs.wire-cdt-release }}
+          REF: ${{ github.ref }}
         run: |
+          set -euo pipefail
           # Defense in depth: reject ref/target overrides containing anything outside a conservative
           # allowlist. This blocks every shell metacharacter and newline (so an override can never
           # break out of $GITHUB_OUTPUT's "name=value" line either) while still accepting real values
           # such as "4.1.0" and "release/4.0". The pattern is held in a variable so [[ =~ ]] treats it
           # as a regex, and the candidate matched is only ever the variable's literal value.
           ref_re='^[A-Za-z0-9._/+-]+$'
-          if [[ -n "$OVERRIDE_CDT_RELEASE" && ! "$OVERRIDE_CDT_RELEASE" =~ $ref_re ]]; then
-            echo "::error::Invalid override ref '$OVERRIDE_CDT_RELEASE'; only [A-Za-z0-9._/+-] are allowed." >&2
+          if [[ -n "$WIRE_CDT_RELEASE" && ! "$WIRE_CDT_RELEASE" =~ $ref_re ]]; then
+            echo "::error::Invalid wire-cdt-release '$WIRE_CDT_RELEASE'; only [A-Za-z0-9._/+-] are allowed." >&2
             exit 1
           fi
 
-          DEFAULTS_JSON=$(curl -sSfL "$(gh api "https://api.github.com/repos/${REPO}/contents/.cicd/defaults.json?ref=${REF_SHA}" --jq .download_url)")
-          echo "cdt-release=$(echo "$DEFAULTS_JSON" | jq -r '.wirecdt.release')" >> "$GITHUB_OUTPUT"
-          echo "cdt-channel=$(echo "$DEFAULTS_JSON" | jq -r '.wirecdt.channel')" >> "$GITHUB_OUTPUT"
-
-          # A one-off build against a different wire-cdt release. The pinned
-          # channel no longer describes it, so the channel is set to the `derive`
-          # sentinel: the download step then reports the release's OWN prerelease
-          # flag instead of asserting it against .cicd/defaults.json. Later lines
-          # win in $GITHUB_OUTPUT, so these override the pinned values above.
-          if [[ -n "$OVERRIDE_CDT_RELEASE" ]]; then
+          # An explicit release wins. Its channel is set to the `derive`
+          # sentinel: the download step then reports the release's OWN
+          # prerelease flag instead of asserting a resolved channel.
+          if [[ -n "$WIRE_CDT_RELEASE" ]]; then
             {
-              echo "cdt-release=$OVERRIDE_CDT_RELEASE"
+              echo "cdt-release=$WIRE_CDT_RELEASE"
               echo "cdt-channel=derive"
             } >> "$GITHUB_OUTPUT"
+            echo "Using explicit wire-cdt release ${WIRE_CDT_RELEASE} (channel derived from the release)"
+            exit 0
           fi
+
+          # Only tag builds install CDT (the download/install steps are gated on
+          # refs/tags/v*); non-tag builds emit empty outputs that nothing reads.
+          if [[ "$REF" != refs/tags/v* ]]; then
+            {
+              echo "cdt-release="
+              echo "cdt-channel="
+            } >> "$GITHUB_OUTPUT"
+            echo "Non-tag build: no wire-cdt release to resolve."
+            exit 0
+          fi
+
+          # The version's suffix IS the channel (same rule as everywhere on the
+          # Strategy-C path); resolve the latest PUBLISHED wire-cdt release in
+          # that channel. There is no first-class "latest prerelease" endpoint,
+          # so the release list is filtered by draft/prerelease and the newest
+          # by creation date wins — the same resolution prepare-release
+          # performed when it wrote the retired .cicd/defaults.json pin.
+          version="$(python3 .github/scripts/cmake-version.py read)"
+          if [[ "$version" == *-* ]]; then
+            channel="prerelease"
+            prerelease="true"
+          else
+            channel="stable"
+            prerelease="false"
+          fi
+
+          releases_json="$(
+            gh api "repos/Wire-Network/wire-cdt/releases?per_page=100" \
+              -H "X-GitHub-Api-Version: 2022-11-28"
+          )"
+          cdt_release="$(
+            jq -r --argjson pre "$prerelease" '
+              [.[] | select(.draft == false and .prerelease == $pre)]
+              | sort_by(.created_at)
+              | last
+              | .tag_name // empty' <<<"$releases_json"
+          )"
+          if [[ -z "$cdt_release" ]]; then
+            echo "::error::No published wire-cdt release found for channel ${channel} (version ${version}). Publish one, or dispatch with an explicit wire-cdt-release." >&2
+            exit 1
+          fi
+
+          {
+            echo "cdt-release=$cdt_release"
+            echo "cdt-channel=$channel"
+          } >> "$GITHUB_OUTPUT"
+          echo "Resolved wire-cdt ${cdt_release} (latest published in channel ${channel} for version ${version})"
 
   verify-packages:
     name: Verify packages (S1-S6)

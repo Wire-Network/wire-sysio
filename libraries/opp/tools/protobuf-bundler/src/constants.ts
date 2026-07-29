@@ -17,6 +17,24 @@ export const PUBLISHABLE_TARGETS: Target[] = [
 export const CARGO_PUBLISHABLE_TARGETS: Target[] = [Target.Solana]
 
 /**
+ * Release channel for published bundle versions, matching the wire-sysio
+ * release channels: `dev` appends the prerelease suffix to the resolved
+ * version (e.g. `1.0.41-dev`); `stable` publishes the bare version
+ * (identical to the historical no-channel behavior). The version RESOLUTION
+ * (latest published → patch bump) is the same for every channel.
+ */
+export enum Channel {
+  dev = "dev",
+  stable = "stable"
+}
+
+/**
+ * Prerelease suffix appended to the resolved version on the dev channel.
+ * The suffix spelling is the channel name itself.
+ */
+export const DEV_PRERELEASE_SUFFIX = Channel.dev
+
+/**
  * Cargo registry name for the WIRE CodeArtifact repository. The publish
  * environment supplies `CARGO_REGISTRIES_WIRE_INDEX` / `_TOKEN`
  * (see libraries/opp/tools/scripts/generate-opp-bundles.sh).

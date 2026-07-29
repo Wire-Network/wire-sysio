@@ -9,22 +9,23 @@ with verified artifacts attached. Artifact contents are documented in
 
 wire-sysio and wire-cdt release **independently**. There is no cross-repo release
 train and no shared pipeline: wire-cdt cuts its own release, and a wire-sysio
-release **consumes a pinned wire-cdt release asset**.
+release **consumes a wire-cdt release asset resolved at build time**.
 
 The properties that follow from that choice:
 
-- **Resolve at prepare, pin at build.** `prepare-release.yaml` resolves the latest
-  published wire-cdt release for the channel and writes it into
-  `.cicd/defaults.json` (`wirecdt.release`, `wirecdt.channel`). The tag build then
-  downloads *exactly* that release's `wire-cdt_<version>_amd64.deb` asset. Re-runs
-  are reproducible, the CDT version is reviewable at gate 1, and there is no
-  publish-order race at release time. For a one-off experiment against a
-  different CDT, `linux_amd64_build.yaml` takes an `override-cdt-release`
-  dispatch input; its channel is then derived from the release's own prerelease
-  flag instead of being asserted against the pin.
-  (`.cicd/defaults.json`'s `wirecdt` block carries exactly the two keys the
-  release-asset path reads — `release` and `channel`. The former `target`
-  git-ref key had no reader and was removed.)
+- **Resolve at build, record at release.** The tag build's `v` job resolves the
+  wire-cdt release itself: an explicit `wire-cdt-release` dispatch input (on
+  `tag-release.yaml`, forwarded to `linux_amd64_build.yaml`) wins; otherwise the
+  latest **published** wire-cdt release in the same channel as the version being
+  built is used. The build downloads that release's
+  `wire-cdt_<version>_amd64.deb` asset, records the resolved tag in its
+  `build-metadata.json` artifact, and `release.yaml` writes it durably into the
+  release's `wire-sysio-versions-<version>.json` asset — the record of what the
+  release was built against. (The former `.cicd/defaults.json` pin, written by
+  `prepare-release.yaml`, is retired; the versions manifest replaced it.)
+  For a one-off experiment against a different CDT, the same `wire-cdt-release`
+  input works on a direct `linux_amd64_build.yaml` dispatch; its channel is then
+  derived from the release's own prerelease flag instead of being asserted.
 - **Release assets, not CI artifacts.** CI artifacts expire after 30 days, so an
   old tag could not be rebuilt from them. Release assets are durable.
   Wire-Network/wire-cdt is public, so the download needs no special token — the
@@ -33,7 +34,9 @@ The properties that follow from that choice:
   download is a plain `gh release download`.)
 - **The version's suffix IS the channel.** `-dev` / `-rcN` means prerelease; no
   suffix means stable. One input (`version`) decides everything downstream —
-  the release's prerelease flag, and which wire-cdt channel gets pinned.
+  the release's prerelease flag, which wire-cdt channel the build resolves in,
+  and which channel the OPP model bundles publish under (`-dev` bundle versions
+  on prerelease, bare versions on stable).
 - **Two human gates.** Gate 1 is reviewing and merging the bump PR. Gate 2 is
   approving the `release` Environment before anything is tagged or created.
 - **The system contracts ship as a release asset.** Only tag builds compile them
@@ -67,11 +70,12 @@ resolve under the home.
 
 | Workflow | Trigger | What it does |
 |---|---|---|
-| `prepare-release.yaml` | `workflow_dispatch(version)` | Validates the version, writes `VERSION_*` into `CMakeLists.txt`, resolves + pins the latest published wire-cdt release for the channel, opens the `release/prep-v<version>` PR. |
-| `tag-release.yaml` | `workflow_dispatch(version)`, `environment: release` | Asserts master HEAD carries the version, creates the annotated tag (`POST /git/tags` then `POST /git/refs`), creates the DRAFT release with generated notes, dispatches both platform builds on the tag ref, dispatches `release.yaml`. |
-| `linux_amd64_build.yaml` | tag ref (dispatched or pushed) | Installs the pinned wire-cdt release deb, builds with system contracts ON, assembles deb + rpm + portable tgz, bundles the contracts, uploads `wire-sysio-packages-amd64`. |
+| `prepare-release.yaml` | `workflow_dispatch(version)` | Validates the version, writes `VERSION_*` into `CMakeLists.txt`, opens the `release/prep-v<version>` PR. |
+| `tag-release.yaml` | `workflow_dispatch(version, wire-cdt-release?)`, `environment: release` | Asserts master HEAD carries the version, creates the annotated tag (`POST /git/tags` then `POST /git/refs`), creates the DRAFT release with generated notes, dispatches both platform builds AND `opp-bundles.yaml` (with the version's channel) on the tag ref, dispatches `release.yaml`. |
+| `linux_amd64_build.yaml` | tag ref (dispatched or pushed) | Resolves the wire-cdt release (explicit input or latest published in the channel), installs its deb, builds with system contracts ON, assembles deb + rpm + portable tgz, bundles the contracts, records `build-metadata.json`, uploads `wire-sysio-packages-amd64`. |
 | `macos_arm64_build.yaml` | tag ref (dispatched or pushed) | Builds, tests, produces the portable tarball, verifies it in `--no-service` mode, uploads `wire-sysio-packages-macos-arm64`. |
-| `release.yaml` | `workflow_dispatch(tag)`; `release: published` as a manual fallback | Awaits both tag-ref builds, downloads both artifacts, verifies each one explicitly, attaches assets + checksums to the draft, then flips the draft public. |
+| `opp-bundles.yaml` | tag ref (dispatched, `channel` input) | Generates the OPP model bundles from the tag's protos, publishes `@wireio/opp-{typescript,solidity}-models` to npm and `wire-opp-solana-models` to the WIRE cargo registry (channel `dev` → `-dev` versions), uploads `opp-published-versions-<tag>`. |
+| `release.yaml` | `workflow_dispatch(tag)`; `release: published` as a manual fallback | Awaits both tag-ref builds, downloads both artifacts, verifies each one explicitly, resolves the tag's opp-bundles run, generates `wire-sysio-versions-<version>.json` + `wire-sysio-source-refs-<version>.json`, attaches assets + checksums, appends the component-version/source-ref tables to the notes, then flips the draft public. |
 
 ### Post-bump
 
@@ -109,14 +113,14 @@ flowchart TD
 
     H1[/"Human: pick version — its suffix IS the channel<br>(-dev/-rcN = prerelease, none = stable)"/]:::human
     H2[/"Human: dispatch prepare-release (input: version)"/]:::human
-    S1["System: edit VERSION_*, resolve+pin latest<br>wire-cdt release (sysio only), open bump PR"]:::system
-    G1{{"GATE 1 — Human: 'Approve and run' the PR checks,<br>review (incl. pinned CDT), merge"}}:::gate
-    H3[/"Human: dispatch tag-release (input: version)"/]:::human
+    S1["System: edit VERSION_*, open bump PR"]:::system
+    G1{{"GATE 1 — Human: 'Approve and run' the PR checks,<br>review, merge"}}:::gate
+    H3[/"Human: dispatch tag-release (input: version,<br>optional wire-cdt-release)"/]:::human
     G2{{"GATE 2 — Human: approve 'release' Environment"}}:::gate
-    S3["System: assert version == master HEAD,<br>create annotated tag + DRAFT release,<br>DISPATCH linux + macos builds on the tag ref"]:::system
-    S4["System: tag builds produce packages<br>(sysio: installs pinned wire-cdt release deb,<br>builds + asserts system contracts, bundles them)"]:::system
-    S6["System: release.yaml — await tag-ref builds,<br>download, verify each artifact explicitly"]:::system
-    S7["System: attach assets + checksums,<br>flip draft to public"]:::system
+    S3["System: assert version == master HEAD,<br>create annotated tag + DRAFT release,<br>DISPATCH linux + macos builds + opp-bundles<br>(channel from the suffix) on the tag ref"]:::system
+    S4["System: tag builds produce packages<br>(sysio: resolves + installs wire-cdt release deb,<br>builds + asserts system contracts, bundles them,<br>records build-metadata.json);<br>opp-bundles publishes the model packages"]:::system
+    S6["System: release.yaml — await tag-ref builds,<br>download, verify each artifact explicitly,<br>generate versions + source-refs manifests"]:::system
+    S7["System: attach assets + checksums,<br>append component tables to the notes,<br>flip draft to public"]:::system
     H4[/"Human: sanity-check the release page"/]:::human
 
     H1 --> H2 --> S1 --> G1 --> H3 --> G2 --> S3 --> S4 --> S6 --> S7 --> H4
@@ -124,7 +128,7 @@ flowchart TD
 
 ## Release assets
 
-Eight assets, excluding GitHub's auto-added source archives:
+Ten assets, excluding GitHub's auto-added source archives:
 
 | Asset | Produced by |
 |---|---|
@@ -135,6 +139,8 @@ Eight assets, excluding GitHub's auto-added source archives:
 | `wire-sysio-<version>-x86_64.tar.gz` | linux tag build (`package-tgz`) |
 | `wire-sysio-<version>-macos-arm64.tar.gz` | macOS tag build (`package-tgz`) |
 | `wire-sysio-system-contracts-<version>.tar.gz` | linux tag build (`sysio.*/{*.wasm,*.abi}`) |
+| `wire-sysio-versions-<version>.json` | `release.yaml` (wire-sysio + wire-cdt + OPP model versions) |
+| `wire-sysio-source-refs-<version>.json` | `release.yaml` (same components → repo/ref/sha) |
 | `wire-sysio-<version>-checksums.txt` | `release.yaml` |
 
 The `-macos-arm64` suffix comes from `WIRE_ARCH_TAG` in `cmake/package.cmake`;
