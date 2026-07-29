@@ -93,6 +93,9 @@ jobs:
           .github/scripts/resolve-build-run.sh "$TAG" "$sha" \
             linux_amd64_build.yaml macos_arm64_build.yaml >> "$GITHUB_OUTPUT"
 
+          # The released commit SHA also feeds the source-refs manifest below.
+          echo "sha=${sha}" >> "$GITHUB_OUTPUT"
+
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # actions/download-artifact@v8.0.1
         with:
           name: wire-sysio-packages-amd64
@@ -106,6 +109,24 @@ jobs:
           path: dist
           run-id: ${{ steps.run.outputs.macos_arm64_build-run-id }}
           github-token: ${{ github.token }}
+
+      # build-metadata.json is TRANSPORT metadata from the linux tag build (the
+      # wire-cdt release the build actually installed) — read it, then remove it
+      # so the verify suite, the checksums list and `gh release upload dist/*`
+      # all see exactly the seven-package set they always have.
+      - name: Extract build metadata
+        id: metadata
+        run: |
+          set -euo pipefail
+          metadata_file="dist/build-metadata.json"
+          [[ -f "$metadata_file" ]] \
+            || { echo "::error::${metadata_file} missing from the linux build artifact (the tag build records the resolved wire-cdt release there)" >&2; exit 1; }
+          cdt_release="$(jq -r '."wire-cdt".release' "$metadata_file")"
+          [[ -n "$cdt_release" && "$cdt_release" != "null" ]] \
+            || { echo "::error::${metadata_file} carries no wire-cdt release" >&2; exit 1; }
+          echo "cdt-release=${cdt_release}" >> "$GITHUB_OUTPUT"
+          rm "$metadata_file"
+          echo "Build used wire-cdt ${cdt_release}"
 
       - name: Guard release tag matches artifact version
         run: |
@@ -139,6 +160,77 @@ jobs:
             || { echo "::error::${bundle} contains no sysio.*.abi"; exit 1; }
           echo "system contracts bundle OK: $(echo "$entries" | grep -c '\.wasm$') wasm, $(echo "$entries" | grep -c '\.abi$') abi"
 
+      # tag-release.yaml dispatched opp-bundles.yaml on the tag ref alongside
+      # the platform builds; by now (after waiting out the builds) its ~10 min
+      # run has long finished. The run is discriminated by head_branch == tag
+      # AND its tag-suffixed published-versions artifact.
+      - name: Resolve the OPP bundles run for the tag
+        id: opp
+        run: |
+          set -euo pipefail
+          .github/scripts/resolve-opp-bundles-run.sh "$TAG" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # actions/download-artifact@v8.0.1
+        with:
+          name: opp-published-versions-${{ env.TAG }}
+          path: opp
+          run-id: ${{ steps.opp.outputs.opp-bundles-run-id }}
+          github-token: ${{ github.token }}
+
+      # The versions manifest is the durable record of what this release is
+      # made of (it replaced the .cicd/defaults.json CDT pin); the source-refs
+      # manifest maps the same components to git refs + commit SHAs. The three
+      # generated model packages repeat wire-sysio's ref/sha — they are
+      # generated from the protos in THIS repo at THIS tag.
+      - name: Generate versions and source-refs manifests
+        env:
+          SHA: ${{ steps.run.outputs.sha }}
+          CDT_RELEASE: ${{ steps.metadata.outputs.cdt-release }}
+        run: |
+          set -euo pipefail
+          version="${TAG#v}"
+
+          opp_versions="opp/opp-published-versions.json"
+          [[ -f "$opp_versions" ]] \
+            || { echo "::error::${opp_versions} missing from the opp-bundles artifact" >&2; exit 1; }
+          typescript_version="$(jq -r '."@wireio/opp-typescript-models"' "$opp_versions")"
+          solidity_version="$(jq -r '."@wireio/opp-solidity-models"' "$opp_versions")"
+          solana_version="$(jq -r '."wire-opp-solana-models"' "$opp_versions")"
+
+          # wire-cdt is public, so the workflow token resolves its tag SHA.
+          cdt_sha="$(gh api "repos/Wire-Network/wire-cdt/commits/${CDT_RELEASE}" --jq .sha)"
+
+          # Repo entries carry their release TAG (v-prefixed); registry entries
+          # carry the published package version exactly as npm/cargo know it.
+          jq -n \
+            --arg sysio "$TAG" \
+            --arg cdt "$CDT_RELEASE" \
+            --arg ts "$typescript_version" \
+            --arg sol "$solidity_version" \
+            --arg solana "$solana_version" \
+            '{
+              "wire-sysio": $sysio,
+              "wire-cdt": $cdt,
+              "@wireio/opp-typescript-models": $ts,
+              "@wireio/opp-solidity-models": $sol,
+              "wire-opp-solana-models": $solana
+            }' > "dist/wire-sysio-versions-${version}.json"
+
+          jq -n \
+            --arg tag "$TAG" \
+            --arg sha "$SHA" \
+            --arg cdt_tag "$CDT_RELEASE" \
+            --arg cdt_sha "$cdt_sha" \
+            '{
+              "wire-sysio":                    { "repo": "Wire-Network/wire-sysio", "ref": $tag,     "sha": $sha },
+              "wire-cdt":                      { "repo": "Wire-Network/wire-cdt",   "ref": $cdt_tag, "sha": $cdt_sha },
+              "@wireio/opp-typescript-models": { "repo": "Wire-Network/wire-sysio", "ref": $tag,     "sha": $sha },
+              "@wireio/opp-solidity-models":   { "repo": "Wire-Network/wire-sysio", "ref": $tag,     "sha": $sha },
+              "wire-opp-solana-models":        { "repo": "Wire-Network/wire-sysio", "ref": $tag,     "sha": $sha }
+            }' > "dist/wire-sysio-source-refs-${version}.json"
+
+          cat "dist/wire-sysio-versions-${version}.json" "dist/wire-sysio-source-refs-${version}.json"
+
       - name: Attach artifacts to the release
         run: |
           set -euo pipefail
@@ -147,7 +239,8 @@ jobs:
           # `sha256sum dist/*` would write `dist/`-prefixed paths into the file
           # (useless to a downloader running `sha256sum -c` next to the assets)
           # and would depend on glob order to avoid hashing the checksums file
-          # itself. Seven package assets + this file = the eight release assets.
+          # itself. Seven package assets + two version manifests + this file =
+          # the ten release assets.
           (
             cd dist
             sha256sum \
@@ -158,10 +251,65 @@ jobs:
               "wire-sysio-${version}-x86_64.tar.gz" \
               "wire-sysio-${version}-macos-arm64.tar.gz" \
               "wire-sysio-system-contracts-${version}.tar.gz" \
+              "wire-sysio-versions-${version}.json" \
+              "wire-sysio-source-refs-${version}.json" \
               > "wire-sysio-${version}-checksums.txt"
           )
           cat "dist/wire-sysio-${version}-checksums.txt"
           gh release upload "$TAG" dist/* --clobber
+
+      # The component-version and source-ref tables ride the release notes so
+      # the release is self-describing without downloading the JSON assets.
+      # A marker-delimited section keeps retries idempotent: any previous
+      # generated section is stripped before the fresh one is appended.
+      - name: Append component tables to the release notes
+        env:
+          SHA: ${{ steps.run.outputs.sha }}
+          CDT_RELEASE: ${{ steps.metadata.outputs.cdt-release }}
+        run: |
+          set -euo pipefail
+          version="${TAG#v}"
+          versions_json="dist/wire-sysio-versions-${version}.json"
+          refs_json="dist/wire-sysio-source-refs-${version}.json"
+
+          typescript_version="$(jq -r '."@wireio/opp-typescript-models"' "$versions_json")"
+          solidity_version="$(jq -r '."@wireio/opp-solidity-models"' "$versions_json")"
+          solana_version="$(jq -r '."wire-opp-solana-models"' "$versions_json")"
+          cdt_sha="$(jq -r '."wire-cdt".sha' "$refs_json")"
+
+          gh release view "$TAG" --json body --jq .body > body.md
+          # Strip any previous generated section (idempotent retries).
+          sed -i '/<!-- wire-versions:begin -->/,/<!-- wire-versions:end -->/d' body.md
+
+          # printf, not an indented heredoc: every body line must start at
+          # column 0 or GitHub renders the whole section as a code block.
+          {
+            cat body.md
+            printf '%s\n' \
+              "" \
+              "<!-- wire-versions:begin -->" \
+              "## Component versions" \
+              "" \
+              "| Component | Version |" \
+              "|---|---|" \
+              "| wire-sysio | [\`${TAG}\`](https://github.com/Wire-Network/wire-sysio/releases/tag/${TAG}) |" \
+              "| wire-cdt | [\`${CDT_RELEASE}\`](https://github.com/Wire-Network/wire-cdt/releases/tag/${CDT_RELEASE}) |" \
+              "| @wireio/opp-typescript-models | [\`${typescript_version}\`](https://www.npmjs.com/package/@wireio/opp-typescript-models/v/${typescript_version}) |" \
+              "| @wireio/opp-solidity-models | [\`${solidity_version}\`](https://www.npmjs.com/package/@wireio/opp-solidity-models/v/${solidity_version}) |" \
+              "| wire-opp-solana-models | \`${solana_version}\` (cargo registry \`sparse+https://public.crates.pkgs.wire-dev.com/\`) |" \
+              "" \
+              "## Source refs" \
+              "" \
+              "| Component | Ref | Commit |" \
+              "|---|---|---|" \
+              "| wire-sysio | \`${TAG}\` | [\`${SHA:0:7}\`](https://github.com/Wire-Network/wire-sysio/commit/${SHA}) |" \
+              "| wire-cdt | \`${CDT_RELEASE}\` | [\`${cdt_sha:0:7}\`](https://github.com/Wire-Network/wire-cdt/commit/${cdt_sha}) |" \
+              "| @wireio/opp-typescript-models | \`${TAG}\` | [\`${SHA:0:7}\`](https://github.com/Wire-Network/wire-sysio/commit/${SHA}) |" \
+              "| @wireio/opp-solidity-models | \`${TAG}\` | [\`${SHA:0:7}\`](https://github.com/Wire-Network/wire-sysio/commit/${SHA}) |" \
+              "| wire-opp-solana-models | \`${TAG}\` | [\`${SHA:0:7}\`](https://github.com/Wire-Network/wire-sysio/commit/${SHA}) |" \
+              "<!-- wire-versions:end -->"
+          } > body-next.md
+          gh release edit "$TAG" --notes-file body-next.md
 
       - name: Publish the release
         run: |

@@ -102,43 +102,13 @@ jobs:
         run: |
           python3 .github/scripts/cmake-version.py write "$VERSION"
 
-      - name: Pin the latest published wire-cdt release for the channel
-        id: cdt
-        env:
-          CDT_PRERELEASE: ${{ steps.version.outputs.prerelease }}
-          CDT_CHANNEL: ${{ steps.version.outputs.channel }}
-        run: |
-          set -euo pipefail
-
-          # Resolve-at-prepare, pin-at-build: the tag build downloads exactly this
-          # release's asset, so re-runs are reproducible, the CDT version is
-          # reviewable at gate 1, and there is no publish-order race at release time.
-          #
-          # There is no first-class "latest prerelease" endpoint, so the release list
-          # is filtered by draft/prerelease and the newest by creation date wins.
-          releases_json="$(
-            gh api "repos/Wire-Network/wire-cdt/releases?per_page=100" \
-              -H "X-GitHub-Api-Version: 2022-11-28"
-          )"
-          cdt_release="$(
-            jq -r --argjson pre "$CDT_PRERELEASE" '
-              [.[] | select(.draft == false and .prerelease == $pre)]
-              | sort_by(.created_at)
-              | last
-              | .tag_name // empty' <<<"$releases_json"
-          )"
-          if [[ -z "$cdt_release" ]]; then
-            echo "::error::No published wire-cdt release found for channel ${CDT_CHANNEL}" >&2
-            exit 1
-          fi
-
-          jq --indent 2 --arg release "$cdt_release" --arg channel "$CDT_CHANNEL" \
-            '.wirecdt.release = $release | .wirecdt.channel = $channel' \
-            .cicd/defaults.json > .cicd/defaults.json.next
-          mv .cicd/defaults.json.next .cicd/defaults.json
-
-          echo "release=$cdt_release" >> "$GITHUB_OUTPUT"
-          echo "Pinned wire-cdt ${cdt_release} (channel ${CDT_CHANNEL})"
+      # NOTE: the former "Pin the latest published wire-cdt release" step (and
+      # its .cicd/defaults.json pin file) is retired. The tag build's `v` job
+      # now resolves the CDT release itself — an explicit `wire-cdt-release`
+      # dispatch input on tag-release.yaml/linux_amd64_build.yaml, or the latest
+      # published wire-cdt release in the version's channel — and the resolved
+      # value is recorded durably in the release's
+      # wire-sysio-versions-<version>.json asset.
 
       - name: Open the bump PR
         env:
@@ -146,14 +116,13 @@ jobs:
           PREVIOUS: ${{ steps.version.outputs.previous }}
           CHANNEL: ${{ steps.version.outputs.channel }}
           MODE: ${{ steps.version.outputs.mode }}
-          CDT_RELEASE: ${{ steps.cdt.outputs.release }}
         run: |
           set -euo pipefail
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -b "$BRANCH"
-          git add CMakeLists.txt .cicd/defaults.json
+          git add CMakeLists.txt
           git commit -m "chore(release): ${MODE} ${PREVIOUS} -> ${VERSION}"
           # --force-with-lease, not a bare push: re-dispatching the prep for the
           # same version (a fixed pin, a re-resolved CDT release) must be able to
@@ -170,9 +139,11 @@ jobs:
             "${MODE}: \`${PREVIOUS}\` -> \`${VERSION}\` (channel: **${CHANNEL}**)." \
             "" \
             "- \`CMakeLists.txt\`: \`VERSION_*\` set to \`${VERSION}\`." \
-            "- \`.cicd/defaults.json\`: \`wirecdt.release\` pinned to \`${CDT_RELEASE}\`, \`wirecdt.channel\` set to \`${CHANNEL}\`." \
             "" \
-            "Review the pinned Wire CDT release, then merge. Tagging is a separate," \
+            "The tag build resolves the Wire CDT release itself (latest published" \
+            "in this channel, or an explicit \`wire-cdt-release\` dispatch input);" \
+            "the resolved version is recorded in the release's" \
+            "\`wire-sysio-versions-<version>.json\`. Tagging is a separate," \
             "approval-gated dispatch of \`tag-release.yaml\` with the same version.")"
           gh pr create \
             --base master \

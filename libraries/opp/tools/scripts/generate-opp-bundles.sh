@@ -6,26 +6,54 @@ set -euo pipefail
 # package repository just to install fish before publishing OPP artifacts.
 
 usage() {
-   echo "Usage: generate-opp-bundles.sh [--publish]" >&2
+   echo "Usage: generate-opp-bundles.sh [--publish] [--channel <dev|stable>] [--package-version <semver>]" >&2
 }
 
 publish=false
-for arg in "$@"; do
-   case "$arg" in
+channel=""
+package_version=""
+# Value-taking args require the while/shift form — a `for arg in "$@"` loop
+# cannot consume a following value.
+while [[ $# -gt 0 ]]; do
+   case "$1" in
       --publish)
          publish=true
+         shift
+         ;;
+      --channel)
+         if [[ $# -lt 2 ]]; then
+            echo "Error: --channel requires a value (dev|stable)." >&2
+            usage
+            exit 1
+         fi
+         channel="$2"
+         shift 2
+         ;;
+      --package-version)
+         if [[ $# -lt 2 ]]; then
+            echo "Error: --package-version requires a semver value." >&2
+            usage
+            exit 1
+         fi
+         package_version="$2"
+         shift 2
          ;;
       -h|--help)
          usage
          exit 0
          ;;
       *)
-         echo "Unknown argument: $arg" >&2
+         echo "Unknown argument: $1" >&2
          usage
          exit 1
          ;;
    esac
 done
+
+if [[ -n "$channel" && "$channel" != "dev" && "$channel" != "stable" ]]; then
+   echo "Error: --channel must be 'dev' or 'stable' (got '$channel')." >&2
+   exit 1
+fi
 
 script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 tools_root="$(cd -- "$script_dir/.." && pwd -P)"
@@ -130,6 +158,14 @@ done
 
 if [[ "$publish" == true ]]; then
    cmd+=(--publish)
+fi
+
+if [[ -n "$channel" ]]; then
+   cmd+=(--channel "$channel")
+fi
+
+if [[ -n "$package_version" ]]; then
+   cmd+=(--package-version "$package_version")
 fi
 
 echo "Running wire-protobuf-bundler for all targets..."
