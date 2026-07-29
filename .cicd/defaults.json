@@ -1,9 +1,6 @@
 {
-    "wirecdt":{
-       "target":"master",
-       "prerelease":true
-    },
-    "wiresystemcontracts":{
-       "ref":"release/4.0"
-    }
- }
+  "wirecdt": {
+    "release": "v1.0.0-dev",
+    "channel": "prerelease"
+  }
+}

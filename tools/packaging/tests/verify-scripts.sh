@@ -7,6 +7,10 @@ fail() { echo "S5 FAIL: $1"; exit 1; }
 for s in debian/config debian/postinst debian/prerm debian/postrm rpm/post.sh rpm/preun.sh rpm/postun.sh tests/verify-tgz.sh tests/verify-deb.sh tests/verify-rpm.sh tests/verify-install-manifest.sh tests/verify-scripts.sh; do
     sh -n "$root/$s" || fail "sh -n $s"
 done
+# tests/verify-all.sh is the one bash member of the suite ([[ ]] / arrays), so it
+# is parsed by bash: `sh -n` would accept it while checking a grammar it is not
+# written in.
+bash -n "$root/tests/verify-all.sh" || fail "bash -n tests/verify-all.sh"
 unit="$root/systemd/wire-sysio-nodeop.service"
 if command -v systemd-analyze >/dev/null 2>&1; then
     # /usr/bin/nodeop is absent on build hosts; that one finding is expected.
