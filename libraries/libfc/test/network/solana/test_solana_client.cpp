@@ -557,9 +557,11 @@ BOOST_AUTO_TEST_CASE(test_runtime_mismatch_blocks_protected_account_read) {
 BOOST_AUTO_TEST_CASE(test_runtime_mismatch_classifies_airdrop_as_submission) {
    const auto expected = fc::test::solana_hash(1);
    const auto wrong_cluster = fc::test::solana_hash(2);
+   auto close_after_startup = fc::test::scripted_json_rpc_response::result(expected);
+   close_after_startup.keep_alive = false;
    fc::test::scripted_json_rpc_server server({
       fc::test::scripted_json_rpc_response::result(expected),
-      resetting_result(expected),
+      std::move(close_after_startup),
       fc::test::scripted_json_rpc_response::result(wrong_cluster),
    });
    solana_client client(test_solana_signature_provider(), server.url(), client_options{},
@@ -567,6 +569,9 @@ BOOST_AUTO_TEST_CASE(test_runtime_mismatch_classifies_airdrop_as_submission) {
 
    BOOST_CHECK_THROW(client.request_airdrop(make_test_pubkey(16), 1), fc::exception);
    const auto snapshot = client.get_cluster_identity_snapshot();
+   BOOST_CHECK(snapshot.status == solana_cluster_identity_status::mismatch);
+   BOOST_CHECK_EQUAL(snapshot.verification_mismatches, 1u);
+   BOOST_REQUIRE(snapshot.blocked_operations.contains(solana_cluster_identity_operation::submission));
    BOOST_CHECK_EQUAL(snapshot.blocked_operations.at(solana_cluster_identity_operation::submission), 1u);
    BOOST_CHECK(!snapshot.blocked_operations.contains(solana_cluster_identity_operation::rpc_read));
 }
