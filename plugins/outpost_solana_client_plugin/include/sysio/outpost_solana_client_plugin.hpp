@@ -8,6 +8,8 @@
 #include <fc/network/solana/solana_client.hpp>
 #include <fc/network/solana/solana_idl.hpp>
 
+#include <appbase/method.hpp>
+
 namespace sysio {
 using namespace fc::network::solana;
 
@@ -69,6 +71,22 @@ struct solana_client_entry_t {
 };
 
 using solana_client_entry_ptr = std::shared_ptr<solana_client_entry_t>;
+
+namespace solana_cluster_identity_metrics {
+
+/**
+ * Loosely coupled provider for current Solana cluster-identity snapshots.
+ *
+ * Consumers register an empty low-priority fallback when the Solana plugin is
+ * optional. The enabled Solana plugin registers the authoritative provider at
+ * the default priority.
+ */
+using snapshot_provider = appbase::method_decl<
+   struct snapshot_provider_tag,
+   std::vector<solana_cluster_identity_snapshot>(),
+   appbase::first_provider_policy>;
+
+} // namespace solana_cluster_identity_metrics
 
 /**
  * @brief Filter loaded IDL definitions down to the OPP outpost program.

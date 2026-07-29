@@ -3,7 +3,9 @@
 
 #include <array>
 #include <boost/core/demangle.hpp>
+#include <chrono>
 #include <cstdint>
+#include <deque>
 #include <fc-lite/threadsafe_map.hpp>
 #include <fc/crypto/signature_provider.hpp>
 #include <fc/network/json_rpc/json_rpc_client.hpp>
@@ -17,6 +19,7 @@
 #include <memory>
 #include <mutex>
 #include <optional>
+#include <set>
 #include <string>
 #include <typeinfo>
 #include <variant>
@@ -145,8 +148,10 @@ struct solana_cluster_identity_snapshot {
    std::uint64_t verification_successes = 0;
    std::uint64_t verification_mismatches = 0;
    std::uint64_t verification_failures = 0;
+   std::uint64_t verification_cancellations = 0;
    std::uint64_t verification_recoveries = 0;
    std::map<solana_cluster_identity_operation, std::uint64_t> blocked_operations;
+   std::map<solana_cluster_identity_operation, std::uint64_t> protected_operation_failures;
 };
 
 class solana_client;
@@ -655,7 +660,10 @@ public:
                  client_options rpc_options, solana_cluster_identity_config identity_config);
 
    /**
-    * @brief Execute a raw JSON-RPC method call
+    * Execute a raw non-idempotent JSON-RPC method call.
+    *
+    * Unknown non-idempotent calls are conservatively classified as
+    * submissions. Read-only callers should use `execute_idempotent`.
     */
    fc::variant execute(const std::string& method, const fc::variant& params);
 
@@ -1083,26 +1091,33 @@ private:
    const solana_public_key _pubkey;
    const std::optional<solana_cluster_identity_config> _cluster_identity;
    const std::string _sanitized_endpoint;
-   /// Configured whole-operation budget, including operation-gate queueing.
+   /// Configured per-RPC budget, further bounded by an active task deadline.
    const std::optional<fc::microseconds> _rpc_total_timeout;
+   /// Blocking-adapter cancellation predicate used while waiting for the pinned RPC gate.
+   const std::function<bool()> _rpc_cancel_check;
    json_rpc_client _client;
-   /// Serializes JSON-RPC, verification state changes, signing, and submission.
-   mutable std::timed_mutex _operation_mutex;
-   /// Protects the published non-blocking telemetry snapshot.
-   mutable std::mutex _snapshot_mutex;
+   /// Serializes pinned calls through their final identity-result cross-check.
+   mutable std::timed_mutex _rpc_mutex;
+   /// Protects cluster identity state without serializing local signing.
+   mutable std::mutex _identity_mutex;
 
    solana_cluster_identity_status _cluster_identity_status;
    solana_cluster_identity_reason _cluster_identity_reason;
    std::optional<solana_genesis_hash> _last_observed_genesis_hash;
    std::optional<fc::time_point> _last_verified_at;
+   std::optional<std::chrono::steady_clock::time_point> _last_verified_monotonic;
    std::uint64_t _verification_attempts = 0;
    std::uint64_t _verification_successes = 0;
    std::uint64_t _verification_mismatches = 0;
    std::uint64_t _verification_failures = 0;
+   std::uint64_t _verification_cancellations = 0;
    std::uint64_t _verification_recoveries = 0;
    std::map<solana_cluster_identity_operation, std::uint64_t> _blocked_operations;
-   /// Latest immutable-by-convention state copied for logs and metric scrapes.
-   solana_cluster_identity_snapshot _published_identity_snapshot;
+   std::map<solana_cluster_identity_operation, std::uint64_t> _protected_operation_failures;
+   solana_cluster_identity_status _validation_previous_status = solana_cluster_identity_status::unverified;
+   bool _validation_failure_recorded = false;
+   std::deque<solana_public_key> _verified_blockhash_order;
+   std::set<solana_public_key> _verified_blockhashes;
 
    using program_key_t = std::pair<solana_public_key, std::string>;
    fc::threadsafe_map<program_key_t, std::shared_ptr<solana_program_client>> _programs_map{};
@@ -1113,12 +1128,17 @@ private:
     */
    fc::variant build_config(commitment_t commitment, const std::optional<fc::variant_object>& extra = std::nullopt);
 
-   using operation_lock = std::unique_lock<std::timed_mutex>;
-
-   /** Acquire the serialized operation gate within the caller's active deadline. */
-   operation_lock lock_operation() const;
-   /** Execute one RPC method while the operation gate is already held. */
-   fc::variant execute_locked(const std::string& method, const fc::variant& params, bool idempotent);
+   /** Force task-deadline inheritance and install the per-connection validator. */
+   client_options configure_rpc_options(client_options options);
+   using rpc_lock = std::unique_lock<std::timed_mutex>;
+   /** Acquire the pinned RPC gate within the caller's active deadline. */
+   rpc_lock lock_rpc() const;
+   /** Execute one RPC with explicit replay and telemetry semantics. */
+   fc::variant execute_rpc(const std::string& method, const fc::variant& params, bool idempotent,
+                           solana_cluster_identity_operation operation);
+   /** Execute one typed read-only RPC with stale-connection recovery. */
+   fc::variant execute_idempotent(const std::string& method, const fc::variant& params,
+                                  solana_cluster_identity_operation operation);
    /** Reject an operation after a sticky cluster-identity mismatch. */
    void throw_if_cluster_identity_mismatched_locked(solana_cluster_identity_operation operation);
    /** Record one transport-level probe failure without exposing request data. */
@@ -1128,16 +1148,28 @@ private:
    bool record_cluster_identity_observation_locked(solana_cluster_identity_operation operation,
                                                    const solana_genesis_hash& observed,
                                                    solana_cluster_identity_status previous_status);
-   /** Perform a fresh standalone verification or block the protected operation. */
-   void ensure_cluster_verified_locked(solana_cluster_identity_operation operation);
-   /** Publish verification state without holding the RPC gate during later scrapes. */
-   void publish_cluster_identity_snapshot_locked();
-   /** Call `getGenesisHash` without recursively entering the public verification gate. */
-   fc::variant fetch_genesis_hash_unchecked_locked();
    /** Count one operation rejected before RPC or signing. */
    void record_blocked_operation_locked(solana_cluster_identity_operation operation);
-   /** Map RPC names and replay semantics onto the closed telemetry operation vocabulary. */
-   static solana_cluster_identity_operation operation_for_rpc_method(const std::string& method, bool idempotent);
+   /** Begin one connection validation for the active protected operation. */
+   void begin_connection_validation();
+   /** Validate one connection's JSON-RPC identity result. */
+   void validate_connection_identity(const fc::variant& result);
+   /** Record one successfully validated persistent connection. */
+   void record_connection_validation_success();
+   /** Classify one rejected connection validation without throwing. */
+   void record_connection_validation_failure(std::exception_ptr failure,
+                                             std::optional<fc::http::failure_kind> transport_failure) noexcept;
+   /** Validate the public getGenesisHash result independently of its connection preflight. */
+   solana_genesis_hash validate_returned_genesis_hash(const fc::variant& result,
+                                                      solana_cluster_identity_operation operation);
+   /** Count one protected RPC that failed after admission. */
+   void record_protected_operation_failure(solana_cluster_identity_operation operation);
+   /** Remember a blockhash obtained through a validated RPC connection. */
+   void remember_verified_blockhash(const solana_public_key& blockhash);
+   /** Require pinned signing input to carry a blockhash observed by this client. */
+   void require_verified_blockhash_for_signing(const solana_public_key& blockhash);
+   /** Return whether sticky mismatch currently requires immediate abort. */
+   bool cluster_identity_mismatched() const;
 };
 
 //=============================================================================

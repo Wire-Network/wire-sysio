@@ -1,8 +1,12 @@
 # Solana Cluster Identity Operations
 
 `outpost_solana_client_plugin` can pin each signing-capable Solana RPC client
-to an expected genesis hash. This prevents a reachable but incorrect RPC
-cluster from receiving reads, signatures, or submitted transactions.
+to an expected genesis hash. This detects benign routing and configuration
+errors before a connection receives ordinary reads or submitted transactions.
+It is not endpoint authentication: the genesis hash is public, so a malicious
+RPC service can claim the expected value, and a request-routing proxy can select
+different backends behind one persistent connection. TLS endpoint
+authentication and trusted network routing remain required.
 
 ## Initial backward-compatible rollout
 
@@ -41,28 +45,39 @@ control-plane source. Do not generate configuration by asking the same RPC URL
 that nodeop will pin: that would make a redirected endpoint self-attesting.
 
 Roll out all identity entries for a node in one configuration change. A pinned
-node performs a bounded `getGenesisHash` probe for every client during startup
-and publishes no clients unless all probes match.
+node validates every client's first persistent RPC connection and performs a
+separate ordinary `getGenesisHash` cross-check during startup. The plugin
+publishes no clients unless all startup checks match.
 
 ## Runtime behavior
 
-- Every protected JSON-RPC request first calls `getGenesisHash` on the same
-  HTTP/TLS connection. The protected request is not written unless that peer
-  returns the configured identity and permits connection reuse. This also
-  covers successful fallback between multiple DNS addresses.
-- Signing always performs a fresh bounded probe immediately before invoking
-  the local signer. Transaction submission performs its verification and
-  `sendTransaction` call on one exact connection.
-- Operation-gate queueing shares the configured RPC total-timeout budget.
-  Startup and signing gate waits share the identity-probe timeout, so a stalled
-  concurrent operation cannot create an unbounded wait.
-- Solana clients always honor an earlier active task deadline. The lower-level
-  transport inheritance switch cannot disable these fail-closed client budgets.
+- Every new HTTP/TLS connection calls `getGenesisHash` before its first
+  ordinary JSON-RPC request. The connection is admitted only when that peer
+  returns the configured identity and preserves the connection for reuse.
+  Healthy persistent connections are validated once; replacements and
+  successful fallback to another resolved address are validated independently.
+- Protected JSON-RPC operations can use only an admitted live connection.
+  There is no process-wide cached authorization or per-operation identity
+  re-probe, so one failed connection does not authorize a later replacement.
+  Later callers may reuse the same admitted persistent connection, but its
+  validation never transfers to a different connection.
+- Signing remains local. In pinned mode, a transaction can be signed only when
+  its recent blockhash came from `getLatestBlockhash` over an admitted
+  connection. This binds the transaction to validated provisioning data
+  without adding network I/O to the signing method. Unpinned signing preserves
+  the legacy local-only behavior.
+- The identity validation request has its own bounded timeout. An endpoint
+  that answers the validation and then closes the connection is incompatible
+  with pinned mode because no ordinary request can be safely bound to that
+  validation.
+- Solana clients honor cancellation and an earlier active task deadline while
+  queued as well as during transport work. The lower-level transport
+  inheritance switch cannot disable these fail-closed client budgets.
 - Verification age is telemetry showing time since the latest successful
-  probe. It is not an authorization cache; every protected JSON-RPC operation
-  performs a new peer-bound preflight.
-- A follow-up transport failure cannot reuse the completed preflight. The next
-  operation independently re-resolves when needed and reverifies.
+  connection admission. It is not an authorization TTL; authorization lives
+  only on the admitted connection and disappears when that connection closes.
+- A transport failure cannot transfer admission to a replacement connection.
+  The next connection independently re-resolves when needed and revalidates.
 - Timeout, RPC, and malformed-response failures block the current operation
   but can recover after a later matching probe.
 - An identity mismatch is sticky for the process lifetime. All later protected
@@ -83,8 +98,10 @@ The Prometheus plugin exports:
 - `nodeop_solana_cluster_identity_verification_successes_total`
 - `nodeop_solana_cluster_identity_verification_mismatches_total`
 - `nodeop_solana_cluster_identity_verification_failures_total`
+- `nodeop_solana_cluster_identity_verification_cancellations_total`
 - `nodeop_solana_cluster_identity_verification_recoveries_total`
 - `nodeop_solana_cluster_identity_blocked_operations_total{operation}`
+- `nodeop_solana_cluster_identity_protected_operation_failures_total{operation}`
 
 Recommended initial alerts:
 
@@ -92,8 +109,13 @@ Recommended initial alerts:
 - any client with `status="mismatch"`;
 - sustained `status="error"` or increasing verification failures;
 - increasing blocked signing or submission operations;
-- unexpectedly old verification age while protected operations should be
-  active.
+- increasing protected-operation failures.
+
+Cancellation increases indicate local shutdown or load-shedding activity, not
+an endpoint identity failure. Verification age is the age of the last
+connection admission. It may grow indefinitely while a healthy persistent
+connection remains in use, so it is diagnostic context rather than a
+standalone freshness alert.
 
 Metric labels are bounded to configured client IDs and closed enum values.
 Expected/observed hashes and endpoint URLs are deliberately excluded.

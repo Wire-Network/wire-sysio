@@ -44,10 +44,12 @@ class transport_impl {
 public:
    explicit transport_impl(
       transport_options options,
+      std::optional<connection_validation> validation = std::nullopt,
       detail::resolver_start_fn resolver_start = {})
       : async_client(
            io.get_executor(),
            std::move(options),
+           std::move(validation),
            std::move(resolver_start))
       , poll_timer(io) {}
 
@@ -372,15 +374,37 @@ private:
    std::timed_mutex use_mutex;
 };
 
-transport::transport(transport_options options)
-   : transport(std::move(options), {}) {}
+transport::transport(
+   transport_options options)
+   : transport(
+        std::move(options),
+        std::nullopt,
+        {}) {}
+
+transport::transport(
+   transport_options options,
+   std::optional<connection_validation> validation)
+   : transport(
+        std::move(options),
+        std::move(validation),
+        {}) {}
 
 transport::transport(
    transport_options options,
    detail::resolver_start_fn resolver_start)
+   : transport(
+        std::move(options),
+        std::nullopt,
+        std::move(resolver_start)) {}
+
+transport::transport(
+   transport_options options,
+   std::optional<connection_validation> validation,
+   detail::resolver_start_fn resolver_start)
    : _impl(
         std::make_unique<transport_impl>(
            std::move(options),
+           std::move(validation),
            std::move(resolver_start))) {}
 
 transport::~transport() = default;

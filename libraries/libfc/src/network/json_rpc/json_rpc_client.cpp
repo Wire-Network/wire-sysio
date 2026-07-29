@@ -16,6 +16,7 @@ constexpr std::string_view https_scheme = "https";
 constexpr std::string_view default_http_path = "/";
 constexpr uint32_t single_attempt = 1;
 constexpr uint32_t stale_connection_max_attempts = 2;
+constexpr int64_t connection_validation_request_id = 0;
 constexpr uint32_t ok_status =
    static_cast<uint32_t>(
       boost::beast::http::status::ok);
@@ -38,6 +39,16 @@ fc::http::request_options stale_connection_retry_options(fc::http::request_optio
    return options;
 }
 
+/** Apply one optional upper bound to a request's total timeout. */
+void cap_total_timeout(fc::http::request_options& options,
+                       const std::optional<fc::microseconds>& cap,
+                       std::string_view operation) {
+   if (!cap)
+      return;
+   FC_ASSERT(cap->count() > 0, "{} total timeout cap must be positive", std::string(operation));
+   options.timeouts.total = options.timeouts.total ? std::min(*options.timeouts.total, *cap) : cap;
+}
+
 /** Apply a per-call replay policy and optional total-timeout cap. */
 fc::http::request_options request_options_for(fc::http::request_options options, const call_options& call) {
    switch (call.replay) {
@@ -49,11 +60,7 @@ fc::http::request_options request_options_for(fc::http::request_options options,
       break;
    }
 
-   if (call.total_timeout_cap) {
-      FC_ASSERT(call.total_timeout_cap->count() > 0, "JSON-RPC total timeout cap must be positive");
-      options.timeouts.total =
-         options.timeouts.total ? std::min(*options.timeouts.total, *call.total_timeout_cap) : call.total_timeout_cap;
-   }
+   cap_total_timeout(options, call.total_timeout_cap, "JSON-RPC call");
    return options;
 }
 
@@ -65,17 +72,7 @@ request_options_for(
    options =
       non_replaying_request_options(
          std::move(options));
-   if (call.total_timeout_cap) {
-      FC_ASSERT(
-         call.total_timeout_cap->count() > 0,
-         "JSON-RPC total timeout cap must be positive");
-      options.timeouts.total =
-         options.timeouts.total
-            ? std::min(
-                 *options.timeouts.total,
-                 *call.total_timeout_cap)
-            : call.total_timeout_cap;
-   }
+   cap_total_timeout(options, call.total_timeout_cap, "JSON-RPC follow-up");
    return options;
 }
 
@@ -133,6 +130,17 @@ variant make_call_payload(
    return variant(std::move(object));
 }
 
+/** Build one JSON-RPC POST request for a complete payload. */
+fc::http::request make_http_request(const fc::url& url, const std::string& user_agent, const variant& payload) {
+   return fc::http::request{
+      .method = fc::http::request_method::post,
+      .target = url,
+      .body = fc::json::to_string(payload, fc::json::yield_function_t{}),
+      .content_type = "application/json",
+      .user_agent = user_agent,
+   };
+}
+
 } // namespace
 
 json_rpc_error::json_rpc_error(const std::string& message)
@@ -164,10 +172,69 @@ json_rpc_client::json_rpc_client(fc::url url, const std::optional<std::string>& 
    , _user_agent(user_agent.value_or(BOOST_BEAST_VERSION_STRING))
    , _next_id(1)
    , _options(normalize_options(refresh_policy, std::move(options)))
-   , _transport(_options.transport) {
+   , _transport(_options.transport, make_http_connection_validation(_url, _user_agent, _options)) {
    const auto scheme = _url.proto();
    FC_ASSERT(scheme == http_scheme || scheme == https_scheme, "Unsupported JSON-RPC URL scheme: {}", scheme);
    FC_ASSERT(_url.host() && !_url.host()->empty(), "JSON-RPC URL is missing host");
+}
+
+json_rpc_client::json_rpc_client(json_rpc_client&& other)
+   : _url(std::move(other._url))
+   , _user_agent(std::move(other._user_agent))
+   , _next_id(other._next_id.load(std::memory_order_relaxed))
+   , _options(std::move(other._options))
+   , _transport(std::move(other._transport)) {}
+
+json_rpc_client& json_rpc_client::operator=(json_rpc_client&& other) {
+   if (this == &other)
+      return *this;
+   _url = std::move(other._url);
+   _user_agent = std::move(other._user_agent);
+   _next_id.store(other._next_id.load(std::memory_order_relaxed), std::memory_order_relaxed);
+   _options = std::move(other._options);
+   _transport = std::move(other._transport);
+   return *this;
+}
+
+std::int64_t json_rpc_client::next_request_id() {
+   const auto id = _next_id.fetch_add(1, std::memory_order_relaxed);
+   FC_ASSERT(id > connection_validation_request_id, "JSON-RPC request id space exhausted");
+   return id;
+}
+
+std::optional<fc::http::connection_validation>
+json_rpc_client::make_http_connection_validation(const fc::url& url,
+                                                 const std::string& user_agent,
+                                                 const client_options& options) {
+   if (!options.connection_validator)
+      return std::nullopt;
+
+   const auto& validator = *options.connection_validator;
+   FC_ASSERT(!validator.method.empty(), "JSON-RPC connection validator method must not be empty");
+   FC_ASSERT(static_cast<bool>(validator.validate_result),
+             "JSON-RPC connection validator requires a result predicate");
+
+   auto request_options = non_replaying_request_options(options.request);
+   cap_total_timeout(request_options, validator.total_timeout_cap, "JSON-RPC connection validation");
+
+   return fc::http::connection_validation{
+      .validation_request =
+         make_http_request(
+            url,
+            user_agent,
+            make_call_payload(validator.method, validator.params, connection_validation_request_id)),
+      .options = std::move(request_options),
+      .validate_response =
+         [validate_result = validator.validate_result](const fc::http::response& response) {
+            require_ok(response, "JSON-RPC connection validation");
+            FC_ASSERT(!response.body.empty(), "Empty HTTP body, expected JSON-RPC connection validation response");
+            validate_result(
+               extract_call_result(fc::json::from_string(response.body), connection_validation_request_id));
+         },
+      .on_attempt = validator.on_attempt,
+      .on_success = validator.on_success,
+      .on_failure = validator.on_failure,
+   };
 }
 
 variant json_rpc_client::call(const std::string& method, const fc::variant& params) {
@@ -182,17 +249,11 @@ variant json_rpc_client::call_then(const std::string& method, const fc::variant&
                                    call_options first_call_options, const continuation_hook& continue_with) {
    FC_ASSERT(static_cast<bool>(continue_with), "JSON-RPC continuation hook must be configured");
 
-   const auto initial_id = _next_id++;
-   const auto next_id = _next_id++;
+   const auto initial_id = next_request_id();
+   const auto next_id = next_request_id();
 
    const auto make_request = [&](const variant& payload) {
-      return fc::http::request{
-         .method = fc::http::request_method::post,
-         .target = _url,
-         .body = fc::json::to_string(payload, fc::json::yield_function_t{}),
-         .content_type = "application/json",
-         .user_agent = _user_agent,
-      };
+      return make_http_request(_url, _user_agent, payload);
    };
 
    const auto response = _transport.perform_then(
@@ -224,7 +285,7 @@ variant json_rpc_client::call_then(const std::string& method, const fc::variant&
 }
 
 variant json_rpc_client::call_with_policy(const std::string& method, const fc::variant& params, call_options options) {
-   const auto id = _next_id++;
+   const auto id = next_request_id();
    variant response =
       send_json(
          make_call_payload(method, params, id),
@@ -309,14 +370,7 @@ fc::variant json_rpc_client::call_batch(const std::vector<fc::variant>& requests
 
 variant json_rpc_client::send_json(const variant& payload, bool expect_json_body,
                                    fc::http::request_options request_options) {
-   const auto body = fc::json::to_string(payload, fc::json::yield_function_t{});
-   fc::http::request request{
-      .method = fc::http::request_method::post,
-      .target = _url,
-      .body = body,
-      .content_type = "application/json",
-      .user_agent = _user_agent,
-   };
+   auto request = make_http_request(_url, _user_agent, payload);
    const auto response = _transport.perform(request, std::move(request_options));
    require_ok(response, "JSON-RPC request");
 

@@ -1095,6 +1095,7 @@ struct connection_state {
    }
 
    stream_variant stream;
+   bool validation_complete = false;
 };
 
 /** Monotonic clock used for connection-pool residence time. */
@@ -1324,9 +1325,11 @@ public:
    explicit client_impl(
       asio::any_io_executor executor,
       transport_options options_in,
+      std::optional<connection_validation> validation_in = std::nullopt,
       detail::resolver_start_fn resolver_start_in = {})
       : strand(asio::make_strand(std::move(executor)))
       , options(std::move(options_in))
+      , validation(std::move(validation_in))
       , tls_context(asio::ssl::context::tls_client)
       , resolver_start(std::move(resolver_start_in)) {
       FC_ASSERT(
@@ -1336,6 +1339,14 @@ public:
       FC_ASSERT(
          options.max_idle_connection_age.count() > 0,
          "Outbound HTTP idle connection age must be positive");
+      if (validation) {
+         FC_ASSERT(
+            static_cast<bool>(validation->validate_response),
+            "Outbound HTTP connection validation requires a response validator");
+         FC_ASSERT(
+            validation->options.retry.max_attempts == 1,
+            "Outbound HTTP connection validation must be single-attempt");
+      }
       tls_context.set_verify_mode(asio::ssl::verify_peer);
       error_code error;
       tls_context.set_default_verify_paths(error);
@@ -1400,6 +1411,7 @@ public:
 
    asio::strand<asio::any_io_executor> strand;
    transport_options options;
+   std::optional<connection_validation> validation;
    asio::ssl::context tls_context;
    detail::resolver_start_fn resolver_start;
    std::optional<std::string> proxy_host;
@@ -2433,6 +2445,14 @@ public:
       connection_affinity affinity = {},
       bool retain_connection = false);
 
+   /** Validate one newly opened connection before its first ordinary request. */
+   asio::awaitable<void>
+   validate_connection(
+      const target_info& target,
+      const std::shared_ptr<connection_state>& connection,
+      const std::shared_ptr<request_control>& control,
+      const std::optional<time_point>& request_total_deadline);
+
    asio::awaitable<void>
    async_warm_up(
       url target,
@@ -2640,6 +2660,84 @@ public:
    bool reading = false;
 };
 
+asio::awaitable<void>
+client_impl::validate_connection(
+   const target_info& target,
+   const std::shared_ptr<connection_state>& connection,
+   const std::shared_ptr<request_control>& control,
+   const std::optional<time_point>& request_total_deadline) {
+   FC_ASSERT(validation, "Outbound HTTP connection validation is not configured");
+   FC_ASSERT(!connection->validation_complete, "Outbound HTTP connection was already validated");
+
+   try {
+      if (validation->on_attempt)
+         validation->on_attempt();
+
+      auto validation_options = validation->options;
+      if (request_total_deadline) {
+         const auto remaining = *request_total_deadline - time_point::now();
+         if (remaining.count() <= 0) {
+            throw transport_failure(
+               failure_kind::timeout_total,
+               "request deadline expired before connection validation");
+         }
+         validation_options.timeouts.total =
+            validation_options.timeouts.total
+               ? std::min(*validation_options.timeouts.total, remaining)
+               : std::optional(remaining);
+      }
+
+      auto reader = co_await async_open(
+         validation->validation_request,
+         std::move(validation_options),
+         control,
+         {},
+         connection_affinity{
+            .connection = connection,
+            .connection_key = target.connection_key,
+         },
+         true);
+
+      response validation_response{
+         .status = reader->value_head.status,
+         .reason = reader->value_head.reason,
+      };
+      std::array<char, body_read_buffer_bytes> body_buffer{};
+      while (!reader->complete.load(std::memory_order_acquire)) {
+         const auto bytes = co_await reader->read_some(asio::buffer(body_buffer));
+         validation_response.body.append(body_buffer.data(), bytes);
+      }
+
+      validation->validate_response(validation_response);
+      if (!connection->open()) {
+         throw transport_failure(
+            failure_kind::connect,
+            "connection validation response did not preserve a persistent connection");
+      }
+      if (validation->on_success)
+         validation->on_success();
+      connection->validation_complete = true;
+   } catch (...) {
+      connection->close();
+      const auto failure = std::current_exception();
+      std::optional<failure_kind> transport_kind;
+      try {
+         std::rethrow_exception(failure);
+      } catch (const transport_failure& transport_error) {
+         transport_kind = transport_error.kind;
+      } catch (...) {
+      }
+      if (validation->on_failure) {
+         try {
+            validation->on_failure(failure, transport_kind);
+         } catch (...) {
+            // Observation cannot replace the validation failure seen by the caller.
+         }
+      }
+      std::rethrow_exception(failure);
+   }
+}
+
 asio::awaitable<std::shared_ptr<response_reader_impl>>
 client_impl::async_open(
    request req,
@@ -2708,6 +2806,9 @@ client_impl::async_open(
             connection = std::move(acquired.first);
             reused = acquired.second;
          }
+
+         if (!affinity && validation && !connection->validation_complete)
+            co_await validate_connection(target, connection, control, total_deadline);
 
          auto request_message = build_request(req, target);
          if (on_phase)
@@ -2914,18 +3015,45 @@ async_close_retained_response(
    co_return;
 }
 
-client::client(asio::any_io_executor executor,
-               transport_options options)
-   : client(std::move(executor), std::move(options), {}) {}
+client::client(
+   asio::any_io_executor executor,
+   transport_options options)
+   : client(
+        std::move(executor),
+        std::move(options),
+        std::nullopt,
+        {}) {}
+
+client::client(
+   asio::any_io_executor executor,
+   transport_options options,
+   std::optional<connection_validation> validation)
+   : client(
+        std::move(executor),
+        std::move(options),
+        std::move(validation),
+        {}) {}
 
 client::client(
    asio::any_io_executor executor,
    transport_options options,
    detail::resolver_start_fn resolver_start)
+   : client(
+        std::move(executor),
+        std::move(options),
+        std::nullopt,
+        std::move(resolver_start)) {}
+
+client::client(
+   asio::any_io_executor executor,
+   transport_options options,
+   std::optional<connection_validation> validation,
+   detail::resolver_start_fn resolver_start)
    : _impl(
         std::make_shared<client_impl>(
            std::move(executor),
            std::move(options),
+           std::move(validation),
            std::move(resolver_start))) {}
 
 client::~client() = default;

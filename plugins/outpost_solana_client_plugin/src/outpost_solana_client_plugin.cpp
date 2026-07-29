@@ -1,4 +1,6 @@
+#include <algorithm>
 #include <fc/log/logger.hpp>
+#include <future>
 #include <magic_enum/magic_enum.hpp>
 #include <ranges>
 #include <set>
@@ -25,6 +27,7 @@ constexpr outbound_http::transport_option_names
       .proxy = "outpost-solana-proxy",
    };
 constexpr uint32_t default_identity_probe_timeout_ms = 5'000;
+constexpr size_t max_concurrent_startup_validations = 8;
 
 /** Credential-bearing client configuration parsed before any client is published. */
 struct parsed_client_spec {
@@ -46,6 +49,7 @@ class outpost_solana_client_plugin_impl {
    using file_idl_programs_t = std::pair<std::filesystem::path, std::vector<fc::network::solana::idl::program>>;
    std::vector<file_idl_programs_t> _idl_files{};
    std::string _outpost_program_name{OPP_SOLANA_OUTPOST_PROGRAM_NAME};
+   solana_cluster_identity_metrics::snapshot_provider::method_type::handle _snapshot_provider;
 
 public:
    void set_outpost_program_name(std::string name) {
@@ -88,12 +92,24 @@ public:
       return snapshots;
    }
 
-   solana_client_entry_ptr get_client(const std::string& id) { return _clients.at(id); }
+   solana_client_entry_ptr get_client(const std::string& id) {
+      const auto found = _clients.find(id);
+      FC_ASSERT(found != _clients.end(), "Unknown Solana client id '{}'", id);
+      return found->second;
+   }
 
    void add_client(const std::string& id, solana_client_entry_ptr client) {
       FC_ASSERT(client, "Client cannot be null");
       FC_ASSERT(!_clients.contains(id), "Client with id {} already exists", id);
       _clients.emplace(id, client);
+   }
+
+   /** Publish the configured clients through the app-level metrics interface. */
+   void register_snapshot_provider() {
+      _snapshot_provider =
+         app()
+            .get_method<solana_cluster_identity_metrics::snapshot_provider>()
+            .register_provider([this] { return get_cluster_identity_snapshots(); });
    }
 
    const std::vector<file_idl_programs_t>& get_idl_files() { return _idl_files; }
@@ -128,10 +144,12 @@ void outpost_solana_client_plugin::plugin_initialize(const variables_map& option
    parsed_clients.reserve(client_specs.size());
    std::set<std::string> client_ids;
 
-   for (const auto& client_spec : client_specs) {
+   for (size_t spec_index = 0; spec_index < client_specs.size(); ++spec_index) {
+      const auto& client_spec = client_specs[spec_index];
       auto parts = fc::split(client_spec, ',');
       SYS_ASSERT(parts.size() == 3, chain::plugin_config_exception,
-                 "Invalid {} spec (expected exactly: <client-id>,<sig-provider-id>,<rpc-url>)", option_name_client);
+                 "Invalid {} entry #{} (expected exactly: <client-id>,<sig-provider-id>,<rpc-url>)",
+                 option_name_client, spec_index + 1);
 
       auto& id = parts[0];
       auto& sig_id = parts[1];
@@ -174,11 +192,12 @@ void outpost_solana_client_plugin::plugin_initialize(const variables_map& option
    const bool pinning_enabled = options.contains(option_name_cluster_identity);
    if (pinning_enabled) {
       const auto identity_specs = options.at(option_name_cluster_identity).as<std::vector<std::string>>();
-      for (const auto& identity_spec : identity_specs) {
+      for (size_t spec_index = 0; spec_index < identity_specs.size(); ++spec_index) {
+         const auto& identity_spec = identity_specs[spec_index];
          auto parts = fc::split(identity_spec, ',');
          SYS_ASSERT(parts.size() == 2, chain::plugin_config_exception,
-                    "Invalid {} spec (expected exactly: <client-id>,<expected-genesis-hash>)",
-                    option_name_cluster_identity);
+                    "Invalid {} entry #{} (expected exactly: <client-id>,<expected-genesis-hash>)",
+                    option_name_cluster_identity, spec_index + 1);
          const auto& client_id = parts[0];
          const auto& expected_hash = parts[1];
          SYS_ASSERT(!client_id.empty(), chain::plugin_config_exception,
@@ -213,29 +232,52 @@ void outpost_solana_client_plugin::plugin_initialize(const variables_map& option
    // Construct every client before publishing any of them. If a pinned startup
    // probe fails, the plugin exits with an empty registry rather than exposing
    // the clients that happened to validate first.
-   std::vector<solana_client_entry_ptr> pending_clients;
-   pending_clients.reserve(parsed_clients.size());
-   for (const auto& client : parsed_clients) {
-      auto sig_provider = sig_mgr.get_provider(client.signature_provider_id);
-      solana_client_ptr rpc_client;
-      if (pinning_enabled) {
-         rpc_client = std::make_shared<solana_client>(
-            sig_provider, client.parsed_rpc_url, rpc_options,
-            solana_cluster_identity_config{
-               .client_id = client.id,
-               .expected_genesis_hash = expected_identities.at(client.id),
-               .probe_timeout = probe_timeout,
-            });
-      } else {
-         rpc_client = std::make_shared<solana_client>(sig_provider, client.parsed_rpc_url, rpc_options);
+   std::vector<solana_client_entry_ptr> pending_clients(parsed_clients.size());
+   if (pinning_enabled) {
+      for (size_t batch_begin = 0; batch_begin < parsed_clients.size();
+           batch_begin += max_concurrent_startup_validations) {
+         const auto batch_end =
+            std::min(parsed_clients.size(), batch_begin + max_concurrent_startup_validations);
+         std::vector<std::future<solana_client_entry_ptr>> startup_validations;
+         startup_validations.reserve(batch_end - batch_begin);
+         for (size_t index = batch_begin; index < batch_end; ++index) {
+            const auto& client = parsed_clients[index];
+            auto sig_provider = sig_mgr.get_provider(client.signature_provider_id);
+            const auto expected_identity = expected_identities.at(client.id);
+            startup_validations.push_back(std::async(
+               std::launch::async,
+               [sig_provider, client, rpc_options, expected_identity, probe_timeout] {
+                  auto rpc_client = std::make_shared<solana_client>(
+                     sig_provider,
+                     client.parsed_rpc_url,
+                     rpc_options,
+                     solana_cluster_identity_config{
+                        .client_id = client.id,
+                        .expected_genesis_hash = expected_identity,
+                        .probe_timeout = probe_timeout,
+                     });
+                  return std::make_shared<solana_client_entry_t>(
+                     client.id,
+                     client.rpc_url,
+                     std::move(rpc_client));
+               }));
+         }
+         for (size_t batch_offset = 0; batch_offset < startup_validations.size(); ++batch_offset)
+            pending_clients[batch_begin + batch_offset] = startup_validations[batch_offset].get();
+      }
+   } else {
+      for (size_t index = 0; index < parsed_clients.size(); ++index) {
+         const auto& client = parsed_clients[index];
+         auto sig_provider = sig_mgr.get_provider(client.signature_provider_id);
+         auto rpc_client = std::make_shared<solana_client>(sig_provider, client.parsed_rpc_url, rpc_options);
          wlog("SEC-139 staged rollout: Solana client '{}' is running without cluster identity "
               "pinning (reason={}). Supply --{} for every configured Solana client to enable "
               "strict pinned mode.",
               client.id, magic_enum::enum_name(solana_cluster_identity_reason::missing_expected_identity),
               option_name_cluster_identity);
+         pending_clients[index] =
+            std::make_shared<solana_client_entry_t>(client.id, client.rpc_url, std::move(rpc_client));
       }
-      pending_clients.push_back(
-         std::make_shared<solana_client_entry_t>(client.id, client.rpc_url, std::move(rpc_client)));
    }
 
    for (std::size_t i = 0; i < pending_clients.size(); ++i) {
@@ -247,6 +289,7 @@ void outpost_solana_client_plugin::plugin_initialize(const variables_map& option
            pinning_enabled ? magic_enum::enum_name(solana_cluster_identity_mode::pinned)
                            : magic_enum::enum_name(solana_cluster_identity_mode::unpinned));
    }
+   my->register_snapshot_provider();
 }
 
 void outpost_solana_client_plugin::plugin_startup() {

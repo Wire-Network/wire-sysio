@@ -19,6 +19,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <array>
+#include <exception>
 #include <filesystem>
 #include <functional>
 #include <memory>
@@ -222,6 +223,29 @@ struct response {
 };
 
 /**
+ * Generic validation performed once for every newly established connection.
+ *
+ * The validation request must target the same endpoint as ordinary requests.
+ * A connection enters the idle pool only after the bounded response is
+ * accepted and the peer keeps the connection alive. Validation state belongs
+ * to the connection and is discarded when that connection closes.
+ */
+struct connection_validation {
+   /// Bounded request sent before the first ordinary request on a connection.
+   request validation_request;
+   /// Single-attempt limits and deadlines for the validation request.
+   request_options options;
+   /// Accept the complete validation response or throw to reject the connection.
+   std::function<void(const response&)> validate_response;
+   /// Observe the start of one connection-validation attempt; must not block.
+   std::function<void()> on_attempt;
+   /// Observe one accepted, persistent connection; must not throw.
+   std::function<void()> on_success;
+   /// Observe one rejected validation attempt; must not throw.
+   std::function<void(std::exception_ptr, std::optional<failure_kind>)> on_failure;
+};
+
+/**
  * One request selected by a connection-affine continuation hook.
  *
  * The request must target the same transport endpoint as the completed
@@ -329,6 +353,10 @@ class client {
 public:
    explicit client(boost::asio::any_io_executor executor,
                    transport_options options = {});
+   /** Construct a client that validates every newly established connection before use. */
+   client(boost::asio::any_io_executor executor,
+          transport_options options,
+          std::optional<connection_validation> validation);
    ~client();
 
    client(const client&) = delete;
@@ -387,6 +415,10 @@ private:
    client(boost::asio::any_io_executor executor,
           transport_options options,
           detail::resolver_start_fn resolver_start);
+   client(boost::asio::any_io_executor executor,
+          transport_options options,
+          std::optional<connection_validation> validation,
+          detail::resolver_start_fn resolver_start);
 
    std::shared_ptr<class client_impl> _impl;
 };
@@ -412,6 +444,9 @@ async_download_atomic(
 class transport {
 public:
    explicit transport(transport_options options = {});
+   /** Construct a blocking adapter that validates every newly established connection before use. */
+   transport(transport_options options,
+             std::optional<connection_validation> validation);
    ~transport();
 
    transport(const transport&) = delete;
@@ -456,6 +491,9 @@ private:
    friend struct transport_test_access;
 
    transport(transport_options options,
+             detail::resolver_start_fn resolver_start);
+   transport(transport_options options,
+             std::optional<connection_validation> validation,
              detail::resolver_start_fn resolver_start);
 
    std::unique_ptr<class transport_impl> _impl;

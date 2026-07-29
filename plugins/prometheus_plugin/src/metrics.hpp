@@ -5,6 +5,7 @@
 #include <fc/network/http/http_client.hpp>
 #include <fc/network/solana/solana_client.hpp>
 #include <magic_enum/magic_enum.hpp>
+#include <limits>
 #include <map>
 #include <prometheus/counter.h>
 #include <prometheus/info.h>
@@ -141,8 +142,10 @@ struct catalog_type {
       prometheus::Family<Counter>& verification_successes;
       prometheus::Family<Counter>& verification_mismatches;
       prometheus::Family<Counter>& verification_failures;
+      prometheus::Family<Counter>& verification_cancellations;
       prometheus::Family<Counter>& verification_recoveries;
       prometheus::Family<Counter>& blocked_operations;
+      prometheus::Family<Counter>& protected_operation_failures;
    };
    solana_cluster_identity_metrics solana_identity_metrics;
 
@@ -154,8 +157,10 @@ struct catalog_type {
       Counter* verification_successes = nullptr;
       Counter* verification_mismatches = nullptr;
       Counter* verification_failures = nullptr;
+      Counter* verification_cancellations = nullptr;
       Counter* verification_recoveries = nullptr;
       std::map<fc::network::solana::solana_cluster_identity_operation, Counter*> blocked_operations;
+      std::map<fc::network::solana::solana_cluster_identity_operation, Counter*> protected_operation_failures;
       fc::network::solana::solana_cluster_identity_snapshot previous;
    };
    std::unordered_map<std::string, tracked_solana_identity_series> tracked_solana_identity_series_by_client;
@@ -255,7 +260,7 @@ struct catalog_type {
                "Current Solana cluster identity mode, status, and reason (always 1)")}
           , .verification_age_seconds{family<Gauge>(
                "nodeop_solana_cluster_identity_verification_age_seconds",
-               "Age of the last successful Solana cluster identity verification; -1 when never verified")}
+               "Age of the last successful Solana cluster identity verification; NaN when never verified")}
           , .verification_attempts{family<Counter>(
                "nodeop_solana_cluster_identity_verification_attempts_total",
                "Total Solana cluster identity verification attempts")}
@@ -268,12 +273,18 @@ struct catalog_type {
           , .verification_failures{family<Counter>(
                "nodeop_solana_cluster_identity_verification_failures_total",
                "Total Solana cluster identity verification transport or format failures")}
+          , .verification_cancellations{family<Counter>(
+               "nodeop_solana_cluster_identity_verification_cancellations_total",
+               "Total Solana cluster identity verifications cancelled by the local caller")}
           , .verification_recoveries{family<Counter>(
                "nodeop_solana_cluster_identity_verification_recoveries_total",
                "Total Solana cluster identity verification recoveries")}
           , .blocked_operations{family<Counter>(
                "nodeop_solana_cluster_identity_blocked_operations_total",
                "Total protected Solana operations blocked by cluster identity verification")}
+          , .protected_operation_failures{family<Counter>(
+               "nodeop_solana_cluster_identity_protected_operation_failures_total",
+               "Total pinned Solana RPC operations that failed before returning a result")}
          } {
       for (const auto failure : magic_enum::enum_values<fc::http::failure_kind>()) {
          const auto index = magic_enum::enum_index(failure);
@@ -405,25 +416,37 @@ struct catalog_type {
             series.verification_successes = &solana_identity_metrics.verification_successes.Add(client_labels);
             series.verification_mismatches = &solana_identity_metrics.verification_mismatches.Add(client_labels);
             series.verification_failures = &solana_identity_metrics.verification_failures.Add(client_labels);
+            series.verification_cancellations =
+               &solana_identity_metrics.verification_cancellations.Add(client_labels);
             series.verification_recoveries = &solana_identity_metrics.verification_recoveries.Add(client_labels);
             for (const auto operation : magic_enum::enum_values<solana_cluster_identity_operation>()) {
                auto operation_labels = client_labels;
                operation_labels.emplace("operation", std::string(magic_enum::enum_name(operation)));
                series.blocked_operations.emplace(operation,
                                                  &solana_identity_metrics.blocked_operations.Add(operation_labels));
+               series.protected_operation_failures.emplace(
+                  operation,
+                  &solana_identity_metrics.protected_operation_failures.Add(operation_labels));
             }
-         } else {
-            solana_identity_metrics.state.Remove(series.state);
          }
 
-         auto state_labels = client_labels;
-         state_labels.emplace("mode", std::string(magic_enum::enum_name(snapshot.mode)));
-         state_labels.emplace("status", std::string(magic_enum::enum_name(snapshot.status)));
-         state_labels.emplace("reason", std::string(magic_enum::enum_name(snapshot.reason)));
-         series.state = &solana_identity_metrics.state.Add(state_labels);
-         series.state->Set(1);
+         const bool state_changed =
+            inserted || snapshot.mode != series.previous.mode || snapshot.status != series.previous.status ||
+            snapshot.reason != series.previous.reason;
+         if (state_changed && !inserted)
+            solana_identity_metrics.state.Remove(series.state);
+         if (state_changed) {
+            auto state_labels = client_labels;
+            state_labels.emplace("mode", std::string(magic_enum::enum_name(snapshot.mode)));
+            state_labels.emplace("status", std::string(magic_enum::enum_name(snapshot.status)));
+            state_labels.emplace("reason", std::string(magic_enum::enum_name(snapshot.reason)));
+            series.state = &solana_identity_metrics.state.Add(state_labels);
+            series.state->Set(1);
+         }
          series.verification_age_seconds->Set(
-            snapshot.verification_age ? static_cast<double>(snapshot.verification_age->count()) / 1'000'000.0 : -1.0);
+            snapshot.verification_age
+               ? static_cast<double>(snapshot.verification_age->count()) / 1'000'000.0
+               : std::numeric_limits<double>::quiet_NaN());
 
          increment_from_snapshot(*series.verification_attempts, snapshot.verification_attempts,
                                  series.previous.verification_attempts);
@@ -433,6 +456,8 @@ struct catalog_type {
                                  series.previous.verification_mismatches);
          increment_from_snapshot(*series.verification_failures, snapshot.verification_failures,
                                  series.previous.verification_failures);
+         increment_from_snapshot(*series.verification_cancellations, snapshot.verification_cancellations,
+                                 series.previous.verification_cancellations);
          increment_from_snapshot(*series.verification_recoveries, snapshot.verification_recoveries,
                                  series.previous.verification_recoveries);
          for (const auto operation : magic_enum::enum_values<solana_cluster_identity_operation>()) {
@@ -442,6 +467,15 @@ struct catalog_type {
                                      ? series.previous.blocked_operations.at(operation)
                                      : 0;
             increment_from_snapshot(*series.blocked_operations.at(operation), current, previous);
+
+            const auto protected_current = snapshot.protected_operation_failures.contains(operation)
+                                              ? snapshot.protected_operation_failures.at(operation)
+                                              : 0;
+            const auto protected_previous = series.previous.protected_operation_failures.contains(operation)
+                                               ? series.previous.protected_operation_failures.at(operation)
+                                               : 0;
+            increment_from_snapshot(*series.protected_operation_failures.at(operation), protected_current,
+                                    protected_previous);
          }
          series.previous = snapshot;
       }
@@ -460,10 +494,15 @@ struct catalog_type {
          solana_identity_metrics.verification_successes.Remove(series.verification_successes);
          solana_identity_metrics.verification_mismatches.Remove(series.verification_mismatches);
          solana_identity_metrics.verification_failures.Remove(series.verification_failures);
+         solana_identity_metrics.verification_cancellations.Remove(series.verification_cancellations);
          solana_identity_metrics.verification_recoveries.Remove(series.verification_recoveries);
          for (const auto& [operation, counter] : series.blocked_operations) {
             (void)operation;
             solana_identity_metrics.blocked_operations.Remove(counter);
+         }
+         for (const auto& [operation, counter] : series.protected_operation_failures) {
+            (void)operation;
+            solana_identity_metrics.protected_operation_failures.Remove(counter);
          }
          it = tracked_solana_identity_series_by_client.erase(it);
       }

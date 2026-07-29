@@ -14,12 +14,16 @@ namespace sysio {
 
    using namespace prometheus;
 
+   constexpr int optional_metrics_fallback_priority = 1'000;
+
    struct prometheus_plugin_impl {
 
       sysio::chain::named_thread_pool<struct prom> _prometheus_thread_pool;
       boost::asio::io_context::strand              _prometheus_strand{_prometheus_thread_pool.get_executor()};
       metrics::catalog_type                        _catalog;
       fc::microseconds                             _max_response_time_us;
+      solana_cluster_identity_metrics::snapshot_provider::method_type* _solana_identity_snapshots = nullptr;
+      solana_cluster_identity_metrics::snapshot_provider::method_type::handle _empty_solana_identity_snapshots;
    };
 
    prometheus_plugin::prometheus_plugin()
@@ -40,9 +44,7 @@ namespace sysio {
 
       void metrics(const fc::variant_object&, chain::plugin_interface::next_function<std::string> results) {
          boost::asio::post(_impl->_prometheus_strand, [this, results=std::move(results)]() {
-            if (auto* solana_plugin = app().find_plugin<outpost_solana_client_plugin>()) {
-               _impl->_catalog.update(solana_plugin->get_cluster_identity_snapshots());
-            }
+            _impl->_catalog.update((*_impl->_solana_identity_snapshots)());
             results(_impl->_catalog.report());
          });
       }
@@ -52,6 +54,13 @@ namespace sysio {
 
    void prometheus_plugin::plugin_initialize(const variables_map& options) {
       my->_catalog.register_update_handlers(my->_prometheus_strand);
+      auto& solana_identity_snapshots =
+         app().get_method<solana_cluster_identity_metrics::snapshot_provider>();
+      my->_solana_identity_snapshots = &solana_identity_snapshots;
+      my->_empty_solana_identity_snapshots =
+         solana_identity_snapshots.register_provider(
+            [] { return std::vector<fc::network::solana::solana_cluster_identity_snapshot>{}; },
+            optional_metrics_fallback_priority);
 
       auto& _http_plugin = app().get_plugin<http_plugin>();
       my->_max_response_time_us = _http_plugin.get_max_response_time();

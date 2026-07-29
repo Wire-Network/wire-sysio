@@ -1,6 +1,8 @@
 #pragma once
 
+#include <atomic>
 #include <cstdint>
+#include <exception>
 #include <fc/io/json.hpp>
 #include <fc/network/http/http_client.hpp>
 #include <fc/network/url.hpp>
@@ -25,6 +27,30 @@ enum class http_verb { GET, PUT, POST, DELETE_ };
 /// Control whether connection failures invalidate the client's startup DNS result.
 enum class endpoint_refresh_policy { on_connection_failure, never };
 
+/**
+ * JSON-RPC method and result predicate used to validate each new connection.
+ *
+ * The validator runs before the first ordinary request on a connection. Its
+ * successful state is discarded with that connection. Lifecycle observers
+ * support domain telemetry without leaking domain concepts into HTTP policy.
+ */
+struct connection_validation {
+   /// Validation method sent before the first ordinary request.
+   std::string method;
+   /// Validation method parameters.
+   fc::variant params = variants{};
+   /// Upper bound for one validation call.
+   std::optional<fc::microseconds> total_timeout_cap;
+   /// Accept the extracted JSON-RPC result or throw to reject the connection.
+   std::function<void(const fc::variant&)> validate_result;
+   /// Observe one validation attempt; may throw to reject before network I/O.
+   std::function<void()> on_attempt;
+   /// Observe one accepted persistent connection; must not throw.
+   std::function<void()> on_success;
+   /// Observe one rejected validation attempt; must not throw.
+   std::function<void(std::exception_ptr, std::optional<fc::http::failure_kind>)> on_failure;
+};
+
 /** Shared transport and per-request policy for one JSON-RPC client. */
 struct client_options {
    /// TLS trust, explicit proxy, and DNS-cache configuration.
@@ -33,6 +59,8 @@ struct client_options {
    };
    /// Caller-specific deadlines, byte ceilings, cancellation, and retry policy.
    fc::http::request_options request;
+   /// Optional validator run once on every newly established connection.
+   std::optional<connection_validation> connection_validator;
 };
 
 /** Replay behavior for one JSON-RPC call. */
@@ -91,6 +119,10 @@ public:
    explicit json_rpc_client(fc::url url, const std::optional<std::string>& user_agent = std::nullopt,
                             endpoint_refresh_policy refresh_policy = endpoint_refresh_policy::on_connection_failure,
                             client_options options = {});
+   /** Move a client while preserving its transport and next request ID. */
+   json_rpc_client(json_rpc_client&& other);
+   /** Move-assign a client while preserving its transport and next request ID. */
+   json_rpc_client& operator=(json_rpc_client&& other);
 
    // -----------------------------------------------------------------------
    //  JSON-RPC 2.0 methods (unchanged, backwards compatible)
@@ -146,9 +178,18 @@ public:
 private:
    fc::url _url;
    std::string _user_agent;
-   std::int64_t _next_id;
+   std::atomic<std::int64_t> _next_id;
    client_options _options;
    fc::http::transport _transport;
+
+   /** Reserve one request ID safely across concurrent synchronous callers. */
+   std::int64_t next_request_id();
+
+   /** Build the generic HTTP validator for this fixed JSON-RPC endpoint. */
+   static std::optional<fc::http::connection_validation>
+   make_http_connection_validation(const fc::url& url,
+                                   const std::string& user_agent,
+                                   const client_options& options);
 
    /** Build and perform one call with an explicit replay policy. */
    variant call_with_policy(const std::string& method, const fc::variant& params, call_options options);

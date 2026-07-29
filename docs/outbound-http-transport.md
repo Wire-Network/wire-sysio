@@ -55,6 +55,24 @@ closed before reuse, which keeps the reuse window below common provider keep-ali
 peer-closed sockets retained by the process. A non-blocking socket peek also rejects a cached connection when a
 peer FIN/reset or unexpected unread bytes are already observable.
 
+## Per-connection validation
+
+The asynchronous client and blocking adapter accept an optional generic validator for fixed-endpoint clients. Before
+the first ordinary request on each newly established connection, the transport sends one bounded, single-attempt
+validation request to that same endpoint. The response predicate either admits the connection or throws to reject
+and close it. An admitted connection must remain persistent; if the peer closes the validation response, the
+transport rejects it because no subsequent operation can be bound to that observation.
+
+Validation state belongs to the live HTTP/TLS connection and is discarded when it closes. A replacement or fallback
+connection therefore validates independently before carrying ordinary work. The attempt, success, and failure
+lifecycle callbacks are non-blocking telemetry hooks; they cannot change the single-attempt policy and must not
+throw from completion callbacks. The initiating ordinary request's already-started total deadline caps the
+validation deadline, so validation cannot extend that request's overall budget.
+
+For a connection-affine continuation, validation precedes the initial call. The hook and follow-up then use the same
+already-admitted connection; the continuation mechanism does not trigger another validation between its two legs.
+This keeps endpoint admission generic and independent from higher-level JSON-RPC or chain-specific policy.
+
 ## Connection-affine continuations
 
 The asynchronous client and blocking compatibility adapter expose a generic one-step continuation hook. The

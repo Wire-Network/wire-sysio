@@ -6,9 +6,11 @@
 
 #include <fc/io/json.hpp>
 
+#include <atomic>
 #include <chrono>
 #include <condition_variable>
 #include <cstdint>
+#include <memory>
 #include <mutex>
 #include <optional>
 #include <sstream>
@@ -33,7 +35,11 @@ struct scripted_json_rpc_response {
 
    kind        response_kind = kind::result;
    fc::variant payload;
+   std::optional<int64_t> response_id;
    std::chrono::microseconds delay{0};
+   std::shared_ptr<std::atomic_bool> release_gate;
+   bool keep_alive = true;
+   bool reset_after_response = false;
 
    /** Return a successful JSON-RPC result. */
    static scripted_json_rpc_response result(fc::variant value) {
@@ -48,6 +54,17 @@ struct scripted_json_rpc_response {
          .response_kind = kind::result,
          .payload = std::move(value),
          .delay = delay,
+      };
+   }
+
+   /** Return a successful result after the caller releases a shared gate. */
+   static scripted_json_rpc_response gated_result(
+      fc::variant value,
+      std::shared_ptr<std::atomic_bool> release_gate) {
+      return {
+         .response_kind = kind::result,
+         .payload = std::move(value),
+         .release_gate = std::move(release_gate),
       };
    }
 
@@ -83,6 +100,13 @@ struct scripted_json_rpc_response {
  */
 class scripted_json_rpc_server {
 public:
+   /** One request observed by the scripted endpoint. */
+   struct request_record {
+      std::string method;
+      size_t connection = 0;
+      std::optional<int64_t> id;
+   };
+
    explicit scripted_json_rpc_server(std::vector<scripted_json_rpc_response> responses)
       : scripted_json_rpc_server(std::move(responses), "127.0.0.1", 0, false) {}
 
@@ -115,6 +139,11 @@ public:
       _stopping_changed.notify_all();
 
       boost::system::error_code error;
+      {
+         std::scoped_lock socket_lock(_socket_mutex);
+         if (_active_socket)
+            _active_socket->shutdown(tcp::socket::shutdown_both, error);
+      }
       boost::asio::io_context wake_io;
       tcp::socket wake_socket(wake_io);
       wake_socket.connect(
@@ -125,6 +154,12 @@ public:
          _worker.join();
       }
       _acceptor.close(error);
+      {
+         std::scoped_lock socket_lock(_socket_mutex);
+         if (_active_socket)
+            _active_socket->close(error);
+         _active_socket.reset();
+      }
    }
 
    /** Return the loopback URL selected for this server. */
@@ -152,6 +187,15 @@ public:
       return _request_methods;
    }
 
+   /** Return how many TCP connections accepted a request. */
+   size_t connection_count() const noexcept { return _connection_count.load(); }
+
+   /** Return request methods and their accepted connection number. */
+   std::vector<request_record> requests() const {
+      std::lock_guard lock(_mutex);
+      return _requests;
+   }
+
 private:
    using tcp = boost::asio::ip::tcp;
 
@@ -161,47 +205,67 @@ private:
       return _stopping;
    }
 
+   /** Serialize worker-side socket options and close against destructor shutdown. */
+   void close_socket(const std::shared_ptr<tcp::socket>& socket,
+                     boost::system::error_code& error,
+                     bool reset_connection = false) {
+      std::scoped_lock socket_lock(_socket_mutex);
+      if (reset_connection)
+         socket->set_option(boost::asio::socket_base::linger(true, 0), error);
+      socket->close(error);
+   }
+
    /** Consume scripted responses sequentially on the worker thread. */
    void serve() {
       size_t response_index = 0;
       while (!stopping()) {
          boost::system::error_code error;
-         tcp::socket socket(_io);
-         _acceptor.accept(socket, error);
+         auto socket = std::make_shared<tcp::socket>(_io);
+         _acceptor.accept(*socket, error);
          if (error || stopping()) {
             return;
          }
+         {
+            std::scoped_lock socket_lock(_socket_mutex);
+            _active_socket = socket;
+         }
+         const auto connection = _connection_count.fetch_add(1) + 1;
 
          boost::beast::flat_buffer request_buffer;
          while (!stopping()) {
             boost::beast::http::request<boost::beast::http::string_body> request;
-            boost::beast::http::read(socket, request_buffer, request, error);
+            boost::beast::http::read(*socket, request_buffer, request, error);
             if (error) {
                break;
             }
+
+            if (response_index >= _responses.size()) {
+               close_socket(socket, error);
+               break;
+            }
+            const auto response = _responses[response_index++];
+            const bool script_complete = response_index >= _responses.size();
 
             fc::variant request_variant;
             try {
                request_variant = fc::json::from_string(request.body());
                const auto& request_object = request_variant.get_object();
                const auto method = request_object["method"].as_string();
+               std::optional<int64_t> id;
+               if (request_object.contains("id"))
+                  id = request_object["id"].as_int64();
                {
                   std::lock_guard lock(_mutex);
                   _request_methods.push_back(method);
+                  _requests.push_back({.method = method, .connection = connection, .id = id});
                }
             } catch (...) {
-               break;
+               if (response.response_kind != scripted_json_rpc_response::kind::raw_body)
+                  break;
             }
 
-            if (response_index >= _responses.size()) {
-               socket.close(error);
-               break;
-            }
-            const auto response = _responses[response_index++];
-            const bool script_complete = response_index >= _responses.size();
             if (response.response_kind == scripted_json_rpc_response::kind::close_connection) {
-               socket.set_option(boost::asio::socket_base::linger(true, 0), error);
-               socket.close(error);
+               close_socket(socket, error, true);
                if (_stop_after_script && script_complete) {
                   _acceptor.close(error);
                   return;
@@ -211,7 +275,17 @@ private:
             if (response.response_kind == scripted_json_rpc_response::kind::hang) {
                std::unique_lock lock(_mutex);
                _stopping_changed.wait(lock, [this] { return _stopping; });
-               socket.close(error);
+               lock.unlock();
+               close_socket(socket, error);
+               return;
+            }
+            while (response.release_gate &&
+                   !response.release_gate->load(std::memory_order_acquire) &&
+                   !stopping()) {
+               std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            }
+            if (stopping()) {
+               close_socket(socket, error);
                return;
             }
             if (response.delay.count() > 0) {
@@ -219,30 +293,41 @@ private:
             }
 
             std::string response_body;
-            if (response.response_kind == scripted_json_rpc_response::kind::raw_body) {
-               response_body = response.payload.as_string();
-            } else {
-               const auto& request_object = request_variant.get_object();
-               fc::mutable_variant_object envelope;
-               envelope("jsonrpc", "2.0")("id", request_object["id"]);
-               if (response.response_kind == scripted_json_rpc_response::kind::result) {
-                  envelope("result", response.payload);
+            try {
+               if (response.response_kind == scripted_json_rpc_response::kind::raw_body) {
+                  response_body = response.payload.as_string();
                } else {
-                  envelope("error", response.payload);
+                  const auto& request_object = request_variant.get_object();
+                  if (request_object.contains("id")) {
+                     fc::mutable_variant_object envelope;
+                     envelope("jsonrpc", "2.0")(
+                        "id",
+                        response.response_id ? fc::variant(*response.response_id) : request_object["id"]);
+                     if (response.response_kind == scripted_json_rpc_response::kind::result) {
+                        envelope("result", response.payload);
+                     } else {
+                        envelope("error", response.payload);
+                     }
+                     response_body = fc::json::to_string(fc::variant(envelope), fc::json::yield_function_t{});
+                  }
                }
-               response_body =
-                  fc::json::to_string(fc::variant(envelope), fc::json::yield_function_t{});
+            } catch (...) {
+               close_socket(socket, error);
+               break;
             }
 
             boost::beast::http::response<boost::beast::http::string_body> http_response{
                boost::beast::http::status::ok, request.version()};
             http_response.set(boost::beast::http::field::content_type, "application/json");
             http_response.body() = std::move(response_body);
-            http_response.keep_alive(request.keep_alive() && !(_stop_after_script && script_complete));
+            http_response.keep_alive(
+               request.keep_alive() && response.keep_alive && !(_stop_after_script && script_complete));
             http_response.prepare_payload();
-            boost::beast::http::write(socket, http_response, error);
+            boost::beast::http::write(*socket, http_response, error);
+            if (!error && response.reset_after_response)
+               close_socket(socket, error, true);
             if (error || !http_response.keep_alive()) {
-               socket.close(error);
+               close_socket(socket, error);
             }
             if (_stop_after_script && script_complete) {
                _acceptor.close(error);
@@ -251,6 +336,11 @@ private:
             if (error || !http_response.keep_alive()) {
                break;
             }
+         }
+         {
+            std::scoped_lock socket_lock(_socket_mutex);
+            if (_active_socket == socket)
+               _active_socket.reset();
          }
       }
    }
@@ -265,6 +355,10 @@ private:
    bool                                     _stopping = false;
    bool                                     _stop_after_script = false;
    std::vector<std::string>                 _request_methods;
+   std::vector<request_record>               _requests;
+   std::atomic_size_t                        _connection_count{0};
+   mutable std::mutex                        _socket_mutex;
+   std::shared_ptr<tcp::socket>              _active_socket;
    std::thread                              _worker;
 };
 

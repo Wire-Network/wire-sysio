@@ -3,7 +3,7 @@
 #include <fc-test/build_info.hpp>
 #include <fc-test/crypto_utils.hpp>
 #include <fc-test/scripted_json_rpc_server.hpp>
-#include <fc/crypto/base58.hpp>
+#include <fc-test/solana_utils.hpp>
 #include <fc/crypto/base64.hpp>
 #include <fc/crypto/keccak256.hpp>
 #include <fc/io/json.hpp>
@@ -22,11 +22,16 @@
 
 #include <algorithm>
 #include <array>
+#include <atomic>
+#include <chrono>
 #include <cstring>
 #include <filesystem>
+#include <future>
 #include <map>
+#include <memory>
 #include <set>
 #include <span>
+#include <thread>
 
 using namespace std::literals;
 using namespace fc::network::solana;
@@ -37,12 +42,6 @@ constexpr std::string_view counter_anchor_idl_fixture = "solana-idl-counter-anch
 constexpr std::string_view opp_outpost_idl_fixture = "solana-idl-opp-outpost-stub.json";
 constexpr std::string_view sec94_terminal_budget_fixture = "sec-94-solana-terminal-budget.json";
 constexpr std::string_view startup_test_rpc_url = "http://127.0.0.1:1";
-
-/** Return a deterministic canonical 32-byte Solana genesis hash. */
-std::string startup_test_genesis_hash(uint8_t seed) {
-   std::vector<char> bytes(32, static_cast<char>(seed));
-   return fc::to_base58(bytes, fc::yield_function_t{});
-}
 
 /** Build a named Solana signature-provider spec from the canonical fixture. */
 std::string named_solana_signature_provider(
@@ -337,8 +336,9 @@ BOOST_AUTO_TEST_CASE(startup_accepts_matching_named_signer) {
 }
 
 BOOST_AUTO_TEST_CASE(startup_accepts_complete_matching_cluster_identity) {
-   const auto genesis_hash = startup_test_genesis_hash(1);
+   const auto genesis_hash = fc::test::solana_hash(1);
    fc::test::scripted_json_rpc_server server({
+      fc::test::scripted_json_rpc_response::result(genesis_hash),
       fc::test::scripted_json_rpc_response::result(genesis_hash),
    });
 
@@ -350,11 +350,50 @@ BOOST_AUTO_TEST_CASE(startup_accepts_complete_matching_cluster_identity) {
       "--outpost-solana-cluster-identity",
       "client-a," + genesis_hash,
    }));
-   BOOST_CHECK_EQUAL(server.request_count(), 1u);
+   BOOST_CHECK_EQUAL(server.request_count(), 2u);
+}
+
+BOOST_AUTO_TEST_CASE(startup_validates_pinned_clients_concurrently) {
+   const auto genesis_hash = fc::test::solana_hash(1);
+   auto release_validations = std::make_shared<std::atomic_bool>(false);
+   fc::test::scripted_json_rpc_server first_server({
+      fc::test::scripted_json_rpc_response::gated_result(genesis_hash, release_validations),
+      fc::test::scripted_json_rpc_response::result(genesis_hash),
+   });
+   fc::test::scripted_json_rpc_server second_server({
+      fc::test::scripted_json_rpc_response::gated_result(genesis_hash, release_validations),
+      fc::test::scripted_json_rpc_response::result(genesis_hash),
+   });
+
+   auto initialization = std::async(std::launch::async, [&] {
+      initialize_outpost_plugin({
+         "--signature-provider",
+         named_solana_signature_provider(),
+         "--outpost-solana-client",
+         "client-a,signer-a," + first_server.url(),
+         "client-b,signer-a," + second_server.url(),
+         "--outpost-solana-cluster-identity",
+         "client-a," + genesis_hash,
+         "client-b," + genesis_hash,
+      });
+   });
+   const auto overlap_deadline = std::chrono::steady_clock::now() + std::chrono::seconds(2);
+   while ((first_server.request_count() < 1 || second_server.request_count() < 1) &&
+          std::chrono::steady_clock::now() < overlap_deadline) {
+      std::this_thread::yield();
+   }
+   const bool validations_overlapped =
+      first_server.request_count() == 1 && second_server.request_count() == 1;
+   release_validations->store(true, std::memory_order_release);
+
+   BOOST_REQUIRE(validations_overlapped);
+   BOOST_CHECK_NO_THROW(initialization.get());
+   BOOST_CHECK_EQUAL(first_server.request_count(), 2u);
+   BOOST_CHECK_EQUAL(second_server.request_count(), 2u);
 }
 
 BOOST_AUTO_TEST_CASE(startup_rejects_partial_cluster_identity_configuration) {
-   const auto genesis_hash = startup_test_genesis_hash(1);
+   const auto genesis_hash = fc::test::solana_hash(1);
    BOOST_CHECK_THROW(initialize_outpost_plugin({
       "--signature-provider",
       named_solana_signature_provider(),
@@ -367,7 +406,7 @@ BOOST_AUTO_TEST_CASE(startup_rejects_partial_cluster_identity_configuration) {
 }
 
 BOOST_AUTO_TEST_CASE(startup_rejects_unknown_cluster_identity_client) {
-   const auto genesis_hash = startup_test_genesis_hash(1);
+   const auto genesis_hash = fc::test::solana_hash(1);
    BOOST_CHECK_THROW(initialize_outpost_plugin({
       "--signature-provider",
       named_solana_signature_provider(),
@@ -379,7 +418,7 @@ BOOST_AUTO_TEST_CASE(startup_rejects_unknown_cluster_identity_client) {
 }
 
 BOOST_AUTO_TEST_CASE(startup_rejects_duplicate_cluster_identity) {
-   const auto genesis_hash = startup_test_genesis_hash(1);
+   const auto genesis_hash = fc::test::solana_hash(1);
    BOOST_CHECK_THROW(initialize_outpost_plugin({
       "--signature-provider",
       named_solana_signature_provider(),
@@ -403,8 +442,8 @@ BOOST_AUTO_TEST_CASE(startup_rejects_malformed_expected_cluster_identity) {
 }
 
 BOOST_AUTO_TEST_CASE(startup_rejects_mismatched_observed_cluster_identity) {
-   const auto expected_hash = startup_test_genesis_hash(1);
-   const auto observed_hash = startup_test_genesis_hash(2);
+   const auto expected_hash = fc::test::solana_hash(1);
+   const auto observed_hash = fc::test::solana_hash(2);
    fc::test::scripted_json_rpc_server server({
       fc::test::scripted_json_rpc_response::result(observed_hash),
    });
@@ -420,7 +459,7 @@ BOOST_AUTO_TEST_CASE(startup_rejects_mismatched_observed_cluster_identity) {
 }
 
 BOOST_AUTO_TEST_CASE(startup_hanging_cluster_identity_probe_obeys_deadline) {
-   const auto expected_hash = startup_test_genesis_hash(1);
+   const auto expected_hash = fc::test::solana_hash(1);
    fc::test::scripted_json_rpc_server server({
       fc::test::scripted_json_rpc_response::hanging(),
    });

@@ -4,6 +4,7 @@
 #include <chrono>
 #include <fc-test/crypto_utils.hpp>
 #include <fc-test/scripted_json_rpc_server.hpp>
+#include <fc-test/solana_utils.hpp>
 #include <fc/crypto/sha256.hpp>
 #include <fc/crypto/signature_provider.hpp>
 #include <fc/exception/exception.hpp>
@@ -35,6 +36,7 @@ constexpr std::string_view empty_vec_account_name = "EmptyVecAccount";
 constexpr std::string_view nested_account_name = "NestedAccount";
 constexpr std::string_view cyclic_account_name = "CyclicAccount";
 constexpr std::string_view idl_depth_error = "Solana IDL type nesting exceeds maximum depth";
+thread_local bool cancel_current_rpc_wait = false;
 
 /**
  * @brief Construct a deterministic Solana public key for serialization tests.
@@ -255,12 +257,6 @@ bool is_idl_depth_exception(const fc::assert_exception& error) {
    return error.to_detail_string().find(idl_depth_error) != std::string::npos;
 }
 
-/** Return a deterministic canonical 32-byte Solana genesis hash. */
-std::string test_genesis_hash(uint8_t seed) {
-   std::vector<char> bytes(32, static_cast<char>(seed));
-   return fc::to_base58(bytes, fc::yield_function_t{});
-}
-
 /** Build the local Solana signature provider used by protected-sign tests. */
 fc::crypto::signature_provider_ptr test_solana_signature_provider() {
    const auto fixture = fc::test::load_keygen_fixture("solana", 1);
@@ -284,18 +280,59 @@ solana_cluster_identity_config test_identity_config(const std::string& expected_
 }
 
 /** Build the smallest transaction that the configured provider can sign. */
-transaction test_signable_transaction(const solana_client& client) {
+transaction test_signable_transaction(const solana_client& client,
+                                      solana_public_key recent_blockhash = make_test_pubkey(777)) {
    transaction tx;
    tx.msg.header.num_required_signatures = 1;
    tx.msg.account_keys.push_back(client.get_pubkey());
-   tx.msg.recent_blockhash = make_test_pubkey(777);
+   tx.msg.recent_blockhash = recent_blockhash;
    tx.signatures.resize(1);
    return tx;
+}
+
+/** Return a valid getLatestBlockhash result. */
+fc::variant blockhash_response(const std::string& blockhash) {
+   return fc::mutable_variant_object()(
+      "context",
+      fc::mutable_variant_object()("slot", 1))(
+      "value",
+      fc::mutable_variant_object()("blockhash", blockhash)("lastValidBlockHeight", 100));
+}
+
+/** Return a successful response that resets its connection after writing. */
+fc::test::scripted_json_rpc_response resetting_result(fc::variant value) {
+   auto response = fc::test::scripted_json_rpc_response::result(std::move(value));
+   response.reset_after_response = true;
+   return response;
 }
 
 /** Return a valid getAccountInfo response for an account that does not exist. */
 fc::variant account_not_found_response() {
    return fc::mutable_variant_object()("context", fc::mutable_variant_object()("slot", 1))("value", fc::variant());
+}
+
+/** Return one successful getSignatureStatuses result at the requested commitment. */
+fc::variant signature_status_response(std::string confirmation_status) {
+   return fc::mutable_variant_object()(
+      "context",
+      fc::mutable_variant_object()("slot", 1))(
+      "value",
+      fc::variants{
+         fc::mutable_variant_object()("slot", 1)("confirmations", 1)("err", fc::variant())(
+            "confirmationStatus", std::move(confirmation_status)),
+      });
+}
+
+/** Return one on-chain transaction failure from getSignatureStatuses. */
+fc::variant failed_signature_status_response(std::string error) {
+   return fc::mutable_variant_object()(
+      "context",
+      fc::mutable_variant_object()("slot", 1))(
+      "value",
+      fc::variants{
+         fc::mutable_variant_object()("slot", 1)("confirmations", 1)("err", std::move(error))(
+            "confirmationStatus", "processed"),
+      });
 }
 
 } // namespace
@@ -305,7 +342,7 @@ fc::variant account_not_found_response() {
 //=============================================================================
 
 BOOST_AUTO_TEST_CASE(test_genesis_hash_requires_canonical_base58_and_exact_length) {
-   const auto canonical = test_genesis_hash(7);
+   const auto canonical = fc::test::solana_hash(7);
    const auto parsed = parse_solana_genesis_hash(canonical);
    BOOST_CHECK_EQUAL(parsed.canonical, canonical);
 
@@ -346,7 +383,7 @@ BOOST_AUTO_TEST_CASE(test_legacy_client_performs_no_identity_probe) {
 }
 
 BOOST_AUTO_TEST_CASE(test_internal_probe_deadline_survives_disabled_task_inheritance) {
-   const auto expected = test_genesis_hash(1);
+   const auto expected = fc::test::solana_hash(1);
    fc::test::scripted_json_rpc_server server({
       fc::test::scripted_json_rpc_response::hanging(),
    });
@@ -384,22 +421,25 @@ BOOST_AUTO_TEST_CASE(test_solana_client_always_honors_ambient_task_deadline) {
 }
 
 BOOST_AUTO_TEST_CASE(test_pinned_client_permits_read_sign_and_submit_after_matching_probes) {
-   const auto expected = test_genesis_hash(1);
+   const auto expected = fc::test::solana_hash(1);
+   const auto blockhash = fc::test::solana_hash(3);
    fc::test::scripted_json_rpc_server server({
       fc::test::scripted_json_rpc_response::result(expected),
       fc::test::scripted_json_rpc_response::result(expected),
+      fc::test::scripted_json_rpc_response::result(blockhash_response(blockhash)),
       fc::test::scripted_json_rpc_response::result(account_not_found_response()),
-      fc::test::scripted_json_rpc_response::result(expected),
-      fc::test::scripted_json_rpc_response::result(expected),
       fc::test::scripted_json_rpc_response::result("tx-signature"),
    });
    solana_client client(test_solana_signature_provider(), server.url(), client_options{},
                         test_identity_config(expected));
 
+   const auto latest_blockhash = client.get_latest_blockhash();
    const auto account = client.get_account_info(make_test_pubkey(12));
    BOOST_CHECK(!account);
 
-   auto tx = test_signable_transaction(client);
+   auto tx = test_signable_transaction(
+      client,
+      solana_public_key::from_base58_string(latest_blockhash.blockhash));
    const auto empty_signature = tx.signatures.front();
    client.sign_transaction(tx);
    BOOST_CHECK(tx.signatures.front() != empty_signature);
@@ -407,20 +447,20 @@ BOOST_AUTO_TEST_CASE(test_pinned_client_permits_read_sign_and_submit_after_match
 
    const auto methods = server.request_methods();
    const std::vector<std::string> expected_methods{
-      "getGenesisHash", "getGenesisHash", "getAccountInfo", "getGenesisHash", "getGenesisHash", "sendTransaction",
+      "getGenesisHash", "getGenesisHash", "getLatestBlockhash", "getAccountInfo", "sendTransaction",
    };
    BOOST_CHECK(methods == expected_methods);
 
    const auto snapshot = client.get_cluster_identity_snapshot();
    BOOST_CHECK(snapshot.status == solana_cluster_identity_status::verified);
-   BOOST_CHECK_EQUAL(snapshot.verification_attempts, 4u);
-   BOOST_CHECK_EQUAL(snapshot.verification_successes, 4u);
+   BOOST_CHECK_EQUAL(snapshot.verification_attempts, 1u);
+   BOOST_CHECK_EQUAL(snapshot.verification_successes, 1u);
    BOOST_CHECK_EQUAL(snapshot.verification_mismatches, 0u);
 }
 
 BOOST_AUTO_TEST_CASE(test_pinned_client_rejects_startup_mismatch) {
-   const auto expected = test_genesis_hash(1);
-   const auto observed = test_genesis_hash(2);
+   const auto expected = fc::test::solana_hash(1);
+   const auto observed = fc::test::solana_hash(2);
    fc::test::scripted_json_rpc_server server({
       fc::test::scripted_json_rpc_response::result(observed),
    });
@@ -431,9 +471,24 @@ BOOST_AUTO_TEST_CASE(test_pinned_client_rejects_startup_mismatch) {
    BOOST_CHECK_EQUAL(server.request_count(), 1u);
 }
 
+BOOST_AUTO_TEST_CASE(test_pinned_client_rejects_nonpersistent_rpc_transport_at_startup) {
+   const auto expected = fc::test::solana_hash(1);
+   auto closing_validation = fc::test::scripted_json_rpc_response::result(expected);
+   closing_validation.keep_alive = false;
+   fc::test::scripted_json_rpc_server server({std::move(closing_validation)});
+
+   BOOST_CHECK_EXCEPTION(
+      solana_client(test_solana_signature_provider(), server.url(), client_options{}, test_identity_config(expected)),
+      fc::exception,
+      [](const fc::exception& error) {
+         return error.to_detail_string().find("did not preserve a persistent connection") != std::string::npos;
+      });
+   BOOST_CHECK_EQUAL(server.request_count(), 1u);
+}
+
 /// An oversized RPC identity is rejected before the quadratic base58 decoder.
 BOOST_AUTO_TEST_CASE(test_pinned_client_rejects_oversized_observed_identity) {
-   const auto expected = test_genesis_hash(1);
+   const auto expected = fc::test::solana_hash(1);
    fc::test::scripted_json_rpc_server server({
       fc::test::scripted_json_rpc_response::result(std::string(4096, 'z')),
    });
@@ -448,24 +503,30 @@ BOOST_AUTO_TEST_CASE(test_pinned_client_rejects_oversized_observed_identity) {
 }
 
 BOOST_AUTO_TEST_CASE(test_runtime_mismatch_blocks_signing_and_remains_sticky) {
-   const auto expected = test_genesis_hash(1);
-   const auto wrong_cluster = test_genesis_hash(2);
+   const auto expected = fc::test::solana_hash(1);
+   const auto wrong_cluster = fc::test::solana_hash(2);
+   const auto blockhash = fc::test::solana_hash(3);
    fc::test::scripted_json_rpc_server server({
       fc::test::scripted_json_rpc_response::result(expected),
-      fc::test::scripted_json_rpc_response::result(wrong_cluster),
       fc::test::scripted_json_rpc_response::result(expected),
+      resetting_result(blockhash_response(blockhash)),
+      fc::test::scripted_json_rpc_response::result(wrong_cluster),
    });
    solana_client client(test_solana_signature_provider(), server.url(), client_options{},
                         test_identity_config(expected));
 
-   auto tx = test_signable_transaction(client);
+   const auto latest_blockhash = client.get_latest_blockhash();
+   auto tx = test_signable_transaction(
+      client,
+      solana_public_key::from_base58_string(latest_blockhash.blockhash));
    const auto empty_signature = tx.signatures.front();
+   BOOST_CHECK_THROW(client.get_health(), fc::exception);
    BOOST_CHECK_THROW(client.sign_transaction(tx), fc::exception);
    BOOST_CHECK(tx.signatures.front() == empty_signature);
 
    BOOST_CHECK_THROW(client.sign_transaction(tx), fc::exception);
    BOOST_CHECK(tx.signatures.front() == empty_signature);
-   BOOST_CHECK_EQUAL(server.request_count(), 2u);
+   BOOST_CHECK_EQUAL(server.request_count(), 4u);
 
    const auto snapshot = client.get_cluster_identity_snapshot();
    BOOST_CHECK(snapshot.status == solana_cluster_identity_status::mismatch);
@@ -475,10 +536,11 @@ BOOST_AUTO_TEST_CASE(test_runtime_mismatch_blocks_signing_and_remains_sticky) {
 }
 
 BOOST_AUTO_TEST_CASE(test_runtime_mismatch_blocks_protected_account_read) {
-   const auto expected = test_genesis_hash(1);
-   const auto wrong_cluster = test_genesis_hash(2);
+   const auto expected = fc::test::solana_hash(1);
+   const auto wrong_cluster = fc::test::solana_hash(2);
    fc::test::scripted_json_rpc_server server({
       fc::test::scripted_json_rpc_response::result(expected),
+      resetting_result(expected),
       fc::test::scripted_json_rpc_response::result(wrong_cluster),
    });
    solana_client client(test_solana_signature_provider(), server.url(), client_options{},
@@ -486,16 +548,18 @@ BOOST_AUTO_TEST_CASE(test_runtime_mismatch_blocks_protected_account_read) {
 
    BOOST_CHECK_THROW(client.get_account_info(make_test_pubkey(15)), fc::exception);
    const auto methods = server.request_methods();
-   BOOST_REQUIRE_EQUAL(methods.size(), 2u);
+   BOOST_REQUIRE_EQUAL(methods.size(), 3u);
    BOOST_CHECK_EQUAL(methods[0], "getGenesisHash");
    BOOST_CHECK_EQUAL(methods[1], "getGenesisHash");
+   BOOST_CHECK_EQUAL(methods[2], "getGenesisHash");
 }
 
 BOOST_AUTO_TEST_CASE(test_runtime_mismatch_classifies_airdrop_as_submission) {
-   const auto expected = test_genesis_hash(1);
-   const auto wrong_cluster = test_genesis_hash(2);
+   const auto expected = fc::test::solana_hash(1);
+   const auto wrong_cluster = fc::test::solana_hash(2);
    fc::test::scripted_json_rpc_server server({
       fc::test::scripted_json_rpc_response::result(expected),
+      resetting_result(expected),
       fc::test::scripted_json_rpc_response::result(wrong_cluster),
    });
    solana_client client(test_solana_signature_provider(), server.url(), client_options{},
@@ -507,15 +571,13 @@ BOOST_AUTO_TEST_CASE(test_runtime_mismatch_classifies_airdrop_as_submission) {
    BOOST_CHECK(!snapshot.blocked_operations.contains(solana_cluster_identity_operation::rpc_read));
 }
 
-BOOST_AUTO_TEST_CASE(test_rpc_verification_is_peer_bound_for_every_call) {
-   const auto expected = test_genesis_hash(1);
+BOOST_AUTO_TEST_CASE(test_rpc_verification_runs_once_per_persistent_connection) {
+   const auto expected = fc::test::solana_hash(1);
    fc::test::scripted_json_rpc_server server({
       fc::test::scripted_json_rpc_response::result(expected),
       fc::test::scripted_json_rpc_response::result(expected),
       fc::test::scripted_json_rpc_response::result("ok"),
-      fc::test::scripted_json_rpc_response::result(expected),
       fc::test::scripted_json_rpc_response::result("ok"),
-      fc::test::scripted_json_rpc_response::result(expected),
       fc::test::scripted_json_rpc_response::result("ok"),
    });
    solana_client client(test_solana_signature_provider(), server.url(), client_options{},
@@ -525,16 +587,45 @@ BOOST_AUTO_TEST_CASE(test_rpc_verification_is_peer_bound_for_every_call) {
    BOOST_CHECK_EQUAL(std::ranges::count(server.request_methods(), "getGenesisHash"), 2);
 
    BOOST_CHECK_EQUAL(client.get_health(), "ok");
-   BOOST_CHECK_EQUAL(std::ranges::count(server.request_methods(), "getGenesisHash"), 3);
+   BOOST_CHECK_EQUAL(std::ranges::count(server.request_methods(), "getGenesisHash"), 2);
 
    BOOST_CHECK_EQUAL(client.get_health(), "ok");
-   BOOST_CHECK_EQUAL(std::ranges::count(server.request_methods(), "getGenesisHash"), 4);
+   BOOST_CHECK_EQUAL(std::ranges::count(server.request_methods(), "getGenesisHash"), 2);
+   BOOST_CHECK_EQUAL(server.connection_count(), 1u);
 }
 
-BOOST_AUTO_TEST_CASE(test_followup_transport_failure_requires_a_new_peer_bound_probe) {
-   const auto expected = test_genesis_hash(1);
+BOOST_AUTO_TEST_CASE(test_each_replacement_connection_is_validated_before_use) {
+   const auto expected = fc::test::solana_hash(1);
    fc::test::scripted_json_rpc_server server({
       fc::test::scripted_json_rpc_response::result(expected),
+      fc::test::scripted_json_rpc_response::result(expected),
+      resetting_result("first"),
+      fc::test::scripted_json_rpc_response::result(expected),
+      fc::test::scripted_json_rpc_response::result("second"),
+   });
+   solana_client client(test_solana_signature_provider(), server.url(), client_options{},
+                        test_identity_config(expected));
+
+   BOOST_CHECK_EQUAL(client.get_health(), "first");
+   BOOST_CHECK_EQUAL(client.get_health(), "second");
+
+   const auto requests = server.requests();
+   BOOST_REQUIRE_EQUAL(requests.size(), 5u);
+   BOOST_CHECK_EQUAL(requests[0].connection, requests[1].connection);
+   BOOST_CHECK_EQUAL(requests[1].connection, requests[2].connection);
+   BOOST_CHECK_NE(requests[2].connection, requests[3].connection);
+   BOOST_CHECK_EQUAL(requests[3].connection, requests[4].connection);
+
+   const auto snapshot = client.get_cluster_identity_snapshot();
+   BOOST_CHECK_EQUAL(snapshot.verification_attempts, 2u);
+   BOOST_CHECK_EQUAL(snapshot.verification_successes, 2u);
+}
+
+BOOST_AUTO_TEST_CASE(test_protected_transport_failure_is_not_reported_as_total_success) {
+   const auto expected = fc::test::solana_hash(1);
+   fc::test::scripted_json_rpc_server server({
+      fc::test::scripted_json_rpc_response::result(expected),
+      resetting_result(expected),
       fc::test::scripted_json_rpc_response::result(expected),
       fc::test::scripted_json_rpc_response::close(),
       fc::test::scripted_json_rpc_response::result(expected),
@@ -549,21 +640,26 @@ BOOST_AUTO_TEST_CASE(test_followup_transport_failure_requires_a_new_peer_bound_p
    BOOST_CHECK(failed_followup_snapshot.reason == solana_cluster_identity_reason::none);
    BOOST_CHECK_EQUAL(failed_followup_snapshot.verification_successes, 2u);
    BOOST_CHECK_EQUAL(failed_followup_snapshot.verification_failures, 0u);
+   BOOST_CHECK_EQUAL(
+      failed_followup_snapshot.protected_operation_failures.at(solana_cluster_identity_operation::rpc_read),
+      1u);
 
    BOOST_CHECK_EQUAL(client.get_health(), "ok");
 
    const auto snapshot = client.get_cluster_identity_snapshot();
    BOOST_CHECK(snapshot.status == solana_cluster_identity_status::verified);
    BOOST_CHECK(snapshot.reason == solana_cluster_identity_reason::none);
+   BOOST_CHECK_EQUAL(snapshot.verification_successes, 3u);
    BOOST_CHECK_EQUAL(snapshot.verification_recoveries, 0u);
 }
 
 BOOST_AUTO_TEST_CASE(test_probe_error_recovers_after_a_later_matching_probe) {
-   const auto expected = test_genesis_hash(1);
+   const auto expected = fc::test::solana_hash(1);
    const auto rpc_error =
       fc::mutable_variant_object()("code", -32000)("message", "temporary probe failure");
    fc::test::scripted_json_rpc_server server({
       fc::test::scripted_json_rpc_response::result(expected),
+      resetting_result(expected),
       fc::test::scripted_json_rpc_response::error(rpc_error),
       fc::test::scripted_json_rpc_response::result(expected),
       fc::test::scripted_json_rpc_response::result("ok"),
@@ -588,33 +684,96 @@ BOOST_AUTO_TEST_CASE(test_probe_error_recovers_after_a_later_matching_probe) {
    BOOST_CHECK_EQUAL(snapshot.verification_recoveries, 1u);
 }
 
-BOOST_AUTO_TEST_CASE(test_hanging_runtime_probe_times_out_before_signing) {
-   const auto expected = test_genesis_hash(1);
+BOOST_AUTO_TEST_CASE(test_runtime_connection_validation_timeout_is_classified) {
+   const auto expected = fc::test::solana_hash(1);
    fc::test::scripted_json_rpc_server server({
       fc::test::scripted_json_rpc_response::result(expected),
+      resetting_result(expected),
       fc::test::scripted_json_rpc_response::hanging(),
+   });
+   solana_client client(test_solana_signature_provider(), server.url(), client_options{},
+                        test_identity_config(expected, fc::milliseconds(50)));
+
+   BOOST_CHECK_THROW(client.get_health(), fc::timeout_exception);
+   const auto snapshot = client.get_cluster_identity_snapshot();
+   BOOST_CHECK(snapshot.status == solana_cluster_identity_status::error);
+   BOOST_CHECK(snapshot.reason == solana_cluster_identity_reason::rpc_timeout);
+   BOOST_CHECK_EQUAL(snapshot.verification_failures, 1u);
+   BOOST_CHECK(!snapshot.protected_operation_failures.contains(
+      solana_cluster_identity_operation::rpc_read));
+}
+
+BOOST_AUTO_TEST_CASE(test_runtime_connection_validation_cancellation_is_classified) {
+   const auto expected = fc::test::solana_hash(1);
+   std::atomic_bool cancellation_requested{false};
+   fc::test::scripted_json_rpc_server server({
+      fc::test::scripted_json_rpc_response::result(expected),
+      resetting_result(expected),
+      fc::test::scripted_json_rpc_response::delayed_result(expected, std::chrono::milliseconds(250)),
+      fc::test::scripted_json_rpc_response::result(expected),
+      fc::test::scripted_json_rpc_response::result("ok"),
+   });
+   client_options rpc_options;
+   rpc_options.request.cancel_check = [&cancellation_requested] {
+      return cancellation_requested.load(std::memory_order_acquire);
+   };
+   solana_client client(test_solana_signature_provider(), server.url(), std::move(rpc_options),
+                        test_identity_config(expected));
+
+   auto read = std::async(std::launch::async, [&client] { return client.get_health(); });
+   const auto request_deadline = std::chrono::steady_clock::now() + std::chrono::seconds(1);
+   while (server.request_count() < 3 && std::chrono::steady_clock::now() < request_deadline)
+      std::this_thread::yield();
+   BOOST_REQUIRE_EQUAL(server.request_count(), 3u);
+   cancellation_requested.store(true, std::memory_order_release);
+   BOOST_CHECK_THROW(read.get(), fc::exception);
+
+   const auto snapshot = client.get_cluster_identity_snapshot();
+   BOOST_CHECK(snapshot.status == solana_cluster_identity_status::verified);
+   BOOST_CHECK(snapshot.reason == solana_cluster_identity_reason::none);
+   BOOST_CHECK_EQUAL(snapshot.verification_failures, 0u);
+   BOOST_CHECK_EQUAL(snapshot.verification_cancellations, 1u);
+   BOOST_CHECK_EQUAL(snapshot.verification_recoveries, 0u);
+   BOOST_CHECK(!snapshot.protected_operation_failures.contains(
+      solana_cluster_identity_operation::rpc_read));
+
+   cancellation_requested.store(false, std::memory_order_release);
+   BOOST_CHECK_EQUAL(client.get_health(), "ok");
+   const auto recovered_snapshot = client.get_cluster_identity_snapshot();
+   BOOST_CHECK(recovered_snapshot.status == solana_cluster_identity_status::verified);
+   BOOST_CHECK(recovered_snapshot.reason == solana_cluster_identity_reason::none);
+   BOOST_CHECK_EQUAL(recovered_snapshot.verification_successes, 2u);
+   BOOST_CHECK_EQUAL(recovered_snapshot.verification_recoveries, 0u);
+}
+
+BOOST_AUTO_TEST_CASE(test_pinned_signing_requires_verified_blockhash_provenance) {
+   const auto expected = fc::test::solana_hash(1);
+   fc::test::scripted_json_rpc_server server({
+      fc::test::scripted_json_rpc_response::result(expected),
+      fc::test::scripted_json_rpc_response::result(expected),
    });
    solana_client client(test_solana_signature_provider(), server.url(), client_options{},
                         test_identity_config(expected, fc::milliseconds(50)));
 
    auto tx = test_signable_transaction(client);
    const auto empty_signature = tx.signatures.front();
-   BOOST_CHECK_THROW(client.sign_transaction(tx), fc::timeout_exception);
+   BOOST_CHECK_THROW(client.sign_transaction(tx), fc::exception);
    BOOST_CHECK(tx.signatures.front() == empty_signature);
+   BOOST_CHECK_EQUAL(server.request_count(), 2u);
 
    const auto snapshot = client.get_cluster_identity_snapshot();
-   BOOST_CHECK(snapshot.status == solana_cluster_identity_status::error);
-   BOOST_CHECK(snapshot.reason == solana_cluster_identity_reason::rpc_timeout);
+   BOOST_CHECK(snapshot.status == solana_cluster_identity_status::verified);
+   BOOST_CHECK_EQUAL(snapshot.blocked_operations.at(solana_cluster_identity_operation::signing), 1u);
 }
 
-BOOST_AUTO_TEST_CASE(test_concurrent_reads_each_bind_identity_to_their_exact_connection) {
+BOOST_AUTO_TEST_CASE(test_concurrent_reads_share_one_validated_persistent_connection) {
    constexpr size_t caller_count = 4;
-   const auto expected = test_genesis_hash(1);
+   const auto expected = fc::test::solana_hash(1);
    std::vector<fc::test::scripted_json_rpc_response> responses{
+      fc::test::scripted_json_rpc_response::result(expected),
       fc::test::scripted_json_rpc_response::result(expected),
    };
    for (size_t i = 0; i < caller_count; ++i) {
-      responses.push_back(fc::test::scripted_json_rpc_response::result(expected));
       responses.push_back(fc::test::scripted_json_rpc_response::result("ok"));
    }
    fc::test::scripted_json_rpc_server server(std::move(responses));
@@ -630,12 +789,13 @@ BOOST_AUTO_TEST_CASE(test_concurrent_reads_each_bind_identity_to_their_exact_con
    }
 
    const auto methods = server.request_methods();
-   BOOST_CHECK_EQUAL(std::ranges::count(methods, "getGenesisHash"), caller_count + 1);
+   BOOST_CHECK_EQUAL(std::ranges::count(methods, "getGenesisHash"), 2u);
    BOOST_CHECK_EQUAL(std::ranges::count(methods, "getHealth"), caller_count);
+   BOOST_CHECK_EQUAL(server.connection_count(), 1u);
 }
 
-BOOST_AUTO_TEST_CASE(test_operation_gate_uses_real_clock_for_task_deadline) {
-   const auto expected = test_genesis_hash(1);
+BOOST_AUTO_TEST_CASE(test_pinned_rpc_honors_ambient_task_deadline) {
+   const auto expected = fc::test::solana_hash(1);
    fc::test::scripted_json_rpc_server server({
       fc::test::scripted_json_rpc_response::result(expected),
       fc::test::scripted_json_rpc_response::result(expected),
@@ -648,48 +808,254 @@ BOOST_AUTO_TEST_CASE(test_operation_gate_uses_real_clock_for_task_deadline) {
    BOOST_CHECK_EQUAL(client.get_health(), "ok");
 }
 
-BOOST_AUTO_TEST_CASE(test_operation_gate_contention_uses_rpc_total_without_task_deadline) {
-   const auto expected = test_genesis_hash(1);
+BOOST_AUTO_TEST_CASE(test_pinned_rpc_gate_contention_honors_ambient_deadline_without_sending) {
+   const auto expected = fc::test::solana_hash(1);
    fc::test::scripted_json_rpc_server server({
+      fc::test::scripted_json_rpc_response::result(expected),
       fc::test::scripted_json_rpc_response::result(expected),
       fc::test::scripted_json_rpc_response::hanging(),
    });
    client_options rpc_options;
-   rpc_options.request.timeouts.total = fc::milliseconds(50);
-   rpc_options.request.timeouts.inherit_task_deadline = false;
-   solana_client client(
-      test_solana_signature_provider(),
-      server.url(),
-      std::move(rpc_options),
-      test_identity_config(expected, fc::milliseconds(500)));
+   rpc_options.request.timeouts.total = std::nullopt;
+   solana_client client(test_solana_signature_provider(), server.url(), std::move(rpc_options),
+                        test_identity_config(expected, fc::seconds(1)));
 
-   auto signing = std::async(
-      std::launch::async,
+   auto holding_call = std::async(std::launch::async, [&client] {
+      fc::task::deadline_scope deadline(fc::time_point::now() + fc::milliseconds(250));
+      return client.get_health();
+   });
+   const auto request_deadline = std::chrono::steady_clock::now() + std::chrono::seconds(1);
+   while (server.request_count() < 3 && std::chrono::steady_clock::now() < request_deadline)
+      std::this_thread::yield();
+   BOOST_REQUIRE_EQUAL(server.request_count(), 3u);
+
+   const auto started = std::chrono::steady_clock::now();
+   BOOST_CHECK_THROW(
       [&client] {
-         auto tx = test_signable_transaction(client);
-         client.sign_transaction(tx);
-      });
+         fc::task::deadline_scope deadline(fc::time_point::now() + fc::milliseconds(50));
+         (void)client.get_health();
+      }(),
+      fc::timeout_exception);
+   const auto elapsed = std::chrono::steady_clock::now() - started;
+
+   BOOST_CHECK_LT(std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count(), 200);
+   BOOST_CHECK_EQUAL(server.request_count(), 3u);
+   BOOST_CHECK_THROW(holding_call.get(), fc::timeout_exception);
+}
+
+BOOST_AUTO_TEST_CASE(test_pinned_rpc_gate_contention_honors_cancellation_without_sending) {
+   const auto expected = fc::test::solana_hash(1);
+   fc::test::scripted_json_rpc_server server({
+      fc::test::scripted_json_rpc_response::result(expected),
+      fc::test::scripted_json_rpc_response::result(expected),
+      fc::test::scripted_json_rpc_response::hanging(),
+   });
+   client_options rpc_options;
+   rpc_options.request.timeouts.total = std::nullopt;
+   rpc_options.request.cancel_check = [] { return cancel_current_rpc_wait; };
+   solana_client client(test_solana_signature_provider(), server.url(), std::move(rpc_options),
+                        test_identity_config(expected, fc::seconds(1)));
+
+   auto holding_call = std::async(std::launch::async, [&client] {
+      fc::task::deadline_scope deadline(fc::time_point::now() + fc::milliseconds(250));
+      return client.get_health();
+   });
+   const auto request_deadline = std::chrono::steady_clock::now() + std::chrono::seconds(1);
+   while (server.request_count() < 3 && std::chrono::steady_clock::now() < request_deadline)
+      std::this_thread::yield();
+   BOOST_REQUIRE_EQUAL(server.request_count(), 3u);
+
+   const auto started = std::chrono::steady_clock::now();
+   auto cancelled_call = std::async(std::launch::async, [&client] {
+      cancel_current_rpc_wait = true;
+      return client.get_health();
+   });
+   BOOST_CHECK_THROW(cancelled_call.get(), fc::canceled_exception);
+   const auto elapsed = std::chrono::steady_clock::now() - started;
+
+   BOOST_CHECK_LT(std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count(), 200);
+   BOOST_CHECK_EQUAL(server.request_count(), 3u);
+   BOOST_CHECK_THROW(holding_call.get(), fc::timeout_exception);
+}
+
+BOOST_AUTO_TEST_CASE(test_unpinned_local_signing_is_not_blocked_by_a_hanging_rpc) {
+   fc::test::scripted_json_rpc_server server({
+      fc::test::scripted_json_rpc_response::hanging(),
+   });
+   client_options rpc_options;
+   rpc_options.request.timeouts.total = fc::milliseconds(100);
+   rpc_options.request.timeouts.inherit_task_deadline = false;
+   solana_client client(test_solana_signature_provider(), server.url(), std::move(rpc_options));
+
+   auto read = std::async(std::launch::async, [&client] { return client.get_health(); });
    const auto request_deadline =
       std::chrono::steady_clock::now() +
       std::chrono::seconds(1);
-   while (server.request_count() < 2 &&
+   while (server.request_count() < 1 &&
           std::chrono::steady_clock::now() < request_deadline) {
       std::this_thread::yield();
    }
-   BOOST_REQUIRE_EQUAL(server.request_count(), 2u);
+   BOOST_REQUIRE_EQUAL(server.request_count(), 1u);
 
+   auto tx = test_signable_transaction(client);
    const auto started = std::chrono::steady_clock::now();
-   BOOST_CHECK_THROW(client.get_health(), fc::timeout_exception);
+   client.sign_transaction(tx);
    const auto elapsed =
       std::chrono::steady_clock::now() - started;
    BOOST_CHECK_LT(
       std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count(),
-      250);
-   BOOST_CHECK_THROW(signing.get(), fc::timeout_exception);
+      50);
+   BOOST_CHECK_THROW(read.get(), fc::timeout_exception);
+}
+
+BOOST_AUTO_TEST_CASE(test_confirmation_poll_retries_transient_rpc_exception_after_single_submission) {
+   const auto rpc_error =
+      fc::mutable_variant_object()("code", -32000)("message", "temporary confirmation failure");
+   fc::test::scripted_json_rpc_server server({
+      fc::test::scripted_json_rpc_response::result("tx-signature"),
+      fc::test::scripted_json_rpc_response::error(rpc_error),
+      fc::test::scripted_json_rpc_response::result(signature_status_response("processed")),
+   });
+   solana_client client(test_solana_signature_provider(), server.url(), client_options{});
+   auto tx = test_signable_transaction(client);
+   solana_confirm_options options;
+   options.retry.initial_backoff = fc::milliseconds(1);
+   options.retry.max_backoff = fc::milliseconds(1);
+   options.retry.total_timeout = fc::seconds(1);
+
+   BOOST_CHECK_EQUAL(client.send_transaction_and_confirm(tx, options), "tx-signature");
+   const std::vector<std::string> expected_methods{
+      "sendTransaction",
+      "getSignatureStatuses",
+      "getSignatureStatuses",
+   };
+   BOOST_CHECK(server.request_methods() == expected_methods);
+}
+
+BOOST_AUTO_TEST_CASE(test_legacy_confirmation_poll_retries_transient_rpc_exception_after_single_submission) {
+   const auto rpc_error =
+      fc::mutable_variant_object()("code", -32000)("message", "temporary confirmation failure");
+   fc::test::scripted_json_rpc_server server({
+      fc::test::scripted_json_rpc_response::result("tx-signature"),
+      fc::test::scripted_json_rpc_response::error(rpc_error),
+      fc::test::scripted_json_rpc_response::result(signature_status_response("processed")),
+   });
+   solana_client client(test_solana_signature_provider(), server.url(), client_options{});
+   auto tx = test_signable_transaction(client);
+
+   BOOST_CHECK_EQUAL(
+      client.send_and_confirm_transaction(tx, commitment_t::processed),
+      "tx-signature");
+   const std::vector<std::string> expected_methods{
+      "sendTransaction",
+      "getSignatureStatuses",
+      "getSignatureStatuses",
+   };
+   BOOST_CHECK(server.request_methods() == expected_methods);
+}
+
+BOOST_AUTO_TEST_CASE(test_legacy_confirmation_propagates_on_chain_failure_without_poll_retry) {
+   fc::test::scripted_json_rpc_server server({
+      fc::test::scripted_json_rpc_response::result("tx-signature"),
+      fc::test::scripted_json_rpc_response::result(failed_signature_status_response("program failure")),
+      fc::test::scripted_json_rpc_response::result(signature_status_response("processed")),
+   });
+   solana_client client(test_solana_signature_provider(), server.url(), client_options{});
+   auto tx = test_signable_transaction(client);
+
+   BOOST_CHECK_THROW(
+      client.send_and_confirm_transaction(tx, commitment_t::processed),
+      fc::exception);
+   const std::vector<std::string> expected_methods{
+      "sendTransaction",
+      "getSignatureStatuses",
+   };
+   BOOST_CHECK(server.request_methods() == expected_methods);
+}
+
+BOOST_AUTO_TEST_CASE(test_legacy_confirmation_honors_short_ambient_deadline_without_resubmission) {
+   fc::test::scripted_json_rpc_server server({
+      fc::test::scripted_json_rpc_response::result("tx-signature"),
+      fc::test::scripted_json_rpc_response::hanging(),
+   });
+   client_options rpc_options;
+   rpc_options.request.timeouts.total = fc::seconds(5);
+   solana_client client(test_solana_signature_provider(), server.url(), std::move(rpc_options));
+   auto tx = test_signable_transaction(client);
+
+   const auto start = fc::time_point::now();
+   BOOST_CHECK_THROW(
+      [&] {
+         fc::task::deadline_scope deadline(fc::time_point::now() + fc::milliseconds(100));
+         client.send_and_confirm_transaction(tx, commitment_t::processed);
+      }(),
+      fc::timeout_exception);
+   const auto elapsed = fc::time_point::now() - start;
+
+   BOOST_CHECK_LT(elapsed.count(), fc::seconds(2).count());
+   const std::vector<std::string> expected_methods{
+      "sendTransaction",
+      "getSignatureStatuses",
+   };
+   BOOST_CHECK(server.request_methods() == expected_methods);
+}
+
+BOOST_AUTO_TEST_CASE(test_confirmation_total_timeout_bounds_hanging_status_poll_without_ambient_deadline) {
+   fc::test::scripted_json_rpc_server server({
+      fc::test::scripted_json_rpc_response::result("tx-signature"),
+      fc::test::scripted_json_rpc_response::hanging(),
+   });
+   client_options rpc_options;
+   rpc_options.request.timeouts.total = std::nullopt;
+   solana_client client(test_solana_signature_provider(), server.url(), std::move(rpc_options));
+   auto tx = test_signable_transaction(client);
+   solana_confirm_options options;
+   options.retry.initial_backoff = fc::milliseconds(1);
+   options.retry.max_backoff = fc::milliseconds(1);
+   options.retry.total_timeout = fc::milliseconds(100);
+
+   const auto start = fc::time_point::now();
+   BOOST_CHECK_THROW(client.send_transaction_and_confirm(tx, options), fc::timeout_exception);
+   const auto elapsed = fc::time_point::now() - start;
+
+   BOOST_CHECK_LT(elapsed.count(), fc::seconds(2).count());
+   const std::vector<std::string> expected_methods{
+      "sendTransaction",
+      "getSignatureStatuses",
+   };
+   BOOST_CHECK(server.request_methods() == expected_methods);
+}
+
+BOOST_AUTO_TEST_CASE(test_pinned_confirmation_revalidates_after_transport_failure_without_resubmission) {
+   const auto expected = fc::test::solana_hash(1);
+   auto submission = fc::test::scripted_json_rpc_response::result("tx-signature");
+   submission.reset_after_response = true;
+   fc::test::scripted_json_rpc_server server({
+      fc::test::scripted_json_rpc_response::result(expected),
+      fc::test::scripted_json_rpc_response::result(expected),
+      std::move(submission),
+      fc::test::scripted_json_rpc_response::result(expected),
+      fc::test::scripted_json_rpc_response::close(),
+      fc::test::scripted_json_rpc_response::result(expected),
+      fc::test::scripted_json_rpc_response::result(signature_status_response("processed")),
+   });
+   solana_client client(test_solana_signature_provider(), server.url(), client_options{},
+                        test_identity_config(expected));
+   auto tx = test_signable_transaction(client);
+   solana_confirm_options options;
+   options.retry.initial_backoff = fc::milliseconds(1);
+   options.retry.max_backoff = fc::milliseconds(1);
+   options.retry.total_timeout = fc::seconds(1);
+
+   BOOST_CHECK_EQUAL(client.send_transaction_and_confirm(tx, options), "tx-signature");
+   const auto methods = server.request_methods();
+   BOOST_CHECK_EQUAL(std::ranges::count(methods, "sendTransaction"), 1u);
+   BOOST_CHECK_EQUAL(std::ranges::count(methods, "getSignatureStatuses"), 2u);
+   BOOST_CHECK_EQUAL(std::ranges::count(methods, "getGenesisHash"), 4u);
 }
 
 BOOST_AUTO_TEST_CASE(test_probe_timeout_does_not_cap_verified_protected_response) {
-   const auto expected = test_genesis_hash(1);
+   const auto expected = fc::test::solana_hash(1);
    fc::test::scripted_json_rpc_server server({
       fc::test::scripted_json_rpc_response::result(expected),
       fc::test::scripted_json_rpc_response::result(expected),
@@ -702,18 +1068,96 @@ BOOST_AUTO_TEST_CASE(test_probe_timeout_does_not_cap_verified_protected_response
    BOOST_CHECK_EQUAL(client.get_health(), "ok");
 }
 
-BOOST_AUTO_TEST_CASE(test_malformed_runtime_identity_blocks_raw_execute) {
-   const auto expected = test_genesis_hash(1);
+BOOST_AUTO_TEST_CASE(test_malformed_runtime_identity_blocks_read) {
+   const auto expected = fc::test::solana_hash(1);
    fc::test::scripted_json_rpc_server server({
       fc::test::scripted_json_rpc_response::result(expected),
+      resetting_result(expected),
       fc::test::scripted_json_rpc_response::result(fc::variant()),
    });
    solana_client client(test_solana_signature_provider(), server.url(), client_options{},
                         test_identity_config(expected));
 
-   BOOST_CHECK_THROW(client.execute("getHealth", fc::variants{}), fc::exception);
+   BOOST_CHECK_THROW(client.execute_idempotent("getHealth", fc::variants{}), fc::exception);
    const auto snapshot = client.get_cluster_identity_snapshot();
    BOOST_CHECK(snapshot.reason == solana_cluster_identity_reason::malformed_observed_identity);
+}
+
+BOOST_AUTO_TEST_CASE(test_public_genesis_hash_result_is_cross_checked_after_connection_validation) {
+   const auto expected = fc::test::solana_hash(1);
+   const auto wrong_cluster = fc::test::solana_hash(2);
+   fc::test::scripted_json_rpc_server server({
+      fc::test::scripted_json_rpc_response::result(expected),
+      fc::test::scripted_json_rpc_response::result(expected),
+      fc::test::scripted_json_rpc_response::result(wrong_cluster),
+   });
+   solana_client client(test_solana_signature_provider(), server.url(), client_options{},
+                        test_identity_config(expected));
+
+   BOOST_CHECK_THROW(client.get_genesis_hash(), fc::exception);
+   const auto snapshot = client.get_cluster_identity_snapshot();
+   BOOST_CHECK(snapshot.status == solana_cluster_identity_status::mismatch);
+   BOOST_CHECK(snapshot.reason == solana_cluster_identity_reason::identity_mismatch);
+   BOOST_CHECK_THROW(client.get_health(), fc::exception);
+   BOOST_CHECK_EQUAL(server.request_count(), 3u);
+}
+
+BOOST_AUTO_TEST_CASE(test_queued_protected_call_observes_public_genesis_mismatch_before_send) {
+   const auto expected = fc::test::solana_hash(1);
+   const auto wrong_cluster = fc::test::solana_hash(2);
+   auto release_mismatch = std::make_shared<std::atomic_bool>(false);
+   fc::test::scripted_json_rpc_server server({
+      fc::test::scripted_json_rpc_response::result(expected),
+      fc::test::scripted_json_rpc_response::result(expected),
+      fc::test::scripted_json_rpc_response::gated_result(wrong_cluster, release_mismatch),
+   });
+   solana_client client(test_solana_signature_provider(), server.url(), client_options{},
+                        test_identity_config(expected));
+
+   auto mismatch = std::async(std::launch::async, [&client] { return client.get_genesis_hash(); });
+   const auto mismatch_deadline = std::chrono::steady_clock::now() + std::chrono::seconds(1);
+   while (server.request_count() < 3 && std::chrono::steady_clock::now() < mismatch_deadline)
+      std::this_thread::yield();
+   BOOST_REQUIRE_EQUAL(server.request_count(), 3u);
+
+   std::promise<void> queued_started;
+   auto queued_started_future = queued_started.get_future();
+   auto queued = std::async(std::launch::async, [&client, &queued_started] {
+      queued_started.set_value();
+      return client.get_health();
+   });
+   queued_started_future.wait();
+   release_mismatch->store(true, std::memory_order_release);
+
+   BOOST_CHECK_THROW(mismatch.get(), fc::exception);
+   BOOST_CHECK_THROW(queued.get(), fc::exception);
+   BOOST_CHECK_EQUAL(server.request_count(), 3u);
+   const auto snapshot = client.get_cluster_identity_snapshot();
+   BOOST_CHECK(snapshot.status == solana_cluster_identity_status::mismatch);
+   BOOST_CHECK_EQUAL(snapshot.blocked_operations.at(solana_cluster_identity_operation::rpc_read), 2u);
+}
+
+BOOST_AUTO_TEST_CASE(test_malformed_public_genesis_hash_is_an_ordinary_failure_on_an_admitted_connection) {
+   const auto expected = fc::test::solana_hash(1);
+   fc::test::scripted_json_rpc_server server({
+      fc::test::scripted_json_rpc_response::result(expected),
+      fc::test::scripted_json_rpc_response::result(expected),
+      fc::test::scripted_json_rpc_response::result(fc::variant()),
+      fc::test::scripted_json_rpc_response::result("ok"),
+   });
+   solana_client client(test_solana_signature_provider(), server.url(), client_options{},
+                        test_identity_config(expected));
+
+   BOOST_CHECK_THROW(client.get_genesis_hash(), fc::exception);
+   BOOST_CHECK_EQUAL(client.get_health(), "ok");
+   const auto snapshot = client.get_cluster_identity_snapshot();
+   BOOST_CHECK(snapshot.status == solana_cluster_identity_status::verified);
+   BOOST_CHECK(snapshot.reason == solana_cluster_identity_reason::none);
+   BOOST_CHECK_EQUAL(
+      snapshot.protected_operation_failures.at(solana_cluster_identity_operation::rpc_read),
+      1u);
+   BOOST_CHECK_EQUAL(server.connection_count(), 1u);
+   BOOST_CHECK_EQUAL(server.request_count(), 4u);
 }
 
 //=============================================================================

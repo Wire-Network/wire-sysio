@@ -85,6 +85,28 @@ BOOST_AUTO_TEST_CASE(deadline_scope_clamps_total_timeout) {
    BOOST_CHECK_LT(elapsed.count(), 1000 * 1000);
 }
 
+/// The retry envelope installs its calculated deadline around each attempt.
+BOOST_AUTO_TEST_CASE(installs_total_timeout_as_attempt_deadline) {
+   auto opts = fast_opts();
+   opts.total_timeout = fc::milliseconds(250);
+   std::optional<fc::time_point> observed_deadline;
+
+   const auto started = fc::time_point::now();
+   const auto result = retry_until<int>(
+      "installed-deadline",
+      opts,
+      [&]() -> std::optional<int> {
+         observed_deadline = fc::task::current_deadline();
+         return 7;
+      });
+
+   BOOST_CHECK_EQUAL(result, 7);
+   BOOST_REQUIRE(observed_deadline);
+   const auto observed_count = observed_deadline->time_since_epoch().count();
+   BOOST_CHECK_GE(observed_count, (started + fc::milliseconds(200)).time_since_epoch().count());
+   BOOST_CHECK_LE(observed_count, (started + fc::milliseconds(300)).time_since_epoch().count());
+}
+
 /// An already-expired caller scope must fail fast instead of invoking the
 /// predicate after the caller's budget has been exhausted.
 BOOST_AUTO_TEST_CASE(expired_deadline_scope_skips_first_attempt) {

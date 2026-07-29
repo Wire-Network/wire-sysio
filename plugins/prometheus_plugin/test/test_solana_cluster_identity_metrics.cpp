@@ -26,9 +26,14 @@ BOOST_AUTO_TEST_CASE(exports_state_counters_and_bounded_operation_labels) {
       .verification_attempts = 4,
       .verification_successes = 3,
       .verification_mismatches = 1,
+      .verification_cancellations = 1,
       .blocked_operations =
          {
                               {solana_cluster_identity_operation::signing, 2},
+                              },
+      .protected_operation_failures =
+         {
+                              {solana_cluster_identity_operation::rpc_read, 1},
                               },
    };
 
@@ -41,7 +46,12 @@ BOOST_AUTO_TEST_CASE(exports_state_counters_and_bounded_operation_labels) {
                std::string::npos);
    BOOST_CHECK(output.find("nodeop_solana_cluster_identity_verification_attempts_total{client_id=\"client-a\"} 4") !=
                std::string::npos);
+   BOOST_CHECK(
+      output.find("nodeop_solana_cluster_identity_verification_cancellations_total{client_id=\"client-a\"} 1") !=
+      std::string::npos);
    BOOST_CHECK(output.find("operation=\"signing\"} 2") != std::string::npos);
+   BOOST_CHECK(output.find("nodeop_solana_cluster_identity_protected_operation_failures_total{client_id=\"client-a\","
+                           "operation=\"rpc_read\"} 1") != std::string::npos);
    BOOST_CHECK(output.find("rpc.example") == std::string::npos);
 }
 

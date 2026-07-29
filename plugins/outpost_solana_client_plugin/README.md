@@ -89,6 +89,11 @@ Pins each configured client to an independently obtained Solana genesis hash:
 <client-id>,<expected-genesis-hash>
 ```
 
+The check detects benign wrong-cluster routing or configuration. It does not
+authenticate a malicious RPC service—the genesis hash is public—and it cannot
+bind backends selected independently by a per-request routing proxy. Continue
+to use authenticated TLS endpoints and trusted network routing.
+
 The initial release has two configuration modes:
 
 - If the option is absent, every client preserves the legacy unpinned behavior.
@@ -109,13 +114,13 @@ One optional bounded-verification setting applies in pinned mode:
 |---|---:|---|
 | `--outpost-solana-cluster-identity-probe-timeout-ms` | `5000` | Deadline for startup and runtime `getGenesisHash` probes |
 
-Signing and submission always force a fresh identity probe. A mismatch is
-sticky until process restart and blocks reads, transaction construction,
-simulation, fee estimation, signing, and submission.
-Operation-gate queueing is included in the configured RPC total timeout;
-startup and signing use the identity-probe timeout.
-Solana clients also always honor an earlier active task deadline; lower-level
-transport configuration cannot disable these fail-closed budgets.
+Every new persistent connection is validated before its first ordinary request;
+healthy connections are validated once and replacements must validate again.
+Pinned signing stays local but requires a recent blockhash obtained over an
+admitted connection. A mismatch is sticky until process restart and blocks
+reads, transaction construction, simulation, fee estimation, signing, and
+submission. Solana clients always honor an earlier active task deadline;
+lower-level transport configuration cannot disable these fail-closed budgets.
 
 #### `--solana-idl-file` (optional, multi-token)
 
@@ -163,21 +168,25 @@ solana-idl-file = ./idl/counter_anchor.json
 ## Solana Cluster Identity Pinning
 
 Pinned clients verify `getGenesisHash` during construction before the plugin
-publishes any client. Runtime verification and each protected JSON-RPC call use
-one exact authenticated HTTP/TLS connection. If that connection closes before
-the follow-up, the protected operation fails closed instead of reconnecting or
-falling back to another cached connection.
+publishes any client. Every new HTTP/TLS connection is then validated before
+its first ordinary JSON-RPC request. A healthy persistent connection is
+validated once; every replacement or DNS fallback connection must pass its own
+validation. An endpoint that closes the validation response is rejected because
+no later request can be bound to that peer observation.
 
-Every protected JSON-RPC operation performs a peer-bound preflight, including
-reads, transaction construction, simulation, fee estimation, and submission.
-Signing independently forces a fresh bounded observation immediately before
-the signer is invoked. Identity mismatch is sticky for the process lifetime.
+Protected reads, transaction construction, simulation, fee estimation, and
+submission can use only an admitted live connection. Signing itself remains
+local: in pinned mode, the transaction's recent blockhash must have come from
+`getLatestBlockhash` over an admitted connection. Unpinned signing keeps the
+legacy local-only behavior. Identity mismatch is sticky for the process
+lifetime.
 
 Prometheus exposes bounded-cardinality state, time since the latest successful
-verification, attempt/success/mismatch/failure/recovery counters, and
-blocked-operation counters. Labels contain only configured client IDs and fixed
-enums; URL credentials, signer IDs, expected/observed hashes, transactions, and
-account payloads are not metric labels.
+verification, attempt/success/mismatch/failure/cancellation/recovery counters, and
+blocked-operation and protected-operation failure counters.
+Labels contain only configured client IDs and fixed enums; URL credentials,
+signer IDs, expected/observed hashes, transactions, and account payloads are
+not metric labels.
 
 The absent-option legacy mode is a compatibility window for the initial
 release. Operators should add identities for all clients together. A later

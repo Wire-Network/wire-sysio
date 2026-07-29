@@ -76,6 +76,7 @@ T retry_until(std::string_view                          op_label,
    const auto deadline_abs = fc::task::clamp_to_current_deadline(start_time + opts.total_timeout);
    const auto budget       = std::max(fc::microseconds(), deadline_abs - start_time);
    auto       backoff      = opts.initial_backoff;
+   fc::task::deadline_scope retry_deadline(deadline_abs);
 
    while (true) {
       if (fc::time_point::now() >= deadline_abs) {
