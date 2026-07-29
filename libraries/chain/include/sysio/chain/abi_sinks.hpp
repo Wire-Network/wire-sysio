@@ -183,12 +183,17 @@ public:
    /// by the variant-fallback built-in path until commit 2 lands the direct unpacks.
    void value_variant(const fc::variant& v);
 
-   /// Generic field emit used by `abi_to_emit<Sink>` for non-ABI types: dispatches
-   /// straight to `fc::to_json_stream(v, w)` so reflected user structs and primitives
-   /// emit their tokens without an intermediate variant build.
+   /// Generic field emit used by `abi_to_emit<Sink>` for non-ABI types: dispatches through
+   /// `fc::json_emit` so reflected user structs and primitives emit their tokens without an
+   /// intermediate variant build.
+   ///
+   /// `fc::json_emit` rather than a direct `fc::to_json_stream` call: a qualified call would
+   /// bind its overload set where this header is parsed, hiding every serializer declared by a
+   /// header included later and dropping those types through to the reflector primary's
+   /// static_assert.  See its declaration for why the indirection keeps ADL open for any `T`.
    template<typename T>
    void emit(const T& v) {
-      fc::to_json_stream(v, w_);
+      fc::json_emit(v, w_);
       on_value_emitted();
    }
 

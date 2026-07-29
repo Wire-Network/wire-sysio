@@ -179,6 +179,29 @@ void to_json_stream(const T& o, json_writer& w) {
    detail::if_enum_json<typename fc::reflector<T>::is_enum>::to_json_stream(o, w);
 }
 
+// -- Cross-namespace dispatch helper -------------------------------------------------------
+
+/// Emit `v` into `w` through the `to_json_stream` customization point.  Call it qualified --
+/// `fc::json_emit(v, w)` -- from any namespace.
+///
+/// A serializer for a given type may be declared by any header, including one pulled in long
+/// after the generic code that emits that type is parsed.  A qualified `fc::to_json_stream(v, w)`
+/// binds its overload set at that parse point and so cannot see those later declarations: the
+/// value silently falls through to the reflector primary above and fails its static_assert.
+/// Dispatching unqualified avoids it, because ADL runs again at the point of instantiation --
+/// and it always reaches namespace `fc`, since `json_writer` is an `fc` type and every call
+/// passes one.  That holds no matter where `T` itself lives, including global-namespace C types
+/// like `softfloat128_t` that associate no useful namespace of their own.
+///
+/// Code already inside namespace `fc` gets this for free by calling `to_json_stream` plainly.
+/// Code OUTSIDE `fc` cannot: ordinary unqualified lookup from, say, `sysio::chain::impl` never
+/// reaches `fc` at all, so each such site would otherwise need its own `using fc::to_json_stream;`
+/// declaration.  This helper is that declaration, written once.
+template<typename T>
+void json_emit(const T& v, json_writer& w) {
+   to_json_stream(v, w);
+}
+
 // -- Convenience entry point --------------------------------------------------------------
 
 /// One-shot helper: serialize `v` into a freshly-allocated std::string.  Hot-path callers
