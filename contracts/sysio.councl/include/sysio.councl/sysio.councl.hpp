@@ -54,6 +54,7 @@ enum class election_tier : uint8_t { GOVERNANCE = 0, T1 = 1, T2 = 2, T3 = 3 };
 enum class cleanup_stage : uint8_t { CANDIDATES = 0, ROSTER = 1, TIER2 = 2, TIER3 = 3, REMAP = 4, COMPLETE = 5 };
 
 static_assert(T1_VOTERS == SEATS - 1, "tier-1 electorate must exclude exactly the seat owner");
+static_assert(SLATE_SIZE == 3, "the fixed action and state schema require a three-candidate slate");
 } // namespace councl
 
 /**
@@ -97,8 +98,8 @@ public:
    [[sysio::action]]
    void finalizeinit();
 
-   /// After DONE, enter staged cleanup for the completed generation. Governance only. Call
-   /// `purge` until cleanup advances the generation and reopens registration.
+   /// Abort LOADING or, after DONE, enter staged cleanup for the current generation. Governance
+   /// only. Call `purge` until cleanup advances the generation and reopens registration.
    [[sysio::action]]
    void reset();
 

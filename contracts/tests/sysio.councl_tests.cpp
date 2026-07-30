@@ -41,6 +41,7 @@ constexpr auto IP_REG = "REG";
 constexpr auto IP_LOADING = "LOADING";
 constexpr auto IP_READY = "READY";
 constexpr auto IP_CLEANING = "CLEANING";
+constexpr auto TIER_GOVERNANCE = "GOVERNANCE";
 constexpr auto TIER_T1 = "T1";
 constexpr auto TIER_T2 = "T2";
 constexpr auto TIER_T3 = "T3";
@@ -304,15 +305,20 @@ public:
    std::string accumulator() { return get_state()["acc"].as_string(); }
    name proposer() { return name(get_state()["proposer"].as_string()); }
 
-   /// Elected member for a filled seat, or the empty name if the seat row is absent.
+   /// ABI-decoded output row for a filled seat, or an empty variant when absent.
    /// Per-election tables are scoped by the generation, so the scope name's value is election_gen.
-   name council_member(uint64_t seat, uint64_t generation = GEN0) {
+   fc::variant council_seat(uint64_t seat, uint64_t generation = GEN0) {
       auto data = get_row_by_id(COUNCL_ACCOUNT, name(generation), "council"_n, seat);
       if (data.empty())
-         return name{};
-      auto v = councl_abi.binary_to_variant("council_row", data,
-                                            abi_serializer::create_yield_function(abi_serializer_max_time));
-      return name(v["member"].as_string());
+         return fc::variant{};
+      return councl_abi.binary_to_variant("council_row", data,
+                                          abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
+   /// Elected member for a filled seat, or the empty name if the seat row is absent.
+   name council_member(uint64_t seat, uint64_t generation = GEN0) {
+      const auto row = council_seat(seat, generation);
+      return row.is_null() ? name{} : name(row["member"].as_string());
    }
 
    /// Return whether a generation still retains a candidate row for `candidate`.
@@ -347,6 +353,7 @@ public:
 
    /// Return whether any lazy Fisher-Yates remap row exists for a generation and seat.
    bool tier3_remap_exists(uint64_t generation, uint8_t seat, uint32_t tier3_size) {
+      // Must match GR_SCOPE_X_BITS in sysio.councl.cpp.
       constexpr uint64_t SEAT_SCOPE_BITS = 40;
       const uint64_t scope = (generation << SEAT_SCOPE_BITS) | seat;
       for (uint64_t idx = 0; idx < tier3_size; ++idx)
@@ -406,6 +413,7 @@ BOOST_FIXTURE_TEST_CASE(registration, sysio_councl_tester) {
       BOOST_REQUIRE_EQUAL(success(), rmcandidate(candidates_[0]));
       BOOST_REQUIRE_EQUAL(get_config()["cand_count"].as<uint32_t>(), 0u);
       BOOST_CHECK_EQUAL(control->get_resource_limits_manager().get_account_ram_usage(candidates_[0]), ram_before);
+      BOOST_REQUIRE_EQUAL(error("assertion failure with message: not a candidate"), rmcandidate(candidates_[0]));
    }
    FC_LOG_AND_RETHROW()
 }
@@ -469,6 +477,31 @@ BOOST_FIXTURE_TEST_CASE(startinit_roster_must_permute_tier1, sysio_councl_tester
    FC_LOG_AND_RETHROW()
 }
 
+BOOST_FIXTURE_TEST_CASE(startinit_rejects_duplicate_roster_owner, sysio_councl_tester) {
+   try {
+      register_candidates(23);
+      register_tiers();
+      std::vector<name> duplicate = t1_owners;
+      duplicate.back() = duplicate.front();
+      BOOST_REQUIRE_EQUAL(error("assertion failure with message: duplicate owner in ordered_owners"),
+                          startinit(TIME_SLOT, duplicate));
+   }
+   FC_LOG_AND_RETHROW()
+}
+
+BOOST_FIXTURE_TEST_CASE(startinit_requires_exactly_21_roa_tier1_owners, sysio_councl_tester) {
+   try {
+      register_candidates(23);
+      // Genesis supplies NODE_DADDY; register only 19 of the remaining 20 owners.
+      for (size_t i = 1; i < t1_owners.size() - 1; ++i)
+         forcereg_owner(t1_owners[i], 1);
+      BOOST_REQUIRE_EQUAL(
+         error("assertion failure with message: roa tier-1 owner count does not match the council seat count"),
+         startinit(TIME_SLOT, t1_owners));
+   }
+   FC_LOG_AND_RETHROW()
+}
+
 BOOST_FIXTURE_TEST_CASE(startinit_bounds_time_slot, sysio_councl_tester) {
    try {
       register_candidates(23);
@@ -499,6 +532,7 @@ BOOST_FIXTURE_TEST_CASE(initialization_actions_require_contract_auth, sysio_coun
                          mvo()("time_slot_sec", TIME_SLOT)("ordered_owners", owners)) != success());
 
       BOOST_REQUIRE_EQUAL(success(), startinit(TIME_SLOT, t1_owners));
+      BOOST_REQUIRE(push(COUNCL_ACCOUNT, councl_abi, candidates_[0], "reset"_n, mvo()) != success());
       BOOST_REQUIRE(push(COUNCL_ACCOUNT, councl_abi, candidates_[0], "loadtier"_n,
                          mvo()("tier", uint8_t{2})("max_rows", uint32_t{1000})) != success());
       BOOST_REQUIRE_EQUAL(success(), loadtier(2, 1000));
@@ -517,6 +551,7 @@ BOOST_FIXTURE_TEST_CASE(staged_load_and_finalize, sysio_councl_tester) {
       BOOST_REQUIRE_EQUAL(success(), startinit(TIME_SLOT, t1_owners));
       // batch tier-2 in two calls, tier-3 in one
       BOOST_REQUIRE_EQUAL(success(), loadtier(2, 3));
+      BOOST_REQUIRE_EQUAL(error("assertion failure with message: tier-2 snapshot incomplete"), finalizeinit());
       BOOST_REQUIRE_EQUAL(success(), loadtier(2, 3)); // remaining 2
       // finalize before tier-3 loaded -> incomplete
       BOOST_REQUIRE_EQUAL(error("assertion failure with message: tier-3 snapshot incomplete"), finalizeinit());
@@ -527,6 +562,70 @@ BOOST_FIXTURE_TEST_CASE(staged_load_and_finalize, sysio_councl_tester) {
       BOOST_REQUIRE_EQUAL(phase(), PH_AWAIT_REP);
       BOOST_REQUIRE_EQUAL(active_seat(), 0);
       BOOST_REQUIRE_EQUAL(proposer().to_string(), t1_owners[0].to_string());
+   }
+   FC_LOG_AND_RETHROW()
+}
+
+BOOST_FIXTURE_TEST_CASE(loadtier_validates_phase_tier_and_batch_size, sysio_councl_tester) {
+   try {
+      register_candidates(23);
+      register_tiers(/*n_t2=*/2, /*n_t3=*/1);
+      BOOST_REQUIRE_EQUAL(error("assertion failure with message: not in the loading phase"), loadtier(2, 1));
+      for (const uint8_t invalid_tier : {uint8_t{0}, uint8_t{1}, uint8_t{4}})
+         BOOST_REQUIRE_EQUAL(error("assertion failure with message: tier must be T2 or T3"),
+                             loadtier(invalid_tier, 1));
+      BOOST_REQUIRE_EQUAL(error("assertion failure with message: max_rows must be positive"), loadtier(2, 0));
+
+      BOOST_REQUIRE_EQUAL(success(), startinit(TIME_SLOT, t1_owners));
+      BOOST_REQUIRE_EQUAL(success(), loadtier(2, 1000));
+      const uint32_t loaded = get_config()["t2_loaded"].as<uint32_t>();
+      BOOST_REQUIRE_EQUAL(success(), loadtier(2, 1000));
+      BOOST_REQUIRE_EQUAL(get_config()["t2_loaded"].as<uint32_t>(), loaded);
+      BOOST_REQUIRE_EQUAL(success(), loadtier(3, 1000));
+      BOOST_REQUIRE_EQUAL(success(), finalizeinit());
+      BOOST_REQUIRE_EQUAL(error("assertion failure with message: not in the loading phase"), loadtier(2, 1));
+   }
+   FC_LOG_AND_RETHROW()
+}
+
+BOOST_FIXTURE_TEST_CASE(action_phase_guards_and_registration_closure, sysio_councl_tester) {
+   try {
+      register_candidates(23);
+      register_tiers();
+      const name candidate = candidates_[0];
+      const name unregistered = candidates_[23];
+
+      BOOST_REQUIRE_EQUAL(error("assertion failure with message: election is not running"),
+                          repcandidate(t1_owners[0], candidates_[0], candidates_[1], candidates_[2]));
+      BOOST_REQUIRE_EQUAL(error("assertion failure with message: election is not running"),
+                          vote(t1_owners[1], true, false, false));
+      BOOST_REQUIRE_EQUAL(error("assertion failure with message: election is not running"), settle());
+      BOOST_REQUIRE_EQUAL(error("assertion failure with message: election is not running"), stir(candidate));
+      BOOST_REQUIRE_EQUAL(error("assertion failure with message: generation cleanup is not active"), purge(1));
+      BOOST_REQUIRE_EQUAL(error("assertion failure with message: max_rows must be positive"), purge(0));
+
+      BOOST_REQUIRE_EQUAL(success(), startinit(TIME_SLOT, t1_owners));
+      BOOST_REQUIRE_EQUAL(error("assertion failure with message: candidate registration is closed"),
+                          addcandidate(unregistered, "closed"));
+      BOOST_REQUIRE_EQUAL(error("assertion failure with message: candidate registration is closed"),
+                          rmcandidate(candidate));
+      BOOST_REQUIRE_EQUAL(error("assertion failure with message: election is not running"),
+                          vote(t1_owners[1], true, false, false));
+
+      BOOST_REQUIRE_EQUAL(success(), loadtier(2, 1000));
+      BOOST_REQUIRE_EQUAL(success(), loadtier(3, 1000));
+      BOOST_REQUIRE_EQUAL(success(), finalizeinit());
+      BOOST_REQUIRE_EQUAL(error("assertion failure with message: voting is not open"),
+                          vote(t1_owners[1], true, false, false));
+
+      const name active_proposer = proposer();
+      BOOST_REQUIRE_EQUAL(success(),
+                          repcandidate(active_proposer, candidates_[0], candidates_[1], candidates_[2]));
+      BOOST_REQUIRE_EQUAL(error("assertion failure with message: not accepting nominations right now"),
+                          repcandidate(active_proposer, candidates_[3], candidates_[4], candidates_[5]));
+      BOOST_REQUIRE_EQUAL(error("assertion failure with message: current election is not complete"), reset());
+      BOOST_REQUIRE_EQUAL(error("assertion failure with message: not awaiting a governance assignment"),
+                          forceassign(candidates_[3]));
    }
    FC_LOG_AND_RETHROW()
 }
@@ -570,6 +669,35 @@ BOOST_FIXTURE_TEST_CASE(loadtier_roa_churn_mid_load, sysio_councl_tester) {
          BOOST_REQUIRE_MESSAGE(snapshot.insert(o).second, "duplicate owner in tier-2 snapshot: " + o.to_string());
       }
       BOOST_CHECK_MESSAGE(snapshot == std::set<name>({twoa, twob, twoc}), "tier-2 snapshot is not the roa tier-2 set");
+   }
+   FC_LOG_AND_RETHROW()
+}
+
+/// A failed or obsolete staged snapshot must be recoverable without redeploying the contract.
+BOOST_FIXTURE_TEST_CASE(loading_generation_can_be_aborted_purged_and_restarted, sysio_councl_tester) {
+   try {
+      register_candidates(23);
+      register_tiers(/*n_t2=*/2, /*n_t3=*/1);
+      BOOST_REQUIRE_EQUAL(success(), startinit(TIME_SLOT, t1_owners));
+      BOOST_REQUIRE_EQUAL(success(), loadtier(2, 1));
+      BOOST_REQUIRE_EQUAL(error("assertion failure with message: tier-2 snapshot incomplete"), finalizeinit());
+
+      BOOST_REQUIRE_EQUAL(success(), reset());
+      BOOST_REQUIRE_EQUAL(init_phase(), IP_CLEANING);
+      for (int calls = 0; init_phase() == IP_CLEANING && calls < 20; ++calls)
+         BOOST_REQUIRE_EQUAL(success(), purge(/*max_rows=*/10));
+      BOOST_REQUIRE_EQUAL(init_phase(), IP_REG);
+      BOOST_REQUIRE_EQUAL(election_gen(), 1u);
+      BOOST_REQUIRE(!candidate_exists(candidates_[0], GEN0));
+      BOOST_REQUIRE(!roster_exists(0, GEN0));
+      BOOST_REQUIRE(tier2_owner(0, GEN0).to_string().empty());
+
+      register_candidates(23);
+      BOOST_REQUIRE_EQUAL(success(), startinit(TIME_SLOT, t1_owners));
+      BOOST_REQUIRE_EQUAL(success(), loadtier(2, 1000));
+      BOOST_REQUIRE_EQUAL(success(), loadtier(3, 1000));
+      BOOST_REQUIRE_EQUAL(success(), finalizeinit());
+      BOOST_REQUIRE_EQUAL(init_phase(), IP_READY);
    }
    FC_LOG_AND_RETHROW()
 }
@@ -712,6 +840,59 @@ BOOST_FIXTURE_TEST_CASE(tier2_failure_escalates_to_tier3, sysio_councl_tester) {
       BOOST_REQUIRE_EQUAL(tier(), TIER_T3);
       BOOST_REQUIRE_EQUAL(phase(), PH_AWAIT_REP);
       BOOST_REQUIRE_EQUAL(tier3_available(), 2u);
+   }
+   FC_LOG_AND_RETHROW()
+}
+
+BOOST_FIXTURE_TEST_CASE(council_rows_record_owner_tier_proposer_and_member, sysio_councl_tester) {
+   try {
+      init_ready(/*n_candidates=*/23, /*n_t2=*/1, /*n_t3=*/1);
+      auto require_row = [&](uint64_t seat, name seat_owner, const char* filled_tier, name row_proposer, name member) {
+         const auto row = council_seat(seat);
+         BOOST_REQUIRE(!row.is_null());
+         BOOST_REQUIRE_EQUAL(row["seat"].as<uint64_t>(), seat);
+         BOOST_REQUIRE_EQUAL(row["seat_owner"].as_string(), seat_owner.to_string());
+         BOOST_REQUIRE_EQUAL(row["filled_tier"].as_string(), filled_tier);
+         BOOST_REQUIRE_EQUAL(row["proposer"].as_string(), row_proposer.to_string());
+         BOOST_REQUIRE_EQUAL(row["member"].as_string(), member.to_string());
+      };
+
+      const name p1 = proposer();
+      BOOST_REQUIRE_EQUAL(success(), repcandidate(p1, candidates_[0], candidates_[4], candidates_[5]));
+      const auto voters1 = tier1_voters_excluding(p1);
+      for (size_t i = 0; i < 14; ++i)
+         BOOST_REQUIRE_EQUAL(success(), vote(voters1[i], true, false, false));
+      require_row(0, t1_owners[0], TIER_T1, p1, candidates_[0]);
+
+      elapse_and_settle(); // seat 1: T1 -> T2
+      const name p2 = proposer();
+      BOOST_REQUIRE_EQUAL(success(), repcandidate(p2, candidates_[1], candidates_[4], candidates_[5]));
+      require_row(1, t1_owners[1], TIER_T2, p2, candidates_[1]);
+
+      elapse_and_settle(); // seat 2: T1 -> T2
+      elapse_and_settle(); // seat 2: T2 -> T3
+      const name p3 = proposer();
+      BOOST_REQUIRE_EQUAL(success(), repcandidate(p3, candidates_[2], candidates_[4], candidates_[5]));
+      require_row(2, t1_owners[2], TIER_T3, p3, candidates_[2]);
+
+      produce_block(fc::seconds(TIME_SLOT + 1));
+      BOOST_REQUIRE_EQUAL(success(), forceback());
+      BOOST_REQUIRE_EQUAL(success(), forceassign(candidates_[3]));
+      require_row(3, t1_owners[3], TIER_GOVERNANCE, COUNCL_ACCOUNT, candidates_[3]);
+   }
+   FC_LOG_AND_RETHROW()
+}
+
+BOOST_FIXTURE_TEST_CASE(tier2_failure_without_tier3_enters_backstop, sysio_councl_tester) {
+   try {
+      init_ready(/*n_candidates=*/23, /*n_t2=*/2, /*n_t3=*/0);
+      elapse_and_settle();
+      const name p2 = proposer();
+      BOOST_REQUIRE_EQUAL(success(), repcandidate(p2, candidates_[0], candidates_[1], candidates_[2]));
+      const auto voters = excluding(t2_owners, p2);
+      BOOST_REQUIRE_EQUAL(voters.size(), 1u);
+      BOOST_REQUIRE_EQUAL(success(), vote(voters[0], false, false, false));
+      BOOST_REQUIRE_EQUAL(phase(), PH_BACKSTOP);
    }
    FC_LOG_AND_RETHROW()
 }
@@ -928,14 +1109,25 @@ BOOST_FIXTURE_TEST_CASE(deadline_boundary_is_inclusive, sysio_councl_tester) {
 BOOST_FIXTURE_TEST_CASE(backstop_forceassign, sysio_councl_tester) {
    try {
       init_ready(/*n_candidates=*/23, /*n_t2=*/0, /*n_t3=*/0); // no escalation targets
+      BOOST_REQUIRE_EQUAL(error("assertion failure with message: not awaiting a governance assignment"),
+                          forceassign(candidates_[0]));
       elapse_and_settle();                                     // tier-1 nomination times out -> no tier2/3 -> BACKSTOP
       BOOST_REQUIRE_EQUAL(phase(), PH_BACKSTOP);
       BOOST_REQUIRE(push(COUNCL_ACCOUNT, councl_abi, candidates_[1], "forceassign"_n,
                          mvo()("member", candidates_[0].to_string())) != success());
+      BOOST_REQUIRE_EQUAL(
+         error("assertion failure with message: no active attempt is eligible for governance recovery"), forceback());
+      BOOST_REQUIRE_EQUAL(error("assertion failure with message: member is not a candidate"),
+                          forceassign(candidates_[25]));
       // governance seats an un-elected candidate
       BOOST_REQUIRE_EQUAL(success(), forceassign(candidates_[0]));
       BOOST_REQUIRE_EQUAL(council_member(0).to_string(), candidates_[0].to_string());
       BOOST_REQUIRE_EQUAL(active_seat(), 1);
+
+      elapse_and_settle();
+      BOOST_REQUIRE_EQUAL(phase(), PH_BACKSTOP);
+      BOOST_REQUIRE_EQUAL(error("assertion failure with message: candidate already elected to a seat"),
+                          forceassign(candidates_[0]));
    }
    FC_LOG_AND_RETHROW()
 }
@@ -965,6 +1157,8 @@ BOOST_FIXTURE_TEST_CASE(full_election_reset_cleanup_and_second_generation, sysio
       const int64_t candidate_ram_with_row =
          control->get_resource_limits_manager().get_account_ram_usage(candidates_[0]);
       drive_generation(/*generation=*/0);
+      BOOST_REQUIRE_EQUAL(error("assertion failure with message: election is complete"), settle());
+      BOOST_REQUIRE_EQUAL(error("assertion failure with message: election is complete"), stir(candidates_[0]));
 
       BOOST_REQUIRE(push(COUNCL_ACCOUNT, councl_abi, candidates_[0], "reset"_n, mvo()) != success());
       BOOST_REQUIRE_EQUAL(success(), reset());

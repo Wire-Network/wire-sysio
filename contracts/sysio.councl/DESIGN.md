@@ -58,7 +58,7 @@ Per seat, the flow is:
 | 9 | Randomness | In-contract **entropy accumulator**, **Variant B** (block number and timestamp excluded), §5. |
 | 10 | Proposer auto-yes | Tier-2/3 proposer's auto-yes counts for **all three** slate candidates. Tier-1 has no auto-yes. |
 | 11 | Tier-2/3 selection set | **Full ordered tier-2 and tier-3 owner lists frozen at init**; nth-pick indexes those. |
-| 12 | Admin auth / re-runs | Initialization and cleanup require contract auth. `reset` enters bounded cleanup; `purge` removes ephemeral rows and then advances `election_gen`. Historical council rows remain. |
+| 12 | Admin auth / re-runs | Initialization and cleanup require contract auth. `reset` aborts partial `LOADING` or cleans a `DONE` generation; `purge` removes ephemeral rows and then advances `election_gen`. Historical council rows remain. |
 | 13 | Recovery | Once an active attempt is past its deadline, governance may call `forceback` to enter `BACKSTOP` immediately instead of waiting through every remaining tier-3 attempt. |
 
 ## 4. Constants
@@ -121,7 +121,8 @@ set, so an owner may be selected again for a later seat.
 should determine whether settlement is allowed, not provide a caller-chosen extra resampling
 input. This remains pseudo-random, deterministic, and grindable—not a cryptographic beacon. A
 future-block VRF would be required to remove trigger-party manipulation. Authenticated cranks make
-each resampling attributable and non-free while allowing any account to advance liveness.
+each resampling attributable while allowing any account to advance liveness, but cheap identities
+mean authentication does not make multi-account grinding economically expensive.
 
 ## 6. Strict-priority resolution [CONFIRMED]
 
@@ -156,7 +157,9 @@ Electorate sizes / voter sets:
 
 [NOTE] Degenerate tiers: if a tier's snapshot size is `0`, that tier is **skipped** during
 escalation (you can't run a round with no electorate). If `n == 1`, `T = win(1) = 1` and the lone
-proposer's auto-yes wins instantly — acceptable and bounded.
+proposer's auto-yes wins instantly. Node owners may also register as candidates, so the lone
+proposer can nominate and immediately seat themselves; the contract intentionally does not impose
+an electorate-size floor or proposer/candidate exclusion.
 
 ## 7. Escalation ladder (per seat)
 
@@ -232,8 +235,10 @@ Tier-3 can hold up to 1000 rows, too many to read+write in one transaction, so i
   4. Set `init_phase = LOADING` and reset the loaded-row counts/next snapshot indices.
 - **`loadtier(uint8 tier, uint32 max_rows)`** — `require_auth(get_self())`, `LOADING` only.
   Appends up to `max_rows` of roa's tier-2 or tier-3 owners into the `tier2`/`tier3` snapshot in
-  `bytier` order. Idempotent; the stored progress value is a loaded-row count/next snapshot index,
-  while each call rescans the live tier and skips identities already frozen.
+  deterministic owner order. Idempotent; each call resumes after the last appended identity and
+  wraps once, while the by-owner index skips identities already frozen. This absorbs owners added
+  earlier in the ordering during a prior batch without rescanning the entire loaded prefix on each
+  normal call.
 - **`finalizeinit()`** — `require_auth(get_self())`, `LOADING` only.
   1. `check` the tier-2/tier-3 snapshots are complete vs `sysio.system::nodecount`
      (`n2 == t2_count`, `n3 == t3_count`) — the completeness cross-check.
@@ -244,7 +249,9 @@ Tier-3 can hold up to 1000 rows, too many to read+write in one transaction, so i
      `seats_filled = 0`, `tier3_available = n3`. Set `init_phase = READY`.
 
 ### Generation cleanup
-- **`reset()`** — contract auth, `DONE` only. Enter `CLEANING`; do not advance the generation yet.
+- **`reset()`** — contract auth, either `LOADING` or `READY` with election phase `DONE`. Enter
+  `CLEANING`; do not advance the generation yet. The `LOADING` path is the recovery hatch for a
+  partial snapshot that cannot pass `finalizeinit`.
 - **`purge(max_rows)`** — contract auth. Delete at most `max_rows` ephemeral candidate, snapshot,
   and remap rows across resumable calls. Council history is not deleted. Once cleanup completes,
   increment `election_gen` and reopen `REG`.
@@ -291,6 +298,8 @@ Tier-3 can hold up to 1000 rows, too many to read+write in one transaction, so i
 
 ```
 REG ──startinit──> LOADING ──loadtier*──> finalizeinit ──> READY
+                         │
+                         └──reset──> CLEANING ──purge*──> REG
                                                              │
                     ┌──────────────── seat k ────────────────┘
                     ▼
@@ -328,7 +337,8 @@ resolutions compound forward naturally.
   the only non-replay-safe temptation, and it never reads a block id).
 - **Cross-contract reads** are read-only point/index lookups against roa's and sysio.system's
   public KV tables. The snapshots at init make the running election immune to mid-election roa
-  churn.
+  churn. `finalizeinit` also verifies that the captured ROA generation is still current; if a
+  generation or count divergence prevents finalization, governance can reset and purge LOADING.
 - **Enum discipline:** election state uses typed contract enums. The action-boundary tier byte is
   checked with `magic_enum`; protobuf ROA tiers use their generated enum names/helpers.
 - **Storage bound:** at most 1,000 candidate-paid rows; 21 roster + 84 tier-2 + 1,000 tier-3
@@ -355,8 +365,8 @@ Split by binary per CLAUDE.md; the seed math is deliberately isolated for cheap 
 
 **On-chain integration tests (contract test harness):**
 - Registration bounds (handle length/characters, duplicate/auth, candidate cap, `< 23` fails init).
-- Staged init: `startinit` permutation/`t1==21` checks; `loadtier` batching + resume; `finalizeinit`
-  completeness cross-check vs `nodecount`.
+- Staged init: `startinit` permutation/`t1==21` checks; `loadtier` batching + churn-safe resume;
+  `finalizeinit` generation/count completeness checks; abort-and-purge recovery from `LOADING`.
 - Tier-1 happy path (14 yes → seat filled; strict priority: 1 wins despite 2 having more yes).
 - Elimination: candidate 1 gets 7 no → candidate 2 becomes active and wins.
 - Early termination: all 20 voted; partial-turnout voting deadline via `settle`; exact inclusive

@@ -70,12 +70,13 @@ against the live node counts, and the first council seat's nomination window ope
 ---
 spec_version: "0.2.0"
 title: Begin Election Reset
-summary: 'Begin staged cleanup of the completed election generation.'
+summary: 'Abort partial initialization or clean a completed election generation.'
 ---
 
-The contract owner starts cleanup of ephemeral rows from a completed election. Council result rows
-remain as permanent history. The contract owner must call `purge` until cleanup completes and
-candidate registration reopens.
+The contract owner starts cleanup of ephemeral rows either while initialization is still loading
+or after the election is complete. The loading path recovers from a partial snapshot that cannot
+be finalized. Council result rows remain as permanent history. The contract owner must call
+`purge` until cleanup completes and candidate registration reopens.
 
 <h1 class="contract">purge</h1>
 

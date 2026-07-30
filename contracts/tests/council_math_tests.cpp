@@ -86,6 +86,9 @@ BOOST_AUTO_TEST_CASE(round_failures) {
 }
 
 BOOST_AUTO_TEST_CASE(degenerate_and_full_turnout) {
+   // Empty tiers are skipped by the state machine; keep the math guard deterministic as well.
+   BOOST_CHECK(R({0, 0, 0}, {0, 0, 0}, 0, false, false).result == round_result::FAIL);
+
    // tier-2/3 N==1 with proposer auto-yes seeded -> instant win c1
    auto r = R({1, 1, 1}, {0, 0, 0}, 1, true, false);
    BOOST_CHECK(r.result == round_result::WIN);
