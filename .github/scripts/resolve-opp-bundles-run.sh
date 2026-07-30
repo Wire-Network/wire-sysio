@@ -75,9 +75,12 @@ resolve_run() {
    # Newest first (the API's default order): the newest successful run's
    # artifact carries the versions actually published last.
    for candidate in $candidate_ids; do
+      # `gh api --jq` takes a bare jq EXPRESSION and no jq flags (`--arg` would be
+      # consumed as the expression and the rest as positionals, erroring with
+      # "accepts 1 arg(s)"); pipe through real jq to bind the artifact name.
       artifact_count="$(
-         gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${candidate}/artifacts" \
-            --jq --arg name "$artifact_name" '[.artifacts[] | select(.name == $name)] | length'
+         gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${candidate}/artifacts" |
+            jq -r --arg name "$artifact_name" '[.artifacts[] | select(.name == $name)] | length'
       )"
       if [[ "$artifact_count" -gt 0 ]]; then
          echo "$candidate"
