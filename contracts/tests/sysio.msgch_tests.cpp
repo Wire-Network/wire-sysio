@@ -361,6 +361,8 @@ constexpr uint64_t SOL_OUTPOST_ID = "SOL"_s.value;
 constexpr auto EVM_TEST_ATTESTATION_TYPE       = opp::types::ATTESTATION_TYPE_OPERATORS;
 constexpr auto SWAP_REMIT_ATTESTATION_TYPE    = opp::types::ATTESTATION_TYPE_SWAP_REMIT;
 constexpr auto UNCOVERED_TEST_ATTESTATION_TYPE = opp::types::ATTESTATION_TYPE_STAKING_REWARD;
+/// Raw protobuf wire slot used only to seed the pre-upgrade READY-row shape.
+constexpr uint32_t RETIRED_STAKE_ATTESTATION_VALUE = 3001;
 
 /// Decode the emitted OPP envelope and count attestations in its single message.
 uint32_t emitted_attestation_count(const fc::variant& emitted_row) {
@@ -402,6 +404,31 @@ BOOST_FIXTURE_TEST_CASE(buildenv_writes_envlog_row, sysio_msgch_envlog_tester) {
    BOOST_REQUIRE(opp::types::CHAIN_KIND_EVM ==
                  row["endpoints"]["end"]["kind"].as<opp::types::ChainKind>());
    BOOST_REQUIRE_EQUAL(31337u, row["endpoints"]["end"]["id"]["value"].as_uint64());
+} FC_LOG_AND_RETHROW() }
+
+/// READY rows written by a pre-upgrade contract with a retired staking wire
+/// value are tombstoned before destination-specific envelope construction.
+/// Active rows behind the tombstone still emit normally, so one legacy row
+/// cannot strand the queue or reach an outpost decoder.
+BOOST_FIXTURE_TEST_CASE(buildenv_tombstones_retired_staking_rows,
+                        sysio_msgch_envlog_tester) { try {
+   bootstrap_epoch_config(/*retention=*/200);
+   register_outpost(opp::types::CHAIN_KIND_EVM, 31337);
+   produce_blocks();
+
+   BOOST_REQUIRE_EQUAL(success(),
+      queueout(/*chain_code=*/ETH_OUTPOST_ID, RETIRED_STAKE_ATTESTATION_VALUE));
+   BOOST_REQUIRE_EQUAL(success(),
+      queueout(/*chain_code=*/ETH_OUTPOST_ID, EVM_TEST_ATTESTATION_TYPE));
+   BOOST_REQUIRE_EQUAL(2u, count_ready_attestations(ETH_OUTPOST_ID, 8));
+
+   BOOST_REQUIRE_EQUAL(success(), buildenv(/*chain_code=*/ETH_OUTPOST_ID));
+   produce_blocks();
+
+   BOOST_REQUIRE_EQUAL(0u, count_ready_attestations(ETH_OUTPOST_ID, 8));
+   const auto emitted = find_outbound_envelope();
+   BOOST_REQUIRE(!emitted.is_null());
+   BOOST_REQUIRE_EQUAL(1u, emitted_attestation_count(emitted));
 } FC_LOG_AND_RETHROW() }
 
 /// Eviction at the boundary. Set `retention=2` and one outpost →

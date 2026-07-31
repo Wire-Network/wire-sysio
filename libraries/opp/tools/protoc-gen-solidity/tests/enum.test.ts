@@ -57,6 +57,13 @@ describe("computeUnderlyingType", () => {
     const values: EnumValueInfo[] = [{ name: "A", number: 0x100000000 }]
     expect(computeUnderlyingType(values)).toBe("uint64")
   })
+
+  it("includes reserved slots when selecting the underlying type", () => {
+    const values: EnumValueInfo[] = [{ name: "UNSPECIFIED", number: 0 }]
+    expect(computeUnderlyingType(values, [{ start: 3001, end: 3002 }])).toBe(
+      "uint16"
+    )
+  })
 })
 
 describe("enumLibName", () => {
@@ -79,6 +86,7 @@ describe("genEnumDefinition", () => {
         { name: "ADMIN", number: 1 },
         { name: "USER", number: 2 }
       ],
+      reservedRanges: [],
       underlyingType: "uint8"
     }
 
@@ -121,6 +129,7 @@ describe("genEnumDefinition", () => {
       name: "Status",
       fullName: "deep.nested.package.Status",
       values: [{ name: "OK", number: 0 }],
+      reservedRanges: [],
       underlyingType: "uint8"
     }
 
@@ -134,6 +143,7 @@ describe("genEnumDefinition", () => {
       name: "Empty",
       fullName: "Empty",
       values: [],
+      reservedRanges: [],
       underlyingType: "uint8"
     }
 
@@ -159,6 +169,7 @@ describe("genEnumDefinition", () => {
         { name: "HIGH", number: 100 },
         { name: "MEDIUM", number: 50 }
       ],
+      reservedRanges: [],
       underlyingType: "uint8"
     }
 
@@ -176,6 +187,7 @@ describe("genEnumDefinition", () => {
         { name: "RUNNING", number: 1 },
         { name: "STARTED", number: 1 }
       ],
+      reservedRanges: [],
       underlyingType: "uint8"
     }
 
@@ -194,10 +206,36 @@ describe("genEnumDefinition", () => {
       name: "Big",
       fullName: "Big",
       values: [{ name: "VAL", number: 0x10000 }],
+      reservedRanges: [],
       underlyingType: "uint24"
     }
 
     const result = genEnumDefinition(desc)
     expect(result).toContain("type Big is uint24;")
+  })
+
+  it("decodes reserved numeric slots opaquely without making them valid", () => {
+    const desc: EnumDescriptor = {
+      name: "AttestationType",
+      fullName: "AttestationType",
+      values: [
+        { name: "UNSPECIFIED", number: 0 },
+        { name: "ACTIVE", number: 3003 }
+      ],
+      reservedRanges: [
+        { start: 3001, end: 3001 },
+        { start: 4000, end: 4002 }
+      ],
+      underlyingType: "uint16"
+    }
+
+    const result = genEnumDefinition(desc)
+    expect(result).toContain("return _raw == 0 || _raw == 3003;")
+    expect(result).toContain(
+      "if (_raw == 3001) return AttestationType.wrap(uint16(_raw));"
+    )
+    expect(result).toContain(
+      "if (_raw >= 4000 && _raw <= 4002) return AttestationType.wrap(uint16(_raw));"
+    )
   })
 })

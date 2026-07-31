@@ -13,6 +13,7 @@
 #include <sysio/opp/attestations/attestations.pb.hpp>
 #include <zpp_bits.h>
 #include <algorithm>
+#include <magic_enum/magic_enum.hpp>
 #include <optional>
 
 namespace sysio {
@@ -79,6 +80,18 @@ constexpr size_t   ATTESTATION_OVERHEAD_BYTES = 24;
 /// + payload preamble, and a safety margin for `zpp::bits` length prefixes.
 constexpr size_t   ENVELOPE_BASELINE_BYTES    = 512;
 
+/// Retired pre-launch attestation wire slots. They remain recognizable here
+/// only so an upgraded contract can tombstone READY rows queued by the prior
+/// implementation instead of forwarding them or blocking envelope creation.
+constexpr int32_t RETIRED_STAKE_ATTESTATION_VALUE   = 3001;
+constexpr int32_t RETIRED_UNSTAKE_ATTESTATION_VALUE = 3002;
+
+bool is_retired_staking_attestation(AttestationType type) {
+   const auto value = magic_enum::enum_integer(type);
+   return value == RETIRED_STAKE_ATTESTATION_VALUE ||
+          value == RETIRED_UNSTAKE_ATTESTATION_VALUE;
+}
+
 using namespace sysio::msgch_svm_terminal_budget;
 
 static_assert(svm_hard_dynamic_account_budget() == 16,
@@ -125,8 +138,6 @@ std::optional<size_t> estimate_svm_dynamic_accounts(AttestationType type,
          return SVM_DYNAMIC_ACCOUNTS_RESERVE_EFFECT_WORST_CASE;
 
       case AT::ATTESTATION_TYPE_UNSPECIFIED:
-      case AT::ATTESTATION_TYPE_STAKE:
-      case AT::ATTESTATION_TYPE_UNSTAKE:
       case AT::ATTESTATION_TYPE_PRETOKEN_PURCHASE:
       case AT::ATTESTATION_TYPE_PRETOKEN_YIELD:
       case AT::ATTESTATION_TYPE_WIRE_TOKEN_PURCHASE:
@@ -799,8 +810,8 @@ void dispatch_node_owner_reg(const std::vector<char>& data, uint64_t chain_code)
 /// in `evalcons` after a consensus envelope has been unpacked. Dispatch is
 /// best-effort — silently no-ops on unknown / out-of-scope types so the
 /// inbound stream can keep flowing even when the depot hasn't yet wired up
-/// every handler (e.g. the deferred STAKE / UNSTAKE / STAKE_UPDATE staking
-/// lifecycle types).
+/// every active handler (for example, STAKE_UPDATE from the separate staking
+/// track). Retired STAKE / UNSTAKE wire values also land on this no-op path.
 void dispatch_attestation(name self, uint64_t attestation_id,
                           AttestationType type,
                           const std::vector<char>& data,
@@ -925,12 +936,10 @@ void dispatch_attestation(name self, uint64_t attestation_id,
          // opening a sysio.chalg dispute vote, not by inbound challenge attestations.
          break;
 
-      case AttestationType::ATTESTATION_TYPE_STAKE:
-      case AttestationType::ATTESTATION_TYPE_UNSTAKE:
       case AttestationType::ATTESTATION_TYPE_STAKE_UPDATE:
       case AttestationType::ATTESTATION_TYPE_STAKE_RESULT:
-         // Validator-staking lifecycle; depot-side handlers land in a later
-         // task alongside liqEth / liqsol-token wiring.
+         // Post-launch validator-staking lifecycle; depot-side handlers land
+         // alongside liqEth / liqsol-token wiring.
          break;
 
       // Outbound-only types (depot emits these, never receives them inbound)
@@ -1694,8 +1703,19 @@ void msgch::buildenv(uint64_t chain_code) {
    for (auto it = status_idx.lower_bound(
            static_cast<uint64_t>(AttestationStatus::ATTESTATION_STATUS_READY));
         it != status_idx.end() &&
-        it->status == AttestationStatus::ATTESTATION_STATUS_READY; ++it) {
-      if (it->chain_code != chain_code) continue;
+        it->status == AttestationStatus::ATTESTATION_STATUS_READY; ) {
+      // Upgrade tombstone: legacy builds could persist STAKE / UNSTAKE rows.
+      // Erase them before destination-specific estimation so neither the SVM
+      // terminal-account gate nor an outpost decoder can be blocked by a
+      // protocol value that no longer has a generated enum/message type.
+      if (is_retired_staking_attestation(it->type)) {
+         it = status_idx.erase(std::move(it));
+         continue;
+      }
+      if (it->chain_code != chain_code) {
+         ++it;
+         continue;
+      }
 
       opp::AttestationEntry entry;
       entry.type = it->type;
@@ -1703,6 +1723,7 @@ void msgch::buildenv(uint64_t chain_code) {
       entry.data = it->data;
       candidate_entries.push_back(std::move(entry));
       candidate_ids.push_back(it->id);
+      ++it;
    }
 
    if (candidate_entries.empty()) return;

@@ -229,10 +229,15 @@ message ReserveAmount {
 // ---------------------------------------------------------------------------
 
 enum AttestationType {
+  reserved 3001, 3002;
+  reserved "ATTESTATION_TYPE_STAKE", "ATTESTATION_TYPE_UNSTAKE";
+
   ATTESTATION_TYPE_UNSPECIFIED = 0;
   ATTESTATION_TYPE_OPERATOR_ACTION = 2001; // 0x07D1
-  ATTESTATION_TYPE_STAKE = 3001;
-  ATTESTATION_TYPE_UNSTAKE = 3002;
+  // 3001 was ATTESTATION_TYPE_STAKE — removed; do not reuse. The pre-launch
+  // stake lifecycle was retired before mainnet launch.
+  // 3002 was ATTESTATION_TYPE_UNSTAKE — removed; do not reuse. The pre-launch
+  // unstake lifecycle was retired before mainnet launch.
   // DEPRECATED — pre-launch only, do not use in new code.
   ATTESTATION_TYPE_PRETOKEN_PURCHASE = 3004;
   // DEPRECATED — pre-launch only, do not use in new code.

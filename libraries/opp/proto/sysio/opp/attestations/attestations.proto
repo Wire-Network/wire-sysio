@@ -29,17 +29,12 @@ message ReserveBalanceSheet {
   repeated sysio.opp.types.ReserveAmount reserves = 4;
 }
 
-// ---------------------------------------------------------------------------
-//  Pre-launch specific attestations (DEPRECATED — kept for proto compatibility
-//  during the deprecation pass)
-// ---------------------------------------------------------------------------
+// PretokenStakeChange was removed with the pre-launch STAKE / UNSTAKE
+// lifecycle. Attestation enum slots 3001 and 3002 remain retired.
 
-message PretokenStakeChange {
-  sysio.opp.types.ChainAddress actor          = 1;
-  sysio.opp.types.TokenAmount  amount         = 2;
-  int64                        index_at_mint  = 10;
-  int64                        index_at_burn  = 11;
-}
+// ---------------------------------------------------------------------------
+//  Remaining pre-launch specific attestations (DEPRECATED)
+// ---------------------------------------------------------------------------
 
 message PretokenPurchase {
   sysio.opp.types.ChainAddress actor          = 1;

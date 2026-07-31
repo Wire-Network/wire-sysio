@@ -358,9 +358,9 @@ public:
 
    // -- Inbound envelope builder --
 
-   /// Encode a deliverable envelope carrying one out-of-scope STAKE attestation (dispatch drops
-   /// the attestation silently; acceptance is still fully observable via `outpcons` and the
-   /// stored attestation row). The semantic header is derived per the spec — `apply_consensus`
+   /// Encode a deliverable envelope carrying one out-of-scope CHALLENGE_RESPONSE attestation
+   /// (dispatch drops the attestation silently; acceptance is still fully observable via
+   /// `outpcons` and the stored attestation row). The semantic header is derived per the spec — `apply_consensus`
    /// drops envelopes whose header fields do not recompute or whose message does not continue the
    /// per-outpost message chain. `prev` (previous_envelope_hash), `prev_message_id`, and
    /// `env_hash` are raw 32-byte strings (or empty for stream genesis).
@@ -375,7 +375,7 @@ public:
       if (!prev.empty()) env.set_previous_envelope_hash(prev);
       if (!env_hash.empty()) env.set_envelope_hash(env_hash);
       auto* att = env.add_messages()->mutable_payload()->add_attestations();
-      att->set_type(sysio::opp::types::ATTESTATION_TYPE_STAKE);
+      att->set_type(sysio::opp::types::ATTESTATION_TYPE_CHALLENGE_RESPONSE);
       att->set_data(att_data);
       att->set_data_size(static_cast<uint32_t>(att_data.size()));
       oracle::finalize_header(*env.mutable_messages(0), prev_message_id, 1'775'612'516'983ULL);
