@@ -103,6 +103,34 @@ std::vector<char> encode_envelope_with_one_attestation(
    return out;
 }
 
+/// Encode a single historical attestation whose numeric enum slot is no
+/// longer declared by the current protobuf schema.
+std::vector<char> encode_envelope_with_one_raw_attestation(
+   uint32_t epoch_index,
+   int32_t raw_att_type,
+   const std::string& att_data)
+{
+   sysio::opp::Envelope env;
+   env.set_epoch_index(epoch_index);
+   env.set_epoch_envelope_index(1);
+   env.set_epoch_timestamp(1'775'612'516'983ULL);
+
+   auto* msg        = env.add_messages();
+   auto* payload    = msg->mutable_payload();
+   auto* att        = payload->add_attestations();
+   const auto* field = att->GetDescriptor()->FindFieldByName("type");
+   BOOST_REQUIRE(field != nullptr);
+   att->GetReflection()->SetEnumValue(att, field, raw_att_type);
+   att->set_data(att_data);
+   att->set_data_size(static_cast<uint32_t>(att_data.size()));
+
+   oracle::finalize_header(*env.mutable_messages(0), {}, 1'775'612'516'983ULL);
+
+   std::vector<char> out(env.ByteSizeLong());
+   env.SerializeToArray(out.data(), static_cast<int>(out.size()));
+   return out;
+}
+
 /// Encode an Envelope wrapping N attestations of the same type. Used to fit
 /// multiple OPERATOR_ACTIONs into a single delivery, since the depot
 /// deduplicates per-(batch_op, outpost, epoch) — a second `deliver` from
@@ -890,11 +918,9 @@ BOOST_FIXTURE_TEST_CASE(dispatch_silently_drops_out_of_scope_types, sysio_dispat
    bootstrap_for_dispatch();
 
    const auto eth_code = fc::slug_name{"ETH"}.value;
-   constexpr auto retired_stake_attestation =
-      static_cast<sysio::opp::types::AttestationType>(3001);
-   auto envelope = encode_envelope_with_one_attestation(
+   auto envelope = encode_envelope_with_one_raw_attestation(
       current_epoch(),
-      retired_stake_attestation,
+      /*raw_att_type=*/3001,
       std::string{});
 
    BOOST_REQUIRE_EQUAL(success(), deliver(/*chain_code=*/eth_code, envelope));
