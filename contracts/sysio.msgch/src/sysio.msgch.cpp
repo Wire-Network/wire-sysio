@@ -86,6 +86,7 @@ constexpr size_t   ENVELOPE_BASELINE_BYTES    = 512;
 constexpr int32_t RETIRED_STAKE_ATTESTATION_VALUE   = 3001;
 constexpr int32_t RETIRED_UNSTAKE_ATTESTATION_VALUE = 3002;
 
+/// Return true when an attestation carries a retired pre-launch staking slot.
 bool is_retired_staking_attestation(AttestationType type) {
    const auto value = magic_enum::enum_integer(type);
    return value == RETIRED_STAKE_ATTESTATION_VALUE ||

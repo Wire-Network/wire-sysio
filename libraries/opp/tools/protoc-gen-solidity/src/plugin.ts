@@ -48,6 +48,7 @@ const EnumValueDescriptorProto = new protobuf.Type("EnumValueDescriptorProto")
   .add(new protobuf.Field("name", 1, "string", "optional"))
   .add(new protobuf.Field("number", 2, "int32", "optional"))
 
+/** Numeric interval reserved by a protobuf enum declaration. */
 const EnumReservedRange = new protobuf.Type("EnumReservedRange")
   .add(new protobuf.Field("start", 1, "int32", "optional"))
   .add(new protobuf.Field("end", 2, "int32", "optional"))
