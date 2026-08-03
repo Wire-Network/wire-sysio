@@ -5,7 +5,7 @@
 #include <magic_enum/magic_enum.hpp>
 #include <sysio.councl/sysio.councl.hpp>
 #include <sysio.roa.hpp>              // roa::roastate_t / roa::nodeowners_t — tier membership
-#include <sysio.system/emissions.hpp> // sysiosystem::emissions::nodecountstate_t — tier counts
+#include <sysio.system/emissions.hpp> // shared node-owner caps
 #include <sysio/opp/types/types.pb.hpp>
 #include <tuple>
 #include <vector>
@@ -40,6 +40,10 @@ using NodeOwnerTier = opp::types::NodeOwnerTier;
 
 static_assert(councl::SEATS == sysiosystem::emissions::T1_MAX_NODE_OWNERS,
               "council seats must match the system tier-1 owner cap");
+static_assert(councl_math::win_threshold(councl::T1_VOTERS) + 1 == councl_math::win_threshold(councl::SEATS),
+              "tier-1 and proposer-auto-yes tiers must require the same number of voter approvals");
+static_assert(councl_math::elim_threshold(councl::T1_VOTERS) == councl_math::elim_threshold(councl::SEATS),
+              "tier-1 and proposer-auto-yes tiers must retain equivalent rejection thresholds");
 
 /// Convert a council tier to its stable integer representation for ROA table comparisons.
 constexpr uint8_t tier_integer(councl::election_tier tier) {
@@ -78,7 +82,7 @@ erase_result erase_rows(Table& table, uint32_t max_rows) {
    uint32_t erased = 0;
    auto it = table.begin();
    while (it != table.end() && erased < max_rows) {
-      it = table.erase(it);
+      it = table.erase(std::move(it));
       ++erased;
    }
    return erase_result{erased, it == table.end()};
@@ -92,33 +96,39 @@ uint32_t frozen_member_index(Table& table, name owner) {
    return it == by_owner.end() ? INVALID_MEMBER_INDEX : static_cast<uint32_t>(it->idx);
 }
 
-/// Append at most `max_rows` not-yet-snapshotted owners of `raw_tier` in deterministic owner order.
+/// Result of one source-read-bounded snapshot pass.
+struct snapshot_result {
+   uint32_t scanned;
+   uint32_t written;
+   uint64_t cursor;
+   bool complete;
+};
+
+/// Inspect at most `max_rows` ROA rows and append matching, not-yet-snapshotted owners.
 template <typename Row, typename Table>
-uint32_t append_snapshot(Table& table, roa::nodeowners_t& owners, uint8_t raw_tier, uint32_t already,
-                         uint32_t max_rows) {
+snapshot_result append_snapshot(Table& table, roa::nodeowners_t& owners, uint8_t raw_tier, uint32_t already,
+                                uint64_t cursor, uint32_t max_rows) {
    auto by_owner = table.template get_index<"byowner"_n>();
+   uint32_t scanned = 0;
    uint32_t written = 0;
 
-   const name resume_after =
-      already == 0 ? name{} : table.get(council::index_key{already - 1}, "snapshot cursor missing").owner;
-   auto append_owner = [&](const auto& owner) {
-      if (owner.tier != raw_tier || by_owner.find(owner.owner.value) != by_owner.end())
-         return;
-      const uint64_t snapshot_index = static_cast<uint64_t>(already) + written;
-      table.emplace(RAM_PAYER, council::index_key{snapshot_index}, Row{snapshot_index, owner.owner});
-      ++written;
-   };
-
-   // The primary nodeowners key is owner identity. Resume immediately after the last appended
-   // owner, then wrap once so owners inserted earlier during a prior batch are still absorbed.
-   auto it = already == 0 ? owners.begin() : owners.upper_bound(roa::nodeowner_key{resume_after.value});
-   for (; it != owners.end() && written < max_rows; ++it)
-      append_owner(*it);
-   if (already > 0 && written < max_rows) {
-      for (it = owners.begin(); it != owners.end() && it->owner.value <= resume_after.value && written < max_rows; ++it)
-         append_owner(*it);
+   // The persistent primary-key cursor makes max_rows a real read bound. Reaching end marks this
+   // pass complete. If finalize later detects a newly inserted earlier identity, another loadtier
+   // call restarts at begin and the by-owner index absorbs only the newcomer.
+   auto it = cursor == 0 ? owners.begin() : owners.upper_bound(roa::nodeowner_key{cursor});
+   while (it != owners.end() && scanned < max_rows) {
+      const auto owner = *it;
+      ++it;
+      ++scanned;
+      cursor = owner.owner.value;
+      if (owner.tier == raw_tier && by_owner.find(owner.owner.value) == by_owner.end()) {
+         const uint64_t snapshot_index = static_cast<uint64_t>(already) + written;
+         table.emplace(RAM_PAYER, council::index_key{snapshot_index}, Row{snapshot_index, owner.owner});
+         ++written;
+      }
    }
-   return written;
+   const bool complete = it == owners.end();
+   return snapshot_result{scanned, written, complete ? 0 : cursor, complete};
 }
 
 /// Return SHA-256 over the canonical packed representation of the supplied values.
@@ -144,30 +154,15 @@ void council::do_stir(election_state& st, name action_tag, name actor) {
 }
 
 // ===========================================================================
-//  Cross-contract reads (sysio.roa / sysio.system)
+//  Cross-contract reads (sysio.roa)
 // ===========================================================================
 uint8_t council::roa_network_gen() const {
-   roa::roastate_t rs(councl::ROA_ACCOUNT);
-   check(rs.exists(), "roa state not initialized");
-   return rs.get().network_gen;
+   return roa::current_network_gen(councl::ROA_ACCOUNT);
 }
 
-uint32_t council::tier_count(councl::election_tier tier) const {
-   sysiosystem::emissions::nodecountstate_t nc(councl::SYSTEM_ACCOUNT);
-   check(nc.exists(), "sysio.system nodecount not initialized");
-   auto v = nc.get();
-   switch (tier) {
-   case councl::election_tier::T1:
-      return v.t1_count;
-   case councl::election_tier::T2:
-      return v.t2_count;
-   case councl::election_tier::T3:
-      return v.t3_count;
-   case councl::election_tier::GOVERNANCE:
-      break;
-   }
-   check(false, "governance is not a node-owner tier");
-   return 0;
+uint32_t council::tier_count(uint8_t network_gen, councl::election_tier tier) const {
+   check(tier != councl::election_tier::GOVERNANCE, "governance is not a node-owner tier");
+   return roa::nodeowner_count(councl::ROA_ACCOUNT, network_gen, tier_integer(tier));
 }
 
 // ===========================================================================
@@ -252,12 +247,12 @@ void council::open_tier_attempt(election_state& st, councl::election_tier tier, 
 }
 
 void council::advance_seat(election_state& st, const config_state& cfg) {
-   ++st.active_seat;
-   st.tier3_available = cfg.n3;
-   if (st.active_seat >= councl::SEATS) {
+   if (st.seats_filled >= councl::SEATS) {
       st.phase = councl::election_phase::DONE;
       return;
    }
+   ++st.active_seat;
+   st.tier3_available = cfg.n3;
    open_tier_attempt(st, councl::election_tier::T1, roster_owner(cfg, st.active_seat));
 }
 
@@ -413,6 +408,8 @@ void council::startinit(uint64_t time_slot_sec, std::vector<name> ordered_owners
    cfg.init_phase = councl::init_phase::LOADING;
    cfg.t2_loaded = 0;
    cfg.t3_loaded = 0;
+   cfg.t2_cursor = cfg.t3_cursor = 0;
+   cfg.t2_scan_complete = cfg.t3_scan_complete = false;
    cg.set(cfg, RAM_PAYER);
 }
 
@@ -428,24 +425,35 @@ void council::loadtier(uint8_t tier, uint32_t max_rows) {
    check(cfg.init_phase == councl::init_phase::LOADING, "not in the loading phase");
 
    roa::nodeowners_t no(councl::ROA_ACCOUNT, cfg.network_gen);
-   // Resume in primary owner order from the last appended identity and wrap once. The byowner
-   // dedup preserves the churn-safe semantics while avoiding a full tier-prefix rescan on every
-   // normal batch.
+   // Resume in primary owner order from the last inspected identity. max_rows bounds source reads,
+   // even when most rows belong to another tier or have already been snapshotted.
    const uint32_t already = *election_tier == councl::election_tier::T2 ? cfg.t2_loaded : cfg.t3_loaded;
    const uint8_t raw_tier = tier_integer(*election_tier);
 
    if (*election_tier == councl::election_tier::T2) {
+      if (cfg.t2_scan_complete) {
+         cfg.t2_cursor = 0;
+         cfg.t2_scan_complete = false;
+      }
       tier2_t t2(get_self(), cfg.election_gen);
-      const uint32_t written = append_snapshot<tier2_row>(t2, no, raw_tier, already, max_rows);
-      cfg.t2_loaded += written;
+      const auto result = append_snapshot<tier2_row>(t2, no, raw_tier, already, cfg.t2_cursor, max_rows);
+      cfg.t2_loaded += result.written;
+      cfg.t2_cursor = result.cursor;
+      cfg.t2_scan_complete = result.complete;
       // Defense in depth: normal ROA registration enforces the same system cap before this row
       // can exist, but reject corrupt or incompatible cross-contract state explicitly.
       check(cfg.t2_loaded <= sysiosystem::emissions::T2_MAX_NODE_OWNERS,
             "tier-2 snapshot exceeds the system owner cap");
    } else {
+      if (cfg.t3_scan_complete) {
+         cfg.t3_cursor = 0;
+         cfg.t3_scan_complete = false;
+      }
       tier3_t t3(get_self(), cfg.election_gen);
-      const uint32_t written = append_snapshot<tier3_row>(t3, no, raw_tier, already, max_rows);
-      cfg.t3_loaded += written;
+      const auto result = append_snapshot<tier3_row>(t3, no, raw_tier, already, cfg.t3_cursor, max_rows);
+      cfg.t3_loaded += result.written;
+      cfg.t3_cursor = result.cursor;
+      cfg.t3_scan_complete = result.complete;
       // Defense in depth; see the tier-2 cap check above.
       check(cfg.t3_loaded <= sysiosystem::emissions::T3_MAX_NODE_OWNERS,
             "tier-3 snapshot exceeds the system owner cap");
@@ -462,8 +470,10 @@ void council::finalizeinit() {
 
    // The snapshot scope and tier values together guarantee identity as well as count completeness.
    check(cfg.network_gen == roa_network_gen(), "roa network generation changed during initialization");
-   const uint32_t c2 = tier_count(councl::election_tier::T2);
-   const uint32_t c3 = tier_count(councl::election_tier::T3);
+   check(cfg.t2_scan_complete, "tier-2 source scan incomplete");
+   check(cfg.t3_scan_complete, "tier-3 source scan incomplete");
+   const uint32_t c2 = tier_count(cfg.network_gen, councl::election_tier::T2);
+   const uint32_t c3 = tier_count(cfg.network_gen, councl::election_tier::T3);
    check(c2 <= sysiosystem::emissions::T2_MAX_NODE_OWNERS, "tier-2 count exceeds the system owner cap");
    check(c3 <= sysiosystem::emissions::T3_MAX_NODE_OWNERS, "tier-3 count exceeds the system owner cap");
    check(cfg.t2_loaded == c2, "tier-2 snapshot incomplete");
@@ -489,16 +499,22 @@ void council::reset() {
    require_auth(get_self());
    config_t cg(get_self());
    config_state cfg = cg.get("contract not initialized");
-   const bool aborting_initialization = cfg.init_phase == councl::init_phase::LOADING;
-   if (!aborting_initialization) {
+   if (cfg.init_phase == councl::init_phase::LOADING) {
+      // Candidate registration predates the failed snapshot and remains valid. Purge only staged
+      // roster/tier rows and reopen REG in the same generation.
+      cfg.cleanup_mode = councl::cleanup_mode::INIT_ABORT;
+      cfg.cleanup_stage = councl::cleanup_stage::ROSTER;
+   } else {
       check(cfg.init_phase == councl::init_phase::READY,
-            "reset requires a loading or completed election generation");
+            "reset requires a loading or active election generation");
       state_t sg(get_self());
-      check(!sg.exists() || sg.get().phase == councl::election_phase::DONE, "current election is not complete");
+      const election_state st = sg.get("election state missing");
+      cfg.cleanup_mode = st.phase == councl::election_phase::DONE ? councl::cleanup_mode::COMPLETED
+                                                                  : councl::cleanup_mode::ACTIVE_ABORT;
+      cfg.cleanup_stage = councl::cleanup_stage::CANDIDATES;
    }
 
    cfg.init_phase = councl::init_phase::CLEANING;
-   cfg.cleanup_stage = councl::cleanup_stage::CANDIDATES;
    cfg.cleanup_seat = 0;
    cg.set(cfg, RAM_PAYER);
 }
@@ -510,6 +526,10 @@ void council::purge(uint32_t max_rows) {
    config_t cg(get_self());
    config_state cfg = cg.get("contract not initialized");
    check(cfg.init_phase == councl::init_phase::CLEANING, "generation cleanup is not active");
+   check(cfg.cleanup_mode == councl::cleanup_mode::INIT_ABORT ||
+            cfg.cleanup_mode == councl::cleanup_mode::ACTIVE_ABORT ||
+            cfg.cleanup_mode == councl::cleanup_mode::COMPLETED,
+         "unknown cleanup mode");
 
    uint32_t remaining = max_rows;
    while (remaining > 0 && cfg.cleanup_stage != councl::cleanup_stage::COMPLETE) {
@@ -543,8 +563,11 @@ void council::purge(uint32_t max_rows) {
          tier3_t table(get_self(), cfg.election_gen);
          const auto result = erase_rows(table, remaining);
          erased = result.erased;
-         if (result.drained)
-            cfg.cleanup_stage = councl::cleanup_stage::REMAP;
+         if (result.drained) {
+            cfg.cleanup_stage = cfg.cleanup_mode == councl::cleanup_mode::INIT_ABORT
+                                   ? councl::cleanup_stage::COMPLETE
+                                   : councl::cleanup_stage::REMAP;
+         }
          break;
       }
       case councl::cleanup_stage::REMAP: {
@@ -553,24 +576,45 @@ void council::purge(uint32_t max_rows) {
          erased = result.erased;
          if (result.drained) {
             ++cfg.cleanup_seat;
-            if (cfg.cleanup_seat >= councl::SEATS)
-               cfg.cleanup_stage = councl::cleanup_stage::COMPLETE;
+            if (cfg.cleanup_seat >= councl::SEATS) {
+               cfg.cleanup_stage = cfg.cleanup_mode == councl::cleanup_mode::ACTIVE_ABORT
+                                      ? councl::cleanup_stage::COUNCIL
+                                      : councl::cleanup_stage::COMPLETE;
+            }
          }
+         break;
+      }
+      case councl::cleanup_stage::COUNCIL: {
+         council_t table(get_self(), cfg.election_gen);
+         const auto result = erase_rows(table, remaining);
+         erased = result.erased;
+         if (result.drained)
+            cfg.cleanup_stage = councl::cleanup_stage::COMPLETE;
          break;
       }
       case councl::cleanup_stage::COMPLETE:
          break;
+      default:
+         check(false, "unknown cleanup stage");
       }
       remaining -= erased;
    }
 
    if (cfg.cleanup_stage == councl::cleanup_stage::COMPLETE) {
-      ++cfg.election_gen;
+      check(cfg.cleanup_mode != councl::cleanup_mode::NONE, "cleanup mode is not set");
+      const bool preserve_registry = cfg.cleanup_mode == councl::cleanup_mode::INIT_ABORT;
+      if (!preserve_registry) {
+         ++cfg.election_gen;
+         cfg.cand_count = 0;
+      }
       cfg.init_phase = councl::init_phase::REG;
       cfg.time_slot_sec = 0;
-      cfg.cand_count = 0;
       cfg.n2 = cfg.n3 = cfg.t2_loaded = cfg.t3_loaded = 0;
+      cfg.t2_cursor = cfg.t3_cursor = 0;
+      cfg.t2_scan_complete = cfg.t3_scan_complete = false;
+      cfg.cleanup_mode = councl::cleanup_mode::NONE;
       cfg.cleanup_seat = 0;
+      state_t(get_self()).remove();
    }
    cg.set(cfg, RAM_PAYER);
 }
@@ -578,7 +622,7 @@ void council::purge(uint32_t max_rows) {
 // ===========================================================================
 //  Election
 // ===========================================================================
-void council::repcandidate(name proposer, name c1, name c2, name c3) {
+void council::repcandidate(name proposer, name c1, name c2, name c3, std::optional<uint64_t> expected_round) {
    require_auth(proposer);
    config_t cg(get_self());
    config_state cfg = cg.get("contract not initialized");
@@ -586,16 +630,21 @@ void council::repcandidate(name proposer, name c1, name c2, name c3) {
 
    state_t sg(get_self());
    election_state st = sg.get("election state missing");
+   if (expected_round.has_value())
+      check(*expected_round == st.round_id, "round does not match expected_round");
    do_stir(st, ACTION_REPCANDIDATE, proposer);
    const uint64_t prior_round = st.round_id;
    const auto prior_phase = st.phase;
    resolve_or_settle(st, cfg);
    if (st.round_id != prior_round || st.phase != prior_phase) {
+      check(!expected_round.has_value(), "round elapsed before nomination could be applied");
       sg.set(st, RAM_PAYER);
       return; // stale nomination acted only as a caller-authenticated settlement crank
    }
 
    check(st.phase == councl::election_phase::AWAIT_REP, "not accepting nominations right now");
+   check(current_time_point() <= st.round_open_ts + sysio::seconds(cfg.time_slot_sec),
+         "nomination deadline has elapsed");
    check(proposer == st.proposer, "not your turn to nominate");
    check(c1 != c2 && c1 != c3 && c2 != c3, "slate candidates must be distinct");
 
@@ -633,7 +682,7 @@ void council::repcandidate(name proposer, name c1, name c2, name c3) {
    sg.set(st, RAM_PAYER);
 }
 
-void council::vote(name voter, bool v1, bool v2, bool v3) {
+void council::vote(name voter, bool v1, bool v2, bool v3, std::optional<uint64_t> expected_round) {
    require_auth(voter);
    config_t cg(get_self());
    config_state cfg = cg.get("contract not initialized");
@@ -641,16 +690,20 @@ void council::vote(name voter, bool v1, bool v2, bool v3) {
 
    state_t sg(get_self());
    election_state st = sg.get("election state missing");
+   if (expected_round.has_value())
+      check(*expected_round == st.round_id, "round does not match expected_round");
    do_stir(st, ACTION_VOTE, voter);
    const uint64_t prior_round = st.round_id;
    const auto prior_phase = st.phase;
    resolve_or_settle(st, cfg);
    if (st.round_id != prior_round || st.phase != prior_phase) {
+      check(!expected_round.has_value(), "round elapsed before vote could be applied");
       sg.set(st, RAM_PAYER);
       return; // stale vote acted only as a caller-authenticated settlement crank
    }
 
    check(st.phase == councl::election_phase::VOTING, "voting is not open");
+   check(current_time_point() <= st.vote_deadline, "voting deadline has elapsed");
    check(voter != st.proposer, "the proposer cannot vote on their own slate");
    const uint32_t voter_index = member_index(cfg, st.tier, voter);
    check(voter_index != INVALID_MEMBER_INDEX, "not eligible to vote in this tier");

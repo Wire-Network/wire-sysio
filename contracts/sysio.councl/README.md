@@ -8,7 +8,7 @@ completion requires governance to act at that backstop. See
 [DESIGN.md](DESIGN.md) for the full model and rationale.
 
 > Implemented against the modern KV table stack (`kv::table` / `kv::scoped_table` / `kv::global`)
-> and the `sysio.roa` / `sysio.system` cross-contract read pattern used by `sysio.chalg`. The pure
+> and the generation-scoped `sysio.roa` authority shared with `sysio.chalg`. The pure
 > election arithmetic lives in a dependency-free header
 > ([`council_math.hpp`](include/sysio.councl/council_math.hpp)) and is unit-tested host-side in
 > [`contracts/tests/council_math_tests.cpp`](../tests/council_math_tests.cpp).
@@ -41,12 +41,12 @@ completion requires governance to act at that backstop. See
 | `addcandidate(account, handle)` | `account` | Self-register as a candidate (registration phase). |
 | `rmcandidate(account)` | contract | Remove a candidate before init. |
 | `startinit(time_slot_sec, ordered_owners[21])` | contract | Freeze the tier-1 roster; close registration. |
-| `loadtier(tier, max_rows)` | contract | Batch-load the tier-2/3 snapshot from roa (resumable). |
-| `finalizeinit()` | contract | Verify snapshots vs `sysio.system::nodecount`; open seat 0. |
-| `reset()` | contract | Abort LOADING or, after DONE, begin staged cleanup of ephemeral generation state. |
+| `loadtier(tier, max_rows)` | contract | Inspect a bounded source batch while loading a resumable tier-2/3 snapshot. |
+| `finalizeinit()` | contract | Verify completed snapshots vs generation-scoped ROA rows; open seat 0. |
+| `reset()` | contract | Abort LOADING/active READY or retire DONE; begin mode-specific staged cleanup. |
 | `purge(max_rows)` | contract | Delete bounded cleanup batches; advance generation and reopen registration when complete. |
-| `repcandidate(proposer, c1, c2, c3)` | `proposer` | The active proposer nominates a 3-candidate slate. |
-| `vote(voter, v1, v2, v3)` | `voter` | Independent yes/no on each slate candidate. |
+| `repcandidate(proposer, c1, c2, c3, expected_round?)` | `proposer` | Nominate a slate, optionally fail-loud if the round changes. |
+| `vote(voter, v1, v2, v3, expected_round?)` | `voter` | Vote on the slate, optionally bound to the expected round. |
 | `settle(caller)` | `caller` | Push a timed-out attempt forward; mix the authenticated caller into entropy. |
 | `forceback()` | contract | Recovery path: move an elapsed active attempt directly to BACKSTOP. |
 | `forceassign(member)` | contract | Governance backstop when tier-3 is exhausted. |
@@ -56,7 +56,7 @@ completion requires governance to act at that backstop. See
 
 | Table | Type | Scope | Contents |
 |-------|------|-------|----------|
-| `config` | global | — | init progress, `time_slot_sec`, generation, tier sizes, loaded-row counts/next snapshot indices |
+| `config` | global | — | init progress, generations, tier sizes, bounded-scan cursors/flags, cleanup mode/position |
 | `state` | global | — | live cursor, current slate + tallies, bounded `voted_bitmap`, entropy accumulator |
 | `candidates` | scoped | generation | `account`, `handle`, `elected` |
 | `roster` / `tier2` / `tier3` | scoped | generation | frozen ordered node-owner snapshots (by-owner secondary index) |
@@ -71,8 +71,10 @@ bit per frozen tier member.
 `addcandidate*` → `startinit` → `loadtier*` → `finalizeinit` → per seat
 `repcandidate` + `vote*` (with authenticated cranks) escalating T1→T2→T3→`forceassign` as needed →
 all 21 seats filled → `DONE` → `reset` → `purge*` → registration for the next generation.
-If staged loading cannot be finalized, governance can also take `LOADING` → `reset` → `purge*` →
-registration instead of leaving the contract stuck in a partial generation.
+If staged loading cannot be finalized, governance can take `LOADING` → `reset` → `purge*` →
+registration in the same generation without making candidates repay their rows. Governance can
+also abort an active READY election; that path advances the generation and deletes partial council
+results, while DONE cleanup retains completed history.
 
 Candidate rows are billed to the self-registering candidate and registrations are capped at 1,000
 per generation. Council results are retained permanently; candidates, snapshots, and tier-3 remap

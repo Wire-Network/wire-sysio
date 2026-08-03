@@ -817,6 +817,19 @@ namespace sysio {
         auto node_key = nodeowner_key{owner.value};
         check(!nodeowners.contains(node_key), "This account is already registered.");
 
+        // ROA rows are the authoritative membership set. Enforce the tier caps here instead of
+        // relying on sysio.system::nodecount, which is an optional emissions-distribution mirror
+        // and deliberately misses registrations made before setemitcfg.
+        uint32_t tier_cap = 0;
+        switch (tier) {
+        case 1: tier_cap = sysiosystem::emissions::T1_MAX_NODE_OWNERS; break;
+        case 2: tier_cap = sysiosystem::emissions::T2_MAX_NODE_OWNERS; break;
+        case 3: tier_cap = sysiosystem::emissions::T3_MAX_NODE_OWNERS; break;
+        default: check(false, "Tier level must be between 1 and 3");
+        }
+        check(nodeowner_count(get_self(), state.network_gen, tier) < tier_cap,
+              "node owner tier cap reached");
+
         // Get the total SYS allocation for this tier
         asset total_sys_allocation = get_allocation_for_tier(tier);
 

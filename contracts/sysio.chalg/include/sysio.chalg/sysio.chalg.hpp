@@ -131,7 +131,6 @@ namespace sysio {
       static constexpr name MSGCH_ACCOUNT  = "sysio.msgch"_n;
       static constexpr name OPREG_ACCOUNT  = "sysio.opreg"_n;
       static constexpr name ROA_ACCOUNT    = "sysio.roa"_n;
-      static constexpr name SYSTEM_ACCOUNT = "sysio"_n;
 
       using DisputeStatus = opp::types::DisputeStatus;
       using NodeOwnerTier = opp::types::NodeOwnerTier;

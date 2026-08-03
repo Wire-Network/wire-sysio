@@ -1,7 +1,7 @@
 /// Integration tests for sysio.councl — the council election contract.
 ///
 /// The fixture mirrors sysio.dispute_tests.cpp: it bootstraps sysio.roa (node owners / tiers) and
-/// sysio.system (nodecount), then deploys the CDT-built sysio.councl artifact.
+/// sysio.system (emissions mirror), then deploys the CDT-built sysio.councl artifact.
 ///
 /// The escalation tests are deliberately *seed-agnostic*: instead of predicting which tier-2/3
 /// account the entropy accumulator selects, they read `state.proposer` back and drive that account.
@@ -13,9 +13,11 @@
 /// selection, governance recovery/backstop, and complete cleanup-separated generations.
 
 #include "contracts.hpp"
+#include "sysio.system_tester.hpp"
 
 #include <boost/test/unit_test.hpp>
 #include <fc/variant_object.hpp>
+#include <optional>
 #include <set>
 #include <string>
 #include <string_view>
@@ -83,7 +85,7 @@ public:
 
    abi_serializer councl_abi, roa_abi, system_abi;
 
-   sysio_councl_tester() {
+   explicit sysio_councl_tester(bool configure_emissions = true) {
       produce_blocks(2);
 
       create_accounts({COUNCL_ACCOUNT});
@@ -114,14 +116,15 @@ public:
       // sysio.roa is a genesis system account already running this build's code; just load its abi.
       load_abi(ROA_ACCOUNT, roa_abi);
 
-      // Deploy + init sysio.system (setemitcfg + addnodeowner -> nodecount.t{1,2,3}_count).
+      // Deploy + init sysio.system so tests also exercise the optional emissions membership mirror.
       set_code(config::system_account_name, contracts::system_wasm());
       set_abi(config::system_account_name, contracts::system_abi().data());
       produce_blocks();
       load_abi(config::system_account_name, system_abi);
       base_tester::push_action(config::system_account_name, "init"_n, config::system_account_name,
                                mvo()("version", 0)("core", std::string("4,SYS")));
-      setup_emission_config();
+      if (configure_emissions)
+         setup_emission_config();
 
       // Deploy sysio.councl (privileged: rows bill to the sysio RAM pool).
       set_code(COUNCL_ACCOUNT, contracts::councl_wasm());
@@ -134,31 +137,17 @@ public:
    // ── helpers ──────────────────────────────────────────────────────────────
 
    void load_abi(name account, abi_serializer& out_ser) {
-      const auto* accnt = control->find_account_metadata(account);
-      BOOST_REQUIRE(accnt != nullptr);
-      abi_def parsed;
-      BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, parsed), true);
-      out_ser.set_abi(std::move(parsed), abi_serializer::create_yield_function(abi_serializer_max_time));
+      sysio_system::test_support::load_account_abi(*this, account, out_ser);
    }
 
    void setup_emission_config() {
-      auto cfg = mvo()("t1_allocation", int64_t(7500000000000000))("t2_allocation", int64_t(1000000000000000))(
-         "t3_allocation", int64_t(100000000000000))("t1_duration", uint32_t(12u * 30u * 24u * 3600u))(
-         "t2_duration", uint32_t(24u * 30u * 24u * 3600u))("t3_duration", uint32_t(36u * 30u * 24u * 3600u))(
-         "min_claimable", int64_t(10000000000))("t5_distributable", int64_t(375000000000000000LL))(
-         "t5_floor", int64_t(125000000000000000LL))("target_annual_decay_bps", uint16_t(6940))(
-         "annual_initial_emission", int64_t(563150000000000LL * 365))("annual_max_emission",
-                                                                      int64_t(3000000000000000LL * 365))(
-         "annual_min_emission", int64_t(100000000000000LL * 365))("compute_bps", uint16_t(4000))(
-         "capex_bps", uint16_t(2000))("governance_bps", uint16_t(1000))("producer_bps", uint16_t(7000))(
-         "batch_op_bps", uint16_t(3000))("standby_end_rank", uint32_t(28))("epoch_log_retention_count", uint32_t(8640))(
-         "pay_cadence_epochs", uint16_t(1));
-      push(config::system_account_name, system_abi, config::system_account_name, "setemitcfg"_n, mvo()("cfg", cfg));
+      push(config::system_account_name, system_abi, config::system_account_name, "setemitcfg"_n,
+           mvo()("cfg", sysio_system::test_support::default_emission_config()));
       produce_blocks();
    }
 
-   /// Register `owner` at `tier` in sysio.roa::nodeowners (forcereg -> regnodeowner also bumps
-   /// sysio.system::nodecount.t{tier}_count via addnodeowner).
+   /// Register `owner` at `tier` in authoritative sysio.roa::nodeowners. When emissions are
+   /// configured, regnodeowner also updates sysio.system's distribution mirror.
    void forcereg_owner(name owner, uint8_t tier) {
       BOOST_REQUIRE_EQUAL(success(), push(ROA_ACCOUNT, roa_abi, ROA_ACCOUNT, "forcereg"_n,
                                           mvo()("owner", owner.to_string())("tier", tier)));
@@ -199,26 +188,7 @@ public:
    // ── generic action push (lands each action in its own block for distinct TaPoS) ─────────────
    action_result push(name contract, abi_serializer& ser, name signer, name action_name,
                       const fc::variant_object& data) {
-      try {
-         std::string action_type = ser.get_action_type(action_name);
-         action act;
-         act.account = contract;
-         act.name = action_name;
-         act.data =
-            ser.variant_to_binary(action_type, data, abi_serializer::create_yield_function(abi_serializer_max_time));
-         act.authorization = std::vector<permission_level>{
-            {signer, config::active_name}
-         };
-         signed_transaction trx;
-         trx.actions.emplace_back(std::move(act));
-         set_transaction_headers(trx);
-         trx.sign(get_private_key(signer, "active"), control->get_chain_id());
-         push_transaction(trx);
-         produce_block();
-         return success();
-      } catch (const fc::exception& ex) {
-         return error(ex.top_message());
-      }
+      return sysio_system::test_support::push_contract_action(*this, contract, ser, signer, action_name, data);
    }
 
    // ── councl action wrappers ────────────────────────────────────────────────
@@ -244,14 +214,21 @@ public:
    action_result purge(uint32_t max_rows) {
       return push(COUNCL_ACCOUNT, councl_abi, COUNCL_ACCOUNT, "purge"_n, mvo()("max_rows", max_rows));
    }
-   action_result repcandidate(name proposer, name c1, name c2, name c3) {
-      return push(
-         COUNCL_ACCOUNT, councl_abi, proposer, "repcandidate"_n,
-         mvo()("proposer", proposer.to_string())("c1", c1.to_string())("c2", c2.to_string())("c3", c3.to_string()));
+   action_result repcandidate(name proposer, name c1, name c2, name c3,
+                              std::optional<uint64_t> expected_round = std::nullopt) {
+      mvo data;
+      data("proposer", proposer.to_string())("c1", c1.to_string())("c2", c2.to_string())("c3", c3.to_string());
+      if (expected_round.has_value())
+         data("expected_round", *expected_round);
+      return push(COUNCL_ACCOUNT, councl_abi, proposer, "repcandidate"_n, data);
    }
-   action_result vote(name voter, bool v1, bool v2, bool v3) {
-      return push(COUNCL_ACCOUNT, councl_abi, voter, "vote"_n,
-                  mvo()("voter", voter.to_string())("v1", v1)("v2", v2)("v3", v3));
+   action_result vote(name voter, bool v1, bool v2, bool v3,
+                      std::optional<uint64_t> expected_round = std::nullopt) {
+      mvo data;
+      data("voter", voter.to_string())("v1", v1)("v2", v2)("v3", v3);
+      if (expected_round.has_value())
+         data("expected_round", *expected_round);
+      return push(COUNCL_ACCOUNT, councl_abi, voter, "vote"_n, data);
    }
    action_result settle(name caller = COUNCL_ACCOUNT) {
       return push(COUNCL_ACCOUNT, councl_abi, caller, "settle"_n, mvo()("caller", caller.to_string()));
@@ -273,9 +250,17 @@ public:
       register_candidates(n_candidates);
       register_tiers(n_t2, n_t3);
       BOOST_REQUIRE_EQUAL(success(), startinit(TIME_SLOT, t1_owners));
-      BOOST_REQUIRE_EQUAL(success(), loadtier(2, 1000));
-      BOOST_REQUIRE_EQUAL(success(), loadtier(3, 1000));
+      load_tier_fully(2);
+      load_tier_fully(3);
       BOOST_REQUIRE_EQUAL(success(), finalizeinit());
+   }
+
+   /// Complete a source-read-bounded tier scan across as many calls as necessary.
+   void load_tier_fully(uint8_t tier, uint32_t batch_size = 1000) {
+      const char* complete_field = tier == 2 ? "t2_scan_complete" : "t3_scan_complete";
+      for (uint32_t calls = 0; !get_config()[complete_field].as_bool() && calls < 10000; ++calls)
+         BOOST_REQUIRE_EQUAL(success(), loadtier(tier, batch_size));
+      BOOST_REQUIRE(get_config()[complete_field].as_bool());
    }
 
    // ── state / config readers ────────────────────────────────────────────────
@@ -324,6 +309,10 @@ public:
    /// Return whether a generation still retains a candidate row for `candidate`.
    bool candidate_exists(name candidate, uint64_t generation = GEN0) {
       return !get_row_by_id(COUNCL_ACCOUNT, name(generation), "candidates"_n, candidate.value).empty();
+   }
+
+   bool state_exists() {
+      return !get_row_by_account(COUNCL_ACCOUNT, COUNCL_ACCOUNT, "state"_n, "state"_n).empty();
    }
 
    /// Return whether a generation still retains its frozen roster row at `seat`.
@@ -385,6 +374,11 @@ public:
             result.push_back(owner);
       return result;
    }
+};
+
+class sysio_councl_without_emissions_tester : public sysio_councl_tester {
+public:
+   sysio_councl_without_emissions_tester() : sysio_councl_tester(false) {}
 };
 
 // ===========================================================================
@@ -502,6 +496,35 @@ BOOST_FIXTURE_TEST_CASE(startinit_requires_exactly_21_roa_tier1_owners, sysio_co
    FC_LOG_AND_RETHROW()
 }
 
+BOOST_FIXTURE_TEST_CASE(roa_enforces_authoritative_tier1_cap_when_emissions_counter_lags,
+                        sysio_councl_tester) {
+   try {
+      register_tiers(); // ROA has 21; nodecount has 20 because NODE_DADDY predates setemitcfg.
+      const name extra{"extraowner"};
+      mk(extra);
+      BOOST_REQUIRE_EQUAL(error("assertion failure with message: node owner tier cap reached"),
+                          push(ROA_ACCOUNT, roa_abi, ROA_ACCOUNT, "forcereg"_n,
+                               mvo()("owner", extra.to_string())("tier", uint8_t{1})));
+   }
+   FC_LOG_AND_RETHROW()
+}
+
+BOOST_FIXTURE_TEST_CASE(finalize_uses_roa_without_emissions_configuration,
+                        sysio_councl_without_emissions_tester) {
+   try {
+      register_candidates(23);
+      register_tiers(/*n_t2=*/2, /*n_t3=*/1); // every registration predates setemitcfg.
+      BOOST_REQUIRE_EQUAL(success(), startinit(TIME_SLOT, t1_owners));
+      load_tier_fully(2);
+      load_tier_fully(3);
+      BOOST_REQUIRE_EQUAL(success(), finalizeinit());
+      BOOST_REQUIRE_EQUAL(init_phase(), IP_READY);
+      BOOST_REQUIRE_EQUAL(get_config()["n2"].as<uint32_t>(), 2u);
+      BOOST_REQUIRE_EQUAL(get_config()["n3"].as<uint32_t>(), 1u);
+   }
+   FC_LOG_AND_RETHROW()
+}
+
 BOOST_FIXTURE_TEST_CASE(startinit_bounds_time_slot, sysio_councl_tester) {
    try {
       register_candidates(23);
@@ -549,13 +572,15 @@ BOOST_FIXTURE_TEST_CASE(staged_load_and_finalize, sysio_councl_tester) {
       register_candidates(23);
       register_tiers(/*n_t2=*/5, /*n_t3=*/9);
       BOOST_REQUIRE_EQUAL(success(), startinit(TIME_SLOT, t1_owners));
-      // batch tier-2 in two calls, tier-3 in one
+      // max_rows bounds source rows inspected, including rows from other tiers.
       BOOST_REQUIRE_EQUAL(success(), loadtier(2, 3));
-      BOOST_REQUIRE_EQUAL(error("assertion failure with message: tier-2 snapshot incomplete"), finalizeinit());
-      BOOST_REQUIRE_EQUAL(success(), loadtier(2, 3)); // remaining 2
+      BOOST_REQUIRE(!get_config()["t2_scan_complete"].as_bool());
+      BOOST_REQUIRE_NE(get_config()["t2_cursor"].as<uint64_t>(), 0u);
+      BOOST_REQUIRE_EQUAL(error("assertion failure with message: tier-2 source scan incomplete"), finalizeinit());
+      load_tier_fully(2, 3);
       // finalize before tier-3 loaded -> incomplete
-      BOOST_REQUIRE_EQUAL(error("assertion failure with message: tier-3 snapshot incomplete"), finalizeinit());
-      BOOST_REQUIRE_EQUAL(success(), loadtier(3, 1000));
+      BOOST_REQUIRE_EQUAL(error("assertion failure with message: tier-3 source scan incomplete"), finalizeinit());
+      load_tier_fully(3);
       BOOST_REQUIRE_EQUAL(success(), finalizeinit());
       BOOST_REQUIRE_EQUAL(get_config()["n2"].as<uint32_t>(), 5u);
       BOOST_REQUIRE_EQUAL(get_config()["n3"].as<uint32_t>(), 9u);
@@ -623,8 +648,9 @@ BOOST_FIXTURE_TEST_CASE(action_phase_guards_and_registration_closure, sysio_coun
                           repcandidate(active_proposer, candidates_[0], candidates_[1], candidates_[2]));
       BOOST_REQUIRE_EQUAL(error("assertion failure with message: not accepting nominations right now"),
                           repcandidate(active_proposer, candidates_[3], candidates_[4], candidates_[5]));
-      BOOST_REQUIRE_EQUAL(error("assertion failure with message: current election is not complete"), reset());
-      BOOST_REQUIRE_EQUAL(error("assertion failure with message: not awaiting a governance assignment"),
+      BOOST_REQUIRE_EQUAL(success(), reset());
+      BOOST_REQUIRE_EQUAL(init_phase(), IP_CLEANING);
+      BOOST_REQUIRE_EQUAL(error("assertion failure with message: election is not running"),
                           forceassign(candidates_[3]));
    }
    FC_LOG_AND_RETHROW()
@@ -651,16 +677,16 @@ BOOST_FIXTURE_TEST_CASE(loadtier_roa_churn_mid_load, sysio_councl_tester) {
       forcereg_owner(twoc, 2);
 
       BOOST_REQUIRE_EQUAL(success(), startinit(TIME_SLOT, t1_owners));
-      BOOST_REQUIRE_EQUAL(success(), loadtier(2, 1)); // snapshots "twob" into idx 0
+      load_tier_fully(2); // snapshots twob/twoc and marks the first source pass complete
 
       // Churn mid-load: a new tier-2 owner that sorts BEFORE the already-loaded "twob".
       name twoa{"twoa"};
       mk(twoa);
       forcereg_owner(twoa, 2);
 
-      BOOST_REQUIRE_EQUAL(success(), loadtier(2, 1000)); // identity resume absorbs "twoa"
-      BOOST_REQUIRE_EQUAL(success(), loadtier(3, 1000));
-      BOOST_REQUIRE_EQUAL(success(), finalizeinit()); // t2_loaded == nodecount either way
+      BOOST_REQUIRE_EQUAL(success(), loadtier(2, 1000)); // a new pass absorbs "twoa" through identity dedup
+      load_tier_fully(3);
+      BOOST_REQUIRE_EQUAL(success(), finalizeinit());
 
       // Faithful snapshot: rows 0..2 hold exactly {twoa, twob, twoc}, no duplicates.
       std::set<name> snapshot;
@@ -680,24 +706,50 @@ BOOST_FIXTURE_TEST_CASE(loading_generation_can_be_aborted_purged_and_restarted, 
       register_tiers(/*n_t2=*/2, /*n_t3=*/1);
       BOOST_REQUIRE_EQUAL(success(), startinit(TIME_SLOT, t1_owners));
       BOOST_REQUIRE_EQUAL(success(), loadtier(2, 1));
-      BOOST_REQUIRE_EQUAL(error("assertion failure with message: tier-2 snapshot incomplete"), finalizeinit());
+      BOOST_REQUIRE_EQUAL(error("assertion failure with message: tier-2 source scan incomplete"), finalizeinit());
 
       BOOST_REQUIRE_EQUAL(success(), reset());
       BOOST_REQUIRE_EQUAL(init_phase(), IP_CLEANING);
       for (int calls = 0; init_phase() == IP_CLEANING && calls < 20; ++calls)
          BOOST_REQUIRE_EQUAL(success(), purge(/*max_rows=*/10));
       BOOST_REQUIRE_EQUAL(init_phase(), IP_REG);
-      BOOST_REQUIRE_EQUAL(election_gen(), 1u);
-      BOOST_REQUIRE(!candidate_exists(candidates_[0], GEN0));
+      BOOST_REQUIRE_EQUAL(election_gen(), GEN0);
+      BOOST_REQUIRE(candidate_exists(candidates_[0], GEN0));
+      BOOST_REQUIRE_EQUAL(get_config()["cand_count"].as<uint32_t>(), 23u);
       BOOST_REQUIRE(!roster_exists(0, GEN0));
       BOOST_REQUIRE(tier2_owner(0, GEN0).to_string().empty());
+      BOOST_REQUIRE(!state_exists());
 
-      register_candidates(23);
       BOOST_REQUIRE_EQUAL(success(), startinit(TIME_SLOT, t1_owners));
-      BOOST_REQUIRE_EQUAL(success(), loadtier(2, 1000));
-      BOOST_REQUIRE_EQUAL(success(), loadtier(3, 1000));
+      load_tier_fully(2);
+      load_tier_fully(3);
       BOOST_REQUIRE_EQUAL(success(), finalizeinit());
       BOOST_REQUIRE_EQUAL(init_phase(), IP_READY);
+   }
+   FC_LOG_AND_RETHROW()
+}
+
+BOOST_FIXTURE_TEST_CASE(active_election_can_be_aborted_without_retaining_partial_results,
+                        sysio_councl_tester) {
+   try {
+      init_ready();
+      const name p = proposer();
+      BOOST_REQUIRE_EQUAL(success(), repcandidate(p, candidates_[0], candidates_[1], candidates_[2]));
+      const auto voters = tier1_voters_excluding(p);
+      for (size_t i = 0; i < 14; ++i)
+         BOOST_REQUIRE_EQUAL(success(), vote(voters[i], true, false, false));
+      BOOST_REQUIRE(!council_member(0, GEN0).to_string().empty());
+
+      // Governance need not wait through a long configured slot or the remaining seats.
+      BOOST_REQUIRE_EQUAL(success(), reset());
+      for (int calls = 0; init_phase() == IP_CLEANING && calls < 100; ++calls)
+         BOOST_REQUIRE_EQUAL(success(), purge(/*max_rows=*/5));
+
+      BOOST_REQUIRE_EQUAL(init_phase(), IP_REG);
+      BOOST_REQUIRE_EQUAL(election_gen(), 1u);
+      BOOST_REQUIRE(!state_exists());
+      BOOST_REQUIRE(council_member(0, GEN0).to_string().empty());
+      BOOST_REQUIRE(!candidate_exists(candidates_[0], GEN0));
    }
    FC_LOG_AND_RETHROW()
 }
@@ -972,6 +1024,32 @@ BOOST_FIXTURE_TEST_CASE(late_nomination_is_settlement_only, sysio_councl_tester)
    FC_LOG_AND_RETHROW()
 }
 
+BOOST_FIXTURE_TEST_CASE(expected_round_makes_late_actions_fail_loud, sysio_councl_tester) {
+   try {
+      init_ready(/*n_candidates=*/23, /*n_t2=*/2, /*n_t3=*/0);
+      const name p1 = proposer();
+      const uint64_t nomination_round = round_id();
+      BOOST_REQUIRE_EQUAL(
+         error("assertion failure with message: round does not match expected_round"),
+         repcandidate(p1, candidates_[0], candidates_[1], candidates_[2], nomination_round + 1));
+
+      BOOST_REQUIRE_EQUAL(success(),
+                          repcandidate(p1, candidates_[0], candidates_[1], candidates_[2], nomination_round));
+      const auto voters = tier1_voters_excluding(p1);
+      produce_block(fc::seconds(TIME_SLOT + 1));
+      BOOST_REQUIRE_EQUAL(error("assertion failure with message: round elapsed before vote could be applied"),
+                          vote(voters[0], true, true, true, nomination_round));
+
+      // The fail-loud transaction rolled settlement back; an explicit crank advances the round.
+      BOOST_REQUIRE_EQUAL(round_id(), nomination_round);
+      BOOST_REQUIRE_EQUAL(phase(), PH_VOTING);
+      BOOST_REQUIRE_EQUAL(success(), settle());
+      BOOST_REQUIRE_GT(round_id(), nomination_round);
+      BOOST_REQUIRE_EQUAL(tier(), TIER_T2);
+   }
+   FC_LOG_AND_RETHROW()
+}
+
 BOOST_FIXTURE_TEST_CASE(full_turnout_failure_escalates, sysio_councl_tester) {
    try {
       init_ready(/*n_candidates=*/23, /*n_t2=*/4, /*n_t3=*/1);
@@ -1060,8 +1138,8 @@ BOOST_FIXTURE_TEST_CASE(maximum_tier3_snapshot_and_retries, sysio_councl_tester)
       }
 
       BOOST_REQUIRE_EQUAL(success(), startinit(TIME_SLOT, t1_owners));
-      BOOST_REQUIRE_EQUAL(success(), loadtier(2, 1000));
-      BOOST_REQUIRE_EQUAL(success(), loadtier(3, 1000));
+      load_tier_fully(2);
+      load_tier_fully(3);
       BOOST_REQUIRE_EQUAL(success(), finalizeinit());
       BOOST_REQUIRE_EQUAL(get_config()["n3"].as<uint32_t>(), 1000u);
 
@@ -1151,6 +1229,7 @@ BOOST_FIXTURE_TEST_CASE(full_election_reset_cleanup_and_second_generation, sysio
          }
          BOOST_REQUIRE_EQUAL(phase(), PH_DONE);
          BOOST_REQUIRE_EQUAL(seats_filled(), 21);
+         BOOST_REQUIRE_EQUAL(active_seat(), 20);
       };
 
       init_ready(/*n_candidates=*/26);
@@ -1172,6 +1251,7 @@ BOOST_FIXTURE_TEST_CASE(full_election_reset_cleanup_and_second_generation, sysio
       BOOST_REQUIRE(!council_member(0, 0).to_string().empty()); // permanent history retained
       BOOST_REQUIRE(!candidate_exists(candidates_[0], 0));
       BOOST_REQUIRE(!roster_exists(0, 0));
+      BOOST_REQUIRE(!state_exists());
       BOOST_CHECK_LT(control->get_resource_limits_manager().get_account_ram_usage(candidates_[0]),
                      candidate_ram_with_row);
 

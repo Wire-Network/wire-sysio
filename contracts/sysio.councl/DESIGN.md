@@ -31,9 +31,11 @@ Per seat, the flow is:
 - **Read precedent: `sysio.chalg`.** `roa::roastate_t(ROA_ACCOUNT)` → `network_gen`, then
   `roa::nodeowners_t(ROA_ACCOUNT, network_gen)`; point-lookup a voter and check
   `tier == NODE_OWNER_TIER_T1`; iterate the `bytier` index to enumerate a tier. We reuse this.
-- **Tier counts / caps: `sysio.system`.** Owns a `nodecount` KV global (`t1_count`, `t2_count`,
-  `t3_count`); caps are `T1_MAX = 21`, `T2_MAX = 84`, `T3_MAX = 1000`. Used at init as a
-  completeness cross-check for the tier snapshots (§9).
+- **Tier counts / caps: `sysio.roa`.** Generation-scoped `nodeowners` rows are authoritative for
+  both membership and counts. ROA enforces the shared caps (`T1_MAX = 21`, `T2_MAX = 84`,
+  `T3_MAX = 1000`) before inserting a row. `sysio.system::nodecount` remains an optional emissions
+  mirror and is deliberately not an election authority because pre-`setemitcfg` registrations are
+  absent from it.
 - **Block entropy is limited [GROUNDED].** An ordinary action can call
   `current_block_number()` and `current_time_point()` and `get_active_producers()`, but **cannot
   read a block id/hash** — `sysio.system`'s `blockinfo` table stores only `{version,
@@ -52,13 +54,13 @@ Per seat, the flow is:
 | 3 | Timing | Event-driven; one inclusive `time_slot_sec` window (maximum 30 days) is used for both nomination and voting. Settlement starts only after the deadline. |
 | 4 | Tier-1 membership | Snapshot the 21 owners + order at init; ignore later roa churn; fail init if `t1 != 21`. |
 | 5 | Seat outcome | **Every seat fills** via the T1→T2→T3→governance escalation ladder (§7). No empty seats. |
-| 6 | Settlement | Lazy settlement in election interactions plus authenticated `settle(caller)` and `stir(caller)` cranks (no on-chain timers). A stale nomination or vote commits settlement and returns without applying itself to the new attempt. |
+| 6 | Settlement | Lazy settlement in election interactions plus authenticated `settle(caller)` and `stir(caller)` cranks (no on-chain timers). A stale unbound nomination/vote commits settlement only; optional `expected_round` makes clients fail loudly instead. |
 | 7 | Candidate exclusivity | An elected candidate leaves the pool; losers may be re-proposed. Floor `MIN_CANDIDATES = 23`. |
 | 8 | Candidate registration | Self-register and pay the row RAM before init; registration is capped at 1,000 and init asserts `>= 23`. |
 | 9 | Randomness | In-contract **entropy accumulator**, **Variant B** (block number and timestamp excluded), §5. |
 | 10 | Proposer auto-yes | Tier-2/3 proposer's auto-yes counts for **all three** slate candidates. Tier-1 has no auto-yes. |
 | 11 | Tier-2/3 selection set | **Full ordered tier-2 and tier-3 owner lists frozen at init**; nth-pick indexes those. |
-| 12 | Admin auth / re-runs | Initialization and cleanup require contract auth. `reset` aborts partial `LOADING` or cleans a `DONE` generation; `purge` removes ephemeral rows and then advances `election_gen`. Historical council rows remain. |
+| 12 | Admin auth / re-runs | Initialization and cleanup require contract auth. `reset` aborts `LOADING` while preserving candidate registration, aborts an active `READY` election while deleting partial results, or retires `DONE` while retaining history. READY cleanup advances `election_gen`. |
 | 13 | Recovery | Once an active attempt is past its deadline, governance may call `forceback` to enter `BACKSTOP` immediately instead of waiting through every remaining tier-3 attempt. |
 
 ## 4. Constants
@@ -73,7 +75,7 @@ namespace councl {
    inline constexpr uint32_t MAX_CANDIDATES = 1000; // registration/RAM bound
    inline constexpr uint32_t MAX_TIME_SLOT_SEC = 30 * 24 * 60 * 60;
    constexpr auto            ROA_ACCOUNT    = "sysio.roa"_n;
-   constexpr auto            SYSTEM_ACCOUNT = "sysio"_n;         // owner of sysio.system tables (nodecount)
+   constexpr auto            SYSTEM_ACCOUNT = "sysio"_n;         // system RAM payer
 
    // Thresholds are computed per round from the electorate size N (never hard-typed):
    //   win(N)  = floor(2N/3) + 1   ==  (2*N)/3 + 1        // YES needed to elect
@@ -86,6 +88,8 @@ namespace councl {
 }
 
 static_assert(councl::T1_VOTERS == councl::SEATS - 1);
+static_assert(win_threshold(councl::T1_VOTERS) + 1 == win_threshold(councl::SEATS));
+static_assert(elim_threshold(councl::T1_VOTERS) == elim_threshold(councl::SEATS));
 ```
 
 ## 5. Randomness — entropy accumulator (Variant B)
@@ -122,7 +126,11 @@ should determine whether settlement is allowed, not provide a caller-chosen extr
 input. This remains pseudo-random, deterministic, and grindable—not a cryptographic beacon. A
 future-block VRF would be required to remove trigger-party manipulation. Authenticated cranks make
 each resampling attributable while allowing any account to advance liveness, but cheap identities
-mean authentication does not make multi-account grinding economically expensive.
+mean authentication does not make multi-account grinding economically expensive. More sharply, a
+single actor controlling several eligible identities can simulate the deterministic post-action
+accumulator and selected proposer for every identity *offline*, then submit only the favorable
+identity in that same transition-triggering action. This same-call choice is an accepted limitation
+of Variant B, not merely a choice of transaction timing.
 
 ## 6. Strict-priority resolution [CONFIRMED]
 
@@ -194,13 +202,18 @@ nomination arriving at its deadline followed by a voting timeout. This deliberat
 bound is operationally impractical, which is why `forceback` exists. Final completion still
 depends on a governance `forceassign`, so the contract cannot promise a wall-clock completion time
 when governance itself is unavailable.
+- Governance can also call `reset` at any time in `READY` to abandon a misconfigured or
+  operationally impractical election immediately. Batched purge deletes partial council results,
+  advances the generation, and reopens registration; this is distinct from `forceback`, which
+  preserves the election and fills only the current seat.
 - On **WIN** (or `forceassign`): mark the candidate `elected`, write the `council` row, advance to
   seat `k+1`. When `k+1 == SEATS`, the election is `DONE`.
 
 ## 8. Tables (KV)
 
 - **`config`** (`kv::global`): `init_phase {REG, LOADING, READY, CLEANING}`, `time_slot_sec`,
-  `network_gen`, `election_gen`, tier sizes/loaded-row counts, candidate count, and cleanup position.
+  `network_gen`, `election_gen`, tier sizes/loaded-row counts, persistent ROA scan cursors and
+  completion flags, candidate count, cleanup mode, and cleanup position.
 - **`state`** (`kv::global`): live seat/tier/phase/proposer, round timing, 32-bit electorate and
   tally counts, current slate, bounded duplicate-vote bitmap, remaining tier-3 count, and entropy.
 - **`roster`**, **`tier2`**, **`tier3`** (`kv::scoped_table`, generation scope): frozen ordered
@@ -232,16 +245,19 @@ Tier-3 can hold up to 1000 rows, too many to read+write in one transaction, so i
   2. Require `0 < time_slot_sec <= MAX_TIME_SLOT_SEC` and at least `MIN_CANDIDATES`.
   3. Read `roa::roastate` → `network_gen`. Enumerate roa tier-1 via `bytier`; `check(size == 21)`
      and `check(ordered_owners` is a permutation of that set`)`. Freeze `roster[0..20]`.
-  4. Set `init_phase = LOADING` and reset the loaded-row counts/next snapshot indices.
+  4. Set `init_phase = LOADING` and reset the loaded-row counts, persistent source cursors, and
+     scan-completion flags.
 - **`loadtier(uint8 tier, uint32 max_rows)`** — `require_auth(get_self())`, `LOADING` only.
-  Appends up to `max_rows` of roa's tier-2 or tier-3 owners into the `tier2`/`tier3` snapshot in
-  deterministic owner order. Idempotent; each call resumes after the last appended identity and
-  wraps once, while the by-owner index skips identities already frozen. This absorbs owners added
-  earlier in the ordering during a prior batch without rescanning the entire loaded prefix on each
-  normal call.
+  Inspects at most `max_rows` ROA owner rows in deterministic primary-owner order and appends the
+  matching tier-2 or tier-3 identities into the snapshot. The persistent last-inspected cursor
+  bounds reads as well as writes, including calls where most source rows belong to another tier.
+  Reaching end sets that tier's scan-complete flag. A subsequent call starts a new deduplicating
+  pass, allowing owners inserted earlier than the prior cursor to be absorbed after a failed
+  completeness check without quadratic wrap scans.
 - **`finalizeinit()`** — `require_auth(get_self())`, `LOADING` only.
-  1. `check` the tier-2/tier-3 snapshots are complete vs `sysio.system::nodecount`
-     (`n2 == t2_count`, `n3 == t3_count`) — the completeness cross-check.
+  1. Require both source scans complete, then count generation-scoped ROA tier-2/tier-3 rows and
+     check them against the deduplicated snapshot sizes. This works even when emissions were never
+     configured and detects membership inserted during a staged scan.
   2. Initialize `state`: `active_seat = 0`, `tier = 1`, `phase = AWAIT_REP`,
      `proposer = roster[0]`, `round_id = 1`, `round_open_ts = now`,
      `acc = sha256(pack((ACC_SEED_TAG, election_gen)))`, where `ACC_SEED_TAG` is the
@@ -249,15 +265,18 @@ Tier-3 can hold up to 1000 rows, too many to read+write in one transaction, so i
      `seats_filled = 0`, `tier3_available = n3`. Set `init_phase = READY`.
 
 ### Generation cleanup
-- **`reset()`** — contract auth, either `LOADING` or `READY` with election phase `DONE`. Enter
-  `CLEANING`; do not advance the generation yet. The `LOADING` path is the recovery hatch for a
-  partial snapshot that cannot pass `finalizeinit`.
-- **`purge(max_rows)`** — contract auth. Delete at most `max_rows` ephemeral candidate, snapshot,
-  and remap rows across resumable calls. Council history is not deleted. Once cleanup completes,
-  increment `election_gen` and reopen `REG`.
+- **`reset()`** — contract auth in `LOADING` or `READY`. Enter `CLEANING`; do not advance the
+  generation yet. A LOADING abort preserves candidate rows and returns to `REG` in the same
+  generation after removing roster/snapshots. An active READY abort also removes partial council
+  rows and advances the generation. A DONE reset advances the generation but retains council
+  history.
+- **`purge(max_rows)`** — contract auth. Delete at most `max_rows` rows across resumable,
+  mode-specific cleanup stages. Unknown stage values abort explicitly instead of spinning.
+  Completion removes the global election state before reopening `REG`.
 
 ### Election
-- **`repcandidate(name proposer, name c1, name c2, name c3)`** — `require_auth(proposer)`.
+- **`repcandidate(name proposer, name c1, name c2, name c3, optional<uint64> expected_round)`** —
+  `require_auth(proposer)`.
   `stir("repcandidate", proposer)`, then `resolve_or_settle()`.
   `check(phase == AWAIT_REP && proposer == state.proposer)`;
   `check(now <= round_open_ts + time_slot_sec)` (propose-deadline);
@@ -265,11 +284,16 @@ Tier-3 can hold up to 1000 rows, too many to read+write in one transaction, so i
   Open the round: set `c[]`, `no[] = {0,0,0}`, `yes[] = tier==1 ? {0,0,0} : {1,1,1}` (auto-yes),
   `elect_N`, `votes_cast = 0`, `phase = VOTING`,
   `vote_deadline = now + time_slot_sec`. Immediately `try_resolve()` (covers `n==1`).
-- **`vote(name voter, bool v1, bool v2, bool v3)`** — `require_auth(voter)`.
+- **`vote(name voter, bool v1, bool v2, bool v3, optional<uint64> expected_round)`** —
+  `require_auth(voter)`.
   `stir("vote", voter)`, then `resolve_or_settle()`. `check(phase == VOTING)`;
   `check(voter` is eligible for the current tier and `!= proposer)`;
   `check` and set the voter's frozen-snapshot bitmap bit; for each true `v`, `++yes[i]`;
   for each false, `++no[i]`; `++votes_cast`. `try_resolve()`.
+- For both nomination and voting, a supplied `expected_round` must match before settlement and
+  causes a deadline-crossing transition to fail/roll back. Omitting it preserves the permissionless
+  settlement-only behavior. Each action also asserts its own inclusive deadline after settlement,
+  so future state-machine changes cannot accidentally accept a late payload.
 - **`settle(name caller)`** — `require_auth(caller)`. Stir, then resolve or advance elapsed state.
 - **`stir(name caller)`** — `require_auth(caller)`. Stir and perform the same lazy settlement.
 - **`forceback()`** — contract auth. After the active nomination/vote deadline has elapsed, move
@@ -291,8 +315,8 @@ Tier-3 can hold up to 1000 rows, too many to read+write in one transaction, so i
   set `proposer`, `elect_N`, clear slate/tallies.
 - **`select_tier3_proposer()`**: uses §5's mutating Fisher-Yates remap and decrements the available
   count, making the tier-3-only side effect explicit.
-- **`advance_seat()`**: `++active_seat`; if `== SEATS` → `phase = DONE`; else start a fresh T1
-  attempt for `roster[active_seat]` (`tier = 1`, `++round_id`, `AWAIT_REP`, timers reset).
+- **`advance_seat()`**: if `seats_filled == SEATS` → `phase = DONE` while `active_seat` remains 20;
+  otherwise increment it and start a fresh T1 attempt (`++round_id`, `AWAIT_REP`, timers reset).
 
 ## 10. State machine
 
@@ -308,12 +332,13 @@ REG ──startinit──> LOADING ──loadtier*──> finalizeinit ──> R
    │                                                                │
    │  fail_attempt escalates tier:            WIN ──win_attempt──> advance_seat
    │   T1→T2→T3(loop, no repeats)→BACKSTOP           │                   │
-   └──────────────────── (next attempt) ────────────┘         active_seat==21?
+   └──────────────────── (next attempt) ────────────┘         seats_filled==21?
        elapsed attempt ──forceback──> BACKSTOP ──forceassign──> win_attempt
                                                                   │  yes → DONE
                                                                   └─ no → seat k+1 (AWAIT_REP)
 
-DONE ──reset──> CLEANING ──purge*──> REG (next generation)
+READY(active) ──reset──> CLEANING ──purge*──> REG (next generation, partial results removed)
+DONE ──────────reset──> CLEANING ──purge*──> REG (next generation, history retained)
 ```
 
 All timing is relative: an attempt's clock starts at `round_open_ts` (the moment the prior
@@ -335,17 +360,18 @@ resolutions compound forward naturally.
   `current_time_point().sec_since_epoch()`; hashing via `sysio::sha256`; no floats, no UB, no
   block-hash dependence. `acc` evolves identically on every replaying node (Variant B excludes
   the only non-replay-safe temptation, and it never reads a block id).
-- **Cross-contract reads** are read-only point/index lookups against roa's and sysio.system's
-  public KV tables. The snapshots at init make the running election immune to mid-election roa
+- **Cross-contract reads** are read-only point/index lookups against ROA's public KV tables. The
+  snapshots at init make the running election immune to mid-election ROA
   churn. `finalizeinit` also verifies that the captured ROA generation is still current; if a
-  generation or count divergence prevents finalization, governance can reset and purge LOADING.
+  generation or count divergence prevents finalization, governance can rescan or abort LOADING
+  without making candidates repay registration RAM.
 - **Enum discipline:** election state uses typed contract enums. The action-boundary tier byte is
   checked with `magic_enum`; protobuf ROA tiers use their generated enum names/helpers.
 - **Storage bound:** at most 1,000 candidate-paid rows; 21 roster + 84 tier-2 + 1,000 tier-3
   system-paid snapshot rows; at most 125 bytes in the vote bitmap; and at most 1,000 remap rows
   per seat (21,000 across a worst-case generation). Remap rows are sparse in typical operation.
-  All of these ephemeral rows are purged before the next generation. Council history grows by
-  exactly 21 deliberately retained rows per completed generation.
+  All ephemeral rows are purged before the next generation. Council history grows by exactly 21
+  retained rows per completed generation; partial rows from an active abort are deleted.
 
 ## 12. Test plan
 
@@ -365,8 +391,9 @@ Split by binary per CLAUDE.md; the seed math is deliberately isolated for cheap 
 
 **On-chain integration tests (contract test harness):**
 - Registration bounds (handle length/characters, duplicate/auth, candidate cap, `< 23` fails init).
-- Staged init: `startinit` permutation/`t1==21` checks; `loadtier` batching + churn-safe resume;
-  `finalizeinit` generation/count completeness checks; abort-and-purge recovery from `LOADING`.
+- Staged init: `startinit` permutation/`t1==21` checks; source-read-bounded `loadtier` batching and
+  churn-safe rescan; ROA-authoritative finalization without emissions config; LOADING abort that
+  preserves paid candidate registration; ROA cap enforcement when `nodecount` lags.
 - Tier-1 happy path (14 yes → seat filled; strict priority: 1 wins despite 2 having more yes).
 - Elimination: candidate 1 gets 7 no → candidate 2 becomes active and wins.
 - Early termination: all 20 voted; partial-turnout voting deadline via `settle`; exact inclusive
@@ -378,8 +405,10 @@ Split by binary per CLAUDE.md; the seed math is deliberately isolated for cheap 
 - Empty-tier skip (`n2==0` and/or `n3==0`).
 - Candidate 3 win after candidates 1 and 2 are eliminated; elected candidate cannot be reused.
 - One-member tier auto-yes; empty tier combinations; maximum tier-3 retry/storage behavior.
-- Full 21-seat run to `DONE`; bounded reset/purge; second generation isolation and retained council.
-- Late nomination/vote settlement-only behavior; authenticated stir/settle; forceback authorization.
+- Full 21-seat run to `DONE`; bounded reset/purge; second generation isolation, retained completed
+  council history, removed global state, and active-abort deletion of partial results.
+- Late nomination/vote settlement-only behavior plus fail-loud `expected_round`; authenticated
+  stir/settle; forceback authorization.
 - Determinism spot-check: same action sequence in a replay yields identical selections.
 
 ## 13. Validation and artifacts

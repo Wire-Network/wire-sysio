@@ -277,6 +277,30 @@ namespace sysio {
                 kv::index<"bytier"_n, const_mem_fun<nodeowners, uint64_t, &nodeowners::by_tier>>
             >;
 
+            /**
+             * Canonical cross-contract accessor for the active ROA network generation.
+             * Sibling system contracts should use this instead of duplicating singleton reads.
+             */
+            static uint8_t current_network_gen(name roa_account) {
+                roastate_t state(roa_account);
+                check(state.exists(), "roa state not initialized");
+                return state.get().network_gen;
+            }
+
+            /**
+             * Count the authoritative node-owner rows for `tier` in one ROA generation.
+             * Unlike sysio.system's optional emissions counter, this remains correct for owners
+             * registered before emissions configuration and across network generations.
+             */
+            static uint32_t nodeowner_count(name roa_account, uint8_t network_gen, uint8_t tier) {
+                nodeowners_t owners(roa_account, network_gen);
+                auto by_tier = owners.get_index<"bytier"_n>();
+                uint32_t count = 0;
+                for (auto it = by_tier.lower_bound(tier); it != by_tier.end() && it->tier == tier; ++it)
+                    ++count;
+                return count;
+            }
+
         private:
 
             /**

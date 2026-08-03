@@ -6,6 +6,7 @@
  *        escalation ladder with strict-priority slate voting. See DESIGN.md for the full model.
  */
 
+#include <optional>
 #include <string>
 #include <sysio.councl/council_math.hpp>
 #include <sysio/crypto.hpp>
@@ -29,7 +30,7 @@ inline constexpr size_t MAX_HANDLE_LEN = 32;                     ///< candidate-
 inline constexpr uint64_t MAX_TIME_SLOT_SEC = 30 * 24 * 60 * 60; ///< thirty-day operational safety cap
 
 constexpr name ROA_ACCOUNT = "sysio.roa"_n; ///< owner of the nodeowners / roastate tables
-constexpr name SYSTEM_ACCOUNT = "sysio"_n;  ///< owner of the nodecount table; RAM pool payer
+constexpr name SYSTEM_ACCOUNT = "sysio"_n;  ///< system RAM pool payer
 
 /// Lifecycle phase of the active election attempt.
 enum class election_phase : uint8_t {
@@ -47,11 +48,27 @@ enum class init_phase : uint8_t {
    CLEANING = 3 ///< prior-generation ephemeral rows are being purged
 };
 
+/// Why the current cleanup was started; determines which generation data is retained.
+enum class cleanup_mode : uint8_t {
+   NONE = 0,         ///< no cleanup is active
+   INIT_ABORT = 1,   ///< discard only staged snapshots and preserve candidate registration
+   ACTIVE_ABORT = 2, ///< discard an unfinished election, including partial council results
+   COMPLETED = 3     ///< retire a completed generation while retaining council history
+};
+
 /// Tier responsible for an attempt or completed seat.
 enum class election_tier : uint8_t { GOVERNANCE = 0, T1 = 1, T2 = 2, T3 = 3 };
 
 /// Ordered cleanup stages used by the batched `purge` action.
-enum class cleanup_stage : uint8_t { CANDIDATES = 0, ROSTER = 1, TIER2 = 2, TIER3 = 3, REMAP = 4, COMPLETE = 5 };
+enum class cleanup_stage : uint8_t {
+   CANDIDATES = 0,
+   ROSTER = 1,
+   TIER2 = 2,
+   TIER3 = 3,
+   REMAP = 4,
+   COUNCIL = 5,
+   COMPLETE = 6
+};
 
 static_assert(T1_VOTERS == SEATS - 1, "tier-1 electorate must exclude exactly the seat owner");
 static_assert(SLATE_SIZE == 3, "the fixed action and state schema require a three-candidate slate");
@@ -87,10 +104,9 @@ public:
    [[sysio::action]]
    void startinit(uint64_t time_slot_sec, std::vector<name> ordered_owners);
 
-   /// Append up to `max_rows` of roa's tier-`tier` (2 or 3) owners into the frozen snapshot,
-   /// skipping owners already snapshotted (identity-based resume, so owners forcereg'd in roa
-   /// mid-load are absorbed by a later batch). Call repeatedly until `finalizeinit`'s count
-   /// cross-check passes. Idempotent. Governance only.
+   /// Inspect at most `max_rows` roa owner rows while appending tier-`tier` (2 or 3) owners into
+   /// the frozen snapshot. The persistent source cursor makes both reads and writes bounded;
+   /// call repeatedly until that tier's scan-complete flag is set. Governance only.
    [[sysio::action]]
    void loadtier(uint8_t tier, uint32_t max_rows);
 
@@ -98,26 +114,29 @@ public:
    [[sysio::action]]
    void finalizeinit();
 
-   /// Abort LOADING or, after DONE, enter staged cleanup for the current generation. Governance
-   /// only. Call `purge` until cleanup advances the generation and reopens registration.
+   /// Abort LOADING or any READY election and enter staged cleanup. A LOADING abort preserves the
+   /// candidate registry and generation; READY cleanup advances the generation. Governance only.
    [[sysio::action]]
    void reset();
 
-   /// Delete up to `max_rows` prior-generation ephemeral rows and finish reset once empty.
-   /// Council results are deliberately retained as the permanent election history.
+   /// Delete up to `max_rows` mode-specific cleanup rows and finish reset once empty. Completed
+   /// council results are retained; partial results from an active abort are deleted.
    [[sysio::action]]
    void purge(uint32_t max_rows);
 
    // ---- Election -----------------------------------------------------------
 
-   /// The active proposer nominates a slate of 3 distinct, un-elected candidates.
+   /// The active proposer nominates a slate of 3 distinct, un-elected candidates. When supplied,
+   /// `expected_round` makes a stale or deadline-crossing request fail instead of acting as a
+   /// settlement-only crank.
    [[sysio::action]]
-   void repcandidate(name proposer, name c1, name c2, name c3);
+   void repcandidate(name proposer, name c1, name c2, name c3, std::optional<uint64_t> expected_round);
 
    /// Cast an independent yes/no on each of the 3 current-slate candidates. One vote per voter
    /// per attempt is enforced by a compact bitmap; the proposer never votes on their own slate.
+   /// `expected_round` provides optional fail-loud round binding.
    [[sysio::action]]
-   void vote(name voter, bool v1, bool v2, bool v3);
+   void vote(name voter, bool v1, bool v2, bool v3, std::optional<uint64_t> expected_round);
 
    /// Public caller-authenticated crank: push a timed-out attempt forward and stir entropy.
    [[sysio::action]]
@@ -149,13 +168,19 @@ public:
       uint32_t n3 = 0;           ///< tier-3 snapshot size
       uint32_t t2_loaded = 0;    ///< tier-2 loaded-row count and next snapshot index
       uint32_t t3_loaded = 0;    ///< tier-3 loaded-row count and next snapshot index
-      uint32_t cand_count = 0;   ///< registered candidates (current generation)
+      uint64_t t2_cursor = 0;         ///< last roa primary owner inspected by the tier-2 scan
+      uint64_t t3_cursor = 0;         ///< last roa primary owner inspected by the tier-3 scan
+      bool t2_scan_complete = false; ///< tier-2 scan reached the end of the roa owner scope
+      bool t3_scan_complete = false; ///< tier-3 scan reached the end of the roa owner scope
+      uint32_t cand_count = 0;        ///< registered candidates (current generation)
+      councl::cleanup_mode cleanup_mode = councl::cleanup_mode::NONE;
       councl::cleanup_stage cleanup_stage = councl::cleanup_stage::COMPLETE;
       uint8_t cleanup_seat = 0; ///< remap scope currently being purged
 
       SYSLIB_SERIALIZE(
          config_state,
-         (init_phase)(time_slot_sec)(network_gen)(election_gen)(n2)(n3)(t2_loaded)(t3_loaded)(cand_count)(cleanup_stage)(cleanup_seat))
+         (init_phase)(time_slot_sec)(network_gen)(election_gen)(n2)(n3)(t2_loaded)(t3_loaded)(t2_cursor)(t3_cursor)
+            (t2_scan_complete)(t3_scan_complete)(cand_count)(cleanup_mode)(cleanup_stage)(cleanup_seat))
    };
    using config_t = sysio::kv::global<"config"_n, config_state>;
 
@@ -291,11 +316,11 @@ private:
    /// Advance to the next seat, or mark the election done after the final seat.
    void advance_seat(election_state& st, const config_state& cfg);
 
-   // roa / nodecount helpers
+   // roa helpers
    /// Read the current ROA network generation.
    uint8_t roa_network_gen() const;
-   /// Read a tier owner count from `sysio.system::nodecount`.
-   uint32_t tier_count(councl::election_tier tier) const;
+   /// Count generation-scoped ROA owners in a tier.
+   uint32_t tier_count(uint8_t network_gen, councl::election_tier tier) const;
 
    // convenience
    /// Return the frozen tier-1 owner associated with a council seat.

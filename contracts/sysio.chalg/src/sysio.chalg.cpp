@@ -1,7 +1,6 @@
 #include <sysio.chalg/sysio.chalg.hpp>
 
-#include <sysio.roa.hpp>                 // T1 voter eligibility: sysio.roa::nodeowners / roastate
-#include <sysio.system/emissions.hpp>    // live Tier-1 count: sysio.system::nodecount
+#include <sysio.roa.hpp> // authoritative T1 voter eligibility and count
 #include <magic_enum/magic_enum.hpp>
 
 #include <algorithm>
@@ -99,9 +98,7 @@ void chalg::votedispute(name owner, uint64_t dispute_id, checksum256 chosen_chec
 
    // Voter eligibility: a Tier-1 node owner in sysio.roa::nodeowners, scoped by the active
    // network generation. Point lookup — no enumeration of the owner set.
-   roa::roastate_t roastate(ROA_ACCOUNT);
-   check(roastate.exists(), "roa state not initialized");
-   const uint8_t network_gen = roastate.get().network_gen;
+   const uint8_t network_gen = roa::current_network_gen(ROA_ACCOUNT);
 
    roa::nodeowners_t nodeowners(ROA_ACCOUNT, network_gen);
    auto no = nodeowners.get(roa::nodeowner_key{owner.value},
@@ -131,9 +128,10 @@ void chalg::chkdispute(uint64_t dispute_id) {
    auto d = disputes.get(d_pk, "dispute not found");
    check(d.status == DisputeStatus::DISPUTE_STATUS_OPEN, "dispute is not open");
 
-   // N = live Tier-1 node-owner count; Q = floor(N/2)+1.
-   sysiosystem::emissions::nodecountstate_t nodecount(SYSTEM_ACCOUNT);
-   const uint32_t N = nodecount.exists() ? nodecount.get().t1_count : 0;
+   // N = authoritative, generation-scoped ROA Tier-1 membership; Q = floor(N/2)+1.
+   const uint8_t network_gen = roa::current_network_gen(ROA_ACCOUNT);
+   const uint32_t N = roa::nodeowner_count(
+      ROA_ACCOUNT, network_gen, magic_enum::enum_integer(NodeOwnerTier::NODE_OWNER_TIER_T1));
    check(N > 0, "no tier-1 node owners are registered");
    const uint32_t Q = N / 2 + 1;
 

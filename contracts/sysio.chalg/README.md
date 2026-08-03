@@ -35,8 +35,9 @@ OPP envelope dispute resolution and slash-execution contract.
 2. **Vote**: Tier-1 node owners (looked up in `sysio.roa::nodeowners`, scoped by the active
    `network_gen` from `sysio.roa::roastate`) call `votedispute` with one of the candidate checksums.
    One vote per owner.
-3. **Tally**: anyone cranks `chkdispute`. With `N = sysio.system::nodecount.t1_count` and
-   `Q = floor(N/2)+1`: a checksum reaching `Q` votes wins at any time (fast path); after the 24h
+3. **Tally**: anyone cranks `chkdispute`. With `N` equal to the active generation's authoritative
+   `sysio.roa::nodeowners` tier-1 count and `Q = floor(N/2)+1`: a checksum reaching `Q` votes wins
+   at any time (fast path); after the 24h
    deadline the bar relaxes to a quorum of cast votes (`cast >= Q`) plus a strict majority of cast
    (`2*votes > cast`). No plurality / tie-break -- an undecided tally keeps waiting for votes.
 4. **Resolve**: the winning checksum is recorded, dispatched via `sysio.msgch::resolvedisp`, and
@@ -46,8 +47,8 @@ OPP envelope dispute resolution and slash-execution contract.
 ## Dependencies
 
 - Triggered by `sysio.msgch::evalcons`; dispatches the winning envelope via `sysio.msgch::resolvedisp`
-- Tier-1 voter eligibility from `sysio.roa::nodeowners` / `roastate`; live Tier-1 count from
-  `sysio.system::nodecount`
+- Tier-1 voter eligibility and live count from `sysio.roa::nodeowners` / `roastate` through shared
+  canonical accessors
 - Slashes via `sysio.opreg::slash` (opreg routes the unlocked bond to the matching LP and defers the
   locked portion through `sysio.uwrit::release`)
 - Pauses / unpauses via `sysio.epoch::pause` / `sysio.epoch::unpause`

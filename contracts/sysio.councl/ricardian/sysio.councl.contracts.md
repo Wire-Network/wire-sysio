@@ -50,9 +50,10 @@ title: Load Tier Snapshot
 summary: 'Append tier-{{nowrap tier}} node owners into the frozen snapshot.'
 ---
 
-The contract owner appends up to {{max_rows}} tier-{{tier}} node owners from sysio.roa into the
-frozen escalation snapshot. Resume is identity-based, so newly observed owners are appended without
-duplicating owners already loaded. Called repeatedly until complete.
+The contract owner inspects at most {{max_rows}} node-owner rows from sysio.roa while appending
+tier-{{tier}} identities into the frozen escalation snapshot. A persistent source cursor bounds
+reads as well as writes, and identity deduplication allows a later pass to absorb newly observed
+owners. Called repeatedly until the tier scan is complete.
 
 <h1 class="contract">finalizeinit</h1>
 
@@ -62,21 +63,23 @@ title: Finalize Election Initialization
 summary: 'Verify the tier snapshots and open the first seat.'
 ---
 
-The contract owner finalizes initialization: the tier-2 and tier-3 snapshots are verified complete
-against the live node counts, and the first council seat's nomination window opens.
+The contract owner finalizes initialization: the tier-2 and tier-3 source scans must be complete,
+their snapshot sizes are verified against authoritative generation-scoped sysio.roa rows, and the
+first council seat's nomination window opens.
 
 <h1 class="contract">reset</h1>
 
 ---
 spec_version: "0.2.0"
 title: Begin Election Reset
-summary: 'Abort partial initialization or clean a completed election generation.'
+summary: 'Abort initialization or an election, or clean a completed generation.'
 ---
 
-The contract owner starts cleanup of ephemeral rows either while initialization is still loading
-or after the election is complete. The loading path recovers from a partial snapshot that cannot
-be finalized. Council result rows remain as permanent history. The contract owner must call
-`purge` until cleanup completes and candidate registration reopens.
+The contract owner starts cleanup while initialization is loading or while an election is active
+or complete. A loading abort preserves candidate registrations and reopens registration in the
+same generation. An active-election abort advances the generation and removes partial council
+results. A completed election advances the generation while retaining its council history. The
+contract owner must call `purge` until cleanup completes.
 
 <h1 class="contract">purge</h1>
 
@@ -86,9 +89,10 @@ title: Purge Election State
 summary: 'Delete up to {{max_rows}} ephemeral rows from the completed generation.'
 ---
 
-The contract owner deletes at most {{max_rows}} candidates, roster entries, tier snapshots, and
-tier-3 remap entries from the completed generation. When all ephemeral rows have been removed, the
-generation advances and registration reopens. Council result rows are retained.
+The contract owner deletes at most {{max_rows}} rows from the mode-specific candidate, roster,
+tier-snapshot, remap, and optional partial-council cleanup stages. Completion removes live election
+state and reopens registration. Completed council history is retained; partial results from an
+aborted active election are not.
 
 <h1 class="contract">repcandidate</h1>
 
@@ -99,7 +103,10 @@ summary: '{{nowrap proposer}} nominates a slate of three candidates.'
 ---
 
 {{proposer}} nominates a slate of three distinct, un-elected candidates ({{c1}}, {{c2}}, and
-{{c3}}) for the current seat, opening the voting round.
+{{c3}}) for the current seat, opening the voting round. Optional {{expected_round}} binds the
+request to a specific round; if the round is stale or elapses during lazy settlement, the action
+fails and rolls back instead of acting as a settlement-only crank. Omitting it preserves the
+settlement-only behavior.
 
 ## Preconditions
 - The caller must be authorized as {{proposer}}.
@@ -116,6 +123,8 @@ summary: '{{nowrap voter}} votes on the three current-slate candidates.'
 ---
 
 {{voter}} casts an independent yes/no vote on each of the three candidates in the current slate.
+Optional {{expected_round}} binds the ballot to a specific round and makes a stale or
+deadline-crossing ballot fail instead of silently settling the election.
 
 ## Preconditions
 - The caller must be authorized as {{voter}}.

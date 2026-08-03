@@ -32,6 +32,7 @@
 #include <fc/crypto/sha256.hpp>
 
 #include "contracts.hpp"
+#include "sysio.system_tester.hpp"
 
 using namespace sysio::testing;
 using namespace sysio;
@@ -147,11 +148,7 @@ public:
    // ── deploy / abi helpers ─────────────────────────────────────────────────
 
    void load_abi(name account, abi_serializer& out_ser) {
-      const auto* accnt = control->find_account_metadata(account);
-      BOOST_REQUIRE(accnt != nullptr);
-      abi_def parsed;
-      BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, parsed), true);
-      out_ser.set_abi(std::move(parsed), abi_serializer::create_yield_function(abi_serializer_max_time));
+      sysio_system::test_support::load_account_abi(*this, account, out_ser);
    }
 
    void deploy(name account, std::vector<uint8_t> wasm, std::vector<char> abi, abi_serializer& out_ser) {
@@ -167,23 +164,8 @@ public:
    }
 
    void setup_emission_config() {
-      auto cfg = mvo()
-         ("t1_allocation", int64_t(7500000000000000))("t2_allocation", int64_t(1000000000000000))
-         ("t3_allocation", int64_t(100000000000000))
-         ("t1_duration", uint32_t(12u*30u*24u*3600u))("t2_duration", uint32_t(24u*30u*24u*3600u))
-         ("t3_duration", uint32_t(36u*30u*24u*3600u))
-         ("min_claimable", int64_t(10000000000))
-         ("t5_distributable", int64_t(375000000000000000LL))("t5_floor", int64_t(125000000000000000LL))
-         ("target_annual_decay_bps", uint16_t(6940))
-         ("annual_initial_emission", int64_t(563150000000000LL*365))
-         ("annual_max_emission", int64_t(3000000000000000LL*365))
-         ("annual_min_emission", int64_t(100000000000000LL*365))
-         ("compute_bps", uint16_t(4000))("capex_bps", uint16_t(2000))("governance_bps", uint16_t(1000))
-         ("producer_bps", uint16_t(7000))("batch_op_bps", uint16_t(3000))
-         ("standby_end_rank", uint32_t(28))
-         ("epoch_log_retention_count", uint32_t(8640))("pay_cadence_epochs", uint16_t(1));
       push(config::system_account_name, system_abi, config::system_account_name,
-           "setemitcfg"_n, mvo()("cfg", cfg));
+           "setemitcfg"_n, mvo()("cfg", sysio_system::test_support::default_emission_config()));
       produce_blocks();
    }
 
@@ -191,27 +173,7 @@ public:
 
    action_result push(name contract, abi_serializer& ser, name signer,
                       name action_name, const fc::variant_object& data) {
-      try {
-         std::string action_type = ser.get_action_type(action_name);
-         action act;
-         act.account = contract;
-         act.name    = action_name;
-         act.data    = ser.variant_to_binary(action_type, data,
-                        abi_serializer::create_yield_function(abi_serializer_max_time));
-         act.authorization = std::vector<permission_level>{{signer, config::active_name}};
-         signed_transaction trx;
-         trx.actions.emplace_back(std::move(act));
-         set_transaction_headers(trx);
-         trx.sign(get_private_key(signer, "active"), control->get_chain_id());
-         push_transaction(trx);
-         // Land each successful action in its own block so repeated identical actions (e.g. a
-         // second chkdispute / double-vote) get a distinct TaPoS ref and reach the contract guard
-         // rather than being dropped as a duplicate transaction.
-         produce_block();
-         return success();
-      } catch (const fc::exception& ex) {
-         return error(ex.top_message());
-      }
+      return sysio_system::test_support::push_contract_action(*this, contract, ser, signer, action_name, data);
    }
 
    // ── OPP stack bootstrap: one batch op, one outpost, advance to epoch 1 ────
@@ -542,12 +504,12 @@ BOOST_FIXTURE_TEST_CASE(votedispute_double_vote_rejected, sysio_dispute_tester) 
 //  chkdispute tally
 // =============================================================================
 
-// Fast path: with N=3 Tier-1 owners (Q=2), two votes for the delivered winning checksum resolve the
-// dispute any time. Exercises winner dispatch (resolvedisp) + epoch unpause.
+// Fast path: the three fixture registrations plus genesis NODE_DADDY make N=4 (Q=3). Three votes
+// for the delivered winning checksum resolve any time and exercise dispatch + epoch unpause.
 BOOST_FIXTURE_TEST_CASE(chkdispute_fast_path_resolves, sysio_dispute_tester) { try {
    register_node_owner("voter1"_n, 1);
    register_node_owner("voter2"_n, 1);
-   register_node_owner("voter3"_n, 1);   // N = 3, Q = 2
+   register_node_owner("voter3"_n, 1);   // N = 4 including NODE_DADDY, Q = 3
 
    const uint32_t epoch = current_epoch();
 
@@ -571,7 +533,12 @@ BOOST_FIXTURE_TEST_CASE(chkdispute_fast_path_resolves, sysio_dispute_tester) { t
    BOOST_REQUIRE_EQUAL("DISPUTE_STATUS_OPEN", get_dispute(1)["status"].as_string());
 
    BOOST_REQUIRE_EQUAL(success(), votedispute("voter2"_n, 1, cs_win));
-   // Two votes (= Q) for the winner -> resolves, dispatches, unpauses.
+   // Two votes are still below the authoritative ROA quorum.
+   BOOST_REQUIRE_EQUAL(success(), chkdispute(1));
+   BOOST_REQUIRE_EQUAL("DISPUTE_STATUS_OPEN", get_dispute(1)["status"].as_string());
+
+   BOOST_REQUIRE_EQUAL(success(), votedispute("voter3"_n, 1, cs_win));
+   // Three votes (= Q) for the winner -> resolves, dispatches, unpauses.
    BOOST_REQUIRE_EQUAL(success(), chkdispute(1));
 
    auto d = get_dispute(1);
@@ -580,7 +547,7 @@ BOOST_FIXTURE_TEST_CASE(chkdispute_fast_path_resolves, sysio_dispute_tester) { t
    BOOST_REQUIRE(!epoch_paused());
 } FC_LOG_AND_RETHROW() }
 
-// Sub-quorum: with N=3 (Q=2), a single vote never resolves before the deadline.
+// Sub-quorum: with N=4 including NODE_DADDY (Q=3), a single vote never resolves before deadline.
 BOOST_FIXTURE_TEST_CASE(chkdispute_sub_quorum_waits, sysio_dispute_tester) { try {
    register_node_owner("voter1"_n, 1);
    register_node_owner("voter2"_n, 1);
@@ -599,15 +566,16 @@ BOOST_FIXTURE_TEST_CASE(chkdispute_sub_quorum_waits, sysio_dispute_tester) { try
    BOOST_REQUIRE_EQUAL("DISPUTE_STATUS_OPEN", get_dispute(1)["status"].as_string());
 } FC_LOG_AND_RETHROW() }
 
-// Post-deadline relaxation: with N=4 (Q=3), a checksum that holds a STRICT MAJORITY of the cast votes
-// (but fewer than Q, so the fast path never fires) resolves only AFTER the 24h deadline, provided a
-// quorum of votes was cast (cast >= Q). Two of three cast votes -> resolves post-deadline; also
+// Post-deadline relaxation: with N=5 including NODE_DADDY (Q=3), a checksum that holds a STRICT
+// MAJORITY of the cast votes (but fewer than Q, so the fast path never fires) resolves only AFTER
+// the 24h deadline, provided a quorum of votes was cast (cast >= Q). Two of three cast votes
+// resolve post-deadline and also
 // exercises winner dispatch (resolvedisp) + unpause on the relaxed path.
 BOOST_FIXTURE_TEST_CASE(chkdispute_post_deadline_majority_resolves, sysio_dispute_tester) { try {
    register_node_owner("voter1"_n, 1);
    register_node_owner("voter2"_n, 1);
    register_node_owner("voter3"_n, 1);
-   register_node_owner("voter4"_n, 1);   // N = 4, Q = 3
+   register_node_owner("voter4"_n, 1);   // N = 5 including NODE_DADDY, Q = 3
 
    const uint32_t epoch = current_epoch();
 
@@ -645,13 +613,13 @@ BOOST_FIXTURE_TEST_CASE(chkdispute_post_deadline_majority_resolves, sysio_disput
    BOOST_REQUIRE(!epoch_paused());
 } FC_LOG_AND_RETHROW() }
 
-// Deadline tie: with N=4 (Q=3), an even split of all cast votes (2 vs 2) has a quorum but NO strict
-// majority of cast, so even after the deadline the dispute does not resolve (no plurality / tie-break).
+// Deadline tie: with N=5 including NODE_DADDY (Q=3), an even split of cast votes (2 vs 2) has a
+// quorum but NO strict majority of cast, so even after the deadline the dispute does not resolve.
 BOOST_FIXTURE_TEST_CASE(chkdispute_deadline_tie_waits, sysio_dispute_tester) { try {
    register_node_owner("voter1"_n, 1);
    register_node_owner("voter2"_n, 1);
    register_node_owner("voter3"_n, 1);
-   register_node_owner("voter4"_n, 1);   // N = 4, Q = 3
+   register_node_owner("voter4"_n, 1);   // N = 5 including NODE_DADDY, Q = 3
 
    const uint32_t epoch = current_epoch();
    auto cs_x = fc::sha256::hash(std::string("x"));

@@ -25,6 +25,67 @@ using mvo = fc::mutable_variant_object;
 
 namespace sysio_system {
 
+namespace test_support {
+
+/// Load an account's deployed ABI into a serializer used by contract integration fixtures.
+template <typename Tester>
+void load_account_abi(Tester& tester, name account, abi_serializer& out_ser) {
+   const auto* metadata = tester.control->find_account_metadata(account);
+   BOOST_REQUIRE(metadata != nullptr);
+   abi_def parsed;
+   BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(metadata->abi, parsed), true);
+   out_ser.set_abi(std::move(parsed), abi_serializer::create_yield_function(Tester::abi_serializer_max_time));
+}
+
+/// Push an ABI-encoded action and land it in its own block for stable TaPoS in repeated tests.
+template <typename Tester>
+typename Tester::action_result push_contract_action(Tester& tester, name contract, abi_serializer& serializer,
+                                                    name signer, name action_name,
+                                                    const fc::variant_object& data) {
+   try {
+      action act;
+      act.account = contract;
+      act.name = action_name;
+      act.data = serializer.variant_to_binary(
+         serializer.get_action_type(action_name), data,
+         abi_serializer::create_yield_function(Tester::abi_serializer_max_time));
+      act.authorization = std::vector<permission_level>{{signer, config::active_name}};
+
+      signed_transaction trx;
+      trx.actions.emplace_back(std::move(act));
+      tester.set_transaction_headers(trx);
+      trx.sign(tester.get_private_key(signer, "active"), tester.control->get_chain_id());
+      tester.push_transaction(trx);
+      tester.produce_block();
+      return Tester::success();
+   } catch (const fc::exception& ex) {
+      return Tester::error(ex.top_message());
+   }
+}
+
+/// Canonical valid emissions configuration shared by system-contract integration fixtures.
+inline fc::mutable_variant_object default_emission_config() {
+   return mvo()
+      ("t1_allocation", int64_t(7500000000000000))("t2_allocation", int64_t(1000000000000000))
+      ("t3_allocation", int64_t(100000000000000))
+      ("t1_duration", uint32_t(12u * 30u * 24u * 3600u))
+      ("t2_duration", uint32_t(24u * 30u * 24u * 3600u))
+      ("t3_duration", uint32_t(36u * 30u * 24u * 3600u))
+      ("min_claimable", int64_t(10000000000))
+      ("t5_distributable", int64_t(375000000000000000LL))
+      ("t5_floor", int64_t(125000000000000000LL))
+      ("target_annual_decay_bps", uint16_t(6940))
+      ("annual_initial_emission", int64_t(563150000000000LL * 365))
+      ("annual_max_emission", int64_t(3000000000000000LL * 365))
+      ("annual_min_emission", int64_t(100000000000000LL * 365))
+      ("compute_bps", uint16_t(4000))("capex_bps", uint16_t(2000))("governance_bps", uint16_t(1000))
+      ("producer_bps", uint16_t(7000))("batch_op_bps", uint16_t(3000))
+      ("standby_end_rank", uint32_t(28))("epoch_log_retention_count", uint32_t(8640))
+      ("pay_cadence_epochs", uint16_t(1));
+}
+
+} // namespace test_support
+
 
 class sysio_system_tester : public TESTER {
 public:
