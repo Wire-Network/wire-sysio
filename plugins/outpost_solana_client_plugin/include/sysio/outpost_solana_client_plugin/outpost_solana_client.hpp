@@ -28,6 +28,102 @@ inline constexpr size_t SOLANA_MAX_ENVELOPE_BYTES = OPP_MAX_ENVELOPE_BYTES;
 /// regenerated and will catch any packet overflow.
 inline constexpr size_t SOLANA_MAX_CHUNK_BYTES = 672;
 
+namespace outpost_solana_client_detail {
+
+/// Assert that the loaded IDL's `LatestOutboundEnvelope` declaration has the
+/// shape `read_inbound_envelope` relies on: the account exists (inline fields
+/// or the Anchor IDL v2 `types`-section fallback), `epoch_index` is a u32, and
+/// `data` is a length-prefixed `bytes` / `Vec<u8>` payload. Field ORDER is
+/// deliberately unconstrained: the reader decodes the whole account through
+/// libfc's IDL-driven `decode_account_data`, which follows the declared field
+/// order at decode time, so BOTH the standalone `opp_outpost`
+/// ({epoch_index, checksum, data, bump}) and the integrated `liqsol_core`
+/// ({bump, epoch_index, checksum, data}) layouts are handled by a single build.
+///
+/// Called at construction for roles that read inbound envelopes so a
+/// misshaped IDL fails at boot (`create_outpost_client`) instead of on the
+/// first inbound poll, where the job loop would wlog and retry forever.
+///
+/// Exposed in this header (rather than the .cpp's anonymous namespace) so the
+/// plugin's unit tests can exercise the pass and fail-loud paths against
+/// synthesized IDLs.
+///
+/// @param program  the program's loaded Anchor IDL.
+/// @throws fc::exception if the account or either field is absent, or a field
+///         has a type the reader cannot faithfully interpret.
+void assert_latest_envelope_shape(const fc::network::solana::idl::program& program);
+
+/// Reduce the name-filtered IDL candidates to the ones whose declared
+/// `address` (Anchor IDL v2 top-level / `metadata.address`) matches the
+/// configured program id. Without this, WHICH same-named IDL version drives
+/// account decoding is decided by `--solana-idl-file` order, and an IDL whose
+/// field order disagrees with the deployed program silently misreads accounts
+/// (the epoch=511 RCA class).
+///
+///   * any candidate matches           -> only the matching ones are returned.
+///   * single candidate, no match      -> returned as-is (address-less stub
+///     IDLs and dev fixtures stay usable; a declared-but-mismatched address
+///     logs a warning).
+///   * multiple candidates, no match   -> throws: the selection would be
+///     order-dependent, which is exactly the misread risk.
+///
+/// @param program_idls  name-filtered candidate IDLs (order preserved).
+/// @param program_id    the deployed outpost program id the client will bind.
+/// @return the surviving candidates, order preserved.
+/// @throws fc::exception when multiple candidates are loaded and none carries
+///         a matching declared address.
+std::vector<fc::network::solana::idl::program>
+select_program_idls_matching(std::vector<fc::network::solana::idl::program> program_idls,
+                             const fc::network::solana::solana_public_key&  program_id);
+
+/// Raw payload bytes of a decoded Borsh `bytes` / `Vec<u8>` IDL field.
+/// libfc's `decode_account_data` renders `bytes` as a base64 string variant
+/// and `Vec<u8>` as an array-of-integers variant; both IDL spellings appear
+/// across outpost program versions, so the reader accepts either.
+///
+/// @param field_value  the decoded field variant.
+/// @return the payload bytes.
+/// @throws fc::exception if the variant is neither shape or an array element
+///         is out of byte range.
+std::vector<char> borsh_payload_bytes(const fc::variant& field_value);
+
+/// Decode an already-fetched `LatestOutboundEnvelope` account through the
+/// outpost program client's loaded IDL and validate it end-to-end:
+///
+///   1. IDL-driven decode (`decode_account_info_data`) - verifies the 8-byte
+///      Anchor discriminator and follows the IDL's declared field order, so
+///      the same binary reads both known program layouts value-exactly.
+///   2. `epoch_index` gate - 0 (never emitted) and stored != requested both
+///      return empty. A stored epoch AHEAD of the request is warned about
+///      (likely IDL-vs-deployment drift misreading the account, or an outpost
+///      relaying for a stale WIRE view); a stored epoch behind the request is
+///      normal emit-cadence lag and stays at debug.
+///   3. `checksum` gate - when the IDL declares the 32-byte checksum field,
+///      the payload's keccak256 must match it (both program versions write
+///      `keccak256(encoded_envelope)`); a mismatch means the decode read the
+///      wrong bytes for `data` (field-order drift) and is warned + rejected.
+///   4. envelope-cap, protobuf-decode and inner-epoch checks, as before.
+///
+/// Any decode/extraction failure logs a warning (visible at default log
+/// level - a permanently undecodable account must not be silent) and returns
+/// empty so the poll loop keeps running.
+///
+/// Exposed in this header so the plugin's unit tests can drive the complete
+/// post-fetch read path against synthesized accounts for BOTH program
+/// layouts without a live RPC endpoint.
+///
+/// @param program_client  outpost program client carrying the loaded IDL.
+/// @param account_data    raw fetched account bytes (incl. discriminator).
+/// @param epoch_index     the WIRE epoch the caller expects to read.
+/// @param log_label       client identity for log lines (`to_string()`).
+/// @return the envelope's protobuf bytes, or empty when unavailable/invalid.
+std::vector<char> decode_latest_envelope_account(opp_solana_outpost_client&  program_client,
+                                                 const std::vector<uint8_t>& account_data,
+                                                 uint32_t                    epoch_index,
+                                                 const std::string&          log_label);
+
+} // namespace outpost_solana_client_detail
+
 /**
  * @brief Solana concrete `outpost_client`.
  *
@@ -49,7 +145,8 @@ public:
                          fc::network::solana::solana_public_key              program_id,
                          std::vector<fc::network::solana::idl::program>      program_idls,
                          uint64_t                                            chain_code,
-                         uint32_t                                            chain_id);
+                         uint32_t                                            chain_id,
+                         solana_outpost_role                                 role);
 
    // ── outpost_client SPI ───────────────────────────────────────────────
    sysio::opp::types::ChainKind chain_kind() const override;

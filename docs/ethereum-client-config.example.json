@@ -1,11 +1,13 @@
 {
-  "version": 1,
+  "schema_version": 1,
   "clients": [
     {
-      "client_id": "eth-anvil-local",
-      "signature_provider_id": "eth-01",
-      "rpc_url": "http://localhost:8545",
-      "chain_id": "31337",
+      "connection": {
+        "client_id": "eth-anvil-local",
+        "signature_provider_id": "eth-01",
+        "rpc_url": "http://localhost:8545"
+      },
+      "chain_id": 31337,
       "transaction_policy": {
         "max_priority_fee_per_gas_wei": "2000000000",
         "max_fee_per_gas_wei": "100000000000",

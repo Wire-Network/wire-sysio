@@ -2,6 +2,8 @@ import { execSync } from "node:child_process"
 import { asOption } from "@3fv/prelude-ts"
 import { log } from "./logger.js"
 import {
+  Channel,
+  DEV_PRERELEASE_SUFFIX,
   Target,
   TargetPackageName,
   PUBLISHABLE_TARGETS
@@ -73,8 +75,16 @@ export function resolveNextVersion(packageName: string): string {
  * For the typescript/solidity pair: query all publishable package versions
  * from npm, take the greatest semver, increment patch, and return that
  * version. This ensures both packages always publish at the same version.
+ *
+ * @param channel optional release channel — `Channel.dev` appends the
+ *   prerelease suffix to the resolved version (`X.Y.Z-dev`);
+ *   `Channel.stable` or omitted returns the bare version. The resolution
+ *   itself (latest published → patch bump) is identical for every channel;
+ *   the parse below already reads the `X.Y.Z` core out of a suffixed latest
+ *   (`1.0.40-dev` → next `1.0.41[-dev]`), so consecutive dev publishes bump
+ *   normally.
  */
-export function resolveSynchronizedVersion(): string {
+export function resolveSynchronizedVersion(channel?: Channel): string {
   log.info("Resolving synchronized version for publishable targets…")
 
   const versions = PUBLISHABLE_TARGETS.map(target => {
@@ -109,7 +119,9 @@ export function resolveSynchronizedVersion(): string {
     )
     .map(maxVersion => {
       const m = maxVersion.match(/^(\d+)\.(\d+)\.(\d+)/)!
-      const next = `${m[1]}.${m[2]}.${parseInt(m[3], 10) + 1}`
+      const core = `${m[1]}.${m[2]}.${parseInt(m[3], 10) + 1}`,
+        next =
+          channel === Channel.dev ? `${core}-${DEV_PRERELEASE_SUFFIX}` : core
       log.info("Synchronized next version: %s", next)
       return next
     })

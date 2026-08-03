@@ -19,6 +19,7 @@ add_executable( test_fc
         io/test_tracked_storage.cpp
         network/ethereum/test_ethereum_client_and_rlp.cpp
         network/ethereum/test_ethereum_transaction_policy.cpp
+        network/test_http_client.cpp
         network/test_json_rpc_client.cpp
         network/solana/test_solana_client.cpp
         network/test_message_buffer.cpp

@@ -6,6 +6,7 @@ plugin_target(
         appbase
         chainbase
         chain_plugin
+        http_client_plugin
 
         signature_provider_manager_plugin
         sysio_chain

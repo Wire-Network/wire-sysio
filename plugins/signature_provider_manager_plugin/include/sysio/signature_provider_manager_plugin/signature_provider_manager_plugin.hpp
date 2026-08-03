@@ -179,6 +179,20 @@ public:
    bool has_provider(const fc::crypto::signature_provider_id_t& key);
 
    /**
+    * Check whether a provider name came from the explicit five-field
+    * `--signature-provider` form.
+    *
+    * Anonymous four-field providers receive a process-local `key-N` name,
+    * while programmatically created/default providers were not specified by
+    * the operator. Neither category satisfies configuration references that
+    * require a stable, explicitly shared provider name.
+    *
+    * @param key_name Provider name referenced by another plugin option.
+    * @return true only when that exact name was explicitly configured.
+    */
+   bool is_explicitly_configured_provider(const std::string& key_name);
+
+   /**
     * Get a provider by public key or key name
     *
     * @param key to lookup provider

@@ -37,7 +37,9 @@ and optional per-client transaction policies. See
 The legacy
 `--outpost-ethereum-client <eth-client-id>,<sig-provider-id>,<eth-node-url>[,<eth-chain-id>]` option remains
 available. It assigns maximum-value policy defaults and cannot be combined with
-`--outpost-ethereum-client-config-file`.
+`--outpost-ethereum-client-config-file`. Those defaults preserve compatibility only, provide no
+finite economic boundary, and are not recommended for production; production operators must use
+reviewed finite `transaction_policy` values in the file configuration.
 
 #### Ethereum ABI File (`--ethereum-abi-file`)
 Path to an Ethereum contract ABI file (relative from current working directory or absolute path). The file should contain a JSON array of ABI-compliant contract definitions.

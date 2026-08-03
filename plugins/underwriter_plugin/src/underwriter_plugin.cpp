@@ -886,7 +886,8 @@ struct underwriter_plugin::impl {
             } else if (ep.kind == ChainKind::CHAIN_KIND_SVM) {
                outpost_by_chain[chain_code] =
                   sol_plug->create_outpost_client(ep.client_id, chain_code, ext_id,
-                                                  ep.commit_addr /*program_id*/);
+                                                  ep.commit_addr /*program_id*/,
+                                                  solana_outpost_role::underwriter);
                ilog("underwriter_plugin: wired SOL outpost_client chain={} (client_id='{}', program={})",
                     code_str, ep.client_id, ep.commit_addr);
             } else {
@@ -1827,7 +1828,7 @@ struct underwriter_plugin::impl {
 
       uint64_t finalized_blk = 0;
       try {
-         const auto finalized_var = entry->client->execute(
+         const auto finalized_var = entry->client->execute_idempotent(
             std::string{ETH_GET_BLOCK_BY_NUMBER_METHOD},
             fc::variants{eth::to_block_tag(eth::block_tag_t::finalized), false});
          if (finalized_var.is_null()) {

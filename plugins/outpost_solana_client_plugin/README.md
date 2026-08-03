@@ -39,14 +39,14 @@ Registers a signing key. Format:
 |---|---|
 | `name` | Lookup ID for this provider (used in `--outpost-solana-client`) |
 | `chain-kind` | Target chain: `solana`, `ethereum`, `wire` |
-| `key-type` | Key algorithm, e.g. `ed` (ED25519 for Solana) |
-| `public-key` | Base58 or hex-encoded public key |
+| `key-type` | Native key type: `solana` (ED25519) |
+| `public-key` | Base58-encoded Solana public key |
 | `provider-type:data` | Either `KEY:<private-key>` or `KIOD:<url>` |
 
-Example using an inline private key:
+Example using the repository's public test fixture key:
 
 ```
---signature-provider sol-signer,solana,ed,PUB_ED_...,KEY:PVT_ED_...
+--signature-provider sol-signer,solana,solana,FDkbys9aWZSSCMYmstq948DfFmjxY69x4qUj7KSr7LCa,KEY:5pNoVifxrWsaAPDyaKGPoKiPjhhbHGaEFdTVmjx9qZJKS472eGsA5118YqEf2m7xUreC2kv6TDq9sssRceeQXHrJ
 ```
 
 #### `--outpost-solana-client` (required, multi-token)
@@ -60,8 +60,12 @@ Registers a Solana RPC client instance. Format:
 | Field | Description |
 |---|---|
 | `client-id` | Unique identifier for this client instance |
-| `sig-provider-id` | Name of a registered `--signature-provider` |
+| `sig-provider-id` | Explicit, non-empty name of a registered `--signature-provider` |
 | `rpc-url` | Solana JSON-RPC endpoint URL |
+
+Startup resolves the signer reference exactly and requires it to use the
+Solana chain and key type. Anonymous signature-provider aliases cannot be
+referenced.
 
 Multiple clients can be configured:
 
@@ -69,6 +73,12 @@ Multiple clients can be configured:
 --outpost-solana-client devnet-client,sol-signer,https://api.devnet.solana.com
 --outpost-solana-client mainnet-client,sol-mainnet-signer,https://api.mainnet-beta.solana.com
 ```
+
+HTTPS RPC endpoints use system CA roots and mandatory DNS/IP identity verification. Use
+`--outpost-solana-additional-ca-file <bundle.pem>` or
+`--outpost-solana-additional-ca-path <hashed-directory>` to add private trust roots. Use
+`--outpost-solana-proxy http://host:port` for an explicit proxy. Verification cannot be disabled, and proxy
+environment variables are not applied implicitly.
 
 #### `--solana-idl-file` (optional, multi-token)
 
@@ -94,7 +104,7 @@ program; the clean-room outpost implementation is hosted inside the
 
 ```bash
 ./outpost_solana_client_tool \
-   --signature-provider sol-signer,solana,ed,PUB_ED_abc123...,KEY:PVT_ED_def456... \
+   --signature-provider sol-signer,solana,solana,FDkbys9aWZSSCMYmstq948DfFmjxY69x4qUj7KSr7LCa,KEY:5pNoVifxrWsaAPDyaKGPoKiPjhhbHGaEFdTVmjx9qZJKS472eGsA5118YqEf2m7xUreC2kv6TDq9sssRceeQXHrJ \
    --outpost-solana-client my-client,sol-signer,https://api.devnet.solana.com \
    --solana-idl-file ./idl/counter_anchor.json
 ```
@@ -104,7 +114,7 @@ program; the clean-room outpost implementation is hosted inside the
 The same options work in a config `.ini` file:
 
 ```ini
-signature-provider = sol-signer,solana,ed,PUB_ED_abc123...,KEY:PVT_ED_def456...
+signature-provider = sol-signer,solana,solana,FDkbys9aWZSSCMYmstq948DfFmjxY69x4qUj7KSr7LCa,KEY:5pNoVifxrWsaAPDyaKGPoKiPjhhbHGaEFdTVmjx9qZJKS472eGsA5118YqEf2m7xUreC2kv6TDq9sssRceeQXHrJ
 outpost-solana-client = my-client,sol-signer,https://api.devnet.solana.com
 solana-idl-file = ./idl/counter_anchor.json
 ```

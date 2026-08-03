@@ -6,26 +6,54 @@ set -euo pipefail
 # package repository just to install fish before publishing OPP artifacts.
 
 usage() {
-   echo "Usage: generate-opp-bundles.sh [--publish]" >&2
+   echo "Usage: generate-opp-bundles.sh [--publish] [--channel <dev|stable>] [--package-version <semver>]" >&2
 }
 
 publish=false
-for arg in "$@"; do
-   case "$arg" in
+channel=""
+package_version=""
+# Value-taking args require the while/shift form — a `for arg in "$@"` loop
+# cannot consume a following value.
+while [[ $# -gt 0 ]]; do
+   case "$1" in
       --publish)
          publish=true
+         shift
+         ;;
+      --channel)
+         if [[ $# -lt 2 ]]; then
+            echo "Error: --channel requires a value (dev|stable)." >&2
+            usage
+            exit 1
+         fi
+         channel="$2"
+         shift 2
+         ;;
+      --package-version)
+         if [[ $# -lt 2 ]]; then
+            echo "Error: --package-version requires a semver value." >&2
+            usage
+            exit 1
+         fi
+         package_version="$2"
+         shift 2
          ;;
       -h|--help)
          usage
          exit 0
          ;;
       *)
-         echo "Unknown argument: $arg" >&2
+         echo "Unknown argument: $1" >&2
          usage
          exit 1
          ;;
    esac
 done
+
+if [[ -n "$channel" && "$channel" != "dev" && "$channel" != "stable" ]]; then
+   echo "Error: --channel must be 'dev' or 'stable' (got '$channel')." >&2
+   exit 1
+fi
 
 script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 tools_root="$(cd -- "$script_dir/.." && pwd -P)"
@@ -100,17 +128,29 @@ pnpm install --frozen-lockfile --ignore-scripts
 # bypass the OPP tool build on pnpm 10.
 pnpm --filter "./proto*" dist
 
+# Publish each tool's bin onto PATH for the protoc/bundler invocations below.
+#
+# pnpm 10 removed the bare `pnpm link --global` form this used to call: it now
+# fails with ERR_PNPM_LINK_BAD_PARAMS ("You must provide a parameter"), and the
+# CMake gate in ../../CMakeLists.txt already requires pnpm >= 10, so the old
+# form could never run here. `pnpm link --global .` is NOT the fix — it resolves
+# `.` as a dependency to ADD, which rewrites the tool's package.json and drops a
+# stray pnpm-lock.yaml/pnpm-workspace.yaml into the source tree.
+#
+# `pnpm add --global <abs-dir>` is the pnpm 10 equivalent: it registers the
+# package globally by path (so edits stay live, as with the old link) and
+# leaves the working tree untouched.
 (
    cd protoc-gen-solidity
-   pnpm link --global
+   pnpm add --global "$PWD"
 )
 (
    cd protoc-gen-solana
-   pnpm link --global
+   pnpm add --global "$PWD"
 )
 (
    cd protobuf-bundler
-   pnpm link --global
+   pnpm add --global "$PWD"
 )
 popd >/dev/null
 
@@ -130,6 +170,14 @@ done
 
 if [[ "$publish" == true ]]; then
    cmd+=(--publish)
+fi
+
+if [[ -n "$channel" ]]; then
+   cmd+=(--channel "$channel")
+fi
+
+if [[ -n "$package_version" ]]; then
+   cmd+=(--package-version "$package_version")
 fi
 
 echo "Running wire-protobuf-bundler for all targets..."

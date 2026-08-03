@@ -8,6 +8,7 @@
 #include <fc/network/ethereum/ethereum_rlp_encoder.hpp>
 
 #include <sysio/outpost_ethereum_client_plugin.hpp>
+#include <sysio/opp/config/client_config_loader.hpp>
 
 #include <boost/asio.hpp>
 
@@ -15,6 +16,7 @@
 #include <atomic>
 #include <fstream>
 #include <functional>
+#include <limits>
 #include <sstream>
 #include <string>
 #include <thread>
@@ -171,6 +173,10 @@ public:
       FC_THROW_EXCEPTION(fc::invalid_arg_exception, "unexpected fake RPC method {}", method);
    }
 
+   fc::variant execute_idempotent(const std::string& method, const fc::variant& params) override {
+      return execute(method, params);
+   }
+
    std::vector<std::string> methods;
    fc::variant              estimate_gas_params;
    size_t                   broadcast_count = 0;
@@ -205,12 +211,15 @@ std::filesystem::path write_client_configuration_file(fc::temp_directory& direct
 
 void with_initialized_outpost_plugin(
    const std::vector<std::string>& configuration_arguments,
-   const std::function<void(sysio::outpost_ethereum_client_plugin&)>& inspect_plugin) {
+   const std::function<void(sysio::outpost_ethereum_client_plugin&)>& inspect_plugin,
+   std::string_view signature_provider_id = "signer-a",
+   std::string_view signature_provider_chain = "ethereum") {
    auto reset_application = gsl_lite::finally([] { appbase::application::reset_app_singleton(); });
    appbase::scoped_app test_application{};
 
    const std::string signature_spec =
-      "signer-a,ethereum,ethereum," + std::string(signer_public_key) + ",KEY:" +
+      std::string(signature_provider_id) + "," + std::string(signature_provider_chain) +
+      ",ethereum," + std::string(signer_public_key) + ",KEY:" +
       std::string(signer_private_key);
    std::vector<std::string> arguments{
       "test_outpost_ethereum_transaction_policy",
@@ -230,23 +239,47 @@ void with_initialized_outpost_plugin(
 }
 
 std::vector<sysio::ethereum_client_entry_ptr>
-initialize_outpost_plugin(const std::vector<std::string>& configuration_arguments) {
+initialize_outpost_plugin(const std::vector<std::string>& configuration_arguments,
+                          std::string_view signature_provider_id = "signer-a",
+                          std::string_view signature_provider_chain = "ethereum") {
    std::vector<sysio::ethereum_client_entry_ptr> clients;
    with_initialized_outpost_plugin(
       configuration_arguments,
-      [&](auto& plugin) { clients = plugin.get_clients(); });
+      [&](auto& plugin) { clients = plugin.get_clients(); },
+      signature_provider_id,
+      signature_provider_chain);
    return clients;
 }
 
-ethereum_transaction_policy_reason startup_rejection_reason(
-   const std::vector<std::string>& configuration_arguments) {
+std::size_t initialize_rejected_file_and_observe_published_clients(
+   const std::filesystem::path& configuration_file) {
+   auto reset_application = gsl_lite::finally([] { appbase::application::reset_app_singleton(); });
+   appbase::scoped_app test_application{};
+
+   const std::string signature_spec =
+      "signer-a,ethereum,ethereum," + std::string(signer_public_key) + ",KEY:" +
+      std::string(signer_private_key);
+   std::vector<std::string> arguments{
+      "test_outpost_ethereum_transaction_policy",
+      "--signature-provider",
+      signature_spec,
+      "--outpost-ethereum-client-config-file",
+      configuration_file.string(),
+   };
+   std::vector<char*> argv;
+   argv.reserve(arguments.size());
+   for (auto& argument : arguments) argv.emplace_back(argument.data());
+
    try {
-      initialize_outpost_plugin(configuration_arguments);
-      BOOST_FAIL("expected startup policy rejection");
-   } catch (const ethereum_transaction_policy_exception& rejection) {
-      return rejection.reason();
+      (void) test_application->initialize<sysio::outpost_ethereum_client_plugin>(
+         argv.size(), argv.data());
+      BOOST_FAIL("expected file configuration rejection");
+   } catch (const sysio::chain::plugin_config_exception&) {
+      return test_application->get_plugin<sysio::outpost_ethereum_client_plugin>()
+         .get_clients()
+         .size();
    }
-   return ethereum_transaction_policy_reason::configuration_schema_invalid;
+   return std::numeric_limits<std::size_t>::max();
 }
 
 } // namespace
@@ -412,123 +445,17 @@ BOOST_AUTO_TEST_CASE(all_typed_write_wrappers_share_the_policy_enforced_path) {
    BOOST_CHECK_EQUAL(client->broadcast_count, 0u);
 }
 
-BOOST_AUTO_TEST_CASE(default_policy_uses_the_maximum_value_for_every_expenditure_cap) {
-   const auto policy = sysio::make_default_ethereum_transaction_policy("client-a", 31337);
-   const auto& maximum = maximum_ethereum_transaction_policy_value();
-   BOOST_CHECK_EQUAL(policy.chain_id, 31337);
-   BOOST_CHECK_EQUAL(policy.max_priority_fee_per_gas, maximum);
-   BOOST_CHECK_EQUAL(policy.max_fee_per_gas, maximum);
-   BOOST_CHECK_EQUAL(policy.max_gas_limit, maximum);
-   BOOST_CHECK_EQUAL(policy.max_total_native_cost, maximum);
-}
-
-BOOST_AUTO_TEST_CASE(unified_file_loads_explicit_and_default_policies) {
-   fc::temp_directory directory;
-   const auto path = write_client_configuration_file(directory, R"json({
-      "version": 1,
-      "clients": [{
-         "client_id": "ethereum-mainnet",
-         "signature_provider_id": "signer-a",
-         "rpc_url": "http://127.0.0.1:1",
-         "chain_id": "1",
-         "transaction_policy": {
-            "max_priority_fee_per_gas_wei": "2000000000",
-            "max_fee_per_gas_wei": "100000000000",
-            "max_gas_limit": "2000000",
-            "max_total_native_cost_wei": "250000000000000000"
-         }
-      }, {
-         "client_id": "ethereum-sepolia",
-         "signature_provider_id": "signer-a",
-         "rpc_url": "http://127.0.0.1:1",
-         "chain_id": "11155111"
-      }]
-   })json");
-
-   const auto configurations = sysio::load_ethereum_client_configuration_file(path);
-   const auto& maximum = maximum_ethereum_transaction_policy_value();
-   BOOST_REQUIRE_EQUAL(configurations.size(), 2u);
-   BOOST_CHECK_EQUAL(configurations.at("ethereum-mainnet").chain_id, 1);
-   BOOST_CHECK_EQUAL(configurations.at("ethereum-mainnet").policy.max_fee_per_gas, 100000000000ULL);
-   BOOST_CHECK_EQUAL(configurations.at("ethereum-sepolia").chain_id, 11155111);
-   BOOST_CHECK_EQUAL(configurations.at("ethereum-sepolia").policy.max_fee_per_gas, maximum);
-}
-
-BOOST_AUTO_TEST_CASE(unified_file_rejects_schema_duplicates_ranges_and_sensitive_unknown_fields) {
-   fc::temp_directory directory;
-   expect_policy_rejection([&] {
-      sysio::load_ethereum_client_configuration_file(directory.path() / "missing.json");
-   });
-
-   auto path = write_client_configuration_file(directory, R"json({
-      "version": 1,
-      "clients": [{
-         "client_id": "client-a",
-         "client_id": "client-b",
-         "signature_provider_id": "signer-a",
-         "rpc_url": "http://127.0.0.1:1",
-         "chain_id": "31337"
-      }]
-   })json");
-   expect_policy_rejection([&] { sysio::load_ethereum_client_configuration_file(path); });
-
-   path = write_client_configuration_file(directory, R"json({
-      "version": 1,
-      "clients": [{
-         "client_id": "client-a",
-         "signature_provider_id": "signer-a",
-         "rpc_url": "http://127.0.0.1:1",
-         "chain_id": "31337"
-      }, {
-         "client_id": "client-a",
-         "signature_provider_id": "signer-a",
-         "rpc_url": "http://127.0.0.1:2",
-         "chain_id": "31337"
-      }]
-   })json");
-   try {
-      sysio::load_ethereum_client_configuration_file(path);
-      BOOST_FAIL("expected duplicate client rejection");
-   } catch (const ethereum_transaction_policy_exception& rejection) {
-      BOOST_CHECK(rejection.reason() ==
-                  ethereum_transaction_policy_reason::configuration_client_duplicate);
-   }
-
-   path = write_client_configuration_file(directory, R"json({
-      "version": 1,
-      "clients": [{
-         "client_id": "client-a",
-         "signature_provider_id": "signer-a",
-         "rpc_url": "http://127.0.0.1:1",
-         "chain_id": "4294967296"
-      }]
-   })json");
-   expect_policy_rejection([&] { sysio::load_ethereum_client_configuration_file(path); });
-
-   constexpr std::string_view sensitive_url = "https://user:password@example.invalid/rpc?token=secret";
-   path = write_client_configuration_file(directory, R"json({
-      "version": 1,
-      "clients": [],
-      "https://user:password@example.invalid/rpc?token=secret": true
-   })json");
-   try {
-      sysio::load_ethereum_client_configuration_file(path);
-      BOOST_FAIL("expected unknown-field rejection");
-   } catch (const ethereum_transaction_policy_exception& rejection) {
-      BOOST_CHECK(rejection.observed().find(sensitive_url) == std::string::npos);
-      BOOST_CHECK(rejection.to_detail_string().find(sensitive_url) == std::string::npos);
-   }
-}
-
 BOOST_AUTO_TEST_CASE(plugin_startup_attaches_unified_client_policies) {
    fc::temp_directory directory;
    const auto path = write_client_configuration_file(directory, R"json({
-      "version": 1,
+      "schema_version": 1,
       "clients": [{
-         "client_id": "client-a",
-         "signature_provider_id": "signer-a",
-         "rpc_url": "http://127.0.0.1:1",
-         "chain_id": "31337",
+         "connection": {
+            "client_id": "client-a",
+            "signature_provider_id": "signer-a",
+            "rpc_url": "http://127.0.0.1:1"
+         },
+         "chain_id": 31337,
          "transaction_policy": {
             "max_priority_fee_per_gas_wei": "10",
             "max_fee_per_gas_wei": "100",
@@ -536,10 +463,12 @@ BOOST_AUTO_TEST_CASE(plugin_startup_attaches_unified_client_policies) {
             "max_total_native_cost_wei": "100000"
          }
       }, {
-         "client_id": "client-b",
-         "signature_provider_id": "signer-a",
-         "rpc_url": "http://127.0.0.1:1",
-         "chain_id": "1"
+         "connection": {
+            "client_id": "client-b",
+            "signature_provider_id": "signer-a",
+            "rpc_url": "http://127.0.0.1:1"
+         },
+         "chain_id": 1
       }]
    })json");
    const auto clients = initialize_outpost_plugin(
@@ -554,6 +483,67 @@ BOOST_AUTO_TEST_CASE(plugin_startup_attaches_unified_client_policies) {
    BOOST_CHECK_EQUAL(clients.back()->client->transaction_policy().max_total_native_cost, maximum);
 }
 
+BOOST_AUTO_TEST_CASE(file_configuration_accepts_nonempty_provider_identifier) {
+   fc::temp_directory directory;
+   const auto path = write_client_configuration_file(directory, R"json({
+      "schema_version":1,
+      "clients":[{
+         "connection":{
+            "client_id":"client-a",
+            "signature_provider_id":"prod/signing",
+            "rpc_url":"http://127.0.0.1:1"
+         },
+         "chain_id":31337
+      }]
+   })json");
+   const auto clients = initialize_outpost_plugin(
+      {"--outpost-ethereum-client-config-file", path.string()}, "prod/signing");
+   BOOST_REQUIRE_EQUAL(clients.size(), 1u);
+   BOOST_CHECK_EQUAL(clients.front()->id, "client-a");
+}
+
+BOOST_AUTO_TEST_CASE(file_configuration_rejects_wrong_chain_provider) {
+   fc::temp_directory directory;
+   const auto path = write_client_configuration_file(directory, R"json({
+      "schema_version":1,
+      "clients":[{
+         "connection":{
+            "client_id":"client-a",
+            "signature_provider_id":"signer-a",
+            "rpc_url":"http://127.0.0.1:1"
+         },
+         "chain_id":31337
+      }]
+   })json");
+   BOOST_CHECK_THROW(
+      initialize_outpost_plugin(
+         {"--outpost-ethereum-client-config-file", path.string()}, "signer-a", "wire"),
+      sysio::chain::plugin_config_exception);
+}
+
+BOOST_AUTO_TEST_CASE(file_configuration_does_not_publish_a_partial_client_map) {
+   fc::temp_directory directory;
+   const auto path = write_client_configuration_file(directory, R"json({
+      "schema_version":1,
+      "clients":[{
+         "connection":{
+            "client_id":"valid-first",
+            "signature_provider_id":"signer-a",
+            "rpc_url":"http://127.0.0.1:1"
+         },
+         "chain_id":31337
+      },{
+         "connection":{
+            "client_id":"invalid-second",
+            "signature_provider_id":"missing-signer",
+            "rpc_url":"http://127.0.0.1:1"
+         },
+         "chain_id":1
+      }]
+   })json");
+   BOOST_CHECK_EQUAL(initialize_rejected_file_and_observe_published_clients(path), 0u);
+}
+
 BOOST_AUTO_TEST_CASE(legacy_client_option_uses_default_policy_with_explicit_chain_id) {
    const auto clients = initialize_outpost_plugin(
       {"--outpost-ethereum-client", "client-a,signer-a,http://127.0.0.1:1,31337"});
@@ -561,6 +551,15 @@ BOOST_AUTO_TEST_CASE(legacy_client_option_uses_default_policy_with_explicit_chai
    BOOST_REQUIRE_EQUAL(clients.size(), 1u);
    BOOST_CHECK_EQUAL(clients.front()->chain_id, 31337);
    BOOST_CHECK_EQUAL(clients.front()->client->transaction_policy().max_fee_per_gas, maximum);
+}
+
+BOOST_AUTO_TEST_CASE(legacy_client_option_preserves_nonempty_identifier_compatibility) {
+   const auto clients = initialize_outpost_plugin(
+      {"--outpost-ethereum-client", "legacy/client,prod/signing,http://127.0.0.1:1,31337"},
+      "prod/signing");
+   BOOST_REQUIRE_EQUAL(clients.size(), 1u);
+   BOOST_CHECK_EQUAL(clients.front()->id, "legacy/client");
+   BOOST_CHECK_EQUAL(clients.front()->client->transaction_policy().client_id, "legacy-client");
 }
 
 BOOST_AUTO_TEST_CASE(legacy_three_field_client_resolves_chain_id_from_rpc) {
@@ -575,24 +574,26 @@ BOOST_AUTO_TEST_CASE(legacy_three_field_client_resolves_chain_id_from_rpc) {
 BOOST_AUTO_TEST_CASE(plugin_startup_rejects_mixed_unified_and_legacy_modes) {
    fc::temp_directory directory;
    const auto path = write_client_configuration_file(
-      directory, R"json({"version":1,"clients":[]})json");
-   BOOST_CHECK(startup_rejection_reason(
+      directory, R"json({"schema_version":1,"clients":[]})json");
+   BOOST_CHECK_THROW(initialize_outpost_plugin(
       {"--outpost-ethereum-client-config-file",
        path.string(),
        "--outpost-ethereum-client",
-       "client-a,signer-a,http://127.0.0.1:1,31337"}) ==
-               ethereum_transaction_policy_reason::configuration_schema_invalid);
+       "client-a,signer-a,http://127.0.0.1:1,31337"}),
+      sysio::chain::plugin_config_exception);
 }
 
 BOOST_AUTO_TEST_CASE(outpost_factory_rejects_client_policy_chain_mismatch) {
    fc::temp_directory directory;
    const auto path = write_client_configuration_file(directory, R"json({
-      "version": 1,
+      "schema_version": 1,
       "clients": [{
-         "client_id": "client-a",
-         "signature_provider_id": "signer-a",
-         "rpc_url": "http://127.0.0.1:1",
-         "chain_id": "31337"
+         "connection": {
+            "client_id": "client-a",
+            "signature_provider_id": "signer-a",
+            "rpc_url": "http://127.0.0.1:1"
+         },
+         "chain_id": 31337
       }]
    })json");
 
@@ -623,21 +624,22 @@ BOOST_AUTO_TEST_CASE(plugin_startup_redacts_an_invalid_authenticated_rpc_url) {
    constexpr std::string_view sensitive_url =
       "http://user:password@localhost:not-a-port/rpc?token=secret";
    const auto path = write_client_configuration_file(directory, R"json({
-      "version": 1,
+      "schema_version": 1,
       "clients": [{
-         "client_id": "client-a",
-         "signature_provider_id": "signer-a",
-         "rpc_url": "http://user:password@localhost:not-a-port/rpc?token=secret",
-         "chain_id": "31337"
+         "connection": {
+            "client_id": "client-a",
+            "signature_provider_id": "signer-a",
+            "rpc_url": "http://user:password@localhost:not-a-port/rpc?token=secret"
+         },
+         "chain_id": 31337
       }]
    })json");
    try {
       initialize_outpost_plugin(
          {"--outpost-ethereum-client-config-file", path.string()});
       BOOST_FAIL("expected invalid URL rejection");
-   } catch (const ethereum_transaction_policy_exception& rejection) {
-      BOOST_CHECK(rejection.reason() ==
-                  ethereum_transaction_policy_reason::configuration_schema_invalid);
+   } catch (const sysio::opp::config::client_config_exception& rejection) {
+      BOOST_CHECK(rejection.reason() == sysio::opp::config::client_config_reason::rpc_url_invalid);
       BOOST_CHECK(rejection.observed().find(sensitive_url) == std::string::npos);
       BOOST_CHECK(rejection.to_detail_string().find(sensitive_url) == std::string::npos);
    }

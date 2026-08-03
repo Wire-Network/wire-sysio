@@ -1,8 +1,11 @@
 #include <ranges>
+
 #include <fc/log/logger.hpp>
 
+#include <sysio/http_client_plugin/http_client_options.hpp>
 #include <sysio/outpost_solana_client_plugin.hpp>
 #include <sysio/outpost_solana_client_plugin/outpost_solana_client.hpp>
+#include <sysio/outpost_client/rpc_options.hpp>
 
 namespace sysio {
 
@@ -10,11 +13,20 @@ namespace {
 constexpr auto option_name_client          = "outpost-solana-client";
 constexpr auto option_idl_file             = "solana-idl-file";
 constexpr auto option_outpost_program_name = "solana-outpost-program-name";
+constexpr outbound_http::transport_option_names
+   transport_option_names{
+      .additional_ca_file =
+         "outpost-solana-additional-ca-file",
+      .additional_ca_path =
+         "outpost-solana-additional-ca-path",
+      .proxy = "outpost-solana-proxy",
+   };
 
 [[maybe_unused]] inline fc::logger& logger() {
    static fc::logger log{"outpost_solana_client_plugin"};
    return log;
 }
+
 } // namespace
 
 class outpost_solana_client_plugin_impl {
@@ -73,6 +85,8 @@ public:
 outpost_solana_client_plugin::outpost_solana_client_plugin()
    : my(std::make_unique<outpost_solana_client_plugin_impl>()) {}
 
+outpost_solana_client_plugin::~outpost_solana_client_plugin() = default;
+
 void outpost_solana_client_plugin::plugin_initialize(const variables_map& options) {
    if (options.contains(option_idl_file)) {
       auto& idl_files = options.at(option_idl_file).as<std::vector<std::filesystem::path>>();
@@ -90,21 +104,49 @@ void outpost_solana_client_plugin::plugin_initialize(const variables_map& option
    // constructed here rather than deferred to startup.
    auto& sig_mgr      = app().get_plugin<signature_provider_manager_plugin>();
    auto client_specs  = options.at(option_name_client).as<std::vector<std::string>>();
+   const auto rpc_options =
+      outpost_rpc::rpc_options(
+         options,
+         transport_option_names);
 
    for (auto& client_spec : client_specs) {
-      dlog("Adding solana client with spec: {}", client_spec);
+      dlog("Adding configured Solana client");
       auto parts = fc::split(client_spec, ',');
-      FC_ASSERT(parts.size() == 3, "Invalid spec {} (expected: <client-id>,<sig-provider-id>,<rpc-url>)",
-                client_spec);
+      SYS_ASSERT(parts.size() == 3,
+                 chain::plugin_config_exception,
+                 "Invalid {} spec '{}' (expected: <client-id>,<sig-provider-id>,<rpc-url>)",
+                 option_name_client,
+                 client_spec);
 
       auto& id     = parts[0];
       auto& sig_id = parts[1];
       auto& url    = parts[2];
+      SYS_ASSERT(!id.empty(), chain::plugin_config_exception,
+                 "Invalid {} spec: Solana client id must not be empty", option_name_client);
+      SYS_ASSERT(!sig_id.empty(), chain::plugin_config_exception,
+                 "Invalid {} spec for client '{}': signer name must not be empty", option_name_client, id);
+      SYS_ASSERT(!url.empty(), chain::plugin_config_exception,
+                 "Invalid {} spec for client '{}': RPC URL must not be empty", option_name_client, id);
+      SYS_ASSERT(sig_mgr.is_explicitly_configured_provider(sig_id),
+                 chain::plugin_config_exception,
+                 "Outpost Solana client '{}' references signer '{}', but no explicitly named "
+                 "--signature-provider with that name was specified",
+                 id,
+                 sig_id);
+
       auto sig_provider = sig_mgr.get_provider(sig_id);
+      SYS_ASSERT(sig_provider->target_chain == fc::crypto::chain_kind_solana &&
+                    sig_provider->key_type == fc::crypto::chain_key_type_solana,
+                 chain::plugin_config_exception,
+                 "Outpost Solana client '{}' signer '{}' must use chain=solana and key-type=solana",
+                 id,
+                 sig_id);
+
       my->add_client(id, std::make_shared<solana_client_entry_t>(
                             id, url, sig_provider,
-                            std::make_shared<solana_client>(sig_provider, url)));
-      ilog("Added solana client (id={},sig_id={},url={})", id, sig_id, url);
+                            std::make_shared<solana_client>(sig_provider, url, rpc_options)));
+      ilog("Added solana client (id={},sig_id={},endpoint={})",
+           id, sig_id, fc::http::sanitized_endpoint(fc::url(url)));
    }
 }
 
@@ -117,7 +159,8 @@ void outpost_solana_client_plugin::set_program_options(options_description& cli,
       option_name_client,
       boost::program_options::value<std::vector<std::string>>()->multitoken(),
       "Outpost Solana Client spec, the plugin supports 1 to many clients in a given process. "
-      "Format: `<sol-client-id>,<sig-provider-id>,<rpc-url>`")(
+      "Format: `<sol-client-id>,<sig-provider-id>,<rpc-url>`. The signer id must "
+      "match an explicitly named --signature-provider with the Solana target chain and key type")(
       option_idl_file,
       boost::program_options::value<std::vector<std::filesystem::path>>()->multitoken(),
       "Solana program IDL file(s). Expects each file to be a JSON IDL (Anchor format) program definition.")(
@@ -127,6 +170,10 @@ void outpost_solana_client_plugin::set_program_options(options_description& cli,
       "programs with this name when constructing outpost clients. The default targets the standalone "
       "opp_outpost program; pass liqsol_core when the outpost interface is hosted inside the liqsol-core "
       "program (clean-room layout).");
+   outbound_http::add_transport_program_options(
+      cfg,
+      transport_option_names,
+      "Solana RPC");
 }
 
 void outpost_solana_client_plugin::plugin_shutdown() {
@@ -147,10 +194,11 @@ outpost_solana_client_plugin::get_idl_files() {
 }
 
 std::shared_ptr<outpost_client>
-outpost_solana_client_plugin::create_outpost_client(const std::string& sol_client_id,
-                                                  uint64_t           chain_code,
-                                                  uint32_t           chain_id,
-                                                  const std::string& program_id) {
+outpost_solana_client_plugin::create_outpost_client(const std::string&  sol_client_id,
+                                                  uint64_t            chain_code,
+                                                  uint32_t            chain_id,
+                                                  const std::string&  program_id,
+                                                  solana_outpost_role role) {
    auto entry = my->get_client(sol_client_id);
    FC_ASSERT(entry, "Unknown solana client id: {}", sol_client_id);
    FC_ASSERT(!program_id.empty(), "Solana program id is required");
@@ -168,7 +216,7 @@ outpost_solana_client_plugin::create_outpost_client(const std::string& sol_clien
              option_outpost_program_name);
 
    return std::make_shared<outpost_solana_client>(
-      entry, program_key, std::move(program_idls), chain_code, chain_id);
+      entry, program_key, std::move(program_idls), chain_code, chain_id, role);
 }
 
 std::vector<fc::network::solana::idl::program> filter_outpost_program_idls(

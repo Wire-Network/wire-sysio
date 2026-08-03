@@ -14,8 +14,6 @@
 #include <fc/network/json_rpc/json_rpc_client.hpp>
 #include <fc/task/retry.hpp>
 
-#include <string_view>
-
 namespace fc::network::ethereum {
 using namespace fc::crypto;
 using namespace fc::crypto::ethereum;
@@ -332,9 +330,11 @@ public:
     * @param sig_provider `signature_provider` shared pointer
     * @param url_source The URL of the Ethereum node (e.g., Infura, local node).
     * @param transaction_policy Required local expenditure policy and authoritative chain id
+    * @param rpc_options authenticated transport and bounded request policy
     */
    ethereum_client(const signature_provider_ptr& sig_provider, const std::variant<std::string, fc::url>& url_source,
-                   ethereum_transaction_policy transaction_policy);
+                   ethereum_transaction_policy transaction_policy,
+                   client_options rpc_options = {});
 
    /** Virtual destructor supporting deterministic RPC fakes in client tests. */
    virtual ~ethereum_client() = default;
@@ -346,6 +346,14 @@ public:
     * @return The raw JSON response as a string, wrapped in std::optional.
     */
    virtual fc::variant execute(const std::string& method, const fc::variant& params);
+
+   /**
+    * @brief Execute an explicitly read-only RPC with stale-connection recovery.
+    *
+    * The request may be replayed once only when an existing cached connection
+    * proves stale. Transaction-submission methods must use `execute`.
+    */
+   virtual fc::variant execute_idempotent(const std::string& method, const fc::variant& params);
 
    fc::variant execute_contract_view_fn(const address& contract_address, const abi::contract& abi,
                                         const block_number_or_tag_t& block, const contract_invoke_data_items& params);
@@ -611,7 +619,7 @@ private:
     */
    json_rpc_client _client;
 
-   /** Required immutable policy, including the locally configured chain ID. */
+   /** Required immutable policy, including the locally authoritative chain ID. */
    const ethereum_transaction_policy _transaction_policy;
 
    /**

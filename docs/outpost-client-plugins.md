@@ -4,78 +4,50 @@
 
 ## Configuration
 
-The preferred configuration keeps each RPC connection, replay-protection domain, and transaction policy in one
-versioned JSON file. Signature providers remain separate because they may use `KEY`, wallet, or KMS backends:
+The preferred Ethereum client configuration is a versioned protobuf-JSON file:
 
 ```sh
 --signature-provider "eth-01,ethereum,ethereum,0x8318535b54105d4a7aae60c08fc45f9687181b4fdfc625bd1a753fa7397fed753547f11ca8696646f2f3acb08e31016afac23e630c5d11f59f61fef57b0d2aa5,KEY:0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
---outpost-ethereum-client-config-file /etc/wire/ethereum-clients.json
+--outpost-ethereum-client-config-file /etc/wire/ethereum-client-config.json
 ```
 
-The unified file can configure one or more EVM outposts:
+See [ethereum-client-config.example.json](ethereum-client-config.example.json). The root
+`schema_version` must be `1`. Each `clients` entry has a signing `connection`, an unquoted positive
+32-bit `chain_id`, and an optional complete `transaction_policy` containing canonical decimal-string
+caps for priority fee, maximum fee, gas limit, and total native cost. When `transaction_policy` is
+omitted all four caps default to `UINT256_MAX` for backward compatibility. This maximum default is
+compatibility-only: it provides no finite economic boundary, is not a production recommendation,
+and production operators must configure reviewed finite `transaction_policy` values.
 
-```json
-{
-  "version": 1,
-  "clients": [
-    {
-      "client_id": "eth-anvil-local",
-      "signature_provider_id": "eth-01",
-      "rpc_url": "http://localhost:8545",
-      "chain_id": "31337",
-      "transaction_policy": {
-        "max_priority_fee_per_gas_wei": "2000000000",
-        "max_fee_per_gas_wei": "100000000000",
-        "max_gas_limit": "2000000",
-        "max_total_native_cost_wei": "250000000000000000"
-      }
-    }
-  ]
-}
-```
+HTTPS endpoints use system CA roots and mandatory DNS/IP identity verification. Private PKI can be added with
+`--outpost-ethereum-additional-ca-file` or `--outpost-ethereum-additional-ca-path`; an explicit proxy can be set
+with `--outpost-ethereum-proxy`. The equivalent Solana options are
+`--outpost-solana-additional-ca-file`, `--outpost-solana-additional-ca-path`, and
+`--outpost-solana-proxy`. The `--outbound-http-*` options provide process-wide fallbacks; chain-specific values
+take precedence. See [Outbound HTTP transport](outbound-http-transport.md) for the complete security and
+resource policy.
 
-`transaction_policy` is optional. If omitted, all four caps are set to the maximum `uint256` value. This permissive
-default preserves the behavior from before transaction policies were introduced; production operators should set
-finite limits explicitly.
+> NOTE:  If you look closely, the reference to `eth-01` in the Ethereum client config, matches the signature provider configured for `Ethereum`.  This mapping is what enables `1..n` clients in a single process
 
-The chain id is a positive canonical decimal string in the external outpost domain `1..UINT32_MAX`. The four policy
-limits are positive canonical decimal strings up to `uint256`; strings avoid JSON number precision loss. The loader
-rejects unknown or duplicate fields, unsupported versions, invalid or zero limits, and duplicate client ids.
+The signer reference is validated during startup and must identify an explicit Ethereum
+`--signature-provider`; anonymous signature-provider specs cannot be referenced. File-configured
+chain IDs are locally authoritative, so startup does not call `eth_chainId` for them.
 
-For backward compatibility, `--outpost-ethereum-client` remains available and cannot be combined with the unified
-file:
+The legacy option remains available and cannot be combined with the file option:
 
 ```sh
 --outpost-ethereum-client eth-anvil-local,eth-01,http://localhost:8545,31337
 ```
 
-Legacy clients always receive the permissive maximum-value policy. A fourth chain-id field is preferred and remains
-locally authoritative. If the original three-field form is used, startup obtains `eth_chainId` from the RPC endpoint
-under one aggregate five-second deadline, so an unavailable endpoint fails startup instead of blocking it indefinitely.
-The removed `--outpost-ethereum-transaction-policy-file` option is not supported.
+The four-field legacy form also treats its chain ID as locally authoritative. The historical
+three-field form remains compatible by resolving `eth_chainId` during startup under a shared
+five-second deadline. Legacy clients receive `UINT256_MAX` expenditure caps, with the same
+compatibility-only warning above.
 
-Immediately before signing, the client requires:
+Every signing-capable client enforces its local policy after the transaction is fully assembled
+and immediately before signing. A rejected transaction is neither signed nor broadcast.
 
-- `maxPriorityFeePerGas <= max_priority_fee_per_gas_wei`
-- `maxFeePerGas <= max_fee_per_gas_wei`
-- `gasLimit <= max_gas_limit`
-- `maxFeePerGas >= maxPriorityFeePerGas`
-- `gasLimit * maxFeePerGas + value <= max_total_native_cost_wei`
-
-All arithmetic is checked for `uint256` overflow. Limits are inclusive: a value equal to a cap is allowed and cap plus
-one is rejected. Rejected transactions are not clamped, signed, or broadcast. In the unified and four-field legacy
-modes, the configured `chain_id` is authoritative for signing and the RPC endpoint cannot select the
-replay-protection domain.
-
-Fee-cap sizing must account for the EIP-1559 derivation `maxFeePerGas = 2 * baseFeePerGas + maxPriorityFeePerGas`. Startup can validate the two configured caps, but it cannot choose a minimum base fee because base fees are dynamic and chain-specific. For an actual priority fee `p`, the largest base fee admitted by the policy is `floor((max_fee_per_gas_wei - p) / 2)`. Operators should size the two caps for the intended chain; insufficient headroom fails closed with reason code `max_fee_cap_exceeded` and field `max_fee_per_gas`. The diagnostic's observed value names the `2 * base_fee_per_gas + max_priority_fee_per_gas` operands; its allowed value is the configured cap.
-
-The `eth-01` reference in the client configuration matches the Ethereum signature provider. A process needs more than
-one `client_id` only when it serves multiple distinct EVM outposts or chains, or when callers explicitly select
-different same-chain endpoints or signers. Multiple same-chain RPC endpoints are not automatic failover: chain-id
-lookup becomes ambiguous and fails closed unless a caller selects a client id explicitly.
-
-With the above configuration and the appropriate `app` and plugin config, you can access the Ethereum client configured
-with name/id `eth-anvil-local` as follows:
+With the above configuration and the appropriate `app` & `plugin` config, you can access the `outpost-ethereum-client` configured with name/id == `eth-anvil-local` as follows
 
 ```cpp
 // GET `outpost_ethereum_client_plugin`
@@ -87,7 +59,7 @@ auto  client_entry = eth_plug.get_clients()[0];
 // CLIENT IS A `std::shared_ptr<ethereum_client>`
 auto& client       = client_entry->client;
 
-// GET THE AUTHORITATIVE POLICY CHAIN ID, JUST AN EXAMPLE
+// GET CHAIN ID, JUST AN EXAMPLE
 // `chain_id` will have the type `fc::uint256`
 auto chain_id = client->get_chain_id();
 ```

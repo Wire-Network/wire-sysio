@@ -6,7 +6,11 @@ d="$1"; dev="$2"
 [ -f "$d" ] || { echo "S2 FAIL: deb not found: $d"; exit 1; }
 fail() { echo "S2 FAIL: $1"; exit 1; }
 c=$(dpkg-deb -c "$d" | awk '{print $6}')
-for f in ./usr/bin/nodeop ./usr/lib/systemd/system/wire-sysio-nodeop.service ./usr/lib/tmpfiles.d/wire-sysio.conf ./etc/logrotate.d/wire-sysio-nodeop; do
+# The wire-sysio programs install DIRECTLY at /usr/bin under their own names --
+# no private home, no symlink indirection. (wire-cdt's /usr/lib/cdt home exists
+# solely because it bundles clang/lld/llvm-* binaries whose names collide with
+# the distro's toolchain packages; wire-sysio bundles no such thing.)
+for f in ./usr/bin/nodeop ./usr/bin/clio ./usr/bin/kiod ./usr/lib/systemd/system/wire-sysio-nodeop.service ./usr/lib/tmpfiles.d/wire-sysio.conf ./etc/logrotate.d/wire-sysio-nodeop; do
     echo "$c" | grep -qx "$f" || fail "payload missing $f"
 done
 echo "$c" | grep -q "^./usr/include/" && fail "base deb leaks headers"

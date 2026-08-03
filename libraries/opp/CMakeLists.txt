@@ -1,4 +1,6 @@
 # opp: library
+add_subdirectory(client_config)
+
 set(TARGET_NAME opp)
 set(TARGET_MODELS_NAME "${TARGET_NAME}_models")
 set(TARGET_CDT_MODELS_NAME "${TARGET_NAME}_cdt_models")
