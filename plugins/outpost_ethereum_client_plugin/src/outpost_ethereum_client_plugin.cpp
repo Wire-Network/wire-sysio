@@ -319,6 +319,7 @@ class outpost_ethereum_client_plugin_impl {
    std::vector<file_abi_contracts_t> _abi_files{};
 
 public:
+   /** Load and de-duplicate ABI files while preserving their parsed contract definitions. */
    std::vector<file_abi_contracts_t>
    load_abi_files(const std::vector<std::filesystem::path>& file_names) {
       for (const auto& filename : file_names) {
