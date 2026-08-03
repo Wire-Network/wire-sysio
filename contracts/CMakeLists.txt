@@ -52,6 +52,7 @@ add_subdirectory(sysio.opreg)
 add_subdirectory(sysio.msgch)
 add_subdirectory(sysio.uwrit)
 add_subdirectory(sysio.chalg)
+add_subdirectory(sysio.councl)
 add_subdirectory(sysio.reserv)
 add_subdirectory(sysio.dclaim)
 

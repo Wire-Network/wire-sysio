@@ -1,6 +1,6 @@
 #include <sysio.chalg/sysio.chalg.hpp>
 
-#include <sysio.roa.hpp>   // T1 electorate snapshot at opendispute: sysio.roa::nodeowners / roastate
+#include <sysio.roa.hpp> // authoritative T1 electorate snapshot at opendispute
 #include <magic_enum/magic_enum.hpp>
 
 #include <algorithm>
@@ -62,9 +62,7 @@ void chalg::opendispute(uint64_t chain_code,
    // snapshot for the dispute's whole life, so they cannot diverge from each other, and later
    // registrations or a generation rotation cannot change an in-flight dispute's electorate or
    // quorum.
-   roa::roastate_t roastate(ROA_ACCOUNT);
-   check(roastate.exists(), "roa state not initialized");
-   const uint8_t network_gen = roastate.get().network_gen;
+   const uint8_t network_gen = roa::current_network_gen(ROA_ACCOUNT);
 
    roa::nodeowners_t nodeowners(ROA_ACCOUNT, network_gen);
    auto by_tier = nodeowners.get_index<"bytier"_n>();
