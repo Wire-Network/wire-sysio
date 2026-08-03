@@ -28,6 +28,8 @@ struct contracts {
    static std::vector<char>    uwrit_abi() { return read_abi("${CMAKE_BINARY_DIR}/contracts/sysio.uwrit/sysio.uwrit.abi"); }
    static std::vector<uint8_t> chalg_wasm() { return read_wasm("${CMAKE_BINARY_DIR}/contracts/sysio.chalg/sysio.chalg.wasm"); }
    static std::vector<char>    chalg_abi() { return read_abi("${CMAKE_BINARY_DIR}/contracts/sysio.chalg/sysio.chalg.abi"); }
+   static std::vector<uint8_t> councl_wasm() { return read_wasm("${CMAKE_BINARY_DIR}/contracts/sysio.councl/sysio.councl.wasm"); }
+   static std::vector<char>    councl_abi() { return read_abi("${CMAKE_BINARY_DIR}/contracts/sysio.councl/sysio.councl.abi"); }
    static std::vector<uint8_t> reserve_wasm() { return read_wasm("${CMAKE_BINARY_DIR}/contracts/sysio.reserv/sysio.reserv.wasm"); }
    static std::vector<char>    reserve_abi() { return read_abi("${CMAKE_BINARY_DIR}/contracts/sysio.reserv/sysio.reserv.abi"); }
    static std::vector<uint8_t> dclaim_wasm() { return read_wasm("${CMAKE_BINARY_DIR}/contracts/sysio.dclaim/sysio.dclaim.wasm"); }
