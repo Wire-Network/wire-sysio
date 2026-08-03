@@ -128,17 +128,29 @@ pnpm install --frozen-lockfile --ignore-scripts
 # bypass the OPP tool build on pnpm 10.
 pnpm --filter "./proto*" dist
 
+# Publish each tool's bin onto PATH for the protoc/bundler invocations below.
+#
+# pnpm 10 removed the bare `pnpm link --global` form this used to call: it now
+# fails with ERR_PNPM_LINK_BAD_PARAMS ("You must provide a parameter"), and the
+# CMake gate in ../../CMakeLists.txt already requires pnpm >= 10, so the old
+# form could never run here. `pnpm link --global .` is NOT the fix — it resolves
+# `.` as a dependency to ADD, which rewrites the tool's package.json and drops a
+# stray pnpm-lock.yaml/pnpm-workspace.yaml into the source tree.
+#
+# `pnpm add --global <abs-dir>` is the pnpm 10 equivalent: it registers the
+# package globally by path (so edits stay live, as with the old link) and
+# leaves the working tree untouched.
 (
    cd protoc-gen-solidity
-   pnpm link --global
+   pnpm add --global "$PWD"
 )
 (
    cd protoc-gen-solana
-   pnpm link --global
+   pnpm add --global "$PWD"
 )
 (
    cd protobuf-bundler
-   pnpm link --global
+   pnpm add --global "$PWD"
 )
 popd >/dev/null
 
