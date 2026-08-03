@@ -1,0 +1,15 @@
+#!/bin/sh
+# Pre-removal: stop and disable the service so removal leaves no active unit
+# or dangling enablement symlinks. Upgrades do not stop a running node.
+set -e
+
+case "$1" in
+    remove|deconfigure)
+        if [ -d /run/systemd/system ]; then
+            systemctl stop wire-sysio-nodeop.service 2>/dev/null || true
+            systemctl disable wire-sysio-nodeop.service 2>/dev/null || true
+        fi
+        ;;
+esac
+
+exit 0

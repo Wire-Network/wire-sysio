@@ -106,7 +106,14 @@ emissions_gate_result check_emissions_ready(uint32_t epoch_duration_sec, uint32_
    // against sysio's balance. Non-pay epochs do not transfer, so no balance
    // check is needed; pending accumulates in t5state via accrueepoch.
    if (r.is_pay_epoch) {
-      r.period_emission = t5s.pending_emission_amount + r.emission_amount;
+      // Same saturating accumulation as sysio.system::accrueepoch (shared
+      // helper in emissions.hpp) so the gate's period total exactly matches
+      // what accrueepoch will store and payepoch will assert against. An
+      // unsaturated sum here could exceed asset::max_amount once the
+      // accumulator clamps, demanding a balance no account can hold and
+      // blocking epoch advancement permanently.
+      r.period_emission = sysiosystem::emissions::saturating_accrue(
+         t5s.pending_emission_amount, r.emission_amount);
 
       sysio::token::token::accounts acct_tbl(TOKEN_ACCOUNT, SYSTEM_ACCOUNT.value);
       sysio::token::token::acct_key key{WIRE_SYMBOL.code().raw()};
@@ -238,10 +245,86 @@ void epoch::setconfig(uint32_t epoch_duration_sec,
          "epoch_duration_sec exceeds 30-day ceiling");
    check(operators_per_epoch > 0, "operators_per_epoch must be positive");
    check(batch_op_groups > 0, "batch_op_groups must be positive");
-   check(batch_operator_minimum_active == operators_per_epoch * batch_op_groups,
+   check(batch_op_groups <= MAX_BATCH_OP_GROUPS,
+         "batch_op_groups exceeds the uint8 group-index ceiling (255)");
+   // Widen the product to uint64 so a large operators_per_epoch cannot wrap the
+   // uint32 multiply into a small value that spuriously matches a small
+   // batch_operator_minimum_active; an honest product beyond uint32 simply fails
+   // the equality against the uint32 field, which is the intended rejection.
+   check(static_cast<uint64_t>(operators_per_epoch) * batch_op_groups == batch_operator_minimum_active,
          "batch_operator_minimum_active must equal operators_per_epoch * batch_op_groups");
+   // Magnitude bounds, checked after the relationship above so an inconsistent
+   // triple reports the equality error. The equality alone cannot reject an
+   // internally consistent but absurd size (UINT32_MAX groups of one), which
+   // would later abort advance() on its schedule-window vector reserves and
+   // halt epoch advancement chain-wide.
+   check(operators_per_epoch <= MAX_OPERATORS_PER_EPOCH,
+         "operators_per_epoch exceeds the per-epoch schedule ceiling (100)");
+   check(batch_operator_minimum_active <= MAX_SCHEDULED_BATCH_OPERATORS,
+         "batch_operator_minimum_active exceeds the schedule-window ceiling (1000)");
    check(epoch_retention_envelope_log_count > 0,
          "epoch_retention_envelope_log_count must be positive");
+
+   // The emissions pay-period accumulation bound (see emissions.hpp) depends
+   // on epoch_duration_sec: scale_annual_to_epoch is linear in the duration,
+   // so raising the duration raises the per-epoch emission ceiling that
+   // sysio.system::setemitcfg validated against the pay cadence. Re-validate
+   // against the stored emission config here so no ordering of the two setters
+   // can accept a period whose accumulation would saturate the pending
+   // accumulator and permanently block the readiness gate.
+   {
+      sysiosystem::emissions::emitcfg_t emit_cfg_tbl(SYSTEM_ACCOUNT);
+      if (emit_cfg_tbl.exists()) {
+         sysiosystem::emissions::t5state_t t5s_tbl(SYSTEM_ACCOUNT);
+         const int64_t pending =
+            t5s_tbl.exists() ? t5s_tbl.get().pending_emission_amount : 0;
+         check(sysiosystem::emissions::period_accrual_fits_asset_range(
+                  emit_cfg_tbl.get(), epoch_duration_sec, pending),
+               "per-epoch emission ceiling x pay_cadence_epochs exceeds the asset range at this epoch_duration_sec");
+      }
+   }
+
+   // The materialized rotation schedule (epoch_state.batch_op_groups) is
+   // sized from batch_op_groups once, at schbatchgps; advance() thereafter
+   // preserves its length (pop-front / push-back) and never re-reads the
+   // config to resize it. Every downstream invariant -- advance()'s
+   // scheduling horizon (current_epoch_index + batch_op_groups - 1) and
+   // sysio.opreg's termination window -- assumes cfg.batch_op_groups equals
+   // the live rotation length, so once a schedule exists the group count is
+   // fixed. Reject a change rather than let the config drift from the live
+   // rotation (which would mis-date newly scheduled groups and let opreg
+   // accept a window validated against the stale count). Reshaping the
+   // rotation is a fresh schbatchgps, a bootstrap-time operation.
+   {
+      epochstate_t state_tbl(get_self());
+      if (state_tbl.exists()) {
+         const auto state = state_tbl.get();
+         if (!state.batch_op_groups.empty()) {
+            check(batch_op_groups == state.batch_op_groups.size(),
+                  "batch_op_groups cannot change once the rotation schedule is materialized");
+         }
+      }
+   }
+
+   // sysio.opreg's consecutive-miss termination rail requires its rolling
+   // window to span the full miss run of DUTY epochs at the CURRENT schedule
+   // (see opreg::min_terminate_window_ms; a resident operator is on duty once
+   // per `batch_op_groups`-epoch rotation). Raising the duration or the group
+   // count can silently vacate a previously valid window, so re-validate the
+   // stored opreg config against the new schedule; opreg::setconfig performs
+   // the same check against the stored schedule, so no ordering of the two
+   // setters can accept a vacuous pair (SEC-28 residual).
+   {
+      opreg::opconfig_t op_cfg_tbl(OPREG_ACCOUNT);
+      if (op_cfg_tbl.exists()) {
+         const auto op_cfg = op_cfg_tbl.get();
+         check(op_cfg.terminate_window_ms >=
+                  opreg::min_terminate_window_ms(op_cfg.terminate_max_consecutive_misses,
+                                                 epoch_duration_sec,
+                                                 batch_op_groups),
+               "epoch schedule would leave sysio.opreg's terminate_window_ms narrower than the consecutive-miss run");
+      }
+   }
 
    epochcfg_t cfg_tbl(get_self());
    epoch_config cfg = cfg_tbl.get_or_default(epoch_config{});

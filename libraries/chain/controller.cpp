@@ -4186,6 +4186,14 @@ size_t controller::fork_db_size() const {
    return my->fork_db_size();
 }
 
+bool controller::is_synced(fc::time_point now, fc::microseconds recency_window) const {
+   return fork_db_has_root() && fork_db_root().block_time() >= now - recency_window;
+}
+
+bool controller::is_synced() const {
+   return is_synced(fc::time_point::now(), fc::milliseconds(default_sync_recency_ms));
+}
+
 const dynamic_global_property_object& controller::get_dynamic_global_properties()const {
   return my->db.get<dynamic_global_property_object>();
 }

@@ -9,6 +9,14 @@ plugin_target(
         signature_provider_manager_plugin
 )
 
+if (TARGET test_${TARGET_LIB_NAME})
+    target_include_directories(
+            test_${TARGET_LIB_NAME}
+            PRIVATE
+            ${CMAKE_SOURCE_DIR}/contracts/sysio.msgch/include
+    )
+endif ()
+
 if (ENABLE_TESTS)
     file(GLOB_RECURSE TOOL_FILES tools/solana_client_rpc_tool/*.cpp)
     chain_target(${TARGET_TOOL_NAME} SOURCE_FILES ${TOOL_FILES})

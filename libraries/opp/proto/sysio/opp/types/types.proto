@@ -225,33 +225,6 @@ message ReserveAmount {
 }
 
 // ---------------------------------------------------------------------------
-//  Encoding flags
-// ---------------------------------------------------------------------------
-
-enum Endianness {
-  ENDIANNESS_BIG    = 0;
-  ENDIANNESS_LITTLE = 1;
-}
-
-enum HashAlgorithm {
-  HASH_ALGORITHM_KECCAK256  = 0;
-  HASH_ALGORITHM_SHA256     = 1;
-  HASH_ALGORITHM_RESERVED_1 = 2;
-  HASH_ALGORITHM_RESERVED_2 = 3;
-}
-
-enum LengthEncoding {
-  LENGTH_ENCODING_VARUINT = 0;
-  LENGTH_ENCODING_UINT32  = 1;
-}
-
-message EncodingFlags {
-  Endianness     endianness      = 1;
-  HashAlgorithm  hash_algorithm  = 2;
-  LengthEncoding length_encoding = 3;
-}
-
-// ---------------------------------------------------------------------------
 //  Attestation discriminant
 // ---------------------------------------------------------------------------
 

@@ -223,6 +223,12 @@ BOOST_FIXTURE_TEST_CASE(setsnpcfg_validation, snapshot_attest_tester) { try {
                         setsnpcfg(1, 101));
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("min_providers must be at least 1"),
                         setsnpcfg(0, 67));
+   // min_providers cannot exceed the provider-table ceiling (max_snap_provider_rank
+   // == 30): above it, quorum is unreachable no matter how many providers register.
+   // The boundary value is accepted; one past it is rejected.
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(30, 80));
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("min_providers exceeds the maximum registrable providers"),
+                        setsnpcfg(31, 80));
 } FC_LOG_AND_RETHROW() }
 
 // ---------------------------------------------------------------------------

@@ -69,6 +69,14 @@ namespace sysio {
       // per deployment via `setclmwindow`.
       static constexpr uint32_t DEFAULT_CLAIM_WINDOW_SEC = 180u * 24u * 60u * 60u;
 
+      // Upper bound on the configurable claim window. Expiry is computed as the
+      // uint32 sum `now_sec() + claim_window_sec`; an unbounded window overflows
+      // uint32 and wraps the expiry into the past, so freshly credited claims are
+      // pruned by `flushexpired` the moment they are written. 10 years is far past
+      // any intended reward lifespan while keeping `now + window` clear of the
+      // uint32 range for decades.
+      static constexpr uint32_t MAX_CLAIM_WINDOW_SEC = 10u * 365u * 24u * 60u * 60u;
+
       // -----------------------------------------------------------------------
       //  Actions
       // -----------------------------------------------------------------------

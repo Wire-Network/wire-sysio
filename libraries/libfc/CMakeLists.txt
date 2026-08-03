@@ -13,6 +13,7 @@ set(fc_sources
         src/io/json.cpp
         src/io/varint.cpp
         src/io/fstream.cpp
+        src/io/secure_file.cpp
         src/io/console.cpp
         src/filesystem.cpp
         src/interprocess/file_mapping.cpp
@@ -63,6 +64,7 @@ set(fc_sources
         src/network/ethereum/ethereum_client.cpp
         src/network/ethereum/ethereum_rlp_encoder.cpp
         src/network/http/http_client.cpp
+        src/network/http/http_client_legacy.cpp
         src/network/json_rpc/json_rpc_client.cpp
         src/network/solana/solana_types.cpp
         src/network/solana/solana_borsh.cpp
@@ -135,12 +137,12 @@ add_subdirectory(benchmark)
 
 install(
         TARGETS fc
-        LIBRARY DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT dev
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT dev
 )
 
 install(
         DIRECTORY include/fc
-        DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR}
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+        COMPONENT dev
 )
-

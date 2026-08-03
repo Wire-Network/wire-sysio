@@ -1,0 +1,32 @@
+#!/bin/sh
+# Post-install: create service directories, register the unit, and -- when the
+# enable answer is true (the default, also applied by noninteractive
+# frontends) -- enable the unit at boot AND start it now.
+set -e
+
+case "$1" in
+    configure)
+        # No systemd (containers/chroots): nothing to register.
+        [ -d /run/systemd/system ] || exit 0
+
+        INSTALL_SERVICE=true
+        ENABLE_SERVICE=true
+        if [ -e /usr/share/debconf/confmodule ]; then
+            . /usr/share/debconf/confmodule
+            db_get wire-sysio/install-service || true
+            [ -n "$RET" ] && INSTALL_SERVICE="$RET"
+            db_get wire-sysio/enable-service || true
+            [ -n "$RET" ] && ENABLE_SERVICE="$RET"
+        fi
+
+        if [ "$INSTALL_SERVICE" = "true" ]; then
+            systemd-tmpfiles --create /usr/lib/tmpfiles.d/wire-sysio.conf || true
+            systemctl daemon-reload || true
+            if [ "$ENABLE_SERVICE" = "true" ]; then
+                systemctl enable --now wire-sysio-nodeop.service || true
+            fi
+        fi
+        ;;
+esac
+
+exit 0

@@ -13,6 +13,7 @@
 #include <sysio/chain/global_property_object.hpp>
 #include <sysio/chain/wasm_config.hpp>
 #include <sysio/chain/chain_config.hpp>
+#include <sysio/chain/genesis_state.hpp>
 #include <fc/io/datastream.hpp>
 
 #include <boost/test/unit_test.hpp>
@@ -221,9 +222,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(chain_config_packed_stability, T, validating_teste
 
    // Verify packed size is stable.
    // If this changes, the packed WASM intrinsic format has changed.
-   // 80 = 8 (uint64) + 10×4 (uint32) + 4 (lifetime) + 4 (delay) + 4 (inline_size)
-   //    + 2 (inline_depth) + 2 (auth_depth) + 4×4 (action_return, kv_key, kv_value, kv_sec_key)
-   BOOST_CHECK_EQUAL(packed.size(), 80u);
+   // 76 = 8 (uint64) + 9x4 (uint32) + 4 (lifetime) + 4 (delay) + 4 (inline_size)
+   //    + 2 (inline_depth) + 2 (auth_depth) + 4x4 (action_return, kv_key, kv_value, kv_sec_key)
+   BOOST_CHECK_EQUAL(packed.size(), 76u);
 
    // Round-trip: unpack and verify all fields match
    chain_config_v0 unpacked;
@@ -233,7 +234,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(chain_config_packed_stability, T, validating_teste
    BOOST_CHECK_EQUAL(unpacked.max_block_net_usage, v0.max_block_net_usage);
    BOOST_CHECK_EQUAL(unpacked.target_block_net_usage_pct, v0.target_block_net_usage_pct);
    BOOST_CHECK_EQUAL(unpacked.max_transaction_net_usage, v0.max_transaction_net_usage);
-   BOOST_CHECK_EQUAL(unpacked.base_per_transaction_net_usage, v0.base_per_transaction_net_usage);
    BOOST_CHECK_EQUAL(unpacked.net_usage_leeway, v0.net_usage_leeway);
    BOOST_CHECK_EQUAL(unpacked.context_free_discount_net_usage_num, v0.context_free_discount_net_usage_num);
    BOOST_CHECK_EQUAL(unpacked.context_free_discount_net_usage_den, v0.context_free_discount_net_usage_den);
@@ -246,6 +246,37 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(chain_config_packed_stability, T, validating_teste
    BOOST_CHECK_EQUAL(unpacked.max_inline_action_size, v0.max_inline_action_size);
    BOOST_CHECK_EQUAL(unpacked.max_inline_action_depth, v0.max_inline_action_depth);
    BOOST_CHECK_EQUAL(unpacked.max_authority_depth, v0.max_authority_depth);
+}
+
+// ============================================================================
+// chain_config::validate() bounds: max_transaction_net_usage floor
+// A config with a too-small max_transaction_net_usage must be rejected --
+// otherwise a bad setparams could cap every billable transaction (including
+// the corrective setparams that would fix it) and wedge the chain.
+// ============================================================================
+
+BOOST_AUTO_TEST_CASE(chain_config_validate_min_max_transaction_net_usage) {
+   chain_config cfg = genesis_state{}.initial_configuration;
+   // The genesis defaults must themselves be valid.
+   cfg.validate();
+
+   auto expect_rejected = [](chain_config c) {
+      BOOST_CHECK_EXCEPTION(c.validate(), action_validate_exception, [](const action_validate_exception& e) {
+         return e.top_message().find("max transaction net usage must be at least") != std::string::npos;
+      });
+   };
+
+   chain_config zero = cfg;
+   zero.max_transaction_net_usage = 0;
+   expect_rejected(zero);
+
+   chain_config undersized = cfg;
+   undersized.max_transaction_net_usage = config::min_max_transaction_net_usage - 1;
+   expect_rejected(undersized);
+
+   chain_config at_floor = cfg;
+   at_floor.max_transaction_net_usage = config::min_max_transaction_net_usage;
+   BOOST_CHECK_NO_THROW(at_floor.validate());
 }
 
 // ============================================================================

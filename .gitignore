@@ -117,3 +117,6 @@ cliff.toml
 !cmake/build-options.cmake
 !/scripts/package-lock.json
 /config-dir/config.ini
+
+# oh-my-claudecode runtime state (operational artifacts, never committed)
+.omc/

@@ -39,14 +39,14 @@ Registers a signing key. Format:
 |---|---|
 | `name` | Lookup ID for this provider (used in `--outpost-solana-client`) |
 | `chain-kind` | Target chain: `solana`, `ethereum`, `wire` |
-| `key-type` | Key algorithm, e.g. `ed` (ED25519 for Solana) |
-| `public-key` | Base58 or hex-encoded public key |
+| `key-type` | Native key type: `solana` (ED25519) |
+| `public-key` | Base58-encoded Solana public key |
 | `provider-type:data` | Either `KEY:<private-key>` or `KIOD:<url>` |
 
-Example using an inline private key:
+Example using the repository's public test fixture key:
 
 ```
---signature-provider sol-signer,solana,ed,PUB_ED_...,KEY:PVT_ED_...
+--signature-provider sol-signer,solana,solana,FDkbys9aWZSSCMYmstq948DfFmjxY69x4qUj7KSr7LCa,KEY:5pNoVifxrWsaAPDyaKGPoKiPjhhbHGaEFdTVmjx9qZJKS472eGsA5118YqEf2m7xUreC2kv6TDq9sssRceeQXHrJ
 ```
 
 #### `--outpost-solana-client` (required, multi-token)
@@ -60,8 +60,12 @@ Registers a Solana RPC client instance. Format:
 | Field | Description |
 |---|---|
 | `client-id` | Unique identifier for this client instance |
-| `sig-provider-id` | Name of a registered `--signature-provider` |
+| `sig-provider-id` | Explicit, non-empty name of a registered `--signature-provider` |
 | `rpc-url` | Solana JSON-RPC endpoint URL |
+
+Startup resolves the signer reference exactly and requires it to use the
+Solana chain and key type. Anonymous signature-provider aliases cannot be
+referenced.
 
 Multiple clients can be configured:
 
@@ -69,6 +73,12 @@ Multiple clients can be configured:
 --outpost-solana-client devnet-client,sol-signer,https://api.devnet.solana.com
 --outpost-solana-client mainnet-client,sol-mainnet-signer,https://api.mainnet-beta.solana.com
 ```
+
+HTTPS RPC endpoints use system CA roots and mandatory DNS/IP identity verification. Use
+`--outpost-solana-additional-ca-file <bundle.pem>` or
+`--outpost-solana-additional-ca-path <hashed-directory>` to add private trust roots. Use
+`--outpost-solana-proxy http://host:port` for an explicit proxy. Verification cannot be disabled, and proxy
+environment variables are not applied implicitly.
 
 #### `--solana-idl-file` (optional, multi-token)
 
@@ -78,11 +88,23 @@ Loads one or more Anchor IDL JSON files for use with `solana_program_client`:
 --solana-idl-file /path/to/counter.json /path/to/another_program.json
 ```
 
+#### `--solana-outpost-program-name` (optional, default `opp_outpost`)
+
+Anchor IDL program name of the Solana OPP outpost. When an outpost client is
+constructed, the loaded `--solana-idl-file` set is filtered to programs whose
+IDL name matches this value. The default targets the standalone `opp_outpost`
+program; the clean-room outpost implementation is hosted inside the
+`liqsol-core` program, whose generated IDL is named `liqsol_core`:
+
+```
+--solana-outpost-program-name liqsol_core
+```
+
 ### Full Example
 
 ```bash
 ./outpost_solana_client_tool \
-   --signature-provider sol-signer,solana,ed,PUB_ED_abc123...,KEY:PVT_ED_def456... \
+   --signature-provider sol-signer,solana,solana,FDkbys9aWZSSCMYmstq948DfFmjxY69x4qUj7KSr7LCa,KEY:5pNoVifxrWsaAPDyaKGPoKiPjhhbHGaEFdTVmjx9qZJKS472eGsA5118YqEf2m7xUreC2kv6TDq9sssRceeQXHrJ \
    --outpost-solana-client my-client,sol-signer,https://api.devnet.solana.com \
    --solana-idl-file ./idl/counter_anchor.json
 ```
@@ -92,7 +114,7 @@ Loads one or more Anchor IDL JSON files for use with `solana_program_client`:
 The same options work in a config `.ini` file:
 
 ```ini
-signature-provider = sol-signer,solana,ed,PUB_ED_abc123...,KEY:PVT_ED_def456...
+signature-provider = sol-signer,solana,solana,FDkbys9aWZSSCMYmstq948DfFmjxY69x4qUj7KSr7LCa,KEY:5pNoVifxrWsaAPDyaKGPoKiPjhhbHGaEFdTVmjx9qZJKS472eGsA5118YqEf2m7xUreC2kv6TDq9sssRceeQXHrJ
 outpost-solana-client = my-client,sol-signer,https://api.devnet.solana.com
 solana-idl-file = ./idl/counter_anchor.json
 ```
@@ -376,7 +398,17 @@ activate Plugin
 
 Plugin -> Plugin : load IDL files\n(--solana-idl-file)
 
+note right of Plugin
+  the signature_provider_manager -- an
+  APPBASE_PLUGIN_REQUIRES dependency --
+  created every configured provider at its
+  own plugin_initialize, before this runs,
+  so providers resolve here regardless of
+  --plugin ordering
+end note
+
 loop for each --outpost-solana-client spec
+   Plugin -> Plugin : parse + validate spec
    Plugin -> SigMgr : get_provider(sig_id)
    SigMgr --> Plugin : signature_provider_ptr
 
@@ -799,6 +831,10 @@ int main(int argc, char* argv[]) {
       }
 
       auto& sol_plug = app->get_plugin<sysio::outpost_solana_client_plugin>();
+
+      // Clients are constructed at plugin_initialize (the signature-provider
+      // manager creates every provider at its own init, before this plugin
+      // initializes), so they are ready to read immediately after init.
 
       // Get the first configured client
       auto clients = sol_plug.get_clients();

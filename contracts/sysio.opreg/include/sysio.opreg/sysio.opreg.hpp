@@ -60,16 +60,90 @@ namespace sysio {
       // minimum is demoted before the funds physically leave.
       static constexpr uint32_t WITHDRAW_WAIT_EPOCHS = 2;
 
-      // Rolling delivery-buffer thresholds for batch-op termination. Per the
-      // plan §1: missing a delivery is NOT a slash; consistent missing IS
-      // grounds for administrative termination.
-      //
-      // All three thresholds live in `op_config` so tests can override them
-      // without recompiling. These `DEFAULT_*` constants are the values
-      // production bootstrap should install.
+      /// Safety rails on the collateral withdraw queue (SEC-78 / WSA-166).
+      /// `withdraw` / `withdrawinle` are operator-driven and bounded only by
+      /// available collateral, so without a row cap an operator could split
+      /// collateral into an unbounded number of system-paid `wtdwqueue` rows and
+      /// force `flushwtdw` to process them all inside one `sysio.epoch::advance`
+      /// transaction. That transaction's CPU budget (~150 ms) is a hard,
+      /// uncatchable deadline, so an oversized queue would abort every advance
+      /// and stall epoch progress chain-wide.
+      ///
+      /// MAX_WTDW_FLUSH_PER_EPOCH bounds the matured rows flushed per advance;
+      /// undrained rows stay queued (collateral stays in the operator's balance
+      /// until flushed) and flush a later epoch. Ingress is already bounded
+      /// economically -- withdraw rows can never exceed the operator's real
+      /// deposited collateral, and direct `withdraw` bills the operator CPU/NET
+      /// per call -- so the flush bound alone is the liveness rail; there is no
+      /// per-account row cap. Conservatively sized to stay well under the
+      /// transaction CPU ceiling shared with the rest of advance's fan-out.
+      static constexpr uint32_t MAX_WTDW_FLUSH_PER_EPOCH = 32;
+
+      /// Rolling delivery-buffer thresholds for batch-op termination. Per the
+      /// plan §1: missing a delivery is NOT a slash; consistent missing IS
+      /// grounds for administrative termination.
+      ///
+      /// All three thresholds live in `op_config` so tests can override them
+      /// without recompiling. These `DEFAULT_*` constants are the values
+      /// production bootstrap should install.
       static constexpr uint32_t DEFAULT_TERMINATE_MAX_CONSECUTIVE_MISSES = 5;
       static constexpr uint32_t DEFAULT_TERMINATE_MAX_PCT_MISSES_24H     = 5;   // percent
       static constexpr uint64_t DEFAULT_TERMINATE_WINDOW_MS              = 24ULL * 60 * 60 * 1000;
+
+      /// Lowest accepted threshold for consecutive miss termination.
+      static constexpr uint32_t MIN_TERMINATE_MAX_CONSECUTIVE_MISSES = 1;
+
+      /// Highest launch-approved consecutive-miss threshold; larger values can
+      /// make miss-based recovery unreachable within the intended operating envelope.
+      /// Deliberately an independent literal: bumping the production default must
+      /// not silently widen this security ceiling.
+      static constexpr uint32_t MAX_TERMINATE_MAX_CONSECUTIVE_MISSES = 5;
+
+      /// Lowest accepted threshold for rolling-window percent-miss termination.
+      static constexpr uint32_t MIN_TERMINATE_MAX_PCT_MISSES_24H = 1;
+
+      /// Highest accepted percent-miss threshold. A 100% threshold can never be
+      /// exceeded by an all-miss window while `termcheck` uses strict breach semantics.
+      static constexpr uint32_t MAX_TERMINATE_MAX_PCT_MISSES_24H = 99;
+
+      static_assert(MIN_TERMINATE_MAX_CONSECUTIVE_MISSES <= DEFAULT_TERMINATE_MAX_CONSECUTIVE_MISSES &&
+                    DEFAULT_TERMINATE_MAX_CONSECUTIVE_MISSES <= MAX_TERMINATE_MAX_CONSECUTIVE_MISSES,
+                    "production default consecutive-miss threshold must lie inside the accepted bounds");
+      static_assert(MIN_TERMINATE_MAX_PCT_MISSES_24H <= DEFAULT_TERMINATE_MAX_PCT_MISSES_24H &&
+                    DEFAULT_TERMINATE_MAX_PCT_MISSES_24H <= MAX_TERMINATE_MAX_PCT_MISSES_24H,
+                    "production default percent-miss threshold must lie inside the accepted bounds");
+
+      /// Minimum accepted `terminate_window_ms` for a given consecutive-miss
+      /// threshold and epoch schedule. Delivery records accrue only on an
+      /// operator's DUTY epochs: `sysio.epoch::advance` runs `recorddel` for
+      /// the expiring group alone, and the schedule is a sliding window of
+      /// `batch_op_groups` groups, so a resident operator's duty interval is
+      /// `batch_op_groups` epochs. The rolling window must span the full
+      /// terminating run -- `consecutive_misses` duty-epoch records -- plus
+      /// one duty interval of boundary slack, or records age out (and are
+      /// pruned) before `termcheck` can observe the run, leaving the
+      /// consecutive rail structurally vacuous (SEC-28 residual). Operators
+      /// benched by a surplus roster accrue no records while benched, so no
+      /// finite window observes them; the bound governs resident operators,
+      /// whose duty interval the sliding schedule pins at `batch_op_groups`
+      /// epochs. Enforced from both `opreg::setconfig` (against the stored
+      /// epoch config) and `sysio.epoch::setconfig` (against the stored opreg
+      /// config) so no ordering of the two setters can accept a vacuous pair.
+      /// Inputs are pre-bounded by those setters (misses <= 5, duration <= 30
+      /// days, groups <= 255), so the product cannot overflow uint64.
+      static constexpr uint64_t min_terminate_window_ms(uint32_t consecutive_misses,
+                                                        uint32_t epoch_duration_sec,
+                                                        uint32_t batch_op_groups) {
+         constexpr uint64_t ms_per_sec = 1000;
+         return (uint64_t{consecutive_misses} + 1) * batch_op_groups * epoch_duration_sec * ms_per_sec;
+      }
+
+      /// Bounded sweep sizes for delivery-log rows that have aged out of the
+      /// rolling termination window. The write-path cap only has to outpace
+      /// insertion (each `recorddel` adds one row); the `prune` cap clears
+      /// backlog faster when cranked.
+      static constexpr uint32_t MAX_DELLOG_PRUNE_PER_WRITE = 4;
+      static constexpr uint32_t MAX_DELLOG_PRUNE_PER_CRANK = 64;
 
       // Per-operator audit log: ring-buffer cap (newest-in / oldest-out) and
       // per-entry error_message length cap. Operators read recent_actions to
@@ -243,6 +317,9 @@ namespace sysio {
 
       /// Record per-batch-op delivery hit/miss for the rolling 24h buffer.
       /// Called inline from `sysio.epoch::advance` after each delivery cycle.
+      /// Each write also sweeps up to `MAX_DELLOG_PRUNE_PER_WRITE` rows that
+      /// have aged out of the rolling termination window, keeping the buffer
+      /// bounded without a dedicated crank.
       [[sysio::action]]
       void recorddel(name account, uint32_t epoch, bool delivered);
 
@@ -261,7 +338,9 @@ namespace sysio {
       [[sysio::action]]
       void terminate(name account, std::string reason);
 
-      /// Prune terminated operator rows past the delay. Permissionless.
+      /// Prune terminated operator rows past the delay, plus delivery-log
+      /// rows that have aged out of the rolling termination window.
+      /// Permissionless.
       [[sysio::action]]
       void prune();
 

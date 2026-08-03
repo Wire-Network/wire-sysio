@@ -1,36 +1,14 @@
 #include "sysio.system_tester.hpp"
+#include "finalizer_test_keys.hpp"
 
 #include <sysio/chain/kv_table_objects.hpp>
+#include <sysio/opp/opp.hpp>
 #include <boost/test/unit_test.hpp>
 
 using namespace sysio_system;
-
-struct key_pair_t {
-   std::string pub_key;
-   std::string pop;
-};
-
-// Those are needed to unpack last_prop_finalizers_info
-struct finalizer_authority_t {
-   std::string           description;
-   uint64_t              weight = 0;
-   std::vector<char>     public_key;
-};
-FC_REFLECT(finalizer_authority_t, (description)(weight)(public_key))
-
-struct finalizer_auth_info {
-   uint64_t               key_id;
-   finalizer_authority_t  fin_authority;
-};
-FC_REFLECT(finalizer_auth_info, (key_id)(fin_authority))
-
-struct last_prop_finalizers_info {
-   std::vector<finalizer_auth_info> last_proposed_finalizers;
-};
-FC_REFLECT(last_prop_finalizers_info, (last_proposed_finalizers))
+using namespace sysio_test;
 
 struct finalizer_key_tester : sysio_system_tester {
-   static const std::vector<key_pair_t> key_pair;
 
    fc::variant get_finalizer_key_info( uint64_t id ) {
       vector<char> data = get_row_by_id( config::system_account_name, config::system_account_name, "finkeys"_n, id );
@@ -43,32 +21,11 @@ struct finalizer_key_tester : sysio_system_tester {
    }
 
    std::vector<finalizer_auth_info> get_last_prop_finalizers_info() {
-      // lastpropfins is kv::global — key is [Name:8B BE] where Name = "lastpropfins"_n
-      char key_buf[sysio::chain::kv_pri_key_size];
-      sysio::chain::kv_encode_be64(key_buf, "lastpropfins"_n.to_uint64_t());
-      std::string_view key_sv(key_buf, sysio::chain::kv_pri_key_size);
-      const auto& kv_idx = control->db().get_index<sysio::chain::kv_index, sysio::chain::by_code_key>();
-      auto it = kv_idx.find(boost::make_tuple(config::system_account_name, sysio::chain::compute_table_id("lastpropfins"_n.to_uint64_t()), key_sv));
-      if (it == kv_idx.end()) {
-         return {};
-      }
-
-      vector<char> data(it->value.data(), it->value.data() + it->value.size());
-      fc::variant fins_info = data.empty() ? fc::variant() : abi_ser.binary_to_variant( "last_prop_finalizers_info", data, abi_serializer::create_yield_function(abi_serializer_max_time) );
-      std::vector<finalizer_auth_info> finalizers = fins_info["last_proposed_finalizers"].as<std::vector<finalizer_auth_info>>();
-
-      return finalizers;
+      return sysio_test::get_last_prop_finalizers(*this, abi_ser);
    };
 
    std::unordered_set<uint64_t> get_last_prop_fin_ids() {
-      auto finalizers = get_last_prop_finalizers_info();
-
-      std::unordered_set<uint64_t> last_prop_fin_ids;
-      for(auto f: finalizers) {
-         last_prop_fin_ids.insert(f.key_id);
-      }
-
-      return last_prop_fin_ids;
+      return sysio_test::get_last_prop_fin_ids(*this, abi_ser);
    };
 
    action_result register_finalizer_key( const account_name& act, const std::string& finalizer_key, const std::string& pop  ) {
@@ -93,7 +50,7 @@ struct finalizer_key_tester : sysio_system_tester {
    void register_finalizer_keys(const std::vector<name>& producer_names, uint32_t num_keys_to_register) {
       uint32_t i = 0;
       for (const auto& p: producer_names) {
-         BOOST_REQUIRE_EQUAL( success(), register_finalizer_key(p, key_pair[i].pub_key, key_pair[i].pop));
+         BOOST_REQUIRE_EQUAL( success(), register_finalizer_key(p, key_pairs[i].pub_key, key_pairs[i].pop));
          ++i;
 
          if ( i  == num_keys_to_register ) {
@@ -101,6 +58,42 @@ struct finalizer_key_tester : sysio_system_tester {
          }
       }
    }
+
+   // sysio.system now schedules a producer only if it is an ACTIVE
+   // OPERATOR_TYPE_PRODUCER operator in sysio.opreg. activate_producers() alone no
+   // longer yields a schedulable set, so this deploys sysio.opreg (once) and
+   // registers each activated producer as a bootstrapped producer operator --
+   // ACTIVE-by-fiat, bypassing the collateral requirement -- before returning.
+   std::vector<name> activate_producers_with_operators( uint32_t count = 21 ) {
+      std::vector<name> producer_names = activate_producers(count);
+      if (!opreg_deployed) {
+         create_account("sysio.opreg"_n, config::system_account_name, false, false, false, true);
+         // opreg is not privileged yet (setpriv requires setcode first). Give it
+         // RAM for the ~800KB wasm and NET/CPU to sign regoperator; a sysio.*
+         // account is created with none by default.
+         push_action(config::system_account_name, "setacctram"_n, mvo()
+            ("account", "sysio.opreg"_n)("ram_bytes", int64_t(2'000'000)));
+         push_action(config::system_account_name, "setacctnet"_n, mvo()
+            ("account", "sysio.opreg"_n)("net_weight", int64_t(1'000'000)));
+         push_action(config::system_account_name, "setacctcpu"_n, mvo()
+            ("account", "sysio.opreg"_n)("cpu_weight", int64_t(1'000'000)));
+         produce_block();
+         set_code("sysio.opreg"_n, contracts::opreg_wasm());
+         set_abi ("sysio.opreg"_n, contracts::opreg_abi().data());
+         set_privileged("sysio.opreg"_n);
+         produce_block();
+         opreg_deployed = true;
+      }
+      for (const auto& p : producer_names) {
+         base_tester::push_action("sysio.opreg"_n, "regoperator"_n, "sysio.opreg"_n, mvo()
+            ("account", p)
+            ("type", sysio::opp::types::OperatorType::OPERATOR_TYPE_PRODUCER)
+            ("is_bootstrapped", true));
+      }
+      produce_block();
+      return producer_names;
+   }
+   bool opreg_deployed = false;
 
    // Verify finalizers_table and last_prop_fins_table match
    void verify_last_proposed_finalizers(const std::vector<name>& producer_names) {
@@ -119,7 +112,7 @@ struct finalizer_key_tester : sysio_system_tester {
 };
 
 
-const std::vector<key_pair_t> finalizer_key_tester::key_pair {
+const std::vector<sysio_test::key_pair_t> sysio_test::key_pairs {
    {"PUB_BLS_9Pbv53DbC9EDGGPEZUrlKuMGeXYWHzIPfmn-Ncrxj7sOTiTEOYIkcCgBrvfKYiIG0BsiafG1dRK9MV40aGWKREE4rWHpiDLIkHR91huq9CEdeZHUb2bRXvcxs0RAa7oADXSTmw", "SIG_BLS_IyjIzDWKzlekYSiRbJmBqYmWoiMsmHX_1aB0Hkqk1woeSJLbtd9D83lMDi6LiMEEpP79rP-AKiJAg1rKHODkt2habnn-y4jFMl76egQOv2KHLjobVzWWj_nz667VxeoF2FwF-NMnX7FQfpPgVRINSDKc5maRADRYQGrnlE-boh_23GBuCaxELnAFD-4L_ZEZRr8B9UIA62Vj9JBS_dExquL3wtlhx7vNq0MAGf9J3_Q69BsTuH_OMH6bs5m2AF4ZqiKpdQ" },
    { "PUB_BLS_WIuHboHhjl3zxB3pt1bdSdF9O6GPOmjMgQvxbzpJBPYYIrWIpcHr6uGbuNGHh8ITlMwLhb_7Fe2QTUStMU0sOgLlXl737hu9GBNyF9W7ZIc7U1xSOmBS5-OpCjViTs4DXQJrjg", "SIG_BLS_RL0hu5YQiXvuvDYdi6LuQqPAISBmS0OuUzGhRezqRYHQC1yL2VlV4lg17rDFzekFCYeB4Agtv0P3Zs3mCDRVwnIbZ3ETin-ONvXKo78Vi71BM4g-AWqdbXbvIbp86u0IXzWjQgSNTuKP2Jj4AqKwhNbDhMiqH5VXUuV1Ogp7P-kN6TcJiqQfqs69iAWklDgYMeDT9Y6qvrb7E1ZtkRbFzISKBrKDYCJ1KFYL7XgknPdqydjPiHEJEIX8ORNwPEgG11PbZQ"},
    {"PUB_BLS_OKI5k1cZcEAvkXQqWCMICE5BSXd1lI5VH_n-PagmHOP6MnKPpydAcS9qgHxm0bIWJwyzvMUdpm-TNqlQQGcQggAn_3GUQx7zSlrdzSFZ3h2kIXjpIDNDB2ZMQJ6wqYIXNX3kZg", "SIG_BLS_BGQbDqe4kpCtMEZsl4cfsSYGwquW8jGeq_9zppptRU4XQvAqRT_flXSg84sR9PMY9_m1lMsa6S9nnlilQ7SdMooOzOXVvYzNFmLuCR6b2c4jDZrJQGtgYleUINFQZEgBhzYS1WRbnlDIsRCBPbS_mDbfqQ80g-DKkUCcyeY0Cr7CJ9IoafmcVWJLFPWV0ukRcGAk0XKBWVbI23REXbgBeKD_XNMJe5PHJS36gZYWyaiO_wHIXAbUuYgOptmC0rAIEPVGow"},
@@ -482,7 +475,7 @@ FC_LOG_AND_RETHROW() // delete_last_finalizer_key_test
 
 // After registering keys and waiting for update_ranked_producers, test key activation
 BOOST_FIXTURE_TEST_CASE(multi_activation_tests, finalizer_key_tester) try {
-   auto producer_names = activate_producers();
+   auto producer_names = activate_producers_with_operators();
    // Register 21 finalizer keys for the first 21 producers
    register_finalizer_keys(producer_names, 21);
 
@@ -537,7 +530,7 @@ FC_LOG_AND_RETHROW()
 
 // Finalizers are not changed in current schedule rounds
 BOOST_FIXTURE_TEST_CASE(update_ranked_producers_no_finalizers_changed_test, finalizer_key_tester) try {
-   auto producer_names = activate_producers();
+   auto producer_names = activate_producers_with_operators();
    register_finalizer_keys(producer_names, 21);
 
    // Wait for update_ranked_producers to run
@@ -560,7 +553,7 @@ FC_LOG_AND_RETHROW()
 
 // An active finalizer activates another key. The change takes effect immediately.
 BOOST_FIXTURE_TEST_CASE(update_ranked_producers_finalizers_changed_test, finalizer_key_tester) try {
-   auto producer_names = activate_producers();
+   auto producer_names = activate_producers_with_operators();
    register_finalizer_keys(producer_names, 21);
 
    // Wait for update_ranked_producers to populate lastpropfins
@@ -600,7 +593,7 @@ FC_LOG_AND_RETHROW()
 // An active finalizer deletes its only key. It is replaced by another finalizer in next round.
 BOOST_FIXTURE_TEST_CASE(update_ranked_producers_finalizers_replaced_test, finalizer_key_tester) try {
    // Create 26 producers (first 21 in schedule, 5 standby)
-   auto producer_names = activate_producers(26);
+   auto producer_names = activate_producers_with_operators(26);
 
    // Only the first 21 producers register finalizer keys at the beginning
    register_finalizer_keys(producer_names, 21);
@@ -684,7 +677,7 @@ FC_LOG_AND_RETHROW()
 // verify the producer schedule via head_active_producers() and the finalizer
 // policy via the contract's lastpropfins table + head_pending_finalizer_policy().
 BOOST_FIXTURE_TEST_CASE(verify_controller_schedule_and_policy_test, finalizer_key_tester) try {
-   auto producer_names = activate_producers();
+   auto producer_names = activate_producers_with_operators();
 
    // Register 21 finalizer keys for the first 21 producers
    register_finalizer_keys(producer_names, 21);

@@ -10,17 +10,23 @@
 #include <fc/task/retry.hpp>
 #include <fc/variant_object.hpp>
 #include <boost/algorithm/string/predicate.hpp>
+#include <boost/asio/steady_timer.hpp>
 #include <boost/endian/conversion.hpp>
 #include <magic_enum/magic_enum.hpp>
+
+#include <cassert>
 
 #include <sysio/chain_plugin/chain_plugin.hpp>
 #include <sysio/chain/authorization_manager.hpp>
 #include <sysio/chain/controller.hpp>
+#include <sysio/chain/plugin_interface.hpp>
 #include <sysio/http_plugin/http_plugin.hpp>
 #include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
 #include <sysio/underwriter_plugin/underwriter_plugin.hpp>
 #include <sysio/underwriter_plugin/source_deposit_constants.hpp>
 #include <sysio/underwriter_plugin/solana_source_deposit_scanner.hpp>
+#include <sysio/underwriter_plugin/routing_detail.hpp>
+#include <sysio/underwriter_plugin/sync_detail.hpp>
 #include <sysio/depot/opreg_status.hpp>
 #include <sysio/opp/opp.hpp>
 #include <sysio/opp/types/types.pb.h>
@@ -42,6 +48,16 @@ using namespace chain_apis;
 using namespace sysio::opp::types;
 namespace eth = fc::network::ethereum;
 namespace opp_att = sysio::opp::attestations;
+
+// SEC-13/WSA-027: exact-(chain_code, token_code, reserve_code) routing /
+// accounting keys, lifted to a testable detail header. These replace the
+// former ChainKind/TokenKind-collapsed in-memory keys so two active chains of
+// the same VM family (e.g. two EVM outposts) never share a credit bucket or a
+// commit-dedup slot.
+using underwriter_detail::bucket_key;
+using underwriter_detail::leg_bond;
+using underwriter_detail::credit_buckets;
+using underwriter_detail::commit_key;
 
 namespace {
 
@@ -113,20 +129,44 @@ struct uw_request {
 };
 
 // ---------------------------------------------------------------------------
-//  Credit line — per-(chain_kind, token_kind) bond from sysio.opreg::operators
+//  Credit line — per-(chain_code, token_code) bond from sysio.opreg::operators
 //
-//  Reads the `balances` field added in opreg's Task 2 refactor (one
-//  aggregate balance per (chain, token_kind), replacing the old
-//  std::vector<stake_entry>). Note this is the RAW balance — the
-//  authoritative `available` rollup also subtracts active locks +
-//  pending withdraws via `sysio.opreg::available()`. v1 of the plugin
-//  treats raw balance as a sufficient gate; the depot's race resolver
-//  (sysio.uwrit::try_select_winner) re-validates via the rollup.
+//  Reads the `balances` field (one aggregate balance per EXACT
+//  (chain_code, token_code) — SEC-13/WSA-027: keyed by the v6 slug codes, NOT
+//  the coarse (ChainKind, TokenKind) family, so two same-family chains hold
+//  independent collateral). Note this is the RAW balance — the authoritative
+//  `available` rollup also subtracts active locks + pending withdraws via
+//  `sysio.opreg::available()`. v1 of the plugin treats raw balance as a
+//  sufficient gate; the depot's race resolver (sysio.uwrit::try_select_winner)
+//  re-validates via the rollup.
+//
+//  Codes held as raw `fc::slug_name::value` (uint64) to match `bucket_key`.
 // ---------------------------------------------------------------------------
 struct credit_line {
-   ChainKind   chain_kind;
-   TokenKind   token_kind;
-   uint64_t    balance;
+   uint64_t chain_code;
+   uint64_t token_code;
+   uint64_t balance;
+};
+
+// ---------------------------------------------------------------------------
+//  Outpost endpoint — operator-supplied wiring for ONE active chain
+//
+//  SEC-13/WSA-027: the underwriter (one process) multiplexes every chain it
+//  serves, so it holds one of these per EXACT `chain_code` — two chains of the
+//  same VM family (e.g. two EVM outposts) are configured and routed
+//  independently. The chain-agnostic deposit selector / instruction
+//  discriminator + event decoding still come from the shared ABI / IDL files;
+//  only the per-chain *addresses* and the RPC `client_id` live here.
+//
+//    ETH chain:  commit_addr        = OperatorRegistry address (uw_commit)
+//                source_deposit_addr = SwapDeposit-emitting contract (verify)
+//    SOL chain:  commit_addr = source_deposit_addr = opp-outpost program id
+// ---------------------------------------------------------------------------
+struct outpost_endpoint {
+   ChainKind   kind = ChainKind::CHAIN_KIND_UNKNOWN;
+   std::string client_id;            ///< RPC connection id in the outpost client plugin
+   std::string commit_addr;          ///< ETH OperatorRegistry addr / SOL program id
+   std::string source_deposit_addr;  ///< ETH SwapDeposit contract / SOL program id
 };
 
 // ---------------------------------------------------------------------------
@@ -138,38 +178,38 @@ struct underwriter_plugin::impl {
    bool         enabled             = underwriter_defaults::enabled;
    uint32_t     scan_interval_ms    = underwriter_defaults::scan_interval_ms;
    uint32_t     action_timeout_ms   = underwriter_defaults::action_timeout_ms;
-   std::string  eth_client_id;
-   std::string  sol_client_id;
-   std::string  eth_opreg_addr;             // OperatorRegistry contract address on ETH
+   /// SEC-13/WSA-027: per-chain outpost wiring, keyed by EXACT `chain_code`
+   /// slug value. One entry per chain the underwriter serves (operator-supplied
+   /// via `--underwriter-{eth,sol}-outpost`). Replaces the former single
+   /// eth/sol client-id + address, which could not distinguish two chains of
+   /// the same VM family.
+   std::map<uint64_t, outpost_endpoint> outpost_endpoints;
+   /// Per-chain external (numeric) chain id, captured from `sysio.chains`
+   /// (`external_chain_id`) by `read_outpost_registry`, fed to
+   /// `create_outpost_client` so each client carries its chain's real id.
+   std::map<uint64_t, uint32_t>         outpost_external_chain_ids;
    /// Maximum number of recent EVM blocks one `eth_getLogs`
    /// source-deposit lookup may cover. Keeping this window bounded prevents
    /// invalid or stale deposit ids from forcing whole-history RPC scans.
    uint64_t     eth_source_deposit_lookback_blocks =
       sysio::underwriter::ETH_SOURCE_DEPOSIT_LOOKBACK_BLOCKS;
-   /// opp-outpost program ID on SOL. Not a CLI option — resolved at
-   /// preflight from the loaded IDL's top-level `address` field (or
-   /// `metadata.address` on older IDLs).
-   std::string  sol_program_id;
    /// Configured names of the swap-deposit function (ETH) / instruction
-   /// (SOL). The contract address + function selector / instruction
-   /// discriminator are resolved at preflight time from the ABI / IDL
-   /// files registered with the outpost client plugins
-   /// (`outpost_ethereum_client_plugin::get_abi_files()` /
-   /// `outpost_solana_client_plugin::get_idl_files()`) so we don't
-   /// duplicate that configuration here. Both are required at preflight.
+   /// (SOL). The CHAIN-AGNOSTIC function selector / instruction discriminator
+   /// are resolved at preflight from the ABI / IDL files registered with the
+   /// outpost client plugins; the per-chain contract / program ADDRESS comes
+   /// from `outpost_endpoints` instead (SEC-13/WSA-027 — the selector is shared
+   /// across same-family chains, only the address varies). Both names required.
    std::string  eth_source_deposit_function_name;
    std::string  sol_source_deposit_instruction_name;
 
-   /// Resolved-at-preflight verify-path state derived from the above
-   /// + the outpost client plugins' ABI / IDL surfaces. Used directly by
-   /// `verify_source_deposit_{eth,sol}` — these are populated only after
-   /// `run_preflight()` has succeeded.
-   std::string  resolved_eth_source_contract_addr;
+   /// Resolved-at-preflight CHAIN-AGNOSTIC verify-path state (the deposit
+   /// selector / discriminator), derived from the outpost client plugins'
+   /// ABI / IDL surfaces. Populated only after `run_preflight()` succeeds; the
+   /// per-chain address is looked up from `outpost_endpoints` at verify time.
    std::vector<uint8_t> resolved_eth_source_deposit_selector;
    std::vector<uint8_t> resolved_sol_source_deposit_discriminator;
 
-   // ── Diagnostic counters surfaced via the `/v1/underwriter/*` HTTP API
-   //   (and the future `clio opp uw stats` wrapper).
+   // ── Diagnostic counters surfaced via the `/v1/underwriter/*` HTTP API.
    //
    //   `source_deposit_mismatch_count` increments every time a source-
    //   deposit verification fails for a uwreq the plugin tried to cover.
@@ -206,6 +246,38 @@ struct underwriter_plugin::impl {
    cron_service::job_id_t            scan_job_id = 0;
    std::atomic<bool>                 shutting_down{false};
 
+   /// Sync gate: `channels::irreversible_block` subscription that arms
+   /// {@link run_deferred_startup} once `controller::is_synced()` holds — a LIB
+   /// advance is the only event that can turn the predicate true. Unsubscribed
+   /// after arming; otherwise the handle's destructor releases it (no shutdown
+   /// unsubscribe needed: posted channel deliveries are drained without
+   /// executing after quit, and the slot checks `shutting_down` first).
+   chain::plugin_interface::channels::irreversible_block::channel_type::handle sync_gate_subscription;
+   /// When the sync gate armed — bounds the preflight retry grace window.
+   fc::time_point                    startup_armed_at;
+   /// Bounded-grace preflight retry timer (main io_context; main-thread wait).
+   std::optional<boost::asio::steady_timer> preflight_retry_timer;
+   /// Deferred-startup lifecycle surfaced by the `/v1/underwriter/*` handlers
+   /// (which register in `plugin_startup`, BEFORE the gate arms). Written on
+   /// the main thread by {@link run_deferred_startup}; read from the HTTP
+   /// handlers' read-only queue — hence atomic. Also the single source of
+   /// truth for "has the deferred startup been armed" ({@link
+   /// startup_attempted}) — every armed attempt leaves `waiting_for_sync`
+   /// before it returns, so no separate armed flag exists to drift.
+   std::atomic<underwriter_detail::startup_state> gate_state{
+      underwriter_detail::startup_state::waiting_for_sync};
+
+   /// True once the deferred startup has been armed: {@link
+   /// attempt_deferred_startup} stores a non-waiting `gate_state` on every
+   /// path (retrying / a terminal failure / active), so "still
+   /// `waiting_for_sync`" IS "not yet armed". Guards the gate callback and
+   /// its posted task against re-arming (each site also checks
+   /// `shutting_down`, which covers the only path that returns before the
+   /// first store).
+   bool startup_attempted() const {
+      return gate_state.load() != underwriter_detail::startup_state::waiting_for_sync;
+   }
+
    // Outpost chain_kind cache: chain_code -> ChainKind
    std::map<uint64_t, ChainKind>     outpost_chain_kinds;
 
@@ -216,14 +288,16 @@ struct underwriter_plugin::impl {
    /// (no commit, no bond) rather than error on.
    std::optional<uint64_t>           depot_chain_code;
 
-   /// SPI handles to the configured outposts, keyed by `ChainKind`. Built
-   /// once at `plugin_startup` (after preflight) via the
+   /// SPI handles to the configured outposts, keyed by EXACT `chain_code` slug
+   /// value (SEC-13/WSA-027 — NOT `ChainKind`, so two chains of the same VM
+   /// family each get their own client). Built at `plugin_startup` (after
+   /// preflight) from `outpost_endpoints` via the
    /// `outpost_{ethereum,solana}_client_plugin::create_outpost_client`
-   /// factories. The relay loop selects by chain_kind and calls
-   /// `outpost->uw_commit(...)` — every chain-specific concern (ABI /
-   /// IDL discovery, address encoding, on-chain confirmation) lives in
-   /// the concrete. Per `outpost-client-spi.md`.
-   std::map<ChainKind, sysio::outpost_client_ptr> outpost_by_chain;
+   /// factories. The relay loop selects by the leg's `chain_code` and calls
+   /// `outpost->uw_commit(...)` — every chain-specific concern (ABI / IDL
+   /// discovery, address encoding, on-chain confirmation) lives in the
+   /// concrete. Per `outpost-client-spi.md`.
+   std::map<uint64_t, sysio::outpost_client_ptr> outpost_by_chain;
    /// v6 cross-walk: token slug_name → TokenKind enum. Refreshed each
    /// scan cycle by `read_credit_lines` (which reads `sysio.tokens::tokens`
    /// for the lookup); used by `scan_pending_requests` to translate the
@@ -233,17 +307,13 @@ struct underwriter_plugin::impl {
 
    // ── Outstanding commit tracking (one entry per CONFIRMED leg) ───────
    // Per `feedback`: an underwriter that confirmed a commit tx for a leg
-   // should NOT resubmit on the next scan cycle. Same-chain swaps share a
-   // chain between legs, so `(uwreq_id, chain, token_kind)` is the
-   // smallest discriminator. The set is pruned at the end of each scan
-   // cycle to drop entries whose uwreq is no longer PENDING (the depot
-   // has resolved the race), keeping the set bounded.
-   struct commit_key {
-      uint64_t  uwreq_id;
-      ChainKind chain;
-      TokenKind token_kind;
-      friend auto operator<=>(const commit_key&, const commit_key&) = default;
-   };
+   // should NOT resubmit on the next scan cycle. The de-dup key is the EXACT
+   // v6 leg identity `(uwreq_id, chain_code, token_code, reserve_code)`
+   // (`underwriter_detail::commit_key`) — NOT the coarse (ChainKind,
+   // TokenKind), so two legs differing only by chain or reserve are tracked
+   // independently (SEC-13/WSA-027). The set is pruned at the end of each scan
+   // cycle to drop entries whose uwreq is no longer PENDING (the depot has
+   // resolved the race), keeping the set bounded.
    std::set<commit_key>              confirmed_commits;
 
    /// Per-pending-UWREQ Solana scan cursors. Persisting `before` across
@@ -339,10 +409,17 @@ struct underwriter_plugin::impl {
    //
    //  Checks (all required):
    //    1. Operator exists in `sysio.opreg::operators` and status == ACTIVE.
-   //    2. `sysio.authex::links` covers every chain in the
-   //       `sysio.epoch::outposts` registered set — without an authex link
+   //    2. Every ACTIVE outpost chain in `sysio.chains::chains` has a
+   //       configured `--underwriter-{eth,sol}-outpost` endpoint of the
+   //       matching VM family. The served set is derived from the registry
+   //       while the outpost clients are built from config, so a gap would
+   //       let the scan loop pick a request it cannot fully commit. Inactive
+   //       (not-yet-activated) chains are excluded, so registering a future
+   //       chain does not block startup before its endpoint is configured.
+   //    3. `sysio.authex::links` covers every chain in the
+   //       `sysio.chains::chains` registered set; without an authex link
    //       for a chain the underwriter cannot sign a commit on that chain.
-   //    3. Non-zero balance on at least one TokenKind for every registered
+   //    4. Non-zero balance on at least one TokenKind for every registered
    //       outpost chain.
    //
    //  Returns true on success. On any failure logs a structured `elog`
@@ -355,7 +432,7 @@ struct underwriter_plugin::impl {
    //  to ship in the plugin.
    // -----------------------------------------------------------------------
    bool run_preflight() {
-      // ── Check 1: operator status ─────────────────────────────────────
+      // -- Check 1: operator status --
       bool found_op = false;
       bool active   = false;
       {
@@ -397,7 +474,50 @@ struct underwriter_plugin::impl {
          return false;
       }
 
-      // ── Check 2: authex link coverage per outpost chain ──────────────
+      // -- Check 2: outpost-client wiring covers every active chain --
+      //
+      // The served set is `outpost_chain_kinds` (ACTIVE non-depot chains only,
+      // per `read_outpost_registry`) as consumed by `is_available` /
+      // `select_coverable`, but the outpost_client handles are built only from
+      // operator-supplied `--underwriter-{eth,sol}-outpost` config
+      // (`outpost_endpoints`). An active chain that is unconfigured, or
+      // configured under the wrong VM family, would let the scan loop SELECT a
+      // request for it and land one leg before discovering the other leg has no
+      // (or a wrong-kind) client (SEC-13/WSA-027). Fail closed here so a
+      // misconfigured underwriter never starts committing partial swaps.
+      {
+         std::map<uint64_t, int> registered_kinds;
+         for (const auto& [code, kind] : outpost_chain_kinds)
+            registered_kinds[code] = magic_enum::enum_integer(kind);
+         std::map<uint64_t, int> configured_kinds;
+         for (const auto& [code, ep] : outpost_endpoints)
+            configured_kinds[code] = magic_enum::enum_integer(ep.kind);
+
+         if (auto gap = underwriter_detail::find_endpoint_coverage_gap(
+                registered_kinds, configured_kinds)) {
+            const auto code_str = fc::slug_name{gap->chain_code}.to_string();
+            // Re-derive the typed ChainKind names from the source maps rather
+            // than reverse-casting the raw ints; the generated `_Name` helper
+            // is the CLAUDE.md-mandated spelling for proto enums.
+            const ChainKind reg_kind = outpost_chain_kinds.at(gap->chain_code);
+            if (gap->config_kind == underwriter_detail::endpoint_coverage_gap::unconfigured) {
+               elog("underwriter preflight: active outpost chain {} (kind={}) has no "
+                    "--underwriter-eth-outpost / --underwriter-sol-outpost entry; configure "
+                    "one endpoint for every active outpost chain",
+                    code_str, std::string{sysio::opp::types::ChainKind_Name(reg_kind)});
+            } else {
+               const ChainKind cfg_kind = outpost_endpoints.at(gap->chain_code).kind;
+               elog("underwriter preflight: outpost chain {} is registered as kind={} but "
+                    "configured as kind={}; fix --underwriter-*-outpost to match the registry",
+                    code_str,
+                    std::string{sysio::opp::types::ChainKind_Name(reg_kind)},
+                    std::string{sysio::opp::types::ChainKind_Name(cfg_kind)});
+            }
+            return false;
+         }
+      }
+
+      // -- Check 3: authex link coverage per outpost chain --
       std::set<ChainKind> linked_chains;
       {
          auto rows = read_all("sysio.authex", "sysio.authex", "links");
@@ -418,7 +538,7 @@ struct underwriter_plugin::impl {
          }
       }
 
-      // ── Check 3: non-zero RAW balance per outpost chain ──────────────
+      // -- Check 4: non-zero RAW balance per outpost chain --
       //
       // Reads `sysio.opreg::operators[underwriter].balances` directly and
       // does NOT subtract active locks or pending withdraws. An underwriter
@@ -463,7 +583,7 @@ struct underwriter_plugin::impl {
          }
       }
 
-      // ── Check 4: required CLI options + ABI/IDL resolution ───────────
+      // -- Check 5: required CLI options + ABI/IDL resolution --
       //
       // The verify_source_deposit path identifies the swap-deposit
       // function (ETH) / instruction (SOL) by NAME. The contract
@@ -482,28 +602,23 @@ struct underwriter_plugin::impl {
       }
 
       // ETH: walk every loaded ABI for a `function` contract whose name
-      // matches. The match yields the deployed `contract_address` and
-      // the keccak256(signature) from which we derive the 4-byte
-      // selector. Both are cached on the plugin for the verify path.
+      // matches. The match yields keccak256(signature) → the CHAIN-AGNOSTIC
+      // 4-byte selector (identical on every EVM chain running the same
+      // contract). The per-chain deployed contract ADDRESS comes from
+      // `outpost_endpoints` (SEC-13/WSA-027), so the ABI's `contract_address`
+      // field is no longer consulted here.
       {
-         resolved_eth_source_contract_addr.clear();
          resolved_eth_source_deposit_selector.clear();
          bool found = false;
          for (const auto& [path, contracts] : eth_plug->get_abi_files()) {
             for (const auto& c : contracts) {
                if (c.type != fc::network::ethereum::abi::invoke_target_type::function) continue;
                if (c.name != eth_source_deposit_function_name) continue;
-               if (c.contract_address.empty()) {
-                  elog("underwriter preflight: ABI '{}' has function '{}' but no "
-                       "`contract_address` metadata — populate the address in the "
-                       "ABI file so the verify path knows the deployed contract",
-                       path.string(), eth_source_deposit_function_name);
-                  return false;
-               }
-               resolved_eth_source_contract_addr = c.contract_address;
                const auto sel_hash = fc::network::ethereum::abi::to_contract_function_selector(c);
                const uint8_t* sp = sel_hash.data();
                resolved_eth_source_deposit_selector.assign(sp, sp + 4);
+               dlog("underwriter preflight: ETH deposit selector for '{}' resolved from ABI '{}'",
+                    eth_source_deposit_function_name, path.string());
                found = true;
                break;
             }
@@ -517,29 +632,21 @@ struct underwriter_plugin::impl {
          }
       }
 
-      // SOL: walk every loaded IDL for the named instruction. The IDL
-      // parser populates each instruction's 8-byte anchor discriminator
-      // (`sha256("global:<instruction_name>")[0..8]`) AND the program's
-      // deployed address (`metadata.address` / top-level `address`),
-      // so we don't duplicate the program ID in a separate CLI option —
-      // both come from the IDL JSON.
+      // SOL: walk every loaded IDL for the named instruction. The IDL parser
+      // populates each instruction's 8-byte anchor discriminator
+      // (`sha256("global:<instruction_name>")[0..8]`) — the CHAIN-AGNOSTIC
+      // identifier the verify path matches. The per-chain program id comes from
+      // `outpost_endpoints` (SEC-13/WSA-027), not the IDL's `address`.
       {
          resolved_sol_source_deposit_discriminator.clear();
-         sol_program_id.clear();
          bool found = false;
          for (const auto& [path, programs] : sol_plug->get_idl_files()) {
             for (const auto& p : programs) {
                if (const auto* ix = p.find_instruction(sol_source_deposit_instruction_name); ix) {
                   resolved_sol_source_deposit_discriminator.assign(
                      ix->discriminator.begin(), ix->discriminator.end());
-                  if (p.address.empty()) {
-                     elog("underwriter preflight: SOL IDL '{}' carries instruction '{}' but "
-                          "no `address` / `metadata.address` field — the program ID must be "
-                          "present in the IDL JSON for the verify path to identify it on-chain",
-                          path.string(), sol_source_deposit_instruction_name);
-                     return false;
-                  }
-                  sol_program_id = p.address;
+                  dlog("underwriter preflight: SOL deposit discriminator for '{}' resolved from IDL '{}'",
+                       sol_source_deposit_instruction_name, path.string());
                   found = true;
                   break;
                }
@@ -642,6 +749,217 @@ struct underwriter_plugin::impl {
    }
 
    // -----------------------------------------------------------------------
+   //  Sync-gated startup
+   // -----------------------------------------------------------------------
+
+   /// Arm the deferred startup: runs AT MOST once (re-entry is guarded by
+   /// {@link startup_attempted}), on the main thread from the sync-gate channel
+   /// callback once `controller::is_synced()` holds. The body itself lives
+   /// in {@link attempt_deferred_startup}, which may retry the preflight
+   /// within a bounded grace and shuts the node down on terminal failure
+   /// (fail-fast).
+   void run_deferred_startup() {
+      startup_armed_at = fc::time_point::now();
+      // Release the gate subscription; the callback already unsubscribed
+      // before calling here, so this is an idempotent cleanup, not the
+      // load-bearing disconnect.
+      sync_gate_subscription.unsubscribe();
+      attempt_deferred_startup();
+   }
+
+   /// One attempt of the deferred startup body: preflight → outpost client
+   /// wiring → cron scheduling. A failing preflight within
+   /// `underwriter_defaults::preflight_retry_grace_ms` of the gate arming is
+   /// NOT terminal — rows the harness confirmed final on the producer can
+   /// land in the LOCAL irreversible state a beat after the gate arms
+   /// (observed live: `regoperator` in block 405 readable 50ms after a
+   /// preflight read at LIB 402), so the attempt re-schedules itself on
+   /// `preflight_retry_interval_ms` until the grace expires. Past the grace,
+   /// a preflight failure on a synced chain is a terminal bootstrap bug —
+   /// stored as a diagnosable gate state, logged, and answered with a
+   /// fail-fast node shutdown (see {@link quit_if_startup_failed_terminally}).
+   ///
+   /// Escapes are contained FIRST (unwinding out of a posted channel delivery
+   /// would skip the diagnosable gate-state store and the shutdown log) and
+   /// then routed through the same fail-fast shutdown. The expected
+   /// preflight/wiring failures inside the body set their own more specific
+   /// states; the containment catches what they don't (a throwing table
+   /// decode in the preflight or registry read, a non-fc exception from
+   /// client wiring, a cron add_job failure). FC_LOG_AND_DROP is the tree's
+   /// containment idiom (see scan_cycle below) and deliberately rethrows
+   /// boost::interprocess::bad_alloc — chainbase shared-memory exhaustion
+   /// stays immediately fatal.
+   void attempt_deferred_startup() {
+      if (shutting_down) {
+         return;
+      }
+      bool completed = false;
+      try {
+         attempt_deferred_startup_body();
+         completed = true;
+      } FC_LOG_AND_DROP("underwriter_plugin: deferred startup failed unexpectedly:");
+      if (!completed) {
+         gate_state = underwriter_detail::startup_state::startup_failed;
+      }
+      // Tripwire for the {@link startup_attempted} derivation: every attempt
+      // that returns normally must have left `waiting_for_sync` — a future
+      // early return in the body before its first gate_state store would
+      // otherwise strand the node in undiagnosable limbo (gate subscription
+      // already released, nothing left to re-arm).
+      assert(startup_attempted());
+      quit_if_startup_failed_terminally();
+   }
+
+   /// The uniform fail-fast policy: a terminal deferred-startup failure shuts
+   /// the node down instead of leaving a quiet, non-underwriting node behind a
+   /// running process — an operator daemon that is not performing its duties
+   /// must be supervisor-visible (it has liveness/slashing consequences), not
+   /// hidden behind one log line. The specific failure was already stored as a
+   /// gate state and logged by the attempt; this holds the shutdown decision in
+   /// ONE place so the policy cannot diverge between the first attempt and the
+   /// bounded preflight retries.
+   void quit_if_startup_failed_terminally() {
+      const auto state = gate_state.load();
+      if (!underwriter_detail::is_terminal_failure(state)) {
+         return;
+      }
+      elog("underwriter_plugin: deferred startup failed terminally (state={}) — "
+           "shutting down node (fail-fast)", magic_enum::enum_name(state));
+      app().quit();
+   }
+
+   /// The deferred startup body proper — see {@link attempt_deferred_startup}
+   /// for the retry semantics and the exception containment around it.
+   void attempt_deferred_startup_body() {
+      // Pre-flight: bail (no cron job) if the depot-side state for this
+      // underwriter is incomplete. Cluster bootstrap is responsible for
+      // establishing the missing state — there is no dev escape hatch.
+      // The already-registered HTTP endpoints keep reporting the gate state
+      // so a not-yet-live underwriter is diagnosable over HTTP.
+      if (!run_preflight()) {
+         const auto since_armed = fc::time_point::now() - startup_armed_at;
+         if (since_armed <
+             fc::milliseconds(underwriter_defaults::preflight_retry_grace_ms)) {
+            gate_state = underwriter_detail::startup_state::preflight_retrying;
+            ilog("underwriter_plugin: preflight incomplete {}ms after the sync gate "
+                 "armed — retrying in {}ms (grace {}ms); the error above is "
+                 "transient until the grace expires",
+                 since_armed.count() / 1000,
+                 underwriter_defaults::preflight_retry_interval_ms,
+                 underwriter_defaults::preflight_retry_grace_ms);
+            schedule_preflight_retry();
+            return;
+         }
+         gate_state = underwriter_detail::startup_state::preflight_failed;
+         elog("underwriter_plugin: pre-flight failed — cron job NOT registered");
+         return;
+      }
+
+      // Materialize one outpost_client SPI handle per CONFIGURED chain
+      // (SEC-13/WSA-027: keyed by EXACT chain_code, so two chains of the same VM
+      // family each get their own client + RPC). The underwriter never sees raw
+      // `ethereum_client` / `solana_client` instances after this point — every
+      // outpost-side action goes through the SPI virtuals. Per `outpost-client-spi.md`:
+      //   * ETH client carries only the OperatorRegistry address (the uw_commit
+      //     target); the underwriter neither consumes nor emits OPP envelopes, so
+      //     OPP / OPPInbound addresses are left empty.
+      //   * SOL client carries the opp-outpost program id; the typed wrapper
+      //     exposes `commit_underwrite` directly.
+      // `external_chain_id` comes from `sysio.chains` (read here so the registry
+      // caches are warm); a chain configured but not yet in the registry builds
+      // with id 0 (harmless — no leg references it until it is active).
+      read_outpost_registry();
+      try {
+         for (const auto& [chain_code, ep] : outpost_endpoints) {
+            const auto     code_str = fc::slug_name{chain_code}.to_string();
+            const uint32_t ext_id   = [&] {
+               auto it = outpost_external_chain_ids.find(chain_code);
+               return it != outpost_external_chain_ids.end() ? it->second : 0u;
+            }();
+            if (ep.kind == ChainKind::CHAIN_KIND_EVM) {
+               outpost_by_chain[chain_code] =
+                  eth_plug->create_outpost_client(ep.client_id, chain_code, ext_id,
+                                                  /*opp_addr=*/"", /*opp_inbound_addr=*/"",
+                                                  ep.commit_addr);
+               ilog("underwriter_plugin: wired ETH outpost_client chain={} (client_id='{}', opreg={})",
+                    code_str, ep.client_id, ep.commit_addr);
+            } else if (ep.kind == ChainKind::CHAIN_KIND_SVM) {
+               outpost_by_chain[chain_code] =
+                  sol_plug->create_outpost_client(ep.client_id, chain_code, ext_id,
+                                                  ep.commit_addr /*program_id*/,
+                                                  solana_outpost_role::underwriter);
+               ilog("underwriter_plugin: wired SOL outpost_client chain={} (client_id='{}', program={})",
+                    code_str, ep.client_id, ep.commit_addr);
+            } else {
+               wlog("underwriter_plugin: outpost_endpoint chain={} has unknown kind — skipped",
+                    code_str);
+            }
+         }
+         if (outpost_by_chain.empty()) {
+            wlog("underwriter_plugin: NO outpost_clients wired — pass "
+                 "--underwriter-eth-outpost / --underwriter-sol-outpost for each served chain");
+         }
+      } catch (const fc::exception& e) {
+         gate_state = underwriter_detail::startup_state::wiring_failed;
+         elog("underwriter_plugin: failed to build outpost_client(s): {}",
+              e.to_detail_string());
+         return;
+      }
+
+      cron_service::job_schedule sched;
+      sched.milliseconds = {cron_service::job_schedule::step_value{scan_interval_ms}};
+
+      cron_service::job_metadata_t meta;
+      meta.label         = "underwriter_scan";
+      meta.one_at_a_time = true;
+
+      scan_job_id = cron_plug->add_job(
+         sched,
+         [this]() { scan_cycle(); },
+         meta
+      );
+      // Stored immediately after the job exists — anything thrown between a
+      // successful add_job and this store would otherwise leave the scan cron
+      // running while the gate reports a terminal failure. The
+      // `/v1/underwriter/*` endpoints (registered back in `plugin_startup`)
+      // switch from gate-state reporting to the real payloads here.
+      gate_state = underwriter_detail::startup_state::active;
+
+      ilog("underwriter_plugin: scheduled scan (id={}, interval={}ms)",
+           scan_job_id, scan_interval_ms);
+   }
+
+   /// Re-run {@link attempt_deferred_startup} after one retry interval, on
+   /// the main thread (appbase-wrapped wait on the app io_context).
+   void schedule_preflight_retry() {
+      if (!preflight_retry_timer) {
+         preflight_retry_timer.emplace(app().get_io_context());
+      }
+      preflight_retry_timer->expires_after(
+         std::chrono::milliseconds(underwriter_defaults::preflight_retry_interval_ms));
+      // Plain wait on the main io_context, then POST the attempt to the app
+      // queue — the same pattern the sync-gate callback uses, so the body
+      // runs in the same main-thread context plugin_startup does.
+      preflight_retry_timer->async_wait([this](const boost::system::error_code& ec) {
+         if (ec || shutting_down) {
+            return;
+         }
+         app().executor().post(appbase::priority::medium, [this]() {
+            // Proceed only while the retry grace is the live state: a
+            // terminal state stored between the timer firing and this task
+            // running must stay terminal. Structural guard — today no such
+            // interleaving exists, but the terminal-stays-terminal invariant
+            // should not rest on statement order in schedule_preflight_retry.
+            if (shutting_down ||
+                gate_state.load() != underwriter_detail::startup_state::preflight_retrying) {
+               return;
+            }
+            attempt_deferred_startup();
+         });
+      });
+   }
+
+   // -----------------------------------------------------------------------
    //  Main scan cycle
    // -----------------------------------------------------------------------
 
@@ -709,9 +1027,13 @@ struct underwriter_plugin::impl {
       // single-leg swap would be reselected forever.
       std::erase_if(selected, [&](const uw_request& r) {
          const bool src_done = r.src_is_depot
-            || confirmed_commits.contains(commit_key{r.id, r.src_chain, r.src_token_kind});
+            || confirmed_commits.contains(
+                  commit_key{r.id, r.src_chain_code.value, r.src_token_code.value,
+                             r.src_reserve_code.value});
          const bool dst_done = r.dst_is_depot
-            || confirmed_commits.contains(commit_key{r.id, r.dst_chain, r.dst_token_kind});
+            || confirmed_commits.contains(
+                  commit_key{r.id, r.dst_chain_code.value, r.dst_token_code.value,
+                             r.dst_reserve_code.value});
          return src_done && dst_done;
       });
 
@@ -734,14 +1056,20 @@ struct underwriter_plugin::impl {
 
    void read_outpost_registry() {
       outpost_chain_kinds.clear();
+      outpost_external_chain_ids.clear();
       // v6 refactor: chain rows moved from `sysio.epoch::outposts` to
       // `sysio.chains::chains`. Each row is a `Chain` with fields:
-      //   `code`       — slug_name (the universal chain identifier; the
-      //                  v5 `outpost_id` was just this slug's uint64).
-      //   `kind`       — ChainKind enum.
-      //   `is_depot`   — true for the WIRE depot's own row; we filter
-      //                  it out since underwriters don't commit to the
-      //                  depot itself.
+      //   `code`              — slug_name (the universal chain identifier; the
+      //                          v5 `outpost_id` was just this slug's uint64).
+      //   `kind`              — ChainKind enum.
+      //   `external_chain_id` — the chain's numeric id (1 = ETH mainnet, …);
+      //                         fed to `create_outpost_client` (SEC-13/WSA-027).
+      //   `is_depot`          — true for the WIRE depot's own row; we filter
+      //                          it out since underwriters don't commit to the
+      //                          depot itself.
+      //   `active`            - false until `sysio.chains::activchain` runs;
+      //                          post-bootstrap `regchain` rows start inactive,
+      //                          so they are not yet live outposts and are skipped.
       auto rows = read_all("sysio.chains", "sysio.chains", "chains");
       depot_chain_code.reset();
       for (auto& row : rows.rows) {
@@ -756,10 +1084,22 @@ struct underwriter_plugin::impl {
             depot_chain_code = chain_code;
             continue;
          }
+         // Skip chains not yet activated. `regchain` inserts post-bootstrap
+         // rows with `active=false` until `activchain` flips them; treating an
+         // inactive (future) chain as a live outpost would make the endpoint-
+         // coverage preflight and `is_available()` demand config + collateral
+         // for a chain that is not serving yet, blocking startup or halting the
+         // already-active chains. Mirrors batch_operator_plugin's
+         // `is_depot || !active` outpost filter.
+         if (!obj.contains("active") || !obj["active"].as_bool())
+            continue;
          // FC_REFLECT_ENUM in sysio/opp/opp.hpp gives us a direct enum
          // round-trip — the variant carries the symbolic name and `.as<T>()`
          // recovers the typed value without a string switch.
          outpost_chain_kinds[chain_code] = obj["kind"].as<ChainKind>();
+         if (obj.contains("external_chain_id"))
+            outpost_external_chain_ids[chain_code] =
+               static_cast<uint32_t>(obj["external_chain_id"].as_uint64());
       }
    }
 
@@ -802,23 +1142,23 @@ struct underwriter_plugin::impl {
          }
       }
 
-      // Local helper: read `chain_code`/`token_code` slug_name fields
-      // (v6 shape `{"value": <u64>}`) and project to (ChainKind,
-      // TokenKind). Returns nullopt when the chain/token isn't in the
-      // outpost registry / tokens table — the row gets skipped.
+      // Local helper: read `chain_code`/`token_code` slug fields (v6 shape
+      // `{"value": <u64>}`) as their EXACT packed slug values. Returns nullopt
+      // (row skipped) when the chain isn't a registered non-depot outpost or
+      // the token is unknown — neither can back a leg. SEC-13/WSA-027: key by
+      // exact code, never collapse to ChainKind/TokenKind.
       auto read_slug_pair = [&](const fc::variant_object& obj)
-         -> std::optional<std::pair<ChainKind, TokenKind>> {
+         -> std::optional<std::pair<uint64_t, uint64_t>> {
          if (!obj.contains("chain_code") || !obj.contains("token_code")) {
             return std::nullopt;
          }
          uint64_t chain_code = obj["chain_code"].get_object()["value"].as_uint64();
          uint64_t token_code = obj["token_code"].get_object()["value"].as_uint64();
-         auto cki = outpost_chain_kinds.find(chain_code);
-         auto tki = token_kind_by_code.find(token_code);
-         if (cki == outpost_chain_kinds.end() || tki == token_kind_by_code.end()) {
+         if (!outpost_chain_kinds.contains(chain_code)
+             || !token_kind_by_code.contains(token_code)) {
             return std::nullopt;
          }
-         return std::make_pair(cki->second, tki->second);
+         return std::make_pair(chain_code, token_code);
       };
 
       // ── Step 1: raw balances from sysio.opreg::operators[underwriter] ──
@@ -829,11 +1169,11 @@ struct underwriter_plugin::impl {
          if (!obj.contains("balances") || !obj["balances"].is_array()) break;
          for (auto& bal_entry : obj["balances"].get_array()) {
             auto be = bal_entry.get_object();
-            auto kinds = read_slug_pair(be);
-            if (!kinds) continue;
+            auto codes = read_slug_pair(be);
+            if (!codes) continue;
             credit_lines.push_back(credit_line{
-               .chain_kind = kinds->first,
-               .token_kind = kinds->second,
+               .chain_code = codes->first,
+               .token_code = codes->second,
                .balance    = be["balance"].as_uint64(),
             });
          }
@@ -847,11 +1187,11 @@ struct underwriter_plugin::impl {
       for (auto& row : lock_rows.rows) {
          auto obj = row.get_object();
          if (chain::name(obj["underwriter"].as_string()) != underwriter_account) continue;
-         auto kinds = read_slug_pair(obj);
-         if (!kinds) continue;
+         auto codes = read_slug_pair(obj);
+         if (!codes) continue;
          const uint64_t amount = obj["amount"].as_uint64();
          for (auto& cl : credit_lines) {
-            if (cl.chain_kind == kinds->first && cl.token_kind == kinds->second) {
+            if (cl.chain_code == codes->first && cl.token_code == codes->second) {
                cl.balance = (cl.balance > amount) ? (cl.balance - amount) : 0;
                break;
             }
@@ -863,11 +1203,11 @@ struct underwriter_plugin::impl {
       for (auto& row : wq_rows.rows) {
          auto obj = row.get_object();
          if (chain::name(obj["account"].as_string()) != underwriter_account) continue;
-         auto kinds = read_slug_pair(obj);
-         if (!kinds) continue;
+         auto codes = read_slug_pair(obj);
+         if (!codes) continue;
          const uint64_t amount = obj["amount"].as_uint64();
          for (auto& cl : credit_lines) {
-            if (cl.chain_kind == kinds->first && cl.token_kind == kinds->second) {
+            if (cl.chain_code == codes->first && cl.token_code == codes->second) {
                cl.balance = (cl.balance > amount) ? (cl.balance - amount) : 0;
                break;
             }
@@ -875,21 +1215,11 @@ struct underwriter_plugin::impl {
       }
 
       for (auto& cl : credit_lines) {
-         ilog("underwriter: credit line chain_kind={} token_kind={} available={}",
-              ChainKind_Name(cl.chain_kind),
-              TokenKind_Name(cl.token_kind),
+         ilog("underwriter: credit line chain_code={} token_code={} available={}",
+              fc::slug_name{cl.chain_code}.to_string(),
+              fc::slug_name{cl.token_code}.to_string(),
               cl.balance);
       }
-   }
-
-   /// Per-(chain, token_kind) availability predicate — replaces the
-   /// per-chain `is_available()` so `select_coverable` and any future
-   /// per-token gate can use the same lookup.
-   bool has_credit(ChainKind chain, TokenKind token_kind) const {
-      for (auto& cl : credit_lines) {
-         if (cl.chain_kind == chain && cl.token_kind == token_kind && cl.balance > 0) return true;
-      }
-      return false;
    }
 
    /**
@@ -932,7 +1262,7 @@ struct underwriter_plugin::impl {
       for (auto& [chain_code, chain_kind] : outpost_chain_kinds) {
          bool found = false;
          for (auto& cl : credit_lines) {
-            if (cl.chain_kind == chain_kind && cl.balance > 0) {
+            if (cl.chain_code == chain_code && cl.balance > 0) {
                found = true;
                break;
             }
@@ -1103,45 +1433,27 @@ struct underwriter_plugin::impl {
    /// case is still 2^N branches.
    static constexpr size_t MAX_CANDIDATES = 64;
 
-   /// Pack a `(chain, token_kind)` pair into a 64-bit credit-bucket key.
-   /// `magic_enum::enum_integer` instead of `static_cast` (per
-   /// `.claude/rules/code-quality.md` §3 / `enums-are-first-class.md`).
-   static uint64_t bucket_key(ChainKind chain, TokenKind token) {
-      return (static_cast<uint64_t>(magic_enum::enum_integer(chain)) << 32)
-           |  static_cast<uint64_t>(magic_enum::enum_integer(token));
+   /// Build a `leg_bond` (exact `(chain_code, token_code)` bucket + bond
+   /// requirement) for one leg of `r`. A WIRE depot leg requires zero bond —
+   /// it has no outpost, no UIC, and no lock.
+   static leg_bond src_bond(const uw_request& r) {
+      return { bucket_key{r.src_chain_code.value, r.src_token_code.value},
+               r.src_is_depot ? 0 : r.src_amount };
+   }
+   static leg_bond dst_bond(const uw_request& r) {
+      return { bucket_key{r.dst_chain_code.value, r.dst_token_code.value},
+               r.dst_is_depot ? 0 : r.dst_amount };
    }
 
-   /// Attempt to debit `r`'s per-leg bond requirements from `remaining`.
-   /// Returns true (and mutates `remaining`) iff every required leg fits.
-   /// Depot (WIRE) legs require ZERO bond — they have no outpost, no UIC,
-   /// and no lock — so they consult no bucket; a swap whose legs are both
-   /// depot is rejected (degenerate; the depot never creates such uwreqs).
-   /// Same-bucket dual-leg swaps (e.g. ERC20 → native on one outpost)
-   /// debit both legs from the single shared row.
-   static bool try_debit_buckets(std::map<uint64_t, uint64_t>& remaining,
-                                  const uw_request&              r) {
-      const uint64_t src_req = r.src_is_depot ? 0 : r.src_amount;
-      const uint64_t dst_req = r.dst_is_depot ? 0 : r.dst_amount;
-      if (src_req == 0 && dst_req == 0) return false;
-      const uint64_t src_k = bucket_key(r.src_chain, r.src_token_kind);
-      const uint64_t dst_k = bucket_key(r.dst_chain, r.dst_token_kind);
-      if (src_req > 0 && dst_req > 0 && src_k == dst_k) {
-         auto it = remaining.find(src_k);
-         if (it == remaining.end() || it->second < src_req + dst_req) return false;
-         it->second -= (src_req + dst_req);
-         return true;
-      }
-      if (src_req > 0) {
-         auto it = remaining.find(src_k);
-         if (it == remaining.end() || it->second < src_req) return false;
-      }
-      if (dst_req > 0) {
-         auto it = remaining.find(dst_k);
-         if (it == remaining.end() || it->second < dst_req) return false;
-      }
-      if (src_req > 0) remaining[src_k] -= src_req;
-      if (dst_req > 0) remaining[dst_k] -= dst_req;
-      return true;
+   /// Attempt to debit `r`'s per-leg bond requirements from `remaining`,
+   /// delegating to the pure `underwriter_detail::try_debit_buckets`. Returns
+   /// true (and mutates `remaining`) iff every required leg fits. Buckets are
+   /// keyed by the EXACT `(chain_code, token_code)` slug pair (SEC-13/WSA-027),
+   /// so two same-VM-family chains hold independent credit and never collide.
+   /// Same-bucket dual-leg swaps (e.g. ERC20 → native on one chain) debit both
+   /// legs from the single shared row; a both-depot swap is rejected.
+   static bool try_debit_buckets(credit_buckets& remaining, const uw_request& r) {
+      return underwriter_detail::try_debit_buckets(remaining, src_bond(r), dst_bond(r));
    }
 
    /// Branch-and-bound search that returns the subset of `candidates`
@@ -1159,7 +1471,7 @@ struct underwriter_plugin::impl {
    void knapsack_dfs(size_t                                   i,
                       const std::vector<uw_request>&            candidates,
                       const std::vector<uint64_t>&              suffix_value,
-                      std::map<uint64_t, uint64_t>              remaining,
+                      credit_buckets                            remaining,
                       std::vector<size_t>                       cur_indices,
                       uint64_t                                  cur_value,
                       uint64_t&                                 best_value,
@@ -1177,7 +1489,7 @@ struct underwriter_plugin::impl {
       }
 
       const auto& r = candidates[i];
-      std::map<uint64_t, uint64_t> after = remaining;
+      credit_buckets after = remaining;
       const bool feasible = try_debit_buckets(after, r);
 
       // Branch 1: include (if feasible).
@@ -1200,7 +1512,7 @@ struct underwriter_plugin::impl {
    /// value descending and picks anything that still fits.
    std::vector<uw_request>
    greedy_fallback(std::vector<uw_request> requests,
-                    std::map<uint64_t, uint64_t> remaining) const {
+                    credit_buckets remaining) const {
       std::sort(requests.begin(), requests.end(),
                 [](const uw_request& a, const uw_request& b) {
                    return (a.src_amount + a.dst_amount)
@@ -1218,9 +1530,9 @@ struct underwriter_plugin::impl {
       // Seed bucket credits from `read_credit_lines`' output. Per the T11
       // mirror, these already have active locks + pending withdraws
       // subtracted, so the search operates on truly-spendable balances.
-      std::map<uint64_t, uint64_t> initial_credit;
+      credit_buckets initial_credit;
       for (auto& cl : credit_lines) {
-         initial_credit[bucket_key(cl.chain_kind, cl.token_kind)] = cl.balance;
+         initial_credit[bucket_key{cl.chain_code, cl.token_code}] = cl.balance;
       }
 
       // Pre-filter requests that can never fit in isolation (no bucket
@@ -1280,17 +1592,6 @@ struct underwriter_plugin::impl {
    //  The outpost locks capital and emits UNDERWRITE_INTENT via OPP
    // -----------------------------------------------------------------------
 
-   /// Look up the depot's outpost id for the given chain via the
-   /// `outpost_chain_kinds` cache (populated by `read_outpost_registry`).
-   /// Returns `std::nullopt` if no outpost is registered for the chain
-   /// (per `feedback_no_zero_sentinels.md` — outpost id 0 is a real id).
-   std::optional<uint64_t> find_outpost_id(ChainKind chain) const {
-      for (auto& [id, ck] : outpost_chain_kinds) {
-         if (ck == chain) return id;
-      }
-      return std::nullopt;
-   }
-
    /// Build a verbatim, signed `UnderwriteIntentCommit` payload for the
    /// given leg's `(uwreq_id, chain_code, chain_code, token_code,
    /// reserve_code)`. Returns an empty vector on any failure (no signature
@@ -1311,7 +1612,6 @@ struct underwriter_plugin::impl {
    /// signature against the underwriter's WIRE account permissions
    /// (`owner` / `active` only) — see `sysio.uwrit::verify_uic_signature`.
    std::vector<char> build_signed_uic_bytes(uint64_t        uwreq_id,
-                                            uint64_t        outpost_chain_code,
                                             ChainKind       leg_chain_kind,
                                             fc::slug_name    chain_code,
                                             fc::slug_name    token_code,
@@ -1319,7 +1619,6 @@ struct underwriter_plugin::impl {
       opp_att::UnderwriteIntentCommit uic;
       uic.mutable_uw_account()->set_name(underwriter_account.to_string());
       uic.set_uw_request_id(uwreq_id);
-      uic.set_outpost_id(outpost_chain_code);
       // v6 data-model: leg identity is the slug_name triple. The wire format
       // for each field is the packed uint64 slug_name value (alphabet
       // `[A-Z0-9_]+`, ≤8 chars). The depot decodes these back to
@@ -1473,6 +1772,18 @@ struct underwriter_plugin::impl {
    /// missing log / receipt without mismatched fields is a deferred
    /// retry (returns false but no mismatch counter bump).
    bool verify_source_deposit_eth(const uw_request& req) {
+      // SEC-13/WSA-027: resolve this leg's outpost wiring by EXACT chain_code —
+      // the RPC client and the SwapDeposit contract address are per-chain, so a
+      // second EVM chain is verified against ITS endpoint, not the first one's.
+      const auto ep_it = outpost_endpoints.find(req.src_chain_code.value);
+      if (ep_it == outpost_endpoints.end()) {
+         elog("underwriter: no outpost endpoint configured for source chain={} "
+              "(uwreq {})", req.src_chain_code.to_string(), req.id);
+         return false;
+      }
+      const std::string& eth_client_id = ep_it->second.client_id;
+      const std::string& resolved_eth_source_contract_addr = ep_it->second.source_deposit_addr;
+
       auto entry = eth_plug->get_client(eth_client_id);
       if (!entry || !entry->client) {
          elog("underwriter: ETH client '{}' not found for source-deposit verify "
@@ -1517,7 +1828,7 @@ struct underwriter_plugin::impl {
 
       uint64_t finalized_blk = 0;
       try {
-         const auto finalized_var = entry->client->execute(
+         const auto finalized_var = entry->client->execute_idempotent(
             std::string{ETH_GET_BLOCK_BY_NUMBER_METHOD},
             fc::variants{eth::to_block_tag(eth::block_tag_t::finalized), false});
          if (finalized_var.is_null()) {
@@ -1745,6 +2056,16 @@ struct underwriter_plugin::impl {
    ///     reached without a matching finalized log — the outer poll loop
    ///     reattempts on its next tick from the persisted cursor.
    bool verify_source_deposit_sol(const uw_request& req) {
+      // SEC-13/WSA-027: resolve this leg's outpost wiring by EXACT chain_code.
+      const auto ep_it = outpost_endpoints.find(req.src_chain_code.value);
+      if (ep_it == outpost_endpoints.end()) {
+         elog("underwriter: no outpost endpoint configured for source chain={} "
+              "(uwreq {})", req.src_chain_code.to_string(), req.id);
+         return false;
+      }
+      const std::string& sol_client_id  = ep_it->second.client_id;
+      const std::string& sol_program_id = ep_it->second.commit_addr;
+
       auto entry = sol_plug->get_client(sol_client_id);
       if (!entry || !entry->client) {
          elog("underwriter: SOL client '{}' not found for source-deposit verify "
@@ -2047,14 +2368,13 @@ struct underwriter_plugin::impl {
       // carries the full triple so the depot's `rcrdcommit` can route to
       // the correct source/dest slot on `commit_entry`.
       //
-      // Confirmation discipline: we skip any leg whose
-      // `(uwreq_id, chain, token_kind)` triple is already in
-      // `confirmed_commits` (a previous cycle's tx confirmed on-chain).
-      // After a successful confirm we record the triple so the next scan
-      // doesn't resubmit. Per project rules: confirm BEFORE recording so
-      // a partial-landing in the map cannot happen without OPP breakage.
+      // Confirmation discipline: we skip any leg whose exact
+      // `(uwreq_id, chain_code, token_code, reserve_code)` identity is already
+      // in `confirmed_commits` (a previous cycle's tx confirmed on-chain).
+      // After a successful confirm we record the key so the next scan doesn't
+      // resubmit. Per project rules: confirm BEFORE recording so a
+      // partial-landing in the map cannot happen without OPP breakage.
       auto submit_one = [this](ChainKind    chain,
-                               TokenKind    token_kind,
                                fc::slug_name chain_code,
                                fc::slug_name token_code,
                                fc::slug_name reserve_code,
@@ -2068,7 +2388,8 @@ struct underwriter_plugin::impl {
                  "no commit needed", uw_request_id, chain_code.to_string());
             return;
          }
-         const commit_key key{uw_request_id, chain, token_kind};
+         const commit_key key{uw_request_id, chain_code.value, token_code.value,
+                              reserve_code.value};
          if (confirmed_commits.contains(key)) {
             ilog("underwriter: skip already-confirmed commit uwreq={} chain={} token={}",
                  uw_request_id,
@@ -2077,26 +2398,20 @@ struct underwriter_plugin::impl {
             return;
          }
 
-         auto outpost_id_opt = find_outpost_id(chain);
-         if (!outpost_id_opt) {
-            elog("underwriter: no outpost registered for chain_kind={} (uwreq {})",
-                 ChainKind_Name(chain), uw_request_id);
-            return;
-         }
          auto uic_bytes = build_signed_uic_bytes(
-            uw_request_id, *outpost_id_opt, chain, chain_code, token_code, reserve_code);
+            uw_request_id, chain, chain_code, token_code, reserve_code);
          if (uic_bytes.empty()) return;   // already logged
 
          // Chain-agnostic SPI call. The `outpost_by_chain` map carries one
-         // `outpost_client` per supported chain kind, built at startup via
-         // the outpost-plugin factories. Each concrete owns its own ABI /
-         // IDL discovery, address encoding, and on-chain confirmation
+         // `outpost_client` per EXACT `chain_code` (SEC-13/WSA-027), built at
+         // startup via the outpost-plugin factories. Each concrete owns its own
+         // ABI / IDL discovery, address encoding, and on-chain confirmation
          // discipline — this loop just relays opaque UIC bytes through the
          // virtual. Per `outpost-client-spi.md`.
-         auto it = outpost_by_chain.find(chain);
+         auto it = outpost_by_chain.find(chain_code.value);
          if (it == outpost_by_chain.end()) {
             elog("underwriter: no outpost_client wired for chain={} (uwreq {})",
-                 ChainKind_Name(chain), uw_request_id);
+                 chain_code.to_string(), uw_request_id);
             std::lock_guard lk{stats_mutex};
             commits_failed_count++;
             return;
@@ -2120,10 +2435,10 @@ struct underwriter_plugin::impl {
             commits_failed_count++;
          }
       };
-      submit_one(req.src_chain, req.src_token_kind,
+      submit_one(req.src_chain,
                  req.src_chain_code, req.src_token_code, req.src_reserve_code,
                  req.id, req.src_is_depot);
-      submit_one(req.dst_chain, req.dst_token_kind,
+      submit_one(req.dst_chain,
                  req.dst_chain_code, req.dst_token_code, req.dst_reserve_code,
                  req.id, req.dst_is_depot);
    }
@@ -2152,9 +2467,12 @@ struct underwriter_plugin::impl {
    //   /v1/underwriter/stats   — session counters + config snapshot
    //   /v1/underwriter/commits — outstanding confirmed commits (per leg)
    //
-   // The matching `clio opp uw <stats|commits>` CLI wrapper is planned in
-   // a follow-up; today the endpoints are addressable via `curl` against
-   // the nodeop HTTP port.
+   // Both carry a `status` discriminator: until the deferred startup body
+   // completes they answer with the gate state (`waiting_for_sync` +
+   // `head_behind_sec`/`lib_behind_sec`, `preflight_retrying`, or a terminal
+   // `preflight_failed`/`wiring_failed`/`startup_failed` with `detail`);
+   // once active they serve the payloads below with `status:"active"`.
+
    fc::variant build_stats_response() {
       std::lock_guard lk{stats_mutex};
       size_t active_sol_source_deposit_cursor_count = 0;
@@ -2166,18 +2484,28 @@ struct underwriter_plugin::impl {
             active_sol_source_deposit_cursor_count++;
          }
       }
+      // SEC-13/WSA-027: surface the per-chain outpost wiring (was the single
+      // eth/sol client-id + address) so operators can confirm each served
+      // chain is configured.
+      std::vector<fc::variant> ep_v;
+      ep_v.reserve(outpost_endpoints.size());
+      for (const auto& [code, ep] : outpost_endpoints) {
+         ep_v.push_back(fc::mutable_variant_object()
+            ("chain_code",          fc::slug_name{code}.to_string())
+            ("kind",                ChainKind_Name(ep.kind))
+            ("client_id",           ep.client_id)
+            ("commit_addr",         ep.commit_addr)
+            ("source_deposit_addr", ep.source_deposit_addr));
+      }
       return fc::variant(fc::mutable_variant_object()
+         (underwriter_detail::field::status, std::string{underwriter_detail::active_status})
          ("underwriter_account",            underwriter_account.to_string())
          ("enabled",                        enabled)
          ("is_active",                      is_active)
          ("scan_interval_ms",               scan_interval_ms)
          ("action_timeout_ms",              action_timeout_ms)
-         ("eth_client_id",                  eth_client_id)
-         ("sol_client_id",                  sol_client_id)
-         ("eth_opreg_addr",                 eth_opreg_addr)
-         ("sol_program_id",                 sol_program_id)
+         ("outpost_endpoints",              fc::variant(std::move(ep_v)))
          ("eth_source_deposit_function",    eth_source_deposit_function_name)
-         ("eth_source_contract_addr",       resolved_eth_source_contract_addr)
          ("sol_source_deposit_instruction", sol_source_deposit_instruction_name)
          ("uwreqs_seen_pending",            uwreqs_seen_pending_count)
          ("commits_confirmed",              commits_confirmed_count)
@@ -2195,38 +2523,88 @@ struct underwriter_plugin::impl {
       entries.reserve(confirmed_commits.size());
       for (const auto& k : confirmed_commits) {
          entries.push_back(fc::variant(fc::mutable_variant_object()
-            ("uwreq_id",   k.uwreq_id)
-            ("chain",      ChainKind_Name(k.chain))
-            ("token_kind", TokenKind_Name(k.token_kind))
+            ("uwreq_id",     k.uwreq_id)
+            ("chain_code",   fc::slug_name{k.chain_code}.to_string())
+            ("token_code",   fc::slug_name{k.token_code}.to_string())
+            ("reserve_code", fc::slug_name{k.reserve_code}.to_string())
          ));
       }
       return fc::variant(fc::mutable_variant_object()
+         (underwriter_detail::field::status, std::string{underwriter_detail::active_status})
          ("count",   entries.size())
          ("entries", std::move(entries))
       );
    }
 
+   /// Answer `cb` with the gate-state payload and return true when the
+   /// deferred startup body has not completed (waiting for sync, retrying,
+   /// or failed terminally); return false once {@link run_deferred_startup}
+   /// reached `active` so the caller serves the real payload.
+   bool respond_if_gated(const url_response_callback& cb) {
+      const auto state = gate_state.load();
+      if (state == underwriter_detail::startup_state::active) {
+         return false;
+      }
+      // Only the waiting_for_sync payload carries the behind-now gaps; skip
+      // the chain reads for the other states. `lib_behind_sec` is the gate's
+      // actual criterion (reads serve the irreversible state); the head gap
+      // distinguishes a finality-stalled node from one still catching up.
+      // An absent irreversible root stays a typed empty optional here — the
+      // payload builder turns it into the wire's -1 sentinel.
+      fc::microseconds                head_behind{};
+      std::optional<fc::microseconds> lib_behind;
+      if (state == underwriter_detail::startup_state::waiting_for_sync) {
+         auto&      chain = chain_plug->chain();
+         const auto now   = fc::time_point::now();
+         head_behind      = now - chain.head().block_time();
+         if (chain.fork_db_has_root()) {
+            lib_behind = now - chain.fork_db_root().block_time();
+         }
+      }
+      cb(200, underwriter_detail::startup_gate_payload(state, head_behind, lib_behind));
+      return true;
+   }
+
    /// Register the `/v1/underwriter/*` HTTP endpoints. Called once from
-   /// `plugin_startup` after preflight passes and the cron job is queued.
+   /// `plugin_startup` when the underwriter is enabled, BEFORE the sync gate:
+   /// `http_plugin`'s handler map is read lock-free by the HTTP worker
+   /// threads, so every registration must happen during plugin startup —
+   /// before the posted listener creation runs — never from a task queued
+   /// after `exec()` is live. Until the deferred startup body completes the
+   /// handlers report the gate state (see {@link respond_if_gated}).
+   ///
+   /// Both endpoints live in the dedicated `api_category::underwriter`, NOT
+   /// `api_category::node`: they expose operator metadata (account identity,
+   /// client ids, outpost contract addresses, outstanding commits) that must
+   /// not ride the always-on node category onto category-isolated public
+   /// listeners. They remain reachable on the default all-category listeners
+   /// (`http-server-address` / `unix-socket-path`); on category-isolated
+   /// setups the operator opts in with `--http-category-address=underwriter,<addr>`.
    void register_http_endpoints() {
       auto& hp = app().get_plugin<http_plugin>();
       hp.add_api({
-         {"/v1/underwriter/stats", api_category::node,
+         {"/v1/underwriter/stats", api_category::underwriter,
             [this](std::string&& /*url*/,
                     std::string&& /*body*/,
                     url_response_callback&& cb) {
                try {
+                  if (respond_if_gated(cb)) {
+                     return;
+                  }
                   cb(200, build_stats_response());
                } catch (const fc::exception& e) {
                   cb(500, fc::variant(fc::mutable_variant_object()
                      ("error", e.to_detail_string())));
                }
             }},
-         {"/v1/underwriter/commits", api_category::node,
+         {"/v1/underwriter/commits", api_category::underwriter,
             [this](std::string&& /*url*/,
                     std::string&& /*body*/,
                     url_response_callback&& cb) {
                try {
+                  if (respond_if_gated(cb)) {
+                     return;
+                  }
                   cb(200, build_commits_response());
                } catch (const fc::exception& e) {
                   cb(500, fc::variant(fc::mutable_variant_object()
@@ -2234,6 +2612,13 @@ struct underwriter_plugin::impl {
                }
             }},
       }, appbase::exec_queue::read_only);
+
+      // Operator metadata should normally stay on loopback / private
+      // management networks; a public bind is a deliberate choice worth a
+      // startup warning (same pattern as the snapshot_ro exposure notice).
+      if (!hp.is_on_loopback(api_category::underwriter)) {
+         wlog("underwriter diagnostics API (/v1/underwriter/*) exposed on a non-loopback address");
+      }
    }
 };
 
@@ -2256,17 +2641,26 @@ void underwriter_plugin::set_program_options(options_description& cli,
         "Timeout for outpost contract calls and table reads (ms)");
    opts("underwriter-enabled", bpo::value<bool>()->default_value(underwriter_defaults::enabled),
         "Enable underwriter functionality");
-   opts("underwriter-eth-client-id", bpo::value<std::string>()->default_value(underwriter_defaults::eth_client_id),
-        "Ethereum outpost client ID");
-   opts("underwriter-sol-client-id", bpo::value<std::string>()->default_value(underwriter_defaults::sol_client_id),
-        "Solana outpost client ID");
-   opts("underwriter-eth-opreg-addr", bpo::value<std::string>(),
-        "OperatorRegistry contract address on Ethereum (hex)");
+   opts("underwriter-eth-outpost",
+        bpo::value<std::vector<std::string>>()->composing(),
+        "Per-EVM-chain outpost wiring (repeatable, one per EVM chain served). Format: "
+        "`<chain_code>,<client_id>,<operator_registry_addr>,<source_deposit_contract_addr>` — "
+        "chain_code is the sysio.chains codename (e.g. ETHEREUM); client_id names the RPC "
+        "connection registered via --outpost-ethereum-client; operator_registry_addr is the OPP "
+        "OperatorRegistry (uw_commit target); source_deposit_contract_addr is the SwapDeposit-"
+        "emitting contract scanned by the verify path. SEC-13/WSA-027: keyed by exact chain_code, "
+        "so two EVM chains are wired independently.");
+   opts("underwriter-sol-outpost",
+        bpo::value<std::vector<std::string>>()->composing(),
+        "Per-SVM-chain outpost wiring (repeatable, one per SVM chain served). Format: "
+        "`<chain_code>,<client_id>,<opp_outpost_program_id>` — client_id names the RPC connection "
+        "registered via --outpost-solana-client; program_id is the opp-outpost program (used for "
+        "both commit_underwrite and the source-deposit scan).");
    opts("underwriter-eth-source-deposit-function", bpo::value<std::string>(),
         "Name of the ETH swap-deposit function. Resolved at preflight against the ABI "
-        "files registered with --ethereum-abi-file; the matching `function` entry's "
-        "`contract_address` becomes the source contract address, and its keccak256 "
-        "signature yields the 4-byte selector. Required.");
+        "files registered with --ethereum-abi-file; the matching `function` entry's keccak256 "
+        "signature yields the chain-agnostic 4-byte selector. The per-chain source contract "
+        "address comes from --underwriter-eth-outpost. Required.");
    opts("underwriter-sol-source-deposit-instruction", bpo::value<std::string>(),
         "Name of the SOL swap-deposit instruction. Resolved at preflight against the IDL "
         "files registered with --solana-idl-file; the matching instruction's anchor "
@@ -2286,10 +2680,45 @@ void underwriter_plugin::plugin_initialize(const variables_map& options) {
    _impl->scan_interval_ms  = options["underwriter-scan-interval-ms"].as<uint32_t>();
    _impl->action_timeout_ms = options["underwriter-action-timeout-ms"].as<uint32_t>();
    _impl->enabled           = options["underwriter-enabled"].as<bool>();
-   _impl->eth_client_id     = options["underwriter-eth-client-id"].as<std::string>();
-   _impl->sol_client_id     = options["underwriter-sol-client-id"].as<std::string>();
-   if (options.count("underwriter-eth-opreg-addr"))
-      _impl->eth_opreg_addr = options["underwriter-eth-opreg-addr"].as<std::string>();
+   // SEC-13/WSA-027: parse the repeatable per-chain outpost wiring into
+   // `outpost_endpoints`, keyed by EXACT chain_code. Each entry is a
+   // comma-separated `<chain_code>,<client_id>,<addr...>`.
+   {
+      auto split_csv = [](const std::string& s) {
+         std::vector<std::string> out;
+         for (size_t start = 0;;) {
+            const size_t comma = s.find(',', start);
+            out.push_back(s.substr(start, comma == std::string::npos ? comma : comma - start));
+            if (comma == std::string::npos) break;
+            start = comma + 1;
+         }
+         return out;
+      };
+      auto parse_outpost = [&](const char* opt, ChainKind kind, size_t min_fields) {
+         if (!options.count(opt)) return;
+         for (const auto& spec : options[opt].as<std::vector<std::string>>()) {
+            const auto f = split_csv(spec);
+            if (f.size() < min_fields || f[0].empty() || f[1].empty() || f[2].empty()) {
+               elog("underwriter: ignoring malformed {} entry '{}' (need "
+                    ">= {} non-empty comma-separated fields)", opt, spec, min_fields);
+               continue;
+            }
+            try {
+               outpost_endpoint ep;
+               ep.kind                = kind;
+               ep.client_id           = f[1];
+               ep.commit_addr         = f[2];
+               ep.source_deposit_addr = (f.size() > 3 && !f[3].empty()) ? f[3] : f[2];
+               _impl->outpost_endpoints[fc::slug_name{f[0]}.value] = ep;
+            } catch (const fc::exception& e) {
+               elog("underwriter: ignoring {} entry '{}' — bad chain_code '{}': {}",
+                    opt, spec, f[0], e.to_detail_string());
+            }
+         }
+      };
+      parse_outpost("underwriter-eth-outpost", ChainKind::CHAIN_KIND_EVM, /*min_fields=*/4);
+      parse_outpost("underwriter-sol-outpost", ChainKind::CHAIN_KIND_SVM, /*min_fields=*/3);
+   }
    if (options.count("underwriter-eth-source-deposit-function"))
       _impl->eth_source_deposit_function_name =
          options["underwriter-eth-source-deposit-function"].as<std::string>();
@@ -2306,6 +2735,17 @@ void underwriter_plugin::plugin_initialize(const variables_map& options) {
    _impl->cron_plug  = &app().get_plugin<cron_plugin>();
    _impl->eth_plug   = &app().get_plugin<outpost_ethereum_client_plugin>();
    _impl->sol_plug   = &app().get_plugin<outpost_solana_client_plugin>();
+
+   // Operator daemons are designed for read-mode = irreversible: the sync gate
+   // (controller::is_synced) measures LIB recency and every local table read the
+   // preflight and scan cycle perform serves the irreversible view. Any other read
+   // mode would validate/underwrite against state that can still fork out. Together
+   // with producer_plugin's inverse assert (no producer-name under irreversible
+   // read-mode), this also makes co-hosting a producer with an operator daemon
+   // impossible by configuration.
+   FC_ASSERT(!_impl->enabled ||
+                _impl->chain_plug->chain().get_read_mode() == chain::db_read_mode::IRREVERSIBLE,
+             "underwriter_plugin requires read-mode = irreversible");
 }
 
 void underwriter_plugin::plugin_startup() {
@@ -2316,86 +2756,75 @@ void underwriter_plugin::plugin_startup() {
 
    ilog("underwriter_plugin: starting for account {}", _impl->underwriter_account.to_string());
 
-   // Unconditional pre-flight: bail (no cron job) if the depot-side state
-   // for this underwriter is incomplete. Cluster bootstrap is responsible
-   // for establishing the missing state — there is no dev escape hatch.
-   if (!_impl->run_preflight()) {
-      elog("underwriter_plugin: pre-flight failed — cron job NOT registered");
-      return;
-   }
-
-   // Materialize the outpost_client SPI handles. The underwriter never
-   // sees raw `ethereum_client` / `solana_client` instances after this
-   // point — every outpost-side action goes through the SPI virtuals.
-   // Per `outpost-client-spi.md`:
-   //   * ETH outpost is constructed with only the OperatorRegistry
-   //     address — the underwriter does not consume / emit OPP
-   //     envelopes itself, so OPP / OPPInbound addresses are left empty
-   //     and `deliver_outbound_envelope` / `read_inbound_envelope` would
-   //     assert if called (they're not, on this code path).
-   //   * SOL outpost is constructed with the program id resolved at
-   //     preflight from the IDL's `address` field; the typed program
-   //     wrapper exposes `commit_underwrite` directly.
-   try {
-      if (!_impl->eth_client_id.empty() && !_impl->eth_opreg_addr.empty()) {
-         _impl->outpost_by_chain[ChainKind::CHAIN_KIND_EVM] =
-            _impl->eth_plug->create_outpost_client(_impl->eth_client_id,
-                                                   /*chain_code=*/0,
-                                                   /*chain_id=*/0,
-                                                   /*opp_addr=*/"",
-                                                   /*opp_inbound_addr=*/"",
-                                                   _impl->eth_opreg_addr);
-         ilog("underwriter_plugin: wired ETH outpost_client (opreg={})",
-              _impl->eth_opreg_addr);
-      } else {
-         wlog("underwriter_plugin: ETH outpost_client NOT wired "
-              "(eth_client_id='{}', eth_opreg_addr='{}')",
-              _impl->eth_client_id, _impl->eth_opreg_addr);
-      }
-      if (!_impl->sol_client_id.empty() && !_impl->sol_program_id.empty()) {
-         _impl->outpost_by_chain[ChainKind::CHAIN_KIND_SVM] =
-            _impl->sol_plug->create_outpost_client(_impl->sol_client_id,
-                                                   /*chain_code=*/0,
-                                                   /*chain_id=*/0,
-                                                   _impl->sol_program_id);
-         ilog("underwriter_plugin: wired SOL outpost_client (program={})",
-              _impl->sol_program_id);
-      } else {
-         wlog("underwriter_plugin: SOL outpost_client NOT wired "
-              "(sol_client_id='{}', sol_program_id='{}')",
-              _impl->sol_client_id, _impl->sol_program_id);
-      }
-   } catch (const fc::exception& e) {
-      elog("underwriter_plugin: failed to build outpost_client(s): {}",
-           e.to_detail_string());
-      return;
-   }
-
-   auto& cron = app().get_plugin<cron_plugin>();
-   cron_service::job_schedule sched;
-   sched.milliseconds = {cron_service::job_schedule::step_value{_impl->scan_interval_ms}};
-
-   cron_service::job_metadata_t meta;
-   meta.label = "underwriter_scan";
-   meta.one_at_a_time = true;
-
-   _impl->scan_job_id = cron.add_job(
-      sched,
-      [this]() { _impl->scan_cycle(); },
-      meta
-   );
-
-   ilog("underwriter_plugin: scheduled scan (id={}, interval={}ms)",
-        _impl->scan_job_id, _impl->scan_interval_ms);
-
-   // Register read-only HTTP diagnostics. Endpoints:
-   //   GET /v1/underwriter/stats    — session counters + config snapshot
-   //   GET /v1/underwriter/commits  — outstanding confirmed commits
+   // Register the `/v1/underwriter/*` endpoints FIRST, before the sync
+   // gate: handler registration must complete during plugin startup
+   // (before the posted HTTP listener goes live) because the handler map
+   // is read lock-free by the HTTP threads — it must never ride the
+   // deferred startup body below. Until that body completes, the handlers
+   // answer with the gate state, so a cold-booting (or terminally-failed)
+   // underwriter is diagnosable over HTTP instead of a single ilog.
    _impl->register_http_endpoints();
+
+   // The preflight validates depot-side state (opreg registration, chain
+   // registry, authex links) via LOCAL table reads. On a cold-booting
+   // operator node those reads see mid-sync (possibly genesis) state and
+   // would fail spuriously, so the whole startup body (preflight → outpost
+   // client wiring → cron) is DEFERRED until the node is synced —
+   // `controller::is_synced()`: the LAST IRREVERSIBLE block's time within
+   // `controller::default_sync_recency_ms` of now (the state the reads
+   // actually serve under read-mode = irreversible). The wake-up is the
+   // existing `irreversible_block` channel: a LIB advance is the only event
+   // that can turn the predicate true, and channel deliveries are posted to
+   // the application executor — main thread, AFTER the triggering block
+   // fully commits — so the callback may run the startup body directly.
+   // There is deliberately no already-synced fast path: operator daemons
+   // boot with genesis-stale LIB in every deployment topology (producer
+   // co-hosting is impossible by configuration — see the read-mode
+   // requirement in plugin_initialize), and a node that somehow is synced at
+   // startup is released by the next LIB advance. That advance is also the
+   // underwriter's WORK SUPPLY — everything here acts on newly-finalized
+   // state — so a finality stall that spans startup (the classic lost-wakeup
+   // case) is one with nothing to underwrite: the first finalized block
+   // re-arms the gate and creates the first actionable state at the same
+   // instant. Post-arming, the preflight
+   // retries within a bounded grace (see attempt_deferred_startup) to absorb
+   // the LIB boundary race; a genuinely incomplete bootstrap still fails
+   // loudly once the grace expires and shuts the node down (fail-fast) —
+   // there remains no dev escape hatch.
+   auto& chain = _impl->chain_plug->chain();
+   ilog("underwriter_plugin: waiting for chain sync before preflight "
+        "(head {} is {}s behind now; irreversible state is {}s behind)",
+        chain.head().block_num(),
+        (fc::time_point::now() - chain.head().block_time()).to_seconds(),
+        chain.fork_db_has_root()
+           ? std::to_string((fc::time_point::now() - chain.fork_db_root().block_time()).to_seconds())
+           : "n/a");
+   _impl->sync_gate_subscription =
+      app().get_channel<chain::plugin_interface::channels::irreversible_block>().subscribe(
+         [impl = _impl.get()](const chain::block_signal_params&) {
+            if (impl->startup_attempted() || impl->shutting_down ||
+                !impl->chain_plug->chain().is_synced()) {
+               return;
+            }
+            // One-shot consumption: unsubscribe (safe from within the slot) and
+            // run the startup body directly — channel deliveries are posted to
+            // the application executor, so this already runs on the main thread
+            // AFTER the triggering block committed (the exact context the old
+            // accepted_block gate had to re-post itself into; running mid
+            // block-application, table reads see an incomplete view — observed
+            // live: a registered operator row read back EMPTY → spurious
+            // preflight failure).
+            impl->sync_gate_subscription.unsubscribe();
+            ilog("underwriter_plugin: chain synced — starting deferred startup");
+            impl->run_deferred_startup();
+         });
 }
 
 void underwriter_plugin::plugin_shutdown() {
    _impl->shutting_down = true;
+   if (_impl->preflight_retry_timer) {
+      _impl->preflight_retry_timer->cancel();
+   }
 
    if (_impl->scan_job_id != 0) {
       auto& cron = app().get_plugin<cron_plugin>();

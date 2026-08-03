@@ -23,8 +23,22 @@ namespace sysio {
       constexpr uint32_t scan_interval_ms    = 5000;
       constexpr uint32_t action_timeout_ms   = 15000;
       constexpr bool     enabled             = false;
-      constexpr const char* eth_client_id    = "eth-default";
-      constexpr const char* sol_client_id    = "sol-default";
+      // The sync-recency window moved to `controller::default_sync_recency_ms`
+      // — the sync predicate is `controller::is_synced()`, shared by every
+      // operator-daemon plugin.
+      /// How long after the sync gate arms a failing preflight keeps
+      /// RETRYING before the failure is terminal. Rows the harness confirmed
+      /// final on the producer can land in the LOCAL irreversible state a
+      /// beat after the gate arms (observed live: a registration in block N
+      /// readable only 50ms after a preflight read at LIB N−3); the grace
+      /// absorbs that boundary race while a genuinely incomplete bootstrap
+      /// still fails loudly once it expires.
+      constexpr uint32_t preflight_retry_grace_ms    = 15000;
+      /// Cadence (ms) of preflight retries within the grace window.
+      constexpr uint32_t preflight_retry_interval_ms = 500;
+      // SEC-13/WSA-027: the single eth/sol client-id defaults were removed with
+      // the single-client config — outpost wiring is now per-chain and required
+      // (--underwriter-{eth,sol}-outpost), with no single fallback.
    }
 
    class underwriter_plugin : public appbase::plugin<underwriter_plugin> {

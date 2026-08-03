@@ -111,6 +111,21 @@ void require_no_duplicate_chain_token(const std::vector<opreg::chain_min_bond>& 
    }
 }
 
+/// Reject a zero `min_bond` in any collateral-requirement entry. Eligibility
+/// evaluation gates an operator on `available >= req.min_bond`; a zero minimum
+/// makes that comparison vacuously true, so an operator could reach ACTIVE with
+/// no collateral posted, defeating the bond requirement entirely. An operator
+/// type that should carry no requirement is expressed by an empty requirement
+/// vector (which makes the type ineligible), never by a zero-valued entry.
+void require_positive_min_bond(const std::vector<opreg::chain_min_bond>& v,
+                               const char* role_label) {
+   for (const auto& entry : v) {
+      check(entry.min_bond > 0,
+            std::string(role_label) +
+               ": min_bond must be positive (an empty requirement set imposes no bond)");
+   }
+}
+
 } // anonymous namespace
 
 // ---------------------------------------------------------------------------
@@ -132,15 +147,42 @@ void opreg::setconfig(uint32_t max_available_producers,
    check(max_available_batch_ops > 0, "max_available_batch_ops must be positive");
    check(max_available_underwriters > 0, "max_available_underwriters must be positive");
    check(terminate_prune_delay_ms > 0, "terminate_prune_delay_ms must be positive");
-   check(terminate_max_consecutive_misses > 0,
-         "terminate_max_consecutive_misses must be positive");
-   check(terminate_max_pct_misses_24h > 0 && terminate_max_pct_misses_24h <= 100,
-         "terminate_max_pct_misses_24h must be in (0, 100]");
+   check(terminate_max_consecutive_misses >= MIN_TERMINATE_MAX_CONSECUTIVE_MISSES &&
+         terminate_max_consecutive_misses <= MAX_TERMINATE_MAX_CONSECUTIVE_MISSES,
+         "terminate_max_consecutive_misses must be in [1, 5]");
+   check(terminate_max_pct_misses_24h >= MIN_TERMINATE_MAX_PCT_MISSES_24H &&
+         terminate_max_pct_misses_24h <= MAX_TERMINATE_MAX_PCT_MISSES_24H,
+         "terminate_max_pct_misses_24h must be in [1, 99]");
    check(terminate_window_ms > 0, "terminate_window_ms must be positive");
+
+   // SEC-28 residual: delivery records accrue only on duty epochs -- one per
+   // `batch_op_groups`-epoch rotation for a resident operator -- so a rolling
+   // window narrower than the full consecutive-miss run of duty epochs makes
+   // the consecutive rail structurally vacuous (records age out and are
+   // pruned before `termcheck` can observe the run) and leaves only the
+   // hair-trigger percent rail. Validate against the live epoch schedule.
+   // Bootstrap installs opreg config before sysio.epoch is configured, so an
+   // absent epochcfg skips the check here; sysio.epoch::setconfig performs
+   // the mirror validation, so no ordering of the two setters can accept a
+   // vacuous pair.
+   {
+      sysio::epoch::epochcfg_t epoch_cfg_tbl(EPOCH_ACCOUNT);
+      if (epoch_cfg_tbl.exists()) {
+         const auto epoch_cfg = epoch_cfg_tbl.get();
+         check(terminate_window_ms >= min_terminate_window_ms(terminate_max_consecutive_misses,
+                                                              epoch_cfg.epoch_duration_sec,
+                                                              epoch_cfg.batch_op_groups),
+               "terminate_window_ms must span at least terminate_max_consecutive_misses + 1 duty rotations");
+      }
+   }
 
    require_no_duplicate_chain_token(req_prod_collat,    "req_prod_collat");
    require_no_duplicate_chain_token(req_batchop_collat, "req_batchop_collat");
    require_no_duplicate_chain_token(req_uw_collat,      "req_uw_collat");
+
+   require_positive_min_bond(req_prod_collat,    "req_prod_collat");
+   require_positive_min_bond(req_batchop_collat, "req_batchop_collat");
+   require_positive_min_bond(req_uw_collat,      "req_uw_collat");
 
    // Stamp every entry's `config_timestamp_ms` with the on-chain time
    // so consumers can detect stale configuration without trusting the
@@ -476,6 +518,26 @@ uint64_t next_dellog_id() {
    ctr.next_dellog_id = id + 1;
    real_ctr.set(ctr, ram_payer);
    return id;
+}
+
+/// Opening edge of the rolling termination window: dellog rows whose `ts_ms`
+/// is strictly below this are invisible to `termcheck` and safe to discard.
+uint64_t termination_window_open_ms(uint64_t now_ms, const opreg::op_config& cfg) {
+   return now_ms > cfg.terminate_window_ms ? now_ms - cfg.terminate_window_ms : 0;
+}
+
+/// Bounded oldest-first sweep of dellog rows that have aged out of the
+/// rolling termination window. `log_id` allocation order matches `ts_ms`
+/// order (both are monotonic), so the primary index walks oldest-first and
+/// the sweep stops at the first still-in-window row.
+void prune_dellog(uint64_t window_open_ms, uint32_t max_rows) {
+   opreg::dellog_t log(name{"sysio.opreg"_n});
+   uint32_t removed = 0;
+   for (auto it = log.begin();
+        it != log.end() && removed < max_rows && it->ts_ms < window_open_ms; ) {
+      it = log.erase(std::move(it));
+      ++removed;
+   }
 }
 
 /// Get the current epoch index from sysio.epoch's epochstate singleton.
@@ -1074,13 +1136,21 @@ void opreg::flushwtdw(uint32_t current_epoch) {
    wtdwqueue_t queue(get_self());
    auto idx = queue.get_index<"byeligible"_n>();
 
-   // Iterate matured rows. Erase as we go, hence the manual cursor.
+   // Iterate matured rows. Erase as we go, hence the manual cursor. Bounded to
+   // MAX_WTDW_FLUSH_PER_EPOCH rows per advance (SEC-78): the remaining matured
+   // rows flush on the next advance, which keeps this epoch-inline action inside
+   // the transaction CPU deadline it shares with the rest of advance's fan-out.
+   // `flushed` is incremented at the top of every iteration, before any of the
+   // per-row `continue` branches, so it counts every attempt.
+   uint32_t flushed = 0;
    auto it = idx.begin();
-   while (it != idx.end() && it->eligible_at_epoch <= current_epoch) {
+   while (it != idx.end() && it->eligible_at_epoch <= current_epoch &&
+          flushed < MAX_WTDW_FLUSH_PER_EPOCH) {
       auto row     = *it;          // copy out before erase
       auto wkey    = withdraw_key{row.request_id};
       // Advance index iterator BEFORE erasing the row.
       ++it;
+      ++flushed;
 
       auto op_pk = operator_key{row.account.value};
       // Per-row outcome lands in the operator's recent_actions log so the
@@ -1421,6 +1491,14 @@ void opreg::terminate(name account, std::string reason) {
 void opreg::recorddel(name account, uint32_t epoch, bool delivered) {
    require_auth(EPOCH_ACCOUNT);
 
+   uint64_t now_ms = current_time_ms();
+
+   // On-write half of the dellog retention contract: sweep a bounded number
+   // of rows that have aged out of the rolling window before adding one.
+   opconfig_t cfg_tbl(get_self());
+   const auto cfg = cfg_tbl.get_or_default(op_config{});
+   prune_dellog(termination_window_open_ms(now_ms, cfg), MAX_DELLOG_PRUNE_PER_WRITE);
+
    dellog_t log(get_self());
    uint64_t id = next_dellog_id();
    log.emplace(ram_payer, delivery_key{id}, delivery_log_entry{
@@ -1428,7 +1506,7 @@ void opreg::recorddel(name account, uint32_t epoch, bool delivered) {
       .account   = account,
       .epoch     = epoch,
       .delivered = delivered,
-      .ts_ms     = current_time_ms(),
+      .ts_ms     = now_ms,
    });
 }
 
@@ -1460,7 +1538,7 @@ void opreg::termcheck(name account) {
    const auto cfg = cfg_tbl.get_or_default(op_config{});
 
    uint64_t now_ms      = current_time_ms();
-   uint64_t window_open = now_ms > cfg.terminate_window_ms ? now_ms - cfg.terminate_window_ms : 0;
+   uint64_t window_open = termination_window_open_ms(now_ms, cfg);
 
    dellog_t log(get_self());
    auto idx = log.get_index<"byaccountts"_n>();
@@ -1499,7 +1577,7 @@ void opreg::termcheck(name account) {
 }
 
 // ---------------------------------------------------------------------------
-//  prune — remove terminated operator rows past the delay
+//  prune — remove terminated operator rows past the delay + expired dellog rows
 // ---------------------------------------------------------------------------
 void opreg::prune() {
    opconfig_t cfg_tbl(get_self());
@@ -1522,6 +1600,10 @@ void opreg::prune() {
          ++it;
       }
    }
+
+   // Crank half of the dellog retention contract: clear delivery-log rows
+   // that have aged out of the rolling termination window.
+   prune_dellog(termination_window_open_ms(now, cfg), MAX_DELLOG_PRUNE_PER_CRANK);
 }
 
 } // namespace sysio

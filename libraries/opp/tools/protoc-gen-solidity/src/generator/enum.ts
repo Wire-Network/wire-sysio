@@ -68,23 +68,40 @@ export function genEnumDefinition(desc: EnumDescriptor): string {
   lines.push(`using {${lib}.isValid} for ${name} global;`)
   lines.push(``)
 
-  // Library with constants and isValid
+  // Library with constants and checked conversions.
   lines.push(`library ${lib} {`)
+  lines.push(`    error InvalidEnumValue(uint64 raw);`)
+  lines.push(``)
 
   for (const val of desc.values) {
-    lines.push(`    ${name} constant ${val.name} = ${name}.wrap(${val.number});`)
+    lines.push(
+      `    ${name} constant ${val.name} = ${name}.wrap(${val.number});`
+    )
   }
 
-  if (desc.values.length > 0) {
-    const maxVal = desc.values.reduce(
-      (max, v) => (v.number > max.number ? v : max),
-      desc.values[0]
-    )
-    lines.push(``)
-    lines.push(`    function isValid(${name} _v) internal pure returns (bool) {`)
-    lines.push(`        return ${name}.unwrap(_v) <= ${name}.unwrap(${maxVal.name});`)
-    lines.push(`    }`)
+  const seenNumbers = new Set<number>()
+  const uniqueValues = desc.values.filter(val => {
+    if (seenNumbers.has(val.number)) return false
+    seenNumbers.add(val.number)
+    return true
+  })
+  const checks = uniqueValues.map(val => `_raw == ${val.number}`).join(" || ")
+
+  lines.push(``)
+  lines.push(`    function isValid(${name} _v) internal pure returns (bool) {`)
+  lines.push(`        uint64 _raw = uint64(${name}.unwrap(_v));`)
+  lines.push(`        return ${checks || "false"};`)
+  lines.push(`    }`)
+
+  lines.push(``)
+  lines.push(
+    `    function fromRaw(uint64 _raw) internal pure returns (${name}) {`
+  )
+  for (const val of uniqueValues) {
+    lines.push(`        if (_raw == ${val.number}) return ${val.name};`)
   }
+  lines.push(`        revert InvalidEnumValue(_raw);`)
+  lines.push(`    }`)
 
   lines.push(`}`)
 

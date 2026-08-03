@@ -1,0 +1,20 @@
+#!/bin/sh
+# Post-removal: deregister the unit. NEVER touches /var/lib/wire/sysio or
+# /var/log/wire/sysio -- chain state and logs survive removal and purge.
+set -e
+
+case "$1" in
+    remove)
+        if [ -d /run/systemd/system ]; then
+            systemctl daemon-reload 2>/dev/null || true
+        fi
+        ;;
+    purge)
+        if [ -e /usr/share/debconf/confmodule ]; then
+            . /usr/share/debconf/confmodule
+            db_purge || true
+        fi
+        ;;
+esac
+
+exit 0

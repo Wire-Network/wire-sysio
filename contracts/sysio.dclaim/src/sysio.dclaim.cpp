@@ -175,6 +175,10 @@ void dclaim::setconfig() {
 void dclaim::setclmwindow(uint32_t window_sec) {
    require_auth(get_self());
    check(window_sec > 0, "window_sec must be positive");
+   // Reject a window so large that `now_sec() + window_sec` overflows uint32 and
+   // wraps the claim expiry into the past, which would let flushexpired prune
+   // freshly credited rewards immediately.
+   check(window_sec <= MAX_CLAIM_WINDOW_SEC, "window_sec exceeds the ten-year ceiling");
    capcfg_t cfg(get_self());
    cap_config c = cfg.get_or_default(cap_config{});
    c.claim_window_sec = window_sec;

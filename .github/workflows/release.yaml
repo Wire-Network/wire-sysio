@@ -1,0 +1,364 @@
+name: "Release Actions"
+
+on:
+  # Manual fallback: publishing a release by hand still populates its assets.
+  # Release-published events always run the DEFAULT branch's workflow file.
+  release:
+    types: [published]
+  # The Strategy-C path: tag-release.yaml dispatches this workflow with the tag it
+  # just created, after dispatching the linux + macOS builds on the same tag ref.
+  # Dispatch is also how a failed asset run is retried against an existing release.
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing release tag to verify and populate (e.g. v1.0.0-rc1)"
+        type: string
+        required: true
+
+permissions:
+  contents: write
+  packages: write
+  actions: read
+
+# One asset run per tag, and NEVER cancel one in flight: a cancelled run can leave
+# a release half-populated, and the workflow is cheap enough to let it finish.
+concurrency:
+  group: release-${{ inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  publish-assets:
+    name: Verify & attach release artifacts
+    runs-on: ubuntu-latest
+    # tag-release.yaml dispatches this workflow at the same moment it dispatches the
+    # platform builds, so this job waits out a full build (linux_amd64_build allows
+    # itself 360 minutes). Kept under the 6h GitHub-hosted job ceiling.
+    timeout-minutes: 350
+    outputs:
+      # The step output names are derived from the workflow file names by
+      # resolve-build-run.sh; the JOB output names stay platform-flavoured for
+      # the experimental-binaries consumer below.
+      linux-run-id: ${{ steps.run.outputs.linux_amd64_build-run-id }}
+      macos-run-id: ${{ steps.run.outputs.macos_arm64_build-run-id }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TAG: ${{ inputs.tag || github.ref_name }}
+    steps:
+      # Check out the TAG's tree, not the workflow ref's. On the Strategy-C path
+      # this workflow is dispatched with --ref master, so a bare checkout would
+      # verify a tag's artifacts with MASTER's verifier scripts -- and a retry
+      # against an older tag would verify it with whatever the scripts have since
+      # become. The tag's own verifiers are the ones that describe its packages.
+      # (`github.ref` is refs/tags/<tag> on the `release: published` path.)
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # actions/checkout@v5
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+
+      - name: Validate the tag
+        run: |
+          set -euo pipefail
+
+          # TAG comes from a workflow_dispatch input on the Strategy-C path, so it
+          # is untrusted text that is about to be spliced into API paths, file
+          # names and a `gh release` target. Pin its shape before anything uses it.
+          # The grammar is cmake-version.py's VERSION_RE -- the ONE definition the
+          # prepare/tag workflows validate against too. NOTE this TIGHTENS the
+          # previous inline pattern, which also accepted an empty-ish or dotted
+          # suffix (v1.0.0-. / v1.0.0-a..b); the canonical grammar is
+          # dot-separated alphanumerics only.
+          python3 .github/scripts/cmake-version.py validate --tag "$TAG" >/dev/null \
+            || { echo "::error::'${TAG}' is not a release tag (expected vX.Y.Z or vX.Y.Z-suffix)" >&2; exit 1; }
+          echo "Publishing assets for ${TAG}"
+
+      - name: Resolve build runs for the released commit
+        id: run
+        run: |
+          set -euo pipefail
+
+          sha=$(gh api "repos/${GITHUB_REPOSITORY}/commits/${TAG}" --jq .sha)
+          echo "Released commit: ${sha}"
+
+          # The resolver (poll loop, tag-ref filtering, candidate dump, budgets)
+          # is byte-identical with wire-cdt's copy of this script; only the
+          # workflows to wait for differ, so they are the arguments. Filtering on
+          # the tag ref is what the script does and it is load-bearing here: the
+          # master-push build sits at the same commit SHA but builds WITHOUT the
+          # system contracts, so matching it would attach a package set with no
+          # contracts bundle. Progress goes to stderr, so this redirect cannot
+          # corrupt $GITHUB_OUTPUT.
+          .github/scripts/resolve-build-run.sh "$TAG" "$sha" \
+            linux_amd64_build.yaml macos_arm64_build.yaml >> "$GITHUB_OUTPUT"
+
+          # The released commit SHA also feeds the source-refs manifest below.
+          echo "sha=${sha}" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # actions/download-artifact@v8.0.1
+        with:
+          name: wire-sysio-packages-amd64
+          path: dist
+          run-id: ${{ steps.run.outputs.linux_amd64_build-run-id }}
+          github-token: ${{ github.token }}
+
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # actions/download-artifact@v8.0.1
+        with:
+          name: wire-sysio-packages-macos-arm64
+          path: dist
+          run-id: ${{ steps.run.outputs.macos_arm64_build-run-id }}
+          github-token: ${{ github.token }}
+
+      # build-metadata.json is TRANSPORT metadata from the linux tag build (the
+      # wire-cdt release the build actually installed) — read it, then remove it
+      # so the verify suite, the checksums list and `gh release upload dist/*`
+      # all see exactly the seven-package set they always have.
+      - name: Extract build metadata
+        id: metadata
+        run: |
+          set -euo pipefail
+          metadata_file="dist/build-metadata.json"
+          [[ -f "$metadata_file" ]] \
+            || { echo "::error::${metadata_file} missing from the linux build artifact (the tag build records the resolved wire-cdt release there)" >&2; exit 1; }
+          cdt_release="$(jq -r '."wire-cdt".release' "$metadata_file")"
+          [[ -n "$cdt_release" && "$cdt_release" != "null" ]] \
+            || { echo "::error::${metadata_file} carries no wire-cdt release" >&2; exit 1; }
+          echo "cdt-release=${cdt_release}" >> "$GITHUB_OUTPUT"
+          rm "$metadata_file"
+          echo "Build used wire-cdt ${cdt_release}"
+
+      - name: Guard release tag matches artifact version
+        run: |
+          set -euo pipefail
+          version="${TAG#v}"
+          ls -la dist/
+          [[ -f "dist/wire-sysio_${version}_amd64.deb" ]] \
+            || { echo "::error::Release tag ${TAG} does not match the artifact version (bump VERSION_* in CMakeLists.txt to match the tag before tagging)"; exit 1; }
+
+      - name: Verify packages (S1-S6)
+        run: |
+          set -euo pipefail
+          version="${TAG#v}"
+          # Passing the version selects the explicit-names mode: the suite owns
+          # the artifact list and the no-bare-tgz-glob rule in one place, shared
+          # with linux_amd64_build.yaml's verification of the same package set.
+          tools/packaging/tests/verify-all.sh dist "$version"
+
+      - name: Verify system contracts bundle
+        run: |
+          set -euo pipefail
+          version="${TAG#v}"
+          bundle="dist/wire-sysio-system-contracts-${version}.tar.gz"
+          [[ -f "$bundle" ]] || { echo "::error::system contracts bundle not found: $bundle"; exit 1; }
+          entries="$(tar tzf "$bundle")"
+          # A tag build compiles the contracts from source, so both halves of every
+          # contract (executable wasm + its abi) must be present.
+          echo "$entries" | grep -q '/sysio\..*\.wasm$' \
+            || { echo "::error::${bundle} contains no sysio.*.wasm"; exit 1; }
+          echo "$entries" | grep -q '/sysio\..*\.abi$' \
+            || { echo "::error::${bundle} contains no sysio.*.abi"; exit 1; }
+          echo "system contracts bundle OK: $(echo "$entries" | grep -c '\.wasm$') wasm, $(echo "$entries" | grep -c '\.abi$') abi"
+
+      # tag-release.yaml dispatched opp-bundles.yaml on the tag ref alongside
+      # the platform builds; by now (after waiting out the builds) its ~10 min
+      # run has long finished. The run is discriminated by head_branch == tag
+      # AND its tag-suffixed published-versions artifact.
+      - name: Resolve the OPP bundles run for the tag
+        id: opp
+        run: |
+          set -euo pipefail
+          .github/scripts/resolve-opp-bundles-run.sh "$TAG" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # actions/download-artifact@v8.0.1
+        with:
+          name: opp-published-versions-${{ env.TAG }}
+          path: opp
+          run-id: ${{ steps.opp.outputs.opp-bundles-run-id }}
+          github-token: ${{ github.token }}
+
+      # The versions manifest is the durable record of what this release is
+      # made of (it replaced the .cicd/defaults.json CDT pin); the source-refs
+      # manifest maps the same components to git refs + commit SHAs. The three
+      # generated model packages repeat wire-sysio's ref/sha — they are
+      # generated from the protos in THIS repo at THIS tag.
+      - name: Generate versions and source-refs manifests
+        env:
+          SHA: ${{ steps.run.outputs.sha }}
+          CDT_RELEASE: ${{ steps.metadata.outputs.cdt-release }}
+        run: |
+          set -euo pipefail
+          version="${TAG#v}"
+
+          opp_versions="opp/opp-published-versions.json"
+          [[ -f "$opp_versions" ]] \
+            || { echo "::error::${opp_versions} missing from the opp-bundles artifact" >&2; exit 1; }
+          typescript_version="$(jq -r '."@wireio/opp-typescript-models"' "$opp_versions")"
+          solidity_version="$(jq -r '."@wireio/opp-solidity-models"' "$opp_versions")"
+          solana_version="$(jq -r '."wire-opp-solana-models"' "$opp_versions")"
+
+          # wire-cdt is public, so the workflow token resolves its tag SHA.
+          cdt_sha="$(gh api "repos/Wire-Network/wire-cdt/commits/${CDT_RELEASE}" --jq .sha)"
+
+          # Repo entries carry their release TAG (v-prefixed); registry entries
+          # carry the published package version exactly as npm/cargo know it.
+          jq -n \
+            --arg sysio "$TAG" \
+            --arg cdt "$CDT_RELEASE" \
+            --arg ts "$typescript_version" \
+            --arg sol "$solidity_version" \
+            --arg solana "$solana_version" \
+            '{
+              "wire-sysio": $sysio,
+              "wire-cdt": $cdt,
+              "@wireio/opp-typescript-models": $ts,
+              "@wireio/opp-solidity-models": $sol,
+              "wire-opp-solana-models": $solana
+            }' > "dist/wire-sysio-versions-${version}.json"
+
+          jq -n \
+            --arg tag "$TAG" \
+            --arg sha "$SHA" \
+            --arg cdt_tag "$CDT_RELEASE" \
+            --arg cdt_sha "$cdt_sha" \
+            '{
+              "wire-sysio":                    { "repo": "Wire-Network/wire-sysio", "ref": $tag,     "sha": $sha },
+              "wire-cdt":                      { "repo": "Wire-Network/wire-cdt",   "ref": $cdt_tag, "sha": $cdt_sha },
+              "@wireio/opp-typescript-models": { "repo": "Wire-Network/wire-sysio", "ref": $tag,     "sha": $sha },
+              "@wireio/opp-solidity-models":   { "repo": "Wire-Network/wire-sysio", "ref": $tag,     "sha": $sha },
+              "wire-opp-solana-models":        { "repo": "Wire-Network/wire-sysio", "ref": $tag,     "sha": $sha }
+            }' > "dist/wire-sysio-source-refs-${version}.json"
+
+          cat "dist/wire-sysio-versions-${version}.json" "dist/wire-sysio-source-refs-${version}.json"
+
+      - name: Attach artifacts to the release
+        run: |
+          set -euo pipefail
+          version="${TAG#v}"
+          # Generated from INSIDE dist/ over an explicit, ordered file list:
+          # `sha256sum dist/*` would write `dist/`-prefixed paths into the file
+          # (useless to a downloader running `sha256sum -c` next to the assets)
+          # and would depend on glob order to avoid hashing the checksums file
+          # itself. Seven package assets + two version manifests + this file =
+          # the ten release assets.
+          (
+            cd dist
+            sha256sum \
+              "wire-sysio_${version}_amd64.deb" \
+              "wire-sysio-dev_${version}_amd64.deb" \
+              "wire-sysio-${version}-x86_64.rpm" \
+              "wire-sysio-dev-${version}-x86_64.rpm" \
+              "wire-sysio-${version}-x86_64.tar.gz" \
+              "wire-sysio-${version}-macos-arm64.tar.gz" \
+              "wire-sysio-system-contracts-${version}.tar.gz" \
+              "wire-sysio-versions-${version}.json" \
+              "wire-sysio-source-refs-${version}.json" \
+              > "wire-sysio-${version}-checksums.txt"
+          )
+          cat "dist/wire-sysio-${version}-checksums.txt"
+          gh release upload "$TAG" dist/* --clobber
+
+      # The component-version and source-ref tables ride the release notes so
+      # the release is self-describing without downloading the JSON assets.
+      # A marker-delimited section keeps retries idempotent: any previous
+      # generated section is stripped before the fresh one is appended.
+      - name: Append component tables to the release notes
+        env:
+          SHA: ${{ steps.run.outputs.sha }}
+          CDT_RELEASE: ${{ steps.metadata.outputs.cdt-release }}
+        run: |
+          set -euo pipefail
+          version="${TAG#v}"
+          versions_json="dist/wire-sysio-versions-${version}.json"
+          refs_json="dist/wire-sysio-source-refs-${version}.json"
+
+          typescript_version="$(jq -r '."@wireio/opp-typescript-models"' "$versions_json")"
+          solidity_version="$(jq -r '."@wireio/opp-solidity-models"' "$versions_json")"
+          solana_version="$(jq -r '."wire-opp-solana-models"' "$versions_json")"
+          cdt_sha="$(jq -r '."wire-cdt".sha' "$refs_json")"
+
+          gh release view "$TAG" --json body --jq .body > body.md
+          # Strip any previous generated section (idempotent retries).
+          sed -i '/<!-- wire-versions:begin -->/,/<!-- wire-versions:end -->/d' body.md
+
+          # printf, not an indented heredoc: every body line must start at
+          # column 0 or GitHub renders the whole section as a code block.
+          {
+            cat body.md
+            printf '%s\n' \
+              "" \
+              "<!-- wire-versions:begin -->" \
+              "## Component versions" \
+              "" \
+              "| Component | Version |" \
+              "|---|---|" \
+              "| wire-sysio | [\`${TAG}\`](https://github.com/Wire-Network/wire-sysio/releases/tag/${TAG}) |" \
+              "| wire-cdt | [\`${CDT_RELEASE}\`](https://github.com/Wire-Network/wire-cdt/releases/tag/${CDT_RELEASE}) |" \
+              "| @wireio/opp-typescript-models | [\`${typescript_version}\`](https://www.npmjs.com/package/@wireio/opp-typescript-models/v/${typescript_version}) |" \
+              "| @wireio/opp-solidity-models | [\`${solidity_version}\`](https://www.npmjs.com/package/@wireio/opp-solidity-models/v/${solidity_version}) |" \
+              "| wire-opp-solana-models | \`${solana_version}\` (cargo registry \`sparse+https://public.crates.pkgs.wire-dev.com/\`) |" \
+              "" \
+              "## Source refs" \
+              "" \
+              "| Component | Ref | Commit |" \
+              "|---|---|---|" \
+              "| wire-sysio | \`${TAG}\` | [\`${SHA:0:7}\`](https://github.com/Wire-Network/wire-sysio/commit/${SHA}) |" \
+              "| wire-cdt | \`${CDT_RELEASE}\` | [\`${cdt_sha:0:7}\`](https://github.com/Wire-Network/wire-cdt/commit/${cdt_sha}) |" \
+              "| @wireio/opp-typescript-models | \`${TAG}\` | [\`${SHA:0:7}\`](https://github.com/Wire-Network/wire-sysio/commit/${SHA}) |" \
+              "| @wireio/opp-solidity-models | \`${TAG}\` | [\`${SHA:0:7}\`](https://github.com/Wire-Network/wire-sysio/commit/${SHA}) |" \
+              "| wire-opp-solana-models | \`${TAG}\` | [\`${SHA:0:7}\`](https://github.com/Wire-Network/wire-sysio/commit/${SHA}) |" \
+              "<!-- wire-versions:end -->"
+          } > body-next.md
+          gh release edit "$TAG" --notes-file body-next.md
+
+      - name: Publish the release
+        run: |
+          # tag-release.yaml creates the release as a DRAFT so no half-populated
+          # release is ever visible. Flipping the draft with GITHUB_TOKEN does NOT
+          # re-fire `release: published`, so this cannot recurse into this workflow.
+          # Stable releases (no version suffix) are explicitly marked `latest`
+          # rather than relying on the API's make_latest default; prereleases
+          # can never hold the latest label, so no flag is passed for them.
+          latest_flag=""
+          [[ "$TAG" != *-* ]] && latest_flag="--latest"
+          gh release edit "$TAG" --draft=false $latest_flag
+
+  experimental-binaries:
+    name: experimental-binaries (ghcr mirror)
+    needs: [publish-assets]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      actions: read
+    steps:
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # actions/download-artifact@v8.0.1
+        with:
+          name: wire-sysio-packages-amd64
+          path: .
+          run-id: ${{ needs.publish-assets.outputs.linux-run-id }}
+          github-token: ${{ github.token }}
+
+      - name: Create Dockerfile
+        run: |
+          cat <<DOCKEREOF > Dockerfile
+          FROM scratch
+          LABEL org.opencontainers.image.description="A collection of experimental Wire binary packages"
+          COPY *.deb /
+          DOCKEREOF
+
+      - name: Login to ghcr
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ github.token }}
+
+      - run: echo "REPOSITORY_OWNER_LOWER=${GITHUB_REPOSITORY_OWNER,,}" >> "${GITHUB_ENV}"
+
+      - name: Build and push wire-sysio-experimental-binaries
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # docker/build-push-action@v6
+        with:
+          push: true
+          tags: ghcr.io/${{ env.REPOSITORY_OWNER_LOWER }}/wire-sysio-experimental-binaries:${{ inputs.tag || github.ref_name }}
+          context: .

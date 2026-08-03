@@ -71,6 +71,24 @@ public:
       BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, abi), true);
       abi_ser.set_abi(std::move(abi), abi_serializer::create_yield_function(abi_serializer_max_time));
 
+      // Normal OPP reserve flows target registered outpost chains. The
+      // never-throw inbound handlers soft-skip unregistered chain_code values
+      // before they can queue outbound replies through sysio.msgch.
+      set_code(CHAINS_ACCOUNT, contracts::chains_wasm());
+      set_abi(CHAINS_ACCOUNT, contracts::chains_abi().data());
+      set_privileged(CHAINS_ACCOUNT);
+      produce_blocks();
+      {
+         const auto* chains = control->find_account_metadata(CHAINS_ACCOUNT);
+         BOOST_REQUIRE(chains != nullptr);
+         abi_def chains_abi_def;
+         BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(chains->abi, chains_abi_def), true);
+         chains_abi_ser.set_abi(std::move(chains_abi_def),
+                                abi_serializer::create_yield_function(abi_serializer_max_time));
+      }
+      BOOST_REQUIRE_EQUAL(success(), regchain(ChainKind::CHAIN_KIND_EVM, "ETH", 1));
+      BOOST_REQUIRE_EQUAL(success(), regchain(ChainKind::CHAIN_KIND_SVM, "SOLANA", 2));
+
       // WIRE custody backing: deploy sysio.token + issue the treasury supply
       // to `sysio` so regreserve's treasury drain and the paywire/refundwire
       // payouts move real tokens.
@@ -104,6 +122,17 @@ public:
 
    action_result push_token_action(name signer, name action_name, const variant_object& data) {
       return push_to(TOKEN_ACCOUNT, token_abi_ser, signer, action_name, data);
+   }
+
+   action_result regchain(ChainKind kind,
+                          std::string_view code,
+                          uint32_t external_chain_id) {
+      return push_to(CHAINS_ACCOUNT, chains_abi_ser, CHAINS_ACCOUNT, "regchain"_n, mvo()
+         ("kind",              kind)
+         ("code",              codename_mvo(code))
+         ("external_chain_id", external_chain_id)
+         ("name",              std::string("outpost"))
+         ("description",       std::string{}));
    }
 
    action_result push_to(name account, abi_serializer& ser, name signer,
@@ -249,9 +278,19 @@ public:
          ("pub_key",    pub));
    }
 
+   /// Deploy sysio.msgch so inline queueout actions execute in tests that
+   /// need to prove a reserve handler cannot trip msgch's hard chain guard.
+   void deploy_msgch() {
+      set_code(MSGCH_ACCOUNT, contracts::msgch_wasm());
+      set_abi(MSGCH_ACCOUNT, contracts::msgch_abi().data());
+      set_privileged(MSGCH_ACCOUNT);
+      produce_blocks();
+   }
+
    abi_serializer abi_ser;
    abi_serializer token_abi_ser;
    abi_serializer authex_abi_ser;
+   abi_serializer chains_abi_ser;
 };
 
 BOOST_AUTO_TEST_SUITE(sysio_reserve_tests)
@@ -367,6 +406,30 @@ BOOST_FIXTURE_TEST_CASE(oncrtreserve_requires_msgch_auth, sysio_reserve_tester) 
       ("is_private",            false)
       ("creator_pub_key",       std::vector<char>(33, '\x02'))
    ).find("missing authority of sysio.msgch") != std::string::npos);
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(oncrtreserve_unregistered_chain_soft_skips_before_queueout, sysio_reserve_tester) { try {
+   // Deploy msgch so the inline RESERVE_CREATE_CANCELLED queueout would execute.
+   // Pre-guard, the unlinked-creator cancel path inserted a CANCELLED row and
+   // then aborted inside sysio.msgch::queueout's hard chain registration check.
+   deploy_msgch();
+
+   BOOST_REQUIRE_EQUAL(success(), push_action(MSGCH_ACCOUNT, "oncrtreserve"_n, mvo()
+      ("chain_code",            codename_mvo("NOCHAIN"))
+      ("token_code",            codename_mvo("ETH"))
+      ("reserve_code",          codename_mvo("USERRES"))
+      ("name",                  "user reserve")
+      ("description",           "")
+      ("external_token_amount", 1000)
+      ("requested_wire_amount", 1000)
+      ("source_token_precision", 9u)
+      ("connector_weight_bps",  5000)
+      ("creator_chain_kind",    ChainKind::CHAIN_KIND_EVM)
+      ("creator_chain_addr",    std::vector<char>(20, '\x01'))
+      ("is_private",            false)
+      ("creator_pub_key",       std::vector<char>(33, '\x02'))));
+
+   BOOST_REQUIRE(find_reserve("NOCHAIN", "ETH", "USERRES").is_null());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(oncrtreserve_unlinked_creator_is_cancelled, sysio_reserve_tester) { try {
@@ -763,16 +826,46 @@ BOOST_FIXTURE_TEST_CASE(paywire_rejects_overdraw, sysio_reserve_tester) { try {
 
 BOOST_FIXTURE_TEST_CASE(refundwire_returns_escrow, sysio_reserve_tester) { try {
    // Seed custody via a bootstrap reserve (the refund itself touches no
-   // reserve row — it returns in-flight escrow).
+   // reserve row — it returns in-flight escrow). Zero revert fee: a no-fault
+   // refund returns the full escrow.
    BOOST_REQUIRE_EQUAL(success(),
       regreserve("ETH", "ETH", "PRIMARY", 1000, 1000));
 
    BOOST_REQUIRE_EQUAL(success(), push_action(UWRIT_ACCOUNT, "refundwire"_n, mvo()
-      ("recipient",   "alice")
-      ("wire_amount", 150)));
+      ("recipient",      "alice")
+      ("wire_amount",    150)
+      ("revert_fee_bps", 0)));
 
    BOOST_REQUIRE_EQUAL(150, wire_balance("alice"_n));
    BOOST_REQUIRE_EQUAL(850, wire_balance(RESERVE_ACCOUNT));
+
+   auto r = find_reserve("ETH", "ETH", "PRIMARY");
+   BOOST_REQUIRE_EQUAL(1000, r["reserve_wire_amount"].as_uint64());   // untouched
+
+   BOOST_REQUIRE(get_rewardbkt().is_null());   // no fee — nothing accrued
+} FC_LOG_AND_RETHROW() }
+
+// A nonzero revert fee (caller-fault drain revert) is taken out of the refund
+// and routed exactly like a settlement fee: rewards share into the bucket
+// (custody-internal), emissions share transferred to the treasury. Integer
+// split: 10% of 150 = 15 -> rewards floor(15/2) = 7, emissions 8; the shares
+// sum to the fee exactly.
+BOOST_FIXTURE_TEST_CASE(refundwire_routes_revert_fee, sysio_reserve_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(),
+      regreserve("ETH", "ETH", "PRIMARY", 1000, 1000));
+
+   BOOST_REQUIRE_EQUAL(success(), push_action(UWRIT_ACCOUNT, "refundwire"_n, mvo()
+      ("recipient",      "alice")
+      ("wire_amount",    150)
+      ("revert_fee_bps", 1000)));   // 10%
+
+   BOOST_REQUIRE_EQUAL(135, wire_balance("alice"_n));            // 150 - 15 fee
+   BOOST_REQUIRE_EQUAL(857, wire_balance(RESERVE_ACCOUNT));      // 1000 - 135 - 8 emissions
+
+   auto bkt = get_rewardbkt();
+   BOOST_REQUIRE(!bkt.is_null());
+   BOOST_REQUIRE_EQUAL(7u, bkt["balance"].as_uint64());
+   BOOST_REQUIRE_EQUAL(7u, bkt["lifetime_accrued"].as_uint64());
 
    auto r = find_reserve("ETH", "ETH", "PRIMARY");
    BOOST_REQUIRE_EQUAL(1000, r["reserve_wire_amount"].as_uint64());   // untouched

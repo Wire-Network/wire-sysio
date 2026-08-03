@@ -5,7 +5,7 @@ elseif(NOT CMAKE_CXX_STANDARD)
    set(CMAKE_CXX_STANDARD_REQUIRED ON)
 endif()
 
-file(GLOB UNIT_TESTS "*.cpp")
+file(GLOB UNIT_TESTS CONFIGURE_DEPENDS "*.cpp")
 add_executable( custom_appbase_test ${UNIT_TESTS} )
 target_link_libraries( custom_appbase_test appbase fc ${CMAKE_DL_LIBS} ${PLATFORM_SPECIFIC_LIBS} )
 target_include_directories( custom_appbase_test PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../include" "${CMAKE_CURRENT_SOURCE_DIR}/../../appbase/include" )

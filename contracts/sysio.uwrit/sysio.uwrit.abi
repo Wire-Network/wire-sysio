@@ -244,6 +244,14 @@
                 {
                     "name": "collateral_lock_duration_ms",
                     "type": "uint64"
+                },
+                {
+                    "name": "min_fromwire_amount",
+                    "type": "uint64"
+                },
+                {
+                    "name": "fromwire_revert_fee_bps",
+                    "type": "uint32"
                 }
             ]
         },
@@ -328,6 +336,14 @@
                 {
                     "name": "collateral_lock_duration_ms",
                     "type": "uint64"
+                },
+                {
+                    "name": "min_fromwire_amount",
+                    "type": "uint64"
+                },
+                {
+                    "name": "fromwire_revert_fee_bps",
+                    "type": "uint32"
                 }
             ]
         },

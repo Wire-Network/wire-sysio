@@ -27,7 +27,6 @@ struct mock_connections_manager {
    std::vector<std::shared_ptr<mock_connection>> connections;
 
    std::function<void(std::string, std::string)> resolve_and_connect;
-   std::function<void(std::string)> disconnect_gossip_connection;
 
    uint32_t get_max_client_count() const { return max_client_count; }
 
@@ -160,22 +159,35 @@ const sysio::chain::name_set_t producers_minus_prodkt{
 
 const sysio::chain::producer_authority_schedule reset_schedule1{ 1, {} };
 
+/// address_set_t is unordered; sort into a vector for stable comparisons
+template <typename Set>
+std::vector<std::string> sorted(const Set& addresses) {
+   std::vector<std::string> result(addresses.begin(), addresses.end());
+   std::ranges::sort(result);
+   return result;
+}
+
 BOOST_AUTO_TEST_CASE(test_on_pending_schedule) {
 
    mock_net_plugin plugin;
    plugin.setup_test_peers();
-   plugin.pending_bps = { "prodj"_n, "prodm"_n };
+   plugin.set_pending_bps({ "prodj"_n, "prodm"_n });
 
    std::vector<std::string> connected_hosts;
 
-   plugin.connections.resolve_and_connect = [&connected_hosts](std::string host, std::string p2p_address) { connected_hosts.push_back(host); };
+   plugin.connections.resolve_and_connect = [&connected_hosts, &plugin](std::string host, std::string p2p_address) {
+      // the new pending set must be published before any dial goes out, otherwise a concurrent
+      // connection_monitor pass could prune the just-established pending-only connections
+      BOOST_TEST(plugin.get_pending_bps() == producers_minus_prodkt);
+      connected_hosts.push_back(host);
+   };
 
    // make sure nothing happens when it is not in_sync
    plugin.lib_catchup = true;
    plugin.on_pending_schedule(test_schedule1);
 
    BOOST_CHECK_EQUAL(connected_hosts, (std::vector<std::string>{}));
-   BOOST_TEST(plugin.pending_bps == (sysio::chain::name_set_t{ "prodj"_n, "prodm"_n }));
+   BOOST_TEST(plugin.get_pending_bps() == (sysio::chain::name_set_t{ "prodj"_n, "prodm"_n }));
    BOOST_CHECK_EQUAL(plugin.pending_schedule_version, 0u);
 
    // when it is in sync and on_pending_schedule is called
@@ -183,7 +195,7 @@ BOOST_AUTO_TEST_CASE(test_on_pending_schedule) {
    plugin.on_pending_schedule(test_schedule1);
 
    // the pending are connected to
-   BOOST_TEST(plugin.pending_bps == producers_minus_prodkt);
+   BOOST_TEST(plugin.get_pending_bps() == producers_minus_prodkt);
 
    // all connect to bp peers should be invoked
    std::ranges::sort(connected_hosts);
@@ -200,7 +212,7 @@ BOOST_AUTO_TEST_CASE(test_on_pending_schedule) {
    BOOST_CHECK_EQUAL(connected_hosts, (std::vector<std::string>{}));
 
    plugin.on_pending_schedule(reset_schedule1);
-   BOOST_TEST(plugin.pending_bps == sysio::chain::name_set_t{});
+   BOOST_TEST(plugin.get_pending_bps() == sysio::chain::name_set_t{});
 }
 
 BOOST_AUTO_TEST_CASE(test_on_active_schedule1) {
@@ -211,14 +223,10 @@ BOOST_AUTO_TEST_CASE(test_on_active_schedule1) {
    plugin.set_active_bps( { "proda"_n, "prodh"_n, "prodn"_n, "prodt"_n } );
    plugin.connections.resolve_and_connect = [](std::string host, std::string p2p_address) {};
 
-   std::vector<std::string> disconnected_hosts;
-   plugin.connections.disconnect_gossip_connection = [&disconnected_hosts](std::string host) { disconnected_hosts.push_back(host); };
-
    // make sure nothing happens when it is not in_sync
    plugin.lib_catchup = true;
    plugin.on_active_schedule(test_schedule1);
 
-   BOOST_CHECK_EQUAL(disconnected_hosts, (std::vector<std::string>{}));
    BOOST_TEST(plugin.get_active_bps() == (sysio::chain::name_set_t{ "proda"_n, "prodh"_n, "prodn"_n, "prodt"_n }));
    BOOST_CHECK_EQUAL(plugin.active_schedule_version, 0u);
 
@@ -226,13 +234,14 @@ BOOST_AUTO_TEST_CASE(test_on_active_schedule1) {
    plugin.lib_catchup = false;
    plugin.on_pending_schedule(test_schedule1);
    plugin.on_active_schedule(test_schedule1);
-   // then disconnect to prodt
-   BOOST_CHECK_EQUAL(disconnected_hosts, (std::vector<std::string>{ "127.0.0.1:8020"s }));
 
    BOOST_TEST(plugin.get_active_bps() == producers_minus_prodkt);
 
    // make sure we change the active_schedule_version
    BOOST_CHECK_EQUAL(plugin.active_schedule_version, 1u);
+
+   // prodt is configured but neither active nor pending: the connection monitor prunes its address
+   BOOST_CHECK_EQUAL(sorted(plugin.gossip_bp_addresses_to_drop()), (std::vector<std::string>{ "127.0.0.1:8020"s }));
 }
 
 BOOST_AUTO_TEST_CASE(test_on_active_schedule2) {
@@ -242,20 +251,65 @@ BOOST_AUTO_TEST_CASE(test_on_active_schedule2) {
 
    plugin.set_active_bps( { "proda"_n, "prodh"_n, "prodn"_n, "prodt"_n } );
    plugin.connections.resolve_and_connect = [](std::string host, std::string p2p_address) {};
-   std::vector<std::string> disconnected_hosts;
-   plugin.connections.disconnect_gossip_connection = [&disconnected_hosts](std::string host) { disconnected_hosts.push_back(host); };
 
    // when pending and active schedules are changed simultaneously
    plugin.lib_catchup = false;
    plugin.on_pending_schedule(test_schedule2);
    plugin.on_active_schedule(test_schedule1);
-   // then disconnect prodt
-   BOOST_CHECK_EQUAL(disconnected_hosts, (std::vector<std::string>{ "127.0.0.1:8020"s }));
 
    BOOST_TEST(plugin.get_active_bps() == producers_minus_prodkt);
 
    // make sure we change the active_schedule_version
    BOOST_CHECK_EQUAL(plugin.active_schedule_version, 1u);
+
+   // prodt is configured but neither in the active nor in the pending schedule
+   BOOST_CHECK_EQUAL(sorted(plugin.gossip_bp_addresses_to_drop()), (std::vector<std::string>{ "127.0.0.1:8020"s }));
+}
+
+BOOST_AUTO_TEST_CASE(test_drop_out_of_gossip_group) {
+
+   mock_net_plugin plugin;
+   plugin.setup_test_peers();
+   // this node's own bp account (prodt) participates in bp gossip
+   plugin.set_bp_producer_peers({ "prodt,127.0.0.1:8020,127.0.0.1"s });
+   plugin.connections.resolve_and_connect = [](std::string host, std::string p2p_address) {};
+   plugin.lib_catchup = false;
+
+   // prodt was active, and is in neither the new active schedule nor the pending one: drop out
+   plugin.set_active_bps({ "proda"_n, "prodt"_n });
+   plugin.on_active_schedule(test_schedule1);
+
+   BOOST_CHECK(!plugin.connect_bp_gossip_peers);
+
+   // out of the gossip group every known bp peer address is pruned
+   std::vector<std::string> all_configured_addresses = peer_addresses;
+   all_configured_addresses.push_back("127.0.0.1:8020"s);
+   std::ranges::sort(all_configured_addresses);
+   BOOST_CHECK_EQUAL(sorted(plugin.gossip_bp_addresses_to_drop()), all_configured_addresses);
+
+   // a new pending schedule re-enters the gossip group and shrinks the prune set again
+   plugin.on_pending_schedule(test_schedule2);
+   BOOST_CHECK(plugin.connect_bp_gossip_peers);
+   BOOST_CHECK_EQUAL(sorted(plugin.gossip_bp_addresses_to_drop()), (std::vector<std::string>{ "127.0.0.1:8020"s }));
+}
+
+BOOST_AUTO_TEST_CASE(test_no_drop_out_while_pending) {
+
+   mock_net_plugin plugin;
+   plugin.setup_test_peers();
+   plugin.set_bp_producer_peers({ "prodt,127.0.0.1:8020,127.0.0.1"s });
+   plugin.connections.resolve_and_connect = [](std::string host, std::string p2p_address) {};
+   plugin.lib_catchup = false;
+
+   // prodt leaves the active schedule but is still in the pending one: stay in the gossip group
+   plugin.set_active_bps({ "proda"_n, "prodt"_n });
+   plugin.set_pending_bps({ "prodt"_n });
+   plugin.on_active_schedule(test_schedule1);
+
+   BOOST_CHECK(plugin.connect_bp_gossip_peers);
+
+   // prodt's own address stays connected while prodt is pending
+   BOOST_CHECK_EQUAL(sorted(plugin.gossip_bp_addresses_to_drop()), (std::vector<std::string>{}));
 }
 
 BOOST_AUTO_TEST_CASE(test_exceeding_connection_limit) {

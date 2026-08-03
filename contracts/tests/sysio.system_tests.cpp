@@ -291,7 +291,6 @@ fc::mutable_variant_object config_to_variant( const sysio::chain::chain_config& 
       ( "max_block_net_usage", config.max_block_net_usage )
       ( "target_block_net_usage_pct", config.target_block_net_usage_pct )
       ( "max_transaction_net_usage", config.max_transaction_net_usage )
-      ( "base_per_transaction_net_usage", config.base_per_transaction_net_usage )
       ( "context_free_discount_net_usage_num", config.context_free_discount_net_usage_num )
       ( "context_free_discount_net_usage_den", config.context_free_discount_net_usage_den )
       ( "max_block_cpu_usage", config.max_block_cpu_usage )

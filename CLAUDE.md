@@ -296,7 +296,7 @@ FC_REFLECT_ENUM(my_namespace::my_enum, (value1)(value2)(value3))
 
 ## Git Practices
 
-**NEVER use `git add -A` or `git add .`** — these will stage build artifacts, core dumps, submodules, and other untracked files. Always stage specific files by name.
+`git add -A` / `git add .` are fine — an authorized commit stages the whole working tree rather than silently omitting files someone judged "unrelated". Build artifacts, core dumps, and CDT-generated `.actions.cpp`/`.dispatch.cpp`/`.desc` files are kept out by `.gitignore`; if something untracked shows up that shouldn't be committed, fix the ignore rules rather than hand-picking paths at stage time.
 
 ## Documentation Comments
 
@@ -344,7 +344,7 @@ OPP is a protocol (encoding scheme) that uses protobufs; the library is located 
 The protobufs are located at [libraries/opp/proto](libraries/opp/proto).
 
 After updating the protobufs:
-- **TS/JS packages**: Run `cd wire-sysio/libraries/opp/tools && ./generate-opp-bundles.fish` to regenerate the TypeScript/Solidity/Solana model packages (`@wireio/opp-typescript-models`, etc.) consumed by `wire-e2e-tests`, `wire-ethereum`, and other JS/TS repos.
+- **TS/JS packages**: Run `cd wire-sysio/libraries/opp/tools && ./scripts/generate-opp-bundles.sh` to regenerate the TypeScript/Solidity/Solana model packages (`@wireio/opp-typescript-models`, etc.) consumed by `wire-e2e-tests`, `wire-ethereum`, and other JS/TS repos.
 - **C++ (host + CDT/WASM)**: Both host protobuf headers (`.pb.h` via `protoc`) and CDT contract headers (`.pb.hpp` via `protoc-gen-zpp`) are generated automatically by CMake `add_dependency` targets when the project is configured/built. No manual step required — just rebuild.
 
 ### Local OPP Model Location (Optional in development environments)
@@ -353,7 +353,7 @@ If you are developing on a local machine and `<wire-sysio>/../wire-opp` exists,
 then PNPM/NPM & other repos (i.e. `wire-ethereum`, `wire-e2e-tests`, etc.) will look for the OPP protobufs
 and generated types in that location.
 
-If the directory exists, when `./generate-opp-bundles.fish` is run, the generated protobuf bundles will be copied to
+If the directory exists, when `./scripts/generate-opp-bundles.sh` is run, the generated protobuf bundles will be copied to
 `<wire-sysio>/../wire-opp/{typescript,solidity,solana}/`.
 
 ## Docker Build
@@ -413,13 +413,13 @@ done
 
 To generate the client types for the system contracts,run the following commands.
 
-`<wire-sysio>/contracts/tools/generate-system-contract-types.py -B . -O /tmp/ctt -P snake -f` then `cp
-  /tmp/ctt/typescript/SystemContractTypes.ts  <wire-libraries-ts>/packages/sdk-core/src/types/` and lastly run `cd <wire-libraries-ts> &&
+`<wire-sysio>/contracts/tools/generate-sysio-contract-types.py -B . -O /tmp/ctt -P snake -f` then `cp
+  /tmp/ctt/typescript/SysioContractTypes.ts  <wire-libraries-ts>/packages/sdk-core/src/types/` and lastly run `cd <wire-libraries-ts> &&
   pnpm build`
 
 This makes the types available in the SDK as:
 ```ts
-import { SystemContracts } from '@wire-libraries/sdk-core';
+import { SysioContracts } from '@wire-libraries/sdk-core';
 ```
 
 

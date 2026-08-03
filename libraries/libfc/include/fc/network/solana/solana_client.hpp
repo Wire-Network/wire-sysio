@@ -51,6 +51,16 @@ struct solana_confirm_options {
 
 inline constexpr solana_confirm_options solana_confirm_option_defaults{};
 
+/**
+ * @brief Maximum nested IDL type descents during Borsh size estimation and decoding.
+ */
+inline constexpr size_t max_idl_type_nesting_depth = 32;
+
+/**
+ * @brief Maximum materialized elements for an IDL vector whose element encoding can consume zero bytes.
+ */
+inline constexpr uint32_t max_zero_sized_idl_vector_elements = 64u * 1024u;
+
 class solana_client;
 using solana_client_ptr = std::shared_ptr<solana_client>;
 
@@ -494,6 +504,28 @@ public:
                        commitment_t commitment = commitment_t::confirmed);
 
 private:
+   /**
+    * @brief Decode an IDL value while enforcing the shared nesting limit.
+    *
+    * @param decoder Borsh decoder (position advances as data is read)
+    * @param type IDL type definition
+    * @param type_depth Number of nested type descents already taken
+    * @return Decoded value as fc::variant
+    */
+   fc::variant decode_type(borsh::decoder& decoder, const idl::idl_type& type, size_t type_depth);
+
+   /**
+    * @brief Decode IDL fields using the supplied nesting depth.
+    *
+    * Sibling fields share the same depth so only nested type relationships consume the limit.
+    *
+    * @param decoder Borsh decoder (position advances as data is read)
+    * @param fields List of field definitions
+    * @param type_depth Number of nested type descents already taken
+    * @return Decoded fields as variant object
+    */
+   fc::variant decode_fields(borsh::decoder& decoder, const std::vector<idl::field>& fields, size_t type_depth);
+
    fc::threadsafe_map<std::string, idl::instruction> _idl_map{};
    std::shared_ptr<idl::program> _program;
 };
@@ -514,13 +546,25 @@ public:
     *
     * @param sig_provider Signature provider for signing transactions (ED25519)
     * @param url_source The URL of the Solana RPC node
+    * @param rpc_options authenticated transport and bounded request policy
     */
-   solana_client(const signature_provider_ptr& sig_provider, const std::variant<std::string, fc::url>& url_source);
+   solana_client(const signature_provider_ptr& sig_provider,
+                 const std::variant<std::string, fc::url>& url_source,
+                 client_options rpc_options = {});
 
    /**
     * @brief Execute a raw JSON-RPC method call
     */
    fc::variant execute(const std::string& method, const fc::variant& params);
+
+   /**
+    * @brief Execute an explicitly read-only RPC with stale-connection recovery.
+    *
+    * The request may be replayed once only when an existing cached connection
+    * proves stale. Transaction submission and airdrop methods must use
+    * `execute`.
+    */
+   fc::variant execute_idempotent(const std::string& method, const fc::variant& params);
 
    /**
     * @brief Get the signer's public key

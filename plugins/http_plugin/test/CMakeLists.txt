@@ -1,4 +1,4 @@
-file(GLOB UNIT_TESTS "*.cpp")
+file(GLOB UNIT_TESTS CONFIGURE_DEPENDS "*.cpp")
 
 add_executable( http_plugin_unit_tests ${UNIT_TESTS})
 

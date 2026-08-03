@@ -1,0 +1,17 @@
+#!/bin/sh
+# Debconf question flow for wire-sysio: ask whether to register the systemd
+# service; if yes, ask whether to enable it at boot (which also starts it).
+set -e
+
+. /usr/share/debconf/confmodule
+
+db_input high wire-sysio/install-service || true
+db_go || true
+
+db_get wire-sysio/install-service
+if [ "$RET" = "true" ]; then
+    db_input high wire-sysio/enable-service || true
+    db_go || true
+fi
+
+exit 0

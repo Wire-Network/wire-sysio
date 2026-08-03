@@ -197,24 +197,6 @@ FC_REFLECT_ENUM(sysio::opp::types::NodeOwnerTier,
    (NODE_OWNER_TIER_T2)
    (NODE_OWNER_TIER_T3))
 
-// ---------------------------------------------------------------------------
-//  Encoding enums
-// ---------------------------------------------------------------------------
-
-FC_REFLECT_ENUM(sysio::opp::types::Endianness,
-   (ENDIANNESS_BIG)
-   (ENDIANNESS_LITTLE))
-
-FC_REFLECT_ENUM(sysio::opp::types::HashAlgorithm,
-   (HASH_ALGORITHM_KECCAK256)
-   (HASH_ALGORITHM_SHA256)
-   (HASH_ALGORITHM_RESERVED_1)
-   (HASH_ALGORITHM_RESERVED_2))
-
-FC_REFLECT_ENUM(sysio::opp::types::LengthEncoding,
-   (LENGTH_ENCODING_VARUINT)
-   (LENGTH_ENCODING_UINT32))
-
 FC_REFLECT_ENUM(sysio::opp::types::StakeStatus,
    (STAKE_STATUS_UNKNOWN)
    (STAKE_STATUS_WARMUP)

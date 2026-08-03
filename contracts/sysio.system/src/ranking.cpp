@@ -6,6 +6,7 @@
 #include <sysio/serialize.hpp>
 
 #include <sysio.system/sysio.system.hpp>
+#include <sysio.system/opreg_status.hpp>
 #include <sysio.token/sysio.token.hpp>
 
 #include <type_traits>
@@ -96,9 +97,31 @@ namespace sysiosystem {
       top_producers.reserve(max_producers);
       proposed_finalizers.reserve(max_producers);
 
+      // Standbys (rank above max_producers, up to standby_end_rank) may backfill
+      // active slots vacated by ineligible producers, so the schedule stays at
+      // max_producers whenever replacements exist. standby_end_rank is
+      // governance-tunable on the emitcfg singleton (>= 22, capped by
+      // setemitcfg); before emissions config is installed there are no standbys,
+      // so fall back to max_producers.
+      uint32_t schedule_rank_limit = max_producers;
+      emissions::emitcfg_t emitcfg( get_self() );
+      if( emitcfg.exists() ) {
+         schedule_rank_limit = emitcfg.get().standby_end_rank;
+      }
+
       for( auto it = idx.cbegin(); it != idx.cend() && top_producers.size() < max_producers; ++it ) {
-         if( it->rank > max_producers ) break;   // no more ranked producers
+         if( it->rank > schedule_rank_limit ) break;   // past the last standby
          if( !it->active() ) continue;
+
+         // A producer must be a live, collateral-backed producer operator in
+         // sysio.opreg. A producer that withdrew collateral (status UNKNOWN),
+         // was slashed, or was terminated is no longer OPERATOR_STATUS_ACTIVE
+         // and must not be scheduled. Requiring OPERATOR_TYPE_PRODUCER prevents
+         // an account that is ACTIVE only as a different operator type (e.g. a
+         // batch operator, backed by different collateral) from being scheduled.
+         if( !is_op_active( it->owner, sysio::opp::types::OperatorType::OPERATOR_TYPE_PRODUCER ) ) {
+            continue;
+         }
 
          // Require active finalizer key for all scheduled producers
          auto fin_key = finalizer_key_t{it->owner.value};
@@ -120,7 +143,14 @@ namespace sysiosystem {
          );
       }
 
-      if( top_producers.empty() || top_producers.size() < _gstate.last_producer_schedule_size ) {
+      // Never publish a schedule (and its lock-step finalizer policy) smaller
+      // than the BFT safety floor. If fewer producers are collateral-eligible,
+      // retain the last good schedule and finalizer policy rather than
+      // concentrate block production and finality onto too few nodes. This
+      // early return precedes both set_proposed_producers and
+      // set_proposed_finalizers, so below the floor neither is changed and the
+      // two stay in lock-step. min_schedule_size >= 1 subsumes the empty check.
+      if( top_producers.size() < min_schedule_size ) {
          return;
       }
 

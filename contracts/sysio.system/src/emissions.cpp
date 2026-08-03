@@ -1,5 +1,6 @@
 #include <sysio.system/sysio.system.hpp>
 #include <sysio.system/emissions.hpp>
+#include <sysio.system/opreg_status.hpp>
 
 #include <sysio/opp/types/types.pb.hpp>
 #include <sysio.opp.common/opp_table_types.hpp>
@@ -24,10 +25,6 @@ using namespace emissions;
 // ---------------------------------------------------------------------------
 // Well-known OPP accounts.
 // ---------------------------------------------------------------------------
-
-namespace opreg_refs {
-   constexpr sysio::name account = "sysio.opreg"_n;
-}
 
 namespace epoch_refs {
    constexpr sysio::name account = "sysio.epoch"_n;
@@ -73,7 +70,7 @@ using sysio::asset;
 using sysio::current_time_point;
 using sysio::name;
 using sysio::time_point_sec;
-using sysio::opp::types::OperatorStatus;
+using sysio::opp::types::OperatorType;
 
 // ---------------------------------------------------------------------------
 // Pure helpers
@@ -164,16 +161,6 @@ int64_t get_reserv_rewards_balance() {
    const uint64_t bal = bkt.get_or_default(reserv_rewards_bucket{}).balance;
    constexpr uint64_t max_amt = static_cast<uint64_t>(sysio::asset::max_amount);
    return bal > max_amt ? sysio::asset::max_amount : static_cast<int64_t>(bal);
-}
-
-// Returns true iff the account is registered in sysio.opreg with AVAILABLE
-// status (OPERATOR_STATUS_ACTIVE). Slashed/terminated/unknown all return false.
-// Non-registered accounts return false.
-bool is_op_active(name account) {
-   sysio::opreg::operators_t ops(opreg_refs::account);
-   auto key = sysio::opreg::operator_key{account.value};
-   if (!ops.contains(key)) return false;
-   return ops.get(key).status == OperatorStatus::OPERATOR_STATUS_ACTIVE;
 }
 
 // ---------------------------------------------------------------------------
@@ -277,6 +264,12 @@ void system_contract::setemitcfg(const emissions::emission_config& cfg) {
    const bool epoch_configured = epoch_cfg_tbl.exists();
    const uint32_t epoch_secs   = epoch_configured ? epoch_cfg_tbl.get().epoch_duration_sec : 0;
 
+   // Single read of t5_state shared by the period-accrual bound (which needs
+   // the already-accrued pending amount) and the post-init brick guards below.
+   t5state_t t5s(get_self());
+   const bool t5_initialized = t5s.exists();
+   const t5_state t5now      = t5_initialized ? t5s.get() : t5_state{};
+
    // If sysio.epoch is configured, sanity-check that each nonzero annual
    // value scales to a non-zero per-epoch share at the canonical
    // epoch_duration_sec. Without this guard, a tiny annual value can round
@@ -296,20 +289,29 @@ void system_contract::setemitcfg(const emissions::emission_config& cfg) {
          sysio::check(emissions::scale_annual_to_epoch(cfg.annual_min_emission, epoch_secs) > 0,
                        "annual_min_emission per-epoch share rounds to 0 at current epoch_duration_sec");
       }
+
+      // Bound the pay-period accumulation: anything already pending plus a
+      // full cadence of ceiling-rate epochs must fit in the asset range.
+      // Without this, pending_emission_amount can saturate at asset::max_amount
+      // mid-period (see saturating_accrue), after which the pay-epoch readiness
+      // gate demands a balance no treasury can hold and epoch advancement
+      // blocks permanently. sysio.epoch::setconfig enforces the same bound when
+      // epoch_duration_sec changes.
+      sysio::check(
+         emissions::period_accrual_fits_asset_range(cfg, epoch_secs, t5now.pending_emission_amount),
+         "per-epoch emission ceiling x pay_cadence_epochs exceeds the asset range at current epoch_duration_sec");
    }
 
    // If t5_state already exists, prevent config changes that would brick future
    // emissions. Post-init, remaining distributable must still cover what's been
    // paid, and the per-epoch floor (derived from annual_min_emission and the
    // canonical epoch_duration_sec) can't exceed what's left to distribute.
-   // initt5 requires sysio.epoch to be configured, so t5s.exists() implies
+   // initt5 requires sysio.epoch to be configured, so t5_initialized implies
    // epoch_configured -- safe to use epoch_secs directly.
-   t5state_t t5s(get_self());
-   if (t5s.exists()) {
-      const auto state = t5s.get();
-      sysio::check(cfg.t5_distributable >= cfg.t5_floor + state.total_distributed,
+   if (t5_initialized) {
+      sysio::check(cfg.t5_distributable >= cfg.t5_floor + t5now.total_distributed,
                     "t5_distributable must cover floor + already-distributed");
-      const int64_t remaining = cfg.t5_distributable - cfg.t5_floor - state.total_distributed;
+      const int64_t remaining = cfg.t5_distributable - cfg.t5_floor - t5now.total_distributed;
       const int64_t per_epoch_min =
          emissions::scale_annual_to_epoch(cfg.annual_min_emission, epoch_secs);
       sysio::check(per_epoch_min <= remaining,
@@ -503,7 +505,16 @@ void system_contract::accrueepoch(uint32_t epoch_index,
 
    sysio::check(epoch_index > state.last_epoch_index, "accrueepoch epoch already accrued");
 
-   state.pending_emission_amount += per_epoch_emission;
+   // Saturating accumulate (shared helper in emissions.hpp). accrueepoch runs
+   // as an inline action from sysio.epoch::advance, so this must never throw --
+   // a throw would abort epoch advancement chain-wide. The readiness gate
+   // precomputed the identical saturated total as period_emission and payepoch
+   // asserts equality against it, so the three sites cannot diverge. The
+   // period-accrual bound enforced by setemitcfg / sysio.epoch::setconfig keeps
+   // any accepted configuration from actually reaching the clamp; saturating
+   // here is defense-in-depth behind those boundary checks.
+   state.pending_emission_amount =
+      saturating_accrue(state.pending_emission_amount, per_epoch_emission);
 
    // Lazy-grow batch_group_epochs to fit batch_group_index. Pre-pay-cadence
    // chains see length 0 and grow on first epoch under the new schema.
@@ -633,8 +644,13 @@ void system_contract::payepoch(uint32_t epoch_index,
       // sysio.epoch (canonical source of truth) scaled by pay_cadence_epochs
       // because elig_rounds accumulates across all epochs in the period.
       const uint32_t epoch_duration_sec = get_epoch_duration_sec();
-      uint32_t expected_rounds =
-         (epoch_duration_sec * cfg.pay_cadence_epochs * 2) / TOTAL_BLOCKS_PER_ROUND;
+      // Compute in uint64: epoch_duration_sec (<= 30 days) * pay_cadence_epochs
+      // (<= uint16 max) * 2 overflows uint32 at the extremes, and a wrapped
+      // denominator would silently distort every producer's pay share. uint64
+      // holds the full product with room to spare; the result is a small round
+      // count that fits back into uint64 for the divide below.
+      uint64_t expected_rounds =
+         (static_cast<uint64_t>(epoch_duration_sec) * cfg.pay_cadence_epochs * 2) / TOTAL_BLOCKS_PER_ROUND;
       // Below ~126s of effective period duration (one full 21-producer round
       // at 0.5s/block), expected_rounds truncates to zero. Falling back to 1
       // keeps the pay formula well-defined -- producer pay collapses to
@@ -670,7 +686,7 @@ void system_contract::payepoch(uint32_t epoch_index,
 
          if (!it->is_active) continue;
          // opreg filter: skip slashed / terminated / unknown
-         if (!is_op_active(it->owner)) continue;
+         if (!is_op_active(it->owner, OperatorType::OPERATOR_TYPE_PRODUCER)) continue;
 
          uint32_t w      = 0;
          bool     standby = false;
@@ -707,7 +723,7 @@ void system_contract::payepoch(uint32_t epoch_index,
                emis_pay = emis_share;
                fee_pay  = fee_share;
             } else {
-               uint32_t r = (pe.elig_rounds > expected_rounds) ? expected_rounds : pe.elig_rounds;
+               uint64_t r = (pe.elig_rounds > expected_rounds) ? expected_rounds : pe.elig_rounds;
                emis_pay = static_cast<int64_t>(
                   static_cast<__int128>(emis_share) * r / expected_rounds);
                fee_pay = static_cast<int64_t>(
@@ -769,7 +785,7 @@ void system_contract::payepoch(uint32_t epoch_index,
          const int64_t fee_per_member = fee_group_pool / members;
 
          for (const auto& m : group) {
-            if (!is_op_active(m)) continue;
+            if (!is_op_active(m, OperatorType::OPERATOR_TYPE_BATCH)) continue;
             // One transfer carries both the emission and the fee share.
             send_wire_transfer(get_self(), m, per_member + fee_per_member, memo::batch_op_reward);
             actual_paid += per_member;

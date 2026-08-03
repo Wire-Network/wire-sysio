@@ -1,6 +1,7 @@
 // noinspection ExceptionCaughtLocallyJS
 
 import { execFileSync, execSync } from "node:child_process"
+import Crypto from "node:crypto"
 import Fs from "node:fs"
 import Path from "node:path"
 import Os from "node:os"
@@ -10,7 +11,17 @@ import { fetchProtos } from "../steps/fetchProtos.js"
 import { runProtoc } from "../steps/runProtoc.js"
 import { generatePackage } from "../steps/generatePackage.js"
 import { generateTypescript } from "../steps/generateTypescript.js"
-import { Target, PUBLISHABLE_TARGETS } from "../constants.js"
+import {
+  Target,
+  PUBLISHABLE_TARGETS,
+  CARGO_PUBLISHABLE_TARGETS,
+  CARGO_REGISTRY_NAME
+} from "../constants.js"
+
+const PROTO_DIR_NAME = "proto"
+const PROTO_FILE_EXTENSION = ".proto"
+const SHA256_ALGORITHM = "sha256"
+const UTF8_ENCODING = "utf-8"
 
 export interface BundleArgs {
   repo: string
@@ -74,6 +85,8 @@ export async function bundleCommand(args: BundleArgs): Promise<void> {
         })
       )
     }
+
+    validateBundledProtoProvenance(protoDir, resolvedOutputDirs, args.targets)
 
     log.info("Bundle complete → %s", resolvedOutputDirs.join(", "))
 
@@ -264,7 +277,7 @@ function copyProtoSources(
   protoDir: string,
   outputDir: string
 ): void {
-  const protoOutDir = Path.join(outputDir, "proto")
+  const protoOutDir = Path.join(outputDir, PROTO_DIR_NAME)
   Fs.mkdirSync(protoOutDir, { recursive: true })
   protoFiles.forEach(pf => {
     const relative = Path.relative(protoDir, pf),
@@ -272,6 +285,94 @@ function copyProtoSources(
     Fs.mkdirSync(Path.dirname(dest), { recursive: true })
     Fs.copyFileSync(pf, dest)
   })
+}
+
+interface ProtoManifestEntry {
+  relativePath: string
+  sha256: string
+}
+
+/**
+ * Verify every generated package carries the exact proto sources used as the
+ * code-generation input before publish can run.
+ */
+function validateBundledProtoProvenance(
+  sourceProtoDir: string,
+  outputDirs: string[],
+  targets: Target[]
+): void {
+  const expectedManifest = buildProtoManifest(sourceProtoDir),
+    expectedJson = JSON.stringify(expectedManifest),
+    expectedDigest = digestManifest(expectedManifest)
+
+  outputDirs.forEach(baseOutputDir => {
+    targets.forEach(target => {
+      const targetProtoDir = Path.join(baseOutputDir, target, PROTO_DIR_NAME),
+        actualManifest = buildProtoManifest(targetProtoDir),
+        actualJson = JSON.stringify(actualManifest)
+
+      if (actualJson !== expectedJson) {
+        throw new Error(
+          `Generated ${target} package proto provenance does not match source protos in ${targetProtoDir}`
+        )
+      }
+
+      log.info(
+        "Verified %s proto provenance in %s (%d files, sha256:%s)",
+        target,
+        targetProtoDir,
+        expectedManifest.length,
+        expectedDigest
+      )
+    })
+  })
+}
+
+/**
+ * Build a stable manifest of .proto files and their SHA-256 digests.
+ */
+function buildProtoManifest(protoDir: string): ProtoManifestEntry[] {
+  if (!Fs.existsSync(protoDir)) {
+    throw new Error(`Proto directory does not exist: ${protoDir}`)
+  }
+
+  return walkFiles(protoDir)
+    .filter(file => file.endsWith(PROTO_FILE_EXTENSION))
+    .map(file => ({
+      relativePath: Path.relative(protoDir, file).split(Path.sep).join("/"),
+      sha256: hashFile(file)
+    }))
+    .sort((a, b) => a.relativePath.localeCompare(b.relativePath))
+}
+
+/**
+ * Hash a file for proto provenance comparisons.
+ */
+function hashFile(file: string): string {
+  return Crypto.createHash(SHA256_ALGORITHM)
+    .update(Fs.readFileSync(file))
+    .digest("hex")
+}
+
+/**
+ * Hash a manifest for compact CI logs and reviewer provenance checks.
+ */
+function digestManifest(manifest: ProtoManifestEntry[]): string {
+  return Crypto.createHash(SHA256_ALGORITHM)
+    .update(JSON.stringify(manifest), UTF8_ENCODING)
+    .digest("hex")
+}
+
+/**
+ * List files recursively in deterministic order.
+ */
+function walkFiles(dir: string): string[] {
+  return Fs.readdirSync(dir, { withFileTypes: true })
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .flatMap(entry => {
+      const fullPath = Path.join(dir, entry.name)
+      return entry.isDirectory() ? walkFiles(fullPath) : [fullPath]
+    })
 }
 
 function publishPackage(dir: string): void {
@@ -289,6 +390,58 @@ function publishPackage(dir: string): void {
   }
 }
 
+/**
+ * Publish the generated Rust crate to the WIRE CodeArtifact cargo registry.
+ *
+ * Registry wiring comes from the environment (`CARGO_REGISTRIES_WIRE_INDEX` /
+ * `_TOKEN`, exported by generate-opp-bundles.sh --publish); no config file is
+ * written and no token touches disk. A duplicate-version rejection is treated
+ * as success so a previous run that published the crate but failed the npm
+ * side (or vice versa) self-heals on the next synchronized version.
+ */
+function publishCargoCrate(dir: string): void {
+  const registryEnvPrefix = `CARGO_REGISTRIES_${CARGO_REGISTRY_NAME.toUpperCase()}`,
+    indexEnvVar = `${registryEnvPrefix}_INDEX`,
+    tokenEnvVar = `${registryEnvPrefix}_TOKEN`
+  if (!process.env[indexEnvVar] || !process.env[tokenEnvVar]) {
+    throw new Error(
+      `cargo publish requires ${indexEnvVar} and ${tokenEnvVar} in the environment ` +
+        `(generate-opp-bundles.sh --publish exports them from the CodeArtifact token)`
+    )
+  }
+
+  log.info(
+    "Publishing cargo crate from %s to registry '%s'…",
+    dir,
+    CARGO_REGISTRY_NAME
+  )
+  try {
+    // --allow-dirty: the output dir lives inside the wire-sysio checkout.
+    // --no-verify: skip the local crate build; consumers compile it and the
+    //   proto provenance gate has already validated the sources.
+    const result = execFileSync(
+      "cargo",
+      ["publish", "--registry", CARGO_REGISTRY_NAME, "--allow-dirty", "--no-verify"],
+      {
+        cwd: dir,
+        encoding: "utf-8",
+        stdio: ["pipe", "pipe", "pipe"]
+      }
+    )
+    log.info("Published cargo crate successfully: %s", result.trim())
+  } catch (err: any) {
+    const stderr: string = err.stderr?.toString() ?? ""
+    if (/already exist|already uploaded|conflict/i.test(stderr)) {
+      log.warn(
+        "Cargo crate version already published — treating as success: %s",
+        stderr.trim()
+      )
+      return
+    }
+    throw new Error(`cargo publish failed: ${stderr || err.message}`)
+  }
+}
+
 async function handlePublish(
   args: BundleArgs,
   baseOutputDir: string
@@ -297,6 +450,12 @@ async function handlePublish(
     .filter(t => PUBLISHABLE_TARGETS.includes(t))
     .forEach(target => {
       publishPackage(Path.join(baseOutputDir, target))
+    })
+
+  args.targets
+    .filter(t => CARGO_PUBLISHABLE_TARGETS.includes(t))
+    .forEach(target => {
+      publishCargoCrate(Path.join(baseOutputDir, target))
     })
 }
 

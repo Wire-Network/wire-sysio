@@ -132,16 +132,6 @@ DataStream& operator>>(DataStream& ds, WirePermission& t) {
    return ds >> t.account >> t.permission;
 }
 
-// EncodingFlags: { Endianness; HashAlgorithm; LengthEncoding; }
-template <typename DataStream>
-DataStream& operator<<(DataStream& ds, const EncodingFlags& t) {
-   return ds << t.endianness << t.hash_algorithm << t.length_encoding;
-}
-template <typename DataStream>
-DataStream& operator>>(DataStream& ds, EncodingFlags& t) {
-   return ds >> t.endianness >> t.hash_algorithm >> t.length_encoding;
-}
-
 // ---------------------------------------------------------------------------
 //  v6 registry-entity messages (Chain / Token / ChainToken / Reserve / ReserveAmount)
 // ---------------------------------------------------------------------------
@@ -242,17 +232,17 @@ DataStream& operator>>(DataStream& ds, MessagePayload& t) {
    return ds >> t.version >> t.attestations;
 }
 
-// MessageHeader: all 8 fields
+// MessageHeader: all 7 fields
 template <typename DataStream>
 DataStream& operator<<(DataStream& ds, const MessageHeader& t) {
    return ds << t.endpoints << t.message_id << t.previous_message_id
-             << t.encoding_flags << t.payload_size << t.payload_checksum
+             << t.payload_size << t.payload_checksum
              << t.timestamp << t.header_checksum;
 }
 template <typename DataStream>
 DataStream& operator>>(DataStream& ds, MessageHeader& t) {
    return ds >> t.endpoints >> t.message_id >> t.previous_message_id
-             >> t.encoding_flags >> t.payload_size >> t.payload_checksum
+             >> t.payload_size >> t.payload_checksum
              >> t.timestamp >> t.header_checksum;
 }
 
@@ -424,20 +414,20 @@ DataStream& operator>>(DataStream& ds, SwapRequest& t) {
 
 // UnderwriteIntentCommit — v6: (token_code, chain_code, reserve_code) triple
 // disambiguates same-chain swap legs. Field order MUST match the generated proto struct
-// (attestations.proto): uw_account, uw_ext_chain_addr, uw_request_id, outpost_id, signature,
-// token_code, chain_code, reserve_code. The previous operators wrote chain_code in outpost_id's
-// 4th slot — dropping outpost_id and double-encoding chain_code. These operators are currently
-// unreached (UIC always travels as raw zpp::bits proto bytes), so this is a latent-correctness fix.
+// (attestations.proto): uw_account, uw_ext_chain_addr, uw_request_id, signature,
+// token_code, chain_code, reserve_code. (The legacy v5 `outpost_id` field — a per-outpost
+// numeric id redundant with `chain_code` and read by no one — was removed in SEC-13/WSA-027.)
+// These operators are currently unreached (UIC always travels as raw zpp::bits proto bytes).
 template <typename DataStream>
 DataStream& operator<<(DataStream& ds, const UnderwriteIntentCommit& t) {
    return ds << t.uw_account << t.uw_ext_chain_addr << t.uw_request_id
-             << t.outpost_id << t.signature
+             << t.signature
              << t.token_code << t.chain_code << t.reserve_code;
 }
 template <typename DataStream>
 DataStream& operator>>(DataStream& ds, UnderwriteIntentCommit& t) {
    return ds >> t.uw_account >> t.uw_ext_chain_addr >> t.uw_request_id
-             >> t.outpost_id >> t.signature
+             >> t.signature
              >> t.token_code >> t.chain_code >> t.reserve_code;
 }
 

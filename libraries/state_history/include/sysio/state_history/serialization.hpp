@@ -289,7 +289,6 @@ datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper_stat
    fc::raw::pack(ds, as_type<uint64_t>(obj.obj.max_block_net_usage));
    fc::raw::pack(ds, as_type<uint32_t>(obj.obj.target_block_net_usage_pct));
    fc::raw::pack(ds, as_type<uint32_t>(obj.obj.max_transaction_net_usage));
-   fc::raw::pack(ds, as_type<uint32_t>(obj.obj.base_per_transaction_net_usage));
    fc::raw::pack(ds, as_type<uint32_t>(obj.obj.net_usage_leeway));
    fc::raw::pack(ds, as_type<uint32_t>(obj.obj.context_free_discount_net_usage_num));
    fc::raw::pack(ds, as_type<uint32_t>(obj.obj.context_free_discount_net_usage_den));

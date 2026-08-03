@@ -58,6 +58,15 @@ namespace sysiosystem {
 
 
    static constexpr size_t   max_producers         = 21;
+   /// Minimum number of producers -- and, in lock-step, finalizers -- that
+   /// update_ranked_producers will ever publish. Savanna's finality threshold
+   /// is (N*2)/3 + 1, so remaining live with at least one faulty finalizer
+   /// requires N >= 4 (N=4 -> threshold 3 tolerates 1 fault; N=3 -> threshold 3
+   /// tolerates 0). When fewer producers than this are collateral-eligible the
+   /// last good schedule is retained rather than concentrating consensus onto
+   /// too few nodes. Raising it trades more aggressive removal of ineligible
+   /// producers for a stronger anti-concentration floor.
+   static constexpr size_t   min_schedule_size     = 4;
    static constexpr uint32_t seconds_per_year      = 52 * 7 * 24 * 3600;
    static constexpr uint32_t seconds_per_day       = 24 * 3600;
    static constexpr uint32_t seconds_per_hour      = 3600;
@@ -351,6 +360,13 @@ namespace sysiosystem {
           * @param url - the url of the block producer, normally the url of the block producer presentation website,
           * @param location - is the country code as defined in the ISO 3166, https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes
           *
+          * @note Registration alone does not schedule the producer. To be placed
+          *       in the active schedule the account must also be an ACTIVE
+          *       OPERATOR_TYPE_PRODUCER operator in sysio.opreg (i.e. have posted
+          *       the required slashable collateral). Eligibility is enforced when
+          *       the schedule is built, so withdrawing that collateral -- or
+          *       being slashed or terminated -- drops the producer.
+          *
           * @pre Producer to register is an account
           * @pre Authority of producer to register
           */
@@ -366,6 +382,13 @@ namespace sysiosystem {
           * @param producer_authority - the weighted threshold multisig block signing authority of the block producer used to sign blocks,
           * @param url - the url of the block producer, normally the url of the block producer presentation website,
           * @param location - is the country code as defined in the ISO 3166, https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes
+          *
+          * @note Registration alone does not schedule the producer. To be placed
+          *       in the active schedule the account must also be an ACTIVE
+          *       OPERATOR_TYPE_PRODUCER operator in sysio.opreg (i.e. have posted
+          *       the required slashable collateral). Eligibility is enforced when
+          *       the schedule is built, so withdrawing that collateral -- or
+          *       being slashed or terminated -- drops the producer.
           *
           * @pre Producer to register is an account
           * @pre Authority of producer to register

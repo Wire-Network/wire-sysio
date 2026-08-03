@@ -1,14 +1,18 @@
 /// Contract tests for the OPP envelope dispute vote (sysio.chalg dispute-vote flow).
 ///
 /// Covers the new chalg actions in isolation and against a minimally-bootstrapped OPP stack:
-///   * opendispute  -- auth (sysio.msgch), >=3 candidates, no duplicate (outpost,epoch), pauses epoch
-///   * votedispute  -- Tier-1 eligibility (sysio.roa::nodeowners), candidate validation, one-vote,
+///   * opendispute  -- auth (sysio.msgch), >=3 candidates, no duplicate (outpost,epoch), pauses
+///                     epoch, snapshots the Tier-1 electorate + quorum from sysio.roa::nodeowners
+///                     (rejecting an empty electorate)
+///   * votedispute  -- electorate-snapshot eligibility (the Tier-1 set frozen at open; later
+///                     registrations cannot join), candidate validation, one-vote,
 ///                     dispute-must-be-open
-///   * chkdispute   -- the Tier-1 tally rule: fast path (votes >= floor(N/2)+1 any time) and the
-///                     post-deadline relaxation (cast >= Q AND a strict majority of cast votes),
-///                     plus the non-resolving waits (sub-quorum before the deadline, tie after it).
-///                     The fast-path and post-deadline resolves both exercise the winner dispatch
-///                     (sysio.msgch::resolvedisp) + epoch unpause.
+///   * chkdispute   -- the Tier-1 tally rule against the snapshot: fast path (votes >=
+///                     floor(N/2)+1 any time) and the post-deadline relaxation (cast >= Q AND a
+///                     strict majority of cast votes), plus the non-resolving waits (sub-quorum
+///                     before the deadline, tie after it). The fast-path and post-deadline
+///                     resolves both exercise the winner dispatch (sysio.msgch::resolvedisp) +
+///                     epoch unpause, which waits for the LAST open dispute.
 ///   * slash gate   -- the ACTIVE-only scheduling filter (shared by sysio.epoch::advance's
 ///                     window-slide and schbatchgps) drops a SLASHED batch op from the eligible
 ///                     pool, so it is never re-placed where advance could attempt a second
@@ -32,6 +36,9 @@
 #include <fc/crypto/sha256.hpp>
 
 #include "contracts.hpp"
+// Canonical-encoding + header-derivation oracle: inbound envelopes must carry
+// spec-derived semantic headers or apply_consensus drops them before dispatch.
+#include "opp_envelope_oracle.hpp"
 #include "sysio.system_tester.hpp"
 
 using namespace sysio::testing;
@@ -79,6 +86,8 @@ std::vector<char> encode_envelope(uint32_t epoch_index, const std::string& tag) 
    att->set_data(tag);
    att->set_data_size(static_cast<uint32_t>(tag.size()));
 
+   oracle::finalize_header(*env.mutable_messages(0), {}, 1'775'612'516'983ULL);
+
    std::vector<char> out(env.ByteSizeLong());
    env.SerializeToArray(out.data(), static_cast<int>(out.size()));
    return out;
@@ -98,7 +107,11 @@ public:
    static constexpr auto BATCHOP        = "batchop.a"_n;
    static constexpr uint64_t ROA_NETWORK_GEN = 0;
 
-   sysio_dispute_tester() {
+   /// @param defer_emission_config When true, skip `setup_emission_config()` during construction
+   ///        so tests can register node owners in the pre-`setemitcfg` window (where
+   ///        `regnodeowner` skips the `sysio.system::addnodeowner` inline registration) and close
+   ///        the window themselves.
+   explicit sysio_dispute_tester(bool defer_emission_config = false) {
       produce_blocks(2);
 
       create_accounts({
@@ -129,7 +142,8 @@ public:
       load_abi(config::system_account_name, system_abi);
       base_tester::push_action(config::system_account_name, "init"_n, config::system_account_name,
                                mvo()("version", 0)("core", std::string("4,SYS")));
-      setup_emission_config();
+      if (!defer_emission_config)
+         setup_emission_config();
 
       // Inline-action delegation web (depot/governance analogue):
       //   epoch.active  trusts chalg@code   (epoch::pause/unpause called by chalg)
@@ -279,6 +293,32 @@ public:
       return v["is_paused"].as_bool();
    }
 
+   /// `chalgstate.open_disputes` (0 when the singleton does not exist yet).
+   uint32_t open_disputes() {
+      auto data = get_row_by_account(CHALG_ACCOUNT, CHALG_ACCOUNT, "chalgstate"_n, "chalgstate"_n);
+      if (data.empty()) return 0;
+      auto v = chalg_abi.binary_to_variant("chalg_state", data,
+         abi_serializer::create_yield_function(abi_serializer_max_time));
+      return v["open_disputes"].as<uint32_t>();
+   }
+
+   /// The dispute's snapshotted electorate as a name vector.
+   std::vector<name> dispute_electorate(uint64_t id) {
+      std::vector<name> members;
+      auto d = get_dispute(id);
+      if (d.is_null()) return members;
+      for (const auto& m : d["electorate"].get_array()) members.push_back(m.as<name>());
+      return members;
+   }
+
+   /// sysio.system `nodecount` singleton (null variant while no owner has been registered there).
+   fc::variant get_node_count() {
+      auto data = get_row_by_account(config::system_account_name, config::system_account_name,
+                                     "nodecount"_n, "nodecount"_n);
+      return data.empty() ? fc::variant() : system_abi.binary_to_variant("node_count_state", data,
+         abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
    uint32_t current_epoch() {
       auto data = get_row_by_account(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "epochstate"_n, "epochstate"_n);
       if (data.empty()) return 0;
@@ -366,12 +406,51 @@ public:
    abi_serializer chalg_abi, epoch_abi, msgch_abi, opreg_abi, uwrit_abi, chains_abi, roa_abi, system_abi;
 };
 
+/// The same OPP stack WITHOUT the emissions configuration: for tests that register node owners
+/// before `setemitcfg` exists (the window where `regnodeowner` skips the
+/// `sysio.system::addnodeowner` inline registration). Tests close the window themselves by calling
+/// `setup_emission_config()`. Note the base tester's `nodedaddy` (Tier-1, registered at genesis
+/// bootstrap -- itself a pre-emitcfg registrant) is present in BOTH fixtures.
+struct sysio_dispute_pre_emitcfg_tester : sysio_dispute_tester {
+   sysio_dispute_pre_emitcfg_tester() : sysio_dispute_tester(/*defer_emission_config=*/true) {}
+};
+
+/// A chain with ROA active but ZERO registered node owners: `full_except_do_not_set_finalizers`
+/// skips `init_roa` (which would register the `nodedaddy` Tier-1 owner), and this fixture replays
+/// init_roa's deploy/activate steps without any registration -- the state of a real network
+/// before the first node-owner claim. Only sysio.chalg is deployed; sysio.msgch exists purely as
+/// the opendispute authority.
+struct sysio_dispute_empty_roa_tester : tester {
+   static constexpr auto CHALG_ACCOUNT = "sysio.chalg"_n;
+   static constexpr auto MSGCH_ACCOUNT = "sysio.msgch"_n;
+
+   sysio_dispute_empty_roa_tester() : tester(setup_policy::full_except_do_not_set_finalizers) {
+      // init_roa, minus the nodedaddy registration.
+      create_account(config::roa_account_name, config::system_account_name, false, true, false, false);
+      create_account("sysio.acct"_n, config::system_account_name, false, false, false, false);
+      create_account("sysio.authex"_n, config::system_account_name, false, false, false, false);
+      set_contract(config::roa_account_name, contracts::roa_wasm(), contracts::roa_abi().data());
+      base_tester::push_action(config::system_account_name, "setpriv"_n, config::system_account_name,
+                               mvo()("account", config::roa_account_name)("is_priv", 1));
+      base_tester::push_action(config::roa_account_name, "activateroa"_n, config::roa_account_name,
+                               mvo()("total_sys", asset::from_string("75496.0000 SYS"))
+                                    ("bytes_per_unit", 104));
+
+      create_accounts({CHALG_ACCOUNT, MSGCH_ACCOUNT});
+      set_contract(CHALG_ACCOUNT, contracts::chalg_wasm(), contracts::chalg_abi().data());
+      base_tester::push_action(config::system_account_name, "setpriv"_n, config::system_account_name,
+                               mvo()("account", CHALG_ACCOUNT)("is_priv", 1));
+      produce_block();
+   }
+};
+
 // =============================================================================
 //  opendispute
 // =============================================================================
 BOOST_AUTO_TEST_SUITE(sysio_dispute_tests)
 
 BOOST_FIXTURE_TEST_CASE(opendispute_writes_row_and_pauses, sysio_dispute_tester) { try {
+   // The base tester's nodedaddy (Tier-1) satisfies opendispute's non-empty-electorate check.
    const uint32_t epoch = current_epoch();
    std::vector<fc::variant> cands{
       candidate(fc::sha256::hash(std::string("a")), {BATCHOP}),
@@ -422,6 +501,100 @@ BOOST_FIXTURE_TEST_CASE(opendispute_rejects_duplicate, sysio_dispute_tester) { t
       opendispute(eth_code(), epoch, cands));
 } FC_LOG_AND_RETHROW() }
 
+// opendispute snapshots the Tier-1 electorate and its quorum into the dispute row. The snapshot
+// is drawn from sysio.roa::nodeowners (the registry registration always writes), holds exactly
+// the Tier-1 owners -- including the base tester's nodedaddy, itself a pre-emitcfg registrant the
+// old nodecount-based tally never saw -- and fixes Q = floor(N/2)+1 at open.
+BOOST_FIXTURE_TEST_CASE(opendispute_snapshots_electorate, sysio_dispute_tester) { try {
+   register_node_owner("voter1"_n, 1);
+   register_node_owner("voter2"_n, 1);
+   register_node_owner("voter3"_n, 1);
+   register_node_owner("tier2"_n, 2);   // non-Tier-1: must not enter the electorate
+
+   const uint32_t epoch = current_epoch();
+   std::vector<fc::variant> cands{
+      candidate(fc::sha256::hash(std::string("a")), {BATCHOP}),
+      candidate(fc::sha256::hash(std::string("b")), {"voter1"_n}),
+      candidate(fc::sha256::hash(std::string("c")), {"voter2"_n}),
+   };
+   BOOST_REQUIRE_EQUAL(success(), opendispute(eth_code(), epoch, cands));
+
+   auto d = get_dispute(1);
+   BOOST_REQUIRE(!d.is_null());
+   BOOST_REQUIRE_EQUAL(ROA_NETWORK_GEN, d["network_gen"].as_uint64());
+   auto members = dispute_electorate(1);
+   BOOST_REQUIRE_EQUAL(4u, members.size());   // nodedaddy + the three registered voters
+   for (auto v : {NODE_DADDY, "voter1"_n, "voter2"_n, "voter3"_n})
+      BOOST_REQUIRE(std::find(members.begin(), members.end(), v) != members.end());
+   BOOST_REQUIRE_EQUAL(3u, d["quorum"].as<uint32_t>());   // floor(4/2)+1
+   BOOST_REQUIRE_EQUAL(1u, open_disputes());
+} FC_LOG_AND_RETHROW() }
+
+// A dispute can never open against an empty Tier-1 electorate: it could never resolve, and
+// (because opendispute pauses the epoch) it would freeze advancement forever. On a chain with ROA
+// active but no node-owner claims yet (no nodedaddy in this fixture), opendispute must refuse
+// loudly. A Tier-2-only registry hits the same check: Tier-2 owners are not electorate members.
+BOOST_FIXTURE_TEST_CASE(opendispute_rejects_empty_electorate, sysio_dispute_empty_roa_tester) { try {
+   auto cand = [](const std::string& tag) {
+      return mvo()("checksum", fc::sha256::hash(tag))("operators", std::vector<name>{});
+   };
+   auto open = [&]() {
+      return base_tester::push_action(CHALG_ACCOUNT, "opendispute"_n, MSGCH_ACCOUNT, mvo()
+         ("chain_code", 1)("epoch_index", 0)
+         ("candidates", fc::variants{cand("a"), cand("b"), cand("c")}));
+   };
+   BOOST_REQUIRE_EXCEPTION(open(), sysio_assert_message_exception,
+      sysio_assert_message_is("cannot open a dispute with no registered tier-1 node owners"));
+
+   // A Tier-2 registration alone still is not an electorate.
+   create_account("tier2"_n);
+   base_tester::push_action(config::roa_account_name, "forcereg"_n, config::roa_account_name,
+                            mvo()("owner", "tier2"_n)("tier", 2));
+   produce_block();
+   BOOST_REQUIRE_EXCEPTION(open(), sysio_assert_message_exception,
+      sysio_assert_message_is("cannot open a dispute with no registered tier-1 node owners"));
+} FC_LOG_AND_RETHROW() }
+
+// Owners registered before the emissions configuration exists never reach
+// sysio.system::nodecount (regnodeowner skips the addnodeowner inline in that window). The
+// electorate must come from sysio.roa::nodeowners -- the registry registration actually writes --
+// so pre-emitcfg owners count toward quorum and can vote. Previously the tally read
+// nodecount.t1_count: here that is 0, which would have made this dispute unresolvable (and the
+// epoch permanently paused) even though three eligible owners exist.
+BOOST_FIXTURE_TEST_CASE(opendispute_counts_pre_emitcfg_owners, sysio_dispute_pre_emitcfg_tester) { try {
+   register_node_owner("voter1"_n, 1);
+   register_node_owner("voter2"_n, 1);
+   register_node_owner("voter3"_n, 1);
+
+   // The divergence under test: ROA holds 4 Tier-1 owners (nodedaddy + the three above), the
+   // emissions registry none.
+   BOOST_REQUIRE(get_node_count().is_null());
+
+   const uint32_t epoch = current_epoch();
+   auto winner_bytes = encode_envelope(epoch, "winner");
+   auto cs_win = fc::sha256::hash(winner_bytes.data(), winner_bytes.size());
+   std::vector<fc::variant> cands{
+      candidate(cs_win, {BATCHOP}),
+      candidate(fc::sha256::hash(std::string("b")), {"voter2"_n}),
+      candidate(fc::sha256::hash(std::string("c")), {"voter3"_n}),
+   };
+   BOOST_REQUIRE_EQUAL(success(), opendispute(eth_code(), epoch, cands));
+   BOOST_REQUIRE_EQUAL(success(), deliver(eth_code(), winner_bytes));
+
+   auto d = get_dispute(1);
+   BOOST_REQUIRE_EQUAL(4u, d["electorate"].get_array().size());   // nodedaddy + voters 1-3
+   BOOST_REQUIRE_EQUAL(3u, d["quorum"].as<uint32_t>());
+
+   // Three pre-emitcfg owners reach Q=3 and resolve; the empty emissions registry never enters
+   // the tally.
+   BOOST_REQUIRE_EQUAL(success(), votedispute("voter1"_n, 1, cs_win));
+   BOOST_REQUIRE_EQUAL(success(), votedispute("voter2"_n, 1, cs_win));
+   BOOST_REQUIRE_EQUAL(success(), votedispute("voter3"_n, 1, cs_win));
+   BOOST_REQUIRE_EQUAL(success(), chkdispute(1));
+   BOOST_REQUIRE_EQUAL("DISPUTE_STATUS_RESOLVED", get_dispute(1)["status"].as_string());
+   BOOST_REQUIRE(!epoch_paused());
+} FC_LOG_AND_RETHROW() }
+
 // =============================================================================
 //  votedispute
 // =============================================================================
@@ -441,7 +614,8 @@ BOOST_FIXTURE_TEST_CASE(votedispute_tier1_accepted, sysio_dispute_tester) { try 
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(votedispute_non_tier1_rejected, sysio_dispute_tester) { try {
-   register_node_owner("tier2"_n, 2);   // a Tier-2 owner: registered but ineligible
+   register_node_owner("voter1"_n, 1);   // the electorate
+   register_node_owner("tier2"_n, 2);    // a Tier-2 owner: registered but not in it
 
    const uint32_t epoch = current_epoch();
    auto cs_a = fc::sha256::hash(std::string("a"));
@@ -452,11 +626,12 @@ BOOST_FIXTURE_TEST_CASE(votedispute_non_tier1_rejected, sysio_dispute_tester) { 
    };
    BOOST_REQUIRE_EQUAL(success(), opendispute(eth_code(), epoch, cands));
    BOOST_REQUIRE_EQUAL(
-      error("assertion failure with message: only tier-1 node owners may vote on a dispute"),
+      error("assertion failure with message: voter is not in the dispute's tier-1 electorate"),
       votedispute("tier2"_n, 1, cs_a));
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(votedispute_unregistered_rejected, sysio_dispute_tester) { try {
+   register_node_owner("voter1"_n, 1);   // the electorate
    const uint32_t epoch = current_epoch();
    auto cs_a = fc::sha256::hash(std::string("a"));
    std::vector<fc::variant> cands{
@@ -466,7 +641,7 @@ BOOST_FIXTURE_TEST_CASE(votedispute_unregistered_rejected, sysio_dispute_tester)
    };
    BOOST_REQUIRE_EQUAL(success(), opendispute(eth_code(), epoch, cands));
    BOOST_REQUIRE_EQUAL(
-      error("assertion failure with message: voter is not a registered node owner"),
+      error("assertion failure with message: voter is not in the dispute's tier-1 electorate"),
       votedispute("stranger"_n, 1, cs_a));
 } FC_LOG_AND_RETHROW() }
 
@@ -500,16 +675,50 @@ BOOST_FIXTURE_TEST_CASE(votedispute_double_vote_rejected, sysio_dispute_tester) 
       votedispute("voter1"_n, 1, cs_a));
 } FC_LOG_AND_RETHROW() }
 
+// The electorate and quorum are frozen at open: a Tier-1 owner registered while the dispute is
+// open cannot vote in it, and the quorum stays the open-time value (here Q=2 from N=3; the live
+// Tier-1 count of 4 would demand 3), so membership changes can neither dilute nor inflate an
+// in-flight dispute.
+BOOST_FIXTURE_TEST_CASE(votedispute_electorate_frozen_at_open, sysio_dispute_tester) { try {
+   register_node_owner("voter1"_n, 1);
+   register_node_owner("voter2"_n, 1);   // with nodedaddy: N = 3, Q = 2 at open
+
+   const uint32_t epoch = current_epoch();
+   auto winner_bytes = encode_envelope(epoch, "winner");
+   auto cs_win = fc::sha256::hash(winner_bytes.data(), winner_bytes.size());
+   std::vector<fc::variant> cands{
+      candidate(cs_win, {BATCHOP}),
+      candidate(fc::sha256::hash(std::string("b")), {"voter2"_n}),
+      candidate(fc::sha256::hash(std::string("c")), {"voter3"_n}),
+   };
+   BOOST_REQUIRE_EQUAL(success(), opendispute(eth_code(), epoch, cands));
+   BOOST_REQUIRE_EQUAL(success(), deliver(eth_code(), winner_bytes));
+
+   // Registered after open: eligible for FUTURE disputes, but not in this one's snapshot.
+   register_node_owner("voter3"_n, 1);
+   BOOST_REQUIRE_EQUAL(3u, dispute_electorate(1).size());
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: voter is not in the dispute's tier-1 electorate"),
+      votedispute("voter3"_n, 1, cs_win));
+
+   // The open-time quorum of 2 still resolves, even though the live Tier-1 count is now 4 (which
+   // would demand 3 votes had the quorum floated).
+   BOOST_REQUIRE_EQUAL(success(), votedispute("voter1"_n, 1, cs_win));
+   BOOST_REQUIRE_EQUAL(success(), votedispute("voter2"_n, 1, cs_win));
+   BOOST_REQUIRE_EQUAL(success(), chkdispute(1));
+   BOOST_REQUIRE_EQUAL("DISPUTE_STATUS_RESOLVED", get_dispute(1)["status"].as_string());
+   BOOST_REQUIRE(!epoch_paused());
+} FC_LOG_AND_RETHROW() }
+
 // =============================================================================
 //  chkdispute tally
 // =============================================================================
 
-// Fast path: the three fixture registrations plus genesis NODE_DADDY make N=4 (Q=3). Three votes
-// for the delivered winning checksum resolve any time and exercise dispatch + epoch unpause.
+// Fast path: with N=3 Tier-1 owners (Q=2), two votes for the delivered winning checksum resolve the
+// dispute any time. Exercises winner dispatch (resolvedisp) + epoch unpause.
 BOOST_FIXTURE_TEST_CASE(chkdispute_fast_path_resolves, sysio_dispute_tester) { try {
    register_node_owner("voter1"_n, 1);
-   register_node_owner("voter2"_n, 1);
-   register_node_owner("voter3"_n, 1);   // N = 4 including NODE_DADDY, Q = 3
+   register_node_owner("voter2"_n, 1);   // with nodedaddy: N = 3, Q = 2
 
    const uint32_t epoch = current_epoch();
 
@@ -533,12 +742,7 @@ BOOST_FIXTURE_TEST_CASE(chkdispute_fast_path_resolves, sysio_dispute_tester) { t
    BOOST_REQUIRE_EQUAL("DISPUTE_STATUS_OPEN", get_dispute(1)["status"].as_string());
 
    BOOST_REQUIRE_EQUAL(success(), votedispute("voter2"_n, 1, cs_win));
-   // Two votes are still below the authoritative ROA quorum.
-   BOOST_REQUIRE_EQUAL(success(), chkdispute(1));
-   BOOST_REQUIRE_EQUAL("DISPUTE_STATUS_OPEN", get_dispute(1)["status"].as_string());
-
-   BOOST_REQUIRE_EQUAL(success(), votedispute("voter3"_n, 1, cs_win));
-   // Three votes (= Q) for the winner -> resolves, dispatches, unpauses.
+   // Two votes (= Q) for the winner -> resolves, dispatches, unpauses.
    BOOST_REQUIRE_EQUAL(success(), chkdispute(1));
 
    auto d = get_dispute(1);
@@ -547,11 +751,46 @@ BOOST_FIXTURE_TEST_CASE(chkdispute_fast_path_resolves, sysio_dispute_tester) { t
    BOOST_REQUIRE(!epoch_paused());
 } FC_LOG_AND_RETHROW() }
 
-// Sub-quorum: with N=4 including NODE_DADDY (Q=3), a single vote never resolves before deadline.
+// SEC-102 (huang): a dispute whose voted winner FAILS depot semantic validation must not
+// resolve-and-strand. chkdispute marks the dispute RESOLVED and unpauses in the same tx that
+// inline-calls resolvedisp -> apply_consensus; if apply_consensus soft-dropped the winner it would
+// report success with no outpcons row, freezing the epoch (chkcons waits for the row forever while
+// evalcons no-ops on the lingering RESOLVED dispute). apply_consensus now returns false on a drop
+// and resolvedisp asserts on it, so the whole chkdispute crank rolls back: the dispute stays
+// OPEN/paused and recoverable.
+// A dispute winner whose header is forged can never reach resolvedisp: since SEC-102's semantic-
+// header check runs at INGRESS (msgch::deliver's inbound_envelope_valid gate), a forged envelope is
+// rejected on delivery and is never recorded, so it cannot become a dispute candidate or a voted
+// winner. This is the root-cause prevention for the resolvedisp-stranding scenario; resolvedisp's
+// own `check(apply_consensus(...))` guard remains as defense in depth (unreachable via this path,
+// so it is not exercised here -- chkdispute_fast_path_resolves covers valid resolution).
+BOOST_FIXTURE_TEST_CASE(forged_dispute_winner_rejected_at_delivery, sysio_dispute_tester) { try {
+   const uint32_t epoch = current_epoch();
+
+   // Forge `payload_checksum` so the header no longer recomputes over the payload.
+   auto winner_valid = encode_envelope(epoch, "winner");
+   sysio::opp::Envelope env;
+   BOOST_REQUIRE(env.ParseFromArray(winner_valid.data(), static_cast<int>(winner_valid.size())));
+   {
+      auto* h = env.mutable_messages(0)->mutable_header();
+      std::string c = h->payload_checksum();
+      c[0] ^= 0x01;
+      h->set_payload_checksum(c);
+   }
+   std::vector<char> winner_bytes(env.ByteSizeLong());
+   env.SerializeToArray(winner_bytes.data(), static_cast<int>(winner_bytes.size()));
+
+   // Rejected at ingress -- never recorded, so it can never be voted into a dispute resolution.
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: delivered envelope failed inbound-chain or "
+            "semantic-header validation"),
+      deliver(eth_code(), winner_bytes));
+} FC_LOG_AND_RETHROW() }
+
+// Sub-quorum: with N=3 (Q=2), a single vote never resolves before the deadline.
 BOOST_FIXTURE_TEST_CASE(chkdispute_sub_quorum_waits, sysio_dispute_tester) { try {
    register_node_owner("voter1"_n, 1);
-   register_node_owner("voter2"_n, 1);
-   register_node_owner("voter3"_n, 1);
+   register_node_owner("voter2"_n, 1);   // with nodedaddy: N = 3, Q = 2
 
    const uint32_t epoch = current_epoch();
    auto cs_a = fc::sha256::hash(std::string("a"));
@@ -566,16 +805,14 @@ BOOST_FIXTURE_TEST_CASE(chkdispute_sub_quorum_waits, sysio_dispute_tester) { try
    BOOST_REQUIRE_EQUAL("DISPUTE_STATUS_OPEN", get_dispute(1)["status"].as_string());
 } FC_LOG_AND_RETHROW() }
 
-// Post-deadline relaxation: with N=5 including NODE_DADDY (Q=3), a checksum that holds a STRICT
-// MAJORITY of the cast votes (but fewer than Q, so the fast path never fires) resolves only AFTER
-// the 24h deadline, provided a quorum of votes was cast (cast >= Q). Two of three cast votes
-// resolve post-deadline and also
+// Post-deadline relaxation: with N=4 (Q=3), a checksum that holds a STRICT MAJORITY of the cast votes
+// (but fewer than Q, so the fast path never fires) resolves only AFTER the 24h deadline, provided a
+// quorum of votes was cast (cast >= Q). Two of three cast votes -> resolves post-deadline; also
 // exercises winner dispatch (resolvedisp) + unpause on the relaxed path.
 BOOST_FIXTURE_TEST_CASE(chkdispute_post_deadline_majority_resolves, sysio_dispute_tester) { try {
    register_node_owner("voter1"_n, 1);
    register_node_owner("voter2"_n, 1);
-   register_node_owner("voter3"_n, 1);
-   register_node_owner("voter4"_n, 1);   // N = 5 including NODE_DADDY, Q = 3
+   register_node_owner("voter3"_n, 1);   // with nodedaddy: N = 4, Q = 3
 
    const uint32_t epoch = current_epoch();
 
@@ -613,13 +850,12 @@ BOOST_FIXTURE_TEST_CASE(chkdispute_post_deadline_majority_resolves, sysio_disput
    BOOST_REQUIRE(!epoch_paused());
 } FC_LOG_AND_RETHROW() }
 
-// Deadline tie: with N=5 including NODE_DADDY (Q=3), an even split of cast votes (2 vs 2) has a
-// quorum but NO strict majority of cast, so even after the deadline the dispute does not resolve.
+// Deadline tie: with N=4 (Q=3), an even split of all cast votes (2 vs 2) has a quorum but NO strict
+// majority of cast, so even after the deadline the dispute does not resolve (no plurality / tie-break).
 BOOST_FIXTURE_TEST_CASE(chkdispute_deadline_tie_waits, sysio_dispute_tester) { try {
    register_node_owner("voter1"_n, 1);
    register_node_owner("voter2"_n, 1);
-   register_node_owner("voter3"_n, 1);
-   register_node_owner("voter4"_n, 1);   // N = 5 including NODE_DADDY, Q = 3
+   register_node_owner("voter3"_n, 1);   // with nodedaddy: N = 4, Q = 3
 
    const uint32_t epoch = current_epoch();
    auto cs_x = fc::sha256::hash(std::string("x"));
@@ -636,12 +872,66 @@ BOOST_FIXTURE_TEST_CASE(chkdispute_deadline_tie_waits, sysio_dispute_tester) { t
    BOOST_REQUIRE_EQUAL(success(), votedispute("voter1"_n, 1, cs_x));
    BOOST_REQUIRE_EQUAL(success(), votedispute("voter2"_n, 1, cs_x));
    BOOST_REQUIRE_EQUAL(success(), votedispute("voter3"_n, 1, cs_y));
-   BOOST_REQUIRE_EQUAL(success(), votedispute("voter4"_n, 1, cs_y));
+   BOOST_REQUIRE_EQUAL(success(), votedispute(NODE_DADDY, 1, cs_y));
 
    produce_block(fc::seconds(24 * 60 * 60 + 1));
    BOOST_REQUIRE_EQUAL(success(), chkdispute(1));
    BOOST_REQUIRE_EQUAL("DISPUTE_STATUS_OPEN", get_dispute(1)["status"].as_string());
    BOOST_REQUIRE(epoch_paused());   // unresolved dispute keeps the epoch paused
+} FC_LOG_AND_RETHROW() }
+
+// sysio.epoch::is_paused is one flag shared by every dispute: resolving the FIRST of two
+// concurrently open disputes (a second EVM outpost's envelopes can split in the same epoch) must
+// not resume epoch advancement while the second is still voting. The pause lifts only when the
+// last open dispute resolves.
+BOOST_FIXTURE_TEST_CASE(chkdispute_unpauses_only_after_last_open_dispute, sysio_dispute_tester) { try {
+   register_node_owner("voter1"_n, 1);
+   register_node_owner("voter2"_n, 1);   // with nodedaddy: N = 3, Q = 2
+
+   // A second EVM outpost (distinct external_chain_id) so a second (outpost, epoch) dispute can
+   // exist concurrently with the ETH one.
+   BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
+      ("kind", ChainKind::CHAIN_KIND_EVM)("code", codename_mvo("BASE"))
+      ("external_chain_id", 8453)("name", std::string("base-test"))("description", std::string{})));
+   const uint64_t base_code = fc::slug_name{"BASE"}.value;
+
+   const uint32_t epoch = current_epoch();
+   auto winner_eth  = encode_envelope(epoch, "winner-eth");
+   auto winner_base = encode_envelope(epoch, "winner-base");
+   auto cs_eth  = fc::sha256::hash(winner_eth.data(), winner_eth.size());
+   auto cs_base = fc::sha256::hash(winner_base.data(), winner_base.size());
+
+   auto cands_for = [&](const fc::sha256& cs) {
+      return std::vector<fc::variant>{
+         candidate(cs, {BATCHOP}),
+         candidate(fc::sha256::hash(std::string("loser-1")), {"voter2"_n}),
+         candidate(fc::sha256::hash(std::string("loser-2")), {"voter3"_n}),
+      };
+   };
+   // Open both first (the open-dispute gate then retains each delivery's raw bytes for
+   // resolvedisp), then deliver each outpost's winner.
+   BOOST_REQUIRE_EQUAL(success(), opendispute(eth_code(),  epoch, cands_for(cs_eth)));
+   BOOST_REQUIRE_EQUAL(success(), opendispute(base_code, epoch, cands_for(cs_base)));
+   BOOST_REQUIRE_EQUAL(2u, open_disputes());
+   BOOST_REQUIRE(epoch_paused());
+   BOOST_REQUIRE_EQUAL(success(), deliver(eth_code(),  winner_eth));
+   BOOST_REQUIRE_EQUAL(success(), deliver(base_code, winner_base));
+
+   // Resolve the ETH dispute: the BASE dispute is still open, so the epoch MUST stay paused.
+   BOOST_REQUIRE_EQUAL(success(), votedispute("voter1"_n, 1, cs_eth));
+   BOOST_REQUIRE_EQUAL(success(), votedispute("voter2"_n, 1, cs_eth));
+   BOOST_REQUIRE_EQUAL(success(), chkdispute(1));
+   BOOST_REQUIRE_EQUAL("DISPUTE_STATUS_RESOLVED", get_dispute(1)["status"].as_string());
+   BOOST_REQUIRE_EQUAL(1u, open_disputes());
+   BOOST_REQUIRE(epoch_paused());
+
+   // Resolve the BASE dispute: last open dispute -> the pause lifts.
+   BOOST_REQUIRE_EQUAL(success(), votedispute("voter1"_n, 2, cs_base));
+   BOOST_REQUIRE_EQUAL(success(), votedispute("voter2"_n, 2, cs_base));
+   BOOST_REQUIRE_EQUAL(success(), chkdispute(2));
+   BOOST_REQUIRE_EQUAL("DISPUTE_STATUS_RESOLVED", get_dispute(2)["status"].as_string());
+   BOOST_REQUIRE_EQUAL(0u, open_disputes());
+   BOOST_REQUIRE(!epoch_paused());
 } FC_LOG_AND_RETHROW() }
 
 // No cross-epoch double slash: the ACTIVE-only scheduling filter -- shared verbatim by

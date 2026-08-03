@@ -1,4 +1,4 @@
-file(GLOB BENCHMARK "*.cpp")
+file(GLOB BENCHMARK CONFIGURE_DEPENDS "*.cpp")
 add_executable( benchmark ${BENCHMARK} )
 
 target_link_libraries( benchmark sysio_testing fc Boost::program_options bn256::bn256)

@@ -59,7 +59,7 @@ macro(chain_target TARGET)
     install(
             TARGETS ${TARGET}
             RUNTIME
-            DESTINATION ${CMAKE_INSTALL_FULL_BINDIR}
+            DESTINATION ${CMAKE_INSTALL_BINDIR}
             COMPONENT base
     )
 

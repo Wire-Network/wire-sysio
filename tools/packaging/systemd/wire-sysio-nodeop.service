@@ -1,0 +1,37 @@
+[Unit]
+Description=wire-sysio-nodeop
+Documentation=https://github.com/Wire-Network/wire-sysio
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=exec
+# Optional per-host overrides; a missing file is not a start failure.
+EnvironmentFile=-/etc/wire/sysio/nodeop.env
+ExecStart=/usr/bin/nodeop --config-dir /etc/wire/sysio -c config.ini --data-dir /var/lib/wire/sysio/data -e -p sysio
+
+# Rotation of these files is provided by /etc/logrotate.d/wire-sysio-nodeop
+# (copytruncate; 5 rotations x 1G).
+StandardOutput=append:/var/log/wire/sysio/nodeop.log
+StandardError=append:/var/log/wire/sysio/nodeop.log
+
+# ── Graceful shutdown — avoid SIGKILL -> dirty chainbase. ──
+KillSignal=SIGINT
+KillMode=mixed
+# TimeoutStopSec MUST exceed nodeop's real chainbase-flush time + margin.
+# It grows with DB size — measure and tune per deployment.
+TimeoutStopSec=300
+# nodeop's startup sync can be long — don't let systemd kill a slow start.
+TimeoutStartSec=900
+# After TimeoutStopSec a genuinely hung nodeop is still SIGKILLed.
+SendSIGKILL=yes
+
+# Don't get OOM-killed: the kernel kills OTHER processes before nodeop.
+OOMScoreAdjust=-900
+
+Restart=on-failure
+RestartSec=10
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target

@@ -56,6 +56,10 @@ inline private_key_type get_private_key( name keyname, string role ) {
       auto system_keys = sig_plug.query_providers(std::nullopt, std::nullopt, crypto::chain_key_type_wire);
       if (system_keys.empty())
       {
+         // register_default_signature_providers is a pre-startup mutator: the manager's provider set is immutable once
+         // the node is running, so this lazy fallback is only valid before the tester has started.
+         FC_ASSERT(sig_plug.get_state() != appbase::abstract_plugin::started,
+                   "no system wire signature provider registered before startup");
          sig_plug.register_default_signature_providers(std::vector{crypto::chain_key_type_wire});
          system_keys = sig_plug.query_providers(std::nullopt, std::nullopt, crypto::chain_key_type_wire);
       }

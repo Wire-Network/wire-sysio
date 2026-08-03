@@ -5,6 +5,8 @@
 #include <fc/variant_object.hpp>
 #include <fc/slug_name.hpp>
 
+#include <limits>
+
 #include "contracts.hpp"
 #include <sysio/opp/opp.hpp>
 
@@ -15,6 +17,59 @@ using namespace fc;
 using namespace sysio::opp::types;
 
 using mvo = fc::mutable_variant_object;
+
+namespace {
+
+/// Standard opreg prune delay used by focused setconfig tests.
+constexpr uint64_t kDefaultPruneDelayMs = 600000;
+
+/// Current production consecutive-miss threshold.
+constexpr uint32_t kDefaultMaxConsecutiveMisses = 5;
+
+/// Current production rolling-window miss-percentage threshold.
+constexpr uint32_t kDefaultMaxPctMisses24h = 5;
+
+/// Highest accepted miss percentage after SEC-28; 100% is intentionally rejected.
+constexpr uint32_t kMaxAcceptedPctMisses24h = 99;
+
+/// Disabling percent threshold rejected because an all-miss window cannot exceed it.
+constexpr uint32_t kDisablingPctMisses24h = 100;
+
+/// Compact collateral amount used to activate non-bootstrapped batch operators.
+constexpr uint64_t kTestMinBond = 1;
+
+/// Rejected collateral minimum that would make eligibility checks vacuous.
+constexpr uint64_t kRejectedZeroMinBond = 0;
+
+/// Standard 24h rolling-window size used by opreg tests.
+constexpr uint64_t kTerminateWindowMs = 24ULL * 60 * 60 * 1000;
+
+/// Epoch duration installed by the SEC-28 window-span tests (seconds).
+constexpr uint32_t kWindowBoundEpochDurationSec = 360;
+
+/// Rotation-group count installed by the SEC-28 window-span tests. A resident
+/// operator is on duty (and accrues a delivery record) once per this many
+/// epochs, so the span bound scales by it.
+constexpr uint32_t kWindowBoundGroups = 3;
+
+/// Smallest `terminate_window_ms` the SEC-28 span bound accepts at
+/// kWindowBoundEpochDurationSec with the production consecutive-miss
+/// threshold: (5 + 1) duty rotations of 3 epochs x 360 s each, in ms.
+constexpr uint64_t kMinWindowMsAtDefaults =
+   (uint64_t{kDefaultMaxConsecutiveMisses} + 1) * kWindowBoundGroups * kWindowBoundEpochDurationSec * 1000;
+
+/// One duty rotation at the window-bound test schedule, in milliseconds:
+/// the wall-clock gap between a resident operator's consecutive records.
+constexpr uint64_t kDutyRotationMs = uint64_t{kWindowBoundGroups} * kWindowBoundEpochDurationSec * 1000;
+
+/// Mirrors opreg's MAX_DELLOG_PRUNE_PER_WRITE (the contract header is not
+/// includable from native test code).
+constexpr uint32_t kDellogPrunePerWrite = 4;
+
+/// Mirrors opreg's MAX_DELLOG_PRUNE_PER_CRANK.
+constexpr uint32_t kDellogPrunePerCrank = 64;
+
+} // namespace
 
 /// v6 data-model: per-chain identity has moved from `ChainKind` enums to
 /// `sysio::slug_name`-keyed registries (`sysio.chains`, `sysio.tokens`,
@@ -102,6 +157,19 @@ public:
       }
    }
 
+   /// Push `sysio.epoch::setconfig` with a 7-operators-per-group schedule of
+   /// the given duration and group count — installs the epochcfg row the
+   /// SEC-28 window-span validation reads.
+   action_result set_epoch_config(uint32_t epoch_duration_sec,
+                                  uint32_t batch_op_groups = kWindowBoundGroups) {
+      return push_epoch_action(EPOCH_ACCOUNT, "setconfig"_n, mvo()
+         ("epoch_duration_sec",                 epoch_duration_sec)
+         ("operators_per_epoch",                7)
+         ("batch_operator_minimum_active",      7 * batch_op_groups)
+         ("batch_op_groups",                    batch_op_groups)
+         ("epoch_retention_envelope_log_count", 200));
+   }
+
    /// Build a single `chain_min_bond` entry as an fc::variant suitable for
    /// `setconfig`'s `req_*_collat` vector arguments. v6: identity is by
    /// (chain_code, token_code) codenames rather than the old enums.
@@ -155,6 +223,53 @@ public:
 
    action_result prune() {
       return push_opreg_action(OPREG_ACCOUNT, "prune"_n, mvo());
+   }
+
+   /// Record a delivery hit/miss through the same opreg action invoked by
+   /// `sysio.epoch::advance`.
+   action_result recorddel(name account, uint32_t epoch, bool delivered) {
+      return push_opreg_action(EPOCH_ACCOUNT, "recorddel"_n, mvo()
+         ("account",   account)
+         ("epoch",     epoch)
+         ("delivered", delivered));
+   }
+
+   /// Run opreg's rolling-window termination check through the epoch-authorized
+   /// action surface.
+   action_result termcheck(name account) {
+      return push_opreg_action(EPOCH_ACCOUNT, "termcheck"_n, mvo()
+         ("account", account));
+   }
+
+   /// Configure one ETH bond requirement and deposit it so a non-bootstrapped
+   /// batch operator becomes ACTIVE through the normal eligibility path.
+   void activate_batch_operator(name account,
+                                uint32_t max_consec_misses = kDefaultMaxConsecutiveMisses,
+                                uint32_t max_pct_misses_24h = kMaxAcceptedPctMisses24h,
+                                uint64_t terminate_window_ms = kTerminateWindowMs) {
+      BOOST_REQUIRE_EQUAL(success(), setconfig(
+         /*max_prod=*/21,
+         /*max_batch=*/63,
+         /*max_uw=*/21,
+         /*prune_delay=*/kDefaultPruneDelayMs,
+         /*max_consec_misses=*/max_consec_misses,
+         /*max_pct_misses_24h=*/max_pct_misses_24h,
+         /*terminate_window_ms=*/terminate_window_ms,
+         /*req_prod_collat=*/{},
+         /*req_batchop_collat=*/{
+            make_chain_min_bond("ETH", "ETH", kTestMinBond),
+         },
+         /*req_uw_collat=*/{}));
+
+      BOOST_REQUIRE_EQUAL(success(),
+         regoperator(account, OPERATOR_TYPE_BATCH, /*is_bootstrapped=*/false));
+      BOOST_REQUIRE_EQUAL(success(),
+         depositinle(account, "ETH", "ETH", kTestMinBond));
+      produce_blocks();
+
+      auto op = get_operator(account);
+      BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE == op["status"].as<OperatorStatus>());
+      BOOST_REQUIRE_EQUAL(0, op["is_bootstrapped"].as_uint64());
    }
 
    // ── Collateral-action helpers (msgch-dispatched paths, v6 codenames) ──
@@ -236,6 +351,14 @@ public:
          abi_serializer::create_yield_function(abi_serializer_max_time));
    }
 
+   /// Raw dellog row by log_id; empty variant when the row does not exist.
+   fc::variant get_dellog_entry(uint64_t log_id) {
+      auto data = get_row_by_account(OPREG_ACCOUNT, OPREG_ACCOUNT, "dellog"_n, name{log_id});
+      return data.empty() ? fc::variant() : opreg_abi_ser.binary_to_variant(
+         "delivery_log_entry", data,
+         abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
    /// Newest entry in the operator's `recent_actions` ring buffer.
    fc::variant latest_action_log(name account) {
       auto op = get_operator(account);
@@ -263,6 +386,9 @@ BOOST_FIXTURE_TEST_CASE(setconfig_basic, sysio_opreg_tester) { try {
    BOOST_REQUIRE_EQUAL(63, cfg["max_available_batch_ops"].as_uint64());
    BOOST_REQUIRE_EQUAL(21, cfg["max_available_underwriters"].as_uint64());
    BOOST_REQUIRE_EQUAL(600000, cfg["terminate_prune_delay_ms"].as_uint64());
+   BOOST_REQUIRE_EQUAL(kDefaultMaxConsecutiveMisses,
+                       cfg["terminate_max_consecutive_misses"].as_uint64());
+   BOOST_REQUIRE_EQUAL(kDefaultMaxPctMisses24h, cfg["terminate_max_pct_misses_24h"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(setconfig_rejects_zero_queue, sysio_opreg_tester) { try {
@@ -270,6 +396,208 @@ BOOST_FIXTURE_TEST_CASE(setconfig_rejects_zero_queue, sysio_opreg_tester) { try 
       error("assertion failure with message: max_available_producers must be positive"),
       setconfig(0, 63, 21, 600000)
    );
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(setconfig_rejects_disabling_percent_miss_threshold, sysio_opreg_tester) { try {
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: terminate_max_pct_misses_24h must be in [1, 99]"),
+      setconfig(21, 63, 21, kDefaultPruneDelayMs,
+                kDefaultMaxConsecutiveMisses, kDisablingPctMisses24h, kTerminateWindowMs)
+   );
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(setconfig_rejects_disabling_consecutive_miss_threshold, sysio_opreg_tester) { try {
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: terminate_max_consecutive_misses must be in [1, 5]"),
+      setconfig(21, 63, 21, kDefaultPruneDelayMs,
+                kDefaultMaxConsecutiveMisses + 1, kMaxAcceptedPctMisses24h, kTerminateWindowMs)
+   );
+
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: terminate_max_consecutive_misses must be in [1, 5]"),
+      setconfig(21, 63, 21, kDefaultPruneDelayMs,
+                std::numeric_limits<uint32_t>::max(), kMaxAcceptedPctMisses24h, kTerminateWindowMs)
+   );
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(setconfig_rejects_zero_min_bond, sysio_opreg_tester) { try {
+   // A zero min_bond entry makes the `available >= min_bond` eligibility gate
+   // vacuously true, so an operator could reach ACTIVE with no collateral posted.
+   // The sane "no requirement" form is an empty vector, which stays accepted.
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: req_uw_collat: min_bond must be positive "
+            "(an empty requirement set imposes no bond)"),
+      setconfig(21, 63, 21, kDefaultPruneDelayMs,
+                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kTerminateWindowMs,
+                {}, {}, { make_chain_min_bond("ETH", "ETH", kRejectedZeroMinBond) })
+   );
+   // The identical shape with a positive min_bond is accepted.
+   BOOST_REQUIRE_EQUAL(
+      success(),
+      setconfig(21, 63, 21, kDefaultPruneDelayMs,
+                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kTerminateWindowMs,
+                {}, {}, { make_chain_min_bond("ETH", "ETH", kTestMinBond) })
+   );
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(setconfig_rejects_window_narrower_than_consecutive_run, sysio_opreg_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), set_epoch_config(kWindowBoundEpochDurationSec));
+   produce_blocks();
+
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: terminate_window_ms must span at least "
+            "terminate_max_consecutive_misses + 1 duty rotations"),
+      setconfig(21, 63, 21, kDefaultPruneDelayMs,
+                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h,
+                kMinWindowMsAtDefaults - 1)
+   );
+
+   // The exact span boundary is the smallest accepted window.
+   BOOST_REQUIRE_EQUAL(success(),
+      setconfig(21, 63, 21, kDefaultPruneDelayMs,
+                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h,
+                kMinWindowMsAtDefaults));
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(setconfig_window_unchecked_before_epoch_config, sysio_opreg_tester) { try {
+   // Bootstrap installs opreg config before sysio.epoch is configured; the
+   // span bound must not reject it. sysio.epoch::setconfig's mirror check
+   // closes the gap when the epoch duration arrives.
+   BOOST_REQUIRE_EQUAL(success(),
+      setconfig(21, 63, 21, kDefaultPruneDelayMs,
+                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h,
+                /*terminate_window_ms=*/1));
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(epoch_setconfig_rejects_duration_that_vacates_stored_window, sysio_opreg_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), set_epoch_config(kWindowBoundEpochDurationSec));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(success(),
+      setconfig(21, 63, 21, kDefaultPruneDelayMs,
+                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h,
+                kMinWindowMsAtDefaults));
+   produce_blocks();
+
+   // Raising the duration by one second leaves the stored window narrower
+   // than the terminating run of duty epochs — the mirror validation must
+   // reject it.
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: epoch schedule would leave "
+            "sysio.opreg's terminate_window_ms narrower than the consecutive-miss run"),
+      set_epoch_config(kWindowBoundEpochDurationSec + 1));
+
+   // Raising the group count stretches the duty rotation the same way and
+   // must be rejected against the same stored window.
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: epoch schedule would leave "
+            "sysio.opreg's terminate_window_ms narrower than the consecutive-miss run"),
+      set_epoch_config(kWindowBoundEpochDurationSec, kWindowBoundGroups + 1));
+
+   // Unchanged and shorter durations keep the stored window valid.
+   BOOST_REQUIRE_EQUAL(success(), set_epoch_config(kWindowBoundEpochDurationSec));
+   BOOST_REQUIRE_EQUAL(success(), set_epoch_config(kWindowBoundEpochDurationSec / 2));
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(termcheck_terminates_at_duty_rotation_cadence, sysio_opreg_tester) { try {
+   // Delivery records accrue only on duty epochs: with a 3-group schedule a
+   // resident operator is recorded once per 3-epoch rotation, so a
+   // consecutive-miss run reaching the threshold spans
+   // (threshold + 1) * kDutyRotationMs of wall clock — the arithmetic the
+   // SEC-28 span bound protects. Drive one outpost's records at exactly that
+   // cadence under a window sized by the bound (with one rotation of margin
+   // for block-time skew) and require the run to stay observable end to end.
+   BOOST_REQUIRE_EQUAL(success(), set_epoch_config(kWindowBoundEpochDurationSec));
+   produce_blocks();
+   activate_batch_operator("batchop.a"_n,
+                           kDefaultMaxConsecutiveMisses,
+                           kMaxAcceptedPctMisses24h,
+                           kMinWindowMsAtDefaults + kDutyRotationMs);
+
+   // Duty epoch 1: a delivered record anchors the window and keeps the
+   // percent rail below its ceiling for the rest of the run.
+   BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, 1, /*delivered=*/true));
+   produce_blocks();
+
+   // Five missed duty epochs, one full rotation apart: still ACTIVE. Each
+   // push is finalized before the next rotation jump so the pending
+   // transaction cannot expire across it.
+   for (uint32_t duty = 1; duty <= kDefaultMaxConsecutiveMisses; ++duty) {
+      produce_block(fc::milliseconds(kDutyRotationMs));
+      BOOST_REQUIRE_EQUAL(success(),
+         recorddel("batchop.a"_n, 1 + duty * kWindowBoundGroups, /*delivered=*/false));
+      produce_blocks();
+   }
+   BOOST_REQUIRE_EQUAL(success(), termcheck("batchop.a"_n));
+   produce_blocks();
+   auto op = get_operator("batchop.a"_n);
+   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE == op["status"].as<OperatorStatus>());
+
+   // The sixth missed rotation crosses the threshold. Every record of the
+   // run — including the anchor a full span earlier — must still be
+   // in-window (un-pruned) for the consecutive rail to observe it.
+   produce_block(fc::milliseconds(kDutyRotationMs));
+   BOOST_REQUIRE_EQUAL(success(),
+      recorddel("batchop.a"_n, 1 + (kDefaultMaxConsecutiveMisses + 1) * kWindowBoundGroups,
+                /*delivered=*/false));
+   produce_blocks();
+   BOOST_REQUIRE(!get_dellog_entry(1).is_null());
+   BOOST_REQUIRE_EQUAL(success(), termcheck("batchop.a"_n));
+   produce_blocks();
+
+   op = get_operator("batchop.a"_n);
+   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_TERMINATED == op["status"].as<OperatorStatus>());
+   BOOST_REQUIRE_EQUAL("rolling-window: >5 consecutive misses", op["status_reason"].as_string());
+} FC_LOG_AND_RETHROW() }
+
+// SEC-28 residual (schedule drift): the live rotation (epoch_state.batch_op_groups)
+// is sized from batch_op_groups once at schbatchgps and advance() then preserves
+// its length, so the config count must stay pinned to the live rotation. Lowering
+// it after the schedule exists would let a later opreg update narrow the window to
+// a span that no longer covers the (wider) duty cadence -- the exact vacuous rail
+// this bound prevents -- so epoch::setconfig rejects any group-count change once
+// the schedule is materialized, while an unchanged count still passes.
+BOOST_FIXTURE_TEST_CASE(epoch_setconfig_locks_batch_op_groups_after_schedule, sysio_opreg_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), setconfig());
+   produce_blocks();
+
+   BOOST_REQUIRE_EQUAL(success(), regoperator("batchop.a"_n, OPERATOR_TYPE_BATCH, true));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(success(), regoperator("batchop.b"_n, OPERATOR_TYPE_BATCH, true));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(success(), regoperator("batchop.c"_n, OPERATOR_TYPE_BATCH, true));
+   produce_blocks();
+
+   auto epoch_setconfig = [&](uint32_t groups, uint32_t min_active) {
+      return push_epoch_action(EPOCH_ACCOUNT, "setconfig"_n, mvo()
+         ("epoch_duration_sec",                 90)
+         ("operators_per_epoch",                1)
+         ("batch_operator_minimum_active",      min_active)
+         ("batch_op_groups",                    groups)
+         ("epoch_retention_envelope_log_count", 200));
+   };
+
+   // Before the schedule exists the group count is free; land on 3 and materialize.
+   BOOST_REQUIRE_EQUAL(success(), epoch_setconfig(3, 3));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(success(), push_epoch_action(EPOCH_ACCOUNT, "schbatchgps"_n, mvo()));
+   produce_blocks();
+
+   // Decreasing the group count is now rejected -- before the window check, so the
+   // guard's message (not the window bound's) is what surfaces.
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: batch_op_groups cannot change once "
+            "the rotation schedule is materialized"),
+      epoch_setconfig(2, 2));
+
+   // Increasing it is rejected the same way (no fourth operator needed -- the guard
+   // fires before schbatchgps would re-materialize).
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: batch_op_groups cannot change once "
+            "the rotation schedule is materialized"),
+      epoch_setconfig(4, 4));
+
+   // Re-issuing the same group count still succeeds.
+   BOOST_REQUIRE_EQUAL(success(), epoch_setconfig(3, 3));
 } FC_LOG_AND_RETHROW() }
 
 // ── regoperator ──
@@ -684,6 +1012,180 @@ BOOST_FIXTURE_TEST_CASE(terminate_rejects_already_slashed_operator, sysio_opreg_
       terminate("batchop.a"_n, "post-slash terminate attempt"));
 } FC_LOG_AND_RETHROW() }
 
+BOOST_FIXTURE_TEST_CASE(termcheck_terminates_all_miss_window_at_max_accepted_percent, sysio_opreg_tester) { try {
+   activate_batch_operator("batchop.a"_n);
+
+   BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, 1, /*delivered=*/false));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(success(), termcheck("batchop.a"_n));
+
+   auto op = get_operator("batchop.a"_n);
+   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_TERMINATED == op["status"].as<OperatorStatus>());
+   BOOST_REQUIRE_EQUAL("rolling-window: >99% miss rate", op["status_reason"].as_string());
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(termcheck_terminates_after_default_consecutive_boundary, sysio_opreg_tester) { try {
+   activate_batch_operator("batchop.a"_n);
+
+   BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, 1, /*delivered=*/true));
+   produce_blocks();
+
+   for (uint32_t epoch = 2; epoch <= 6; ++epoch) {
+      BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, epoch, /*delivered=*/false));
+      produce_blocks();
+   }
+   BOOST_REQUIRE_EQUAL(success(), termcheck("batchop.a"_n));
+   auto op = get_operator("batchop.a"_n);
+   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE == op["status"].as<OperatorStatus>());
+
+   BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, 7, /*delivered=*/false));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(success(), termcheck("batchop.a"_n));
+
+   op = get_operator("batchop.a"_n);
+   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_TERMINATED == op["status"].as<OperatorStatus>());
+   BOOST_REQUIRE_EQUAL("rolling-window: >5 consecutive misses", op["status_reason"].as_string());
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(termcheck_keeps_bootstrapped_operator_exempt, sysio_opreg_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), setconfig(
+      /*max_prod=*/21,
+      /*max_batch=*/63,
+      /*max_uw=*/21,
+      /*prune_delay=*/kDefaultPruneDelayMs,
+      /*max_consec_misses=*/1,
+      /*max_pct_misses_24h=*/kMaxAcceptedPctMisses24h,
+      /*terminate_window_ms=*/kTerminateWindowMs));
+   BOOST_REQUIRE_EQUAL(success(),
+      regoperator("batchop.a"_n, OPERATOR_TYPE_BATCH, /*is_bootstrapped=*/true));
+
+   BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, 1, /*delivered=*/false));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(success(), termcheck("batchop.a"_n));
+
+   auto op = get_operator("batchop.a"_n);
+   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE == op["status"].as<OperatorStatus>());
+   BOOST_REQUIRE_EQUAL(1, op["is_bootstrapped"].as_uint64());
+} FC_LOG_AND_RETHROW() }
+
+// ---- dellog retention: bounded pruning of rows outside the rolling window ----
+
+BOOST_FIXTURE_TEST_CASE(recorddel_prunes_rows_that_aged_out_of_window, sysio_opreg_tester) { try {
+   activate_batch_operator("batchop.a"_n);
+
+   for (uint32_t epoch = 1; epoch <= 3; ++epoch) {
+      BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, epoch, /*delivered=*/true));
+      produce_blocks();
+   }
+   for (uint64_t id = 1; id <= 3; ++id)
+      BOOST_REQUIRE(!get_dellog_entry(id).is_null());
+
+   // Push chain time past the 24h window so rows 1..3 age out.
+   produce_block(fc::hours(25));
+
+   BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, 4, /*delivered=*/true));
+   produce_blocks();
+
+   for (uint64_t id = 1; id <= 3; ++id)
+      BOOST_REQUIRE(get_dellog_entry(id).is_null());
+   auto row = get_dellog_entry(4);
+   BOOST_REQUIRE(!row.is_null());
+   BOOST_REQUIRE_EQUAL("batchop.a", row["account"].as_string());
+   BOOST_REQUIRE_EQUAL(4, row["epoch"].as_uint64());
+   BOOST_REQUIRE_EQUAL(true, row["delivered"].as_bool());
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(recorddel_prune_is_bounded_per_write, sysio_opreg_tester) { try {
+   activate_batch_operator("batchop.a"_n);
+
+   for (uint32_t epoch = 1; epoch <= 6; ++epoch) {
+      BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, epoch, /*delivered=*/true));
+      produce_blocks();
+   }
+   produce_block(fc::hours(25));
+
+   // First write past the window sweeps at most kDellogPrunePerWrite rows.
+   BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, 7, /*delivered=*/true));
+   produce_blocks();
+   for (uint64_t id = 1; id <= kDellogPrunePerWrite; ++id)
+      BOOST_REQUIRE(get_dellog_entry(id).is_null());
+   BOOST_REQUIRE(!get_dellog_entry(5).is_null());
+   BOOST_REQUIRE(!get_dellog_entry(6).is_null());
+   BOOST_REQUIRE(!get_dellog_entry(7).is_null());
+
+   // Second write clears the remaining two and stops at the in-window row.
+   BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, 8, /*delivered=*/true));
+   produce_blocks();
+   BOOST_REQUIRE(get_dellog_entry(5).is_null());
+   BOOST_REQUIRE(get_dellog_entry(6).is_null());
+   BOOST_REQUIRE(!get_dellog_entry(7).is_null());
+   BOOST_REQUIRE(!get_dellog_entry(8).is_null());
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(prune_sweeps_expired_dellog_rows, sysio_opreg_tester) { try {
+   activate_batch_operator("batchop.a"_n);
+
+   // One more expired row than a single crank may remove.
+   constexpr uint32_t SEEDED_ROWS = kDellogPrunePerCrank + 1;
+   for (uint32_t epoch = 1; epoch <= SEEDED_ROWS; ++epoch) {
+      BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, epoch, /*delivered=*/false));
+      produce_blocks();
+   }
+   produce_block(fc::hours(25));
+
+   // First crank removes exactly kDellogPrunePerCrank rows, oldest first.
+   BOOST_REQUIRE_EQUAL(success(), prune());
+   produce_blocks();
+   for (uint64_t id = 1; id <= kDellogPrunePerCrank; ++id)
+      BOOST_REQUIRE(get_dellog_entry(id).is_null());
+   BOOST_REQUIRE(!get_dellog_entry(SEEDED_ROWS).is_null());
+
+   // Second crank clears the remainder.
+   BOOST_REQUIRE_EQUAL(success(), prune());
+   produce_blocks();
+   BOOST_REQUIRE(get_dellog_entry(SEEDED_ROWS).is_null());
+
+   // With no rows left in the window the operator stays ACTIVE.
+   BOOST_REQUIRE_EQUAL(success(), termcheck("batchop.a"_n));
+   auto op = get_operator("batchop.a"_n);
+   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE == op["status"].as<OperatorStatus>());
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(termcheck_unaffected_by_on_write_pruning, sysio_opreg_tester) { try {
+   activate_batch_operator("batchop.a"_n);
+
+   // Six misses that age out before they are ever evaluated.
+   for (uint32_t epoch = 1; epoch <= 6; ++epoch) {
+      BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, epoch, /*delivered=*/false));
+      produce_blocks();
+   }
+   produce_block(fc::hours(25));
+
+   // Six fresh misses; their writes also sweep the six expired rows.
+   for (uint32_t epoch = 7; epoch <= 12; ++epoch) {
+      BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, epoch, /*delivered=*/false));
+      produce_blocks();
+   }
+   for (uint64_t id = 1; id <= 6; ++id)
+      BOOST_REQUIRE(get_dellog_entry(id).is_null());
+   for (uint64_t id = 7; id <= 12; ++id)
+      BOOST_REQUIRE(!get_dellog_entry(id).is_null());
+
+   // The in-window rows still drive the consecutive-miss rail as before.
+   BOOST_REQUIRE_EQUAL(success(), termcheck("batchop.a"_n));
+   auto op = get_operator("batchop.a"_n);
+   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_TERMINATED == op["status"].as<OperatorStatus>());
+   BOOST_REQUIRE_EQUAL("rolling-window: >5 consecutive misses", op["status_reason"].as_string());
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(recorddel_succeeds_without_opconfig, sysio_opreg_tester) { try {
+   // No setconfig installed: the on-write sweep falls back to default
+   // thresholds via get_or_default instead of asserting.
+   BOOST_REQUIRE_EQUAL(success(), recorddel("batchop.a"_n, 1, /*delivered=*/true));
+   produce_blocks();
+   BOOST_REQUIRE(!get_dellog_entry(1).is_null());
+} FC_LOG_AND_RETHROW() }
+
 BOOST_FIXTURE_TEST_CASE(releaselock_requires_uwrit_authority, sysio_opreg_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), setconfig());
    BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.alice"_n, OPERATOR_TYPE_UNDERWRITER, false));
@@ -782,6 +1284,55 @@ BOOST_FIXTURE_TEST_CASE(flushwtdw_terminated_operator_does_not_abort, sysio_opre
    BOOST_REQUIRE_EQUAL(success(),
       push_opreg_action(EPOCH_ACCOUNT, "flushwtdw"_n, mvo()("current_epoch", 1000000u)));
    BOOST_REQUIRE(get_wtdw(1).is_null());   // matured row erased, not stuck re-throwing every advance
+} FC_LOG_AND_RETHROW() }
+
+// SEC-78 / WSA-166: flushwtdw drains at most MAX_WTDW_FLUSH_PER_EPOCH matured rows per advance, so an
+// operator cannot split collateral into enough queued withdraws to blow the transaction CPU deadline
+// advance shares with the rest of its fan-out and stall epoch progress chain-wide. The remainder
+// flushes on the next advance. This drives a TERMINATED operator so every matured row takes the
+// erase-without-remit branch (no outpost/token infra needed) -- the bound lives at the top of the
+// loop, above the per-row branches, so it holds regardless of which branch each row takes.
+BOOST_FIXTURE_TEST_CASE(flushwtdw_bounds_rows_per_epoch, sysio_opreg_tester) { try {
+   // Mirror of the contract-internal cap (contract headers are not host-compilable, same convention
+   // as the msgch size-cap tests). Keep in sync with sysio.opreg.hpp::MAX_WTDW_FLUSH_PER_EPOCH.
+   constexpr uint32_t MAX_WTDW_FLUSH_PER_EPOCH = 32;
+   constexpr uint32_t N = MAX_WTDW_FLUSH_PER_EPOCH + 8;   // 40 > one epoch's flush budget
+
+   BOOST_REQUIRE_EQUAL(success(), setconfig());
+   BOOST_REQUIRE_EQUAL(success(),
+      regoperator("batchop.a"_n, OPERATOR_TYPE_BATCH, /*is_bootstrapped=*/false));
+   BOOST_REQUIRE_EQUAL(success(), depositinle("batchop.a"_n, "ETH", "ETH", 100'000));
+
+   // Queue N one-*ish*-unit withdraws. Amounts vary (i+1) only so each is a distinct transaction
+   // (identical actions in one block would be rejected as duplicates before the contract runs); the
+   // per-row amount is irrelevant to the bound. Sum stays well under the deposited balance.
+   for (uint32_t i = 0; i < N; ++i) {
+      BOOST_REQUIRE_EQUAL(success(),
+         withdrawinle("batchop.a"_n, "ETH", "ETH", i + 1));
+   }
+   // Terminate so every matured row takes flushwtdw's erase-without-remit branch.
+   BOOST_REQUIRE_EQUAL(success(), terminate("batchop.a"_n, "rolling-24h miss"));
+
+   // Count remaining queue rows by probing the monotonic ids 1..N (order-independent).
+   auto count_pending = [&]() {
+      uint32_t n = 0;
+      for (uint64_t id = 1; id <= N; ++id) if (!get_wtdw(id).is_null()) ++n;
+      return n;
+   };
+   BOOST_REQUIRE_EQUAL(N, count_pending());
+
+   // First flush drains exactly MAX_WTDW_FLUSH_PER_EPOCH rows; the remainder stays queued.
+   BOOST_REQUIRE_EQUAL(success(),
+      push_opreg_action(EPOCH_ACCOUNT, "flushwtdw"_n, mvo()("current_epoch", 1'000'000u)));
+   BOOST_REQUIRE_EQUAL(N - MAX_WTDW_FLUSH_PER_EPOCH, count_pending());
+
+   // Cross a block boundary so the second flush is a distinct transaction — an identical action in
+   // the same block is rejected as a duplicate before the contract runs, masking the guard under test.
+   produce_blocks();
+   // Second flush drains the rest -- progress resumes where the first stopped.
+   BOOST_REQUIRE_EQUAL(success(),
+      push_opreg_action(EPOCH_ACCOUNT, "flushwtdw"_n, mvo()("current_epoch", 1'000'000u)));
+   BOOST_REQUIRE_EQUAL(0u, count_pending());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()

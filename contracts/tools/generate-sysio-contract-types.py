@@ -4,7 +4,7 @@ Generate JSON Schema and TypeScript types from Wire system contract ABIs.
 
 Gathers all sysio.*.abi files from <build-dir>/contracts/ and produces:
   - <output-dir>/schema/system-contracts.schema.json
-  - <output-dir>/typescript/SystemContractTypes.ts
+  - <output-dir>/typescript/SysioContractTypes.ts
 
 Type names are always PascalCase (e.g., SysioWrapTransactionHeaderType).
 Member names follow the --style flag: snake_case (default) or camelCase.
@@ -58,6 +58,41 @@ def member_variants(name: str, style: str) -> list[str]:
     return [convert_member(name, style)]
 
 
+# Contracts whose deploy account differs from `sysio.<short>`.
+# system + bios both deploy onto the privileged `sysio` account.
+DEPLOY_ACCOUNT_OVERRIDES = {'system': 'sysio', 'bios': 'sysio'}
+
+
+def short_contract_name(contract_name: str) -> str:
+    """'sysio.epoch' -> 'epoch'; 'sysio.system' -> 'system'."""
+    return contract_name.split('.', 1)[1] if '.' in contract_name else contract_name
+
+
+def emit_contract_interface(abi: dict, contract_name: str, contract_prefix: str) -> list[str]:
+    """Emit `export interface Sysio<Pascal>Contract { actions; tables }`.
+
+    actions: action-name -> its `Action` struct interface (struct name == action name).
+    tables:  table-name  -> its row-struct `Type` interface (row struct == table['type']).
+    """
+    lines = [
+        f'/** {contract_name} - action + table surface for the typed contract client. */',
+        f'export interface {contract_prefix}Contract {{',
+        '  actions: {',
+    ]
+    for action in abi.get('actions', []):
+        action_ts = contract_prefix + to_pascal(action['name']) + 'Action'
+        lines.append(f'    {action["name"]}: {action_ts}')
+    lines.append('  }')
+    lines.append('  tables: {')
+    for table in abi.get('tables', []):
+        row_ts = contract_prefix + to_pascal(table['type']) + 'Type'
+        lines.append(f'    {table["name"]}: {row_ts}')
+    lines.append('  }')
+    lines.append('}')
+    lines.append('')
+    return lines
+
+
 # ---------------------------------------------------------------------------
 # ABI type → JSON Schema
 # ---------------------------------------------------------------------------
@@ -67,7 +102,11 @@ PRIMITIVE_SCHEMA = {
     'int8': {'type': 'integer'}, 'uint8': {'type': 'integer'},
     'int16': {'type': 'integer'}, 'uint16': {'type': 'integer'},
     'int32': {'type': 'integer'}, 'uint32': {'type': 'integer'},
-    'int64': {'type': 'integer'}, 'uint64': {'type': 'integer'},
+    # Mirrors PRIMITIVE_TS: int64-class values exceed 2^53 on the wire, so the
+    # chain returns (and accepts) a decimal-string form for large magnitudes.
+    # `pattern` constrains only the string alternative.
+    'int64': {'type': ['integer', 'string'], 'pattern': '^-?[0-9]+$'},
+    'uint64': {'type': ['integer', 'string'], 'pattern': '^[0-9]+$'},
     'int128': {'type': 'string'}, 'uint128': {'type': 'string'},
     'float32': {'type': 'number'}, 'float64': {'type': 'number'}, 'float128': {'type': 'string'},
     'name': {'type': 'string', 'pattern': '^[a-z1-5.]{1,13}$'},
@@ -118,7 +157,10 @@ PRIMITIVE_TS = {
     'bool': 'boolean',
     'int8': 'number', 'uint8': 'number', 'int16': 'number', 'uint16': 'number',
     'int32': 'number', 'uint32': 'number',
-    'int64': 'number', 'uint64': 'number',
+    # int64-class values exceed Number.MAX_SAFE_INTEGER on the wire; the chain
+    # RPC accepts either form, so consumers may pass a decimal string for
+    # magnitudes past 2^53 (the wire truth) without casting.
+    'int64': 'number | string', 'uint64': 'number | string',
     'int128': 'string', 'uint128': 'string',
     'float32': 'number', 'float64': 'number', 'float128': 'string',
     'name': 'string', 'string': 'string', 'bytes': 'string',
@@ -134,17 +176,27 @@ PRIMITIVE_TS = {
 
 def abi_type_to_ts(abi_type: str, structs_map: dict, type_aliases: dict,
                    contract_prefix: str, enums_map: dict | None = None) -> str:
-    """Map an ABI type to a TypeScript type string."""
+    """Map an ABI type to a TypeScript type string.
+
+    Enum-typed fields emit the WIRE-SPELLING UNION ``Enum | keyof typeof Enum``:
+    the ABI accepts (and table reads return) the proto member NAME spelling as
+    well as the numeric value, so the generated type admits both — consumers
+    assign ``SysioXChainkind.CHAIN_KIND_EVM`` or its ``"CHAIN_KIND_EVM"``
+    spelling without casts (see enums-are-first-class).
+    """
     abi_type = resolve_type(abi_type, type_aliases)
     if abi_type.endswith('[]'):
-        return abi_type_to_ts(abi_type[:-2], structs_map, type_aliases, contract_prefix, enums_map) + '[]'
+        inner = abi_type_to_ts(abi_type[:-2], structs_map, type_aliases, contract_prefix, enums_map)
+        # A union inner type must parenthesize: `(A | B)[]`, not `A | B[]`.
+        return (f'({inner})[]' if '|' in inner else inner + '[]')
     if abi_type.endswith('?'):
         return abi_type_to_ts(abi_type[:-1], structs_map, type_aliases, contract_prefix, enums_map) + ' | null'
     if abi_type in PRIMITIVE_TS:
         return PRIMITIVE_TS[abi_type]
     if enums_map and abi_type in enums_map:
         enum_base = abi_type[:-2] if abi_type.endswith('_t') else abi_type
-        return contract_prefix + to_pascal(enum_base) + ('Type' if abi_type.endswith('_t') else '')
+        enum_name = contract_prefix + to_pascal(enum_base) + ('Type' if abi_type.endswith('_t') else '')
+        return f'{enum_name} | keyof typeof {enum_name}'
     if abi_type in structs_map:
         return contract_prefix + to_pascal(abi_type) + 'Type'
     return 'unknown'
@@ -160,11 +212,12 @@ def generate(abi_files: list[str], output_dir: str, style: str) -> None:
     os.makedirs(os.path.join(output_dir, 'typescript'), exist_ok=True)
 
     all_definitions: dict = {}
+    contract_registry: list[tuple[str, str, list[str], list[str]]] = []   # (name, prefix, action_names, table_names)
     ts_lines: list[str] = [
         '// noinspection SpellCheckingInspection',
         '/**',
         ' * Auto-generated TypeScript types for Wire system contracts.',
-        ' * Generated by generate-system-contract-types.py',
+        ' * Generated by generate-sysio-contract-types.py',
         ' *',
         f' * Property naming style: {style}',
         ' */',
@@ -275,6 +328,56 @@ def generate(abi_files: list[str], output_dir: str, style: str) -> None:
             ts_lines.append('}')
             ts_lines.append('')
 
+        # ── typed-client surface: Sysio<Pascal>Contract (actions + tables) ──
+        ts_lines.extend(emit_contract_interface(abi, contract_name, contract_prefix))
+        contract_registry.append((contract_name, contract_prefix,
+            [a['name'] for a in abi.get('actions', [])], [t['name'] for t in abi.get('tables', [])]))
+
+    # ── contract registry: SysioContractName + Account + Mapping + Definitions ──
+    ts_lines.append('// ── contract registry ──')
+    ts_lines.append('')
+    ts_lines.append('/** Short contract name - key into SysioContractMapping / SysioContractAccount. */')
+    ts_lines.append('export enum SysioContractName {')
+    for contract_name, *_ in contract_registry:
+        short = short_contract_name(contract_name)
+        ts_lines.append(f'  {short} = "{short}",')
+    ts_lines.append('}')
+    ts_lines.append('')
+    ts_lines.append('/** On-chain account per contract (default sysio.<name>; system/bios -> sysio). */')
+    ts_lines.append('export const SysioContractAccount: Record<SysioContractName, string> = {')
+    for contract_name, *_ in contract_registry:
+        short = short_contract_name(contract_name)
+        account = DEPLOY_ACCOUNT_OVERRIDES.get(short, contract_name)
+        ts_lines.append(f'  [SysioContractName.{short}]: "{account}",')
+    ts_lines.append('}')
+    ts_lines.append('')
+    ts_lines.append('/** Each contract -> its action+table surface, for the typed contract client. */')
+    ts_lines.append('export interface SysioContractMapping {')
+    for contract_name, contract_prefix, *_ in contract_registry:
+        short = short_contract_name(contract_name)
+        ts_lines.append(f'  [SysioContractName.{short}]: {contract_prefix}Contract')
+    ts_lines.append('}')
+    ts_lines.append('')
+    ts_lines.append('/** Runtime action/table names + account per contract (the typed client validates against this). */')
+    ts_lines.append('export interface SysioContractDefinition<Name extends SysioContractName> {')
+    ts_lines.append('  readonly name: Name')
+    ts_lines.append('  readonly account: string')
+    ts_lines.append('  readonly actions: ReadonlyArray<string>')
+    ts_lines.append('  readonly tables: ReadonlyArray<string>')
+    ts_lines.append('}')
+    ts_lines.append('export const SysioContractDefinitions: {')
+    ts_lines.append('  readonly [Name in SysioContractName]: SysioContractDefinition<Name>')
+    ts_lines.append('} = {')
+    for contract_name, _prefix, action_names, table_names in contract_registry:
+        short = short_contract_name(contract_name)
+        account = DEPLOY_ACCOUNT_OVERRIDES.get(short, contract_name)
+        actions_arr = ', '.join(f'"{a}"' for a in action_names)
+        tables_arr = ', '.join(f'"{t}"' for t in table_names)
+        ts_lines.append(f'  [SysioContractName.{short}]: {{ name: SysioContractName.{short}, account: "{account}", '
+                        f'actions: [{actions_arr}], tables: [{tables_arr}] }},')
+    ts_lines.append('}')
+    ts_lines.append('')
+
     # Write JSON Schema
     schema = {
         '$schema': 'https://json-schema.org/draft/2020-12/schema',
@@ -288,7 +391,7 @@ def generate(abi_files: list[str], output_dir: str, style: str) -> None:
     click.echo(f'Written: {schema_path} ({len(all_definitions)} definitions)')
 
     # Write TypeScript
-    ts_path = os.path.join(output_dir, 'typescript', 'SystemContractTypes.ts')
+    ts_path = os.path.join(output_dir, 'typescript', 'SysioContractTypes.ts')
     with open(ts_path, 'w') as f:
         f.write('\n'.join(ts_lines) + '\n')
     iface_count = sum(1 for line in ts_lines if line.startswith('export interface'))
@@ -335,7 +438,7 @@ def main(build_dir: str, output_dir: str, style: str, force: bool) -> None:
     click.echo()
     click.echo('Generation complete:')
     click.echo(f'  Schema:     {output_dir}/schema/system-contracts.schema.json')
-    click.echo(f'  TypeScript: {output_dir}/typescript/SystemContractTypes.ts')
+    click.echo(f'  TypeScript: {output_dir}/typescript/SysioContractTypes.ts')
     click.echo(f'  Style:      {style}')
 
 

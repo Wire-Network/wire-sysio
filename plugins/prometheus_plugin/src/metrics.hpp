@@ -5,11 +5,20 @@
 #include <sysio/producer_plugin/producer_plugin.hpp>
 #include <sysio/chain_plugin/tracked_votes.hpp>
 
+#include <fc/network/http/http_client.hpp>
 #include <prometheus/counter.h>
 #include <prometheus/info.h>
 #include <prometheus/registry.h>
 #include <prometheus/text_serializer.h>
 #include <fc/log/logger.hpp>
+
+#include <array>
+#include <string>
+#include <unordered_map>
+#include <unordered_set>
+#include <utility>
+#include <vector>
+
 namespace sysio::metrics {
 
 struct catalog_type {
@@ -33,6 +42,13 @@ struct catalog_type {
    prometheus::Info info_details;
    // http plugin
    prometheus::Family<Counter>& http_request_counts;
+   Counter& outbound_http_requests;
+   Counter& outbound_http_successes;
+   Counter& outbound_http_request_bytes;
+   Counter& outbound_http_response_bytes;
+   prometheus::Family<Counter>& outbound_http_failures;
+   std::array<Counter*, fc::http::failure_kind_count> outbound_http_failure_counts{};
+   fc::http::metrics_snapshot last_outbound_http_metrics;
 
    // net plugin failed p2p connection
    Counter& failed_p2p_connections;
@@ -44,7 +60,6 @@ struct catalog_type {
       Gauge& num_peers;
       Gauge& num_clients;
 
-      prometheus::Family<Gauge>& addr; // Empty gauge; ipv6 address can't be transmitted as a double
       prometheus::Family<Gauge>& port;
       prometheus::Family<Gauge>& connection_number;
       prometheus::Family<Gauge>& accepting_blocks;
@@ -62,9 +77,13 @@ struct catalog_type {
       prometheus::Family<Gauge>& block_sync_throttling;
       prometheus::Family<Gauge>& connection_start_time;
       prometheus::Family<Gauge>& peer_score;
-      prometheus::Family<Gauge>& peer_addr; // Empty gauge; we only want the label
    };
    p2p_connection_metrics p2p_metrics;
+
+   // Live per-connection gauge handles, keyed by "<remote_ip>|<connection_id>", so that when a connection
+   // leaves the net_plugin snapshot its series can be removed from every p2p family. Bounds registry growth
+   // from P2P connection churn. Only accessed on the prometheus update strand, so it needs no locking.
+   std::unordered_map<std::string, std::vector<std::pair<prometheus::Family<Gauge>*, Gauge*>>> tracked_p2p_series;
 
    prometheus::Family<Counter>& cpu_usage_us;
    prometheus::Family<Counter>& net_usage_us;
@@ -117,12 +136,27 @@ struct catalog_type {
    catalog_type()
        : info(family<prometheus::Info>("nodeop", "static information about the server"))
        , http_request_counts(family<Counter>("nodeop_http_requests_total", "number of HTTP requests"))
+       , outbound_http_requests(build<Counter>(
+            "nodeop_outbound_http_requests_total",
+            "total shared outbound HTTP transport requests"))
+       , outbound_http_successes(build<Counter>(
+            "nodeop_outbound_http_successes_total",
+            "total successful shared outbound HTTP transport requests"))
+       , outbound_http_request_bytes(build<Counter>(
+            "nodeop_outbound_http_request_bytes_total",
+            "process-wide complete request-body bytes uploaded by the shared outbound HTTP transport, including "
+            "completed retry attempts"))
+       , outbound_http_response_bytes(build<Counter>(
+            "nodeop_outbound_http_response_bytes_total",
+            "total response-body bytes accepted by the shared outbound HTTP transport"))
+       , outbound_http_failures(family<Counter>(
+            "nodeop_outbound_http_failures_total",
+            "shared outbound HTTP transport failures by fixed category"))
        , failed_p2p_connections(build<Counter>("nodeop_p2p_failed_connections", "total number of failed out-going p2p connections"))
        , dropped_trxs_total(build<Counter>("nodeop_p2p_dropped_trxs_total", "total number of dropped transactions by net plugin"))
        , p2p_metrics{
               .num_peers{build<Gauge>("nodeop_p2p_peers", "current number of connected outgoing peers")}
             , .num_clients{build<Gauge>("nodeop_p2p_clients", "current number of connected incoming clients")}
-            , .addr{family<Gauge>("nodeop_p2p_addr", "ipv6 address")}
             , .port{family<Gauge>("nodeop_p2p_port", "port")}
             , .connection_number{family<Gauge>("nodeop_p2p_connection_number", "monatomic increasing connection number")}
             , .accepting_blocks{family<Gauge>("nodeop_p2p_accepting_blocks", "accepting blocks on connection")}
@@ -140,7 +174,6 @@ struct catalog_type {
             , .block_sync_throttling{family<Gauge>("nodeop_p2p_block_sync_throttling", "is block sync throttling currently active")}
             , .connection_start_time{family<Gauge>("nodeop_p2p_connection_start_time", "time of last connection to peer")}
             , .peer_score{family<Gauge>("nodeop_p2p_peer_score", "peer quality score")}
-            , .peer_addr{family<Gauge>("nodeop_p2p_peer_addr", "peer address")}
          }
        , cpu_usage_us(family<Counter>("nodeop_cpu_usage_us_total", "total cpu usage in microseconds for blocks"))
        , net_usage_us(family<Counter>("nodeop_net_usage_us_total", "total net usage in microseconds for blocks"))
@@ -188,14 +221,40 @@ struct catalog_type {
        , blocks_incoming(build<Counter>("nodeop_blocks_incoming", "number of incoming blocks"))
        , bytes_transferred(build<Counter>("exposer_transferred_bytes_total",
                                           "total number of bytes for responses to prometheus scrape requests"))
-       , num_scrapes(build<Counter>("exposer_scrapes_total", "total number of prometheus scrape requests received")) {}
+       , num_scrapes(build<Counter>("exposer_scrapes_total", "total number of prometheus scrape requests received")) {
+      for (const auto failure : magic_enum::enum_values<fc::http::failure_kind>()) {
+         const auto index = magic_enum::enum_index(failure);
+         FC_ASSERT(index, "Unknown outbound HTTP failure kind");
+         outbound_http_failure_counts[*index] =
+            &outbound_http_failures.Add({{"category", std::string(fc::http::failure_kind_name(failure))}});
+      }
+   }
 
    std::string report() {
+      update_outbound_http_metrics();
       const prometheus::TextSerializer serializer;
       auto                             result = serializer.Serialize(registry.Collect());
       bytes_transferred.Increment(result.size());
       num_scrapes.Increment(1);
       return result;
+   }
+
+   /** Copy process-wide monotonic outbound transport deltas into Prometheus counters. */
+   void update_outbound_http_metrics() {
+      const auto current = fc::http::get_metrics_snapshot();
+      outbound_http_requests.Increment(current.requests - last_outbound_http_metrics.requests);
+      outbound_http_successes.Increment(current.successes - last_outbound_http_metrics.successes);
+      outbound_http_request_bytes.Increment(
+         current.request_bytes - last_outbound_http_metrics.request_bytes);
+      outbound_http_response_bytes.Increment(
+         current.response_bytes - last_outbound_http_metrics.response_bytes);
+      for (const auto failure : magic_enum::enum_values<fc::http::failure_kind>()) {
+         const auto index = magic_enum::enum_index(failure);
+         FC_ASSERT(index, "Unknown outbound HTTP failure kind");
+         outbound_http_failure_counts[*index]->Increment(
+            current.failures[*index] - last_outbound_http_metrics.failures[*index]);
+      }
+      last_outbound_http_metrics = current;
    }
 
    void update(const http_plugin::metrics& metrics) {
@@ -205,16 +264,29 @@ struct catalog_type {
    void update(const net_plugin::p2p_connections_metrics& metrics) {
       p2p_metrics.num_peers.Set(metrics.num_peers);
       p2p_metrics.num_clients.Set(metrics.num_clients);
-      for(size_t i = 0; i < metrics.stats.peers.size(); ++i) {
-         const auto& peer = metrics.stats.peers[i];
-         const auto& conn_id = peer.unique_conn_node_id;
 
-         const auto addr = boost::asio::ip::make_address_v6(peer.address).to_string();
-         p2p_metrics.addr.Add({{"connid", conn_id},{"ipv6", addr},{"address", peer.p2p_address}});
+      // Per-connection series are keyed by {remote_ip, connection_id}: the real socket peer IP and the node's
+      // own monotonic connection counter. Both are observed locally, never values the remote peer supplies in
+      // its handshake, so a peer cannot inject arbitrary label text or inflate label cardinality by
+      // reconnecting with fresh node ids. Stale series are pruned below once a connection leaves the snapshot.
+      std::unordered_set<std::string> live_keys;
+      live_keys.reserve(metrics.stats.peers.size());
 
-         auto add_and_set_gauge = [&](auto& fam, const auto& value) {
-            auto& gauge = fam.Add({{"connid", conn_id}});
+      for (const auto& peer : metrics.stats.peers) {
+         const std::string remote_ip = boost::asio::ip::make_address_v6(peer.address).to_string();
+         const std::string conn_num  = std::to_string(peer.connection_id);
+         const std::string key       = remote_ip + '|' + conn_num;
+         live_keys.insert(key);
+
+         const prometheus::Labels labels{{"remote_ip", remote_ip}, {"connection_id", conn_num}};
+         auto&      handles    = tracked_p2p_series[key];
+         const bool first_seen = handles.empty();
+
+         auto add_and_set_gauge = [&](prometheus::Family<Gauge>& fam, const auto& value) {
+            auto& gauge = fam.Add(labels);
             gauge.Set(value);
+            if (first_seen)
+               handles.emplace_back(&fam, &gauge);
          };
 
          add_and_set_gauge(p2p_metrics.connection_number, peer.connection_id);
@@ -234,6 +306,18 @@ struct catalog_type {
          add_and_set_gauge(p2p_metrics.block_sync_throttling, peer.block_sync_throttling);
          add_and_set_gauge(p2p_metrics.connection_start_time, peer.connection_start_time.count());
          add_and_set_gauge(p2p_metrics.peer_score, peer.peer_score);
+      }
+
+      // Prune series for connections no longer present in the snapshot so peer-driven churn cannot accumulate
+      // stale per-connection labels in the registry.
+      for (auto it = tracked_p2p_series.begin(); it != tracked_p2p_series.end();) {
+         if (live_keys.count(it->first) == 0) {
+            for (auto& [fam, gauge] : it->second)
+               fam->Remove(gauge);
+            it = tracked_p2p_series.erase(it);
+         } else {
+            ++it;
+         }
       }
    }
 

@@ -2,6 +2,7 @@
 #include <fc/crypto/sha256.hpp>
 #include <fc/int128.hpp>
 #include <fc/io/json.hpp>
+#include <fc/slug_name.hpp>
 #include <fc/variant_object.hpp>
 #include <boost/endian/conversion.hpp>
 #include <algorithm>
@@ -13,10 +14,12 @@
 
 #include <sysio/batch_operator_plugin/batch_operator_plugin.hpp>
 #include <sysio/batch_operator_plugin/depot_ops.hpp>
+#include <sysio/batch_operator_plugin/outpost_binding.hpp>
 #include <sysio/batch_operator_plugin/outpost_epoch_lookup.hpp>
 #include <sysio/batch_operator_plugin/outpost_opp_job.hpp>
 #include <sysio/depot/opreg_status.hpp>
 #include <sysio/chain/abi_serializer.hpp>
+#include <sysio/chain/plugin_interface.hpp>
 #include <sysio/chain/transaction.hpp>
 #include <sysio/chain_plugin/chain_plugin.hpp>
 #include <sysio/opp/opp.hpp>
@@ -61,7 +64,6 @@ namespace {
       constexpr auto table_outenvelopes  = "outenvelopes";
       constexpr auto action_deliver      = "deliver";
       constexpr auto action_chkcons      = "chkcons";
-      constexpr auto action_bootstrap    = "bootstrap";
       /// Field names on `envelope_entry` / `outbound_envelope` rows.
       namespace field {
          constexpr auto chain_code     = "chain_code";
@@ -136,11 +138,14 @@ struct batch_operator_plugin::impl {
    bool         enabled             = false;
    uint32_t     epoch_poll_ms       = EPOCH_POLL_MS;
    uint32_t     delivery_timeout_ms = DELIVERY_TIMEOUT_MS;
-   std::string  eth_client_id;
+   // SVM RPC client id (one Solana cluster serves all SVM programs). The EVM
+   // client is selected per outpost by external_chain_id, and each outpost's
+   // OPP contract addresses come from its `--batch-outpost` binding — see
+   // build_opp_jobs.
    std::string  sol_client_id;
-   std::string  eth_opp_inbound_addr;  // hex address of OPPInbound on ETH
-   std::string  eth_opp_addr;          // hex address of OPP on ETH
-   std::string  sol_program_id;        // base58 address of opp-solana-outpost
+   /// Remote OPP contract bindings from `--batch-outpost`, keyed by packed
+   /// chain code (matches `outpost_descriptor::id`).
+   std::map<uint64_t, batch_operator_detail::outpost_binding> outpost_bindings;
 
    // Epoch state tracked across polls
    uint32_t                 current_epoch = 0;
@@ -181,6 +186,15 @@ struct batch_operator_plugin::impl {
    };
    std::map<uint64_t, scheduled_opp_job_ids> scheduled_opp_jobs;
    std::atomic<bool>                 shutting_down{false};
+
+   /// Sync gate: `channels::irreversible_block` subscription that arms
+   /// {@link run_deferred_startup_or_quit} once `controller::is_synced()`
+   /// holds — a LIB advance is the only event that can turn the predicate
+   /// true. Unsubscribed after arming; otherwise the handle's destructor
+   /// releases it (no shutdown unsubscribe needed: posted channel deliveries
+   /// are drained without executing after quit, and the slot checks
+   /// `shutting_down` first).
+   chain::plugin_interface::channels::irreversible_block::channel_type::handle sync_gate_subscription;
 
    // -----------------------------------------------------------------------
    //  Chain-agnostic orchestration layer
@@ -459,19 +473,19 @@ struct batch_operator_plugin::impl {
       auto [ok, epoch_index] = parse_epoch_state();
       if (!ok) return;
 
-      // Genesis bootstrap: if epoch has never been advanced (epoch == 0),
-      // trigger the first advance via msgch::bootstrap.
-      // Post-genesis: advance is triggered by evalcons consensus, not by batch operators.
-      if (epoch_index == 0) {
-         try {
-            push_action(msgch::account, msgch::action_bootstrap, operator_account,
-                        fc::mutable_variant_object());
-            auto [ok2, epoch_index2] = parse_epoch_state();
-            if (ok2) epoch_index = epoch_index2;
-         } catch (const fc::exception& e) {
-            dlog("batch_operator: bootstrap skipped — {}", e.to_string());
-         }
-      }
+      // The genesis advance (epoch 0 -> 1) is a SYSTEM responsibility, not a
+      // batch operator's: `sysio.msgch::bootstrap` gates on
+      // `require_auth(get_self())`, so only the holder of `sysio.msgch`'s own
+      // authority (the genesis / bootstrap process) can trigger it. A batch
+      // operator signs with its own account authority, so an operator-side push
+      // fails unconditionally with `missing authority of sysio.msgch` before the
+      // epoch check — it never advanced anything, it only produced boot-window
+      // error-log noise. From epoch 1 onward batch operators still TRIGGER
+      // advancement — the elected operator's poll cranks `msgch::chkcons`
+      // (see poll_epoch_state), which sends the inline `sysio.epoch::advance`
+      // (again under msgch's own authority) once the per-outpost consensus
+      // recorded during `evalcons` dispatch and the epoch time gate are met —
+      // but they never AUTHORIZE bootstrap or advance directly.
 
       if (!is_elected) {
          if (epoch_index != current_epoch) {
@@ -577,11 +591,50 @@ struct batch_operator_plugin::impl {
          std::shared_ptr<sysio::outpost_client> client;
          try {
             if (op.chain_kind == CHAIN_KIND_EVM) {
-               client = eth_plug->create_outpost_client(eth_client_id, op.id, op.chain_id,
-                                                     eth_opp_addr, eth_opp_inbound_addr);
+               // Bind this exact outpost to its own remote identity: the RPC
+               // client is the one whose configured chain id matches this
+               // row's external_chain_id (never a shared per-kind tuple), and
+               // the OPP / OPPInbound contract addresses come from the row's
+               // `--batch-outpost` binding. Anything missing => skip the job
+               // (fail closed) so an outpost is never relayed through another
+               // chain's endpoint.
+               auto entry = eth_plug->get_client_by_chain_id(op.chain_id);
+               if (!entry) {
+                  wlog("batch_operator: no unique --outpost-ethereum-client for chain_id {} "
+                       "(outpost {}); skipping until one is configured",
+                       op.chain_id, fc::slug_name{op.id}.to_string());
+                  continue;
+               }
+               auto bound = outpost_bindings.find(op.id);
+               if (bound == outpost_bindings.end() || bound->second.opp_inbound_addr.empty()) {
+                  wlog("batch_operator: outpost {} (EVM) has no {}=<CODE>,<OPP>,<OPPInbound> "
+                       "binding; skipping until one is configured",
+                       fc::slug_name{op.id}.to_string(), batch_operator_detail::BATCH_OUTPOST_OPTION);
+                  continue;
+               }
+               client = eth_plug->create_outpost_client(entry->id, op.id, op.chain_id,
+                                                     bound->second.opp_addr,
+                                                     bound->second.opp_inbound_addr);
             } else if (op.chain_kind == CHAIN_KIND_SVM) {
+               // SVM: one Solana cluster (RPC client) serves every program, so
+               // the shared sol client is correct; the per-outpost identity is
+               // the program id from the row's `--batch-outpost` binding.
+               auto bound = outpost_bindings.find(op.id);
+               if (bound == outpost_bindings.end()) {
+                  wlog("batch_operator: outpost {} (SVM) has no {}=<CODE>,<program_id> binding; "
+                       "skipping until one is configured",
+                       fc::slug_name{op.id}.to_string(), batch_operator_detail::BATCH_OUTPOST_OPTION);
+                  continue;
+               }
+               if (!bound->second.opp_inbound_addr.empty()) {
+                  wlog("batch_operator: outpost {} (SVM) binding must not carry an inbound "
+                       "address (the single program serves both directions); skipping",
+                       fc::slug_name{op.id}.to_string());
+                  continue;
+               }
                client = sol_plug->create_outpost_client(sol_client_id, op.id, op.chain_id,
-                                                     sol_program_id);
+                                                     bound->second.opp_addr,
+                                                     solana_outpost_role::batch_operator);
             } else {
                wlog("batch_operator: outpost {} has unsupported chain_kind, skipping job build",
                     op.id);
@@ -769,6 +822,91 @@ struct batch_operator_plugin::impl {
          elog("batch_operator: push {}::{} timed out", contract, action_name);
       }
    }
+
+   // -----------------------------------------------------------------------
+   //  Sync-gated startup
+   // -----------------------------------------------------------------------
+
+   /// The startup body deferred behind the sync gate: outpost
+   /// discovery → private cron_service creation (sized from the discovered
+   /// outposts) → epoch_tick scheduling → per-outpost relay jobs. Runs on the
+   /// main thread from {@link run_deferred_startup_or_quit} once the node is
+   /// synced. Deferral exists because `refresh_outposts` reads `sysio.chains`
+   /// LOCALLY: on a cold-booting operator node still replaying toward the
+   /// deploy blocks the read throws Account/Contract Query Exceptions
+   /// (3060002/3060003) — spurious boot-window errors the gate removes.
+   void run_deferred_startup() {
+      if (shutting_down) {
+         return;
+      }
+
+      // Discover outposts before the private cron_service starts. Later refresh
+      // ticks add/remove per-outpost cron jobs as the active chain set changes.
+      try {
+         refresh_outposts();
+      } catch (const fc::exception& e) {
+         wlog("batch_operator_plugin: initial outpost discovery failed: {}. "
+              "Starting with 0 per-outpost jobs; refresh ticks will retry after "
+              "the chain has caught up.", e.to_string());
+      }
+
+      // Size the pool for startup outposts. Later dynamic outposts are added to
+      // the same queued cron service; the minimum keeps epoch_tick viable even
+      // when no outposts are known yet.
+      const std::size_t outpost_count   = opp_jobs.size();
+      const std::size_t required_threads = outpost_count * OPP_CRON_JOBS_PER_OUTPOST + EPOCH_TICK_CRON_JOBS;
+      const std::size_t thread_count    = std::max(required_threads, MIN_CRON_THREADS);
+
+      sysio::services::cron_service::options svc_opts;
+      svc_opts.name        = "batch_operator";
+      svc_opts.num_threads = thread_count;
+      svc_opts.autostart   = true;
+
+      cron_svc = sysio::services::cron_service::create(svc_opts);
+      ilog("batch_operator_plugin: cron_service started with {} thread(s) ({} outpost(s) discovered)",
+           thread_count, outpost_count);
+
+      const auto poll_ms = epoch_poll_ms;
+
+      // epoch_tick — refresh epoch state + election. Keeps `current_epoch`
+      // and `within_epoch_window` accurate for every per-outpost job.
+      {
+         sysio::services::cron_service::job_schedule sched;
+         sched.milliseconds = {sysio::services::cron_service::job_schedule::step_value{poll_ms}};
+         sysio::services::cron_service::job_metadata_t meta;
+         meta.label          = "batch_operator_epoch_tick";
+         meta.one_at_a_time  = true;
+         auto id = cron_svc->add(sched,
+                                 [this]() { poll_epoch_state(); },
+                                 meta);
+         cron_job_ids.push_back(id);
+         ilog("batch_operator_plugin: scheduled {} (id={}, every {}ms)", meta.label, id, poll_ms);
+      }
+
+      schedule_opp_jobs();
+   }
+
+   /// {@link run_deferred_startup} plus the uniform fail-fast policy: the
+   /// sync-gate callback is a posted channel delivery, so an escaping
+   /// exception would unwind the application executor mid-task with no
+   /// diagnosable trace of WHAT failed. Contain it long enough to log, then
+   /// shut the node down — an operator daemon whose relay never started must
+   /// be supervisor-visible (it has liveness/slashing consequences), not
+   /// hidden behind a running process. Expected transient failures
+   /// (outpost discovery against a not-yet-deployed registry) are already
+   /// absorbed inside {@link run_deferred_startup} and retried by the refresh
+   /// ticks; what reaches here is structural (cron_service creation or job
+   /// scheduling failed). FC_LOG_AND_DROP deliberately rethrows
+   /// boost::interprocess::bad_alloc — chainbase shared-memory exhaustion
+   /// stays immediately fatal.
+   void run_deferred_startup_or_quit() {
+      try {
+         run_deferred_startup();
+         return;
+      } FC_LOG_AND_DROP("batch_operator_plugin: deferred startup failed unexpectedly:");
+      elog("batch_operator_plugin: deferred startup failed terminally — shutting down node (fail-fast)");
+      app().quit();
+   }
 };
 
 // ---------------------------------------------------------------------------
@@ -794,16 +932,18 @@ void batch_operator_plugin::set_program_options(options_description& cli,
         "Max time to wait for chain delivery confirmation (ms)");
    opts("batch-enabled", bpo::value<bool>()->default_value(false),
         "Enable batch operator functionality");
-   opts("batch-eth-client-id", bpo::value<std::string>()->default_value("eth-default"),
-        "Ethereum outpost client ID");
    opts("batch-sol-client-id", bpo::value<std::string>()->default_value("sol-default"),
-        "Solana outpost client ID");
-   opts("batch-eth-opp-inbound-addr", bpo::value<std::string>(),
-        "OPPInbound contract address on Ethereum (hex)");
-   opts("batch-eth-opp-addr", bpo::value<std::string>(),
-        "OPP contract address on Ethereum (hex)");
-   opts("batch-sol-program-id", bpo::value<std::string>(),
-        "opp-solana-outpost program ID (base58)");
+        "Solana outpost client ID (RPC connection) for SVM outpost rows");
+   // Help text must not contain a " --" sequence (or non-ASCII): the
+   // PerformanceHarness plugin-args generator splits nodeop's --help output on
+   // " --", so option names referenced below are spelled without the dashes.
+   opts(batch_operator_detail::BATCH_OUTPOST_OPTION, bpo::value<std::vector<std::string>>()->multitoken(),
+        "Remote OPP contract binding for one active sysio.chains row, repeatable once per "
+        "chain code. Spec: CHAIN_CODE,opp_addr[,opp_inbound_addr]. EVM rows require the OPP "
+        "and OPPInbound contract addresses (0x-hex); SVM rows require only the outpost "
+        "program id (base58). The Ethereum RPC client for a row is selected by matching the "
+        "row's external_chain_id against the chain ids of the outpost-ethereum-client specs; "
+        "an active row with no binding or no matching client is skipped (fail closed).");
 }
 
 void batch_operator_plugin::plugin_initialize(const variables_map& options) {
@@ -812,19 +952,32 @@ void batch_operator_plugin::plugin_initialize(const variables_map& options) {
    _impl->epoch_poll_ms       = options["batch-epoch-poll-ms"].as<uint32_t>();
    _impl->delivery_timeout_ms = options["batch-delivery-timeout-ms"].as<uint32_t>();
    _impl->enabled             = options["batch-enabled"].as<bool>();
-   _impl->eth_client_id       = options["batch-eth-client-id"].as<std::string>();
    _impl->sol_client_id       = options["batch-sol-client-id"].as<std::string>();
-   if (options.count("batch-eth-opp-inbound-addr"))
-      _impl->eth_opp_inbound_addr = options["batch-eth-opp-inbound-addr"].as<std::string>();
-   if (options.count("batch-eth-opp-addr"))
-      _impl->eth_opp_addr = options["batch-eth-opp-addr"].as<std::string>();
-   if (options.count("batch-sol-program-id"))
-      _impl->sol_program_id = options["batch-sol-program-id"].as<std::string>();
+   if (options.count(batch_operator_detail::BATCH_OUTPOST_OPTION)) {
+      for (const auto& spec :
+           options[batch_operator_detail::BATCH_OUTPOST_OPTION].as<std::vector<std::string>>()) {
+         auto [code, binding] = batch_operator_detail::parse_outpost_binding(spec);
+         FC_ASSERT(_impl->outpost_bindings.emplace(code, std::move(binding)).second,
+                   "Duplicate {} binding for chain code {}",
+                   batch_operator_detail::BATCH_OUTPOST_OPTION, fc::slug_name{code}.to_string());
+      }
+   }
 
    _impl->chain_plug = &app().get_plugin<chain_plugin>();
    _impl->cron_plug  = &app().get_plugin<cron_plugin>();
    _impl->eth_plug   = &app().get_plugin<outpost_ethereum_client_plugin>();
    _impl->sol_plug   = &app().get_plugin<outpost_solana_client_plugin>();
+
+   // Operator daemons are designed for read-mode = irreversible: the sync gate
+   // (controller::is_synced) measures LIB recency and every local table read the
+   // relay performs serves the irreversible view. Any other read mode would relay
+   // envelopes derived from state that can still fork out. Together with
+   // producer_plugin's inverse assert (no producer-name under irreversible
+   // read-mode), this also makes co-hosting a producer with an operator daemon
+   // impossible by configuration.
+   FC_ASSERT(!_impl->enabled ||
+                _impl->chain_plug->chain().get_read_mode() == chain::db_read_mode::IRREVERSIBLE,
+             "batch_operator_plugin requires read-mode = irreversible");
 }
 
 void batch_operator_plugin::plugin_startup() {
@@ -835,50 +988,49 @@ void batch_operator_plugin::plugin_startup() {
 
    ilog("batch_operator_plugin: starting for account {}", _impl->operator_account.to_string());
 
-   // Discover outposts before the private cron_service starts. Later refresh
-   // ticks add/remove per-outpost cron jobs as the active chain set changes.
-   try {
-      _impl->refresh_outposts();
-   } catch (const fc::exception& e) {
-      wlog("batch_operator_plugin: initial outpost discovery failed: {}. "
-           "Starting with 0 per-outpost jobs; refresh ticks will retry after "
-           "the chain has caught up.", e.to_string());
-   }
-
-   // Size the pool for startup outposts. Later dynamic outposts are added to
-   // the same queued cron service; the minimum keeps epoch_tick viable even
-   // when no outposts are known yet.
-   const std::size_t outpost_count   = _impl->opp_jobs.size();
-   const std::size_t required_threads = outpost_count * OPP_CRON_JOBS_PER_OUTPOST + EPOCH_TICK_CRON_JOBS;
-   const std::size_t thread_count    = std::max(required_threads, MIN_CRON_THREADS);
-
-   sysio::services::cron_service::options svc_opts;
-   svc_opts.name        = "batch_operator";
-   svc_opts.num_threads = thread_count;
-   svc_opts.autostart   = true;
-
-   _impl->cron_svc = sysio::services::cron_service::create(svc_opts);
-   ilog("batch_operator_plugin: cron_service started with {} thread(s) ({} outpost(s) discovered)",
-        thread_count, outpost_count);
-
-   const auto poll_ms = _impl->epoch_poll_ms;
-
-   // epoch_tick — refresh epoch state + election. Keeps `current_epoch`
-   // and `within_epoch_window` accurate for every per-outpost job.
-   {
-      sysio::services::cron_service::job_schedule sched;
-      sched.milliseconds = {sysio::services::cron_service::job_schedule::step_value{poll_ms}};
-      sysio::services::cron_service::job_metadata_t meta;
-      meta.label          = "batch_operator_epoch_tick";
-      meta.one_at_a_time  = true;
-      auto id = _impl->cron_svc->add(sched,
-                                     [impl = _impl.get()]() { impl->poll_epoch_state(); },
-                                     meta);
-      _impl->cron_job_ids.push_back(id);
-      ilog("batch_operator_plugin: scheduled {} (id={}, every {}ms)", meta.label, id, poll_ms);
-   }
-
-   _impl->schedule_opp_jobs();
+   // The startup body's outpost discovery reads `sysio.chains` LOCALLY. On a
+   // cold-booting operator node those reads see mid-sync (possibly genesis)
+   // state and throw spuriously, so the whole body (discovery → cron_service →
+   // epoch_tick → relay jobs) is DEFERRED until the node is synced —
+   // `controller::is_synced()`: the LAST IRREVERSIBLE block's time within
+   // `controller::default_sync_recency_ms` of now (the state the reads
+   // actually serve under read-mode = irreversible). The wake-up is the
+   // existing `irreversible_block` channel: a LIB advance is the only event
+   // that can turn the predicate true, and channel deliveries are posted to
+   // the application executor — main thread, AFTER the triggering block fully
+   // commits — so the callback may run the startup body directly. There is
+   // deliberately no already-synced fast path: operator daemons boot with
+   // genesis-stale LIB in every deployment topology (producer co-hosting is
+   // impossible by configuration — see the read-mode requirement in
+   // plugin_initialize), and a node that somehow is synced at startup is
+   // released by the next LIB advance. That advance is also the relay's WORK
+   // SUPPLY — everything here acts on newly-finalized state — so a finality
+   // stall that spans startup (the classic lost-wakeup case) is one with
+   // nothing to relay: the first finalized block re-arms the gate and
+   // creates the first actionable state at the same instant.
+   auto& chain = _impl->chain_plug->chain();
+   ilog("batch_operator_plugin: waiting for chain sync before outpost discovery "
+        "(head {} is {}s behind now; irreversible state is {}s behind)",
+        chain.head().block_num(),
+        (fc::time_point::now() - chain.head().block_time()).to_seconds(),
+        chain.fork_db_has_root()
+           ? std::to_string((fc::time_point::now() - chain.fork_db_root().block_time()).to_seconds())
+           : "n/a");
+   _impl->sync_gate_subscription =
+      app().get_channel<chain::plugin_interface::channels::irreversible_block>().subscribe(
+         [impl = _impl.get()](const chain::block_signal_params&) {
+            if (impl->shutting_down || !impl->chain_plug->chain().is_synced()) {
+               return;
+            }
+            // One-shot consumption: unsubscribe (safe from within the slot) and
+            // run the startup body directly — channel deliveries are posted to
+            // the application executor, so this already runs on the main thread
+            // AFTER the triggering block committed (mid block-application,
+            // table reads would observe an incomplete view).
+            impl->sync_gate_subscription.unsubscribe();
+            ilog("batch_operator_plugin: chain synced — starting deferred startup");
+            impl->run_deferred_startup_or_quit();
+         });
 }
 
 void batch_operator_plugin::plugin_shutdown() {

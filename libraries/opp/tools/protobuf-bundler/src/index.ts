@@ -6,6 +6,8 @@ import { log, setLogLevel } from "./util/logger.js"
 import { bundleCommand } from "./commands/bundle.js"
 import { resolveSynchronizedVersion } from "./util/resolveVersion.js"
 import {
+  Channel,
+  DEV_PRERELEASE_SUFFIX,
   Target,
   ALL_TARGETS,
   PUBLISHABLE_TARGETS,
@@ -67,11 +69,17 @@ async function main(): Promise<void> {
       describe:
         "Semver version. If omitted, resolved from npm (ts/solidity synced, solana defaults to 0.1.0)."
     })
+    .option("channel", {
+      type: "string",
+      choices: Object.values(Channel),
+      describe:
+        "Release channel matching wire-sysio. 'dev' appends the -dev prerelease suffix to the resolved version; 'stable' (or omitted) publishes the bare version. Version resolution itself is unchanged."
+    })
     .option("publish", {
       type: "boolean",
       default: false,
       describe:
-        "Publish typescript/solidity packages to npm after generation."
+        "Publish typescript/solidity packages to npm and the solana crate to the WIRE cargo registry after generation."
     })
     .option("verbose", {
       type: "boolean",
@@ -106,11 +114,28 @@ async function main(): Promise<void> {
     requestedTargets.includes(t)
   )
 
+  // An explicit --package-version wins over resolution, but must agree with
+  // the requested channel's suffix — error on mismatch, never silently rewrite.
+  const channel = argv.channel as Channel | undefined,
+    devSuffix = `-${DEV_PRERELEASE_SUFFIX}`
+  if (argv.packageVersion && channel === Channel.dev) {
+    Assert.ok(
+      argv.packageVersion.endsWith(devSuffix),
+      `--channel ${Channel.dev} requires a --package-version ending in "${devSuffix}" (got "${argv.packageVersion}")`
+    )
+  }
+  if (argv.packageVersion && channel === Channel.stable) {
+    Assert.ok(
+      !argv.packageVersion.includes("-"),
+      `--channel ${Channel.stable} requires a bare --package-version with no prerelease suffix (got "${argv.packageVersion}")`
+    )
+  }
+
   // Resolve version — synchronized for ts/solidity if any are in the set
   const hasNpmTargets = targets.some(t => PUBLISHABLE_TARGETS.includes(t)),
     packageVersion =
       argv.packageVersion ??
-      (hasNpmTargets ? resolveSynchronizedVersion() : "0.1.0")
+      (hasNpmTargets ? resolveSynchronizedVersion(channel) : "0.1.0")
 
   await bundleCommand({
     repo: argv.repo,

@@ -9,7 +9,10 @@ import {
   Target,
   TargetPackageName,
   TemplatePath,
-  TemplateFile
+  TemplateFile,
+  CARGO_REGISTRY_NAME,
+  CRATE_LICENSE,
+  CRATE_REPOSITORY_URL
 } from "../constants.js"
 
 /**
@@ -91,6 +94,11 @@ async function generateSolanaPackage(
     packageName,
     version: packageVersion,
     repo,
+    license: CRATE_LICENSE,
+    repository: CRATE_REPOSITORY_URL,
+    // Restrict publishing to the WIRE registry — the crate can never be
+    // pushed to crates.io by accident.
+    publishRegistries: [CARGO_REGISTRY_NAME],
     modules: [] as string[],
     dependencies: {}
   }

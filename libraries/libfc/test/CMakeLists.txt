@@ -7,15 +7,18 @@ add_executable( test_fc
         crypto/test_hash_functions.cpp
         crypto/test_k1_recover.cpp
         crypto/test_modular_arithmetic.cpp
+        crypto/test_signature_provider.cpp
         crypto/test_webauthn.cpp
         io/test_cfile.cpp
         io/test_json.cpp
+        io/test_secure_file.cpp
         log/test_json_formatter.cpp
         io/test_json_variant.cpp
         io/test_random_access_file.cpp
         io/test_raw.cpp
         io/test_tracked_storage.cpp
         network/ethereum/test_ethereum_client_and_rlp.cpp
+        network/test_http_client.cpp
         network/test_json_rpc_client.cpp
         network/solana/test_solana_client.cpp
         network/test_message_buffer.cpp

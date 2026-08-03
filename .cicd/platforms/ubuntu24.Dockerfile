@@ -53,3 +53,15 @@ RUN apt-get update && apt-get upgrade -y && \
 ENV CC=/usr/bin/clang-18
 ENV CXX=/usr/bin/clang++-18
 ENV CMAKE_MAKE_PROGRAM=/usr/bin/ninja
+
+# GitHub CLI from the official apt repository. The release workflows use `gh`
+# inside these images (linux_amd64_build.yaml downloads the pinned wire-cdt
+# release asset with `gh release download`), and it is installed in EVERY
+# platform image rather than just the packaging one so the images stay uniform.
+RUN mkdir -p -m 755 /etc/apt/keyrings \
+    && wget -nv -O /etc/apt/keyrings/githubcli-archive-keyring.gpg https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+    && chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
+       > /etc/apt/sources.list.d/github-cli.list \
+    && apt-get update \
+    && apt-get install -y gh

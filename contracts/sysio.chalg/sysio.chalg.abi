@@ -4,6 +4,16 @@
     "types": [],
     "structs": [
         {
+            "name": "chalg_state",
+            "base": "",
+            "fields": [
+                {
+                    "name": "open_disputes",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
             "name": "chkdispute",
             "base": "",
             "fields": [
@@ -62,6 +72,18 @@
                 {
                     "name": "candidates",
                     "type": "dispute_candidate[]"
+                },
+                {
+                    "name": "network_gen",
+                    "type": "uint8"
+                },
+                {
+                    "name": "electorate",
+                    "type": "name[]"
+                },
+                {
+                    "name": "quorum",
+                    "type": "uint32"
                 }
             ]
         },
@@ -177,6 +199,14 @@
         }
     ],
     "tables": [
+        {
+            "name": "chalgstate",
+            "type": "chalg_state",
+            "index_type": "i64",
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 32990
+        },
         {
             "name": "disputes",
             "type": "dispute_entry",

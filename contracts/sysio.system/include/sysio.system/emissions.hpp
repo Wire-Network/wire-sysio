@@ -10,6 +10,7 @@
 #include <sysio/system.hpp>
 #include <sysio/time.hpp>
 
+#include <algorithm>
 #include <cstdint>
 
 // Core emissions tables owned by sysio.system. This header is intentionally
@@ -272,6 +273,49 @@ inline int64_t compute_epoch_emission(const emission_config& cfg,
    if (emission > remaining) emission = remaining;
 
    return emission;
+}
+
+// ---------------------------------------------------------------------------
+// Pay-cadence accumulator arithmetic. accrueepoch runs as an inline action
+// from sysio.epoch::advance and must never throw, so the pending accumulator
+// saturates at the asset ceiling instead of wrapping. The readiness gate
+// (sysio.epoch::check_emissions_ready) precomputes the same period total and
+// payepoch asserts equality between the two, so all of them MUST share this
+// one helper: an unsaturated gate sum could exceed any holdable balance once
+// the accumulator clamps, blocking epoch advancement permanently.
+// ---------------------------------------------------------------------------
+
+/// Saturating pay-period accumulation: pending + per_epoch, capped at
+/// sysio::asset::max_amount (2^62 - 1). Expects 0 <= pending <= max_amount and
+/// per_epoch >= 0 (both enforced upstream).
+inline int64_t saturating_accrue(int64_t pending, int64_t per_epoch) {
+   const int64_t room = sysio::asset::max_amount - pending;
+   return pending + (per_epoch <= room ? per_epoch : room);
+}
+
+/// Largest per-epoch emission the curve can produce under cfg at the given
+/// epoch duration: the scaled initial emission (first-epoch path, capped only
+/// by the remaining treasury) or the scaled annual ceiling (the decay-path
+/// clamp in compute_epoch_emission), whichever is larger.
+inline int64_t per_epoch_emission_ceiling(const emission_config& cfg, uint32_t epoch_duration_sec) {
+   return std::max(scale_annual_to_epoch(cfg.annual_initial_emission, epoch_duration_sec),
+                   scale_annual_to_epoch(cfg.annual_max_emission, epoch_duration_sec));
+}
+
+/// True when the worst-case pay-period accumulation stays inside the asset
+/// range: whatever is already pending plus a full pay cadence of ceiling-rate
+/// epochs must not exceed sysio::asset::max_amount. Enforced at both config
+/// boundaries that feed the accumulator -- sysio.system::setemitcfg (annual
+/// emission values, pay cadence) and sysio.epoch::setconfig (epoch duration,
+/// which scales the per-epoch ceiling linearly) -- so no accepted
+/// configuration can drive saturating_accrue to its clamp mid-period.
+inline bool period_accrual_fits_asset_range(const emission_config& cfg,
+                                            uint32_t epoch_duration_sec,
+                                            int64_t pending_emission_amount) {
+   const __int128 worst_case =
+      static_cast<__int128>(pending_emission_amount) +
+      static_cast<__int128>(per_epoch_emission_ceiling(cfg, epoch_duration_sec)) * cfg.pay_cadence_epochs;
+   return worst_case <= static_cast<__int128>(sysio::asset::max_amount);
 }
 
 // ---------------------------------------------------------------------------

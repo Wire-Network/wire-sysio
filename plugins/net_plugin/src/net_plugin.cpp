@@ -385,7 +385,6 @@ namespace sysio {
       string resolve_and_connect(const string& peer_address, const string& listen_address);
       connection_ptr is_other_connected(const string& peer_address, const connection_ptr& c) const;
       string disconnect(const string& host);
-      void disconnect_gossip_connection(const string& host);
       void close_all();
 
       std::optional<connection_status> status(const string& host) const;
@@ -5110,19 +5109,6 @@ namespace sysio {
       return true;
    }
 
-   void connections_manager::disconnect_gossip_connection(const string& host) {
-      std::lock_guard g( connections_mtx );
-      // do not disconnect if a p2p-peer-address
-      if (supplied_peers.contains(host))
-         return;
-      auto& index = connections.get<by_host>();
-      if( auto i = index.find( host ); i != index.end() ) {
-         fc_ilog( p2p_conn_log, "disconnecting: '{}' - {}", host, i->c->connection_id );
-         i->c->close();
-         connections.erase(i);
-      }
-   }
-
    // called by API
    string connections_manager::disconnect( const string& host ) {
       std::lock_guard g( connections_mtx );
@@ -5229,6 +5215,12 @@ namespace sysio {
    // called from any thread
    void connections_manager::connection_monitor(const std::weak_ptr<connection>& from_connection) {
       size_t num_rm = 0, num_clients = 0, num_peers = 0, num_bp_peers = 0;
+      // bp peer addresses whose producers have left scheduling proximity: outbound connections to
+      // them are pruned below (a supplied peer is never pruned). Always empty when auto bp
+      // peering is not enabled — a config check, no locks — so nodes not participating in bp
+      // gossip pay no per-connection cost (the empty() gate below short-circuits).
+      // Computed before acquiring connections_mtx (it takes the bp gossip mutexes).
+      const auto bp_addresses_to_drop = my_impl->gossip_bp_addresses_to_drop();
       auto cleanup = [&num_rm, this](vector<connection_ptr>&& reconnecting, vector<connection_ptr>&& removing) {
          for( auto& c : reconnecting ) {
             if (!c->resolve_and_connect()) {
@@ -5261,6 +5253,21 @@ namespace sysio {
             return;
          }
          const connection_ptr& c = it->c;
+         if (!bp_addresses_to_drop.empty() && !c->incoming()) {
+            // prune the outbound connection (open, or closed and awaiting reconnect) of a bp peer
+            // which is no longer within scheduling proximity; its own outbound side is pruned by
+            // the peer, so the connection heals on both ends without either closing inbound ones
+            const std::string& peer_addr = c->peer_address();
+            if (bp_addresses_to_drop.contains(peer_addr) && !supplied_peers.contains(peer_addr)) {
+               fc_ilog( p2p_conn_log, "pruning connection to bp peer no longer in scheduling proximity: '{}' - {}",
+                        peer_addr, c->connection_id );
+               c->close();
+               ++num_rm;
+               removing.push_back(c);
+               ++it;
+               continue;
+            }
+         }
          if (c->bp_connection != connection::bp_connection_type::non_bp) {
             ++num_bp_peers;
          } else if (c->incoming()) {

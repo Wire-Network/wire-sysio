@@ -3,5 +3,6 @@ plugin_target(
         LIBRARIES
         appbase
         batch_operator_plugin
+        http_client_plugin
         opp
         fc)

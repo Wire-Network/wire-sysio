@@ -5,6 +5,7 @@ import {
   fieldTag,
   resolveSolType
 } from "./type-map.js"
+import { enumLibName } from "./enum.js"
 import type { EnumFieldInfo } from "./enum.js"
 import { log } from "../util/logger.js"
 
@@ -18,7 +19,12 @@ export interface FieldInfo {
   typeName?: string
   label: number // 1=optional, 2=required, 3=repeated
   oneofIndex?: number
-  mapEntry?: { keyType: number; valueType: number; valueTypeName?: string; valueEnumInfo?: EnumFieldInfo }
+  mapEntry?: {
+    keyType: number
+    valueType: number
+    valueTypeName?: string
+    valueEnumInfo?: EnumFieldInfo
+  }
   enumInfo?: EnumFieldInfo
 }
 
@@ -116,7 +122,10 @@ export interface DecodeBranch {
  * Returns the wire tag and the body statements (indented at 8 spaces)
  * to be placed inside an if/else-if block by the caller.
  */
-export function genFieldDecode(field: FieldInfo, varName: string): DecodeBranch {
+export function genFieldDecode(
+  field: FieldInfo,
+  varName: string
+): DecodeBranch {
   const solName = toSolFieldName(field.name)
   const typeInfo = PROTO_TYPE_MAP[field.type]
 
@@ -125,7 +134,10 @@ export function genFieldDecode(field: FieldInfo, varName: string): DecodeBranch 
       field.number,
       field.mapEntry ? WireType.LengthDelimited : 0
     )
-    return { tag, body: `        // TODO: unsupported field type ${field.type} for ${field.name}` }
+    return {
+      tag,
+      body: `        // TODO: unsupported field type ${field.type} for ${field.name}`
+    }
   }
 
   const tag = fieldTag(
@@ -177,14 +189,28 @@ function castToUint64(solType: string, expr: string): string {
 }
 
 /** True when _decode_varint needs an explicit cast to the target type. */
-function needsVarintDecodeCast(typeInfo: (typeof PROTO_TYPE_MAP)[number]): boolean {
-  return typeInfo.decodeFunc === "_decode_varint" && typeInfo.solType !== "uint64"
+function needsVarintDecodeCast(
+  typeInfo: (typeof PROTO_TYPE_MAP)[number]
+): boolean {
+  return (
+    typeInfo.decodeFunc === "_decode_varint" && typeInfo.solType !== "uint64"
+  )
 }
 
 /** True when _encode_varint needs an explicit cast from the source type. */
-function needsVarintEncodeCast(typeInfo: (typeof PROTO_TYPE_MAP)[number]): boolean {
-  return typeInfo.encodeFunc === "_encode_varint" &&
-    typeInfo.solType !== "uint64" && typeInfo.solType !== "uint32"
+function needsVarintEncodeCast(
+  typeInfo: (typeof PROTO_TYPE_MAP)[number]
+): boolean {
+  return (
+    typeInfo.encodeFunc === "_encode_varint" &&
+    typeInfo.solType !== "uint64" &&
+    typeInfo.solType !== "uint32"
+  )
+}
+
+/** Generate a checked enum conversion from a decoded protobuf varint. */
+function enumFromRaw(ei: EnumFieldInfo, expr: string): string {
+  return `${enumLibName(ei.solTypeName)}.fromRaw(${expr})`
 }
 
 // ── Internal codegen helpers ──────────────────────────────────────────
@@ -211,7 +237,7 @@ function genEnumFieldDecode(
   return [
     `        { uint64 _v;`,
     `        (_v, pos) = ProtobufRuntime._decode_varint(data, pos);`,
-    `        ${varName}.${solName} = ${ei.solTypeName}.wrap(${ei.underlyingType}(_v)); }`
+    `        ${varName}.${solName} = ${enumFromRaw(ei, "_v")}; }`
   ].join("\n")
 }
 
@@ -283,7 +309,11 @@ function genRepeatedEncode(
   return lines.join("\n")
 }
 
-function genMapEncode(field: FieldInfo, tagHex: string, varName: string): string {
+function genMapEncode(
+  field: FieldInfo,
+  tagHex: string,
+  varName: string
+): string {
   const solName = toSolFieldName(field.name)
   const loopVar = `_i_${solName}`
   const me = field.mapEntry!
@@ -384,7 +414,7 @@ function genRepeatedDecode(
     return [
       `        { uint64 _elem;`,
       `        (_elem, pos) = ProtobufRuntime._decode_varint(data, pos);`,
-      `        ${varName}.${solName}[${idxVar}++] = ${ei.solTypeName}.wrap(${ei.underlyingType}(_elem)); }`
+      `        ${varName}.${solName}[${idxVar}++] = ${enumFromRaw(ei, "_elem")}; }`
     ].join("\n")
   }
 
@@ -404,7 +434,11 @@ function genRepeatedDecode(
   ].join("\n")
 }
 
-function genMapDecode(field: FieldInfo, solName: string, varName: string): string {
+function genMapDecode(
+  field: FieldInfo,
+  solName: string,
+  varName: string
+): string {
   const me = field.mapEntry!
   const keyInfo = PROTO_TYPE_MAP[me.keyType]
   const valInfo = PROTO_TYPE_MAP[me.valueType]
@@ -442,7 +476,7 @@ function genMapDecode(field: FieldInfo, solName: string, varName: string): strin
       `          } else if (_entryTag == ${fieldTag(2, valInfo.wireType)}) {`,
       `            { uint64 _raw;`,
       `            (_raw, pos) = ProtobufRuntime._decode_varint(data, pos);`,
-      `            _val = ${vei.solTypeName}.wrap(${vei.underlyingType}(_raw)); }`
+      `            _val = ${enumFromRaw(vei, "_raw")}; }`
     )
   } else {
     lines.push(

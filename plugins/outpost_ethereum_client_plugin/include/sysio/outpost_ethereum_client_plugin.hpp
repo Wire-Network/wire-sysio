@@ -15,6 +15,11 @@ struct ethereum_client_entry_t {
    std::string                        url;
    fc::crypto::signature_provider_ptr signature_provider;
    ethereum_client_ptr                client;
+   /// Numeric EVM chain id from the client spec's optional 4th field. Lets the
+   /// batch operator auto-select the client for an outpost row by matching the
+   /// row's `external_chain_id`, so multiple EVM outposts never share one
+   /// remote endpoint. `nullopt` when the spec omitted the chain id.
+   std::optional<uint32_t>            chain_id;
 };
 
 using ethereum_client_entry_ptr = std::shared_ptr<ethereum_client_entry_t>;
@@ -24,8 +29,12 @@ using ethereum_client_entry_ptr = std::shared_ptr<ethereum_client_entry_t>;
 /// not silently drop (see epoch-859 stall RCA); the confirmed factory
 /// awaits `eth_getTransactionReceipt` + N blocks before returning.
 struct opp_contract_client : ethereum_contract_client {
-   ethereum_contract_tx_fn<fc::variant> emit_outbound_envelope;
-   ethereum_contract_tx_fn<fc::variant> finalize_epoch;
+   /// Recovery-only write matching `emitOutboundEnvelope(uint32)` on the
+   /// Ethereum outpost. No in-tree steady-state caller invokes this wrapper:
+   /// normal operation emits during inbound consensus. It remains available
+   /// for explicit operator recovery tooling that must advance a stalled
+   /// outpost with the expected WIRE epoch.
+   ethereum_contract_tx_fn<fc::variant, uint32_t> emit_outbound_envelope;
    /// View: latest outbound envelope's raw bytes + epoch — overwritten
    /// on every `emitOutboundEnvelope`. Read by the WIRE batch operator
    /// to relay the envelope back to WIRE.
@@ -35,8 +44,7 @@ struct opp_contract_client : ethereum_contract_client {
                        const address_compat_type& contract_address,
                        const std::vector<fc::network::ethereum::abi::contract>& contracts)
       : ethereum_contract_client(client, contract_address, contracts)
-      , emit_outbound_envelope(create_tx_and_confirm<fc::variant>(get_abi("emitOutboundEnvelope")))
-      , finalize_epoch(create_tx_and_confirm<fc::variant>(get_abi("finalizeEpoch")))
+      , emit_outbound_envelope(create_tx_and_confirm<fc::variant, uint32_t>(get_abi("emitOutboundEnvelope")))
       , get_latest_outbound_envelope(create_call<fc::variant>(get_abi("getLatestOutboundEnvelope"))) {}
 };
 
@@ -81,7 +89,7 @@ class outpost_ethereum_client_plugin : public appbase::plugin<outpost_ethereum_c
 public:
    APPBASE_PLUGIN_REQUIRES((outpost_client_plugin)(signature_provider_manager_plugin))
    outpost_ethereum_client_plugin();
-   virtual ~outpost_ethereum_client_plugin() = default;
+   virtual ~outpost_ethereum_client_plugin();
 
    virtual void set_program_options(options_description& cli, options_description& cfg) override;
 
@@ -93,6 +101,15 @@ public:
 
    std::vector<ethereum_client_entry_ptr> get_clients();
    ethereum_client_entry_ptr get_client(const std::string& id);
+
+   /// Return the single configured client whose spec chain id equals
+   /// `chain_id`, or nullptr when none — or more than one — match. The batch
+   /// operator uses this to bind each EVM outpost row to its own RPC client by
+   /// `external_chain_id`; an ambiguous (duplicate chain id) or missing match
+   /// yields nullptr so the caller can fail closed rather than relay an
+   /// outpost through the wrong endpoint.
+   ethereum_client_entry_ptr get_client_by_chain_id(uint32_t chain_id);
+
    const std::vector<std::pair<std::filesystem::path, std::vector<fc::network::ethereum::abi::contract>>>& get_abi_files();
 
    /**

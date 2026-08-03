@@ -17,6 +17,7 @@ enum class api_category : uint32_t {
    prometheus   = 1 << 9,
    test_control = 1 << 10,
    snapshot_ro  = 1 << 11,  // public read-only snapshot metadata + download
+   underwriter  = 1 << 12,  // read-only underwriter diagnostics (stats/commits)
    node        = UINT32_MAX
 };
 

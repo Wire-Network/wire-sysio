@@ -116,6 +116,11 @@ try:
     assert Utils.waitForBool(lambda: prodNode.getHeadBlockNum() > shipStride + 10, timeout=300), \
         f"chain did not reach block {shipStride + 10}"
 
+    # Stop clear of a state-history-stride boundary: on an exact multiple the head log/index have
+    # just rotated into retained/ and are empty, which the info/range checks below cannot parse.
+    assert prodNode.waitForBlockClearOfStride(shipStride, timeout=30), \
+        "producer did not advance clear of a state-history-stride boundary"
+
     Print("Pause producer and stop both nodes")
     prodNode.processUrllibRequest("producer", "pause", exitOnError=True)
     # pause can return while one more block is mid-production; wait for the head to settle so the

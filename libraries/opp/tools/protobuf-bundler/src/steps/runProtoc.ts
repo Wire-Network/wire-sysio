@@ -61,7 +61,7 @@ function resolveFromPathOrBin(name: string, npmPkg: string): string {
  * Resolve a protoc plugin binary from the bundler's OWN install tree.
  *
  * The bundler runs with its CWD set to the consumer repo root (see
- * `generate-opp-bundles.fish`, which `cd`s to the repo before invoking the
+ * `generate-opp-bundles.sh`, which `cd`s to the repo before invoking the
  * globally-linked CLI). Plugin binaries that live only in the bundler's own
  * dependency tree — notably `protoc-gen-ts` from `@protobuf-ts/plugin`, which
  * (unlike the workspace `protoc-gen-solana`/`protoc-gen-solidity`) is never
@@ -114,9 +114,7 @@ export function resolvePluginBin(name: string, npmPkg: string): string {
     )
   ]
 
-  return asOption(
-    pkgBinCandidates.find(candidate => Fs.existsSync(candidate))
-  )
+  return asOption(pkgBinCandidates.find(candidate => Fs.existsSync(candidate)))
     .map(candidate => {
       const resolved = Path.resolve(candidate)
       log.debug("Found pkg binary at: %s", resolved)
@@ -130,7 +128,7 @@ export function resolvePluginBin(name: string, npmPkg: string): string {
  *
  * The bundler depends on a pinned `protoc` (see package.json) that pnpm places
  * in its own `node_modules/.bin`. Invoking bare `npx protoc` from the consumer
- * repo root (the bundler's runtime CWD — see generate-opp-bundles.fish) does NOT
+ * repo root (the bundler's runtime CWD — see generate-opp-bundles.sh) does NOT
  * find that pinned binary; npx instead downloads the LATEST `protoc` from the
  * registry, which can be a major version ahead of what the `protoc-gen-*`
  * plugins support and make code generation fail. Resolving from the bundler's
@@ -166,9 +164,7 @@ export function findProtoRoot(baseDir: string): string {
 export async function runProtoc(opts: RunProtocOptions): Promise<string[]> {
   const pluginInfo = PLUGIN_MAP[opts.target]
   if (!pluginInfo) {
-    throw new Error(
-      `No protoc plugin configured for target "${opts.target}"`
-    )
+    throw new Error(`No protoc plugin configured for target "${opts.target}"`)
   }
 
   const pluginBin = resolvePluginBin(pluginInfo.bin, pluginInfo.pkg)
@@ -179,9 +175,7 @@ export async function runProtoc(opts: RunProtocOptions): Promise<string[]> {
 
   const protoRoot = findProtoRoot(opts.protoDir)
 
-  const relativeProtos = opts.protoFiles.map(p =>
-    Path.relative(protoRoot, p)
-  )
+  const relativeProtos = opts.protoFiles.map(p => Path.relative(protoRoot, p))
 
   const args = [
     `--plugin=${pluginInfo.bin}=${pluginBin}`,

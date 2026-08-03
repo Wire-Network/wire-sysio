@@ -358,6 +358,27 @@ namespace sysio::chain {
          // thread-safe
          size_t       fork_db_size() const;
 
+         /// Behind-now gap (ms) under which {@link is_synced} counts the node as synced.
+         /// Must exceed steady-state finality lag (a few blocks) plus scheduling slack, and
+         /// stay well under one epoch so consumers gating work on the predicate never start
+         /// against stale state. Not an operator tunable.
+         static constexpr uint32_t default_sync_recency_ms = 5000;
+
+         /**
+          * @brief True when the LAST IRREVERSIBLE block's time is within `recency_window`
+          *        of `now`; false while no irreversible root exists (fresh boot,
+          *        mid-replay, snapshot catch-up).
+          *
+          * @param now            Instant to measure against (wall-clock in production;
+          *                       explicit for testability).
+          * @param recency_window Maximum behind-`now` gap still considered synced.
+          */
+         // thread-safe
+         bool is_synced(fc::time_point now, fc::microseconds recency_window) const;
+         /// {@link is_synced} against wall-clock now at {@link default_sync_recency_ms}.
+         // thread-safe
+         bool is_synced() const;
+
          // thread-safe, retrieves block according to fork db best branch which can change at any moment
          signed_block_ptr fetch_block_by_number( uint32_t block_num )const;
          // thread-safe

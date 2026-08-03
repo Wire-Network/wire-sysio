@@ -70,7 +70,7 @@ if(BUILD_OPP_BUNDLES)
     message(STATUS "BUILD_OPP_BUNDLES is enabled, checking for required programs to generate OPP bundles (TypeScript, Solidity, Solana) after protobuf generation.")
 
     # After protobuf generation, regenerate OPP bundles (TS/Solidity/Solana models)
-    set(_required_progs fish npm pnpm node)
+    set(_required_progs bash npm pnpm node)
     set(_missing_progs)
     foreach(_prog ${_required_progs})
         # Use a distinct cache variable per tool: find_program short-circuits when
@@ -141,7 +141,7 @@ if(BUILD_OPP_BUNDLES)
                 TARGET ${TARGET_NAME}
                 POST_BUILD
                 COMMENT "Generating OPP bundles (TypeScript, Solidity, Solana)"
-                COMMAND fish ${CMAKE_CURRENT_SOURCE_DIR}/tools/scripts/generate-opp-bundles.fish
+                COMMAND bash ${CMAKE_CURRENT_SOURCE_DIR}/tools/scripts/generate-opp-bundles.sh
                 WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tools
         )
     endif()
@@ -203,7 +203,7 @@ if(TARGET cdt::protoc-gen-zpp)
 endif()
 
 if(ENABLE_TESTS)
-    file(GLOB_RECURSE TEST_FILES test/*.cpp test/*.hpp)
+    file(GLOB_RECURSE TEST_FILES CONFIGURE_DEPENDS test/*.cpp test/*.hpp)
     set(TEST_TARGET_NAME test_opp)
     add_executable(
             ${TEST_TARGET_NAME}
@@ -231,12 +231,14 @@ endif()
 # Installation: headers to include/sysio
 install(
         DIRECTORY include/sysio
-        DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR}
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+        COMPONENT dev
 )
 
 install(
         DIRECTORY ${PROTO_GEN_DIR}/
-        DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR}
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+        COMPONENT dev
         FILES_MATCHING PATTERN "*.pb.h"
 )
 
@@ -244,4 +246,5 @@ install(
 install(
         TARGETS ${TARGET_NAME}
         EXPORT ${TARGET_NAME}-targets
+        COMPONENT dev
 )

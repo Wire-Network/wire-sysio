@@ -374,7 +374,6 @@ extern const char* const state_history_plugin_abi = R"({
                 { "type": "uint64", "name": "max_block_net_usage" },
                 { "type": "uint32", "name": "target_block_net_usage_pct" },
                 { "type": "uint32", "name": "max_transaction_net_usage" },
-                { "type": "uint32", "name": "base_per_transaction_net_usage" },
                 { "type": "uint32", "name": "net_usage_leeway" },
                 { "type": "uint32", "name": "context_free_discount_net_usage_num" },
                 { "type": "uint32", "name": "context_free_discount_net_usage_den" },

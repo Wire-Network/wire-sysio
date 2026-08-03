@@ -13,6 +13,40 @@ export const PUBLISHABLE_TARGETS: Target[] = [
   Target.Solidity
 ]
 
+/** Targets that are published to the WIRE CodeArtifact cargo registry (solana). */
+export const CARGO_PUBLISHABLE_TARGETS: Target[] = [Target.Solana]
+
+/**
+ * Release channel for published bundle versions, matching the wire-sysio
+ * release channels: `dev` appends the prerelease suffix to the resolved
+ * version (e.g. `1.0.41-dev`); `stable` publishes the bare version
+ * (identical to the historical no-channel behavior). The version RESOLUTION
+ * (latest published → patch bump) is the same for every channel.
+ */
+export enum Channel {
+  dev = "dev",
+  stable = "stable"
+}
+
+/**
+ * Prerelease suffix appended to the resolved version on the dev channel.
+ * The suffix spelling is the channel name itself.
+ */
+export const DEV_PRERELEASE_SUFFIX = Channel.dev
+
+/**
+ * Cargo registry name for the WIRE CodeArtifact repository. The publish
+ * environment supplies `CARGO_REGISTRIES_WIRE_INDEX` / `_TOKEN`
+ * (see libraries/opp/tools/scripts/generate-opp-bundles.sh).
+ */
+export const CARGO_REGISTRY_NAME = "wire"
+
+/** SPDX license expression stamped into the generated Rust crate. */
+export const CRATE_LICENSE = "LicenseRef-Wire-Proprietary"
+
+/** Canonical repository URL stamped into the generated Rust crate. */
+export const CRATE_REPOSITORY_URL = "https://github.com/Wire-Network/wire-sysio"
+
 /**
  * Canonical build order — typescript before solidity (dependency).
  * Solana is independent so its position doesn't matter.
