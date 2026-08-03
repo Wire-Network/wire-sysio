@@ -20,21 +20,10 @@ namespace sysio::opp::config {
 /** Maximum accepted size of a host client-configuration JSON document. */
 inline constexpr std::size_t max_client_configuration_file_size = 1024 * 1024;
 
-/** Maximum accepted object/array nesting depth in a host client-configuration document. */
-inline constexpr std::size_t max_client_configuration_nesting_depth = 32;
-
 /** Stable reason codes for sanitized client-configuration failures. */
 enum class client_config_reason {
    file_unreadable,
    file_too_large,
-   json_invalid,
-   root_type_invalid,
-   nesting_depth_exceeded,
-   duplicate_field,
-   null_value,
-   unknown_field,
-   field_type_invalid,
-   numeric_token_invalid,
    proto_json_invalid,
    schema_version_unsupported,
    client_missing,
@@ -87,10 +76,9 @@ private:
 };
 
 /**
- * Load raw JSON into a generated protobuf message after bounded structural and descriptor-driven validation.
+ * Load bounded JSON into a generated protobuf message using strict ProtoJSON conversion.
  *
- * The raw pass rejects duplicate keys, duplicate protobuf aliases, explicit nulls, unknown fields, invalid JSON
- * types, noncanonical uint32 tokens, excessive size, and excessive nesting before ProtoJSON conversion.
+ * Unknown fields and malformed ProtoJSON are rejected. Other values follow the standard protobuf JSON mapping.
  */
 void load_client_configuration_json(const std::filesystem::path& configuration_file,
                                     google::protobuf::Message&   destination);

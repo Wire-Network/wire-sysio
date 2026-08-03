@@ -529,8 +529,8 @@ public:
                                      const block_number_or_tag_t& block = block_tag_t::pending);
 
    /**
-    * @brief Retrieves the chain ID of the connected Ethereum network.
-    * @return The chain ID.
+    * @brief Returns the locally configured authoritative chain ID without querying the RPC endpoint.
+    * @return The chain ID used for transaction replay protection and policy validation.
     */
    fc::uint256 get_chain_id() const;
 

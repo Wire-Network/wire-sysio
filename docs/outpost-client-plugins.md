@@ -12,10 +12,11 @@ The preferred Ethereum client configuration is a versioned protobuf-JSON file:
 ```
 
 See [ethereum-client-config.example.json](ethereum-client-config.example.json). The root
-`schema_version` must be `1`. Each `clients` entry has a signing `connection`, an unquoted positive
-32-bit `chain_id`, and an optional complete `transaction_policy` containing canonical decimal-string
-caps for priority fee, maximum fee, gas limit, and total native cost. When `transaction_policy` is
-omitted all four caps default to `UINT256_MAX` for backward compatibility. This maximum default is
+`schema_version` must be `1`. Each `clients` entry has a signing `connection`, a positive 32-bit
+`chain_id` using standard ProtoJSON numeric forms, and an optional complete `transaction_policy`
+containing canonical decimal-string caps for priority fee, maximum fee, gas limit, and total native
+cost. When `transaction_policy` is omitted or `null`, ProtoJSON leaves it unset and all four caps
+default to `UINT256_MAX` for backward compatibility. This maximum default is
 compatibility-only: it provides no finite economic boundary, is not a production recommendation,
 and production operators must configure reviewed finite `transaction_policy` values.
 

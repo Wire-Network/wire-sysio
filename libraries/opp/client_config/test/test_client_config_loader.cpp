@@ -31,7 +31,7 @@ config::client_config_reason rejection_reason(std::string_view contents) {
    } catch (const config::client_config_exception& rejection) {
       return rejection.reason();
    }
-   return config::client_config_reason::json_invalid;
+   return config::client_config_reason::proto_json_invalid;
 }
 
 constexpr std::string_view valid_configuration = R"json({
@@ -90,7 +90,7 @@ BOOST_AUTO_TEST_CASE(accepts_transport_valid_bracketed_ipv6_host) {
    BOOST_CHECK_NO_THROW(config::load_evm_client_configuration_file(path));
 }
 
-BOOST_AUTO_TEST_CASE(rejects_file_bounds_and_raw_json_hazards) {
+BOOST_AUTO_TEST_CASE(rejects_file_bounds_and_invalid_proto_json) {
    fc::temp_directory directory;
    try {
       (void) config::load_evm_client_configuration_file(directory.path() / "missing.json");
@@ -108,44 +108,37 @@ BOOST_AUTO_TEST_CASE(rejects_file_bounds_and_raw_json_hazards) {
       BOOST_CHECK(rejection.reason() == config::client_config_reason::file_too_large);
    }
 
-   std::string too_deep = R"json({"unknown":)json";
-   too_deep.append(config::max_client_configuration_nesting_depth + 1, '[');
-   too_deep += "0";
-   too_deep.append(config::max_client_configuration_nesting_depth + 1, ']');
-   too_deep += "}";
-
-   BOOST_CHECK(rejection_reason("[]") == config::client_config_reason::root_type_invalid);
-   BOOST_CHECK(rejection_reason("{") == config::client_config_reason::json_invalid);
-   BOOST_CHECK(rejection_reason(R"json({"schema_version":1,"schema_version":1})json") ==
-               config::client_config_reason::duplicate_field);
-   BOOST_CHECK(rejection_reason(R"json({"schema_version":null,"clients":[]})json") ==
-               config::client_config_reason::null_value);
-   BOOST_CHECK(rejection_reason(too_deep) == config::client_config_reason::nesting_depth_exceeded);
+   BOOST_CHECK(rejection_reason("[]") == config::client_config_reason::proto_json_invalid);
+   BOOST_CHECK(rejection_reason("{") == config::client_config_reason::proto_json_invalid);
 
    std::string embedded_nul = std::string(valid_configuration) + '\0' + "{}";
-   BOOST_CHECK(rejection_reason(embedded_nul) == config::client_config_reason::json_invalid);
+   BOOST_CHECK(rejection_reason(embedded_nul) == config::client_config_reason::proto_json_invalid);
 }
 
-BOOST_AUTO_TEST_CASE(rejects_unknown_alias_duplicate_types_and_noncanonical_numeric_tokens) {
+BOOST_AUTO_TEST_CASE(rejects_unknown_fields_and_proto_json_invalid_values) {
    BOOST_CHECK(rejection_reason(R"json({"schema_version":1,"clients":[],"unexpected":true})json") ==
-               config::client_config_reason::unknown_field);
-   BOOST_CHECK(rejection_reason(R"json({"schema_version":1,"schemaVersion":1,"clients":[]})json") ==
-               config::client_config_reason::duplicate_field);
-   BOOST_CHECK(rejection_reason(R"json({"schema_version":"1","clients":[]})json") ==
-               config::client_config_reason::numeric_token_invalid);
-   BOOST_CHECK(rejection_reason(R"json({"schema_version":1.0,"clients":[]})json") ==
-               config::client_config_reason::numeric_token_invalid);
-   BOOST_CHECK(rejection_reason(R"json({"schema_version":-0,"clients":[]})json") ==
-               config::client_config_reason::numeric_token_invalid);
-   BOOST_CHECK(rejection_reason(R"json({"schema_version":1,"clients":{}})json") ==
-               config::client_config_reason::field_type_invalid);
-   BOOST_CHECK(rejection_reason(R"json({
-      "schema_version":1,
-      "clients":[{
-        "connection":{"client_id":"a","signature_provider_id":"s","rpc_url":"http://localhost"},
-        "chain_id":"1"
-      }]
-   })json") == config::client_config_reason::numeric_token_invalid);
+               config::client_config_reason::proto_json_invalid);
+   BOOST_CHECK(rejection_reason(R"json({"schema_version":1,"clients":true})json") ==
+               config::client_config_reason::proto_json_invalid);
+}
+
+BOOST_AUTO_TEST_CASE(follows_standard_proto_json_value_semantics) {
+   fc::temp_directory directory;
+   const auto configuration = config::load_evm_client_configuration_file(
+      write_configuration(directory, R"json({
+         "schema_version":"1",
+         "clients":[{
+           "connection":{"client_id":"a","signature_provider_id":"s","rpc_url":"http://localhost"},
+           "chain_id":1.0,
+           "transaction_policy":null
+         }]
+      })json"));
+
+   BOOST_REQUIRE(configuration.has_schema_version());
+   BOOST_CHECK_EQUAL(configuration.schema_version(), 1u);
+   BOOST_REQUIRE_EQUAL(configuration.clients_size(), 1);
+   BOOST_CHECK_EQUAL(configuration.clients(0).chain_id(), 1u);
+   BOOST_CHECK(!configuration.clients(0).has_transaction_policy());
 }
 
 BOOST_AUTO_TEST_CASE(rejects_semantically_invalid_configuration) {

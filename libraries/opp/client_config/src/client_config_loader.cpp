@@ -4,34 +4,20 @@
 #include <fc/network/http/http_client.hpp>
 #include <fc/network/url.hpp>
 
-#include <google/protobuf/descriptor.h>
 #include <google/protobuf/message.h>
 #include <google/protobuf/util/json_util.h>
 #include <magic_enum/magic_enum.hpp>
-#include <rapidjson/document.h>
-#include <rapidjson/memorystream.h>
-#include <rapidjson/reader.h>
 
 #include <fstream>
-#include <limits>
-#include <ranges>
 #include <set>
 #include <string>
 #include <utility>
-#include <vector>
 
 namespace sysio::opp::config {
 
 namespace {
 
 constexpr uint32_t supported_schema_version = 1;
-
-struct raw_validation_failure {
-   client_config_reason       reason;
-   std::string                field;
-   std::string                observed;
-   std::optional<std::string> allowed;
-};
 
 [[noreturn]] void throw_client_config_failure(client_config_reason       reason,
                                               std::string                field,
@@ -41,13 +27,6 @@ struct raw_validation_failure {
                                  std::move(field),
                                  std::move(observed),
                                  std::move(allowed));
-}
-
-[[noreturn]] void throw_client_config_failure(raw_validation_failure failure) {
-   throw_client_config_failure(failure.reason,
-                               std::move(failure.field),
-                               std::move(failure.observed),
-                               std::move(failure.allowed));
 }
 
 /** Read a complete configuration document without exposing its path in failures. */
@@ -81,264 +60,6 @@ std::string read_bounded_configuration_file(const std::filesystem::path& configu
                                   "<unreadable>");
    }
    return contents;
-}
-
-/** Streaming structural guard that retains duplicate keys before a DOM can collapse them. */
-class raw_json_safety_handler
-   : public rapidjson::BaseReaderHandler<rapidjson::UTF8<>, raw_json_safety_handler> {
-public:
-   bool Null() {
-      return fail(client_config_reason::null_value, "document", "<null>");
-   }
-
-   bool Bool(bool) { return accept_scalar_root(); }
-   bool Int(int) { return accept_scalar_root(); }
-   bool Uint(unsigned) { return accept_scalar_root(); }
-   bool Int64(std::int64_t) { return accept_scalar_root(); }
-   bool Uint64(std::uint64_t) { return accept_scalar_root(); }
-   bool Double(double) { return accept_scalar_root(); }
-
-   bool RawNumber(const char* value, rapidjson::SizeType length, bool) {
-      _number_tokens.emplace_back(value, length);
-      return accept_scalar_root();
-   }
-   bool String(const char*, rapidjson::SizeType, bool) { return accept_scalar_root(); }
-
-   bool StartObject() {
-      if (_scopes.empty()) {
-         if (_root_seen) return fail(client_config_reason::json_invalid, "root", "<multiple-values>");
-         _root_seen = true;
-      }
-      if (_scopes.size() >= max_client_configuration_nesting_depth) {
-         return fail(client_config_reason::nesting_depth_exceeded,
-                     "document",
-                     std::to_string(_scopes.size() + 1),
-                     std::to_string(max_client_configuration_nesting_depth));
-      }
-      _scopes.emplace_back(std::set<std::string>{});
-      return true;
-   }
-
-   bool Key(const char* value, rapidjson::SizeType length, bool) {
-      if (_scopes.empty() || !_scopes.back()) {
-         return fail(client_config_reason::json_invalid, "document", "<invalid-object-key>");
-      }
-      if (!_scopes.back()->emplace(value, length).second) {
-         return fail(client_config_reason::duplicate_field, "document", "<duplicate-field>");
-      }
-      return true;
-   }
-
-   bool EndObject(rapidjson::SizeType) {
-      if (_scopes.empty() || !_scopes.back()) {
-         return fail(client_config_reason::json_invalid, "document", "<invalid-object>");
-      }
-      _scopes.pop_back();
-      return true;
-   }
-
-   bool StartArray() {
-      if (_scopes.empty()) {
-         _root_seen = true;
-         return fail(client_config_reason::root_type_invalid, "root", "<non-object>");
-      }
-      if (_scopes.size() >= max_client_configuration_nesting_depth) {
-         return fail(client_config_reason::nesting_depth_exceeded,
-                     "document",
-                     std::to_string(_scopes.size() + 1),
-                     std::to_string(max_client_configuration_nesting_depth));
-      }
-      _scopes.emplace_back(std::nullopt);
-      return true;
-   }
-
-   bool EndArray(rapidjson::SizeType) {
-      if (_scopes.empty() || _scopes.back()) {
-         return fail(client_config_reason::json_invalid, "document", "<invalid-array>");
-      }
-      _scopes.pop_back();
-      return true;
-   }
-
-   const std::optional<raw_validation_failure>& failure() const { return _failure; }
-   const std::vector<std::string>& number_tokens() const { return _number_tokens; }
-
-private:
-   bool accept_scalar_root() {
-      if (!_scopes.empty()) return true;
-      _root_seen = true;
-      return fail(client_config_reason::root_type_invalid, "root", "<non-object>");
-   }
-
-   bool fail(client_config_reason       reason,
-             std::string                field,
-             std::string                observed,
-             std::optional<std::string> allowed = std::nullopt) {
-      if (!_failure) {
-         _failure = raw_validation_failure{
-            reason,
-            std::move(field),
-            std::move(observed),
-            std::move(allowed),
-         };
-      }
-      return false;
-   }
-
-   bool                                                   _root_seen = false;
-   std::vector<std::optional<std::set<std::string>>>      _scopes;
-   std::optional<raw_validation_failure>                  _failure;
-   std::vector<std::string>                               _number_tokens;
-};
-
-/** Resolve either a proto field name or its canonical ProtoJSON alias. */
-const google::protobuf::FieldDescriptor*
-find_json_field(const google::protobuf::Descriptor& descriptor, std::string_view name) {
-   if (const auto* field = descriptor.FindFieldByName(std::string(name))) return field;
-   for (int index = 0; index < descriptor.field_count(); ++index) {
-      const auto* field = descriptor.field(index);
-      if (field->json_name() == name) return field;
-   }
-   return nullptr;
-}
-
-std::string child_field_path(std::string_view parent,
-                             const google::protobuf::FieldDescriptor& field) {
-   const std::string field_name(field.name().data(), field.name().size());
-   if (parent.empty()) return field_name;
-   return std::string(parent) + "." + field_name;
-}
-
-void validate_json_value(const rapidjson::Value&                    value,
-                         const google::protobuf::FieldDescriptor& field,
-                         std::string_view                          path,
-                         const std::vector<std::string>&           number_tokens,
-                         std::size_t&                              number_index);
-
-/** Validate a JSON object from the generated protobuf descriptor rather than a parallel schema. */
-void validate_json_message(const rapidjson::Value&              value,
-                           const google::protobuf::Descriptor& descriptor,
-                           std::string_view                    path,
-                           const std::vector<std::string>&     number_tokens,
-                           std::size_t&                        number_index) {
-   if (!value.IsObject()) {
-      throw_client_config_failure(client_config_reason::field_type_invalid,
-                                  path.empty() ? "root" : std::string(path),
-                                  "<non-object>");
-   }
-
-   std::set<const google::protobuf::FieldDescriptor*> observed_fields;
-   for (auto member = value.MemberBegin(); member != value.MemberEnd(); ++member) {
-      const std::string_view member_name{member->name.GetString(), member->name.GetStringLength()};
-      const auto* field = find_json_field(descriptor, member_name);
-      if (!field) {
-         throw_client_config_failure(client_config_reason::unknown_field,
-                                     path.empty() ? "root" : std::string(path),
-                                     "<unknown-field>");
-      }
-      const auto field_path = child_field_path(path, *field);
-      if (!observed_fields.insert(field).second) {
-         throw_client_config_failure(client_config_reason::duplicate_field,
-                                     field_path,
-                                     "<duplicate-field>");
-      }
-
-      if (field->is_repeated()) {
-         if (!member->value.IsArray()) {
-            throw_client_config_failure(client_config_reason::field_type_invalid,
-                                        field_path,
-                                        "<non-array>");
-         }
-         for (const auto& element : member->value.GetArray()) {
-            validate_json_value(element, *field, field_path, number_tokens, number_index);
-         }
-      } else {
-         validate_json_value(member->value, *field, field_path, number_tokens, number_index);
-      }
-   }
-}
-
-void validate_json_value(const rapidjson::Value&                    value,
-                         const google::protobuf::FieldDescriptor& field,
-                         std::string_view                          path,
-                         const std::vector<std::string>&           number_tokens,
-                         std::size_t&                              number_index) {
-   const std::string* number_token = nullptr;
-   if (value.IsNumber()) {
-      if (number_index >= number_tokens.size()) {
-         throw_client_config_failure(client_config_reason::json_invalid,
-                                     "document",
-                                     "<numeric-token-mismatch>");
-      }
-      number_token = &number_tokens[number_index++];
-   }
-
-   using field_descriptor = google::protobuf::FieldDescriptor;
-   switch (field.type()) {
-   case field_descriptor::TYPE_MESSAGE:
-      validate_json_message(value, *field.message_type(), path, number_tokens, number_index);
-      return;
-   case field_descriptor::TYPE_STRING:
-   case field_descriptor::TYPE_BYTES:
-      if (value.IsString()) return;
-      break;
-   case field_descriptor::TYPE_BOOL:
-      if (value.IsBool()) return;
-      break;
-   case field_descriptor::TYPE_UINT32:
-   case field_descriptor::TYPE_FIXED32:
-      if (value.IsUint() && number_token && !number_token->empty() &&
-          (number_token->size() == 1 || number_token->front() != '0') &&
-          std::ranges::all_of(*number_token, [](unsigned char character) {
-             return character >= '0' && character <= '9';
-          })) {
-         return;
-      }
-      throw_client_config_failure(client_config_reason::numeric_token_invalid,
-                                  std::string(path),
-                                  "<noncanonical-unsigned-integer>");
-   case field_descriptor::TYPE_INT32:
-   case field_descriptor::TYPE_SINT32:
-   case field_descriptor::TYPE_SFIXED32:
-      if (value.IsInt()) return;
-      break;
-   case field_descriptor::TYPE_UINT64:
-   case field_descriptor::TYPE_FIXED64:
-      if (value.IsUint64() || value.IsString()) return;
-      break;
-   case field_descriptor::TYPE_INT64:
-   case field_descriptor::TYPE_SINT64:
-   case field_descriptor::TYPE_SFIXED64:
-      if (value.IsInt64() || value.IsString()) return;
-      break;
-   case field_descriptor::TYPE_FLOAT:
-   case field_descriptor::TYPE_DOUBLE:
-      if (value.IsNumber() || value.IsString()) return;
-      break;
-   case field_descriptor::TYPE_ENUM:
-      if (value.IsString() || value.IsInt()) return;
-      break;
-   case field_descriptor::TYPE_GROUP:
-      break;
-   }
-
-   throw_client_config_failure(client_config_reason::field_type_invalid,
-                               std::string(path),
-                               "<wrong-type>");
-}
-
-/** Run the duplicate/null/depth guard before constructing a JSON DOM. */
-std::vector<std::string> validate_raw_json_safety(std::string_view json) {
-   rapidjson::Reader reader;
-   rapidjson::MemoryStream stream(json.data(), json.size());
-   raw_json_safety_handler handler;
-   const bool valid = reader.Parse<rapidjson::kParseValidateEncodingFlag |
-                                   rapidjson::kParseNumbersAsStringsFlag>(stream, handler);
-   if (!valid || stream.Tell() != json.size()) {
-      if (handler.failure()) throw_client_config_failure(*handler.failure());
-      throw_client_config_failure(client_config_reason::json_invalid, "document", "<invalid-json>");
-   }
-   return handler.number_tokens();
 }
 
 fc::uint256 parse_policy_value(std::string_view value, std::string_view field) {
@@ -404,25 +125,6 @@ void client_config_exception::rethrow() const {
 void load_client_configuration_json(const std::filesystem::path& configuration_file,
                                     google::protobuf::Message&   destination) {
    const auto contents = read_bounded_configuration_file(configuration_file);
-   const auto number_tokens = validate_raw_json_safety(contents);
-
-   rapidjson::Document document;
-   document.Parse<rapidjson::kParseValidateEncodingFlag |
-                  rapidjson::kParseFullPrecisionFlag>(contents.data(), contents.size());
-   if (document.HasParseError()) {
-      throw_client_config_failure(client_config_reason::json_invalid, "document", "<invalid-json>");
-   }
-   if (!document.IsObject()) {
-      throw_client_config_failure(client_config_reason::root_type_invalid, "root", "<non-object>");
-   }
-
-   std::size_t number_index = 0;
-   validate_json_message(document, *destination.GetDescriptor(), "", number_tokens, number_index);
-   if (number_index != number_tokens.size()) {
-      throw_client_config_failure(client_config_reason::json_invalid,
-                                  "document",
-                                  "<numeric-token-mismatch>");
-   }
 
    destination.Clear();
    google::protobuf::util::JsonParseOptions options;
