@@ -19,6 +19,24 @@ using namespace fc::crypto;
 using namespace fc::crypto::ethereum;
 using namespace fc::network::json_rpc;
 constexpr std::string_view invalid_log_identifier = "<invalid>";
+constexpr auto missing_rpc_value = "<missing>";
+constexpr auto unavailable_policy_limit = "n/a";
+
+namespace transaction_policy_field {
+constexpr std::string_view nonce = "nonce";
+constexpr std::string_view base_fee_per_gas = "base_fee_per_gas";
+constexpr std::string_view max_priority_fee_per_gas = "max_priority_fee_per_gas";
+constexpr std::string_view estimated_gas = "estimated_gas";
+constexpr std::string_view gas_price = "gas_price";
+} // namespace transaction_policy_field
+
+namespace ethereum_rpc_field {
+constexpr std::string_view base_fee_per_gas = "baseFeePerGas";
+constexpr std::string_view max_priority_fee_per_gas = "maxPriorityFeePerGas";
+constexpr std::string_view max_fee_per_gas = "maxFeePerGas";
+} // namespace ethereum_rpc_field
+
+constexpr std::string_view gas_configuration_operation = "get_gas_config";
 } // namespace
 
 /**
@@ -119,7 +137,7 @@ void ethereum_client::log_policy_rejection(const ethereum_transaction_policy_exc
         safe_operation_type,
         rejection.field(),
         rejection.observed(),
-        rejection.allowed().value_or("n/a"));
+        rejection.allowed().value_or(unavailable_policy_limit));
 }
 
 /**
@@ -208,7 +226,7 @@ fc::uint256 ethereum_client::get_transaction_count(const address_compat_type& ad
    auto from_addr_hex = to_hex(from_addr, true);
    fc::variants params{from_addr_hex, to_block_tag(block)};
    auto res = execute_idempotent("eth_getTransactionCount", params);
-   return parse_rpc_quantity(res, "nonce");
+   return parse_rpc_quantity(res, transaction_policy_field::nonce);
 }
 
 /**
@@ -389,12 +407,13 @@ fc::variant ethereum_client::get_transaction_by_hash(const std::string& tx_hash)
  */
 fc::uint256 ethereum_client::get_base_fee_per_gas() {
    auto block = get_block_by_number(block_tag_t::latest);
-   if (!block.contains("baseFeePerGas")) {
+   const std::string base_fee_field{ethereum_rpc_field::base_fee_per_gas};
+   if (!block.contains(base_fee_field)) {
       throw_transaction_policy_exception(ethereum_transaction_policy_reason::rpc_quantity_invalid,
-                                         "base_fee_per_gas",
-                                         "<missing>");
+                                         transaction_policy_field::base_fee_per_gas,
+                                         missing_rpc_value);
    }
-   return parse_rpc_quantity(block["baseFeePerGas"], "base_fee_per_gas");
+   return parse_rpc_quantity(block[base_fee_field], transaction_policy_field::base_fee_per_gas);
 }
 
 /**
@@ -409,7 +428,7 @@ fc::uint256 ethereum_client::get_base_fee_per_gas() {
 fc::uint256 ethereum_client::get_max_priority_fee_per_gas() {
    fc::variants params; // empty
    auto resp = execute_idempotent("eth_maxPriorityFeePerGas", params);
-   return parse_rpc_quantity(resp, "max_priority_fee_per_gas");
+   return parse_rpc_quantity(resp, transaction_policy_field::max_priority_fee_per_gas);
 }
 
 /**
@@ -429,7 +448,7 @@ fc::uint256 ethereum_client::estimate_gas(const address_compat_type& to, const s
    tx("from", get_address())("to", to_address(to))("value", value);
    fc::variants params{fc::variant(tx)};
    auto resp = execute_idempotent("eth_estimateGas", params);
-   return parse_rpc_quantity(resp, "estimated_gas");
+   return parse_rpc_quantity(resp, transaction_policy_field::estimated_gas);
 }
 
 /**
@@ -446,7 +465,7 @@ ethereum_client::gas_config_t ethereum_client::get_gas_config() {
    try {
       return get_gas_config_unlogged();
    } catch (const ethereum_transaction_policy_exception& rejection) {
-      log_policy_rejection(rejection, "get_gas_config");
+      log_policy_rejection(rejection, gas_configuration_operation);
       throw;
    }
 }
@@ -488,13 +507,13 @@ fc::uint256 ethereum_client::estimate_gas(const address_compat_type& to, const a
 
    tx("from", to_hex(get_address(), true))
    ("to", to_hex(to_address(to), true))
-   ("maxPriorityFeePerGas", format_rpc_quantity(gc.tip))
-   ("maxFeePerGas", format_rpc_quantity(gc.max_fee_per_gas))
+   (std::string(ethereum_rpc_field::max_priority_fee_per_gas), format_rpc_quantity(gc.tip))
+   (std::string(ethereum_rpc_field::max_fee_per_gas), format_rpc_quantity(gc.max_fee_per_gas))
    ("data", data)
    ("input", data);
 
    auto resp = execute_idempotent("eth_estimateGas", fc::variants{tx});
-   return parse_rpc_quantity(resp, "estimated_gas");
+   return parse_rpc_quantity(resp, transaction_policy_field::estimated_gas);
 }
 
 /**
@@ -509,7 +528,7 @@ fc::uint256 ethereum_client::estimate_gas(const address_compat_type& to, const a
 fc::uint256 ethereum_client::get_gas_price() {
    fc::variants params; // empty
    auto resp = execute_idempotent("eth_gasPrice", params);
-   return parse_rpc_quantity(resp, "gas_price");
+   return parse_rpc_quantity(resp, transaction_policy_field::gas_price);
 }
 
 /**

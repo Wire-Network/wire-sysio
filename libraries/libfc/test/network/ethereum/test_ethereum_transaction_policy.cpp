@@ -19,6 +19,7 @@ constexpr std::string_view above_max_uint256_decimal =
 
 static_assert(std::is_same_v<decltype(ethereum_transaction_policy::chain_id), uint32_t>);
 
+/** Return a compact positive policy used by validation and arithmetic tests. */
 ethereum_transaction_policy bounded_policy() {
    return ethereum_transaction_policy{
       .client_id = "client-a",
@@ -30,6 +31,7 @@ ethereum_transaction_policy bounded_policy() {
    };
 }
 
+/** Return a policy whose limits cover the complete uint256 domain. */
 ethereum_transaction_policy uint256_wide_policy() {
    const fc::uint256 maximum{std::string(max_uint256_decimal)};
    return ethereum_transaction_policy{
@@ -42,6 +44,7 @@ ethereum_transaction_policy uint256_wide_policy() {
    };
 }
 
+/** Return a transaction that exactly matches the compact bounded policy. */
 eip1559_tx bounded_transaction() {
    return eip1559_tx{
       .chain_id = 31337,
@@ -56,6 +59,7 @@ eip1559_tx bounded_transaction() {
    };
 }
 
+/** Assert that an operation fails with the expected stable policy reason. */
 void check_rejection_reason(const std::function<void()>& operation,
                             ethereum_transaction_policy_reason expected_reason) {
    try {

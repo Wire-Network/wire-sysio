@@ -44,6 +44,7 @@ using tcp = boost::asio::ip::tcp;
 /** One-shot JSON-RPC endpoint used to preserve coverage of the legacy three-field client form. */
 class chain_id_rpc_server {
 public:
+   /** Start a loopback server that returns the test chain id once. */
    chain_id_rpc_server()
       : _acceptor(_io, tcp::endpoint(boost::asio::ip::make_address("127.0.0.1"), 0))
       , _port(_acceptor.local_endpoint().port())
@@ -52,6 +53,7 @@ public:
    chain_id_rpc_server(const chain_id_rpc_server&) = delete;
    chain_id_rpc_server& operator=(const chain_id_rpc_server&) = delete;
 
+   /** Stop the loopback server and join its worker thread. */
    ~chain_id_rpc_server() {
       boost::system::error_code error;
       _acceptor.close(error);
@@ -61,11 +63,13 @@ public:
       if (_worker.joinable()) _worker.join();
    }
 
+   /** Return the loopback URL selected for this server instance. */
    std::string url() const {
       return "http://127.0.0.1:" + std::to_string(_port);
    }
 
 private:
+   /** Serve one fixed JSON-RPC response and then return. */
    void serve() {
       boost::system::error_code error;
       tcp::socket socket(_io);
@@ -94,6 +98,7 @@ private:
    std::thread             _worker;
 };
 
+/** Return a compact positive policy used by plugin enforcement tests. */
 ethereum_transaction_policy bounded_policy(std::string client_id = "client-a") {
    return ethereum_transaction_policy{
       .client_id = std::move(client_id),
@@ -105,6 +110,7 @@ ethereum_transaction_policy bounded_policy(std::string client_id = "client-a") {
    };
 }
 
+/** Build a function ABI without input arguments. */
 ethabi::contract no_argument_function(std::string name) {
    return ethabi::contract{
       .name = std::move(name),
@@ -114,6 +120,7 @@ ethabi::contract no_argument_function(std::string name) {
    };
 }
 
+/** Build a function ABI with one dynamic-bytes argument. */
 ethabi::contract bytes_argument_function(std::string name) {
    return ethabi::contract{
       .name = std::move(name),
@@ -123,6 +130,7 @@ ethabi::contract bytes_argument_function(std::string name) {
    };
 }
 
+/** Build a function ABI with one uint32 argument. */
 ethabi::contract uint32_argument_function(std::string name) {
    return ethabi::contract{
       .name = std::move(name),
@@ -132,6 +140,7 @@ ethabi::contract uint32_argument_function(std::string name) {
    };
 }
 
+/** Create an Ethereum signer that records every private-key operation. */
 signature_provider_ptr make_recording_signer(std::atomic<size_t>& sign_count) {
    auto private_key = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em);
    auto ethereum_key = private_key.get<fc::em::private_key_shim>();
@@ -149,12 +158,15 @@ signature_provider_ptr make_recording_signer(std::atomic<size_t>& sign_count) {
    return provider;
 }
 
+/** Deterministic Ethereum client that records RPC and broadcast activity. */
 class recording_ethereum_client final : public ethereum_client {
 public:
+   /** Construct a recording client with the supplied signer and local policy. */
    recording_ethereum_client(const signature_provider_ptr& provider,
                              ethereum_transaction_policy   policy)
       : ethereum_client(provider, std::string(fake_rpc_url), std::move(policy)) {}
 
+   /** Return deterministic responses for the RPC methods used by transaction construction. */
    fc::variant execute(const std::string& method, const fc::variant& params) override {
       methods.emplace_back(method);
       if (method == "eth_maxPriorityFeePerGas") return fc::variant("0xa");
@@ -173,6 +185,7 @@ public:
       FC_THROW_EXCEPTION(fc::invalid_arg_exception, "unexpected fake RPC method {}", method);
    }
 
+   /** Route idempotent calls through the same deterministic recorder. */
    fc::variant execute_idempotent(const std::string& method, const fc::variant& params) override {
       return execute(method, params);
    }
@@ -182,6 +195,7 @@ public:
    size_t                   broadcast_count = 0;
 };
 
+/** Return a transaction that exactly reaches the bounded policy values. */
 eip1559_tx exact_transaction() {
    return eip1559_tx{
       .chain_id = 31337,
@@ -196,10 +210,12 @@ eip1559_tx exact_transaction() {
    };
 }
 
+/** Assert that an operation is rejected by transaction-policy enforcement. */
 void expect_policy_rejection(const std::function<void()>& operation) {
    BOOST_CHECK_THROW(operation(), ethereum_transaction_policy_exception);
 }
 
+/** Write a plugin configuration fixture to an isolated temporary file. */
 std::filesystem::path write_client_configuration_file(fc::temp_directory& directory,
                                                       std::string_view    contents) {
    const auto path = directory.path() / "ethereum-client-config.json";
@@ -209,6 +225,7 @@ std::filesystem::path write_client_configuration_file(fc::temp_directory& direct
    return path;
 }
 
+/** Initialize an isolated plugin instance and expose it to a test callback. */
 void with_initialized_outpost_plugin(
    const std::vector<std::string>& configuration_arguments,
    const std::function<void(sysio::outpost_ethereum_client_plugin&)>& inspect_plugin,
@@ -238,6 +255,7 @@ void with_initialized_outpost_plugin(
    inspect_plugin(test_application->get_plugin<sysio::outpost_ethereum_client_plugin>());
 }
 
+/** Initialize an isolated plugin instance and return its published clients. */
 std::vector<sysio::ethereum_client_entry_ptr>
 initialize_outpost_plugin(const std::vector<std::string>& configuration_arguments,
                           std::string_view signature_provider_id = "signer-a",
@@ -251,6 +269,7 @@ initialize_outpost_plugin(const std::vector<std::string>& configuration_argument
    return clients;
 }
 
+/** Return the client count visible after a file configuration fails during initialization. */
 std::size_t initialize_rejected_file_and_observe_published_clients(
    const std::filesystem::path& configuration_file) {
    auto reset_application = gsl_lite::finally([] { appbase::application::reset_app_singleton(); });

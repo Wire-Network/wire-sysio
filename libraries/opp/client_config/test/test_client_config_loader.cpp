@@ -12,9 +12,12 @@ namespace config = sysio::opp::config;
 
 namespace {
 
+constexpr std::string_view default_configuration_name = "client-config.json";
+
+/** Write one test configuration document to an isolated temporary file. */
 std::filesystem::path write_configuration(fc::temp_directory& directory,
                                           std::string_view contents,
-                                          std::string_view name = "client-config.json") {
+                                          std::string_view name = default_configuration_name) {
    const auto path = directory.path() / std::string(name);
    std::ofstream output(path, std::ios::binary);
    output.write(contents.data(), static_cast<std::streamsize>(contents.size()));
@@ -22,6 +25,7 @@ std::filesystem::path write_configuration(fc::temp_directory& directory,
    return path;
 }
 
+/** Load a test document and return its structured rejection reason. */
 config::client_config_reason rejection_reason(std::string_view contents) {
    fc::temp_directory directory;
    const auto path = write_configuration(directory, contents);
@@ -34,6 +38,7 @@ config::client_config_reason rejection_reason(std::string_view contents) {
    return config::client_config_reason::proto_json_invalid;
 }
 
+/** Representative valid configuration with both bounded and compatibility policy modes. */
 constexpr std::string_view valid_configuration = R"json({
   "schema_version": 1,
   "clients": [{

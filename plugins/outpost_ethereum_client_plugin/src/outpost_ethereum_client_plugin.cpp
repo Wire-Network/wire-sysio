@@ -21,6 +21,21 @@ constexpr auto option_name_client = "outpost-ethereum-client";
 constexpr auto option_name_client_config_file = "outpost-ethereum-client-config-file";
 constexpr auto option_abi_file = "ethereum-abi-file";
 constexpr auto legacy_chain_id_resolution_timeout = fc::seconds(5);
+constexpr std::string_view legacy_transaction_policy_client_id = "legacy-client";
+constexpr auto unavailable_policy_limit = "n/a";
+
+namespace transaction_policy_field {
+constexpr std::string_view chain_id = "chain_id";
+constexpr std::string_view max_priority_fee_per_gas_wei = "max_priority_fee_per_gas_wei";
+constexpr std::string_view max_fee_per_gas_wei = "max_fee_per_gas_wei";
+constexpr std::string_view max_gas_limit = "max_gas_limit";
+constexpr std::string_view max_total_native_cost_wei = "max_total_native_cost_wei";
+} // namespace transaction_policy_field
+
+namespace ethereum_rpc_method {
+constexpr std::string_view chain_id = "eth_chainId";
+} // namespace ethereum_rpc_method
+
 constexpr outbound_http::transport_option_names transport_option_names{
    .additional_ca_file = "outpost-ethereum-additional-ca-file",
    .additional_ca_path = "outpost-ethereum-additional-ca-path",
@@ -70,6 +85,7 @@ std::optional<uint32_t> parse_legacy_chain_id(std::string_view text) {
    return value == 0 ? std::nullopt : std::optional<uint32_t>{value};
 }
 
+/** Construct the compatibility policy used when a client has no explicit expenditure limits. */
 ethereum_transaction_policy maximum_policy(std::string client_id, uint32_t chain_id) {
    const auto& maximum = fc::network::ethereum::maximum_ethereum_transaction_policy_value();
    return ethereum_transaction_policy{
@@ -87,9 +103,10 @@ std::string transaction_policy_client_label(std::string_view client_id) {
    if (fc::network::ethereum::is_safe_transaction_policy_identifier(client_id)) {
       return std::string(client_id);
    }
-   return "legacy-client";
+   return std::string(legacy_transaction_policy_client_id);
 }
 
+/** Convert a validated protobuf client policy to the runtime transaction-policy model. */
 ethereum_transaction_policy policy_from_configuration(const EvmClientConfiguration& client) {
    const auto& connection = client.connection();
    if (!client.has_transaction_policy()) {
@@ -101,28 +118,31 @@ ethereum_transaction_policy policy_from_configuration(const EvmClientConfigurati
       .client_id = connection.client_id(),
       .chain_id = client.chain_id(),
       .max_priority_fee_per_gas = fc::network::ethereum::parse_canonical_uint256_decimal(
-         policy.max_priority_fee_per_gas_wei(), "max_priority_fee_per_gas_wei"),
+         policy.max_priority_fee_per_gas_wei(), transaction_policy_field::max_priority_fee_per_gas_wei),
       .max_fee_per_gas = fc::network::ethereum::parse_canonical_uint256_decimal(
-         policy.max_fee_per_gas_wei(), "max_fee_per_gas_wei"),
+         policy.max_fee_per_gas_wei(), transaction_policy_field::max_fee_per_gas_wei),
       .max_gas_limit = fc::network::ethereum::parse_canonical_uint256_decimal(
-         policy.max_gas_limit(), "max_gas_limit"),
+         policy.max_gas_limit(), transaction_policy_field::max_gas_limit),
       .max_total_native_cost = fc::network::ethereum::parse_canonical_uint256_decimal(
-         policy.max_total_native_cost_wei(), "max_total_native_cost_wei"),
+         policy.max_total_native_cost_wei(), transaction_policy_field::max_total_native_cost_wei),
    };
 }
 
+/** Report a sanitized client-construction failure without exposing the endpoint or credentials. */
 [[noreturn]] void throw_client_initialization_failure(const std::string& client_id) {
    FC_THROW_EXCEPTION(chain::plugin_config_exception,
                       "Failed to initialize outpost Ethereum client '{}'",
                       client_id);
 }
 
+/** Report a sanitized legacy chain-id lookup failure. */
 [[noreturn]] void throw_legacy_chain_id_resolution_failure(const std::string& client_id) {
    FC_THROW_EXCEPTION(chain::plugin_config_exception,
                       "Unable to resolve chain id for legacy outpost Ethereum client '{}'",
                       client_id);
 }
 
+/** Resolve and bound the chain id required by the legacy three-field client specification. */
 uint32_t resolve_legacy_chain_id(
    const std::string& client_id,
    const std::string& url,
@@ -130,7 +150,8 @@ uint32_t resolve_legacy_chain_id(
    try {
       auto rpc = fc::network::json_rpc::json_rpc_client::create(url, rpc_options);
       const auto chain_id = fc::network::ethereum::parse_rpc_quantity(
-         rpc.call_idempotent("eth_chainId", fc::variants{}), "chain_id");
+         rpc.call_idempotent(std::string(ethereum_rpc_method::chain_id), fc::variants{}),
+         transaction_policy_field::chain_id);
       if (chain_id == 0 || chain_id > std::numeric_limits<uint32_t>::max()) {
          throw_legacy_chain_id_resolution_failure(client_id);
       }
@@ -144,6 +165,7 @@ uint32_t resolve_legacy_chain_id(
    }
 }
 
+/** Resolve an explicitly named Ethereum signature provider for one configured client. */
 fc::crypto::signature_provider_ptr resolve_signature_provider(
    signature_provider_manager_plugin& signature_provider_manager,
    const std::string& client_id,
@@ -162,6 +184,7 @@ fc::crypto::signature_provider_ptr resolve_signature_provider(
    return provider;
 }
 
+/** Construct a policy-enforcing Ethereum client and sanitize construction failures. */
 ethereum_client_ptr create_client(
    const fc::crypto::signature_provider_ptr& signature_provider,
    const std::string& url,
@@ -177,6 +200,7 @@ ethereum_client_ptr create_client(
    }
 }
 
+/** Add one fully initialized client to a temporary map before it is published by the plugin. */
 void add_client(client_map& clients,
                 const std::string& client_id,
                 const std::string& url,
@@ -199,6 +223,7 @@ void add_client(client_map& clients,
         chain_id);
 }
 
+/** Load every protobuf-configured client into a map that is published only on complete success. */
 client_map load_file_clients(
    const std::filesystem::path& configuration_file,
    signature_provider_manager_plugin& signature_provider_manager,
@@ -219,6 +244,7 @@ client_map load_file_clients(
    return clients;
 }
 
+/** Load legacy command-line client specifications with maximum compatibility policies. */
 client_map load_legacy_clients(
    const std::vector<std::string>& client_specs,
    signature_provider_manager_plugin& signature_provider_manager,
@@ -285,6 +311,7 @@ client_map load_legacy_clients(
 
 } // namespace
 
+/** Private plugin state and lookup operations for fully initialized Ethereum clients. */
 class outpost_ethereum_client_plugin_impl {
    std::map<std::string, ethereum_client_entry_ptr> _clients{};
    using file_abi_contracts_t =
@@ -307,14 +334,18 @@ public:
       return _abi_files;
    }
 
+   /** Atomically replace the published client map after initialization succeeds. */
    void set_clients(client_map clients) { _clients = std::move(clients); }
 
+   /** Return every published client in deterministic identifier order. */
    std::vector<ethereum_client_entry_ptr> get_clients() {
       return std::views::values(_clients) | std::ranges::to<std::vector>();
    }
 
+   /** Return the published client identified by @p id. */
    ethereum_client_entry_ptr get_client(const std::string& id) { return _clients.at(id); }
 
+   /** Return the unique client for @p chain_id, or null when the id is ambiguous. */
    ethereum_client_entry_ptr get_client_by_chain_id(uint32_t chain_id) {
       ethereum_client_entry_ptr match;
       for (const auto& entry : std::views::values(_clients)) {
@@ -325,6 +356,7 @@ public:
       return match;
    }
 
+   /** Return all loaded ABI files and their parsed contracts. */
    const std::vector<file_abi_contracts_t>& get_abi_files() const { return _abi_files; }
 };
 
@@ -361,14 +393,14 @@ void outpost_ethereum_client_plugin::plugin_initialize(const variables_map& opti
            client_config::client_config_reason_name(rejection.reason()),
            rejection.field(),
            rejection.observed(),
-           rejection.allowed().value_or("n/a"));
+           rejection.allowed().value_or(unavailable_policy_limit));
       throw;
    } catch (const fc::network::ethereum::ethereum_transaction_policy_exception& rejection) {
       elog("Rejected Ethereum client policy (reason_code={},field={},observed={},allowed={})",
            fc::network::ethereum::reason_code_name(rejection.reason()),
            rejection.field(),
            rejection.observed(),
-           rejection.allowed().value_or("n/a"));
+           rejection.allowed().value_or(unavailable_policy_limit));
       throw;
    }
 }
@@ -434,7 +466,7 @@ outpost_ethereum_client_plugin::create_outpost_client(const std::string& eth_cli
    if (entry->chain_id != chain_id) {
       fc::network::ethereum::throw_transaction_policy_exception(
          fc::network::ethereum::ethereum_transaction_policy_reason::configuration_chain_id_mismatch,
-         "chain_id",
+         transaction_policy_field::chain_id,
          std::to_string(chain_id),
          std::to_string(entry->chain_id));
    }
