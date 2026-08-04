@@ -591,8 +591,9 @@ namespace sysiosystem {
           * batch_op_groups.size()).
           *
           * Runtime conditions (config missing, treasury exhausted, balance
-          * insufficient) are caught upstream by the gate, which emits an
-          * EmissionsBlocked attestation and prevents advance from proceeding.
+          * insufficient) are caught upstream by the gate, which records the
+          * block in sysio.epoch's blocklog and prevents advance from
+          * proceeding.
           */
          [[sysio::action]]
          void payepoch(uint32_t epoch_index,

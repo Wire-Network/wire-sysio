@@ -395,6 +395,8 @@ constexpr auto SWAP_REMIT_ATTESTATION_TYPE    = opp::types::ATTESTATION_TYPE_SWA
 constexpr auto UNCOVERED_TEST_ATTESTATION_TYPE = opp::types::ATTESTATION_TYPE_STAKING_REWARD;
 /// Raw protobuf wire slot used only to seed the pre-upgrade READY-row shape.
 constexpr uint32_t RETIRED_STAKE_ATTESTATION_VALUE = 3001;
+/// Raw protobuf wire slot used only to seed the pre-upgrade READY-row shape.
+constexpr uint32_t RETIRED_UNSTAKE_ATTESTATION_VALUE = 3002;
 /// Maximum retired READY rows pruned during one deterministic build call.
 constexpr uint32_t RETIRED_STAKING_PRUNE_LIMIT     = 32;
 
@@ -453,8 +455,10 @@ BOOST_FIXTURE_TEST_CASE(buildenv_tombstones_retired_staking_rows,
    BOOST_REQUIRE_EQUAL(success(),
       queueout(/*chain_code=*/ETH_OUTPOST_ID, RETIRED_STAKE_ATTESTATION_VALUE));
    BOOST_REQUIRE_EQUAL(success(),
+      queueout(/*chain_code=*/ETH_OUTPOST_ID, RETIRED_UNSTAKE_ATTESTATION_VALUE));
+   BOOST_REQUIRE_EQUAL(success(),
       queueout(/*chain_code=*/ETH_OUTPOST_ID, EVM_TEST_ATTESTATION_TYPE));
-   BOOST_REQUIRE_EQUAL(2u, count_ready_attestations(ETH_OUTPOST_ID, 8));
+   BOOST_REQUIRE_EQUAL(3u, count_ready_attestations(ETH_OUTPOST_ID, 8));
 
    BOOST_REQUIRE_EQUAL(success(), buildenv(/*chain_code=*/ETH_OUTPOST_ID));
    produce_blocks();
