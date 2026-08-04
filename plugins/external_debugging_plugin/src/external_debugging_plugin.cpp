@@ -7,6 +7,7 @@
 #include <sysio/external_debugging_plugin/debug_envelope_event_sink.hpp>
 #include <sysio/external_debugging_plugin/external_debugging_plugin.hpp>
 #include <sysio/external_debugging_plugin/external_debugging_rpc_client.hpp>
+#include <sysio/http_client_plugin/http_client_options.hpp>
 #include <sysio/opp/debugging/debugging.pb.h>
 #include <sysio/opp/opp.pb.h>
 
@@ -19,8 +20,18 @@ namespace {
 constexpr auto option_name_ext_debugging_server = "ext-debugging-server";
 constexpr auto option_name_ext_debugging_max_pending_envelopes = "ext-debugging-max-pending-envelopes";
 constexpr auto option_name_ext_debugging_request_timeout_ms = "ext-debugging-request-timeout-ms";
+constexpr outbound_http::transport_option_names
+   transport_option_names{
+      .additional_ca_file =
+         "ext-debugging-additional-ca-file",
+      .additional_ca_path =
+         "ext-debugging-additional-ca-path",
+      .proxy = "ext-debugging-proxy",
+   };
 constexpr uint32_t default_max_pending_envelopes = 16;
 constexpr uint32_t default_request_timeout_ms = 5'000;
+constexpr uint64_t max_debugging_request_bytes = 1ULL * 1024ULL * 1024ULL;
+constexpr uint64_t max_debugging_response_bytes = 1ULL * 1024ULL * 1024ULL;
 }
 
 struct external_debugging_plugin::impl {
@@ -28,6 +39,7 @@ struct external_debugging_plugin::impl {
    bool enabled = false;
    uint32_t max_pending_envelopes = default_max_pending_envelopes;
    uint32_t request_timeout_ms = default_request_timeout_ms;
+   fc::http::transport_options transport_options;
 
    // Signal connection to batch_operator_plugin
    std::optional<scoped_connection> bo_signal_connection;
@@ -40,6 +52,36 @@ struct external_debugging_plugin::impl {
 
    /** Return the absolute deadline for one debugging-server request. */
    fc::time_point next_request_deadline() const { return fc::time_point::now() + fc::milliseconds(request_timeout_ms); }
+
+   /** Return a credential- and path-free endpoint label for diagnostics. */
+   std::string log_endpoint() const {
+      try {
+         return fc::http::sanitized_endpoint(fc::url(server_url));
+      } catch (...) {
+         return "<invalid-endpoint>";
+      }
+   }
+
+   /** Return the named bounded request policy for external-debugging traffic. */
+   rpc::client_options client_options() const {
+      const auto request_timeout = fc::milliseconds(request_timeout_ms);
+      return rpc::client_options{
+         .transport = transport_options,
+         .request =
+            fc::http::request_options{
+               .max_request_body_bytes = max_debugging_request_bytes,
+               .max_response_body_bytes = max_debugging_response_bytes,
+               .timeouts =
+                  fc::http::timeout_options{
+                     .connect = request_timeout,
+                     .header = request_timeout,
+                     .read = request_timeout,
+                     .idle = request_timeout,
+                     .total = request_timeout,
+                  },
+            },
+      };
+   }
 
    // ------------------------------------------------------------------
    //  Serialize DebugEnvelopeEvent to PutEnvelopeRequest and send
@@ -72,7 +114,7 @@ struct external_debugging_plugin::impl {
          rpc_client->send_http(rpc::http_verb::GET, debugging::rpc_client::api_paths::ping);
          return true;
       } catch (const fc::exception& e) {
-         elog("opp_tracking: server validation failed at {}: {}", server_url, e.to_string());
+         elog("opp_tracking: server validation failed at {}: {}", log_endpoint(), e.to_string());
          return false;
       }
    }
@@ -97,6 +139,10 @@ void external_debugging_plugin::set_program_options(options_description& cli, op
         "Maximum debugging envelopes waiting behind the active server request.");
    opts(option_name_ext_debugging_request_timeout_ms, bpo::value<uint32_t>()->default_value(default_request_timeout_ms),
         "Maximum time in milliseconds for each debugging-server request.");
+   outbound_http::add_transport_program_options(
+      cfg,
+      transport_option_names,
+      "external-debugging");
 }
 
 void external_debugging_plugin::plugin_initialize(const variables_map& options) {
@@ -106,6 +152,10 @@ void external_debugging_plugin::plugin_initialize(const variables_map& options) 
    if (options.contains(option_name_ext_debugging_request_timeout_ms)) {
       _impl->request_timeout_ms = options[option_name_ext_debugging_request_timeout_ms].as<uint32_t>();
    }
+   _impl->transport_options =
+      outbound_http::read_transport_options(
+         options,
+         transport_option_names);
 
    SYS_ASSERT(_impl->max_pending_envelopes > 0, chain::plugin_config_exception, "--{} must be greater than 0",
               option_name_ext_debugging_max_pending_envelopes);
@@ -129,10 +179,15 @@ void external_debugging_plugin::plugin_startup() {
    {
       fc::task::deadline_scope startup_deadline(_impl->next_request_deadline());
       auto rpc_url = _impl->server_url + debugging::rpc_client::api_paths::opp_base;
-      _impl->rpc_client =
-         std::make_unique<rpc::json_rpc_client>(fc::url(rpc_url), std::nullopt, rpc::endpoint_refresh_policy::never);
+      _impl->rpc_client = std::make_unique<rpc::json_rpc_client>(
+         fc::url(rpc_url),
+         std::nullopt,
+         rpc::endpoint_refresh_policy::never,
+         _impl->client_options());
 
-      FC_ASSERT(_impl->validate_server(), "External debugging server not reachable at {}", _impl->server_url);
+      FC_ASSERT(_impl->validate_server(),
+                "External debugging server not reachable at {}",
+                _impl->log_endpoint());
    }
 
    // Start the bounded asynchronous event sink
@@ -146,17 +201,15 @@ void external_debugging_plugin::plugin_startup() {
             return;
          };
 
-         std::string event_json;
-         if (auto res = google::protobuf::json::MessageToJsonString(envelope, &event_json); !res.ok()) {
-            elog("external_debugging_plugin: failed to unpack DebugEnvelope for event from batch_op={}: code={}, message={}",
-                 std::get<2>(event).to_string(), res.raw_code(), res.message());
-            return;
-         }
-
          try {
             impl->send_envelope(event);
          }
-         FC_LOG_AND_DROP("external_debugging_plugin: error sending envelope to {}: {}", impl->server_url, event_json);
+         FC_LOG_AND_DROP(
+            "external_debugging_plugin: error sending envelope to {} "
+            "(epoch={}, batch_op={})",
+            impl->log_endpoint(),
+            std::get<0>(event),
+            std::get<2>(event).to_string());
       });
 
    // Connect to batch_operator_plugin signal
@@ -166,7 +219,7 @@ void external_debugging_plugin::plugin_startup() {
 
    ilog("external_debugging_plugin: connected to batch_operator_plugin, "
         "forwarding to {} with pending_capacity={} request_timeout_ms={}",
-        _impl->server_url, _impl->max_pending_envelopes, _impl->request_timeout_ms);
+        _impl->log_endpoint(), _impl->max_pending_envelopes, _impl->request_timeout_ms);
 }
 
 void external_debugging_plugin::plugin_shutdown() {

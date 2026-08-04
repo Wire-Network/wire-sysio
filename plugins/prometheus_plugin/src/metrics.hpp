@@ -5,12 +5,14 @@
 #include <sysio/producer_plugin/producer_plugin.hpp>
 #include <sysio/chain_plugin/tracked_votes.hpp>
 
+#include <fc/network/http/http_client.hpp>
 #include <prometheus/counter.h>
 #include <prometheus/info.h>
 #include <prometheus/registry.h>
 #include <prometheus/text_serializer.h>
 #include <fc/log/logger.hpp>
 
+#include <array>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -40,6 +42,13 @@ struct catalog_type {
    prometheus::Info info_details;
    // http plugin
    prometheus::Family<Counter>& http_request_counts;
+   Counter& outbound_http_requests;
+   Counter& outbound_http_successes;
+   Counter& outbound_http_request_bytes;
+   Counter& outbound_http_response_bytes;
+   prometheus::Family<Counter>& outbound_http_failures;
+   std::array<Counter*, fc::http::failure_kind_count> outbound_http_failure_counts{};
+   fc::http::metrics_snapshot last_outbound_http_metrics;
 
    // net plugin failed p2p connection
    Counter& failed_p2p_connections;
@@ -127,6 +136,22 @@ struct catalog_type {
    catalog_type()
        : info(family<prometheus::Info>("nodeop", "static information about the server"))
        , http_request_counts(family<Counter>("nodeop_http_requests_total", "number of HTTP requests"))
+       , outbound_http_requests(build<Counter>(
+            "nodeop_outbound_http_requests_total",
+            "total shared outbound HTTP transport requests"))
+       , outbound_http_successes(build<Counter>(
+            "nodeop_outbound_http_successes_total",
+            "total successful shared outbound HTTP transport requests"))
+       , outbound_http_request_bytes(build<Counter>(
+            "nodeop_outbound_http_request_bytes_total",
+            "process-wide complete request-body bytes uploaded by the shared outbound HTTP transport, including "
+            "completed retry attempts"))
+       , outbound_http_response_bytes(build<Counter>(
+            "nodeop_outbound_http_response_bytes_total",
+            "total response-body bytes accepted by the shared outbound HTTP transport"))
+       , outbound_http_failures(family<Counter>(
+            "nodeop_outbound_http_failures_total",
+            "shared outbound HTTP transport failures by fixed category"))
        , failed_p2p_connections(build<Counter>("nodeop_p2p_failed_connections", "total number of failed out-going p2p connections"))
        , dropped_trxs_total(build<Counter>("nodeop_p2p_dropped_trxs_total", "total number of dropped transactions by net plugin"))
        , p2p_metrics{
@@ -196,14 +221,40 @@ struct catalog_type {
        , blocks_incoming(build<Counter>("nodeop_blocks_incoming", "number of incoming blocks"))
        , bytes_transferred(build<Counter>("exposer_transferred_bytes_total",
                                           "total number of bytes for responses to prometheus scrape requests"))
-       , num_scrapes(build<Counter>("exposer_scrapes_total", "total number of prometheus scrape requests received")) {}
+       , num_scrapes(build<Counter>("exposer_scrapes_total", "total number of prometheus scrape requests received")) {
+      for (const auto failure : magic_enum::enum_values<fc::http::failure_kind>()) {
+         const auto index = magic_enum::enum_index(failure);
+         FC_ASSERT(index, "Unknown outbound HTTP failure kind");
+         outbound_http_failure_counts[*index] =
+            &outbound_http_failures.Add({{"category", std::string(fc::http::failure_kind_name(failure))}});
+      }
+   }
 
    std::string report() {
+      update_outbound_http_metrics();
       const prometheus::TextSerializer serializer;
       auto                             result = serializer.Serialize(registry.Collect());
       bytes_transferred.Increment(result.size());
       num_scrapes.Increment(1);
       return result;
+   }
+
+   /** Copy process-wide monotonic outbound transport deltas into Prometheus counters. */
+   void update_outbound_http_metrics() {
+      const auto current = fc::http::get_metrics_snapshot();
+      outbound_http_requests.Increment(current.requests - last_outbound_http_metrics.requests);
+      outbound_http_successes.Increment(current.successes - last_outbound_http_metrics.successes);
+      outbound_http_request_bytes.Increment(
+         current.request_bytes - last_outbound_http_metrics.request_bytes);
+      outbound_http_response_bytes.Increment(
+         current.response_bytes - last_outbound_http_metrics.response_bytes);
+      for (const auto failure : magic_enum::enum_values<fc::http::failure_kind>()) {
+         const auto index = magic_enum::enum_index(failure);
+         FC_ASSERT(index, "Unknown outbound HTTP failure kind");
+         outbound_http_failure_counts[*index]->Increment(
+            current.failures[*index] - last_outbound_http_metrics.failures[*index]);
+      }
+      last_outbound_http_metrics = current;
    }
 
    void update(const http_plugin::metrics& metrics) {

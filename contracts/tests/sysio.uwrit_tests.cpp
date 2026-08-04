@@ -81,15 +81,19 @@ public:
       }
    }
 
-   action_result setconfig(uint32_t fee_bps                     = 10,
-                           uint64_t collateral_lock_duration_ms = 43'200'000,
-                           uint64_t min_fromwire_amount         = 5'000'000'000ull,
-                           uint32_t fromwire_revert_fee_bps     = 10) {
+   action_result setconfig(uint32_t fee_bps                      = 10,
+                           uint64_t collateral_lock_duration_ms  = 43'200'000,
+                           uint64_t min_fromwire_amount          = 5'000'000'000ull,
+                           uint32_t fromwire_revert_fee_bps      = 10,
+                           uint32_t uwreq_pending_timeout_epochs = 10,
+                           uint32_t uwreq_retention_epochs       = 10) {
       return push_uwrit_action(UWRIT_ACCOUNT, "setconfig"_n, mvo()
-         ("fee_bps",                     fee_bps)
-         ("collateral_lock_duration_ms", collateral_lock_duration_ms)
-         ("min_fromwire_amount",         min_fromwire_amount)
-         ("fromwire_revert_fee_bps",     fromwire_revert_fee_bps)
+         ("fee_bps",                      fee_bps)
+         ("collateral_lock_duration_ms",  collateral_lock_duration_ms)
+         ("min_fromwire_amount",          min_fromwire_amount)
+         ("fromwire_revert_fee_bps",      fromwire_revert_fee_bps)
+         ("uwreq_pending_timeout_epochs", uwreq_pending_timeout_epochs)
+         ("uwreq_retention_epochs",       uwreq_retention_epochs)
       );
    }
 
@@ -124,6 +128,8 @@ BOOST_FIXTURE_TEST_CASE(setconfig_basic, sysio_uwrit_tester) { try {
    BOOST_REQUIRE_EQUAL(43'200'000u, cfg["collateral_lock_duration_ms"].as_uint64());
    BOOST_REQUIRE_EQUAL(5'000'000'000u, cfg["min_fromwire_amount"].as_uint64());
    BOOST_REQUIRE_EQUAL(10, cfg["fromwire_revert_fee_bps"].as_uint64());
+   BOOST_REQUIRE_EQUAL(10, cfg["uwreq_pending_timeout_epochs"].as_uint64());
+   BOOST_REQUIRE_EQUAL(10, cfg["uwreq_retention_epochs"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(setconfig_writes_custom_lock_duration, sysio_uwrit_tester) { try {
@@ -190,6 +196,57 @@ BOOST_FIXTURE_TEST_CASE(setconfig_accepts_max_revert_fee_and_custom_floor, sysio
    BOOST_REQUIRE_EQUAL(9999, cfg["fromwire_revert_fee_bps"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
+// ── SEC-129 / WSA-223: UWREQ lifecycle knobs ──
+//
+// A zero pending timeout would expire every uwreq the epoch it is created; a
+// zero retention would erase terminal rows before the audit window they exist
+// for; a near-UINT32_MAX value would wrap the `current_epoch + knob` deadline
+// stamp to a tiny epoch index (instant expiry). setconfig rejects all three.
+
+BOOST_FIXTURE_TEST_CASE(setconfig_rejects_zero_pending_timeout, sysio_uwrit_tester) { try {
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: uwreq_pending_timeout_epochs must be positive"),
+      setconfig(/*fee_bps*/10, /*lock_ms*/43'200'000, /*min_fromwire*/5'000'000'000ull,
+                /*revert_fee_bps*/10, /*pending_timeout*/0)
+   );
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(setconfig_rejects_zero_retention, sysio_uwrit_tester) { try {
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: uwreq_retention_epochs must be positive"),
+      setconfig(/*fee_bps*/10, /*lock_ms*/43'200'000, /*min_fromwire*/5'000'000'000ull,
+                /*revert_fee_bps*/10, /*pending_timeout*/10, /*retention*/0)
+   );
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(setconfig_rejects_lifecycle_epochs_over_ceiling, sysio_uwrit_tester) { try {
+   // The ceiling itself is accepted for both knobs; one epoch beyond it is
+   // rejected before the value could wrap a deadline stamp.
+   constexpr uint32_t ceiling = 1'000'000;
+   BOOST_REQUIRE_EQUAL(success(),
+      setconfig(/*fee_bps*/10, /*lock_ms*/43'200'000, /*min_fromwire*/5'000'000'000ull,
+                /*revert_fee_bps*/10, /*pending_timeout*/ceiling, /*retention*/ceiling));
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: uwreq_pending_timeout_epochs exceeds the lifecycle ceiling"),
+      setconfig(/*fee_bps*/10, /*lock_ms*/43'200'000, /*min_fromwire*/5'000'000'000ull,
+                /*revert_fee_bps*/10, /*pending_timeout*/ceiling + 1, /*retention*/ceiling)
+   );
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: uwreq_retention_epochs exceeds the lifecycle ceiling"),
+      setconfig(/*fee_bps*/10, /*lock_ms*/43'200'000, /*min_fromwire*/5'000'000'000ull,
+                /*revert_fee_bps*/10, /*pending_timeout*/ceiling, /*retention*/ceiling + 1)
+   );
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(setconfig_roundtrips_lifecycle_epochs, sysio_uwrit_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(),
+      setconfig(/*fee_bps*/10, /*lock_ms*/43'200'000, /*min_fromwire*/5'000'000'000ull,
+                /*revert_fee_bps*/10, /*pending_timeout*/3, /*retention*/7));
+   auto cfg = get_uwconfig();
+   BOOST_REQUIRE_EQUAL(3, cfg["uwreq_pending_timeout_epochs"].as_uint64());
+   BOOST_REQUIRE_EQUAL(7, cfg["uwreq_retention_epochs"].as_uint64());
+} FC_LOG_AND_RETHROW() }
+
 BOOST_FIXTURE_TEST_CASE(setconfig_rejects_zero_lock_duration, sysio_uwrit_tester) { try {
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: collateral_lock_duration_ms must be positive"),
@@ -236,6 +293,31 @@ BOOST_FIXTURE_TEST_CASE(chklocks_noop_with_no_locks, sysio_uwrit_tester) { try {
    // no-op (it runs inside every epoch advance).
    BOOST_REQUIRE_EQUAL(success(),
       push_uwrit_action(UWRIT_ACCOUNT, "chklocks"_n, mvo()));
+} FC_LOG_AND_RETHROW() }
+
+// ── pruneuwreqs — bounded UWREQ lifecycle sweep (SEC-129 / WSA-223) ──
+//
+// The enforcement trigger for `uw_request_t.expires_at_epoch`. Auth mirrors
+// its sibling epoch-inline sweeps; the lifecycle behavior itself (PENDING
+// timeout, terminal retention erase, per-epoch budget) needs real epoch
+// movement and lives in sysio.dispatch_tests.cpp.
+
+BOOST_FIXTURE_TEST_CASE(pruneuwreqs_requires_epoch_or_self_auth, sysio_uwrit_tester) { try {
+   BOOST_REQUIRE(push_uwrit_action("uwrit.a"_n, "pruneuwreqs"_n, mvo()
+      ("max_rows", 10)
+   ).find("pruneuwreqs requires sysio.epoch or sysio.uwrit authority") != std::string::npos);
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(pruneuwreqs_noop_with_empty_table, sysio_uwrit_tester) { try {
+   // Steady-state: nothing due, nothing to sweep — must be a clean no-op
+   // (it runs inside every epoch advance).
+   BOOST_REQUIRE_EQUAL(success(),
+      push_uwrit_action(UWRIT_ACCOUNT, "pruneuwreqs"_n, mvo()("max_rows", 10)));
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(pruneuwreqs_zero_budget_is_noop, sysio_uwrit_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(),
+      push_uwrit_action(UWRIT_ACCOUNT, "pruneuwreqs"_n, mvo()("max_rows", 0)));
 } FC_LOG_AND_RETHROW() }
 
 // ── drainfwq — epoch-boundary swap-from-WIRE queue drain ──

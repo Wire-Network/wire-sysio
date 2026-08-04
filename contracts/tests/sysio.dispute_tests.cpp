@@ -39,6 +39,7 @@
 // Canonical-encoding + header-derivation oracle: inbound envelopes must carry
 // spec-derived semantic headers or apply_consensus drops them before dispatch.
 #include "opp_envelope_oracle.hpp"
+#include "sysio.system_tester.hpp"
 
 using namespace sysio::testing;
 using namespace sysio;
@@ -161,11 +162,7 @@ public:
    // ── deploy / abi helpers ─────────────────────────────────────────────────
 
    void load_abi(name account, abi_serializer& out_ser) {
-      const auto* accnt = control->find_account_metadata(account);
-      BOOST_REQUIRE(accnt != nullptr);
-      abi_def parsed;
-      BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, parsed), true);
-      out_ser.set_abi(std::move(parsed), abi_serializer::create_yield_function(abi_serializer_max_time));
+      sysio_system::test_support::load_account_abi(*this, account, out_ser);
    }
 
    void deploy(name account, std::vector<uint8_t> wasm, std::vector<char> abi, abi_serializer& out_ser) {
@@ -181,23 +178,8 @@ public:
    }
 
    void setup_emission_config() {
-      auto cfg = mvo()
-         ("t1_allocation", int64_t(7500000000000000))("t2_allocation", int64_t(1000000000000000))
-         ("t3_allocation", int64_t(100000000000000))
-         ("t1_duration", uint32_t(12u*30u*24u*3600u))("t2_duration", uint32_t(24u*30u*24u*3600u))
-         ("t3_duration", uint32_t(36u*30u*24u*3600u))
-         ("min_claimable", int64_t(10000000000))
-         ("t5_distributable", int64_t(375000000000000000LL))("t5_floor", int64_t(125000000000000000LL))
-         ("target_annual_decay_bps", uint16_t(6940))
-         ("annual_initial_emission", int64_t(563150000000000LL*365))
-         ("annual_max_emission", int64_t(3000000000000000LL*365))
-         ("annual_min_emission", int64_t(100000000000000LL*365))
-         ("compute_bps", uint16_t(4000))("capex_bps", uint16_t(2000))("governance_bps", uint16_t(1000))
-         ("producer_bps", uint16_t(7000))("batch_op_bps", uint16_t(3000))
-         ("standby_end_rank", uint32_t(28))
-         ("epoch_log_retention_count", uint32_t(8640))("pay_cadence_epochs", uint16_t(1));
       push(config::system_account_name, system_abi, config::system_account_name,
-           "setemitcfg"_n, mvo()("cfg", cfg));
+           "setemitcfg"_n, mvo()("cfg", sysio_system::test_support::default_emission_config()));
       produce_blocks();
    }
 
@@ -205,27 +187,7 @@ public:
 
    action_result push(name contract, abi_serializer& ser, name signer,
                       name action_name, const fc::variant_object& data) {
-      try {
-         std::string action_type = ser.get_action_type(action_name);
-         action act;
-         act.account = contract;
-         act.name    = action_name;
-         act.data    = ser.variant_to_binary(action_type, data,
-                        abi_serializer::create_yield_function(abi_serializer_max_time));
-         act.authorization = std::vector<permission_level>{{signer, config::active_name}};
-         signed_transaction trx;
-         trx.actions.emplace_back(std::move(act));
-         set_transaction_headers(trx);
-         trx.sign(get_private_key(signer, "active"), control->get_chain_id());
-         push_transaction(trx);
-         // Land each successful action in its own block so repeated identical actions (e.g. a
-         // second chkdispute / double-vote) get a distinct TaPoS ref and reach the contract guard
-         // rather than being dropped as a duplicate transaction.
-         produce_block();
-         return success();
-      } catch (const fc::exception& ex) {
-         return error(ex.top_message());
-      }
+      return sysio_system::test_support::push_contract_action(*this, contract, ser, signer, action_name, data);
    }
 
    // ── OPP stack bootstrap: one batch op, one outpost, advance to epoch 1 ────

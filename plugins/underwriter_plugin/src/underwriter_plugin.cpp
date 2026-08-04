@@ -1828,7 +1828,7 @@ struct underwriter_plugin::impl {
 
       uint64_t finalized_blk = 0;
       try {
-         const auto finalized_var = entry->client->execute(
+         const auto finalized_var = entry->client->execute_idempotent(
             std::string{ETH_GET_BLOCK_BY_NUMBER_METHOD},
             fc::variants{eth::to_block_tag(eth::block_tag_t::finalized), false});
          if (finalized_var.is_null()) {

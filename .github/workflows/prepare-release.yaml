@@ -1,0 +1,152 @@
+name: "Prepare Release"
+
+# Gate 1 of the Strategy-C release path (docs/release-workflow.md): produce the
+# version-bump PR a human reviews and merges. Nothing is tagged or published here.
+#
+# `version` is the SOLE input -- its suffix IS the channel everywhere downstream:
+# a suffix (-dev, -rcN, ...) means prerelease, no suffix means stable.
+#
+# Post-bump mode is the same dispatch: after a stable release lands, dispatch this
+# workflow again with the next `-dev` version to restore the development suffix on
+# master. The workflow labels the PR accordingly.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to prepare, without a leading v (e.g. 1.0.0-dev, 1.1.0-rc1, 1.1.0)"
+        type: string
+        required: true
+
+permissions:
+  contents: write
+  pull-requests: write
+
+defaults:
+  run:
+    shell: bash
+
+# One prep run per version, and never cancel one mid-flight: a cancelled run can
+# leave a pushed prep branch with no PR opened for it. Matches wire-cdt's
+# prepare-release.yaml.
+concurrency:
+  group: prepare-release-${{ inputs.version }}
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    name: Open the version-bump PR
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      # Untrusted dispatch input: passed as an environment variable and NEVER
+      # interpolated into a script body, so a value such as $(...) stays inert data.
+      VERSION: ${{ inputs.version }}
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # actions/checkout@v5
+        with:
+          ref: master
+          # Unshallowed so the remote-tracking refs exist: `git push
+          # --force-with-lease` below needs origin/<prep-branch> to compare
+          # against, and on a shallow clone with no such ref it fails with
+          # "stale info" whenever a previous prep attempt already pushed it.
+          fetch-depth: 0
+
+      - name: Validate version and derive the channel
+        id: version
+        run: |
+          set -euo pipefail
+
+          # The grammar is cmake-version.py's VERSION_RE, asserted by the parser
+          # itself rather than re-spelled here: an inline copy is one edit away
+          # from accepting a version the `write` below would then reject.
+          python3 .github/scripts/cmake-version.py validate "$VERSION" \
+            || { echo "::error::'${VERSION}' is not <major>.<minor>.<patch>[-<suffix>] (no leading v)" >&2; exit 1; }
+
+          previous="$(python3 .github/scripts/cmake-version.py read)"
+
+          # Nothing to do: master already carries this version, so the bump would
+          # be an empty commit and the PR would have no diff to review. Fail here
+          # with the reason rather than at `git commit` with "nothing to commit".
+          if [[ "$previous" == "$VERSION" ]]; then
+            echo "::error::master is already at ${VERSION}; nothing to prepare. Dispatch with the NEXT version instead." >&2
+            exit 1
+          fi
+
+          if [[ "$VERSION" == *-* ]]; then
+            channel="prerelease"
+            prerelease="true"
+          else
+            channel="stable"
+            prerelease="false"
+          fi
+
+          # A suffixed version replacing an unsuffixed one is the post-stable
+          # restoration of the development suffix, not a release preparation.
+          if [[ "$previous" != *-* && "$VERSION" == *-* ]]; then
+            mode="post-bump"
+          else
+            mode="release-prep"
+          fi
+
+          {
+            echo "previous=$previous"
+            echo "channel=$channel"
+            echo "prerelease=$prerelease"
+            echo "mode=$mode"
+            echo "branch=release/prep-v${VERSION}"
+          } >> "$GITHUB_OUTPUT"
+
+          echo "Preparing ${previous} -> ${VERSION} (channel ${channel}, mode ${mode})"
+
+      - name: Write the version into CMakeLists.txt
+        run: |
+          python3 .github/scripts/cmake-version.py write "$VERSION"
+
+      # NOTE: the former "Pin the latest published wire-cdt release" step (and
+      # its .cicd/defaults.json pin file) is retired. The tag build's `v` job
+      # now resolves the CDT release itself — an explicit `wire-cdt-release`
+      # dispatch input on tag-release.yaml/linux_amd64_build.yaml, or the latest
+      # published wire-cdt release in the version's channel — and the resolved
+      # value is recorded durably in the release's
+      # wire-sysio-versions-<version>.json asset.
+
+      - name: Open the bump PR
+        env:
+          BRANCH: ${{ steps.version.outputs.branch }}
+          PREVIOUS: ${{ steps.version.outputs.previous }}
+          CHANNEL: ${{ steps.version.outputs.channel }}
+          MODE: ${{ steps.version.outputs.mode }}
+        run: |
+          set -euo pipefail
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          git add CMakeLists.txt
+          git commit -m "chore(release): ${MODE} ${PREVIOUS} -> ${VERSION}"
+          # --force-with-lease, not a bare push: re-dispatching the prep for the
+          # same version (a fixed pin, a re-resolved CDT release) must be able to
+          # replace the previous attempt's branch tip instead of failing
+          # non-fast-forward, while still refusing to clobber a tip that someone
+          # else moved since this run's fetch.
+          git push --force-with-lease origin "$BRANCH"
+
+          # NOTE: a PR opened with GITHUB_TOKEN starts its `pull_request` checks in
+          # an approval-required state -- gate 1 includes an "Approve and run" click.
+          # printf, not an indented heredoc: every body line must start at column 0
+          # or GitHub renders the whole description as a code block.
+          body="$(printf '%s\n' \
+            "${MODE}: \`${PREVIOUS}\` -> \`${VERSION}\` (channel: **${CHANNEL}**)." \
+            "" \
+            "- \`CMakeLists.txt\`: \`VERSION_*\` set to \`${VERSION}\`." \
+            "" \
+            "The tag build resolves the Wire CDT release itself (latest published" \
+            "in this channel, or an explicit \`wire-cdt-release\` dispatch input);" \
+            "the resolved version is recorded in the release's" \
+            "\`wire-sysio-versions-<version>.json\`. Tagging is a separate," \
+            "approval-gated dispatch of \`tag-release.yaml\` with the same version.")"
+          gh pr create \
+            --base master \
+            --head "$BRANCH" \
+            --title "chore(release): ${MODE} v${VERSION}" \
+            --body "$body"

@@ -10,21 +10,16 @@ on:
   schedule:
     # GitHub schedules run from the default branch, providing nightly coverage for origin/master.
     - cron: "0 8 * * *"
+  # NOTE: a `paths:` filter cannot be scoped to one ref pattern within a single
+  # `push:` block, and a tag push carries no new commits for the filter to match --
+  # so a `paths:`-filtered push trigger would silently suppress every `v*` tag run,
+  # which is exactly the run that produces the macOS release tarball. The filter is
+  # therefore kept on `pull_request:` only; master pushes now always build macOS.
   push:
     branches:
       - master
-    paths:
-      - ".github/workflows/macos_arm64_build.yaml"
-      - ".github/vcpkg-triplets/**"
-      - "cmake/**"
-      - "libraries/**"
-      - "plugins/**"
-      - "programs/**"
-      - "unittests/**"
-      - "tests/**"
-      - "CMakeLists.txt"
-      - "vcpkg.json"
-      - "vcpkg-configuration.json"
+    tags:
+      - "v*"
   pull_request:
     types: [opened, synchronize, reopened]
     paths:
@@ -69,8 +64,12 @@ jobs:
           "$RUNNER_TEMP/python-venv/bin/python" -m pip install numpy
           echo "$RUNNER_TEMP/python-venv/bin" >> "$GITHUB_PATH"
 
+      # Split restore/save (not the monolithic actions/cache) -- see the matching
+      # comment in linux_amd64_build.yaml: the paired save runs immediately after
+      # the build, and only on an exact-key miss (caches are immutable).
       - name: Restore vcpkg binary cache
-        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # actions/cache@v5
+        id: restore-vcpkg
+        uses: actions/cache/restore@caa296126883cff596d87d8935842f9db880ef25 # actions/cache/restore@v5
         with:
           path: ${{ github.workspace }}/vcpkg-binary-cache
           key: vcpkg-binaries-macos-arm64-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json', '.github/vcpkg-triplets/arm64-osx-release.cmake') }}
@@ -93,6 +92,13 @@ jobs:
           VCPKG_HOST_TRIPLET: arm64-osx-release
         run: |
           bash .github/scripts/build-sysio.sh "$(sysctl -n hw.logicalcpu)"
+
+      - name: Save vcpkg binary cache
+        if: ${{ success() && steps.restore-vcpkg.outputs.cache-hit != 'true' }}
+        uses: actions/cache/save@caa296126883cff596d87d8935842f9db880ef25 # actions/cache/save@v5
+        with:
+          path: ${{ github.workspace }}/vcpkg-binary-cache
+          key: vcpkg-binaries-macos-arm64-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json', '.github/vcpkg-triplets/arm64-osx-release.cmake') }}
 
       - name: Enable macOS core dumps
         run: |
@@ -142,6 +148,29 @@ jobs:
         with:
           path: ${{ github.workspace }}/.ccache
           key: ccache-macos-arm64-${{ github.sha }}
+
+      # macOS ships the portable tarball only -- there is no deb/rpm generator and no
+      # service payload (cmake/package.cmake gates those install() rules on NOT APPLE).
+      # WIRE_ARCH_TAG makes the artifact wire-sysio-<version>-macos-arm64.tar.gz, so it
+      # never collides with the Linux wire-sysio-<version>-x86_64.tar.gz on a release.
+      - name: Build portable tarball
+        run: |
+          cmake --build "$BUILD_DIR" --target package-tgz
+
+      - name: Verify portable tarball (S1, no-service)
+        run: |
+          set -euo pipefail
+          tarball="$(find "$BUILD_DIR" -maxdepth 1 -type f -name 'wire-sysio-*-macos-arm64.tar.gz' -print -quit)"
+          [[ -n "$tarball" ]] || { echo "::error::macOS portable tarball not found in $BUILD_DIR" >&2; exit 1; }
+          tools/packaging/tests/verify-tgz.sh --no-service "$tarball"
+
+      - name: Upload release package set
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # actions/upload-artifact@v6
+        with:
+          name: wire-sysio-packages-macos-arm64
+          if-no-files-found: error
+          path: |
+            ${{ env.BUILD_DIR }}/wire-sysio-*-macos-arm64.tar.gz
 
       - name: Upload core files from failed tests
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # actions/upload-artifact@v6

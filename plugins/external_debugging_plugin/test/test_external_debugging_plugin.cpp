@@ -44,6 +44,9 @@ BOOST_AUTO_TEST_CASE(backpressure_options_are_registered) {
    BOOST_TEST(option_names.contains("ext-debugging-server"));
    BOOST_TEST(option_names.contains("ext-debugging-max-pending-envelopes"));
    BOOST_TEST(option_names.contains("ext-debugging-request-timeout-ms"));
+   BOOST_TEST(option_names.contains("ext-debugging-additional-ca-file"));
+   BOOST_TEST(option_names.contains("ext-debugging-additional-ca-path"));
+   BOOST_TEST(option_names.contains("ext-debugging-proxy"));
 }
 
 BOOST_AUTO_TEST_CASE(backpressure_defaults_are_bounded) {
