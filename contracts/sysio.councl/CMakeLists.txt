@@ -1,4 +1,4 @@
-set(contract_name sysio.epoch)
+set(contract_name sysio.councl)
 bootstrap_contract(${contract_name})
 
 if(BUILD_SYSTEM_CONTRACTS)
@@ -6,6 +6,7 @@ if(BUILD_SYSTEM_CONTRACTS)
     file(GLOB_RECURSE SOURCES src/*.cpp)
     file(GLOB_RECURSE HEADERS include/*.hpp)
     add_contract(${contract_name} ${contract_name} ${SOURCES})
+    target_ricardian_directory(${contract_name} ${CMAKE_CURRENT_SOURCE_DIR}/ricardian)
     set(targets ${contract_name})
 
     if("native-module" IN_LIST SYSIO_WASM_RUNTIMES)
@@ -14,7 +15,7 @@ if(BUILD_SYSTEM_CONTRACTS)
                 TARGET ${contract_name}_native
                 SOURCES ${SOURCES}
                 INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include
-                CONTRACT_CLASS "sysio::epoch"
+                CONTRACT_CLASS "sysio::council"
                 HEADERS ${HEADERS}
                 ABI_FILE ${CMAKE_BINARY_DIR}/contracts/${contract_name}/${contract_name}.abi
         )
@@ -31,19 +32,17 @@ if(BUILD_SYSTEM_CONTRACTS)
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/../../libraries/opp/generated-cdt>
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/libfc-lite/include>
-                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.system/include>
-                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.opreg/include>
-                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.msgch/include>
-                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.authex/include>
-                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.chains/include>
-                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.uwrit/include>
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.opp.common/include>
-                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.token/include>
+                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.system/include>
+                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.roa>
         )
 
         target_link_libraries(${target}
-                INTERFACE
+                PRIVATE
                 magic_enum::magic_enum
         )
+        # cdt-cpp intentionally drops host system include paths. Treat the imported header-only
+        # target as a normal include so its contract-compatible headers reach the WASM compiler.
+        set_target_properties(${target} PROPERTIES NO_SYSTEM_FROM_IMPORTED TRUE)
     endforeach()
 endif()

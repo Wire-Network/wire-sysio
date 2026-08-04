@@ -200,6 +200,16 @@
             ]
         },
         {
+            "name": "pruneuwreqs",
+            "base": "",
+            "fields": [
+                {
+                    "name": "max_rows",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
             "name": "rcrdcommit",
             "base": "",
             "fields": [
@@ -251,6 +261,14 @@
                 },
                 {
                     "name": "fromwire_revert_fee_bps",
+                    "type": "uint32"
+                },
+                {
+                    "name": "uwreq_pending_timeout_epochs",
+                    "type": "uint32"
+                },
+                {
+                    "name": "uwreq_retention_epochs",
                     "type": "uint32"
                 }
             ]
@@ -343,6 +361,14 @@
                 },
                 {
                     "name": "fromwire_revert_fee_bps",
+                    "type": "uint32"
+                },
+                {
+                    "name": "uwreq_pending_timeout_epochs",
+                    "type": "uint32"
+                },
+                {
+                    "name": "uwreq_retention_epochs",
                     "type": "uint32"
                 }
             ]
@@ -469,6 +495,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "pruneuwreqs",
+            "type": "pruneuwreqs",
+            "ricardian_contract": ""
+        },
+        {
             "name": "rcrdcommit",
             "type": "rcrdcommit",
             "ricardian_contract": ""
@@ -563,6 +594,11 @@
                     "name": "bywinner",
                     "key_type": "uint64",
                     "table_id": 29561
+                },
+                {
+                    "name": "byexpire",
+                    "key_type": "uint64",
+                    "table_id": 36295
                 }
             ]
         }

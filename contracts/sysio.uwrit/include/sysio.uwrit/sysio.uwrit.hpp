@@ -74,10 +74,79 @@ namespace sysio {
       static constexpr name RESERVE_ACCOUNT = "sysio.reserv"_n;
       static constexpr name TOKEN_ACCOUNT = "sysio.token"_n;
 
-      // Number of epochs an UWREQ row lives after settlement / abort. 10 epochs
-      // matches the bootstrap doc's "losers retained 10 epochs for debugging"
-      // requirement; covers SETTLED, REVERTED, EXPIRED uwreqs alike.
-      static constexpr uint32_t UWREQ_RETENTION_EPOCHS = 10;
+      // Default number of epochs a TERMINAL (COMPLETED / REJECTED / EXPIRED)
+      // UWREQ row lives before `pruneuwreqs` erases it. 10 epochs matches the
+      // bootstrap doc's "losers retained 10 epochs for debugging" requirement.
+      // Live value is `uwconfig.uwreq_retention_epochs` (retunable via
+      // `setconfig`); this constant is only the fresh-chain default.
+      static constexpr uint32_t DEFAULT_UWREQ_RETENTION_EPOCHS = 10;
+
+      // Default number of epochs a PENDING UWREQ may wait for its underwriter
+      // race to resolve before `pruneuwreqs` expires it (refund/revert + flip
+      // to UNDERWRITE_REQUEST_STATUS_EXPIRED). A pending request only resolves
+      // if underwriter commits arrive — an external, optional event — so
+      // without this deadline an abandoned request is indistinguishable from a
+      // slow one forever and its row (plus the user's escrowed/deposited
+      // funds) lingers indefinitely (SEC-129 / WSA-223). Live value is
+      // `uwconfig.uwreq_pending_timeout_epochs` (retunable via `setconfig`).
+      static constexpr uint32_t DEFAULT_UWREQ_PENDING_TIMEOUT_EPOCHS = 10;
+
+      // Ceiling `setconfig` accepts for BOTH epoch-count lifecycle knobs
+      // (pending timeout + retention). Prevents a misconfigured value near
+      // UINT32_MAX from wrapping the `current_epoch + knob` deadline stamp to
+      // a tiny epoch index (instant expiry/prune). One million epochs is ~2
+      // years at the 60s test cadence and far beyond any real retention need,
+      // while `current_epoch + 1'000'000` stays astronomically below the
+      // uint32 wrap point for any reachable epoch index.
+      static constexpr uint32_t MAX_UWREQ_LIFECYCLE_EPOCHS = 1'000'000;
+
+      // Rows `sysio.epoch::advance` passes to `pruneuwreqs` each epoch. Sized
+      // like MAX_FWQ_DRAIN_PER_EPOCH (and for the same reason): the sweep runs
+      // inline inside advance's hard, uncatchable transaction CPU deadline, so
+      // per-epoch work must be bounded; a backlog simply drains across
+      // subsequent epochs.
+      static constexpr uint32_t MAX_UWREQ_PRUNE_PER_EPOCH = 32;
+
+      // ── UWREQ row-growth rails (SEC-129 / WSA-223) ─────────────────────────
+      // Every uwreqs `modify` re-serializes the whole row inside the
+      // never-throw evalcons / advance dispatch surfaces, so per-field byte
+      // caps + a total-row guard keep the serialized row from approaching
+      // database value limits (where a later consensus-dispatched modify
+      // would abort and stall the chain). All are protocol backstops sized
+      // generously above legitimate traffic — violations log + skip, never
+      // check().
+
+      // Per-candidate cap on `uw_request_t.commits_by`. rcrdcommit already
+      // gates entries on ACTIVE underwriters; this bounds the row even if the
+      // ACTIVE roster grows large.
+      static constexpr uint32_t MAX_UWREQ_CANDIDATES = 32;
+
+      // Per-leg cap on a stored verbatim `UnderwriteIntentCommit` payload
+      // (`commit_entry.source_uic_bytes` / `dest_uic_bytes`). A real UIC is a
+      // handful of ids + codes + a signature `verify_uic_signature` already
+      // bounds to 1024 bytes — 2 KiB is ~2x the largest legitimate encoding.
+      static constexpr uint32_t MAX_UIC_LEG_BYTES = 2048;
+
+      // Cap on the stored inbound SwapRequest payload
+      // (`uw_request_t.attestation_inbound_data`) at createuwreq.
+      static constexpr uint32_t MAX_ATTESTATION_INBOUND_DATA_BYTES = 4096;
+
+      // Cap on `SwapRequest.source_tx_id` (largest real id today is a 64-byte
+      // Solana signature; 2x headroom for future chains).
+      static constexpr uint32_t MAX_SOURCE_TX_ID_BYTES = 128;
+
+      // Cap on the depositor address bytes (`SwapRequest.actor.address`).
+      // Mirrors swapfromwire's existing 64-byte `recipient_addr` cap — the
+      // platform's notion of a maximum chain address.
+      static constexpr uint32_t MAX_DEPOSITOR_BYTES = 64;
+
+      // Belt-and-braces ceiling on the projected serialized uwreqs row before
+      // any growing `modify`. Structural worst case under the caps above
+      // (32 candidates x 2 x 2 KiB legs + 4 KiB attestation + fixed fields)
+      // is ~135 KiB, comfortably inside this guard; the guard exists so no
+      // future field addition can silently push a row toward chain KV value
+      // limits.
+      static constexpr uint32_t MAX_UWREQ_ROW_BYTES = 262'144;
 
       // Safety rails on the depot-originated swap-from-WIRE queue (SEC-77 /
       // WSA-165). `swapfromwire` is public and escrows only the caller's WIRE,
@@ -167,11 +236,19 @@ namespace sysio {
       ///     queued from-WIRE swap reverts at drain for a caller-controlled
       ///     cause (see `drainfwq`); routed exactly like the settlement fee.
       ///     Capped at MAX_FEE_BPS so the post-fee refund stays positive.
+      ///   * `uwreq_pending_timeout_epochs` — epochs a PENDING uwreq may wait
+      ///     for its race to resolve before `pruneuwreqs` expires it
+      ///     (refund/revert + EXPIRED). 1..MAX_UWREQ_LIFECYCLE_EPOCHS.
+      ///   * `uwreq_retention_epochs` — epochs a terminal (COMPLETED /
+      ///     REJECTED / EXPIRED) uwreq row is retained for audit before
+      ///     `pruneuwreqs` erases it. 1..MAX_UWREQ_LIFECYCLE_EPOCHS.
       [[sysio::action]]
       void setconfig(uint32_t fee_bps,
                      uint64_t collateral_lock_duration_ms,
                      uint64_t min_fromwire_amount,
-                     uint32_t fromwire_revert_fee_bps);
+                     uint32_t fromwire_revert_fee_bps,
+                     uint32_t uwreq_pending_timeout_epochs,
+                     uint32_t uwreq_retention_epochs);
 
       /// Called inline from `sysio.msgch::dispatch` when a SWAP attestation
       /// arrives. Decodes the SwapRequest, runs the variance-tolerance check
@@ -233,6 +310,32 @@ namespace sysio {
       /// challenge window (12h default) and are never released by delivery.
       [[sysio::action]]
       void chklocks();
+
+      /// Bounded UWREQ lifecycle sweep (SEC-129 / WSA-223). Inlined from
+      /// `sysio.epoch::advance` each epoch with `MAX_UWREQ_PRUNE_PER_EPOCH`;
+      /// also invocable by `sysio.uwrit` itself with a caller-chosen budget
+      /// for manual backlog drains. Walks the `byexpire` index over rows whose
+      /// `expires_at_epoch` is non-zero and has elapsed, handling at most
+      /// `max_rows` rows (`max_rows == 0` is a no-op):
+      ///
+      ///   * PENDING past its deadline — the underwriter race never resolved
+      ///     inside `uwconfig.uwreq_pending_timeout_epochs`. Refund the source
+      ///     side (SWAP_REVERT to the source outpost, or a full `refundwire`
+      ///     of the from-WIRE escrow), flip the row to EXPIRED, clear its
+      ///     heavy payloads, and re-stamp `expires_at_epoch` for the terminal
+      ///     retention window.
+      ///   * COMPLETED / REJECTED / EXPIRED past retention — erase the row.
+      ///   * CONFIRMED never appears: winner selection zeroes the deadline
+      ///     (the wall-clock lock window owns the row until `chklocks`
+      ///     terminalizes it).
+      ///
+      /// NEVER throws past the auth gate — it runs inline inside `advance`,
+      /// where an abort stalls epoch progress chain-wide. There are no timers
+      /// anywhere in this lifecycle: `expires_at_epoch` is passive row data,
+      /// and this action — a trigger fired by the epoch machinery — is the
+      /// only thing that ever evaluates it.
+      [[sysio::action]]
+      void pruneuwreqs(uint32_t max_rows);
 
       /// Swap FROM WIRE (the depot is the source chain). `user` escrows
       /// `wire_amount` REAL WIRE into `sysio.reserv` custody NOW and the
@@ -473,8 +576,16 @@ namespace sysio {
          name                                    winner;
          uint64_t                                committed_at_ms   = 0;
          uint64_t                                settled_at_ms     = 0;
-         /// Epoch after which this row is eligible for prune (kept for
-         /// debugging; see `UWREQ_RETENTION_EPOCHS`).
+         /// The row's lifecycle deadline, evaluated (lazily, at trigger time)
+         /// by `pruneuwreqs` via the `byexpire` index. Semantics by status:
+         ///   * PENDING   — `creation_epoch + uwconfig.uwreq_pending_timeout_epochs`;
+         ///                 past it the race is abandoned (refund + EXPIRED).
+         ///   * CONFIRMED — 0 (no deadline): the wall-clock lock window owns
+         ///                 the row; `chklocks` always terminalizes it.
+         ///   * terminal  — `terminal_epoch + uwconfig.uwreq_retention_epochs`;
+         ///                 past it the row is erased.
+         /// 0 means "no deadline, never swept" (same zero-sentinel predicate
+         /// as `sysio.dclaim::flushexpired`).
          uint32_t                                expires_at_epoch  = 0;
 
          /// Inbound attestation payload (zpp_bits-encoded protobuf).
@@ -487,6 +598,7 @@ namespace sysio {
 
          uint64_t by_status() const { return magic_enum::enum_integer(status); }
          uint64_t by_winner() const { return winner.value; }
+         uint64_t by_expires_at_epoch() const { return expires_at_epoch; }
 
          SYSLIB_SERIALIZE(uw_request_t,
             (id)(type)(status)
@@ -501,7 +613,9 @@ namespace sysio {
          sysio::kv::index<"bystatus"_n,
             sysio::const_mem_fun<uw_request_t, uint64_t, &uw_request_t::by_status>>,
          sysio::kv::index<"bywinner"_n,
-            sysio::const_mem_fun<uw_request_t, uint64_t, &uw_request_t::by_winner>>
+            sysio::const_mem_fun<uw_request_t, uint64_t, &uw_request_t::by_winner>>,
+         sysio::kv::index<"byexpire"_n,
+            sysio::const_mem_fun<uw_request_t, uint64_t, &uw_request_t::by_expires_at_epoch>>
       >;
 
       /// Singleton holding the next-issued `lock_id` + the depot-origin
@@ -575,8 +689,17 @@ namespace sysio {
          /// Fee (bps of the escrow) on caller-controlled drain-time reverts,
          /// routed like the settlement fee. <= MAX_FEE_BPS.
          uint32_t fromwire_revert_fee_bps      = DEFAULT_FROMWIRE_REVERT_FEE_BPS;
+         /// Epochs a PENDING uwreq may wait for its underwriter race before
+         /// `pruneuwreqs` expires it (refund/revert + EXPIRED). The deadline
+         /// is stamped per row at creation; retuning is not retroactive.
+         uint32_t uwreq_pending_timeout_epochs = DEFAULT_UWREQ_PENDING_TIMEOUT_EPOCHS;
+         /// Epochs a terminal (COMPLETED / REJECTED / EXPIRED) uwreq row is
+         /// retained for audit before `pruneuwreqs` erases it. Stamped per
+         /// row at the terminal transition; retuning is not retroactive.
+         uint32_t uwreq_retention_epochs       = DEFAULT_UWREQ_RETENTION_EPOCHS;
          SYSLIB_SERIALIZE(uw_config, (fee_bps)(collateral_lock_duration_ms)
-                                     (min_fromwire_amount)(fromwire_revert_fee_bps))
+                                     (min_fromwire_amount)(fromwire_revert_fee_bps)
+                                     (uwreq_pending_timeout_epochs)(uwreq_retention_epochs))
       };
 
       using uwconfig_t = sysio::kv::global<"uwconfig"_n, uw_config>;
