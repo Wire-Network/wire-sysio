@@ -3252,16 +3252,18 @@ BOOST_FIXTURE_TEST_CASE( payepoch_folds_swap_fee_rewards, sysio_emissions_tester
       ("name", "sol")("description", "")
       ("initial_chain_amount", 1'000'000'000'000ULL)("initial_wire_amount", 1'000'000'000'000ULL)
       ("source_token_precision", 9u)("connector_weight_bps", 5000u)("is_private", false)("owner", name{}) ) );
+   // No winning underwriter on this settlement (`underwriter` unset): the whole
+   // fee falls through to the rewards bucket, which is the quantity payepoch
+   // drains. The underwriter half's own accrual + claim is covered by
+   // sysio.reserv_tests; this test is about the drain and who it reaches.
    BOOST_REQUIRE_EQUAL( success(), push_reserv_action(UWRIT, "applyswap"_n, mvo()
       ("src_chain_code", codename("ETH"))("src_token_code", codename("ETH"))("src_reserve_code", codename("PRIMARY"))
       ("src_amount", 1'000'000'000ULL)
       ("dst_chain_code", codename("SOLANA"))("dst_token_code", codename("SOL"))("dst_reserve_code", codename("PRIMARY"))
-      ("dst_amount", 100'000'000ULL) ) );
+      ("dst_amount", 100'000'000ULL)("underwriter", name{}) ) );
 
    const int64_t fee_total = reward_balance();
    BOOST_REQUIRE_GT( fee_total, 0 );
-   const int64_t fee_producer_pool = test_split_bps(fee_total, PRODUCER_BPS);
-   BOOST_REQUIRE_GT( fee_producer_pool, 0 );
 
    // --- Single full-round producer; advance to the cadence-1 pay-epoch ---
    setup_producers(1);
@@ -3286,17 +3288,21 @@ BOOST_FIXTURE_TEST_CASE( payepoch_folds_swap_fee_rewards, sysio_emissions_tester
    const int64_t gov           = log["governance_amount"].as<int64_t>();
    const int64_t producer_pool = test_split_bps(compute, PRODUCER_BPS);
 
-   // The producer received its full emission share PLUS its share of the fee
-   // (expected_rounds clamps to 1 at the 60s epoch, so the single active
-   // producer takes the whole producer pool).
-   BOOST_REQUIRE_EQUAL( got, producer_pool + fee_producer_pool );
-   BOOST_REQUIRE_GT( got, producer_pool ); // fee folded in: pure emission caps at producer_pool
+   // The producer received its emission share and NOTHING MORE. Swap fees pay
+   // the parties that carry an individual swap — the winning underwriter and the
+   // batch operators that relay it — never producers, who earn emissions for
+   // securing the chain. (expected_rounds clamps to 1 at the 60s epoch, so the
+   // single active producer takes the whole producer pool.)
+   BOOST_REQUIRE_EQUAL( got, producer_pool );
 
-   // The audit log records the fee actually distributed (only the producer
-   // share; the batch-op share rolled to treasury with no active group).
-   BOOST_REQUIRE_EQUAL( log["fee_distributed"].as<int64_t>(), fee_producer_pool );
+   // Nothing was distributed out of the fee: the whole pool belongs to batch
+   // operators and this fixture has no active rotation group, so it rolls to
+   // treasury. (Batch operators actually receiving it is covered end-to-end by
+   // the swap flow tests, which run a real group.)
+   BOOST_REQUIRE_EQUAL( log["fee_distributed"].as<int64_t>(), 0 );
 
-   // The bucket was swept to zero by the inline drain.
+   // The bucket was still swept to zero by the inline drain — the drain is
+   // unconditional on there being a recipient, and it must not overdraw.
    BOOST_REQUIRE_EQUAL( reward_balance(), 0 );
 
    // total_distributed counts emission only (producer_pool + capex + gov, with

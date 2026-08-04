@@ -595,11 +595,19 @@ void system_contract::payepoch(uint32_t epoch_index,
    const int64_t batch_pool    = compute_amount - producer_pool;
 
    // ----- Swap-fee rewards fold-in -----
-   // The rewards half of collected swap fees accrues in sysio.reserv's
-   // rewards_bucket (the other half already went to this treasury at swap
-   // time). Fold the whole bucket into THIS period's compute distribution so
-   // producers + batch operators receive it alongside emissions, split by the
-   // SAME producer_bps / batch_op_bps and weighted identically.
+   // The BATCH-OPERATOR half of collected swap fees accrues in sysio.reserv's
+   // rewards_bucket. The other half accrues per-underwriter in sysio.reserv and
+   // is drawn by that account's own `claimuwfee` — it never passes through this
+   // treasury. Fold the whole bucket into THIS period's batch-operator
+   // distribution so batch ops receive it alongside emissions, weighted
+   // identically by active-epoch count.
+   //
+   // Producers are NOT paid out of swap fees: the fee compensates the parties
+   // that carry an individual swap — the underwriter who locks collateral for it
+   // and the batch operators who relay it — while producers earn emissions for
+   // securing the chain. So `producer_bps` / `batch_op_bps` govern the emission
+   // `compute_amount` split only, and the entire drained fee pool goes to the
+   // batch-op distribution below.
    //
    // The fee WIRE lives in sysio.reserv's custody, so it must be swept here
    // before the payouts below can spend it. drainrewards is queued FIRST (ahead
@@ -610,9 +618,9 @@ void system_contract::payepoch(uint32_t epoch_index,
    //
    // Fees are funded by that transfer, NOT the T5 treasury, so fee payouts are
    // tracked in `fee_paid` and excluded from total_distributed (which governs
-   // the emission curve). Any fee not distributed (producer round-scaling,
-   // skipped slashed/terminated recipients, integer-division remainders) stays
-   // in this treasury, exactly as undistributed emission does.
+   // the emission curve). Any fee not distributed (groups active in zero epochs,
+   // skipped slashed/terminated members, integer-division remainders) stays in
+   // this treasury, exactly as undistributed emission does.
    const int64_t fee_total = get_reserv_rewards_balance();
    if (fee_total > 0) {
       sysio::action(
@@ -622,8 +630,7 @@ void system_contract::payepoch(uint32_t epoch_index,
          std::make_tuple(fee_total)
       ).send();
    }
-   const int64_t fee_producer_pool = split_bps(fee_total, cfg.producer_bps);
-   const int64_t fee_batch_pool    = fee_total - fee_producer_pool;
+   const int64_t fee_batch_pool = fee_total;
 
    int64_t actual_paid = 0; // emission actually transferred (counts toward total_distributed)
    int64_t fee_paid    = 0; // swap-fee rewards actually transferred (does NOT count toward treasury)
@@ -708,39 +715,29 @@ void system_contract::payepoch(uint32_t epoch_index,
          }
       }
 
-      int64_t distributed_to_producers = 0; // emission portion
-      int64_t fee_to_producers         = 0; // swap-fee portion
+      // Producers are paid the emission share only — swap fees go to the
+      // underwriter + batch operators (see the fold-in comment above).
+      int64_t distributed_to_producers = 0;
       if (total_weight > 0) {
          for (const auto& pe : eligible) {
-            // Emission and fee shares use the same weight and the same
-            // round-scaling, so a producer's fee tracks its emission reward.
             const int64_t emis_share = static_cast<int64_t>(
                static_cast<__int128>(producer_pool) * pe.weight / total_weight);
-            const int64_t fee_share = static_cast<int64_t>(
-               static_cast<__int128>(fee_producer_pool) * pe.weight / total_weight);
-            int64_t emis_pay, fee_pay;
+            int64_t pay;
             if (pe.is_standby) {
-               emis_pay = emis_share;
-               fee_pay  = fee_share;
+               pay = emis_share;
             } else {
                uint64_t r = (pe.elig_rounds > expected_rounds) ? expected_rounds : pe.elig_rounds;
-               emis_pay = static_cast<int64_t>(
+               pay = static_cast<int64_t>(
                   static_cast<__int128>(emis_share) * r / expected_rounds);
-               fee_pay = static_cast<int64_t>(
-                  static_cast<__int128>(fee_share) * r / expected_rounds);
             }
-            const int64_t pay = emis_pay + fee_pay;
             if (pay > 0) {
-               // One transfer carries both the emission and the fee share.
                send_wire_transfer(get_self(), pe.owner, pay, memo::producer_reward);
-               distributed_to_producers += emis_pay;
-               fee_to_producers         += fee_pay;
+               distributed_to_producers += pay;
             }
          }
       }
 
       actual_paid += distributed_to_producers;
-      fee_paid    += fee_to_producers;
 
       // Reset round-tracking after distribution (iteration-safe: uses PK snapshot).
       for (const auto& owner : to_reset) {
@@ -822,8 +819,8 @@ void system_contract::payepoch(uint32_t epoch_index,
 
    // Audit log: records the AUTHORIZED period emission + the four category
    // amounts for the period that just paid, plus the swap-fee rewards folded
-   // into the compute distribution (fee_distributed, sourced from swap fees
-   // rather than the treasury). (Producer / batch-op sub-distribution is
+   // into the batch-operator distribution (fee_distributed, sourced from swap
+   // fees rather than the treasury). (Producer / batch-op sub-distribution is
    // implicit -- recipients are in traces.) One row per pay-epoch;
    // non-pay-epochs have no audit-log row.
    epochlog_t epoch_table(get_self());

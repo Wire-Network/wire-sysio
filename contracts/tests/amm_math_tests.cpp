@@ -144,10 +144,10 @@ BOOST_AUTO_TEST_CASE(convenience_wrappers) {
 BOOST_AUTO_TEST_CASE(split_wire_fee_boundaries) {
    // 100% fee: fee == input, net == 0, and the fee splits exactly.
    {
-      const auto f = split_wire_fee(1'000'000'000ULL, BPS_TOTAL, /*reward_share_bps*/5000);
+      const auto f = split_wire_fee(1'000'000'000ULL, BPS_TOTAL, /*underwriter_share_bps*/5000);
       BOOST_CHECK_EQUAL(f.fee, 1'000'000'000ULL);
       BOOST_CHECK_EQUAL(f.net, 0u);
-      BOOST_CHECK_EQUAL(f.reward_share + f.emissions_share, f.fee);
+      BOOST_CHECK_EQUAL(f.underwriter_share + f.reward_share, f.fee);
    }
    // Over-100% is clamped to 100% (split_wire_fee guards fee_bps > BPS_TOTAL),
    // still net == 0 — also rejected upstream by setconfig.
@@ -164,6 +164,54 @@ BOOST_AUTO_TEST_CASE(split_wire_fee_boundaries) {
          BOOST_CHECK_GT(f.net, 0u);
          BOOST_CHECK_EQUAL(f.net + f.fee, amt);
       }
+   }
+}
+
+/// Stage 2 of the split: `emissions_share_bps` divides the REWARDS POOL (what is
+/// left after the underwriter's cut), not the whole fee. The default is 0 — the
+/// whole pool reaches batch operators and no fee leaves `sysio.reserv` custody.
+BOOST_AUTO_TEST_CASE(split_wire_fee_emissions_share_divides_the_rewards_pool) {
+   constexpr uint64_t AMOUNT  = 1'000'000ULL;
+   constexpr uint32_t FEE_BPS = 1'000;   // 10% -> fee 100'000
+   constexpr uint32_t HALF    = 5'000;   // 50% underwriter -> pool 50'000
+
+   // Default (omitted) emissions share: nothing is earmarked for the treasury.
+   {
+      const auto f = split_wire_fee(AMOUNT, FEE_BPS, HALF);
+      BOOST_CHECK_EQUAL(f.fee, 100'000u);
+      BOOST_CHECK_EQUAL(f.underwriter_share, 50'000u);
+      BOOST_CHECK_EQUAL(f.reward_share, 50'000u);
+      BOOST_CHECK_EQUAL(f.emissions_share, 0u);
+   }
+   // A 40% emissions share takes 40% OF THE POOL (20'000), not of the fee.
+   {
+      const auto f = split_wire_fee(AMOUNT, FEE_BPS, HALF, 4'000);
+      BOOST_CHECK_EQUAL(f.underwriter_share, 50'000u);
+      BOOST_CHECK_EQUAL(f.emissions_share, 20'000u);
+      BOOST_CHECK_EQUAL(f.reward_share, 30'000u);
+   }
+   // 100% of the pool leaves batch operators with nothing; the underwriter's
+   // half is untouched by this dial.
+   {
+      const auto f = split_wire_fee(AMOUNT, FEE_BPS, HALF, BPS_TOTAL);
+      BOOST_CHECK_EQUAL(f.underwriter_share, 50'000u);
+      BOOST_CHECK_EQUAL(f.emissions_share, 50'000u);
+      BOOST_CHECK_EQUAL(f.reward_share, 0u);
+   }
+   // Three-way conservation holds exactly across odd amounts and odd shares —
+   // each stage takes the REMAINDER, so no subunit is created or lost.
+   for (uint32_t emis : {0u, 1u, 3'333u, 5'000u, 9'999u, BPS_TOTAL}) {
+      for (uint64_t amt : {1ULL, 7ULL, 999ULL, 1'000'003ULL, 1'000'000'000'000ULL}) {
+         const auto f = split_wire_fee(amt, 137, 5'000, emis);
+         BOOST_CHECK_EQUAL(f.underwriter_share + f.reward_share + f.emissions_share, f.fee);
+         BOOST_CHECK_EQUAL(f.net + f.fee, amt);
+      }
+   }
+   // Over-100% share clamps rather than wrapping.
+   {
+      const auto f = split_wire_fee(AMOUNT, FEE_BPS, HALF, BPS_TOTAL + 7'777);
+      BOOST_CHECK_EQUAL(f.emissions_share, 50'000u);
+      BOOST_CHECK_EQUAL(f.reward_share, 0u);
    }
 }
 

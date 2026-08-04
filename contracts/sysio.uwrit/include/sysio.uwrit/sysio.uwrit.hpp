@@ -191,10 +191,15 @@ namespace sysio {
       // caused by system state changes after enqueue (reserve deactivated,
       // flipped private, chain deregistered) refund in full — the caller did
       // nothing wrong. Successful swaps are unaffected; they already pay
-      // `fee_bps` at settlement. The default mirrors `fee_bps` as a
-      // placeholder pending final fee calibration.
+      // `fee_bps` at settlement.
+      //
+      // 500 bps (5%) is the launch default (Jonathan, 2026-08-04), replacing the
+      // 0.1% placeholder that merely mirrored `fee_bps`. It has to be large
+      // enough that cycling escrows through the queue is not free. It stays
+      // governance-tunable via `setconfig` (capped at MAX_FEE_BPS), so this is a
+      // starting point, not a commitment.
       static constexpr uint64_t DEFAULT_MIN_FROMWIRE_AMOUNT     = 5'000'000'000; // 5 WIRE @ 9 decimals
-      static constexpr uint32_t DEFAULT_FROMWIRE_REVERT_FEE_BPS = 10;            // 0.1%
+      static constexpr uint32_t DEFAULT_FROMWIRE_REVERT_FEE_BPS = 500;           // 5%
 
       // Maximum accepted swap fee, in basis points. A 100% fee (10000 bps)
       // would zero the post-fee WIRE leg of every swap (`net == 0` in
@@ -220,9 +225,11 @@ namespace sysio {
       /// Set underwriting fee + lock config. Fields:
       ///   * `fee_bps` — per-spoke swap fee charged by the depot, taken out of
       ///     the WIRE leg of every swap (so the ETH/SOL the recipient can
-      ///     receive is reduced). `sysio.reserv` routes the collected fee 50/50
-      ///     to its on-chain rewards bucket and the `sysio` emissions treasury
-      ///     (see `sysio.reserv::FEE_REWARD_SHARE_BPS`).
+      ///     receive is reduced). `sysio.reserv` splits the collected fee 50/50
+      ///     between the swap's winning underwriter (claimable via
+      ///     `sysio.reserv::claimuwfee`) and its on-chain rewards bucket, which
+      ///     `sysio.system::payepoch` pays out to batch operators (see
+      ///     `sysio.reserv::FEE_UNDERWRITER_SHARE_BPS`).
       ///   * `collateral_lock_duration_ms` — wall-clock milliseconds after
       ///     `lock_entry.created_at_ms` that the lock auto-expires (swept by
       ///     `sysio.epoch::advance -> chklocks`). This is the challenge
@@ -673,9 +680,9 @@ namespace sysio {
       >;
 
       /// Fee + lock-duration configuration singleton. `fee_bps` is the per-spoke
-      /// swap fee, charged out of the WIRE leg; the rewards/emissions split of
-      /// the collected fee is fixed in `sysio.reserv` (FEE_REWARD_SHARE_BPS), so
-      /// no fee-distribution shares live here.
+      /// swap fee, charged out of the WIRE leg; the underwriter/batch-operator
+      /// split of the collected fee is fixed in `sysio.reserv`
+      /// (FEE_UNDERWRITER_SHARE_BPS), so no fee-distribution shares live here.
       struct [[sysio::table("uwconfig")]] uw_config {
          uint32_t fee_bps                      = 10;           // 0.1% per spoke
          /// Wall-clock collateral lock duration — the challenge window.

@@ -172,38 +172,98 @@ inline uint64_t wire_to_token(uint64_t reserve_wire_amount,
 /// Basis-points denominator (10000 = 100%).
 inline constexpr uint32_t BPS_TOTAL = 10000;
 
-/// Decomposition of a swap fee taken out of the WIRE leg.
+/// Decomposition of EVERY fee taken out of a swap's WIRE leg.
+///
+/// Two independent fees ride the same leg (WIRE-281): the NETWORK fee
+/// (`sysio.uwrit::fee_bps`, split between the winning underwriter, batch
+/// operators and optionally the emissions treasury) and each participating
+/// RESERVE's own owner fee. A chain-to-chain swap therefore pays three fees —
+/// two reserve owners plus the network — while a WIRE-endpoint swap touches one
+/// reserve and pays two.
 struct wire_fee {
-   uint64_t fee             = 0; ///< total fee charged (WIRE)
-   uint64_t reward_share    = 0; ///< portion routed to the rewards bucket
-   uint64_t emissions_share = 0; ///< portion returned to the emissions treasury
-   uint64_t net             = 0; ///< wire_amount - fee (continues through the swap)
+   uint64_t fee               = 0; ///< TOTAL of every fee charged on the leg
+   uint64_t underwriter_share = 0; ///< network fee: the swap's winning underwriter
+   uint64_t reward_share      = 0; ///< network fee: rewards bucket (batch operators)
+   uint64_t emissions_share   = 0; ///< network fee: the `sysio` emissions treasury
+   uint64_t src_reserve_share = 0; ///< the SOURCE reserve owner's fee
+   uint64_t dst_reserve_share = 0; ///< the DESTINATION reserve owner's fee
+   uint64_t net               = 0; ///< wire_amount - fee (continues through the swap)
 };
 
-/// Split `wire_amount` into fee (`fee_bps`) + remainder, then split the fee into
-/// a rewards share (`reward_share_bps`) and an emissions share (the rest). All
-/// integer; `reward_share + emissions_share == fee` and `net + fee ==
-/// wire_amount` exactly (no rounding leak). Computed in `u128` to avoid overflow.
-inline wire_fee split_wire_fee(uint64_t wire_amount, uint32_t fee_bps, uint32_t reward_share_bps) {
+/// The ONE fee decomposition for a swap's WIRE leg — used by BOTH the read-only
+/// quote and settlement, so the two can never drift by a rounding subunit.
+///
+/// Every rate is applied to the SAME gross `wire_amount`, so the fees are purely
+/// additive and order-independent — a user pays `fee_bps + src + dst` of the
+/// leg, and no party's cut depends on who is computed first:
+///
+///   * **Reserve fees** — `src_reserve_fee_bps` / `dst_reserve_fee_bps`, each
+///     the owner fee of the reserve supplying that leg (0 for a WIRE endpoint,
+///     which has no reserve). Accrue to those reserves' owners.
+///   * **Network fee** — `fee_bps`, itself split in two stages:
+///     1. `underwriter_share_bps` of it goes to the winning underwriter; the
+///        remainder is the **rewards pool**.
+///     2. `emissions_share_bps` of that POOL (not of the whole fee) goes to the
+///        `sysio` emissions treasury; the rest is the batch-operator share.
+///
+/// All integer, exact: the five shares sum to `fee` and `net + fee ==
+/// wire_amount`, because every stage takes a REMAINDER rather than a second
+/// floored product. Computed in `u128` to avoid overflow.
+///
+/// **Callers must check `net > 0`.** With enough stacked rates the total can
+/// reach or exceed the leg; the settlement paths already assert this, and
+/// `sysio.reserv::setrsvfee` / `sysio.uwrit::setconfig` cap each rate so a
+/// realistic combination cannot get there.
+///
+/// Paths with no winning underwriter (a revert refund) pass 0 for
+/// `underwriter_share_bps`, sending the whole network fee into the rewards pool.
+/// The trailing rates default to 0, so a caller that charges only the network
+/// fee — a revert, or a quote against a fee-free reserve — omits them.
+inline wire_fee split_wire_fee(uint64_t wire_amount,
+                               uint32_t fee_bps,
+                               uint32_t underwriter_share_bps,
+                               uint32_t emissions_share_bps  = 0,
+                               uint32_t src_reserve_fee_bps  = 0,
+                               uint32_t dst_reserve_fee_bps  = 0) {
    wire_fee r;
    if (fee_bps > BPS_TOTAL) fee_bps = BPS_TOTAL;
-   if (reward_share_bps > BPS_TOTAL) reward_share_bps = BPS_TOTAL;
-   r.fee             = static_cast<uint64_t>((static_cast<u128>(wire_amount) * fee_bps) / BPS_TOTAL);
-   r.reward_share    = static_cast<uint64_t>((static_cast<u128>(r.fee) * reward_share_bps) / BPS_TOTAL);
-   r.emissions_share = r.fee - r.reward_share;
-   r.net             = wire_amount - r.fee;
+   if (underwriter_share_bps > BPS_TOTAL) underwriter_share_bps = BPS_TOTAL;
+   if (emissions_share_bps > BPS_TOTAL) emissions_share_bps = BPS_TOTAL;
+   if (src_reserve_fee_bps > BPS_TOTAL) src_reserve_fee_bps = BPS_TOTAL;
+   if (dst_reserve_fee_bps > BPS_TOTAL) dst_reserve_fee_bps = BPS_TOTAL;
+
+   // Each reserve owner's cut, off the gross leg.
+   r.src_reserve_share = static_cast<uint64_t>((static_cast<u128>(wire_amount) * src_reserve_fee_bps) / BPS_TOTAL);
+   r.dst_reserve_share = static_cast<uint64_t>((static_cast<u128>(wire_amount) * dst_reserve_fee_bps) / BPS_TOTAL);
+
+   // The network fee, off the same gross leg, then its own two-stage split.
+   const uint64_t network_fee = static_cast<uint64_t>((static_cast<u128>(wire_amount) * fee_bps) / BPS_TOTAL);
+   r.underwriter_share = static_cast<uint64_t>((static_cast<u128>(network_fee) * underwriter_share_bps) / BPS_TOTAL);
+   const uint64_t rewards_pool = network_fee - r.underwriter_share;
+   r.emissions_share   = static_cast<uint64_t>((static_cast<u128>(rewards_pool) * emissions_share_bps) / BPS_TOTAL);
+   r.reward_share      = rewards_pool - r.emissions_share;
+
+   r.fee = network_fee + r.src_reserve_share + r.dst_reserve_share;
+   // Saturate rather than wrap if the stacked rates ever reach the whole leg —
+   // the caller's `net > 0` check is what actually rejects that swap.
+   r.net = (r.fee >= wire_amount) ? 0 : wire_amount - r.fee;
    return r;
 }
 
 /// Post-fee swap quote along the depot curve. A WIRE endpoint (`src_is_wire` /
 /// `dst_is_wire`) skips that side's reserve — the depot IS the WIRE side. For a
-/// non-WIRE side pass that reserve's `(chain_amount, wire_amount, cw)`. The fee
-/// (`fee_bps`) is charged on the WIRE leg. Returns the post-fee output the
-/// recipient could receive, or 0 on degenerate input. Mirrors settlement
-/// exactly so quotes and books agree.
+/// non-WIRE side pass that reserve's `(chain_amount, wire_amount, cw)` AND its
+/// `owner_fee_bps`; a WIRE endpoint has no reserve, so pass 0 for its fee.
+///
+/// Every fee — the network `fee_bps` plus each participating reserve's owner fee
+/// — is charged on the WIRE leg through the SAME `split_wire_fee` the settlement
+/// paths use, so quotes and books agree by construction. Returns the post-fee
+/// output the recipient could receive, or 0 on degenerate input (including a
+/// stacked-fee combination that leaves nothing).
 inline uint64_t quote_swap(bool src_is_wire, uint64_t src_chain, uint64_t src_wire, uint32_t src_cw,
                            bool dst_is_wire, uint64_t dst_chain, uint64_t dst_wire, uint32_t dst_cw,
-                           uint64_t amount_in, uint32_t fee_bps) {
+                           uint64_t amount_in, uint32_t fee_bps,
+                           uint32_t src_reserve_fee_bps = 0, uint32_t dst_reserve_fee_bps = 0) {
    if (amount_in == 0) return 0;
    if (src_is_wire && dst_is_wire) return amount_in; // WIRE->WIRE is a plain transfer
 
@@ -212,7 +272,13 @@ inline uint64_t quote_swap(bool src_is_wire, uint64_t src_chain, uint64_t src_wi
                                    : token_to_wire(src_chain, src_wire, src_cw, amount_in);
    if (wire_leg == 0) return 0;
 
-   const uint64_t wire_net = split_wire_fee(wire_leg, fee_bps, /*reward_share_bps*/0).net;
+   // A WIRE endpoint has no reserve on that side and therefore charges no
+   // reserve fee, whatever the caller passed.
+   const uint64_t wire_net = split_wire_fee(wire_leg, fee_bps, /*underwriter_share_bps*/0,
+                                            /*emissions_share_bps*/0,
+                                            src_is_wire ? 0 : src_reserve_fee_bps,
+                                            dst_is_wire ? 0 : dst_reserve_fee_bps).net;
+   if (wire_net == 0) return 0;
    if (dst_is_wire) return wire_net; // user receives WIRE directly
    return wire_to_token(dst_wire, dst_chain, dst_cw, wire_net);
 }

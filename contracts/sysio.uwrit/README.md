@@ -1,37 +1,78 @@
 # sysio.uwrit
 
-Underwriting ledger, intent/confirmation flow, and fee distribution contract.
+Underwriting ledger and swap lifecycle contract. Owns the underwriter COMMIT
+race, the collateral lock vector, the swap-from-WIRE escrow queue, and the fee
+rate every swap is charged.
 
 ## Responsibility
 
-- Tracks underwriter collateral per chain (staked, locked, available)
-- Manages the underwriting lifecycle: intent → confirmation → remit → completion
-- Enforces 24-hour challenge window hold on committed funds
-- Distributes fees (0.1% per spoke) split 50/25/25 among underwriter, other underwriters, batch operators
-- Handles collateral updates from outpost attestations
-- Executes slashing on underwriters (called by `sysio.chalg`)
+- Ingests `SWAP_REQUEST` attestations from outposts and opens an underwrite
+  request (`uwreqs`) for each.
+- Resolves the underwriter COMMIT race: verifies each candidate's signature
+  against their WIRE account permissions, re-runs the LP variance check,
+  re-checks available collateral, then picks a winner.
+- Writes one collateral lock per required leg and holds it for the full
+  wall-clock challenge window. **Locks are never released by delivery** — only
+  `chklocks` sweeps them once `expires_at_ms` passes.
+- Settles the winning swap against `sysio.reserv` and queues the outbound
+  `SWAP_REMIT`.
+- Escrows and drains swap-from-WIRE requests (`fwqueue`), charging a revert fee
+  on caller-fault drain failures.
+- Owns the swap fee RATE (`uwconfig.fee_bps`). The fee is charged and
+  distributed by `sysio.reserv` — see "Fees" below.
+
+## Fees
+
+`uwconfig.fee_bps` (default 10 = 0.1%) is taken out of the **WIRE leg** of every
+swap, so it reduces what the recipient receives. `sysio.reserv` splits the
+collected fee **50/50**:
+
+| Half | Recipient | Path |
+|---|---|---|
+| 50% | The swap's **winning underwriter** | Accrues to `sysio.reserv::uwfees`; drawn by that account's own `sysio.reserv::claimuwfee` |
+| 50% | **Batch operators** | Accrues to `sysio.reserv::rewardbkt`; swept by `sysio.system::payepoch` into the batch-op distribution |
+
+Both halves stay in `sysio.reserv`'s WIRE custody until claimed or drained — no
+part of a swap fee reaches the emissions treasury, and producers are not paid
+out of swap fees. The split constant is `sysio.reserv::FEE_UNDERWRITER_SHARE_BPS`.
+
+`uwconfig.fromwire_revert_fee_bps` is charged on the refunded escrow when a
+queued from-WIRE swap reverts at drain for a cause the caller controls
+(unpriceable target, variance tolerance exceeded). A revert has no winning
+underwriter, so the whole revert fee goes to the rewards bucket. Reverts caused
+by system state changes after enqueue (reserve deactivated, flipped private,
+chain deregistered) refund in full.
 
 ## Tables
 
-| Table | Type | Description |
-|-------|------|-------------|
-| `uwconfig` | Singleton | Fee basis points, lock duration, fee share percentages |
-| `collateral` | Multi-index | Per-underwriter per-chain collateral tracking |
-| `uwledger` | Multi-index | Underwriting entries with status lifecycle |
+| Table | Row type | Description |
+|-------|----------|-------------|
+| `uwconfig` | `uw_config` | Singleton: `fee_bps`, `collateral_lock_duration_ms`, `min_fromwire_amount`, `fromwire_revert_fee_bps`, `uwreq_pending_timeout_epochs`, `uwreq_retention_epochs` |
+| `uwreqs` | `uw_request_t` | One row per swap intent — race state in `commits_by`, `winner`, lifecycle status, mirrored `variance_tolerance_bps`. Retained for `uwreq_retention_epochs` after settlement for audit |
+| `locks` | `lock_entry` | Flat per-leg lock vector consulted by `sysio.opreg::available()`. The `byexpire` secondary index lets `chklocks` sweep expired locks in one pass |
+| `fwqueue` | `fromwire_q` | Escrowed swap-from-WIRE requests awaiting drain. `byepoch` secondary index |
+| `uwcounters` | `uw_counters` | Monotonic id allocators (uwreq ids, lock ids) |
 
 ## Actions
 
 | Action | Auth | Description |
 |--------|------|-------------|
-| `setconfig` | `sysio.uwrit` | Set fee/lock configuration |
-| `submituw` | underwriter | Submit intent to underwrite a message |
-| `confirmuw` | `sysio.uwrit` | Confirm after both outposts acknowledge |
-| `expirelock` | permissionless | Release expired locks |
-| `distfee` | `sysio.uwrit` | Distribute fees after completion |
-| `updcltrl` | `sysio.uwrit` | Update collateral from outpost attestations |
-| `slash` | `sysio.chalg` | Seize all collateral from slashed underwriter |
+| `setconfig` | `sysio.uwrit` | Set the fee rate, lock duration, from-WIRE floor, revert fee, and uwreq lifecycle windows |
+| `createuwreq` | `sysio.msgch` | Open an underwrite request from an inbound `SWAP_REQUEST` attestation |
+| `rcrdcommit` | `sysio.msgch` | Record an underwriter's per-leg `UNDERWRITE_INTENT_COMMIT` bytes; resolves the race once both legs are present |
+| `swapfromwire` | `user` | Escrow WIRE and enqueue a swap-FROM-WIRE request |
+| `drainfwq` | `sysio.epoch` or self | Drain the from-WIRE queue: settle what prices, revert the rest (charging the revert fee on caller-fault causes) |
+| `chklocks` | `sysio.epoch` or self | Sweep collateral locks whose wall-clock window has expired |
+| `pruneuwreqs` | permissionless | Expire timed-out PENDING uwreqs and erase terminal rows past their retention window |
+| `sumlocks` | read-only | Sum an underwriter's active locks for a `(chain, token)` bucket — the lock half of `sysio.opreg::available()` |
 
 ## Dependencies
 
-- Queues outbound attestations via `sysio.msgch`
-- Slash called by `sysio.chalg`
+- Receives inbound attestations via `sysio.msgch`; queues outbound `SWAP_REMIT`
+  / `SWAP_REVERT` through it.
+- Settles against `sysio.reserv` (`applyswap` / `applyfromwire` / `paywire` /
+  `refundwire`), forwarding the winning underwriter so the fee accrues to them.
+- Reads collateral from `sysio.opreg`; its `locks` table is the lock half of
+  that contract's `available()` rollup.
+- Lock sweeping and queue draining are inlined from `sysio.epoch::advance`.
+- The off-chain counterpart is `wire-sysio/plugins/underwriter_plugin/`.
