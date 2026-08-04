@@ -825,15 +825,16 @@ public:
       }
    }
 
-   /// Make `sysio.epoch::advance` genuinely advance: the genesis `sysio`
-   /// account runs only the boot contract, so the full sysio.system (where
-   /// the emissions gate's config + t5 state live) is deployed first — the
-   /// same sequence as emissions_tests.cpp's fixture — then the emission
-   /// config + t5 state are initialized and the T5 holding accounts payepoch
-   /// transfers WIRE to are created. Values mirror emissions_tests.cpp's
-   /// defaults. Requires setup_wire_token_and_reserves() first (payepoch pays
-   /// WIRE out of sysio's token balance).
-   void enable_epoch_advancement() {
+   /// Deploy the full sysio.system contract (the genesis `sysio` account runs
+   /// only the boot contract), create the T5 holding accounts payepoch
+   /// transfers WIRE to, and set the emission config — i.e. everything
+   /// `enable_epoch_advancement` does EXCEPT `initt5`. Split out so the
+   /// emissions gate's "emitcfg present, t5state missing"
+   /// (EMISSIONS_BLOCK_REASON_STATE_UNINITIALIZED) state is reachable on its
+   /// own; every test that wants a genuinely-advancing epoch calls
+   /// `enable_epoch_advancement` instead. Values mirror emissions_tests.cpp's
+   /// defaults.
+   void deploy_system_with_emitcfg() {
       set_code(config::system_account_name, contracts::system_wasm());
       set_abi(config::system_account_name, contracts::system_abi().data());
       BOOST_REQUIRE_EQUAL(success(), push_system(config::system_account_name, "init"_n,
@@ -870,6 +871,16 @@ public:
             ("standby_end_rank",          uint32_t(28))
             ("epoch_log_retention_count", uint32_t(8640))
             ("pay_cadence_epochs",        uint16_t(1)))));
+      produce_blocks();
+   }
+
+   /// Make `sysio.epoch::advance` genuinely advance: everything
+   /// `deploy_system_with_emitcfg` sets up, plus the t5 state the gate needs
+   /// past its STATE_UNINITIALIZED check. Requires
+   /// setup_wire_token_and_reserves() first (payepoch pays WIRE out of sysio's
+   /// token balance).
+   void enable_epoch_advancement() {
+      deploy_system_with_emitcfg();
       BOOST_REQUIRE_EQUAL(success(), push_system(config::system_account_name, "initt5"_n,
          mvo()("start_time", time_point_sec(control->head().block_time()))));
       produce_blocks();
@@ -1520,17 +1531,58 @@ BOOST_FIXTURE_TEST_CASE(chkcons_survives_non_advancing_advance, sysio_dispatch_t
    BOOST_REQUIRE_EQUAL(retry_count(), rc1 + 1);
 } FC_LOG_AND_RETHROW() }
 
-// msgch::bootstrap refuses to start a chain whose emissions are not configured. This fixture
-// deploys no sysio.system at all (setemitcfg / initt5 never ran), which is exactly the
-// misconfigured-deployment shape: without the guard, bootstrap's inline genesis advance would
-// gate-block SILENTLY (the emissions gate never throws, by design) and the defect would surface
-// only as "epoch stuck at 0". advance()'s own soft block-and-retry behavior for the ECONOMIC gate
-// reasons is covered above (chkcons_survives_non_advancing_advance) and in emissions_tests.
+// ═════════════════════════════════════════════════════════════════════════
+// msgch::bootstrap emissions guards. Missing emissions config is a bootstrap DEFECT, not an
+// operational state: without these guards bootstrap's inline genesis advance would gate-block
+// SILENTLY (the emissions gate never throws, by design) and the misconfiguration would surface
+// only as "epoch stuck at 0". The three cases below cover both guards independently plus the
+// fully-configured pass-through. advance()'s own soft block-and-retry behavior for the ECONOMIC
+// gate reasons is covered above (chkcons_survives_non_advancing_advance) and in emissions_tests.
+// ═════════════════════════════════════════════════════════════════════════
+
+// Guard 1 — emitcfg missing. This fixture deploys no sysio.system at all (setemitcfg / initt5
+// never ran), which is exactly the never-configured deployment shape.
 BOOST_FIXTURE_TEST_CASE(bootstrap_requires_emissions_config, sysio_dispatch_tester) { try {
    bootstrap_for_dispatch();
    BOOST_REQUIRE_EQUAL(
       wasm_assert_msg("msgch::bootstrap: emissions config missing -- sysio.system::setemitcfg must run before bootstrap"),
       push(MSGCH_ACCOUNT, msgch_abi, MSGCH_ACCOUNT, "bootstrap"_n, mvo()));
+} FC_LOG_AND_RETHROW() }
+
+// Guard 2 — emitcfg present, t5state missing (the half-configured deployment: setemitcfg ran,
+// initt5 was forgotten). Proves the SECOND check is independently reachable and reads t5state,
+// not emitcfg again: guard 1 passes here, so a wrong table/account lookup or a shadowed copy of
+// the first check would surface as the WRONG diagnostic (or no throw at all).
+BOOST_FIXTURE_TEST_CASE(bootstrap_requires_emissions_state, sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+   deploy_system_with_emitcfg();   // setemitcfg only -- initt5 deliberately not run
+   BOOST_REQUIRE_EQUAL(
+      wasm_assert_msg("msgch::bootstrap: emissions state uninitialized -- sysio.system::initt5 must run before bootstrap"),
+      push(MSGCH_ACCOUNT, msgch_abi, MSGCH_ACCOUNT, "bootstrap"_n, mvo()));
+} FC_LOG_AND_RETHROW() }
+
+// Both guards pass — the genesis 0 -> 1 advance actually happens. Guards that always threw (or a
+// gate that never passes) would look identical to guards 1 and 2 above, so this is the case that
+// pins them as guards rather than a permanent bootstrap block.
+BOOST_FIXTURE_TEST_CASE(bootstrap_advances_genesis_epoch_when_emissions_configured,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+   setup_wire_token_and_reserves();   // payepoch pays WIRE out of sysio's token balance
+   enable_epoch_advancement();        // setemitcfg + initt5
+
+   // bootstrap_for_dispatch's own advance ran while emissions were unconfigured, so it
+   // gate-blocked and left a blocklog row for the target epoch.
+   BOOST_REQUIRE_EQUAL(current_epoch(), 0u);
+   BOOST_REQUIRE(!get_blocklog(1).is_null());
+
+   BOOST_REQUIRE_EQUAL(success(),
+      push(MSGCH_ACCOUNT, msgch_abi, MSGCH_ACCOUNT, "bootstrap"_n, mvo()));
+   produce_blocks();
+
+   // The inline genesis advance passed the gate: epoch 0 -> 1, and the gate cleared the stale
+   // blocklog row on its way through.
+   BOOST_REQUIRE_EQUAL(current_epoch(), 1u);
+   BOOST_REQUIRE(get_blocklog(1).is_null());
 } FC_LOG_AND_RETHROW() }
 
 // A forged/invalid delivery cannot strand the epoch. SEC-102's semantic-header check runs at

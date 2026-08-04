@@ -8,7 +8,8 @@
 //  - sysio.roa::forcereg wiring: inline addnodeowner occurs (guarded on emitcfg.exists())
 //  - payepoch (driven by sysio.epoch::advance gate): opreg status filter, batch-op rotation group
 //                  pay, slashed/terminated share rollback to treasury, treasury balance/floor
-//                  enforcement via the gate's EmissionsBlocked path
+//                  enforcement via the gate's block path (recorded depot-locally in
+//                  sysio.epoch::blocklog; the gate broadcasts nothing cross-chain)
 //
 // This fixture deploys the real sysio.opreg and sysio.epoch contracts (not a mock) so that
 // emissions's cross-contract reads (operators_t, epochstate_t) exercise the same code paths
@@ -2193,7 +2194,8 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_post_initt5_rejects_brick_reduce, sysio_emis
    // After t5_state exists and epochs have run, setemitcfg must reject a
    // t5_distributable reduction that would make remaining (= distributable -
    // floor - total_distributed) negative. Otherwise the treasury silently
-   // bricks with EmissionsBlocked on the next advance (gate sees treasury exhausted).
+   // bricks on the next advance: the gate sees treasury exhausted and refuses to
+   // advance the epoch.
    create_t5_holding_accounts();
    const uint32_t start = head_secs() - ONE_EPOCH - 1;
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
@@ -3722,8 +3724,8 @@ BOOST_FIXTURE_TEST_CASE( advance_gate_blocks_on_insufficient_treasury_balance, s
    // The fixture funds sysio with 1_000_000_000 WIRE which easily covers the
    // default emission schedule. If sysio's balance is drained below the next
    // epoch's emission, sysio.epoch's readiness gate refuses to advance: the
-   // epoch index stays at 0, a blocklog row is written, and an EmissionsBlocked
-   // attestation is queued per outpost.
+   // epoch index stays at 0 and a blocklog row is written. The gate state is
+   // depot-local -- nothing is queued for the outposts.
    create_t5_holding_accounts();
    const uint32_t start = head_secs() - ONE_EPOCH - 1;
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
@@ -3741,7 +3743,7 @@ BOOST_FIXTURE_TEST_CASE( advance_gate_blocks_on_insufficient_treasury_balance, s
            ("memo", "drain for balance-floor test")
    );
 
-   // advance must succeed (no throw -- gate emits error attestation cleanly).
+   // advance must succeed (no throw -- the gate records the block and returns cleanly).
    produce_blocks(130);
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state(EPOCH) );
 
