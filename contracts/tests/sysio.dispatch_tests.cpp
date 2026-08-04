@@ -167,6 +167,9 @@ std::vector<char> encode_envelope_with_attestations(
 /// mirror, same as the outbound packing tests in sysio.msgch_tests.cpp.
 constexpr size_t MAX_ENVELOPE_BYTES = 65'536;
 
+/// Historical STAKE protobuf wire value used to verify dispatch drops retired types.
+constexpr int32_t RETIRED_STAKE_ATTESTATION_VALUE = 3001;
+
 /// Encode a decodable envelope whose serialised size is EXACTLY `target_bytes`, padded with a
 /// single challenge-response attestation (dispatch drops it with no value-bearing effect). Probe
 /// once with `target_bytes` of padding to measure the fixed protobuf overhead, then rebuild with
@@ -1001,7 +1004,7 @@ BOOST_FIXTURE_TEST_CASE(dispatch_silently_drops_out_of_scope_types, sysio_dispat
    const auto eth_code = fc::slug_name{"ETH"}.value;
    auto envelope = encode_envelope_with_one_raw_attestation(
       current_epoch(),
-      /*raw_att_type=*/3001,
+      RETIRED_STAKE_ATTESTATION_VALUE,
       std::string{});
 
    BOOST_REQUIRE_EQUAL(success(), deliver(/*chain_code=*/eth_code, envelope));

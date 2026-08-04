@@ -202,6 +202,9 @@ public:
    static constexpr auto CHALG_ACCOUNT  = "sysio.chalg"_n;
    static constexpr auto CHAINS_ACCOUNT = "sysio.chains"_n;
 
+   /// Attestation queue table used by historical-row upgrade fixtures.
+   static constexpr auto ATTESTATIONS_TABLE = "attestations"_n;
+
    sysio_msgch_envlog_tester() {
       produce_blocks(2);
       create_accounts({ MSGCH_ACCOUNT, EPOCH_ACCOUNT, CHALG_ACCOUNT, CHAINS_ACCOUNT });
@@ -298,7 +301,7 @@ public:
    /// destination chain. The indexed fields (id, status, type, epoch) stay
    /// unchanged, so the existing secondary-index entries remain valid.
    void retarget_attestation_for_upgrade_test(uint64_t id, uint64_t chain_code) {
-      const auto table_id = chain::compute_table_id("attestations"_n.value);
+      const auto table_id = chain::compute_table_id(ATTESTATIONS_TABLE.value);
       const auto& kv_idx = control->db().get_index<chain::kv_index, chain::by_code_key>();
       char primary_key[chain::kv_pri_key_size];
       chain::kv_encode_be64(primary_key, id);
@@ -328,7 +331,7 @@ public:
    uint32_t count_ready_attestations(uint64_t chain_code, uint64_t scan_until) {
       uint32_t n = 0;
       for (uint64_t id = 0; id < scan_until; ++id) {
-         auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "attestations"_n, id);
+         auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, ATTESTATIONS_TABLE, id);
          if (data.empty()) continue;
          auto row = msgch_abi.binary_to_variant(
             "attestation_entry", data,
@@ -392,6 +395,7 @@ constexpr auto SWAP_REMIT_ATTESTATION_TYPE    = opp::types::ATTESTATION_TYPE_SWA
 constexpr auto UNCOVERED_TEST_ATTESTATION_TYPE = opp::types::ATTESTATION_TYPE_STAKING_REWARD;
 /// Raw protobuf wire slot used only to seed the pre-upgrade READY-row shape.
 constexpr uint32_t RETIRED_STAKE_ATTESTATION_VALUE = 3001;
+/// Maximum retired READY rows pruned during one deterministic build call.
 constexpr uint32_t RETIRED_STAKING_PRUNE_LIMIT     = 32;
 
 /// Decode the emitted OPP envelope and count attestations in its single message.
