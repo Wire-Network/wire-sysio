@@ -600,9 +600,9 @@ private:
    /** Fetch and validate fee suggestions without logging a duplicate rejection. */
    gas_config_t get_gas_config_unlogged();
 
-   /** Emit one sanitized high-severity record for a policy rejection. */
-   void log_policy_rejection(const ethereum_transaction_policy_exception& rejection,
-                             std::string_view                              operation_type) const;
+   /** Emit one sanitized record with policy and RPC decode faults classified separately. */
+   void log_transaction_rejection(const ethereum_transaction_policy_exception& rejection,
+                                  std::string_view                              operation_type) const;
 
    /**
     * @brief Signature provider for signing transactions

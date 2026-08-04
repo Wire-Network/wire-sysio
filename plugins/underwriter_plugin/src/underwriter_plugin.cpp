@@ -468,12 +468,6 @@ struct underwriter_plugin::impl {
       // the link + balance coverage checks know what to look for.
       read_outpost_registry();
 
-      if (outpost_chain_kinds.empty()) {
-         elog("underwriter preflight: no outposts registered in sysio.chains::chains — "
-              "nothing to commit against");
-         return false;
-      }
-
       // -- Check 2: outpost-client wiring covers every active chain --
       //
       // The served set is `outpost_chain_kinds` (ACTIVE non-depot chains only,
@@ -496,11 +490,18 @@ struct underwriter_plugin::impl {
          if (auto gap = underwriter_detail::find_endpoint_coverage_gap(
                 registered_kinds, configured_kinds)) {
             const auto code_str = fc::slug_name{gap->chain_code}.to_string();
+            if (!gap->registry_kind) {
+               elog("underwriter preflight: configured outpost chain {} has no active "
+                    "sysio.chains::chains row; run activchain for this chain or remove its "
+                    "--underwriter-*-outpost flag",
+                    code_str);
+               return false;
+            }
             // Re-derive the typed ChainKind names from the source maps rather
             // than reverse-casting the raw ints; the generated `_Name` helper
             // is the CLAUDE.md-mandated spelling for proto enums.
             const ChainKind reg_kind = outpost_chain_kinds.at(gap->chain_code);
-            if (gap->config_kind == underwriter_detail::endpoint_coverage_gap::unconfigured) {
+            if (!gap->config_kind) {
                elog("underwriter preflight: active outpost chain {} (kind={}) has no "
                     "--underwriter-eth-outpost / --underwriter-sol-outpost entry; configure "
                     "one endpoint for every active outpost chain",
@@ -515,6 +516,12 @@ struct underwriter_plugin::impl {
             }
             return false;
          }
+      }
+
+      if (outpost_chain_kinds.empty()) {
+         elog("underwriter preflight: no outposts registered in sysio.chains::chains — "
+              "nothing to commit against");
+         return false;
       }
 
       // -- Check 3: authex link coverage per outpost chain --
@@ -865,17 +872,14 @@ struct underwriter_plugin::impl {
       //     OPP / OPPInbound addresses are left empty.
       //   * SOL client carries the opp-outpost program id; the typed wrapper
       //     exposes `commit_underwrite` directly.
-      // `external_chain_id` comes from `sysio.chains` (read here so the registry
-      // caches are warm); a chain configured but not yet in the registry builds
-      // with id 0 (harmless — no leg references it until it is active).
+      // `external_chain_id` comes from the matching ACTIVE `sysio.chains` row.
+      // The preflight above enforces that inverse coverage for both EVM and SVM
+      // endpoints before either client plugin is asked to build a handle.
       read_outpost_registry();
       try {
          for (const auto& [chain_code, ep] : outpost_endpoints) {
             const auto     code_str = fc::slug_name{chain_code}.to_string();
-            const uint32_t ext_id   = [&] {
-               auto it = outpost_external_chain_ids.find(chain_code);
-               return it != outpost_external_chain_ids.end() ? it->second : 0u;
-            }();
+            const uint32_t ext_id   = outpost_external_chain_ids.at(chain_code);
             if (ep.kind == ChainKind::CHAIN_KIND_EVM) {
                outpost_by_chain[chain_code] =
                   eth_plug->create_outpost_client(ep.client_id, chain_code, ext_id,
@@ -1097,9 +1101,8 @@ struct underwriter_plugin::impl {
          // round-trip — the variant carries the symbolic name and `.as<T>()`
          // recovers the typed value without a string switch.
          outpost_chain_kinds[chain_code] = obj["kind"].as<ChainKind>();
-         if (obj.contains("external_chain_id"))
-            outpost_external_chain_ids[chain_code] =
-               static_cast<uint32_t>(obj["external_chain_id"].as_uint64());
+         outpost_external_chain_ids[chain_code] =
+            static_cast<uint32_t>(obj["external_chain_id"].as_uint64());
       }
    }
 

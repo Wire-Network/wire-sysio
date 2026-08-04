@@ -97,21 +97,14 @@ struct commit_key {
    friend auto operator<=>(const commit_key&, const commit_key&) = default;
 };
 
-/// One registered outpost chain the operator config fails to serve correctly:
-/// either no endpoint was configured for it, or the configured endpoint's VM
-/// family does not match the registry. Returned by `find_endpoint_coverage_gap`.
+/// One outpost chain whose active registry row and configured endpoint disagree.
 struct endpoint_coverage_gap {
-   /// Sentinel `config_kind` meaning "no endpoint configured for this chain".
-   static constexpr int unconfigured = -1;
-
-   uint64_t chain_code    = 0;              ///< `fc::slug_name::value` of the registered chain.
-   int      registry_kind = 0;              ///< raw `ChainKind` integer from the registry.
-   int      config_kind   = unconfigured;   ///< configured kind, or `unconfigured`.
+   uint64_t           chain_code = 0;  ///< `fc::slug_name::value` of the offending chain.
+   std::optional<int> registry_kind;   ///< Registry kind, or empty when inactive/unregistered.
+   std::optional<int> config_kind;     ///< Configured kind, or empty when unconfigured.
 };
 
-/// Verify that every registered outpost chain has a configured endpoint of the
-/// MATCHING VM family. Returns the first offending chain, or `nullopt` when the
-/// config covers the whole registered set exactly.
+/// Verify a one-to-one match between active registry chains and configured endpoints.
 ///
 /// SEC-13 / WSA-027: the underwriter derives its served set from the on-chain
 /// registry (`sysio.chains`) but builds its outpost_client handles only from
@@ -127,9 +120,13 @@ find_endpoint_coverage_gap(const std::map<uint64_t, int>& registered_kinds,
    for (const auto& [chain_code, reg_kind] : registered_kinds) {
       auto it = configured_kinds.find(chain_code);
       if (it == configured_kinds.end())
-         return endpoint_coverage_gap{chain_code, reg_kind, endpoint_coverage_gap::unconfigured};
+         return endpoint_coverage_gap{chain_code, reg_kind, std::nullopt};
       if (it->second != reg_kind)
          return endpoint_coverage_gap{chain_code, reg_kind, it->second};
+   }
+   for (const auto& [chain_code, config_kind] : configured_kinds) {
+      if (!registered_kinds.contains(chain_code))
+         return endpoint_coverage_gap{chain_code, std::nullopt, config_kind};
    }
    return std::nullopt;
 }

@@ -2,6 +2,8 @@
 
 #include <boost/test/unit_test.hpp>
 #include <boost/dll.hpp>
+#include <boost/beast/core.hpp>
+#include <boost/beast/http.hpp>
 #include <boost/process/v1/io.hpp>
 
 
@@ -180,6 +182,7 @@ constexpr size_t emit_outbound_envelope_call_hex_chars =
    evm_function_selector_hex_chars + evm_abi_word_hex_chars;
 constexpr uint64_t test_outpost_chain_code = 1;
 constexpr uint32_t test_evm_chain_id = 31337;
+constexpr size_t transient_chain_id_failures = 1;
 constexpr uint32_t test_wire_epoch = 7;
 constexpr uint32_t test_stale_wire_epoch = test_wire_epoch - 1;
 constexpr uint32_t test_different_wire_epoch = test_wire_epoch + 1;
@@ -194,6 +197,76 @@ fc::test::one_shot_http_server chain_id_rpc_server(std::string result_json = "\"
       R"json({"jsonrpc":"2.0","id":1,"result":)json" + result_json + "}",
       "eth_chainId"};
 }
+
+/** Loopback RPC fixture that resets one connection before returning a valid chain id. */
+class transient_chain_id_rpc_server {
+public:
+   /** Start the two-attempt fixture on an ephemeral loopback port. */
+   transient_chain_id_rpc_server()
+      : _acceptor(_io, tcp::endpoint(boost::asio::ip::make_address("127.0.0.1"), 0))
+      , _port(_acceptor.local_endpoint().port())
+      , _worker([this] { serve(); }) {}
+
+   transient_chain_id_rpc_server(const transient_chain_id_rpc_server&) = delete;
+   transient_chain_id_rpc_server& operator=(const transient_chain_id_rpc_server&) = delete;
+
+   /** Unblock any outstanding accepts and join the worker. */
+   ~transient_chain_id_rpc_server() {
+      for (size_t attempt = 0; attempt <= transient_chain_id_failures; ++attempt) {
+         boost::system::error_code error;
+         boost::asio::io_context io;
+         tcp::socket socket(io);
+         socket.connect(tcp::endpoint(boost::asio::ip::make_address("127.0.0.1"), _port), error);
+         socket.close(error);
+      }
+      if (_worker.joinable()) _worker.join();
+   }
+
+   /** Return the loopback URL selected for the fixture. */
+   std::string url() const {
+      return "http://127.0.0.1:" + std::to_string(_port);
+   }
+
+private:
+   using tcp = boost::asio::ip::tcp;
+
+   /** Reset the first request, then serve a valid `eth_chainId` response. */
+   void serve() {
+      for (size_t attempt = 0; attempt < transient_chain_id_failures; ++attempt) {
+         boost::system::error_code error;
+         tcp::socket socket(_io);
+         _acceptor.accept(socket, error);
+         if (error) return;
+         socket.set_option(boost::asio::socket_base::linger(true, 0), error);
+         socket.close(error);
+      }
+
+      boost::system::error_code error;
+      tcp::socket socket(_io);
+      _acceptor.accept(socket, error);
+      if (error) return;
+      boost::beast::flat_buffer request_buffer;
+      boost::beast::http::request<boost::beast::http::string_body> request;
+      boost::beast::http::read(socket, request_buffer, request, error);
+      if (error) return;
+
+      constexpr std::string_view response_body =
+         R"json({"jsonrpc":"2.0","id":1,"result":"0x7a69"})json";
+      std::ostringstream response;
+      response << "HTTP/1.1 200 OK\r\n"
+               << "Content-Type: application/json\r\n"
+               << "Content-Length: " << response_body.size() << "\r\n"
+               << "Connection: close\r\n\r\n"
+               << response_body;
+      const auto response_text = response.str();
+      boost::asio::write(socket, boost::asio::buffer(response_text), error);
+   }
+
+   boost::asio::io_context _io;
+   tcp::acceptor           _acceptor;
+   uint16_t                _port;
+   std::thread             _worker;
+};
 
 /** Build the canonical named Ethereum signature-provider test spec. */
 std::string named_ethereum_signature_provider(std::string name = "signer-a",
@@ -354,18 +427,28 @@ BOOST_AUTO_TEST_CASE(startup_rejects_named_signer_with_wrong_key_type) {
    }), sysio::chain::plugin_config_exception);
 }
 
-BOOST_AUTO_TEST_CASE(startup_does_not_probe_rpc_for_explicit_chain_id) {
+BOOST_AUTO_TEST_CASE(startup_rejects_explicit_chain_id_mismatch) {
    auto rpc_server = chain_id_rpc_server();
-   BOOST_CHECK_NO_THROW(initialize_outpost_plugin({
+   BOOST_CHECK_THROW(initialize_outpost_plugin({
       "--signature-provider",
       named_ethereum_signature_provider(),
       "--outpost-ethereum-client",
       "client-a,signer-a," + rpc_server.url() + ",1",
-   }));
+   }), sysio::chain::plugin_config_exception);
 }
 
-BOOST_AUTO_TEST_CASE(startup_accepts_unavailable_rpc_when_chain_id_is_explicit) {
+BOOST_AUTO_TEST_CASE(startup_rejects_unavailable_rpc_after_bounded_grace) {
    fc::test::connection_closing_http_server rpc_server;
+   BOOST_CHECK_THROW(initialize_outpost_plugin({
+      "--signature-provider",
+      named_ethereum_signature_provider(),
+      "--outpost-ethereum-client",
+      "client-a,signer-a," + rpc_server.url() + ",31337",
+   }), sysio::chain::plugin_config_exception);
+}
+
+BOOST_AUTO_TEST_CASE(startup_retries_transient_chain_id_transport_failure) {
+   transient_chain_id_rpc_server rpc_server;
    BOOST_CHECK_NO_THROW(initialize_outpost_plugin({
       "--signature-provider",
       named_ethereum_signature_provider(),

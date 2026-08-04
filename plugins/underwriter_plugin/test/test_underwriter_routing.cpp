@@ -187,8 +187,9 @@ BOOST_AUTO_TEST_CASE(endpoint_coverage_flags_unconfigured_chain) {
    const auto gap = find_endpoint_coverage_gap(registered, configured);
    BOOST_REQUIRE(gap.has_value());
    BOOST_CHECK_EQUAL(gap->chain_code, EVM2);
-   BOOST_CHECK_EQUAL(gap->registry_kind, KIND_EVM);
-   BOOST_CHECK_EQUAL(gap->config_kind, endpoint_coverage_gap::unconfigured);
+   BOOST_REQUIRE(gap->registry_kind.has_value());
+   BOOST_CHECK_EQUAL(*gap->registry_kind, KIND_EVM);
+   BOOST_CHECK(!gap->config_kind.has_value());
 }
 
 BOOST_AUTO_TEST_CASE(endpoint_coverage_flags_wrong_family) {
@@ -200,24 +201,32 @@ BOOST_AUTO_TEST_CASE(endpoint_coverage_flags_wrong_family) {
    const auto gap = find_endpoint_coverage_gap(registered, configured);
    BOOST_REQUIRE(gap.has_value());
    BOOST_CHECK_EQUAL(gap->chain_code, ETH);
-   BOOST_CHECK_EQUAL(gap->registry_kind, KIND_EVM);
-   BOOST_CHECK_EQUAL(gap->config_kind, KIND_SVM);
+   BOOST_REQUIRE(gap->registry_kind.has_value());
+   BOOST_REQUIRE(gap->config_kind.has_value());
+   BOOST_CHECK_EQUAL(*gap->registry_kind, KIND_EVM);
+   BOOST_CHECK_EQUAL(*gap->config_kind, KIND_SVM);
 }
 
-BOOST_AUTO_TEST_CASE(endpoint_coverage_extra_config_is_ok) {
-   // The operator configured an endpoint for a chain not (yet) registered;
-   // harmless: no leg references it, so it must NOT be reported as a gap.
+BOOST_AUTO_TEST_CASE(endpoint_coverage_flags_configured_inactive_chain) {
    const std::map<uint64_t, int> registered{{ETH, KIND_EVM}};
    const std::map<uint64_t, int> configured{{ETH, KIND_EVM}, {EVM2, KIND_EVM}};
-   BOOST_CHECK(!find_endpoint_coverage_gap(registered, configured).has_value());
+   const auto gap = find_endpoint_coverage_gap(registered, configured);
+   BOOST_REQUIRE(gap.has_value());
+   BOOST_CHECK_EQUAL(gap->chain_code, EVM2);
+   BOOST_CHECK(!gap->registry_kind.has_value());
+   BOOST_REQUIRE(gap->config_kind.has_value());
+   BOOST_CHECK_EQUAL(*gap->config_kind, KIND_EVM);
 }
 
-BOOST_AUTO_TEST_CASE(endpoint_coverage_empty_registry_has_no_gap) {
-   // Degenerate: nothing registered -> nothing to cover. (Preflight rejects the
-   // empty-registry case separately, before this check runs.)
+BOOST_AUTO_TEST_CASE(endpoint_coverage_empty_registry_flags_configured_chain) {
    const std::map<uint64_t, int> registered;
    const std::map<uint64_t, int> configured{{ETH, KIND_EVM}};
-   BOOST_CHECK(!find_endpoint_coverage_gap(registered, configured).has_value());
+   const auto gap = find_endpoint_coverage_gap(registered, configured);
+   BOOST_REQUIRE(gap.has_value());
+   BOOST_CHECK_EQUAL(gap->chain_code, ETH);
+   BOOST_CHECK(!gap->registry_kind.has_value());
+   BOOST_REQUIRE(gap->config_kind.has_value());
+   BOOST_CHECK_EQUAL(*gap->config_kind, KIND_EVM);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

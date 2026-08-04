@@ -37,6 +37,9 @@ inline std::string_view reason_code_name(ethereum_transaction_policy_reason reas
    return magic_enum::enum_name(reason);
 }
 
+/** Return whether a rejection describes malformed or oversized JSON-RPC response data. */
+bool is_rpc_quantity_rejection(ethereum_transaction_policy_reason reason);
+
 /** Return whether an identifier is bounded and ASCII-safe for policy logs and lookups. */
 bool is_safe_transaction_policy_identifier(std::string_view identifier);
 

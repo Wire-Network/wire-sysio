@@ -7,6 +7,7 @@
 
 #include <fc/log/logger.hpp>
 #include <fc/task/deadline.hpp>
+#include <fc/task/retry.hpp>
 
 #include <algorithm>
 #include <limits>
@@ -20,9 +21,12 @@ namespace {
 constexpr auto option_name_client = "outpost-ethereum-client";
 constexpr auto option_name_client_config_file = "outpost-ethereum-client-config-file";
 constexpr auto option_abi_file = "ethereum-abi-file";
-constexpr auto legacy_chain_id_resolution_timeout = fc::seconds(5);
+constexpr auto chain_id_resolution_timeout = fc::seconds(5);
+constexpr auto chain_id_resolution_initial_backoff = fc::milliseconds(200);
+constexpr auto chain_id_resolution_max_backoff = fc::seconds(1);
 constexpr std::string_view legacy_transaction_policy_client_id = "legacy-client";
 constexpr auto unavailable_policy_limit = "n/a";
+constexpr std::string_view chain_id_resolution_operation = "ethereum-client:eth_chainId";
 
 namespace transaction_policy_field {
 constexpr std::string_view chain_id = "chain_id";
@@ -51,6 +55,12 @@ using client_map = std::map<std::string, ethereum_client_entry_ptr>;
 namespace client_config = opp::config;
 using client_config::EvmClientConfiguration;
 using fc::network::ethereum::ethereum_transaction_policy;
+
+/** Whether startup must verify a configured local chain id against `eth_chainId`. */
+enum class rpc_chain_id_validation {
+   not_required,
+   required,
+};
 
 /** Parse a positive decimal or Ethereum hex quantity without fixed-width wraparound. */
 std::optional<uint32_t> parse_legacy_chain_id(std::string_view text) {
@@ -135,33 +145,58 @@ ethereum_transaction_policy policy_from_configuration(const EvmClientConfigurati
                       client_id);
 }
 
-/** Report a sanitized legacy chain-id lookup failure. */
-[[noreturn]] void throw_legacy_chain_id_resolution_failure(const std::string& client_id) {
+/** Report a sanitized startup chain-id lookup failure. */
+[[noreturn]] void throw_chain_id_resolution_failure(const std::string& client_id) {
    FC_THROW_EXCEPTION(chain::plugin_config_exception,
-                      "Unable to resolve chain id for legacy outpost Ethereum client '{}'",
+                      "Unable to resolve or validate chain id for outpost Ethereum client '{}' "
+                      "within the bounded RPC startup grace",
                       client_id);
 }
 
-/** Resolve and bound the chain id required by the legacy three-field client specification. */
-uint32_t resolve_legacy_chain_id(
+/** Return the retry envelope used independently by each startup chain-id probe. */
+fc::task::retry_options chain_id_resolution_retry_options() {
+   fc::task::retry_options options;
+   options.initial_backoff = chain_id_resolution_initial_backoff;
+   options.max_backoff = chain_id_resolution_max_backoff;
+   options.total_timeout = chain_id_resolution_timeout;
+   return options;
+}
+
+/** Resolve and bound one RPC chain id after retrying transient transport failures. */
+uint32_t resolve_rpc_chain_id(
    const std::string& client_id,
    const std::string& url,
    const fc::network::json_rpc::client_options& rpc_options) {
    try {
-      auto rpc = fc::network::json_rpc::json_rpc_client::create(url, rpc_options);
-      const auto chain_id = fc::network::ethereum::parse_rpc_quantity(
-         rpc.call_idempotent(std::string(ethereum_rpc_method::chain_id), fc::variants{}),
-         transaction_policy_field::chain_id);
-      if (chain_id == 0 || chain_id > std::numeric_limits<uint32_t>::max()) {
-         throw_legacy_chain_id_resolution_failure(client_id);
-      }
-      return chain_id.convert_to<uint32_t>();
+      fc::task::deadline_scope deadline(fc::time_point::now() + chain_id_resolution_timeout);
+      return fc::task::retry_until<uint32_t>(
+         chain_id_resolution_operation,
+         chain_id_resolution_retry_options(),
+         [&]() -> std::optional<uint32_t> {
+            fc::variant response;
+            try {
+               auto rpc = fc::network::json_rpc::json_rpc_client::create(url, rpc_options);
+               response = rpc.call_idempotent(
+                  std::string(ethereum_rpc_method::chain_id), fc::variants{});
+            } catch (const fc::exception&) {
+               return std::nullopt;
+            } catch (const std::exception&) {
+               return std::nullopt;
+            }
+
+            const auto chain_id = fc::network::ethereum::parse_rpc_quantity(
+               response, transaction_policy_field::chain_id);
+            if (chain_id == 0 || chain_id > std::numeric_limits<uint32_t>::max()) {
+               throw_chain_id_resolution_failure(client_id);
+            }
+            return chain_id.convert_to<uint32_t>();
+         });
    } catch (const chain::plugin_config_exception&) {
       throw;
    } catch (const fc::exception&) {
-      throw_legacy_chain_id_resolution_failure(client_id);
+      throw_chain_id_resolution_failure(client_id);
    } catch (const std::exception&) {
-      throw_legacy_chain_id_resolution_failure(client_id);
+      throw_chain_id_resolution_failure(client_id);
    }
 }
 
@@ -200,15 +235,25 @@ ethereum_client_ptr create_client(
    }
 }
 
-/** Add one fully initialized client to a temporary map before it is published by the plugin. */
+/** Add one fully initialized and optionally RPC-validated client before publication. */
 void add_client(client_map& clients,
                 const std::string& client_id,
                 const std::string& url,
                 const fc::crypto::signature_provider_ptr& signature_provider,
                 ethereum_transaction_policy policy,
-                const fc::network::json_rpc::client_options& rpc_options) {
+                const fc::network::json_rpc::client_options& rpc_options,
+                rpc_chain_id_validation chain_id_validation) {
    const auto chain_id = policy.chain_id;
    auto client = create_client(signature_provider, url, std::move(policy), rpc_options);
+   if (chain_id_validation == rpc_chain_id_validation::required) {
+      const auto remote_chain_id = resolve_rpc_chain_id(client_id, url, rpc_options);
+      SYS_ASSERT(remote_chain_id == chain_id,
+                 chain::plugin_config_exception,
+                 "Chain id mismatch for outpost Ethereum client '{}': configured {}, RPC endpoint reports {}",
+                 client_id,
+                 chain_id,
+                 remote_chain_id);
+   }
    const bool inserted = clients.emplace(
       client_id,
       std::make_shared<ethereum_client_entry_t>(
@@ -239,7 +284,8 @@ client_map load_file_clients(
                  connection.rpc_url(),
                  provider,
                  policy_from_configuration(configured_client),
-                 rpc_options);
+                 rpc_options,
+                 rpc_chain_id_validation::required);
    }
    return clients;
 }
@@ -249,15 +295,6 @@ client_map load_legacy_clients(
    const std::vector<std::string>& client_specs,
    signature_provider_manager_plugin& signature_provider_manager,
    const fc::network::json_rpc::client_options& rpc_options) {
-   const bool resolves_chain_id = std::ranges::any_of(client_specs, [](const auto& client_spec) {
-      return fc::split(client_spec, ',').size() == 3;
-   });
-   std::optional<fc::task::deadline_scope> chain_id_resolution_deadline;
-   if (resolves_chain_id) {
-      chain_id_resolution_deadline.emplace(
-         fc::time_point::now() + legacy_chain_id_resolution_timeout);
-   }
-
    client_map clients;
    for (const auto& client_spec : client_specs) {
       const auto parts = fc::split(client_spec, ',');
@@ -294,7 +331,7 @@ client_map load_legacy_clients(
                     client_id);
          chain_id = *parsed;
       } else {
-         chain_id = resolve_legacy_chain_id(client_id, url, rpc_options);
+         chain_id = resolve_rpc_chain_id(client_id, url, rpc_options);
       }
 
       auto provider = resolve_signature_provider(
@@ -304,7 +341,9 @@ client_map load_legacy_clients(
                  url,
                  provider,
                  maximum_policy(transaction_policy_client_label(client_id), chain_id),
-                 rpc_options);
+                 rpc_options,
+                 parts.size() == 4 ? rpc_chain_id_validation::required
+                                   : rpc_chain_id_validation::not_required);
    }
    return clients;
 }

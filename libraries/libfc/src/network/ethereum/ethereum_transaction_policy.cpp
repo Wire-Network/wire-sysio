@@ -95,6 +95,11 @@ bool is_safe_transaction_policy_identifier(std::string_view identifier) {
           });
 }
 
+bool is_rpc_quantity_rejection(ethereum_transaction_policy_reason reason) {
+   return reason == ethereum_transaction_policy_reason::rpc_quantity_invalid ||
+          reason == ethereum_transaction_policy_reason::rpc_quantity_out_of_range;
+}
+
 ethereum_transaction_policy_exception::ethereum_transaction_policy_exception(
    ethereum_transaction_policy_reason reason,
    std::string                        field,

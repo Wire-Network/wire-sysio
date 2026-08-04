@@ -124,11 +124,23 @@ fc::variant ethereum_client::execute_idempotent(const std::string& method, const
    return _client.call_idempotent(method, params);
 }
 
-/** Emit a sanitized policy-rejection record without endpoint, key, calldata, or signature data. */
-void ethereum_client::log_policy_rejection(const ethereum_transaction_policy_exception& rejection,
-                                           std::string_view                              operation_type) const {
+/** Emit a sanitized rejection record without endpoint, key, calldata, or signature data. */
+void ethereum_client::log_transaction_rejection(
+   const ethereum_transaction_policy_exception& rejection,
+   std::string_view                              operation_type) const {
    const std::string_view safe_operation_type =
       is_safe_transaction_policy_identifier(operation_type) ? operation_type : invalid_log_identifier;
+   if (is_rpc_quantity_rejection(rejection.reason())) {
+      elog("Ethereum RPC response rejected reason_code={} client_id={} chain_id={} operation={} "
+           "field={} observed={}",
+           reason_code_name(rejection.reason()),
+           _transaction_policy.client_id,
+           _transaction_policy.chain_id,
+           safe_operation_type,
+           rejection.field(),
+           rejection.observed());
+      return;
+   }
    elog("Ethereum transaction policy rejected reason_code={} client_id={} chain_id={} operation={} "
         "field={} observed={} allowed={}",
         reason_code_name(rejection.reason()),
@@ -183,7 +195,7 @@ fc::variant ethereum_client::execute_contract_tx_fn(const eip1559_tx& source_tx,
    try {
       validate_transaction_against_policy(_transaction_policy, tx);
    } catch (const ethereum_transaction_policy_exception& rejection) {
-      log_policy_rejection(rejection, abi.name);
+      log_transaction_rejection(rejection, abi.name);
       throw;
    }
 
@@ -302,7 +314,7 @@ eip1559_tx ethereum_client::create_default_tx(const address_compat_type& to, con
                         .data = from_hex(data),
                         .access_list = {}};
    } catch (const ethereum_transaction_policy_exception& rejection) {
-      log_policy_rejection(rejection, contract.name);
+      log_transaction_rejection(rejection, contract.name);
       throw;
    }
 }
@@ -465,7 +477,7 @@ ethereum_client::gas_config_t ethereum_client::get_gas_config() {
    try {
       return get_gas_config_unlogged();
    } catch (const ethereum_transaction_policy_exception& rejection) {
-      log_policy_rejection(rejection, gas_configuration_operation);
+      log_transaction_rejection(rejection, gas_configuration_operation);
       throw;
    }
 }

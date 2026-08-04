@@ -209,6 +209,13 @@ BOOST_AUTO_TEST_CASE(rejects_semantically_invalid_configuration) {
         {"connection":{"client_id":"a","signature_provider_id":"t","rpc_url":"http://localhost"},"chain_id":2}
       ]
    })json") == config::client_config_reason::client_duplicate);
+   BOOST_CHECK(rejection_reason(R"json({
+      "schema_version":1,
+      "clients":[
+        {"connection":{"client_id":"a","signature_provider_id":"s","rpc_url":"http://localhost"},"chain_id":1},
+        {"connection":{"client_id":"b","signature_provider_id":"t","rpc_url":"http://localhost"},"chain_id":1}
+      ]
+   })json") == config::client_config_reason::chain_id_duplicate);
 }
 
 BOOST_AUTO_TEST_CASE(rejects_incomplete_noncanonical_and_inconsistent_policy) {

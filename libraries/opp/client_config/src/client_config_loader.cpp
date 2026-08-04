@@ -191,6 +191,7 @@ void validate_evm_client_configuration(const EvmClientConfigurationFile& configu
    }
 
    std::set<std::string> client_ids;
+   std::set<uint32_t>    chain_ids;
    for (const auto& client : configuration.clients()) {
       if (!client.has_connection()) {
          throw_client_config_failure(client_config_reason::connection_missing,
@@ -227,6 +228,11 @@ void validate_evm_client_configuration(const EvmClientConfigurationFile& configu
                                      client.has_chain_id() ? diagnostic_observation::zero
                                                            : diagnostic_observation::missing,
                                      positive_uint32_range);
+      }
+      if (!chain_ids.insert(client.chain_id()).second) {
+         throw_client_config_failure(client_config_reason::chain_id_duplicate,
+                                     configuration_field::chain_id,
+                                     std::to_string(client.chain_id()));
       }
 
       if (!client.has_transaction_policy()) continue;

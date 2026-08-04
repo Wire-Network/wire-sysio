@@ -112,6 +112,15 @@ BOOST_AUTO_TEST_CASE(rpc_quantities_are_canonical_and_non_truncating) {
       ethereum_transaction_policy_reason::rpc_quantity_invalid);
 }
 
+BOOST_AUTO_TEST_CASE(rpc_quantity_reasons_are_classified_as_response_faults) {
+   BOOST_CHECK(is_rpc_quantity_rejection(
+      ethereum_transaction_policy_reason::rpc_quantity_invalid));
+   BOOST_CHECK(is_rpc_quantity_rejection(
+      ethereum_transaction_policy_reason::rpc_quantity_out_of_range));
+   BOOST_CHECK(!is_rpc_quantity_rejection(
+      ethereum_transaction_policy_reason::max_fee_cap_exceeded));
+}
+
 BOOST_AUTO_TEST_CASE(malformed_values_do_not_reappear_in_policy_diagnostics) {
    constexpr std::string_view sensitive_url = "https://user:password@example.invalid/rpc?token=secret";
    try {
