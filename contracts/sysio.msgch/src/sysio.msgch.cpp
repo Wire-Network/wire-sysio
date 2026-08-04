@@ -86,6 +86,10 @@ constexpr size_t   ENVELOPE_BASELINE_BYTES    = 512;
 constexpr int32_t RETIRED_STAKE_ATTESTATION_VALUE   = 3001;
 constexpr int32_t RETIRED_UNSTAKE_ATTESTATION_VALUE = 3002;
 
+/// Bound legacy-row cleanup work performed by one buildenv action. Remaining
+/// tombstones stay READY for a later call but are never envelope candidates.
+constexpr size_t MAX_RETIRED_STAKING_PRUNE_PER_BUILD = 32;
+
 /// Return true when an attestation carries a retired pre-launch staking slot.
 bool is_retired_staking_attestation(AttestationType type) {
    const auto value = magic_enum::enum_integer(type);
@@ -1701,6 +1705,7 @@ void msgch::buildenv(uint64_t chain_code) {
    std::vector<uint64_t>              candidate_ids;
 
    auto status_idx = atts.get_index<"bystatus"_n>();
+   size_t retired_staking_pruned = 0;
    for (auto it = status_idx.lower_bound(
            static_cast<uint64_t>(AttestationStatus::ATTESTATION_STATUS_READY));
         it != status_idx.end() &&
@@ -1710,7 +1715,12 @@ void msgch::buildenv(uint64_t chain_code) {
       // terminal-account gate nor an outpost decoder can be blocked by a
       // protocol value that no longer has a generated enum/message type.
       if (is_retired_staking_attestation(it->type)) {
-         it = status_idx.erase(std::move(it));
+         if (retired_staking_pruned < MAX_RETIRED_STAKING_PRUNE_PER_BUILD) {
+            it = status_idx.erase(std::move(it));
+            ++retired_staking_pruned;
+         } else {
+            ++it;
+         }
          continue;
       }
       if (it->chain_code != chain_code) {

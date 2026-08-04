@@ -229,7 +229,7 @@ message ReserveAmount {
 // ---------------------------------------------------------------------------
 
 enum AttestationType {
-  reserved 3001, 3002;
+  reserved 3001, 3002, 60929, 60933, 60935 to 60938, 60946, 60948, 60954, 60957;
   reserved "ATTESTATION_TYPE_STAKE", "ATTESTATION_TYPE_UNSTAKE";
 
   ATTESTATION_TYPE_UNSPECIFIED = 0;

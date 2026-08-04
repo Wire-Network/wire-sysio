@@ -294,6 +294,35 @@ public:
       );
    }
 
+   /// Recreate a historical pre-validation row by changing only its
+   /// destination chain. The indexed fields (id, status, type, epoch) stay
+   /// unchanged, so the existing secondary-index entries remain valid.
+   void retarget_attestation_for_upgrade_test(uint64_t id, uint64_t chain_code) {
+      const auto table_id = chain::compute_table_id("attestations"_n.value);
+      const auto& kv_idx = control->db().get_index<chain::kv_index, chain::by_code_key>();
+      char primary_key[chain::kv_pri_key_size];
+      chain::kv_encode_be64(primary_key, id);
+      const auto kv_itr = kv_idx.find(boost::make_tuple(
+         MSGCH_ACCOUNT, table_id,
+         std::string_view(primary_key, chain::kv_pri_key_size)));
+      BOOST_REQUIRE(kv_itr != kv_idx.end());
+
+      auto row = msgch_abi.binary_to_variant(
+         "attestation_entry",
+         std::vector<char>(kv_itr->value.data(), kv_itr->value.data() + kv_itr->value.size()),
+         abi_serializer::create_yield_function(abi_serializer_max_time));
+      fc::mutable_variant_object updated(row.get_object());
+      updated.set("chain_code", chain_code);
+      const auto encoded = msgch_abi.variant_to_binary(
+         "attestation_entry", updated,
+         abi_serializer::create_yield_function(abi_serializer_max_time));
+
+      auto& db = const_cast<chainbase::database&>(control->db());
+      db.modify(*kv_itr, [&](auto& object) {
+         object.value.assign(encoded.data(), encoded.size());
+      });
+   }
+
    /// Count READY-status attestations for `chain_code` by probing the
    /// table by-id. Avoids needing an ABI binding for the secondary index.
    uint32_t count_ready_attestations(uint64_t chain_code, uint64_t scan_until) {
@@ -363,6 +392,7 @@ constexpr auto SWAP_REMIT_ATTESTATION_TYPE    = opp::types::ATTESTATION_TYPE_SWA
 constexpr auto UNCOVERED_TEST_ATTESTATION_TYPE = opp::types::ATTESTATION_TYPE_STAKING_REWARD;
 /// Raw protobuf wire slot used only to seed the pre-upgrade READY-row shape.
 constexpr uint32_t RETIRED_STAKE_ATTESTATION_VALUE = 3001;
+constexpr uint32_t RETIRED_STAKING_PRUNE_LIMIT     = 32;
 
 /// Decode the emitted OPP envelope and count attestations in its single message.
 uint32_t emitted_attestation_count(const fc::variant& emitted_row) {
@@ -426,6 +456,81 @@ BOOST_FIXTURE_TEST_CASE(buildenv_tombstones_retired_staking_rows,
    produce_blocks();
 
    BOOST_REQUIRE_EQUAL(0u, count_ready_attestations(ETH_OUTPOST_ID, 8));
+   const auto emitted = find_outbound_envelope();
+   BOOST_REQUIRE(!emitted.is_null());
+   BOOST_REQUIRE_EQUAL(1u, emitted_attestation_count(emitted));
+} FC_LOG_AND_RETHROW() }
+
+/// A retired row at the end of the READY index is safe to erase. In
+/// particular, `erase` returning the index end iterator must not be
+/// incremented or dereferenced by the collection loop.
+BOOST_FIXTURE_TEST_CASE(buildenv_tombstones_last_retired_staking_row,
+                        sysio_msgch_envlog_tester) { try {
+   bootstrap_epoch_config(/*retention=*/200);
+   register_outpost(opp::types::CHAIN_KIND_EVM, 31337);
+   produce_blocks();
+
+   BOOST_REQUIRE_EQUAL(success(),
+      queueout(/*chain_code=*/ETH_OUTPOST_ID, RETIRED_STAKE_ATTESTATION_VALUE));
+   BOOST_REQUIRE_EQUAL(1u, count_ready_attestations(ETH_OUTPOST_ID, 4));
+
+   BOOST_REQUIRE_EQUAL(success(), buildenv(/*chain_code=*/ETH_OUTPOST_ID));
+   produce_blocks();
+
+   BOOST_REQUIRE_EQUAL(0u, count_ready_attestations(ETH_OUTPOST_ID, 4));
+   BOOST_REQUIRE(find_outbound_envelope().is_null());
+} FC_LOG_AND_RETHROW() }
+
+/// Tombstones are removed before destination-specific collection. Current
+/// queueout correctly refuses to create an invalid legacy SVM row, so queue
+/// through the EVM-compatible path and retarget the stored row to recreate
+/// the pre-upgrade SVM state. A Solana build must remove it before the dynamic
+/// account estimator sees the unknown type.
+BOOST_FIXTURE_TEST_CASE(buildenv_tombstone_cleanup_precedes_svm_estimation,
+                        sysio_msgch_envlog_tester) { try {
+   bootstrap_epoch_config(/*retention=*/200);
+   register_outpost(opp::types::CHAIN_KIND_EVM, 31337);
+   register_outpost(opp::types::CHAIN_KIND_SVM, 31338);
+   produce_blocks();
+
+   BOOST_REQUIRE_EQUAL(success(),
+      queueout(/*chain_code=*/ETH_OUTPOST_ID, RETIRED_STAKE_ATTESTATION_VALUE));
+   retarget_attestation_for_upgrade_test(/*id=*/1, /*chain_code=*/SOL_OUTPOST_ID);
+   BOOST_REQUIRE_EQUAL(success(),
+      queueout(/*chain_code=*/SOL_OUTPOST_ID, EVM_TEST_ATTESTATION_TYPE));
+
+   BOOST_REQUIRE_EQUAL(success(), buildenv(/*chain_code=*/SOL_OUTPOST_ID));
+   produce_blocks();
+
+   BOOST_REQUIRE_EQUAL(0u, count_ready_attestations(SOL_OUTPOST_ID, 8));
+   const auto emitted = find_outbound_envelope();
+   BOOST_REQUIRE(!emitted.is_null());
+   BOOST_REQUIRE_EQUAL(1u, emitted_attestation_count(emitted));
+} FC_LOG_AND_RETHROW() }
+
+/// Cleanup is capped per action so an upgrade cannot turn an epoch advance
+/// into an unbounded erase sweep. Rows beyond the cap remain READY but are
+/// skipped as candidates, while an active row behind them still emits.
+BOOST_FIXTURE_TEST_CASE(buildenv_bounds_retired_staking_row_cleanup,
+                        sysio_msgch_envlog_tester) { try {
+   bootstrap_epoch_config(/*retention=*/200);
+   register_outpost(opp::types::CHAIN_KIND_EVM, 31337);
+   produce_blocks();
+
+   for (uint32_t i = 0; i < RETIRED_STAKING_PRUNE_LIMIT + 1; ++i) {
+      BOOST_REQUIRE_EQUAL(success(),
+         queueout_with_data(
+            /*chain_code=*/ETH_OUTPOST_ID,
+            RETIRED_STAKE_ATTESTATION_VALUE,
+            std::vector<char>{static_cast<char>(i)}));
+   }
+   BOOST_REQUIRE_EQUAL(success(),
+      queueout(/*chain_code=*/ETH_OUTPOST_ID, EVM_TEST_ATTESTATION_TYPE));
+
+   BOOST_REQUIRE_EQUAL(success(), buildenv(/*chain_code=*/ETH_OUTPOST_ID));
+   produce_blocks();
+
+   BOOST_REQUIRE_EQUAL(1u, count_ready_attestations(ETH_OUTPOST_ID, 64));
    const auto emitted = find_outbound_envelope();
    BOOST_REQUIRE(!emitted.is_null());
    BOOST_REQUIRE_EQUAL(1u, emitted_attestation_count(emitted));

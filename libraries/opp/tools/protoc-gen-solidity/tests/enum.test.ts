@@ -58,11 +58,12 @@ describe("computeUnderlyingType", () => {
     expect(computeUnderlyingType(values)).toBe("uint64")
   })
 
-  it("includes reserved slots when selecting the underlying type", () => {
-    const values: EnumValueInfo[] = [{ name: "UNSPECIFIED", number: 0 }]
-    expect(computeUnderlyingType(values, [{ start: 3001, end: 3002 }])).toBe(
-      "uint16"
-    )
+  it("does not let an open-ended reservation widen the underlying type", () => {
+    const values: EnumValueInfo[] = [
+      { name: "UNSPECIFIED", number: 0 },
+      { name: "ACTIVE", number: 255 }
+    ]
+    expect(computeUnderlyingType(values)).toBe("uint8")
   })
 })
 
@@ -236,6 +237,34 @@ describe("genEnumDefinition", () => {
     )
     expect(result).toContain(
       "if (_raw >= 4000 && _raw <= 4002) return AttestationType.wrap(uint16(_raw));"
+    )
+    expect(result).toContain(
+      "if (_raw > type(uint16).max) revert InvalidEnumValue(_raw);"
+    )
+    expect(result.indexOf("type(uint16).max")).toBeLessThan(
+      result.indexOf("AttestationType.wrap(uint16(_raw))")
+    )
+  })
+
+  it("rejects an unrepresentable reserved value before narrowing it", () => {
+    const desc: EnumDescriptor = {
+      name: "Small",
+      fullName: "Small",
+      values: [
+        { name: "UNSPECIFIED", number: 0 },
+        { name: "ACTIVE", number: 255 }
+      ],
+      reservedRanges: [{ start: 5, end: 0x7fffffff }],
+      underlyingType: "uint8"
+    }
+
+    const result = genEnumDefinition(desc)
+    expect(result).toContain("type Small is uint8;")
+    expect(result).toContain(
+      "if (_raw > type(uint8).max) revert InvalidEnumValue(_raw);"
+    )
+    expect(result.indexOf("type(uint8).max")).toBeLessThan(
+      result.indexOf("Small.wrap(uint8(_raw))")
     )
   })
 })

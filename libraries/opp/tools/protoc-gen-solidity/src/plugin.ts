@@ -248,7 +248,7 @@ function buildEnumRegistry(protoFiles: any[]): EnumRegistry {
         fullName,
         values,
         reservedRanges,
-        underlyingType: computeUnderlyingType(values, reservedRanges)
+        underlyingType: computeUnderlyingType(values)
       })
     }
   }
@@ -346,7 +346,7 @@ function extractEnums(protoFile: any, packageName: string): EnumDescriptor[] {
         fullName,
         values,
         reservedRanges,
-        underlyingType: computeUnderlyingType(values, reservedRanges)
+        underlyingType: computeUnderlyingType(values)
       })
     }
   }
