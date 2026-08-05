@@ -78,7 +78,7 @@ chain deregistered) refund in full.
 | `swapfromwire` | `user` | Escrow WIRE and enqueue a swap-FROM-WIRE request |
 | `drainfwq` | `sysio.epoch` or self | Drain the from-WIRE queue: settle what prices, revert the rest (charging the revert fee on caller-fault causes) |
 | `chklocks` | `sysio.epoch` or self | Sweep collateral locks whose wall-clock window has expired |
-| `pruneuwreqs` | permissionless | Expire timed-out PENDING uwreqs and erase terminal rows past their retention window |
+| `pruneuwreqs` | `sysio.epoch` or self | Expire timed-out PENDING uwreqs and erase terminal rows past their retention window |
 | `sumlocks` | read-only | Sum an underwriter's active locks for a `(chain, token)` bucket — the lock half of `sysio.opreg::available()` |
 
 ## Dependencies

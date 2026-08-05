@@ -3427,6 +3427,115 @@ BOOST_FIXTURE_TEST_CASE( payepoch_pays_swap_fee_to_active_batch_operator, sysio_
    BOOST_REQUIRE_EQUAL( t5_after - t5_before, producer_pool + batch_pool + capex + gov );
 } FC_LOG_AND_RETHROW()
 
+// Lowering pay_cadence_epochs MID-PERIOD must not multiply the payout.
+// `accrueepoch` increments one batch_group_epochs slot per epoch unconditionally,
+// while `setemitcfg` may change pay_cadence_epochs at any time. Normalizing by
+// cfg.pay_cadence_epochs instead of the accrued total made those two disagree:
+// cadence 3 -> 1 after one accrual leaves the counters summing to 2 against a
+// divisor of 1, paying 2x batch_pool AND 2x fee_batch_pool. The surplus fee is the
+// dangerous half — only ONE fee pool was swept from sysio.reserv, so the extra is
+// drawn from this treasury, and fee payouts are excluded from total_distributed,
+// so it never shows up against the emission curve.
+//
+// Runs with an ACTIVE batch group and a NON-ZERO fee, because with either absent
+// the overpayment is unobservable: no group means nothing is distributed, and a
+// zero fee makes the fee half of the bug invisible.
+BOOST_FIXTURE_TEST_CASE( cadence_drop_midperiod_does_not_multiply_batch_fee_payout,
+                         sysio_emissions_tester ) try {
+   const account_name RESERV   = "sysio.reserv"_n;
+   const account_name UWRIT    = "sysio.uwrit"_n;
+   const account_name BATCH_OP = "batchopb"_n;
+
+   create_t5_holding_accounts();
+   deploy_reserv();
+
+   abi_serializer reserv_ser;
+   {
+      const auto* a = control->find_account_metadata( RESERV );
+      BOOST_REQUIRE( a != nullptr );
+      abi_def d;
+      BOOST_REQUIRE_EQUAL( abi_serializer::to_abi(a->abi, d), true );
+      reserv_ser.set_abi( d, abi_serializer::create_yield_function(abi_serializer_max_time) );
+   }
+   auto codename = [](std::string_view s) { return mvo()("value", fc::slug_name{s}.value); };
+   auto reward_balance = [&]() -> int64_t {
+      auto data = get_row_by_account(RESERV, RESERV, "rewardbkt"_n, "rewardbkt"_n);
+      if (data.empty()) return 0;
+      auto v = reserv_ser.binary_to_variant("rewards_bucket", data,
+                  abi_serializer::create_yield_function(abi_serializer_max_time));
+      return static_cast<int64_t>(v["balance"].as_uint64());
+   };
+
+   BOOST_REQUIRE_EQUAL( success(), push_reserv_action(RESERV, "regreserve"_n, mvo()
+      ("chain_code", codename("ETH"))("token_code", codename("ETH"))("reserve_code", codename("PRIMARY"))
+      ("name", "eth")("description", "")
+      ("initial_chain_amount", 1'000'000'000'000ULL)("initial_wire_amount", 1'000'000'000'000ULL)
+      ("source_token_precision", 9u)("connector_weight_bps", 5000u)("is_private", false)("owner", name{}) ) );
+   BOOST_REQUIRE_EQUAL( success(), push_reserv_action(RESERV, "regreserve"_n, mvo()
+      ("chain_code", codename("SOLANA"))("token_code", codename("SOL"))("reserve_code", codename("PRIMARY"))
+      ("name", "sol")("description", "")
+      ("initial_chain_amount", 1'000'000'000'000ULL)("initial_wire_amount", 1'000'000'000'000ULL)
+      ("source_token_precision", 9u)("connector_weight_bps", 5000u)("is_private", false)("owner", name{}) ) );
+   BOOST_REQUIRE_EQUAL( success(), push_reserv_action(UWRIT, "applyswap"_n, mvo()
+      ("src_chain_code", codename("ETH"))("src_token_code", codename("ETH"))("src_reserve_code", codename("PRIMARY"))
+      ("src_amount", 1'000'000'000ULL)
+      ("dst_chain_code", codename("SOLANA"))("dst_token_code", codename("SOL"))("dst_reserve_code", codename("PRIMARY"))
+      ("dst_amount", 100'000'000ULL)("underwriter", name{}) ) );
+
+   const int64_t fee_total = reward_balance();
+   BOOST_REQUIRE_GT( fee_total, 0 );
+
+   create_accounts( { BATCH_OP }, false, false, false, true );
+   BOOST_REQUIRE_EQUAL( success(),
+      register_operator( BATCH_OP, OperatorType::OPERATOR_TYPE_BATCH, /*is_bootstrapped*/true ) );
+   BOOST_REQUIRE_EQUAL( success(), init_epoch_state(60, /*operators_per_epoch*/1,
+                                                    /*batch_op_groups_count*/1) );
+   produce_blocks(1);
+   BOOST_REQUIRE_EQUAL( success(), push_epoch_action(EPOCH, "schbatchgps"_n, mvo()) );
+
+   setup_producers(1);
+   wait_for_producer_schedule();
+   produce_complete_cycles(1, 2);
+
+   // Cadence 3: the first advance accrues without paying.
+   BOOST_REQUIRE_EQUAL( success(), setemitcfg_with_cadence( config::system_account_name, uint16_t(3) ) );
+   const uint32_t start = head_secs() - ONE_EPOCH - 1;
+   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
+
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+   BOOST_REQUIRE_EQUAL( get_t5_state()["epoch_count"].as<uint64_t>(), 0u ); // non-pay
+   BOOST_REQUIRE_GT( get_t5_state()["pending_emission_amount"].as<int64_t>(), 0 );
+
+   // Drop to cadence 1 mid-period. The counters now sum to 2 while cfg says 1.
+   BOOST_REQUIRE_EQUAL( success(), setemitcfg_with_cadence( config::system_account_name, uint16_t(1) ) );
+
+   const int64_t bal_before = get_wire_balance(BATCH_OP).get_amount();
+   produce_blocks(130);
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );   // pay-epoch
+   BOOST_REQUIRE_EQUAL( get_t5_state()["epoch_count"].as<uint64_t>(), 1u );
+
+   auto log = get_epoch_log(2);
+   const int64_t compute       = log["compute_amount"].as<int64_t>();
+   const int64_t producer_pool = test_split_bps(compute, PRODUCER_BPS);
+   const int64_t batch_pool    = compute - producer_pool;
+
+   // The single group holds BOTH accrued epochs, so normalizing by the accrued
+   // total (2) gives it the whole pool exactly once -- not twice.
+   const int64_t got = get_wire_balance(BATCH_OP).get_amount() - bal_before;
+   BOOST_REQUIRE_EQUAL( got, batch_pool + fee_total );
+
+   // The load-bearing assertion: the fee is distributed ONCE. Under the old
+   // divisor this was 2 * fee_total, with the surplus drawn from the treasury.
+   BOOST_REQUIRE_EQUAL( log["fee_distributed"].as<int64_t>(), fee_total );
+   BOOST_REQUIRE_EQUAL( reward_balance(), 0 );
+
+   // And the emission side is not double-paid either.
+   const int64_t capex = log["capex_amount"].as<int64_t>();
+   const int64_t gov   = log["governance_amount"].as<int64_t>();
+   BOOST_REQUIRE_EQUAL( get_t5_state()["total_distributed"].as<int64_t>(),
+                        producer_pool + batch_pool + capex + gov );
+} FC_LOG_AND_RETHROW()
+
 BOOST_FIXTURE_TEST_CASE( standby_weight_decreases_by_rank, sysio_emissions_tester ) try {
    // Rank 22 should receive more than rank 23, which should receive more than rank 24, etc.
    // Weight formula: w = 29 - rank (22→7, 23→6, 24→5)

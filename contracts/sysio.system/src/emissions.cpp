@@ -601,6 +601,26 @@ void system_contract::payepoch(uint32_t epoch_index,
    const int64_t producer_pool = split_bps(compute_amount, cfg.producer_bps);
    const int64_t batch_pool    = compute_amount - producer_pool;
 
+   // ----- The period's ACTUAL length, in accrued epochs -----
+   // BOTH distributions below normalize by this, and NEITHER may use
+   // cfg.pay_cadence_epochs for it. accrueepoch increments one batch_group_epochs
+   // slot per epoch unconditionally, while setemitcfg may change
+   // pay_cadence_epochs at any time (taking effect on the next advance), so the
+   // configured cadence and the epochs this period actually spans can disagree --
+   // lowering 3->1 after one accrual leaves the counters summing to 2 against a
+   // configured 1. Deriving the divisor from the counters themselves keeps both
+   // normalizations correct whatever the config did mid-period.
+   //
+   // Sum in int64: each counter is a uint32 epoch tally and the vector is sized
+   // from batch_op_groups, so the total cannot approach the int64 range. Zero is
+   // impossible in practice (payepoch asserts accrueepoch ran for this same
+   // epoch_index, and accrueepoch always increments a slot) but is guarded at
+   // each use, because a zero divisor would abort the whole advance chain.
+   int64_t accrued_epochs = 0;
+   for (const uint32_t group_epoch_count : state.batch_group_epochs) {
+      accrued_epochs += group_epoch_count;
+   }
+
    // ----- Swap-fee rewards fold-in -----
    // The BATCH-OPERATOR half of collected swap fees accrues in sysio.reserv's
    // rewards_bucket. The other half accrues per-underwriter in sysio.reserv and
@@ -660,16 +680,24 @@ void system_contract::payepoch(uint32_t epoch_index,
       auto prod_by_rank = _producers.get_index<"prodrank"_n>();
 
       // expected_rounds is derived from the configured epoch duration on
-      // sysio.epoch (canonical source of truth) scaled by pay_cadence_epochs
-      // because elig_rounds accumulates across all epochs in the period.
+      // sysio.epoch (canonical source of truth) scaled by the period's ACTUAL
+      // accrued epoch count, because elig_rounds accumulates across exactly those
+      // epochs. It must NOT scale by cfg.pay_cadence_epochs: a mid-period cadence
+      // change makes the two disagree (see accrued_epochs above), and the
+      // mismatch silently distorts every producer's pay share -- too small a
+      // denominator lets everyone hit the clamp and collect their full share, too
+      // large a one forfeits pay that was earned. Unlike the batch-op pool this
+      // cannot overpay past producer_pool (the clamp bounds each share by
+      // emis_share), so it skews proportions rather than the total.
       const uint32_t epoch_duration_sec = get_epoch_duration_sec();
-      // Compute in uint64: epoch_duration_sec (<= 30 days) * pay_cadence_epochs
-      // (<= uint16 max) * 2 overflows uint32 at the extremes, and a wrapped
+      // Compute in uint64: epoch_duration_sec (<= 30 days) * the accrued epoch
+      // count * 2 overflows uint32 at the extremes, and a wrapped
       // denominator would silently distort every producer's pay share. uint64
       // holds the full product with room to spare; the result is a small round
       // count that fits back into uint64 for the divide below.
       uint64_t expected_rounds =
-         (static_cast<uint64_t>(epoch_duration_sec) * cfg.pay_cadence_epochs * 2) / TOTAL_BLOCKS_PER_ROUND;
+         (static_cast<uint64_t>(epoch_duration_sec)
+          * static_cast<uint64_t>(accrued_epochs > 0 ? accrued_epochs : 1) * 2) / TOTAL_BLOCKS_PER_ROUND;
       // Below ~126s of effective period duration (one full 21-producer round
       // at 0.5s/block), expected_rounds truncates to zero. Falling back to 1
       // keeps the pay formula well-defined -- producer pay collapses to
@@ -768,13 +796,23 @@ void system_contract::payepoch(uint32_t epoch_index,
    // Batch-op pay. With pay_cadence_epochs > 1 the active group can rotate
    // multiple times across a period, so each group's slice is weighted by
    // its active-epoch count (state.batch_group_epochs[g]) over the period.
-   // sum(batch_group_epochs) == pay_cadence_epochs by construction, so the
-   // per-group weights partition the pool exactly.
+   //
+   // The divisor is the ACTUAL accrued epoch count -- the sum of those counters
+   // -- NOT cfg.pay_cadence_epochs. The two can disagree: accrueepoch increments
+   // one slot per epoch unconditionally, while setemitcfg may change
+   // pay_cadence_epochs at any time, taking effect on the next advance. Lowering
+   // cadence 3->1 after one accrual leaves the counters summing to 2 against a
+   // divisor of 1, which pays 2x batch_pool AND 2x fee_batch_pool -- the surplus
+   // fee drawn from this treasury even though only one fee pool was swept from
+   // sysio.reserv, and invisible to total_distributed because fee payouts are
+   // excluded from it. A shortened genesis period underpays by the inverse.
+   // Summing the counters makes the per-group weights partition the pool by
+   // construction, whatever the config did mid-period.
    //
    // A group active in zero epochs is skipped, but that retains NOTHING: its
-   // weighted allocation is `pool * 0 / cadence` == 0, and because the counts sum
-   // to the cadence the remaining groups already absorb the whole pool. What
-   // ACTUALLY leaves WIRE behind in the treasury is:
+   // weighted allocation is `pool * 0 / accrued_epochs` == 0, and since the
+   // counters sum to that divisor the remaining groups already absorb the whole
+   // pool. What ACTUALLY leaves WIRE behind in the treasury is:
    //   * no groups at all (the enclosing `if` fails) — the entire pool;
    //   * an EMPTY group that owns POSITIVE epochs — skipped by the `group.empty()`
    //     test BEFORE the epoch check, so its weighted slice is never paid;
@@ -783,7 +821,7 @@ void system_contract::payepoch(uint32_t epoch_index,
    //   * the remainders of the two integer divisions below (per-group weighting
    //     and the even per-member split).
    // =======================================================================
-   if (cfg.pay_cadence_epochs > 0 && !batch_op_groups.empty()) {
+   if (accrued_epochs > 0 && !batch_op_groups.empty()) {
       for (size_t g = 0; g < batch_op_groups.size(); ++g) {
          const auto& group = batch_op_groups[g];
          if (group.empty()) continue;
@@ -796,9 +834,9 @@ void system_contract::payepoch(uint32_t epoch_index,
          // count over the period) so a member's fee tracks its emission reward.
          const int64_t members = static_cast<int64_t>(group.size());
          const int64_t group_pool = static_cast<int64_t>(
-            static_cast<__int128>(batch_pool) * group_epochs / cfg.pay_cadence_epochs);
+            static_cast<__int128>(batch_pool) * group_epochs / accrued_epochs);
          const int64_t fee_group_pool = static_cast<int64_t>(
-            static_cast<__int128>(fee_batch_pool) * group_epochs / cfg.pay_cadence_epochs);
+            static_cast<__int128>(fee_batch_pool) * group_epochs / accrued_epochs);
          const int64_t per_member     = group_pool / members;
          const int64_t fee_per_member = fee_group_pool / members;
 

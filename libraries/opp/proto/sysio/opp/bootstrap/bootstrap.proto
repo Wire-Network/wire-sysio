@@ -96,7 +96,10 @@ message TokenSpec {
 // A launch reserve to seed via
 // `sysio.reserv::regreserve(chain_code, token_code, reserve_code, name,
 //  description, initial_chain_amount, initial_wire_amount,
-//  connector_weight_bps, is_private, owner)`.
+//  source_token_precision, connector_weight_bps, is_private, owner)`.
+//
+// ELEVEN arguments. `source_token_precision` — the 8th — has no field in this
+// message; it is the paired `TokenSpec.precision` (see `token_code` below).
 //
 // The WIRE side (`initial_wire_amount`) is drained from the `sysio` emissions
 // treasury into reserve custody at registration time (real WIRE transfer; see

@@ -80,8 +80,9 @@ The `regreserve` signature (with `is_private` + `owner`) and the ms-based
 onto them. `owner` is a WIRE account name (`sysio::name`): empty for public
 reserves, the owning account for private ones.
 
-`regreserve` takes an eleventh argument, `source_token_precision`, that no
-`ReserveSpec` field supplies. It is the **depot-frame precision of the paired
+`regreserve`'s eleven-argument signature includes `source_token_precision` as its
+**eighth** argument, which no `ReserveSpec` field supplies. It is the
+**depot-frame precision of the paired
 token** — i.e. the referenced `TokenSpec.precision`, which is itself
 `min(native precision, 9)`. So the mapping is a lookup, not a new config field:
 resolve `(chain_code, token_code)` to its `TokenSpec` and pass that spec's
