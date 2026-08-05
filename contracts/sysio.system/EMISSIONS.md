@@ -46,11 +46,17 @@ per-group active-epoch count. Producers are not paid out of swap fees, so
 `producer_bps` / `batch_op_bps` govern the emission split only.
 
 Allocated is not the same as paid: as with emissions, only **eligible** shares
-are actually transferred. A group active in zero epochs of the period, a member
-that is not opreg-ACTIVE, and integer-division remainders all leave their share
-in the treasury. `epochlog.fee_distributed` records what was actually paid, so it
-can be lower than the swept amount — and is `0` when no eligible batch operator
-existed at all, even though `drainrewards` swept the bucket to zero regardless.
+are actually transferred. WIRE stays in the treasury when there are **no groups
+at all**, when an **empty group owns positive active epochs** (its weighted slice
+is skipped), when a **member is not opreg-ACTIVE**, or as the **remainder** of the
+two integer divisions (per-group weighting, then the even per-member split). A
+group active in **zero** epochs is *not* one of these cases — its weighted
+allocation is already zero, and because the per-group counts sum to the cadence
+the remaining groups absorb the whole pool.
+
+`epochlog.fee_distributed` records what was actually paid, so it can be lower
+than the swept amount — and is `0` when no eligible batch operator existed at all,
+even though `drainrewards` swept the bucket to zero regardless.
 
 ## Retrieved via a claim action (pulled by recipient)
 

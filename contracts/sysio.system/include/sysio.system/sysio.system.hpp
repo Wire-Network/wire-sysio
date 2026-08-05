@@ -588,7 +588,8 @@ namespace sysiosystem {
           * the batch pool proportionally to each group's active-epoch count
           * over the period (groups that were active in zero epochs are
           * skipped, which can only happen when pay_cadence_epochs <
-          * batch_op_groups.size()).
+          * batch_op_groups.size(); skipping costs them nothing, since a
+          * zero count already weights their allocation to zero).
           *
           * Runtime conditions (config missing, treasury exhausted, balance
           * insufficient) are caught upstream by the gate, which records the

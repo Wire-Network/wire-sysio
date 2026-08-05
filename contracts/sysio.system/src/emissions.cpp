@@ -552,9 +552,11 @@ void system_contract::accrueepoch(uint32_t epoch_index,
 // emission share and weighted by the same per-group active-epoch count.
 // Producers are NOT paid out of swap fees, so producer_bps / batch_op_bps govern
 // the emission split only -- see the fold-in comment at the drain. Allocated is
-// not paid: only ELIGIBLE shares go out, and whatever is skipped (zero-epoch
-// groups, non-ACTIVE members, integer-division remainders) stays in this
-// treasury, exactly as undistributed emission does. Fees are funded by the sweep
+// not paid: only ELIGIBLE shares go out, and whatever is skipped stays in this
+// treasury, exactly as undistributed emission does. What is actually skipped is
+// listed at the batch-op loop below -- note a zero-epoch group is NOT one of
+// them, since its weighted allocation is zero to begin with.
+// Fees are funded by the sweep
 // (not the treasury) and so are excluded from total_distributed.
 //
 // Single-trx semantics guarantee gate conditions hold through this call;
@@ -626,9 +628,11 @@ void system_contract::payepoch(uint32_t epoch_index,
    //
    // Fees are funded by that transfer, NOT the T5 treasury, so fee payouts are
    // tracked in `fee_paid` and excluded from total_distributed (which governs
-   // the emission curve). Any fee not distributed (groups active in zero epochs,
-   // skipped slashed/terminated members, integer-division remainders) stays in
-   // this treasury, exactly as undistributed emission does.
+   // the emission curve). Any fee not distributed stays in this treasury, exactly
+   // as undistributed emission does — see the batch-op loop for what is actually
+   // retained (an EMPTY group holding positive epochs, non-ACTIVE members, the
+   // two integer divisions' remainders, or no groups at all). A group active in
+   // zero epochs retains NOTHING: its weighted allocation is already zero.
    const int64_t fee_total = get_reserv_rewards_balance();
    if (fee_total > 0) {
       sysio::action(
@@ -764,11 +768,20 @@ void system_contract::payepoch(uint32_t epoch_index,
    // Batch-op pay. With pay_cadence_epochs > 1 the active group can rotate
    // multiple times across a period, so each group's slice is weighted by
    // its active-epoch count (state.batch_group_epochs[g]) over the period.
-   // sum(batch_group_epochs) == pay_cadence_epochs by construction. Groups
-   // that were active in zero epochs are skipped (only possible when
-   // pay_cadence < batch_op_groups.size()); their slice stays in treasury.
-   // Members not registered as ACTIVE in sysio.opreg (slashed / terminated /
-   // unknown) are skipped and their slice remains in the treasury.
+   // sum(batch_group_epochs) == pay_cadence_epochs by construction, so the
+   // per-group weights partition the pool exactly.
+   //
+   // A group active in zero epochs is skipped, but that retains NOTHING: its
+   // weighted allocation is `pool * 0 / cadence` == 0, and because the counts sum
+   // to the cadence the remaining groups already absorb the whole pool. What
+   // ACTUALLY leaves WIRE behind in the treasury is:
+   //   * no groups at all (the enclosing `if` fails) — the entire pool;
+   //   * an EMPTY group that owns POSITIVE epochs — skipped by the `group.empty()`
+   //     test BEFORE the epoch check, so its weighted slice is never paid;
+   //   * a member not registered ACTIVE in sysio.opreg (slashed / terminated /
+   //     unknown) — that member's per-member slice;
+   //   * the remainders of the two integer divisions below (per-group weighting
+   //     and the even per-member split).
    // =======================================================================
    if (cfg.pay_cadence_epochs > 0 && !batch_op_groups.empty()) {
       for (size_t g = 0; g < batch_op_groups.size(); ++g) {

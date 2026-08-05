@@ -74,7 +74,15 @@ message TokenSpec {
   string                    symbol_name      = 3;
   // Free-form description / provenance note.
   string                    description      = 4;
-  // Decimal precision; convention is 9 across the depot frame.
+  // DEPOT-FRAME decimal precision, i.e. `min(native precision, 9)` — NOT the
+  // token's native precision. Valid range 1..9: `sysio.tokens::regtoken` rejects
+  // anything above MAX_TOKEN_PRECISION (9), so a higher value would pass config
+  // validation and then abort the irreversible bootstrap. A token whose native
+  // precision exceeds the frame (ETH at 18) declares the frame value here and is
+  // downscaled at the outpost boundary; the cap is what keeps every uint64/int64
+  // amount field in range. This value also supplies `regreserve`'s
+  // `source_token_precision` for any reserve pairing this token — see
+  // `ReserveSpec`.
   uint32                    precision        = 5;
   // Chain this token binds to — must reference a declared `ChainSpec.code`.
   string                    chain_code       = 6;
@@ -101,6 +109,12 @@ message ReserveSpec {
   string chain_code            = 2;
   // Token paired against WIRE — must reference a `TokenSpec` bound to
   // `chain_code`.
+  //
+  // That referenced spec ALSO supplies `regreserve`'s `source_token_precision`
+  // argument, which has no field of its own here: it is the paired token's
+  // depot-frame `TokenSpec.precision` (`min(native, 9)`). Resolve
+  // `(chain_code, token_code)` to its `TokenSpec` and pass that precision;
+  // `regreserve` rejects anything above 9 (`WIRE_PRECISION`).
   string token_code            = 3;
   // Human-readable display name.
   string name                  = 4;

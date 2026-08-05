@@ -247,8 +247,9 @@ namespace sysio {
       /// that carry an individual swap (the winning underwriter, whose share never
       /// enters this bucket, and the batch operators that relay it). Allocated is
       /// not the same as paid: payepoch pays only ELIGIBLE shares, and whatever it
-      /// skips (groups active in zero epochs, non-ACTIVE members, integer-division
-      /// remainders) stays in the treasury. Called
+      /// skips (no groups at all, an EMPTY group holding positive epochs,
+      /// non-ACTIVE members, or the remainders of its two integer divisions) stays
+      /// in the treasury. Called
       /// inline by payepoch with the amount it read from `rewardbal()`, so the
       /// swept WIRE lands in the treasury before payepoch's payout transfers
       /// execute (inline actions run depth-first, drain queued before payouts).
