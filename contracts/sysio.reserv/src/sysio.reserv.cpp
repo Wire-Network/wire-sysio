@@ -635,8 +635,8 @@ uint64_t reserve::rewardbal() {
 
 void reserve::drainrewards(int64_t amount) {
    // Only the system treasury (where sysio.system::payepoch runs) may sweep the
-   // rewards bucket. The swept WIRE is redistributed to producers + batch
-   // operators at the next pay-epoch.
+   // rewards bucket. The swept WIRE is paid entirely to batch operators at the
+   // next pay-epoch — producers are not paid out of swap fees.
    require_auth(TREASURY_ACCOUNT);
 
    // Internal treasury sweep: a non-positive amount means the caller's

@@ -218,16 +218,20 @@ namespace sysio {
                          sysio::slug_name to_token_code,
                          sysio::slug_name to_reserve_code);
 
-      /// Read-only: current rewards-bucket WIRE balance (the rewards half of
-      /// collected swap fees, held in this contract's custody until `drainrewards`
-      /// sweeps it to the emissions treasury for distribution).
+      /// Read-only: current rewards-bucket WIRE balance (the batch-operator share
+      /// of collected swap fees, held in this contract's custody until
+      /// `drainrewards` sweeps it to the emissions treasury for distribution to
+      /// batch operators).
       [[sysio::action, sysio::read_only]]
       uint64_t rewardbal();
 
       /// Auth = `sysio` (the emissions treasury / system account). Sweep `amount`
       /// WIRE of accrued swap-fee rewards out of this contract's custody to the
-      /// `sysio` treasury, where `sysio.system::payepoch` folds it into the
-      /// per-epoch compute distribution to producers + batch operators. Called
+      /// `sysio` treasury, where `sysio.system::payepoch` pays it ENTIRELY to
+      /// batch operators, on top of their emission share. Producers are not paid
+      /// out of swap fees — the fee compensates the parties that carry an
+      /// individual swap (the winning underwriter, whose share never enters this
+      /// bucket, and the batch operators that relay it). Called
       /// inline by payepoch with the amount it read from `rewardbal()`, so the
       /// swept WIRE lands in the treasury before payepoch's payout transfers
       /// execute (inline actions run depth-first, drain queued before payouts).
@@ -264,7 +268,8 @@ namespace sysio {
       ///   src: chain += src_amount, wire -= w_gross
       ///   dst: wire  += w_net,      chain -= dst_amount   (w_net = w_gross - fee)
       /// The fee is split 50/50 to `underwriter`'s claimable accrual / the
-      /// rewards bucket. Balances are checked BEFORE any mutation; a failed check
+      /// rewards pool (which reaches `rewards_bucket` less any configured
+      /// `fee_emissions_share_bps`). Balances are checked BEFORE any mutation; a failed check
       /// aborts the surrounding race-resolution transaction (no half-state). `Σ
       /// reserve_wire_amount` drops by the fee (which leaves the reserve pair but
       /// stays in this contract's custody).
@@ -289,7 +294,8 @@ namespace sysio {
       /// target reserve's WIRE-side liquidity:
       ///   dst: wire += w_net, chain -= dst_amount   (w_net = wire_in - fee)
       /// The fee is split 50/50 to `underwriter`'s claimable accrual / the
-      /// rewards bucket. The escrowed `wire_in` splits into that liquidity plus
+      /// rewards pool (which reaches `rewards_bucket` less any configured
+      /// `fee_emissions_share_bps`). The escrowed `wire_in` splits into that liquidity plus
       /// the routed fee, and every part stays in custody, so custody stays
       /// balanced.
       ///
@@ -310,7 +316,8 @@ namespace sysio {
       ///   src: chain += src_amount, wire -= (wire_out + fee)
       ///   inline sysio.token::transfer(sysio.reserv → recipient, wire_out)
       /// The fee is split 50/50 to `underwriter`'s claimable accrual / the
-      /// rewards bucket; the source reserve keeps any surplus when the user
+      /// rewards pool (which reaches `rewards_bucket` less any configured
+      /// `fee_emissions_share_bps`); the source reserve keeps any surplus when the user
       /// targeted below the post-fee quote. `Σ reserve_wire_amount` drops by
       /// `wire_out + fee`, but only `wire_out` leaves custody.
       ///

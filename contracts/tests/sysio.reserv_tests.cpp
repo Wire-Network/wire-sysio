@@ -1138,9 +1138,9 @@ BOOST_FIXTURE_TEST_CASE(applyswap_accrues_per_underwriter_and_accumulates, sysio
    BOOST_REQUIRE_EQUAL(before_other, get_uwfees(UNDERWRITER_ACCOUNT)["balance"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
-// ── drainrewards: sweep the accrued rewards half to the emissions treasury ──
+// ── drainrewards: sweep the accrued batch-operator share to the emissions treasury ──
 // payepoch (sysio.system) calls this inline to fold swap fees into the per-epoch
-// producer + batch-operator distribution.
+// batch-operator distribution.
 
 BOOST_FIXTURE_TEST_CASE(drainrewards_sweeps_bucket_to_treasury, sysio_reserve_tester) { try {
    // Seed the rewards bucket with a swap fee (same setup as the 50/50 routing test:
@@ -1277,11 +1277,12 @@ BOOST_FIXTURE_TEST_CASE(refundwire_returns_escrow, sysio_reserve_tester) { try {
    BOOST_REQUIRE(get_rewardbkt().is_null());   // no fee — nothing accrued
 } FC_LOG_AND_RETHROW() }
 
-// A nonzero revert fee (caller-fault drain revert) is taken out of the refund
-// and routed exactly like a settlement fee: rewards share into the bucket
-// (custody-internal), emissions share transferred to the treasury. Integer
-// split: 10% of 150 = 15 -> rewards floor(15/2) = 7, emissions 8; the shares
-// sum to the fee exactly.
+// A nonzero revert fee (caller-fault drain revert) is taken out of the refund and
+// routed exactly like a settlement fee, through `route_wire_fee`. Arithmetic here:
+// 10% of 150 = 15, and a revert has no winning underwriter, so the whole 15 is the
+// rewards pool. This fixture never calls `setconfig`, so `fee_emissions_share_bps`
+// is the default 0 and all 15 accrues to `rewards_bucket` — custody-internal, with
+// nothing transferred to the emissions treasury.
 BOOST_FIXTURE_TEST_CASE(refundwire_routes_revert_fee, sysio_reserve_tester) { try {
    BOOST_REQUIRE_EQUAL(success(),
       regreserve("ETH", "ETH", "PRIMARY", 1000, 1000));
@@ -1294,11 +1295,9 @@ BOOST_FIXTURE_TEST_CASE(refundwire_routes_revert_fee, sysio_reserve_tester) { tr
    BOOST_REQUIRE_EQUAL(135, wire_balance("alice"_n));            // 150 - 15 fee
    BOOST_REQUIRE_EQUAL(865, wire_balance(RESERVE_ACCOUNT));      // 1000 - 135; the fee stays in custody
 
-   // A revert has no winning underwriter, so the WHOLE revert fee becomes the
-   // rewards pool rather than being split with an underwriter. This fixture
-   // never calls `setconfig`, so `fee_emissions_share_bps` is the default 0 and
-   // that pool reaches the rewards bucket intact — a configured dial would
-   // divert its share to the emissions treasury instead.
+   // The whole fee, per the header: no underwriter share to carve out, and a
+   // zero emissions dial leaves the pool intact. A configured dial would divert
+   // its share to the emissions treasury instead.
    auto bkt = get_rewardbkt();
    BOOST_REQUIRE(!bkt.is_null());
    BOOST_REQUIRE_EQUAL(15u, bkt["balance"].as_uint64());
