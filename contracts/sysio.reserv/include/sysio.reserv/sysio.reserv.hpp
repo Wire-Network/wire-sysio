@@ -90,10 +90,14 @@ namespace sysio {
       static constexpr uint32_t FEE_SPLIT_TOTAL_BPS       = 10000;
 
       // Swap-fee split, stage 2 — the rewards pool's own division, GOVERNANCE
-      // CONFIGURABLE (`reserve_config.fee_emissions_share_bps`, seeded at
-      // bootstrap). This share of the pool is transferred to the `sysio`
-      // emissions treasury; the remainder accrues to `rewards_bucket` for batch
-      // operators via `sysio.system::payepoch`.
+      // CONFIGURABLE (`reserve_config.fee_emissions_share_bps`). This share of
+      // the pool is transferred to the `sysio` emissions treasury; the remainder
+      // accrues to `rewards_bucket` for batch operators via
+      // `sysio.system::payepoch`.
+      //
+      // Nothing seeds the `reservcfg` row: bootstrap does not write it, and every
+      // read goes through `get_or_default(reserve_config{})`, so the dial reads
+      // as zero until the self-authorized `setconfig` first persists a row.
       //
       // The DEFAULT IS ZERO: the whole pool reaches batch operators and no part
       // of a swap fee leaves this contract's custody at settlement. A non-zero
@@ -204,8 +208,16 @@ namespace sysio {
       /// Read-only swap quote. Prices `from_amount` of the source reserve into
       /// the destination reserve along the depot's live curve — the SAME
       /// weighted-Bancor math (each reserve's `connector_weight_bps`) and the
-      /// SAME post-fee reduction (`sysio.uwrit::fee_bps` out of the WIRE leg)
-      /// that settlement uses, so the quote equals what a swap would deliver.
+      /// SAME post-fee reduction that settlement uses, so the quote equals what a
+      /// swap would deliver.
+      ///
+      /// The fee priced here is the network fee (`sysio.uwrit::fee_bps`) PLUS
+      /// every participating non-WIRE leg's reserve `owner_fee_bps` — both sides
+      /// on a chain-to-chain swap, one side against a WIRE endpoint (a WIRE
+      /// endpoint has no reserve and charges no owner fee). Callers drive
+      /// ingestion and race-time variance checks off this value, so it must
+      /// account for every rate settlement will charge; a quote that priced only
+      /// `fee_bps` would drift from the books by each owner fee.
       /// Handles WIRE endpoints: a WIRE source/destination skips that leg's
       /// reserve (the depot IS the WIRE side). Returns 0 when a required reserve
       /// is missing or not ACTIVE (callers treat 0 as "no quote").
@@ -267,12 +279,17 @@ namespace sysio {
       /// — takes the swap fee out of that WIRE leg, then:
       ///   src: chain += src_amount, wire -= w_gross
       ///   dst: wire  += w_net,      chain -= dst_amount   (w_net = w_gross - fee)
-      /// The fee is split 50/50 to `underwriter`'s claimable accrual / the
-      /// rewards pool (which reaches `rewards_bucket` less any configured
-      /// `fee_emissions_share_bps`). Balances are checked BEFORE any mutation; a failed check
+      /// `fee` is the TOTAL taken off that leg: BOTH reserves' `owner_fee_bps`
+      /// (each accrued to its own reserve row's `owner_fee_accrued`) PLUS the
+      /// network fee. Only the NETWORK component is split 50/50 to
+      /// `underwriter`'s claimable accrual / the rewards pool — and any
+      /// configured `fee_emissions_share_bps` of that pool is TRANSFERRED to the
+      /// `sysio` treasury rather than accruing to `rewards_bucket`.
+      /// Balances are checked BEFORE any mutation; a failed check
       /// aborts the surrounding race-resolution transaction (no half-state). `Σ
-      /// reserve_wire_amount` drops by the fee (which leaves the reserve pair but
-      /// stays in this contract's custody).
+      /// reserve_wire_amount` drops by the whole fee; all of it stays in this
+      /// contract's custody as the three accruals EXCEPT that emissions share,
+      /// which is the only part that leaves.
       ///
       /// `underwriter` is the uwreq's winning underwriter, forwarded by
       /// `sysio.uwrit::try_select_winner`.
@@ -293,11 +310,14 @@ namespace sysio {
       /// the swap fee taken out of it; only the post-fee remainder becomes the
       /// target reserve's WIRE-side liquidity:
       ///   dst: wire += w_net, chain -= dst_amount   (w_net = wire_in - fee)
-      /// The fee is split 50/50 to `underwriter`'s claimable accrual / the
-      /// rewards pool (which reaches `rewards_bucket` less any configured
-      /// `fee_emissions_share_bps`). The escrowed `wire_in` splits into that liquidity plus
-      /// the routed fee, and every part stays in custody, so custody stays
-      /// balanced.
+      /// `fee` is the TOTAL taken off the leg: the DESTINATION reserve's
+      /// `owner_fee_bps` (accrued to that row; there is no source reserve) PLUS
+      /// the network fee. Only the NETWORK component is split 50/50 to
+      /// `underwriter`'s claimable accrual / the rewards pool, and any configured
+      /// `fee_emissions_share_bps` of that pool is TRANSFERRED to the `sysio`
+      /// treasury. The escrowed `wire_in` splits into the new liquidity plus the
+      /// routed fee; every part stays in custody except that emissions share, so
+      /// custody balances once it is accounted for.
       ///
       /// `underwriter` is the uwreq's winning underwriter, forwarded by
       /// `sysio.uwrit::try_select_winner`.
@@ -315,11 +335,15 @@ namespace sysio {
       /// weighted WIRE leg the source produces:
       ///   src: chain += src_amount, wire -= (wire_out + fee)
       ///   inline sysio.token::transfer(sysio.reserv → recipient, wire_out)
-      /// The fee is split 50/50 to `underwriter`'s claimable accrual / the
-      /// rewards pool (which reaches `rewards_bucket` less any configured
-      /// `fee_emissions_share_bps`); the source reserve keeps any surplus when the user
-      /// targeted below the post-fee quote. `Σ reserve_wire_amount` drops by
-      /// `wire_out + fee`, but only `wire_out` leaves custody.
+      /// `fee` is the TOTAL taken off the leg: the SOURCE reserve's
+      /// `owner_fee_bps` (accrued to that row; the recipient is paid in WIRE, so
+      /// there is no destination reserve) PLUS the network fee. Only the NETWORK
+      /// component is split 50/50 to `underwriter`'s claimable accrual / the
+      /// rewards pool, and any configured `fee_emissions_share_bps` of that pool
+      /// is TRANSFERRED to the `sysio` treasury. The source reserve keeps any
+      /// surplus when the user targeted below the post-fee quote. `Σ
+      /// reserve_wire_amount` drops by `wire_out + fee`; what leaves custody is
+      /// `wire_out` plus that emissions share, nothing else.
       ///
       /// `underwriter` is the uwreq's winning underwriter, forwarded by
       /// `sysio.uwrit::try_select_winner`.

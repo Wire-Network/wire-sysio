@@ -23,18 +23,31 @@ rate every swap is charged.
 
 ## Fees
 
-`uwconfig.fee_bps` (default 10 = 0.1%) is taken out of the **WIRE leg** of every
-swap, so it reduces what the recipient receives. `sysio.reserv` splits the
-collected fee **50/50**:
+`uwconfig.fee_bps` (default 10 = 0.1%) is the **network fee**, taken out of the
+**WIRE leg** of every swap. It is not the whole effective fee: each participating
+non-WIRE leg's reserve independently charges its own `owner_fee_bps`
+(`sysio.reserv::setrsvfee`, in `[MIN_OWNER_FEE_BPS, MAX_OWNER_FEE_BPS]` or zero).
+A chain-to-chain swap therefore pays two owner fees plus the network fee; a swap
+against a WIRE endpoint pays one plus the network fee. All of them come off the
+same WIRE leg, so together they reduce what the recipient receives.
 
-| Half | Recipient | Path |
+`sysio.reserv` routes each part as follows — the owner fees to their reserves,
+and the network fee through a **two-stage** split:
+
+| Part | Recipient | Path |
 |---|---|---|
-| 50% | The swap's **winning underwriter** | Accrues to `sysio.reserv::uwfees`; drawn by that account's own `sysio.reserv::claimuwfee` |
-| 50% | **Batch operators** | Accrues to `sysio.reserv::rewardbkt`; swept by `sysio.system::payepoch` into the batch-op distribution |
+| Each reserve's `owner_fee_bps` | That **reserve's owner** | Accrues to the reserve row's `owner_fee_accrued`; drawn by `sysio.reserv::claimrsvfee` |
+| 50% of the **network fee** | The swap's **winning underwriter** | Accrues to `sysio.reserv::uwfees`; drawn by that account's own `sysio.reserv::claimuwfee` |
+| The other 50% — the **rewards pool** — less `fee_emissions_share_bps` | **Batch operators** | Accrues to `sysio.reserv::rewardbkt`; swept by `sysio.system::payepoch` into the batch-op distribution |
+| `fee_emissions_share_bps` of the **rewards pool** | The `sysio` **emissions treasury** | Transferred out at settlement by `route_wire_fee` |
 
-Both halves stay in `sysio.reserv`'s WIRE custody until claimed or drained — no
-part of a swap fee reaches the emissions treasury, and producers are not paid
-out of swap fees. The split constant is `sysio.reserv::FEE_UNDERWRITER_SHARE_BPS`.
+The 50/50 network split is the fixed `sysio.reserv::FEE_UNDERWRITER_SHARE_BPS`;
+the stage-2 share is the governance dial `reserve_config.fee_emissions_share_bps`,
+which **defaults to zero**. At that default every part stays in `sysio.reserv`'s
+WIRE custody until claimed or drained and no part of a swap fee reaches the
+emissions treasury — but a non-zero dial diverts that share of the rewards pool
+to the treasury at settlement, so the custody statement holds only at the
+default. Producers are never paid out of swap fees at any setting.
 
 `uwconfig.fromwire_revert_fee_bps` is charged on the refunded escrow when a
 queued from-WIRE swap reverts at drain for a cause the caller controls

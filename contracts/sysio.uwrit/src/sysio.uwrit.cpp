@@ -695,7 +695,10 @@ void uwrit::setconfig(uint32_t fee_bps,
    // Reject a 100% (or higher) fee: it zeroes the post-fee WIRE leg
    // (`net == 0`), which let a swap debit destination reserve liquidity while
    // crediting zero WIRE (SEC-26 / WSA-042). MAX_FEE_BPS == 9999 keeps the
-   // remainder positive for every positive input.
+   // remainder positive for every positive input — for THIS rate alone. Reserve
+   // owner fees stack on the same leg under their own cap, so the total can
+   // still reach 100%; `sysio.reserv`'s settlement `net > 0` checks reject that
+   // configured combination.
    check(fee_bps <= MAX_FEE_BPS,
          "fee_bps must be below 10000 (100%): a 100% fee zeroes the post-fee WIRE leg");
    check(collateral_lock_duration_ms > 0,

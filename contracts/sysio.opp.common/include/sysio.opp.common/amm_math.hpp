@@ -210,13 +210,23 @@ struct wire_fee {
 /// wire_amount`, because every stage takes a REMAINDER rather than a second
 /// floored product. Computed in `u128` to avoid overflow.
 ///
-/// **Callers must check `net > 0`.** With enough stacked rates the total can
-/// reach or exceed the leg. When it does, `fee` is CLAMPED to `wire_amount` and
-/// `net` is 0 — so in THAT case alone the per-share fields sum to more than
-/// `fee`, which is harmless because the caller rejects the swap and no share is
-/// ever accrued. The settlement paths already assert this, and
-/// `sysio.reserv::setrsvfee` / `sysio.uwrit::setconfig` cap each rate so a
-/// realistic combination cannot get there.
+/// **Callers must check `net > 0`.** Stacked rates can reach or exceed the leg,
+/// and that is REACHABLE UNDER VALID CONFIGURATION rather than merely
+/// theoretical: the caps bound each rate INDEPENDENTLY, so a network fee at
+/// `sysio.uwrit::MAX_FEE_BPS` (9999) plus a single reserve owner fee at
+/// `sysio.reserv::MIN_OWNER_FEE_BPS` (1) already totals exactly 100%. A
+/// zero-`net` result is therefore an intentionally REJECTED CONFIGURATION that
+/// every caller must handle — not unreachable defense-in-depth.
+///
+/// When the total reaches the leg, `fee` is CLAMPED to `wire_amount` and `net`
+/// is 0 — so in THAT case alone the per-share fields sum to more than `fee`,
+/// which is harmless because no share is ever accrued: the swap is refused
+/// before any accrual. `quote_swap` returns 0 (no quote), and `applyswap` /
+/// `applyfromwire` / `refundwire` assert `net > 0` directly. `paywire` is the
+/// exception worth knowing: it pays the caller's `wire_out` target rather than
+/// `net`, so it never reads the field — it fails closed upstream on the zero
+/// quote, and locally on its `reserve_wire_amount >= wire_out + fee`
+/// sufficiency check.
 ///
 /// Paths with no winning underwriter (a revert refund) pass 0 for
 /// `underwriter_share_bps`, sending the whole network fee into the rewards pool.

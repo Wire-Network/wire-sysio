@@ -745,9 +745,12 @@ void reserve::applyswap(sysio::slug_name src_chain_code,
                                                 src_it->owner_fee_bps, dst_it->owner_fee_bps);
    // SEC-26 / WSA-042 settlement backstop: a zero post-fee WIRE leg credits no
    // WIRE to the destination reserve below while still debiting its chain side
-   // — draining it at an arbitrary price. `net == 0` is only reachable at a
-   // 100% fee, which `sysio.uwrit::setconfig` rejects (MAX_FEE_BPS), so this is
-   // unreachable defense-in-depth rather than a live path.
+   // — draining it at an arbitrary price. This is a LIVE path, not unreachable
+   // defense-in-depth: the caps bound each rate INDEPENDENTLY, so a network fee
+   // at `sysio.uwrit::MAX_FEE_BPS` (9999) plus either reserve's owner fee at
+   // MIN_OWNER_FEE_BPS (1) already totals 100%. Such a combination is an
+   // intentionally rejected configuration — refuse the swap here rather than
+   // settle it at an arbitrary price.
    sysio::check(fee.net > 0, "applyswap: zero post-fee WIRE would credit no destination liquidity");
    sysio::check(src_it->reserve_wire_amount >= w_gross,
                 "applyswap: insufficient source reserve WIRE for intermediate");
@@ -768,7 +771,10 @@ void reserve::applyswap(sysio::slug_name src_chain_code,
       accrue_owner_fee(row, fee.dst_reserve_share);
    });
 
-   // Route the fee — both halves stay in custody (underwriter accrual + bucket).
+   // Route the NETWORK component (the two owner shares already accrued to their
+   // reserve rows above): underwriter half to `uwfees`, rewards half to
+   // `rewards_bucket` — both custody-internal — except any configured
+   // `fee_emissions_share_bps`, the only part that leaves for the treasury.
    route_wire_fee(get_self(), fee, underwriter);
 }
 
@@ -802,7 +808,9 @@ void reserve::applyfromwire(sysio::slug_name dst_chain_code,
                                              /*src_reserve_fee_bps*/ 0, it->owner_fee_bps);
    // SEC-26 / WSA-042 settlement backstop — see applyswap. A zero post-fee WIRE
    // leg would debit the destination reserve below while crediting zero WIRE.
-   // Unreachable given `sysio.uwrit::setconfig`'s MAX_FEE_BPS cap.
+   // Reachable under valid configuration — the network fee at MAX_FEE_BPS (9999)
+   // plus this reserve's owner fee at MIN_OWNER_FEE_BPS (1) totals 100% — so
+   // this rejects a configured combination, not an impossible one.
    sysio::check(fee.net > 0, "applyfromwire: zero post-fee WIRE would credit no destination liquidity");
 
    tbl.modify(ram_payer, pk, [&](auto& row) {
@@ -856,10 +864,13 @@ void reserve::paywire(sysio::slug_name src_chain_code,
       accrue_owner_fee(row, fee.src_reserve_share);
    });
 
-   // Only `wire_out` leaves custody, to the recipient; the whole fee stays as
-   // the underwriter accrual + the rewards bucket. `Σ reserve_wire_amount` drops
-   // by `wire_out + fee` while the token balance drops by `wire_out` alone —
-   // the difference is exactly the two accumulators, preserving the invariant.
+   // `wire_out` goes to the recipient. The fee stays behind as three accruals —
+   // the source reserve's owner accrual (above), the underwriter accrual, and
+   // the rewards bucket — except any configured `fee_emissions_share_bps`, which
+   // `route_wire_fee` transfers to the treasury. `Σ reserve_wire_amount` drops by
+   // `wire_out + fee` while the token balance drops by `wire_out` plus that
+   // emissions share; the difference is exactly the accruals, preserving the
+   // invariant.
    action(
       permission_level{get_self(), "active"_n},
       TOKEN_ACCOUNT, "transfer"_n,
@@ -884,11 +895,15 @@ void reserve::refundwire(sysio::name recipient,
    // pool exactly as it does a settlement fee's: the whole revert fee lands in
    // the rewards bucket only under the default zero dial; a configured dial
    // diverts that share to the emissions treasury. Zero bps (no-fault refund)
-   // makes both the split and the routing no-ops. For any positive amount and a
-   // fee below 100%, floor division leaves `net >= 1`, so the backstop below is
-   // unreachable given `sysio.uwrit::setconfig`'s MAX_FEE_BPS cap — same
-   // defense-in-depth pattern as `applyswap`. It must hold: this action is
-   // inlined from the never-throw `drainfwq` drain.
+   // makes both the split and the routing no-ops.
+   //
+   // Unlike `applyswap` / `applyfromwire`, the backstop below really IS
+   // unreachable here, and for a reason specific to this path: a refund charges
+   // NO reserve owner fee (the trailing rates are left at 0), so the total is
+   // the network fee alone, which `sysio.uwrit::setconfig` caps at MAX_FEE_BPS
+   // (9999). Floor division then leaves `net >= 1` for any positive amount.
+   // There is no second rate to stack on top and reach 100%. It must hold: this
+   // action is inlined from the never-throw `drainfwq` drain.
    const auto fee = opp::amm::split_wire_fee(wire_amount, revert_fee_bps,
                                              /*underwriter_share_bps*/ 0,
                                              fee_emissions_share_bps(get_self()));
