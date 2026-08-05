@@ -3,6 +3,7 @@
 #include <sysio/chain/abi_serializer.hpp>
 #include <sysio/chain/kv_table_objects.hpp>
 #include <sysio/opp/opp.hpp>
+#include <sysio.opp.common/amm_math.hpp>
 
 #include <fc/variant_object.hpp>
 #include <fc/slug_name.hpp>
@@ -160,6 +161,26 @@ public:
       } catch (const fc::exception& ex) {
          return error(ex.top_message());
       }
+   }
+
+   /// `swapquote` is a read-only action whose ANSWER is its return value.
+   /// `push_action` above discards the transaction trace and yields only
+   /// `success()`, so a test written against it passes even when the quote
+   /// ignores every fee. Decode the action return value instead.
+   uint64_t swapquote_value(std::string_view from_chain, std::string_view from_token,
+                            std::string_view from_reserve, uint64_t from_amount,
+                            std::string_view to_chain, std::string_view to_token,
+                            std::string_view to_reserve) {
+      auto trace = tester::push_action(RESERVE_ACCOUNT, "swapquote"_n, RESERVE_ACCOUNT, mvo()
+         ("from_chain_code",   codename_mvo(from_chain))
+         ("from_token_code",   codename_mvo(from_token))
+         ("from_reserve_code", codename_mvo(from_reserve))
+         ("from_amount",       from_amount)
+         ("to_chain_code",     codename_mvo(to_chain))
+         ("to_token_code",     codename_mvo(to_token))
+         ("to_reserve_code",   codename_mvo(to_reserve)));
+      BOOST_REQUIRE(trace && !trace->action_traces.empty());
+      return fc::raw::unpack<uint64_t>(trace->action_traces[0].return_value);
    }
 
    // ── SlugName helpers (v6) ──
@@ -962,34 +983,61 @@ BOOST_FIXTURE_TEST_CASE(claimrsvfee_pays_owner_and_guards_auth, sysio_reserve_te
 BOOST_FIXTURE_TEST_CASE(swapquote_prices_the_reserve_owner_fees, sysio_reserve_tester) { try {
    // The read-only quote must price EXACTLY what settlement charges, reserve
    // fees included — otherwise the variance check drifts against the books.
-   BOOST_REQUIRE_EQUAL(success(),
-      regreserve("ETH", "ETH", "PRIMARY", 1'000'000'000'000ULL, 1'000'000'000'000ULL,
-                 5000, false, "alice"_n));
-   BOOST_REQUIRE_EQUAL(success(),
-      regreserve("SOLANA", "SOL", "PRIMARY", 1'000'000'000'000ULL, 1'000'000'000'000ULL,
-                 5000, false, UNDERWRITER_ACCOUNT));
+   // So this asserts the DECODED quote against the shared AMM kernel, not just
+   // that the action succeeded: a quote that ignored `owner_fee_bps` entirely
+   // would still return success.
+   constexpr uint64_t POOL      = 1'000'000'000'000ULL;
+   constexpr uint32_t WEIGHT    = 5000;
+   constexpr uint64_t FROM      = 1'000'000'000ULL;
+   constexpr uint32_t OWNER_FEE = 500;   // 5%, charged by EACH side's reserve
+   // `sysio.uwrit` exists as a bare account in this fixture (no contract), so
+   // the contract's `uwrit_fee_bps()` reads the `uw_config{}` in-struct default.
+   constexpr uint32_t NETWORK_FEE_BPS = 10;
 
-   auto quote = [&]() {
-      return push_action(RESERVE_ACCOUNT, "swapquote"_n, mvo()
-         ("from_chain_code",   codename_mvo("ETH"))
-         ("from_token_code",   codename_mvo("ETH"))
-         ("from_reserve_code", codename_mvo("PRIMARY"))
-         ("from_amount",       1'000'000'000ULL)
-         ("to_chain_code",     codename_mvo("SOLANA"))
-         ("to_token_code",     codename_mvo("SOL"))
-         ("to_reserve_code",   codename_mvo("PRIMARY")));
+   BOOST_REQUIRE_EQUAL(success(),
+      regreserve("ETH", "ETH", "PRIMARY", POOL, POOL, WEIGHT, false, "alice"_n));
+   BOOST_REQUIRE_EQUAL(success(),
+      regreserve("SOLANA", "SOL", "PRIMARY", POOL, POOL, WEIGHT, false, UNDERWRITER_ACCOUNT));
+
+   /// The kernel's answer for these pools at a given pair of reserve fees.
+   auto expected = [&](uint32_t src_fee, uint32_t dst_fee) {
+      return opp::amm::quote_swap(/*src_is_wire*/false, POOL, POOL, WEIGHT,
+                                  /*dst_is_wire*/false, POOL, POOL, WEIGHT,
+                                  FROM, NETWORK_FEE_BPS, src_fee, dst_fee);
    };
-   BOOST_REQUIRE_EQUAL(success(), quote());
 
-   // Adding reserve fees must strictly reduce the quoted output.
+   // Fee-free baseline: network fee only.
+   const uint64_t before = swapquote_value("ETH", "ETH", "PRIMARY", FROM,
+                                           "SOLANA", "SOL", "PRIMARY");
+   BOOST_REQUIRE_GT(before, 0u);
+   BOOST_CHECK_EQUAL(before, expected(0, 0));
+
    BOOST_REQUIRE_EQUAL(success(), push_action("alice"_n, "setrsvfee"_n, mvo()
       ("chain_code", codename_mvo("ETH"))("token_code", codename_mvo("ETH"))
-      ("reserve_code", codename_mvo("PRIMARY"))("owner_fee_bps", 500)));
+      ("reserve_code", codename_mvo("PRIMARY"))("owner_fee_bps", OWNER_FEE)));
    BOOST_REQUIRE_EQUAL(success(), push_action(UNDERWRITER_ACCOUNT, "setrsvfee"_n, mvo()
       ("chain_code", codename_mvo("SOLANA"))("token_code", codename_mvo("SOL"))
-      ("reserve_code", codename_mvo("PRIMARY"))("owner_fee_bps", 500)));
+      ("reserve_code", codename_mvo("PRIMARY"))("owner_fee_bps", OWNER_FEE)));
    produce_block();
-   BOOST_REQUIRE_EQUAL(success(), quote());
+
+   // Both owner fees are now priced in, off the same gross WIRE leg.
+   const uint64_t after = swapquote_value("ETH", "ETH", "PRIMARY", FROM,
+                                          "SOLANA", "SOL", "PRIMARY");
+   BOOST_CHECK_EQUAL(after, expected(OWNER_FEE, OWNER_FEE));
+   BOOST_CHECK_LT(after, before);   // the claim this case exists to prove
+
+   // Each side is priced INDEPENDENTLY — clearing one must move the quote back
+   // by only that side's share, which a quote summing the wrong reserve's rate
+   // (or double-counting one) would not reproduce.
+   BOOST_REQUIRE_EQUAL(success(), push_action(UNDERWRITER_ACCOUNT, "setrsvfee"_n, mvo()
+      ("chain_code", codename_mvo("SOLANA"))("token_code", codename_mvo("SOL"))
+      ("reserve_code", codename_mvo("PRIMARY"))("owner_fee_bps", 0)));
+   produce_block();
+   const uint64_t source_only = swapquote_value("ETH", "ETH", "PRIMARY", FROM,
+                                                "SOLANA", "SOL", "PRIMARY");
+   BOOST_CHECK_EQUAL(source_only, expected(OWNER_FEE, 0));
+   BOOST_CHECK_LT(source_only, before);
+   BOOST_CHECK_GT(source_only, after);
 } FC_LOG_AND_RETHROW() }
 
 // ── Underwriter fee accrual + owner-authenticated claim ──

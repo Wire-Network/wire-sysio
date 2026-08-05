@@ -53,8 +53,15 @@ constexpr sysio::slug_name WIRE_TOKEN = "WIRE"_s;
 /// inside the consensus dispatch chain (applyswap / applyfromwire / paywire inline from
 /// uwrit::try_select_winner). A raw `+=` could wrap the uint64 and corrupt the
 /// weighted-AMM curve and the `>=` sufficiency checks; cap at UINT64_MAX instead — never wrap,
-/// never throw on the consensus path. The cap is unreachable for any real token amount. Delegates
-/// to the shared `sysio::opp::safe::add_sat_u64` so the never-wrap rule lives in one place.
+/// never throw on the consensus path. Delegates to the shared
+/// `sysio::opp::safe::add_sat_u64` so the never-wrap rule lives in one place.
+///
+/// The cap is unreachable for any real BALANCE — a balance is bounded by what is
+/// actually in custody. That reasoning does NOT carry to the monotonic
+/// `lifetime_*` audit counters this helper also credits: those are unbounded
+/// running totals and CAN saturate, which is documented at each field
+/// (`reserve_row::owner_fee_lifetime`, `uw_fee_row::lifetime_*`). Saturation
+/// there truncates audit history only — never a balance, never a payout.
 inline void add_capped_u64(uint64_t& balance, uint64_t amt) {
    balance = sysio::opp::safe::add_sat_u64(balance, amt);
 }

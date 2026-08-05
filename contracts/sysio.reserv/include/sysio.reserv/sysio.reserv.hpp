@@ -480,8 +480,17 @@ namespace sysio {
          /// this contract's custody until the owner calls `claimrsvfee`. Part of
          /// the custody invariant documented on `rewards_bucket`.
          uint64_t                    owner_fee_accrued      = 0;
-         /// Audit total: every WIRE this reserve has EVER earned from
-         /// `owner_fee_bps`. Monotonic — never decremented by a claim.
+         /// Audit total: WIRE this reserve has earned from `owner_fee_bps`.
+         /// Monotonic — never decremented by a claim.
+         ///
+         /// SATURATES at `UINT64_MAX` (~18.45e9 WIRE at 9dp) rather than
+         /// wrapping. Unlike `owner_fee_accrued` — a balance, bounded by what is
+         /// actually in custody — this is an unbounded running total, so the
+         /// ceiling is reachable in principle: it needs roughly 370 turnovers of
+         /// the entire launch supply through THIS ONE reserve at a 5% owner fee
+         /// (~19 at the 99% maximum). Past that the counter stops advancing
+         /// while accrual and claims continue to work normally; only the audit
+         /// history is truncated, never a balance.
          uint64_t                    owner_fee_lifetime     = 0;
 
          uint128_t by_chain_token() const {
@@ -546,11 +555,17 @@ namespace sysio {
       /// `balance` is unclaimed WIRE. `lifetime_accrued` / `lifetime_claimed`
       /// are monotonic audit totals; a row is created on first accrual and
       /// RETAINED at zero balance after a claim so the audit trail survives.
+      /// The two `lifetime_*` counters SATURATE at `UINT64_MAX` (~18.45e9 WIRE
+      /// at 9dp) rather than wrapping — see `reserve_row::owner_fee_lifetime`
+      /// for the reachability arithmetic. They are unbounded running totals, so
+      /// unlike `balance` (bounded by custody) the ceiling is reachable in
+      /// principle; past it the audit history is truncated while accrual and
+      /// `claimuwfee` continue to work normally.
       struct [[sysio::table("uwfees")]] uw_fee_row {
          sysio::name underwriter;
          uint64_t    balance          = 0;   // unclaimed WIRE held in custody
-         uint64_t    lifetime_accrued = 0;   // audit: total WIRE ever accrued
-         uint64_t    lifetime_claimed = 0;   // audit: total WIRE ever paid out
+         uint64_t    lifetime_accrued = 0;   // audit: WIRE accrued (saturating)
+         uint64_t    lifetime_claimed = 0;   // audit: WIRE paid out (saturating)
          SYSLIB_SERIALIZE(uw_fee_row, (underwriter)(balance)(lifetime_accrued)(lifetime_claimed))
       };
       using uwfees_t = sysio::kv::table<"uwfees"_n, uw_fee_key, uw_fee_row>;
