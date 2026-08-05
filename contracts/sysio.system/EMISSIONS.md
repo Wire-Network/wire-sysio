@@ -51,8 +51,14 @@ at all**, when an **empty group owns positive active epochs** (its weighted slic
 is skipped), when a **member is not opreg-ACTIVE**, or as the **remainder** of the
 two integer divisions (per-group weighting, then the even per-member split). A
 group active in **zero** epochs is *not* one of these cases — its weighted
-allocation is already zero, and because the per-group counts sum to the cadence
-the remaining groups absorb the whole pool.
+allocation is already zero, and because the per-group counts sum to the **actual
+accrued-epoch divisor** the remaining groups absorb the whole pool.
+
+That divisor is the sum of the per-group counters, **not** the configured
+`pay_cadence_epochs`. The two can differ — a mid-period `setemitcfg` cadence
+change, or the shortened genesis period — and normalizing by the configured value
+is what caused a payout to be multiplied. Deriving it from the counters is what
+makes the weights partition each pool by construction.
 
 `epochlog.fee_distributed` records what was actually paid, so it can be lower
 than the swept amount — and is `0` when no eligible batch operator existed at all,

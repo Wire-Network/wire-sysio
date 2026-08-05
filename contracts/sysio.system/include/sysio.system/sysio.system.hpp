@@ -586,10 +586,13 @@ namespace sysiosystem {
           * `batch_op_groups` is the full state.batch_op_groups vector from
           * sysio.epoch; payepoch reads t5state.batch_group_epochs to weight
           * the batch pool proportionally to each group's active-epoch count
-          * over the period (groups that were active in zero epochs are
-          * skipped, which can only happen when pay_cadence_epochs <
-          * batch_op_groups.size(); skipping costs them nothing, since a
-          * zero count already weights their allocation to zero).
+          * over the period, normalized by the ACTUAL accrued-epoch count (the
+          * sum of those counters) rather than the configured
+          * pay_cadence_epochs, which a mid-period setemitcfg change or the
+          * shortened genesis period can make disagree. Groups active in zero
+          * epochs are skipped, which happens whenever the accrued count is
+          * smaller than batch_op_groups.size(); skipping costs them nothing,
+          * since a zero count already weights their allocation to zero.
           *
           * Runtime conditions (config missing, treasury exhausted, balance
           * insufficient) are caught upstream by the gate, which records the
