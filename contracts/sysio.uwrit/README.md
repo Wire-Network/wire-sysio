@@ -39,7 +39,9 @@ out of swap fees. The split constant is `sysio.reserv::FEE_UNDERWRITER_SHARE_BPS
 `uwconfig.fromwire_revert_fee_bps` is charged on the refunded escrow when a
 queued from-WIRE swap reverts at drain for a cause the caller controls
 (unpriceable target, variance tolerance exceeded). A revert has no winning
-underwriter, so the whole revert fee goes to the rewards bucket. Reverts caused
+underwriter, so the whole revert fee becomes the rewards pool — reaching the
+rewards bucket in full under the default zero `fee_emissions_share_bps`, less the
+configured emissions share when that dial is set. Reverts caused
 by system state changes after enqueue (reserve deactivated, flipped private,
 chain deregistered) refund in full.
 

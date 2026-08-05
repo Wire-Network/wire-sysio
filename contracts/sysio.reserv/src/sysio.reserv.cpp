@@ -880,12 +880,15 @@ void reserve::refundwire(sysio::name recipient,
    // Caller-fault revert fee, routed through the same path as a settlement fee.
    // A revert has NO winning underwriter — no collateral was locked for a swap
    // that never settled — so the underwriter share is zero and the whole revert
-   // fee lands in the rewards bucket. Zero bps (no-fault refund) makes both the
-   // split and the routing no-ops. For any positive amount and a fee below 100%,
-   // floor division leaves `net >= 1`, so the backstop below is unreachable
-   // given `sysio.uwrit::setconfig`'s MAX_FEE_BPS cap — same defense-in-depth
-   // pattern as `applyswap`. It must hold: this action is inlined from the
-   // never-throw `drainfwq` drain.
+   // fee becomes the rewards POOL. `fee_emissions_share_bps` then splits that
+   // pool exactly as it does a settlement fee's: the whole revert fee lands in
+   // the rewards bucket only under the default zero dial; a configured dial
+   // diverts that share to the emissions treasury. Zero bps (no-fault refund)
+   // makes both the split and the routing no-ops. For any positive amount and a
+   // fee below 100%, floor division leaves `net >= 1`, so the backstop below is
+   // unreachable given `sysio.uwrit::setconfig`'s MAX_FEE_BPS cap — same
+   // defense-in-depth pattern as `applyswap`. It must hold: this action is
+   // inlined from the never-throw `drainfwq` drain.
    const auto fee = opp::amm::split_wire_fee(wire_amount, revert_fee_bps,
                                              /*underwriter_share_bps*/ 0,
                                              fee_emissions_share_bps(get_self()));

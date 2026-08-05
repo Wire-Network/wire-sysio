@@ -334,8 +334,12 @@ namespace sysio {
       /// `revert_fee_bps` is the caller-fault revert fee: the recipient gets
       /// `wire_amount` minus the fee, and the fee routes through the standard
       /// `route_wire_fee` path. A revert has no winning underwriter — nobody
-      /// locked collateral for a swap that never settled — so the whole revert
-      /// fee goes to the rewards bucket (zero underwriter share). Pass 0 for
+      /// locked collateral for a swap that never settled — so the underwriter
+      /// share is zero and the WHOLE revert fee becomes the rewards POOL. That
+      /// pool is then split by `fee_emissions_share_bps` exactly like a
+      /// settlement fee's: under the default zero dial the entire revert fee
+      /// accrues to `rewards_bucket`, and with a configured dial that share is
+      /// transferred to the `sysio` emissions treasury instead. Pass 0 for
       /// no-fault refunds (whole fee path no-ops). Callers keep it below 100%
       /// (`sysio.uwrit::MAX_FEE_BPS`) so the post-fee refund transfer stays
       /// positive.

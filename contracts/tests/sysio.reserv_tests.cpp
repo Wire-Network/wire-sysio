@@ -1294,8 +1294,11 @@ BOOST_FIXTURE_TEST_CASE(refundwire_routes_revert_fee, sysio_reserve_tester) { tr
    BOOST_REQUIRE_EQUAL(135, wire_balance("alice"_n));            // 150 - 15 fee
    BOOST_REQUIRE_EQUAL(865, wire_balance(RESERVE_ACCOUNT));      // 1000 - 135; the fee stays in custody
 
-   // A revert has no winning underwriter, so the WHOLE revert fee goes to the
-   // rewards bucket rather than being split.
+   // A revert has no winning underwriter, so the WHOLE revert fee becomes the
+   // rewards pool rather than being split with an underwriter. This fixture
+   // never calls `setconfig`, so `fee_emissions_share_bps` is the default 0 and
+   // that pool reaches the rewards bucket intact — a configured dial would
+   // divert its share to the emissions treasury instead.
    auto bkt = get_rewardbkt();
    BOOST_REQUIRE(!bkt.is_null());
    BOOST_REQUIRE_EQUAL(15u, bkt["balance"].as_uint64());

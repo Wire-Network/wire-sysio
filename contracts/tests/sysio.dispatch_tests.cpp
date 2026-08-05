@@ -2580,7 +2580,9 @@ BOOST_FIXTURE_TEST_CASE(drainfwq_charges_revert_fee_on_caller_fault, sysio_dispa
    constexpr uint32_t REVERT_FEE_BPS      = 100;              // 1%
    constexpr uint64_t FEE                 = ESCROW * REVERT_FEE_BPS / 10000ull; // 0.05 WIRE
    // A revert has no winning underwriter, so `refundwire` passes a zero underwriter share and
-   // the WHOLE fee lands in the reserv rewards bucket (batch operators).
+   // the WHOLE fee becomes the rewards pool. reserv's `fee_emissions_share_bps` is never set
+   // here (the default 0), so that pool lands in the rewards bucket intact (batch operators);
+   // a configured dial would divert its share to the emissions treasury.
    constexpr uint64_t REWARD_SHARE        = FEE;
    constexpr uint64_t DEPOT_ORIGIN_ID_0   = 0x8000000000000000ull;
    const auto WIRE_SYM = symbol(9, "WIRE");

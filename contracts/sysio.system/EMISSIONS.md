@@ -40,8 +40,10 @@ group pool divided by the full group size). A transfer is sent only to members
 that are opreg-ACTIVE, so the slices of skipped (inactive / slashed / terminated)
 members stay in the treasury rather than being redistributed to the active
 ones. Swap-fee rewards from `sysio.reserv`'s `rewards_bucket` are swept in
-(`drainrewards`) and folded into the same compute distribution on top of
-emissions, split by the same `producer_bps` / `batch_op_bps`.
+(`drainrewards`) and paid out entirely to batch operators, on top of their
+emission share and weighted by that same per-group active-epoch count. Producers
+are not paid out of swap fees, so `producer_bps` / `batch_op_bps` govern the
+emission split only.
 
 ## Retrieved via a claim action (pulled by recipient)
 

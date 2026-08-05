@@ -54,7 +54,7 @@ constexpr sysio::name CAPEX_OPERATIONS_ACCOUNT   = "sysio.ops"_n;
 constexpr sysio::name TOKEN_CONTRACT             = "sysio.token"_n;
 constexpr sysio::name ROA_CONTRACT               = "sysio.roa"_n;
 // sysio.reserv holds the swap-fee rewards bucket that payepoch folds into the
-// per-epoch compute distribution.
+// per-epoch batch-operator distribution.
 constexpr sysio::name RESERV_CONTRACT            = "sysio.reserv"_n;
 
 namespace memo {
@@ -546,10 +546,12 @@ void system_contract::accrueepoch(uint32_t epoch_index,
 // dclaim has funds the moment a claim is credited rather than at the next
 // pay-epoch.
 //
-// Swap-fee rewards: the rewards half of collected swap fees (sysio.reserv's
-// rewards_bucket) is swept here via an inline drainrewards and folded into the
-// compute distribution -- producers + batch operators receive it alongside
-// emissions, split by the same producer_bps / batch_op_bps. Fees are funded by
+// Swap-fee rewards: the batch-operator share of collected swap fees
+// (sysio.reserv's rewards_bucket) is swept here via an inline drainrewards and
+// paid out ENTIRELY to batch operators, on top of their emission share and
+// weighted by the same per-group active-epoch count. Producers are NOT paid out
+// of swap fees, so producer_bps / batch_op_bps govern the emission split only --
+// see the fold-in comment at the drain for the reasoning. Fees are funded by
 // the sweep (not the treasury) and so are excluded from total_distributed.
 //
 // Single-trx semantics guarantee gate conditions hold through this call;
@@ -598,9 +600,12 @@ void system_contract::payepoch(uint32_t epoch_index,
    // The BATCH-OPERATOR half of collected swap fees accrues in sysio.reserv's
    // rewards_bucket. The other half accrues per-underwriter in sysio.reserv and
    // is drawn by that account's own `claimuwfee` — it never passes through this
-   // treasury. Fold the whole bucket into THIS period's batch-operator
-   // distribution so batch ops receive it alongside emissions, weighted
-   // identically by active-epoch count.
+   // treasury. (When reserv's `fee_emissions_share_bps` dial is non-zero, that
+   // configured share of the batch-op half is transferred straight to this
+   // account at collection time and never enters the bucket; the dial defaults
+   // to zero, leaving the whole half here.) Fold the whole bucket into THIS
+   // period's batch-operator distribution so batch ops receive it alongside
+   // emissions, weighted identically by active-epoch count.
    //
    // Producers are NOT paid out of swap fees: the fee compensates the parties
    // that carry an individual swap — the underwriter who locks collateral for it

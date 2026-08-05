@@ -3207,12 +3207,13 @@ BOOST_FIXTURE_TEST_CASE( single_active_producer_full_active_share, sysio_emissio
 } FC_LOG_AND_RETHROW()
 
 // Swap-fee rewards (sysio.reserv rewards_bucket) are folded into payepoch's
-// compute distribution: producers + batch operators receive them on top of
-// emissions, split by producer_bps / batch_op_bps. End-to-end: deploy reserv,
+// BATCH-OPERATOR distribution only: batch ops receive them on top of their
+// emission share, and producers receive none of them (producer_bps /
+// batch_op_bps govern the emission split alone). End-to-end: deploy reserv,
 // seed the bucket with a real swap fee, advance to the (cadence-1) pay-epoch,
-// and verify the single producer is paid producer_pool + its fee share, the
-// bucket is swept to 0, the fee is NOT counted against the emission treasury,
-// and the audit log records it.
+// and verify the single producer is paid its emission producer_pool and NOTHING
+// more, the bucket is swept to 0 regardless, and the fee is NOT counted against
+// the emission treasury.
 BOOST_FIXTURE_TEST_CASE( payepoch_folds_swap_fee_rewards, sysio_emissions_tester ) try {
    const account_name RESERV = "sysio.reserv"_n;
    const account_name UWRIT  = "sysio.uwrit"_n;
