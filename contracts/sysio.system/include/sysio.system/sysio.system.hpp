@@ -615,9 +615,9 @@ namespace sysiosystem {
           * and bumps t5state.batch_group_epochs[batch_group_index] by 1, so
           * the next payepoch sees the period total + per-group counts.
           *
-          * Because it also runs on the pay epoch, the counter sum payepoch
-          * normalizes by INCLUDES the epoch being paid. Reading this as
-          * "non-pay epochs only" understates that sum by one and is how the
+          * Because it also runs on the pay epoch, the counter sum that
+          * `payepoch` normalizes by includes the epoch being paid. Reading this
+          * as "non-pay epochs only" understates that sum by one and is how the
           * configured-cadence divisor came to look correct.
           *
           * No transfers happen here. Treasury / balance gating is the
