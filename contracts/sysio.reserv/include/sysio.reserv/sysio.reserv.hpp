@@ -99,9 +99,11 @@ namespace sysio {
       // read goes through `get_or_default(reserve_config{})`, so the dial reads
       // as zero until the self-authorized `setconfig` first persists a row.
       //
-      // The DEFAULT IS ZERO: the whole pool reaches batch operators and no part
-      // of a swap fee leaves this contract's custody at settlement. A non-zero
-      // share re-opens a treasury inflow without touching the underwriter half.
+      // The DEFAULT IS ZERO: the whole pool is allocated to the batch-operator
+      // distribution and no part of a swap fee leaves this contract's custody at
+      // settlement. (`payepoch` then pays only eligible shares — see
+      // `drainrewards`.) A non-zero share re-opens a treasury inflow without
+      // touching the underwriter half.
       static constexpr uint32_t DEFAULT_FEE_EMISSIONS_SHARE_BPS = 0;
 
       // Reserve OWNER fee bounds (WIRE-281). A reserve's owner fee is a second,
@@ -239,18 +241,22 @@ namespace sysio {
 
       /// Auth = `sysio` (the emissions treasury / system account). Sweep `amount`
       /// WIRE of accrued swap-fee rewards out of this contract's custody to the
-      /// `sysio` treasury, where `sysio.system::payepoch` pays it ENTIRELY to
-      /// batch operators, on top of their emission share. Producers are not paid
-      /// out of swap fees — the fee compensates the parties that carry an
-      /// individual swap (the winning underwriter, whose share never enters this
-      /// bucket, and the batch operators that relay it). Called
+      /// `sysio` treasury, where `sysio.system::payepoch` allocates it EXCLUSIVELY
+      /// to the batch-operator distribution, on top of their emission share.
+      /// Producers are not paid out of swap fees — the fee compensates the parties
+      /// that carry an individual swap (the winning underwriter, whose share never
+      /// enters this bucket, and the batch operators that relay it). Allocated is
+      /// not the same as paid: payepoch pays only ELIGIBLE shares, and whatever it
+      /// skips (groups active in zero epochs, non-ACTIVE members, integer-division
+      /// remainders) stays in the treasury. Called
       /// inline by payepoch with the amount it read from `rewardbal()`, so the
       /// swept WIRE lands in the treasury before payepoch's payout transfers
       /// execute (inline actions run depth-first, drain queued before payouts).
       ///
       /// Decrements `rewards_bucket.balance` by `amount`; `lifetime_accrued`
-      /// (an audit total) is left untouched. `amount <= 0` is a defensive no-op;
-      /// `amount` exceeding the live balance throws (a bug in the caller).
+      /// (an audit total) is left untouched. A non-positive `amount` is REJECTED
+      /// (throws — an internal sweep asking for <= 0 is a caller bug, not a
+      /// no-op), as is an `amount` exceeding the live balance.
       [[sysio::action]]
       void drainrewards(int64_t amount);
 
@@ -384,9 +390,10 @@ namespace sysio {
       ///   * `fee_emissions_share_bps` — the share of each fee's REWARDS POOL
       ///     (the half left after the winning underwriter's cut) transferred to
       ///     the `sysio` emissions treasury; the remainder accrues to
-      ///     `rewards_bucket` for batch operators. 0 (the default) sends the
-      ///     whole pool to batch operators and keeps every fee inside this
-      ///     contract's custody at settlement. Capped at `FEE_SPLIT_TOTAL_BPS`.
+      ///     `rewards_bucket` for batch operators. 0 (the default) allocates the
+      ///     whole pool to the batch-operator distribution and keeps every fee
+      ///     inside this contract's custody at settlement. Capped at
+      ///     `FEE_SPLIT_TOTAL_BPS`.
       [[sysio::action]]
       void setconfig(uint32_t fee_emissions_share_bps);
 

@@ -71,7 +71,7 @@ lifecycle fields that are outputs. A hand-authored config wants the opposite:
 | `ChainSpec` | `sysio.chains::regchain(kind, code, external_chain_id, name, description)` |
 | `TokenSpec` | `sysio.tokens::regtoken(kind, code, symbol_name, description, precision, address)` then `sysio.tokens::regctok(chain_code, token_code, contract_addr, is_native)` |
 | `ReserveSpec` | `sysio.reserv::regreserve(chain_code, token_code, reserve_code, name, description, initial_chain_amount, initial_wire_amount, connector_weight_bps, is_private, owner)` |
-| `UwritConfig` | `sysio.uwrit::setconfig(fee_bps, collateral_lock_duration_ms)` |
+| `UwritConfig` | `sysio.uwrit::setconfig(fee_bps, collateral_lock_duration_ms, min_fromwire_amount, fromwire_revert_fee_bps, uwreq_pending_timeout_epochs, uwreq_retention_epochs)` — the spec pins the first two; the caller supplies the rest (see below) |
 | `t5_reserve_allocation` | none — feeds the `setemitcfg` arithmetic below |
 | `t5_dex_allocation` | none yet — reserved earmark; carved out of T5 alongside `t5_reserve_allocation` once the DEX-seeding path lands |
 
@@ -79,6 +79,23 @@ The `regreserve` signature (with `is_private` + `owner`) and the ms-based
 `setconfig` are the reserve-and-swap-beta surface; this config slots directly
 onto them. `owner` is a WIRE account name (`sysio::name`): empty for public
 reserves, the owning account for private ones.
+
+`UwritConfig` carries only `fee_bps` and `collateral_lock_duration_ms`, while
+`setconfig` takes six arguments. The remaining four —
+`min_fromwire_amount`, `fromwire_revert_fee_bps`, `uwreq_pending_timeout_epochs`,
+`uwreq_retention_epochs` — are **not part of this spec**: a bootstrap caller
+passes the contract's `uw_config` in-struct defaults (5 WIRE floor, 500 bps
+revert fee, and the two uwreq lifecycle windows) unless it has a reason to
+override them.
+
+`fee_bps` is the **network** fee and not the whole effective swap fee. Each
+participating non-WIRE leg's reserve independently charges its own
+`owner_fee_bps` off the same WIRE leg; that rate is **not** in `ReserveSpec` and
+is set post-bootstrap via `sysio.reserv::setrsvfee`. The network fee itself
+splits 50/50 between the winning underwriter and a rewards pool
+(`sysio.reserv::FEE_UNDERWRITER_SHARE_BPS`), and that pool splits again by the
+optional `reservcfg` dial `fee_emissions_share_bps` — which nothing seeds, so it
+reads zero until `sysio.reserv::setconfig` first persists a row.
 
 ## T5 reserve earmark
 

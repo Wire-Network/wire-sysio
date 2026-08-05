@@ -241,10 +241,11 @@ namespace sysio {
       ///     pool then splits again by `reserve_config.fee_emissions_share_bps`:
       ///     that share is transferred to the `sysio` emissions treasury and the
       ///     remainder accrues to the rewards bucket, which
-      ///     `sysio.system::payepoch` pays out to batch operators. The dial
-      ///     defaults to zero, so by default the whole pool reaches batch
-      ///     operators and no part of a fee leaves `sysio.reserv`'s custody at
-      ///     settlement.
+      ///     `sysio.system::payepoch` allocates to the batch-operator
+      ///     distribution (paying only eligible shares; the rest stays in the
+      ///     treasury). The dial defaults to zero, so by default the whole pool
+      ///     is allocated to batch operators and no part of a fee leaves
+      ///     `sysio.reserv`'s custody at settlement.
       ///   * `collateral_lock_duration_ms` — wall-clock milliseconds after
       ///     `lock_entry.created_at_ms` that the lock auto-expires (swept by
       ///     `sysio.epoch::advance -> chklocks`). This is the challenge

@@ -176,7 +176,8 @@ BOOST_AUTO_TEST_CASE(split_wire_fee_boundaries) {
 
 /// Stage 2 of the split: `emissions_share_bps` divides the REWARDS POOL (what is
 /// left after the underwriter's cut), not the whole fee. The default is 0 — the
-/// whole pool reaches batch operators and no fee leaves `sysio.reserv` custody.
+/// whole pool is allocated to the batch-operator distribution and no fee leaves
+/// `sysio.reserv` custody.
 BOOST_AUTO_TEST_CASE(split_wire_fee_emissions_share_divides_the_rewards_pool) {
    constexpr uint64_t AMOUNT  = 1'000'000ULL;
    constexpr uint32_t FEE_BPS = 1'000;   // 10% -> fee 100'000

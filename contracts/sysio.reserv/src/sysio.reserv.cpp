@@ -76,8 +76,8 @@ uint32_t uwrit_fee_bps() {
 
 /// Stage-2 governance dial: the share of each fee's REWARDS POOL routed to the
 /// `sysio` emissions treasury. Read fresh per settlement so a `setconfig` takes
-/// effect immediately; defaults to 0 (the whole pool goes to batch operators and
-/// no fee leaves custody) until the contract is configured.
+/// effect immediately; defaults to 0 (the whole pool is allocated to the
+/// batch-operator distribution and no fee leaves custody) until configured.
 uint32_t fee_emissions_share_bps(name self) {
    reserve::reservcfg_t cfg(self);
    return cfg.get_or_default(reserve::reserve_config{}).fee_emissions_share_bps;
@@ -635,8 +635,10 @@ uint64_t reserve::rewardbal() {
 
 void reserve::drainrewards(int64_t amount) {
    // Only the system treasury (where sysio.system::payepoch runs) may sweep the
-   // rewards bucket. The swept WIRE is paid entirely to batch operators at the
-   // next pay-epoch — producers are not paid out of swap fees.
+   // rewards bucket. The swept WIRE is allocated exclusively to the
+   // batch-operator distribution at the next pay-epoch — producers are not paid
+   // out of swap fees. payepoch pays only eligible shares; what it skips stays in
+   // the treasury.
    require_auth(TREASURY_ACCOUNT);
 
    // Internal treasury sweep: a non-positive amount means the caller's

@@ -3296,10 +3296,11 @@ BOOST_FIXTURE_TEST_CASE( payepoch_folds_swap_fee_rewards, sysio_emissions_tester
    // single active producer takes the whole producer pool.)
    BOOST_REQUIRE_EQUAL( got, producer_pool );
 
-   // Nothing was distributed out of the fee: the whole pool belongs to batch
-   // operators and this fixture has no active rotation group, so it rolls to
-   // treasury. (Batch operators actually receiving it is covered end-to-end by
-   // the swap flow tests, which run a real group.)
+   // Nothing was distributed out of the fee: the whole pool is allocated to the
+   // batch-operator distribution and this fixture has no active rotation group,
+   // so every share rolls to treasury. This is the NEGATIVE case — a batch
+   // operator actually receiving the fee is
+   // `payepoch_pays_swap_fee_to_active_batch_operator` below.
    BOOST_REQUIRE_EQUAL( log["fee_distributed"].as<int64_t>(), 0 );
 
    // The bucket was still swept to zero by the inline drain — the drain is
@@ -3311,6 +3312,119 @@ BOOST_FIXTURE_TEST_CASE( payepoch_folds_swap_fee_rewards, sysio_emissions_tester
    // charged against the emission curve.
    const int64_t t5_after = get_t5_state()["total_distributed"].as<int64_t>();
    BOOST_REQUIRE_EQUAL( t5_after - t5_before, producer_pool + capex + gov );
+} FC_LOG_AND_RETHROW()
+
+// The POSITIVE counterpart: a swap fee actually reaching an ACTIVE batch
+// operator's balance. `payepoch_folds_swap_fee_rewards` proves only that the
+// bucket is SWEPT — `drainrewards` does that unconditionally, even when every
+// payout is skipped — so on its own it cannot distinguish "batch ops were paid"
+// from "the fee silently rolled to treasury". Neither can a flow test that waits
+// for `sysio.reserv` custody to fall by the reward share, for the same reason.
+//
+// Scaled to a ONE-member rotation (operators_per_epoch = batch_op_groups = 1) so
+// the arithmetic is exact rather than a proportional bound: with one group active
+// for the single epoch of a cadence-1 period, that member's slice is the entire
+// batch pool and the entire fee pool. Asserts the recipient's balance delta and
+// the exact positive `epochlog.fee_distributed`.
+BOOST_FIXTURE_TEST_CASE( payepoch_pays_swap_fee_to_active_batch_operator, sysio_emissions_tester ) try {
+   const account_name RESERV    = "sysio.reserv"_n;
+   const account_name UWRIT     = "sysio.uwrit"_n;
+   const account_name BATCH_OP  = "batchopa"_n;
+
+   create_t5_holding_accounts();
+   deploy_reserv();
+
+   abi_serializer reserv_ser;
+   {
+      const auto* a = control->find_account_metadata( RESERV );
+      BOOST_REQUIRE( a != nullptr );
+      abi_def d;
+      BOOST_REQUIRE_EQUAL( abi_serializer::to_abi(a->abi, d), true );
+      reserv_ser.set_abi( d, abi_serializer::create_yield_function(abi_serializer_max_time) );
+   }
+   auto codename = [](std::string_view s) { return mvo()("value", fc::slug_name{s}.value); };
+   auto reward_balance = [&]() -> int64_t {
+      auto data = get_row_by_account(RESERV, RESERV, "rewardbkt"_n, "rewardbkt"_n);
+      if (data.empty()) return 0;
+      auto v = reserv_ser.binary_to_variant("rewards_bucket", data,
+                  abi_serializer::create_yield_function(abi_serializer_max_time));
+      return static_cast<int64_t>(v["balance"].as_uint64());
+   };
+
+   // --- Seed the rewards bucket with a real swap fee (bootstrap window) ---
+   BOOST_REQUIRE_EQUAL( success(), push_reserv_action(RESERV, "regreserve"_n, mvo()
+      ("chain_code", codename("ETH"))("token_code", codename("ETH"))("reserve_code", codename("PRIMARY"))
+      ("name", "eth")("description", "")
+      ("initial_chain_amount", 1'000'000'000'000ULL)("initial_wire_amount", 1'000'000'000'000ULL)
+      ("source_token_precision", 9u)("connector_weight_bps", 5000u)("is_private", false)("owner", name{}) ) );
+   BOOST_REQUIRE_EQUAL( success(), push_reserv_action(RESERV, "regreserve"_n, mvo()
+      ("chain_code", codename("SOLANA"))("token_code", codename("SOL"))("reserve_code", codename("PRIMARY"))
+      ("name", "sol")("description", "")
+      ("initial_chain_amount", 1'000'000'000'000ULL)("initial_wire_amount", 1'000'000'000'000ULL)
+      ("source_token_precision", 9u)("connector_weight_bps", 5000u)("is_private", false)("owner", name{}) ) );
+   // No winning underwriter, so the whole network fee lands in the rewards bucket
+   // — the quantity payepoch drains and must hand to the batch operator.
+   BOOST_REQUIRE_EQUAL( success(), push_reserv_action(UWRIT, "applyswap"_n, mvo()
+      ("src_chain_code", codename("ETH"))("src_token_code", codename("ETH"))("src_reserve_code", codename("PRIMARY"))
+      ("src_amount", 1'000'000'000ULL)
+      ("dst_chain_code", codename("SOLANA"))("dst_token_code", codename("SOL"))("dst_reserve_code", codename("PRIMARY"))
+      ("dst_amount", 100'000'000ULL)("underwriter", name{}) ) );
+
+   const int64_t fee_total = reward_balance();
+   BOOST_REQUIRE_GT( fee_total, 0 );
+
+   // --- A one-member rotation group, ACTIVE in opreg ---
+   // Bootstrapped so the ACTIVE flip bypasses the collateral gate (see
+   // .claude/rules/bootstrapped-operator-invariants.md); payepoch's own filter is
+   // `is_op_active(member, OPERATOR_TYPE_BATCH)`, which this satisfies.
+   create_accounts( { BATCH_OP }, false, false, false, true ); // include_ram_gift
+   BOOST_REQUIRE_EQUAL( success(),
+      register_operator( BATCH_OP, OperatorType::OPERATOR_TYPE_BATCH, /*is_bootstrapped*/true ) );
+
+   // operators_per_epoch = batch_op_groups = 1 -> batch_operator_minimum_active
+   // is 1, so this single operator satisfies schbatchgps and fills the whole
+   // window: one group, one member, paid every epoch.
+   BOOST_REQUIRE_EQUAL( success(), init_epoch_state(60, /*operators_per_epoch*/1,
+                                                    /*batch_op_groups_count*/1) );
+   produce_blocks(1);
+   BOOST_REQUIRE_EQUAL( success(), push_epoch_action(EPOCH, "schbatchgps"_n, mvo()) );
+
+   setup_producers(1);
+   wait_for_producer_schedule();
+   produce_complete_cycles(1, 2);
+
+   const uint32_t start = head_secs() - ONE_EPOCH - 1;
+   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
+
+   const int64_t t5_before  = get_t5_state()["total_distributed"].as<int64_t>();
+   const int64_t bal_before = get_wire_balance(BATCH_OP).get_amount();
+
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+
+   // --- The payout ---
+   auto log = get_epoch_log(1);
+   const int64_t compute       = log["compute_amount"].as<int64_t>();
+   const int64_t producer_pool = test_split_bps(compute, PRODUCER_BPS);
+   const int64_t batch_pool    = compute - producer_pool;
+
+   // One group, active for the single epoch of a cadence-1 period, one member:
+   // the member's slice is the whole batch pool AND the whole fee pool. The
+   // emission and fee shares ride ONE transfer, so the balance delta is the sum.
+   const int64_t got = get_wire_balance(BATCH_OP).get_amount() - bal_before;
+   BOOST_REQUIRE_EQUAL( got, batch_pool + fee_total );
+
+   // The fee reached a real recipient — the assertion the negative case cannot
+   // make. Exact value, not merely positive: a fee that leaked into the producer
+   // pool or was double-counted would still be > 0 here.
+   BOOST_REQUIRE_EQUAL( log["fee_distributed"].as<int64_t>(), fee_total );
+
+   // Bucket swept, and the fee is NOT charged against the emission curve —
+   // total_distributed moves by the EMISSION only, excluding fee_total.
+   BOOST_REQUIRE_EQUAL( reward_balance(), 0 );
+   const int64_t capex = log["capex_amount"].as<int64_t>();
+   const int64_t gov   = log["governance_amount"].as<int64_t>();
+   const int64_t t5_after = get_t5_state()["total_distributed"].as<int64_t>();
+   BOOST_REQUIRE_EQUAL( t5_after - t5_before, producer_pool + batch_pool + capex + gov );
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( standby_weight_decreases_by_rank, sysio_emissions_tester ) try {

@@ -126,13 +126,33 @@ message ReserveSpec {
   string owner      = 10;
 }
 
-// Global swap settings applied once via
-// `sysio.uwrit::setconfig(fee_bps, collateral_lock_duration_ms)`.
+// Global swap settings applied once via `sysio.uwrit::setconfig`, which takes
+// SIX arguments: `(fee_bps, collateral_lock_duration_ms, min_fromwire_amount,
+// fromwire_revert_fee_bps, uwreq_pending_timeout_epochs,
+// uwreq_retention_epochs)`. This message pins only the first two; a bootstrap
+// caller supplies the remaining four itself, using the contract's `uw_config`
+// in-struct defaults (5 WIRE floor, 500 bps revert fee, and the two uwreq
+// lifecycle windows) unless it has a reason to override them.
 //
-// The collected swap fee is taken out of the WIRE leg of every swap and split
-// 50/50 between an on-chain rewards bucket and the emissions treasury inside
-// `sysio.reserv` (a fixed protocol constant, FEE_REWARD_SHARE_BPS), so no
-// fee-distribution shares are configured here.
+// NO fee-DISTRIBUTION shares are configured here. The routing is a two-stage
+// split of the network fee plus an independent per-reserve owner fee:
+//
+//   * `fee_bps` is the NETWORK fee, taken out of the WIRE leg of every swap.
+//     `sysio.reserv` splits that component 50/50 between the swap's WINNING
+//     UNDERWRITER (claimable via `claimuwfee`) and a REWARDS POOL — the fixed
+//     protocol constant `sysio.reserv::FEE_UNDERWRITER_SHARE_BPS`.
+//   * The rewards pool then splits again by the OPTIONAL governance dial
+//     `sysio.reserv::reserve_config.fee_emissions_share_bps` (`reservcfg`): that
+//     share is transferred to the `sysio` emissions treasury, the remainder
+//     accrues to the rewards bucket for batch operators. Nothing seeds
+//     `reservcfg`, so the dial reads ZERO until `sysio.reserv::setconfig` first
+//     persists a row — at which default the whole pool is allocated to batch
+//     operators and no fee leaves `sysio.reserv`'s custody at settlement.
+//   * Each participating non-WIRE leg's reserve ALSO charges its own
+//     `owner_fee_bps` off the same WIRE leg, INDEPENDENTLY of `fee_bps`
+//     (`ReserveSpec` does not carry it; it is set post-bootstrap via
+//     `sysio.reserv::setrsvfee`). So `fee_bps` is not the whole effective swap
+//     fee: a chain-to-chain swap pays two owner fees plus the network fee.
 message UwritConfig {
   // Per-spoke depot swap fee in basis points (<= 9999; a 100% fee is rejected),
   // taken out of the WIRE leg of every swap.
@@ -142,8 +162,9 @@ message UwritConfig {
   uint64 collateral_lock_duration_ms = 2;
 
   // Slots 3-5 were fee_split_winner_pct / fee_split_other_uw_pct /
-  // fee_split_batch_op_pct (whole-percent distribution shares) — removed; the
-  // fee split is now the fixed 50/50 rewards/emissions constant in sysio.reserv.
+  // fee_split_batch_op_pct (whole-percent distribution shares) — removed. Field
+  // numbers stay reserved so the wire format cannot reuse them. Distribution is
+  // no longer configured here at all: see the two-stage split described above.
   reserved 3, 4, 5;
   reserved "fee_split_winner_pct", "fee_split_other_uw_pct", "fee_split_batch_op_pct";
 }

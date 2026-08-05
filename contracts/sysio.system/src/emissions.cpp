@@ -548,11 +548,14 @@ void system_contract::accrueepoch(uint32_t epoch_index,
 //
 // Swap-fee rewards: the batch-operator share of collected swap fees
 // (sysio.reserv's rewards_bucket) is swept here via an inline drainrewards and
-// paid out ENTIRELY to batch operators, on top of their emission share and
-// weighted by the same per-group active-epoch count. Producers are NOT paid out
-// of swap fees, so producer_bps / batch_op_bps govern the emission split only --
-// see the fold-in comment at the drain for the reasoning. Fees are funded by
-// the sweep (not the treasury) and so are excluded from total_distributed.
+// allocated EXCLUSIVELY to the batch-operator distribution, on top of their
+// emission share and weighted by the same per-group active-epoch count.
+// Producers are NOT paid out of swap fees, so producer_bps / batch_op_bps govern
+// the emission split only -- see the fold-in comment at the drain. Allocated is
+// not paid: only ELIGIBLE shares go out, and whatever is skipped (zero-epoch
+// groups, non-ACTIVE members, integer-division remainders) stays in this
+// treasury, exactly as undistributed emission does. Fees are funded by the sweep
+// (not the treasury) and so are excluded from total_distributed.
 //
 // Single-trx semantics guarantee gate conditions hold through this call;
 // payepoch trusts the gate-computed period_emission and does not recompute.
