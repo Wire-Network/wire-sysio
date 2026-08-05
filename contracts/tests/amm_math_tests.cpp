@@ -18,6 +18,7 @@
 
 #include <cmath>
 #include <cstdint>
+#include <limits>
 #include <vector>
 
 using namespace sysio::opp::amm;
@@ -212,6 +213,61 @@ BOOST_AUTO_TEST_CASE(split_wire_fee_emissions_share_divides_the_rewards_pool) {
       const auto f = split_wire_fee(AMOUNT, FEE_BPS, HALF, BPS_TOTAL + 7'777);
       BOOST_CHECK_EQUAL(f.emissions_share, 50'000u);
       BOOST_CHECK_EQUAL(f.reward_share, 0u);
+   }
+}
+
+/// Three fees ride the same leg (network + both reserve owners), so their TOTAL
+/// can carry past `uint64_t` even though each product is computed in `u128`.
+/// The total must therefore be summed and compared in `u128` too: a wrapped
+/// total is strictly worse than a saturated one, because it reports a small
+/// POSITIVE `net` for a leg the fees consumed entirely — and `net > 0` is
+/// exactly the gate every caller uses to reject such a swap.
+BOOST_AUTO_TEST_CASE(split_wire_fee_stacked_rates_cannot_wrap_the_total) {
+   constexpr uint64_t MAX = std::numeric_limits<uint64_t>::max();
+
+   // The boundary case: maximum leg, three 100% rates. Summed in uint64 this
+   // wraps to MAX - 2 and reports net == 2 — a fully-consumed leg passing the
+   // caller's `net > 0` gate. Clamped, it reports what actually happened.
+   {
+      const auto f = split_wire_fee(MAX, BPS_TOTAL, /*underwriter*/5'000,
+                                    /*emissions*/0, /*src*/BPS_TOTAL, /*dst*/BPS_TOTAL);
+      BOOST_CHECK_EQUAL(f.net, 0u);
+      BOOST_CHECK_EQUAL(f.fee, MAX);
+      // Each individual share is still its own true (un-wrapped) product.
+      BOOST_CHECK_EQUAL(f.src_reserve_share, MAX);
+      BOOST_CHECK_EQUAL(f.dst_reserve_share, MAX);
+   }
+   // Same wrap hazard at a partial rate: 40% + 40% + 40% of MAX is 1.2 × MAX,
+   // which overflows uint64 while each term individually fits.
+   {
+      const auto f = split_wire_fee(MAX, 4'000, 5'000, 0, 4'000, 4'000);
+      BOOST_CHECK_EQUAL(f.net, 0u);
+      BOOST_CHECK_EQUAL(f.fee, MAX);
+   }
+   // Just BELOW the carry: 30% + 30% + 30% of MAX is 0.9 × MAX, so the total
+   // fits and must be reported exactly — not clamped.
+   {
+      const auto f = split_wire_fee(MAX, 3'000, 5'000, 0, 3'000, 3'000);
+      const uint64_t expected = f.src_reserve_share + f.dst_reserve_share
+                              + f.underwriter_share + f.reward_share + f.emissions_share;
+      BOOST_CHECK_EQUAL(f.fee, expected);
+      BOOST_CHECK_GT(f.net, 0u);
+      BOOST_CHECK_EQUAL(f.net + f.fee, MAX);
+   }
+   // Stacked rates that merely REACH the leg (no uint64 carry) also clamp to a
+   // zero net rather than under-reporting the fee.
+   {
+      const auto f = split_wire_fee(1'000'000ULL, 5'000, 5'000, 0, 3'000, 2'000);
+      BOOST_CHECK_EQUAL(f.fee, 1'000'000u);
+      BOOST_CHECK_EQUAL(f.net, 0u);
+   }
+   // Ordinary stacked rates conserve the leg exactly across odd amounts.
+   for (uint64_t amt : {1ULL, 7ULL, 999ULL, 1'000'003ULL, 1'000'000'000'000ULL}) {
+      const auto f = split_wire_fee(amt, 137, 5'000, 1'111, 89, 233);
+      BOOST_CHECK_EQUAL(f.src_reserve_share + f.dst_reserve_share
+                        + f.underwriter_share + f.reward_share + f.emissions_share,
+                        f.fee);
+      BOOST_CHECK_EQUAL(f.net + f.fee, amt);
    }
 }
 

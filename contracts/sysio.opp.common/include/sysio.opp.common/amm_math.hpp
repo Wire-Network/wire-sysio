@@ -211,7 +211,10 @@ struct wire_fee {
 /// floored product. Computed in `u128` to avoid overflow.
 ///
 /// **Callers must check `net > 0`.** With enough stacked rates the total can
-/// reach or exceed the leg; the settlement paths already assert this, and
+/// reach or exceed the leg. When it does, `fee` is CLAMPED to `wire_amount` and
+/// `net` is 0 — so in THAT case alone the per-share fields sum to more than
+/// `fee`, which is harmless because the caller rejects the swap and no share is
+/// ever accrued. The settlement paths already assert this, and
 /// `sysio.reserv::setrsvfee` / `sysio.uwrit::setconfig` cap each rate so a
 /// realistic combination cannot get there.
 ///
@@ -243,10 +246,22 @@ inline wire_fee split_wire_fee(uint64_t wire_amount,
    r.emissions_share   = static_cast<uint64_t>((static_cast<u128>(rewards_pool) * emissions_share_bps) / BPS_TOTAL);
    r.reward_share      = rewards_pool - r.emissions_share;
 
-   r.fee = network_fee + r.src_reserve_share + r.dst_reserve_share;
-   // Saturate rather than wrap if the stacked rates ever reach the whole leg —
-   // the caller's `net > 0` check is what actually rejects that swap.
-   r.net = (r.fee >= wire_amount) ? 0 : wire_amount - r.fee;
+   // Sum in u128. Three stacked rates carry past uint64 on an extreme leg, and a
+   // WRAPPED total is worse than a saturated one: it reports a small positive
+   // `net` for a swap that consumed the whole leg, so the caller's `net > 0`
+   // gate waves it through. Compare in u128 and narrow only when the total
+   // genuinely fits; otherwise clamp to the leg so a fully-consumed leg is
+   // reported as exactly that.
+   const u128 total_fee = static_cast<u128>(network_fee)
+                        + static_cast<u128>(r.src_reserve_share)
+                        + static_cast<u128>(r.dst_reserve_share);
+   if (total_fee >= static_cast<u128>(wire_amount)) {
+      r.fee = wire_amount;
+      r.net = 0;
+   } else {
+      r.fee = static_cast<uint64_t>(total_fee);
+      r.net = wire_amount - r.fee;
+   }
    return r;
 }
 

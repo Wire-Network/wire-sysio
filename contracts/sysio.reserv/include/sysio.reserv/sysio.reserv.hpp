@@ -508,7 +508,10 @@ namespace sysio {
       /// fees. The WIRE stays in this contract's custody — it is NOT transferred
       /// out — so the custody invariant is `token_balance == Σ
       /// reserve_wire_amount + rewards.balance + Σ uw_fee_row.balance +
-      /// in-flight escrow`. `balance` is the portion earmarked for distribution
+      /// Σ reserve_row.owner_fee_accrued + in-flight escrow`. A collected owner
+      /// fee leaves `reserve_wire_amount` but stays in this contract until
+      /// `claimrsvfee`, so it is a term in the equation, not an outflow.
+      /// `balance` is the portion earmarked for distribution
       /// (swept by `drainrewards` and folded into `sysio.system::payepoch`);
       /// `lifetime_accrued` is an audit total. (The underwriter half of each fee
       /// accrues to `uwfees` instead and is therefore not tracked here.)
