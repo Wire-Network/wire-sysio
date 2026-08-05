@@ -63,7 +63,7 @@ chain deregistered) refund in full.
 | Table | Row type | Description |
 |-------|----------|-------------|
 | `uwconfig` | `uw_config` | Singleton: `fee_bps`, `collateral_lock_duration_ms`, `min_fromwire_amount`, `fromwire_revert_fee_bps`, `uwreq_pending_timeout_epochs`, `uwreq_retention_epochs` |
-| `uwreqs` | `uw_request_t` | One row per swap intent — race state in `commits_by`, `winner`, lifecycle status, mirrored `variance_tolerance_bps`. Retained for `uwreq_retention_epochs` after ANY terminal transition — `COMPLETED` (settled by `chklocks`), `REJECTED` (immediate failure via `reject_and_refund`), or `EXPIRED` (pending timeout, same path) — then erased by `pruneuwreqs` |
+| `uwreqs` | `uw_request_t` | One row per swap intent — race state in `commits_by`, `winner`, lifecycle status, mirrored `variance_tolerance_bps`. Retained for `uwreq_retention_epochs` after ANY terminal transition — `COMPLETED` (after `chklocks` sweeps the final collateral lock; the reserve settlement itself already happened at winner selection, which is what made the row CONFIRMED), `REJECTED` (immediate failure via `reject_and_refund`), or `EXPIRED` (pending timeout, same path) — then erased by `pruneuwreqs` |
 | `locks` | `lock_entry` | Flat per-leg lock vector consulted by `sysio.opreg::available()`. The `byexpire` secondary index lets `chklocks` sweep expired locks in one pass |
 | `fwqueue` | `fromwire_q` | Escrowed swap-from-WIRE requests awaiting drain. `byepoch` secondary index |
 | `uwcounters` | `uw_counters` | Monotonic id allocators (uwreq ids, lock ids) |
