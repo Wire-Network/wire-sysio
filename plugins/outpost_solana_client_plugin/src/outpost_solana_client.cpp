@@ -701,6 +701,12 @@ sysio::opp::types::ChainKind outpost_solana_client::chain_kind() const {
    return sysio::opp::types::CHAIN_KIND_SVM;
 }
 
+std::vector<uint8_t>
+outpost_solana_client::authenticated_caller_address() const {
+   const auto public_key = _entry->client->get_pubkey().serialize();
+   return {public_key.begin(), public_key.end()};
+}
+
 std::optional<outpost_solana_client::reserve_terminal_info>
 outpost_solana_client::reserve_info_for_codes(uint64_t token_code, uint64_t reserve_code) {
    const auto reserve_pda =

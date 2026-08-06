@@ -73,6 +73,12 @@ sysio::opp::types::ChainKind outpost_ethereum_client::chain_kind() const {
    return sysio::opp::types::CHAIN_KIND_EVM;
 }
 
+std::vector<uint8_t>
+outpost_ethereum_client::authenticated_caller_address() const {
+   const auto address = _entry->client->get_signer_address();
+   return {address.begin(), address.end()};
+}
+
 std::string outpost_ethereum_client::deliver_outbound_envelope(
    uint32_t                 epoch_index,
    const std::vector<char>& envelope_bytes,

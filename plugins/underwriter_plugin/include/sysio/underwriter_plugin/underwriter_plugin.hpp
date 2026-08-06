@@ -13,12 +13,15 @@ namespace sysio {
    ///
    /// The underwriter does NOT relay OPP envelopes (that's the batch operator's job).
    /// Instead it:
-   /// 1. Polls sysio.uwrit::uwreqs for PENDING underwrite requests
-   /// 2. Reads its own credit lines from sysio.opreg::operators (aggregate stakes per chain)
-   /// 3. Selects requests where credit covers 100% of SWAP on both send and receive chains
-   /// 4. Submits underwrite intent to the relevant outpost contract (ETH/SOL)
-   ///    — the outpost locks capital and emits UNDERWRITE_INTENT via OPP
-   /// 5. Monitors uwreqs for status changes (assigned, confirmed, rejected)
+   /// 1. Polls sysio.uwrit::uwreqs for PENDING underwrite requests.
+   /// 2. Reads its available credit and authoritative stored-candidate state.
+   /// 3. Sends complete stored candidates to the depot's retrycommit action.
+   /// 4. Selects absent/partial candidates whose still-missing outpost legs fit
+   ///    the daemon's provisional credit view.
+   /// 5. Submits signed UICs for those missing legs to the relevant outpost
+   ///    contract (ETH/SOL), which authenticates the caller and relays them.
+   /// 6. The depot validates winner conditions and creates collateral locks;
+   ///    the plugin monitors uwreqs for status changes.
    namespace underwriter_defaults {
       constexpr uint32_t scan_interval_ms    = 5000;
       constexpr uint32_t action_timeout_ms   = 15000;

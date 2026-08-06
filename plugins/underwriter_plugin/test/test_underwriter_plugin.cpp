@@ -1,5 +1,7 @@
 #include <boost/test/unit_test.hpp>
 
+#include <array>
+#include <filesystem>
 #include <map>
 #include <set>
 #include <string>
@@ -7,14 +9,22 @@
 #include <unordered_set>
 #include <vector>
 
+#include <gsl-lite/gsl-lite.hpp>
+
 #include <fc/crypto/hex.hpp>
 #include <fc/crypto/keccak256.hpp>
+#include <fc/crypto/private_key.hpp>
 #include <fc/exception/exception.hpp>
 #include <fc/variant_object.hpp>
 #include <sysio/underwriter_plugin/solana_source_deposit_scanner.hpp>
 #include <sysio/underwriter_plugin/source_deposit_constants.hpp>
 #include <sysio/underwriter_plugin/source_deposit_hash_detail.hpp>
+#include <sysio/underwriter_plugin/routing_detail.hpp>
+#include <sysio/underwriter_plugin/uic_signature_detail.hpp>
+#include <sysio/underwriter_plugin/uic_construction_detail.hpp>
 #include <sysio/underwriter_plugin/underwriter_plugin.hpp>
+#include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
+#include <sysio/opp/test/uic_signature_test_utils.hpp>
 
 using namespace std::literals;
 using namespace sysio::underwriter_defaults;
@@ -122,9 +132,143 @@ scan_test_page(const std::vector<fc::variant>& sigs,
       config);
 }
 
+/** Build one explicitly named local signature-provider specification. */
+std::string explicit_uic_provider_spec(
+   std::string_view key_name,
+   fc::crypto::chain_key_type_t key_type,
+   fc::crypto::private_key::key_type concrete_type) {
+   const auto key = fc::crypto::private_key::generate(concrete_type);
+   return fc::crypto::to_signature_provider_spec(
+      std::string{key_name}, fc::crypto::chain_kind_wire, key_type,
+      key.get_public_key().to_string({}), "KEY:" + key.to_string({}));
+}
+
+/** Build one anonymous four-field local signature-provider specification. */
+std::string anonymous_uic_provider_spec(
+   std::string_view key_name,
+   fc::crypto::chain_key_type_t key_type,
+   fc::crypto::private_key::key_type concrete_type) {
+   const auto named = explicit_uic_provider_spec(key_name, key_type, concrete_type);
+   return named.substr(named.find(',') + 1);
+}
+
+/**
+ * Exercise operator-configured UIC selection after production-style WIRE default
+ * registration for one supported provider key type.
+ */
+void check_operator_configured_uic_provider_beats_wire_default(
+   std::string_view key_name,
+   fc::crypto::chain_key_type_t key_type,
+   fc::crypto::private_key::key_type concrete_type,
+   bool automatic_default_coexists = true,
+   bool has_explicit_name = true) {
+   using namespace fc::crypto;
+   auto reset_app = gsl_lite::finally([]() {
+      appbase::application::reset_app_singleton();
+   });
+   const auto config_dir = std::filesystem::temp_directory_path()
+      / ("underwriter-uic-provider-" + std::string{key_name});
+   std::error_code ec;
+   std::filesystem::remove_all(config_dir, ec);
+   std::filesystem::create_directories(config_dir);
+   auto cleanup = gsl_lite::finally([&]() {
+      std::error_code ignored;
+      std::filesystem::remove_all(config_dir, ignored);
+   });
+
+   std::vector<std::string> args{
+      "test_underwriter_plugin",
+      "--config-dir", config_dir.string(),
+      "--signature-provider",
+      has_explicit_name
+         ? explicit_uic_provider_spec(key_name, key_type, concrete_type)
+         : anonymous_uic_provider_spec(key_name, key_type, concrete_type),
+   };
+   std::vector<char*> argv;
+   argv.reserve(args.size());
+   for (auto& arg : args) argv.push_back(arg.data());
+
+   appbase::scoped_app test_app;
+   BOOST_REQUIRE(test_app->initialize<sysio::signature_provider_manager_plugin>(
+      argv.size(), argv.data()));
+   auto& manager = test_app->get_plugin<sysio::signature_provider_manager_plugin>();
+
+   // Emulate chain_plugin's production initialize-time call. This focused test
+   // intentionally couples to that API; if chain_plugin changes registration
+   // timing, reassess the preflight ordering as well as this regression.
+   manager.register_default_signature_providers({chain_key_type_wire});
+   const auto wire_providers = manager.query_providers(std::nullopt, chain_kind_wire);
+   const auto selected = sysio::underwriter_detail::select_uic_signature_providers(
+      wire_providers, [&](const std::string& name) {
+         return manager.is_operator_configured_provider(name);
+      }, [](const public_key&) { return true; });
+
+   BOOST_REQUIRE_EQUAL(1u, selected.size());
+   BOOST_CHECK_EQUAL(has_explicit_name ? std::string{key_name} : "key-0",
+                     selected.front()->key_name);
+   BOOST_CHECK(manager.is_operator_configured_provider(
+      selected.front()->key_name));
+   BOOST_CHECK_EQUAL(has_explicit_name,
+                     manager.is_explicitly_configured_provider(selected.front()->key_name));
+   BOOST_CHECK(sysio::underwriter_detail::is_supported_uic_public_key(
+      selected.front()->public_key));
+
+   std::vector<signature_provider_ptr> automatic_only;
+   for (const auto& provider : wire_providers) {
+      if (!manager.is_operator_configured_provider(provider->key_name)) {
+         automatic_only.push_back(provider);
+      }
+   }
+   if (automatic_default_coexists) {
+      BOOST_REQUIRE(!automatic_only.empty());
+   } else {
+      // Production default registration is keyed by chain-key type. An
+      // explicit WIRE-native K1/R1 provider suppresses the automatic WIRE
+      // default in that same bucket; EM/ED occupy different buckets and
+      // therefore coexist with it.
+      BOOST_CHECK(automatic_only.empty());
+   }
+   BOOST_CHECK(sysio::underwriter_detail::select_uic_signature_providers(
+      automatic_only, [&](const std::string& name) {
+         return manager.is_operator_configured_provider(name);
+      }, [](const public_key&) { return true; }).empty());
+}
+
 } // namespace
 
 BOOST_AUTO_TEST_SUITE(underwriter_plugin_tests)
+
+BOOST_AUTO_TEST_CASE(uic_authenticated_caller_shape_is_non_default_and_exact) try {
+   using sysio::opp::attestations::UnderwriteIntentCommit;
+   using sysio::opp::types::CHAIN_KIND_EVM;
+   using sysio::opp::types::CHAIN_KIND_SVM;
+   using sysio::opp::types::CHAIN_KIND_UNKNOWN;
+
+   for (const auto [kind, size] : std::array{
+           std::pair{CHAIN_KIND_EVM, size_t{20}},
+           std::pair{CHAIN_KIND_SVM, size_t{32}},
+        }) {
+      UnderwriteIntentCommit uic;
+      const std::vector<uint8_t> address(size, 0x5au);
+      BOOST_REQUIRE(sysio::underwriter_detail::set_uic_authenticated_caller(
+         uic, kind, address));
+      BOOST_CHECK_EQUAL(kind, uic.uw_ext_chain_addr().kind());
+      BOOST_CHECK_EQUAL_COLLECTIONS(
+         address.begin(), address.end(),
+         uic.uw_ext_chain_addr().address().begin(),
+         uic.uw_ext_chain_addr().address().end());
+   }
+
+   UnderwriteIntentCommit invalid;
+   const std::vector<uint8_t> short_evm(19, 0x01u);
+   BOOST_CHECK(!sysio::underwriter_detail::set_uic_authenticated_caller(
+      invalid, CHAIN_KIND_EVM, short_evm));
+   BOOST_CHECK(!invalid.has_uw_ext_chain_addr());
+   const std::vector<uint8_t> unsupported(32, 0x01u);
+   BOOST_CHECK(!sysio::underwriter_detail::set_uic_authenticated_caller(
+      invalid, CHAIN_KIND_UNKNOWN, unsupported));
+   BOOST_CHECK(!invalid.has_uw_ext_chain_addr());
+} FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(plugin_can_be_constructed) try {
    sysio::underwriter_plugin plugin;
@@ -264,6 +408,393 @@ BOOST_AUTO_TEST_CASE(preflight_required_options_are_registered) try {
    BOOST_CHECK(option_names.count("underwriter-sol-source-deposit-instruction") > 0);
 } FC_LOG_AND_RETHROW();
 
+BOOST_AUTO_TEST_CASE(preflight_accepts_fixed_size_recoverable_uic_signature_providers) try {
+   using private_key = fc::crypto::private_key;
+   using provider_result =
+      sysio::underwriter_detail::uic_signature_provider_result;
+
+   const auto digest = fc::sha256::hash(
+      std::string{sysio::underwriter_detail::uic_signature_self_test_domain});
+   const std::array supported_types{
+      private_key::key_type::k1,
+      private_key::key_type::r1,
+      private_key::key_type::em,
+      private_key::key_type::ed,
+   };
+
+   for (const auto type : supported_types) {
+      const auto key = private_key::generate(type);
+      const auto signature = key.sign(digest);
+
+      fc::crypto::signature_provider_t provider;
+      provider.public_key = key.get_public_key();
+      provider.sign = [signature](const fc::sha256&) { return signature; };
+
+      const auto check =
+         sysio::underwriter_detail::check_uic_signature_provider(provider, digest);
+      BOOST_CHECK(check.result == provider_result::compatible);
+      BOOST_REQUIRE(check.recovered_key);
+      BOOST_CHECK(*check.recovered_key == key.get_public_key());
+
+      const auto packed = fc::raw::pack(signature);
+      BOOST_CHECK(
+         sysio::underwriter_detail::is_canonical_packed_uic_signature(packed));
+      const size_t expected_size =
+         sysio::underwriter_detail::canonical_packed_uic_signature_size(
+            signature.type());
+      BOOST_CHECK_EQUAL(packed.size(), expected_size);
+   }
+
+   const auto k1_private = private_key::generate(private_key::key_type::k1);
+   const auto r1_private = private_key::generate(private_key::key_type::r1);
+   const auto r1_signature = r1_private.sign(digest);
+
+   // A supported provider key paired with another supported signature variant
+   // still fails: the signer identity must match its configured public key.
+   fc::crypto::signature_provider_t mismatched_provider;
+   mismatched_provider.public_key = k1_private.get_public_key();
+   mismatched_provider.sign = [r1_signature](const fc::sha256&) {
+      return r1_signature;
+   };
+   const auto mismatched_check =
+      sysio::underwriter_detail::check_uic_signature_provider(mismatched_provider, digest);
+   BOOST_CHECK(mismatched_check.result == provider_result::signature_type_mismatch);
+   BOOST_CHECK(!mismatched_check.recovered_key);
+
+   // WebAuthn and BLS tags remain outside the non-parsing protocol boundary,
+   // and supported tags with the wrong exact size are non-canonical.
+   using sig_type = fc::crypto::signature::sig_type;
+   auto tag = [](sig_type type) {
+      return static_cast<char>(magic_enum::enum_integer(type));
+   };
+   fc::crypto::webauthn::signature webauthn{
+      fc::crypto::r1::compact_signature{},
+      std::vector<uint8_t>{1, 2, 3},
+      R"({"type":"webauthn.get"})"};
+   const auto webauthn_shape = fc::raw::pack(fc::crypto::signature{
+      fc::crypto::signature::storage_type{std::move(webauthn)}});
+   const auto bls_shape = fc::raw::pack(fc::crypto::signature{
+      fc::crypto::signature::storage_type{
+         std::in_place_type<fc::crypto::bls::signature_shim>}});
+   std::vector<char> truncated_ed(
+      sysio::underwriter_detail::canonical_packed_uic_signature_size(sig_type::ed) - 1,
+      '\0');
+   truncated_ed.front() = tag(sig_type::ed);
+   BOOST_CHECK(!sysio::underwriter_detail::is_canonical_packed_uic_signature(
+      webauthn_shape));
+   BOOST_CHECK(!sysio::underwriter_detail::is_canonical_packed_uic_signature(
+      bls_shape));
+   BOOST_CHECK(!sysio::underwriter_detail::is_canonical_packed_uic_signature(
+      truncated_ed));
+
+   // A provider can return a recoverable high-s alternate even though local
+   // libfc signers normally emit low-s. Preflight must reject it before key
+   // recovery so runtime construction cannot submit a depot-invalid UIC.
+   const auto canonical_k1 = k1_private.sign(digest);
+   auto high_s_packed = sysio::opp::test::create_high_s_alternate(
+      fc::raw::pack(canonical_k1), private_key::key_type::k1);
+   BOOST_REQUIRE(high_s_packed.has_value());
+   BOOST_REQUIRE_EQUAL(
+      sysio::underwriter_detail::canonical_packed_uic_signature_size(
+         sig_type::k1),
+      high_s_packed->size());
+   // create_signed_uic_bytes calls this shared predicate independently at
+   // runtime after packing every returned signature, even after startup
+   // preflight has passed. Exercise that exact guard as well as the aggregate
+   // preflight result below.
+   BOOST_CHECK(!sysio::underwriter_detail::has_canonical_uic_signature_body(
+      *high_s_packed));
+   const auto high_s_signature =
+      fc::raw::unpack<fc::crypto::signature>(*high_s_packed);
+   fc::crypto::signature_provider_t high_s_provider;
+   high_s_provider.public_key = k1_private.get_public_key();
+   high_s_provider.sign = [high_s_signature](const fc::sha256&) {
+      return high_s_signature;
+   };
+   const auto high_s_check =
+      sysio::underwriter_detail::check_uic_signature_provider(high_s_provider, digest);
+   BOOST_CHECK(high_s_check.result == provider_result::non_canonical_signature);
+   BOOST_CHECK(!high_s_check.recovered_key);
+
+   // Libfc can recover the same key from the other recovery-header family.
+   // Both startup preflight and the runtime predicate must reject that alias
+   // so a UIC signature has exactly one accepted byte representation.
+   const std::array alias_types{
+      private_key::key_type::k1,
+      private_key::key_type::r1,
+      private_key::key_type::em,
+   };
+   for (const auto type : alias_types) {
+      const auto key = private_key::generate(type);
+      const auto canonical = key.sign(digest);
+      auto aliased_packed = sysio::opp::test::create_recovery_alias(
+         fc::raw::pack(canonical), type);
+      BOOST_REQUIRE(aliased_packed.has_value());
+      BOOST_CHECK(!sysio::underwriter_detail::has_canonical_uic_signature_body(
+         *aliased_packed));
+
+      const auto aliased = fc::raw::unpack<fc::crypto::signature>(*aliased_packed);
+      BOOST_REQUIRE(fc::crypto::public_key::recover(aliased, digest)
+                    == key.get_public_key());
+      fc::crypto::signature_provider_t alias_provider;
+      alias_provider.public_key = key.get_public_key();
+      alias_provider.sign = [aliased](const fc::sha256&) { return aliased; };
+      const auto alias_check =
+         sysio::underwriter_detail::check_uic_signature_provider(alias_provider, digest);
+      BOOST_CHECK(alias_check.result == provider_result::non_canonical_signature);
+      BOOST_CHECK(!alias_check.recovered_key);
+   }
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(uic_provider_selection_reaches_all_supported_native_key_formats) try {
+   using namespace fc::crypto;
+
+   appbase::scoped_app test_app;
+   char program_name[] = "test_underwriter_plugin";
+   char* argv[] = {program_name};
+   BOOST_REQUIRE(test_app->initialize<sysio::signature_provider_manager_plugin>(
+      std::size(argv), argv));
+   auto& manager = test_app->get_plugin<sysio::signature_provider_manager_plugin>();
+
+   auto add_provider = [&](std::string key_name,
+                           chain_kind_t target_chain,
+                           chain_key_type_t key_type,
+                           private_key::key_type concrete_type) {
+      const auto key = private_key::generate(concrete_type);
+      return manager.create_provider(
+         key_name, target_chain, key_type,
+         key.get_public_key().to_string({}), "KEY:" + key.to_string({}));
+   };
+
+   add_provider("uic-k1", chain_kind_wire, chain_key_type_wire,
+                private_key::key_type::k1);
+   add_provider("uic-r1", chain_kind_wire, chain_key_type_wire,
+                private_key::key_type::r1);
+   add_provider("uic-em", chain_kind_wire, chain_key_type_ethereum,
+                private_key::key_type::em);
+   add_provider("uic-ed", chain_kind_wire, chain_key_type_solana,
+                private_key::key_type::ed);
+   add_provider("wire-bls", chain_kind_wire, chain_key_type_wire_bls,
+                private_key::key_type::bls);
+   add_provider("ethereum-transaction", chain_kind_ethereum,
+                chain_key_type_ethereum, private_key::key_type::em);
+
+   const auto wire_target_providers =
+      manager.query_providers(std::nullopt, chain_kind_wire);
+   const auto uic_providers =
+      sysio::underwriter_detail::select_uic_signature_providers(
+         wire_target_providers,
+         [](const std::string&) { return true; },
+         [](const public_key&) { return true; });
+
+   BOOST_REQUIRE_EQUAL(5u, wire_target_providers.size());
+   BOOST_REQUIRE_EQUAL(4u, uic_providers.size());
+   std::set<public_key::key_type> selected_types;
+   for (const auto& provider : uic_providers) {
+      selected_types.insert(provider->public_key.type());
+      BOOST_CHECK(provider->target_chain == chain_kind_wire);
+   }
+   const std::set expected_types{
+      public_key::key_type::k1,
+      public_key::key_type::r1,
+      public_key::key_type::em,
+      public_key::key_type::ed,
+   };
+   BOOST_CHECK(selected_types == expected_types);
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(uic_provider_selection_excludes_unrelated_wire_signer) try {
+   using namespace fc::crypto;
+   const auto underwriter_key = private_key::generate(private_key::key_type::em);
+   const auto block_signing_key = private_key::generate(private_key::key_type::k1);
+
+   auto create_provider = [](std::string name, chain_key_type_t key_type,
+                             const private_key& key) {
+      auto provider = std::make_shared<signature_provider_t>();
+      provider->target_chain = chain_kind_wire;
+      provider->key_type = key_type;
+      provider->key_name = std::move(name);
+      provider->public_key = key.get_public_key();
+      provider->sign = [key](const fc::sha256& digest) { return key.sign(digest); };
+      return provider;
+   };
+
+   const std::vector<signature_provider_ptr> providers{
+      create_provider("uic-em", chain_key_type_ethereum, underwriter_key),
+      create_provider("block-k1", chain_key_type_wire, block_signing_key),
+   };
+   const auto selected = sysio::underwriter_detail::select_uic_signature_providers(
+      providers,
+      [](const std::string&) { return true; },
+      [&](const public_key& key) {
+         return key == underwriter_key.get_public_key();
+      });
+
+   BOOST_REQUIRE_EQUAL(1u, selected.size());
+   BOOST_CHECK_EQUAL("uic-em", selected.front()->key_name);
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(uic_provider_selection_ignores_default_for_explicit_em) try {
+   check_operator_configured_uic_provider_beats_wire_default(
+      "uic-em", fc::crypto::chain_key_type_ethereum,
+      fc::crypto::private_key::key_type::em);
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(uic_provider_selection_uses_explicit_k1_after_default_suppression) try {
+   check_operator_configured_uic_provider_beats_wire_default(
+      "uic-k1", fc::crypto::chain_key_type_wire,
+      fc::crypto::private_key::key_type::k1, false);
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(uic_provider_selection_uses_explicit_r1_after_default_suppression) try {
+   check_operator_configured_uic_provider_beats_wire_default(
+      "uic-r1", fc::crypto::chain_key_type_wire,
+      fc::crypto::private_key::key_type::r1, false);
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(uic_provider_selection_ignores_default_for_explicit_ed) try {
+   check_operator_configured_uic_provider_beats_wire_default(
+      "uic-ed", fc::crypto::chain_key_type_solana,
+      fc::crypto::private_key::key_type::ed);
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(uic_provider_selection_accepts_anonymous_em) try {
+   check_operator_configured_uic_provider_beats_wire_default(
+      "ignored-em", fc::crypto::chain_key_type_ethereum,
+      fc::crypto::private_key::key_type::em, true, false);
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(uic_provider_selection_accepts_anonymous_k1) try {
+   check_operator_configured_uic_provider_beats_wire_default(
+      "ignored-k1", fc::crypto::chain_key_type_wire,
+      fc::crypto::private_key::key_type::k1, false, false);
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(uic_provider_selection_accepts_anonymous_r1) try {
+   check_operator_configured_uic_provider_beats_wire_default(
+      "ignored-r1", fc::crypto::chain_key_type_wire,
+      fc::crypto::private_key::key_type::r1, false, false);
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(uic_provider_selection_accepts_anonymous_ed) try {
+   check_operator_configured_uic_provider_beats_wire_default(
+      "ignored-ed", fc::crypto::chain_key_type_solana,
+      fc::crypto::private_key::key_type::ed, true, false);
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(uic_provider_selection_preserves_two_explicit_ambiguity) try {
+   using namespace fc::crypto;
+   auto reset_app = gsl_lite::finally([]() {
+      appbase::application::reset_app_singleton();
+   });
+   const auto config_dir = std::filesystem::temp_directory_path()
+      / "underwriter-uic-provider-ambiguity";
+   std::error_code ec;
+   std::filesystem::remove_all(config_dir, ec);
+   std::filesystem::create_directories(config_dir);
+   auto cleanup = gsl_lite::finally([&]() {
+      std::error_code ignored;
+      std::filesystem::remove_all(config_dir, ignored);
+   });
+
+   std::vector<std::string> args{
+      "test_underwriter_plugin",
+      "--config-dir", config_dir.string(),
+      "--signature-provider",
+      explicit_uic_provider_spec("uic-em", chain_key_type_ethereum,
+                                 private_key::key_type::em),
+      "--signature-provider",
+      explicit_uic_provider_spec("uic-ed", chain_key_type_solana,
+                                 private_key::key_type::ed),
+   };
+   std::vector<char*> argv;
+   argv.reserve(args.size());
+   for (auto& arg : args) argv.push_back(arg.data());
+
+   appbase::scoped_app test_app;
+   BOOST_REQUIRE(test_app->initialize<sysio::signature_provider_manager_plugin>(
+      argv.size(), argv.data()));
+   auto& manager = test_app->get_plugin<sysio::signature_provider_manager_plugin>();
+   manager.register_default_signature_providers({chain_key_type_wire});
+
+   const auto selected = sysio::underwriter_detail::select_uic_signature_providers(
+      manager.query_providers(std::nullopt, chain_kind_wire),
+      [&](const std::string& name) {
+         return manager.is_operator_configured_provider(name);
+      }, [](const public_key&) { return true; });
+   BOOST_REQUIRE_EQUAL(2u, selected.size());
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(stored_commit_plan_retries_complete_candidate_after_restart) try {
+   const auto plan = sysio::underwriter_detail::plan_stored_commits(
+      /*candidate_exists=*/true,
+      /*intent_submitted=*/true,
+      /*source_is_depot=*/false,
+      /*destination_is_depot=*/false,
+      /*source_uic_stored=*/true,
+      /*destination_uic_stored=*/true);
+   BOOST_CHECK(plan.retry_depot);
+   BOOST_CHECK(!plan.skip_candidate);
+   BOOST_CHECK(!plan.submit_source);
+   BOOST_CHECK(!plan.submit_destination);
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(stored_commit_plan_submits_only_missing_outpost_leg) try {
+   const auto plan = sysio::underwriter_detail::plan_stored_commits(
+      /*candidate_exists=*/true,
+      /*intent_submitted=*/true,
+      /*source_is_depot=*/false,
+      /*destination_is_depot=*/false,
+      /*source_uic_stored=*/true,
+      /*destination_uic_stored=*/false);
+   BOOST_CHECK(!plan.retry_depot);
+   BOOST_CHECK(!plan.skip_candidate);
+   BOOST_CHECK(!plan.submit_source);
+   BOOST_CHECK(plan.submit_destination);
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(stored_commit_plan_handles_single_outpost_candidate) try {
+   const auto ready = sysio::underwriter_detail::plan_stored_commits(
+      true, true, false, true, true, false);
+   BOOST_CHECK(ready.retry_depot);
+   BOOST_CHECK(!ready.skip_candidate);
+   BOOST_CHECK(!ready.submit_source);
+   BOOST_CHECK(!ready.submit_destination);
+
+   const auto missing = sysio::underwriter_detail::plan_stored_commits(
+      true, true, false, true, false, false);
+   BOOST_CHECK(!missing.retry_depot);
+   BOOST_CHECK(!missing.skip_candidate);
+   BOOST_CHECK(missing.submit_source);
+   BOOST_CHECK(!missing.submit_destination);
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(stored_commit_plan_skips_disqualified_candidate_after_restart) try {
+   const auto disqualified = sysio::underwriter_detail::plan_stored_commits(
+      /*candidate_exists=*/true,
+      /*intent_submitted=*/false,
+      /*source_is_depot=*/false,
+      /*destination_is_depot=*/false,
+      /*source_uic_stored=*/true,
+      /*destination_uic_stored=*/true);
+   BOOST_CHECK(!disqualified.retry_depot);
+   BOOST_CHECK(disqualified.skip_candidate);
+   BOOST_CHECK(!disqualified.submit_source);
+   BOOST_CHECK(!disqualified.submit_destination);
+
+   const auto absent = sysio::underwriter_detail::plan_stored_commits(
+      /*candidate_exists=*/false,
+      /*intent_submitted=*/false,
+      /*source_is_depot=*/false,
+      /*destination_is_depot=*/false,
+      /*source_uic_stored=*/false,
+      /*destination_uic_stored=*/false);
+   BOOST_CHECK(!absent.retry_depot);
+   BOOST_CHECK(!absent.skip_candidate);
+   BOOST_CHECK(absent.submit_source);
+   BOOST_CHECK(absent.submit_destination);
+} FC_LOG_AND_RETHROW();
+
 // The preflight cases below are placeholders: exercising the live
 // preflight requires standing up a chain_plugin + chain controller +
 // authex/opreg/epoch contracts in a tester fixture. The integration
@@ -276,13 +807,15 @@ BOOST_AUTO_TEST_CASE(preflight_fails_on_missing_authex_link) try {
    BOOST_CHECK(true);
 } FC_LOG_AND_RETHROW();
 
-BOOST_AUTO_TEST_CASE(preflight_fails_on_zero_balance_on_any_registered_outpost) try {
-   // Stub — see preflight_fails_on_missing_authex_link comment.
+BOOST_AUTO_TEST_CASE(preflight_allows_late_collateral_without_global_runtime_gate) try {
+   // Stub — see preflight_fails_on_missing_authex_link comment. Request-level
+   // bucket admission is exercised by the underwriter race integration flow.
    BOOST_CHECK(true);
 } FC_LOG_AND_RETHROW();
 
-BOOST_AUTO_TEST_CASE(preflight_fails_on_slashed_status) try {
-   // Stub — see preflight_fails_on_missing_authex_link comment.
+BOOST_AUTO_TEST_CASE(scan_waits_for_active_status_after_preflight) try {
+   // Stub — see preflight_fails_on_missing_authex_link comment. The live
+   // status transition is covered by the cluster harness.
    BOOST_CHECK(true);
 } FC_LOG_AND_RETHROW();
 

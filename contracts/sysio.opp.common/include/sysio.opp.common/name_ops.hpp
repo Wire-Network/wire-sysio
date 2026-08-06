@@ -43,7 +43,12 @@ namespace sysio::opp::safe {
 /// @return the constructed `name` iff `s` is a nonempty canonical account name.
 inline std::optional<sysio::name> parse_wire_account_name(std::string_view s) {
    if (s.empty() || !is_valid_name_string(s)) return std::nullopt;
-   return sysio::name{s};
+   const sysio::name parsed{s};
+   // CDT's numeric name encoding discards trailing dots. Require the exact
+   // round trip so aliases such as `underwriter.` cannot name the same roster
+   // principal differently on the depot and on different outpost runtimes.
+   if (parsed.to_string() != s) return std::nullopt;
+   return parsed;
 }
 
 } // namespace sysio::opp::safe

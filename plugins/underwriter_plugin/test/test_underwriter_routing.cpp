@@ -161,6 +161,24 @@ BOOST_AUTO_TEST_CASE(depot_leg_requires_no_bucket) {
    BOOST_CHECK(!try_debit_buckets(credit, NO_LEG, NO_LEG));
 }
 
+BOOST_AUTO_TEST_CASE(stored_or_locally_confirmed_leg_requires_no_new_credit) {
+   const bucket_key bucket{.chain_code = 101, .token_code = 202};
+   const auto fresh = pending_leg_bond(
+      bucket, 50, /*is_depot=*/false, /*plan_submits_leg=*/true,
+      /*locally_confirmed=*/false);
+   const auto stored = pending_leg_bond(
+      bucket, 50, /*is_depot=*/false, /*plan_submits_leg=*/false,
+      /*locally_confirmed=*/false);
+   const auto confirmed = pending_leg_bond(
+      bucket, 50, /*is_depot=*/false, /*plan_submits_leg=*/true,
+      /*locally_confirmed=*/true);
+
+   BOOST_CHECK(fresh.bucket == bucket);
+   BOOST_CHECK_EQUAL(fresh.require, 50u);
+   BOOST_CHECK_EQUAL(stored.require, 0u);
+   BOOST_CHECK_EQUAL(confirmed.require, 0u);
+}
+
 // -- endpoint coverage: config must serve every registered chain --
 
 namespace {

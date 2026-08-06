@@ -42,6 +42,22 @@ struct leg_bond {
    uint64_t   require = 0;
 };
 
+/// Construct the fresh collateral requirement for one candidate leg. Depot
+/// legs, legs already stored by the depot, and legs confirmed locally while
+/// their inbound attestation catches up consume no additional available
+/// balance in the current scan.
+inline leg_bond pending_leg_bond(bucket_key bucket,
+                                 uint64_t amount,
+                                 bool is_depot,
+                                 bool plan_submits_leg,
+                                 bool locally_confirmed) {
+   return {
+      .bucket = bucket,
+      .require = is_depot || !plan_submits_leg || locally_confirmed
+         ? 0 : amount,
+   };
+}
+
 /// Per-bucket spendable credit: exact `(chain_code, token_code)` → balance.
 using credit_buckets = std::map<bucket_key, uint64_t>;
 
@@ -96,6 +112,41 @@ struct commit_key {
    uint64_t reserve_code = 0;   ///< `fc::slug_name::value`
    friend auto operator<=>(const commit_key&, const commit_key&) = default;
 };
+
+/// Restart-safe work derived from one candidate's authoritative depot row.
+/// A complete INTENT_SUBMITTED candidate is retried on the depot; a partial
+/// candidate submits only missing outpost legs. An existing non-submitted
+/// candidate is durably non-retryable and suppresses all outpost replay.
+/// Depot legs never submit.
+struct stored_commit_plan {
+   bool retry_depot = false;
+   bool skip_candidate = false;
+   bool submit_source = false;
+   bool submit_destination = false;
+};
+
+inline stored_commit_plan plan_stored_commits(bool candidate_exists,
+                                               bool intent_submitted,
+                                               bool source_is_depot,
+                                               bool destination_is_depot,
+                                               bool source_uic_stored,
+                                               bool destination_uic_stored) {
+   if (candidate_exists && !intent_submitted) {
+      return {.skip_candidate = true};
+   }
+   const bool source_complete = source_is_depot ||
+      (intent_submitted && source_uic_stored);
+   const bool destination_complete = destination_is_depot ||
+      (intent_submitted && destination_uic_stored);
+   if (intent_submitted && source_complete && destination_complete) {
+      return {.retry_depot = true};
+   }
+   return {
+      .retry_depot = false,
+      .submit_source = !source_complete,
+      .submit_destination = !destination_complete,
+   };
+}
 
 /// One outpost chain whose active registry row and configured endpoint disagree.
 struct endpoint_coverage_gap {

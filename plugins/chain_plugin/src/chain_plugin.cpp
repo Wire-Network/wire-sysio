@@ -40,11 +40,14 @@
 #include <magic_enum/magic_enum.hpp>
 #include <sysio/http_client_plugin/http_client_options.hpp>
 
+#include <algorithm>
 #include <cmath>
 #include <cstdlib>
+#include <future>
 #include <limits>
 #include <optional>
 #include <string_view>
+#include <thread>
 
 
 const std::string deep_mind_logger_name("dmlog");
@@ -80,6 +83,14 @@ namespace snapshot_attest {
 constexpr uint32_t snapshot_attestation_grace_blocks = 12500;
 
 constexpr uint64_t bytes_per_mebibyte = 1024 * 1024;
+
+/// Poll interval while an off-thread caller waits for the app executor or a
+/// transaction callback. Short enough to observe shutdown promptly without a
+/// busy wait.
+constexpr auto executor_wait_poll_interval = std::chrono::milliseconds{200};
+
+/// TAPOS lifetime for plugin-originated one-action transactions.
+constexpr int64_t signed_action_expiration_seconds = 30;
 
 /// Convert a positive MiB option value to bytes without overflowing uint64_t.
 uint64_t checked_mebibytes(uint64_t value, std::string_view option_name) {
@@ -1546,6 +1557,26 @@ chain_apis::read_write chain_plugin::get_read_write_api(const fc::microseconds& 
    return chain_apis::read_write(chain(), my->_trx_retry_db, get_abi_serializer_max_time(), http_max_response_time, api_accept_transactions());
 }
 
+chain::plugin_interface::next_function<
+   chain_apis::read_write::push_transaction_results>
+signed_action_detail::create_signed_action_submission_callback(
+   std::shared_ptr<chain_apis::read_write> read_write_api,
+   std::shared_ptr<std::promise<signed_action_result>> promise) {
+   return [read_write_api = std::move(read_write_api),
+           promise = std::move(promise)](const auto& result) {
+      // read_write::push_transaction's internal completion lambda captures its
+      // API through a raw `this`. Retain that API through this nested callback
+      // so a caller-side timeout cannot destroy it before async completion.
+      (void)read_write_api;
+      if (auto* error = std::get_if<fc::exception_ptr>(&result)) {
+         promise->set_value({.state = signed_action_result::status::rejected,
+                             .error = (*error)->to_string()});
+      } else {
+         promise->set_value({.state = signed_action_result::status::succeeded});
+      }
+   };
+}
+
 chain_apis::read_only chain_plugin::get_read_only_api(const fc::microseconds& http_max_response_time) const {
    return chain_apis::read_only(chain(), my->_get_info_db, my->_account_query_db, my->_last_tracked_votes, get_abi_serializer_max_time(), http_max_response_time, my->_trx_finality_status_processing.get());
 }
@@ -1617,7 +1648,7 @@ chain_plugin::read_table_rows(chain_apis::read_only::get_table_rows_params param
 
    // Poll every 200ms so we can abandon the wait if the caller is shutting down or if the deadline expires before
    // the executor drains our lambda.
-   while (fut.wait_for(std::chrono::milliseconds(200)) == std::future_status::timeout) {
+   while (fut.wait_for(executor_wait_poll_interval) == std::future_status::timeout) {
       if (shutdown_flag.load(std::memory_order_relaxed)) {
          wlog("{}: abandoning table read on shutdown ({}::{})", log_prefix, log_code, log_table);
          return {};
@@ -1629,6 +1660,168 @@ chain_plugin::read_table_rows(chain_apis::read_only::get_table_rows_params param
       }
    }
    return fut.get();
+}
+
+bool chain_plugin::provider_can_authorize_active_alone(
+   chain::name actor,
+   const fc::crypto::public_key& provider_key) const {
+   const auto& authorization = chain().get_authorization_manager();
+   // Declaring actor@active may be satisfied by active itself or its owner
+   // ancestor. Mere membership in a multisig authority is insufficient.
+   for (const auto permission : {chain::config::active_name,
+                                 chain::config::owner_name}) {
+      try {
+         const auto& permission_object =
+            authorization.get_permission({actor, permission});
+         if (std::ranges::any_of(
+                permission_object.auth.keys, [&](const auto& weighted_key) {
+                   return weighted_key.key.to_public_key() == provider_key &&
+                          weighted_key.weight >= permission_object.auth.threshold;
+                })) {
+            return true;
+         }
+      } catch (...) {
+         // A missing permission cannot authorize this transaction.
+      }
+   }
+   return false;
+}
+
+signed_action_result
+chain_plugin::push_signed_action(chain::name contract,
+                                 chain::name action,
+                                 chain::name actor,
+                                 const fc::variant_object& data,
+                                 const fc::crypto::signature_provider_ptr& provider,
+                                 fc::microseconds timeout,
+                                 const std::atomic<bool>& shutdown_flag) {
+   using status = signed_action_result::status;
+
+   if (!provider) {
+      return {.state = status::rejected,
+              .error = "no signature provider selected"};
+   }
+
+   struct prepared_action {
+      std::optional<chain::signed_transaction> transaction;
+      std::optional<chain::chain_id_type>       chain_id;
+      std::string                              error;
+   };
+
+   const auto deadline = fc::time_point::now() + timeout;
+   const auto prepare = [this, contract, action, actor, data,
+                         provider_key = provider->public_key,
+                         timeout]() -> prepared_action {
+      try {
+         auto& ctrl = chain();
+         if (!provider_can_authorize_active_alone(actor, provider_key)) {
+            return {.error =
+               "selected provider does not satisfy actor active/owner threshold alone"};
+         }
+
+         auto resolver = make_resolver(ctrl, timeout, throw_on_yield::no);
+         auto abi = resolver(contract);
+         if (!abi) {
+            return {.error = "contract ABI is unavailable"};
+         }
+
+         const auto action_type = abi->get_action_type(action);
+         auto action_data = abi->variant_to_binary(
+            action_type, fc::variant(data),
+            chain::abi_serializer::create_yield_function(timeout));
+
+         chain::signed_transaction transaction;
+         transaction.actions.emplace_back(
+            std::vector<chain::permission_level>{
+               {actor, chain::config::active_name}},
+            contract, action, std::move(action_data));
+         transaction.set_reference_block(ctrl.head().id());
+         transaction.expiration = fc::time_point_sec(
+            ctrl.head().block_time() +
+            fc::seconds(signed_action_expiration_seconds));
+
+         return {.transaction = std::move(transaction),
+                 .chain_id = ctrl.get_chain_id()};
+      } catch (const fc::exception& e) {
+         return {.error = e.to_detail_string()};
+      } catch (const std::exception& e) {
+         return {.error = e.what()};
+      } catch (...) {
+         return {.error = "unknown transaction preparation failure"};
+      }
+   };
+
+   auto wait_until_ready = [&](auto& future) -> bool {
+      while (future.wait_for(executor_wait_poll_interval) ==
+             std::future_status::timeout) {
+         if (shutdown_flag.load(std::memory_order_relaxed) ||
+             fc::time_point::now() >= deadline) {
+            return false;
+         }
+      }
+      return true;
+   };
+
+   prepared_action prepared;
+   if (std::this_thread::get_id() == app().executor().get_main_thread_id()) {
+      prepared = prepare();
+   } else {
+      auto promise = std::make_shared<std::promise<prepared_action>>();
+      auto future = promise->get_future();
+      app().executor().post(
+         appbase::priority::medium, appbase::exec_queue::read_only,
+         [promise, prepare]() mutable { promise->set_value(prepare()); });
+      if (!wait_until_ready(future)) {
+         return {
+            .state = shutdown_flag.load(std::memory_order_relaxed)
+               ? status::shutting_down : status::timed_out,
+            .error = "transaction preparation did not complete before the deadline",
+         };
+      }
+      prepared = future.get();
+   }
+
+   if (!prepared.transaction || !prepared.chain_id) {
+      return {.state = status::rejected, .error = std::move(prepared.error)};
+   }
+
+   try {
+      auto& transaction = *prepared.transaction;
+      const auto digest = transaction.sig_digest(
+         *prepared.chain_id, transaction.context_free_data);
+      transaction.signatures.push_back(provider->sign(digest));
+
+      auto packed = chain::packed_transaction(
+         std::move(transaction),
+         chain::packed_transaction::compression_type::none);
+      fc::variant packed_variant;
+      chain::to_variant(packed, packed_variant);
+
+      auto promise = std::make_shared<std::promise<signed_action_result>>();
+      auto future = promise->get_future();
+      auto rw = std::make_shared<chain_apis::read_write>(
+         get_read_write_api(timeout));
+      rw->push_transaction(
+         packed_variant.get_object(),
+         signed_action_detail::create_signed_action_submission_callback(
+            rw, promise));
+
+      if (!wait_until_ready(future)) {
+         return {
+            .state = shutdown_flag.load(std::memory_order_relaxed)
+               ? status::shutting_down : status::timed_out,
+            .error = "transaction submission did not complete before the deadline",
+         };
+      }
+      return future.get();
+   } catch (const fc::exception& e) {
+      return {.state = status::rejected, .error = e.to_detail_string()};
+   } catch (const std::exception& e) {
+      return {.state = status::rejected, .error = e.what()};
+   } catch (...) {
+      return {.state = status::rejected,
+              .error = "unknown transaction signing/submission failure"};
+   }
 }
 
 void chain_plugin::accept_transaction(const chain::packed_transaction_ptr& trx, next_function<chain::transaction_trace_ptr> next) {

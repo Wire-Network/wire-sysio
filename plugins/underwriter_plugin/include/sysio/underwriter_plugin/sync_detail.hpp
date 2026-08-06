@@ -2,7 +2,7 @@
 /**
  * @file sync_detail.hpp
  * @brief Pure gate-lifecycle machinery for the underwriter plugin — the deferred-
- *        startup states and the `/v1/underwriter/*` gate payloads — lifted out of
+ *        startup states and the `/v1/underwriter/` gate payloads — lifted out of
  *        the `.cpp`-private impl so they are unit-testable without standing up a
  *        chain.
  *

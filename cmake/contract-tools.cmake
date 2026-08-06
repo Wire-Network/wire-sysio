@@ -4,15 +4,18 @@ include(ExternalProject)
 
 option(BUILD_SYSTEM_CONTRACTS "Build system contracts" OFF)
 cmake_dependent_option(BUILD_TEST_CONTRACTS "Build test contracts" OFF "BUILD_SYSTEM_CONTRACTS" OFF)
-cmake_dependent_option(CDT_BUILD "Indicates that the CDT is being built" OFF "BUILD_SYSTEM_CONTRACTS" ON)
+option(CDT_BUILD "Indicates that the CDT is being built" OFF)
 
 message(STATUS "CDT_ROOT is set to: ${CDT_ROOT}")
+
+if(NOT CDT_BUILD AND (BUILD_SYSTEM_CONTRACTS OR (ENABLE_TESTS AND CDT_ROOT)))
+  find_package(cdt REQUIRED)
+endif()
 
 if(BUILD_SYSTEM_CONTRACTS AND NOT CDT_BUILD)
   set(SYSIO_WASM_OLD_BEHAVIOR "Off")
   set(CDT_CONTRACT_INCLUDE_PATH "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/include")
   message(NOTICE "CDT_CONTRACT_INCLUDE_PATH = ${CDT_CONTRACT_INCLUDE_PATH}")
-  find_package(cdt REQUIRED)
   set(
     CDT_CMAKE_ARGS
           -DCDT_ROOT=${CDT_ROOT}

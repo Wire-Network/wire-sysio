@@ -18,9 +18,7 @@
 #include <sysio/batch_operator_plugin/outpost_epoch_lookup.hpp>
 #include <sysio/batch_operator_plugin/outpost_opp_job.hpp>
 #include <sysio/depot/opreg_status.hpp>
-#include <sysio/chain/abi_serializer.hpp>
 #include <sysio/chain/plugin_interface.hpp>
-#include <sysio/chain/transaction.hpp>
 #include <sysio/chain_plugin/chain_plugin.hpp>
 #include <sysio/opp/opp.hpp>
 #include <sysio/opp/attestations/attestations.pb.h>
@@ -759,32 +757,9 @@ struct batch_operator_plugin::impl {
                     const std::string& action_name,
                     chain::name auth_account,
                     const fc::variant_object& data) {
-      auto abi_max_time = fc::microseconds(delivery_timeout_ms * 1000);
-      auto& chain = chain_plug->chain();
-
-      // Resolve ABI and serialize action data
-      auto resolver = make_resolver(chain, abi_max_time, throw_on_yield::no);
-      auto abis_opt = resolver(chain::name(contract));
-      if (!abis_opt) {
-         elog("batch_operator: no ABI found for {}", contract);
-         return;
-      }
-
-      auto action_type = abis_opt->get_action_type(chain::name(action_name));
-      auto action_data = abis_opt->variant_to_binary(
-         action_type, fc::variant(data),
-         chain::abi_serializer::create_yield_function(abi_max_time));
-
-      // Build the signed transaction
-      chain::signed_transaction trx;
-      trx.actions.emplace_back(
-         std::vector<chain::permission_level>{{auth_account, chain::config::active_name}},
-         chain::name(contract), chain::name(action_name), std::move(action_data));
-
-      trx.set_reference_block(chain.head().id());
-      trx.expiration = fc::time_point_sec(chain.head().block_time() + fc::seconds(30));
-
-      // Sign with the operator's WIRE K1 key via signature_provider_manager
+      // Preserve the batch operator's existing WIRE-provider selection; the
+      // shared chain helper owns read-window-safe authorization, ABI/TAPOS
+      // preparation, signing, and submission.
       auto& sig_plug = app().get_plugin<signature_provider_manager_plugin>();
       auto wire_providers = sig_plug.query_providers(
          std::nullopt, fc::crypto::chain_kind_wire, fc::crypto::chain_key_type_wire);
@@ -793,33 +768,20 @@ struct batch_operator_plugin::impl {
          return;
       }
 
-      auto chain_id = chain.get_chain_id();
-      auto digest = trx.sig_digest(chain_id, trx.context_free_data);
-      trx.signatures.push_back(wire_providers.front()->sign(digest));
-
-      // Pack and push
-      auto packed = chain::packed_transaction(std::move(trx), chain::packed_transaction::compression_type::none);
-      auto rw = chain_plug->get_read_write_api(abi_max_time);
-
-      fc::variant packed_var;
-      chain::to_variant(packed, packed_var);
-
-      std::promise<void> done;
-      auto future = done.get_future();
-
-      rw.push_transaction(
-         packed_var.get_object(),
-         [&done, &contract, &action_name](const auto& result) {
-            if (auto* err = std::get_if<fc::exception_ptr>(&result)) {
-               elog("batch_operator: push {}::{} failed — {}", contract, action_name, (*err)->to_string());
-            } else {
-               ilog("batch_operator: pushed {}::{} ok", contract, action_name);
-            }
-            done.set_value();
-         });
-
-      if (future.wait_for(std::chrono::milliseconds(delivery_timeout_ms)) == std::future_status::timeout) {
-         elog("batch_operator: push {}::{} timed out", contract, action_name);
+      const auto result = chain_plug->push_signed_action(
+         chain::name(contract), chain::name(action_name), auth_account, data,
+         wire_providers.front(), fc::milliseconds(delivery_timeout_ms),
+         shutting_down);
+      if (result.succeeded()) {
+         ilog("batch_operator: pushed {}::{} ok", contract, action_name);
+      } else if (result.state == signed_action_result::status::shutting_down) {
+         return;
+      } else if (result.state == signed_action_result::status::timed_out) {
+         elog("batch_operator: push {}::{} timed out — {}",
+              contract, action_name, result.error);
+      } else {
+         elog("batch_operator: push {}::{} failed — {}",
+              contract, action_name, result.error);
       }
    }
 

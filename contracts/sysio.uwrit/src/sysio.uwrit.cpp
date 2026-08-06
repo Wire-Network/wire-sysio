@@ -8,6 +8,7 @@
 #include <sysio.opp.common/amm_math.hpp>
 #include <sysio.opp.common/safe_ops.hpp>
 #include <sysio.opp.common/name_ops.hpp>
+#include <sysio/opp/uic_signature_canonical.hpp>
 #include <sysio/opp/attestations/attestations.pb.hpp>
 #include <sysio/permission.hpp>
 #include <sysio/crypto.hpp>
@@ -18,6 +19,8 @@
 #include <cstring>
 #include <limits>
 #include <optional>
+#include <type_traits>
+#include <variant>
 
 namespace sysio {
 
@@ -56,6 +59,61 @@ constexpr sysio::symbol WIRE_SYMBOL{"WIRE", 9};
 /// inbound attestation ids — msgch's `mint_att_id` counts monotonically
 /// from 1 and can never reach 2^63, so the two id spaces are disjoint.
 constexpr uint64_t DEPOT_ORIGIN_ID_BASE = 0x8000000000000000ULL;
+
+/// Fixed-size, recoverable `sysio::signature` variants accepted at the UIC
+/// protocol boundary. WebAuthn is deliberately excluded because its variable
+/// fields require a hostile-byte parser; BLS is fixed-size but not recoverable.
+/// The enum values are the packed variant tags and `sysio::signature` indices.
+enum class uic_signature_variant : uint8_t {
+   k1 = 0,
+   r1 = 1,
+   wa = 2,
+   em = 3,
+   ed = 4,
+   bls = 5,
+};
+
+static_assert(std::variant_size_v<sysio::signature> == 6);
+static_assert(std::is_same_v<std::variant_alternative_t<2, sysio::signature>,
+                             sysio::webauthn_signature>);
+static_assert(std::is_same_v<std::variant_alternative_t<4, sysio::signature>,
+                             sysio::ed_signature>);
+static_assert(std::is_same_v<std::variant_alternative_t<5, sysio::signature>,
+                             sysio::bls_signature>);
+// K1, R1, and EM intentionally share ecc_signature as their alternative type,
+// so type-identity assertions cannot detect a permutation of those indices.
+// sysio.dispatch_tests pins their concrete packed tags and exercises real
+// contract recovery/permission authorization for all four accepted variants.
+
+constexpr size_t K1_SIGNATURE_VARIANT_INDEX =
+   magic_enum::enum_integer(uic_signature_variant::k1);
+constexpr size_t R1_SIGNATURE_VARIANT_INDEX =
+   magic_enum::enum_integer(uic_signature_variant::r1);
+constexpr size_t EM_SIGNATURE_VARIANT_INDEX =
+   magic_enum::enum_integer(uic_signature_variant::em);
+constexpr size_t ED_SIGNATURE_VARIANT_INDEX =
+   magic_enum::enum_integer(uic_signature_variant::ed);
+
+/// Every accepted variant index is encoded as one varuint byte.
+constexpr size_t PACKED_SIGNATURE_TAG_SIZE = 1;
+
+/// Exact packed sizes of the one-byte variant tag plus each fixed signature
+/// body. K1, R1, and EM share the 65-byte ECC representation; ED embeds its
+/// public key in a 96-byte body.
+constexpr size_t PACKED_ECC_SIGNATURE_SIZE =
+   PACKED_SIGNATURE_TAG_SIZE + std::tuple_size_v<sysio::ecc_signature>;
+constexpr size_t PACKED_ED_SIGNATURE_SIZE =
+   PACKED_SIGNATURE_TAG_SIZE + std::tuple_size_v<sysio::ed_signature>;
+
+/// Stable action-trace marker for malformed or unauthorized UIC signatures.
+constexpr const char* UIC_SIGNATURE_REJECTED_LOG_PREFIX = "UIC_SIGNATURE_REJECTED";
+
+/// Prefix used in the durable commit-entry rejection reason.
+constexpr const char* UIC_SIGNATURE_REJECTED_REASON_PREFIX =
+   "invalid underwrite-intent-commit ";
+
+/// Separates the rejected leg from its typed verification result.
+constexpr const char* UIC_SIGNATURE_REJECTED_REASON_SEPARATOR = " signature: ";
 
 /// Fixed serialized-size allowance for a NEW `commit_entry`'s non-vector
 /// fields (underwriter name, two timestamp/outpost-id pairs, status, empty
@@ -521,8 +579,10 @@ swap_remit_disp try_build_swap_remit(const uwrit::uw_request_t& req,
 
    // Resolve the winning underwriter's destination-chain pubkey from
    // `sysio.authex::links` (`bynamechain`) so the SwapRemit carries the
-   // underwriter's auditable identity — the destination outpost
-   // cross-references it against the UNDERWRITE_INTENT_COMMIT it already saw.
+   // underwriter's auditable destination-chain settlement key. This is not
+   // the UIC's authenticated transaction caller: on EVM the remit carries a
+   // 33-byte compressed EM key while `uw_ext_chain_addr` carries the 20-byte
+   // `msg.sender`, so the two fields are deliberately not byte-compared.
    // A winner without a dst-chain link cannot ship a SwapRemit with a
    // populated underwriter, but this is candidate-specific: disqualify them
    // so the race can resolve for another underwriter (NOT terminal).
@@ -586,30 +646,96 @@ void queue_swap_remit(name self, uint64_t dst_outpost_id,
    ).send();
 }
 
+/// Typed outcome of verifying one required UIC leg.
+enum class uic_signature_result {
+   valid,
+   empty_uic,
+   malformed_uic,
+   non_canonical_uic,
+   missing_signature,
+   invalid_signature_length,
+   unsupported_signature_type,
+   non_canonical_signature,
+   digest_encoding_failed,
+   recovery_failed,
+   unauthorized_key,
+};
+
+/// Identifies which required UIC leg failed verification.
+enum class uic_leg {
+   source,
+   destination,
+};
+
+/// True only when one incoming side already carries complete stored evidence.
+bool required_uic_leg_populated(const uwrit::commit_entry& entry, uic_leg leg) {
+   return leg == uic_leg::source
+      ? !entry.source_uic_bytes.empty() && entry.source_received_at_ms != 0
+      : !entry.dest_uic_bytes.empty() && entry.dest_received_at_ms != 0;
+}
+
+/// True when every outpost-backed side has complete stored UIC evidence.
+bool required_uic_legs_complete(const uwrit::uw_request_t& request,
+                                const uwrit::commit_entry& entry) {
+   const bool source_complete = leg_is_depot(request.src_chain_code) ||
+      required_uic_leg_populated(entry, uic_leg::source);
+   const bool destination_complete = leg_is_depot(request.dst_chain_code) ||
+      required_uic_leg_populated(entry, uic_leg::destination);
+   return source_complete && destination_complete;
+}
+
+/**
+ * @brief Validate and construct one fixed-size ECDSA UIC signature variant.
+ * @tparam VariantIndex Exact `sysio::signature` alternative to construct.
+ * @param packed Packed bytes including the one-byte variant tag.
+ * @param curve Curve order governing `r` and `s`.
+ * @param recovery_position Position of the compact recovery byte.
+ * @param recovery_encoding Required numeric recovery-byte representation.
+ * @param parsed_sig Destination signature variant.
+ * @return Typed length/canonicality outcome, or `valid` after construction.
+ */
+template <size_t VariantIndex>
+uic_signature_result parse_uic_ecc_signature(
+   std::span<const char> packed,
+   opp::uic_ecdsa_curve curve,
+   opp::uic_ecdsa_recovery_position recovery_position,
+   opp::uic_ecdsa_recovery_encoding recovery_encoding,
+   sysio::signature& parsed_sig) {
+   if (packed.size() != PACKED_ECC_SIGNATURE_SIZE) {
+      return uic_signature_result::invalid_signature_length;
+   }
+   const auto body = packed.subspan(PACKED_SIGNATURE_TAG_SIZE);
+   if (!opp::is_canonical_uic_ecdsa_signature(
+          body, curve, recovery_position, recovery_encoding)) {
+      return uic_signature_result::non_canonical_signature;
+   }
+
+   sysio::ecc_signature compact_sig{};
+   std::copy_n(body.begin(), compact_sig.size(), compact_sig.begin());
+   parsed_sig.emplace<VariantIndex>(std::move(compact_sig));
+   return uic_signature_result::valid;
+}
+
 /// Verify the embedded signature in `uic_bytes` was produced by a key on
 /// EITHER the `underwriter` account's `active` OR `owner` permission, over
-/// the digest `sha256(serialize(uic_with_signature_blanked))`. Returns
-/// true on first matching key. Returns false (never throws) when the bytes
-/// are empty, the proto fails to decode, the embedded signature is missing,
-/// or no `active`/`owner` key recovers to the signature. Other permissions
-/// (custom permission names) are intentionally NOT checked: the
-/// underwriter_plugin's signature_provider_manager_plugin config is pinned
-/// to one of `active`/`owner`, so accepting a custom permission would let
-/// an attacker bypass the configuration constraint.
+/// the digest `sha256(serialize(uic_with_signature_blanked))`.
 ///
-/// **Per `feedback_opp_handlers_never_throw.md` — this MUST stay
-/// non-throwing.** It's called from `try_select_winner`, which runs inside
-/// the evalcons inline-action chain; a `check()`/throw here halts
-/// consensus. The defensive size+tag bounds below reject the structurally
-/// invalid signatures before recovery. Recovery itself uses
-/// `sysio::recover_key`; converting its remaining contract-observable
-/// throws (unactivated variant, recovery-math failure) to an rc = -1
-/// sentinel — so this is non-throwing on every input — is tracked as
-/// separate host+CDT work landing in its own PR. Until then a crafted but
-/// size/tag-valid signature can still throw here.
-bool verify_uic_signature(name underwriter,
-                           const std::vector<char>& uic_bytes) {
-   if (uic_bytes.empty()) return false;
+/// The accepted wire shapes are the fixed-size recoverable variants already
+/// supported by WIRE providers: K1, R1, and EM (one tag byte plus a 65-byte ECC
+/// body), and ED (one tag byte plus a 96-byte body). Each body is copied into
+/// its known variant directly instead of routing attacker-controlled bytes
+/// through the generic variant deserializer, whose fixed-array underrun calls
+/// `check()` and would abort the enclosing evalcons transaction. Variable-size
+/// WebAuthn and unrecoverable BLS signatures are rejected before construction.
+///
+/// Per `feedback_opp_handlers_never_throw.md`, every attacker-controlled
+/// failure is returned as a typed result. Other permissions (custom names)
+/// are intentionally not checked: the plugin is pinned to `active` or
+/// `owner`, and accepting a custom permission would create an unconfigured
+/// authorization surface.
+uic_signature_result verify_uic_signature(name underwriter,
+                                          const std::vector<char>& uic_bytes) {
+   if (uic_bytes.empty()) return uic_signature_result::empty_uic;
 
    // Decode the UIC payload.
    opp::attestations::UnderwriteIntentCommit uic;
@@ -617,47 +743,90 @@ bool verify_uic_signature(name underwriter,
       auto in = zpp::bits::in{
          std::span{uic_bytes.data(), uic_bytes.size()},
          zpp::bits::no_size{}};
-      if (in(uic) != zpp::bits::errc{}) return false;
+      if (in(uic) != zpp::bits::errc{}) return uic_signature_result::malformed_uic;
    }
 
-   // Save the signature, blank it, recompute the digest.
-   std::vector<char> sig_bytes_view{uic.signature.begin(), uic.signature.end()};
-   if (sig_bytes_view.empty()) return false;
+   // Require the exact canonical protobuf encoding before hashing or recovery.
+   // zpp decode normalizes duplicate/default/unknown-field representations;
+   // re-encoding the complete message (with its original signature intact)
+   // makes every alternate byte sequence fail closed without throwing.
+   std::vector<char> canonical_uic;
+   auto canonical_out = zpp::bits::out{canonical_uic, zpp::bits::no_size{}};
+   if (canonical_out(uic) != zpp::bits::errc{}) {
+      return uic_signature_result::digest_encoding_failed;
+   }
+   if (canonical_uic != uic_bytes) {
+      return uic_signature_result::non_canonical_uic;
+   }
+
+   // Validate the exact fixed-size shape before doing any hashing or
+   // constructing the signature variant. This both bounds work on malformed
+   // inputs and makes the former generic-deserializer underrun unreachable.
+   const std::vector<char> sig_bytes_view{uic.signature.begin(), uic.signature.end()};
+   if (sig_bytes_view.empty()) return uic_signature_result::missing_signature;
+   const auto signature_variant = magic_enum::enum_cast<uic_signature_variant>(
+      static_cast<uint8_t>(sig_bytes_view.front()));
+   if (!signature_variant) {
+      return uic_signature_result::unsupported_signature_type;
+   }
+
+   sysio::signature parsed_sig;
+   switch (*signature_variant) {
+      case uic_signature_variant::k1:
+         if (const auto result = parse_uic_ecc_signature<K1_SIGNATURE_VARIANT_INDEX>(
+                sig_bytes_view, opp::uic_ecdsa_curve::secp256k1,
+                opp::uic_ecdsa_recovery_position::prefix,
+                opp::uic_ecdsa_recovery_encoding::compact, parsed_sig);
+             result != uic_signature_result::valid) return result;
+         break;
+      case uic_signature_variant::r1:
+         if (const auto result = parse_uic_ecc_signature<R1_SIGNATURE_VARIANT_INDEX>(
+                sig_bytes_view, opp::uic_ecdsa_curve::p256,
+                opp::uic_ecdsa_recovery_position::prefix,
+                opp::uic_ecdsa_recovery_encoding::compact, parsed_sig);
+             result != uic_signature_result::valid) return result;
+         break;
+      case uic_signature_variant::em:
+         if (const auto result = parse_uic_ecc_signature<EM_SIGNATURE_VARIANT_INDEX>(
+                sig_bytes_view, opp::uic_ecdsa_curve::secp256k1,
+                opp::uic_ecdsa_recovery_position::suffix,
+                opp::uic_ecdsa_recovery_encoding::ethereum, parsed_sig);
+             result != uic_signature_result::valid) return result;
+         break;
+      case uic_signature_variant::ed: {
+         if (sig_bytes_view.size() != PACKED_ED_SIGNATURE_SIZE) {
+            return uic_signature_result::invalid_signature_length;
+         }
+         sysio::ed_signature compact_sig{};
+         std::copy_n(sig_bytes_view.begin() + PACKED_SIGNATURE_TAG_SIZE,
+                     compact_sig.size(), compact_sig.begin());
+         parsed_sig.emplace<ED_SIGNATURE_VARIANT_INDEX>(std::move(compact_sig));
+         break;
+      }
+      case uic_signature_variant::wa:
+      case uic_signature_variant::bls:
+      default:
+         return uic_signature_result::unsupported_signature_type;
+   }
+
+   // Blank the signature and recompute the signed digest.
    uic.signature.clear();
 
    std::vector<char> blanked;
    auto out = zpp::bits::out{blanked, zpp::bits::no_size{}};
-   if (out(uic) != zpp::bits::errc{}) return false;
+   if (out(uic) != zpp::bits::errc{}) {
+      return uic_signature_result::digest_encoding_failed;
+   }
 
    sysio::checksum256 digest =
       sysio::sha256(blanked.data(), blanked.size());
 
-   // Defensive bounds before invoking the chain signature intrinsic. The
-   // first byte of a packed `sysio::signature` is the variant tag
-   // (0=K1, 1=R1, 2=WebAuthN, 3=EM, 4=ED25519, 5=BLS). Anything outside
-   // that range or sized outside the smallest/largest legal variant is
-   // tossed before the intrinsic gets a chance to attempt recovery.
-   if (sig_bytes_view.size() < 2 || sig_bytes_view.size() > 1024) return false;
-   const uint8_t tag = static_cast<uint8_t>(sig_bytes_view[0]);
-   if (tag > 5) return false;
-
-   // Unpack the underwriter's signature variant from the embedded bytes.
-   sysio::signature parsed_sig;
-   {
-      sysio::datastream<const char*> ds{sig_bytes_view.data(),
-                                          sig_bytes_view.size()};
-      ds >> parsed_sig;
-   }
-
-   // Recover the public key — non-throwing variant. The host wraps the
-   // throwing recovery path in try/catch and returns `std::nullopt` on
-   // any failure (malformed bytes, unactivated sig type, recovery math
-   // failure, subjective-size limit). Required because CDT compiles
-   // with `-fno-exceptions` and `try_select_winner` cannot halt the
-   // dispatch on attacker-controlled bytes (per
-   // `feedback_opp_handlers_never_throw.md`).
+   // Recover the public key through the rc-returning intrinsic. Exact
+   // fixed-size construction above makes the subjective variable-size
+   // signature guard unreachable, while bad recovery bytes or curve values
+   // return nullopt.
    auto recovered_opt = sysio::try_recover_key(digest, parsed_sig);
-   if (!recovered_opt) return false;
+   if (!recovered_opt) return uic_signature_result::recovery_failed;
    const sysio::public_key& recovered = *recovered_opt;
 
    // Only `owner` and `active` permissions are considered. The
@@ -671,10 +840,29 @@ bool verify_uic_signature(name underwriter,
       auto rec_opt = sysio::get_permission(underwriter, perm);
       if (!rec_opt) continue;
       for (const auto& kw : rec_opt->auth.keys) {
-         if (kw.key == recovered) return true;
+         // A UIC carries exactly one signature. A direct key therefore
+         // authorizes it only when that key's weight alone reaches this
+         // permission's threshold; mere membership in a multisig authority
+         // is not sufficient.
+         if (kw.key == recovered && kw.weight >= rec_opt->auth.threshold) {
+            return uic_signature_result::valid;
+         }
       }
    }
-   return false;
+   return uic_signature_result::unauthorized_key;
+}
+
+/// Create the durable rejection reason from typed leg and verification values.
+std::string create_uic_signature_rejection_reason(uic_leg leg,
+                                                  uic_signature_result result) {
+   const auto leg_name = magic_enum::enum_name(leg);
+   const auto result_name = magic_enum::enum_name(result);
+
+   std::string reason{UIC_SIGNATURE_REJECTED_REASON_PREFIX};
+   reason.append(leg_name.data(), leg_name.size());
+   reason.append(UIC_SIGNATURE_REJECTED_REASON_SEPARATOR);
+   reason.append(result_name.data(), result_name.size());
+   return reason;
 }
 
 /// Allocate a fresh `lock_id` from the uwcounters singleton.
@@ -1067,14 +1255,15 @@ uwrit::commit_entry* find_or_create_commit(uwrit::uw_request_t& req, name underw
 /// Non-throwing.
 ///
 /// Uses the dedicated `UNDERWRITE_STATUS_DISQUALIFIED` status — a
-/// candidate-specific, pre-settlement invalidity (bad UIC signature,
-/// insufficient bond, or a missing destination authex link). It is
+/// candidate-specific, durable pre-settlement invalidity (for example, an
+/// older stored UIC invalidated by permission-key rotation or a missing
+/// destination-authex identity link). It is
 /// deliberately distinct from `UNDERWRITE_STATUS_SLASHED` (an economic
 /// punishment that actually burned collateral) and from
 /// `UNDERWRITE_STATUS_RELEASED` (a clean race loser whose commit was valid):
 /// conflating the three would mislead downstream indexing and audits. A
-/// disqualified entry is reclaimable — a later `rcrdcommit` re-arms it to
-/// `INTENT_SUBMITTED` for re-evaluation.
+/// disqualified entry is durable for this request: later records naming the
+/// candidate cannot rewrite its evidence or re-arm it for winner selection.
 void disqualify_candidate(uwrit::uwreqs_t& reqs, const uwrit::id_key& pk,
                           name candidate, const std::string& reason) {
    reqs.modify(same_payer, pk, [&](auto& r) {
@@ -1082,6 +1271,44 @@ void disqualify_candidate(uwrit::uwreqs_t& reqs, const uwrit::id_key& pk,
       c->status = UnderwriteStatus::UNDERWRITE_STATUS_DISQUALIFIED;
       c->reason = reason;
    });
+}
+
+/// Emit the stable rejection marker for an invalid claimed candidate UIC.
+/// `chain_code` is the provenance-bound slug supplied by msgch, not an outpost
+/// table id. Logging is the only effect when pre-storage validation fails.
+void log_uic_signature_rejection(uint64_t uwreq_id,
+                                 name candidate,
+                                 uic_leg leg,
+                                 uint64_t chain_code,
+                                 uic_signature_result result) {
+   const std::string leg_name{magic_enum::enum_name(leg)};
+   const std::string result_name{magic_enum::enum_name(result)};
+   sysio::print(UIC_SIGNATURE_REJECTED_LOG_PREFIX,
+                ": uwreq=", uwreq_id,
+                ", claimed_underwriter=", candidate,
+                ", leg=", leg_name,
+                ", chain_code=", chain_code,
+                ", reason=", result_name, "\n");
+}
+
+/// Revalidate an older stored leg when its matching leg arrives. This protects
+/// the race from WIRE permission-key rotation between leg arrivals: a key that
+/// authorized the first leg may no longer be authorized when the pair becomes
+/// eligible to win. Returning false is a normal consensus-path outcome.
+bool validate_candidate_uic(uwrit::uwreqs_t& reqs,
+                            const uwrit::id_key& pk,
+                            uint64_t uwreq_id,
+                            name candidate,
+                            uic_leg leg,
+                            uint64_t chain_code,
+                            const std::vector<char>& uic_bytes) {
+   const auto result = verify_uic_signature(candidate, uic_bytes);
+   if (result == uic_signature_result::valid) return true;
+
+   const auto reason = create_uic_signature_rejection_reason(leg, result);
+   log_uic_signature_rejection(uwreq_id, candidate, leg, chain_code, result);
+   disqualify_candidate(reqs, pk, candidate, reason);
+   return false;
 }
 
 /// Terminally close a uwreq that can never settle: refund the source side and
@@ -1168,10 +1395,11 @@ void reject_and_refund(name self, uwrit::uwreqs_t& reqs, const uwrit::id_key& pk
 ///   * normal     — reserv::applyswap  + SWAP_REMIT to the dst outpost
 ///   * from-WIRE  — reserv::applyfromwire + SWAP_REMIT to the dst outpost
 ///   * to-WIRE    — reserv::paywire (REAL WIRE to the recipient; no remit)
-/// Disqualified candidates get their commit_entry marked
-/// (status=DISQUALIFIED); transient liquidity shortfalls log + skip, leaving
-/// the uwreq PENDING.
-void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
+/// Stale/invalid evidence and a missing destination identity link disqualify a
+/// candidate durably. Transient collateral and reserve-liquidity shortfalls
+/// log + skip without aborting the enclosing dispatch.
+void try_select_winner(name self, uint64_t uwreq_id, name candidate,
+                       std::optional<uic_leg> just_verified_leg) {
    uwrit::uwreqs_t reqs(self);
    auto pk = uwrit::id_key{uwreq_id};
    if (!reqs.contains(pk)) return;
@@ -1180,6 +1408,20 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
 
    const bool src_needed = !leg_is_depot(req.src_chain_code);
    const bool dst_needed = !leg_is_depot(req.dst_chain_code);
+
+   // The resolver only operates on one complete, live candidate. Keeping this
+   // invariant here makes both the consensus-dispatch path and the explicit
+   // retry action idempotent and prevents either caller from reaching costly
+   // permission recovery with incomplete or terminal evidence.
+   const uwrit::commit_entry* ce_ptr = nullptr;
+   for (const auto& c : req.commits_by) {
+      if (c.underwriter == candidate) { ce_ptr = &c; break; }
+   }
+   if (!ce_ptr ||
+       ce_ptr->status != UnderwriteStatus::UNDERWRITE_STATUS_INTENT_SUBMITTED ||
+       !required_uic_legs_complete(req, *ce_ptr)) {
+      return;
+   }
 
    // ── Underwriter eligibility — role + activation gate ─────────────────
    // Mirrored bond availability and UIC signature recovery alone do NOT
@@ -1193,9 +1435,9 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
    // carrying enough mirrored balance and a valid UIC signature would be
    // selected as the winner, consume lock capacity, and settle against the
    // reserves. Require an ACTIVE UNDERWRITER before any signature work, lock,
-   // CONFIRMED write, or reserve mutation. Disqualify (reclaimable — a later
-   // rcrdcommit re-arms the entry once the operator activates) rather than
-   // throw: this resolver runs inside the evalcons dispatch chain, and a
+   // CONFIRMED write, or reserve mutation. Durably disqualify this candidate
+   // for the request rather than throw: this resolver runs inside the evalcons
+   // dispatch chain, and a
    // check() here would stall OPP consensus (`feedback_opp_handlers_never_throw`).
    if (!is_active_underwriter(candidate)) {
       disqualify_candidate(reqs, pk, candidate,
@@ -1204,26 +1446,21 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
       return;
    }
 
-   // ── T7: signature verification — required (outpost) legs only ────────
-   // Look up the candidate's commit_entry to get the per-leg UIC bytes.
-   const uwrit::commit_entry* ce_ptr = nullptr;
-   for (const auto& c : req.commits_by) {
-      if (c.underwriter == candidate) { ce_ptr = &c; break; }
+   // ── T7: permission freshness ──────────────────────────────────────────
+   // `rcrdcommit` passes its incoming leg after verifying it immediately, so
+   // only the older stored opposite leg needs another recovery. `retrycommit`
+   // supplies no just-verified leg; both stored signatures are then recovered
+   // against current owner/active keys before locks or settlement.
+   if (src_needed && just_verified_leg != std::optional{uic_leg::source} &&
+       !validate_candidate_uic(reqs, pk, uwreq_id, candidate, uic_leg::source,
+                               ce_ptr->source_outpost_id,
+                               ce_ptr->source_uic_bytes)) {
+      return;
    }
-   if (!ce_ptr) return;
-   if ((src_needed && !verify_uic_signature(candidate, ce_ptr->source_uic_bytes)) ||
-       (dst_needed && !verify_uic_signature(candidate, ce_ptr->dest_uic_bytes))) {
-      // A candidate whose UIC signature does not recover to its active/owner
-      // key can never win — disqualify it (non-throwing) so the race state
-      // converges, instead of leaving a stale INTENT_SUBMITTED that keeps the
-      // uwreq pending/noisy until another underwriter wins. The race stays
-      // open for the remaining valid commits, and the disqualified candidate
-      // may re-arm via a later rcrdcommit. Per
-      // `feedback_opp_handlers_never_throw.md` a check() here would halt
-      // evalcons and stall consensus, so this path stays non-throwing.
-      disqualify_candidate(reqs, pk, candidate,
-                           "invalid underwrite-intent-commit signature on one "
-                           "or both required legs");
+   if (dst_needed && just_verified_leg != std::optional{uic_leg::destination} &&
+       !validate_candidate_uic(reqs, pk, uwreq_id, candidate,
+                               uic_leg::destination, ce_ptr->dest_outpost_id,
+                               ce_ptr->dest_uic_bytes)) {
       return;
    }
 
@@ -1267,9 +1504,9 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
    // and a balance is itself uint64, so an overflowing aggregate must read as
    // genuinely insufficient — NOT saturate to UINT64_MAX (which a UINT64_MAX
    // available balance would spuriously satisfy) and NOT wrap to a small
-   // passing value. This resolver is non-throwing
-   // (`feedback_opp_handlers_never_throw`), so it disqualifies the candidate
-   // rather than asserting on an over-large request.
+   // passing value. Collateral availability can change as locks are released
+   // or funds are deposited, so an insufficient candidate remains retryable.
+   // This resolver is non-throwing (`feedback_opp_handlers_never_throw`).
    const bool same_bucket = src_needed && dst_needed
                             && req.src_chain_code == req.dst_chain_code
                             && req.src_token_code == req.dst_token_code;
@@ -1292,11 +1529,8 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
                        || (dst_needed && dst_avail < req.dst_amount);
    }
    if (insufficient_bond) {
-      // Insufficient bond to cover the aggregate required collateral —
-      // disqualify this candidate, leave the race open for another.
-      disqualify_candidate(reqs, pk, candidate,
-                           "insufficient bond to cover the aggregate required "
-                           "collateral on one or both legs");
+      sysio::print("try_select_winner: insufficient candidate bond for uwreq ",
+                   uwreq_id, ", leaving commit retryable\n");
       return;
    }
 
@@ -1561,9 +1795,8 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
             c.status = UnderwriteStatus::UNDERWRITE_STATUS_RELEASED;
             c.reason = "lost the COMMIT race";
          }
-         // Race resolved — non-winner UIC blobs have no remaining reader
-         // (re-arm via rcrdcommit is PENDING-gated, and only PENDING rows
-         // re-evaluate). The winner's bytes stay through the lock window as
+         // Race resolved — non-winner UIC blobs have no remaining reader.
+         // The winner's bytes stay through the lock window as
          // the challenge-evidence trail; `chklocks` clears them at COMPLETED.
          if (c.underwriter != candidate) {
             c.source_uic_bytes.clear();
@@ -1670,7 +1903,7 @@ void uwrit::rcrdcommit(uint64_t uwreq_id,
    }
 
    // Only a registered ACTIVE underwriter can win this race — try_select_winner enforces the same
-   // gate, and the DISQUALIFIED re-arm below already requires a fresh rcrdcommit, so an entry for
+   // gate, so an entry for
    // any other account is pure dead weight. Refuse to create one: otherwise a matched-leg UIC could
    // append one commit_entry per attacker-chosen valid-but-unregistered account name and bloat the
    // row. Fail closed, no mutation, never check().
@@ -1680,26 +1913,59 @@ void uwrit::rcrdcommit(uint64_t uwreq_id,
       return;
    }
 
-   // Row-growth rails (SEC-129 / WSA-223) — every rail fails closed with no
-   // mutation, never check() (we are inside the evalcons dispatch chain).
-   // A stored UIC leg is capped so a hostile relay cannot inflate the row
-   // with an oversized blob…
-   if (uic_bytes.size() > MAX_UIC_LEG_BYTES) {
-      sysio::print("rcrdcommit: uwreq ", uwreq_id, " UIC payload of ",
-                   uic_bytes.size(), " bytes exceeds the per-leg cap, skipping\n");
-      return;
-   }
-   // …the candidate roster is capped so the ACTIVE-underwriter population
-   // bounds scan cost but not row size…
-   const bool existing_entry =
-      std::any_of(req_snapshot.commits_by.begin(), req_snapshot.commits_by.end(),
-                  [&](const commit_entry& c) { return c.underwriter == underwriter; });
+   // Reject a new name at the roster cap before protobuf decoding, hashing, or
+   // recovery. Existing candidates can still provide or replace a required leg.
+   const auto existing_it =
+      std::find_if(req_snapshot.commits_by.begin(), req_snapshot.commits_by.end(),
+                   [&](const commit_entry& c) { return c.underwriter == underwriter; });
+   const bool existing_entry = existing_it != req_snapshot.commits_by.end();
    if (!existing_entry && req_snapshot.commits_by.size() >= MAX_UWREQ_CANDIDATES) {
       sysio::print("rcrdcommit: uwreq ", uwreq_id, " already carries ",
                    req_snapshot.commits_by.size(),
                    " candidates (cap reached), skipping new candidate\n");
       return;
    }
+
+   // Disqualification is durable for this request. Once winner-time checks
+   // reject a candidate, no replay, malformed record, unauthorized record, or
+   // even newly valid replacement may rewrite the evidence/timestamps or
+   // re-arm that candidate. Another underwriter can still win the open race.
+   if (existing_entry &&
+       existing_it->status == UnderwriteStatus::UNDERWRITE_STATUS_DISQUALIFIED) {
+      sysio::print("rcrdcommit: uwreq ", uwreq_id, " candidate ", underwriter,
+                   " is already DISQUALIFIED, skipping\n");
+      return;
+   }
+
+   const auto incoming_leg = is_source ? uic_leg::source : uic_leg::destination;
+
+   // Reject oversized blobs before protobuf decoding, hashing, or recovery.
+   // Candidate evidence/status/reason/timestamps remain untouched.
+   if (uic_bytes.size() > MAX_UIC_LEG_BYTES) {
+      sysio::print("rcrdcommit: uwreq ", uwreq_id, " UIC payload of ",
+                   uic_bytes.size(), " bytes exceeds the per-leg cap, skipping\n");
+      return;
+   }
+
+   // Validate the claimed underwriter's signature before changing candidate
+   // evidence/status/reason/timestamps.
+   // Updated outposts bind their authenticated transaction submitter to
+   // `uw_account`, but the depot remains authoritative for current WIRE
+   // permission keys. An invalid claim must never overwrite an honest
+   // candidate's previously stored leg, re-arm its status, or create a
+   // competitor-visible entry. Log and ignore it; later
+   // records in the same envelope continue dispatching.
+   const auto signature_result = verify_uic_signature(underwriter, uic_bytes);
+   if (signature_result != uic_signature_result::valid) {
+      log_uic_signature_rejection(uwreq_id, underwriter, incoming_leg,
+                                  chain_code, signature_result);
+      return;
+   }
+
+   // Remaining row-growth rails (SEC-129 / WSA-223) — every rail fails closed
+   // with no mutation, never check() (we are inside the evalcons dispatch
+   // chain). The candidate roster is capped so the ACTIVE-underwriter population
+   // bounds scan cost but not row size…
    // …and the projected whole-row size is guarded so THIS modify — and every
    // later consensus-dispatched one — stays clear of chain KV value limits.
    // Conservative projection: current packed row + the incoming leg bytes +
@@ -1716,25 +1982,15 @@ void uwrit::rcrdcommit(uint64_t uwreq_id,
 
    reqs.modify(same_payer, pk, [&](auto& r) {
       auto* c = find_or_create_commit(r, underwriter);
-      uint64_t now_ms = current_time_ms();
+      const uint64_t admitted_at_ms = current_time_ms();
       if (is_source) {
-         c->source_received_at_ms = now_ms;
+         c->source_received_at_ms = admitted_at_ms;
          c->source_outpost_id     = chain_code;
          c->source_uic_bytes      = uic_bytes;
       } else if (is_dest) {
-         c->dest_received_at_ms = now_ms;
+         c->dest_received_at_ms = admitted_at_ms;
          c->dest_outpost_id     = chain_code;
          c->dest_uic_bytes      = uic_bytes;
-      }
-      // Re-arm a previously-disqualified entry to INTENT_SUBMITTED if the
-      // underwriter re-commits (e.g. they topped up bond, or added the missing
-      // destination authex link, and want back in the race). The next
-      // try_select_winner call re-evaluates. An economic SLASH is recorded on
-      // the lock, never on a commit_entry, so DISQUALIFIED is the only
-      // reclaimable terminal state here.
-      if (c->status == UnderwriteStatus::UNDERWRITE_STATUS_DISQUALIFIED) {
-         c->status = UnderwriteStatus::UNDERWRITE_STATUS_INTENT_SUBMITTED;
-         c->reason.clear();
       }
    });
 
@@ -1743,17 +1999,46 @@ void uwrit::rcrdcommit(uint64_t uwreq_id,
    // satisfied by construction (no outpost exists to send a UIC for it),
    // so single-leg swaps arm the race on their one real commit.
    auto refreshed = reqs.get(pk);
-   const bool src_needed = !leg_is_depot(refreshed.src_chain_code);
-   const bool dst_needed = !leg_is_depot(refreshed.dst_chain_code);
    for (const auto& c : refreshed.commits_by) {
       if (c.underwriter != underwriter) continue;
-      const bool src_ok = !src_needed || c.source_received_at_ms != 0;
-      const bool dst_ok = !dst_needed || c.dest_received_at_ms != 0;
-      if (src_ok && dst_ok) {
-         try_select_winner(get_self(), uwreq_id, underwriter);
+      if (required_uic_legs_complete(refreshed, c)) {
+         try_select_winner(get_self(), uwreq_id, underwriter, incoming_leg);
       }
       break;
    }
+}
+
+// ---------------------------------------------------------------------------
+//  retrycommit — retry one complete stored candidate without outpost replay
+// ---------------------------------------------------------------------------
+//
+// Transient collateral and reserve-liquidity failures deliberately leave a
+// candidate INTENT_SUBMITTED. The outpost transactions have already landed,
+// so retrying them would waste gas/fees and can enqueue duplicate attestations.
+// This action performs one bounded depot-side re-evaluation using the stored
+// evidence. Authorization makes the candidate pay for its own retry work; the
+// shared resolver caps that work at the request's two required UIC legs.
+void uwrit::retrycommit(uint64_t uwreq_id, name underwriter) {
+   require_auth(underwriter);
+
+   uwreqs_t reqs(get_self());
+   const auto pk = id_key{uwreq_id};
+   if (!reqs.contains(pk)) return;
+   const auto req = reqs.get(pk);
+   if (req.status != UnderwriteRequestStatus::UNDERWRITE_REQUEST_STATUS_PENDING) return;
+
+   const auto it = std::find_if(
+      req.commits_by.begin(), req.commits_by.end(),
+      [&](const commit_entry& c) { return c.underwriter == underwriter; });
+   if (it == req.commits_by.end() ||
+       it->status != UnderwriteStatus::UNDERWRITE_STATUS_INTENT_SUBMITTED ||
+       !required_uic_legs_complete(req, *it)) {
+      return;
+   }
+
+   // No leg arrived in this transaction. Revalidate every required stored UIC
+   // against current permissions before attempting collateral/settlement.
+   try_select_winner(get_self(), uwreq_id, underwriter, std::nullopt);
 }
 
 // ---------------------------------------------------------------------------

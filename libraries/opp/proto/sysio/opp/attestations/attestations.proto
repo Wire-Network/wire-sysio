@@ -199,6 +199,9 @@ message SwapRequest {
 //                                  (chain, token) pair this leg covers.
 message UnderwriteIntentCommit {
   sysio.opp.types.WireAccount     uw_account        = 1;
+  // Authenticated transaction caller on the originating outpost: exactly
+  // 20 bytes for EVM and exactly 32 bytes for SVM. The outpost binds this
+  // independently of the WIRE signature below before relaying the UIC.
   sysio.opp.types.ChainAddress    uw_ext_chain_addr = 2;
   uint64                          uw_request_id     = 3;
   bytes                           signature         = 5;
@@ -224,6 +227,8 @@ message SwapRemit {
   sysio.opp.types.ChainAddress recipient            = 1;
   sysio.opp.types.TokenAmount  amount               = 2;
   bytes                        original_message_id  = 3;
+  // Settlement address selected through authex; unlike the UIC caller
+  // address, this is not the originating transaction caller.
   sysio.opp.types.ChainAddress underwriter          = 4;
   uint64                       unlock_timestamp     = 5;
   // Destination chain + reserve identity (codenames).
