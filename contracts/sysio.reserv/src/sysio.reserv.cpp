@@ -180,7 +180,10 @@ void queue_attestation_out(name self,
    ).send();
 }
 
-/// Route a collected WIRE swap fee to its three destinations:
+/// Route the NETWORK COMPONENT of a collected WIRE swap fee to its three
+/// destinations. The reserve-owner shares carried in `fee` are NOT routed here —
+/// the settlement actions accrue those to their own reserve rows before calling
+/// this, so this function only ever moves the network fee's own split:
 ///   * the underwriter share accrues to `underwriter`'s `uwfees` row, payable to
 ///     that account on its own `claimuwfee` call — stays in custody;
 ///   * the rewards share accrues to the singleton `rewards_bucket`, swept by
@@ -190,10 +193,13 @@ void queue_attestation_out(name self,
 ///     TRANSFERRED to the `sysio` treasury — the only part that leaves custody.
 /// No-op when there is no fee.
 ///
-/// At the default config the emissions share is 0, so the whole fee moves from a
-/// reserve's WIRE side into two earmarked accumulators in the SAME custody and
-/// this call never changes `token_balance`. With a non-zero share, custody drops
-/// by exactly that share.
+/// At the default config the emissions share is 0, so everything THIS function
+/// routes moves into two earmarked accumulators in the SAME custody and the call
+/// never changes `token_balance`. With a non-zero share, custody drops by exactly
+/// that share. Note the total `wire_fee::fee` is larger than what is routed here
+/// whenever a participating reserve charges an owner fee: at the default dial the
+/// whole fee ends up spread across the owner accrual(s) the caller already made,
+/// `uwfees`, and `rewards_bucket` — not wholly into the two accumulators below.
 ///
 /// A fee with no winning underwriter (a revert refund) passes an unset
 /// `underwriter` together with a zero underwriter share. Should a caller ever
@@ -732,9 +738,11 @@ void reserve::applyswap(sysio::slug_name src_chain_code,
    // the weighted curve (the source reserve's own `connector_weight_bps`) — the
    // same definition `sysio.uwrit::swap_quote` uses, so the depot's books and
    // its quotes share one curve. The fee is then taken OUT of this WIRE leg: the
-   // source side gives up the full gross WIRE, only `net` continues to the
-   // destination side, and `fee` is split between the winning underwriter's
-   // accrual and the batch-operator rewards bucket.
+   // source side gives up the full gross WIRE and only `net` continues to the
+   // destination side. The TOTAL `fee` spreads across BOTH reserves' owner
+   // accruals (made in the modifies below), the winning underwriter's accrual,
+   // the batch-operator rewards bucket, and — only when
+   // `fee_emissions_share_bps` is set — a transfer of that share to `sysio`.
    const uint64_t w_gross = opp::amm::token_to_wire(src_it->reserve_chain_amount,
                                                     src_it->reserve_wire_amount,
                                                     src_it->connector_weight_bps,
@@ -799,10 +807,12 @@ void reserve::applyfromwire(sysio::slug_name dst_chain_code,
                 "applyfromwire: insufficient destination reserve balance");
 
    // Fee out of the user's escrowed input WIRE: only the post-fee remainder
-   // becomes destination-reserve liquidity; the fee is split between the winning
-   // underwriter's accrual and the rewards bucket. The full `wire_in` was
-   // escrowed in this contract at `swapfromwire` time and none of it leaves
-   // here, so custody stays balanced (net -> Σwire, fee -> the two accumulators).
+   // becomes destination-reserve liquidity. The TOTAL fee spreads across the
+   // DESTINATION reserve's owner accrual, the winning underwriter's accrual, and
+   // the rewards bucket. The full `wire_in` was escrowed in this contract at
+   // `swapfromwire` time; the ONLY part that leaves here is a configured
+   // `fee_emissions_share_bps` of the rewards pool. At the default-zero dial
+   // nothing leaves and custody balances as net -> Σwire, fee -> the accruals.
    // The source is the depot's own WIRE — there is no source reserve — so only
    // the DESTINATION reserve charges an owner fee here.
    const auto fee = opp::amm::split_wire_fee(wire_in, uwrit_fee_bps(), FEE_UNDERWRITER_SHARE_BPS,

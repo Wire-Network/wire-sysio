@@ -206,9 +206,12 @@ struct wire_fee {
 ///     2. `emissions_share_bps` of that POOL (not of the whole fee) goes to the
 ///        `sysio` emissions treasury; the rest is the batch-operator share.
 ///
-/// All integer, exact: the five shares sum to `fee` and `net + fee ==
-/// wire_amount`, because every stage takes a REMAINDER rather than a second
-/// floored product. Computed in `u128` to avoid overflow.
+/// All integer, exact, because every stage takes a REMAINDER rather than a
+/// second floored product. `net + fee == wire_amount` holds UNCONDITIONALLY.
+/// Five-share conservation — the shares summing to `fee` — holds only on the
+/// non-clamped path, i.e. when `total_fee < wire_amount`; once the total reaches
+/// the leg `fee` is clamped to `wire_amount` and the shares sum to MORE than it
+/// (see the clamp note below). Computed in `u128` to avoid overflow.
 ///
 /// **Callers must check `net > 0`.** Stacked rates can reach or exceed the leg,
 /// and that is REACHABLE UNDER VALID CONFIGURATION rather than merely
