@@ -229,7 +229,7 @@ message ReserveAmount {
 // ---------------------------------------------------------------------------
 
 enum AttestationType {
-  reserved 3001, 3002, 60929, 60933, 60935 to 60938, 60946, 60948, 60954, 60957;
+  reserved 3001, 3002, 60929, 60931, 60933, 60935 to 60942, 60946, 60948, 60954, 60957;
   reserved "ATTESTATION_TYPE_STAKE", "ATTESTATION_TYPE_UNSTAKE";
 
   ATTESTATION_TYPE_UNSPECIFIED = 0;
@@ -247,6 +247,7 @@ enum AttestationType {
   // 60929 (0xEE01) was ATTESTATION_TYPE_NATIVE_YIELD_REWARD — removed; do not reuse.
   // DEPRECATED — pre-launch only, do not use in new code.
   ATTESTATION_TYPE_WIRE_TOKEN_PURCHASE = 60930;
+  // 60931 was ATTESTATION_TYPE_OPERATOR_REG_DEREG — replaced by OPERATOR_ACTION; do not reuse.
   ATTESTATION_TYPE_CHALLENGE_RESPONSE = 60932;
   // 60933 was standalone SLASH_OPERATOR — removed; SLASH is now an OperatorAction sub-type.
   ATTESTATION_TYPE_SWAP_REQUEST = 60934;
@@ -254,6 +255,10 @@ enum AttestationType {
   // 60936 was ATTESTATION_TYPE_UNDERWRITE_CONFIRM — removed; do not reuse.
   // 60937 was ATTESTATION_TYPE_UNDERWRITE_REJECT — removed; do not reuse.
   // 60938 was ATTESTATION_TYPE_UNDERWRITE_UNLOCK — removed; do not reuse.
+  // 60939 was ATTESTATION_TYPE_CHALLENGE_REQUEST — renumbered to 60945; do not reuse.
+  // 60940 was ATTESTATION_TYPE_EPOCH_SYNC — renumbered to 60946, then removed; do not reuse.
+  // 60941 was ATTESTATION_TYPE_ROSTER_UPDATE — removed; do not reuse.
+  // 60942 was ATTESTATION_TYPE_REMIT_CONFIRM — renumbered to 60948, then removed; do not reuse.
   ATTESTATION_TYPE_SWAP_REMIT = 60944;
   ATTESTATION_TYPE_CHALLENGE_REQUEST = 60945;
   // 60946 was ATTESTATION_TYPE_EPOCH_SYNC — removed; do not reuse.
