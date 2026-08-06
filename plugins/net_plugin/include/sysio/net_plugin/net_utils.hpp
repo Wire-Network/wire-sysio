@@ -157,6 +157,22 @@ namespace detail {
       blocks_only
    };
 
+   /// Resolve whether block notice and block nack should be disabled for this node.
+   ///
+   /// The block notice and block nack exchange trades a round trip for bandwidth: a peer that is
+   /// repeatedly told "already have it" stops sending blocks and sends announcements instead. A node
+   /// that produces cannot pay that round trip, because a block reaching it late can cost it its own
+   /// production slot, so a configured producer exchanges full blocks by default. An explicit setting
+   /// always wins over that default.
+   ///
+   /// @param configured value supplied for p2p-disable-block-nack, meaningful only when explicitly set
+   /// @param explicitly_set whether @p configured came from configuration rather than the built-in default
+   /// @param configured_producer whether this node has at least one producer configured
+   /// @return true when block notice and block nack should be disabled
+   inline bool resolve_disable_block_nack(bool configured, bool explicitly_set, bool configured_producer) {
+      return explicitly_set ? configured : configured_producer;
+   }
+
    /// De-duplicate listen endpoints while preserving first-seen order so positionally paired
    /// p2p-server-address values remain aligned with their p2p-listen-endpoint.
    inline std::vector<std::string> dedupe_preserve_order(const std::vector<std::string>& addresses) {
