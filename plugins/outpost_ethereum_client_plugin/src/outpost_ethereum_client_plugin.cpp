@@ -6,6 +6,8 @@
 #include <sysio/outpost_ethereum_client_plugin/outpost_ethereum_client.hpp>
 
 #include <fc/log/logger.hpp>
+#include <fc/network/http/http_client.hpp>
+#include <fc/slug_name.hpp>
 #include <fc/task/deadline.hpp>
 #include <fc/task/retry.hpp>
 
@@ -27,6 +29,14 @@ constexpr auto chain_id_resolution_max_backoff = fc::seconds(1);
 constexpr std::string_view legacy_transaction_policy_client_id = "legacy-client";
 constexpr auto unavailable_policy_limit = "n/a";
 constexpr std::string_view chain_id_resolution_operation = "ethereum-client:eth_chainId";
+constexpr std::string_view outbound_http_failure_prefix = "Outbound HTTP ";
+constexpr std::string_view http_status_detail_prefix = "failed with status ";
+constexpr size_t http_status_code_width = 3;
+constexpr std::string_view retry_budget_exhausted_cause = "retry_budget_exhausted";
+constexpr std::string_view standard_exception_cause = "std_exception";
+constexpr std::string_view invalid_rpc_response_cause = "invalid_rpc_response";
+constexpr std::string_view fc_exception_cause_prefix = "fc_exception:";
+constexpr std::string_view configuration_chain_id_mismatch_reason = "configuration_chain_id_mismatch";
 
 namespace transaction_policy_field {
 constexpr std::string_view chain_id = "chain_id";
@@ -145,12 +155,44 @@ ethereum_transaction_policy policy_from_configuration(const EvmClientConfigurati
                       client_id);
 }
 
-/** Report a sanitized startup chain-id lookup failure. */
-[[noreturn]] void throw_chain_id_resolution_failure(const std::string& client_id) {
+/** Return a bounded transport category without reflecting response bodies or endpoint credentials. */
+std::string sanitized_chain_id_failure_cause(const fc::exception& failure) {
+   const auto message = failure.top_message();
+   for (const auto failure_kind : magic_enum::enum_values<fc::http::failure_kind>()) {
+      const auto failure_name = fc::http::failure_kind_name(failure_kind);
+      const auto marker = std::string(outbound_http_failure_prefix) + std::string(failure_name) + ":";
+      const auto marker_position = message.find(marker);
+      if (marker_position == std::string::npos) continue;
+
+      std::string cause(failure_name);
+      if (failure_kind == fc::http::failure_kind::http_status) {
+         const auto status_position = message.find(
+            http_status_detail_prefix, marker_position + marker.size());
+         if (status_position != std::string::npos) {
+            const auto code_begin = status_position + http_status_detail_prefix.size();
+            const auto code_end = std::min(code_begin + http_status_code_width, message.size());
+            if (code_end - code_begin == http_status_code_width &&
+                std::ranges::all_of(message.substr(code_begin, http_status_code_width),
+                                    [](char digit) { return digit >= '0' && digit <= '9'; })) {
+               cause += ":" + message.substr(code_begin, http_status_code_width);
+            }
+         }
+      }
+      return cause;
+   }
+   return std::string{fc_exception_cause_prefix} + failure.name();
+}
+
+/** Report a startup chain-id lookup failure with only sanitized diagnostic context. */
+[[noreturn]] void throw_chain_id_resolution_failure(const std::string& client_id,
+                                                    const std::string& endpoint,
+                                                    std::string_view last_failure) {
    FC_THROW_EXCEPTION(chain::plugin_config_exception,
                       "Unable to resolve or validate chain id for outpost Ethereum client '{}' "
-                      "within the bounded RPC startup grace",
-                      client_id);
+                      "within the bounded RPC startup grace (endpoint={},last_failure={})",
+                      client_id,
+                      endpoint,
+                      last_failure);
 }
 
 /** Return the retry envelope used independently by each startup chain-id probe. */
@@ -167,6 +209,8 @@ uint32_t resolve_rpc_chain_id(
    const std::string& client_id,
    const std::string& url,
    const fc::network::json_rpc::client_options& rpc_options) {
+   const auto endpoint = fc::http::sanitized_endpoint(fc::url(url));
+   std::string last_failure(retry_budget_exhausted_cause);
    try {
       fc::task::deadline_scope deadline(fc::time_point::now() + chain_id_resolution_timeout);
       return fc::task::retry_until<uint32_t>(
@@ -178,25 +222,34 @@ uint32_t resolve_rpc_chain_id(
                auto rpc = fc::network::json_rpc::json_rpc_client::create(url, rpc_options);
                response = rpc.call_idempotent(
                   std::string(ethereum_rpc_method::chain_id), fc::variants{});
-            } catch (const fc::exception&) {
+            } catch (const fc::exception& failure) {
+               const auto cause = sanitized_chain_id_failure_cause(failure);
+               const auto total_timeout_cause =
+                  fc::http::failure_kind_name(fc::http::failure_kind::timeout_total);
+               if (cause != total_timeout_cause || last_failure == retry_budget_exhausted_cause) {
+                  last_failure = cause;
+               }
                return std::nullopt;
             } catch (const std::exception&) {
+               last_failure = standard_exception_cause;
                return std::nullopt;
             }
 
             const auto chain_id = fc::network::ethereum::parse_rpc_quantity(
                response, transaction_policy_field::chain_id);
             if (chain_id == 0 || chain_id > std::numeric_limits<uint32_t>::max()) {
-               throw_chain_id_resolution_failure(client_id);
+               throw_chain_id_resolution_failure(client_id, endpoint, invalid_rpc_response_cause);
             }
             return chain_id.convert_to<uint32_t>();
          });
    } catch (const chain::plugin_config_exception&) {
       throw;
+   } catch (const fc::network::ethereum::ethereum_transaction_policy_exception&) {
+      throw_chain_id_resolution_failure(client_id, endpoint, invalid_rpc_response_cause);
    } catch (const fc::exception&) {
-      throw_chain_id_resolution_failure(client_id);
+      throw_chain_id_resolution_failure(client_id, endpoint, last_failure);
    } catch (const std::exception&) {
-      throw_chain_id_resolution_failure(client_id);
+      throw_chain_id_resolution_failure(client_id, endpoint, last_failure);
    }
 }
 
@@ -503,13 +556,16 @@ outpost_ethereum_client_plugin::create_outpost_client(const std::string& eth_cli
                                                        const std::string& operator_registry_addr) {
    const auto entry = my->get_client(eth_client_id);
    FC_ASSERT(entry, "Unknown ethereum client id: {}", eth_client_id);
-   if (entry->chain_id != chain_id) {
-      fc::network::ethereum::throw_transaction_policy_exception(
-         fc::network::ethereum::ethereum_transaction_policy_reason::configuration_chain_id_mismatch,
-         transaction_policy_field::chain_id,
-         std::to_string(chain_id),
-         std::to_string(entry->chain_id));
-   }
+   const auto chain_name = fc::slug_name{chain_code}.to_string();
+   SYS_ASSERT(entry->chain_id == chain_id,
+              chain::plugin_config_exception,
+              "Outpost Ethereum client configuration rejected "
+              "(reason_code={},chain={},client_id={},registry_chain_id={},client_chain_id={})",
+              configuration_chain_id_mismatch_reason,
+              chain_name,
+              eth_client_id,
+              chain_id,
+              entry->chain_id);
 
    std::vector<fc::network::ethereum::abi::contract> all_abis;
    for (const auto& [path, contracts] : my->get_abi_files()) {

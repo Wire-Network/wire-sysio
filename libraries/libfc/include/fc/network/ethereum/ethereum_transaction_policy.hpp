@@ -16,7 +16,6 @@ namespace fc::network::ethereum {
 
 /** Stable reason codes emitted when Ethereum transaction policy validation fails. */
 enum class ethereum_transaction_policy_reason {
-   configuration_chain_id_mismatch,
    configuration_value_invalid,
    rpc_quantity_invalid,
    rpc_quantity_out_of_range,

@@ -6,6 +6,7 @@
 #include <fc/crypto/private_key.hpp>
 #include <fc/filesystem.hpp>
 #include <fc/network/ethereum/ethereum_rlp_encoder.hpp>
+#include <fc/slug_name.hpp>
 
 #include <sysio/outpost_ethereum_client_plugin.hpp>
 #include <sysio/opp/config/client_config_loader.hpp>
@@ -654,7 +655,7 @@ BOOST_AUTO_TEST_CASE(plugin_startup_rejects_mixed_unified_and_legacy_modes) {
       sysio::chain::plugin_config_exception);
 }
 
-BOOST_AUTO_TEST_CASE(outpost_factory_rejects_client_policy_chain_mismatch) {
+BOOST_AUTO_TEST_CASE(outpost_factory_reports_client_configuration_chain_mismatch) {
    fc::temp_directory directory;
    chain_id_rpc_server rpc_server;
    std::string configuration = R"json({
@@ -674,21 +675,24 @@ BOOST_AUTO_TEST_CASE(outpost_factory_rejects_client_policy_chain_mismatch) {
    with_initialized_outpost_plugin(
       {"--outpost-ethereum-client-config-file", path.string()},
       [&](auto& plugin) {
+         const auto chain_code = fc::slug_name{"ETH"}.value;
          try {
             plugin.create_outpost_client(
                "client-a",
-               1,
+               chain_code,
                1,
                std::string(contract_address),
                std::string(contract_address),
                std::string(contract_address));
             BOOST_FAIL("expected client/outpost chain mismatch rejection");
-         } catch (const ethereum_transaction_policy_exception& rejection) {
-            BOOST_CHECK(rejection.reason() ==
-                        ethereum_transaction_policy_reason::configuration_chain_id_mismatch);
-            BOOST_CHECK_EQUAL(rejection.observed(), "1");
-            BOOST_REQUIRE(rejection.allowed().has_value());
-            BOOST_CHECK_EQUAL(*rejection.allowed(), "31337");
+         } catch (const sysio::chain::plugin_config_exception& rejection) {
+            const auto detail = rejection.to_detail_string();
+            BOOST_CHECK(detail.find("reason_code=configuration_chain_id_mismatch") != std::string::npos);
+            BOOST_CHECK(detail.find("chain=ETH") != std::string::npos);
+            BOOST_CHECK(detail.find("client_id=client-a") != std::string::npos);
+            BOOST_CHECK(detail.find("registry_chain_id=1") != std::string::npos);
+            BOOST_CHECK(detail.find("client_chain_id=31337") != std::string::npos);
+            BOOST_CHECK(detail.find("transaction policy") == std::string::npos);
          }
       });
 }

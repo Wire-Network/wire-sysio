@@ -165,6 +165,7 @@ constexpr std::string_view emit_outbound_envelope_abi_name = "emitOutboundEnvelo
 constexpr std::string_view emit_outbound_envelope_selector = "a3ad9cc3";
 constexpr std::string_view test_opp_address = "5FbDB2315678afecb367f032d93F642f64180aa3";
 constexpr std::string_view latest_slot_test_rpc_url = "http://127.0.0.1:1";
+constexpr std::string_view http_scheme_prefix = "http://";
 constexpr std::string_view latest_slot_test_entry_id = "latest-slot-test";
 constexpr std::string_view latest_slot_test_private_key =
    "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80";
@@ -439,12 +440,26 @@ BOOST_AUTO_TEST_CASE(startup_rejects_explicit_chain_id_mismatch) {
 
 BOOST_AUTO_TEST_CASE(startup_rejects_unavailable_rpc_after_bounded_grace) {
    fc::test::connection_closing_http_server rpc_server;
-   BOOST_CHECK_THROW(initialize_outpost_plugin({
-      "--signature-provider",
-      named_ethereum_signature_provider(),
-      "--outpost-ethereum-client",
-      "client-a,signer-a," + rpc_server.url() + ",31337",
-   }), sysio::chain::plugin_config_exception);
+   const auto safe_endpoint = rpc_server.url();
+   const auto sensitive_url =
+      "http://operator:super-secret@" + safe_endpoint.substr(http_scheme_prefix.size()) +
+      "/rpc?token=secret";
+   try {
+      initialize_outpost_plugin({
+         "--signature-provider",
+         named_ethereum_signature_provider(),
+         "--outpost-ethereum-client",
+         "client-a,signer-a," + sensitive_url + ",31337",
+      });
+      BOOST_FAIL("expected unavailable RPC rejection");
+   } catch (const sysio::chain::plugin_config_exception& rejection) {
+      const auto detail = rejection.to_detail_string();
+      BOOST_CHECK(detail.find("client-a") != std::string::npos);
+      BOOST_CHECK(detail.find("endpoint=" + safe_endpoint) != std::string::npos);
+      BOOST_CHECK(detail.find("last_failure=io") != std::string::npos);
+      BOOST_CHECK(detail.find("super-secret") == std::string::npos);
+      BOOST_CHECK(detail.find("token=secret") == std::string::npos);
+   }
 }
 
 BOOST_AUTO_TEST_CASE(startup_retries_transient_chain_id_transport_failure) {
