@@ -308,8 +308,43 @@ namespace sysio {
       ///
       /// This sweep is the ONLY lock-release path: locks are a wall-clock
       /// challenge window (12h default) and are never released by delivery.
+      ///
+      /// EXCEPTION (WIRE-297): a lock whose `challenge_id` is non-zero — an
+      /// underwriter-fault challenge is OPEN against its commitment — is NOT
+      /// released at expiry. The sweep skips it and instead pokes
+      /// `sysio.chalg::chkuwchal`, whose resolution either sweeps the locks
+      /// with the underwriter slashed (`sweeplocks`) or clears the hold
+      /// (`freelocks`) so the NEXT sweep releases them normally. The epoch
+      /// tick is thereby the challenge system's only cadence.
       [[sysio::action]]
       void chklocks();
+
+      /// Mark the winning underwriter's locks for `uwreq_id` as held by the OPEN underwriter-
+      /// fault challenge `chal_id` (WIRE-297). Auth: `sysio.chalg`, inlined from `openuwchal`.
+      /// This is the AUTHORITATIVE liveness validation for a filing — every lock must still be
+      /// inside its window and free of any other challenge, and at least one lock must exist —
+      /// so a stale challenge aborts whole here, bond escrow included.
+      [[sysio::action]]
+      void holdlocks(uint64_t uwreq_id, name underwriter, uint64_t chal_id);
+
+      /// Clear the challenge hold on the underwriter's locks for `uwreq_id` — the challenge was
+      /// REJECTED by the council or LAPSED at the window's end. The locks then release on their
+      /// next normal `chklocks` sweep: a healthy release, no collateral moves. Auth:
+      /// `sysio.chalg`. Deliberately a silent no-op when nothing is held: it runs inline from
+      /// the epoch tick (`chklocks` -> `chkuwchal` -> here), where an abort would stall epoch
+      /// advancement chain-wide.
+      [[sysio::action]]
+      void freelocks(uint64_t uwreq_id, name underwriter);
+
+      /// Release + erase the underwriter's locks for `uwreq_id` after an UPHELD challenge. The
+      /// underwriter is already SLASHED (`chkuwchal` slashes before sweeping — inline actions
+      /// run depth-first in send order), so every inlined `opreg::releaselock` takes its
+      /// deferred-slash branch: the locked collateral is debited and the outbound SLASH
+      /// attestation queued. Ends with the same COMPLETED-flip / evidence-clear / retention
+      /// tail `chklocks` runs when a uwreq's last lock leaves. Auth: `sysio.chalg`; silent
+      /// no-op when no locks remain (same never-throw-inside-advance reasoning as `freelocks`).
+      [[sysio::action]]
+      void sweeplocks(uint64_t uwreq_id, name underwriter);
 
       /// Bounded UWREQ lifecycle sweep (SEC-129 / WSA-223). Inlined from
       /// `sysio.epoch::advance` each epoch with `MAX_UWREQ_PRUNE_PER_EPOCH`;
@@ -450,6 +485,14 @@ namespace sysio {
             std::memcpy(buf.data() + 16, &token_code.value, 8);
             return sysio::sha256(reinterpret_cast<const char*>(buf.data()), buf.size());
          }
+         /// Non-zero while an underwriter-fault challenge (the `sysio.chalg::uwchals` row id) is
+         /// OPEN against this lock's commitment (WIRE-297). A held lock is NOT released at
+         /// `expires_at_ms`: `chklocks` skips it and instead pokes the challenge's tally crank,
+         /// so the collateral stays at risk until the council resolves or the challenge lapses.
+         /// Stamped by `holdlocks`, cleared by `freelocks` (reject/lapse); an UPHELD challenge
+         /// erases the row through `sweeplocks` instead.
+         uint64_t                challenge_id     = 0;
+
          /// Split-index for cheap per-operator scans (plan §B.2). Callers
          /// pull all rows for a given underwriter and filter on
          /// chain_code / token_code / reserve_code in memory.
@@ -459,7 +502,7 @@ namespace sysio {
 
          SYSLIB_SERIALIZE(lock_entry,
             (lock_id)(uwreq_id)(underwriter)(chain_code)(token_code)(reserve_code)
-            (amount)(created_at_ms)(expires_at_ms))
+            (amount)(created_at_ms)(expires_at_ms)(challenge_id))
       };
 
       // Per plan §B.2: split-index approach — keep only uint64 secondary

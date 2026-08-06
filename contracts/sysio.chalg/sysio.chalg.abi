@@ -24,6 +24,16 @@
             ]
         },
         {
+            "name": "chkuwchal",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chal_id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "dispute_candidate",
             "base": "",
             "fields": [
@@ -144,6 +154,32 @@
             ]
         },
         {
+            "name": "openuwchal",
+            "base": "",
+            "fields": [
+                {
+                    "name": "challenger",
+                    "type": "name"
+                },
+                {
+                    "name": "uwreq_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "underwriter",
+                    "type": "name"
+                },
+                {
+                    "name": "reason",
+                    "type": "uint8"
+                },
+                {
+                    "name": "detail",
+                    "type": "string"
+                }
+            ]
+        },
+        {
             "name": "slashop",
             "base": "",
             "fields": [
@@ -154,6 +190,120 @@
                 {
                     "name": "reason",
                     "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "uwchal_entry",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "uwreq_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "underwriter",
+                    "type": "name"
+                },
+                {
+                    "name": "challenger",
+                    "type": "name"
+                },
+                {
+                    "name": "reason",
+                    "type": "underwrite_fault_reason"
+                },
+                {
+                    "name": "detail",
+                    "type": "string"
+                },
+                {
+                    "name": "status",
+                    "type": "DisputeStatus"
+                },
+                {
+                    "name": "verdict",
+                    "type": "uwchal_verdict"
+                },
+                {
+                    "name": "bond_amount",
+                    "type": "uint64"
+                },
+                {
+                    "name": "deadline_ms",
+                    "type": "uint64"
+                },
+                {
+                    "name": "opened_at",
+                    "type": "time_point"
+                },
+                {
+                    "name": "network_gen",
+                    "type": "uint8"
+                },
+                {
+                    "name": "electorate",
+                    "type": "name[]"
+                },
+                {
+                    "name": "quorum",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "uwchal_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "uwchal_vote",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "ballot",
+                    "type": "uwchal_ballot"
+                },
+                {
+                    "name": "voted_at",
+                    "type": "time_point"
+                }
+            ]
+        },
+        {
+            "name": "uwchal_vote_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "uwchalbond",
+            "base": "",
+            "fields": [
+                {
+                    "name": "uwreq_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "underwriter",
+                    "type": "name"
                 }
             ]
         },
@@ -174,6 +324,24 @@
                     "type": "checksum256"
                 }
             ]
+        },
+        {
+            "name": "voteuwchal",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "chal_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "ballot",
+                    "type": "uint8"
+                }
+            ]
         }
     ],
     "actions": [
@@ -183,8 +351,18 @@
             "ricardian_contract": ""
         },
         {
+            "name": "chkuwchal",
+            "type": "chkuwchal",
+            "ricardian_contract": ""
+        },
+        {
             "name": "opendispute",
             "type": "opendispute",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "openuwchal",
+            "type": "openuwchal",
             "ricardian_contract": ""
         },
         {
@@ -193,8 +371,18 @@
             "ricardian_contract": ""
         },
         {
+            "name": "uwchalbond",
+            "type": "uwchalbond",
+            "ricardian_contract": ""
+        },
+        {
             "name": "votedispute",
             "type": "votedispute",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "voteuwchal",
+            "type": "voteuwchal",
             "ricardian_contract": ""
         }
     ],
@@ -234,11 +422,39 @@
             "key_names": ["scope","owner"],
             "key_types": ["name","uint64"],
             "table_id": 51768
+        },
+        {
+            "name": "uwchals",
+            "type": "uwchal_entry",
+            "index_type": "i64",
+            "key_names": ["id"],
+            "key_types": ["uint64"],
+            "table_id": 10118,
+            "secondary_indexes": [
+                {
+                    "name": "byuwrequw",
+                    "key_type": "uint128",
+                    "table_id": 26153
+                }
+            ]
+        },
+        {
+            "name": "uwchalvote",
+            "type": "uwchal_vote",
+            "index_type": "i64",
+            "key_names": ["scope","owner"],
+            "key_types": ["name","uint64"],
+            "table_id": 12100
         }
     ],
     "ricardian_clauses": [],
     "variants": [],
-    "action_results": [],
+    "action_results": [
+        {
+            "name": "uwchalbond",
+            "result_type": "uint64"
+        }
+    ],
     "enums": [
         {
             "name": "DisputeStatus",
@@ -255,6 +471,68 @@
                 {
                     "name": "DISPUTE_STATUS_RESOLVED",
                     "value": 2
+                }
+            ]
+        },
+        {
+            "name": "underwrite_fault_reason",
+            "type": "uint8",
+            "values": [
+                {
+                    "name": "SOURCE_DEPOSIT_MISSING",
+                    "value": 0
+                },
+                {
+                    "name": "SOURCE_DEPOSIT_MISMATCH",
+                    "value": 1
+                },
+                {
+                    "name": "NON_CANONICAL_ENVELOPE",
+                    "value": 2
+                }
+            ]
+        },
+        {
+            "name": "uwchal_ballot",
+            "type": "uint8",
+            "values": [
+                {
+                    "name": "UPHOLD",
+                    "value": 0
+                },
+                {
+                    "name": "REJECT_REFUND",
+                    "value": 1
+                },
+                {
+                    "name": "REJECT_FORFEIT",
+                    "value": 2
+                }
+            ]
+        },
+        {
+            "name": "uwchal_verdict",
+            "type": "uint8",
+            "values": [
+                {
+                    "name": "NONE",
+                    "value": 0
+                },
+                {
+                    "name": "UPHELD",
+                    "value": 1
+                },
+                {
+                    "name": "REJECTED_REFUND",
+                    "value": 2
+                },
+                {
+                    "name": "REJECTED_FORFEIT",
+                    "value": 3
+                },
+                {
+                    "name": "LAPSED",
+                    "value": 4
                 }
             ]
         }

@@ -78,6 +78,20 @@
             "fields": []
         },
         {
+            "name": "freelocks",
+            "base": "",
+            "fields": [
+                {
+                    "name": "uwreq_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "underwriter",
+                    "type": "name"
+                }
+            ]
+        },
+        {
             "name": "fromwire_q",
             "base": "",
             "fields": [
@@ -138,6 +152,24 @@
             ]
         },
         {
+            "name": "holdlocks",
+            "base": "",
+            "fields": [
+                {
+                    "name": "uwreq_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "underwriter",
+                    "type": "name"
+                },
+                {
+                    "name": "chal_id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "id_key",
             "base": "",
             "fields": [
@@ -185,6 +217,10 @@
                 },
                 {
                     "name": "expires_at_ms",
+                    "type": "uint64"
+                },
+                {
+                    "name": "challenge_id",
                     "type": "uint64"
                 }
             ]
@@ -344,6 +380,20 @@
             ]
         },
         {
+            "name": "sweeplocks",
+            "base": "",
+            "fields": [
+                {
+                    "name": "uwreq_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "underwriter",
+                    "type": "name"
+                }
+            ]
+        },
+        {
             "name": "uw_config",
             "base": "",
             "fields": [
@@ -495,6 +545,16 @@
             "ricardian_contract": ""
         },
         {
+            "name": "freelocks",
+            "type": "freelocks",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "holdlocks",
+            "type": "holdlocks",
+            "ricardian_contract": ""
+        },
+        {
             "name": "pruneuwreqs",
             "type": "pruneuwreqs",
             "ricardian_contract": ""
@@ -517,6 +577,11 @@
         {
             "name": "swapfromwire",
             "type": "swapfromwire",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "sweeplocks",
+            "type": "sweeplocks",
             "ricardian_contract": ""
         }
     ],
