@@ -157,6 +157,32 @@ namespace detail {
       blocks_only
    };
 
+   /// What a received block notice calls for.
+   enum class block_notice_action {
+      record_peer_has_block, ///< the announced block is already held, so only record that the peer has it
+      request_blocks,        ///< neither the announced block nor its parent is held, so ask for the branch
+      ignore                 ///< the parent is held but the announced block is not, so there is nothing to do here
+   };
+
+   /// Classify a block notice from what the dispatcher already holds.
+   ///
+   /// @param have_announced_block whether the announced block is already held
+   /// @param have_parent_block whether the announced block's parent is already held
+   inline block_notice_action classify_block_notice(bool have_announced_block, bool have_parent_block) {
+      if( have_announced_block )
+         return block_notice_action::record_peer_has_block;
+      return have_parent_block ? block_notice_action::ignore : block_notice_action::request_blocks;
+   }
+
+   /// Whether a notice counts as block progress on the connection it arrived on.
+   ///
+   /// Only an announcement of a block we already hold does. A notice for a block we are missing leaves us
+   /// behind, and treating it as progress defers the handshake in check_heartbeat that recovers the block,
+   /// which is the only thing that recovers it when no further block is produced.
+   inline bool block_notice_marks_progress(block_notice_action action) {
+      return action == block_notice_action::record_peer_has_block;
+   }
+
    /// Resolve whether block notice and block nack should be disabled for this node.
    ///
    /// The block notice and block nack exchange trades a round trip for bandwidth: a peer that is

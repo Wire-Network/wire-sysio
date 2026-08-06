@@ -4021,13 +4021,22 @@ namespace sysio {
       if (block_header::num_from_id(msg.id) <= fork_db_root_num)
          return;
 
-      if (my_impl->dispatcher.have_block(msg.id)) {
-         // Only an announcement of a block we already hold counts as block progress on this connection.
-         // Refreshing on a notice for a block we are missing hides the fact that we are behind and defers
-         // the handshake in check_heartbeat that would otherwise recover it.
+      const bool have_announced_block = my_impl->dispatcher.have_block(msg.id);
+      // the parent only matters when the announced block is missing, so skip that lookup otherwise
+      const bool have_parent_block = have_announced_block || my_impl->dispatcher.have_block(msg.previous);
+      const auto action = net_utils::classify_block_notice(have_announced_block, have_parent_block);
+
+      // Refreshing on a notice for a block we are missing would hide the fact that we are behind and defer
+      // the handshake in check_heartbeat that recovers it.
+      if (net_utils::block_notice_marks_progress(action)) {
          latest_blk_time = std::chrono::steady_clock::now();
+      }
+
+      switch (action) {
+      case net_utils::block_notice_action::record_peer_has_block:
          my_impl->dispatcher.add_peer_block(msg.id, connection_id);
-      } else if (!my_impl->dispatcher.have_block(msg.previous)) { // still don't have previous block
+         break;
+      case net_utils::block_notice_action::request_blocks: { // still don't have previous block
          peer_dlog(p2p_blk_log, this, "Received unknown block notice, checking already requested");
          const block_id_type& target = msg.previous;
          bool already_requested = my_impl->connections.any_of_block_connections([&target](const auto& c) {
@@ -4047,6 +4056,10 @@ namespace sysio {
             }
             enqueue(req);
          }
+         break;
+      }
+      case net_utils::block_notice_action::ignore:
+         break;
       }
    }
 
