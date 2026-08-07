@@ -18,6 +18,8 @@
 #include <sysio/opp/opp.pb.h>
 #include <sysio/opp/attestations/attestations.pb.h>
 #include <sysio/opp/types/types.pb.h>
+// The depot's swap kernel — tests re-derive the quote settlement must pay.
+#include <sysio.opp.common/amm_math.hpp>
 
 #include <fc/variant_object.hpp>
 #include <fc/slug_name.hpp>
@@ -291,6 +293,11 @@ public:
    static constexpr auto EPOCH_ACCOUNT  = "sysio.epoch"_n;
    static constexpr auto RESERV_ACCOUNT = "sysio.reserv"_n;
    static constexpr auto CHALG_ACCOUNT  = "sysio.chalg"_n;
+
+   /// `sysio.uwrit::uw_config::fee_bps`'s default (0.1% per spoke) — the rate in
+   /// force whenever a case does not push its own `uwrit::setconfig`. Tests that
+   /// re-derive a swap quote must charge the same fee the contract did.
+   static constexpr uint32_t kDefaultUwritFeeBps = 10;
    static constexpr auto TOKEN_ACCOUNT  = "sysio.token"_n;
    static constexpr auto AUTHEX_ACCOUNT = "sysio.authex"_n;
    static constexpr auto CHAINS_ACCOUNT = "sysio.chains"_n;
@@ -421,13 +428,17 @@ public:
    /// `req_uw_collat` is what promotes UWRIT_OP to ACTIVE via
    /// `opreg::processuw`; the eligibility-gate tests tune these to make a
    /// candidate ACTIVE (a funded producer) or keep one inactive while funded.
+   /// `prune_delay_ms` defaults to 10 minutes — far beyond any test's wall
+   /// clock, so `prune` cases that want to exercise a gate OTHER than the delay
+   /// lower it explicitly.
    action_result opreg_setconfig_collat(const fc::variants& req_uw_collat,
-                                        const fc::variants& req_prod_collat = fc::variants{}) {
+                                        const fc::variants& req_prod_collat = fc::variants{},
+                                        uint64_t prune_delay_ms = 600000) {
       return push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "setconfig"_n, mvo()
          ("max_available_producers",          21)
          ("max_available_batch_ops",          63)
          ("max_available_underwriters",       21)
-         ("terminate_prune_delay_ms",         600000)
+         ("terminate_prune_delay_ms",         prune_delay_ms)
          ("terminate_max_consecutive_misses", 5)
          ("terminate_max_pct_misses_24h",     5)
          ("terminate_window_ms",              uint64_t{24ULL * 60 * 60 * 1000})
@@ -732,6 +743,77 @@ public:
          ("chain_code", codename_mvo(chain_code))
          ("token_code", codename_mvo(token_code))
          ("amount",     amount));
+   }
+
+   /// Administratively terminate an operator (`sysio.opreg::terminate`,
+   /// self-authorized). Remits the unlocked portion of every balance and leaves
+   /// the locked remainder for `releaselock` — the state WNS-01's prune gate
+   /// must protect.
+   action_result terminate_op(name account, const std::string& reason) {
+      return push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "terminate"_n, mvo()
+         ("account", account.to_string())
+         ("reason",  reason));
+   }
+
+   /// The permissionless `sysio.opreg::prune` crank.
+   action_result opreg_prune() {
+      return push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "prune"_n, mvo());
+   }
+
+   /// Walk `sysio.reserv::reserves` and return the row matching the slug_name
+   /// triple. The table is KV-keyed by a checksum256, which `get_row_by_id`
+   /// (uint64 keys only) cannot reach — same scan `sysio.reserv_tests` uses.
+   fc::variant find_reserve(std::string_view chain_code,
+                            std::string_view token_code,
+                            std::string_view reserve_code) {
+      const auto target_chain   = fc::slug_name{chain_code}.value;
+      const auto target_token   = fc::slug_name{token_code}.value;
+      const auto target_reserve = fc::slug_name{reserve_code}.value;
+
+      const auto& db       = control->db();
+      const auto  table_id = chain::compute_table_id("reserves"_n.to_uint64_t());
+      const auto& kv_idx   = db.get_index<chain::kv_index, chain::by_code_key>();
+      auto itr = kv_idx.lower_bound(boost::make_tuple(RESERV_ACCOUNT, table_id, std::string_view{}));
+      for (; itr != kv_idx.end() && itr->code == RESERV_ACCOUNT
+             && itr->table_id == table_id; ++itr) {
+         std::vector<char> raw(itr->value.size());
+         if (!raw.empty()) std::memcpy(raw.data(), itr->value.data(), raw.size());
+         try {
+            auto row = reserv_abi.binary_to_variant("reserve_row", raw,
+               abi_serializer::create_yield_function(abi_serializer_max_time));
+            if (row["chain_code"]["value"].as_uint64()   == target_chain &&
+                row["token_code"]["value"].as_uint64()   == target_token &&
+                row["reserve_code"]["value"].as_uint64() == target_reserve) {
+               return row;
+            }
+         } catch (...) {
+            // Not a reserve_row — skip.
+         }
+      }
+      return fc::variant();
+   }
+
+   /// The depot's own quote for a swap, computed with the SAME kernel the
+   /// contract uses (`sysio.uwrit::swap_quote` -> `opp::amm::quote_swap`) over
+   /// the live reserve rows. Tests assert settlement against this rather than
+   /// against a hardcoded number, so they pin the INVARIANT ("dst_amount is the
+   /// curve's output") instead of one fixture's arithmetic.
+   uint64_t expected_quote(std::string_view src_chain, std::string_view src_token,
+                           std::string_view src_reserve, uint64_t src_amount,
+                           std::string_view dst_chain, std::string_view dst_token,
+                           std::string_view dst_reserve, uint32_t fee_bps) {
+      const auto src = find_reserve(src_chain, src_token, src_reserve);
+      const auto dst = find_reserve(dst_chain, dst_token, dst_reserve);
+      BOOST_REQUIRE(!src.is_null());
+      BOOST_REQUIRE(!dst.is_null());
+      return sysio::opp::amm::quote_swap(
+         /*src_is_wire*/ false,
+         src["reserve_chain_amount"].as_uint64(), src["reserve_wire_amount"].as_uint64(),
+         static_cast<uint32_t>(src["connector_weight_bps"].as_uint64()),
+         /*dst_is_wire*/ false,
+         dst["reserve_chain_amount"].as_uint64(), dst["reserve_wire_amount"].as_uint64(),
+         static_cast<uint32_t>(dst["connector_weight_bps"].as_uint64()),
+         src_amount, fee_bps);
    }
 
    /// Register one ACTIVE reserve with ample balanced liquidity (1e12 / 1e12,
@@ -1752,14 +1834,252 @@ BOOST_FIXTURE_TEST_CASE(swap_zero_quote_from_active_reserve_fails_closed,
    BOOST_REQUIRE(get_uwreq(ATT_ID).is_null());
 } FC_LOG_AND_RETHROW() }
 
-// [P1] regression (r3444213199): an oversized to-WIRE target_amount must be
-// terminally REJECTED + refunded BEFORE settlement. dst_amount is the unbounded
-// cross-chain SwapRequest.target_amount; left unchecked, a value near UINT64_MAX
-// wraps the `dst_amount + to_wire_fee` sufficiency guard, slips into settlement,
-// and aborts reserv::paywire's asset(static_cast<int64_t>(dst_amount)) inside
-// evalcons — a chain-wide consensus stall. A representable-but-too-large target
-// (> asset::max_amount) must also be rejected, never left stuck PENDING forever.
-BOOST_FIXTURE_TEST_CASE(swap_to_wire_oversized_target_is_rejected_not_aborted,
+// [P0] WNS-02 (CertiK "Wire Network - Sysio Audit 1", Critical): a swap must
+// settle on the AMM QUOTE, never on the caller's `target_amount`.
+//
+// The attack: `createuwreq` stored `dst_amount = sr.target_amount` — a number
+// the caller puts in the SwapRequest — and the only guard computed the allowed
+// deviation as a percentage of that SAME caller-supplied target
+// (`allowed = target * target_tolerance_bps / 10000`). At 10000 bps the check
+// reduces to `|quote - target| <= target`, which every target above the quote
+// satisfies. `try_select_winner` then locked and `sysio.reserv::applyswap` paid
+// out `req.dst_amount` verbatim, so a negligible source deposit drained the
+// destination reserve.
+//
+// Post-fix, both halves are closed and this pins each:
+//   (a) the allowance is a fraction of the QUOTE, so the drain request is
+//       refused outright — no uwreq exists to settle;
+//   (b) even for a target the tolerance legitimately admits, the row carries
+//       the quote, so the settlement amount is not caller-controlled at all.
+BOOST_FIXTURE_TEST_CASE(swap_settles_on_amm_quote_not_caller_target,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+   setup_eth_to_sol_uwreq(/*att_id*/ 9500);   // registers SOLANA, reserves, collateral
+
+   const uint64_t eth       = fc::slug_name{"ETH"}.value;
+   const uint64_t sol_chain = fc::slug_name{"SOLANA"}.value;
+   const uint64_t sol_token = fc::slug_name{"SOL"}.value;
+   const uint64_t primary   = fc::slug_name{"PRIMARY"}.value;
+   constexpr int64_t SRC_AMOUNT = 1'000'000;
+
+   const uint64_t quote = expected_quote("ETH", "ETH", "PRIMARY", SRC_AMOUNT,
+                                         "SOLANA", "SOL", "PRIMARY", kDefaultUwritFeeBps);
+   BOOST_REQUIRE(quote > 0);
+
+   auto submit = [&](uint64_t att_id, uint64_t target, uint32_t tolerance_bps) {
+      const auto sr = encode_swap_request(
+         ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
+         eth, eth, primary, SRC_AMOUNT,
+         sol_chain, sol_token, primary, target,
+         tolerance_bps, ChainKind::CHAIN_KIND_SVM, std::vector<char>(32, '\x0b'));
+      BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(att_id, eth, sr));
+   };
+
+   // (a) THE EXPLOIT, verbatim: a tiny source deposit naming most of the
+   // destination reserve, with the 100% tolerance that used to make the check
+   // pass unconditionally. Refused at ingestion — no uwreq, nothing to settle.
+   constexpr uint64_t DRAIN_TARGET = 900'000'000'000ull;   // 90% of the 1e12 reserve
+   submit(/*att_id*/ 9501, DRAIN_TARGET, /*tolerance_bps*/ 10'000);
+   BOOST_REQUIRE(get_uwreq(9501).is_null());
+
+   // A tolerance ABOVE 100% must not buy the caller anything either — the
+   // allowance is clamped, so the same drain is still refused.
+   submit(/*att_id*/ 9502, DRAIN_TARGET, /*tolerance_bps*/ 1'000'000);
+   BOOST_REQUIRE(get_uwreq(9502).is_null());
+
+   // (b) A target the tolerance genuinely admits (1.5x the quote at 100%
+   // tolerance: |quote - target| = 0.5*quote <= quote). The request is accepted
+   // — and the row still carries the QUOTE, not the inflated target.
+   const uint64_t inflated_target = quote + quote / 2;
+   submit(/*att_id*/ 9503, inflated_target, /*tolerance_bps*/ 10'000);
+   const auto accepted = get_uwreq(9503);
+   BOOST_REQUIRE(!accepted.is_null());
+   BOOST_REQUIRE_EQUAL(quote, accepted["dst_amount"].as_uint64());
+   BOOST_REQUIRE_LT(accepted["dst_amount"].as_uint64(), inflated_target);
+} FC_LOG_AND_RETHROW() }
+
+// [P0] WNS-02, settlement half: the destination reserve is debited by the AMM
+// quote and by nothing else. The row-level assertion above proves `dst_amount`
+// is the quote; this drives the full race to CONFIRMED and reads the reserve
+// books, so the guarantee is pinned where the funds actually move
+// (`sysio.reserv::applyswap`), which is where the drain happened.
+BOOST_FIXTURE_TEST_CASE(swap_settlement_debits_destination_reserve_by_the_quote,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+   setup_wire_token_and_reserves();
+   // Both legs on ETH (PRIMARY -> SECOND): UWRIT_OP's only authex link is EVM,
+   // so an ETH destination is what lets the race actually reach settlement.
+   BOOST_REQUIRE_EQUAL(success(), regreserve_active("ETH", "ETH", "SECOND"));
+
+   const uint64_t eth       = fc::slug_name{"ETH"}.value;
+   const uint64_t primary   = fc::slug_name{"PRIMARY"}.value;
+   const uint64_t secondary = fc::slug_name{"SECOND"}.value;
+   constexpr uint64_t ATT_ID     = 9601;
+   constexpr int64_t  SRC_AMOUNT = 1'000'000;
+
+   // One bucket funds both legs, so it must cover src + quote.
+   BOOST_REQUIRE_EQUAL(success(),
+      depositinle_credit(UWRIT_OP, "ETH", "ETH", uint64_t{1'000'000'000}));
+
+   const uint64_t quote = expected_quote("ETH", "ETH", "PRIMARY", SRC_AMOUNT,
+                                         "ETH", "ETH", "SECOND", kDefaultUwritFeeBps);
+   BOOST_REQUIRE(quote > 0);
+
+   const uint64_t dst_chain_before =
+      find_reserve("ETH", "ETH", "SECOND")["reserve_chain_amount"].as_uint64();
+   const uint64_t src_chain_before =
+      find_reserve("ETH", "ETH", "PRIMARY")["reserve_chain_amount"].as_uint64();
+
+   // Target 20% above the quote — inside a 100% tolerance, so the race resolves
+   // and the ONLY thing that can decide the payout is the curve.
+   const auto sr = encode_swap_request(
+      ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
+      eth, eth, primary, SRC_AMOUNT,
+      eth, eth, secondary, /*target_amount*/ quote + quote / 5,
+      /*tolerance_bps*/ 10'000, ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0b'));
+   BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, eth, sr));
+
+   const auto src_uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
+   BOOST_REQUIRE_EQUAL(success(),
+      rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", src_uic));
+   const auto dst_uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, secondary);
+   BOOST_REQUIRE_EQUAL(success(),
+      rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "SECOND", dst_uic));
+
+   const auto req = get_uwreq(ATT_ID);
+   BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_CONFIRMED", req["status"].as_string());
+   BOOST_REQUIRE_EQUAL(UWRIT_OP.to_string(), req["winner"].as_string());
+   // The CONFIRMED row records the price the books moved at.
+   BOOST_REQUIRE_EQUAL(quote, req["dst_amount"].as_uint64());
+
+   // Destination reserve gave up exactly the quote; the source reserve took in
+   // exactly the source amount. Neither is the caller's target.
+   const uint64_t dst_chain_after =
+      find_reserve("ETH", "ETH", "SECOND")["reserve_chain_amount"].as_uint64();
+   const uint64_t src_chain_after =
+      find_reserve("ETH", "ETH", "PRIMARY")["reserve_chain_amount"].as_uint64();
+   BOOST_REQUIRE_EQUAL(dst_chain_before - quote, dst_chain_after);
+   BOOST_REQUIRE_EQUAL(src_chain_before + static_cast<uint64_t>(SRC_AMOUNT), src_chain_after);
+
+   // The destination lock — the collateral the winner has at risk — is sized to
+   // the delivered amount, so the challenge window covers the real obligation.
+   BOOST_REQUIRE_EQUAL(quote, get_lock(2)["amount"].as_uint64());
+} FC_LOG_AND_RETHROW() }
+
+// [P0] WNS-01 (CertiK "Wire Network - Sysio Audit 1", Critical): `opreg::prune`
+// must not erase a TERMINATED operator whose collateral has not settled.
+//
+// `terminate` remits only the immediately-unlocked portion and deliberately
+// LEAVES the locked remainder on the row, because `releaselock` settles it when
+// `chklocks` frees each lock. `prune` gated on `terminated_at` + the prune delay
+// alone, so any caller — it is permissionless — could erase the row first;
+// `releaselock` then returns at its missing-operator check and the retained
+// collateral is stranded with no attestation that could ever release it.
+BOOST_FIXTURE_TEST_CASE(prune_keeps_terminated_operator_until_collateral_settles,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+   // A 1s prune delay (vs the fixture's 10min) so the delay gate is satisfied
+   // within the test — isolating the SETTLEMENT gate as the only thing holding
+   // the row. The underwriter minimum is re-declared verbatim: setconfig
+   // replaces the whole config.
+   BOOST_REQUIRE_EQUAL(success(),
+      opreg_setconfig_collat(fc::variants{chain_min_bond_mvo("ETH", "ETH", 1)},
+                             fc::variants{}, /*prune_delay_ms*/ 1'000));
+   // A 2-minute lock window, so `chklocks` can expire it inside the test.
+   BOOST_REQUIRE_EQUAL(success(), push(UWRIT_ACCOUNT, uwrit_abi, UWRIT_ACCOUNT, "setconfig"_n, mvo()
+      ("fee_bps", kDefaultUwritFeeBps)("collateral_lock_duration_ms", 120'000u)
+      ("min_fromwire_amount", 1)("fromwire_revert_fee_bps", 0)
+      ("uwreq_pending_timeout_epochs", 10)("uwreq_retention_epochs", 10)));
+
+   const uint64_t eth       = fc::slug_name{"ETH"}.value;
+   const uint64_t primary   = fc::slug_name{"PRIMARY"}.value;
+   const uint64_t secondary = fc::slug_name{"SECOND"}.value;
+   constexpr uint64_t ATT_ID     = 9700;
+   constexpr int64_t  SRC_AMOUNT = 1'000'000;
+
+   // Both legs on ETH — UWRIT_OP is authex-linked on EVM only, so this is the
+   // shape whose race actually reaches CONFIRMED and writes locks.
+   setup_wire_token_and_reserves();
+   BOOST_REQUIRE_EQUAL(success(), regreserve_active("ETH", "ETH", "SECOND"));
+   BOOST_REQUIRE_EQUAL(success(),
+      depositinle_credit(UWRIT_OP, "ETH", "ETH", uint64_t{1'000'000'000}));
+   enable_epoch_advancement();
+
+   // Win a race so UWRIT_OP holds live locks on both legs.
+   const uint64_t quote = expected_quote("ETH", "ETH", "PRIMARY", SRC_AMOUNT,
+                                         "ETH", "ETH", "SECOND", kDefaultUwritFeeBps);
+   BOOST_REQUIRE(quote > 0);
+   const auto sr = encode_swap_request(
+      ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
+      eth, eth, primary, SRC_AMOUNT,
+      eth, eth, secondary, /*target_amount*/ quote,
+      /*tolerance_bps*/ 10'000, ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0b'));
+   BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, eth, sr));
+   const auto src_uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
+   BOOST_REQUIRE_EQUAL(success(),
+      rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", src_uic));
+   const auto dst_uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, secondary);
+   BOOST_REQUIRE_EQUAL(success(),
+      rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "SECOND", dst_uic));
+   BOOST_REQUIRE(!get_uwreq(ATT_ID).is_null());
+   BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_CONFIRMED",
+                       get_uwreq(ATT_ID)["status"].as_string());
+   BOOST_REQUIRE(!get_lock(1).is_null());
+   BOOST_REQUIRE(!get_lock(2).is_null());
+
+   // Terminate: the unlocked portion is remitted, the locked portion stays on
+   // the row for `releaselock`.
+   BOOST_REQUIRE_EQUAL(success(), terminate_op(UWRIT_OP, "audit-test termination"));
+   {
+      const auto op = get_operator(UWRIT_OP);
+      BOOST_REQUIRE(!op.is_null());
+      BOOST_REQUIRE_EQUAL("OPERATOR_STATUS_TERMINATED", op["status"].as_string());
+      uint64_t retained = 0;
+      for (const auto& b : op["balances"].get_array()) retained += b["balance"].as_uint64();
+      BOOST_REQUIRE_GT(retained, 0u);   // exactly the locked collateral
+   }
+
+   // Past the prune delay, with locks still live: the row MUST survive. This is
+   // the vulnerability — pre-fix the delay alone was sufficient to erase it.
+   produce_blocks(4);   // > 1s at 0.5s/block
+   BOOST_REQUIRE_EQUAL(success(), opreg_prune());
+   BOOST_REQUIRE(!get_operator(UWRIT_OP).is_null());
+
+   // Let the 2-minute lock window elapse. Each advance runs `chklocks` inline,
+   // which frees the expired locks and fans out `opreg::releaselock` — the
+   // deferred remit that drains the retained balance.
+   age_one_epoch();
+   age_one_epoch();
+   age_one_epoch();
+   BOOST_REQUIRE(get_lock(1).is_null());
+   BOOST_REQUIRE(get_lock(2).is_null());
+   {
+      const auto op = get_operator(UWRIT_OP);
+      BOOST_REQUIRE(!op.is_null());
+      for (const auto& b : op["balances"].get_array())
+         BOOST_REQUIRE_EQUAL(0u, b["balance"].as_uint64());
+   }
+
+   // Settled — now the row is genuinely disposable and prune erases it.
+   BOOST_REQUIRE_EQUAL(success(), opreg_prune());
+   BOOST_REQUIRE(get_operator(UWRIT_OP).is_null());
+} FC_LOG_AND_RETHROW() }
+
+// [P1] regression (r3444213199) + WNS-02: an oversized to-WIRE target_amount
+// must never reach settlement. Originally the target WAS the settlement amount,
+// so a value near UINT64_MAX wrapped `dst_amount + to_wire_fee`, slipped into
+// paywire, and aborted its `asset(static_cast<int64_t>(dst_amount))` inside
+// evalcons — a chain-wide consensus stall — which the downstream
+// `asset::max_amount` guard was added to catch.
+//
+// With settlement priced by the curve (WNS-02) the row never carries the target
+// at all, and the variance check refuses these at INGRESS: the allowance is a
+// fraction of the quote, so a target orders of magnitude above it fails for any
+// tolerance. That is strictly stronger than the old outcome (no uwreq is created
+// at all, versus one created then terminally rejected after a commit), and it
+// makes the downstream asset-bound guard unreachable defense-in-depth — kept in
+// the contract, but no longer constructible from a SwapRequest.
+BOOST_FIXTURE_TEST_CASE(swap_to_wire_oversized_target_is_refused_at_ingress,
                         sysio_dispatch_tester) { try {
    bootstrap_for_dispatch();          // ETH source outpost + UWRIT_OP (EVM link)
    register_wire_depot();             // WIRE depot => to-WIRE destination
@@ -1768,15 +2088,13 @@ BOOST_FIXTURE_TEST_CASE(swap_to_wire_oversized_target_is_rejected_not_aborted,
    const uint64_t eth     = fc::slug_name{"ETH"}.value;
    const uint64_t wire    = fc::slug_name{"WIRE"}.value;
    const uint64_t primary = fc::slug_name{"PRIMARY"}.value;
-   // src_amount large enough that the 0.1% to-WIRE fee rounds to >= 1, so the
-   // pre-fix `dst_amount + to_wire_fee` actually wraps for dst_amount near
-   // UINT64_MAX and slips into paywire (the abort being regressed).
+   // Large enough that the source leg prices well above the kernel's floor, so
+   // the refusal is the variance check and not the unpriceable-reserve gate.
    constexpr int64_t SRC_AMOUNT = 1'000'000;
    BOOST_REQUIRE_EQUAL(success(),
       depositinle_credit(UWRIT_OP, "ETH", "ETH", uint64_t{1'000'000'000}));
 
-   // A valid existing WIRE recipient so the to-WIRE path reaches the amount
-   // guard (past the recipient-validity terminal check).
+   // A valid existing WIRE recipient, so nothing earlier in the path rejects.
    const std::string rs = UWRIT_OP.to_string();
    const std::vector<char> rcpt(rs.begin(), rs.end());
 
@@ -1786,28 +2104,18 @@ BOOST_FIXTURE_TEST_CASE(swap_to_wire_oversized_target_is_rejected_not_aborted,
          ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
          eth, eth, primary, SRC_AMOUNT,
          wire, wire, primary, target,
+         // 100x the meaningful maximum: `variance_allowance` clamps it to 100%,
+         // so even the widest tolerance a caller can name cannot admit a target
+         // this far from the quote. Pre-fix, this tolerance let it straight in.
          /*tolerance_bps*/ 1'000'000, ChainKind::CHAIN_KIND_WIRE, rcpt);
+      // createuwreq never throws — it emits SWAP_REVERT and returns.
       BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(att_id, eth, sr));
-      const auto src_uic = make_signed_uic(UWRIT_OP, att_id, eth, eth, primary);
-      // The push MUST succeed — a pre-fix wrap aborts paywire's asset() here and
-      // fails the whole transaction (the production consensus stall).
-      BOOST_REQUIRE_EQUAL(success(),
-         rcrdcommit_direct(att_id, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", src_uic));
-      const auto req = get_uwreq(att_id);
-      BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_REJECTED", req["status"].as_string());
-      // Pin the rejection to the amount guard (not the variance recheck, which
-      // the 100x tolerance above lets pass).
-      bool reason_ok = false;
-      for (const auto& c : req["commits_by"].get_array()) {
-         if (c["underwriter"].as_string() == UWRIT_OP.to_string())
-            reason_ok = c["reason"].as_string().find("asset") != std::string::npos;
-      }
-      BOOST_REQUIRE(reason_ok);
+      BOOST_REQUIRE(get_uwreq(att_id).is_null());
    };
 
    run(7001, ASSET_MAX + 1);        // target == asset::max_amount + 1 (boundary)
    run(7002, uint64_t{1} << 63);    // high bit set (negative as int64)
-   run(7003, ~uint64_t{0});         // UINT64_MAX — wraps dst_amount + fee pre-fix
+   run(7003, ~uint64_t{0});         // UINT64_MAX — wrapped dst_amount + fee pre-fix
 } FC_LOG_AND_RETHROW() }
 
 // Regression (r3444212152): a candidate whose UIC signature does not recover to
@@ -2238,6 +2546,12 @@ BOOST_FIXTURE_TEST_CASE(swap_request_negative_source_is_reverted,
 BOOST_FIXTURE_TEST_CASE(swap_same_token_legs_overcommit_is_disqualified,
                         sysio_dispatch_tester) { try {
    bootstrap_for_dispatch();   // ETH chain + UWRIT_OP (EVM authex link)
+   // Both reserves must be ACTIVE and priceable: the resolver re-quotes on the
+   // live curve BEFORE the bond check (it is the quote that fixes `dst_amount`,
+   // and the bond must cover what the winner will actually deliver), so an
+   // unpriceable request never reaches the bond gate at all.
+   setup_wire_token_and_reserves();
+   BOOST_REQUIRE_EQUAL(success(), regreserve_active("ETH", "ETH", "SECOND"));
 
    const uint64_t eth       = fc::slug_name{"ETH"}.value;
    const uint64_t primary   = fc::slug_name{"PRIMARY"}.value;
@@ -2246,8 +2560,8 @@ BOOST_FIXTURE_TEST_CASE(swap_same_token_legs_overcommit_is_disqualified,
    constexpr int64_t  SRC_AMOUNT = 100;
    constexpr uint64_t DST_AMOUNT = 100;
 
-   // One (ETH, ETH) bucket holds 150. The bond check runs before any
-   // reserve-liquidity gate, so no reserves are needed to reach disqualification.
+   // One (ETH, ETH) bucket holds 150 against an aggregate need of
+   // `src_amount + quote(src_amount)` — just under 200, so 150 cannot cover it.
    BOOST_REQUIRE_EQUAL(success(), depositinle_credit(UWRIT_OP, "ETH", "ETH", 150));
 
    // Same-(chain, token) swap between two reserves on the one ETH outpost.
@@ -2279,10 +2593,14 @@ BOOST_FIXTURE_TEST_CASE(swap_same_token_legs_overcommit_is_disqualified,
    BOOST_REQUIRE(get_lock(1).is_null());   // no locks written
 } FC_LOG_AND_RETHROW() }
 
-// Positive + existing-locks coverage: a balance that exactly covers the
-// aggregate (200 == 100 + 100) must select the underwriter and write two locks
-// totaling 200. A subsequent same-bucket swap must then see availability
-// reduced by those active locks (200 - 200 = 0) and be disqualified.
+// Positive + existing-locks coverage: a balance that covers the aggregate
+// (`src_amount + quote`) must select the underwriter and write two locks
+// totaling exactly that. A subsequent same-bucket swap must then see
+// availability reduced by those active locks and be disqualified.
+//
+// The destination lock is sized by the AMM QUOTE, not by the caller's
+// `target_amount` (WNS-02) — hence the assertions derive from `expected_quote`
+// rather than repeating the request's target.
 BOOST_FIXTURE_TEST_CASE(swap_same_token_legs_exact_balance_wins,
                         sysio_dispatch_tester) { try {
    bootstrap_for_dispatch();
@@ -2296,12 +2614,19 @@ BOOST_FIXTURE_TEST_CASE(swap_same_token_legs_exact_balance_wins,
 
    BOOST_REQUIRE_EQUAL(success(), depositinle_credit(UWRIT_OP, "ETH", "ETH", 200));
 
+   // The quote the swap will settle at, taken before any reserve moves.
+   const uint64_t quote = expected_quote("ETH", "ETH", "PRIMARY", /*src_amount*/ 100,
+                                         "ETH", "ETH", "SECOND", kDefaultUwritFeeBps);
+   BOOST_REQUIRE(quote > 0);
+
    const auto sr = encode_swap_request(
       ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
       eth, eth, primary,   /*src_amount*/ 100,
-      eth, eth, secondary, /*dst_amount*/ 100,
+      eth, eth, secondary, /*target_amount*/ 100,
       /*tolerance_bps*/ 1'000'000, ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0b'));
    BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, eth, sr));
+   // The row carries the QUOTE, never the caller's target.
+   BOOST_REQUIRE_EQUAL(quote, get_uwreq(ATT_ID)["dst_amount"].as_uint64());
 
    const auto src_uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
    BOOST_REQUIRE_EQUAL(success(),
@@ -2314,7 +2639,8 @@ BOOST_FIXTURE_TEST_CASE(swap_same_token_legs_exact_balance_wins,
    BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_CONFIRMED", req["status"].as_string());
    BOOST_REQUIRE_EQUAL(UWRIT_OP.to_string(), req["winner"].as_string());
 
-   // Two locks, both on (ETH, ETH), totaling 200.
+   // Two locks, both on (ETH, ETH): the source leg at `src_amount`, the
+   // destination leg at the quote — together the aggregate the bond had to cover.
    const auto l1 = get_lock(1);
    const auto l2 = get_lock(2);
    BOOST_REQUIRE(!l1.is_null());
@@ -2323,7 +2649,9 @@ BOOST_FIXTURE_TEST_CASE(swap_same_token_legs_exact_balance_wins,
    BOOST_REQUIRE_EQUAL(eth, l1["token_code"]["value"].as_uint64());
    BOOST_REQUIRE_EQUAL(eth, l2["chain_code"]["value"].as_uint64());
    BOOST_REQUIRE_EQUAL(eth, l2["token_code"]["value"].as_uint64());
-   BOOST_REQUIRE_EQUAL(200u, l1["amount"].as_uint64() + l2["amount"].as_uint64());
+   BOOST_REQUIRE_EQUAL(100u,   l1["amount"].as_uint64());
+   BOOST_REQUIRE_EQUAL(quote,  l2["amount"].as_uint64());
+   BOOST_REQUIRE_EQUAL(100u + quote, l1["amount"].as_uint64() + l2["amount"].as_uint64());
 
    // Existing active locks now reserve the whole bucket (available == 0), so a
    // fresh same-bucket swap must be disqualified. Amounts must be large enough

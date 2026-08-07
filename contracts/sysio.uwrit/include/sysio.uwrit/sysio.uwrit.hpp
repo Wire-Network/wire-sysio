@@ -251,13 +251,15 @@ namespace sysio {
                      uint32_t uwreq_retention_epochs);
 
       /// Called inline from `sysio.msgch::dispatch` when a SWAP attestation
-      /// arrives. Decodes the SwapRequest, runs the variance-tolerance check
-      /// against `sysio.reserve::swapquote` (skipped when no LP is provisioned
-      /// for the relevant reserves), and either:
-      ///   * creates an OPEN UWREQ with src/dst populated from the swap, or
+      /// arrives. Decodes the SwapRequest, prices the swap on the depot's live
+      /// curve (`sysio.reserve::swapquote`'s kernel), runs the
+      /// variance-tolerance check, and either:
+      ///   * creates an OPEN UWREQ whose `dst_amount` is that QUOTE — never the
+      ///     caller's `target_amount` (WNS-02) — or
       ///   * emits a SWAP_REVERT back to `chain_code` and skips UWREQ creation
-      ///     when the gap between target_amount and the depot's
-      ///     current quote exceeds `target_tolerance_bps`.
+      ///     when the gap between `target_amount` and the depot's current quote
+      ///     exceeds `target_tolerance_bps` of that quote, or when every
+      ///     required reserve is ACTIVE yet the curve cannot price the swap.
       ///
       /// `chain_code` is the source outpost the SWAP came from — needed so
       /// the SWAP_REVERT routes back to the user's depositing outpost on
@@ -536,8 +538,17 @@ namespace sysio {
 
          /// Src / dst of the cross-chain swap. Populated by `createuwreq`
          /// from the decoded SwapRequest. Used by `try_select_winner` to
-         /// validate per-leg bond coverage. `dst_amount` IS the quoted
-         /// destination amount the underwriter must deliver.
+         /// validate per-leg bond coverage.
+         ///
+         /// `dst_amount` IS the AMM quote — the destination amount the
+         /// underwriter must deliver and the amount `sysio.reserv` debits at
+         /// settlement. It is **never** the caller's `SwapRequest.target_amount`
+         /// (WNS-02): the target is an unauthenticated expectation carried over
+         /// OPP, and paying it out let a caller name any figure and drain the
+         /// destination reserve. `createuwreq` / `drainfwq` seed it with the
+         /// quote at ingestion; `try_select_winner` re-prices on the live curve
+         /// and overwrites it with the price the books actually move at, after
+         /// checking the drift against `variance_tolerance_bps`.
          sysio::slug_name                         src_chain_code;
          sysio::slug_name                         src_token_code;
          sysio::slug_name                         src_reserve_code;
@@ -547,10 +558,13 @@ namespace sysio {
          sysio::slug_name                         dst_reserve_code;
          uint64_t                                dst_amount        = 0;
          /// Variance tolerance the user accepted at SWAP_REQUEST time, in
-         /// basis points (50 = 0.5%). The depot's createuwreq path validates
-         /// the LP quote against this at ingestion; `try_select_winner`
-         /// re-validates against the live quote at race-resolution time so
-         /// drift between ingestion and race doesn't burn the underwriter.
+         /// basis points (50 = 0.5%). The allowance it produces is a fraction
+         /// of the **AMM quote**, never of the user's `target_amount` (WNS-02)
+         /// — see `variance_allowance` in the implementation — and is clamped
+         /// to 100%. The depot's createuwreq path validates the ingestion quote
+         /// against it; `try_select_winner` re-validates the live quote at
+         /// race-resolution time so drift between ingestion and race doesn't
+         /// silently move the settlement price past what the user accepted.
          uint32_t                                variance_tolerance_bps = 0;
 
          /// Source-chain id of the deposit transaction that funded this

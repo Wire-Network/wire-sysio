@@ -670,6 +670,45 @@ BOOST_FIXTURE_TEST_CASE(applyswap_applies_four_legs, sysio_reserve_tester) { try
    // amounts the 0.1% fee floors to 0, so the w hop stays fully internal.
 } FC_LOG_AND_RETHROW() }
 
+// [P0] WNS-02: applyswap must refuse a destination debit larger than the
+// destination curve's output for the post-fee WIRE it is receiving. The audited
+// vulnerability paid out a caller-chosen `dst_amount` verbatim, so the reserve
+// enforces its own floor instead of trusting `sysio.uwrit` to have derived it.
+BOOST_FIXTURE_TEST_CASE(applyswap_rejects_debit_above_curve_output, sysio_reserve_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(),
+      regreserve("ETH", "ETH", "PRIMARY", 1000, 1000));
+   BOOST_REQUIRE_EQUAL(success(),
+      regreserve("SOLANA", "SOL", "PRIMARY", 1000, 1000));
+
+   // w_gross = 90 (see applyswap_applies_four_legs), fee floors to 0, so the
+   // destination receives 90 WIRE and its curve yields
+   // floor(1000*90/1090) = 82 token. 83 is one subunit past what the AMM owes.
+   constexpr int64_t CURVE_OUT = 82;
+   auto apply = [&](int64_t dst_amount) {
+      return push_action(UWRIT_ACCOUNT, "applyswap"_n, mvo()
+         ("src_chain_code",   codename_mvo("ETH"))
+         ("src_token_code",   codename_mvo("ETH"))
+         ("src_reserve_code", codename_mvo("PRIMARY"))
+         ("src_amount",       100)
+         ("dst_chain_code",   codename_mvo("SOLANA"))
+         ("dst_token_code",   codename_mvo("SOL"))
+         ("dst_reserve_code", codename_mvo("PRIMARY"))
+         ("dst_amount",       dst_amount));
+   };
+
+   // One subunit over — refused. A grossly-inflated amount (the drain shape)
+   // takes the same path.
+   const auto expected = error("assertion failure with message: applyswap: "
+                               "destination amount exceeds the curve output for the post-fee WIRE");
+   BOOST_REQUIRE_EQUAL(expected, apply(CURVE_OUT + 1));
+   BOOST_REQUIRE_EQUAL(expected, apply(900));
+
+   // Exactly the curve output settles — the amount `sysio.uwrit` derives.
+   BOOST_REQUIRE_EQUAL(success(), apply(CURVE_OUT));
+   BOOST_REQUIRE_EQUAL(1000 - CURVE_OUT,
+                       find_reserve("SOLANA", "SOL", "PRIMARY")["reserve_chain_amount"].as_uint64());
+} FC_LOG_AND_RETHROW() }
+
 BOOST_FIXTURE_TEST_CASE(applyswap_charges_fee_and_routes_50_50, sysio_reserve_tester) { try {
    // Large amounts so the default 0.1% (10 bps) fee is non-zero and routes.
    BOOST_REQUIRE_EQUAL(success(),
@@ -786,11 +825,48 @@ BOOST_FIXTURE_TEST_CASE(applyfromwire_credits_wire_and_debits_chain, sysio_reser
    BOOST_REQUIRE_EQUAL(900,  r["reserve_chain_amount"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
+// [P0] WNS-02, from-WIRE shape — see applyswap_rejects_debit_above_curve_output.
+// The user's escrowed WIRE feeds the WIRE leg directly, so the bound is the
+// destination curve's output for the post-fee remainder.
+BOOST_FIXTURE_TEST_CASE(applyfromwire_rejects_debit_above_curve_output,
+                        sysio_reserve_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(),
+      regreserve("SOLANA", "SOL", "PRIMARY", 1000, 1000));
+
+   // 200 WIRE in, 0.1% fee floors to 0, so the curve yields
+   // floor(1000*200/1200) = 166 token.
+   constexpr int64_t CURVE_OUT = 166;
+   auto apply = [&](int64_t dst_amount) {
+      return push_action(UWRIT_ACCOUNT, "applyfromwire"_n, mvo()
+         ("dst_chain_code",   codename_mvo("SOLANA"))
+         ("dst_token_code",   codename_mvo("SOL"))
+         ("dst_reserve_code", codename_mvo("PRIMARY"))
+         ("wire_in",          200)
+         ("dst_amount",       dst_amount));
+   };
+
+   const auto expected = error("assertion failure with message: applyfromwire: "
+                               "destination amount exceeds the curve output for the post-fee WIRE");
+   BOOST_REQUIRE_EQUAL(expected, apply(CURVE_OUT + 1));
+   BOOST_REQUIRE_EQUAL(expected, apply(900));
+
+   BOOST_REQUIRE_EQUAL(success(), apply(CURVE_OUT));
+   BOOST_REQUIRE_EQUAL(1000 - CURVE_OUT,
+                       find_reserve("SOLANA", "SOL", "PRIMARY")["reserve_chain_amount"].as_uint64());
+} FC_LOG_AND_RETHROW() }
+
 BOOST_FIXTURE_TEST_CASE(paywire_pays_real_wire_from_custody, sysio_reserve_tester) { try {
    BOOST_REQUIRE_EQUAL(success(),
       regreserve("ETH", "ETH", "PRIMARY", 1000, 1000));
    BOOST_REQUIRE_EQUAL(1000, wire_balance(RESERVE_ACCOUNT));
    BOOST_REQUIRE_EQUAL(0,    wire_balance("alice"_n));
+
+   // The curve's output for this leg: equal weights reduce to constant product,
+   // so `token_to_wire(1000, 1000, 100)` = floor(1000*100/1100) = 90, and the
+   // 0.1% fee floors to 0 at that size, leaving a post-fee 90. `sysio.uwrit`
+   // passes exactly this (its `swap_quote` returns the post-fee WIRE leg for a
+   // WIRE destination), and paywire now refuses anything above it (WNS-02).
+   constexpr int64_t CURVE_OUT = 90;
 
    // Swap-to-WIRE settlement: source books move + alice is paid REAL WIRE.
    BOOST_REQUIRE_EQUAL(success(), push_action(UWRIT_ACCOUNT, "paywire"_n, mvo()
@@ -799,22 +875,35 @@ BOOST_FIXTURE_TEST_CASE(paywire_pays_real_wire_from_custody, sysio_reserve_teste
       ("src_reserve_code", codename_mvo("PRIMARY"))
       ("src_amount",       100)
       ("recipient",        "alice")
-      ("wire_out",         200)));
+      ("wire_out",         CURVE_OUT)));
 
    auto r = find_reserve("ETH", "ETH", "PRIMARY");
    BOOST_REQUIRE_EQUAL(1100, r["reserve_chain_amount"].as_uint64());
-   BOOST_REQUIRE_EQUAL(800,  r["reserve_wire_amount"].as_uint64());
-   // Custody invariant: Σ reserve_wire_amount dropped by 200 AND the real
-   // balance dropped by 200, together.
-   BOOST_REQUIRE_EQUAL(800, wire_balance(RESERVE_ACCOUNT));
-   BOOST_REQUIRE_EQUAL(200, wire_balance("alice"_n));
+   BOOST_REQUIRE_EQUAL(910,  r["reserve_wire_amount"].as_uint64());
+   // Custody invariant: Σ reserve_wire_amount dropped by the payout AND the real
+   // balance dropped by the payout, together.
+   BOOST_REQUIRE_EQUAL(910, wire_balance(RESERVE_ACCOUNT));
+   BOOST_REQUIRE_EQUAL(90,  wire_balance("alice"_n));
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(paywire_rejects_overdraw, sysio_reserve_tester) { try {
+// [P0] WNS-02: paywire must refuse a payout larger than the WIRE its own curve
+// produces for `src_amount`. `wire_out` is a caller-supplied parameter, and the
+// audited vulnerability was precisely a caller-chosen destination amount being
+// paid out verbatim — so the reserve enforces its own floor rather than trusting
+// `sysio.uwrit` to have derived it.
+//
+// This bound also subsumes the older "insufficient source reserve WIRE for
+// payout + fee" guard: `w_gross` is capped at the reserve's own WIRE balance by
+// `out_given_in`, so `wire_out + fee <= w_gross <= reserve_wire_amount` holds
+// by construction once the payout is bounded. That guard stays in the contract
+// as defense-in-depth but is no longer constructible through this action.
+BOOST_FIXTURE_TEST_CASE(paywire_rejects_payout_above_curve_output, sysio_reserve_tester) { try {
+   // 1000 token / 100 WIRE: the curve yields floor(100*100/1100) = 9 WIRE for a
+   // 100-token source leg, so a 200 payout is ~22x the reserve's own price.
    BOOST_REQUIRE_EQUAL(success(),
       regreserve("ETH", "ETH", "PRIMARY", 1000, 100));
    BOOST_REQUIRE_EQUAL(
-      error("assertion failure with message: paywire: insufficient source reserve WIRE for payout + fee"),
+      error("assertion failure with message: paywire: payout exceeds the post-fee WIRE the source leg produced"),
       push_action(UWRIT_ACCOUNT, "paywire"_n, mvo()
          ("src_chain_code",   codename_mvo("ETH"))
          ("src_token_code",   codename_mvo("ETH"))
@@ -822,6 +911,16 @@ BOOST_FIXTURE_TEST_CASE(paywire_rejects_overdraw, sysio_reserve_tester) { try {
          ("src_amount",       100)
          ("recipient",        "alice")
          ("wire_out",         200)));
+
+   // The curve's own output settles cleanly against the same reserve.
+   BOOST_REQUIRE_EQUAL(success(), push_action(UWRIT_ACCOUNT, "paywire"_n, mvo()
+      ("src_chain_code",   codename_mvo("ETH"))
+      ("src_token_code",   codename_mvo("ETH"))
+      ("src_reserve_code", codename_mvo("PRIMARY"))
+      ("src_amount",       100)
+      ("recipient",        "alice")
+      ("wire_out",         9)));
+   BOOST_REQUIRE_EQUAL(9, wire_balance("alice"_n));
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(refundwire_returns_escrow, sysio_reserve_tester) { try {

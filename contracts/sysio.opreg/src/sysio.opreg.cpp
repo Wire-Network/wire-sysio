@@ -317,6 +317,43 @@ uint64_t sum_locks_inline(name account, sysio::slug_name chain_code, sysio::slug
    return total;
 }
 
+/// True iff `sysio.uwrit::locks` still holds ANY row for `account`, on any
+/// `(chain_code, token_code)` pair. Existence-only, so it stops at the first row
+/// instead of summing like `sum_locks_inline` — `prune` needs to know whether
+/// deferred settlement is still outstanding, not how much.
+bool has_active_locks(name account) {
+   uwrit::locks_t locks(opreg::UWRIT_ACCOUNT);
+   auto idx = locks.template get_index<"byuw"_n>();
+   return idx.lower_bound(account.value) != idx.upper_bound(account.value);
+}
+
+/// True iff a TERMINATED operator's collateral is completely settled — every
+/// balance bucket drained AND no `sysio.uwrit` lock still naming the account.
+///
+/// This is `prune`'s erase precondition (WNS-01). `terminate_inline` remits only
+/// the immediately-unlocked portion and deliberately LEAVES the locked remainder
+/// in the row, so `releaselock` can emit its deferred WITHDRAW_REMIT when
+/// `sysio.uwrit::chklocks` later releases each lock. `releaselock` returns early
+/// at its missing-operator check, so erasing the row before that settlement lands
+/// permanently strands the retained collateral: WIRE-side custody keeps it with
+/// no ledger entry to release against, and the outpost keeps its escrow with no
+/// attestation that could ever free it.
+///
+/// Balance rows are checked by VALUE, not by `balances.empty()` —
+/// `subtract_balance` zeroes a bucket in place and never erases the entry.
+///
+/// A row that never settles is never pruned, and that is the intended outcome:
+/// an unprunable row costs some RAM, while an erased one costs the operator
+/// their bond. In correct operation the wait is bounded — `chklocks` releases
+/// every lock at its wall-clock expiry, and each `releaselock` drains the
+/// matching bucket, so the predicate goes true on its own.
+bool is_fully_settled(const opreg::operator_entry& op) {
+   for (const auto& bal : op.balances) {
+      if (bal.balance > 0) return false;
+   }
+   return !has_active_locks(op.account);
+}
+
 /// Sum the pending (not-yet-flushed) withdraws on this contract for a given
 /// (op, chain, token). Subtracted by `available()` so a queued withdraw
 /// effectively reserves the funds for its 2-epoch wait.
@@ -1588,14 +1625,24 @@ void opreg::prune() {
    operators_t ops(get_self());
    auto status_idx = ops.get_index<"bystatus"_n>();
 
+   // Erase a TERMINATED row only when BOTH gates pass: the prune delay has
+   // elapsed AND the operator's collateral is completely settled (WNS-01 — see
+   // `is_fully_settled`). The delay alone is not sufficient: `terminate_inline`
+   // intentionally retains the locked portion of every balance for
+   // `releaselock` to settle when `sysio.uwrit::chklocks` frees the lock, and
+   // `releaselock` no-ops the moment the operator row is gone. Since `prune` is
+   // permissionless, gating on the delay alone let ANY caller strand a
+   // terminated operator's locked collateral by cranking it first.
    uint32_t removed = 0;
    for (auto it = status_idx.lower_bound(
            magic_enum::enum_integer(OperatorStatus::OPERATOR_STATUS_TERMINATED));
         it != status_idx.end() &&
         it->status == OperatorStatus::OPERATOR_STATUS_TERMINATED;) {
-      if (it->terminated_at > 0 && now - it->terminated_at >= cfg.terminate_prune_delay_ms) {
+      const bool delay_elapsed = it->terminated_at > 0
+                                 && now - it->terminated_at >= cfg.terminate_prune_delay_ms;
+      if (delay_elapsed && is_fully_settled(*it)) {
          it = status_idx.erase(std::move(it));
-         if (++removed >= 20) break; // Bound CPU
+         if (++removed >= MAX_OPERATOR_PRUNE_PER_CRANK) break; // Bound CPU
       } else {
          ++it;
       }
