@@ -79,35 +79,15 @@ inline bool metadata_exceeds_bounds(std::string_view label, std::string_view des
 }
 
 /**
- * @brief Trim `s` to at most `max_bytes`, never splitting a UTF-8 character.
+ * @brief The label a handler stores on a row it rejected for over-bound metadata.
  *
- * A byte-wise `resize` cuts at a byte offset, not a code-point boundary: a 33-byte label of
- * 31 ASCII bytes plus `é` (0xC3 0xA9) clamped to 32 would keep a lone 0xC3 lead byte and
- * persist malformed text in state. Backing off to the previous boundary drops the straddling
- * character whole. The BOUND itself stays a byte bound -- it exists to cap state size.
+ * The rejected strings are NOT truncated onto the row. Truncation would have to cut at a
+ * byte offset rather than a UTF-8 code-point boundary (splitting a multi-byte character), and
+ * the salvaged text buys nothing: nothing reads a tombstone's metadata — the reclaim path
+ * overwrites every field — and the creator's original strings are preserved in the inbound
+ * OPP envelope artifact regardless. A short fixed marker states plainly that the row carries
+ * no metadata BECAUSE it was rejected, rather than leaving a blank a reader has to interpret.
  */
-inline std::string clamp_utf8(std::string s, std::size_t max_bytes) {
-   if (s.size() <= max_bytes) return s;
-   // `s[cut]` is the first dropped byte. While it is a continuation byte (10xxxxxx) the
-   // character straddling the boundary is being split, so walk back onto its lead byte and
-   // drop the whole sequence. Terminates at 0 in the worst case.
-   std::size_t cut = max_bytes;
-   while (cut > 0 && (static_cast<unsigned char>(s[cut]) & 0xC0) == 0x80) --cut;
-   s.resize(cut);
-   return s;
-}
-
-/// Clamp a label for storage on a reject-path tombstone row. The tombstone still lands in
-/// `sysio`-billed state, so an over-bound string must be truncated rather than stored
-/// verbatim — otherwise rejecting an oversized registration would persist exactly the
-/// state the bound exists to prevent.
-inline std::string truncate_label(std::string label) {
-   return clamp_utf8(std::move(label), label_max_bytes);
-}
-
-/// Clamp a description for storage on a reject-path tombstone row. See `truncate_label`.
-inline std::string truncate_description(std::string description) {
-   return clamp_utf8(std::move(description), description_max_bytes);
-}
+inline constexpr std::string_view rejected_label = "<rejected>";
 
 } // namespace sysio::opp::registry

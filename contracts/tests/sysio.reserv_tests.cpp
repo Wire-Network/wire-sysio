@@ -632,8 +632,10 @@ BOOST_FIXTURE_TEST_CASE(oncrtreserve_invalid_amount_is_cancelled, sysio_reserve_
 // reject predicate, releasing the creator's escrow via RESERVE_CREATE_CANCELLED.
 //
 // The creator here is properly LINKED with a valid amount, so the metadata is the sole
-// rejection reason. The tombstone row is itself `sysio`-billed, so the stored name must be
-// TRUNCATED — persisting it verbatim would keep exactly the state the bound prevents.
+// rejection reason. The tombstone is itself a `sysio`-billed row, so the over-bound strings
+// are replaced by a fixed marker rather than carried onto it. Both an ASCII and a MULTIBYTE
+// over-bound label are covered: because nothing is truncated there is no code-point boundary
+// to split, so neither can leave malformed text in state.
 BOOST_FIXTURE_TEST_CASE(oncrtreserve_oversized_metadata_is_cancelled, sysio_reserve_tester) { try {
    deploy_authex();
 
@@ -642,64 +644,39 @@ BOOST_FIXTURE_TEST_CASE(oncrtreserve_oversized_metadata_is_cancelled, sysio_rese
    BOOST_REQUIRE_EQUAL(success(),
       recordlink_em("alice"_n, ChainKind::CHAIN_KIND_EVM, creator_pub));
 
-   BOOST_REQUIRE_EQUAL(success(), push_action(MSGCH_ACCOUNT, "oncrtreserve"_n, mvo()
-      ("chain_code",            codename_mvo("ETH"))
-      ("token_code",            codename_mvo("ETH"))
-      ("reserve_code",          codename_mvo("USERRES"))
-      ("name",                  std::string(33, 'x'))   // one byte over label_max_bytes
-      ("description",           "")
-      ("external_token_amount", 1000)
-      ("requested_wire_amount", 1000)
-      ("source_token_precision", 9u)
-      ("connector_weight_bps",  5000)
-      ("creator_chain_kind",    ChainKind::CHAIN_KIND_EVM)
-      ("creator_chain_addr",    std::vector<char>(20, '\x01'))
-      ("is_private",            false)
-      ("creator_pub_key",       em_pubkey_bytes(creator_pub))));   // linked key
+   auto create_with_name = [&](std::string_view reserve_code, const std::string& name) {
+      return push_action(MSGCH_ACCOUNT, "oncrtreserve"_n, mvo()
+         ("chain_code",            codename_mvo("ETH"))
+         ("token_code",            codename_mvo("ETH"))
+         ("reserve_code",          codename_mvo(reserve_code))
+         ("name",                  name)
+         ("description",           "")
+         ("external_token_amount", 1000)
+         ("requested_wire_amount", 1000)
+         ("source_token_precision", 9u)
+         ("connector_weight_bps",  5000)
+         ("creator_chain_kind",    ChainKind::CHAIN_KIND_EVM)
+         ("creator_chain_addr",    std::vector<char>(20, '\x01'))
+         ("is_private",            false)
+         ("creator_pub_key",       em_pubkey_bytes(creator_pub)));   // linked key
+   };
 
-   auto r = find_reserve("ETH", "ETH", "USERRES");
-   BOOST_REQUIRE(!r.is_null());
-   BOOST_REQUIRE_EQUAL("RESERVE_STATUS_CANCELLED", r["status"].as_string());
-   // Clamped on the way into state, not stored verbatim.
-   BOOST_REQUIRE_EQUAL(std::string(32, 'x'), r["name"].as_string());
-} FC_LOG_AND_RETHROW() }
+   // 33 ASCII bytes — one over label_max_bytes.
+   BOOST_REQUIRE_EQUAL(success(), create_with_name("USERRES", std::string(33, 'x')));
+   auto ascii_row = find_reserve("ETH", "ETH", "USERRES");
+   BOOST_REQUIRE(!ascii_row.is_null());
+   BOOST_REQUIRE_EQUAL("RESERVE_STATUS_CANCELLED", ascii_row["status"].as_string());
+   BOOST_REQUIRE_EQUAL("<rejected>", ascii_row["name"].as_string());
 
-// The tombstone clamp must land on a UTF-8 code-point boundary. A byte-wise resize would cut
-// this 33-byte label — 31 ASCII plus `é` (0xC3 0xA9) — at byte 32, keeping a lone 0xC3 lead
-// byte and persisting malformed text in chain state. The straddling character is dropped whole,
-// so the stored label is the 31 ASCII bytes.
-BOOST_FIXTURE_TEST_CASE(oncrtreserve_metadata_clamp_respects_utf8, sysio_reserve_tester) { try {
-   deploy_authex();
-
-   auto creator_priv = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em);
-   auto creator_pub  = creator_priv.get_public_key();
-   BOOST_REQUIRE_EQUAL(success(),
-      recordlink_em("alice"_n, ChainKind::CHAIN_KIND_EVM, creator_pub));
-
-   const std::string ascii_head(31, 'x');
-   const std::string multibyte_name = ascii_head + "\xC3\xA9";   // 33 bytes, 32 code points
+   // 33 bytes as 31 ASCII + `é` (0xC3 0xA9) — a byte-wise truncation at 32 would have split
+   // the final character and persisted a lone lead byte. The marker sidesteps that entirely.
+   const std::string multibyte_name = std::string(31, 'x') + "\xC3\xA9";
    BOOST_REQUIRE_EQUAL(33u, multibyte_name.size());
-
-   BOOST_REQUIRE_EQUAL(success(), push_action(MSGCH_ACCOUNT, "oncrtreserve"_n, mvo()
-      ("chain_code",            codename_mvo("ETH"))
-      ("token_code",            codename_mvo("ETH"))
-      ("reserve_code",          codename_mvo("USERRES"))
-      ("name",                  multibyte_name)
-      ("description",           "")
-      ("external_token_amount", 1000)
-      ("requested_wire_amount", 1000)
-      ("source_token_precision", 9u)
-      ("connector_weight_bps",  5000)
-      ("creator_chain_kind",    ChainKind::CHAIN_KIND_EVM)
-      ("creator_chain_addr",    std::vector<char>(20, '\x01'))
-      ("is_private",            false)
-      ("creator_pub_key",       em_pubkey_bytes(creator_pub))));
-
-   auto r = find_reserve("ETH", "ETH", "USERRES");
-   BOOST_REQUIRE(!r.is_null());
-   BOOST_REQUIRE_EQUAL("RESERVE_STATUS_CANCELLED", r["status"].as_string());
-   // 31 bytes, not 32 — the split `é` is dropped rather than half-stored.
-   BOOST_REQUIRE_EQUAL(ascii_head, r["name"].as_string());
+   BOOST_REQUIRE_EQUAL(success(), create_with_name("USERRES2", multibyte_name));
+   auto multibyte_row = find_reserve("ETH", "ETH", "USERRES2");
+   BOOST_REQUIRE(!multibyte_row.is_null());
+   BOOST_REQUIRE_EQUAL("RESERVE_STATUS_CANCELLED", multibyte_row["status"].as_string());
+   BOOST_REQUIRE_EQUAL("<rejected>", multibyte_row["name"].as_string());
 } FC_LOG_AND_RETHROW() }
 
 // ── matchreserve (gating preconditions) ──

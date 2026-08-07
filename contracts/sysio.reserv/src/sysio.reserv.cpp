@@ -349,10 +349,16 @@ void reserve::oncrtreserve(sysio::slug_name       chain_code,
             .chain_code             = chain_code,
             .token_code             = token_code,
             .reserve_code           = reserve_code,
-            // The tombstone is itself a `sysio`-billed row, so the metadata is clamped here —
-            // storing it verbatim would persist exactly the state the bound exists to prevent.
-            .name                   = opp::registry::truncate_label(std::move(name)),
-            .description            = opp::registry::truncate_description(std::move(description)),
+            // The tombstone is itself a `sysio`-billed row, so over-bound strings are NOT
+            // carried onto it — storing them verbatim would persist exactly the state the
+            // bound exists to prevent. Only THAT rejection reason substitutes the marker; a
+            // row rejected for an unlinked creator or an invalid amount keeps its (already
+            // in-bounds) metadata. The creator's originals stay in the inbound OPP envelope
+            // artifact either way.
+            .name                   = oversized_metadata
+                                       ? std::string(opp::registry::rejected_label)
+                                       : std::move(name),
+            .description            = oversized_metadata ? std::string{} : std::move(description),
             .status                 = opp::types::RESERVE_STATUS_CANCELLED,
             .reserve_chain_amount   = 0,
             .reserve_wire_amount    = 0,
