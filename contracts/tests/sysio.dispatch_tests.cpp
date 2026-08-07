@@ -2065,10 +2065,11 @@ BOOST_FIXTURE_TEST_CASE(forged_delivery_does_not_strand_chkcons, sysio_dispatch_
    BOOST_REQUIRE_EQUAL(retry_count(), rc0 + 1);
 } FC_LOG_AND_RETHROW() }
 
-// #5-residual: a race winner lacking a destination-chain authex link must be
-// DISQUALIFIED (skipped, uwreq left PENDING), reached via try_build_swap_remit
-// BEFORE any CONFIRMED / reserve write so nothing throws in evalcons.
-BOOST_FIXTURE_TEST_CASE(swap_winner_without_dst_authex_link_is_disqualified,
+// A race winner lacking a destination-chain authex link must be DISQUALIFIED
+// before a request-global race-time variance verdict. This candidate is fully
+// bonded, but another underwriter may have the missing identity link, so the
+// request remains PENDING and no lock or reserve write occurs.
+BOOST_FIXTURE_TEST_CASE(swap_missing_dst_authex_precedes_race_time_rejection,
                         sysio_dispatch_tester) { try {
    bootstrap_for_dispatch();   // registers ETH + UWRIT_OP (EVM link only)
 
@@ -2084,21 +2085,28 @@ BOOST_FIXTURE_TEST_CASE(swap_winner_without_dst_authex_link_is_disqualified,
    const uint64_t sol_chain = fc::slug_name{"SOLANA"}.value;
    const uint64_t sol_token = fc::slug_name{"SOL"}.value;
    const uint64_t primary   = fc::slug_name{"PRIMARY"}.value;
-   constexpr uint64_t ATT_ID    = 5000;
-   constexpr int64_t  SRC_AMOUNT = 100;
-   constexpr uint64_t DST_AMOUNT = 100;
+   constexpr uint64_t ATT_ID = 5000;
+   constexpr uint64_t AMOUNT = 1'000'000'000;
 
    setup_wire_token_and_reserves();
 
-   BOOST_REQUIRE_EQUAL(success(), depositinle_credit(UWRIT_OP, "ETH",    "ETH", 1'000'000));
-   BOOST_REQUIRE_EQUAL(success(), depositinle_credit(UWRIT_OP, "SOLANA", "SOL", 1'000'000));
+   BOOST_REQUIRE_EQUAL(success(), depositinle_credit(UWRIT_OP, "ETH",    "ETH", AMOUNT));
+   BOOST_REQUIRE_EQUAL(success(), depositinle_credit(UWRIT_OP, "SOLANA", "SOL", AMOUNT));
 
    const auto sr = encode_swap_request(
       ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
-      eth, eth, primary, SRC_AMOUNT,
-      sol_chain, sol_token, primary, DST_AMOUNT,
-      5000, ChainKind::CHAIN_KIND_SVM, std::vector<char>(32, '\x0b'));
+      eth, eth, primary, static_cast<int64_t>(AMOUNT),
+      sol_chain, sol_token, primary, AMOUNT,
+      /*tolerance_bps*/ 1'000'000, ChainKind::CHAIN_KIND_SVM,
+      std::vector<char>(32, '\x0b'));
    BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, eth, sr));
+
+   // Drain the destination after admission so the live quote is far outside
+   // the original target. Without the candidate-first remit gate, this fully
+   // bonded but identity-incomplete candidate would reject the whole request.
+   constexpr uint64_t SEEDED_RESERVE = 1'000'000'000'000ull;
+   BOOST_REQUIRE_EQUAL(success(), debit_reserve_chain(
+      "SOLANA", "SOL", "PRIMARY", SEEDED_RESERVE - (AMOUNT - 1)));
 
    const auto src_uic = create_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
    BOOST_REQUIRE_EQUAL(success(),
@@ -2109,6 +2117,7 @@ BOOST_FIXTURE_TEST_CASE(swap_winner_without_dst_authex_link_is_disqualified,
 
    const auto req = get_uwreq(ATT_ID);
    BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_PENDING", req["status"].as_string());
+   BOOST_REQUIRE(!req["attestation_inbound_data"].as_string().empty());
    bool found = false;
    for (const auto& c : req["commits_by"].get_array()) {
       if (c["underwriter"].as_string() == UWRIT_OP.to_string()) {
@@ -2120,6 +2129,7 @@ BOOST_FIXTURE_TEST_CASE(swap_winner_without_dst_authex_link_is_disqualified,
       }
    }
    BOOST_REQUIRE(found);
+   BOOST_REQUIRE(get_lock(1).is_null());
 
 } FC_LOG_AND_RETHROW() }
 
@@ -2851,13 +2861,13 @@ BOOST_FIXTURE_TEST_CASE(swap_signature_rejection_taxonomy_is_logged_and_non_thro
 } FC_LOG_AND_RETHROW() }
 
 // Strict protobuf canonicality rejects alternate host encodings before
-// signature recovery. The real cross-generator gate proves an absent nested
-// A present default-valued nested address and a zero top-level scalar decode
-// but normalize differently in CDT zpp. Repeated unknown field keys
-// exercise the decoder's historical unknown-field behavior all the way to the
-// 2 KiB boundary: decoding succeeds, canonical re-encoding drops the unknown
-// keys, and the payload is rejected as non-canonical. None can replace the
-// already stored honest source leg.
+// signature recovery. The real cross-generator gate proves that an absent
+// nested address, a present default-valued nested address, and a zero top-level
+// scalar all decode but normalize differently in CDT zpp. Repeated unknown
+// field keys exercise the decoder's historical unknown-field behavior all the
+// way to the 2 KiB boundary: decoding succeeds, canonical re-encoding drops
+// the unknown keys, and the payload is rejected as non-canonical. None can
+// replace the already stored honest source leg.
 BOOST_FIXTURE_TEST_CASE(swap_noncanonical_uic_cannot_replace_valid_leg,
                         sysio_dispatch_tester) { try {
    bootstrap_for_dispatch();
@@ -4036,6 +4046,13 @@ BOOST_FIXTURE_TEST_CASE(swap_race_time_reserve_drain_rejects_request,
          ("external_chain_id", 900)
          ("name",              std::string("solana-test"))
          ("description",       std::string{})));
+   const auto solana_link_key = fc::crypto::private_key::generate(
+      fc::crypto::private_key::key_type::ed).get_public_key();
+   BOOST_REQUIRE_EQUAL(success(), push(
+      AUTHEX_ACCOUNT, authex_abi, AUTHEX_ACCOUNT, "recordlink"_n, mvo()
+         ("account", UWRIT_OP)
+         ("chain_kind", ChainKind::CHAIN_KIND_SVM)
+         ("pub_key", solana_link_key)));
    setup_wire_token_and_reserves();
 
    const uint64_t eth       = fc::slug_name{"ETH"}.value;

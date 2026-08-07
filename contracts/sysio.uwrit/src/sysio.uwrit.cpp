@@ -1560,16 +1560,45 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate,
       }
    }
 
+   // ── Candidate-specific remit eligibility ─────────────────────────────
+   // Build the outbound remit before any request-global verdict. A missing
+   // destination-chain authex link belongs to this candidate: another
+   // underwriter may have the required identity, so this candidate must be
+   // DISQUALIFIED before it can surface live-price or reserve failures that
+   // would reject somebody else's request. Request-wide build failures remain
+   // terminal, and every outcome here is still after the authoritative bond
+   // gate above.
+   uint64_t remit_dst_outpost_id = 0;
+   std::vector<char> remit_encoded;
+   if (dst_needed) {
+      switch (try_build_swap_remit(req, candidate, remit_dst_outpost_id, remit_encoded)) {
+         case swap_remit_disp::ok:
+            break;
+         case swap_remit_disp::disqualified:
+            disqualify_candidate(reqs, pk, candidate,
+               "winning candidate has no authex link for the destination "
+               "chain — cannot emit an auditable SwapRemit");
+            return;
+         case swap_remit_disp::terminal:
+            reject_and_refund(self, reqs, pk, req, src_needed,
+               "swap unremittable at race resolution: destination outpost / "
+               "chain-kind unresolved or stored request undecodable",
+               "uwreq rejected: destination unremittable at race resolution");
+            return;
+      }
+   }
+
    // ── Request-level terminal decisions ─────────────────────────────────
    // Deliberately placed AFTER every candidate-specific gate (eligibility,
-   // signature, bond). These two outcomes REFUND the user and close the request
-   // for good, so they must not be reachable by a candidate that was never
-   // going to win: an ACTIVE underwriter can clear the role minimum yet be
-   // under-bonded for this particular swap, and letting it terminally close a
-   // healthy request during transient drift would hand any such operator a
-   // denial-of-service on other people's swaps. A candidate that reaches this
-   // point has proved it could actually settle, so the verdict it triggers is
-   // the request's own.
+   // signature, bond, destination identity). These outcomes REFUND the user
+   // and close the request for good, so they must not be reachable by a
+   // candidate that was never going to win: an ACTIVE underwriter can clear
+   // the role minimum yet be under-bonded for this particular swap, and
+   // letting it terminally close a healthy request during transient drift
+   // would hand any such operator a denial-of-service on other people's swaps.
+   // A candidate that reaches this point is eligible, remittable, and bonded
+   // for the currently known obligation, so every remaining verdict belongs
+   // to the request itself.
    if (settle_quote == 0) {
       if (required_reserves_active(req.src_chain_code, req.src_token_code, req.src_reserve_code,
                                    req.dst_chain_code, req.dst_token_code, req.dst_reserve_code)) {
@@ -1729,40 +1758,6 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate,
             "swap rejected at race resolution: insufficient reserve liquidity",
             "request released: reserves cannot settle the swap");
          return;
-      }
-   }
-
-   // ── Pre-build the outbound SWAP_REMIT (dst-outpost paths only) ───────
-   // The remit's identity resolution — stored-request decode, destination
-   // outpost / chain-kind, and the winner's destination authex link — used to
-   // run inside the former `emit_swap_remit` AFTER the
-   // reserve mutation, with `check()` aborts that would halt evalcons and
-   // stall OPP consensus chain-wide. Build + validate the envelope HERE,
-   // before any lock / CONFIRMED / applyswap write, so a failure unwinds the
-   // race non-throwing. `queue_swap_remit` (in the settlement tail) only
-   // ships the pre-built bytes, after the reserve books have moved.
-   uint64_t remit_dst_outpost_id = 0;
-   std::vector<char> remit_encoded;
-   if (dst_needed) {
-      switch (try_build_swap_remit(req, candidate, remit_dst_outpost_id, remit_encoded)) {
-         case swap_remit_disp::ok:
-            break;
-         case swap_remit_disp::disqualified:
-            // This winner has no destination-chain authex link / usable
-            // pubkey — disqualify and let the race resolve for another.
-            disqualify_candidate(reqs, pk, candidate,
-               "winning candidate has no authex link for the destination "
-               "chain — cannot emit an auditable SwapRemit");
-            return;
-         case swap_remit_disp::terminal:
-            // No underwriter can ever remit this uwreq (stored request
-            // undecodable, or destination outpost / chain-kind unresolved) —
-            // refund the source side and REJECT.
-            reject_and_refund(self, reqs, pk, req, src_needed,
-               "swap unremittable at race resolution: destination outpost / "
-               "chain-kind unresolved or stored request undecodable",
-               "uwreq rejected: destination unremittable at race resolution");
-            return;
       }
    }
 
