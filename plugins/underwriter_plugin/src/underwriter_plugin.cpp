@@ -15,7 +15,6 @@
 #include <magic_enum/magic_enum.hpp>
 
 #include <cassert>
-#include <limits>
 #include <memory>
 
 #include <sysio/chain_plugin/chain_plugin.hpp>
@@ -31,6 +30,7 @@
 #include <sysio/underwriter_plugin/sync_detail.hpp>
 #include <sysio/underwriter_plugin/uic_signature_detail.hpp>
 #include <sysio/underwriter_plugin/uic_construction_detail.hpp>
+#include <sysio/underwriter_plugin/variant_enum_detail.hpp>
 #include <sysio/depot/opreg_status.hpp>
 #include <sysio/opp/opp.hpp>
 #include <sysio/opp/types/types.pb.h>
@@ -1399,22 +1399,17 @@ struct underwriter_plugin::impl {
       // in-flight swap; race-resolved rows transition to other
       // statuses within an epoch), so this is cheap.
       auto rows = read_all(uwrit::account, uwrit::account, uwrit::table_requests);
-      const auto pending_name = std::string{
-         "UNDERWRITE_REQUEST_STATUS_PENDING"};
       for (auto& row : rows.rows) {
          auto obj = row.get_object();
 
-         // Filter to PENDING only. The status field surfaces as the
-         // wire-format spelling string under the v6 ABI.
+         // Filter to PENDING only. FC-reflected decoding accepts the ABI
+         // spelling or numeric representation and rejects undeclared values.
          if (!obj.contains(uwrit::request_field::status)) continue;
-         if (obj[uwrit::request_field::status].is_string()) {
-            if (obj[uwrit::request_field::status].as_string() != pending_name) continue;
-         } else {
-            if (obj[uwrit::request_field::status].as_uint64() !=
-                magic_enum::enum_integer(
-                  UnderwriteRequestStatus::UNDERWRITE_REQUEST_STATUS_PENDING))
-               continue;
-         }
+         const auto request_status =
+            underwriter_detail::decode_enum_variant<UnderwriteRequestStatus>(
+               obj[uwrit::request_field::status]);
+         if (!request_status || *request_status !=
+             UnderwriteRequestStatus::UNDERWRITE_REQUEST_STATUS_PENDING) continue;
 
          // Skip if already assigned to another underwriter
          auto uw_name = obj.contains(uwrit::request_field::underwriter_name)
@@ -1427,36 +1422,15 @@ struct underwriter_plugin::impl {
 
          uw_request req;
          req.id = obj[uwrit::request_field::id].as_uint64();
-         // Pre-filtered to PENDING by the bystatus index range above.
-         req.status  = UnderwriteRequestStatus::UNDERWRITE_REQUEST_STATUS_PENDING;
+         req.status  = *request_status;
          req.uw_name = uw_name;
 
-         // Parse attestation type. Variant carries either the wire-format
-         // spelling (string) or the underlying numeric value (uint64);
-         // resolve both into a typed `AttestationType` and skip any value
-         // we don't underwrite. Per CLAUDE.md §3, proto-generated enums
-         // use the `<EnumName>_Parse` / `<EnumName>_Name` helpers rather
-         // than `magic_enum`.
-         {
-            std::optional<AttestationType> at;
-            if (obj[uwrit::request_field::type].is_string()) {
-               AttestationType parsed{};
-               if (AttestationType_Parse(
-                     obj[uwrit::request_field::type].as_string(), &parsed)) {
-                  at = parsed;
-               }
-            } else {
-               const uint64_t raw_type =
-                  obj[uwrit::request_field::type].as_uint64();
-               if (raw_type <= static_cast<uint64_t>(
-                                  std::numeric_limits<int>::max()) &&
-                   AttestationType_IsValid(static_cast<int>(raw_type))) {
-                  at = static_cast<AttestationType>(raw_type);
-               }
-            }
-            if (!at || *at != AttestationType::ATTESTATION_TYPE_SWAP_REQUEST) continue;
-            req.attestation_type = *at;
-         }
+         const auto attestation_type =
+            underwriter_detail::decode_enum_variant<AttestationType>(
+               obj[uwrit::request_field::type]);
+         if (!attestation_type || *attestation_type !=
+             AttestationType::ATTESTATION_TYPE_SWAP_REQUEST) continue;
+         req.attestation_type = *attestation_type;
 
          // v6 data-model schema: src/dst identity lives on the uwreq row as
          // `(chain_code, token_code, reserve_code)` slug_name triples plus a
@@ -1547,22 +1521,9 @@ struct underwriter_plugin::impl {
                own_candidate_exists = true;
                std::optional<UnderwriteStatus> stored_status;
                if (commit.contains(uwrit::commit_field::status)) {
-                  if (commit[uwrit::commit_field::status].is_string()) {
-                     UnderwriteStatus parsed{};
-                     if (UnderwriteStatus_Parse(
-                           commit[uwrit::commit_field::status].as_string(),
-                           &parsed)) {
-                        stored_status = parsed;
-                     }
-                  } else {
-                     const uint64_t raw_status =
-                        commit[uwrit::commit_field::status].as_uint64();
-                     if (raw_status <= static_cast<uint64_t>(
-                                          std::numeric_limits<int>::max()) &&
-                         UnderwriteStatus_IsValid(static_cast<int>(raw_status))) {
-                        stored_status = static_cast<UnderwriteStatus>(raw_status);
-                     }
-                  }
+                  stored_status =
+                     underwriter_detail::decode_enum_variant<UnderwriteStatus>(
+                        commit[uwrit::commit_field::status]);
                }
                own_candidate_submitted = stored_status ==
                   UnderwriteStatus::UNDERWRITE_STATUS_INTENT_SUBMITTED;

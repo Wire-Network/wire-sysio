@@ -2,6 +2,7 @@
 
 #include <array>
 #include <filesystem>
+#include <limits>
 #include <map>
 #include <set>
 #include <string>
@@ -10,6 +11,7 @@
 #include <vector>
 
 #include <gsl-lite/gsl-lite.hpp>
+#include <magic_enum/magic_enum.hpp>
 
 #include <fc/crypto/hex.hpp>
 #include <fc/crypto/keccak256.hpp>
@@ -22,8 +24,10 @@
 #include <sysio/underwriter_plugin/routing_detail.hpp>
 #include <sysio/underwriter_plugin/uic_signature_detail.hpp>
 #include <sysio/underwriter_plugin/uic_construction_detail.hpp>
+#include <sysio/underwriter_plugin/variant_enum_detail.hpp>
 #include <sysio/underwriter_plugin/underwriter_plugin.hpp>
 #include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
+#include <sysio/opp/opp.hpp>
 #include <sysio/opp/test/uic_signature_test_utils.hpp>
 
 using namespace std::literals;
@@ -237,6 +241,38 @@ void check_operator_configured_uic_provider_beats_wire_default(
 } // namespace
 
 BOOST_AUTO_TEST_SUITE(underwriter_plugin_tests)
+
+BOOST_AUTO_TEST_CASE(enum_variant_decode_is_typed_and_checked) try {
+   using sysio::opp::types::AttestationType;
+   using sysio::opp::types::UnderwriteRequestStatus;
+   using sysio::opp::types::UnderwriteStatus;
+
+   const auto request_status =
+      sysio::underwriter_detail::decode_enum_variant<UnderwriteRequestStatus>(
+         fc::variant{std::string{"UNDERWRITE_REQUEST_STATUS_PENDING"}});
+   BOOST_REQUIRE(request_status);
+   BOOST_CHECK(*request_status ==
+      UnderwriteRequestStatus::UNDERWRITE_REQUEST_STATUS_PENDING);
+
+   const auto attestation_type =
+      sysio::underwriter_detail::decode_enum_variant<AttestationType>(
+         fc::variant{int64_t{magic_enum::enum_integer(
+            AttestationType::ATTESTATION_TYPE_SWAP_REQUEST)}});
+   BOOST_REQUIRE(attestation_type);
+   BOOST_CHECK(*attestation_type == AttestationType::ATTESTATION_TYPE_SWAP_REQUEST);
+
+   const auto candidate_status =
+      sysio::underwriter_detail::decode_enum_variant<UnderwriteStatus>(
+         fc::variant{std::string{"UNDERWRITE_STATUS_INTENT_SUBMITTED"}});
+   BOOST_REQUIRE(candidate_status);
+   BOOST_CHECK(*candidate_status ==
+      UnderwriteStatus::UNDERWRITE_STATUS_INTENT_SUBMITTED);
+
+   BOOST_CHECK(!sysio::underwriter_detail::decode_enum_variant<UnderwriteStatus>(
+      fc::variant{std::numeric_limits<int64_t>::max()}));
+   BOOST_CHECK(!sysio::underwriter_detail::decode_enum_variant<UnderwriteStatus>(
+      fc::variant{std::string{"UNDERWRITE_STATUS_NOT_REAL"}}));
+} FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(uic_authenticated_caller_shape_is_non_default_and_exact) try {
    using sysio::opp::attestations::UnderwriteIntentCommit;
