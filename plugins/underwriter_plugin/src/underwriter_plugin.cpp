@@ -1926,7 +1926,7 @@ struct underwriter_plugin::impl {
    ///          depositor[20]
    ///          src_amount [u64 BE]   src_token_code [u64 BE]   src_reserve_code [u64 BE]
    ///          dst_chain_code [u64 BE]   dst_token_code [u64 BE]   dst_reserve_code [u64 BE]
-   ///          dst_amount [u64 BE]
+   ///          target_amount [u64 BE]
    ///          variance_tolerance_bps [u32 BE])
    ///      The depot's UWREQ row carries every input; matches must be
    ///      bit-exact against the contract-emitted `hash`.

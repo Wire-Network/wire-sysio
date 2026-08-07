@@ -414,6 +414,34 @@ BOOST_AUTO_TEST_CASE(eth_source_deposit_options_reject_zero_window) try {
    BOOST_CHECK_THROW(plugin.plugin_initialize(vm), fc::exception);
 } FC_LOG_AND_RETHROW();
 
+BOOST_AUTO_TEST_CASE(source_deposit_hash_uses_the_immutable_target_amount) try {
+   const std::array<char, sysio::underwriter::EVM_DEPOSITOR_SIZE> depositor{
+      0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11,
+      0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11,
+   };
+   const sysio::underwriter::source_deposit_hash_input input{
+      .depositor = depositor,
+      .source_amount = 0x0102030405060708ULL,
+      .source_token_code = 0x1112131415161718ULL,
+      .source_reserve_code = 0x2122232425262728ULL,
+      .target_chain_code = 0x3132333435363738ULL,
+      .target_token_code = 0x4142434445464748ULL,
+      .target_reserve_code = 0x5152535455565758ULL,
+      .target_amount = 0x6162636465666768ULL,
+      .target_tolerance_bps = 0x71727374U,
+   };
+   const auto hash = sysio::underwriter::source_deposit_hash(input);
+
+   BOOST_CHECK_EQUAL(
+      fc::to_hex(reinterpret_cast<const char*>(hash.data()), 32),
+      "08e7395c07b220b0c1ae590b5273028f0e2f424a39fbd307d691e2b5eba2ac04");
+
+   auto changed_target = input;
+   ++changed_target.target_amount;
+   const auto different_target = sysio::underwriter::source_deposit_hash(changed_target);
+   BOOST_CHECK(hash != different_target);
+} FC_LOG_AND_RETHROW();
+
 /// Explicit block bounds must be encoded as JSON-RPC quantities, not tags such
 /// as `earliest` or `latest`.
 BOOST_AUTO_TEST_CASE(eth_block_quantity_formats_json_rpc_numbers) try {
