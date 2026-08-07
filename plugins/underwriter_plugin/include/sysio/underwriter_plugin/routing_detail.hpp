@@ -98,6 +98,24 @@ inline bool try_debit_buckets(credit_buckets& remaining,
    return true;
 }
 
+/// Conservatively reserve the future depot locks for an in-flight candidate
+/// that has no outpost submission work left. Unlike `try_debit_buckets`, this
+/// operation is intentionally saturating: if concurrent state changes have
+/// already reduced a bucket below the outstanding requirement, no additional
+/// request may consume the remainder while the paid UIC is still reaching the
+/// depot.
+inline void reserve_buckets(credit_buckets& remaining,
+                            const leg_bond& src, const leg_bond& dst) {
+   const auto reserve = [&](const leg_bond& leg) {
+      if (leg.require == 0) return;
+      auto it = remaining.find(leg.bucket);
+      if (it == remaining.end()) return;
+      it->second = it->second > leg.require ? it->second - leg.require : 0;
+   };
+   reserve(src);
+   reserve(dst);
+}
+
 /// Local commit de-dup key — one CONFIRMED leg. Keyed by the exact v6 leg
 /// identity `(uwreq_id, chain_code, token_code, reserve_code)` so two legs that
 /// differ only by chain OR reserve (e.g. a same-`(chain, token)` swap with two
@@ -120,6 +138,15 @@ struct stored_commit_plan {
    bool submit_source = false;
    bool submit_destination = false;
 };
+
+/// True when at least one leg still requires a paid outpost submission after
+/// combining the restart-safe depot plan with this process's confirmations.
+inline bool has_submission_work(const stored_commit_plan& plan,
+                                bool source_confirmed_locally,
+                                bool destination_confirmed_locally) {
+   return (plan.submit_source && !source_confirmed_locally) ||
+      (plan.submit_destination && !destination_confirmed_locally);
+}
 
 inline stored_commit_plan plan_stored_commits(bool candidate_exists,
                                                bool intent_submitted,

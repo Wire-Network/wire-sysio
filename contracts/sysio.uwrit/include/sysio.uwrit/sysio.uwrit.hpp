@@ -503,9 +503,6 @@ namespace sysio {
       /// `(chain_code, token_code, reserve_code)` identity is on the
       /// surrounding `uw_request_t::src_*` / `dst_*` fields; the
       /// commit_entry slot is solely a race-tracker.
-      ///
-      /// This appended table layout is released only through disposable fresh
-      /// deployment. Existing rows are intentionally not migrated.
       struct commit_entry {
          name      underwriter;
          /// Source-leg COMMIT. `source_uic_bytes` is the verbatim zpp_bits

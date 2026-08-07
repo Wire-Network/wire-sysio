@@ -192,11 +192,10 @@ struct uw_request {
 //  Reads the `balances` field (one aggregate balance per EXACT
 //  (chain_code, token_code) — SEC-13/WSA-027: keyed by the v6 slug codes, NOT
 //  the coarse (ChainKind, TokenKind) family, so two same-family chains hold
-//  independent collateral). Note this is the RAW balance — the authoritative
-//  `available` rollup also subtracts active locks + pending withdraws via
-//  `sysio.opreg::available()`. v1 of the plugin treats raw balance as a
-//  sufficient gate; the depot's race resolver (sysio.uwrit::try_select_winner)
-//  re-validates via the rollup.
+//  independent collateral). `read_credit_lines` starts from this raw balance
+//  and subtracts active locks plus pending withdrawals to mirror the depot's
+//  authoritative `sysio.opreg::available()` rollup. Winner selection still
+//  revalidates the live rollup because capacity can change after the scan.
 //
 //  Codes held as raw `fc::slug_name::value` (uint64) to match `bucket_key`.
 // ---------------------------------------------------------------------------
@@ -1135,32 +1134,48 @@ struct underwriter_plugin::impl {
       }
       if (requests.empty()) return;
 
-      // Drop any request whose required legs became locally
-      // confirmed while its inbound attestations are still catching up. A
-      // depot (WIRE) leg is implicitly done: it never has an outpost commit.
-      // Do this before cover selection so a no-work candidate cannot reserve
-      // provisional credit and starve a request that still needs a submission.
+      // Seed provisional capacity from the depot's current available balance.
+      // Candidates whose paid legs are all stored or locally confirmed have no
+      // submission work, but their eventual locks do not exist yet. Reserve
+      // their full winner-time requirements before selecting new work so OPP
+      // relay latency cannot make the daemon knowingly overcommit collateral.
+      credit_buckets remaining_credit;
+      for (const auto& cl : credit_lines) {
+         remaining_credit[bucket_key{cl.chain_code, cl.token_code}] = cl.balance;
+      }
+      size_t outstanding_no_work = 0;
       std::erase_if(requests, [&](const uw_request& r) {
-         const bool src_done = r.src_is_depot
-            || confirmed_commits.contains(
-                  commit_key{r.id, r.src_chain_code.value, r.src_token_code.value,
-                             r.src_reserve_code.value});
-         const bool dst_done = r.dst_is_depot
-            || confirmed_commits.contains(
-                  commit_key{r.id, r.dst_chain_code.value, r.dst_token_code.value,
-                             r.dst_reserve_code.value});
-         return src_done && dst_done;
+         const bool source_confirmed = confirmed_commits.contains(
+            commit_key{r.id, r.src_chain_code.value, r.src_token_code.value,
+                       r.src_reserve_code.value});
+         const bool destination_confirmed = confirmed_commits.contains(
+            commit_key{r.id, r.dst_chain_code.value, r.dst_token_code.value,
+                       r.dst_reserve_code.value});
+         if (underwriter_detail::has_submission_work(
+                r.own_stored_commit_plan, source_confirmed,
+                destination_confirmed)) {
+            return false;
+         }
+         underwriter_detail::reserve_buckets(
+            remaining_credit, src_bond(r), dst_bond(r));
+         ++outstanding_no_work;
+         return true;
       });
 
+      if (outstanding_no_work != 0) {
+         ilog("underwriter: reserved collateral for {} locally complete "
+              "candidate(s) awaiting depot observation", outstanding_no_work);
+      }
+
       if (requests.empty()) {
-         ilog("underwriter: pending uwreqs already have every required leg "
-              "confirmed locally");
+         ilog("underwriter: pending uwreqs have no remaining outpost "
+              "submission work");
          return;
       }
 
       // Step 4: Select requests whose complete winner-time collateral
       // requirements can be covered, then submit only their missing legs.
-      auto selected = select_coverable(requests);
+      auto selected = select_coverable(requests, std::move(remaining_credit));
       if (selected.empty()) {
          ilog("underwriter: no requests coverable with current credit lines");
          return;
@@ -1702,15 +1717,8 @@ struct underwriter_plugin::impl {
       return picked;
    }
 
-   std::vector<uw_request> select_coverable(std::vector<uw_request>& requests) {
-      // Seed bucket credits from `read_credit_lines`' output. Per the T11
-      // mirror, these already have active locks + pending withdraws
-      // subtracted, so the search operates on truly-spendable balances.
-      credit_buckets initial_credit;
-      for (auto& cl : credit_lines) {
-         initial_credit[bucket_key{cl.chain_code, cl.token_code}] = cl.balance;
-      }
-
+   std::vector<uw_request> select_coverable(
+      std::vector<uw_request>& requests, credit_buckets initial_credit) {
       // Pre-filter requests that can never fit in isolation (no bucket even
       // matches), so the search space stays small. Selection budgets every
       // eventual outpost lock, including stored or locally-confirmed UIC legs;

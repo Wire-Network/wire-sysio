@@ -4,8 +4,8 @@ Autonomous underwriter daemon. Polls `sysio.uwrit::uwreqs` for PENDING
 swaps, derives each candidate's authoritative stored-evidence state, and
 submits signed `UnderwriteIntentCommit` records only for missing outpost legs.
 Before submitting, it budgets the candidate's full eventual depot collateral
-requirement, including any leg whose UIC is already stored but whose lock does
-not yet exist. A complete candidate has already received its one authoritative
+requirement, including stored or locally confirmed legs whose locks do not yet
+exist. A complete depot candidate has already received its one authoritative
 winner-selection attempt and is never replayed.
 
 The underwriter is a **separate daemon** from the batch operator. It does
@@ -82,7 +82,12 @@ Every `--underwriter-scan-interval-ms` (default 5 s):
 5. Remove complete and terminal candidates before cover selection. Complete
    evidence means the depot already made the candidate's one authoritative
    decision; replaying either paid outpost transaction cannot change it.
-6. For remaining absent/partial candidates, run the bounded branch-and-bound
+6. For any candidate whose remaining legs are all stored or locally confirmed,
+   reserve its full eventual bond from the provisional snapshot while OPP
+   catches up, then remove it from submission work. Saturating reservation
+   prevents a concurrent shortfall from exposing leftover capacity to a new
+   paid commit.
+7. For remaining absent/partial candidates, run the bounded branch-and-bound
    selector (with its value-sorted fallback) over every eventual non-depot
    lock, including a leg whose UIC is already stored or locally confirmed. The
    selector uses the daemon's current credit snapshot to avoid knowingly
