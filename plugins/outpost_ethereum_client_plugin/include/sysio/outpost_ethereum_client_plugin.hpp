@@ -127,7 +127,7 @@ public:
     * OperatorRegistry; both share the same SPI surface).
     *
     * @param eth_client_id     Id from the file configuration or legacy client option.
-    * @param chain_code        Outpost id from `sysio.epoch::outposts`.
+    * @param chain_code        Outpost id from `sysio.chains::chains`.
     * @param chain_id          Numeric chain id from the outpost row (e.g. 31337, 1).
     * @param opp_addr          Hex address of the `OPP.sol` contract, or empty.
     * @param opp_inbound_addr  Hex address of the `OPPInbound.sol` contract, or empty.

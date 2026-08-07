@@ -2649,7 +2649,7 @@ void underwriter_plugin::set_program_options(options_description& cli,
         "Per-EVM-chain outpost wiring (repeatable, one per EVM chain served). Format: "
         "`<chain_code>,<client_id>,<operator_registry_addr>,<source_deposit_contract_addr>` — "
         "chain_code is the sysio.chains codename (e.g. ETHEREUM); client_id names the RPC "
-        "connection registered via --outpost-ethereum-client; operator_registry_addr is the OPP "
+        "connection of a configured Ethereum client; operator_registry_addr is the OPP "
         "OperatorRegistry (uw_commit target); source_deposit_contract_addr is the SwapDeposit-"
         "emitting contract scanned by the verify path. SEC-13/WSA-027: keyed by exact chain_code, "
         "so two EVM chains are wired independently.");
