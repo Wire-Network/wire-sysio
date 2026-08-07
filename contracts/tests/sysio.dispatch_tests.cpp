@@ -2273,10 +2273,10 @@ BOOST_FIXTURE_TEST_CASE(swap_settlement_debits_destination_reserve_by_the_quote,
       /*tolerance_bps*/ 10'000, ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0b'));
    BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, eth, sr));
 
-   const auto src_uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
+   const auto src_uic = create_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
    BOOST_REQUIRE_EQUAL(success(),
       rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", src_uic));
-   const auto dst_uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, secondary);
+   const auto dst_uic = create_signed_uic(UWRIT_OP, ATT_ID, eth, eth, secondary);
    BOOST_REQUIRE_EQUAL(success(),
       rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "SECOND", dst_uic));
 
@@ -2365,10 +2365,10 @@ BOOST_FIXTURE_TEST_CASE(swap_slippage_bound_does_not_compound_across_checkpoints
    BOOST_REQUIRE_LE(ingestion_quote - settle_quote, allowed);   // old rule: would pass
    BOOST_REQUIRE_GT(target - settle_quote,          allowed);   // new rule: must reject
 
-   const auto src_uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
+   const auto src_uic = create_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
    BOOST_REQUIRE_EQUAL(success(),
       rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", src_uic));
-   const auto dst_uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, secondary);
+   const auto dst_uic = create_signed_uic(UWRIT_OP, ATT_ID, eth, eth, secondary);
    BOOST_REQUIRE_EQUAL(success(),
       rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "SECOND", dst_uic));
 
@@ -2423,10 +2423,10 @@ BOOST_FIXTURE_TEST_CASE(swap_underbonded_candidate_cannot_terminally_reject,
       ("reserve_code", codename_mvo("SECOND"))
       ("amount",       uint64_t{500'000'000'000})));
 
-   const auto src_uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
+   const auto src_uic = create_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
    BOOST_REQUIRE_EQUAL(success(),
       rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", src_uic));
-   const auto dst_uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, secondary);
+   const auto dst_uic = create_signed_uic(UWRIT_OP, ATT_ID, eth, eth, secondary);
    BOOST_REQUIRE_EQUAL(success(),
       rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "SECOND", dst_uic));
 
@@ -2493,10 +2493,10 @@ BOOST_FIXTURE_TEST_CASE(prune_keeps_terminated_operator_until_collateral_settles
       eth, eth, secondary, /*target_amount*/ quote,
       /*tolerance_bps*/ 10'000, ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0b'));
    BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, eth, sr));
-   const auto src_uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
+   const auto src_uic = create_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
    BOOST_REQUIRE_EQUAL(success(),
       rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", src_uic));
-   const auto dst_uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, secondary);
+   const auto dst_uic = create_signed_uic(UWRIT_OP, ATT_ID, eth, eth, secondary);
    BOOST_REQUIRE_EQUAL(success(),
       rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "SECOND", dst_uic));
    BOOST_REQUIRE(!get_uwreq(ATT_ID).is_null());
@@ -2579,10 +2579,10 @@ BOOST_FIXTURE_TEST_CASE(reregistration_blocked_until_collateral_settles,
       eth, eth, secondary, quote,
       /*tolerance_bps*/ 10'000, ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0b'));
    BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, eth, sr));
-   const auto src_uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
+   const auto src_uic = create_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
    BOOST_REQUIRE_EQUAL(success(),
       rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", src_uic));
-   const auto dst_uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, secondary);
+   const auto dst_uic = create_signed_uic(UWRIT_OP, ATT_ID, eth, eth, secondary);
    BOOST_REQUIRE_EQUAL(success(),
       rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "SECOND", dst_uic));
    BOOST_REQUIRE(!get_lock(1).is_null());
