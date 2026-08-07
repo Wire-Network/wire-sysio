@@ -43,8 +43,10 @@ The legacy option remains available and cannot be combined with the file option:
 
 The four-field legacy form also treats its chain ID as locally authoritative for signing and
 verifies it against the configured RPC endpoint. The historical three-field form remains
-compatible by resolving `eth_chainId` during startup under a shared five-second deadline. Legacy
-clients receive `UINT256_MAX` expenditure caps, with the same compatibility-only warning above.
+compatible by resolving `eth_chainId` during startup. File-configured, four-field legacy, and
+three-field legacy clients all require a reachable RPC endpoint at startup; each client receives
+an independent five-second budget for chain ID verification or resolution. Legacy clients receive
+`UINT256_MAX` expenditure caps, with the same compatibility-only warning above.
 
 Every signing-capable client enforces its local policy after the transaction is fully assembled
 and immediately before signing. A rejected transaction is neither signed nor broadcast.
