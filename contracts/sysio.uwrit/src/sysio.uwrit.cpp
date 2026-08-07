@@ -1582,13 +1582,16 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate,
             "uwreq reverted at race resolution (unpriceable reserve)");
          return;
       }
-      // A required reserve is unprovisioned / not ACTIVE (dev & smoke clusters).
-      // Nothing can settle yet and there is no price to settle at, so leave the
-      // row PENDING — the settlement pre-checks below would reach the same
-      // conclusion. NOT terminal: a reserve may still be provisioned before the
-      // PENDING deadline.
-      sysio::print("try_select_winner: no priceable reserve for uwreq ",
-                   uwreq_id, " (unprovisioned LP), skipping\n");
+      // A required reserve is missing / not ACTIVE. `createuwreq` admits this
+      // shape for dev and smoke clusters, but a complete one-shot candidate has
+      // no later wake-up after this authoritative attempt: the daemon suppresses
+      // replay and reserve activation does not call `try_select_winner`. Treat
+      // the unprovisioned route as request-global and terminal once a candidate
+      // has passed eligibility, signature, and bond checks above.
+      reject_and_refund(
+         self, reqs, pk, req, src_needed,
+         "swap rejected at race resolution: required reserve missing or not ACTIVE",
+         "request released: required reserve missing or not ACTIVE");
       return;
    }
    // Slippage — the live settlement quote against the user's ORIGINAL

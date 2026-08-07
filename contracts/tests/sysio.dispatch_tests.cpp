@@ -3955,10 +3955,10 @@ BOOST_FIXTURE_TEST_CASE(swap_request_negative_source_is_reverted,
 BOOST_FIXTURE_TEST_CASE(swap_same_token_legs_overcommit_disqualifies_candidate,
                         sysio_dispatch_tester) { try {
    bootstrap_for_dispatch();   // ETH chain + UWRIT_OP (EVM authex link)
-   // Both reserves must be ACTIVE and priceable: the resolver re-quotes on the
-   // live curve BEFORE the bond check (it is the quote that fixes `dst_amount`,
-   // and the bond must cover what the winner will actually deliver), so an
-   // unpriceable request never reaches the bond gate at all.
+   // Both reserves must be ACTIVE and priceable: the resolver computes the live
+   // quote before the bond check so the bond covers the actual obligation, then
+   // applies request-level quote verdicts only after that candidate gate. This
+   // setup keeps the test specifically on the aggregate-collateral path.
    setup_wire_token_and_reserves();
    BOOST_REQUIRE_EQUAL(success(), regreserve_active("ETH", "ETH", "SECOND"));
 
@@ -4084,6 +4084,54 @@ BOOST_FIXTURE_TEST_CASE(swap_race_time_reserve_drain_rejects_request,
                        candidate["status"].as_string());
    BOOST_CHECK_NE(std::string::npos,
                   candidate["reason"].as_string().find("variance drift"));
+   BOOST_REQUIRE(candidate["source_uic_bytes"].as_string().empty());
+   BOOST_REQUIRE(candidate["dest_uic_bytes"].as_string().empty());
+   BOOST_REQUIRE(get_lock(1).is_null());
+} FC_LOG_AND_RETHROW() }
+
+// createuwreq admits missing/inactive reserves for dev and smoke clusters, but
+// a complete one-shot candidate has no retry or reserve-activation wake-up.
+// Once that candidate has passed its source-sized bond gate, the unprovisioned
+// route is request-global: reject/refund immediately and compact its evidence.
+BOOST_FIXTURE_TEST_CASE(swap_missing_reserve_complete_candidate_rejects_request,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+
+   const uint64_t eth       = fc::slug_name{"ETH"}.value;
+   const uint64_t primary   = fc::slug_name{"PRIMARY"}.value;
+   const uint64_t secondary = fc::slug_name{"SECOND"}.value;
+   constexpr uint64_t ATT_ID = 8005;
+   constexpr uint64_t AMOUNT = 100;
+
+   // No reserve rows are provisioned. The zero ingestion quote leaves only the
+   // source amount in this same-bucket candidate's authoritative bond check.
+   BOOST_REQUIRE_EQUAL(success(),
+      depositinle_credit(UWRIT_OP, "ETH", "ETH", AMOUNT));
+   const auto sr = encode_swap_request(
+      ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
+      eth, eth, primary, static_cast<int64_t>(AMOUNT),
+      eth, eth, secondary, AMOUNT,
+      /*tolerance_bps*/ 1'000'000, ChainKind::CHAIN_KIND_EVM,
+      std::vector<char>(20, '\x0b'));
+   BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, eth, sr));
+
+   BOOST_REQUIRE_EQUAL(success(), rcrdcommit_direct(
+      ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY",
+      create_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary)));
+   BOOST_REQUIRE_EQUAL(success(), rcrdcommit_direct(
+      ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "SECOND",
+      create_signed_uic(UWRIT_OP, ATT_ID, eth, eth, secondary)));
+
+   const auto req = get_uwreq(ATT_ID);
+   BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_REJECTED",
+                       req["status"].as_string());
+   BOOST_REQUIRE(req["attestation_inbound_data"].as_string().empty());
+   const auto candidate = req["commits_by"].get_array().front();
+   BOOST_REQUIRE_EQUAL("UNDERWRITE_STATUS_RELEASED",
+                       candidate["status"].as_string());
+   BOOST_CHECK_NE(std::string::npos,
+                  candidate["reason"].as_string().find(
+                     "required reserve missing or not ACTIVE"));
    BOOST_REQUIRE(candidate["source_uic_bytes"].as_string().empty());
    BOOST_REQUIRE(candidate["dest_uic_bytes"].as_string().empty());
    BOOST_REQUIRE(get_lock(1).is_null());
