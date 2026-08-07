@@ -99,6 +99,32 @@ uwchal_bond_quote compute_uwchal_bond(name uwrit_account, name reserv_account,
    return quote;
 }
 
+/// Credit `amount` WIRE to `account`'s claimable-bond balance, accumulating onto an existing row.
+///
+/// This is how a resolved challenge's escrow leaves `chkuwchal` — deliberately NOT a transfer.
+/// `chkuwchal` can run inline under `sysio.epoch::advance`, and `sysio.token::transfer` runs the
+/// recipient's code through `require_recipient(to)`; an asserting recipient there would abort the
+/// whole advance and, with the challenge rolled back to OPEN and its locks still held, stall epoch
+/// advancement chain-wide. Crediting touches only this contract's own table. See `chalg::claimbond`.
+///
+/// Saturates at `asset::max_amount` (the `sysio.dclaim::add_wire_capped` discipline): the credit
+/// is paid out as an `asset`, whose amount is a signed 62-bit quantity, so an unclamped sum could
+/// build a row that `claimbond` can never construct a payout for.
+void credit_bond(name self, name account, uint64_t amount) {
+   chalg::bondcredits_t credits(self);
+   const auto pk = chalg::bond_credit_key{account.value};
+   auto it = credits.find(pk);
+   if (it == credits.end()) {
+      const uint64_t seed = std::min<uint64_t>(amount, static_cast<uint64_t>(asset::max_amount));
+      credits.emplace(ram_payer, pk, chalg::bond_credit{ .account = account, .amount = seed });
+      return;
+   }
+   credits.modify(same_payer, pk, [&](auto& r) {
+      const uint64_t room = static_cast<uint64_t>(asset::max_amount) - r.amount;
+      r.amount += (amount <= room ? amount : room);
+   });
+}
+
 } // anonymous namespace
 
 // ---------------------------------------------------------------------------
@@ -475,7 +501,31 @@ void chalg::chkuwchal(uint64_t chal_id) {
    chals.modify(same_payer, c_pk, [&](auto& r) {
       r.status  = DisputeStatus::DISPUTE_STATUS_RESOLVED;
       r.verdict = verdict;
+      // Compact to a fixed-width tombstone. Past resolution the row has exactly two on-chain
+      // jobs — the `byuwrequw` uniqueness gate (a verdict is final per commitment) and the
+      // verdict record — and neither needs the variable-length fields. `detail` was
+      // caller-controlled evidence FOR the council; `electorate` was the ballot roll. Both stay
+      // permanently readable in the filing's action trace, and dropping them here is what bounds
+      // this contract's retained variable-length state by the number of CONCURRENTLY OPEN
+      // challenges (each backed by a live lock set and an escrowed bond) rather than by every
+      // challenge ever filed — the per-note cap alone cannot do that, because filing is
+      // permissionless and the bond comes back on every non-forfeit outcome.
+      r.detail.clear();
+      r.electorate.clear();
    });
+
+   // The ballots go with it: they were the tally input above and the one-vote-per-owner gate,
+   // neither of which applies once the row leaves OPEN. Collect first, erase second (an erase
+   // invalidates the iterator) — bounded by the Tier-1 electorate this challenge snapshotted, the
+   // same bound the tally walk above already runs under.
+   std::vector<uint64_t> ballot_owners;
+   ballot_owners.reserve(uphold + reject_refund + reject_forfeit);
+   for (auto it = votes.begin(); it != votes.end(); ++it) {
+      ballot_owners.push_back(it->owner.value);
+   }
+   for (uint64_t owner : ballot_owners) {
+      votes.erase(uwchal_vote_key{owner});
+   }
 
    if (verdict == uwchal_verdict::UPHELD) {
       // Slash FIRST, then sweep: inline actions run depth-first in send order, so the SLASHED
@@ -515,19 +565,44 @@ void chalg::chkuwchal(uint64_t chal_id) {
 
    // Route the bond per the verdict: forfeiture to the wrongly-challenged underwriter ONLY on an
    // explicit REJECT_FORFEIT majority; every other outcome returns it to the challenger.
+   //
+   // CREDITED, never transferred. This whole function can run inline under
+   // `sysio.epoch::advance -> sysio.uwrit::chklocks`, where `sysio.token::transfer`'s
+   // `require_recipient(to)` would run the recipient's own code and let it abort epoch
+   // advancement — see `chalg::claimbond` for the full argument. The escrow stays in this
+   // contract's custody until the recipient pulls it.
    if (c.bond_amount > 0) {
       const bool forfeited = (verdict == uwchal_verdict::REJECTED_FORFEIT);
-      const name bond_recipient = forfeited ? c.underwriter : c.challenger;
-      action(
-         permission_level{get_self(), "active"_n},
-         TOKEN_ACCOUNT, "transfer"_n,
-         std::make_tuple(get_self(), bond_recipient,
-            asset(static_cast<int64_t>(c.bond_amount), WIRE_SYMBOL),
-            forfeited
-               ? std::string("sysio.chalg: challenge rejected — bond forfeited to the underwriter")
-               : std::string("sysio.chalg: challenge bond returned"))
-      ).send();
+      credit_bond(get_self(), forfeited ? c.underwriter : c.challenger, c.bond_amount);
    }
+}
+
+// ---------------------------------------------------------------------------
+//  claimbond — pull a resolved challenge's bond out of this contract's custody
+// ---------------------------------------------------------------------------
+void chalg::claimbond(name account) {
+   // The recipient's own authority, as `sysio.dclaim::claim` requires it: the transfer below
+   // notifies `account`, so only `account` can trigger code execution on its own behalf here.
+   require_auth(account);
+
+   bondcredits_t credits(get_self());
+   const auto pk = bond_credit_key{account.value};
+   auto it = credits.find(pk);
+   check(it != credits.end(), "claimbond: no claimable bond");
+   const uint64_t amount = it->amount;
+   check(amount > 0, "claimbond: zero claimable balance");
+
+   // Erase BEFORE sending: the inline transfer runs after this action returns and notifies
+   // `account`, which may re-enter `claimbond`. The row must already be gone when it does.
+   credits.erase(pk);
+
+   action(
+      permission_level{get_self(), "active"_n},
+      TOKEN_ACCOUNT, "transfer"_n,
+      std::make_tuple(get_self(), account,
+         asset(static_cast<int64_t>(amount), WIRE_SYMBOL),
+         std::string("sysio.chalg challenge bond payout"))
+   ).send();
 }
 
 // ---------------------------------------------------------------------------

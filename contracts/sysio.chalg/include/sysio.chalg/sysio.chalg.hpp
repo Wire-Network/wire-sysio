@@ -161,15 +161,36 @@ namespace sysio {
       ///     `sysio.uwrit::sweeplocks` releases the now-deferred-slash locks (the slash lands
       ///     first — inline actions run depth-first in send order — so `opreg::releaselock`
       ///     takes its SLASHED branch, debiting the locked collateral and emitting the outbound
-      ///     SLASH attestations); the bond returns to the challenger.
+      ///     SLASH attestations); the bond is credited back to the challenger.
       ///   * REJECT ballots (both flavours combined) reach Q, any time — REJECTED: disposition by
       ///     majority among the rejectors, a tie favouring refund; `sysio.uwrit::freelocks`
       ///     clears the hold and the locks live out their natural window.
       ///   * `deadline_ms` (the locks' own expiry) passes with neither threshold met — LAPSED:
-      ///     bond returned to the challenger, holds cleared, the locks release on the next
+      ///     bond credited back to the challenger, holds cleared, the locks release on the next
       ///     normal sweep. No verdict, nobody punished.
+      ///
+      /// The bond is CREDITED to a claimable balance, never transferred from here — see
+      /// `claimbond`. Resolution also compacts the challenge row and erases its ballots.
       [[sysio::action]]
       void chkuwchal(uint64_t chal_id);
+
+      /// Withdraw the WIRE this contract owes `account` from resolved underwriter challenges —
+      /// a refunded challenger bond, or one forfeited to a wrongly-challenged underwriter.
+      /// Erases the credit row and transfers the whole balance. Auth: `account` (the
+      /// `sysio.dclaim::claim` pattern).
+      ///
+      /// Why the payout is a PULL and not a push: `chkuwchal` can run inline under the epoch tick
+      /// (`sysio.epoch::advance` -> `sysio.uwrit::chklocks` -> `chkuwchal`), and
+      /// `sysio.token::transfer` notifies its recipient — `require_recipient(to)` runs whatever
+      /// code that account has deployed. A challenger contract that allows its outgoing escrow
+      /// and asserts on the incoming refund would abort the entire `advance` transaction; the
+      /// rollback leaves the challenge OPEN with its locks still held, so every later sweep
+      /// re-pokes the same failing transfer and epoch advancement stalls chain-wide
+      /// (`epoch-stall-is-fatal`, the same hazard `opreg::releaselock` clamps for). Crediting a
+      /// balance keeps every account the crank touches system-owned: the only transaction a
+      /// hostile recipient can abort is its own claim, and only its own funds are stranded.
+      [[sysio::action]]
+      void claimbond(name account);
 
       /// Read-only: the WIRE bond `openuwchal` would require RIGHT NOW to challenge this
       /// commitment — the winning underwriter's live lock amounts, each valued through its own
@@ -271,16 +292,28 @@ namespace sysio {
       };
 
       /// An underwriter-fault challenge. Opened permissionlessly against one CONFIRMED
-      /// commitment; resolved by a Tier-1 vote or lapsed at the lock window's end. The row is
-      /// retained after resolution as the audit record AND as the guard that a commitment is
-      /// challenged at most once, ever (mirrors one-dispute-per-(outpost, epoch)).
+      /// commitment; resolved by a Tier-1 vote or lapsed at the lock window's end. The row
+      /// survives resolution as the guard that a commitment is challenged at most once, ever
+      /// (mirrors one-dispute-per-(outpost, epoch)) and as the verdict record.
+      ///
+      /// It does NOT survive at full size: `chkuwchal` compacts it to a fixed-width tombstone on
+      /// resolution, clearing the two variable-length fields (`detail`, `electorate`) and erasing
+      /// the challenge's ballot rows. Filing is permissionless and the bond comes back on every
+      /// non-forfeit outcome, so recycled bond capital could otherwise pin unbounded
+      /// caller-controlled bytes in RAM billed to `sysio`; compacting bounds the retained
+      /// variable-length state by the number of CONCURRENTLY OPEN challenges — each backed by a
+      /// live lock set and an escrowed bond — rather than by every challenge ever filed. The full
+      /// filing and every ballot stay permanently readable in the action-trace history that
+      /// indexers consume.
       struct [[sysio::table("uwchals")]] uwchal_entry {
          uint64_t                  id;
          uint64_t                  uwreq_id;         ///< the challenged commitment's uwreq
          name                      underwriter;      ///< the CONFIRMED winner under challenge
          name                      challenger;       ///< who filed and posted the bond
          underwrite_fault_reason   reason;           ///< alleged fault class
-         std::string               detail;           ///< challenger's free-text evidence context
+         /// Challenger's free-text evidence context, capped at `max_uwchal_detail_bytes` on
+         /// filing and CLEARED on resolution (it is council input, not a permanent record).
+         std::string               detail;
          opp::types::DisputeStatus status;           ///< OPEN / RESOLVED — same lifecycle enum as `disputes`
          uwchal_verdict            verdict;          ///< NONE while OPEN; the terminal outcome after
          uint64_t                  bond_amount = 0;  ///< WIRE the challenger escrowed (9-decimal units)
@@ -292,7 +325,8 @@ namespace sysio {
          /// The Tier-1 electorate + quorum, snapshotted at open — same discipline as
          /// `dispute_entry`: voter eligibility (`voteuwchal`) and the tally denominator
          /// (`chkuwchal`) come from one list frozen when the challenge opened, so registrations
-         /// after open can neither join nor dilute it.
+         /// after open can neither join nor dilute it. CLEARED on resolution together with the
+         /// ballots it gated; `quorum` is kept as the fixed-width record of the threshold used.
          std::vector<name>         electorate;
          uint32_t                  quorum = 0;
 
@@ -319,7 +353,9 @@ namespace sysio {
          SYSLIB_SERIALIZE(uwchal_vote_key, (owner))
       };
 
-      /// One Tier-1 ballot in an underwriter challenge. Scoped by `chal_id`.
+      /// One Tier-1 ballot in an underwriter challenge. Scoped by `chal_id`. Live only while the
+      /// challenge is OPEN — it is the tally input and the one-vote-per-owner gate, and neither
+      /// applies to a resolved challenge, so `chkuwchal` erases the scope on resolution.
       struct [[sysio::table("uwchalvote")]] uwchal_vote {
          name          owner;
          uwchal_ballot ballot;
@@ -330,6 +366,26 @@ namespace sysio {
 
       using uwchalvotes_t =
          sysio::kv::scoped_table<"uwchalvote"_n, uwchal_vote_key, uwchal_vote>;
+
+      /// Claimable-bond primary key (the account the payout is owed to).
+      struct bond_credit_key {
+         uint64_t account;
+         uint64_t primary_key() const { return account; }
+         SYSLIB_SERIALIZE(bond_credit_key, (account))
+      };
+
+      /// WIRE this contract holds on an account's behalf out of a resolved challenge's escrow.
+      /// `chkuwchal` credits it; `claimbond` pays it out and erases the row. Credits ACCUMULATE
+      /// per account, so the table is bounded by the number of accounts with an unclaimed payout
+      /// — not by the number of challenges ever resolved.
+      struct [[sysio::table("bondcredits")]] bond_credit {
+         name     account;
+         uint64_t amount = 0;   ///< unclaimed WIRE, 9-decimal units
+
+         SYSLIB_SERIALIZE(bond_credit, (account)(amount))
+      };
+
+      using bondcredits_t = sysio::kv::table<"bondcredits"_n, bond_credit_key, bond_credit>;
 
    private:
       // Well-known accounts
@@ -349,10 +405,12 @@ namespace sysio {
       /// relaxes to a quorum of cast votes plus a strict majority of cast votes.
       static constexpr uint32_t dispute_deadline_sec = 24 * 60 * 60;
 
-      /// Upper bound on `openuwchal`'s caller-controlled `detail` note. The uwchals audit row is
-      /// retained indefinitely with RAM billed to this contract, and the bond returns on every
-      /// non-forfeit outcome — uncapped, recycled bond capital could persist near-arbitrary
-      /// payloads. 1 KiB keeps the allegation note useful while bounding the amplification.
+      /// Upper bound on `openuwchal`'s caller-controlled `detail` note. Filing is permissionless
+      /// and the bond returns on every non-forfeit outcome, so recycled bond capital could
+      /// otherwise pin near-arbitrary payloads in RAM billed to `sysio`. This caps ONE note;
+      /// `chkuwchal`'s compaction of the resolved row is what caps the total (the two together
+      /// bound retained challenge bytes at `max_uwchal_detail_bytes` x concurrently-open
+      /// challenges). 1 KiB keeps the allegation note useful for the council.
       static constexpr size_t max_uwchal_detail_bytes = 1024;
    };
 

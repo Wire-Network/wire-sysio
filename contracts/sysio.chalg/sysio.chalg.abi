@@ -4,6 +4,30 @@
     "types": [],
     "structs": [
         {
+            "name": "bond_credit",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "amount",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "bond_credit_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "chalg_state",
             "base": "",
             "fields": [
@@ -30,6 +54,16 @@
                 {
                     "name": "chal_id",
                     "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "claimbond",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
                 }
             ]
         },
@@ -356,6 +390,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "claimbond",
+            "type": "claimbond",
+            "ricardian_contract": ""
+        },
+        {
             "name": "opendispute",
             "type": "opendispute",
             "ricardian_contract": ""
@@ -387,6 +426,14 @@
         }
     ],
     "tables": [
+        {
+            "name": "bondcredits",
+            "type": "bond_credit",
+            "index_type": "i64",
+            "key_names": ["account"],
+            "key_types": ["uint64"],
+            "table_id": 30792
+        },
         {
             "name": "chalgstate",
             "type": "chalg_state",
