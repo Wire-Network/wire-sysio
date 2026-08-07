@@ -1,9 +1,17 @@
 #include <sysio.chains/sysio.chains.hpp>
 #include <sysio.epoch/sysio.epoch.hpp>
+#include <sysio.opp.common/registry_metadata.hpp>
 
 namespace sysio {
 
 namespace {
+
+using sysio::slug_name_literals::operator""_s;
+
+// The canonical code of the depot self-row. Bootstrap invariant V3
+// (docs/platform-bootstrap-config.md) fixes the depot at
+// `(kind=WIRE, code="WIRE", external_chain_id=0, is_depot=true)`.
+constexpr sysio::slug_name WIRE_CHAIN_CODE = "WIRE"_s;
 
 // System-owned rows bill to the sysio RAM pool, not this contract account (privileged-contract
 // model, as sysio.token uses): the account stays finite at code+abi size; growth draws from the pool.
@@ -40,14 +48,24 @@ void chains::regchain(opp::types::ChainKind kind,
 
    sysio::check(kind != opp::types::CHAIN_KIND_UNKNOWN,
                 "sysio.chains: kind must not be UNKNOWN");
+   // Both strings persist into a `sysio`-billed row -- bound them before emplace.
+   opp::registry::check_metadata(name, description, "sysio.chains");
 
    chains_t tbl(get_self());
    chain_key pk{code};
    sysio::check(tbl.find(pk) == tbl.end(),
                 "sysio.chains: chain code already registered");
 
-   // Enforce: at most one row with kind == WIRE (the depot self-row).
+   // Enforce: the depot self-row is unique AND canonically coded.
+   //
+   // `is_depot` is derived from the KIND alone below, so the code half of bootstrap
+   // invariant V3 has to be enforced here or a registration could claim depot identity
+   // under any code (e.g. `FAKE`) -- previously only the cardinality half was on-chain
+   // and the code depended entirely on the off-chain config validator.
    if (kind == opp::types::CHAIN_KIND_WIRE) {
+      sysio::check(code == WIRE_CHAIN_CODE,
+                   "sysio.chains: a WIRE chain must use the code WIRE");
+
       auto by_kind_idx = tbl.template get_index<"bykind"_n>();
       const auto wire_kind_value = magic_enum::enum_integer(opp::types::CHAIN_KIND_WIRE);
       sysio::check(by_kind_idx.lower_bound(wire_kind_value) == by_kind_idx.upper_bound(wire_kind_value),

@@ -388,6 +388,29 @@ BOOST_FIXTURE_TEST_CASE(regreserve_seeds_private_reserve, sysio_reserve_tester) 
    BOOST_REQUIRE_EQUAL("alice", r["owner"].as_string());
 } FC_LOG_AND_RETHROW() }
 
+// `name` and `description` persist into a reserve row billed to `ram_payer = sysio` — the
+// shared system pool — so both are bounded before emplace, via the same
+// `sysio::opp::registry::check_metadata` the chains and tokens registries use. CertiK WNS-10
+// raised the unbounded pair on `sysio.tokens::regtoken`; it was identical here.
+//
+// `regreserve` is privileged and abort-safe, so it enforces the bound with `check_metadata`.
+// The post-bootstrap `oncrtreserve` path must never abort and instead routes an over-bound
+// row into the existing cancel/refund flow — see `oncrtreserve_oversized_metadata_is_cancelled`.
+BOOST_FIXTURE_TEST_CASE(regreserve_bounds_metadata, sysio_reserve_tester) { try {
+   BOOST_REQUIRE(regreserve("ETH", "ETH", "PRIMARY", 100, 100, 5000, false, name{},
+                            std::string(33, 'x'))
+      .find("label exceeds 32 bytes") != std::string::npos);
+
+   BOOST_REQUIRE(regreserve("ETH", "ETH", "PRIMARY", 100, 100, 5000, false, name{},
+                            "ok", std::string(257, 'x'))
+      .find("description exceeds 256 bytes") != std::string::npos);
+
+   // The bounds are inclusive, and neither rejection claimed the reserve key.
+   BOOST_REQUIRE_EQUAL(success(),
+      regreserve("ETH", "ETH", "PRIMARY", 100, 100, 5000, false, name{},
+                 std::string(32, 'x'), std::string(256, 'x')));
+} FC_LOG_AND_RETHROW() }
+
 // ── oncrtreserve (create gating) ──
 
 BOOST_FIXTURE_TEST_CASE(oncrtreserve_requires_msgch_auth, sysio_reserve_tester) { try {
@@ -599,6 +622,46 @@ BOOST_FIXTURE_TEST_CASE(oncrtreserve_invalid_amount_is_cancelled, sysio_reserve_
    auto r = find_reserve("ETH", "ETH", "USERRES");
    BOOST_REQUIRE(!r.is_null());
    BOOST_REQUIRE_EQUAL("RESERVE_STATUS_CANCELLED", r["status"].as_string());
+} FC_LOG_AND_RETHROW() }
+
+// The same `sysio`-billed metadata bound `regreserve` enforces, applied to the inbound
+// creation path. `oncrtreserve` is an OPP dispatch handler, so it must NOT `check()` —
+// aborting here rolls back the consensus-tipping delivery and stalls epoch advancement
+// chain-wide (feedback_opp_handlers_never_throw / epoch-stall-is-fatal). An over-bound
+// string therefore joins `invalid_amount` and the unlinked-creator case on the existing
+// reject predicate, releasing the creator's escrow via RESERVE_CREATE_CANCELLED.
+//
+// The creator here is properly LINKED with a valid amount, so the metadata is the sole
+// rejection reason. The tombstone row is itself `sysio`-billed, so the stored name must be
+// TRUNCATED — persisting it verbatim would keep exactly the state the bound prevents.
+BOOST_FIXTURE_TEST_CASE(oncrtreserve_oversized_metadata_is_cancelled, sysio_reserve_tester) { try {
+   deploy_authex();
+
+   auto creator_priv = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em);
+   auto creator_pub  = creator_priv.get_public_key();
+   BOOST_REQUIRE_EQUAL(success(),
+      recordlink_em("alice"_n, ChainKind::CHAIN_KIND_EVM, creator_pub));
+
+   BOOST_REQUIRE_EQUAL(success(), push_action(MSGCH_ACCOUNT, "oncrtreserve"_n, mvo()
+      ("chain_code",            codename_mvo("ETH"))
+      ("token_code",            codename_mvo("ETH"))
+      ("reserve_code",          codename_mvo("USERRES"))
+      ("name",                  std::string(33, 'x'))   // one byte over label_max_bytes
+      ("description",           "")
+      ("external_token_amount", 1000)
+      ("requested_wire_amount", 1000)
+      ("source_token_precision", 9u)
+      ("connector_weight_bps",  5000)
+      ("creator_chain_kind",    ChainKind::CHAIN_KIND_EVM)
+      ("creator_chain_addr",    std::vector<char>(20, '\x01'))
+      ("is_private",            false)
+      ("creator_pub_key",       em_pubkey_bytes(creator_pub))));   // linked key
+
+   auto r = find_reserve("ETH", "ETH", "USERRES");
+   BOOST_REQUIRE(!r.is_null());
+   BOOST_REQUIRE_EQUAL("RESERVE_STATUS_CANCELLED", r["status"].as_string());
+   // Clamped on the way into state, not stored verbatim.
+   BOOST_REQUIRE_EQUAL(std::string(32, 'x'), r["name"].as_string());
 } FC_LOG_AND_RETHROW() }
 
 // ── matchreserve (gating preconditions) ──

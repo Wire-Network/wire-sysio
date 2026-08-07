@@ -6,10 +6,6 @@
 
 #include <string>
 
-namespace sysiosystem {
-   class system_contract;
-}
-
 namespace sysio {
 
    using std::string;

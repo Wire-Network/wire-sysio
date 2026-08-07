@@ -14,6 +14,13 @@ void token::create( const name&   issuer,
     check( maximum_supply.is_valid(), "invalid supply");
     check( maximum_supply.amount > 0, "max-supply must be positive");
 
+    // `issuer` is stored verbatim and is the ONLY account `issue` will mint to
+    // (`to == st.issuer` + `require_auth(st.issuer)`). A null or non-existent issuer
+    // therefore creates a token that can never be issued, while permanently occupying
+    // the symbol -- `create` rejects duplicates, so the symbol cannot be reclaimed.
+    check( issuer.value != 0, "issuer account cannot be empty" );
+    check( is_account( issuer ), "issuer account does not exist" );
+
     stats statstable( get_self(), sym.code().raw() );
     statstable.emplace( ram_payer, stat_key{sym.code().raw()}, currency_stats{
        .supply     = asset{0, maximum_supply.symbol},

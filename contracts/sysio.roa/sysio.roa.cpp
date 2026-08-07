@@ -562,6 +562,16 @@ namespace sysio {
         // Reduction weights must be in the core SYS symbol (matches the stored policy weights).
         check_core_symbol(state.total_sys.symbol, net_weight, cpu_weight, ram_weight);
 
+        // A reduction is applied as a SUBTRACTION, so a negative weight ADDS quota. The bounds below
+        // only cap the request from above -- a condition any negative amount satisfies whenever the
+        // stored weight is positive -- so without this guard a node owner could inflate an account's
+        // NET/CPU past the issuer's ROA budget (bypassing expandpolicy's free-allocation check) and
+        // desynchronise the reslimit row and the issuer's nodeowners accounting from the policy
+        // weights. addpolicy and expandpolicy already reject negatives; mirror them here.
+        check(net_weight.amount >= 0, "NET weight cannot be negative");
+        check(cpu_weight.amount >= 0, "CPU weight cannot be negative");
+        check(ram_weight.amount >= 0, "RAM weight cannot be negative");
+
         // Validate time block
         uint32_t current_block = current_block_number();
         check(current_block >= pol_row.time_block, "Cannot reduce policy before time_block");

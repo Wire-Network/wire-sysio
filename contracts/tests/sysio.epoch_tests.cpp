@@ -272,6 +272,44 @@ BOOST_FIXTURE_TEST_CASE(regchain_destination_binding_uniqueness, sysio_epoch_tes
       .find("an SVM chain is already registered") != std::string::npos);
 } FC_LOG_AND_RETHROW() }
 
+/// Bootstrap invariant V3 (docs/platform-bootstrap-config.md) is "exactly one CHAIN_KIND_WIRE
+/// chain, code WIRE". Only the cardinality half used to be on-chain; `is_depot` is derived from
+/// the KIND alone, so a row could claim depot identity under any code and the code's validity
+/// rested entirely on the off-chain config validator. CertiK WNS-11.
+BOOST_FIXTURE_TEST_CASE(regchain_wire_requires_canonical_code, sysio_epoch_tester) { try {
+   BOOST_REQUIRE(regchain(ChainKind::CHAIN_KIND_WIRE, "FAKE", 0)
+      .find("a WIRE chain must use the code WIRE") != std::string::npos);
+
+   // The canonical code registers, and is the depot row.
+   BOOST_REQUIRE_EQUAL(success(), regchain(ChainKind::CHAIN_KIND_WIRE, "WIRE", 0));
+   produce_blocks();
+
+   auto row = get_chain("WIRE");
+   BOOST_REQUIRE(!row.is_null());
+   BOOST_REQUIRE(ChainKind::CHAIN_KIND_WIRE == row["kind"].as<ChainKind>());
+   BOOST_REQUIRE_EQUAL(true, row["is_depot"].as<bool>());
+
+   // The cardinality half still holds — and is reported as such, not as a code error.
+   BOOST_REQUIRE(regchain(ChainKind::CHAIN_KIND_WIRE, "WIRE", 0)
+      .find("already") != std::string::npos);
+} FC_LOG_AND_RETHROW() }
+
+/// `name` and `description` persist into a row billed to the shared `sysio` RAM pool, so both
+/// are bounded before emplace. CertiK WNS-10 raised this for `sysio.tokens::regtoken`; the same
+/// unbounded pair existed on `sysio.chains::regchain` and `sysio.reserv::regreserve`, and all
+/// three now share `sysio::opp::registry::check_metadata`.
+BOOST_FIXTURE_TEST_CASE(regchain_bounds_metadata, sysio_epoch_tester) { try {
+   BOOST_REQUIRE(regchain(ChainKind::CHAIN_KIND_EVM, "ETH", 1, std::string(33, 'x'))
+      .find("label exceeds 32 bytes") != std::string::npos);
+
+   BOOST_REQUIRE(regchain(ChainKind::CHAIN_KIND_EVM, "ETH", 1, "ok", std::string(257, 'x'))
+      .find("description exceeds 256 bytes") != std::string::npos);
+
+   // The bounds are inclusive.
+   BOOST_REQUIRE_EQUAL(success(),
+      regchain(ChainKind::CHAIN_KIND_EVM, "ETH", 1, std::string(32, 'x'), std::string(256, 'x')));
+} FC_LOG_AND_RETHROW() }
+
 BOOST_FIXTURE_TEST_CASE(advance_before_config, sysio_epoch_tester) { try {
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: epoch config not initialized"),
