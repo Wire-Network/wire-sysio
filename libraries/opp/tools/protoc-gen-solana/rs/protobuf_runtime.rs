@@ -266,7 +266,10 @@ mod tests {
             Err(DecodeError::BufferOverflow)
         ));
         assert!(matches!(
-            decode_varint(&[0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x02], 0),
+            decode_varint(
+                &[0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x02],
+                0
+            ),
             Err(DecodeError::InvalidVarint)
         ));
     }
