@@ -2475,8 +2475,10 @@ struct underwriter_plugin::impl {
     * that caller. The depot's resolver
     * (sysio.uwrit::try_select_winner) reconstructs the digest, verifies
     * the signature against the underwriter's account permissions, and
-    * promotes the underwriter to winner iff both legs' signatures verify
-    * AND both legs' bond covers (via `available()` rollup).
+    * promotes the underwriter to winner only after every required UIC leg and
+    * current WIRE permission verifies, the complete live obligation is bonded
+    * (via `available()` rollup), destination remit identity is available, and
+    * the request-global live-price and reserve gates pass.
     *
     * Outposts do not validate the WIRE permission signature or bond; those
     * remain the depot's authoritative responsibilities.

@@ -430,7 +430,7 @@ public:
          *this, contract, ser, signer, action_name, data);
    }
 
-   void create_uwrit_op_eth_authex_link() {
+   std::vector<char> create_eth_authex_link(name account) {
       using namespace fc::crypto;
       using namespace sysio::opp::types;
 
@@ -438,21 +438,25 @@ public:
       auto pub  = priv.get_public_key();
       const uint64_t nonce = control->head().block_time().time_since_epoch().count() / 1000;
 
-      auto msg = build_link_message(pub, UWRIT_OP.to_string(),
+      auto msg = build_link_message(pub, account.to_string(),
                                     ChainKind::CHAIN_KIND_EVM, nonce);
       auto msg_hash = keccak256::hash(msg);
       auto sig = priv.sign(fc::sha256(reinterpret_cast<const char*>(msg_hash.data()),
                                       32));
 
-      BOOST_REQUIRE_EQUAL(success(), push(AUTHEX_ACCOUNT, authex_abi, UWRIT_OP,
+      BOOST_REQUIRE_EQUAL(success(), push(AUTHEX_ACCOUNT, authex_abi, account,
          "createlink"_n, mvo()
             ("chain_kind", ChainKind::CHAIN_KIND_EVM)
-            ("account",    UWRIT_OP.to_string())
+            ("account",    account.to_string())
             ("sig",        sig)
             ("pub_key",    pub)
             ("nonce",      nonce)));
 
-      uwrit_op_eth_pubkey = em_pubkey_bytes(pub);
+      return em_pubkey_bytes(pub);
+   }
+
+   void create_uwrit_op_eth_authex_link() {
+      uwrit_op_eth_pubkey = create_eth_authex_link(UWRIT_OP);
    }
 
    /// Push `sysio.opreg::setconfig` with the dispatch-suite defaults, varying
@@ -2065,10 +2069,10 @@ BOOST_FIXTURE_TEST_CASE(forged_delivery_does_not_strand_chkcons, sysio_dispatch_
    BOOST_REQUIRE_EQUAL(retry_count(), rc0 + 1);
 } FC_LOG_AND_RETHROW() }
 
-// A race winner lacking a destination-chain authex link must be DISQUALIFIED
-// before a request-global race-time variance verdict. This candidate is fully
-// bonded, but another underwriter may have the missing identity link, so the
-// request remains PENDING and no lock or reserve write occurs.
+// A complete, fully bonded candidate lacking a destination-chain authex link
+// must be DISQUALIFIED before a request-global race-time variance verdict.
+// Another underwriter may have the missing identity link, so the request
+// remains PENDING and no lock or reserve write occurs.
 BOOST_FIXTURE_TEST_CASE(swap_missing_dst_authex_precedes_race_time_rejection,
                         sysio_dispatch_tester) { try {
    bootstrap_for_dispatch();   // registers ETH + UWRIT_OP (EVM link only)
@@ -3960,8 +3964,8 @@ BOOST_FIXTURE_TEST_CASE(swap_request_negative_source_is_reverted,
 
 // Balance 150 covers each single 100-leg but not the 200 aggregate. The depot
 // permanently disqualifies only that candidate, compacts its UIC payloads, and
-// leaves the request PENDING for another underwriter. A later top-up and replay
-// cannot re-arm the one-shot candidate.
+// leaves the request PENDING. A later top-up and replay cannot re-arm the
+// one-shot candidate; a distinct fully funded candidate can still win.
 BOOST_FIXTURE_TEST_CASE(swap_same_token_legs_overcommit_disqualifies_candidate,
                         sysio_dispatch_tester) { try {
    bootstrap_for_dispatch();   // ETH chain + UWRIT_OP (EVM authex link)
@@ -3978,6 +3982,20 @@ BOOST_FIXTURE_TEST_CASE(swap_same_token_legs_overcommit_disqualifies_candidate,
    constexpr uint64_t ATT_ID     = 8000;
    constexpr int64_t  SRC_AMOUNT = 100;
    constexpr uint64_t DST_AMOUNT = 100;
+   const name FUNDED_UW = "uwrit.bob"_n;
+
+   // A separately keyed and EVM-linked ACTIVE underwriter proves the request
+   // remains actionable after the first candidate's terminal failure.
+   create_account(FUNDED_UW);
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT,
+      "regoperator"_n, mvo()
+         ("account",         FUNDED_UW.to_string())
+         ("type",            OperatorType::OPERATOR_TYPE_UNDERWRITER)
+         ("is_bootstrapped", false)));
+   create_eth_authex_link(FUNDED_UW);
+   BOOST_REQUIRE_EQUAL(success(), depositinle_credit(FUNDED_UW, "ETH", "ETH", 200));
+   BOOST_REQUIRE_EQUAL("OPERATOR_STATUS_ACTIVE",
+                       get_operator(FUNDED_UW)["status"].as_string());
 
    // One (ETH, ETH) bucket holds 150 against an aggregate need of
    // `src_amount + quote(src_amount)` — just under 200, so 150 cannot cover it.
@@ -4028,6 +4046,44 @@ BOOST_FIXTURE_TEST_CASE(swap_same_token_legs_overcommit_disqualifies_candidate,
    BOOST_REQUIRE_EQUAL("UNDERWRITE_STATUS_DISQUALIFIED",
                        replayed["status"].as_string());
    BOOST_REQUIRE(get_lock(1).is_null());
+
+   // Candidate-local failure did not consume the request: a different
+   // eligible, sufficiently bonded, remittable underwriter completes it.
+   const auto funded_src_uic = create_signed_uic(
+      FUNDED_UW, ATT_ID, eth, eth, primary);
+   BOOST_REQUIRE_EQUAL(success(),
+      rcrdcommit_direct(ATT_ID, FUNDED_UW, eth, "ETH", "ETH", "PRIMARY",
+                        funded_src_uic));
+   const auto funded_dst_uic = create_signed_uic(
+      FUNDED_UW, ATT_ID, eth, eth, secondary);
+   BOOST_REQUIRE_EQUAL(success(),
+      rcrdcommit_direct(ATT_ID, FUNDED_UW, eth, "ETH", "ETH", "SECOND",
+                        funded_dst_uic));
+
+   const auto confirmed = get_uwreq(ATT_ID);
+   BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_CONFIRMED",
+                       confirmed["status"].as_string());
+   BOOST_REQUIRE_EQUAL(FUNDED_UW.to_string(), confirmed["winner"].as_string());
+   bool first_still_disqualified = false;
+   bool second_confirmed = false;
+   for (const auto& c : confirmed["commits_by"].get_array()) {
+      if (c["underwriter"].as_string() == UWRIT_OP.to_string()) {
+         first_still_disqualified =
+            c["status"].as_string() == "UNDERWRITE_STATUS_DISQUALIFIED";
+      } else if (c["underwriter"].as_string() == FUNDED_UW.to_string()) {
+         second_confirmed =
+            c["status"].as_string() == "UNDERWRITE_STATUS_INTENT_CONFIRMED";
+      }
+   }
+   BOOST_REQUIRE(first_still_disqualified);
+   BOOST_REQUIRE(second_confirmed);
+   BOOST_REQUIRE_EQUAL(FUNDED_UW.to_string(),
+                       get_lock(1)["underwriter"].as_string());
+   BOOST_REQUIRE_EQUAL(FUNDED_UW.to_string(),
+                       get_lock(2)["underwriter"].as_string());
+   BOOST_REQUIRE_EQUAL(ATT_ID, get_lock(1)["uwreq_id"].as_uint64());
+   BOOST_REQUIRE_EQUAL(ATT_ID, get_lock(2)["uwreq_id"].as_uint64());
+   BOOST_REQUIRE(get_lock(3).is_null());
 } FC_LOG_AND_RETHROW() }
 
 // Reserve liquidity belongs to the request, not to an underwriter candidate.

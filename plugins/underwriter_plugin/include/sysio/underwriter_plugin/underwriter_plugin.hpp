@@ -20,8 +20,9 @@ namespace sysio {
    ///    the daemon's provisional available-collateral view.
    /// 5. Submits signed UICs only for missing legs to the relevant ACTIVE-role-
    ///    gated outpost contract (ETH/SOL), which relays them as opaque bytes.
-   /// 6. The depot gives the complete candidate one authoritative capacity
-   ///    check, then either creates locks or disqualifies that candidate.
+   /// 6. The depot gives the complete candidate one authoritative attempt,
+   ///    then either creates locks, disqualifies a candidate-local failure, or
+   ///    rejects and refunds a request-global failure.
    namespace underwriter_defaults {
       constexpr uint32_t scan_interval_ms    = 5000;
       constexpr uint32_t action_timeout_ms   = 15000;
