@@ -148,6 +148,10 @@ inline bool has_submission_work(const stored_commit_plan& plan,
       (plan.submit_destination && !destination_confirmed_locally);
 }
 
+/// Derive the restart-safe submission plan from one authoritative depot
+/// candidate. Existing terminal candidates and candidates that already
+/// completed their one winner-selection attempt are skipped; otherwise only
+/// missing non-depot UIC legs remain eligible for submission.
 inline stored_commit_plan plan_stored_commits(bool candidate_exists,
                                                bool intent_submitted,
                                                bool source_is_depot,

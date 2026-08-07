@@ -247,16 +247,21 @@ BOOST_AUTO_TEST_CASE(enum_variant_decode_is_typed_and_checked) try {
    using sysio::opp::types::UnderwriteRequestStatus;
    using sysio::opp::types::UnderwriteStatus;
 
+   const fc::variant_object request_object{
+      fc::mutable_variant_object{}(
+         "status", std::string{"UNDERWRITE_REQUEST_STATUS_PENDING"})};
    const auto request_status =
-      sysio::underwriter_detail::decode_enum_variant<UnderwriteRequestStatus>(
-         fc::variant{std::string{"UNDERWRITE_REQUEST_STATUS_PENDING"}});
+      sysio::underwriter_detail::decode_enum_field<UnderwriteRequestStatus>(
+         request_object, "status");
    BOOST_REQUIRE(request_status);
    BOOST_CHECK(*request_status ==
       UnderwriteRequestStatus::UNDERWRITE_REQUEST_STATUS_PENDING);
+   BOOST_CHECK(!sysio::underwriter_detail::decode_enum_field<
+      UnderwriteRequestStatus>(request_object, "missing"));
 
    const auto attestation_type =
       sysio::underwriter_detail::decode_enum_variant<AttestationType>(
-         fc::variant{int64_t{magic_enum::enum_integer(
+         fc::variant{uint64_t{magic_enum::enum_integer(
             AttestationType::ATTESTATION_TYPE_SWAP_REQUEST)}});
    BOOST_REQUIRE(attestation_type);
    BOOST_CHECK(*attestation_type == AttestationType::ATTESTATION_TYPE_SWAP_REQUEST);
@@ -268,6 +273,23 @@ BOOST_AUTO_TEST_CASE(enum_variant_decode_is_typed_and_checked) try {
    BOOST_CHECK(*candidate_status ==
       UnderwriteStatus::UNDERWRITE_STATUS_INTENT_SUBMITTED);
 
+   const std::array<fc::variant, 11> rejected_shapes{
+      fc::variant{},
+      fc::variant{false},
+      fc::variant{true},
+      fc::variant{0.9},
+      fc::variant{std::numeric_limits<double>::max()},
+      fc::variant{std::numeric_limits<double>::infinity()},
+      fc::variant{fc::variant_object{}},
+      fc::variant{fc::variants{}},
+      fc::variant{fc::blob{}},
+      fc::variant{std::numeric_limits<uint64_t>::max()},
+      fc::variant{int64_t{-1}},
+   };
+   for (const auto& value : rejected_shapes) {
+      BOOST_CHECK(!sysio::underwriter_detail::decode_enum_variant<
+         UnderwriteStatus>(value));
+   }
    BOOST_CHECK(!sysio::underwriter_detail::decode_enum_variant<UnderwriteStatus>(
       fc::variant{std::numeric_limits<int64_t>::max()}));
    BOOST_CHECK(!sysio::underwriter_detail::decode_enum_variant<UnderwriteStatus>(

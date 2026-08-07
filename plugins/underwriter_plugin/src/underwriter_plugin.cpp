@@ -1404,10 +1404,9 @@ struct underwriter_plugin::impl {
 
          // Filter to PENDING only. FC-reflected decoding accepts the ABI
          // spelling or numeric representation and rejects undeclared values.
-         if (!obj.contains(uwrit::request_field::status)) continue;
          const auto request_status =
-            underwriter_detail::decode_enum_variant<UnderwriteRequestStatus>(
-               obj[uwrit::request_field::status]);
+            underwriter_detail::decode_enum_field<UnderwriteRequestStatus>(
+               obj, uwrit::request_field::status);
          if (!request_status || *request_status !=
              UnderwriteRequestStatus::UNDERWRITE_REQUEST_STATUS_PENDING) continue;
 
@@ -1426,8 +1425,8 @@ struct underwriter_plugin::impl {
          req.uw_name = uw_name;
 
          const auto attestation_type =
-            underwriter_detail::decode_enum_variant<AttestationType>(
-               obj[uwrit::request_field::type]);
+            underwriter_detail::decode_enum_field<AttestationType>(
+               obj, uwrit::request_field::type);
          if (!attestation_type || *attestation_type !=
              AttestationType::ATTESTATION_TYPE_SWAP_REQUEST) continue;
          req.attestation_type = *attestation_type;
@@ -1519,12 +1518,9 @@ struct underwriter_plugin::impl {
                   continue;
                }
                own_candidate_exists = true;
-               std::optional<UnderwriteStatus> stored_status;
-               if (commit.contains(uwrit::commit_field::status)) {
-                  stored_status =
-                     underwriter_detail::decode_enum_variant<UnderwriteStatus>(
-                        commit[uwrit::commit_field::status]);
-               }
+               const auto stored_status =
+                  underwriter_detail::decode_enum_field<UnderwriteStatus>(
+                     commit, uwrit::commit_field::status);
                own_candidate_submitted = stored_status ==
                   UnderwriteStatus::UNDERWRITE_STATUS_INTENT_SUBMITTED;
                const auto leg_ready = [&](const char* timestamp,
