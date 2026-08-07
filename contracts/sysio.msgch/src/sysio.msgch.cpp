@@ -9,6 +9,7 @@
 #include <sysio.opp.common/safe_ops.hpp>   // to_depot_amount — WSA-028 fail-closed TokenAmount gate
 #include <sysio.opp.common/name_ops.hpp>   // parse_wire_account_name — never-throw account-name parse
 #include <sysio.opp.common/opp_canonical_codec.hpp> // canonical envelope encoding + keccak epoch digest
+#include <sysio.system/emissions.hpp>      // emitcfg_t / t5state_t existence checks in bootstrap()
 #include <sysio/opp/opp.pb.hpp>
 #include <sysio/opp/attestations/attestations.pb.hpp>
 #include <zpp_bits.h>
@@ -27,6 +28,7 @@ using opp::types::AttestationStatus;
 
 namespace {
 
+constexpr auto     SYSTEM_ACCOUNT  = "sysio"_n;
 constexpr auto     EPOCH_ACCOUNT   = "sysio.epoch"_n;
 constexpr auto     OPREG_ACCOUNT   = "sysio.opreg"_n;
 constexpr auto     UWRIT_ACCOUNT   = "sysio.uwrit"_n;
@@ -1240,6 +1242,20 @@ void msgch::bootstrap() {
    require_auth(get_self());
    uint32_t epoch = current_epoch_index();
    check(epoch == 0, "bootstrap can only be called at epoch 0");
+
+   // Missing emissions config is a bootstrap defect, not an operational state:
+   // refuse to start a chain that cannot pay its first epoch. Without these
+   // checks the genesis advance below gate-blocks SILENTLY (sysio.epoch's
+   // emissions gate never throws, by design) and the misconfiguration only
+   // surfaces later as "epoch stuck at 0". The economic gate reasons
+   // (treasury exhaustion / balance shortfall) remain advance()'s soft
+   // block-and-retry at every epoch — only the two set-up-once singletons
+   // are asserted here.
+   check(sysiosystem::emissions::emitcfg_t(SYSTEM_ACCOUNT).exists(),
+         "msgch::bootstrap: emissions config missing -- sysio.system::setemitcfg must run before bootstrap");
+   check(sysiosystem::emissions::t5state_t(SYSTEM_ACCOUNT).exists(),
+         "msgch::bootstrap: emissions state uninitialized -- sysio.system::initt5 must run before bootstrap");
+
    action(
       permission_level{get_self(), "active"_n},
       EPOCH_ACCOUNT,
