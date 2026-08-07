@@ -280,6 +280,10 @@ namespace sysio {
       /// race. For a dual-outpost request it revalidates only the older stored
       /// leg so a WIRE permission-key change between arrivals cannot authorize
       /// stale evidence; the just-verified incoming leg is not recovered twice.
+      /// The complete candidate receives exactly one authoritative live-capacity
+      /// check: insufficient collateral durably disqualifies that candidate,
+      /// while request-global reserve failure rejects/refunds the whole request.
+      /// Neither outcome is retried or re-armed by replayed UIC bytes.
       ///
       /// `(from_chain_code, from_token_code, reserve_code)` together identify
       /// which leg of the swap this UIC covers. Same-chain swaps with
@@ -297,17 +301,6 @@ namespace sysio {
                       sysio::slug_name from_token_code,
                       sysio::slug_name reserve_code,
                       std::vector<char> uic_bytes);
-
-      /// Re-evaluate one candidate whose required outpost commits are already
-      /// stored. This is the retry path for transient collateral or reserve
-      /// liquidity shortfalls: it reuses the original UIC bytes instead of
-      /// paying to replay either outpost transaction. The candidate must
-      /// authorize the call. Unknown, incomplete, disqualified, and resolved
-      /// requests are idempotent no-ops; a live retry revalidates every
-      /// required stored signature against current permissions before winner
-      /// selection.
-      [[sysio::action]]
-      void retrycommit(uint64_t uwreq_id, name underwriter);
 
       /// Sweep all `locks` rows whose `expires_at_ms` has elapsed. Inlined
       /// from `sysio.epoch::advance` (as one of its FIRST steps — freshly
@@ -530,8 +523,9 @@ namespace sysio {
          std::vector<char> dest_uic_bytes;
          /// Race outcome — INTENT_SUBMITTED (initial), INTENT_CONFIRMED
          /// (winner), DISQUALIFIED (durable candidate invalidity such as an
-         /// older stored signature invalidated by key rotation or a durable
-         /// role/activation failure),
+         /// older stored signature invalidated by key rotation, a durable
+         /// role/activation failure, or insufficient collateral at the
+         /// candidate's one authoritative winner-selection attempt),
          /// or RELEASED (clean loser, retained for audit). A new matching,
          /// `rcrdcommit` cannot rewrite or re-arm a DISQUALIFIED entry. The
          /// reused protobuf enum also contains SLASHED, but commit entries

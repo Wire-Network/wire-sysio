@@ -3,13 +3,16 @@
 Autonomous underwriter daemon. Polls `sysio.uwrit::uwreqs` for PENDING
 swaps, derives each candidate's authoritative stored-evidence state, and
 submits signed `UnderwriteIntentCommit` records only for missing outpost legs.
-When both paid legs are already stored, it submits the depot's signed
-`retrycommit` action so the contract can recheck live capital and race state.
+Before submitting, it budgets the candidate's full eventual depot collateral
+requirement, including any leg whose UIC is already stored but whose lock does
+not yet exist. A complete candidate has already received its one authoritative
+winner-selection attempt and is never replayed.
 
 The underwriter is a **separate daemon** from the batch operator. It does
 not relay OPP envelopes — that is the batch operator's job. The
-underwriter signs and submits underwriting commits to outposts and bounded
-`retrycommit` transactions to the depot.
+underwriter signs and submits underwriting commits to outposts. The depot
+receives those commits through ordinary OPP dispatch and performs the terminal
+winner-selection decision.
 
 ## Lifecycle
 
@@ -65,7 +68,7 @@ Every `--underwriter-scan-interval-ms` (default 5 s):
 2. `read_outpost_registry()` — refresh the `(chain_code → chain_kind)`
    cache from `sysio.chains::chains`.
 3. `read_credit_lines()` — compute available bond per
-   `(chain, token_kind)` by mirroring the depot's `sysio.opreg::available()`
+   `(chain_code, token_code)` by mirroring the depot's `sysio.opreg::available()`
    math:
 
        available = balance(opreg::balances)
@@ -74,20 +77,25 @@ Every `--underwriter-scan-interval-ms` (default 5 s):
 
 4. `scan_pending_requests()` — walk the small in-flight
    `sysio.uwrit::uwreqs` KV table, filter to `PENDING` rows, and derive this
-   underwriter's absent, partial, complete, or non-retryable candidate state
+   underwriter's absent, partial, complete, or terminal candidate state
    from the authoritative `commits_by` row.
-5. Remove non-retryable candidates, then route complete stored candidates
-   directly to the signed depot `retrycommit` action. Their paid outpost
-   evidence is already stored, so the daemon does not reserve credit for work
-   that is already complete or replay a paid outpost transaction.
+5. Remove complete and terminal candidates before cover selection. Complete
+   evidence means the depot already made the candidate's one authoritative
+   decision; replaying either paid outpost transaction cannot change it.
 6. For remaining absent/partial candidates, run the bounded branch-and-bound
-   selector (with its value-sorted fallback) over only still-missing legs, so
-   one cycle does not schedule more new outpost work than the daemon's current
-   credit view can support. `submit_intent_to_outpost()` verifies the source
-   deposit and submits only those missing legs. The contract remains
-   authoritative: `retrycommit` rechecks live availability and creates locks
-   only when winner selection succeeds. A disqualified candidate submits no
-   paid outpost transaction, including after daemon restart.
+   selector (with its value-sorted fallback) over every eventual non-depot
+   lock, including a leg whose UIC is already stored or locally confirmed. The
+   selector uses the daemon's current credit snapshot to avoid knowingly
+   submitting a candidate the depot cannot cover. `submit_intent_to_outpost()`
+   still sends only missing legs. This pre-validation is advisory because
+   collateral can change before OPP delivery: the contract rechecks live state
+   atomically, creates locks on success, and otherwise disqualifies only that
+   candidate while the request remains PENDING for another underwriter.
+
+Reserve liquidity is request-global rather than candidate-specific. If the
+winning attempt finds that the required reserve settlement cannot execute, the
+contract rejects and refunds the request instead of retaining a complete row
+with no retry or wake-up path.
 
 ### Commit submission (`create_signed_uic_bytes`)
 
@@ -145,7 +153,7 @@ authenticated depot submitter.
 |---|---|---|
 | `--underwriter-account` | — | WIRE account name for this underwriter |
 | `--underwriter-scan-interval-ms` | 5000 | How often to scan for pending uwreqs (ms) |
-| `--underwriter-action-timeout-ms` | 15000 | Timeout for outpost RPC calls, depot retry transactions, and table reads (ms) |
+| `--underwriter-action-timeout-ms` | 15000 | Timeout for outpost RPC calls and table reads (ms) |
 | `--underwriter-enabled` | false | Enable underwriter functionality |
 | `--underwriter-eth-outpost` | — | Per-EVM-chain outpost wiring (repeatable, one per served EVM chain). Format `<chain_code>,<client_id>,<operator_registry_addr>,<source_deposit_contract_addr>` — keyed by exact `chain_code`, so two EVM chains are wired independently |
 | `--underwriter-sol-outpost` | — | Per-SVM-chain outpost wiring (repeatable, one per served SVM chain). Format `<chain_code>,<client_id>,<opp_outpost_program_id>` |
@@ -240,9 +248,9 @@ Query them directly over HTTP, e.g.
 ## Deferred / follow-up
 
 The current implementation covers canonical commit construction, bounded
-cover selection, restart-safe missing-leg routing, and depot-only retry of
-complete stored candidates. The following optional locator improvement remains
-out of scope:
+cover selection, full-candidate collateral pre-validation, terminal depot
+resolution, and restart-safe missing-leg routing. The following optional
+locator improvement remains out of scope:
 
 - **Source-deposit locator hardening** — the current verifier validates
   `SwapRequest.source_tx_id` before committing; ETH uses a bounded

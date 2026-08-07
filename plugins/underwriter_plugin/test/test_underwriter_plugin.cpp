@@ -725,7 +725,7 @@ BOOST_AUTO_TEST_CASE(uic_provider_selection_preserves_two_explicit_ambiguity) tr
    BOOST_REQUIRE_EQUAL(2u, selected.size());
 } FC_LOG_AND_RETHROW();
 
-BOOST_AUTO_TEST_CASE(stored_commit_plan_retries_complete_candidate_after_restart) try {
+BOOST_AUTO_TEST_CASE(stored_commit_plan_skips_complete_candidate_after_restart) try {
    const auto plan = sysio::underwriter_detail::plan_stored_commits(
       /*candidate_exists=*/true,
       /*intent_submitted=*/true,
@@ -733,8 +733,7 @@ BOOST_AUTO_TEST_CASE(stored_commit_plan_retries_complete_candidate_after_restart
       /*destination_is_depot=*/false,
       /*source_uic_stored=*/true,
       /*destination_uic_stored=*/true);
-   BOOST_CHECK(plan.retry_depot);
-   BOOST_CHECK(!plan.skip_candidate);
+   BOOST_CHECK(plan.skip_candidate);
    BOOST_CHECK(!plan.submit_source);
    BOOST_CHECK(!plan.submit_destination);
 } FC_LOG_AND_RETHROW();
@@ -747,7 +746,6 @@ BOOST_AUTO_TEST_CASE(stored_commit_plan_submits_only_missing_outpost_leg) try {
       /*destination_is_depot=*/false,
       /*source_uic_stored=*/true,
       /*destination_uic_stored=*/false);
-   BOOST_CHECK(!plan.retry_depot);
    BOOST_CHECK(!plan.skip_candidate);
    BOOST_CHECK(!plan.submit_source);
    BOOST_CHECK(plan.submit_destination);
@@ -756,14 +754,12 @@ BOOST_AUTO_TEST_CASE(stored_commit_plan_submits_only_missing_outpost_leg) try {
 BOOST_AUTO_TEST_CASE(stored_commit_plan_handles_single_outpost_candidate) try {
    const auto ready = sysio::underwriter_detail::plan_stored_commits(
       true, true, false, true, true, false);
-   BOOST_CHECK(ready.retry_depot);
-   BOOST_CHECK(!ready.skip_candidate);
+   BOOST_CHECK(ready.skip_candidate);
    BOOST_CHECK(!ready.submit_source);
    BOOST_CHECK(!ready.submit_destination);
 
    const auto missing = sysio::underwriter_detail::plan_stored_commits(
       true, true, false, true, false, false);
-   BOOST_CHECK(!missing.retry_depot);
    BOOST_CHECK(!missing.skip_candidate);
    BOOST_CHECK(missing.submit_source);
    BOOST_CHECK(!missing.submit_destination);
@@ -777,7 +773,6 @@ BOOST_AUTO_TEST_CASE(stored_commit_plan_skips_disqualified_candidate_after_resta
       /*destination_is_depot=*/false,
       /*source_uic_stored=*/true,
       /*destination_uic_stored=*/true);
-   BOOST_CHECK(!disqualified.retry_depot);
    BOOST_CHECK(disqualified.skip_candidate);
    BOOST_CHECK(!disqualified.submit_source);
    BOOST_CHECK(!disqualified.submit_destination);
@@ -789,7 +784,6 @@ BOOST_AUTO_TEST_CASE(stored_commit_plan_skips_disqualified_candidate_after_resta
       /*destination_is_depot=*/false,
       /*source_uic_stored=*/false,
       /*destination_uic_stored=*/false);
-   BOOST_CHECK(!absent.retry_depot);
    BOOST_CHECK(!absent.skip_candidate);
    BOOST_CHECK(absent.submit_source);
    BOOST_CHECK(absent.submit_destination);

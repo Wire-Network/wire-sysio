@@ -75,12 +75,6 @@ namespace uwrit {
 constexpr auto account              = "sysio.uwrit";
 constexpr auto table_locks          = "locks";
 constexpr auto table_requests       = "uwreqs";
-constexpr auto action_retry_commit  = "retrycommit";
-
-namespace retry_field {
-constexpr auto request_id  = "uwreq_id";
-constexpr auto underwriter = "underwriter";
-}
 
 namespace lock_field {
 constexpr auto underwriter = "underwriter";
@@ -187,8 +181,8 @@ struct uw_request {
    bool                    dst_is_depot = false;
 
    /// Authoritative depot-row plan for this daemon's candidate. It
-   /// distinguishes absent, partial, complete, and durably non-retryable rows
-   /// even after restart has emptied the local `confirmed_commits` cache.
+   /// distinguishes missing-leg work from complete or terminal candidates even
+   /// after restart has emptied the local `confirmed_commits` cache.
    underwriter_detail::stored_commit_plan own_stored_commit_plan;
 };
 
@@ -1104,7 +1098,7 @@ struct underwriter_plugin::impl {
       // Step 3: Scan sysio.uwrit::uwreqs for PENDING requests. Admission is
       // request-specific: select_coverable checks the exact collateral
       // buckets for each route, so an unrelated active chain with no balance
-      // must not block a stored candidate's depot-only retry.
+      // must not block otherwise coverable work.
       auto requests = scan_pending_requests();
 
       // Step 3b: prune local per-uwreq state whose uwreq is no longer
@@ -1128,47 +1122,25 @@ struct underwriter_plugin::impl {
 
       ilog("underwriter: found {} pending underwrite requests", requests.size());
 
-      // A durably non-retryable candidate must not enter cover selection. If
-      // it consumed the knapsack's local credit before being discarded, one
-      // large disqualified row could starve otherwise valid pending work.
-      const auto skipped_nonretryable = std::erase_if(
+      // Complete candidates have already received their one authoritative
+      // winner-selection attempt; terminal candidates are also durable. Neither
+      // may enter cover selection or replay a paid outpost transaction.
+      const auto skipped_candidates = std::erase_if(
          requests, [](const uw_request& r) {
             return r.own_stored_commit_plan.skip_candidate;
          });
-      if (skipped_nonretryable != 0) {
-         ilog("underwriter: skipped {} non-retryable depot candidates before "
-              "cover selection", skipped_nonretryable);
+      if (skipped_candidates != 0) {
+         ilog("underwriter: skipped {} complete or terminal depot candidates "
+              "before cover selection", skipped_candidates);
       }
       if (requests.empty()) return;
 
-      // Complete stored candidates have no paid outpost work left. Route them
-      // before fresh-credit selection so the daemon does not reserve credit
-      // for legs whose evidence is already stored or replay those legs. The
-      // contract remains authoritative: retrycommit revalidates the evidence,
-      // checks live availability, and creates locks only on success.
-      const auto retried_on_depot = std::erase_if(
-         requests, [&](const uw_request& r) {
-            if (!r.own_stored_commit_plan.retry_depot) return false;
-            push_depot_retry(r.id);
-            return true;
-         });
-      if (retried_on_depot != 0) {
-         ilog("underwriter: routed {} complete stored candidates directly to "
-              "depot retry", retried_on_depot);
-      }
-      if (requests.empty()) return;
-
-      // Step 4: Select requests whose still-missing legs can be covered.
-      auto selected = select_coverable(requests);
-      if (selected.empty()) {
-         ilog("underwriter: no requests coverable with current credit lines");
-         return;
-      }
-
-      // Step 4b: drop any request whose required legs became locally
+      // Drop any request whose required legs became locally
       // confirmed while its inbound attestations are still catching up. A
       // depot (WIRE) leg is implicitly done: it never has an outpost commit.
-      std::erase_if(selected, [&](const uw_request& r) {
+      // Do this before cover selection so a no-work candidate cannot reserve
+      // provisional credit and starve a request that still needs a submission.
+      std::erase_if(requests, [&](const uw_request& r) {
          const bool src_done = r.src_is_depot
             || confirmed_commits.contains(
                   commit_key{r.id, r.src_chain_code.value, r.src_token_code.value,
@@ -1180,9 +1152,17 @@ struct underwriter_plugin::impl {
          return src_done && dst_done;
       });
 
-      if (selected.empty()) {
-         ilog("underwriter: selected uwreqs already have every required leg "
+      if (requests.empty()) {
+         ilog("underwriter: pending uwreqs already have every required leg "
               "confirmed locally");
+         return;
+      }
+
+      // Step 4: Select requests whose complete winner-time collateral
+      // requirements can be covered, then submit only their missing legs.
+      auto selected = select_coverable(requests);
+      if (selected.empty()) {
+         ilog("underwriter: no requests coverable with current credit lines");
          return;
       }
 
@@ -1365,33 +1345,6 @@ struct underwriter_plugin::impl {
       }
    }
 
-   /// Push one signed WIRE action that re-evaluates the daemon's already
-   /// stored candidate. No UIC bytes cross this surface; the contract reads
-   /// its bounded evidence from the named uwreq and verifies both legs again.
-   void push_depot_retry(uint64_t uw_request_id) {
-      const auto& provider = uic_signature_provider;
-      const fc::variant_object action_data = fc::mutable_variant_object()
-         (uwrit::retry_field::request_id, uw_request_id)
-         (uwrit::retry_field::underwriter, underwriter_account.to_string());
-      const auto result = chain_plug->push_signed_action(
-         chain::name{uwrit::account}, chain::name{uwrit::action_retry_commit},
-         underwriter_account, action_data, provider,
-         fc::milliseconds(action_timeout_ms), shutting_down);
-
-      if (result.succeeded()) {
-         ilog("underwriter: depot retrycommit landed for uwreq {}",
-              uw_request_id);
-      } else if (result.state == signed_action_result::status::shutting_down) {
-         return;
-      } else if (result.state == signed_action_result::status::timed_out) {
-         elog("underwriter: depot retrycommit timed out for uwreq {} — {}",
-              uw_request_id, result.error);
-      } else {
-         elog("underwriter: depot retrycommit failed for uwreq {} — {}",
-              uw_request_id, result.error);
-      }
-   }
-
    /**
     * Refresh `is_active` from `sysio.opreg::operators[underwriter_account].status`.
     * Mirror of the awareness poll on batch_operator_plugin — both share
@@ -1527,15 +1480,14 @@ struct underwriter_plugin::impl {
             ? static_cast<uint32_t>(obj[
                  uwrit::request_field::variance_tolerance_bps].as_uint64())
             : 0u;
-         // Cross-walk the slug_name codes to ChainKind/TokenKind enums
-         // for the `select_coverable` bucket-matching path (which keys
-         // on the enums). Maps populated by the upstream
+         // Cross-walk the slug_name codes to ChainKind/TokenKind enums for
+         // outpost dispatch and diagnostics. Maps populated by the upstream
          // `read_outpost_registry` (`sysio.chains::chains` → ChainKind)
          // and `read_credit_lines` (`sysio.tokens::tokens` → TokenKind)
          // calls in `do_scan_cycle`. Any uncovered slug — e.g. the
          // depot's WIRE chain (filtered out of outpost_chain_kinds via
-         // is_depot) — falls through as UNKNOWN; `select_coverable`
-         // then treats the request as out of scope and skips it.
+         // is_depot) — falls through as UNKNOWN; depot legs are identified
+         // independently below and require neither an outpost nor collateral.
          auto resolve_chain_kind = [&](fc::slug_name code) -> ChainKind {
             auto it = outpost_chain_kinds.find(code.value);
             return it != outpost_chain_kinds.end()
@@ -1558,10 +1510,10 @@ struct underwriter_plugin::impl {
 
          // The depot row, not the process-local confirmation cache, is the
          // restart-safe authority for whether this candidate already has all
-         // required outpost evidence. A complete INTENT_SUBMITTED candidate
-         // is retried on WIRE; it must never pay to replay an outpost commit.
-         // An existing status that is invalid or no longer INTENT_SUBMITTED
-         // fails closed as non-retryable rather than masquerading as absence.
+         // required outpost evidence. A complete INTENT_SUBMITTED candidate has
+         // already received its one depot attempt and must never replay an
+         // outpost commit. An existing status that is invalid or no longer
+         // INTENT_SUBMITTED also fails closed rather than masquerading as absence.
          bool own_candidate_exists = false;
          bool own_candidate_submitted = false;
          bool source_stored = false;
@@ -1644,8 +1596,8 @@ struct underwriter_plugin::impl {
 
    // -----------------------------------------------------------------------
    //  Select requests coverable by our credit lines
-   //  Requires 100% coverage on BOTH src and dst legs of the swap, where
-   //  each leg's required bond is per-(chain_kind, token_kind).
+   //  Requires 100% coverage on BOTH non-depot legs of the swap, where each
+   //  leg's required bond is per exact `(chain_code, token_code)` bucket.
    // -----------------------------------------------------------------------
 
    /// Hard cap on the number of candidates the branch-and-bound search
@@ -1655,25 +1607,18 @@ struct underwriter_plugin::impl {
    static constexpr size_t MAX_CANDIDATES = 64;
 
    /// Build a `leg_bond` (exact `(chain_code, token_code)` bucket + bond
-   /// requirement) for one still-missing leg of `r`. Depot legs, depot-stored
-   /// legs, and locally-confirmed legs require no new collateral reservation.
+   /// requirement) for one eventual lock of `r`. Only depot legs require no
+   /// collateral. Stored or locally-confirmed UICs have not created a lock yet,
+   /// so pre-validation must still budget their full winner-time requirement.
    leg_bond src_bond(const uw_request& r) const {
-      const bool locally_confirmed = confirmed_commits.contains(
-         commit_key{r.id, r.src_chain_code.value, r.src_token_code.value,
-                    r.src_reserve_code.value});
-      return underwriter_detail::pending_leg_bond(
+      return underwriter_detail::candidate_leg_bond(
          bucket_key{r.src_chain_code.value, r.src_token_code.value},
-         r.src_amount, r.src_is_depot,
-         r.own_stored_commit_plan.submit_source, locally_confirmed);
+         r.src_amount, r.src_is_depot);
    }
    leg_bond dst_bond(const uw_request& r) const {
-      const bool locally_confirmed = confirmed_commits.contains(
-         commit_key{r.id, r.dst_chain_code.value, r.dst_token_code.value,
-                    r.dst_reserve_code.value});
-      return underwriter_detail::pending_leg_bond(
+      return underwriter_detail::candidate_leg_bond(
          bucket_key{r.dst_chain_code.value, r.dst_token_code.value},
-         r.dst_amount, r.dst_is_depot,
-         r.own_stored_commit_plan.submit_destination, locally_confirmed);
+         r.dst_amount, r.dst_is_depot);
    }
 
    /// Attempt to debit `r`'s per-leg bond requirements from `remaining`,
@@ -1688,8 +1633,8 @@ struct underwriter_plugin::impl {
    }
 
    /// Branch-and-bound search that returns the subset of `candidates`
-   /// maximizing `Σ(src_amount + dst_amount)` while each per-(chain,
-   /// token_kind) credit bucket stays non-negative. Recurses depth-first
+   /// maximizing `Σ(src_amount + dst_amount)` while each exact
+   /// `(chain_code, token_code)` credit bucket stays non-negative. Recurses depth-first
    /// in two branches per candidate (include / skip); on each include
    /// branch verifies feasibility before descending, and prunes the
    /// subtree on infeasibility OR when the upper-bound estimate (current
@@ -1767,9 +1712,9 @@ struct underwriter_plugin::impl {
       }
 
       // Pre-filter requests that can never fit in isolation (no bucket even
-      // matches), so the search space stays small. Depot, depot-stored, and
-      // locally-confirmed legs cost zero; selection reserves only work that
-      // still requires a paid outpost transaction.
+      // matches), so the search space stays small. Selection budgets every
+      // eventual outpost lock, including stored or locally-confirmed UIC legs;
+      // only a depot leg costs zero.
       std::vector<uw_request> feasible_in_isolation;
       feasible_in_isolation.reserve(requests.size());
       for (auto& r : requests) {
@@ -2560,7 +2505,7 @@ struct underwriter_plugin::impl {
    /**
     * Submit a `commit` JSON-RPC call to each still-missing outpost leg. Depot
     * rows suppress already-stored legs after restart, while complete stored
-    * candidates are routed to `retrycommit` before this function is reached.
+    * candidates are skipped before this function is reached.
     * Each outpost canonicalizes the UIC, binds its external address and WIRE
     * roster identity to the authenticated ACTIVE underwriter caller, then
     * queues the original UNDERWRITE_INTENT_COMMIT bytes. The depot's resolver
@@ -2697,11 +2642,9 @@ struct underwriter_plugin::impl {
    // `outpost_ethereum_client::uw_commit` and
    // `outpost_solana_client::uw_commit`. Per `outpost-client-spi.md`.
 
-   // Paid outpost commit submissions use the outpost_client SPI. A complete
-   // stored candidate instead uses `push_depot_retry`, which signs one WIRE
-   // `retrycommit` action through chain_plugin's shared read-window-safe
-   // helper. The signature_provider_manager_plugin supplies the selected
-   // provider for both UIC digest signing and that depot retry transaction.
+   // Paid outpost commit submissions use the outpost_client SPI. Complete or
+   // terminal candidates are suppressed by the authoritative depot-row plan;
+   // no WIRE-side retry transaction exists.
 
    // ── HTTP API: /v1/underwriter/* ─────────────────────────────────────
    // Read-only diagnostic surface for the operator. Wraps internal state

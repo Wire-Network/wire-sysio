@@ -15,13 +15,13 @@ namespace sysio {
    /// Instead it:
    /// 1. Polls sysio.uwrit::uwreqs for PENDING underwrite requests.
    /// 2. Reads its available credit and authoritative stored-candidate state.
-   /// 3. Sends complete stored candidates to the depot's retrycommit action.
-   /// 4. Selects absent/partial candidates whose still-missing outpost legs fit
-   ///    the daemon's provisional credit view.
-   /// 5. Submits signed UICs for those missing legs to the relevant outpost
+   /// 3. Suppresses terminal and already-complete candidates after restart.
+   /// 4. Selects absent/partial candidates whose complete winner-time bond fits
+   ///    the daemon's provisional available-collateral view.
+   /// 5. Submits signed UICs only for missing legs to the relevant outpost
    ///    contract (ETH/SOL), which authenticates the caller and relays them.
-   /// 6. The depot validates winner conditions and creates collateral locks;
-   ///    the plugin monitors uwreqs for status changes.
+   /// 6. The depot gives the complete candidate one authoritative capacity
+   ///    check, then either creates locks or disqualifies that candidate.
    namespace underwriter_defaults {
       constexpr uint32_t scan_interval_ms    = 5000;
       constexpr uint32_t action_timeout_ms   = 15000;

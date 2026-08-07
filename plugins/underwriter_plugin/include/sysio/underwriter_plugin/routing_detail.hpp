@@ -42,19 +42,16 @@ struct leg_bond {
    uint64_t   require = 0;
 };
 
-/// Construct the fresh collateral requirement for one candidate leg. Depot
-/// legs, legs already stored by the depot, and legs confirmed locally while
-/// their inbound attestation catches up consume no additional available
-/// balance in the current scan.
-inline leg_bond pending_leg_bond(bucket_key bucket,
-                                 uint64_t amount,
-                                 bool is_depot,
-                                 bool plan_submits_leg,
-                                 bool locally_confirmed) {
+/// Construct the full winner-time collateral requirement for one candidate
+/// leg. Only depot legs require no collateral. A UIC already submitted to or
+/// stored from an outpost has not created a depot lock, so it still consumes
+/// capacity during pre-validation of the candidate's final missing leg.
+inline leg_bond candidate_leg_bond(bucket_key bucket,
+                                   uint64_t amount,
+                                   bool is_depot) {
    return {
       .bucket = bucket,
-      .require = is_depot || !plan_submits_leg || locally_confirmed
-         ? 0 : amount,
+      .require = is_depot ? 0 : amount,
    };
 }
 
@@ -114,12 +111,11 @@ struct commit_key {
 };
 
 /// Restart-safe work derived from one candidate's authoritative depot row.
-/// A complete INTENT_SUBMITTED candidate is retried on the depot; a partial
-/// candidate submits only missing outpost legs. An existing non-submitted
-/// candidate is durably non-retryable and suppresses all outpost replay.
-/// Depot legs never submit.
+/// A partial candidate submits only missing outpost legs. A complete candidate
+/// has already received its one authoritative depot attempt and suppresses all
+/// replay, as does an existing non-submitted terminal candidate. Depot legs
+/// never submit.
 struct stored_commit_plan {
-   bool retry_depot = false;
    bool skip_candidate = false;
    bool submit_source = false;
    bool submit_destination = false;
@@ -139,10 +135,9 @@ inline stored_commit_plan plan_stored_commits(bool candidate_exists,
    const bool destination_complete = destination_is_depot ||
       (intent_submitted && destination_uic_stored);
    if (intent_submitted && source_complete && destination_complete) {
-      return {.retry_depot = true};
+      return {.skip_candidate = true};
    }
    return {
-      .retry_depot = false,
       .submit_source = !source_complete,
       .submit_destination = !destination_complete,
    };

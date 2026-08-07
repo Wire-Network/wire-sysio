@@ -161,22 +161,27 @@ BOOST_AUTO_TEST_CASE(depot_leg_requires_no_bucket) {
    BOOST_CHECK(!try_debit_buckets(credit, NO_LEG, NO_LEG));
 }
 
-BOOST_AUTO_TEST_CASE(stored_or_locally_confirmed_leg_requires_no_new_credit) {
+BOOST_AUTO_TEST_CASE(every_eventual_outpost_lock_requires_credit) {
    const bucket_key bucket{.chain_code = 101, .token_code = 202};
-   const auto fresh = pending_leg_bond(
-      bucket, 50, /*is_depot=*/false, /*plan_submits_leg=*/true,
-      /*locally_confirmed=*/false);
-   const auto stored = pending_leg_bond(
-      bucket, 50, /*is_depot=*/false, /*plan_submits_leg=*/false,
-      /*locally_confirmed=*/false);
-   const auto confirmed = pending_leg_bond(
-      bucket, 50, /*is_depot=*/false, /*plan_submits_leg=*/true,
-      /*locally_confirmed=*/true);
+   const auto outpost = candidate_leg_bond(
+      bucket, 50, /*is_depot=*/false);
+   const auto depot = candidate_leg_bond(
+      bucket, 50, /*is_depot=*/true);
 
-   BOOST_CHECK(fresh.bucket == bucket);
-   BOOST_CHECK_EQUAL(fresh.require, 50u);
-   BOOST_CHECK_EQUAL(stored.require, 0u);
-   BOOST_CHECK_EQUAL(confirmed.require, 0u);
+   BOOST_CHECK(outpost.bucket == bucket);
+   BOOST_CHECK_EQUAL(outpost.require, 50u);
+   BOOST_CHECK_EQUAL(depot.require, 0u);
+
+   // Pre-validation budgets the full winner-time lock even when one leg's UIC
+   // is already stored or locally confirmed. Those states avoid another paid
+   // outpost submission, but neither has consumed collateral on the depot.
+   credit_buckets insufficient{{bucket, 49}};
+   BOOST_CHECK(!try_debit_buckets(insufficient, outpost, depot));
+   BOOST_CHECK_EQUAL(insufficient[bucket], 49u);
+
+   credit_buckets exact{{bucket, 50}};
+   BOOST_CHECK(try_debit_buckets(exact, outpost, depot));
+   BOOST_CHECK_EQUAL(exact[bucket], 0u);
 }
 
 // -- endpoint coverage: config must serve every registered chain --

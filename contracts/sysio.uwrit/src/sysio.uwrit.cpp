@@ -1264,12 +1264,17 @@ uwrit::commit_entry* find_or_create_commit(uwrit::uw_request_t& req, name underw
 /// conflating the three would mislead downstream indexing and audits. A
 /// disqualified entry is durable for this request: later records naming the
 /// candidate cannot rewrite its evidence or re-arm it for winner selection.
+/// Raw UIC payloads are cleared because terminal candidates have no remaining
+/// signature-validation reader; timestamps, outpost ids, status, and reason
+/// remain as the compact audit record.
 void disqualify_candidate(uwrit::uwreqs_t& reqs, const uwrit::id_key& pk,
                           name candidate, const std::string& reason) {
    reqs.modify(same_payer, pk, [&](auto& r) {
       auto* c = find_or_create_commit(r, candidate);
       c->status = UnderwriteStatus::UNDERWRITE_STATUS_DISQUALIFIED;
       c->reason = reason;
+      c->source_uic_bytes.clear();
+      c->dest_uic_bytes.clear();
    });
 }
 
@@ -1395,11 +1400,13 @@ void reject_and_refund(name self, uwrit::uwreqs_t& reqs, const uwrit::id_key& pk
 ///   * normal     — reserv::applyswap  + SWAP_REMIT to the dst outpost
 ///   * from-WIRE  — reserv::applyfromwire + SWAP_REMIT to the dst outpost
 ///   * to-WIRE    — reserv::paywire (REAL WIRE to the recipient; no remit)
-/// Stale/invalid evidence and a missing destination identity link disqualify a
-/// candidate durably. Transient collateral and reserve-liquidity shortfalls
-/// log + skip without aborting the enclosing dispatch.
+/// Stale/invalid evidence, insufficient live collateral, and a missing
+/// destination identity link disqualify a candidate durably. Reserve-liquidity
+/// shortfalls reject and refund the request because they are request-global and
+/// another underwriter cannot repair them. Every failure remains non-throwing
+/// inside the enclosing consensus dispatch.
 void try_select_winner(name self, uint64_t uwreq_id, name candidate,
-                       std::optional<uic_leg> just_verified_leg) {
+                       uic_leg just_verified_leg) {
    uwrit::uwreqs_t reqs(self);
    auto pk = uwrit::id_key{uwreq_id};
    if (!reqs.contains(pk)) return;
@@ -1410,8 +1417,7 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate,
    const bool dst_needed = !leg_is_depot(req.dst_chain_code);
 
    // The resolver only operates on one complete, live candidate. Keeping this
-   // invariant here makes both the consensus-dispatch path and the explicit
-   // retry action idempotent and prevents either caller from reaching costly
+   // invariant here prevents consensus dispatch from reaching costly
    // permission recovery with incomplete or terminal evidence.
    const uwrit::commit_entry* ce_ptr = nullptr;
    for (const auto& c : req.commits_by) {
@@ -1448,16 +1454,15 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate,
 
    // ── T7: permission freshness ──────────────────────────────────────────
    // `rcrdcommit` passes its incoming leg after verifying it immediately, so
-   // only the older stored opposite leg needs another recovery. `retrycommit`
-   // supplies no just-verified leg; both stored signatures are then recovered
-   // against current owner/active keys before locks or settlement.
-   if (src_needed && just_verified_leg != std::optional{uic_leg::source} &&
+   // only the older stored opposite leg needs another recovery against current
+   // owner/active keys before locks or settlement.
+   if (src_needed && just_verified_leg != uic_leg::source &&
        !validate_candidate_uic(reqs, pk, uwreq_id, candidate, uic_leg::source,
                                ce_ptr->source_outpost_id,
                                ce_ptr->source_uic_bytes)) {
       return;
    }
-   if (dst_needed && just_verified_leg != std::optional{uic_leg::destination} &&
+   if (dst_needed && just_verified_leg != uic_leg::destination &&
        !validate_candidate_uic(reqs, pk, uwreq_id, candidate,
                                uic_leg::destination, ce_ptr->dest_outpost_id,
                                ce_ptr->dest_uic_bytes)) {
@@ -1504,13 +1509,13 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate,
    // and a balance is itself uint64, so an overflowing aggregate must read as
    // genuinely insufficient — NOT saturate to UINT64_MAX (which a UINT64_MAX
    // available balance would spuriously satisfy) and NOT wrap to a small
-   // passing value. Collateral availability can change as locks are released
-   // or funds are deposited, so an insufficient candidate remains retryable.
-   // This resolver is non-throwing (`feedback_opp_handlers_never_throw`).
+   // passing value. This is the candidate's one authoritative capacity check:
+   // insufficient collateral disqualifies only this candidate while the uwreq
+   // remains PENDING for another underwriter. This resolver is non-throwing
+   // (`feedback_opp_handlers_never_throw`).
    const bool same_bucket = src_needed && dst_needed
                             && req.src_chain_code == req.dst_chain_code
                             && req.src_token_code == req.dst_token_code;
-   bool insufficient_bond = false;
    if (same_bucket) {
       // One opreg balance funds both legs — it must cover their sum. uint128
       // keeps the comparison honest when src+dst exceeds uint64 (no uint64
@@ -1518,20 +1523,41 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate,
       const uint64_t  avail = available_via_mirrors(self, candidate,
                                                     req.src_chain_code, req.src_token_code);
       const uint128_t need  = static_cast<uint128_t>(req.src_amount) + req.dst_amount;
-      insufficient_bond = static_cast<uint128_t>(avail) < need;
+      if (static_cast<uint128_t>(avail) < need) {
+         const std::string required = need > std::numeric_limits<uint64_t>::max()
+            ? "greater than uint64 maximum"
+            : std::to_string(static_cast<uint64_t>(need));
+         disqualify_candidate(
+            reqs, pk, candidate,
+            "insufficient available collateral at winner selection for bucket (" +
+               req.src_chain_code.to_string() + ", " + req.src_token_code.to_string() +
+               "): required=" + required + ", available=" + std::to_string(avail));
+         return;
+      }
    } else {
       // Distinct buckets (or a single required leg) — check each independently.
       const uint64_t src_avail = src_needed
          ? available_via_mirrors(self, candidate, req.src_chain_code, req.src_token_code) : 0;
       const uint64_t dst_avail = dst_needed
          ? available_via_mirrors(self, candidate, req.dst_chain_code, req.dst_token_code) : 0;
-      insufficient_bond = (src_needed && src_avail < req.src_amount)
-                       || (dst_needed && dst_avail < req.dst_amount);
-   }
-   if (insufficient_bond) {
-      sysio::print("try_select_winner: insufficient candidate bond for uwreq ",
-                   uwreq_id, ", leaving commit retryable\n");
-      return;
+      if (src_needed && src_avail < req.src_amount) {
+         disqualify_candidate(
+            reqs, pk, candidate,
+            "insufficient available collateral at winner selection for source bucket (" +
+               req.src_chain_code.to_string() + ", " + req.src_token_code.to_string() +
+               "): required=" + std::to_string(req.src_amount) +
+               ", available=" + std::to_string(src_avail));
+         return;
+      }
+      if (dst_needed && dst_avail < req.dst_amount) {
+         disqualify_candidate(
+            reqs, pk, candidate,
+            "insufficient available collateral at winner selection for destination bucket (" +
+               req.dst_chain_code.to_string() + ", " + req.dst_token_code.to_string() +
+               "): required=" + std::to_string(req.dst_amount) +
+               ", available=" + std::to_string(dst_avail));
+         return;
+      }
    }
 
    // ── Request-level terminal decisions ─────────────────────────────────
@@ -1596,8 +1622,9 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate,
    // dispatch chain stalls consensus, so every condition is pre-validated
    // here — making the inline actions unreachable-failure by construction
    // (no other reserve mutation can interleave within this transaction).
-   // Transient shortfalls (another swap drained the reserve between quote
-   // and win) log + skip, leaving the uwreq PENDING for later resolution.
+   // A live reserve shortfall is request-global: changing underwriters cannot
+   // repair it. Reject + refund rather than retaining a complete candidate with
+   // no future wake-up path.
    name towire_recipient{};
    if (!dst_needed) {
       // Swap-to-WIRE. Terminal first: a malformed recipient can never
@@ -1659,8 +1686,11 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate,
          w_gross, current_fee_bps(self), reserve::FEE_REWARD_SHARE_BPS).fee;
       const uint64_t wire_needed = opp::safe::add_sat_u64(req.dst_amount, to_wire_fee);
       if (!src_r || w_gross == 0 || src_r->reserve_wire_amount < wire_needed) {
-         sysio::print("try_select_winner: insufficient source-reserve WIRE for "
-                      "to-WIRE payout on uwreq ", uwreq_id, ", skipping\n");
+         reject_and_refund(
+            self, reqs, pk, req, src_needed,
+            "swap rejected at race resolution: insufficient source-reserve WIRE "
+            "for the to-WIRE payout",
+            "request released: source reserve cannot settle the to-WIRE payout");
          return;
       }
    } else if (!src_needed) {
@@ -1668,8 +1698,11 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate,
       // live state (privacy is immutable, but liquidity can drift).
       auto dst_r = find_active_reserve(req.dst_chain_code, req.dst_token_code, req.dst_reserve_code);
       if (!dst_r || dst_r->is_private || dst_r->reserve_chain_amount < req.dst_amount) {
-         sysio::print("try_select_winner: destination reserve unavailable for "
-                      "from-WIRE swap on uwreq ", uwreq_id, ", skipping\n");
+         reject_and_refund(
+            self, reqs, pk, req, src_needed,
+            "swap rejected at race resolution: destination reserve cannot settle "
+            "the from-WIRE payout",
+            "request released: destination reserve cannot settle the from-WIRE payout");
          return;
       }
    } else {
@@ -1688,8 +1721,10 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate,
       if (!src_r || !dst_r || w_gross == 0 ||
           src_r->reserve_wire_amount < w_gross ||
           dst_r->reserve_chain_amount < req.dst_amount) {
-         sysio::print("try_select_winner: insufficient reserve liquidity for "
-                      "uwreq ", uwreq_id, ", skipping\n");
+         reject_and_refund(
+            self, reqs, pk, req, src_needed,
+            "swap rejected at race resolution: insufficient reserve liquidity",
+            "request released: reserves cannot settle the swap");
          return;
       }
    }
@@ -2006,39 +2041,6 @@ void uwrit::rcrdcommit(uint64_t uwreq_id,
       }
       break;
    }
-}
-
-// ---------------------------------------------------------------------------
-//  retrycommit — retry one complete stored candidate without outpost replay
-// ---------------------------------------------------------------------------
-//
-// Transient collateral and reserve-liquidity failures deliberately leave a
-// candidate INTENT_SUBMITTED. The outpost transactions have already landed,
-// so retrying them would waste gas/fees and can enqueue duplicate attestations.
-// This action performs one bounded depot-side re-evaluation using the stored
-// evidence. Authorization makes the candidate pay for its own retry work; the
-// shared resolver caps that work at the request's two required UIC legs.
-void uwrit::retrycommit(uint64_t uwreq_id, name underwriter) {
-   require_auth(underwriter);
-
-   uwreqs_t reqs(get_self());
-   const auto pk = id_key{uwreq_id};
-   if (!reqs.contains(pk)) return;
-   const auto req = reqs.get(pk);
-   if (req.status != UnderwriteRequestStatus::UNDERWRITE_REQUEST_STATUS_PENDING) return;
-
-   const auto it = std::find_if(
-      req.commits_by.begin(), req.commits_by.end(),
-      [&](const commit_entry& c) { return c.underwriter == underwriter; });
-   if (it == req.commits_by.end() ||
-       it->status != UnderwriteStatus::UNDERWRITE_STATUS_INTENT_SUBMITTED ||
-       !required_uic_legs_complete(req, *it)) {
-      return;
-   }
-
-   // No leg arrived in this transaction. Revalidate every required stored UIC
-   // against current permissions before attempting collateral/settlement.
-   try_select_winner(get_self(), uwreq_id, underwriter, std::nullopt);
 }
 
 // ---------------------------------------------------------------------------
