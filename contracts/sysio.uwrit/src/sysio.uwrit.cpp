@@ -580,9 +580,9 @@ swap_remit_disp try_build_swap_remit(const uwrit::uw_request_t& req,
    // Resolve the winning underwriter's destination-chain pubkey from
    // `sysio.authex::links` (`bynamechain`) so the SwapRemit carries the
    // underwriter's auditable destination-chain settlement key. This is not
-   // the UIC's authenticated transaction caller: on EVM the remit carries a
+   // the UIC's signed transaction-signer metadata: on EVM the remit carries a
    // 33-byte compressed EM key while `uw_ext_chain_addr` carries the 20-byte
-   // `msg.sender`, so the two fields are deliberately not byte-compared.
+   // address, so the two fields are deliberately not byte-compared.
    // A winner without a dst-chain link cannot ship a SwapRemit with a
    // populated underwriter, but this is candidate-specific: disqualify them
    // so the race can resolve for another underwriter (NOT terminal).
@@ -1984,9 +1984,9 @@ void uwrit::rcrdcommit(uint64_t uwreq_id,
 
    // Validate the claimed underwriter's signature before changing candidate
    // evidence/status/reason/timestamps.
-   // Updated outposts bind their authenticated transaction submitter to
-   // `uw_account`, but the depot remains authoritative for current WIRE
-   // permission keys. An invalid claim must never overwrite an honest
+   // Current outposts relay opaque UIC bytes, so the depot is authoritative
+   // for binding `uw_account` to current WIRE permission keys. An invalid
+   // claim must never overwrite an honest
    // candidate's previously stored leg, re-arm its status, or create a
    // competitor-visible entry. Log and ignore it; later
    // records in the same envelope continue dispatching.

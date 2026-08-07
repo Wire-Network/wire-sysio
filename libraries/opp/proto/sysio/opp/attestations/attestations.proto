@@ -199,9 +199,9 @@ message SwapRequest {
 //                                  (chain, token) pair this leg covers.
 message UnderwriteIntentCommit {
   sysio.opp.types.WireAccount     uw_account        = 1;
-  // Authenticated transaction caller on the originating outpost: exactly
-  // 20 bytes for EVM and exactly 32 bytes for SVM. The outpost binds this
-  // independently of the WIRE signature below before relaying the UIC.
+  // External-chain transaction-signer metadata populated by the submitting
+  // client: 20 bytes for EVM or 32 bytes for SVM. It is covered by the WIRE
+  // signature below; current outposts relay the complete UIC as opaque bytes.
   sysio.opp.types.ChainAddress    uw_ext_chain_addr = 2;
   uint64                          uw_request_id     = 3;
   bytes                           signature         = 5;

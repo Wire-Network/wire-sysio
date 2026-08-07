@@ -18,8 +18,8 @@ namespace sysio {
    /// 3. Suppresses terminal and already-complete candidates after restart.
    /// 4. Selects absent/partial candidates whose complete winner-time bond fits
    ///    the daemon's provisional available-collateral view.
-   /// 5. Submits signed UICs only for missing legs to the relevant outpost
-   ///    contract (ETH/SOL), which authenticates the caller and relays them.
+   /// 5. Submits signed UICs only for missing legs to the relevant ACTIVE-role-
+   ///    gated outpost contract (ETH/SOL), which relays them as opaque bytes.
    /// 6. The depot gives the complete candidate one authoritative capacity
    ///    check, then either creates locks or disqualifies that candidate.
    namespace underwriter_defaults {

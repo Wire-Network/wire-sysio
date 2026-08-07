@@ -32,7 +32,7 @@ inline size_t expected_uic_caller_address_size(
  * required by every production underwriter UIC.
  *
  * @param uic UIC to populate after all validation succeeds.
- * @param kind Authenticated outpost caller's chain family.
+ * @param kind Configured outpost transaction signer's chain family.
  * @param address Authenticated chain-native caller bytes.
  * @return true when the kind is supported and the address has its exact
  *         chain-native size; false without mutating `uic` otherwise.

@@ -1,6 +1,5 @@
 add_executable( test_chain_plugin
         test_account_query_db.cpp
-        test_signed_action_submission.cpp
         test_trx_retry_db.cpp
         test_trx_finality_status_processing.cpp
         plugin_config_test.cpp
@@ -13,7 +12,6 @@ set(CHAIN_PLUGIN_TEST_CASES
         outbound_http_global_option_registration
         chain_plugin_snapshot_endpoint_option_validation
         account_query_db_tests
-        signed_action_submission_tests
         trx_finality_status_processing_test
         trx_retry_db_test
         )

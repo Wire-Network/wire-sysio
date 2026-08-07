@@ -35,7 +35,7 @@ any gating failure logs a structured `elog` and skips cron registration:
 3. `sysio.authex::links` covers every active chain in `sysio.chains::chains` —
    the underwriter cannot sign a commit on a chain it has no authex link for.
 4. The required source-deposit function / instruction names resolve
-   against the loaded ABI / IDL files; exactly one explicitly configured WIRE
+   against the loaded ABI / IDL files; exactly one operator-configured WIRE
    UIC provider whose public key is a direct key whose weight alone reaches the
    underwriter account's current `owner` or `active` threshold is selected
    (automatically registered defaults and unrelated WIRE/block-signing
@@ -119,12 +119,11 @@ For each leg of every selected uwreq:
    submit those bytes verbatim to the outpost — `commit(bytes uicBytes)`
    on Ethereum, `commit_underwrite(uic_bytes)` on Solana.
 
-Every outpost decodes the generated UIC model far enough to resolve the claimed
-`uw_account` through its current authoritative operator roster, requires that
-account to match the registered ACTIVE `msg.sender` / `Signer`, requires exact
-decode/re-encode equality for the complete payload, and then queues the original
-canonical bytes unchanged. The outpost does not validate WIRE permission keys;
-that remains the depot's responsibility. Before storing a leg, the depot
+The current outposts require an ACTIVE-role transaction caller and relay the
+complete UIC as opaque bytes. They do not decode the UIC to bind `uw_account` or
+`uw_ext_chain_addr` to that caller and do not enforce canonical encoding. Those
+fields are signer metadata populated and signed by the local underwriter client;
+the depot performs the authoritative validation. Before storing a leg, the depot
 first requires the complete signed protobuf bytes to equal the
 CDT generator's canonical re-encoding. It then reconstructs the digest and
 accepts exactly the canonical packed fixed-size recoverable shapes: K1/R1/EM

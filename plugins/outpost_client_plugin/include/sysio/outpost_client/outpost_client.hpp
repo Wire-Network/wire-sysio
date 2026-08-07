@@ -56,7 +56,8 @@ public:
     * transaction signer. Solana returns the configured signer's 32-byte
     * public key. Underwriter UIC construction signs this value into
     * `uw_ext_chain_addr`, so the canonical payload contains no omitted
-    * default byte field and records the same identity the outpost authenticates.
+    * default byte field and records the local transaction signer as signed
+    * metadata. The current outpost does not bind that field to its caller.
     *
     * @return Opaque chain-native address bytes; 20 bytes for Ethereum and 32
     *         bytes for Solana.
@@ -119,18 +120,17 @@ public:
 
    /**
     * @brief UNDERWRITER COMMIT — submit a signed `UnderwriteIntentCommit`
-    *        (UIC) to an outpost that authenticates the claimed underwriter.
+    *        (UIC) through an ACTIVE-role-gated outpost relay.
     *
     * Called by the underwriter plugin (or any future plugin that issues
     * outpost-side commits) to deliver a signed intent without the caller
     * knowing the outpost's contract surface, ABI / IDL layout, or message
     * encoding. The chain-specific concrete resolves which contract or
     * program action to invoke, how to encode the bytes for the wire, and
-    * how to await on-chain confirmation. Every outpost decodes the generated
-    * UIC model far enough to resolve `uw_account` through its current
-    * authoritative operator roster and requires that account to match the
-    * authenticated caller. It then queues the original bytes unchanged; the
-    * WIRE depot remains authoritative for validating permission signatures.
+    * how to await on-chain confirmation. The current outpost accepts the call
+    * only from an ACTIVE-role account and queues the UIC as opaque bytes. It
+    * does not bind `uw_account` or `uw_ext_chain_addr` to that caller; the WIRE
+    * depot is authoritative for validating the signed claim.
     *
     * Returns only after on-chain inclusion + confirmations — the caller
     * uses the return value as a "this leg landed" signal before recording

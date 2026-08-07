@@ -1765,7 +1765,7 @@ struct underwriter_plugin::impl {
 
    // -----------------------------------------------------------------------
    //  Submit commit to outpost contract
-   //  The outpost authenticates the caller and relays UNDERWRITE_INTENT_COMMIT
+   //  The outpost requires an ACTIVE caller and relays opaque UIC bytes
    // -----------------------------------------------------------------------
 
    /// Build a verbatim, signed `UnderwriteIntentCommit` payload for the
@@ -1803,11 +1803,10 @@ struct underwriter_plugin::impl {
       uic.set_token_code(token_code.value);
       uic.set_reserve_code(reserve_code.value);
       // Populate BOTH members from the concrete client that will submit this
-      // UIC. Host protobuf omits empty byte fields while the generated outpost
-      // encoders emit them, so a kind-only production UIC cannot satisfy the
-      // outposts' exact decode/re-encode check. Signing the actual caller also
-      // records the same identity the outpost authenticates, without adding a
-      // second configuration surface.
+      // UIC. Host protobuf omits empty byte fields while the generated encoders
+      // emit them, so including the configured transaction signer gives every
+      // production encoder the same representation. The WIRE signature covers
+      // this signer metadata; current outposts relay the UIC as opaque bytes.
       const auto leg_chain_kind = outpost.chain_kind();
       const auto caller_address = outpost.authenticated_caller_address();
       const auto expected_address_size =
@@ -2506,9 +2505,9 @@ struct underwriter_plugin::impl {
     * Submit a `commit` JSON-RPC call to each still-missing outpost leg. Depot
     * rows suppress already-stored legs after restart, while complete stored
     * candidates are skipped before this function is reached.
-    * Each outpost canonicalizes the UIC, binds its external address and WIRE
-    * roster identity to the authenticated ACTIVE underwriter caller, then
-    * queues the original UNDERWRITE_INTENT_COMMIT bytes. The depot's resolver
+    * Each outpost requires an ACTIVE-role caller, then queues the opaque
+    * UNDERWRITE_INTENT_COMMIT bytes without binding their identity fields to
+    * that caller. The depot's resolver
     * (sysio.uwrit::try_select_winner) reconstructs the digest, verifies
     * the signature against the underwriter's account permissions, and
     * promotes the underwriter to winner iff both legs' signatures verify

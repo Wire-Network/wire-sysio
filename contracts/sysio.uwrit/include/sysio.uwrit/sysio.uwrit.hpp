@@ -493,8 +493,8 @@ namespace sysio {
       /// leg of a dual-COMMIT pair arrived so `try_select_winner` can
       /// resolve the race deterministically. Each leg's COMMIT is an
       /// independent attestation with its own chain_code + uw_ext_chain_addr
-      /// (the authenticated transaction caller on that leg's outpost) + signature
-      /// over the whole UIC. The depot stores the full UIC bytes per leg so
+      /// (signed external-chain signer metadata for that leg) + signature over
+      /// the whole UIC. The depot stores the full UIC bytes per leg so
       /// `try_select_winner` can reconstruct the signed digest verbatim and
       /// verify a canonical fixed-size recoverable K1, R1, EM, or ED signature
       /// against the underwriter's WIRE account `active` or `owner` permission.
