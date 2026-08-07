@@ -142,9 +142,9 @@ struct uw_request {
    /// identifiers for the depot's `rcrdcommit` routing and the
    /// `UnderwriteIntentCommit` (`chain_code` / `token_code` / `reserve_code`)
    /// payload populated in `create_signed_uic_bytes`. The `ChainKind` /
-   /// `TokenKind` siblings above are retained only for credit-line bucketing
-   /// against `sysio.opreg::operators.balances`, which still surfaces those
-   /// enums for now.
+   /// `TokenKind` siblings above are retained for VM-family dispatch and
+   /// human-readable diagnostics; collateral bucketing uses the exact slug
+   /// codes below.
    fc::slug_name            src_chain_code{};
    fc::slug_name            src_token_code{};
    fc::slug_name            src_reserve_code{};
