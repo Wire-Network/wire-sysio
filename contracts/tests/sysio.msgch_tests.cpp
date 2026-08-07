@@ -6,6 +6,8 @@
 #include <fc/variant_object.hpp>
 #include <fc/slug_name.hpp>
 
+#include <array>
+
 #include "contracts.hpp"
 #include <sysio/chain/action.hpp>
 
@@ -397,8 +399,17 @@ constexpr auto UNCOVERED_TEST_ATTESTATION_TYPE = opp::types::ATTESTATION_TYPE_ST
 constexpr uint32_t RETIRED_STAKE_ATTESTATION_VALUE = 3001;
 /// Raw protobuf wire slot used only to seed the pre-upgrade READY-row shape.
 constexpr uint32_t RETIRED_UNSTAKE_ATTESTATION_VALUE = 3002;
+/// Former OPERATOR_REG_DEREG slot used to cover a non-staking retirement.
+constexpr uint32_t RETIRED_OPERATOR_REG_DEREG_ATTESTATION_VALUE = 60931;
+/// Exhaustive retired AttestationType slots mirrored from the protobuf schema.
+constexpr std::array<uint32_t, 17> RETIRED_ATTESTATION_VALUES{
+   RETIRED_STAKE_ATTESTATION_VALUE, RETIRED_UNSTAKE_ATTESTATION_VALUE,
+   60929, RETIRED_OPERATOR_REG_DEREG_ATTESTATION_VALUE, 60933,
+   60935, 60936, 60937, 60938, 60939, 60940, 60941, 60942,
+   60946, 60948, 60954, 60957
+};
 /// Maximum retired READY rows pruned during one deterministic build call.
-constexpr uint32_t RETIRED_STAKING_PRUNE_LIMIT     = 32;
+constexpr uint32_t RETIRED_ATTESTATION_PRUNE_LIMIT = 32;
 
 /// Decode the emitted OPP envelope and count attestations in its single message.
 uint32_t emitted_attestation_count(const fc::variant& emitted_row) {
@@ -442,28 +453,29 @@ BOOST_FIXTURE_TEST_CASE(buildenv_writes_envlog_row, sysio_msgch_envlog_tester) {
    BOOST_REQUIRE_EQUAL(31337u, row["endpoints"]["end"]["id"]["value"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
-/// READY rows written by a pre-upgrade contract with a retired staking wire
-/// value are tombstoned before destination-specific envelope construction.
+/// READY rows written by pre-upgrade contracts with any retired wire value
+/// are tombstoned before destination-specific envelope construction.
 /// Active rows behind the tombstone still emit normally, so one legacy row
 /// cannot strand the queue or reach an outpost decoder.
-BOOST_FIXTURE_TEST_CASE(buildenv_tombstones_retired_staking_rows,
+BOOST_FIXTURE_TEST_CASE(buildenv_tombstones_all_retired_attestation_rows,
                         sysio_msgch_envlog_tester) { try {
    bootstrap_epoch_config(/*retention=*/200);
    register_outpost(opp::types::CHAIN_KIND_EVM, 31337);
    produce_blocks();
 
-   BOOST_REQUIRE_EQUAL(success(),
-      queueout(/*chain_code=*/ETH_OUTPOST_ID, RETIRED_STAKE_ATTESTATION_VALUE));
-   BOOST_REQUIRE_EQUAL(success(),
-      queueout(/*chain_code=*/ETH_OUTPOST_ID, RETIRED_UNSTAKE_ATTESTATION_VALUE));
+   for (const auto retired_value : RETIRED_ATTESTATION_VALUES) {
+      BOOST_REQUIRE_EQUAL(success(),
+         queueout(/*chain_code=*/ETH_OUTPOST_ID, retired_value));
+   }
    BOOST_REQUIRE_EQUAL(success(),
       queueout(/*chain_code=*/ETH_OUTPOST_ID, EVM_TEST_ATTESTATION_TYPE));
-   BOOST_REQUIRE_EQUAL(3u, count_ready_attestations(ETH_OUTPOST_ID, 8));
+   BOOST_REQUIRE_EQUAL(RETIRED_ATTESTATION_VALUES.size() + 1,
+                       count_ready_attestations(ETH_OUTPOST_ID, 32));
 
    BOOST_REQUIRE_EQUAL(success(), buildenv(/*chain_code=*/ETH_OUTPOST_ID));
    produce_blocks();
 
-   BOOST_REQUIRE_EQUAL(0u, count_ready_attestations(ETH_OUTPOST_ID, 8));
+   BOOST_REQUIRE_EQUAL(0u, count_ready_attestations(ETH_OUTPOST_ID, 32));
    const auto emitted = find_outbound_envelope();
    BOOST_REQUIRE(!emitted.is_null());
    BOOST_REQUIRE_EQUAL(1u, emitted_attestation_count(emitted));
@@ -472,7 +484,7 @@ BOOST_FIXTURE_TEST_CASE(buildenv_tombstones_retired_staking_rows,
 /// A retired row at the end of the READY index is safe to erase. In
 /// particular, `erase` returning the index end iterator must not be
 /// incremented or dereferenced by the collection loop.
-BOOST_FIXTURE_TEST_CASE(buildenv_tombstones_last_retired_staking_row,
+BOOST_FIXTURE_TEST_CASE(buildenv_tombstones_last_retired_attestation_row,
                         sysio_msgch_envlog_tester) { try {
    bootstrap_epoch_config(/*retention=*/200);
    register_outpost(opp::types::CHAIN_KIND_EVM, 31337);
@@ -491,9 +503,9 @@ BOOST_FIXTURE_TEST_CASE(buildenv_tombstones_last_retired_staking_row,
 
 /// Tombstones are removed before destination-specific collection. Current
 /// queueout correctly refuses to create an invalid legacy SVM row, so queue
-/// through the EVM-compatible path and retarget the stored row to recreate
-/// the pre-upgrade SVM state. A Solana build must remove it before the dynamic
-/// account estimator sees the unknown type.
+/// through the EVM-compatible path and retarget a non-staking retired row to
+/// recreate the pre-upgrade SVM state. A Solana build must remove it before
+/// the dynamic account estimator sees the unknown type.
 BOOST_FIXTURE_TEST_CASE(buildenv_tombstone_cleanup_precedes_svm_estimation,
                         sysio_msgch_envlog_tester) { try {
    bootstrap_epoch_config(/*retention=*/200);
@@ -502,7 +514,7 @@ BOOST_FIXTURE_TEST_CASE(buildenv_tombstone_cleanup_precedes_svm_estimation,
    produce_blocks();
 
    BOOST_REQUIRE_EQUAL(success(),
-      queueout(/*chain_code=*/ETH_OUTPOST_ID, RETIRED_STAKE_ATTESTATION_VALUE));
+      queueout(/*chain_code=*/ETH_OUTPOST_ID, RETIRED_OPERATOR_REG_DEREG_ATTESTATION_VALUE));
    retarget_attestation_for_upgrade_test(/*id=*/1, /*chain_code=*/SOL_OUTPOST_ID);
    BOOST_REQUIRE_EQUAL(success(),
       queueout(/*chain_code=*/SOL_OUTPOST_ID, EVM_TEST_ATTESTATION_TYPE));
@@ -519,13 +531,13 @@ BOOST_FIXTURE_TEST_CASE(buildenv_tombstone_cleanup_precedes_svm_estimation,
 /// Cleanup is capped per action so an upgrade cannot turn an epoch advance
 /// into an unbounded erase sweep. Rows beyond the cap remain READY but are
 /// skipped as candidates, while an active row behind them still emits.
-BOOST_FIXTURE_TEST_CASE(buildenv_bounds_retired_staking_row_cleanup,
+BOOST_FIXTURE_TEST_CASE(buildenv_bounds_retired_attestation_row_cleanup,
                         sysio_msgch_envlog_tester) { try {
    bootstrap_epoch_config(/*retention=*/200);
    register_outpost(opp::types::CHAIN_KIND_EVM, 31337);
    produce_blocks();
 
-   for (uint32_t i = 0; i < RETIRED_STAKING_PRUNE_LIMIT + 1; ++i) {
+   for (uint32_t i = 0; i < RETIRED_ATTESTATION_PRUNE_LIMIT + 1; ++i) {
       BOOST_REQUIRE_EQUAL(success(),
          queueout_with_data(
             /*chain_code=*/ETH_OUTPOST_ID,

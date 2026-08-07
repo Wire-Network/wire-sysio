@@ -74,11 +74,15 @@ message WireTokenPurchase {
 
 message OperatorAction {
   enum ActionType {
+    reserved 5;
+    reserved "ACTION_TYPE_WITHDRAW_CONFIRMED";
+
     ACTION_TYPE_UNKNOWN          = 0;
     ACTION_TYPE_DEPOSIT_REQUEST  = 1;
     ACTION_TYPE_WITHDRAW_REQUEST = 2;
     ACTION_TYPE_WITHDRAW_REMIT   = 3;
     ACTION_TYPE_SLASH            = 4;
+    // Slot 5 was ACTION_TYPE_WITHDRAW_CONFIRMED; the confirmation stage was removed.
   };
   ActionType                       action_type = 1;
   // Operator's outpost-chain identity (full chain public key).

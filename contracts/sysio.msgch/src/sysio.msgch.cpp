@@ -14,6 +14,7 @@
 #include <sysio/opp/attestations/attestations.pb.hpp>
 #include <zpp_bits.h>
 #include <algorithm>
+#include <array>
 #include <magic_enum/magic_enum.hpp>
 #include <optional>
 
@@ -82,21 +83,24 @@ constexpr size_t   ATTESTATION_OVERHEAD_BYTES = 24;
 /// + payload preamble, and a safety margin for `zpp::bits` length prefixes.
 constexpr size_t   ENVELOPE_BASELINE_BYTES    = 512;
 
-/// Retired pre-launch attestation wire slots. They remain recognizable here
-/// only so an upgraded contract can tombstone READY rows queued by the prior
-/// implementation instead of forwarding them or blocking envelope creation.
-constexpr int32_t RETIRED_STAKE_ATTESTATION_VALUE   = 3001;
-constexpr int32_t RETIRED_UNSTAKE_ATTESTATION_VALUE = 3002;
+/// Retired attestation wire slots from the numeric `reserved` declarations in
+/// `libraries/opp/proto/sysio/opp/types/types.proto`. They remain recognizable
+/// here only so an upgraded contract can tombstone READY rows queued by prior
+/// implementations instead of forwarding them or blocking envelope creation.
+constexpr std::array<int32_t, 17> RETIRED_ATTESTATION_VALUES{
+   3001, 3002, 60929, 60931, 60933, 60935, 60936, 60937, 60938,
+   60939, 60940, 60941, 60942, 60946, 60948, 60954, 60957
+};
 
 /// Bound legacy-row cleanup work performed by one buildenv action. Remaining
 /// tombstones stay READY for a later call but are never envelope candidates.
-constexpr size_t MAX_RETIRED_STAKING_PRUNE_PER_BUILD = 32;
+constexpr size_t MAX_RETIRED_ATTESTATION_PRUNE_PER_BUILD = 32;
 
-/// Return true when an attestation carries a retired pre-launch staking slot.
-bool is_retired_staking_attestation(AttestationType type) {
+/// Return true when an attestation carries any retired protobuf wire slot.
+bool is_retired_attestation(AttestationType type) {
    const auto value = magic_enum::enum_integer(type);
-   return value == RETIRED_STAKE_ATTESTATION_VALUE ||
-          value == RETIRED_UNSTAKE_ATTESTATION_VALUE;
+   return std::find(RETIRED_ATTESTATION_VALUES.begin(), RETIRED_ATTESTATION_VALUES.end(), value) !=
+          RETIRED_ATTESTATION_VALUES.end();
 }
 
 using namespace sysio::msgch_svm_terminal_budget;
@@ -1721,19 +1725,19 @@ void msgch::buildenv(uint64_t chain_code) {
    std::vector<uint64_t>              candidate_ids;
 
    auto status_idx = atts.get_index<"bystatus"_n>();
-   size_t retired_staking_pruned = 0;
+   size_t retired_pruned = 0;
    for (auto it = status_idx.lower_bound(
            static_cast<uint64_t>(AttestationStatus::ATTESTATION_STATUS_READY));
         it != status_idx.end() &&
         it->status == AttestationStatus::ATTESTATION_STATUS_READY; ) {
-      // Upgrade tombstone: legacy builds could persist STAKE / UNSTAKE rows.
+      // Upgrade tombstone: legacy builds could persist retired protocol rows.
       // Erase them before destination-specific estimation so neither the SVM
       // terminal-account gate nor an outpost decoder can be blocked by a
       // protocol value that no longer has a generated enum/message type.
-      if (is_retired_staking_attestation(it->type)) {
-         if (retired_staking_pruned < MAX_RETIRED_STAKING_PRUNE_PER_BUILD) {
+      if (is_retired_attestation(it->type)) {
+         if (retired_pruned < MAX_RETIRED_ATTESTATION_PRUNE_PER_BUILD) {
             it = status_idx.erase(std::move(it));
-            ++retired_staking_pruned;
+            ++retired_pruned;
          } else {
             ++it;
          }

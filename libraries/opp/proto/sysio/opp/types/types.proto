@@ -13,12 +13,15 @@ option cc_enable_arenas = true;
 // ---------------------------------------------------------------------------
 
 enum ChainKind  {
+  reserved 4;
+  reserved "CHAIN_KIND_SUI";
+
   CHAIN_KIND_UNKNOWN = 0;
   CHAIN_KIND_WIRE    = 1;   // The WIRE depot itself (singleton; Chain.code = "WIRE")
   CHAIN_KIND_EVM     = 2;   // All EVM-compatible chains (Ethereum, Polygon, BSC, Arbitrum, Optimism, Base, …)
   CHAIN_KIND_SVM     = 3;   // Solana Virtual Machine chains (Solana mainnet, Eclipse, …)
 
-  // Slots 4+ reserved. Slot 4 was previously CHAIN_KIND_SUI; do not reuse.
+  // Slot 4 was previously CHAIN_KIND_SUI; do not reuse.
 }
 
 // Chain instance identifier — used by `Envelope.Endpoints` to identify
@@ -102,6 +105,8 @@ enum UnderwriteRequestStatus {
 // ---------------------------------------------------------------------------
 
 enum TokenKind {
+  reserved 256 to 259, 496, 512, 752;
+
   TOKEN_KIND_UNKNOWN  = 0;
   TOKEN_KIND_NATIVE   = 1;   // chain-native asset (ETH on EVM, SOL on SVM, WIRE on WIRE)
   TOKEN_KIND_ERC20    = 2;
@@ -371,10 +376,13 @@ enum AttestationStatus {
 }
 
 enum UnderwriteStatus {
+  reserved 4;
+
   UNDERWRITE_STATUS_INTENT_CREATED   = 0;
   UNDERWRITE_STATUS_INTENT_SUBMITTED = 1;
   UNDERWRITE_STATUS_INTENT_CONFIRMED = 2;
   UNDERWRITE_STATUS_READY            = 3;
+  // Slot 4 was UNDERWRITE_STATUS_SLASHED before that state moved to 10; do not reuse.
   UNDERWRITE_STATUS_RELEASED         = 5;
   UNDERWRITE_STATUS_SLASHED          = 10;
   // Candidate-specific, pre-settlement invalidity in the underwriter race (bad
