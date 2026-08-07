@@ -94,6 +94,7 @@ constexpr auto destination_chain_code = "dst_chain_code";
 constexpr auto destination_token_code = "dst_token_code";
 constexpr auto destination_reserve_code = "dst_reserve_code";
 constexpr auto destination_amount     = "dst_amount";
+constexpr auto target_amount          = "target_amount";
 constexpr auto variance_tolerance_bps = "variance_tolerance_bps";
 constexpr auto commits_by             = "commits_by";
 constexpr auto source_transaction_id  = "source_tx_id";
@@ -1440,7 +1441,8 @@ struct underwriter_plugin::impl {
          if (!obj.contains(uwrit::request_field::source_chain_code) ||
              !obj.contains(uwrit::request_field::source_amount) ||
              !obj.contains(uwrit::request_field::destination_chain_code) ||
-             !obj.contains(uwrit::request_field::destination_amount)) {
+             !obj.contains(uwrit::request_field::destination_amount) ||
+             !obj.contains(uwrit::request_field::target_amount)) {
             // Row not yet populated (createuwreq writes them inline so this
             // should be unreachable for SWAP-derived UWREQs). Skip safely.
             continue;
@@ -1463,6 +1465,8 @@ struct underwriter_plugin::impl {
             uwrit::request_field::destination_reserve_code);
          req.dst_amount = obj[
             uwrit::request_field::destination_amount].as_uint64();
+         req.target_amount = obj[
+            uwrit::request_field::target_amount].as_uint64();
          req.variance_tolerance_bps = obj.contains(
             uwrit::request_field::variance_tolerance_bps)
             ? static_cast<uint32_t>(obj[
