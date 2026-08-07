@@ -514,7 +514,7 @@ void outpost_ethereum_client_plugin::set_program_options(options_description& cl
        boost::program_options::value<std::vector<std::string>>()->multitoken(),
        "Legacy outpost Ethereum client spec: "
        "<client-id>,<signature-provider-id>,<rpc-url>[,<chain-id>]. A three-field spec resolves "
-       "eth_chainId during startup; a four-field chain id is locally authoritative.")
+       "eth_chainId during startup; a four-field chain id controls signing and is verified against the endpoint.")
       (option_name_client_config_file,
        boost::program_options::value<std::filesystem::path>(),
        "Versioned protobuf-JSON outpost Ethereum client configuration file. Cannot be combined "

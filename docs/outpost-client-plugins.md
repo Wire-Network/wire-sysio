@@ -32,7 +32,8 @@ resource policy.
 
 The signer reference is validated during startup and must identify an explicit Ethereum
 `--signature-provider`; anonymous signature-provider specs cannot be referenced. File-configured
-chain IDs are locally authoritative, so startup does not call `eth_chainId` for them.
+chain IDs are locally authoritative for signing, and startup verifies them against `eth_chainId`
+reported by the configured RPC endpoint.
 
 The legacy option remains available and cannot be combined with the file option:
 
@@ -40,10 +41,10 @@ The legacy option remains available and cannot be combined with the file option:
 --outpost-ethereum-client eth-anvil-local,eth-01,http://localhost:8545,31337
 ```
 
-The four-field legacy form also treats its chain ID as locally authoritative. The historical
-three-field form remains compatible by resolving `eth_chainId` during startup under a shared
-five-second deadline. Legacy clients receive `UINT256_MAX` expenditure caps, with the same
-compatibility-only warning above.
+The four-field legacy form also treats its chain ID as locally authoritative for signing and
+verifies it against the configured RPC endpoint. The historical three-field form remains
+compatible by resolving `eth_chainId` during startup under a shared five-second deadline. Legacy
+clients receive `UINT256_MAX` expenditure caps, with the same compatibility-only warning above.
 
 Every signing-capable client enforces its local policy after the transaction is fully assembled
 and immediately before signing. A rejected transaction is neither signed nor broadcast.

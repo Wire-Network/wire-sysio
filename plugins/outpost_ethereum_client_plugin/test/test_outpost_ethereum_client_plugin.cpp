@@ -21,6 +21,7 @@
 #include <fc/network/ethereum/ethereum_client.hpp>
 #include <fc/network/ethereum/ethereum_abi.hpp>
 #include <fc/network/ethereum/ethereum_rlp_encoder.hpp>
+#include <fc/network/http/http_client.hpp>
 
 #include <sysio/chain/types.hpp>
 #include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
@@ -166,6 +167,8 @@ constexpr std::string_view emit_outbound_envelope_selector = "a3ad9cc3";
 constexpr std::string_view test_opp_address = "5FbDB2315678afecb367f032d93F642f64180aa3";
 constexpr std::string_view latest_slot_test_rpc_url = "http://127.0.0.1:1";
 constexpr std::string_view http_scheme_prefix = "http://";
+/** Prefix identifying the bounded transport category in chain-id startup diagnostics. */
+constexpr std::string_view last_failure_detail_prefix = "last_failure=";
 constexpr std::string_view latest_slot_test_entry_id = "latest-slot-test";
 constexpr std::string_view latest_slot_test_private_key =
    "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80";
@@ -456,7 +459,14 @@ BOOST_AUTO_TEST_CASE(startup_rejects_unavailable_rpc_after_bounded_grace) {
       const auto detail = rejection.to_detail_string();
       BOOST_CHECK(detail.find("client-a") != std::string::npos);
       BOOST_CHECK(detail.find("endpoint=" + safe_endpoint) != std::string::npos);
-      BOOST_CHECK(detail.find("last_failure=io") != std::string::npos);
+      const auto io_failure =
+         std::string(last_failure_detail_prefix) +
+         std::string(fc::http::failure_kind_name(fc::http::failure_kind::io));
+      const auto connect_failure =
+         std::string(last_failure_detail_prefix) +
+         std::string(fc::http::failure_kind_name(fc::http::failure_kind::connect));
+      BOOST_CHECK(detail.find(io_failure) != std::string::npos ||
+                  detail.find(connect_failure) != std::string::npos);
       BOOST_CHECK(detail.find("super-secret") == std::string::npos);
       BOOST_CHECK(detail.find("token=secret") == std::string::npos);
    }
