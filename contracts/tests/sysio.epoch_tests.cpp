@@ -294,6 +294,29 @@ BOOST_FIXTURE_TEST_CASE(regchain_wire_requires_canonical_code, sysio_epoch_teste
       .find("already") != std::string::npos);
 } FC_LOG_AND_RETHROW() }
 
+/// The reservation is BIDIRECTIONAL. Enforcing only "kind WIRE => code WIRE" still admits
+/// `regchain(EVM, "WIRE", ...)`, and because chain codes are unique with NO erase action that
+/// row would permanently squat the depot's identity — leaving the canonical self-row
+/// unregisterable and bootstrap bricked with no on-chain recovery. Ordering is the whole point
+/// of this case: the squat is attempted BEFORE the depot row exists.
+BOOST_FIXTURE_TEST_CASE(regchain_wire_code_reserved_from_other_kinds, sysio_epoch_tester) { try {
+   BOOST_REQUIRE(regchain(ChainKind::CHAIN_KIND_EVM, "WIRE", 1)
+      .find("the code WIRE is reserved for the depot self-row") != std::string::npos);
+   BOOST_REQUIRE(regchain(ChainKind::CHAIN_KIND_SVM, "WIRE", 0)
+      .find("the code WIRE is reserved for the depot self-row") != std::string::npos);
+
+   // Nothing squatted the code, so the canonical depot row still registers.
+   BOOST_REQUIRE_EQUAL(success(), regchain(ChainKind::CHAIN_KIND_WIRE, "WIRE", 0));
+   produce_blocks();
+
+   auto row = get_chain("WIRE");
+   BOOST_REQUIRE(!row.is_null());
+   BOOST_REQUIRE_EQUAL(true, row["is_depot"].as<bool>());
+
+   // Non-WIRE codes are unaffected by the reservation.
+   BOOST_REQUIRE_EQUAL(success(), regchain(ChainKind::CHAIN_KIND_EVM, "ETH", 1));
+} FC_LOG_AND_RETHROW() }
+
 /// `name` and `description` persist into a row billed to the shared `sysio` RAM pool, so both
 /// are bounded before emplace. CertiK WNS-10 raised this for `sysio.tokens::regtoken`; the same
 /// unbounded pair existed on `sysio.chains::regchain` and `sysio.reserv::regreserve`, and all

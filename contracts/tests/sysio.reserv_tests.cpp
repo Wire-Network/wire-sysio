@@ -664,6 +664,44 @@ BOOST_FIXTURE_TEST_CASE(oncrtreserve_oversized_metadata_is_cancelled, sysio_rese
    BOOST_REQUIRE_EQUAL(std::string(32, 'x'), r["name"].as_string());
 } FC_LOG_AND_RETHROW() }
 
+// The tombstone clamp must land on a UTF-8 code-point boundary. A byte-wise resize would cut
+// this 33-byte label — 31 ASCII plus `é` (0xC3 0xA9) — at byte 32, keeping a lone 0xC3 lead
+// byte and persisting malformed text in chain state. The straddling character is dropped whole,
+// so the stored label is the 31 ASCII bytes.
+BOOST_FIXTURE_TEST_CASE(oncrtreserve_metadata_clamp_respects_utf8, sysio_reserve_tester) { try {
+   deploy_authex();
+
+   auto creator_priv = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em);
+   auto creator_pub  = creator_priv.get_public_key();
+   BOOST_REQUIRE_EQUAL(success(),
+      recordlink_em("alice"_n, ChainKind::CHAIN_KIND_EVM, creator_pub));
+
+   const std::string ascii_head(31, 'x');
+   const std::string multibyte_name = ascii_head + "\xC3\xA9";   // 33 bytes, 32 code points
+   BOOST_REQUIRE_EQUAL(33u, multibyte_name.size());
+
+   BOOST_REQUIRE_EQUAL(success(), push_action(MSGCH_ACCOUNT, "oncrtreserve"_n, mvo()
+      ("chain_code",            codename_mvo("ETH"))
+      ("token_code",            codename_mvo("ETH"))
+      ("reserve_code",          codename_mvo("USERRES"))
+      ("name",                  multibyte_name)
+      ("description",           "")
+      ("external_token_amount", 1000)
+      ("requested_wire_amount", 1000)
+      ("source_token_precision", 9u)
+      ("connector_weight_bps",  5000)
+      ("creator_chain_kind",    ChainKind::CHAIN_KIND_EVM)
+      ("creator_chain_addr",    std::vector<char>(20, '\x01'))
+      ("is_private",            false)
+      ("creator_pub_key",       em_pubkey_bytes(creator_pub))));
+
+   auto r = find_reserve("ETH", "ETH", "USERRES");
+   BOOST_REQUIRE(!r.is_null());
+   BOOST_REQUIRE_EQUAL("RESERVE_STATUS_CANCELLED", r["status"].as_string());
+   // 31 bytes, not 32 — the split `é` is dropped rather than half-stored.
+   BOOST_REQUIRE_EQUAL(ascii_head, r["name"].as_string());
+} FC_LOG_AND_RETHROW() }
+
 // ── matchreserve (gating preconditions) ──
 
 BOOST_FIXTURE_TEST_CASE(matchreserve_rejects_unknown_reserve, sysio_reserve_tester) { try {

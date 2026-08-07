@@ -56,12 +56,18 @@ void chains::regchain(opp::types::ChainKind kind,
    sysio::check(tbl.find(pk) == tbl.end(),
                 "sysio.chains: chain code already registered");
 
-   // Enforce: the depot self-row is unique AND canonically coded.
+   // Enforce: the code `WIRE` and `CHAIN_KIND_WIRE` are reserved FOR EACH OTHER, and the
+   // depot self-row is unique.
    //
-   // `is_depot` is derived from the KIND alone below, so the code half of bootstrap
-   // invariant V3 has to be enforced here or a registration could claim depot identity
-   // under any code (e.g. `FAKE`) -- previously only the cardinality half was on-chain
-   // and the code depended entirely on the off-chain config validator.
+   // Forward: `is_depot` is derived from the KIND alone below, so kind=WIRE must carry the
+   // canonical code or a row could claim depot identity under any code (e.g. `FAKE`) --
+   // previously only the cardinality half of bootstrap invariant V3 was on-chain and the code
+   // rested entirely on the off-chain config validator.
+   //
+   // Inverse: chain codes are unique and there is NO erase action, so a non-WIRE row
+   // registered under the code `WIRE` would permanently squat the depot's identity and leave
+   // the canonical row unregisterable -- bricking bootstrap with no on-chain recovery. Both
+   // directions are needed; the forward check alone still admits `regchain(EVM, "WIRE", ...)`.
    if (kind == opp::types::CHAIN_KIND_WIRE) {
       sysio::check(code == WIRE_CHAIN_CODE,
                    "sysio.chains: a WIRE chain must use the code WIRE");
@@ -70,6 +76,9 @@ void chains::regchain(opp::types::ChainKind kind,
       const auto wire_kind_value = magic_enum::enum_integer(opp::types::CHAIN_KIND_WIRE);
       sysio::check(by_kind_idx.lower_bound(wire_kind_value) == by_kind_idx.upper_bound(wire_kind_value),
                    "sysio.chains: a WIRE chain (depot self-row) already exists");
+   } else {
+      sysio::check(code != WIRE_CHAIN_CODE,
+                   "sysio.chains: the code WIRE is reserved for the depot self-row");
    }
 
    // Enforce: EVM rows are unique per `external_chain_id`. The pair (kind, external_chain_id)

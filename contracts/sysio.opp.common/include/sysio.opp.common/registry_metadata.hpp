@@ -78,19 +78,36 @@ inline bool metadata_exceeds_bounds(std::string_view label, std::string_view des
    return label.size() > label_max_bytes || description.size() > description_max_bytes;
 }
 
+/**
+ * @brief Trim `s` to at most `max_bytes`, never splitting a UTF-8 character.
+ *
+ * A byte-wise `resize` cuts at a byte offset, not a code-point boundary: a 33-byte label of
+ * 31 ASCII bytes plus `é` (0xC3 0xA9) clamped to 32 would keep a lone 0xC3 lead byte and
+ * persist malformed text in state. Backing off to the previous boundary drops the straddling
+ * character whole. The BOUND itself stays a byte bound -- it exists to cap state size.
+ */
+inline std::string clamp_utf8(std::string s, std::size_t max_bytes) {
+   if (s.size() <= max_bytes) return s;
+   // `s[cut]` is the first dropped byte. While it is a continuation byte (10xxxxxx) the
+   // character straddling the boundary is being split, so walk back onto its lead byte and
+   // drop the whole sequence. Terminates at 0 in the worst case.
+   std::size_t cut = max_bytes;
+   while (cut > 0 && (static_cast<unsigned char>(s[cut]) & 0xC0) == 0x80) --cut;
+   s.resize(cut);
+   return s;
+}
+
 /// Clamp a label for storage on a reject-path tombstone row. The tombstone still lands in
 /// `sysio`-billed state, so an over-bound string must be truncated rather than stored
 /// verbatim — otherwise rejecting an oversized registration would persist exactly the
 /// state the bound exists to prevent.
 inline std::string truncate_label(std::string label) {
-   if (label.size() > label_max_bytes) label.resize(label_max_bytes);
-   return label;
+   return clamp_utf8(std::move(label), label_max_bytes);
 }
 
 /// Clamp a description for storage on a reject-path tombstone row. See `truncate_label`.
 inline std::string truncate_description(std::string description) {
-   if (description.size() > description_max_bytes) description.resize(description_max_bytes);
-   return description;
+   return clamp_utf8(std::move(description), description_max_bytes);
 }
 
 } // namespace sysio::opp::registry
