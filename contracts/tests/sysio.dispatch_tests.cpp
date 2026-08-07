@@ -2438,7 +2438,8 @@ BOOST_FIXTURE_TEST_CASE(swap_underbonded_candidate_cannot_terminally_reject,
    for (const auto& c : req["commits_by"].get_array()) {
       if (c["underwriter"].as_string() == UWRIT_OP.to_string()) {
          BOOST_REQUIRE_EQUAL("UNDERWRITE_STATUS_DISQUALIFIED", c["status"].as_string());
-         bond_dq = c["reason"].as_string().find("insufficient bond") != std::string::npos;
+         bond_dq = c["reason"].as_string().find(
+            "insufficient available collateral") != std::string::npos;
       }
    }
    BOOST_REQUIRE(bond_dq);
@@ -4021,10 +4022,11 @@ BOOST_FIXTURE_TEST_CASE(swap_same_token_legs_overcommit_disqualifies_candidate,
 
 // Reserve liquidity belongs to the request, not to an underwriter candidate.
 // If it changes after request admission but before the second UIC reaches the
-// depot, changing candidates cannot make settlement possible. The authoritative
-// attempt therefore rejects/refunds the request and releases compact candidate
+// depot, the live AMM re-quote turns the drain into price drift before the
+// defensive raw-liquidity precheck. A fully bonded candidate may therefore
+// trigger the request-level rejection/refund, releasing compact candidate
 // metadata instead of leaving a complete row with no retry or wake-up path.
-BOOST_FIXTURE_TEST_CASE(swap_race_time_reserve_shortfall_rejects_request,
+BOOST_FIXTURE_TEST_CASE(swap_race_time_reserve_drain_rejects_request,
                         sysio_dispatch_tester) { try {
    bootstrap_for_dispatch();
    BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT,
@@ -4056,10 +4058,10 @@ BOOST_FIXTURE_TEST_CASE(swap_race_time_reserve_shortfall_rejects_request,
       std::vector<char>(32, '\x0b'));
    BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, eth, sr));
 
-   // The request was admitted against 1e12 units. Leave the destination one
-   // unit short only after admission, while its two UICs are notionally in
-   // flight. The resulting live AMM quote remains positive, so resolution
-   // reaches the explicit reserve-liquidity precheck.
+   // The request was admitted against 1e12 units. Drain the destination only
+   // after admission, while its two UICs are notionally in flight. The live
+   // quote remains positive but falls outside the fixed target's tolerance, so
+   // the candidate passes its bond gate before the request is rejected.
    constexpr uint64_t SEEDED_RESERVE = 1'000'000'000'000ull;
    BOOST_REQUIRE_EQUAL(success(), debit_reserve_chain(
       "SOLANA", "SOL", "PRIMARY", SEEDED_RESERVE - (AMOUNT - 1)));
@@ -4081,7 +4083,7 @@ BOOST_FIXTURE_TEST_CASE(swap_race_time_reserve_shortfall_rejects_request,
    BOOST_REQUIRE_EQUAL("UNDERWRITE_STATUS_RELEASED",
                        candidate["status"].as_string());
    BOOST_CHECK_NE(std::string::npos,
-                  candidate["reason"].as_string().find("reserves cannot settle"));
+                  candidate["reason"].as_string().find("variance drift"));
    BOOST_REQUIRE(candidate["source_uic_bytes"].as_string().empty());
    BOOST_REQUIRE(candidate["dest_uic_bytes"].as_string().empty());
    BOOST_REQUIRE(get_lock(1).is_null());
