@@ -318,6 +318,8 @@ void chalg::openuwchal(name challenger, uint64_t uwreq_id, name underwriter,
    // (never static_cast — out-of-range would be UB and hide bad input).
    const auto fault = magic_enum::enum_cast<underwrite_fault_reason>(reason);
    check(fault.has_value(), "openuwchal: unknown fault reason");
+   check(detail.size() <= max_uwchal_detail_bytes,
+         "openuwchal: detail exceeds max_uwchal_detail_bytes");
 
    // The challenged commitment: a CONFIRMED uwreq whose recorded winner is `underwriter`.
    uwrit::uwreqs_t reqs(UWRIT_ACCOUNT);
@@ -402,6 +404,12 @@ void chalg::voteuwchal(name owner, uint64_t chal_id, uint8_t ballot) {
    uwchals_t chals(get_self());
    auto c = chals.get(uwchal_key{chal_id}, "challenge not found");
    check(c.status == DisputeStatus::DISPUTE_STATUS_OPEN, "challenge is not open");
+
+   // Ballots are valid only inside the challenge window. Past deadline_ms the sole lawful
+   // outcome is LAPSED (there is deliberately no after-deadline relaxed tally), so a late
+   // quorum must not be assemblable for a manual chkuwchal crank in the gap between expiry
+   // and the next epoch-tick poke.
+   check(current_time_ms() < c.deadline_ms, "voteuwchal: the challenge window has expired");
 
    // Voter eligibility: membership in the challenge's snapshotted Tier-1 electorate — the same
    // list chkuwchal's quorum is measured against, so a voter the tally would not count can never

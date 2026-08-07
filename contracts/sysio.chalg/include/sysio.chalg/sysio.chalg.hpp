@@ -348,6 +348,12 @@ namespace sysio {
       /// majority of the dispute's snapshotted electorate) can resolve; after it, the denominator
       /// relaxes to a quorum of cast votes plus a strict majority of cast votes.
       static constexpr uint32_t dispute_deadline_sec = 24 * 60 * 60;
+
+      /// Upper bound on `openuwchal`'s caller-controlled `detail` note. The uwchals audit row is
+      /// retained indefinitely with RAM billed to this contract, and the bond returns on every
+      /// non-forfeit outcome — uncapped, recycled bond capital could persist near-arbitrary
+      /// payloads. 1 KiB keeps the allegation note useful while bounding the amplification.
+      static constexpr size_t max_uwchal_detail_bytes = 1024;
    };
 
 } // namespace sysio

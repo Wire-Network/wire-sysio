@@ -3279,6 +3279,11 @@ BOOST_FIXTURE_TEST_CASE(openuwchal_guards, sysio_uwchal_tester) { try {
                     .find("not this request's winner") != std::string::npos);
    BOOST_REQUIRE(openuwchal(CHALLENGER, ATT_ID, UWRIT_OP, /*reason*/ 99, "x")
                     .find("unknown fault reason") != std::string::npos);
+   // The caller-controlled detail note is retained on the audit row indefinitely (RAM billed to
+   // the contract) — the byte cap refuses the filing before any escrow moves.
+   BOOST_REQUIRE(openuwchal(CHALLENGER, ATT_ID, UWRIT_OP, REASON_DEPOSIT_MISSING,
+                            std::string(1024 + 1, 'x'))
+                    .find("detail exceeds max_uwchal_detail_bytes") != std::string::npos);
 
    // Time-travel past the 12h window: the commitment is no longer challengeable, and the locks
    // release healthy on the next sweep. Seal the pending block FIRST — a big skip aborts pending
@@ -3431,6 +3436,11 @@ BOOST_FIXTURE_TEST_CASE(chklocks_skips_held_lock_and_lapse_refunds, sysio_uwchal
 
    produce_blocks();             // seal pending before the jump (see openuwchal_guards)
    produce_block(fc::hours(13)); // past both the lock expiry and therefore the vote deadline
+
+   // Past the deadline the ballot door is closed: a late quorum can never be assembled for a
+   // manual chkuwchal crank in the expiry→sweep gap — the only remaining outcome is LAPSED.
+   BOOST_REQUIRE(voteuwchal(VOTER2, 1, BALLOT_UPHOLD)
+                    .find("the challenge window has expired") != std::string::npos);
 
    // First sweep: the held locks are SKIPPED (still present), the poke lapses the challenge.
    BOOST_REQUIRE_EQUAL(success(), chklocks());
