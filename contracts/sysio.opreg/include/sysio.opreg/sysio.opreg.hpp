@@ -145,9 +145,11 @@ namespace sysio {
       static constexpr uint32_t MAX_DELLOG_PRUNE_PER_WRITE = 4;
       static constexpr uint32_t MAX_DELLOG_PRUNE_PER_CRANK = 64;
 
-      /// Bounded sweep size for TERMINATED operator rows in `prune`. Each
-      /// erase-candidate costs a `sysio.uwrit::locks` index probe, so the cap
-      /// keeps this permissionless crank inside its transaction CPU deadline.
+      /// Bounded sweep size for TERMINATED operator rows in `prune`, counted in
+      /// rows EXAMINED (not rows erased). Every candidate costs a
+      /// `sysio.uwrit::locks` index probe whether or not it turns out to be
+      /// prunable, so the cap must bound the scan itself to keep this
+      /// permissionless crank inside its transaction CPU deadline.
       static constexpr uint32_t MAX_OPERATOR_PRUNE_PER_CRANK = 20;
 
       // Per-operator audit log: ring-buffer cap (newest-in / oldest-out) and

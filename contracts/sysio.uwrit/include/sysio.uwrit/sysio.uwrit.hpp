@@ -557,6 +557,22 @@ namespace sysio {
          sysio::slug_name                         dst_token_code;
          sysio::slug_name                         dst_reserve_code;
          uint64_t                                dst_amount        = 0;
+         /// The destination amount the caller ASKED for — `SwapRequest.target_amount`
+         /// (outpost-originated) or `fromwire_q::target_amount` (swap-from-WIRE).
+         ///
+         /// This is an expectation, never an instruction: it is the fixed
+         /// reference the slippage check measures against, and it is NEVER paid
+         /// out. Settlement uses `dst_amount` (the AMM quote) exclusively.
+         ///
+         /// It is retained on the row precisely so `try_select_winner` can
+         /// compare the LIVE settlement quote against the user's ORIGINAL bound.
+         /// Comparing instead against the previous quote (what `dst_amount`
+         /// holds before the race re-prices) would compound the tolerance across
+         /// the two checkpoints — a 10% tolerance accepting a 91 quote at
+         /// ingestion and an 83 quote at settlement, 17% below a target of 100 —
+         /// and would skip the bound entirely on a row created while no LP was
+         /// provisioned (`dst_amount == 0`).
+         uint64_t                                target_amount     = 0;
          /// Variance tolerance the user accepted at SWAP_REQUEST time, in
          /// basis points (50 = 0.5%). The allowance it produces is a fraction
          /// of the **AMM quote**, never of the user's `target_amount` (WNS-02)
@@ -618,7 +634,7 @@ namespace sysio {
             (id)(type)(status)
             (src_chain_code)(src_token_code)(src_reserve_code)(src_amount)
             (dst_chain_code)(dst_token_code)(dst_reserve_code)(dst_amount)
-            (variance_tolerance_bps)(source_tx_id)(depositor)
+            (target_amount)(variance_tolerance_bps)(source_tx_id)(depositor)
             (commits_by)(winner)(committed_at_ms)(settled_at_ms)(expires_at_epoch)
             (attestation_inbound_data)(attestation_outbound_data))
       };

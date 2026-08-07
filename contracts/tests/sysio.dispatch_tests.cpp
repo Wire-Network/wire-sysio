@@ -1966,6 +1966,150 @@ BOOST_FIXTURE_TEST_CASE(swap_settlement_debits_destination_reserve_by_the_quote,
    BOOST_REQUIRE_EQUAL(quote, get_lock(2)["amount"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
+// [P0] Review follow-up (PR #550): the slippage bound must NOT compound across
+// the two checkpoints. The row's `dst_amount` is re-priced at race resolution,
+// so measuring race-time drift against it would compare the settlement quote
+// with the PREVIOUS quote instead of with what the user actually asked for —
+// letting the price walk one tolerance-step per checkpoint. The reviewer's
+// example: target 100 at 10% accepts an ingestion quote of 91 (9 <= 9.1) and
+// then a settlement quote of 83 (8 <= 8.3), delivering 17% below target.
+//
+// `target_amount` is retained on the row precisely so this check anchors on the
+// user's ORIGINAL bound, whatever path the price took.
+BOOST_FIXTURE_TEST_CASE(swap_slippage_bound_does_not_compound_across_checkpoints,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+   setup_wire_token_and_reserves();
+   BOOST_REQUIRE_EQUAL(success(), regreserve_active("ETH", "ETH", "SECOND"));
+
+   const uint64_t eth       = fc::slug_name{"ETH"}.value;
+   const uint64_t primary   = fc::slug_name{"PRIMARY"}.value;
+   const uint64_t secondary = fc::slug_name{"SECOND"}.value;
+   constexpr uint64_t ATT_ID       = 9800;
+   constexpr int64_t  SRC_AMOUNT   = 1'000'000;
+   constexpr uint32_t TOLERANCE_BPS = 1'000;   // 10%
+
+   BOOST_REQUIRE_EQUAL(success(),
+      depositinle_credit(UWRIT_OP, "ETH", "ETH", uint64_t{1'000'000'000}));
+
+   // Target ~9% above the ingestion quote — inside the 10% bound, so the request
+   // is accepted and the row records the quote.
+   const uint64_t ingestion_quote = expected_quote("ETH", "ETH", "PRIMARY", SRC_AMOUNT,
+                                                   "ETH", "ETH", "SECOND", kDefaultUwritFeeBps);
+   BOOST_REQUIRE(ingestion_quote > 0);
+   const uint64_t target = ingestion_quote + (ingestion_quote * 9 / 100);
+
+   const auto sr = encode_swap_request(
+      ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
+      eth, eth, primary, SRC_AMOUNT,
+      eth, eth, secondary, target,
+      TOLERANCE_BPS, ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0b'));
+   BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, eth, sr));
+   {
+      const auto req = get_uwreq(ATT_ID);
+      BOOST_REQUIRE(!req.is_null());
+      BOOST_REQUIRE_EQUAL(ingestion_quote, req["dst_amount"].as_uint64());
+      BOOST_REQUIRE_EQUAL(target,          req["target_amount"].as_uint64());
+   }
+
+   // Move the destination reserve so the price walks a second step down: debit
+   // 7% of its token side (UWRIT-authorized, the same primitive settlement uses).
+   BOOST_REQUIRE_EQUAL(success(), push(RESERV_ACCOUNT, reserv_abi, UWRIT_ACCOUNT, "debit"_n, mvo()
+      ("chain_code",   codename_mvo("ETH"))
+      ("token_code",   codename_mvo("ETH"))
+      ("reserve_code", codename_mvo("SECOND"))
+      ("amount",       uint64_t{70'000'000'000})));
+
+   // Pin the scenario: the drift is inside tolerance of the PREVIOUS quote (so
+   // the compounding rule would have let it settle) but outside tolerance of the
+   // user's TARGET (so the anchored rule must reject). If the fixture's
+   // arithmetic ever drifts out of this window the test says so here, rather
+   // than silently asserting nothing.
+   const uint64_t settle_quote = expected_quote("ETH", "ETH", "PRIMARY", SRC_AMOUNT,
+                                                "ETH", "ETH", "SECOND", kDefaultUwritFeeBps);
+   const uint64_t allowed = settle_quote * TOLERANCE_BPS / 10'000;
+   BOOST_REQUIRE_LE(ingestion_quote - settle_quote, allowed);   // old rule: would pass
+   BOOST_REQUIRE_GT(target - settle_quote,          allowed);   // new rule: must reject
+
+   const auto src_uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
+   BOOST_REQUIRE_EQUAL(success(),
+      rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", src_uic));
+   const auto dst_uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, secondary);
+   BOOST_REQUIRE_EQUAL(success(),
+      rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "SECOND", dst_uic));
+
+   const auto req = get_uwreq(ATT_ID);
+   BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_REJECTED", req["status"].as_string());
+   bool drift = false;
+   for (const auto& c : req["commits_by"].get_array()) {
+      if (c["underwriter"].as_string() == UWRIT_OP.to_string())
+         drift = c["reason"].as_string().find("variance drift") != std::string::npos;
+   }
+   BOOST_REQUIRE(drift);
+} FC_LOG_AND_RETHROW() }
+
+// [P1] Review follow-up (PR #550): an under-bonded candidate must not be able to
+// terminally close someone else's swap. The variance / unpriceable verdicts
+// refund the user and end the request, so they run only after a candidate has
+// proved it could actually settle. An ACTIVE underwriter can clear the role
+// minimum yet lack collateral for a particular swap; if it could trigger a
+// terminal refund during transient drift, any such operator would hold a
+// denial-of-service over other people's swaps.
+BOOST_FIXTURE_TEST_CASE(swap_underbonded_candidate_cannot_terminally_reject,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+   setup_wire_token_and_reserves();
+   BOOST_REQUIRE_EQUAL(success(), regreserve_active("ETH", "ETH", "SECOND"));
+
+   const uint64_t eth       = fc::slug_name{"ETH"}.value;
+   const uint64_t primary   = fc::slug_name{"PRIMARY"}.value;
+   const uint64_t secondary = fc::slug_name{"SECOND"}.value;
+   constexpr uint64_t ATT_ID       = 9850;
+   constexpr int64_t  SRC_AMOUNT   = 1'000'000;
+   constexpr uint32_t TOLERANCE_BPS = 1'000;   // 10%
+
+   // Clears the 1-unit role minimum (so the candidate is an ACTIVE underwriter)
+   // but is nowhere near the src + dst aggregate this swap needs.
+   BOOST_REQUIRE_EQUAL(success(), depositinle_credit(UWRIT_OP, "ETH", "ETH", 10));
+
+   const uint64_t ingestion_quote = expected_quote("ETH", "ETH", "PRIMARY", SRC_AMOUNT,
+                                                   "ETH", "ETH", "SECOND", kDefaultUwritFeeBps);
+   const auto sr = encode_swap_request(
+      ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
+      eth, eth, primary, SRC_AMOUNT,
+      eth, eth, secondary, ingestion_quote,
+      TOLERANCE_BPS, ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0b'));
+   BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, eth, sr));
+
+   // Drift the price far outside the tolerance — the request IS terminally
+   // doomed, but this candidate must not be the one to close it.
+   BOOST_REQUIRE_EQUAL(success(), push(RESERV_ACCOUNT, reserv_abi, UWRIT_ACCOUNT, "debit"_n, mvo()
+      ("chain_code",   codename_mvo("ETH"))
+      ("token_code",   codename_mvo("ETH"))
+      ("reserve_code", codename_mvo("SECOND"))
+      ("amount",       uint64_t{500'000'000'000})));
+
+   const auto src_uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
+   BOOST_REQUIRE_EQUAL(success(),
+      rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", src_uic));
+   const auto dst_uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, secondary);
+   BOOST_REQUIRE_EQUAL(success(),
+      rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "SECOND", dst_uic));
+
+   // Still PENDING (not REJECTED): the candidate was disqualified on bond, and
+   // the request stays open for an underwriter that can actually settle it.
+   const auto req = get_uwreq(ATT_ID);
+   BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_PENDING", req["status"].as_string());
+   bool bond_dq = false;
+   for (const auto& c : req["commits_by"].get_array()) {
+      if (c["underwriter"].as_string() == UWRIT_OP.to_string()) {
+         BOOST_REQUIRE_EQUAL("UNDERWRITE_STATUS_DISQUALIFIED", c["status"].as_string());
+         bond_dq = c["reason"].as_string().find("insufficient bond") != std::string::npos;
+      }
+   }
+   BOOST_REQUIRE(bond_dq);
+} FC_LOG_AND_RETHROW() }
+
 // [P0] WNS-01 (CertiK "Wire Network - Sysio Audit 1", Critical): `opreg::prune`
 // must not erase a TERMINATED operator whose collateral has not settled.
 //
@@ -2063,6 +2207,88 @@ BOOST_FIXTURE_TEST_CASE(prune_keeps_terminated_operator_until_collateral_settles
    // Settled — now the row is genuinely disposable and prune erases it.
    BOOST_REQUIRE_EQUAL(success(), opreg_prune());
    BOOST_REQUIRE(get_operator(UWRIT_OP).is_null());
+} FC_LOG_AND_RETHROW() }
+
+// [P0] Review follow-up (PR #550): `prune` is not the only path that destroys a
+// TERMINATED row — `regoperator` REPLACES one to allow re-registration, and it
+// strands collateral the same way. A terminated underwriter re-registering while
+// its locks are live would swap the retained balance row for a fresh healthy
+// one; `chklocks` then fans out `releaselock`, which settles only SLASHED /
+// TERMINATED operators, sees a healthy row, and no-ops. Every terminated-row
+// erase path carries the settlement precondition.
+BOOST_FIXTURE_TEST_CASE(reregistration_blocked_until_collateral_settles,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+   BOOST_REQUIRE_EQUAL(success(), push(UWRIT_ACCOUNT, uwrit_abi, UWRIT_ACCOUNT, "setconfig"_n, mvo()
+      ("fee_bps", kDefaultUwritFeeBps)("collateral_lock_duration_ms", 120'000u)
+      ("min_fromwire_amount", 1)("fromwire_revert_fee_bps", 0)
+      ("uwreq_pending_timeout_epochs", 10)("uwreq_retention_epochs", 10)));
+
+   const uint64_t eth       = fc::slug_name{"ETH"}.value;
+   const uint64_t primary   = fc::slug_name{"PRIMARY"}.value;
+   const uint64_t secondary = fc::slug_name{"SECOND"}.value;
+   constexpr uint64_t ATT_ID     = 9900;
+   constexpr int64_t  SRC_AMOUNT = 1'000'000;
+
+   setup_wire_token_and_reserves();
+   BOOST_REQUIRE_EQUAL(success(), regreserve_active("ETH", "ETH", "SECOND"));
+   BOOST_REQUIRE_EQUAL(success(),
+      depositinle_credit(UWRIT_OP, "ETH", "ETH", uint64_t{1'000'000'000}));
+   enable_epoch_advancement();
+
+   // Win a race so the operator holds live locks.
+   const uint64_t quote = expected_quote("ETH", "ETH", "PRIMARY", SRC_AMOUNT,
+                                         "ETH", "ETH", "SECOND", kDefaultUwritFeeBps);
+   const auto sr = encode_swap_request(
+      ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
+      eth, eth, primary, SRC_AMOUNT,
+      eth, eth, secondary, quote,
+      /*tolerance_bps*/ 10'000, ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0b'));
+   BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, eth, sr));
+   const auto src_uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
+   BOOST_REQUIRE_EQUAL(success(),
+      rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", src_uic));
+   const auto dst_uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, secondary);
+   BOOST_REQUIRE_EQUAL(success(),
+      rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "SECOND", dst_uic));
+   BOOST_REQUIRE(!get_lock(1).is_null());
+
+   BOOST_REQUIRE_EQUAL(success(), terminate_op(UWRIT_OP, "audit-test termination"));
+
+   auto reregister = [&]() {
+      return push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "regoperator"_n, mvo()
+         ("account",         UWRIT_OP.to_string())
+         ("type",            OperatorType::OPERATOR_TYPE_UNDERWRITER)
+         ("is_bootstrapped", false));
+   };
+
+   // Locks live + balance retained: re-registration must be refused, so the
+   // terminated row (and the collateral it accounts for) survives intact.
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: operator has unsettled collateral: a terminated "
+            "operator may only re-register once its balances are drained and no underwriting "
+            "locks remain"),
+      reregister());
+   {
+      const auto op = get_operator(UWRIT_OP);
+      BOOST_REQUIRE(!op.is_null());
+      BOOST_REQUIRE_EQUAL("OPERATOR_STATUS_TERMINATED", op["status"].as_string());
+      uint64_t retained = 0;
+      for (const auto& b : op["balances"].get_array()) retained += b["balance"].as_uint64();
+      BOOST_REQUIRE_GT(retained, 0u);
+   }
+
+   // Let the locks expire; `chklocks` -> `releaselock` drains the balance.
+   age_one_epoch();
+   age_one_epoch();
+   age_one_epoch();
+   BOOST_REQUIRE(get_lock(1).is_null());
+
+   // Settled — re-registration is allowed again, with a clean row.
+   BOOST_REQUIRE_EQUAL(success(), reregister());
+   const auto op = get_operator(UWRIT_OP);
+   BOOST_REQUIRE(!op.is_null());
+   BOOST_REQUIRE(op["status"].as_string() != "OPERATOR_STATUS_TERMINATED");
 } FC_LOG_AND_RETHROW() }
 
 // [P1] regression (r3444213199) + WNS-02: an oversized to-WIRE target_amount
