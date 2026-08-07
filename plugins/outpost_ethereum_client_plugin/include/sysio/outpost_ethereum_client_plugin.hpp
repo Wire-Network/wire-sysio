@@ -12,14 +12,13 @@ using namespace fc::network::ethereum;
 
 struct ethereum_client_entry_t {
    std::string                        id;
-   std::string                        url;
    fc::crypto::signature_provider_ptr signature_provider;
    ethereum_client_ptr                client;
-   /// Numeric EVM chain id from the client spec's optional 4th field. Lets the
+   /// Authoritative numeric EVM chain id. Lets the
    /// batch operator auto-select the client for an outpost row by matching the
    /// row's `external_chain_id`, so multiple EVM outposts never share one
-   /// remote endpoint. `nullopt` when the spec omitted the chain id.
-   std::optional<uint32_t>            chain_id;
+   /// remote endpoint.
+   uint32_t                           chain_id;
 };
 
 using ethereum_client_entry_ptr = std::shared_ptr<ethereum_client_entry_t>;
@@ -102,7 +101,7 @@ public:
    std::vector<ethereum_client_entry_ptr> get_clients();
    ethereum_client_entry_ptr get_client(const std::string& id);
 
-   /// Return the single configured client whose spec chain id equals
+   /// Return the single configured client whose authoritative chain id equals
    /// `chain_id`, or nullptr when none — or more than one — match. The batch
    /// operator uses this to bind each EVM outpost row to its own RPC client by
    /// `external_chain_id`; an ambiguous (duplicate chain id) or missing match
@@ -127,8 +126,8 @@ public:
     * concern (batch operator wires OPP + OPPInbound; underwriter wires
     * OperatorRegistry; both share the same SPI surface).
     *
-    * @param eth_client_id     Id passed to `--outpost-ethereum-client`.
-    * @param chain_code        Outpost id from `sysio.epoch::outposts`.
+    * @param eth_client_id     Id from the file configuration or legacy client option.
+    * @param chain_code        Outpost id from `sysio.chains::chains`.
     * @param chain_id          Numeric chain id from the outpost row (e.g. 31337, 1).
     * @param opp_addr          Hex address of the `OPP.sol` contract, or empty.
     * @param opp_inbound_addr  Hex address of the `OPPInbound.sol` contract, or empty.
