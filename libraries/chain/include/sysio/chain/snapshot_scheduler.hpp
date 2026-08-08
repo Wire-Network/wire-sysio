@@ -220,10 +220,25 @@ public:
    // snapshot scheduler handlers
    // schedule a snapshot request; scheduling validation errors are thrown to the caller.
    // next (may be empty) is stored on the request and called with the snapshot_information
-   // (or execution error) when a snapshot produced by this request completes
+   // (or execution error) when a snapshot produced by this request completes; a request that
+   // expires without ever running reports that through the same callback
    snapshot_schedule_result schedule_snapshot(const snapshot_request_information& sri, next_function<snapshot_information> next);
    snapshot_schedule_result unschedule_snapshot(uint32_t sri);
-   // remove requests that are expired at the given irreversible block height
+
+   /**
+    * Remove requests that can no longer produce a snapshot at the given irreversible block height.
+    *
+    * A one-time request is kept until lib_height passes its start_block_num, because it runs from
+    * on_start_block() at start_block_num + 1 and irreversibility never runs ahead of the applied
+    * head. Any request expires once lib_height reaches its end_block_num.
+    *
+    * A removed request that still carries a completion callback never ran; its callback is invoked
+    * with a snapshot_execution_exception so the caller sees an error rather than having the callback
+    * silently destroyed. Callback exceptions are logged and swallowed -- this runs on the
+    * irreversible-block path.
+    *
+    * @param lib_height block number of the last irreversible block
+    */
    void unschedule_snapshot_requests(block_num_type lib_height);
    get_snapshot_requests_result get_snapshot_requests();
 

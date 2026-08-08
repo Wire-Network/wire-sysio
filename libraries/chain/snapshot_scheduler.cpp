@@ -12,8 +12,9 @@ void snapshot_scheduler::on_start_block(uint32_t height, chain::controller& chai
    // iterating. In irreversible read mode execute_snapshot() creates the snapshot synchronously and
    // unschedules the now-completed request, erasing from _snapshot_requests; doing that while the
    // range-for below iterates the same container would invalidate the loop iterator.
-   bool                                found = false;
-   uint32_t                            srid  = 0;
+   bool                                found   = false;
+   bool                                onetime = false;
+   uint32_t                            srid    = 0;
    next_function<snapshot_information> next;
 
    for(const auto& req: _snapshot_requests.get<0>()) {
@@ -24,15 +25,30 @@ void snapshot_scheduler::on_start_block(uint32_t height, chain::controller& chai
       if(recurring_snapshot || onetime_snapshot) {
          dlog("snapshot scheduler creating a snapshot from the request [start_block_num:{}, end_block_num={}, block_spacing={}], height={}",
               req.start_block_num, req.end_block_num, req.block_spacing, height);
-         srid  = req.snapshot_request_id;
-         next  = req.next;
-         found = true;
+         srid    = req.snapshot_request_id;
+         next    = req.next;
+         onetime = onetime_snapshot;
+         found   = true;
          break;
       }
    }
 
-   if(found)
-      execute_snapshot(srid, chain, next);
+   if(!found)
+      return;
+
+   if(onetime) {
+      // The request has handed its completion callback to the execution path and owes the caller
+      // nothing further: the result is delivered synchronously by create_snapshot() in irreversible
+      // read mode, otherwise by the pending snapshot once its block becomes irreversible. Drop the
+      // copy held by the request so unschedule_snapshot_requests() cannot later mistake this for a
+      // request that expired without ever running and report a spurious failure to a caller that has
+      // already been answered. Recurring requests keep their callback -- they can fire again.
+      auto& snapshot_by_id = _snapshot_requests.get<by_snapshot_id>();
+      if(auto it = snapshot_by_id.find(srid); it != snapshot_by_id.end())
+         snapshot_by_id.modify(it, [](snapshot_schedule_information& req) { req.next = {}; });
+   }
+
+   execute_snapshot(srid, chain, next);
 }
 
 void snapshot_scheduler::on_irreversible_block(const signed_block_ptr& lib, const block_id_type& block_id, const chain::controller& chain) {
@@ -61,7 +77,15 @@ void snapshot_scheduler::on_irreversible_block(const signed_block_ptr& lib, cons
 void snapshot_scheduler::unschedule_snapshot_requests(block_num_type lib_height) {
    std::vector<uint32_t> unschedule_snapshot_request_ids;
    for(const auto& req: _snapshot_requests.get<0>()) {
-      bool marked_for_deletion = (!req.block_spacing && lib_height >= req.start_block_num) || // if one time snapshot executed or scheduled for the past, it should be gone
+      // A one-time request runs from on_start_block() at height start_block_num + 1, so it has to
+      // survive until that height is reached. Irreversibility never runs ahead of the applied head,
+      // so lib_height > start_block_num is first observed while block start_block_num + 1 is being
+      // applied -- strictly after that block's block_start signal fired. Collecting at
+      // lib_height >= start_block_num instead loses the request whenever a node applies a run of
+      // blocks back to back (catching up after a stall, syncing, or switching forks): committing
+      // block start_block_num lands LIB exactly on the threshold, one block before the request's
+      // firing height is applied.
+      bool marked_for_deletion = (!req.block_spacing && lib_height > req.start_block_num) ||
                                  lib_height >= req.end_block_num;               // any snapshot can expire by end block num (end_block_num can be max value)
 
       // cleanup - remove expired (or invalid) request
@@ -70,8 +94,27 @@ void snapshot_scheduler::unschedule_snapshot_requests(block_num_type lib_height)
       }
    }
 
+   auto& snapshot_by_id = _snapshot_requests.get<by_snapshot_id>();
    for(const auto& i: unschedule_snapshot_request_ids) {
+      // A request still holding a completion callback never executed -- on_start_block() clears the
+      // callback the moment it hands the request off. Report the expiry through the callback rather
+      // than destroying it: dropping it releases the last reference to the caller's HTTP session,
+      // which closes the connection with no response at all and hangs the client until it times out.
+      next_function<snapshot_information> undelivered;
+      if(auto it = snapshot_by_id.find(i); it != snapshot_by_id.end())
+         undelivered = it->next;
+
       unschedule_snapshot(i);
+
+      if(undelivered) {
+         try {
+            auto ex = snapshot_execution_exception(FC_LOG_MESSAGE(
+                  error, "snapshot request {} expired at irreversible block {} without executing", i, lib_height));
+            undelivered(ex.dynamic_copy_exception());
+            // FC_LOG_AND_DROP rather than a rethrow: this runs on the irreversible-block path, where
+            // a throwing completion callback must not escape into block processing.
+         } FC_LOG_AND_DROP();
+      }
    }
 }
 
@@ -220,8 +263,11 @@ void snapshot_scheduler::create_snapshot(next_function<snapshot_information> nex
          snapshot_information si{head_id, head_block_num, head_block_time, chain_snapshot_header::current_version, snapshot_path.generic_string(), captured_root_hash};
          next(snapshot_information{si});
          notify_snapshot_finalized(si);
-         // irreversible-mode snapshots are produced directly from a scheduled one-shot request and
-         // never reach on_irreversible_block, so clean up the now-completed request here.
+         // Irreversible-mode snapshots queue no pending snapshot, so on_irreversible_block() has no
+         // promotion work to do for them; run the height-based request cleanup here as well. Note
+         // this call does not collect the request that just ran: head_block_num is one short of that
+         // request's firing height, and the threshold has to stay above it so a request is never
+         // dropped before it runs. It is collected on the next irreversible block.
          unschedule_snapshot_requests(head_block_num);
       }
       CATCH_AND_CALL(next);
