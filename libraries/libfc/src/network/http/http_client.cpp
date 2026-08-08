@@ -235,7 +235,7 @@ constexpr uint32_t status_value(beast_http::status status) {
 }
 
 /** Return whether @p host is safe to serialize into an HTTP authority and TLS identity. */
-bool is_safe_network_host(std::string_view host) {
+bool is_safe_network_host_impl(std::string_view host) {
    if (host.empty())
       return false;
 
@@ -1279,6 +1279,10 @@ struct async_resolution_state {
 };
 
 } // namespace
+
+bool is_safe_network_host(std::string_view host) {
+   return is_safe_network_host_impl(host);
+}
 
 void detail::post_platform_resolver_worker_task_for_testing(
    size_t worker,

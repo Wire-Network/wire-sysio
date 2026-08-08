@@ -5,6 +5,7 @@ plugin_target(
         ${TARGET_LIB_NAME}
         LIBRARIES
         chain_plugin
+        opp_client_config
         outpost_client_plugin
         signature_provider_manager_plugin
 )

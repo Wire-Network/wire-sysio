@@ -145,6 +145,13 @@ namespace sysio {
       static constexpr uint32_t MAX_DELLOG_PRUNE_PER_WRITE = 4;
       static constexpr uint32_t MAX_DELLOG_PRUNE_PER_CRANK = 64;
 
+      /// Bounded sweep size for TERMINATED operator rows in `prune`, counted in
+      /// rows EXAMINED (not rows erased). Every candidate costs a
+      /// `sysio.uwrit::locks` index probe whether or not it turns out to be
+      /// prunable, so the cap must bound the scan itself to keep this
+      /// permissionless crank inside its transaction CPU deadline.
+      static constexpr uint32_t MAX_OPERATOR_PRUNE_PER_CRANK = 20;
+
       // Per-operator audit log: ring-buffer cap (newest-in / oldest-out) and
       // per-entry error_message length cap. Operators read recent_actions to
       // diagnose dropped requests; the log must stay bounded so a long-lived
@@ -338,9 +345,16 @@ namespace sysio {
       [[sysio::action]]
       void terminate(name account, std::string reason);
 
-      /// Prune terminated operator rows past the delay, plus delivery-log
-      /// rows that have aged out of the rolling termination window.
-      /// Permissionless.
+      /// Prune terminated operator rows, plus delivery-log rows that have aged
+      /// out of the rolling termination window. Permissionless.
+      ///
+      /// A terminated row is erased only once BOTH the prune delay has elapsed
+      /// AND the operator is completely settled — every balance bucket drained
+      /// and no `sysio.uwrit` lock still naming the account (WNS-01).
+      /// `terminate` deliberately retains the locked portion of each balance for
+      /// `releaselock` to settle later, and `releaselock` no-ops once the row is
+      /// gone; erasing on the delay alone therefore stranded that collateral,
+      /// and any caller could trigger it.
       [[sysio::action]]
       void prune();
 

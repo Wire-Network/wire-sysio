@@ -18,6 +18,25 @@ namespace {
 using namespace fc::crypto;
 using namespace fc::crypto::ethereum;
 using namespace fc::network::json_rpc;
+constexpr std::string_view invalid_log_identifier = "<invalid>";
+constexpr auto missing_rpc_value = "<missing>";
+constexpr auto unavailable_policy_limit = "n/a";
+
+namespace transaction_policy_field {
+constexpr std::string_view nonce = "nonce";
+constexpr std::string_view base_fee_per_gas = "base_fee_per_gas";
+constexpr std::string_view max_priority_fee_per_gas = "max_priority_fee_per_gas";
+constexpr std::string_view estimated_gas = "estimated_gas";
+constexpr std::string_view gas_price = "gas_price";
+} // namespace transaction_policy_field
+
+namespace ethereum_rpc_field {
+constexpr std::string_view base_fee_per_gas = "baseFeePerGas";
+constexpr std::string_view max_priority_fee_per_gas = "maxPriorityFeePerGas";
+constexpr std::string_view max_fee_per_gas = "maxFeePerGas";
+} // namespace ethereum_rpc_field
+
+constexpr std::string_view gas_configuration_operation = "get_gas_config";
 } // namespace
 
 /**
@@ -70,22 +89,24 @@ const abi::contract& ethereum_contract_client::get_abi(const std::string& contra
  * @brief Constructs an ethereum_client instance
  *
  * Initializes the client with a signature provider for transaction signing,
- * a JSON-RPC endpoint URL, and an optional chain ID. The Ethereum address
+ * a JSON-RPC endpoint URL, and a required local transaction policy. The Ethereum address
  * is derived from the signature provider's public key.
  *
  * @param sig_provider Signature provider for signing transactions
  * @param url_source URL of the Ethereum node (string or fc::url)
- * @param chain_id Optional chain ID (if not provided, will be fetched from the node)
+ * @param transaction_policy Required expenditure limits and authoritative chain ID
  * @param rpc_options Authenticated transport and bounded request policy
  */
 ethereum_client::ethereum_client(const signature_provider_ptr& sig_provider,
                                  const std::variant<std::string, fc::url>& url_source,
-                                 std::optional<fc::uint256> chain_id,
+                                 ethereum_transaction_policy transaction_policy,
                                  client_options rpc_options)
    : _signature_provider(sig_provider)
    , _address(to_address(_signature_provider->public_key))
    , _client(json_rpc_client::create(url_source, std::move(rpc_options)))
-   , _chain_id(chain_id) {}
+   , _transaction_policy(std::move(transaction_policy)) {
+   validate_transaction_policy_configuration(_transaction_policy);
+}
 
 /**
  * @brief Executes a JSON-RPC method call on the Ethereum node
@@ -101,6 +122,34 @@ fc::variant ethereum_client::execute(const std::string& method, const fc::varian
 
 fc::variant ethereum_client::execute_idempotent(const std::string& method, const fc::variant& params) {
    return _client.call_idempotent(method, params);
+}
+
+/** Emit a sanitized rejection record without endpoint, key, calldata, or signature data. */
+void ethereum_client::log_transaction_rejection(
+   const ethereum_transaction_policy_exception& rejection,
+   std::string_view                              operation_type) const {
+   const std::string_view safe_operation_type =
+      is_safe_transaction_policy_identifier(operation_type) ? operation_type : invalid_log_identifier;
+   if (is_rpc_quantity_rejection(rejection.reason())) {
+      elog("Ethereum RPC response rejected reason_code={} client_id={} chain_id={} operation={} "
+           "field={} observed={}",
+           reason_code_name(rejection.reason()),
+           _transaction_policy.client_id,
+           _transaction_policy.chain_id,
+           safe_operation_type,
+           rejection.field(),
+           rejection.observed());
+      return;
+   }
+   elog("Ethereum transaction policy rejected reason_code={} client_id={} chain_id={} operation={} "
+        "field={} observed={} allowed={}",
+        reason_code_name(rejection.reason()),
+        _transaction_policy.client_id,
+        _transaction_policy.chain_id,
+        safe_operation_type,
+        rejection.field(),
+        rejection.observed(),
+        rejection.allowed().value_or(unavailable_policy_limit));
 }
 
 /**
@@ -142,6 +191,14 @@ fc::variant ethereum_client::execute_contract_tx_fn(const eip1559_tx& source_tx,
                                                     const contract_invoke_data_items& params, bool sign) {
    eip1559_tx tx = source_tx;
    tx.data = from_hex(contract_encode_data(abi, params));
+
+   try {
+      validate_transaction_against_policy(_transaction_policy, tx);
+   } catch (const ethereum_transaction_policy_exception& rejection) {
+      log_transaction_rejection(rejection, abi.name);
+      throw;
+   }
+
    auto tx_encoded = rlp::encode_eip1559_unsigned_typed(tx);
    if (sign) {
       fc::crypto::eth_client_signer signer(*_signature_provider);
@@ -181,30 +238,19 @@ fc::uint256 ethereum_client::get_transaction_count(const address_compat_type& ad
    auto from_addr_hex = to_hex(from_addr, true);
    fc::variants params{from_addr_hex, to_block_tag(block)};
    auto res = execute_idempotent("eth_getTransactionCount", params);
-   dlog("tx_count: {}", res.as_string());
-   return to_uint256(res);
+   return parse_rpc_quantity(res, transaction_policy_field::nonce);
 }
 
 /**
  * @brief Retrieves the chain ID of the connected Ethereum network
  *
- * Fetches the chain ID from the node on first call and caches it for subsequent calls.
- * The chain ID is used in EIP-155 replay protection for transactions.
+ * Returns the locally configured policy chain ID. An RPC provider is never trusted to
+ * select the replay-protection domain of a transaction this client will sign.
  *
  * @return The chain ID as a uint256
- * @throws fc::network::json_rpc::json_rpc_exception if the RPC call fails
  */
-fc::uint256 ethereum_client::get_chain_id() {
-   static std::mutex mutex;
-   std::scoped_lock<std::mutex> lock(mutex);
-   if (_chain_id.has_value()) {
-      return *_chain_id;
-   }
-
-   fc::variants params; // empty array
-   _chain_id = to_uint256(execute_idempotent("eth_chainId", params));
-
-   return _chain_id.value();
+fc::uint256 ethereum_client::get_chain_id() const {
+   return _transaction_policy.chain_id;
 }
 
 /**
@@ -251,22 +297,26 @@ fc::variant ethereum_client::get_syncing_status() {
  */
 eip1559_tx ethereum_client::create_default_tx(const address_compat_type& to, const abi::contract& contract,
                                               const fc::variants& params) {
-   auto gc = get_gas_config();
-   auto data = contract_encode_data(contract, params);
+   try {
+      auto gc = get_gas_config_unlogged();
+      auto data = contract_encode_data(contract, params);
 
-   auto estimated_gas = estimate_gas(to, contract, data, gc);
-   // add 20% buffer - same as ceil(x * 1.2), but integer division only
-   auto gas_limit = (estimated_gas * 6) /5;
+      auto estimated_gas = estimate_gas(to, contract, data, gc);
+      auto gas_limit = derive_buffered_gas_limit(_transaction_policy, estimated_gas);
 
-   return eip1559_tx{.chain_id = get_chain_id(),
-                     .nonce = get_transaction_count(get_signer_address(), "pending"),
-                     .max_priority_fee_per_gas = gc.tip,
-                     .max_fee_per_gas = gc.max_fee_per_gas,
-                     .gas_limit = gas_limit,
-                     .to = to_address(to),
-                     .value = 0,
-                     .data = from_hex(data),
-                     .access_list = {}};
+      return eip1559_tx{.chain_id = get_chain_id(),
+                        .nonce = get_transaction_count(get_signer_address(), block_tag_t::pending),
+                        .max_priority_fee_per_gas = gc.tip,
+                        .max_fee_per_gas = gc.max_fee_per_gas,
+                        .gas_limit = gas_limit,
+                        .to = to_address(to),
+                        .value = 0,
+                        .data = from_hex(data),
+                        .access_list = {}};
+   } catch (const ethereum_transaction_policy_exception& rejection) {
+      log_transaction_rejection(rejection, contract.name);
+      throw;
+   }
 }
 
 /**
@@ -369,9 +419,13 @@ fc::variant ethereum_client::get_transaction_by_hash(const std::string& tx_hash)
  */
 fc::uint256 ethereum_client::get_base_fee_per_gas() {
    auto block = get_block_by_number(block_tag_t::latest);
-   FC_ASSERT_FMT(block.contains("baseFeePerGas"), "Block {} does not contain baseFeePerGas",
-                 to_string(block_tag_t::latest));
-   return block["baseFeePerGas"].as_uint256();
+   const std::string base_fee_field{ethereum_rpc_field::base_fee_per_gas};
+   if (!block.contains(base_fee_field)) {
+      throw_transaction_policy_exception(ethereum_transaction_policy_reason::rpc_quantity_invalid,
+                                         transaction_policy_field::base_fee_per_gas,
+                                         missing_rpc_value);
+   }
+   return parse_rpc_quantity(block[base_fee_field], transaction_policy_field::base_fee_per_gas);
 }
 
 /**
@@ -386,7 +440,7 @@ fc::uint256 ethereum_client::get_base_fee_per_gas() {
 fc::uint256 ethereum_client::get_max_priority_fee_per_gas() {
    fc::variants params; // empty
    auto resp = execute_idempotent("eth_maxPriorityFeePerGas", params);
-   return resp.as_uint256();
+   return parse_rpc_quantity(resp, transaction_policy_field::max_priority_fee_per_gas);
 }
 
 /**
@@ -406,7 +460,7 @@ fc::uint256 ethereum_client::estimate_gas(const address_compat_type& to, const s
    tx("from", get_address())("to", to_address(to))("value", value);
    fc::variants params{fc::variant(tx)};
    auto resp = execute_idempotent("eth_estimateGas", params);
-   return resp.as_uint256();
+   return parse_rpc_quantity(resp, transaction_policy_field::estimated_gas);
 }
 
 /**
@@ -420,9 +474,19 @@ fc::uint256 ethereum_client::estimate_gas(const address_compat_type& to, const s
  * @throws fc::network::json_rpc::json_rpc_exception if any RPC call fails
  */
 ethereum_client::gas_config_t ethereum_client::get_gas_config() {
+   try {
+      return get_gas_config_unlogged();
+   } catch (const ethereum_transaction_policy_exception& rejection) {
+      log_transaction_rejection(rejection, gas_configuration_operation);
+      throw;
+   }
+}
+
+/** Fetch fee suggestions and apply the local caps without emitting a duplicate log record. */
+ethereum_client::gas_config_t ethereum_client::get_gas_config_unlogged() {
    auto tip = get_max_priority_fee_per_gas();
    auto base_fee = get_base_fee_per_gas();
-   auto max_fee_per_gas = (base_fee * 2) + tip;
+   auto max_fee_per_gas = derive_max_fee_per_gas(_transaction_policy, tip, base_fee);
 
    return gas_config_t{
       .tip = tip,
@@ -449,25 +513,19 @@ fc::uint256 ethereum_client::estimate_gas(const address_compat_type& to, const a
                                           const data_or_params_t& data_or_params, const std::optional<gas_config_t>& gas_config_opt) {
    fc::mutable_variant_object tx;
 
-   gas_config_t gc = gas_config_opt.value_or(get_gas_config());
+   gas_config_t gc = gas_config_opt ? *gas_config_opt : get_gas_config();
 
-   std::string data = to_data_from_params(contract, data_or_params);;
-   if (std::holds_alternative<fc::variants>(data_or_params)) {
-      auto& params = std::get<fc::variants>(data_or_params);
-      data = "0x" + contract_encode_data(contract, params);
-   } else {
-      data = "0x" + std::get<std::string>(data_or_params);
-   }
+   std::string data = to_data_from_params(contract, data_or_params, true);
 
    tx("from", to_hex(get_address(), true))
    ("to", to_hex(to_address(to), true))
-   ("maxPriorityFeePerGas", to_hex(rlp::encode_uint(gc.max_fee_per_gas), true))
-   ("maxFeePerGas", to_hex(rlp::encode_uint(gc.max_fee_per_gas), true))
+   (std::string(ethereum_rpc_field::max_priority_fee_per_gas), format_rpc_quantity(gc.tip))
+   (std::string(ethereum_rpc_field::max_fee_per_gas), format_rpc_quantity(gc.max_fee_per_gas))
    ("data", data)
    ("input", data);
 
    auto resp = execute_idempotent("eth_estimateGas", fc::variants{tx});
-   return resp.as_uint256();
+   return parse_rpc_quantity(resp, transaction_policy_field::estimated_gas);
 }
 
 /**
@@ -482,7 +540,7 @@ fc::uint256 ethereum_client::estimate_gas(const address_compat_type& to, const a
 fc::uint256 ethereum_client::get_gas_price() {
    fc::variants params; // empty
    auto resp = execute_idempotent("eth_gasPrice", params);
-   return resp.as_uint256();
+   return parse_rpc_quantity(resp, transaction_policy_field::gas_price);
 }
 
 /**

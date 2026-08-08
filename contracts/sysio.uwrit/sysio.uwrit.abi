@@ -436,6 +436,10 @@
                     "type": "uint64"
                 },
                 {
+                    "name": "target_amount",
+                    "type": "uint64"
+                },
+                {
                     "name": "variance_tolerance_bps",
                     "type": "uint32"
                 },
