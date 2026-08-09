@@ -155,10 +155,11 @@ struct opp_solana_outpost_client : fc::network::solana::solana_program_client {
    /// `deposit(operator_type: u8, wire_account_name: string, amount: u64) -> signature`.
    solana_program_tx_fn<std::string, uint8_t, std::string, uint64_t> deposit;
    /// `commit_underwrite(uic_bytes: bytes) -> signature`.
-   /// Relays an underwriter's signed `UnderwriteIntentCommit` to the
-   /// outpost as opaque bytes. The on-chain handler stores the bytes
-   /// for the next outbound envelope so the batch operator can relay
-   /// the COMMIT back to the depot; no other state changes.
+   /// Submits an underwriter's original canonical `UnderwriteIntentCommit`
+   /// bytes. The on-chain handler binds their signed SVM caller and claimed
+   /// ACTIVE roster identity, then stores the unchanged bytes for the next
+   /// outbound envelope so the batch operator can relay the COMMIT to the
+   /// depot.
    solana_program_tx_fn<std::string, std::vector<uint8_t>> commit_underwrite;
 
    /// Decode already-fetched Anchor account bytes using the outpost IDL.

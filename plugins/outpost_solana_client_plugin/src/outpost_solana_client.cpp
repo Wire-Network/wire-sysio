@@ -1021,9 +1021,11 @@ std::string outpost_solana_client::uw_commit(
 
    throw_if_past_deadline(deadline_abs, OP_UW_COMMIT);
 
-   // `commit_underwrite(uic_bytes: bytes)` — opaque relay. The typed
-   // wrapper carries the IDL-default account list (config + outbound
-   // message buffer); the underwriter doesn't supply overrides.
+   // Submit the original canonical UIC bytes unchanged. The on-chain
+   // `commit_underwrite` handler decodes them and binds the signed SVM caller
+   // plus claimed ACTIVE roster identity before relaying them. The typed
+   // wrapper supplies the IDL-derived signer, operator-registry, and outbound
+   // message-buffer accounts; the underwriter does not override that list.
    std::vector<uint8_t> uic_bytes_u8(uic_bytes.begin(), uic_bytes.end());
    auto signature = _program_client->commit_underwrite(std::move(uic_bytes_u8));
    ilog("outpost_solana_client[{}]: uw_commit confirmed uwreq={} sig={} bytes={}",
