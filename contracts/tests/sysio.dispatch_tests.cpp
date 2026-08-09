@@ -3534,13 +3534,14 @@ BOOST_FIXTURE_TEST_CASE(malformed_uic_does_not_abort_later_attestations_in_same_
    BOOST_REQUIRE(!get_lock(1).is_null());
 } FC_LOG_AND_RETHROW() }
 
-// A UIC's `uw_account` is only a claim. Current outposts authenticate and
-// ACTIVE-role-gate their transaction submitter but relay the UIC bytes opaquely;
-// they do not bind that submitter to the claimed WIRE account. The depot's
-// independent current-permission signature check must therefore prevent a
-// competitor from claiming another underwriter and replacing or disqualifying
-// its honest stored leg. The forged record is ignored before mutation, so the
-// untouched source leg can still pair with the honest destination and win.
+// A UIC's `uw_account` remains a signed claim at the depot boundary. Current
+// outposts decode and canonicalize each UIC, authenticate its chain-native
+// submitter, and bind that caller to the claimed ACTIVE WIRE roster entry before
+// relaying the original bytes. The depot independently repeats the current
+// permission-signature check as defense in depth against a compromised,
+// outdated, or misconfigured outpost. A forged direct delivery is ignored
+// before mutation, so the untouched source leg can still pair with the honest
+// destination and win.
 BOOST_FIXTURE_TEST_CASE(swap_forged_claim_cannot_overwrite_honest_candidate,
                         sysio_dispatch_tester) { try {
    bootstrap_for_dispatch();
