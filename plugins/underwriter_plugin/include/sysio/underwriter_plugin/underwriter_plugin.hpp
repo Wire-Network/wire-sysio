@@ -19,7 +19,8 @@ namespace sysio {
    /// 4. Selects absent/partial candidates whose complete winner-time bond fits
    ///    the daemon's provisional available-collateral view.
    /// 5. Submits signed UICs only for missing legs to the relevant ACTIVE-role-
-   ///    gated outpost contract (ETH/SOL), which relays them as opaque bytes.
+   ///    gated outpost contract (ETH/SOL), which caller-binds and canonicalizes
+   ///    each UIC before relaying its original validated bytes.
    /// 6. The depot gives the complete candidate one authoritative attempt,
    ///    then either creates locks, disqualifies a candidate-local failure, or
    ///    rejects and refunds a request-global failure.

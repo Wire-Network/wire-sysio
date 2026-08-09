@@ -275,7 +275,9 @@ namespace sysio {
       /// claimed underwriter's fixed-size recoverable signature before
       /// changing candidate evidence. Invalid claims are logged and ignored:
       /// they cannot replace stored bytes, change status/reason, or refresh
-      /// arrival timestamps. When both legs
+      /// arrival timestamps. A valid replay of an already-recorded leg is
+      /// also ignored before signature work: candidate legs are write-once.
+      /// When both legs
       /// land for the same underwriter, runs `try_select_winner` to resolve the
       /// race. For a dual-outpost request it revalidates only the older stored
       /// leg so a WIRE permission-key change between arrivals cannot authorize

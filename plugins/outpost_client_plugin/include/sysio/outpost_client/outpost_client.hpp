@@ -57,7 +57,8 @@ public:
     * public key. Underwriter UIC construction signs this value into
     * `uw_ext_chain_addr`, so the canonical payload contains no omitted
     * default byte field and records the local transaction signer as signed
-    * metadata. The current outpost does not bind that field to its caller.
+    * metadata. The outpost binds this field and the claimed WIRE account to
+    * the authenticated caller and its current ACTIVE underwriter roster row.
     *
     * @return Opaque chain-native address bytes; 20 bytes for Ethereum and 32
     *         bytes for Solana.
@@ -127,10 +128,11 @@ public:
     * knowing the outpost's contract surface, ABI / IDL layout, or message
     * encoding. The chain-specific concrete resolves which contract or
     * program action to invoke, how to encode the bytes for the wire, and
-    * how to await on-chain confirmation. The current outpost accepts the call
-    * only from an ACTIVE-role account and queues the UIC as opaque bytes. It
-    * does not bind `uw_account` or `uw_ext_chain_addr` to that caller; the WIRE
-    * depot is authoritative for validating the signed claim.
+    * how to await on-chain confirmation. The current outposts accept only a
+    * canonically encoded UIC whose claimed WIRE account and external address
+    * match the authenticated caller's current ACTIVE underwriter roster row.
+    * They queue the original validated bytes unchanged. The WIRE depot remains
+    * authoritative for validating the embedded permission signature and bond.
     *
     * Returns only after on-chain inclusion + confirmations — the caller
     * uses the return value as a "this leg landed" signal before recording
@@ -140,8 +142,8 @@ public:
     *
     * @param uw_request_id  The depot's `sysio.uwrit::uwreqs` row id this
     *                       UIC is committing to. Used only for log
-    *                       correlation; the on-chain call carries only
-    *                       the opaque bytes.
+    *                       correlation; the on-chain call carries the original
+    *                       validated UIC bytes.
     * @param uic_bytes      Serialized `UnderwriteIntentCommit` (protobuf
     *                       encoded, signed by an authorized WIRE K1, R1,
     *                       EM, or ED permission key).

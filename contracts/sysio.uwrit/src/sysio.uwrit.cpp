@@ -1947,7 +1947,7 @@ void uwrit::rcrdcommit(uint64_t uwreq_id,
    }
 
    // Reject a new name at the roster cap before protobuf decoding, hashing, or
-   // recovery. Existing candidates can still provide or replace a required leg.
+   // recovery. Existing candidates can still provide their missing required leg.
    const auto existing_it =
       std::find_if(req_snapshot.commits_by.begin(), req_snapshot.commits_by.end(),
                    [&](const commit_entry& c) { return c.underwriter == underwriter; });
@@ -1958,6 +1958,8 @@ void uwrit::rcrdcommit(uint64_t uwreq_id,
                    " candidates (cap reached), skipping new candidate\n");
       return;
    }
+
+   const auto incoming_leg = is_source ? uic_leg::source : uic_leg::destination;
 
    // Disqualification is durable for this request. Once winner-time checks
    // reject a candidate, no replay, malformed record, unauthorized record, or
@@ -1970,7 +1972,19 @@ void uwrit::rcrdcommit(uint64_t uwreq_id,
       return;
    }
 
-   const auto incoming_leg = is_source ? uic_leg::source : uic_leg::destination;
+   // A candidate leg is write-once. Outpost delivery is at-least-once, so an
+   // already-recorded leg is an idempotent replay, not replacement evidence.
+   // Return before protobuf canonicalization, hashing, or key recovery: an
+   // ACTIVE underwriter can enqueue repeated valid commits, and paying the
+   // cryptographic cost for every duplicate would let one envelope exhaust
+   // consensus-dispatch CPU and roll back all of its attestations.
+   if (existing_entry && required_uic_leg_populated(*existing_it, incoming_leg)) {
+      sysio::print("rcrdcommit: uwreq ", uwreq_id, " candidate ", underwriter,
+                   " already carries a ",
+                   is_source ? "source" : "destination",
+                   " UIC, skipping duplicate\n");
+      return;
+   }
 
    // Reject oversized blobs before protobuf decoding, hashing, or recovery.
    // Candidate evidence/status/reason/timestamps remain untouched.
@@ -1982,9 +1996,10 @@ void uwrit::rcrdcommit(uint64_t uwreq_id,
 
    // Validate the claimed underwriter's signature before changing candidate
    // evidence/status/reason/timestamps.
-   // Current outposts relay opaque UIC bytes, so the depot is authoritative
-   // for binding `uw_account` to current WIRE permission keys. An invalid
-   // claim must never overwrite an honest
+   // Current outposts bind the canonical UIC's claimed identity and external
+   // address to their authenticated caller, while the depot remains
+   // authoritative for binding `uw_account` to current WIRE permission keys.
+   // An invalid claim must never overwrite an honest
    // candidate's previously stored leg, re-arm its status, or create a
    // competitor-visible entry. Log and ignore it; later
    // records in the same envelope continue dispatching.
@@ -2002,8 +2017,7 @@ void uwrit::rcrdcommit(uint64_t uwreq_id,
    // …and the projected whole-row size is guarded so THIS modify — and every
    // later consensus-dispatched one — stays clear of chain KV value limits.
    // Conservative projection: current packed row + the incoming leg bytes +
-   // a fixed allowance for a new entry's non-vector fields (replaced bytes,
-   // if any, are ignored — over-counting only tightens the guard).
+   // a fixed allowance for a new entry's non-vector fields.
    const size_t projected_row_bytes = pack_size(req_snapshot)
                                     + uic_bytes.size()
                                     + (existing_entry ? 0 : COMMIT_ENTRY_PACK_ALLOWANCE_BYTES);

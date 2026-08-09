@@ -1734,7 +1734,8 @@ struct underwriter_plugin::impl {
 
    // -----------------------------------------------------------------------
    //  Submit commit to outpost contract
-   //  The outpost requires an ACTIVE caller and relays opaque UIC bytes
+   //  The outpost requires an ACTIVE caller, validates caller binding and
+   //  canonicality, then relays the original UIC bytes unchanged
    // -----------------------------------------------------------------------
 
    /// Build a verbatim, signed `UnderwriteIntentCommit` payload for the
@@ -1775,7 +1776,9 @@ struct underwriter_plugin::impl {
       // UIC. Host protobuf omits empty byte fields while the generated encoders
       // emit them, so including the configured transaction signer gives every
       // production encoder the same representation. The WIRE signature covers
-      // this signer metadata; current outposts relay the UIC as opaque bytes.
+      // this signer metadata. The outposts bind the claimed account and address
+      // to their authenticated caller and require canonical encoding, then
+      // relay these original validated bytes unchanged.
       const auto leg_chain_kind = outpost.chain_kind();
       const auto caller_address = outpost.authenticated_caller_address();
       const auto expected_address_size =
@@ -2474,10 +2477,10 @@ struct underwriter_plugin::impl {
     * Submit a `commit` JSON-RPC call to each still-missing outpost leg. Depot
     * rows suppress already-stored legs after restart, while complete stored
     * candidates are skipped before this function is reached.
-    * Each outpost requires an ACTIVE-role caller, then queues the opaque
-    * UNDERWRITE_INTENT_COMMIT bytes without binding their identity fields to
-    * that caller. The depot's resolver
-    * (sysio.uwrit::try_select_winner) reconstructs the digest, verifies
+    * Each outpost requires an ACTIVE-role caller, canonicalizes the
+    * UNDERWRITE_INTENT_COMMIT, binds its identity fields to that caller and
+    * current roster row, then queues the original validated bytes. The depot's
+    * resolver (sysio.uwrit::try_select_winner) reconstructs the digest, verifies
     * the signature against the underwriter's account permissions, and
     * promotes the underwriter to winner only after every required UIC leg and
     * current WIRE permission verifies, the complete live obligation is bonded
@@ -2554,8 +2557,8 @@ struct underwriter_plugin::impl {
          // `outpost_client` per EXACT `chain_code` (SEC-13/WSA-027), built at
          // startup via the outpost-plugin factories. Each concrete owns its own
          // ABI / IDL discovery, address encoding, and on-chain confirmation
-         // discipline — this loop just relays opaque UIC bytes through the
-         // virtual. Per `outpost-client-spi.md`.
+         // discipline — this loop passes the serialized UIC bytes unchanged
+         // through the virtual. Per `outpost-client-spi.md`.
          auto it = outpost_by_chain.find(chain_code.value);
          if (it == outpost_by_chain.end()) {
             elog("underwriter: no outpost_client wired for chain={} (uwreq {})",

@@ -124,12 +124,13 @@ For each leg of every selected uwreq:
    submit those bytes verbatim to the outpost — `commit(bytes uicBytes)`
    on Ethereum, `commit_underwrite(uic_bytes)` on Solana.
 
-The current outposts require an ACTIVE-role transaction caller and relay the
-complete UIC as opaque bytes. They do not decode the UIC to bind `uw_account` or
-`uw_ext_chain_addr` to that caller and do not enforce canonical encoding. Those
-fields are signer metadata populated and signed by the local underwriter client;
-the depot performs the authoritative validation. Before storing a leg, the depot
-first requires the complete signed protobuf bytes to equal the
+The current outposts require an ACTIVE-role transaction caller, decode and
+canonically re-encode the complete UIC, and require the original bytes to match.
+They bind `uw_account` and `uw_ext_chain_addr` to that authenticated caller and
+its current roster row, then enqueue the original validated UIC bytes unchanged.
+The outposts do not validate the embedded WIRE permission signature or bond;
+those remain the depot's authoritative responsibilities. Before storing a leg,
+the depot first requires the complete signed protobuf bytes to equal the
 CDT generator's canonical re-encoding. It then reconstructs the digest and
 accepts exactly the canonical packed fixed-size recoverable shapes: K1/R1/EM
 (variant tags `0`/`1`/`3` plus a 65-byte ECC body) or ED (tag `4` plus a

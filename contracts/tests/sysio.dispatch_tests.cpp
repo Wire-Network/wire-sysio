@@ -2871,8 +2871,9 @@ BOOST_FIXTURE_TEST_CASE(swap_signature_rejection_taxonomy_is_logged_and_non_thro
 // field keys exercise the decoder's historical unknown-field behavior all the
 // way to the 2 KiB boundary: decoding succeeds, canonical re-encoding drops
 // the unknown keys, and the payload is rejected as non-canonical. None can
-// replace the already stored honest source leg.
-BOOST_FIXTURE_TEST_CASE(swap_noncanonical_uic_cannot_replace_valid_leg,
+// create candidate evidence. After one honest source leg is stored, valid
+// replays are write-once no-ops before signature work.
+BOOST_FIXTURE_TEST_CASE(swap_noncanonical_uic_is_rejected_and_valid_leg_is_write_once,
                         sysio_dispatch_tester) { try {
    bootstrap_for_dispatch();
    constexpr uint64_t ATT_ID = 7'280;
@@ -2881,13 +2882,6 @@ BOOST_FIXTURE_TEST_CASE(swap_noncanonical_uic_cannot_replace_valid_leg,
    const uint64_t primary = fc::slug_name{"PRIMARY"}.value;
 
    const auto honest = create_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
-   BOOST_REQUIRE_EQUAL(success(), rcrdcommit_direct(
-      ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", honest));
-   // Commit the honest evidence before time-based replacement attempts. The
-   // tester re-applies pending transactions at the produced block timestamp.
-   produce_block();
-   const auto before = get_uwreq(ATT_ID)["commits_by"].get_array().front();
-
    auto default_nested = create_uic(UWRIT_OP.to_string(), ATT_ID, eth, eth, primary);
    default_nested.mutable_uw_ext_chain_addr()->set_kind(
       ChainKind::CHAIN_KIND_UNKNOWN);
@@ -2942,6 +2936,28 @@ BOOST_FIXTURE_TEST_CASE(swap_noncanonical_uic_cannot_replace_valid_leg,
       BOOST_CHECK_MESSAGE(
          console.find("reason=" + std::string{alternate.rejection}) != std::string::npos,
          "unexpected rejection log: " << console);
+      BOOST_REQUIRE(get_uwreq(ATT_ID)["commits_by"].get_array().empty());
+      // Seal the rejection before the next empty-block time jump.
+      produce_block();
+   }
+
+   BOOST_REQUIRE_EQUAL(success(), rcrdcommit_direct(
+      ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", honest));
+   produce_block();
+   const auto before = get_uwreq(ATT_ID)["commits_by"].get_array().front();
+
+   // Repeated canonical UICs can coexist in one relayed envelope. Pin the
+   // contract-side idempotency branch: every replay exits before signature
+   // recovery and leaves the first evidence and arrival time unchanged.
+   for (uint32_t replay = 0; replay < 8; ++replay) {
+      const auto trace = rcrdcommit_trace(
+         ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", honest);
+      BOOST_REQUIRE(!trace->except);
+      const auto& console = trace->action_traces.front().console;
+      BOOST_CHECK_NE(std::string::npos,
+                     console.find("already carries a source UIC, skipping duplicate"));
+      BOOST_CHECK_EQUAL(std::string::npos,
+                        console.find("UIC_SIGNATURE_REJECTED"));
       const auto after = get_uwreq(ATT_ID)["commits_by"].get_array().front();
       BOOST_CHECK_EQUAL(before["source_uic_bytes"].as_string(),
                         after["source_uic_bytes"].as_string());
@@ -2949,7 +2965,6 @@ BOOST_FIXTURE_TEST_CASE(swap_noncanonical_uic_cannot_replace_valid_leg,
                         after["source_received_at_ms"].as_uint64());
       BOOST_CHECK_EQUAL("UNDERWRITE_STATUS_INTENT_SUBMITTED",
                         after["status"].as_string());
-      // Seal the rejection before the next empty-block time jump.
       produce_block();
    }
    BOOST_REQUIRE(get_lock(1).is_null());
@@ -4915,7 +4930,7 @@ BOOST_FIXTURE_TEST_CASE(rcrdcommit_oversized_uic_leg_is_dropped,
 
 // The candidate roster is capped at MAX_UWREQ_CANDIDATES (32): the 33rd
 // distinct ACTIVE underwriter is refused with no row growth, while an
-// existing candidate still updates its entry at the cap (dedupe, not append).
+// existing candidate can still supply its missing leg at the cap.
 BOOST_FIXTURE_TEST_CASE(rcrdcommit_candidate_cap_bounds_row,
                         sysio_dispatch_tester) { try {
    bootstrap_for_dispatch();
