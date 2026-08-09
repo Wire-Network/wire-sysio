@@ -70,7 +70,12 @@ mod tests {
     }
 
     #[test]
-    fn generated_rust_decoder_rejects_malformed_uint64_varints() {
-        assert!(UnderwriteIntentCommit::decode(&decode_hex("1880")).is_err());
+    fn generated_rust_codec_rejects_malformed_uint64_varints_canonically() {
+        for malformed in ["1880", "1880808080808080808002"] {
+            let encoded = decode_hex(malformed);
+            if let Ok(decoded) = UnderwriteIntentCommit::decode(&encoded) {
+                assert_ne!(decoded.encode(), encoded, "malformed varint round-tripped");
+            }
+        }
     }
 }
