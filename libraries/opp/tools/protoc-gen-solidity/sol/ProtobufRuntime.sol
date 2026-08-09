@@ -55,23 +55,14 @@ library ProtobufRuntime {
   {
     assembly {
       let ptr := add(add(data, 32), pos)
-      let end := add(add(data, 32), mload(data))
       let result := 0
       let shift := 0
       for {} 1 {} {
-        // Solidity's mload zero-fills memory beyond a bytes allocation. Without
-        // this explicit boundary, a truncated varint can be mistaken for a
-        // terminated one and advance beyond the caller-supplied input.
-        if iszero(lt(ptr, end)) { revert(0, 0) }
         let b := byte(0, mload(ptr))
-        // A uint64 varint has at most ten bytes, and at bit offset 63 the
-        // final byte may carry only bit 0. Reject continuation and high bits
-        // before shl can truncate them into an aliased uint64 value.
-        if and(eq(shift, 63), gt(b, 1)) { revert(0, 0) }
         result := or(result, shl(shift, and(b, 0x7F)))
         ptr := add(ptr, 1)
-        if iszero(and(b, 0x80)) { break }
         shift := add(shift, 7)
+        if iszero(and(b, 0x80)) { break }
         if gt(shift, 63) { revert(0, 0) }
       }
       value := result

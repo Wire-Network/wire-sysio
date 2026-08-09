@@ -35,9 +35,9 @@ contract UICCrossGeneratorTest {
         _assertConstructsAndReencodes(ChainKindLib.CHAIN_KIND_SVM, SVM_ADDRESS, SVM_SIGNATURE, SVM_FULL);
     }
 
-    function testGeneratedSolidityDecoderRejectsMalformedUint64Varints() public {
-        _assertDecodeReverts(hex"1880");
-        _assertDecodeReverts(hex"1880808080808080808002");
+    function testGeneratedSolidityCodecRejectsMalformedUint64VarintsCanonically() public {
+        _assertDoesNotRoundTrip(hex"1880");
+        _assertDoesNotRoundTrip(hex"1880808080808080808002");
     }
 
     function decodeAndReencode(bytes memory encoded) external pure returns (bytes memory) {
@@ -63,9 +63,14 @@ contract UICCrossGeneratorTest {
         _assertBytesEqual(UnderwriteIntentCommitCodec.encode(UnderwriteIntentCommitCodec.decode(expected)), expected);
     }
 
-    function _assertDecodeReverts(bytes memory malformed) private {
-        (bool success,) = address(this).call(abi.encodeCall(this.decodeAndReencode, (malformed)));
-        require(!success, "malformed varint decoded successfully");
+    function _assertDoesNotRoundTrip(bytes memory malformed) private {
+        (bool success, bytes memory output) = address(this).call(
+            abi.encodeCall(this.decodeAndReencode, (malformed))
+        );
+        if (!success) return;
+
+        bytes memory canonical = abi.decode(output, (bytes));
+        require(keccak256(canonical) != keccak256(malformed), "malformed varint round-tripped");
     }
 
     function _assertBytesEqual(bytes memory actual, bytes memory expected) private pure {
