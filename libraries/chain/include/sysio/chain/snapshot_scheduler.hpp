@@ -190,6 +190,24 @@ private:
     */
    void notify_snapshot_finalized(const snapshot_information& si);
 
+   /**
+    * Drop the completion callback request @p srid still holds, now that the callback has resolved.
+    *
+    * A stored callback is a next_function, which may be invoked exactly once across all of its
+    * copies, so it has to be cleared the moment execute_snapshot()'s completion handler answers
+    * the caller. A request outlives its own snapshot in two ways, and both would otherwise reach
+    * that callback again: a request whose snapshot is forked out stays scheduled and runs again on
+    * the adopted branch, and a spent request is not collected until irreversibility passes its
+    * firing height. Clearing here is also what makes the converse true -- a request that still
+    * carries a callback is one whose caller is still waiting, which is what
+    * unschedule_snapshot_requests() relies on to report removal as a failure.
+    *
+    * No-op if the request is already gone or carries no callback.
+    *
+    * @param srid id of the request whose completion callback has just been resolved
+    */
+   void clear_delivered_request_callback(uint32_t srid);
+
    void x_serialize() {
       auto& vec = _snapshot_requests.get<as_vector>();
       std::vector<snapshot_schedule_information> sr(vec.begin(), vec.end());
@@ -219,9 +237,9 @@ public:
 
    // snapshot scheduler handlers
    // schedule a snapshot request; scheduling validation errors are thrown to the caller.
-   // next (may be empty) is stored on the request and called with the snapshot_information
-   // (or execution error) when a snapshot produced by this request completes; a request that
-   // expires without ever running reports that through the same callback
+   // next (may be empty) is stored on the request and resolved exactly once: with the
+   // snapshot_information (or execution error) of the first snapshot this request delivers, or
+   // with a snapshot_execution_exception if the request is removed without ever delivering one
    snapshot_schedule_result schedule_snapshot(const snapshot_request_information& sri, next_function<snapshot_information> next);
    snapshot_schedule_result unschedule_snapshot(uint32_t sri);
 
@@ -230,12 +248,13 @@ public:
     *
     * A one-time request is kept until lib_height passes its start_block_num, because it runs from
     * on_start_block() at start_block_num + 1 and irreversibility never runs ahead of the applied
-    * head. Any request expires once lib_height reaches its end_block_num.
+    * head; its end_block_num, which scheduling allows to equal start_block_num, does not shorten
+    * that. A recurring request expires once lib_height reaches its end_block_num.
     *
-    * A removed request that still carries a completion callback never ran; its callback is invoked
-    * with a snapshot_execution_exception so the caller sees an error rather than having the callback
-    * silently destroyed. Callback exceptions are logged and swallowed -- this runs on the
-    * irreversible-block path.
+    * A removed request that still carries a completion callback never delivered a snapshot to its
+    * caller; its callback is invoked with a snapshot_execution_exception so the caller sees an error
+    * rather than having the callback silently destroyed. Callback exceptions are logged and
+    * swallowed -- this runs on the irreversible-block path.
     *
     * @param lib_height block number of the last irreversible block
     */
