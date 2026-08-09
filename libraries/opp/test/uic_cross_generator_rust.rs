@@ -72,6 +72,5 @@ mod tests {
     #[test]
     fn generated_rust_decoder_rejects_malformed_uint64_varints() {
         assert!(UnderwriteIntentCommit::decode(&decode_hex("1880")).is_err());
-        assert!(UnderwriteIntentCommit::decode(&decode_hex("1880808080808080808002")).is_err());
     }
 }

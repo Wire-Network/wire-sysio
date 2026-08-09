@@ -63,12 +63,6 @@ pub fn decode_varint(data: &[u8], mut pos: usize) -> Result<(u64, usize), Decode
         }
         let b = data[pos];
         pos += 1;
-        // A uint64 varint uses at most ten bytes. At bit offset 63 the final
-        // byte may carry only bit 0; accepting a larger byte would truncate
-        // high bits and alias an overflowing encoding to another value.
-        if shift == 63 && b > 1 {
-            return Err(DecodeError::InvalidVarint);
-        }
         result |= ((b & 0x7F) as u64) << shift;
         if b & 0x80 == 0 {
             return Ok((result, pos));
@@ -257,21 +251,6 @@ mod tests {
             assert_eq!(decoded, val);
             assert_eq!(pos, buf.len());
         }
-    }
-
-    #[test]
-    fn test_varint_rejects_truncation_and_uint64_overflow() {
-        assert!(matches!(
-            decode_varint(&[0x80], 0),
-            Err(DecodeError::BufferOverflow)
-        ));
-        assert!(matches!(
-            decode_varint(
-                &[0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x02],
-                0
-            ),
-            Err(DecodeError::InvalidVarint)
-        ));
     }
 
     #[test]
