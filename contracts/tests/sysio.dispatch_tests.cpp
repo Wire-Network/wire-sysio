@@ -1472,6 +1472,41 @@ BOOST_FIXTURE_TEST_CASE(swap_request_mismatched_source_chain_is_refunded,
    BOOST_REQUIRE(!get_uwreq(9002).is_null());
 } FC_LOG_AND_RETHROW() }
 
+// An exact `(chain, token, reserve)` self-route has only one outpost leg and
+// can never produce the two distinct commitments an ordinary external-token
+// swap requires. Depot ingestion must therefore refund it without creating a
+// UWREQ. The cross-chain control proves same-asset-style routing remains
+// admissible whenever the endpoint triple is not identical.
+BOOST_FIXTURE_TEST_CASE(swap_request_identical_reserve_identity_is_refunded,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+   BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
+      ("kind", ChainKind::CHAIN_KIND_SVM)("code", codename_mvo("SOLANA"))
+      ("external_chain_id", 900)("name", std::string("solana-test"))("description", std::string{})));
+   setup_wire_token_and_reserves();
+
+   const auto eth       = fc::slug_name{"ETH"}.value;
+   const auto sol_chain = fc::slug_name{"SOLANA"}.value;
+   const auto sol_token = fc::slug_name{"SOL"}.value;
+   const auto primary   = fc::slug_name{"PRIMARY"}.value;
+
+   const auto self_route = encode_swap_request(
+      ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
+      eth, eth, primary, /*src_amount*/ 100,
+      eth, eth, primary, /*target*/ 100,
+      5000, ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0b'));
+   BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(/*att_id*/ 9051, /*proven=*/ eth, self_route));
+   BOOST_REQUIRE(get_uwreq(9051).is_null());
+
+   const auto cross_chain = encode_swap_request(
+      ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
+      eth, eth, primary, /*src_amount*/ 100,
+      sol_chain, sol_token, primary, /*target*/ 100,
+      5000, ChainKind::CHAIN_KIND_SVM, std::vector<char>(32, '\x0b'));
+   BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(/*att_id*/ 9052, /*proven=*/ eth, cross_chain));
+   BOOST_REQUIRE(!get_uwreq(9052).is_null());
+} FC_LOG_AND_RETHROW() }
+
 // UNDERWRITE_INTENT_COMMIT: the same signed dest-leg (SOLANA) commit, delivered through the FULL
 // deliver->evalcons->apply_consensus->dispatch path, is recorded only when its proven outpost matches
 // `uic.chain_code`. Delivered from ETH it is dropped (no commit); delivered from SOLANA it lands.

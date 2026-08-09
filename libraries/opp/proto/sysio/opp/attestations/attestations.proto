@@ -201,7 +201,9 @@ message UnderwriteIntentCommit {
   sysio.opp.types.WireAccount     uw_account        = 1;
   // External-chain transaction-signer metadata populated by the submitting
   // client: 20 bytes for EVM or 32 bytes for SVM. It is covered by the WIRE
-  // signature below; current outposts relay the complete UIC as opaque bytes.
+  // signature below. Each outpost decodes one canonical UIC representation
+  // to bind this address and `uw_account` to the authenticated caller, then
+  // relays the original canonical bytes unchanged for depot verification.
   sysio.opp.types.ChainAddress    uw_ext_chain_addr = 2;
   uint64                          uw_request_id     = 3;
   bytes                           signature         = 5;

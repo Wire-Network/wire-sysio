@@ -1037,6 +1037,21 @@ void uwrit::createuwreq(uint64_t attestation_id,
       return;
    }
 
+   // An exact source/destination reserve identity has only one outpost leg.
+   // Admitting it would leave the ordinary two-leg request waiting forever
+   // for a second distinct commitment. Refund on the proven source outpost
+   // and create no UWREQ; same-asset cross-chain swaps and different reserve
+   // codes remain distinct triples and continue through the normal path.
+   if (src_chain_code == dst_chain_code &&
+       src_token_code == dst_token_code &&
+       src_reserve_code == dst_reserve_code) {
+      emit_swap_revert(get_self(), chain_code, attestation_id, sr,
+                       src_chain_code, src_reserve_code,
+                       "SwapRequest rejected: source and destination reserve "
+                       "identities must differ");
+      return;
+   }
+
    // Structural guards — refund via SwapRevert, never throw (we are inside
    // the evalcons dispatch chain). Zero amounts are rejected up front so
    // every downstream lock/settlement amount is provably positive (a
