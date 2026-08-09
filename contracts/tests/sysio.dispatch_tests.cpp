@@ -105,34 +105,6 @@ std::vector<char> encode_envelope_with_one_attestation(
    return out;
 }
 
-/// Encode a single historical attestation whose numeric enum slot is no
-/// longer declared by the current protobuf schema.
-std::vector<char> encode_envelope_with_one_raw_attestation(
-   uint32_t epoch_index,
-   int32_t raw_att_type,
-   const std::string& att_data)
-{
-   sysio::opp::Envelope env;
-   env.set_epoch_index(epoch_index);
-   env.set_epoch_envelope_index(1);
-   env.set_epoch_timestamp(1'775'612'516'983ULL);
-
-   auto* msg        = env.add_messages();
-   auto* payload    = msg->mutable_payload();
-   auto* att        = payload->add_attestations();
-   const auto* field = att->GetDescriptor()->FindFieldByName("type");
-   BOOST_REQUIRE(field != nullptr);
-   att->GetReflection()->SetEnumValue(att, field, raw_att_type);
-   att->set_data(att_data);
-   att->set_data_size(static_cast<uint32_t>(att_data.size()));
-
-   oracle::finalize_header(*env.mutable_messages(0), {}, 1'775'612'516'983ULL);
-
-   std::vector<char> out(env.ByteSizeLong());
-   env.SerializeToArray(out.data(), static_cast<int>(out.size()));
-   return out;
-}
-
 /// Encode an Envelope wrapping N attestations of the same type. Used to fit
 /// multiple OPERATOR_ACTIONs into a single delivery, since the depot
 /// deduplicates per-(batch_op, outpost, epoch) — a second `deliver` from
@@ -169,11 +141,9 @@ std::vector<char> encode_envelope_with_attestations(
 /// mirror, same as the outbound packing tests in sysio.msgch_tests.cpp.
 constexpr size_t MAX_ENVELOPE_BYTES = 65'536;
 
-/// Historical STAKE protobuf wire value used to verify dispatch drops retired types.
-constexpr int32_t RETIRED_STAKE_ATTESTATION_VALUE = 3001;
-
 /// Encode a decodable envelope whose serialised size is EXACTLY `target_bytes`, padded with a
-/// single challenge-response attestation (dispatch drops it with no value-bearing effect). Probe
+/// single out-of-scope challenge-response attestation (dispatch drops it with no value-bearing
+/// effect). Probe
 /// once with `target_bytes` of padding to measure the fixed protobuf overhead, then rebuild with
 /// the pad shrunk by that overhead: at sizes near the 64 KiB envelope cap every nested length
 /// prefix and the `data_size` varint sit in the same 3-byte width band (16 KiB .. 2 MiB), so the
@@ -1095,9 +1065,9 @@ BOOST_FIXTURE_TEST_CASE(dispatch_silently_drops_out_of_scope_types, sysio_dispat
    bootstrap_for_dispatch();
 
    const auto eth_code = fc::slug_name{"ETH"}.value;
-   auto envelope = encode_envelope_with_one_raw_attestation(
+   auto envelope = encode_envelope_with_one_attestation(
       current_epoch(),
-      RETIRED_STAKE_ATTESTATION_VALUE,
+      sysio::opp::types::ATTESTATION_TYPE_CHALLENGE_RESPONSE,
       std::string{});
 
    BOOST_REQUIRE_EQUAL(success(), deliver(/*chain_code=*/eth_code, envelope));

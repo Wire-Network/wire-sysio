@@ -13,15 +13,12 @@ option cc_enable_arenas = true;
 // ---------------------------------------------------------------------------
 
 enum ChainKind  {
-  reserved 4;
-  reserved "CHAIN_KIND_SUI";
-
   CHAIN_KIND_UNKNOWN = 0;
   CHAIN_KIND_WIRE    = 1;   // The WIRE depot itself (singleton; Chain.code = "WIRE")
   CHAIN_KIND_EVM     = 2;   // All EVM-compatible chains (Ethereum, Polygon, BSC, Arbitrum, Optimism, Base, …)
   CHAIN_KIND_SVM     = 3;   // Solana Virtual Machine chains (Solana mainnet, Eclipse, …)
 
-  // Slot 4 was previously CHAIN_KIND_SUI; do not reuse.
+  // Slots 4+ reserved. Slot 4 was previously CHAIN_KIND_SUI; do not reuse.
 }
 
 // Chain instance identifier — used by `Envelope.Endpoints` to identify
@@ -105,8 +102,6 @@ enum UnderwriteRequestStatus {
 // ---------------------------------------------------------------------------
 
 enum TokenKind {
-  reserved 256 to 259, 496, 512, 752;
-
   TOKEN_KIND_UNKNOWN  = 0;
   TOKEN_KIND_NATIVE   = 1;   // chain-native asset (ETH on EVM, SOL on SVM, WIRE on WIRE)
   TOKEN_KIND_ERC20    = 2;
@@ -234,15 +229,8 @@ message ReserveAmount {
 // ---------------------------------------------------------------------------
 
 enum AttestationType {
-  reserved 3001, 3002, 60929, 60931, 60933, 60935 to 60942, 60946, 60948, 60954, 60957;
-  reserved "ATTESTATION_TYPE_STAKE", "ATTESTATION_TYPE_UNSTAKE";
-
   ATTESTATION_TYPE_UNSPECIFIED = 0;
   ATTESTATION_TYPE_OPERATOR_ACTION = 2001; // 0x07D1
-  // 3001 was ATTESTATION_TYPE_STAKE — removed; do not reuse. The pre-launch
-  // stake lifecycle was retired before mainnet launch.
-  // 3002 was ATTESTATION_TYPE_UNSTAKE — removed; do not reuse. The pre-launch
-  // unstake lifecycle was retired before mainnet launch.
   // DEPRECATED — pre-launch only, do not use in new code.
   ATTESTATION_TYPE_PRETOKEN_PURCHASE = 3004;
   // DEPRECATED — pre-launch only, do not use in new code.
@@ -252,7 +240,6 @@ enum AttestationType {
   // 60929 (0xEE01) was ATTESTATION_TYPE_NATIVE_YIELD_REWARD — removed; do not reuse.
   // DEPRECATED — pre-launch only, do not use in new code.
   ATTESTATION_TYPE_WIRE_TOKEN_PURCHASE = 60930;
-  // 60931 was ATTESTATION_TYPE_OPERATOR_REG_DEREG — replaced by OPERATOR_ACTION; do not reuse.
   ATTESTATION_TYPE_CHALLENGE_RESPONSE = 60932;
   // 60933 was standalone SLASH_OPERATOR — removed; SLASH is now an OperatorAction sub-type.
   ATTESTATION_TYPE_SWAP_REQUEST = 60934;
@@ -260,10 +247,6 @@ enum AttestationType {
   // 60936 was ATTESTATION_TYPE_UNDERWRITE_CONFIRM — removed; do not reuse.
   // 60937 was ATTESTATION_TYPE_UNDERWRITE_REJECT — removed; do not reuse.
   // 60938 was ATTESTATION_TYPE_UNDERWRITE_UNLOCK — removed; do not reuse.
-  // 60939 was ATTESTATION_TYPE_CHALLENGE_REQUEST — renumbered to 60945; do not reuse.
-  // 60940 was ATTESTATION_TYPE_EPOCH_SYNC — renumbered to 60946, then removed; do not reuse.
-  // 60941 was ATTESTATION_TYPE_ROSTER_UPDATE — removed; do not reuse.
-  // 60942 was ATTESTATION_TYPE_REMIT_CONFIRM — renumbered to 60948, then removed; do not reuse.
   ATTESTATION_TYPE_SWAP_REMIT = 60944;
   ATTESTATION_TYPE_CHALLENGE_REQUEST = 60945;
   // 60946 was ATTESTATION_TYPE_EPOCH_SYNC — removed; do not reuse.
@@ -376,13 +359,10 @@ enum AttestationStatus {
 }
 
 enum UnderwriteStatus {
-  reserved 4;
-
   UNDERWRITE_STATUS_INTENT_CREATED   = 0;
   UNDERWRITE_STATUS_INTENT_SUBMITTED = 1;
   UNDERWRITE_STATUS_INTENT_CONFIRMED = 2;
   UNDERWRITE_STATUS_READY            = 3;
-  // Slot 4 was UNDERWRITE_STATUS_SLASHED before that state moved to 10; do not reuse.
   UNDERWRITE_STATUS_RELEASED         = 5;
   UNDERWRITE_STATUS_SLASHED          = 10;
   // Candidate-specific, pre-settlement invalidity in the underwriter race (bad

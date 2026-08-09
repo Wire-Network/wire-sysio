@@ -6,12 +6,6 @@ export interface EnumValueInfo {
   number: number
 }
 
-/** A protobuf enum reservation. Both bounds are inclusive in descriptor.proto. */
-export interface EnumReservedRangeInfo {
-  start: number
-  end: number
-}
-
 /** Descriptor for a protobuf enum, ready for Solidity codegen. */
 export interface EnumDescriptor {
   /** Simple name (e.g. "Role") */
@@ -20,8 +14,6 @@ export interface EnumDescriptor {
   fullName: string
   /** Enum values */
   values: EnumValueInfo[]
-  /** Numeric slots retired with `reserved`; decoded opaquely but never valid. */
-  reservedRanges: EnumReservedRangeInfo[]
   /** Computed smallest unsigned integer type that fits all values */
   underlyingType: string
 }
@@ -43,6 +35,7 @@ export interface EnumFieldInfo {
  * Compute the smallest unsigned integer type that can hold all enum values.
  */
 export function computeUnderlyingType(values: EnumValueInfo[]): string {
+  if (values.length === 0) return "uint8"
   const maxVal = Math.max(0, ...values.map(v => v.number))
   if (maxVal <= 0xff) return "uint8"
   if (maxVal <= 0xffff) return "uint16"
@@ -106,20 +99,6 @@ export function genEnumDefinition(desc: EnumDescriptor): string {
   )
   for (const val of uniqueValues) {
     lines.push(`        if (_raw == ${val.number}) return ${val.name};`)
-  }
-  if (desc.reservedRanges.length > 0) {
-    lines.push(
-      `        if (_raw > type(${underlying}).max) revert InvalidEnumValue(_raw);`
-    )
-  }
-  for (const range of desc.reservedRanges) {
-    const condition =
-      range.end === range.start
-        ? `_raw == ${range.start}`
-        : `_raw >= ${range.start} && _raw <= ${range.end}`
-    lines.push(
-      `        if (${condition}) return ${name}.wrap(${underlying}(_raw));`
-    )
   }
   lines.push(`        revert InvalidEnumValue(_raw);`)
   lines.push(`    }`)

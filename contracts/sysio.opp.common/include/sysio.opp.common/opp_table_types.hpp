@@ -298,9 +298,6 @@ DataStream& operator>>(DataStream& ds, ReserveBalanceSheet& t) {
    return ds >> t.chain_code >> t.reserves;
 }
 
-// PretokenStakeChange DataStream operators were removed with the retired
-// pre-launch STAKE / UNSTAKE lifecycle (enum slots 3001 and 3002).
-
 // PretokenPurchase (deprecated; pre-launch only)
 template <typename DataStream>
 DataStream& operator<<(DataStream& ds, const PretokenPurchase& t) {

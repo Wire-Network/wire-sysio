@@ -48,18 +48,10 @@ const EnumValueDescriptorProto = new protobuf.Type("EnumValueDescriptorProto")
   .add(new protobuf.Field("name", 1, "string", "optional"))
   .add(new protobuf.Field("number", 2, "int32", "optional"))
 
-/** Numeric interval reserved by a protobuf enum declaration. */
-const EnumReservedRange = new protobuf.Type("EnumReservedRange")
-  .add(new protobuf.Field("start", 1, "int32", "optional"))
-  .add(new protobuf.Field("end", 2, "int32", "optional"))
-
 const EnumDescriptorProtoMsg = new protobuf.Type("EnumDescriptorProto")
   .add(new protobuf.Field("name", 1, "string", "optional"))
   .add(new protobuf.Field("value", 2, "EnumValueDescriptorProto", "repeated"))
-  .add(new protobuf.Field("reserved_range", 4, "EnumReservedRange", "repeated"))
-  .add(new protobuf.Field("reserved_name", 5, "string", "repeated"))
   .add(EnumValueDescriptorProto)
-  .add(EnumReservedRange)
 
 const DescriptorProto = new protobuf.Type("DescriptorProto")
   .add(new protobuf.Field("name", 1, "string", "optional"))
@@ -239,15 +231,10 @@ function buildEnumRegistry(protoFiles: any[]): EnumRegistry {
         name: v.name ?? "",
         number: v.number ?? 0
       }))
-      const reservedRanges = (e.reserved_range ?? []).map((range: any) => ({
-        start: range.start ?? 0,
-        end: range.end ?? 0
-      }))
       registry.set(fqn, {
         name,
         fullName,
         values,
-        reservedRanges,
         underlyingType: computeUnderlyingType(values)
       })
     }
@@ -337,15 +324,10 @@ function extractEnums(protoFile: any, packageName: string): EnumDescriptor[] {
         name: v.name ?? "",
         number: v.number ?? 0
       }))
-      const reservedRanges = (e.reserved_range ?? []).map((range: any) => ({
-        start: range.start ?? 0,
-        end: range.end ?? 0
-      }))
       result.push({
         name,
         fullName,
         values,
-        reservedRanges,
         underlyingType: computeUnderlyingType(values)
       })
     }
