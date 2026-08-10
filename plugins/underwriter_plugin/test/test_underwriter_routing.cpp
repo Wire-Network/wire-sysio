@@ -201,6 +201,16 @@ BOOST_AUTO_TEST_CASE(fully_local_candidate_reserves_before_new_submission) {
       remaining, leg_bond{B_ETH_USDC, 1}, NO_LEG));
 }
 
+BOOST_AUTO_TEST_CASE(stored_complete_candidate_reserves_before_depot_retry) {
+   credit_buckets credit{{B_ETH_USDC, 100}};
+   const leg_bond src{B_ETH_USDC, 40};
+   const leg_bond dst{B_ETH_USDC, 60};
+
+   reserve_buckets(credit, src, dst);
+   BOOST_CHECK_EQUAL(credit[B_ETH_USDC], 0u);
+   BOOST_CHECK(!try_debit_buckets(credit, leg_bond{B_ETH_USDC, 1}, NO_LEG));
+}
+
 BOOST_AUTO_TEST_CASE(mixed_stored_local_candidate_reserves_full_bond) {
    const auto partial = plan_stored_commits(
       /*candidate_exists=*/true,

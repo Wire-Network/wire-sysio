@@ -8,7 +8,7 @@ option(CDT_BUILD "Indicates that the CDT is being built" OFF)
 
 message(STATUS "CDT_ROOT is set to: ${CDT_ROOT}")
 
-if(NOT CDT_BUILD AND (BUILD_SYSTEM_CONTRACTS OR (ENABLE_TESTS AND CDT_ROOT)))
+if(BUILD_SYSTEM_CONTRACTS AND NOT CDT_BUILD)
   find_package(cdt REQUIRED)
 endif()
 

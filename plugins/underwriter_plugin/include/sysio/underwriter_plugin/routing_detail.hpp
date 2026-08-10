@@ -130,10 +130,11 @@ struct commit_key {
 
 /// Restart-safe work derived from one candidate's authoritative depot row.
 /// A partial candidate submits only missing outpost legs. A complete candidate
-/// has already received its one authoritative depot attempt and suppresses all
-/// replay, as does an existing non-submitted terminal candidate. Depot legs
-/// never submit.
+/// reuses its stored proof through one bounded depot retry, rather than replaying
+/// paid outpost commits; an existing non-submitted terminal candidate is still
+/// skipped. Depot legs never submit.
 struct stored_commit_plan {
+   bool retry_depot = false;
    bool skip_candidate = false;
    bool submit_source = false;
    bool submit_destination = false;
@@ -149,8 +150,8 @@ inline bool has_submission_work(const stored_commit_plan& plan,
 }
 
 /// Derive the restart-safe submission plan from one authoritative depot
-/// candidate. Existing terminal candidates and candidates that already
-/// completed their one winner-selection attempt are skipped; otherwise only
+/// candidate. Existing terminal candidates are skipped. A complete candidate
+/// is retried on the depot from its already-stored evidence; otherwise only
 /// missing non-depot UIC legs remain eligible for submission.
 inline stored_commit_plan plan_stored_commits(bool candidate_exists,
                                                bool intent_submitted,
@@ -166,7 +167,7 @@ inline stored_commit_plan plan_stored_commits(bool candidate_exists,
    const bool destination_complete = destination_is_depot ||
       (intent_submitted && destination_uic_stored);
    if (intent_submitted && source_complete && destination_complete) {
-      return {.skip_candidate = true};
+      return {.retry_depot = true};
    }
    return {
       .submit_source = !source_complete,

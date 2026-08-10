@@ -244,6 +244,20 @@
             ]
         },
         {
+            "name": "retrycommit",
+            "base": "",
+            "fields": [
+                {
+                    "name": "uwreq_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "underwriter",
+                    "type": "name"
+                }
+            ]
+        },
+        {
             "name": "setconfig",
             "base": "",
             "fields": [
@@ -506,6 +520,11 @@
         {
             "name": "rcrdcommit",
             "type": "rcrdcommit",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "retrycommit",
+            "type": "retrycommit",
             "ricardian_contract": ""
         },
         {

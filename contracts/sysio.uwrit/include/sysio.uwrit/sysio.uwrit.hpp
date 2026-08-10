@@ -282,10 +282,11 @@ namespace sysio {
       /// race. For a dual-outpost request it revalidates only the older stored
       /// leg so a WIRE permission-key change between arrivals cannot authorize
       /// stale evidence; the just-verified incoming leg is not recovered twice.
-      /// The complete candidate receives exactly one authoritative live-capacity
-      /// check: insufficient collateral durably disqualifies that candidate,
-      /// while request-global reserve failure rejects/refunds the whole request.
-      /// Neither outcome is retried or re-armed by replayed UIC bytes.
+      /// A complete candidate is evaluated immediately. Recoverable conditions
+      /// (temporarily unavailable collateral, identity links, or reserves) keep
+      /// its evidence on the PENDING row and are re-evaluated by
+      /// `retrycommit`; malformed or no-longer-authorized stored evidence is
+      /// durably disqualified. Replayed UIC bytes never replace stored legs.
       ///
       /// `(from_chain_code, from_token_code, reserve_code)` together identify
       /// which leg of the swap this UIC covers. Same-chain swaps with
@@ -303,6 +304,16 @@ namespace sysio {
                       sysio::slug_name from_token_code,
                       sysio::slug_name reserve_code,
                       std::vector<char> uic_bytes);
+
+      /// Re-evaluate one complete candidate using its already-stored UIC
+      /// evidence. The candidate authorizes this bounded depot-only retry, so
+      /// a transient candidate-local or reserve condition can recover without
+      /// replaying paid outpost commits. Unknown, incomplete, durably
+      /// disqualified, and resolved requests are idempotent no-ops; a live
+      /// retry revalidates every required stored signature against current
+      /// permissions before attempting winner selection.
+      [[sysio::action]]
+      void retrycommit(uint64_t uwreq_id, name underwriter);
 
       /// Sweep all `locks` rows whose `expires_at_ms` has elapsed. Inlined
       /// from `sysio.epoch::advance` (as one of its FIRST steps — freshly
@@ -520,13 +531,12 @@ namespace sysio {
          uint64_t          dest_received_at_ms   = 0;
          uint64_t          dest_outpost_id       = 0;
          std::vector<char> dest_uic_bytes;
-         /// Race outcome — INTENT_SUBMITTED (initial), INTENT_CONFIRMED
-         /// (winner), DISQUALIFIED (durable candidate invalidity such as an
-         /// older stored signature invalidated by key rotation, a durable
-         /// role/activation failure, or insufficient collateral at the
-         /// candidate's one authoritative winner-selection attempt),
-         /// or RELEASED (clean loser, retained for audit). A new matching,
-         /// `rcrdcommit` cannot rewrite or re-arm a DISQUALIFIED entry. The
+         /// Race outcome — INTENT_SUBMITTED (initial/retryable),
+         /// INTENT_CONFIRMED (winner), DISQUALIFIED (durably invalid stored
+         /// evidence, such as a signature invalidated by key rotation), or
+         /// RELEASED (clean loser, retained for audit). A new matching
+         /// `rcrdcommit` cannot rewrite or re-arm a DISQUALIFIED entry;
+         /// `retrycommit` can re-evaluate only an INTENT_SUBMITTED entry. The
          /// reused protobuf enum also contains SLASHED, but commit entries
          /// never write that value; economic slash state belongs to lock and
          /// operator settlement.

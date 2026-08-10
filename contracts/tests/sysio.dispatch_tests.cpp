@@ -690,6 +690,41 @@ public:
          ("uic_bytes",       uic_bytes));
    }
 
+   action_result retrycommit_direct(uint64_t uwreq_id, name underwriter,
+                                    name signer) {
+      return push(UWRIT_ACCOUNT, uwrit_abi, signer, "retrycommit"_n, mvo()
+         ("uwreq_id",    uwreq_id)
+         ("underwriter", underwriter.to_string()));
+   }
+
+   action_result retrycommit_direct(
+      uint64_t uwreq_id, name underwriter,
+      const fc::crypto::private_key& signing_key) {
+      try {
+         action retry;
+         retry.account = UWRIT_ACCOUNT;
+         retry.name = "retrycommit"_n;
+         retry.data = uwrit_abi.variant_to_binary(
+            uwrit_abi.get_action_type(retry.name),
+            mvo()("uwreq_id", uwreq_id)("underwriter", underwriter.to_string()),
+            abi_serializer::create_yield_function(abi_serializer_max_time));
+         retry.authorization = {{underwriter, config::active_name}};
+
+         signed_transaction trx;
+         trx.actions.emplace_back(std::move(retry));
+         set_transaction_headers(trx);
+         trx.sign(signing_key, control->get_chain_id());
+         push_transaction(trx);
+         return success();
+      } catch (const fc::exception& ex) {
+         return error(ex.top_message());
+      }
+   }
+
+   action_result retrycommit_direct(uint64_t uwreq_id, name underwriter) {
+      return retrycommit_direct(uwreq_id, underwriter, underwriter);
+   }
+
    /** Push `rcrdcommit` and retain its trace for exact rejection-log assertions. */
    transaction_trace_ptr rcrdcommit_trace(
       uint64_t uwreq_id, name underwriter, uint64_t outpost_chain_code,
@@ -2105,10 +2140,10 @@ BOOST_FIXTURE_TEST_CASE(forged_delivery_does_not_strand_chkcons, sysio_dispatch_
 } FC_LOG_AND_RETHROW() }
 
 // A complete, fully bonded candidate lacking a destination-chain authex link
-// must be DISQUALIFIED before a request-global race-time variance verdict.
-// Another underwriter may have the missing identity link, so the request
-// remains PENDING and no lock or reserve write occurs.
-BOOST_FIXTURE_TEST_CASE(swap_missing_dst_authex_precedes_race_time_rejection,
+// keeps its valid UIC evidence while the request remains PENDING. Once the
+// operator fixes the link, retrycommit settles from those stored bytes without
+// requiring either outpost commit to be replayed.
+BOOST_FIXTURE_TEST_CASE(swap_missing_dst_authex_recovers_after_depot_retry,
                         sysio_dispatch_tester) { try {
    bootstrap_for_dispatch();   // registers ETH + UWRIT_OP (EVM link only)
 
@@ -2140,13 +2175,6 @@ BOOST_FIXTURE_TEST_CASE(swap_missing_dst_authex_precedes_race_time_rejection,
       std::vector<char>(32, '\x0b'));
    BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, eth, sr));
 
-   // Drain the destination after admission so the live quote is far outside
-   // the original target. Without the candidate-first remit gate, this fully
-   // bonded but identity-incomplete candidate would reject the whole request.
-   constexpr uint64_t SEEDED_RESERVE = 1'000'000'000'000ull;
-   BOOST_REQUIRE_EQUAL(success(), debit_reserve_chain(
-      "SOLANA", "SOL", "PRIMARY", SEEDED_RESERVE - (AMOUNT - 1)));
-
    const auto src_uic = create_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
    BOOST_REQUIRE_EQUAL(success(),
       rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", src_uic));
@@ -2161,14 +2189,30 @@ BOOST_FIXTURE_TEST_CASE(swap_missing_dst_authex_precedes_race_time_rejection,
    for (const auto& c : req["commits_by"].get_array()) {
       if (c["underwriter"].as_string() == UWRIT_OP.to_string()) {
          found = true;
-         BOOST_REQUIRE_EQUAL("UNDERWRITE_STATUS_DISQUALIFIED",
+         BOOST_REQUIRE_EQUAL("UNDERWRITE_STATUS_INTENT_SUBMITTED",
                              c["status"].as_string());
-         BOOST_REQUIRE(c["reason"].as_string().find(
-            "no authex link for the destination") != std::string::npos);
+         BOOST_REQUIRE(!c["source_uic_bytes"].as_string().empty());
+         BOOST_REQUIRE(!c["dest_uic_bytes"].as_string().empty());
       }
    }
    BOOST_REQUIRE(found);
    BOOST_REQUIRE(get_lock(1).is_null());
+
+   const auto solana_link_key = fc::crypto::private_key::generate(
+      fc::crypto::private_key::key_type::ed).get_public_key();
+   BOOST_REQUIRE_EQUAL(success(), push(
+      AUTHEX_ACCOUNT, authex_abi, AUTHEX_ACCOUNT, "recordlink"_n, mvo()
+         ("account", UWRIT_OP)
+         ("chain_kind", ChainKind::CHAIN_KIND_SVM)
+         ("pub_key", solana_link_key)));
+   produce_block();
+
+   BOOST_REQUIRE_EQUAL(success(), retrycommit_direct(ATT_ID, UWRIT_OP));
+   BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_CONFIRMED",
+                       get_uwreq(ATT_ID)["status"].as_string());
+   BOOST_REQUIRE_EQUAL(UWRIT_OP.to_string(), get_uwreq(ATT_ID)["winner"].as_string());
+   BOOST_REQUIRE(!get_lock(1).is_null());
+   BOOST_REQUIRE(!get_lock(2).is_null());
 
 } FC_LOG_AND_RETHROW() }
 
@@ -2479,19 +2523,20 @@ BOOST_FIXTURE_TEST_CASE(swap_underbonded_candidate_cannot_terminally_reject,
    BOOST_REQUIRE_EQUAL(success(),
       rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "SECOND", dst_uic));
 
-   // Still PENDING (not REJECTED): the candidate was disqualified on bond, and
-   // the request stays open for an underwriter that can actually settle it.
+   // Still PENDING (not REJECTED): the valid candidate was under-bonded, so
+   // the request remains retryable after collateral changes.
    const auto req = get_uwreq(ATT_ID);
    BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_PENDING", req["status"].as_string());
-   bool bond_dq = false;
+   bool bond_retryable = false;
    for (const auto& c : req["commits_by"].get_array()) {
       if (c["underwriter"].as_string() == UWRIT_OP.to_string()) {
-         BOOST_REQUIRE_EQUAL("UNDERWRITE_STATUS_DISQUALIFIED", c["status"].as_string());
-         bond_dq = c["reason"].as_string().find(
-            "insufficient available collateral") != std::string::npos;
+         BOOST_REQUIRE_EQUAL("UNDERWRITE_STATUS_INTENT_SUBMITTED", c["status"].as_string());
+         bond_retryable = c["reason"].as_string().empty()
+                          && !c["source_uic_bytes"].as_string().empty()
+                          && !c["dest_uic_bytes"].as_string().empty();
       }
    }
-   BOOST_REQUIRE(bond_dq);
+   BOOST_REQUIRE(bond_retryable);
 } FC_LOG_AND_RETHROW() }
 
 // [P0] WNS-01 (CertiK "Wire Network - Sysio Audit 1", Critical): `opreg::prune`
@@ -3208,6 +3253,11 @@ BOOST_FIXTURE_TEST_CASE(swap_key_rotation_disqualifies_older_stored_leg,
    // An identical, otherwise valid replay cannot re-arm a disqualified entry.
    BOOST_REQUIRE_EQUAL(success(), rcrdcommit_direct(
       ATT_ID, UWRIT_OP, sol, "SOLANA", "SOL", "PRIMARY", new_destination));
+   assert_disqualification_unchanged();
+
+   // `retrycommit` cannot re-arm stale evidence after key rotation either.
+   BOOST_REQUIRE_EQUAL(success(), retrycommit_direct(
+      ATT_ID, UWRIT_OP, replacement_key));
    assert_disqualification_unchanged();
 
    // Neither malformed nor unauthorized changed replacements can re-arm it.
@@ -4013,11 +4063,10 @@ BOOST_FIXTURE_TEST_CASE(swap_request_negative_source_is_reverted,
 // legs; checking each leg independently lets a balance covering each single leg
 // but not their sum win and overcommit the bucket.
 
-// Balance 150 covers each single 100-leg but not the 200 aggregate. The depot
-// permanently disqualifies only that candidate, compacts its UIC payloads, and
-// leaves the request PENDING. A later top-up and replay cannot re-arm the
-// one-shot candidate; a distinct fully funded candidate can still win.
-BOOST_FIXTURE_TEST_CASE(swap_same_token_legs_overcommit_disqualifies_candidate,
+// Balance 150 covers each single 100-leg but not the 200 aggregate. The valid
+// candidate remains PENDING after the failed capacity check; a top-up followed
+// by its depot-only retry settles from the stored UICs without outpost replay.
+BOOST_FIXTURE_TEST_CASE(swap_same_token_legs_overcommit_recovers_after_top_up,
                         sysio_dispatch_tester) { try {
    bootstrap_for_dispatch();   // ETH chain + UWRIT_OP (EVM authex link)
    // Both reserves must be ACTIVE and priceable: the resolver computes the live
@@ -4033,21 +4082,6 @@ BOOST_FIXTURE_TEST_CASE(swap_same_token_legs_overcommit_disqualifies_candidate,
    constexpr uint64_t ATT_ID     = 8000;
    constexpr int64_t  SRC_AMOUNT = 100;
    constexpr uint64_t DST_AMOUNT = 100;
-   const name FUNDED_UW = "uwrit.bob"_n;
-
-   // A separately keyed and EVM-linked ACTIVE underwriter proves the request
-   // remains actionable after the first candidate's terminal failure.
-   create_account(FUNDED_UW);
-   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT,
-      "regoperator"_n, mvo()
-         ("account",         FUNDED_UW.to_string())
-         ("type",            OperatorType::OPERATOR_TYPE_UNDERWRITER)
-         ("is_bootstrapped", false)));
-   create_eth_authex_link(FUNDED_UW);
-   BOOST_REQUIRE_EQUAL(success(), depositinle_credit(FUNDED_UW, "ETH", "ETH", 200));
-   BOOST_REQUIRE_EQUAL("OPERATOR_STATUS_ACTIVE",
-                       get_operator(FUNDED_UW)["status"].as_string());
-
    // One (ETH, ETH) bucket holds 150 against an aggregate need of
    // `src_amount + quote(src_amount)` — just under 200, so 150 cannot cover it.
    BOOST_REQUIRE_EQUAL(success(), depositinle_credit(UWRIT_OP, "ETH", "ETH", 150));
@@ -4073,65 +4107,29 @@ BOOST_FIXTURE_TEST_CASE(swap_same_token_legs_overcommit_disqualifies_candidate,
    for (const auto& c : req["commits_by"].get_array()) {
       if (c["underwriter"].as_string() == UWRIT_OP.to_string()) {
          found = true;
-         BOOST_REQUIRE_EQUAL("UNDERWRITE_STATUS_DISQUALIFIED",
+         BOOST_REQUIRE_EQUAL("UNDERWRITE_STATUS_INTENT_SUBMITTED",
                              c["status"].as_string());
-         BOOST_CHECK_NE(std::string::npos,
-                        c["reason"].as_string().find("insufficient available collateral"));
-         BOOST_REQUIRE(c["source_uic_bytes"].as_string().empty());
-         BOOST_REQUIRE(c["dest_uic_bytes"].as_string().empty());
+         BOOST_REQUIRE(c["reason"].as_string().empty());
+         BOOST_REQUIRE(!c["source_uic_bytes"].as_string().empty());
+         BOOST_REQUIRE(!c["dest_uic_bytes"].as_string().empty());
       }
    }
    BOOST_REQUIRE(found);
    BOOST_REQUIRE(get_lock(1).is_null());   // no locks written
 
-   // More collateral makes future requests eligible; it does not revive this
-   // candidate or let a replay consume winner-selection work again.
+   // More collateral makes this already-proven candidate eligible. The bounded
+   // retry revalidates its stored signatures and writes the two locks.
    BOOST_REQUIRE_EQUAL(success(),
       depositinle_credit(UWRIT_OP, "ETH", "ETH", 50));
    produce_block();
-   BOOST_REQUIRE_EQUAL(success(),
-      rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", src_uic));
-   BOOST_REQUIRE_EQUAL(success(),
-      rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "SECOND", dst_uic));
-   const auto replayed = get_uwreq(ATT_ID)["commits_by"].get_array().front();
-   BOOST_REQUIRE_EQUAL("UNDERWRITE_STATUS_DISQUALIFIED",
-                       replayed["status"].as_string());
-   BOOST_REQUIRE(get_lock(1).is_null());
-
-   // Candidate-local failure did not consume the request: a different
-   // eligible, sufficiently bonded, remittable underwriter completes it.
-   const auto funded_src_uic = create_signed_uic(
-      FUNDED_UW, ATT_ID, eth, eth, primary);
-   BOOST_REQUIRE_EQUAL(success(),
-      rcrdcommit_direct(ATT_ID, FUNDED_UW, eth, "ETH", "ETH", "PRIMARY",
-                        funded_src_uic));
-   const auto funded_dst_uic = create_signed_uic(
-      FUNDED_UW, ATT_ID, eth, eth, secondary);
-   BOOST_REQUIRE_EQUAL(success(),
-      rcrdcommit_direct(ATT_ID, FUNDED_UW, eth, "ETH", "ETH", "SECOND",
-                        funded_dst_uic));
+   BOOST_REQUIRE_EQUAL(success(), retrycommit_direct(ATT_ID, UWRIT_OP));
 
    const auto confirmed = get_uwreq(ATT_ID);
    BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_CONFIRMED",
                        confirmed["status"].as_string());
-   BOOST_REQUIRE_EQUAL(FUNDED_UW.to_string(), confirmed["winner"].as_string());
-   bool first_still_disqualified = false;
-   bool second_confirmed = false;
-   for (const auto& c : confirmed["commits_by"].get_array()) {
-      if (c["underwriter"].as_string() == UWRIT_OP.to_string()) {
-         first_still_disqualified =
-            c["status"].as_string() == "UNDERWRITE_STATUS_DISQUALIFIED";
-      } else if (c["underwriter"].as_string() == FUNDED_UW.to_string()) {
-         second_confirmed =
-            c["status"].as_string() == "UNDERWRITE_STATUS_INTENT_CONFIRMED";
-      }
-   }
-   BOOST_REQUIRE(first_still_disqualified);
-   BOOST_REQUIRE(second_confirmed);
-   BOOST_REQUIRE_EQUAL(FUNDED_UW.to_string(),
-                       get_lock(1)["underwriter"].as_string());
-   BOOST_REQUIRE_EQUAL(FUNDED_UW.to_string(),
-                       get_lock(2)["underwriter"].as_string());
+   BOOST_REQUIRE_EQUAL(UWRIT_OP.to_string(), confirmed["winner"].as_string());
+   BOOST_REQUIRE_EQUAL(UWRIT_OP.to_string(), get_lock(1)["underwriter"].as_string());
+   BOOST_REQUIRE_EQUAL(UWRIT_OP.to_string(), get_lock(2)["underwriter"].as_string());
    BOOST_REQUIRE_EQUAL(ATT_ID, get_lock(1)["uwreq_id"].as_uint64());
    BOOST_REQUIRE_EQUAL(ATT_ID, get_lock(2)["uwreq_id"].as_uint64());
    BOOST_REQUIRE(get_lock(3).is_null());
@@ -4213,11 +4211,10 @@ BOOST_FIXTURE_TEST_CASE(swap_race_time_reserve_drain_rejects_request,
    BOOST_REQUIRE(get_lock(1).is_null());
 } FC_LOG_AND_RETHROW() }
 
-// createuwreq admits missing/inactive reserves for dev and smoke clusters, but
-// a complete one-shot candidate has no retry or reserve-activation wake-up.
-// Once that candidate has passed its source-sized bond gate, the unprovisioned
-// route is request-global: reject/refund immediately and compact its evidence.
-BOOST_FIXTURE_TEST_CASE(swap_missing_reserve_complete_candidate_rejects_request,
+// createuwreq admits missing/inactive reserves for dev and smoke clusters. A
+// complete candidate must keep the request PENDING while the reserve route is
+// provisioned, then settle through its bounded depot-only retry.
+BOOST_FIXTURE_TEST_CASE(swap_missing_reserve_complete_candidate_recovers_after_provisioning,
                         sysio_dispatch_tester) { try {
    bootstrap_for_dispatch();
 
@@ -4230,7 +4227,7 @@ BOOST_FIXTURE_TEST_CASE(swap_missing_reserve_complete_candidate_rejects_request,
    // No reserve rows are provisioned. The zero ingestion quote leaves only the
    // source amount in this same-bucket candidate's authoritative bond check.
    BOOST_REQUIRE_EQUAL(success(),
-      depositinle_credit(UWRIT_OP, "ETH", "ETH", AMOUNT));
+      depositinle_credit(UWRIT_OP, "ETH", "ETH", uint64_t{1'000'000}));
    const auto sr = encode_swap_request(
       ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
       eth, eth, primary, static_cast<int64_t>(AMOUNT),
@@ -4247,18 +4244,25 @@ BOOST_FIXTURE_TEST_CASE(swap_missing_reserve_complete_candidate_rejects_request,
       create_signed_uic(UWRIT_OP, ATT_ID, eth, eth, secondary)));
 
    const auto req = get_uwreq(ATT_ID);
-   BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_REJECTED",
+   BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_PENDING",
                        req["status"].as_string());
-   BOOST_REQUIRE(req["attestation_inbound_data"].as_string().empty());
    const auto candidate = req["commits_by"].get_array().front();
-   BOOST_REQUIRE_EQUAL("UNDERWRITE_STATUS_RELEASED",
+   BOOST_REQUIRE_EQUAL("UNDERWRITE_STATUS_INTENT_SUBMITTED",
                        candidate["status"].as_string());
-   BOOST_CHECK_NE(std::string::npos,
-                  candidate["reason"].as_string().find(
-                     "required reserve missing or not ACTIVE"));
-   BOOST_REQUIRE(candidate["source_uic_bytes"].as_string().empty());
-   BOOST_REQUIRE(candidate["dest_uic_bytes"].as_string().empty());
+   BOOST_REQUIRE(!candidate["source_uic_bytes"].as_string().empty());
+   BOOST_REQUIRE(!candidate["dest_uic_bytes"].as_string().empty());
    BOOST_REQUIRE(get_lock(1).is_null());
+
+   // A third party cannot spend the candidate's bounded retry opportunity.
+   BOOST_REQUIRE(retrycommit_direct(ATT_ID, UWRIT_OP, MSGCH_ACCOUNT) != success());
+
+   setup_wire_token_and_reserves();
+   BOOST_REQUIRE_EQUAL(success(), regreserve_active("ETH", "ETH", "SECOND"));
+   BOOST_REQUIRE_EQUAL(success(), retrycommit_direct(ATT_ID, UWRIT_OP));
+   BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_CONFIRMED",
+                       get_uwreq(ATT_ID)["status"].as_string());
+   BOOST_REQUIRE(!get_lock(1).is_null());
+   BOOST_REQUIRE(!get_lock(2).is_null());
 } FC_LOG_AND_RETHROW() }
 
 // Positive + existing-locks coverage: a balance that covers the aggregate
@@ -4322,7 +4326,7 @@ BOOST_FIXTURE_TEST_CASE(swap_same_token_legs_exact_balance_wins,
    BOOST_REQUIRE_EQUAL(100u + quote, l1["amount"].as_uint64() + l2["amount"].as_uint64());
 
    // Existing active locks now reserve the whole bucket (available == 0), so a
-   // fresh same-bucket swap cannot win and disqualifies that one-shot candidate.
+   // fresh same-bucket swap cannot win yet but retains valid retryable evidence.
    // Amounts must be large enough
    // to price against the 1e12 reserves — a sub-quote-floor amount is rejected
    // earlier by the unpriceable-reserve gate, which would mask the bond check.
@@ -4342,18 +4346,17 @@ BOOST_FIXTURE_TEST_CASE(swap_same_token_legs_exact_balance_wins,
 
    const auto req2 = get_uwreq(ATT_ID2);
    BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_PENDING", req2["status"].as_string());
-   bool disqualified = false;
+   bool retryable = false;
    for (const auto& c : req2["commits_by"].get_array()) {
       if (c["underwriter"].as_string() == UWRIT_OP.to_string()) {
-         disqualified =
-            c["status"].as_string() == "UNDERWRITE_STATUS_DISQUALIFIED"
-            && c["reason"].as_string().find("insufficient available collateral")
-                  != std::string::npos
-            && c["source_uic_bytes"].as_string().empty()
-            && c["dest_uic_bytes"].as_string().empty();
+         retryable =
+            c["status"].as_string() == "UNDERWRITE_STATUS_INTENT_SUBMITTED"
+            && c["reason"].as_string().empty()
+            && !c["source_uic_bytes"].as_string().empty()
+            && !c["dest_uic_bytes"].as_string().empty();
       }
    }
-   BOOST_REQUIRE(disqualified);
+   BOOST_REQUIRE(retryable);
 } FC_LOG_AND_RETHROW() }
 
 // WSA-028 closes the single-swap aggregate-overflow vector at ingress. SEC-15's
@@ -4362,7 +4365,7 @@ BOOST_FIXTURE_TEST_CASE(swap_same_token_legs_exact_balance_wins,
 // amount of -1 wrapped to UINT64_MAX. to_depot_amount now rejects that source
 // before any uwreq exists, so a single swap can no longer form the overflow: the
 // request reverts and creates no uwreq. The uint128 aggregate addition itself
-// stays covered by swap_same_token_legs_overcommit_disqualifies_candidate /
+// stays covered by swap_same_token_legs_overcommit_recovers_after_top_up /
 // _exact_balance_wins.
 BOOST_FIXTURE_TEST_CASE(swap_oversized_source_reverts_at_ingress,
                         sysio_dispatch_tester) { try {
