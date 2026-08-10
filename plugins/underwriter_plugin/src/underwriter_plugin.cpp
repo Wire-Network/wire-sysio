@@ -84,7 +84,14 @@ struct uw_request {
    uint64_t                src_amount;
    ChainKind               dst_chain;
    TokenKind               dst_token_kind;
+   /// The depot's AMM quote — what settlement pays out (WNS-02). NOT what the
+   /// caller asked for, and NOT what the source outpost hashed.
    uint64_t                dst_amount;
+   /// The destination amount the CALLER asked for (`SwapRequest.target_amount`).
+   /// The source outpost hashed this into its `SwapDeposit` / correlation hash
+   /// before the depot ever quoted, so it — not `dst_amount` — is what the
+   /// source-deposit verifiers must repack to reproduce that hash.
+   uint64_t                target_amount{};
    /// Per-leg slug_name triples (v6 data-model). These are the authoritative
    /// identifiers for the depot's `rcrdcommit` routing and the
    /// `UnderwriteIntentCommit` (`chain_code` / `token_code` / `reserve_code`)
@@ -1373,6 +1380,7 @@ struct underwriter_plugin::impl {
          req.dst_token_code   = read_codename("dst_token_code");
          req.dst_reserve_code = read_codename("dst_reserve_code");
          req.dst_amount       = obj["dst_amount"].as_uint64();
+         req.target_amount    = obj["target_amount"].as_uint64();
          req.variance_tolerance_bps = obj.contains("variance_tolerance_bps")
             ? static_cast<uint32_t>(obj["variance_tolerance_bps"].as_uint64())
             : 0u;
@@ -1710,6 +1718,23 @@ struct underwriter_plugin::impl {
    /// empty here means either the depot's reject regressed OR the plugin
    /// read a row pre-validation; either way the safe move is to refuse to
    /// commit until the data is whole.
+   /// Project a UWREQ row onto the outpost-hashed swap terms. The single place
+   /// the plugin's `uw_request` meets the pure preimage packer, so the
+   /// `target_amount` (not `dst_amount`) choice is made once for both chains.
+   static sysio::underwriter_detail::swap_deposit_terms
+   swap_deposit_terms_of(const uw_request& req) {
+      return {
+         .src_amount             = req.src_amount,
+         .src_token_code         = req.src_token_code.value,
+         .src_reserve_code       = req.src_reserve_code.value,
+         .dst_chain_code         = req.dst_chain_code.value,
+         .dst_token_code         = req.dst_token_code.value,
+         .dst_reserve_code       = req.dst_reserve_code.value,
+         .target_amount          = req.target_amount,
+         .variance_tolerance_bps = req.variance_tolerance_bps,
+      };
+   }
+
    bool verify_source_deposit(const uw_request& req) {
       if (req.src_is_depot) {
          // Swap-from-WIRE: the source funds were escrowed ON the depot by
@@ -1928,31 +1953,13 @@ struct underwriter_plugin::impl {
                std::string{data_view.substr(i * 2, 2)}, nullptr, 16));
          }
 
-         // (4) Recompute the hash from the UWREQ row's flat fields.
-         //     Layout MUST match ReserveManager.requestSwap's
-         //     abi.encodePacked(...) call exactly.
-         std::vector<uint8_t> packed;
-         packed.reserve(20 + 8 * 7 + 4);
-         packed.insert(packed.end(),
-                       req.depositor.begin(), req.depositor.end());
-         auto append_u64_be = [&](uint64_t v) {
-            for (int shift = 56; shift >= 0; shift -= 8) {
-               packed.push_back(static_cast<uint8_t>((v >> shift) & 0xff));
-            }
-         };
-         auto append_u32_be = [&](uint32_t v) {
-            for (int shift = 24; shift >= 0; shift -= 8) {
-               packed.push_back(static_cast<uint8_t>((v >> shift) & 0xff));
-            }
-         };
-         append_u64_be(req.src_amount);
-         append_u64_be(req.src_token_code.value);
-         append_u64_be(req.src_reserve_code.value);
-         append_u64_be(req.dst_chain_code.value);
-         append_u64_be(req.dst_token_code.value);
-         append_u64_be(req.dst_reserve_code.value);
-         append_u64_be(req.dst_amount);
-         append_u32_be(req.variance_tolerance_bps);
+         // (4) Recompute the hash from the UWREQ row's flat fields. Layout MUST
+         //     match ReserveManager.requestSwap's abi.encodePacked(...) exactly
+         //     — see `pack_swap_deposit_preimage`, shared with the SVM verifier
+         //     so the two can never drift, and note there why the destination
+         //     slot is `target_amount` and never `dst_amount`.
+         auto packed = sysio::underwriter_detail::pack_swap_deposit_preimage(
+            req.depositor, swap_deposit_terms_of(req));
          if (packed.size() != 20 + 8 * 7 + 4) {
             elog("underwriter: source-deposit verify failed for uwreq {} — "
                  "packed buffer size {} != expected {}",
@@ -2098,9 +2105,9 @@ struct underwriter_plugin::impl {
       // ── (4) Recompute the expected correlation hash from UWREQ fields ──
       // Layout MUST stay synchronized with the producer side
       // (`opp-outpost/src/instructions/request_swap.rs::correlation_hash`).
-      // 32 + 7×8 + 4 = 92 bytes total.
-      std::vector<uint8_t> packed;
-      packed.reserve(32 + 7 * 8 + 4);
+      // 32 + 7×8 + 4 = 92 bytes total. Shared packing with the EVM verifier —
+      // see `pack_swap_deposit_preimage`, and note there why the destination
+      // slot is `target_amount` and never `dst_amount`.
       if (req.depositor.size() != 32) {
          elog("underwriter: source-deposit verify failed for uwreq {} — "
               "depositor has wrong size ({} bytes; expected 32 for SVM "
@@ -2108,25 +2115,8 @@ struct underwriter_plugin::impl {
          bump_mismatch();
          return false;
       }
-      packed.insert(packed.end(), req.depositor.begin(), req.depositor.end());
-      auto append_u64_be = [&](uint64_t v) {
-         for (int shift = 56; shift >= 0; shift -= 8) {
-            packed.push_back(static_cast<uint8_t>((v >> shift) & 0xff));
-         }
-      };
-      auto append_u32_be = [&](uint32_t v) {
-         for (int shift = 24; shift >= 0; shift -= 8) {
-            packed.push_back(static_cast<uint8_t>((v >> shift) & 0xff));
-         }
-      };
-      append_u64_be(req.src_amount);
-      append_u64_be(req.src_token_code.value);
-      append_u64_be(req.src_reserve_code.value);
-      append_u64_be(req.dst_chain_code.value);
-      append_u64_be(req.dst_token_code.value);
-      append_u64_be(req.dst_reserve_code.value);
-      append_u64_be(req.dst_amount);
-      append_u32_be(req.variance_tolerance_bps);
+      auto packed = sysio::underwriter_detail::pack_swap_deposit_preimage(
+         req.depositor, swap_deposit_terms_of(req));
       if (packed.size() != 32 + 7 * 8 + 4) {
          elog("underwriter: source-deposit verify failed for uwreq {} — "
               "packed buffer size {} != expected {}",

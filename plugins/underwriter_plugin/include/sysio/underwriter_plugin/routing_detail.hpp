@@ -22,6 +22,7 @@
 #include <cstdint>
 #include <map>
 #include <optional>
+#include <vector>
 
 namespace sysio::underwriter_detail {
 
@@ -129,6 +130,65 @@ find_endpoint_coverage_gap(const std::map<uint64_t, int>& registered_kinds,
          return endpoint_coverage_gap{chain_code, std::nullopt, config_kind};
    }
    return std::nullopt;
+}
+
+// ---------------------------------------------------------------------------
+//  Source-deposit hash preimage
+// ---------------------------------------------------------------------------
+
+/// The swap terms the SOURCE OUTPOST hashed when it accepted the deposit, in the
+/// order it hashed them. Both outposts commit to the same seven values plus the
+/// depositor: `ReserveManager.requestSwap`'s `abi.encodePacked(...)` on EVM and
+/// `request_swap.rs::correlation_hash` on SVM.
+struct swap_deposit_terms {
+   uint64_t src_amount             = 0;
+   uint64_t src_token_code         = 0;   ///< `fc::slug_name::value`
+   uint64_t src_reserve_code       = 0;   ///< `fc::slug_name::value`
+   uint64_t dst_chain_code         = 0;   ///< `fc::slug_name::value`
+   uint64_t dst_token_code         = 0;   ///< `fc::slug_name::value`
+   uint64_t dst_reserve_code       = 0;   ///< `fc::slug_name::value`
+   /// The destination amount the CALLER asked for (`SwapRequest.target_amount`).
+   ///
+   /// This is the field the outpost hashed, and it is deliberately NOT the
+   /// UWREQ's `dst_amount`: the depot overwrites that with its own AMM quote
+   /// (WNS-02), a number minted AFTER the deposit was hashed and one the outpost
+   /// never saw. Packing the quote here reproduces the wrong preimage for every
+   /// swap whose quote differs from the target -- i.e. every swap that pays a
+   /// WIRE-leg fee -- and the underwriter then silently declines to commit.
+   uint64_t target_amount          = 0;
+   uint32_t variance_tolerance_bps = 0;
+};
+
+/// Big-endian preimage of the source-deposit hash: `depositor || 7 x u64 || u32`.
+///
+/// The depositor rides in as raw bytes because it is the ONLY per-chain
+/// difference -- a 20-byte EVM address or a 32-byte Ed25519 pubkey -- so both
+/// verifiers share this one packing and cannot drift apart. Callers validate the
+/// depositor width (and therefore the total size) for their chain.
+inline std::vector<uint8_t> pack_swap_deposit_preimage(const std::vector<char>& depositor,
+                                                       const swap_deposit_terms& terms) {
+   std::vector<uint8_t> packed;
+   packed.reserve(depositor.size() + 8 * 7 + 4);
+   for (char byte : depositor) packed.push_back(static_cast<uint8_t>(byte));
+
+   auto append_u64_be = [&](uint64_t v) {
+      for (int shift = 56; shift >= 0; shift -= 8)
+         packed.push_back(static_cast<uint8_t>((v >> shift) & 0xff));
+   };
+   auto append_u32_be = [&](uint32_t v) {
+      for (int shift = 24; shift >= 0; shift -= 8)
+         packed.push_back(static_cast<uint8_t>((v >> shift) & 0xff));
+   };
+
+   append_u64_be(terms.src_amount);
+   append_u64_be(terms.src_token_code);
+   append_u64_be(terms.src_reserve_code);
+   append_u64_be(terms.dst_chain_code);
+   append_u64_be(terms.dst_token_code);
+   append_u64_be(terms.dst_reserve_code);
+   append_u64_be(terms.target_amount);
+   append_u32_be(terms.variance_tolerance_bps);
+   return packed;
 }
 
 } // namespace sysio::underwriter_detail
