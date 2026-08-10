@@ -31,9 +31,16 @@
 namespace sysio::opp::registry {
 
 /// Maximum byte length of a registry row's short display label --
-/// `Chain.name`, `Token.symbol_name`, `Reserve.name`. These are ticker- or
-/// title-sized ("Wire", "Ethereum", "wire-depot"), never prose.
-inline constexpr std::size_t label_max_bytes = 32;
+/// `Chain.name`, `Token.symbol_name`, `Reserve.name`.
+///
+/// The bound exists to stop a row consuming up to the KV/action ceiling of
+/// system-paid state; it is NOT a house style for terse names. Real labels run
+/// well past ticker length -- a reserve names its full leg
+/// ("ETHEREUM-ETH/WIRE unlinked-creator reserve" is 42 bytes) -- so the bound
+/// is set with room for descriptive names rather than at the current longest.
+/// A label that has to be shortened to satisfy this is a sign the bound is
+/// wrong, not the label.
+inline constexpr std::size_t label_max_bytes = 128;
 
 /// Maximum byte length of a registry row's free-form description. Matches the
 /// established `sysio.token::issue` memo bound.

@@ -149,15 +149,15 @@ BOOST_FIXTURE_TEST_CASE(regctok_records_binding, sysio_tokens_tester) { try {
 // `code` consume up to the KV/action ceiling of system-owned state. regtoken validated
 // `kind`, `precision`, and duplicate `code`, but never the two strings. CertiK WNS-10.
 BOOST_FIXTURE_TEST_CASE(regtoken_bounds_metadata, sysio_tokens_tester) { try {
-   BOOST_REQUIRE(regtoken("WIRE", std::string(33, 'x'), "ok")
-      .find("label exceeds 32 bytes") != std::string::npos);
+   BOOST_REQUIRE(regtoken("WIRE", std::string(129, 'x'), "ok")
+      .find("label exceeds 128 bytes") != std::string::npos);
 
    BOOST_REQUIRE(regtoken("WIRE", "Wire", std::string(257, 'x'))
       .find("description exceeds 256 bytes") != std::string::npos);
 
    // The bounds are inclusive, and a rejected registration never claimed the code.
    BOOST_REQUIRE_EQUAL(success(),
-      regtoken("WIRE", std::string(32, 'x'), std::string(256, 'x')));
+      regtoken("WIRE", std::string(128, 'x'), std::string(256, 'x')));
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()

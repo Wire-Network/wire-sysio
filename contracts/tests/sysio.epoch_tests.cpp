@@ -322,15 +322,15 @@ BOOST_FIXTURE_TEST_CASE(regchain_wire_code_reserved_from_other_kinds, sysio_epoc
 /// unbounded pair existed on `sysio.chains::regchain` and `sysio.reserv::regreserve`, and all
 /// three now share `sysio::opp::registry::check_metadata`.
 BOOST_FIXTURE_TEST_CASE(regchain_bounds_metadata, sysio_epoch_tester) { try {
-   BOOST_REQUIRE(regchain(ChainKind::CHAIN_KIND_EVM, "ETH", 1, std::string(33, 'x'))
-      .find("label exceeds 32 bytes") != std::string::npos);
+   BOOST_REQUIRE(regchain(ChainKind::CHAIN_KIND_EVM, "ETH", 1, std::string(129, 'x'))
+      .find("label exceeds 128 bytes") != std::string::npos);
 
    BOOST_REQUIRE(regchain(ChainKind::CHAIN_KIND_EVM, "ETH", 1, "ok", std::string(257, 'x'))
       .find("description exceeds 256 bytes") != std::string::npos);
 
    // The bounds are inclusive.
    BOOST_REQUIRE_EQUAL(success(),
-      regchain(ChainKind::CHAIN_KIND_EVM, "ETH", 1, std::string(32, 'x'), std::string(256, 'x')));
+      regchain(ChainKind::CHAIN_KIND_EVM, "ETH", 1, std::string(128, 'x'), std::string(256, 'x')));
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(advance_before_config, sysio_epoch_tester) { try {
