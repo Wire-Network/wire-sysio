@@ -676,6 +676,21 @@ void reserve::applyswap(sysio::slug_name src_chain_code,
    sysio::check(fee.net > 0, "applyswap: zero post-fee WIRE would credit no destination liquidity");
    sysio::check(src_it->reserve_wire_amount >= w_gross,
                 "applyswap: insufficient source reserve WIRE for intermediate");
+   // WNS-02 settlement bound: the destination side may never give up more token
+   // than its own curve produces for the post-fee WIRE it is about to receive.
+   // `sysio.uwrit` derives `dst_amount` from exactly this expression (via
+   // `swap_quote` -> `opp::amm::quote_swap`) against the same pre-mutation rows
+   // in the same transaction, so equality holds and this cannot fire on the
+   // live path. It exists so the reserve is self-defending: `dst_amount` arrives
+   // as a caller-supplied parameter, and the vulnerability this replaces was
+   // precisely a caller-chosen amount being paid out verbatim. A reserve that
+   // trusts its caller for a payout size has no floor of its own.
+   const uint64_t curve_out = opp::amm::wire_to_token(dst_it->reserve_wire_amount,
+                                                      dst_it->reserve_chain_amount,
+                                                      dst_it->connector_weight_bps,
+                                                      fee.net);
+   sysio::check(dst_amount <= curve_out,
+                "applyswap: destination amount exceeds the curve output for the post-fee WIRE");
    sysio::check(dst_it->reserve_chain_amount >= dst_amount,
                 "applyswap: insufficient destination reserve balance");
 
@@ -722,6 +737,15 @@ void reserve::applyfromwire(sysio::slug_name dst_chain_code,
    // leg would debit the destination reserve below while crediting zero WIRE.
    // Unreachable given `sysio.uwrit::setconfig`'s MAX_FEE_BPS cap.
    sysio::check(fee.net > 0, "applyfromwire: zero post-fee WIRE would credit no destination liquidity");
+   // WNS-02 settlement bound — see applyswap. The from-WIRE shape feeds the
+   // user's escrowed WIRE straight into the WIRE leg, so the curve output is
+   // `wire_to_token` of the post-fee remainder.
+   const uint64_t curve_out = opp::amm::wire_to_token(it->reserve_wire_amount,
+                                                      it->reserve_chain_amount,
+                                                      it->connector_weight_bps,
+                                                      fee.net);
+   sysio::check(dst_amount <= curve_out,
+                "applyfromwire: destination amount exceeds the curve output for the post-fee WIRE");
 
    tbl.modify(ram_payer, pk, [&](auto& row) {
       add_capped_u64(row.reserve_wire_amount, fee.net);
@@ -748,16 +772,21 @@ void reserve::paywire(sysio::slug_name src_chain_code,
    sysio::check(it->status == opp::types::RESERVE_STATUS_ACTIVE,
                 "paywire: source reserve not ACTIVE");
 
-   // Swap-to-WIRE: the recipient receives exactly `wire_out` (their target), and
-   // the fee is charged on the gross WIRE the source side produces — the same
-   // WIRE leg the quote priced. The source reserve gives up `wire_out + fee`
-   // and keeps any surplus (when the user targeted below the post-fee quote).
+   // Swap-to-WIRE: the recipient receives `wire_out`, and the fee is charged on
+   // the gross WIRE the source side produces — the same WIRE leg the quote
+   // priced. The source reserve gives up `wire_out + fee`.
    const uint64_t w_gross = opp::amm::token_to_wire(it->reserve_chain_amount,
                                                     it->reserve_wire_amount,
                                                     it->connector_weight_bps,
                                                     src_amount);
    sysio::check(w_gross > 0, "paywire: WIRE leg is zero");
    const auto fee = opp::amm::split_wire_fee(w_gross, uwrit_fee_bps(), FEE_REWARD_SHARE_BPS);
+   // WNS-02 settlement bound — see applyswap. For a WIRE destination the curve
+   // output IS the post-fee WIRE leg, so the payout may never exceed `fee.net`.
+   // `sysio.uwrit` passes exactly `fee.net` (its `swap_quote` returns the
+   // post-fee WIRE for a WIRE endpoint), so equality holds on the live path.
+   sysio::check(wire_out <= fee.net,
+                "paywire: payout exceeds the post-fee WIRE the source leg produced");
    const uint64_t wire_leaving = wire_out + fee.fee;
    sysio::check(it->reserve_wire_amount >= wire_leaving,
                 "paywire: insufficient source reserve WIRE for payout + fee");

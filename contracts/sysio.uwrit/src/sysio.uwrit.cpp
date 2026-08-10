@@ -311,6 +311,28 @@ bool required_reserves_active(sysio::slug_name src_chain_code,
    return true;
 }
 
+/// Slippage allowance for a variance check, in absolute destination units:
+/// `tolerance_bps` of the **AMM quote**.
+///
+/// The reference is deliberately the quote and NEVER the caller-supplied
+/// `target_amount` (WNS-02). A target crosses the OPP boundary unauthenticated,
+/// so deriving the allowance from it made the bound scale with the very number
+/// it was meant to constrain: `|quote - target| <= target * tolerance_bps / 10000`
+/// holds for ANY target above the quote once `tolerance_bps` reaches 10000, which
+/// is what let a caller name an arbitrary destination amount and have it settle.
+/// Measured against the quote, the check means what it says — "the price I got is
+/// within N% of the price I expected".
+///
+/// `tolerance_bps` is clamped to `BPS_TOTAL` (100%): a wider tolerance is
+/// meaningless (100% already admits every target from zero to twice the quote)
+/// and only inflates the allowance. Computed in `uint128_t` so the product cannot
+/// overflow for any (quote, tolerance) pair.
+uint128_t variance_allowance(uint64_t quote, uint32_t tolerance_bps) {
+   const uint32_t bounded_bps = tolerance_bps > opp::amm::BPS_TOTAL ? opp::amm::BPS_TOTAL
+                                                                    : tolerance_bps;
+   return (static_cast<uint128_t>(quote) * bounded_bps) / opp::amm::BPS_TOTAL;
+}
+
 /// Encode + queue a SWAP_REVERT attestation back to the source outpost when
 /// the variance check fails. The outpost matches the original SWAP_REQUEST
 /// via `original_swap_message_id` (low 8 bytes carry the depot's
@@ -934,43 +956,55 @@ void uwrit::createuwreq(uint64_t attestation_id,
       }
    }
 
-   // Variance-tolerance check via sysio.reserv mirror. If no matching
-   // ACTIVE reserve exists for either leg the quote returns 0 and the
-   // variance check is implicitly skipped — the swap proceeds to the
-   // underwriter race. This lets dev / smoke clusters without provisioned
-   // LPs continue to operate while still applying the check the moment
-   // matching reserves are present.
+   // Price the swap on the depot's live curve. This quote — NOT the caller's
+   // `target_amount` — is what the row carries as `dst_amount` (WNS-02).
+   // `target_amount` is the caller's *expectation*, an unauthenticated number
+   // that arrives over OPP, while `dst_amount` is paid out verbatim by
+   // `sysio.reserv::applyswap` / `applyfromwire` / `paywire`. Settling on the
+   // caller's figure let a small source deposit name an arbitrary destination
+   // amount and drain the destination reserve.
    const uint64_t current_quote = swap_quote(src_chain_code, src_token_code, src_reserve_code,
                                               dst_chain_code, dst_token_code, dst_reserve_code,
                                               src_amount, cfg.fee_bps);
-   if (sr.target_amount != 0) {
-      if (current_quote == 0) {
-         // Zero quote: skip only when a required reserve is genuinely
-         // unprovisioned / not ACTIVE (dev & smoke clusters). If every required
-         // reserve IS ACTIVE, a zero quote is an unpriceable/degenerate reserve
-         // — fail closed so target_amount cannot bypass variance and over-debit
-         // at settlement (WSA-041).
-         if (required_reserves_active(src_chain_code, src_token_code, src_reserve_code,
-                                      dst_chain_code, dst_token_code, dst_reserve_code)) {
-            emit_swap_revert(get_self(), chain_code, attestation_id, sr,
-                             src_chain_code, src_reserve_code,
-                             "unpriceable reserve: zero quote from an ACTIVE reserve "
-                             "(degenerate weights/balances) — fail closed");
-            return;   // no UWREQ created
-         }
-      } else {
-         uint64_t target   = sr.target_amount;
-         uint64_t diff     = current_quote > target ? current_quote - target : target - current_quote;
-         // tolerance_bps / 10000 of target; computed in uint128 to avoid overflow.
-         uint128_t allowed = (static_cast<uint128_t>(target) * sr.target_tolerance_bps) / 10000u;
-         if (static_cast<uint128_t>(diff) > allowed) {
-            emit_swap_revert(get_self(), chain_code, attestation_id, sr,
-                             src_chain_code, src_reserve_code,
-                             "variance exceeded tolerance: target=" + std::to_string(target)
-                             + " current=" + std::to_string(current_quote)
-                             + " tolerance_bps=" + std::to_string(sr.target_tolerance_bps));
-            return;   // no UWREQ created
-         }
+   // Zero quote with every required reserve ACTIVE = an unpriceable / degenerate
+   // reserve (a side drained to zero, extreme connector weights, or a leg too
+   // small for the weighted-Bancor kernel to price). Fail closed (WSA-041) —
+   // otherwise the row would be created with `dst_amount == 0`, which
+   // `applyswap` and its siblings assert against, aborting inside evalcons.
+   // The gate is no longer nested under `target_amount != 0`: it protects
+   // `dst_amount`, which has nothing to do with the caller's target, so it must
+   // not depend on the positive-amounts gate above to be reached.
+   //
+   // A zero quote from a MISSING / not-ACTIVE reserve is the dev & smoke cluster
+   // case: no LP is provisioned, so the row is created (the underwriter race
+   // still runs) but cannot settle until a reserve exists — `try_select_winner`
+   // re-quotes and only ever settles against ACTIVE reserves.
+   if (current_quote == 0 &&
+       required_reserves_active(src_chain_code, src_token_code, src_reserve_code,
+                                dst_chain_code, dst_token_code, dst_reserve_code)) {
+      emit_swap_revert(get_self(), chain_code, attestation_id, sr,
+                       src_chain_code, src_reserve_code,
+                       "unpriceable reserve: zero quote from an ACTIVE reserve "
+                       "(degenerate weights/balances) — fail closed");
+      return;   // no UWREQ created
+   }
+   // Variance tolerance — the caller's slippage bound on the quote they will be
+   // given, measured as a fraction of that quote (see `variance_allowance`).
+   // A zero `target_amount` was already refused by the positive-amounts gate
+   // above, so that term is defensive; the live skip is `current_quote == 0`,
+   // the unprovisioned-LP case, where there is no price to compare against.
+   if (sr.target_amount != 0 && current_quote != 0) {
+      const uint64_t  target  = sr.target_amount;
+      const uint64_t  diff    = current_quote > target ? current_quote - target
+                                                       : target - current_quote;
+      const uint128_t allowed = variance_allowance(current_quote, sr.target_tolerance_bps);
+      if (static_cast<uint128_t>(diff) > allowed) {
+         emit_swap_revert(get_self(), chain_code, attestation_id, sr,
+                          src_chain_code, src_reserve_code,
+                          "variance exceeded tolerance: target=" + std::to_string(target)
+                          + " current=" + std::to_string(current_quote)
+                          + " tolerance_bps=" + std::to_string(sr.target_tolerance_bps));
+         return;   // no UWREQ created
       }
    }
 
@@ -985,7 +1019,13 @@ void uwrit::createuwreq(uint64_t attestation_id,
       .dst_chain_code            = dst_chain_code,
       .dst_token_code            = dst_token_code,
       .dst_reserve_code          = dst_reserve_code,
-      .dst_amount                = sr.target_amount,
+      // The AMM quote, never `sr.target_amount` (WNS-02). Re-quoted and
+      // overwritten with the live price at race resolution before anything
+      // settles against it.
+      .dst_amount                = current_quote,
+      // The caller's expectation, retained as the FIXED reference the
+      // race-time slippage check measures against. Never paid out.
+      .target_amount             = sr.target_amount,
       .variance_tolerance_bps    = sr.target_tolerance_bps,
       .source_tx_id              = sr.source_tx_id,
       .depositor                 = sr.actor.address,
@@ -1187,6 +1227,29 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
       return;
    }
 
+   // ── Settlement quote — re-price on the live curve ────────────────────
+   // The books move in this transaction, so the price they move at is the price
+   // computed HERE, not the one quoted at ingestion. Settling on a stale quote
+   // would over-debit the destination reserve by exactly the drift the LP took
+   // between ingestion and the race.
+   //
+   // Only the quote is computed at this point — every decision it feeds is made
+   // below, AFTER the candidate has proved its bond. The quote must come first
+   // regardless, because it is what sizes the obligation the bond has to cover.
+   const uint64_t settle_quote = swap_quote(
+      req.src_chain_code, req.src_token_code, req.src_reserve_code,
+      req.dst_chain_code, req.dst_token_code, req.dst_reserve_code,
+      req.src_amount, current_fee_bps(self));
+   if (settle_quote != 0) {
+      // Every downstream read of `req.dst_amount` — bond coverage below, the
+      // reserve pre-checks, the lock amount, the SWAP_REMIT payload, and the
+      // reserv settlement actions — now uses the live price, and the CONFIRMED
+      // write persists it as the amount the winner owes. When the curve cannot
+      // price the swap the stored ingestion quote stands in for the bond check;
+      // the request is terminated (or skipped) below before it could settle.
+      req.dst_amount = settle_quote;
+   }
+
    // ── Bond availability — required legs, aggregated per collateral bucket ─
    // Underwriter collateral is held and rolled up by (underwriter,
    // chain_code, token_code) — NOT by reserve_code (see `available_via_mirrors`
@@ -1237,50 +1300,59 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
       return;
    }
 
-   // ── T6: race-time variance recheck ────────────────────────────────────
-   // The createuwreq path validated the LP quote at ingestion. Between
-   // then and now the LP may have drifted; if the drift now exceeds the
-   // user's tolerance, emit SWAP_REVERT instead of locking. Skipped when
-   // the local mirror returns 0 (no LP provisioned) — same convention as
-   // createuwreq.
-   {
-      const uint64_t current_quote = swap_quote(
-         req.src_chain_code, req.src_token_code, req.src_reserve_code,
-         req.dst_chain_code, req.dst_token_code, req.dst_reserve_code,
-         req.src_amount, current_fee_bps(self));
-      const uint64_t quoted = req.dst_amount;
-      if (quoted != 0) {
-         if (current_quote == 0) {
-            // Zero quote with every required reserve ACTIVE = unpriceable /
-            // degenerate reserve (drained side, extreme weights, leg too small
-            // to price). Fail closed so a stale target cannot settle against a
-            // reserve the AMM can no longer price (WSA-041). Skip only when a
-            // required reserve is genuinely unprovisioned (dev & smoke clusters).
-            if (required_reserves_active(req.src_chain_code, req.src_token_code, req.src_reserve_code,
-                                         req.dst_chain_code, req.dst_token_code, req.dst_reserve_code)) {
-               reject_and_refund(self, reqs, pk, req, src_needed,
-                  "unpriceable reserve: zero quote from an ACTIVE reserve at race resolution",
-                  "uwreq reverted at race resolution (unpriceable reserve)");
-               return;
-            }
-         } else {
-            const uint64_t diff = current_quote > quoted
-                                     ? current_quote - quoted
-                                     : quoted - current_quote;
-            const uint128_t allowed = (static_cast<uint128_t>(quoted)
-                                          * req.variance_tolerance_bps) / 10000u;
-            if (static_cast<uint128_t>(diff) > allowed) {
-               // Drift now exceeds the user's tolerance — refund the source
-               // side and REJECT rather than lock a stale quote. Non-throwing.
-               reject_and_refund(self, reqs, pk, req, src_needed,
-                  "variance exceeded tolerance at race resolution: "
-                  "quoted=" + std::to_string(quoted)
-                  + " current=" + std::to_string(current_quote)
-                  + " tolerance_bps=" + std::to_string(req.variance_tolerance_bps),
-                  "uwreq reverted at race resolution (variance drift)");
-               return;
-            }
-         }
+   // ── Request-level terminal decisions ─────────────────────────────────
+   // Deliberately placed AFTER every candidate-specific gate (eligibility,
+   // signature, bond). These two outcomes REFUND the user and close the request
+   // for good, so they must not be reachable by a candidate that was never
+   // going to win: an ACTIVE underwriter can clear the role minimum yet be
+   // under-bonded for this particular swap, and letting it terminally close a
+   // healthy request during transient drift would hand any such operator a
+   // denial-of-service on other people's swaps. A candidate that reaches this
+   // point has proved it could actually settle, so the verdict it triggers is
+   // the request's own.
+   if (settle_quote == 0) {
+      if (required_reserves_active(req.src_chain_code, req.src_token_code, req.src_reserve_code,
+                                   req.dst_chain_code, req.dst_token_code, req.dst_reserve_code)) {
+         // Every required reserve is ACTIVE yet the curve cannot price the swap
+         // — a drained side, extreme connector weights, or a leg below the
+         // kernel's pricing floor. Terminal: fail closed rather than settle at a
+         // price the AMM does not have (WSA-041).
+         reject_and_refund(self, reqs, pk, req, src_needed,
+            "unpriceable reserve: zero quote from an ACTIVE reserve at race resolution",
+            "uwreq reverted at race resolution (unpriceable reserve)");
+         return;
+      }
+      // A required reserve is unprovisioned / not ACTIVE (dev & smoke clusters).
+      // Nothing can settle yet and there is no price to settle at, so leave the
+      // row PENDING — the settlement pre-checks below would reach the same
+      // conclusion. NOT terminal: a reserve may still be provisioned before the
+      // PENDING deadline.
+      sysio::print("try_select_winner: no priceable reserve for uwreq ",
+                   uwreq_id, " (unprovisioned LP), skipping\n");
+      return;
+   }
+   // Slippage — the live settlement quote against the user's ORIGINAL
+   // `target_amount`, never against the previous quote. Measuring drift from
+   // `dst_amount` (the ingestion quote) would compound the tolerance across the
+   // two checkpoints: a 10% bound would accept a 91 quote at ingestion and then
+   // an 83 quote at settlement, delivering 17% below a target of 100. Anchoring
+   // on the fixed target means the bound the user agreed to is the bound they
+   // get, whatever path the price took. `target_amount` is guaranteed positive
+   // by `createuwreq` / `swapfromwire`, so the guard is defensive.
+   // Non-throwing throughout (`feedback_opp_handlers_never_throw`).
+   if (req.target_amount != 0) {
+      const uint64_t  diff    = settle_quote > req.target_amount
+                                   ? settle_quote - req.target_amount
+                                   : req.target_amount - settle_quote;
+      const uint128_t allowed = variance_allowance(settle_quote, req.variance_tolerance_bps);
+      if (static_cast<uint128_t>(diff) > allowed) {
+         reject_and_refund(self, reqs, pk, req, src_needed,
+            "variance exceeded tolerance at race resolution: "
+            "target=" + std::to_string(req.target_amount)
+            + " current=" + std::to_string(settle_quote)
+            + " tolerance_bps=" + std::to_string(req.variance_tolerance_bps),
+            "uwreq reverted at race resolution (variance drift)");
+         return;
       }
    }
 
@@ -1322,19 +1394,20 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
       }
       towire_recipient = *rcpt;
       // Terminal: the to-WIRE payout is sent as `asset(dst_amount, WIRE)` by
-      // reserv::paywire. `dst_amount` is the UNBOUNDED cross-chain
-      // `SwapRequest.target_amount`; a target exceeding asset::max_amount
-      // (2^62-1) can never be represented as a WIRE asset — for ANY winner or
-      // liquidity. Left unchecked it would (a) wrap the `dst_amount +
-      // to_wire_fee` sufficiency guard below for a target near UINT64_MAX,
-      // letting the swap slip into settlement, then (b) abort paywire's
-      // asset() constructor mid-evalcons and stall consensus. Reject + refund
-      // the source side here, BEFORE any CONFIRMED / lock / reserve write.
+      // reserv::paywire, and an amount past asset::max_amount (2^62-1) has no
+      // WIRE-asset representation — it would (a) wrap the `dst_amount +
+      // to_wire_fee` sufficiency guard below and (b) abort paywire's asset()
+      // constructor mid-evalcons, stalling consensus. Since `dst_amount` is the
+      // AMM quote (WNS-02), it is bounded by the source reserve's WIRE side,
+      // itself an asset-bounded balance — so this is unreachable
+      // defense-in-depth rather than a live path. Kept because the consequence
+      // of it ever becoming reachable is a chain-wide consensus stall; it must
+      // stay AHEAD of any CONFIRMED / lock / reserve write.
       if (req.dst_amount > static_cast<uint64_t>(asset::max_amount)) {
          reject_and_refund(self, reqs, pk, req, src_needed,
-            "swap-to-WIRE rejected: target amount exceeds the maximum "
+            "swap-to-WIRE rejected: quoted amount exceeds the maximum "
             "representable WIRE asset",
-            "uwreq rejected: to-WIRE target exceeds asset max_amount");
+            "uwreq rejected: to-WIRE quote exceeds asset max_amount");
          return;
       }
       auto src_r = find_active_reserve(req.src_chain_code, req.src_token_code, req.src_reserve_code);
@@ -1469,6 +1542,11 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate) {
       r.status          = UnderwriteRequestStatus::UNDERWRITE_REQUEST_STATUS_CONFIRMED;
       r.winner          = candidate;
       r.committed_at_ms = current_time_ms();
+      // The live quote this race settled at — the amount the winner owes on the
+      // destination chain, and the amount the locks and the SWAP_REMIT carry.
+      // Persisting it keeps the row's record of the swap equal to what the
+      // reserve books actually moved.
+      r.dst_amount      = req.dst_amount;
       // Deadline cleared (SEC-129 / WSA-223): a CONFIRMED row is owned by the
       // wall-clock lock window — `chklocks` is guaranteed to terminalize it
       // once the locks expire, so a second (epoch-count) deadline would just
@@ -1845,12 +1923,13 @@ void uwrit::drainfwq() {
          continue;
       }
       {
-         // `target_amount > 0` is guaranteed by swapfromwire.
+         // `target_amount > 0` is guaranteed by swapfromwire. The allowance is a
+         // fraction of the AMM `quote`, never of the user's target (WNS-02) —
+         // see `variance_allowance`.
          const uint64_t diff = quote > row.target_amount
                                   ? quote - row.target_amount
                                   : row.target_amount - quote;
-         const uint128_t allowed = (static_cast<uint128_t>(row.target_amount)
-                                       * row.variance_tolerance_bps) / 10000u;
+         const uint128_t allowed = variance_allowance(quote, row.variance_tolerance_bps);
          if (static_cast<uint128_t>(diff) > allowed) {
             refund_and_drop("variance exceeded tolerance at drain",
                             cfg.fromwire_revert_fee_bps);
@@ -1912,7 +1991,11 @@ void uwrit::drainfwq() {
          .dst_chain_code            = row.dst_chain_code,
          .dst_token_code            = row.dst_token_code,
          .dst_reserve_code          = row.dst_reserve_code,
-         .dst_amount                = row.target_amount,
+         // The AMM quote, never the user's `target_amount` (WNS-02) — same
+         // contract as `createuwreq`; re-quoted at race resolution.
+         .dst_amount                = quote,
+         // The user's expectation, retained as the FIXED slippage reference.
+         .target_amount             = row.target_amount,
          .variance_tolerance_bps    = row.variance_tolerance_bps,
          .source_tx_id              = std::move(stx),
          .depositor                 = wire_name_bytes(row.user),

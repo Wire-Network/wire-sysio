@@ -4021,10 +4021,22 @@ namespace sysio {
       if (block_header::num_from_id(msg.id) <= fork_db_root_num)
          return;
 
-      latest_blk_time = std::chrono::steady_clock::now();
-      if (my_impl->dispatcher.have_block(msg.id)) {
+      const bool have_announced_block = my_impl->dispatcher.have_block(msg.id);
+      // the parent only matters when the announced block is missing, so skip that lookup otherwise
+      const bool have_parent_block = have_announced_block || my_impl->dispatcher.have_block(msg.previous);
+      const auto action = net_utils::classify_block_notice(have_announced_block, have_parent_block);
+
+      // Refreshing on a notice for a block we are missing would hide the fact that we are behind and defer
+      // the handshake in check_heartbeat that recovers it.
+      if (net_utils::block_notice_marks_progress(action)) {
+         latest_blk_time = std::chrono::steady_clock::now();
+      }
+
+      switch (action) {
+      case net_utils::block_notice_action::record_peer_has_block:
          my_impl->dispatcher.add_peer_block(msg.id, connection_id);
-      } else if (!my_impl->dispatcher.have_block(msg.previous)) { // still don't have previous block
+         break;
+      case net_utils::block_notice_action::request_blocks: { // still don't have previous block
          peer_dlog(p2p_blk_log, this, "Received unknown block notice, checking already requested");
          const block_id_type& target = msg.previous;
          bool already_requested = my_impl->connections.any_of_block_connections([&target](const auto& c) {
@@ -4044,6 +4056,10 @@ namespace sysio {
             }
             enqueue(req);
          }
+         break;
+      }
+      case net_utils::block_notice_action::ignore:
+         break;
       }
    }
 
@@ -4543,7 +4559,8 @@ namespace sysio {
          ( "p2p-max-nodes-per-host", bpo::value<int>()->default_value(def_max_nodes_per_host), "Maximum number of client nodes from any single /24 (IPv4) or /48 (IPv6) subnet")
          ( "p2p-accept-transactions", bpo::value<bool>()->default_value(true), "Allow transactions received over p2p network to be evaluated and relayed if valid.")
          ( "p2p-disable-block-nack", bpo::value<bool>()->default_value(false),
-            "Disable block notice and block nack. All blocks received will be broadcast to all peers unless already received.")
+            "Disable block notice and block nack. All blocks received will be broadcast to all peers unless already received.\n"
+            "Defaults to true when producer-name is configured, so a producing node always exchanges full blocks.")
          ( "p2p-auto-bp-peer", bpo::value< vector<string> >()->composing(),
            "The account and public p2p endpoint of a block producer node to automatically connect to when it is in producer schedule. Not gossipped.\n"
            "  Syntax: bp_account,host:port\n"
@@ -4615,7 +4632,15 @@ namespace sysio {
          resp_expected_period = def_resp_expected_wait;
          max_nodes_per_host = options.at( "p2p-max-nodes-per-host" ).as<int>();
          p2p_accept_transactions = options.at( "p2p-accept-transactions" ).as<bool>();
-         p2p_disable_block_nack = options.at( "p2p-disable-block-nack" ).as<bool>();
+         // producer_plugin is a declared dependency, so its options are already parsed here.
+         const auto& block_nack_opt = options.at( "p2p-disable-block-nack" );
+         const producer_plugin* prod_plug = app().find_plugin<producer_plugin>();
+         const bool configured_producer = prod_plug != nullptr && !prod_plug->producer_accounts().empty();
+         p2p_disable_block_nack = net_utils::resolve_disable_block_nack(
+               block_nack_opt.as<bool>(), !block_nack_opt.defaulted(), configured_producer );
+         if( p2p_disable_block_nack && block_nack_opt.defaulted() ) {
+            fc_ilog( p2p_blk_log, "block notice and block nack disabled by default, this node is configured to produce blocks" );
+         }
 
          keepalive_interval = std::chrono::milliseconds( options.at( "p2p-keepalive-interval-ms" ).as<int>() );
          SYS_ASSERT( keepalive_interval.count() > 0, chain::plugin_config_exception,

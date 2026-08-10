@@ -106,6 +106,9 @@ inline constexpr size_t failure_kind_count = magic_enum::enum_count<failure_kind
 /** Return a stable metric label for @p failure. */
 std::string_view failure_kind_name(failure_kind failure);
 
+/** Return whether @p host is valid for HTTP authority serialization and TLS identity checks. */
+bool is_safe_network_host(std::string_view host);
+
 /** Return only the scheme, host, and explicit port of @p target for safe diagnostics. */
 std::string sanitized_endpoint(const url& target);
 
