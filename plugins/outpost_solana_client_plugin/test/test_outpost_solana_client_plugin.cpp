@@ -515,58 +515,28 @@ BOOST_AUTO_TEST_CASE(outpost_program_name_default_is_opp_outpost) try {
    BOOST_CHECK_EQUAL(std::string{sysio::OPP_SOLANA_OUTPOST_PROGRAM_NAME}, "opp_outpost");
 } FC_LOG_AND_RETHROW();
 
-BOOST_AUTO_TEST_CASE(resolve_token_custody_reads_outpost_config_maps) try {
-   using sysio::outpost_solana_client_detail::resolve_token_custody;
+BOOST_AUTO_TEST_CASE(resolve_reserve_custody_reads_pinned_fields) try {
+   using sysio::outpost_solana_client_detail::resolve_reserve_custody;
 
-   const auto spl_mint      = measurement_pubkey(77);
-   const auto native_marker = system::program_ids::SYSTEM_PROGRAM;
-
-   fc::variants addresses;
-   addresses.push_back(fc::mutable_variant_object("token_code", 111)(
-      "mint", spl_mint.to_string(fc::yield_function_t{})));
-   addresses.push_back(fc::mutable_variant_object("token_code", 222)(
-      "mint", native_marker.to_string(fc::yield_function_t{})));
-   fc::variants precisions;
-   precisions.push_back(fc::mutable_variant_object("token_code", 111)("decimals", 6));
-   precisions.push_back(fc::mutable_variant_object("token_code", 222)("decimals", 9));
-
-   const fc::variant_object config =
-      fc::mutable_variant_object("token_addresses_by_code", std::move(addresses))(
-         "precision_by_token_code", std::move(precisions));
-
-   // SPL binding: configured mint + configured decimals.
-   const auto spl = resolve_token_custody(config, 111);
+   const auto spl_mint = measurement_pubkey(77);
+   const fc::variant_object reserve =
+      fc::mutable_variant_object(
+         "custody_mint", spl_mint.to_string(fc::yield_function_t{}))(
+         "custody_decimals", 6);
+   const auto spl = resolve_reserve_custody(reserve);
    BOOST_CHECK(spl.mint == spl_mint);
    BOOST_CHECK_EQUAL(static_cast<unsigned>(spl.decimals), 6u);
-
-   // Explicit zero-mint binding (the harness registers native SOL this way):
-   // native custody + its configured precision.
-   const auto native = resolve_token_custody(config, 222);
-   BOOST_CHECK(native.mint == native_marker);
-   BOOST_CHECK_EQUAL(static_cast<unsigned>(native.decimals), 9u);
 } FC_LOG_AND_RETHROW();
 
-BOOST_AUTO_TEST_CASE(resolve_token_custody_requires_both_config_entries) try {
-   using sysio::outpost_solana_client_detail::resolve_token_custody;
+BOOST_AUTO_TEST_CASE(resolve_reserve_custody_requires_both_pinned_fields) try {
+   using sysio::outpost_solana_client_detail::resolve_reserve_custody;
 
    const auto spl_mint = measurement_pubkey(78);
-   fc::variants addresses;
-   addresses.push_back(fc::mutable_variant_object("token_code", 111)(
-      "mint", spl_mint.to_string(fc::yield_function_t{})));
-
-   // Address bound but precision missing -> throws (wire-ethereum
-   // WIRE_TokenPrecisionUnset parity; program PrecisionUnconfigured parity).
-   const fc::variant_object address_only =
-      fc::mutable_variant_object("token_addresses_by_code", addresses)(
-         "precision_by_token_code", fc::variants{});
-   BOOST_CHECK_THROW(resolve_token_custody(address_only, 111), fc::assert_exception);
-
-   // Unknown token_code entirely -> throws on the address requirement.
-   BOOST_CHECK_THROW(resolve_token_custody(address_only, 999), fc::assert_exception);
-
-   // Config carrying no maps at all -> throws.
+   const fc::variant_object mint_only = fc::mutable_variant_object(
+      "custody_mint", spl_mint.to_string(fc::yield_function_t{}));
+   BOOST_CHECK_THROW(resolve_reserve_custody(mint_only), fc::assert_exception);
    BOOST_CHECK_THROW(
-      resolve_token_custody(fc::variant_object{fc::mutable_variant_object{}}, 111),
+      resolve_reserve_custody(fc::variant_object{fc::mutable_variant_object{}}),
       fc::assert_exception);
 } FC_LOG_AND_RETHROW();
 
@@ -1005,10 +975,11 @@ BOOST_AUTO_TEST_CASE(extract_pubkeys_skips_malformed_address_length) try {
    BOOST_CHECK(pks.empty());
 } FC_LOG_AND_RETHROW();
 
-BOOST_AUTO_TEST_CASE(extract_pubkeys_returns_empty_on_garbage_envelope) try {
+BOOST_AUTO_TEST_CASE(extract_pubkeys_retries_on_garbage_envelope) try {
    std::vector<char> garbage = {char(0xFF), char(0xFF), char(0xFF), char(0xFF)};
-   auto pks = sysio::outpost_solana_client_detail::extract_inbound_recipient_pubkeys(garbage);
-   BOOST_CHECK(pks.empty());
+   BOOST_CHECK_THROW(
+      sysio::outpost_solana_client_detail::extract_inbound_recipient_pubkeys(garbage),
+      fc::assert_exception);
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(extract_pubkeys_mixed_remit_and_revert_preserved_order) try {

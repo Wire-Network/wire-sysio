@@ -177,12 +177,9 @@ private:
    };
 
    /// Resolve the terminal-finalization facts for a per-reserve PDA:
-   /// `creator` from the `Reserve` account, custody (mint / decimals) from
-   /// the `OutpostConfig` maps keyed by `token_code`. The clean-room outpost
-   /// program resolves custody from `config.token_addresses_by_code` at
-   /// dispatch time (`Reserve` carries no custody fields), so the relay
-   /// mirrors that lookup to stay account-consistent with the on-chain
-   /// handlers.
+   /// creator and pinned custody (mint / decimals) from the `Reserve` account.
+   /// The relay mirrors the on-chain resolver so a later OutpostConfig change
+   /// cannot alter the terminal effect-account manifest.
    std::optional<reserve_terminal_info>
    reserve_info_for_codes(uint64_t token_code, uint64_t reserve_code);
 
@@ -198,10 +195,7 @@ using outpost_solana_client_ptr = std::shared_ptr<outpost_solana_client>;
 
 namespace outpost_solana_client_detail {
 
-/// Custody binding for a `token_code`, resolved from the outpost's
-/// `OutpostConfig` maps. The clean-room program pins custody on the config
-/// (`token_addresses_by_code` / `precision_by_token_code`) instead of
-/// denormalizing it onto each `Reserve` account.
+/// Custody binding pinned on a decoded Reserve account.
 struct token_custody_info {
    /// SPL mint for the token, or the all-zero system-program key when the
    /// token is native lamports (the on-chain zero-marker convention).
@@ -210,14 +204,10 @@ struct token_custody_info {
    uint8_t decimals = 0;
 };
 
-/// Resolve `token_code`'s custody binding from a decoded `OutpostConfig`
-/// account object. BOTH entries are required — same contract as
-/// wire-ethereum's `ReserveManager` (`WIRE_TokenPrecisionUnset`) and the
-/// program's own `PrecisionUnconfigured` / `TokenCodeNotConfigured` gates:
-/// a missing address or precision entry throws instead of silently
-/// defaulting. Native custody is expressed by an EXPLICIT zero-mint entry.
-token_custody_info resolve_token_custody(const fc::variant_object& outpost_config,
-                                         uint64_t token_code);
+/// Resolve custody from a decoded Reserve. Both pinned fields are required;
+/// a legacy/malformed account throws so delivery is retried rather than
+/// submitting metas derived from mutable configuration.
+token_custody_info resolve_reserve_custody(const fc::variant_object& reserve);
 
 /// Append `key` to `metas`, or merge its writable flag into the existing
 /// entry when an earlier terminal effect already required the same account.
@@ -304,7 +294,7 @@ struct swap_remit_spl_target {
 
 /// Walk every `SWAP_REMIT` attestation in `envelope_bytes` and collect
 /// the SPL-relevant tuple. Caller is responsible for resolving each
-/// `token_code` to a mint pubkey (cached from `OutpostConfig`) before
+/// Reserve's pinned mint before
 /// deriving the recipient ATA + including it in `remaining_accounts`.
 std::vector<swap_remit_spl_target>
 extract_inbound_swap_remit_spl_targets(const std::vector<char>& envelope_bytes);

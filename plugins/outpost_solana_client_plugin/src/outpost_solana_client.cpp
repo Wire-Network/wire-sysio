@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cstring>
+#include <limits>
 #include <map>
 #include <optional>
 #include <span>
@@ -59,6 +60,19 @@ namespace latest_envelope {
 namespace outpost_solana_client_detail {
 
 namespace {
+
+/// A terminal manifest is part of the delivery contract, not a best-effort
+/// optimization. Fail before submitting an account-incomplete `epoch_in`;
+/// `outpost_opp_job` leaves the epoch unmarked and retries on its next tick.
+sysio::opp::Envelope parse_terminal_manifest_envelope(
+   const std::vector<char>& envelope_bytes) {
+   sysio::opp::Envelope env;
+   FC_ASSERT(env.ParseFromArray(envelope_bytes.data(),
+                                static_cast<int>(envelope_bytes.size())),
+             "outpost_solana_client: cannot decode envelope for terminal "
+             "effect-account manifest; delivery will be retried");
+   return env;
+}
 
 /// Wrap a 32-byte address slice from `op_address.address` /
 /// `depositor.address` into a `solana_public_key`. Returns nullopt
@@ -383,16 +397,7 @@ fc::network::solana::solana_public_key derive_reserve_vault_pda(
 std::vector<fc::network::solana::solana_public_key>
 extract_inbound_recipient_pubkeys(const std::vector<char>& envelope_bytes) {
    std::vector<fc::network::solana::solana_public_key> recipients;
-
-   sysio::opp::Envelope env;
-   if (!env.ParseFromArray(envelope_bytes.data(),
-                           static_cast<int>(envelope_bytes.size()))) {
-      wlog("outpost_solana_client: envelope decode for remaining-accounts "
-           "extraction failed; submitting epoch_in with no extras "
-           "(WITHDRAW_REMIT/DEPOSIT_REVERT/SWAP native transfers may "
-           "log-and-skip on-chain if any are present)");
-      return recipients;
-   }
+   const auto env = parse_terminal_manifest_envelope(envelope_bytes);
 
    auto record_unique = [&recipients](const fc::network::solana::solana_public_key& pk) {
       if (std::find(recipients.begin(), recipients.end(), pk) == recipients.end()) {
@@ -451,16 +456,7 @@ extract_inbound_recipient_pubkeys(const std::vector<char>& envelope_bytes) {
 std::vector<swap_remit_spl_target>
 extract_inbound_swap_remit_spl_targets(const std::vector<char>& envelope_bytes) {
    std::vector<swap_remit_spl_target> targets;
-
-   sysio::opp::Envelope env;
-   if (!env.ParseFromArray(envelope_bytes.data(),
-                           static_cast<int>(envelope_bytes.size()))) {
-      wlog("outpost_solana_client: envelope decode for SPL swap-remit "
-           "target extraction failed; submitting epoch_in with no SPL "
-           "extras (any SPL SwapRemit attestations present will log-and-skip "
-           "if their effect accounts are missing)");
-      return targets;
-   }
+   const auto env = parse_terminal_manifest_envelope(envelope_bytes);
 
    for (const auto& message : env.messages()) {
       for (const auto& entry : message.payload().attestations()) {
@@ -483,16 +479,7 @@ extract_inbound_swap_remit_spl_targets(const std::vector<char>& envelope_bytes) 
 std::vector<swap_remit_spl_target>
 extract_inbound_swap_revert_spl_targets(const std::vector<char>& envelope_bytes) {
    std::vector<swap_remit_spl_target> targets;
-
-   sysio::opp::Envelope env;
-   if (!env.ParseFromArray(envelope_bytes.data(),
-                           static_cast<int>(envelope_bytes.size()))) {
-      wlog("outpost_solana_client: envelope decode for SPL swap-revert "
-           "target extraction failed; submitting epoch_in with no SPL "
-           "revert extras (any SPL SwapRevert attestations present will "
-           "log-and-skip on-chain)");
-      return targets;
-   }
+   const auto env = parse_terminal_manifest_envelope(envelope_bytes);
 
    for (const auto& message : env.messages()) {
       for (const auto& entry : message.payload().attestations()) {
@@ -515,16 +502,7 @@ extract_inbound_swap_revert_spl_targets(const std::vector<char>& envelope_bytes)
 std::vector<reserve_pda_seeds>
 extract_inbound_swap_remit_reserve_seeds(const std::vector<char>& envelope_bytes) {
    std::vector<reserve_pda_seeds> seeds;
-
-   sysio::opp::Envelope env;
-   if (!env.ParseFromArray(envelope_bytes.data(),
-                           static_cast<int>(envelope_bytes.size()))) {
-      wlog("outpost_solana_client: envelope decode for swap-remit reserve "
-           "seeds extraction failed; submitting epoch_in with no Reserve "
-           "PDAs (SWAP_REMIT lamport transfers will log-and-skip on-chain "
-           "if any are present)");
-      return seeds;
-   }
+   const auto env = parse_terminal_manifest_envelope(envelope_bytes);
 
    auto record_unique = [&seeds](uint64_t token_code, uint64_t reserve_code) {
       auto matches = [&](const reserve_pda_seeds& s) {
@@ -584,15 +562,7 @@ extract_inbound_swap_remit_reserve_seeds(const std::vector<char>& envelope_bytes
 std::vector<reserve_pda_seeds>
 extract_inbound_reserve_create_cancelled_seeds(const std::vector<char>& envelope_bytes) {
    std::vector<reserve_pda_seeds> seeds;
-
-   sysio::opp::Envelope env;
-   if (!env.ParseFromArray(envelope_bytes.data(),
-                           static_cast<int>(envelope_bytes.size()))) {
-      wlog("outpost_solana_client: envelope decode for reserve-cancel "
-           "target extraction failed; terminal manifest may omit refund "
-           "accounts");
-      return seeds;
-   }
+   const auto env = parse_terminal_manifest_envelope(envelope_bytes);
 
    auto record_unique = [&seeds](uint64_t token_code, uint64_t reserve_code) {
       auto matches = [&](const reserve_pda_seeds& s) {
@@ -615,42 +585,18 @@ extract_inbound_reserve_create_cancelled_seeds(const std::vector<char>& envelope
    return seeds;
 }
 
-token_custody_info resolve_token_custody(const fc::variant_object& outpost_config,
-                                         uint64_t token_code) {
+token_custody_info resolve_reserve_custody(const fc::variant_object& reserve) {
    token_custody_info custody;
-   bool address_found   = false;
-   bool precision_found = false;
-
-   if (outpost_config.contains("token_addresses_by_code")) {
-      for (const auto& entry_v : outpost_config["token_addresses_by_code"].get_array()) {
-         const auto& entry = entry_v.get_object();
-         if (entry["token_code"].as_uint64() == token_code) {
-            custody.mint =
-               fc::network::solana::solana_public_key::from_base58_string(entry["mint"].as_string());
-            address_found = true;
-            break;
-         }
-      }
-   }
-   FC_ASSERT(address_found,
-             "token address binding unconfigured for token_code {} — the outpost's "
-             "token_addresses_by_code map must carry an explicit entry (zero mint = native)",
-             token_code);
-
-   if (outpost_config.contains("precision_by_token_code")) {
-      for (const auto& entry_v : outpost_config["precision_by_token_code"].get_array()) {
-         const auto& entry = entry_v.get_object();
-         if (entry["token_code"].as_uint64() == token_code) {
-            custody.decimals  = static_cast<uint8_t>(entry["decimals"].as_uint64());
-            precision_found = true;
-            break;
-         }
-      }
-   }
-   FC_ASSERT(precision_found,
-             "token precision unconfigured for token_code {} — required, same as "
-             "wire-ethereum's WIRE_TokenPrecisionUnset and the program's PrecisionUnconfigured",
-             token_code);
+   FC_ASSERT(reserve.contains("custody_mint"),
+             "Reserve account missing pinned custody_mint field");
+   FC_ASSERT(reserve.contains("custody_decimals"),
+             "Reserve account missing pinned custody_decimals field");
+   custody.mint = fc::network::solana::solana_public_key::from_base58_string(
+      reserve["custody_mint"].as_string());
+   const auto decimals = reserve["custody_decimals"].as_uint64();
+   FC_ASSERT(decimals <= std::numeric_limits<uint8_t>::max(),
+             "Reserve custody_decimals {} exceeds uint8", decimals);
+   custody.decimals = static_cast<uint8_t>(decimals);
 
    return custody;
 }
@@ -709,7 +655,8 @@ outpost_solana_client::reserve_info_for_codes(uint64_t token_code, uint64_t rese
    const auto account_info = _entry->client->get_account_info(reserve_pda);
    if (!account_info.has_value()) {
       wlog("outpost_solana_client[{}]: Reserve({}, {}) absent at {}; "
-           "terminal manifest will omit branch-specific accounts for this reserve",
+           "terminal manifest will carry only its canonical Reserve PDA so the "
+           "outpost records this non-repairable state",
            to_string(),
            token_code,
            reserve_code,
@@ -727,18 +674,10 @@ outpost_solana_client::reserve_info_for_codes(uint64_t token_code, uint64_t rese
    const auto& reserve = reserve_v.get_object();
    FC_ASSERT(reserve.contains("creator"), "Reserve account missing creator field");
 
-   // Custody (mint / decimals) lives on the OutpostConfig maps keyed by
-   // token_code — the clean-room program resolves it there at dispatch time,
-   // so the relay mirrors that lookup to stay account-consistent with the
-   // on-chain handlers.
-   const auto config_info = _entry->client->get_account_info(_program_client->config_pda);
-   FC_ASSERT(config_info.has_value() && !config_info->data.empty(),
-             "OutpostConfig account missing at {} — outpost not initialized",
-             _program_client->config_pda.to_string(fc::yield_function_t{}));
-   const auto config_v =
-      _program_client->decode_account_info_data("OutpostConfig", config_info->data);
+   // Mirror the on-chain handler exactly: a Reserve pins custody facts at
+   // creation, so later OutpostConfig changes cannot alter settlement.
    const auto custody =
-      outpost_solana_client_detail::resolve_token_custody(config_v.get_object(), token_code);
+      outpost_solana_client_detail::resolve_reserve_custody(reserve);
 
    return reserve_terminal_info{
       fc::network::solana::solana_public_key::from_base58_string(reserve["creator"].as_string()),
@@ -830,11 +769,15 @@ std::string outpost_solana_client::deliver_outbound_envelope(
          outpost_solana_client_detail::derive_reserve_vault_pda(
             _program_id, target.token_code, target.reserve_code),
          true);
+      add_terminal_account(info.custody_mint, false);
+      add_terminal_account(target.recipient, true);
       add_terminal_account(
          fc::network::solana::system::get_associated_token_address(
             target.recipient, info.custody_mint),
          true);
       add_terminal_account(token_program_id, false);
+      add_terminal_account(associated_token_program_id, false);
+      add_terminal_account(system_program_id, false);
       spl_accounts_added += terminal_accounts.size() - before;
    }
 
