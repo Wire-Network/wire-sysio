@@ -2,7 +2,6 @@
 
 import signal
 import json
-import time
 import os
 import filecmp
 
@@ -79,14 +78,29 @@ try:
 
     producerNode.kill(signal.SIGTERM)
 
-    # wait for all blocks to arrive and be processed by irrNode
-    time.sleep(3)
+    # Wait for irrNode to catch up to the promoted producer schedule. The producer is already at or
+    # past setProdsBlockNum, and the blocks it emitted before dying carry irrNode to the same point,
+    # so the snapshot below covers the updated global_property_object.
+    def isSetProdsBlockNumIrrOnIrrNode():
+        """Report whether irrNode has advanced its LIB to the set-prods block."""
+        return irrNode.getIrreversibleBlockNum() >= setProdsBlockNum
+    assert Utils.waitForBool(isSetProdsBlockNumIrrOnIrrNode, timeout=30, sleepTime=0.1), \
+        f"irrNode did not reach irreversible block {setProdsBlockNum}"
 
-    # Create the snapshot and rename it to avoid name conflict later on
+    # Take down every remaining source of blocks. irrNode runs in irreversible read mode, so its head
+    # is its LIB, and any block delivered after the first snapshot advances that LIB -- leaving the two
+    # snapshots describing different chain states and making them legitimately unequal. With no peer
+    # left to serve blocks, the restart below replays the same persisted state and lands on the same head.
+    nonProdNode.kill(signal.SIGTERM)
+    cluster.biosNode.kill(signal.SIGTERM)
+
+    # Create the snapshot and rename it, because the post-restart snapshot is written under the same
+    # head-block-derived name and createSnapshot refuses to overwrite an existing file.
     res = irrNode.createSnapshot()
-    beforeShutdownSnapshotPath = res["payload"]["snapshot_name"]
-    snapshotPathWithoutExt, snapshotExt = os.path.splitext(beforeShutdownSnapshotPath)
-    os.rename(beforeShutdownSnapshotPath, snapshotPathWithoutExt + "_before_shutdown" + snapshotExt)
+    beforeShutdownBlockNum = res["payload"]["head_block_num"]
+    snapshotPathWithoutExt, snapshotExt = os.path.splitext(res["payload"]["snapshot_name"])
+    beforeShutdownSnapshotPath = snapshotPathWithoutExt + "_before_shutdown" + snapshotExt
+    os.rename(res["payload"]["snapshot_name"], beforeShutdownSnapshotPath)
 
     # Restart irr node and ensure the snapshot is still identical
     irrNode.kill(signal.SIGTERM)
@@ -94,7 +108,10 @@ try:
     assert isRelaunchSuccess, "Fail to relaunch"
     res = irrNode.createSnapshot()
     afterShutdownSnapshotPath = res["payload"]["snapshot_name"]
-    assert filecmp.cmp(beforeShutdownSnapshotPath, afterShutdownSnapshotPath), "snapshot is not identical"
+    afterShutdownBlockNum = res["payload"]["head_block_num"]
+    assert afterShutdownBlockNum == beforeShutdownBlockNum, \
+        f"snapshots cover different blocks: {beforeShutdownBlockNum} before shutdown, {afterShutdownBlockNum} after"
+    assert filecmp.cmp(beforeShutdownSnapshotPath, afterShutdownSnapshotPath, shallow=False), "snapshot is not identical"
 
     testSuccessful = True
 finally:

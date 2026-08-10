@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package sysio.opp.config;
+
+// One signing-capable client connection. Key material remains in the separately
+// configured signature provider and is never stored in this document.
+message ClientConnection {
+  optional string client_id             = 1;
+  optional string signature_provider_id = 2;
+  optional string rpc_url               = 3;
+}
+
+// Absolute local expenditure limits for a complete EIP-1559 transaction.
+message EvmTransactionPolicy {
+  optional string max_priority_fee_per_gas_wei = 1;
+  optional string max_fee_per_gas_wei          = 2;
+  optional string max_gas_limit                = 3;
+  optional string max_total_native_cost_wei    = 4;
+}
+
+// One EVM signing client. Future keyless witness endpoints must use a distinct
+// endpoint message rather than overloading the signing ClientConnection.
+message EvmClientConfiguration {
+  optional ClientConnection     connection         = 1;
+  optional uint32               chain_id            = 2;
+  optional EvmTransactionPolicy transaction_policy = 3;
+}
+
+// Versioned Ethereum client configuration owned by the Ethereum outpost plugin.
+message EvmClientConfigurationFile {
+  optional uint32                  schema_version = 1;
+  repeated EvmClientConfiguration clients        = 2;
+}

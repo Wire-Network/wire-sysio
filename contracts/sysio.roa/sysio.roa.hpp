@@ -86,11 +86,16 @@ namespace sysio {
              *
              * Note: Will reclaim UPTO ram_weight worth of bytes, limited to the pool of unused bytes on 'owner's reslimit and upper bound by the policy ram_weight.
              *
+             * Every weight must be non-negative and no greater than the stored policy weight: the
+             * reduction is applied as a subtraction, so a negative weight would ADD quota and break
+             * the conservation relationship between policy weights, resource limits, and the
+             * issuer's nodeowners accounting.
+             *
              * @param owner The account this policy is issued to.
              * @param issuer The Node Owner who issued this policy.
-             * @param net_weight The amount in SYS to decrease NET by.
-             * @param cpu_weight The amount in SYS to decrease CPU by.
-             * @param ram_weight The amount in SYS to attempt decreasing RAM by, returning only
+             * @param net_weight The non-negative amount in SYS to decrease NET by.
+             * @param cpu_weight The non-negative amount in SYS to decrease CPU by.
+             * @param ram_weight The non-negative amount in SYS to attempt decreasing RAM by, returning only
              * @param network_gen Generation of issuer, in cases where you are a Node Owner in multiple,
              *                     specifies which allocation of SYS to adjust.
              */

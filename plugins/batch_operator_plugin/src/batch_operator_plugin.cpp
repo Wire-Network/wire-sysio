@@ -600,7 +600,7 @@ struct batch_operator_plugin::impl {
                // chain's endpoint.
                auto entry = eth_plug->get_client_by_chain_id(op.chain_id);
                if (!entry) {
-                  wlog("batch_operator: no unique --outpost-ethereum-client for chain_id {} "
+                  wlog("batch_operator: no unique configured Ethereum client for chain_id {} "
                        "(outpost {}); skipping until one is configured",
                        op.chain_id, fc::slug_name{op.id}.to_string());
                   continue;
@@ -942,7 +942,7 @@ void batch_operator_plugin::set_program_options(options_description& cli,
         "chain code. Spec: CHAIN_CODE,opp_addr[,opp_inbound_addr]. EVM rows require the OPP "
         "and OPPInbound contract addresses (0x-hex); SVM rows require only the outpost "
         "program id (base58). The Ethereum RPC client for a row is selected by matching the "
-        "row's external_chain_id against the chain ids of the outpost-ethereum-client specs; "
+        "row's external_chain_id against the chain ids of the configured Ethereum clients; "
         "an active row with no binding or no matching client is skipped (fail closed).");
 }
 

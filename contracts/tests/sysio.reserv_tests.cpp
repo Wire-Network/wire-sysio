@@ -421,6 +421,29 @@ BOOST_FIXTURE_TEST_CASE(regreserve_seeds_private_reserve, sysio_reserve_tester) 
    BOOST_REQUIRE_EQUAL("alice", r["owner"].as_string());
 } FC_LOG_AND_RETHROW() }
 
+// `name` and `description` persist into a reserve row billed to `ram_payer = sysio` — the
+// shared system pool — so both are bounded before emplace, via the same
+// `sysio::opp::registry::check_metadata` the chains and tokens registries use. CertiK WNS-10
+// raised the unbounded pair on `sysio.tokens::regtoken`; it was identical here.
+//
+// `regreserve` is privileged and abort-safe, so it enforces the bound with `check_metadata`.
+// The post-bootstrap `oncrtreserve` path must never abort and instead routes an over-bound
+// row into the existing cancel/refund flow — see `oncrtreserve_oversized_metadata_is_cancelled`.
+BOOST_FIXTURE_TEST_CASE(regreserve_bounds_metadata, sysio_reserve_tester) { try {
+   BOOST_REQUIRE(regreserve("ETH", "ETH", "PRIMARY", 100, 100, 5000, false, name{},
+                            std::string(129, 'x'))
+      .find("label exceeds 128 bytes") != std::string::npos);
+
+   BOOST_REQUIRE(regreserve("ETH", "ETH", "PRIMARY", 100, 100, 5000, false, name{},
+                            "ok", std::string(257, 'x'))
+      .find("description exceeds 256 bytes") != std::string::npos);
+
+   // The bounds are inclusive, and neither rejection claimed the reserve key.
+   BOOST_REQUIRE_EQUAL(success(),
+      regreserve("ETH", "ETH", "PRIMARY", 100, 100, 5000, false, name{},
+                 std::string(128, 'x'), std::string(256, 'x')));
+} FC_LOG_AND_RETHROW() }
+
 // ── oncrtreserve (create gating) ──
 
 BOOST_FIXTURE_TEST_CASE(oncrtreserve_requires_msgch_auth, sysio_reserve_tester) { try {
@@ -634,6 +657,80 @@ BOOST_FIXTURE_TEST_CASE(oncrtreserve_invalid_amount_is_cancelled, sysio_reserve_
    BOOST_REQUIRE_EQUAL("RESERVE_STATUS_CANCELLED", r["status"].as_string());
 } FC_LOG_AND_RETHROW() }
 
+// The same `sysio`-billed metadata bound `regreserve` enforces, applied to the inbound
+// creation path. `oncrtreserve` is an OPP dispatch handler, so it must NOT `check()` —
+// aborting here rolls back the consensus-tipping delivery and stalls epoch advancement
+// chain-wide (feedback_opp_handlers_never_throw / epoch-stall-is-fatal). An over-bound
+// string therefore joins `invalid_amount` and the unlinked-creator case on the existing
+// reject predicate, releasing the creator's escrow via RESERVE_CREATE_CANCELLED.
+//
+// The creator here is properly LINKED with a valid amount, so the metadata is the sole
+// rejection reason. The tombstone is itself a `sysio`-billed row, so the over-bound strings
+// are replaced by a fixed marker rather than carried onto it. Both an ASCII and a MULTIBYTE
+// over-bound label are covered: because nothing is truncated there is no code-point boundary
+// to split, so neither can leave malformed text in state. A third case drives the OTHER half
+// of `metadata_exceeds_bounds` — an over-bound `description` behind an in-bound name — so
+// each side of the predicate is exercised independently rather than only via the label.
+BOOST_FIXTURE_TEST_CASE(oncrtreserve_oversized_metadata_is_cancelled, sysio_reserve_tester) { try {
+   deploy_authex();
+
+   auto creator_priv = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em);
+   auto creator_pub  = creator_priv.get_public_key();
+   BOOST_REQUIRE_EQUAL(success(),
+      recordlink_em("alice"_n, ChainKind::CHAIN_KIND_EVM, creator_pub));
+
+   auto create_with_metadata = [&](std::string_view reserve_code,
+                                   const std::string& name,
+                                   const std::string& description) {
+      return push_action(MSGCH_ACCOUNT, "oncrtreserve"_n, mvo()
+         ("chain_code",            codename_mvo("ETH"))
+         ("token_code",            codename_mvo("ETH"))
+         ("reserve_code",          codename_mvo(reserve_code))
+         ("name",                  name)
+         ("description",           description)
+         ("external_token_amount", 1000)
+         ("requested_wire_amount", 1000)
+         ("source_token_precision", 9u)
+         ("connector_weight_bps",  5000)
+         ("creator_chain_kind",    ChainKind::CHAIN_KIND_EVM)
+         ("creator_chain_addr",    std::vector<char>(20, '\x01'))
+         ("is_private",            false)
+         ("creator_pub_key",       em_pubkey_bytes(creator_pub)));   // linked key
+   };
+
+   // 129 ASCII bytes — one over label_max_bytes.
+   BOOST_REQUIRE_EQUAL(success(), create_with_metadata("USERRES", std::string(129, 'x'), ""));
+   auto ascii_row = find_reserve("ETH", "ETH", "USERRES");
+   BOOST_REQUIRE(!ascii_row.is_null());
+   BOOST_REQUIRE_EQUAL("RESERVE_STATUS_CANCELLED", ascii_row["status"].as_string());
+   BOOST_REQUIRE_EQUAL("<rejected>", ascii_row["name"].as_string());
+
+   // 129 bytes as 127 ASCII + `é` (0xC3 0xA9) — a byte-wise truncation at the bound would
+   // have split the final character and persisted a lone lead byte. The marker sidesteps
+   // that entirely: nothing is truncated, so there is no code-point boundary to get wrong.
+   const std::string multibyte_name = std::string(127, 'x') + "\xC3\xA9";
+   BOOST_REQUIRE_EQUAL(129u, multibyte_name.size());
+   BOOST_REQUIRE_EQUAL(success(), create_with_metadata("USERRES2", multibyte_name, ""));
+   auto multibyte_row = find_reserve("ETH", "ETH", "USERRES2");
+   BOOST_REQUIRE(!multibyte_row.is_null());
+   BOOST_REQUIRE_EQUAL("RESERVE_STATUS_CANCELLED", multibyte_row["status"].as_string());
+   BOOST_REQUIRE_EQUAL("<rejected>", multibyte_row["name"].as_string());
+
+   // 257 bytes — one over description_max_bytes — behind an in-bound name. This is the
+   // `description` half of `metadata_exceeds_bounds`: the label alone would have passed, so
+   // the description is the sole rejection reason. The tombstone drops the over-bound text
+   // rather than carrying it onto a `sysio`-billed row, so the stored description is empty
+   // while the name still reads as the rejection marker.
+   const std::string oversized_description(257, 'd');
+   BOOST_REQUIRE_EQUAL(success(),
+      create_with_metadata("USERRES3", "in-bound name", oversized_description));
+   auto description_row = find_reserve("ETH", "ETH", "USERRES3");
+   BOOST_REQUIRE(!description_row.is_null());
+   BOOST_REQUIRE_EQUAL("RESERVE_STATUS_CANCELLED", description_row["status"].as_string());
+   BOOST_REQUIRE_EQUAL("<rejected>", description_row["name"].as_string());
+   BOOST_REQUIRE_EQUAL("", description_row["description"].as_string());
+} FC_LOG_AND_RETHROW() }
+
 // ── matchreserve (gating preconditions) ──
 
 BOOST_FIXTURE_TEST_CASE(matchreserve_rejects_unknown_reserve, sysio_reserve_tester) { try {
@@ -703,6 +800,46 @@ BOOST_FIXTURE_TEST_CASE(applyswap_applies_four_legs, sysio_reserve_tester) { try
    BOOST_REQUIRE_EQUAL(950,  dst["reserve_chain_amount"].as_uint64());
    // Σ reserve_wire_amount unchanged (910 + 1090 == 2000) — at these tiny
    // amounts the 0.1% fee floors to 0, so the w hop stays fully internal.
+} FC_LOG_AND_RETHROW() }
+
+// [P0] WNS-02: applyswap must refuse a destination debit larger than the
+// destination curve's output for the post-fee WIRE it is receiving. The audited
+// vulnerability paid out a caller-chosen `dst_amount` verbatim, so the reserve
+// enforces its own floor instead of trusting `sysio.uwrit` to have derived it.
+BOOST_FIXTURE_TEST_CASE(applyswap_rejects_debit_above_curve_output, sysio_reserve_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(),
+      regreserve("ETH", "ETH", "PRIMARY", 1000, 1000));
+   BOOST_REQUIRE_EQUAL(success(),
+      regreserve("SOLANA", "SOL", "PRIMARY", 1000, 1000));
+
+   // w_gross = 90 (see applyswap_applies_four_legs), fee floors to 0, so the
+   // destination receives 90 WIRE and its curve yields
+   // floor(1000*90/1090) = 82 token. 83 is one subunit past what the AMM owes.
+   constexpr int64_t CURVE_OUT = 82;
+   auto apply = [&](int64_t dst_amount) {
+      return push_action(UWRIT_ACCOUNT, "applyswap"_n, mvo()
+         ("src_chain_code",   codename_mvo("ETH"))
+         ("src_token_code",   codename_mvo("ETH"))
+         ("src_reserve_code", codename_mvo("PRIMARY"))
+         ("src_amount",       100)
+         ("dst_chain_code",   codename_mvo("SOLANA"))
+         ("dst_token_code",   codename_mvo("SOL"))
+         ("dst_reserve_code", codename_mvo("PRIMARY"))
+         ("dst_amount",       dst_amount)
+         ("underwriter",      "underwriter1"));
+   };
+
+   // One subunit over — refused. A grossly-inflated amount (the drain shape)
+   // takes the same path.
+   const auto expected = error("assertion failure with message: applyswap: "
+                               "destination amount exceeds the curve output for the post-fee WIRE");
+   BOOST_REQUIRE_EQUAL(expected, apply(CURVE_OUT + 1));
+   BOOST_REQUIRE_EQUAL(expected, apply(900));
+
+   // Exactly the curve output settles — the amount `sysio.uwrit` derives.
+   BOOST_REQUIRE_EQUAL(success(), apply(CURVE_OUT));
+   BOOST_REQUIRE_EQUAL(1000 - CURVE_OUT,
+                       find_reserve("SOLANA", "SOL", "PRIMARY")["reserve_chain_amount"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(applyswap_charges_fee_and_routes_50_50, sysio_reserve_tester) { try {
@@ -1216,11 +1353,49 @@ BOOST_FIXTURE_TEST_CASE(applyfromwire_credits_wire_and_debits_chain, sysio_reser
    BOOST_REQUIRE_EQUAL(900,  r["reserve_chain_amount"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
+// [P0] WNS-02, from-WIRE shape — see applyswap_rejects_debit_above_curve_output.
+// The user's escrowed WIRE feeds the WIRE leg directly, so the bound is the
+// destination curve's output for the post-fee remainder.
+BOOST_FIXTURE_TEST_CASE(applyfromwire_rejects_debit_above_curve_output,
+                        sysio_reserve_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(),
+      regreserve("SOLANA", "SOL", "PRIMARY", 1000, 1000));
+
+   // 200 WIRE in, 0.1% fee floors to 0, so the curve yields
+   // floor(1000*200/1200) = 166 token.
+   constexpr int64_t CURVE_OUT = 166;
+   auto apply = [&](int64_t dst_amount) {
+      return push_action(UWRIT_ACCOUNT, "applyfromwire"_n, mvo()
+         ("dst_chain_code",   codename_mvo("SOLANA"))
+         ("dst_token_code",   codename_mvo("SOL"))
+         ("dst_reserve_code", codename_mvo("PRIMARY"))
+         ("wire_in",          200)
+         ("dst_amount",       dst_amount)
+         ("underwriter",      "underwriter1"));
+   };
+
+   const auto expected = error("assertion failure with message: applyfromwire: "
+                               "destination amount exceeds the curve output for the post-fee WIRE");
+   BOOST_REQUIRE_EQUAL(expected, apply(CURVE_OUT + 1));
+   BOOST_REQUIRE_EQUAL(expected, apply(900));
+
+   BOOST_REQUIRE_EQUAL(success(), apply(CURVE_OUT));
+   BOOST_REQUIRE_EQUAL(1000 - CURVE_OUT,
+                       find_reserve("SOLANA", "SOL", "PRIMARY")["reserve_chain_amount"].as_uint64());
+} FC_LOG_AND_RETHROW() }
+
 BOOST_FIXTURE_TEST_CASE(paywire_pays_real_wire_from_custody, sysio_reserve_tester) { try {
    BOOST_REQUIRE_EQUAL(success(),
       regreserve("ETH", "ETH", "PRIMARY", 1000, 1000));
    BOOST_REQUIRE_EQUAL(1000, wire_balance(RESERVE_ACCOUNT));
    BOOST_REQUIRE_EQUAL(0,    wire_balance("alice"_n));
+
+   // The curve's output for this leg: equal weights reduce to constant product,
+   // so `token_to_wire(1000, 1000, 100)` = floor(1000*100/1100) = 90, and the
+   // 0.1% fee floors to 0 at that size, leaving a post-fee 90. `sysio.uwrit`
+   // passes exactly this (its `swap_quote` returns the post-fee WIRE leg for a
+   // WIRE destination), and paywire now refuses anything above it (WNS-02).
+   constexpr int64_t CURVE_OUT = 90;
 
    // Swap-to-WIRE settlement: source books move + alice is paid REAL WIRE.
    BOOST_REQUIRE_EQUAL(success(), push_action(UWRIT_ACCOUNT, "paywire"_n, mvo()
@@ -1229,23 +1404,36 @@ BOOST_FIXTURE_TEST_CASE(paywire_pays_real_wire_from_custody, sysio_reserve_teste
       ("src_reserve_code", codename_mvo("PRIMARY"))
       ("src_amount",       100)
       ("recipient",        "alice")
-      ("wire_out",         200)
+      ("wire_out",         CURVE_OUT)
       ("underwriter",      "underwriter1")));
 
    auto r = find_reserve("ETH", "ETH", "PRIMARY");
    BOOST_REQUIRE_EQUAL(1100, r["reserve_chain_amount"].as_uint64());
-   BOOST_REQUIRE_EQUAL(800,  r["reserve_wire_amount"].as_uint64());
-   // Custody invariant: Σ reserve_wire_amount dropped by 200 AND the real
-   // balance dropped by 200, together.
-   BOOST_REQUIRE_EQUAL(800, wire_balance(RESERVE_ACCOUNT));
-   BOOST_REQUIRE_EQUAL(200, wire_balance("alice"_n));
+   BOOST_REQUIRE_EQUAL(910,  r["reserve_wire_amount"].as_uint64());
+   // Custody invariant: Σ reserve_wire_amount dropped by the payout AND the real
+   // balance dropped by the payout, together.
+   BOOST_REQUIRE_EQUAL(910, wire_balance(RESERVE_ACCOUNT));
+   BOOST_REQUIRE_EQUAL(90,  wire_balance("alice"_n));
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(paywire_rejects_overdraw, sysio_reserve_tester) { try {
+// [P0] WNS-02: paywire must refuse a payout larger than the WIRE its own curve
+// produces for `src_amount`. `wire_out` is a caller-supplied parameter, and the
+// audited vulnerability was precisely a caller-chosen destination amount being
+// paid out verbatim — so the reserve enforces its own floor rather than trusting
+// `sysio.uwrit` to have derived it.
+//
+// This bound also subsumes the older "insufficient source reserve WIRE for
+// payout + fee" guard: `w_gross` is capped at the reserve's own WIRE balance by
+// `out_given_in`, so `wire_out + fee <= w_gross <= reserve_wire_amount` holds
+// by construction once the payout is bounded. That guard stays in the contract
+// as defense-in-depth but is no longer constructible through this action.
+BOOST_FIXTURE_TEST_CASE(paywire_rejects_payout_above_curve_output, sysio_reserve_tester) { try {
+   // 1000 token / 100 WIRE: the curve yields floor(100*100/1100) = 9 WIRE for a
+   // 100-token source leg, so a 200 payout is ~22x the reserve's own price.
    BOOST_REQUIRE_EQUAL(success(),
       regreserve("ETH", "ETH", "PRIMARY", 1000, 100));
    BOOST_REQUIRE_EQUAL(
-      error("assertion failure with message: paywire: insufficient source reserve WIRE for payout + fee"),
+      error("assertion failure with message: paywire: payout exceeds the post-fee WIRE the source leg produced"),
       push_action(UWRIT_ACCOUNT, "paywire"_n, mvo()
          ("src_chain_code",   codename_mvo("ETH"))
          ("src_token_code",   codename_mvo("ETH"))
@@ -1254,6 +1442,17 @@ BOOST_FIXTURE_TEST_CASE(paywire_rejects_overdraw, sysio_reserve_tester) { try {
          ("recipient",        "alice")
          ("wire_out",         200)
          ("underwriter",      "underwriter1")));
+
+   // The curve's own output settles cleanly against the same reserve.
+   BOOST_REQUIRE_EQUAL(success(), push_action(UWRIT_ACCOUNT, "paywire"_n, mvo()
+      ("src_chain_code",   codename_mvo("ETH"))
+      ("src_token_code",   codename_mvo("ETH"))
+      ("src_reserve_code", codename_mvo("PRIMARY"))
+      ("src_amount",       100)
+      ("recipient",        "alice")
+      ("wire_out",         9)
+      ("underwriter",      "underwriter1")));
+   BOOST_REQUIRE_EQUAL(9, wire_balance("alice"_n));
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(refundwire_returns_escrow, sysio_reserve_tester) { try {

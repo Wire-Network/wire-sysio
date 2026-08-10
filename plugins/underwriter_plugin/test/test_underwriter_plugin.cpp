@@ -13,6 +13,7 @@
 #include <fc/variant_object.hpp>
 #include <sysio/underwriter_plugin/solana_source_deposit_scanner.hpp>
 #include <sysio/underwriter_plugin/source_deposit_constants.hpp>
+#include <sysio/underwriter_plugin/source_deposit_hash_detail.hpp>
 #include <sysio/underwriter_plugin/underwriter_plugin.hpp>
 
 using namespace std::literals;
@@ -39,6 +40,14 @@ fc::crypto::keccak256 test_expected_hash() {
 /// Hex-encodes a 32-byte keccak hash the same way the Solana outpost log does.
 std::string hash_hex(const fc::crypto::keccak256& hash) {
    return fc::to_hex(reinterpret_cast<const char*>(hash.data()), 32);
+}
+
+/// Decodes a hex string into the `std::vector<char>` shape a UWREQ row's
+/// `depositor` field carries.
+std::vector<char> depositor_bytes(std::string_view hex) {
+   std::vector<char> bytes(hex.size() / 2);
+   fc::from_hex(hex, bytes.data(), bytes.size());
+   return bytes;
 }
 
 /// Builds the canonical SwapDeposit marker prefix for a deposit id.
@@ -583,6 +592,68 @@ BOOST_AUTO_TEST_CASE(solana_source_deposit_scan_skips_failed_listing_transaction
 
    BOOST_CHECK(result.status == sysio::underwriter::solana_source_deposit_page_status::not_found);
    BOOST_CHECK_EQUAL(fetch_count, 0);
+} FC_LOG_AND_RETHROW();
+
+// ── SwapDeposit correlation-hash preimage ──────────────────────────────
+//
+// Both outposts hash the user's accepted `target_amount`
+// (`ReserveManagerLib.hashSwapDeposit` on EVM,
+// `swap_correlation_hash` on SVM). The depot re-prices `dst_amount` at
+// ingestion, so the two diverge whenever the caller's target is not
+// exactly the depot's quote — which is the normal case, and precisely
+// what `variance_tolerance_bps` exists to bound.
+
+/// The EVM leg of a real ETH→SOL underwritten swap, captured from a live
+/// cluster run. `on_chain_swap_deposit_hash` is the `SwapDeposit` event's
+/// hash as `ReserveManager` emitted it.
+const std::vector<char> production_depositor =
+   depositor_bytes("cf2d5b3cbb4d7bf04e3f7bfa8e27081b52191f91");
+constexpr uint64_t production_source_amount        = 100000000;
+constexpr uint64_t production_source_token_code    = 23373212024832;
+constexpr uint64_t production_source_reserve_code  = 71615576876608;
+constexpr uint64_t production_target_chain_code    = 84606581215232;
+constexpr uint64_t production_target_token_code    = 84606560763904;
+constexpr uint64_t production_target_reserve_code  = 71615576876608;
+constexpr uint64_t production_target_amount        = 98039214;
+constexpr uint64_t production_settlement_quote     = 97747972;
+constexpr uint32_t production_tolerance_bps        = 50;
+constexpr auto     on_chain_swap_deposit_hash =
+   "fd8f16aad2443acf2847c6f49c41feac6f32feadc87682df25835ae328a76695";
+
+/// Build the production preimage, varying only the destination amount.
+sysio::underwriter::source_deposit_hash_input production_hash_input(uint64_t destination_amount) {
+   return {
+      .depositor            = std::span<const char>{production_depositor},
+      .source_amount        = production_source_amount,
+      .source_token_code    = production_source_token_code,
+      .source_reserve_code  = production_source_reserve_code,
+      .target_chain_code    = production_target_chain_code,
+      .target_token_code    = production_target_token_code,
+      .target_reserve_code  = production_target_reserve_code,
+      .target_amount        = destination_amount,
+      .target_tolerance_bps = production_tolerance_bps,
+   };
+}
+
+/// The recomputed hash matches the outpost's only when the preimage carries
+/// the caller's `target_amount`.
+BOOST_AUTO_TEST_CASE(source_deposit_hash_binds_the_callers_target_amount) try {
+   const auto recomputed = sysio::underwriter::source_deposit_hash(
+      production_hash_input(production_target_amount));
+
+   BOOST_CHECK_EQUAL(hash_hex(recomputed), on_chain_swap_deposit_hash);
+} FC_LOG_AND_RETHROW();
+
+/// The depot's re-priced settlement quote is NOT what the outpost hashed;
+/// feeding it in reproduces the divergence that stalls every UWREQ whose
+/// target differs from the quote.
+BOOST_AUTO_TEST_CASE(source_deposit_hash_rejects_the_depot_settlement_quote) try {
+   BOOST_REQUIRE_NE(production_settlement_quote, production_target_amount);
+
+   const auto recomputed = sysio::underwriter::source_deposit_hash(
+      production_hash_input(production_settlement_quote));
+
+   BOOST_CHECK_NE(hash_hex(recomputed), on_chain_swap_deposit_hash);
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_SUITE_END()

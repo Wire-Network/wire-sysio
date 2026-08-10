@@ -7,6 +7,7 @@
 #include <sysio.opp.common/opp_table_types.hpp>
 #include <sysio.opp.common/amm_math.hpp>
 #include <sysio.opp.common/safe_ops.hpp>
+#include <sysio.opp.common/registry_metadata.hpp>
 
 #include <zpp_bits.h>
 
@@ -274,6 +275,8 @@ void reserve::regreserve(sysio::slug_name chain_code,
                 "bootstrap reserve must seed both chain_amount and wire_amount > 0");
    sysio::check(!is_private || owner != sysio::name{},
                 "a private bootstrap reserve must name an owner");
+   // Both strings persist into a `sysio`-billed row -- bound them before emplace.
+   opp::registry::check_metadata(name, description, "sysio.reserv");
 
    reserves_t tbl(get_self());
    auto pk = make_key(chain_code, token_code, reserve_code);
@@ -343,6 +346,10 @@ void reserve::oncrtreserve(sysio::slug_name       chain_code,
    // the SAME cancel/refund path as an unlinked creator below (insert a CANCELLED
    // row + queue RESERVE_CREATE_CANCELLED), idempotently.
    const bool invalid_amount = (external_token_amount == 0 || requested_wire_amount == 0);
+   // Same `sysio`-billed metadata bound the privileged registrations enforce with
+   // `check_metadata`, asked the non-throwing way: this handler must never abort, so an
+   // over-bound string joins the reject/refund path below rather than reverting dispatch.
+   const bool oversized_metadata = opp::registry::metadata_exceeds_bounds(name, description);
    // The outpost downscales to min(native, 9) at its boundary, so a
    // source_token_precision above the depot frame means a malformed attestation.
    if (source_token_precision > WIRE_PRECISION) {
@@ -375,7 +382,8 @@ void reserve::oncrtreserve(sysio::slug_name       chain_code,
    // Create gating: the creator must already be authex-linked to a WIRE
    // account ("the only requirement to create a reserve"). Reconstruct the
    // creator's key variant and probe `sysio.authex::links.bypubkey`. On
-   // any failure — malformed key bytes OR no link — reject by inserting a
+   // any failure — malformed key bytes, no link, an invalid amount, OR
+   // over-bound metadata — reject by inserting a
    // CANCELLED row (for refund idempotency) and queueing
    // RESERVE_CREATE_CANCELLED so the outpost refunds the creator's escrow.
    // The CANCELLED row does NOT permanently burn the identity: a later,
@@ -393,7 +401,7 @@ void reserve::oncrtreserve(sysio::slug_name       chain_code,
             canonical_creator_key = sysio::pubkey_to_bytes(*pk_variant);
          }
       }
-      if (!linked || invalid_amount) {
+      if (!linked || invalid_amount || oversized_metadata) {
          // A CANCELLED row already standing means this is a re-relay of the same
          // rejected create (an unlinked squatter OR an invalid amount). Leave it
          // and do NOT queue a second refund — the refund was queued when the row
@@ -405,14 +413,22 @@ void reserve::oncrtreserve(sysio::slug_name       chain_code,
             return;
          }
          sysio::print("oncrtreserve: rejecting with RESERVE_CREATE_CANCELLED "
-                      "(invalid amount or unlinked / malformed creator key)\n");
+                      "(invalid amount, over-bound metadata, or unlinked / malformed creator key)\n");
          const auto now = current_time_ms();
          tbl.emplace(ram_payer, pk, reserve_row{
             .chain_code             = chain_code,
             .token_code             = token_code,
             .reserve_code           = reserve_code,
-            .name                   = std::move(name),
-            .description            = std::move(description),
+            // The tombstone is itself a `sysio`-billed row, so over-bound strings are NOT
+            // carried onto it — storing them verbatim would persist exactly the state the
+            // bound exists to prevent. Only THAT rejection reason substitutes the marker; a
+            // row rejected for an unlinked creator or an invalid amount keeps its (already
+            // in-bounds) metadata. The creator's originals stay in the inbound OPP envelope
+            // artifact either way.
+            .name                   = oversized_metadata
+                                       ? std::string(opp::registry::rejected_label)
+                                       : std::move(name),
+            .description            = oversized_metadata ? std::string{} : std::move(description),
             .status                 = opp::types::RESERVE_STATUS_CANCELLED,
             .reserve_chain_amount   = 0,
             .reserve_wire_amount    = 0,
@@ -764,6 +780,21 @@ void reserve::applyswap(sysio::slug_name src_chain_code,
    sysio::check(fee.net > 0, "applyswap: zero post-fee WIRE would credit no destination liquidity");
    sysio::check(src_it->reserve_wire_amount >= w_gross,
                 "applyswap: insufficient source reserve WIRE for intermediate");
+   // WNS-02 settlement bound: the destination side may never give up more token
+   // than its own curve produces for the post-fee WIRE it is about to receive.
+   // `sysio.uwrit` derives `dst_amount` from exactly this expression (via
+   // `swap_quote` -> `opp::amm::quote_swap`) against the same pre-mutation rows
+   // in the same transaction, so equality holds and this cannot fire on the
+   // live path. It exists so the reserve is self-defending: `dst_amount` arrives
+   // as a caller-supplied parameter, and the vulnerability this replaces was
+   // precisely a caller-chosen amount being paid out verbatim. A reserve that
+   // trusts its caller for a payout size has no floor of its own.
+   const uint64_t curve_out = opp::amm::wire_to_token(dst_it->reserve_wire_amount,
+                                                      dst_it->reserve_chain_amount,
+                                                      dst_it->connector_weight_bps,
+                                                      fee.net);
+   sysio::check(dst_amount <= curve_out,
+                "applyswap: destination amount exceeds the curve output for the post-fee WIRE");
    sysio::check(dst_it->reserve_chain_amount >= dst_amount,
                 "applyswap: insufficient destination reserve balance");
 
@@ -824,6 +855,15 @@ void reserve::applyfromwire(sysio::slug_name dst_chain_code,
    // plus this reserve's owner fee at MIN_OWNER_FEE_BPS (1) totals 100% — so
    // this rejects a configured combination, not an impossible one.
    sysio::check(fee.net > 0, "applyfromwire: zero post-fee WIRE would credit no destination liquidity");
+   // WNS-02 settlement bound — see applyswap. The from-WIRE shape feeds the
+   // user's escrowed WIRE straight into the WIRE leg, so the curve output is
+   // `wire_to_token` of the post-fee remainder.
+   const uint64_t curve_out = opp::amm::wire_to_token(it->reserve_wire_amount,
+                                                      it->reserve_chain_amount,
+                                                      it->connector_weight_bps,
+                                                      fee.net);
+   sysio::check(dst_amount <= curve_out,
+                "applyfromwire: destination amount exceeds the curve output for the post-fee WIRE");
 
    tbl.modify(ram_payer, pk, [&](auto& row) {
       add_capped_u64(row.reserve_wire_amount, fee.net);
@@ -852,10 +892,9 @@ void reserve::paywire(sysio::slug_name src_chain_code,
    sysio::check(it->status == opp::types::RESERVE_STATUS_ACTIVE,
                 "paywire: source reserve not ACTIVE");
 
-   // Swap-to-WIRE: the recipient receives exactly `wire_out` (their target), and
-   // the fee is charged on the gross WIRE the source side produces — the same
-   // WIRE leg the quote priced. The source reserve gives up `wire_out + fee`
-   // and keeps any surplus (when the user targeted below the post-fee quote).
+   // Swap-to-WIRE: the recipient receives `wire_out`, and the fee is charged on
+   // the gross WIRE the source side produces — the same WIRE leg the quote
+   // priced. The source reserve gives up `wire_out + fee`.
    const uint64_t w_gross = opp::amm::token_to_wire(it->reserve_chain_amount,
                                                     it->reserve_wire_amount,
                                                     it->connector_weight_bps,
@@ -866,6 +905,15 @@ void reserve::paywire(sysio::slug_name src_chain_code,
    const auto fee = opp::amm::split_wire_fee(w_gross, uwrit_fee_bps(), FEE_UNDERWRITER_SHARE_BPS,
                                                 fee_emissions_share_bps(get_self()),
                                                 it->owner_fee_bps, /*dst_reserve_fee_bps*/ 0);
+   // WNS-02 settlement bound — see applyswap. For a WIRE destination the curve
+   // output IS the post-fee WIRE leg, so the payout may never exceed `fee.net`.
+   // `sysio.uwrit` passes exactly `fee.net` (its `swap_quote` returns the
+   // post-fee WIRE for a WIRE endpoint), so equality holds on the live path.
+   // `fee.net` now also nets out the source reserve owner's share, and
+   // `quote_swap` charges that share through this same `split_wire_fee`, so the
+   // quote and this bound still agree by construction.
+   sysio::check(wire_out <= fee.net,
+                "paywire: payout exceeds the post-fee WIRE the source leg produced");
    const uint64_t wire_leaving = wire_out + fee.fee;
    sysio::check(it->reserve_wire_amount >= wire_leaving,
                 "paywire: insufficient source reserve WIRE for payout + fee");

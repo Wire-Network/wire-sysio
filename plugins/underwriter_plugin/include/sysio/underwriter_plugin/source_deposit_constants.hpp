@@ -12,6 +12,13 @@
 
 namespace sysio::underwriter {
 
+/// Byte length of an EVM address carried in `SwapRequest.actor.address`.
+inline constexpr size_t EVM_DEPOSITOR_SIZE = 20;
+
+/// Byte length of a Solana Ed25519 public key carried in
+/// `SwapRequest.actor.address`.
+inline constexpr size_t SVM_DEPOSITOR_SIZE = 32;
+
 /// ETH: maximum number of recent blocks one source-deposit `eth_getLogs`
 /// lookup may cover.
 ///
