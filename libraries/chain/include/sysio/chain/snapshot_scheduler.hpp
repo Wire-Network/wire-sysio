@@ -3,6 +3,7 @@
 #include <sysio/chain/pending_snapshot.hpp>
 
 #include <fc/crypto/blake3.hpp>
+#include <fc/log/log_message.hpp>
 #include <sysio/chain/config.hpp>
 #include <sysio/chain/exceptions.hpp>
 #include <sysio/chain/resource_limits.hpp>
@@ -208,6 +209,26 @@ private:
     */
    void clear_delivered_request_callback(uint32_t srid);
 
+   /**
+    * Erase request @p sri, resolving a completion callback it still carries.
+    *
+    * The single removal path for scheduled requests: every way a request can leave the container
+    * -- expiry from unschedule_snapshot_requests(), explicit cancellation through
+    * unschedule_snapshot() -- goes through here, so a caller waiting on a request can never have
+    * its callback destroyed instead of answered. A request that still carries a callback has not
+    * delivered a result, and that callback is invoked with a snapshot_execution_exception built
+    * from @p undelivered_reason. Callback exceptions are logged and swallowed: this is reached
+    * from the irreversible-block path, where a throwing completion callback must not escape into
+    * block processing.
+    *
+    * @param sri                 id of the request to remove
+    * @param undelivered_reason  message reported to a caller that is still waiting; built at the
+    *                            call site so it carries that site's log context
+    * @return the removed request
+    * @throws snapshot_request_not_found if no request has that id
+    */
+   snapshot_schedule_result remove_request(uint32_t sri, fc::log_message undelivered_reason);
+
    void x_serialize() {
       auto& vec = _snapshot_requests.get<as_vector>();
       std::vector<snapshot_schedule_information> sr(vec.begin(), vec.end());
@@ -241,6 +262,19 @@ public:
    // snapshot_information (or execution error) of the first snapshot this request delivers, or
    // with a snapshot_execution_exception if the request is removed without ever delivering one
    snapshot_schedule_result schedule_snapshot(const snapshot_request_information& sri, next_function<snapshot_information> next);
+
+   /**
+    * Cancel request @p sri.
+    *
+    * A request that has not yet delivered a snapshot may still have a caller waiting on it -- an
+    * outstanding /v1/producer/create_snapshot is a scheduled request, and is visible through
+    * get_snapshot_requests() like any other. Cancelling it resolves that caller with a
+    * snapshot_execution_exception rather than destroying its callback.
+    *
+    * @param sri id of the request to cancel
+    * @return the cancelled request
+    * @throws snapshot_request_not_found if no request has that id
+    */
    snapshot_schedule_result unschedule_snapshot(uint32_t sri);
 
    /**
@@ -251,10 +285,8 @@ public:
     * head; its end_block_num, which scheduling allows to equal start_block_num, does not shorten
     * that. A recurring request expires once lib_height reaches its end_block_num.
     *
-    * A removed request that still carries a completion callback never delivered a snapshot to its
-    * caller; its callback is invoked with a snapshot_execution_exception so the caller sees an error
-    * rather than having the callback silently destroyed. Callback exceptions are logged and
-    * swallowed -- this runs on the irreversible-block path.
+    * Removal goes through remove_request(), so a request removed while a caller is still waiting on
+    * it reports that as an error rather than having its callback destroyed.
     *
     * @param lib_height block number of the last irreversible block
     */

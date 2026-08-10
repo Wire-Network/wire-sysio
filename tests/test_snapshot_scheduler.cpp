@@ -579,4 +579,104 @@ BOOST_AUTO_TEST_CASE(forked_out_snapshot_regenerates_and_still_answers_caller) {
    BOOST_TEST(f.scheduler.get_snapshot_requests().snapshot_requests.empty());
 }
 
+// A completion callback belongs to the API caller and can fail on its own account -- writing to a
+// client that has gone away, say. It is still resolved: a next_function permits exactly one
+// invocation across all of its copies, so a request left holding one for unschedule_snapshot_requests
+// to resolve again would be undefined behavior. The snapshot itself is unaffected by the failure.
+BOOST_AUTO_TEST_CASE(throwing_completion_callback_is_resolved_once) {
+   testing::tester            chain;
+   scheduler_callback_fixture f;
+   uint32_t                   invocations = 0;
+
+   chain.produce_block();
+   chain.control->abort_block(); // snapshot creation requires no pending block
+
+   const uint32_t start_block_num = chain.control->head().block_num();
+
+   snapshot_request_information sri;
+   sri.block_spacing        = 0;
+   sri.start_block_num      = start_block_num;
+   sri.end_block_num        = std::numeric_limits<uint32_t>::max();
+   sri.snapshot_description = "on-demand snapshot whose caller fails to take the answer";
+   f.scheduler.schedule_snapshot(sri, [&invocations](const next_function_variant<snapshot_scheduler::snapshot_information>&) {
+      ++invocations;
+      throw std::runtime_error("completion callback failed");
+   });
+
+   f.scheduler.on_start_block(start_block_num + 1, *chain.control);
+
+   // This one irreversible block both delivers the snapshot and, because it carries LIB past the
+   // firing height, collects the request -- the ordering that would resolve the callback twice.
+   auto lib_block = chain.produce_block();
+   f.scheduler.on_irreversible_block(lib_block, lib_block->calculate_id(), *chain.control);
+
+   BOOST_TEST(invocations == 1u);
+   BOOST_TEST(f.scheduler.get_snapshot_requests().snapshot_requests.empty());
+   BOOST_TEST(f.cb1_count == 1u); // a failing caller does not cost the snapshot its finalized notification
+   BOOST_TEST(f.cb2_count == 1u);
+}
+
+// An outstanding /v1/producer/create_snapshot is a scheduled request like any other and is listed by
+// get_snapshot_requests(), so its id can be handed straight to /v1/producer/unschedule_snapshot.
+// Cancelling it must answer the caller rather than destroy the callback holding its HTTP session.
+BOOST_AUTO_TEST_CASE(unscheduling_an_outstanding_request_reports_failure_to_caller) {
+   testing::tester            chain;
+   scheduler_callback_fixture f;
+   next_outcome               outcome;
+
+   chain.produce_block();
+
+   snapshot_request_information sri;
+   sri.block_spacing        = 0;
+   sri.start_block_num      = chain.control->head().block_num() + 1;
+   sri.end_block_num        = std::numeric_limits<uint32_t>::max();
+   sri.snapshot_description = "on-demand snapshot cancelled before it runs";
+   const auto scheduled = f.scheduler.schedule_snapshot(sri, outcome.recorder());
+
+   f.scheduler.unschedule_snapshot(scheduled.snapshot_request_id);
+
+   BOOST_TEST(f.scheduler.get_snapshot_requests().snapshot_requests.empty());
+   BOOST_TEST(outcome.successes == 0u);
+   BOOST_TEST(outcome.errors == 1u); // caller gets an error, not a dropped connection
+   BOOST_TEST(f.cb1_count == 0u);    // nothing was ever snapshotted
+}
+
+// A request that has delivered its snapshot stays scheduled until irreversibility passes its firing
+// height, and an operator can cancel it in that window. Its caller has already been answered, so
+// cancellation must not reach the same callback a second time.
+BOOST_AUTO_TEST_CASE(unscheduling_a_delivered_request_does_not_re_resolve_caller) {
+   testing::tester            chain;
+   scheduler_callback_fixture f;
+   next_outcome               outcome;
+
+   chain.produce_block();
+   chain.control->abort_block(); // snapshot creation requires no pending block
+
+   const uint32_t start_block_num = chain.control->head().block_num() + 1;
+
+   snapshot_request_information sri;
+   sri.block_spacing        = 0;
+   sri.start_block_num      = start_block_num;
+   sri.end_block_num        = std::numeric_limits<uint32_t>::max();
+   sri.snapshot_description = "on-demand snapshot cancelled after it is answered";
+   const auto scheduled = f.scheduler.schedule_snapshot(sri, outcome.recorder());
+
+   auto lib_block = chain.produce_block();
+   BOOST_REQUIRE_EQUAL(lib_block->block_num(), start_block_num);
+   chain.control->abort_block();
+   f.scheduler.on_start_block(start_block_num + 1, *chain.control);
+
+   // irreversibility reaching the snapshotted block answers the caller but leaves the request
+   // scheduled -- collection waits until it passes the firing height
+   f.scheduler.on_irreversible_block(lib_block, lib_block->calculate_id(), *chain.control);
+   BOOST_REQUIRE(outcome.successes == 1u);
+   BOOST_REQUIRE_EQUAL(f.scheduler.get_snapshot_requests().snapshot_requests.size(), 1u);
+
+   f.scheduler.unschedule_snapshot(scheduled.snapshot_request_id);
+
+   BOOST_TEST(outcome.successes == 1u);
+   BOOST_TEST(outcome.errors == 0u);
+   BOOST_TEST(f.scheduler.get_snapshot_requests().snapshot_requests.empty());
+}
+
 BOOST_AUTO_TEST_SUITE_END()

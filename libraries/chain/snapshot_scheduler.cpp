@@ -89,31 +89,9 @@ void snapshot_scheduler::unschedule_snapshot_requests(block_num_type lib_height)
       }
    }
 
-   auto& snapshot_by_id = _snapshot_requests.get<by_snapshot_id>();
-   for(const auto& i: unschedule_snapshot_request_ids) {
-      // A request still holding a completion callback never delivered a result to its caller: the
-      // callback is dropped from the request the moment execute_snapshot()'s completion handler
-      // resolves it. That covers a request that never ran and one that ran but whose snapshot was
-      // forked out or deduplicated against a snapshot already pending for the same block. Report
-      // the removal through the callback rather than destroying it: dropping it releases the last
-      // reference to the caller's HTTP session, which closes the connection with no response at all
-      // and hangs the client until it times out.
-      next_function<snapshot_information> undelivered;
-      if(auto it = snapshot_by_id.find(i); it != snapshot_by_id.end())
-         undelivered = it->next;
-
-      unschedule_snapshot(i);
-
-      if(undelivered) {
-         try {
-            auto ex = snapshot_execution_exception(FC_LOG_MESSAGE(
-                  error, "snapshot request {} removed at irreversible block {} without producing a snapshot", i, lib_height));
-            undelivered(ex.dynamic_copy_exception());
-            // FC_LOG_AND_DROP rather than a rethrow: this runs on the irreversible-block path, where
-            // a throwing completion callback must not escape into block processing.
-         } FC_LOG_AND_DROP();
-      }
-   }
+   for(const auto& i: unschedule_snapshot_request_ids)
+      remove_request(i, FC_LOG_MESSAGE(
+            error, "snapshot request {} removed at irreversible block {} without producing a snapshot", i, lib_height));
 }
 
 std::optional<uint32_t> snapshot_scheduler::find_snapshot_request(uint32_t block_spacing, uint32_t start_block_num, uint32_t end_block_num) const {
@@ -139,17 +117,43 @@ snapshot_scheduler::snapshot_schedule_result snapshot_scheduler::schedule_snapsh
    return snapshot_schedule_result{{_snapshot_id - 1}, {sri.block_spacing, sri.start_block_num, sri.end_block_num, sri.snapshot_description}};
 }
 
-snapshot_scheduler::snapshot_schedule_result snapshot_scheduler::unschedule_snapshot(uint32_t sri) {
+snapshot_scheduler::snapshot_schedule_result snapshot_scheduler::remove_request(uint32_t sri, fc::log_message undelivered_reason) {
    auto& snapshot_by_id = _snapshot_requests.get<by_snapshot_id>();
    auto existing = snapshot_by_id.find(sri);
    SYS_ASSERT(existing != snapshot_by_id.end(), chain::snapshot_request_not_found, "Snapshot request not found");
 
    snapshot_schedule_result result{{existing->snapshot_request_id}, {existing->block_spacing, existing->start_block_num, existing->end_block_num, existing->snapshot_description}};
+
+   // Take the callback out before erasing. A request still holding one has not delivered a result
+   // to its caller -- execute_snapshot()'s completion handler drops the request's copy as soon as
+   // the caller is answered -- so it covers a request that never ran, one that ran but whose
+   // snapshot was forked out or deduplicated against a snapshot already pending for the same block,
+   // and one cancelled while a snapshot was still in flight. Report the removal through the
+   // callback rather than destroying it: dropping it releases the last reference to the caller's
+   // HTTP session, which closes the connection with no response at all and hangs the client until
+   // it times out.
+   next_function<snapshot_information> undelivered = existing->next;
+
    _snapshot_requests.erase(existing);
    x_serialize();
 
+   if(undelivered) {
+      try {
+         auto ex = snapshot_execution_exception(std::move(undelivered_reason));
+         undelivered(ex.dynamic_copy_exception());
+         // FC_LOG_AND_DROP rather than a rethrow: unschedule_snapshot_requests() reaches here on the
+         // irreversible-block path, where a throwing completion callback must not escape into block
+         // processing, and the request is already gone so there is nothing left to unwind.
+      } FC_LOG_AND_DROP();
+   }
+
    // returning snapshot_schedule_result
    return result;
+}
+
+snapshot_scheduler::snapshot_schedule_result snapshot_scheduler::unschedule_snapshot(uint32_t sri) {
+   return remove_request(sri, FC_LOG_MESSAGE(
+         error, "snapshot request {} was unscheduled before producing a snapshot", sri));
 }
 
 snapshot_scheduler::get_snapshot_requests_result snapshot_scheduler::get_snapshot_requests() {
@@ -199,16 +203,16 @@ void snapshot_scheduler::clear_delivered_request_callback(uint32_t srid) {
 
 void snapshot_scheduler::execute_snapshot(uint32_t srid, chain::controller& chain, next_function<snapshot_information> http_next) {
    _inflight_sid = srid;
-   auto next = [srid, this, http_next](const chain::next_function_variant<snapshot_information>& result) {
-      if (http_next) {
-         http_next(chain::next_function_variant<snapshot_information>{result}); // copy; next_function::operator() is rvalue-only
-         // The caller now has its answer, so the request must stop carrying the callback: another
-         // snapshot from the same request would otherwise resolve it a second time, and collecting
-         // the request would report an undelivered failure over an answer already sent.
-         clear_delivered_request_callback(srid);
-      }
+   // A next_function may be invoked exactly once across all of its copies, and copies of the handler
+   // below outlive a single call: it is stored on the pending snapshot, and create_snapshot() hands
+   // it to CATCH_AND_CALL(), which re-invokes it with the exception if delivery itself throws. Hold
+   // the caller's callback in a slot the handler empties before use, so the first delivery is the
+   // only one whichever copy runs it and whether or not the callback throws.
+   auto caller_slot = std::make_shared<next_function<snapshot_information>>(std::move(http_next));
+   const bool has_caller = static_cast<bool>(*caller_slot);
+   auto next = [srid, this, caller_slot, has_caller](const chain::next_function_variant<snapshot_information>& result) {
       if(std::holds_alternative<fc::exception_ptr>(result)) {
-         if (!http_next)
+         if (!has_caller)
             wlog("Snapshot creation error: {}", std::get<fc::exception_ptr>(result)->to_detail_string());
       } else {
          // success, snapshot finalized
@@ -229,6 +233,24 @@ void snapshot_scheduler::execute_snapshot(uint32_t srid, chain::controller& chai
          // callbacks fire once per snapshot from create_snapshot() (irreversible mode) or
          // on_irreversible_block() (pending promotion). Notifying here as well would invoke
          // every subscriber twice for scheduled snapshots.
+      }
+
+      // Answer the caller last, with the scheduler's own bookkeeping already settled, and empty the
+      // slot before the call so a callback that throws cannot be reached again through this handler.
+      if(*caller_slot) {
+         auto answer = std::move(*caller_slot);
+         // Clear the request's copy before the call for the same reason: unschedule_snapshot_requests()
+         // would otherwise still find req.next set and resolve the very same next_function a second
+         // time, which a next_function does not permit.
+         clear_delivered_request_callback(srid);
+         try {
+            answer(chain::next_function_variant<snapshot_information>{result}); // copy; next_function::operator() is rvalue-only
+            // The callback belongs to the API caller and may fail for reasons of its own -- writing
+            // to a client that has gone away, say. Letting that escape would abort the pipeline that
+            // invoked this handler: on_irreversible_block() would skip notify_snapshot_finalized()
+            // for a snapshot that did finalize, and create_snapshot() would re-enter this handler
+            // through CATCH_AND_CALL() to report the caller's own failure back to it.
+         } FC_LOG_AND_DROP();
       }
    };
    create_snapshot(next, chain);
