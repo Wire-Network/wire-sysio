@@ -12,9 +12,9 @@ void snapshot_scheduler::on_start_block(uint32_t height, chain::controller& chai
    // iterating. In irreversible read mode execute_snapshot() creates the snapshot synchronously and
    // runs the height-based request cleanup, erasing expired requests from _snapshot_requests; doing
    // that while the range-for below iterates the same container would invalidate the loop iterator.
-   bool                                found = false;
-   uint32_t                            srid  = 0;
-   next_function<snapshot_information> next;
+   bool             found = false;
+   uint32_t         srid  = 0;
+   request_callback caller;
 
    for(const auto& req: _snapshot_requests.get<0>()) {
       // -1 since its called from start block
@@ -24,20 +24,20 @@ void snapshot_scheduler::on_start_block(uint32_t height, chain::controller& chai
       if(recurring_snapshot || onetime_snapshot) {
          dlog("snapshot scheduler creating a snapshot from the request [start_block_num:{}, end_block_num={}, block_spacing={}], height={}",
               req.start_block_num, req.end_block_num, req.block_spacing, height);
-         srid  = req.snapshot_request_id;
-         next  = req.next;
-         found = true;
+         srid   = req.snapshot_request_id;
+         caller = req.caller;
+         found  = true;
          break;
       }
    }
 
-   // The request keeps its completion callback across execution: starting a snapshot is not
-   // delivering one. A snapshot taken here is only pending, and is discarded unfinalized if its
-   // block is forked out -- in which case the request, still scheduled, runs again when the adopted
-   // branch reapplies this height and it is that regenerated snapshot that answers the caller. The
-   // callback is dropped when it is actually resolved; see clear_delivered_request_callback().
+   // The snapshot shares the request's callback slot rather than taking a copy of the callback:
+   // starting a snapshot is not delivering one. A snapshot taken here is only pending, and is
+   // discarded unfinalized if its block is forked out -- in which case the request, still scheduled,
+   // runs again when the adopted branch reapplies this height, and whichever attempt reaches the
+   // caller first is the one that empties the slot.
    if(found)
-      execute_snapshot(srid, chain, next);
+      execute_snapshot(srid, chain, caller);
 }
 
 void snapshot_scheduler::on_irreversible_block(const signed_block_ptr& lib, const block_id_type& block_id, const chain::controller& chain) {
@@ -110,7 +110,13 @@ snapshot_scheduler::snapshot_schedule_result snapshot_scheduler::schedule_snapsh
    SYS_ASSERT(sri.start_block_num <= sri.end_block_num, chain::invalid_snapshot_request, "End block number should be greater or equal to start block number");
    SYS_ASSERT(sri.start_block_num + sri.block_spacing <= sri.end_block_num, chain::invalid_snapshot_request, "Block spacing exceeds defined by start and end range");
 
-   _snapshot_requests.emplace(snapshot_schedule_information{{_snapshot_id++}, {sri.block_spacing, sri.start_block_num, sri.end_block_num, sri.snapshot_description}, {}, next});
+   // a request with no caller to answer gets no slot at all, so a null slot and an emptied one are
+   // never confused with each other
+   request_callback caller;
+   if(next)
+      caller = std::make_shared<next_function<snapshot_information>>(std::move(next));
+
+   _snapshot_requests.emplace(snapshot_schedule_information{{_snapshot_id++}, {sri.block_spacing, sri.start_block_num, sri.end_block_num, sri.snapshot_description}, {}, std::move(caller)});
    x_serialize();
 
    // returning snapshot_schedule_result
@@ -124,15 +130,17 @@ snapshot_scheduler::snapshot_schedule_result snapshot_scheduler::remove_request(
 
    snapshot_schedule_result result{{existing->snapshot_request_id}, {existing->block_spacing, existing->start_block_num, existing->end_block_num, existing->snapshot_description}};
 
-   // Take the callback out before erasing. A request still holding one has not delivered a result
-   // to its caller -- execute_snapshot()'s completion handler drops the request's copy as soon as
-   // the caller is answered -- so it covers a request that never ran, one that ran but whose
-   // snapshot was forked out or deduplicated against a snapshot already pending for the same block,
-   // and one cancelled while a snapshot was still in flight. Report the removal through the
-   // callback rather than destroying it: dropping it releases the last reference to the caller's
-   // HTTP session, which closes the connection with no response at all and hangs the client until
-   // it times out.
-   next_function<snapshot_information> undelivered = existing->next;
+   // Take the callback out of the request's slot before erasing. A caller still waiting there has
+   // had no result: the request never ran, or it ran and its snapshot was forked out or deduplicated
+   // against one already pending for the same block. Report the removal through the callback rather
+   // than destroying it -- dropping it releases the last reference to the caller's HTTP session,
+   // which closes the connection with no response at all and hangs the client until it times out.
+   //
+   // Taking from the slot mutates what the request points at rather than the request itself, so no
+   // modify() is needed and no index key is affected; it is also what a snapshot still in flight
+   // from this request checks before answering, so a cancellation racing a finalizing snapshot
+   // produces exactly one answer.
+   next_function<snapshot_information> undelivered = take_pending_answer(existing->caller);
 
    _snapshot_requests.erase(existing);
    x_serialize();
@@ -195,22 +203,22 @@ void snapshot_scheduler::add_pending_snapshot_info(const snapshot_information& s
    }
 }
 
-void snapshot_scheduler::clear_delivered_request_callback(uint32_t srid) {
-   auto& snapshot_by_id = _snapshot_requests.get<by_snapshot_id>();
-   if(auto it = snapshot_by_id.find(srid); it != snapshot_by_id.end() && it->next)
-      snapshot_by_id.modify(it, [](snapshot_schedule_information& req) { req.next = {}; });
+next_function<snapshot_scheduler::snapshot_information> snapshot_scheduler::take_pending_answer(const request_callback& caller) {
+   if(!caller || !*caller)
+      return {};
+   return std::move(*caller);
 }
 
-void snapshot_scheduler::execute_snapshot(uint32_t srid, chain::controller& chain, next_function<snapshot_information> http_next) {
+void snapshot_scheduler::execute_snapshot(uint32_t srid, chain::controller& chain, request_callback caller) {
    _inflight_sid = srid;
-   // A next_function may be invoked exactly once across all of its copies, and copies of the handler
-   // below outlive a single call: it is stored on the pending snapshot, and create_snapshot() hands
-   // it to CATCH_AND_CALL(), which re-invokes it with the exception if delivery itself throws. Hold
-   // the caller's callback in a slot the handler empties before use, so the first delivery is the
-   // only one whichever copy runs it and whether or not the callback throws.
-   auto caller_slot = std::make_shared<next_function<snapshot_information>>(std::move(http_next));
-   const bool has_caller = static_cast<bool>(*caller_slot);
-   auto next = [srid, this, caller_slot, has_caller](const chain::next_function_variant<snapshot_information>& result) {
+   // The handler below outlives a single call -- it is stored on the pending snapshot, and
+   // create_snapshot() hands it to CATCH_AND_CALL(), which re-invokes it with the exception if
+   // delivery itself throws -- and it is not the only thing that can answer this caller. It shares
+   // the request's callback slot with the removal path and with any other snapshot this request has
+   // in flight, and empties that slot before use, so the first answer is the only one however many
+   // handlers exist and whether or not the callback throws.
+   const bool has_caller = static_cast<bool>(caller);
+   auto next = [srid, this, caller, has_caller](const chain::next_function_variant<snapshot_information>& result) {
       if(std::holds_alternative<fc::exception_ptr>(result)) {
          if (!has_caller)
             wlog("Snapshot creation error: {}", std::get<fc::exception_ptr>(result)->to_detail_string());
@@ -235,14 +243,11 @@ void snapshot_scheduler::execute_snapshot(uint32_t srid, chain::controller& chai
          // every subscriber twice for scheduled snapshots.
       }
 
-      // Answer the caller last, with the scheduler's own bookkeeping already settled, and empty the
-      // slot before the call so a callback that throws cannot be reached again through this handler.
-      if(*caller_slot) {
-         auto answer = std::move(*caller_slot);
-         // Clear the request's copy before the call for the same reason: unschedule_snapshot_requests()
-         // would otherwise still find req.next set and resolve the very same next_function a second
-         // time, which a next_function does not permit.
-         clear_delivered_request_callback(srid);
+      // Answer the caller last, with the scheduler's own bookkeeping already settled. Taking the
+      // callback out of the slot before the call, rather than after, is what keeps a callback that
+      // throws from being reached a second time -- by this handler, by another snapshot from the
+      // same request, or by the request's removal.
+      if(auto answer = take_pending_answer(caller)) {
          try {
             answer(chain::next_function_variant<snapshot_information>{result}); // copy; next_function::operator() is rvalue-only
             // The callback belongs to the API caller and may fail for reasons of its own -- writing

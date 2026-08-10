@@ -641,6 +641,43 @@ BOOST_AUTO_TEST_CASE(unscheduling_an_outstanding_request_reports_failure_to_call
    BOOST_TEST(f.cb1_count == 0u);    // nothing was ever snapshotted
 }
 
+// Cancellation can also land while a snapshot from the request is in flight: the pending snapshot
+// carries a handler that answers the caller when it finalizes, and the request is cancellable the
+// whole time. Both can reach the caller, so exactly one of them must, whichever gets there first.
+BOOST_AUTO_TEST_CASE(unscheduling_an_in_flight_request_answers_caller_once) {
+   testing::tester            chain;
+   scheduler_callback_fixture f;
+   next_outcome               outcome;
+
+   chain.produce_block();
+   chain.control->abort_block(); // snapshot creation requires no pending block
+
+   const uint32_t start_block_num = chain.control->head().block_num();
+
+   snapshot_request_information sri;
+   sri.block_spacing        = 0;
+   sri.start_block_num      = start_block_num;
+   sri.end_block_num        = std::numeric_limits<uint32_t>::max();
+   sri.snapshot_description = "on-demand snapshot cancelled while its snapshot is pending";
+   const auto scheduled = f.scheduler.schedule_snapshot(sri, outcome.recorder());
+
+   // the snapshot is taken and pending; it answers the caller only once its block is irreversible
+   f.scheduler.on_start_block(start_block_num + 1, *chain.control);
+   BOOST_REQUIRE(outcome.successes == 0u);
+
+   f.scheduler.unschedule_snapshot(scheduled.snapshot_request_id);
+   BOOST_REQUIRE(outcome.errors == 1u); // cancellation is what reaches the caller here
+
+   // the pending snapshot still finalizes, and must not answer the same caller a second time
+   auto lib_block = chain.produce_block();
+   f.scheduler.on_irreversible_block(lib_block, lib_block->calculate_id(), *chain.control);
+
+   BOOST_TEST(outcome.successes == 0u);
+   BOOST_TEST(outcome.errors == 1u);
+   BOOST_TEST(f.cb1_count == 1u); // the snapshot itself finalized and notified as usual
+   BOOST_TEST(f.cb2_count == 1u);
+}
+
 // A request that has delivered its snapshot stays scheduled until irreversibility passes its firing
 // height, and an operator can cancel it in that window. Its caller has already been answered, so
 // cancellation must not reach the same callback a second time.

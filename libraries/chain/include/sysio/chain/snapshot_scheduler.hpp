@@ -65,9 +65,22 @@ public:
    struct snapshot_schedule_result : public snapshot_request_id_information, public snapshot_request_information {
    };
 
+   /**
+    * A request's completion callback, held so that everything able to answer the caller shares one
+    * consumable copy.
+    *
+    * A next_function may be invoked exactly once across all of its copies, yet more than one place
+    * can reach a caller: the handler stored on a pending snapshot, another handler if the request
+    * runs again after a fork, and the removal path when the request is cancelled or expires. Each
+    * holds this shared_ptr rather than its own copy of the callback and moves the callback out of it
+    * before use, so whichever gets there first is the one and only answer and the others find the
+    * slot empty. Null means the request was scheduled without a caller to answer.
+    */
+   using request_callback = std::shared_ptr<next_function<snapshot_information>>;
+
    struct snapshot_schedule_information : public snapshot_request_id_information, public snapshot_request_information {
       std::vector<snapshot_information> pending_snapshots;
-      next_function<snapshot_information> next; // not serialized
+      request_callback caller; // not serialized
    };
 
    struct get_snapshot_requests_result {
@@ -192,22 +205,17 @@ private:
    void notify_snapshot_finalized(const snapshot_information& si);
 
    /**
-    * Drop the completion callback request @p srid still holds, now that the callback has resolved.
+    * Take the completion callback out of @p caller if one is still waiting there.
     *
-    * A stored callback is a next_function, which may be invoked exactly once across all of its
-    * copies, so it has to be cleared the moment execute_snapshot()'s completion handler answers
-    * the caller. A request outlives its own snapshot in two ways, and both would otherwise reach
-    * that callback again: a request whose snapshot is forked out stays scheduled and runs again on
-    * the adopted branch, and a spent request is not collected until irreversibility passes its
-    * firing height. Clearing here is also what makes the converse true -- a request that still
-    * carries a callback is one whose caller is still waiting, which is what
-    * unschedule_snapshot_requests() relies on to report removal as a failure.
+    * Consuming the slot is what marks a caller answered, and it is visible to every other holder of
+    * the same request_callback -- see that alias for why answering has to be exclusive. Callers of
+    * this function own the answer and must deliver it.
     *
-    * No-op if the request is already gone or carries no callback.
-    *
-    * @param srid id of the request whose completion callback has just been resolved
+    * @param caller the request's shared callback slot; emptied when it still held a callback
+    * @return the callback to invoke, or an empty next_function if the caller has already been
+    *         answered or never existed
     */
-   void clear_delivered_request_callback(uint32_t srid);
+   static next_function<snapshot_information> take_pending_answer(const request_callback& caller);
 
    /**
     * Erase request @p sri, resolving a completion callback it still carries.
@@ -215,11 +223,12 @@ private:
     * The single removal path for scheduled requests: every way a request can leave the container
     * -- expiry from unschedule_snapshot_requests(), explicit cancellation through
     * unschedule_snapshot() -- goes through here, so a caller waiting on a request can never have
-    * its callback destroyed instead of answered. A request that still carries a callback has not
-    * delivered a result, and that callback is invoked with a snapshot_execution_exception built
-    * from @p undelivered_reason. Callback exceptions are logged and swallowed: this is reached
-    * from the irreversible-block path, where a throwing completion callback must not escape into
-    * block processing.
+    * its callback destroyed instead of answered. If the request's caller is still waiting, it is
+    * answered with a snapshot_execution_exception built from @p undelivered_reason; if a snapshot
+    * from this request already answered it, or one still in flight gets there first, nothing is
+    * reported twice. Callback exceptions are logged and swallowed: this is reached from the
+    * irreversible-block path, where a throwing completion callback must not escape into block
+    * processing.
     *
     * @param sri                 id of the request to remove
     * @param undelivered_reason  message reported to a caller that is still waiting; built at the
@@ -258,9 +267,9 @@ public:
 
    // snapshot scheduler handlers
    // schedule a snapshot request; scheduling validation errors are thrown to the caller.
-   // next (may be empty) is stored on the request and resolved exactly once: with the
-   // snapshot_information (or execution error) of the first snapshot this request delivers, or
-   // with a snapshot_execution_exception if the request is removed without ever delivering one
+   // next (may be empty) becomes the request's shared callback slot and is resolved at most once:
+   // with the snapshot_information (or execution error) of the first snapshot this request delivers,
+   // or with a snapshot_execution_exception if the request is removed before delivering one
    snapshot_schedule_result schedule_snapshot(const snapshot_request_information& sri, next_function<snapshot_information> next);
 
    /**
@@ -312,9 +321,10 @@ public:
    // add pending snapshot info to inflight snapshot request
    void add_pending_snapshot_info(const snapshot_information& si);
 
-   // execute snapshot request srid; next (may be empty) receives the result of the snapshot in
-   // addition to the scheduler's own bookkeeping handler
-   void execute_snapshot(uint32_t srid, chain::controller& chain, next_function<snapshot_information> next);
+   // execute snapshot request srid; caller (may be null) is the request's shared callback slot, and
+   // the snapshot answers whoever is still waiting there in addition to the scheduler's own
+   // bookkeeping handler
+   void execute_snapshot(uint32_t srid, chain::controller& chain, request_callback caller);
 
    // former producer_plugin snapshot fn
    void create_snapshot(next_function<snapshot_information> next, chain::controller& chain);
