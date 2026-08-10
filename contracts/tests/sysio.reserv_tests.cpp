@@ -635,7 +635,9 @@ BOOST_FIXTURE_TEST_CASE(oncrtreserve_invalid_amount_is_cancelled, sysio_reserve_
 // rejection reason. The tombstone is itself a `sysio`-billed row, so the over-bound strings
 // are replaced by a fixed marker rather than carried onto it. Both an ASCII and a MULTIBYTE
 // over-bound label are covered: because nothing is truncated there is no code-point boundary
-// to split, so neither can leave malformed text in state.
+// to split, so neither can leave malformed text in state. A third case drives the OTHER half
+// of `metadata_exceeds_bounds` — an over-bound `description` behind an in-bound name — so
+// each side of the predicate is exercised independently rather than only via the label.
 BOOST_FIXTURE_TEST_CASE(oncrtreserve_oversized_metadata_is_cancelled, sysio_reserve_tester) { try {
    deploy_authex();
 
@@ -644,13 +646,15 @@ BOOST_FIXTURE_TEST_CASE(oncrtreserve_oversized_metadata_is_cancelled, sysio_rese
    BOOST_REQUIRE_EQUAL(success(),
       recordlink_em("alice"_n, ChainKind::CHAIN_KIND_EVM, creator_pub));
 
-   auto create_with_name = [&](std::string_view reserve_code, const std::string& name) {
+   auto create_with_metadata = [&](std::string_view reserve_code,
+                                   const std::string& name,
+                                   const std::string& description) {
       return push_action(MSGCH_ACCOUNT, "oncrtreserve"_n, mvo()
          ("chain_code",            codename_mvo("ETH"))
          ("token_code",            codename_mvo("ETH"))
          ("reserve_code",          codename_mvo(reserve_code))
          ("name",                  name)
-         ("description",           "")
+         ("description",           description)
          ("external_token_amount", 1000)
          ("requested_wire_amount", 1000)
          ("source_token_precision", 9u)
@@ -662,7 +666,7 @@ BOOST_FIXTURE_TEST_CASE(oncrtreserve_oversized_metadata_is_cancelled, sysio_rese
    };
 
    // 129 ASCII bytes — one over label_max_bytes.
-   BOOST_REQUIRE_EQUAL(success(), create_with_name("USERRES", std::string(129, 'x')));
+   BOOST_REQUIRE_EQUAL(success(), create_with_metadata("USERRES", std::string(129, 'x'), ""));
    auto ascii_row = find_reserve("ETH", "ETH", "USERRES");
    BOOST_REQUIRE(!ascii_row.is_null());
    BOOST_REQUIRE_EQUAL("RESERVE_STATUS_CANCELLED", ascii_row["status"].as_string());
@@ -673,11 +677,25 @@ BOOST_FIXTURE_TEST_CASE(oncrtreserve_oversized_metadata_is_cancelled, sysio_rese
    // that entirely: nothing is truncated, so there is no code-point boundary to get wrong.
    const std::string multibyte_name = std::string(127, 'x') + "\xC3\xA9";
    BOOST_REQUIRE_EQUAL(129u, multibyte_name.size());
-   BOOST_REQUIRE_EQUAL(success(), create_with_name("USERRES2", multibyte_name));
+   BOOST_REQUIRE_EQUAL(success(), create_with_metadata("USERRES2", multibyte_name, ""));
    auto multibyte_row = find_reserve("ETH", "ETH", "USERRES2");
    BOOST_REQUIRE(!multibyte_row.is_null());
    BOOST_REQUIRE_EQUAL("RESERVE_STATUS_CANCELLED", multibyte_row["status"].as_string());
    BOOST_REQUIRE_EQUAL("<rejected>", multibyte_row["name"].as_string());
+
+   // 257 bytes — one over description_max_bytes — behind an in-bound name. This is the
+   // `description` half of `metadata_exceeds_bounds`: the label alone would have passed, so
+   // the description is the sole rejection reason. The tombstone drops the over-bound text
+   // rather than carrying it onto a `sysio`-billed row, so the stored description is empty
+   // while the name still reads as the rejection marker.
+   const std::string oversized_description(257, 'd');
+   BOOST_REQUIRE_EQUAL(success(),
+      create_with_metadata("USERRES3", "in-bound name", oversized_description));
+   auto description_row = find_reserve("ETH", "ETH", "USERRES3");
+   BOOST_REQUIRE(!description_row.is_null());
+   BOOST_REQUIRE_EQUAL("RESERVE_STATUS_CANCELLED", description_row["status"].as_string());
+   BOOST_REQUIRE_EQUAL("<rejected>", description_row["name"].as_string());
+   BOOST_REQUIRE_EQUAL("", description_row["description"].as_string());
 } FC_LOG_AND_RETHROW() }
 
 // ── matchreserve (gating preconditions) ──
