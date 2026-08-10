@@ -24,6 +24,7 @@
 #include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
 #include <sysio/underwriter_plugin/underwriter_plugin.hpp>
 #include <sysio/underwriter_plugin/source_deposit_constants.hpp>
+#include <sysio/underwriter_plugin/source_deposit_hash_detail.hpp>
 #include <sysio/underwriter_plugin/solana_source_deposit_scanner.hpp>
 #include <sysio/underwriter_plugin/routing_detail.hpp>
 #include <sysio/underwriter_plugin/sync_detail.hpp>
@@ -85,6 +86,13 @@ struct uw_request {
    ChainKind               dst_chain;
    TokenKind               dst_token_kind;
    uint64_t                dst_amount;
+   /// The destination amount the caller ASKED for, retained as the fixed
+   /// reference the depot's slippage check measures against. Distinct from
+   /// `dst_amount`, which is the depot's AMM quote and is re-priced at
+   /// settlement. The outposts fold THIS field — never `dst_amount` — into the
+   /// `SwapDeposit` correlation hash, so it is the value the source-deposit
+   /// verifier must reproduce.
+   uint64_t                target_amount;
    /// Per-leg slug_name triples (v6 data-model). These are the authoritative
    /// identifiers for the depot's `rcrdcommit` routing and the
    /// `UnderwriteIntentCommit` (`chain_code` / `token_code` / `reserve_code`)
@@ -1373,6 +1381,7 @@ struct underwriter_plugin::impl {
          req.dst_token_code   = read_codename("dst_token_code");
          req.dst_reserve_code = read_codename("dst_reserve_code");
          req.dst_amount       = obj["dst_amount"].as_uint64();
+         req.target_amount    = obj["target_amount"].as_uint64();
          req.variance_tolerance_bps = obj.contains("variance_tolerance_bps")
             ? static_cast<uint32_t>(obj["variance_tolerance_bps"].as_uint64())
             : 0u;
@@ -1928,40 +1937,29 @@ struct underwriter_plugin::impl {
                std::string{data_view.substr(i * 2, 2)}, nullptr, 16));
          }
 
-         // (4) Recompute the hash from the UWREQ row's flat fields.
-         //     Layout MUST match ReserveManager.requestSwap's
-         //     abi.encodePacked(...) call exactly.
-         std::vector<uint8_t> packed;
-         packed.reserve(20 + 8 * 7 + 4);
-         packed.insert(packed.end(),
-                       req.depositor.begin(), req.depositor.end());
-         auto append_u64_be = [&](uint64_t v) {
-            for (int shift = 56; shift >= 0; shift -= 8) {
-               packed.push_back(static_cast<uint8_t>((v >> shift) & 0xff));
-            }
-         };
-         auto append_u32_be = [&](uint32_t v) {
-            for (int shift = 24; shift >= 0; shift -= 8) {
-               packed.push_back(static_cast<uint8_t>((v >> shift) & 0xff));
-            }
-         };
-         append_u64_be(req.src_amount);
-         append_u64_be(req.src_token_code.value);
-         append_u64_be(req.src_reserve_code.value);
-         append_u64_be(req.dst_chain_code.value);
-         append_u64_be(req.dst_token_code.value);
-         append_u64_be(req.dst_reserve_code.value);
-         append_u64_be(req.dst_amount);
-         append_u32_be(req.variance_tolerance_bps);
-         if (packed.size() != 20 + 8 * 7 + 4) {
+         // (4) Recompute the hash from the UWREQ row's immutable source-outpost
+         //     fields. Layout MUST match ReserveManagerLib.hashSwapDeposit's
+         //     abi.encodePacked(...) call exactly. In particular, the outpost
+         //     hashes the user's original `target_amount`, not the depot's
+         //     re-priced `dst_amount` settlement quote.
+         if (req.depositor.size() != underwriter::EVM_DEPOSITOR_SIZE) {
             elog("underwriter: source-deposit verify failed for uwreq {} — "
-                 "packed buffer size {} != expected {}",
-                 req.id, packed.size(), 20 + 8 * 7 + 4);
+                 "depositor has wrong size ({} bytes; expected {} for EVM "
+                 "address)", req.id, req.depositor.size(), underwriter::EVM_DEPOSITOR_SIZE);
             bump_mismatch();
             return false;
          }
-         auto recomputed = fc::crypto::keccak256::hash(
-            std::span<const uint8_t>{packed.data(), packed.size()});
+         const auto recomputed = underwriter::source_deposit_hash({
+            .depositor            = std::span<const char>{req.depositor},
+            .source_amount        = req.src_amount,
+            .source_token_code    = req.src_token_code.value,
+            .source_reserve_code  = req.src_reserve_code.value,
+            .target_chain_code    = req.dst_chain_code.value,
+            .target_token_code    = req.dst_token_code.value,
+            .target_reserve_code  = req.dst_reserve_code.value,
+            .target_amount        = req.target_amount,
+            .target_tolerance_bps = req.variance_tolerance_bps,
+         });
          if (std::memcmp(recomputed.data(), on_chain_hash.data(), 32) != 0) {
             const std::string got_hex = fc::to_hex(
                reinterpret_cast<const char*>(on_chain_hash.data()), 32);
@@ -2098,44 +2096,26 @@ struct underwriter_plugin::impl {
       // ── (4) Recompute the expected correlation hash from UWREQ fields ──
       // Layout MUST stay synchronized with the producer side
       // (`opp-outpost/src/instructions/request_swap.rs::correlation_hash`).
-      // 32 + 7×8 + 4 = 92 bytes total.
-      std::vector<uint8_t> packed;
-      packed.reserve(32 + 7 * 8 + 4);
-      if (req.depositor.size() != 32) {
+      // Like the EVM outpost, it hashes the user's original `target_amount`,
+      // not the depot's re-priced `dst_amount` settlement quote.
+      if (req.depositor.size() != underwriter::SVM_DEPOSITOR_SIZE) {
          elog("underwriter: source-deposit verify failed for uwreq {} — "
-              "depositor has wrong size ({} bytes; expected 32 for SVM "
-              "Ed25519 pubkey)", req.id, req.depositor.size());
+              "depositor has wrong size ({} bytes; expected {} for SVM "
+              "Ed25519 pubkey)", req.id, req.depositor.size(), underwriter::SVM_DEPOSITOR_SIZE);
          bump_mismatch();
          return false;
       }
-      packed.insert(packed.end(), req.depositor.begin(), req.depositor.end());
-      auto append_u64_be = [&](uint64_t v) {
-         for (int shift = 56; shift >= 0; shift -= 8) {
-            packed.push_back(static_cast<uint8_t>((v >> shift) & 0xff));
-         }
-      };
-      auto append_u32_be = [&](uint32_t v) {
-         for (int shift = 24; shift >= 0; shift -= 8) {
-            packed.push_back(static_cast<uint8_t>((v >> shift) & 0xff));
-         }
-      };
-      append_u64_be(req.src_amount);
-      append_u64_be(req.src_token_code.value);
-      append_u64_be(req.src_reserve_code.value);
-      append_u64_be(req.dst_chain_code.value);
-      append_u64_be(req.dst_token_code.value);
-      append_u64_be(req.dst_reserve_code.value);
-      append_u64_be(req.dst_amount);
-      append_u32_be(req.variance_tolerance_bps);
-      if (packed.size() != 32 + 7 * 8 + 4) {
-         elog("underwriter: source-deposit verify failed for uwreq {} — "
-              "packed buffer size {} != expected {}",
-              req.id, packed.size(), 32 + 7 * 8 + 4);
-         bump_mismatch();
-         return false;
-      }
-      const auto recomputed_hash = fc::crypto::keccak256::hash(
-         std::span<const uint8_t>{packed.data(), packed.size()});
+      const auto recomputed_hash = underwriter::source_deposit_hash({
+         .depositor            = std::span<const char>{req.depositor},
+         .source_amount        = req.src_amount,
+         .source_token_code    = req.src_token_code.value,
+         .source_reserve_code  = req.src_reserve_code.value,
+         .target_chain_code    = req.dst_chain_code.value,
+         .target_token_code    = req.dst_token_code.value,
+         .target_reserve_code  = req.dst_reserve_code.value,
+         .target_amount        = req.target_amount,
+         .target_tolerance_bps = req.variance_tolerance_bps,
+      });
 
       // Canonical marker the producer emits on `request_swap`. The
       // Solana JSON-RPC `meta.logMessages[]` array contains each
