@@ -3912,6 +3912,56 @@ BOOST_FIXTURE_TEST_CASE(voteuwchal_guards, sysio_uwchal_tester) { try {
 
 // The uphold path end-to-end: quorum -> SLASHED -> the locks sweep through releaselock's
 // deferred-slash branch (collateral debited) -> uwreq COMPLETED -> bond back to the challenger.
+// An OPEN challenge PINS the uwreq row against the retention sweep. The locks hold the
+// collateral, but THIS row holds the evidence the challenge adjudicates against
+// (`attestation_inbound_data`, `source_tx_id`, `commits_by`), and the terminal retention
+// window is far shorter than the challenge window — so without the pin a challenge could
+// outlive the record it exists to adjudicate. Both release branches are covered: `freelocks`
+// on a REJECTED verdict here, `sweeplocks` on UPHELD below.
+BOOST_FIXTURE_TEST_CASE(pruneuwreqs_skips_a_challenged_uwreq, sysio_uwchal_tester) { try {
+   constexpr uint64_t ATT_ID = 9600;
+   make_confirmed_uwreq(ATT_ID);
+
+   // Filing stamps the request, not just its locks.
+   BOOST_REQUIRE_EQUAL(success(),
+      openuwchal(CHALLENGER, ATT_ID, UWRIT_OP, REASON_DEPOSIT_MISSING, "no deposit on ETH"));
+   BOOST_REQUIRE_EQUAL(1u, get_uwreq(ATT_ID)["challenge_id"].as_uint64());
+
+   // The sweep refuses it however generous the budget — the pin is not status- or
+   // retention-conditional.
+   BOOST_REQUIRE_EQUAL(success(), push(UWRIT_ACCOUNT, uwrit_abi, UWRIT_ACCOUNT,
+      "pruneuwreqs"_n, mvo()("max_rows", 100)));
+   BOOST_REQUIRE(!get_uwreq(ATT_ID).is_null());
+
+   // REJECT_FORFEIT resolves through `freelocks`, which clears both markers.
+   for (auto v : {VOTER1, VOTER2, VOTER3}) {
+      BOOST_REQUIRE_EQUAL(success(), voteuwchal(v, 1, BALLOT_REJECT_FORFEIT));
+   }
+   produce_block();
+   BOOST_REQUIRE_EQUAL(success(), chkuwchal(1));
+   BOOST_REQUIRE_EQUAL(0u, get_uwreq(ATT_ID)["challenge_id"].as_uint64());
+} FC_LOG_AND_RETHROW() }
+
+/// The UPHELD branch releases the pin too — `sweeplocks` ERASES the locks rather than
+/// clearing their markers, so it is the only place the row's own marker comes off there.
+/// Without it the row would be skipped forever and never reclaimable.
+BOOST_FIXTURE_TEST_CASE(uphold_releases_the_uwreq_challenge_pin, sysio_uwchal_tester) { try {
+   constexpr uint64_t ATT_ID = 9610;
+   make_confirmed_uwreq(ATT_ID);
+
+   BOOST_REQUIRE_EQUAL(success(),
+      openuwchal(CHALLENGER, ATT_ID, UWRIT_OP, REASON_DEPOSIT_MISSING, "no deposit on ETH"));
+   BOOST_REQUIRE_EQUAL(1u, get_uwreq(ATT_ID)["challenge_id"].as_uint64());
+
+   for (auto v : {VOTER1, VOTER2, VOTER3}) {
+      BOOST_REQUIRE_EQUAL(success(), voteuwchal(v, 1, BALLOT_UPHOLD));
+   }
+   produce_block();
+   BOOST_REQUIRE_EQUAL(success(), chkuwchal(1));
+   BOOST_REQUIRE_EQUAL("UPHELD", get_uwchal(1)["verdict"].as_string());
+   BOOST_REQUIRE_EQUAL(0u, get_uwreq(ATT_ID)["challenge_id"].as_uint64());
+} FC_LOG_AND_RETHROW() }
+
 BOOST_FIXTURE_TEST_CASE(chkuwchal_uphold_slashes_and_returns_bond, sysio_uwchal_tester) { try {
    constexpr uint64_t ATT_ID = 9500;
    make_confirmed_uwreq(ATT_ID);

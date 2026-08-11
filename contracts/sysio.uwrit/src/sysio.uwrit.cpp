@@ -2191,6 +2191,17 @@ void uwrit::holdlocks(uint64_t uwreq_id, name underwriter, uint64_t chal_id) {
          row.challenge_id = chal_id;
       });
    }
+
+   // Mark the REQUEST too, not just its locks. The locks hold the collateral;
+   // this row holds the evidence the challenge adjudicates against, and its
+   // retention window is far shorter than the challenge window — see
+   // `pruneuwreqs`, which refuses to erase a marked row.
+   uwreqs_t reqs(get_self());
+   auto req_it = reqs.find(id_key{uwreq_id});
+   check(req_it != reqs.end(), "holdlocks: uwreq not found");
+   reqs.modify(same_payer, id_key{uwreq_id}, [&](auto& row) {
+      row.challenge_id = chal_id;
+   });
 }
 
 void uwrit::freelocks(uint64_t uwreq_id, name underwriter) {
@@ -2211,6 +2222,17 @@ void uwrit::freelocks(uint64_t uwreq_id, name underwriter) {
 
    for (uint64_t lock_id : to_free) {
       locks.modify(same_payer, lock_key{lock_id}, [&](auto& row) {
+         row.challenge_id = 0;
+      });
+   }
+
+   // Release the request's own marker so the retention sweep can reclaim it
+   // again. Soft like the loop above — this runs inline from the epoch tick,
+   // where an abort would stall advancement chain-wide.
+   uwreqs_t reqs(get_self());
+   auto req_it = reqs.find(id_key{uwreq_id});
+   if (req_it != reqs.end() && req_it->challenge_id != 0) {
+      reqs.modify(same_payer, id_key{uwreq_id}, [&](auto& row) {
          row.challenge_id = 0;
       });
    }
@@ -2246,6 +2268,20 @@ void uwrit::sweeplocks(uint64_t uwreq_id, name underwriter) {
       locks.erase(lock_key{l.lock_id});
       if (std::find(affected.begin(), affected.end(), l.uwreq_id) == affected.end()) {
          affected.push_back(l.uwreq_id);
+      }
+   }
+
+   // Release the request's challenge marker. The UPHELD path ERASES the locks
+   // rather than clearing their markers, so this is the ONLY place the row's
+   // own marker comes off on that branch — without it `pruneuwreqs` would skip
+   // the row forever and the retention sweep could never reclaim it.
+   {
+      uwreqs_t reqs(get_self());
+      auto req_it = reqs.find(id_key{uwreq_id});
+      if (req_it != reqs.end() && req_it->challenge_id != 0) {
+         reqs.modify(same_payer, id_key{uwreq_id}, [&](auto& row) {
+            row.challenge_id = 0;
+         });
       }
    }
 
@@ -2292,6 +2328,17 @@ void uwrit::pruneuwreqs(uint32_t max_rows) {
 
    for (const auto& req : due) {
       auto pk = id_key{req.id};
+      // An OPEN challenge pins the row regardless of status or retention: this
+      // row carries the evidence the challenge adjudicates against
+      // (`attestation_inbound_data`, `source_tx_id`, `commits_by`), and the
+      // terminal retention window is far shorter than the challenge window.
+      // `freelocks` clears the marker on reject/lapse and `sweeplocks` on an
+      // upheld verdict, so the row rejoins the sweep once the challenge is done.
+      if (req.challenge_id != 0) {
+         sysio::print("pruneuwreqs: uwreq ", req.id, " held by challenge ",
+                      req.challenge_id, ", skipping\n");
+         continue;
+      }
       switch (req.status) {
          case UnderwriteRequestStatus::UNDERWRITE_REQUEST_STATUS_PENDING: {
             // The race never resolved inside the pending timeout — abandon

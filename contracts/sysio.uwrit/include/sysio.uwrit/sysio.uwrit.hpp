@@ -692,6 +692,19 @@ namespace sysio {
          /// Empty until that flow lands.
          std::vector<char>                       attestation_outbound_data;
 
+         /// Non-zero while an underwriter-fault challenge (the `sysio.chalg::uwchals` row id)
+         /// is OPEN against this request's commitment — stamped by `holdlocks`, cleared by
+         /// `freelocks`, alongside the identical marker on each held lock.
+         ///
+         /// `pruneuwreqs` refuses to erase a row carrying one. The lock marker alone is not
+         /// enough: the locks hold the COLLATERAL, but this row holds the EVIDENCE a challenge
+         /// adjudicates against — `attestation_inbound_data` (the stored SwapRequest),
+         /// `source_tx_id`, and `commits_by` with the per-leg UIC bytes. Terminal rows are
+         /// erased at `terminal_epoch + uwreq_retention_epochs`, which is far shorter than the
+         /// challenge window, so without this a challenge could outlive the record it exists
+         /// to adjudicate and resolve against nothing.
+         uint64_t                                challenge_id      = 0;
+
          uint64_t by_status() const { return magic_enum::enum_integer(status); }
          uint64_t by_winner() const { return winner.value; }
          uint64_t by_expires_at_epoch() const { return expires_at_epoch; }
@@ -702,7 +715,7 @@ namespace sysio {
             (dst_chain_code)(dst_token_code)(dst_reserve_code)(dst_amount)
             (target_amount)(variance_tolerance_bps)(source_tx_id)(depositor)
             (commits_by)(winner)(committed_at_ms)(settled_at_ms)(expires_at_epoch)
-            (attestation_inbound_data)(attestation_outbound_data))
+            (attestation_inbound_data)(attestation_outbound_data)(challenge_id))
       };
 
       using uwreqs_t = sysio::kv::table<"uwreqs"_n, id_key, uw_request_t,
