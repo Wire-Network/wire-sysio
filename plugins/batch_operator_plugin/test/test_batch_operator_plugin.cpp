@@ -1,3 +1,5 @@
+#include "../src/async_action_completion.hpp"
+
 #include <boost/test/unit_test.hpp>
 
 #include <atomic>
@@ -5,12 +7,11 @@
 #include <cstdint>
 #include <functional>
 #include <memory>
-#include <stdexcept>
 #include <optional>
 #include <set>
+#include <stdexcept>
 #include <thread>
 
-#include <sysio/batch_operator_plugin/async_action_completion.hpp>
 #include <sysio/batch_operator_plugin/batch_operator_plugin.hpp>
 #include <sysio/batch_operator_plugin/outpost_binding.hpp>
 #include <sysio/chain_plugin/chain_plugin.hpp>

@@ -12,8 +12,9 @@
 #include <optional>
 #include <string_view>
 
+#include "async_action_completion.hpp"
+
 #include <sysio/batch_operator_plugin/batch_operator_plugin.hpp>
-#include <sysio/batch_operator_plugin/async_action_completion.hpp>
 #include <sysio/batch_operator_plugin/depot_ops.hpp>
 #include <sysio/batch_operator_plugin/outpost_binding.hpp>
 #include <sysio/batch_operator_plugin/outpost_epoch_lookup.hpp>
