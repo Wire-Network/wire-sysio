@@ -280,6 +280,16 @@ public:
       return _explicitly_configured_provider_names.contains(key_name);
    }
 
+   /** Record that `key_name` came from an operator-supplied provider specification. */
+   void mark_operator_configured_provider(const std::string& key_name) {
+      _operator_configured_provider_names.insert(key_name);
+   }
+
+   /** Return whether `key_name` came from an operator-supplied provider specification. */
+   bool is_operator_configured_provider(const std::string& key_name) const {
+      return _operator_configured_provider_names.contains(key_name);
+   }
+
    fc::crypto::signature_provider_ptr get_provider(const fc::crypto::signature_provider_id_t& key) {
       if (holds_alternative<std::string>(key)) {
          auto& keyName = std::get<std::string>(key);
@@ -496,6 +506,7 @@ public:
       auto parsed = parse_provider_spec(spec);
       const bool has_explicit_name = parsed.has_explicit_name;
       auto provider = create_provider(std::move(parsed));
+      mark_operator_configured_provider(provider->key_name);
       if (has_explicit_name) {
          mark_explicitly_configured_provider(provider->key_name);
       }
@@ -648,6 +659,8 @@ private:
    std::map<std::string, fc::crypto::signature_provider_ptr> _signing_providers_by_name{};
    std::map<chain::public_key_type, fc::crypto::signature_provider_ptr> _signing_providers_by_pubkey{};
    std::set<std::string> _explicitly_configured_provider_names{};
+   /** Provider names originating from the operator's explicit configuration. */
+   std::set<std::string> _operator_configured_provider_names{};
 
    /**
     * One-shot startup probes, one per provider whose handler attached one (today: KMS). Collected as providers are
@@ -774,6 +787,10 @@ bool signature_provider_manager_plugin::has_provider(const fc::crypto::signature
 
 bool signature_provider_manager_plugin::is_explicitly_configured_provider(const std::string& key_name) {
    return my->is_explicitly_configured_provider(key_name);
+}
+
+bool signature_provider_manager_plugin::is_operator_configured_provider(const std::string& key_name) {
+   return my->is_operator_configured_provider(key_name);
 }
 
 fc::crypto::signature_provider_ptr signature_provider_manager_plugin::get_provider(

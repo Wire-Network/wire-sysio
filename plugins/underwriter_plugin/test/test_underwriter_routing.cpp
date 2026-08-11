@@ -4,7 +4,6 @@
 
 #include <limits>
 #include <map>
-#include <optional>
 #include <set>
 
 /**
@@ -159,6 +158,76 @@ BOOST_AUTO_TEST_CASE(depot_leg_requires_no_bucket) {
 
    // both-depot (degenerate) is rejected — there is nothing to underwrite.
    BOOST_CHECK(!try_debit_buckets(credit, NO_LEG, NO_LEG));
+}
+
+BOOST_AUTO_TEST_CASE(every_eventual_outpost_lock_requires_credit) {
+   const bucket_key bucket{.chain_code = 101, .token_code = 202};
+   const auto outpost = candidate_leg_bond(
+      bucket, 50, /*is_depot=*/false);
+   const auto depot = candidate_leg_bond(
+      bucket, 50, /*is_depot=*/true);
+
+   BOOST_CHECK(outpost.bucket == bucket);
+   BOOST_CHECK_EQUAL(outpost.require, 50u);
+   BOOST_CHECK_EQUAL(depot.require, 0u);
+
+   // Pre-validation budgets the full winner-time lock even when one leg's UIC
+   // is already stored or locally confirmed. Those states avoid another paid
+   // outpost submission, but neither has consumed collateral on the depot.
+   credit_buckets insufficient{{bucket, 49}};
+   BOOST_CHECK(!try_debit_buckets(insufficient, outpost, depot));
+   BOOST_CHECK_EQUAL(insufficient[bucket], 49u);
+
+   credit_buckets exact{{bucket, 50}};
+   BOOST_CHECK(try_debit_buckets(exact, outpost, depot));
+   BOOST_CHECK_EQUAL(exact[bucket], 0u);
+}
+
+BOOST_AUTO_TEST_CASE(fully_local_candidate_reserves_before_new_submission) {
+   const stored_commit_plan absent{
+      .submit_source = true,
+      .submit_destination = true,
+   };
+   BOOST_CHECK(!has_submission_work(
+      absent, /*source_confirmed_locally=*/true,
+      /*destination_confirmed_locally=*/true));
+
+   credit_buckets remaining{{B_ETH_USDC, 100}};
+   reserve_buckets(
+      remaining, leg_bond{B_ETH_USDC, 100}, NO_LEG);
+   BOOST_CHECK_EQUAL(remaining[B_ETH_USDC], 0u);
+   BOOST_CHECK(!try_debit_buckets(
+      remaining, leg_bond{B_ETH_USDC, 1}, NO_LEG));
+}
+
+BOOST_AUTO_TEST_CASE(stored_complete_candidate_reserves_while_awaiting_external_replay) {
+   credit_buckets credit{{B_ETH_USDC, 100}};
+   const leg_bond src{B_ETH_USDC, 40};
+   const leg_bond dst{B_ETH_USDC, 60};
+
+   reserve_buckets(credit, src, dst);
+   BOOST_CHECK_EQUAL(credit[B_ETH_USDC], 0u);
+   BOOST_CHECK(!try_debit_buckets(credit, leg_bond{B_ETH_USDC, 1}, NO_LEG));
+}
+
+BOOST_AUTO_TEST_CASE(mixed_stored_local_candidate_reserves_full_bond) {
+   const auto partial = plan_stored_commits(
+      /*candidate_exists=*/true,
+      /*intent_submitted=*/true,
+      /*source_is_depot=*/false,
+      /*destination_is_depot=*/false,
+      /*source_uic_stored=*/true,
+      /*destination_uic_stored=*/false);
+   BOOST_CHECK(!has_submission_work(
+      partial, /*source_confirmed_locally=*/false,
+      /*destination_confirmed_locally=*/true));
+
+   credit_buckets remaining{{B_ETH_USDC, 100}};
+   reserve_buckets(
+      remaining, leg_bond{B_ETH_USDC, 40}, leg_bond{B_ETH_USDC, 60});
+   BOOST_CHECK_EQUAL(remaining[B_ETH_USDC], 0u);
+   BOOST_CHECK(!try_debit_buckets(
+      remaining, leg_bond{B_ETH_USDC, 1}, NO_LEG));
 }
 
 // -- endpoint coverage: config must serve every registered chain --

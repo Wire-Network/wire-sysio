@@ -40,6 +40,8 @@
 #include <magic_enum/magic_enum.hpp>
 #include <sysio/http_client_plugin/http_client_options.hpp>
 
+#include <algorithm>
+#include <chrono>
 #include <cmath>
 #include <cstdlib>
 #include <limits>
@@ -80,6 +82,9 @@ namespace snapshot_attest {
 constexpr uint32_t snapshot_attestation_grace_blocks = 12500;
 
 constexpr uint64_t bytes_per_mebibyte = 1024 * 1024;
+
+/// Off-thread table reads poll this interval so plugin shutdown and request deadlines take effect promptly.
+constexpr std::chrono::milliseconds table_read_wait_poll_interval{200};
 
 /// Convert a positive MiB option value to bytes without overflowing uint64_t.
 uint64_t checked_mebibytes(uint64_t value, std::string_view option_name) {
@@ -1615,9 +1620,9 @@ chain_plugin::read_table_rows(chain_apis::read_only::get_table_rows_params param
          prom->set_value(run_scan(params));
       });
 
-   // Poll every 200ms so we can abandon the wait if the caller is shutting down or if the deadline expires before
-   // the executor drains our lambda.
-   while (fut.wait_for(std::chrono::milliseconds(200)) == std::future_status::timeout) {
+   // Poll at the named interval so we can abandon the wait if the caller is shutting down or if the deadline
+   // expires before the executor drains our lambda.
+   while (fut.wait_for(table_read_wait_poll_interval) == std::future_status::timeout) {
       if (shutdown_flag.load(std::memory_order_relaxed)) {
          wlog("{}: abandoning table read on shutdown ({}::{})", log_prefix, log_code, log_table);
          return {};
@@ -1629,6 +1634,31 @@ chain_plugin::read_table_rows(chain_apis::read_only::get_table_rows_params param
       }
    }
    return fut.get();
+}
+
+bool chain_plugin::provider_can_authorize_active_alone(
+   chain::name actor,
+   const fc::crypto::public_key& provider_key) const {
+   const auto& authorization = chain().get_authorization_manager();
+   // Declaring actor@active may be satisfied by active itself or its owner
+   // ancestor. Mere membership in a multisig authority is insufficient.
+   for (const auto permission : {chain::config::active_name,
+                                 chain::config::owner_name}) {
+      try {
+         const auto& permission_object =
+            authorization.get_permission({actor, permission});
+         if (std::ranges::any_of(
+                permission_object.auth.keys, [&](const auto& weighted_key) {
+                   return weighted_key.key.to_public_key() == provider_key &&
+                          weighted_key.weight >= permission_object.auth.threshold;
+                })) {
+            return true;
+         }
+      } catch (...) {
+         // A missing permission cannot authorize this transaction.
+      }
+   }
+   return false;
 }
 
 void chain_plugin::accept_transaction(const chain::packed_transaction_ptr& trx, next_function<chain::transaction_trace_ptr> next) {

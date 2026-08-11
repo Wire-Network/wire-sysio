@@ -5,6 +5,7 @@
 #include <fc/variant_object.hpp>
 
 #include "contracts.hpp"
+#include "contract_test_support.hpp"
 #include <sysio/opp/opp.hpp>
 
 using namespace sysio::testing;
@@ -55,29 +56,11 @@ public:
 
    action_result push(name code, abi_serializer& ser, name signer,
                        name action_name, const variant_object& data) {
-      try {
-         string atype = ser.get_action_type(action_name);
-         action act;
-         act.account = code;
-         act.name    = action_name;
-         act.data    = ser.variant_to_binary(
-            atype, data, abi_serializer::create_yield_function(abi_serializer_max_time));
-         act.authorization = vector<permission_level>{{signer, config::active_name}};
-         signed_transaction trx;
-         trx.actions.emplace_back(std::move(act));
-         set_transaction_headers(trx);
-         trx.sign(get_private_key(signer, "active"), control->get_chain_id());
-         push_transaction(trx);
-         // Close a block per applied action: each OPP inbound / crank is its
-         // own transaction in production, and distinct TaPoS makes an
-         // intentional replay (e.g. the dedupe test) a new transaction that
-         // actually reaches the contract instead of being rejected chain-side
-         // as a duplicate.
-         produce_block();
-         return success();
-      } catch (const fc::exception& ex) {
-         return error(ex.top_message());
-      }
+      // Close a block per applied action: each OPP inbound / crank is its own
+      // production transaction, and distinct TaPoS lets replay tests reach the
+      // contract instead of failing chain-side as duplicate transactions.
+      return sysio_system::test_support::push_contract_action_and_produce_block(
+         *this, code, ser, signer, action_name, data);
    }
 
    action_result push_dclaim(name signer, name action_name, const variant_object& data) {
