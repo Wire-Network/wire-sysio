@@ -827,7 +827,7 @@ struct batch_operator_plugin::impl {
                   ilog("batch_operator: pushed {}::{} ok", contract, action_name);
                },
                [&contract, &action_name](const fc::exception_ptr& error) {
-                  elog("batch_operator: push {}::{} failed — {}", contract, action_name, error->to_string());
+                  elog("batch_operator: push {}::{} failed: {}", contract, action_name, error->to_string());
                });
          });
 

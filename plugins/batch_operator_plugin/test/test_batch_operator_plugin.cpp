@@ -68,10 +68,17 @@ BOOST_AUTO_TEST_CASE(default_options_are_correct) try {
 BOOST_AUTO_TEST_CASE(async_action_completion_handles_normal_completion) {
    sysio::batch_operator_detail::async_action_completion completion;
    auto done = completion.get_future();
+   using push_result = sysio::chain::next_function_variant<sysio::chain_apis::read_write::push_transaction_results>;
+   push_result successful_result{sysio::chain_apis::read_write::push_transaction_results{}};
    bool success_logged = false;
+   bool failure_logged = false;
 
-   BOOST_CHECK(completion.complete([&success_logged] { success_logged = true; }));
+   BOOST_CHECK(completion.complete_push_result(
+      successful_result,
+      [&success_logged] { success_logged = true; },
+      [&failure_logged](const fc::exception_ptr&) { failure_logged = true; }));
    BOOST_CHECK(success_logged);
+   BOOST_CHECK(!failure_logged);
    BOOST_CHECK(done.wait_for(0ms) == std::future_status::ready);
 }
 
@@ -107,6 +114,31 @@ BOOST_AUTO_TEST_CASE(async_action_completion_handles_failed_push_result) try {
    BOOST_CHECK_EQUAL(error_logs, 1u);
    BOOST_CHECK(done.wait_for(0ms) == std::future_status::ready);
 } FC_LOG_AND_RETHROW();
+
+/// A deferred transaction result is evaluated before it reports completion.
+BOOST_AUTO_TEST_CASE(async_action_completion_handles_deferred_push_result) {
+   sysio::batch_operator_detail::async_action_completion completion;
+   auto done = completion.get_future();
+   using push_result = sysio::chain::next_function_variant<sysio::chain_apis::read_write::push_transaction_results>;
+   bool deferred_called = false;
+   bool success_logged = false;
+   bool failure_logged = false;
+   push_result deferred_result{std::function<sysio::chain::t_or_exception<sysio::chain_apis::read_write::push_transaction_results>()>{
+      [&deferred_called] {
+         deferred_called = true;
+         return sysio::chain::t_or_exception<sysio::chain_apis::read_write::push_transaction_results>{
+            sysio::chain_apis::read_write::push_transaction_results{}};
+      }}};
+
+   BOOST_CHECK(completion.complete_push_result(
+      deferred_result,
+      [&success_logged] { success_logged = true; },
+      [&failure_logged](const fc::exception_ptr&) { failure_logged = true; }));
+   BOOST_CHECK(deferred_called);
+   BOOST_CHECK(success_logged);
+   BOOST_CHECK(!failure_logged);
+   BOOST_CHECK(done.wait_for(0ms) == std::future_status::ready);
+}
 
 /// Callback-side exceptions are contained and still release the waiting relay job.
 BOOST_AUTO_TEST_CASE(async_action_completion_contains_callback_exceptions) {
