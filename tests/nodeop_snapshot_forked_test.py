@@ -60,10 +60,20 @@ def getSnapshotsCount(nodeId):
     if snapshotScheduleDB in snapshotDirContents: snapshotDirContents.remove(snapshotScheduleDB)
     return len(snapshotDirContents)
 
-def createNodeSnapshot(nodeId, node):
-    """Issue a blocking v1/producer/create_snapshot request against the given node."""
+def createNodeSnapshot(nodeId, node, outcome):
+    """Issue a blocking v1/producer/create_snapshot request and record how it completed.
+
+    The request outlives a fork of the block it snapshots: that pending snapshot is discarded
+    unfinalized and the still-scheduled request re-creates it once the adopted branch reapplies
+    the firing height. Only that regenerated snapshot can answer this call, so the outcome is
+    recorded rather than discarded -- a request that loses its completion callback along the way
+    closes the connection with no response, which arrives here as an exception.
+    """
     Print("Creating snapshot for node %d" % nodeId)
-    node.createSnapshot()
+    try:
+        outcome["response"] = node.createSnapshot()
+    except Exception as ex:
+        outcome["exception"] = ex
 
 try:
     TestHelper.printSystemInfo("BEGIN")
@@ -166,7 +176,9 @@ try:
     # create snapshot in a separate thread since it blocks until finalized; the snapshotted
     # block is forked out when the network re-merges, so the snapshot is re-created on the
     # adopted branch before the request completes
-    rpcThread = threading.Thread(target = createNodeSnapshot, args = (1, prodB))
+    # daemon so an unanswered request is reported by the join below rather than blocking exit
+    snapshotOutcome = {}
+    rpcThread = threading.Thread(target = createNodeSnapshot, args = (1, prodB, snapshotOutcome), daemon = True)
     rpcThread.start()
 
     assert not nonProdNode.verifyAlive(), "Bridge node should have been killed if test was functioning correctly."
@@ -188,7 +200,19 @@ try:
         "ERROR: Network did not reach consensus after bridge node was restarted."
 
     Print("Wait for rpc thread to complete")
-    rpcThread.join()
+    rpcThread.join(timeout=120)
+
+    # The snapshot the request first created was forked out; the request must still answer this
+    # caller from the snapshot it re-created on the adopted branch. A request that is dropped, or
+    # that gives up its completion callback when it starts executing, leaves nothing to answer
+    # with: the connection closes unanswered and the call never returns a snapshot.
+    assert not rpcThread.is_alive(), \
+        "ERROR: create_snapshot never completed after the snapshotted block was forked out"
+    assert "exception" not in snapshotOutcome, \
+        f"ERROR: create_snapshot failed after the snapshotted block was forked out: {snapshotOutcome['exception']}"
+    snapshotResponse = snapshotOutcome.get("response")
+    assert snapshotResponse is not None and "snapshot_name" in snapshotResponse.get("payload", {}), \
+        f"ERROR: create_snapshot returned no snapshot: {json.dumps(snapshotResponse, indent=1)}"
 
     for prodNode in prodNodes:
         info=prodNode.getInfo()

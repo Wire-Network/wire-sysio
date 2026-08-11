@@ -1,5 +1,6 @@
 #include <sysio.tokens/sysio.tokens.hpp>
 #include <sysio.epoch/sysio.epoch.hpp>
+#include <sysio.opp.common/registry_metadata.hpp>
 
 namespace sysio {
 
@@ -50,6 +51,8 @@ void tokens::regtoken(opp::types::TokenKind    kind,
                 "sysio.tokens: token kind must not be UNKNOWN");
    sysio::check(precision <= MAX_TOKEN_PRECISION,
                 "sysio.tokens: precision exceeds the depot frame maximum (9)");
+   // Both strings persist into a `sysio`-billed row -- bound them before emplace.
+   opp::registry::check_metadata(symbol_name, description, "sysio.tokens");
 
    tokens_t tbl(get_self());
    token_key pk{code};
