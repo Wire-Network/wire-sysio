@@ -4,7 +4,6 @@
 
 #include <limits>
 #include <map>
-#include <optional>
 #include <set>
 
 /**
@@ -201,7 +200,7 @@ BOOST_AUTO_TEST_CASE(fully_local_candidate_reserves_before_new_submission) {
       remaining, leg_bond{B_ETH_USDC, 1}, NO_LEG));
 }
 
-BOOST_AUTO_TEST_CASE(stored_complete_candidate_reserves_before_depot_retry) {
+BOOST_AUTO_TEST_CASE(stored_complete_candidate_reserves_while_awaiting_external_replay) {
    credit_buckets credit{{B_ETH_USDC, 100}};
    const leg_bond src{B_ETH_USDC, 40};
    const leg_bond dst{B_ETH_USDC, 60};

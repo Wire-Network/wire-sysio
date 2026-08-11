@@ -1417,9 +1417,8 @@ void reject_and_refund(name self, uwrit::uwreqs_t& reqs, const uwrit::id_key& pk
 ///   * to-WIRE    — reserv::paywire (REAL WIRE to the recipient; no remit)
 /// Stale/invalid evidence disqualifies a candidate durably. Candidate-local
 /// eligibility, collateral, and identity-link gaps, plus mutable reserve
-/// availability, remain PENDING and are retried by the candidate-authorized
-/// depot-only `retrycommit` action. Every failure remains non-throwing inside
-/// the enclosing consensus dispatch.
+/// availability, remain PENDING until an outpost replays an exact stored UIC.
+/// Every failure remains non-throwing inside the enclosing consensus dispatch.
 void try_select_winner(name self, uint64_t uwreq_id, name candidate,
                        std::optional<uic_leg> just_verified_leg) {
    uwrit::uwreqs_t reqs(self);
@@ -1457,8 +1456,8 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate,
    // selected as the winner, consume lock capacity, and settle against the
    // reserves. Require an ACTIVE UNDERWRITER before any signature work, lock,
    // CONFIRMED write, or reserve mutation. This status can change through the
-   // ordinary opreg lifecycle, so retain valid UIC evidence and let the
-   // candidate retry after it becomes eligible rather than permanently
+   // ordinary opreg lifecycle, so retain valid UIC evidence and let an exact
+   // external replay retry after it becomes eligible rather than permanently
    // disqualifying it. This resolver runs inside the evalcons dispatch chain,
    // so it must remain non-throwing (`feedback_opp_handlers_never_throw`).
    if (!is_active_underwriter(candidate)) {
@@ -1526,7 +1525,7 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate,
    // genuinely insufficient — NOT saturate to UINT64_MAX (which a UINT64_MAX
    // available balance would spuriously satisfy) and NOT wrap to a small
    // passing value. Collateral can be replenished or freed by lock expiry, so
-   // insufficient coverage keeps this valid candidate retryable while the
+   // insufficient coverage keeps this valid candidate replayable while the
    // uwreq remains PENDING. This resolver is non-throwing
    // (`feedback_opp_handlers_never_throw`).
    const bool same_bucket = src_needed && dst_needed
@@ -1573,8 +1572,9 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate,
    // ── Candidate-specific remit eligibility ─────────────────────────────
    // Build the outbound remit before any request-global verdict. A missing
    // destination-chain authex link belongs to this candidate. It can be added
-   // without changing the request or UIC evidence, so retry after the link is
-   // provisioned rather than permanently disqualifying the candidate.
+   // without changing the request or UIC evidence, so an exact external replay
+   // can retry after the link is provisioned rather than permanently
+   // disqualifying the candidate.
    // Request-wide build failures remain terminal, and every outcome here is
    // still after the authoritative bond gate above.
    uint64_t remit_dst_outpost_id = 0;
@@ -1621,8 +1621,8 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate,
          return;
       }
       // A required reserve may be provisioned or activated while the UWREQ is
-      // still PENDING. Keep the candidate's valid evidence so a later
-      // candidate UIC or its depot-only retry can re-evaluate the live route.
+      // still PENDING. Keep the candidate's valid evidence so a later exact
+      // UIC replay can re-evaluate the live route.
       sysio::print("try_select_winner: required reserve missing or not ACTIVE for uwreq ",
                    uwreq_id, ", leaving request PENDING\n");
       return;
@@ -1968,13 +1968,28 @@ void uwrit::rcrdcommit(uint64_t uwreq_id,
       return;
    }
 
-   // A candidate leg is write-once. Outpost delivery is at-least-once, so an
-   // already-recorded leg is an idempotent replay, not replacement evidence.
-   // Return before protobuf canonicalization, hashing, or key recovery: an
-   // ACTIVE underwriter can enqueue repeated valid commits, and paying the
-   // cryptographic cost for every duplicate would let one envelope exhaust
-   // consensus-dispatch CPU and roll back all of its attestations.
+   // A candidate leg is write-once. Outpost delivery is at-least-once, so a
+   // conflicting duplicate is never replacement evidence. A byte-identical
+   // replay of a complete candidate is the explicit external trigger for a
+   // fresh winner-selection pass: it does not mutate evidence or timestamps,
+   // and `std::nullopt` makes the resolver revalidate every stored leg against
+   // current permissions.
    if (existing_entry && required_uic_leg_populated(*existing_it, incoming_leg)) {
+      const auto& stored_bytes = is_source
+         ? existing_it->source_uic_bytes
+         : existing_it->dest_uic_bytes;
+      if (stored_bytes != uic_bytes) {
+         sysio::print("rcrdcommit: uwreq ", uwreq_id, " candidate ", underwriter,
+                      " received conflicting duplicate ",
+                      is_source ? "source" : "destination", " UIC, skipping\n");
+         return;
+      }
+      if (required_uic_legs_complete(req_snapshot, *existing_it)) {
+         sysio::print("rcrdcommit: uwreq ", uwreq_id, " candidate ", underwriter,
+                      " received exact stored UIC replay, re-evaluating\n");
+         try_select_winner(get_self(), uwreq_id, underwriter, std::nullopt);
+         return;
+      }
       sysio::print("rcrdcommit: uwreq ", uwreq_id, " candidate ", underwriter,
                    " already carries a ",
                    is_source ? "source" : "destination",
@@ -2049,36 +2064,6 @@ void uwrit::rcrdcommit(uint64_t uwreq_id,
       }
       break;
    }
-}
-
-// ---------------------------------------------------------------------------
-//  retrycommit — retry one complete stored candidate without outpost replay
-// ---------------------------------------------------------------------------
-//
-// Recoverable candidate and reserve conditions leave the UIC pair on a PENDING
-// row. The candidate authorizes this bounded re-evaluation instead of paying to
-// replay already-confirmed outpost transactions or enqueue duplicate OPP work.
-void uwrit::retrycommit(uint64_t uwreq_id, name underwriter) {
-   require_auth(underwriter);
-
-   uwreqs_t reqs(get_self());
-   const auto pk = id_key{uwreq_id};
-   if (!reqs.contains(pk)) return;
-   const auto req = reqs.get(pk);
-   if (req.status != UnderwriteRequestStatus::UNDERWRITE_REQUEST_STATUS_PENDING) return;
-
-   const auto it = std::find_if(
-      req.commits_by.begin(), req.commits_by.end(),
-      [&](const commit_entry& c) { return c.underwriter == underwriter; });
-   if (it == req.commits_by.end() ||
-       it->status != UnderwriteStatus::UNDERWRITE_STATUS_INTENT_SUBMITTED ||
-       !required_uic_legs_complete(req, *it)) {
-      return;
-   }
-
-   // No fresh leg arrived in this transaction, so revalidate every required
-   // stored UIC against current account permissions before selection.
-   try_select_winner(get_self(), uwreq_id, underwriter, std::nullopt);
 }
 
 // ---------------------------------------------------------------------------

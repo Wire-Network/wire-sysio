@@ -151,11 +151,6 @@ endif()
 if(NOT TARGET cdt::protoc-gen-zpp)
     if(BUILD_SYSTEM_CONTRACTS)
         message(FATAL_ERROR "cdt::protoc-gen-zpp target not found, CDT protobuf support is required.")
-    elseif(ENABLE_TESTS)
-        message(WARNING
-                "Skipping test_uic_cross_generator: CDT protobuf tools are unavailable. "
-                "Configure the regular test build with CDT_ROOT to enable the ordinary CTest target; "
-                "run-uic-cross-generator-tests.sh only covers the generated Rust and Solidity checks after CTest.")
     else()
         message(STATUS "cdt::protoc-gen-zpp target not found, but BUILD_SYSTEM_CONTRACTS is disabled, so skipping CDT protobuf generation as expected.")
     endif()
@@ -211,10 +206,6 @@ endif()
 
 if(ENABLE_TESTS)
     file(GLOB_RECURSE TEST_FILES CONFIGURE_DEPENDS test/*.cpp test/*.hpp)
-    set(CROSS_GENERATOR_SOURCE
-            ${CMAKE_CURRENT_SOURCE_DIR}/test/test_uic_cross_generator.cpp)
-    set(OPP_TEST_MAIN ${CMAKE_CURRENT_SOURCE_DIR}/test/main.cpp)
-    list(REMOVE_ITEM TEST_FILES ${CROSS_GENERATOR_SOURCE})
     set(TEST_TARGET_NAME test_opp)
     add_executable(
             ${TEST_TARGET_NAME}
@@ -238,38 +229,6 @@ if(ENABLE_TESTS)
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     )
 
-    # This compatibility test belongs to the regular host test build. Contract
-    # packaging builds already exercise CDT for their own artifacts and should
-    # not add the host/CDT test to every CI matrix variant.
-    if(TARGET ${TARGET_CDT_MODELS_NAME} AND NOT BUILD_SYSTEM_CONTRACTS)
-        set(CROSS_GENERATOR_TARGET test_uic_cross_generator)
-        add_executable(
-                ${CROSS_GENERATOR_TARGET}
-                ${OPP_TEST_MAIN}
-                ${CROSS_GENERATOR_SOURCE}
-        )
-        target_link_libraries(
-                ${CROSS_GENERATOR_TARGET}
-                PRIVATE
-                ${TARGET_NAME}
-                ${TARGET_CDT_MODELS_NAME}
-        )
-        # zpp_bits.h comes from CDT, but it is private to this compatibility
-        # translation unit and must not alter header resolution for test_opp.
-        target_include_directories(
-                ${CROSS_GENERATOR_TARGET}
-                SYSTEM PRIVATE
-                ${CDT_ROOT}/include
-        )
-        add_test(
-                NAME ${CROSS_GENERATOR_TARGET}
-                COMMAND ${CMAKE_CURRENT_BINARY_DIR}/${CROSS_GENERATOR_TARGET}
-                WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-        )
-        set_tests_properties(${CROSS_GENERATOR_TARGET}
-                PROPERTIES LABELS "uic_cross_generator")
-
-    endif()
 endif()
 
 # Installation: headers to include/sysio

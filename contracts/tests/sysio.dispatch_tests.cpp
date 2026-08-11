@@ -690,41 +690,6 @@ public:
          ("uic_bytes",       uic_bytes));
    }
 
-   action_result retrycommit_direct(uint64_t uwreq_id, name underwriter,
-                                    name signer) {
-      return push(UWRIT_ACCOUNT, uwrit_abi, signer, "retrycommit"_n, mvo()
-         ("uwreq_id",    uwreq_id)
-         ("underwriter", underwriter.to_string()));
-   }
-
-   action_result retrycommit_direct(
-      uint64_t uwreq_id, name underwriter,
-      const fc::crypto::private_key& signing_key) {
-      try {
-         action retry;
-         retry.account = UWRIT_ACCOUNT;
-         retry.name = "retrycommit"_n;
-         retry.data = uwrit_abi.variant_to_binary(
-            uwrit_abi.get_action_type(retry.name),
-            mvo()("uwreq_id", uwreq_id)("underwriter", underwriter.to_string()),
-            abi_serializer::create_yield_function(abi_serializer_max_time));
-         retry.authorization = {{underwriter, config::active_name}};
-
-         signed_transaction trx;
-         trx.actions.emplace_back(std::move(retry));
-         set_transaction_headers(trx);
-         trx.sign(signing_key, control->get_chain_id());
-         push_transaction(trx);
-         return success();
-      } catch (const fc::exception& ex) {
-         return error(ex.top_message());
-      }
-   }
-
-   action_result retrycommit_direct(uint64_t uwreq_id, name underwriter) {
-      return retrycommit_direct(uwreq_id, underwriter, underwriter);
-   }
-
    /** Push `rcrdcommit` and retain its trace for exact rejection-log assertions. */
    transaction_trace_ptr rcrdcommit_trace(
       uint64_t uwreq_id, name underwriter, uint64_t outpost_chain_code,
@@ -2141,9 +2106,9 @@ BOOST_FIXTURE_TEST_CASE(forged_delivery_does_not_strand_chkcons, sysio_dispatch_
 
 // A complete, fully bonded candidate lacking a destination-chain authex link
 // keeps its valid UIC evidence while the request remains PENDING. Once the
-// operator fixes the link, retrycommit settles from those stored bytes without
-// requiring either outpost commit to be replayed.
-BOOST_FIXTURE_TEST_CASE(swap_missing_dst_authex_recovers_after_depot_retry,
+// operator fixes the link, an exact external UIC replay settles from the
+// preserved bytes without replacing the evidence.
+BOOST_FIXTURE_TEST_CASE(swap_missing_dst_authex_recovers_after_exact_uic_replay,
                         sysio_dispatch_tester) { try {
    bootstrap_for_dispatch();   // registers ETH + UWRIT_OP (EVM link only)
 
@@ -2207,7 +2172,8 @@ BOOST_FIXTURE_TEST_CASE(swap_missing_dst_authex_recovers_after_depot_retry,
          ("pub_key", solana_link_key)));
    produce_block();
 
-   BOOST_REQUIRE_EQUAL(success(), retrycommit_direct(ATT_ID, UWRIT_OP));
+   BOOST_REQUIRE_EQUAL(success(), rcrdcommit_direct(
+      ATT_ID, UWRIT_OP, sol_chain, "SOLANA", "SOL", "PRIMARY", dst_uic));
    BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_CONFIRMED",
                        get_uwreq(ATT_ID)["status"].as_string());
    BOOST_REQUIRE_EQUAL(UWRIT_OP.to_string(), get_uwreq(ATT_ID)["winner"].as_string());
@@ -2945,14 +2911,13 @@ BOOST_FIXTURE_TEST_CASE(swap_signature_rejection_taxonomy_is_logged_and_non_thro
 } FC_LOG_AND_RETHROW() }
 
 // Strict protobuf canonicality rejects alternate host encodings before
-// signature recovery. The real cross-generator gate proves that an absent
-// nested address, a present default-valued nested address, and a zero top-level
-// scalar all decode but normalize differently in CDT zpp. Repeated unknown
-// field keys exercise the decoder's historical unknown-field behavior all the
-// way to the 2 KiB boundary: decoding succeeds, canonical re-encoding drops
-// the unknown keys, and the payload is rejected as non-canonical. None can
-// create candidate evidence. After one honest source leg is stored, valid
-// replays are write-once no-ops before signature work.
+// signature recovery. An absent nested address, a present default-valued nested
+// address, and a zero top-level scalar all decode but normalize differently.
+// Repeated unknown field keys exercise decoder behavior all the way to the 2
+// KiB boundary: decoding succeeds, canonical re-encoding drops the unknown
+// keys, and the payload is rejected as non-canonical. None can create
+// candidate evidence. After one honest source leg is stored, valid replays are
+// write-once no-ops before signature work.
 BOOST_FIXTURE_TEST_CASE(swap_noncanonical_uic_is_rejected_and_valid_leg_is_write_once,
                         sysio_dispatch_tester) { try {
    bootstrap_for_dispatch();
@@ -3253,11 +3218,6 @@ BOOST_FIXTURE_TEST_CASE(swap_key_rotation_disqualifies_older_stored_leg,
    // An identical, otherwise valid replay cannot re-arm a disqualified entry.
    BOOST_REQUIRE_EQUAL(success(), rcrdcommit_direct(
       ATT_ID, UWRIT_OP, sol, "SOLANA", "SOL", "PRIMARY", new_destination));
-   assert_disqualification_unchanged();
-
-   // `retrycommit` cannot re-arm stale evidence after key rotation either.
-   BOOST_REQUIRE_EQUAL(success(), retrycommit_direct(
-      ATT_ID, UWRIT_OP, replacement_key));
    assert_disqualification_unchanged();
 
    // Neither malformed nor unauthorized changed replacements can re-arm it.
@@ -4065,8 +4025,8 @@ BOOST_FIXTURE_TEST_CASE(swap_request_negative_source_is_reverted,
 
 // Balance 150 covers each single 100-leg but not the 200 aggregate. The valid
 // candidate remains PENDING after the failed capacity check; a top-up followed
-// by its depot-only retry settles from the stored UICs without outpost replay.
-BOOST_FIXTURE_TEST_CASE(swap_same_token_legs_overcommit_recovers_after_top_up,
+// by an exact external UIC replay settles from the stored UICs.
+BOOST_FIXTURE_TEST_CASE(swap_same_token_legs_overcommit_recovers_after_top_up_replay,
                         sysio_dispatch_tester) { try {
    bootstrap_for_dispatch();   // ETH chain + UWRIT_OP (EVM authex link)
    // Both reserves must be ACTIVE and priceable: the resolver computes the live
@@ -4117,12 +4077,13 @@ BOOST_FIXTURE_TEST_CASE(swap_same_token_legs_overcommit_recovers_after_top_up,
    BOOST_REQUIRE(found);
    BOOST_REQUIRE(get_lock(1).is_null());   // no locks written
 
-   // More collateral makes this already-proven candidate eligible. The bounded
-   // retry revalidates its stored signatures and writes the two locks.
+   // More collateral makes this already-proven candidate eligible. An exact
+   // replay revalidates both stored signatures and writes the two locks.
    BOOST_REQUIRE_EQUAL(success(),
       depositinle_credit(UWRIT_OP, "ETH", "ETH", 50));
    produce_block();
-   BOOST_REQUIRE_EQUAL(success(), retrycommit_direct(ATT_ID, UWRIT_OP));
+   BOOST_REQUIRE_EQUAL(success(), rcrdcommit_direct(
+      ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", src_uic));
 
    const auto confirmed = get_uwreq(ATT_ID);
    BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_CONFIRMED",
@@ -4211,10 +4172,80 @@ BOOST_FIXTURE_TEST_CASE(swap_race_time_reserve_drain_rejects_request,
    BOOST_REQUIRE(get_lock(1).is_null());
 } FC_LOG_AND_RETHROW() }
 
+// An exact external replay is a fresh outpost trigger. An adverse price move
+// discovered while re-evaluating the immutable UIC pair therefore rejects and
+// refunds this otherwise eligible request.
+BOOST_FIXTURE_TEST_CASE(swap_replayed_uic_variance_drift_rejects_request,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();   // registers ETH + UWRIT_OP (EVM link only)
+   BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT,
+      "regchain"_n, mvo()
+         ("kind",              ChainKind::CHAIN_KIND_SVM)
+         ("code",              codename_mvo("SOLANA"))
+         ("external_chain_id", 900)
+         ("name",              std::string("solana-test"))
+         ("description",       std::string{})));
+
+   const uint64_t eth       = fc::slug_name{"ETH"}.value;
+   const uint64_t sol_chain = fc::slug_name{"SOLANA"}.value;
+   const uint64_t sol_token = fc::slug_name{"SOL"}.value;
+   const uint64_t primary   = fc::slug_name{"PRIMARY"}.value;
+   constexpr uint64_t ATT_ID = 8006;
+   constexpr uint64_t AMOUNT = 1'000'000'000;
+
+   setup_wire_token_and_reserves();
+   BOOST_REQUIRE_EQUAL(success(), depositinle_credit(UWRIT_OP, "ETH", "ETH", AMOUNT));
+   BOOST_REQUIRE_EQUAL(success(), depositinle_credit(UWRIT_OP, "SOLANA", "SOL", AMOUNT));
+
+   const auto sr = encode_swap_request(
+      ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
+      eth, eth, primary, static_cast<int64_t>(AMOUNT),
+      sol_chain, sol_token, primary, AMOUNT,
+      /*tolerance_bps*/ 1'000'000, ChainKind::CHAIN_KIND_SVM,
+      std::vector<char>(32, '\x0b'));
+   BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, eth, sr));
+
+   // Leave the destination authex link absent while both UICs arrive. This
+   // deliberately parks a complete, authenticated candidate for external replay.
+   const auto src_uic = create_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
+   BOOST_REQUIRE_EQUAL(success(), rcrdcommit_direct(
+      ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY",
+      src_uic));
+   BOOST_REQUIRE_EQUAL(success(), rcrdcommit_direct(
+      ATT_ID, UWRIT_OP, sol_chain, "SOLANA", "SOL", "PRIMARY",
+      create_signed_uic(UWRIT_OP, ATT_ID, sol_chain, sol_token, primary)));
+   BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_PENDING",
+                       get_uwreq(ATT_ID)["status"].as_string());
+
+   constexpr uint64_t SEEDED_RESERVE = 1'000'000'000'000ull;
+   BOOST_REQUIRE_EQUAL(success(), debit_reserve_chain(
+      "SOLANA", "SOL", "PRIMARY", SEEDED_RESERVE - (AMOUNT - 1)));
+
+   const auto solana_link_key = fc::crypto::private_key::generate(
+      fc::crypto::private_key::key_type::ed).get_public_key();
+   BOOST_REQUIRE_EQUAL(success(), push(
+      AUTHEX_ACCOUNT, authex_abi, AUTHEX_ACCOUNT, "recordlink"_n, mvo()
+         ("account", UWRIT_OP)
+         ("chain_kind", ChainKind::CHAIN_KIND_SVM)
+         ("pub_key", solana_link_key)));
+   produce_block();
+
+   BOOST_REQUIRE_EQUAL(success(), rcrdcommit_direct(
+      ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", src_uic));
+   const auto req = get_uwreq(ATT_ID);
+   BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_REJECTED", req["status"].as_string());
+   const auto candidate = req["commits_by"].get_array().front();
+   BOOST_REQUIRE_EQUAL("UNDERWRITE_STATUS_RELEASED",
+                       candidate["status"].as_string());
+   BOOST_REQUIRE(candidate["source_uic_bytes"].as_string().empty());
+   BOOST_REQUIRE(candidate["dest_uic_bytes"].as_string().empty());
+   BOOST_REQUIRE(get_lock(1).is_null());
+} FC_LOG_AND_RETHROW() }
+
 // createuwreq admits missing/inactive reserves for dev and smoke clusters. A
 // complete candidate must keep the request PENDING while the reserve route is
-// provisioned, then settle through its bounded depot-only retry.
-BOOST_FIXTURE_TEST_CASE(swap_missing_reserve_complete_candidate_recovers_after_provisioning,
+// provisioned, then settle after an exact external UIC replay.
+BOOST_FIXTURE_TEST_CASE(swap_missing_reserve_complete_candidate_recovers_after_provisioning_replay,
                         sysio_dispatch_tester) { try {
    bootstrap_for_dispatch();
 
@@ -4239,9 +4270,10 @@ BOOST_FIXTURE_TEST_CASE(swap_missing_reserve_complete_candidate_recovers_after_p
    BOOST_REQUIRE_EQUAL(success(), rcrdcommit_direct(
       ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY",
       create_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary)));
+   const auto dst_uic = create_signed_uic(UWRIT_OP, ATT_ID, eth, eth, secondary);
    BOOST_REQUIRE_EQUAL(success(), rcrdcommit_direct(
       ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "SECOND",
-      create_signed_uic(UWRIT_OP, ATT_ID, eth, eth, secondary)));
+      dst_uic));
 
    const auto req = get_uwreq(ATT_ID);
    BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_PENDING",
@@ -4253,12 +4285,14 @@ BOOST_FIXTURE_TEST_CASE(swap_missing_reserve_complete_candidate_recovers_after_p
    BOOST_REQUIRE(!candidate["dest_uic_bytes"].as_string().empty());
    BOOST_REQUIRE(get_lock(1).is_null());
 
-   // A third party cannot spend the candidate's bounded retry opportunity.
-   BOOST_REQUIRE(retrycommit_direct(ATT_ID, UWRIT_OP, MSGCH_ACCOUNT) != success());
-
    setup_wire_token_and_reserves();
    BOOST_REQUIRE_EQUAL(success(), regreserve_active("ETH", "ETH", "SECOND"));
-   BOOST_REQUIRE_EQUAL(success(), retrycommit_direct(ATT_ID, UWRIT_OP));
+   // The replay has identical action data by design. Advance the test chain so
+   // its enclosing transaction is a new relay submission rather than the
+   // duplicate transaction ID of the original delivery.
+   produce_block();
+   BOOST_REQUIRE_EQUAL(success(), rcrdcommit_direct(
+      ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "SECOND", dst_uic));
    BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_CONFIRMED",
                        get_uwreq(ATT_ID)["status"].as_string());
    BOOST_REQUIRE(!get_lock(1).is_null());

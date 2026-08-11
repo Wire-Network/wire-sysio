@@ -45,6 +45,7 @@
 #include <set>
 #include <string_view>
 #include <tuple>
+#include <unordered_map>
 #include <unordered_set>
 
 namespace sysio {
@@ -68,7 +69,6 @@ namespace {
 
 /// Ethereum JSON-RPC method used to inspect the finalized source-chain head.
 constexpr std::string_view ETH_GET_BLOCK_BY_NUMBER_METHOD = "eth_getBlockByNumber";
-
 /// `sysio.uwrit` ABI identifiers used by the daemon. Keeping the contract,
 /// action, table, and row-field spellings together makes host/contract schema
 /// drift visible in one place.
@@ -76,12 +76,6 @@ namespace uwrit {
 constexpr auto account              = "sysio.uwrit";
 constexpr auto table_locks          = "locks";
 constexpr auto table_requests       = "uwreqs";
-constexpr auto action_retry_commit  = "retrycommit";
-
-namespace retry_field {
-constexpr auto request_id  = "uwreq_id";
-constexpr auto underwriter = "underwriter";
-}
 
 namespace lock_field {
 constexpr auto underwriter = "underwriter";
@@ -1130,8 +1124,8 @@ struct underwriter_plugin::impl {
       ilog("underwriter: found {} pending underwrite requests", requests.size());
 
       // A durable terminal candidate must not consume fresh-cover selection.
-      // A complete stored candidate instead gets a bounded depot retry below,
-      // after reserving its potential winner-time collateral.
+      // A complete stored candidate is reserved below while it awaits its
+      // explicit external replay trigger.
       const auto skipped_candidates = std::erase_if(
          requests, [](const uw_request& r) {
             return r.own_stored_commit_plan.skip_candidate;
@@ -1152,19 +1146,7 @@ struct underwriter_plugin::impl {
          remaining_credit[bucket_key{cl.chain_code, cl.token_code}] = cl.balance;
       }
       size_t outstanding_no_work = 0;
-      size_t retried_on_depot = 0;
       std::erase_if(requests, [&](const uw_request& r) {
-         if (r.own_stored_commit_plan.retry_depot) {
-            // The UIC pair is already stored, but its eventual locks have not
-            // been created. Reserve it before retrying so this scan cannot
-            // select new paid work that would knowingly overcommit the same
-            // collateral bucket while the retry is settling.
-            underwriter_detail::reserve_buckets(
-               remaining_credit, src_bond(r), dst_bond(r));
-            push_depot_retry(r.id);
-            ++retried_on_depot;
-            return true;
-         }
          const bool source_confirmed = confirmed_commits.contains(
             commit_key{r.id, r.src_chain_code.value, r.src_token_code.value,
                        r.src_reserve_code.value});
@@ -1185,10 +1167,6 @@ struct underwriter_plugin::impl {
       if (outstanding_no_work != 0) {
          ilog("underwriter: reserved collateral for {} locally complete "
               "candidate(s) awaiting depot observation", outstanding_no_work);
-      }
-      if (retried_on_depot != 0) {
-         ilog("underwriter: reserved collateral and retried {} complete stored "
-              "candidate(s) on the depot", retried_on_depot);
       }
 
       if (requests.empty()) {
@@ -1270,33 +1248,6 @@ struct underwriter_plugin::impl {
    /// CHAIN_KIND_UNKNOWN (which also matches unregistered chains).
    bool is_depot_leg(fc::slug_name code) const {
       return depot_chain_code && code.value == *depot_chain_code;
-   }
-
-   /// Push one signed WIRE action that re-evaluates this daemon's complete
-   /// stored candidate. No UIC bytes cross this surface: the contract reads its
-   /// bounded evidence, revalidates it, and either settles or leaves the row
-   /// PENDING for a later scan.
-   void push_depot_retry(uint64_t uw_request_id) {
-      const auto& provider = uic_signature_provider;
-      const fc::variant_object action_data = fc::mutable_variant_object()
-         (uwrit::retry_field::request_id, uw_request_id)
-         (uwrit::retry_field::underwriter, underwriter_account.to_string());
-      const auto result = chain_plug->push_signed_action(
-         chain::name{uwrit::account}, chain::name{uwrit::action_retry_commit},
-         underwriter_account, action_data, provider,
-         fc::milliseconds(action_timeout_ms), shutting_down);
-
-      if (result.succeeded()) {
-         ilog("underwriter: depot retrycommit landed for uwreq {}", uw_request_id);
-      } else if (result.state == signed_action_result::status::shutting_down) {
-         return;
-      } else if (result.state == signed_action_result::status::timed_out) {
-         elog("underwriter: depot retrycommit timed out for uwreq {} — {}",
-              uw_request_id, result.error);
-      } else {
-         elog("underwriter: depot retrycommit failed for uwreq {} — {}",
-              uw_request_id, result.error);
-      }
    }
 
    // -----------------------------------------------------------------------
@@ -2667,8 +2618,8 @@ struct underwriter_plugin::impl {
 
    // Paid outpost commit submissions use the outpost_client SPI. Terminal
    // candidates are suppressed by the authoritative depot-row plan; complete
-   // candidates instead submit `retrycommit` on WIRE without replaying their
-   // paid outpost UICs.
+   // candidates await an external exact-UIC replay rather than resubmitting
+   // paid outpost work automatically.
 
    // ── HTTP API: /v1/underwriter/* ─────────────────────────────────────
    // Read-only diagnostic surface for the operator. Wraps internal state

@@ -5,8 +5,9 @@ swaps, derives each candidate's authoritative stored-evidence state, and
 submits signed `UnderwriteIntentCommit` records only for missing outpost legs.
 Before submitting, it budgets the candidate's full eventual depot collateral
 requirement, including stored or locally confirmed legs whose locks do not yet
-exist. A complete depot candidate has already received its one authoritative
-winner-selection attempt and is never replayed.
+exist. A complete depot candidate never automatically replays a paid outpost
+commit; it remains reserved while the request awaits an external exact-UIC
+replay.
 
 The underwriter is a **separate daemon** from the batch operator. It does
 not relay OPP envelopes — that is the batch operator's job. The
@@ -79,14 +80,13 @@ Every `--underwriter-scan-interval-ms` (default 5 s):
    `sysio.uwrit::uwreqs` KV table, filter to `PENDING` rows, and derive this
    underwriter's absent, partial, complete, or terminal candidate state
    from the authoritative `commits_by` row.
-5. Remove complete and terminal candidates before cover selection. Complete
-   evidence means the depot already made the candidate's one authoritative
-   decision; replaying either paid outpost transaction cannot change it.
-6. For any candidate whose remaining legs are all stored or locally confirmed,
-   reserve its full eventual bond from the provisional snapshot while OPP
-   catches up, then remove it from submission work. Saturating reservation
-   prevents a concurrent shortfall from exposing leftover capacity to a new
-   paid commit.
+5. Remove terminal candidates before cover selection. For a complete stored
+   candidate, reserve its full eventual bond while it awaits an external exact
+   UIC replay; do not automatically replay either paid outpost transaction.
+6. For candidates whose remaining legs are only locally confirmed, reserve the
+   full eventual bond while OPP catches up, then remove them from submission
+   work. Saturating reservation prevents a concurrent shortfall from exposing
+   leftover capacity to a new paid commit.
 7. For remaining absent/partial candidates, run the bounded branch-and-bound
    selector (with its value-sorted fallback) over every eventual non-depot
    lock, including a leg whose UIC is already stored or locally confirmed. The
@@ -97,10 +97,10 @@ Every `--underwriter-scan-interval-ms` (default 5 s):
    atomically, creates locks on success, and otherwise disqualifies only that
    candidate while the request remains PENDING for another underwriter.
 
-Reserve liquidity is request-global rather than candidate-specific. If the
-winning attempt finds that the required reserve settlement cannot execute, the
-contract rejects and refunds the request instead of retaining a complete row
-with no retry or wake-up path.
+Fresh outpost evidence, including an exact replay of a stored UIC, can make
+request-level terminal decisions such as a variance rejection. If the route,
+quote, or liquidity is still unsuitable, the row remains PENDING for another
+external replay or for expiry pruning.
 
 ### Commit submission (`create_signed_uic_bytes`)
 
@@ -110,7 +110,7 @@ For each leg of every selected uwreq:
    `uw_request_id`, `chain_code`, and a blank `signature`. Populate
    `uw_ext_chain_addr` from the same concrete outpost client's authenticated
    transaction signer (20-byte EVM address or 32-byte Solana public key), so
-   every production field has one cross-generator representation.
+   every production field has one unambiguous serialized representation.
 2. Serialize the proto, compute `sha256(blanked_bytes)` — the digest.
 3. Sign with the permission-authorized provider selected and cached during
    startup preflight. Runtime signing never re-queries or switches providers;

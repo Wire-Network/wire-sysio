@@ -811,7 +811,7 @@ BOOST_AUTO_TEST_CASE(uic_provider_selection_preserves_two_explicit_ambiguity) tr
    BOOST_REQUIRE_EQUAL(2u, selected.size());
 } FC_LOG_AND_RETHROW();
 
-BOOST_AUTO_TEST_CASE(stored_commit_plan_retries_complete_candidate_on_depot_after_restart) try {
+BOOST_AUTO_TEST_CASE(stored_commit_plan_leaves_complete_candidate_for_external_replay) try {
    const auto plan = sysio::underwriter_detail::plan_stored_commits(
       /*candidate_exists=*/true,
       /*intent_submitted=*/true,
@@ -819,10 +819,12 @@ BOOST_AUTO_TEST_CASE(stored_commit_plan_retries_complete_candidate_on_depot_afte
       /*destination_is_depot=*/false,
       /*source_uic_stored=*/true,
       /*destination_uic_stored=*/true);
-   BOOST_CHECK(plan.retry_depot);
    BOOST_CHECK(!plan.skip_candidate);
    BOOST_CHECK(!plan.submit_source);
    BOOST_CHECK(!plan.submit_destination);
+   BOOST_CHECK(!sysio::underwriter_detail::has_submission_work(
+      plan, /*source_confirmed_locally=*/false,
+      /*destination_confirmed_locally=*/false));
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(stored_commit_plan_submits_only_missing_outpost_leg) try {
@@ -841,10 +843,12 @@ BOOST_AUTO_TEST_CASE(stored_commit_plan_submits_only_missing_outpost_leg) try {
 BOOST_AUTO_TEST_CASE(stored_commit_plan_handles_single_outpost_candidate) try {
    const auto ready = sysio::underwriter_detail::plan_stored_commits(
       true, true, false, true, true, false);
-   BOOST_CHECK(ready.retry_depot);
    BOOST_CHECK(!ready.skip_candidate);
    BOOST_CHECK(!ready.submit_source);
    BOOST_CHECK(!ready.submit_destination);
+   BOOST_CHECK(!sysio::underwriter_detail::has_submission_work(
+      ready, /*source_confirmed_locally=*/false,
+      /*destination_confirmed_locally=*/false));
 
    const auto missing = sysio::underwriter_detail::plan_stored_commits(
       true, true, false, true, false, false);
@@ -875,59 +879,6 @@ BOOST_AUTO_TEST_CASE(stored_commit_plan_skips_disqualified_candidate_after_resta
    BOOST_CHECK(!absent.skip_candidate);
    BOOST_CHECK(absent.submit_source);
    BOOST_CHECK(absent.submit_destination);
-} FC_LOG_AND_RETHROW();
-
-// The preflight cases below are placeholders: exercising the live
-// preflight requires standing up a chain_plugin + chain controller +
-// authex/opreg/epoch contracts in a tester fixture. The integration
-// flow tests cover those paths end-to-end; this unit-test file is the
-// option-surface guard.
-BOOST_AUTO_TEST_CASE(preflight_fails_on_missing_authex_link) try {
-   // Documented in test plan as needing the cluster harness; this stub
-   // keeps the test name on the books so future scaffolding lands here.
-   // Integration coverage: flow-underwriter-race (deferred).
-   BOOST_CHECK(true);
-} FC_LOG_AND_RETHROW();
-
-BOOST_AUTO_TEST_CASE(preflight_allows_late_collateral_without_global_runtime_gate) try {
-   // Stub — see preflight_fails_on_missing_authex_link comment. Request-level
-   // bucket admission is exercised by the underwriter race integration flow.
-   BOOST_CHECK(true);
-} FC_LOG_AND_RETHROW();
-
-BOOST_AUTO_TEST_CASE(scan_waits_for_active_status_after_preflight) try {
-   // Stub — see preflight_fails_on_missing_authex_link comment. The live
-   // status transition is covered by the cluster harness.
-   BOOST_CHECK(true);
-} FC_LOG_AND_RETHROW();
-
-// ── B5: knapsack fallback above MAX_CANDIDATES ─────────────────────────
-//
-// The branch-and-bound selector lives in the `impl` private struct and
-// isn't reachable from this test binary (no public accessor). The
-// fallback is exercised at integration time; we sanity-check here that
-// the constant is well-defined (compile-time) by referencing it. The
-// real coverage lives in flow tests.
-BOOST_AUTO_TEST_CASE(knapsack_fallback_threshold_is_documented) try {
-   // Documentation marker — see underwriter_plugin.cpp::MAX_CANDIDATES.
-   // The threshold is 64; raising it without a fallback test would be a
-   // regression to surface in a future PR's review.
-   BOOST_CHECK(true);
-} FC_LOG_AND_RETHROW();
-
-// ── B3: HTTP diagnostic endpoint plumbing ──────────────────────────────
-//
-// /v1/underwriter/stats + /v1/underwriter/commits register via
-// http_plugin during plugin_startup — UNCONDITIONALLY, before the sync
-// gate, because http_plugin's handler map is read lock-free once the
-// listener goes live. Until the deferred startup body completes the
-// handlers answer with the gate state (covered as the pure
-// `startup_gate_payload` cases in test_underwriter_sync.cpp).
-// Constructing http_plugin in isolation from chain_plugin requires the
-// appbase wiring. Stub here; integration coverage via curl in the flow
-// tests.
-BOOST_AUTO_TEST_CASE(http_endpoints_registered_at_startup) try {
-   BOOST_CHECK(true);
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(solana_source_deposit_scan_state_advances_across_pages) try {

@@ -28,8 +28,6 @@
 #include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
 
 #include <atomic>
-#include <future>
-#include <memory>
 #include <string_view>
 
 namespace fc { class variant; }
@@ -653,36 +651,6 @@ public:
 
 } // namespace chain_apis
 
-/// Outcome of synchronously preparing, signing, and submitting one action.
-/// The helper keeps controller/chainbase reads inside an executor read window;
-/// callers may safely invoke it from cron workers.
-struct signed_action_result {
-   enum class status {
-      succeeded,
-      rejected,
-      timed_out,
-      shutting_down,
-   } state = status::rejected;
-
-   std::string error;
-
-   [[nodiscard]] bool succeeded() const {
-      return state == status::succeeded;
-   }
-};
-
-namespace signed_action_detail {
-
-/// Build the completion callback for a plugin-originated transaction while
-/// retaining the temporary read/write API until asynchronous processing ends.
-chain::plugin_interface::next_function<
-   chain_apis::read_write::push_transaction_results>
-create_signed_action_submission_callback(
-   std::shared_ptr<chain_apis::read_write> read_write_api,
-   std::shared_ptr<std::promise<signed_action_result>> promise);
-
-} // namespace signed_action_detail
-
 class chain_plugin : public plugin<chain_plugin> {
 public:
    APPBASE_PLUGIN_REQUIRES((signature_provider_manager_plugin))
@@ -726,20 +694,6 @@ public:
    bool provider_can_authorize_active_alone(
       chain::name actor,
       const fc::crypto::public_key& provider_key) const;
-
-   /// Build a one-action transaction during a controller read window, verify
-   /// that the selected provider can satisfy the actor's active permission by
-   /// itself, then sign and submit through controller-safe executor handling.
-   /// The provider is supplied by the caller so plugin-specific selection
-   /// semantics are preserved.
-   signed_action_result
-   push_signed_action(chain::name contract,
-                      chain::name action,
-                      chain::name actor,
-                      const fc::variant_object& data,
-                      const fc::crypto::signature_provider_ptr& provider,
-                      fc::microseconds timeout,
-                      const std::atomic<bool>& shutdown_flag);
 
    void accept_transaction(const chain::packed_transaction_ptr& trx, chain::plugin_interface::next_function<chain::transaction_trace_ptr> next);
 

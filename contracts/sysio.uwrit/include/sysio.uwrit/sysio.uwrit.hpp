@@ -275,8 +275,10 @@ namespace sysio {
       /// claimed underwriter's fixed-size recoverable signature before
       /// changing candidate evidence. Invalid claims are logged and ignored:
       /// they cannot replace stored bytes, change status/reason, or refresh
-      /// arrival timestamps. A valid replay of an already-recorded leg is
-      /// also ignored before signature work: candidate legs are write-once.
+      /// arrival timestamps. A valid replay of an already-recorded leg never
+      /// replaces the stored bytes: candidate legs are write-once. Once both
+      /// legs are stored, an exact replay revalidates the preserved evidence
+      /// and retries winner selection against current mutable depot state.
       /// When both legs
       /// land for the same underwriter, runs `try_select_winner` to resolve the
       /// race. For a dual-outpost request it revalidates only the older stored
@@ -284,8 +286,8 @@ namespace sysio {
       /// stale evidence; the just-verified incoming leg is not recovered twice.
       /// A complete candidate is evaluated immediately. Recoverable conditions
       /// (temporarily unavailable collateral, identity links, or reserves) keep
-      /// its evidence on the PENDING row and are re-evaluated by
-      /// `retrycommit`; malformed or no-longer-authorized stored evidence is
+      /// its evidence on the PENDING row until an outpost replays one of the
+      /// exact stored UICs; malformed or no-longer-authorized stored evidence is
       /// durably disqualified. Replayed UIC bytes never replace stored legs.
       ///
       /// `(from_chain_code, from_token_code, reserve_code)` together identify
@@ -304,16 +306,6 @@ namespace sysio {
                       sysio::slug_name from_token_code,
                       sysio::slug_name reserve_code,
                       std::vector<char> uic_bytes);
-
-      /// Re-evaluate one complete candidate using its already-stored UIC
-      /// evidence. The candidate authorizes this bounded depot-only retry, so
-      /// a transient candidate-local or reserve condition can recover without
-      /// replaying paid outpost commits. Unknown, incomplete, durably
-      /// disqualified, and resolved requests are idempotent no-ops; a live
-      /// retry revalidates every required stored signature against current
-      /// permissions before attempting winner selection.
-      [[sysio::action]]
-      void retrycommit(uint64_t uwreq_id, name underwriter);
 
       /// Sweep all `locks` rows whose `expires_at_ms` has elapsed. Inlined
       /// from `sysio.epoch::advance` (as one of its FIRST steps — freshly
@@ -535,8 +527,8 @@ namespace sysio {
          /// INTENT_CONFIRMED (winner), DISQUALIFIED (durably invalid stored
          /// evidence, such as a signature invalidated by key rotation), or
          /// RELEASED (clean loser, retained for audit). A new matching
-         /// `rcrdcommit` cannot rewrite or re-arm a DISQUALIFIED entry;
-         /// `retrycommit` can re-evaluate only an INTENT_SUBMITTED entry. The
+         /// `rcrdcommit` cannot rewrite or re-arm a DISQUALIFIED entry. An
+         /// exact replay can re-evaluate only an INTENT_SUBMITTED entry. The
          /// reused protobuf enum also contains SLASHED, but commit entries
          /// never write that value; economic slash state belongs to lock and
          /// operator settlement.
