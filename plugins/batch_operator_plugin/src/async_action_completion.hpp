@@ -46,7 +46,8 @@ public:
    /// before completing the waiter. The result is consumed synchronously, so
    /// only the handlers need ownership that survives the asynchronous callback.
    template <typename SuccessHandler, typename FailureHandler>
-   bool complete_push_result(const chain::next_function_variant<chain_apis::read_write::push_transaction_results>& result,
+   bool complete_push_result(
+      const chain::next_function_variant<chain_apis::read_write::push_transaction_results>& result,
                              SuccessHandler&& on_success,
                              FailureHandler&& on_failure) {
       return complete([&result, &on_success, &on_failure] {
@@ -55,8 +56,8 @@ public:
          } else if (std::holds_alternative<chain_apis::read_write::push_transaction_results>(result)) {
             on_success();
          } else {
-            const auto& deferred =
-               std::get<std::function<chain::t_or_exception<chain_apis::read_write::push_transaction_results>()>>(result);
+            const auto& deferred = std::get<std::function<
+               chain::t_or_exception<chain_apis::read_write::push_transaction_results>()>>(result);
             const auto deferred_result = deferred();
             if (const auto* error = std::get_if<fc::exception_ptr>(&deferred_result)) {
                on_failure(*error);

@@ -123,12 +123,13 @@ BOOST_AUTO_TEST_CASE(async_action_completion_handles_deferred_push_result) {
    bool deferred_called = false;
    bool success_logged = false;
    bool failure_logged = false;
-   push_result deferred_result{std::function<sysio::chain::t_or_exception<sysio::chain_apis::read_write::push_transaction_results>()>{
-      [&deferred_called] {
-         deferred_called = true;
-         return sysio::chain::t_or_exception<sysio::chain_apis::read_write::push_transaction_results>{
-            sysio::chain_apis::read_write::push_transaction_results{}};
-      }}};
+   push_result deferred_result{
+      std::function<sysio::chain::t_or_exception<sysio::chain_apis::read_write::push_transaction_results>()>{
+         [&deferred_called] {
+            deferred_called = true;
+            return sysio::chain::t_or_exception<sysio::chain_apis::read_write::push_transaction_results>{
+               sysio::chain_apis::read_write::push_transaction_results{}};
+         }}};
 
    BOOST_CHECK(completion.complete_push_result(
       deferred_result,
