@@ -54,7 +54,7 @@ constexpr sysio::name CAPEX_OPERATIONS_ACCOUNT   = "sysio.ops"_n;
 constexpr sysio::name TOKEN_CONTRACT             = "sysio.token"_n;
 constexpr sysio::name ROA_CONTRACT               = "sysio.roa"_n;
 // sysio.reserv holds the swap-fee rewards bucket that payepoch folds into the
-// per-epoch compute distribution.
+// per-epoch batch-operator distribution.
 constexpr sysio::name RESERV_CONTRACT            = "sysio.reserv"_n;
 
 namespace memo {
@@ -546,11 +546,18 @@ void system_contract::accrueepoch(uint32_t epoch_index,
 // dclaim has funds the moment a claim is credited rather than at the next
 // pay-epoch.
 //
-// Swap-fee rewards: the rewards half of collected swap fees (sysio.reserv's
-// rewards_bucket) is swept here via an inline drainrewards and folded into the
-// compute distribution -- producers + batch operators receive it alongside
-// emissions, split by the same producer_bps / batch_op_bps. Fees are funded by
-// the sweep (not the treasury) and so are excluded from total_distributed.
+// Swap-fee rewards: the batch-operator share of collected swap fees
+// (sysio.reserv's rewards_bucket) is swept here via an inline drainrewards and
+// allocated EXCLUSIVELY to the batch-operator distribution, on top of their
+// emission share and weighted by the same per-group active-epoch count.
+// Producers are NOT paid out of swap fees, so producer_bps / batch_op_bps govern
+// the emission split only -- see the fold-in comment at the drain. Allocated is
+// not paid: only ELIGIBLE shares go out, and whatever is skipped stays in this
+// treasury, exactly as undistributed emission does. What is actually skipped is
+// listed at the batch-op loop below -- note a zero-epoch group is NOT one of
+// them, since its weighted allocation is zero to begin with.
+// Fees are funded by the sweep
+// (not the treasury) and so are excluded from total_distributed.
 //
 // Single-trx semantics guarantee gate conditions hold through this call;
 // payepoch trusts the gate-computed period_emission and does not recompute.
@@ -594,12 +601,43 @@ void system_contract::payepoch(uint32_t epoch_index,
    const int64_t producer_pool = split_bps(compute_amount, cfg.producer_bps);
    const int64_t batch_pool    = compute_amount - producer_pool;
 
+   // ----- The period's ACTUAL length, in accrued epochs -----
+   // BOTH distributions below normalize by this, and NEITHER may use
+   // cfg.pay_cadence_epochs for it. accrueepoch increments one batch_group_epochs
+   // slot per epoch unconditionally, while setemitcfg may change
+   // pay_cadence_epochs at any time (taking effect on the next advance), so the
+   // configured cadence and the epochs this period actually spans can disagree --
+   // lowering 3->1 after one accrual leaves the counters summing to 2 against a
+   // configured 1. Deriving the divisor from the counters themselves keeps both
+   // normalizations correct whatever the config did mid-period.
+   //
+   // Sum in int64: each counter is a uint32 epoch tally and the vector is sized
+   // from batch_op_groups, so the total cannot approach the int64 range. Zero is
+   // impossible in practice (payepoch asserts accrueepoch ran for this same
+   // epoch_index, and accrueepoch always increments a slot) but is guarded at
+   // each use, because a zero divisor would abort the whole advance chain.
+   int64_t accrued_epochs = 0;
+   for (const uint32_t group_epoch_count : state.batch_group_epochs) {
+      accrued_epochs += group_epoch_count;
+   }
+
    // ----- Swap-fee rewards fold-in -----
-   // The rewards half of collected swap fees accrues in sysio.reserv's
-   // rewards_bucket (the other half already went to this treasury at swap
-   // time). Fold the whole bucket into THIS period's compute distribution so
-   // producers + batch operators receive it alongside emissions, split by the
-   // SAME producer_bps / batch_op_bps and weighted identically.
+   // The BATCH-OPERATOR half of collected swap fees accrues in sysio.reserv's
+   // rewards_bucket. The other half accrues per-underwriter in sysio.reserv and
+   // is drawn by that account's own `claimuwfee` — it never passes through this
+   // treasury. (When reserv's `fee_emissions_share_bps` dial is non-zero, that
+   // configured share of the batch-op half is transferred straight to this
+   // account at collection time and never enters the bucket; the dial defaults
+   // to zero, leaving the whole half here.) Fold the whole bucket into THIS
+   // period's batch-operator distribution so batch ops receive it alongside
+   // emissions, weighted identically by active-epoch count.
+   //
+   // Producers are NOT paid out of swap fees: the fee compensates the parties
+   // that carry an individual swap — the underwriter who locks collateral for it
+   // and the batch operators who relay it — while producers earn emissions for
+   // securing the chain. So `producer_bps` / `batch_op_bps` govern the emission
+   // `compute_amount` split only, and the entire drained fee pool goes to the
+   // batch-op distribution below.
    //
    // The fee WIRE lives in sysio.reserv's custody, so it must be swept here
    // before the payouts below can spend it. drainrewards is queued FIRST (ahead
@@ -610,9 +648,11 @@ void system_contract::payepoch(uint32_t epoch_index,
    //
    // Fees are funded by that transfer, NOT the T5 treasury, so fee payouts are
    // tracked in `fee_paid` and excluded from total_distributed (which governs
-   // the emission curve). Any fee not distributed (producer round-scaling,
-   // skipped slashed/terminated recipients, integer-division remainders) stays
-   // in this treasury, exactly as undistributed emission does.
+   // the emission curve). Any fee not distributed stays in this treasury, exactly
+   // as undistributed emission does — see the batch-op loop for what is actually
+   // retained (an EMPTY group holding positive epochs, non-ACTIVE members, the
+   // two integer divisions' remainders, or no groups at all). A group active in
+   // zero epochs retains NOTHING: its weighted allocation is already zero.
    const int64_t fee_total = get_reserv_rewards_balance();
    if (fee_total > 0) {
       sysio::action(
@@ -622,8 +662,7 @@ void system_contract::payepoch(uint32_t epoch_index,
          std::make_tuple(fee_total)
       ).send();
    }
-   const int64_t fee_producer_pool = split_bps(fee_total, cfg.producer_bps);
-   const int64_t fee_batch_pool    = fee_total - fee_producer_pool;
+   const int64_t fee_batch_pool = fee_total;
 
    int64_t actual_paid = 0; // emission actually transferred (counts toward total_distributed)
    int64_t fee_paid    = 0; // swap-fee rewards actually transferred (does NOT count toward treasury)
@@ -641,16 +680,24 @@ void system_contract::payepoch(uint32_t epoch_index,
       auto prod_by_rank = _producers.get_index<"prodrank"_n>();
 
       // expected_rounds is derived from the configured epoch duration on
-      // sysio.epoch (canonical source of truth) scaled by pay_cadence_epochs
-      // because elig_rounds accumulates across all epochs in the period.
+      // sysio.epoch (canonical source of truth) scaled by the period's ACTUAL
+      // accrued epoch count, because elig_rounds accumulates across exactly those
+      // epochs. It must NOT scale by cfg.pay_cadence_epochs: a mid-period cadence
+      // change makes the two disagree (see accrued_epochs above), and the
+      // mismatch silently distorts every producer's pay share -- too small a
+      // denominator lets everyone hit the clamp and collect their full share, too
+      // large a one forfeits pay that was earned. Unlike the batch-op pool this
+      // cannot overpay past producer_pool (the clamp bounds each share by
+      // emis_share), so it skews proportions rather than the total.
       const uint32_t epoch_duration_sec = get_epoch_duration_sec();
-      // Compute in uint64: epoch_duration_sec (<= 30 days) * pay_cadence_epochs
-      // (<= uint16 max) * 2 overflows uint32 at the extremes, and a wrapped
+      // Compute in uint64: epoch_duration_sec (<= 30 days) * the accrued epoch
+      // count * 2 overflows uint32 at the extremes, and a wrapped
       // denominator would silently distort every producer's pay share. uint64
       // holds the full product with room to spare; the result is a small round
       // count that fits back into uint64 for the divide below.
       uint64_t expected_rounds =
-         (static_cast<uint64_t>(epoch_duration_sec) * cfg.pay_cadence_epochs * 2) / TOTAL_BLOCKS_PER_ROUND;
+         (static_cast<uint64_t>(epoch_duration_sec)
+          * static_cast<uint64_t>(accrued_epochs > 0 ? accrued_epochs : 1) * 2) / TOTAL_BLOCKS_PER_ROUND;
       // Below ~126s of effective period duration (one full 21-producer round
       // at 0.5s/block), expected_rounds truncates to zero. Falling back to 1
       // keeps the pay formula well-defined -- producer pay collapses to
@@ -708,39 +755,29 @@ void system_contract::payepoch(uint32_t epoch_index,
          }
       }
 
-      int64_t distributed_to_producers = 0; // emission portion
-      int64_t fee_to_producers         = 0; // swap-fee portion
+      // Producers are paid the emission share only — swap fees go to the
+      // underwriter + batch operators (see the fold-in comment above).
+      int64_t distributed_to_producers = 0;
       if (total_weight > 0) {
          for (const auto& pe : eligible) {
-            // Emission and fee shares use the same weight and the same
-            // round-scaling, so a producer's fee tracks its emission reward.
             const int64_t emis_share = static_cast<int64_t>(
                static_cast<__int128>(producer_pool) * pe.weight / total_weight);
-            const int64_t fee_share = static_cast<int64_t>(
-               static_cast<__int128>(fee_producer_pool) * pe.weight / total_weight);
-            int64_t emis_pay, fee_pay;
+            int64_t pay;
             if (pe.is_standby) {
-               emis_pay = emis_share;
-               fee_pay  = fee_share;
+               pay = emis_share;
             } else {
                uint64_t r = (pe.elig_rounds > expected_rounds) ? expected_rounds : pe.elig_rounds;
-               emis_pay = static_cast<int64_t>(
+               pay = static_cast<int64_t>(
                   static_cast<__int128>(emis_share) * r / expected_rounds);
-               fee_pay = static_cast<int64_t>(
-                  static_cast<__int128>(fee_share) * r / expected_rounds);
             }
-            const int64_t pay = emis_pay + fee_pay;
             if (pay > 0) {
-               // One transfer carries both the emission and the fee share.
                send_wire_transfer(get_self(), pe.owner, pay, memo::producer_reward);
-               distributed_to_producers += emis_pay;
-               fee_to_producers         += fee_pay;
+               distributed_to_producers += pay;
             }
          }
       }
 
       actual_paid += distributed_to_producers;
-      fee_paid    += fee_to_producers;
 
       // Reset round-tracking after distribution (iteration-safe: uses PK snapshot).
       for (const auto& owner : to_reset) {
@@ -759,13 +796,32 @@ void system_contract::payepoch(uint32_t epoch_index,
    // Batch-op pay. With pay_cadence_epochs > 1 the active group can rotate
    // multiple times across a period, so each group's slice is weighted by
    // its active-epoch count (state.batch_group_epochs[g]) over the period.
-   // sum(batch_group_epochs) == pay_cadence_epochs by construction. Groups
-   // that were active in zero epochs are skipped (only possible when
-   // pay_cadence < batch_op_groups.size()); their slice stays in treasury.
-   // Members not registered as ACTIVE in sysio.opreg (slashed / terminated /
-   // unknown) are skipped and their slice remains in the treasury.
+   //
+   // The divisor is the ACTUAL accrued epoch count -- the sum of those counters
+   // -- NOT cfg.pay_cadence_epochs. The two can disagree: accrueepoch increments
+   // one slot per epoch unconditionally, while setemitcfg may change
+   // pay_cadence_epochs at any time, taking effect on the next advance. Lowering
+   // cadence 3->1 after one accrual leaves the counters summing to 2 against a
+   // divisor of 1, which pays 2x batch_pool AND 2x fee_batch_pool -- the surplus
+   // fee drawn from this treasury even though only one fee pool was swept from
+   // sysio.reserv, and invisible to total_distributed because fee payouts are
+   // excluded from it. A shortened genesis period underpays by the inverse.
+   // Summing the counters makes the per-group weights partition the pool by
+   // construction, whatever the config did mid-period.
+   //
+   // A group active in zero epochs is skipped, but that retains NOTHING: its
+   // weighted allocation is `pool * 0 / accrued_epochs` == 0, and since the
+   // counters sum to that divisor the remaining groups already absorb the whole
+   // pool. What ACTUALLY leaves WIRE behind in the treasury is:
+   //   * no groups at all (the enclosing `if` fails) — the entire pool;
+   //   * an EMPTY group that owns POSITIVE epochs — skipped by the `group.empty()`
+   //     test BEFORE the epoch check, so its weighted slice is never paid;
+   //   * a member not registered ACTIVE in sysio.opreg (slashed / terminated /
+   //     unknown) — that member's per-member slice;
+   //   * the remainders of the two integer divisions below (per-group weighting
+   //     and the even per-member split).
    // =======================================================================
-   if (cfg.pay_cadence_epochs > 0 && !batch_op_groups.empty()) {
+   if (accrued_epochs > 0 && !batch_op_groups.empty()) {
       for (size_t g = 0; g < batch_op_groups.size(); ++g) {
          const auto& group = batch_op_groups[g];
          if (group.empty()) continue;
@@ -778,9 +834,9 @@ void system_contract::payepoch(uint32_t epoch_index,
          // count over the period) so a member's fee tracks its emission reward.
          const int64_t members = static_cast<int64_t>(group.size());
          const int64_t group_pool = static_cast<int64_t>(
-            static_cast<__int128>(batch_pool) * group_epochs / cfg.pay_cadence_epochs);
+            static_cast<__int128>(batch_pool) * group_epochs / accrued_epochs);
          const int64_t fee_group_pool = static_cast<int64_t>(
-            static_cast<__int128>(fee_batch_pool) * group_epochs / cfg.pay_cadence_epochs);
+            static_cast<__int128>(fee_batch_pool) * group_epochs / accrued_epochs);
          const int64_t per_member     = group_pool / members;
          const int64_t fee_per_member = fee_group_pool / members;
 
@@ -822,8 +878,8 @@ void system_contract::payepoch(uint32_t epoch_index,
 
    // Audit log: records the AUTHORIZED period emission + the four category
    // amounts for the period that just paid, plus the swap-fee rewards folded
-   // into the compute distribution (fee_distributed, sourced from swap fees
-   // rather than the treasury). (Producer / batch-op sub-distribution is
+   // into the batch-operator distribution (fee_distributed, sourced from swap
+   // fees rather than the treasury). (Producer / batch-op sub-distribution is
    // implicit -- recipients are in traces.) One row per pay-epoch;
    // non-pay-epochs have no audit-log row.
    epochlog_t epoch_table(get_self());
