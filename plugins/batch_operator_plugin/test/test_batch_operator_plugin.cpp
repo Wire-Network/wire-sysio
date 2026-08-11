@@ -141,6 +141,38 @@ BOOST_AUTO_TEST_CASE(async_action_completion_handles_deferred_push_result) {
    BOOST_CHECK(done.wait_for(0ms) == std::future_status::ready);
 }
 
+/// A deferred transaction error invokes the failure handler before completing.
+BOOST_AUTO_TEST_CASE(async_action_completion_handles_deferred_push_failure) try {
+   sysio::batch_operator_detail::async_action_completion completion;
+   auto done = completion.get_future();
+   using push_result = sysio::chain::next_function_variant<sysio::chain_apis::read_write::push_transaction_results>;
+   fc::exception_ptr push_error;
+   try {
+      FC_THROW_EXCEPTION(fc::assert_exception, "simulated deferred push failure");
+   } catch (const fc::exception& error) {
+      push_error = error.dynamic_copy_exception();
+   }
+
+   bool success_logged = false;
+   uint32_t error_logs = 0;
+   push_result deferred_result{
+      std::function<sysio::chain::t_or_exception<sysio::chain_apis::read_write::push_transaction_results>()>{
+         [&push_error] {
+            return sysio::chain::t_or_exception<sysio::chain_apis::read_write::push_transaction_results>{push_error};
+         }}};
+
+   BOOST_CHECK(completion.complete_push_result(
+      deferred_result,
+      [&success_logged] { success_logged = true; },
+      [&error_logs, &push_error](const fc::exception_ptr& logged_error) {
+         BOOST_CHECK_EQUAL(logged_error.get(), push_error.get());
+         ++error_logs;
+      }));
+   BOOST_CHECK(!success_logged);
+   BOOST_CHECK_EQUAL(error_logs, 1u);
+   BOOST_CHECK(done.wait_for(0ms) == std::future_status::ready);
+} FC_LOG_AND_RETHROW();
+
 /// Callback-side exceptions are contained and still release the waiting relay job.
 BOOST_AUTO_TEST_CASE(async_action_completion_contains_callback_exceptions) {
    sysio::batch_operator_detail::async_action_completion completion;
@@ -174,7 +206,7 @@ BOOST_AUTO_TEST_CASE(push_action_callback_retains_api_after_timeout) {
       auto completion = std::make_shared<sysio::batch_operator_detail::async_action_completion>();
       auto done = completion->get_future();
       BOOST_CHECK(done.wait_for(0ms) == std::future_status::timeout);
-      late_callback = sysio::batch_operator_detail::make_push_action_callback(
+      late_callback = sysio::batch_operator_detail::create_push_action_callback(
          api, completion, "sysio.system", "onblock");
       api.reset();
       BOOST_CHECK(!api_lifetime.expired());

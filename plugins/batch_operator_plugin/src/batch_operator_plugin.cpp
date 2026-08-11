@@ -816,7 +816,7 @@ struct batch_operator_plugin::impl {
 
       rw->push_transaction(
          packed_var.get_object(),
-         batch_operator_detail::make_push_action_callback(rw, completion, contract, action_name));
+         batch_operator_detail::create_push_action_callback(rw, completion, contract, action_name));
 
       if (future.wait_for(std::chrono::milliseconds(delivery_timeout_ms)) == std::future_status::timeout) {
          elog("batch_operator: push {}::{} timed out", contract, action_name);
