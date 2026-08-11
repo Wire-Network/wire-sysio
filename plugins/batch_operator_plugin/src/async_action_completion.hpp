@@ -12,6 +12,11 @@
 
 namespace sysio::batch_operator_detail {
 
+namespace push_action_log {
+inline constexpr auto success = "batch_operator: pushed {}::{} ok";
+inline constexpr auto failure = "batch_operator: push {}::{} failed: {}";
+} // namespace push_action_log
+
 /// Owns completion notification for an asynchronous batch-operator action.
 ///
 /// The state is intentionally shared with the completion callback so a caller
@@ -51,8 +56,8 @@ public:
    template <typename SuccessHandler, typename FailureHandler>
    bool complete_push_result(
       const chain::next_function_variant<chain_apis::read_write::push_transaction_results>& result,
-                             SuccessHandler&& on_success,
-                             FailureHandler&& on_failure) {
+      SuccessHandler&& on_success,
+      FailureHandler&& on_failure) {
       return complete([&result, &on_success, &on_failure] {
          if (const auto* error = std::get_if<fc::exception_ptr>(&result)) {
             on_failure(*error);
@@ -91,10 +96,10 @@ create_push_action_callback(std::shared_ptr<void> api_lifetime,
       completion->complete_push_result(
          result,
          [&contract, &action_name] {
-            ilog("batch_operator: pushed {}::{} ok", contract, action_name);
+            ilog(push_action_log::success, contract, action_name);
          },
          [&contract, &action_name](const fc::exception_ptr& error) {
-            elog("batch_operator: push {}::{} failed: {}", contract, action_name, error->to_string());
+            elog(push_action_log::failure, contract, action_name, error->to_string());
          });
    };
 }
