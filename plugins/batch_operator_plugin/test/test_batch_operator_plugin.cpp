@@ -26,6 +26,7 @@ constexpr auto immediate_wait = 0ms;
 constexpr auto simulated_push_failure = "simulated push failure";
 constexpr auto simulated_deferred_push_failure = "simulated deferred push failure";
 constexpr auto callback_failure_message = "callback failure";
+constexpr uint32_t expected_error_log_count = 1;
 
 namespace callback_lifetime_action {
 constexpr auto contract = "sysio.system";
@@ -108,7 +109,7 @@ BOOST_AUTO_TEST_CASE(async_action_completion_handles_failed_push_result) try {
    }
 
    push_result failed_result{push_error};
-   uint32_t error_logs = 0;
+   uint32_t error_logs{};
    bool success_logged = false;
 
    BOOST_CHECK(completion.complete_push_result(
@@ -123,7 +124,7 @@ BOOST_AUTO_TEST_CASE(async_action_completion_handles_failed_push_result) try {
       [&success_logged] { success_logged = true; },
       [&error_logs](const fc::exception_ptr&) { ++error_logs; }));
    BOOST_CHECK(!success_logged);
-   BOOST_CHECK_EQUAL(error_logs, 1u);
+   BOOST_CHECK_EQUAL(error_logs, expected_error_log_count);
    BOOST_CHECK(done.wait_for(immediate_wait) == std::future_status::ready);
 } FC_LOG_AND_RETHROW();
 
@@ -166,7 +167,7 @@ BOOST_AUTO_TEST_CASE(async_action_completion_handles_deferred_push_failure) try 
    }
 
    bool success_logged = false;
-   uint32_t error_logs = 0;
+   uint32_t error_logs{};
    push_result deferred_result{
       std::function<sysio::chain::t_or_exception<sysio::chain_apis::read_write::push_transaction_results>()>{
          [&push_error] {
@@ -181,7 +182,7 @@ BOOST_AUTO_TEST_CASE(async_action_completion_handles_deferred_push_failure) try 
          ++error_logs;
       }));
    BOOST_CHECK(!success_logged);
-   BOOST_CHECK_EQUAL(error_logs, 1u);
+   BOOST_CHECK_EQUAL(error_logs, expected_error_log_count);
    BOOST_CHECK(done.wait_for(immediate_wait) == std::future_status::ready);
 } FC_LOG_AND_RETHROW();
 
