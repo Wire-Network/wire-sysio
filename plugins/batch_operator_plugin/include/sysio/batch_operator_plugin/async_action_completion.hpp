@@ -3,6 +3,9 @@
 #include <atomic>
 #include <future>
 #include <utility>
+#include <variant>
+
+#include <fc/exception/exception.hpp>
 
 namespace sysio::batch_operator_detail {
 
@@ -38,6 +41,22 @@ public:
          // The one-shot guard prevents future_error in normal operation.
       }
       return true;
+   }
+
+   /// Dispatches a push-transaction result to the matching logging handler
+   /// before completing the waiter. The result is consumed synchronously, so
+   /// only the handlers need ownership that survives the asynchronous callback.
+   template <typename Result, typename SuccessHandler, typename FailureHandler>
+   bool complete_push_result(const Result& result,
+                             SuccessHandler&& on_success,
+                             FailureHandler&& on_failure) noexcept {
+      return complete([&result, &on_success, &on_failure] {
+         if (const auto* error = std::get_if<fc::exception_ptr>(&result)) {
+            on_failure(*error);
+         } else {
+            on_success();
+         }
+      });
    }
 
 private:

@@ -756,6 +756,11 @@ struct batch_operator_plugin::impl {
    //  Helpers
    // -----------------------------------------------------------------------
 
+   /// Serializes and asynchronously submits a depot action.
+   ///
+   /// The bounded wait deliberately does not cancel the request. Its callback
+   /// retains its API, labels, and completion state so it remains safe if this
+   /// function returns after timing out but before the transaction completes.
    void push_action(const std::string& contract,
                     const std::string& action_name,
                     chain::name auth_account,
@@ -815,13 +820,14 @@ struct batch_operator_plugin::impl {
          // state alive until that callback has finished dispatching.
          [completion, rw, contract, action_name](const auto& result) {
             (void)rw;
-            completion->complete([&result, &contract, &action_name] {
-               if (auto* err = std::get_if<fc::exception_ptr>(&result)) {
-                  elog("batch_operator: push {}::{} failed — {}", contract, action_name, (*err)->to_string());
-               } else {
+            completion->complete_push_result(
+               result,
+               [&contract, &action_name] {
                   ilog("batch_operator: pushed {}::{} ok", contract, action_name);
-               }
-            });
+               },
+               [&contract, &action_name](const fc::exception_ptr& error) {
+                  elog("batch_operator: push {}::{} failed — {}", contract, action_name, error->to_string());
+               });
          });
 
       if (future.wait_for(std::chrono::milliseconds(delivery_timeout_ms)) == std::future_status::timeout) {

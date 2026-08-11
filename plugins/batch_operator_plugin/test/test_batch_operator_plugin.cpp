@@ -13,6 +13,7 @@
 #include <sysio/batch_operator_plugin/async_action_completion.hpp>
 #include <sysio/batch_operator_plugin/batch_operator_plugin.hpp>
 #include <sysio/batch_operator_plugin/outpost_binding.hpp>
+#include <sysio/chain_plugin/chain_plugin.hpp>
 #include <sysio/services/cron_service.hpp>
 
 #include <fc/slug_name.hpp>
@@ -73,17 +74,38 @@ BOOST_AUTO_TEST_CASE(async_action_completion_handles_normal_completion) {
    BOOST_CHECK(done.wait_for(0ms) == std::future_status::ready);
 }
 
-/// A failure handler runs once and duplicate delivery does not complete twice.
-BOOST_AUTO_TEST_CASE(async_action_completion_runs_failure_handler_once) {
+/// A failed transaction result dispatches its failure logging handler once and
+/// releases the waiting relay job.
+BOOST_AUTO_TEST_CASE(async_action_completion_handles_failed_push_result) try {
    sysio::batch_operator_detail::async_action_completion completion;
    auto done = completion.get_future();
-   uint32_t error_logs = 0;
+   using push_result = sysio::chain::next_function_variant<sysio::chain_apis::read_write::push_transaction_results>;
+   fc::exception_ptr push_error;
+   try {
+      FC_THROW_EXCEPTION(fc::assert_exception, "simulated push failure");
+   } catch (const fc::exception& error) {
+      push_error = error.dynamic_copy_exception();
+   }
 
-   BOOST_CHECK(completion.complete([&error_logs] { ++error_logs; }));
-   BOOST_CHECK(!completion.complete([&error_logs] { ++error_logs; }));
+   push_result failed_result{push_error};
+   uint32_t error_logs = 0;
+   bool success_logged = false;
+
+   BOOST_CHECK(completion.complete_push_result(
+      failed_result,
+      [&success_logged] { success_logged = true; },
+      [&error_logs, &push_error](const fc::exception_ptr& logged_error) {
+         BOOST_CHECK_EQUAL(logged_error.get(), push_error.get());
+         ++error_logs;
+      }));
+   BOOST_CHECK(!completion.complete_push_result(
+      failed_result,
+      [&success_logged] { success_logged = true; },
+      [&error_logs](const fc::exception_ptr&) { ++error_logs; }));
+   BOOST_CHECK(!success_logged);
    BOOST_CHECK_EQUAL(error_logs, 1u);
    BOOST_CHECK(done.wait_for(0ms) == std::future_status::ready);
-}
+} FC_LOG_AND_RETHROW();
 
 /// Callback-side exceptions are contained and still release the waiting relay job.
 BOOST_AUTO_TEST_CASE(async_action_completion_contains_callback_exceptions) {
