@@ -3,7 +3,6 @@
 #include <sysio.roa.hpp>                 // authoritative T1 electorate snapshot at open
 #include <sysio.uwrit/sysio.uwrit.hpp>   // uwreq + lock reads for the underwriter challenge
 #include <sysio.reserv/sysio.reserv.hpp> // reserve books that price the challenge bond
-#include <sysio.chains/sysio.chains.hpp> // is_depot — a WIRE source leg needs no curve
 #include <sysio.opreg/sysio.opreg.hpp>   // operator status guard before slashing
 #include <sysio.opp.common/amm_math.hpp> // token_to_wire — the bond's WIRE valuation
 #include <magic_enum/magic_enum.hpp>
@@ -28,6 +27,11 @@ namespace {
 /// `sysio.reserv`'s WIRE_SYMBOL; deliberately NOT opreg's CORE_SYM).
 constexpr sysio::symbol WIRE_SYMBOL{"WIRE", 9};
 
+/// The WIRE token's slug code. A collateral bucket denominated in WIRE needs no curve — it is
+/// already in the unit the bond is posted in. (`sysio.reserv`'s own `WIRE_TOKEN` is file-local
+/// to that translation unit, so it cannot be reused here.)
+constexpr sysio::slug_name WIRE_TOKEN_CODE = "WIRE"_s;
+
 /// Wall-clock now in ms — the clock `sysio.uwrit`'s lock window runs on
 /// (`lock_entry.expires_at_ms`), so challenge deadlines compare like-for-like.
 uint64_t current_time_ms() {
@@ -50,20 +54,9 @@ std::vector<name> snapshot_t1_electorate(name roa_account, uint8_t network_gen) 
    return electorate;
 }
 
-/// True iff `chain_code` is a REGISTERED chain row flagged `is_depot` — i.e. the swap's leg is
-/// the WIRE depot itself rather than an outpost. Mirrors `sysio.uwrit`'s own `leg_is_depot`
-/// (private to that translation unit): an UNREGISTERED chain is NOT the depot, so an unknown
-/// code can never be mistaken for a WIRE leg and silently waive the curve valuation.
-bool leg_is_depot(sysio::slug_name chain_code) {
-   sysio::chains::chains_t chains_tbl(uwrit::CHAINS_ACCOUNT);
-   sysio::chains::chain_key pk{chain_code};
-   if (!chains_tbl.contains(pk)) return false;
-   return chains_tbl.get(pk).is_depot;
-}
-
 /// The bond quote for challenging one commitment — see `compute_uwchal_bond`.
 struct uwchal_bond_quote {
-   uint64_t bond        = 0; ///< the swap's gross pre-fee WIRE leg; 0 = unquotable
+   uint64_t bond        = 0; ///< Σ the underwriter's collateral quoted to WIRE; 0 = unquotable
    uint64_t deadline_ms = 0; ///< the locks' shared `expires_at_ms` — becomes the vote deadline
    uint32_t live_locks  = 0; ///< locks counted into the bond
 };
@@ -71,16 +64,24 @@ struct uwchal_bond_quote {
 /// THE bond formula — one function behind both the read-only quote (`uwchalbond`) and the charge
 /// (`openuwchal`), so the two can never drift (the `split_wire_fee` principle).
 ///
-/// The bond is the swap's GROSS, PRE-FEE WIRE leg — the WIRE the source side produced before
-/// `split_wire_fee` took anything out of it (Jonathan, 2026-08-11: *"as the challenge is on
-/// WIRE, let's keep it simple and require the WIRE (pre-fees) amount"*). For an outpost source
-/// that is `token_to_wire(src_amount)` on the leg's OWN reserve books — the same books the swap
-/// rode; for a swap-from-WIRE the escrowed WIRE IS the leg and no curve is consulted.
+/// The bond is the underwriter's ENTIRE collateral, quoted to WIRE (Jonathan, 2026-08-11:
+/// *"sum their outpost deposits based on current quotes to convert TO WIRE … and use that amount
+/// for now"*). That is what an upheld verdict actually costs them: `opreg::slash` drains every
+/// bucket's slashable-now portion and `sweeplocks` deferred-slashes the locked remainder, so the
+/// challenger stakes what the underwriter stands to lose.
 ///
-/// This supersedes the earlier per-lock valuation (each leg priced through its own reserve and
-/// summed). Quoting the WIRE leg directly keeps the stake in the unit the challenge is
-/// adjudicated in, and removes the question of which reserve prices collateral that names no
-/// reserve of its own.
+/// Deposits are per-outpost and per-token — native and ERC-20/SPL alike — so each bucket is
+/// quoted on its pair's live reserve books and the quotes summed. A WIRE-denominated bucket, if
+/// one exists, contributes directly.
+///
+/// **REVISIT (Jonathan, 2026-08-11 — "make a note to revisit").** Two provisional choices here:
+///   1. A (chain, token) pair may carry SEVERAL active reserves — PRIMARY plus private ones — at
+///      different depths and therefore different prices. This takes the first ACTIVE row from the
+///      `bychaintok` index, which is arbitrary when more than one qualifies.
+///   2. The quote is a spot read of pool depth, so the bond a challenger is quoted can move
+///      before they file. A configured WIRE figure would be stable; a curve quote is not.
+/// Both are acceptable while collateral is small and pairs carry one public reserve; neither
+/// survives a deep private-reserve market. Revisit before launch.
 ///
 /// The lock walk that remains is the LIVENESS gate, not the amount: filing is time-boxed to the
 /// live lock window, a commitment already under challenge is not re-challengeable, and the locks
@@ -88,8 +89,8 @@ struct uwchal_bond_quote {
 ///
 /// Returns a zeroed quote (unchallengeable / unquotable) when: the winner has no locks for the
 /// uwreq, any lock is already held by another challenge or already expired (filing is time-gated
-/// to the live window), the uwreq row is gone, the source reserve row is gone, the books price
-/// the leg to zero, or the leg exceeds `asset::max_amount`.
+/// to the live window), the operator row is gone, a bucket has no ACTIVE reserve to price it
+/// against, a bucket's books price it to zero, or the sum exceeds `asset::max_amount`.
 ///
 /// The bound is the TRANSFERABLE asset range (2^62-1), not `uint64_t`'s: `openuwchal` escrows the
 /// quote as `asset(static_cast<int64_t>(quote.bond), WIRE_SYMBOL)`, and `asset`'s own range check
@@ -100,7 +101,7 @@ struct uwchal_bond_quote {
 /// overflows (source and destination may price against the same imbalanced reserve). Quoting zero
 /// keeps the advertised bond and what filing can actually escrow in agreement — the same range
 /// discipline `credit_bond` applies on the payout side.
-uwchal_bond_quote compute_uwchal_bond(name uwrit_account, name reserv_account,
+uwchal_bond_quote compute_uwchal_bond(name uwrit_account, name reserv_account, name opreg_account,
                                       uint64_t uwreq_id, name underwriter) {
    uwchal_bond_quote quote;
    const uint64_t now_ms = current_time_ms();
@@ -121,23 +122,39 @@ uwchal_bond_quote compute_uwchal_bond(name uwrit_account, name reserv_account,
    }
    if (quote.live_locks == 0) return uwchal_bond_quote{};
 
-   // The bond IS the swap's gross, pre-fee WIRE leg — the WIRE the source side produced before
-   // `split_wire_fee` took anything out of it. The challenge is adjudicated on WIRE, so the
-   // stake is quoted in WIRE directly rather than valuing per-chain collateral through a curve.
-   uwrit::uwreqs_t reqs(uwrit_account);
-   auto rq = reqs.find(uwrit::id_key{uwreq_id});
-   if (rq == reqs.end()) return uwchal_bond_quote{};
+   // The bond is EVERYTHING the underwriter stands to lose: an upheld verdict drains every
+   // collateral bucket (`opreg::slash` takes each bucket's slashable-now portion, and
+   // `sweeplocks` deferred-slashes the locked remainder). Buckets are denominated per outpost
+   // in that leg's own token — native and ERC-20/SPL alike — so each is quoted to WIRE on its
+   // pair's live books and the quotes are summed.
+   opreg::operators_t ops(opreg_account);
+   auto op = ops.find(opreg::operator_key{underwriter.value});
+   if (op == ops.end()) return uwchal_bond_quote{};
 
+   auto by_chain_token = reserves.template get_index<"bychaintok"_n>();
    opp::amm::u128 total = 0;
-   if (leg_is_depot(rq->src_chain_code)) {
-      // Swap-from-WIRE: the escrowed WIRE IS the leg — no curve, nothing to price.
-      total = rq->src_amount;
-   } else {
-      auto rit = reserves.find(
-         reserve::reserve_key{rq->src_chain_code, rq->src_token_code, rq->src_reserve_code});
-      if (rit == reserves.end()) return uwchal_bond_quote{};
-      total = opp::amm::token_to_wire(rit->reserve_chain_amount, rit->reserve_wire_amount,
-                                      rit->connector_weight_bps, rq->src_amount);
+   for (const auto& bal : op->balances) {
+      if (bal.balance == 0) continue;
+      if (bal.token_code == WIRE_TOKEN_CODE) {
+         total += bal.balance;   // already WIRE — no curve to ride
+         continue;
+      }
+      // FIRST ACTIVE reserve for the pair. A pair may carry several (PRIMARY plus private
+      // ones) at different depths, so this pricing is deliberately provisional — see the
+      // revisit note on the declaration.
+      const uint128_t ck = (static_cast<uint128_t>(bal.chain_code.value) << 64) | bal.token_code.value;
+      uint64_t bucket_wire = 0;
+      for (auto it = by_chain_token.lower_bound(ck);
+           it != by_chain_token.end() && it->by_chain_token() == ck; ++it) {
+         if (it->status != opp::types::RESERVE_STATUS_ACTIVE) continue;
+         bucket_wire = opp::amm::token_to_wire(it->reserve_chain_amount, it->reserve_wire_amount,
+                                               it->connector_weight_bps, bal.balance);
+         break;
+      }
+      // A bucket the depot cannot price leaves the stake understated, which would let a
+      // challenger risk less than the underwriter stands to lose. Refuse to quote instead.
+      if (bucket_wire == 0) return uwchal_bond_quote{};
+      total += bucket_wire;
    }
    if (total == 0) return uwchal_bond_quote{};
    if (total > static_cast<opp::amm::u128>(asset::max_amount)) return uwchal_bond_quote{};
@@ -411,7 +428,7 @@ void chalg::openuwchal(name challenger, uint64_t uwreq_id, name underwriter,
 
    // Price the bond off the SAME formula `uwchalbond` quotes. Zero live locks means the window
    // has closed (or never opened); an unpriceable bond refuses the filing rather than guessing.
-   const auto quote = compute_uwchal_bond(UWRIT_ACCOUNT, RESERV_ACCOUNT, uwreq_id, underwriter);
+   const auto quote = compute_uwchal_bond(UWRIT_ACCOUNT, RESERV_ACCOUNT, OPREG_ACCOUNT, uwreq_id, underwriter);
    check(quote.live_locks > 0,
          "openuwchal: no live collateral locks to challenge (the lock window has closed)");
    check(quote.bond > 0, "openuwchal: challenge bond cannot be priced");
@@ -668,7 +685,7 @@ uint64_t chalg::uwchalbond(uint64_t uwreq_id, name underwriter) {
    const uint128_t composite = (static_cast<uint128_t>(uwreq_id) << 64) | underwriter.value;
    if (uq_idx.find(composite) != uq_idx.end()) return 0; // already challenged — a verdict is final
 
-   return compute_uwchal_bond(UWRIT_ACCOUNT, RESERV_ACCOUNT, uwreq_id, underwriter).bond;
+   return compute_uwchal_bond(UWRIT_ACCOUNT, RESERV_ACCOUNT, OPREG_ACCOUNT, uwreq_id, underwriter).bond;
 }
 
 } // namespace sysio

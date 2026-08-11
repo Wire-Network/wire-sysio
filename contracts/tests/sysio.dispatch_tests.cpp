@@ -3700,24 +3700,59 @@ public:
       return fc::variant();
    }
 
-   /// What `uwchalbond`/`openuwchal` must price: the swap's GROSS PRE-FEE WIRE leg — the
-   /// SOURCE leg's `token_to_wire` on its own reserve's LIVE books (Jonathan, 2026-08-11:
-   /// the challenge is adjudicated on WIRE, so the stake is the WIRE amount before fees).
-   /// Live books, not the registration constants — winner selection settles inline, so by
-   /// challenge time `applyswap` has already moved both sides. Recomputing on the host over
-   /// the same row pins the contract to the shared kernel: right reserve, right field order.
-   /// Deliberately NOT the two legs summed — that was the superseded per-lock valuation.
-   uint64_t expected_bond(uint64_t uwreq_id) {
-      const auto req = get_uwreq(uwreq_id);
-      BOOST_REQUIRE(!req.is_null());
-      const auto row = find_reserve(req["src_chain_code"]["value"].as_uint64(),
-                                    req["src_token_code"]["value"].as_uint64(),
-                                    req["src_reserve_code"]["value"].as_uint64());
-      BOOST_REQUIRE(!row.is_null());
-      return sysio::opp::amm::token_to_wire(row["reserve_chain_amount"].as_uint64(),
-                                            row["reserve_wire_amount"].as_uint64(),
-                                            row["connector_weight_bps"].as_uint64(),
-                                            req["src_amount"].as_uint64());
+   /// What `uwchalbond`/`openuwchal` must price: the underwriter's ENTIRE collateral, each
+   /// bucket quoted to WIRE on its pair's LIVE books and summed (Jonathan, 2026-08-11) — what
+   /// an upheld verdict actually costs them. Live books, not the registration constants:
+   /// winner selection settles inline, so by challenge time `applyswap` has already moved both
+   /// sides. Recomputing on the host over the same rows pins the contract to the shared kernel:
+   /// right reserve per bucket, right field order, and the sum.
+   uint64_t expected_bond(name underwriter) {
+      const auto op = get_operator(underwriter);
+      BOOST_REQUIRE(!op.is_null());
+      uint64_t total = 0;
+      for (const auto& bal : op["balances"].get_array()) {
+         const uint64_t amount = bal["balance"].as_uint64();
+         if (amount == 0) continue;
+         const auto chain = bal["chain_code"]["value"].as_uint64(),
+                    token = bal["token_code"]["value"].as_uint64();
+         if (token == fc::slug_name{"WIRE"}.value) {
+            total += amount;   // already WIRE — no curve
+            continue;
+         }
+         const auto row = first_active_reserve(chain, token);
+         BOOST_REQUIRE(!row.is_null());
+         total += sysio::opp::amm::token_to_wire(row["reserve_chain_amount"].as_uint64(),
+                                                 row["reserve_wire_amount"].as_uint64(),
+                                                 row["connector_weight_bps"].as_uint64(),
+                                                 amount);
+      }
+      return total;
+   }
+
+   /// The FIRST ACTIVE reserve for a (chain, token) pair — the row the contract's `bychaintok`
+   /// walk lands on when pricing a collateral bucket that names no reserve of its own.
+   fc::variant first_active_reserve(uint64_t target_chain, uint64_t target_token) {
+      const auto& db       = control->db();
+      const auto  table_id = chain::compute_table_id("reserves"_n.to_uint64_t());
+      const auto& kv_idx   = db.get_index<chain::kv_index, chain::by_code_key>();
+      auto itr = kv_idx.lower_bound(boost::make_tuple(RESERV_ACCOUNT, table_id, std::string_view{}));
+      for (; itr != kv_idx.end() && itr->code == RESERV_ACCOUNT
+             && itr->table_id == table_id; ++itr) {
+         std::vector<char> raw(itr->value.size());
+         if (!raw.empty()) std::memcpy(raw.data(), itr->value.data(), raw.size());
+         try {
+            auto row = reserv_abi.binary_to_variant("reserve_row", raw,
+               abi_serializer::create_yield_function(abi_serializer_max_time));
+            if (row["chain_code"]["value"].as_uint64() == target_chain &&
+                row["token_code"]["value"].as_uint64() == target_token &&
+                row["status"].as_string() == "RESERVE_STATUS_ACTIVE") {
+               return row;
+            }
+         } catch (...) {
+            // Not a reserve_row — skip.
+         }
+      }
+      return fc::variant();
    }
 
    // ── chalg action wrappers ────────────────────────────────────────────────
@@ -3816,8 +3851,8 @@ BOOST_FIXTURE_TEST_CASE(uwchalbond_quotes_the_live_lock_value, sysio_uwchal_test
    constexpr uint64_t ATT_ID = 9100;
    make_confirmed_uwreq(ATT_ID);
 
-   BOOST_REQUIRE_EQUAL(expected_bond(ATT_ID), uwchalbond(ATT_ID, UWRIT_OP));
-   BOOST_REQUIRE_GT(expected_bond(ATT_ID), 0u);
+   BOOST_REQUIRE_EQUAL(expected_bond(UWRIT_OP), uwchalbond(ATT_ID, UWRIT_OP));
+   BOOST_REQUIRE_GT(expected_bond(UWRIT_OP), 0u);
 
    BOOST_REQUIRE_EQUAL(0u, uwchalbond(ATT_ID + 1, UWRIT_OP));    // no such uwreq
    BOOST_REQUIRE_EQUAL(0u, uwchalbond(ATT_ID, "batchop.a"_n));   // not the winner
