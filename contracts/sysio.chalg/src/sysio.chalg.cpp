@@ -67,7 +67,17 @@ struct uwchal_bond_quote {
 /// Returns a zeroed quote (unchallengeable / unquotable) when: the winner has no locks for the
 /// uwreq, any lock is already held by another challenge or already expired (filing is time-gated
 /// to the live window), a leg's reserve row is gone, a leg's books price it to zero, or the sum
-/// does not fit uint64.
+/// exceeds `asset::max_amount`.
+///
+/// The bound is the TRANSFERABLE asset range (2^62-1), not `uint64_t`'s: `openuwchal` escrows the
+/// quote as `asset(static_cast<int64_t>(quote.bond), WIRE_SYMBOL)`, and `asset`'s own range check
+/// rejects anything above `max_amount`. Bounding at uint64 instead let a two-leg quote land in
+/// (`asset::max_amount`, `uint64_t::max`] — `uwchalbond` would advertise a nonzero bond that
+/// `openuwchal` could never escrow, so filing reverted before any lock was held and the
+/// commitment became unchallengeable. Each leg is independently valid there; the SUM is what
+/// overflows (source and destination may price against the same imbalanced reserve). Quoting zero
+/// keeps the advertised bond and what filing can actually escrow in agreement — the same range
+/// discipline `credit_bond` applies on the payout side.
 uwchal_bond_quote compute_uwchal_bond(name uwrit_account, name reserv_account,
                                       uint64_t uwreq_id, name underwriter) {
    uwchal_bond_quote quote;
@@ -94,7 +104,7 @@ uwchal_bond_quote compute_uwchal_bond(name uwrit_account, name reserv_account,
       ++quote.live_locks;
    }
    if (quote.live_locks == 0) return uwchal_bond_quote{};
-   if (total > std::numeric_limits<uint64_t>::max()) return uwchal_bond_quote{};
+   if (total > static_cast<opp::amm::u128>(asset::max_amount)) return uwchal_bond_quote{};
    quote.bond = static_cast<uint64_t>(total);
    return quote;
 }
