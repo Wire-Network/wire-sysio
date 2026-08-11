@@ -3700,27 +3700,24 @@ public:
       return fc::variant();
    }
 
-   /// What `uwchalbond`/`openuwchal` must price for the builder's commitment: each leg's lock
-   /// amount through its OWN reserve's LIVE books. Live, not the registration constants —
-   /// winner selection settles inline, so by challenge time `applyswap` has already moved both
-   /// books (src gained the chain leg / paid WIRE; dst the reverse). Recomputing on the host
-   /// over the same rows pins the contract to the shared kernel: right reserve per leg, right
-   /// field order, and the sum.
-   uint64_t expected_bond() {
-      uint64_t total = 0;
-      for (uint64_t lock_id : {1u, 2u}) {
-         const auto lock = get_lock(lock_id);
-         BOOST_REQUIRE(!lock.is_null());
-         const auto row = find_reserve(lock["chain_code"]["value"].as_uint64(),
-                                       lock["token_code"]["value"].as_uint64(),
-                                       lock["reserve_code"]["value"].as_uint64());
-         BOOST_REQUIRE(!row.is_null());
-         total += sysio::opp::amm::token_to_wire(row["reserve_chain_amount"].as_uint64(),
-                                                 row["reserve_wire_amount"].as_uint64(),
-                                                 row["connector_weight_bps"].as_uint64(),
-                                                 lock["amount"].as_uint64());
-      }
-      return total;
+   /// What `uwchalbond`/`openuwchal` must price: the swap's GROSS PRE-FEE WIRE leg — the
+   /// SOURCE leg's `token_to_wire` on its own reserve's LIVE books (Jonathan, 2026-08-11:
+   /// the challenge is adjudicated on WIRE, so the stake is the WIRE amount before fees).
+   /// Live books, not the registration constants — winner selection settles inline, so by
+   /// challenge time `applyswap` has already moved both sides. Recomputing on the host over
+   /// the same row pins the contract to the shared kernel: right reserve, right field order.
+   /// Deliberately NOT the two legs summed — that was the superseded per-lock valuation.
+   uint64_t expected_bond(uint64_t uwreq_id) {
+      const auto req = get_uwreq(uwreq_id);
+      BOOST_REQUIRE(!req.is_null());
+      const auto row = find_reserve(req["src_chain_code"]["value"].as_uint64(),
+                                    req["src_token_code"]["value"].as_uint64(),
+                                    req["src_reserve_code"]["value"].as_uint64());
+      BOOST_REQUIRE(!row.is_null());
+      return sysio::opp::amm::token_to_wire(row["reserve_chain_amount"].as_uint64(),
+                                            row["reserve_wire_amount"].as_uint64(),
+                                            row["connector_weight_bps"].as_uint64(),
+                                            req["src_amount"].as_uint64());
    }
 
    // ── chalg action wrappers ────────────────────────────────────────────────
@@ -3819,8 +3816,8 @@ BOOST_FIXTURE_TEST_CASE(uwchalbond_quotes_the_live_lock_value, sysio_uwchal_test
    constexpr uint64_t ATT_ID = 9100;
    make_confirmed_uwreq(ATT_ID);
 
-   BOOST_REQUIRE_EQUAL(expected_bond(), uwchalbond(ATT_ID, UWRIT_OP));
-   BOOST_REQUIRE_GT(expected_bond(), 0u);
+   BOOST_REQUIRE_EQUAL(expected_bond(ATT_ID), uwchalbond(ATT_ID, UWRIT_OP));
+   BOOST_REQUIRE_GT(expected_bond(ATT_ID), 0u);
 
    BOOST_REQUIRE_EQUAL(0u, uwchalbond(ATT_ID + 1, UWRIT_OP));    // no such uwreq
    BOOST_REQUIRE_EQUAL(0u, uwchalbond(ATT_ID, "batchop.a"_n));   // not the winner

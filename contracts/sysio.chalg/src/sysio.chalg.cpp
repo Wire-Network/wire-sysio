@@ -3,6 +3,7 @@
 #include <sysio.roa.hpp>                 // authoritative T1 electorate snapshot at open
 #include <sysio.uwrit/sysio.uwrit.hpp>   // uwreq + lock reads for the underwriter challenge
 #include <sysio.reserv/sysio.reserv.hpp> // reserve books that price the challenge bond
+#include <sysio.chains/sysio.chains.hpp> // is_depot — a WIRE source leg needs no curve
 #include <sysio.opreg/sysio.opreg.hpp>   // operator status guard before slashing
 #include <sysio.opp.common/amm_math.hpp> // token_to_wire — the bond's WIRE valuation
 #include <magic_enum/magic_enum.hpp>
@@ -49,9 +50,20 @@ std::vector<name> snapshot_t1_electorate(name roa_account, uint8_t network_gen) 
    return electorate;
 }
 
+/// True iff `chain_code` is a REGISTERED chain row flagged `is_depot` — i.e. the swap's leg is
+/// the WIRE depot itself rather than an outpost. Mirrors `sysio.uwrit`'s own `leg_is_depot`
+/// (private to that translation unit): an UNREGISTERED chain is NOT the depot, so an unknown
+/// code can never be mistaken for a WIRE leg and silently waive the curve valuation.
+bool leg_is_depot(sysio::slug_name chain_code) {
+   sysio::chains::chains_t chains_tbl(uwrit::CHAINS_ACCOUNT);
+   sysio::chains::chain_key pk{chain_code};
+   if (!chains_tbl.contains(pk)) return false;
+   return chains_tbl.get(pk).is_depot;
+}
+
 /// The bond quote for challenging one commitment — see `compute_uwchal_bond`.
 struct uwchal_bond_quote {
-   uint64_t bond        = 0; ///< Σ `token_to_wire(leg)` over the winner's live locks; 0 = unquotable
+   uint64_t bond        = 0; ///< the swap's gross pre-fee WIRE leg; 0 = unquotable
    uint64_t deadline_ms = 0; ///< the locks' shared `expires_at_ms` — becomes the vote deadline
    uint32_t live_locks  = 0; ///< locks counted into the bond
 };
@@ -59,15 +71,25 @@ struct uwchal_bond_quote {
 /// THE bond formula — one function behind both the read-only quote (`uwchalbond`) and the charge
 /// (`openuwchal`), so the two can never drift (the `split_wire_fee` principle).
 ///
-/// "The full collateral in question" (Jonathan, 2026-07-28) is the winning underwriter's lock
-/// set for this uwreq. Locks are denominated per-leg in the leg's native token, so each is
-/// valued in WIRE through its OWN reserve's live books — the same books the swap rode. The sum
-/// accumulates in u128 (two stacked uint64 legs can carry — the `split_wire_fee` wrap lesson).
+/// The bond is the swap's GROSS, PRE-FEE WIRE leg — the WIRE the source side produced before
+/// `split_wire_fee` took anything out of it (Jonathan, 2026-08-11: *"as the challenge is on
+/// WIRE, let's keep it simple and require the WIRE (pre-fees) amount"*). For an outpost source
+/// that is `token_to_wire(src_amount)` on the leg's OWN reserve books — the same books the swap
+/// rode; for a swap-from-WIRE the escrowed WIRE IS the leg and no curve is consulted.
+///
+/// This supersedes the earlier per-lock valuation (each leg priced through its own reserve and
+/// summed). Quoting the WIRE leg directly keeps the stake in the unit the challenge is
+/// adjudicated in, and removes the question of which reserve prices collateral that names no
+/// reserve of its own.
+///
+/// The lock walk that remains is the LIVENESS gate, not the amount: filing is time-boxed to the
+/// live lock window, a commitment already under challenge is not re-challengeable, and the locks
+/// carry the shared `expires_at_ms` that becomes the vote deadline.
 ///
 /// Returns a zeroed quote (unchallengeable / unquotable) when: the winner has no locks for the
 /// uwreq, any lock is already held by another challenge or already expired (filing is time-gated
-/// to the live window), a leg's reserve row is gone, a leg's books price it to zero, or the sum
-/// exceeds `asset::max_amount`.
+/// to the live window), the uwreq row is gone, the source reserve row is gone, the books price
+/// the leg to zero, or the leg exceeds `asset::max_amount`.
 ///
 /// The bound is the TRANSFERABLE asset range (2^62-1), not `uint64_t`'s: `openuwchal` escrows the
 /// quote as `asset(static_cast<int64_t>(quote.bond), WIRE_SYMBOL)`, and `asset`'s own range check
@@ -86,24 +108,38 @@ uwchal_bond_quote compute_uwchal_bond(name uwrit_account, name reserv_account,
    uwrit::locks_t locks(uwrit_account);
    reserve::reserves_t reserves(reserv_account);
 
-   opp::amm::u128 total = 0;
+   // The lock walk is the LIVENESS gate, not the amount: filing is time-boxed to the live lock
+   // window, and a commitment already under challenge is not re-challengeable. It also carries
+   // the shared `expires_at_ms` that becomes the vote deadline.
    auto by_uwreq = locks.get_index<"byuwreq"_n>();
    for (auto it = by_uwreq.lower_bound(uwreq_id);
         it != by_uwreq.end() && it->uwreq_id == uwreq_id; ++it) {
       if (it->underwriter != underwriter) continue;
       if (it->challenge_id != 0 || now_ms >= it->expires_at_ms) return uwchal_bond_quote{};
-      auto rit = reserves.find(reserve::reserve_key{it->chain_code, it->token_code, it->reserve_code});
-      if (rit == reserves.end()) return uwchal_bond_quote{};
-      const uint64_t leg_wire = opp::amm::token_to_wire(rit->reserve_chain_amount,
-                                                        rit->reserve_wire_amount,
-                                                        rit->connector_weight_bps,
-                                                        it->amount);
-      if (leg_wire == 0) return uwchal_bond_quote{};
-      total += leg_wire;
       quote.deadline_ms = it->expires_at_ms;
       ++quote.live_locks;
    }
    if (quote.live_locks == 0) return uwchal_bond_quote{};
+
+   // The bond IS the swap's gross, pre-fee WIRE leg — the WIRE the source side produced before
+   // `split_wire_fee` took anything out of it. The challenge is adjudicated on WIRE, so the
+   // stake is quoted in WIRE directly rather than valuing per-chain collateral through a curve.
+   uwrit::uwreqs_t reqs(uwrit_account);
+   auto rq = reqs.find(uwrit::id_key{uwreq_id});
+   if (rq == reqs.end()) return uwchal_bond_quote{};
+
+   opp::amm::u128 total = 0;
+   if (leg_is_depot(rq->src_chain_code)) {
+      // Swap-from-WIRE: the escrowed WIRE IS the leg — no curve, nothing to price.
+      total = rq->src_amount;
+   } else {
+      auto rit = reserves.find(
+         reserve::reserve_key{rq->src_chain_code, rq->src_token_code, rq->src_reserve_code});
+      if (rit == reserves.end()) return uwchal_bond_quote{};
+      total = opp::amm::token_to_wire(rit->reserve_chain_amount, rit->reserve_wire_amount,
+                                      rit->connector_weight_bps, rq->src_amount);
+   }
+   if (total == 0) return uwchal_bond_quote{};
    if (total > static_cast<opp::amm::u128>(asset::max_amount)) return uwchal_bond_quote{};
    quote.bond = static_cast<uint64_t>(total);
    return quote;
