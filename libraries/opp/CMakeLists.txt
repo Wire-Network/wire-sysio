@@ -228,7 +228,6 @@ if(ENABLE_TESTS)
             COMMAND ${CMAKE_CURRENT_BINARY_DIR}/${TEST_TARGET_NAME}
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     )
-
 endif()
 
 # Installation: headers to include/sysio
