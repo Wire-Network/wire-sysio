@@ -2,7 +2,10 @@
 
 #include <atomic>
 #include <fc/exception/exception.hpp>
+#include <functional>
 #include <future>
+#include <memory>
+#include <string>
 #include <sysio/chain_plugin/chain_plugin.hpp>
 #include <utility>
 #include <variant>
@@ -72,5 +75,28 @@ private:
    std::atomic<bool> completed{false};
    std::promise<void> done;
 };
+
+/// Creates the transaction callback while retaining its API through deferred completion.
+inline chain::plugin_interface::next_function<chain_apis::read_write::push_transaction_results>
+make_push_action_callback(std::shared_ptr<void> api_lifetime,
+                          std::shared_ptr<async_action_completion> completion,
+                          std::string contract,
+                          std::string action_name) {
+   return [api_lifetime = std::move(api_lifetime),
+           completion = std::move(completion),
+           contract = std::move(contract),
+           action_name = std::move(action_name)](const auto& result) {
+      // `read_write::push_transaction` retains a raw `this` in its own callback.
+      (void)api_lifetime;
+      completion->complete_push_result(
+         result,
+         [&contract, &action_name] {
+            ilog("batch_operator: pushed {}::{} ok", contract, action_name);
+         },
+         [&contract, &action_name](const fc::exception_ptr& error) {
+            elog("batch_operator: push {}::{} failed: {}", contract, action_name, error->to_string());
+         });
+   };
+}
 
 } // namespace sysio::batch_operator_detail

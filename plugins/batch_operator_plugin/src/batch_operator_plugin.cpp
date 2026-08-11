@@ -816,20 +816,7 @@ struct batch_operator_plugin::impl {
 
       rw->push_transaction(
          packed_var.get_object(),
-         // `read_write::push_transaction` retains a raw `this` in its own
-         // asynchronous callback, so keep the API, labels, and completion
-         // state alive until that callback has finished dispatching.
-         [completion, rw, contract, action_name](const auto& result) {
-            (void)rw;
-            completion->complete_push_result(
-               result,
-               [&contract, &action_name] {
-                  ilog("batch_operator: pushed {}::{} ok", contract, action_name);
-               },
-               [&contract, &action_name](const fc::exception_ptr& error) {
-                  elog("batch_operator: push {}::{} failed: {}", contract, action_name, error->to_string());
-               });
-         });
+         batch_operator_detail::make_push_action_callback(rw, completion, contract, action_name));
 
       if (future.wait_for(std::chrono::milliseconds(delivery_timeout_ms)) == std::future_status::timeout) {
          elog("batch_operator: push {}::{} timed out", contract, action_name);

@@ -150,22 +150,42 @@ BOOST_AUTO_TEST_CASE(async_action_completion_contains_callback_exceptions) {
    BOOST_CHECK(done.wait_for(0ms) == std::future_status::ready);
 }
 
-/// A callback retained after the caller times out owns the completion state safely.
-BOOST_AUTO_TEST_CASE(async_action_completion_handles_late_completion_after_timeout) {
-   std::function<void()> late_callback;
-   uint32_t late_completions = 0;
+/// Records whether a callback-retained API lifetime has been released.
+struct callback_lifetime_sentinel {
+   explicit callback_lifetime_sentinel(bool& destroyed)
+      : destroyed(destroyed) {}
+
+   ~callback_lifetime_sentinel() { destroyed = true; }
+
+   bool& destroyed;
+};
+
+/// A delayed transaction callback keeps its API alive after the caller times out.
+BOOST_AUTO_TEST_CASE(push_action_callback_retains_api_after_timeout) {
+   using push_result = sysio::chain::next_function_variant<sysio::chain_apis::read_write::push_transaction_results>;
+   using push_callback = sysio::chain::next_function<sysio::chain_apis::read_write::push_transaction_results>;
+   push_callback late_callback;
+   std::weak_ptr<callback_lifetime_sentinel> api_lifetime;
+   bool api_destroyed = false;
 
    {
+      auto api = std::make_shared<callback_lifetime_sentinel>(api_destroyed);
+      api_lifetime = api;
       auto completion = std::make_shared<sysio::batch_operator_detail::async_action_completion>();
       auto done = completion->get_future();
       BOOST_CHECK(done.wait_for(0ms) == std::future_status::timeout);
-      late_callback = [completion, &late_completions] {
-         completion->complete([&late_completions] { ++late_completions; });
-      };
+      late_callback = sysio::batch_operator_detail::make_push_action_callback(
+         api, completion, "sysio.system", "onblock");
+      api.reset();
+      BOOST_CHECK(!api_lifetime.expired());
    }
 
-   BOOST_CHECK_NO_THROW(late_callback());
-   BOOST_CHECK_EQUAL(late_completions, 1u);
+   push_result success{sysio::chain_apis::read_write::push_transaction_results{}};
+   BOOST_CHECK_NO_THROW(late_callback(std::move(success)));
+   BOOST_CHECK(!api_lifetime.expired());
+   late_callback = {};
+   BOOST_CHECK(api_lifetime.expired());
+   BOOST_CHECK(api_destroyed);
 }
 
 /// Regression coverage for SEC-7: the private cron service must support adding
