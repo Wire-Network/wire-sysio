@@ -136,7 +136,13 @@ std::vector<std::string> validate(const BootstrapPlatformConfig& c) {
          e.push_back("V4 token " + t.code() + " references undeclared chain " + t.chain_code());
          continue;
       }
-      if (t.precision() < 1 || t.precision() > 18) e.push_back("V4 token precision: " + t.code());
+      // 1..9, NOT 1..18: `TokenSpec.precision` is the DEPOT-FRAME precision, and
+      // `sysio.tokens::regtoken` rejects anything above MAX_TOKEN_PRECISION (9).
+      // Accepting 10..18 here let a config pass strict validation and then throw
+      // partway through the IRREVERSIBLE bootstrap actions. A token whose native
+      // precision exceeds the frame (ETH at 18) declares min(native, 9) and is
+      // downscaled at the outpost boundary.
+      if (t.precision() < 1 || t.precision() > 9) e.push_back("V4 token precision: " + t.code());
       bindings.insert({t.chain_code(), t.code()});
       if (t.is_native()) {
          ++native_per_chain[t.chain_code()];
@@ -252,6 +258,17 @@ BOOST_AUTO_TEST_CASE(validator_rejects_mutations) {
      tok->set_kind(TokenKind::TOKEN_KIND_NATIVE);
      tok->clear_contract_address();
      BOOST_CHECK(!validate(c).empty()); }
+   // V4 precision is bounded by the DEPOT FRAME (9), not asset's 18. A token
+   // declared above the frame is rejected by `sysio.tokens::regtoken`, so
+   // accepting it here would pass validation and then abort the IRREVERSIBLE
+   // bootstrap. 10 is the first rejected value; 18 (ETH's native precision, which
+   // must be declared downscaled as 9) is well past it.
+   { auto c = base; c.mutable_tokens(0)->set_precision(10);
+     BOOST_CHECK(!validate(c).empty()); }                               // V4 one past the frame
+   { auto c = base; c.mutable_tokens(0)->set_precision(18);
+     BOOST_CHECK(!validate(c).empty()); }                               // V4 native ETH precision, not downscaled
+   { auto c = base; c.mutable_tokens(0)->set_precision(9);
+     BOOST_CHECK(validate(c).empty()); }                                // V4 the frame itself stays valid
    { auto c = base; c.mutable_reserves(0)->set_connector_weight_bps(10000);
      BOOST_CHECK(!validate(c).empty()); }                               // V6 weight 10000 rejected (zero token-side weight)
    { auto c = base; c.set_t5_reserve_allocation(1);

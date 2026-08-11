@@ -298,8 +298,9 @@ std::optional<reserve::reserve_row> find_reserve(sysio::slug_name chain_code,
 /// Quote `src_amount` of (src_chain, src_token, src_reserve) into
 /// (dst_chain, dst_token, dst_reserve) along the depot's live curve. Mirrors
 /// `sysio.reserv::swapquote` exactly — the shared weighted-Bancor kernel (each
-/// reserve's `connector_weight_bps`) and the SAME post-fee reduction (`fee_bps`
-/// out of the WIRE leg) — so the variance check at SWAP_REQUEST receipt time
+/// reserve's `connector_weight_bps`) and the SAME post-fee reduction: the
+/// network `fee_bps` PLUS each participating reserve's own `owner_fee_bps`, all
+/// out of the WIRE leg — so the variance check at SWAP_REQUEST receipt time
 /// matches what settlement will deliver, without an inline action call into
 /// reserv. Returns 0 if any required reserve is missing or not ACTIVE (caller
 /// treats 0 as "no quote available, skip variance check").
@@ -325,21 +326,23 @@ uint64_t swap_quote(sysio::slug_name src_chain_code,
       return r;
    };
 
-   uint64_t sc = 0, sw = 0; uint32_t scw = 0;
+   uint64_t sc = 0, sw = 0; uint32_t scw = 0, sfee = 0;
    if (!src_is_wire) {
       auto r = active(find_reserve(src_chain_code, src_token_code, src_reserve_code));
       if (!r) return 0;
       sc = r->reserve_chain_amount; sw = r->reserve_wire_amount; scw = r->connector_weight_bps;
+      sfee = r->owner_fee_bps;
    }
-   uint64_t dc = 0, dw = 0; uint32_t dcw = 0;
+   uint64_t dc = 0, dw = 0; uint32_t dcw = 0, dfee = 0;
    if (!dst_is_wire) {
       auto r = active(find_reserve(dst_chain_code, dst_token_code, dst_reserve_code));
       if (!r) return 0;
       dc = r->reserve_chain_amount; dw = r->reserve_wire_amount; dcw = r->connector_weight_bps;
+      dfee = r->owner_fee_bps;
    }
    return opp::amm::quote_swap(src_is_wire, sc, sw, scw,
                                dst_is_wire, dc, dw, dcw,
-                               src_amount, fee_bps);
+                               src_amount, fee_bps, sfee, dfee);
 }
 
 /// True iff every NON-WIRE leg of a swap has an ACTIVE reserve row. Lets callers
@@ -902,7 +905,10 @@ void uwrit::setconfig(uint32_t fee_bps,
    // Reject a 100% (or higher) fee: it zeroes the post-fee WIRE leg
    // (`net == 0`), which let a swap debit destination reserve liquidity while
    // crediting zero WIRE (SEC-26 / WSA-042). MAX_FEE_BPS == 9999 keeps the
-   // remainder positive for every positive input.
+   // remainder positive for every positive input — for THIS rate alone. Reserve
+   // owner fees stack on the same leg under their own cap, so the total can
+   // still reach 100%; `sysio.reserv`'s settlement `net > 0` checks reject that
+   // configured combination.
    check(fee_bps <= MAX_FEE_BPS,
          "fee_bps must be below 10000 (100%): a 100% fee zeroes the post-fee WIRE leg");
    check(collateral_lock_duration_ms > 0,
@@ -1718,8 +1724,14 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate,
          ? opp::amm::token_to_wire(src_r->reserve_chain_amount, src_r->reserve_wire_amount,
                                    src_r->connector_weight_bps, req.src_amount)
          : 0;
+      // The TOTAL fee `paywire` will charge on this leg: the network fee plus
+      // the source reserve's own owner fee (swap-to-WIRE has no destination
+      // reserve). Only `.fee` is read, and the total is independent of how the
+      // network fee sub-divides, so the emissions share is irrelevant here.
       const uint64_t to_wire_fee = opp::amm::split_wire_fee(
-         w_gross, current_fee_bps(self), reserve::FEE_REWARD_SHARE_BPS).fee;
+         w_gross, current_fee_bps(self), reserve::FEE_UNDERWRITER_SHARE_BPS,
+         /*emissions_share_bps*/ 0,
+         src_r ? src_r->owner_fee_bps : 0, /*dst_reserve_fee_bps*/ 0).fee;
       const uint64_t wire_needed = opp::safe::add_sat_u64(req.dst_amount, to_wire_fee);
       if (!src_r || w_gross == 0 || src_r->reserve_wire_amount < wire_needed) {
          sysio::print("try_select_winner: insufficient source-reserve WIRE for uwreq ",
@@ -1849,7 +1861,7 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate,
          permission_level{self, "active"_n},
          uwrit::RESERVE_ACCOUNT, "paywire"_n,
          std::make_tuple(req.src_chain_code, req.src_token_code, req.src_reserve_code,
-                          req.src_amount, towire_recipient, req.dst_amount)
+                          req.src_amount, towire_recipient, req.dst_amount, candidate)
       ).send();
    } else if (!src_needed) {
       // Swap-from-WIRE: the escrowed WIRE becomes dst-reserve liquidity,
@@ -1858,7 +1870,7 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate,
          permission_level{self, "active"_n},
          uwrit::RESERVE_ACCOUNT, "applyfromwire"_n,
          std::make_tuple(req.dst_chain_code, req.dst_token_code, req.dst_reserve_code,
-                          req.src_amount, req.dst_amount)
+                          req.src_amount, req.dst_amount, candidate)
       ).send();
       queue_swap_remit(self, remit_dst_outpost_id, remit_encoded);
    } else {
@@ -1869,7 +1881,7 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate,
          std::make_tuple(req.src_chain_code, req.src_token_code, req.src_reserve_code,
                           req.src_amount,
                           req.dst_chain_code, req.dst_token_code, req.dst_reserve_code,
-                          req.dst_amount)
+                          req.dst_amount, candidate)
       ).send();
       queue_swap_remit(self, remit_dst_outpost_id, remit_encoded);
    }
