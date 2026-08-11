@@ -1,11 +1,10 @@
 #pragma once
 
 #include <atomic>
+#include <fc/exception/exception.hpp>
 #include <future>
 #include <utility>
 #include <variant>
-
-#include <fc/exception/exception.hpp>
 
 namespace sysio::batch_operator_detail {
 
@@ -17,9 +16,7 @@ namespace sysio::batch_operator_detail {
 class async_action_completion {
 public:
    /// Returns the single future that waits for this action's callback.
-   std::future<void> get_future() {
-      return done.get_future();
-   }
+   std::future<void> get_future() { return done.get_future(); }
 
    /// Invokes `on_complete` once, suppresses callback exceptions, and signals
    /// the waiter without allowing duplicate asynchronous completions to throw.
@@ -47,9 +44,7 @@ public:
    /// before completing the waiter. The result is consumed synchronously, so
    /// only the handlers need ownership that survives the asynchronous callback.
    template <typename Result, typename SuccessHandler, typename FailureHandler>
-   bool complete_push_result(const Result& result,
-                             SuccessHandler&& on_success,
-                             FailureHandler&& on_failure) noexcept {
+   bool complete_push_result(const Result& result, SuccessHandler&& on_success, FailureHandler&& on_failure) noexcept {
       return complete([&result, &on_success, &on_failure] {
          if (const auto* error = std::get_if<fc::exception_ptr>(&result)) {
             on_failure(*error);
