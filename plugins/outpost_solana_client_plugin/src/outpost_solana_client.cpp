@@ -701,6 +701,12 @@ sysio::opp::types::ChainKind outpost_solana_client::chain_kind() const {
    return sysio::opp::types::CHAIN_KIND_SVM;
 }
 
+std::vector<uint8_t>
+outpost_solana_client::authenticated_caller_address() const {
+   const auto public_key = _entry->client->get_pubkey().serialize();
+   return {public_key.begin(), public_key.end()};
+}
+
 std::optional<outpost_solana_client::reserve_terminal_info>
 outpost_solana_client::reserve_info_for_codes(uint64_t token_code, uint64_t reserve_code) {
    const auto reserve_pda =
@@ -1015,9 +1021,11 @@ std::string outpost_solana_client::uw_commit(
 
    throw_if_past_deadline(deadline_abs, OP_UW_COMMIT);
 
-   // `commit_underwrite(uic_bytes: bytes)` — opaque relay. The typed
-   // wrapper carries the IDL-default account list (config + outbound
-   // message buffer); the underwriter doesn't supply overrides.
+   // Submit the original canonical UIC bytes unchanged. The on-chain
+   // `commit_underwrite` handler decodes them and binds the signed SVM caller
+   // plus claimed ACTIVE roster identity before relaying them. The typed
+   // wrapper supplies the IDL-derived signer, operator-registry, and outbound
+   // message-buffer accounts; the underwriter does not override that list.
    std::vector<uint8_t> uic_bytes_u8(uic_bytes.begin(), uic_bytes.end());
    auto signature = _program_client->commit_underwrite(std::move(uic_bytes_u8));
    ilog("outpost_solana_client[{}]: uw_commit confirmed uwreq={} sig={} bytes={}",

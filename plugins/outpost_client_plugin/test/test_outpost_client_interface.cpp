@@ -21,6 +21,9 @@ public:
    sysio::opp::types::ChainKind chain_kind() const override { return _kind; }
    uint64_t                     chain_code() const override { return _outpost_id; }
    uint32_t                     chain_id()   const override { return _chain_id; }
+   std::vector<uint8_t>         authenticated_caller_address() const override {
+      return std::vector<uint8_t>(_kind == CHAIN_KIND_EVM ? 20u : 32u, 0x01u);
+   }
    std::string                  to_string()  const override {
       return std::format("{}:{}:{}",
                          _outpost_id,

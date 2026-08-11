@@ -39,6 +39,9 @@ public:
    sysio::opp::types::ChainKind chain_kind() const override { return _kind; }
    uint64_t                     chain_code() const override { return _outpost_id; }
    uint32_t                     chain_id()   const override { return _chain_id; }
+   std::vector<uint8_t>         authenticated_caller_address() const override {
+      return caller_address;
+   }
    std::string                  to_string()  const override {
       return std::format("{}:{}:{}",
                          _outpost_id,
@@ -100,6 +103,7 @@ public:
    std::vector<outbound_call> outbound_calls;
    std::vector<inbound_call>  inbound_calls;
    std::vector<commit_call>   commit_calls;
+   std::vector<uint8_t>       caller_address;
 
 private:
    sysio::opp::types::ChainKind _kind;

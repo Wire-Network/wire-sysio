@@ -15,6 +15,7 @@
 #include <fc/slug_name.hpp>
 
 #include "contracts.hpp"
+#include "contract_test_support.hpp"
 
 using namespace sysio::testing;
 using namespace sysio;
@@ -148,23 +149,8 @@ public:
    /// Push an action against any deployed contract.
    action_result push(name contract, abi_serializer& ser, name signer,
                       name action_name, const fc::variant_object& data) {
-      try {
-         std::string action_type = ser.get_action_type(action_name);
-         action act;
-         act.account = contract;
-         act.name    = action_name;
-         act.data    = ser.variant_to_binary(action_type, data,
-                        abi_serializer::create_yield_function(abi_serializer_max_time));
-         act.authorization = std::vector<permission_level>{{signer, config::active_name}};
-         signed_transaction trx;
-         trx.actions.emplace_back(std::move(act));
-         set_transaction_headers(trx);
-         trx.sign(get_private_key(signer, "active"), control->get_chain_id());
-         push_transaction(trx);
-         return success();
-      } catch (const fc::exception& ex) {
-         return error(ex.top_message());
-      }
+      return sysio_system::test_support::push_contract_action(
+         *this, contract, ser, signer, action_name, data);
    }
 
    /// Push setemitcfg with values mirroring `sysio_emissions_tester`'s

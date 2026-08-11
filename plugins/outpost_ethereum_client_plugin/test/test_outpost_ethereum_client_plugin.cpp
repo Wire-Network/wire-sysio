@@ -706,6 +706,12 @@ BOOST_AUTO_TEST_CASE(read_inbound_envelope_validates_latest_slot) try {
       test_outpost_chain_code,
       test_evm_chain_id);
 
+   const auto expected_caller = eth_client->get_signer_address();
+   const auto actual_caller = outpost.authenticated_caller_address();
+   BOOST_CHECK_EQUAL_COLLECTIONS(
+      expected_caller.begin(), expected_caller.end(),
+      actual_caller.begin(), actual_caller.end());
+
    auto set_response = [&](std::string response) {
       typed_opp->get_latest_outbound_envelope =
          [response = std::move(response)](const block_number_or_tag_t& block) -> fc::variant {

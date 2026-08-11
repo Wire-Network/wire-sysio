@@ -81,6 +81,10 @@ constexpr size_t   ATTESTATION_OVERHEAD_BYTES = 24;
 /// + payload preamble, and a safety margin for `zpp::bits` length prefixes.
 constexpr size_t   ENVELOPE_BASELINE_BYTES    = 512;
 
+/// Stable audit marker for a UIC rejected before it can reach `rcrdcommit`.
+constexpr const char* UIC_DISPATCH_REJECTED_LOG_PREFIX =
+   "UIC_DISPATCH_REJECTED";
+
 using namespace sysio::msgch_svm_terminal_budget;
 
 static_assert(svm_hard_dynamic_account_budget() == 16,
@@ -572,13 +576,23 @@ void dispatch_underwrite_commit(name self, const std::vector<char>& data, uint64
    {
       auto in = zpp::bits::in{std::span{data.data(), data.size()}, zpp::bits::no_size{}};
       auto rc = in(uic);
-      if (rc != zpp::bits::errc{}) return;
+      if (rc != zpp::bits::errc{}) {
+         sysio::print(UIC_DISPATCH_REJECTED_LOG_PREFIX,
+                      ": chain_code=", chain_code,
+                      ", reason=malformed_uic\n");
+         return;
+      }
    }
    // Pre-validate the relayed account string before constructing `name` below. The CDT `name`
    // ctor aborts on an empty, overlong, or out-of-charset string, and an abort here would revert
    // the whole evalcons/apply_consensus delivery; a malformed name is dropped instead.
    const auto underwriter = sysio::opp::safe::parse_wire_account_name(uic.uw_account.name);
-   if (!underwriter) return;
+   if (!underwriter) {
+      sysio::print(UIC_DISPATCH_REJECTED_LOG_PREFIX,
+                   ": chain_code=", chain_code,
+                   ", reason=invalid_wire_account\n");
+      return;
+   }
 
    // WSA-005: the leg's chain (uic.chain_code) must be the proven delivering outpost before the
    // commit is recorded against a swap leg.
