@@ -13,6 +13,7 @@
 #include <string_view>
 
 #include <sysio/batch_operator_plugin/batch_operator_plugin.hpp>
+#include <sysio/batch_operator_plugin/async_action_completion.hpp>
 #include <sysio/batch_operator_plugin/depot_ops.hpp>
 #include <sysio/batch_operator_plugin/outpost_binding.hpp>
 #include <sysio/batch_operator_plugin/outpost_epoch_lookup.hpp>
@@ -799,23 +800,28 @@ struct batch_operator_plugin::impl {
 
       // Pack and push
       auto packed = chain::packed_transaction(std::move(trx), chain::packed_transaction::compression_type::none);
-      auto rw = chain_plug->get_read_write_api(abi_max_time);
+      auto rw = std::make_shared<read_write>(chain_plug->get_read_write_api(abi_max_time));
 
       fc::variant packed_var;
       chain::to_variant(packed, packed_var);
 
-      std::promise<void> done;
-      auto future = done.get_future();
+      auto completion = std::make_shared<batch_operator_detail::async_action_completion>();
+      auto future = completion->get_future();
 
-      rw.push_transaction(
+      rw->push_transaction(
          packed_var.get_object(),
-         [&done, &contract, &action_name](const auto& result) {
-            if (auto* err = std::get_if<fc::exception_ptr>(&result)) {
-               elog("batch_operator: push {}::{} failed — {}", contract, action_name, (*err)->to_string());
-            } else {
-               ilog("batch_operator: pushed {}::{} ok", contract, action_name);
-            }
-            done.set_value();
+         // `read_write::push_transaction` retains a raw `this` in its own
+         // asynchronous callback, so keep the API, labels, and completion
+         // state alive until that callback has finished dispatching.
+         [completion, rw, contract, action_name](const auto& result) {
+            (void)rw;
+            completion->complete([&result, &contract, &action_name] {
+               if (auto* err = std::get_if<fc::exception_ptr>(&result)) {
+                  elog("batch_operator: push {}::{} failed — {}", contract, action_name, (*err)->to_string());
+               } else {
+                  ilog("batch_operator: pushed {}::{} ok", contract, action_name);
+               }
+            });
          });
 
       if (future.wait_for(std::chrono::milliseconds(delivery_timeout_ms)) == std::future_status::timeout) {

@@ -2,10 +2,15 @@
 
 #include <atomic>
 #include <chrono>
-#include <thread>
+#include <cstdint>
+#include <functional>
+#include <memory>
+#include <stdexcept>
 #include <optional>
 #include <set>
+#include <thread>
 
+#include <sysio/batch_operator_plugin/async_action_completion.hpp>
 #include <sysio/batch_operator_plugin/batch_operator_plugin.hpp>
 #include <sysio/batch_operator_plugin/outpost_binding.hpp>
 #include <sysio/services/cron_service.hpp>
@@ -56,6 +61,56 @@ BOOST_AUTO_TEST_CASE(default_options_are_correct) try {
    BOOST_CHECK_EQUAL(vm["batch-delivery-timeout-ms"].as<uint32_t>(), 15000u);
    BOOST_CHECK_EQUAL(vm["batch-enabled"].as<bool>(), false);
 } FC_LOG_AND_RETHROW();
+
+/// A normal push result invokes its callback and wakes the waiting relay job.
+BOOST_AUTO_TEST_CASE(async_action_completion_handles_normal_completion) {
+   sysio::batch_operator_detail::async_action_completion completion;
+   auto done = completion.get_future();
+   bool success_logged = false;
+
+   BOOST_CHECK(completion.complete([&success_logged] { success_logged = true; }));
+   BOOST_CHECK(success_logged);
+   BOOST_CHECK(done.wait_for(0ms) == std::future_status::ready);
+}
+
+/// A failure handler runs once and duplicate delivery does not complete twice.
+BOOST_AUTO_TEST_CASE(async_action_completion_runs_failure_handler_once) {
+   sysio::batch_operator_detail::async_action_completion completion;
+   auto done = completion.get_future();
+   uint32_t error_logs = 0;
+
+   BOOST_CHECK(completion.complete([&error_logs] { ++error_logs; }));
+   BOOST_CHECK(!completion.complete([&error_logs] { ++error_logs; }));
+   BOOST_CHECK_EQUAL(error_logs, 1u);
+   BOOST_CHECK(done.wait_for(0ms) == std::future_status::ready);
+}
+
+/// Callback-side exceptions are contained and still release the waiting relay job.
+BOOST_AUTO_TEST_CASE(async_action_completion_contains_callback_exceptions) {
+   sysio::batch_operator_detail::async_action_completion completion;
+   auto done = completion.get_future();
+
+   BOOST_CHECK_NO_THROW(completion.complete([] { throw std::runtime_error{"callback failure"}; }));
+   BOOST_CHECK(done.wait_for(0ms) == std::future_status::ready);
+}
+
+/// A callback retained after the caller times out owns the completion state safely.
+BOOST_AUTO_TEST_CASE(async_action_completion_handles_late_completion_after_timeout) {
+   std::function<void()> late_callback;
+   uint32_t late_completions = 0;
+
+   {
+      auto completion = std::make_shared<sysio::batch_operator_detail::async_action_completion>();
+      auto done = completion->get_future();
+      BOOST_CHECK(done.wait_for(0ms) == std::future_status::timeout);
+      late_callback = [completion, &late_completions] {
+         completion->complete([&late_completions] { ++late_completions; });
+      };
+   }
+
+   BOOST_CHECK_NO_THROW(late_callback());
+   BOOST_CHECK_EQUAL(late_completions, 1u);
+}
 
 /// Regression coverage for SEC-7: the private cron service must support adding
 /// and cancelling per-outpost jobs after startup, which is how refreshed active
