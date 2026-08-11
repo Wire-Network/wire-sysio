@@ -79,9 +79,9 @@ private:
 /// Creates the transaction callback while retaining its API through deferred completion.
 inline chain::plugin_interface::next_function<chain_apis::read_write::push_transaction_results>
 create_push_action_callback(std::shared_ptr<void> api_lifetime,
-                            std::shared_ptr<async_action_completion> completion,
-                            std::string contract,
-                            std::string action_name) {
+      std::shared_ptr<async_action_completion> completion,
+      std::string contract,
+      std::string action_name) {
    return [api_lifetime = std::move(api_lifetime),
            completion = std::move(completion),
            contract = std::move(contract),
