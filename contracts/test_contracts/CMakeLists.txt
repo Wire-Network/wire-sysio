@@ -1,3 +1,4 @@
 add_subdirectory(blockinfo_tester)
 add_subdirectory(sendinline)
 add_subdirectory(reenter_deposit)
+add_subdirectory(block_transfer)

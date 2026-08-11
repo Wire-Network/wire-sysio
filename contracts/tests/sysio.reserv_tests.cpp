@@ -207,6 +207,26 @@ public:
          "rewards_bucket", data, abi_serializer::create_yield_function(abi_serializer_max_time));
    }
 
+   /// Claimable WIRE credited by `paywire` / `refundwire`. Null when the account is owed
+   /// nothing. `paywire` and `refundwire` credit rather than transfer, because both run on
+   /// never-throw paths where a recipient's transfer-notify handler could otherwise abort the
+   /// enclosing transaction.
+   fc::variant get_wireclaim(name account) {
+      auto data = get_row_by_account(RESERVE_ACCOUNT, RESERVE_ACCOUNT, "wireclaims"_n, account);
+      return data.empty() ? fc::variant() : abi_ser.binary_to_variant(
+         "wire_claim", data, abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
+   /// Claimable balance owed to `account`, or 0 when there is no row.
+   uint64_t wire_claimable(name account) {
+      auto c = get_wireclaim(account);
+      return c.is_null() ? 0u : c["balance"].as_uint64();
+   }
+
+   action_result claimwire(name account) {
+      return push_action(account, "claimwire"_n, mvo()("account", account));
+   }
+
    /// Walk every row in `sysio.reserv::reserves` (KV-keyed by checksum256)
    /// via the DB index and return the row whose slug_name triple matches.
    /// `get_row_by_id` only supports uint64 keys; this scan is the test-side
@@ -880,8 +900,17 @@ BOOST_FIXTURE_TEST_CASE(paywire_pays_real_wire_from_custody, sysio_reserve_teste
    auto r = find_reserve("ETH", "ETH", "PRIMARY");
    BOOST_REQUIRE_EQUAL(1100, r["reserve_chain_amount"].as_uint64());
    BOOST_REQUIRE_EQUAL(910,  r["reserve_wire_amount"].as_uint64());
-   // Custody invariant: Σ reserve_wire_amount dropped by the payout AND the real
-   // balance dropped by the payout, together.
+
+   // Custody invariant: `Σ reserve_wire_amount` drops by the payout immediately, but the
+   // WIRE itself does NOT leave -- it moves sideways into `Σ wireclaims.balance`, still in this
+   // contract's custody, until the recipient pulls it. paywire credits rather than transfers
+   // because it settles inside the never-throw consensus dispatch chain.
+   BOOST_REQUIRE_EQUAL(90u,  wire_claimable("alice"_n));
+   BOOST_REQUIRE_EQUAL(1000, wire_balance(RESERVE_ACCOUNT));   // unchanged: 910 booked + 90 claimable
+   BOOST_REQUIRE_EQUAL(0,    wire_balance("alice"_n));
+
+   // The pull completes the settlement and restores the original end state.
+   BOOST_REQUIRE_EQUAL(success(), claimwire("alice"_n));
    BOOST_REQUIRE_EQUAL(910, wire_balance(RESERVE_ACCOUNT));
    BOOST_REQUIRE_EQUAL(90,  wire_balance("alice"_n));
 } FC_LOG_AND_RETHROW() }
@@ -920,6 +949,8 @@ BOOST_FIXTURE_TEST_CASE(paywire_rejects_payout_above_curve_output, sysio_reserve
       ("src_amount",       100)
       ("recipient",        "alice")
       ("wire_out",         9)));
+   BOOST_REQUIRE_EQUAL(9u, wire_claimable("alice"_n));   // credited, not pushed
+   BOOST_REQUIRE_EQUAL(success(), claimwire("alice"_n));
    BOOST_REQUIRE_EQUAL(9, wire_balance("alice"_n));
 } FC_LOG_AND_RETHROW() }
 
@@ -935,8 +966,17 @@ BOOST_FIXTURE_TEST_CASE(refundwire_returns_escrow, sysio_reserve_tester) { try {
       ("wire_amount",    150)
       ("revert_fee_bps", 0)));
 
+   // The refund is CREDITED, not pushed. Until alice pulls it the WIRE stays in this
+   // contract's custody, so the escrow is owed but has not moved.
+   BOOST_REQUIRE_EQUAL(150u, wire_claimable("alice"_n));
+   BOOST_REQUIRE_EQUAL(0,    wire_balance("alice"_n));
+   BOOST_REQUIRE_EQUAL(1000, wire_balance(RESERVE_ACCOUNT));
+
+   // Pulling it produces the original settlement: alice holds the escrow, custody drops by it.
+   BOOST_REQUIRE_EQUAL(success(), claimwire("alice"_n));
    BOOST_REQUIRE_EQUAL(150, wire_balance("alice"_n));
    BOOST_REQUIRE_EQUAL(850, wire_balance(RESERVE_ACCOUNT));
+   BOOST_REQUIRE(get_wireclaim("alice"_n).is_null());   // row consumed by the payout
 
    auto r = find_reserve("ETH", "ETH", "PRIMARY");
    BOOST_REQUIRE_EQUAL(1000, r["reserve_wire_amount"].as_uint64());   // untouched
@@ -958,6 +998,13 @@ BOOST_FIXTURE_TEST_CASE(refundwire_routes_revert_fee, sysio_reserve_tester) { tr
       ("wire_amount",    150)
       ("revert_fee_bps", 1000)));   // 10%
 
+   // Credited net of the fee; the emissions share leaves custody immediately (it goes to a system
+   // account, which cannot block a transfer), the refund itself waits to be pulled.
+   BOOST_REQUIRE_EQUAL(135u, wire_claimable("alice"_n));         // 150 - 15 fee
+   BOOST_REQUIRE_EQUAL(0,    wire_balance("alice"_n));
+   BOOST_REQUIRE_EQUAL(992,  wire_balance(RESERVE_ACCOUNT));     // 1000 - 8 emissions only
+
+   BOOST_REQUIRE_EQUAL(success(), claimwire("alice"_n));
    BOOST_REQUIRE_EQUAL(135, wire_balance("alice"_n));            // 150 - 15 fee
    BOOST_REQUIRE_EQUAL(857, wire_balance(RESERVE_ACCOUNT));      // 1000 - 135 - 8 emissions
 

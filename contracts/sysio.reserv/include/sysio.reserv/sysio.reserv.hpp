@@ -89,6 +89,22 @@ namespace sysio {
       static constexpr uint32_t FEE_REWARD_SHARE_BPS = 5000; // 50% rewards / 50% emissions
       static constexpr uint32_t FEE_SPLIT_TOTAL_BPS  = 10000;
 
+      // Claimable-WIRE retention. `refundwire` / `paywire` credit an unbounded, caller-influenced
+      // set of accounts, and the rows bill to the sysio RAM pool, so an abandoned dust row would
+      // otherwise occupy system-paid RAM forever. A row not pulled within this window is swept and
+      // its balance returns to the emissions treasury.
+      //
+      // One year is deliberately far longer than any plausible claim latency: forfeiture is a RAM
+      // backstop, not an economic lever. (Contrast `sysio.dclaim::claim_window_sec`, which is
+      // governance-tunable because staker windows ARE policy.) Promote this to config if that ever
+      // changes; a constant keeps the swap-settlement surface unchanged in the meantime.
+      static constexpr uint32_t WIRE_CLAIM_WINDOW_SEC = 365 * 24 * 60 * 60;
+
+      // Rows swept per credit. Bounds the on-write retention sweep so a settlement action reached
+      // from `sysio.epoch::advance` (via `drainfwq`) stays inside its CPU deadline, the same shape
+      // `sysio.opreg::prune_dellog` uses.
+      static constexpr uint32_t MAX_CLAIM_SWEEP_PER_CREDIT = 4;
+
       // -----------------------------------------------------------------------
       //  Actions
       // -----------------------------------------------------------------------
@@ -274,10 +290,17 @@ namespace sysio {
       /// `wire_out` REAL WIRE from custody, and charges the swap fee on the gross
       /// weighted WIRE leg the source produces:
       ///   src: chain += src_amount, wire -= (wire_out + fee)
-      ///   inline sysio.token::transfer(sysio.reserv → recipient, wire_out)
+      ///   credit `wire_out` to the recipient's `wireclaims` row (pulled via `claimwire`)
       /// The fee is routed 50/50 to the rewards bucket / `sysio` emissions; the
       /// source reserve keeps any surplus when the user targeted below the
       /// post-fee quote. `Σ reserve_wire_amount` drops by `wire_out + fee`.
+      ///
+      /// The payout is CREDITED, not transferred: this action is inlined from
+      /// `sysio.uwrit::try_select_winner` inside the never-throw
+      /// `deliver -> evalcons -> dispatch` chain, and `sysio.token::transfer`
+      /// notifies `recipient`. A recipient whose notify handler asserts (or burns
+      /// CPU) would otherwise abort the consensus-tipping delivery and stall
+      /// dispatch. The WIRE stays in this contract's custody until claimed.
       [[sysio::action]]
       void paywire(sysio::slug_name src_chain_code,
                    sysio::slug_name src_token_code,
@@ -297,11 +320,30 @@ namespace sysio {
       /// rewards/emissions split (`route_wire_fee`), exactly like settlement
       /// fees. Pass 0 for no-fault refunds (whole fee path no-ops). Callers
       /// keep it below 100% (`sysio.uwrit::MAX_FEE_BPS`) so the post-fee
-      /// refund transfer stays positive.
+      /// refund stays positive.
+      ///
+      /// The refund is CREDITED to the recipient's `wireclaims` row, not
+      /// transferred. This action is inlined from the never-throw
+      /// `sysio.uwrit::drainfwq` drain, which itself runs inline from
+      /// `sysio.epoch::advance`; a pushed transfer notifies `recipient`, so a
+      /// hostile notify handler would abort `advance` and halt epoch
+      /// advancement chain-wide. Worse, the queue row erase would roll back
+      /// with it, making the block permanent and retried every epoch.
       [[sysio::action]]
       void refundwire(sysio::name recipient,
                       uint64_t   wire_amount,
                       uint32_t   revert_fee_bps);
+
+      /// Auth = the claiming account. Pull the caller's credited WIRE
+      /// (swap-to-WIRE payouts and swap-from-WIRE refunds) out of this
+      /// contract's custody in a single transfer.
+      ///
+      /// This is the ONLY place a `wireclaims` balance becomes a transfer, and
+      /// it carries the claimant's own authority — so a recipient whose
+      /// transfer-notify handler aborts blocks nothing but its own claim.
+      /// Throws when there is nothing to claim, which reaches only the caller.
+      [[sysio::action]]
+      void claimwire(sysio::name account);
 
       // -----------------------------------------------------------------------
       //  Tables
@@ -384,7 +426,9 @@ namespace sysio {
       /// Singleton accumulator for the rewards half of swap fees. The WIRE
       /// stays in this contract's custody — it is NOT transferred out — so the
       /// custody invariant is `token_balance == Σ reserve_wire_amount +
-      /// rewards.balance + in-flight escrow`. `balance` is the portion
+      /// rewards.balance + in-flight escrow + Σ wireclaims.balance`. The last
+      /// term covers settled-but-unclaimed payouts and refunds, whose WIRE also
+      /// stays in custody until the recipient pulls it. `balance` is the portion
       /// earmarked for distribution (swept by `drainrewards` and folded into
       /// `sysio.system::payepoch`); `lifetime_accrued` is an audit total. (The
       /// emissions half of each fee IS transferred to the `sysio` treasury at
@@ -402,6 +446,39 @@ namespace sysio {
          SYSLIB_SERIALIZE(rewards_bucket, (balance)(lifetime_accrued))
       };
       using rewardbkt_t = sysio::kv::global<"rewardbkt"_n, rewards_bucket>;
+
+      /// Claimable WIRE owed to an account by `paywire` (swap-to-WIRE settlement) or
+      /// `refundwire` (swap-from-WIRE revert). Both credit here instead of transferring, because
+      /// both are reached from never-throw paths where a recipient's transfer-notify handler could
+      /// otherwise abort the enclosing transaction — stalling consensus dispatch in `paywire`'s
+      /// case and halting epoch advancement chain-wide in `refundwire`'s.
+      ///
+      /// The backing WIRE never leaves this contract's custody at credit time, so it is a term of
+      /// the custody invariant above.
+      struct wireclaim_key {
+         uint64_t account;
+         SYSLIB_SERIALIZE(wireclaim_key, (account))
+      };
+
+      struct [[sysio::table("wireclaims")]] wire_claim {
+         sysio::name account;
+         uint64_t    balance        = 0;   // atomic WIRE units owed, not yet claimed
+         uint32_t    expires_at_sec = 0;   // swept back to the treasury once past
+
+         /// Expiry-major composite so the secondary index orders by expiry and the retention sweep
+         /// can stop at the first live row. The account tail only breaks ties, keeping the key
+         /// unique when many rows share an expiry second.
+         uint128_t by_expiry() const {
+            return (static_cast<uint128_t>(expires_at_sec) << 64) | account.value;
+         }
+
+         SYSLIB_SERIALIZE(wire_claim, (account)(balance)(expires_at_sec))
+      };
+
+      using wireclaims_t = sysio::kv::table<"wireclaims"_n, wireclaim_key, wire_claim,
+         sysio::kv::index<"byexpiry"_n,
+            sysio::const_mem_fun<wire_claim, uint128_t, &wire_claim::by_expiry>>
+      >;
 
    private:
       using ReserveStatus = opp::types::ReserveStatus;

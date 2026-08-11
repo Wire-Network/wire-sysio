@@ -7,6 +7,7 @@
 #include <sysio.opp.common/opp_table_types.hpp>
 #include <sysio.opp.common/amm_math.hpp>
 #include <sysio.opp.common/safe_ops.hpp>
+#include <sysio.opp.common/claimable.hpp>
 
 #include <zpp_bits.h>
 
@@ -176,6 +177,49 @@ void route_wire_fee(name self, const opp::amm::wire_fee& fee) {
          std::make_tuple(self, reserve::TREASURY_ACCOUNT,
             asset(static_cast<int64_t>(fee.emissions_share), WIRE_SYMBOL),
             std::string("sysio.reserv::swap fee -> emissions"))
+      ).send();
+   }
+}
+
+/// Credit `amount` WIRE to `recipient`'s claimable row, then run the bounded retention sweep.
+///
+/// Both callers (`paywire`, `refundwire`) sit on never-throw paths, so nothing here may abort: the
+/// credit saturates rather than overflowing, and the sweep is bounded and non-throwing.
+///
+/// Crediting instead of transferring is the whole point. `sysio.token::transfer` notifies the
+/// recipient, and the chain runs notified receivers with no exception isolation, so a pushed payout
+/// hands the recipient an abort switch over the enclosing transaction -- stalling consensus
+/// dispatch from `paywire`, and halting epoch advancement chain-wide from `refundwire`.
+///
+/// Reclaimed WIRE from expired rows is pushed to the emissions treasury. That push is safe for the
+/// same reason `route_wire_fee`'s emissions share is: `sysio` is a system account under protocol
+/// control, not a counterparty that can install a hostile notify handler.
+void credit_wire_claim(name self, name recipient, uint64_t amount) {
+   if (amount == 0) return;
+
+   const uint32_t now_sec = static_cast<uint32_t>(current_time_point().sec_since_epoch());
+
+   reserve::wireclaims_t claims(self);
+   sysio::opp::claimable::credit(
+      claims, ram_payer, reserve::wireclaim_key{recipient.value},
+      reserve::wire_claim{.account = recipient}, amount,
+      now_sec + reserve::WIRE_CLAIM_WINDOW_SEC);
+
+   // On-write retention: sweep a bounded number of rows that aged out before adding more. Runs
+   // after the credit so the row just refreshed above is never the one collected.
+   auto by_expiry = claims.get_index<"byexpiry"_n>();
+   const uint64_t reclaimed = sysio::opp::claimable::sweep_expired(
+      claims, by_expiry,
+      [](const reserve::wire_claim& r) { return reserve::wireclaim_key{r.account.value}; },
+      now_sec, reserve::MAX_CLAIM_SWEEP_PER_CREDIT);
+
+   if (reclaimed > 0) {
+      action(
+         permission_level{self, "active"_n},
+         reserve::TOKEN_ACCOUNT, "transfer"_n,
+         std::make_tuple(self, reserve::TREASURY_ACCOUNT,
+            asset(static_cast<int64_t>(reclaimed), WIRE_SYMBOL),
+            std::string("sysio.reserv::expired WIRE claim -> emissions"))
       ).send();
    }
 }
@@ -796,16 +840,15 @@ void reserve::paywire(sysio::slug_name src_chain_code,
       row.reserve_wire_amount  -= wire_leaving;
    });
 
-   // REAL WIRE leaves custody to the recipient; the fee's emissions half also
-   // leaves (rewards half stays in the bucket). `Σ reserve_wire_amount` and the
-   // contract's token balance drop together, preserving the custody invariant.
-   action(
-      permission_level{get_self(), "active"_n},
-      TOKEN_ACCOUNT, "transfer"_n,
-      std::make_tuple(get_self(), recipient,
-         asset(static_cast<int64_t>(wire_out), WIRE_SYMBOL),
-         std::string("sysio.reserv::paywire swap-to-WIRE payout"))
-   ).send();
+   // The payout is credited, not pushed: this action is inlined from
+   // `sysio.uwrit::try_select_winner` inside the never-throw consensus dispatch chain, and a
+   // transfer would let `recipient`'s notify handler abort the whole delivery.
+   //
+   // Custody bookkeeping: `Σ reserve_wire_amount` drops by `wire_out + fee`, but only the fee's
+   // emissions half actually leaves the contract's token balance. `wire_out` moves sideways into
+   // `Σ wireclaims.balance` and the fee's rewards half into `rewards.balance` -- both still in
+   // custody, so the invariant balances.
+   credit_wire_claim(get_self(), recipient, wire_out);
    route_wire_fee(get_self(), fee);
 }
 
@@ -826,14 +869,22 @@ void reserve::refundwire(sysio::name recipient,
    const auto fee = opp::amm::split_wire_fee(wire_amount, revert_fee_bps, FEE_REWARD_SHARE_BPS);
    sysio::check(fee.net > 0, "refundwire: revert fee must be below 100%");
 
-   action(
-      permission_level{get_self(), "active"_n},
-      TOKEN_ACCOUNT, "transfer"_n,
-      std::make_tuple(get_self(), recipient,
-         asset(static_cast<int64_t>(fee.net), WIRE_SYMBOL),
-         std::string("sysio.reserv::refundwire swap-from-WIRE refund"))
-   ).send();
+   // Credited, not pushed. This runs inline from the never-throw `sysio.uwrit::drainfwq` drain,
+   // which itself runs inline from `sysio.epoch::advance`: a transfer here would let the refund
+   // recipient's notify handler abort `advance`, and because the drain's `q.erase()` rolls back
+   // with the transaction the offending queue row would survive and re-block every later epoch.
+   credit_wire_claim(get_self(), recipient, fee.net);
    route_wire_fee(get_self(), fee);
+}
+
+void reserve::claimwire(sysio::name account) {
+   require_auth(account);
+
+   reserve::wireclaims_t claims(get_self());
+   sysio::opp::claimable::pay_out(
+      claims, reserve::wireclaim_key{account.value}, get_self(), TOKEN_ACCOUNT,
+      account, WIRE_SYMBOL, std::string("sysio.reserv::claimwire payout"),
+      "no claimable WIRE for this account");
 }
 
 } // namespace sysio

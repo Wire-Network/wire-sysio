@@ -129,6 +129,18 @@ emissions_gate_result check_emissions_ready(uint32_t epoch_duration_sec, uint32_
          r.sysio_balance = acct_tbl.get(key).balance.amount;
       }
 
+      // Reserve pay that payepoch has already credited but nobody has pulled yet. Those balances
+      // still sit in sysio's token balance while being fully owed, so counting them as available
+      // would let the gate authorize a period the treasury cannot actually cover -- the next
+      // claimpay would then fail on overdraw and strand earned pay. `sysio_balance` is reported to
+      // the blocklog as the SPENDABLE amount for exactly this reason: an operator reading
+      // BALANCE_INSUFFICIENT needs the shortfall against what can really be paid, not the gross.
+      sysiosystem::emissions::payclaimtot_t claim_tot_tbl(SYSTEM_ACCOUNT);
+      const int64_t claims_reserve = static_cast<int64_t>(
+         claim_tot_tbl.get_or_default(sysiosystem::emissions::pay_claim_total{}).outstanding);
+      r.sysio_balance -= claims_reserve;
+      if (r.sysio_balance < 0) r.sysio_balance = 0;
+
       // emission_amount / period_emission is retained on the
       // BALANCE_INSUFFICIENT path so the blocklog row reports the real
       // shortfall (period total vs. available balance), not zero.

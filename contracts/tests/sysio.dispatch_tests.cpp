@@ -12,6 +12,7 @@
 #include <sysio/chain/abi_serializer.hpp>
 #include <sysio/chain/authority.hpp>
 #include <sysio/chain/authorization_manager.hpp>
+#include <sysio/chain/resource_limits.hpp>
 #include <sysio/chain/permission_object.hpp>
 #include <sysio/chain/kv_table_objects.hpp>   // kv_index / by_code_key for reading sysio.roa kv tables
 #include <sysio/opp/opp.hpp>
@@ -3173,9 +3174,16 @@ BOOST_FIXTURE_TEST_CASE(drainfwq_charges_revert_fee_on_caller_fault, sysio_dispa
    BOOST_REQUIRE_EQUAL(success(),
       push(UWRIT_ACCOUNT, uwrit_abi, EPOCH_ACCOUNT, "drainfwq"_n, mvo()));
 
-   // Row consumed; escrow minus the fee came back; the fee split 50/50 into the reserv rewards
-   // bucket (custody-internal) and the sysio emissions treasury (real transfer).
+   // Row consumed; escrow minus the fee is now OWED to the caller; the fee split 50/50 into the
+   // reserv rewards bucket (custody-internal) and the sysio emissions treasury (real transfer).
+   //
+   // The refund is credited, not pushed. drainfwq runs inline from sysio.epoch::advance,
+   // where a recipient's transfer-notify handler could otherwise abort the whole advance -- and
+   // because the queue-row erase rolls back with it, that block would be permanent. Pulling the
+   // credit via claimwire produces the original balance.
    BOOST_REQUIRE(get_row_by_id(UWRIT_ACCOUNT, UWRIT_ACCOUNT, "fwqueue"_n, DEPOT_ORIGIN_ID_0).empty());
+   BOOST_REQUIRE_EQUAL(success(),
+      push(RESERV_ACCOUNT, reserv_abi, "swapuser"_n, "claimwire"_n, mvo()("account", "swapuser")));
    BOOST_REQUIRE_EQUAL(funded - static_cast<int64_t>(FEE),
       get_currency_balance(TOKEN_ACCOUNT, WIRE_SYM, "swapuser"_n).get_amount());
    auto bkt_data = get_row_by_account(RESERV_ACCOUNT, RESERV_ACCOUNT, "rewardbkt"_n, "rewardbkt"_n);
@@ -3224,12 +3232,96 @@ BOOST_FIXTURE_TEST_CASE(drainfwq_full_refund_on_system_caused_revert, sysio_disp
    BOOST_REQUIRE_EQUAL(success(),
       push(UWRIT_ACCOUNT, uwrit_abi, EPOCH_ACCOUNT, "drainfwq"_n, mvo()));
 
-   // Full escrow returned — no fee — and no rewards-bucket accrual.
+   // Full escrow returned — no fee — and no rewards-bucket accrual. Credited rather than pushed
+   // (credited, not pushed), so the caller pulls it with claimwire.
    BOOST_REQUIRE(get_row_by_id(UWRIT_ACCOUNT, UWRIT_ACCOUNT, "fwqueue"_n, DEPOT_ORIGIN_ID_0).empty());
+   BOOST_REQUIRE_EQUAL(success(),
+      push(RESERV_ACCOUNT, reserv_abi, "swapuser"_n, "claimwire"_n, mvo()("account", "swapuser")));
    BOOST_REQUIRE_EQUAL(funded,
       get_currency_balance(TOKEN_ACCOUNT, WIRE_SYM, "swapuser"_n).get_amount());
    BOOST_REQUIRE(get_row_by_account(RESERV_ACCOUNT, RESERV_ACCOUNT,
                                     "rewardbkt"_n, "rewardbkt"_n).empty());
+} FC_LOG_AND_RETHROW() }
+
+// [P0] A swap-from-WIRE user cannot halt the epoch drain by refusing its own refund.
+//
+// This was the cheapest and most durable chain-halt in the protocol. `sysio.token::transfer`
+// notifies `to`, and the chain runs notified receivers with no exception isolation, so a recipient
+// asserting in its transfer-notify handler aborts the WHOLE transaction. `refundwire` is inlined
+// from the never-throw `drainfwq` drain, which is itself inlined from `sysio.epoch::advance` --
+// so the abort took down epoch advancement chain-wide. Worse, the drain's `q.erase()` rolled back
+// with it, leaving the offending queue row in place to re-block every later epoch. Cost to the
+// attacker: one `min_fromwire_amount` escrow, once.
+//
+// `refundwire` now credits `wireclaims` and transfers nothing, so no recipient handler runs on the
+// drain path. The drain completes, the row is consumed, and the hostile user is merely owed money
+// it cannot collect.
+BOOST_FIXTURE_TEST_CASE(blocking_refund_recipient_cannot_stall_drainfwq, sysio_dispatch_tester) { try {
+   constexpr uint64_t ESCROW            = 5'000'000'000ull;
+   constexpr uint64_t DEPOT_ORIGIN_ID_0 = 0x8000000000000000ull;
+   const auto WIRE_SYM = symbol(9, "WIRE");
+
+   bootstrap_for_dispatch();
+   setup_wire_token_and_reserves();
+   // No depot chain registered -> the drain takes the full-refund (system-fault) branch.
+   BOOST_REQUIRE_EQUAL(success(), push(UWRIT_ACCOUNT, uwrit_abi, UWRIT_ACCOUNT, "setconfig"_n, mvo()
+      ("fee_bps", 10)("collateral_lock_duration_ms", 120'000u)
+      ("min_fromwire_amount", ESCROW)("fromwire_revert_fee_bps", 100)
+      ("uwreq_pending_timeout_epochs", 10)("uwreq_retention_epochs", 10)));
+
+   create_account("swapuser"_n, config::system_account_name, /*multisig=*/false,
+                  /*include_code=*/true, /*include_roa_policy=*/false);
+   BOOST_REQUIRE_EQUAL(success(), push(TOKEN_ACCOUNT, token_abi, config::system_account_name,
+      "transfer"_n, mvo()("from", "sysio")("to", "swapuser")
+         ("quantity", "10.000000000 WIRE")("memo", "fund swap user")));
+
+   // Queue the swap FIRST: the escrow leg is an outgoing transfer, and arming the blocker before
+   // it would stop the setup rather than the path under test.
+   BOOST_REQUIRE_EQUAL(success(),
+      push(UWRIT_ACCOUNT, uwrit_abi, "swapuser"_n, "swapfromwire"_n, mvo()
+         ("user",                 "swapuser")
+         ("wire_amount",          ESCROW)
+         ("dst_chain_code",       codename_mvo("ETH"))
+         ("dst_token_code",       codename_mvo("ETH"))
+         ("dst_reserve_code",     codename_mvo("PRIMARY"))
+         ("target_amount",        uint64_t{1'000'000})
+         ("target_tolerance_bps", uint32_t{10000})
+         ("recipient_kind",       sysio::opp::types::ChainKind::CHAIN_KIND_EVM)
+         ("recipient_addr",       std::vector<char>(20, '\x0a'))));
+   const int64_t escrowed_bal = get_currency_balance(TOKEN_ACCOUNT, WIRE_SYM, "swapuser"_n).get_amount();
+
+   // Arm the blocker: every INCOMING transfer to swapuser now asserts.
+   control->get_mutable_resource_limits_manager()
+      .set_account_limits("swapuser"_n, 1024 * 1024, -1, -1, false);
+   produce_blocks();
+   set_code("swapuser"_n, contracts::util::block_transfer_wasm());
+   set_abi("swapuser"_n, contracts::util::block_transfer_abi().data());
+   produce_blocks();
+
+   // The drain must still complete. Before this change it aborted, taking advance() with it.
+   BOOST_REQUIRE_EQUAL(success(),
+      push(UWRIT_ACCOUNT, uwrit_abi, EPOCH_ACCOUNT, "drainfwq"_n, mvo()));
+
+   // The queue row is consumed for good -- this is what made the old failure permanent, since the
+   // erase rolled back with the aborted transaction and the row re-blocked every later epoch.
+   BOOST_REQUIRE(get_row_by_id(UWRIT_ACCOUNT, UWRIT_ACCOUNT, "fwqueue"_n, DEPOT_ORIGIN_ID_0).empty());
+
+   // The refund is owed, not paid: the escrow has not returned to the blocker's balance.
+   BOOST_REQUIRE_EQUAL(escrowed_bal,
+      get_currency_balance(TOKEN_ACCOUNT, WIRE_SYM, "swapuser"_n).get_amount());
+
+   // And the blocker can only block itself: its own claim is what its handler rejects.
+   auto r = push(RESERV_ACCOUNT, reserv_abi, "swapuser"_n, "claimwire"_n, mvo()("account", "swapuser"));
+   BOOST_REQUIRE_MESSAGE(r != success(), "blocking user unexpectedly claimed its own refund");
+   BOOST_REQUIRE_MESSAGE(r.find("block_transfer: rejecting incoming transfer") != std::string::npos,
+                         "unexpected failure reason: " + r);
+
+   // A second drain is a clean no-op -- the queue really is empty, so epochs keep advancing.
+   // Advance a block first: an identical action replayed in the same block is rejected as a
+   // duplicate transaction before the contract runs, which would assert nothing.
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(success(),
+      push(UWRIT_ACCOUNT, uwrit_abi, EPOCH_ACCOUNT, "drainfwq"_n, mvo()));
 } FC_LOG_AND_RETHROW() }
 
 // ═════════════════════════════════════════════════════════════════════════
@@ -3355,6 +3447,10 @@ BOOST_FIXTURE_TEST_CASE(uwreq_from_wire_pending_timeout_refunds_escrow,
    age_one_epoch();
    BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_EXPIRED",
                        get_uwreq(DEPOT_ORIGIN_ID_0)["status"].as_string());
+   // Credited rather than pushed — the expiry sweep runs on the never-throw advance
+   // path, so the escrow is owed until the user pulls it.
+   BOOST_REQUIRE_EQUAL(success(),
+      push(RESERV_ACCOUNT, reserv_abi, "swapuser"_n, "claimwire"_n, mvo()("account", "swapuser")));
    BOOST_REQUIRE_EQUAL(funded,
       get_currency_balance(TOKEN_ACCOUNT, WIRE_SYM, "swapuser"_n).get_amount());
 

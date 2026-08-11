@@ -166,6 +166,52 @@ struct node_claim_result {
 };
 
 // ---------------------------------------------------------------------------
+// Claimable epoch pay (producers, standbys, batch operators, category buckets)
+// ---------------------------------------------------------------------------
+
+// payepoch runs as an inline action from sysio.epoch::advance and must never abort. It therefore
+// does NOT push `sysio.token::transfer` to recipients: a transfer notifies `to`, and a recipient
+// whose on_notify handler asserts (or burns CPU) would abort advance and stall epoch advancement
+// chain-wide. Pay is credited here instead and pulled later by `claimpay`, which carries the
+// claimant's own authority -- so a hostile recipient blocks only its own payout.
+//
+// The set is bounded (ranks 1..standby_end_rank, plus batch-op group members and the two category
+// accounts), so rows do not expire: this is earned pay and is held until claimed.
+
+struct payclaim_key {
+   uint64_t account_name;
+   SYSLIB_SERIALIZE(payclaim_key, (account_name))
+};
+
+struct [[sysio::table("payclaims"), sysio::contract("sysio.system")]] pay_claim {
+   sysio::name account_name;
+   uint64_t    balance = 0;   // atomic WIRE units owed, not yet claimed
+
+   SYSLIB_SERIALIZE(pay_claim, (account_name)(balance))
+};
+
+using payclaims_t = sysio::kv::table<"payclaims"_n, payclaim_key, pay_claim>;
+
+// Running total of every outstanding `payclaims` balance.
+//
+// The WIRE backing unclaimed rows sits in sysio's token balance but is already owed, so every
+// gate that spends against that balance must reserve it -- otherwise the treasury double-commits
+// and a later `claimpay` fails on overdraw, stranding earned pay. Two readers depend on it:
+// `sysio.system::fundclaim` (its balance cap) and `sysio.epoch`'s emissions readiness gate.
+//
+// Held as a maintained counter rather than recomputed by scanning `payclaims`, because the epoch
+// gate reads it on EVERY advance and an O(rows) scan there would grow with the standby set. Kept
+// in its own singleton rather than folded into `t5_state` so the two evolve independently (the
+// same reason `node_count_state` is separate from `emission_state`).
+struct [[sysio::table("payclaimtot"), sysio::contract("sysio.system")]] pay_claim_total {
+   uint64_t outstanding = 0;
+
+   SYSLIB_SERIALIZE(pay_claim_total, (outstanding))
+};
+
+using payclaimtot_t = sysio::kv::global<"payclaimtot"_n, pay_claim_total>;
+
+// ---------------------------------------------------------------------------
 // T5 treasury emissions
 // ---------------------------------------------------------------------------
 

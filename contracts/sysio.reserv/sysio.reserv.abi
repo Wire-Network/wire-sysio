@@ -82,6 +82,16 @@
             ]
         },
         {
+            "name": "claimwire",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                }
+            ]
+        },
+        {
             "name": "debit",
             "base": "",
             "fields": [
@@ -483,6 +493,34 @@
                     "type": "slug_name"
                 }
             ]
+        },
+        {
+            "name": "wire_claim",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "balance",
+                    "type": "uint64"
+                },
+                {
+                    "name": "expires_at_sec",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "wireclaim_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "uint64"
+                }
+            ]
         }
     ],
     "actions": [
@@ -494,6 +532,11 @@
         {
             "name": "applyswap",
             "type": "applyswap",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "claimwire",
+            "type": "claimwire",
             "ricardian_contract": ""
         },
         {
@@ -575,6 +618,21 @@
             "key_names": ["name"],
             "key_types": ["name"],
             "table_id": 15326
+        },
+        {
+            "name": "wireclaims",
+            "type": "wire_claim",
+            "index_type": "i64",
+            "key_names": ["account"],
+            "key_types": ["uint64"],
+            "table_id": 22082,
+            "secondary_indexes": [
+                {
+                    "name": "byexpiry",
+                    "key_type": "uint128",
+                    "table_id": 59144
+                }
+            ]
         }
     ],
     "ricardian_clauses": [],

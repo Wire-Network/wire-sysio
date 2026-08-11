@@ -345,6 +345,19 @@ namespace sysio {
       [[sysio::action]]
       void terminate(name account, std::string reason);
 
+      /// Auth = the claiming operator. Pull CORE_SYM collateral credited by a WIRE-chain remit
+      /// (withdraw flush, deferred lock release, or termination payout) in a single transfer.
+      ///
+      /// The remit paths credit rather than transfer because they are reachable from
+      /// `sysio.epoch::advance`, which must never abort; see `remitclaims`. This is the only place
+      /// such a balance becomes a transfer, and it carries the operator's own authority, so a
+      /// hostile transfer-notify handler blocks nothing but this caller's own claim.
+      ///
+      /// Independent of the operator row: `prune` may have erased a settled TERMINATED operator,
+      /// and the collateral remains claimable regardless.
+      [[sysio::action]]
+      void claimremit(name account);
+
       /// Prune terminated operator rows, plus delivery-log rows that have aged
       /// out of the rolling termination window. Permissionless.
       ///
@@ -523,6 +536,34 @@ namespace sysio {
          sysio::kv::index<"byaccountts"_n,
             sysio::const_mem_fun<delivery_log_entry, uint128_t, &delivery_log_entry::by_account_ts>>
       >;
+
+      /// Claimable CORE_SYM collateral owed to an operator by a WIRE-chain remit: a withdraw
+      /// flush (`flushwtdw`), a deferred lock release on a TERMINATED operator, or the
+      /// termination payout itself.
+      ///
+      /// All three are reachable from `sysio.epoch::advance` (flush by epoch, termination via
+      /// `termcheck`), which must never abort. A pushed `sysio.token::transfer` notifies the
+      /// operator, so an operator carrying a hostile notify handler could abort `advance` and halt
+      /// epoch advancement chain-wide -- and in the termination case would be blocking its own
+      /// removal, so the retry never converges. Crediting here and paying out from `claimremit`
+      /// puts the transfer under the operator's own authority instead.
+      ///
+      /// No expiry: the operator set is bounded and registered, and this is returned collateral,
+      /// held until claimed. (Contrast `sysio.reserv::wireclaims`, whose recipient set is
+      /// unbounded and therefore swept.)
+      struct remitclaim_key {
+         uint64_t account;
+         SYSLIB_SERIALIZE(remitclaim_key, (account))
+      };
+
+      struct [[sysio::table("remitclaims")]] remit_claim {
+         sysio::name account;
+         uint64_t    balance = 0;   // atomic CORE_SYM units owed, not yet claimed
+
+         SYSLIB_SERIALIZE(remit_claim, (account)(balance))
+      };
+
+      using remitclaims_t = sysio::kv::table<"remitclaims"_n, remitclaim_key, remit_claim>;
 
       /// Singleton holding the next-issued `request_id` / `log_id`. Keeps
       /// the auto-increment monotonic across action calls.

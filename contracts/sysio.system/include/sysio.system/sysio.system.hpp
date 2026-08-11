@@ -560,6 +560,21 @@ namespace sysiosystem {
          void claimnodedis(const sysio::name& account_name);
 
          /**
+          * Claim epoch pay credited by payepoch (producer, standby, batch-operator or category
+          * share). Drains the caller's `payclaims` row and transfers the whole balance out.
+          *
+          * payepoch credits rather than transfers because it runs inline from
+          * sysio.epoch::advance: `sysio.token::transfer` notifies the recipient, and a recipient
+          * whose notify handler aborts (or burns CPU) would abort advance and stall epoch
+          * advancement chain-wide. Moving the transfer here puts it under the claimant's own
+          * authority, so a hostile recipient can only block its own payout.
+          *
+          * Auth: the claiming account.
+          */
+         [[sysio::action]]
+         void claimpay(const sysio::name& account_name);
+
+         /**
           * Read-only: view claimable Node Owner distributions.
           */
          [[sysio::action, sysio::read_only]]
