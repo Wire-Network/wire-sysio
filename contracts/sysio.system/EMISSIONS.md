@@ -40,8 +40,29 @@ group pool divided by the full group size). A transfer is sent only to members
 that are opreg-ACTIVE, so the slices of skipped (inactive / slashed / terminated)
 members stay in the treasury rather than being redistributed to the active
 ones. Swap-fee rewards from `sysio.reserv`'s `rewards_bucket` are swept in
-(`drainrewards`) and folded into the same compute distribution on top of
-emissions, split by the same `producer_bps` / `batch_op_bps`.
+(`drainrewards`) and allocated **exclusively to the batch-operator
+distribution**, on top of their emission share and weighted by that same
+per-group active-epoch count. Producers are not paid out of swap fees, so
+`producer_bps` / `batch_op_bps` govern the emission split only.
+
+Allocated is not the same as paid: as with emissions, only **eligible** shares
+are actually transferred. WIRE stays in the treasury when there are **no groups
+at all**, when an **empty group owns positive active epochs** (its weighted slice
+is skipped), when a **member is not opreg-ACTIVE**, or as the **remainder** of the
+two integer divisions (per-group weighting, then the even per-member split). A
+group active in **zero** epochs is *not* one of these cases — its weighted
+allocation is already zero, and because the per-group counts sum to the **actual
+accrued-epoch divisor** the remaining groups absorb the whole pool.
+
+That divisor is the sum of the per-group counters, **not** the configured
+`pay_cadence_epochs`. The two can differ — a mid-period `setemitcfg` cadence
+change, or the shortened genesis period — and normalizing by the configured value
+is what caused a payout to be multiplied. Deriving it from the counters is what
+makes the weights partition each pool by construction.
+
+`epochlog.fee_distributed` records what was actually paid, so it can be lower
+than the swept amount — and is `0` when no eligible batch operator existed at all,
+even though `drainrewards` swept the bucket to zero regardless.
 
 ## Retrieved via a claim action (pulled by recipient)
 

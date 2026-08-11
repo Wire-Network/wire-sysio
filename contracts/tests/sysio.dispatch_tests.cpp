@@ -3127,14 +3127,17 @@ BOOST_FIXTURE_TEST_CASE(swapfromwire_enforces_min_amount, sysio_dispatch_tester)
 } FC_LOG_AND_RETHROW() }
 
 // Caller-controlled drain-time reverts forfeit the configured revert fee: the refund returns the
-// escrow minus the fee, and the fee routes through the standard rewards/emissions split exactly
+// escrow minus the fee, and the fee routes through the standard `route_wire_fee` path exactly
 // like a settlement fee — so revert churn pays the system instead of recycling for free.
 BOOST_FIXTURE_TEST_CASE(drainfwq_charges_revert_fee_on_caller_fault, sysio_dispatch_tester) { try {
    constexpr uint64_t ESCROW              = 5'000'000'000ull; // the default floor exactly
    constexpr uint32_t REVERT_FEE_BPS      = 100;              // 1%
    constexpr uint64_t FEE                 = ESCROW * REVERT_FEE_BPS / 10000ull; // 0.05 WIRE
-   // Mirror of sysio.reserv.hpp::FEE_REWARD_SHARE_BPS (50% rewards / 50% emissions).
-   constexpr uint64_t REWARD_SHARE        = FEE / 2;
+   // A revert has no winning underwriter, so `refundwire` passes a zero underwriter share and
+   // the WHOLE fee becomes the rewards pool. reserv's `fee_emissions_share_bps` is never set
+   // here (the default 0), so that pool lands in the rewards bucket intact (batch operators);
+   // a configured dial would divert its share to the emissions treasury.
+   constexpr uint64_t REWARD_SHARE        = FEE;
    constexpr uint64_t DEPOT_ORIGIN_ID_0   = 0x8000000000000000ull;
    const auto WIRE_SYM = symbol(9, "WIRE");
 
@@ -3173,8 +3176,8 @@ BOOST_FIXTURE_TEST_CASE(drainfwq_charges_revert_fee_on_caller_fault, sysio_dispa
    BOOST_REQUIRE_EQUAL(success(),
       push(UWRIT_ACCOUNT, uwrit_abi, EPOCH_ACCOUNT, "drainfwq"_n, mvo()));
 
-   // Row consumed; escrow minus the fee came back; the fee split 50/50 into the reserv rewards
-   // bucket (custody-internal) and the sysio emissions treasury (real transfer).
+   // Row consumed; escrow minus the fee came back; the whole fee accrued into the reserv
+   // rewards bucket (custody-internal — no transfer leaves reserv for a fee).
    BOOST_REQUIRE(get_row_by_id(UWRIT_ACCOUNT, UWRIT_ACCOUNT, "fwqueue"_n, DEPOT_ORIGIN_ID_0).empty());
    BOOST_REQUIRE_EQUAL(funded - static_cast<int64_t>(FEE),
       get_currency_balance(TOKEN_ACCOUNT, WIRE_SYM, "swapuser"_n).get_amount());
