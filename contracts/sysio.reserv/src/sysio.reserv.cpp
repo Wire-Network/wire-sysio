@@ -8,6 +8,7 @@
 #include <sysio.opp.common/amm_math.hpp>
 #include <sysio.opp.common/safe_ops.hpp>
 #include <sysio.opp.common/claimable.hpp>
+#include <sysio.opp.common/registry_metadata.hpp>
 
 #include <zpp_bits.h>
 
@@ -248,6 +249,8 @@ void reserve::regreserve(sysio::slug_name chain_code,
                 "bootstrap reserve must seed both chain_amount and wire_amount > 0");
    sysio::check(!is_private || owner != sysio::name{},
                 "a private bootstrap reserve must name an owner");
+   // Both strings persist into a `sysio`-billed row -- bound them before emplace.
+   opp::registry::check_metadata(name, description, "sysio.reserv");
 
    reserves_t tbl(get_self());
    auto pk = make_key(chain_code, token_code, reserve_code);
@@ -317,6 +320,10 @@ void reserve::oncrtreserve(sysio::slug_name       chain_code,
    // the SAME cancel/refund path as an unlinked creator below (insert a CANCELLED
    // row + queue RESERVE_CREATE_CANCELLED), idempotently.
    const bool invalid_amount = (external_token_amount == 0 || requested_wire_amount == 0);
+   // Same `sysio`-billed metadata bound the privileged registrations enforce with
+   // `check_metadata`, asked the non-throwing way: this handler must never abort, so an
+   // over-bound string joins the reject/refund path below rather than reverting dispatch.
+   const bool oversized_metadata = opp::registry::metadata_exceeds_bounds(name, description);
    // The outpost downscales to min(native, 9) at its boundary, so a
    // source_token_precision above the depot frame means a malformed attestation.
    if (source_token_precision > WIRE_PRECISION) {
@@ -349,7 +356,8 @@ void reserve::oncrtreserve(sysio::slug_name       chain_code,
    // Create gating: the creator must already be authex-linked to a WIRE
    // account ("the only requirement to create a reserve"). Reconstruct the
    // creator's key variant and probe `sysio.authex::links.bypubkey`. On
-   // any failure — malformed key bytes OR no link — reject by inserting a
+   // any failure — malformed key bytes, no link, an invalid amount, OR
+   // over-bound metadata — reject by inserting a
    // CANCELLED row (for refund idempotency) and queueing
    // RESERVE_CREATE_CANCELLED so the outpost refunds the creator's escrow.
    // The CANCELLED row does NOT permanently burn the identity: a later,
@@ -367,7 +375,7 @@ void reserve::oncrtreserve(sysio::slug_name       chain_code,
             canonical_creator_key = sysio::pubkey_to_bytes(*pk_variant);
          }
       }
-      if (!linked || invalid_amount) {
+      if (!linked || invalid_amount || oversized_metadata) {
          // A CANCELLED row already standing means this is a re-relay of the same
          // rejected create (an unlinked squatter OR an invalid amount). Leave it
          // and do NOT queue a second refund — the refund was queued when the row
@@ -379,14 +387,22 @@ void reserve::oncrtreserve(sysio::slug_name       chain_code,
             return;
          }
          sysio::print("oncrtreserve: rejecting with RESERVE_CREATE_CANCELLED "
-                      "(invalid amount or unlinked / malformed creator key)\n");
+                      "(invalid amount, over-bound metadata, or unlinked / malformed creator key)\n");
          const auto now = current_time_ms();
          tbl.emplace(ram_payer, pk, reserve_row{
             .chain_code             = chain_code,
             .token_code             = token_code,
             .reserve_code           = reserve_code,
-            .name                   = std::move(name),
-            .description            = std::move(description),
+            // The tombstone is itself a `sysio`-billed row, so over-bound strings are NOT
+            // carried onto it — storing them verbatim would persist exactly the state the
+            // bound exists to prevent. Only THAT rejection reason substitutes the marker; a
+            // row rejected for an unlinked creator or an invalid amount keeps its (already
+            // in-bounds) metadata. The creator's originals stay in the inbound OPP envelope
+            // artifact either way.
+            .name                   = oversized_metadata
+                                       ? std::string(opp::registry::rejected_label)
+                                       : std::move(name),
+            .description            = oversized_metadata ? std::string{} : std::move(description),
             .status                 = opp::types::RESERVE_STATUS_CANCELLED,
             .reserve_chain_amount   = 0,
             .reserve_wire_amount    = 0,

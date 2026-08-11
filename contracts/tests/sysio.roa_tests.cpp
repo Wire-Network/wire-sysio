@@ -1093,6 +1093,52 @@ BOOST_FIXTURE_TEST_CASE( reducepolicy_below_zero, sysio_roa_full_tester ) try {
       sysio_assert_message_is("Cannot reduce NET below zero"));
 } FC_LOG_AND_RETHROW()
 
+// A negative reduction weight is rejected outright, per NET/CPU/RAM independently.
+// reducepolicy applies each weight as a SUBTRACTION, so a negative amount ADDS quota while
+// still satisfying the reduce-below-zero upper bounds (`w <= stored`, true for any negative
+// w whenever the stored weight is positive). Left unguarded it inflates the account's
+// resource limits past the issuer's ROA budget -- bypassing expandpolicy's free-allocation
+// check -- and desynchronises the reslimit row and nodeowners accounting from the policy.
+// The NET case is CertiK WNS-03's PoC verbatim: a 10.0000 SYS policy reduced by -5.0000 SYS
+// used to end at 15.0000 SYS.
+BOOST_FIXTURE_TEST_CASE( reducepolicy_negative_weight_rejected, sysio_roa_full_tester ) try {
+   auto user = create_newuser(node_owners[2]);
+   produce_block();
+
+   add_roa_policy(node_owners[2], user, "10.0000 SYS", "10.0000 SYS", "10.0000 SYS", 0, 0);
+   produce_block();
+
+   int64_t ram_before, net_before, cpu_before;
+   control->get_resource_limits_manager().get_account_limits(user, ram_before, net_before, cpu_before);
+
+   BOOST_CHECK_EXCEPTION(
+      reduce_roa_policy(node_owners[2], user, "-5.0000 SYS", "0.0000 SYS", "0.0000 SYS", 0),
+      sysio_assert_message_exception,
+      sysio_assert_message_is("NET weight cannot be negative"));
+   BOOST_CHECK_EXCEPTION(
+      reduce_roa_policy(node_owners[2], user, "0.0000 SYS", "-5.0000 SYS", "0.0000 SYS", 0),
+      sysio_assert_message_exception,
+      sysio_assert_message_is("CPU weight cannot be negative"));
+   BOOST_CHECK_EXCEPTION(
+      reduce_roa_policy(node_owners[2], user, "0.0000 SYS", "0.0000 SYS", "-5.0000 SYS", 0),
+      sysio_assert_message_exception,
+      sysio_assert_message_is("RAM weight cannot be negative"));
+   produce_block();
+
+   // The policy is untouched by the rejected attempts...
+   auto p = get_policy(user, node_owners[2]);
+   BOOST_TEST(p["net_weight"].as_string() == "10.0000 SYS");
+   BOOST_TEST(p["cpu_weight"].as_string() == "10.0000 SYS");
+   BOOST_TEST(p["ram_weight"].as_string() == "10.0000 SYS");
+
+   // ...and no quota was minted onto the account.
+   int64_t ram_after, net_after, cpu_after;
+   control->get_resource_limits_manager().get_account_limits(user, ram_after, net_after, cpu_after);
+   BOOST_TEST(net_after == net_before);
+   BOOST_TEST(cpu_after == cpu_before);
+   BOOST_TEST(ram_after == ram_before);
+} FC_LOG_AND_RETHROW()
+
 // Cannot reduce before time_block
 BOOST_FIXTURE_TEST_CASE( reducepolicy_before_timeblock, sysio_roa_full_tester ) try {
    auto user = create_newuser(node_owners[2]);

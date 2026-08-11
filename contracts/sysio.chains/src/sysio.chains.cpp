@@ -1,9 +1,17 @@
 #include <sysio.chains/sysio.chains.hpp>
 #include <sysio.epoch/sysio.epoch.hpp>
+#include <sysio.opp.common/registry_metadata.hpp>
 
 namespace sysio {
 
 namespace {
+
+using sysio::slug_name_literals::operator""_s;
+
+// The canonical code of the depot self-row. Bootstrap invariant V3
+// (docs/platform-bootstrap-config.md) fixes the depot at
+// `(kind=WIRE, code="WIRE", external_chain_id=0, is_depot=true)`.
+constexpr sysio::slug_name WIRE_CHAIN_CODE = "WIRE"_s;
 
 // System-owned rows bill to the sysio RAM pool, not this contract account (privileged-contract
 // model, as sysio.token uses): the account stays finite at code+abi size; growth draws from the pool.
@@ -40,18 +48,37 @@ void chains::regchain(opp::types::ChainKind kind,
 
    sysio::check(kind != opp::types::CHAIN_KIND_UNKNOWN,
                 "sysio.chains: kind must not be UNKNOWN");
+   // Both strings persist into a `sysio`-billed row -- bound them before emplace.
+   opp::registry::check_metadata(name, description, "sysio.chains");
 
    chains_t tbl(get_self());
    chain_key pk{code};
    sysio::check(tbl.find(pk) == tbl.end(),
                 "sysio.chains: chain code already registered");
 
-   // Enforce: at most one row with kind == WIRE (the depot self-row).
+   // Enforce: the code `WIRE` and `CHAIN_KIND_WIRE` are reserved FOR EACH OTHER, and the
+   // depot self-row is unique.
+   //
+   // Forward: `is_depot` is derived from the KIND alone below, so kind=WIRE must carry the
+   // canonical code or a row could claim depot identity under any code (e.g. `FAKE`) --
+   // previously only the cardinality half of bootstrap invariant V3 was on-chain and the code
+   // rested entirely on the off-chain config validator.
+   //
+   // Inverse: chain codes are unique and there is NO erase action, so a non-WIRE row
+   // registered under the code `WIRE` would permanently squat the depot's identity and leave
+   // the canonical row unregisterable -- bricking bootstrap with no on-chain recovery. Both
+   // directions are needed; the forward check alone still admits `regchain(EVM, "WIRE", ...)`.
    if (kind == opp::types::CHAIN_KIND_WIRE) {
+      sysio::check(code == WIRE_CHAIN_CODE,
+                   "sysio.chains: a WIRE chain must use the code WIRE");
+
       auto by_kind_idx = tbl.template get_index<"bykind"_n>();
       const auto wire_kind_value = magic_enum::enum_integer(opp::types::CHAIN_KIND_WIRE);
       sysio::check(by_kind_idx.lower_bound(wire_kind_value) == by_kind_idx.upper_bound(wire_kind_value),
                    "sysio.chains: a WIRE chain (depot self-row) already exists");
+   } else {
+      sysio::check(code != WIRE_CHAIN_CODE,
+                   "sysio.chains: the code WIRE is reserved for the depot self-row");
    }
 
    // Enforce: EVM rows are unique per `external_chain_id`. The pair (kind, external_chain_id)

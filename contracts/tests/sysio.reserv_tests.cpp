@@ -408,6 +408,29 @@ BOOST_FIXTURE_TEST_CASE(regreserve_seeds_private_reserve, sysio_reserve_tester) 
    BOOST_REQUIRE_EQUAL("alice", r["owner"].as_string());
 } FC_LOG_AND_RETHROW() }
 
+// `name` and `description` persist into a reserve row billed to `ram_payer = sysio` — the
+// shared system pool — so both are bounded before emplace, via the same
+// `sysio::opp::registry::check_metadata` the chains and tokens registries use. CertiK WNS-10
+// raised the unbounded pair on `sysio.tokens::regtoken`; it was identical here.
+//
+// `regreserve` is privileged and abort-safe, so it enforces the bound with `check_metadata`.
+// The post-bootstrap `oncrtreserve` path must never abort and instead routes an over-bound
+// row into the existing cancel/refund flow — see `oncrtreserve_oversized_metadata_is_cancelled`.
+BOOST_FIXTURE_TEST_CASE(regreserve_bounds_metadata, sysio_reserve_tester) { try {
+   BOOST_REQUIRE(regreserve("ETH", "ETH", "PRIMARY", 100, 100, 5000, false, name{},
+                            std::string(129, 'x'))
+      .find("label exceeds 128 bytes") != std::string::npos);
+
+   BOOST_REQUIRE(regreserve("ETH", "ETH", "PRIMARY", 100, 100, 5000, false, name{},
+                            "ok", std::string(257, 'x'))
+      .find("description exceeds 256 bytes") != std::string::npos);
+
+   // The bounds are inclusive, and neither rejection claimed the reserve key.
+   BOOST_REQUIRE_EQUAL(success(),
+      regreserve("ETH", "ETH", "PRIMARY", 100, 100, 5000, false, name{},
+                 std::string(128, 'x'), std::string(256, 'x')));
+} FC_LOG_AND_RETHROW() }
+
 // ── oncrtreserve (create gating) ──
 
 BOOST_FIXTURE_TEST_CASE(oncrtreserve_requires_msgch_auth, sysio_reserve_tester) { try {
@@ -619,6 +642,80 @@ BOOST_FIXTURE_TEST_CASE(oncrtreserve_invalid_amount_is_cancelled, sysio_reserve_
    auto r = find_reserve("ETH", "ETH", "USERRES");
    BOOST_REQUIRE(!r.is_null());
    BOOST_REQUIRE_EQUAL("RESERVE_STATUS_CANCELLED", r["status"].as_string());
+} FC_LOG_AND_RETHROW() }
+
+// The same `sysio`-billed metadata bound `regreserve` enforces, applied to the inbound
+// creation path. `oncrtreserve` is an OPP dispatch handler, so it must NOT `check()` —
+// aborting here rolls back the consensus-tipping delivery and stalls epoch advancement
+// chain-wide (feedback_opp_handlers_never_throw / epoch-stall-is-fatal). An over-bound
+// string therefore joins `invalid_amount` and the unlinked-creator case on the existing
+// reject predicate, releasing the creator's escrow via RESERVE_CREATE_CANCELLED.
+//
+// The creator here is properly LINKED with a valid amount, so the metadata is the sole
+// rejection reason. The tombstone is itself a `sysio`-billed row, so the over-bound strings
+// are replaced by a fixed marker rather than carried onto it. Both an ASCII and a MULTIBYTE
+// over-bound label are covered: because nothing is truncated there is no code-point boundary
+// to split, so neither can leave malformed text in state. A third case drives the OTHER half
+// of `metadata_exceeds_bounds` — an over-bound `description` behind an in-bound name — so
+// each side of the predicate is exercised independently rather than only via the label.
+BOOST_FIXTURE_TEST_CASE(oncrtreserve_oversized_metadata_is_cancelled, sysio_reserve_tester) { try {
+   deploy_authex();
+
+   auto creator_priv = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em);
+   auto creator_pub  = creator_priv.get_public_key();
+   BOOST_REQUIRE_EQUAL(success(),
+      recordlink_em("alice"_n, ChainKind::CHAIN_KIND_EVM, creator_pub));
+
+   auto create_with_metadata = [&](std::string_view reserve_code,
+                                   const std::string& name,
+                                   const std::string& description) {
+      return push_action(MSGCH_ACCOUNT, "oncrtreserve"_n, mvo()
+         ("chain_code",            codename_mvo("ETH"))
+         ("token_code",            codename_mvo("ETH"))
+         ("reserve_code",          codename_mvo(reserve_code))
+         ("name",                  name)
+         ("description",           description)
+         ("external_token_amount", 1000)
+         ("requested_wire_amount", 1000)
+         ("source_token_precision", 9u)
+         ("connector_weight_bps",  5000)
+         ("creator_chain_kind",    ChainKind::CHAIN_KIND_EVM)
+         ("creator_chain_addr",    std::vector<char>(20, '\x01'))
+         ("is_private",            false)
+         ("creator_pub_key",       em_pubkey_bytes(creator_pub)));   // linked key
+   };
+
+   // 129 ASCII bytes — one over label_max_bytes.
+   BOOST_REQUIRE_EQUAL(success(), create_with_metadata("USERRES", std::string(129, 'x'), ""));
+   auto ascii_row = find_reserve("ETH", "ETH", "USERRES");
+   BOOST_REQUIRE(!ascii_row.is_null());
+   BOOST_REQUIRE_EQUAL("RESERVE_STATUS_CANCELLED", ascii_row["status"].as_string());
+   BOOST_REQUIRE_EQUAL("<rejected>", ascii_row["name"].as_string());
+
+   // 129 bytes as 127 ASCII + `é` (0xC3 0xA9) — a byte-wise truncation at the bound would
+   // have split the final character and persisted a lone lead byte. The marker sidesteps
+   // that entirely: nothing is truncated, so there is no code-point boundary to get wrong.
+   const std::string multibyte_name = std::string(127, 'x') + "\xC3\xA9";
+   BOOST_REQUIRE_EQUAL(129u, multibyte_name.size());
+   BOOST_REQUIRE_EQUAL(success(), create_with_metadata("USERRES2", multibyte_name, ""));
+   auto multibyte_row = find_reserve("ETH", "ETH", "USERRES2");
+   BOOST_REQUIRE(!multibyte_row.is_null());
+   BOOST_REQUIRE_EQUAL("RESERVE_STATUS_CANCELLED", multibyte_row["status"].as_string());
+   BOOST_REQUIRE_EQUAL("<rejected>", multibyte_row["name"].as_string());
+
+   // 257 bytes — one over description_max_bytes — behind an in-bound name. This is the
+   // `description` half of `metadata_exceeds_bounds`: the label alone would have passed, so
+   // the description is the sole rejection reason. The tombstone drops the over-bound text
+   // rather than carrying it onto a `sysio`-billed row, so the stored description is empty
+   // while the name still reads as the rejection marker.
+   const std::string oversized_description(257, 'd');
+   BOOST_REQUIRE_EQUAL(success(),
+      create_with_metadata("USERRES3", "in-bound name", oversized_description));
+   auto description_row = find_reserve("ETH", "ETH", "USERRES3");
+   BOOST_REQUIRE(!description_row.is_null());
+   BOOST_REQUIRE_EQUAL("RESERVE_STATUS_CANCELLED", description_row["status"].as_string());
+   BOOST_REQUIRE_EQUAL("<rejected>", description_row["name"].as_string());
+   BOOST_REQUIRE_EQUAL("", description_row["description"].as_string());
 } FC_LOG_AND_RETHROW() }
 
 // ── matchreserve (gating preconditions) ──
