@@ -71,10 +71,11 @@ struct opp_inbound_contract_client : ethereum_contract_client {
 /// uses the return as a "this leg landed" signal before recording the
 /// action locally.
 struct operator_registry_contract_client : ethereum_contract_client {
-   /// `commit(bytes uicBytes)` — relays a signed `UnderwriteIntentCommit`
-   /// from an underwriter into the OperatorRegistry as opaque bytes. The
-   /// hardhat-generated ABI passes the parameter as a hex-encoded string
-   /// (per `ethereum_abi::encode_dynamic_data` for `dt::bytes`).
+   /// `commit(bytes uicBytes)` — submits the original canonical
+   /// `UnderwriteIntentCommit` bytes. OperatorRegistry binds their signed EVM
+   /// caller and claimed ACTIVE roster identity before queuing the unchanged
+   /// bytes. The hardhat-generated ABI passes the parameter as a hex-encoded
+   /// string (per `ethereum_abi::encode_dynamic_data` for `dt::bytes`).
    ethereum_contract_tx_fn<fc::variant, std::string> commit;
 
    operator_registry_contract_client(const ethereum_client_ptr& client,

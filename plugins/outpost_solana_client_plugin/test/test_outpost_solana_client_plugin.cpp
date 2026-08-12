@@ -12,6 +12,7 @@
 #include <sysio/outpost_solana_client_plugin.hpp>
 #include <sysio/outpost_solana_client_plugin/outpost_solana_client.hpp>
 #include <sysio/outpost_client/rpc_options.hpp>
+#include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
 #include <sysio.msgch/solana_terminal_budget.hpp>
 
 #include <sysio/opp/opp.pb.h>
@@ -25,6 +26,7 @@
 #include <map>
 #include <set>
 #include <span>
+#include <variant>
 
 using namespace std::literals;
 using namespace fc::network::solana;
@@ -326,6 +328,50 @@ BOOST_AUTO_TEST_CASE(startup_accepts_matching_named_signer) {
       "--outpost-solana-client",
       "client-a,signer-a," + std::string(startup_test_rpc_url),
    }));
+}
+
+BOOST_AUTO_TEST_CASE(authenticated_caller_address_returns_configured_signer_pubkey) {
+   appbase::scoped_app test_application{};
+   std::vector<std::string> arguments{"test_outpost_solana_client_plugin"};
+   std::vector<char*> argv;
+   argv.reserve(arguments.size());
+   for (auto& argument : arguments) {
+      argv.emplace_back(argument.data());
+   }
+   BOOST_REQUIRE(test_application->initialize<sysio::signature_provider_manager_plugin>(
+      argv.size(), argv.data()));
+
+   const auto fixture = fc::test::load_keygen_fixture("solana", 1);
+   auto& manager = test_application->get_plugin<sysio::signature_provider_manager_plugin>();
+   auto sig_provider = manager.create_provider(
+      "signer-a",
+      fc::crypto::chain_kind_solana,
+      fc::crypto::chain_key_type_solana,
+      fixture.public_key,
+      fc::test::to_private_key_spec(fixture.private_key));
+
+   auto sol_client = std::make_shared<solana_client>(
+      sig_provider,
+      std::variant<std::string, fc::url>{std::string(startup_test_rpc_url)});
+   auto entry = std::make_shared<sysio::solana_client_entry_t>();
+   entry->id = "client-a";
+   entry->url = std::string(startup_test_rpc_url);
+   entry->signature_provider = sig_provider;
+   entry->client = sol_client;
+
+   sysio::outpost_solana_client outpost(
+      entry,
+      measurement_pubkey(42),
+      {load_idl_fixture(opp_outpost_idl_fixture)},
+      1,
+      1,
+      sysio::solana_outpost_role::underwriter);
+
+   const auto expected_caller = sol_client->get_pubkey().serialize();
+   const auto actual_caller = outpost.authenticated_caller_address();
+   BOOST_CHECK_EQUAL_COLLECTIONS(
+      expected_caller.begin(), expected_caller.end(),
+      actual_caller.begin(), actual_caller.end());
 }
 
 BOOST_AUTO_TEST_CASE(startup_rejects_client_without_matching_named_signature_provider) {

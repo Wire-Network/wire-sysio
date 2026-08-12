@@ -688,6 +688,13 @@ public:
                    std::string_view log_prefix,
                    const std::atomic<bool>& shutdown_flag);
 
+   /// Return true when `provider_key` is a direct key whose weight alone
+   /// reaches `actor`'s active threshold or its owner ancestor. Call only from
+   /// the main app thread or an executor read window.
+   bool provider_can_authorize_active_alone(
+      chain::name actor,
+      const fc::crypto::public_key& provider_key) const;
+
    void accept_transaction(const chain::packed_transaction_ptr& trx, chain::plugin_interface::next_function<chain::transaction_trace_ptr> next);
 
    // Only call this after plugin_initialize()!

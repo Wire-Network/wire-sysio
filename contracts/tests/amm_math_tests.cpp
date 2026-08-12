@@ -18,6 +18,7 @@
 
 #include <cmath>
 #include <cstdint>
+#include <limits>
 #include <vector>
 
 using namespace sysio::opp::amm;
@@ -138,16 +139,22 @@ BOOST_AUTO_TEST_CASE(convenience_wrappers) {
 /// SEC-26 / WSA-042: a 100% fee (`fee_bps == BPS_TOTAL`) consumes the entire
 /// WIRE leg, leaving `net == 0`. That degenerate post-fee leg is what let a
 /// from-WIRE / token-to-token swap debit destination reserve liquidity while
-/// crediting zero WIRE. Any fee below 100% leaves a positive remainder for
-/// every positive input — so rejecting `fee_bps >= BPS_TOTAL` at
-/// `sysio.uwrit::setconfig` makes `net == 0` unconstructible at settlement.
+/// crediting zero WIRE. Any NETWORK fee below 100% leaves a positive remainder
+/// for every positive input, which is why `sysio.uwrit::setconfig` rejects
+/// `fee_bps >= BPS_TOTAL`.
+///
+/// That cap does NOT make `net == 0` unconstructible at settlement, and this
+/// suite must not imply it does: reserve owner fees ride the same leg under a
+/// separate cap, so the TOTAL can still reach 100% — see
+/// `split_wire_fee_reaches_the_leg_under_valid_configuration` below. The
+/// settlement `net > 0` checks are live rejections, not dead code.
 BOOST_AUTO_TEST_CASE(split_wire_fee_boundaries) {
    // 100% fee: fee == input, net == 0, and the fee splits exactly.
    {
-      const auto f = split_wire_fee(1'000'000'000ULL, BPS_TOTAL, /*reward_share_bps*/5000);
+      const auto f = split_wire_fee(1'000'000'000ULL, BPS_TOTAL, /*underwriter_share_bps*/5000);
       BOOST_CHECK_EQUAL(f.fee, 1'000'000'000ULL);
       BOOST_CHECK_EQUAL(f.net, 0u);
-      BOOST_CHECK_EQUAL(f.reward_share + f.emissions_share, f.fee);
+      BOOST_CHECK_EQUAL(f.underwriter_share + f.reward_share, f.fee);
    }
    // Over-100% is clamped to 100% (split_wire_fee guards fee_bps > BPS_TOTAL),
    // still net == 0 — also rejected upstream by setconfig.
@@ -164,6 +171,148 @@ BOOST_AUTO_TEST_CASE(split_wire_fee_boundaries) {
          BOOST_CHECK_GT(f.net, 0u);
          BOOST_CHECK_EQUAL(f.net + f.fee, amt);
       }
+   }
+}
+
+/// Stage 2 of the split: `emissions_share_bps` divides the REWARDS POOL (what is
+/// left after the underwriter's cut), not the whole fee. The default is 0 — the
+/// whole pool is allocated to the batch-operator distribution and no fee leaves
+/// `sysio.reserv` custody.
+BOOST_AUTO_TEST_CASE(split_wire_fee_emissions_share_divides_the_rewards_pool) {
+   constexpr uint64_t AMOUNT  = 1'000'000ULL;
+   constexpr uint32_t FEE_BPS = 1'000;   // 10% -> fee 100'000
+   constexpr uint32_t HALF    = 5'000;   // 50% underwriter -> pool 50'000
+
+   // Default (omitted) emissions share: nothing is earmarked for the treasury.
+   {
+      const auto f = split_wire_fee(AMOUNT, FEE_BPS, HALF);
+      BOOST_CHECK_EQUAL(f.fee, 100'000u);
+      BOOST_CHECK_EQUAL(f.underwriter_share, 50'000u);
+      BOOST_CHECK_EQUAL(f.reward_share, 50'000u);
+      BOOST_CHECK_EQUAL(f.emissions_share, 0u);
+   }
+   // A 40% emissions share takes 40% OF THE POOL (20'000), not of the fee.
+   {
+      const auto f = split_wire_fee(AMOUNT, FEE_BPS, HALF, 4'000);
+      BOOST_CHECK_EQUAL(f.underwriter_share, 50'000u);
+      BOOST_CHECK_EQUAL(f.emissions_share, 20'000u);
+      BOOST_CHECK_EQUAL(f.reward_share, 30'000u);
+   }
+   // 100% of the pool leaves batch operators with nothing; the underwriter's
+   // half is untouched by this dial.
+   {
+      const auto f = split_wire_fee(AMOUNT, FEE_BPS, HALF, BPS_TOTAL);
+      BOOST_CHECK_EQUAL(f.underwriter_share, 50'000u);
+      BOOST_CHECK_EQUAL(f.emissions_share, 50'000u);
+      BOOST_CHECK_EQUAL(f.reward_share, 0u);
+   }
+   // Three-way conservation holds exactly across odd amounts and odd shares —
+   // each stage takes the REMAINDER, so no subunit is created or lost.
+   for (uint32_t emis : {0u, 1u, 3'333u, 5'000u, 9'999u, BPS_TOTAL}) {
+      for (uint64_t amt : {1ULL, 7ULL, 999ULL, 1'000'003ULL, 1'000'000'000'000ULL}) {
+         const auto f = split_wire_fee(amt, 137, 5'000, emis);
+         BOOST_CHECK_EQUAL(f.underwriter_share + f.reward_share + f.emissions_share, f.fee);
+         BOOST_CHECK_EQUAL(f.net + f.fee, amt);
+      }
+   }
+   // Over-100% share clamps rather than wrapping.
+   {
+      const auto f = split_wire_fee(AMOUNT, FEE_BPS, HALF, BPS_TOTAL + 7'777);
+      BOOST_CHECK_EQUAL(f.emissions_share, 50'000u);
+      BOOST_CHECK_EQUAL(f.reward_share, 0u);
+   }
+}
+
+/// Three fees ride the same leg (network + both reserve owners), so their TOTAL
+/// can carry past `uint64_t` even though each product is computed in `u128`.
+/// The total must therefore be summed and compared in `u128` too: a wrapped
+/// total is strictly worse than a saturated one, because it reports a small
+/// POSITIVE `net` for a leg the fees consumed entirely — and `net > 0` is
+/// exactly the gate every caller uses to reject such a swap.
+BOOST_AUTO_TEST_CASE(split_wire_fee_stacked_rates_cannot_wrap_the_total) {
+   constexpr uint64_t MAX = std::numeric_limits<uint64_t>::max();
+
+   // The boundary case: maximum leg, three 100% rates. Summed in uint64 this
+   // wraps to MAX - 2 and reports net == 2 — a fully-consumed leg passing the
+   // caller's `net > 0` gate. Clamped, it reports what actually happened.
+   {
+      const auto f = split_wire_fee(MAX, BPS_TOTAL, /*underwriter*/5'000,
+                                    /*emissions*/0, /*src*/BPS_TOTAL, /*dst*/BPS_TOTAL);
+      BOOST_CHECK_EQUAL(f.net, 0u);
+      BOOST_CHECK_EQUAL(f.fee, MAX);
+      // Each individual share is still its own true (un-wrapped) product.
+      BOOST_CHECK_EQUAL(f.src_reserve_share, MAX);
+      BOOST_CHECK_EQUAL(f.dst_reserve_share, MAX);
+   }
+   // Same wrap hazard at a partial rate: 40% + 40% + 40% of MAX is 1.2 × MAX,
+   // which overflows uint64 while each term individually fits.
+   {
+      const auto f = split_wire_fee(MAX, 4'000, 5'000, 0, 4'000, 4'000);
+      BOOST_CHECK_EQUAL(f.net, 0u);
+      BOOST_CHECK_EQUAL(f.fee, MAX);
+   }
+   // Just BELOW the carry: 30% + 30% + 30% of MAX is 0.9 × MAX, so the total
+   // fits and must be reported exactly — not clamped.
+   {
+      const auto f = split_wire_fee(MAX, 3'000, 5'000, 0, 3'000, 3'000);
+      const uint64_t expected = f.src_reserve_share + f.dst_reserve_share
+                              + f.underwriter_share + f.reward_share + f.emissions_share;
+      BOOST_CHECK_EQUAL(f.fee, expected);
+      BOOST_CHECK_GT(f.net, 0u);
+      BOOST_CHECK_EQUAL(f.net + f.fee, MAX);
+   }
+   // Stacked rates that merely REACH the leg (no uint64 carry) also clamp to a
+   // zero net rather than under-reporting the fee.
+   {
+      const auto f = split_wire_fee(1'000'000ULL, 5'000, 5'000, 0, 3'000, 2'000);
+      BOOST_CHECK_EQUAL(f.fee, 1'000'000u);
+      BOOST_CHECK_EQUAL(f.net, 0u);
+   }
+   // Ordinary stacked rates conserve the leg exactly across odd amounts.
+   for (uint64_t amt : {1ULL, 7ULL, 999ULL, 1'000'003ULL, 1'000'000'000'000ULL}) {
+      const auto f = split_wire_fee(amt, 137, 5'000, 1'111, 89, 233);
+      BOOST_CHECK_EQUAL(f.src_reserve_share + f.dst_reserve_share
+                        + f.underwriter_share + f.reward_share + f.emissions_share,
+                        f.fee);
+      BOOST_CHECK_EQUAL(f.net + f.fee, amt);
+   }
+}
+
+/// A zero `net` is an intentionally REJECTED CONFIGURATION, not unreachable
+/// defense-in-depth. The two caps bound their rates INDEPENDENTLY — nothing
+/// cross-checks the sum — so the maximum network fee `sysio.uwrit::setconfig`
+/// accepts plus the minimum owner fee `sysio.reserv::setrsvfee` accepts already
+/// consumes the whole leg. This pins that reachability so the `net > 0` checks in
+/// `applyswap` / `applyfromwire` are never mistaken for dead code again.
+BOOST_AUTO_TEST_CASE(split_wire_fee_reaches_the_leg_under_valid_configuration) {
+   // Mirrors the on-chain caps: sysio.uwrit::MAX_FEE_BPS / sysio.reserv's
+   // [MIN_OWNER_FEE_BPS, MAX_OWNER_FEE_BPS]. Duplicated as literals because this
+   // suite tests the shared AMM kernel and does not link either contract.
+   constexpr uint32_t MAX_FEE_BPS       = 9'999; // 99.99% network fee
+   constexpr uint32_t MIN_OWNER_FEE_BPS = 1;     // 0.01% reserve owner fee
+
+   // 9999 + 1 == BPS_TOTAL exactly: one owner fee at its FLOOR is enough.
+   {
+      const auto f = split_wire_fee(1'000'000'000ULL, MAX_FEE_BPS, /*underwriter*/5'000,
+                                    /*emissions*/0, /*src*/MIN_OWNER_FEE_BPS, /*dst*/0);
+      BOOST_CHECK_EQUAL(f.net, 0u);
+      BOOST_CHECK_EQUAL(f.fee, 1'000'000'000ULL);
+   }
+   // Both legs charging the floor overshoots, and still reports a consumed leg
+   // rather than wrapping or under-reporting.
+   {
+      const auto f = split_wire_fee(1'000'000'000ULL, MAX_FEE_BPS, 5'000, 0,
+                                    MIN_OWNER_FEE_BPS, MIN_OWNER_FEE_BPS);
+      BOOST_CHECK_EQUAL(f.net, 0u);
+      BOOST_CHECK_EQUAL(f.fee, 1'000'000'000ULL);
+   }
+   // One bp below the boundary still settles: 9998 + 1 leaves a positive net, so
+   // the rejection is a genuine boundary and not a blanket refusal of high fees.
+   {
+      const auto f = split_wire_fee(1'000'000'000ULL, MAX_FEE_BPS - 1, 5'000, 0,
+                                    MIN_OWNER_FEE_BPS, 0);
+      BOOST_CHECK_GT(f.net, 0u);
+      BOOST_CHECK_EQUAL(f.net + f.fee, 1'000'000'000ULL);
    }
 }
 

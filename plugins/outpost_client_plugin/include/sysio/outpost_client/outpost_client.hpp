@@ -25,8 +25,8 @@ inline constexpr size_t OPP_MAX_ENVELOPE_BYTES = 65'536;
  * This is the SPI (Service Provider Interface) between `batch_operator_plugin`
  * and the chain-specific `outpost_ethereum_client_plugin` /
  * `outpost_solana_client_plugin`. The orchestrating `outpost_opp_job` holds an
- * `outpost_client_ptr` and calls only the virtuals below — it never sees an
- * ETH address, a Solana PDA, or a signature-provider format.
+ * `outpost_client_ptr` and calls only the virtuals below — it never interprets
+ * an ETH address, Solana public key, PDA, or signature-provider format.
  *
  * Each concrete implementation owns its chain-specific machinery (opp contract
  * clients, program clients, signature providers) and is responsible for
@@ -48,6 +48,22 @@ public:
    /// Solana = 0 (Solana has no numeric chain id; clusters are identified by
    /// genesis hash).
    virtual uint32_t chain_id() const = 0;
+
+   /**
+    * @brief Raw chain-native address that authenticates this client's writes.
+    *
+    * Ethereum returns the 20-byte address derived from the configured
+    * transaction signer. Solana returns the configured signer's 32-byte
+    * public key. Underwriter UIC construction signs this value into
+    * `uw_ext_chain_addr`, so the canonical payload contains no omitted
+    * default byte field and records the local transaction signer as signed
+    * metadata. The outpost binds this field and the claimed WIRE account to
+    * the authenticated caller and its current ACTIVE underwriter roster row.
+    *
+    * @return Opaque chain-native address bytes; 20 bytes for Ethereum and 32
+    *         bytes for Solana.
+    */
+   virtual std::vector<uint8_t> authenticated_caller_address() const = 0;
 
    /// Human-readable identifier safe to embed in log lines and metrics.
    /// Canonical format: `{chain_code}:{ChainKind_Name}:{chain_id}`
@@ -104,15 +120,19 @@ public:
                                                    fc::microseconds deadline) = 0;
 
    /**
-    * @brief UNDERWRITER COMMIT — relay a signed `UnderwriteIntentCommit` (UIC)
-    *        to this outpost as an opaque bytes blob.
+    * @brief UNDERWRITER COMMIT — submit a signed `UnderwriteIntentCommit`
+    *        (UIC) through an ACTIVE-role-gated outpost relay.
     *
     * Called by the underwriter plugin (or any future plugin that issues
     * outpost-side commits) to deliver a signed intent without the caller
     * knowing the outpost's contract surface, ABI / IDL layout, or message
     * encoding. The chain-specific concrete resolves which contract or
     * program action to invoke, how to encode the bytes for the wire, and
-    * how to await on-chain confirmation.
+    * how to await on-chain confirmation. The current outposts accept only a
+    * canonically encoded UIC whose claimed WIRE account and external address
+    * match the authenticated caller's current ACTIVE underwriter roster row.
+    * They queue the original validated bytes unchanged. The WIRE depot remains
+    * authoritative for validating the embedded permission signature and bond.
     *
     * Returns only after on-chain inclusion + confirmations — the caller
     * uses the return value as a "this leg landed" signal before recording
@@ -122,11 +142,11 @@ public:
     *
     * @param uw_request_id  The depot's `sysio.uwrit::uwreqs` row id this
     *                       UIC is committing to. Used only for log
-    *                       correlation; the on-chain call carries only
-    *                       the opaque bytes.
+    *                       correlation; the on-chain call carries the original
+    *                       validated UIC bytes.
     * @param uic_bytes      Serialized `UnderwriteIntentCommit` (protobuf
-    *                       encoded, signed by the underwriter's WIRE K1
-    *                       key).
+    *                       encoded, signed by an authorized WIRE K1, R1,
+    *                       EM, or ED permission key).
     * @param deadline       Upper bound on the total time spent talking to
     *                       the remote chain for this call.
     * @return Chain-native tx id / signature suitable for logs.

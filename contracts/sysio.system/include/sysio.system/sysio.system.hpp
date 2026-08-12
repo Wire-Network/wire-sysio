@@ -601,9 +601,13 @@ namespace sysiosystem {
           * `batch_op_groups` is the full state.batch_op_groups vector from
           * sysio.epoch; payepoch reads t5state.batch_group_epochs to weight
           * the batch pool proportionally to each group's active-epoch count
-          * over the period (groups that were active in zero epochs are
-          * skipped, which can only happen when pay_cadence_epochs <
-          * batch_op_groups.size()).
+          * over the period, normalized by the ACTUAL accrued-epoch count (the
+          * sum of those counters) rather than the configured
+          * pay_cadence_epochs, which a mid-period setemitcfg change or the
+          * shortened genesis period can make disagree. Groups active in zero
+          * epochs are skipped, which happens whenever the accrued count is
+          * smaller than batch_op_groups.size(); skipping costs them nothing,
+          * since a zero count already weights their allocation to zero.
           *
           * Runtime conditions (config missing, treasury exhausted, balance
           * insufficient) are caught upstream by the gate, which records the
@@ -617,13 +621,19 @@ namespace sysiosystem {
 
          /**
           * Accrue this epoch's per-epoch emission share onto t5state, without
-          * paying. Called inline by sysio.epoch::advance on every non-pay
-          * epoch (the cadence-1..cadence-2 epochs of each pay period). Auth:
-          * require_auth("sysio.epoch").
+          * paying. Called inline by sysio.epoch::advance on EVERY successful
+          * epoch — including a pay epoch, where advance queues this action
+          * FIRST and payepoch after it, so FIFO inline ordering means payepoch
+          * observes the post-accrue state. Auth: require_auth("sysio.epoch").
           *
           * Increments t5state.pending_emission_amount by `per_epoch_emission`
           * and bumps t5state.batch_group_epochs[batch_group_index] by 1, so
           * the next payepoch sees the period total + per-group counts.
+          *
+          * Because it also runs on the pay epoch, the counter sum that
+          * `payepoch` normalizes by includes the epoch being paid. Reading this
+          * as "non-pay epochs only" understates that sum by one and is how the
+          * configured-cadence divisor came to look correct.
           *
           * No transfers happen here. Treasury / balance gating is the
           * gate's responsibility upstream.

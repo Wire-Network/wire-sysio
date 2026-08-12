@@ -40,6 +40,10 @@
                 {
                     "name": "dst_amount",
                     "type": "uint64"
+                },
+                {
+                    "name": "underwriter",
+                    "type": "name"
                 }
             ]
         },
@@ -78,6 +82,38 @@
                 {
                     "name": "dst_amount",
                     "type": "uint64"
+                },
+                {
+                    "name": "underwriter",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "claimrsvfee",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "reserve_code",
+                    "type": "slug_name"
+                }
+            ]
+        },
+        {
+            "name": "claimuwfee",
+            "base": "",
+            "fields": [
+                {
+                    "name": "underwriter",
+                    "type": "name"
                 }
             ]
         },
@@ -260,6 +296,10 @@
                 {
                     "name": "wire_out",
                     "type": "uint64"
+                },
+                {
+                    "name": "underwriter",
+                    "type": "name"
                 }
             ]
         },
@@ -328,6 +368,16 @@
                 {
                     "name": "owner",
                     "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "reserve_config",
+            "base": "",
+            "fields": [
+                {
+                    "name": "fee_emissions_share_bps",
+                    "type": "uint32"
                 }
             ]
         },
@@ -428,6 +478,18 @@
                 {
                     "name": "creator_pub_key",
                     "type": "bytes"
+                },
+                {
+                    "name": "owner_fee_bps",
+                    "type": "uint32"
+                },
+                {
+                    "name": "owner_fee_accrued",
+                    "type": "uint64"
+                },
+                {
+                    "name": "owner_fee_lifetime",
+                    "type": "uint64"
                 }
             ]
         },
@@ -447,6 +509,56 @@
                 {
                     "name": "lifetime_accrued",
                     "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "rsvfeebal",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "reserve_code",
+                    "type": "slug_name"
+                }
+            ]
+        },
+        {
+            "name": "setconfig",
+            "base": "",
+            "fields": [
+                {
+                    "name": "fee_emissions_share_bps",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "setrsvfee",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "reserve_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "owner_fee_bps",
+                    "type": "uint32"
                 }
             ]
         },
@@ -495,6 +607,48 @@
             ]
         },
         {
+            "name": "uw_fee_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "underwriter",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "uw_fee_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "underwriter",
+                    "type": "name"
+                },
+                {
+                    "name": "balance",
+                    "type": "uint64"
+                },
+                {
+                    "name": "lifetime_accrued",
+                    "type": "uint64"
+                },
+                {
+                    "name": "lifetime_claimed",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "uwfeebal",
+            "base": "",
+            "fields": [
+                {
+                    "name": "underwriter",
+                    "type": "name"
+                }
+            ]
+        },
+        {
             "name": "wire_claim",
             "base": "",
             "fields": [
@@ -532,6 +686,16 @@
         {
             "name": "applyswap",
             "type": "applyswap",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "claimrsvfee",
+            "type": "claimrsvfee",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "claimuwfee",
+            "type": "claimuwfee",
             "ricardian_contract": ""
         },
         {
@@ -585,12 +749,40 @@
             "ricardian_contract": ""
         },
         {
+            "name": "rsvfeebal",
+            "type": "rsvfeebal",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "setconfig",
+            "type": "setconfig",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "setrsvfee",
+            "type": "setrsvfee",
+            "ricardian_contract": ""
+        },
+        {
             "name": "swapquote",
             "type": "swapquote",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "uwfeebal",
+            "type": "uwfeebal",
             "ricardian_contract": ""
         }
     ],
     "tables": [
+        {
+            "name": "reservcfg",
+            "type": "reserve_config",
+            "index_type": "i64",
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 11698
+        },
         {
             "name": "reserves",
             "type": "reserve_row",
@@ -620,6 +812,14 @@
             "table_id": 15326
         },
         {
+            "name": "uwfees",
+            "type": "uw_fee_row",
+            "index_type": "i64",
+            "key_names": ["underwriter"],
+            "key_types": ["name"],
+            "table_id": 43959
+        },
+        {
             "name": "wireclaims",
             "type": "wire_claim",
             "index_type": "i64",
@@ -643,7 +843,15 @@
             "result_type": "uint64"
         },
         {
+            "name": "rsvfeebal",
+            "result_type": "uint64"
+        },
+        {
             "name": "swapquote",
+            "result_type": "uint64"
+        },
+        {
+            "name": "uwfeebal",
             "result_type": "uint64"
         }
     ],
