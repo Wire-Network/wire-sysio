@@ -27,6 +27,8 @@ target_link_libraries(${CONTRACT_UNIT_TEST_EXE}
         fc-lite
         opp
 )
+target_include_directories(${CONTRACT_UNIT_TEST_EXE} PRIVATE
+        ${CMAKE_SOURCE_DIR}/libraries/opp/test/include)
 
 # add_sysio_test_executable(${CONTRACT_UNIT_TEST_EXE} ${UNIT_TESTS}) # build unit tests as one executable
 add_test(NAME ${CONTRACT_UNIT_TEST_EXE} COMMAND ${CONTRACT_UNIT_TEST_EXE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})

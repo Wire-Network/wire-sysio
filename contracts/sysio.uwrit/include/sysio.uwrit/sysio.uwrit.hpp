@@ -294,11 +294,24 @@ namespace sysio {
                        std::vector<char> data);
 
       /// Called inline from `sysio.msgch::dispatch` when an
-      /// UNDERWRITE_INTENT_COMMIT attestation arrives. Records the per-leg
-      /// arrival in `uwreqs.commits_by` and stores the verbatim UIC bytes
-      /// so `try_select_winner` can reconstruct + verify the digest. When
-      /// both legs land for the same underwriter, runs `try_select_winner`
-      /// to resolve the race.
+      /// UNDERWRITE_INTENT_COMMIT attestation arrives. Pre-validates the
+      /// claimed underwriter's fixed-size recoverable signature before
+      /// changing candidate evidence. Invalid claims are logged and ignored:
+      /// they cannot replace stored bytes, change status/reason, or refresh
+      /// arrival timestamps. A valid replay of an already-recorded leg never
+      /// replaces the stored bytes: candidate legs are write-once. Once both
+      /// legs are stored, an exact replay revalidates the preserved evidence
+      /// and retries winner selection against current mutable depot state.
+      /// When both legs
+      /// land for the same underwriter, runs `try_select_winner` to resolve the
+      /// race. For a dual-outpost request it revalidates only the older stored
+      /// leg so a WIRE permission-key change between arrivals cannot authorize
+      /// stale evidence; the just-verified incoming leg is not recovered twice.
+      /// A complete candidate is evaluated immediately. Recoverable conditions
+      /// (temporarily unavailable collateral, identity links, or reserves) keep
+      /// its evidence on the PENDING row until an outpost replays one of the
+      /// exact stored UICs; malformed or no-longer-authorized stored evidence is
+      /// durably disqualified. Replayed UIC bytes never replace stored legs.
       ///
       /// `(from_chain_code, from_token_code, reserve_code)` together identify
       /// which leg of the swap this UIC covers. Same-chain swaps with
@@ -551,10 +564,11 @@ namespace sysio {
       /// leg of a dual-COMMIT pair arrived so `try_select_winner` can
       /// resolve the race deterministically. Each leg's COMMIT is an
       /// independent attestation with its own chain_code + uw_ext_chain_addr
-      /// (the underwriter's chain identity on that leg's outpost) + signature
-      /// over the whole UIC. The depot stores the full UIC bytes per leg so
+      /// (signed external-chain signer metadata for that leg) + signature over
+      /// the whole UIC. The depot stores the full UIC bytes per leg so
       /// `try_select_winner` can reconstruct the signed digest verbatim and
-      /// verify against any of the underwriter's WIRE account permissions.
+      /// verify a canonical fixed-size recoverable K1, R1, EM, or ED signature
+      /// against the underwriter's WIRE account `active` or `owner` permission.
       ///
       /// `commit_entry` does NOT carry codenames — the per-leg
       /// `(chain_code, token_code, reserve_code)` identity is on the
@@ -575,10 +589,15 @@ namespace sysio {
          uint64_t          dest_received_at_ms   = 0;
          uint64_t          dest_outpost_id       = 0;
          std::vector<char> dest_uic_bytes;
-         /// Race outcome — INTENT_SUBMITTED (initial), INTENT_CONFIRMED
-         /// (winner), SLASHED (rejected for insufficient bond), or RELEASED
-         /// (loser, kept for debugging). Reuses the existing protobuf
-         /// UnderwriteStatus enum.
+         /// Race outcome — INTENT_SUBMITTED (initial/retryable),
+         /// INTENT_CONFIRMED (winner), DISQUALIFIED (durably invalid stored
+         /// evidence, such as a signature invalidated by key rotation), or
+         /// RELEASED (clean loser, retained for audit). A new matching
+         /// `rcrdcommit` cannot rewrite or re-arm a DISQUALIFIED entry. An
+         /// exact replay can re-evaluate only an INTENT_SUBMITTED entry. The
+         /// reused protobuf enum also contains SLASHED, but commit entries
+         /// never write that value; economic slash state belongs to lock and
+         /// operator settlement.
          opp::types::UnderwriteStatus status = opp::types::UNDERWRITE_STATUS_INTENT_SUBMITTED;
          std::string reason;
 

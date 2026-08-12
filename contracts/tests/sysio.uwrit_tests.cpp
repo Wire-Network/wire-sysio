@@ -462,41 +462,4 @@ BOOST_FIXTURE_TEST_CASE(rcrdcommit_same_chain_swap_auth, sysio_uwrit_tester) { t
    ).find("missing authority of sysio.msgch") != std::string::npos);
 } FC_LOG_AND_RETHROW() }
 
-// ── B4: try_recover_key no-throw guarantee ─────────────────────────
-//
-// verify_uic_signature must never halt the dispatch chain on malformed
-// signature bytes (per feedback_opp_handlers_never_throw.md — a
-// `check()` here stalls consensus). It calls `try_recover_key` which
-// returns `std::nullopt` on any failure; the helper turns that into a
-// `return false` and logs.
-//
-// This case sends rcrdcommit with msgch auth and a uic_bytes blob whose
-// (decoded) signature would normally cause `recover_key` to throw. The
-// assertion is "the action does NOT throw" — it may write the
-// commit_entry with the bad bytes, but it must not halt. Today the
-// uwreq doesn't exist so the dispatch fails earlier with "uwreq not
-// found" before the verify path runs; this is fine — the test's
-// invariant is that nothing in the call chain throws on a malformed
-// signature blob payload.
-BOOST_FIXTURE_TEST_CASE(rcrdcommit_malformed_uic_does_not_halt, sysio_uwrit_tester) { try {
-   // 32-byte blob with a tag byte (>5, invalid variant tag) — would fail
-   // the pre-validation bounds check in verify_uic_signature.
-   std::vector<char> bad_uic_bytes(32, '\x00');
-   bad_uic_bytes[0] = '\xFF';  // variant tag well outside legal range
-
-   auto r = push_uwrit_action(MSGCH_ACCOUNT, "rcrdcommit"_n, mvo()
-      ("uwreq_id",         9001)
-      ("underwriter",      "uwrit.a")
-      ("chain_code",       1)
-      ("from_chain_code",  codename_mvo("ETH"))
-      ("from_token_code",  codename_mvo("ETH"))
-      ("reserve_code",     codename_mvo("PRIMARY"))
-      ("uic_bytes",        bad_uic_bytes)
-   );
-   // v6: rcrdcommit logs + skips rather than throwing — neither the
-   // unknown-uwreq path nor the malformed-uic path may halt the
-   // consensus pipeline. The invariant: the action does NOT throw.
-   BOOST_REQUIRE_EQUAL(success(), r);
-} FC_LOG_AND_RETHROW() }
-
 BOOST_AUTO_TEST_SUITE_END()

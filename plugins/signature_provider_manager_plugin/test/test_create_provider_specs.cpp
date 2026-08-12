@@ -84,6 +84,7 @@ BOOST_AUTO_TEST_CASE(create_provider_wire_key_from_example_spec) {
    // A named provider created through the public API was not supplied through
    // --signature-provider and must not satisfy another plugin's config reference.
    BOOST_CHECK(!mgr.is_explicitly_configured_provider(provider->key_name));
+   BOOST_CHECK(!mgr.is_operator_configured_provider(provider->key_name));
 
    // Public key should match the one provided in spec
    BOOST_CHECK_EQUAL(provider->public_key.to_string({}), pub.to_string({}));
@@ -201,9 +202,11 @@ BOOST_AUTO_TEST_CASE(ethereum_signature_provider_spec_options) {
    // Provider 1 should be retrievable
    BOOST_CHECK(!mgr.query_providers(fixture1.key_name).empty());
    BOOST_CHECK(mgr.is_explicitly_configured_provider(fixture1.key_name));
+   BOOST_CHECK(mgr.is_operator_configured_provider(fixture1.key_name));
    // Provider 2 should be retrievable
    BOOST_CHECK(!mgr.query_providers(fixture2.key_name).empty());
    BOOST_CHECK(mgr.is_explicitly_configured_provider(fixture2.key_name));
+   BOOST_CHECK(mgr.is_operator_configured_provider(fixture2.key_name));
 }
 
 BOOST_AUTO_TEST_CASE(wire_signature_provider_spec_options) {
@@ -229,6 +232,29 @@ BOOST_AUTO_TEST_CASE(wire_signature_provider_spec_options) {
    // Provider 1 should be retrievable
    BOOST_CHECK(!mgr.query_providers(fixture1.key_name).empty());
 
+}
+
+BOOST_AUTO_TEST_CASE(anonymous_option_is_operator_configured_without_an_explicit_name) {
+   using namespace fc::crypto;
+   auto clean_app = gsl_lite::finally([]() {
+      appbase::application::reset_app_singleton();
+   });
+
+   const auto key = private_key::generate();
+   const auto named_spec = to_signature_provider_spec(
+      "unused", chain_kind_wire, chain_key_type_wire,
+      key.get_public_key().to_string({}), to_private_key_spec(key.to_string({})));
+   const auto first_comma = named_spec.find(',');
+   BOOST_REQUIRE(first_comma != std::string::npos);
+   const auto anonymous_spec = named_spec.substr(first_comma + 1);
+
+   auto tester = create_app(std::string{"--signature-provider"}, anonymous_spec);
+   auto& mgr = tester->plugin();
+   const auto providers = mgr.query_providers(std::nullopt, chain_kind_wire);
+   BOOST_REQUIRE_EQUAL(1u, providers.size());
+   BOOST_CHECK_EQUAL("key-0", providers.front()->key_name);
+   BOOST_CHECK(mgr.is_operator_configured_provider(providers.front()->key_name));
+   BOOST_CHECK(!mgr.is_explicitly_configured_provider(providers.front()->key_name));
 }
 
 BOOST_AUTO_TEST_CASE(create_provider_solana_fixture_pub_priv_sig_interoperable) {
@@ -597,6 +623,12 @@ BOOST_AUTO_TEST_CASE(default_signature_provider_file_is_owner_only) {
 
    // Generating + persisting a default provider must write the key file with owner-only permissions.
    tester->plugin().register_default_signature_providers({chain_key_type_wire});
+
+   const auto defaults = tester->plugin().query_providers(std::nullopt, chain_kind_wire);
+   BOOST_REQUIRE(!defaults.empty());
+   for (const auto& provider : defaults) {
+      BOOST_CHECK(!tester->plugin().is_operator_configured_provider(provider->key_name));
+   }
 
    auto key_file = config_dir / "default_signature_providers.json";
    BOOST_REQUIRE(std::filesystem::exists(key_file));

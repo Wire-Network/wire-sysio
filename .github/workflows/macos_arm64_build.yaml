@@ -131,8 +131,18 @@ jobs:
           echo "Running sharded NP/LR tests with ${test_jobs} jobs"
           ctest -j "${test_jobs}" \
             -L "(nonparallelizable_tests|long_running_tests)" \
+            -E "^auto_bp_gossip_peering_test$" \
             --timeout 2700 \
             2>&1 | tee "$RUNNER_TEMP/macos-arm64-np-lr-ctest.log"
+
+      - name: Run auto BP gossip peering test serially
+        if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.run_sharded_np_lr) }}
+        run: |
+          cd "$BUILD_DIR"
+          # The 21-node gossip topology requires exclusive macOS host resources.
+          ctest -j 1 -R "^auto_bp_gossip_peering_test$" \
+            --output-on-failure --timeout 2700 \
+            2>&1 | tee "$RUNNER_TEMP/macos-arm64-auto-bp-gossip-peering-ctest.log"
 
       - name: Save CTest cost data
         if: ${{ always() && hashFiles(format('{0}/Testing/Temporary/CTestCostData.txt', env.BUILD_DIR)) != '' }}

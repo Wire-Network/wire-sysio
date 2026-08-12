@@ -152,6 +152,7 @@ public:
    sysio::opp::types::ChainKind chain_kind() const override;
    uint64_t                     chain_code() const override { return _outpost_id; }
    uint32_t                     chain_id()   const override { return _chain_id; }
+   std::vector<uint8_t>         authenticated_caller_address() const override;
    // to_string() inherits the base-class default: "{chain_code}:{ChainKind}:{chain_id}".
 
    std::string deliver_outbound_envelope(uint32_t                 epoch_index,

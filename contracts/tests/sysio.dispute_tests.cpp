@@ -187,7 +187,8 @@ public:
 
    action_result push(name contract, abi_serializer& ser, name signer,
                       name action_name, const fc::variant_object& data) {
-      return sysio_system::test_support::push_contract_action(*this, contract, ser, signer, action_name, data);
+      return sysio_system::test_support::push_contract_action_and_produce_block(
+         *this, contract, ser, signer, action_name, data);
    }
 
    // ── OPP stack bootstrap: one batch op, one outpost, advance to epoch 1 ────

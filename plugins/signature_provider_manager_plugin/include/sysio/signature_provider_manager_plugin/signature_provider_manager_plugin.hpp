@@ -193,6 +193,20 @@ public:
    bool is_explicitly_configured_provider(const std::string& key_name);
 
    /**
+    * Check whether a provider came from any `--signature-provider` option.
+    *
+    * This includes both stable five-field names and process-local names
+    * assigned to anonymous four-field options. Programmatic and generated
+    * default providers are excluded. Use this predicate when operator intent,
+    * rather than a stable cross-plugin name reference, is the selection rule.
+    *
+    * @param key_name Final provider name stored in the registry.
+    * @return true when the operator supplied the provider on the command line
+    *         or in configuration.
+    */
+   bool is_operator_configured_provider(const std::string& key_name);
+
+   /**
     * Get a provider by public key or key name
     *
     * @param key to lookup provider
