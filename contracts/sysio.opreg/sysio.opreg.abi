@@ -532,6 +532,10 @@
                 {
                     "name": "balance",
                     "type": "uint64"
+                },
+                {
+                    "name": "expires_at_sec",
+                    "type": "uint32"
                 }
             ]
         },
@@ -895,7 +899,14 @@
             "index_type": "i64",
             "key_names": ["account"],
             "key_types": ["uint64"],
-            "table_id": 45499
+            "table_id": 45499,
+            "secondary_indexes": [
+                {
+                    "name": "byexpiry",
+                    "key_type": "uint128",
+                    "table_id": 43905
+                }
+            ]
         },
         {
             "name": "wtdwqueue",

@@ -41,9 +41,16 @@ constexpr name ram_payer = "sysio"_n;
 void credit_remit_claim(name self, name account, uint64_t amount) {
    if (amount == 0) return;
 
+   // The expiry stamp is RECORDED, not acted on: no sweep is wired against `remitclaims` (see the
+   // note on the table). Refreshing it on every credit means an operator still being remitted
+   // never ages, so the stamp already carries the "last had activity" signal a future retention
+   // pass (WIRE-339) needs, rather than that history starting the day a sweep lands.
+   const uint32_t now_sec = current_time_point().sec_since_epoch();
+
    opreg::remitclaims_t claims(self);
    sysio::opp::claimable::credit(claims, ram_payer, opreg::remitclaim_key{account.value},
-                                 opreg::remit_claim{.account = account}, amount);
+                                 opreg::remit_claim{.account = account}, amount,
+                                 now_sec + opreg::REMIT_CLAIM_WINDOW_SEC);
 }
 
 /// Well-known chain code for the WIRE depot itself. Comparisons of the form

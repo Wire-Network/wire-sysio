@@ -204,9 +204,16 @@ void credit_pay(name self, name to, int64_t amount, std::string_view /*memo_str*
    if (amount <= 0) return;
    const uint64_t amt = static_cast<uint64_t>(amount);
 
+   // The expiry stamp is RECORDED, not acted on: no sweep is wired against `payclaims` (see the
+   // note on the table). Refreshing it on every credit means an account still being paid never
+   // ages, so the stamp already carries the "last had activity" signal a future retention pass
+   // (WIRE-339) needs, rather than that history starting the day a sweep lands.
+   const uint32_t now_sec = current_time_point().sec_since_epoch();
+
    payclaims_t claims(self);
    sysio::opp::claimable::credit(claims, self, payclaim_key{to.value},
-                                 pay_claim{.account_name = to}, amt);
+                                 pay_claim{.account_name = to}, amt,
+                                 now_sec + PAY_CLAIM_WINDOW_SEC);
 
    // Reserve the credited WIRE so fundclaim and the epoch gate cannot re-commit it. Saturates on
    // the same cap as the row itself, keeping the counter consistent with the sum of the rows.
