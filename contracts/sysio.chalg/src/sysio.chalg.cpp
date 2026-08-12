@@ -32,6 +32,23 @@ constexpr sysio::symbol WIRE_SYMBOL{"WIRE", 9};
 /// to that translation unit, so it cannot be reused here.)
 constexpr sysio::slug_name WIRE_TOKEN_CODE = "WIRE"_s;
 
+/// Floor valuation, in WIRE atomic units, for a NONZERO collateral bucket the depot cannot price —
+/// its `(chain_code, token_code)` pair carries no ACTIVE reserve, or the pair's books floor the
+/// conversion to zero (dust).
+///
+/// Pricing such a bucket at this floor rather than refusing the whole quote is deliberate, and the
+/// direction matters. Collateral ingress (`opreg::depositinle`) accepts any positive amount for any
+/// pair without requiring one that quotes, so refusing made unpriceability an ATTACKER-CONTROLLED
+/// switch: an underwriter could seed a single dust or unreserved bucket and permanently immunize
+/// every later CONFIRMED commitment against challenge. An understated stake weakens the deterrent
+/// for one filing; an unchallengeable commitment defeats the mechanism outright and cannot be
+/// recovered from. The floor is the strictly safer failure, and it is deterministic — the same
+/// bucket always contributes the same amount, so `uwchalbond` and `openuwchal` still agree.
+///
+/// Shares the provisional-pricing caveat on `compute_uwchal_bond`: acceptable while collateral is
+/// small, and a real valuation for unreserved pairs is part of that same pre-launch revisit.
+constexpr uint64_t MIN_UWCHAL_BUCKET_WIRE = 1;
+
 /// Wall-clock now in ms — the clock `sysio.uwrit`'s lock window runs on
 /// (`lock_entry.expires_at_ms`), so challenge deadlines compare like-for-like.
 uint64_t current_time_ms() {
@@ -89,8 +106,13 @@ struct uwchal_bond_quote {
 ///
 /// Returns a zeroed quote (unchallengeable / unquotable) when: the winner has no locks for the
 /// uwreq, any lock is already held by another challenge or already expired (filing is time-gated
-/// to the live window), the operator row is gone, a bucket has no ACTIVE reserve to price it
-/// against, a bucket's books price it to zero, or the sum exceeds `asset::max_amount`.
+/// to the live window), the operator row is gone, the operator holds no collateral at all, or the
+/// sum exceeds `asset::max_amount`.
+///
+/// A bucket the depot cannot price does NOT void the quote — it contributes
+/// `MIN_UWCHAL_BUCKET_WIRE`. Voiding made unpriceability an underwriter-controlled immunity
+/// switch, since collateral ingress never required a quoteable pair; that constant carries the
+/// full argument.
 ///
 /// The bound is the TRANSFERABLE asset range (2^62-1), not `uint64_t`'s: `openuwchal` escrows the
 /// quote as `asset(static_cast<int64_t>(quote.bond), WIRE_SYMBOL)`, and `asset`'s own range check
@@ -151,10 +173,12 @@ uwchal_bond_quote compute_uwchal_bond(name uwrit_account, name reserv_account, n
                                                it->connector_weight_bps, bal.balance);
          break;
       }
-      // A bucket the depot cannot price leaves the stake understated, which would let a
-      // challenger risk less than the underwriter stands to lose. Refuse to quote instead.
-      if (bucket_wire == 0) return uwchal_bond_quote{};
-      total += bucket_wire;
+      // A bucket the depot cannot price (no ACTIVE reserve for the pair, or books that floor the
+      // conversion to zero) contributes its floor instead of voiding the whole quote. Refusing
+      // here understated nothing but handed the underwriter a switch: seed one dust or unreserved
+      // bucket at ingress and every later commitment becomes unchallengeable. See
+      // `MIN_UWCHAL_BUCKET_WIRE` for why the understatement is the safer of the two.
+      total += (bucket_wire > 0 ? bucket_wire : MIN_UWCHAL_BUCKET_WIRE);
    }
    if (total == 0) return uwchal_bond_quote{};
    if (total > static_cast<opp::amm::u128>(asset::max_amount)) return uwchal_bond_quote{};

@@ -1123,14 +1123,25 @@ public:
    /// same-(chain, token) multi-reserve swap tests, which add a second reserve
    /// on an already-registered (chain, token) pair.
    action_result regreserve_active(std::string_view c, std::string_view t, std::string_view r) {
+      return regreserve_active_amounts(c, t, r, /*chain_amount*/ 1'000'000'000'000ull,
+                                                /*wire_amount*/  1'000'000'000'000ull);
+   }
+
+   /// `regreserve_active` with explicit pool depths, for a test that needs a deliberately
+   /// IMBALANCED reserve. At the 50% connector weight the curve is pure constant product
+   /// (`out = wire * amount / (chain + amount)`), so a deep token side over a shallow WIRE side
+   /// floors a small conversion to zero — the "dust bucket" the bond quote has to survive.
+   action_result regreserve_active_amounts(std::string_view c, std::string_view t,
+                                           std::string_view r,
+                                           uint64_t chain_amount, uint64_t wire_amount) {
       return push(RESERV_ACCOUNT, reserv_abi, RESERV_ACCOUNT, "regreserve"_n, mvo()
          ("chain_code",             codename_mvo(c))
          ("token_code",             codename_mvo(t))
          ("reserve_code",           codename_mvo(r))
          ("name",                   std::string(c))
          ("description",            std::string{})
-         ("initial_chain_amount",   uint64_t{1'000'000'000'000ull})
-         ("initial_wire_amount",    uint64_t{1'000'000'000'000ull})
+         ("initial_chain_amount",   chain_amount)
+         ("initial_wire_amount",    wire_amount)
          ("source_token_precision", uint32_t{9})
          ("connector_weight_bps",   uint32_t{5000})
          ("is_private",             false)
@@ -5109,6 +5120,11 @@ public:
    /// Fault-reason wire value (`underwrite_fault_reason::SOURCE_DEPOSIT_MISSING`).
    static constexpr uint8_t REASON_DEPOSIT_MISSING = 0;
 
+   /// Mirrors `chalg::min_uwchal_bucket_wire` — the floor a nonzero collateral bucket contributes
+   /// when the depot cannot price it (no ACTIVE reserve for the pair, or dust that the books floor
+   /// to zero). Keeps the quote nonzero so the commitment stays challengeable.
+   static constexpr uint64_t MIN_UWCHAL_BUCKET_WIRE = 1;
+
    /// Source amount (and requested target) the confirmed-uwreq builder swaps. The SOURCE leg
    /// locks exactly this; the destination leg locks the AMM quote for it, which the curve puts
    /// just under it — so the two locks together stay inside the 200 credited to the underwriter.
@@ -5225,12 +5241,17 @@ public:
             total += amount;   // already WIRE — no curve
             continue;
          }
+         // A bucket with no ACTIVE reserve, or one whose books floor the conversion to zero,
+         // contributes the contract's floor rather than voiding the quote — mirrors
+         // `chalg::min_uwchal_bucket_wire`.
          const auto row = first_active_reserve(chain, token);
-         BOOST_REQUIRE(!row.is_null());
-         total += sysio::opp::amm::token_to_wire(row["reserve_chain_amount"].as_uint64(),
-                                                 row["reserve_wire_amount"].as_uint64(),
-                                                 row["connector_weight_bps"].as_uint64(),
-                                                 amount);
+         const uint64_t bucket_wire =
+            row.is_null() ? 0
+                          : sysio::opp::amm::token_to_wire(row["reserve_chain_amount"].as_uint64(),
+                                                           row["reserve_wire_amount"].as_uint64(),
+                                                           row["connector_weight_bps"].as_uint64(),
+                                                           amount);
+         total += (bucket_wire > 0 ? bucket_wire : MIN_UWCHAL_BUCKET_WIRE);
       }
       return total;
    }
@@ -5362,6 +5383,67 @@ BOOST_FIXTURE_TEST_CASE(uwchalbond_quotes_the_live_lock_value, sysio_uwchal_test
 
    BOOST_REQUIRE_EQUAL(0u, uwchalbond(ATT_ID + 1, UWRIT_OP));    // no such uwreq
    BOOST_REQUIRE_EQUAL(0u, uwchalbond(ATT_ID, "batchop.a"_n));   // not the winner
+} FC_LOG_AND_RETHROW() }
+
+// A collateral bucket whose (chain, token) pair carries NO ACTIVE reserve must not void the quote.
+// `opreg::depositinle` accepts any positive amount for any pair without requiring one that quotes,
+// so voiding here handed the underwriter an immunity switch: seed one unreserved bucket and every
+// later CONFIRMED commitment becomes permanently unchallengeable. The bucket contributes the floor
+// instead, and filing still works.
+BOOST_FIXTURE_TEST_CASE(unreserved_collateral_bucket_still_quotes_a_bond, sysio_uwchal_tester) { try {
+   constexpr uint64_t ATT_ID = 9800;
+   make_confirmed_uwreq(ATT_ID);
+
+   const uint64_t priced_only = uwchalbond(ATT_ID, UWRIT_OP);
+   BOOST_REQUIRE_GT(priced_only, 0u);
+
+   // No reserve was ever registered for (SOLANA, USDC) — nothing to price the bucket against.
+   BOOST_REQUIRE_EQUAL(success(), depositinle_credit(UWRIT_OP, "SOLANA", "USDC", 5'000));
+   BOOST_REQUIRE(first_active_reserve(fc::slug_name{"SOLANA"}.value,
+                                      fc::slug_name{"USDC"}.value).is_null());
+
+   // Quote survives, grows by exactly the floor, and still matches the shared formula.
+   const uint64_t quoted = uwchalbond(ATT_ID, UWRIT_OP);
+   BOOST_REQUIRE_EQUAL(priced_only + MIN_UWCHAL_BUCKET_WIRE, quoted);
+   BOOST_REQUIRE_EQUAL(expected_bond(UWRIT_OP), quoted);
+
+   // The commitment is still challengeable — the property the void broke.
+   BOOST_REQUIRE_EQUAL(success(),
+      openuwchal(CHALLENGER, ATT_ID, UWRIT_OP, REASON_DEPOSIT_MISSING, "no such deposit"));
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(quoted), wire_balance(CHALG_ACCOUNT));
+} FC_LOG_AND_RETHROW() }
+
+// Same property for the DUST flavour: the pair HAS an ACTIVE reserve, but its books floor the
+// conversion to zero. A deep token side over a shallow WIRE side does it at the 50% weight, where
+// the curve is pure constant product: 1 * 1000 / (1e12 + 1) = 0.
+BOOST_FIXTURE_TEST_CASE(dust_collateral_bucket_still_quotes_a_bond, sysio_uwchal_tester) { try {
+   constexpr uint64_t ATT_ID = 9810;
+   make_confirmed_uwreq(ATT_ID);
+
+   const uint64_t priced_only = uwchalbond(ATT_ID, UWRIT_OP);
+   BOOST_REQUIRE_GT(priced_only, 0u);
+
+   BOOST_REQUIRE_EQUAL(success(), regreserve_active_amounts("ETH", "USDC", "PRIMARY",
+                                                            /*chain_amount*/ 1'000'000'000'000ull,
+                                                            /*wire_amount*/  1'000ull));
+   BOOST_REQUIRE_EQUAL(success(), depositinle_credit(UWRIT_OP, "ETH", "USDC", 1));
+
+   // Pin the premise: the pair IS priceable, and the books really do floor this bucket to zero.
+   const auto dust_row = first_active_reserve(fc::slug_name{"ETH"}.value,
+                                              fc::slug_name{"USDC"}.value);
+   BOOST_REQUIRE(!dust_row.is_null());
+   BOOST_REQUIRE_EQUAL(0u, sysio::opp::amm::token_to_wire(
+                              dust_row["reserve_chain_amount"].as_uint64(),
+                              dust_row["reserve_wire_amount"].as_uint64(),
+                              dust_row["connector_weight_bps"].as_uint64(), 1));
+
+   const uint64_t quoted = uwchalbond(ATT_ID, UWRIT_OP);
+   BOOST_REQUIRE_EQUAL(priced_only + MIN_UWCHAL_BUCKET_WIRE, quoted);
+   BOOST_REQUIRE_EQUAL(expected_bond(UWRIT_OP), quoted);
+
+   BOOST_REQUIRE_EQUAL(success(),
+      openuwchal(CHALLENGER, ATT_ID, UWRIT_OP, REASON_DEPOSIT_MISSING, "no such deposit"));
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(quoted), wire_balance(CHALG_ACCOUNT));
 } FC_LOG_AND_RETHROW() }
 
 // Filing escrows exactly the quoted bond, stamps every lock with the challenge id, and records
