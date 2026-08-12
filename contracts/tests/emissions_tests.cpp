@@ -546,6 +546,28 @@ public:
       );
    }
 
+   /// Push a sysio.system action as a READ-ONLY transaction.
+   ///
+   /// Read-only transactions carry no authorization and no signature, and the chain refuses any
+   /// KV write attempted while one executes. Before sysio_global_state moved to
+   /// kv::cached_global, ~system_contract() wrote the global unconditionally, so every action --
+   /// including these pure-query view actions -- died here with table_operation_not_permitted
+   /// ("cannot store a KV record when executing a readonly transaction").
+   transaction_trace_ptr push_system_action_readonly( name action_name, const fc::variant_object& data ) {
+      action act;
+      act.account = config::system_account_name;
+      act.name    = action_name;
+      act.data    = sysio_abi_ser.variant_to_binary(
+         sysio_abi_ser.get_action_type(action_name), data,
+         abi_serializer::create_yield_function(abi_serializer_max_time));
+
+      signed_transaction trx;
+      trx.actions.emplace_back(std::move(act));
+      set_transaction_headers(trx);
+      return push_transaction(trx, fc::time_point::maximum(), DEFAULT_BILLED_CPU_TIME_US,
+                              false, transaction_metadata::trx_type::read_only);
+   }
+
    t5_epoch_info viewepoch() {
       auto trace = push_system_action_trace(
          config::system_account_name,
@@ -2049,6 +2071,52 @@ BOOST_FIXTURE_TEST_CASE( viewemitcfg_returns_current_config, sysio_emissions_tes
    BOOST_REQUIRE_EQUAL( cfg.producer_bps, PRODUCER_BPS );
    BOOST_REQUIRE_EQUAL( cfg.batch_op_bps, uint16_t(3000) );
    BOOST_REQUIRE_EQUAL( cfg.standby_end_rank, T_STANDBY_END_RANK );
+} FC_LOG_AND_RETHROW()
+
+/// The view actions exist to be called through clio --read / send_read_only_transaction, so they
+/// must execute inside a read-only transaction.
+///
+/// This is the regression for "cannot store a KV record when executing a readonly transaction".
+/// The dispatcher instantiates system_contract as a temporary and destroys it the moment the
+/// action returns; while sysio_global_state was a plain kv::global written unconditionally from
+/// ~system_contract(), that destructor issued a kv_set on EVERY action and the chain refused it
+/// here. The failure appeared only on the success path -- viewnodedist with a bad account still
+/// reported "account is not a node owner", because sysio::check traps before the destructor runs.
+/// With kv::cached_global the write happens only when an action actually mutated the global, so a
+/// query issues none.
+BOOST_FIXTURE_TEST_CASE( view_actions_execute_in_readonly_transaction, sysio_emissions_tester ) try {
+   auto trace = push_system_action_readonly( "viewemitcfg"_n, mvo() );
+   BOOST_REQUIRE( trace );
+   if ( trace->except ) BOOST_FAIL( trace->except->to_detail_string() );
+   BOOST_REQUIRE( !trace->action_traces.empty() );
+   BOOST_REQUIRE( !trace->action_traces[0].return_value.empty() );
+
+   // A read-only call must return exactly what a normal call returns.
+   const auto ro_cfg = fc::raw::unpack<emit_cfg_result>( trace->action_traces[0].return_value );
+   const auto rw_cfg = viewemitcfg();
+   BOOST_REQUIRE_EQUAL( ro_cfg.t1_allocation,          rw_cfg.t1_allocation );
+   BOOST_REQUIRE_EQUAL( ro_cfg.t5_distributable,       rw_cfg.t5_distributable );
+   BOOST_REQUIRE_EQUAL( ro_cfg.annual_initial_emission, rw_cfg.annual_initial_emission );
+   BOOST_REQUIRE_EQUAL( ro_cfg.producer_bps,           rw_cfg.producer_bps );
+
+   // Repeatable: the query must not have left the singleton in a state that breaks the next call.
+   auto again = push_system_action_readonly( "viewemitcfg"_n, mvo() );
+   BOOST_REQUIRE( again );
+   if ( again->except ) BOOST_FAIL( again->except->to_detail_string() );
+} FC_LOG_AND_RETHROW()
+
+/// viewnodedist's failure path was the misleading half of the bug report: it reported its own
+/// error correctly even while the success path died in the destructor. Both halves must now work
+/// inside a read-only transaction.
+BOOST_FIXTURE_TEST_CASE( viewnodedist_readonly_reports_its_own_error, sysio_emissions_tester ) try {
+   create_user_accounts({ "nobody3"_n });
+   BOOST_REQUIRE_EQUAL( success(), setinittime( config::system_account_name, tpsec(head_secs()) ) );
+
+   BOOST_REQUIRE_EXCEPTION(
+      push_system_action_readonly( "viewnodedist"_n, mvo()("account_name", "nobody3"_n) ),
+      sysio_assert_message_exception,
+      sysio_assert_message_is( "account is not a node owner" )
+   );
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( viewemitcfg_reflects_update, sysio_emissions_tester ) try {

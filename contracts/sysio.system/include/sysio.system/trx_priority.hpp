@@ -41,25 +41,28 @@ struct [[sysio::table("trxpglobal"), sysio::contract("sysio.system")]] trx_prio_
 
 // -------------------------------------------------------------------------------------------------
 using trx_priority_table = sysio::kv::table<"trxpriority"_n, trxprio_key, trx_prio>;
-using global_trx_prio_singleton = sysio::kv::global< "trxpglobal"_n, trx_prio_global >;
+// cached_global for the same reason as sysio_global_state: an unconditional write from
+// ~trx_priority() made every action on this contract fail inside a read-only transaction.
+using global_trx_prio_singleton = sysio::kv::cached_global< "trxpglobal"_n, trx_prio_global >;
 
 // -------------------------------------------------------------------------------------------------
 struct [[sysio::contract("sysio.system")]] trx_priority : public sysio::contract {
 private:
    global_trx_prio_singleton   _global;
-   trx_prio_global             _gstate;
 
 public:
 
    trx_priority(name s, name code, sysio::datastream<const char*> ds)
       : sysio::contract(s, code, ds),
         _global(get_self())
-   {
-      _gstate = _global.get_or_default(trx_prio_global{});
-   }
+   {}
 
-   ~trx_priority() {
-      _global.set(_gstate, get_self());
+   /// Stamp the last-update time. upsert rather than modify: the row may not exist yet, and the
+   /// write is deferred to _global's destructor so read-only actions issue none.
+   void touch_last_update() {
+      _global.upsert(get_self(), trx_prio_global{}, [](auto& g) {
+         g.last_trx_priority_update = sysio::current_time_point();
+      });
    }
 
    /**

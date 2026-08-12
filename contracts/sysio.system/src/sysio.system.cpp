@@ -18,7 +18,11 @@ namespace sysiosystem {
     _fin_key_id_generator(get_self()),
     _global(get_self())
    {
-      _gstate  = _global.exists() ? _global.get() : get_default_parameters();
+      // Materialize defaults only on a chain where the row was never written. The write is
+      // deferred to _global's destructor, so an action that merely reads issues no kv_set and
+      // stays legal inside a read-only transaction.
+      if( !_global.exists() )
+         _global.set( get_default_parameters(), get_self() );
    }
 
    sysio_global_state system_contract::get_default_parameters() {
@@ -27,18 +31,17 @@ namespace sysiosystem {
       return dp;
    }
 
-   system_contract::~system_contract() {
-      _global.set( _gstate, get_self() );
-   }
-
    void system_contract::setram( uint64_t max_ram_size ) {
       require_auth( get_self() );
 
-      check( _gstate.max_ram_size < max_ram_size, "ram may only be increased" ); /// decreasing ram might result market maker issues
+      const auto& gs = _global.get();
+      check( gs.max_ram_size < max_ram_size, "ram may only be increased" ); /// decreasing ram might result market maker issues
       check( max_ram_size < 1024ll*1024*1024*1024*1024, "ram size is unrealistic" );
-      check( max_ram_size > _gstate.total_ram_bytes_reserved, "attempt to set max below reserved" );
+      check( max_ram_size > gs.total_ram_bytes_reserved, "attempt to set max below reserved" );
 
-      _gstate.max_ram_size = max_ram_size;
+      _global.modify( get_self(), [&]( auto& g ) {
+         g.max_ram_size = max_ram_size;
+      });
    }
 
 #ifdef SYSTEM_BLOCKCHAIN_PARAMETERS
@@ -47,8 +50,10 @@ namespace sysiosystem {
 
    void system_contract::setparams( const blockchain_parameters_t& params ) {
       require_auth( get_self() );
-      (sysio::blockchain_parameters&)(_gstate) = params;
-      check( 3 <= _gstate.max_authority_depth, "max_authority_depth should be at least 3" );
+      _global.modify( get_self(), [&]( auto& g ) {
+         (sysio::blockchain_parameters&)(g) = params;
+         check( 3 <= g.max_authority_depth, "max_authority_depth should be at least 3" );
+      });
 #ifndef SYSTEM_BLOCKCHAIN_PARAMETERS
       set_blockchain_parameters( params );
 #else
