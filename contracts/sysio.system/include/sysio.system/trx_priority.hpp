@@ -57,10 +57,12 @@ public:
         _global(get_self())
    {}
 
-   /// Stamp the last-update time. upsert rather than modify: the row may not exist yet, and the
-   /// write is deferred to _global's destructor so read-only actions issue none.
+   /// Stamp the last-update time. modify_or_create rather than modify: the row may not exist yet,
+   /// and the write is deferred to _global's destructor so read-only actions issue none. The blank
+   /// default is only a seed -- the lambda runs on the create path too, which is what stamps the
+   /// time on the very first call.
    void touch_last_update() {
-      _global.upsert(get_self(), trx_prio_global{}, [](auto& g) {
+      _global.modify_or_create(get_self(), trx_prio_global{}, [](auto& g) {
          g.last_trx_priority_update = sysio::current_time_point();
       });
    }
