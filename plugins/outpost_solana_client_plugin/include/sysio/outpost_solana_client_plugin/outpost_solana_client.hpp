@@ -44,6 +44,19 @@ inline constexpr size_t SOLANA_MAX_CHUNK_BYTES = 668;
 /// THIS constant rather than a copy of it.
 inline constexpr size_t MAX_TERMINAL_DYNAMIC_ACCOUNTS = 16;
 
+/// Heap frame requested on every `dispatch_attestations` call, in bytes.
+///
+/// The frame rides with the work it protects: that call decodes the staged
+/// envelope, dispatches its effects, and on the draining call encodes the
+/// outbound emit -- all of which allocate well past Solana's 32 KiB default
+/// heap. The compute-budget pre-instruction carrying it also costs packet
+/// budget, which is why `dispatch_attestations_full_manifest_fits_packet_limit`
+/// measures the transaction WITH it.
+///
+/// Exported so the packet-limit test (and the program-side test pinning the
+/// same frame) measure THIS constant rather than a copy of it.
+inline constexpr uint32_t SOLANA_DISPATCH_HEAP_FRAME_BYTES = 256'000;
+
 /// Backstop on `dispatch_attestations` rounds per envelope. The drain loop
 /// already exits on a drained cursor, on consensus not yet reached, and on a
 /// cursor that fails to advance; this only bounds a pathological envelope so
@@ -152,6 +165,102 @@ std::vector<char> decode_latest_envelope_account(opp_solana_outpost_client&  pro
                                                  const std::vector<uint8_t>& account_data,
                                                  uint32_t                    epoch_index,
                                                  const std::string&          log_label);
+
+/// Assert that the loaded IDL's `EpochDeliveries` declaration carries the
+/// fields the dispatch cursor read depends on: `consensus_reached` (bool) and
+/// `dispatched_count` (u32), in either IDL field home (inline on the account
+/// or in the Anchor IDL v2 `types` section). Field ORDER is unconstrained for
+/// the same reason as `assert_latest_envelope_shape` -- the reader decodes
+/// through the IDL.
+///
+/// Called at construction for the batch-operator role, beside the
+/// `dispatch_attestations` instruction check. A PRESENT but drifted
+/// `EpochDeliveries` (renamed or dropped cursor field) would otherwise leave
+/// `consensus_reached` silently false forever: `drain_dispatch` would no-op
+/// every tick behind a dlog, the epoch would never close, and nothing in the
+/// logs would say why.
+///
+/// @param program  the program's loaded Anchor IDL.
+/// @throws fc::exception if the account, either field, or either field's type
+///         is absent or disagrees with what the cursor read decodes.
+void assert_epoch_deliveries_shape(const fc::network::solana::idl::program& program);
+
+/// Assert that the loaded IDL's `Reserve` declaration carries the three fields
+/// the terminal manifest resolves from it: `creator` and `custody_mint`
+/// (pubkeys) and `custody_decimals` (u8), in either IDL field home.
+///
+/// Called at construction for the batch-operator role, beside the
+/// `EpochDeliveries` check. IDL drift is the realistic reason a live,
+/// program-readable `Reserve` becomes unreadable to THIS relay, and that
+/// failure is unrecoverable in flight: the manifest cannot be completed, the
+/// dispatch window would abort on a missing effect account, and every later
+/// window repacks from the same unadvanced cursor. Catching it at boot turns a
+/// wedged epoch into a startup error while the IDL is still fixable.
+///
+/// @param program  the program's loaded Anchor IDL.
+/// @throws fc::exception if the account or any of the three fields is absent,
+///         or a field has a type the manifest builder cannot interpret.
+void assert_reserve_shape(const fc::network::solana::idl::program& program);
+
+/// Terminal-finalization facts for one per-`(token_code, reserve_code)`
+/// Reserve PDA, read from the `Reserve` ACCOUNT itself.
+///
+/// Custody is pinned on the Reserve at creation time and is exactly what the
+/// on-chain handlers branch on (`handle_swap_remit` / `handle_swap_revert` /
+/// `handle_reserve_create_cancelled` all test `reserve.custody_mint` against
+/// the native marker). Resolving it from the mutable
+/// `OutpostConfig.token_addresses_by_code` instead would let an admin
+/// re-pointing a token address between reserve creation and dispatch drive the
+/// relay down the native branch while the program takes the SPL one -- the
+/// manifest would then lack the vault/ATA accounts the handler requires and
+/// the call would abort permanently, wedging the epoch.
+struct reserve_terminal_info {
+   /// Reserve creator -- the `RESERVE_CREATE_CANCELLED` refund target.
+   fc::network::solana::solana_public_key creator;
+   /// Custody mint, or the all-zero system-program key for native lamports
+   /// (the program's `NATIVE_TOKEN_MARKER` convention).
+   fc::network::solana::solana_public_key custody_mint;
+   /// Chain-native decimals pinned at reserve creation.
+   uint8_t                                custody_decimals = 0;
+};
+
+/// Extract the terminal-finalization facts from an already-decoded `Reserve`
+/// account object. ALL THREE fields are required: `creator`, `custody_mint`
+/// and `custody_decimals` are written together at reserve creation, so a
+/// record missing any of them is not a reserve this relay can build an
+/// account-consistent manifest for — guessing custody is precisely the
+/// divergence that aborts the on-chain call.
+///
+/// Throwing here FAILS THE BUILD, by design — do not "restore" a degrade on
+/// this path. Reaching this function means the account EXISTS and the program
+/// therefore decodes it fine and takes its real branch, demanding the accounts
+/// that branch needs. A manifest built by guessing the missing field is
+/// guaranteed to abort on chain (`require_remaining_account` ->
+/// EffectAccountMissing), and because `drive_dispatch_rounds` repacks every
+/// window from the unadvanced on-chain cursor, that aborting attestation heads
+/// every future window and the epoch never closes.
+///
+/// The benign degrade lives one level up and covers a DIFFERENT cause: an
+/// ABSENT or EMPTY reserve never reaches this function, and
+/// `reserve_info_for_codes` returns empty for it because the program skips an
+/// uninitialized reserve. Only that cause may degrade.
+///
+/// Exposed in this header so the plugin's unit tests can drive custody
+/// resolution — including a config-vs-reserve divergence — without RPC.
+///
+/// @param reserve  a decoded `Reserve` account object.
+/// @throws fc::exception when a required field is absent or unparseable.
+reserve_terminal_info reserve_info_from_account(const fc::variant_object& reserve);
+
+/// Reads the `Reserve` account behind `(token_code, reserve_code)`.
+///
+/// Returns empty ONLY for a reserve the program itself will skip (absent or
+/// uninitialized) — a benign per-attestation degrade. A reserve that exists
+/// but cannot be read THROWS, because the program would take its real branch
+/// and abort on the accounts a degraded manifest omits; that exception is
+/// propagated by `build_dispatch_manifests` rather than absorbed.
+using reserve_info_reader =
+   std::function<std::optional<reserve_terminal_info>(uint64_t token_code, uint64_t reserve_code)>;
 
 /// How far the outpost has settled one inbound epoch's attestations.
 struct epoch_dispatch_progress {
@@ -289,20 +398,23 @@ public:
    const fc::network::solana::solana_public_key& program_id()            const { return _program_id; }
 
 private:
-   struct reserve_terminal_info {
-      fc::network::solana::solana_public_key creator;
-      fc::network::solana::solana_public_key custody_mint;
-      uint8_t                                custody_decimals = 0;
-   };
-
-   /// Resolve the terminal-finalization facts for a per-reserve PDA:
-   /// `creator` from the `Reserve` account, custody (mint / decimals) from
-   /// the `OutpostConfig` maps keyed by `token_code`. The clean-room outpost
-   /// program resolves custody from `config.token_addresses_by_code` at
-   /// dispatch time (`Reserve` carries no custody fields), so the relay
-   /// mirrors that lookup to stay account-consistent with the on-chain
-   /// handlers.
-   std::optional<reserve_terminal_info>
+   /// Resolve the terminal-finalization facts for a per-reserve PDA -- creator
+   /// AND custody (mint / decimals) -- from the ONE account the on-chain
+   /// handlers themselves branch on: the `Reserve` PDA. One RPC read per
+   /// distinct reserve; no `OutpostConfig` read on this path at all.
+   ///
+   /// The two failure modes are deliberately NOT treated alike:
+   ///
+   ///   * An ABSENT or EMPTY reserve returns empty (a warning is logged). The
+   ///     program skips an uninitialized reserve, so a partial manifest is
+   ///     harmless.
+   ///   * A reserve that EXISTS but this relay cannot decode (or that is
+   ///     missing creator/custody) THROWS, after logging the chain-side
+   ///     reason. The program reads that account fine and demands the accounts
+   ///     its real branch needs, so a degraded manifest would be guaranteed to
+   ///     abort — permanently, since every later window repacks from the same
+   ///     unadvanced cursor. Failing the tick leaves the cursor untouched.
+   std::optional<outpost_solana_client_detail::reserve_terminal_info>
    reserve_info_for_codes(uint64_t token_code, uint64_t reserve_code);
 
    /// Read `EpochDeliveries` for `epoch_index`. A missing/empty account means
@@ -342,27 +454,6 @@ using outpost_solana_client_ptr = std::shared_ptr<outpost_solana_client>;
 
 namespace outpost_solana_client_detail {
 
-/// Custody binding for a `token_code`, resolved from the outpost's
-/// `OutpostConfig` maps. The clean-room program pins custody on the config
-/// (`token_addresses_by_code` / `precision_by_token_code`) instead of
-/// denormalizing it onto each `Reserve` account.
-struct token_custody_info {
-   /// SPL mint for the token, or the all-zero system-program key when the
-   /// token is native lamports (the on-chain zero-marker convention).
-   fc::network::solana::solana_public_key mint;
-   /// Chain-native decimals for the token.
-   uint8_t decimals = 0;
-};
-
-/// Resolve `token_code`'s custody binding from a decoded `OutpostConfig`
-/// account object. BOTH entries are required — same contract as
-/// wire-ethereum's `ReserveManager` (`WIRE_TokenPrecisionUnset`) and the
-/// program's own `PrecisionUnconfigured` / `TokenCodeNotConfigured` gates:
-/// a missing address or precision entry throws instead of silently
-/// defaulting. Native custody is expressed by an EXPLICIT zero-mint entry.
-token_custody_info resolve_token_custody(const fc::variant_object& outpost_config,
-                                         uint64_t token_code);
-
 /// Append `key` to `metas`, or merge its writable flag into the existing
 /// entry when an earlier terminal effect already required the same account.
 void record_terminal_account(std::vector<fc::network::solana::account_meta>& metas,
@@ -378,6 +469,27 @@ struct reserve_pda_seeds {
    uint64_t token_code;
    uint64_t reserve_code;
 };
+
+/// Derive the per-`(token_code, reserve_code)` `Reserve` PDA: seeds
+/// `["reserve", token_code.to_le_bytes(), reserve_code.to_le_bytes()]`.
+/// Byte-exact mirror of the program's `#[account(seeds = ...)]` declaration —
+/// a derivation that disagrees fails seeds validation on chain.
+///
+/// Exported so the manifest builder and its tests derive through ONE
+/// implementation rather than re-spelling the seed list.
+fc::network::solana::solana_public_key
+derive_reserve_pda(const fc::network::solana::solana_public_key& program_id,
+                   uint64_t token_code,
+                   uint64_t reserve_code);
+
+/// Derive the per-`(token_code, reserve_code)` `reserve_vault` PDA: seeds
+/// `["reserve_vault", token_code.to_le_bytes(), reserve_code.to_le_bytes()]`.
+/// The vault holds the reserve's SPL custody; native reserves settle straight
+/// out of the Reserve PDA, so this account only rides an SPL manifest.
+fc::network::solana::solana_public_key
+derive_reserve_vault_pda(const fc::network::solana::solana_public_key& program_id,
+                         uint64_t token_code,
+                         uint64_t reserve_code);
 
 /// Which family of effect accounts one inbound attestation needs. The relay
 /// derives the concrete metas per shape; the on-chain handler resolves them
@@ -439,6 +551,48 @@ extract_inbound_effects(const std::vector<char>& envelope_bytes);
 /// includes attestations that need no effect accounts. Returns 0 if the
 /// envelope does not decode.
 uint32_t count_inbound_attestations(const std::vector<char>& envelope_bytes);
+
+/// Build the per-attestation effect-account manifests `drive_dispatch_rounds`
+/// packs its `dispatch_attestations` windows from, factored over its ONE RPC
+/// touchpoint (`read_reserve_info`) so the plugin's unit tests can drive the
+/// whole build -- custody branching, per-reserve read coalescing, degrade
+/// paths and the deadline probe -- without a live Solana endpoint.
+///
+/// The result is indexed by the FLAT attestation position the on-chain cursor
+/// counts, sized to `total_attestations`; attestations needing no effect
+/// account keep an empty entry so the indices stay aligned.
+///
+/// Behaviour that matters:
+///   * `read_reserve_info` is called at most ONCE per distinct
+///     `(token_code, reserve_code)` -- the results are memoised for the build,
+///     including the empty (degraded) ones, so a repeated reserve never
+///     re-pays an RPC round-trip.
+///   * Custody branching follows `reserve_terminal_info::custody_mint`, the
+///     same field the on-chain handler branches on.
+///   * `throw_if_past_deadline` runs once per effect, BEFORE its reserve read,
+///     so an over-deadline build fails at the loop rather than deep in the RPC
+///     layer with the work already lost.
+///   * A degraded (empty) reserve read costs only THAT attestation its
+///     custody-dependent accounts; every other attestation's manifest is still
+///     built, so the envelope's healthy prefix still dispatches. A THROWING
+///     read propagates untouched — it means a manifest the program would abort
+///     on, and shipping one would wedge the epoch rather than delay it.
+///
+/// @param program_id            outpost program id, for PDA derivation.
+/// @param effects               account-needing attestations, in dispatch order.
+/// @param total_attestations    the envelope's attestation total (the cursor's
+///                              denominator) -- the size of the result.
+/// @param throw_if_past_deadline  throws once the caller's deadline passes.
+/// @param read_reserve_info     reads one `Reserve` record (may degrade).
+/// @param log_label             client identity for log lines.
+/// @return one manifest per attestation, in dispatch order.
+std::vector<std::vector<fc::network::solana::account_meta>> build_dispatch_manifests(
+   const fc::network::solana::solana_public_key& program_id,
+   const std::vector<inbound_effect>&            effects,
+   uint32_t                                      total_attestations,
+   const std::function<void()>&                  throw_if_past_deadline,
+   const reserve_info_reader&                    read_reserve_info,
+   const std::string&                            log_label);
 
 } // namespace outpost_solana_client_detail
 

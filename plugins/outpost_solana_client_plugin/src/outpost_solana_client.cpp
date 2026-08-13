@@ -103,6 +103,28 @@ namespace latest_envelope {
    constexpr auto field_checksum = "checksum";
 } // namespace latest_envelope
 
+/// Identifiers of the per-epoch `EpochDeliveries` account + the two fields the
+/// dispatch cursor read consumes. Both are validated at boot for the
+/// batch-operator role (`assert_epoch_deliveries_shape`): a drifted
+/// declaration would otherwise decode into a row without them, leaving
+/// `consensus_reached` false and `dispatched_count` 0 forever.
+namespace epoch_deliveries {
+   constexpr auto account_name            = "EpochDeliveries";
+   constexpr auto field_consensus_reached = "consensus_reached";
+   constexpr auto field_dispatched_count  = "dispatched_count";
+} // namespace epoch_deliveries
+
+/// Field identifiers of the per-`(token_code, reserve_code)` `Reserve`
+/// account. `custody_mint` / `custody_decimals` are pinned at reserve creation
+/// and are what the on-chain terminal handlers branch on, so the relay's
+/// manifest must read custody from HERE and nowhere else.
+namespace reserve_account {
+   constexpr auto account_name           = "Reserve";
+   constexpr auto field_creator          = "creator";
+   constexpr auto field_custody_mint     = "custody_mint";
+   constexpr auto field_custody_decimals = "custody_decimals";
+} // namespace reserve_account
+
 } // anonymous namespace
 
 namespace outpost_solana_client_detail {
@@ -143,6 +165,30 @@ std::string describe_idl_type(const fc::network::solana::idl::idl_type& type) {
    return type.to_string();
 }
 
+/// The field list an account is DECLARED with, from whichever IDL home holds
+/// it: inline on the `accounts` entry (legacy shape) or in the `types` section
+/// (Anchor IDL v2 keeps account struct fields there). Mirrors
+/// `solana_program_client::decode_account_data`'s own inline-then-types
+/// fallback, so a boot assert validates exactly the declaration the decoder
+/// will follow at runtime.
+///
+/// @throws fc::exception when the account is undeclared, or declared with no
+///         field definition in either home.
+const std::vector<fc::network::solana::idl::field>&
+declared_account_fields(const fc::network::solana::idl::program& program,
+                        std::string_view                         account_name) {
+   namespace idl = fc::network::solana::idl;
+   const std::string name{account_name};
+   const idl::account* account = program.find_account(name);
+   FC_ASSERT(account, "IDL has no '{}' account definition", name);
+   if (!account->fields.empty()) return account->fields;
+
+   const idl::type_def* type_def = program.find_type(name);
+   FC_ASSERT(type_def && type_def->is_struct() && type_def->struct_fields,
+             "IDL '{}' has no struct field definition", name);
+   return *type_def->struct_fields;
+}
+
 } // anonymous namespace (within outpost_solana_client_detail)
 
 /// Assert the loaded IDL declares `LatestOutboundEnvelope` with the field
@@ -151,23 +197,11 @@ std::string describe_idl_type(const fc::network::solana::idl::idl_type& type) {
 /// declaration.
 void assert_latest_envelope_shape(const fc::network::solana::idl::program& program) {
    namespace idl = fc::network::solana::idl;
-   const idl::account* account = program.find_account(latest_envelope::account_name);
-   FC_ASSERT(account, "IDL has no '{}' account definition", latest_envelope::account_name);
-
-   // Anchor IDL v2 keeps the struct's fields in the `types` section; the
-   // `accounts` entry carries only name + discriminator. Mirror
-   // `solana_program_client::decode_account_data`'s inline-then-types fallback.
-   const std::vector<idl::field>* fields = &account->fields;
-   if (fields->empty()) {
-      const idl::type_def* type_def = program.find_type(latest_envelope::account_name);
-      FC_ASSERT(type_def && type_def->is_struct() && type_def->struct_fields,
-                "IDL '{}' has no struct field definition", latest_envelope::account_name);
-      fields = &(*type_def->struct_fields);
-   }
+   const auto& fields = declared_account_fields(program, latest_envelope::account_name);
 
    bool has_epoch = false;
    bool has_data  = false;
-   for (const auto& field : *fields) {
+   for (const auto& field : fields) {
       // Compare against the optional member directly: a malformed type object
       // (kind==primitive but no primitive value) must produce the per-field
       // diagnostic below, not `get_primitive()`'s generic throw.
@@ -196,6 +230,85 @@ void assert_latest_envelope_shape(const fc::network::solana::idl::program& progr
    }
    FC_ASSERT(has_epoch, "LatestOutboundEnvelope IDL missing '{}' field", latest_envelope::field_epoch);
    FC_ASSERT(has_data, "LatestOutboundEnvelope IDL missing '{}' field", latest_envelope::field_data);
+}
+
+/// Assert the loaded IDL declares `EpochDeliveries` with the two cursor fields
+/// `read_epoch_dispatch_progress` decodes. Full contract on the header
+/// declaration.
+void assert_epoch_deliveries_shape(const fc::network::solana::idl::program& program) {
+   namespace idl = fc::network::solana::idl;
+   const auto& fields = declared_account_fields(program, epoch_deliveries::account_name);
+
+   bool has_consensus = false;
+   bool has_cursor    = false;
+   for (const auto& field : fields) {
+      // Compare against the optional member directly, exactly as the envelope
+      // shape check does: a malformed type object must reach the per-field
+      // diagnostic rather than `get_primitive()`'s generic throw.
+      if (field.name == epoch_deliveries::field_consensus_reached) {
+         FC_ASSERT(field.type.is_primitive() && field.type.primitive == idl::primitive_type::bool_t,
+                   "EpochDeliveries '{}' must be declared bool, got '{}'",
+                   epoch_deliveries::field_consensus_reached, describe_idl_type(field.type));
+         has_consensus = true;
+      } else if (field.name == epoch_deliveries::field_dispatched_count) {
+         // The cursor read narrows the decoded value to uint32; a differently
+         // declared width means the IDL disagrees with the on-chain struct.
+         FC_ASSERT(field.type.is_primitive() && field.type.primitive == idl::primitive_type::u32,
+                   "EpochDeliveries '{}' must be declared u32, got '{}'",
+                   epoch_deliveries::field_dispatched_count, describe_idl_type(field.type));
+         has_cursor = true;
+      }
+   }
+   FC_ASSERT(has_consensus,
+             "EpochDeliveries IDL missing '{}' field; the dispatch crank would read consensus as "
+             "never reached and no-op on every tick, stalling the epoch silently",
+             epoch_deliveries::field_consensus_reached);
+   FC_ASSERT(has_cursor,
+             "EpochDeliveries IDL missing '{}' field; the dispatch crank would resume from 0 on "
+             "every tick and re-send settled windows forever",
+             epoch_deliveries::field_dispatched_count);
+}
+
+/// Assert the loaded IDL declares `Reserve` with the three fields the terminal
+/// manifest resolves from it. Full contract on the header declaration.
+void assert_reserve_shape(const fc::network::solana::idl::program& program) {
+   namespace idl = fc::network::solana::idl;
+   const auto& fields = declared_account_fields(program, reserve_account::account_name);
+
+   bool has_creator  = false;
+   bool has_mint     = false;
+   bool has_decimals = false;
+   for (const auto& field : fields) {
+      // Compare against the optional member directly, as the sibling shape
+      // checks do: a malformed type object must reach the per-field diagnostic
+      // rather than `get_primitive()`'s generic throw.
+      const bool is_pubkey =
+         field.type.is_primitive() && field.type.primitive == idl::primitive_type::pubkey;
+      if (field.name == reserve_account::field_creator) {
+         FC_ASSERT(is_pubkey, "Reserve '{}' must be declared pubkey, got '{}'",
+                   reserve_account::field_creator, describe_idl_type(field.type));
+         has_creator = true;
+      } else if (field.name == reserve_account::field_custody_mint) {
+         FC_ASSERT(is_pubkey, "Reserve '{}' must be declared pubkey, got '{}'",
+                   reserve_account::field_custody_mint, describe_idl_type(field.type));
+         has_mint = true;
+      } else if (field.name == reserve_account::field_custody_decimals) {
+         FC_ASSERT(field.type.is_primitive() && field.type.primitive == idl::primitive_type::u8,
+                   "Reserve '{}' must be declared u8, got '{}'",
+                   reserve_account::field_custody_decimals, describe_idl_type(field.type));
+         has_decimals = true;
+      }
+   }
+   // One message for all three: they are written together at reserve creation,
+   // and any one missing costs the manifest the same way -- the effect account
+   // the program's branch requires cannot be derived, so its dispatch window
+   // aborts and the cursor never moves past it.
+   FC_ASSERT(has_creator && has_mint && has_decimals,
+             "Reserve IDL missing '{}' / '{}' / '{}' (found {} / {} / {}); the terminal manifest "
+             "resolves custody and the cancel-refund target from these, and a reserve-backed "
+             "dispatch window cannot be built without them",
+             reserve_account::field_creator, reserve_account::field_custody_mint,
+             reserve_account::field_custody_decimals, has_creator, has_mint, has_decimals);
 }
 
 /// Keep only the candidate IDLs whose declared address matches the deployed
@@ -405,6 +518,10 @@ std::vector<uint8_t> u64_seed(uint64_t value) {
    return out;
 }
 
+} // anonymous namespace (within outpost_solana_client_detail)
+
+/// Derive the per-reserve `Reserve` PDA. Full contract on the header
+/// declaration.
 fc::network::solana::solana_public_key derive_reserve_pda(
    const fc::network::solana::solana_public_key& program_id,
    uint64_t token_code,
@@ -416,6 +533,8 @@ fc::network::solana::solana_public_key derive_reserve_pda(
       program_id).first;
 }
 
+/// Derive the per-reserve `reserve_vault` PDA. Full contract on the header
+/// declaration.
 fc::network::solana::solana_public_key derive_reserve_vault_pda(
    const fc::network::solana::solana_public_key& program_id,
    uint64_t token_code,
@@ -426,8 +545,6 @@ fc::network::solana::solana_public_key derive_reserve_vault_pda(
        u64_seed(reserve_code)},
       program_id).first;
 }
-
-} // anonymous namespace (within outpost_solana_client_detail)
 
 uint32_t count_inbound_attestations(const std::vector<char>& envelope_bytes) {
    sysio::opp::Envelope env;
@@ -539,44 +656,180 @@ extract_inbound_effects(const std::vector<char>& envelope_bytes) {
    return effects;
 }
 
-token_custody_info resolve_token_custody(const fc::variant_object& outpost_config,
-                                         uint64_t token_code) {
-   token_custody_info custody;
-   bool address_found   = false;
-   bool precision_found = false;
+reserve_terminal_info reserve_info_from_account(const fc::variant_object& reserve) {
+   // Required, not defaulted: a Reserve without custody is one this relay
+   // cannot build an account-consistent manifest for, and a defaulted
+   // (all-zero) mint would silently mean "native" -- the exact branch
+   // divergence that makes the on-chain call abort for good.
+   FC_ASSERT(reserve.contains(reserve_account::field_creator),
+             "Reserve account missing '{}' field", reserve_account::field_creator);
+   FC_ASSERT(reserve.contains(reserve_account::field_custody_mint),
+             "Reserve account missing '{}' field — custody must come from the Reserve the "
+             "on-chain handlers branch on, never from the mutable OutpostConfig token maps",
+             reserve_account::field_custody_mint);
+   FC_ASSERT(reserve.contains(reserve_account::field_custody_decimals),
+             "Reserve account missing '{}' field", reserve_account::field_custody_decimals);
 
-   if (outpost_config.contains("token_addresses_by_code")) {
-      for (const auto& entry_v : outpost_config["token_addresses_by_code"].get_array()) {
-         const auto& entry = entry_v.get_object();
-         if (entry["token_code"].as_uint64() == token_code) {
-            custody.mint =
-               fc::network::solana::solana_public_key::from_base58_string(entry["mint"].as_string());
-            address_found = true;
+   const auto decimals = reserve[reserve_account::field_custody_decimals].as_uint64();
+   FC_ASSERT(decimals <= std::numeric_limits<uint8_t>::max(),
+             "Reserve '{}' = {} is out of byte range",
+             reserve_account::field_custody_decimals, decimals);
+
+   return reserve_terminal_info{
+      fc::network::solana::solana_public_key::from_base58_string(
+         reserve[reserve_account::field_creator].as_string()),
+      fc::network::solana::solana_public_key::from_base58_string(
+         reserve[reserve_account::field_custody_mint].as_string()),
+      static_cast<uint8_t>(decimals)};
+}
+
+std::vector<std::vector<fc::network::solana::account_meta>> build_dispatch_manifests(
+   const fc::network::solana::solana_public_key& program_id,
+   const std::vector<inbound_effect>&            effects,
+   uint32_t                                      total_attestations,
+   const std::function<void()>&                  throw_if_past_deadline,
+   const reserve_info_reader&                    read_reserve_info,
+   const std::string&                            log_label) {
+   const auto& token_program_id = fc::network::solana::system::program_ids::TOKEN_PROGRAM;
+   const auto& associated_token_program_id =
+      fc::network::solana::system::program_ids::ASSOCIATED_TOKEN_PROGRAM;
+   const auto& system_program_id = fc::network::solana::system::program_ids::SYSTEM_PROGRAM;
+
+   // `NATIVE_TOKEN_MARKER` on the program side: an all-zero custody mint means
+   // the reserve custodies lamports, which is the branch the handler takes.
+   auto is_native_custody = [&](const fc::network::solana::solana_public_key& mint) {
+      return mint == system_program_id;
+   };
+
+   // One read per DISTINCT reserve for the whole build -- the same reserve can
+   // back many attestations of one envelope, and a degraded (empty) read is
+   // memoised too so a permanently unreadable reserve costs exactly one
+   // round-trip, not one per attestation.
+   std::map<std::pair<uint64_t, uint64_t>, std::optional<reserve_terminal_info>> reserve_cache;
+   auto reserve_info = [&](uint64_t token_code,
+                           uint64_t reserve_code) -> const std::optional<reserve_terminal_info>& {
+      const auto cache_key = std::make_pair(token_code, reserve_code);
+      auto       it        = reserve_cache.find(cache_key);
+      if (it != reserve_cache.end()) return it->second;
+      return reserve_cache.emplace(cache_key, read_reserve_info(token_code, reserve_code))
+         .first->second;
+   };
+
+   std::vector<std::vector<fc::network::solana::account_meta>> per_attestation(total_attestations);
+   for (const auto& effect : effects) {
+      // The deadline is probed per effect, BEFORE its reserve read: a build
+      // that runs past the tick deadline must fail here, where the remaining
+      // work is known, rather than deep inside the RPC layer with every
+      // manifest already paid for and none of them dispatched.
+      throw_if_past_deadline();
+
+      if (effect.attestation_index >= per_attestation.size()) {
+         // Defensive: the index comes from the same walk that produced
+         // `total_attestations`, so this cannot happen without a decode
+         // disagreeing with itself -- log it rather than writing out of range.
+         elog("outpost_solana_client[{}]: effect index {} is past the envelope's {} attestations; "
+              "skipping it rather than misaligning the dispatch cursor",
+              log_label, effect.attestation_index, per_attestation.size());
+         continue;
+      }
+
+      auto& metas = per_attestation[effect.attestation_index];
+      auto  add   = [&](const fc::network::solana::solana_public_key& key, bool is_writable) {
+         record_terminal_account(metas, key, is_writable);
+      };
+
+      if (effect.shape == effect_shape::native_payee) {
+         if (effect.recipient) add(*effect.recipient, true);
+         continue;
+      }
+      if (!effect.reserve) continue;
+
+      const auto token_code   = effect.reserve->token_code;
+      const auto reserve_code = effect.reserve->reserve_code;
+
+      // Every reserve-backed handler loads the Reserve PDA first.
+      add(derive_reserve_pda(program_id, token_code, reserve_code), true);
+      if (effect.shape == effect_shape::reserve_ready) continue;
+
+      const auto vault_pda = derive_reserve_vault_pda(program_id, token_code, reserve_code);
+
+      const auto& info_opt = reserve_info(token_code, reserve_code);
+      if (!info_opt.has_value()) {
+         // ONE cause reaches here: the Reserve account is ABSENT or EMPTY (see
+         // `reserve_info_for_codes`, which throws on every other cause rather
+         // than degrade). That case is benign by construction — the program's
+         // `load_reserve_from_remaining` finds the Reserve PDA we DO pass,
+         // fails to deserialize an uninitialized account, and returns
+         // `Ok(None)`, which every reserve-backed handler turns into a logged
+         // skip. No account we omit below is ever reached.
+         //
+         // The accounts are still passed because the reserve may be created
+         // between this read and the crank landing. If it is, this manifest is
+         // complete only for a NATIVE swap remit/revert (Reserve PDA +
+         // recipient); an SPL one is short the recipient ATA, and a
+         // RESERVE_CREATE_CANCELLED is short the `creator` on EITHER custody
+         // kind, since the creator is read off the Reserve we could not
+         // decode. Those windows abort and the next tick rebuilds them against
+         // a now-readable Reserve.
+         //
+         // The degrade is PER-ATTESTATION: the manifests are built for every
+         // other attestation too, so the envelope's healthy PREFIX — the
+         // attestations ahead of this one in dispatch order — still settles.
+         // Nothing behind an aborting window can settle until it clears, since
+         // `drive_dispatch_rounds` repacks each window from the on-chain
+         // cursor.
+         wlog("outpost_solana_client[{}]: Reserve({}, {}) absent or empty while building the "
+              "terminal manifest for attestation {}; passing derivable accounts only -- the "
+              "handler will log-and-skip an uninitialized reserve",
+              log_label, token_code, reserve_code, effect.attestation_index);
+         add(vault_pda, true);
+         if (effect.recipient) add(*effect.recipient, true);
+         add(token_program_id, false);
+         continue;
+      }
+      const auto& info = *info_opt;
+
+      switch (effect.shape) {
+         case effect_shape::swap_remit: {
+            if (!effect.recipient) break;
+            if (is_native_custody(info.custody_mint)) { add(*effect.recipient, true); break; }
+            add(vault_pda, true);
+            add(fc::network::solana::system::get_associated_token_address(
+                   *effect.recipient, info.custody_mint), true);
+            add(token_program_id, false);
             break;
          }
-      }
-   }
-   FC_ASSERT(address_found,
-             "token address binding unconfigured for token_code {} — the outpost's "
-             "token_addresses_by_code map must carry an explicit entry (zero mint = native)",
-             token_code);
-
-   if (outpost_config.contains("precision_by_token_code")) {
-      for (const auto& entry_v : outpost_config["precision_by_token_code"].get_array()) {
-         const auto& entry = entry_v.get_object();
-         if (entry["token_code"].as_uint64() == token_code) {
-            custody.decimals  = static_cast<uint8_t>(entry["decimals"].as_uint64());
-            precision_found = true;
+         case effect_shape::swap_revert: {
+            if (!effect.recipient) break;
+            if (is_native_custody(info.custody_mint)) { add(*effect.recipient, true); break; }
+            add(vault_pda, true);
+            add(info.custody_mint, false);
+            add(*effect.recipient, true);
+            add(fc::network::solana::system::get_associated_token_address(
+                   *effect.recipient, info.custody_mint), true);
+            add(token_program_id, false);
+            add(associated_token_program_id, false);
+            add(system_program_id, false);
             break;
          }
+         case effect_shape::reserve_create_cancelled: {
+            if (is_native_custody(info.custody_mint)) { add(info.creator, true); break; }
+            add(vault_pda, true);
+            add(info.creator, false);
+            add(fc::network::solana::system::get_associated_token_address(
+                   info.creator, info.custody_mint), true);
+            add(info.custody_mint, false);
+            add(token_program_id, false);
+            add(associated_token_program_id, false);
+            add(system_program_id, false);
+            break;
+         }
+         default:
+            break;
       }
    }
-   FC_ASSERT(precision_found,
-             "token precision unconfigured for token_code {} — required, same as "
-             "wire-ethereum's WIRE_TokenPrecisionUnset and the program's PrecisionUnconfigured",
-             token_code);
 
-   return custody;
+   return per_attestation;
 }
 
 std::string drive_dispatch_rounds(
@@ -724,6 +977,20 @@ outpost_solana_client::outpost_solana_client(
                 "outpost program IDL lacks `dispatch_attestations`; this relay "
                 "requires the two-phase dispatch program (delivery-only "
                 "epoch_in + dispatch_attestations crank)");
+      // The instruction existing is not enough: the crank is driven from the
+      // `EpochDeliveries` cursor, so a PRESENT but drifted declaration (a
+      // renamed or dropped `consensus_reached` / `dispatched_count`) would
+      // leave every drain reading "consensus not reached, cursor at 0" behind
+      // a dlog -- the outpost would stop settling with no error anywhere.
+      // Fail at boot instead, where the IDL is still fixable.
+      outpost_solana_client_detail::assert_epoch_deliveries_shape(*_program_client->get_program());
+      // Same reasoning one level down: the crank's manifests resolve custody
+      // and the cancel-refund target from `Reserve`, and a drifted declaration
+      // makes a LIVE reserve unreadable to this relay only. In flight that is
+      // unrecoverable -- the window aborts on the effect account it could not
+      // derive, and every later window repacks from the same cursor -- so it
+      // has to be a boot failure, not a first-drain surprise.
+      outpost_solana_client_detail::assert_reserve_shape(*_program_client->get_program());
    }
 }
 
@@ -755,61 +1022,87 @@ outpost_solana_client::read_epoch_dispatch_progress(uint32_t epoch_index) {
       return progress;
    }
 
-   const auto decoded = _program_client->decode_account_info_data("EpochDeliveries", account_info->data);
+   const auto decoded =
+      _program_client->decode_account_info_data(epoch_deliveries::account_name, account_info->data);
    const auto& row = decoded.get_object();
-   if (row.contains("consensus_reached")) {
-      progress.consensus_reached = row["consensus_reached"].as_bool();
-   }
-   if (row.contains("dispatched_count")) {
-      progress.dispatched_count = static_cast<uint32_t>(row["dispatched_count"].as_uint64());
-   }
+   // Both fields are boot-validated for this role (`assert_epoch_deliveries_shape`),
+   // so their absence here means the loaded IDL changed under a running relay.
+   // Assert rather than default: a defaulted `consensus_reached` reads as "not
+   // reached" and would no-op the crank on every tick with only a dlog, which
+   // is exactly the silent epoch stall the boot check exists to prevent.
+   FC_ASSERT(row.contains(epoch_deliveries::field_consensus_reached) &&
+                row.contains(epoch_deliveries::field_dispatched_count),
+             "EpochDeliveries decoded without '{}' / '{}'; the loaded IDL disagrees with the "
+             "deployed program and the dispatch cursor cannot be read",
+             epoch_deliveries::field_consensus_reached, epoch_deliveries::field_dispatched_count);
+   progress.consensus_reached = row[epoch_deliveries::field_consensus_reached].as_bool();
+   progress.dispatched_count =
+      static_cast<uint32_t>(row[epoch_deliveries::field_dispatched_count].as_uint64());
    return progress;
 }
 
-std::optional<outpost_solana_client::reserve_terminal_info>
+std::optional<outpost_solana_client_detail::reserve_terminal_info>
 outpost_solana_client::reserve_info_for_codes(uint64_t token_code, uint64_t reserve_code) {
    const auto reserve_pda =
       outpost_solana_client_detail::derive_reserve_pda(_program_id, token_code, reserve_code);
+   const auto pda_label = reserve_pda.to_string(fc::yield_function_t{});
 
+   // The two ways this can fail are NOT interchangeable, and conflating them
+   // is what turns a bad reserve into a wedged epoch:
+   //
+   //   * ABSENT / EMPTY  -> degrade. The program's `load_reserve_from_remaining`
+   //     fails to deserialize an uninitialized account and returns `Ok(None)`,
+   //     which every reserve-backed handler turns into a logged skip. Passing a
+   //     partial manifest costs nothing, because no omitted account is reached.
+   //
+   //   * PRESENT BUT UNREADABLE BY US -> throw. The account exists and the
+   //     PROGRAM decodes it fine (its Borsh is authoritative), so it takes the
+   //     real branch and demands the accounts that branch needs -- the custody
+   //     ATA for an SPL remit/revert, the `creator` for a cancel with an escrow
+   //     to refund, on EITHER custody kind. A degraded manifest is then
+   //     guaranteed to hit `require_remaining_account` -> EffectAccountMissing
+   //     and abort. That is not a retryable blip: `drive_dispatch_rounds`
+   //     repacks every window from the on-chain cursor, so the same unreadable
+   //     attestation heads every future window and the epoch never closes.
+   //     Failing the tick loudly leaves the cursor untouched and keeps the
+   //     envelope re-drivable once the cause (realistically IDL drift, which
+   //     `assert_reserve_shape` now catches at boot) is fixed.
+   //
+   // `get_account_info` sits OUTSIDE the try on purpose: an RPC or deadline
+   // exception is not a statement about this reserve, and `deadline_scope`
+   // MUST propagate so an over-deadline build stops instead of degrading every
+   // remaining attestation into an aborting manifest.
    const auto account_info = _entry->client->get_account_info(reserve_pda);
-   if (!account_info.has_value()) {
-      wlog("outpost_solana_client[{}]: Reserve({}, {}) absent at {}; "
-           "terminal manifest will omit branch-specific accounts for this reserve",
-           to_string(),
-           token_code,
-           reserve_code,
-           reserve_pda.to_string(fc::yield_function_t{}));
+   if (!account_info.has_value() || account_info->data.empty()) {
+      wlog("outpost_solana_client[{}]: Reserve({}, {}) absent or empty at {}; terminal manifest "
+           "will omit branch-specific accounts for this reserve -- the handler log-and-skips an "
+           "uninitialized reserve",
+           to_string(), token_code, reserve_code, pda_label);
       return std::nullopt;
    }
 
-   FC_ASSERT(!account_info->data.empty(),
-             "Reserve({}, {}) at {} has no account data",
-             token_code,
-             reserve_code,
-             reserve_pda.to_string(fc::yield_function_t{}));
+   try {
+      const auto reserve_v =
+         _program_client->decode_account_info_data(reserve_account::account_name, account_info->data);
+      const auto& reserve = reserve_v.get_object();
 
-   const auto reserve_v = _program_client->decode_account_info_data("Reserve", account_info->data);
-   const auto& reserve = reserve_v.get_object();
-   FC_ASSERT(reserve.contains("creator"), "Reserve account missing creator field");
-
-   // Custody (mint / decimals) lives on the OutpostConfig maps keyed by
-   // token_code — the clean-room program resolves it there at dispatch time,
-   // so the relay mirrors that lookup to stay account-consistent with the
-   // on-chain handlers.
-   const auto config_info = _entry->client->get_account_info(_program_client->config_pda);
-   FC_ASSERT(config_info.has_value() && !config_info->data.empty(),
-             "OutpostConfig account missing at {} — outpost not initialized",
-             _program_client->config_pda.to_string(fc::yield_function_t{}));
-   const auto config_v =
-      _program_client->decode_account_info_data("OutpostConfig", config_info->data);
-   const auto custody =
-      outpost_solana_client_detail::resolve_token_custody(config_v.get_object(), token_code);
-
-   return reserve_terminal_info{
-      fc::network::solana::solana_public_key::from_base58_string(reserve["creator"].as_string()),
-      custody.mint,
-      custody.decimals
-   };
+      // Custody is read from the RESERVE, never from the mutable
+      // `OutpostConfig` token maps: `handle_swap_remit`, `handle_swap_revert`
+      // and `handle_reserve_create_cancelled` all branch on
+      // `reserve.custody_mint`, so resolving it anywhere else lets an admin
+      // re-point of a token address between reserve creation and dispatch put
+      // the relay on the native branch while the program takes the SPL one --
+      // the missing vault/ATA accounts then abort the call permanently.
+      return outpost_solana_client_detail::reserve_info_from_account(reserve);
+   } catch (const fc::exception& e) {
+      elog("outpost_solana_client[{}]: Reserve({}, {}) at {} EXISTS ({} bytes) but this relay "
+           "cannot read it; refusing to build a manifest the program is guaranteed to abort on. "
+           "The dispatch cursor is left untouched and this epoch cannot settle until the cause is "
+           "fixed -- check the loaded IDL against the deployed program: {}",
+           to_string(), token_code, reserve_code, pda_label, account_info->data.size(),
+           e.to_detail_string());
+      throw;
+   }
 }
 
 std::string outpost_solana_client::send_dispatch_attestations(
@@ -844,7 +1137,7 @@ std::string outpost_solana_client::send_dispatch_attestations(
    // encodes the outbound emit.
    std::vector<fc::network::solana::instruction> pre_ixs;
    pre_ixs.push_back(
-      fc::network::solana::system::compute_budget::request_heap_frame(256'000));
+      fc::network::solana::system::compute_budget::request_heap_frame(SOLANA_DISPATCH_HEAP_FRAME_BYTES));
    auto accounts = _program_client->resolve_accounts(instr, params, overrides);
    accounts.reserve(accounts.size() + extra_remaining_accounts.size());
    accounts.insert(accounts.end(), extra_remaining_accounts.begin(),
@@ -859,125 +1152,6 @@ std::string outpost_solana_client::drain_dispatch(
    const auto deadline_abs = fc::time_point::now() + deadline;
    fc::task::deadline_scope rpc_deadline(deadline_abs);
    std::string last_sig;
-   // Build the zero-data terminal call's remaining-account manifest. Data
-   // chunks only upload bytes; the terminal call triggers `finalize_envelope`
-   // on-chain, so every account touched by effect handlers must be declared
-   // here with the right writable flag. Reserve-backed effects fetch the
-   // Reserve PDA first and use its pinned custody facts, not mutable
-   // OutpostConfig token rows.
-   std::map<std::pair<uint64_t, uint64_t>, std::optional<reserve_terminal_info>> reserve_info_cache;
-
-   auto reserve_info = [&](uint64_t token_code, uint64_t reserve_code) -> std::optional<reserve_terminal_info> {
-      const auto cache_key = std::make_pair(token_code, reserve_code);
-      auto it = reserve_info_cache.find(cache_key);
-      if (it != reserve_info_cache.end()) return it->second;
-
-      auto info = reserve_info_for_codes(token_code, reserve_code);
-      return reserve_info_cache.emplace(cache_key, std::move(info)).first->second;
-   };
-   auto is_native_custody = [](const fc::network::solana::solana_public_key& mint) {
-      return mint == fc::network::solana::system::program_ids::SYSTEM_PROGRAM;
-   };
-
-   const auto& token_program_id =
-      fc::network::solana::system::program_ids::TOKEN_PROGRAM;
-   const auto& associated_token_program_id =
-      fc::network::solana::system::program_ids::ASSOCIATED_TOKEN_PROGRAM;
-   const auto& system_program_id =
-      fc::network::solana::system::program_ids::SYSTEM_PROGRAM;
-
-   // Effect accounts for ONE attestation. Reserve-backed shapes read the
-   // pinned Reserve record for custody facts rather than the mutable
-   // OutpostConfig token rows, matching what the on-chain handler resolves.
-   auto accounts_for_effect =
-      [&](const outpost_solana_client_detail::inbound_effect& effect)
-      -> std::vector<fc::network::solana::account_meta> {
-      using shape = outpost_solana_client_detail::effect_shape;
-      std::vector<fc::network::solana::account_meta> metas;
-      auto add = [&](const fc::network::solana::solana_public_key& key, bool is_writable) {
-         outpost_solana_client_detail::record_terminal_account(metas, key, is_writable);
-      };
-
-      if (effect.shape == shape::native_payee) {
-         if (effect.recipient) add(*effect.recipient, true);
-         return metas;
-      }
-
-      if (!effect.reserve) return metas;
-      const auto token_code   = effect.reserve->token_code;
-      const auto reserve_code = effect.reserve->reserve_code;
-
-      // Every reserve-backed handler loads the Reserve PDA first.
-      add(outpost_solana_client_detail::derive_reserve_pda(_program_id, token_code, reserve_code),
-          true);
-      if (effect.shape == shape::reserve_ready) return metas;
-
-      const auto vault_pda =
-         outpost_solana_client_detail::derive_reserve_vault_pda(_program_id, token_code, reserve_code);
-
-      const auto info_opt = reserve_info(token_code, reserve_code);
-      if (!info_opt.has_value()) {
-         // The handler now ABORTS on an effect account it needs and did not
-         // receive, rather than skipping the effect -- so omitting accounts
-         // here can no longer silently drop a remit; at worst the terminal
-         // call fails and is re-driven. Pass everything still derivable
-         // without the Reserve record. Only the recipient/creator ATA is
-         // truly out of reach (it needs the custody mint), so if this reserve
-         // turns out to be SPL the call aborts and retries -- which is the
-         // correct outcome for a transient read failure, and a no-op when the
-         // Reserve PDA is simply uninitialized (the handler then has nothing
-         // to settle).
-         wlog("outpost_solana_client[{}]: Reserve({}, {}) unreadable while building the "
-              "terminal manifest; passing derivable accounts only -- an SPL reserve will "
-              "abort this call and be retried",
-              to_string(), token_code, reserve_code);
-         add(vault_pda, true);
-         if (effect.recipient) add(*effect.recipient, true);
-         add(token_program_id, false);
-         return metas;
-      }
-      const auto& info = *info_opt;
-
-      switch (effect.shape) {
-         case shape::swap_remit: {
-            if (!effect.recipient) break;
-            if (is_native_custody(info.custody_mint)) { add(*effect.recipient, true); break; }
-            add(vault_pda, true);
-            add(fc::network::solana::system::get_associated_token_address(
-                   *effect.recipient, info.custody_mint), true);
-            add(token_program_id, false);
-            break;
-         }
-         case shape::swap_revert: {
-            if (!effect.recipient) break;
-            if (is_native_custody(info.custody_mint)) { add(*effect.recipient, true); break; }
-            add(vault_pda, true);
-            add(info.custody_mint, false);
-            add(*effect.recipient, true);
-            add(fc::network::solana::system::get_associated_token_address(
-                   *effect.recipient, info.custody_mint), true);
-            add(token_program_id, false);
-            add(associated_token_program_id, false);
-            add(system_program_id, false);
-            break;
-         }
-         case shape::reserve_create_cancelled: {
-            if (is_native_custody(info.custody_mint)) { add(info.creator, true); break; }
-            add(vault_pda, true);
-            add(info.creator, false);
-            add(fc::network::solana::system::get_associated_token_address(
-                   info.creator, info.custody_mint), true);
-            add(info.custody_mint, false);
-            add(token_program_id, false);
-            add(associated_token_program_id, false);
-            add(system_program_id, false);
-            break;
-         }
-         default:
-            break;
-      }
-      return metas;
-   };
 
    // The attestation count comes from a decode this function REQUIRES to
    // succeed. A local decode failure must THROW, never read as "zero
@@ -1014,15 +1188,22 @@ std::string outpost_solana_client::drain_dispatch(
 
    // Per-attestation manifests, indexed by the SAME flat position the on-chain
    // dispatch cursor counts. Attestations needing no effect account keep an
-   // empty entry so the indices stay aligned.
+   // empty entry so the indices stay aligned. The build reads ONE account per
+   // distinct reserve -- the `Reserve` PDA the handlers themselves branch on --
+   // probes the deadline per effect, and degrades a single unusable reserve
+   // instead of abandoning the envelope's other manifests.
    const auto effects = outpost_solana_client_detail::extract_inbound_effects(envelope_bytes);
    const uint32_t total_attestations =
       outpost_solana_client_detail::count_inbound_attestations(envelope_bytes);
-   std::vector<std::vector<fc::network::solana::account_meta>> per_attestation(total_attestations);
-   for (const auto& effect : effects) {
-      if (effect.attestation_index >= per_attestation.size()) continue;  // defensive
-      per_attestation[effect.attestation_index] = accounts_for_effect(effect);
-   }
+   const auto per_attestation = outpost_solana_client_detail::build_dispatch_manifests(
+      _program_id,
+      effects,
+      total_attestations,
+      [&] { throw_if_past_deadline(deadline_abs, OP_DISPATCH_ATTESTATIONS); },
+      [&](uint64_t token_code, uint64_t reserve_code) {
+         return reserve_info_for_codes(token_code, reserve_code);
+      },
+      to_string());
 
    // Settlement is a SEPARATE instruction, driven from the on-chain cursor.
    // The crank loop lives in `drive_dispatch_rounds`, factored over its RPC
