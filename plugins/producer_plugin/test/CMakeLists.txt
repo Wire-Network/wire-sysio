@@ -4,6 +4,7 @@ add_executable( test_producer_plugin
         test_options.cpp
         test_block_timing_util.cpp
         test_disallow_delayed_trx.cpp
+        test_mockable_production_timer.cpp
         main.cpp
         )
 target_link_libraries( test_producer_plugin producer_plugin sysio_testing sysio_chain_wrap )
