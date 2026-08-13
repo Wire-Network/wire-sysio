@@ -18,7 +18,8 @@
 #include <sysio/opp/opp.pb.h>
 #include <sysio/opp/attestations/attestations.pb.h>
 #include <sysio/opp/types/types.pb.h>
-// The depot's swap kernel — tests re-derive the quote settlement must pay.
+// The depot's swap kernel — tests re-derive both the quote settlement must pay
+// and (via token_to_wire) the challenge-bond reference math.
 #include <sysio.opp.common/amm_math.hpp>
 #include <sysio/opp/uic_signature_canonical.hpp>
 #include <sysio/opp/test/uic_signature_test_utils.hpp>
@@ -1122,14 +1123,25 @@ public:
    /// same-(chain, token) multi-reserve swap tests, which add a second reserve
    /// on an already-registered (chain, token) pair.
    action_result regreserve_active(std::string_view c, std::string_view t, std::string_view r) {
+      return regreserve_active_amounts(c, t, r, /*chain_amount*/ 1'000'000'000'000ull,
+                                                /*wire_amount*/  1'000'000'000'000ull);
+   }
+
+   /// `regreserve_active` with explicit pool depths, for a test that needs a deliberately
+   /// IMBALANCED reserve. At the 50% connector weight the curve is pure constant product
+   /// (`out = wire * amount / (chain + amount)`), so a deep token side over a shallow WIRE side
+   /// floors a small conversion to zero — the "dust bucket" the bond quote has to survive.
+   action_result regreserve_active_amounts(std::string_view c, std::string_view t,
+                                           std::string_view r,
+                                           uint64_t chain_amount, uint64_t wire_amount) {
       return push(RESERV_ACCOUNT, reserv_abi, RESERV_ACCOUNT, "regreserve"_n, mvo()
          ("chain_code",             codename_mvo(c))
          ("token_code",             codename_mvo(t))
          ("reserve_code",           codename_mvo(r))
          ("name",                   std::string(c))
          ("description",            std::string{})
-         ("initial_chain_amount",   uint64_t{1'000'000'000'000ull})
-         ("initial_wire_amount",    uint64_t{1'000'000'000'000ull})
+         ("initial_chain_amount",   chain_amount)
+         ("initial_wire_amount",    wire_amount)
          ("source_token_precision", uint32_t{9})
          ("connector_weight_bps",   uint32_t{5000})
          ("is_private",             false)
@@ -5079,6 +5091,798 @@ BOOST_FIXTURE_TEST_CASE(rcrdcommit_candidate_cap_bounds_row,
                            uws[0], ATT_ID, sol_chain, sol_token,
                            fc::slug_name{"PRIMARY"}.value)));
    BOOST_REQUIRE_EQUAL(32u, get_uwreq(ATT_ID)["commits_by"].get_array().size());
+} FC_LOG_AND_RETHROW() }
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  Underwriter-fault challenge (WIRE-297) — openuwchal / voteuwchal /
+//  chkuwchal / uwchalbond + the uwrit lock-hold trio
+// ═══════════════════════════════════════════════════════════════════════════
+
+/// The dispatch stack + a deployed `sysio.chalg`, a Tier-1 electorate of three, and a
+/// WIRE-funded challenger. The confirmed-uwreq builder mirrors
+/// `swap_same_token_legs_exact_balance_wins` exactly: two same-chain legs of LEG_AMOUNT
+/// against the 1e12/1e12 cw-5000 books, so the winner holds two (ETH, ETH) locks — the source
+/// leg at LEG_AMOUNT and the destination leg at the AMM quote (swaps settle on the quote, never
+/// on the caller's target). Nothing here pins either amount: the bond math reads the live lock
+/// rows, so the fixture tracks whatever the curve prices.
+class sysio_uwchal_tester : public sysio_dispatch_tester {
+public:
+   static constexpr auto CHALLENGER = "challenger"_n;
+   static constexpr auto VOTER1     = "voter1"_n;
+   static constexpr auto VOTER2     = "voter2"_n;
+   static constexpr auto VOTER3     = "voter3"_n;
+   static constexpr auto VOTER4     = "voter4"_n;
+
+   /// Ballot wire values (the uint8 `uwchal_ballot` members).
+   static constexpr uint8_t BALLOT_UPHOLD         = 0;
+   static constexpr uint8_t BALLOT_REJECT_REFUND  = 1;
+   static constexpr uint8_t BALLOT_REJECT_FORFEIT = 2;
+   /// Fault-reason wire value (`underwrite_fault_reason::SOURCE_DEPOSIT_MISSING`).
+   static constexpr uint8_t REASON_DEPOSIT_MISSING = 0;
+
+   /// Mirrors `chalg::min_uwchal_bucket_wire` — the floor a nonzero collateral bucket contributes
+   /// when the depot cannot price it (no ACTIVE reserve for the pair, or dust that the books floor
+   /// to zero). Keeps the quote nonzero so the commitment stays challengeable.
+   static constexpr uint64_t MIN_UWCHAL_BUCKET_WIRE = 1;
+
+   /// Source amount (and requested target) the confirmed-uwreq builder swaps. The SOURCE leg
+   /// locks exactly this; the destination leg locks the AMM quote for it, which the curve puts
+   /// just under it — so the two locks together stay inside the 200 credited to the underwriter.
+   static constexpr uint64_t LEG_AMOUNT = 100;
+
+   abi_serializer chalg_abi;
+
+   sysio_uwchal_tester() {
+      // CHALG_ACCOUNT exists (base fixture creates it); it just never had code until now.
+      deploy(CHALG_ACCOUNT, contracts::chalg_wasm(), contracts::chalg_abi(), chalg_abi);
+
+      // Tier-1 voters (no roa policy — same shape as the dispute tester's electorate) and the
+      // bond-posting challenger.
+      for (auto v : {VOTER1, VOTER2, VOTER3, VOTER4, CHALLENGER}) {
+         create_account(v, config::system_account_name, /*multisig=*/false,
+                        /*include_code=*/true, /*include_roa_policy=*/false);
+      }
+      produce_blocks();
+
+      // T1 electorate rows in sysio.roa (gen 0). `forcereg` works pre-emitcfg — the electorate
+      // snapshot walks `nodeowners` directly, never `nodecount`. Genesis already carries ONE T1
+      // owner, so the snapshot is these four + it: N = 5, Q = 3 — every quorum path below casts
+      // three ballots, and the tie case splits four rejectors 2–2.
+      for (auto v : {VOTER1, VOTER2, VOTER3, VOTER4}) {
+         BOOST_REQUIRE_EQUAL(success(), push(ROA_ACCOUNT, roa_abi, ROA_ACCOUNT, "forcereg"_n,
+            mvo()("owner", v.to_string())("tier", 1)));
+      }
+      produce_blocks();
+   }
+
+   // ── setup: the challenged commitment ─────────────────────────────────────
+
+   /// Full path to a CONFIRMED uwreq with two live (ETH, ETH) locks — the source leg at
+   /// LEG_AMOUNT, the destination leg at the AMM quote — byte-for-byte the
+   /// `swap_same_token_legs_exact_balance_wins` recipe.
+   void make_confirmed_uwreq(uint64_t att_id) {
+      bootstrap_for_dispatch();
+      setup_wire_token_and_reserves();
+      BOOST_REQUIRE_EQUAL(success(), regreserve_active("ETH", "ETH", "SECOND"));
+
+      // The challenger's bond funding comes from the WIRE treasury seeded above.
+      BOOST_REQUIRE_EQUAL(success(), push(TOKEN_ACCOUNT, token_abi, config::system_account_name,
+         "transfer"_n, mvo()("from", "sysio")("to", CHALLENGER.to_string())
+            ("quantity", "100.000000000 WIRE")("memo", "challenge bond funding")));
+
+      const uint64_t eth       = fc::slug_name{"ETH"}.value;
+      const uint64_t primary   = fc::slug_name{"PRIMARY"}.value;
+      const uint64_t secondary = fc::slug_name{"SECOND"}.value;
+
+      BOOST_REQUIRE_EQUAL(success(), depositinle_credit(UWRIT_OP, "ETH", "ETH", 200));
+
+      const auto sr = encode_swap_request(
+         ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
+         eth, eth, primary,   /*src_amount*/ LEG_AMOUNT,
+         eth, eth, secondary, /*dst_amount*/ LEG_AMOUNT,
+         /*tolerance_bps*/ 1'000'000, ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0b'));
+      BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(att_id, eth, sr));
+
+      const auto src_uic = create_signed_uic(UWRIT_OP, att_id, eth, eth, primary);
+      BOOST_REQUIRE_EQUAL(success(),
+         rcrdcommit_direct(att_id, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", src_uic));
+      const auto dst_uic = create_signed_uic(UWRIT_OP, att_id, eth, eth, secondary);
+      BOOST_REQUIRE_EQUAL(success(),
+         rcrdcommit_direct(att_id, UWRIT_OP, eth, "ETH", "ETH", "SECOND", dst_uic));
+
+      BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_CONFIRMED",
+                          get_uwreq(att_id)["status"].as_string());
+   }
+
+   /// Walk `sysio.reserv::reserves` (checksum256-keyed, so `get_row_by_id` cannot address it)
+   /// and return the row matching the slug triple — the reserv tests' scan workaround. Takes the
+   /// raw slug VALUES so a lock row's fields feed straight in.
+   fc::variant find_reserve(uint64_t target_chain, uint64_t target_token,
+                            uint64_t target_reserve) {
+      const auto& db       = control->db();
+      const auto  table_id = chain::compute_table_id("reserves"_n.to_uint64_t());
+      const auto& kv_idx   = db.get_index<chain::kv_index, chain::by_code_key>();
+      auto itr = kv_idx.lower_bound(boost::make_tuple(RESERV_ACCOUNT, table_id, std::string_view{}));
+      for (; itr != kv_idx.end() && itr->code == RESERV_ACCOUNT && itr->table_id == table_id; ++itr) {
+         std::vector<char> raw(itr->value.size());
+         if (!raw.empty())
+            std::memcpy(raw.data(), itr->value.data(), raw.size());
+         try {
+            auto row = reserv_abi.binary_to_variant(
+               "reserve_row", raw, abi_serializer::create_yield_function(abi_serializer_max_time));
+            if (row["chain_code"]["value"].as_uint64()   == target_chain &&
+                row["token_code"]["value"].as_uint64()   == target_token &&
+                row["reserve_code"]["value"].as_uint64() == target_reserve) {
+               return row;
+            }
+         } catch (...) {
+            // skip rows that don't decode
+         }
+      }
+      return fc::variant();
+   }
+
+   /// What `uwchalbond`/`openuwchal` must price: the underwriter's ENTIRE collateral, each
+   /// bucket quoted to WIRE on its pair's LIVE books and summed (Jonathan, 2026-08-11) — what
+   /// an upheld verdict actually costs them. Live books, not the registration constants:
+   /// winner selection settles inline, so by challenge time `applyswap` has already moved both
+   /// sides. Recomputing on the host over the same rows pins the contract to the shared kernel:
+   /// right reserve per bucket, right field order, and the sum.
+   uint64_t expected_bond(name underwriter) {
+      const auto op = get_operator(underwriter);
+      BOOST_REQUIRE(!op.is_null());
+      uint64_t total = 0;
+      for (const auto& bal : op["balances"].get_array()) {
+         const uint64_t amount = bal["balance"].as_uint64();
+         if (amount == 0) continue;
+         const auto chain = bal["chain_code"]["value"].as_uint64(),
+                    token = bal["token_code"]["value"].as_uint64();
+         if (token == fc::slug_name{"WIRE"}.value) {
+            total += amount;   // already WIRE — no curve
+            continue;
+         }
+         // A bucket with no ACTIVE reserve, or one whose books floor the conversion to zero,
+         // contributes the contract's floor rather than voiding the quote — mirrors
+         // `chalg::min_uwchal_bucket_wire`.
+         const auto row = first_active_reserve(chain, token);
+         const uint64_t bucket_wire =
+            row.is_null() ? 0
+                          : sysio::opp::amm::token_to_wire(row["reserve_chain_amount"].as_uint64(),
+                                                           row["reserve_wire_amount"].as_uint64(),
+                                                           row["connector_weight_bps"].as_uint64(),
+                                                           amount);
+         total += (bucket_wire > 0 ? bucket_wire : MIN_UWCHAL_BUCKET_WIRE);
+      }
+      return total;
+   }
+
+   /// The FIRST ACTIVE reserve for a (chain, token) pair — the row the contract's `bychaintok`
+   /// walk lands on when pricing a collateral bucket that names no reserve of its own.
+   fc::variant first_active_reserve(uint64_t target_chain, uint64_t target_token) {
+      const auto& db       = control->db();
+      const auto  table_id = chain::compute_table_id("reserves"_n.to_uint64_t());
+      const auto& kv_idx   = db.get_index<chain::kv_index, chain::by_code_key>();
+      auto itr = kv_idx.lower_bound(boost::make_tuple(RESERV_ACCOUNT, table_id, std::string_view{}));
+      for (; itr != kv_idx.end() && itr->code == RESERV_ACCOUNT
+             && itr->table_id == table_id; ++itr) {
+         std::vector<char> raw(itr->value.size());
+         if (!raw.empty()) std::memcpy(raw.data(), itr->value.data(), raw.size());
+         try {
+            auto row = reserv_abi.binary_to_variant("reserve_row", raw,
+               abi_serializer::create_yield_function(abi_serializer_max_time));
+            if (row["chain_code"]["value"].as_uint64() == target_chain &&
+                row["token_code"]["value"].as_uint64() == target_token &&
+                row["status"].as_string() == "RESERVE_STATUS_ACTIVE") {
+               return row;
+            }
+         } catch (...) {
+            // Not a reserve_row — skip.
+         }
+      }
+      return fc::variant();
+   }
+
+   // ── chalg action wrappers ────────────────────────────────────────────────
+
+   action_result openuwchal(name challenger, uint64_t uwreq_id, name underwriter,
+                            uint8_t reason, const std::string& detail) {
+      return push(CHALG_ACCOUNT, chalg_abi, challenger, "openuwchal"_n, mvo()
+         ("challenger", challenger.to_string())("uwreq_id", uwreq_id)
+         ("underwriter", underwriter.to_string())("reason", reason)("detail", detail));
+   }
+
+   action_result voteuwchal(name owner, uint64_t chal_id, uint8_t ballot) {
+      return push(CHALG_ACCOUNT, chalg_abi, owner, "voteuwchal"_n, mvo()
+         ("owner", owner.to_string())("chal_id", chal_id)("ballot", ballot));
+   }
+
+   action_result chkuwchal(uint64_t chal_id, name signer = CHALLENGER) {
+      return push(CHALG_ACCOUNT, chalg_abi, signer, "chkuwchal"_n, mvo()("chal_id", chal_id));
+   }
+
+   /// Pull a resolved challenge's bond out of chalg custody, signed by the recipient itself.
+   action_result claimbond(name account, name signer = name()) {
+      return push(CHALG_ACCOUNT, chalg_abi, signer == name() ? account : signer, "claimbond"_n,
+                  mvo()("account", account.to_string()));
+   }
+
+   /// Decoded return of the read-only bond quote. Seals a block first: tests re-quote the SAME
+   /// (uwreq, underwriter) before and after filing, and identical bytes in one block window
+   /// collide on transaction dedup.
+   uint64_t uwchalbond(uint64_t uwreq_id, name underwriter) {
+      produce_block();
+      auto trace = base_tester::push_action(CHALG_ACCOUNT, "uwchalbond"_n, CHALG_ACCOUNT, mvo()
+         ("uwreq_id", uwreq_id)("underwriter", underwriter.to_string()));
+      BOOST_REQUIRE(trace && !trace->action_traces.empty());
+      return fc::raw::unpack<uint64_t>(trace->action_traces[0].return_value);
+   }
+
+   // ── row / balance readers ────────────────────────────────────────────────
+
+   fc::variant get_uwchal(uint64_t id) {
+      auto data = get_row_by_id(CHALG_ACCOUNT, CHALG_ACCOUNT, "uwchals"_n, id);
+      return data.empty() ? fc::variant() : chalg_abi.binary_to_variant(
+         "uwchal_entry", data,
+         abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
+   /// The challenge's escrowed bond, straight off the row.
+   uint64_t uwchal_bond_amount(uint64_t id) {
+      return get_uwchal(id)["bond_amount"].as_uint64();
+   }
+
+   /// One owner's ballot in a challenge (the vote table is scoped by chal_id) — null once
+   /// resolution erased the scope.
+   fc::variant get_uwchal_vote(uint64_t chal_id, name owner) {
+      auto data = get_row_by_id(CHALG_ACCOUNT, name(chal_id), "uwchalvote"_n, owner.value);
+      return data.empty() ? fc::variant() : chalg_abi.binary_to_variant(
+         "uwchal_vote", data,
+         abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
+   /// Unclaimed WIRE `sysio.chalg` owes `account` from resolved challenges; 0 when no row exists.
+   uint64_t get_bond_credit(name account) {
+      auto data = get_row_by_id(CHALG_ACCOUNT, CHALG_ACCOUNT, "bondcredits"_n, account.value);
+      if (data.empty()) return 0;
+      return chalg_abi.binary_to_variant(
+         "bond_credit", data,
+         abi_serializer::create_yield_function(abi_serializer_max_time))["amount"].as_uint64();
+   }
+
+   int64_t wire_balance(name account) {
+      return get_currency_balance(TOKEN_ACCOUNT, symbol{9, "WIRE"}, account).get_amount();
+   }
+
+   /// The decoded `sysio.opreg::operators` row.
+   fc::variant get_operator(name account) {
+      auto data = get_row_by_id(OPREG_ACCOUNT, OPREG_ACCOUNT, "operators"_n, account.value);
+      return data.empty() ? fc::variant() : opreg_abi.binary_to_variant(
+         "operator_entry", data,
+         abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
+   /// The operator's status string straight off `sysio.opreg::operators`.
+   std::string operator_status(name account) {
+      return get_operator(account)["status"].as_string();
+   }
+
+   /// Sweep expired locks as the epoch machinery would (`chklocks` accepts epoch or self auth).
+   action_result chklocks() {
+      return push(UWRIT_ACCOUNT, uwrit_abi, UWRIT_ACCOUNT, "chklocks"_n, mvo());
+   }
+};
+
+// The read-only quote prices the live locks through their own books and answers 0 for every
+// not-challengeable state — the same soft contract as sysio.reserv::swapquote.
+BOOST_FIXTURE_TEST_CASE(uwchalbond_quotes_the_live_lock_value, sysio_uwchal_tester) { try {
+   constexpr uint64_t ATT_ID = 9100;
+   make_confirmed_uwreq(ATT_ID);
+
+   BOOST_REQUIRE_EQUAL(expected_bond(UWRIT_OP), uwchalbond(ATT_ID, UWRIT_OP));
+   BOOST_REQUIRE_GT(expected_bond(UWRIT_OP), 0u);
+
+   BOOST_REQUIRE_EQUAL(0u, uwchalbond(ATT_ID + 1, UWRIT_OP));    // no such uwreq
+   BOOST_REQUIRE_EQUAL(0u, uwchalbond(ATT_ID, "batchop.a"_n));   // not the winner
+} FC_LOG_AND_RETHROW() }
+
+// A collateral bucket whose (chain, token) pair carries NO ACTIVE reserve must not void the quote.
+// `opreg::depositinle` accepts any positive amount for any pair without requiring one that quotes,
+// so voiding here handed the underwriter an immunity switch: seed one unreserved bucket and every
+// later CONFIRMED commitment becomes permanently unchallengeable. The bucket contributes the floor
+// instead, and filing still works.
+BOOST_FIXTURE_TEST_CASE(unreserved_collateral_bucket_still_quotes_a_bond, sysio_uwchal_tester) { try {
+   constexpr uint64_t ATT_ID = 9800;
+   make_confirmed_uwreq(ATT_ID);
+
+   const uint64_t priced_only = uwchalbond(ATT_ID, UWRIT_OP);
+   BOOST_REQUIRE_GT(priced_only, 0u);
+
+   // No reserve was ever registered for (SOLANA, USDC) — nothing to price the bucket against.
+   BOOST_REQUIRE_EQUAL(success(), depositinle_credit(UWRIT_OP, "SOLANA", "USDC", 5'000));
+   BOOST_REQUIRE(first_active_reserve(fc::slug_name{"SOLANA"}.value,
+                                      fc::slug_name{"USDC"}.value).is_null());
+
+   // Quote survives, grows by exactly the floor, and still matches the shared formula.
+   const uint64_t quoted = uwchalbond(ATT_ID, UWRIT_OP);
+   BOOST_REQUIRE_EQUAL(priced_only + MIN_UWCHAL_BUCKET_WIRE, quoted);
+   BOOST_REQUIRE_EQUAL(expected_bond(UWRIT_OP), quoted);
+
+   // The commitment is still challengeable — the property the void broke.
+   BOOST_REQUIRE_EQUAL(success(),
+      openuwchal(CHALLENGER, ATT_ID, UWRIT_OP, REASON_DEPOSIT_MISSING, "no such deposit"));
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(quoted), wire_balance(CHALG_ACCOUNT));
+} FC_LOG_AND_RETHROW() }
+
+// Same property for the DUST flavour: the pair HAS an ACTIVE reserve, but its books floor the
+// conversion to zero. A deep token side over a shallow WIRE side does it at the 50% weight, where
+// the curve is pure constant product: 1 * 1000 / (1e12 + 1) = 0.
+BOOST_FIXTURE_TEST_CASE(dust_collateral_bucket_still_quotes_a_bond, sysio_uwchal_tester) { try {
+   constexpr uint64_t ATT_ID = 9810;
+   make_confirmed_uwreq(ATT_ID);
+
+   const uint64_t priced_only = uwchalbond(ATT_ID, UWRIT_OP);
+   BOOST_REQUIRE_GT(priced_only, 0u);
+
+   BOOST_REQUIRE_EQUAL(success(), regreserve_active_amounts("ETH", "USDC", "PRIMARY",
+                                                            /*chain_amount*/ 1'000'000'000'000ull,
+                                                            /*wire_amount*/  1'000ull));
+   BOOST_REQUIRE_EQUAL(success(), depositinle_credit(UWRIT_OP, "ETH", "USDC", 1));
+
+   // Pin the premise: the pair IS priceable, and the books really do floor this bucket to zero.
+   const auto dust_row = first_active_reserve(fc::slug_name{"ETH"}.value,
+                                              fc::slug_name{"USDC"}.value);
+   BOOST_REQUIRE(!dust_row.is_null());
+   BOOST_REQUIRE_EQUAL(0u, sysio::opp::amm::token_to_wire(
+                              dust_row["reserve_chain_amount"].as_uint64(),
+                              dust_row["reserve_wire_amount"].as_uint64(),
+                              dust_row["connector_weight_bps"].as_uint64(), 1));
+
+   const uint64_t quoted = uwchalbond(ATT_ID, UWRIT_OP);
+   BOOST_REQUIRE_EQUAL(priced_only + MIN_UWCHAL_BUCKET_WIRE, quoted);
+   BOOST_REQUIRE_EQUAL(expected_bond(UWRIT_OP), quoted);
+
+   BOOST_REQUIRE_EQUAL(success(),
+      openuwchal(CHALLENGER, ATT_ID, UWRIT_OP, REASON_DEPOSIT_MISSING, "no such deposit"));
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(quoted), wire_balance(CHALG_ACCOUNT));
+} FC_LOG_AND_RETHROW() }
+
+// Filing escrows exactly the quoted bond, stamps every lock with the challenge id, and records
+// the OPEN row — and the quote answers 0 afterwards (a commitment is challengeable once).
+BOOST_FIXTURE_TEST_CASE(openuwchal_escrows_bond_and_holds_locks, sysio_uwchal_tester) { try {
+   constexpr uint64_t ATT_ID = 9200;
+   make_confirmed_uwreq(ATT_ID);
+
+   const uint64_t bond   = uwchalbond(ATT_ID, UWRIT_OP);
+   const int64_t  before = wire_balance(CHALLENGER);
+
+   BOOST_REQUIRE_EQUAL(success(),
+      openuwchal(CHALLENGER, ATT_ID, UWRIT_OP, REASON_DEPOSIT_MISSING, "no such deposit"));
+
+   BOOST_REQUIRE_EQUAL(before - static_cast<int64_t>(bond), wire_balance(CHALLENGER));
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(bond), wire_balance(CHALG_ACCOUNT));
+
+   const auto chal = get_uwchal(1);
+   BOOST_REQUIRE(!chal.is_null());
+   BOOST_REQUIRE_EQUAL("DISPUTE_STATUS_OPEN", chal["status"].as_string());
+   BOOST_REQUIRE_EQUAL("NONE", chal["verdict"].as_string());
+   BOOST_REQUIRE_EQUAL(ATT_ID, chal["uwreq_id"].as_uint64());
+   BOOST_REQUIRE_EQUAL(bond, chal["bond_amount"].as_uint64());
+   // Four registered voters + the ONE genesis T1 owner (this assert breaks loudly if genesis
+   // ever seeds a different count — the quorum arithmetic below depends on it).
+   BOOST_REQUIRE_EQUAL(5u, chal["electorate"].get_array().size());
+   BOOST_REQUIRE_EQUAL(3u, chal["quorum"].as_uint64());
+
+   BOOST_REQUIRE_EQUAL(1u, get_lock(1)["challenge_id"].as_uint64());
+   BOOST_REQUIRE_EQUAL(1u, get_lock(2)["challenge_id"].as_uint64());
+
+   BOOST_REQUIRE_EQUAL(0u, uwchalbond(ATT_ID, UWRIT_OP));
+   BOOST_REQUIRE(openuwchal(CHALLENGER, ATT_ID, UWRIT_OP, REASON_DEPOSIT_MISSING, "again")
+                    .find("already been challenged") != std::string::npos);
+} FC_LOG_AND_RETHROW() }
+
+// Every way a filing can be stale or malformed is refused before any WIRE moves.
+BOOST_FIXTURE_TEST_CASE(openuwchal_guards, sysio_uwchal_tester) { try {
+   constexpr uint64_t ATT_ID = 9300;
+   make_confirmed_uwreq(ATT_ID);
+
+   BOOST_REQUIRE(openuwchal(CHALLENGER, ATT_ID + 77, UWRIT_OP, REASON_DEPOSIT_MISSING, "x")
+                    .find("not found") != std::string::npos);
+   BOOST_REQUIRE(openuwchal(CHALLENGER, ATT_ID, "batchop.a"_n, REASON_DEPOSIT_MISSING, "x")
+                    .find("not this request's winner") != std::string::npos);
+   BOOST_REQUIRE(openuwchal(CHALLENGER, ATT_ID, UWRIT_OP, /*reason*/ 99, "x")
+                    .find("unknown fault reason") != std::string::npos);
+   // The caller-controlled detail note is retained on the audit row indefinitely (RAM billed to
+   // the contract) — the byte cap refuses the filing before any escrow moves.
+   BOOST_REQUIRE(openuwchal(CHALLENGER, ATT_ID, UWRIT_OP, REASON_DEPOSIT_MISSING,
+                            std::string(1024 + 1, 'x'))
+                    .find("detail exceeds max_uwchal_detail_bytes") != std::string::npos);
+
+   // Time-travel past the 12h window: the commitment is no longer challengeable, and the locks
+   // release healthy on the next sweep. Seal the pending block FIRST — a big skip aborts pending
+   // and re-applies its transactions at the jumped time, where they have expired.
+   const int64_t before = wire_balance(CHALLENGER);
+   produce_blocks();
+   produce_block(fc::hours(13));
+   BOOST_REQUIRE(openuwchal(CHALLENGER, ATT_ID, UWRIT_OP, REASON_DEPOSIT_MISSING, "late")
+                    .find("lock window has closed") != std::string::npos);
+   // The whole transaction rolled back (the bond gate refuses pre-escrow here; a mid-window
+   // race would instead throw in holdlocks AFTER the escrow was sent — same atomicity): no
+   // WIRE moved, no challenge row survives.
+   BOOST_REQUIRE_EQUAL(before, wire_balance(CHALLENGER));
+   BOOST_REQUIRE(get_uwchal(1).is_null());
+} FC_LOG_AND_RETHROW() }
+
+// Ballot guards mirror votedispute's: electorate membership, one vote per owner, a real ballot
+// value, and an OPEN challenge.
+BOOST_FIXTURE_TEST_CASE(voteuwchal_guards, sysio_uwchal_tester) { try {
+   constexpr uint64_t ATT_ID = 9400;
+   make_confirmed_uwreq(ATT_ID);
+   BOOST_REQUIRE_EQUAL(success(),
+      openuwchal(CHALLENGER, ATT_ID, UWRIT_OP, REASON_DEPOSIT_MISSING, "d"));
+
+   BOOST_REQUIRE(voteuwchal(CHALLENGER, 1, BALLOT_UPHOLD)
+                    .find("not in the challenge's tier-1 electorate") != std::string::npos);
+   BOOST_REQUIRE(voteuwchal(VOTER1, 1, /*ballot*/ 7).find("unknown ballot") != std::string::npos);
+   BOOST_REQUIRE_EQUAL(success(), voteuwchal(VOTER1, 1, BALLOT_UPHOLD));
+   produce_block(); // identical re-vote bytes need fresh TAPOS to reach the contract's guard
+   BOOST_REQUIRE(voteuwchal(VOTER1, 1, BALLOT_UPHOLD)
+                    .find("already voted") != std::string::npos);
+   BOOST_REQUIRE(chkuwchal(99).find("challenge not found") != std::string::npos);
+} FC_LOG_AND_RETHROW() }
+
+// The uphold path end-to-end: quorum -> SLASHED -> the locks sweep through releaselock's
+// deferred-slash branch (collateral debited) -> uwreq COMPLETED -> bond back to the challenger.
+// An OPEN challenge PINS the uwreq row against the retention sweep. The locks hold the
+// collateral, but THIS row holds the evidence the challenge adjudicates against
+// (`attestation_inbound_data`, `source_tx_id`, `commits_by`), and the terminal retention
+// window is far shorter than the challenge window — so without the pin a challenge could
+// outlive the record it exists to adjudicate. Both release branches are covered: `freelocks`
+// on a REJECTED verdict here, `sweeplocks` on UPHELD below.
+BOOST_FIXTURE_TEST_CASE(pruneuwreqs_skips_a_challenged_uwreq, sysio_uwchal_tester) { try {
+   constexpr uint64_t ATT_ID = 9600;
+   make_confirmed_uwreq(ATT_ID);
+
+   // Filing stamps the request, not just its locks.
+   BOOST_REQUIRE_EQUAL(success(),
+      openuwchal(CHALLENGER, ATT_ID, UWRIT_OP, REASON_DEPOSIT_MISSING, "no deposit on ETH"));
+   BOOST_REQUIRE_EQUAL(1u, get_uwreq(ATT_ID)["challenge_id"].as_uint64());
+
+   // The sweep refuses it however generous the budget — the pin is not status- or
+   // retention-conditional.
+   BOOST_REQUIRE_EQUAL(success(), push(UWRIT_ACCOUNT, uwrit_abi, UWRIT_ACCOUNT,
+      "pruneuwreqs"_n, mvo()("max_rows", 100)));
+   BOOST_REQUIRE(!get_uwreq(ATT_ID).is_null());
+
+   // REJECT_FORFEIT resolves through `freelocks`, which clears both markers.
+   for (auto v : {VOTER1, VOTER2, VOTER3}) {
+      BOOST_REQUIRE_EQUAL(success(), voteuwchal(v, 1, BALLOT_REJECT_FORFEIT));
+   }
+   produce_block();
+   BOOST_REQUIRE_EQUAL(success(), chkuwchal(1));
+   BOOST_REQUIRE_EQUAL(0u, get_uwreq(ATT_ID)["challenge_id"].as_uint64());
+} FC_LOG_AND_RETHROW() }
+
+/// The UPHELD branch releases the pin too — `sweeplocks` ERASES the locks rather than
+/// clearing their markers, so it is the only place the row's own marker comes off there.
+/// Without it the row would be skipped forever and never reclaimable.
+BOOST_FIXTURE_TEST_CASE(uphold_releases_the_uwreq_challenge_pin, sysio_uwchal_tester) { try {
+   constexpr uint64_t ATT_ID = 9610;
+   make_confirmed_uwreq(ATT_ID);
+
+   BOOST_REQUIRE_EQUAL(success(),
+      openuwchal(CHALLENGER, ATT_ID, UWRIT_OP, REASON_DEPOSIT_MISSING, "no deposit on ETH"));
+   BOOST_REQUIRE_EQUAL(1u, get_uwreq(ATT_ID)["challenge_id"].as_uint64());
+
+   for (auto v : {VOTER1, VOTER2, VOTER3}) {
+      BOOST_REQUIRE_EQUAL(success(), voteuwchal(v, 1, BALLOT_UPHOLD));
+   }
+   produce_block();
+   BOOST_REQUIRE_EQUAL(success(), chkuwchal(1));
+   BOOST_REQUIRE_EQUAL("UPHELD", get_uwchal(1)["verdict"].as_string());
+   BOOST_REQUIRE_EQUAL(0u, get_uwreq(ATT_ID)["challenge_id"].as_uint64());
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(chkuwchal_uphold_slashes_and_returns_bond, sysio_uwchal_tester) { try {
+   constexpr uint64_t ATT_ID = 9500;
+   make_confirmed_uwreq(ATT_ID);
+   const int64_t challenger_start = wire_balance(CHALLENGER);
+
+   BOOST_REQUIRE_EQUAL(success(),
+      openuwchal(CHALLENGER, ATT_ID, UWRIT_OP, REASON_DEPOSIT_MISSING, "no deposit on ETH"));
+   BOOST_REQUIRE_EQUAL(success(), voteuwchal(VOTER1, 1, BALLOT_UPHOLD));
+   BOOST_REQUIRE_EQUAL(success(), voteuwchal(VOTER2, 1, BALLOT_UPHOLD));
+
+   // Sub-quorum (2 of Q=3): the crank resolves nothing and the operator stands.
+   BOOST_REQUIRE_EQUAL(success(), chkuwchal(1));
+   BOOST_REQUIRE_EQUAL("DISPUTE_STATUS_OPEN", get_uwchal(1)["status"].as_string());
+   BOOST_REQUIRE_EQUAL("OPERATOR_STATUS_ACTIVE", operator_status(UWRIT_OP));
+
+   BOOST_REQUIRE_EQUAL(success(), voteuwchal(VOTER3, 1, BALLOT_UPHOLD));
+   produce_block(); // the resolving crank re-pushes identical bytes — fresh TAPOS required
+   BOOST_REQUIRE_EQUAL(success(), chkuwchal(1));
+
+   const auto chal = get_uwchal(1);
+   BOOST_REQUIRE_EQUAL("DISPUTE_STATUS_RESOLVED", chal["status"].as_string());
+   BOOST_REQUIRE_EQUAL("UPHELD", chal["verdict"].as_string());
+
+   // The operator is slashed and BOTH locks are gone — swept, not expired.
+   BOOST_REQUIRE_EQUAL("OPERATOR_STATUS_SLASHED", operator_status(UWRIT_OP));
+   BOOST_REQUIRE(get_lock(1).is_null());
+   BOOST_REQUIRE(get_lock(2).is_null());
+
+   // Every bucket drains: `opreg::slash` debits each bucket's slashable-now portion (balance
+   // minus active locks — for the challenged (ETH, ETH) bucket that is everything ABOVE the two
+   // 100-unit locks), and the two sweeping releaselocks then take the deferred-slash branch for
+   // the locked 200. Unlocked buckets on other chains were slashed in full at slash time.
+   // (Bind the row first — ranging over `get_operator(...)[...]` would iterate a dangling
+   // temporary.)
+   const auto slashed_op = get_operator(UWRIT_OP);
+   for (const auto& bal : slashed_op["balances"].get_array()) {
+      BOOST_REQUIRE_EQUAL(0u, bal["balance"].as_uint64());
+   }
+
+   // COMPLETED flip ran through the shared tail.
+   BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_COMPLETED",
+                       get_uwreq(ATT_ID)["status"].as_string());
+
+   // The bond is CREDITED, not pushed: resolution moves no WIRE at all, so custody is still
+   // chalg's and the challenger is still down the escrow. (The crank can run under the epoch
+   // tick, where a transfer would run the recipient's notification handler — see
+   // hostile_bond_recipient_cannot_stall_the_epoch_tick.)
+   const uint64_t bond = chal["bond_amount"].as_uint64();
+   BOOST_REQUIRE_GT(bond, 0u);
+   BOOST_REQUIRE_EQUAL(challenger_start - static_cast<int64_t>(bond), wire_balance(CHALLENGER));
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(bond), wire_balance(CHALG_ACCOUNT));
+   BOOST_REQUIRE_EQUAL(bond, get_bond_credit(CHALLENGER));
+
+   // The pull settles it: the bond comes home and chalg ends at zero custody.
+   BOOST_REQUIRE_EQUAL(success(), claimbond(CHALLENGER));
+   BOOST_REQUIRE_EQUAL(challenger_start, wire_balance(CHALLENGER));
+   BOOST_REQUIRE_EQUAL(0, wire_balance(CHALG_ACCOUNT));
+   BOOST_REQUIRE_EQUAL(0u, get_bond_credit(CHALLENGER));
+} FC_LOG_AND_RETHROW() }
+
+// An explicit REJECT_FORFEIT majority is the ONLY road to forfeiture: the bond lands on the
+// wrongly-challenged underwriter, the holds clear, and the locks release healthy at expiry
+// with the collateral untouched.
+BOOST_FIXTURE_TEST_CASE(chkuwchal_reject_forfeit_pays_underwriter, sysio_uwchal_tester) { try {
+   constexpr uint64_t ATT_ID = 9600;
+   make_confirmed_uwreq(ATT_ID);
+   const uint64_t bond = uwchalbond(ATT_ID, UWRIT_OP);
+   const int64_t  uw_start = wire_balance(UWRIT_OP);
+
+   BOOST_REQUIRE_EQUAL(success(),
+      openuwchal(CHALLENGER, ATT_ID, UWRIT_OP, REASON_DEPOSIT_MISSING, "wrong"));
+   BOOST_REQUIRE_EQUAL(success(), voteuwchal(VOTER1, 1, BALLOT_REJECT_FORFEIT));
+   BOOST_REQUIRE_EQUAL(success(), voteuwchal(VOTER2, 1, BALLOT_REJECT_FORFEIT));
+   BOOST_REQUIRE_EQUAL(success(), voteuwchal(VOTER3, 1, BALLOT_REJECT_FORFEIT));
+   BOOST_REQUIRE_EQUAL(success(), chkuwchal(1));
+
+   BOOST_REQUIRE_EQUAL("REJECTED_FORFEIT", get_uwchal(1)["verdict"].as_string());
+   BOOST_REQUIRE_EQUAL("OPERATOR_STATUS_ACTIVE", operator_status(UWRIT_OP));
+
+   // Forfeiture credits the underwriter; the WIRE lands when IT pulls.
+   BOOST_REQUIRE_EQUAL(bond, get_bond_credit(UWRIT_OP));
+   BOOST_REQUIRE_EQUAL(uw_start, wire_balance(UWRIT_OP));
+   BOOST_REQUIRE_EQUAL(success(), claimbond(UWRIT_OP));
+   BOOST_REQUIRE_EQUAL(uw_start + static_cast<int64_t>(bond), wire_balance(UWRIT_OP));
+   BOOST_REQUIRE_EQUAL(0, wire_balance(CHALG_ACCOUNT));
+
+   // Holds cleared; locks still present until natural expiry, then a HEALTHY release.
+   BOOST_REQUIRE_EQUAL(0u, get_lock(1)["challenge_id"].as_uint64());
+   BOOST_REQUIRE_EQUAL(0u, get_lock(2)["challenge_id"].as_uint64());
+   const auto balances_before = get_operator(UWRIT_OP)["balances"];
+   produce_blocks();
+   produce_block(fc::hours(13));
+   BOOST_REQUIRE_EQUAL(success(), chklocks());
+   BOOST_REQUIRE(get_lock(1).is_null());
+   // A healthy release moves NO collateral: the balances are byte-identical to the pre-expiry
+   // snapshot after a rejected challenge.
+   const auto balances_after = get_operator(UWRIT_OP)["balances"];
+   BOOST_REQUIRE_EQUAL(fc::json::to_string(balances_before, fc::time_point::maximum()),
+                       fc::json::to_string(balances_after, fc::time_point::maximum()));
+} FC_LOG_AND_RETHROW() }
+
+// A split reject quorum favours the refund on a tie — forfeiture requires a strict majority of
+// the rejectors.
+BOOST_FIXTURE_TEST_CASE(chkuwchal_reject_tie_favours_refund, sysio_uwchal_tester) { try {
+   constexpr uint64_t ATT_ID = 9700;
+   make_confirmed_uwreq(ATT_ID);
+   const int64_t challenger_start = wire_balance(CHALLENGER);
+
+   BOOST_REQUIRE_EQUAL(success(),
+      openuwchal(CHALLENGER, ATT_ID, UWRIT_OP, REASON_DEPOSIT_MISSING, "honest mistake"));
+   // Four rejectors split 2–2: the combined rejects clear Q=3, and the forfeit/refund tie must
+   // fall to the refund — forfeiture only ever happens by a strict majority of the rejectors.
+   BOOST_REQUIRE_EQUAL(success(), voteuwchal(VOTER1, 1, BALLOT_REJECT_REFUND));
+   BOOST_REQUIRE_EQUAL(success(), voteuwchal(VOTER2, 1, BALLOT_REJECT_FORFEIT));
+   BOOST_REQUIRE_EQUAL(success(), voteuwchal(VOTER3, 1, BALLOT_REJECT_REFUND));
+   BOOST_REQUIRE_EQUAL(success(), voteuwchal(VOTER4, 1, BALLOT_REJECT_FORFEIT));
+   BOOST_REQUIRE_EQUAL(success(), chkuwchal(1));
+
+   BOOST_REQUIRE_EQUAL("REJECTED_REFUND", get_uwchal(1)["verdict"].as_string());
+   BOOST_REQUIRE_EQUAL(success(), claimbond(CHALLENGER));
+   BOOST_REQUIRE_EQUAL(challenger_start, wire_balance(CHALLENGER));
+} FC_LOG_AND_RETHROW() }
+
+// The epoch tick IS the challenge's cadence: an expired-but-challenged lock is NOT released by
+// the sweep; the sweep pokes the tally, the sub-quorum challenge LAPSES (bond refunded — silence
+// never punishes), the freed locks release on the NEXT sweep.
+BOOST_FIXTURE_TEST_CASE(chklocks_skips_held_lock_and_lapse_refunds, sysio_uwchal_tester) { try {
+   constexpr uint64_t ATT_ID = 9800;
+   make_confirmed_uwreq(ATT_ID);
+   const int64_t challenger_start = wire_balance(CHALLENGER);
+
+   BOOST_REQUIRE_EQUAL(success(),
+      openuwchal(CHALLENGER, ATT_ID, UWRIT_OP, REASON_DEPOSIT_MISSING, "nobody voted"));
+   BOOST_REQUIRE_EQUAL(success(), voteuwchal(VOTER1, 1, BALLOT_UPHOLD)); // sub-quorum (Q=3)
+
+   produce_blocks();             // seal pending before the jump (see openuwchal_guards)
+   produce_block(fc::hours(13)); // past both the lock expiry and therefore the vote deadline
+
+   // Past the deadline the ballot door is closed: a late quorum can never be assembled for a
+   // manual chkuwchal crank in the expiry→sweep gap — the only remaining outcome is LAPSED.
+   BOOST_REQUIRE(voteuwchal(VOTER2, 1, BALLOT_UPHOLD)
+                    .find("the challenge window has expired") != std::string::npos);
+
+   // First sweep: the held locks are SKIPPED (still present), the poke lapses the challenge.
+   BOOST_REQUIRE_EQUAL(success(), chklocks());
+   BOOST_REQUIRE(!get_lock(1).is_null());
+   BOOST_REQUIRE(!get_lock(2).is_null());
+   BOOST_REQUIRE_EQUAL(0u, get_lock(1)["challenge_id"].as_uint64());
+   BOOST_REQUIRE_EQUAL("LAPSED", get_uwchal(1)["verdict"].as_string());
+   BOOST_REQUIRE_EQUAL("OPERATOR_STATUS_ACTIVE", operator_status(UWRIT_OP));
+   // Silence never punishes: the whole bond is credited back, claimable on demand.
+   BOOST_REQUIRE_EQUAL(uwchal_bond_amount(1), get_bond_credit(CHALLENGER));
+   BOOST_REQUIRE_EQUAL(success(), claimbond(CHALLENGER));
+   BOOST_REQUIRE_EQUAL(challenger_start, wire_balance(CHALLENGER));
+
+   // Second sweep: the now-unheld expired locks release healthy; uwreq completes.
+   produce_block(); // identical sweep bytes — fresh TAPOS
+   BOOST_REQUIRE_EQUAL(success(), chklocks());
+   BOOST_REQUIRE(get_lock(1).is_null());
+   BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_COMPLETED",
+                       get_uwreq(ATT_ID)["status"].as_string());
+} FC_LOG_AND_RETHROW() }
+
+// A resolved challenge keeps only what consensus still needs: the uniqueness gate and the
+// verdict. The caller-controlled detail note, the electorate snapshot, and every ballot row go —
+// filing is permissionless and the bond returns on every non-forfeit outcome, so without this
+// the same recycled capital could pin unbounded bytes in RAM billed to sysio.
+BOOST_FIXTURE_TEST_CASE(chkuwchal_compacts_resolved_row_and_erases_ballots,
+                        sysio_uwchal_tester) { try {
+   constexpr uint64_t ATT_ID = 9250;
+   make_confirmed_uwreq(ATT_ID);
+
+   const std::string detail(1024, 'e');   // a full-size note, right at max_uwchal_detail_bytes
+   BOOST_REQUIRE_EQUAL(success(),
+      openuwchal(CHALLENGER, ATT_ID, UWRIT_OP, REASON_DEPOSIT_MISSING, detail));
+
+   // While OPEN the row carries everything the council votes against.
+   const auto open_row = get_uwchal(1);
+   BOOST_REQUIRE_EQUAL(detail, open_row["detail"].as_string());
+   BOOST_REQUIRE_EQUAL(5u, open_row["electorate"].get_array().size());
+
+   BOOST_REQUIRE_EQUAL(success(), voteuwchal(VOTER1, 1, BALLOT_REJECT_REFUND));
+   BOOST_REQUIRE_EQUAL(success(), voteuwchal(VOTER2, 1, BALLOT_REJECT_REFUND));
+   BOOST_REQUIRE(!get_uwchal_vote(1, VOTER1).is_null());
+   BOOST_REQUIRE_EQUAL(success(), voteuwchal(VOTER3, 1, BALLOT_REJECT_REFUND));
+   BOOST_REQUIRE_EQUAL(success(), chkuwchal(1));
+
+   // Resolved: the fixed-width record stands, both variable-length fields are empty, the ballots
+   // are gone.
+   const auto tomb = get_uwchal(1);
+   BOOST_REQUIRE_EQUAL("DISPUTE_STATUS_RESOLVED", tomb["status"].as_string());
+   BOOST_REQUIRE_EQUAL("REJECTED_REFUND", tomb["verdict"].as_string());
+   BOOST_REQUIRE_EQUAL(ATT_ID, tomb["uwreq_id"].as_uint64());
+   BOOST_REQUIRE_EQUAL(3u, tomb["quorum"].as_uint64());
+   BOOST_REQUIRE(tomb["detail"].as_string().empty());
+   BOOST_REQUIRE_EQUAL(0u, tomb["electorate"].get_array().size());
+   for (auto v : {VOTER1, VOTER2, VOTER3}) {
+      BOOST_REQUIRE(get_uwchal_vote(1, v).is_null());
+   }
+
+   // The tombstone still does its consensus job — a verdict is final per commitment, even though
+   // the reject freed the locks and they are live again.
+   BOOST_REQUIRE_EQUAL(0u, uwchalbond(ATT_ID, UWRIT_OP));
+   BOOST_REQUIRE(openuwchal(CHALLENGER, ATT_ID, UWRIT_OP, REASON_DEPOSIT_MISSING, "retry")
+                    .find("already been challenged") != std::string::npos);
+} FC_LOG_AND_RETHROW() }
+
+// The payout is a pull under the recipient's own authority, and it settles exactly once.
+BOOST_FIXTURE_TEST_CASE(claimbond_guards, sysio_uwchal_tester) { try {
+   constexpr uint64_t ATT_ID = 9350;
+   make_confirmed_uwreq(ATT_ID);
+
+   BOOST_REQUIRE(claimbond(CHALLENGER).find("no claimable bond") != std::string::npos);
+
+   BOOST_REQUIRE_EQUAL(success(),
+      openuwchal(CHALLENGER, ATT_ID, UWRIT_OP, REASON_DEPOSIT_MISSING, "d"));
+   for (auto v : {VOTER1, VOTER2, VOTER3}) {
+      BOOST_REQUIRE_EQUAL(success(), voteuwchal(v, 1, BALLOT_REJECT_REFUND));
+   }
+   BOOST_REQUIRE_EQUAL(success(), chkuwchal(1));
+
+   const uint64_t bond = uwchal_bond_amount(1);
+   BOOST_REQUIRE_GT(bond, 0u);
+   BOOST_REQUIRE_EQUAL(bond, get_bond_credit(CHALLENGER));
+
+   // Another account cannot pull someone else's credit.
+   BOOST_REQUIRE(claimbond(CHALLENGER, /*signer*/ VOTER1)
+                    .find("missing authority of challenger") != std::string::npos);
+
+   const int64_t before = wire_balance(CHALLENGER);
+   BOOST_REQUIRE_EQUAL(success(), claimbond(CHALLENGER));
+   BOOST_REQUIRE_EQUAL(before + static_cast<int64_t>(bond), wire_balance(CHALLENGER));
+
+   // Erased on payout — a second pull draws nothing.
+   produce_block(); // identical claim bytes need fresh TAPOS to reach the contract's guard
+   BOOST_REQUIRE(claimbond(CHALLENGER).find("no claimable bond") != std::string::npos);
+} FC_LOG_AND_RETHROW() }
+
+// A hostile bond recipient cannot hold epoch advancement hostage. `sysio.token::transfer` runs
+// its recipient's code through `require_recipient(to)`, so a contract at the challenger's account
+// can assert on the incoming refund. Were the payout pushed from the crank, that assert would
+// abort `sysio.epoch::advance -> chklocks -> chkuwchal`, roll the challenge back to OPEN with its
+// locks still held, and be retried identically by every later sweep — a permanent chain-wide
+// stall bought with one permissionless filing. Crediting keeps the crank inside system-owned
+// state: the challenge resolves, the locks release, and the only transaction the hostile account
+// can abort is its own claim, stranding only its own funds.
+BOOST_FIXTURE_TEST_CASE(hostile_bond_recipient_cannot_stall_the_epoch_tick,
+                        sysio_uwchal_tester) { try {
+   constexpr uint64_t ATT_ID = 9450;
+   make_confirmed_uwreq(ATT_ID);
+
+   BOOST_REQUIRE_EQUAL(success(),
+      openuwchal(CHALLENGER, ATT_ID, UWRIT_OP, REASON_DEPOSIT_MISSING, "then i go hostile"));
+   const uint64_t bond = uwchal_bond_amount(1);
+   BOOST_REQUIRE_GT(bond, 0u);
+
+   // The escrow is in; NOW the challenger deploys a contract that rejects every incoming
+   // notification. Nothing prevents this — filing is permissionless and code can land afterwards,
+   // so the payout path can never assume a bare recipient. (The fixture creates the challenger
+   // without a roa policy; setcode needs RAM, so grant one first.)
+   BOOST_REQUIRE(add_roa_policy(NODE_DADDY, CHALLENGER, "0.0010 SYS", "0.0010 SYS",
+                                "50.0000 SYS", /*time_block*/ 0, /*network_gen*/ 0));
+   set_code(CHALLENGER, contracts::util::reject_all_wasm());
+   produce_blocks();               // seal pending before the jump (see openuwchal_guards)
+   produce_block(fc::hours(13));   // past the lock expiry: the sweep must now resolve the challenge
+
+   // The epoch tick's sweep runs to completion: it pokes the tally, the sub-quorum challenge
+   // LAPSES, and nothing in the crank touches the hostile account.
+   BOOST_REQUIRE_EQUAL(success(), chklocks());
+   BOOST_REQUIRE_EQUAL("LAPSED", get_uwchal(1)["verdict"].as_string());
+   BOOST_REQUIRE_EQUAL(bond, get_bond_credit(CHALLENGER));
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(bond), wire_balance(CHALG_ACCOUNT));
+
+   // The freed locks release on the next sweep and the uwreq settles — advancement never stalled.
+   produce_block(); // identical sweep bytes — fresh TAPOS
+   BOOST_REQUIRE_EQUAL(success(), chklocks());
+   BOOST_REQUIRE(get_lock(1).is_null());
+   BOOST_REQUIRE(get_lock(2).is_null());
+   BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_COMPLETED",
+                       get_uwreq(ATT_ID)["status"].as_string());
+
+   // Only the hostile account's OWN claim fails, and its credit simply stays put.
+   BOOST_REQUIRE(claimbond(CHALLENGER).find("rejecting all notifications") != std::string::npos);
+   BOOST_REQUIRE_EQUAL(bond, get_bond_credit(CHALLENGER));
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(bond), wire_balance(CHALG_ACCOUNT));
+} FC_LOG_AND_RETHROW() }
+
+// The lock-control trio is chalg's alone.
+BOOST_FIXTURE_TEST_CASE(lock_hold_actions_require_chalg_auth, sysio_uwchal_tester) { try {
+   constexpr uint64_t ATT_ID = 9900;
+   make_confirmed_uwreq(ATT_ID);
+
+   BOOST_REQUIRE(push(UWRIT_ACCOUNT, uwrit_abi, UWRIT_ACCOUNT, "holdlocks"_n, mvo()
+      ("uwreq_id", ATT_ID)("underwriter", UWRIT_OP.to_string())("chal_id", 7))
+         .find("missing authority of sysio.chalg") != std::string::npos);
+   BOOST_REQUIRE(push(UWRIT_ACCOUNT, uwrit_abi, UWRIT_ACCOUNT, "freelocks"_n, mvo()
+      ("uwreq_id", ATT_ID)("underwriter", UWRIT_OP.to_string()))
+         .find("missing authority of sysio.chalg") != std::string::npos);
+   BOOST_REQUIRE(push(UWRIT_ACCOUNT, uwrit_abi, UWRIT_ACCOUNT, "sweeplocks"_n, mvo()
+      ("uwreq_id", ATT_ID)("underwriter", UWRIT_OP.to_string()))
+         .find("missing authority of sysio.chalg") != std::string::npos);
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()
