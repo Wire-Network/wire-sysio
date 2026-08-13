@@ -607,6 +607,16 @@
             ]
         },
         {
+            "name": "sweepclaims",
+            "base": "",
+            "fields": [
+                {
+                    "name": "max_rows",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
             "name": "uw_fee_key",
             "base": "",
             "fields": [
@@ -766,6 +776,11 @@
         {
             "name": "swapquote",
             "type": "swapquote",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "sweepclaims",
+            "type": "sweepclaims",
             "ricardian_contract": ""
         },
         {

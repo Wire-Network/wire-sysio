@@ -265,6 +265,34 @@ void route_wire_fee(name self, const opp::amm::wire_fee& fee, name underwriter) 
 /// Reclaimed WIRE from expired rows is pushed to the emissions treasury. That push is safe for the
 /// same reason `route_wire_fee`'s emissions share is: `sysio` is a system account under protocol
 /// control, not a counterparty that can install a hostile notify handler.
+/// THE retention sweep — one implementation behind both triggers, so the on-write path and the
+/// epoch path can never drift on what "expired" means or where the reclaimed WIRE goes.
+///
+/// Erases up to `max_rows` rows whose `expires_at_sec` has passed and pushes their total to the
+/// emissions treasury. Never throws: both callers sit on never-throw paths (`credit_wire_claim`
+/// runs under consensus dispatch and epoch advance; `sweepclaims` is inlined from `advance`).
+///
+/// @return atomic WIRE units reclaimed.
+uint64_t sweep_expired_wire_claims(name self, uint32_t now_sec, uint32_t max_rows) {
+   reserve::wireclaims_t claims(self);
+   auto by_expiry = claims.get_index<"byexpiry"_n>();
+   const uint64_t reclaimed = sysio::opp::claimable::sweep_expired(
+      claims, by_expiry,
+      [](const reserve::wire_claim& r) { return reserve::wireclaim_key{r.account.value}; },
+      now_sec, max_rows);
+
+   if (reclaimed > 0) {
+      action(
+         permission_level{self, "active"_n},
+         reserve::TOKEN_ACCOUNT, "transfer"_n,
+         std::make_tuple(self, reserve::TREASURY_ACCOUNT,
+            asset(static_cast<int64_t>(reclaimed), WIRE_SYMBOL),
+            std::string("sysio.reserv::expired WIRE claim -> emissions"))
+      ).send();
+   }
+   return reclaimed;
+}
+
 void credit_wire_claim(name self, name recipient, uint64_t amount) {
    if (amount == 0) return;
 
@@ -278,21 +306,11 @@ void credit_wire_claim(name self, name recipient, uint64_t amount) {
 
    // On-write retention: sweep a bounded number of rows that aged out before adding more. Runs
    // after the credit so the row just refreshed above is never the one collected.
-   auto by_expiry = claims.get_index<"byexpiry"_n>();
-   const uint64_t reclaimed = sysio::opp::claimable::sweep_expired(
-      claims, by_expiry,
-      [](const reserve::wire_claim& r) { return reserve::wireclaim_key{r.account.value}; },
-      now_sec, reserve::MAX_CLAIM_SWEEP_PER_CREDIT);
-
-   if (reclaimed > 0) {
-      action(
-         permission_level{self, "active"_n},
-         reserve::TOKEN_ACCOUNT, "transfer"_n,
-         std::make_tuple(self, reserve::TREASURY_ACCOUNT,
-            asset(static_cast<int64_t>(reclaimed), WIRE_SYMBOL),
-            std::string("sysio.reserv::expired WIRE claim -> emissions"))
-      ).send();
-   }
+   //
+   // This is an OPPORTUNISTIC trigger, not the guarantee: it only fires while swap traffic keeps
+   // arriving. `sweepclaims`, inlined from `sysio.epoch::advance`, is what makes the retention
+   // deadline hold when settlement stops.
+   sweep_expired_wire_claims(self, now_sec, reserve::MAX_CLAIM_SWEEP_PER_CREDIT);
 }
 
 } // namespace
@@ -1132,10 +1150,37 @@ void reserve::claimwire(sysio::name account) {
    require_auth(account);
 
    reserve::wireclaims_t claims(get_self());
+   const auto pk = reserve::wireclaim_key{account.value};
+
+   // Enforce the retention deadline HERE, not just in the sweep. The sweep is bounded and
+   // best-effort, so a row can outlive its expiry by an arbitrary number of epochs while it waits
+   // its turn; without this check the deadline would mean "swept eventually" rather than
+   // "claimable until". Refusing tells the caller the row is forfeit instead of paying a claim the
+   // retention policy already extinguished, and the sweep still reclaims the WIRE.
+   auto it = claims.find(pk);
+   if (it != claims.end() && it->expires_at_sec != 0) {
+      const uint32_t now_sec = static_cast<uint32_t>(current_time_point().sec_since_epoch());
+      sysio::check(now_sec < it->expires_at_sec,
+                   "claimwire: this claim expired and is pending sweep to the treasury");
+   }
+
    sysio::opp::claimable::pay_out(
-      claims, reserve::wireclaim_key{account.value}, get_self(), TOKEN_ACCOUNT,
+      claims, pk, get_self(), TOKEN_ACCOUNT,
       account, WIRE_SYMBOL, std::string("sysio.reserv::claimwire payout"),
       "no claimable WIRE for this account");
+}
+
+void reserve::sweepclaims(uint32_t max_rows) {
+   // Two valid callers, mirroring `sysio.uwrit::chklocks`:
+   //   * sysio.epoch::advance — inlined every epoch with MAX_CLAIM_SWEEP_PER_EPOCH.
+   //   * sysio.reserv — manual drain with a caller-chosen budget.
+   sysio::check(has_auth(EPOCH_ACCOUNT) || has_auth(get_self()),
+                "sweepclaims requires sysio.epoch or sysio.reserv authority");
+   if (max_rows == 0) return;
+
+   sweep_expired_wire_claims(get_self(),
+                             static_cast<uint32_t>(current_time_point().sec_since_epoch()),
+                             max_rows);
 }
 
 } // namespace sysio

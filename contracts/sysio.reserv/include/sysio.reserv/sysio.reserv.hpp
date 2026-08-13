@@ -135,6 +135,14 @@ namespace sysio {
       // `sysio.opreg::prune_dellog` uses.
       static constexpr uint32_t MAX_CLAIM_SWEEP_PER_CREDIT = 4;
 
+      // Rows swept per epoch by `sweepclaims`, which `sysio.epoch::advance` inlines. Larger than
+      // the per-credit budget because this is the trigger that has to actually drain a backlog:
+      // the on-write sweep only fires while settlement traffic arrives, so if swaps stop, this is
+      // the only thing that revisits an aged-out row. Sized like the other advance-inlined bounds
+      // (`MAX_LOCK_RELEASE_PER_EPOCH`, `MAX_WTDW_FLUSH_PER_EPOCH`) to stay well inside advance's
+      // hard, uncatchable CPU deadline; an oversized backlog simply drains across later epochs.
+      static constexpr uint32_t MAX_CLAIM_SWEEP_PER_EPOCH = 32;
+
       // -----------------------------------------------------------------------
       //  Actions
       // -----------------------------------------------------------------------
@@ -420,12 +428,35 @@ namespace sysio {
       /// (swap-to-WIRE payouts and swap-from-WIRE refunds) out of this
       /// contract's custody in a single transfer.
       ///
-      /// This is the ONLY place a `wireclaims` balance becomes a transfer, and
-      /// it carries the claimant's own authority — so a recipient whose
-      /// transfer-notify handler aborts blocks nothing but its own claim.
+      /// This is the ONLY place a `wireclaims` balance becomes a transfer to the
+      /// claimant, and it carries the claimant's own authority — so a recipient
+      /// whose transfer-notify handler aborts blocks nothing but its own claim.
       /// Throws when there is nothing to claim, which reaches only the caller.
+      ///
+      /// Also refuses a row past `expires_at_sec`. The sweep is bounded and
+      /// best-effort, so an expired row can wait many epochs for its turn;
+      /// without this check the retention deadline would mean "swept eventually"
+      /// rather than "claimable until", and a forfeit balance would still pay
+      /// out in the meantime.
       [[sysio::action]]
       void claimwire(sysio::name account);
+
+      /// Auth = `sysio.epoch` or self. Erase up to `max_rows` `wireclaims` rows
+      /// whose one-year retention window has closed and push their total to the
+      /// emissions treasury.
+      ///
+      /// `sysio.epoch::advance` inlines this every epoch with
+      /// `MAX_CLAIM_SWEEP_PER_EPOCH`. That is what makes the retention deadline
+      /// real: `credit_wire_claim` also sweeps, but only as a side effect of a
+      /// later credit, so with settlement traffic stopped no action would ever
+      /// revisit an aged-out row — leaving an unbounded, system-funded table and
+      /// the WIRE it reserves outstanding indefinitely.
+      ///
+      /// Bounded and never-throwing past the auth gate for the usual reason: it
+      /// runs inline inside `advance`, where an abort stalls epoch progress
+      /// chain-wide. An oversized backlog drains across later epochs.
+      [[sysio::action]]
+      void sweepclaims(uint32_t max_rows);
 
       /// Auth = self (`sysio.reserv`). Set the contract's fee-routing config.
       ///

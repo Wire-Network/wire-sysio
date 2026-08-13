@@ -7,6 +7,10 @@
 // For uwrit::MAX_UWREQ_PRUNE_PER_EPOCH — the per-epoch budget advance hands
 // to the inline `pruneuwreqs` sweep (the constant is owned by sysio.uwrit).
 #include <sysio.uwrit/sysio.uwrit.hpp>
+// For reserve::MAX_CLAIM_SWEEP_PER_EPOCH — the per-epoch budget advance hands
+// to the inline `sweepclaims` retention sweep (the constant is owned by
+// sysio.reserv).
+#include <sysio.reserv/sysio.reserv.hpp>
 // Canonical sysio.system emissions types + compute_epoch_emission. The
 // [[sysio::contract("sysio.system")]] attribute on emission_config / t5_state
 // pins them to sysio.system's ABI; no readonly mirror needed here.
@@ -387,6 +391,33 @@ void epoch::advance() {
       "pruneuwreqs"_n,
       std::make_tuple(uwrit::MAX_UWREQ_PRUNE_PER_EPOCH)
    ).send();
+
+   // Bounded retention sweep of expired `sysio.reserv::wireclaims`: erase rows
+   // whose one-year window closed and return their WIRE to the treasury.
+   //
+   // `sysio.reserv` also sweeps opportunistically when crediting a new claim,
+   // but that only fires while settlement traffic arrives. This inline call is
+   // what makes the deadline hold when swaps stop: without it nothing would
+   // revisit an aged-out row, leaving an unbounded system-funded table and the
+   // WIRE it reserves outstanding indefinitely. Budget-bounded and
+   // never-throwing, like the two sweeps above — a backlog drains across
+   // subsequent epochs.
+   //
+   // GUARDED on the account existing. Dispatching an inline action to an
+   // absent code account is a hard `action_validate_exception`, which inside
+   // `advance` is an epoch stall chain-wide — and `sysio.reserv` is not a
+   // precondition for advancing an epoch: a chain can advance before reserves
+   // are ever deployed (every emissions-only test fixture does exactly that).
+   // Nothing can have accrued a wireclaim in that state, so skipping the sweep
+   // is precisely correct rather than merely safe.
+   if (is_account(RESERV_ACCOUNT)) {
+      action(
+         permission_level{get_self(), "owner"_n},
+         RESERV_ACCOUNT,
+         "sweepclaims"_n,
+         std::make_tuple(reserve::MAX_CLAIM_SWEEP_PER_EPOCH)
+      ).send();
+   }
 
    // Before incrementing: evaluate per-op delivery state for the EXPIRING
    // epoch. The active group of the expiring epoch (`current_batch_op_group`
