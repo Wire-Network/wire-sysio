@@ -256,9 +256,18 @@ try:
     Print("Validating blockNum=%s, producer=%s" % (blockNum, blockProducer))
     cluster.biosNode.kill(signal.SIGTERM)
 
+    # Every slot that goes unproduced pushes the next block a further slotTime out in wall clock, and
+    # the walk below is deliberately tolerant of missed slots, so the wait for each block has to
+    # outlast a stall rather than abort on it.  The original three second leeway is shorter than
+    # stalls that have actually been seen on loaded CI machines, so when caught up to the head this
+    # gave the walk four seconds and it aborted before the gap it is now meant to record.  The leeway
+    # is what bounds how long the chain may go dark before the test declares it dead.
+    stalledChainLeewaySeconds=60
+
     class HeadWaiter:
-        def __init__(self, node):
+        def __init__(self, node, leewaySeconds):
             self.node=node
+            self.leewaySeconds=leewaySeconds
             self.cachedHeadBlockNum=node.getBlockNum()
 
         def waitIfNeeded(self, blockNum):
@@ -267,7 +276,7 @@ try:
                 return
             previousHeadBlockNum=self.cachedHeadBlockNum
             delta=-1*delta
-            timeout=(delta+1)/2 + 3 # round up to nearest second and 3 second extra leeway
+            timeout=(delta+1)/2 + self.leewaySeconds # round up to nearest second, plus the stall leeway
             self.node.waitForBlock(blockNum, timeout=timeout)
             self.cachedHeadBlockNum=node.getBlockNum()
             if blockNum > self.cachedHeadBlockNum:
@@ -283,7 +292,7 @@ try:
     # everything below, without this test needing to know the chain's block timestamp epoch.  A
     # handover that is not slot adjacent means the boundary slot itself went unproduced, which says
     # nothing about where the boundary was, so keep looking in that case.
-    waiter=HeadWaiter(node)
+    waiter=HeadWaiter(node, stalledChainLeewaySeconds)
 
     block=waiter.getBlock(blockNum)
     timestampStr=Node.getBlockAttribute(block, "timestamp", blockNum)
