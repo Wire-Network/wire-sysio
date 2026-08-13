@@ -132,23 +132,6 @@ uint32_t get_current_epoch() {
    return es.get().current_epoch_index;
 }
 
-/// Compose the `sha256(account || chain_code || token_code)` composite key.
-/// Post v6 split-index design (§B.2): the rollup helpers (`opreg_pending_withdraws`,
-/// `sum_locks_inline`) now scan the per-uint64 secondary indexes (`byaccount`,
-/// `byuw`) and filter `(chain_code, token_code)` in memory instead of indexing
-/// by a 24-byte composite. This helper is kept only for any caller that still
-/// needs to derive the same key for cross-contract diagnostic comparison.
-checksum256 compose_account_chain_token_ck(name account,
-                                            sysio::slug_name chain_code,
-                                            sysio::slug_name token_code) {
-   std::array<uint8_t, 24> buf{};
-   uint64_t acc_v = account.value;
-   std::memcpy(buf.data() +  0, &acc_v,             8);
-   std::memcpy(buf.data() +  8, &chain_code.value,  8);
-   std::memcpy(buf.data() + 16, &token_code.value,  8);
-   return sysio::sha256(reinterpret_cast<const char*>(buf.data()), buf.size());
-}
-
 /// Sum the underwriter's pending withdraws on opreg for the given
 /// `(chain_code, token_code)`. Per v6 plan §B.2 (split-index design):
 /// `opreg::wtdwqueue_t` exposes only uint64 secondary indexes. The `byaccount`

@@ -487,6 +487,30 @@ namespace sysio {
       /// a slash, the outpost routes seized collateral to that reserve via
       /// `ReserveAmount`, even when multiple reserves exist for the same
       /// `(chain_code, token_code)` pair.
+      /// The `(account, chain_code, token_code)` collateral-bucket digest:
+      /// the three uint64 identities packed little-endian into 24 bytes and
+      /// hashed. 3 × uint64 = 192 bits does not fit `uint128_t`, so the triple
+      /// is hashed to land in a `checksum256`.
+      ///
+      /// SINGLE SOURCE for that encoding, and it must stay that way.
+      /// `lock_entry::by_underwriter_ck()` says which bucket a lock row
+      /// belongs to; `lock_sum_key::primary_key()` addresses that bucket's
+      /// materialized total. If the two derivations ever diverged, the rollup
+      /// would be keyed differently from the rows it summarizes and every
+      /// reader would silently observe zero locked — collateral already
+      /// committed to a live lock would look spendable. Both call this, so
+      /// they cannot diverge.
+      static checksum256 compose_account_chain_token_ck(name account,
+                                                        sysio::slug_name chain_code,
+                                                        sysio::slug_name token_code) {
+         std::array<uint8_t, 24> buf{};
+         uint64_t acc_v = account.value;
+         std::memcpy(buf.data() +  0, &acc_v,             8);
+         std::memcpy(buf.data() +  8, &chain_code.value,  8);
+         std::memcpy(buf.data() + 16, &token_code.value,  8);
+         return sysio::sha256(reinterpret_cast<const char*>(buf.data()), buf.size());
+      }
+
       struct lock_key {
          uint64_t lock_id;
          uint64_t primary_key() const { return lock_id; }
@@ -509,17 +533,11 @@ namespace sysio {
          /// `byexpire` so `chklocks` sweeps expired locks in ascending order.
          uint64_t                expires_at_ms    = 0;
 
-         /// Composite checksum index for opreg's `available()` rollup:
-         /// `sha256(underwriter.value || chain_code.value || token_code.value)`
-         /// packed as 24 little-endian bytes. 3 × uint64 = 192 bits doesn't
-         /// fit `uint128_t`, so we hash the triple to land in `checksum256`.
+         /// Which collateral bucket this lock belongs to — see
+         /// `compose_account_chain_token_ck`, the single source of that
+         /// encoding, shared with `lock_sum_key::primary_key()`.
          checksum256 by_underwriter_ck() const {
-            std::array<uint8_t, 24> buf{};
-            uint64_t uw_v = underwriter.value;
-            std::memcpy(buf.data() +  0, &uw_v,             8);
-            std::memcpy(buf.data() +  8, &chain_code.value, 8);
-            std::memcpy(buf.data() + 16, &token_code.value, 8);
-            return sysio::sha256(reinterpret_cast<const char*>(buf.data()), buf.size());
+            return compose_account_chain_token_ck(underwriter, chain_code, token_code);
          }
          /// Split-index for cheap per-operator scans (plan §B.2). Callers
          /// pull all rows for a given underwriter and filter on
@@ -551,21 +569,15 @@ namespace sysio {
       >;
 
       /// Primary key of `locksums`: one (underwriter, chain_code, token_code)
-      /// collateral bucket. Packed and hashed EXACTLY like
-      /// `lock_entry::by_underwriter_ck()` — that helper is what says which
-      /// bucket a given lock row belongs to, so the two derivations must not
-      /// diverge.
+      /// collateral bucket, addressed by the SAME digest
+      /// `lock_entry::by_underwriter_ck()` uses to say which bucket a lock row
+      /// belongs to — both call `compose_account_chain_token_ck`.
       struct lock_sum_key {
          name             underwriter;
          sysio::slug_name chain_code;
          sysio::slug_name token_code;
          checksum256 primary_key() const {
-            std::array<uint8_t, 24> buf{};
-            uint64_t uw_v = underwriter.value;
-            std::memcpy(buf.data() +  0, &uw_v,             8);
-            std::memcpy(buf.data() +  8, &chain_code.value, 8);
-            std::memcpy(buf.data() + 16, &token_code.value, 8);
-            return sysio::sha256(reinterpret_cast<const char*>(buf.data()), buf.size());
+            return compose_account_chain_token_ck(underwriter, chain_code, token_code);
          }
          SYSLIB_SERIALIZE(lock_sum_key, (underwriter)(chain_code)(token_code))
       };
