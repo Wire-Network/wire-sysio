@@ -466,6 +466,27 @@ void system_contract::claimnodedis(const sysio::name& account_name) {
    const auto info = compute_node_claim(emission, row, cfg.min_claimable);
    sysio::check(info.can_claim, "claim amount below minimum threshold");
 
+   // Node-owner vesting draws on the SAME `sysio` WIRE balance that backs unclaimed epoch pay, so
+   // it must respect the same reserve `fundclaim` and the epoch readiness gate hold. `payclaims`
+   // rows are already owed: paying them out is a promise this contract has made and cannot revoke,
+   // whereas this withdrawal is a claim on the free remainder.
+   //
+   // Without the reserve the two overdraw each other. Credit 60 of epoch pay against a 100
+   // balance, let a vested owner withdraw 50, and only 50 backs the 60 owed -- the later
+   // `claimpay` cannot pay out, and `payepoch` stays balance-blocked from then on. That exposure
+   // is new: before payouts became claimable, epoch pay had already left the treasury by the time
+   // this ran, so there was nothing outstanding for it to spend into.
+   //
+   // Rejecting rather than capping keeps `claimed` exactly in step with what was transferred; the
+   // claim stays fully available and succeeds once claims are pulled or emissions refill the
+   // treasury. `claimnodedis` is user-initiated, so the throw reaches the caller who asked.
+   payclaimtot_t nd_tot_tbl(get_self());
+   const int64_t nd_outstanding =
+      static_cast<int64_t>(nd_tot_tbl.get_or_default(pay_claim_total{}).outstanding);
+   const int64_t nd_spendable = get_wire_balance(get_self()) - nd_outstanding;
+   sysio::check(info.claimable.amount <= nd_spendable,
+                "treasury balance is reserved against unclaimed epoch pay; try again later");
+
    nodedist.modify(same_payer, pk, [&](auto& mrow) {
       mrow.claimed += info.claimable;
       sysio::check(mrow.claimed <= mrow.total_allocation, "claim would exceed total allocation");

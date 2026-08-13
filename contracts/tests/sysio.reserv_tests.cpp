@@ -1573,6 +1573,46 @@ BOOST_FIXTURE_TEST_CASE(expired_wire_claim_is_swept_without_further_traffic, sys
                        claimwire("alice"_n));
 } FC_LOG_AND_RETHROW() }
 
+// Crediting an account whose row already expired must not resurrect the forfeited balance.
+// `claimable::credit` upserts, so without settling first the old amount would be added to and its
+// stamp refreshed — making a balance `claimwire` has been refusing claimable again, and letting a
+// trickle of small credits keep a system-funded row alive forever. The new credit legitimately
+// starts a fresh window (an account being credited is not abandoned); only the old balance is
+// forfeit.
+BOOST_FIXTURE_TEST_CASE(recredit_after_expiry_does_not_revive_the_forfeited_balance,
+                        sysio_reserve_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(),
+      regreserve("ETH", "ETH", "PRIMARY", 1000, 1000));
+
+   BOOST_REQUIRE_EQUAL(success(), push_action(UWRIT_ACCOUNT, "refundwire"_n, mvo()
+      ("recipient",      "alice")
+      ("wire_amount",    150)
+      ("revert_fee_bps", 0)));
+   BOOST_REQUIRE_EQUAL(150u, wire_claimable("alice"_n));
+
+   // Age past the window WITHOUT sweeping, so the forfeited row is still sitting there.
+   produce_block();
+   produce_block(fc::days(366));
+   BOOST_REQUIRE_EQUAL(150u, wire_claimable("alice"_n));
+
+   const int64_t treasury_before = wire_balance(SYSIO_ACCOUNT);
+
+   // A later refund for the same account credits 40.
+   BOOST_REQUIRE_EQUAL(success(), push_action(UWRIT_ACCOUNT, "refundwire"_n, mvo()
+      ("recipient",      "alice")
+      ("wire_amount",    40)
+      ("revert_fee_bps", 0)));
+
+   // Only the NEW amount is claimable — the forfeited 150 went to the treasury, it did not
+   // accumulate into a 190 balance with a fresh window.
+   BOOST_REQUIRE_EQUAL(40u, wire_claimable("alice"_n));
+   BOOST_REQUIRE_EQUAL(treasury_before + 150, wire_balance(SYSIO_ACCOUNT));
+
+   // And the fresh claim is live, so the recipient is not penalised for the new payout.
+   BOOST_REQUIRE_EQUAL(success(), claimwire("alice"_n));
+   BOOST_REQUIRE_EQUAL(40, wire_balance("alice"_n));
+} FC_LOG_AND_RETHROW() }
+
 // A LIVE row is untouched by the sweep and still claims normally — the budget walks the
 // expiry-ordered index and stops at the first row whose window is open.
 BOOST_FIXTURE_TEST_CASE(sweepclaims_leaves_live_rows_alone, sysio_reserve_tester) { try {

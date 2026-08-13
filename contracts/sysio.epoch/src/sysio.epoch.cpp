@@ -346,6 +346,38 @@ void epoch::advance() {
    // wall clock for the current epoch effectively extends until the gate
    // eventually passes on a subsequent chkcons retry.
    const uint32_t target_epoch = state.current_epoch_index + 1;
+
+   // Bounded retention sweep of expired `sysio.reserv::wireclaims`: erase rows whose one-year
+   // window closed and return their WIRE to the treasury.
+   //
+   // Runs BEFORE the emissions gate, deliberately. This is maintenance, not economics, and the
+   // WIRE it reclaims lands in the very balance the gate measures -- so ordering it after the gate
+   // creates a deadlock: an epoch blocked as BALANCE_INSUFFICIENT returns below without ever
+   // reclaiming forfeited WIRE that could cover the shortfall, and every retry takes the same
+   // path. The contract would be sitting on the funds needed to unblock itself. `sweepclaims`
+   // takes only epoch or reserv authority, so no ordinary keeper could break that cycle either.
+   //
+   // Safe to run ahead of the gate because it is bounded, never-throwing past its auth check, and
+   // touches no epoch state -- a blocked epoch that sweeps and still cannot pay is exactly as
+   // blocked as before, minus some expired rows.
+   //
+   // `sysio.reserv` also sweeps opportunistically when crediting a new claim, but that only fires
+   // while settlement traffic arrives; this call is what makes the deadline hold when swaps stop.
+   //
+   // GUARDED on the account existing. Dispatching an inline action to an absent code account is a
+   // hard `action_validate_exception`, which inside `advance` is a chain-wide epoch stall.
+   // `sysio.reserv` is not a precondition for advancing an epoch -- a chain can advance before
+   // reserves are ever deployed -- and nothing can have accrued a wireclaim in that state, so
+   // skipping is precisely correct rather than merely defensive.
+   if (is_account(RESERV_ACCOUNT)) {
+      action(
+         permission_level{get_self(), "owner"_n},
+         RESERV_ACCOUNT,
+         "sweepclaims"_n,
+         std::make_tuple(reserve::MAX_CLAIM_SWEEP_PER_EPOCH)
+      ).send();
+   }
+
    const auto gate = check_emissions_ready(cfg.epoch_duration_sec, target_epoch);
    if (!gate.ready) {
       // OPP silent-return diagnostic: the epoch silently does NOT advance when the
@@ -391,33 +423,6 @@ void epoch::advance() {
       "pruneuwreqs"_n,
       std::make_tuple(uwrit::MAX_UWREQ_PRUNE_PER_EPOCH)
    ).send();
-
-   // Bounded retention sweep of expired `sysio.reserv::wireclaims`: erase rows
-   // whose one-year window closed and return their WIRE to the treasury.
-   //
-   // `sysio.reserv` also sweeps opportunistically when crediting a new claim,
-   // but that only fires while settlement traffic arrives. This inline call is
-   // what makes the deadline hold when swaps stop: without it nothing would
-   // revisit an aged-out row, leaving an unbounded system-funded table and the
-   // WIRE it reserves outstanding indefinitely. Budget-bounded and
-   // never-throwing, like the two sweeps above — a backlog drains across
-   // subsequent epochs.
-   //
-   // GUARDED on the account existing. Dispatching an inline action to an
-   // absent code account is a hard `action_validate_exception`, which inside
-   // `advance` is an epoch stall chain-wide — and `sysio.reserv` is not a
-   // precondition for advancing an epoch: a chain can advance before reserves
-   // are ever deployed (every emissions-only test fixture does exactly that).
-   // Nothing can have accrued a wireclaim in that state, so skipping the sweep
-   // is precisely correct rather than merely safe.
-   if (is_account(RESERV_ACCOUNT)) {
-      action(
-         permission_level{get_self(), "owner"_n},
-         RESERV_ACCOUNT,
-         "sweepclaims"_n,
-         std::make_tuple(reserve::MAX_CLAIM_SWEEP_PER_EPOCH)
-      ).send();
-   }
 
    // Before incrementing: evaluate per-op delivery state for the EXPIRING
    // epoch. The active group of the expiring epoch (`current_batch_op_group`

@@ -299,8 +299,36 @@ void credit_wire_claim(name self, name recipient, uint64_t amount) {
    const uint32_t now_sec = static_cast<uint32_t>(current_time_point().sec_since_epoch());
 
    reserve::wireclaims_t claims(self);
+   const auto pk = reserve::wireclaim_key{recipient.value};
+
+   // Settle an ALREADY-FORFEITED row before accumulating onto it.
+   //
+   // `credit` upserts: it adds to whatever balance is there and refreshes the stamp. If this
+   // recipient's row is past its window but still queued behind the bounded sweep, that would
+   // resurrect a balance `claimwire` has already been refusing -- the old amount becomes claimable
+   // again, and a trickle of small credits could keep a system-funded row (and its forfeited WIRE)
+   // alive indefinitely. Reclaiming first means a credit can only ever start a FRESH claim.
+   //
+   // Expiry exists so abandoned rows do not hold RAM forever; an account still being credited is
+   // not abandoned, so its new claim legitimately gets a full window. What that must not do is
+   // un-forfeit the balance the last window already closed on.
+   auto it = claims.find(pk);
+   if (it != claims.end() && it->expires_at_sec != 0 && now_sec >= it->expires_at_sec) {
+      const uint64_t forfeited = it->balance;
+      claims.erase(pk);
+      if (forfeited > 0) {
+         action(
+            permission_level{self, "active"_n},
+            reserve::TOKEN_ACCOUNT, "transfer"_n,
+            std::make_tuple(self, reserve::TREASURY_ACCOUNT,
+               asset(static_cast<int64_t>(forfeited), WIRE_SYMBOL),
+               std::string("sysio.reserv::expired WIRE claim -> emissions"))
+         ).send();
+      }
+   }
+
    sysio::opp::claimable::credit(
-      claims, ram_payer, reserve::wireclaim_key{recipient.value},
+      claims, ram_payer, pk,
       reserve::wire_claim{.account = recipient}, amount,
       now_sec + reserve::WIRE_CLAIM_WINDOW_SEC);
 

@@ -4066,6 +4066,91 @@ BOOST_FIXTURE_TEST_CASE( opreg_unregistered_producer_excluded_from_pay, sysio_em
    BOOST_REQUIRE_EQUAL( sysio_decrease, expected_baseline );
 } FC_LOG_AND_RETHROW()
 
+// Node-owner vesting draws on the same `sysio` WIRE balance that backs unclaimed epoch pay, so it
+// has to respect the same reserve `fundclaim` and the epoch gate hold. Without that, a vested owner
+// can withdraw WIRE already promised to a `payclaims` row, leaving the later `claimpay` unpayable
+// and `payepoch` balance-blocked from then on. That exposure is new: before payouts became
+// claimable, epoch pay had already left the treasury by the time a node claim ran.
+BOOST_FIXTURE_TEST_CASE( claimnodedis_reserves_outstanding_epoch_pay, sysio_emissions_tester ) try {
+   create_t5_holding_accounts();
+
+   // A fully vested T1 owner: claimable == the whole allocation.
+   create_user_accounts({ "noderesv"_n });
+   const uint32_t start = head_secs() - (T1_DURATION + 10);
+   BOOST_REQUIRE_EQUAL( success(), setinittime( config::system_account_name, tpsec(start) ) );
+   BOOST_REQUIRE_EQUAL( success(), addnodeowner( ROA, "noderesv"_n, 1 ) );
+
+   const auto vested = viewnodedist( "noderesv"_n );
+   BOOST_REQUIRE( vested.can_claim );
+   const int64_t claimable = vested.claimable.get_amount();
+   BOOST_REQUIRE_GT( claimable, 0 );
+
+   // Credit epoch pay so something is outstanding, using the real payepoch path: one ACTIVE
+   // bootstrapped batch operator in a single-member rotation group takes the whole batch pool.
+   const account_name BATCH_OP = "batchresv"_n;
+   create_accounts( { BATCH_OP }, false, false, false, true );
+   BOOST_REQUIRE_EQUAL( success(),
+      register_operator( BATCH_OP, OperatorType::OPERATOR_TYPE_BATCH, /*is_bootstrapped*/true ) );
+   BOOST_REQUIRE_EQUAL( success(), init_epoch_state(60, /*operators_per_epoch*/1,
+                                                    /*batch_op_groups_count*/1) );
+   produce_blocks(1);
+   BOOST_REQUIRE_EQUAL( success(), push_epoch_action(EPOCH, "schbatchgps"_n, mvo()) );
+   setup_producers(1);
+   wait_for_producer_schedule();
+   produce_complete_cycles(1, 2);
+   const uint32_t t5_start = head_secs() - ONE_EPOCH - 1;
+   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(t5_start) ) );
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+
+   const int64_t outstanding = pay_outstanding_total();
+   BOOST_REQUIRE_GT( outstanding, 0 );
+
+   // Leave the treasury able to cover the outstanding pay but NOT that plus this node claim.
+   create_user_accounts({ "resvdrain"_n });
+   const int64_t balance = get_wire_balance(config::system_account_name).get_amount();
+   const int64_t target  = outstanding + claimable - 1;   // one short of both
+   BOOST_REQUIRE_GT( balance, target );
+   base_tester::push_action(
+      TOKEN, "transfer"_n,
+      vector<permission_level>{{ config::system_account_name, "active"_n }},
+      mvo()("from", config::system_account_name)
+           ("to", "resvdrain"_n)
+           ("quantity", asset(balance - target, WIRE_SYMBOL))
+           ("memo", "leave the treasury one short of pay + node claim")
+   );
+   produce_blocks(1);
+
+   // The withdrawal would eat into WIRE already owed to `payclaims`, so it is refused -- and
+   // nothing is spent: the outstanding pay is still fully backed.
+   auto blocked = claimnodedis( "noderesv"_n, "noderesv"_n );
+   BOOST_REQUIRE( blocked != success() );
+   require_substr( blocked, "treasury balance is reserved against unclaimed epoch pay" );
+   BOOST_REQUIRE_EQUAL( get_wire_balance(config::system_account_name).get_amount(), target );
+   BOOST_REQUIRE_EQUAL( pay_outstanding_total(), outstanding );
+
+   // Fund the treasury by exactly the missing unit and the same claim goes through: the reserve
+   // gates on real headroom, it does not block node owners categorically.
+   base_tester::push_action(
+      TOKEN, "transfer"_n,
+      vector<permission_level>{{ "resvdrain"_n, "active"_n }},
+      mvo()("from", "resvdrain"_n)
+           ("to", config::system_account_name)
+           ("quantity", asset(1, WIRE_SYMBOL))
+           ("memo", "one unit of headroom")
+   );
+   produce_blocks(1);
+   BOOST_REQUIRE_EQUAL( success(), claimnodedis( "noderesv"_n, "noderesv"_n ) );
+
+   // The point of the reserve: the epoch pay promised earlier is STILL fully backed after the
+   // node owner withdrew. Its claim is untouched and the balance can honour it.
+   BOOST_REQUIRE_EQUAL( pay_outstanding_total(), outstanding );
+   BOOST_REQUIRE_GE( get_wire_balance(config::system_account_name).get_amount(), outstanding );
+
+   // And it really is payable, not merely covered on paper.
+   BOOST_REQUIRE_EQUAL(success(),
+      push_system_action(BATCH_OP, "claimpay"_n, mvo()("account_name", BATCH_OP)));
+} FC_LOG_AND_RETHROW()
+
 BOOST_FIXTURE_TEST_CASE( advance_gate_blocks_on_insufficient_treasury_balance, sysio_emissions_tester ) try {
    // The fixture funds sysio with 1_000_000_000 WIRE which easily covers the
    // default emission schedule. If sysio's balance is drained below the next
