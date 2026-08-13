@@ -2376,7 +2376,8 @@ uint64_t uwrit::sumlocks(name underwriter,
 }
 
 // ---------------------------------------------------------------------------
-//  chklocks — epoch-boundary sweep of expired locks (the ONLY release path)
+//  chklocks — epoch-boundary sweep of expired locks (the only HEALTHY release
+//  path; `sweeplocks` also erases, on an UPHELD challenge)
 // ---------------------------------------------------------------------------
 //
 // Locks are a wall-clock challenge window (12h default via uwconfig) and

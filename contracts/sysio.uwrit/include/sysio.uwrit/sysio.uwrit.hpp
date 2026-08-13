@@ -366,8 +366,11 @@ namespace sysio {
       /// (delivery itself is implicit — there is no SWAP_REMIT ack; the
       /// lock window expiring IS the settlement horizon).
       ///
-      /// This sweep is the ONLY lock-release path: locks are a wall-clock
-      /// challenge window (12h default) and are never released by delivery.
+      /// This sweep is the only HEALTHY lock-release path: locks are a
+      /// wall-clock challenge window (12h default) and are never released by
+      /// delivery. It is not the only path that ERASES a lock — `sweeplocks`
+      /// does too, on an UPHELD challenge (see `lock_sum`, whose rollup both
+      /// must maintain).
       ///
       /// EXCEPTION (WIRE-297): a lock whose `challenge_id` is non-zero — an
       /// underwriter-fault challenge is OPEN against its commitment — is NOT
@@ -643,12 +646,27 @@ namespace sysio {
       /// Materialized Σ `lock_entry.amount` for one (underwriter, chain_code,
       /// token_code) bucket — the "locked" half of `sysio.opreg::available()`.
       ///
-      /// A CACHE of the `locks` table with exactly ONE writer: the only two
-      /// code paths that can change a bucket's total both live in this
-      /// contract — `try_select_winner` (one lock per required leg, on a win)
-      /// and `chklocks` (release at expiry, the sole erase path). A row is
-      /// erased when its total reaches zero, so an absent row reads as zero
-      /// and the table holds only live buckets.
+      /// A CACHE of the `locks` table with exactly ONE writer: every code path
+      /// that can change a bucket's total lives in this contract. There are
+      /// THREE, and any new one inherits the same obligation — nothing
+      /// structural enforces it:
+      ///
+      ///   * `try_select_winner` — ADDS, one lock per required leg, on a win.
+      ///   * `chklocks`  — DECREMENTS, releasing locks at expiry.
+      ///   * `sweeplocks` — DECREMENTS, erasing the held locks of a commitment
+      ///     whose underwriter-fault challenge was UPHELD (WIRE-297). This one
+      ///     runs OUTSIDE `chklocks`, which is exactly why it was missed once:
+      ///     this block previously said `chklocks` was the sole erase path, and
+      ///     `sweeplocks` erased rows without decrementing.
+      ///
+      /// Getting that wrong is permanent and silent rather than merely stale:
+      /// the rollup is authoritative for `sysio.opreg::available()`, so a bucket
+      /// left positive after its last row is gone suppresses that collateral
+      /// forever — nothing decrements it again, because the rows that would
+      /// have are already erased.
+      ///
+      /// A row is erased when its total reaches zero, so an absent row reads as
+      /// zero and the table holds only live buckets.
       ///
       /// It exists because the derivation it replaces does not scale. Both
       /// `sum_locks_inline` rollups (here and in sysio.opreg) previously
