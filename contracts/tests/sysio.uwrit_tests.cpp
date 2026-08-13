@@ -281,10 +281,14 @@ BOOST_FIXTURE_TEST_CASE(createuwreq_requires_msgch_auth, sysio_uwrit_tester) { t
 //
 // Locks are never released by delivery (there is no SWAP_REMIT ack); the
 // epoch-advance sweep is the only releaser. `release`/`expirelock` were
-// retired with the dead reflected-remit dispatch.
+// retired with the dead reflected-remit dispatch. Budget-bounded like its
+// sibling epoch-inline sweeps; the bound's BEHAVIOR (one lock per unit of
+// budget, backlog draining on the next sweep) needs real locks and lives in
+// sysio.dispatch_tests.cpp.
 
 BOOST_FIXTURE_TEST_CASE(chklocks_requires_epoch_or_self_auth, sysio_uwrit_tester) { try {
    BOOST_REQUIRE(push_uwrit_action("uwrit.a"_n, "chklocks"_n, mvo()
+      ("max_rows", 10)
    ).find("chklocks requires sysio.epoch or sysio.uwrit authority") != std::string::npos);
 } FC_LOG_AND_RETHROW() }
 
@@ -292,7 +296,14 @@ BOOST_FIXTURE_TEST_CASE(chklocks_noop_with_no_locks, sysio_uwrit_tester) { try {
    // Steady-state: nothing expired, nothing to sweep — must be a clean
    // no-op (it runs inside every epoch advance).
    BOOST_REQUIRE_EQUAL(success(),
-      push_uwrit_action(UWRIT_ACCOUNT, "chklocks"_n, mvo()));
+      push_uwrit_action(UWRIT_ACCOUNT, "chklocks"_n, mvo()("max_rows", 10)));
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(chklocks_zero_budget_is_noop, sysio_uwrit_tester) { try {
+   // The budget gate short-circuits before any index walk — mirrors
+   // pruneuwreqs / drainfwq.
+   BOOST_REQUIRE_EQUAL(success(),
+      push_uwrit_action(UWRIT_ACCOUNT, "chklocks"_n, mvo()("max_rows", 0)));
 } FC_LOG_AND_RETHROW() }
 
 // ── pruneuwreqs — bounded UWREQ lifecycle sweep (SEC-129 / WSA-223) ──

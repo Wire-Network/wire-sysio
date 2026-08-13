@@ -6,7 +6,12 @@
         {
             "name": "chklocks",
             "base": "",
-            "fields": []
+            "fields": [
+                {
+                    "name": "max_rows",
+                    "type": "uint32"
+                }
+            ]
         },
         {
             "name": "commit_entry",

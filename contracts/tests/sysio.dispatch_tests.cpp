@@ -1034,6 +1034,15 @@ public:
          ("reason",  reason));
    }
 
+   /// Direct `sysio.uwrit::chklocks` call with an explicit budget
+   /// (self-authorized). `advance` inlines it with MAX_LOCK_RELEASE_PER_EPOCH;
+   /// the tests call it directly to exercise the budget itself without an
+   /// intervening advance sweeping the whole backlog first.
+   action_result chklocks_direct(uint32_t max_rows) {
+      return push(UWRIT_ACCOUNT, uwrit_abi, UWRIT_ACCOUNT, "chklocks"_n, mvo()
+         ("max_rows", max_rows));
+   }
+
    /// Direct sysio.opreg::releaselock call (UWRIT-authorized). In production
    /// this is fanned out one-per-lock by sysio.uwrit::chklocks at epoch advance;
    /// the tests call it directly to exercise the deferred-slash settlement math.
@@ -2514,6 +2523,107 @@ BOOST_FIXTURE_TEST_CASE(swap_underbonded_candidate_cannot_terminally_reject,
 // alone, so any caller — it is permissionless — could erase the row first;
 // `releaselock` then returns at its missing-operator check and the retained
 // collateral is stranded with no attestation that could ever release it.
+// `chklocks` releases at most `max_rows` locks per call, and the remainder
+// drains on the next sweep.
+//
+// Lock expiry is inherently BURSTY: every lock is stamped
+// `now + collateral_lock_duration_ms` when its race is won, so a burst of
+// settlements inside one epoch produces a burst of expiries inside one epoch,
+// exactly one lock-duration later. Each expired lock costs an inline
+// `opreg::releaselock` dispatch plus an erase, all inside `advance`'s hard,
+// uncatchable transaction CPU deadline — so an UNBOUNDED sweep of a large
+// enough burst aborts `advance`, and because those same locks are still
+// expired at the next advance it aborts identically forever: a permanent
+// chain-wide epoch stall, not a transient one. The budget converts that into
+// bounded release latency, which is harmless because the challenge window has
+// already closed by the time a lock is swept.
+BOOST_FIXTURE_TEST_CASE(chklocks_budget_bounds_the_sweep_and_backlog_drains,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+   // A 2-minute lock window, so the locks can expire inside the test.
+   BOOST_REQUIRE_EQUAL(success(), push(UWRIT_ACCOUNT, uwrit_abi, UWRIT_ACCOUNT, "setconfig"_n, mvo()
+      ("fee_bps", kDefaultUwritFeeBps)("collateral_lock_duration_ms", 120'000u)
+      ("min_fromwire_amount", 1)("fromwire_revert_fee_bps", 0)
+      ("uwreq_pending_timeout_epochs", 10)("uwreq_retention_epochs", 10)));
+
+   const uint64_t eth       = fc::slug_name{"ETH"}.value;
+   const uint64_t primary   = fc::slug_name{"PRIMARY"}.value;
+   const uint64_t secondary = fc::slug_name{"SECOND"}.value;
+   constexpr uint64_t ATT_ID     = 9750;
+   constexpr int64_t  SRC_AMOUNT = 1'000'000;
+
+   // Both legs on ETH — the shape whose race reaches CONFIRMED and writes a
+   // lock per required leg, so one won race yields the two locks this bound
+   // is exercised against.
+   setup_wire_token_and_reserves();
+   BOOST_REQUIRE_EQUAL(success(), regreserve_active("ETH", "ETH", "SECOND"));
+   BOOST_REQUIRE_EQUAL(success(),
+      depositinle_credit(UWRIT_OP, "ETH", "ETH", uint64_t{1'000'000'000}));
+   enable_epoch_advancement();
+
+   const uint64_t quote = expected_quote("ETH", "ETH", "PRIMARY", SRC_AMOUNT,
+                                         "ETH", "ETH", "SECOND", kDefaultUwritFeeBps);
+   BOOST_REQUIRE(quote > 0);
+   const auto sr = encode_swap_request(
+      ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
+      eth, eth, primary, SRC_AMOUNT,
+      eth, eth, secondary, /*target_amount*/ quote,
+      /*tolerance_bps*/ 10'000, ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0b'));
+   BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, eth, sr));
+   const auto src_uic = create_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
+   BOOST_REQUIRE_EQUAL(success(),
+      rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", src_uic));
+   const auto dst_uic = create_signed_uic(UWRIT_OP, ATT_ID, eth, eth, secondary);
+   BOOST_REQUIRE_EQUAL(success(),
+      rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "SECOND", dst_uic));
+   BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_CONFIRMED",
+                       get_uwreq(ATT_ID)["status"].as_string());
+   BOOST_REQUIRE(!get_lock(1).is_null());
+   BOOST_REQUIRE(!get_lock(2).is_null());
+
+   // Let the lock window elapse WITHOUT an advance, so both locks are due and
+   // nothing has swept them yet (advance would run the full budget inline).
+   produce_blocks(260);   // > 120s at 0.5s/block
+   BOOST_REQUIRE(!get_lock(1).is_null());
+   BOOST_REQUIRE(!get_lock(2).is_null());
+
+   // Zero budget is a no-op even with expired locks waiting.
+   BOOST_REQUIRE_EQUAL(success(), chklocks_direct(0));
+   BOOST_REQUIRE(!get_lock(1).is_null());
+   BOOST_REQUIRE(!get_lock(2).is_null());
+
+   // Budget of one releases EXACTLY one lock. Both were written by the same
+   // transaction and so share an `expires_at_ms`; the bound is what is under
+   // test here, not the tie-break between equal expiries.
+   BOOST_REQUIRE_EQUAL(success(), chklocks_direct(1));
+   BOOST_REQUIRE(get_lock(1).is_null() != get_lock(2).is_null());
+
+   // A block between the two sweeps: the second call carries identical action
+   // data and the same signer, so without a fresh TAPOS reference block the
+   // two pushes hash to the same transaction id and the second is rejected as
+   // a duplicate. In production each sweep rides its own epoch's advance.
+   produce_blocks();
+
+   // The remainder drains on the next sweep — an oversized burst costs release
+   // latency, never a stalled advance.
+   BOOST_REQUIRE_EQUAL(success(), chklocks_direct(1));
+   BOOST_REQUIRE(get_lock(1).is_null());
+   BOOST_REQUIRE(get_lock(2).is_null());
+
+   // The releaselock fan-out still ran for both, benignly: UWRIT_OP is healthy
+   // (neither SLASHED nor TERMINATED), so each release is a no-op on the
+   // ledger and the bond is left whole — the lock rows disappearing is what
+   // restores `available()`.
+   {
+      const auto op = get_operator(UWRIT_OP);
+      BOOST_REQUIRE(!op.is_null());
+      BOOST_REQUIRE_EQUAL("OPERATOR_STATUS_ACTIVE", op["status"].as_string());
+      uint64_t total = 0;
+      for (const auto& b : op["balances"].get_array()) total += b["balance"].as_uint64();
+      BOOST_REQUIRE_EQUAL(uint64_t{1'000'000'000}, total);
+   }
+} FC_LOG_AND_RETHROW() }
+
 BOOST_FIXTURE_TEST_CASE(prune_keeps_terminated_operator_until_collateral_settles,
                         sysio_dispatch_tester) { try {
    bootstrap_for_dispatch();

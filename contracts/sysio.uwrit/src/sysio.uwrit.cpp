@@ -2366,12 +2366,15 @@ uint64_t uwrit::sumlocks(name underwriter,
 // so even a residual over-committed lock set cannot underflow + abort the
 // advance (defence-in-depth — the winner-selection aggregate bond check
 // already prevents the over-commit at lock-creation time).
-void uwrit::chklocks() {
-   // Two valid callers:
-   //   * sysio.epoch::advance — inlined at every epoch boundary.
-   //   * sysio.uwrit — manual cleanup invocation, e.g. from a migration.
+void uwrit::chklocks(uint32_t max_rows) {
+   // Two valid callers, mirroring pruneuwreqs / drainfwq:
+   //   * sysio.epoch::advance — inlined at every epoch boundary with
+   //     MAX_LOCK_RELEASE_PER_EPOCH.
+   //   * sysio.uwrit — manual cleanup invocation with a caller-chosen budget,
+   //     e.g. from a migration.
    check(has_auth(EPOCH_ACCOUNT) || has_auth(get_self()),
          "chklocks requires sysio.epoch or sysio.uwrit authority");
+   if (max_rows == 0) return;
 
    const uint64_t now_ms = current_time_ms();
    locks_t locks(get_self());
@@ -2380,9 +2383,23 @@ void uwrit::chklocks() {
    // Walk in ascending `expires_at_ms` and collect full copies while
    // expired — we erase in a second pass (an erase invalidates the index
    // cursor) and need every field for the releaselock fan-out.
+   //
+   // Bounded to `max_rows`, for the same reason as MAX_UWREQ_PRUNE_PER_EPOCH
+   // and MAX_FWQ_DRAIN_PER_EPOCH: the per-lock work here is an inline
+   // `opreg::releaselock` dispatch plus an erase, and it runs inside
+   // advance's hard, uncatchable transaction CPU deadline. Expiries arrive
+   // in BURSTS — every lock is stamped `now + collateral_lock_duration_ms`
+   // at creation, so one epoch's settlements all fall due in one epoch a
+   // lock-duration later — and an unbounded sweep of such a burst would
+   // abort `advance`. Those locks would still be expired at the next
+   // advance, so it would abort identically every epoch thereafter: a
+   // permanent chain-wide epoch stall. Ascending expiry order makes the
+   // bound a FIFO drain; an oversized burst simply spreads across
+   // subsequent epochs.
    std::vector<lock_entry> expired;
    for (auto it = idx.begin();
-        it != idx.end() && it->expires_at_ms <= now_ms; ++it) {
+        it != idx.end() && it->expires_at_ms <= now_ms && expired.size() < max_rows;
+        ++it) {
       expired.push_back(*it);
    }
    if (expired.empty()) return;

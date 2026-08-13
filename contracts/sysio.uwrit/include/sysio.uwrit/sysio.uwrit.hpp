@@ -107,6 +107,28 @@ namespace sysio {
       // subsequent epochs.
       static constexpr uint32_t MAX_UWREQ_PRUNE_PER_EPOCH = 32;
 
+      // Locks `sysio.epoch::advance` passes to `chklocks` each epoch. Sized
+      // like MAX_UWREQ_PRUNE_PER_EPOCH / MAX_FWQ_DRAIN_PER_EPOCH, and for the
+      // same reason — but the exposure here is sharper than either, because
+      // lock EXPIRY is inherently bursty. Every lock is stamped
+      // `now + collateral_lock_duration_ms` at creation, so a burst of
+      // settlements inside one epoch produces a burst of expiries inside one
+      // epoch, exactly one lock-duration later. Sustained swap traffic
+      // therefore presents `chklocks` with a whole epoch's settlements at
+      // once, and per expired lock the sweep does an inline
+      // `opreg::releaselock` dispatch plus an erase — all inside advance's
+      // hard, uncatchable transaction CPU deadline.
+      //
+      // Unbounded, a large enough expiry burst aborts `advance`; and because
+      // those same locks are still expired at the next advance, it aborts
+      // identically every epoch thereafter — a PERMANENT chain-wide epoch
+      // stall rather than a transient one. Bounded, an oversized burst is
+      // just release latency that drains across subsequent epochs, which is
+      // harmless: the challenge window has already closed, so a lock freed an
+      // epoch or two late costs only a brief overstatement of the
+      // underwriter's reserved collateral.
+      static constexpr uint32_t MAX_LOCK_RELEASE_PER_EPOCH = 32;
+
       // ── UWREQ row-growth rails (SEC-129 / WSA-223) ─────────────────────────
       // Every uwreqs `modify` re-serializes the whole row inside the
       // never-throw evalcons / advance dispatch surfaces, so per-field byte
@@ -346,8 +368,19 @@ namespace sysio {
       ///
       /// This sweep is the ONLY lock-release path: locks are a wall-clock
       /// challenge window (12h default) and are never released by delivery.
+      ///
+      /// Budget-bounded, mirroring `pruneuwreqs` / `drainfwq`: walks the
+      /// `byexpire` index in ascending `expires_at_ms` and releases at most
+      /// `max_rows` locks (`max_rows == 0` is a no-op). Inlined from
+      /// `sysio.epoch::advance` with `MAX_LOCK_RELEASE_PER_EPOCH`; also
+      /// invocable by `sysio.uwrit` itself with a caller-chosen budget for a
+      /// manual backlog drain. Ascending-expiry order makes the bound a FIFO
+      /// drain — the oldest locks always release first, so no lock can starve
+      /// behind a sustained burst. NEVER throws past the auth gate: it runs
+      /// inline inside `advance`, where an abort stalls epoch progress
+      /// chain-wide.
       [[sysio::action]]
-      void chklocks();
+      void chklocks(uint32_t max_rows);
 
       /// Bounded UWREQ lifecycle sweep (SEC-129 / WSA-223). Inlined from
       /// `sysio.epoch::advance` each epoch with `MAX_UWREQ_PRUNE_PER_EPOCH`;
