@@ -1,8 +1,11 @@
 #pragma once
 
+#include <cstdint>
+#include <functional>
 #include <memory>
 #include <optional>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <fc/network/solana/solana_client.hpp>
@@ -19,14 +22,42 @@ namespace sysio {
 /// reads must reject the same envelope size before hex decoding.
 inline constexpr size_t SOLANA_MAX_ENVELOPE_BYTES = OPP_MAX_ENVELOPE_BYTES;
 
-/// Per-`epoch_in` chunk payload limit. Mirrors `MAX_CHUNK_BYTES` on the
-/// Solana side. Solana's tx-packet MTU is 1 232 B raw. Tx overhead at the
-/// current full data-chunk shape is fixture-measured and must stay <= 1 232 B.
-/// Finalization happens in a separate zero-data terminal call, so data chunks
-/// do not reserve packet space for dynamic effect accounts. If the static
-/// `epoch_in` account list changes, the SEC-94 fixture/parity test must be
-/// regenerated and will catch any packet overflow.
-inline constexpr size_t SOLANA_MAX_CHUNK_BYTES = 672;
+/// Must equal `MAX_CHUNK_BYTES` on the Solana side — non-final chunks must be
+/// exactly this size. 668 keeps a full data chunk under Solana's 1 232 B packet
+/// limit with the `epoch_in` tx overhead (static account list, header,
+/// blockhash, signature, instruction discriminator + chunked args) included.
+/// Any change to the `epoch_in` account list or argument tuple moves that
+/// overhead; `epoch_in_full_data_chunk_fits_packet_limit` is what catches it.
+inline constexpr size_t SOLANA_MAX_CHUNK_BYTES = 668;
+
+/// Dynamic (`remaining_accounts`) budget for ONE `dispatch_attestations` call.
+///
+/// A legacy Solana transaction is capped at 1232 bytes and each account costs
+/// 32 bytes of key plus 1 byte of index; after the instruction's own static
+/// account list, the fee payer, the compute-budget pre-instruction, header,
+/// blockhash and signature, ~16 dynamic accounts fit. This lives in the RELAY
+/// because the relay builds the transaction -- the depot used to carry an
+/// equivalent estimate and could not, since a WIRE consensus contract has no
+/// business modelling another chain's packet limit.
+///
+/// Exported so `dispatch_attestations_full_manifest_fits_packet_limit` measures
+/// THIS constant rather than a copy of it.
+inline constexpr size_t MAX_TERMINAL_DYNAMIC_ACCOUNTS = 16;
+
+/// Backstop on `dispatch_attestations` rounds per envelope. The drain loop
+/// already exits on a drained cursor, on consensus not yet reached, and on a
+/// cursor that fails to advance; this only bounds a pathological envelope so
+/// the relay can never spin forever on one epoch.
+///
+/// Sized against the depot's worst case now that the depot no longer bounds the
+/// envelope by Solana's packet limit: `MAX_ENVELOPE_BYTES` (64 KiB) admits on the
+/// order of 500 small SPL swap-remits across distinct reserves, and at ~5
+/// attestations per 16-account round that needs ~100 rounds. Exhausting this is
+/// a liveness alarm, never a silent success.
+///
+/// Exported so the plugin's round-exhaustion test sizes its fixture against
+/// THIS constant rather than a copy of it.
+inline constexpr uint32_t MAX_DISPATCH_ROUNDS = 128;
 
 namespace outpost_solana_client_detail {
 
@@ -122,6 +153,67 @@ std::vector<char> decode_latest_envelope_account(opp_solana_outpost_client&  pro
                                                  uint32_t                    epoch_index,
                                                  const std::string&          log_label);
 
+/// How far the outpost has settled one inbound epoch's attestations.
+struct epoch_dispatch_progress {
+   /// Whether consensus has tipped for the epoch. Until it has, a terminal
+   /// call records the delivery and dispatches NOTHING -- the normal
+   /// outcome for every operator except the one whose delivery reaches the
+   /// threshold.
+   bool     consensus_reached = false;
+   /// The on-chain cursor: attestations already settled, in envelope
+   /// dispatch order. The relay resumes from here.
+   uint32_t dispatched_count  = 0;
+};
+
+/// The `dispatch_attestations` crank loop, factored over its RPC touchpoints
+/// so the plugin's unit tests can drive the full state machine (packing,
+/// `dispatch_limit` sizing, cursor resume, and the consensus / stall /
+/// exhaustion exits) without a live Solana endpoint.
+///
+/// `per_attestation` carries one account-meta manifest per attestation of the
+/// envelope, indexed by the SAME flat position the on-chain dispatch cursor
+/// counts (`messages[*].payload.attestations[*]`, walked in order);
+/// attestations needing no effect accounts hold an empty entry. Its size IS
+/// the envelope's attestation total -- the denominator the cursor counts
+/// toward.
+///
+/// Behaviour:
+///   * Consensus not reached -> returns without sending; the normal path for
+///     every operator but the one whose delivery tipped the threshold.
+///   * `per_attestation.empty()` (a zero-attestation envelope) -> sends ONE
+///     `dispatch_limit = 1` crank and returns. The program clamps the window
+///     to the empty envelope and runs its completion block, closing the epoch
+///     and emitting the riding outbound envelope. Without this crank the
+///     epoch would never close: `epoch_in`'s terminal call deliberately stops
+///     at recording, and `dispatch_attestations` is the only place
+///     `next_epoch_index` advances. On an already-closed epoch the crank is a
+///     benign on-chain no-op.
+///   * Otherwise packs greedily from the cursor while the account UNION fits
+///     `MAX_TERMINAL_DYNAMIC_ACCOUNTS` (always taking at least one so a
+///     single oversized manifest still makes progress), sends, and re-reads
+///     the cursor. A cursor that fails to advance means another caller is
+///     draining this envelope -- exit; a drained cursor is done.
+///   * Elogs and returns when `MAX_DISPATCH_ROUNDS` is exhausted (the log IS
+///     the alarm; the next tick resumes from the on-chain cursor); throws
+///     when the deadline callback throws.
+///
+/// @param epoch_index             the WIRE epoch being settled (log context).
+/// @param per_attestation         per-attestation effect-account manifests.
+/// @param throw_if_past_deadline  throws once the caller's deadline passes.
+/// @param read_progress           reads `EpochDeliveries` (consensus + cursor).
+/// @param send_dispatch           sends `dispatch_attestations(limit, accounts)`
+///                                and returns the tx signature.
+/// @param log_label               client identity for log lines.
+/// @return the last dispatch signature this call sent (empty when none).
+std::string drive_dispatch_rounds(
+   uint32_t                                                           epoch_index,
+   const std::vector<std::vector<fc::network::solana::account_meta>>& per_attestation,
+   const std::function<void()>&                                       throw_if_past_deadline,
+   const std::function<epoch_dispatch_progress()>&                    read_progress,
+   const std::function<std::string(uint32_t, std::vector<fc::network::solana::account_meta>)>&
+                                                                      send_dispatch,
+   const std::string&                                                 log_label);
+
 } // namespace outpost_solana_client_detail
 
 /**
@@ -159,6 +251,32 @@ public:
                                          const std::vector<char>& envelope_bytes,
                                          fc::microseconds         deadline) override;
 
+   /// Settle every outstanding attestation for `epoch_index` by cranking
+   /// `dispatch_attestations` until the on-chain cursor drains.
+   ///
+   /// Separate from delivery on purpose: an undrained cursor blocks every later
+   /// epoch on this outpost, so recovery must not depend on the one relay whose
+   /// delivery happened to fail. Order of operations: (1) decode-probes the
+   /// envelope locally -- THROWING when it does not decode, because an
+   /// undecodable envelope must never read as an empty one; (2) reads
+   /// `EpochDeliveries` and returns a no-op when consensus has not tipped yet
+   /// (the normal state for every operator but the one whose delivery reaches
+   /// the threshold), skipping the per-attestation manifest work below on that
+   /// common path; (3) builds the per-attestation effect-account manifests from
+   /// the envelope; (4) drives `outpost_solana_client_detail::drive_dispatch_rounds`,
+   /// which re-reads the cursor at the top of every round so a re-drive resumes
+   /// where the program will actually settle, closes a zero-attestation epoch
+   /// with a single clamped crank, and elogs + returns on round-budget
+   /// exhaustion -- the log is the liveness alarm, and the next tick resumes
+   /// from the cursor.
+   ///
+   /// @return the last `dispatch_attestations` signature this call sent, or
+   ///         empty when consensus had not tipped or the cursor was already
+   ///         drained.
+   std::string drain_dispatch(uint32_t                 epoch_index,
+                              const std::vector<char>& envelope_bytes,
+                              fc::microseconds         deadline);
+
    std::vector<char> read_inbound_envelope(uint32_t         epoch_index,
                                            fc::microseconds deadline) override;
 
@@ -187,11 +305,36 @@ private:
    std::optional<reserve_terminal_info>
    reserve_info_for_codes(uint64_t token_code, uint64_t reserve_code);
 
+   /// Read `EpochDeliveries` for `epoch_index`. A missing/empty account means
+   /// nothing has been delivered yet, reported as zero progress rather than
+   /// treated as an error.
+   outpost_solana_client_detail::epoch_dispatch_progress
+   read_epoch_dispatch_progress(uint32_t epoch_index);
+
+   /// Send ONE `dispatch_attestations(epoch_index, dispatch_limit)` call,
+   /// appending `extra_remaining_accounts` (the packed effect-account batch)
+   /// past the IDL account list as Anchor `remaining_accounts`. Built on the
+   /// program client's PUBLIC generic API (`get_idl` / `resolve_accounts` /
+   /// `execute_tx_and_confirm`) so the dispatch surface lives entirely in
+   /// this client and the shell header stays at its master shape.
+   std::string send_dispatch_attestations(
+      uint32_t                                       epoch_index,
+      uint32_t                                       dispatch_limit,
+      std::vector<fc::network::solana::account_meta> extra_remaining_accounts);
+
    solana_client_entry_ptr                       _entry;
    fc::network::solana::solana_public_key        _program_id;
    std::shared_ptr<opp_solana_outpost_client>    _program_client;
    uint64_t                                      _outpost_id;
    uint32_t                                      _chain_id;
+   /// The latest envelope this relay delivered, kept so `read_inbound_envelope`
+   /// can drain its epoch's dispatch cursor without depot access -- consensus
+   /// can tip via OTHER operators' deliveries between our ticks, and the drain
+   /// manifest can only be built from the envelope bytes themselves. In-memory
+   /// on purpose: after a restart the still-pending envelope is re-delivered by
+   /// the next outbound tick (re-staging chunks and a duplicate terminal call
+   /// are benign on-chain), which repopulates this memo.
+   std::optional<std::pair<uint32_t, std::vector<char>>> _delivered_envelope;
 
 };
 
@@ -226,95 +369,76 @@ void record_terminal_account(std::vector<fc::network::solana::account_meta>& met
                              const fc::network::solana::solana_public_key& key,
                              bool is_writable);
 
-/// Decode an inbound envelope and return the deduplicated set of
-/// 32-byte Solana pubkeys that the on-chain `epoch_in` handler will
-/// need to address in its CPI lamport transfers:
-///
-///   * `OPERATOR_ACTION(WITHDRAW_REMIT)` → operator's SOL wallet
-///     (`op_address.address`) for the vault → operator transfer.
-///   * `DEPOSIT_REVERT`                   → depositor's SOL wallet
-///     (`depositor.address`)              for the vault → depositor refund.
-///
-/// `OPERATOR_ACTION(SLASH)` routes vault → Reserve PDA, which is
-/// already a declared account on the `epoch_in` IDL, so SLASH targets
-/// are NOT in the returned vector.
-///
-/// Malformed attestations (wrong chain kind, wrong address length,
-/// proto decode failure) are skipped silently — the on-chain handler
-/// log+skips them the same way per `feedback_opp_handlers_never_throw.md`.
-/// A whole-envelope decode failure returns an empty vector + a warning
-/// log; the on-chain handlers will then log+skip every remit/revert in
-/// the envelope, the depot retains the authoritative state, and the
-/// next envelope can re-attempt.
-///
-/// Exposed in this header (rather than the .cpp's anonymous namespace)
-/// so the plugin's unit tests can exercise the decoder against a
-/// synthesised Envelope without spinning up a full Solana client.
-std::vector<fc::network::solana::solana_public_key>
-extract_inbound_recipient_pubkeys(const std::vector<char>& envelope_bytes);
-
-/// `(token_code, reserve_code)` pair for a Reserve PDA derivation. Used
-/// by the SWAP_REMIT remaining-accounts path: the cranker walks inbound
-/// SWAP_REMIT attestations, collects every (token_code, reserve_code)
-/// pair, and the caller derives + appends the corresponding Reserve
-/// PDA(s) past the IDL's declared accounts on the zero-data terminal
-/// `epoch_in` submission. Without this the on-chain `handle_swap_remit`
-/// can't `find_remaining_account` the Reserve PDA and logs the unpaid remit
-/// instead of paying the recipient.
+/// `(token_code, reserve_code)` pair for a Reserve PDA derivation, carried on
+/// every reserve-backed `inbound_effect`. The manifest builder derives the
+/// Reserve PDA via Anchor's `find_program_address` with the `[RESERVE_SEED,
+/// &token_code.to_le_bytes(), &reserve_code.to_le_bytes()]` seed list against
+/// the program id.
 struct reserve_pda_seeds {
    uint64_t token_code;
    uint64_t reserve_code;
 };
 
-/// Walk every Reserve-PDA-consuming attestation in `envelope_bytes` —
-/// `SWAP_REMIT`, `SWAP_REVERT`, `RESERVE_READY`, and
-/// `RESERVE_CREATE_CANCELLED` — and collect the (token_code, reserve_code)
-/// pair for each (deduped).
-/// Caller derives the Reserve PDA via Anchor's `find_program_address`
-/// with the `[RESERVE_SEED, &token_code.to_le_bytes(),
-/// &reserve_code.to_le_bytes()]` seed list against the program id.
-/// RESERVE_READY is single-shot (queued once at `matchreserve`); a
-/// missing PDA strands the outpost-local reserve in PENDING forever, so
-/// the lifecycle types are first-class here, not best-effort.
-std::vector<reserve_pda_seeds>
-extract_inbound_swap_remit_reserve_seeds(const std::vector<char>& envelope_bytes);
-
-/// Walk every `RESERVE_CREATE_CANCELLED` attestation in `envelope_bytes`
-/// and collect each unique reserve PDA seed pair. The terminal manifest
-/// uses this narrower extractor after the Reserve PDA has been declared so
-/// it can append branch-specific refund/vault accounts from pinned reserve
-/// metadata.
-std::vector<reserve_pda_seeds>
-extract_inbound_reserve_create_cancelled_seeds(const std::vector<char>& envelope_bytes);
-
-/// Tuple of (token_code, reserve_code, recipient) pulled from every
-/// inbound SWAP_REMIT attestation in the envelope. The relay uses this
-/// to derive the per-attestation reserve_vault PDA + recipient ATA
-/// (`get_associated_token_address(recipient, mint)`) when the target
-/// `token_code` resolves to an SPL mint via `OutpostConfig.token_addresses_by_code`.
-///
-/// Native-SOL targets harmlessly produce the same struct — the relay
-/// just skips the ATA / mint derivation when the mint lookup returns
-/// the native marker. The on-chain `handle_swap_remit` native branch
-/// doesn't reference any of the extra accounts, so they're inert.
-struct swap_remit_spl_target {
-   uint64_t                                token_code;
-   uint64_t                                reserve_code;
-   fc::network::solana::solana_public_key  recipient;
+/// Which family of effect accounts one inbound attestation needs. The relay
+/// derives the concrete metas per shape; the on-chain handler resolves them
+/// out of `remaining_accounts` by pubkey.
+enum class effect_shape {
+   /// Pays a native-SOL recipient directly (WITHDRAW_REMIT, DEPOSIT_REVERT).
+   native_payee,
+   /// SWAP_REMIT: Reserve PDA, plus vault + recipient ATA + token program
+   /// when the reserve's custody mint is SPL rather than native.
+   swap_remit,
+   /// SWAP_REVERT: refunds the depositor, so it additionally needs the mint,
+   /// the ATA program and the system program to create the ATA if absent.
+   swap_revert,
+   /// RESERVE_READY: Reserve PDA only.
+   reserve_ready,
+   /// RESERVE_CREATE_CANCELLED: refunds the reserve's creator.
+   reserve_create_cancelled,
 };
 
-/// Walk every `SWAP_REMIT` attestation in `envelope_bytes` and collect
-/// the SPL-relevant tuple. Caller is responsible for resolving each
-/// `token_code` to a mint pubkey (cached from `OutpostConfig`) before
-/// deriving the recipient ATA + including it in `remaining_accounts`.
-std::vector<swap_remit_spl_target>
-extract_inbound_swap_remit_spl_targets(const std::vector<char>& envelope_bytes);
+/// One inbound attestation's effect-account requirement, keyed by its FLAT
+/// position in the envelope's dispatch order (`messages[*].payload
+/// .attestations[*]`, walked in order).
+///
+/// That index is the coordinate the resumable-dispatch cursor counts in: the
+/// program settles `[dispatched_count, dispatched_count + dispatch_limit)`
+/// over exactly this sequence, so the relay can size a terminal call's
+/// `dispatch_limit` to the attestations whose accounts it is actually
+/// carrying. Attestations needing no effect account produce no entry.
+struct inbound_effect {
+   size_t                                                attestation_index;
+   effect_shape                                          shape;
+   /// Native payee / SWAP_REMIT recipient / SWAP_REVERT depositor.
+   std::optional<fc::network::solana::solana_public_key> recipient;
+   /// Set for every reserve-backed shape.
+   std::optional<reserve_pda_seeds>                      reserve;
+};
 
-/// Walk every `SWAP_REVERT` attestation in `envelope_bytes` and collect the
-/// SPL-relevant tuple. The `recipient` field carries the depositor pubkey,
-/// because the SPL revert branch refunds into the depositor's ATA.
-std::vector<swap_remit_spl_target>
-extract_inbound_swap_revert_spl_targets(const std::vector<char>& envelope_bytes);
+/// Walk `envelope_bytes` ONCE and return every attestation that needs effect
+/// accounts, in dispatch order. This is the authoritative decode and the ONLY
+/// one on the production path -- `drain_dispatch` builds its per-attestation
+/// manifests from it, so the per-type dispatch lives in exactly one place.
+///
+/// One entry per account-needing attestation, NO cross-attestation dedup --
+/// duplicate accounts derived from the entries merge later in
+/// `record_terminal_account` when a batch's manifests union.
+///
+/// Two on-chain failure modes, deliberately different, and this walk mirrors
+/// the first: a MALFORMED ATTESTATION (bad chain code, unparseable payload) is
+/// skipped here and logged-and-skipped on-chain, because no retry can fix it
+/// and wedging the epoch on it would be worse. A MISSING EFFECT ACCOUNT is the
+/// opposite -- the program ABORTS the whole call, because that is caller-side
+/// and retryable, and tolerating it would let a caller choose which effects
+/// land. A whole-envelope decode failure returns empty + a warning.
+std::vector<inbound_effect>
+extract_inbound_effects(const std::vector<char>& envelope_bytes);
+
+/// Total attestations in `envelope_bytes`, across every message, in dispatch
+/// order. This is the denominator the on-chain cursor counts toward, so it
+/// includes attestations that need no effect accounts. Returns 0 if the
+/// envelope does not decode.
+uint32_t count_inbound_attestations(const std::vector<char>& envelope_bytes);
 
 } // namespace outpost_solana_client_detail
 

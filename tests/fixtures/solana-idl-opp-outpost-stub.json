@@ -170,9 +170,11 @@
           "docs": [
             "Per-(epoch, operator) staging buffer. Same `init_if_needed` +",
             "`payer = operator` pattern the program already uses for",
-            "`EpochDeliveries`. Closed by the handler when the operator's",
-            "zero-data terminal call finalizes the envelope, returning the",
-            "rent lamports — net cost to the operator across the full epoch is zero."
+            "`EpochDeliveries`. The zero-data terminal call leaves it open;",
+            "the `dispatch_attestations` crank that drains the cursor closes",
+            "the ONE buffer it was handed and reclaims that buffer's rent.",
+            "Other operators' buffers stay open until the permissionless",
+            "`cleanup_envelope_chunks` reaper closes them."
           ],
           "writable": true
         },
@@ -182,26 +184,6 @@
             "Singleton inbound-envelope log. Append-and-prune on every",
             "consensus-reach (see `finalize_envelope`)."
           ],
-          "writable": true
-        },
-        {
-          "name": "outbound_message_buffer",
-          "writable": true
-        },
-        {
-          "name": "outbound_envelopes",
-          "writable": true
-        },
-        {
-          "name": "latest_outbound_envelope",
-          "writable": true
-        },
-        {
-          "name": "vault",
-          "writable": true
-        },
-        {
-          "name": "reserve_aggregate",
           "writable": true
         },
         {
@@ -480,6 +462,89 @@
       "args": [
         {
           "name": "epoch_index",
+          "type": "u32"
+        }
+      ]
+    },
+    {
+      "name": "dispatch_attestations",
+      "docs": [
+        "Settle [cursor, cursor + dispatch_limit) of the epoch's attestations."
+      ],
+      "discriminator": [
+        11,
+        22,
+        33,
+        44,
+        55,
+        66,
+        77,
+        88
+      ],
+      "accounts": [
+        {
+          "name": "caller",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "config",
+          "writable": true,
+          "signer": false
+        },
+        {
+          "name": "operator_registry",
+          "writable": true,
+          "signer": false
+        },
+        {
+          "name": "epoch_deliveries",
+          "writable": true,
+          "signer": false
+        },
+        {
+          "name": "chunk_buffer",
+          "writable": false,
+          "signer": false
+        },
+        {
+          "name": "outbound_message_buffer",
+          "writable": true,
+          "signer": false
+        },
+        {
+          "name": "outbound_envelopes",
+          "writable": true,
+          "signer": false
+        },
+        {
+          "name": "latest_outbound_envelope",
+          "writable": true,
+          "signer": false
+        },
+        {
+          "name": "vault",
+          "writable": true,
+          "signer": false
+        },
+        {
+          "name": "reserve_aggregate",
+          "writable": true,
+          "signer": false
+        },
+        {
+          "name": "system_program",
+          "writable": false,
+          "signer": false
+        }
+      ],
+      "args": [
+        {
+          "name": "epoch_index",
+          "type": "u32"
+        },
+        {
+          "name": "dispatch_limit",
           "type": "u32"
         }
       ]

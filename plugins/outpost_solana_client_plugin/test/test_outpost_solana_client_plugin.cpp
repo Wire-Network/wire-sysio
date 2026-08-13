@@ -13,7 +13,6 @@
 #include <sysio/outpost_solana_client_plugin/outpost_solana_client.hpp>
 #include <sysio/outpost_client/rpc_options.hpp>
 #include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
-#include <sysio.msgch/solana_terminal_budget.hpp>
 
 #include <sysio/opp/opp.pb.h>
 #include <sysio/opp/attestations/attestations.pb.h>
@@ -23,6 +22,7 @@
 #include <array>
 #include <cstring>
 #include <filesystem>
+#include <limits>
 #include <map>
 #include <set>
 #include <span>
@@ -35,7 +35,6 @@ namespace {
 
 constexpr std::string_view counter_anchor_idl_fixture = "solana-idl-counter-anchor.json";
 constexpr std::string_view opp_outpost_idl_fixture = "solana-idl-opp-outpost-stub.json";
-constexpr std::string_view sec94_terminal_budget_fixture = "sec-94-solana-terminal-budget.json";
 constexpr std::string_view startup_test_rpc_url = "http://127.0.0.1:1";
 
 /** Build a named Solana signature-provider spec from the canonical fixture. */
@@ -77,26 +76,10 @@ void initialize_outpost_plugin(const std::vector<std::string>& configuration_arg
    BOOST_REQUIRE(test_application->initialize<sysio::outpost_solana_client_plugin>(argv.size(), argv.data()));
 }
 
-/// Measured legacy transaction dimensions for a terminal Solana `epoch_in` call.
-struct terminal_tx_measurement {
-   size_t declared_idl_accounts = 0;
-   size_t instruction_data_bytes = 0;
-   size_t required_signatures = 0;
-   size_t legacy_account_keys = 0;
-   size_t loaded_accounts = 0;
-   size_t packet_bytes = 0;
-};
-
 /// Load an Anchor IDL fixture from the libfc test fixture directory.
 idl::program load_idl_fixture(std::string_view filename) {
    auto path = fc::test::get_test_fixtures_path() / boost::filesystem::path(filename);
    return idl::parse_idl_file(path.generic_string());
-}
-
-/// Load a JSON fixture from the libfc test fixture directory.
-fc::variant load_json_fixture(std::string_view filename) {
-   auto path = fc::test::get_test_fixtures_path() / boost::filesystem::path(filename);
-   return fc::json::from_file(std::filesystem::path(path.generic_string()));
 }
 
 /// Create deterministic placeholder keys for transaction-size measurements.
@@ -124,18 +107,21 @@ void write_u32_le(std::vector<uint8_t>& out, uint32_t value) {
    out.push_back(static_cast<uint8_t>((value >> 24) & 0xff));
 }
 
-/// Encode `epoch_in` args used by the SEC-94 packet-budget fixture.
-std::vector<uint8_t> epoch_in_data(const idl::instruction& instr,
-                                   const fc::variant_object& args) {
+/// Borsh-encode a data-chunk `epoch_in` instruction payload carrying
+/// `chunk_data_bytes` of chunk data. Mirrors the client's argument order:
+/// `epoch_index, chunk_index, total_chunks, total_bytes, chunk_data,
+/// dispatch_limit`.
+std::vector<uint8_t> epoch_in_data_chunk_payload(const idl::instruction& instr,
+                                                 size_t chunk_data_bytes) {
    std::vector<uint8_t> data;
-   data.reserve(instr.discriminator.size() + 16 + args["chunk_data_bytes"].as_uint64());
+   data.reserve(instr.discriminator.size() + 20 + chunk_data_bytes);
    data.insert(data.end(), instr.discriminator.begin(), instr.discriminator.end());
-   write_u32_le(data, static_cast<uint32_t>(args["epoch_index"].as_uint64()));
-   write_u16_le(data, static_cast<uint16_t>(args["chunk_index"].as_uint64()));
-   write_u16_le(data, static_cast<uint16_t>(args["total_chunks"].as_uint64()));
-   write_u32_le(data, static_cast<uint32_t>(args["total_bytes"].as_uint64()));
-   write_u32_le(data, static_cast<uint32_t>(args["chunk_data_bytes"].as_uint64()));
-   data.resize(data.size() + static_cast<size_t>(args["chunk_data_bytes"].as_uint64()));
+   write_u32_le(data, 1);                                          // epoch_index
+   write_u16_le(data, 0);                                          // chunk_index
+   write_u16_le(data, 2);                                          // total_chunks
+   write_u32_le(data, static_cast<uint32_t>(chunk_data_bytes * 2)); // total_bytes
+   write_u32_le(data, static_cast<uint32_t>(chunk_data_bytes));     // chunk_data length prefix
+   data.resize(data.size() + chunk_data_bytes);
    return data;
 }
 
@@ -241,77 +227,6 @@ transaction build_measured_legacy_transaction(const std::vector<instruction>& in
    return tx;
 }
 
-/// Measure terminal `epoch_in` with distinct dynamic `remaining_accounts`.
-terminal_tx_measurement measure_terminal_epoch_in_transaction(const idl::instruction& instr,
-                                                              const fc::variant_object& fixture,
-                                                              size_t dynamic_accounts) {
-   const auto fee_payer = measurement_pubkey(1);
-   auto accounts = terminal_static_accounts(instr, fee_payer);
-   accounts.reserve(accounts.size() + dynamic_accounts);
-   for (size_t i = 0; i < dynamic_accounts; ++i) {
-      accounts.push_back(account_meta::writable(measurement_pubkey(static_cast<uint32_t>(1'000 + i)), false));
-   }
-
-   const auto program_id = solana_public_key::from_base58_string(fixture["program_id"].as_string());
-   const auto heap_bytes =
-      fixture["terminal_pre_instructions"].get_array().front()["bytes"].as_uint64();
-   std::vector<instruction> instructions = {
-      system::compute_budget::request_heap_frame(static_cast<uint32_t>(heap_bytes)),
-      instruction{program_id, std::move(accounts), epoch_in_data(instr, fixture["terminal_args"].get_object())},
-   };
-
-   auto tx = build_measured_legacy_transaction(instructions, fee_payer);
-   const auto packet = tx.serialize();
-   return terminal_tx_measurement{
-      .declared_idl_accounts = instr.accounts.size(),
-      .instruction_data_bytes = instructions.back().data.size(),
-      .required_signatures = tx.msg.header.num_required_signatures,
-      .legacy_account_keys = tx.msg.account_keys.size(),
-      .loaded_accounts = tx.msg.account_keys.size(),
-      .packet_bytes = packet.size(),
-   };
-}
-
-/// Measure a non-terminal data chunk with no ComputeBudget pre-instruction.
-terminal_tx_measurement measure_data_chunk_epoch_in_transaction(const idl::instruction& instr,
-                                                                const fc::variant_object& fixture) {
-   const auto fee_payer = measurement_pubkey(1);
-   auto accounts = terminal_static_accounts(instr, fee_payer);
-   const auto program_id = solana_public_key::from_base58_string(fixture["program_id"].as_string());
-   const auto& data_chunk = fixture["data_chunk"].get_object();
-
-   std::vector<instruction> instructions = {
-      instruction{program_id, std::move(accounts), epoch_in_data(instr, data_chunk["args"].get_object())},
-   };
-
-   auto tx = build_measured_legacy_transaction(instructions, fee_payer);
-   const auto packet = tx.serialize();
-   return terminal_tx_measurement{
-      .declared_idl_accounts = instr.accounts.size(),
-      .instruction_data_bytes = instructions.back().data.size(),
-      .required_signatures = tx.msg.header.num_required_signatures,
-      .legacy_account_keys = tx.msg.account_keys.size(),
-      .loaded_accounts = tx.msg.account_keys.size(),
-      .packet_bytes = packet.size(),
-   };
-}
-
-/// Assert that a measured transaction row exactly matches the JSON fixture.
-void check_measurement_matches_fixture(const terminal_tx_measurement& measured,
-                                       const fc::variant_object& expected) {
-   if (expected.contains("declared_idl_accounts")) {
-      BOOST_CHECK_EQUAL(measured.declared_idl_accounts, expected["declared_idl_accounts"].as_uint64());
-   }
-   if (expected.contains("instruction_data_bytes")) {
-      BOOST_CHECK_EQUAL(measured.instruction_data_bytes, expected["instruction_data_bytes"].as_uint64());
-   }
-   if (expected.contains("required_signatures")) {
-      BOOST_CHECK_EQUAL(measured.required_signatures, expected["required_signatures"].as_uint64());
-   }
-   BOOST_CHECK_EQUAL(measured.legacy_account_keys, expected["legacy_account_keys"].as_uint64());
-   BOOST_CHECK_EQUAL(measured.loaded_accounts, expected["loaded_accounts"].as_uint64());
-   BOOST_CHECK_EQUAL(measured.packet_bytes, expected["packet_bytes"].as_uint64());
-}
 
 } // anonymous namespace
 
@@ -628,8 +543,17 @@ BOOST_AUTO_TEST_CASE(opp_outpost_epoch_in_has_chunked_args) try {
    // Chunked signature: (epoch_index, chunk_index, total_chunks, total_bytes,
    // chunk_data). Solana's 1 232-byte tx MTU forces multi-call streaming for
    // production-scale envelopes; the program assembles per-(epoch, signer)
-   // staging PDAs and finalizes on a zero-data terminal call where
+   // staging PDAs and records delivery on a zero-data terminal call where
    // chunk_index == total_chunks.
+   //
+   // ORDER IS LOAD-BEARING: args are encoded positionally, so this list must
+   // match the program's #[instruction(...)] exactly.
+   //
+   // There is deliberately NO dispatch_limit here. The terminal call records
+   // delivery and runs the consensus predicate and nothing else, so it carries
+   // no effect accounts and no settlement window -- that is what stops a
+   // dispatch concern from wedging consensus. Settlement is
+   // `dispatch_attestations`, asserted below.
    BOOST_REQUIRE_EQUAL(epoch_in->args.size(), 5u);
    BOOST_CHECK_EQUAL(epoch_in->args[0].name, "epoch_index");
    BOOST_CHECK_EQUAL(epoch_in->args[1].name, "chunk_index");
@@ -637,71 +561,58 @@ BOOST_AUTO_TEST_CASE(opp_outpost_epoch_in_has_chunked_args) try {
    BOOST_CHECK_EQUAL(epoch_in->args[3].name, "total_bytes");
    BOOST_CHECK_EQUAL(epoch_in->args[4].name, "chunk_data");
 
+   // The settlement half of the split. Asserted HERE, beside epoch_in, because
+   // the two signatures are one contract: what epoch_in stopped carrying,
+   // dispatch_attestations must carry.
+   const idl::instruction* dispatch = nullptr;
+   for (auto& instr : prog.instructions) {
+      if (instr.name == "dispatch_attestations") { dispatch = &instr; break; }
+   }
+   BOOST_REQUIRE(dispatch != nullptr);
+   BOOST_REQUIRE_EQUAL(dispatch->args.size(), 2u);
+   BOOST_CHECK_EQUAL(dispatch->args[0].name, "epoch_index");
+   BOOST_CHECK_EQUAL(dispatch->args[1].name, "dispatch_limit");
+   // No inbound_envelopes: the crank settles effects, it does not append the
+   // inbound audit record -- that happens once, on the consensus-tipping call.
+   BOOST_CHECK_EQUAL(dispatch->accounts.size(), 11u);
+   BOOST_CHECK(dispatch->accounts[0].is_signer);
+   BOOST_CHECK_EQUAL(dispatch->accounts[4].name, "chunk_buffer");
+
    // Accounts: operator (signer), config, operator_registry, epoch_deliveries,
-   //           chunk_buffer, inbound_envelopes, outbound emit state, vault,
-   //           reserve_aggregate, system_program.
-   BOOST_CHECK_EQUAL(epoch_in->accounts.size(), 12u);
+   //           chunk_buffer, inbound_envelopes, system_program. No outbound-emit
+   //           accounts here -- epoch_in only stages/finalizes inbound chunks and
+   //           processes the enclosed attestations inline on consensus reach;
+   //           dispatch_attestations (asserted above) owns the outbound emit.
+   BOOST_CHECK_EQUAL(epoch_in->accounts.size(), 7u);
    BOOST_CHECK(epoch_in->accounts[0].is_signer);
    BOOST_CHECK_EQUAL(epoch_in->accounts[4].name, "chunk_buffer");
-   BOOST_CHECK_EQUAL(epoch_in->accounts[6].name, "outbound_message_buffer");
-   BOOST_CHECK_EQUAL(epoch_in->accounts[8].name, "latest_outbound_envelope");
-   BOOST_CHECK_EQUAL(epoch_in->accounts[10].name, "reserve_aggregate");
+   BOOST_CHECK_EQUAL(epoch_in->accounts[5].name, "inbound_envelopes");
+   BOOST_CHECK_EQUAL(epoch_in->accounts[6].name, "system_program");
 } FC_LOG_AND_RETHROW();
 
-BOOST_AUTO_TEST_CASE(sec94_terminal_budget_fixture_matches_contract_estimator) try {
+BOOST_AUTO_TEST_CASE(opp_outpost_dispatch_attestations_present) try {
+   // The relay's crank path requires the two-phase program: a deployment
+   // whose IDL lacks `dispatch_attestations` must fail at BOOT (the
+   // batch-operator constructor asserts has_idl), not at the first drain.
+   // This pins the fixture the boot assert is validated against.
    auto prog = load_idl_fixture(opp_outpost_idl_fixture);
-   auto fixture = load_json_fixture(sec94_terminal_budget_fixture).get_object();
 
-   const idl::instruction* epoch_in = nullptr;
+   const idl::instruction* dispatch = nullptr;
    for (auto& instr : prog.instructions) {
-      if (instr.name == "epoch_in") { epoch_in = &instr; break; }
+      if (instr.name == "dispatch_attestations") { dispatch = &instr; break; }
    }
-   BOOST_REQUIRE(epoch_in != nullptr);
+   BOOST_REQUIRE(dispatch != nullptr);
+   BOOST_REQUIRE_EQUAL(dispatch->args.size(), 2u);
+   BOOST_CHECK_EQUAL(dispatch->args[0].name, "epoch_index");
+   BOOST_CHECK_EQUAL(dispatch->args[1].name, "dispatch_limit");
 
-   BOOST_REQUIRE_EQUAL(fixture["legacy_packet_limit_bytes"].as_uint64(),
-                       limits::PACKET_DATA_SIZE);
-   BOOST_REQUIRE_EQUAL(fixture["legacy_packet_limit_bytes"].as_uint64(),
-                       sysio::msgch_svm_terminal_budget::SVM_TERMINAL_PACKET_LIMIT_BYTES);
-   BOOST_REQUIRE_EQUAL(fixture["runtime_account_limit"].as_uint64(),
-                       sysio::msgch_svm_terminal_budget::SVM_TERMINAL_RUNTIME_ACCOUNT_LIMIT);
-   BOOST_REQUIRE_EQUAL(fixture["legacy_account_key_limit"].as_uint64(),
-                       limits::LEGACY_ACCOUNT_KEY_LIMIT);
-   BOOST_REQUIRE_EQUAL(fixture["legacy_account_key_limit"].as_uint64(),
-                       sysio::msgch_svm_terminal_budget::SVM_TERMINAL_ACCOUNT_KEY_LIMIT);
-
-   const auto data_chunk_measured = measure_data_chunk_epoch_in_transaction(*epoch_in, fixture);
-   check_measurement_matches_fixture(data_chunk_measured, fixture["data_chunk"].get_object());
-   // Data chunks do not carry terminal remaining_accounts. The hard invariant
-   // is that the measured full data-chunk packet fits Solana's raw MTU; future
-   // static IDL/account-list drift must update this fixture and keep fitting.
-   BOOST_CHECK_LE(data_chunk_measured.packet_bytes,
-                  sysio::msgch_svm_terminal_budget::SVM_TERMINAL_PACKET_LIMIT_BYTES);
-
-   const auto static_measured = measure_terminal_epoch_in_transaction(*epoch_in, fixture, 0);
-   check_measurement_matches_fixture(static_measured, fixture["static"].get_object());
-   BOOST_CHECK_LE(static_measured.packet_bytes,
-                  sysio::msgch_svm_terminal_budget::SVM_TERMINAL_STATIC_PACKET_BYTES_WITH_MARGIN);
-   BOOST_CHECK_LE(static_measured.legacy_account_keys,
-                  sysio::msgch_svm_terminal_budget::SVM_TERMINAL_STATIC_ACCOUNT_KEYS);
-   BOOST_CHECK_LE(static_measured.loaded_accounts,
-                  sysio::msgch_svm_terminal_budget::SVM_TERMINAL_STATIC_LOADED_ACCOUNTS);
-   BOOST_CHECK_EQUAL(sysio::msgch_svm_terminal_budget::svm_hard_dynamic_account_budget(), 16u);
-
-   for (const auto& entry : fixture["cases"].get_array()) {
-      const auto& test_case = entry.get_object();
-      const auto dynamic_accounts = static_cast<size_t>(test_case["dynamic_remaining_accounts"].as_uint64());
-      const auto measured = measure_terminal_epoch_in_transaction(*epoch_in, fixture, dynamic_accounts);
-      check_measurement_matches_fixture(measured, test_case);
-      BOOST_CHECK(sysio::msgch_svm_terminal_budget::svm_terminal_budget_fits(dynamic_accounts));
-      BOOST_CHECK_LE(measured.packet_bytes,
-                     sysio::msgch_svm_terminal_budget::svm_estimated_terminal_packet_bytes(dynamic_accounts));
-      BOOST_CHECK_LE(measured.packet_bytes,
-                     sysio::msgch_svm_terminal_budget::SVM_TERMINAL_PACKET_BUDGET_BYTES);
-      BOOST_CHECK_LE(measured.loaded_accounts,
-                     sysio::msgch_svm_terminal_budget::SVM_TERMINAL_STATIC_LOADED_ACCOUNTS + dynamic_accounts);
-      BOOST_CHECK_LE(measured.legacy_account_keys,
-                     sysio::msgch_svm_terminal_budget::SVM_TERMINAL_STATIC_ACCOUNT_KEYS + dynamic_accounts);
-   }
+   // Accounts: caller (permissionless signer), then the same static outpost
+   // account list the relay overrides by name in send_dispatch_attestations.
+   BOOST_REQUIRE_EQUAL(dispatch->accounts.size(), 11u);
+   BOOST_CHECK_EQUAL(dispatch->accounts[0].name, "caller");
+   BOOST_CHECK(dispatch->accounts[0].is_signer);
+   BOOST_CHECK_EQUAL(dispatch->accounts[3].name, "epoch_deliveries");
+   BOOST_CHECK_EQUAL(dispatch->accounts[4].name, "chunk_buffer");
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(opp_outpost_cleanup_envelope_chunks_present) try {
@@ -725,6 +636,76 @@ BOOST_AUTO_TEST_CASE(opp_outpost_cleanup_envelope_chunks_present) try {
    BOOST_CHECK_EQUAL(cleanup->accounts[4].name, "uploader");
 } FC_LOG_AND_RETHROW();
 
+BOOST_AUTO_TEST_CASE(epoch_in_full_data_chunk_fits_packet_limit) try {
+   // A full data chunk must serialise under Solana's raw packet limit. Any
+   // change to the `epoch_in` account list or argument tuple moves the fixed
+   // overhead; adding `dispatch_limit` (+4 B) without lowering
+   // SOLANA_MAX_CHUNK_BYTES pushed this to 1234 B and wedged every epoch whose
+   // envelope needed a full chunk.
+   auto prog = load_idl_fixture(opp_outpost_idl_fixture);
+   const idl::instruction* epoch_in = nullptr;
+   for (auto& instr : prog.instructions) {
+      if (instr.name == "epoch_in") { epoch_in = &instr; break; }
+   }
+   BOOST_REQUIRE(epoch_in);
+
+   const auto fee_payer = measurement_pubkey(1);
+   std::vector<instruction> instructions = {
+      instruction{measurement_pubkey(3),
+                  terminal_static_accounts(*epoch_in, fee_payer),
+                  epoch_in_data_chunk_payload(*epoch_in, sysio::SOLANA_MAX_CHUNK_BYTES)},
+   };
+
+   const auto packet = build_measured_legacy_transaction(instructions, fee_payer).serialize();
+   BOOST_CHECK_LE(packet.size(), limits::PACKET_DATA_SIZE);
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(dispatch_attestations_full_manifest_fits_packet_limit) try {
+   // MAX_TERMINAL_DYNAMIC_ACCOUNTS is a BUDGET, and a budget nobody measures is
+   // a guess. It counts only the `remaining_accounts` extras -- not the
+   // instruction's ~11 IDL-declared accounts, not the fee payer, not the
+   // compute-budget pre-instruction the relay injects on this call. This test
+   // is what makes the number honest: a dispatch_attestations tx carrying a
+   // FULL manifest must still serialise inside Solana's packet limit.
+   //
+   // If this fails, lower MAX_TERMINAL_DYNAMIC_ACCOUNTS to the measured
+   // maximum -- do not raise the limit, which is not ours to move.
+   auto prog = load_idl_fixture(opp_outpost_idl_fixture);
+   const idl::instruction* dispatch = nullptr;
+   for (auto& instr : prog.instructions) {
+      if (instr.name == "dispatch_attestations") { dispatch = &instr; break; }
+   }
+   BOOST_REQUIRE(dispatch);
+
+   const auto fee_payer = measurement_pubkey(1);
+   auto accounts = terminal_static_accounts(*dispatch, fee_payer);
+
+   // A full extras manifest: distinct writable accounts, the worst case for
+   // packet size since each costs a fresh 32-byte key in the message.
+   for (size_t i = 0; i < sysio::MAX_TERMINAL_DYNAMIC_ACCOUNTS; ++i) {
+      accounts.push_back(
+         account_meta::writable(measurement_pubkey(static_cast<uint32_t>(900 + i)), false));
+   }
+
+   std::vector<uint8_t> data;
+   data.insert(data.end(), dispatch->discriminator.begin(), dispatch->discriminator.end());
+   write_u32_le(data, 1);                                                    // epoch_index
+   write_u32_le(data, static_cast<uint32_t>(sysio::MAX_TERMINAL_DYNAMIC_ACCOUNTS)); // dispatch_limit
+
+   // The relay injects a heap-frame request on this call; it occupies packet
+   // budget exactly like any other instruction, so the measurement includes it.
+   std::vector<instruction> instructions = {
+      system::compute_budget::request_heap_frame(256'000),
+      instruction{measurement_pubkey(3), accounts, data},
+   };
+
+   const auto packet = build_measured_legacy_transaction(instructions, fee_payer).serialize();
+   BOOST_TEST_MESSAGE("dispatch_attestations tx with "
+                      << sysio::MAX_TERMINAL_DYNAMIC_ACCOUNTS
+                      << " extras serialises to " << packet.size() << " bytes");
+   BOOST_CHECK_LE(packet.size(), limits::PACKET_DATA_SIZE);
+} FC_LOG_AND_RETHROW();
+
 BOOST_AUTO_TEST_CASE(envelope_chunk_count_math) try {
    // The relay derives `total_chunks` as `ceil(total / MAX_CHUNK_BYTES)`.
    // Verify the arithmetic at sentinel sizes: empty (rejected by the relay
@@ -746,17 +727,17 @@ BOOST_AUTO_TEST_CASE(envelope_chunk_count_math) try {
    BOOST_CHECK_EQUAL(epoch_in_calls_for(sysio::SOLANA_MAX_CHUNK_BYTES + 1), 3u);
    BOOST_CHECK_EQUAL(chunks_for(2 * sysio::SOLANA_MAX_CHUNK_BYTES), 2u);
    // dev-026 captured 2,526-byte envelope (groups-of-7 batch op delivery).
-   BOOST_CHECK_EQUAL(chunks_for(2526), 4u);   // 2526/672 = 3.75 -> 4
-   // 64 KiB cap: ceil(65 536 / 672) = 98 chunks. Last chunk is 352 B
-   // (65_536 mod 672 = 352), the first 97 are full at MAX_CHUNK_BYTES.
-   BOOST_CHECK_EQUAL(chunks_for(sysio::SOLANA_MAX_ENVELOPE_BYTES), 98u);
-   BOOST_CHECK_EQUAL(epoch_in_calls_for(sysio::SOLANA_MAX_ENVELOPE_BYTES), 99u);
-   BOOST_CHECK_EQUAL(sysio::SOLANA_MAX_ENVELOPE_BYTES % sysio::SOLANA_MAX_CHUNK_BYTES, 352u);
+   BOOST_CHECK_EQUAL(chunks_for(2526), 4u);   // 2526/668 = 3.78 -> 4
+   // 64 KiB cap: ceil(65 536 / 668) = 99 chunks. Last chunk is 72 B
+   // (65_536 mod 668 = 72), the first 98 are full at MAX_CHUNK_BYTES.
+   BOOST_CHECK_EQUAL(chunks_for(sysio::SOLANA_MAX_ENVELOPE_BYTES), 99u);
+   BOOST_CHECK_EQUAL(epoch_in_calls_for(sysio::SOLANA_MAX_ENVELOPE_BYTES), 100u);
+   BOOST_CHECK_EQUAL(sysio::SOLANA_MAX_ENVELOPE_BYTES % sysio::SOLANA_MAX_CHUNK_BYTES, 72u);
 
    // Last-chunk size at the dev-026 reproduction: the loop fills the first
-   // 3 chunks at MAX_CHUNK_BYTES (= 672) and the last with the remainder.
+   // 3 chunks at MAX_CHUNK_BYTES (= 668) and the last with the remainder.
    const size_t last_chunk_size = 2526 - 3 * sysio::SOLANA_MAX_CHUNK_BYTES;
-   BOOST_CHECK_EQUAL(last_chunk_size, 510u);   // 2526 - 2016 = 510
+   BOOST_CHECK_EQUAL(last_chunk_size, 522u);   // 2526 - 2004 = 522
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(opp_outpost_emit_has_wire_epoch_arg) try {
@@ -810,12 +791,12 @@ BOOST_AUTO_TEST_CASE(borsh_encode_bytes_roundtrip) try {
    BOOST_CHECK(decoded == test_data);
 } FC_LOG_AND_RETHROW();
 
-// ── extract_inbound_recipient_pubkeys: envelope-decode + remit/revert
-//    pubkey extraction. Verifies the cranker enhancement that walks an
-//    inbound envelope's attestations and surfaces the operator /
-//    depositor SOL pubkeys that `epoch_in` must declare in its
-//    `remaining_accounts` so the on-chain WITHDRAW_REMIT /
-//    DEPOSIT_REVERT handlers can do their CPI transfers immediately.
+// ── extract_inbound_effects: the single authoritative envelope decode.
+//    Walks an inbound envelope's attestations in dispatch order and
+//    surfaces one `inbound_effect` per account-needing attestation --
+//    the manifests `drain_dispatch` builds `dispatch_attestations`
+//    batches from. These tests pin the per-shape decode, the flat
+//    dispatch-order indexing, and the malformed-input drops.
 
 namespace {
 
@@ -968,50 +949,117 @@ std::array<uint8_t, 32> filled_pubkey(uint8_t byte) {
 
 } // anonymous namespace
 
-BOOST_AUTO_TEST_CASE(extract_pubkeys_empty_envelope_returns_empty) try {
+BOOST_AUTO_TEST_CASE(extract_effects_empty_envelope_returns_empty) try {
    std::vector<char> envelope = envelope_with_entries({});
-   auto pks = sysio::outpost_solana_client_detail::extract_inbound_recipient_pubkeys(envelope);
-   BOOST_CHECK(pks.empty());
+   auto effects = sysio::outpost_solana_client_detail::extract_inbound_effects(envelope);
+   BOOST_CHECK(effects.empty());
 } FC_LOG_AND_RETHROW();
 
-BOOST_AUTO_TEST_CASE(extract_pubkeys_single_withdraw_remit) try {
+BOOST_AUTO_TEST_CASE(extract_effects_single_withdraw_remit) try {
+   namespace detail = sysio::outpost_solana_client_detail;
    auto op_pk = filled_pubkey(0xAA);
    auto envelope = envelope_with_entries({remit_entry(make_sol_addr(op_pk))});
 
-   auto pks = sysio::outpost_solana_client_detail::extract_inbound_recipient_pubkeys(envelope);
-   BOOST_REQUIRE_EQUAL(pks.size(), 1u);
-   BOOST_CHECK(pks[0].serialize() == op_pk);
+   const auto effects = detail::extract_inbound_effects(envelope);
+   BOOST_REQUIRE_EQUAL(effects.size(), 1u);
+   BOOST_CHECK_EQUAL(effects[0].attestation_index, 0u);
+   BOOST_CHECK(effects[0].shape == detail::effect_shape::native_payee);
+   BOOST_REQUIRE(effects[0].recipient.has_value());
+   BOOST_CHECK(effects[0].recipient->serialize() == op_pk);
+   BOOST_CHECK(!effects[0].reserve.has_value());
 } FC_LOG_AND_RETHROW();
 
-BOOST_AUTO_TEST_CASE(extract_pubkeys_deposit_revert) try {
+BOOST_AUTO_TEST_CASE(extract_effects_deposit_revert) try {
+   namespace detail = sysio::outpost_solana_client_detail;
    auto depositor_pk = filled_pubkey(0xBB);
    auto envelope = envelope_with_entries({revert_entry(make_sol_addr(depositor_pk))});
 
-   auto pks = sysio::outpost_solana_client_detail::extract_inbound_recipient_pubkeys(envelope);
-   BOOST_REQUIRE_EQUAL(pks.size(), 1u);
-   BOOST_CHECK(pks[0].serialize() == depositor_pk);
+   const auto effects = detail::extract_inbound_effects(envelope);
+   BOOST_REQUIRE_EQUAL(effects.size(), 1u);
+   BOOST_CHECK(effects[0].shape == detail::effect_shape::native_payee);
+   BOOST_REQUIRE(effects[0].recipient.has_value());
+   BOOST_CHECK(effects[0].recipient->serialize() == depositor_pk);
 } FC_LOG_AND_RETHROW();
 
-BOOST_AUTO_TEST_CASE(extract_pubkeys_dedupes_repeated_recipient) try {
+/// The effect index MUST equal the attestation's flat position in dispatch
+/// order, counting attestations that need no effect accounts.
+///
+/// This is what makes resumable dispatch safe: the program settles
+/// `[dispatched_count, dispatched_count + dispatch_limit)` over that same
+/// sequence, so the relay sizes each terminal call's `dispatch_limit` to the
+/// attestations whose accounts it is carrying. If an index drifted, a batch
+/// would claim attestations whose accounts are absent -- and a handler with a
+/// missing account log-and-skips (a SUCCESSFUL no-op) while the cursor
+/// advances past it, silently dropping a remit or a slash with no retry path.
+BOOST_AUTO_TEST_CASE(extract_effects_indices_track_dispatch_order) try {
+   namespace detail = sysio::outpost_solana_client_detail;
+   auto remit_op = filled_pubkey(0x11);
+   auto revert_op = filled_pubkey(0x22);
+
+   // SLASH sits BETWEEN the two account-needing attestations and contributes
+   // no effect entry -- but it still occupies index 1 on chain, so the entries
+   // either side must report 0 and 2, not 0 and 1.
+   auto envelope = envelope_with_entries({
+      remit_entry(make_sol_addr(remit_op)),
+      slash_entry(make_sol_addr(filled_pubkey(0x33))),
+      revert_entry(make_sol_addr(revert_op)),
+   });
+
+   BOOST_CHECK_EQUAL(detail::count_inbound_attestations(envelope), 3u);
+
+   const auto effects = detail::extract_inbound_effects(envelope);
+   BOOST_REQUIRE_EQUAL(effects.size(), 2u);
+
+   BOOST_CHECK_EQUAL(effects[0].attestation_index, 0u);
+   BOOST_CHECK(effects[0].shape == detail::effect_shape::native_payee);
+   BOOST_REQUIRE(effects[0].recipient.has_value());
+   BOOST_CHECK(effects[0].recipient->serialize() == remit_op);
+
+   BOOST_CHECK_EQUAL(effects[1].attestation_index, 2u);
+   BOOST_CHECK(effects[1].shape == detail::effect_shape::native_payee);
+   BOOST_REQUIRE(effects[1].recipient.has_value());
+   BOOST_CHECK(effects[1].recipient->serialize() == revert_op);
+} FC_LOG_AND_RETHROW();
+
+/// An envelope the decoder cannot parse yields no effects AND a zero count,
+/// so the relay submits a terminal call claiming nothing rather than one
+/// claiming attestations whose accounts it never derived.
+BOOST_AUTO_TEST_CASE(extract_effects_on_undecodable_envelope_is_empty) try {
+   namespace detail = sysio::outpost_solana_client_detail;
+   const std::vector<char> garbage(32, '\xAB');
+   BOOST_CHECK_EQUAL(detail::count_inbound_attestations(garbage), 0u);
+   BOOST_CHECK(detail::extract_inbound_effects(garbage).empty());
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(extract_effects_repeated_recipient_yields_one_entry_per_attestation) try {
+   namespace detail = sysio::outpost_solana_client_detail;
    auto op_pk = filled_pubkey(0xCC);
    // Two WITHDRAW_REMITs to the same operator (e.g. ETH bond + SOL bond
    // both being returned in one envelope referencing the operator's SOL
-   // wallet twice) — only one account slot is needed in the tx.
+   // wallet twice). The walk is per-attestation with NO cross-attestation
+   // dedup -- the cursor counts both -- and the duplicate ACCOUNT merges
+   // later in `record_terminal_account` when a batch's manifests union
+   // (pinned by record_terminal_account_dedupes_and_merges_writable).
    auto envelope = envelope_with_entries({
       remit_entry(make_sol_addr(op_pk)),
       remit_entry(make_sol_addr(op_pk)),
    });
 
-   auto pks = sysio::outpost_solana_client_detail::extract_inbound_recipient_pubkeys(envelope);
-   BOOST_REQUIRE_EQUAL(pks.size(), 1u);
-   BOOST_CHECK(pks[0].serialize() == op_pk);
+   const auto effects = detail::extract_inbound_effects(envelope);
+   BOOST_REQUIRE_EQUAL(effects.size(), 2u);
+   BOOST_CHECK_EQUAL(effects[0].attestation_index, 0u);
+   BOOST_CHECK_EQUAL(effects[1].attestation_index, 1u);
+   BOOST_CHECK(effects[0].recipient->serialize() == op_pk);
+   BOOST_CHECK(effects[1].recipient->serialize() == op_pk);
 } FC_LOG_AND_RETHROW();
 
-BOOST_AUTO_TEST_CASE(extract_pubkeys_skips_slash) try {
+BOOST_AUTO_TEST_CASE(extract_effects_skips_slash) try {
+   namespace detail = sysio::outpost_solana_client_detail;
    // SLASH attestations target the Reserve PDA, which is already a
-   // declared account on `epoch_in`. They MUST NOT bloat the
-   // remaining_accounts list — every entry costs ~33 bytes against the
-   // 1 232-byte tx MTU.
+   // declared account on the dispatch instruction. They MUST NOT bloat
+   // the remaining_accounts list — every entry costs ~33 bytes against
+   // the 1 232-byte tx MTU — but they still occupy their dispatch-order
+   // index.
    auto slash_op = filled_pubkey(0xDD);
    auto remit_op = filled_pubkey(0xEE);
    auto envelope = envelope_with_entries({
@@ -1019,24 +1067,25 @@ BOOST_AUTO_TEST_CASE(extract_pubkeys_skips_slash) try {
       remit_entry(make_sol_addr(remit_op)),
    });
 
-   auto pks = sysio::outpost_solana_client_detail::extract_inbound_recipient_pubkeys(envelope);
-   BOOST_REQUIRE_EQUAL(pks.size(), 1u);
-   BOOST_CHECK(pks[0].serialize() == remit_op);
+   const auto effects = detail::extract_inbound_effects(envelope);
+   BOOST_REQUIRE_EQUAL(effects.size(), 1u);
+   BOOST_CHECK_EQUAL(effects[0].attestation_index, 1u);
+   BOOST_CHECK(effects[0].recipient->serialize() == remit_op);
 } FC_LOG_AND_RETHROW();
 
-BOOST_AUTO_TEST_CASE(extract_pubkeys_skips_non_solana_chain) try {
+BOOST_AUTO_TEST_CASE(extract_effects_skips_non_solana_chain) try {
    // A WITHDRAW_REMIT whose `op_address` carries kind=ETHEREUM is not
-   // for this outpost and must not contribute a SOL account.
+   // for this outpost and must not contribute a SOL effect entry.
    auto eth_bytes = filled_pubkey(0x01);
    auto envelope  = envelope_with_entries({
       remit_entry(make_eth_addr_32(eth_bytes)),
    });
 
-   auto pks = sysio::outpost_solana_client_detail::extract_inbound_recipient_pubkeys(envelope);
-   BOOST_CHECK(pks.empty());
+   auto effects = sysio::outpost_solana_client_detail::extract_inbound_effects(envelope);
+   BOOST_CHECK(effects.empty());
 } FC_LOG_AND_RETHROW();
 
-BOOST_AUTO_TEST_CASE(extract_pubkeys_skips_malformed_address_length) try {
+BOOST_AUTO_TEST_CASE(extract_effects_skips_malformed_address_length) try {
    // 20-byte address with kind=SOLANA — the bytes pass the chain check
    // but fail the length check; the decoder must drop the entry rather
    // than truncate or zero-extend.
@@ -1047,17 +1096,12 @@ BOOST_AUTO_TEST_CASE(extract_pubkeys_skips_malformed_address_length) try {
 
    auto envelope = envelope_with_entries({remit_entry(malformed)});
 
-   auto pks = sysio::outpost_solana_client_detail::extract_inbound_recipient_pubkeys(envelope);
-   BOOST_CHECK(pks.empty());
+   auto effects = sysio::outpost_solana_client_detail::extract_inbound_effects(envelope);
+   BOOST_CHECK(effects.empty());
 } FC_LOG_AND_RETHROW();
 
-BOOST_AUTO_TEST_CASE(extract_pubkeys_returns_empty_on_garbage_envelope) try {
-   std::vector<char> garbage = {char(0xFF), char(0xFF), char(0xFF), char(0xFF)};
-   auto pks = sysio::outpost_solana_client_detail::extract_inbound_recipient_pubkeys(garbage);
-   BOOST_CHECK(pks.empty());
-} FC_LOG_AND_RETHROW();
-
-BOOST_AUTO_TEST_CASE(extract_pubkeys_mixed_remit_and_revert_preserved_order) try {
+BOOST_AUTO_TEST_CASE(extract_effects_mixed_remit_and_revert_preserved_order) try {
+   namespace detail = sysio::outpost_solana_client_detail;
    auto op_a       = filled_pubkey(0x10);
    auto depositor  = filled_pubkey(0x20);
    auto op_b       = filled_pubkey(0x30);
@@ -1067,14 +1111,18 @@ BOOST_AUTO_TEST_CASE(extract_pubkeys_mixed_remit_and_revert_preserved_order) try
       remit_entry(make_sol_addr(op_b)),
    });
 
-   auto pks = sysio::outpost_solana_client_detail::extract_inbound_recipient_pubkeys(envelope);
-   BOOST_REQUIRE_EQUAL(pks.size(), 3u);
-   BOOST_CHECK(pks[0].serialize() == op_a);
-   BOOST_CHECK(pks[1].serialize() == depositor);
-   BOOST_CHECK(pks[2].serialize() == op_b);
+   const auto effects = detail::extract_inbound_effects(envelope);
+   BOOST_REQUIRE_EQUAL(effects.size(), 3u);
+   BOOST_CHECK(effects[0].recipient->serialize() == op_a);
+   BOOST_CHECK(effects[1].recipient->serialize() == depositor);
+   BOOST_CHECK(effects[2].recipient->serialize() == op_b);
+   BOOST_CHECK_EQUAL(effects[0].attestation_index, 0u);
+   BOOST_CHECK_EQUAL(effects[1].attestation_index, 1u);
+   BOOST_CHECK_EQUAL(effects[2].attestation_index, 2u);
 } FC_LOG_AND_RETHROW();
 
-BOOST_AUTO_TEST_CASE(extract_pubkeys_includes_native_swap_effect_wallets) try {
+BOOST_AUTO_TEST_CASE(extract_effects_swap_shapes_carry_wallets_and_reserve_seeds) try {
+   namespace detail = sysio::outpost_solana_client_detail;
    auto swap_recipient = filled_pubkey(0x41);
    auto swap_depositor = filled_pubkey(0x42);
    auto withdraw_op    = filled_pubkey(0x43);
@@ -1084,16 +1132,35 @@ BOOST_AUTO_TEST_CASE(extract_pubkeys_includes_native_swap_effect_wallets) try {
       remit_entry(make_sol_addr(withdraw_op)),
    });
 
-   auto pks = sysio::outpost_solana_client_detail::extract_inbound_recipient_pubkeys(envelope);
-   BOOST_REQUIRE_EQUAL(pks.size(), 3u);
-   BOOST_CHECK(pks[0].serialize() == swap_recipient);
-   BOOST_CHECK(pks[1].serialize() == swap_depositor);
-   BOOST_CHECK(pks[2].serialize() == withdraw_op);
+   const auto effects = detail::extract_inbound_effects(envelope);
+   BOOST_REQUIRE_EQUAL(effects.size(), 3u);
+
+   // SWAP_REMIT: recipient wallet + (token, reserve) seeds for the
+   // Reserve/vault PDA derivations and the recipient ATA.
+   BOOST_CHECK(effects[0].shape == detail::effect_shape::swap_remit);
+   BOOST_CHECK(effects[0].recipient->serialize() == swap_recipient);
+   BOOST_REQUIRE(effects[0].reserve.has_value());
+   BOOST_CHECK_EQUAL(effects[0].reserve->token_code, 10u);
+   BOOST_CHECK_EQUAL(effects[0].reserve->reserve_code, 20u);
+
+   // SWAP_REVERT: the wallet is the DEPOSITOR (the refund target).
+   BOOST_CHECK(effects[1].shape == detail::effect_shape::swap_revert);
+   BOOST_CHECK(effects[1].recipient->serialize() == swap_depositor);
+   BOOST_REQUIRE(effects[1].reserve.has_value());
+   BOOST_CHECK_EQUAL(effects[1].reserve->token_code, 11u);
+   BOOST_CHECK_EQUAL(effects[1].reserve->reserve_code, 21u);
+
+   BOOST_CHECK(effects[2].shape == detail::effect_shape::native_payee);
+   BOOST_CHECK(effects[2].recipient->serialize() == withdraw_op);
 } FC_LOG_AND_RETHROW();
 
-BOOST_AUTO_TEST_CASE(extract_reserve_seeds_includes_all_terminal_reserve_effects_and_dedupes) try {
+BOOST_AUTO_TEST_CASE(extract_effects_reserve_shapes_carry_seeds_per_attestation) try {
+   namespace detail = sysio::outpost_solana_client_detail;
    auto recipient = filled_pubkey(0x51);
    auto depositor = filled_pubkey(0x52);
+   // The repeated RESERVE_READY pair appears TWICE: the walk is
+   // per-attestation (the cursor counts both); the duplicate Reserve PDA
+   // merges later in `record_terminal_account`.
    auto envelope  = envelope_with_entries({
       swap_remit_entry(100, 200, make_sol_addr(recipient)),
       swap_revert_entry(101, 201, make_sol_addr(depositor)),
@@ -1102,19 +1169,24 @@ BOOST_AUTO_TEST_CASE(extract_reserve_seeds_includes_all_terminal_reserve_effects
       reserve_ready_entry(102, 202),
    });
 
-   auto seeds = sysio::outpost_solana_client_detail::extract_inbound_swap_remit_reserve_seeds(envelope);
-   BOOST_REQUIRE_EQUAL(seeds.size(), 4u);
-   BOOST_CHECK_EQUAL(seeds[0].token_code, 100u);
-   BOOST_CHECK_EQUAL(seeds[0].reserve_code, 200u);
-   BOOST_CHECK_EQUAL(seeds[1].token_code, 101u);
-   BOOST_CHECK_EQUAL(seeds[1].reserve_code, 201u);
-   BOOST_CHECK_EQUAL(seeds[2].token_code, 102u);
-   BOOST_CHECK_EQUAL(seeds[2].reserve_code, 202u);
-   BOOST_CHECK_EQUAL(seeds[3].token_code, 103u);
-   BOOST_CHECK_EQUAL(seeds[3].reserve_code, 203u);
+   const auto effects = detail::extract_inbound_effects(envelope);
+   BOOST_REQUIRE_EQUAL(effects.size(), 5u);
+   const std::array<std::pair<uint64_t, uint64_t>, 5> expected_seeds{{
+      {100u, 200u}, {101u, 201u}, {102u, 202u}, {103u, 203u}, {102u, 202u}}};
+   for (size_t i = 0; i < expected_seeds.size(); ++i) {
+      BOOST_REQUIRE(effects[i].reserve.has_value());
+      BOOST_CHECK_EQUAL(effects[i].reserve->token_code, expected_seeds[i].first);
+      BOOST_CHECK_EQUAL(effects[i].reserve->reserve_code, expected_seeds[i].second);
+   }
+   BOOST_CHECK(effects[2].shape == detail::effect_shape::reserve_ready);
+   BOOST_CHECK(!effects[2].recipient.has_value());
+   BOOST_CHECK(effects[3].shape == detail::effect_shape::reserve_create_cancelled);
+   BOOST_CHECK(!effects[3].recipient.has_value());
+   BOOST_CHECK(effects[4].shape == detail::effect_shape::reserve_ready);
 } FC_LOG_AND_RETHROW();
 
-BOOST_AUTO_TEST_CASE(extract_reserve_create_cancelled_seeds_only_reads_cancelled_effects) try {
+BOOST_AUTO_TEST_CASE(extract_effects_reserve_create_cancelled_shape_selects_cancelled_only) try {
+   namespace detail = sysio::outpost_solana_client_detail;
    auto recipient = filled_pubkey(0x53);
    auto depositor = filled_pubkey(0x54);
    auto envelope  = envelope_with_entries({
@@ -1125,12 +1197,17 @@ BOOST_AUTO_TEST_CASE(extract_reserve_create_cancelled_seeds_only_reads_cancelled
       reserve_create_cancelled_entry(113, 213),
    });
 
-   auto seeds = sysio::outpost_solana_client_detail::extract_inbound_reserve_create_cancelled_seeds(envelope);
-   BOOST_REQUIRE_EQUAL(seeds.size(), 2u);
-   BOOST_CHECK_EQUAL(seeds[0].token_code, 111u);
-   BOOST_CHECK_EQUAL(seeds[0].reserve_code, 211u);
-   BOOST_CHECK_EQUAL(seeds[1].token_code, 113u);
-   BOOST_CHECK_EQUAL(seeds[1].reserve_code, 213u);
+   const auto effects = detail::extract_inbound_effects(envelope);
+   BOOST_REQUIRE_EQUAL(effects.size(), 5u);
+   std::vector<std::pair<uint64_t, uint64_t>> cancelled;
+   for (const auto& effect : effects) {
+      if (effect.shape != detail::effect_shape::reserve_create_cancelled) continue;
+      BOOST_REQUIRE(effect.reserve.has_value());
+      cancelled.emplace_back(effect.reserve->token_code, effect.reserve->reserve_code);
+   }
+   const std::vector<std::pair<uint64_t, uint64_t>> expected{
+      {111u, 211u}, {111u, 211u}, {113u, 213u}};
+   BOOST_CHECK(cancelled == expected);
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(record_terminal_account_dedupes_and_merges_writable) try {
@@ -1157,30 +1234,234 @@ BOOST_AUTO_TEST_CASE(record_terminal_account_dedupes_and_merges_writable) try {
    BOOST_CHECK(metas[1].is_writable);
 } FC_LOG_AND_RETHROW();
 
-BOOST_AUTO_TEST_CASE(extract_swap_remit_spl_targets_uses_recipient_pubkey) try {
-   auto recipient = filled_pubkey(0x61);
-   auto envelope  = envelope_with_entries({
-      swap_remit_entry(300, 400, make_sol_addr(recipient)),
-   });
+// ── drive_dispatch_rounds: the dispatch-crank state machine, driven through
+//    its RPC seams (progress read + dispatch send) with a scripted on-chain
+//    model. Both confirmed drain defects (the zero-attestation early return
+//    and the dispatch throw fused into delivery) lived in this previously
+//    untested region -- these tests pin the loop's packing, dispatch_limit
+//    sizing, cursor resume, and every exit.
 
-   auto targets = sysio::outpost_solana_client_detail::extract_inbound_swap_remit_spl_targets(envelope);
-   BOOST_REQUIRE_EQUAL(targets.size(), 1u);
-   BOOST_CHECK_EQUAL(targets[0].token_code, 300u);
-   BOOST_CHECK_EQUAL(targets[0].reserve_code, 400u);
-   BOOST_CHECK(targets[0].recipient.serialize() == recipient);
+namespace {
+
+namespace drive_detail = sysio::outpost_solana_client_detail;
+
+/// Scripted stand-in for the on-chain `EpochDeliveries` + dispatch send.
+/// `send` records each batch and, like the program, advances the cursor by
+/// `limit` (clamped to the total) unless `advance_on_send` is cleared to model
+/// a send whose effect this relay never observes (another caller's drain, a
+/// dropped tx).
+struct dispatch_drive_harness {
+   explicit dispatch_drive_harness(uint32_t total_attestations,
+                                   bool     consensus_reached = true,
+                                   uint32_t initial_cursor    = 0)
+      : total(total_attestations) {
+      chain.consensus_reached = consensus_reached;
+      chain.dispatched_count  = initial_cursor;
+   }
+
+   struct sent_batch {
+      uint32_t                  limit = 0;
+      std::vector<account_meta> accounts;
+   };
+
+   uint32_t                              total;
+   drive_detail::epoch_dispatch_progress chain;
+   bool                                  advance_on_send = true;
+   std::vector<sent_batch>               sends;
+
+   std::function<void()> no_deadline() {
+      return [] {};
+   }
+   std::function<drive_detail::epoch_dispatch_progress()> read() {
+      return [this] { return chain; };
+   }
+   std::function<std::string(uint32_t, std::vector<account_meta>)> send() {
+      return [this](uint32_t limit, std::vector<account_meta> accounts) {
+         sends.push_back(sent_batch{limit, std::move(accounts)});
+         if (advance_on_send) {
+            chain.dispatched_count = std::min(chain.dispatched_count + limit, total);
+         }
+         return "sig-" + std::to_string(sends.size() - 1);
+      };
+   }
+
+   std::string drive(const std::vector<std::vector<account_meta>>& per_attestation,
+                     const std::function<void()>&                  deadline_probe) {
+      return drive_detail::drive_dispatch_rounds(
+         7, per_attestation, deadline_probe, read(), send(), "test-relay");
+   }
+   std::string drive(const std::vector<std::vector<account_meta>>& per_attestation) {
+      return drive(per_attestation, no_deadline());
+   }
+};
+
+/// `count` manifests of `accounts_each` DISTINCT account metas apiece --
+/// distinct across the whole fixture, so every attestation widens the batch
+/// union by exactly `accounts_each`.
+std::vector<std::vector<account_meta>> distinct_manifests(uint32_t count,
+                                                          uint32_t accounts_each) {
+   std::vector<std::vector<account_meta>> manifests(count);
+   uint32_t seed = 1;
+   for (auto& manifest : manifests) {
+      for (uint32_t i = 0; i < accounts_each; ++i) {
+         manifest.emplace_back(measurement_pubkey(seed++), false, true);
+      }
+   }
+   return manifests;
+}
+
+} // namespace
+
+BOOST_AUTO_TEST_CASE(drive_dispatch_zero_attestation_envelope_sends_one_close_crank) try {
+   // A zero-attestation envelope still has to CLOSE its epoch: the program's
+   // completion block runs on a crank whose window clamps to the empty
+   // envelope, and `dispatch_attestations` is the only place
+   // `next_epoch_index` advances. The old loop's `0 >= 0` early return meant
+   // NO relay ever cranked, stranding the epoch with consensus tipped.
+   dispatch_drive_harness harness(0);
+   harness.advance_on_send = false;  // the program closes the epoch; the cursor stays 0
+   const auto sig = harness.drive({});
+   BOOST_REQUIRE_EQUAL(harness.sends.size(), 1u);
+   BOOST_CHECK_EQUAL(harness.sends[0].limit, 1u);
+   BOOST_CHECK(harness.sends[0].accounts.empty());
+   BOOST_CHECK_EQUAL(sig, "sig-0");
 } FC_LOG_AND_RETHROW();
 
-BOOST_AUTO_TEST_CASE(extract_swap_revert_spl_targets_uses_depositor_pubkey) try {
-   auto depositor = filled_pubkey(0x62);
-   auto envelope  = envelope_with_entries({
-      swap_revert_entry(301, 401, make_sol_addr(depositor)),
-   });
+BOOST_AUTO_TEST_CASE(drive_dispatch_zero_attestation_waits_for_consensus) try {
+   dispatch_drive_harness harness(0, /*consensus_reached=*/false);
+   const auto sig = harness.drive({});
+   BOOST_CHECK(harness.sends.empty());
+   BOOST_CHECK_EQUAL(sig, "");
+} FC_LOG_AND_RETHROW();
 
-   auto targets = sysio::outpost_solana_client_detail::extract_inbound_swap_revert_spl_targets(envelope);
-   BOOST_REQUIRE_EQUAL(targets.size(), 1u);
-   BOOST_CHECK_EQUAL(targets[0].token_code, 301u);
-   BOOST_CHECK_EQUAL(targets[0].reserve_code, 401u);
-   BOOST_CHECK(targets[0].recipient.serialize() == depositor);
+BOOST_AUTO_TEST_CASE(drive_dispatch_consensus_not_reached_sends_nothing) try {
+   dispatch_drive_harness harness(3, /*consensus_reached=*/false);
+   const auto sig = harness.drive(distinct_manifests(3, 2));
+   BOOST_CHECK(harness.sends.empty());
+   BOOST_CHECK_EQUAL(sig, "");
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(drive_dispatch_already_drained_cursor_sends_nothing) try {
+   dispatch_drive_harness harness(3, true, /*initial_cursor=*/3);
+   const auto sig = harness.drive(distinct_manifests(3, 2));
+   BOOST_CHECK(harness.sends.empty());
+   BOOST_CHECK_EQUAL(sig, "");
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(drive_dispatch_single_round_settles_small_manifests) try {
+   // 3 attestations x 2 distinct accounts = a 6-account union, well inside
+   // the 16-account budget -- one send covers the whole envelope.
+   dispatch_drive_harness harness(3);
+   const auto sig = harness.drive(distinct_manifests(3, 2));
+   BOOST_REQUIRE_EQUAL(harness.sends.size(), 1u);
+   BOOST_CHECK_EQUAL(harness.sends[0].limit, 3u);
+   BOOST_CHECK_EQUAL(harness.sends[0].accounts.size(), 6u);
+   BOOST_CHECK_EQUAL(sig, "sig-0");
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(drive_dispatch_packs_union_to_exact_account_budget) try {
+   // 8 distinct accounts per attestation: two fill the 16-account budget
+   // EXACTLY (16 is allowed; the pack breaks only past it), a third would
+   // make 24 -- so 4 attestations settle as two 2-wide rounds.
+   dispatch_drive_harness harness(4);
+   harness.drive(distinct_manifests(4, 8));
+   BOOST_REQUIRE_EQUAL(harness.sends.size(), 2u);
+   BOOST_CHECK_EQUAL(harness.sends[0].limit, 2u);
+   BOOST_CHECK_EQUAL(harness.sends[0].accounts.size(), sysio::MAX_TERMINAL_DYNAMIC_ACCOUNTS);
+   BOOST_CHECK_EQUAL(harness.sends[1].limit, 2u);
+   BOOST_CHECK_EQUAL(harness.sends[1].accounts.size(), sysio::MAX_TERMINAL_DYNAMIC_ACCOUNTS);
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(drive_dispatch_shared_accounts_pack_as_a_union) try {
+   // Every attestation references the SAME 10 accounts: the batch union stays
+   // at 10, so all 3 fit one round even though 3 x 10 raw metas would not.
+   dispatch_drive_harness harness(3);
+   std::vector<account_meta> shared;
+   for (uint32_t i = 0; i < 10; ++i) {
+      shared.emplace_back(measurement_pubkey(1000 + i), false, true);
+   }
+   harness.drive({shared, shared, shared});
+   BOOST_REQUIRE_EQUAL(harness.sends.size(), 1u);
+   BOOST_CHECK_EQUAL(harness.sends[0].limit, 3u);
+   BOOST_CHECK_EQUAL(harness.sends[0].accounts.size(), 10u);
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(drive_dispatch_resumes_from_nonzero_cursor) try {
+   // Cursor already at 2 of 5 (a prior partial drain): the batch starts AT
+   // the cursor and carries only the unsettled manifests' accounts.
+   const auto manifests = distinct_manifests(5, 2);
+   dispatch_drive_harness harness(5, true, /*initial_cursor=*/2);
+   harness.drive(manifests);
+   BOOST_REQUIRE_EQUAL(harness.sends.size(), 1u);
+   BOOST_CHECK_EQUAL(harness.sends[0].limit, 3u);
+   BOOST_CHECK_EQUAL(harness.sends[0].accounts.size(), 6u);
+   const auto& sent = harness.sends[0].accounts;
+   auto sent_has = [&](const solana_public_key& key) {
+      return std::any_of(sent.begin(), sent.end(),
+                         [&](const account_meta& meta) { return meta.key == key; });
+   };
+   BOOST_CHECK(!sent_has(manifests[0][0].key));   // settled before the cursor
+   BOOST_CHECK(!sent_has(manifests[1][0].key));
+   BOOST_CHECK(sent_has(manifests[2][0].key));    // the resumed window
+   BOOST_CHECK(sent_has(manifests[4][1].key));
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(drive_dispatch_oversized_single_manifest_still_takes_one) try {
+   // One attestation whose own manifest exceeds the budget: the pack must
+   // still take it (alone) so it can make progress -- an unsendable manifest
+   // fails loudly at serialize, not by wedging the cursor.
+   constexpr uint32_t oversized = sysio::MAX_TERMINAL_DYNAMIC_ACCOUNTS + 4;
+   dispatch_drive_harness harness(1);
+   harness.drive(distinct_manifests(1, oversized));
+   BOOST_REQUIRE_EQUAL(harness.sends.size(), 1u);
+   BOOST_CHECK_EQUAL(harness.sends[0].limit, 1u);
+   BOOST_CHECK_EQUAL(harness.sends[0].accounts.size(), oversized);
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(drive_dispatch_exits_when_cursor_does_not_advance) try {
+   // The send lands but the observed cursor does not move: another caller is
+   // draining this envelope (or the read raced the write). One send, then a
+   // clean exit -- never a spin.
+   dispatch_drive_harness harness(2);
+   harness.advance_on_send = false;
+   const auto sig = harness.drive(distinct_manifests(2, 2));
+   BOOST_REQUIRE_EQUAL(harness.sends.size(), 1u);
+   BOOST_CHECK_EQUAL(sig, "sig-0");
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(drive_dispatch_round_exhaustion_alarms_and_returns) try {
+   // 9-account manifests force one attestation per round; two more
+   // attestations than the round budget means the loop stops at the budget.
+   // Under tick-driven cranking exhaustion is an ALARM (elog), not a caller
+   // failure: the cursor persists on-chain and the next inbound tick resumes
+   // from it, so the call returns the last signature it sent instead of
+   // throwing away that bounded progress.
+   const uint32_t total = sysio::MAX_DISPATCH_ROUNDS + 2;
+   dispatch_drive_harness harness(total);
+   const auto sig = harness.drive(distinct_manifests(total, 9));
+   BOOST_CHECK_EQUAL(harness.sends.size(), sysio::MAX_DISPATCH_ROUNDS);
+   BOOST_CHECK_EQUAL(sig, "sig-" + std::to_string(sysio::MAX_DISPATCH_ROUNDS - 1));
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(drive_dispatch_deadline_expiry_throws) try {
+   // The deadline probe fires once per round, before any read or send. Let
+   // round 0 through and expire on round 1: exactly one batch goes out and
+   // the expiry propagates to the caller.
+   dispatch_drive_harness harness(2);
+   uint32_t probes = 0;
+   BOOST_CHECK_EXCEPTION(
+      harness.drive(distinct_manifests(2, 9),
+                    [&] {
+                       if (probes++ > 0) {
+                          FC_THROW_EXCEPTION(fc::timeout_exception,
+                                             "deadline exceeded (test probe)");
+                       }
+                    }),
+      fc::timeout_exception,
+      [](const fc::timeout_exception& e) {
+         return e.to_detail_string().find("deadline exceeded") != std::string::npos;
+      });
+   BOOST_REQUIRE_EQUAL(harness.sends.size(), 1u);
 } FC_LOG_AND_RETHROW();
 
 // ── LatestOutboundEnvelope inbound-read path. The epoch=511 RCA was
