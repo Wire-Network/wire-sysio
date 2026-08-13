@@ -1,5 +1,6 @@
 #include <boost/test/unit_test.hpp>
 
+#include <sysio/producer_plugin/block_timing_util.hpp>
 #include <sysio/producer_plugin/producer_plugin.hpp>
 
 #include <sysio/chain/application.hpp>
@@ -9,7 +10,7 @@
 
 #include <fc/mock_time.hpp>
 #include <fc/scoped_exit.hpp>
-#include <fc/mockable_timer.hpp>
+#include <fc/system_timer.hpp>
 
 #include <atomic>
 #include <chrono>
@@ -115,6 +116,21 @@ public:
    /// what says which side of the _ro_timer cycle the node is on.
    bool in_write_window() const { return _chain_plug->chain().is_write_window(); }
 
+   /// Timestamp of the head block, the anchor for working out when the next one is owed.
+   chain::block_timestamp_type head_block_timestamp() const {
+      return chain::block_timestamp_type(_chain_plug->chain().head().block_time());
+   }
+
+   /// Where the virtual clock currently stands.
+   fc::time_point now() const { return _now; }
+
+   /// Move the virtual clock to an absolute point. Only valid going forwards.
+   void advance_to(const fc::time_point& t) {
+      BOOST_REQUIRE_GE(t.time_since_epoch().count(), _now.time_since_epoch().count());
+      _now = t;
+      fc::mock_time_traits::set_now(_now);
+   }
+
    /// Run fn on the node's main thread, where anything touching chain state has to run.
    template<typename F>
    void post_to_main_thread(F&& fn) {
@@ -161,7 +177,7 @@ constexpr uint32_t slots_to_step = 12;
 
 } // namespace
 
-BOOST_AUTO_TEST_SUITE(mockable_production_timer)
+BOOST_AUTO_TEST_SUITE(mockable_timers)
 
 /**
  * Block production is driven entirely by the produce timer, and nothing else covers the path from
@@ -284,6 +300,48 @@ BOOST_AUTO_TEST_CASE(read_window_opens_only_when_the_write_window_expires) {
    BOOST_REQUIRE_MESSAGE(wait_for([&]() { return node.in_write_window(); }),
                          "the read window did not close and hand the node back to production");
    BOOST_REQUIRE_MESSAGE(node.step_one_slot(), "production did not resume after the read window closed");
+}
+
+/**
+ * A block is not shipped at its own slot time, it is shipped at the cpu effort deadline
+ * calculate_producing_block_deadline works out, which falls earlier so the block has time to reach
+ * the next producer. block_timing_util's tests check that arithmetic in isolation and nothing checks
+ * that the plugin actually arms its timer on the result, which is the difference between a schedule
+ * that keeps ahead of the wall clock and one that drifts a little later every round.
+ *
+ * Owning the clock makes the distinction observable: hold just short of the deadline and no block is
+ * owed, cross it and the block appears, all while the block's own slot time is still in the future.
+ */
+BOOST_AUTO_TEST_CASE(a_block_ships_at_its_deadline_not_at_its_slot) {
+   // Fix the offset rather than relying on the default, since the deadline being strictly inside the
+   // slot is the whole point of the case. cpu_effort mirrors the plugin's own derivation.
+   constexpr uint32_t       produce_block_offset_ms = 450;
+   const fc::microseconds   cpu_effort{config::block_interval_us -
+                                       (produce_block_offset_ms * 1000 / config::producer_repetitions)};
+   running_node node{{"--produce-block-offset-ms", "450"}};
+
+   // The block the node owes next, and when it is due to ship it.
+   const auto next_block_time = chain::block_timestamp_type(node.head_block_timestamp().slot + 1);
+   const auto deadline        = block_timing_util::calculate_producing_block_deadline(cpu_effort, next_block_time);
+   BOOST_REQUIRE_MESSAGE(deadline < next_block_time.to_time_point(),
+                         "this case is only meaningful while the deadline precedes the slot it belongs to");
+   BOOST_REQUIRE_MESSAGE(deadline > node.now(),
+                         "the deadline for the next block has already passed, nothing to observe");
+
+   const uint32_t settled = node.blocks_produced();
+
+   // Just short of the deadline nothing is owed, even though real time has moved on.
+   node.advance_to(deadline - fc::milliseconds(2));
+   std::this_thread::sleep_for(real_time_patience);
+   BOOST_CHECK_MESSAGE(node.blocks_produced() == settled,
+                       "a block shipped before its deadline");
+
+   // Crossing the deadline ships it, while its own slot time is still ahead of the clock.
+   node.advance_to(deadline + fc::milliseconds(2));
+   BOOST_REQUIRE_MESSAGE(wait_for([&]() { return node.blocks_produced() > settled; }),
+                         "no block shipped once its deadline passed");
+   BOOST_CHECK_MESSAGE(node.now() < next_block_time.to_time_point(),
+                       "the block was only shipped after its slot time, so the deadline did nothing");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

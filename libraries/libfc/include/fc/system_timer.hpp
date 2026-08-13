@@ -18,11 +18,11 @@ namespace fc {
  *
  * Its epoch is fc::time_point's, which is the unix epoch, matching std::chrono::system_clock.
  */
-struct mockable_clock {
+struct system_clock {
    using duration                  = std::chrono::system_clock::duration;
    using rep                       = duration::rep;
    using period                    = duration::period;
-   using time_point                = std::chrono::time_point<mockable_clock, duration>;
+   using time_point                = std::chrono::time_point<system_clock, duration>;
    static constexpr bool is_steady = false;
 
    static time_point now() noexcept { return from_time_point( fc::time_point::now() ); }
@@ -49,20 +49,21 @@ struct mockable_clock {
  * Production and test therefore share one timer type: no build variant, no test only option and no
  * runtime polymorphism, only the same latch fc::time_point::now() already consults.
  */
-struct mockable_wait_traits {
+struct system_timer_wait_traits {
    /// Poll interval used only while mock time is engaged.
    static constexpr std::chrono::milliseconds mock_poll_interval{1};
 
-   static mockable_clock::duration to_wait_duration( const mockable_clock::duration& d ) {
-      return mock_time_traits::is_set() ? std::chrono::duration_cast<mockable_clock::duration>( mock_poll_interval ) : d;
+   static system_clock::duration to_wait_duration( const system_clock::duration& d ) {
+      return mock_time_traits::is_set() ? std::chrono::duration_cast<system_clock::duration>( mock_poll_interval ) : d;
    }
 
-   static mockable_clock::duration to_wait_duration( const mockable_clock::time_point& t ) {
-      return to_wait_duration( t - mockable_clock::now() );
+   static system_clock::duration to_wait_duration( const system_clock::time_point& t ) {
+      return to_wait_duration( t - system_clock::now() );
    }
 };
 
-/// Timer that runs on the real clock in production and on fc's mock clock under test.
-using mockable_timer = boost::asio::basic_waitable_timer<mockable_clock, mockable_wait_traits>;
+/// Drop-in for boost::asio::system_timer that runs on fc's clock: the wall clock in production and
+/// the virtual clock once a test has engaged fc's mock time latch.
+using system_timer = boost::asio::basic_waitable_timer<system_clock, system_timer_wait_traits>;
 
 } // namespace fc
