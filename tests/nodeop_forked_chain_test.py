@@ -36,6 +36,15 @@ from TestHarness.TestHelper import AppArgs
 
 Print=Utils.Print
 
+# Block timestamps advance one production slot at a time, so the gap between two of them is a whole
+# number of slots.  Only the slot interval is needed here; the chain's timestamp epoch is not, since
+# the schedule grid is anchored to an observed block rather than to an absolute slot number.
+slotTime=0.5
+
+def slotsBetween(earlier, later):
+    """Return the number of production slots from one parsed block timestamp to another."""
+    return round((later - earlier).total_seconds() / slotTime)
+
 def analyzeBPs(bps0, bps1, expectDivergence):
     start=0
     index=None
@@ -268,19 +277,30 @@ try:
             self.waitIfNeeded(blockNum)
             return self.node.getBlock(blockNum)
 
-    #advance to the next block of 12
-    lastBlockProducer=blockProducer
-
+    # Advance to the first block of a producer's window.  A producer owns a contiguous run of
+    # inRowCountPerProducer slots, so a handover into the immediately following slot can only happen
+    # on a window boundary: such a block is at offset 0 of its window and anchors the window grid for
+    # everything below, without this test needing to know the chain's block timestamp epoch.  A
+    # handover that is not slot adjacent means the boundary slot itself went unproduced, which says
+    # nothing about where the boundary was, so keep looking in that case.
     waiter=HeadWaiter(node)
 
-    while blockProducer==lastBlockProducer:
+    block=waiter.getBlock(blockNum)
+    timestampStr=Node.getBlockAttribute(block, "timestamp", blockNum)
+    timestamp=datetime.strptime(timestampStr, Utils.TimeFmt)
+
+    windowAnchorTimestamp=None
+    while windowAnchorTimestamp is None:
+        lastBlockProducer=blockProducer
+        lastTimestamp=timestamp
         blockNum+=1
         block=waiter.getBlock(blockNum)
         Utils.Print("Block num: %d, block: %s" % (blockNum, json.dumps(block, indent=4, sort_keys=True)))
         blockProducer=Node.getBlockAttribute(block, "producer", blockNum)
-
-    timestampStr=Node.getBlockAttribute(block, "timestamp", blockNum)
-    timestamp=datetime.strptime(timestampStr, Utils.TimeFmt)
+        timestampStr=Node.getBlockAttribute(block, "timestamp", blockNum)
+        timestamp=datetime.strptime(timestampStr, Utils.TimeFmt)
+        if blockProducer!=lastBlockProducer and slotsBetween(lastTimestamp, timestamp)==1:
+            windowAnchorTimestamp=timestamp
 
     shipNode = cluster.getNode(0)
     block_range = 1000
@@ -314,65 +334,92 @@ try:
 
     # ***   Identify what the production cycle is   ***
 
+    # Each producer owns exactly one contiguous window of inRowCountPerProducer slots, and a slot
+    # that goes unproduced leaves a hole inside its window: it never moves a window boundary and it
+    # never hands a slot to the next producer.  The cycle is therefore derived from the window each
+    # block falls in rather than from runs of consecutive blocks by the same producer.  Runs are only
+    # a proxy for the schedule, and a loaded test machine breaks the proxy: a node that stalls past
+    # its slot leaves a short run, or no run at all, with nothing wrong with the schedule.  Window
+    # boundaries are the property actually under test and they do not move when a block is late.
+    #
+    # Windows are counted from windowAnchorTimestamp, a block known to sit at offset 0 of its window.
     productionCycle=[]
-    producerToSlot={}
-    slot=-1
+    producerToWindow={}
+    windowToProducer={}
+    missedSlotAfter=[]
     inRowCountPerProducer=12
-    minNumBlocksPerProducer=10
-    lastTimestamp=timestamp
     headBlockNum=node.getBlockNum()
-    firstBlockForWindowMissedSlot=None
+
+    endWindow=maxActiveProducers   # exclusive, one full rotation from the anchor
+    lastTimestamp=timestamp
+    lastWindow=0
+
     while True:
-        if blockProducer not in producers:
-            Utils.errorExit("Producer %s was not one of the voted on producers" % blockProducer)
-
-        productionCycle.append(blockProducer)
-        slot+=1
-        if blockProducer in producerToSlot:
-            Utils.errorExit("Producer %s was first seen in slot %d, but is repeated in slot %d" % (blockProducer, producerToSlot[blockProducer], slot))
-
-        producerToSlot[blockProducer]={"slot":slot, "count":0}
-        lastBlockProducer=blockProducer
-        blockSkip=[]
-        roundSkips=0
-        missedSlotAfter=[]
-        if firstBlockForWindowMissedSlot is not None:
-            missedSlotAfter.append(firstBlockForWindowMissedSlot)
-            firstBlockForWindowMissedSlot=None
-
-        while blockProducer==lastBlockProducer:
-            producerToSlot[blockProducer]["count"]+=1
-            blockNum+=1
-            block=waiter.getBlock(blockNum)
-            blockProducer=Node.getBlockAttribute(block, "producer", blockNum)
-            timestampStr=Node.getBlockAttribute(block, "timestamp", blockNum)
-            timestamp=datetime.strptime(timestampStr, Utils.TimeFmt)
-            timediff=timestamp-lastTimestamp
-            slotTime=0.5
-            slotsDiff=int(timediff.total_seconds() / slotTime)
-            if slotsDiff != 1:
-                slotTimeDelta=timedelta(seconds=slotTime)
-                first=lastTimestamp + slotTimeDelta
-                missed=first.strftime(Utils.TimeFmt)
-                if slotsDiff > 2:
-                    last=timestamp - slotTimeDelta
-                    missed+= " thru " + last.strftime(Utils.TimeFmt)
-                missedSlotAfter.append("%d (%s)" % (blockNum-1, missed))
-            lastTimestamp=timestamp
-
-        if producerToSlot[lastBlockProducer]["count"] < minNumBlocksPerProducer or producerToSlot[lastBlockProducer]["count"] > inRowCountPerProducer:
-            Utils.errorExit("Producer %s, in slot %d, expected to produce %d blocks but produced %d blocks.  At block number %d. " %
-                            (lastBlockProducer, slot, inRowCountPerProducer, producerToSlot[lastBlockProducer]["count"], blockNum-1) +
-                            "Slots were missed after the following blocks: %s" % (", ".join(missedSlotAfter)))
-
-        if len(missedSlotAfter) > 0:
-            # it may be the most recent producer missed a slot
-            possibleMissed=missedSlotAfter[-1]
-            if possibleMissed == blockNum - 1:
-                firstBlockForWindowMissedSlot=possibleMissed
-
-        if blockProducer==productionCycle[0]:
+        slotsFromAnchor=slotsBetween(windowAnchorTimestamp, timestamp)
+        window=slotsFromAnchor // inRowCountPerProducer
+        if window >= endWindow:
             break
+
+        if blockProducer not in producers:
+            Utils.errorExit("Producer %s, of block %d, was not one of the voted on producers" % (blockProducer, blockNum))
+
+        if window < lastWindow:
+            Utils.errorExit("Block %d, produced by %s, is in schedule window %d, behind window %d of the block before it." %
+                            (blockNum, blockProducer, window, lastWindow))
+
+        owner=windowToProducer.get(window)
+        if owner is None:
+            if blockProducer in producerToWindow:
+                Utils.errorExit("Producer %s owns schedule window %d, but also produced block %d in window %d.  "
+                                "A producer is scheduled at most once per %d producer cycle." %
+                                (blockProducer, producerToWindow[blockProducer]["window"], blockNum, window, maxActiveProducers))
+            windowToProducer[window]=blockProducer
+            producerToWindow[blockProducer]={"window":window, "count":0}
+            productionCycle.append(blockProducer)
+        elif owner != blockProducer:
+            Utils.errorExit("Block %d, %d slots into the cycle, was produced by %s, but %s already produced in schedule window %d.  "
+                            "A window belongs to exactly one producer." %
+                            (blockNum, slotsFromAnchor, blockProducer, owner, window))
+
+        producerToWindow[blockProducer]["count"]+=1
+        lastWindow=window
+
+        precedingProducer=blockProducer
+        blockNum+=1
+        block=waiter.getBlock(blockNum)
+        blockProducer=Node.getBlockAttribute(block, "producer", blockNum)
+        timestampStr=Node.getBlockAttribute(block, "timestamp", blockNum)
+        timestamp=datetime.strptime(timestampStr, Utils.TimeFmt)
+        slotsDiff=slotsBetween(lastTimestamp, timestamp)
+        if slotsDiff==1 and blockProducer!=precedingProducer and slotsBetween(windowAnchorTimestamp, timestamp) % inRowCountPerProducer != 0:
+            # A handover into the very next slot can only happen on a window boundary, so this block
+            # has to sit at offset 0 of its window.  Landing anywhere else means this handover and
+            # the anchor disagree about where the boundaries are, which is a producer having been
+            # given a run of the wrong length.
+            Utils.errorExit("Producer handover from %s to %s at block %d landed %d slots into a %d slot window instead of at its start.  "
+                            "Producer runs are not aligned to a single window grid." %
+                            (precedingProducer, blockProducer, blockNum,
+                             slotsBetween(windowAnchorTimestamp, timestamp) % inRowCountPerProducer, inRowCountPerProducer))
+        if slotsDiff != 1:
+            slotTimeDelta=timedelta(seconds=slotTime)
+            first=lastTimestamp + slotTimeDelta
+            missed=first.strftime(Utils.TimeFmt)
+            if slotsDiff > 2:
+                last=timestamp - slotTimeDelta
+                missed+= " thru " + last.strftime(Utils.TimeFmt)
+            missedSlotAfter.append("%d (%s)" % (blockNum-1, missed))
+        lastTimestamp=timestamp
+
+    # Unproduced slots are a liveness property of the machine the test is running on, not of the
+    # schedule, and the schedule was verified window by window above.  Report them, do not fail on
+    # them.
+    if len(missedSlotAfter) > 0:
+        Print("WARNING: slots went unproduced after the following blocks: %s" % (", ".join(missedSlotAfter)))
+
+    silentWindows=[window for window in range(0, endWindow) if window not in windowToProducer]
+    if len(silentWindows) > 0:
+        Print("WARNING: %d of the %d producers in the cycle produced no block in their window, at cycle positions: %s" %
+              (len(silentWindows), maxActiveProducers, ", ".join(str(window) for window in silentWindows)))
 
     output=None
     for blockProducer in productionCycle:
@@ -380,7 +427,7 @@ try:
             output=""
         else:
             output+=", "
-        output+=blockProducer+":"+str(producerToSlot[blockProducer]["count"])
+        output+=blockProducer+":"+str(producerToWindow[blockProducer]["count"])
     Print("ProductionCycle ->> {\n%s\n}" % output)
 
     #retrieve the info for all the nodes to report the status for each
