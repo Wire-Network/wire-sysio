@@ -351,7 +351,7 @@ try:
             slotTime=0.5
             slotsDiff=int(timediff.total_seconds() / slotTime)
             if slotsDiff != 1:
-                slotTimeDelta=timedelta(slotTime)
+                slotTimeDelta=timedelta(seconds=slotTime)
                 first=lastTimestamp + slotTimeDelta
                 missed=first.strftime(Utils.TimeFmt)
                 if slotsDiff > 2:
