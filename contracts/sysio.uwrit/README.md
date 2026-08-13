@@ -65,6 +65,7 @@ chain deregistered) refund in full.
 | `uwconfig` | `uw_config` | Singleton: `fee_bps`, `collateral_lock_duration_ms`, `min_fromwire_amount`, `fromwire_revert_fee_bps`, `uwreq_pending_timeout_epochs`, `uwreq_retention_epochs` |
 | `uwreqs` | `uw_request_t` | One row per swap intent — race state in `commits_by`, `winner`, lifecycle status, mirrored `variance_tolerance_bps`. Retained for `uwreq_retention_epochs` after ANY terminal transition — `COMPLETED` (after `chklocks` sweeps the final collateral lock; the reserve settlement itself already happened at winner selection, which is what made the row CONFIRMED), `REJECTED` (immediate failure via `reject_and_refund`), or `EXPIRED` (pending timeout, same path) — then erased by `pruneuwreqs` |
 | `locks` | `lock_entry` | Flat per-leg lock vector consulted by `sysio.opreg::available()`. The `byexpire` secondary index lets `chklocks` sweep expired locks oldest-first, up to its per-epoch budget |
+| `locksums` | `lock_sum` | Materialized Σ `lock_entry.amount` per `(underwriter, chain_code, token_code)` bucket — the "locked" half of `sysio.opreg::available()`, read O(1) instead of scanning `locks`. Written only by `try_select_winner` (on a win) and `chklocks` (on release); a bucket's row is erased once its total reaches zero, so an absent row reads as zero |
 | `fwqueue` | `fromwire_q` | Escrowed swap-from-WIRE requests awaiting drain. `byepoch` secondary index |
 | `uwcounters` | `uw_counters` | Monotonic id allocators (uwreq ids, lock ids) |
 

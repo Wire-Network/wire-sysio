@@ -1034,6 +1034,69 @@ public:
          ("reason",  reason));
    }
 
+   /// The `locksums` rollup total for one (underwriter, chain, token) bucket.
+   /// `locksums` is keyed by a checksum256 over the triple, so this walks the
+   /// KV table and filters in memory — same shape as `get_reserve`. An absent
+   /// row IS zero: the rollup erases a bucket once it empties.
+   uint64_t get_lock_sum(name underwriter, std::string_view chain_code,
+                         std::string_view token_code) {
+      const auto target_chain = fc::slug_name{chain_code}.value;
+      const auto target_token = fc::slug_name{token_code}.value;
+      const auto& db       = control->db();
+      const auto  table_id = chain::compute_table_id("locksums"_n.to_uint64_t());
+      const auto& kv_idx   = db.get_index<chain::kv_index, chain::by_code_key>();
+      auto itr = kv_idx.lower_bound(boost::make_tuple(UWRIT_ACCOUNT, table_id, std::string_view{}));
+      for (; itr != kv_idx.end() && itr->code == UWRIT_ACCOUNT
+             && itr->table_id == table_id; ++itr) {
+         std::vector<char> raw(itr->value.size());
+         if (!raw.empty()) std::memcpy(raw.data(), itr->value.data(), raw.size());
+         try {
+            auto row = uwrit_abi.binary_to_variant("lock_sum", raw,
+               abi_serializer::create_yield_function(abi_serializer_max_time));
+            if (row["underwriter"].as_string()             == underwriter.to_string() &&
+                row["chain_code"]["value"].as_uint64()     == target_chain &&
+                row["token_code"]["value"].as_uint64()      == target_token) {
+               return row["amount"].as_uint64();
+            }
+         } catch (...) {
+            // Not a lock_sum row — skip.
+         }
+      }
+      return 0;
+   }
+
+   /// Recompute the same bucket total from the AUTHORITATIVE `locks` rows.
+   /// This is the oracle the materialized rollup is asserted against — it is
+   /// the derivation `sum_locks_inline` used to perform inline before the
+   /// rollup replaced it.
+   uint64_t scan_lock_total(name underwriter, std::string_view chain_code,
+                            std::string_view token_code) {
+      const auto target_chain = fc::slug_name{chain_code}.value;
+      const auto target_token = fc::slug_name{token_code}.value;
+      const auto& db       = control->db();
+      const auto  table_id = chain::compute_table_id("locks"_n.to_uint64_t());
+      const auto& kv_idx   = db.get_index<chain::kv_index, chain::by_code_key>();
+      uint64_t total = 0;
+      auto itr = kv_idx.lower_bound(boost::make_tuple(UWRIT_ACCOUNT, table_id, std::string_view{}));
+      for (; itr != kv_idx.end() && itr->code == UWRIT_ACCOUNT
+             && itr->table_id == table_id; ++itr) {
+         std::vector<char> raw(itr->value.size());
+         if (!raw.empty()) std::memcpy(raw.data(), itr->value.data(), raw.size());
+         try {
+            auto row = uwrit_abi.binary_to_variant("lock_entry", raw,
+               abi_serializer::create_yield_function(abi_serializer_max_time));
+            if (row["underwriter"].as_string()         == underwriter.to_string() &&
+                row["chain_code"]["value"].as_uint64() == target_chain &&
+                row["token_code"]["value"].as_uint64() == target_token) {
+               total += row["amount"].as_uint64();
+            }
+         } catch (...) {
+            // Not a lock_entry row — skip.
+         }
+      }
+      return total;
+   }
+
    /// Direct `sysio.uwrit::chklocks` call with an explicit budget
    /// (self-authorized). `advance` inlines it with MAX_LOCK_RELEASE_PER_EPOCH;
    /// the tests call it directly to exercise the budget itself without an
@@ -2581,6 +2644,14 @@ BOOST_FIXTURE_TEST_CASE(chklocks_budget_bounds_the_sweep_and_backlog_drains,
    BOOST_REQUIRE(!get_lock(1).is_null());
    BOOST_REQUIRE(!get_lock(2).is_null());
 
+   // Both legs are ETH/ETH, so they share one collateral bucket: the rollup
+   // carries their sum, and agrees with the authoritative scan of the lock
+   // rows it materializes.
+   BOOST_REQUIRE_EQUAL(uint64_t(SRC_AMOUNT) + quote,
+                       get_lock_sum(UWRIT_OP, "ETH", "ETH"));
+   BOOST_REQUIRE_EQUAL(scan_lock_total(UWRIT_OP, "ETH", "ETH"),
+                       get_lock_sum(UWRIT_OP, "ETH", "ETH"));
+
    // Let the lock window elapse WITHOUT an advance, so both locks are due and
    // nothing has swept them yet (advance would run the full budget inline).
    produce_blocks(260);   // > 120s at 0.5s/block
@@ -2598,6 +2669,12 @@ BOOST_FIXTURE_TEST_CASE(chklocks_budget_bounds_the_sweep_and_backlog_drains,
    BOOST_REQUIRE_EQUAL(success(), chklocks_direct(1));
    BOOST_REQUIRE(get_lock(1).is_null() != get_lock(2).is_null());
 
+   // The rollup decremented by exactly the released leg and still matches the
+   // surviving lock rows — a partial sweep leaves the two consistent.
+   BOOST_REQUIRE_EQUAL(scan_lock_total(UWRIT_OP, "ETH", "ETH"),
+                       get_lock_sum(UWRIT_OP, "ETH", "ETH"));
+   BOOST_REQUIRE_GT(get_lock_sum(UWRIT_OP, "ETH", "ETH"), 0u);
+
    // A block between the two sweeps: the second call carries identical action
    // data and the same signer, so without a fresh TAPOS reference block the
    // two pushes hash to the same transaction id and the second is rejected as
@@ -2609,6 +2686,11 @@ BOOST_FIXTURE_TEST_CASE(chklocks_budget_bounds_the_sweep_and_backlog_drains,
    BOOST_REQUIRE_EQUAL(success(), chklocks_direct(1));
    BOOST_REQUIRE(get_lock(1).is_null());
    BOOST_REQUIRE(get_lock(2).is_null());
+
+   // Bucket emptied: the rollup row is ERASED, so it reads as zero and the
+   // table is left holding only live buckets.
+   BOOST_REQUIRE_EQUAL(0u, get_lock_sum(UWRIT_OP, "ETH", "ETH"));
+   BOOST_REQUIRE_EQUAL(0u, scan_lock_total(UWRIT_OP, "ETH", "ETH"));
 
    // The releaselock fan-out still ran for both, benignly: UWRIT_OP is healthy
    // (neither SLASHED nor TERMINATED), so each release is a no-op on the

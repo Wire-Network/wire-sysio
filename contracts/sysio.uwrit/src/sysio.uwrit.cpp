@@ -173,29 +173,72 @@ uint64_t opreg_pending_withdraws(name underwriter,
    return total;
 }
 
-/// Sum this contract's active locks for the given
-/// `(underwriter, chain_code, token_code)`. Per v6 plan §B.2 (split-index
-/// design): `uwrit::locks_t` exposes only uint64 secondary indexes. The `byuw`
-/// index keys on `underwriter.value`; rows are filtered on `(chain_code,
-/// token_code)` in memory. Per-underwriter lock counts are O(1)-ish so the
-/// scan is cheap.
+/// This contract's active lock total for the given
+/// `(underwriter, chain_code, token_code)` — an O(1) read of the `locksums`
+/// rollup maintained by `add_locked_total` / `sub_locked_total`. An absent row
+/// means the bucket holds no live locks.
+///
+/// This used to walk every lock row the underwriter held, on the assumption
+/// that per-underwriter lock counts stay small. They do not: locks are held
+/// for the whole wall-clock challenge window and are never released by
+/// delivery, so the count is (settlement rate × lock duration). See the
+/// `lock_sum` docs for why that mattered on this particular call path.
 uint64_t sum_locks_inline(name self,
                            name underwriter,
                            sysio::slug_name chain_code,
                            sysio::slug_name token_code) {
-   uwrit::locks_t locks(self);
-   auto idx = locks.template get_index<"byuw"_n>();
+   uwrit::locksums_t sums(self);
+   uwrit::lock_sum_key pk{underwriter, chain_code, token_code};
+   return sums.contains(pk) ? sums.get(pk).amount : 0;
+}
 
-   uint64_t total = 0;
-   auto it  = idx.lower_bound(underwriter.value);
-   auto end = idx.upper_bound(underwriter.value);
-   for (; it != end; ++it) {
-      if (it->chain_code != chain_code || it->token_code != token_code) continue;
-      // Saturating: amounts are uncapped uint64 (external-chain values); a
-      // wrapped subtotal would understate `reserved` and overstate availability.
-      total = opp::safe::add_sat_u64(total, it->amount);
+/// Add `amount` to the `(underwriter, chain_code, token_code)` bucket,
+/// creating the row when the bucket was empty. Called once per lock row
+/// written by `try_select_winner`.
+///
+/// Saturating, matching the scan it replaced: amounts are uncapped uint64
+/// external-chain values, and a wrapped total would UNDERSTATE what is
+/// reserved and so OVERSTATE availability — the one direction that lets an
+/// overcommit through. Saturation instead overstates `locked`, which fails
+/// closed (a swap is refused, never over-collateralized).
+void add_locked_total(name self, name underwriter, sysio::slug_name chain_code,
+                      sysio::slug_name token_code, uint64_t amount) {
+   uwrit::locksums_t sums(self);
+   uwrit::lock_sum_key pk{underwriter, chain_code, token_code};
+   if (sums.contains(pk)) {
+      sums.modify(ram_payer, pk, [&](auto& row) {
+         row.amount = opp::safe::add_sat_u64(row.amount, amount);
+      });
+      return;
    }
-   return total;
+   sums.emplace(ram_payer, pk, uwrit::lock_sum{
+      .underwriter = underwriter,
+      .chain_code  = chain_code,
+      .token_code  = token_code,
+      .amount      = amount,
+   });
+}
+
+/// Subtract `amount` from the bucket, erasing the row once it reaches zero so
+/// the table holds only live buckets.
+///
+/// Clamped at zero rather than wrapping. A wrap here would leave a colossal
+/// `locked` on the bucket and zero the underwriter's `available()` for the
+/// rest of the chain's life — and this runs inside `chklocks`, which is inline
+/// in `sysio.epoch::advance` and must never throw. Clamping keeps a
+/// hypothetical accounting slip local and self-healing instead.
+void sub_locked_total(name self, name underwriter, sysio::slug_name chain_code,
+                      sysio::slug_name token_code, uint64_t amount) {
+   uwrit::locksums_t sums(self);
+   uwrit::lock_sum_key pk{underwriter, chain_code, token_code};
+   if (!sums.contains(pk)) return;
+   const uint64_t current = sums.get(pk).amount;
+   const uint64_t next    = current > amount ? current - amount : 0;
+   if (next == 0) {
+      sums.erase(pk);
+      return;
+   }
+   sums.modify(ram_payer, pk, [&](auto& row) { row.amount = next; });
 }
 
 /// Look up an underwriter's balance on opreg for the given
@@ -1796,6 +1839,8 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate,
          .created_at_ms = now_ms_v,
          .expires_at_ms = expires_ms,
       });
+      add_locked_total(self, candidate, req.src_chain_code, req.src_token_code,
+                       req.src_amount);
    }
 
    if (dst_needed) {
@@ -1811,6 +1856,8 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate,
          .created_at_ms = now_ms_v,
          .expires_at_ms = expires_ms,
       });
+      add_locked_total(self, candidate, req.dst_chain_code, req.dst_token_code,
+                       req.dst_amount);
    }
 
    reqs.modify(same_payer, pk, [&](auto& r) {
@@ -2412,6 +2459,7 @@ void uwrit::chklocks(uint32_t max_rows) {
          std::make_tuple(l.underwriter, l.chain_code, l.token_code, l.amount)
       ).send();
       locks.erase(lock_key{l.lock_id});
+      sub_locked_total(get_self(), l.underwriter, l.chain_code, l.token_code, l.amount);
       if (std::find(affected.begin(), affected.end(), l.uwreq_id) == affected.end()) {
          affected.push_back(l.uwreq_id);
       }

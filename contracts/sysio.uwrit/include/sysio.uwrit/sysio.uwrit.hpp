@@ -550,6 +550,63 @@ namespace sysio {
             sysio::const_mem_fun<lock_entry, uint64_t, &lock_entry::by_expires_at_ms>>
       >;
 
+      /// Primary key of `locksums`: one (underwriter, chain_code, token_code)
+      /// collateral bucket. Packed and hashed EXACTLY like
+      /// `lock_entry::by_underwriter_ck()` — that helper is what says which
+      /// bucket a given lock row belongs to, so the two derivations must not
+      /// diverge.
+      struct lock_sum_key {
+         name             underwriter;
+         sysio::slug_name chain_code;
+         sysio::slug_name token_code;
+         checksum256 primary_key() const {
+            std::array<uint8_t, 24> buf{};
+            uint64_t uw_v = underwriter.value;
+            std::memcpy(buf.data() +  0, &uw_v,             8);
+            std::memcpy(buf.data() +  8, &chain_code.value, 8);
+            std::memcpy(buf.data() + 16, &token_code.value, 8);
+            return sysio::sha256(reinterpret_cast<const char*>(buf.data()), buf.size());
+         }
+         SYSLIB_SERIALIZE(lock_sum_key, (underwriter)(chain_code)(token_code))
+      };
+
+      /// Materialized Σ `lock_entry.amount` for one (underwriter, chain_code,
+      /// token_code) bucket — the "locked" half of `sysio.opreg::available()`.
+      ///
+      /// A CACHE of the `locks` table with exactly ONE writer: the only two
+      /// code paths that can change a bucket's total both live in this
+      /// contract — `try_select_winner` (one lock per required leg, on a win)
+      /// and `chklocks` (release at expiry, the sole erase path). A row is
+      /// erased when its total reaches zero, so an absent row reads as zero
+      /// and the table holds only live buckets.
+      ///
+      /// It exists because the derivation it replaces does not scale. Both
+      /// `sum_locks_inline` rollups (here and in sysio.opreg) previously
+      /// walked every lock row an underwriter held, each documenting the
+      /// assumption that "per-underwriter lock counts are O(1)-ish so the scan
+      /// is cheap". That is false under sustained swap traffic: locks are held
+      /// for the full wall-clock challenge window
+      /// (`collateral_lock_duration_ms`, 12h default) and are NEVER released
+      /// by delivery, so a bucket's live lock count is
+      /// (settlement rate × lock duration) — unbounded within the window. The
+      /// scan ran per candidate inside `try_select_winner` (up to
+      /// MAX_UWREQ_CANDIDATES of them per uwreq), i.e. inside the same
+      /// consensus-dispatch CPU budget whose overrun stalls the chain.
+      ///
+      /// `sumlocks` reads this rollup, so it stays the cheap external answer
+      /// to "how much of this bucket is locked"; the authoritative recompute
+      /// is the `locks` table itself, which the contract tests scan and
+      /// compare against this total.
+      struct [[sysio::table("locksums")]] lock_sum {
+         name             underwriter;
+         sysio::slug_name chain_code;
+         sysio::slug_name token_code;
+         uint64_t         amount = 0;
+         SYSLIB_SERIALIZE(lock_sum, (underwriter)(chain_code)(token_code)(amount))
+      };
+
+      using locksums_t = sysio::kv::table<"locksums"_n, lock_sum_key, lock_sum>;
+
       /// Per-underwriter race entry inside an UWREQ row. Tracks when each
       /// leg of a dual-COMMIT pair arrived so `try_select_winner` can
       /// resolve the race deterministically. Each leg's COMMIT is an
