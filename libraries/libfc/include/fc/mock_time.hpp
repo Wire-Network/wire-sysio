@@ -36,4 +36,17 @@ private:
    static std::atomic<int64_t> now_;
 };
 
+/// Engages the mock clock for a scope and releases it on exit, so a test using virtual time does not
+/// leave the clock frozen for whatever runs next in the same binary. Carries the same threading
+/// caveat as mock_time_traits::set_now(): construct before the threads that observe the clock are
+/// spawned, and destroy once they are done with it.
+class scoped_mock_clock {
+public:
+   explicit scoped_mock_clock( const fc::time_point& start ) { mock_time_traits::set_now( start ); }
+   ~scoped_mock_clock() { mock_time_traits::unset(); }
+
+   scoped_mock_clock( const scoped_mock_clock& ) = delete;
+   scoped_mock_clock& operator=( const scoped_mock_clock& ) = delete;
+};
+
 } // namespace fc
