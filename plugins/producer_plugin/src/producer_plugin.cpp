@@ -15,7 +15,7 @@
 #include <sysio/resource_monitor_plugin/resource_monitor_plugin.hpp>
 
 #include <fc/io/json.hpp>
-#include <fc/mockable_deadline_timer.hpp>
+#include <fc/mockable_timer.hpp>
 #include <fc/log/logger_config.hpp>
 #include <fc/scoped_exit.hpp>
 #include <fc/time.hpp>
@@ -794,7 +794,7 @@ public:
    sysio::chain::named_thread_pool<struct prod>      _timer_thread;
    // Runs on the real clock in production; a test engages fc's mock clock via
    // fc::mock_time_traits::set_now() and drives production timing deterministically.
-   fc::mockable_deadline_timer                       _timer{_timer_thread.get_executor()};
+   fc::mockable_timer                                _timer{_timer_thread.get_executor()};
 
    using signature_provider_type = fc::crypto::sign_fn;
    std::map<chain::public_key_type, fc::crypto::signature_provider_ptr> _signature_providers;
@@ -3025,7 +3025,7 @@ void producer_plugin_impl::schedule_production_loop() {
 
    if (result == start_block_result::failed) {
       fc_wlog(_log, "Failed to start a pending block, will try again later");
-      _timer.expires_from_now(boost::posix_time::microseconds(config::block_interval_us / 10));
+      _timer.expires_after(std::chrono::microseconds(config::block_interval_us / 10));
 
       // we failed to start a block, so try again later?
       _timer.async_wait([this, cid = ++_timer_corelation_id](const boost::system::error_code& ec) {
@@ -3088,12 +3088,12 @@ void producer_plugin_impl::schedule_maybe_produce_block(bool exhausted) {
    if (!exhausted && deadline > fc::time_point::now()) {
       // ship this block off no later than its deadline
       SYS_ASSERT(chain.is_building_block(), missing_pending_block_state, "producing without pending_block_state, start_block succeeded");
-      _timer.expires_at(fc::mockable_time_traits::to_time_type(deadline));
+      _timer.expires_at(fc::mockable_clock::from_time_point(deadline));
       fc_dlog(_log, "Scheduling Block Production on Normal Block #{} for {}",
               chain.head().block_num() + 1, deadline);
    } else {
       SYS_ASSERT(chain.is_building_block(), missing_pending_block_state, "producing without pending_block_state");
-      _timer.expires_from_now(boost::posix_time::microseconds(0));
+      _timer.expires_after(std::chrono::microseconds(0));
       fc_dlog(_log, "Scheduling Block Production on {} Block #{} immediately",
               block_is_exhausted() ? "Exhausted" : "Deadline exceeded", chain.head().block_num() + 1);
    }
@@ -3123,7 +3123,7 @@ void producer_plugin_impl::schedule_delayed_production_loop(const std::weak_ptr<
                                                             std::optional<fc::time_point>              wake_up_time) {
    if (wake_up_time) {
       fc_dlog(_log, "Scheduling Speculative/Production Change at {}", *wake_up_time);
-      _timer.expires_at(fc::mockable_time_traits::to_time_type(*wake_up_time));
+      _timer.expires_at(fc::mockable_clock::from_time_point(*wake_up_time));
       _timer.async_wait([this, cid = ++_timer_corelation_id](const boost::system::error_code& ec) {
          if (ec != boost::asio::error::operation_aborted && cid == _timer_corelation_id) {
             interrupt_transaction(controller::interrupt_t::all_trx);

@@ -7,7 +7,7 @@
 #include <sysio/chain/genesis_state.hpp>
 
 #include <fc/mock_time.hpp>
-#include <fc/mockable_deadline_timer.hpp>
+#include <fc/mockable_timer.hpp>
 
 #include <atomic>
 #include <chrono>
