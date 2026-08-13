@@ -22,6 +22,11 @@ public:
    // Thread safe only if first call to set_now is before any threads are spawned or memory barrier introduced
    static bool is_set() { return mock_enabled_; }
 
+   // Return to the real clock. For a test that engages the mock clock in a binary it shares with
+   // tests that need real time, so the mock does not leak into whatever runs next. Carries the same
+   // threading caveat as set_now(): call it once the threads that observe the clock are done.
+   static void unset() { mock_enabled_ = false; }
+
    // return now as fc::time_point, used by fc::time_point::now() if mock_time_traits is_set()
    static fc::time_point fc_now();
 
