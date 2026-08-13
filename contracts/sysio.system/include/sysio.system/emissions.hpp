@@ -166,7 +166,7 @@ struct node_claim_result {
 };
 
 // ---------------------------------------------------------------------------
-// Claimable epoch pay (producers, standbys, batch operators, category buckets)
+// Claimable epoch pay (producers, standbys, batch operators)
 // ---------------------------------------------------------------------------
 
 // payepoch runs as an inline action from sysio.epoch::advance and must never abort. It therefore
@@ -175,10 +175,17 @@ struct node_claim_result {
 // chain-wide. Pay is credited here instead and pulled later by `claimpay`, which carries the
 // claimant's own authority -- so a hostile recipient blocks only its own payout.
 //
+// The two CATEGORY BUCKETS (`sysio.ops`, `sysio.gov`) are the deliberate exception and are still
+// pushed -- see the transfer site in payepoch. They hold no code today, so no handler exists to
+// abort `advance`, and any contract governance later deploys there must not assert on a
+// transfer notify. Being `sysio.*` they can neither sign a claim (`sysio.roa` zeroes net/cpu for
+// that prefix) nor host a contract to emit one inline, so crediting them would strand the pay
+// permanently. This table's recipients are therefore the accounts that CAN claim.
+//
 // Rows do not expire: this is earned pay, held until claimed.
 //
 // The recipient set is bounded only CONCURRENTLY (ranks 1..standby_end_rank, plus batch-op group
-// members and the two category accounts) — not across this table's lifetime. Producers and batch
+// members) — not across this table's lifetime. Producers and batch
 // operators churn, and every departed account that never calls `claimpay` leaves a row billed to
 // the sysio RAM pool forever, so system-funded claim storage grows with historical participants
 // rather than with the live set. That is a known, accepted cost here: expiring earned pay is an

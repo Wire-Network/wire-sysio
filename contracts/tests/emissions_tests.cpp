@@ -872,10 +872,6 @@ public:
    /// so repeated claims across a test are distinct transactions rather than duplicates.
    void claim_pay( account_name acc ) {
       if (pay_claimable(acc) == 0) return;
-      // The fixed category accounts are created without net/cpu in this fixture, so they cannot
-      // sign a transaction of their own. Their pay is asserted directly against `pay_claimable`
-      // (see holding_accounts_receive_correct_amounts) rather than by pulling it.
-      if (acc == "sysio.gov"_n || acc == "sysio.ops"_n) return;
       BOOST_REQUIRE_EQUAL(success(),
          push_system_action(acc, "claimpay"_n, mvo()("account_name", acc)));
       produce_blocks();
@@ -2606,9 +2602,10 @@ BOOST_FIXTURE_TEST_CASE( no_producers_undistributed_stays_in_sysio, sysio_emissi
    int64_t emission = log["total_emission"].as<int64_t>();
    int64_t capex_base = test_split_bps(emission, CAPEX_BPS);
 
-   // Capex gets only its base split (no producer dust redirect). The category buckets are
-   // credited, not transferred, so what capex "received" is its claimable balance.
-   int64_t capex_received = pay_claimable("sysio.ops"_n);
+   // Capex gets only its base split (no producer dust redirect). The category buckets are PUSHED
+   // rather than credited (they can neither sign a claim nor host a contract to emit one), so
+   // what capex "received" is a real balance.
+   int64_t capex_received = get_wire_balance("sysio.ops"_n).get_amount();
    BOOST_REQUIRE_EQUAL( capex_received, capex_base );
 
    // sysio's balance decreases by (emission - producer_pool - batch_pool) since
@@ -2722,6 +2719,8 @@ BOOST_FIXTURE_TEST_CASE( holding_accounts_receive_correct_amounts, sysio_emissio
 
    asset dclaim_before   = get_wire_balance("sysio.dclaim"_n);
    asset batch_before = get_wire_balance("sysio.batch"_n);
+   asset gov_before   = get_wire_balance("sysio.gov"_n);
+   asset ops_before   = get_wire_balance("sysio.ops"_n);
 
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
@@ -2730,17 +2729,15 @@ BOOST_FIXTURE_TEST_CASE( holding_accounts_receive_correct_amounts, sysio_emissio
    int64_t gov      = log["governance_amount"].as<int64_t>();
    int64_t capex_base = test_split_bps(emission, CAPEX_BPS);
 
-   // The category buckets are CREDITED by payepoch, not transferred, so what they
-   // "received" is their claimable balance. These are protocol-owned accounts with no net/cpu
-   // resources in this fixture, so they cannot sign a claimpay of their own -- which is exactly
-   // why the assertion reads the ledger rather than pulling it.
-   //
-   // dclaim is the exception: it is still funded by a real push from fundclaim (a system
-   // destination that cannot install a hostile notify handler), so it stays balance-based.
+   // The category buckets are PUSHED, not credited -- the deliberate exception to the pull rule,
+   // so what they "received" is a real balance delta. They are protocol-owned holding accounts
+   // with no code (no notify handler to abort `advance`) and, being `sysio.*`, no net/cpu to sign
+   // a claim with and no contract to emit one inline: crediting them would strand the pay in
+   // `payclaims` permanently. `sysio.dclaim` is pushed for the same reason, via fundclaim.
    int64_t dclaim_received   = get_wire_balance("sysio.dclaim"_n).get_amount() - dclaim_before.get_amount();
-   int64_t gov_received   = pay_claimable("sysio.gov"_n);
+   int64_t gov_received   = get_wire_balance("sysio.gov"_n).get_amount() - gov_before.get_amount();
    int64_t batch_received = get_wire_balance("sysio.batch"_n).get_amount() - batch_before.get_amount();
-   int64_t ops_received   = pay_claimable("sysio.ops"_n);
+   int64_t ops_received   = get_wire_balance("sysio.ops"_n).get_amount() - ops_before.get_amount();
 
    // dclaim is not funded at payepoch anymore -- capital draws are lazy
    // via sysio.dclaim::onreward -> sysio.system::fundclaim.

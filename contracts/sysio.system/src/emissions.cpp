@@ -930,12 +930,29 @@ void system_contract::payepoch(uint32_t epoch_index,
    // dclaim has WIRE the moment the claim is credited rather than waiting
    // for the next pay-epoch.
    // =======================================================================
-   // Credited, not pushed, for the same reason as the loops above. These two are protocol-owned
-   // accounts rather than attacker-controlled ones, so they are not the live threat -- but routing
-   // them through the same claimable path removes a latent halt should either ever carry code, and
-   // keeps every payepoch payout on one mechanism.
-   credit_pay(get_self(), CAPEX_OPERATIONS_ACCOUNT, capex_amount,      memo::capex);
-   credit_pay(get_self(), GOVERNANCE_ACCOUNT,       governance_amount, memo::governance);
+   // PUSHED, not credited -- the deliberate exception to this contract's pull rule, and the same
+   // exception `fundclaim` already makes for `sysio.dclaim`.
+   //
+   // The pull model exists because a payout to an account the protocol does not control lets that
+   // account's transfer-notify handler abort `advance`. These two are protocol-owned holding
+   // accounts: they carry no code, so there is no handler to run, and only governance can ever put
+   // code there. The threat the credit path defends against does not exist for them.
+   //
+   // Crediting them instead would strand the money. A claim needs `require_auth(account_name)`,
+   // and a `sysio.*` account can neither sign nor be acted for here: `sysio.roa` forces
+   // `net_weight`/`cpu_weight` to zero for every account whose prefix is `sysio`
+   // (`is_sysio_account`), so they cannot pay for a transaction, and unlike `sysio.dclaim` they
+   // have no contract of their own to emit the claim inline. Their pay would accrue in
+   // `payclaims` forever while `payclaimtot` reserved the backing WIRE against `fundclaim` and the
+   // epoch readiness gate -- a permanent, growing reservation of WIRE nobody can move.
+   //
+   // This is a standing constraint on the two accounts, not a reason to revisit this call: any
+   // contract ever deployed on `sysio.ops` or `sysio.gov` MUST NOT assert (or burn CPU) in an
+   // `on_notify("sysio.token::transfer")` handler. Only governance can put code there, so that is
+   // enforceable by review rather than by the protocol -- which is exactly why the same latitude
+   // is not extended to any recipient outside protocol control.
+   send_wire_transfer(get_self(), CAPEX_OPERATIONS_ACCOUNT, capex_amount,      memo::capex);
+   send_wire_transfer(get_self(), GOVERNANCE_ACCOUNT,       governance_amount, memo::governance);
 
    actual_paid += capex_amount + governance_amount;
 
