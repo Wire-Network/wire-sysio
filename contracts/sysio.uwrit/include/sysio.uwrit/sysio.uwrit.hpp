@@ -369,18 +369,68 @@ namespace sysio {
       /// This sweep is the ONLY lock-release path: locks are a wall-clock
       /// challenge window (12h default) and are never released by delivery.
       ///
+      /// EXCEPTION (WIRE-297): a lock whose `challenge_id` is non-zero — an
+      /// underwriter-fault challenge is OPEN against its commitment — is NOT
+      /// released at expiry. The sweep skips it and instead pokes
+      /// `sysio.chalg::chkuwchal`, whose resolution either sweeps the locks
+      /// with the underwriter slashed (`sweeplocks`) or clears the hold
+      /// (`freelocks`) so the NEXT sweep releases them normally. The epoch
+      /// tick is thereby the challenge system's only cadence.
+      ///
       /// Budget-bounded, mirroring `pruneuwreqs` / `drainfwq`: walks the
-      /// `byexpire` index in ascending `expires_at_ms` and releases at most
-      /// `max_rows` locks (`max_rows == 0` is a no-op). Inlined from
+      /// `byexpire` index in ascending `expires_at_ms` and EXAMINES at most
+      /// `max_rows` rows (`max_rows == 0` is a no-op). Inlined from
       /// `sysio.epoch::advance` with `MAX_LOCK_RELEASE_PER_EPOCH`; also
       /// invocable by `sysio.uwrit` itself with a caller-chosen budget for a
-      /// manual backlog drain. Ascending-expiry order makes the bound a FIFO
-      /// drain — the oldest locks always release first, so no lock can starve
-      /// behind a sustained burst. NEVER throws past the auth gate: it runs
-      /// inline inside `advance`, where an abort stalls epoch progress
-      /// chain-wide.
+      /// manual backlog drain. NEVER throws past the auth gate: it runs inline
+      /// inside `advance`, where an abort stalls epoch progress chain-wide.
+      ///
+      /// The budget counts rows EXAMINED, not locks released — held locks and
+      /// the challenge pokes they generate cost real work too. Bounding only
+      /// releases would let an arbitrary number of held rows be scanned and an
+      /// arbitrary number of distinct challenges fan out an inline
+      /// `chkuwchal` each, which is exactly the unbounded `advance` work this
+      /// bound exists to remove. `open_challenges` is therefore bounded by
+      /// `max_rows` as a consequence of the same counter.
+      ///
+      /// Ascending-expiry order makes the bound a FIFO drain, so an oversized
+      /// burst simply spreads across subsequent epochs. Held locks are the one
+      /// thing that can sit at the head of that queue without leaving it: they
+      /// are skipped, not erased, so while more than `max_rows` challenges are
+      /// open the rows behind them wait. That is bounded and self-clearing
+      /// rather than a stall — each sweep pokes the challenges it can see, and
+      /// a resolved challenge removes its locks (`sweeplocks`) or clears their
+      /// hold (`freelocks`), letting the window advance on the next tick.
+
       [[sysio::action]]
       void chklocks(uint32_t max_rows);
+
+      /// Mark the winning underwriter's locks for `uwreq_id` as held by the OPEN underwriter-
+      /// fault challenge `chal_id` (WIRE-297). Auth: `sysio.chalg`, inlined from `openuwchal`.
+      /// This is the AUTHORITATIVE liveness validation for a filing — every lock must still be
+      /// inside its window and free of any other challenge, and at least one lock must exist —
+      /// so a stale challenge aborts whole here, bond escrow included.
+      [[sysio::action]]
+      void holdlocks(uint64_t uwreq_id, name underwriter, uint64_t chal_id);
+
+      /// Clear the challenge hold on the underwriter's locks for `uwreq_id` — the challenge was
+      /// REJECTED by the council or LAPSED at the window's end. The locks then release on their
+      /// next normal `chklocks` sweep: a healthy release, no collateral moves. Auth:
+      /// `sysio.chalg`. Deliberately a silent no-op when nothing is held: it runs inline from
+      /// the epoch tick (`chklocks` -> `chkuwchal` -> here), where an abort would stall epoch
+      /// advancement chain-wide.
+      [[sysio::action]]
+      void freelocks(uint64_t uwreq_id, name underwriter);
+
+      /// Release + erase the underwriter's locks for `uwreq_id` after an UPHELD challenge. The
+      /// underwriter is already SLASHED (`chkuwchal` slashes before sweeping — inline actions
+      /// run depth-first in send order), so every inlined `opreg::releaselock` takes its
+      /// deferred-slash branch: the locked collateral is debited and the outbound SLASH
+      /// attestation queued. Ends with the same COMPLETED-flip / evidence-clear / retention
+      /// tail `chklocks` runs when a uwreq's last lock leaves. Auth: `sysio.chalg`; silent
+      /// no-op when no locks remain (same never-throw-inside-advance reasoning as `freelocks`).
+      [[sysio::action]]
+      void sweeplocks(uint64_t uwreq_id, name underwriter);
 
       /// Bounded UWREQ lifecycle sweep (SEC-129 / WSA-223). Inlined from
       /// `sysio.epoch::advance` each epoch with `MAX_UWREQ_PRUNE_PER_EPOCH`;
@@ -539,6 +589,14 @@ namespace sysio {
          checksum256 by_underwriter_ck() const {
             return compose_account_chain_token_ck(underwriter, chain_code, token_code);
          }
+         /// Non-zero while an underwriter-fault challenge (the `sysio.chalg::uwchals` row id) is
+         /// OPEN against this lock's commitment (WIRE-297). A held lock is NOT released at
+         /// `expires_at_ms`: `chklocks` skips it and instead pokes the challenge's tally crank,
+         /// so the collateral stays at risk until the council resolves or the challenge lapses.
+         /// Stamped by `holdlocks`, cleared by `freelocks` (reject/lapse); an UPHELD challenge
+         /// erases the row through `sweeplocks` instead.
+         uint64_t                challenge_id     = 0;
+
          /// Split-index for cheap per-operator scans (plan §B.2). Callers
          /// pull all rows for a given underwriter and filter on
          /// chain_code / token_code / reserve_code in memory.
@@ -548,7 +606,7 @@ namespace sysio {
 
          SYSLIB_SERIALIZE(lock_entry,
             (lock_id)(uwreq_id)(underwriter)(chain_code)(token_code)(reserve_code)
-            (amount)(created_at_ms)(expires_at_ms))
+            (amount)(created_at_ms)(expires_at_ms)(challenge_id))
       };
 
       // Per plan §B.2: split-index approach — keep only uint64 secondary
@@ -770,6 +828,19 @@ namespace sysio {
          /// Empty until that flow lands.
          std::vector<char>                       attestation_outbound_data;
 
+         /// Non-zero while an underwriter-fault challenge (the `sysio.chalg::uwchals` row id)
+         /// is OPEN against this request's commitment — stamped by `holdlocks`, cleared by
+         /// `freelocks`, alongside the identical marker on each held lock.
+         ///
+         /// `pruneuwreqs` refuses to erase a row carrying one. The lock marker alone is not
+         /// enough: the locks hold the COLLATERAL, but this row holds the EVIDENCE a challenge
+         /// adjudicates against — `attestation_inbound_data` (the stored SwapRequest),
+         /// `source_tx_id`, and `commits_by` with the per-leg UIC bytes. Terminal rows are
+         /// erased at `terminal_epoch + uwreq_retention_epochs`, which is far shorter than the
+         /// challenge window, so without this a challenge could outlive the record it exists
+         /// to adjudicate and resolve against nothing.
+         uint64_t                                challenge_id      = 0;
+
          uint64_t by_status() const { return magic_enum::enum_integer(status); }
          uint64_t by_winner() const { return winner.value; }
          uint64_t by_expires_at_epoch() const { return expires_at_epoch; }
@@ -780,7 +851,7 @@ namespace sysio {
             (dst_chain_code)(dst_token_code)(dst_reserve_code)(dst_amount)
             (target_amount)(variance_tolerance_bps)(source_tx_id)(depositor)
             (commits_by)(winner)(committed_at_ms)(settled_at_ms)(expires_at_epoch)
-            (attestation_inbound_data)(attestation_outbound_data))
+            (attestation_inbound_data)(attestation_outbound_data)(challenge_id))
       };
 
       using uwreqs_t = sysio::kv::table<"uwreqs"_n, id_key, uw_request_t,
