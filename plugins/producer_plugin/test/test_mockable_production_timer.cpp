@@ -4,9 +4,11 @@
 
 #include <sysio/chain/application.hpp>
 #include <sysio/chain/controller.hpp>
+#include <sysio/chain/exec_pri_queue.hpp>
 #include <sysio/chain/genesis_state.hpp>
 
 #include <fc/mock_time.hpp>
+#include <fc/scoped_exit.hpp>
 #include <fc/mockable_timer.hpp>
 
 #include <atomic>
@@ -49,7 +51,7 @@ bool wait_for(Pred pred) {
 /// the chain and the production timer share one frame of reference from genesis onward.
 class running_node {
 public:
-   running_node()
+   explicit running_node(const std::vector<const char*>& extra_args = {})
       : _genesis(fc::time_point::from_iso_string(genesis_timestamp))
       , _temp_dir_str(_temp.path().string())
       , _mock_clock(_genesis) {
@@ -65,6 +67,7 @@ public:
                                              "--data-dir", _temp_dir_str.c_str(),
                                              "--config-dir", _temp_dir_str.c_str(),
                                              "-p", "sysio", "-e"};
+            argv.insert(argv.end(), extra_args.begin(), extra_args.end());
             _app->initialize<signature_provider_manager_plugin, chain_plugin, producer_plugin>(argv.size(),
                                                                                               (char**)&argv[0]);
             _app->startup();
@@ -108,10 +111,27 @@ public:
    uint32_t         blocks_produced() const { return _blocks_produced.load(); }
    producer_plugin* producer() { return _prod_plug; }
 
+   /// Whether the node is in its write window. The read only window is the complement, so this is
+   /// what says which side of the _ro_timer cycle the node is on.
+   bool in_write_window() const { return _chain_plug->chain().is_write_window(); }
+
    /// Run fn on the node's main thread, where anything touching chain state has to run.
    template<typename F>
    void post_to_main_thread(F&& fn) {
       _app->post(appbase::priority::high, std::forward<F>(fn));
+   }
+
+   /// Enqueue read-only work. switch_to_read_window stays in the write window when this queue is
+   /// empty, so a test that wants the read window to open has to give it something to do.
+   template<typename F>
+   void post_read_only(F&& fn) {
+      _app->executor().post(appbase::priority::low, appbase::exec_queue::read_only, std::forward<F>(fn));
+   }
+
+   /// Advance the virtual clock by an arbitrary amount, for waits that are not a whole slot.
+   void advance(fc::microseconds by) {
+      _now += by;
+      fc::mock_time_traits::set_now(_now);
    }
 
    /// Advance the virtual clock by one production slot and wait for the block it owes. Returns
@@ -215,6 +235,55 @@ BOOST_AUTO_TEST_CASE(production_survives_a_competing_reschedule) {
    }
 
    BOOST_CHECK_GE(node.blocks_produced(), settled + slots_to_step);
+}
+
+/**
+ * The read only window is bounded by wall clock in exactly the way block production is: _ro_timer
+ * arms for the write window, its handler switches to the read window, and that window closes on its
+ * own deadline. Nothing covered that cycle, because observing it against a real clock means racing
+ * it, and _ro_timer carries its own correlation id guard against a handler from a previous cycle
+ * landing in the current one.
+ *
+ * With the clock owned by the test the cycle is observable directly: read only work cannot run
+ * before the write window expires, and it must run once it has. switch_to_read_window stays in the
+ * write window when the read only queue is empty, so the queue is primed first.
+ */
+BOOST_AUTO_TEST_CASE(read_window_opens_only_when_the_write_window_expires) {
+   // Read only threads are rejected on a producing node outside test mode.
+   producer_plugin::set_test_mode(true);
+   auto restore_mode = fc::make_scoped_exit([]() { producer_plugin::set_test_mode(false); });
+
+   constexpr uint32_t write_window_us = 200'000;
+   running_node       node{{"--read-only-threads", "2",
+                            "--read-only-write-window-time-us", "200000",
+                            "--read-only-read-window-time-us", "60000"}};
+
+   BOOST_REQUIRE_MESSAGE(node.in_write_window(), "a node should start in its write window");
+
+   // switch_to_read_window stays put when the read only queue is empty, so give it work to find.
+   // Read only tasks can also be drained on the main thread, so their running proves nothing about
+   // the window; the window state itself is what this checks.
+   // Real time alone must not close the write window, the property that makes this deterministic.
+   std::this_thread::sleep_for(real_time_patience);
+   BOOST_CHECK(node.in_write_window());
+
+   // Prime the queue immediately before crossing the deadline: the main thread also drains read only
+   // work during the write window, so a backlog has to still be there when the timer fires.
+   std::atomic<uint32_t> read_only_ran{0};
+   for (uint32_t i = 0; i < 2000; ++i)
+      node.post_read_only([&]() { ++read_only_ran; });
+
+   // Crossing the write window deadline must hand the read only threads their window.
+   node.advance(fc::microseconds(write_window_us + 1000));
+   BOOST_REQUIRE_MESSAGE(wait_for([&]() { return !node.in_write_window(); }),
+                         "the write window did not close after its deadline passed in virtual time");
+   BOOST_CHECK_MESSAGE(wait_for([&]() { return read_only_ran.load() > 0; }),
+                       "the read window opened but its queued work did not run");
+
+   // The read window must close on its own deadline, leaving the node producing again.
+   BOOST_REQUIRE_MESSAGE(wait_for([&]() { return node.in_write_window(); }),
+                         "the read window did not close and hand the node back to production");
+   BOOST_REQUIRE_MESSAGE(node.step_one_slot(), "production did not resume after the read window closed");
 }
 
 BOOST_AUTO_TEST_SUITE_END()
