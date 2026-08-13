@@ -36,6 +36,10 @@ constexpr std::chrono::seconds reaction_timeout{10};
 /// clock 55 years behind the chain. running_node checks the two against each other at startup.
 constexpr const char* genesis_timestamp = "2025-01-01T12:00:00";
 
+/// Pinned rather than left to the default so the deadlines below are computable. cpu_effort mirrors
+/// the plugin's own derivation from it.
+constexpr uint32_t produce_block_offset_ms = 450;
+
 /// Spin until pred() holds or reaction_timeout elapses. Returns whether pred() held.
 template<typename Pred>
 bool wait_for(Pred pred) {
@@ -67,7 +71,8 @@ public:
             std::vector<const char*> argv = {"test",
                                              "--data-dir", _temp_dir_str.c_str(),
                                              "--config-dir", _temp_dir_str.c_str(),
-                                             "-p", "sysio", "-e"};
+                                             "-p", "sysio", "-e",
+                                             "--produce-block-offset-ms", "450"};
             argv.insert(argv.end(), extra_args.begin(), extra_args.end());
             _app->initialize<signature_provider_manager_plugin, chain_plugin, producer_plugin>(argv.size(),
                                                                                               (char**)&argv[0]);
@@ -78,10 +83,19 @@ public:
             return;
          }
          FC_LOG_AND_DROP()
-         BOOST_CHECK(!"app threw exception see logged error");
+         // Boost.Test is not safe to call from this thread, and doing so while the main thread is
+         // unwinding a failed check turns a legible failure into an abort. Record it instead, and
+         // still satisfy the promise: leaving it unset strands the constructor forever on a startup
+         // failure, which is a hang rather than a diagnosis.
+         _app_threw = true;
+         try {
+            plugin_promise.set_value({nullptr, nullptr});
+         } catch (const std::future_error&) {} // already satisfied, the failure came later
       });
 
       std::tie(_prod_plug, _chain_plug) = plugin_fut.get();
+      BOOST_REQUIRE_MESSAGE(_prod_plug != nullptr && _chain_plug != nullptr,
+                            "the node failed to start, see the logged error");
 
       // The clock and the chain must agree, or the producer has nothing to do and every test here
       // would hang rather than report anything useful.
@@ -110,6 +124,7 @@ public:
    running_node& operator=(const running_node&) = delete;
 
    uint32_t         blocks_produced() const { return _blocks_produced.load(); }
+   bool             app_threw() const { return _app_threw.load(); }
    producer_plugin* producer() { return _prod_plug; }
 
    /// Whether the node is in its write window. The read only window is the complement, so this is
@@ -150,8 +165,33 @@ public:
       fc::mock_time_traits::set_now(_now);
    }
 
-   /// Advance the virtual clock by one production slot and wait for the block it owes. Returns
-   /// whether that block arrived.
+   /// The cpu effort the node was configured with, which is what spaces block deadlines.
+   static fc::microseconds cpu_effort() {
+      return fc::microseconds(config::block_interval_us -
+                              (produce_block_offset_ms * 1000 / config::producer_repetitions));
+   }
+
+   /// When the block after the current head is due to ship, for a test that wants a single block.
+   fc::time_point next_block_deadline() const {
+      const auto next = chain::block_timestamp_type(head_block_timestamp().slot + 1);
+      return block_timing_util::calculate_producing_block_deadline(cpu_effort(), next);
+   }
+
+   /// Advance the virtual clock by one slot and wait until the node has produced at least
+   /// blocksOwed blocks in total since baseline.
+   ///
+   /// The count is cumulative rather than per step because a block ships at its cpu effort deadline
+   /// rather than at its slot, and those deadlines sit closer together than slots do, so the node
+   /// runs progressively further ahead across a round and then waits at the round boundary. A single
+   /// step can therefore yield two blocks or none. What holds at every step is that the node is
+   /// never behind: one block per slot of virtual time elapsed, whatever order they ship in.
+   bool step_one_slot_expecting(uint32_t baseline, uint32_t blocksOwed) {
+      _now += fc::milliseconds(config::block_interval_ms);
+      fc::mock_time_traits::set_now(_now);
+      return wait_for([&]() { return _blocks_produced.load() >= baseline + blocksOwed; });
+   }
+
+   /// Advance one slot and require a block, for callers that only need production to be moving.
    bool step_one_slot() {
       const uint32_t before = _blocks_produced.load();
       _now += fc::milliseconds(config::block_interval_ms);
@@ -169,11 +209,12 @@ private:
    producer_plugin*                   _prod_plug  = nullptr;
    chain_plugin*                      _chain_plug = nullptr;
    std::atomic<uint32_t>              _blocks_produced{0};
+   std::atomic<bool>                  _app_threw{false};
    fc::time_point                     _now;
    boost::signals2::scoped_connection _accepted_block;
 };
 
-constexpr uint32_t slots_to_step = 12;
+constexpr uint32_t slots_to_step = 12;   // one full production round
 
 } // namespace
 
@@ -201,11 +242,10 @@ BOOST_AUTO_TEST_CASE(production_follows_the_virtual_clock) {
    // 2. Every slot the clock advances through must yield a block. Stepping one slot at a time is
    //    what makes a silently skipped slot a failure rather than a timing artifact.
    for (uint32_t slot = 1; slot <= slots_to_step; ++slot) {
-      BOOST_REQUIRE_MESSAGE(node.step_one_slot(),
-                            "no block produced for step " << slot << " of " << slots_to_step
-                                                          << " after advancing the clock by one slot");
+      BOOST_REQUIRE_MESSAGE(node.step_one_slot_expecting(settled, slot),
+                            "after " << slot << " slots of virtual time the node had produced "
+                                     << (node.blocks_produced() - settled) << " blocks, so it fell a slot behind");
    }
-   BOOST_CHECK_GE(node.blocks_produced(), settled + slots_to_step);
 
    // 3. Stopping the clock must stop production, confirming that step 2 measured the clock driving
    //    production rather than production simply running free.
@@ -244,13 +284,11 @@ BOOST_AUTO_TEST_CASE(production_survives_a_competing_reschedule) {
       BOOST_REQUIRE_MESSAGE(disturbed_fut.wait_for(reaction_timeout) == std::future_status::ready,
                             "the node stopped servicing its main thread at step " << slot);
 
-      BOOST_REQUIRE_MESSAGE(node.step_one_slot(),
-                            "no block produced for step " << slot << " of " << slots_to_step
-                                                          << ": the produce timer was starved by the reschedule "
-                                                             "that get_integrity_hash triggers");
+      BOOST_REQUIRE_MESSAGE(node.step_one_slot_expecting(settled, slot),
+                            "after " << slot << " slots the node had produced " << (node.blocks_produced() - settled)
+                                     << " blocks: the produce timer was starved by the reschedule that "
+                                        "get_integrity_hash triggers");
    }
-
-   BOOST_CHECK_GE(node.blocks_produced(), settled + slots_to_step);
 }
 
 /**
@@ -313,12 +351,10 @@ BOOST_AUTO_TEST_CASE(read_window_opens_only_when_the_write_window_expires) {
  * owed, cross it and the block appears, all while the block's own slot time is still in the future.
  */
 BOOST_AUTO_TEST_CASE(a_block_ships_at_its_deadline_not_at_its_slot) {
-   // Fix the offset rather than relying on the default, since the deadline being strictly inside the
-   // slot is the whole point of the case. cpu_effort mirrors the plugin's own derivation.
-   constexpr uint32_t       produce_block_offset_ms = 450;
-   const fc::microseconds   cpu_effort{config::block_interval_us -
-                                       (produce_block_offset_ms * 1000 / config::producer_repetitions)};
-   running_node node{{"--produce-block-offset-ms", "450"}};
+   // running_node pins produce-block-offset-ms, which is what makes the deadline land strictly
+   // inside the slot and so makes this case meaningful at all.
+   const fc::microseconds cpu_effort = running_node::cpu_effort();
+   running_node node;
 
    // The block the node owes next, and when it is due to ship it.
    const auto next_block_time = chain::block_timestamp_type(node.head_block_timestamp().slot + 1);
