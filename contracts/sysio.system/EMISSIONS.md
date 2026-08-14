@@ -30,14 +30,22 @@ not control is therefore **credited** to `payclaims` and pulled later with
 
 | Bucket | Share | Destination | How | Memo |
 |--------|-------|-------------|-----|------|
-| Producer reward | `compute_bps` x `producer_bps` | each active producer / standby (rank <= `standby_end_rank`, opreg-ACTIVE) | **credited — `claimpay`** | `T5 producer reward` |
-| Batch-op reward | `compute_bps` x `batch_op_bps` | each active batch-operator group member | **credited — `claimpay`** | `T5 batch operator reward` |
+| Producer reward | `compute_bps` x `producer_bps` | each active producer / standby (rank <= `standby_end_rank`, opreg-ACTIVE) | **credited — `claimpay`** | none at credit; `T5 epoch pay claim` at the claim |
+| Batch-op reward | `compute_bps` x `batch_op_bps` | each active batch-operator group member | **credited — `claimpay`** | none at credit; `T5 epoch pay claim` at the claim |
 | Capex | `capex_bps` | `sysio.ops` | pushed | `T5 capex` |
 | Governance | `governance_bps` | `sysio.gov` | pushed | `T5 governance` |
 
 **Producers, standbys and batch operators are not paid by transfer.** Their WIRE
 sits in `payclaims` until they call `sysio.system::claimpay`; a balance watcher
 waiting for it to arrive will wait forever. Monitoring reads `payclaims`.
+
+**Do not key monitoring on a per-bucket memo for the credited rows.** A credit is a
+kv write and carries no memo at all, and `claimpay` drains the whole `payclaims` row
+in ONE transfer under the single memo `T5 epoch pay claim` — so a claimant who earned
+both a producer and a batch-op share receives one transfer, and no category-specific
+memo or per-recipient transfer trace exists at either end. Per-bucket attribution
+comes from the `epochlog` row (aggregate amounts) and per-recipient attribution from
+`payclaims` deltas.
 
 **`sysio.ops` and `sysio.gov` stay pushed** because no claim path can reach them:
 a claim needs `require_auth(account_name)`, `sysio.roa` forces

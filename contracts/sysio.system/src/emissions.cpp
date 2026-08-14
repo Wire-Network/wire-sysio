@@ -198,8 +198,13 @@ void send_wire_transfer(name self, name to, int64_t amount, std::string_view mem
 // Observability note: the per-recipient inline transfer this replaces used to carry `memo_str` and
 // showed up as its own action trace. The credit is a kv write, so per-recipient attribution now
 // comes from the `payclaims` table deltas (visible to state-history consumers) plus the aggregate
-// `epochlog` row; `memo_str` is retained in the signature because the eventual `claimpay` transfer
-// still needs a reason string, and to keep the call sites self-documenting.
+// `epochlog` row.
+//
+// `memo_str` is DISCARDED, and nothing downstream recovers it: `claimpay` drains the whole row in
+// one transfer under its own constant memo (`memo::epoch_pay_claim`), so a claimant owed both a
+// producer and a batch-op share gets ONE transfer with no per-bucket memo. The parameter survives
+// only so the call sites read as which bucket they are paying (`memo::producer_reward` /
+// `memo::batch_op_reward`) — it does not reach the chain, and no monitoring may key on it.
 void credit_pay(name self, name to, int64_t amount, std::string_view /*memo_str*/) {
    if (amount <= 0) return;
    const uint64_t amt = static_cast<uint64_t>(amount);
