@@ -4236,8 +4236,27 @@ BOOST_FIXTURE_TEST_CASE( expired_wire_claims_unblock_a_balance_blocked_epoch, sy
       ("initial_chain_amount", RESERVE_SEED)("initial_wire_amount", RESERVE_SEED)
       ("source_token_precision", 9u)("connector_weight_bps", 5000u)("is_private", false)("owner", name{}) ) );
 
-   // A swap-from-WIRE refund credits a claimable balance that nobody ever pulls.
+   // Fund the escrow the refund gives back, SEPARATELY from the reserve's booked liquidity.
+   // `regreserve` books RESERVE_SEED into `reserve_wire_amount`, and `refundwire` credits a claim
+   // without debiting that row — in production it is reached only after `swapfromwire` has already
+   // deposited the user's in-flight escrow on top. Skipping that deposit would make the sweep hand
+   // the treasury registered reserve liquidity instead of forfeited escrow, so the test would
+   // unblock emissions by breaking reserv's custody invariant rather than by reclaiming a claim.
    constexpr uint64_t FORFEIT = 100'000'000'000ULL;
+   base_tester::push_action(
+      TOKEN, "transfer"_n,
+      vector<permission_level>{{ config::system_account_name, "active"_n }},
+      mvo()("from", config::system_account_name)
+           ("to", RESERV)
+           ("quantity", asset(static_cast<int64_t>(FORFEIT), WIRE_SYMBOL))
+           ("memo", "in-flight swap-from-WIRE escrow the refund returns")
+   );
+   produce_blocks(1);
+   BOOST_REQUIRE_EQUAL( RESERVE_SEED + FORFEIT,
+                        static_cast<uint64_t>(get_wire_balance(RESERV).get_amount()) );
+
+   // A swap-from-WIRE refund credits a claimable balance that nobody ever pulls. Custody now
+   // reads `reserve_wire_amount (RESERVE_SEED) + Σ wireclaims (FORFEIT)`.
    create_user_accounts({ "lapseduser"_n });
    BOOST_REQUIRE_EQUAL( success(), push_reserv_action(UWRIT, "refundwire"_n, mvo()
       ("recipient",      "lapseduser")
@@ -4289,6 +4308,11 @@ BOOST_FIXTURE_TEST_CASE( expired_wire_claims_unblock_a_balance_blocked_epoch, sy
    // transaction that recorded the block.
    BOOST_REQUIRE_EQUAL( 0u, wire_claimable("lapseduser"_n) );
    BOOST_REQUIRE_EQUAL( period_emission, get_wire_balance(config::system_account_name).get_amount() );
+
+   // What moved was the ESCROW, not the reserve. Custody is back to exactly the booked
+   // `reserve_wire_amount`, so the epoch unblocked itself on forfeited value rather than on
+   // registered liquidity.
+   BOOST_REQUIRE_EQUAL( RESERVE_SEED, static_cast<uint64_t>(get_wire_balance(RESERV).get_amount()) );
 
    // SECOND attempt: no manual sweepclaims, no funding -- the epoch advances on its own.
    produce_blocks(130);
