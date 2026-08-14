@@ -529,10 +529,10 @@ BOOST_FIXTURE_TEST_CASE(buildenv_drops_processed_attestations, sysio_msgch_envlo
    BOOST_REQUIRE(found);
 } FC_LOG_AND_RETHROW() }
 
-/// Packing-loop coverage for `MAX_ENVELOPE_BYTES = 65 536`. Queue 12
-/// attestations of 8 KiB each (cumulative ≈ 96 KiB, ~50 % over the cap),
+/// Packing-loop coverage for `MAX_ENVELOPE_BYTES = 32 768`. Queue 6
+/// attestations of 8 KiB each (cumulative ≈ 48 KiB, ~50 % over the cap),
 /// call `buildenv`, and assert:
-///   * the emitted `outenvelopes` row is ≤ 65 536 bytes (cross-chain cap),
+///   * the emitted `outenvelopes` row is ≤ 32 768 bytes (cross-chain cap),
 ///   * a non-trivial subset of READY attestations remained queued for the
 ///     next epoch (the un-included tail),
 ///   * a second `buildenv` drains the remainder under the same cap.
@@ -546,15 +546,16 @@ BOOST_FIXTURE_TEST_CASE(buildenv_packs_until_cap_then_leaves_remainder,
 
    // 8 KiB of payload per attestation. With ENVELOPE_BASELINE_BYTES = 512
    // and ATTESTATION_OVERHEAD_BYTES = 24 in the contract's estimator,
-   // each entry costs 24 + 8192 = 8216 bytes; (65 536 − 512) / 8216 ≈ 7.9
-   // → 7 entries fit, 5 stay queued. Exact fit count depends on the
+   // each entry costs 24 + 8192 = 8216 bytes; (32 768 − 512) / 8216 ≈ 3.9
+   // → 3 entries fit, 3 stay queued. Exact fit count depends on the
    // estimator's conservative margin; the assertions below check the
    // invariants ("≤ cap", "some remainder", "drains on next emit") rather
    // than a hardcoded fit count, keeping the test robust to small
-   // estimator tweaks.
+   // estimator tweaks. The queued total is sized so exactly two emits drain
+   // it at the 32 KiB cap — invariant 3 requires an empty queue after emit#2.
    constexpr size_t  PER_ATTEST_BYTES   = 8 * 1024;
-   constexpr uint32_t TOTAL_ATTESTATIONS = 12;
-   constexpr size_t  MAX_ENV_BYTES      = 65'536;
+   constexpr uint32_t TOTAL_ATTESTATIONS = 6;
+   constexpr size_t  MAX_ENV_BYTES      = 32'768;
 
    // Vary one byte per attestation so each tx has a distinct payload —
    // identical transactions in the same block collapse to a single
