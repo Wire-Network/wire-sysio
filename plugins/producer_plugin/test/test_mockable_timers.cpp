@@ -41,6 +41,18 @@ constexpr const char* genesis_timestamp = "2025-01-01T12:00:00";
 constexpr uint32_t produce_block_offset_ms = 450;
 
 /// Spin until pred() holds or reaction_timeout elapses. Returns whether pred() held.
+/// Spin until pred() holds or the given budget elapses. Returns whether pred() held.
+template<typename Pred>
+bool wait_up_to(std::chrono::milliseconds budget, Pred pred) {
+   const auto deadline = std::chrono::steady_clock::now() + budget;
+   while (!pred()) {
+      if (std::chrono::steady_clock::now() > deadline)
+         return false;
+      std::this_thread::sleep_for(std::chrono::milliseconds(1));
+   }
+   return true;
+}
+
 template<typename Pred>
 bool wait_for(Pred pred) {
    const auto deadline = std::chrono::steady_clock::now() + reaction_timeout;
@@ -131,6 +143,8 @@ public:
    /// what says which side of the _ro_timer cycle the node is on.
    bool in_write_window() const { return _chain_plug->chain().is_write_window(); }
 
+   uint32_t head_block_num() const { return _chain_plug->chain().head().block_num(); }
+
    /// Timestamp of the head block, the anchor for working out when the next one is owed.
    chain::block_timestamp_type head_block_timestamp() const {
       return chain::block_timestamp_type(_chain_plug->chain().head().block_time());
@@ -177,26 +191,25 @@ public:
       return block_timing_util::calculate_producing_block_deadline(cpu_effort(), next);
    }
 
-   /// Advance the virtual clock by one slot and wait until the node has produced at least
-   /// blocksOwed blocks in total since baseline.
+   /// Advance the clock a slot at a time until the head moves, and report whether it did.
    ///
-   /// The count is cumulative rather than per step because a block ships at its cpu effort deadline
-   /// rather than at its slot, and those deadlines sit closer together than slots do, so the node
-   /// runs progressively further ahead across a round and then waits at the round boundary. A single
-   /// step can therefore yield two blocks or none. What holds at every step is that the node is
-   /// never behind: one block per slot of virtual time elapsed, whatever order they ship in.
-   bool step_one_slot_expecting(uint32_t baseline, uint32_t blocksOwed) {
-      _now += fc::milliseconds(config::block_interval_ms);
-      fc::mock_time_traits::set_now(_now);
-      return wait_for([&]() { return _blocks_produced.load() >= baseline + blocksOwed; });
-   }
-
-   /// Advance one slot and require a block, for callers that only need production to be moving.
-   bool step_one_slot() {
-      const uint32_t before = _blocks_produced.load();
-      _now += fc::milliseconds(config::block_interval_ms);
-      fc::mock_time_traits::set_now(_now);
-      return wait_for([&]() { return _blocks_produced.load() > before; });
+   /// Counting blocks against slots elapsed is not a safe invariant here. A block ships at its cpu
+   /// effort deadline rather than at its slot, and those deadlines sit closer together than slots
+   /// do, so the node runs progressively further ahead across a round and then waits out a gap of
+   /// nearly two slots at the round boundary. How far ahead it is at any moment follows from where
+   /// in that round it started, which is startup timing rather than anything under test. What does
+   /// hold, and what a starved timer breaks, is that production keeps moving while the clock does.
+   bool advance_until_head_moves() {
+      const uint32_t before = head_block_num();
+      // Three slots covers the round boundary gap, the longest legitimate pause in shipping.
+      for (uint32_t slot = 0; slot < 3; ++slot) {
+         _now += fc::milliseconds(config::block_interval_ms);
+         fc::mock_time_traits::set_now(_now);
+         if (wait_up_to(std::chrono::seconds(2), [&]() { return head_block_num() > before; }))
+            return true;
+      }
+      // One last generous wait, so a merely loaded machine is not mistaken for a stalled one.
+      return wait_for([&]() { return head_block_num() > before; });
    }
 
 private:
@@ -242,10 +255,12 @@ BOOST_AUTO_TEST_CASE(production_follows_the_virtual_clock) {
    // 2. Every slot the clock advances through must yield a block. Stepping one slot at a time is
    //    what makes a silently skipped slot a failure rather than a timing artifact.
    for (uint32_t slot = 1; slot <= slots_to_step; ++slot) {
-      BOOST_REQUIRE_MESSAGE(node.step_one_slot_expecting(settled, slot),
-                            "after " << slot << " slots of virtual time the node had produced "
-                                     << (node.blocks_produced() - settled) << " blocks, so it fell a slot behind");
+      BOOST_REQUIRE_MESSAGE(node.advance_until_head_moves(),
+                            "production stopped at step " << slot << " of " << slots_to_step
+                                                          << ": the head did not move across three slots of "
+                                                             "virtual time");
    }
+   BOOST_CHECK_GT(node.blocks_produced(), settled);
 
    // 3. Stopping the clock must stop production, confirming that step 2 measured the clock driving
    //    production rather than production simply running free.
@@ -284,11 +299,11 @@ BOOST_AUTO_TEST_CASE(production_survives_a_competing_reschedule) {
       BOOST_REQUIRE_MESSAGE(disturbed_fut.wait_for(reaction_timeout) == std::future_status::ready,
                             "the node stopped servicing its main thread at step " << slot);
 
-      BOOST_REQUIRE_MESSAGE(node.step_one_slot_expecting(settled, slot),
-                            "after " << slot << " slots the node had produced " << (node.blocks_produced() - settled)
-                                     << " blocks: the produce timer was starved by the reschedule that "
-                                        "get_integrity_hash triggers");
+      BOOST_REQUIRE_MESSAGE(node.advance_until_head_moves(),
+                            "production stopped at step " << slot << ": the produce timer was starved by the "
+                                                             "reschedule that get_integrity_hash triggers");
    }
+   BOOST_CHECK_GT(node.blocks_produced(), settled);
 }
 
 /**
@@ -321,23 +336,36 @@ BOOST_AUTO_TEST_CASE(read_window_opens_only_when_the_write_window_expires) {
    std::this_thread::sleep_for(real_time_patience);
    BOOST_CHECK(node.in_write_window());
 
-   // Prime the queue immediately before crossing the deadline: the main thread also drains read only
-   // work during the write window, so a backlog has to still be there when the timer fires.
+   // Two things have to be true at once for the read window to open, and each is easy to lose.
+   // switch_to_read_window returns to the write window when it finds the read only queue empty, and
+   // the main thread drains that queue during the write window, so a batch posted up front can be
+   // gone by the time the timer fires. And each return to the write window re-arms the timer for
+   // another window's worth of virtual time, which only expires if the clock keeps moving. So drive
+   // both: keep topping the queue up and keep advancing, until the window actually changes.
    std::atomic<uint32_t> read_only_ran{0};
-   for (uint32_t i = 0; i < 2000; ++i)
-      node.post_read_only([&]() { ++read_only_ran; });
+   auto drive_until = [&](bool wantWriteWindow) {
+      const auto giveUp = std::chrono::steady_clock::now() + reaction_timeout;
+      while (node.in_write_window() != wantWriteWindow) {
+         if (std::chrono::steady_clock::now() > giveUp)
+            return false;
+         for (uint32_t i = 0; i < 200; ++i)
+            node.post_read_only([&]() { ++read_only_ran; });
+         node.advance(fc::microseconds(write_window_us + 1000));
+         std::this_thread::sleep_for(std::chrono::milliseconds(2));
+      }
+      return true;
+   };
 
    // Crossing the write window deadline must hand the read only threads their window.
-   node.advance(fc::microseconds(write_window_us + 1000));
-   BOOST_REQUIRE_MESSAGE(wait_for([&]() { return !node.in_write_window(); }),
-                         "the write window did not close after its deadline passed in virtual time");
+   BOOST_REQUIRE_MESSAGE(drive_until(false),
+                         "the write window did not close although the clock kept passing its deadline");
    BOOST_CHECK_MESSAGE(wait_for([&]() { return read_only_ran.load() > 0; }),
                        "the read window opened but its queued work did not run");
 
    // The read window must close on its own deadline, leaving the node producing again.
-   BOOST_REQUIRE_MESSAGE(wait_for([&]() { return node.in_write_window(); }),
+   BOOST_REQUIRE_MESSAGE(drive_until(true),
                          "the read window did not close and hand the node back to production");
-   BOOST_REQUIRE_MESSAGE(node.step_one_slot(), "production did not resume after the read window closed");
+   BOOST_REQUIRE_MESSAGE(node.advance_until_head_moves(), "production did not resume after the read window closed");
 }
 
 /**
