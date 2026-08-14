@@ -161,9 +161,15 @@ namespace sysio {
       /// (operators_per_epoch * batch_op_groups). The full window is held in the
       /// `epochstate` singleton row, flattened into a resident vector on every
       /// `advance`, and serialized into the per-outpost BatchOperatorGroups
-      /// attestation (~20 bytes per member against the 64 KiB OPP envelope cap).
-      /// 1000 members keeps all three comfortably bounded while far exceeding any
-      /// practical roster.
+      /// attestation (~20 bytes per member against the 32 KiB OPP envelope cap).
+      /// The ceiling is unchanged by the platform cap reduction 65 536 -> 32 768,
+      /// but the headroom it leaves is materially tighter: at the ceiling the
+      /// roster attestation alone is ~20 KB, about 62 % of a 32 KiB envelope
+      /// (it was ~31 % of 64 KiB). 1000 members still keeps all three bounded --
+      /// the resident window vector, the epoch-boundary transaction, and the
+      /// attestation -- while far exceeding any practical roster; a roster that
+      /// large would leave little room for value-bearing attestations in the same
+      /// envelope, and `buildenv` would carry the remainder to the next epoch.
       static constexpr uint32_t MAX_SCHEDULED_BATCH_OPERATORS = 1000;
 
    private:
