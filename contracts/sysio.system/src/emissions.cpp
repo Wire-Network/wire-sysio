@@ -179,18 +179,25 @@ int64_t get_reserv_rewards_balance() {
 // account the protocol does not control therefore hands it an abort switch over every parent
 // inline action.
 //
-// THREE call sites remain, and every one targets a protocol-owned account with no code of its own:
+// THREE call sites remain, and every one targets a PROTOCOL-CONTROLLED account. What makes each
+// safe differs, and the difference is the thing to preserve:
 //
-//   * `fundclaim`             -> `sysio.dclaim`
-//   * `payepoch` (capex)      -> `sysio.ops`
-//   * `payepoch` (governance) -> `sysio.gov`
+//   * `fundclaim`             -> `sysio.dclaim`  — a DEPLOYED contract, not a bare account. Safe
+//                                                  because it is protocol-controlled and its code
+//                                                  has no failing `sysio.token::transfer` notify
+//                                                  path; that invariant must hold as dclaim evolves.
+//   * `payepoch` (capex)      -> `sysio.ops`     — no code deployed
+//   * `payepoch` (governance) -> `sysio.gov`     — no code deployed
 //
-// The two `payepoch` pushes are on the never-throw `advance` path, so this list IS the set of
-// accounts that could abort epoch advancement if code were ever deployed on them — see the standing
-// constraint at those call sites. Adding a fourth destination outside protocol control reopens the
-// vulnerability this file exists to close.
+// The two `payepoch` pushes are on the never-throw `advance` path, so those two accounts are the
+// ones that could abort epoch advancement if code were ever deployed on them — see the standing
+// constraint at that call site. Adding a fourth AUTOMATIC destination outside protocol control
+// reopens the vulnerability this file exists to close.
 //
-// Every payout to an account the protocol does not control goes through `credit_pay` instead.
+// The scope is automatic payouts on never-throw paths. A claimant-authorized action MAY transfer
+// straight to an uncontrolled account — `claimpay` and `claimnodedis` do, correctly: they carry the
+// claimant's own authority, so a hostile notify handler blocks nothing but that caller's own payout.
+// It is the payepoch path that credits via `credit_pay` instead.
 void send_wire_transfer(name self, name to, int64_t amount, std::string_view memo_str) {
    if (amount <= 0) return;
    sysio::action(

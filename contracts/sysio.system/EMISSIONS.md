@@ -50,9 +50,14 @@ the CATEGORY, not the trace:
   a claimant who earned both a producer and a batch-op share receives one transfer
   carrying neither category.
 
-Per-bucket attribution therefore comes from the `epochlog` row (aggregate amounts per
-category), and per-recipient attribution from `payclaims` deltas plus the claim
-transfer.
+And `epochlog` does not recover the split either. It records top-level PERIOD aggregates
+— `total_emission`, `compute_amount`, `capex_amount`, `governance_amount`,
+`fee_distributed` — where `compute_amount` is the COMBINED producer + batch-operator
+pool. Neither operator category's actually-credited total is stored, so once both kinds
+of credit accumulate in one `payclaims` row, **the producer-versus-batch-operator split
+is not available anywhere on chain**. What you can attribute: period totals per top-level
+category from `epochlog`, and per-recipient amounts from `payclaims` deltas plus the
+claim transfer.
 
 **`sysio.ops` and `sysio.gov` stay pushed** because no claim path can reach them:
 a claim needs `require_auth(account_name)`, `sysio.roa` forces

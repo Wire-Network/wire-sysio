@@ -153,21 +153,6 @@ uint64_t pay_out(Table& tbl, const Key& key, sysio::name self, sysio::name token
    return amount;
 }
 
-/// Total of every outstanding claimable balance, saturating.
-///
-/// Callers that gate spending against a live token balance MUST subtract this: the WIRE backing
-/// unclaimed rows is already owed, and spending it would leave a later `pay_out` unpayable. O(n)
-/// over the table, so it is intended for bounded claimable sets (a producer schedule, a registered
-/// operator set), not for the unbounded ones.
-template<class Table>
-uint64_t total_outstanding(const Table& tbl) {
-   uint64_t total = 0;
-   for (auto it = tbl.begin(); it != tbl.end(); ++it) {
-      total = safe::add_sat_u64(total, it->balance);
-   }
-   return total;
-}
-
 /// Bounded sweep of rows past their expiry, returning the reclaimed total.
 ///
 /// Iterates the caller's expiry-ordered secondary index so the oldest rows are visited first and

@@ -1463,10 +1463,13 @@ void opreg::releaselock(name account,
       emit_slash_attestation(get_self(), slash_action);
       append_action_log(ops, op_pk, slash_action, /*success*/ true, "");
    } else {
-      // TERMINATED — for WIRE-direct, CREDIT the operator's `remitclaims` row (it is paid only
-      // when it calls `claimremit`; a pushed transfer here would let the operator being terminated
-      // abort its own termination); otherwise queue WITHDRAW_REMIT so the outpost can transfer to
-      // the authex destination. request_id == 0 (this remit isn't queued in wtdwqueue).
+      // TERMINATED — for WIRE-direct, CREDIT the operator's `remitclaims` row; it is paid only when
+      // it calls `claimremit`. The termination itself already committed in an earlier epoch, so a
+      // pushed transfer here could not undo it — what it WOULD do is abort this lock release, which
+      // `chklocks` runs inline from `sysio.epoch::advance`, stalling epoch advancement chain-wide
+      // and leaving the lock unreleased on every retry. (Aborting the termination itself is the
+      // `terminate_inline` case below.) Otherwise queue WITHDRAW_REMIT so the outpost can transfer
+      // to the authex destination. request_id == 0 (this remit isn't queued in wtdwqueue).
       if (chain_code == kWireChainCode) {
          credit_remit_claim(get_self(), account, settle_amount);
       } else {

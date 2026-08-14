@@ -670,8 +670,10 @@ void epoch::advance() {
    // Drain matured rows from `sysio.opreg::wtdwqueue`. Operators that queued
    // a withdrawal at least WITHDRAW_WAIT_EPOCHS ago are now eligible — opreg
    // subtracts from the balance and emits OPERATOR_ACTION(WITHDRAW_REMIT) to
-   // the matching outpost (or transfers WIRE tokens directly for WIRE-direct
-   // withdraws). Slashed-during-the-wait rows are dropped silently inside
+   // the matching outpost (or, for WIRE-direct withdraws, CREDITS the operator's
+   // `sysio.opreg::remitclaims` row, which it pulls with `claimremit` — nothing
+   // is transferred from this path, precisely because it runs inline from here).
+   // Slashed-during-the-wait rows are dropped silently inside
    // opreg's flushwtdw. See CLAUDE-WIRE-OPERATOR-COLLATERAL-IMPL-PLAN.md §3.3.
    action(
       permission_level{get_self(), "owner"_n},
