@@ -12,8 +12,11 @@ rate every swap is charged.
   against their WIRE account permissions, re-runs the LP variance check,
   re-checks available collateral, then picks a winner.
 - Writes one collateral lock per required leg and holds it for the full
-  wall-clock challenge window. **Locks are never released by delivery** — only
-  `chklocks` sweeps them once `expires_at_ms` passes.
+  wall-clock challenge window. **Locks are never released by delivery** — on the
+  healthy path only `chklocks` sweeps them, once `expires_at_ms` passes. An
+  UPHELD underwriter-fault challenge ends the window early instead: `sweeplocks`
+  erases that commitment's locks where they stand, which can be well before
+  `expires_at_ms`.
 - Settles the winning swap against `sysio.reserv` and queues the outbound
   `SWAP_REMIT`.
 - Escrows and drains swap-from-WIRE requests (`fwqueue`), charging a revert fee
@@ -78,7 +81,7 @@ chain deregistered) refund in full.
 | `rcrdcommit` | `sysio.msgch` | Record an underwriter's per-leg `UNDERWRITE_INTENT_COMMIT` bytes; resolves the race once both legs are present |
 | `swapfromwire` | `user` | Escrow WIRE and enqueue a swap-FROM-WIRE request |
 | `drainfwq` | `sysio.epoch` or self | Drain the from-WIRE queue: settle what prices, revert the rest (charging the revert fee on caller-fault causes) |
-| `chklocks` | `sysio.epoch` or self | Sweep collateral locks whose wall-clock window has expired, oldest-first, at most `max_rows` per call (`advance` passes `MAX_LOCK_RELEASE_PER_EPOCH`); an oversized expiry burst drains across later epochs rather than aborting `advance` |
+| `chklocks` | `sysio.epoch` or self | Sweep collateral locks whose wall-clock window has expired, oldest-first, EXAMINING at most `max_rows` rows per call (`advance` passes `MAX_LOCK_RELEASE_PER_EPOCH`) — the budget counts rows examined rather than locks released, so held locks and the challenge pokes they generate are bounded by it too; an oversized expiry burst drains across later epochs rather than aborting `advance` |
 | `pruneuwreqs` | `sysio.epoch` or self | Expire timed-out PENDING uwreqs and erase terminal rows past their retention window |
 | `holdlocks` | `sysio.chalg` | Mark a commitment's winning locks as held by an OPEN underwriter-fault challenge (WIRE-297); held locks are skipped by `chklocks` instead of released |
 | `freelocks` | `sysio.chalg` | Clear the hold after a REJECTED or LAPSED challenge, so the next `chklocks` releases the locks normally |
