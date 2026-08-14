@@ -1,5 +1,5 @@
 {
-  "address": "2FcAgnSdn29VXZ3eF2jS4U4KzGaYm5M9Wha1CtArm9EU",
+  "address": "5nBtmutQLrRKBUxNfHJPDjiW5u8id6QM9Hhjg1D1g1XH",
   "metadata": {
     "name": "opp_outpost",
     "version": "0.1.0",
@@ -25,114 +25,32 @@
           "signer": true
         },
         {
-          "name": "config",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  111,
-                  117,
-                  116,
-                  112,
-                  111,
-                  115,
-                  116,
-                  95,
-                  99,
-                  111,
-                  110,
-                  102,
-                  105,
-                  103
-                ]
-              }
-            ]
-          }
+          "name": "liqsol_mint"
         },
         {
-          "name": "message_buffer",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  109,
-                  101,
-                  115,
-                  115,
-                  97,
-                  103,
-                  101,
-                  95,
-                  98,
-                  117,
-                  102,
-                  102,
-                  101,
-                  114
-                ]
-              }
-            ]
-          }
+          "name": "distribution_state",
+          "writable": true
         },
         {
-          "name": "operator_registry",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  111,
-                  112,
-                  101,
-                  114,
-                  97,
-                  116,
-                  111,
-                  114,
-                  95,
-                  114,
-                  101,
-                  103,
-                  105,
-                  115,
-                  116,
-                  114,
-                  121
-                ]
-              }
-            ]
-          }
+          "name": "bucket_authority"
+        },
+        {
+          "name": "pool_authority"
+        },
+        {
+          "name": "token_program"
         },
         {
           "name": "system_program"
+        },
+        {
+          "name": "rent"
         }
       ],
-      "args": [
-        {
-          "name": "consensus_threshold",
-          "type": "u32"
-        }
-      ]
+      "args": []
     },
     {
       "name": "epoch_in",
-      "docs": [
-        "Accept one chunk of an inbound epoch envelope from a batch operator.",
-        "",
-        "Solana's 1 232-byte transaction MTU forces production-scale OPP",
-        "envelopes (multi-KB) to stream in pieces; the program assembles",
-        "each operator's chunks in a per-(epoch, operator) staging PDA. A",
-        "final zero-data call (`chunk_index == total_chunks`) finalizes the",
-        "already-uploaded bytes. Once consensus is reached across the active",
-        "group, the enclosed attestations are processed inline and the epoch",
-        "cursor advances. A 1-chunk envelope is the degenerate data-upload",
-        "case followed by the same terminal call."
-      ],
       "discriminator": [
         85,
         70,
@@ -159,49 +77,14 @@
         },
         {
           "name": "epoch_deliveries",
-          "docs": [
-            "Per-epoch consensus tracker. Lazily inited on the first delivery",
-            "(i.e. the first operator to land their terminal call for this epoch)."
-          ],
           "writable": true
         },
         {
           "name": "chunk_buffer",
-          "docs": [
-            "Per-(epoch, operator) staging buffer. Same `init_if_needed` +",
-            "`payer = operator` pattern the program already uses for",
-            "`EpochDeliveries`. Closed by the handler when the operator's",
-            "zero-data terminal call finalizes the envelope, returning the",
-            "rent lamports — net cost to the operator across the full epoch is zero."
-          ],
           "writable": true
         },
         {
           "name": "inbound_envelopes",
-          "docs": [
-            "Singleton inbound-envelope log. Append-and-prune on every",
-            "consensus-reach (see `finalize_envelope`)."
-          ],
-          "writable": true
-        },
-        {
-          "name": "outbound_message_buffer",
-          "writable": true
-        },
-        {
-          "name": "outbound_envelopes",
-          "writable": true
-        },
-        {
-          "name": "latest_outbound_envelope",
-          "writable": true
-        },
-        {
-          "name": "vault",
-          "writable": true
-        },
-        {
-          "name": "reserve_aggregate",
           "writable": true
         },
         {
@@ -245,62 +128,31 @@
       ],
       "accounts": [
         {
-          "name": "caller",
+          "name": "admin",
+          "writable": true,
           "signer": true
         },
         {
-          "name": "config",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  111,
-                  117,
-                  116,
-                  112,
-                  111,
-                  115,
-                  116,
-                  95,
-                  99,
-                  111,
-                  110,
-                  102,
-                  105,
-                  103
-                ]
-              }
-            ]
-          }
+          "name": "global_config"
         },
         {
-          "name": "message_buffer",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  109,
-                  101,
-                  115,
-                  115,
-                  97,
-                  103,
-                  101,
-                  95,
-                  98,
-                  117,
-                  102,
-                  102,
-                  101,
-                  114
-                ]
-              }
-            ]
-          }
+          "name": "config",
+          "writable": true
+        },
+        {
+          "name": "outbound_message_buffer",
+          "writable": true
+        },
+        {
+          "name": "outbound_envelopes",
+          "writable": true
+        },
+        {
+          "name": "latest_outbound_envelope",
+          "writable": true
+        },
+        {
+          "name": "system_program"
         }
       ],
       "args": [
@@ -329,83 +181,19 @@
           "signer": true
         },
         {
-          "name": "config",
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  111,
-                  117,
-                  116,
-                  112,
-                  111,
-                  115,
-                  116,
-                  95,
-                  99,
-                  111,
-                  110,
-                  102,
-                  105,
-                  103
-                ]
-              }
-            ]
-          }
+          "name": "config"
         },
         {
-          "name": "message_buffer",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  109,
-                  101,
-                  115,
-                  115,
-                  97,
-                  103,
-                  101,
-                  95,
-                  98,
-                  117,
-                  102,
-                  102,
-                  101,
-                  114
-                ]
-              }
-            ]
-          }
+          "name": "operator_registry",
+          "writable": true
+        },
+        {
+          "name": "outbound_message_buffer",
+          "writable": true
         },
         {
           "name": "vault",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  111,
-                  117,
-                  116,
-                  112,
-                  111,
-                  115,
-                  116,
-                  95,
-                  118,
-                  97,
-                  117,
-                  108,
-                  116
-                ]
-              }
-            ]
-          }
+          "writable": true
         },
         {
           "name": "system_program"
@@ -414,11 +202,11 @@
       "args": [
         {
           "name": "operator_type",
-          "type": "u8"
+          "type": "u32"
         },
         {
-          "name": "wire_account_name",
-          "type": "string"
+          "name": "token_code",
+          "type": "u64"
         },
         {
           "name": "amount",
@@ -428,12 +216,6 @@
     },
     {
       "name": "cleanup_envelope_chunks",
-      "docs": [
-        "Permissionless reaper for `EnvelopeChunks` PDAs an operator started",
-        "but never finished. Callable once the chain has advanced past",
-        "`epoch_index` (consensus reached); rent returns to the original",
-        "uploader. The caller pays only the tx fee."
-      ],
       "discriminator": [
         224,
         118,
@@ -447,9 +229,6 @@
       "accounts": [
         {
           "name": "reaper",
-          "docs": [
-            "Anyone can invoke. Pays the tx fee, gets nothing in return."
-          ],
           "signer": true
         },
         {
@@ -460,26 +239,84 @@
         },
         {
           "name": "chunk_buffer",
-          "docs": [
-            "The stale buffer to close. The seeds constraint pins the PDA's",
-            "third seed to `uploader.key()`, so Anchor's PDA derivation is",
-            "itself the proof that `uploader` IS the operator that originally",
-            "opened this buffer. `close = uploader` returns rent to that key."
-          ],
           "writable": true
         },
         {
           "name": "uploader",
-          "docs": [
-            "The original uploader. Receives the reclaimed rent. Must be `mut`",
-            "so Anchor's `close` can credit lamports."
-          ],
           "writable": true
         }
       ],
       "args": [
         {
           "name": "epoch_index",
+          "type": "u32"
+        }
+      ]
+    },
+    {
+      "name": "dispatch_attestations",
+      "discriminator": [
+        142,
+        108,
+        131,
+        92,
+        227,
+        101,
+        16,
+        205
+      ],
+      "accounts": [
+        {
+          "name": "caller",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "config",
+          "writable": true
+        },
+        {
+          "name": "operator_registry",
+          "writable": true
+        },
+        {
+          "name": "epoch_deliveries",
+          "writable": true
+        },
+        {
+          "name": "chunk_buffer"
+        },
+        {
+          "name": "outbound_message_buffer",
+          "writable": true
+        },
+        {
+          "name": "outbound_envelopes",
+          "writable": true
+        },
+        {
+          "name": "latest_outbound_envelope",
+          "writable": true
+        },
+        {
+          "name": "vault",
+          "writable": true
+        },
+        {
+          "name": "reserve_aggregate",
+          "writable": true
+        },
+        {
+          "name": "system_program"
+        }
+      ],
+      "args": [
+        {
+          "name": "epoch_index",
+          "type": "u32"
+        },
+        {
+          "name": "dispatch_limit",
           "type": "u32"
         }
       ]
@@ -510,19 +347,6 @@
         247,
         59,
         127
-      ]
-    },
-    {
-      "name": "MessageBuffer",
-      "discriminator": [
-        25,
-        244,
-        3,
-        5,
-        225,
-        165,
-        29,
-        250
       ]
     },
     {
@@ -559,8 +383,16 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "authority",
-            "type": "pubkey"
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "config_version",
+            "type": "u8"
+          },
+          {
+            "name": "chain_code",
+            "type": "u64"
           },
           {
             "name": "next_epoch_index",
@@ -576,8 +408,21 @@
             }
           },
           {
-            "name": "consensus_threshold",
+            "name": "previous_outbound_epoch_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "epoch_duration_sec",
             "type": "u32"
+          },
+          {
+            "name": "current_epoch_started_at",
+            "type": "i64"
           },
           {
             "name": "registry_initialized",
@@ -597,8 +442,28 @@
             "type": "u64"
           },
           {
-            "name": "bump",
-            "type": "u8"
+            "name": "envelope_retention_epochs",
+            "type": "u32"
+          },
+          {
+            "name": "token_addresses_by_code",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "TokenAddressEntry"
+                }
+              }
+            }
+          },
+          {
+            "name": "precision_by_token_code",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "TokenPrecisionEntry"
+                }
+              }
+            }
           }
         ]
       }
@@ -608,6 +473,10 @@
       "type": {
         "kind": "struct",
         "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
           {
             "name": "token_code",
             "type": "u64"
@@ -673,10 +542,70 @@
                 256
               ]
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "OperatorDelivery",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "operator",
+            "type": "pubkey"
           },
+          {
+            "name": "envelope_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "EpochDeliveries",
+      "type": {
+        "kind": "struct",
+        "fields": [
           {
             "name": "bump",
             "type": "u8"
+          },
+          {
+            "name": "epoch_index",
+            "type": "u32"
+          },
+          {
+            "name": "deliveries",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "OperatorDelivery"
+                }
+              }
+            }
+          },
+          {
+            "name": "consensus_reached",
+            "type": "bool"
+          },
+          {
+            "name": "consensus_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "dispatched_count",
+            "type": "u32"
           }
         ]
       }
@@ -694,6 +623,38 @@
           },
           {
             "name": "Cancelled"
+          }
+        ]
+      }
+    },
+    {
+      "name": "TokenAddressEntry",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "token_code",
+            "type": "u64"
+          },
+          {
+            "name": "mint",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "TokenPrecisionEntry",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "token_code",
+            "type": "u64"
+          },
+          {
+            "name": "decimals",
+            "type": "u8"
           }
         ]
       }

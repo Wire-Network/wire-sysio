@@ -120,3 +120,9 @@ cliff.toml
 
 # oh-my-claudecode runtime state (operational artifacts, never committed)
 .omc/
+
+# Build residue from containerised builds: the OPP bundle generator's pnpm
+# store, and the throwaway HOME the build container needs because it runs as
+# a non-root uid with no home of its own.
+.pnpm-store/
+.container-home/

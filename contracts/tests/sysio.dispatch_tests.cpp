@@ -179,16 +179,16 @@ std::vector<char> encode_envelope_with_attestations(
    return out;
 }
 
-/// Mirrors the contract-internal `MAX_ENVELOPE_BYTES` protocol cap (64 KiB, shared with the
+/// Mirrors the contract-internal `MAX_ENVELOPE_BYTES` protocol cap (32 KiB, shared with the
 /// Ethereum and Solana outpost implementations). The contract constant lives in the msgch
 /// translation unit — contract headers are not host-compilable — so tests keep this manual
 /// mirror, same as the outbound packing tests in sysio.msgch_tests.cpp.
-constexpr size_t MAX_ENVELOPE_BYTES = 65'536;
+constexpr size_t MAX_ENVELOPE_BYTES = 32'768;
 
 /// Encode a decodable envelope whose serialised size is EXACTLY `target_bytes`, padded with a
 /// single out-of-scope STAKE attestation (dispatch drops it with no value-bearing effect). Probe
 /// once with `target_bytes` of padding to measure the fixed protobuf overhead, then rebuild with
-/// the pad shrunk by that overhead: at sizes near the 64 KiB envelope cap every nested length
+/// the pad shrunk by that overhead: at sizes near the 32 KiB envelope cap every nested length
 /// prefix and the `data_size` varint sit in the same 3-byte width band (16 KiB .. 2 MiB), so the
 /// second pass lands exactly on target — the final REQUIRE pins it.
 std::vector<char> encode_envelope_padded_to(uint32_t epoch_index, size_t target_bytes) {
@@ -1798,7 +1798,7 @@ BOOST_FIXTURE_TEST_CASE(deliver_duplicate_from_same_operator_reverts, sysio_disp
       deliver(/*chain_code=*/eth_code, envelope));
 } FC_LOG_AND_RETHROW() }
 
-// The inbound `deliver` boundary enforces the same 64 KiB protocol envelope cap the outbound
+// The inbound `deliver` boundary enforces the same 32 KiB protocol envelope cap the outbound
 // `buildenv` packer obeys (and that the Ethereum/Solana outposts enforce on their side): a
 // decodable current-epoch envelope one byte over the cap must revert before anything is hashed
 // or stored. Without the contract-level cap, the generic chain ceilings (~512 KiB inline-action,

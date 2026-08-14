@@ -343,7 +343,8 @@ function genMessageDecode(
   return [
     `            ${tag} => {`,
     `                let (len, new_pos) = decode_varint(data, pos)?;`,
-    `                let end = new_pos + len as usize;`,
+    `                let end = new_pos.checked_add(len as usize).ok_or(DecodeError::BufferOverflow)?;`,
+    `                if end > data.len() { return Err(DecodeError::BufferOverflow); }`,
     `                msg.${rustName} = ${structType}::decode(&data[new_pos..end])?;`,
     `                pos = end;`,
     `            }`
@@ -361,7 +362,8 @@ function genRepeatedDecode(
     return [
       `            ${tag} => {`,
       `                let (len, new_pos) = decode_varint(data, pos)?;`,
-      `                let end = new_pos + len as usize;`,
+      `                let end = new_pos.checked_add(len as usize).ok_or(DecodeError::BufferOverflow)?;`,
+      `                if end > data.len() { return Err(DecodeError::BufferOverflow); }`,
       `                msg.${rustName}.push(${structType}::decode(&data[new_pos..end])?);`,
       `                pos = end;`,
       `            }`
@@ -423,7 +425,8 @@ function genMapDecode(field: FieldInfo, rustName: string, tag: number): string {
     `            ${tag} => {`,
     `                let (entry_len, new_pos) = decode_varint(data, pos)?;`,
     `                pos = new_pos;`,
-    `                let entry_end = pos + entry_len as usize;`,
+    `                let entry_end = pos.checked_add(entry_len as usize).ok_or(DecodeError::BufferOverflow)?;`,
+    `                if entry_end > data.len() { return Err(DecodeError::BufferOverflow); }`,
     `                let mut key: ${keySol} = Default::default();`,
     `                let mut val: ${valSol} = Default::default();`,
     `                while pos < entry_end {`,
@@ -442,7 +445,8 @@ function genMapDecode(field: FieldInfo, rustName: string, tag: number): string {
     lines.push(
       `                        ${valTag} => {`,
       `                            let (v_len, new_pos) = decode_varint(data, pos)?;`,
-      `                            let v_end = new_pos + v_len as usize;`,
+      `                            let v_end = new_pos.checked_add(v_len as usize).ok_or(DecodeError::BufferOverflow)?;`,
+      `                            if v_end > data.len() { return Err(DecodeError::BufferOverflow); }`,
       `                            val = ${valSol}::decode(&data[new_pos..v_end])?;`,
       `                            pos = v_end;`,
       `                        }`

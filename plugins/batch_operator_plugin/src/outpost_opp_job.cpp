@@ -117,6 +117,11 @@ void outpost_opp_job::run_outbound() {
    } FC_LOG_AND_DROP("outpost_opp_job[{}]: emit_debug_envelope threw", _client->to_string());
 
    try {
+      // An EMPTY tx id is a defined outcome, not a failure: the relay skipped a
+      // delivery whose epoch the outpost has already advanced past (chunked
+      // Ethereum deliveries read that back before spending gas on late no-ops).
+      // The epoch is correctly marked handled below; the relay's own
+      // "skipping epoch=..." ilog is the truthful record of what happened.
       auto tx_id = _client->deliver_outbound_envelope(epoch, pending->raw_envelope, _outpost_deadline);
       ilog("outpost_opp_job[{}]: {} outbound envelope ({} bytes) tx={}",
            _client->to_string(),
