@@ -15,19 +15,39 @@ Contracts outside the coupled set stage separately, in any order.
 
 ## The deployment recipe
 
-Two repository defaults make "just `setcode` everything in one transaction"
-fail, and both bite this release specifically.
+"Just `setcode` everything in one transaction" fails twice over — once on which
+action deploys each account, once on transaction size — and both bite this
+release specifically.
 
-**1. System contracts deploy through `sysio.roa`, not through raw `setcode`.**
-`sysio.roa::setsyscode(account, vmtype, vmversion, code)` and
-`sysio.roa::setsysabi(account, abi)` set the code/abi AND gift the exact RAM it
-consumes out of sysio's pool via `giftram`, measured after the write
-(re-callable: a smaller re-deploy reclaims the freed RAM). A raw
-`setcode`/`setabi` skips that reconciliation, so the account is left paying for
-the new size out of a finite quota it does not have — a provisioned system
-account keeps only its small creation allowance. This is not theoretical for
-this release: `sysio.reserv.wasm` grows **6,040 bytes** and `sysio.opreg.wasm`
-grows **2,447 bytes**.
+**1. The deploy action depends on WHICH account holds the contract — the
+transaction mixes both.**
+
+*Separate system accounts* (`sysio.epoch`, `sysio.reserv`, `sysio.opreg`,
+`sysio.uwrit`, …) deploy through **`sysio.roa::setsyscode(account, vmtype,
+vmversion, code)` / `sysio.roa::setsysabi(account, abi)`**. Those set the
+code/abi AND reconcile the account's gifted RAM to its exact new usage out of
+sysio's pool via `giftram`, measured after the write (re-callable: a smaller
+re-deploy reclaims). A raw `setcode` here skips that reconciliation and leaves
+the account paying for the new size out of a finite quota it does not have —
+not theoretical for this release, where `sysio.reserv.wasm` grows **6,040
+bytes** and `sysio.opreg.wasm` grows **2,447 bytes** against a system account's
+small creation allowance.
+
+*The root `sysio` account* — which holds `sysio.system` and **is the RAM pool
+itself** — deploys with the **native `setcode` / `setabi`**. `giftram` cannot
+self-target: with `account == sysio` and a positive delta it moves the delta
+from sysio's reslimit row into `sysio.acct`, then calls
+`set_resource_limits(sysio, sram - delta)` and `add_system_resources(sysio,
+delta)` — both against the same account, so the chain quota is restored while
+the ROA ledger has already been decremented. The result is a ledger that reads
+lower than the actual quota, and it fails silently: sysio's limit is finite, so
+`giftram`'s own `cur_ram >= 0` guard does not catch it. This is why the
+production bootstrap deploys `system` on `sysio` natively (the harness encodes
+the same split as `ContractSteps.DeployMode.raw` for bios/system/roa).
+
+So the atomic transaction for this release's trio carries **native
+`setcode`/`setabi` for `sysio`** plus **ROA `setsyscode`/`setsysabi` for
+`sysio.epoch` and `sysio.reserv`**.
 
 **2. The whole release does not fit in one transaction.** The five changed
 WASMs total **579,408 bytes**, already past the default
