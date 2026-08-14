@@ -45,18 +45,108 @@ def slotsBetween(earlier, later):
     """Return the number of production slots from one parsed block timestamp to another."""
     return round((later - earlier).total_seconds() / slotTime)
 
-def phasesAllowingRun(firstSlot, lastSlot, windowSize):
-    """Return the window grid phases under which one run of blocks fits inside a single window.
+def censusProductionCycle(getBlock, firstBlockNum, windowPhase, windowSize, cycleLength, scheduledProducers):
+    """Attribute one full rotation of producers to the windows of a single schedule grid.
 
-    A run of consecutive blocks by one producer occupies slots firstSlot..lastSlot and must lie
-    within one window, so the window can begin anywhere from the run's own start back to the point
-    where the run ends on the window's last slot. Each of those starts implies a phase, and the
-    phases common to several runs are the ones the grid can actually have.
+    Each producer owns exactly one contiguous window of windowSize slots, and a slot that goes
+    unproduced leaves a hole inside its window: it never moves a window boundary and it never hands a
+    slot to the next producer.  The cycle is therefore derived from the window each block falls in
+    rather than from runs of consecutive blocks by the same producer.  Runs are only a proxy for the
+    schedule, and a loaded test machine breaks the proxy: a node that stalls past its slot leaves a
+    short run, or no run at all, with nothing wrong with the schedule.  Window boundaries are the
+    property actually under test and they do not move when a block is late.
+
+    getBlock(blockNum) supplies a block as (producer, slot), slots counted from an arbitrary origin.
+    windowPhase says which slots begin a window, modulo windowSize.  The grid the chain is running on
+    is not known ahead of time, so the caller tries each phase in turn: rather than exit on a
+    violation this returns it in "error", leaving the caller to decide whether some other grid
+    explains the same blocks.  "error" is None when this one explains all of them, and the rest of
+    the result then describes the rotation:
+
+      cycle          the producers in the order their windows come round
+      counts         how many blocks each of them signed
+      silentWindows  cycle positions whose producer signed nothing at all
+      blocksExamined how far the walk got, which ranks the grids against each other when they all
+                     fail and the most informative violation has to be picked out
     """
-    length=lastSlot - firstSlot + 1
-    if length > windowSize:
-        return set()
-    return set((firstSlot - offset) % windowSize for offset in range(0, windowSize - length + 1))
+    windowOfSlot=lambda slot: (slot - windowPhase) // windowSize
+    cycle=[]
+    counts={}
+    windowToProducer={}
+    producerToWindow={}
+    blocksExamined=0
+    result={"cycle":cycle, "counts":counts, "silentWindows":[], "blocksExamined":0, "error":None}
+
+    def fail(message):
+        result["blocksExamined"]=blocksExamined
+        result["error"]=message
+        return result
+
+    blockNum=firstBlockNum
+    producer,slot=getBlock(blockNum)
+    firstWindow=windowOfSlot(slot)
+    endWindow=firstWindow + cycleLength   # exclusive, one full rotation
+    lastWindow=firstWindow
+
+    while True:
+        window=windowOfSlot(slot)
+        if window >= endWindow:
+            # This look-ahead block is the first at or past the wrap, and it is checked rather than
+            # discarded: a producer granted a thirteenth consecutive slot would put its own block
+            # here, and only comparing against the producer that owns the window this cycle started
+            # on catches that.
+            if window == endWindow:
+                wrapped=windowToProducer.get(firstWindow)
+                if wrapped is not None and producer != wrapped:
+                    return fail("Block %d opens the next cycle at position %d but was produced by %s, where the cycle "
+                                "began with %s.  A cycle of %d producers must wrap onto the producer it started with." %
+                                (blockNum, window-firstWindow, producer, wrapped, cycleLength))
+            break
+
+        if producer not in scheduledProducers:
+            return fail("Producer %s, of block %d, was not one of the voted on producers" % (producer, blockNum))
+
+        if window < lastWindow:
+            return fail("Block %d, produced by %s, is at cycle position %d, behind position %d of the block before "
+                        "it." % (blockNum, producer, window-firstWindow, lastWindow-firstWindow))
+
+        owner=windowToProducer.get(window)
+        if owner is None:
+            if producer in producerToWindow:
+                return fail("Producer %s owns cycle position %d, but also produced block %d at position %d.  "
+                            "A producer is scheduled at most once per %d producer cycle." %
+                            (producer, producerToWindow[producer]-firstWindow, blockNum, window-firstWindow,
+                             cycleLength))
+            windowToProducer[window]=producer
+            producerToWindow[producer]=window
+            counts[producer]=0
+            cycle.append(producer)
+        elif owner != producer:
+            return fail("Block %d, %d slots into the walk, was produced by %s, but %s already produced at cycle "
+                        "position %d.  A window belongs to exactly one producer." %
+                        (blockNum, slot, producer, owner, window-firstWindow))
+
+        counts[producer]+=1
+        blocksExamined+=1
+        lastWindow=window
+
+        precedingProducer=producer
+        precedingSlot=slot
+        blockNum+=1
+        producer,slot=getBlock(blockNum)
+        if slot-precedingSlot==1 and producer!=precedingProducer and (slot - windowPhase) % windowSize != 0:
+            # A handover into the very next slot can only happen on a window boundary, so this block
+            # has to sit at offset 0 of its window.  Landing anywhere else means this handover and
+            # this grid disagree about where the boundaries are, which is a producer having been
+            # given a run of the wrong length.
+            return fail("Producer handover from %s to %s at block %d landed %d slots into a %d slot window instead of "
+                        "at its start.  Producer runs are not aligned to this window grid." %
+                        (precedingProducer, producer, blockNum, (slot - windowPhase) % windowSize, windowSize))
+
+    result["silentWindows"]=[position for position in range(cycleLength)
+                             if firstWindow+position not in windowToProducer]
+    result["blocksExamined"]=blocksExamined
+    return result
 
 def analyzeBPs(bps0, bps1, expectDivergence):
     start=0
@@ -299,64 +389,55 @@ try:
             self.waitIfNeeded(blockNum)
             return self.node.getBlock(blockNum)
 
-    # Establish the phase of the window grid, meaning which slots begin a producer's run of
-    # inRowCountPerProducer.  Every maximal run of consecutive blocks by one producer has to lie
-    # inside a single window, which constrains where that window can begin, and the phases common to
-    # several runs are the ones the grid can have.  Deriving it this way asks nothing of any
-    # particular handover: waiting for one that is slot adjacent would wait forever on a chain that
-    # misses the last slot of every window, since such a chain keeps advancing and never trips the
-    # block wait either.
-    #
-    # More than one phase can survive, when the missed slots fall in the same place in every window.
-    # That is harmless: under any surviving phase each run still lies in one window and consecutive
-    # runs in consecutive windows, which is all the census below asks of the grid.
     waiter=HeadWaiter(node, stalledChainLeewaySeconds)
     inRowCountPerProducer=12
 
-    block=waiter.getBlock(blockNum)
-    timestampStr=Node.getBlockAttribute(block, "timestamp", blockNum)
-    timestamp=datetime.strptime(timestampStr, Utils.TimeFmt)
+    class BlockReader:
+        """Reads the walked blocks as (producer, slot), fetching each of them exactly once.
 
-    originTimestamp=timestamp
-    candidatePhases=set(range(inRowCountPerProducer))
-    runProducer=blockProducer
-    runFirstSlot=0
-    runLastSlot=0
-    # Runs are what carry information, and a single complete run pins the phase outright, so the
-    # search is bounded by runs rather than blocks. Where runs are short the surviving set stops
-    # shrinking almost immediately and further runs tell us nothing, so a handful is enough; bounding
-    # it at all is what stops a chain that never yields a usable run from spinning forever.
-    runsToExamine=3
-    runsExamined=0
+        The census is replayed against one candidate window grid after another, so the same blocks
+        are read several times over and holding them is what keeps that from costing a refetch.  It
+        is also where the missed slots are recorded, since a walk that gets repeated is no place to
+        count anything.  Slots are counted from the block the walk begins on: the grid is anchored to
+        an observed block rather than to an absolute slot number, so the chain's timestamp epoch
+        never enters into it.
+        """
+        def __init__(self, waiter, firstBlockNum):
+            self.waiter=waiter
+            self.nextBlockNum=firstBlockNum
+            self.blocks={}
+            self.missedSlotAfter=[]
+            self.originTimestamp=None
+            self.lastTimestamp=None
 
-    while len(candidatePhases) > 1 and runsExamined < runsToExamine:
-        blockNum+=1
-        block=waiter.getBlock(blockNum)
-        blockProducer=Node.getBlockAttribute(block, "producer", blockNum)
-        timestampStr=Node.getBlockAttribute(block, "timestamp", blockNum)
-        timestamp=datetime.strptime(timestampStr, Utils.TimeFmt)
-        slot=slotsBetween(originTimestamp, timestamp)
+        def get(self, blockNum):
+            entry=self.blocks.get(blockNum)
+            if entry is not None:
+                return entry
+            if blockNum != self.nextBlockNum:
+                Utils.errorExit("Block %d was read before block %d, but the walk only ever moves forward." %
+                                (blockNum, self.nextBlockNum))
+            block=self.waiter.getBlock(blockNum)
+            producer=Node.getBlockAttribute(block, "producer", blockNum)
+            timestampStr=Node.getBlockAttribute(block, "timestamp", blockNum)
+            timestamp=datetime.strptime(timestampStr, Utils.TimeFmt)
+            if self.originTimestamp is None:
+                self.originTimestamp=timestamp
+            else:
+                slotsDiff=slotsBetween(self.lastTimestamp, timestamp)
+                if slotsDiff != 1:
+                    slotTimeDelta=timedelta(seconds=slotTime)
+                    missed=(self.lastTimestamp + slotTimeDelta).strftime(Utils.TimeFmt)
+                    if slotsDiff > 2:
+                        missed+= " thru " + (timestamp - slotTimeDelta).strftime(Utils.TimeFmt)
+                    self.missedSlotAfter.append("%d (%s)" % (blockNum-1, missed))
+            self.lastTimestamp=timestamp
+            entry=(producer, slotsBetween(self.originTimestamp, timestamp))
+            self.blocks[blockNum]=entry
+            self.nextBlockNum=blockNum+1
+            return entry
 
-        if blockProducer==runProducer:
-            runLastSlot=slot
-            continue
-
-        allowed=phasesAllowingRun(runFirstSlot, runLastSlot, inRowCountPerProducer)
-        candidatePhases &= allowed
-        if len(candidatePhases)==0:
-            Utils.errorExit("Producer %s held slots %d through %d, which no %d slot window can contain, so the "
-                            "producer schedule is not running in windows of %d." %
-                            (runProducer, runFirstSlot, runLastSlot, inRowCountPerProducer, inRowCountPerProducer))
-        runsExamined+=1
-        runProducer=blockProducer
-        runFirstSlot=slot
-        runLastSlot=slot
-
-    if len(candidatePhases) > 1:
-        Print("NOTE: the window grid phase is still ambiguous after %d producer runs, %s all fit them.  "
-              "Each describes the same windows for these blocks, so the census uses the lowest." %
-              (runsExamined, sorted(candidatePhases)))
-    windowPhase=min(candidatePhases)
+    reader=BlockReader(waiter, blockNum)
 
     shipNode = cluster.getNode(0)
     block_range = 1000
@@ -390,113 +471,51 @@ try:
 
     # ***   Identify what the production cycle is   ***
 
-    # Each producer owns exactly one contiguous window of inRowCountPerProducer slots, and a slot
-    # that goes unproduced leaves a hole inside its window: it never moves a window boundary and it
-    # never hands a slot to the next producer.  The cycle is therefore derived from the window each
-    # block falls in rather than from runs of consecutive blocks by the same producer.  Runs are only
-    # a proxy for the schedule, and a loaded test machine breaks the proxy: a node that stalls past
-    # its slot leaves a short run, or no run at all, with nothing wrong with the schedule.  Window
-    # boundaries are the property actually under test and they do not move when a block is late.
+    # Which slots begin a producer's window is not known ahead of time, so the walk is run against
+    # each of the inRowCountPerProducer grids in turn and the first that explains every block is the
+    # one the chain is running on.  Deriving a single grid up front instead, from how the earliest
+    # runs of consecutive blocks sit, does not work: it asks the same question the walk itself asks,
+    # only of fewer blocks, so the answer can be ambiguous and committing to one of the survivors
+    # rejects chains the surviving alternative accepts.  It also has nowhere to stop, since a
+    # producer that never yields leaves the run count standing still while the chain advances happily
+    # underneath it.
     #
-    # Windows are numbered off the grid phase derived above.
-    productionCycle=[]
-    producerToWindow={}
-    windowToProducer={}
-    missedSlotAfter=[]
-    headBlockNum=node.getBlockNum()
-
-    windowOfSlot=lambda s: (s - windowPhase) // inRowCountPerProducer
-    firstWindow=windowOfSlot(slotsBetween(originTimestamp, timestamp))
-    endWindow=firstWindow + maxActiveProducers   # exclusive, one full rotation
-    lastTimestamp=timestamp
-    lastWindow=firstWindow
-
-    while True:
-        slotFromOrigin=slotsBetween(originTimestamp, timestamp)
-        window=windowOfSlot(slotFromOrigin)
-        if window >= endWindow:
-            # This look-ahead block is the first at or past the wrap, and it is checked rather than
-            # discarded: a producer granted a thirteenth consecutive slot would put its own block
-            # here, and only comparing against the producer that owns the window this cycle started
-            # on catches that.
-            if window == endWindow:
-                wrapped=windowToProducer.get(firstWindow)
-                if wrapped is not None and blockProducer != wrapped:
-                    Utils.errorExit("Block %d opens the next cycle in schedule window %d but was produced by %s, "
-                                    "where the cycle began with %s.  A cycle of %d producers must wrap onto the "
-                                    "producer it started with." %
-                                    (blockNum, window, blockProducer, wrapped, maxActiveProducers))
+    # Grids the chain is not running on are rejected almost immediately: a producer's run straddles
+    # their boundaries and it ends up owning two windows, which the walk refuses.
+    census=None
+    failedCensuses=[]
+    for windowPhase in range(inRowCountPerProducer):
+        attempt=censusProductionCycle(reader.get, blockNum, windowPhase, inRowCountPerProducer,
+                                      maxActiveProducers, producers)
+        if attempt["error"] is None:
+            census=attempt
             break
+        failedCensuses.append(attempt)
 
-        if blockProducer not in producers:
-            Utils.errorExit("Producer %s, of block %d, was not one of the voted on producers" % (blockProducer, blockNum))
-
-        if window < lastWindow:
-            Utils.errorExit("Block %d, produced by %s, is in schedule window %d, behind window %d of the block before it." %
-                            (blockNum, blockProducer, window, lastWindow))
-
-        owner=windowToProducer.get(window)
-        if owner is None:
-            if blockProducer in producerToWindow:
-                Utils.errorExit("Producer %s owns schedule window %d, but also produced block %d in window %d.  "
-                                "A producer is scheduled at most once per %d producer cycle." %
-                                (blockProducer, producerToWindow[blockProducer]["window"], blockNum, window, maxActiveProducers))
-            windowToProducer[window]=blockProducer
-            producerToWindow[blockProducer]={"window":window, "count":0}
-            productionCycle.append(blockProducer)
-        elif owner != blockProducer:
-            Utils.errorExit("Block %d, %d slots into the cycle, was produced by %s, but %s already produced in schedule window %d.  "
-                            "A window belongs to exactly one producer." %
-                            (blockNum, slotFromOrigin, blockProducer, owner, window))
-
-        producerToWindow[blockProducer]["count"]+=1
-        lastWindow=window
-
-        precedingProducer=blockProducer
-        blockNum+=1
-        block=waiter.getBlock(blockNum)
-        blockProducer=Node.getBlockAttribute(block, "producer", blockNum)
-        timestampStr=Node.getBlockAttribute(block, "timestamp", blockNum)
-        timestamp=datetime.strptime(timestampStr, Utils.TimeFmt)
-        slotsDiff=slotsBetween(lastTimestamp, timestamp)
-        offsetInWindow=(slotsBetween(originTimestamp, timestamp) - windowPhase) % inRowCountPerProducer
-        if slotsDiff==1 and blockProducer!=precedingProducer and offsetInWindow != 0:
-            # A handover into the very next slot can only happen on a window boundary, so this block
-            # has to sit at offset 0 of its window.  Landing anywhere else means this handover and
-            # the derived grid disagree about where the boundaries are, which is a producer having
-            # been given a run of the wrong length.
-            Utils.errorExit("Producer handover from %s to %s at block %d landed %d slots into a %d slot window instead of at its start.  "
-                            "Producer runs are not aligned to a single window grid." %
-                            (precedingProducer, blockProducer, blockNum, offsetInWindow, inRowCountPerProducer))
-        if slotsDiff != 1:
-            slotTimeDelta=timedelta(seconds=slotTime)
-            first=lastTimestamp + slotTimeDelta
-            missed=first.strftime(Utils.TimeFmt)
-            if slotsDiff > 2:
-                last=timestamp - slotTimeDelta
-                missed+= " thru " + last.strftime(Utils.TimeFmt)
-            missedSlotAfter.append("%d (%s)" % (blockNum-1, missed))
-        lastTimestamp=timestamp
+    if census is None:
+        # Every grid failed, so the schedule really is not running in windows of this size.  The one
+        # that got furthest is the chain's own grid, and so the one whose complaint describes what is
+        # actually wrong.
+        furthest=max(failedCensuses, key=lambda attempt: attempt["blocksExamined"])
+        Utils.errorExit("No grid of %d slot windows accounts for the blocks produced over a full cycle, so the "
+                        "producer schedule is not running in windows of %d.  The grid that accounted for the most "
+                        "blocks, %d of them, reports: %s" %
+                        (inRowCountPerProducer, inRowCountPerProducer, furthest["blocksExamined"], furthest["error"]))
 
     # Unproduced slots are a liveness property of the machine the test is running on, not of the
     # schedule, and the schedule was verified window by window above.  Report them, do not fail on
     # them.
-    if len(missedSlotAfter) > 0:
-        Print("WARNING: slots went unproduced after the following blocks: %s" % (", ".join(missedSlotAfter)))
+    if len(reader.missedSlotAfter) > 0:
+        Print("WARNING: slots went unproduced after the following blocks: %s" % (", ".join(reader.missedSlotAfter)))
 
-    silentWindows=[window for window in range(firstWindow, endWindow) if window not in windowToProducer]
-    if len(silentWindows) > 0:
+    if len(census["silentWindows"]) > 0:
         Print("WARNING: %d of the %d producers in the cycle produced no block in their window, at cycle positions: %s" %
-              (len(silentWindows), maxActiveProducers, ", ".join(str(window - firstWindow) for window in silentWindows)))
+              (len(census["silentWindows"]), maxActiveProducers,
+               ", ".join(str(position) for position in census["silentWindows"])))
 
-    output=None
-    for blockProducer in productionCycle:
-        if output is None:
-            output=""
-        else:
-            output+=", "
-        output+=blockProducer+":"+str(producerToWindow[blockProducer]["count"])
-    Print("ProductionCycle ->> {\n%s\n}" % output)
+    productionCycle=census["cycle"]
+    Print("ProductionCycle ->> {\n%s\n}" %
+          (", ".join(blockProducer+":"+str(census["counts"][blockProducer]) for blockProducer in productionCycle)))
 
     #retrieve the info for all the nodes to report the status for each
     for node in cluster.getNodes():
