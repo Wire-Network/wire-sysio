@@ -450,8 +450,9 @@ namespace sysio {
       ///     retention window.
       ///   * COMPLETED / REJECTED / EXPIRED past retention — erase the row.
       ///   * CONFIRMED never appears: winner selection zeroes the deadline
-      ///     (the wall-clock lock window owns the row until `chklocks`
-      ///     terminalizes it).
+      ///     (the wall-clock lock window owns the row until whichever eraser
+      ///     takes its last lock terminalizes it — `chklocks` at expiry, or
+      ///     `sweeplocks` earlier on an UPHELD challenge).
       ///
       /// NEVER throws past the auth gate — it runs inline inside `advance`,
       /// where an abort stalls epoch progress chain-wide. There are no timers
@@ -947,8 +948,9 @@ namespace sysio {
          uint32_t fee_bps                      = 10;           // 0.1% per spoke
          /// Wall-clock collateral lock duration — the challenge window.
          /// Locks are NEVER released by delivery; they expire this many ms
-         /// after creation and are swept by `chklocks` at epoch advance.
-         /// Default 12 hours.
+         /// after creation and are swept by `chklocks` at epoch advance. An
+         /// UPHELD challenge cuts the window short — `sweeplocks` erases the
+         /// commitment's locks where they stand. Default 12 hours.
          uint64_t collateral_lock_duration_ms  = 43'200'000;
          /// Minimum WIRE escrow accepted by `swapfromwire` (atomic units,
          /// 9 decimals) — the queue-slot price floor.

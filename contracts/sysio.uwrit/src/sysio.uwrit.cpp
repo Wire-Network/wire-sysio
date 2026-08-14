@@ -1442,8 +1442,9 @@ void reject_and_refund(name self, uwrit::uwreqs_t& reqs, const uwrit::id_key& pk
 /// envelope (so both the inline reserv settlement actions and the remit are
 /// unreachable-failure by construction — nothing past the CONFIRMED write can
 /// `check()`-abort and stall evalcons), push one lock per required leg (a 12h
-/// wall-clock challenge window — released only by `chklocks`, never by
-/// delivery), mark CONFIRMED, then settle:
+/// wall-clock challenge window — never released by delivery: `chklocks` sweeps
+/// it at expiry, or `sweeplocks` erases it earlier on an UPHELD challenge),
+/// mark CONFIRMED, then settle:
 ///   * normal     — reserv::applyswap  + SWAP_REMIT to the dst outpost
 ///   * from-WIRE  — reserv::applyfromwire + SWAP_REMIT to the dst outpost
 ///   * to-WIRE    — reserv::paywire (REAL WIRE to the recipient; no remit)
@@ -1800,8 +1801,9 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate,
    // (`chain_code, token_code, reserve_code`) so a future slash routes
    // unambiguously back to the originating reserve. Locks are a
    // wall-clock challenge window (12h default): they are NEVER released
-   // by delivery — only `chklocks` (epoch advance) sweeps them after
-   // `expires_at_ms`.
+   // by delivery — `chklocks` (epoch advance) sweeps them after
+   // `expires_at_ms` on the healthy path, and `sweeplocks` erases them
+   // ahead of it when a challenge against the commitment is UPHELD.
    const uint64_t now_ms_v = current_time_ms();
    uwrit::uwconfig_t uwcfg_tbl(self);
    auto uwcfg = uwcfg_tbl.get_or_default(uwrit::uw_config{});
