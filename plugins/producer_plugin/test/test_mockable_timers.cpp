@@ -16,6 +16,7 @@
 #include <atomic>
 #include <chrono>
 #include <future>
+#include <mutex>
 #include <thread>
 
 namespace {
@@ -31,6 +32,11 @@ constexpr std::chrono::milliseconds real_time_patience{200};
 /// this bounds a failure rather than the happy path: the reaction is normally within a few ms.
 constexpr std::chrono::seconds reaction_timeout{10};
 
+/// How long to leave the timer thread alone with a moved clock. Under mock time the timer polls the
+/// virtual clock rather than sleeping out its delay, so this is many poll intervals; it is used
+/// where a test needs the timer to have fired and nothing on the test side can observe that it has.
+constexpr std::chrono::milliseconds timer_thread_patience{50};
+
 /// The timestamp genesis_state's parameterized constructor stamps, which is what chain_plugin builds
 /// a fresh chain with. genesis_state's default constructor leaves initial_timestamp at epoch, so
 /// this cannot be read from a default constructed genesis_state without silently putting the mock
@@ -40,6 +46,13 @@ constexpr const char* genesis_timestamp = "2025-01-01T12:00:00";
 /// Pinned rather than left to the default so the deadlines below are computable. cpu_effort mirrors
 /// the plugin's own derivation from it.
 constexpr uint32_t produce_block_offset_ms = 450;
+
+/// The one producer running_node holds a key for, so the one whose windows it can commit in.
+constexpr chain::account_name own_producer = config::system_account_name;
+
+/// How long to give the node to do something with a slot the clock has just moved into, before
+/// concluding it did nothing with it. Bounds a per-slot poll, so it is short.
+constexpr std::chrono::milliseconds slot_settle_budget{200};
 
 /// Spin until pred() holds or reaction_timeout elapses. Returns whether pred() held.
 /// Spin until pred() holds or the given budget elapses. Returns whether pred() held.
@@ -82,36 +95,42 @@ public:
       BOOST_REQUIRE_EQUAL(fc::time_point::now().time_since_epoch().count(), _clockStart.time_since_epoch().count());
       BOOST_REQUIRE_GT(_clockStart.time_since_epoch().count(), 0);
 
-      std::promise<std::tuple<producer_plugin*, chain_plugin*>> plugin_promise;
-      auto                                                      plugin_fut = plugin_promise.get_future();
-      _app_thread                                                          = std::thread([&]() {
+      // The promise is held by shared_ptr and captured by value because the app thread outlives this
+      // constructor: a promise on the constructor's stack is destroyed the moment the startup value
+      // releases it, and anything the thread reported through it afterwards would be writing to
+      // freed storage.
+      auto startup     = std::make_shared<std::promise<std::tuple<producer_plugin*, chain_plugin*>>>();
+      auto startup_fut = startup->get_future();
+      _app_thread      = std::thread([this, startup, args = extra_args]() {
+         bool started = false;
          try {
             std::vector<const char*> argv = {"test",
                                              "--data-dir", _dataDir.c_str(),
                                              "--config-dir", _dataDir.c_str(),
                                              "-p", "sysio", "-e",
                                              "--produce-block-offset-ms", "450"};
-            argv.insert(argv.end(), extra_args.begin(), extra_args.end());
+            argv.insert(argv.end(), args.begin(), args.end());
             _app->initialize<signature_provider_manager_plugin, chain_plugin, producer_plugin>(argv.size(),
                                                                                               (char**)&argv[0]);
             _app->startup();
             _app->executor().set_main_thread_id();
-            plugin_promise.set_value({_app->find_plugin<producer_plugin>(), _app->find_plugin<chain_plugin>()});
+            startup->set_value({_app->find_plugin<producer_plugin>(), _app->find_plugin<chain_plugin>()});
+            started = true;
             _app->exec();
             return;
          }
          FC_LOG_AND_DROP()
          // Boost.Test is not safe to call from this thread, and doing so while the main thread is
-         // unwinding a failed check turns a legible failure into an abort. Record it instead, and
-         // still satisfy the promise: leaving it unset strands the constructor forever on a startup
-         // failure, which is a hang rather than a diagnosis.
+         // unwinding a failed check turns a legible failure into an abort, so record it instead.
          _app_threw = true;
-         try {
-            plugin_promise.set_value({nullptr, nullptr});
-         } catch (const std::future_error&) {} // already satisfied, the failure came later
+         // Only a failure during startup answers the promise, and leaving it unset there would
+         // strand the constructor forever. Past that point nobody is waiting on it any more, and the
+         // failure is reported through _app_threw alone.
+         if (!started)
+            startup->set_value({nullptr, nullptr});
       });
 
-      std::tie(_prod_plug, _chain_plug) = plugin_fut.get();
+      std::tie(_prod_plug, _chain_plug) = startup_fut.get();
       if (_prod_plug == nullptr || _chain_plug == nullptr) {
          // Join before failing. Throwing here would destroy a still joinable thread and abort the
          // process, replacing the reason the node did not start with a bare terminate.
@@ -121,20 +140,39 @@ public:
          BOOST_FAIL("the node failed to start, see the logged error");
       }
 
+      // Connect and seed together on the app thread. Doing both there is what makes the snapshot
+      // whole: a block accepted between reading the head and connecting the signal would go
+      // unrecorded, and reading the head from this thread is the race the snapshot exists to remove.
+      std::promise<void> observing;
+      auto               observing_fut = observing.get_future();
+      post_to_main_thread([this, &observing]() {
+         chain::controller& chain = _chain_plug->chain();
+         _accepted_block          = chain.accepted_block().connect([this](const chain::block_signal_params& params) {
+            const auto& [block, id] = params;
+            record_head(block->block_num(), block->producer, block->timestamp);
+            ++_blocks_produced;
+         });
+         const auto head = chain.head();
+         record_head(head.block_num(), head.producer(), chain::block_timestamp_type(head.block_time()));
+         observing.set_value();
+      });
+      BOOST_REQUIRE_MESSAGE(observing_fut.wait_for(reaction_timeout) == std::future_status::ready,
+                            "the node never serviced its main thread after startup");
+
       // The clock and the chain must agree, or the producer has nothing to do and every test here
       // would hang rather than report anything useful.
-      const auto head_time = _chain_plug->chain().head().block_time();
+      const auto head_time = head_block_timestamp().to_time_point();
       BOOST_REQUIRE_MESSAGE(head_time >= _clockStart - fc::seconds(1) && head_time <= _clockStart + fc::seconds(5),
                             "mock clock and chain head disagree: head is at "
                                << head_time.time_since_epoch().count() << "us, clock is at "
                                << _clockStart.time_since_epoch().count() << "us");
 
-      _accepted_block = _chain_plug->chain().accepted_block().connect(
-         [this](const chain::block_signal_params&) { ++_blocks_produced; });
-
-      // The node produces the block for the slot the clock already sits on, so let production settle
-      // before a test samples, otherwise its first step races that startup block.
-      wait_for([this]() { return _blocks_produced.load() > 0; });
+      // A fresh chain owes the block for the slot the clock already sits on, so let production settle
+      // before a test samples, otherwise its first step races that startup block. A seeded chain
+      // opens on a head that is already current and owes nothing until the clock moves, so waiting
+      // there would only burn the timeout.
+      if (seededDataDir.empty())
+         wait_for([this]() { return _blocks_produced.load() > 0; });
       _now = _clockStart;
    }
 
@@ -151,14 +189,21 @@ public:
    bool             app_threw() const { return _app_threw.load(); }
    producer_plugin* producer() { return _prod_plug; }
 
-   uint32_t head_block_num() const { return _chain_plug->chain().head().block_num(); }
-
-   /// Producer of the block at the head, which is what says whether the node's own window is open.
-   chain::account_name head_producer() const { return _chain_plug->chain().head().producer(); }
+   uint32_t head_block_num() const { return head().block_num; }
 
    /// Timestamp of the head block, the anchor for working out when the next one is owed.
-   chain::block_timestamp_type head_block_timestamp() const {
-      return chain::block_timestamp_type(_chain_plug->chain().head().block_time());
+   chain::block_timestamp_type head_block_timestamp() const { return head().timestamp; }
+
+   /// Whether the node is building a block for a slot it does not own, which is what speculating is.
+   ///
+   /// Asked of the pending block rather than the head, because the head cannot answer it: the other
+   /// producers in the schedule have no key here, so nothing they own is ever committed and the head
+   /// only ever shows this node's own work or whatever history the chain was seeded with.
+   bool speculating() {
+      return on_main_thread([this]() {
+         chain::controller& chain = _chain_plug->chain();
+         return chain.is_building_block() && chain.pending_block_producer() != own_producer;
+      });
    }
 
    /// Where the virtual clock currently stands.
@@ -172,15 +217,47 @@ public:
    }
 
    /// Run fn on the node's main thread, where anything touching chain state has to run.
+   ///
+   /// Posted with the priority and queue the plugin's own timer lambdas use, because the executor
+   /// runs handlers of equal priority in the order they were posted and one case below depends on
+   /// where its work lands relative to those.
    template<typename F>
    void post_to_main_thread(F&& fn) {
-      _app->post(appbase::priority::high, std::forward<F>(fn));
+      _app->executor().post(appbase::priority::high, exec_queue::read_write, std::forward<F>(fn));
+   }
+
+   /// Run fn on the main thread and wait for it, handing back whatever it returned.
+   ///
+   /// Anything reading chain state has to go through here. controller::head() hands back a
+   /// block_handle by value, so copying it while the app thread is replacing chain_head races on the
+   /// shared pointer inside, and controller has no lock a test could take instead.
+   template<typename F>
+   auto on_main_thread(F&& fn) -> decltype(fn()) {
+      std::promise<decltype(fn())> result;
+      auto                         fut = result.get_future();
+      post_to_main_thread([&]() { result.set_value(fn()); });
+      BOOST_REQUIRE_MESSAGE(fut.wait_for(reaction_timeout) == std::future_status::ready,
+                            "the node stopped servicing its main thread");
+      return fut.get();
    }
 
    /// Advance the virtual clock by an arbitrary amount, for waits that are not a whole slot.
    void advance(fc::microseconds by) {
       _now += by;
       fc::mock_time_traits::set_now(_now);
+   }
+
+   /// Step the clock a slot at a time until pred() holds, giving the node a chance to react to each
+   /// slot before moving on. Returns whether it held within the bound.
+   template<typename Pred>
+   bool advance_slots_until(uint32_t max_slots, Pred pred) {
+      for (uint32_t slot = 0; slot < max_slots; ++slot) {
+         if (pred())
+            return true;
+         advance(fc::milliseconds(config::block_interval_ms));
+         wait_up_to(slot_settle_budget, pred);
+      }
+      return pred();
    }
 
    /// The cpu effort the node was configured with, which is what spaces block deadlines.
@@ -217,6 +294,25 @@ public:
    }
 
 private:
+   /// What the app thread last accepted. Kept here rather than read from the controller on demand so
+   /// that no test thread ever touches chain state.
+   struct head_state {
+      uint32_t                    block_num = 0;
+      chain::account_name         producer;
+      chain::block_timestamp_type timestamp;
+   };
+
+   /// Called on the app thread only, from the accepted_block slot and from the seeding post.
+   void record_head(uint32_t block_num, chain::account_name producer, chain::block_timestamp_type timestamp) {
+      std::lock_guard g(_head_mtx);
+      _head = head_state{block_num, producer, timestamp};
+   }
+
+   head_state head() const {
+      std::lock_guard g(_head_mtx);
+      return _head;
+   }
+
    fc::temp_directory                 _temp;
    const std::string                  _dataDir;
    const fc::time_point               _clockStart;
@@ -228,6 +324,8 @@ private:
    std::atomic<uint32_t>              _blocks_produced{0};
    std::atomic<bool>                  _app_threw{false};
    fc::time_point                     _now;
+   mutable std::mutex                 _head_mtx;
+   head_state                         _head;
    boost::signals2::scoped_connection _accepted_block;
 };
 
@@ -266,6 +364,40 @@ fc::time_point seed_chain_with_other_producers(const fc::temp_directory&        
    BOOST_REQUIRE_EQUAL(t.control->head_active_producers().producers.size(), schedule.size());
    return t.control->head().block_time();
 }
+
+/// A node whose schedule holds producers it has no key for, so it must speculate through their
+/// windows rather than producing every slot. That is the only state in which the delayed production
+/// loop is armed, so both of the cases that care about it start here.
+///
+/// The seeded directory and the signature provider string are held alongside the node because it
+/// borrows both: the directory for as long as it runs, the string while it is starting up.
+class speculating_node {
+public:
+   explicit speculating_node(const std::vector<chain::account_name>& others)
+      : _others(others)
+      , _head_time(seed_chain_with_other_producers(_seeded, _others))
+      // <chain-kind>,<key-type>,<public-key>,<private-key-provider-spec>. Only sysio's key, so the
+      // node produces its own window and speculates through the rest.
+      , _provider("wire,wire,"
+                  + sysio::testing::base_tester::get_public_key(config::system_account_name, "active").to_string({})
+                  + ",KEY:"
+                  + sysio::testing::base_tester::get_private_key(config::system_account_name, "active").to_string({}))
+      , node({"--signature-provider", _provider.c_str(), "--production-pause-vote-timeout-ms", "0"},
+             _seeded.path().string(), _head_time) {}
+
+   /// Slots in one turn of the whole schedule, which bounds every walk over it.
+   uint32_t rotation() const { return (_others.size() + 1) * config::producer_repetitions; }
+
+private:
+   const std::vector<chain::account_name> _others;
+   fc::temp_directory                     _seeded;
+   const fc::time_point                   _head_time;
+   const std::string                      _provider;
+
+public:
+   /// Declared last so it is constructed last, after everything it borrows above exists.
+   running_node node;
+};
 
 } // namespace
 
@@ -311,37 +443,83 @@ BOOST_AUTO_TEST_CASE(production_follows_the_virtual_clock) {
  * schedule_delayed_production_loop rechecks its correlation id inside the posted lambda because a
  * competing schedule_* call can land between the timer firing and that lambda running, and running
  * the production loop unconditionally would bump the id again and, in its own words, "starve the
- * just-scheduled produce_block timer". A starved timer produces no block and reports nothing, so
- * that reasoning is currently held in place by the comment alone.
+ * just-scheduled produce_block timer". Nothing reached that interleaving, so the reasoning was held
+ * in place by the comment alone.
+ *
+ * What this case establishes is that the interleaving happens and that production comes back from
+ * it. It does not establish that the recheck is what brings production back: with the recheck
+ * removed the node still recovers, in the same number of slots, because every route into
+ * schedule_production_loop re-arms the timer anyway. The recheck is defence in depth, and this is
+ * what would notice if the interleaving ever stopped being survivable.
  *
  * get_integrity_hash is the disturbance, and it is reachable through the plugin's public interface:
  * while a block is being built it aborts the pending block and reschedules the production loop on
- * scope exit, which is exactly a competing schedule_* call arriving with a produce timer armed. The
- * invariant a starved timer breaks is that every slot still yields a block.
+ * scope exit, which is exactly a competing schedule_* call arriving with a timer already armed.
+ *
+ * Provoking it takes a barrier rather than timing. The timer runs on the plugin's own thread and only
+ * posts to the app thread, so holding the app thread lets the timer fire and enqueue while the
+ * disturbance sits in front of it in the queue; releasing then runs the disturbance, which bumps the
+ * id, and only afterwards the lambda that was armed under the old one. The node has to be speculating
+ * for any of it, since that is the only state in which the delayed loop is the armed timer.
  */
 BOOST_AUTO_TEST_CASE(production_survives_a_competing_reschedule) {
-   running_node   node;
+   speculating_node seeded{{"defproducera"_n, "defproducerb"_n}};
+   running_node&    node = seeded.node;
+
+   // The wake up is only armed while the node is speculating, so get there first.
+   BOOST_REQUIRE_MESSAGE(node.advance_slots_until(2 * seeded.rotation(), [&]() { return node.speculating(); }),
+                         "the node never built a block for a producer it has no key for, so the delayed "
+                         "production loop was never armed and there is no stale lambda to provoke");
+
    const uint32_t settled = node.blocks_produced();
 
-   for (uint32_t slot = 1; slot <= slots_to_step; ++slot) {
-      // Land the abort and its reschedule while the produce timer for the block in flight is armed.
-      std::promise<void> disturbed;
-      auto               disturbed_fut = disturbed.get_future();
-      node.post_to_main_thread([&]() {
-         try {
-            node.producer()->get_integrity_hash();
-         }
-         FC_LOG_AND_DROP()
-         disturbed.set_value();
-      });
-      BOOST_REQUIRE_MESSAGE(disturbed_fut.wait_for(reaction_timeout) == std::future_status::ready,
-                            "the node stopped servicing its main thread at step " << slot);
+   // Take the app thread and keep it. The timer runs on the plugin's own thread and only posts here,
+   // so while this is held the timer can fire and enqueue with nothing on this side running.
+   std::promise<void> holding;
+   std::promise<void> release;
+   auto               holding_fut = holding.get_future();
+   auto               release_fut = release.get_future();
+   node.post_to_main_thread([&]() {
+      holding.set_value();
+      release_fut.wait();
+   });
+   BOOST_REQUIRE_MESSAGE(holding_fut.wait_for(reaction_timeout) == std::future_status::ready,
+                         "the node stopped servicing its main thread");
 
-      BOOST_REQUIRE_MESSAGE(node.advance_until_head_moves(),
-                            "production stopped at step " << slot << ": the produce timer was starved by the "
-                                                             "reschedule that get_integrity_hash triggers");
+   // Queue the disturbance behind the gate, before the clock moves. get_integrity_hash aborts the
+   // pending block and reschedules the production loop on scope exit, which is a competing schedule_*
+   // call bumping the correlation id. Queuing it now is what puts it ahead of whatever the timer
+   // posts, since the executor runs handlers of equal priority in the order they were posted.
+   std::promise<void> disturbed;
+   auto               disturbed_fut = disturbed.get_future();
+   node.post_to_main_thread([&]() {
+      try {
+         node.producer()->get_integrity_hash();
+      }
+      FC_LOG_AND_DROP()
+      disturbed.set_value();
+   });
+
+   // Walk the clock past the armed wake up while the app thread is still held, so the timer fires
+   // with the id it was armed with and lands its lambda behind the disturbance. Nothing here can
+   // observe that post, and nothing on this side can be asked while the thread is held, so the walk
+   // is blind and the pause is what gives the timer thread its chance to notice each step.
+   for (uint32_t slot = 0; slot < seeded.rotation(); ++slot) {
+      node.advance(fc::milliseconds(config::block_interval_ms));
+      std::this_thread::sleep_for(timer_thread_patience);
    }
-   BOOST_CHECK_GT(node.blocks_produced(), settled);
+
+   // Release. The disturbance runs first and bumps the id, then the timer's lambda runs under an id
+   // that is no longer current, which is the interleaving the recheck is written for.
+   release.set_value();
+   BOOST_REQUIRE_MESSAGE(disturbed_fut.wait_for(reaction_timeout) == std::future_status::ready,
+                         "the node stopped servicing its main thread");
+
+   BOOST_CHECK_MESSAGE(node.advance_slots_until(2 * seeded.rotation(),
+                                               [&]() { return node.blocks_produced() > settled; }),
+                       "the node never produced again after a wake up landed under a superseded "
+                       "correlation id");
+   BOOST_CHECK_MESSAGE(!node.app_threw(), "the node reported an exception while the stale lambda was in flight");
 }
 
 /**
@@ -395,41 +573,33 @@ BOOST_AUTO_TEST_CASE(a_block_ships_at_its_deadline_not_at_its_slot) {
  * speculating is the only thing that brings it back.
  */
 BOOST_AUTO_TEST_CASE(production_resumes_after_speculating_through_other_windows) {
-   const std::vector<chain::account_name> others{"defproducera"_n, "defproducerb"_n};
-
-   fc::temp_directory seeded;
-   const fc::time_point head_time = seed_chain_with_other_producers(seeded, others);
-
-   // Only sysio's key, so the node produces its own window and speculates through the other two.
-   const auto priv     = sysio::testing::base_tester::get_private_key(config::system_account_name, "active");
-   const auto pub      = sysio::testing::base_tester::get_public_key(config::system_account_name, "active");
-   // <chain-kind>,<key-type>,<public-key>,<private-key-provider-spec>
-   const auto provider = "wire,wire," + pub.to_string({}) + ",KEY:" + priv.to_string({});
-
-   running_node node{{"--signature-provider", provider.c_str(),
-                      "--production-pause-vote-timeout-ms", "0"},
-                     seeded.path().string(), head_time};
+   speculating_node seeded{{"defproducera"_n, "defproducerb"_n}};
+   running_node&    node = seeded.node;
 
    // Walk a whole rotation. The node must speculate through the windows it has no key for, and it
    // must produce again in its own, which is what the delayed wake up exists to do.
-   const uint32_t rotation = (others.size() + 1) * config::producer_repetitions;
-   bool           sawOther = false;
-   bool           sawOwnAfterOther = false;
+   const uint32_t rotation   = seeded.rotation();
+   bool           speculated = false;
+   bool           resumed    = false;
 
-   for (uint32_t slot = 0; slot < 2 * rotation && !sawOwnAfterOther; ++slot) {
+   for (uint32_t slot = 0; slot < 2 * rotation && !resumed; ++slot) {
+      const uint32_t before = node.blocks_produced();
       node.advance(fc::milliseconds(config::block_interval_ms));
-      std::this_thread::sleep_for(std::chrono::milliseconds(5));
-      const auto producer = node.head_producer();
-      if (producer != config::system_account_name)
-         sawOther = true;
-      else if (sawOther)
-         sawOwnAfterOther = true;
+
+      // Give the node the chance to do something with the slot, then ask what it did: either it is
+      // building a block for a producer it has no key for, or it committed one of its own.
+      wait_up_to(slot_settle_budget, [&]() { return node.speculating() || node.blocks_produced() > before; });
+
+      if (node.speculating())
+         speculated = true;
+      else if (speculated && node.blocks_produced() > before)
+         resumed = true;
    }
 
-   BOOST_REQUIRE_MESSAGE(sawOther,
-                         "the head never left sysio, so the node never speculated and this case "
-                         "did not exercise the delayed production loop");
-   BOOST_CHECK_MESSAGE(sawOwnAfterOther,
+   BOOST_REQUIRE_MESSAGE(speculated,
+                         "the node never built a block for a producer it has no key for, so it never "
+                         "speculated and this case did not exercise the delayed production loop");
+   BOOST_CHECK_MESSAGE(resumed,
                        "the node speculated through another producer's window and never produced "
                        "again: the wake up armed while speculating did not bring it back");
 }
