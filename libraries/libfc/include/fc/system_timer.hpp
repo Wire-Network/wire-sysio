@@ -28,8 +28,14 @@ struct system_clock {
    static time_point now() noexcept { return from_time_point( fc::time_point::now() ); }
 
    /// Convert an fc::time_point for use with the timer's expires_at().
+   ///
+   /// Goes through fc::time_point::to_system_clock() rather than converting the microsecond count
+   /// directly, because that conversion has to be clamped: this clock's duration is finer than a
+   /// microsecond on some platforms, nanoseconds on Linux, so scaling fc::time_point::maximum() up
+   /// overflows and wraps to a moment in the past. A deadline meant to be unreachable would then be
+   /// one that has already passed, which turns a dormant timer into one that fires at once.
    static time_point from_time_point( const fc::time_point& t ) noexcept {
-      return time_point{ std::chrono::duration_cast<duration>( std::chrono::microseconds( t.time_since_epoch().count() ) ) };
+      return time_point{ t.to_system_clock().time_since_epoch() };
    }
 };
 
