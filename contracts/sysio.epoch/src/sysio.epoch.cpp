@@ -369,6 +369,13 @@ void epoch::advance() {
    // `sysio.reserv` is not a precondition for advancing an epoch -- a chain can advance before
    // reserves are ever deployed -- and nothing can have accrued a wireclaim in that state, so
    // skipping is precisely correct rather than merely defensive.
+   //
+   // That guard covers an ABSENT account, not a STALE one: an old `sysio.reserv` build has the
+   // account and not the action, and the CDT dispatcher asserts on an action it does not
+   // implement -- so deploying `sysio.epoch` ahead of `sysio.reserv` aborts every advance. The
+   // deploy is therefore one atomic `sysio.msig` transaction, or `sysio.reserv` first. Both this
+   // edge and the `sysio.epoch`-before-`sysio.system` one the emissions gate creates are written
+   // up in `docs/contract-upgrade-order.md`.
    if (is_account(RESERV_ACCOUNT)) {
       action(
          permission_level{get_self(), "owner"_n},
