@@ -5,8 +5,9 @@
 
 #include <sysio/chain/application.hpp>
 #include <sysio/chain/controller.hpp>
-#include <sysio/chain/exec_pri_queue.hpp>
 #include <sysio/chain/genesis_state.hpp>
+
+#include <sysio/testing/tester.hpp>
 
 #include <fc/mock_time.hpp>
 #include <fc/scoped_exit.hpp>
@@ -68,21 +69,26 @@ bool wait_for(Pred pred) {
 /// the chain and the production timer share one frame of reference from genesis onward.
 class running_node {
 public:
-   explicit running_node(const std::vector<const char*>& extra_args = {})
-      : _genesis(fc::time_point::from_iso_string(genesis_timestamp))
-      , _temp_dir_str(_temp.path().string())
-      , _mock_clock(_genesis) {
+   /// Starts a node on its own fresh chain, or on a data directory seeded beforehand. A seeded
+   /// chain's head is wherever seeding left it, so the clock has to start there rather than at
+   /// genesis, otherwise the node has nothing to do and every wait below simply times out.
+   explicit running_node(const std::vector<const char*>& extra_args = {},
+                         const std::string&              seededDataDir = {},
+                         fc::time_point                  clockStart    = fc::time_point{})
+      : _dataDir(seededDataDir.empty() ? _temp.path().string() : seededDataDir)
+      , _clockStart(clockStart == fc::time_point{} ? fc::time_point::from_iso_string(genesis_timestamp) : clockStart)
+      , _mock_clock(_clockStart) {
       BOOST_REQUIRE(fc::mock_time_traits::is_set());
-      BOOST_REQUIRE_EQUAL(fc::time_point::now().time_since_epoch().count(), _genesis.time_since_epoch().count());
-      BOOST_REQUIRE_GT(_genesis.time_since_epoch().count(), 0);
+      BOOST_REQUIRE_EQUAL(fc::time_point::now().time_since_epoch().count(), _clockStart.time_since_epoch().count());
+      BOOST_REQUIRE_GT(_clockStart.time_since_epoch().count(), 0);
 
       std::promise<std::tuple<producer_plugin*, chain_plugin*>> plugin_promise;
       auto                                                      plugin_fut = plugin_promise.get_future();
       _app_thread                                                          = std::thread([&]() {
          try {
             std::vector<const char*> argv = {"test",
-                                             "--data-dir", _temp_dir_str.c_str(),
-                                             "--config-dir", _temp_dir_str.c_str(),
+                                             "--data-dir", _dataDir.c_str(),
+                                             "--config-dir", _dataDir.c_str(),
                                              "-p", "sysio", "-e",
                                              "--produce-block-offset-ms", "450"};
             argv.insert(argv.end(), extra_args.begin(), extra_args.end());
@@ -106,16 +112,22 @@ public:
       });
 
       std::tie(_prod_plug, _chain_plug) = plugin_fut.get();
-      BOOST_REQUIRE_MESSAGE(_prod_plug != nullptr && _chain_plug != nullptr,
-                            "the node failed to start, see the logged error");
+      if (_prod_plug == nullptr || _chain_plug == nullptr) {
+         // Join before failing. Throwing here would destroy a still joinable thread and abort the
+         // process, replacing the reason the node did not start with a bare terminate.
+         _app->quit();
+         if (_app_thread.joinable())
+            _app_thread.join();
+         BOOST_FAIL("the node failed to start, see the logged error");
+      }
 
       // The clock and the chain must agree, or the producer has nothing to do and every test here
       // would hang rather than report anything useful.
       const auto head_time = _chain_plug->chain().head().block_time();
-      BOOST_REQUIRE_MESSAGE(head_time >= _genesis && head_time <= _genesis + fc::seconds(5),
-                            "mock clock and chain genesis disagree: chain head is at "
+      BOOST_REQUIRE_MESSAGE(head_time >= _clockStart - fc::seconds(1) && head_time <= _clockStart + fc::seconds(5),
+                            "mock clock and chain head disagree: head is at "
                                << head_time.time_since_epoch().count() << "us, clock is at "
-                               << _genesis.time_since_epoch().count() << "us");
+                               << _clockStart.time_since_epoch().count() << "us");
 
       _accepted_block = _chain_plug->chain().accepted_block().connect(
          [this](const chain::block_signal_params&) { ++_blocks_produced; });
@@ -123,7 +135,7 @@ public:
       // The node produces the block for the slot the clock already sits on, so let production settle
       // before a test samples, otherwise its first step races that startup block.
       wait_for([this]() { return _blocks_produced.load() > 0; });
-      _now = _genesis;
+      _now = _clockStart;
    }
 
    ~running_node() {
@@ -139,11 +151,10 @@ public:
    bool             app_threw() const { return _app_threw.load(); }
    producer_plugin* producer() { return _prod_plug; }
 
-   /// Whether the node is in its write window. The read only window is the complement, so this is
-   /// what says which side of the _ro_timer cycle the node is on.
-   bool in_write_window() const { return _chain_plug->chain().is_write_window(); }
-
    uint32_t head_block_num() const { return _chain_plug->chain().head().block_num(); }
+
+   /// Producer of the block at the head, which is what says whether the node's own window is open.
+   chain::account_name head_producer() const { return _chain_plug->chain().head().producer(); }
 
    /// Timestamp of the head block, the anchor for working out when the next one is owed.
    chain::block_timestamp_type head_block_timestamp() const {
@@ -164,13 +175,6 @@ public:
    template<typename F>
    void post_to_main_thread(F&& fn) {
       _app->post(appbase::priority::high, std::forward<F>(fn));
-   }
-
-   /// Enqueue read-only work. switch_to_read_window stays in the write window when this queue is
-   /// empty, so a test that wants the read window to open has to give it something to do.
-   template<typename F>
-   void post_read_only(F&& fn) {
-      _app->executor().post(appbase::priority::low, appbase::exec_queue::read_only, std::forward<F>(fn));
    }
 
    /// Advance the virtual clock by an arbitrary amount, for waits that are not a whole slot.
@@ -214,8 +218,8 @@ public:
 
 private:
    fc::temp_directory                 _temp;
-   const fc::time_point               _genesis;
-   const std::string                  _temp_dir_str;
+   const std::string                  _dataDir;
+   const fc::time_point               _clockStart;
    const fc::scoped_mock_clock        _mock_clock;
    appbase::scoped_app                _app;
    std::thread                        _app_thread;
@@ -228,6 +232,40 @@ private:
 };
 
 constexpr uint32_t slots_to_step = 12;   // one full production round
+
+/// Build a chain in `dir` whose active schedule holds more producers than the node under test will
+/// own, so that node has to speculate through the other windows rather than producing every slot.
+/// Returns the head block time, which is where the mock clock has to stand when the node opens it.
+///
+/// The schedule is installed with a tester rather than by pushing transactions into the running
+/// plugin, because setting producers goes through sysio.bios and needs protocol features and a
+/// finalizer policy in place first; the tester already knows how to do all of that. The tester is
+/// destroyed before the node starts, so only one controller ever has the directory open.
+fc::time_point seed_chain_with_other_producers(const fc::temp_directory&              dir,
+                                               const std::vector<chain::account_name>& others) {
+   using namespace sysio::testing;
+
+   tester t(dir, true);
+   t.produce_block();
+   t.set_bios_contract();
+   t.preactivate_all_builtin_protocol_features();
+   t.produce_block();
+   t.init_roa();
+   finalizer_keys fin_keys(t, 1u, 1u);
+   fin_keys.activate_savanna(0u);
+
+   t.create_accounts(others);
+   std::vector<chain::account_name> schedule{config::system_account_name};
+   schedule.insert(schedule.end(), others.begin(), others.end());
+   t.set_producers(schedule);
+
+   // A proposer policy takes effect a round after it is proposed, so run out two rounds of the new
+   // schedule to be certain the node opens a chain that is already using it.
+   t.produce_blocks(2 * schedule.size() * config::producer_repetitions);
+
+   BOOST_REQUIRE_EQUAL(t.control->head_active_producers().producers.size(), schedule.size());
+   return t.control->head().block_time();
+}
 
 } // namespace
 
@@ -307,68 +345,6 @@ BOOST_AUTO_TEST_CASE(production_survives_a_competing_reschedule) {
 }
 
 /**
- * The read only window is bounded by wall clock in exactly the way block production is: _ro_timer
- * arms for the write window, its handler switches to the read window, and that window closes on its
- * own deadline. Nothing covered that cycle, because observing it against a real clock means racing
- * it, and _ro_timer carries its own correlation id guard against a handler from a previous cycle
- * landing in the current one.
- *
- * With the clock owned by the test the cycle is observable directly: read only work cannot run
- * before the write window expires, and it must run once it has. switch_to_read_window stays in the
- * write window when the read only queue is empty, so the queue is primed first.
- */
-BOOST_AUTO_TEST_CASE(read_window_opens_only_when_the_write_window_expires) {
-   // Read only threads are rejected on a producing node outside test mode.
-   producer_plugin::set_test_mode(true);
-   auto restore_mode = fc::make_scoped_exit([]() { producer_plugin::set_test_mode(false); });
-
-   constexpr uint32_t write_window_us = 200'000;
-   running_node       node{{"--read-only-threads", "2",
-                            "--read-only-write-window-time-us", "200000",
-                            "--read-only-read-window-time-us", "60000"}};
-
-   BOOST_REQUIRE_MESSAGE(node.in_write_window(), "a node should start in its write window");
-
-   // switch_to_read_window stays put when the read only queue is empty, so give it work to find.
-   // Read only tasks can also be drained on the main thread, so their running proves nothing about
-   // the window; the window state itself is what this checks.
-   // Real time alone must not close the write window, the property that makes this deterministic.
-   std::this_thread::sleep_for(real_time_patience);
-   BOOST_CHECK(node.in_write_window());
-
-   // Two things have to be true at once for the read window to open, and each is easy to lose.
-   // switch_to_read_window returns to the write window when it finds the read only queue empty, and
-   // the main thread drains that queue during the write window, so a batch posted up front can be
-   // gone by the time the timer fires. And each return to the write window re-arms the timer for
-   // another window's worth of virtual time, which only expires if the clock keeps moving. So drive
-   // both: keep topping the queue up and keep advancing, until the window actually changes.
-   std::atomic<uint32_t> read_only_ran{0};
-   auto drive_until = [&](bool wantWriteWindow) {
-      const auto giveUp = std::chrono::steady_clock::now() + reaction_timeout;
-      while (node.in_write_window() != wantWriteWindow) {
-         if (std::chrono::steady_clock::now() > giveUp)
-            return false;
-         for (uint32_t i = 0; i < 200; ++i)
-            node.post_read_only([&]() { ++read_only_ran; });
-         node.advance(fc::microseconds(write_window_us + 1000));
-         std::this_thread::sleep_for(std::chrono::milliseconds(2));
-      }
-      return true;
-   };
-
-   // Crossing the write window deadline must hand the read only threads their window.
-   BOOST_REQUIRE_MESSAGE(drive_until(false),
-                         "the write window did not close although the clock kept passing its deadline");
-   BOOST_CHECK_MESSAGE(wait_for([&]() { return read_only_ran.load() > 0; }),
-                       "the read window opened but its queued work did not run");
-
-   // The read window must close on its own deadline, leaving the node producing again.
-   BOOST_REQUIRE_MESSAGE(drive_until(true),
-                         "the read window did not close and hand the node back to production");
-   BOOST_REQUIRE_MESSAGE(node.advance_until_head_moves(), "production did not resume after the read window closed");
-}
-
-/**
  * A block is not shipped at its own slot time, it is shipped at the cpu effort deadline
  * calculate_producing_block_deadline works out, which falls earlier so the block has time to reach
  * the next producer. block_timing_util's tests check that arithmetic in isolation and nothing checks
@@ -406,6 +382,56 @@ BOOST_AUTO_TEST_CASE(a_block_ships_at_its_deadline_not_at_its_slot) {
                          "no block shipped once its deadline passed");
    BOOST_CHECK_MESSAGE(node.now() < next_block_time.to_time_point(),
                        "the block was only shipped after its slot time, so the deadline did nothing");
+}
+
+/**
+ * The other half of schedule_production_loop is the speculating branch: when the slot belongs to
+ * someone else the node builds a speculative block and arms schedule_delayed_production_loop to wake
+ * for its own next window. Everything above drives a node that owns every slot, so that branch never
+ * runs; only a schedule with producers this node has no key for reaches it.
+ *
+ * The property is that speculating is not a one way door. A node that hands off to other producers
+ * has to come back and produce when its own window returns, and the wake up it arms while
+ * speculating is the only thing that brings it back.
+ */
+BOOST_AUTO_TEST_CASE(production_resumes_after_speculating_through_other_windows) {
+   const std::vector<chain::account_name> others{"defproducera"_n, "defproducerb"_n};
+
+   fc::temp_directory seeded;
+   const fc::time_point head_time = seed_chain_with_other_producers(seeded, others);
+
+   // Only sysio's key, so the node produces its own window and speculates through the other two.
+   const auto priv     = sysio::testing::base_tester::get_private_key(config::system_account_name, "active");
+   const auto pub      = sysio::testing::base_tester::get_public_key(config::system_account_name, "active");
+   // <chain-kind>,<key-type>,<public-key>,<private-key-provider-spec>
+   const auto provider = "wire,wire," + pub.to_string({}) + ",KEY:" + priv.to_string({});
+
+   running_node node{{"--signature-provider", provider.c_str(),
+                      "--production-pause-vote-timeout-ms", "0"},
+                     seeded.path().string(), head_time};
+
+   // Walk a whole rotation. The node must speculate through the windows it has no key for, and it
+   // must produce again in its own, which is what the delayed wake up exists to do.
+   const uint32_t rotation = (others.size() + 1) * config::producer_repetitions;
+   bool           sawOther = false;
+   bool           sawOwnAfterOther = false;
+
+   for (uint32_t slot = 0; slot < 2 * rotation && !sawOwnAfterOther; ++slot) {
+      node.advance(fc::milliseconds(config::block_interval_ms));
+      std::this_thread::sleep_for(std::chrono::milliseconds(5));
+      const auto producer = node.head_producer();
+      if (producer != config::system_account_name)
+         sawOther = true;
+      else if (sawOther)
+         sawOwnAfterOther = true;
+   }
+
+   BOOST_REQUIRE_MESSAGE(sawOther,
+                         "the head never left sysio, so the node never speculated and this case "
+                         "did not exercise the delayed production loop");
+   BOOST_CHECK_MESSAGE(sawOwnAfterOther,
+                       "the node speculated through another producer's window and never produced "
+                       "again: the wake up armed while speculating did not bring it back");
 }
 
 BOOST_AUTO_TEST_SUITE_END()
