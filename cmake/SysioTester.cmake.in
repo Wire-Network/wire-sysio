@@ -272,6 +272,31 @@ if(IS_DIRECTORY "${sysioPrefixDir}/libraries")
         list(APPEND _sysio_build_tree_include_dirs "${_inc_dir}")
     endforeach()
 endif()
+# Build-tree equivalents of the install-tree include entries in the
+# target_include_directories() call below. A consumer that resolves this package
+# from the BUILD tree (sysio_DIR=<build>/lib/cmake/sysio -- e.g. wire-cdt's
+# integration tests) has nothing installed, so @CMAKE_INSTALL_FULL_INCLUDEDIR@
+# names a prefix that does not exist and the headers it is meant to expose are
+# unreachable.
+#
+# softfloat is vcpkg-provided. Its softfloat.hpp does `#include <softfloat_types.h>`
+# -- an ANGLED include, so the including file's own directory is NOT searched and
+# the softfloat/ directory itself must be on the include path, not merely its
+# parent.
+set(_sysio_vcpkg_include_dir "${sysioPrefixDir}/vcpkg_installed/${_sysio_vcpkg_triplet}/include")
+if(IS_DIRECTORY "${_sysio_vcpkg_include_dir}")
+    list(APPEND _sysio_build_tree_include_dirs "${_sysio_vcpkg_include_dir}")
+    if(IS_DIRECTORY "${_sysio_vcpkg_include_dir}/softfloat")
+        list(APPEND _sysio_build_tree_include_dirs "${_sysio_vcpkg_include_dir}/softfloat")
+    endif()
+endif()
+# wasm-jit ships its headers under libraries/wasm-jit/Include (capital I), which
+# the lowercase libraries/*/include glob above does not match. The install tree
+# exposes them as <includedir>/wasm-jit; this is the build-tree spelling.
+if(IS_DIRECTORY "${_sysio_source_dir}/libraries/wasm-jit/Include")
+    list(APPEND _sysio_build_tree_include_dirs "${_sysio_source_dir}/libraries/wasm-jit/Include")
+endif()
+
 if(_sysio_build_tree_include_dirs)
     list(REMOVE_DUPLICATES _sysio_build_tree_include_dirs)
 endif()
