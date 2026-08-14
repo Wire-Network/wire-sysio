@@ -240,25 +240,19 @@ struct opp_solana_outpost_client : fc::network::solana::solana_program_client {
                   epoch_seed,
                   std::vector<uint8_t>(signer_pk.begin(), signer_pk.end())},
                  program_id);
-           // The Solana program's `epoch_in` finalize path now fires the
-           // outbound emit inline at consensus reach (see
-           // `epoch_in.rs::finalize_envelope`), so the IDL's account list
-           // grew to carry the outbound-emit accounts. The relay injects
-           // pre-derived PDAs for all of them; the operator never sends a
-           // separate `emit_outbound_envelope` tx.
+           // `epoch_in` only stages/finalizes inbound chunks and, on
+           // consensus reach, processes the enclosed attestations inline —
+           // it no longer fires an outbound emit itself (that moved to the
+           // `dispatch_attestations` crank below, which drains the epoch's
+           // attestation cursor and carries the outbound-emit accounts).
+           // The IDL's `epoch_in` account list is just the 7 delivery/
+           // staging/consensus accounts below; no outbound PDAs needed here.
            account_overrides_t overrides = {
               {"config",                    config_pda},
               {"operator_registry",         operator_registry_pda},
               {"epoch_deliveries",          epoch_deliveries_pda},
               {"chunk_buffer",              chunk_buffer_pda},
               {"inbound_envelopes",         inbound_envelopes_pda},
-              {"outbound_message_buffer",   outbound_message_buffer_pda},
-              {"outbound_envelopes",        outbound_envelopes_pda},
-              {"latest_outbound_envelope",  latest_outbound_envelope_pda},
-              {"vault",                     vault_pda},
-              // v6 IDL field is `reserve_aggregate` (matches the Anchor
-              // `#[derive(Accounts)]` field name in epoch_in.rs / Initialize).
-              {"reserve_aggregate",         reserve_pda},
            };
            auto& instr = get_idl("epoch_in");
            program_invoke_data_items params = {
