@@ -130,22 +130,27 @@ public:
             startup->set_value({nullptr, nullptr});
       });
 
-      std::tie(_prod_plug, _chain_plug) = startup_fut.get();
-      if (_prod_plug == nullptr || _chain_plug == nullptr) {
-         // Join before failing. Throwing here would destroy a still joinable thread and abort the
-         // process, replacing the reason the node did not start with a bare terminate.
+      // The thread is joinable from here on, and a constructor that fails never runs the destructor:
+      // std::thread's own destructor would terminate the process, replacing whichever assertion
+      // failed with a bare abort. Everything below therefore unwinds through this.
+      auto stopNode = fc::make_scoped_exit([this]() {
          _app->quit();
          if (_app_thread.joinable())
             _app_thread.join();
+      });
+
+      std::tie(_prod_plug, _chain_plug) = startup_fut.get();
+      if (_prod_plug == nullptr || _chain_plug == nullptr)
          BOOST_FAIL("the node failed to start, see the logged error");
-      }
 
       // Connect and seed together on the app thread. Doing both there is what makes the snapshot
       // whole: a block accepted between reading the head and connecting the signal would go
       // unrecorded, and reading the head from this thread is the race the snapshot exists to remove.
-      std::promise<void> observing;
-      auto               observing_fut = observing.get_future();
-      post_to_main_thread([this, &observing]() {
+      // The promise is owned by both sides for the same reason the startup one is: if the wait below
+      // gives up, this lambda may still be queued behind whatever is holding the app thread.
+      auto observing     = std::make_shared<std::promise<void>>();
+      auto observing_fut = observing->get_future();
+      post_to_main_thread([this, observing]() {
          chain::controller& chain = _chain_plug->chain();
          _accepted_block          = chain.accepted_block().connect([this](const chain::block_signal_params& params) {
             const auto& [block, id] = params;
@@ -154,7 +159,7 @@ public:
          });
          const auto head = chain.head();
          record_head(head.block_num(), head.producer(), chain::block_timestamp_type(head.block_time()));
-         observing.set_value();
+         observing->set_value();
       });
       BOOST_REQUIRE_MESSAGE(observing_fut.wait_for(reaction_timeout) == std::future_status::ready,
                             "the node never serviced its main thread after startup");
@@ -167,13 +172,11 @@ public:
                                << head_time.time_since_epoch().count() << "us, clock is at "
                                << _clockStart.time_since_epoch().count() << "us");
 
-      // A fresh chain owes the block for the slot the clock already sits on, so let production settle
-      // before a test samples, otherwise its first step races that startup block. A seeded chain
-      // opens on a head that is already current and owes nothing until the clock moves, so waiting
-      // there would only burn the timeout.
-      if (seededDataDir.empty())
-         wait_for([this]() { return _blocks_produced.load() > 0; });
+      // Nothing is owed yet, so there is nothing to settle before a test samples: the next block's
+      // deadline falls inside the slot after the one the clock sits on, and virtual time does not
+      // move until a test moves it.
       _now = _clockStart;
+      stopNode.cancel();   // fully constructed, so the destructor owns the thread from here
    }
 
    ~running_node() {
@@ -200,9 +203,28 @@ public:
    /// producers in the schedule have no key here, so nothing they own is ever committed and the head
    /// only ever shows this node's own work or whatever history the chain was seeded with.
    bool speculating() {
+      const auto building = pending();
+      return building.building && building.producer != own_producer;
+   }
+
+   /// What the node is building right now, as a value that changes once it moves on to a new slot.
+   /// A test waiting for the node to react to the clock has to wait for this to differ from what it
+   /// was: waiting on a condition that already held before the clock moved returns at once and
+   /// leaves the sampling racing the timer thread.
+   struct pending_block {
+      bool                building  = false;
+      chain::account_name producer;
+      uint32_t            block_num = 0;
+
+      bool operator==(const pending_block&) const = default;
+   };
+
+   pending_block pending() {
       return on_main_thread([this]() {
          chain::controller& chain = _chain_plug->chain();
-         return chain.is_building_block() && chain.pending_block_producer() != own_producer;
+         if (!chain.is_building_block())
+            return pending_block{};
+         return pending_block{true, chain.pending_block_producer(), chain.pending_block_num()};
       });
    }
 
@@ -583,13 +605,18 @@ BOOST_AUTO_TEST_CASE(production_resumes_after_speculating_through_other_windows)
    bool           resumed    = false;
 
    for (uint32_t slot = 0; slot < 2 * rotation && !resumed; ++slot) {
-      const uint32_t before = node.blocks_produced();
+      const uint32_t before        = node.blocks_produced();
+      const auto     beforePending = node.pending();
       node.advance(fc::milliseconds(config::block_interval_ms));
 
-      // Give the node the chance to do something with the slot, then ask what it did: either it is
-      // building a block for a producer it has no key for, or it committed one of its own.
-      wait_up_to(slot_settle_budget, [&]() { return node.speculating() || node.blocks_produced() > before; });
+      // Wait for the node to do something NEW with the slot, not for a condition that already held
+      // before the clock moved. Once it is speculating it goes on speculating, so waiting on that
+      // would return at once and leave the sampling below racing the timer thread.
+      wait_up_to(slot_settle_budget,
+                 [&]() { return node.blocks_produced() > before || node.pending() != beforePending; });
 
+      // Then ask what it did with the slot: either it is building for a producer it has no key for,
+      // or it committed one of its own.
       if (node.speculating())
          speculated = true;
       else if (speculated && node.blocks_produced() > before)
