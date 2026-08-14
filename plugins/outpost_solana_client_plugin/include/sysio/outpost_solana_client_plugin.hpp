@@ -285,7 +285,7 @@ struct opp_solana_outpost_client : fc::network::solana::solana_program_client {
            // Deliberately NOT injecting `set_compute_unit_limit` — the
            // OOM tx consumed 116 K of 200 K CU, so CU is not the
            // bottleneck for the production 2.5 KB envelope. Add a CU
-           // bump only when 64 KB envelopes land live.
+           // bump only when cap-sized (32 KiB) envelopes land live.
            std::vector<fc::network::solana::instruction> pre_ixs;
            if (chunk_index == total_chunks) {
               pre_ixs.push_back(
