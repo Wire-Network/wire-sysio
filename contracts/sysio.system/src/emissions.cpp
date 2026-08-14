@@ -177,9 +177,20 @@ int64_t get_reserv_rewards_balance() {
 // `sysio.token::transfer` notifies `to`, and the chain runs notified receivers with no exception
 // isolation, so the destination decides whether the enclosing transaction commits. Pushing to an
 // account the protocol does not control therefore hands it an abort switch over every parent
-// inline action. Only `fundclaim` still uses this, and only to reach `sysio.dclaim`.
+// inline action.
 //
-// Recipient payouts go through `credit_pay` instead.
+// THREE call sites remain, and every one targets a protocol-owned account with no code of its own:
+//
+//   * `fundclaim`             -> `sysio.dclaim`
+//   * `payepoch` (capex)      -> `sysio.ops`
+//   * `payepoch` (governance) -> `sysio.gov`
+//
+// The two `payepoch` pushes are on the never-throw `advance` path, so this list IS the set of
+// accounts that could abort epoch advancement if code were ever deployed on them — see the standing
+// constraint at those call sites. Adding a fourth destination outside protocol control reopens the
+// vulnerability this file exists to close.
+//
+// Every payout to an account the protocol does not control goes through `credit_pay` instead.
 void send_wire_transfer(name self, name to, int64_t amount, std::string_view memo_str) {
    if (amount <= 0) return;
    sysio::action(
@@ -196,9 +207,11 @@ void send_wire_transfer(name self, name to, int64_t amount, std::string_view mem
 // which runs inline from `sysio.epoch::advance` and must not be abortable by any recipient.
 //
 // Observability note: the per-recipient inline transfer this replaces used to carry `memo_str` and
-// showed up as its own action trace. The credit is a kv write, so per-recipient attribution now
-// comes from the `payclaims` table deltas (visible to state-history consumers) plus the aggregate
-// `epochlog` row.
+// showed up as its own action trace HERE, on the payepoch path. That trace is gone -- the credit is
+// a kv write -- so attribution at credit time is the `payclaims` table delta (visible to
+// state-history consumers) plus the aggregate `epochlog` row. A per-recipient transfer trace does
+// still appear later, when the claimant calls `claimpay`; what no longer exists anywhere is a
+// CATEGORY-tagged one.
 //
 // `memo_str` is DISCARDED, and nothing downstream recovers it: `claimpay` drains the whole row in
 // one transfer under its own constant memo (`memo::epoch_pay_claim`), so a claimant owed both a
@@ -507,10 +520,12 @@ void system_contract::claimnodedis(const sysio::name& account_name) {
 
 // claimpay - pull the caller's credited epoch pay.
 //
-// This is the ONLY place a payepoch payout becomes a token transfer. payepoch itself credits
-// `payclaims` and transfers nothing, because it runs inline from sysio.epoch::advance and a
-// recipient's transfer-notify handler would otherwise be able to abort advance and stall epoch
-// advancement chain-wide. Here the transfer runs under the claimant's own authority, so a hostile
+// This is the ONLY place an epoch pay CREDIT becomes a token transfer. payepoch credits the
+// producer / standby / batch-operator shares and transfers nothing to them, because it runs inline
+// from sysio.epoch::advance and a recipient's transfer-notify handler would otherwise be able to
+// abort advance and stall epoch advancement chain-wide. (payepoch does still push the T5 category
+// buckets to `sysio.ops` / `sysio.gov` -- protocol-owned accounts with no code; see the note at
+// that call site.) Here the transfer runs under the claimant's own authority, so a hostile
 // handler blocks nothing but this caller's own claim.
 //
 // The row is erased before the transfer is queued (inside pay_out), so a notify handler that
@@ -1062,8 +1077,8 @@ void system_contract::payepoch(uint32_t epoch_index,
 // boundary (BALANCE_INSUFFICIENT) or leave payepoch's credits unbacked.
 //
 // The balance cap ALSO reserves outstanding `payclaims`. Those balances have
-// already been credited to producers / batch operators / category accounts but
-// not yet pulled, so the WIRE backing them is still sitting in this account's
+// already been credited to producers / standbys / batch operators but not yet
+// pulled, so the WIRE backing them is still sitting in this account's
 // token balance while being fully owed. Spending it here would leave a later
 // `claimpay` unable to transfer, stranding earned pay -- the claimable-payout
 // equivalent of the "overdrawn balance" abort this cap has always guarded.

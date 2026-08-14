@@ -39,13 +39,20 @@ not control is therefore **credited** to `payclaims` and pulled later with
 sits in `payclaims` until they call `sysio.system::claimpay`; a balance watcher
 waiting for it to arrive will wait forever. Monitoring reads `payclaims`.
 
-**Do not key monitoring on a per-bucket memo for the credited rows.** A credit is a
-kv write and carries no memo at all, and `claimpay` drains the whole `payclaims` row
-in ONE transfer under the single memo `T5 epoch pay claim` — so a claimant who earned
-both a producer and a batch-op share receives one transfer, and no category-specific
-memo or per-recipient transfer trace exists at either end. Per-bucket attribution
-comes from the `epochlog` row (aggregate amounts) and per-recipient attribution from
-`payclaims` deltas.
+**Do not key monitoring on a per-bucket memo for the credited rows.** What is lost is
+the CATEGORY, not the trace:
+
+- **At credit time** there is no transfer and no memo at all — the credit is a kv
+  write, so `payclaims` deltas are the only signal.
+- **At claim time** `claimpay` does emit a normal `sysio.token::transfer` to the
+  claimant, so a per-recipient transfer trace exists and is worth watching. But it
+  drains the whole row in ONE transfer under the single memo `T5 epoch pay claim`, so
+  a claimant who earned both a producer and a batch-op share receives one transfer
+  carrying neither category.
+
+Per-bucket attribution therefore comes from the `epochlog` row (aggregate amounts per
+category), and per-recipient attribution from `payclaims` deltas plus the claim
+transfer.
 
 **`sysio.ops` and `sysio.gov` stay pushed** because no claim path can reach them:
 a claim needs `require_auth(account_name)`, `sysio.roa` forces

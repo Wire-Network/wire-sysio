@@ -33,7 +33,10 @@
  * `sysio.reserv::rewards_bucket`). The helpers below are templated over the table instead, and
  * require only that the row expose:
  *
- *   * `uint64_t balance`            -- required, the claimable amount in atomic WIRE units
+ *   * `uint64_t balance`            -- required, the claimable amount in atomic units of THAT
+ *                                      contract's token (WIRE for sysio.system / sysio.reserv,
+ *                                      CORE_SYM for sysio.opreg) -- these helpers never name a
+ *                                      symbol; `pay_out`'s caller supplies it
  *   * `uint32_t expires_at_sec`     -- optional; when present it is maintained by `credit` and
  *                                      makes the row eligible for `sweep_expired`
  */
@@ -53,10 +56,13 @@
 
 namespace sysio::opp::claimable {
 
-/// Compile-time detection of the optional `expires_at_sec` member on a claimable row. Contracts
-/// whose claimable set is bounded (a producer schedule, a registered operator set) omit the field
-/// and opt out of expiry entirely; contracts crediting an unbounded, caller-influenced set of
-/// accounts carry it so abandoned dust rows cannot accumulate system-paid RAM forever.
+/// Compile-time detection of the optional `expires_at_sec` member on a claimable row.
+///
+/// A row that omits the field opts out of expiry entirely: nothing stamps it and `sweep_expired`
+/// cannot select it. Every row in this tree currently CARRIES the field -- `payclaims`,
+/// `wireclaims` and `remitclaims` alike -- so the false branch is the shape a future bounded-set
+/// contract may choose, not a description of any table today. Whether a stamped row is ever acted
+/// on is a separate, per-contract decision (only `wireclaims` is swept; see WIRE-339).
 template<class Row, class = void>
 struct has_expiry : std::false_type {};
 
@@ -90,7 +96,7 @@ inline uint64_t add_capped(uint64_t balance, uint64_t amount) {
 /// @param key      primary key for the recipient.
 /// @param fresh    prototype row used when the key is absent; the caller pre-fills the identifying
 ///                 fields (`account`, ...) and this function sets `balance` (and `expires_at_sec`).
-/// @param amount   atomic WIRE units to credit.
+/// @param amount   atomic units to credit, in the caller's token (see the row contract above).
 /// @param expires_at_sec  absolute expiry stamp, ignored unless the row carries the field. Passing
 ///                 the refreshed expiry on every credit means an account with ongoing activity
 ///                 never expires mid-stream.
@@ -125,7 +131,7 @@ void credit(Table& tbl, sysio::name payer, const Key& key, Row fresh, uint64_t a
 /// Unlike `credit`, this DOES `check()`-throw when there is nothing to claim -- correct here,
 /// because the throw reaches only the claimant who asked for it.
 ///
-/// @return the amount paid out, in atomic WIRE units.
+/// @return the amount paid out, in atomic units of the `symbol` passed in.
 template<class Table, class Key>
 uint64_t pay_out(Table& tbl, const Key& key, sysio::name self, sysio::name token_account,
                  sysio::name to, const sysio::symbol& sym, const std::string& memo,

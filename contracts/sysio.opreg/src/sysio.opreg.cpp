@@ -1282,9 +1282,11 @@ void opreg::flushwtdw(uint32_t current_epoch) {
          subtract_balance(o, row.chain_code, row.token_code, row.amount);
       });
 
-      // For WIRE-direct: do the token transfer back inline. For outpost
-      // chains: queue an OPERATOR_ACTION(WITHDRAW_REMIT) to the outpost
-      // so it can release the escrow on its end.
+      // For WIRE-direct: CREDIT the operator's `remitclaims` row -- no transfer happens here, and
+      // the operator receives nothing until it calls `claimremit`. This path runs inline from
+      // `sysio.epoch::advance`, where a pushed transfer would let the operator's notify handler
+      // abort epoch advancement chain-wide. For outpost chains: queue an
+      // OPERATOR_ACTION(WITHDRAW_REMIT) to the outpost so it can release the escrow on its end.
       if (row.chain_code == kWireChainCode) {
          credit_remit_claim(get_self(), row.account, row.amount);
       } else {
@@ -1461,9 +1463,10 @@ void opreg::releaselock(name account,
       emit_slash_attestation(get_self(), slash_action);
       append_action_log(ops, op_pk, slash_action, /*success*/ true, "");
    } else {
-      // TERMINATED — for WIRE-direct, transfer back to operator; otherwise
-      // queue WITHDRAW_REMIT so the outpost can transfer to the authex
-      // destination. request_id == 0 (this remit isn't queued in wtdwqueue).
+      // TERMINATED — for WIRE-direct, CREDIT the operator's `remitclaims` row (it is paid only
+      // when it calls `claimremit`; a pushed transfer here would let the operator being terminated
+      // abort its own termination); otherwise queue WITHDRAW_REMIT so the outpost can transfer to
+      // the authex destination. request_id == 0 (this remit isn't queued in wtdwqueue).
       if (chain_code == kWireChainCode) {
          credit_remit_claim(get_self(), account, settle_amount);
       } else {
@@ -1515,8 +1518,9 @@ void terminate_inline(name self, name account, const std::string& reason) {
       }
    });
 
-   // Remit each (chain_code, token_code). For WIRE-chain: direct token transfer
-   // back to the operator. For outpost chains: queue WITHDRAW_REMIT.
+   // Remit each (chain_code, token_code). For WIRE-chain: CREDIT `remitclaims`, which the operator
+   // pulls with `claimremit` -- nothing is transferred from here. For outpost chains: queue
+   // WITHDRAW_REMIT.
    //
    // After each remit, append a WITHDRAW_REMIT entry to the operator's
    // `recent_actions` ring buffer so the audit trail mirrors the
