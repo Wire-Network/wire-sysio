@@ -253,11 +253,19 @@ public:
    /// Anything reading chain state has to go through here. controller::head() hands back a
    /// block_handle by value, so copying it while the app thread is replacing chain_head races on the
    /// shared pointer inside, and controller has no lock a test could take instead.
+   ///
+   /// The callable and the promise are owned by the posted lambda rather than borrowed from this
+   /// frame. Giving up on the wait below does not withdraw the lambda: it stays queued behind
+   /// whatever is holding the app thread and runs later, by which time anything left on this stack
+   /// is gone.
    template<typename F>
    auto on_main_thread(F&& fn) -> decltype(fn()) {
-      std::promise<decltype(fn())> result;
-      auto                         fut = result.get_future();
-      post_to_main_thread([&]() { result.set_value(fn()); });
+      using result_t = decltype(fn());
+      auto result    = std::make_shared<std::promise<result_t>>();
+      auto fut       = result->get_future();
+      post_to_main_thread([result, call = std::decay_t<F>(std::forward<F>(fn))]() mutable {
+         result->set_value(call());
+      });
       BOOST_REQUIRE_MESSAGE(fut.wait_for(reaction_timeout) == std::future_status::ready,
                             "the node stopped servicing its main thread");
       return fut.get();
@@ -495,15 +503,25 @@ BOOST_AUTO_TEST_CASE(production_survives_a_competing_reschedule) {
 
    const uint32_t settled = node.blocks_produced();
 
+   // The gate and the disturbance both outlive this frame if anything here gives up: they stay queued
+   // behind whichever of them is holding the app thread, so they own their synchronization rather
+   // than borrowing this stack. The guard is what stops a failed wait from unwinding past a gate that
+   // is still holding the thread, which would leave the node unable to shut down.
+   auto holding = std::make_shared<std::promise<void>>();
+   auto release = std::make_shared<std::promise<void>>();
+   auto holding_fut = holding->get_future();
+   auto release_fut = std::make_shared<std::shared_future<void>>(release->get_future());
+   auto released    = false;
+   auto openTheGate = fc::make_scoped_exit([&]() {
+      if (!released)
+         release->set_value();
+   });
+
    // Take the app thread and keep it. The timer runs on the plugin's own thread and only posts here,
    // so while this is held the timer can fire and enqueue with nothing on this side running.
-   std::promise<void> holding;
-   std::promise<void> release;
-   auto               holding_fut = holding.get_future();
-   auto               release_fut = release.get_future();
-   node.post_to_main_thread([&]() {
-      holding.set_value();
-      release_fut.wait();
+   node.post_to_main_thread([holding, release_fut]() {
+      holding->set_value();
+      release_fut->wait();
    });
    BOOST_REQUIRE_MESSAGE(holding_fut.wait_for(reaction_timeout) == std::future_status::ready,
                          "the node stopped servicing its main thread");
@@ -512,14 +530,14 @@ BOOST_AUTO_TEST_CASE(production_survives_a_competing_reschedule) {
    // pending block and reschedules the production loop on scope exit, which is a competing schedule_*
    // call bumping the correlation id. Queuing it now is what puts it ahead of whatever the timer
    // posts, since the executor runs handlers of equal priority in the order they were posted.
-   std::promise<void> disturbed;
-   auto               disturbed_fut = disturbed.get_future();
-   node.post_to_main_thread([&]() {
+   auto disturbed     = std::make_shared<std::promise<void>>();
+   auto disturbed_fut = disturbed->get_future();
+   node.post_to_main_thread([producer = node.producer(), disturbed]() {
       try {
-         node.producer()->get_integrity_hash();
+         producer->get_integrity_hash();
       }
       FC_LOG_AND_DROP()
-      disturbed.set_value();
+      disturbed->set_value();
    });
 
    // Walk the clock past the armed wake up while the app thread is still held, so the timer fires
@@ -533,7 +551,8 @@ BOOST_AUTO_TEST_CASE(production_survives_a_competing_reschedule) {
 
    // Release. The disturbance runs first and bumps the id, then the timer's lambda runs under an id
    // that is no longer current, which is the interleaving the recheck is written for.
-   release.set_value();
+   release->set_value();
+   released = true;
    BOOST_REQUIRE_MESSAGE(disturbed_fut.wait_for(reaction_timeout) == std::future_status::ready,
                          "the node stopped servicing its main thread");
 
