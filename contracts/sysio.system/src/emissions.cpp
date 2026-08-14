@@ -759,8 +759,11 @@ void system_contract::payepoch(uint32_t epoch_index,
    }
    const int64_t fee_batch_pool = fee_total;
 
-   int64_t actual_paid = 0; // emission actually transferred (counts toward total_distributed)
-   int64_t fee_paid    = 0; // swap-fee rewards actually transferred (does NOT count toward treasury)
+   // "paid" here means DISTRIBUTED -- credited to `payclaims` for producers / standbys /
+   // batch operators, transferred for the category buckets. Both leave the treasury's
+   // spendable position, which is what these counters feed.
+   int64_t actual_paid = 0; // emission actually distributed (counts toward total_distributed)
+   int64_t fee_paid    = 0; // swap-fee rewards actually distributed (does NOT count toward treasury)
 
    // =======================================================================
    // Producer + standby pay. Active producers (rank 1..21) are paid in
@@ -996,8 +999,10 @@ void system_contract::payepoch(uint32_t epoch_index,
    // amounts for the period that just paid, plus the swap-fee rewards folded
    // into the batch-operator distribution (fee_distributed, sourced from swap
    // fees rather than the treasury). (Producer / batch-op sub-distribution is
-   // implicit -- recipients are in traces.) One row per pay-epoch;
-   // non-pay-epochs have no audit-log row.
+   // implicit. Those shares are CREDITED to `payclaims` rather than transferred, so a
+   // recipient no longer appears as its own transfer trace -- per-recipient attribution
+   // comes from the `payclaims` row deltas, and the eventual `claimpay`.) One row per
+   // pay-epoch; non-pay-epochs have no audit-log row.
    epochlog_t epoch_table(get_self());
    epoch_table.emplace(get_self(), epochlog_key{epoch_index}, epoch_log{
       .sysio_epoch_index = epoch_index,
