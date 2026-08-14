@@ -66,6 +66,7 @@ def censusProductionCycle(getBlock, firstBlockNum, windowPhase, windowSize, cycl
       cycle          the producers in the order their windows come round
       counts         how many blocks each of them signed
       silentWindows  cycle positions whose producer signed nothing at all
+      wrapProducer   the producer checked at the wrap, or None if none could be
       blocksExamined how far the walk got, which ranks the grids against each other when they all
                      fail and the most informative violation has to be picked out
     """
@@ -75,7 +76,7 @@ def censusProductionCycle(getBlock, firstBlockNum, windowPhase, windowSize, cycl
     windowToProducer={}
     producerToWindow={}
     blocksExamined=0
-    result={"cycle":cycle, "counts":counts, "silentWindows":[], "blocksExamined":0, "error":None}
+    result={"cycle":cycle, "counts":counts, "silentWindows":[], "wrapProducer":None, "blocksExamined":0, "error":None}
 
     def fail(message):
         result["blocksExamined"]=blocksExamined
@@ -91,44 +92,49 @@ def censusProductionCycle(getBlock, firstBlockNum, windowPhase, windowSize, cycl
     while True:
         window=windowOfSlot(slot)
         if window >= endWindow:
-            # This look-ahead block is the first at or past the wrap, and it is checked rather than
-            # discarded: a producer granted a thirteenth consecutive slot would put its own block
-            # here, and only comparing against the producer that owns the window this cycle started
-            # on catches that.
-            if window == endWindow:
-                wrapped=windowToProducer.get(firstWindow)
-                if wrapped is not None and producer != wrapped:
-                    return fail("Block %d opens the next cycle at position %d but was produced by %s, where the cycle "
-                                "began with %s.  A cycle of %d producers must wrap onto the producer it started with." %
-                                (blockNum, window-firstWindow, producer, wrapped, cycleLength))
-            break
+            # The first block past the cycle is checked rather than discarded: a producer granted a
+            # thirteenth consecutive slot puts its own block here, and only comparing it against the
+            # producer that owns this position in the rotation catches that.  The comparison is made
+            # modulo the rotation because a silent window can carry the block past the wrap itself,
+            # and where the position it lands on was also silent this cycle there is nobody to
+            # compare it with and the walk goes on to the next block.
+            owner=windowToProducer.get(firstWindow + (window - firstWindow) % cycleLength)
+            if owner is not None:
+                if producer != owner:
+                    return fail("Block %d, at cycle position %d, was produced by %s where %s owns that position in the "
+                                "rotation.  A cycle of %d producers must come round to the producers it started with." %
+                                (blockNum, window-firstWindow, producer, owner, cycleLength))
+                result["wrapProducer"]=owner
+                break
+            if window - endWindow >= cycleLength:
+                break
+        else:
+            if producer not in scheduledProducers:
+                return fail("Producer %s, of block %d, was not one of the voted on producers" % (producer, blockNum))
 
-        if producer not in scheduledProducers:
-            return fail("Producer %s, of block %d, was not one of the voted on producers" % (producer, blockNum))
+            if window < lastWindow:
+                return fail("Block %d, produced by %s, is at cycle position %d, behind position %d of the block before "
+                            "it." % (blockNum, producer, window-firstWindow, lastWindow-firstWindow))
 
-        if window < lastWindow:
-            return fail("Block %d, produced by %s, is at cycle position %d, behind position %d of the block before "
-                        "it." % (blockNum, producer, window-firstWindow, lastWindow-firstWindow))
+            owner=windowToProducer.get(window)
+            if owner is None:
+                if producer in producerToWindow:
+                    return fail("Producer %s owns cycle position %d, but also produced block %d at position %d.  "
+                                "A producer is scheduled at most once per %d producer cycle." %
+                                (producer, producerToWindow[producer]-firstWindow, blockNum, window-firstWindow,
+                                 cycleLength))
+                windowToProducer[window]=producer
+                producerToWindow[producer]=window
+                counts[producer]=0
+                cycle.append(producer)
+            elif owner != producer:
+                return fail("Block %d, %d slots into the walk, was produced by %s, but %s already produced at cycle "
+                            "position %d.  A window belongs to exactly one producer." %
+                            (blockNum, slot, producer, owner, window-firstWindow))
 
-        owner=windowToProducer.get(window)
-        if owner is None:
-            if producer in producerToWindow:
-                return fail("Producer %s owns cycle position %d, but also produced block %d at position %d.  "
-                            "A producer is scheduled at most once per %d producer cycle." %
-                            (producer, producerToWindow[producer]-firstWindow, blockNum, window-firstWindow,
-                             cycleLength))
-            windowToProducer[window]=producer
-            producerToWindow[producer]=window
-            counts[producer]=0
-            cycle.append(producer)
-        elif owner != producer:
-            return fail("Block %d, %d slots into the walk, was produced by %s, but %s already produced at cycle "
-                        "position %d.  A window belongs to exactly one producer." %
-                        (blockNum, slot, producer, owner, window-firstWindow))
-
-        counts[producer]+=1
-        blocksExamined+=1
-        lastWindow=window
+            counts[producer]+=1
+            blocksExamined+=1
+            lastWindow=window
 
         precedingProducer=producer
         precedingSlot=slot
@@ -512,6 +518,10 @@ try:
         Print("WARNING: %d of the %d producers in the cycle produced no block in their window, at cycle positions: %s" %
               (len(census["silentWindows"]), maxActiveProducers,
                ", ".join(str(position) for position in census["silentWindows"])))
+
+    if census["wrapProducer"] is None:
+        Print("WARNING: the producers that followed the cycle all fell in windows that went silent during it, so the "
+              "cycle could not be checked for coming round to the producers it started with.")
 
     productionCycle=census["cycle"]
     Print("ProductionCycle ->> {\n%s\n}" %
