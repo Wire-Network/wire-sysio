@@ -88,6 +88,7 @@ def censusProductionCycle(getBlock, firstBlockNum, windowPhase, windowSize, cycl
     firstWindow=windowOfSlot(slot)
     endWindow=firstWindow + cycleLength   # exclusive, one full rotation
     lastWindow=firstWindow
+    silentPositions=None
 
     while True:
         window=windowOfSlot(slot)
@@ -98,7 +99,14 @@ def censusProductionCycle(getBlock, firstBlockNum, windowPhase, windowSize, cycl
             # modulo the rotation because a silent window can carry the block past the wrap itself,
             # and where the position it lands on was also silent this cycle there is nobody to
             # compare it with and the walk goes on to the next block.
-            owner=windowToProducer.get(firstWindow + (window - firstWindow) % cycleLength)
+            if silentPositions is None:
+                # Taken before the walk past the cycle can record an owner for any of them, since
+                # these are the positions the cycle itself never filled and that is what is reported.
+                silentPositions=[position for position in range(cycleLength)
+                                 if firstWindow+position not in windowToProducer]
+
+            position=firstWindow + (window - firstWindow) % cycleLength
+            owner=windowToProducer.get(position)
             if owner is not None:
                 if producer != owner:
                     return fail("Block %d, at cycle position %d, was produced by %s where %s owns that position in the "
@@ -106,6 +114,24 @@ def censusProductionCycle(getBlock, firstBlockNum, windowPhase, windowSize, cycl
                                 (blockNum, window-firstWindow, producer, owner, cycleLength))
                 result["wrapProducer"]=owner
                 break
+
+            # Nobody produced at this position during the cycle, so there is no owner to compare
+            # against and the walk goes on rather than accepting the block on that alone. Everything
+            # that can be checked without an owner still is: the producer has to be one that was
+            # voted in, and it cannot be one that already owns a different position, since a producer
+            # owns exactly one per rotation. Taking the position here is what makes the next block to
+            # land on it comparable, so a second producer claiming it is caught as well.
+            if producer not in scheduledProducers:
+                return fail("Producer %s, of block %d, was not one of the voted on producers" % (producer, blockNum))
+
+            claimed=producerToWindow.get(producer)
+            if claimed is not None and claimed != position:
+                return fail("Producer %s owns cycle position %d, but also produced block %d at position %d.  "
+                            "A producer is scheduled at most once per %d producer cycle." %
+                            (producer, claimed-firstWindow, blockNum, position-firstWindow, cycleLength))
+            windowToProducer[position]=producer
+            producerToWindow[producer]=position
+
             if window - endWindow >= cycleLength:
                 break
         else:
@@ -149,8 +175,7 @@ def censusProductionCycle(getBlock, firstBlockNum, windowPhase, windowSize, cycl
                         "at its start.  Producer runs are not aligned to this window grid." %
                         (precedingProducer, producer, blockNum, (slot - windowPhase) % windowSize, windowSize))
 
-    result["silentWindows"]=[position for position in range(cycleLength)
-                             if firstWindow+position not in windowToProducer]
+    result["silentWindows"]=silentPositions
     result["blocksExamined"]=blocksExamined
     return result
 
