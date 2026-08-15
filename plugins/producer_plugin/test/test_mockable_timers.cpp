@@ -439,9 +439,23 @@ BOOST_AUTO_TEST_SUITE(mockable_timers)
  * to wake for and stop there, and the integration tests race a real clock. A slot lost between the
  * two emits no log line and no error, it simply produces no block.
  *
- * With fc's mock clock engaged the production timer becomes virtual, so a production round can be
- * stepped slot by slot with no sleeping and no tolerance for a loaded machine: either the block for
- * a slot appears when the clock reaches it, or it does not.
+ * With fc's mock clock engaged the production timer becomes virtual, so a round can be driven with
+ * no sleeping and no tolerance for a loaded machine: the head advances only when the test moves the
+ * clock, and it must keep advancing for as long as the test keeps moving it.
+ *
+ * What that establishes is BOUNDED LIVENESS, not a per-slot guarantee, and the difference is
+ * deliberate rather than a shortcut. Blocks ship at their cpu-effort deadline -- 462.5ms at the
+ * default offset -- rather than at the 500ms slot boundary, so a node runs progressively further
+ * ahead across a round and then waits out a gap of roughly two slots. Requiring a block from every
+ * slot would therefore fail on correct behaviour, at a step that moves with startup timing. This
+ * case asserts instead that the head never stalls longer than that legitimate gap, twelve times
+ * running, and that twelve advances yield at least twelve blocks.
+ *
+ * It follows that a regression losing a single deadline is NOT caught here: the head still moves
+ * within the allowance, just later. Detecting that needs a slot budget over the whole round, and a
+ * fixed budget is brittle for the same reason a per-slot assertion is -- how much drift has
+ * accumulated depends on where in the round the node started. What this case does catch is a timer
+ * that stops re-arming, which is the failure the seam under test can actually introduce.
  */
 BOOST_AUTO_TEST_CASE(production_follows_the_virtual_clock) {
    running_node   node;
@@ -452,15 +466,19 @@ BOOST_AUTO_TEST_CASE(production_follows_the_virtual_clock) {
    std::this_thread::sleep_for(real_time_patience);
    BOOST_CHECK_EQUAL(node.blocks_produced(), settled);
 
-   // 2. Every slot the clock advances through must yield a block. Stepping one slot at a time is
-   //    what makes a silently skipped slot a failure rather than a timing artifact.
-   for (uint32_t slot = 1; slot <= slots_to_step; ++slot) {
+   // 2. The head must keep advancing for as long as the clock does, and each advance must arrive
+   //    inside the longest legitimate pause -- the round-boundary gap advance_until_head_moves
+   //    allows for. A timer that stops re-arming fails here on the step where it stopped.
+   for (uint32_t step = 1; step <= slots_to_step; ++step) {
       BOOST_REQUIRE_MESSAGE(node.advance_until_head_moves(),
-                            "production stopped at step " << slot << " of " << slots_to_step
+                            "production stopped at step " << step << " of " << slots_to_step
                                                           << ": the head did not move across three slots of "
                                                              "virtual time");
    }
-   BOOST_CHECK_GT(node.blocks_produced(), settled);
+
+   // Each of those steps required the head to move at least once, and this node is the only
+   // producer, so every advance is a block it produced.
+   BOOST_CHECK_GE(node.blocks_produced(), settled + slots_to_step);
 
    // 3. Stopping the clock must stop production, confirming that step 2 measured the clock driving
    //    production rather than production simply running free.
