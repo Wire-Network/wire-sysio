@@ -241,11 +241,7 @@ static int64_t compute_undistributed_if_no_operators(int64_t emission) {
 class sysio_emissions_tester : public tester {
 public:
    sysio_emissions_tester() {
-      produce_blocks(2);
-
-      // --- sysio.system (emissions lives here) ---
-      set_code( config::system_account_name, contracts::system_wasm() );
-      set_abi ( config::system_account_name, contracts::system_abi().data() );
+      deploy_system_contract();
 
       base_tester::push_action(
          config::system_account_name,
@@ -256,14 +252,7 @@ public:
       );
       produce_blocks(1);
 
-      // sysio.system ABI serializer
-      {
-         const auto* accnt = control->find_account_metadata( config::system_account_name );
-         BOOST_REQUIRE( accnt != nullptr );
-         abi_def abi;
-         BOOST_REQUIRE_EQUAL( abi_serializer::to_abi(accnt->abi, abi), true );
-         sysio_abi_ser.set_abi( abi, abi_serializer::create_yield_function(abi_serializer_max_time) );
-      }
+      bind_system_abi();
 
       // --- sysio.roa is expected to already be deployed by the harness ---
       {
@@ -389,6 +378,63 @@ public:
       bootstrap_epoch();
    }
 
+protected:
+   /// Selects the minimal construction path used by sysio_fresh_deploy_tester below.
+   struct deploy_only_t {};
+
+   /// Deploy sysio.system and bind its ABI, and do nothing else -- in particular produce no block
+   /// and push no action, so `onblock` has never run against this code and the contract's `global`
+   /// row has never been written. Everything the full fixture does past this point (init, the
+   /// token/roa/opreg/epoch bootstrap, produce_blocks) would persist that row, because each action
+   /// constructs a fresh system_contract whose deferred write lands at end of action.
+   explicit sysio_emissions_tester( deploy_only_t ) {
+      deploy_system_contract();
+      bind_system_abi();
+   }
+
+   /// Put sysio.system on chain. Shared by both construction paths so they cannot drift.
+   void deploy_system_contract() {
+      produce_blocks(2);
+
+      // --- sysio.system (emissions lives here) ---
+      set_code( config::system_account_name, contracts::system_wasm() );
+      set_abi ( config::system_account_name, contracts::system_abi().data() );
+   }
+
+   /// Bind the sysio.system ABI serializer from the deployed account's metadata.
+   void bind_system_abi() {
+      const auto* accnt = control->find_account_metadata( config::system_account_name );
+      BOOST_REQUIRE( accnt != nullptr );
+      abi_def abi;
+      BOOST_REQUIRE_EQUAL( abi_serializer::to_abi(accnt->abi, abi), true );
+      sysio_abi_ser.set_abi( abi, abi_serializer::create_yield_function(abi_serializer_max_time) );
+   }
+
+public:
+   /// Raw bytes of sysio.system's `global` singleton row, empty when the row does not exist.
+   ///
+   /// Spelled out rather than routed through get_row_by_id, which probes a 16-byte [scope][pk] key
+   /// before falling back to the unscoped one -- this test asserts on the row's ABSENCE, so a
+   /// lookup with a second way to match is the wrong instrument.
+   ///
+   /// kv::global keys its single entry by the table name alone: table_id = compute_table_id(name)
+   /// and an 8-byte big-endian key of that same name, no scope.
+   vector<char> global_row() const {
+      char key_buf[chain::kv_pri_key_size];
+      chain::kv_encode_be64( key_buf, "global"_n.to_uint64_t() );
+
+      const auto& kv_idx = control->db().get_index<chain::kv_index, chain::by_code_key>();
+      auto it = kv_idx.find( boost::make_tuple( config::system_account_name,
+                                                chain::compute_table_id( "global"_n.to_uint64_t() ),
+                                                std::string_view( key_buf, chain::kv_pri_key_size ) ) );
+
+      vector<char> data;
+      if( it != kv_idx.end() )
+         data.assign( it->value.begin(), it->value.end() );
+      return data;
+   }
+
+   bool global_row_exists() const { return !global_row().empty(); }
 
    /// Current head block time in seconds since epoch (used for deterministic time tests).
    uint32_t head_secs() const {
@@ -476,7 +522,13 @@ public:
    /// Same as setemitcfg_defaults but with a configurable pay_cadence_epochs.
    /// Tests that exercise cadence > 1 behavior call this directly.
    action_result setemitcfg_with_cadence( account_name signer, uint16_t cadence ) {
-      return setemitcfg(signer, mvo()
+      return setemitcfg(signer, default_emit_cfg(cadence));
+   }
+
+   /// The default emission config payload, split out so a caller that must push it through a
+   /// different transport (see push_system_action_no_block) does not restate twenty fields.
+   fc::variant_object default_emit_cfg( uint16_t cadence ) {
+      return mvo()
          ("t1_allocation",          T1_ALLOCATION.get_amount())
          ("t2_allocation",          T2_ALLOCATION.get_amount())
          ("t3_allocation",          T3_ALLOCATION.get_amount())
@@ -497,8 +549,7 @@ public:
          ("batch_op_bps",           uint16_t(3000))
          ("standby_end_rank",       T_STANDBY_END_RANK)
          ("epoch_log_retention_count", uint32_t(8640))
-         ("pay_cadence_epochs",     cadence)
-      );
+         ("pay_cadence_epochs",     cadence);
    }
 
    action_result setinittime( account_name signer, time_point_sec start ) {
@@ -942,6 +993,40 @@ protected:
       return base_tester::push_action( std::move(act), signer.to_uint64_t() );
    }
 
+   /// Push a sysio.system action WITHOUT crossing a block boundary.
+   ///
+   /// base_tester::push_action(action&&, uint64_t) calls produce_block() once the transaction
+   /// lands. That is invisible to most tests and fatal to the absent-`global`-row one: the next
+   /// block's onblock stamps last_pervote_bucket_fill on a fresh chain, creating the very row that
+   /// test needs to stay missing. Pushing straight into the open block keeps onblock from ever
+   /// running against sysio.system code. Error handling mirrors push_action so action_result
+   /// comparisons (success(), wasm_assert_msg()) read the same at the call site.
+   action_result push_system_action_no_block( const account_name& signer,
+                                              const action_name& act_name,
+                                              const variant_object& data ) {
+      action act;
+      act.account       = config::system_account_name;
+      act.name          = act_name;
+      act.authorization = vector<permission_level>{
+         { signer, config::sysio_payer_name },
+         { signer, config::active_name } };
+      act.data = sysio_abi_ser.variant_to_binary(
+         sysio_abi_ser.get_action_type(act_name), data,
+         abi_serializer::create_yield_function(abi_serializer_max_time));
+
+      signed_transaction trx;
+      trx.actions.emplace_back( std::move(act) );
+      set_transaction_headers(trx);
+      trx.sign( get_private_key(signer, "active"), control->get_chain_id() );
+
+      try {
+         push_transaction(trx);
+      } catch (const fc::exception& ex) {
+         return error(ex.top_message());
+      }
+      return success();
+   }
+
    transaction_trace_ptr push_system_action_trace( const account_name& signer,
                                                   const action_name& name,
                                                   const variant_object& data ) {
@@ -1127,6 +1212,18 @@ protected:
    abi_serializer token_abi_ser;
    abi_serializer opreg_abi_ser;
    abi_serializer epoch_abi_ser;
+};
+
+/// sysio.system deployed onto a chain where its `global` row has never been written.
+///
+/// The full fixture cannot reach this state: it produces blocks after the deploy, and the first
+/// onblock to run against sysio.system code stamps last_pervote_bucket_fill on a fresh chain, so
+/// the row is always present by the time a test body runs. Once the row exists, seeding it and
+/// merely reading it are indistinguishable -- which is why the absent-row path needs its own
+/// fixture. Inherits every helper from the full fixture; only the constructor differs.
+class sysio_fresh_deploy_tester : public sysio_emissions_tester {
+public:
+   sysio_fresh_deploy_tester() : sysio_emissions_tester( deploy_only_t{} ) {}
 };
 
 BOOST_AUTO_TEST_SUITE(sysio_emissions_tests)
@@ -2117,6 +2214,71 @@ BOOST_FIXTURE_TEST_CASE( viewnodedist_readonly_reports_its_own_error, sysio_emis
       sysio_assert_message_exception,
       sysio_assert_message_is( "account is not a node owner" )
    );
+} FC_LOG_AND_RETHROW()
+
+/// The missing-row half of the same regression: the global must not reach storage until an action
+/// genuinely mutates it.
+///
+/// view_actions_execute_in_readonly_transaction cannot reach this state. Its fixture has produced
+/// post-deploy blocks, so onblock has already persisted `global`, and once the row exists every
+/// way of materializing defaults looks alike. The behaviour only has teeth while the row is absent.
+///
+/// What this pins, and what it does not. The write-suppression SEMANTICS -- that materializing a
+/// default leaves the handle clean, so a pure read owes no kv_set -- belong to kv::cached_value and
+/// are covered by its own unit tests, which fail when that property is broken. What is asserted
+/// here is the integrated behaviour this contract depends on: a chain where nobody has written the
+/// global still serves reads, a query does not bring the row into existence, the values served are
+/// the declared defaults rather than a zero-initialized struct, and the first real mutation stores
+/// defaults plus that change.
+///
+/// Order is load-bearing. Each action constructs its own system_contract and flushes on return, so
+/// an action that persisted the row early would mask everything after it. setemitcfg is the probe
+/// because it succeeds without touching the global at all -- the only mutators are onblock, setram,
+/// setparams, the ranking updates and payepoch -- so the row must still be absent afterwards.
+BOOST_FIXTURE_TEST_CASE( seeded_global_defaults_owe_no_write, sysio_fresh_deploy_tester ) try {
+   // sysio_global_state::max_ram_size's in-contract default. Mirrored rather than included because
+   // the tests link against the chain, not the contract.
+   constexpr uint64_t DEFAULT_MAX_RAM_SIZE = 64ll*1024*1024*1024;
+
+   // Every push below goes through push_system_action_no_block: crossing a block boundary would
+   // run onblock, which writes the global itself and would mask what is being measured.
+
+   // Nothing has written the singleton on this chain.
+   BOOST_REQUIRE( !global_row_exists() );
+
+   // An action that succeeds without mutating the global must not bring the row into existence.
+   BOOST_REQUIRE_EQUAL( success(),
+                        push_system_action_no_block( config::system_account_name, "setemitcfg"_n,
+                                                     mvo()("cfg", default_emit_cfg(1)) ) );
+   BOOST_REQUIRE( !global_row_exists() );
+
+   // The read-only query runs with the row still missing -- the case that used to fail outright --
+   // and must not create it either.
+   auto trace = push_system_action_readonly( "viewemitcfg"_n, mvo() );
+   BOOST_REQUIRE( trace );
+   if ( trace->except ) BOOST_FAIL( trace->except->to_detail_string() );
+   BOOST_REQUIRE( !trace->action_traces.empty() );
+   BOOST_REQUIRE( !trace->action_traces[0].return_value.empty() );
+   BOOST_REQUIRE( !global_row_exists() );
+
+   // Seeded means the defaults are what the contract reads, not a zero-initialized struct: 64GiB
+   // is already the max, so a decrease is rejected. Against a zeroed cache this would succeed.
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg("ram may only be increased"),
+                        push_system_action_no_block( config::system_account_name, "setram"_n,
+                                                     mvo()("max_ram_size", DEFAULT_MAX_RAM_SIZE - 1) ) );
+   BOOST_REQUIRE( !global_row_exists() );
+
+   // The first genuine mutation is what persists the row.
+   BOOST_REQUIRE_EQUAL( success(),
+                        push_system_action_no_block( config::system_account_name, "setram"_n,
+                                                     mvo()("max_ram_size", DEFAULT_MAX_RAM_SIZE + 1024) ) );
+   BOOST_REQUIRE( global_row_exists() );
+
+   // And what landed carries the mutation on top of the seeded defaults -- a value above the
+   // default but below what was just stored has to be rejected on the stored value.
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg("ram may only be increased"),
+                        push_system_action_no_block( config::system_account_name, "setram"_n,
+                                                     mvo()("max_ram_size", DEFAULT_MAX_RAM_SIZE + 512) ) );
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( viewemitcfg_reflects_update, sysio_emissions_tester ) try {
