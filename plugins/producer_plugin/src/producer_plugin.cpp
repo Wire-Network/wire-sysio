@@ -21,6 +21,7 @@
 #include <fc/time.hpp>
 
 #include <boost/asio.hpp>
+#include <boost/asio/system_timer.hpp>
 #include <boost/signals2/connection.hpp>
 
 #include <cstdint>
@@ -931,9 +932,7 @@ public:
                                                                    // use atomic for simplicity and performance
    fc::time_point                 _ro_read_window_start_time;
    fc::time_point                 _ro_window_deadline;    // only modified on app thread, read-window deadline or write-window deadline
-   // Follows the mock clock under test for the same reason _timer does: the read window is bounded
-   // by wall clock, so its cycling is only testable deterministically if a test owns the clock.
-   fc::system_timer               _ro_timer{_timer_thread.get_executor()}; // only accessible from the main thread
+   boost::asio::system_timer      _ro_timer{_timer_thread.get_executor()}; // only accessible from the main thread
    std::atomic<uint32_t>          _ro_timer_corelation_id{0};              // written on main thread, read on read-only threads
    fc::microseconds               _ro_max_trx_time_us{0}; // calculated during option initialization
    ro_trx_queue_t                 _ro_exhausted_trx_queue;
