@@ -17,16 +17,9 @@ namespace sysiosystem {
     _last_prop_finalizers(get_self()),
     _fin_key_id_generator(get_self()),
     _global(get_self())
-   {
-      // Materialize defaults into the cache only, on a chain where the row was never written.
-      // seed_if_absent rather than set: set() would owe a write, and that write is flushed from
-      // every action including the read-only view actions, which the chain refuses. Seeding leaves
-      // the handle clean, so a query issues no kv_set and the defaults reach storage the first time
-      // an action actually mutates the global.
-      _global.seed_if_absent( get_default_parameters() );
-   }
+   {}
 
-   sysio_global_state system_contract::get_default_parameters() {
+   sysio_global_state default_global_state() {
       sysio_global_state dp;
       get_blockchain_parameters(dp);
       return dp;
