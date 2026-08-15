@@ -154,11 +154,10 @@ public:
          chain::controller& chain = _chain_plug->chain();
          _accepted_block          = chain.accepted_block().connect([this](const chain::block_signal_params& params) {
             const auto& [block, id] = params;
-            record_head(block->block_num(), block->producer, block->timestamp);
-            ++_blocks_produced;
+            record_head(block->block_num(), block->producer, block->timestamp, true);
          });
          const auto head = chain.head();
-         record_head(head.block_num(), head.producer(), chain::block_timestamp_type(head.block_time()));
+         record_head(head.block_num(), head.producer(), chain::block_timestamp_type(head.block_time()), false);
          observing->set_value();
       });
       BOOST_REQUIRE_MESSAGE(observing_fut.wait_for(reaction_timeout) == std::future_status::ready,
@@ -188,7 +187,7 @@ public:
    running_node(const running_node&)            = delete;
    running_node& operator=(const running_node&) = delete;
 
-   uint32_t         blocks_produced() const { return _blocks_produced.load(); }
+   uint32_t         blocks_produced() const { return head().blocks_accepted; }
    bool             app_threw() const { return _app_threw.load(); }
    producer_plugin* producer() { return _prod_plug; }
 
@@ -326,16 +325,26 @@ public:
 private:
    /// What the app thread last accepted. Kept here rather than read from the controller on demand so
    /// that no test thread ever touches chain state.
+   ///
+   /// The accepted count lives in this snapshot rather than beside it. Held separately it was
+   /// published after the head, so a test that waited on the head could sample the count before the
+   /// block that moved it was counted -- reading eleven increments after observing twelve head
+   /// moves. Every check pairing the two is written assuming they agree, so they are updated under
+   /// one lock and read as one value.
    struct head_state {
       uint32_t                    block_num = 0;
       chain::account_name         producer;
       chain::block_timestamp_type timestamp;
+      uint32_t                    blocks_accepted = 0;
    };
 
    /// Called on the app thread only, from the accepted_block slot and from the seeding post.
-   void record_head(uint32_t block_num, chain::account_name producer, chain::block_timestamp_type timestamp) {
+   ///
+   /// \p accepted separates the two: both publish a head, but only a block the node accepted counts.
+   void record_head(uint32_t block_num, chain::account_name producer, chain::block_timestamp_type timestamp,
+                    bool accepted) {
       std::lock_guard g(_head_mtx);
-      _head = head_state{block_num, producer, timestamp};
+      _head = head_state{block_num, producer, timestamp, _head.blocks_accepted + (accepted ? 1u : 0u)};
    }
 
    head_state head() const {
@@ -351,7 +360,6 @@ private:
    std::thread                        _app_thread;
    producer_plugin*                   _prod_plug  = nullptr;
    chain_plugin*                      _chain_plug = nullptr;
-   std::atomic<uint32_t>              _blocks_produced{0};
    std::atomic<bool>                  _app_threw{false};
    fc::time_point                     _now;
    mutable std::mutex                 _head_mtx;
