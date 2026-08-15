@@ -185,6 +185,27 @@ std::vector<char> decode_latest_envelope_account(opp_solana_outpost_client&  pro
 ///         is absent or disagrees with what the cursor read decodes.
 void assert_epoch_deliveries_shape(const fc::network::solana::idl::program& program);
 
+/// Assert that the loaded IDL's `CollateralPosition` declaration carries the
+/// four fields the on-chain settlement path binds together: `operator` and
+/// `custody_mint` (pubkeys), plus `token_code` and `amount` (u64), in either
+/// IDL field home.
+///
+/// The relay itself decodes only `custody_mint`; the other three are a
+/// DELIBERATE drift canary — a program-side rename of any of the four fails
+/// loudly at boot rather than surfacing later as a live position this relay
+/// silently half-understands.
+///
+/// Called at construction for the batch-operator role. IDL drift is the
+/// realistic reason a live, program-readable position becomes unreadable to
+/// THIS relay; without its pinned custody mint the manifest cannot include the
+/// effect accounts the program's real branch requires, so the dispatch window
+/// would abort and every retry would wedge on the same cursor position.
+///
+/// @param program  the program's loaded Anchor IDL.
+/// @throws fc::exception if the account or any of the four fields is absent,
+///         or a field has a type the manifest builder cannot interpret.
+void assert_collateral_position_shape(const fc::network::solana::idl::program& program);
+
 /// Assert that the loaded IDL's `Reserve` declaration carries the three fields
 /// the terminal manifest resolves from it: `creator` and `custody_mint`
 /// (pubkeys) and `custody_decimals` (u8), in either IDL field home.
@@ -323,6 +344,26 @@ std::string drive_dispatch_rounds(
                                                                       send_dispatch,
    const std::string&                                                 log_label);
 
+/// Custody binding read from the account the on-chain settlement handler
+/// branches on. Deliberately mint-only: `CollateralPosition` carries no
+/// decimals, and the manifest path branches on the mint alone — a decimals
+/// field here could only ever hold a made-up value (contrast
+/// `reserve_terminal_info`, whose `custody_decimals` is a real pinned fact).
+struct token_custody_info {
+   /// SPL mint for the token, or the all-zero system-program key when the
+   /// token is native lamports (the on-chain zero-marker convention).
+   fc::network::solana::solana_public_key mint;
+};
+
+/// Reads ONE `(operator, token_code)` position's custody binding from its
+/// `CollateralPosition` PDA, exactly where the on-chain handler resolves it.
+/// Absent positions degrade because the program log-and-skips them; a present
+/// but unreadable position throws so the relay never submits a manifest that
+/// is guaranteed to abort.
+using collateral_custody_reader =
+   std::function<std::optional<token_custody_info>(
+      const fc::network::solana::solana_public_key& operator_key, uint64_t token_code)>;
+
 } // namespace outpost_solana_client_detail
 
 /**
@@ -434,6 +475,19 @@ private:
       uint32_t                                       dispatch_limit,
       std::vector<fc::network::solana::account_meta> extra_remaining_accounts);
 
+   /// Resolve one per-`(operator, token_code)` collateral position's pinned
+   /// custody mint from the `CollateralPosition` PDA the on-chain handlers
+   /// themselves branch on.
+   ///
+   /// An ABSENT or EMPTY position returns empty because the program
+   /// log-and-skips an uninitialized account. A position that EXISTS but this
+   /// relay cannot decode THROWS after logging: the program takes its real
+   /// custody branch, so degrading would omit required effect accounts and
+   /// permanently wedge the unadvanced dispatch cursor.
+   std::optional<outpost_solana_client_detail::token_custody_info>
+   collateral_position_custody(
+      const fc::network::solana::solana_public_key& operator_key, uint64_t token_code);
+
    solana_client_entry_ptr                       _entry;
    fc::network::solana::solana_public_key        _program_id;
    std::shared_ptr<opp_solana_outpost_client>    _program_client;
@@ -491,12 +545,52 @@ derive_reserve_vault_pda(const fc::network::solana::solana_public_key& program_i
                          uint64_t token_code,
                          uint64_t reserve_code);
 
+/// Derive the per-`(operator, token_code)` `CollateralPosition` PDA (SOL-379):
+/// seeds `["collateral_position", operator.as_ref(), token_code.to_le_bytes()]`.
+/// Byte-exact mirror of the program's `#[account(seeds = ...)]` declaration.
+///
+/// Exported so the manifest builder and its tests derive through ONE
+/// implementation rather than re-spelling the seed list.
+fc::network::solana::solana_public_key
+derive_collateral_position_pda(const fc::network::solana::solana_public_key& program_id,
+                               const fc::network::solana::solana_public_key& operator_key,
+                               uint64_t token_code);
+
+/// Derive the per-`token_code` `collateral_vault` PDA: seeds
+/// `["collateral_vault", token_code.to_le_bytes()]`. The vault holds the
+/// token's SPL collateral custody; native collateral settles straight out of
+/// the named `vault`, so this account only rides an SPL manifest.
+fc::network::solana::solana_public_key
+derive_collateral_vault_pda(const fc::network::solana::solana_public_key& program_id,
+                            uint64_t token_code);
+
 /// Which family of effect accounts one inbound attestation needs. The relay
 /// derives the concrete metas per shape; the on-chain handler resolves them
 /// out of `remaining_accounts` by pubkey.
+///
+/// The collateral-settling shapes (`withdraw_remit`, `slash`,
+/// `deposit_revert`) exist because SOL-379 replaced the bounded collateral
+/// `Vec` on `OperatorRegistry` with a per-`(operator, token_code)`
+/// `CollateralPosition` PDA, and SOL-380 made the handlers settle in the
+/// asset the position actually escrows — so their manifests must declare the
+/// position PDA (seeds `[COLLATERAL_POSITION_SEED, operator.as_ref(),
+/// &token_code.to_le_bytes()]`) and, for SPL custody, the
+/// `[COLLATERAL_VAULT_SEED, &token_code.to_le_bytes()]` vault PDA, the
+/// destination ATA and the SPL token program.
 enum class effect_shape {
-   /// Pays a native-SOL recipient directly (WITHDRAW_REMIT, DEPOSIT_REVERT).
-   native_payee,
+   /// OPERATOR_ACTION(WITHDRAW_REMIT): pays the operator (natively out of the
+   /// named `vault`, or into their canonical ATA under SPL custody) and
+   /// debits their `CollateralPosition` PDA.
+   withdraw_remit,
+   /// OPERATOR_ACTION(SLASH): debits the operator's `CollateralPosition` PDA
+   /// and routes the seizure into the named `reserve_aggregate` (native) or
+   /// its canonical ATA via the collateral vault + token program (SPL).
+   slash,
+   /// DEPOSIT_REVERT: refunds the depositor natively and debits their
+   /// `CollateralPosition` PDA. The SPL branch is REFUSED on-chain by design
+   /// (the gas×multiplier penalty stub is lamport-denominated and meaningless
+   /// in token units), so this shape never carries SPL extras.
+   deposit_revert,
    /// SWAP_REMIT: Reserve PDA, plus vault + recipient ATA + token program
    /// when the reserve's custody mint is SPL rather than native.
    swap_remit,
@@ -521,10 +615,17 @@ enum class effect_shape {
 struct inbound_effect {
    size_t                                                attestation_index;
    effect_shape                                          shape;
-   /// Native payee / SWAP_REMIT recipient / SWAP_REVERT depositor.
+   /// WITHDRAW_REMIT operator / DEPOSIT_REVERT depositor / SWAP_REMIT
+   /// recipient / SWAP_REVERT depositor. For `slash` it is the SLASHED
+   /// operator — it keys the `CollateralPosition` PDA and the destination
+   /// ATA owner lookup but is never itself paid.
    std::optional<fc::network::solana::solana_public_key> recipient;
    /// Set for every reserve-backed shape.
    std::optional<reserve_pda_seeds>                      reserve;
+   /// Set for every collateral-settling shape (`withdraw_remit`, `slash`,
+   /// `deposit_revert`): the `token_code` keying the `CollateralPosition`
+   /// PDA and its pinned custody lookup.
+   std::optional<uint64_t>                               collateral_token_code;
 };
 
 /// Walk `envelope_bytes` ONCE and return every attestation that needs effect
@@ -578,12 +679,26 @@ uint32_t count_inbound_attestations(const std::vector<char>& envelope_bytes);
 ///     read propagates untouched — it means a manifest the program would abort
 ///     on, and shipping one would wedge the epoch rather than delay it.
 ///
+///   * Collateral-settling shapes (`withdraw_remit`, `slash`, `deposit_revert`)
+///     resolve custody through `read_collateral_custody` — called at most ONCE
+///     per distinct `(operator, token_code)` position, memoised like the
+///     reserve reads. A degraded (empty) custody read costs that attestation
+///     only its SPL extras; the `CollateralPosition` PDA and (where owed) the
+///     recipient are still declared, matching the program's log-and-skip /
+///     abort-and-retry gates.
+///
 /// @param program_id            outpost program id, for PDA derivation.
 /// @param effects               account-needing attestations, in dispatch order.
 /// @param total_attestations    the envelope's attestation total (the cursor's
 ///                              denominator) -- the size of the result.
 /// @param throw_if_past_deadline  throws once the caller's deadline passes.
 /// @param read_reserve_info     reads one `Reserve` record (may degrade).
+/// @param read_collateral_custody  reads one `(operator, token_code)`
+///                              position's pinned custody (may degrade only
+///                              when the position is absent or empty).
+/// @param reserve_aggregate     the named `reserve_aggregate` account — the
+///                              destination whose ATA receives an SPL slash
+///                              seizure.
 /// @param log_label             client identity for log lines.
 /// @return one manifest per attestation, in dispatch order.
 std::vector<std::vector<fc::network::solana::account_meta>> build_dispatch_manifests(
@@ -592,6 +707,8 @@ std::vector<std::vector<fc::network::solana::account_meta>> build_dispatch_manif
    uint32_t                                      total_attestations,
    const std::function<void()>&                  throw_if_past_deadline,
    const reserve_info_reader&                    read_reserve_info,
+   const collateral_custody_reader&              read_collateral_custody,
+   const fc::network::solana::solana_public_key& reserve_aggregate,
    const std::string&                            log_label);
 
 } // namespace outpost_solana_client_detail
