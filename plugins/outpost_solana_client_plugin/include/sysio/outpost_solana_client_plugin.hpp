@@ -115,8 +115,11 @@ struct opp_solana_outpost_client : fc::network::solana::solana_program_client {
    /// DEPOSIT_REVERT by the program's signed system_program::transfer
    /// CPI. Pre-derived from seed `outpost_vault`.
    fc::network::solana::solana_public_key vault_pda;
-   /// Outpost Reserve PDA — receives slashed-collateral routing and
-   /// DEPOSIT_REVERT penalties. Pre-derived from seed `outpost_reserve`.
+   /// Outpost `reserve_aggregate` PDA — receives slashed-collateral routing
+   /// and DEPOSIT_REVERT penalties, and owns the destination ATA of an SPL
+   /// SLASH seizure. Pre-derived from seed `reserve_aggregate` (see the
+   /// derivation below for the `outpost_reserve` mis-seed incident this
+   /// spelling replaced).
    fc::network::solana::solana_public_key reserve_pda;
 
    /// `initialize(consensus_threshold: u32) -> signature`.
