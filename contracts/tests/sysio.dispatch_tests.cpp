@@ -471,13 +471,17 @@ public:
    /// `prune_delay_ms` defaults to 10 minutes — far beyond any test's wall
    /// clock, so `prune` cases that want to exercise a gate OTHER than the delay
    /// lower it explicitly.
+   /// `max_available_underwriters` is a parameter because the registration ceiling is now
+   /// ENFORCED in `regoperator` (WIRE-342): a scenario that provisions more underwriters
+   /// than the ceiling must raise it explicitly rather than silently exceeding it.
    action_result opreg_setconfig_collat(const fc::variants& req_uw_collat,
                                         const fc::variants& req_prod_collat = fc::variants{},
-                                        uint64_t prune_delay_ms = 600000) {
+                                        uint64_t prune_delay_ms = 600000,
+                                        uint32_t max_available_underwriters = 21) {
       return push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "setconfig"_n, mvo()
          ("max_available_producers",          21)
          ("max_available_batch_ops",          63)
-         ("max_available_underwriters",       21)
+         ("max_available_underwriters",       max_available_underwriters)
          ("terminate_prune_delay_ms",         prune_delay_ms)
          ("terminate_max_consecutive_misses", 5)
          ("terminate_max_pct_misses_24h",     5)
@@ -5125,6 +5129,15 @@ BOOST_FIXTURE_TEST_CASE(rcrdcommit_candidate_cap_bounds_row,
    // Provision 33 ACTIVE underwriters (register + meet the 1-unit ETH/ETH
    // minimum from bootstrap_for_dispatch's opreg config). UWRIT_OP stays out
    // of this roster.
+   //
+   // The registration ceiling is enforced as of WIRE-342, and the fixture's default
+   // `max_available_underwriters` is 21 — below the 32-candidate cap this test exercises.
+   // Raise it so the scenario is reachable; the ceiling itself is covered in
+   // `sysio.opreg_tests`.
+   BOOST_REQUIRE_EQUAL(success(),
+      opreg_setconfig_collat(fc::variants{chain_min_bond_mvo("ETH", "ETH", 1)},
+                             fc::variants{}, 600000, /*max_available_underwriters=*/40));
+
    std::vector<name> uws;
    for (uint32_t i = 0; i < 33; ++i) {
       std::string s = "uwcap";
@@ -5979,6 +5992,154 @@ BOOST_FIXTURE_TEST_CASE(lock_hold_actions_require_chalg_auth, sysio_uwchal_teste
    BOOST_REQUIRE(push(UWRIT_ACCOUNT, uwrit_abi, UWRIT_ACCOUNT, "sweeplocks"_n, mvo()
       ("uwreq_id", ATT_ID)("underwriter", UWRIT_OP.to_string()))
          .find("missing authority of sysio.chalg") != std::string::npos);
+} FC_LOG_AND_RETHROW() }
+
+// ---------------------------------------------------------------------------
+//  WIRE-342 — the OPERATORS roster ships only when its content changed
+// ---------------------------------------------------------------------------
+//
+// `next_att_id()` is the monotonic `attseq` counter every `queueout` mints from, so its
+// delta across one `advance` counts what that advance queued — and unlike the
+// `attestations` rows themselves it survives the inline `buildenv` drain. The assertions
+// below are RELATIVE (static-epoch delta vs roster-changing-epoch delta) so they stay
+// valid whatever else `advance` queues per epoch.
+
+/// Bring the fixture to a state where `advance` actually COMPLETES.
+///
+/// `bootstrap_for_dispatch` alone is not enough: its own advance runs while emissions are
+/// unconfigured, so `sysio.epoch::advance` gate-blocks and returns at its emissions check —
+/// long before the roster/queueout block. Every delta below would then be 0, and a test
+/// asserting "no roster was queued" would pass for entirely the wrong reason.
+#define REQUIRE_ADVANCING_FIXTURE()                                                          \
+   do {                                                                                      \
+      bootstrap_for_dispatch();                                                               \
+      setup_wire_token_and_reserves();                                                        \
+      enable_epoch_advancement();                                                             \
+      BOOST_REQUIRE_EQUAL(success(),                                                          \
+         push(MSGCH_ACCOUNT, msgch_abi, MSGCH_ACCOUNT, "bootstrap"_n, mvo()));                \
+      produce_blocks();                                                                       \
+      BOOST_REQUIRE_EQUAL(current_epoch(), 1u);                                               \
+   } while (0)
+
+BOOST_FIXTURE_TEST_CASE(advance_queues_operators_only_when_the_roster_changes,
+                        sysio_dispatch_tester) { try {
+   REQUIRE_ADVANCING_FIXTURE();
+   create_accounts({"batchop.b"_n});
+   produce_blocks();
+
+   // Establish the per-epoch baseline over an unchanged roster.
+   const uint32_t epoch_before_baseline = current_epoch();
+   age_one_epoch();
+   const uint64_t before_first = next_att_id();
+   age_one_epoch();
+   const uint64_t static_delta = next_att_id() - before_first;
+
+   // Non-vacuity guards. Without these the whole test passes when `advance` silently does
+   // nothing — which is exactly how the first version of it "passed".
+   BOOST_REQUIRE_GT(current_epoch(), epoch_before_baseline);
+   BOOST_REQUIRE_GT(static_delta, 0u);
+
+   // A second unchanged epoch must queue exactly the same set — the roster re-derives to
+   // byte-identical content, so no OPERATORS attestation is minted. Before this change the
+   // full roster was re-encoded and fanned to every outpost on EVERY advance regardless.
+   const uint64_t before_second = next_att_id();
+   age_one_epoch();
+   BOOST_REQUIRE_EQUAL(static_delta, next_att_id() - before_second);
+
+   // A bootstrapped registration lands ACTIVE immediately, so the roster's content changes
+   // and the next advance queues exactly one MORE attestation: the roster itself.
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT,
+      "regoperator"_n, mvo()
+         ("account",         std::string("batchop.b"))
+         ("type",            OperatorType::OPERATOR_TYPE_BATCH)
+         ("is_bootstrapped", true)));
+
+   const uint64_t before_change = next_att_id();
+   age_one_epoch();
+   BOOST_REQUIRE_EQUAL(static_delta + 1, next_att_id() - before_change);
+
+   // And the epoch after the change is static again — one send per change, not a latch.
+   const uint64_t before_after = next_att_id();
+   age_one_epoch();
+   BOOST_REQUIRE_EQUAL(static_delta, next_att_id() - before_after);
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(advance_ignores_never_bonded_registrations, sysio_dispatch_tester) { try {
+   REQUIRE_ADVANCING_FIXTURE();
+   create_accounts({"batchop.b"_n});
+   produce_blocks();
+
+   age_one_epoch();
+   const uint64_t before_first = next_att_id();
+   age_one_epoch();
+   const uint64_t static_delta = next_att_id() - before_first;
+
+   // This assertion is what makes the test meaningful: it proves advance is really queueing
+   // per epoch, so the "no extra attestation" check below is a genuine observation rather
+   // than a comparison of two zeroes.
+   BOOST_REQUIRE_GT(static_delta, 0u);
+
+   // A NON-bootstrapped registration lands OPERATOR_STATUS_UNKNOWN — registered, never
+   // bonded. It is excluded from the roster, so it changes no content, so it produces NO
+   // envelope traffic whatsoever.
+   //
+   // This is the whole WIRE-342 attack closure: accumulating never-bonded registrations
+   // was free (self-authorizing, row billed to the sysio RAM pool) and every one of them
+   // rode every envelope to every outpost. Now it costs the registrant a transaction and
+   // the chain nothing at all.
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT,
+      "regoperator"_n, mvo()
+         ("account",         std::string("batchop.b"))
+         ("type",            OperatorType::OPERATOR_TYPE_BATCH)
+         ("is_bootstrapped", false)));
+
+   const uint64_t before_unknown = next_att_id();
+   age_one_epoch();
+   BOOST_REQUIRE_EQUAL(static_delta, next_att_id() - before_unknown);
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(advance_sends_the_roster_to_a_newly_activated_outpost_only,
+                        sysio_dispatch_tester) { try {
+   REQUIRE_ADVANCING_FIXTURE();
+
+   age_one_epoch();
+   const uint64_t before_first = next_att_id();
+   age_one_epoch();
+   const uint64_t static_delta = next_att_id() - before_first;   // one outpost
+   BOOST_REQUIRE_GT(static_delta, 0u);
+
+   // Register a SECOND outpost. The roster's content is unchanged — it lists operators,
+   // not chains — so the incumbent outpost's digest still matches and it gets nothing.
+   // The new outpost has no digest row at all, and that ABSENCE is what makes it receive
+   // the roster on its very first advance.
+   BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT,
+      "regchain"_n, mvo()
+         ("kind",              ChainKind::CHAIN_KIND_SVM)
+         ("code",              codename_mvo("SOL"))
+         ("external_chain_id", 900)
+         ("name",              std::string("outpost-two"))
+         ("description",       std::string{})));
+
+   // `regchain` outside the bootstrap window inserts the row with `active = false`, and
+   // `is_active_outpost` skips it — so no fan-out reaches it until it is activated. That
+   // gate is exactly what makes "a newly ACTIVATED outpost" the event under test here.
+   BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT,
+      "activchain"_n, mvo()("code", codename_mvo("SOL"))));
+   produce_blocks();
+
+   // +1 for the second outpost's own BATCH_OPERATOR_GROUPS (which ships every epoch to
+   // every outpost) and +1 for the roster going to the NEW outpost alone. If the digest
+   // gate were global rather than per-outpost this would be +1; if it re-sent to every
+   // outpost on any miss it would be +3.
+   const uint64_t before_new = next_att_id();
+   age_one_epoch();
+   BOOST_REQUIRE_EQUAL(static_delta + 2, next_att_id() - before_new);
+
+   // Both outposts now hold the same roster digest, so the next epoch carries only the
+   // two per-epoch group attestations.
+   const uint64_t before_settled = next_att_id();
+   age_one_epoch();
+   BOOST_REQUIRE_EQUAL(static_delta + 1, next_att_id() - before_settled);
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()

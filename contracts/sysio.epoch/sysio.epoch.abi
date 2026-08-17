@@ -127,6 +127,34 @@
             "fields": []
         },
         {
+            "name": "roster_digest_entry",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "uint64"
+                },
+                {
+                    "name": "digest",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "sent_at_epoch",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "roster_digest_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "schbatchgps",
             "base": "",
             "fields": []
@@ -214,6 +242,14 @@
             "key_names": ["name"],
             "key_types": ["name"],
             "table_id": 59387
+        },
+        {
+            "name": "rosterdig",
+            "type": "roster_digest_entry",
+            "index_type": "i64",
+            "key_names": ["chain_code"],
+            "key_types": ["uint64"],
+            "table_id": 29555
         }
     ],
     "ricardian_clauses": [],

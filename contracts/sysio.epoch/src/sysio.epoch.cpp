@@ -17,6 +17,7 @@
 #include <sysio.system/emissions.hpp>
 #include <sysio.chains/sysio.chains.hpp>
 #include <sysio/opp/attestations/attestations.pb.hpp>
+#include <magic_enum/magic_enum.hpp>
 
 namespace sysio {
 
@@ -55,6 +56,53 @@ constexpr symbol WIRE_SYMBOL{"WIRE", 9};
 /// uses the identical predicate.
 inline bool is_active_outpost(const sysio::chains::chain_row& row) {
    return row.active && !row.is_depot;
+}
+
+/// Build one OPERATORS-roster entry for `op`, collecting its authex-linked chain
+/// addresses from the `byname` index.
+///
+/// The address walk is bounded at `epoch::MAX_OPERATOR_CHAIN_ADDRESSES`: `authex::links`
+/// places no cap on how many keys one account may link, so an unbounded walk lets a
+/// single account inflate one roster entry without limit — and the roster is the one
+/// attestation that grows with adoption, so an oversized entry can push it past the
+/// outbound envelope on its own.
+template <typename LinksByNameIndex>
+opp::attestations::OperatorEntry build_operator_entry(const opreg::operator_entry& op,
+                                                      LinksByNameIndex&            links_by_name) {
+   opp::attestations::OperatorEntry entry;
+   entry.account.name = op.account.to_string();
+   entry.type         = op.type;
+   entry.status       = op.status;
+
+   // Store raw public key bytes from the variant (33 bytes for EM/secp256k1,
+   // 32 bytes for ED/Ed25519).
+   auto link_it = links_by_name.lower_bound(op.account.value);
+   while (link_it != links_by_name.end() && link_it->username == op.account &&
+          entry.addresses.size() < epoch::MAX_OPERATOR_CHAIN_ADDRESSES) {
+      opp::types::ChainAddress chain_addr;
+      chain_addr.kind = static_cast<opp::types::ChainKind>(link_it->chain_kind);
+
+      std::visit([&](const auto& key_data) {
+         using T = std::decay_t<decltype(key_data)>;
+         if constexpr (std::is_same_v<T, webauthn_public_key>) {
+            // EM (secp256k1 compressed) — 33 bytes in key.key
+            chain_addr.address.assign(key_data.key.begin(), key_data.key.end());
+         } else if constexpr (std::is_same_v<T, ed_public_key>) {
+            // ED (Ed25519) — 32 bytes
+            chain_addr.address.assign(
+               reinterpret_cast<const char*>(key_data.data()),
+               reinterpret_cast<const char*>(key_data.data() + key_data.size()));
+         } else if constexpr (std::is_same_v<T, ecc_public_key>) {
+            // K1/R1 (secp256k1/P-256 compressed) — 33 bytes
+            chain_addr.address.assign(key_data.begin(), key_data.end());
+         }
+         // Skip BLS keys — not used for chain address linking
+      }, link_it->pub_key);
+
+      entry.addresses.push_back(std::move(chain_addr));
+      ++link_it;
+   }
+   return entry;
 }
 
 struct emissions_gate_result {
@@ -682,61 +730,62 @@ void epoch::advance() {
       std::make_tuple(state.current_epoch_index)
    ).send();
 
-   // Queue OPERATORS attestation (full roster with authex chain addresses) for each outpost.
+   // Queue the OPERATORS attestation for each outpost — but ONLY when the roster's
+   // content changed since that outpost's last send (see `epoch::roster_digest_entry`).
+   //
    // IMPORTANT: Must come before BATCH_OPERATOR_GROUPS so that the ETH outpost's
    // _handleOperators populates operatorEthAddress before _handleBatchOperatorGroups
-   // looks up those addresses.
+   // looks up those addresses. Skipping an UNCHANGED roster cannot break that ordering:
+   // both outposts retain the roster they already hold (ETH never prunes its address
+   // map; SOL only ever replaces it wholesale), and any newly-scheduled operator is by
+   // definition an ACTIVE batch operator, so its arrival IS a roster change and sends in
+   // the very epoch it is first scheduled.
    {
       opp::attestations::Operators ops_attest;
       opreg::operators_t opreg_ops(OPREG_ACCOUNT);
       authex::links_t authex_links(AUTHEX_ACCOUNT);
       auto links_by_name = authex_links.get_index<"byname"_n>();
+      auto status_idx    = opreg_ops.get_index<"bystatus"_n>();
 
-      for (auto it = opreg_ops.begin(); it != opreg_ops.end(); ++it) {
-         opp::attestations::OperatorEntry entry;
-         entry.account.name = it->account.to_string();
-         entry.type = it->type;
-         entry.status = it->status;
-
-         // Collect all authex-linked chain addresses for this operator.
-         // Store raw public key bytes from the variant (33 bytes for EM/secp256k1,
-         // 32 bytes for ED/Ed25519).
-         auto link_it = links_by_name.lower_bound(it->account.value);
-         while (link_it != links_by_name.end() && link_it->username == it->account) {
-            opp::types::ChainAddress chain_addr;
-            chain_addr.kind = static_cast<opp::types::ChainKind>(link_it->chain_kind);
-
-            std::visit([&](const auto& key_data) {
-               using T = std::decay_t<decltype(key_data)>;
-               if constexpr (std::is_same_v<T, webauthn_public_key>) {
-                  // EM (secp256k1 compressed) — 33 bytes in key.key
-                  chain_addr.address.assign(key_data.key.begin(), key_data.key.end());
-               } else if constexpr (std::is_same_v<T, ed_public_key>) {
-                  // ED (Ed25519) — 32 bytes
-                  chain_addr.address.assign(
-                     reinterpret_cast<const char*>(key_data.data()),
-                     reinterpret_cast<const char*>(key_data.data() + key_data.size()));
-               } else if constexpr (std::is_same_v<T, ecc_public_key>) {
-                  // K1/R1 (secp256k1/P-256 compressed) — 33 bytes
-                  chain_addr.address.assign(key_data.begin(), key_data.end());
-               }
-               // Skip BLS keys — not used for chain address linking
-            }, link_it->pub_key);
-
-            entry.addresses.push_back(std::move(chain_addr));
-            ++link_it;
+      // ACTIVE and SLASHED only — never the full table.
+      //
+      // UNKNOWN (registered but never bonded) has no consumer on either outpost: it
+      // cannot be scheduled and cannot commit. Excluding it is what makes a never-bonded
+      // registration cost zero envelope bytes, so growing the broadcast requires bonding
+      // collateral per operator rather than being free. TERMINATED rows are settled
+      // history and are never erased, so including them would make the roster grow
+      // monotonically over the network's lifetime even under perfect operator churn.
+      //
+      // SLASHED MUST stay in: `opreg::slash` flips the row to SLASHED *before* it emits
+      // OPERATOR_ACTION(SLASH), and the Solana outpost resolves a slash's target through
+      // this roster — so an ACTIVE-only roster would silently no-op every slash.
+      for (const auto status : { OperatorStatus::OPERATOR_STATUS_ACTIVE,
+                                 OperatorStatus::OPERATOR_STATUS_SLASHED }) {
+         for (auto it = status_idx.lower_bound(magic_enum::enum_integer(status));
+              it != status_idx.end() && it->status == status; ++it) {
+            ops_attest.operators.push_back(build_operator_entry(*it, links_by_name));
          }
-
-         ops_attest.operators.push_back(std::move(entry));
       }
 
       std::vector<char> encoded;
       auto out = zpp::bits::out{encoded, zpp::bits::no_size{}};
       (void)out(ops_attest);
 
+      // Content digest over the exact bytes each outpost would receive. Every outpost is
+      // sent the identical payload, so one digest compares against every per-outpost row.
+      const checksum256 roster_digest = sysio::keccak(encoded.data(), encoded.size());
+
+      epoch::rosterdig_t rosterdigs(get_self());
       sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
       for (auto it = chains_tbl.begin(); it != chains_tbl.end(); ++it) {
          if (!is_active_outpost(*it)) continue;
+
+         const auto digest_pk = epoch::roster_digest_key{it->code.value};
+         const bool seen      = rosterdigs.contains(digest_pk);
+         if (seen && rosterdigs.get(digest_pk).digest == roster_digest) {
+            continue; // unchanged since this outpost's last send — nothing to say
+         }
+
          action(
             permission_level{get_self(), "owner"_n},
             MSGCH_ACCOUNT,
@@ -747,6 +796,19 @@ void epoch::advance() {
                encoded
             )
          ).send();
+
+         if (seen) {
+            rosterdigs.modify(ram_payer, digest_pk, [&](auto& row) {
+               row.digest        = roster_digest;
+               row.sent_at_epoch = state.current_epoch_index;
+            });
+         } else {
+            rosterdigs.emplace(ram_payer, digest_pk, epoch::roster_digest_entry{
+               .chain_code    = it->code.value,
+               .digest        = roster_digest,
+               .sent_at_epoch = state.current_epoch_index,
+            });
+         }
       }
    }
 
