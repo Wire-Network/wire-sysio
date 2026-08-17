@@ -191,10 +191,15 @@ namespace sysio {
       // caused by system state changes after enqueue (reserve deactivated,
       // flipped private, chain deregistered) refund in full — the caller did
       // nothing wrong. Successful swaps are unaffected; they already pay
-      // `fee_bps` at settlement. The default mirrors `fee_bps` as a
-      // placeholder pending final fee calibration.
+      // `fee_bps` at settlement.
+      //
+      // 500 bps (5%) is the launch default (Jonathan, 2026-08-04), replacing the
+      // 0.1% placeholder that merely mirrored `fee_bps`. It has to be large
+      // enough that cycling escrows through the queue is not free. It stays
+      // governance-tunable via `setconfig` (capped at MAX_FEE_BPS), so this is a
+      // starting point, not a commitment.
       static constexpr uint64_t DEFAULT_MIN_FROMWIRE_AMOUNT     = 5'000'000'000; // 5 WIRE @ 9 decimals
-      static constexpr uint32_t DEFAULT_FROMWIRE_REVERT_FEE_BPS = 10;            // 0.1%
+      static constexpr uint32_t DEFAULT_FROMWIRE_REVERT_FEE_BPS = 500;           // 5%
 
       // Maximum accepted swap fee, in basis points. A 100% fee (10000 bps)
       // would zero the post-fee WIRE leg of every swap (`net == 0` in
@@ -203,6 +208,13 @@ namespace sysio {
       // draining the reserve at an arbitrary price (SEC-26 / WSA-042). Any fee
       // below 100% leaves a positive remainder for every positive input, so the
       // cap is 9999 (mirrors `sysio.reserv::MAX_CONNECTOR_WEIGHT_BPS`).
+      //
+      // This bounds THIS rate only. Reserve owner fees are charged off the same
+      // WIRE leg and capped independently, so the TOTAL can still reach 100% —
+      // 9999 here plus one owner fee at `sysio.reserv::MIN_OWNER_FEE_BPS` (1)
+      // does exactly that. The settlement paths' `net > 0` checks are therefore
+      // live rejections of a configured combination, not dead defense-in-depth;
+      // see `opp::amm::split_wire_fee`.
       static constexpr uint32_t MAX_FEE_BPS = 9999;
 
       // Upper bound on the collateral lock duration. try_select_winner locks a
@@ -218,11 +230,22 @@ namespace sysio {
       // -----------------------------------------------------------------------
 
       /// Set underwriting fee + lock config. Fields:
-      ///   * `fee_bps` — per-spoke swap fee charged by the depot, taken out of
-      ///     the WIRE leg of every swap (so the ETH/SOL the recipient can
-      ///     receive is reduced). `sysio.reserv` routes the collected fee 50/50
-      ///     to its on-chain rewards bucket and the `sysio` emissions treasury
-      ///     (see `sysio.reserv::FEE_REWARD_SHARE_BPS`).
+      ///   * `fee_bps` — the NETWORK swap fee charged by the depot per spoke,
+      ///     taken out of the WIRE leg of every swap (so the ETH/SOL the
+      ///     recipient can receive is reduced). It is NOT the whole effective
+      ///     fee: each participating non-WIRE leg's reserve independently charges
+      ///     its own `owner_fee_bps` off the same leg (`sysio.reserv::setrsvfee`).
+      ///     `sysio.reserv` splits the NETWORK component 50/50 between the swap's
+      ///     winning underwriter (claimable via `sysio.reserv::claimuwfee`) and a
+      ///     rewards pool (see `sysio.reserv::FEE_UNDERWRITER_SHARE_BPS`). That
+      ///     pool then splits again by `reserve_config.fee_emissions_share_bps`:
+      ///     that share is transferred to the `sysio` emissions treasury and the
+      ///     remainder accrues to the rewards bucket, which
+      ///     `sysio.system::payepoch` allocates to the batch-operator
+      ///     distribution (paying only eligible shares; the rest stays in the
+      ///     treasury). The dial defaults to zero, so by default the whole pool
+      ///     is allocated to batch operators and no part of a fee leaves
+      ///     `sysio.reserv`'s custody at settlement.
       ///   * `collateral_lock_duration_ms` — wall-clock milliseconds after
       ///     `lock_entry.created_at_ms` that the lock auto-expires (swept by
       ///     `sysio.epoch::advance -> chklocks`). This is the challenge
@@ -271,11 +294,24 @@ namespace sysio {
                        std::vector<char> data);
 
       /// Called inline from `sysio.msgch::dispatch` when an
-      /// UNDERWRITE_INTENT_COMMIT attestation arrives. Records the per-leg
-      /// arrival in `uwreqs.commits_by` and stores the verbatim UIC bytes
-      /// so `try_select_winner` can reconstruct + verify the digest. When
-      /// both legs land for the same underwriter, runs `try_select_winner`
-      /// to resolve the race.
+      /// UNDERWRITE_INTENT_COMMIT attestation arrives. Pre-validates the
+      /// claimed underwriter's fixed-size recoverable signature before
+      /// changing candidate evidence. Invalid claims are logged and ignored:
+      /// they cannot replace stored bytes, change status/reason, or refresh
+      /// arrival timestamps. A valid replay of an already-recorded leg never
+      /// replaces the stored bytes: candidate legs are write-once. Once both
+      /// legs are stored, an exact replay revalidates the preserved evidence
+      /// and retries winner selection against current mutable depot state.
+      /// When both legs
+      /// land for the same underwriter, runs `try_select_winner` to resolve the
+      /// race. For a dual-outpost request it revalidates only the older stored
+      /// leg so a WIRE permission-key change between arrivals cannot authorize
+      /// stale evidence; the just-verified incoming leg is not recovered twice.
+      /// A complete candidate is evaluated immediately. Recoverable conditions
+      /// (temporarily unavailable collateral, identity links, or reserves) keep
+      /// its evidence on the PENDING row until an outpost replays one of the
+      /// exact stored UICs; malformed or no-longer-authorized stored evidence is
+      /// durably disqualified. Replayed UIC bytes never replace stored legs.
       ///
       /// `(from_chain_code, from_token_code, reserve_code)` together identify
       /// which leg of the swap this UIC covers. Same-chain swaps with
@@ -310,8 +346,43 @@ namespace sysio {
       ///
       /// This sweep is the ONLY lock-release path: locks are a wall-clock
       /// challenge window (12h default) and are never released by delivery.
+      ///
+      /// EXCEPTION (WIRE-297): a lock whose `challenge_id` is non-zero — an
+      /// underwriter-fault challenge is OPEN against its commitment — is NOT
+      /// released at expiry. The sweep skips it and instead pokes
+      /// `sysio.chalg::chkuwchal`, whose resolution either sweeps the locks
+      /// with the underwriter slashed (`sweeplocks`) or clears the hold
+      /// (`freelocks`) so the NEXT sweep releases them normally. The epoch
+      /// tick is thereby the challenge system's only cadence.
       [[sysio::action]]
       void chklocks();
+
+      /// Mark the winning underwriter's locks for `uwreq_id` as held by the OPEN underwriter-
+      /// fault challenge `chal_id` (WIRE-297). Auth: `sysio.chalg`, inlined from `openuwchal`.
+      /// This is the AUTHORITATIVE liveness validation for a filing — every lock must still be
+      /// inside its window and free of any other challenge, and at least one lock must exist —
+      /// so a stale challenge aborts whole here, bond escrow included.
+      [[sysio::action]]
+      void holdlocks(uint64_t uwreq_id, name underwriter, uint64_t chal_id);
+
+      /// Clear the challenge hold on the underwriter's locks for `uwreq_id` — the challenge was
+      /// REJECTED by the council or LAPSED at the window's end. The locks then release on their
+      /// next normal `chklocks` sweep: a healthy release, no collateral moves. Auth:
+      /// `sysio.chalg`. Deliberately a silent no-op when nothing is held: it runs inline from
+      /// the epoch tick (`chklocks` -> `chkuwchal` -> here), where an abort would stall epoch
+      /// advancement chain-wide.
+      [[sysio::action]]
+      void freelocks(uint64_t uwreq_id, name underwriter);
+
+      /// Release + erase the underwriter's locks for `uwreq_id` after an UPHELD challenge. The
+      /// underwriter is already SLASHED (`chkuwchal` slashes before sweeping — inline actions
+      /// run depth-first in send order), so every inlined `opreg::releaselock` takes its
+      /// deferred-slash branch: the locked collateral is debited and the outbound SLASH
+      /// attestation queued. Ends with the same COMPLETED-flip / evidence-clear / retention
+      /// tail `chklocks` runs when a uwreq's last lock leaves. Auth: `sysio.chalg`; silent
+      /// no-op when no locks remain (same never-throw-inside-advance reasoning as `freelocks`).
+      [[sysio::action]]
+      void sweeplocks(uint64_t uwreq_id, name underwriter);
 
       /// Bounded UWREQ lifecycle sweep (SEC-129 / WSA-223). Inlined from
       /// `sysio.epoch::advance` each epoch with `MAX_UWREQ_PRUNE_PER_EPOCH`;
@@ -452,6 +523,14 @@ namespace sysio {
             std::memcpy(buf.data() + 16, &token_code.value, 8);
             return sysio::sha256(reinterpret_cast<const char*>(buf.data()), buf.size());
          }
+         /// Non-zero while an underwriter-fault challenge (the `sysio.chalg::uwchals` row id) is
+         /// OPEN against this lock's commitment (WIRE-297). A held lock is NOT released at
+         /// `expires_at_ms`: `chklocks` skips it and instead pokes the challenge's tally crank,
+         /// so the collateral stays at risk until the council resolves or the challenge lapses.
+         /// Stamped by `holdlocks`, cleared by `freelocks` (reject/lapse); an UPHELD challenge
+         /// erases the row through `sweeplocks` instead.
+         uint64_t                challenge_id     = 0;
+
          /// Split-index for cheap per-operator scans (plan §B.2). Callers
          /// pull all rows for a given underwriter and filter on
          /// chain_code / token_code / reserve_code in memory.
@@ -461,7 +540,7 @@ namespace sysio {
 
          SYSLIB_SERIALIZE(lock_entry,
             (lock_id)(uwreq_id)(underwriter)(chain_code)(token_code)(reserve_code)
-            (amount)(created_at_ms)(expires_at_ms))
+            (amount)(created_at_ms)(expires_at_ms)(challenge_id))
       };
 
       // Per plan §B.2: split-index approach — keep only uint64 secondary
@@ -485,10 +564,11 @@ namespace sysio {
       /// leg of a dual-COMMIT pair arrived so `try_select_winner` can
       /// resolve the race deterministically. Each leg's COMMIT is an
       /// independent attestation with its own chain_code + uw_ext_chain_addr
-      /// (the underwriter's chain identity on that leg's outpost) + signature
-      /// over the whole UIC. The depot stores the full UIC bytes per leg so
+      /// (signed external-chain signer metadata for that leg) + signature over
+      /// the whole UIC. The depot stores the full UIC bytes per leg so
       /// `try_select_winner` can reconstruct the signed digest verbatim and
-      /// verify against any of the underwriter's WIRE account permissions.
+      /// verify a canonical fixed-size recoverable K1, R1, EM, or ED signature
+      /// against the underwriter's WIRE account `active` or `owner` permission.
       ///
       /// `commit_entry` does NOT carry codenames — the per-leg
       /// `(chain_code, token_code, reserve_code)` identity is on the
@@ -509,10 +589,15 @@ namespace sysio {
          uint64_t          dest_received_at_ms   = 0;
          uint64_t          dest_outpost_id       = 0;
          std::vector<char> dest_uic_bytes;
-         /// Race outcome — INTENT_SUBMITTED (initial), INTENT_CONFIRMED
-         /// (winner), SLASHED (rejected for insufficient bond), or RELEASED
-         /// (loser, kept for debugging). Reuses the existing protobuf
-         /// UnderwriteStatus enum.
+         /// Race outcome — INTENT_SUBMITTED (initial/retryable),
+         /// INTENT_CONFIRMED (winner), DISQUALIFIED (durably invalid stored
+         /// evidence, such as a signature invalidated by key rotation), or
+         /// RELEASED (clean loser, retained for audit). A new matching
+         /// `rcrdcommit` cannot rewrite or re-arm a DISQUALIFIED entry. An
+         /// exact replay can re-evaluate only an INTENT_SUBMITTED entry. The
+         /// reused protobuf enum also contains SLASHED, but commit entries
+         /// never write that value; economic slash state belongs to lock and
+         /// operator settlement.
          opp::types::UnderwriteStatus status = opp::types::UNDERWRITE_STATUS_INTENT_SUBMITTED;
          std::string reason;
 
@@ -626,6 +711,19 @@ namespace sysio {
          /// Empty until that flow lands.
          std::vector<char>                       attestation_outbound_data;
 
+         /// Non-zero while an underwriter-fault challenge (the `sysio.chalg::uwchals` row id)
+         /// is OPEN against this request's commitment — stamped by `holdlocks`, cleared by
+         /// `freelocks`, alongside the identical marker on each held lock.
+         ///
+         /// `pruneuwreqs` refuses to erase a row carrying one. The lock marker alone is not
+         /// enough: the locks hold the COLLATERAL, but this row holds the EVIDENCE a challenge
+         /// adjudicates against — `attestation_inbound_data` (the stored SwapRequest),
+         /// `source_tx_id`, and `commits_by` with the per-leg UIC bytes. Terminal rows are
+         /// erased at `terminal_epoch + uwreq_retention_epochs`, which is far shorter than the
+         /// challenge window, so without this a challenge could outlive the record it exists
+         /// to adjudicate and resolve against nothing.
+         uint64_t                                challenge_id      = 0;
+
          uint64_t by_status() const { return magic_enum::enum_integer(status); }
          uint64_t by_winner() const { return winner.value; }
          uint64_t by_expires_at_epoch() const { return expires_at_epoch; }
@@ -636,7 +734,7 @@ namespace sysio {
             (dst_chain_code)(dst_token_code)(dst_reserve_code)(dst_amount)
             (target_amount)(variance_tolerance_bps)(source_tx_id)(depositor)
             (commits_by)(winner)(committed_at_ms)(settled_at_ms)(expires_at_epoch)
-            (attestation_inbound_data)(attestation_outbound_data))
+            (attestation_inbound_data)(attestation_outbound_data)(challenge_id))
       };
 
       using uwreqs_t = sysio::kv::table<"uwreqs"_n, id_key, uw_request_t,
@@ -703,9 +801,13 @@ namespace sysio {
       >;
 
       /// Fee + lock-duration configuration singleton. `fee_bps` is the per-spoke
-      /// swap fee, charged out of the WIRE leg; the rewards/emissions split of
-      /// the collected fee is fixed in `sysio.reserv` (FEE_REWARD_SHARE_BPS), so
-      /// no fee-distribution shares live here.
+      /// NETWORK swap fee, charged out of the WIRE leg — the reserve owner fees
+      /// charged alongside it live on their own reserve rows
+      /// (`sysio.reserv::reserve::owner_fee_bps`), not here. No fee-DISTRIBUTION
+      /// shares live here either: the underwriter/rewards split of the network
+      /// fee is fixed in `sysio.reserv` (FEE_UNDERWRITER_SHARE_BPS), and the
+      /// rewards pool's own emissions share is that contract's governance dial
+      /// (`reserve_config.fee_emissions_share_bps`).
       struct [[sysio::table("uwconfig")]] uw_config {
          uint32_t fee_bps                      = 10;           // 0.1% per spoke
          /// Wall-clock collateral lock duration — the challenge window.

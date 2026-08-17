@@ -7,6 +7,10 @@
 // For uwrit::MAX_UWREQ_PRUNE_PER_EPOCH — the per-epoch budget advance hands
 // to the inline `pruneuwreqs` sweep (the constant is owned by sysio.uwrit).
 #include <sysio.uwrit/sysio.uwrit.hpp>
+// For reserve::MAX_CLAIM_SWEEP_PER_EPOCH — the per-epoch budget advance hands
+// to the inline `sweepclaims` retention sweep (the constant is owned by
+// sysio.reserv).
+#include <sysio.reserv/sysio.reserv.hpp>
 // Canonical sysio.system emissions types + compute_epoch_emission. The
 // [[sysio::contract("sysio.system")]] attribute on emission_config / t5_state
 // pins them to sysio.system's ABI; no readonly mirror needed here.
@@ -128,6 +132,18 @@ emissions_gate_result check_emissions_ready(uint32_t epoch_duration_sec, uint32_
       if (acct_tbl.contains(key)) {
          r.sysio_balance = acct_tbl.get(key).balance.amount;
       }
+
+      // Reserve pay that payepoch has already credited but nobody has pulled yet. Those balances
+      // still sit in sysio's token balance while being fully owed, so counting them as available
+      // would let the gate authorize a period the treasury cannot actually cover -- the next
+      // claimpay would then fail on overdraw and strand earned pay. `sysio_balance` is reported to
+      // the blocklog as the SPENDABLE amount for exactly this reason: an operator reading
+      // BALANCE_INSUFFICIENT needs the shortfall against what can really be paid, not the gross.
+      sysiosystem::emissions::payclaimtot_t claim_tot_tbl(SYSTEM_ACCOUNT);
+      const int64_t claims_reserve = static_cast<int64_t>(
+         claim_tot_tbl.get_or_default(sysiosystem::emissions::pay_claim_total{}).outstanding);
+      r.sysio_balance -= claims_reserve;
+      if (r.sysio_balance < 0) r.sysio_balance = 0;
 
       // emission_amount / period_emission is retained on the
       // BALANCE_INSUFFICIENT path so the blocklog row reports the real
@@ -330,6 +346,45 @@ void epoch::advance() {
    // wall clock for the current epoch effectively extends until the gate
    // eventually passes on a subsequent chkcons retry.
    const uint32_t target_epoch = state.current_epoch_index + 1;
+
+   // Bounded retention sweep of expired `sysio.reserv::wireclaims`: erase rows whose one-year
+   // window closed and return their WIRE to the treasury.
+   //
+   // Runs BEFORE the emissions gate, deliberately. This is maintenance, not economics, and the
+   // WIRE it reclaims lands in the very balance the gate measures -- so ordering it after the gate
+   // creates a deadlock: an epoch blocked as BALANCE_INSUFFICIENT returns below without ever
+   // reclaiming forfeited WIRE that could cover the shortfall, and every retry takes the same
+   // path. The contract would be sitting on the funds needed to unblock itself. `sweepclaims`
+   // takes only epoch or reserv authority, so no ordinary keeper could break that cycle either.
+   //
+   // Safe to run ahead of the gate because it is bounded, never-throwing past its auth check, and
+   // touches no epoch state -- a blocked epoch that sweeps and still cannot pay is exactly as
+   // blocked as before, minus some expired rows.
+   //
+   // `sysio.reserv` also sweeps opportunistically when crediting a new claim, but that only fires
+   // while settlement traffic arrives; this call is what makes the deadline hold when swaps stop.
+   //
+   // GUARDED on the account existing. Dispatching an inline action to an absent code account is a
+   // hard `action_validate_exception`, which inside `advance` is a chain-wide epoch stall.
+   // `sysio.reserv` is not a precondition for advancing an epoch -- a chain can advance before
+   // reserves are ever deployed -- and nothing can have accrued a wireclaim in that state, so
+   // skipping is precisely correct rather than merely defensive.
+   //
+   // That guard covers an ABSENT account, not a STALE one: an old `sysio.reserv` build has the
+   // account and not the action, and the CDT dispatcher asserts on an action it does not
+   // implement -- so deploying `sysio.epoch` ahead of `sysio.reserv` aborts every advance. The
+   // deploy is therefore one atomic `sysio.msig` transaction, or `sysio.reserv` first. Both this
+   // edge and the `sysio.epoch`-before-`sysio.system` one the emissions gate creates are written
+   // up in `docs/contract-upgrade-order.md`.
+   if (is_account(RESERV_ACCOUNT)) {
+      action(
+         permission_level{get_self(), "owner"_n},
+         RESERV_ACCOUNT,
+         "sweepclaims"_n,
+         std::make_tuple(reserve::MAX_CLAIM_SWEEP_PER_EPOCH)
+      ).send();
+   }
+
    const auto gate = check_emissions_ready(cfg.epoch_duration_sec, target_epoch);
    if (!gate.ready) {
       // OPP silent-return diagnostic: the epoch silently does NOT advance when the
@@ -615,8 +670,10 @@ void epoch::advance() {
    // Drain matured rows from `sysio.opreg::wtdwqueue`. Operators that queued
    // a withdrawal at least WITHDRAW_WAIT_EPOCHS ago are now eligible — opreg
    // subtracts from the balance and emits OPERATOR_ACTION(WITHDRAW_REMIT) to
-   // the matching outpost (or transfers WIRE tokens directly for WIRE-direct
-   // withdraws). Slashed-during-the-wait rows are dropped silently inside
+   // the matching outpost (or, for WIRE-direct withdraws, CREDITS the operator's
+   // `sysio.opreg::remitclaims` row, which it pulls with `claimremit` — nothing
+   // is transferred from this path, precisely because it runs inline from here).
+   // Slashed-during-the-wait rows are dropped silently inside
    // opreg's flushwtdw. See CLAUDE-WIRE-OPERATOR-COLLATERAL-IMPL-PLAN.md §3.3.
    action(
       permission_level{get_self(), "owner"_n},

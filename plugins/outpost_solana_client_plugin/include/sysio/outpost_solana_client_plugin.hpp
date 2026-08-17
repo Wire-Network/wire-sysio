@@ -155,10 +155,11 @@ struct opp_solana_outpost_client : fc::network::solana::solana_program_client {
    /// `deposit(operator_type: u8, wire_account_name: string, amount: u64) -> signature`.
    solana_program_tx_fn<std::string, uint8_t, std::string, uint64_t> deposit;
    /// `commit_underwrite(uic_bytes: bytes) -> signature`.
-   /// Relays an underwriter's signed `UnderwriteIntentCommit` to the
-   /// outpost as opaque bytes. The on-chain handler stores the bytes
-   /// for the next outbound envelope so the batch operator can relay
-   /// the COMMIT back to the depot; no other state changes.
+   /// Submits an underwriter's original canonical `UnderwriteIntentCommit`
+   /// bytes. The on-chain handler binds their signed SVM caller and claimed
+   /// ACTIVE roster identity, then stores the unchanged bytes for the next
+   /// outbound envelope so the batch operator can relay the COMMIT to the
+   /// depot.
    solana_program_tx_fn<std::string, std::vector<uint8_t>> commit_underwrite;
 
    /// Decode already-fetched Anchor account bytes using the outpost IDL.
@@ -239,25 +240,19 @@ struct opp_solana_outpost_client : fc::network::solana::solana_program_client {
                   epoch_seed,
                   std::vector<uint8_t>(signer_pk.begin(), signer_pk.end())},
                  program_id);
-           // The Solana program's `epoch_in` finalize path now fires the
-           // outbound emit inline at consensus reach (see
-           // `epoch_in.rs::finalize_envelope`), so the IDL's account list
-           // grew to carry the outbound-emit accounts. The relay injects
-           // pre-derived PDAs for all of them; the operator never sends a
-           // separate `emit_outbound_envelope` tx.
+           // `epoch_in` only stages/finalizes inbound chunks and, on
+           // consensus reach, processes the enclosed attestations inline —
+           // it no longer fires an outbound emit itself (that moved to the
+           // `dispatch_attestations` crank below, which drains the epoch's
+           // attestation cursor and carries the outbound-emit accounts).
+           // The IDL's `epoch_in` account list is just the 7 delivery/
+           // staging/consensus accounts below; no outbound PDAs needed here.
            account_overrides_t overrides = {
               {"config",                    config_pda},
               {"operator_registry",         operator_registry_pda},
               {"epoch_deliveries",          epoch_deliveries_pda},
               {"chunk_buffer",              chunk_buffer_pda},
               {"inbound_envelopes",         inbound_envelopes_pda},
-              {"outbound_message_buffer",   outbound_message_buffer_pda},
-              {"outbound_envelopes",        outbound_envelopes_pda},
-              {"latest_outbound_envelope",  latest_outbound_envelope_pda},
-              {"vault",                     vault_pda},
-              // v6 IDL field is `reserve_aggregate` (matches the Anchor
-              // `#[derive(Accounts)]` field name in epoch_in.rs / Initialize).
-              {"reserve_aggregate",         reserve_pda},
            };
            auto& instr = get_idl("epoch_in");
            program_invoke_data_items params = {
@@ -290,7 +285,7 @@ struct opp_solana_outpost_client : fc::network::solana::solana_program_client {
            // Deliberately NOT injecting `set_compute_unit_limit` — the
            // OOM tx consumed 116 K of 200 K CU, so CU is not the
            // bottleneck for the production 2.5 KB envelope. Add a CU
-           // bump only when 64 KB envelopes land live.
+           // bump only when cap-sized (32 KiB) envelopes land live.
            std::vector<fc::network::solana::instruction> pre_ixs;
            if (chunk_index == total_chunks) {
               pre_ixs.push_back(

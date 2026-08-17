@@ -12,6 +12,8 @@
 #include <optional>
 #include <string_view>
 
+#include "async_action_completion.hpp"
+
 #include <sysio/batch_operator_plugin/batch_operator_plugin.hpp>
 #include <sysio/batch_operator_plugin/depot_ops.hpp>
 #include <sysio/batch_operator_plugin/outpost_binding.hpp>
@@ -755,6 +757,11 @@ struct batch_operator_plugin::impl {
    //  Helpers
    // -----------------------------------------------------------------------
 
+   /// Serializes and asynchronously submits a depot action.
+   ///
+   /// The bounded wait deliberately does not cancel the request. Its callback
+   /// retains its API, labels, and completion state so it remains safe if this
+   /// function returns after timing out but before the transaction completes.
    void push_action(const std::string& contract,
                     const std::string& action_name,
                     chain::name auth_account,
@@ -799,24 +806,17 @@ struct batch_operator_plugin::impl {
 
       // Pack and push
       auto packed = chain::packed_transaction(std::move(trx), chain::packed_transaction::compression_type::none);
-      auto rw = chain_plug->get_read_write_api(abi_max_time);
+      auto rw = std::make_shared<read_write>(chain_plug->get_read_write_api(abi_max_time));
 
       fc::variant packed_var;
       chain::to_variant(packed, packed_var);
 
-      std::promise<void> done;
-      auto future = done.get_future();
+      auto completion = std::make_shared<batch_operator_detail::async_action_completion>();
+      auto future = completion->get_future();
 
-      rw.push_transaction(
+      rw->push_transaction(
          packed_var.get_object(),
-         [&done, &contract, &action_name](const auto& result) {
-            if (auto* err = std::get_if<fc::exception_ptr>(&result)) {
-               elog("batch_operator: push {}::{} failed — {}", contract, action_name, (*err)->to_string());
-            } else {
-               ilog("batch_operator: pushed {}::{} ok", contract, action_name);
-            }
-            done.set_value();
-         });
+         batch_operator_detail::create_push_action_callback(rw, completion, contract, action_name));
 
       if (future.wait_for(std::chrono::milliseconds(delivery_timeout_ms)) == std::future_status::timeout) {
          elog("batch_operator: push {}::{} timed out", contract, action_name);
@@ -928,6 +928,22 @@ void batch_operator_plugin::set_program_options(options_description& cli,
         "WIRE account name for this batch operator");
    opts("batch-epoch-poll-ms", bpo::value<uint32_t>()->default_value(EPOCH_POLL_MS),
         "How often to check epoch state (ms)");
+   // SIZING RULE for batch-delivery-timeout-ms: it bounds the WHOLE outbound
+   // delivery, and an Ethereum delivery is now one transaction PER CHUNK
+   // (ETHEREUM_MAX_CHUNK_BYTES = 8192; Solana chunks at 672). Size it as
+   //     total chunks x (target block time + confirmation margin)
+   // for the largest envelope the outpost is expected to carry. At the 32768
+   // byte platform envelope cap that is 4 Ethereum chunks, so the 15000 ms
+   // default covers a 1 s block time with wide margin. Undersizing is not fatal:
+   // the relay resumes from the on-chain per-operator high-water mark on the
+   // next cron tick, so a truncated tick converges rather than restarting from
+   // chunk zero. SHARED KNOB: this same value also bounds the depot
+   // push_action completion wait (see push_action above); post-WIRE-331 a
+   // timeout there is safe (the async_action_completion callback retains its
+   // own state), but raising this option lengthens BOTH waits, so raise it for
+   // chunking deliberately rather than as a blanket tuning step.
+   // Help text below must stay ASCII with no " --" sequence (PerformanceHarness
+   // splits nodeop --help output on that token).
    opts("batch-delivery-timeout-ms", bpo::value<uint32_t>()->default_value(DELIVERY_TIMEOUT_MS),
         "Max time to wait for chain delivery confirmation (ms)");
    opts("batch-enabled", bpo::value<bool>()->default_value(false),

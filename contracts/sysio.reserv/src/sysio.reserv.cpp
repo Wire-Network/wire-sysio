@@ -7,6 +7,8 @@
 #include <sysio.opp.common/opp_table_types.hpp>
 #include <sysio.opp.common/amm_math.hpp>
 #include <sysio.opp.common/safe_ops.hpp>
+#include <sysio.opp.common/claimable.hpp>
+#include <sysio.opp.common/registry_metadata.hpp>
 
 #include <zpp_bits.h>
 
@@ -53,8 +55,15 @@ constexpr sysio::slug_name WIRE_TOKEN = "WIRE"_s;
 /// inside the consensus dispatch chain (applyswap / applyfromwire / paywire inline from
 /// uwrit::try_select_winner). A raw `+=` could wrap the uint64 and corrupt the
 /// weighted-AMM curve and the `>=` sufficiency checks; cap at UINT64_MAX instead — never wrap,
-/// never throw on the consensus path. The cap is unreachable for any real token amount. Delegates
-/// to the shared `sysio::opp::safe::add_sat_u64` so the never-wrap rule lives in one place.
+/// never throw on the consensus path. Delegates to the shared
+/// `sysio::opp::safe::add_sat_u64` so the never-wrap rule lives in one place.
+///
+/// The cap is unreachable for any real BALANCE — a balance is bounded by what is
+/// actually in custody. That reasoning does NOT carry to the monotonic
+/// `lifetime_*` audit counters this helper also credits: those are unbounded
+/// running totals and CAN saturate, which is documented at each field
+/// (`reserve_row::owner_fee_lifetime`, `uw_fee_row::lifetime_*`). Saturation
+/// there truncates audit history only — never a balance, never a payout.
 inline void add_capped_u64(uint64_t& balance, uint64_t amt) {
    balance = sysio::opp::safe::add_sat_u64(balance, amt);
 }
@@ -65,6 +74,24 @@ inline void add_capped_u64(uint64_t& balance, uint64_t amt) {
 uint32_t uwrit_fee_bps() {
    sysio::uwrit::uwconfig_t cfg(reserve::UWRIT_ACCOUNT);
    return cfg.get_or_default(sysio::uwrit::uw_config{}).fee_bps;
+}
+
+/// Stage-2 governance dial: the share of each fee's REWARDS POOL routed to the
+/// `sysio` emissions treasury. Read fresh per settlement so a `setconfig` takes
+/// effect immediately; defaults to 0 (the whole pool is allocated to the
+/// batch-operator distribution and no fee leaves custody) until configured.
+uint32_t fee_emissions_share_bps(name self) {
+   reserve::reservcfg_t cfg(self);
+   return cfg.get_or_default(reserve::reserve_config{}).fee_emissions_share_bps;
+}
+
+/// Credit a reserve's owner-fee revenue — the claimable balance AND the
+/// monotonic audit total — from inside an open `modify` lambda. No-op at zero,
+/// so a fee-free reserve costs nothing.
+void accrue_owner_fee(reserve::reserve_row& row, uint64_t amount) {
+   if (amount == 0) return;
+   add_capped_u64(row.owner_fee_accrued,  amount);
+   add_capped_u64(row.owner_fee_lifetime, amount);
 }
 
 reserve::reserve_key make_key(sysio::slug_name chain_code,
@@ -155,20 +182,65 @@ void queue_attestation_out(name self,
    ).send();
 }
 
-/// Route a collected WIRE swap fee: accrue the rewards share into the on-chain
-/// `rewards_bucket` (the WIRE stays in this contract's custody, earmarked for a
-/// future distribution) and transfer the emissions share back to the `sysio`
-/// treasury. No-op when there is no fee. The custody invariant is preserved:
-/// the rewards share moves from a reserve's WIRE side into `rewards.balance`
-/// (same custody), and only the emissions share leaves as a real transfer.
-void route_wire_fee(name self, const opp::amm::wire_fee& fee) {
-   if (fee.reward_share > 0) {
+/// Route the NETWORK COMPONENT of a collected WIRE swap fee to its three
+/// destinations. The reserve-owner shares carried in `fee` are NOT routed here —
+/// the settlement actions accrue those to their own reserve rows before calling
+/// this, so this function only ever moves the network fee's own split:
+///   * the underwriter share accrues to `underwriter`'s `uwfees` row, payable to
+///     that account on its own `claimuwfee` call — stays in custody;
+///   * the rewards share accrues to the singleton `rewards_bucket`, swept by
+///     `drainrewards` into `sysio.system::payepoch` and paid to batch operators
+///     — stays in custody;
+///   * the emissions share (zero unless `reserve_config` sets one) is
+///     TRANSFERRED to the `sysio` treasury — the only part that leaves custody.
+/// No-op when there is no fee.
+///
+/// At the default config the emissions share is 0, so everything THIS function
+/// routes moves into two earmarked accumulators in the SAME custody and the call
+/// never changes `token_balance`. With a non-zero share, custody drops by exactly
+/// that share. Note the total `wire_fee::fee` is larger than what is routed here
+/// whenever a participating reserve charges an owner fee: at the default dial the
+/// whole fee ends up spread across the owner accrual(s) the caller already made,
+/// `uwfees`, and `rewards_bucket` — not wholly into the two accumulators below.
+///
+/// A fee with no winning underwriter (a revert refund) passes an unset
+/// `underwriter` together with a zero underwriter share. Should a caller ever
+/// pair an unset account with a non-zero share, the share falls through to the
+/// rewards bucket rather than stranding WIRE in custody with no claimant.
+void route_wire_fee(name self, const opp::amm::wire_fee& fee, name underwriter) {
+   uint64_t reward_share = fee.reward_share;
+
+   if (fee.underwriter_share > 0 && underwriter.value != 0) {
+      reserve::uwfees_t uwf(self);
+      reserve::uw_fee_key key{underwriter};
+      auto it = uwf.find(key);
+      if (it == uwf.end()) {
+         uwf.emplace(ram_payer, key, reserve::uw_fee_row{
+            .underwriter      = underwriter,
+            .balance          = fee.underwriter_share,
+            .lifetime_accrued = fee.underwriter_share,
+            .lifetime_claimed = 0,
+         });
+      } else {
+         uwf.modify(ram_payer, key, [&](auto& row) {
+            add_capped_u64(row.balance,          fee.underwriter_share);
+            add_capped_u64(row.lifetime_accrued, fee.underwriter_share);
+         });
+      }
+   } else {
+      reward_share += fee.underwriter_share;
+   }
+
+   if (reward_share > 0) {
       reserve::rewardbkt_t bkt(self);
       auto rb = bkt.get_or_default(reserve::rewards_bucket{});
-      add_capped_u64(rb.balance,          fee.reward_share);
-      add_capped_u64(rb.lifetime_accrued, fee.reward_share);
+      add_capped_u64(rb.balance,          reward_share);
+      add_capped_u64(rb.lifetime_accrued, reward_share);
       bkt.set(rb, ram_payer);
    }
+
+   // The ONLY part of a fee that leaves this contract's custody, and only when
+   // governance has configured a non-zero emissions share.
    if (fee.emissions_share > 0) {
       action(
          permission_level{self, "active"_n},
@@ -178,6 +250,95 @@ void route_wire_fee(name self, const opp::amm::wire_fee& fee) {
             std::string("sysio.reserv::swap fee -> emissions"))
       ).send();
    }
+}
+
+/// Credit `amount` WIRE to `recipient`'s claimable row, then run the bounded retention sweep.
+///
+/// Both callers (`paywire`, `refundwire`) sit on never-throw paths, so nothing here may abort: the
+/// credit saturates rather than overflowing, and the sweep is bounded and non-throwing.
+///
+/// Crediting instead of transferring is the whole point. `sysio.token::transfer` notifies the
+/// recipient, and the chain runs notified receivers with no exception isolation, so a pushed payout
+/// hands the recipient an abort switch over the enclosing transaction -- stalling consensus
+/// dispatch from `paywire`, and halting epoch advancement chain-wide from `refundwire`.
+///
+/// Reclaimed WIRE from expired rows is pushed to the emissions treasury. That push is safe for the
+/// same reason `route_wire_fee`'s emissions share is: `sysio` is a system account under protocol
+/// control, not a counterparty that can install a hostile notify handler.
+/// THE retention sweep — one implementation behind both triggers, so the on-write path and the
+/// epoch path can never drift on what "expired" means or where the reclaimed WIRE goes.
+///
+/// Erases up to `max_rows` rows whose `expires_at_sec` has passed and pushes their total to the
+/// emissions treasury. Never throws: both callers sit on never-throw paths (`credit_wire_claim`
+/// runs under consensus dispatch and epoch advance; `sweepclaims` is inlined from `advance`).
+///
+/// @return atomic WIRE units reclaimed.
+uint64_t sweep_expired_wire_claims(name self, uint32_t now_sec, uint32_t max_rows) {
+   reserve::wireclaims_t claims(self);
+   auto by_expiry = claims.get_index<"byexpiry"_n>();
+   const uint64_t reclaimed = sysio::opp::claimable::sweep_expired(
+      claims, by_expiry,
+      [](const reserve::wire_claim& r) { return reserve::wireclaim_key{r.account.value}; },
+      now_sec, max_rows);
+
+   if (reclaimed > 0) {
+      action(
+         permission_level{self, "active"_n},
+         reserve::TOKEN_ACCOUNT, "transfer"_n,
+         std::make_tuple(self, reserve::TREASURY_ACCOUNT,
+            asset(static_cast<int64_t>(reclaimed), WIRE_SYMBOL),
+            std::string("sysio.reserv::expired WIRE claim -> emissions"))
+      ).send();
+   }
+   return reclaimed;
+}
+
+void credit_wire_claim(name self, name recipient, uint64_t amount) {
+   if (amount == 0) return;
+
+   const uint32_t now_sec = static_cast<uint32_t>(current_time_point().sec_since_epoch());
+
+   reserve::wireclaims_t claims(self);
+   const auto pk = reserve::wireclaim_key{recipient.value};
+
+   // Settle an ALREADY-FORFEITED row before accumulating onto it.
+   //
+   // `credit` upserts: it adds to whatever balance is there and refreshes the stamp. If this
+   // recipient's row is past its window but still queued behind the bounded sweep, that would
+   // resurrect a balance `claimwire` has already been refusing -- the old amount becomes claimable
+   // again, and a trickle of small credits could keep a system-funded row (and its forfeited WIRE)
+   // alive indefinitely. Reclaiming first means a credit can only ever start a FRESH claim.
+   //
+   // Expiry exists so abandoned rows do not hold RAM forever; an account still being credited is
+   // not abandoned, so its new claim legitimately gets a full window. What that must not do is
+   // un-forfeit the balance the last window already closed on.
+   auto it = claims.find(pk);
+   if (it != claims.end() && it->expires_at_sec != 0 && now_sec >= it->expires_at_sec) {
+      const uint64_t forfeited = it->balance;
+      claims.erase(pk);
+      if (forfeited > 0) {
+         action(
+            permission_level{self, "active"_n},
+            reserve::TOKEN_ACCOUNT, "transfer"_n,
+            std::make_tuple(self, reserve::TREASURY_ACCOUNT,
+               asset(static_cast<int64_t>(forfeited), WIRE_SYMBOL),
+               std::string("sysio.reserv::expired WIRE claim -> emissions"))
+         ).send();
+      }
+   }
+
+   sysio::opp::claimable::credit(
+      claims, ram_payer, pk,
+      reserve::wire_claim{.account = recipient}, amount,
+      now_sec + reserve::WIRE_CLAIM_WINDOW_SEC);
+
+   // On-write retention: sweep a bounded number of rows that aged out before adding more. Runs
+   // after the credit so the row just refreshed above is never the one collected.
+   //
+   // This is an OPPORTUNISTIC trigger, not the guarantee: it only fires while swap traffic keeps
+   // arriving. `sweepclaims`, inlined from `sysio.epoch::advance`, is what makes the retention
+   // deadline hold when settlement stops.
+   sweep_expired_wire_claims(self, now_sec, reserve::MAX_CLAIM_SWEEP_PER_CREDIT);
 }
 
 } // namespace
@@ -204,6 +365,8 @@ void reserve::regreserve(sysio::slug_name chain_code,
                 "bootstrap reserve must seed both chain_amount and wire_amount > 0");
    sysio::check(!is_private || owner != sysio::name{},
                 "a private bootstrap reserve must name an owner");
+   // Both strings persist into a `sysio`-billed row -- bound them before emplace.
+   opp::registry::check_metadata(name, description, "sysio.reserv");
 
    reserves_t tbl(get_self());
    auto pk = make_key(chain_code, token_code, reserve_code);
@@ -273,6 +436,10 @@ void reserve::oncrtreserve(sysio::slug_name       chain_code,
    // the SAME cancel/refund path as an unlinked creator below (insert a CANCELLED
    // row + queue RESERVE_CREATE_CANCELLED), idempotently.
    const bool invalid_amount = (external_token_amount == 0 || requested_wire_amount == 0);
+   // Same `sysio`-billed metadata bound the privileged registrations enforce with
+   // `check_metadata`, asked the non-throwing way: this handler must never abort, so an
+   // over-bound string joins the reject/refund path below rather than reverting dispatch.
+   const bool oversized_metadata = opp::registry::metadata_exceeds_bounds(name, description);
    // The outpost downscales to min(native, 9) at its boundary, so a
    // source_token_precision above the depot frame means a malformed attestation.
    if (source_token_precision > WIRE_PRECISION) {
@@ -305,7 +472,8 @@ void reserve::oncrtreserve(sysio::slug_name       chain_code,
    // Create gating: the creator must already be authex-linked to a WIRE
    // account ("the only requirement to create a reserve"). Reconstruct the
    // creator's key variant and probe `sysio.authex::links.bypubkey`. On
-   // any failure — malformed key bytes OR no link — reject by inserting a
+   // any failure — malformed key bytes, no link, an invalid amount, OR
+   // over-bound metadata — reject by inserting a
    // CANCELLED row (for refund idempotency) and queueing
    // RESERVE_CREATE_CANCELLED so the outpost refunds the creator's escrow.
    // The CANCELLED row does NOT permanently burn the identity: a later,
@@ -323,7 +491,7 @@ void reserve::oncrtreserve(sysio::slug_name       chain_code,
             canonical_creator_key = sysio::pubkey_to_bytes(*pk_variant);
          }
       }
-      if (!linked || invalid_amount) {
+      if (!linked || invalid_amount || oversized_metadata) {
          // A CANCELLED row already standing means this is a re-relay of the same
          // rejected create (an unlinked squatter OR an invalid amount). Leave it
          // and do NOT queue a second refund — the refund was queued when the row
@@ -335,14 +503,22 @@ void reserve::oncrtreserve(sysio::slug_name       chain_code,
             return;
          }
          sysio::print("oncrtreserve: rejecting with RESERVE_CREATE_CANCELLED "
-                      "(invalid amount or unlinked / malformed creator key)\n");
+                      "(invalid amount, over-bound metadata, or unlinked / malformed creator key)\n");
          const auto now = current_time_ms();
          tbl.emplace(ram_payer, pk, reserve_row{
             .chain_code             = chain_code,
             .token_code             = token_code,
             .reserve_code           = reserve_code,
-            .name                   = std::move(name),
-            .description            = std::move(description),
+            // The tombstone is itself a `sysio`-billed row, so over-bound strings are NOT
+            // carried onto it — storing them verbatim would persist exactly the state the
+            // bound exists to prevent. Only THAT rejection reason substitutes the marker; a
+            // row rejected for an unlinked creator or an invalid amount keeps its (already
+            // in-bounds) metadata. The creator's originals stay in the inbound OPP envelope
+            // artifact either way.
+            .name                   = oversized_metadata
+                                       ? std::string(opp::registry::rejected_label)
+                                       : std::move(name),
+            .description            = oversized_metadata ? std::string{} : std::move(description),
             .status                 = opp::types::RESERVE_STATUS_CANCELLED,
             .reserve_chain_amount   = 0,
             .reserve_wire_amount    = 0,
@@ -537,26 +713,31 @@ uint64_t reserve::swapquote(sysio::slug_name from_chain_code,
    // Resolve only the non-WIRE side(s); a WIRE endpoint has no token/WIRE pool
    // (the depot IS the WIRE side). Any required reserve missing or not ACTIVE
    // yields a 0 quote.
-   uint64_t src_chain = 0, src_wire = 0; uint32_t src_cw = 0;
+   uint64_t src_chain = 0, src_wire = 0; uint32_t src_cw = 0, src_fee_bps = 0;
    if (!src_is_wire) {
       auto it = tbl.find(make_key(from_chain_code, from_token_code, from_reserve_code));
       if (it == tbl.end() || it->status != opp::types::RESERVE_STATUS_ACTIVE) return 0;
-      src_chain = it->reserve_chain_amount;
-      src_wire  = it->reserve_wire_amount;
-      src_cw    = it->connector_weight_bps;
+      src_chain   = it->reserve_chain_amount;
+      src_wire    = it->reserve_wire_amount;
+      src_cw      = it->connector_weight_bps;
+      src_fee_bps = it->owner_fee_bps;
    }
-   uint64_t dst_chain = 0, dst_wire = 0; uint32_t dst_cw = 0;
+   uint64_t dst_chain = 0, dst_wire = 0; uint32_t dst_cw = 0, dst_fee_bps = 0;
    if (!dst_is_wire) {
       auto it = tbl.find(make_key(to_chain_code, to_token_code, to_reserve_code));
       if (it == tbl.end() || it->status != opp::types::RESERVE_STATUS_ACTIVE) return 0;
-      dst_chain = it->reserve_chain_amount;
-      dst_wire  = it->reserve_wire_amount;
-      dst_cw    = it->connector_weight_bps;
+      dst_chain   = it->reserve_chain_amount;
+      dst_wire    = it->reserve_wire_amount;
+      dst_cw      = it->connector_weight_bps;
+      dst_fee_bps = it->owner_fee_bps;
    }
 
+   // Each participating reserve's owner fee rides the quote alongside the
+   // network fee, so the quote prices exactly what settlement will charge.
    return opp::amm::quote_swap(src_is_wire, src_chain, src_wire, src_cw,
                                dst_is_wire, dst_chain, dst_wire, dst_cw,
-                               from_amount, uwrit_fee_bps());
+                               from_amount, uwrit_fee_bps(),
+                               src_fee_bps, dst_fee_bps);
 }
 
 uint64_t reserve::rewardbal() {
@@ -566,8 +747,10 @@ uint64_t reserve::rewardbal() {
 
 void reserve::drainrewards(int64_t amount) {
    // Only the system treasury (where sysio.system::payepoch runs) may sweep the
-   // rewards bucket. The swept WIRE is redistributed to producers + batch
-   // operators at the next pay-epoch.
+   // rewards bucket. The swept WIRE is allocated exclusively to the
+   // batch-operator distribution at the next pay-epoch — producers are not paid
+   // out of swap fees. payepoch pays only eligible shares; what it skips stays in
+   // the treasury.
    require_auth(TREASURY_ACCOUNT);
 
    // Internal treasury sweep: a non-positive amount means the caller's
@@ -640,7 +823,8 @@ void reserve::applyswap(sysio::slug_name src_chain_code,
                          sysio::slug_name dst_chain_code,
                          sysio::slug_name dst_token_code,
                          sysio::slug_name dst_reserve_code,
-                         uint64_t        dst_amount) {
+                         uint64_t        dst_amount,
+                         sysio::name     underwriter) {
    require_auth(UWRIT_ACCOUNT);
    sysio::check(src_amount > 0 && dst_amount > 0, "applyswap: amounts must be positive");
 
@@ -660,19 +844,29 @@ void reserve::applyswap(sysio::slug_name src_chain_code,
    // the weighted curve (the source reserve's own `connector_weight_bps`) — the
    // same definition `sysio.uwrit::swap_quote` uses, so the depot's books and
    // its quotes share one curve. The fee is then taken OUT of this WIRE leg: the
-   // source side gives up the full gross WIRE, only `net` continues to the
-   // destination side, and `fee` is routed to rewards + emissions.
+   // source side gives up the full gross WIRE and only `net` continues to the
+   // destination side. The TOTAL `fee` spreads across BOTH reserves' owner
+   // accruals (made in the modifies below), the winning underwriter's accrual,
+   // the batch-operator rewards bucket, and — only when
+   // `fee_emissions_share_bps` is set — a transfer of that share to `sysio`.
    const uint64_t w_gross = opp::amm::token_to_wire(src_it->reserve_chain_amount,
                                                     src_it->reserve_wire_amount,
                                                     src_it->connector_weight_bps,
                                                     src_amount);
    sysio::check(w_gross > 0, "applyswap: WIRE intermediate is zero");
-   const auto fee = opp::amm::split_wire_fee(w_gross, uwrit_fee_bps(), FEE_REWARD_SHARE_BPS);
+   // BOTH reserves supply liquidity for this swap, so both charge their own
+   // owner fee on the same WIRE leg — on top of the network fee (WIRE-281).
+   const auto fee = opp::amm::split_wire_fee(w_gross, uwrit_fee_bps(), FEE_UNDERWRITER_SHARE_BPS,
+                                                fee_emissions_share_bps(get_self()),
+                                                src_it->owner_fee_bps, dst_it->owner_fee_bps);
    // SEC-26 / WSA-042 settlement backstop: a zero post-fee WIRE leg credits no
    // WIRE to the destination reserve below while still debiting its chain side
-   // — draining it at an arbitrary price. `net == 0` is only reachable at a
-   // 100% fee, which `sysio.uwrit::setconfig` rejects (MAX_FEE_BPS), so this is
-   // unreachable defense-in-depth rather than a live path.
+   // — draining it at an arbitrary price. This is a LIVE path, not unreachable
+   // defense-in-depth: the caps bound each rate INDEPENDENTLY, so a network fee
+   // at `sysio.uwrit::MAX_FEE_BPS` (9999) plus either reserve's owner fee at
+   // MIN_OWNER_FEE_BPS (1) already totals 100%. Such a combination is an
+   // intentionally rejected configuration — refuse the swap here rather than
+   // settle it at an arbitrary price.
    sysio::check(fee.net > 0, "applyswap: zero post-fee WIRE would credit no destination liquidity");
    sysio::check(src_it->reserve_wire_amount >= w_gross,
                 "applyswap: insufficient source reserve WIRE for intermediate");
@@ -697,6 +891,7 @@ void reserve::applyswap(sysio::slug_name src_chain_code,
    tbl.modify(ram_payer, src_pk, [&](auto& row) {
       add_capped_u64(row.reserve_chain_amount, src_amount);
       row.reserve_wire_amount  -= w_gross;
+      accrue_owner_fee(row, fee.src_reserve_share);
    });
    // Same-row swaps (identical triples) compose correctly: the second
    // modify reads the post-first-modify state. The destination receives only
@@ -704,17 +899,22 @@ void reserve::applyswap(sysio::slug_name src_chain_code,
    tbl.modify(ram_payer, dst_pk, [&](auto& row) {
       add_capped_u64(row.reserve_wire_amount, fee.net);
       row.reserve_chain_amount -= dst_amount;
+      accrue_owner_fee(row, fee.dst_reserve_share);
    });
 
-   // Route the fee (rewards half stays in custody, emissions half leaves).
-   route_wire_fee(get_self(), fee);
+   // Route the NETWORK component (the two owner shares already accrued to their
+   // reserve rows above): underwriter half to `uwfees`, rewards half to
+   // `rewards_bucket` — both custody-internal — except any configured
+   // `fee_emissions_share_bps`, the only part that leaves for the treasury.
+   route_wire_fee(get_self(), fee, underwriter);
 }
 
 void reserve::applyfromwire(sysio::slug_name dst_chain_code,
                              sysio::slug_name dst_token_code,
                              sysio::slug_name dst_reserve_code,
                              uint64_t        wire_in,
-                             uint64_t        dst_amount) {
+                             uint64_t        dst_amount,
+                             sysio::name     underwriter) {
    require_auth(UWRIT_ACCOUNT);
    sysio::check(wire_in > 0 && dst_amount > 0, "applyfromwire: amounts must be positive");
 
@@ -728,14 +928,22 @@ void reserve::applyfromwire(sysio::slug_name dst_chain_code,
                 "applyfromwire: insufficient destination reserve balance");
 
    // Fee out of the user's escrowed input WIRE: only the post-fee remainder
-   // becomes destination-reserve liquidity; the fee is routed to rewards +
-   // emissions. The full `wire_in` was escrowed in this contract at
-   // `swapfromwire` time, so custody stays balanced (net -> Σwire, rewards ->
-   // bucket, emissions -> transferred out).
-   const auto fee = opp::amm::split_wire_fee(wire_in, uwrit_fee_bps(), FEE_REWARD_SHARE_BPS);
+   // becomes destination-reserve liquidity. The TOTAL fee spreads across the
+   // DESTINATION reserve's owner accrual, the winning underwriter's accrual, and
+   // the rewards bucket. The full `wire_in` was escrowed in this contract at
+   // `swapfromwire` time; the ONLY part that leaves here is a configured
+   // `fee_emissions_share_bps` of the rewards pool. At the default-zero dial
+   // nothing leaves and custody balances as net -> Σwire, fee -> the accruals.
+   // The source is the depot's own WIRE — there is no source reserve — so only
+   // the DESTINATION reserve charges an owner fee here.
+   const auto fee = opp::amm::split_wire_fee(wire_in, uwrit_fee_bps(), FEE_UNDERWRITER_SHARE_BPS,
+                                             fee_emissions_share_bps(get_self()),
+                                             /*src_reserve_fee_bps*/ 0, it->owner_fee_bps);
    // SEC-26 / WSA-042 settlement backstop — see applyswap. A zero post-fee WIRE
    // leg would debit the destination reserve below while crediting zero WIRE.
-   // Unreachable given `sysio.uwrit::setconfig`'s MAX_FEE_BPS cap.
+   // Reachable under valid configuration — the network fee at MAX_FEE_BPS (9999)
+   // plus this reserve's owner fee at MIN_OWNER_FEE_BPS (1) totals 100% — so
+   // this rejects a configured combination, not an impossible one.
    sysio::check(fee.net > 0, "applyfromwire: zero post-fee WIRE would credit no destination liquidity");
    // WNS-02 settlement bound — see applyswap. The from-WIRE shape feeds the
    // user's escrowed WIRE straight into the WIRE leg, so the curve output is
@@ -750,9 +958,10 @@ void reserve::applyfromwire(sysio::slug_name dst_chain_code,
    tbl.modify(ram_payer, pk, [&](auto& row) {
       add_capped_u64(row.reserve_wire_amount, fee.net);
       row.reserve_chain_amount -= dst_amount;
+      accrue_owner_fee(row, fee.dst_reserve_share);
    });
 
-   route_wire_fee(get_self(), fee);
+   route_wire_fee(get_self(), fee, underwriter);
 }
 
 void reserve::paywire(sysio::slug_name src_chain_code,
@@ -760,7 +969,8 @@ void reserve::paywire(sysio::slug_name src_chain_code,
                        sysio::slug_name src_reserve_code,
                        uint64_t        src_amount,
                        sysio::name     recipient,
-                       uint64_t        wire_out) {
+                       uint64_t        wire_out,
+                       sysio::name     underwriter) {
    require_auth(UWRIT_ACCOUNT);
    sysio::check(src_amount > 0 && wire_out > 0, "paywire: amounts must be positive");
    sysio::check(is_account(recipient), "paywire: recipient account does not exist");
@@ -780,11 +990,18 @@ void reserve::paywire(sysio::slug_name src_chain_code,
                                                     it->connector_weight_bps,
                                                     src_amount);
    sysio::check(w_gross > 0, "paywire: WIRE leg is zero");
-   const auto fee = opp::amm::split_wire_fee(w_gross, uwrit_fee_bps(), FEE_REWARD_SHARE_BPS);
+   // The recipient is paid in WIRE — there is no destination reserve — so only
+   // the SOURCE reserve charges an owner fee here.
+   const auto fee = opp::amm::split_wire_fee(w_gross, uwrit_fee_bps(), FEE_UNDERWRITER_SHARE_BPS,
+                                                fee_emissions_share_bps(get_self()),
+                                                it->owner_fee_bps, /*dst_reserve_fee_bps*/ 0);
    // WNS-02 settlement bound — see applyswap. For a WIRE destination the curve
    // output IS the post-fee WIRE leg, so the payout may never exceed `fee.net`.
    // `sysio.uwrit` passes exactly `fee.net` (its `swap_quote` returns the
    // post-fee WIRE for a WIRE endpoint), so equality holds on the live path.
+   // `fee.net` now also nets out the source reserve owner's share, and
+   // `quote_swap` charges that share through this same `split_wire_fee`, so the
+   // quote and this bound still agree by construction.
    sysio::check(wire_out <= fee.net,
                 "paywire: payout exceeds the post-fee WIRE the source leg produced");
    const uint64_t wire_leaving = wire_out + fee.fee;
@@ -794,19 +1011,23 @@ void reserve::paywire(sysio::slug_name src_chain_code,
    tbl.modify(ram_payer, pk, [&](auto& row) {
       add_capped_u64(row.reserve_chain_amount, src_amount);
       row.reserve_wire_amount  -= wire_leaving;
+      accrue_owner_fee(row, fee.src_reserve_share);
    });
 
-   // REAL WIRE leaves custody to the recipient; the fee's emissions half also
-   // leaves (rewards half stays in the bucket). `Σ reserve_wire_amount` and the
-   // contract's token balance drop together, preserving the custody invariant.
-   action(
-      permission_level{get_self(), "active"_n},
-      TOKEN_ACCOUNT, "transfer"_n,
-      std::make_tuple(get_self(), recipient,
-         asset(static_cast<int64_t>(wire_out), WIRE_SYMBOL),
-         std::string("sysio.reserv::paywire swap-to-WIRE payout"))
-   ).send();
-   route_wire_fee(get_self(), fee);
+   // The payout is credited, not pushed: this action is inlined from
+   // `sysio.uwrit::try_select_winner` inside the never-throw consensus dispatch chain, and a
+   // transfer would let `recipient`'s notify handler abort the whole delivery.
+   //
+   // The fee stays behind as three accruals — the source reserve's owner accrual (above), the
+   // underwriter accrual, and the rewards bucket — except any configured
+   // `fee_emissions_share_bps`, which `route_wire_fee` transfers to the treasury.
+   //
+   // Custody bookkeeping: `Σ reserve_wire_amount` drops by `wire_out + fee`, but only that
+   // emissions share actually leaves the contract's token balance. `wire_out` moves sideways
+   // into `Σ wireclaims.balance` and the rest of the fee into the accruals -- all still in
+   // custody, so the invariant balances.
+   credit_wire_claim(get_self(), recipient, wire_out);
+   route_wire_fee(get_self(), fee, underwriter);
 }
 
 void reserve::refundwire(sysio::name recipient,
@@ -816,24 +1037,178 @@ void reserve::refundwire(sysio::name recipient,
    sysio::check(wire_amount > 0, "refundwire: amount must be positive");
    sysio::check(is_account(recipient), "refundwire: recipient account does not exist");
 
-   // Caller-fault revert fee, routed exactly like a settlement fee (rewards
-   // share stays in custody, emissions share leaves). Zero bps (no-fault
-   // refund) makes both the split and the routing no-ops. For any positive
-   // amount and a fee below 100%, floor division leaves `net >= 1`, so the
-   // backstop below is unreachable given `sysio.uwrit::setconfig`'s
-   // MAX_FEE_BPS cap — same defense-in-depth pattern as `applyswap`. It must
-   // hold: this action is inlined from the never-throw `drainfwq` drain.
-   const auto fee = opp::amm::split_wire_fee(wire_amount, revert_fee_bps, FEE_REWARD_SHARE_BPS);
+   // Caller-fault revert fee, routed through the same path as a settlement fee.
+   // A revert has NO winning underwriter — no collateral was locked for a swap
+   // that never settled — so the underwriter share is zero and the whole revert
+   // fee becomes the rewards POOL. `fee_emissions_share_bps` then splits that
+   // pool exactly as it does a settlement fee's: the whole revert fee lands in
+   // the rewards bucket only under the default zero dial; a configured dial
+   // diverts that share to the emissions treasury. Zero bps (no-fault refund)
+   // makes both the split and the routing no-ops.
+   //
+   // Unlike `applyswap` / `applyfromwire`, the backstop below really IS
+   // unreachable here, and for a reason specific to this path: a refund charges
+   // NO reserve owner fee (the trailing rates are left at 0), so the total is
+   // the network fee alone, which `sysio.uwrit::setconfig` caps at MAX_FEE_BPS
+   // (9999). Floor division then leaves `net >= 1` for any positive amount.
+   // There is no second rate to stack on top and reach 100%. It must hold: this
+   // action is inlined from the never-throw `drainfwq` drain.
+   const auto fee = opp::amm::split_wire_fee(wire_amount, revert_fee_bps,
+                                             /*underwriter_share_bps*/ 0,
+                                             fee_emissions_share_bps(get_self()));
    sysio::check(fee.net > 0, "refundwire: revert fee must be below 100%");
+
+   // Credited, not pushed. This runs inline from the never-throw `sysio.uwrit::drainfwq` drain,
+   // which itself runs inline from `sysio.epoch::advance`: a transfer here would let the refund
+   // recipient's notify handler abort `advance`, and because the drain's `q.erase()` rolls back
+   // with the transaction the offending queue row would survive and re-block every later epoch.
+   credit_wire_claim(get_self(), recipient, fee.net);
+   route_wire_fee(get_self(), fee, /*underwriter*/ name{});
+}
+
+void reserve::setconfig(uint32_t fee_emissions_share_bps) {
+   require_auth(get_self());
+   sysio::check(fee_emissions_share_bps <= FEE_SPLIT_TOTAL_BPS,
+                "setconfig: fee_emissions_share_bps must be <= 10000 (100% of the rewards pool)");
+
+   reservcfg_t cfg(get_self());
+   auto row = cfg.get_or_default(reserve_config{});
+   row.fee_emissions_share_bps = fee_emissions_share_bps;
+   cfg.set(row, ram_payer);
+}
+
+void reserve::setrsvfee(sysio::slug_name chain_code,
+                         sysio::slug_name token_code,
+                         sysio::slug_name reserve_code,
+                         uint32_t        owner_fee_bps) {
+   reserves_t tbl(get_self());
+   auto pk = make_key(chain_code, token_code, reserve_code);
+   auto it = tbl.find(pk);
+   sysio::check(it != tbl.end(), "setrsvfee: reserve not found");
+   sysio::check(it->status == opp::types::RESERVE_STATUS_ACTIVE,
+                "setrsvfee: reserve is not ACTIVE");
+   // A bootstrap-seeded public reserve has no owner, so nobody can authorize a
+   // fee on it — which is exactly the guard that stops WIRE accruing with no
+   // claimant. `require_auth(name{})` would abort with a confusing message, so
+   // say why first.
+   sysio::check(it->owner.value != 0, "setrsvfee: reserve has no owner");
+   require_auth(it->owner);
+
+   // 0 disables the fee; anything else must clear the dust floor and stay below
+   // the 99% ceiling that keeps a positive remainder on the WIRE leg.
+   sysio::check(owner_fee_bps == 0 ||
+                   (owner_fee_bps >= MIN_OWNER_FEE_BPS && owner_fee_bps <= MAX_OWNER_FEE_BPS),
+                "setrsvfee: owner_fee_bps must be 0 or within [1, 9900]");
+
+   tbl.modify(ram_payer, pk, [&](auto& row) { row.owner_fee_bps = owner_fee_bps; });
+}
+
+uint64_t reserve::rsvfeebal(sysio::slug_name chain_code,
+                             sysio::slug_name token_code,
+                             sysio::slug_name reserve_code) {
+   reserves_t tbl(get_self());
+   auto it = tbl.find(make_key(chain_code, token_code, reserve_code));
+   return it == tbl.end() ? 0 : it->owner_fee_accrued;
+}
+
+void reserve::claimrsvfee(sysio::slug_name chain_code,
+                           sysio::slug_name token_code,
+                           sysio::slug_name reserve_code) {
+   reserves_t tbl(get_self());
+   auto pk = make_key(chain_code, token_code, reserve_code);
+   auto it = tbl.find(pk);
+   sysio::check(it != tbl.end(), "claimrsvfee: reserve not found");
+   sysio::check(it->owner.value != 0, "claimrsvfee: reserve has no owner");
+   require_auth(it->owner);
+
+   const uint64_t amount = it->owner_fee_accrued;
+   const name     owner  = it->owner;
+   sysio::check(amount > 0, "claimrsvfee: no unclaimed balance");
+
+   // Zero the accounting balance first, then move the backing WIRE out of
+   // custody. `owner_fee_lifetime` is a cumulative audit total — never reduced.
+   tbl.modify(ram_payer, pk, [&](auto& row) { row.owner_fee_accrued = 0; });
 
    action(
       permission_level{get_self(), "active"_n},
       TOKEN_ACCOUNT, "transfer"_n,
-      std::make_tuple(get_self(), recipient,
-         asset(static_cast<int64_t>(fee.net), WIRE_SYMBOL),
-         std::string("sysio.reserv::refundwire swap-from-WIRE refund"))
+      std::make_tuple(get_self(), owner,
+         asset(static_cast<int64_t>(amount), WIRE_SYMBOL),
+         std::string("sysio.reserv::reserve owner fee claim"))
    ).send();
-   route_wire_fee(get_self(), fee);
+}
+
+uint64_t reserve::uwfeebal(sysio::name underwriter) {
+   uwfees_t uwf(get_self());
+   auto it = uwf.find(uw_fee_key{underwriter});
+   return it == uwf.end() ? 0 : it->balance;
+}
+
+void reserve::claimuwfee(sysio::name underwriter) {
+   // Only the earner may sweep their own accrual. There is no depot-side push:
+   // an underwriter claims when they choose, and a dormant one costs the chain
+   // nothing.
+   require_auth(underwriter);
+
+   uwfees_t uwf(get_self());
+   uw_fee_key key{underwriter};
+   auto it = uwf.find(key);
+   sysio::check(it != uwf.end(), "claimuwfee: no accrued swap fees for this underwriter");
+
+   const uint64_t amount = it->balance;
+   sysio::check(amount > 0, "claimuwfee: no unclaimed balance");
+
+   // Zero the accounting balance first, then move the backing WIRE out of
+   // custody. The row is retained at zero so the lifetime audit totals survive.
+   uwf.modify(ram_payer, key, [&](auto& row) {
+      row.balance = 0;
+      add_capped_u64(row.lifetime_claimed, amount);
+   });
+
+   action(
+      permission_level{get_self(), "active"_n},
+      TOKEN_ACCOUNT, "transfer"_n,
+      std::make_tuple(get_self(), underwriter,
+         asset(static_cast<int64_t>(amount), WIRE_SYMBOL),
+         std::string("sysio.reserv::underwriter swap-fee claim"))
+   ).send();
+}
+
+void reserve::claimwire(sysio::name account) {
+   require_auth(account);
+
+   reserve::wireclaims_t claims(get_self());
+   const auto pk = reserve::wireclaim_key{account.value};
+
+   // Enforce the retention deadline HERE, not just in the sweep. The sweep is bounded and
+   // best-effort, so a row can outlive its expiry by an arbitrary number of epochs while it waits
+   // its turn; without this check the deadline would mean "swept eventually" rather than
+   // "claimable until". Refusing tells the caller the row is forfeit instead of paying a claim the
+   // retention policy already extinguished, and the sweep still reclaims the WIRE.
+   auto it = claims.find(pk);
+   if (it != claims.end() && it->expires_at_sec != 0) {
+      const uint32_t now_sec = static_cast<uint32_t>(current_time_point().sec_since_epoch());
+      sysio::check(now_sec < it->expires_at_sec,
+                   "claimwire: this claim expired and is pending sweep to the treasury");
+   }
+
+   sysio::opp::claimable::pay_out(
+      claims, pk, get_self(), TOKEN_ACCOUNT,
+      account, WIRE_SYMBOL, std::string("sysio.reserv::claimwire payout"),
+      "no claimable WIRE for this account");
+}
+
+void reserve::sweepclaims(uint32_t max_rows) {
+   // Two valid callers, mirroring `sysio.uwrit::chklocks`:
+   //   * sysio.epoch::advance — inlined every epoch with MAX_CLAIM_SWEEP_PER_EPOCH.
+   //   * sysio.reserv — manual drain with a caller-chosen budget.
+   sysio::check(has_auth(EPOCH_ACCOUNT) || has_auth(get_self()),
+                "sweepclaims requires sysio.epoch or sysio.reserv authority");
+   if (max_rows == 0) return;
+
+   sweep_expired_wire_claims(get_self(),
+                             static_cast<uint32_t>(current_time_point().sec_since_epoch()),
+                             max_rows);
 }
 
 } // namespace sysio

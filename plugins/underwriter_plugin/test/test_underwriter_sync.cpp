@@ -1,7 +1,7 @@
 /**
  * @file test_underwriter_sync.cpp
  * @brief Unit tests for the underwriter plugin's sync-gate lifecycle surface —
- *        the `/v1/underwriter/*` gate payloads served until the deferred startup
+ *        the `/v1/underwriter/` gate payloads served until the deferred startup
  *        completes, and the terminal-failure classification behind the fail-fast
  *        shutdown. The sync predicate itself is the first-class chain_plugin
  *        gate; its tests live in `plugins/chain_plugin/test/test_sync_gate.cpp`.

@@ -345,6 +345,19 @@ namespace sysio {
       [[sysio::action]]
       void terminate(name account, std::string reason);
 
+      /// Auth = the claiming operator. Pull CORE_SYM collateral credited by a WIRE-chain remit
+      /// (withdraw flush, deferred lock release, or termination payout) in a single transfer.
+      ///
+      /// The remit paths credit rather than transfer because they are reachable from
+      /// `sysio.epoch::advance`, which must never abort; see `remitclaims`. This is the only place
+      /// such a balance becomes a transfer, and it carries the operator's own authority, so a
+      /// hostile transfer-notify handler blocks nothing but this caller's own claim.
+      ///
+      /// Independent of the operator row: `prune` may have erased a settled TERMINATED operator,
+      /// and the collateral remains claimable regardless.
+      [[sysio::action]]
+      void claimremit(name account);
+
       /// Prune terminated operator rows, plus delivery-log rows that have aged
       /// out of the rolling termination window. Permissionless.
       ///
@@ -522,6 +535,67 @@ namespace sysio {
       using dellog_t = sysio::kv::table<"dellog"_n, delivery_key, delivery_log_entry,
          sysio::kv::index<"byaccountts"_n,
             sysio::const_mem_fun<delivery_log_entry, uint128_t, &delivery_log_entry::by_account_ts>>
+      >;
+
+      /// Claimable CORE_SYM collateral owed to an operator by a WIRE-chain remit: a withdraw
+      /// flush (`flushwtdw`), a deferred lock release on a TERMINATED operator, or the
+      /// termination payout itself.
+      ///
+      /// All three are reachable from `sysio.epoch::advance` (flush by epoch, termination via
+      /// `termcheck`), which must never abort. A pushed `sysio.token::transfer` notifies the
+      /// operator, so an operator carrying a hostile notify handler could abort `advance` and halt
+      /// epoch advancement chain-wide -- and in the termination case would be blocking its own
+      /// removal, so the retry never converges. Crediting here and paying out from `claimremit`
+      /// puts the transfer under the operator's own authority instead.
+      ///
+      /// No expiry: this is returned collateral, held until claimed.
+      ///
+      /// The operator set is registered and bounded only CONCURRENTLY, not across this table's
+      /// lifetime — a terminated operator that never calls `claimremit` leaves a row billed to the
+      /// sysio RAM pool even after `prune` removes its operator record, so storage grows with
+      /// historical operators rather than with the live set. Accepted here for the same reason as
+      /// `sysio.system::payclaims`: forfeiting returned collateral is an economic decision, not a
+      /// RAM one. (Contrast `sysio.reserv::wireclaims`, whose recipient set is unbounded AND
+      /// caller-influenced, and which pays for its sweep with forfeiture.)
+      ///
+      /// The row therefore carries `expires_at_sec` and an expiry-ordered index NOW, even though
+      /// nothing reads them yet. Landing the schema is free before launch and expensive after it;
+      /// wiring the sweep is the part that needs a decision, so the two are deliberately
+      /// separated. `credit` maintains the stamp, so WIRE-339 inherits real age data rather than a
+      /// table that starts counting from the day the field is added.
+      ///
+      /// NOTHING EXPIRES TODAY: no `claimable::sweep_expired` call is wired against this table.
+      /// `REMIT_CLAIM_WINDOW_SEC` is the provisional window the stamp is computed from, not a
+      /// commitment — whether returned collateral should be forfeited at all is open in WIRE-339.
+      struct remitclaim_key {
+         uint64_t account;
+         SYSLIB_SERIALIZE(remitclaim_key, (account))
+      };
+
+      /// Provisional retention window used only to compute `remit_claim::expires_at_sec`. Mirrors
+      /// `sysio.reserv::WIRE_CLAIM_WINDOW_SEC` so the claimable tables age on one scale; revisited
+      /// when (and if) a sweep is wired.
+      static constexpr uint32_t REMIT_CLAIM_WINDOW_SEC = 365 * 24 * 60 * 60;
+
+      struct [[sysio::table("remitclaims")]] remit_claim {
+         sysio::name account;
+         uint64_t    balance        = 0;   // atomic CORE_SYM units owed, not yet claimed
+         uint32_t    expires_at_sec = 0;   // recorded by `credit`; read by nothing yet (WIRE-339)
+
+         /// Expiry-major composite so the secondary index orders by expiry and a future retention
+         /// sweep can stop at the first live row. The account tail only breaks ties, keeping the
+         /// key unique when many rows share an expiry second. (Same shape as
+         /// `sysio.reserv::wire_claim`.)
+         uint128_t by_expiry() const {
+            return (static_cast<uint128_t>(expires_at_sec) << 64) | account.value;
+         }
+
+         SYSLIB_SERIALIZE(remit_claim, (account)(balance)(expires_at_sec))
+      };
+
+      using remitclaims_t = sysio::kv::table<"remitclaims"_n, remitclaim_key, remit_claim,
+         sysio::kv::index<"byexpiry"_n,
+            sysio::const_mem_fun<remit_claim, uint128_t, &remit_claim::by_expiry>>
       >;
 
       /// Singleton holding the next-issued `request_id` / `log_id`. Keeps

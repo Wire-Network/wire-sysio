@@ -3,6 +3,7 @@
 #include <sysio/chain/abi_serializer.hpp>
 #include <sysio/chain/kv_table_objects.hpp>
 #include <sysio/opp/opp.hpp>
+#include <sysio.opp.common/amm_math.hpp>
 
 #include <fc/variant_object.hpp>
 #include <fc/slug_name.hpp>
@@ -51,13 +52,17 @@ public:
    static constexpr auto AUTHEX_ACCOUNT  = "sysio.authex"_n;
    static constexpr auto CHAINS_ACCOUNT  = "sysio.chains"_n;
    static constexpr auto SYSIO_ACCOUNT   = "sysio"_n;
+   /// Stand-in for a swap's winning underwriter — the account the settlement
+   /// actions accrue the underwriter half of the fee to.
+   static constexpr auto UNDERWRITER_ACCOUNT = "underwriter1"_n;
 
    sysio_reserve_tester() {
       produce_blocks(2);
       // sysio.authex is pre-created by the tester boot (account linking) —
       // creating it again would collide.
       create_accounts({RESERVE_ACCOUNT, MSGCH_ACCOUNT, UWRIT_ACCOUNT,
-                       TOKEN_ACCOUNT, CHAINS_ACCOUNT, "alice"_n});
+                       TOKEN_ACCOUNT, CHAINS_ACCOUNT, "alice"_n,
+                       UNDERWRITER_ACCOUNT});
       produce_blocks(2);
 
       set_code(RESERVE_ACCOUNT, contracts::reserve_wasm());
@@ -158,6 +163,26 @@ public:
       }
    }
 
+   /// `swapquote` is a read-only action whose ANSWER is its return value.
+   /// `push_action` above discards the transaction trace and yields only
+   /// `success()`, so a test written against it passes even when the quote
+   /// ignores every fee. Decode the action return value instead.
+   uint64_t swapquote_value(std::string_view from_chain, std::string_view from_token,
+                            std::string_view from_reserve, uint64_t from_amount,
+                            std::string_view to_chain, std::string_view to_token,
+                            std::string_view to_reserve) {
+      auto trace = tester::push_action(RESERVE_ACCOUNT, "swapquote"_n, RESERVE_ACCOUNT, mvo()
+         ("from_chain_code",   codename_mvo(from_chain))
+         ("from_token_code",   codename_mvo(from_token))
+         ("from_reserve_code", codename_mvo(from_reserve))
+         ("from_amount",       from_amount)
+         ("to_chain_code",     codename_mvo(to_chain))
+         ("to_token_code",     codename_mvo(to_token))
+         ("to_reserve_code",   codename_mvo(to_reserve)));
+      BOOST_REQUIRE(trace && !trace->action_traces.empty());
+      return fc::raw::unpack<uint64_t>(trace->action_traces[0].return_value);
+   }
+
    // ── SlugName helpers (v6) ──
 
    static fc::slug_name cn(std::string_view s) { return fc::slug_name{s}; }
@@ -200,11 +225,50 @@ public:
       return bal.get_amount();
    }
 
+   /// Read `underwriter`'s `uwfees` accrual row. Null when they have never
+   /// earned a swap fee (no row is created until the first accrual).
+   fc::variant get_uwfees(name underwriter) {
+      auto data = get_row_by_account(RESERVE_ACCOUNT, RESERVE_ACCOUNT, "uwfees"_n, underwriter);
+      return data.empty() ? fc::variant() : abi_ser.binary_to_variant(
+         "uw_fee_row", data, abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
    /// Read the `rewards_bucket` singleton (kv::global). Null when never accrued.
    fc::variant get_rewardbkt() {
       auto data = get_row_by_account(RESERVE_ACCOUNT, RESERVE_ACCOUNT, "rewardbkt"_n, "rewardbkt"_n);
       return data.empty() ? fc::variant() : abi_ser.binary_to_variant(
          "rewards_bucket", data, abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
+   /// Claimable WIRE credited by `paywire` / `refundwire`. Null when the account is owed
+   /// nothing. `paywire` and `refundwire` credit rather than transfer, because both run on
+   /// never-throw paths where a recipient's transfer-notify handler could otherwise abort the
+   /// enclosing transaction.
+   fc::variant get_wireclaim(name account) {
+      auto data = get_row_by_account(RESERVE_ACCOUNT, RESERVE_ACCOUNT, "wireclaims"_n, account);
+      return data.empty() ? fc::variant() : abi_ser.binary_to_variant(
+         "wire_claim", data, abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
+   /// Claimable balance owed to `account`, or 0 when there is no row.
+   uint64_t wire_claimable(name account) {
+      auto c = get_wireclaim(account);
+      return c.is_null() ? 0u : c["balance"].as_uint64();
+   }
+
+   action_result claimwire(name account) {
+      return push_action(account, "claimwire"_n, mvo()("account", account));
+   }
+
+   /// Mirrors `sysio.reserv::MAX_CLAIM_SWEEP_PER_EPOCH` — the budget
+   /// `sysio.epoch::advance` hands the inline retention sweep.
+   static constexpr uint32_t reserve_max_claim_sweep_per_epoch = 32;
+
+   /// Drive the retention sweep directly, as the epoch tick would. Signed by the contract itself
+   /// (`sweepclaims` accepts `sysio.epoch` or self), so a test can age rows out without standing
+   /// up the epoch machinery.
+   action_result sweepclaims(uint32_t max_rows) {
+      return push_action(RESERVE_ACCOUNT, "sweepclaims"_n, mvo()("max_rows", max_rows));
    }
 
    /// Walk every row in `sysio.reserv::reserves` (KV-keyed by checksum256)
@@ -386,6 +450,29 @@ BOOST_FIXTURE_TEST_CASE(regreserve_seeds_private_reserve, sysio_reserve_tester) 
    BOOST_REQUIRE(!r.is_null());
    BOOST_REQUIRE_EQUAL(true,    r["is_private"].as_bool());
    BOOST_REQUIRE_EQUAL("alice", r["owner"].as_string());
+} FC_LOG_AND_RETHROW() }
+
+// `name` and `description` persist into a reserve row billed to `ram_payer = sysio` — the
+// shared system pool — so both are bounded before emplace, via the same
+// `sysio::opp::registry::check_metadata` the chains and tokens registries use. CertiK WNS-10
+// raised the unbounded pair on `sysio.tokens::regtoken`; it was identical here.
+//
+// `regreserve` is privileged and abort-safe, so it enforces the bound with `check_metadata`.
+// The post-bootstrap `oncrtreserve` path must never abort and instead routes an over-bound
+// row into the existing cancel/refund flow — see `oncrtreserve_oversized_metadata_is_cancelled`.
+BOOST_FIXTURE_TEST_CASE(regreserve_bounds_metadata, sysio_reserve_tester) { try {
+   BOOST_REQUIRE(regreserve("ETH", "ETH", "PRIMARY", 100, 100, 5000, false, name{},
+                            std::string(129, 'x'))
+      .find("label exceeds 128 bytes") != std::string::npos);
+
+   BOOST_REQUIRE(regreserve("ETH", "ETH", "PRIMARY", 100, 100, 5000, false, name{},
+                            "ok", std::string(257, 'x'))
+      .find("description exceeds 256 bytes") != std::string::npos);
+
+   // The bounds are inclusive, and neither rejection claimed the reserve key.
+   BOOST_REQUIRE_EQUAL(success(),
+      regreserve("ETH", "ETH", "PRIMARY", 100, 100, 5000, false, name{},
+                 std::string(128, 'x'), std::string(256, 'x')));
 } FC_LOG_AND_RETHROW() }
 
 // ── oncrtreserve (create gating) ──
@@ -601,6 +688,80 @@ BOOST_FIXTURE_TEST_CASE(oncrtreserve_invalid_amount_is_cancelled, sysio_reserve_
    BOOST_REQUIRE_EQUAL("RESERVE_STATUS_CANCELLED", r["status"].as_string());
 } FC_LOG_AND_RETHROW() }
 
+// The same `sysio`-billed metadata bound `regreserve` enforces, applied to the inbound
+// creation path. `oncrtreserve` is an OPP dispatch handler, so it must NOT `check()` —
+// aborting here rolls back the consensus-tipping delivery and stalls epoch advancement
+// chain-wide (feedback_opp_handlers_never_throw / epoch-stall-is-fatal). An over-bound
+// string therefore joins `invalid_amount` and the unlinked-creator case on the existing
+// reject predicate, releasing the creator's escrow via RESERVE_CREATE_CANCELLED.
+//
+// The creator here is properly LINKED with a valid amount, so the metadata is the sole
+// rejection reason. The tombstone is itself a `sysio`-billed row, so the over-bound strings
+// are replaced by a fixed marker rather than carried onto it. Both an ASCII and a MULTIBYTE
+// over-bound label are covered: because nothing is truncated there is no code-point boundary
+// to split, so neither can leave malformed text in state. A third case drives the OTHER half
+// of `metadata_exceeds_bounds` — an over-bound `description` behind an in-bound name — so
+// each side of the predicate is exercised independently rather than only via the label.
+BOOST_FIXTURE_TEST_CASE(oncrtreserve_oversized_metadata_is_cancelled, sysio_reserve_tester) { try {
+   deploy_authex();
+
+   auto creator_priv = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em);
+   auto creator_pub  = creator_priv.get_public_key();
+   BOOST_REQUIRE_EQUAL(success(),
+      recordlink_em("alice"_n, ChainKind::CHAIN_KIND_EVM, creator_pub));
+
+   auto create_with_metadata = [&](std::string_view reserve_code,
+                                   const std::string& name,
+                                   const std::string& description) {
+      return push_action(MSGCH_ACCOUNT, "oncrtreserve"_n, mvo()
+         ("chain_code",            codename_mvo("ETH"))
+         ("token_code",            codename_mvo("ETH"))
+         ("reserve_code",          codename_mvo(reserve_code))
+         ("name",                  name)
+         ("description",           description)
+         ("external_token_amount", 1000)
+         ("requested_wire_amount", 1000)
+         ("source_token_precision", 9u)
+         ("connector_weight_bps",  5000)
+         ("creator_chain_kind",    ChainKind::CHAIN_KIND_EVM)
+         ("creator_chain_addr",    std::vector<char>(20, '\x01'))
+         ("is_private",            false)
+         ("creator_pub_key",       em_pubkey_bytes(creator_pub)));   // linked key
+   };
+
+   // 129 ASCII bytes — one over label_max_bytes.
+   BOOST_REQUIRE_EQUAL(success(), create_with_metadata("USERRES", std::string(129, 'x'), ""));
+   auto ascii_row = find_reserve("ETH", "ETH", "USERRES");
+   BOOST_REQUIRE(!ascii_row.is_null());
+   BOOST_REQUIRE_EQUAL("RESERVE_STATUS_CANCELLED", ascii_row["status"].as_string());
+   BOOST_REQUIRE_EQUAL("<rejected>", ascii_row["name"].as_string());
+
+   // 129 bytes as 127 ASCII + `é` (0xC3 0xA9) — a byte-wise truncation at the bound would
+   // have split the final character and persisted a lone lead byte. The marker sidesteps
+   // that entirely: nothing is truncated, so there is no code-point boundary to get wrong.
+   const std::string multibyte_name = std::string(127, 'x') + "\xC3\xA9";
+   BOOST_REQUIRE_EQUAL(129u, multibyte_name.size());
+   BOOST_REQUIRE_EQUAL(success(), create_with_metadata("USERRES2", multibyte_name, ""));
+   auto multibyte_row = find_reserve("ETH", "ETH", "USERRES2");
+   BOOST_REQUIRE(!multibyte_row.is_null());
+   BOOST_REQUIRE_EQUAL("RESERVE_STATUS_CANCELLED", multibyte_row["status"].as_string());
+   BOOST_REQUIRE_EQUAL("<rejected>", multibyte_row["name"].as_string());
+
+   // 257 bytes — one over description_max_bytes — behind an in-bound name. This is the
+   // `description` half of `metadata_exceeds_bounds`: the label alone would have passed, so
+   // the description is the sole rejection reason. The tombstone drops the over-bound text
+   // rather than carrying it onto a `sysio`-billed row, so the stored description is empty
+   // while the name still reads as the rejection marker.
+   const std::string oversized_description(257, 'd');
+   BOOST_REQUIRE_EQUAL(success(),
+      create_with_metadata("USERRES3", "in-bound name", oversized_description));
+   auto description_row = find_reserve("ETH", "ETH", "USERRES3");
+   BOOST_REQUIRE(!description_row.is_null());
+   BOOST_REQUIRE_EQUAL("RESERVE_STATUS_CANCELLED", description_row["status"].as_string());
+   BOOST_REQUIRE_EQUAL("<rejected>", description_row["name"].as_string());
+   BOOST_REQUIRE_EQUAL("", description_row["description"].as_string());
+} FC_LOG_AND_RETHROW() }
+
 // ── matchreserve (gating preconditions) ──
 
 BOOST_FIXTURE_TEST_CASE(matchreserve_rejects_unknown_reserve, sysio_reserve_tester) { try {
@@ -640,6 +801,7 @@ BOOST_FIXTURE_TEST_CASE(applyswap_requires_uwrit_auth, sysio_reserve_tester) { t
       ("dst_token_code",   codename_mvo("SOL"))
       ("dst_reserve_code", codename_mvo("PRIMARY"))
       ("dst_amount",       50)
+      ("underwriter",      "underwriter1")
    ).find("missing authority of sysio.uwrit") != std::string::npos);
 } FC_LOG_AND_RETHROW() }
 
@@ -658,7 +820,8 @@ BOOST_FIXTURE_TEST_CASE(applyswap_applies_four_legs, sysio_reserve_tester) { try
       ("dst_chain_code",   codename_mvo("SOLANA"))
       ("dst_token_code",   codename_mvo("SOL"))
       ("dst_reserve_code", codename_mvo("PRIMARY"))
-      ("dst_amount",       50)));
+      ("dst_amount",       50)
+      ("underwriter",      "underwriter1")));
 
    auto src = find_reserve("ETH", "ETH", "PRIMARY");
    auto dst = find_reserve("SOLANA", "SOL", "PRIMARY");
@@ -693,7 +856,8 @@ BOOST_FIXTURE_TEST_CASE(applyswap_rejects_debit_above_curve_output, sysio_reserv
          ("dst_chain_code",   codename_mvo("SOLANA"))
          ("dst_token_code",   codename_mvo("SOL"))
          ("dst_reserve_code", codename_mvo("PRIMARY"))
-         ("dst_amount",       dst_amount));
+         ("dst_amount",       dst_amount)
+         ("underwriter",      "underwriter1"));
    };
 
    // One subunit over — refused. A grossly-inflated amount (the drain shape)
@@ -720,7 +884,7 @@ BOOST_FIXTURE_TEST_CASE(applyswap_charges_fee_and_routes_50_50, sysio_reserve_te
    const int64_t resv_before  = wire_balance(RESERVE_ACCOUNT);
 
    // w_gross = cp_output(1e12, 1e12, 1e9) = 999'000'999 (50/50 = constant product).
-   // fee = 999'000'999 * 10 / 10000 = 999'000 ; reward = emis = 499'500 ;
+   // fee = 999'000'999 * 10 / 10000 = 999'000 ; underwriter = reward = 499'500 ;
    // net = 999'000'999 - 999'000 = 998'001'999.
    BOOST_REQUIRE_EQUAL(success(), push_action(UWRIT_ACCOUNT, "applyswap"_n, mvo()
       ("src_chain_code",   codename_mvo("ETH"))
@@ -730,7 +894,8 @@ BOOST_FIXTURE_TEST_CASE(applyswap_charges_fee_and_routes_50_50, sysio_reserve_te
       ("dst_chain_code",   codename_mvo("SOLANA"))
       ("dst_token_code",   codename_mvo("SOL"))
       ("dst_reserve_code", codename_mvo("PRIMARY"))
-      ("dst_amount",       100'000'000ULL)));
+      ("dst_amount",       100'000'000ULL)
+      ("underwriter",      "underwriter1")));
 
    auto src = find_reserve("ETH", "ETH", "PRIMARY");
    auto dst = find_reserve("SOLANA", "SOL", "PRIMARY");
@@ -740,18 +905,410 @@ BOOST_FIXTURE_TEST_CASE(applyswap_charges_fee_and_routes_50_50, sysio_reserve_te
    BOOST_REQUIRE_EQUAL(1'000'000'000'000ULL + 1'000'000'000ULL, src["reserve_chain_amount"].as_uint64());
    BOOST_REQUIRE_EQUAL(1'000'000'000'000ULL - 100'000'000ULL,   dst["reserve_chain_amount"].as_uint64());
 
-   // Fee routed 50/50: reward half accrues in the bucket (stays in custody),
-   // emissions half is transferred to `sysio`.
+   // Fee split 50/50: half accrues to the winning underwriter's claimable row,
+   // half to the batch-operator rewards bucket.
+   auto uwf = get_uwfees(UNDERWRITER_ACCOUNT);
+   BOOST_REQUIRE_EQUAL(499'500ULL, uwf["balance"].as_uint64());
+   BOOST_REQUIRE_EQUAL(499'500ULL, uwf["lifetime_accrued"].as_uint64());
+   BOOST_REQUIRE_EQUAL(0ULL,       uwf["lifetime_claimed"].as_uint64());
+
    auto bkt = get_rewardbkt();
    BOOST_REQUIRE_EQUAL(499'500ULL, bkt["balance"].as_uint64());
    BOOST_REQUIRE_EQUAL(499'500ULL, bkt["lifetime_accrued"].as_uint64());
-   BOOST_REQUIRE_EQUAL(sysio_before + 499'500, wire_balance(SYSIO_ACCOUNT));   // emissions half left custody
-   BOOST_REQUIRE_EQUAL(resv_before  - 499'500, wire_balance(RESERVE_ACCOUNT)); // only emissions half left
+
+   // BOTH halves stay in reserv custody — no part of a swap fee reaches the
+   // emissions treasury, so neither real balance moves at settlement.
+   BOOST_REQUIRE_EQUAL(sysio_before, wire_balance(SYSIO_ACCOUNT));
+   BOOST_REQUIRE_EQUAL(resv_before,  wire_balance(RESERVE_ACCOUNT));
 } FC_LOG_AND_RETHROW() }
 
-// ── drainrewards: sweep the accrued rewards half to the emissions treasury ──
+BOOST_FIXTURE_TEST_CASE(setconfig_emissions_share_routes_pool_to_treasury, sysio_reserve_tester) { try {
+   // Stage 2 of the split is a governance dial: a non-zero
+   // `fee_emissions_share_bps` diverts that share of the REWARDS POOL (the half
+   // left after the underwriter's cut) out of custody to the `sysio` treasury.
+   BOOST_REQUIRE(push_action("alice"_n, "setconfig"_n, mvo()("fee_emissions_share_bps", 5000))
+      .find("missing authority of sysio.reserv") != std::string::npos);
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: setconfig: fee_emissions_share_bps must be <= 10000 (100% of the rewards pool)"),
+      push_action(RESERVE_ACCOUNT, "setconfig"_n, mvo()("fee_emissions_share_bps", 10001)));
+
+   // Send the WHOLE rewards pool to the treasury so the split is unambiguous.
+   BOOST_REQUIRE_EQUAL(success(), push_action(RESERVE_ACCOUNT, "setconfig"_n,
+      mvo()("fee_emissions_share_bps", 10000)));
+
+   BOOST_REQUIRE_EQUAL(success(),
+      regreserve("ETH", "ETH", "PRIMARY", 1'000'000'000'000ULL, 1'000'000'000'000ULL));
+   BOOST_REQUIRE_EQUAL(success(),
+      regreserve("SOLANA", "SOL", "PRIMARY", 1'000'000'000'000ULL, 1'000'000'000'000ULL));
+
+   const int64_t sysio_before = wire_balance(SYSIO_ACCOUNT);
+   const int64_t resv_before  = wire_balance(RESERVE_ACCOUNT);
+
+   // Same swap as the 50/50 test: fee 999'000, underwriter 499'500, pool 499'500.
+   BOOST_REQUIRE_EQUAL(success(), push_action(UWRIT_ACCOUNT, "applyswap"_n, mvo()
+      ("src_chain_code",   codename_mvo("ETH"))
+      ("src_token_code",   codename_mvo("ETH"))
+      ("src_reserve_code", codename_mvo("PRIMARY"))
+      ("src_amount",       1'000'000'000ULL)
+      ("dst_chain_code",   codename_mvo("SOLANA"))
+      ("dst_token_code",   codename_mvo("SOL"))
+      ("dst_reserve_code", codename_mvo("PRIMARY"))
+      ("dst_amount",       100'000'000ULL)
+      ("underwriter",      "underwriter1")));
+
+   // The underwriter's half is untouched by this dial and stays in custody.
+   BOOST_REQUIRE_EQUAL(499'500ULL, get_uwfees(UNDERWRITER_ACCOUNT)["balance"].as_uint64());
+   // The whole pool went to the treasury instead of the rewards bucket, and it
+   // is the ONLY part of the fee that left custody.
+   BOOST_REQUIRE(get_rewardbkt().is_null());
+   BOOST_REQUIRE_EQUAL(sysio_before + 499'500, wire_balance(SYSIO_ACCOUNT));
+   BOOST_REQUIRE_EQUAL(resv_before  - 499'500, wire_balance(RESERVE_ACCOUNT));
+} FC_LOG_AND_RETHROW() }
+
+// ── Reserve OWNER fee: per-reserve rate, accrual, and owner claim (WIRE-281) ──
+
+BOOST_FIXTURE_TEST_CASE(setrsvfee_guards_owner_status_and_bounds, sysio_reserve_tester) { try {
+   // Owner-less (bootstrap-seeded) reserve: nobody can authorize a fee, so no
+   // WIRE can ever accrue with no claimant.
+   BOOST_REQUIRE_EQUAL(success(), regreserve("ETH", "ETH", "PRIMARY", 1000, 1000));
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: setrsvfee: reserve has no owner"),
+      push_action(RESERVE_ACCOUNT, "setrsvfee"_n, mvo()
+         ("chain_code", codename_mvo("ETH"))("token_code", codename_mvo("ETH"))
+         ("reserve_code", codename_mvo("PRIMARY"))("owner_fee_bps", 100)));
+
+   // An OWNED reserve: only the owner may set the fee.
+   BOOST_REQUIRE_EQUAL(success(),
+      regreserve("SOLANA", "SOL", "PRIMARY", 1000, 1000, 5000, false, "alice"_n));
+   auto setFee = [&](name signer, uint32_t bps) {
+      return push_action(signer, "setrsvfee"_n, mvo()
+         ("chain_code", codename_mvo("SOLANA"))("token_code", codename_mvo("SOL"))
+         ("reserve_code", codename_mvo("PRIMARY"))("owner_fee_bps", bps));
+   };
+   BOOST_REQUIRE(setFee(UNDERWRITER_ACCOUNT, 100).find("missing authority of alice") != std::string::npos);
+
+   // 0 disables; the [1, 9900] band is accepted at both ends; past 99% rejected.
+   BOOST_REQUIRE_EQUAL(success(), setFee("alice"_n, 0));
+   produce_block();
+   BOOST_REQUIRE_EQUAL(success(), setFee("alice"_n, 1));
+   produce_block();
+   BOOST_REQUIRE_EQUAL(success(), setFee("alice"_n, 9900));
+   produce_block();
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: setrsvfee: owner_fee_bps must be 0 or within [1, 9900]"),
+      setFee("alice"_n, 9901));
+
+   // Unknown reserve fails before any auth work.
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: setrsvfee: reserve not found"),
+      push_action("alice"_n, "setrsvfee"_n, mvo()
+         ("chain_code", codename_mvo("ETH"))("token_code", codename_mvo("NOPE"))
+         ("reserve_code", codename_mvo("PRIMARY"))("owner_fee_bps", 10)));
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(applyswap_charges_both_reserve_owner_fees, sysio_reserve_tester) { try {
+   // Jonathan, 2026-08-04: "per reserve" — a chain-to-chain swap pays 3 fees,
+   // two reserve owners plus the network.
+   BOOST_REQUIRE_EQUAL(success(),
+      regreserve("ETH", "ETH", "PRIMARY", 1'000'000'000'000ULL, 1'000'000'000'000ULL,
+                 5000, false, "alice"_n));
+   BOOST_REQUIRE_EQUAL(success(),
+      regreserve("SOLANA", "SOL", "PRIMARY", 1'000'000'000'000ULL, 1'000'000'000'000ULL,
+                 5000, false, UNDERWRITER_ACCOUNT));
+
+   // src 100 bps (1%), dst 200 bps (2%) on the same WIRE leg.
+   BOOST_REQUIRE_EQUAL(success(), push_action("alice"_n, "setrsvfee"_n, mvo()
+      ("chain_code", codename_mvo("ETH"))("token_code", codename_mvo("ETH"))
+      ("reserve_code", codename_mvo("PRIMARY"))("owner_fee_bps", 100)));
+   BOOST_REQUIRE_EQUAL(success(), push_action(UNDERWRITER_ACCOUNT, "setrsvfee"_n, mvo()
+      ("chain_code", codename_mvo("SOLANA"))("token_code", codename_mvo("SOL"))
+      ("reserve_code", codename_mvo("PRIMARY"))("owner_fee_bps", 200)));
+
+   const int64_t resv_before = wire_balance(RESERVE_ACCOUNT);
+
+   // w_gross = 999'000'999. network 10bps = 999'000; src 1% = 9'990'009;
+   // dst 2% = 19'980'019; net = w_gross - (999'000 + 9'990'009 + 19'980'019).
+   BOOST_REQUIRE_EQUAL(success(), push_action(UWRIT_ACCOUNT, "applyswap"_n, mvo()
+      ("src_chain_code",   codename_mvo("ETH"))
+      ("src_token_code",   codename_mvo("ETH"))
+      ("src_reserve_code", codename_mvo("PRIMARY"))
+      ("src_amount",       1'000'000'000ULL)
+      ("dst_chain_code",   codename_mvo("SOLANA"))
+      ("dst_token_code",   codename_mvo("SOL"))
+      ("dst_reserve_code", codename_mvo("PRIMARY"))
+      ("dst_amount",       100'000'000ULL)
+      ("underwriter",      "underwriter1")));
+
+   auto src = find_reserve("ETH", "ETH", "PRIMARY");
+   auto dst = find_reserve("SOLANA", "SOL", "PRIMARY");
+   BOOST_REQUIRE_EQUAL(9'990'009ULL,  src["owner_fee_accrued"].as_uint64());
+   BOOST_REQUIRE_EQUAL(9'990'009ULL,  src["owner_fee_lifetime"].as_uint64());
+   BOOST_REQUIRE_EQUAL(19'980'019ULL, dst["owner_fee_accrued"].as_uint64());
+   BOOST_REQUIRE_EQUAL(19'980'019ULL, dst["owner_fee_lifetime"].as_uint64());
+
+   // Destination liquidity is the leg minus ALL THREE fees.
+   const uint64_t total_fee = 999'000ULL + 9'990'009ULL + 19'980'019ULL;
+   BOOST_REQUIRE_EQUAL(1'000'000'000'000ULL + (999'000'999ULL - total_fee),
+                       dst["reserve_wire_amount"].as_uint64());
+
+   // Every fee stayed in custody — the reserve shares as accruals, the network
+   // fee as the underwriter accrual + rewards bucket.
+   BOOST_REQUIRE_EQUAL(resv_before, wire_balance(RESERVE_ACCOUNT));
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(single_reserve_paths_charge_only_their_own_side, sysio_reserve_tester) { try {
+   // A WIRE endpoint has no reserve, so only the one participating reserve
+   // charges: paywire → source, applyfromwire → destination.
+   BOOST_REQUIRE_EQUAL(success(),
+      regreserve("ETH", "ETH", "PRIMARY", 1'000'000'000'000ULL, 1'000'000'000'000ULL,
+                 5000, false, "alice"_n));
+   BOOST_REQUIRE_EQUAL(success(), push_action("alice"_n, "setrsvfee"_n, mvo()
+      ("chain_code", codename_mvo("ETH"))("token_code", codename_mvo("ETH"))
+      ("reserve_code", codename_mvo("PRIMARY"))("owner_fee_bps", 100)));
+
+   BOOST_REQUIRE_EQUAL(success(), push_action(UWRIT_ACCOUNT, "paywire"_n, mvo()
+      ("src_chain_code",   codename_mvo("ETH"))
+      ("src_token_code",   codename_mvo("ETH"))
+      ("src_reserve_code", codename_mvo("PRIMARY"))
+      ("src_amount",       1'000'000'000ULL)
+      ("recipient",        "alice")
+      ("wire_out",         100'000'000ULL)
+      ("underwriter",      "underwriter1")));
+
+   // 1% of the 999'000'999 gross leg accrued to the source reserve's owner.
+   BOOST_REQUIRE_EQUAL(9'990'009ULL,
+                       find_reserve("ETH", "ETH", "PRIMARY")["owner_fee_accrued"].as_uint64());
+
+   // applyfromwire: the destination reserve is the only one that charges.
+   BOOST_REQUIRE_EQUAL(success(),
+      regreserve("SOLANA", "SOL", "PRIMARY", 1'000'000'000'000ULL, 1'000'000'000'000ULL,
+                 5000, false, UNDERWRITER_ACCOUNT));
+   BOOST_REQUIRE_EQUAL(success(), push_action(UNDERWRITER_ACCOUNT, "setrsvfee"_n, mvo()
+      ("chain_code", codename_mvo("SOLANA"))("token_code", codename_mvo("SOL"))
+      ("reserve_code", codename_mvo("PRIMARY"))("owner_fee_bps", 200)));
+   BOOST_REQUIRE_EQUAL(success(), push_action(UWRIT_ACCOUNT, "applyfromwire"_n, mvo()
+      ("dst_chain_code",   codename_mvo("SOLANA"))
+      ("dst_token_code",   codename_mvo("SOL"))
+      ("dst_reserve_code", codename_mvo("PRIMARY"))
+      ("wire_in",          1'000'000'000ULL)
+      ("dst_amount",       100'000'000ULL)
+      ("underwriter",      "underwriter1")));
+
+   // 2% of the 1e9 escrow. The source reserve is untouched by this swap.
+   BOOST_REQUIRE_EQUAL(20'000'000ULL,
+                       find_reserve("SOLANA", "SOL", "PRIMARY")["owner_fee_accrued"].as_uint64());
+   BOOST_REQUIRE_EQUAL(9'990'009ULL,
+                       find_reserve("ETH", "ETH", "PRIMARY")["owner_fee_accrued"].as_uint64());
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(claimrsvfee_pays_owner_and_guards_auth, sysio_reserve_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(),
+      regreserve("ETH", "ETH", "PRIMARY", 1'000'000'000'000ULL, 1'000'000'000'000ULL,
+                 5000, false, "alice"_n));
+
+   auto claim = [&](name signer) {
+      return push_action(signer, "claimrsvfee"_n, mvo()
+         ("chain_code", codename_mvo("ETH"))("token_code", codename_mvo("ETH"))
+         ("reserve_code", codename_mvo("PRIMARY")));
+   };
+   // Nothing earned yet.
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: claimrsvfee: no unclaimed balance"), claim("alice"_n));
+
+   BOOST_REQUIRE_EQUAL(success(), push_action("alice"_n, "setrsvfee"_n, mvo()
+      ("chain_code", codename_mvo("ETH"))("token_code", codename_mvo("ETH"))
+      ("reserve_code", codename_mvo("PRIMARY"))("owner_fee_bps", 100)));
+   BOOST_REQUIRE_EQUAL(success(), push_action(UWRIT_ACCOUNT, "paywire"_n, mvo()
+      ("src_chain_code",   codename_mvo("ETH"))
+      ("src_token_code",   codename_mvo("ETH"))
+      ("src_reserve_code", codename_mvo("PRIMARY"))
+      ("src_amount",       1'000'000'000ULL)
+      ("recipient",        UNDERWRITER_ACCOUNT)
+      ("wire_out",         100'000'000ULL)
+      ("underwriter",      "underwriter1")));
+
+   const int64_t alice_before = wire_balance("alice"_n),
+                 resv_before  = wire_balance(RESERVE_ACCOUNT);
+   BOOST_REQUIRE_EQUAL(9'990'009ULL,
+                       find_reserve("ETH", "ETH", "PRIMARY")["owner_fee_accrued"].as_uint64());
+
+   // Only the owner may sweep it.
+   BOOST_REQUIRE(claim(UNDERWRITER_ACCOUNT).find("missing authority of alice") != std::string::npos);
+   BOOST_REQUIRE_EQUAL(success(), claim("alice"_n));
+
+   BOOST_REQUIRE_EQUAL(alice_before + 9'990'009, wire_balance("alice"_n));
+   BOOST_REQUIRE_EQUAL(resv_before  - 9'990'009, wire_balance(RESERVE_ACCOUNT));
+
+   auto row = find_reserve("ETH", "ETH", "PRIMARY");
+   BOOST_REQUIRE_EQUAL(0ULL,          row["owner_fee_accrued"].as_uint64());
+   BOOST_REQUIRE_EQUAL(9'990'009ULL,  row["owner_fee_lifetime"].as_uint64()); // audit total survives
+
+   produce_block();
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: claimrsvfee: no unclaimed balance"), claim("alice"_n));
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(swapquote_prices_the_reserve_owner_fees, sysio_reserve_tester) { try {
+   // The read-only quote must price EXACTLY what settlement charges, reserve
+   // fees included — otherwise the variance check drifts against the books.
+   // So this asserts the DECODED quote against the shared AMM kernel, not just
+   // that the action succeeded: a quote that ignored `owner_fee_bps` entirely
+   // would still return success.
+   constexpr uint64_t POOL      = 1'000'000'000'000ULL;
+   constexpr uint32_t WEIGHT    = 5000;
+   constexpr uint64_t FROM      = 1'000'000'000ULL;
+   constexpr uint32_t OWNER_FEE = 500;   // 5%, charged by EACH side's reserve
+   // `sysio.uwrit` exists as a bare account in this fixture (no contract), so
+   // the contract's `uwrit_fee_bps()` reads the `uw_config{}` in-struct default.
+   constexpr uint32_t NETWORK_FEE_BPS = 10;
+
+   BOOST_REQUIRE_EQUAL(success(),
+      regreserve("ETH", "ETH", "PRIMARY", POOL, POOL, WEIGHT, false, "alice"_n));
+   BOOST_REQUIRE_EQUAL(success(),
+      regreserve("SOLANA", "SOL", "PRIMARY", POOL, POOL, WEIGHT, false, UNDERWRITER_ACCOUNT));
+
+   /// The kernel's answer for these pools at a given pair of reserve fees.
+   auto expected = [&](uint32_t src_fee, uint32_t dst_fee) {
+      return opp::amm::quote_swap(/*src_is_wire*/false, POOL, POOL, WEIGHT,
+                                  /*dst_is_wire*/false, POOL, POOL, WEIGHT,
+                                  FROM, NETWORK_FEE_BPS, src_fee, dst_fee);
+   };
+
+   // Fee-free baseline: network fee only.
+   const uint64_t before = swapquote_value("ETH", "ETH", "PRIMARY", FROM,
+                                           "SOLANA", "SOL", "PRIMARY");
+   BOOST_REQUIRE_GT(before, 0u);
+   BOOST_CHECK_EQUAL(before, expected(0, 0));
+
+   BOOST_REQUIRE_EQUAL(success(), push_action("alice"_n, "setrsvfee"_n, mvo()
+      ("chain_code", codename_mvo("ETH"))("token_code", codename_mvo("ETH"))
+      ("reserve_code", codename_mvo("PRIMARY"))("owner_fee_bps", OWNER_FEE)));
+   BOOST_REQUIRE_EQUAL(success(), push_action(UNDERWRITER_ACCOUNT, "setrsvfee"_n, mvo()
+      ("chain_code", codename_mvo("SOLANA"))("token_code", codename_mvo("SOL"))
+      ("reserve_code", codename_mvo("PRIMARY"))("owner_fee_bps", OWNER_FEE)));
+   produce_block();
+
+   // Both owner fees are now priced in, off the same gross WIRE leg.
+   const uint64_t after = swapquote_value("ETH", "ETH", "PRIMARY", FROM,
+                                          "SOLANA", "SOL", "PRIMARY");
+   BOOST_CHECK_EQUAL(after, expected(OWNER_FEE, OWNER_FEE));
+   BOOST_CHECK_LT(after, before);   // the claim this case exists to prove
+
+   // Each side is priced INDEPENDENTLY — clearing one must move the quote back
+   // by only that side's share, which a quote summing the wrong reserve's rate
+   // (or double-counting one) would not reproduce.
+   BOOST_REQUIRE_EQUAL(success(), push_action(UNDERWRITER_ACCOUNT, "setrsvfee"_n, mvo()
+      ("chain_code", codename_mvo("SOLANA"))("token_code", codename_mvo("SOL"))
+      ("reserve_code", codename_mvo("PRIMARY"))("owner_fee_bps", 0)));
+   produce_block();
+   const uint64_t source_only = swapquote_value("ETH", "ETH", "PRIMARY", FROM,
+                                                "SOLANA", "SOL", "PRIMARY");
+   BOOST_CHECK_EQUAL(source_only, expected(OWNER_FEE, 0));
+   BOOST_CHECK_LT(source_only, before);
+   BOOST_CHECK_GT(source_only, after);
+} FC_LOG_AND_RETHROW() }
+
+// ── Underwriter fee accrual + owner-authenticated claim ──
+
+BOOST_FIXTURE_TEST_CASE(claimuwfee_pays_accrual_and_zeroes_balance, sysio_reserve_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(),
+      regreserve("ETH", "ETH", "PRIMARY", 1'000'000'000'000ULL, 1'000'000'000'000ULL));
+   BOOST_REQUIRE_EQUAL(success(),
+      regreserve("SOLANA", "SOL", "PRIMARY", 1'000'000'000'000ULL, 1'000'000'000'000ULL));
+   BOOST_REQUIRE_EQUAL(success(), push_action(UWRIT_ACCOUNT, "applyswap"_n, mvo()
+      ("src_chain_code",   codename_mvo("ETH"))
+      ("src_token_code",   codename_mvo("ETH"))
+      ("src_reserve_code", codename_mvo("PRIMARY"))
+      ("src_amount",       1'000'000'000ULL)
+      ("dst_chain_code",   codename_mvo("SOLANA"))
+      ("dst_token_code",   codename_mvo("SOL"))
+      ("dst_reserve_code", codename_mvo("PRIMARY"))
+      ("dst_amount",       100'000'000ULL)
+      ("underwriter",      "underwriter1")));
+
+   const int64_t resv_before = wire_balance(RESERVE_ACCOUNT);
+   BOOST_REQUIRE_EQUAL(0, wire_balance(UNDERWRITER_ACCOUNT));
+   BOOST_REQUIRE_EQUAL(499'500ULL, get_uwfees(UNDERWRITER_ACCOUNT)["balance"].as_uint64());
+
+   // The earner claims their own accrual.
+   BOOST_REQUIRE_EQUAL(success(), push_action(UNDERWRITER_ACCOUNT, "claimuwfee"_n,
+      mvo()("underwriter", "underwriter1")));
+
+   // REAL WIRE moved out of reserv custody to the underwriter.
+   BOOST_REQUIRE_EQUAL(499'500, wire_balance(UNDERWRITER_ACCOUNT));
+   BOOST_REQUIRE_EQUAL(resv_before - 499'500, wire_balance(RESERVE_ACCOUNT));
+
+   // Row retained at zero balance; lifetime totals record the round trip.
+   auto uwf = get_uwfees(UNDERWRITER_ACCOUNT);
+   BOOST_REQUIRE_EQUAL(0ULL,       uwf["balance"].as_uint64());
+   BOOST_REQUIRE_EQUAL(499'500ULL, uwf["lifetime_accrued"].as_uint64());
+   BOOST_REQUIRE_EQUAL(499'500ULL, uwf["lifetime_claimed"].as_uint64());
+
+   // A second claim on the drained row is a caller error, not a silent no-op.
+   // Produce a block first: an identical action re-pushed against the same TAPOS
+   // reference block serializes to the same tx id and is rejected as a duplicate
+   // before it ever reaches the contract.
+   produce_block();
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: claimuwfee: no unclaimed balance"),
+      push_action(UNDERWRITER_ACCOUNT, "claimuwfee"_n, mvo()("underwriter", "underwriter1")));
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(claimuwfee_requires_earner_auth_and_a_row, sysio_reserve_tester) { try {
+   // Nobody else may sweep an underwriter's accrual.
+   BOOST_REQUIRE(push_action("alice"_n, "claimuwfee"_n, mvo()("underwriter", "underwriter1"))
+      .find("missing authority of underwriter1") != std::string::npos);
+
+   // An underwriter that never earned has no row at all.
+   BOOST_REQUIRE(get_uwfees(UNDERWRITER_ACCOUNT).is_null());
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: claimuwfee: no accrued swap fees for this underwriter"),
+      push_action(UNDERWRITER_ACCOUNT, "claimuwfee"_n, mvo()("underwriter", "underwriter1")));
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(applyswap_accrues_per_underwriter_and_accumulates, sysio_reserve_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(),
+      regreserve("ETH", "ETH", "PRIMARY", 1'000'000'000'000ULL, 1'000'000'000'000ULL));
+   BOOST_REQUIRE_EQUAL(success(),
+      regreserve("SOLANA", "SOL", "PRIMARY", 1'000'000'000'000ULL, 1'000'000'000'000ULL));
+
+   auto swap_won_by = [&](const char* underwriter) {
+      return push_action(UWRIT_ACCOUNT, "applyswap"_n, mvo()
+         ("src_chain_code",   codename_mvo("ETH"))
+         ("src_token_code",   codename_mvo("ETH"))
+         ("src_reserve_code", codename_mvo("PRIMARY"))
+         ("src_amount",       1'000'000'000ULL)
+         ("dst_chain_code",   codename_mvo("SOLANA"))
+         ("dst_token_code",   codename_mvo("SOL"))
+         ("dst_reserve_code", codename_mvo("PRIMARY"))
+         ("dst_amount",       100'000'000ULL)
+         ("underwriter",      underwriter));
+   };
+
+   // Two swaps won by the same underwriter accumulate on one row. Each repeat of
+   // an identical action needs its own block — same TAPOS reference + same bytes
+   // is one tx id, rejected as a duplicate before reaching the contract.
+   BOOST_REQUIRE_EQUAL(success(), swap_won_by("underwriter1"));
+   const uint64_t first = get_uwfees(UNDERWRITER_ACCOUNT)["balance"].as_uint64();
+   BOOST_REQUIRE_GT(first, 0u);
+   produce_block();
+   BOOST_REQUIRE_EQUAL(success(), swap_won_by("underwriter1"));
+   auto after_two = get_uwfees(UNDERWRITER_ACCOUNT);
+   BOOST_REQUIRE_GT(after_two["balance"].as_uint64(), first);
+   BOOST_REQUIRE_EQUAL(after_two["balance"].as_uint64(),
+                       after_two["lifetime_accrued"].as_uint64());
+
+   // A different winner accrues to their OWN row, leaving the first untouched.
+   // (Different `underwriter` bytes, so no duplicate-tx risk here.)
+   const uint64_t before_other = after_two["balance"].as_uint64();
+   BOOST_REQUIRE_EQUAL(success(), swap_won_by("alice"));
+   BOOST_REQUIRE_GT(get_uwfees("alice"_n)["balance"].as_uint64(), 0u);
+   BOOST_REQUIRE_EQUAL(before_other, get_uwfees(UNDERWRITER_ACCOUNT)["balance"].as_uint64());
+} FC_LOG_AND_RETHROW() }
+
+// ── drainrewards: sweep the accrued batch-operator share to the emissions treasury ──
 // payepoch (sysio.system) calls this inline to fold swap fees into the per-epoch
-// producer + batch-operator distribution.
+// batch-operator distribution.
 
 BOOST_FIXTURE_TEST_CASE(drainrewards_sweeps_bucket_to_treasury, sysio_reserve_tester) { try {
    // Seed the rewards bucket with a swap fee (same setup as the 50/50 routing test:
@@ -768,7 +1325,8 @@ BOOST_FIXTURE_TEST_CASE(drainrewards_sweeps_bucket_to_treasury, sysio_reserve_te
       ("dst_chain_code",   codename_mvo("SOLANA"))
       ("dst_token_code",   codename_mvo("SOL"))
       ("dst_reserve_code", codename_mvo("PRIMARY"))
-      ("dst_amount",       100'000'000ULL)));
+      ("dst_amount",       100'000'000ULL)
+      ("underwriter",      "underwriter1")));
 
    auto bkt = get_rewardbkt();
    const uint64_t reward   = bkt["balance"].as_uint64();
@@ -818,7 +1376,8 @@ BOOST_FIXTURE_TEST_CASE(applyfromwire_credits_wire_and_debits_chain, sysio_reser
       ("dst_token_code",   codename_mvo("SOL"))
       ("dst_reserve_code", codename_mvo("PRIMARY"))
       ("wire_in",          200)
-      ("dst_amount",       100)));
+      ("dst_amount",       100)
+      ("underwriter",      "underwriter1")));
 
    auto r = find_reserve("SOLANA", "SOL", "PRIMARY");
    BOOST_REQUIRE_EQUAL(1200, r["reserve_wire_amount"].as_uint64());
@@ -842,7 +1401,8 @@ BOOST_FIXTURE_TEST_CASE(applyfromwire_rejects_debit_above_curve_output,
          ("dst_token_code",   codename_mvo("SOL"))
          ("dst_reserve_code", codename_mvo("PRIMARY"))
          ("wire_in",          200)
-         ("dst_amount",       dst_amount));
+         ("dst_amount",       dst_amount)
+         ("underwriter",      "underwriter1"));
    };
 
    const auto expected = error("assertion failure with message: applyfromwire: "
@@ -875,13 +1435,23 @@ BOOST_FIXTURE_TEST_CASE(paywire_pays_real_wire_from_custody, sysio_reserve_teste
       ("src_reserve_code", codename_mvo("PRIMARY"))
       ("src_amount",       100)
       ("recipient",        "alice")
-      ("wire_out",         CURVE_OUT)));
+      ("wire_out",         CURVE_OUT)
+      ("underwriter",      "underwriter1")));
 
    auto r = find_reserve("ETH", "ETH", "PRIMARY");
    BOOST_REQUIRE_EQUAL(1100, r["reserve_chain_amount"].as_uint64());
    BOOST_REQUIRE_EQUAL(910,  r["reserve_wire_amount"].as_uint64());
-   // Custody invariant: Σ reserve_wire_amount dropped by the payout AND the real
-   // balance dropped by the payout, together.
+
+   // Custody invariant: `Σ reserve_wire_amount` drops by the payout immediately, but the
+   // WIRE itself does NOT leave -- it moves sideways into `Σ wireclaims.balance`, still in this
+   // contract's custody, until the recipient pulls it. paywire credits rather than transfers
+   // because it settles inside the never-throw consensus dispatch chain.
+   BOOST_REQUIRE_EQUAL(90u,  wire_claimable("alice"_n));
+   BOOST_REQUIRE_EQUAL(1000, wire_balance(RESERVE_ACCOUNT));   // unchanged: 910 booked + 90 claimable
+   BOOST_REQUIRE_EQUAL(0,    wire_balance("alice"_n));
+
+   // The pull completes the settlement and restores the original end state.
+   BOOST_REQUIRE_EQUAL(success(), claimwire("alice"_n));
    BOOST_REQUIRE_EQUAL(910, wire_balance(RESERVE_ACCOUNT));
    BOOST_REQUIRE_EQUAL(90,  wire_balance("alice"_n));
 } FC_LOG_AND_RETHROW() }
@@ -910,7 +1480,8 @@ BOOST_FIXTURE_TEST_CASE(paywire_rejects_payout_above_curve_output, sysio_reserve
          ("src_reserve_code", codename_mvo("PRIMARY"))
          ("src_amount",       100)
          ("recipient",        "alice")
-         ("wire_out",         200)));
+         ("wire_out",         200)
+         ("underwriter",      "underwriter1")));
 
    // The curve's own output settles cleanly against the same reserve.
    BOOST_REQUIRE_EQUAL(success(), push_action(UWRIT_ACCOUNT, "paywire"_n, mvo()
@@ -919,7 +1490,10 @@ BOOST_FIXTURE_TEST_CASE(paywire_rejects_payout_above_curve_output, sysio_reserve
       ("src_reserve_code", codename_mvo("PRIMARY"))
       ("src_amount",       100)
       ("recipient",        "alice")
-      ("wire_out",         9)));
+      ("wire_out",         9)
+      ("underwriter",      "underwriter1")));
+   BOOST_REQUIRE_EQUAL(9u, wire_claimable("alice"_n));   // credited, not pushed
+   BOOST_REQUIRE_EQUAL(success(), claimwire("alice"_n));
    BOOST_REQUIRE_EQUAL(9, wire_balance("alice"_n));
 } FC_LOG_AND_RETHROW() }
 
@@ -935,8 +1509,17 @@ BOOST_FIXTURE_TEST_CASE(refundwire_returns_escrow, sysio_reserve_tester) { try {
       ("wire_amount",    150)
       ("revert_fee_bps", 0)));
 
+   // The refund is CREDITED, not pushed. Until alice pulls it the WIRE stays in this
+   // contract's custody, so the escrow is owed but has not moved.
+   BOOST_REQUIRE_EQUAL(150u, wire_claimable("alice"_n));
+   BOOST_REQUIRE_EQUAL(0,    wire_balance("alice"_n));
+   BOOST_REQUIRE_EQUAL(1000, wire_balance(RESERVE_ACCOUNT));
+
+   // Pulling it produces the original settlement: alice holds the escrow, custody drops by it.
+   BOOST_REQUIRE_EQUAL(success(), claimwire("alice"_n));
    BOOST_REQUIRE_EQUAL(150, wire_balance("alice"_n));
    BOOST_REQUIRE_EQUAL(850, wire_balance(RESERVE_ACCOUNT));
+   BOOST_REQUIRE(get_wireclaim("alice"_n).is_null());   // row consumed by the payout
 
    auto r = find_reserve("ETH", "ETH", "PRIMARY");
    BOOST_REQUIRE_EQUAL(1000, r["reserve_wire_amount"].as_uint64());   // untouched
@@ -944,11 +1527,116 @@ BOOST_FIXTURE_TEST_CASE(refundwire_returns_escrow, sysio_reserve_tester) { try {
    BOOST_REQUIRE(get_rewardbkt().is_null());   // no fee — nothing accrued
 } FC_LOG_AND_RETHROW() }
 
-// A nonzero revert fee (caller-fault drain revert) is taken out of the refund
-// and routed exactly like a settlement fee: rewards share into the bucket
-// (custody-internal), emissions share transferred to the treasury. Integer
-// split: 10% of 150 = 15 -> rewards floor(15/2) = 7, emissions 8; the shares
-// sum to the fee exactly.
+// The retention deadline has to hold WITHOUT further settlement traffic. `credit_wire_claim`
+// sweeps opportunistically, so it only fires while swaps keep arriving; if traffic stops, nothing
+// revisits an aged-out row and both the system-funded table and the WIRE it reserves stay
+// outstanding forever. `sweepclaims` — inlined every epoch by `sysio.epoch::advance` — is the
+// trigger that makes the window real, and `claimwire` refuses an expired row so the deadline means
+// "claimable until" rather than "swept eventually".
+BOOST_FIXTURE_TEST_CASE(expired_wire_claim_is_swept_without_further_traffic, sysio_reserve_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(),
+      regreserve("ETH", "ETH", "PRIMARY", 1000, 1000));
+
+   BOOST_REQUIRE_EQUAL(success(), push_action(UWRIT_ACCOUNT, "refundwire"_n, mvo()
+      ("recipient",      "alice")
+      ("wire_amount",    150)
+      ("revert_fee_bps", 0)));
+   BOOST_REQUIRE_EQUAL(150u, wire_claimable("alice"_n));
+
+   const int64_t treasury_before = wire_balance(SYSIO_ACCOUNT);
+   const int64_t custody_before  = wire_balance(RESERVE_ACCOUNT);
+
+   // Age past the one-year window with NO further credits — the opportunistic sweep never runs.
+   produce_block();
+   produce_block(fc::days(366));
+   BOOST_REQUIRE_EQUAL(150u, wire_claimable("alice"_n));   // still sitting there
+
+   // The deadline is enforced at the claim, so the forfeit balance cannot be pulled.
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: claimwire: this claim expired and is pending sweep to the treasury"),
+      claimwire("alice"_n));
+
+   // A zero budget is a no-op even with an expired row waiting.
+   BOOST_REQUIRE_EQUAL(success(), sweepclaims(0));
+   BOOST_REQUIRE_EQUAL(150u, wire_claimable("alice"_n));
+
+   // The epoch-driven sweep reclaims it with no settlement traffic involved: the row is gone and
+   // its WIRE has left custody for the treasury.
+   BOOST_REQUIRE_EQUAL(success(), sweepclaims(reserve_max_claim_sweep_per_epoch));
+   BOOST_REQUIRE(get_wireclaim("alice"_n).is_null());
+   BOOST_REQUIRE_EQUAL(0u, wire_claimable("alice"_n));
+   BOOST_REQUIRE_EQUAL(treasury_before + 150, wire_balance(SYSIO_ACCOUNT));
+   BOOST_REQUIRE_EQUAL(custody_before  - 150, wire_balance(RESERVE_ACCOUNT));
+
+   // Nothing to claim afterwards — the balance is forfeit, not merely deferred.
+   BOOST_REQUIRE_EQUAL(error("assertion failure with message: no claimable WIRE for this account"),
+                       claimwire("alice"_n));
+} FC_LOG_AND_RETHROW() }
+
+// Crediting an account whose row already expired must not resurrect the forfeited balance.
+// `claimable::credit` upserts, so without settling first the old amount would be added to and its
+// stamp refreshed — making a balance `claimwire` has been refusing claimable again, and letting a
+// trickle of small credits keep a system-funded row alive forever. The new credit legitimately
+// starts a fresh window (an account being credited is not abandoned); only the old balance is
+// forfeit.
+BOOST_FIXTURE_TEST_CASE(recredit_after_expiry_does_not_revive_the_forfeited_balance,
+                        sysio_reserve_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(),
+      regreserve("ETH", "ETH", "PRIMARY", 1000, 1000));
+
+   BOOST_REQUIRE_EQUAL(success(), push_action(UWRIT_ACCOUNT, "refundwire"_n, mvo()
+      ("recipient",      "alice")
+      ("wire_amount",    150)
+      ("revert_fee_bps", 0)));
+   BOOST_REQUIRE_EQUAL(150u, wire_claimable("alice"_n));
+
+   // Age past the window WITHOUT sweeping, so the forfeited row is still sitting there.
+   produce_block();
+   produce_block(fc::days(366));
+   BOOST_REQUIRE_EQUAL(150u, wire_claimable("alice"_n));
+
+   const int64_t treasury_before = wire_balance(SYSIO_ACCOUNT);
+
+   // A later refund for the same account credits 40.
+   BOOST_REQUIRE_EQUAL(success(), push_action(UWRIT_ACCOUNT, "refundwire"_n, mvo()
+      ("recipient",      "alice")
+      ("wire_amount",    40)
+      ("revert_fee_bps", 0)));
+
+   // Only the NEW amount is claimable — the forfeited 150 went to the treasury, it did not
+   // accumulate into a 190 balance with a fresh window.
+   BOOST_REQUIRE_EQUAL(40u, wire_claimable("alice"_n));
+   BOOST_REQUIRE_EQUAL(treasury_before + 150, wire_balance(SYSIO_ACCOUNT));
+
+   // And the fresh claim is live, so the recipient is not penalised for the new payout.
+   BOOST_REQUIRE_EQUAL(success(), claimwire("alice"_n));
+   BOOST_REQUIRE_EQUAL(40, wire_balance("alice"_n));
+} FC_LOG_AND_RETHROW() }
+
+// A LIVE row is untouched by the sweep and still claims normally — the budget walks the
+// expiry-ordered index and stops at the first row whose window is open.
+BOOST_FIXTURE_TEST_CASE(sweepclaims_leaves_live_rows_alone, sysio_reserve_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(),
+      regreserve("ETH", "ETH", "PRIMARY", 1000, 1000));
+
+   BOOST_REQUIRE_EQUAL(success(), push_action(UWRIT_ACCOUNT, "refundwire"_n, mvo()
+      ("recipient",      "alice")
+      ("wire_amount",    150)
+      ("revert_fee_bps", 0)));
+
+   BOOST_REQUIRE_EQUAL(success(), sweepclaims(reserve_max_claim_sweep_per_epoch));
+   BOOST_REQUIRE_EQUAL(150u, wire_claimable("alice"_n));
+
+   BOOST_REQUIRE_EQUAL(success(), claimwire("alice"_n));
+   BOOST_REQUIRE_EQUAL(150, wire_balance("alice"_n));
+} FC_LOG_AND_RETHROW() }
+
+// A nonzero revert fee (caller-fault drain revert) is taken out of the refund and
+// routed exactly like a settlement fee, through `route_wire_fee`. Arithmetic here:
+// 10% of 150 = 15, and a revert has no winning underwriter, so the whole 15 is the
+// rewards pool. This fixture never calls `setconfig`, so `fee_emissions_share_bps`
+// is the default 0 and all 15 accrues to `rewards_bucket` — custody-internal, with
+// nothing transferred to the emissions treasury.
 BOOST_FIXTURE_TEST_CASE(refundwire_routes_revert_fee, sysio_reserve_tester) { try {
    BOOST_REQUIRE_EQUAL(success(),
       regreserve("ETH", "ETH", "PRIMARY", 1000, 1000));
@@ -958,13 +1646,24 @@ BOOST_FIXTURE_TEST_CASE(refundwire_routes_revert_fee, sysio_reserve_tester) { tr
       ("wire_amount",    150)
       ("revert_fee_bps", 1000)));   // 10%
 
-   BOOST_REQUIRE_EQUAL(135, wire_balance("alice"_n));            // 150 - 15 fee
-   BOOST_REQUIRE_EQUAL(857, wire_balance(RESERVE_ACCOUNT));      // 1000 - 135 - 8 emissions
+   // Credited net of the fee, and the refund waits to be pulled. With the default zero
+   // emissions dial the whole fee stays in custody as rewards, so nothing leaves at all.
+   BOOST_REQUIRE_EQUAL(135u, wire_claimable("alice"_n));         // 150 - 15 fee
+   BOOST_REQUIRE_EQUAL(0,    wire_balance("alice"_n));
+   BOOST_REQUIRE_EQUAL(1000, wire_balance(RESERVE_ACCOUNT));     // nothing transferred out yet
 
+   BOOST_REQUIRE_EQUAL(success(), claimwire("alice"_n));
+   BOOST_REQUIRE_EQUAL(135, wire_balance("alice"_n));            // 150 - 15 fee
+   BOOST_REQUIRE_EQUAL(865, wire_balance(RESERVE_ACCOUNT));      // 1000 - 135; the fee stays in custody
+
+   // The whole fee, per the header: no underwriter share to carve out, and a
+   // zero emissions dial leaves the pool intact. A configured dial would divert
+   // its share to the emissions treasury instead.
    auto bkt = get_rewardbkt();
    BOOST_REQUIRE(!bkt.is_null());
-   BOOST_REQUIRE_EQUAL(7u, bkt["balance"].as_uint64());
-   BOOST_REQUIRE_EQUAL(7u, bkt["lifetime_accrued"].as_uint64());
+   BOOST_REQUIRE_EQUAL(15u, bkt["balance"].as_uint64());
+   BOOST_REQUIRE_EQUAL(15u, bkt["lifetime_accrued"].as_uint64());
+   BOOST_REQUIRE(get_uwfees(UNDERWRITER_ACCOUNT).is_null());     // nobody underwrote it
 
    auto r = find_reserve("ETH", "ETH", "PRIMARY");
    BOOST_REQUIRE_EQUAL(1000, r["reserve_wire_amount"].as_uint64());   // untouched

@@ -12,14 +12,18 @@
 #include <sysio/chain/abi_serializer.hpp>
 #include <sysio/chain/authority.hpp>
 #include <sysio/chain/authorization_manager.hpp>
+#include <sysio/chain/resource_limits.hpp>
 #include <sysio/chain/permission_object.hpp>
 #include <sysio/chain/kv_table_objects.hpp>   // kv_index / by_code_key for reading sysio.roa kv tables
 #include <sysio/opp/opp.hpp>
 #include <sysio/opp/opp.pb.h>
 #include <sysio/opp/attestations/attestations.pb.h>
 #include <sysio/opp/types/types.pb.h>
-// The depot's swap kernel — tests re-derive the quote settlement must pay.
+// The depot's swap kernel — tests re-derive both the quote settlement must pay
+// and (via token_to_wire) the challenge-bond reference math.
 #include <sysio.opp.common/amm_math.hpp>
+#include <sysio/opp/uic_signature_canonical.hpp>
+#include <sysio/opp/test/uic_signature_test_utils.hpp>
 
 #include <fc/variant_object.hpp>
 #include <fc/slug_name.hpp>
@@ -31,7 +35,12 @@
 #include <fc/crypto/signature.hpp>
 #include <magic_enum/magic_enum.hpp>
 
+#include <algorithm>
+#include <array>
+#include <iterator>
+
 #include "contracts.hpp"
+#include "contract_test_support.hpp"
 // Canonical-encoding + header-derivation oracle: inbound envelopes must carry
 // spec-derived semantic headers or apply_consensus drops them before dispatch.
 #include "opp_envelope_oracle.hpp"
@@ -45,9 +54,45 @@ using mvo = fc::mutable_variant_object;
 
 namespace {
 
+constexpr uint64_t PROTOBUF_VARINT_PAYLOAD_MASK = 0x7fu;
+constexpr uint32_t PROTOBUF_VARINT_PAYLOAD_BITS = 7u;
+constexpr uint8_t  PROTOBUF_VARINT_CONTINUATION_BIT = 0x80u;
+constexpr uint32_t PROTOBUF_FIELD_TAG_SHIFT = 3u;
+
 /// SlugName mvo helper for v6 action arguments.
 inline fc::mutable_variant_object codename_mvo(std::string_view s) {
    return mvo()("value", fc::slug_name{s}.value);
+}
+
+/** Append one unsigned protobuf varint to a hostile-wire-format fixture. */
+void append_proto_varint(std::vector<char>& out, uint64_t value) {
+   do {
+      uint8_t byte = static_cast<uint8_t>(value & PROTOBUF_VARINT_PAYLOAD_MASK);
+      value >>= PROTOBUF_VARINT_PAYLOAD_BITS;
+      if (value != 0) byte |= PROTOBUF_VARINT_CONTINUATION_BIT;
+      out.push_back(static_cast<char>(byte));
+   } while (value != 0);
+}
+
+/** Append one complete protobuf varint field as an explicit key/value pair. */
+void append_varint_field(std::vector<char>& out, uint32_t field_number,
+                         uint64_t value) {
+   constexpr uint32_t VARINT_WIRE_TYPE = 0;
+   append_proto_varint(out, (static_cast<uint64_t>(field_number)
+                            << PROTOBUF_FIELD_TAG_SHIFT)
+                            | VARINT_WIRE_TYPE);
+   append_proto_varint(out, value);
+}
+
+/** Append one length-delimited protobuf field without a generated schema. */
+void append_length_delimited_field(std::vector<char>& out, uint32_t field_number,
+                                   std::span<const char> payload) {
+   constexpr uint32_t LENGTH_DELIMITED_WIRE_TYPE = 2;
+   append_proto_varint(out, (static_cast<uint64_t>(field_number)
+                            << PROTOBUF_FIELD_TAG_SHIFT)
+                            | LENGTH_DELIMITED_WIRE_TYPE);
+   append_proto_varint(out, payload.size());
+   out.insert(out.end(), payload.begin(), payload.end());
 }
 
 /// One `chain_min_bond` entry for `sysio.opreg::setconfig`'s `req_*_collat`
@@ -135,17 +180,17 @@ std::vector<char> encode_envelope_with_attestations(
    return out;
 }
 
-/// Mirrors the contract-internal `MAX_ENVELOPE_BYTES` protocol cap (64 KiB, shared with the
+/// Mirrors the contract-internal `MAX_ENVELOPE_BYTES` protocol cap (32 KiB, shared with the
 /// Ethereum and Solana outpost implementations). The contract constant lives in the msgch
 /// translation unit — contract headers are not host-compilable — so tests keep this manual
 /// mirror, same as the outbound packing tests in sysio.msgch_tests.cpp.
-constexpr size_t MAX_ENVELOPE_BYTES = 65'536;
+constexpr size_t MAX_ENVELOPE_BYTES = 32'768;
 
 /// Encode a decodable envelope whose serialised size is EXACTLY `target_bytes`, padded with a
 /// single out-of-scope challenge-response attestation (dispatch drops it with no value-bearing
 /// effect). Probe
 /// once with `target_bytes` of padding to measure the fixed protobuf overhead, then rebuild with
-/// the pad shrunk by that overhead: at sizes near the 64 KiB envelope cap every nested length
+/// the pad shrunk by that overhead: at sizes near the 32 KiB envelope cap every nested length
 /// prefix and the `data_size` varint sit in the same 3-byte width band (16 KiB .. 2 MiB), so the
 /// second pass lands exactly on target — the final REQUIRE pins it.
 std::vector<char> encode_envelope_padded_to(uint32_t epoch_index, size_t target_bytes) {
@@ -378,27 +423,18 @@ public:
 
    action_result push(name contract, abi_serializer& ser, name signer,
                       name action_name, const fc::variant_object& data) {
-      try {
-         std::string action_type = ser.get_action_type(action_name);
-         action act;
-         act.account = contract;
-         act.name    = action_name;
-         act.data    = ser.variant_to_binary(action_type, data,
-                        abi_serializer::create_yield_function(abi_serializer_max_time));
-         act.authorization = std::vector<permission_level>{{signer, config::active_name}};
-
-         signed_transaction trx;
-         trx.actions.emplace_back(std::move(act));
-         set_transaction_headers(trx);
-         trx.sign(get_private_key(signer, "active"), control->get_chain_id());
-         push_transaction(trx);
-         return success();
-      } catch (const fc::exception& ex) {
-         return error(ex.top_message());
-      }
+      return sysio_system::test_support::push_contract_action(
+         *this, contract, ser, signer, action_name, data);
    }
 
-   void create_uwrit_op_eth_authex_link() {
+   /** Push one ABI-encoded action and retain its trace/console output. */
+   transaction_trace_ptr push_trace(name contract, abi_serializer& ser, name signer,
+                                    name action_name, const fc::variant_object& data) {
+      return sysio_system::test_support::push_contract_action_trace(
+         *this, contract, ser, signer, action_name, data);
+   }
+
+   std::vector<char> create_eth_authex_link(name account) {
       using namespace fc::crypto;
       using namespace sysio::opp::types;
 
@@ -406,21 +442,25 @@ public:
       auto pub  = priv.get_public_key();
       const uint64_t nonce = control->head().block_time().time_since_epoch().count() / 1000;
 
-      auto msg = build_link_message(pub, UWRIT_OP.to_string(),
+      auto msg = build_link_message(pub, account.to_string(),
                                     ChainKind::CHAIN_KIND_EVM, nonce);
       auto msg_hash = keccak256::hash(msg);
       auto sig = priv.sign(fc::sha256(reinterpret_cast<const char*>(msg_hash.data()),
                                       32));
 
-      BOOST_REQUIRE_EQUAL(success(), push(AUTHEX_ACCOUNT, authex_abi, UWRIT_OP,
+      BOOST_REQUIRE_EQUAL(success(), push(AUTHEX_ACCOUNT, authex_abi, account,
          "createlink"_n, mvo()
             ("chain_kind", ChainKind::CHAIN_KIND_EVM)
-            ("account",    UWRIT_OP.to_string())
+            ("account",    account.to_string())
             ("sig",        sig)
             ("pub_key",    pub)
             ("nonce",      nonce)));
 
-      uwrit_op_eth_pubkey = em_pubkey_bytes(pub);
+      return em_pubkey_bytes(pub);
+   }
+
+   void create_uwrit_op_eth_authex_link() {
+      uwrit_op_eth_pubkey = create_eth_authex_link(UWRIT_OP);
    }
 
    /// Push `sysio.opreg::setconfig` with the dispatch-suite defaults, varying
@@ -509,6 +549,14 @@ public:
 
    action_result deliver(uint64_t chain_code, const std::vector<char>& data) {
       return push(MSGCH_ACCOUNT, msgch_abi, BATCHOP, "deliver"_n, mvo()
+         ("batch_op_name", BATCHOP.to_string())
+         ("chain_code",    chain_code)
+         ("data",          data));
+   }
+
+   transaction_trace_ptr deliver_trace(uint64_t chain_code,
+                                       const std::vector<char>& data) {
+      return push_trace(MSGCH_ACCOUNT, msgch_abi, BATCHOP, "deliver"_n, mvo()
          ("batch_op_name", BATCHOP.to_string())
          ("chain_code",    chain_code)
          ("data",          data));
@@ -646,54 +694,309 @@ public:
          ("uic_bytes",       uic_bytes));
    }
 
-   /// Build + sign an UnderwriteIntentCommit so it passes verify_uic_signature:
-   /// serialize with signature EMPTY (matching the contract's blank-then-rehash;
-   /// set uw_ext_chain_addr.kind non-zero with an empty address per the
-   /// proto3/zpp encoder-parity rule), sha256 the RAW bytes, sign with the
-   /// underwriter's active key, embed the packed signature, serialize.
-   std::vector<char> make_signed_uic(name underwriter, uint64_t uwreq_id,
-                                     uint64_t chain_code_v,
-                                     uint64_t token_code_v, uint64_t reserve_code_v) {
+   /** Push `rcrdcommit` and retain its trace for exact rejection-log assertions. */
+   transaction_trace_ptr rcrdcommit_trace(
+      uint64_t uwreq_id, name underwriter, uint64_t outpost_chain_code,
+      std::string_view from_chain, std::string_view from_token,
+      std::string_view reserve, const std::vector<char>& uic_bytes) {
+      return push_trace(UWRIT_ACCOUNT, uwrit_abi, MSGCH_ACCOUNT, "rcrdcommit"_n, mvo()
+         ("uwreq_id",        uwreq_id)
+         ("underwriter",     underwriter.to_string())
+         ("chain_code",      outpost_chain_code)
+         ("from_chain_code", codename_mvo(from_chain))
+         ("from_token_code", codename_mvo(from_token))
+         ("reserve_code",    codename_mvo(reserve))
+         ("uic_bytes",       uic_bytes));
+   }
+
+   /// Create the common UnderwriteIntentCommit fields used by signed,
+   /// malformed-signature, and malformed-account test payloads.
+   sysio::opp::attestations::UnderwriteIntentCommit create_uic(
+      std::string_view underwriter,
+      uint64_t uwreq_id,
+      uint64_t chain_code_v,
+      uint64_t token_code_v,
+      uint64_t reserve_code_v) {
       sysio::opp::attestations::UnderwriteIntentCommit uic;
-      uic.mutable_uw_account()->set_name(underwriter.to_string());
+      uic.mutable_uw_account()->set_name(
+         std::string{underwriter.data(), underwriter.size()});
       uic.mutable_uw_ext_chain_addr()->set_kind(sysio::opp::types::CHAIN_KIND_EVM);
+      uic.mutable_uw_ext_chain_addr()->set_address(std::string(20, '\x01'));
       uic.set_uw_request_id(uwreq_id);
       uic.set_token_code(token_code_v);
       uic.set_chain_code(chain_code_v);
       uic.set_reserve_code(reserve_code_v);
+      return uic;
+   }
 
-      std::string blanked;
-      uic.SerializeToString(&blanked);
-      const auto digest = fc::sha256::hash(blanked.data(), blanked.size());
-
-      const auto sig       = get_private_key(underwriter, "active").sign(digest);
-      const auto sig_bytes = fc::raw::pack(sig);
-      uic.set_signature(sig_bytes.data(), sig_bytes.size());
-
+   /// Serialize one UnderwriteIntentCommit into the raw bytes relayed by an
+   /// outpost and stored by `sysio.uwrit::rcrdcommit`.
+   std::vector<char> serialize_uic(
+      const sysio::opp::attestations::UnderwriteIntentCommit& uic) {
       std::string full;
-      uic.SerializeToString(&full);
+      BOOST_REQUIRE(uic.SerializeToString(&full));
       return std::vector<char>(full.begin(), full.end());
    }
 
-   /// Build an UnderwriteIntentCommit carrying an arbitrary raw `uw_account.name`
+   /// Blank, digest, sign, and serialize an already-shaped UIC.
+   std::vector<char> sign_uic(
+      sysio::opp::attestations::UnderwriteIntentCommit uic,
+      const fc::crypto::private_key& signing_key) {
+      uic.clear_signature();
+      const auto blanked = serialize_uic(uic);
+      const auto digest = fc::sha256::hash(blanked.data(), blanked.size());
+
+      const auto sig       = signing_key.sign(digest);
+      const auto sig_bytes = fc::raw::pack(sig);
+      uic.set_signature(sig_bytes.data(), sig_bytes.size());
+      return serialize_uic(uic);
+   }
+
+   /// Create a UIC claiming `claimed_underwriter` and signed by an explicit
+   /// WIRE private key. Tests use this to exercise every supported fixed-size
+   /// signature variant and to model forged account claims.
+   std::vector<char> create_signed_uic_with_key(
+      name claimed_underwriter,
+      const fc::crypto::private_key& signing_key,
+      uint64_t uwreq_id,
+      uint64_t chain_code_v,
+      uint64_t token_code_v,
+      uint64_t reserve_code_v) {
+      auto uic = create_uic(claimed_underwriter.to_string(), uwreq_id, chain_code_v,
+                            token_code_v, reserve_code_v);
+      return sign_uic(std::move(uic), signing_key);
+   }
+
+   /// Produce a valid K1-signed UIC with an exact serialized size. Padding is
+   /// carried in the external-chain address, which is part of the signed digest
+   /// but otherwise irrelevant to rcrdcommit's row-growth boundary.
+   std::vector<char> create_signed_uic_of_size(
+      name underwriter,
+      uint64_t uwreq_id,
+      uint64_t chain_code_v,
+      uint64_t token_code_v,
+      uint64_t reserve_code_v,
+      size_t target_size) {
+      const auto size_probe_digest = fc::sha256::hash(std::string{
+         "wire.sysio.dispatch_tests.sized_uic_signature"});
+      const size_t packed_k1_signature_size = fc::raw::pack(
+         get_private_key(underwriter, "active").sign(size_probe_digest)).size();
+      auto uic = create_uic(underwriter.to_string(), uwreq_id, chain_code_v,
+                            token_code_v, reserve_code_v);
+
+      for (size_t padding_size = 0; padding_size < target_size; ++padding_size) {
+         uic.mutable_uw_ext_chain_addr()->set_address(
+            std::string(padding_size, '\x01'));
+         uic.set_signature(std::string(packed_k1_signature_size, '\0'));
+         const auto shaped_size = uic.ByteSizeLong();
+         if (shaped_size < target_size) continue;
+         BOOST_REQUIRE_EQUAL(target_size, shaped_size);
+
+         const auto signed_uic = sign_uic(
+            std::move(uic), get_private_key(underwriter, "active"));
+         BOOST_REQUIRE_EQUAL(target_size, signed_uic.size());
+         return signed_uic;
+      }
+
+      BOOST_FAIL("could not construct an exact-size signed UIC");
+      return {};
+   }
+
+   /// Create a UIC claiming `claimed_underwriter` but signed by
+   /// `signing_account`. Separating these accounts lets tests model a real
+   /// protocol forgery: dispatch derives the candidate from the claimed
+   /// account, while signature recovery must reject an unrelated signing key.
+   std::vector<char> create_signed_uic_as(name claimed_underwriter,
+                                          name signing_account,
+                                          uint64_t uwreq_id,
+                                          uint64_t chain_code_v,
+                                          uint64_t token_code_v,
+                                          uint64_t reserve_code_v) {
+      return create_signed_uic_with_key(
+         claimed_underwriter, get_private_key(signing_account, "active"),
+         uwreq_id, chain_code_v, token_code_v, reserve_code_v);
+   }
+
+   /// Create and sign an UnderwriteIntentCommit so it passes verification:
+   /// serialize with signature empty (matching the contract's
+   /// blank-then-rehash), hash the raw bytes, sign with the claimed
+   /// underwriter's active key, embed the packed signature, and serialize.
+   std::vector<char> create_signed_uic(name underwriter, uint64_t uwreq_id,
+                                       uint64_t chain_code_v,
+                                       uint64_t token_code_v, uint64_t reserve_code_v) {
+      return create_signed_uic_as(underwriter, underwriter, uwreq_id, chain_code_v,
+                                  token_code_v, reserve_code_v);
+   }
+
+   /// Create a protobuf-valid UIC carrying caller-supplied packed signature
+   /// bytes. This reaches the depot's inner-signature verifier while allowing
+   /// tests to exercise truncated, oversized, and unsupported variant shapes.
+   std::vector<char> create_uic_with_signature(
+      name underwriter,
+      uint64_t uwreq_id,
+      uint64_t chain_code_v,
+      uint64_t token_code_v,
+      uint64_t reserve_code_v,
+      const std::vector<char>& signature) {
+      auto uic = create_uic(underwriter.to_string(), uwreq_id, chain_code_v,
+                            token_code_v, reserve_code_v);
+      if (!signature.empty()) {
+         uic.set_signature(signature.data(), signature.size());
+      }
+      return serialize_uic(uic);
+   }
+
+   /** Return the one-byte fc variant tag for a packed UIC signature type. */
+   static char packed_uic_signature_tag(fc::crypto::signature::sig_type type) {
+      return static_cast<char>(magic_enum::enum_integer(type));
+   }
+
+   /** Produce a real signer-generated packed shape for a supported key type. */
+   static std::vector<char> create_packed_uic_signature(
+      fc::crypto::private_key::key_type type) {
+      const auto digest = fc::sha256::hash(std::string{
+         "wire.sysio.dispatch_tests.packed_uic_signature"});
+      return fc::raw::pack(fc::crypto::private_key::generate(type).sign(digest));
+   }
+
+   /** Produce a complete serialized WebAuthn variant with structured fields. */
+   static std::vector<char> create_packed_webauthn_uic_signature() {
+      fc::crypto::webauthn::signature webauthn{
+         fc::crypto::r1::compact_signature{},
+         std::vector<uint8_t>{1, 2, 3},
+         R"({"type":"webauthn.get"})"};
+      return fc::raw::pack(fc::crypto::signature{
+         fc::crypto::signature::storage_type{std::move(webauthn)}});
+   }
+
+   /** Produce a complete serialized fixed-size variant for a shim type. */
+   template <typename SignatureShim>
+   static std::vector<char> create_default_packed_uic_signature() {
+      return fc::raw::pack(fc::crypto::signature{
+         fc::crypto::signature::storage_type{
+            std::in_place_type<SignatureShim>}});
+   }
+
+   /** Replace only the fc variant tag while preserving a real packed size. */
+   static std::vector<char> retag_packed_uic_signature(
+      std::vector<char> packed,
+      fc::crypto::signature::sig_type type) {
+      BOOST_REQUIRE(!packed.empty());
+      packed.front() = packed_uic_signature_tag(type);
+      return packed;
+   }
+
+   /// Produce a correctly tagged fixed-size signature that is one byte short.
+   /// Its size comes from fc's real signer/serializer rather than a duplicated
+   /// protocol constant.
+   std::vector<char> create_truncated_uic_signature(
+      fc::crypto::private_key::key_type type) {
+      auto packed = create_packed_uic_signature(type);
+      BOOST_REQUIRE_GT(packed.size(), 1u);
+      packed.pop_back();
+      return packed;
+   }
+
+   /// Preserve fc's serialized variant tag/size while replacing the signature
+   /// body with invalid recovery data.
+   std::vector<char> create_invalid_uic_signature(
+      fc::crypto::private_key::key_type type) {
+      auto packed = create_packed_uic_signature(type);
+      BOOST_REQUIRE_GT(packed.size(), 1u);
+      std::fill(std::next(packed.begin()), packed.end(), '\0');
+      return packed;
+   }
+
+   /** Produce a correctly tagged fixed-size signature that is one byte long. */
+   std::vector<char> create_overlength_uic_signature(
+      fc::crypto::private_key::key_type type) {
+      auto packed = create_packed_uic_signature(type);
+      packed.push_back('\0');
+      return packed;
+   }
+
+   /** Corrupt only the Ed25519 signature suffix, preserving its embedded key. */
+   std::vector<char> create_corrupted_ed_uic_signature() {
+      auto packed = create_packed_uic_signature(
+         fc::crypto::private_key::key_type::ed);
+      BOOST_REQUIRE(!packed.empty());
+      packed.back() = static_cast<char>(static_cast<uint8_t>(packed.back()) ^ 1u);
+      return packed;
+   }
+
+   /**
+    * Convert a legitimate low-s UIC signature into its valid high-s alternate
+    * (`s' = n - s`, recovery parity flipped) without changing signed bytes.
+    */
+   std::vector<char> create_high_s_signed_uic(
+      name underwriter,
+      const fc::crypto::private_key& signing_key,
+      uint64_t uwreq_id,
+      uint64_t chain_code_v,
+      uint64_t token_code_v,
+      uint64_t reserve_code_v) {
+      using key_type = fc::crypto::private_key::key_type;
+      auto uic = create_uic(underwriter.to_string(), uwreq_id, chain_code_v,
+                            token_code_v, reserve_code_v);
+      const auto blanked = serialize_uic(uic);
+      const auto digest = fc::sha256::hash(blanked.data(), blanked.size());
+      auto packed = fc::raw::pack(signing_key.sign(digest));
+      auto high_s = sysio::opp::test::create_high_s_alternate(
+         std::move(packed), signing_key.type());
+      BOOST_REQUIRE(high_s.has_value());
+      packed = std::move(*high_s);
+
+      // Prove this is a valid alternate representation, not random corruption.
+      // libfc's R1 recovery entrypoint itself enforces low-s before recovery,
+      // so the algebraic n-s/parity construction is the executable proof for
+      // R1; K1/EM can additionally recover through their host shims.
+      const auto alternate = fc::raw::unpack<fc::crypto::signature>(packed);
+      if (signing_key.type() != key_type::r1) {
+         BOOST_REQUIRE(fc::crypto::public_key::recover(alternate, digest)
+                       == signing_key.get_public_key());
+      }
+
+      uic.set_signature(packed.data(), packed.size());
+      return serialize_uic(uic);
+   }
+
+   /**
+    * Replace a legitimate UIC signature recovery byte with libfc's equivalent
+    * noncanonical alias without changing the recovered key.
+    */
+   std::vector<char> create_recovery_alias_signed_uic(
+      name underwriter,
+      const fc::crypto::private_key& signing_key,
+      uint64_t uwreq_id,
+      uint64_t chain_code_v,
+      uint64_t token_code_v,
+      uint64_t reserve_code_v) {
+      auto uic = create_uic(underwriter.to_string(), uwreq_id, chain_code_v,
+                            token_code_v, reserve_code_v);
+      const auto blanked = serialize_uic(uic);
+      const auto digest = fc::sha256::hash(blanked.data(), blanked.size());
+      auto alias = sysio::opp::test::create_recovery_alias(
+         fc::raw::pack(signing_key.sign(digest)), signing_key.type());
+      BOOST_REQUIRE(alias.has_value());
+
+      const auto alternate = fc::raw::unpack<fc::crypto::signature>(*alias);
+      BOOST_REQUIRE(fc::crypto::public_key::recover(alternate, digest)
+                    == signing_key.get_public_key());
+
+      uic.set_signature(alias->data(), alias->size());
+      return serialize_uic(uic);
+   }
+
+   /// Create an UnderwriteIntentCommit carrying an arbitrary raw `uw_account.name`
    /// string — including names that are not constructible as a `sysio::name`
    /// (uppercase, hyphen, over-long). No signature is embedded: the dispatch path
    /// validates the account name and drops a malformed UIC before rcrdcommit or
    /// signature verification is ever reached, so a valid signature is unnecessary.
-   std::vector<char> make_uic_raw_name(const std::string& raw_name, uint64_t uwreq_id,
-                                       uint64_t chain_code_v,
-                                       uint64_t token_code_v, uint64_t reserve_code_v) {
-      sysio::opp::attestations::UnderwriteIntentCommit uic;
-      uic.mutable_uw_account()->set_name(raw_name);
-      uic.mutable_uw_ext_chain_addr()->set_kind(sysio::opp::types::CHAIN_KIND_EVM);
-      uic.set_uw_request_id(uwreq_id);
-      uic.set_token_code(token_code_v);
-      uic.set_chain_code(chain_code_v);
-      uic.set_reserve_code(reserve_code_v);
-
-      std::string full;
-      uic.SerializeToString(&full);
-      return std::vector<char>(full.begin(), full.end());
+   std::vector<char> create_uic_raw_name(const std::string& raw_name, uint64_t uwreq_id,
+                                         uint64_t chain_code_v,
+                                         uint64_t token_code_v, uint64_t reserve_code_v) {
+      return serialize_uic(
+         create_uic(raw_name, uwreq_id, chain_code_v, token_code_v, reserve_code_v));
    }
 
    fc::variant get_uwreq(uint64_t id) {
@@ -823,18 +1126,41 @@ public:
    /// same-(chain, token) multi-reserve swap tests, which add a second reserve
    /// on an already-registered (chain, token) pair.
    action_result regreserve_active(std::string_view c, std::string_view t, std::string_view r) {
+      return regreserve_active_amounts(c, t, r, /*chain_amount*/ 1'000'000'000'000ull,
+                                                /*wire_amount*/  1'000'000'000'000ull);
+   }
+
+   /// `regreserve_active` with explicit pool depths, for a test that needs a deliberately
+   /// IMBALANCED reserve. At the 50% connector weight the curve is pure constant product
+   /// (`out = wire * amount / (chain + amount)`), so a deep token side over a shallow WIRE side
+   /// floors a small conversion to zero — the "dust bucket" the bond quote has to survive.
+   action_result regreserve_active_amounts(std::string_view c, std::string_view t,
+                                           std::string_view r,
+                                           uint64_t chain_amount, uint64_t wire_amount) {
       return push(RESERV_ACCOUNT, reserv_abi, RESERV_ACCOUNT, "regreserve"_n, mvo()
          ("chain_code",             codename_mvo(c))
          ("token_code",             codename_mvo(t))
          ("reserve_code",           codename_mvo(r))
          ("name",                   std::string(c))
          ("description",            std::string{})
-         ("initial_chain_amount",   uint64_t{1'000'000'000'000ull})
-         ("initial_wire_amount",    uint64_t{1'000'000'000'000ull})
+         ("initial_chain_amount",   chain_amount)
+         ("initial_wire_amount",    wire_amount)
          ("source_token_precision", uint32_t{9})
          ("connector_weight_bps",   uint32_t{5000})
          ("is_private",             false)
          ("owner",                  ""));
+   }
+
+   /// Drain chain-side reserve liquidity through the same UWRIT-authorized
+   /// action used by emitted swap settlement. Tests use this after request
+   /// creation to model liquidity changing while UICs are in flight.
+   action_result debit_reserve_chain(std::string_view c, std::string_view t,
+                                     std::string_view r, uint64_t amount) {
+      return push(RESERV_ACCOUNT, reserv_abi, UWRIT_ACCOUNT, "debit"_n, mvo()
+         ("chain_code",   codename_mvo(c))
+         ("token_code",   codename_mvo(t))
+         ("reserve_code", codename_mvo(r))
+         ("amount",       amount));
    }
 
    /// Deploy sysio.token, issue a WIRE supply to the treasury, and seed two
@@ -1161,6 +1487,41 @@ BOOST_FIXTURE_TEST_CASE(swap_request_mismatched_source_chain_is_refunded,
    BOOST_REQUIRE(!get_uwreq(9002).is_null());
 } FC_LOG_AND_RETHROW() }
 
+// An exact `(chain, token, reserve)` self-route has only one outpost leg and
+// can never produce the two distinct commitments an ordinary external-token
+// swap requires. Depot ingestion must therefore refund it without creating a
+// UWREQ. The cross-chain control proves same-asset-style routing remains
+// admissible whenever the endpoint triple is not identical.
+BOOST_FIXTURE_TEST_CASE(swap_request_identical_reserve_identity_is_refunded,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+   BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
+      ("kind", ChainKind::CHAIN_KIND_SVM)("code", codename_mvo("SOLANA"))
+      ("external_chain_id", 900)("name", std::string("solana-test"))("description", std::string{})));
+   setup_wire_token_and_reserves();
+
+   const auto eth       = fc::slug_name{"ETH"}.value;
+   const auto sol_chain = fc::slug_name{"SOLANA"}.value;
+   const auto sol_token = fc::slug_name{"SOL"}.value;
+   const auto primary   = fc::slug_name{"PRIMARY"}.value;
+
+   const auto self_route = encode_swap_request(
+      ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
+      eth, eth, primary, /*src_amount*/ 100,
+      eth, eth, primary, /*target*/ 100,
+      5000, ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0b'));
+   BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(/*att_id*/ 9051, /*proven=*/ eth, self_route));
+   BOOST_REQUIRE(get_uwreq(9051).is_null());
+
+   const auto cross_chain = encode_swap_request(
+      ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
+      eth, eth, primary, /*src_amount*/ 100,
+      sol_chain, sol_token, primary, /*target*/ 100,
+      5000, ChainKind::CHAIN_KIND_SVM, std::vector<char>(32, '\x0b'));
+   BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(/*att_id*/ 9052, /*proven=*/ eth, cross_chain));
+   BOOST_REQUIRE(!get_uwreq(9052).is_null());
+} FC_LOG_AND_RETHROW() }
+
 // UNDERWRITE_INTENT_COMMIT: the same signed dest-leg (SOLANA) commit, delivered through the FULL
 // deliver->evalcons->apply_consensus->dispatch path, is recorded only when its proven outpost matches
 // `uic.chain_code`. Delivered from ETH it is dropped (no commit); delivered from SOLANA it lands.
@@ -1190,8 +1551,8 @@ BOOST_FIXTURE_TEST_CASE(underwrite_commit_mismatched_source_chain_is_dropped,
 
    // One signed dest-leg (SOLANA) UIC, wrapped in an envelope. The outpost it is proven-delivered
    // from is the ONLY thing that varies between the two deliveries below.
-   const auto uic_sol = make_signed_uic(UWRIT_OP, ATT_ID,
-                                        /*chain_code*/ sol_chain, sol_token, primary);
+   const auto uic_sol = create_signed_uic(UWRIT_OP, ATT_ID,
+                                          /*chain_code*/ sol_chain, sol_token, primary);
    const auto uic_env = encode_envelope_with_one_attestation(
       current_epoch(), sysio::opp::types::ATTESTATION_TYPE_UNDERWRITE_INTENT_COMMIT,
       std::string(uic_sol.begin(), uic_sol.end()));
@@ -1254,7 +1615,7 @@ BOOST_FIXTURE_TEST_CASE(underwrite_commit_two_evm_chains_route_per_chain,
 
    // One signed dest-leg (POLYGON) UIC; the proven delivering outpost is the
    // only thing that varies between the two deliveries below.
-   const auto uic_pol = make_signed_uic(UWRIT_OP, ATT_ID, /*chain_code*/ polygon, pol_tok, primary);
+   const auto uic_pol = create_signed_uic(UWRIT_OP, ATT_ID, /*chain_code*/ polygon, pol_tok, primary);
    const auto uic_env = encode_envelope_with_one_attestation(
       current_epoch(), sysio::opp::types::ATTESTATION_TYPE_UNDERWRITE_INTENT_COMMIT,
       std::string(uic_pol.begin(), uic_pol.end()));
@@ -1278,12 +1639,10 @@ BOOST_FIXTURE_TEST_CASE(underwrite_commit_two_evm_chains_route_per_chain,
    BOOST_REQUIRE(dest_committed());
 } FC_LOG_AND_RETHROW() }
 
-// A decode-clean UIC whose `uw_account.name` is nonempty but not a constructible account name
-// (uppercase, hyphen, over-long) must be dropped inside dispatch WITHOUT throwing: constructing
-// `name{}` from it would abort the evalcons/apply_consensus transaction and stall consensus
-// chain-wide. All three malformed names ride one envelope so a single consensus delivery exercises
-// them (a second deliver from the same operator+epoch would revert as a duplicate).
-BOOST_FIXTURE_TEST_CASE(underwrite_commit_invalid_account_name_is_dropped,
+// Malformed UIC bytes and decode-clean UICs whose `uw_account.name` is not a
+// canonical constructible account name must be logged and dropped without
+// throwing. A valid UIC later in the same envelope must still be dispatched.
+BOOST_FIXTURE_TEST_CASE(underwrite_commit_early_rejections_log_and_continue,
                         sysio_dispatch_tester) { try {
    bootstrap_for_dispatch();
    constexpr uint64_t ATT_ID = 9200;
@@ -1293,19 +1652,37 @@ BOOST_FIXTURE_TEST_CASE(underwrite_commit_invalid_account_name_is_dropped,
    const auto sol_token = fc::slug_name{"SOL"}.value;
    const auto primary   = fc::slug_name{"PRIMARY"}.value;
 
-   const auto uic_upper  = make_uic_raw_name("BADNAME",        ATT_ID, sol_chain, sol_token, primary);
-   const auto uic_hyphen = make_uic_raw_name("bad-name",       ATT_ID, sol_chain, sol_token, primary);
-   const auto uic_long   = make_uic_raw_name("abcdefghijklmn", ATT_ID, sol_chain, sol_token, primary);
+   const auto uic_upper  = create_uic_raw_name("BADNAME",        ATT_ID, sol_chain, sol_token, primary);
+   const auto uic_hyphen = create_uic_raw_name("bad-name",       ATT_ID, sol_chain, sol_token, primary);
+   const auto uic_long   = create_uic_raw_name("abcdefghijklmn", ATT_ID, sol_chain, sol_token, primary);
+   const auto uic_alias  = create_uic_raw_name("underwriter.",   ATT_ID, sol_chain, sol_token, primary);
+   const auto valid_uic = create_signed_uic(
+      UWRIT_OP, ATT_ID, sol_chain, sol_token, primary);
    const auto env = encode_envelope_with_attestations(
       current_epoch(), sysio::opp::types::ATTESTATION_TYPE_UNDERWRITE_INTENT_COMMIT,
-      {std::string(uic_upper.begin(),  uic_upper.end()),
+      {std::string(1, '\x0a'),
+       std::string(uic_upper.begin(),  uic_upper.end()),
        std::string(uic_hyphen.begin(), uic_hyphen.end()),
-       std::string(uic_long.begin(),   uic_long.end())});
+       std::string(uic_long.begin(),   uic_long.end()),
+       std::string(uic_alias.begin(),  uic_alias.end()),
+       std::string(valid_uic.begin(), valid_uic.end())});
 
-   // deliver() must SUCCEED — the malformed names are dropped inside dispatch, never thrown.
-   BOOST_REQUIRE_EQUAL(success(), deliver(/*proven=*/ sol_chain, env));
-   // ...and nothing was recorded against the request.
-   BOOST_REQUIRE_EQUAL(0u, get_uwreq(ATT_ID)["commits_by"].get_array().size());
+   const auto trace = deliver_trace(/*proven=*/ sol_chain, env);
+   BOOST_REQUIRE(trace != nullptr);
+   BOOST_REQUIRE(!trace->except);
+   std::string console;
+   for (const auto& action_trace : trace->action_traces) {
+      console += action_trace.console;
+   }
+   BOOST_CHECK_NE(std::string::npos,
+                  console.find("UIC_DISPATCH_REJECTED: chain_code="));
+   BOOST_CHECK_NE(std::string::npos, console.find("reason=malformed_uic"));
+   BOOST_CHECK_NE(std::string::npos, console.find("reason=invalid_wire_account"));
+
+   const auto commits = get_uwreq(ATT_ID)["commits_by"].get_array();
+   BOOST_REQUIRE_EQUAL(1u, commits.size());
+   BOOST_CHECK_EQUAL(UWRIT_OP.to_string(), commits.front()["underwriter"].as_string());
+   BOOST_CHECK(!commits.front()["dest_uic_bytes"].as_string().empty());
 } FC_LOG_AND_RETHROW() }
 
 // A UIC whose (chain_code, token_code, reserve_code) triple matches neither the source nor the
@@ -1320,7 +1697,7 @@ BOOST_FIXTURE_TEST_CASE(rcrdcommit_unmatched_leg_leaves_commits_empty,
    const auto sol_chain = fc::slug_name{"SOLANA"}.value;
    const auto sol_token = fc::slug_name{"SOL"}.value;
    const auto primary   = fc::slug_name{"PRIMARY"}.value;
-   const auto uic = make_signed_uic(UWRIT_OP, ATT_ID, sol_chain, sol_token, primary);
+   const auto uic = create_signed_uic(UWRIT_OP, ATT_ID, sol_chain, sol_token, primary);
 
    // (SOLANA, ETH, PRIMARY): source-chain differs from the dest leg, token differs from the source
    // leg — matches neither.
@@ -1340,7 +1717,7 @@ BOOST_FIXTURE_TEST_CASE(rcrdcommit_unmatched_distinct_underwriters_do_not_grow_r
    const auto sol_chain = fc::slug_name{"SOLANA"}.value;
    const auto sol_token = fc::slug_name{"SOL"}.value;
    const auto primary   = fc::slug_name{"PRIMARY"}.value;
-   const auto uic = make_signed_uic(UWRIT_OP, ATT_ID, sol_chain, sol_token, primary);
+   const auto uic = create_signed_uic(UWRIT_OP, ATT_ID, sol_chain, sol_token, primary);
 
    for (name uw : {"uwtwo"_n, "uwthree"_n, "uwfour"_n}) {
       BOOST_REQUIRE_EQUAL(success(),
@@ -1359,7 +1736,7 @@ BOOST_FIXTURE_TEST_CASE(rcrdcommit_matched_source_leg_is_recorded,
 
    const auto eth     = fc::slug_name{"ETH"}.value;
    const auto primary = fc::slug_name{"PRIMARY"}.value;
-   const auto uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
+   const auto uic = create_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
 
    // (ETH, ETH, PRIMARY) is the source leg.
    BOOST_REQUIRE_EQUAL(success(),
@@ -1382,11 +1759,18 @@ BOOST_FIXTURE_TEST_CASE(rcrdcommit_matched_leg_non_underwriter_names_do_not_grow
    setup_eth_to_sol_uwreq(ATT_ID);   // src=(ETH,ETH,PRIMARY)
 
    const auto eth = fc::slug_name{"ETH"}.value;
-   const std::vector<char> uic(8, '\x00');   // opaque: dropped before the bytes are ever read
+   const auto primary = fc::slug_name{"PRIMARY"}.value;
+
+   // These are real accounts with valid active keys, deliberately omitted
+   // from the operator roster. That isolates the ACTIVE-underwriter gate from
+   // account-nonexistence and malformed-key shortcuts.
+   create_accounts({"alice"_n, "bob"_n, "carol"_n});
+   produce_blocks();
 
    // (ETH, ETH, PRIMARY) IS the source leg, so these clear the leg-binding guard; each name is a
-   // valid sysio::name but none is a registered underwriter, so all are dropped before mutation.
+   // real keyed account but none is a registered underwriter, so all are dropped before mutation.
    for (name uw : {"alice"_n, "bob"_n, "carol"_n}) {
+      const auto uic = create_signed_uic(uw, ATT_ID, eth, eth, primary);
       BOOST_REQUIRE_EQUAL(success(),
          rcrdcommit_direct(ATT_ID, uw, eth, "ETH", "ETH", "PRIMARY", uic));
    }
@@ -1417,7 +1801,7 @@ BOOST_FIXTURE_TEST_CASE(deliver_duplicate_from_same_operator_reverts, sysio_disp
       deliver(/*chain_code=*/eth_code, envelope));
 } FC_LOG_AND_RETHROW() }
 
-// The inbound `deliver` boundary enforces the same 64 KiB protocol envelope cap the outbound
+// The inbound `deliver` boundary enforces the same 32 KiB protocol envelope cap the outbound
 // `buildenv` packer obeys (and that the Ethereum/Solana outposts enforce on their side): a
 // decodable current-epoch envelope one byte over the cap must revert before anything is hashed
 // or stored. Without the contract-level cap, the generic chain ceilings (~512 KiB inline-action,
@@ -1735,10 +2119,11 @@ BOOST_FIXTURE_TEST_CASE(forged_delivery_does_not_strand_chkcons, sysio_dispatch_
    BOOST_REQUIRE_EQUAL(retry_count(), rc0 + 1);
 } FC_LOG_AND_RETHROW() }
 
-// #5-residual: a race winner lacking a destination-chain authex link must be
-// DISQUALIFIED (skipped, uwreq left PENDING), reached via try_build_swap_remit
-// BEFORE any CONFIRMED / reserve write so nothing throws in evalcons.
-BOOST_FIXTURE_TEST_CASE(swap_winner_without_dst_authex_link_is_disqualified,
+// A complete, fully bonded candidate lacking a destination-chain authex link
+// keeps its valid UIC evidence while the request remains PENDING. Once the
+// operator fixes the link, an exact external UIC replay settles from the
+// preserved bytes without replacing the evidence.
+BOOST_FIXTURE_TEST_CASE(swap_missing_dst_authex_recovers_after_exact_uic_replay,
                         sysio_dispatch_tester) { try {
    bootstrap_for_dispatch();   // registers ETH + UWRIT_OP (EVM link only)
 
@@ -1754,41 +2139,62 @@ BOOST_FIXTURE_TEST_CASE(swap_winner_without_dst_authex_link_is_disqualified,
    const uint64_t sol_chain = fc::slug_name{"SOLANA"}.value;
    const uint64_t sol_token = fc::slug_name{"SOL"}.value;
    const uint64_t primary   = fc::slug_name{"PRIMARY"}.value;
-   constexpr uint64_t ATT_ID    = 5000;
-   constexpr int64_t  SRC_AMOUNT = 100;
-   constexpr uint64_t DST_AMOUNT = 100;
+   constexpr uint64_t ATT_ID = 5000;
+   constexpr uint64_t AMOUNT = 1'000'000'000;
 
    setup_wire_token_and_reserves();
 
-   BOOST_REQUIRE_EQUAL(success(), depositinle_credit(UWRIT_OP, "ETH",    "ETH", 1'000'000));
-   BOOST_REQUIRE_EQUAL(success(), depositinle_credit(UWRIT_OP, "SOLANA", "SOL", 1'000'000));
+   BOOST_REQUIRE_EQUAL(success(), depositinle_credit(UWRIT_OP, "ETH",    "ETH", AMOUNT));
+   BOOST_REQUIRE_EQUAL(success(), depositinle_credit(UWRIT_OP, "SOLANA", "SOL", AMOUNT));
 
    const auto sr = encode_swap_request(
       ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
-      eth, eth, primary, SRC_AMOUNT,
-      sol_chain, sol_token, primary, DST_AMOUNT,
-      5000, ChainKind::CHAIN_KIND_SVM, std::vector<char>(32, '\x0b'));
+      eth, eth, primary, static_cast<int64_t>(AMOUNT),
+      sol_chain, sol_token, primary, AMOUNT,
+      /*tolerance_bps*/ 1'000'000, ChainKind::CHAIN_KIND_SVM,
+      std::vector<char>(32, '\x0b'));
    BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, eth, sr));
 
-   const auto src_uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
+   const auto src_uic = create_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
    BOOST_REQUIRE_EQUAL(success(),
       rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", src_uic));
-   const auto dst_uic = make_signed_uic(UWRIT_OP, ATT_ID, sol_chain, sol_token, primary);
+   const auto dst_uic = create_signed_uic(UWRIT_OP, ATT_ID, sol_chain, sol_token, primary);
    BOOST_REQUIRE_EQUAL(success(),
       rcrdcommit_direct(ATT_ID, UWRIT_OP, sol_chain, "SOLANA", "SOL", "PRIMARY", dst_uic));
 
    const auto req = get_uwreq(ATT_ID);
    BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_PENDING", req["status"].as_string());
+   BOOST_REQUIRE(!req["attestation_inbound_data"].as_string().empty());
    bool found = false;
    for (const auto& c : req["commits_by"].get_array()) {
       if (c["underwriter"].as_string() == UWRIT_OP.to_string()) {
          found = true;
-         BOOST_REQUIRE_EQUAL("UNDERWRITE_STATUS_DISQUALIFIED", c["status"].as_string());
-         BOOST_REQUIRE(c["reason"].as_string().find(
-            "no authex link for the destination") != std::string::npos);
+         BOOST_REQUIRE_EQUAL("UNDERWRITE_STATUS_INTENT_SUBMITTED",
+                             c["status"].as_string());
+         BOOST_REQUIRE(!c["source_uic_bytes"].as_string().empty());
+         BOOST_REQUIRE(!c["dest_uic_bytes"].as_string().empty());
       }
    }
    BOOST_REQUIRE(found);
+   BOOST_REQUIRE(get_lock(1).is_null());
+
+   const auto solana_link_key = fc::crypto::private_key::generate(
+      fc::crypto::private_key::key_type::ed).get_public_key();
+   BOOST_REQUIRE_EQUAL(success(), push(
+      AUTHEX_ACCOUNT, authex_abi, AUTHEX_ACCOUNT, "recordlink"_n, mvo()
+         ("account", UWRIT_OP)
+         ("chain_kind", ChainKind::CHAIN_KIND_SVM)
+         ("pub_key", solana_link_key)));
+   produce_block();
+
+   BOOST_REQUIRE_EQUAL(success(), rcrdcommit_direct(
+      ATT_ID, UWRIT_OP, sol_chain, "SOLANA", "SOL", "PRIMARY", dst_uic));
+   BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_CONFIRMED",
+                       get_uwreq(ATT_ID)["status"].as_string());
+   BOOST_REQUIRE_EQUAL(UWRIT_OP.to_string(), get_uwreq(ATT_ID)["winner"].as_string());
+   BOOST_REQUIRE(!get_lock(1).is_null());
+   BOOST_REQUIRE(!get_lock(2).is_null());
+
 } FC_LOG_AND_RETHROW() }
 
 // [P1] WSA-041: a zero AMM quote from ACTIVE reserves must FAIL CLOSED, not skip
@@ -1941,10 +2347,10 @@ BOOST_FIXTURE_TEST_CASE(swap_settlement_debits_destination_reserve_by_the_quote,
       /*tolerance_bps*/ 10'000, ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0b'));
    BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, eth, sr));
 
-   const auto src_uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
+   const auto src_uic = create_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
    BOOST_REQUIRE_EQUAL(success(),
       rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", src_uic));
-   const auto dst_uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, secondary);
+   const auto dst_uic = create_signed_uic(UWRIT_OP, ATT_ID, eth, eth, secondary);
    BOOST_REQUIRE_EQUAL(success(),
       rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "SECOND", dst_uic));
 
@@ -2033,10 +2439,10 @@ BOOST_FIXTURE_TEST_CASE(swap_slippage_bound_does_not_compound_across_checkpoints
    BOOST_REQUIRE_LE(ingestion_quote - settle_quote, allowed);   // old rule: would pass
    BOOST_REQUIRE_GT(target - settle_quote,          allowed);   // new rule: must reject
 
-   const auto src_uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
+   const auto src_uic = create_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
    BOOST_REQUIRE_EQUAL(success(),
       rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", src_uic));
-   const auto dst_uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, secondary);
+   const auto dst_uic = create_signed_uic(UWRIT_OP, ATT_ID, eth, eth, secondary);
    BOOST_REQUIRE_EQUAL(success(),
       rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "SECOND", dst_uic));
 
@@ -2091,25 +2497,27 @@ BOOST_FIXTURE_TEST_CASE(swap_underbonded_candidate_cannot_terminally_reject,
       ("reserve_code", codename_mvo("SECOND"))
       ("amount",       uint64_t{500'000'000'000})));
 
-   const auto src_uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
+   const auto src_uic = create_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
    BOOST_REQUIRE_EQUAL(success(),
       rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", src_uic));
-   const auto dst_uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, secondary);
+   const auto dst_uic = create_signed_uic(UWRIT_OP, ATT_ID, eth, eth, secondary);
    BOOST_REQUIRE_EQUAL(success(),
       rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "SECOND", dst_uic));
 
-   // Still PENDING (not REJECTED): the candidate was disqualified on bond, and
-   // the request stays open for an underwriter that can actually settle it.
+   // Still PENDING (not REJECTED): the valid candidate was under-bonded, so
+   // the request remains retryable after collateral changes.
    const auto req = get_uwreq(ATT_ID);
    BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_PENDING", req["status"].as_string());
-   bool bond_dq = false;
+   bool bond_retryable = false;
    for (const auto& c : req["commits_by"].get_array()) {
       if (c["underwriter"].as_string() == UWRIT_OP.to_string()) {
-         BOOST_REQUIRE_EQUAL("UNDERWRITE_STATUS_DISQUALIFIED", c["status"].as_string());
-         bond_dq = c["reason"].as_string().find("insufficient bond") != std::string::npos;
+         BOOST_REQUIRE_EQUAL("UNDERWRITE_STATUS_INTENT_SUBMITTED", c["status"].as_string());
+         bond_retryable = c["reason"].as_string().empty()
+                          && !c["source_uic_bytes"].as_string().empty()
+                          && !c["dest_uic_bytes"].as_string().empty();
       }
    }
-   BOOST_REQUIRE(bond_dq);
+   BOOST_REQUIRE(bond_retryable);
 } FC_LOG_AND_RETHROW() }
 
 // [P0] WNS-01 (CertiK "Wire Network - Sysio Audit 1", Critical): `opreg::prune`
@@ -2161,10 +2569,10 @@ BOOST_FIXTURE_TEST_CASE(prune_keeps_terminated_operator_until_collateral_settles
       eth, eth, secondary, /*target_amount*/ quote,
       /*tolerance_bps*/ 10'000, ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0b'));
    BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, eth, sr));
-   const auto src_uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
+   const auto src_uic = create_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
    BOOST_REQUIRE_EQUAL(success(),
       rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", src_uic));
-   const auto dst_uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, secondary);
+   const auto dst_uic = create_signed_uic(UWRIT_OP, ATT_ID, eth, eth, secondary);
    BOOST_REQUIRE_EQUAL(success(),
       rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "SECOND", dst_uic));
    BOOST_REQUIRE(!get_uwreq(ATT_ID).is_null());
@@ -2247,10 +2655,10 @@ BOOST_FIXTURE_TEST_CASE(reregistration_blocked_until_collateral_settles,
       eth, eth, secondary, quote,
       /*tolerance_bps*/ 10'000, ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0b'));
    BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, eth, sr));
-   const auto src_uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
+   const auto src_uic = create_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
    BOOST_REQUIRE_EQUAL(success(),
       rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", src_uic));
-   const auto dst_uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, secondary);
+   const auto dst_uic = create_signed_uic(UWRIT_OP, ATT_ID, eth, eth, secondary);
    BOOST_REQUIRE_EQUAL(success(),
       rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "SECOND", dst_uic));
    BOOST_REQUIRE(!get_lock(1).is_null());
@@ -2346,50 +2754,911 @@ BOOST_FIXTURE_TEST_CASE(swap_to_wire_oversized_target_is_refused_at_ingress,
    run(7003, ~uint64_t{0});         // UINT64_MAX — wrapped dst_amount + fee pre-fix
 } FC_LOG_AND_RETHROW() }
 
-// Regression (r3444212152): a candidate whose UIC signature does not recover to
-// its active/owner key must be DISQUALIFIED so the race state converges — not
-// silently left INTENT_SUBMITTED, keeping the uwreq pending/noisy until another
-// underwriter wins. The handler stays non-throwing (no consensus stall).
-BOOST_FIXTURE_TEST_CASE(swap_candidate_with_invalid_uic_signature_is_disqualified,
+// WIRE-291: every protobuf-valid UIC whose embedded signature is malformed or
+// unsupported must be ignored before storage without aborting rcrdcommit.
+// The table covers all packed tags 0..5: fixed-size K1/R1/EM/ED truncations,
+// unsupported WebAuthn/BLS shapes, and invalid K1 recovery math. These cases
+// use real PENDING requests and an ACTIVE, bonded underwriter, so each action
+// reaches pre-storage verification rather than an earlier guard.
+BOOST_FIXTURE_TEST_CASE(swap_malformed_signature_shapes_are_ignored_before_storage,
                         sysio_dispatch_tester) { try {
    bootstrap_for_dispatch();
    register_wire_depot();             // to-WIRE: a single (source) required leg
+   setup_wire_token_and_reserves();   // ACTIVE ETH/ETH/PRIMARY source reserve w/ WIRE
 
    const uint64_t eth     = fc::slug_name{"ETH"}.value;
    const uint64_t wire    = fc::slug_name{"WIRE"}.value;
    const uint64_t primary = fc::slug_name{"PRIMARY"}.value;
-   constexpr uint64_t ATT_ID = 7200;
+   constexpr uint64_t ATT_ID_BASE = 7'210;
+   using key_type = fc::crypto::private_key::key_type;
+
    BOOST_REQUIRE_EQUAL(success(),
       depositinle_credit(UWRIT_OP, "ETH", "ETH", uint64_t{1'000'000}));
 
-   const std::string rs = UWRIT_OP.to_string();
-   const std::vector<char> rcpt(rs.begin(), rs.end());
+   const std::vector<std::vector<char>> cases{
+      {},
+      create_truncated_uic_signature(key_type::k1),
+      create_truncated_uic_signature(key_type::r1),
+      create_packed_webauthn_uic_signature(),
+      create_truncated_uic_signature(key_type::em),
+      create_truncated_uic_signature(key_type::ed),
+      create_default_packed_uic_signature<fc::crypto::bls::signature_shim>(),
+      create_invalid_uic_signature(key_type::k1),
+   };
+
+   const std::string recipient = UWRIT_OP.to_string();
+   const std::vector<char> recipient_bytes(recipient.begin(), recipient.end());
    const auto sr = encode_swap_request(
       ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
       eth, eth, primary, /*src_amount*/ 100,
       wire, wire, primary, /*target*/ 50,
-      5000, ChainKind::CHAIN_KIND_WIRE, rcpt);
-   BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, eth, sr));
+      /*tolerance_bps*/ 1'000'000,
+      ChainKind::CHAIN_KIND_WIRE, recipient_bytes);
 
-   // Source UIC signed by the WRONG account (batchop.a): the recovered key does
-   // not match UWRIT_OP's active/owner permission, so verify_uic_signature
-   // returns false. The push must still succeed (non-throwing).
-   const auto bad_uic = make_signed_uic(BATCHOP, ATT_ID, eth, eth, primary);
+   for (size_t i = 0; i < cases.size(); ++i) {
+      const uint64_t att_id = ATT_ID_BASE + i;
+      BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(att_id, eth, sr));
+
+      const auto uic = create_uic_with_signature(
+         UWRIT_OP, att_id, eth, eth, primary, cases[i]);
+      BOOST_REQUIRE_EQUAL(success(),
+         rcrdcommit_direct(att_id, UWRIT_OP, eth,
+                           "ETH", "ETH", "PRIMARY", uic));
+
+      const auto req = get_uwreq(att_id);
+      BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_PENDING",
+                          req["status"].as_string());
+      BOOST_REQUIRE(req["commits_by"].get_array().empty());
+   }
+
+   // No malformed candidate reached lock creation or settlement.
+   BOOST_REQUIRE(get_lock(1).is_null());
+} FC_LOG_AND_RETHROW() }
+
+// Every structural rejection class is stable and operator-visible. These
+// payloads all reach signature verification on a real PENDING request; each
+// action succeeds at the consensus level, logs its exact typed reason, and
+// leaves the candidate roster untouched.
+BOOST_FIXTURE_TEST_CASE(swap_signature_rejection_taxonomy_is_logged_and_non_throwing,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+   register_wire_depot();
+   setup_wire_token_and_reserves();
+
+   const uint64_t eth = fc::slug_name{"ETH"}.value;
+   const uint64_t wire = fc::slug_name{"WIRE"}.value;
+   const uint64_t primary = fc::slug_name{"PRIMARY"}.value;
+   constexpr uint64_t ATT_ID_BASE = 7'250;
+   using key_type = fc::crypto::private_key::key_type;
+   using sig_type = fc::crypto::signature::sig_type;
+
    BOOST_REQUIRE_EQUAL(success(),
-      rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", bad_uic));
+      depositinle_credit(UWRIT_OP, "ETH", "ETH", uint64_t{1'000'000}));
+   const std::string recipient = UWRIT_OP.to_string();
+   const std::vector<char> recipient_bytes(recipient.begin(), recipient.end());
+   const auto sr = encode_swap_request(
+      ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
+      eth, eth, primary, 100, wire, wire, primary, 50,
+      1'000'000, ChainKind::CHAIN_KIND_WIRE, recipient_bytes);
+
+   struct rejection_case {
+      std::vector<char> payload;
+      std::string_view reason;
+   };
+   const auto ecc_sized_shape = create_packed_uic_signature(key_type::k1);
+   const auto ed_sized_shape = create_packed_uic_signature(key_type::ed);
+   const std::vector<rejection_case> cases{
+      {{}, "empty_uic"},
+      {{'\x0a'}, "malformed_uic"},
+      {create_uic_with_signature(UWRIT_OP, ATT_ID_BASE + 2, eth, eth, primary, {}),
+       "missing_signature"},
+      {create_uic_with_signature(UWRIT_OP, ATT_ID_BASE + 3, eth, eth, primary,
+                                 create_truncated_uic_signature(key_type::k1)),
+       "invalid_signature_length"},
+      {create_uic_with_signature(UWRIT_OP, ATT_ID_BASE + 4, eth, eth, primary,
+                                 create_truncated_uic_signature(key_type::r1)),
+       "invalid_signature_length"},
+      {create_uic_with_signature(UWRIT_OP, ATT_ID_BASE + 5, eth, eth, primary,
+                                 create_truncated_uic_signature(key_type::em)),
+       "invalid_signature_length"},
+      {create_uic_with_signature(UWRIT_OP, ATT_ID_BASE + 6, eth, eth, primary,
+                                 create_truncated_uic_signature(key_type::ed)),
+       "invalid_signature_length"},
+      {create_uic_with_signature(UWRIT_OP, ATT_ID_BASE + 7, eth, eth, primary,
+                                 create_overlength_uic_signature(key_type::k1)),
+       "invalid_signature_length"},
+      {create_uic_with_signature(UWRIT_OP, ATT_ID_BASE + 8, eth, eth, primary,
+                                 create_overlength_uic_signature(key_type::r1)),
+       "invalid_signature_length"},
+      {create_uic_with_signature(UWRIT_OP, ATT_ID_BASE + 9, eth, eth, primary,
+                                 create_overlength_uic_signature(key_type::em)),
+       "invalid_signature_length"},
+      {create_uic_with_signature(UWRIT_OP, ATT_ID_BASE + 10, eth, eth, primary,
+                                 create_overlength_uic_signature(key_type::ed)),
+       "invalid_signature_length"},
+      {create_uic_with_signature(UWRIT_OP, ATT_ID_BASE + 11, eth, eth, primary,
+                                 retag_packed_uic_signature(
+                                    ecc_sized_shape, sig_type::ed)),
+       "invalid_signature_length"},
+      {create_uic_with_signature(UWRIT_OP, ATT_ID_BASE + 12, eth, eth, primary,
+                                 retag_packed_uic_signature(
+                                    ed_sized_shape, sig_type::k1)),
+       "invalid_signature_length"},
+      {create_uic_with_signature(UWRIT_OP, ATT_ID_BASE + 13, eth, eth, primary,
+                                 retag_packed_uic_signature(
+                                    ed_sized_shape, sig_type::r1)),
+       "invalid_signature_length"},
+      {create_uic_with_signature(UWRIT_OP, ATT_ID_BASE + 14, eth, eth, primary,
+                                 retag_packed_uic_signature(
+                                    ed_sized_shape, sig_type::em)),
+       "invalid_signature_length"},
+      {create_uic_with_signature(UWRIT_OP, ATT_ID_BASE + 15, eth, eth, primary,
+                                 create_packed_webauthn_uic_signature()),
+       "unsupported_signature_type"},
+      {create_uic_with_signature(UWRIT_OP, ATT_ID_BASE + 16, eth, eth, primary,
+                                 create_default_packed_uic_signature<
+                                    fc::crypto::bls::signature_shim>()),
+       "unsupported_signature_type"},
+      {create_uic_with_signature(UWRIT_OP, ATT_ID_BASE + 17, eth, eth, primary,
+                                 create_corrupted_ed_uic_signature()),
+       "recovery_failed"},
+      {create_uic_with_signature(UWRIT_OP, ATT_ID_BASE + 18, eth, eth, primary,
+                                 create_invalid_uic_signature(key_type::k1)),
+       "non_canonical_signature"},
+   };
+
+   for (size_t i = 0; i < cases.size(); ++i) {
+      const uint64_t att_id = ATT_ID_BASE + i;
+      BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(att_id, eth, sr));
+      auto payload = cases[i].payload;
+      // Payload-bearing cases were shaped with their final attestation id.
+      // The two raw malformed cases contain no signed/id-dependent content.
+      const auto trace = rcrdcommit_trace(
+         att_id, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", payload);
+      BOOST_REQUIRE(trace != nullptr);
+      BOOST_REQUIRE(!trace->except);
+      BOOST_REQUIRE(!trace->action_traces.empty());
+      const auto expected = "reason=" + std::string{cases[i].reason};
+      BOOST_CHECK_NE(std::string::npos,
+                     trace->action_traces.front().console.find(expected));
+      BOOST_REQUIRE(get_uwreq(att_id)["commits_by"].get_array().empty());
+   }
+} FC_LOG_AND_RETHROW() }
+
+// Strict protobuf canonicality rejects alternate host encodings before
+// signature recovery. An absent nested address, a present default-valued nested
+// address, and a zero top-level scalar all decode but normalize differently.
+// Repeated unknown field keys exercise decoder behavior all the way to the 2
+// KiB boundary: decoding succeeds, canonical re-encoding drops the unknown
+// keys, and the payload is rejected as non-canonical. None can create
+// candidate evidence. After one honest source leg is stored, valid replays are
+// write-once no-ops before signature work.
+BOOST_FIXTURE_TEST_CASE(swap_noncanonical_uic_is_rejected_and_valid_leg_is_write_once,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+   constexpr uint64_t ATT_ID = 7'280;
+   setup_eth_to_sol_uwreq(ATT_ID);
+   const uint64_t eth = fc::slug_name{"ETH"}.value;
+   const uint64_t primary = fc::slug_name{"PRIMARY"}.value;
+
+   const auto honest = create_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
+   auto default_nested = create_uic(UWRIT_OP.to_string(), ATT_ID, eth, eth, primary);
+   default_nested.mutable_uw_ext_chain_addr()->set_kind(
+      ChainKind::CHAIN_KIND_UNKNOWN);
+   auto zero_scalar = create_uic(UWRIT_OP.to_string(), ATT_ID, eth, eth, primary);
+   zero_scalar.set_token_code(0);
+   auto repeated_unknown = honest;
+   constexpr size_t MAX_UIC_LEG_BYTES = 2048;
+   while (true) {
+      std::vector<char> unknown_pair;
+      append_varint_field(unknown_pair, 9, 72);
+      if (repeated_unknown.size() + unknown_pair.size() > MAX_UIC_LEG_BYTES) break;
+      repeated_unknown.insert(repeated_unknown.end(),
+                              unknown_pair.begin(), unknown_pair.end());
+   }
+   sysio::opp::attestations::UnderwriteIntentCommit honest_decoded;
+   sysio::opp::attestations::UnderwriteIntentCommit unknown_decoded;
+   BOOST_REQUIRE(honest_decoded.ParseFromArray(honest.data(), honest.size()));
+   BOOST_REQUIRE(unknown_decoded.ParseFromArray(
+      repeated_unknown.data(), repeated_unknown.size()));
+   honest_decoded.DiscardUnknownFields();
+   unknown_decoded.DiscardUnknownFields();
+   BOOST_CHECK_EQUAL(honest_decoded.SerializeAsString(),
+                     unknown_decoded.SerializeAsString());
+   sysio::opp::types::WireAccount attacker_account;
+   attacker_account.set_name("alice");
+   std::string attacker_account_bytes;
+   BOOST_REQUIRE(attacker_account.SerializeToString(&attacker_account_bytes));
+   std::vector<char> parser_differential;
+   append_length_delimited_field(
+      parser_differential, 1,
+      std::span{attacker_account_bytes.data(), attacker_account_bytes.size()});
+   append_length_delimited_field(parser_differential, 15, honest);
+   struct alternate_encoding {
+      std::vector<char> payload;
+      std::string_view rejection;
+   };
+   const std::array<alternate_encoding, 4> alternates{
+      alternate_encoding{
+         sign_uic(std::move(default_nested), get_private_key(UWRIT_OP, "active")),
+         "non_canonical_uic"},
+      alternate_encoding{
+         sign_uic(std::move(zero_scalar), get_private_key(UWRIT_OP, "active")),
+         "non_canonical_uic"},
+      alternate_encoding{std::move(repeated_unknown), "non_canonical_uic"},
+      alternate_encoding{std::move(parser_differential), "non_canonical_uic"},
+   };
+   for (const auto& alternate : alternates) {
+      const auto trace = rcrdcommit_trace(
+         ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", alternate.payload);
+      BOOST_REQUIRE(!trace->except);
+      const auto& console = trace->action_traces.front().console;
+      BOOST_CHECK_MESSAGE(
+         console.find("reason=" + std::string{alternate.rejection}) != std::string::npos,
+         "unexpected rejection log: " << console);
+      BOOST_REQUIRE(get_uwreq(ATT_ID)["commits_by"].get_array().empty());
+      // Seal the rejection before the next empty-block time jump.
+      produce_block();
+   }
+
+   BOOST_REQUIRE_EQUAL(success(), rcrdcommit_direct(
+      ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", honest));
+   produce_block();
+   const auto before = get_uwreq(ATT_ID)["commits_by"].get_array().front();
+
+   // Repeated canonical UICs can coexist in one relayed envelope. Pin the
+   // contract-side idempotency branch: every replay exits before signature
+   // recovery and leaves the first evidence and arrival time unchanged.
+   for (uint32_t replay = 0; replay < 8; ++replay) {
+      const auto trace = rcrdcommit_trace(
+         ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", honest);
+      BOOST_REQUIRE(!trace->except);
+      const auto& console = trace->action_traces.front().console;
+      BOOST_CHECK_NE(std::string::npos,
+                     console.find("already carries a source UIC, skipping duplicate"));
+      BOOST_CHECK_EQUAL(std::string::npos,
+                        console.find("UIC_SIGNATURE_REJECTED"));
+      const auto after = get_uwreq(ATT_ID)["commits_by"].get_array().front();
+      BOOST_CHECK_EQUAL(before["source_uic_bytes"].as_string(),
+                        after["source_uic_bytes"].as_string());
+      BOOST_CHECK_EQUAL(before["source_received_at_ms"].as_uint64(),
+                        after["source_received_at_ms"].as_uint64());
+      BOOST_CHECK_EQUAL("UNDERWRITE_STATUS_INTENT_SUBMITTED",
+                        after["status"].as_string());
+      produce_block();
+   }
+   BOOST_REQUIRE(get_lock(1).is_null());
+} FC_LOG_AND_RETHROW() }
+
+// K1, R1, and EM high-s alternates remain cryptographically recoverable but
+// are not canonical protocol signatures. Each is logged and ignored before
+// storage, with no lock or settlement side effect.
+BOOST_FIXTURE_TEST_CASE(swap_high_s_ecdsa_alternates_are_rejected,
+                        sysio_dispatch_tester) { try {
+   using private_key = fc::crypto::private_key;
+   bootstrap_for_dispatch();
+   register_wire_depot();
+   setup_wire_token_and_reserves();
+   const uint64_t eth = fc::slug_name{"ETH"}.value;
+   const uint64_t wire = fc::slug_name{"WIRE"}.value;
+   const uint64_t primary = fc::slug_name{"PRIMARY"}.value;
+   constexpr uint64_t ATT_ID_BASE = 7'290;
+
+   BOOST_REQUIRE_EQUAL(success(),
+      depositinle_credit(UWRIT_OP, "ETH", "ETH", uint64_t{1'000'000}));
+   const std::array keys{
+      private_key::generate(private_key::key_type::k1),
+      private_key::generate(private_key::key_type::r1),
+      private_key::generate(private_key::key_type::em),
+   };
+   std::vector<key_weight> active_keys;
+   for (const auto& key : keys) active_keys.push_back({key.get_public_key(), 1});
+   set_authority(UWRIT_OP, config::active_name,
+                 authority{1, std::move(active_keys)}, config::owner_name);
+   produce_blocks();
+
+   const std::string recipient = UWRIT_OP.to_string();
+   const auto sr = encode_swap_request(
+      ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
+      eth, eth, primary, 100, wire, wire, primary, 50, 1'000'000,
+      ChainKind::CHAIN_KIND_WIRE,
+      std::vector<char>(recipient.begin(), recipient.end()));
+   for (size_t i = 0; i < keys.size(); ++i) {
+      const uint64_t att_id = ATT_ID_BASE + i;
+      BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(att_id, eth, sr));
+      const auto high_s = create_high_s_signed_uic(
+         UWRIT_OP, keys[i], att_id, eth, eth, primary);
+      const auto trace = rcrdcommit_trace(
+         att_id, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", high_s);
+      BOOST_REQUIRE(!trace->except);
+      BOOST_CHECK_NE(std::string::npos,
+         trace->action_traces.front().console.find("reason=non_canonical_signature"));
+      BOOST_REQUIRE(get_uwreq(att_id)["commits_by"].get_array().empty());
+   }
+   BOOST_REQUIRE(get_lock(1).is_null());
+} FC_LOG_AND_RETHROW() }
+
+// Libfc recovery accepts the compact (31..34) and Ethereum (27..30) header
+// families as aliases. The UIC boundary pins exactly one family per variant so
+// the same key/signature cannot have two accepted byte representations.
+BOOST_FIXTURE_TEST_CASE(swap_recovery_header_aliases_are_rejected,
+                        sysio_dispatch_tester) { try {
+   using private_key = fc::crypto::private_key;
+   bootstrap_for_dispatch();
+   register_wire_depot();
+   setup_wire_token_and_reserves();
+   const uint64_t eth = fc::slug_name{"ETH"}.value;
+   const uint64_t wire = fc::slug_name{"WIRE"}.value;
+   const uint64_t primary = fc::slug_name{"PRIMARY"}.value;
+   constexpr uint64_t ATT_ID_BASE = 7'295;
+
+   BOOST_REQUIRE_EQUAL(success(),
+      depositinle_credit(UWRIT_OP, "ETH", "ETH", uint64_t{1'000'000}));
+   const std::array keys{
+      private_key::generate(private_key::key_type::k1),
+      private_key::generate(private_key::key_type::r1),
+      private_key::generate(private_key::key_type::em),
+   };
+   std::vector<key_weight> active_keys;
+   for (const auto& key : keys) active_keys.push_back({key.get_public_key(), 1});
+   set_authority(UWRIT_OP, config::active_name,
+                 authority{1, std::move(active_keys)}, config::owner_name);
+   produce_blocks();
+
+   const std::string recipient = UWRIT_OP.to_string();
+   const auto sr = encode_swap_request(
+      ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
+      eth, eth, primary, 100, wire, wire, primary, 50, 1'000'000,
+      ChainKind::CHAIN_KIND_WIRE,
+      std::vector<char>(recipient.begin(), recipient.end()));
+   for (size_t i = 0; i < keys.size(); ++i) {
+      const uint64_t att_id = ATT_ID_BASE + i;
+      BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(att_id, eth, sr));
+      const auto aliased = create_recovery_alias_signed_uic(
+         UWRIT_OP, keys[i], att_id, eth, eth, primary);
+      const auto trace = rcrdcommit_trace(
+         att_id, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", aliased);
+      BOOST_REQUIRE(!trace->except);
+      BOOST_CHECK_NE(std::string::npos,
+         trace->action_traces.front().console.find("reason=non_canonical_signature"));
+      BOOST_REQUIRE(get_uwreq(att_id)["commits_by"].get_array().empty());
+   }
+   BOOST_REQUIRE(get_lock(1).is_null());
+} FC_LOG_AND_RETHROW() }
+
+// A UIC has one recoverable signature, so one minority key in a multisig
+// permission cannot authorize the commitment by mere membership. The direct
+// key's own weight must satisfy active or owner threshold by itself.
+BOOST_FIXTURE_TEST_CASE(swap_below_threshold_permission_key_is_rejected,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+   register_wire_depot();
+   setup_wire_token_and_reserves();
+
+   const uint64_t eth = fc::slug_name{"ETH"}.value;
+   const uint64_t wire = fc::slug_name{"WIRE"}.value;
+   const uint64_t primary = fc::slug_name{"PRIMARY"}.value;
+   constexpr uint64_t ATT_ID = 7'299;
+   BOOST_REQUIRE_EQUAL(success(),
+      depositinle_credit(UWRIT_OP, "ETH", "ETH", uint64_t{1'000'000}));
+
+   const auto minority_key = fc::crypto::private_key::generate(
+      fc::crypto::private_key::key_type::k1);
+   const auto second_key = fc::crypto::private_key::generate(
+      fc::crypto::private_key::key_type::k1);
+   std::vector<key_weight> active_keys{
+      {minority_key.get_public_key(), 1},
+      {second_key.get_public_key(), 1},
+   };
+   std::sort(active_keys.begin(), active_keys.end());
+   set_authority(UWRIT_OP, config::active_name,
+                 authority{2, std::move(active_keys)}, config::owner_name);
+   produce_blocks();
+
+   const std::string recipient = UWRIT_OP.to_string();
+   const auto sr = encode_swap_request(
+      ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
+      eth, eth, primary, 100, wire, wire, primary, 50, 1'000'000,
+      ChainKind::CHAIN_KIND_WIRE,
+      std::vector<char>(recipient.begin(), recipient.end()));
+   BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, eth, sr));
+   const auto uic = create_signed_uic_with_key(
+      UWRIT_OP, minority_key, ATT_ID, eth, eth, primary);
+   const auto trace = rcrdcommit_trace(
+      ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", uic);
+   BOOST_REQUIRE(!trace->except);
+   BOOST_CHECK_NE(std::string::npos,
+      trace->action_traces.front().console.find("reason=unauthorized_key"));
+   BOOST_REQUIRE(get_uwreq(ATT_ID)["commits_by"].get_array().empty());
+   BOOST_REQUIRE(get_lock(1).is_null());
+} FC_LOG_AND_RETHROW() }
+
+// Winner-time verification exists for permission freshness. If the first leg's
+// active key is removed before the matching leg arrives, only that older leg is
+// revalidated and the candidate is durably disqualified without aborting.
+BOOST_FIXTURE_TEST_CASE(swap_key_rotation_disqualifies_older_stored_leg,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+   constexpr uint64_t ATT_ID = 7'300;
+   setup_eth_to_sol_uwreq(ATT_ID);
+   const uint64_t eth = fc::slug_name{"ETH"}.value;
+   const uint64_t sol = fc::slug_name{"SOLANA"}.value;
+   const uint64_t sol_token = fc::slug_name{"SOL"}.value;
+   const uint64_t primary = fc::slug_name{"PRIMARY"}.value;
+
+   const auto old_source = create_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
+   BOOST_REQUIRE_EQUAL(success(), rcrdcommit_direct(
+      ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", old_source));
+
+   const auto replacement_key = fc::crypto::private_key::generate(
+      fc::crypto::private_key::key_type::k1);
+   set_authority(UWRIT_OP, config::active_name,
+                 authority{replacement_key.get_public_key()}, config::owner_name);
+   produce_blocks();
+
+   const auto new_destination = create_signed_uic_with_key(
+      UWRIT_OP, replacement_key, ATT_ID, sol, sol_token, primary);
+   const auto trace = rcrdcommit_trace(
+      ATT_ID, UWRIT_OP, sol, "SOLANA", "SOL", "PRIMARY", new_destination);
+   BOOST_REQUIRE(!trace->except);
+   BOOST_CHECK_NE(std::string::npos,
+      trace->action_traces.front().console.find("reason=unauthorized_key"));
 
    const auto req = get_uwreq(ATT_ID);
-   // Race left open (PENDING) but the bad candidate is DISQUALIFIED.
    BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_PENDING", req["status"].as_string());
+   const auto& candidate = req["commits_by"].get_array().front();
+   BOOST_CHECK_EQUAL("UNDERWRITE_STATUS_DISQUALIFIED", candidate["status"].as_string());
+   BOOST_CHECK_EQUAL("invalid underwrite-intent-commit source signature: unauthorized_key",
+                     candidate["reason"].as_string());
+
+   // Advance past duplicate-transaction detection before replaying the same
+   // action bytes; the assertion below is about contract state, not mempool
+   // transaction de-duplication.
+   produce_blocks();
+
+   const auto assert_disqualification_unchanged = [&]() {
+      const auto current = get_uwreq(ATT_ID)["commits_by"].get_array().front();
+      BOOST_CHECK_EQUAL(candidate["status"].as_string(), current["status"].as_string());
+      BOOST_CHECK_EQUAL(candidate["reason"].as_string(), current["reason"].as_string());
+      BOOST_CHECK_EQUAL(candidate["source_received_at_ms"].as_uint64(),
+                        current["source_received_at_ms"].as_uint64());
+      BOOST_CHECK_EQUAL(candidate["dest_received_at_ms"].as_uint64(),
+                        current["dest_received_at_ms"].as_uint64());
+      BOOST_CHECK_EQUAL(candidate["source_uic_bytes"].as_string(),
+                        current["source_uic_bytes"].as_string());
+      BOOST_CHECK_EQUAL(candidate["dest_uic_bytes"].as_string(),
+                        current["dest_uic_bytes"].as_string());
+   };
+
+   // An identical, otherwise valid replay cannot re-arm a disqualified entry.
+   BOOST_REQUIRE_EQUAL(success(), rcrdcommit_direct(
+      ATT_ID, UWRIT_OP, sol, "SOLANA", "SOL", "PRIMARY", new_destination));
+   assert_disqualification_unchanged();
+
+   // Neither malformed nor unauthorized changed replacements can re-arm it.
+   const auto malformed_source = create_uic_with_signature(
+      UWRIT_OP, ATT_ID, eth, eth, primary,
+      {packed_uic_signature_tag(fc::crypto::signature::sig_type::k1)});
+   BOOST_REQUIRE_EQUAL(success(), rcrdcommit_direct(
+      ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", malformed_source));
+   assert_disqualification_unchanged();
+   const auto forged_source = create_signed_uic_as(
+      UWRIT_OP, BATCHOP, ATT_ID, eth, eth, primary);
+   BOOST_REQUIRE_EQUAL(success(), rcrdcommit_direct(
+      ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", forged_source));
+   assert_disqualification_unchanged();
+   BOOST_REQUIRE(get_lock(1).is_null());
+} FC_LOG_AND_RETHROW() }
+
+// The freshness rule is symmetric: when the destination arrives first, a
+// permission rotation before the source arrives durably disqualifies that
+// older destination evidence and produces no settlement side effect.
+BOOST_FIXTURE_TEST_CASE(swap_destination_key_rotation_disqualifies_older_stored_leg,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+   constexpr uint64_t ATT_ID = 7'301;
+   setup_eth_to_sol_uwreq(ATT_ID);
+   const uint64_t eth = fc::slug_name{"ETH"}.value;
+   const uint64_t sol = fc::slug_name{"SOLANA"}.value;
+   const uint64_t sol_token = fc::slug_name{"SOL"}.value;
+   const uint64_t primary = fc::slug_name{"PRIMARY"}.value;
+
+   const auto old_destination = create_signed_uic(
+      UWRIT_OP, ATT_ID, sol, sol_token, primary);
+   BOOST_REQUIRE_EQUAL(success(), rcrdcommit_direct(
+      ATT_ID, UWRIT_OP, sol, "SOLANA", "SOL", "PRIMARY", old_destination));
+
+   const auto replacement_key = fc::crypto::private_key::generate(
+      fc::crypto::private_key::key_type::k1);
+   set_authority(UWRIT_OP, config::active_name,
+                 authority{replacement_key.get_public_key()}, config::owner_name);
+   produce_blocks();
+
+   const auto new_source = create_signed_uic_with_key(
+      UWRIT_OP, replacement_key, ATT_ID, eth, eth, primary);
+   const auto trace = rcrdcommit_trace(
+      ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", new_source);
+   BOOST_REQUIRE(!trace->except);
+   BOOST_CHECK_NE(std::string::npos,
+      trace->action_traces.front().console.find("reason=unauthorized_key"));
+
+   const auto req = get_uwreq(ATT_ID);
+   BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_PENDING", req["status"].as_string());
+   const auto& candidate = req["commits_by"].get_array().front();
+   BOOST_CHECK_EQUAL("UNDERWRITE_STATUS_DISQUALIFIED", candidate["status"].as_string());
+   BOOST_CHECK_EQUAL(
+      "invalid underwrite-intent-commit destination signature: unauthorized_key",
+      candidate["reason"].as_string());
+   BOOST_REQUIRE(get_lock(1).is_null());
+} FC_LOG_AND_RETHROW() }
+
+// The WIRE provider key family includes four fixed-size recoverable variants.
+// Pin the full contract boundary (packing, direct variant construction, host
+// recovery, and active-permission comparison) for K1, R1, EM, and ED.
+BOOST_FIXTURE_TEST_CASE(swap_fixed_size_recoverable_signatures_are_accepted,
+                        sysio_dispatch_tester) { try {
+   using private_key = fc::crypto::private_key;
+
+   bootstrap_for_dispatch();
+   register_wire_depot();
+   setup_wire_token_and_reserves();
+
+   const uint64_t eth     = fc::slug_name{"ETH"}.value;
+   const uint64_t wire    = fc::slug_name{"WIRE"}.value;
+   const uint64_t primary = fc::slug_name{"PRIMARY"}.value;
+   constexpr uint64_t ATT_ID_BASE = 7'230;
+
+   BOOST_REQUIRE_EQUAL(success(),
+      depositinle_credit(UWRIT_OP, "ETH", "ETH", uint64_t{1'000'000}));
+
+   const std::array signing_keys{
+      private_key::from_string(
+         "PVT_K1_2Nb6TgdiEJopY3dCFYhrA46NzXC3DSWzznes1Dc71oWF29tJTt"),
+      private_key::from_string(
+         "PVT_R1_iyQmnyPEGvFd8uffnk152WC2WryBjgTrg22fXQryuGL9mU6qW"),
+      private_key::from_string(
+         "PVT_EM_0x4646464646464646464646464646464646464646464646464646464646464646"),
+      private_key::from_string(
+         "4YFq9y5f5hi77Bq8kDCE6VgqoAqKGSQN87yW9YeGybpNfqKUG4WxnwhboHGUeXjY7g8262mhL1kCCM9yy8uGvdj7",
+         private_key::key_type::ed),
+   };
+   constexpr std::array<uint8_t, 4> EXPECTED_PACKED_TAGS{0, 1, 3, 4};
+   std::vector<key_weight> active_keys;
+   active_keys.reserve(signing_keys.size());
+   for (const auto& key : signing_keys) {
+      active_keys.push_back({key.get_public_key(), 1});
+   }
+   set_authority(UWRIT_OP, config::active_name,
+                 authority{1, std::move(active_keys)}, config::owner_name);
+   produce_blocks();
+
+   const std::string recipient = UWRIT_OP.to_string();
+   const std::vector<char> recipient_bytes(recipient.begin(), recipient.end());
+   const auto sr = encode_swap_request(
+      ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
+      eth, eth, primary, /*src_amount*/ 100,
+      wire, wire, primary, /*target*/ 50,
+      /*tolerance_bps*/ 1'000'000,
+      ChainKind::CHAIN_KIND_WIRE, recipient_bytes);
+
+   for (size_t i = 0; i < signing_keys.size(); ++i) {
+      const uint64_t att_id = ATT_ID_BASE + i;
+      BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(att_id, eth, sr));
+      const auto uic = create_signed_uic_with_key(
+         UWRIT_OP, signing_keys[i], att_id, eth, eth, primary);
+      sysio::opp::attestations::UnderwriteIntentCommit decoded;
+      BOOST_REQUIRE(decoded.ParseFromArray(uic.data(), static_cast<int>(uic.size())));
+      BOOST_REQUIRE(!decoded.signature().empty());
+      BOOST_CHECK_EQUAL(EXPECTED_PACKED_TAGS[i],
+                        static_cast<uint8_t>(decoded.signature().front()));
+      BOOST_REQUIRE_EQUAL(success(),
+         rcrdcommit_direct(att_id, UWRIT_OP, eth,
+                           "ETH", "ETH", "PRIMARY", uic));
+
+      const auto req = get_uwreq(att_id);
+      BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_CONFIRMED",
+                          req["status"].as_string());
+      BOOST_REQUIRE_EQUAL(UWRIT_OP.to_string(), req["winner"].as_string());
+   }
+} FC_LOG_AND_RETHROW() }
+
+// Owner remains an authorization ancestor of active, so a UIC signed by the
+// claimed underwriter's owner key is accepted by the permission-authority
+// check even though underwriters normally configure an active key provider.
+BOOST_FIXTURE_TEST_CASE(swap_owner_permission_signature_is_accepted,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+   register_wire_depot();
+   setup_wire_token_and_reserves();
+
+   const uint64_t eth = fc::slug_name{"ETH"}.value;
+   const uint64_t wire = fc::slug_name{"WIRE"}.value;
+   const uint64_t primary = fc::slug_name{"PRIMARY"}.value;
+   constexpr uint64_t ATT_ID = 7'240;
+   BOOST_REQUIRE_EQUAL(success(),
+      depositinle_credit(UWRIT_OP, "ETH", "ETH", uint64_t{1'000'000}));
+
+   const std::string recipient = UWRIT_OP.to_string();
+   const auto sr = encode_swap_request(
+      ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
+      eth, eth, primary, 100, wire, wire, primary, 50, 1'000'000,
+      ChainKind::CHAIN_KIND_WIRE,
+      std::vector<char>(recipient.begin(), recipient.end()));
+   BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, eth, sr));
+
+   const auto owner_signed = create_signed_uic_with_key(
+      UWRIT_OP, get_private_key(UWRIT_OP, "owner"),
+      ATT_ID, eth, eth, primary);
+   BOOST_REQUIRE_EQUAL(success(), rcrdcommit_direct(
+      ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", owner_signed));
+
+   const auto req = get_uwreq(ATT_ID);
+   BOOST_CHECK_EQUAL("UNDERWRITE_REQUEST_STATUS_CONFIRMED",
+                     req["status"].as_string());
+   BOOST_CHECK_EQUAL(UWRIT_OP.to_string(), req["winner"].as_string());
+} FC_LOG_AND_RETHROW() }
+
+// Authorization is independent of signature encoding. Unrelated K1, R1, EM,
+// and ED keys all produce structurally valid UICs, but none may claim the
+// underwriter account or create candidate/lock state.
+BOOST_FIXTURE_TEST_CASE(swap_unrelated_supported_keys_are_unauthorized,
+                        sysio_dispatch_tester) { try {
+   using private_key = fc::crypto::private_key;
+   bootstrap_for_dispatch();
+   register_wire_depot();
+   setup_wire_token_and_reserves();
+
+   const uint64_t eth = fc::slug_name{"ETH"}.value;
+   const uint64_t wire = fc::slug_name{"WIRE"}.value;
+   const uint64_t primary = fc::slug_name{"PRIMARY"}.value;
+   constexpr uint64_t ATT_ID_BASE = 7'245;
+   BOOST_REQUIRE_EQUAL(success(),
+      depositinle_credit(UWRIT_OP, "ETH", "ETH", uint64_t{1'000'000}));
+
+   const std::string recipient = UWRIT_OP.to_string();
+   const auto sr = encode_swap_request(
+      ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
+      eth, eth, primary, 100, wire, wire, primary, 50, 1'000'000,
+      ChainKind::CHAIN_KIND_WIRE,
+      std::vector<char>(recipient.begin(), recipient.end()));
+   const std::array unrelated_keys{
+      private_key::generate(private_key::key_type::k1),
+      private_key::generate(private_key::key_type::r1),
+      private_key::generate(private_key::key_type::em),
+      private_key::generate(private_key::key_type::ed),
+   };
+
+   for (size_t i = 0; i < unrelated_keys.size(); ++i) {
+      const uint64_t att_id = ATT_ID_BASE + i;
+      BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(att_id, eth, sr));
+      const auto forged = create_signed_uic_with_key(
+         UWRIT_OP, unrelated_keys[i], att_id, eth, eth, primary);
+      const auto trace = rcrdcommit_trace(
+         att_id, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", forged);
+      BOOST_REQUIRE(!trace->except);
+      BOOST_CHECK_NE(std::string::npos,
+         trace->action_traces.front().console.find("reason=unauthorized_key"));
+      BOOST_REQUIRE(get_uwreq(att_id)["commits_by"].get_array().empty());
+   }
+   BOOST_REQUIRE(get_lock(1).is_null());
+} FC_LOG_AND_RETHROW() }
+
+// Source and destination UICs are pre-validated independently. Exercise the
+// destination branch with a valid source commit followed by a truncated ED
+// destination signature; the bad record is ignored, the valid source bytes
+// remain stored, and neither leg reaches lock creation.
+BOOST_FIXTURE_TEST_CASE(swap_malformed_destination_signature_preserves_valid_source,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+   BOOST_REQUIRE_EQUAL(success(), push(
+      CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
+         ("kind", ChainKind::CHAIN_KIND_SVM)
+         ("code", codename_mvo("SOLANA"))
+         ("external_chain_id", 900)
+         ("name", std::string("solana-test"))
+         ("description", std::string{})));
+   setup_wire_token_and_reserves();
+
+   const uint64_t eth       = fc::slug_name{"ETH"}.value;
+   const uint64_t sol_chain = fc::slug_name{"SOLANA"}.value;
+   const uint64_t sol_token = fc::slug_name{"SOL"}.value;
+   const uint64_t primary   = fc::slug_name{"PRIMARY"}.value;
+   constexpr uint64_t ATT_ID = 7'219;
+
+   BOOST_REQUIRE_EQUAL(success(),
+      depositinle_credit(UWRIT_OP, "ETH", "ETH", uint64_t{1'000'000}));
+   BOOST_REQUIRE_EQUAL(success(),
+      depositinle_credit(UWRIT_OP, "SOLANA", "SOL", uint64_t{1'000'000}));
+
+   const auto sr = encode_swap_request(
+      ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
+      eth, eth, primary, /*src_amount*/ 100,
+      sol_chain, sol_token, primary, /*target*/ 100,
+      /*tolerance_bps*/ 1'000'000,
+      ChainKind::CHAIN_KIND_SVM, std::vector<char>(32, '\x0b'));
+   BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, eth, sr));
+
+   const auto valid_source =
+      create_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
+   BOOST_REQUIRE_EQUAL(success(),
+      rcrdcommit_direct(ATT_ID, UWRIT_OP, eth,
+                        "ETH", "ETH", "PRIMARY", valid_source));
+
+   const auto malformed_destination = create_uic_with_signature(
+      UWRIT_OP, ATT_ID, sol_chain, sol_token, primary,
+      create_truncated_uic_signature(fc::crypto::private_key::key_type::ed));
+   BOOST_REQUIRE_EQUAL(success(),
+      rcrdcommit_direct(ATT_ID, UWRIT_OP, sol_chain,
+                        "SOLANA", "SOL", "PRIMARY", malformed_destination));
+
+   const auto req = get_uwreq(ATT_ID);
+   BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_PENDING",
+                       req["status"].as_string());
    bool found = false;
    for (const auto& c : req["commits_by"].get_array()) {
-      if (c["underwriter"].as_string() == UWRIT_OP.to_string()) {
-         found = true;
-         BOOST_REQUIRE_EQUAL("UNDERWRITE_STATUS_DISQUALIFIED", c["status"].as_string());
-         BOOST_REQUIRE(c["reason"].as_string().find("signature") != std::string::npos);
-      }
+      if (c["underwriter"].as_string() != UWRIT_OP.to_string()) continue;
+      found = true;
+      BOOST_REQUIRE_EQUAL("UNDERWRITE_STATUS_INTENT_SUBMITTED",
+                          c["status"].as_string());
+      BOOST_REQUIRE(c["source_received_at_ms"].as_uint64() > 0);
+      BOOST_REQUIRE_EQUAL(uint64_t{0}, c["dest_received_at_ms"].as_uint64());
+      BOOST_REQUIRE(c["reason"].as_string().empty());
    }
    BOOST_REQUIRE(found);
+   BOOST_REQUIRE(get_lock(1).is_null());
+} FC_LOG_AND_RETHROW() }
+
+// WIRE-291 full-path regression: the first UIC in one consensus envelope has
+// a truncated K1 shape that previously reached `ds >> signature`
+// and aborted evalcons. A valid commit follows in the SAME envelope. The bad
+// record must be ignored before storage, and the valid record must still win,
+// proving dispatch continued past the malformed record.
+BOOST_FIXTURE_TEST_CASE(malformed_uic_does_not_abort_later_attestations_in_same_envelope,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+   register_wire_depot();             // to-WIRE: a single (source) required leg
+   setup_wire_token_and_reserves();   // ACTIVE ETH/ETH/PRIMARY source reserve w/ WIRE
+
+   const uint64_t eth     = fc::slug_name{"ETH"}.value;
+   const uint64_t wire    = fc::slug_name{"WIRE"}.value;
+   const uint64_t primary = fc::slug_name{"PRIMARY"}.value;
+   constexpr uint64_t ATT_ID = 7'220;
+
+   BOOST_REQUIRE_EQUAL(success(),
+      depositinle_credit(UWRIT_OP, "ETH", "ETH", uint64_t{1'000'000}));
+
+   const std::string recipient = UWRIT_OP.to_string();
+   const std::vector<char> recipient_bytes(recipient.begin(), recipient.end());
+   const auto sr = encode_swap_request(
+      ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
+      eth, eth, primary, /*src_amount*/ 100,
+      wire, wire, primary, /*target*/ 50,
+      /*tolerance_bps*/ 1'000'000,
+      ChainKind::CHAIN_KIND_WIRE, recipient_bytes);
+   BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, eth, sr));
+
+   const auto truncated_uic = create_uic_with_signature(
+      UWRIT_OP, ATT_ID, eth, eth, primary,
+      {packed_uic_signature_tag(fc::crypto::signature::sig_type::k1)});
+   const auto valid_uic = create_signed_uic(
+      UWRIT_OP, ATT_ID, eth, eth, primary);
+
+   const std::string truncated_bytes(truncated_uic.begin(), truncated_uic.end());
+   const std::string valid_bytes(valid_uic.begin(), valid_uic.end());
+   BOOST_REQUIRE_EQUAL(success(), deliver(
+      /*proven=*/ eth,
+      encode_envelope_with_attestations(
+         current_epoch(),
+         AttestationType::ATTESTATION_TYPE_UNDERWRITE_INTENT_COMMIT,
+         {truncated_bytes, valid_bytes})));
+
+   const auto req = get_uwreq(ATT_ID);
+   BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_CONFIRMED",
+                       req["status"].as_string());
+   BOOST_REQUIRE_EQUAL(UWRIT_OP.to_string(), req["winner"].as_string());
+   BOOST_REQUIRE(!get_lock(1).is_null());
+} FC_LOG_AND_RETHROW() }
+
+// A UIC's `uw_account` remains a signed claim at the depot boundary. Current
+// outposts decode and canonicalize each UIC, authenticate its chain-native
+// submitter, and bind that caller to the claimed ACTIVE WIRE roster entry before
+// relaying the original bytes. The depot independently repeats the current
+// permission-signature check as defense in depth against a compromised,
+// outdated, or misconfigured outpost. A forged direct delivery is ignored
+// before mutation, so the untouched source leg can still pair with the honest
+// destination and win.
+BOOST_FIXTURE_TEST_CASE(swap_forged_claim_cannot_overwrite_honest_candidate,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+   BOOST_REQUIRE_EQUAL(success(), push(
+      CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
+         ("kind", ChainKind::CHAIN_KIND_SVM)
+         ("code", codename_mvo("SOLANA"))
+         ("external_chain_id", 900)
+         ("name", std::string("solana-test"))
+         ("description", std::string{})));
+   const auto solana_link_key = fc::crypto::private_key::generate(
+      fc::crypto::private_key::key_type::ed).get_public_key();
+   BOOST_REQUIRE_EQUAL(success(), push(
+      AUTHEX_ACCOUNT, authex_abi, AUTHEX_ACCOUNT, "recordlink"_n, mvo()
+         ("account", UWRIT_OP)
+         ("chain_kind", ChainKind::CHAIN_KIND_SVM)
+         ("pub_key", solana_link_key)));
+   setup_wire_token_and_reserves();
+
+   const uint64_t eth       = fc::slug_name{"ETH"}.value;
+   const uint64_t sol_chain = fc::slug_name{"SOLANA"}.value;
+   const uint64_t sol_token = fc::slug_name{"SOL"}.value;
+   const uint64_t primary   = fc::slug_name{"PRIMARY"}.value;
+   constexpr uint64_t ATT_ID = 7200;
+   BOOST_REQUIRE_EQUAL(success(),
+      depositinle_credit(UWRIT_OP, "ETH", "ETH", uint64_t{1'000'000}));
+   BOOST_REQUIRE_EQUAL(success(),
+      depositinle_credit(UWRIT_OP, "SOLANA", "SOL", uint64_t{1'000'000}));
+
+   const auto sr = encode_swap_request(
+      ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
+      eth, eth, primary, /*src_amount*/ 100,
+      sol_chain, sol_token, primary, /*target*/ 100,
+      /*tolerance_bps*/ 1'000'000,
+      ChainKind::CHAIN_KIND_SVM, std::vector<char>(32, '\x0b'));
+   BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, eth, sr));
+
+   const auto honest_source =
+      create_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
+   BOOST_REQUIRE_EQUAL(success(),
+      rcrdcommit_direct(ATT_ID, UWRIT_OP, eth,
+                        "ETH", "ETH", "PRIMARY", honest_source));
+
+   const auto before_forgery = get_uwreq(ATT_ID);
+   BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_PENDING",
+                       before_forgery["status"].as_string());
+   BOOST_REQUIRE_EQUAL(1u, before_forgery["commits_by"].get_array().size());
+   const auto& honest_candidate = before_forgery["commits_by"].get_array().front();
+   BOOST_REQUIRE_EQUAL("UNDERWRITE_STATUS_INTENT_SUBMITTED",
+                       honest_candidate["status"].as_string());
+   const auto stored_source_before = honest_candidate["source_uic_bytes"].as_string();
+   const auto source_received_before =
+      honest_candidate["source_received_at_ms"].as_uint64();
+   BOOST_REQUIRE(source_received_before > 0);
+
+   // This UIC claims UWRIT_OP but is signed by the unrelated batchop.a key.
+   // Drive the real envelope path so dispatch derives UWRIT_OP from the forged
+   // field before signature recovery rejects it.
+   const auto forged_source =
+      create_signed_uic_as(UWRIT_OP, BATCHOP, ATT_ID, eth, eth, primary);
+   const std::string forged_source_bytes(forged_source.begin(), forged_source.end());
+   BOOST_REQUIRE_EQUAL(success(),
+      deliver(
+         /*proven=*/ eth,
+         encode_envelope_with_one_attestation(
+            current_epoch(),
+            AttestationType::ATTESTATION_TYPE_UNDERWRITE_INTENT_COMMIT,
+            forged_source_bytes)));
+
+   const auto after_forgery = get_uwreq(ATT_ID);
+   BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_PENDING",
+                       after_forgery["status"].as_string());
+   BOOST_REQUIRE_EQUAL(1u, after_forgery["commits_by"].get_array().size());
+   const auto& candidate_after = after_forgery["commits_by"].get_array().front();
+   BOOST_REQUIRE_EQUAL("UNDERWRITE_STATUS_INTENT_SUBMITTED",
+                       candidate_after["status"].as_string());
+   BOOST_REQUIRE_EQUAL(stored_source_before,
+                       candidate_after["source_uic_bytes"].as_string());
+   BOOST_REQUIRE_EQUAL(source_received_before,
+                       candidate_after["source_received_at_ms"].as_uint64());
+   BOOST_REQUIRE(candidate_after["reason"].as_string().empty());
+
+   const auto honest_destination =
+      create_signed_uic(UWRIT_OP, ATT_ID, sol_chain, sol_token, primary);
+   BOOST_REQUIRE_EQUAL(success(),
+      rcrdcommit_direct(ATT_ID, UWRIT_OP, sol_chain,
+                        "SOLANA", "SOL", "PRIMARY", honest_destination));
+
+   const auto confirmed = get_uwreq(ATT_ID);
+   BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_CONFIRMED",
+                       confirmed["status"].as_string());
+   BOOST_REQUIRE_EQUAL(UWRIT_OP.to_string(), confirmed["winner"].as_string());
 } FC_LOG_AND_RETHROW() }
 
 // ── Underwriter role + activation gate at commit ingestion ───────────────────
@@ -2459,7 +3728,7 @@ BOOST_FIXTURE_TEST_CASE(swap_commit_non_underwriter_type_is_dropped,
 
    // Valid UIC self-signed by PRODOP — signature recovery passes, so only the
    // eligibility gate can reject it.
-   const auto uic = make_signed_uic(PRODOP, ATT_ID, eth, eth, primary);
+   const auto uic = create_signed_uic(PRODOP, ATT_ID, eth, eth, primary);
    BOOST_REQUIRE_EQUAL(success(),
       rcrdcommit_direct(ATT_ID, PRODOP, eth, "ETH", "ETH", "PRIMARY", uic));
 
@@ -2509,7 +3778,7 @@ BOOST_FIXTURE_TEST_CASE(swap_commit_inactive_underwriter_is_dropped,
       5000, ChainKind::CHAIN_KIND_WIRE, rcpt);
    BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, eth, sr));
 
-   const auto uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
+   const auto uic = create_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
    BOOST_REQUIRE_EQUAL(success(),
       rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", uic));
 
@@ -2769,15 +4038,16 @@ BOOST_FIXTURE_TEST_CASE(swap_request_negative_source_is_reverted,
 // legs; checking each leg independently lets a balance covering each single leg
 // but not their sum win and overcommit the bucket.
 
-// Negative: balance 150 covers each single 100-leg but not the 200 aggregate —
-// the candidate must be DISQUALIFIED and the race left PENDING with no locks.
-BOOST_FIXTURE_TEST_CASE(swap_same_token_legs_overcommit_is_disqualified,
+// Balance 150 covers each single 100-leg but not the 200 aggregate. The valid
+// candidate remains PENDING after the failed capacity check; a top-up followed
+// by an exact external UIC replay settles from the stored UICs.
+BOOST_FIXTURE_TEST_CASE(swap_same_token_legs_overcommit_recovers_after_top_up_replay,
                         sysio_dispatch_tester) { try {
    bootstrap_for_dispatch();   // ETH chain + UWRIT_OP (EVM authex link)
-   // Both reserves must be ACTIVE and priceable: the resolver re-quotes on the
-   // live curve BEFORE the bond check (it is the quote that fixes `dst_amount`,
-   // and the bond must cover what the winner will actually deliver), so an
-   // unpriceable request never reaches the bond gate at all.
+   // Both reserves must be ACTIVE and priceable: the resolver computes the live
+   // quote before the bond check so the bond covers the actual obligation, then
+   // applies request-level quote verdicts only after that candidate gate. This
+   // setup keeps the test specifically on the aggregate-collateral path.
    setup_wire_token_and_reserves();
    BOOST_REQUIRE_EQUAL(success(), regreserve_active("ETH", "ETH", "SECOND"));
 
@@ -2787,7 +4057,6 @@ BOOST_FIXTURE_TEST_CASE(swap_same_token_legs_overcommit_is_disqualified,
    constexpr uint64_t ATT_ID     = 8000;
    constexpr int64_t  SRC_AMOUNT = 100;
    constexpr uint64_t DST_AMOUNT = 100;
-
    // One (ETH, ETH) bucket holds 150 against an aggregate need of
    // `src_amount + quote(src_amount)` — just under 200, so 150 cannot cover it.
    BOOST_REQUIRE_EQUAL(success(), depositinle_credit(UWRIT_OP, "ETH", "ETH", 150));
@@ -2800,10 +4069,10 @@ BOOST_FIXTURE_TEST_CASE(swap_same_token_legs_overcommit_is_disqualified,
       /*tolerance_bps*/ 1'000'000, ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0b'));
    BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, eth, sr));
 
-   const auto src_uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
+   const auto src_uic = create_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
    BOOST_REQUIRE_EQUAL(success(),
       rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", src_uic));
-   const auto dst_uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, secondary);
+   const auto dst_uic = create_signed_uic(UWRIT_OP, ATT_ID, eth, eth, secondary);
    BOOST_REQUIRE_EQUAL(success(),
       rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "SECOND", dst_uic));
 
@@ -2813,18 +4082,242 @@ BOOST_FIXTURE_TEST_CASE(swap_same_token_legs_overcommit_is_disqualified,
    for (const auto& c : req["commits_by"].get_array()) {
       if (c["underwriter"].as_string() == UWRIT_OP.to_string()) {
          found = true;
-         BOOST_REQUIRE_EQUAL("UNDERWRITE_STATUS_DISQUALIFIED", c["status"].as_string());
-         BOOST_REQUIRE(c["reason"].as_string().find("aggregate required") != std::string::npos);
+         BOOST_REQUIRE_EQUAL("UNDERWRITE_STATUS_INTENT_SUBMITTED",
+                             c["status"].as_string());
+         BOOST_REQUIRE(c["reason"].as_string().empty());
+         BOOST_REQUIRE(!c["source_uic_bytes"].as_string().empty());
+         BOOST_REQUIRE(!c["dest_uic_bytes"].as_string().empty());
       }
    }
    BOOST_REQUIRE(found);
    BOOST_REQUIRE(get_lock(1).is_null());   // no locks written
+
+   // More collateral makes this already-proven candidate eligible. An exact
+   // replay revalidates both stored signatures and writes the two locks.
+   BOOST_REQUIRE_EQUAL(success(),
+      depositinle_credit(UWRIT_OP, "ETH", "ETH", 50));
+   produce_block();
+   BOOST_REQUIRE_EQUAL(success(), rcrdcommit_direct(
+      ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", src_uic));
+
+   const auto confirmed = get_uwreq(ATT_ID);
+   BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_CONFIRMED",
+                       confirmed["status"].as_string());
+   BOOST_REQUIRE_EQUAL(UWRIT_OP.to_string(), confirmed["winner"].as_string());
+   BOOST_REQUIRE_EQUAL(UWRIT_OP.to_string(), get_lock(1)["underwriter"].as_string());
+   BOOST_REQUIRE_EQUAL(UWRIT_OP.to_string(), get_lock(2)["underwriter"].as_string());
+   BOOST_REQUIRE_EQUAL(ATT_ID, get_lock(1)["uwreq_id"].as_uint64());
+   BOOST_REQUIRE_EQUAL(ATT_ID, get_lock(2)["uwreq_id"].as_uint64());
+   BOOST_REQUIRE(get_lock(3).is_null());
+} FC_LOG_AND_RETHROW() }
+
+// Reserve liquidity belongs to the request, not to an underwriter candidate.
+// If it changes after request admission but before the second UIC reaches the
+// depot, the live AMM re-quote turns the drain into price drift before the
+// defensive raw-liquidity precheck. A fully bonded candidate may therefore
+// trigger the request-level rejection/refund, releasing compact candidate
+// metadata instead of leaving a complete row with no retry or wake-up path.
+BOOST_FIXTURE_TEST_CASE(swap_race_time_reserve_drain_rejects_request,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+   BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT,
+      "regchain"_n, mvo()
+         ("kind",              ChainKind::CHAIN_KIND_SVM)
+         ("code",              codename_mvo("SOLANA"))
+         ("external_chain_id", 900)
+         ("name",              std::string("solana-test"))
+         ("description",       std::string{})));
+   const auto solana_link_key = fc::crypto::private_key::generate(
+      fc::crypto::private_key::key_type::ed).get_public_key();
+   BOOST_REQUIRE_EQUAL(success(), push(
+      AUTHEX_ACCOUNT, authex_abi, AUTHEX_ACCOUNT, "recordlink"_n, mvo()
+         ("account", UWRIT_OP)
+         ("chain_kind", ChainKind::CHAIN_KIND_SVM)
+         ("pub_key", solana_link_key)));
+   setup_wire_token_and_reserves();
+
+   const uint64_t eth       = fc::slug_name{"ETH"}.value;
+   const uint64_t sol_chain = fc::slug_name{"SOLANA"}.value;
+   const uint64_t sol_token = fc::slug_name{"SOL"}.value;
+   const uint64_t primary   = fc::slug_name{"PRIMARY"}.value;
+   constexpr uint64_t ATT_ID = 8004;
+   constexpr uint64_t AMOUNT = 1'000'000'000;
+
+   BOOST_REQUIRE_EQUAL(success(),
+      depositinle_credit(UWRIT_OP, "ETH", "ETH", AMOUNT));
+   BOOST_REQUIRE_EQUAL(success(),
+      depositinle_credit(UWRIT_OP, "SOLANA", "SOL", AMOUNT));
+
+   const auto sr = encode_swap_request(
+      ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
+      eth, eth, primary, static_cast<int64_t>(AMOUNT),
+      sol_chain, sol_token, primary, AMOUNT,
+      /*tolerance_bps*/ 1'000'000, ChainKind::CHAIN_KIND_SVM,
+      std::vector<char>(32, '\x0b'));
+   BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, eth, sr));
+
+   // The request was admitted against 1e12 units. Drain the destination only
+   // after admission, while its two UICs are notionally in flight. The live
+   // quote remains positive but falls outside the fixed target's tolerance, so
+   // the candidate passes its bond gate before the request is rejected.
+   constexpr uint64_t SEEDED_RESERVE = 1'000'000'000'000ull;
+   BOOST_REQUIRE_EQUAL(success(), debit_reserve_chain(
+      "SOLANA", "SOL", "PRIMARY", SEEDED_RESERVE - (AMOUNT - 1)));
+
+   const auto src_uic = create_signed_uic(
+      UWRIT_OP, ATT_ID, eth, eth, primary);
+   BOOST_REQUIRE_EQUAL(success(), rcrdcommit_direct(
+      ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", src_uic));
+   const auto dst_uic = create_signed_uic(
+      UWRIT_OP, ATT_ID, sol_chain, sol_token, primary);
+   BOOST_REQUIRE_EQUAL(success(), rcrdcommit_direct(
+      ATT_ID, UWRIT_OP, sol_chain, "SOLANA", "SOL", "PRIMARY", dst_uic));
+
+   const auto req = get_uwreq(ATT_ID);
+   BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_REJECTED",
+                       req["status"].as_string());
+   BOOST_REQUIRE(req["attestation_inbound_data"].as_string().empty());
+   const auto candidate = req["commits_by"].get_array().front();
+   BOOST_REQUIRE_EQUAL("UNDERWRITE_STATUS_RELEASED",
+                       candidate["status"].as_string());
+   BOOST_CHECK_NE(std::string::npos,
+                  candidate["reason"].as_string().find("variance drift"));
+   BOOST_REQUIRE(candidate["source_uic_bytes"].as_string().empty());
+   BOOST_REQUIRE(candidate["dest_uic_bytes"].as_string().empty());
+   BOOST_REQUIRE(get_lock(1).is_null());
+} FC_LOG_AND_RETHROW() }
+
+// An exact external replay is a fresh outpost trigger. An adverse price move
+// discovered while re-evaluating the immutable UIC pair therefore rejects and
+// refunds this otherwise eligible request.
+BOOST_FIXTURE_TEST_CASE(swap_replayed_uic_variance_drift_rejects_request,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();   // registers ETH + UWRIT_OP (EVM link only)
+   BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT,
+      "regchain"_n, mvo()
+         ("kind",              ChainKind::CHAIN_KIND_SVM)
+         ("code",              codename_mvo("SOLANA"))
+         ("external_chain_id", 900)
+         ("name",              std::string("solana-test"))
+         ("description",       std::string{})));
+
+   const uint64_t eth       = fc::slug_name{"ETH"}.value;
+   const uint64_t sol_chain = fc::slug_name{"SOLANA"}.value;
+   const uint64_t sol_token = fc::slug_name{"SOL"}.value;
+   const uint64_t primary   = fc::slug_name{"PRIMARY"}.value;
+   constexpr uint64_t ATT_ID = 8006;
+   constexpr uint64_t AMOUNT = 1'000'000'000;
+
+   setup_wire_token_and_reserves();
+   BOOST_REQUIRE_EQUAL(success(), depositinle_credit(UWRIT_OP, "ETH", "ETH", AMOUNT));
+   BOOST_REQUIRE_EQUAL(success(), depositinle_credit(UWRIT_OP, "SOLANA", "SOL", AMOUNT));
+
+   const auto sr = encode_swap_request(
+      ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
+      eth, eth, primary, static_cast<int64_t>(AMOUNT),
+      sol_chain, sol_token, primary, AMOUNT,
+      /*tolerance_bps*/ 1'000'000, ChainKind::CHAIN_KIND_SVM,
+      std::vector<char>(32, '\x0b'));
+   BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, eth, sr));
+
+   // Leave the destination authex link absent while both UICs arrive. This
+   // deliberately parks a complete, authenticated candidate for external replay.
+   const auto src_uic = create_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
+   BOOST_REQUIRE_EQUAL(success(), rcrdcommit_direct(
+      ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY",
+      src_uic));
+   BOOST_REQUIRE_EQUAL(success(), rcrdcommit_direct(
+      ATT_ID, UWRIT_OP, sol_chain, "SOLANA", "SOL", "PRIMARY",
+      create_signed_uic(UWRIT_OP, ATT_ID, sol_chain, sol_token, primary)));
+   BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_PENDING",
+                       get_uwreq(ATT_ID)["status"].as_string());
+
+   constexpr uint64_t SEEDED_RESERVE = 1'000'000'000'000ull;
+   BOOST_REQUIRE_EQUAL(success(), debit_reserve_chain(
+      "SOLANA", "SOL", "PRIMARY", SEEDED_RESERVE - (AMOUNT - 1)));
+
+   const auto solana_link_key = fc::crypto::private_key::generate(
+      fc::crypto::private_key::key_type::ed).get_public_key();
+   BOOST_REQUIRE_EQUAL(success(), push(
+      AUTHEX_ACCOUNT, authex_abi, AUTHEX_ACCOUNT, "recordlink"_n, mvo()
+         ("account", UWRIT_OP)
+         ("chain_kind", ChainKind::CHAIN_KIND_SVM)
+         ("pub_key", solana_link_key)));
+   produce_block();
+
+   BOOST_REQUIRE_EQUAL(success(), rcrdcommit_direct(
+      ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", src_uic));
+   const auto req = get_uwreq(ATT_ID);
+   BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_REJECTED", req["status"].as_string());
+   const auto candidate = req["commits_by"].get_array().front();
+   BOOST_REQUIRE_EQUAL("UNDERWRITE_STATUS_RELEASED",
+                       candidate["status"].as_string());
+   BOOST_REQUIRE(candidate["source_uic_bytes"].as_string().empty());
+   BOOST_REQUIRE(candidate["dest_uic_bytes"].as_string().empty());
+   BOOST_REQUIRE(get_lock(1).is_null());
+} FC_LOG_AND_RETHROW() }
+
+// createuwreq admits missing/inactive reserves for dev and smoke clusters. A
+// complete candidate must keep the request PENDING while the reserve route is
+// provisioned, then settle after an exact external UIC replay.
+BOOST_FIXTURE_TEST_CASE(swap_missing_reserve_complete_candidate_recovers_after_provisioning_replay,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+
+   const uint64_t eth       = fc::slug_name{"ETH"}.value;
+   const uint64_t primary   = fc::slug_name{"PRIMARY"}.value;
+   const uint64_t secondary = fc::slug_name{"SECOND"}.value;
+   constexpr uint64_t ATT_ID = 8005;
+   constexpr uint64_t AMOUNT = 100;
+
+   // No reserve rows are provisioned. The zero ingestion quote leaves only the
+   // source amount in this same-bucket candidate's authoritative bond check.
+   BOOST_REQUIRE_EQUAL(success(),
+      depositinle_credit(UWRIT_OP, "ETH", "ETH", uint64_t{1'000'000}));
+   const auto sr = encode_swap_request(
+      ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
+      eth, eth, primary, static_cast<int64_t>(AMOUNT),
+      eth, eth, secondary, AMOUNT,
+      /*tolerance_bps*/ 1'000'000, ChainKind::CHAIN_KIND_EVM,
+      std::vector<char>(20, '\x0b'));
+   BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, eth, sr));
+
+   BOOST_REQUIRE_EQUAL(success(), rcrdcommit_direct(
+      ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY",
+      create_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary)));
+   const auto dst_uic = create_signed_uic(UWRIT_OP, ATT_ID, eth, eth, secondary);
+   BOOST_REQUIRE_EQUAL(success(), rcrdcommit_direct(
+      ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "SECOND",
+      dst_uic));
+
+   const auto req = get_uwreq(ATT_ID);
+   BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_PENDING",
+                       req["status"].as_string());
+   const auto candidate = req["commits_by"].get_array().front();
+   BOOST_REQUIRE_EQUAL("UNDERWRITE_STATUS_INTENT_SUBMITTED",
+                       candidate["status"].as_string());
+   BOOST_REQUIRE(!candidate["source_uic_bytes"].as_string().empty());
+   BOOST_REQUIRE(!candidate["dest_uic_bytes"].as_string().empty());
+   BOOST_REQUIRE(get_lock(1).is_null());
+
+   setup_wire_token_and_reserves();
+   BOOST_REQUIRE_EQUAL(success(), regreserve_active("ETH", "ETH", "SECOND"));
+   // The replay has identical action data by design. Advance the test chain so
+   // its enclosing transaction is a new relay submission rather than the
+   // duplicate transaction ID of the original delivery.
+   produce_block();
+   BOOST_REQUIRE_EQUAL(success(), rcrdcommit_direct(
+      ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "SECOND", dst_uic));
+   BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_CONFIRMED",
+                       get_uwreq(ATT_ID)["status"].as_string());
+   BOOST_REQUIRE(!get_lock(1).is_null());
+   BOOST_REQUIRE(!get_lock(2).is_null());
 } FC_LOG_AND_RETHROW() }
 
 // Positive + existing-locks coverage: a balance that covers the aggregate
 // (`src_amount + quote`) must select the underwriter and write two locks
 // totaling exactly that. A subsequent same-bucket swap must then see
-// availability reduced by those active locks and be disqualified.
+// availability reduced by those active locks and disqualify that candidate.
 //
 // The destination lock is sized by the AMM QUOTE, not by the caller's
 // `target_amount` (WNS-02) — hence the assertions derive from `expected_quote`
@@ -2856,10 +4349,10 @@ BOOST_FIXTURE_TEST_CASE(swap_same_token_legs_exact_balance_wins,
    // The row carries the QUOTE, never the caller's target.
    BOOST_REQUIRE_EQUAL(quote, get_uwreq(ATT_ID)["dst_amount"].as_uint64());
 
-   const auto src_uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
+   const auto src_uic = create_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
    BOOST_REQUIRE_EQUAL(success(),
       rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", src_uic));
-   const auto dst_uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, secondary);
+   const auto dst_uic = create_signed_uic(UWRIT_OP, ATT_ID, eth, eth, secondary);
    BOOST_REQUIRE_EQUAL(success(),
       rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "SECOND", dst_uic));
 
@@ -2882,7 +4375,8 @@ BOOST_FIXTURE_TEST_CASE(swap_same_token_legs_exact_balance_wins,
    BOOST_REQUIRE_EQUAL(100u + quote, l1["amount"].as_uint64() + l2["amount"].as_uint64());
 
    // Existing active locks now reserve the whole bucket (available == 0), so a
-   // fresh same-bucket swap must be disqualified. Amounts must be large enough
+   // fresh same-bucket swap cannot win yet but retains valid retryable evidence.
+   // Amounts must be large enough
    // to price against the 1e12 reserves — a sub-quote-floor amount is rejected
    // earlier by the unpriceable-reserve gate, which would mask the bond check.
    constexpr uint64_t ATT_ID2 = 8101;
@@ -2892,21 +4386,26 @@ BOOST_FIXTURE_TEST_CASE(swap_same_token_legs_exact_balance_wins,
       eth, eth, secondary, /*dst_amount*/ 100,
       /*tolerance_bps*/ 1'000'000, ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0b'));
    BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID2, eth, sr2));
-   const auto src_uic2 = make_signed_uic(UWRIT_OP, ATT_ID2, eth, eth, primary);
+   const auto src_uic2 = create_signed_uic(UWRIT_OP, ATT_ID2, eth, eth, primary);
    BOOST_REQUIRE_EQUAL(success(),
       rcrdcommit_direct(ATT_ID2, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", src_uic2));
-   const auto dst_uic2 = make_signed_uic(UWRIT_OP, ATT_ID2, eth, eth, secondary);
+   const auto dst_uic2 = create_signed_uic(UWRIT_OP, ATT_ID2, eth, eth, secondary);
    BOOST_REQUIRE_EQUAL(success(),
       rcrdcommit_direct(ATT_ID2, UWRIT_OP, eth, "ETH", "ETH", "SECOND", dst_uic2));
 
    const auto req2 = get_uwreq(ATT_ID2);
    BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_PENDING", req2["status"].as_string());
-   bool dq = false;
+   bool retryable = false;
    for (const auto& c : req2["commits_by"].get_array()) {
-      if (c["underwriter"].as_string() == UWRIT_OP.to_string())
-         dq = (c["status"].as_string() == "UNDERWRITE_STATUS_DISQUALIFIED");
+      if (c["underwriter"].as_string() == UWRIT_OP.to_string()) {
+         retryable =
+            c["status"].as_string() == "UNDERWRITE_STATUS_INTENT_SUBMITTED"
+            && c["reason"].as_string().empty()
+            && !c["source_uic_bytes"].as_string().empty()
+            && !c["dest_uic_bytes"].as_string().empty();
+      }
    }
-   BOOST_REQUIRE(dq);
+   BOOST_REQUIRE(retryable);
 } FC_LOG_AND_RETHROW() }
 
 // WSA-028 closes the single-swap aggregate-overflow vector at ingress. SEC-15's
@@ -2915,7 +4414,8 @@ BOOST_FIXTURE_TEST_CASE(swap_same_token_legs_exact_balance_wins,
 // amount of -1 wrapped to UINT64_MAX. to_depot_amount now rejects that source
 // before any uwreq exists, so a single swap can no longer form the overflow: the
 // request reverts and creates no uwreq. The uint128 aggregate addition itself
-// stays covered by swap_same_token_legs_overcommit_is_disqualified / _exact_balance_wins.
+// stays covered by swap_same_token_legs_overcommit_recovers_after_top_up /
+// _exact_balance_wins.
 BOOST_FIXTURE_TEST_CASE(swap_oversized_source_reverts_at_ingress,
                         sysio_dispatch_tester) { try {
    bootstrap_for_dispatch();
@@ -2972,7 +4472,7 @@ BOOST_FIXTURE_TEST_CASE(releaselock_clamps_overdrain_without_aborting,
       wire, wire, primary, /*target*/ 50,
       /*tolerance_bps*/ 1'000'000, ChainKind::CHAIN_KIND_WIRE, rcpt);
    BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, eth, sr));
-   const auto src_uic = make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
+   const auto src_uic = create_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
    BOOST_REQUIRE_EQUAL(success(),
       rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", src_uic));
    BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_CONFIRMED",
@@ -3129,14 +4629,17 @@ BOOST_FIXTURE_TEST_CASE(swapfromwire_enforces_min_amount, sysio_dispatch_tester)
 } FC_LOG_AND_RETHROW() }
 
 // Caller-controlled drain-time reverts forfeit the configured revert fee: the refund returns the
-// escrow minus the fee, and the fee routes through the standard rewards/emissions split exactly
+// escrow minus the fee, and the fee routes through the standard `route_wire_fee` path exactly
 // like a settlement fee — so revert churn pays the system instead of recycling for free.
 BOOST_FIXTURE_TEST_CASE(drainfwq_charges_revert_fee_on_caller_fault, sysio_dispatch_tester) { try {
    constexpr uint64_t ESCROW              = 5'000'000'000ull; // the default floor exactly
    constexpr uint32_t REVERT_FEE_BPS      = 100;              // 1%
    constexpr uint64_t FEE                 = ESCROW * REVERT_FEE_BPS / 10000ull; // 0.05 WIRE
-   // Mirror of sysio.reserv.hpp::FEE_REWARD_SHARE_BPS (50% rewards / 50% emissions).
-   constexpr uint64_t REWARD_SHARE        = FEE / 2;
+   // A revert has no winning underwriter, so `refundwire` passes a zero underwriter share and
+   // the WHOLE fee becomes the rewards pool. reserv's `fee_emissions_share_bps` is never set
+   // here (the default 0), so that pool lands in the rewards bucket intact (batch operators);
+   // a configured dial would divert its share to the emissions treasury.
+   constexpr uint64_t REWARD_SHARE        = FEE;
    constexpr uint64_t DEPOT_ORIGIN_ID_0   = 0x8000000000000000ull;
    const auto WIRE_SYM = symbol(9, "WIRE");
 
@@ -3175,9 +4678,16 @@ BOOST_FIXTURE_TEST_CASE(drainfwq_charges_revert_fee_on_caller_fault, sysio_dispa
    BOOST_REQUIRE_EQUAL(success(),
       push(UWRIT_ACCOUNT, uwrit_abi, EPOCH_ACCOUNT, "drainfwq"_n, mvo()));
 
-   // Row consumed; escrow minus the fee came back; the fee split 50/50 into the reserv rewards
-   // bucket (custody-internal) and the sysio emissions treasury (real transfer).
+   // Row consumed; escrow minus the fee is now OWED to the caller; the whole fee accrued into
+   // the reserv rewards bucket (custody-internal — no transfer leaves reserv for a fee).
+   //
+   // The refund is credited, not pushed. drainfwq runs inline from sysio.epoch::advance,
+   // where a recipient's transfer-notify handler could otherwise abort the whole advance -- and
+   // because the queue-row erase rolls back with it, that block would be permanent. Pulling the
+   // credit via claimwire produces the original balance.
    BOOST_REQUIRE(get_row_by_id(UWRIT_ACCOUNT, UWRIT_ACCOUNT, "fwqueue"_n, DEPOT_ORIGIN_ID_0).empty());
+   BOOST_REQUIRE_EQUAL(success(),
+      push(RESERV_ACCOUNT, reserv_abi, "swapuser"_n, "claimwire"_n, mvo()("account", "swapuser")));
    BOOST_REQUIRE_EQUAL(funded - static_cast<int64_t>(FEE),
       get_currency_balance(TOKEN_ACCOUNT, WIRE_SYM, "swapuser"_n).get_amount());
    auto bkt_data = get_row_by_account(RESERV_ACCOUNT, RESERV_ACCOUNT, "rewardbkt"_n, "rewardbkt"_n);
@@ -3226,12 +4736,96 @@ BOOST_FIXTURE_TEST_CASE(drainfwq_full_refund_on_system_caused_revert, sysio_disp
    BOOST_REQUIRE_EQUAL(success(),
       push(UWRIT_ACCOUNT, uwrit_abi, EPOCH_ACCOUNT, "drainfwq"_n, mvo()));
 
-   // Full escrow returned — no fee — and no rewards-bucket accrual.
+   // Full escrow returned — no fee — and no rewards-bucket accrual. Credited rather than pushed
+   // (credited, not pushed), so the caller pulls it with claimwire.
    BOOST_REQUIRE(get_row_by_id(UWRIT_ACCOUNT, UWRIT_ACCOUNT, "fwqueue"_n, DEPOT_ORIGIN_ID_0).empty());
+   BOOST_REQUIRE_EQUAL(success(),
+      push(RESERV_ACCOUNT, reserv_abi, "swapuser"_n, "claimwire"_n, mvo()("account", "swapuser")));
    BOOST_REQUIRE_EQUAL(funded,
       get_currency_balance(TOKEN_ACCOUNT, WIRE_SYM, "swapuser"_n).get_amount());
    BOOST_REQUIRE(get_row_by_account(RESERV_ACCOUNT, RESERV_ACCOUNT,
                                     "rewardbkt"_n, "rewardbkt"_n).empty());
+} FC_LOG_AND_RETHROW() }
+
+// [P0] A swap-from-WIRE user cannot halt the epoch drain by refusing its own refund.
+//
+// This was the cheapest and most durable chain-halt in the protocol. `sysio.token::transfer`
+// notifies `to`, and the chain runs notified receivers with no exception isolation, so a recipient
+// asserting in its transfer-notify handler aborts the WHOLE transaction. `refundwire` is inlined
+// from the never-throw `drainfwq` drain, which is itself inlined from `sysio.epoch::advance` --
+// so the abort took down epoch advancement chain-wide. Worse, the drain's `q.erase()` rolled back
+// with it, leaving the offending queue row in place to re-block every later epoch. Cost to the
+// attacker: one `min_fromwire_amount` escrow, once.
+//
+// `refundwire` now credits `wireclaims` and transfers nothing, so no recipient handler runs on the
+// drain path. The drain completes, the row is consumed, and the hostile user is merely owed money
+// it cannot collect.
+BOOST_FIXTURE_TEST_CASE(blocking_refund_recipient_cannot_stall_drainfwq, sysio_dispatch_tester) { try {
+   constexpr uint64_t ESCROW            = 5'000'000'000ull;
+   constexpr uint64_t DEPOT_ORIGIN_ID_0 = 0x8000000000000000ull;
+   const auto WIRE_SYM = symbol(9, "WIRE");
+
+   bootstrap_for_dispatch();
+   setup_wire_token_and_reserves();
+   // No depot chain registered -> the drain takes the full-refund (system-fault) branch.
+   BOOST_REQUIRE_EQUAL(success(), push(UWRIT_ACCOUNT, uwrit_abi, UWRIT_ACCOUNT, "setconfig"_n, mvo()
+      ("fee_bps", 10)("collateral_lock_duration_ms", 120'000u)
+      ("min_fromwire_amount", ESCROW)("fromwire_revert_fee_bps", 100)
+      ("uwreq_pending_timeout_epochs", 10)("uwreq_retention_epochs", 10)));
+
+   create_account("swapuser"_n, config::system_account_name, /*multisig=*/false,
+                  /*include_code=*/true, /*include_roa_policy=*/false);
+   BOOST_REQUIRE_EQUAL(success(), push(TOKEN_ACCOUNT, token_abi, config::system_account_name,
+      "transfer"_n, mvo()("from", "sysio")("to", "swapuser")
+         ("quantity", "10.000000000 WIRE")("memo", "fund swap user")));
+
+   // Queue the swap FIRST: the escrow leg is an outgoing transfer, and arming the blocker before
+   // it would stop the setup rather than the path under test.
+   BOOST_REQUIRE_EQUAL(success(),
+      push(UWRIT_ACCOUNT, uwrit_abi, "swapuser"_n, "swapfromwire"_n, mvo()
+         ("user",                 "swapuser")
+         ("wire_amount",          ESCROW)
+         ("dst_chain_code",       codename_mvo("ETH"))
+         ("dst_token_code",       codename_mvo("ETH"))
+         ("dst_reserve_code",     codename_mvo("PRIMARY"))
+         ("target_amount",        uint64_t{1'000'000})
+         ("target_tolerance_bps", uint32_t{10000})
+         ("recipient_kind",       sysio::opp::types::ChainKind::CHAIN_KIND_EVM)
+         ("recipient_addr",       std::vector<char>(20, '\x0a'))));
+   const int64_t escrowed_bal = get_currency_balance(TOKEN_ACCOUNT, WIRE_SYM, "swapuser"_n).get_amount();
+
+   // Arm the blocker: every INCOMING transfer to swapuser now asserts.
+   control->get_mutable_resource_limits_manager()
+      .set_account_limits("swapuser"_n, 1024 * 1024, -1, -1, false);
+   produce_blocks();
+   set_code("swapuser"_n, contracts::util::block_transfer_wasm());
+   set_abi("swapuser"_n, contracts::util::block_transfer_abi().data());
+   produce_blocks();
+
+   // The drain must still complete. Before this change it aborted, taking advance() with it.
+   BOOST_REQUIRE_EQUAL(success(),
+      push(UWRIT_ACCOUNT, uwrit_abi, EPOCH_ACCOUNT, "drainfwq"_n, mvo()));
+
+   // The queue row is consumed for good -- this is what made the old failure permanent, since the
+   // erase rolled back with the aborted transaction and the row re-blocked every later epoch.
+   BOOST_REQUIRE(get_row_by_id(UWRIT_ACCOUNT, UWRIT_ACCOUNT, "fwqueue"_n, DEPOT_ORIGIN_ID_0).empty());
+
+   // The refund is owed, not paid: the escrow has not returned to the blocker's balance.
+   BOOST_REQUIRE_EQUAL(escrowed_bal,
+      get_currency_balance(TOKEN_ACCOUNT, WIRE_SYM, "swapuser"_n).get_amount());
+
+   // And the blocker can only block itself: its own claim is what its handler rejects.
+   auto r = push(RESERV_ACCOUNT, reserv_abi, "swapuser"_n, "claimwire"_n, mvo()("account", "swapuser"));
+   BOOST_REQUIRE_MESSAGE(r != success(), "blocking user unexpectedly claimed its own refund");
+   BOOST_REQUIRE_MESSAGE(r.find("block_transfer: rejecting incoming transfer") != std::string::npos,
+                         "unexpected failure reason: " + r);
+
+   // A second drain is a clean no-op -- the queue really is empty, so epochs keep advancing.
+   // Advance a block first: an identical action replayed in the same block is rejected as a
+   // duplicate transaction before the contract runs, which would assert nothing.
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(success(),
+      push(UWRIT_ACCOUNT, uwrit_abi, EPOCH_ACCOUNT, "drainfwq"_n, mvo()));
 } FC_LOG_AND_RETHROW() }
 
 // ═════════════════════════════════════════════════════════════════════════
@@ -3357,6 +4951,10 @@ BOOST_FIXTURE_TEST_CASE(uwreq_from_wire_pending_timeout_refunds_escrow,
    age_one_epoch();
    BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_EXPIRED",
                        get_uwreq(DEPOT_ORIGIN_ID_0)["status"].as_string());
+   // Credited rather than pushed — the expiry sweep runs on the never-throw advance
+   // path, so the escrow is owed until the user pulls it.
+   BOOST_REQUIRE_EQUAL(success(),
+      push(RESERV_ACCOUNT, reserv_abi, "swapuser"_n, "claimwire"_n, mvo()("account", "swapuser")));
    BOOST_REQUIRE_EQUAL(funded,
       get_currency_balance(TOKEN_ACCOUNT, WIRE_SYM, "swapuser"_n).get_amount());
 
@@ -3397,10 +4995,10 @@ BOOST_FIXTURE_TEST_CASE(uwreq_completed_row_erased_after_retention,
    BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, eth, sr));
    BOOST_REQUIRE_EQUAL(success(),
       rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY",
-                        make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary)));
+                        create_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary)));
    BOOST_REQUIRE_EQUAL(success(),
       rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "SECOND",
-                        make_signed_uic(UWRIT_OP, ATT_ID, eth, eth, secondary)));
+                        create_signed_uic(UWRIT_OP, ATT_ID, eth, eth, secondary)));
    {
       const auto req = get_uwreq(ATT_ID);
       BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_CONFIRMED", req["status"].as_string());
@@ -3498,23 +5096,27 @@ BOOST_FIXTURE_TEST_CASE(rcrdcommit_oversized_uic_leg_is_dropped,
    setup_eth_to_sol_uwreq(ATT_ID);
    const uint64_t eth = fc::slug_name{"ETH"}.value;
 
-   // One byte past MAX_UIC_LEG_BYTES (2048) — dropped with no mutation.
+   // One byte past MAX_UIC_LEG_BYTES (2048) — validly signed, then dropped by
+   // the row-size boundary with no mutation.
+   const auto oversized_uic = create_signed_uic_of_size(
+      UWRIT_OP, ATT_ID, eth, eth, fc::slug_name{"PRIMARY"}.value, 2049);
    BOOST_REQUIRE_EQUAL(success(),
       rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY",
-                        std::vector<char>(2049, '\x01')));
+                        oversized_uic));
    BOOST_REQUIRE_EQUAL(0u, get_uwreq(ATT_ID)["commits_by"].get_array().size());
 
-   // At the cap the commit records (bytes are stored verbatim; nothing
-   // decodes them until winner selection, which this single leg never arms).
+   // At the cap the valid commit records normally.
+   const auto capped_uic = create_signed_uic_of_size(
+      UWRIT_OP, ATT_ID, eth, eth, fc::slug_name{"PRIMARY"}.value, 2048);
    BOOST_REQUIRE_EQUAL(success(),
       rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY",
-                        std::vector<char>(2048, '\x01')));
+                        capped_uic));
    BOOST_REQUIRE_EQUAL(1u, get_uwreq(ATT_ID)["commits_by"].get_array().size());
 } FC_LOG_AND_RETHROW() }
 
 // The candidate roster is capped at MAX_UWREQ_CANDIDATES (32): the 33rd
 // distinct ACTIVE underwriter is refused with no row growth, while an
-// existing candidate still updates its entry at the cap (dedupe, not append).
+// existing candidate can still supply its missing leg at the cap.
 BOOST_FIXTURE_TEST_CASE(rcrdcommit_candidate_cap_bounds_row,
                         sysio_dispatch_tester) { try {
    bootstrap_for_dispatch();
@@ -3547,18 +5149,28 @@ BOOST_FIXTURE_TEST_CASE(rcrdcommit_candidate_cap_bounds_row,
    }
    produce_blocks();
 
-   // 32 distinct candidates record; the 33rd is refused at the cap.
+   // 32 distinct candidates record; the 33rd is refused at the cap before its
+   // deliberately malformed signature can reach protobuf/signature work.
    for (uint32_t i = 0; i < 32; ++i) {
       BOOST_REQUIRE_EQUAL(success(),
          rcrdcommit_direct(ATT_ID, uws[i], eth, "ETH", "ETH", "PRIMARY",
-                           std::vector<char>{1, 2, 3}));
+                           create_signed_uic(
+                              uws[i], ATT_ID, eth, eth,
+                              fc::slug_name{"PRIMARY"}.value)));
       if (i % 8 == 7) produce_blocks();
    }
    BOOST_REQUIRE_EQUAL(32u, get_uwreq(ATT_ID)["commits_by"].get_array().size());
    produce_blocks();
-   BOOST_REQUIRE_EQUAL(success(),
-      rcrdcommit_direct(ATT_ID, uws[32], eth, "ETH", "ETH", "PRIMARY",
-                        std::vector<char>{1, 2, 3}));
+   const auto capped_trace = rcrdcommit_trace(
+      ATT_ID, uws[32], eth, "ETH", "ETH", "PRIMARY",
+      create_uic_with_signature(
+         uws[32], ATT_ID, eth, eth, fc::slug_name{"PRIMARY"}.value,
+         {packed_uic_signature_tag(fc::crypto::signature::sig_type::k1)}));
+   BOOST_REQUIRE(!capped_trace->except);
+   const auto& capped_console = capped_trace->action_traces.front().console;
+   BOOST_CHECK_NE(std::string::npos, capped_console.find("cap reached"));
+   BOOST_CHECK_EQUAL(std::string::npos,
+                     capped_console.find("UIC_SIGNATURE_REJECTED"));
    {
       const auto req = get_uwreq(ATT_ID);
       BOOST_REQUIRE_EQUAL(32u, req["commits_by"].get_array().size());
@@ -3567,11 +5179,808 @@ BOOST_FIXTURE_TEST_CASE(rcrdcommit_candidate_cap_bounds_row,
       }
    }
 
-   // An EXISTING candidate still updates its entry at the cap.
+   // An EXISTING candidate can still supply its missing destination leg at the
+   // cap. It reaches normal validation/winner handling rather than the roster rail.
+   const auto sol_chain = fc::slug_name{"SOLANA"}.value;
+   const auto sol_token = fc::slug_name{"SOL"}.value;
    BOOST_REQUIRE_EQUAL(success(),
-      rcrdcommit_direct(ATT_ID, uws[0], eth, "ETH", "ETH", "PRIMARY",
-                        std::vector<char>{4, 5, 6}));
+      rcrdcommit_direct(ATT_ID, uws[0], sol_chain, "SOLANA", "SOL", "PRIMARY",
+                        create_signed_uic(
+                           uws[0], ATT_ID, sol_chain, sol_token,
+                           fc::slug_name{"PRIMARY"}.value)));
    BOOST_REQUIRE_EQUAL(32u, get_uwreq(ATT_ID)["commits_by"].get_array().size());
+} FC_LOG_AND_RETHROW() }
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  Underwriter-fault challenge (WIRE-297) — openuwchal / voteuwchal /
+//  chkuwchal / uwchalbond + the uwrit lock-hold trio
+// ═══════════════════════════════════════════════════════════════════════════
+
+/// The dispatch stack + a deployed `sysio.chalg`, a Tier-1 electorate of three, and a
+/// WIRE-funded challenger. The confirmed-uwreq builder mirrors
+/// `swap_same_token_legs_exact_balance_wins` exactly: two same-chain legs of LEG_AMOUNT
+/// against the 1e12/1e12 cw-5000 books, so the winner holds two (ETH, ETH) locks — the source
+/// leg at LEG_AMOUNT and the destination leg at the AMM quote (swaps settle on the quote, never
+/// on the caller's target). Nothing here pins either amount: the bond math reads the live lock
+/// rows, so the fixture tracks whatever the curve prices.
+class sysio_uwchal_tester : public sysio_dispatch_tester {
+public:
+   static constexpr auto CHALLENGER = "challenger"_n;
+   static constexpr auto VOTER1     = "voter1"_n;
+   static constexpr auto VOTER2     = "voter2"_n;
+   static constexpr auto VOTER3     = "voter3"_n;
+   static constexpr auto VOTER4     = "voter4"_n;
+
+   /// Ballot wire values (the uint8 `uwchal_ballot` members).
+   static constexpr uint8_t BALLOT_UPHOLD         = 0;
+   static constexpr uint8_t BALLOT_REJECT_REFUND  = 1;
+   static constexpr uint8_t BALLOT_REJECT_FORFEIT = 2;
+   /// Fault-reason wire value (`underwrite_fault_reason::SOURCE_DEPOSIT_MISSING`).
+   static constexpr uint8_t REASON_DEPOSIT_MISSING = 0;
+
+   /// Mirrors `chalg::min_uwchal_bucket_wire` — the floor a nonzero collateral bucket contributes
+   /// when the depot cannot price it (no ACTIVE reserve for the pair, or dust that the books floor
+   /// to zero). Keeps the quote nonzero so the commitment stays challengeable.
+   static constexpr uint64_t MIN_UWCHAL_BUCKET_WIRE = 1;
+
+   /// Source amount (and requested target) the confirmed-uwreq builder swaps. The SOURCE leg
+   /// locks exactly this; the destination leg locks the AMM quote for it, which the curve puts
+   /// just under it — so the two locks together stay inside the 200 credited to the underwriter.
+   static constexpr uint64_t LEG_AMOUNT = 100;
+
+   abi_serializer chalg_abi;
+
+   sysio_uwchal_tester() {
+      // CHALG_ACCOUNT exists (base fixture creates it); it just never had code until now.
+      deploy(CHALG_ACCOUNT, contracts::chalg_wasm(), contracts::chalg_abi(), chalg_abi);
+
+      // Tier-1 voters (no roa policy — same shape as the dispute tester's electorate) and the
+      // bond-posting challenger.
+      for (auto v : {VOTER1, VOTER2, VOTER3, VOTER4, CHALLENGER}) {
+         create_account(v, config::system_account_name, /*multisig=*/false,
+                        /*include_code=*/true, /*include_roa_policy=*/false);
+      }
+      produce_blocks();
+
+      // T1 electorate rows in sysio.roa (gen 0). `forcereg` works pre-emitcfg — the electorate
+      // snapshot walks `nodeowners` directly, never `nodecount`. Genesis already carries ONE T1
+      // owner, so the snapshot is these four + it: N = 5, Q = 3 — every quorum path below casts
+      // three ballots, and the tie case splits four rejectors 2–2.
+      for (auto v : {VOTER1, VOTER2, VOTER3, VOTER4}) {
+         BOOST_REQUIRE_EQUAL(success(), push(ROA_ACCOUNT, roa_abi, ROA_ACCOUNT, "forcereg"_n,
+            mvo()("owner", v.to_string())("tier", 1)));
+      }
+      produce_blocks();
+   }
+
+   // ── setup: the challenged commitment ─────────────────────────────────────
+
+   /// Full path to a CONFIRMED uwreq with two live (ETH, ETH) locks — the source leg at
+   /// LEG_AMOUNT, the destination leg at the AMM quote — byte-for-byte the
+   /// `swap_same_token_legs_exact_balance_wins` recipe.
+   void make_confirmed_uwreq(uint64_t att_id) {
+      bootstrap_for_dispatch();
+      setup_wire_token_and_reserves();
+      BOOST_REQUIRE_EQUAL(success(), regreserve_active("ETH", "ETH", "SECOND"));
+
+      // The challenger's bond funding comes from the WIRE treasury seeded above.
+      BOOST_REQUIRE_EQUAL(success(), push(TOKEN_ACCOUNT, token_abi, config::system_account_name,
+         "transfer"_n, mvo()("from", "sysio")("to", CHALLENGER.to_string())
+            ("quantity", "100.000000000 WIRE")("memo", "challenge bond funding")));
+
+      const uint64_t eth       = fc::slug_name{"ETH"}.value;
+      const uint64_t primary   = fc::slug_name{"PRIMARY"}.value;
+      const uint64_t secondary = fc::slug_name{"SECOND"}.value;
+
+      BOOST_REQUIRE_EQUAL(success(), depositinle_credit(UWRIT_OP, "ETH", "ETH", 200));
+
+      const auto sr = encode_swap_request(
+         ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
+         eth, eth, primary,   /*src_amount*/ LEG_AMOUNT,
+         eth, eth, secondary, /*dst_amount*/ LEG_AMOUNT,
+         /*tolerance_bps*/ 1'000'000, ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0b'));
+      BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(att_id, eth, sr));
+
+      const auto src_uic = create_signed_uic(UWRIT_OP, att_id, eth, eth, primary);
+      BOOST_REQUIRE_EQUAL(success(),
+         rcrdcommit_direct(att_id, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", src_uic));
+      const auto dst_uic = create_signed_uic(UWRIT_OP, att_id, eth, eth, secondary);
+      BOOST_REQUIRE_EQUAL(success(),
+         rcrdcommit_direct(att_id, UWRIT_OP, eth, "ETH", "ETH", "SECOND", dst_uic));
+
+      BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_CONFIRMED",
+                          get_uwreq(att_id)["status"].as_string());
+   }
+
+   /// Walk `sysio.reserv::reserves` (checksum256-keyed, so `get_row_by_id` cannot address it)
+   /// and return the row matching the slug triple — the reserv tests' scan workaround. Takes the
+   /// raw slug VALUES so a lock row's fields feed straight in.
+   fc::variant find_reserve(uint64_t target_chain, uint64_t target_token,
+                            uint64_t target_reserve) {
+      const auto& db       = control->db();
+      const auto  table_id = chain::compute_table_id("reserves"_n.to_uint64_t());
+      const auto& kv_idx   = db.get_index<chain::kv_index, chain::by_code_key>();
+      auto itr = kv_idx.lower_bound(boost::make_tuple(RESERV_ACCOUNT, table_id, std::string_view{}));
+      for (; itr != kv_idx.end() && itr->code == RESERV_ACCOUNT && itr->table_id == table_id; ++itr) {
+         std::vector<char> raw(itr->value.size());
+         if (!raw.empty())
+            std::memcpy(raw.data(), itr->value.data(), raw.size());
+         try {
+            auto row = reserv_abi.binary_to_variant(
+               "reserve_row", raw, abi_serializer::create_yield_function(abi_serializer_max_time));
+            if (row["chain_code"]["value"].as_uint64()   == target_chain &&
+                row["token_code"]["value"].as_uint64()   == target_token &&
+                row["reserve_code"]["value"].as_uint64() == target_reserve) {
+               return row;
+            }
+         } catch (...) {
+            // skip rows that don't decode
+         }
+      }
+      return fc::variant();
+   }
+
+   /// What `uwchalbond`/`openuwchal` must price: the underwriter's ENTIRE collateral, each
+   /// bucket quoted to WIRE on its pair's LIVE books and summed (Jonathan, 2026-08-11) — what
+   /// an upheld verdict actually costs them. Live books, not the registration constants:
+   /// winner selection settles inline, so by challenge time `applyswap` has already moved both
+   /// sides. Recomputing on the host over the same rows pins the contract to the shared kernel:
+   /// right reserve per bucket, right field order, and the sum.
+   uint64_t expected_bond(name underwriter) {
+      const auto op = get_operator(underwriter);
+      BOOST_REQUIRE(!op.is_null());
+      uint64_t total = 0;
+      for (const auto& bal : op["balances"].get_array()) {
+         const uint64_t amount = bal["balance"].as_uint64();
+         if (amount == 0) continue;
+         const auto chain = bal["chain_code"]["value"].as_uint64(),
+                    token = bal["token_code"]["value"].as_uint64();
+         if (token == fc::slug_name{"WIRE"}.value) {
+            total += amount;   // already WIRE — no curve
+            continue;
+         }
+         // A bucket with no ACTIVE reserve, or one whose books floor the conversion to zero,
+         // contributes the contract's floor rather than voiding the quote — mirrors
+         // `chalg::min_uwchal_bucket_wire`.
+         const auto row = first_active_reserve(chain, token);
+         const uint64_t bucket_wire =
+            row.is_null() ? 0
+                          : sysio::opp::amm::token_to_wire(row["reserve_chain_amount"].as_uint64(),
+                                                           row["reserve_wire_amount"].as_uint64(),
+                                                           row["connector_weight_bps"].as_uint64(),
+                                                           amount);
+         total += (bucket_wire > 0 ? bucket_wire : MIN_UWCHAL_BUCKET_WIRE);
+      }
+      return total;
+   }
+
+   /// The FIRST ACTIVE reserve for a (chain, token) pair — the row the contract's `bychaintok`
+   /// walk lands on when pricing a collateral bucket that names no reserve of its own.
+   fc::variant first_active_reserve(uint64_t target_chain, uint64_t target_token) {
+      const auto& db       = control->db();
+      const auto  table_id = chain::compute_table_id("reserves"_n.to_uint64_t());
+      const auto& kv_idx   = db.get_index<chain::kv_index, chain::by_code_key>();
+      auto itr = kv_idx.lower_bound(boost::make_tuple(RESERV_ACCOUNT, table_id, std::string_view{}));
+      for (; itr != kv_idx.end() && itr->code == RESERV_ACCOUNT
+             && itr->table_id == table_id; ++itr) {
+         std::vector<char> raw(itr->value.size());
+         if (!raw.empty()) std::memcpy(raw.data(), itr->value.data(), raw.size());
+         try {
+            auto row = reserv_abi.binary_to_variant("reserve_row", raw,
+               abi_serializer::create_yield_function(abi_serializer_max_time));
+            if (row["chain_code"]["value"].as_uint64() == target_chain &&
+                row["token_code"]["value"].as_uint64() == target_token &&
+                row["status"].as_string() == "RESERVE_STATUS_ACTIVE") {
+               return row;
+            }
+         } catch (...) {
+            // Not a reserve_row — skip.
+         }
+      }
+      return fc::variant();
+   }
+
+   // ── chalg action wrappers ────────────────────────────────────────────────
+
+   action_result openuwchal(name challenger, uint64_t uwreq_id, name underwriter,
+                            uint8_t reason, const std::string& detail) {
+      return push(CHALG_ACCOUNT, chalg_abi, challenger, "openuwchal"_n, mvo()
+         ("challenger", challenger.to_string())("uwreq_id", uwreq_id)
+         ("underwriter", underwriter.to_string())("reason", reason)("detail", detail));
+   }
+
+   action_result voteuwchal(name owner, uint64_t chal_id, uint8_t ballot) {
+      return push(CHALG_ACCOUNT, chalg_abi, owner, "voteuwchal"_n, mvo()
+         ("owner", owner.to_string())("chal_id", chal_id)("ballot", ballot));
+   }
+
+   action_result chkuwchal(uint64_t chal_id, name signer = CHALLENGER) {
+      return push(CHALG_ACCOUNT, chalg_abi, signer, "chkuwchal"_n, mvo()("chal_id", chal_id));
+   }
+
+   /// Pull a resolved challenge's bond out of chalg custody, signed by the recipient itself.
+   action_result claimbond(name account, name signer = name()) {
+      return push(CHALG_ACCOUNT, chalg_abi, signer == name() ? account : signer, "claimbond"_n,
+                  mvo()("account", account.to_string()));
+   }
+
+   /// Decoded return of the read-only bond quote. Seals a block first: tests re-quote the SAME
+   /// (uwreq, underwriter) before and after filing, and identical bytes in one block window
+   /// collide on transaction dedup.
+   uint64_t uwchalbond(uint64_t uwreq_id, name underwriter) {
+      produce_block();
+      auto trace = base_tester::push_action(CHALG_ACCOUNT, "uwchalbond"_n, CHALG_ACCOUNT, mvo()
+         ("uwreq_id", uwreq_id)("underwriter", underwriter.to_string()));
+      BOOST_REQUIRE(trace && !trace->action_traces.empty());
+      return fc::raw::unpack<uint64_t>(trace->action_traces[0].return_value);
+   }
+
+   // ── row / balance readers ────────────────────────────────────────────────
+
+   fc::variant get_uwchal(uint64_t id) {
+      auto data = get_row_by_id(CHALG_ACCOUNT, CHALG_ACCOUNT, "uwchals"_n, id);
+      return data.empty() ? fc::variant() : chalg_abi.binary_to_variant(
+         "uwchal_entry", data,
+         abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
+   /// The challenge's escrowed bond, straight off the row.
+   uint64_t uwchal_bond_amount(uint64_t id) {
+      return get_uwchal(id)["bond_amount"].as_uint64();
+   }
+
+   /// One owner's ballot in a challenge (the vote table is scoped by chal_id) — null once
+   /// resolution erased the scope.
+   fc::variant get_uwchal_vote(uint64_t chal_id, name owner) {
+      auto data = get_row_by_id(CHALG_ACCOUNT, name(chal_id), "uwchalvote"_n, owner.value);
+      return data.empty() ? fc::variant() : chalg_abi.binary_to_variant(
+         "uwchal_vote", data,
+         abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
+   /// Unclaimed WIRE `sysio.chalg` owes `account` from resolved challenges; 0 when no row exists.
+   uint64_t get_bond_credit(name account) {
+      auto data = get_row_by_id(CHALG_ACCOUNT, CHALG_ACCOUNT, "bondcredits"_n, account.value);
+      if (data.empty()) return 0;
+      return chalg_abi.binary_to_variant(
+         "bond_credit", data,
+         abi_serializer::create_yield_function(abi_serializer_max_time))["amount"].as_uint64();
+   }
+
+   int64_t wire_balance(name account) {
+      return get_currency_balance(TOKEN_ACCOUNT, symbol{9, "WIRE"}, account).get_amount();
+   }
+
+   /// The decoded `sysio.opreg::operators` row.
+   fc::variant get_operator(name account) {
+      auto data = get_row_by_id(OPREG_ACCOUNT, OPREG_ACCOUNT, "operators"_n, account.value);
+      return data.empty() ? fc::variant() : opreg_abi.binary_to_variant(
+         "operator_entry", data,
+         abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
+   /// The operator's status string straight off `sysio.opreg::operators`.
+   std::string operator_status(name account) {
+      return get_operator(account)["status"].as_string();
+   }
+
+   /// Sweep expired locks as the epoch machinery would (`chklocks` accepts epoch or self auth).
+   action_result chklocks() {
+      return push(UWRIT_ACCOUNT, uwrit_abi, UWRIT_ACCOUNT, "chklocks"_n, mvo());
+   }
+};
+
+// The read-only quote prices the live locks through their own books and answers 0 for every
+// not-challengeable state — the same soft contract as sysio.reserv::swapquote.
+BOOST_FIXTURE_TEST_CASE(uwchalbond_quotes_the_live_lock_value, sysio_uwchal_tester) { try {
+   constexpr uint64_t ATT_ID = 9100;
+   make_confirmed_uwreq(ATT_ID);
+
+   BOOST_REQUIRE_EQUAL(expected_bond(UWRIT_OP), uwchalbond(ATT_ID, UWRIT_OP));
+   BOOST_REQUIRE_GT(expected_bond(UWRIT_OP), 0u);
+
+   BOOST_REQUIRE_EQUAL(0u, uwchalbond(ATT_ID + 1, UWRIT_OP));    // no such uwreq
+   BOOST_REQUIRE_EQUAL(0u, uwchalbond(ATT_ID, "batchop.a"_n));   // not the winner
+} FC_LOG_AND_RETHROW() }
+
+// A collateral bucket whose (chain, token) pair carries NO ACTIVE reserve must not void the quote.
+// `opreg::depositinle` accepts any positive amount for any pair without requiring one that quotes,
+// so voiding here handed the underwriter an immunity switch: seed one unreserved bucket and every
+// later CONFIRMED commitment becomes permanently unchallengeable. The bucket contributes the floor
+// instead, and filing still works.
+BOOST_FIXTURE_TEST_CASE(unreserved_collateral_bucket_still_quotes_a_bond, sysio_uwchal_tester) { try {
+   constexpr uint64_t ATT_ID = 9800;
+   make_confirmed_uwreq(ATT_ID);
+
+   const uint64_t priced_only = uwchalbond(ATT_ID, UWRIT_OP);
+   BOOST_REQUIRE_GT(priced_only, 0u);
+
+   // No reserve was ever registered for (SOLANA, USDC) — nothing to price the bucket against.
+   BOOST_REQUIRE_EQUAL(success(), depositinle_credit(UWRIT_OP, "SOLANA", "USDC", 5'000));
+   BOOST_REQUIRE(first_active_reserve(fc::slug_name{"SOLANA"}.value,
+                                      fc::slug_name{"USDC"}.value).is_null());
+
+   // Quote survives, grows by exactly the floor, and still matches the shared formula.
+   const uint64_t quoted = uwchalbond(ATT_ID, UWRIT_OP);
+   BOOST_REQUIRE_EQUAL(priced_only + MIN_UWCHAL_BUCKET_WIRE, quoted);
+   BOOST_REQUIRE_EQUAL(expected_bond(UWRIT_OP), quoted);
+
+   // The commitment is still challengeable — the property the void broke.
+   BOOST_REQUIRE_EQUAL(success(),
+      openuwchal(CHALLENGER, ATT_ID, UWRIT_OP, REASON_DEPOSIT_MISSING, "no such deposit"));
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(quoted), wire_balance(CHALG_ACCOUNT));
+} FC_LOG_AND_RETHROW() }
+
+// Same property for the DUST flavour: the pair HAS an ACTIVE reserve, but its books floor the
+// conversion to zero. A deep token side over a shallow WIRE side does it at the 50% weight, where
+// the curve is pure constant product: 1 * 1000 / (1e12 + 1) = 0.
+BOOST_FIXTURE_TEST_CASE(dust_collateral_bucket_still_quotes_a_bond, sysio_uwchal_tester) { try {
+   constexpr uint64_t ATT_ID = 9810;
+   make_confirmed_uwreq(ATT_ID);
+
+   const uint64_t priced_only = uwchalbond(ATT_ID, UWRIT_OP);
+   BOOST_REQUIRE_GT(priced_only, 0u);
+
+   BOOST_REQUIRE_EQUAL(success(), regreserve_active_amounts("ETH", "USDC", "PRIMARY",
+                                                            /*chain_amount*/ 1'000'000'000'000ull,
+                                                            /*wire_amount*/  1'000ull));
+   BOOST_REQUIRE_EQUAL(success(), depositinle_credit(UWRIT_OP, "ETH", "USDC", 1));
+
+   // Pin the premise: the pair IS priceable, and the books really do floor this bucket to zero.
+   const auto dust_row = first_active_reserve(fc::slug_name{"ETH"}.value,
+                                              fc::slug_name{"USDC"}.value);
+   BOOST_REQUIRE(!dust_row.is_null());
+   BOOST_REQUIRE_EQUAL(0u, sysio::opp::amm::token_to_wire(
+                              dust_row["reserve_chain_amount"].as_uint64(),
+                              dust_row["reserve_wire_amount"].as_uint64(),
+                              dust_row["connector_weight_bps"].as_uint64(), 1));
+
+   const uint64_t quoted = uwchalbond(ATT_ID, UWRIT_OP);
+   BOOST_REQUIRE_EQUAL(priced_only + MIN_UWCHAL_BUCKET_WIRE, quoted);
+   BOOST_REQUIRE_EQUAL(expected_bond(UWRIT_OP), quoted);
+
+   BOOST_REQUIRE_EQUAL(success(),
+      openuwchal(CHALLENGER, ATT_ID, UWRIT_OP, REASON_DEPOSIT_MISSING, "no such deposit"));
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(quoted), wire_balance(CHALG_ACCOUNT));
+} FC_LOG_AND_RETHROW() }
+
+// Filing escrows exactly the quoted bond, stamps every lock with the challenge id, and records
+// the OPEN row — and the quote answers 0 afterwards (a commitment is challengeable once).
+BOOST_FIXTURE_TEST_CASE(openuwchal_escrows_bond_and_holds_locks, sysio_uwchal_tester) { try {
+   constexpr uint64_t ATT_ID = 9200;
+   make_confirmed_uwreq(ATT_ID);
+
+   const uint64_t bond   = uwchalbond(ATT_ID, UWRIT_OP);
+   const int64_t  before = wire_balance(CHALLENGER);
+
+   BOOST_REQUIRE_EQUAL(success(),
+      openuwchal(CHALLENGER, ATT_ID, UWRIT_OP, REASON_DEPOSIT_MISSING, "no such deposit"));
+
+   BOOST_REQUIRE_EQUAL(before - static_cast<int64_t>(bond), wire_balance(CHALLENGER));
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(bond), wire_balance(CHALG_ACCOUNT));
+
+   const auto chal = get_uwchal(1);
+   BOOST_REQUIRE(!chal.is_null());
+   BOOST_REQUIRE_EQUAL("DISPUTE_STATUS_OPEN", chal["status"].as_string());
+   BOOST_REQUIRE_EQUAL("NONE", chal["verdict"].as_string());
+   BOOST_REQUIRE_EQUAL(ATT_ID, chal["uwreq_id"].as_uint64());
+   BOOST_REQUIRE_EQUAL(bond, chal["bond_amount"].as_uint64());
+   // Four registered voters + the ONE genesis T1 owner (this assert breaks loudly if genesis
+   // ever seeds a different count — the quorum arithmetic below depends on it).
+   BOOST_REQUIRE_EQUAL(5u, chal["electorate"].get_array().size());
+   BOOST_REQUIRE_EQUAL(3u, chal["quorum"].as_uint64());
+
+   BOOST_REQUIRE_EQUAL(1u, get_lock(1)["challenge_id"].as_uint64());
+   BOOST_REQUIRE_EQUAL(1u, get_lock(2)["challenge_id"].as_uint64());
+
+   BOOST_REQUIRE_EQUAL(0u, uwchalbond(ATT_ID, UWRIT_OP));
+   BOOST_REQUIRE(openuwchal(CHALLENGER, ATT_ID, UWRIT_OP, REASON_DEPOSIT_MISSING, "again")
+                    .find("already been challenged") != std::string::npos);
+} FC_LOG_AND_RETHROW() }
+
+// Every way a filing can be stale or malformed is refused before any WIRE moves.
+BOOST_FIXTURE_TEST_CASE(openuwchal_guards, sysio_uwchal_tester) { try {
+   constexpr uint64_t ATT_ID = 9300;
+   make_confirmed_uwreq(ATT_ID);
+
+   BOOST_REQUIRE(openuwchal(CHALLENGER, ATT_ID + 77, UWRIT_OP, REASON_DEPOSIT_MISSING, "x")
+                    .find("not found") != std::string::npos);
+   BOOST_REQUIRE(openuwchal(CHALLENGER, ATT_ID, "batchop.a"_n, REASON_DEPOSIT_MISSING, "x")
+                    .find("not this request's winner") != std::string::npos);
+   BOOST_REQUIRE(openuwchal(CHALLENGER, ATT_ID, UWRIT_OP, /*reason*/ 99, "x")
+                    .find("unknown fault reason") != std::string::npos);
+   // The caller-controlled detail note is retained on the audit row indefinitely (RAM billed to
+   // the contract) — the byte cap refuses the filing before any escrow moves.
+   BOOST_REQUIRE(openuwchal(CHALLENGER, ATT_ID, UWRIT_OP, REASON_DEPOSIT_MISSING,
+                            std::string(1024 + 1, 'x'))
+                    .find("detail exceeds max_uwchal_detail_bytes") != std::string::npos);
+
+   // Time-travel past the 12h window: the commitment is no longer challengeable, and the locks
+   // release healthy on the next sweep. Seal the pending block FIRST — a big skip aborts pending
+   // and re-applies its transactions at the jumped time, where they have expired.
+   const int64_t before = wire_balance(CHALLENGER);
+   produce_blocks();
+   produce_block(fc::hours(13));
+   BOOST_REQUIRE(openuwchal(CHALLENGER, ATT_ID, UWRIT_OP, REASON_DEPOSIT_MISSING, "late")
+                    .find("lock window has closed") != std::string::npos);
+   // The whole transaction rolled back (the bond gate refuses pre-escrow here; a mid-window
+   // race would instead throw in holdlocks AFTER the escrow was sent — same atomicity): no
+   // WIRE moved, no challenge row survives.
+   BOOST_REQUIRE_EQUAL(before, wire_balance(CHALLENGER));
+   BOOST_REQUIRE(get_uwchal(1).is_null());
+} FC_LOG_AND_RETHROW() }
+
+// Ballot guards mirror votedispute's: electorate membership, one vote per owner, a real ballot
+// value, and an OPEN challenge.
+BOOST_FIXTURE_TEST_CASE(voteuwchal_guards, sysio_uwchal_tester) { try {
+   constexpr uint64_t ATT_ID = 9400;
+   make_confirmed_uwreq(ATT_ID);
+   BOOST_REQUIRE_EQUAL(success(),
+      openuwchal(CHALLENGER, ATT_ID, UWRIT_OP, REASON_DEPOSIT_MISSING, "d"));
+
+   BOOST_REQUIRE(voteuwchal(CHALLENGER, 1, BALLOT_UPHOLD)
+                    .find("not in the challenge's tier-1 electorate") != std::string::npos);
+   BOOST_REQUIRE(voteuwchal(VOTER1, 1, /*ballot*/ 7).find("unknown ballot") != std::string::npos);
+   BOOST_REQUIRE_EQUAL(success(), voteuwchal(VOTER1, 1, BALLOT_UPHOLD));
+   produce_block(); // identical re-vote bytes need fresh TAPOS to reach the contract's guard
+   BOOST_REQUIRE(voteuwchal(VOTER1, 1, BALLOT_UPHOLD)
+                    .find("already voted") != std::string::npos);
+   BOOST_REQUIRE(chkuwchal(99).find("challenge not found") != std::string::npos);
+} FC_LOG_AND_RETHROW() }
+
+// The uphold path end-to-end: quorum -> SLASHED -> the locks sweep through releaselock's
+// deferred-slash branch (collateral debited) -> uwreq COMPLETED -> bond back to the challenger.
+// An OPEN challenge PINS the uwreq row against the retention sweep. The locks hold the
+// collateral, but THIS row holds the evidence the challenge adjudicates against
+// (`attestation_inbound_data`, `source_tx_id`, `commits_by`), and the terminal retention
+// window is far shorter than the challenge window — so without the pin a challenge could
+// outlive the record it exists to adjudicate. Both release branches are covered: `freelocks`
+// on a REJECTED verdict here, `sweeplocks` on UPHELD below.
+BOOST_FIXTURE_TEST_CASE(pruneuwreqs_skips_a_challenged_uwreq, sysio_uwchal_tester) { try {
+   constexpr uint64_t ATT_ID = 9600;
+   make_confirmed_uwreq(ATT_ID);
+
+   // Filing stamps the request, not just its locks.
+   BOOST_REQUIRE_EQUAL(success(),
+      openuwchal(CHALLENGER, ATT_ID, UWRIT_OP, REASON_DEPOSIT_MISSING, "no deposit on ETH"));
+   BOOST_REQUIRE_EQUAL(1u, get_uwreq(ATT_ID)["challenge_id"].as_uint64());
+
+   // The sweep refuses it however generous the budget — the pin is not status- or
+   // retention-conditional.
+   BOOST_REQUIRE_EQUAL(success(), push(UWRIT_ACCOUNT, uwrit_abi, UWRIT_ACCOUNT,
+      "pruneuwreqs"_n, mvo()("max_rows", 100)));
+   BOOST_REQUIRE(!get_uwreq(ATT_ID).is_null());
+
+   // REJECT_FORFEIT resolves through `freelocks`, which clears both markers.
+   for (auto v : {VOTER1, VOTER2, VOTER3}) {
+      BOOST_REQUIRE_EQUAL(success(), voteuwchal(v, 1, BALLOT_REJECT_FORFEIT));
+   }
+   produce_block();
+   BOOST_REQUIRE_EQUAL(success(), chkuwchal(1));
+   BOOST_REQUIRE_EQUAL(0u, get_uwreq(ATT_ID)["challenge_id"].as_uint64());
+} FC_LOG_AND_RETHROW() }
+
+/// The UPHELD branch releases the pin too — `sweeplocks` ERASES the locks rather than
+/// clearing their markers, so it is the only place the row's own marker comes off there.
+/// Without it the row would be skipped forever and never reclaimable.
+BOOST_FIXTURE_TEST_CASE(uphold_releases_the_uwreq_challenge_pin, sysio_uwchal_tester) { try {
+   constexpr uint64_t ATT_ID = 9610;
+   make_confirmed_uwreq(ATT_ID);
+
+   BOOST_REQUIRE_EQUAL(success(),
+      openuwchal(CHALLENGER, ATT_ID, UWRIT_OP, REASON_DEPOSIT_MISSING, "no deposit on ETH"));
+   BOOST_REQUIRE_EQUAL(1u, get_uwreq(ATT_ID)["challenge_id"].as_uint64());
+
+   for (auto v : {VOTER1, VOTER2, VOTER3}) {
+      BOOST_REQUIRE_EQUAL(success(), voteuwchal(v, 1, BALLOT_UPHOLD));
+   }
+   produce_block();
+   BOOST_REQUIRE_EQUAL(success(), chkuwchal(1));
+   BOOST_REQUIRE_EQUAL("UPHELD", get_uwchal(1)["verdict"].as_string());
+   BOOST_REQUIRE_EQUAL(0u, get_uwreq(ATT_ID)["challenge_id"].as_uint64());
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(chkuwchal_uphold_slashes_and_returns_bond, sysio_uwchal_tester) { try {
+   constexpr uint64_t ATT_ID = 9500;
+   make_confirmed_uwreq(ATT_ID);
+   const int64_t challenger_start = wire_balance(CHALLENGER);
+
+   BOOST_REQUIRE_EQUAL(success(),
+      openuwchal(CHALLENGER, ATT_ID, UWRIT_OP, REASON_DEPOSIT_MISSING, "no deposit on ETH"));
+   BOOST_REQUIRE_EQUAL(success(), voteuwchal(VOTER1, 1, BALLOT_UPHOLD));
+   BOOST_REQUIRE_EQUAL(success(), voteuwchal(VOTER2, 1, BALLOT_UPHOLD));
+
+   // Sub-quorum (2 of Q=3): the crank resolves nothing and the operator stands.
+   BOOST_REQUIRE_EQUAL(success(), chkuwchal(1));
+   BOOST_REQUIRE_EQUAL("DISPUTE_STATUS_OPEN", get_uwchal(1)["status"].as_string());
+   BOOST_REQUIRE_EQUAL("OPERATOR_STATUS_ACTIVE", operator_status(UWRIT_OP));
+
+   BOOST_REQUIRE_EQUAL(success(), voteuwchal(VOTER3, 1, BALLOT_UPHOLD));
+   produce_block(); // the resolving crank re-pushes identical bytes — fresh TAPOS required
+   BOOST_REQUIRE_EQUAL(success(), chkuwchal(1));
+
+   const auto chal = get_uwchal(1);
+   BOOST_REQUIRE_EQUAL("DISPUTE_STATUS_RESOLVED", chal["status"].as_string());
+   BOOST_REQUIRE_EQUAL("UPHELD", chal["verdict"].as_string());
+
+   // The operator is slashed and BOTH locks are gone — swept, not expired.
+   BOOST_REQUIRE_EQUAL("OPERATOR_STATUS_SLASHED", operator_status(UWRIT_OP));
+   BOOST_REQUIRE(get_lock(1).is_null());
+   BOOST_REQUIRE(get_lock(2).is_null());
+
+   // Every bucket drains: `opreg::slash` debits each bucket's slashable-now portion (balance
+   // minus active locks — for the challenged (ETH, ETH) bucket that is everything ABOVE the two
+   // 100-unit locks), and the two sweeping releaselocks then take the deferred-slash branch for
+   // the locked 200. Unlocked buckets on other chains were slashed in full at slash time.
+   // (Bind the row first — ranging over `get_operator(...)[...]` would iterate a dangling
+   // temporary.)
+   const auto slashed_op = get_operator(UWRIT_OP);
+   for (const auto& bal : slashed_op["balances"].get_array()) {
+      BOOST_REQUIRE_EQUAL(0u, bal["balance"].as_uint64());
+   }
+
+   // COMPLETED flip ran through the shared tail.
+   BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_COMPLETED",
+                       get_uwreq(ATT_ID)["status"].as_string());
+
+   // The bond is CREDITED, not pushed: resolution moves no WIRE at all, so custody is still
+   // chalg's and the challenger is still down the escrow. (The crank can run under the epoch
+   // tick, where a transfer would run the recipient's notification handler — see
+   // hostile_bond_recipient_cannot_stall_the_epoch_tick.)
+   const uint64_t bond = chal["bond_amount"].as_uint64();
+   BOOST_REQUIRE_GT(bond, 0u);
+   BOOST_REQUIRE_EQUAL(challenger_start - static_cast<int64_t>(bond), wire_balance(CHALLENGER));
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(bond), wire_balance(CHALG_ACCOUNT));
+   BOOST_REQUIRE_EQUAL(bond, get_bond_credit(CHALLENGER));
+
+   // The pull settles it: the bond comes home and chalg ends at zero custody.
+   BOOST_REQUIRE_EQUAL(success(), claimbond(CHALLENGER));
+   BOOST_REQUIRE_EQUAL(challenger_start, wire_balance(CHALLENGER));
+   BOOST_REQUIRE_EQUAL(0, wire_balance(CHALG_ACCOUNT));
+   BOOST_REQUIRE_EQUAL(0u, get_bond_credit(CHALLENGER));
+} FC_LOG_AND_RETHROW() }
+
+// An explicit REJECT_FORFEIT majority is the ONLY road to forfeiture: the bond lands on the
+// wrongly-challenged underwriter, the holds clear, and the locks release healthy at expiry
+// with the collateral untouched.
+BOOST_FIXTURE_TEST_CASE(chkuwchal_reject_forfeit_pays_underwriter, sysio_uwchal_tester) { try {
+   constexpr uint64_t ATT_ID = 9600;
+   make_confirmed_uwreq(ATT_ID);
+   const uint64_t bond = uwchalbond(ATT_ID, UWRIT_OP);
+   const int64_t  uw_start = wire_balance(UWRIT_OP);
+
+   BOOST_REQUIRE_EQUAL(success(),
+      openuwchal(CHALLENGER, ATT_ID, UWRIT_OP, REASON_DEPOSIT_MISSING, "wrong"));
+   BOOST_REQUIRE_EQUAL(success(), voteuwchal(VOTER1, 1, BALLOT_REJECT_FORFEIT));
+   BOOST_REQUIRE_EQUAL(success(), voteuwchal(VOTER2, 1, BALLOT_REJECT_FORFEIT));
+   BOOST_REQUIRE_EQUAL(success(), voteuwchal(VOTER3, 1, BALLOT_REJECT_FORFEIT));
+   BOOST_REQUIRE_EQUAL(success(), chkuwchal(1));
+
+   BOOST_REQUIRE_EQUAL("REJECTED_FORFEIT", get_uwchal(1)["verdict"].as_string());
+   BOOST_REQUIRE_EQUAL("OPERATOR_STATUS_ACTIVE", operator_status(UWRIT_OP));
+
+   // Forfeiture credits the underwriter; the WIRE lands when IT pulls.
+   BOOST_REQUIRE_EQUAL(bond, get_bond_credit(UWRIT_OP));
+   BOOST_REQUIRE_EQUAL(uw_start, wire_balance(UWRIT_OP));
+   BOOST_REQUIRE_EQUAL(success(), claimbond(UWRIT_OP));
+   BOOST_REQUIRE_EQUAL(uw_start + static_cast<int64_t>(bond), wire_balance(UWRIT_OP));
+   BOOST_REQUIRE_EQUAL(0, wire_balance(CHALG_ACCOUNT));
+
+   // Holds cleared; locks still present until natural expiry, then a HEALTHY release.
+   BOOST_REQUIRE_EQUAL(0u, get_lock(1)["challenge_id"].as_uint64());
+   BOOST_REQUIRE_EQUAL(0u, get_lock(2)["challenge_id"].as_uint64());
+   const auto balances_before = get_operator(UWRIT_OP)["balances"];
+   produce_blocks();
+   produce_block(fc::hours(13));
+   BOOST_REQUIRE_EQUAL(success(), chklocks());
+   BOOST_REQUIRE(get_lock(1).is_null());
+   // A healthy release moves NO collateral: the balances are byte-identical to the pre-expiry
+   // snapshot after a rejected challenge.
+   const auto balances_after = get_operator(UWRIT_OP)["balances"];
+   BOOST_REQUIRE_EQUAL(fc::json::to_string(balances_before, fc::time_point::maximum()),
+                       fc::json::to_string(balances_after, fc::time_point::maximum()));
+} FC_LOG_AND_RETHROW() }
+
+// A split reject quorum favours the refund on a tie — forfeiture requires a strict majority of
+// the rejectors.
+BOOST_FIXTURE_TEST_CASE(chkuwchal_reject_tie_favours_refund, sysio_uwchal_tester) { try {
+   constexpr uint64_t ATT_ID = 9700;
+   make_confirmed_uwreq(ATT_ID);
+   const int64_t challenger_start = wire_balance(CHALLENGER);
+
+   BOOST_REQUIRE_EQUAL(success(),
+      openuwchal(CHALLENGER, ATT_ID, UWRIT_OP, REASON_DEPOSIT_MISSING, "honest mistake"));
+   // Four rejectors split 2–2: the combined rejects clear Q=3, and the forfeit/refund tie must
+   // fall to the refund — forfeiture only ever happens by a strict majority of the rejectors.
+   BOOST_REQUIRE_EQUAL(success(), voteuwchal(VOTER1, 1, BALLOT_REJECT_REFUND));
+   BOOST_REQUIRE_EQUAL(success(), voteuwchal(VOTER2, 1, BALLOT_REJECT_FORFEIT));
+   BOOST_REQUIRE_EQUAL(success(), voteuwchal(VOTER3, 1, BALLOT_REJECT_REFUND));
+   BOOST_REQUIRE_EQUAL(success(), voteuwchal(VOTER4, 1, BALLOT_REJECT_FORFEIT));
+   BOOST_REQUIRE_EQUAL(success(), chkuwchal(1));
+
+   BOOST_REQUIRE_EQUAL("REJECTED_REFUND", get_uwchal(1)["verdict"].as_string());
+   BOOST_REQUIRE_EQUAL(success(), claimbond(CHALLENGER));
+   BOOST_REQUIRE_EQUAL(challenger_start, wire_balance(CHALLENGER));
+} FC_LOG_AND_RETHROW() }
+
+// The epoch tick IS the challenge's cadence: an expired-but-challenged lock is NOT released by
+// the sweep; the sweep pokes the tally, the sub-quorum challenge LAPSES (bond refunded — silence
+// never punishes), the freed locks release on the NEXT sweep.
+BOOST_FIXTURE_TEST_CASE(chklocks_skips_held_lock_and_lapse_refunds, sysio_uwchal_tester) { try {
+   constexpr uint64_t ATT_ID = 9800;
+   make_confirmed_uwreq(ATT_ID);
+   const int64_t challenger_start = wire_balance(CHALLENGER);
+
+   BOOST_REQUIRE_EQUAL(success(),
+      openuwchal(CHALLENGER, ATT_ID, UWRIT_OP, REASON_DEPOSIT_MISSING, "nobody voted"));
+   BOOST_REQUIRE_EQUAL(success(), voteuwchal(VOTER1, 1, BALLOT_UPHOLD)); // sub-quorum (Q=3)
+
+   produce_blocks();             // seal pending before the jump (see openuwchal_guards)
+   produce_block(fc::hours(13)); // past both the lock expiry and therefore the vote deadline
+
+   // Past the deadline the ballot door is closed: a late quorum can never be assembled for a
+   // manual chkuwchal crank in the expiry→sweep gap — the only remaining outcome is LAPSED.
+   BOOST_REQUIRE(voteuwchal(VOTER2, 1, BALLOT_UPHOLD)
+                    .find("the challenge window has expired") != std::string::npos);
+
+   // First sweep: the held locks are SKIPPED (still present), the poke lapses the challenge.
+   BOOST_REQUIRE_EQUAL(success(), chklocks());
+   BOOST_REQUIRE(!get_lock(1).is_null());
+   BOOST_REQUIRE(!get_lock(2).is_null());
+   BOOST_REQUIRE_EQUAL(0u, get_lock(1)["challenge_id"].as_uint64());
+   BOOST_REQUIRE_EQUAL("LAPSED", get_uwchal(1)["verdict"].as_string());
+   BOOST_REQUIRE_EQUAL("OPERATOR_STATUS_ACTIVE", operator_status(UWRIT_OP));
+   // Silence never punishes: the whole bond is credited back, claimable on demand.
+   BOOST_REQUIRE_EQUAL(uwchal_bond_amount(1), get_bond_credit(CHALLENGER));
+   BOOST_REQUIRE_EQUAL(success(), claimbond(CHALLENGER));
+   BOOST_REQUIRE_EQUAL(challenger_start, wire_balance(CHALLENGER));
+
+   // Second sweep: the now-unheld expired locks release healthy; uwreq completes.
+   produce_block(); // identical sweep bytes — fresh TAPOS
+   BOOST_REQUIRE_EQUAL(success(), chklocks());
+   BOOST_REQUIRE(get_lock(1).is_null());
+   BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_COMPLETED",
+                       get_uwreq(ATT_ID)["status"].as_string());
+} FC_LOG_AND_RETHROW() }
+
+// A resolved challenge keeps only what consensus still needs: the uniqueness gate and the
+// verdict. The caller-controlled detail note, the electorate snapshot, and every ballot row go —
+// filing is permissionless and the bond returns on every non-forfeit outcome, so without this
+// the same recycled capital could pin unbounded bytes in RAM billed to sysio.
+BOOST_FIXTURE_TEST_CASE(chkuwchal_compacts_resolved_row_and_erases_ballots,
+                        sysio_uwchal_tester) { try {
+   constexpr uint64_t ATT_ID = 9250;
+   make_confirmed_uwreq(ATT_ID);
+
+   const std::string detail(1024, 'e');   // a full-size note, right at max_uwchal_detail_bytes
+   BOOST_REQUIRE_EQUAL(success(),
+      openuwchal(CHALLENGER, ATT_ID, UWRIT_OP, REASON_DEPOSIT_MISSING, detail));
+
+   // While OPEN the row carries everything the council votes against.
+   const auto open_row = get_uwchal(1);
+   BOOST_REQUIRE_EQUAL(detail, open_row["detail"].as_string());
+   BOOST_REQUIRE_EQUAL(5u, open_row["electorate"].get_array().size());
+
+   BOOST_REQUIRE_EQUAL(success(), voteuwchal(VOTER1, 1, BALLOT_REJECT_REFUND));
+   BOOST_REQUIRE_EQUAL(success(), voteuwchal(VOTER2, 1, BALLOT_REJECT_REFUND));
+   BOOST_REQUIRE(!get_uwchal_vote(1, VOTER1).is_null());
+   BOOST_REQUIRE_EQUAL(success(), voteuwchal(VOTER3, 1, BALLOT_REJECT_REFUND));
+   BOOST_REQUIRE_EQUAL(success(), chkuwchal(1));
+
+   // Resolved: the fixed-width record stands, both variable-length fields are empty, the ballots
+   // are gone.
+   const auto tomb = get_uwchal(1);
+   BOOST_REQUIRE_EQUAL("DISPUTE_STATUS_RESOLVED", tomb["status"].as_string());
+   BOOST_REQUIRE_EQUAL("REJECTED_REFUND", tomb["verdict"].as_string());
+   BOOST_REQUIRE_EQUAL(ATT_ID, tomb["uwreq_id"].as_uint64());
+   BOOST_REQUIRE_EQUAL(3u, tomb["quorum"].as_uint64());
+   BOOST_REQUIRE(tomb["detail"].as_string().empty());
+   BOOST_REQUIRE_EQUAL(0u, tomb["electorate"].get_array().size());
+   for (auto v : {VOTER1, VOTER2, VOTER3}) {
+      BOOST_REQUIRE(get_uwchal_vote(1, v).is_null());
+   }
+
+   // The tombstone still does its consensus job — a verdict is final per commitment, even though
+   // the reject freed the locks and they are live again.
+   BOOST_REQUIRE_EQUAL(0u, uwchalbond(ATT_ID, UWRIT_OP));
+   BOOST_REQUIRE(openuwchal(CHALLENGER, ATT_ID, UWRIT_OP, REASON_DEPOSIT_MISSING, "retry")
+                    .find("already been challenged") != std::string::npos);
+} FC_LOG_AND_RETHROW() }
+
+// The payout is a pull under the recipient's own authority, and it settles exactly once.
+BOOST_FIXTURE_TEST_CASE(claimbond_guards, sysio_uwchal_tester) { try {
+   constexpr uint64_t ATT_ID = 9350;
+   make_confirmed_uwreq(ATT_ID);
+
+   BOOST_REQUIRE(claimbond(CHALLENGER).find("no claimable bond") != std::string::npos);
+
+   BOOST_REQUIRE_EQUAL(success(),
+      openuwchal(CHALLENGER, ATT_ID, UWRIT_OP, REASON_DEPOSIT_MISSING, "d"));
+   for (auto v : {VOTER1, VOTER2, VOTER3}) {
+      BOOST_REQUIRE_EQUAL(success(), voteuwchal(v, 1, BALLOT_REJECT_REFUND));
+   }
+   BOOST_REQUIRE_EQUAL(success(), chkuwchal(1));
+
+   const uint64_t bond = uwchal_bond_amount(1);
+   BOOST_REQUIRE_GT(bond, 0u);
+   BOOST_REQUIRE_EQUAL(bond, get_bond_credit(CHALLENGER));
+
+   // Another account cannot pull someone else's credit.
+   BOOST_REQUIRE(claimbond(CHALLENGER, /*signer*/ VOTER1)
+                    .find("missing authority of challenger") != std::string::npos);
+
+   const int64_t before = wire_balance(CHALLENGER);
+   BOOST_REQUIRE_EQUAL(success(), claimbond(CHALLENGER));
+   BOOST_REQUIRE_EQUAL(before + static_cast<int64_t>(bond), wire_balance(CHALLENGER));
+
+   // Erased on payout — a second pull draws nothing.
+   produce_block(); // identical claim bytes need fresh TAPOS to reach the contract's guard
+   BOOST_REQUIRE(claimbond(CHALLENGER).find("no claimable bond") != std::string::npos);
+} FC_LOG_AND_RETHROW() }
+
+// A hostile bond recipient cannot hold epoch advancement hostage. `sysio.token::transfer` runs
+// its recipient's code through `require_recipient(to)`, so a contract at the challenger's account
+// can assert on the incoming refund. Were the payout pushed from the crank, that assert would
+// abort `sysio.epoch::advance -> chklocks -> chkuwchal`, roll the challenge back to OPEN with its
+// locks still held, and be retried identically by every later sweep — a permanent chain-wide
+// stall bought with one permissionless filing. Crediting keeps the crank inside system-owned
+// state: the challenge resolves, the locks release, and the only transaction the hostile account
+// can abort is its own claim, stranding only its own funds.
+BOOST_FIXTURE_TEST_CASE(hostile_bond_recipient_cannot_stall_the_epoch_tick,
+                        sysio_uwchal_tester) { try {
+   constexpr uint64_t ATT_ID = 9450;
+   make_confirmed_uwreq(ATT_ID);
+
+   BOOST_REQUIRE_EQUAL(success(),
+      openuwchal(CHALLENGER, ATT_ID, UWRIT_OP, REASON_DEPOSIT_MISSING, "then i go hostile"));
+   const uint64_t bond = uwchal_bond_amount(1);
+   BOOST_REQUIRE_GT(bond, 0u);
+
+   // The escrow is in; NOW the challenger deploys a contract that rejects every incoming
+   // notification. Nothing prevents this — filing is permissionless and code can land afterwards,
+   // so the payout path can never assume a bare recipient. (The fixture creates the challenger
+   // without a roa policy; setcode needs RAM, so grant one first.)
+   BOOST_REQUIRE(add_roa_policy(NODE_DADDY, CHALLENGER, "0.0010 SYS", "0.0010 SYS",
+                                "50.0000 SYS", /*time_block*/ 0, /*network_gen*/ 0));
+   set_code(CHALLENGER, contracts::util::reject_all_wasm());
+   produce_blocks();               // seal pending before the jump (see openuwchal_guards)
+   produce_block(fc::hours(13));   // past the lock expiry: the sweep must now resolve the challenge
+
+   // The epoch tick's sweep runs to completion: it pokes the tally, the sub-quorum challenge
+   // LAPSES, and nothing in the crank touches the hostile account.
+   BOOST_REQUIRE_EQUAL(success(), chklocks());
+   BOOST_REQUIRE_EQUAL("LAPSED", get_uwchal(1)["verdict"].as_string());
+   BOOST_REQUIRE_EQUAL(bond, get_bond_credit(CHALLENGER));
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(bond), wire_balance(CHALG_ACCOUNT));
+
+   // The freed locks release on the next sweep and the uwreq settles — advancement never stalled.
+   produce_block(); // identical sweep bytes — fresh TAPOS
+   BOOST_REQUIRE_EQUAL(success(), chklocks());
+   BOOST_REQUIRE(get_lock(1).is_null());
+   BOOST_REQUIRE(get_lock(2).is_null());
+   BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_COMPLETED",
+                       get_uwreq(ATT_ID)["status"].as_string());
+
+   // Only the hostile account's OWN claim fails, and its credit simply stays put.
+   BOOST_REQUIRE(claimbond(CHALLENGER).find("rejecting all notifications") != std::string::npos);
+   BOOST_REQUIRE_EQUAL(bond, get_bond_credit(CHALLENGER));
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(bond), wire_balance(CHALG_ACCOUNT));
+} FC_LOG_AND_RETHROW() }
+
+// The lock-control trio is chalg's alone.
+BOOST_FIXTURE_TEST_CASE(lock_hold_actions_require_chalg_auth, sysio_uwchal_tester) { try {
+   constexpr uint64_t ATT_ID = 9900;
+   make_confirmed_uwreq(ATT_ID);
+
+   BOOST_REQUIRE(push(UWRIT_ACCOUNT, uwrit_abi, UWRIT_ACCOUNT, "holdlocks"_n, mvo()
+      ("uwreq_id", ATT_ID)("underwriter", UWRIT_OP.to_string())("chal_id", 7))
+         .find("missing authority of sysio.chalg") != std::string::npos);
+   BOOST_REQUIRE(push(UWRIT_ACCOUNT, uwrit_abi, UWRIT_ACCOUNT, "freelocks"_n, mvo()
+      ("uwreq_id", ATT_ID)("underwriter", UWRIT_OP.to_string()))
+         .find("missing authority of sysio.chalg") != std::string::npos);
+   BOOST_REQUIRE(push(UWRIT_ACCOUNT, uwrit_abi, UWRIT_ACCOUNT, "sweeplocks"_n, mvo()
+      ("uwreq_id", ATT_ID)("underwriter", UWRIT_OP.to_string()))
+         .find("missing authority of sysio.chalg") != std::string::npos);
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()

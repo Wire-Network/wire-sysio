@@ -4,6 +4,7 @@
 #include <sysio/chain/abi_serializer.hpp>
 #include <sysio/chain/resource_limits.hpp>
 #include "contracts.hpp"
+#include "contract_test_support.hpp"
 #include "test_symbol.hpp"
 
 #include <fc/variant_object.hpp>
@@ -26,42 +27,6 @@ using mvo = fc::mutable_variant_object;
 namespace sysio_system {
 
 namespace test_support {
-
-/// Load an account's deployed ABI into a serializer used by contract integration fixtures.
-template <typename Tester>
-void load_account_abi(Tester& tester, name account, abi_serializer& out_ser) {
-   const auto* metadata = tester.control->find_account_metadata(account);
-   BOOST_REQUIRE(metadata != nullptr);
-   abi_def parsed;
-   BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(metadata->abi, parsed), true);
-   out_ser.set_abi(std::move(parsed), abi_serializer::create_yield_function(Tester::abi_serializer_max_time));
-}
-
-/// Push an ABI-encoded action and land it in its own block for stable TaPoS in repeated tests.
-template <typename Tester>
-typename Tester::action_result push_contract_action(Tester& tester, name contract, abi_serializer& serializer,
-                                                    name signer, name action_name,
-                                                    const fc::variant_object& data) {
-   try {
-      action act;
-      act.account = contract;
-      act.name = action_name;
-      act.data = serializer.variant_to_binary(
-         serializer.get_action_type(action_name), data,
-         abi_serializer::create_yield_function(Tester::abi_serializer_max_time));
-      act.authorization = std::vector<permission_level>{{signer, config::active_name}};
-
-      signed_transaction trx;
-      trx.actions.emplace_back(std::move(act));
-      tester.set_transaction_headers(trx);
-      trx.sign(tester.get_private_key(signer, "active"), tester.control->get_chain_id());
-      tester.push_transaction(trx);
-      tester.produce_block();
-      return Tester::success();
-   } catch (const fc::exception& ex) {
-      return Tester::error(ex.top_message());
-   }
-}
 
 /// Canonical valid emissions configuration shared by system-contract integration fixtures.
 inline fc::mutable_variant_object default_emission_config() {

@@ -50,15 +50,44 @@ struct opp_contract_client : ethereum_contract_client {
 /// Typed contract client for OPPInbound.sol. Same confirmed-default
 /// policy as `opp_contract_client` for write paths.
 struct opp_inbound_contract_client : ethereum_contract_client {
-   ethereum_contract_tx_fn<fc::variant, std::string> epoch_in;
+   /// `epochIn(uint32 epochIndex, uint16 chunkIndex, uint16 totalChunks,
+   ///          uint32 totalBytes, bytes chunkData)` — ONE chunk of the
+   /// envelope. The contract stages every chunk but the last and finalizes
+   /// inline on the chunk that completes the envelope; there is no terminal
+   /// call and no crank. `chunkData` rides as a hex-encoded string because the
+   /// libfc ABI encoder takes `dt::bytes` that way (see
+   /// `ethereum_abi::encode_dynamic_data`).
+   ///
+   /// `ethereum_contract_tx_fn` binds every argument as a non-const lvalue
+   /// reference, so callers must materialize named locals for all five.
+   ethereum_contract_tx_fn<fc::variant, uint32_t, uint16_t, uint16_t, uint32_t, std::string> epoch_in;
+   /// `discardEnvelopeChunks()` — staged-owner-only recovery, resetting every
+   /// header this signer owns. Invoked by the relay when it finds a
+   /// CURRENT-epoch staging header whose shape belongs to a superseded
+   /// envelope; reverts (`OPP_ChunkBufferMissing`) when nothing is staged,
+   /// which the relay treats as "already clear".
+   ethereum_contract_tx_fn<fc::variant> discard_envelope_chunks;
+   /// `nextEpochIndex()` view — the epoch the outpost is currently accepting.
    ethereum_contract_call_fn<fc::variant> next_epoch_index;
+   /// `envelopeChunkState(address operator_)` view — the OWNER-BOUND staging
+   /// header, the relay's resume read. Block tag rides first per
+   /// `ethereum_contract_call_fn`; the address argument is a hex string.
+   /// Returns the raw `eth_call` hex — `create_call<fc::variant>` does not
+   /// auto-decode, so the caller pushes it back through `contract_decode_data`
+   /// against this ABI entry (the same shape `read_inbound_envelope` uses for
+   /// `getLatestOutboundEnvelope`).
+   ethereum_contract_call_fn<fc::variant, std::string> envelope_chunk_state;
 
    opp_inbound_contract_client(const ethereum_client_ptr& client,
                                const address_compat_type& contract_address,
                                const std::vector<fc::network::ethereum::abi::contract>& contracts)
       : ethereum_contract_client(client, contract_address, contracts)
-      , epoch_in(create_tx_and_confirm<fc::variant, std::string>(get_abi("epochIn")))
-      , next_epoch_index(create_call<fc::variant>(get_abi("nextEpochIndex"))) {}
+      , epoch_in(create_tx_and_confirm<fc::variant, uint32_t, uint16_t, uint16_t, uint32_t, std::string>(
+           get_abi("epochIn")))
+      , discard_envelope_chunks(
+           create_tx_and_confirm<fc::variant>(get_abi("discardEnvelopeChunks")))
+      , next_epoch_index(create_call<fc::variant>(get_abi("nextEpochIndex")))
+      , envelope_chunk_state(create_call<fc::variant, std::string>(get_abi("envelopeChunkState"))) {}
 };
 
 /// Typed contract client for OperatorRegistry.sol. Carries the actions
@@ -71,10 +100,11 @@ struct opp_inbound_contract_client : ethereum_contract_client {
 /// uses the return as a "this leg landed" signal before recording the
 /// action locally.
 struct operator_registry_contract_client : ethereum_contract_client {
-   /// `commit(bytes uicBytes)` — relays a signed `UnderwriteIntentCommit`
-   /// from an underwriter into the OperatorRegistry as opaque bytes. The
-   /// hardhat-generated ABI passes the parameter as a hex-encoded string
-   /// (per `ethereum_abi::encode_dynamic_data` for `dt::bytes`).
+   /// `commit(bytes uicBytes)` — submits the original canonical
+   /// `UnderwriteIntentCommit` bytes. OperatorRegistry binds their signed EVM
+   /// caller and claimed ACTIVE roster identity before queuing the unchanged
+   /// bytes. The hardhat-generated ABI passes the parameter as a hex-encoded
+   /// string (per `ethereum_abi::encode_dynamic_data` for `dt::bytes`).
    ethereum_contract_tx_fn<fc::variant, std::string> commit;
 
    operator_registry_contract_client(const ethereum_client_ptr& client,

@@ -560,6 +560,30 @@ namespace sysiosystem {
          void claimnodedis(const sysio::name& account_name);
 
          /**
+          * Claim epoch pay credited by payepoch — a producer, standby or batch-operator share.
+          * Drains the caller's `payclaims` row and transfers the whole balance out.
+          *
+          * payepoch credits rather than transfers because it runs inline from
+          * sysio.epoch::advance: `sysio.token::transfer` notifies the recipient, and a recipient
+          * whose notify handler aborts (or burns CPU) would abort advance and stall epoch
+          * advancement chain-wide. Moving the transfer here puts it under the claimant's own
+          * authority, so a hostile recipient can only block its own payout.
+          *
+          * The T5 category buckets (`sysio.ops` capex, `sysio.gov` governance) are NOT credited
+          * here — payepoch transfers to them directly. A claim needs `require_auth(account_name)`
+          * and neither can ever produce it: `sysio.roa` forces `net_weight`/`cpu_weight` to zero
+          * for every `sysio`-prefixed account, so they cannot pay for a transaction, and unlike
+          * `sysio.dclaim` they carry no contract that could emit the claim inline. They are
+          * protocol-owned holding accounts with no code, so the notify-handler threat the pull
+          * model defends against does not exist for them. See the note at the push site in
+          * emissions.cpp for the standing constraint that keeps it that way.
+          *
+          * Auth: the claiming account.
+          */
+         [[sysio::action]]
+         void claimpay(const sysio::name& account_name);
+
+         /**
           * Read-only: view claimable Node Owner distributions.
           */
          [[sysio::action, sysio::read_only]]
@@ -586,9 +610,13 @@ namespace sysiosystem {
           * `batch_op_groups` is the full state.batch_op_groups vector from
           * sysio.epoch; payepoch reads t5state.batch_group_epochs to weight
           * the batch pool proportionally to each group's active-epoch count
-          * over the period (groups that were active in zero epochs are
-          * skipped, which can only happen when pay_cadence_epochs <
-          * batch_op_groups.size()).
+          * over the period, normalized by the ACTUAL accrued-epoch count (the
+          * sum of those counters) rather than the configured
+          * pay_cadence_epochs, which a mid-period setemitcfg change or the
+          * shortened genesis period can make disagree. Groups active in zero
+          * epochs are skipped, which happens whenever the accrued count is
+          * smaller than batch_op_groups.size(); skipping costs them nothing,
+          * since a zero count already weights their allocation to zero.
           *
           * Runtime conditions (config missing, treasury exhausted, balance
           * insufficient) are caught upstream by the gate, which records the
@@ -602,13 +630,19 @@ namespace sysiosystem {
 
          /**
           * Accrue this epoch's per-epoch emission share onto t5state, without
-          * paying. Called inline by sysio.epoch::advance on every non-pay
-          * epoch (the cadence-1..cadence-2 epochs of each pay period). Auth:
-          * require_auth("sysio.epoch").
+          * paying. Called inline by sysio.epoch::advance on EVERY successful
+          * epoch — including a pay epoch, where advance queues this action
+          * FIRST and payepoch after it, so FIFO inline ordering means payepoch
+          * observes the post-accrue state. Auth: require_auth("sysio.epoch").
           *
           * Increments t5state.pending_emission_amount by `per_epoch_emission`
           * and bumps t5state.batch_group_epochs[batch_group_index] by 1, so
           * the next payepoch sees the period total + per-group counts.
+          *
+          * Because it also runs on the pay epoch, the counter sum that
+          * `payepoch` normalizes by includes the epoch being paid. Reading this
+          * as "non-pay epochs only" understates that sum by one and is how the
+          * configured-cadence divisor came to look correct.
           *
           * No transfers happen here. Treasury / balance gating is the
           * gate's responsibility upstream.

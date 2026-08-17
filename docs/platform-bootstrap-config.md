@@ -70,8 +70,8 @@ lifecycle fields that are outputs. A hand-authored config wants the opposite:
 |---|---|
 | `ChainSpec` | `sysio.chains::regchain(kind, code, external_chain_id, name, description)` |
 | `TokenSpec` | `sysio.tokens::regtoken(kind, code, symbol_name, description, precision, address)` then `sysio.tokens::regctok(chain_code, token_code, contract_addr, is_native)` |
-| `ReserveSpec` | `sysio.reserv::regreserve(chain_code, token_code, reserve_code, name, description, initial_chain_amount, initial_wire_amount, connector_weight_bps, is_private, owner)` |
-| `UwritConfig` | `sysio.uwrit::setconfig(fee_bps, collateral_lock_duration_ms)` |
+| `ReserveSpec` | `sysio.reserv::regreserve(chain_code, token_code, reserve_code, name, description, initial_chain_amount, initial_wire_amount, source_token_precision, connector_weight_bps, is_private, owner)` — `source_token_precision` is **not** a `ReserveSpec` field: it comes from the referenced `TokenSpec.precision` (see below) |
+| `UwritConfig` | `sysio.uwrit::setconfig(fee_bps, collateral_lock_duration_ms, min_fromwire_amount, fromwire_revert_fee_bps, uwreq_pending_timeout_epochs, uwreq_retention_epochs)` — the spec pins the first two; the caller supplies the rest (see below) |
 | `t5_reserve_allocation` | none — feeds the `setemitcfg` arithmetic below |
 | `t5_dex_allocation` | none yet — reserved earmark; carved out of T5 alongside `t5_reserve_allocation` once the DEX-seeding path lands |
 
@@ -79,6 +79,37 @@ The `regreserve` signature (with `is_private` + `owner`) and the ms-based
 `setconfig` are the reserve-and-swap-beta surface; this config slots directly
 onto them. `owner` is a WIRE account name (`sysio::name`): empty for public
 reserves, the owning account for private ones.
+
+`regreserve`'s eleven-argument signature includes `source_token_precision` as its
+**eighth** argument, which no `ReserveSpec` field supplies. It is the
+**depot-frame precision of the paired
+token** — i.e. the referenced `TokenSpec.precision`, which is itself
+`min(native precision, 9)`. So the mapping is a lookup, not a new config field:
+resolve `(chain_code, token_code)` to its `TokenSpec` and pass that spec's
+`precision`. `regreserve` rejects a value above 9 (`WIRE_PRECISION`) with
+*"source_token_precision exceeds the depot frame (9) — the outpost must downscale
+to min(native, 9)"*, which is why V4 bounds `precision` at 9 rather than 18:
+a token declared at, say, 18 would satisfy a wider validator and then abort the
+irreversible bootstrap at `regtoken`/`regreserve`. Tokens whose native precision
+exceeds the frame (ETH at 18) declare the frame value and are downscaled at the
+outpost boundary.
+
+`UwritConfig` carries only `fee_bps` and `collateral_lock_duration_ms`, while
+`setconfig` takes six arguments. The remaining four —
+`min_fromwire_amount`, `fromwire_revert_fee_bps`, `uwreq_pending_timeout_epochs`,
+`uwreq_retention_epochs` — are **not part of this spec**: a bootstrap caller
+passes the contract's `uw_config` in-struct defaults (5 WIRE floor, 500 bps
+revert fee, and the two uwreq lifecycle windows) unless it has a reason to
+override them.
+
+`fee_bps` is the **network** fee and not the whole effective swap fee. Each
+participating non-WIRE leg's reserve independently charges its own
+`owner_fee_bps` off the same WIRE leg; that rate is **not** in `ReserveSpec` and
+is set post-bootstrap via `sysio.reserv::setrsvfee`. The network fee itself
+splits 50/50 between the winning underwriter and a rewards pool
+(`sysio.reserv::FEE_UNDERWRITER_SHARE_BPS`), and that pool splits again by the
+optional `reservcfg` dial `fee_emissions_share_bps` — which nothing seeds, so it
+reads zero until `sysio.reserv::setconfig` first persists a row.
 
 ## T5 reserve earmark
 
@@ -135,7 +166,7 @@ because the file is hand-authored and drives irreversible actions. A validator
 | V1 | `schema_version == 1`; `network` non-empty |
 | V2 | every code is a valid slug (`[A-Z0-9_]`, ≤ 8 chars) |
 | V3 | chain codes unique; exactly one `CHAIN_KIND_WIRE` chain, code `WIRE` |
-| V4 | token codes unique; `chain_code` declared; `precision` ∈ 1..18; native ⇔ kind `NATIVE` + empty address; non-native address well-formed for the chain kind (EVM `0x`+40 hex; SVM base58 → 32 bytes) |
+| V4 | token codes unique; `chain_code` declared; `precision` ∈ 1..9 (the depot frame — `sysio.tokens::regtoken` rejects anything higher, so a wider bound here would pass validation and then fail mid-bootstrap); native ⇔ kind `NATIVE` + empty address; non-native address well-formed for the chain kind (EVM `0x`+40 hex; SVM base58 → 32 bytes) |
 | V5 | exactly one native token per non-depot chain |
 | V6 | reserve `(chain, token, code)` unique; references a declared binding; not on the depot; `0 < connector_weight_bps ≤ 9999`; amounts > 0 |
 | V7 | Σ `initial_wire_amount` ≤ `t5_reserve_allocation` > 0 |

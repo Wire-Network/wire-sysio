@@ -16,11 +16,13 @@
 #include <cstring>
 
 #include "contracts.hpp"
+#include <sysio/opp/opp.hpp>
 
 using namespace sysio::testing;
 using namespace sysio;
 using namespace sysio::chain;
 using namespace fc;
+using namespace sysio::opp::types;
 
 using mvo = fc::mutable_variant_object;
 
@@ -59,6 +61,20 @@ public:
 
    static fc::mutable_variant_object codename(std::string_view s) {
       return mvo()("value", fc::slug_name{s}.value);
+   }
+
+   /// `sysio.tokens::regtoken` for a chain-native token; the metadata strings are the
+   /// parameters under test, everything else is a fixed valid value.
+   action_result regtoken(std::string_view code,
+                          const std::string& symbol_name,
+                          const std::string& description) {
+      return push_action(TOKENS_ACCOUNT, "regtoken"_n, mvo()
+         ("kind",        TokenKind::TOKEN_KIND_NATIVE)
+         ("code",        codename(code))
+         ("symbol_name", symbol_name)
+         ("description", description)
+         ("precision",   9)
+         ("address",     mvo()("kind", ChainKind::CHAIN_KIND_UNKNOWN)("address", "")));
    }
 
    /// `chaintokens` is a uint128-keyed kv::table; `get_row_by_id` only supports
@@ -126,6 +142,22 @@ BOOST_FIXTURE_TEST_CASE(regctok_records_binding, sysio_tokens_tester) { try {
    auto erc20 = find_chaintoken("ETH", "USDC");
    BOOST_REQUIRE(!erc20.is_null());
    BOOST_REQUIRE_EQUAL(false, erc20["is_native"].as<bool>());
+} FC_LOG_AND_RETHROW() }
+
+// `symbol_name` and `description` are moved into a persisted `token_row` billed to
+// `ram_payer = sysio` — the shared system pool — so an unbounded string lets each unique
+// `code` consume up to the KV/action ceiling of system-owned state. regtoken validated
+// `kind`, `precision`, and duplicate `code`, but never the two strings. CertiK WNS-10.
+BOOST_FIXTURE_TEST_CASE(regtoken_bounds_metadata, sysio_tokens_tester) { try {
+   BOOST_REQUIRE(regtoken("WIRE", std::string(129, 'x'), "ok")
+      .find("label exceeds 128 bytes") != std::string::npos);
+
+   BOOST_REQUIRE(regtoken("WIRE", "Wire", std::string(257, 'x'))
+      .find("description exceeds 256 bytes") != std::string::npos);
+
+   // The bounds are inclusive, and a rejected registration never claimed the code.
+   BOOST_REQUIRE_EQUAL(success(),
+      regtoken("WIRE", std::string(128, 'x'), std::string(256, 'x')));
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -144,6 +144,26 @@ BOOST_FIXTURE_TEST_CASE( create_negative_max_supply, sysio_token_tester ) try {
 
 } FC_LOG_AND_RETHROW()
 
+// `issuer` is stored as trusted input after `require_auth(get_self())`, but `issue` later
+// gates on `to == st.issuer` + `require_auth(st.issuer)`. A null or non-existent issuer
+// therefore yields a token nobody can ever issue, while permanently burning the symbol --
+// `create` rejects duplicates, so it can never be recreated. CertiK WNS-09.
+BOOST_FIXTURE_TEST_CASE( create_null_issuer, sysio_token_tester ) try {
+
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg( "issuer account cannot be empty" ),
+      create( name{}, asset::from_string("1000.000 TKN"))
+   );
+
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( create_nonexistent_issuer, sysio_token_tester ) try {
+
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg( "issuer account does not exist" ),
+      create( "ghostacct"_n, asset::from_string("1000.000 TKN"))
+   );
+
+} FC_LOG_AND_RETHROW()
+
 BOOST_FIXTURE_TEST_CASE( symbol_already_exists, sysio_token_tester ) try {
 
    auto token = create( "alice"_n, asset::from_string("100 TKN"));

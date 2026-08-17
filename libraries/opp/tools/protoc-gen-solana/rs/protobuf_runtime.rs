@@ -182,10 +182,14 @@ pub fn encode_bytes(buf: &mut Vec<u8>, value: &[u8]) {
 pub fn decode_bytes(data: &[u8], pos: usize) -> Result<(Vec<u8>, usize), DecodeError> {
     let (len, pos) = decode_varint(data, pos)?;
     let len = len as usize;
-    if pos + len > data.len() {
+    // checked_add guards against an attacker-controlled length (up to u64::MAX)
+    // overflowing usize BEFORE the bounds comparison — a release build with
+    // overflow-checks=true would otherwise trap here instead of returning Err.
+    let end = pos.checked_add(len).ok_or(DecodeError::BufferOverflow)?;
+    if end > data.len() {
         return Err(DecodeError::BufferOverflow);
     }
-    Ok((data[pos..pos + len].to_vec(), pos + len))
+    Ok((data[pos..end].to_vec(), end))
 }
 
 #[inline]
@@ -219,9 +223,11 @@ pub fn skip_field(data: &[u8], pos: usize, wire_type: u64) -> Result<usize, Deco
             Ok(pos + 8)
         }
         2 => {
-            // Length-delimited: read length, skip that many bytes
+            // Length-delimited: read length, skip that many bytes.
+            // checked_add guards against a u64::MAX length overflowing usize
+            // before the bounds comparison (release traps on overflow).
             let (len, new_pos) = decode_varint(data, pos)?;
-            let end = new_pos + len as usize;
+            let end = new_pos.checked_add(len as usize).ok_or(DecodeError::BufferOverflow)?;
             if end > data.len() {
                 return Err(DecodeError::BufferOverflow);
             }
@@ -348,5 +354,58 @@ mod tests {
         encode_fixed32(&mut buf, 42);
         let new_pos = skip_field(&buf, 0, 5).unwrap();
         assert_eq!(new_pos, 4);
+    }
+
+    // ── Malformed length prefixes must return Err, never panic ───────────
+    //
+    // Both routes are on-chain-reachable and a panic (release builds set
+    // overflow-checks = true) aborts the transaction on consensus-pinned
+    // bytes, permanently wedging an outpost epoch. These decoders must
+    // fail closed with DecodeError instead.
+
+    #[test]
+    fn test_decode_bytes_length_overrun_errors() {
+        // Route 1 (bounds): a length that is a valid number but points past
+        // the buffer. Must return Err, not slice out of bounds.
+        let mut buf = Vec::new();
+        encode_varint(&mut buf, 100); // claims 100 bytes; none follow
+        assert!(matches!(
+            decode_bytes(&buf, 0),
+            Err(DecodeError::BufferOverflow)
+        ));
+    }
+
+    #[test]
+    fn test_decode_bytes_length_overflow_errors() {
+        // Route 2 (overflow): a u64::MAX varint length overflows usize on the
+        // add. checked_add must catch it before the bounds comparison.
+        let mut buf = Vec::new();
+        encode_varint(&mut buf, u64::MAX);
+        assert!(matches!(
+            decode_bytes(&buf, 0),
+            Err(DecodeError::BufferOverflow)
+        ));
+    }
+
+    #[test]
+    fn test_skip_field_length_overrun_errors() {
+        // Route 1 for the wiretype-2 skip arm.
+        let mut buf = Vec::new();
+        encode_varint(&mut buf, 100);
+        assert!(matches!(
+            skip_field(&buf, 0, 2),
+            Err(DecodeError::BufferOverflow)
+        ));
+    }
+
+    #[test]
+    fn test_skip_field_length_overflow_errors() {
+        // Route 2 for the wiretype-2 skip arm.
+        let mut buf = Vec::new();
+        encode_varint(&mut buf, u64::MAX);
+        assert!(matches!(
+            skip_field(&buf, 0, 2),
+            Err(DecodeError::BufferOverflow)
+        ));
     }
 }

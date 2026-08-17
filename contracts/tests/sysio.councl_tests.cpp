@@ -188,7 +188,8 @@ public:
    // ── generic action push (lands each action in its own block for distinct TaPoS) ─────────────
    action_result push(name contract, abi_serializer& ser, name signer, name action_name,
                       const fc::variant_object& data) {
-      return sysio_system::test_support::push_contract_action(*this, contract, ser, signer, action_name, data);
+      return sysio_system::test_support::push_contract_action_and_produce_block(
+         *this, contract, ser, signer, action_name, data);
    }
 
    // ── councl action wrappers ────────────────────────────────────────────────

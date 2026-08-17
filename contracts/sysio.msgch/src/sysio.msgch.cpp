@@ -1,5 +1,4 @@
 #include <sysio.msgch/sysio.msgch.hpp>
-#include <sysio.msgch/solana_terminal_budget.hpp>
 #include <sysio.epoch/sysio.epoch.hpp>
 #include <sysio.authex/sysio.authex.hpp>
 #include <sysio.chains/sysio.chains.hpp>
@@ -58,15 +57,18 @@ constexpr sysio::slug_name NODE_OWNER_SRC_CHAIN = "ETHEREUM"_s;
 
 /// Hard cap on the encoded envelope size in BOTH directions, mirroring the
 /// Solana (`opp_outpost::MAX_ENVELOPE_BYTES`) and Ethereum (`OPP.MAX_ENVELOPE_BYTES`)
-/// caps. 64 KiB is the e2e-supported maximum across WIRE / Ethereum / Solana,
-/// bound by Solana's 256 KiB BPF heap divided by ~3.3× envelope-size peak heap
-/// usage during the finalising chunk's `Envelope::decode + keccak::hash + clone`.
+/// caps. 32 KiB is the e2e-supported maximum across WIRE / Ethereum / Solana.
+/// Solana's 256 KiB BPF heap divided by ~3.3× envelope-size peak heap usage
+/// during the finalising chunk's `Envelope::decode + keccak::hash + clone`
+/// tolerates more, but Ethereum is the binding constraint: a cold
+/// `emitOutboundEnvelope` of a near-64-KiB envelope costs ~45 M gas, ~2.7× the
+/// EIP-7825 per-transaction cap of 16 777 216, so the platform cap is 32 768.
 /// Outbound, the `buildenv` packing loop uses this to decide how many READY
 /// attestations to bundle into the current epoch's envelope; any that don't fit
 /// stay in the `attestations` table with status READY for the next epoch's
 /// `buildenv` call. Inbound, `deliver` rejects anything larger before hashing
 /// or storing it.
-constexpr size_t   MAX_ENVELOPE_BYTES         = 65'536;
+constexpr size_t   MAX_ENVELOPE_BYTES         = 32'768;
 
 /// Conservative per-attestation byte budget used by the `buildenv` packing
 /// loop: protobuf tags + length prefixes + the attestation type/data-size
@@ -81,71 +83,9 @@ constexpr size_t   ATTESTATION_OVERHEAD_BYTES = 24;
 /// + payload preamble, and a safety margin for `zpp::bits` length prefixes.
 constexpr size_t   ENVELOPE_BASELINE_BYTES    = 512;
 
-using namespace sysio::msgch_svm_terminal_budget;
-
-static_assert(svm_hard_dynamic_account_budget() == 16,
-              "SEC-94 SVM dynamic-account budget changed; update tests and terminal budget docs");
-
-/// Pessimistic dynamic-account estimate for one Solana-bound outbound
-/// attestation. `std::nullopt` means the attestation is not covered by the
-/// SEC-94 manifest and must not be committed to a Solana envelope.
-std::optional<size_t> estimate_svm_dynamic_accounts(AttestationType type,
-                                                    const std::vector<char>& data) {
-   using AT = AttestationType;
-   switch (type) {
-      case AT::ATTESTATION_TYPE_OPERATORS:
-      case AT::ATTESTATION_TYPE_BATCH_OPERATOR_GROUPS:
-      case AT::ATTESTATION_TYPE_EMISSIONS_BLOCKED:
-         return SVM_DYNAMIC_ACCOUNTS_NONE;
-
-      case AT::ATTESTATION_TYPE_OPERATOR_ACTION: {
-         opp::attestations::OperatorAction oa;
-         auto in = zpp::bits::in{std::span{data.data(), data.size()}, zpp::bits::no_size{}};
-         if (in(oa) != zpp::bits::errc{}) return std::nullopt;
-
-         using OAT = opp::attestations::OperatorAction;
-         switch (oa.action_type) {
-            case OAT::ACTION_TYPE_WITHDRAW_REMIT:
-               return SVM_DYNAMIC_ACCOUNTS_NATIVE_WALLET;
-            case OAT::ACTION_TYPE_SLASH:
-               return SVM_DYNAMIC_ACCOUNTS_NONE;
-            case OAT::ACTION_TYPE_DEPOSIT_REQUEST:
-            case OAT::ACTION_TYPE_WITHDRAW_REQUEST:
-            case OAT::ACTION_TYPE_UNKNOWN:
-            default:
-               return std::nullopt;
-         }
-      }
-
-      case AT::ATTESTATION_TYPE_DEPOSIT_REVERT:
-      case AT::ATTESTATION_TYPE_RESERVE_READY:
-         return SVM_DYNAMIC_ACCOUNTS_NATIVE_WALLET;
-
-      case AT::ATTESTATION_TYPE_SWAP_REMIT:
-      case AT::ATTESTATION_TYPE_SWAP_REVERT:
-      case AT::ATTESTATION_TYPE_RESERVE_CREATE_CANCELLED:
-         return SVM_DYNAMIC_ACCOUNTS_RESERVE_EFFECT_WORST_CASE;
-
-      case AT::ATTESTATION_TYPE_UNSPECIFIED:
-      case AT::ATTESTATION_TYPE_PRETOKEN_PURCHASE:
-      case AT::ATTESTATION_TYPE_PRETOKEN_YIELD:
-      case AT::ATTESTATION_TYPE_WIRE_TOKEN_PURCHASE:
-      case AT::ATTESTATION_TYPE_RESERVE_BALANCE_SHEET:
-      case AT::ATTESTATION_TYPE_STAKE_UPDATE:
-      case AT::ATTESTATION_TYPE_CHALLENGE_RESPONSE:
-      case AT::ATTESTATION_TYPE_SWAP_REQUEST:
-      case AT::ATTESTATION_TYPE_CHALLENGE_REQUEST:
-      case AT::ATTESTATION_TYPE_NODE_OWNER_REG:
-      case AT::ATTESTATION_TYPE_STAKING_REWARD:
-      case AT::ATTESTATION_TYPE_STAKE_RESULT:
-      case AT::ATTESTATION_TYPE_ATTESTATION_PROCESSING_ERROR:
-      case AT::ATTESTATION_TYPE_UNDERWRITE_INTENT_COMMIT:
-      case AT::ATTESTATION_TYPE_RESERVE_CREATE:
-      case AT::ATTESTATION_TYPE_RESERVE_CREATE_CANCEL:
-      default:
-         return std::nullopt;
-   }
-}
+/// Stable audit marker for a UIC rejected before it can reach `rcrdcommit`.
+constexpr const char* UIC_DISPATCH_REJECTED_LOG_PREFIX =
+   "UIC_DISPATCH_REJECTED";
 
 uint32_t current_epoch_index() {
    epoch::epochstate_t tbl(EPOCH_ACCOUNT);
@@ -570,13 +510,23 @@ void dispatch_underwrite_commit(name self, const std::vector<char>& data, uint64
    {
       auto in = zpp::bits::in{std::span{data.data(), data.size()}, zpp::bits::no_size{}};
       auto rc = in(uic);
-      if (rc != zpp::bits::errc{}) return;
+      if (rc != zpp::bits::errc{}) {
+         sysio::print(UIC_DISPATCH_REJECTED_LOG_PREFIX,
+                      ": chain_code=", chain_code,
+                      ", reason=malformed_uic\n");
+         return;
+      }
    }
    // Pre-validate the relayed account string before constructing `name` below. The CDT `name`
    // ctor aborts on an empty, overlong, or out-of-charset string, and an abort here would revert
    // the whole evalcons/apply_consensus delivery; a malformed name is dropped instead.
    const auto underwriter = sysio::opp::safe::parse_wire_account_name(uic.uw_account.name);
-   if (!underwriter) return;
+   if (!underwriter) {
+      sysio::print(UIC_DISPATCH_REJECTED_LOG_PREFIX,
+                   ": chain_code=", chain_code,
+                   ", reason=invalid_wire_account\n");
+      return;
+   }
 
    // WSA-005: the leg's chain (uic.chain_code) must be the proven delivering outpost before the
    // commit is recorded against a swap leg.
@@ -1065,7 +1015,8 @@ void dispatch_attestation(name self, uint64_t attestation_id,
    // `inbound_envelope_valid`, which `deliver` already ran at ingress and which is re-checked below.
    const auto op_row = [&]() {
       sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
-      return chains_tbl.get(sysio::chains::chain_key{sysio::slug_name{chain_code}});
+      return chains_tbl.get(sysio::chains::chain_key{sysio::slug_name{chain_code}},
+                            "sysio.msgch: inbound envelope names an unregistered chain_code");
    }();
    // Validate the envelope-level chain + per-message semantic headers -- the SAME check `deliver`
    // runs at ingress (see `inbound_envelope_valid`), re-run here as defense in depth. A drop is a
@@ -1281,7 +1232,7 @@ void msgch::deliver(name batch_op_name, uint64_t chain_code, std::vector<char> d
    check(!data.empty(), "delivery data cannot be empty");
 
    // Enforce the protocol envelope cap on the inbound boundary, not just in the
-   // outbound `buildenv` packer: every outpost packs to the same 64 KiB cap, so
+   // outbound `buildenv` packer: every outpost packs to the same 32 KiB cap, so
    // an oversized delivery is malformed by construction. The generic chain
    // ceilings (`max_inline_action_size` ~512 KiB, `max_kv_value_size` ~256 KiB)
    // are far looser and would otherwise let an operator persist envelopes here
@@ -1631,15 +1582,25 @@ void msgch::queueout(uint64_t chain_code,
          has_auth(RESERV_ACCOUNT) || has_auth(get_self()),
          "queueout: caller not authorized to queue outbound attestations");
 
-   {
-      sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
-      auto chain = chains_tbl.get(sysio::chains::chain_key{sysio::slug_name{chain_code}},
-                                  "sysio.msgch::queueout: chain_code is not registered");
-      if (chain.kind == ChainKind::CHAIN_KIND_SVM) {
-         check(estimate_svm_dynamic_accounts(attest_type, data).has_value(),
-               "sysio.msgch::queueout: no Solana terminal account estimate for attestation");
-      }
-   }
+   // The chains registry is the ONLY authority on which chain codes exist.
+   //
+   // This is not an attack gate -- the authorization check above is. It is an
+   // ops gate: all eight production call sites derive their code from
+   // sysio.chains, but a governance msig holding one of those authorities can
+   // call queueout directly, and a typo'd code used to abort here. Without it
+   // the row is created READY and is then unreachable forever: epoch::advance
+   // only fans buildenv to registered active outposts, the PROCESSED drain
+   // skips mismatched codes, and no prune action exists -- so it is permanent
+   // sysio-pool RAM, re-walked by the Phase-1 bystatus scan on every buildenv,
+   // for every outpost, every epoch.
+   //
+   // The SVM terminal-account estimator that used to live beside this lookup
+   // was deliberately deleted (it made the depot model another chain's packet
+   // limit); the registration assert was scaffolding for it and fell out by
+   // accident. Only the assert comes back.
+   sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
+   chains_tbl.get(sysio::chains::chain_key{sysio::slug_name{chain_code}},
+                  "sysio.msgch::queueout: chain_code is not registered");
 
    auto now_sec = static_cast<uint64_t>(current_time_point().sec_since_epoch());
 
@@ -1720,9 +1681,9 @@ void msgch::buildenv(uint64_t chain_code) {
 
    const auto op_row = [&]() {
       sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
-      return chains_tbl.get(sysio::chains::chain_key{sysio::slug_name{chain_code}});
+      return chains_tbl.get(sysio::chains::chain_key{sysio::slug_name{chain_code}},
+                            "sysio.msgch::buildenv: chain_code is not registered");
    }();
-   const bool is_svm_destination = op_row.kind == ChainKind::CHAIN_KIND_SVM;
 
    // Route endpoints, stamped into the wire envelope below and mirrored on the envlog audit
    // row (symmetric with the evalcons inbound projection: `kind` → ChainId.kind,
@@ -1738,40 +1699,31 @@ void msgch::buildenv(uint64_t chain_code) {
 
    // Phase 2: estimator-based initial pick. Walk candidates in order, accumulating a conservative byte
    // estimate; stop once the next one would push the envelope over MAX_ENVELOPE_BYTES. The trim loop
-   // below is the source of truth for the encoded size invariant; for SVM destinations this pass also
-   // enforces the consensus-critical terminal transaction budget before the envelope is committed.
+   // below is the source of truth for the encoded size invariant.
+   //
+   // This pass deliberately does NOT bound the envelope by any destination chain's transaction
+   // capacity. Solana dispatch is resumable: the outpost settles `[cursor, cursor + dispatch_limit)`
+   // per terminal call and the relay loops until the cursor drains, so an envelope that needs more
+   // effect accounts than one Solana transaction can carry is settled across several calls rather
+   // than refused here. Sizing a WIRE consensus envelope against another chain's packet limit put
+   // that chain's MTU inside depot consensus; the cursor removes the need.
    size_t              included_count = 0;
    size_t              estimated_bytes = ENVELOPE_BASELINE_BYTES;
-   size_t              estimated_svm_dynamic_accounts = 0;
    for (const auto& entry : candidate_entries) {
       const size_t entry_bytes = ATTESTATION_OVERHEAD_BYTES + entry.data.size();
       if (estimated_bytes + entry_bytes > MAX_ENVELOPE_BYTES) {
          break;
       }
-      size_t next_svm_dynamic_accounts = estimated_svm_dynamic_accounts;
-      size_t entry_svm_dynamic_accounts = 0;
-      if (is_svm_destination) {
-         auto estimate = estimate_svm_dynamic_accounts(entry.type, entry.data);
-         check(estimate.has_value(),
-               "sysio.msgch::buildenv: no Solana terminal account estimate for READY attestation");
-         entry_svm_dynamic_accounts = *estimate;
-         next_svm_dynamic_accounts += entry_svm_dynamic_accounts;
-         if (!svm_terminal_budget_fits(next_svm_dynamic_accounts)) {
-            break;
-         }
-      }
       estimated_bytes += entry_bytes;
-      estimated_svm_dynamic_accounts = next_svm_dynamic_accounts;
       ++included_count;
    }
 
    // First-attestation-too-big guard. The estimator picks zero only when the first candidate alone
-   // overshoots the envelope or SVM terminal cap; the trim loop below would surface the same envelope
-   // condition, but aborting upfront avoids building anything in the doomed case. Never expected at
-   // protocol level because every valid current Solana-bound attestation should fit by itself.
+   // overshoots the envelope; the trim loop below would surface the same condition, but aborting
+   // upfront avoids building anything in the doomed case. Never expected at protocol level because
+   // every valid current attestation should fit by itself.
    check(included_count > 0,
-         "sysio.msgch::buildenv: a single READY attestation exceeds "
-         "the outbound envelope or Solana terminal budget");
+         "sysio.msgch::buildenv: a single READY attestation exceeds the outbound envelope");
 
    std::vector<opp::AttestationEntry> entries(
       std::make_move_iterator(candidate_entries.begin()),
