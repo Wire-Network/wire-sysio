@@ -5,6 +5,7 @@
 #include <sysio.uwrit/sysio.uwrit.hpp>
 #include <sysio.opp.common/slug_name.hpp>
 #include <sysio.opp.common/safe_ops.hpp>
+#include <sysio.opp.common/claimable.hpp>
 #include <sysio/opp/attestations/attestations.pb.hpp>
 #include <magic_enum/magic_enum.hpp>
 #include <zpp_bits.h>
@@ -27,6 +28,30 @@ using namespace sysio::slug_name_literals;
 // System-owned rows bill to the sysio RAM pool, not this contract account (privileged-contract
 // model, as sysio.token uses): the account stays finite at code+abi size; growth draws from the pool.
 constexpr name ram_payer = "sysio"_n;
+
+/// Credit a WIRE-chain remit to the operator's claimable row instead of transferring it.
+///
+/// Every caller (withdraw flush, deferred lock release, termination payout) is reachable from
+/// `sysio.epoch::advance`, which must never abort. `sysio.token::transfer` notifies the operator,
+/// and the chain runs notified receivers with no exception isolation, so a pushed remit would let
+/// an operator's notify handler abort `advance` and halt epoch advancement chain-wide. In the
+/// termination case the operator would be blocking its own removal, so the retry never converges.
+///
+/// Never throws: the credit saturates rather than overflowing.
+void credit_remit_claim(name self, name account, uint64_t amount) {
+   if (amount == 0) return;
+
+   // The expiry stamp is RECORDED, not acted on: no sweep is wired against `remitclaims` (see the
+   // note on the table). Refreshing it on every credit means an operator still being remitted
+   // never ages, so the stamp already carries the "last had activity" signal a future retention
+   // pass (WIRE-339) needs, rather than that history starting the day a sweep lands.
+   const uint32_t now_sec = current_time_point().sec_since_epoch();
+
+   opreg::remitclaims_t claims(self);
+   sysio::opp::claimable::credit(claims, ram_payer, opreg::remitclaim_key{account.value},
+                                 opreg::remit_claim{.account = account}, amount,
+                                 now_sec + opreg::REMIT_CLAIM_WINDOW_SEC);
+}
 
 /// Well-known chain code for the WIRE depot itself. Comparisons of the form
 /// `chain == ChainKind::CHAIN_KIND_WIRE` are now `chain_code == kWireChainCode`.
@@ -1257,17 +1282,13 @@ void opreg::flushwtdw(uint32_t current_epoch) {
          subtract_balance(o, row.chain_code, row.token_code, row.amount);
       });
 
-      // For WIRE-direct: do the token transfer back inline. For outpost
-      // chains: queue an OPERATOR_ACTION(WITHDRAW_REMIT) to the outpost
-      // so it can release the escrow on its end.
+      // For WIRE-direct: CREDIT the operator's `remitclaims` row -- no transfer happens here, and
+      // the operator receives nothing until it calls `claimremit`. This path runs inline from
+      // `sysio.epoch::advance`, where a pushed transfer would let the operator's notify handler
+      // abort epoch advancement chain-wide. For outpost chains: queue an
+      // OPERATOR_ACTION(WITHDRAW_REMIT) to the outpost so it can release the escrow on its end.
       if (row.chain_code == kWireChainCode) {
-         action(
-            permission_level{get_self(), "active"_n},
-            TOKEN_ACCOUNT, "transfer"_n,
-            std::make_tuple(get_self(), row.account,
-               asset(static_cast<int64_t>(row.amount), CORE_SYM),
-               std::string("opreg::withdraw flush"))
-         ).send();
+         credit_remit_claim(get_self(), row.account, row.amount);
       } else {
          emit_withdraw_remit(get_self(), row.account, op.type,
                              row.chain_code, row.token_code, row.amount, row.request_id);
@@ -1442,17 +1463,15 @@ void opreg::releaselock(name account,
       emit_slash_attestation(get_self(), slash_action);
       append_action_log(ops, op_pk, slash_action, /*success*/ true, "");
    } else {
-      // TERMINATED — for WIRE-direct, transfer back to operator; otherwise
-      // queue WITHDRAW_REMIT so the outpost can transfer to the authex
-      // destination. request_id == 0 (this remit isn't queued in wtdwqueue).
+      // TERMINATED — for WIRE-direct, CREDIT the operator's `remitclaims` row; it is paid only when
+      // it calls `claimremit`. The termination itself already committed in an earlier epoch, so a
+      // pushed transfer here could not undo it — what it WOULD do is abort this lock release, which
+      // `chklocks` runs inline from `sysio.epoch::advance`, stalling epoch advancement chain-wide
+      // and leaving the lock unreleased on every retry. (Aborting the termination itself is the
+      // `terminate_inline` case below.) Otherwise queue WITHDRAW_REMIT so the outpost can transfer
+      // to the authex destination. request_id == 0 (this remit isn't queued in wtdwqueue).
       if (chain_code == kWireChainCode) {
-         action(
-            permission_level{get_self(), "active"_n},
-            TOKEN_ACCOUNT, "transfer"_n,
-            std::make_tuple(get_self(), account,
-               asset(static_cast<int64_t>(settle_amount), CORE_SYM),
-               std::string("terminate-deferred-remit"))
-         ).send();
+         credit_remit_claim(get_self(), account, settle_amount);
       } else {
          emit_withdraw_remit(get_self(), op.account, op.type,
                              chain_code, token_code, settle_amount, /*request_id*/ 0);
@@ -1502,8 +1521,9 @@ void terminate_inline(name self, name account, const std::string& reason) {
       }
    });
 
-   // Remit each (chain_code, token_code). For WIRE-chain: direct token transfer
-   // back to the operator. For outpost chains: queue WITHDRAW_REMIT.
+   // Remit each (chain_code, token_code). For WIRE-chain: CREDIT `remitclaims`, which the operator
+   // pulls with `claimremit` -- nothing is transferred from here. For outpost chains: queue
+   // WITHDRAW_REMIT.
    //
    // After each remit, append a WITHDRAW_REMIT entry to the operator's
    // `recent_actions` ring buffer so the audit trail mirrors the
@@ -1515,13 +1535,7 @@ void terminate_inline(name self, name account, const std::string& reason) {
    // (which are transient — the rows drain on the next `buildenv`).
    for (const auto& rp : to_remit) {
       if (rp.chain_code == kWireChainCode) {
-         action(
-            permission_level{self, "active"_n},
-            opreg::TOKEN_ACCOUNT, "transfer"_n,
-            std::make_tuple(self, account,
-               asset(static_cast<int64_t>(rp.amount), opreg::CORE_SYM),
-               std::string("terminate-remit"))
-         ).send();
+         credit_remit_claim(self, account, rp.amount);
       } else {
          emit_withdraw_remit(self, account, op.type,
                              rp.chain_code, rp.token_code, rp.amount, /*request_id*/ 0);
@@ -1538,6 +1552,26 @@ void terminate_inline(name self, name account, const std::string& reason) {
 void opreg::terminate(name account, std::string reason) {
    require_auth(get_self());
    terminate_inline(get_self(), account, reason);
+}
+
+// claimremit - pull collateral credited by a WIRE-chain remit.
+//
+// The remit paths (withdraw flush, deferred lock release, termination payout) credit rather than
+// transfer because every one of them is reachable from `sysio.epoch::advance`, which must never
+// abort. This is the only place such a balance becomes a transfer, and it carries the operator's
+// own authority, so a hostile transfer-notify handler blocks nothing but this caller's own claim.
+//
+// The row is erased before the transfer is queued (inside pay_out), so a notify handler that
+// re-enters claimremit finds no row and cannot double spend -- the same ordering guard `deposit`
+// applies by crediting before it transfers.
+void opreg::claimremit(name account) {
+   require_auth(account);
+
+   remitclaims_t claims(get_self());
+   sysio::opp::claimable::pay_out(
+      claims, remitclaim_key{account.value}, get_self(), TOKEN_ACCOUNT,
+      account, CORE_SYM, std::string("opreg::claimremit collateral payout"),
+      "no claimable remit for this account");
 }
 
 void opreg::recorddel(name account, uint32_t epoch, bool delivered) {

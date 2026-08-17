@@ -578,6 +578,30 @@ namespace sysiosystem {
          void claimnodedis(const sysio::name& account_name);
 
          /**
+          * Claim epoch pay credited by payepoch — a producer, standby or batch-operator share.
+          * Drains the caller's `payclaims` row and transfers the whole balance out.
+          *
+          * payepoch credits rather than transfers because it runs inline from
+          * sysio.epoch::advance: `sysio.token::transfer` notifies the recipient, and a recipient
+          * whose notify handler aborts (or burns CPU) would abort advance and stall epoch
+          * advancement chain-wide. Moving the transfer here puts it under the claimant's own
+          * authority, so a hostile recipient can only block its own payout.
+          *
+          * The T5 category buckets (`sysio.ops` capex, `sysio.gov` governance) are NOT credited
+          * here — payepoch transfers to them directly. A claim needs `require_auth(account_name)`
+          * and neither can ever produce it: `sysio.roa` forces `net_weight`/`cpu_weight` to zero
+          * for every `sysio`-prefixed account, so they cannot pay for a transaction, and unlike
+          * `sysio.dclaim` they carry no contract that could emit the claim inline. They are
+          * protocol-owned holding accounts with no code, so the notify-handler threat the pull
+          * model defends against does not exist for them. See the note at the push site in
+          * emissions.cpp for the standing constraint that keeps it that way.
+          *
+          * Auth: the claiming account.
+          */
+         [[sysio::action]]
+         void claimpay(const sysio::name& account_name);
+
+         /**
           * Read-only: view claimable Node Owner distributions.
           */
          [[sysio::action, sysio::read_only]]

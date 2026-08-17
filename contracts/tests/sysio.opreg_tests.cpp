@@ -367,6 +367,41 @@ public:
       return log.empty() ? fc::variant() : log.back();
    }
 
+   /// Claimable CORE_SYM row credited by a WIRE-chain remit. Empty variant when absent.
+   fc::variant get_remitclaim(name account) {
+      auto data = get_row_by_account(OPREG_ACCOUNT, OPREG_ACCOUNT, "remitclaims"_n, account);
+      return data.empty() ? fc::variant() : opreg_abi_ser.binary_to_variant(
+         "remit_claim", data,
+         abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
+   action_result claimremit(name account) {
+      return push_opreg_action(account, "claimremit"_n, mvo()("account", account));
+   }
+
+   /// Stand up sysio.token with the opreg CORE_SYM (SYS, precision 4) and fund `who`, so a
+   /// WIRE-chain `deposit` can move real collateral. Mirrors the setup in
+   /// deposit_reentrancy_cannot_exceed_max_collateral.
+   void setup_core_token_and_fund(name who, const std::string& quantity) {
+      set_code(TOKEN_ACCOUNT, contracts::token_wasm());
+      set_abi(TOKEN_ACCOUNT, contracts::token_abi().data());
+      set_privileged(TOKEN_ACCOUNT);   // so create/issue can bill the stat/balance RAM
+      produce_blocks();
+      base_tester::push_action(TOKEN_ACCOUNT, "create"_n, TOKEN_ACCOUNT,
+         mvo()("issuer", "sysio")("maximum_supply", "461168601842738.7903 SYS"));
+      base_tester::push_action(TOKEN_ACCOUNT, "issue"_n, config::system_account_name,
+         mvo()("to", "sysio")("quantity", quantity)("memo", "seed"));
+      base_tester::push_action(TOKEN_ACCOUNT, "transfer"_n, config::system_account_name,
+         mvo()("from", "sysio")("to", who)("quantity", quantity)("memo", "fund operator"));
+   }
+
+   /// Park the blocking contract on `who`: every INCOMING sysio.token::transfer asserts.
+   void make_transfer_blocking(name who) {
+      set_code(who, contracts::util::block_transfer_wasm());
+      set_abi(who, contracts::util::block_transfer_abi().data());
+      produce_blocks();
+   }
+
    abi_serializer opreg_abi_ser;
    abi_serializer epoch_abi_ser;
 };
@@ -1000,6 +1035,91 @@ BOOST_FIXTURE_TEST_CASE(terminate_marks_status_and_zeros_unlocked_balance, sysio
    auto balances = op["balances"].get_array();
    BOOST_REQUIRE_EQUAL(1, balances.size());
    BOOST_REQUIRE_EQUAL(0, balances[0]["balance"].as_uint64());
+} FC_LOG_AND_RETHROW() }
+
+// An operator cannot block its own termination by refusing the collateral remit.
+//
+// `sysio.token::transfer` notifies `to`, and the chain runs notified receivers with no exception
+// isolation, so a recipient asserting in its transfer-notify handler aborts the WHOLE transaction.
+// While the WIRE-chain remit was a pushed transfer, an operator facing termination could park such
+// a handler and abort `terminate` -- and because `terminate` is reached from `sysio.epoch::advance`
+// via `termcheck`, that aborted epoch advancement chain-wide. Worse, the termination never
+// committed, so every later advance retried the same remit and re-aborted: a self-defending
+// deadlock with no convergence.
+//
+// The remit now credits `remitclaims` and transfers nothing, so no notify handler runs on the
+// termination path at all. The hostile operator is terminated on schedule and its collateral waits
+// in the claim ledger; the ONLY thing its handler can still block is its own `claimremit`.
+BOOST_FIXTURE_TEST_CASE(terminate_survives_operator_blocking_its_own_remit, sysio_opreg_tester) { try {
+   const auto OPERATOR    = "batchop.a"_n;
+   const uint64_t DEPOSIT = 5000;   // atomic SYS units (CORE_SYM precision 4)
+
+   BOOST_REQUIRE_EQUAL(success(), setconfig());
+   BOOST_REQUIRE_EQUAL(success(),
+      regoperator(OPERATOR, OPERATOR_TYPE_BATCH, /*is_bootstrapped=*/false));
+
+   // Real CORE_SYM collateral on the WIRE chain, so termination takes the WIRE-direct remit
+   // branch rather than emitting a WITHDRAW_REMIT attestation to an outpost.
+   setup_core_token_and_fund(OPERATOR, "1.0000 SYS");
+   BOOST_REQUIRE_EQUAL(success(),
+      push_opreg_action(OPERATOR, "deposit"_n, mvo()("account", OPERATOR)("amount", DEPOSIT)));
+
+   // Arm the operator AFTER the deposit: `deposit`'s escrow leg is an OUTGOING transfer, which the
+   // blocking contract deliberately ignores, but deploying afterwards keeps the setup honest about
+   // which transfer is under test.
+   make_transfer_blocking(OPERATOR);
+
+   // Termination must commit despite the hostile handler. Before this change it aborted here.
+   BOOST_REQUIRE_EQUAL(success(), terminate(OPERATOR, "rolling-24h: >5% miss rate"));
+
+   auto op = get_operator(OPERATOR);
+   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_TERMINATED == op["status"].as<OperatorStatus>());
+   auto balances = op["balances"].get_array();
+   BOOST_REQUIRE_EQUAL(1u, balances.size());
+   BOOST_REQUIRE_EQUAL(0u, balances[0]["balance"].as_uint64());   // debited, not stranded
+
+   // The collateral is owed, in full, in the claim ledger.
+   auto claim = get_remitclaim(OPERATOR);
+   BOOST_REQUIRE(!claim.is_null());
+   BOOST_REQUIRE_EQUAL(DEPOSIT, claim["balance"].as_uint64());
+
+   // ...and the blocker's reach ends there: its own claim is the one thing it breaks.
+   auto r = claimremit(OPERATOR);
+   BOOST_REQUIRE_MESSAGE(r != success(), "blocking operator unexpectedly claimed its own remit");
+   BOOST_REQUIRE_MESSAGE(r.find("block_transfer: rejecting incoming transfer") != std::string::npos,
+                         "unexpected failure reason: " + r);
+
+   // The failed claim rolled back whole -- the balance is still owed, not burned.
+   BOOST_REQUIRE_EQUAL(DEPOSIT, get_remitclaim(OPERATOR)["balance"].as_uint64());
+} FC_LOG_AND_RETHROW() }
+
+// Positive control: a cooperative operator pulls its terminated collateral normally, and
+// the claim row is consumed. Pairs with the test above -- together they pin that the claimable
+// path pays everyone except the account that refuses payment.
+BOOST_FIXTURE_TEST_CASE(claimremit_pays_terminated_operator_and_clears_row, sysio_opreg_tester) { try {
+   const auto OPERATOR    = "batchop.a"_n;
+   const uint64_t DEPOSIT = 5000;
+
+   BOOST_REQUIRE_EQUAL(success(), setconfig());
+   BOOST_REQUIRE_EQUAL(success(),
+      regoperator(OPERATOR, OPERATOR_TYPE_BATCH, /*is_bootstrapped=*/false));
+   setup_core_token_and_fund(OPERATOR, "1.0000 SYS");
+   BOOST_REQUIRE_EQUAL(success(),
+      push_opreg_action(OPERATOR, "deposit"_n, mvo()("account", OPERATOR)("amount", DEPOSIT)));
+   BOOST_REQUIRE_EQUAL(success(), terminate(OPERATOR, "rolling-24h miss"));
+
+   BOOST_REQUIRE_EQUAL(DEPOSIT, get_remitclaim(OPERATOR)["balance"].as_uint64());
+   BOOST_REQUIRE_EQUAL(success(), claimremit(OPERATOR));
+   BOOST_REQUIRE(get_remitclaim(OPERATOR).is_null());   // row erased by the payout
+
+   // Double-claim finds nothing -- the erase happens before the transfer, closing the re-entrancy
+   // window a notify handler would otherwise use to drain the row twice. Advance a block first:
+   // an identical action replayed in the same block is rejected as a duplicate transaction before
+   // the contract ever runs, which would assert nothing about the contract's own guard.
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: no claimable remit for this account"),
+      claimremit(OPERATOR));
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(terminate_rejects_already_slashed_operator, sysio_opreg_tester) { try {
