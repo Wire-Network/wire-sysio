@@ -2169,6 +2169,17 @@ void uwrit::swapfromwire(name                  user,
 // post-fee refund stays positive because setconfig caps the revert fee
 // below 100%). Validation failures refund + drop; only validated rows
 // become PENDING uwreqs.
+//
+// Pre-guaranteeing `refundwire`'s own `check()`s is necessary but was NOT
+// sufficient while the refund was a pushed `sysio.token::transfer`. A transfer
+// notifies its recipient, and the chain executes notified receivers with no
+// exception isolation, so the refund recipient -- not this contract -- decided
+// whether `advance` committed. A recipient asserting in its notify handler (or
+// merely burning CPU) aborted the whole transaction, and because the `q.erase()`
+// below rolls back with it, the offending row survived and re-blocked every
+// later epoch: a permanent chain-wide epoch halt bought for one
+// `min_fromwire_amount` escrow. `refundwire` now credits a claimable balance and
+// transfers nothing, so no counterparty sits inside this drain's abort surface.
 void uwrit::drainfwq() {
    check(has_auth(EPOCH_ACCOUNT) || has_auth(get_self()),
          "drainfwq requires sysio.epoch or sysio.uwrit authority");
