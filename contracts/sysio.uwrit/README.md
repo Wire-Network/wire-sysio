@@ -67,7 +67,7 @@ chain deregistered) refund in full.
 |-------|----------|-------------|
 | `uwconfig` | `uw_config` | Singleton: `fee_bps`, `collateral_lock_duration_ms`, `min_fromwire_amount`, `fromwire_revert_fee_bps`, `uwreq_pending_timeout_epochs`, `uwreq_retention_epochs` |
 | `uwreqs` | `uw_request_t` | One row per swap intent — race state in `commits_by`, `winner`, lifecycle status, mirrored `variance_tolerance_bps`. Retained for `uwreq_retention_epochs` after ANY terminal transition — `COMPLETED` (once the last collateral lock is gone — normally when `chklocks` sweeps it at expiry, but earlier when `sweeplocks` erases it on an UPHELD challenge; both run the same `finalize_settled_uwreqs` tail. The reserve settlement itself already happened at winner selection, which is what made the row CONFIRMED), `REJECTED` (immediate failure via `reject_and_refund`), or `EXPIRED` (pending timeout, same path) — then erased by `pruneuwreqs` |
-| `locks` | `lock_entry` | Flat per-leg lock vector consulted by `sysio.opreg::available()`. The `byexpire` secondary index lets `chklocks` sweep expired locks oldest-first, up to its per-epoch budget |
+| `locks` | `lock_entry` | Flat per-leg lock vector — the AUTHORITY for locked collateral. `sysio.opreg::available()` does not scan it; it reads the `locksums` cache below. The `byexpire` secondary index lets `chklocks` sweep expired locks oldest-first, up to its per-epoch budget |
 | `locksums` | `lock_sum` | Materialized Σ `lock_entry.amount` per `(underwriter, chain_code, token_code)` bucket — the "locked" half of `sysio.opreg::available()`, read O(1) instead of scanning `locks`. Written by exactly three paths, all in this contract: `try_select_winner` ADDS (on a win), `chklocks` DECREMENTS (healthy release at expiry), and `sweeplocks` DECREMENTS (erasing a commitment's held locks on an UPHELD challenge). A bucket's row is erased once its total reaches zero, so an absent row reads as zero. Any new erase path must decrement too — the rollup is authoritative for `available()`, so a bucket left positive after its last row is gone suppresses that collateral permanently |
 | `fwqueue` | `fromwire_q` | Escrowed swap-from-WIRE requests awaiting drain. `byepoch` secondary index |
 | `uwcounters` | `uw_counters` | Monotonic id allocators (uwreq ids, lock ids) |
@@ -94,7 +94,8 @@ chain deregistered) refund in full.
   / `SWAP_REVERT` through it.
 - Settles against `sysio.reserv` (`applyswap` / `applyfromwire` / `paywire` /
   `refundwire`), forwarding the winning underwriter so the fee accrues to them.
-- Reads collateral from `sysio.opreg`; its `locks` table is the lock half of
-  that contract's `available()` rollup.
+- Reads collateral from `sysio.opreg`; its `locksums` rollup — the O(1) cache
+  over the authoritative `locks` table — is the lock half of that contract's
+  `available()`.
 - Lock sweeping and queue draining are inlined from `sysio.epoch::advance`.
 - The off-chain counterpart is `wire-sysio/plugins/underwriter_plugin/`.

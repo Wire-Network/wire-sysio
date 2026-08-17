@@ -381,8 +381,18 @@ namespace {
 /// cheap". That assumption does not hold: uwrit locks are held for the full
 /// wall-clock challenge window and are never released by delivery, so a
 /// bucket's live lock count is (settlement rate × lock duration). uwrit now
-/// maintains the total at the two sites that can change it; see
-/// `uwrit::lock_sum`.
+/// maintains the total at the THREE sites that can change it:
+///
+///   * `try_select_winner` — ADDS, one lock per required leg, on a win.
+///   * `chklocks`          — DECREMENTS, releasing locks at expiry.
+///   * `sweeplocks`        — DECREMENTS, erasing the held locks of a
+///                           commitment whose underwriter-fault challenge was
+///                           UPHELD (WIRE-297), outside `chklocks`.
+///
+/// That third path is the one this PR's stale-cache bug came from, so the
+/// count is worth keeping exact here: this reader trusts the rollup
+/// completely, and a bucket left positive after its last lock row is gone
+/// suppresses that collateral forever. See `uwrit::lock_sum`.
 uint64_t sum_locks_inline(name account, sysio::slug_name chain_code, sysio::slug_name token_code) {
    uwrit::locksums_t sums(opreg::UWRIT_ACCOUNT);
    uwrit::lock_sum_key pk{account, chain_code, token_code};

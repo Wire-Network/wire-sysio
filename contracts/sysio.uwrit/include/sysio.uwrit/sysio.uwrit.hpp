@@ -21,8 +21,11 @@ namespace sysio {
     *
     * - opreg owns the bond ledger (per-(operator, chain_code, token_code) aggregate
     *   balance). uwrit owns the **lock vector** — one row per leg of every
-    *   in-flight UWREQ. opreg's `available()` rollup reads this table via a
-    *   mirror to subtract active locks from the operator's spendable balance.
+    *   in-flight UWREQ, plus `locksums` — the per-(underwriter, chain_code,
+    *   token_code) materialized total of those rows. `locks` is the
+    *   authority; `locksums` is the O(1) read cache, and it is what opreg's
+    *   `available()` reads cross-contract to subtract active locks from the
+    *   operator's spendable balance.
     *
     * - Identity has been rekeyed onto `sysio::slug_name` (uint64). Each
     *   `lock_entry` carries `(chain_code, token_code, reserve_code)`; the
@@ -31,15 +34,21 @@ namespace sysio {
     *   multiple reserves can route unambiguously. `uw_request_t` carries
     *   `src_*` and `dst_*` slug_name triples for the same reason.
     *
-    * - The per-underwriter composite lock index can no longer fit in a
-    *   `uint128_t` (3 × uint64 = 192 bits). It is split into two secondary
-    *   indexes per the plan's B.2 design:
-    *     * `byuwck`         — `checksum256(account || chain_code || token_code)`
-    *                          for the per-(chain, token) rollup that opreg's
-    *                          `available()` reads.
-    *     * `byunderwriter` — uint64 split-index keyed on `underwriter.value`
+    * - The per-underwriter composite lock key can no longer fit in a
+    *   `uint128_t` (3 × uint64 = 192 bits), so per the plan's B.2 design the
+    *   table carries only uint64 secondary indexes and the composite lives
+    *   outside them:
+    *     * `compose_account_chain_token_ck` — `checksum256(account ||
+    *                          chain_code || token_code)`, computed on the row
+    *                          by `lock_entry::by_underwriter_ck()` and used
+    *                          as the `locksums` primary key. NOT a
+    *                          table-managed secondary index.
+    *     * `byuw`           — uint64 split-index keyed on `underwriter.value`
     *                          for cheap per-operator scans (in-memory filter
     *                          on chain_code / token_code / reserve_code).
+    *     * `byuwreq`, `byexpire` — uint64 indexes on `uwreq_id` and
+    *                          `expires_at_ms`; the latter is the window
+    *                          `chklocks` sweeps.
     *
     * - On `UNDERWRITE_INTENT_COMMIT` arrival (one per outpost; underwriters
     *   call `commit(...)` JSON-RPC on each side), `record_commit` registers
@@ -526,16 +535,19 @@ namespace sysio {
       };
 
       /// Per-leg lock row. Rows are pushed by `try_select_winner` and erased
-      /// by `release`.
+      /// by `chklocks` (natural expiry) or `sweeplocks` (an UPHELD
+      /// underwriter-fault challenge's slash-sweep, before expiry). Each of
+      /// those erase sites must also decrement `locksums` — see `lock_sum`.
       ///
-      /// The `(underwriter, chain_code, token_code)` triple is the indexing
-      /// surface opreg's `available()` rollup uses (cross-contract read of
-      /// `sysio::uwrit::locks_t` from `sysio.opreg`). 3 × uint64 = 192 bits
-      /// exceeds `uint128_t`, so the composite is hashed into a `checksum256`
-      /// via `by_underwriter_ck`. A separate `by_underwriter` split-index
-      /// (uint64 keyed on `underwriter.value`) provides the cheap
-      /// per-operator scan path for consumers that filter on chain / token
-      /// / reserve in-memory (per plan §B.2).
+      /// The `(underwriter, chain_code, token_code)` triple is the collateral
+      /// bucket a row rolls up into. 3 × uint64 = 192 bits exceeds
+      /// `uint128_t`, so the composite is hashed into a `checksum256` via
+      /// `by_underwriter_ck` — the same digest `locksums` uses to address
+      /// that bucket's materialized total, which is the O(1) surface opreg's
+      /// `available()` actually reads cross-contract. A separate
+      /// `by_underwriter` split-index (uint64 keyed on `underwriter.value`)
+      /// provides the cheap per-operator scan path for consumers that filter
+      /// on chain / token / reserve in-memory (per plan §B.2).
       ///
       /// `reserve_code` records which specific reserve this leg covers; on
       /// a slash, the outpost routes seized collateral to that reserve via
@@ -617,10 +629,21 @@ namespace sysio {
       // indexes. `by_underwriter_ck` (checksum256) is computed on the row
       // when needed for cross-contract composite comparisons, but is NOT a
       // table-managed secondary index (Antelope KV's secondary-index
-      // templates expect fixed-width integer keys). opreg's `available()`
-      // rollup scans `byunderwriter` (uint64) and filters (chain_code,
-      // token_code) in memory — cheap because underwriters hold O(1)
-      // concurrent locks.
+      // templates expect fixed-width integer keys).
+      //
+      // This table is the AUTHORITY for locked collateral — one row per live
+      // lock leg, and the only thing that can settle what is actually locked.
+      // `locksums` is the O(1) read cache derived from it, one row per
+      // (underwriter, chain_code, token_code) bucket; `sysio.opreg`'s
+      // `available()` reads THAT cross-contract, not this table.
+      //
+      // It used to scan `byuw` (uint64) and filter (chain_code, token_code)
+      // in memory, on the assumption that underwriters hold O(1) concurrent
+      // locks. That assumption is false: locks are held for the full
+      // wall-clock challenge window and are never released by delivery, so a
+      // bucket's live count is (settlement rate × lock duration). See
+      // `lock_sum` for the three sites that maintain the cache, and why a
+      // missed one is permanent rather than merely stale.
       using locks_t = sysio::kv::table<"locks"_n, lock_key, lock_entry,
          sysio::kv::index<"byuw"_n,
             sysio::const_mem_fun<lock_entry, uint64_t, &lock_entry::by_underwriter>>,
