@@ -166,6 +166,93 @@ struct node_claim_result {
 };
 
 // ---------------------------------------------------------------------------
+// Claimable epoch pay (producers, standbys, batch operators)
+// ---------------------------------------------------------------------------
+
+// payepoch runs as an inline action from sysio.epoch::advance and must never abort. It therefore
+// does NOT push `sysio.token::transfer` to recipients: a transfer notifies `to`, and a recipient
+// whose on_notify handler asserts (or burns CPU) would abort advance and stall epoch advancement
+// chain-wide. Pay is credited here instead and pulled later by `claimpay`, which carries the
+// claimant's own authority -- so a hostile recipient blocks only its own payout.
+//
+// The two CATEGORY BUCKETS (`sysio.ops`, `sysio.gov`) are the deliberate exception and are still
+// pushed -- see the transfer site in payepoch. They hold no code today, so no handler exists to
+// abort `advance`, and any contract governance later deploys there must not assert on a
+// transfer notify. Being `sysio.*` they can neither sign a claim (`sysio.roa` zeroes net/cpu for
+// that prefix) nor host a contract to emit one inline, so crediting them would strand the pay
+// permanently. This table's recipients are therefore the accounts that CAN claim.
+//
+// Rows do not expire: this is earned pay, held until claimed.
+//
+// The recipient set is bounded only CONCURRENTLY (ranks 1..standby_end_rank, plus batch-op group
+// members) — not across this table's lifetime. Producers and batch
+// operators churn, and every departed account that never calls `claimpay` leaves a row billed to
+// the sysio RAM pool forever, so system-funded claim storage grows with historical participants
+// rather than with the live set. That is a known, accepted cost here: expiring earned pay is an
+// economic decision, not a RAM one, and the alternative (`sysio.reserv::wireclaims`, whose
+// recipient set is unbounded AND caller-influenced) buys its sweep by forfeiting balances.
+//
+// The row therefore carries `expires_at_sec` and an expiry-ordered index NOW, even though nothing
+// reads them yet. Landing the schema is free before launch and expensive after it; wiring the
+// sweep is the part that needs a decision, so the two are deliberately separated. `credit`
+// maintains the stamp, so by the time WIRE-339 picks the question up there is real age data to
+// reason about instead of a table that starts counting from the day the field is added.
+//
+// NOTHING EXPIRES TODAY: no `claimable::sweep_expired` call is wired against this table, so the
+// stamp is recorded and ignored. `PAY_CLAIM_WINDOW_SEC` is the provisional window that stamp is
+// computed from, not a commitment — whether earned pay should be forfeited at all, and over what
+// window, is the open economic decision in WIRE-339.
+
+struct payclaim_key {
+   uint64_t account_name;
+   SYSLIB_SERIALIZE(payclaim_key, (account_name))
+};
+
+// Provisional retention window used only to compute `pay_claim::expires_at_sec`. Mirrors
+// `sysio.reserv::WIRE_CLAIM_WINDOW_SEC` so the two claimable tables age on the same scale; the
+// value is revisited when (and if) a sweep is wired.
+inline constexpr uint32_t PAY_CLAIM_WINDOW_SEC = 365 * 24 * 60 * 60;
+
+struct [[sysio::table("payclaims"), sysio::contract("sysio.system")]] pay_claim {
+   sysio::name account_name;
+   uint64_t    balance        = 0;   // atomic WIRE units owed, not yet claimed
+   uint32_t    expires_at_sec = 0;   // recorded by `credit`; read by nothing yet (WIRE-339)
+
+   /// Expiry-major composite so the secondary index orders by expiry and a future retention sweep
+   /// can stop at the first live row. The account tail only breaks ties, keeping the key unique
+   /// when many rows share an expiry second. (Same shape as `sysio.reserv::wire_claim`.)
+   uint128_t by_expiry() const {
+      return (static_cast<uint128_t>(expires_at_sec) << 64) | account_name.value;
+   }
+
+   SYSLIB_SERIALIZE(pay_claim, (account_name)(balance)(expires_at_sec))
+};
+
+using payclaims_t = sysio::kv::table<"payclaims"_n, payclaim_key, pay_claim,
+   sysio::kv::index<"byexpiry"_n,
+      sysio::const_mem_fun<pay_claim, uint128_t, &pay_claim::by_expiry>>
+>;
+
+// Running total of every outstanding `payclaims` balance.
+//
+// The WIRE backing unclaimed rows sits in sysio's token balance but is already owed, so every
+// gate that spends against that balance must reserve it -- otherwise the treasury double-commits
+// and a later `claimpay` fails on overdraw, stranding earned pay. Two readers depend on it:
+// `sysio.system::fundclaim` (its balance cap) and `sysio.epoch`'s emissions readiness gate.
+//
+// Held as a maintained counter rather than recomputed by scanning `payclaims`, because the epoch
+// gate reads it on EVERY advance and an O(rows) scan there would grow with the standby set. Kept
+// in its own singleton rather than folded into `t5_state` so the two evolve independently (the
+// same reason `node_count_state` is separate from `emission_state`).
+struct [[sysio::table("payclaimtot"), sysio::contract("sysio.system")]] pay_claim_total {
+   uint64_t outstanding = 0;
+
+   SYSLIB_SERIALIZE(pay_claim_total, (outstanding))
+};
+
+using payclaimtot_t = sysio::kv::global<"payclaimtot"_n, pay_claim_total>;
+
+// ---------------------------------------------------------------------------
 // T5 treasury emissions
 // ---------------------------------------------------------------------------
 

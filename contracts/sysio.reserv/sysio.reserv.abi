@@ -118,6 +118,16 @@
             ]
         },
         {
+            "name": "claimwire",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                }
+            ]
+        },
+        {
             "name": "debit",
             "base": "",
             "fields": [
@@ -597,6 +607,16 @@
             ]
         },
         {
+            "name": "sweepclaims",
+            "base": "",
+            "fields": [
+                {
+                    "name": "max_rows",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
             "name": "uw_fee_key",
             "base": "",
             "fields": [
@@ -637,6 +657,34 @@
                     "type": "name"
                 }
             ]
+        },
+        {
+            "name": "wire_claim",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "balance",
+                    "type": "uint64"
+                },
+                {
+                    "name": "expires_at_sec",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "wireclaim_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "uint64"
+                }
+            ]
         }
     ],
     "actions": [
@@ -658,6 +706,11 @@
         {
             "name": "claimuwfee",
             "type": "claimuwfee",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "claimwire",
+            "type": "claimwire",
             "ricardian_contract": ""
         },
         {
@@ -726,6 +779,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "sweepclaims",
+            "type": "sweepclaims",
+            "ricardian_contract": ""
+        },
+        {
             "name": "uwfeebal",
             "type": "uwfeebal",
             "ricardian_contract": ""
@@ -775,6 +833,21 @@
             "key_names": ["underwriter"],
             "key_types": ["name"],
             "table_id": 43959
+        },
+        {
+            "name": "wireclaims",
+            "type": "wire_claim",
+            "index_type": "i64",
+            "key_names": ["account"],
+            "key_types": ["uint64"],
+            "table_id": 22082,
+            "secondary_indexes": [
+                {
+                    "name": "byexpiry",
+                    "key_type": "uint128",
+                    "table_id": 59144
+                }
+            ]
         }
     ],
     "ricardian_clauses": [],
