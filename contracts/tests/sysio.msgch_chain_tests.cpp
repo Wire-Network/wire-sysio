@@ -1264,14 +1264,17 @@ BOOST_FIXTURE_TEST_CASE(noncanonical_delivery_slashes_before_termination, sysio_
    const auto divergent_checksum = fc::sha256::hash(divergent.data(), divergent.size());
    BOOST_REQUIRE_NE(canonical_checksum, divergent_checksum);
 
-   // Stage the split ETH deliveries and one SOL delivery before the boundary.
-   // The two remaining canonical deliveries reach majority after the boundary;
-   // then the permissionless chkcons crank advances the epoch inline.
+   // Stage the split deliveries for both outposts before the boundary. BATCHOP
+   // is non-canonical everywhere, so `advance` must deduplicate it before
+   // invoking slashop: a second opreg::slash throws and would roll the epoch
+   // advance back. BATCHOP_B/C establish canonical consensus after the boundary.
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP,   ETH_OUTPOST_ID, divergent));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP,   SOL_OUTPOST_ID, divergent));
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, canonical));
-   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP,   SOL_OUTPOST_ID, canonical));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, SOL_OUTPOST_ID, canonical));
    elapse_epoch_boundary();
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, ETH_OUTPOST_ID, canonical));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, SOL_OUTPOST_ID, canonical));
    {
       auto eth_consensus = get_outpcons(ETH_OUTPOST_ID);
       BOOST_REQUIRE(!eth_consensus.is_null());
@@ -1281,7 +1284,15 @@ BOOST_FIXTURE_TEST_CASE(noncanonical_delivery_slashes_before_termination, sysio_
       BOOST_REQUIRE(!divergent_delivery.is_null());
       BOOST_REQUIRE_EQUAL(divergent_checksum.str(), divergent_delivery["checksum"].as_string());
    }
-   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, SOL_OUTPOST_ID, canonical));
+   {
+      auto sol_consensus = get_outpcons(SOL_OUTPOST_ID);
+      BOOST_REQUIRE(!sol_consensus.is_null());
+      BOOST_REQUIRE_EQUAL(epoch, sol_consensus["epoch_index"].as<uint32_t>());
+      BOOST_REQUIRE_EQUAL(canonical_checksum.str(), sol_consensus["winning_checksum"].as_string());
+      auto divergent_delivery = find_inbound_delivery(SOL_OUTPOST_ID, epoch, BATCHOP);
+      BOOST_REQUIRE(!divergent_delivery.is_null());
+      BOOST_REQUIRE_EQUAL(divergent_checksum.str(), divergent_delivery["checksum"].as_string());
+   }
    BOOST_REQUIRE_EQUAL(success(), push(MSGCH_ACCOUNT, msgch_abi, MSGCH_ACCOUNT,
                                       "chkcons"_n, mvo()));
    produce_blocks();

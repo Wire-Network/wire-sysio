@@ -50,6 +50,12 @@ namespace chalg_actions {
 constexpr name SLASHOP = "slashop"_n;
 } // namespace chalg_actions
 
+/// Action identifiers owned by sysio.opreg and invoked while closing an epoch.
+namespace opreg_actions {
+constexpr name RECORD_DELIVERY = "recorddel"_n;
+constexpr name TERMINATION_CHECK = "termcheck"_n;
+} // namespace opreg_actions
+
 /// Durable reason prefix for an epoch-delivery classification slash.
 constexpr const char* NON_CANONICAL_DELIVERY_REASON_PREFIX =
    "non-canonical OPP envelope delivery, epoch ";
@@ -586,13 +592,13 @@ void epoch::advance() {
          action(
             permission_level{get_self(), "owner"_n},
             OPREG_ACCOUNT,
-            "recorddel"_n,
+            opreg_actions::RECORD_DELIVERY,
             std::make_tuple(observation.member, state.current_epoch_index, observation.did_deliver)
          ).send();
          action(
             permission_level{get_self(), "owner"_n},
             OPREG_ACCOUNT,
-            "termcheck"_n,
+            opreg_actions::TERMINATION_CHECK,
             std::make_tuple(observation.member)
          ).send();
       }
