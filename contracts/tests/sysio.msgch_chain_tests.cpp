@@ -1190,4 +1190,90 @@ BOOST_FIXTURE_TEST_CASE(terminate_at_duty_rotation_via_advance, sysio_msgch_chai
    BOOST_REQUIRE(terminated);
 } FC_LOG_AND_RETHROW() }
 
+// WNS-15(a) / WNS-08 (WIRE-346 / WIRE-322): consensus thresholds must derive from the group that
+// can ACTUALLY deliver, not from the configured `operators_per_epoch`.
+//
+// The resident group is a snapshot; `deliver` additionally requires current opreg ACTIVE status, so
+// slashing a member shrinks the deliverable set without shrinking the snapshot. With the configured
+// size still 3, the pre-fix thresholds were both unreachable for the surviving two: unanimity
+// required 3 deliveries, and the boundary-majority path required `count > 3/2`, i.e. 3 as well.
+// Consensus was arithmetically impossible and the epoch stalled chain-wide with every remaining
+// operator behaving correctly. CertiK shipped this as
+// sysio_msgch_chain_tests/short_one_member_group_still_uses_configured_three_member_quorum.
+BOOST_FIXTURE_TEST_CASE(short_group_after_slash_still_reaches_consensus, sysio_msgch_chain_tester) { try {
+   bootstrap(/*n_batch_ops=*/3);   // configured operators_per_epoch == 3, resident group == 3
+
+   // Slash one member. It stays in batch_op_groups[current] until the next reschedule, but can no
+   // longer deliver -- so the eligible set is 2 while the configured size is still 3.
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, CHALG_ACCOUNT, "slash"_n,
+      mvo()("account", BATCHOP_C.to_string())("reason", "WNS-15 short-group regression")));
+   produce_blocks();
+
+   const uint32_t epoch = current_epoch();
+   auto envelope = encode_delivery(epoch, "short-group");
+   const auto digest = oracle::epoch_digest(decode_envelope(envelope));
+
+   // The slashed member is refused outright -- it is not merely uncounted.
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: delivering operator is not ACTIVE in sysio.opreg"),
+      deliver_as(BATCHOP_C, ETH_OUTPOST_ID, envelope));
+   produce_blocks();
+
+   // Both surviving members deliver identical bytes: unanimity over the ELIGIBLE group.
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, envelope));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, envelope));
+   produce_blocks();
+
+   auto opc = get_outpcons(ETH_OUTPOST_ID);
+   BOOST_REQUIRE(!opc.is_null());
+   BOOST_REQUIRE_EQUAL(opc["consensus_reached"].as<bool>(), true);
+   BOOST_REQUIRE_EQUAL(opc["epoch_index"].as<uint32_t>(), epoch);
+   BOOST_REQUIRE_EQUAL(opc["envelope_digest"].as_string(), digest.str());
+} FC_LOG_AND_RETHROW() }
+
+// WNS-15(b) / WNS-21 (WIRE-346 / WIRE-354): a majority that forms BEFORE the epoch boundary must
+// still be finalized once the boundary passes.
+//
+// `evalcons` runs only as an inline of `deliver`, and `deliver` rejects a second delivery from the
+// same operator, so before the fix nothing on chain could re-examine a pre-boundary majority once
+// the time gate opened -- the epoch stalled permanently even though the votes were already cast and
+// unanimous among those who voted. `chkcons` (permissionless, cranked every tick) now re-drives
+// `evalcons` for every outpost still lacking a current-epoch consensus row.
+//
+// Note the re-drive lands as an inline AFTER chkcons returns, so the row appears on the following
+// block -- this test asserts exactly that ordering rather than same-transaction settlement.
+BOOST_FIXTURE_TEST_CASE(pre_boundary_majority_finalized_by_chkcons_crank, sysio_msgch_chain_tester) { try {
+   bootstrap(/*n_batch_ops=*/3);
+
+   const uint32_t epoch = current_epoch();
+   auto envelope = encode_delivery(epoch, "pre-boundary-majority");
+   const auto digest = oracle::epoch_digest(decode_envelope(envelope));
+
+   // Two of three agree, all BEFORE the boundary. The unanimous path needs all three, and the
+   // majority path is time-gated, so no consensus is recorded yet.
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, envelope));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, envelope));
+   produce_blocks();
+   {
+      auto opc = get_outpcons(ETH_OUTPOST_ID);
+      BOOST_REQUIRE(opc.is_null() || !opc["consensus_reached"].as<bool>());
+   }
+
+   // The boundary passes with NO further delivery -- the third operator never shows up, and the two
+   // that did are barred from delivering again. This is the stall state.
+   elapse_epoch_boundary();
+
+   // The permissionless crank re-drives evalcons for the outposts still awaiting consensus.
+   BOOST_REQUIRE_EQUAL(success(), push(MSGCH_ACCOUNT, msgch_abi, BATCHOP, "chkcons"_n, mvo()));
+   produce_blocks();
+
+   auto opc = get_outpcons(ETH_OUTPOST_ID);
+   BOOST_REQUIRE(!opc.is_null());
+   BOOST_REQUIRE_EQUAL(opc["consensus_reached"].as<bool>(), true);
+   BOOST_REQUIRE_EQUAL(opc["epoch_index"].as<uint32_t>(), epoch);
+   BOOST_REQUIRE_EQUAL(opc["envelope_digest"].as_string(), digest.str());
+} FC_LOG_AND_RETHROW() }
+
 BOOST_AUTO_TEST_SUITE_END()
