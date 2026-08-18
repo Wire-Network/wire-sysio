@@ -60,6 +60,7 @@ constexpr uint64_t ETH_OUTPOST_ID = "ETH"_s.value;
 constexpr uint64_t SOL_OUTPOST_ID = "SOL"_s.value;
 constexpr std::string_view ETH_CHAIN_CODE = "ETH";
 constexpr std::string_view SOL_CHAIN_CODE = "SOL";
+constexpr char SLASH_ACTION_TYPE[] = "ACTION_TYPE_SLASH";
 constexpr uint64_t BATCHOP_MIN_COLLATERAL = 1;
 constexpr uint64_t TABLE_SCAN_LIMIT = 64;
 
@@ -451,8 +452,7 @@ public:
       for (const auto& log : op["recent_actions"].get_array()) {
          const auto& action = log["action"];
          if (!log["success"].as_bool() ||
-             action["action_type"].as<sysio::opp::attestations::OperatorAction_ActionType>() !=
-                sysio::opp::attestations::OperatorAction::ACTION_TYPE_SLASH ||
+             action["action_type"].as_string() != SLASH_ACTION_TYPE ||
              action["chain_code"].as_uint64() != chain_code) continue;
          ++n;
       }
