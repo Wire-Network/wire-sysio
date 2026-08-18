@@ -60,7 +60,6 @@ constexpr uint64_t ETH_OUTPOST_ID = "ETH"_s.value;
 constexpr uint64_t SOL_OUTPOST_ID = "SOL"_s.value;
 constexpr std::string_view ETH_CHAIN_CODE = "ETH";
 constexpr std::string_view SOL_CHAIN_CODE = "SOL";
-constexpr char SLASH_ACTION_TYPE[] = "ACTION_TYPE_SLASH";
 constexpr uint64_t BATCHOP_MIN_COLLATERAL = 1;
 constexpr uint64_t TABLE_SCAN_LIMIT = 64;
 
@@ -448,11 +447,17 @@ public:
       auto op = get_operator(account);
       if (op.is_null()) return 0;
 
+      using operator_action_type = sysio::opp::attestations::OperatorAction_ActionType;
       uint32_t n = 0;
       for (const auto& log : op["recent_actions"].get_array()) {
+         operator_action_type action_type =
+            sysio::opp::attestations::OperatorAction_ActionType_ACTION_TYPE_UNKNOWN;
          const auto& action = log["action"];
-         if (!log["success"].as_bool() ||
-             action["action_type"].as_string() != SLASH_ACTION_TYPE ||
+         const bool is_slash =
+            sysio::opp::attestations::OperatorAction_ActionType_Parse(
+               action["action_type"].as_string(), &action_type) &&
+            action_type == sysio::opp::attestations::OperatorAction_ActionType_ACTION_TYPE_SLASH;
+         if (!log["success"].as_bool() || !is_slash ||
              action["chain_code"].as_uint64() != chain_code) continue;
          ++n;
       }
@@ -1200,10 +1205,18 @@ BOOST_FIXTURE_TEST_CASE(late_confirmation_after_consensus_recorded, sysio_msgch_
 /// path; pre-fix, `termcheck` marked BATCHOP TERMINATED before `slashop`
 /// rejected that state and rolled the entire epoch back.
 BOOST_FIXTURE_TEST_CASE(noncanonical_delivery_slashes_before_termination, sysio_msgch_chain_tester) { try {
-   constexpr uint32_t kMaxConsecutiveMisses = 5;
+   constexpr uint32_t kBatchOperatorCount                      = 3;
+   constexpr uint32_t kExpectedInitialEpoch                    = 1;
+   constexpr uint32_t kMaxConsecutiveMisses                    = 5;
+   constexpr uint32_t kHistoricalMissesPastTerminationThreshold = 1;
+   constexpr const char* kCanonicalPayload                     = "canonical";
+   constexpr const char* kNonCanonicalPayload                  = "non-canonical";
+   constexpr uint32_t kExpectedSlashActionsPerOutpost          = 1;
+   constexpr uint32_t kEpochAdvanceCount                       = 1;
+   constexpr uint32_t kExpectedDeliveredLogCount               = 2;
 
-   bootstrap(/*n_batch_ops=*/3, /*batchop_is_bootstrapped=*/false);
-   BOOST_REQUIRE_EQUAL(1u, current_epoch());
+   bootstrap(/*n_batch_ops=*/kBatchOperatorCount, /*batchop_is_bootstrapped=*/false);
+   BOOST_REQUIRE_EQUAL(kExpectedInitialEpoch, current_epoch());
    BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE,
                        get_operator(BATCHOP)["status"].as<opp::types::OperatorStatus>());
    {
@@ -1220,14 +1233,16 @@ BOOST_FIXTURE_TEST_CASE(noncanonical_delivery_slashes_before_termination, sysio_
    // Seed enough prior misses for the next termcheck to terminate BATCHOP if
    // it remains ACTIVE. The current epoch's non-canonical delivery still
    // counts as delivered, so this specifically covers the ordering conflict.
-   for (uint32_t prior_epoch = 1; prior_epoch <= kMaxConsecutiveMisses + 1; ++prior_epoch) {
+   for (uint32_t prior_epoch = kExpectedInitialEpoch;
+        prior_epoch <= kMaxConsecutiveMisses + kHistoricalMissesPastTerminationThreshold;
+        ++prior_epoch) {
       BOOST_REQUIRE_EQUAL(success(), record_delivery(BATCHOP, prior_epoch, /*delivered=*/false));
       produce_blocks();
    }
 
    const uint32_t epoch = current_epoch();
-   const auto canonical = encode_delivery(epoch, "canonical");
-   const auto divergent = encode_delivery(epoch, "non-canonical");
+   const auto canonical = encode_delivery(epoch, kCanonicalPayload);
+   const auto divergent = encode_delivery(epoch, kNonCanonicalPayload);
    const auto canonical_checksum = fc::sha256::hash(canonical.data(), canonical.size());
    const auto divergent_checksum = fc::sha256::hash(divergent.data(), divergent.size());
    BOOST_REQUIRE_NE(canonical_checksum, divergent_checksum);
@@ -1257,10 +1272,12 @@ BOOST_FIXTURE_TEST_CASE(noncanonical_delivery_slashes_before_termination, sysio_
    auto op = get_operator(BATCHOP);
    BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_SLASHED,
                        op["status"].as<opp::types::OperatorStatus>());
-   BOOST_REQUIRE_EQUAL(1u, slash_action_count(BATCHOP, ETH_OUTPOST_ID));
-   BOOST_REQUIRE_EQUAL(1u, slash_action_count(BATCHOP, SOL_OUTPOST_ID));
-   BOOST_REQUIRE_EQUAL(epoch + 1, current_epoch());
-   BOOST_REQUIRE_EQUAL(2u, delivered_dellog_count(BATCHOP));
+   BOOST_REQUIRE_EQUAL(kExpectedSlashActionsPerOutpost,
+                       slash_action_count(BATCHOP, ETH_OUTPOST_ID));
+   BOOST_REQUIRE_EQUAL(kExpectedSlashActionsPerOutpost,
+                       slash_action_count(BATCHOP, SOL_OUTPOST_ID));
+   BOOST_REQUIRE_EQUAL(epoch + kEpochAdvanceCount, current_epoch());
+   BOOST_REQUIRE_EQUAL(kExpectedDeliveredLogCount, delivered_dellog_count(BATCHOP));
 } FC_LOG_AND_RETHROW() }
 
 // SEC-28 (huang review): terminate on the CONSECUTIVE-miss rail through the REAL rotation -- a
