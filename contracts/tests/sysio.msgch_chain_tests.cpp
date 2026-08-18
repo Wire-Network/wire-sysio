@@ -63,6 +63,23 @@ constexpr std::string_view SOL_CHAIN_CODE = "SOL";
 constexpr uint64_t BATCHOP_MIN_COLLATERAL = 1;
 constexpr uint64_t TABLE_SCAN_LIMIT = 64;
 
+/// sysio.opreg action identifiers used by the WNS-16 fixture.
+namespace opreg_actions {
+constexpr name RECORD_DELIVERY = "recorddel"_n;
+} // namespace opreg_actions
+
+/// sysio.opreg ABI field identifiers used by the WNS-16 fixture.
+namespace opreg_fields {
+constexpr const char* ACCOUNT        = "account";
+constexpr const char* EPOCH          = "epoch";
+constexpr const char* DELIVERED      = "delivered";
+constexpr const char* RECENT_ACTIONS = "recent_actions";
+constexpr const char* ACTION         = "action";
+constexpr const char* ACTION_TYPE    = "action_type";
+constexpr const char* SUCCESS        = "success";
+constexpr const char* CHAIN_CODE     = "chain_code";
+} // namespace opreg_fields
+
 } // anonymous namespace
 
 // ---------------------------------------------------------------------------
@@ -305,10 +322,10 @@ public:
    /// Seed a historical delivery outcome under epoch authority so the next
    /// real epoch advance exercises the rolling termination threshold.
    action_result record_delivery(name account, uint32_t epoch, bool delivered) {
-      return push(OPREG_ACCOUNT, opreg_abi, EPOCH_ACCOUNT, "recorddel"_n, mvo()
-         ("account",   account.to_string())
-         ("epoch",     epoch)
-         ("delivered", delivered));
+      return push(OPREG_ACCOUNT, opreg_abi, EPOCH_ACCOUNT, opreg_actions::RECORD_DELIVERY, mvo()
+         (opreg_fields::ACCOUNT,   account.to_string())
+         (opreg_fields::EPOCH,     epoch)
+         (opreg_fields::DELIVERED, delivered));
    }
 
    /// Let the consensus boundary elapse WITHOUT advancing the epoch: evalcons' fallback
@@ -449,16 +466,16 @@ public:
 
       using operator_action_type = sysio::opp::attestations::OperatorAction_ActionType;
       uint32_t n = 0;
-      for (const auto& log : op["recent_actions"].get_array()) {
+      for (const auto& log : op[opreg_fields::RECENT_ACTIONS].get_array()) {
          operator_action_type action_type =
             sysio::opp::attestations::OperatorAction_ActionType_ACTION_TYPE_UNKNOWN;
-         const auto& action = log["action"];
+         const auto& action = log[opreg_fields::ACTION];
          const bool is_slash =
             sysio::opp::attestations::OperatorAction_ActionType_Parse(
-               action["action_type"].as_string(), &action_type) &&
+               action[opreg_fields::ACTION_TYPE].as_string(), &action_type) &&
             action_type == sysio::opp::attestations::OperatorAction_ActionType_ACTION_TYPE_SLASH;
-         if (!log["success"].as_bool() || !is_slash ||
-             action["chain_code"].as_uint64() != chain_code) continue;
+         if (!log[opreg_fields::SUCCESS].as_bool() || !is_slash ||
+             action[opreg_fields::CHAIN_CODE].as_uint64() != chain_code) continue;
          ++n;
       }
       return n;
