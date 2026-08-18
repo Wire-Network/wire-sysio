@@ -95,6 +95,7 @@ public:
       });
       produce_blocks(2);
 
+      deploy(CHALG_ACCOUNT,  contracts::chalg_wasm(),  contracts::chalg_abi(),  chalg_abi);
       deploy(EPOCH_ACCOUNT,  contracts::epoch_wasm(),  contracts::epoch_abi(),  epoch_abi);
       deploy(OPREG_ACCOUNT,  contracts::opreg_wasm(),  contracts::opreg_abi(),  opreg_abi);
       deploy(MSGCH_ACCOUNT,  contracts::msgch_wasm(),  contracts::msgch_abi(),  msgch_abi);
@@ -553,7 +554,7 @@ public:
       produce_blocks();
    }
 
-   abi_serializer sysio_abi, token_abi, epoch_abi, opreg_abi, msgch_abi, chains_abi, uwrit_abi;
+   abi_serializer sysio_abi, token_abi, epoch_abi, opreg_abi, msgch_abi, chalg_abi, chains_abi, uwrit_abi;
 };
 
 // ---------------------------------------------------------------------------
