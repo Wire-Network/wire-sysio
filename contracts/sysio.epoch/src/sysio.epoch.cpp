@@ -440,9 +440,9 @@ void epoch::advance() {
    // For each (outpost × member of the expiring group):
    //   - scan `msgch::envelopes` (`byoutepoch` index) for any row matching
    //     (chain_code, current_epoch_index, batch_op_name == member)
-   //   - inline `opreg::recorddel(member, current_epoch_index, did_deliver)`
-   //   - inline `opreg::termcheck(member)` — the threshold + window come
-   //     from `op_config`, so tests dial the thresholds via setconfig
+   //   - collect the delivery result and every non-canonical deliverer
+   //   - slash all non-canonical deliverers before delivery accounting can
+   //     terminate them, then record the result and run `termcheck`
    //
    // The outpost set is sourced via a cross-contract read of
    // `sysio.chains::chains` (no local mirror) filtered to
@@ -468,6 +468,15 @@ void epoch::advance() {
       // outposts must be slashed a single time (opreg::slash throws on a second slash of the same
       // operator, which would abort advance and stall the chain).
       std::vector<name> to_slash;
+
+      /// A delivery result retained until non-canonical offenders have been
+      /// slashed. `recorddel` remains an audit record even for a newly
+      /// slashed operator, while `termcheck` safely skips non-ACTIVE rows.
+      struct delivery_observation {
+         name member;
+         bool did_deliver;
+      };
+      std::vector<delivery_observation> observations;
 
       sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
       for (auto op_it = chains_tbl.begin(); op_it != chains_tbl.end(); ++op_it) {
@@ -520,22 +529,11 @@ void epoch::advance() {
                   break;
                }
             }
-            action(
-               permission_level{get_self(), "owner"_n},
-               OPREG_ACCOUNT,
-               "recorddel"_n,
-               std::make_tuple(member, state.current_epoch_index, did_deliver)
-            ).send();
-            action(
-               permission_level{get_self(), "owner"_n},
-               OPREG_ACCOUNT,
-               "termcheck"_n,
-               std::make_tuple(member)
-            ).send();
+            observations.push_back({member, did_deliver});
 
             // Single slash path (dispute-vote design, per-operator outcome table): a delivered
             // NON-canonical checksum is a fault -> slash. Silence (no delivery) is never slashed; it
-            // stays on the recorddel/termcheck miss ladder above. Collect here; flush once below.
+            // stays on the recorddel/termcheck miss ladder below. Collect here; flush once below.
             if (did_deliver && have_winner && member_checksum != winner) {
                bool queued = false;
                for (const auto& s : to_slash) {
@@ -569,6 +567,24 @@ void epoch::advance() {
             std::make_tuple(member,
                             std::string("non-canonical OPP envelope delivery, epoch ")
                                + std::to_string(state.current_epoch_index))
+         ).send();
+      }
+
+      // Preserve the delivery history after slashing. A non-canonical operator is already
+      // SLASHED here, so opreg::termcheck returns without converting the punitive outcome into a
+      // termination/remit. Other group members retain their normal delivery accounting.
+      for (const auto& observation : observations) {
+         action(
+            permission_level{get_self(), "owner"_n},
+            OPREG_ACCOUNT,
+            "recorddel"_n,
+            std::make_tuple(observation.member, state.current_epoch_index, observation.did_deliver)
+         ).send();
+         action(
+            permission_level{get_self(), "owner"_n},
+            OPREG_ACCOUNT,
+            "termcheck"_n,
+            std::make_tuple(observation.member)
          ).send();
       }
 

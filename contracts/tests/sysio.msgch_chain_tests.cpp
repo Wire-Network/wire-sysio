@@ -178,10 +178,10 @@ public:
             ("pay_cadence_epochs",     uint16_t(1))));
    }
 
-   /// Epoch + opreg config, bootstrapped batch ops (`BATCHOP` always; `BATCHOP_B`/`BATCHOP_C` when
-   /// `n_batch_ops` is 3 -- a single group of three, so consensus needs more than one delivery),
-   /// ETH + SOL chain rows, group schedule, genesis advance.
-   void bootstrap(uint32_t n_batch_ops = 1) {
+   /// Epoch + opreg config, a configurable `BATCHOP` plus bootstrapped `BATCHOP_B`/`BATCHOP_C` when
+   /// `n_batch_ops` is 3 (a single group of three, so consensus needs more than one delivery), ETH +
+   /// SOL chain rows, group schedule, and genesis advance.
+   void bootstrap(uint32_t n_batch_ops = 1, bool batchop_is_bootstrapped = true) {
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT,
          "setconfig"_n, mvo()
             ("epoch_duration_sec",                  EPOCH_DURATION_SEC)
@@ -221,11 +221,17 @@ public:
             "regoperator"_n, mvo()
                ("account",          op.to_string())
                ("type",             opp::types::OperatorType::OPERATOR_TYPE_BATCH)
-               ("is_bootstrapped",  true)));
+               ("is_bootstrapped",  op == BATCHOP ? batchop_is_bootstrapped : true)));
       }
 
       register_chain(opp::types::ChainKind::CHAIN_KIND_EVM, "ETH", 31337);
       register_chain(opp::types::ChainKind::CHAIN_KIND_SVM, "SOL", 1);
+
+      // A non-bootstrapped batch operator starts UNKNOWN and becomes ACTIVE
+      // only after a collateral update re-evaluates its role eligibility.
+      if (!batchop_is_bootstrapped) {
+         BOOST_REQUIRE_EQUAL(success(), depositinle(BATCHOP, "ETH", "ETH", 1));
+      }
 
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT,
          "schbatchgps"_n, mvo()));
@@ -276,6 +282,15 @@ public:
          ("batch_op_name", op.to_string())
          ("chain_code",    chain_code)
          ("data",          data));
+   }
+
+   /// Seed a historical delivery outcome under epoch authority so the next
+   /// real epoch advance exercises the rolling termination threshold.
+   action_result record_delivery(name account, uint32_t epoch, bool delivered) {
+      return push(OPREG_ACCOUNT, opreg_abi, EPOCH_ACCOUNT, "recorddel"_n, mvo()
+         ("account",   account.to_string())
+         ("epoch",     epoch)
+         ("delivered", delivered));
    }
 
    /// Let the consensus boundary elapse WITHOUT advancing the epoch: evalcons' fallback
@@ -1124,6 +1139,48 @@ BOOST_FIXTURE_TEST_CASE(late_confirmation_after_consensus_recorded, sysio_msgch_
       BOOST_REQUIRE_EQUAL(opc["envelope_digest"].as_string(), winner_digest.str());
       BOOST_REQUIRE_EQUAL(attestation_count(ETH_OUTPOST_ID, epoch), 1u);
    }
+} FC_LOG_AND_RETHROW() }
+
+/// WNS-16: a non-canonical delivery must be slashed before its historical
+/// miss window can terminate it. The last canonical delivery reaches
+/// consensus for both outposts and drives the real `chkcons -> advance`
+/// path; pre-fix, `termcheck` marked BATCHOP TERMINATED before `slashop`
+/// rejected that state and rolled the entire epoch back.
+BOOST_FIXTURE_TEST_CASE(noncanonical_delivery_slashes_before_termination, sysio_msgch_chain_tester) { try {
+   constexpr uint32_t kMaxConsecutiveMisses = 5;
+
+   bootstrap(/*n_batch_ops=*/3, /*batchop_is_bootstrapped=*/false);
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE,
+                       get_operator(BATCHOP)["status"].as<opp::types::OperatorStatus>());
+
+   // Seed enough prior misses for the next termcheck to terminate BATCHOP if
+   // it remains ACTIVE. The current epoch's non-canonical delivery still
+   // counts as delivered, so this specifically covers the ordering conflict.
+   for (uint32_t prior_epoch = 1; prior_epoch <= kMaxConsecutiveMisses + 1; ++prior_epoch) {
+      BOOST_REQUIRE_EQUAL(success(), record_delivery(BATCHOP, prior_epoch, /*delivered=*/false));
+      produce_blocks();
+   }
+
+   const uint32_t epoch = current_epoch();
+   const auto canonical = encode_delivery(epoch, "canonical");
+   const auto divergent = encode_delivery(epoch, "non-canonical");
+
+   // Stage the split ETH deliveries and one SOL delivery before the boundary.
+   // The two remaining canonical deliveries reach majority after the boundary;
+   // the SOL delivery invokes chkcons, which advances the epoch inline.
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP,   ETH_OUTPOST_ID, divergent));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, canonical));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP,   SOL_OUTPOST_ID, canonical));
+   elapse_epoch_boundary();
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, ETH_OUTPOST_ID, canonical));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, SOL_OUTPOST_ID, canonical));
+   produce_blocks();
+
+   auto op = get_operator(BATCHOP);
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_SLASHED,
+                       op["status"].as<opp::types::OperatorStatus>());
+   BOOST_REQUIRE_EQUAL(epoch + 1, current_epoch());
+   BOOST_REQUIRE_EQUAL(2u, delivered_dellog_count(BATCHOP));
 } FC_LOG_AND_RETHROW() }
 
 // SEC-28 (huang review): terminate on the CONSECUTIVE-miss rail through the REAL rotation -- a
