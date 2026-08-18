@@ -118,9 +118,40 @@ uint64_t mint_att_id(name self) {
    return out;
 }
 
+/// Size of the batch-operator group actually serving the current epoch.
+///
+/// The consensus thresholds are fractions of the group that is SERVING, not of the group size
+/// the config asks for. `sysio.epoch::advance` deliberately admits a short or empty tail group
+/// rather than aborting -- aborting would halt OPP epoch advancement chain-wide -- so the two
+/// numbers diverge whenever batch operators are terminated faster than replacements activate.
+///
+/// Measuring against the configured size makes a short group unable to reach EITHER threshold:
+/// with `operators_per_epoch` at 7, a group of 3 can neither deliver 7 identical checksums nor
+/// exceed 3.5, so every epoch that group serves stalls with no path to consensus and no dispute
+/// (the dispute needs three variants, which 3 operators split two ways never produce).
+///
+/// The outposts already size their threshold from the serving group -- `OPPInbound` reads
+/// `batchOpGroups[0].length` -- so this measures the same population on both sides of the bridge.
+///
+/// Reads the front of the sliding window, which is the active group (`advance` keeps
+/// `current_batch_op_group` at 0). A delivery arriving for an already-rotated epoch is therefore
+/// measured against the group serving now rather than the one that served then; the outposts
+/// have the same property, and matching them matters more than being independently exact.
+///
+/// Falls back to the configured size when the schedule has not been materialized yet
+/// (`schbatchgps` has not run) or when the active group is empty -- an empty group has no
+/// deliveries to count, so the fallback only avoids reporting a zero-sized electorate.
 uint32_t epoch_operators_per_group() {
-   epoch::epochcfg_t tbl(EPOCH_ACCOUNT);
-   return tbl.exists() ? tbl.get().operators_per_epoch : 7;
+   epoch::epochstate_t state_tbl(EPOCH_ACCOUNT);
+   if (state_tbl.exists()) {
+      const auto state = state_tbl.get();
+      if (state.current_batch_op_group < state.batch_op_groups.size()) {
+         const auto serving = state.batch_op_groups[state.current_batch_op_group].size();
+         if (serving > 0) return static_cast<uint32_t>(serving);
+      }
+   }
+   epoch::epochcfg_t cfg_tbl(EPOCH_ACCOUNT);
+   return cfg_tbl.exists() ? cfg_tbl.get().operators_per_epoch : 7;
 }
 
 /// Insert a metadata row into `envelope_log` and, if the table has grown

@@ -185,8 +185,9 @@ public:
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT,
          "setconfig"_n, mvo()
             ("epoch_duration_sec",                  EPOCH_DURATION_SEC)
-            // Consensus group size: evalcons' unanimous/majority thresholds derive from
-            // `epochcfg.operators_per_epoch` (see msgch's epoch_operators_per_group). The epoch
+            // Consensus group size: evalcons' unanimous/majority thresholds derive from the
+            // SERVING group's size (see msgch's epoch_operators_per_group). Config and serving
+            // size coincide here because every registered batch op is scheduled. The epoch
             // contract enforces minimum_active == operators_per_epoch * batch_op_groups.
             ("operators_per_epoch",                 n_batch_ops)
             ("batch_operator_minimum_active",       n_batch_ops)
@@ -1057,6 +1058,47 @@ BOOST_FIXTURE_TEST_CASE(inbound_bootstrap_accepts_unverifiable_prev, sysio_msgch
    BOOST_REQUIRE_EQUAL(opc["epoch_index"].as<uint32_t>(), epoch);
    BOOST_REQUIRE_EQUAL(opc["envelope_digest"].as_string(), n1_digest.str());
    BOOST_REQUIRE_EQUAL(attestation_count(SOL_OUTPOST_ID, epoch), 1u);
+} FC_LOG_AND_RETHROW() }
+
+// Consensus thresholds measure the group that is SERVING, not the group size the config asks
+// for. `sysio.epoch::advance` admits a short tail group rather than aborting -- aborting would
+// halt OPP epoch advancement chain-wide -- so the two diverge whenever batch operators are
+// terminated faster than replacements activate. Measured against the configured size, a short
+// group reaches NEITHER threshold: the unanimous path wants a full group's worth of identical
+// deliveries and the majority path wants more than half of a group that large, so every epoch
+// that group serves stalls, with no dispute either (that needs three variants).
+BOOST_FIXTURE_TEST_CASE(short_group_reaches_consensus_on_its_own_size, sysio_msgch_chain_tester) { try {
+   bootstrap(/*n_batch_ops=*/3);   // a scheduled group of three
+
+   // Raise the CONFIGURED size without rescheduling. `setconfig` pins the rotation length once a
+   // schedule is materialized but not the group size, so the live group keeps its three members
+   // while the config now asks for seven -- the same divergence a run of terminations produces,
+   // without having to drive the terminations.
+   BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "setconfig"_n, mvo()
+      ("epoch_duration_sec",                  EPOCH_DURATION_SEC)
+      ("operators_per_epoch",                 7)
+      ("batch_operator_minimum_active",       7)
+      ("batch_op_groups",                     1)
+      ("epoch_retention_envelope_log_count",  200)));
+
+   const uint32_t epoch  = current_epoch();
+   auto           winner = encode_delivery(epoch, "short-group");
+   const auto     winner_digest = oracle::epoch_digest(decode_envelope(winner));
+
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, winner));
+   elapse_epoch_boundary();
+
+   // Two of the three operators on duty is a majority of the serving group. Against the
+   // configured seven it is neither a majority nor unanimity, so this delivery settles the epoch
+   // only because the threshold follows the group that is actually serving.
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, winner));
+   produce_blocks();
+
+   auto opc = get_outpcons(ETH_OUTPOST_ID);
+   BOOST_REQUIRE(!opc.is_null());
+   BOOST_REQUIRE_EQUAL(opc["consensus_reached"].as<bool>(), true);
+   BOOST_REQUIRE_EQUAL(opc["epoch_index"].as<uint32_t>(), epoch);
+   BOOST_REQUIRE_EQUAL(opc["envelope_digest"].as_string(), winner_digest.str());
 } FC_LOG_AND_RETHROW() }
 
 /// Late confirmation: once an epoch's winner is accepted, the per-stream tip advances to the
