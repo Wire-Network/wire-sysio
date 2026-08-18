@@ -18,7 +18,7 @@ void trx_priority::addtrxp(name receiver, name action_name, trx_match_type match
       .action_name = action_name,
       .match_type = match_type,
    });
-   _gstate.last_trx_priority_update = sysio::current_time_point();
+   touch_last_update();
 }
 
 void trx_priority::deltrxp(short priority) {
@@ -28,7 +28,7 @@ void trx_priority::deltrxp(short priority) {
    auto key = trxprio_key{static_cast<uint64_t>(static_cast<uint16_t>(priority))};
    sysio::check(tbl.contains(key), "Unable to find priority: " + std::to_string(priority));
    tbl.erase(key);
-   _gstate.last_trx_priority_update = sysio::current_time_point();
+   touch_last_update();
 }
 
 } // namespace sysiosystem
