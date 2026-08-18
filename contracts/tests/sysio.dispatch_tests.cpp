@@ -1020,6 +1020,24 @@ public:
       return v["next"].as_uint64();
    }
 
+   /// Raw bytes of the outbound envelope currently staged for `chain_code`. `sysio.msgch`
+   /// keeps `outenvelopes` one row deep per outpost and replaces it on each `buildenv`, so
+   /// this returns the most recent epoch's bytes -- the exact payload the outpost consumes.
+   /// Reading the ENVELOPE rather than the `attestations` rows is deliberate: `buildenv`
+   /// consumes the READY attestation rows as it bundles them, so they no longer exist by
+   /// the time an advance returns.
+   std::vector<char> outbound_envelope_bytes(uint64_t chain_code, uint64_t scan_until = 32) {
+      for (uint64_t id = 0; id < scan_until; ++id) {
+         auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "outenvelopes"_n, id);
+         if (data.empty()) continue;
+         auto row = msgch_abi.binary_to_variant("outbound_envelope", data,
+            abi_serializer::create_yield_function(abi_serializer_max_time));
+         if (row["chain_code"].as_uint64() != chain_code) continue;
+         return row["raw_envelope"].as<std::vector<char>>();
+      }
+      return {};
+   }
+
    /// Read a collateral lock row by lock_id (uwrit `locks` KV table). lock_ids
    /// are allocated from 1 (uwcounters default), so the first swap's source +
    /// destination locks are ids 1 and 2.
@@ -6140,6 +6158,47 @@ BOOST_FIXTURE_TEST_CASE(advance_sends_the_roster_to_a_newly_activated_outpost_on
    const uint64_t before_settled = next_att_id();
    age_one_epoch();
    BOOST_REQUIRE_EQUAL(static_delta + 1, next_att_id() - before_settled);
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(advance_roster_retains_slashed_operators, sysio_dispatch_tester) { try {
+   REQUIRE_ADVANCING_FIXTURE();
+   create_accounts({"batchop.b"_n});
+   produce_blocks();
+
+   // A bootstrapped registration lands ACTIVE immediately, so it joins the roster at once.
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT,
+      "regoperator"_n, mvo()
+         ("account",         std::string("batchop.b"))
+         ("type",            OperatorType::OPERATOR_TYPE_BATCH)
+         ("is_bootstrapped", true)));
+
+   // Settle the roster so the operator's ACTIVE entry is what the recorded digest covers.
+   age_one_epoch();
+
+   // `sysio.opreg::slash` flips the row to SLASHED *before* emitting OPERATOR_ACTION(SLASH).
+   BOOST_REQUIRE_EQUAL(success(), slash_op("batchop.b"_n, "wire-342 roster retention"));
+
+   const uint64_t before_slash_epoch = next_att_id();
+   age_one_epoch();
+
+   // `status` is part of the encoded entry, so the flip is a content change and the digest
+   // gate must let this roster through rather than suppressing it as unchanged. Guarding on
+   // the mint counter first keeps the payload assertion below from passing against a stale
+   // envelope that some earlier epoch happened to leave staged.
+   BOOST_REQUIRE_GT(next_att_id(), before_slash_epoch);
+
+   // Read the ENVELOPE, not the attestation rows: `buildenv` consumes those as it bundles.
+   const auto raw = outbound_envelope_bytes(fc::slug_name{"ETH"}.value);
+   BOOST_REQUIRE(!raw.empty());
+
+   // THE REGRESSION GUARD for the SLASHED carve-out. `build_operator_entry` writes
+   // `entry.account.name` as a plain string, so the account name appears verbatim in the
+   // serialized bytes. Narrowing the roster filter to ACTIVE-only would drop this entry --
+   // and because the Solana slash handler resolves its target THROUGH the roster the
+   // outpost holds, that would silently turn every subsequent slash into a no-op on the
+   // outpost instead of failing loudly.
+   const std::string encoded(raw.begin(), raw.end());
+   BOOST_REQUIRE(encoded.find("batchop.b") != std::string::npos);
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()
