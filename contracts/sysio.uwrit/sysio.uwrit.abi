@@ -6,7 +6,12 @@
         {
             "name": "chklocks",
             "base": "",
-            "fields": []
+            "fields": [
+                {
+                    "name": "max_rows",
+                    "type": "uint32"
+                }
+            ]
         },
         {
             "name": "commit_entry",
@@ -232,6 +237,46 @@
                 {
                     "name": "lock_id",
                     "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "lock_sum",
+            "base": "",
+            "fields": [
+                {
+                    "name": "underwriter",
+                    "type": "name"
+                },
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "amount",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "lock_sum_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "underwriter",
+                    "type": "name"
+                },
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
                 }
             ]
         },
@@ -633,6 +678,14 @@
                     "table_id": 53377
                 }
             ]
+        },
+        {
+            "name": "locksums",
+            "type": "lock_sum",
+            "index_type": "i64",
+            "key_names": ["underwriter","chain_code","token_code"],
+            "key_types": ["name","slug_name","slug_name"],
+            "table_id": 57617
         },
         {
             "name": "uwconfig",

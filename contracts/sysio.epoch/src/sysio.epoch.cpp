@@ -4,8 +4,9 @@
 #include <sysio.opp.common/opp_keys.hpp>
 #include <sysio.authex/sysio.authex.hpp>
 #include <sysio.token/sysio.token.hpp>
-// For uwrit::MAX_UWREQ_PRUNE_PER_EPOCH — the per-epoch budget advance hands
-// to the inline `pruneuwreqs` sweep (the constant is owned by sysio.uwrit).
+// For uwrit::MAX_LOCK_RELEASE_PER_EPOCH and uwrit::MAX_UWREQ_PRUNE_PER_EPOCH —
+// the per-epoch budgets advance hands to the inline `chklocks` and
+// `pruneuwreqs` sweeps (both constants are owned by sysio.uwrit).
 #include <sysio.uwrit/sysio.uwrit.hpp>
 // For reserve::MAX_CLAIM_SWEEP_PER_EPOCH — the per-epoch budget advance hands
 // to the inline `sweepclaims` retention sweep (the constant is owned by
@@ -414,7 +415,7 @@ void epoch::advance() {
       permission_level{get_self(), "owner"_n},
       UWRIT_ACCOUNT,
       "chklocks"_n,
-      std::make_tuple()
+      std::make_tuple(uwrit::MAX_LOCK_RELEASE_PER_EPOCH)
    ).send();
 
    // Bounded UWREQ lifecycle sweep (SEC-129 / WSA-223): erase terminal
