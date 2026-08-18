@@ -208,7 +208,12 @@ public:
             ("terminate_max_pct_misses_24h",     5)
             ("terminate_window_ms",              uint64_t{24ULL * 60 * 60 * 1000})
             ("req_prod_collat",                  fc::variants{})
-            ("req_batchop_collat",               fc::variants{})
+            // Empty collateral requirements intentionally keep non-bootstrapped
+            // operators UNKNOWN. Give the WNS-16 fixture's non-bootstrapped
+            // operator the one-unit ETH requirement it satisfies below.
+            ("req_batchop_collat",               batchop_is_bootstrapped
+                                                   ? fc::variants{}
+                                                   : fc::variants{ make_chain_min_bond("ETH", "ETH", 1) })
             ("req_uw_collat",                    fc::variants{})));
 
       std::vector<name> batch_ops{BATCHOP};
