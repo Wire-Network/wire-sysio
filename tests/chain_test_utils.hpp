@@ -10,7 +10,9 @@
 #include <sysio/chain/controller.hpp>
 
 #include <fc/exception/exception.hpp>
+#include <fc/log/logger.hpp>
 
+#include <chrono>
 #include <exception>
 #include <future>
 #include <stdexcept>
@@ -88,18 +90,45 @@ inline auto make_bios_ro_trx(sysio::chain::controller& control) {
    return std::make_shared<packed_transaction>( std::move(trx) );
 }
 
-// Push an input transaction to controller and return trx trace
-// If account is sysio then signs with the default private key
-inline auto push_input_trx(appbase::scoped_app& app, sysio::chain::controller& control, account_name account, signed_transaction& trx) {
+/// A node drops a transaction that trips an objective cpu limit and leaves resubmission to the client. The helpers
+/// below only build the chain state a test starts from, so they resubmit rather than report such a drop as a test
+/// failure: deploying the bios contract bills a few milliseconds of the chain's 150ms max_transaction_cpu_usage, but a
+/// CI host running the whole suite in parallel can deschedule the producing thread mid-action for long enough to blow
+/// through that limit. Only the codes a resubmission can plausibly clear are retried; anything else is a real failure
+/// and propagates from the first attempt.
+/// @param e exception reported for the dropped transaction
+/// @return true when the same transaction is worth pushing again
+inline bool is_resubmittable_setup_failure( const fc::exception& e ) {
+   return e.code() == tx_cpu_usage_exceeded::code_value
+       || e.code() == block_cpu_usage_exceeded::code_value
+       || e.code() == deadline_exception::code_value;
+}
+
+/// Number of attempts a setup transaction is given before its failure is reported to the test.
+inline constexpr size_t max_setup_trx_attempts = 4;
+
+/// Push an input transaction to controller once and return its trx trace.
+/// If account is sysio then signs with the default private key.
+/// @param app        running application hosting the chain and producer plugins
+/// @param control    controller the transaction is stamped against
+/// @param account    authorizing account, also the signer
+/// @param trx        transaction to stamp, sign and push; restamped on every call
+/// @return trace of the executed transaction
+/// @throws fc::exception the node reported for the transaction, std::runtime_error if it did not execute in time
+inline transaction_trace_ptr push_input_trx_once( appbase::scoped_app& app, sysio::chain::controller& control,
+                                                  account_name account, signed_transaction& trx ) {
    trx.expiration = fc::time_point_sec{fc::time_point::now() + fc::seconds(30)};
    trx.set_reference_block( control.head().id() );
+   trx.signatures.clear(); // a resubmission signs the restamped transaction, it does not accumulate signatures
    trx.sign(get_private_key(account, "active"), control.get_chain_id());
    auto ptrx = std::make_shared<packed_transaction>( trx, packed_transaction::compression_type::none );
 
    auto trx_promise = std::make_shared<std::promise<transaction_trace_ptr>>();
    std::future<transaction_trace_ptr> trx_future = trx_promise->get_future();
 
-   app->executor().post( priority::low, exec_queue::read_write, [&ptrx, &app, trx_promise]() {
+   // ptrx is captured by value: on the timeout path below this function returns while the posted work may still be
+   // queued, so the lambda cannot reference a local of a frame that is already gone.
+   app->executor().post( priority::low, exec_queue::read_write, [ptrx, &app, trx_promise]() {
       app->get_method<plugin_interface::incoming::methods::transaction_async>()(ptrx,
                                                                                 false, // api_trx
                                                                                 transaction_metadata::trx_type::input, // trx_type
@@ -127,6 +156,32 @@ inline auto push_input_trx(appbase::scoped_app& app, sysio::chain::controller& c
       throw std::runtime_error("failed to execute trx: " + ptrx->get_transaction().actions.at(0).name.to_string() + " to account: " + account.to_string());
 
    return trx_future.get();
+}
+
+/// Push an input transaction to controller and return its trx trace, resubmitting the transaction while the node
+/// keeps dropping it for a transient objective-cpu failure.
+/// If account is sysio then signs with the default private key.
+/// @param app        running application hosting the chain and producer plugins
+/// @param control    controller the transaction is stamped against
+/// @param account    authorizing account, also the signer
+/// @param trx        transaction to stamp, sign and push; restamped on every attempt
+/// @return trace of the executed transaction
+/// @throws fc::exception the node reported on the final attempt, std::runtime_error if it did not execute in time
+inline transaction_trace_ptr push_input_trx( appbase::scoped_app& app, sysio::chain::controller& control,
+                                             account_name account, signed_transaction& trx ) {
+   for( size_t attempt = 1; ; ++attempt ) {
+      try {
+         return push_input_trx_once( app, control, account, trx );
+      } catch( const fc::exception& e ) {
+         if( attempt == max_setup_trx_attempts || !is_resubmittable_setup_failure( e ) )
+            throw;
+         wlog( "setup transaction dropped on attempt {} of {}, resubmitting: {}",
+               attempt, max_setup_trx_attempts, e.top_message() );
+         // Let the chain advance a block so the resubmission carries a new reference block, which keeps it distinct
+         // from the transaction just dropped.
+         std::this_thread::sleep_for( std::chrono::milliseconds(config::block_interval_ms) );
+      }
+   }
 }
 
 // Push setcode trx to controller and return trx trace
