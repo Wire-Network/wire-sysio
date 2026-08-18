@@ -1170,6 +1170,9 @@ BOOST_FIXTURE_TEST_CASE(noncanonical_delivery_slashes_before_termination, sysio_
    const uint32_t epoch = current_epoch();
    const auto canonical = encode_delivery(epoch, "canonical");
    const auto divergent = encode_delivery(epoch, "non-canonical");
+   const auto canonical_checksum = fc::sha256::hash(canonical.data(), canonical.size());
+   const auto divergent_checksum = fc::sha256::hash(divergent.data(), divergent.size());
+   BOOST_REQUIRE_NE(canonical_checksum, divergent_checksum);
 
    // Stage the split ETH deliveries and one SOL delivery before the boundary.
    // The two remaining canonical deliveries reach majority after the boundary;
@@ -1179,6 +1182,12 @@ BOOST_FIXTURE_TEST_CASE(noncanonical_delivery_slashes_before_termination, sysio_
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP,   SOL_OUTPOST_ID, canonical));
    elapse_epoch_boundary();
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, ETH_OUTPOST_ID, canonical));
+   {
+      auto eth_consensus = get_outpcons(ETH_OUTPOST_ID);
+      BOOST_REQUIRE(!eth_consensus.is_null());
+      BOOST_REQUIRE_EQUAL(epoch, eth_consensus["epoch_index"].as<uint32_t>());
+      BOOST_REQUIRE_EQUAL(canonical_checksum.str(), eth_consensus["winning_checksum"].as_string());
+   }
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, SOL_OUTPOST_ID, canonical));
    BOOST_REQUIRE_EQUAL(success(), push(MSGCH_ACCOUNT, msgch_abi, MSGCH_ACCOUNT,
                                       "chkcons"_n, mvo()));
