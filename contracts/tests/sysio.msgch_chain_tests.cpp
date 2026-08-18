@@ -1173,13 +1173,15 @@ BOOST_FIXTURE_TEST_CASE(noncanonical_delivery_slashes_before_termination, sysio_
 
    // Stage the split ETH deliveries and one SOL delivery before the boundary.
    // The two remaining canonical deliveries reach majority after the boundary;
-   // the SOL delivery invokes chkcons, which advances the epoch inline.
+   // then the permissionless chkcons crank advances the epoch inline.
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP,   ETH_OUTPOST_ID, divergent));
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, canonical));
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP,   SOL_OUTPOST_ID, canonical));
    elapse_epoch_boundary();
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, ETH_OUTPOST_ID, canonical));
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, SOL_OUTPOST_ID, canonical));
+   BOOST_REQUIRE_EQUAL(success(), push(MSGCH_ACCOUNT, msgch_abi, MSGCH_ACCOUNT,
+                                      "chkcons"_n, mvo()));
    produce_blocks();
 
    auto op = get_operator(BATCHOP);
