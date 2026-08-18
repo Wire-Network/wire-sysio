@@ -1155,6 +1155,7 @@ BOOST_FIXTURE_TEST_CASE(noncanonical_delivery_slashes_before_termination, sysio_
    constexpr uint32_t kMaxConsecutiveMisses = 5;
 
    bootstrap(/*n_batch_ops=*/3, /*batchop_is_bootstrapped=*/false);
+   BOOST_REQUIRE_EQUAL(1u, current_epoch());
    BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE,
                        get_operator(BATCHOP)["status"].as<opp::types::OperatorStatus>());
 
