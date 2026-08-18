@@ -239,23 +239,23 @@ namespace sysio {
       // `max_available_*` ceilings against the result, so a governance change cannot
       // raise the registry past what an envelope can carry.
 
-      /// Chain addresses carried per operator at the REALISTIC shape: one per
-      /// registered outpost. The launch outpost set is {ETH, SOL}, and every operator
-      /// type must bond on every registered outpost, so two is the shape to size
-      /// against — not `MAX_OPERATOR_CHAIN_ADDRESSES`, which is the defensive per-entry
-      /// cap for a pathological account, not the expected census.
-      static constexpr uint32_t ROSTER_ADDRESSES_PER_OPERATOR = 2;
-
       /// Encoded bytes of one `ChainAddress`: 1 B tag + 1 B length + 2 B `kind` varint
       /// + 2 B inner tag/length + a 33-byte compressed secp256k1 key (Ed25519 is 32,
       /// so 33 is the worst case).
       static constexpr uint32_t ROSTER_BYTES_PER_ADDRESS = 39;
 
-      /// Encoded bytes of one `OperatorEntry`: a maximum-length WIRE account name
-      /// (4 B framing + 13 B) + its addresses + 2 B `type` + 3 B `status` (SLASHED is
-      /// 241, a two-byte varint) + 2 B for the repeated-field framing in `Operators`.
-      static constexpr uint32_t ROSTER_BYTES_PER_OPERATOR =
-         17 + ROSTER_ADDRESSES_PER_OPERATOR * ROSTER_BYTES_PER_ADDRESS + 2 + 3 + 2;
+      /// Encoded bytes of one `OperatorEntry` carrying `addresses` chain addresses:
+      /// a maximum-length WIRE account name (4 B framing + 13 B) + its addresses
+      /// + 2 B `type` + 3 B `status` (SLASHED is 241, a two-byte varint) + 2 B for the
+      /// repeated-field framing in `Operators`.
+      ///
+      /// Parameterised on the address count rather than pinned to today's outpost set:
+      /// an operator carries one address per registered outpost, so registering a third
+      /// outpost makes every entry ~39 B fatter. A fixed constant would silently
+      /// overstate capacity the moment that happens.
+      static constexpr uint32_t roster_bytes_per_operator(uint32_t addresses) {
+         return 17 + addresses * ROSTER_BYTES_PER_ADDRESS + 2 + 3 + 2;
+      }
 
       /// The share of one envelope the roster may claim.
       ///
@@ -267,12 +267,34 @@ namespace sysio {
       /// traffic that settles user value, which must not be deferred behind the roster.
       static constexpr uint32_t ROSTER_ENVELOPE_SHARE_DIVISOR = 2;
 
-      /// Ceiling on the total registered (non-bootstrapped) operator count, derived
-      /// from the envelope budget that `sysio.msgch` owns rather than restating it.
-      static constexpr uint32_t MAX_ROSTER_OPERATORS =
-         static_cast<uint32_t>(sysio::opp::SINGLE_ATTESTATION_BUDGET_BYTES
-                               / ROSTER_ENVELOPE_SHARE_DIVISOR
-                               / ROSTER_BYTES_PER_OPERATOR);
+      /// Strictest OUTPOST-side ceiling on roster ENTRIES.
+      ///
+      /// The depot's envelope arithmetic is necessary but not sufficient: an outpost
+      /// that cannot seat the roster it receives skips the WHOLE attestation and keeps
+      /// its previous one, so the roster silently stops tracking the depot. The Solana
+      /// outpost's `OperatorRegistry` is a fixed-size PDA — 32 entries today, raised to
+      /// 128 by wire-solana#442 (SOL-385), which explicitly defers the depot-side number
+      /// to WIRE-342. Ethereum applies no count cap, so Solana is the binding one.
+      ///
+      /// Keep in lock-step with `liqsol-core`'s `MAX_OPERATORS`; this bound is only
+      /// meaningful while it is the smaller of the two.
+      static constexpr uint32_t MAX_OUTPOST_ROSTER_ENTRIES = 128;
+
+      /// Roster ceiling for a network carrying `outpost_count` active outposts: the
+      /// smaller of what half an envelope can carry and what the strictest outpost can
+      /// seat. Both bounds are real and neither implies the other — bytes gate what the
+      /// depot can SEND, entries gate what an outpost can STORE.
+      static constexpr uint32_t max_roster_operators(uint32_t outpost_count) {
+         const uint32_t addresses =
+            outpost_count == 0 ? 1
+                               : (outpost_count > MAX_OPERATOR_CHAIN_ADDRESSES
+                                     ? MAX_OPERATOR_CHAIN_ADDRESSES : outpost_count);
+         const uint32_t by_bytes =
+            static_cast<uint32_t>(sysio::opp::SINGLE_ATTESTATION_BUDGET_BYTES
+                                  / ROSTER_ENVELOPE_SHARE_DIVISOR
+                                  / roster_bytes_per_operator(addresses));
+         return by_bytes < MAX_OUTPOST_ROSTER_ENTRIES ? by_bytes : MAX_OUTPOST_ROSTER_ENTRIES;
+      }
 
    private:
 

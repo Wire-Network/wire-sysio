@@ -216,6 +216,23 @@ uint32_t registration_ceiling_for_type(OperatorType type, const opreg::op_config
 /// the registry. UNKNOWN, ACTIVE and SLASHED all count: UNKNOWN is what an attacker
 /// accumulates for free, and ACTIVE + SLASHED is exactly the set the OPERATORS roster
 /// ships.
+/// Count operators currently carried by the OPERATORS roster — ACTIVE + SLASHED, the
+/// exact set `sysio.epoch::advance` serializes. Bounded by `limit`: the caller only ever
+/// asks "is the roster already at its ceiling", so walking past it buys nothing.
+uint32_t count_roster_operators(name self, uint32_t limit) {
+   opreg::operators_t ops(self);
+   auto     status_idx = ops.get_index<"bystatus"_n>();
+   uint32_t count      = 0;
+   for (const auto status : { OperatorStatus::OPERATOR_STATUS_ACTIVE,
+                              OperatorStatus::OPERATOR_STATUS_SLASHED }) {
+      for (auto it = status_idx.lower_bound(magic_enum::enum_integer(status));
+           it != status_idx.end() && it->status == status && count < limit; ++it) {
+         ++count;
+      }
+   }
+   return count;
+}
+
 uint32_t count_registered_of_type(name self, OperatorType type, uint32_t limit) {
    opreg::operators_t ops(self);
    auto     type_idx = ops.get_index<"bytype"_n>();
@@ -268,17 +285,22 @@ void opreg::setconfig(uint32_t max_available_producers,
    // through. `sysio.epoch` already applies this reasoning to the sibling
    // BATCH_OPERATOR_GROUPS attestation via `MAX_SCHEDULED_BATCH_OPERATORS`.
    //
-   // The sum is what matters: all three types share one roster. Bootstrapped operators
-   // bypass the per-type registration ceiling, and CHALLENGER carries none, so the
-   // headroom `epoch::MAX_ROSTER_OPERATORS` reserves (half an envelope) also absorbs
-   // those.
+   // The sum is what matters: all three types share one roster. CHALLENGER carries no
+   // per-type ceiling, but a self-registered challenger can never reach the roster: ACTIVE
+   // at registration requires `is_bootstrapped` (privileged), and the eligibility path
+   // returns false for CHALLENGER, so it stays UNKNOWN and the ACTIVE+SLASHED filter
+   // excludes it. Bootstrapped operators DO reach the roster, so they are bounded by the
+   // global actual-roster check in `regoperator` rather than by this configured sum.
    {
       const uint64_t total_ceiling = static_cast<uint64_t>(max_available_producers) +
                                      max_available_batch_ops +
                                      max_available_underwriters;
-      check(total_ceiling <= sysio::epoch::MAX_ROSTER_OPERATORS,
-            "max_available_* sum exceeds the OPERATORS roster ceiling: the resulting "
-            "roster could not fit an outbound envelope");
+      const uint32_t roster_ceiling =
+         sysio::epoch::max_roster_operators(sysio::chains::active_outpost_count());
+      check(total_ceiling <= roster_ceiling,
+            "max_available_* sum exceeds the OPERATORS roster ceiling (" +
+            std::to_string(roster_ceiling) + "): the resulting roster could not fit an "
+            "outbound envelope, or could not be seated by an outpost");
    }
 
    // SEC-28 residual: delivery records accrue only on duty epochs -- one per
@@ -408,6 +430,25 @@ void opreg::regoperator(name account,
          check(count_registered_of_type(get_self(), type, ceiling) < ceiling,
                "operator registration ceiling reached for this operator type");
       }
+   }
+
+   // Global actual-roster bound — applies to EVERY registration, bootstrapped included.
+   //
+   // The per-type ceilings above are a CONFIGURED sum that the bootstrap path bypasses,
+   // so on their own they are not a safety invariant: a privileged seed could push the
+   // LIVE roster past what half an envelope carries or what an outpost can seat, and a
+   // bootstrapped operator lands ACTIVE immediately, so it is in the roster at once.
+   // Bootstrap's exemptions from collateral and termination are ECONOMIC
+   // (`bootstrapped-operator-invariants.md`); they do not extend to a consensus-liveness
+   // capacity limit, because exceeding it does not harm the operator — it wedges the
+   // outpost for everyone.
+   {
+      const uint32_t roster_ceiling =
+         sysio::epoch::max_roster_operators(sysio::chains::active_outpost_count());
+      check(count_roster_operators(get_self(), roster_ceiling) < roster_ceiling,
+            "OPERATORS roster ceiling reached (" + std::to_string(roster_ceiling) +
+            "): registering another operator would produce a roster that cannot fit an "
+            "outbound envelope or be seated by an outpost");
    }
 
    // Verify authex links exist for all active outpost chains.

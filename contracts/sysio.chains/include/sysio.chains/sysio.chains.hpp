@@ -104,6 +104,30 @@ namespace sysio {
          sysio::kv::index<"byextid"_n,   sysio::const_mem_fun<chain_row, uint64_t, &chain_row::by_external_chain_id>>,
          sysio::kv::index<"byactive"_n,  sysio::const_mem_fun<chain_row, uint64_t, &chain_row::by_active>>
       >;
+
+      /// True when a chains row represents an active OUTPOST — i.e. it is active and
+      /// is not the depot self-row (which carries no outpost).
+      ///
+      /// Shared because three call sites need the identical predicate: `sysio.epoch`'s
+      /// envelope fan-out loops, `sysio.opreg::regoperator`'s authex-link requirement,
+      /// and the roster-ceiling derivation. Divergence between them would mean the
+      /// depot sizes a roster against one outpost set while fanning it to another.
+      static inline bool is_active_outpost(const chain_row& row) {
+         return row.active && !row.is_depot;
+      }
+
+      /// Number of active outposts. This is the number of chain addresses a fully
+      /// bonded operator carries, since every operator type must bond on every
+      /// registered outpost (see `outpost-three-concerns.md`), which is what makes it
+      /// the correct multiplier for the OPERATORS roster's bytes-per-operator.
+      static inline uint32_t active_outpost_count() {
+         chains_t chains_tbl(name{"sysio.chains"_n});
+         uint32_t count = 0;
+         for (auto it = chains_tbl.begin(); it != chains_tbl.end(); ++it) {
+            if (is_active_outpost(*it)) ++count;
+         }
+         return count;
+      }
    };
 
 } // namespace sysio
