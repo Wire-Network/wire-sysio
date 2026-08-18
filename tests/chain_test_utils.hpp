@@ -107,6 +107,27 @@ inline bool is_resubmittable_setup_failure( const fc::exception& e ) {
 /// Number of attempts a setup transaction is given before its failure is reported to the test.
 inline constexpr size_t max_setup_trx_attempts = 4;
 
+/// How long a resubmission waits for the chain to advance past the block its predecessor was dropped from.
+inline constexpr std::chrono::seconds head_advance_timeout{5};
+
+/// How often that wait samples the head block.
+inline constexpr std::chrono::milliseconds head_advance_poll_interval{10};
+
+/// Wait for the controller to report a head block past the one observed on entry.
+/// The wait is bounded: a chain that has stopped advancing is a failure for the caller to report, not one to spin on.
+/// @param control controller to observe, sampled from the calling thread as the push helpers already do
+/// @return true if the head advanced before head_advance_timeout elapsed
+inline bool wait_for_head_block_advance( sysio::chain::controller& control ) {
+   const auto dropped_from = control.head().block_num();
+   const auto deadline     = std::chrono::steady_clock::now() + head_advance_timeout;
+   while( control.head().block_num() == dropped_from ) {
+      if( std::chrono::steady_clock::now() >= deadline )
+         return false;
+      std::this_thread::sleep_for( head_advance_poll_interval );
+   }
+   return true;
+}
+
 /// Push an input transaction to controller once and return its trx trace.
 /// If account is sysio then signs with the default private key.
 /// @param app        running application hosting the chain and producer plugins
@@ -159,14 +180,15 @@ inline transaction_trace_ptr push_input_trx_once( appbase::scoped_app& app, sysi
 }
 
 /// Push an input transaction to controller and return its trx trace, resubmitting the transaction while the node
-/// keeps dropping it for a transient objective-cpu failure.
+/// keeps dropping it for a transient objective-cpu failure. Every resubmission waits for the chain to advance first.
 /// If account is sysio then signs with the default private key.
 /// @param app        running application hosting the chain and producer plugins
 /// @param control    controller the transaction is stamped against
 /// @param account    authorizing account, also the signer
 /// @param trx        transaction to stamp, sign and push; restamped on every attempt
 /// @return trace of the executed transaction
-/// @throws fc::exception the node reported on the final attempt, std::runtime_error if it did not execute in time
+/// @throws fc::exception the node reported on the last attempt made, whether that is the final attempt or the one
+///                       after which the chain stopped advancing; std::runtime_error if it did not execute in time
 inline transaction_trace_ptr push_input_trx( appbase::scoped_app& app, sysio::chain::controller& control,
                                              account_name account, signed_transaction& trx ) {
    for( size_t attempt = 1; ; ++attempt ) {
@@ -177,9 +199,12 @@ inline transaction_trace_ptr push_input_trx( appbase::scoped_app& app, sysio::ch
             throw;
          wlog( "setup transaction dropped on attempt {} of {}, resubmitting: {}",
                attempt, max_setup_trx_attempts, e.top_message() );
-         // Let the chain advance a block so the resubmission carries a new reference block, which keeps it distinct
-         // from the transaction just dropped.
-         std::this_thread::sleep_for( std::chrono::milliseconds(config::block_interval_ms) );
+         // The resubmission has to carry a new reference block to stay distinct from the transaction just dropped, so
+         // wait for the chain to actually advance instead of assuming it does within one nominal block interval: the
+         // starvation that drops the transaction is just as able to delay the block that follows it. A chain that
+         // stops advancing altogether is reported as the drop that got us here rather than as a wait that timed out.
+         if( !wait_for_head_block_advance( control ) )
+            throw;
       }
    }
 }
