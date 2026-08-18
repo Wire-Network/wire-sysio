@@ -344,6 +344,22 @@ public:
          abi_serializer::create_yield_function(abi_serializer_max_time));
    }
 
+   /// Inbound delivery metadata for one (outpost, epoch, batch operator), or null when absent.
+   /// Consensus deliberately clears only raw_data, leaving this row for advance() to classify.
+   fc::variant find_inbound_delivery(uint64_t chain_code, uint32_t epoch_index, name batch_op,
+                                     uint64_t scan_until = 64) {
+      for (uint64_t id = 0; id < scan_until; ++id) {
+         auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "envelopes"_n, id);
+         if (data.empty()) continue;
+         auto row = msgch_abi.binary_to_variant(
+            "envelope_entry", data, abi_serializer::create_yield_function(abi_serializer_max_time));
+         if (row["chain_code"].as_uint64() == chain_code &&
+             row["epoch_index"].as<uint32_t>() == epoch_index &&
+             row["batch_op_name"].as_string() == batch_op.to_string()) return row;
+      }
+      return fc::variant{};
+   }
+
    /// Count attestation rows recorded for (`chain_code`, `epoch_index`); the observable effect
    /// of an ACCEPTED inbound envelope (rows are emplaced before dispatch, even for types
    /// dispatch drops as out of scope).
@@ -1158,6 +1174,16 @@ BOOST_FIXTURE_TEST_CASE(noncanonical_delivery_slashes_before_termination, sysio_
    BOOST_REQUIRE_EQUAL(1u, current_epoch());
    BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE,
                        get_operator(BATCHOP)["status"].as<opp::types::OperatorStatus>());
+   {
+      auto state = read_epoch_state();
+      auto groups = state["batch_op_groups"].get_array();
+      auto active_group = groups[state["current_batch_op_group"].as_uint64()].get_array();
+      bool batchop_is_scheduled = false;
+      for (const auto& member : active_group) {
+         if (member.as_string() == BATCHOP.to_string()) batchop_is_scheduled = true;
+      }
+      BOOST_REQUIRE(batchop_is_scheduled);
+   }
 
    // Seed enough prior misses for the next termcheck to terminate BATCHOP if
    // it remains ACTIVE. The current epoch's non-canonical delivery still
@@ -1187,6 +1213,9 @@ BOOST_FIXTURE_TEST_CASE(noncanonical_delivery_slashes_before_termination, sysio_
       BOOST_REQUIRE(!eth_consensus.is_null());
       BOOST_REQUIRE_EQUAL(epoch, eth_consensus["epoch_index"].as<uint32_t>());
       BOOST_REQUIRE_EQUAL(canonical_checksum.str(), eth_consensus["winning_checksum"].as_string());
+      auto divergent_delivery = find_inbound_delivery(ETH_OUTPOST_ID, epoch, BATCHOP);
+      BOOST_REQUIRE(!divergent_delivery.is_null());
+      BOOST_REQUIRE_EQUAL(divergent_checksum.str(), divergent_delivery["checksum"].as_string());
    }
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, SOL_OUTPOST_ID, canonical));
    BOOST_REQUIRE_EQUAL(success(), push(MSGCH_ACCOUNT, msgch_abi, MSGCH_ACCOUNT,
