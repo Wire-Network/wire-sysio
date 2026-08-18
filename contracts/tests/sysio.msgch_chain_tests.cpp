@@ -80,6 +80,28 @@ constexpr const char* SUCCESS        = "success";
 constexpr const char* CHAIN_CODE     = "chain_code";
 } // namespace opreg_fields
 
+/// sysio.msgch action identifiers used by the WNS-16 fixture.
+namespace msgch_actions {
+constexpr name CHECK_CONSENSUS = "chkcons"_n;
+} // namespace msgch_actions
+
+/// sysio.msgch table identifiers used by the WNS-16 fixture.
+namespace msgch_tables {
+constexpr name ENVELOPES = "envelopes"_n;
+} // namespace msgch_tables
+
+/// sysio.msgch ABI type identifiers used by the WNS-16 fixture.
+namespace msgch_abi_types {
+constexpr const char* ENVELOPE_ENTRY = "envelope_entry";
+} // namespace msgch_abi_types
+
+/// sysio.msgch ABI field identifiers used by the WNS-16 fixture.
+namespace msgch_fields {
+constexpr const char* CHAIN_CODE    = "chain_code";
+constexpr const char* EPOCH_INDEX   = "epoch_index";
+constexpr const char* BATCH_OP_NAME = "batch_op_name";
+} // namespace msgch_fields
+
 } // anonymous namespace
 
 // ---------------------------------------------------------------------------
@@ -379,13 +401,14 @@ public:
    fc::variant find_inbound_delivery(uint64_t chain_code, uint32_t epoch_index, name batch_op,
                                      uint64_t scan_until = TABLE_SCAN_LIMIT) {
       for (uint64_t id = 0; id < scan_until; ++id) {
-         auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "envelopes"_n, id);
+         auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, msgch_tables::ENVELOPES, id);
          if (data.empty()) continue;
          auto row = msgch_abi.binary_to_variant(
-            "envelope_entry", data, abi_serializer::create_yield_function(abi_serializer_max_time));
-         if (row["chain_code"].as_uint64() == chain_code &&
-             row["epoch_index"].as<uint32_t>() == epoch_index &&
-             row["batch_op_name"].as_string() == batch_op.to_string()) return row;
+            msgch_abi_types::ENVELOPE_ENTRY, data,
+            abi_serializer::create_yield_function(abi_serializer_max_time));
+         if (row[msgch_fields::CHAIN_CODE].as_uint64() == chain_code &&
+             row[msgch_fields::EPOCH_INDEX].as<uint32_t>() == epoch_index &&
+             row[msgch_fields::BATCH_OP_NAME].as_string() == batch_op.to_string()) return row;
       }
       return fc::variant{};
    }
@@ -1294,7 +1317,7 @@ BOOST_FIXTURE_TEST_CASE(noncanonical_delivery_slashes_before_termination, sysio_
       BOOST_REQUIRE_EQUAL(divergent_checksum.str(), divergent_delivery["checksum"].as_string());
    }
    BOOST_REQUIRE_EQUAL(success(), push(MSGCH_ACCOUNT, msgch_abi, MSGCH_ACCOUNT,
-                                      "chkcons"_n, mvo()));
+                                      msgch_actions::CHECK_CONSENSUS, mvo()));
    produce_blocks();
 
    auto op = get_operator(BATCHOP);
