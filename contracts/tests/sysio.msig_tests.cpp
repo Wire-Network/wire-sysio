@@ -97,14 +97,16 @@ public:
       */
    }
 
-   transaction reqauth( account_name from, const vector<permission_level>& auths, const fc::microseconds& max_serialization_time );
+   transaction reqauth( account_name from, const vector<permission_level>& auths,
+                        const fc::microseconds& max_serialization_time, uint32_t delay_sec = 0 );
 
    void check_traces(transaction_trace_ptr trace, std::vector<std::map<std::string, name>> res);
 
    abi_serializer abi_ser;
 };
 
-transaction sysio_msig_tester::reqauth( account_name from, const vector<permission_level>& auths, const fc::microseconds& max_serialization_time ) {
+transaction sysio_msig_tester::reqauth( account_name from, const vector<permission_level>& auths,
+                                        const fc::microseconds& max_serialization_time, uint32_t delay_sec ) {
    fc::variants v;
    for ( auto& level : auths ) {
       v.push_back(fc::mutable_variant_object()
@@ -118,7 +120,7 @@ transaction sysio_msig_tester::reqauth( account_name from, const vector<permissi
       ("ref_block_prefix", 3)
       ("max_net_usage_words", 0)
       ("max_cpu_usage_ms", 0)
-      ("delay_sec", 0)
+      ("delay_sec", delay_sec)
       ("actions", fc::variants({
             fc::mutable_variant_object()
                ("account", name(config::system_account_name))
@@ -180,6 +182,176 @@ BOOST_FIXTURE_TEST_CASE( propose_approve_execute, sysio_msig_tester ) try {
                                              ("executer",      "alice")
    );
 
+   check_traces( trace, {
+                        {{"receiver", "sysio.msig"_n}, {"act_name", "exec"_n}},
+                        {{"receiver", config::system_account_name}, {"act_name", "reqauth"_n}}
+                        } );
+} FC_LOG_AND_RETHROW()
+
+
+// A proposal carrying a non-zero `delay_sec` executes once its delay has elapsed, and not
+// before. Nothing else in this suite proposes with a delay, so without this case the whole
+// delayed-execution path is unexercised.
+//
+// This is the end-to-end behaviour a delayed proposal is supposed to have; it holds on the
+// unmodified contract too, which is what shows the delayed path was never broken.
+BOOST_FIXTURE_TEST_CASE( propose_approve_execute_with_delay, sysio_msig_tester ) try {
+   const uint32_t delay_sec = 60;
+   auto trx = reqauth( "alice"_n, {permission_level{"alice"_n, config::active_name}},
+                       abi_serializer_max_time, delay_sec );
+
+   push_action( "alice"_n, "propose"_n, mvo()
+                  ("proposer",      "alice")
+                  ("proposal_name", "delayed")
+                  ("trx",           trx)
+                  ("requested", vector<permission_level>{{ "alice"_n, config::active_name }})
+   );
+
+   // Crossing the approval threshold starts the clock; it does not make the proposal
+   // executable, which is the whole point of the delay.
+   push_action( "alice"_n, "approve"_n, mvo()
+                  ("proposer",      "alice")
+                  ("proposal_name", "delayed")
+                  ("level",         permission_level{ "alice"_n, config::active_name })
+   );
+
+   BOOST_REQUIRE_EXCEPTION( push_action( "alice"_n, "exec"_n, mvo()
+                                          ("proposer",      "alice")
+                                          ("proposal_name", "delayed")
+                                          ("executer",      "alice")
+                            ),
+                            sysio_assert_message_exception,
+                            sysio_assert_message_is("too early to execute")
+   );
+
+   produce_block( fc::seconds( delay_sec ) );
+
+   transaction_trace_ptr trace = push_action( "alice"_n, "exec"_n, mvo()
+                                             ("proposer",      "alice")
+                                             ("proposal_name", "delayed")
+                                             ("executer",      "alice")
+   );
+
+   check_traces( trace, {
+                        {{"receiver", "sysio.msig"_n}, {"act_name", "exec"_n}},
+                        {{"receiver", config::system_account_name}, {"act_name", "reqauth"_n}}
+                        } );
+} FC_LOG_AND_RETHROW()
+
+
+// Shared setup for the delayed-proposal cases below: an account whose active permission is
+// satisfied by any two of alice, bob and carol. A threshold above one is what lets a THIRD
+// approver restore authorization after one approval is invalidated, with no `unapprove` in
+// between -- the sequence the deadline handling has to get right.
+static void setup_two_of_three( sysio_msig_tester& t, name account ) {
+   t.create_accounts( { account } );
+   t.set_authority(
+      account,
+      config::active_name,
+      authority( 2,
+                 vector<key_weight>{},
+                 vector<permission_level_weight>{ {{"alice"_n, config::active_name}, 1},
+                                                  {{"bob"_n,   config::active_name}, 1},
+                                                  {{"carol"_n, config::active_name}, 1} }
+      ),
+      config::owner_name,
+      {{account, config::owner_name}},
+      {t.get_private_key( account, "owner" )}
+   );
+}
+
+// An approval landing on an ALREADY-authorized proposal must not move the deadline. If it
+// did, any requested approver could push a delayed proposal back indefinitely simply by
+// approving it, which is a liveness attack dressed up as participation.
+BOOST_FIXTURE_TEST_CASE( delayed_extra_approval_does_not_restart_the_delay, sysio_msig_tester ) try {
+   const uint32_t delay_sec = 120;
+   setup_two_of_three( *this, "threshold"_n );
+
+   auto trx = reqauth( "threshold"_n, {permission_level{"threshold"_n, config::active_name}},
+                       abi_serializer_max_time, delay_sec );
+   push_action( "alice"_n, "propose"_n, mvo()
+                  ("proposer",      "alice")
+                  ("proposal_name", "delayed")
+                  ("trx",           trx)
+                  ("requested", vector<permission_level>{ {"alice"_n, config::active_name},
+                                                          {"bob"_n,   config::active_name},
+                                                          {"carol"_n, config::active_name} })
+   );
+
+   push_action( "alice"_n, "approve"_n, mvo()("proposer","alice")("proposal_name","delayed")
+                  ("level", permission_level{ "alice"_n, config::active_name }) );
+   // Second approval crosses the threshold and starts the clock.
+   push_action( "bob"_n, "approve"_n, mvo()("proposer","alice")("proposal_name","delayed")
+                  ("level", permission_level{ "bob"_n, config::active_name }) );
+
+   // Halfway through the delay a third approver piles on. A restarted clock would push the
+   // deadline out past the exec below.
+   produce_block( fc::seconds( delay_sec / 2 ) );
+   push_action( "carol"_n, "approve"_n, mvo()("proposer","alice")("proposal_name","delayed")
+                  ("level", permission_level{ "carol"_n, config::active_name }) );
+
+   produce_block( fc::seconds( delay_sec / 2 + 1 ) );
+   transaction_trace_ptr trace = push_action( "alice"_n, "exec"_n, mvo()
+                                             ("proposer","alice")("proposal_name","delayed")("executer","alice") );
+   check_traces( trace, {
+                        {{"receiver", "sysio.msig"_n}, {"act_name", "exec"_n}},
+                        {{"receiver", config::system_account_name}, {"act_name", "reqauth"_n}}
+                        } );
+} FC_LOG_AND_RETHROW()
+
+// Regaining the approval threshold after an invalidation must serve the delay again, rather
+// than executing on the deadline the earlier, now-void approval set had earned.
+//
+// `invalidate` is O(1) and never visits proposals, so nothing clears the stored deadline
+// when it voids an approver's approvals. Restoring authorization through a third approver
+// takes no `unapprove`, so the deadline is only recomputed if `approve` notices that this
+// approval is the one that carried the proposal from unauthorized back to authorized.
+BOOST_FIXTURE_TEST_CASE( delayed_reapproval_after_invalidate_restarts_the_delay, sysio_msig_tester ) try {
+   const uint32_t delay_sec = 120;
+   setup_two_of_three( *this, "threshold"_n );
+
+   auto trx = reqauth( "threshold"_n, {permission_level{"threshold"_n, config::active_name}},
+                       abi_serializer_max_time, delay_sec );
+   push_action( "alice"_n, "propose"_n, mvo()
+                  ("proposer",      "alice")
+                  ("proposal_name", "delayed")
+                  ("trx",           trx)
+                  ("requested", vector<permission_level>{ {"alice"_n, config::active_name},
+                                                          {"bob"_n,   config::active_name},
+                                                          {"carol"_n, config::active_name} })
+   );
+
+   push_action( "alice"_n, "approve"_n, mvo()("proposer","alice")("proposal_name","delayed")
+                  ("level", permission_level{ "alice"_n, config::active_name }) );
+   push_action( "bob"_n, "approve"_n, mvo()("proposer","alice")("proposal_name","delayed")
+                  ("level", permission_level{ "bob"_n, config::active_name }) );
+
+   // alice voids her own approval; the proposal drops to one valid approval of the two it
+   // needs. Her approval row survives, so she never touches `unapprove`.
+   push_action( "alice"_n, "invalidate"_n, mvo()("account", "alice") );
+
+   // Past the ORIGINAL deadline, and still not executable -- the proposal is not authorized.
+   produce_block( fc::seconds( delay_sec + 1 ) );
+   BOOST_REQUIRE_EXCEPTION( push_action( "alice"_n, "exec"_n, mvo()
+                                          ("proposer","alice")("proposal_name","delayed")("executer","alice") ),
+                            sysio_assert_message_exception,
+                            sysio_assert_message_is("transaction authorization failed")
+   );
+
+   // carol restores the threshold. The stale deadline has already elapsed, so if it were
+   // reused the proposal would execute here with no delay served at all.
+   push_action( "carol"_n, "approve"_n, mvo()("proposer","alice")("proposal_name","delayed")
+                  ("level", permission_level{ "carol"_n, config::active_name }) );
+   BOOST_REQUIRE_EXCEPTION( push_action( "alice"_n, "exec"_n, mvo()
+                                          ("proposer","alice")("proposal_name","delayed")("executer","alice") ),
+                            sysio_assert_message_exception,
+                            sysio_assert_message_is("too early to execute")
+   );
+
+   // The fresh delay runs from carol's approval.
+   produce_block( fc::seconds( delay_sec + 1 ) );
+   transaction_trace_ptr trace = push_action( "alice"_n, "exec"_n, mvo()
+                                             ("proposer","alice")("proposal_name","delayed")("executer","alice") );
    check_traces( trace, {
                         {{"receiver", "sysio.msig"_n}, {"act_name", "exec"_n}},
                         {{"receiver", config::system_account_name}, {"act_name", "reqauth"_n}}
