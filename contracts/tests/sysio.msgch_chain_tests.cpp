@@ -58,6 +58,10 @@ using fc::slug_name_literals::operator""_s;
 
 constexpr uint64_t ETH_OUTPOST_ID = "ETH"_s.value;
 constexpr uint64_t SOL_OUTPOST_ID = "SOL"_s.value;
+constexpr std::string_view ETH_CHAIN_CODE = "ETH";
+constexpr std::string_view SOL_CHAIN_CODE = "SOL";
+constexpr uint64_t BATCHOP_MIN_COLLATERAL = 1;
+constexpr uint64_t TABLE_SCAN_LIMIT = 64;
 
 } // anonymous namespace
 
@@ -211,10 +215,14 @@ public:
             ("req_prod_collat",                  fc::variants{})
             // Empty collateral requirements intentionally keep non-bootstrapped
             // operators UNKNOWN. Give the WNS-16 fixture's non-bootstrapped
-            // operator the one-unit ETH requirement it satisfies below.
+            // operator the one-unit ETH and SOL requirements it satisfies below.
             ("req_batchop_collat",               batchop_is_bootstrapped
                                                    ? fc::variants{}
-                                                   : fc::variants{ make_chain_min_bond("ETH", "ETH", 1) })
+                                                   : fc::variants{
+                                                        make_chain_min_bond(ETH_CHAIN_CODE, ETH_CHAIN_CODE,
+                                                                            BATCHOP_MIN_COLLATERAL),
+                                                        make_chain_min_bond(SOL_CHAIN_CODE, SOL_CHAIN_CODE,
+                                                                            BATCHOP_MIN_COLLATERAL) })
             ("req_uw_collat",                    fc::variants{})));
 
       std::vector<name> batch_ops{BATCHOP};
@@ -230,13 +238,17 @@ public:
                ("is_bootstrapped",  op == BATCHOP ? batchop_is_bootstrapped : true)));
       }
 
-      register_chain(opp::types::ChainKind::CHAIN_KIND_EVM, "ETH", 31337);
-      register_chain(opp::types::ChainKind::CHAIN_KIND_SVM, "SOL", 1);
+      register_chain(opp::types::ChainKind::CHAIN_KIND_EVM, ETH_CHAIN_CODE, 31337);
+      register_chain(opp::types::ChainKind::CHAIN_KIND_SVM, SOL_CHAIN_CODE, 1);
 
       // A non-bootstrapped batch operator starts UNKNOWN and becomes ACTIVE
       // only after a collateral update re-evaluates its role eligibility.
       if (!batchop_is_bootstrapped) {
-         BOOST_REQUIRE_EQUAL(success(), depositinle(BATCHOP, "ETH", "ETH", 1));
+         BOOST_REQUIRE_EQUAL(success(), depositinle(BATCHOP, ETH_CHAIN_CODE, ETH_CHAIN_CODE,
+                                                    BATCHOP_MIN_COLLATERAL));
+         BOOST_REQUIRE_EQUAL(success(), depositinle(BATCHOP, SOL_CHAIN_CODE, SOL_CHAIN_CODE,
+                                                    BATCHOP_MIN_COLLATERAL,
+                                                    opp::types::ChainKind::CHAIN_KIND_SVM));
       }
 
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT,
@@ -348,7 +360,7 @@ public:
    /// Inbound delivery metadata for one (outpost, epoch, batch operator), or null when absent.
    /// Consensus deliberately clears only raw_data, leaving this row for advance() to classify.
    fc::variant find_inbound_delivery(uint64_t chain_code, uint32_t epoch_index, name batch_op,
-                                     uint64_t scan_until = 64) {
+                                     uint64_t scan_until = TABLE_SCAN_LIMIT) {
       for (uint64_t id = 0; id < scan_until; ++id) {
          auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "envelopes"_n, id);
          if (data.empty()) continue;
@@ -365,7 +377,7 @@ public:
    /// of an ACCEPTED inbound envelope (rows are emplaced before dispatch, even for types
    /// dispatch drops as out of scope).
    uint32_t attestation_count(uint64_t chain_code, uint32_t epoch_index,
-                              uint64_t scan_until = 64) {
+                              uint64_t scan_until = TABLE_SCAN_LIMIT) {
       uint32_t n = 0;
       for (uint64_t id = 0; id < scan_until; ++id) {
          auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "attestations"_n, id);
@@ -429,10 +441,28 @@ public:
          "operator_entry", data, abi_serializer::create_yield_function(abi_serializer_max_time));
    }
 
+   /// Count successful SLASH audit entries for `account` routed to `chain_code`.
+   /// opreg emits and logs one action for each immediately slashable collateral balance.
+   uint32_t slash_action_count(name account, uint64_t chain_code) {
+      auto op = get_operator(account);
+      if (op.is_null()) return 0;
+
+      uint32_t n = 0;
+      for (const auto& log : op["recent_actions"].get_array()) {
+         const auto& action = log["action"];
+         if (!log["success"].as_bool() ||
+             action["action_type"].as<sysio::opp::attestations::OperatorAction_ActionType>() !=
+                sysio::opp::attestations::OperatorAction::ACTION_TYPE_SLASH ||
+             action["chain_code"].as_uint64() != chain_code) continue;
+         ++n;
+      }
+      return n;
+   }
+
    /// Count DELIVERED dellog rows still present for `account`. recorddel PRUNES (erases) rows that
    /// have aged out of the rolling window, so a surviving delivered row proves that record is still
    /// inside the window -- the direct check that the edge anchor was not pruned.
-   uint32_t delivered_dellog_count(name account, uint64_t scan_until = 64) {
+   uint32_t delivered_dellog_count(name account, uint64_t scan_until = TABLE_SCAN_LIMIT) {
       uint32_t n = 0;
       for (uint64_t id = 0; id < scan_until; ++id) {
          auto data = get_row_by_account(OPREG_ACCOUNT, OPREG_ACCOUNT, "dellog"_n, name{id});
@@ -490,13 +520,14 @@ public:
    /// Inline collateral credit (the path sysio.msgch drives in production; pushed directly here) that
    /// lifts a non-bootstrapped operator to ACTIVE once its bond meets the configured minimum.
    action_result depositinle(name account, std::string_view chain_code, std::string_view token_code,
-                             uint64_t amount) {
+                             uint64_t amount,
+                             opp::types::ChainKind actor_chain = opp::types::ChainKind::CHAIN_KIND_EVM) {
       return push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "depositinle"_n, mvo()
          ("account",             account.to_string())
          ("chain_code",          codename_mvo(chain_code))
          ("token_code",          codename_mvo(token_code))
          ("amount",              amount)
-         ("actor_chain",         opp::types::ChainKind::CHAIN_KIND_EVM)
+         ("actor_chain",         actor_chain)
          ("actor_address",       std::vector<char>{})
          ("original_message_id", std::string(64, '0')));
    }
@@ -1226,6 +1257,8 @@ BOOST_FIXTURE_TEST_CASE(noncanonical_delivery_slashes_before_termination, sysio_
    auto op = get_operator(BATCHOP);
    BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_SLASHED,
                        op["status"].as<opp::types::OperatorStatus>());
+   BOOST_REQUIRE_EQUAL(1u, slash_action_count(BATCHOP, ETH_OUTPOST_ID));
+   BOOST_REQUIRE_EQUAL(1u, slash_action_count(BATCHOP, SOL_OUTPOST_ID));
    BOOST_REQUIRE_EQUAL(epoch + 1, current_epoch());
    BOOST_REQUIRE_EQUAL(2u, delivered_dellog_count(BATCHOP));
 } FC_LOG_AND_RETHROW() }

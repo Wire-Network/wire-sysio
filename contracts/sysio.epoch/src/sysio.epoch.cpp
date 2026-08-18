@@ -44,6 +44,7 @@ namespace {
 
 constexpr name SYSTEM_ACCOUNT     = "sysio"_n;
 constexpr name TOKEN_ACCOUNT      = "sysio.token"_n;
+constexpr name CHALG_SLASHOP_ACTION = "slashop"_n;
 
 // System-owned rows are billed to the sysio RAM pool rather than to this contract account (the
 // privileged-contract model sysio.token uses): the contract account stays finite at its code+abi
@@ -563,7 +564,7 @@ void epoch::advance() {
          action(
             permission_level{get_self(), "owner"_n},
             CHALG_ACCOUNT,
-            "slashop"_n,
+            CHALG_SLASHOP_ACTION,
             std::make_tuple(member,
                             std::string("non-canonical OPP envelope delivery, epoch ")
                                + std::to_string(state.current_epoch_index))
