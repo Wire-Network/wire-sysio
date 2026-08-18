@@ -18,6 +18,7 @@
 #include <sysio.system/emissions.hpp>
 #include <sysio.chains/sysio.chains.hpp>
 #include <sysio/opp/attestations/attestations.pb.hpp>
+#include <magic_enum/magic_enum.hpp>
 
 namespace sysio {
 
@@ -656,7 +657,7 @@ void epoch::advance() {
       auto status_idx = opreg_ops.get_index<"bystatus"_n>();
       std::vector<std::pair<name, bool>> pool;
       for (auto it = status_idx.lower_bound(
-              static_cast<uint64_t>(OperatorStatus::OPERATOR_STATUS_ACTIVE));
+              magic_enum::enum_integer(OperatorStatus::OPERATOR_STATUS_ACTIVE));
            it != status_idx.end() &&
            it->status == OperatorStatus::OPERATOR_STATUS_ACTIVE; ++it) {
          if (it->type == OperatorType::OPERATOR_TYPE_BATCH && !is_resident(it->account)) {
@@ -736,7 +737,7 @@ void epoch::advance() {
          auto link_it = links_by_name.lower_bound(it->account.value);
          while (link_it != links_by_name.end() && link_it->username == it->account) {
             opp::types::ChainAddress chain_addr;
-            chain_addr.kind = static_cast<opp::types::ChainKind>(link_it->chain_kind);
+            chain_addr.kind = link_it->chain_kind;
 
             std::visit([&](const auto& key_data) {
                using T = std::decay_t<decltype(key_data)>;
@@ -920,7 +921,7 @@ void epoch::schbatchgps() {
    auto status_idx = opreg_ops.get_index<"bystatus"_n>();
    std::vector<std::pair<name, bool>> available_batch; // (account, is_bootstrapped)
    for (auto it = status_idx.lower_bound(
-           static_cast<uint64_t>(OperatorStatus::OPERATOR_STATUS_ACTIVE));
+           magic_enum::enum_integer(OperatorStatus::OPERATOR_STATUS_ACTIVE));
         it != status_idx.end() &&
         it->status == OperatorStatus::OPERATOR_STATUS_ACTIVE; ++it) {
       if (it->type == OperatorType::OPERATOR_TYPE_BATCH) {
