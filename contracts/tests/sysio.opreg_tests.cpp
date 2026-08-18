@@ -1455,4 +1455,170 @@ BOOST_FIXTURE_TEST_CASE(flushwtdw_bounds_rows_per_epoch, sysio_opreg_tester) { t
    BOOST_REQUIRE_EQUAL(0u, count_pending());
 } FC_LOG_AND_RETHROW() }
 
+// ---------------------------------------------------------------------------
+//  WIRE-342 — registry ceilings bound the OPERATORS roster
+// ---------------------------------------------------------------------------
+
+/// `epoch::max_roster_operators` mirrored for the host tests: the epoch contract header
+/// is CDT-only and cannot be included here, so the derivation is restated with its inputs
+/// rather than as a bare number. If `sysio.epoch.hpp` changes any of these, this mirror
+/// diverges and the boundary cases below fail — which is the intent: the ceiling is
+/// consensus-visible and a silent change to it should not pass unnoticed.
+///
+/// Two independent bounds, whichever is smaller:
+///   bytes   — (32768 envelope - 512 baseline - 24 overhead) / 2 share / bytes-per-operator
+///   entries — the strictest outpost's roster capacity (Solana's `MAX_OPERATORS`)
+static constexpr uint32_t EXPECTED_MAX_OUTPOST_ROSTER_ENTRIES = 128;
+
+static constexpr uint32_t expected_max_roster_operators(uint32_t outposts) {
+   const uint32_t addresses = outposts == 0 ? 1 : (outposts > 8 ? 8 : outposts);
+   const uint32_t bytes_per = 17 + addresses * 39 + 2 + 3 + 2;
+   const uint32_t by_bytes  = (32768 - 512 - 24) / 2 / bytes_per;
+   return by_bytes < EXPECTED_MAX_OUTPOST_ROSTER_ENTRIES
+             ? by_bytes : EXPECTED_MAX_OUTPOST_ROSTER_ENTRIES;
+}
+
+/// This fixture registers no chains, so the ceiling is the outpost entry cap.
+static constexpr uint32_t EXPECTED_ROSTER_CEILING = expected_max_roster_operators(0);
+
+BOOST_FIXTURE_TEST_CASE(setconfig_accepts_shipped_default_ceilings, sysio_opreg_tester) { try {
+   // The defaults must remain a legal configuration — a ceiling that rejected them would
+   // brick `setconfig` for every existing cluster.
+   BOOST_REQUIRE_EQUAL(success(), setconfig(21, 63, 21));
+   BOOST_REQUIRE_LT(21u + 63u + 21u, EXPECTED_ROSTER_CEILING);
+
+   // The launch outpost set is {ETH, SOL}. At that shape the OUTPOST entry cap binds
+   // before the envelope does — so the depot cannot accept a configuration Solana would
+   // refuse to seat. Adding outposts fattens every entry and hands the bound back to
+   // bytes, which is the case a fixed bytes-per-operator constant used to get wrong.
+   BOOST_REQUIRE_EQUAL(EXPECTED_MAX_OUTPOST_ROSTER_ENTRIES, expected_max_roster_operators(2));
+   BOOST_REQUIRE_LT(expected_max_roster_operators(4), expected_max_roster_operators(2));
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(setconfig_rejects_ceilings_exceeding_roster_capacity, sysio_opreg_tester) { try {
+   // Exactly at the ceiling is legal; one over is not. Pinning both sides is what makes
+   // this a boundary test rather than a smoke test.
+   const uint32_t at_ceiling = EXPECTED_ROSTER_CEILING;
+   BOOST_REQUIRE_EQUAL(success(), setconfig(at_ceiling - 2, 1, 1));
+
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: max_available_* sum exceeds the OPERATORS "
+            "roster ceiling (" + std::to_string(EXPECTED_ROSTER_CEILING) + "): the "
+            "resulting roster could not fit an outbound envelope, or could not be seated "
+            "by an outpost"),
+      setconfig(at_ceiling - 1, 1, 1));
+
+   // A governance-scale raise is the case this guard exists for: without it the roster
+   // could grow past what an envelope carries, and `buildenv` aborts inline inside
+   // `sysio.epoch::advance` — halting epoch advancement chain-wide with no config left
+   // to change it through.
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: max_available_* sum exceeds the OPERATORS "
+            "roster ceiling (" + std::to_string(EXPECTED_ROSTER_CEILING) + "): the "
+            "resulting roster could not fit an outbound envelope, or could not be seated "
+            "by an outpost"),
+      setconfig(500, 500, 500));
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(regoperator_enforces_per_type_ceiling, sysio_opreg_tester) { try {
+   // One batch-operator slot. `max_available_*` was declared, validated and persisted
+   // since the registry landed but read by NOTHING, so registration had no count, rate
+   // or admission bound at all.
+   BOOST_REQUIRE_EQUAL(success(), setconfig(21, 1, 21));
+
+   BOOST_REQUIRE_EQUAL(success(),
+      regoperator("batchop.a"_n, OperatorType::OPERATOR_TYPE_BATCH, false));
+
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: operator registration ceiling reached for "
+            "this operator type"),
+      regoperator("batchop.b"_n, OperatorType::OPERATOR_TYPE_BATCH, false));
+
+   // The ceiling is PER TYPE — a full batch-operator roster must not block underwriters.
+   BOOST_REQUIRE_EQUAL(success(),
+      regoperator("uwrit.a"_n, OperatorType::OPERATOR_TYPE_UNDERWRITER, false));
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(regoperator_ceiling_bypassed_by_bootstrapped, sysio_opreg_tester) { try {
+   // Bootstrapped operators are the genesis seed the chain cannot start without, and are
+   // already exempt from the collateral and termination gates
+   // (`bootstrapped-operator-invariants.md`). The ceiling must not be the one gate that
+   // can refuse them, or a mis-set config could make the chain unstartable.
+   BOOST_REQUIRE_EQUAL(success(), setconfig(21, 1, 21));
+
+   BOOST_REQUIRE_EQUAL(success(),
+      regoperator("batchop.a"_n, OperatorType::OPERATOR_TYPE_BATCH, false));
+   BOOST_REQUIRE_EQUAL(success(),
+      regoperator("batchop.b"_n, OperatorType::OPERATOR_TYPE_BATCH, true));
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(regoperator_global_roster_bound_applies_to_bootstrapped,
+                        sysio_opreg_tester) { try {
+   // The PER-TYPE ceilings are a configured sum the bootstrap path bypasses, so on their
+   // own they are not a safety invariant. The GLOBAL bound is, and it must hold for
+   // bootstrapped registrations too: a bootstrapped operator lands ACTIVE immediately and
+   // is therefore in the roster at once. Bootstrap's collateral and termination
+   // exemptions are economic; exceeding a transport/seating ceiling is not a cost to the
+   // operator, it wedges the outpost for everyone.
+   BOOST_REQUIRE_EQUAL(success(), setconfig(21, 63, 21));
+
+   std::vector<name> ops;
+   ops.reserve(EXPECTED_ROSTER_CEILING + 1);
+   for (uint32_t i = 0; i <= EXPECTED_ROSTER_CEILING; ++i) {
+      std::string account = "rostr";
+      account += static_cast<char>('a' + i / 26);
+      account += static_cast<char>('a' + i % 26);
+      ops.emplace_back(account);
+   }
+   // Chunked: creating this many accounts in one block trips `block_cpu_usage_exceeded`
+   // before the test reaches what it is actually asserting.
+   for (size_t start = 0; start < ops.size(); start += 8) {
+      const size_t stop = std::min(start + 8, ops.size());
+      create_accounts(std::vector<name>(ops.begin() + start, ops.begin() + stop));
+      produce_blocks();
+   }
+
+   // Fill the roster to exactly the ceiling, all bootstrapped so each lands ACTIVE and
+   // enters the roster immediately. Blocks are produced along the way: this many
+   // registrations in one block would exhaust the per-block billable CPU.
+   // One block per registration. Each `regoperator` now also walks the roster (bounded by
+   // the ceiling) on top of the per-type count, so batching even a handful into one block
+   // trips `block_cpu_usage_exceeded` well before the ceiling is reached.
+   for (uint32_t i = 0; i < EXPECTED_ROSTER_CEILING; ++i) {
+      BOOST_REQUIRE_EQUAL(success(),
+         regoperator(ops[i], OperatorType::OPERATOR_TYPE_BATCH, true));
+      produce_blocks();
+   }
+
+   // The bypass tested above covers the PER-TYPE ceiling only. It must NOT extend to the
+   // global bound — this is the assertion that makes the sum a real invariant.
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: OPERATORS roster ceiling reached (" +
+            std::to_string(EXPECTED_ROSTER_CEILING) + "): registering another operator "
+            "would produce a roster that cannot fit an outbound envelope or be seated by "
+            "an outpost"),
+      regoperator(ops[EXPECTED_ROSTER_CEILING], OperatorType::OPERATOR_TYPE_BATCH, true));
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(regoperator_ceiling_ignores_terminated_rows, sysio_opreg_tester) { try {
+   // The count deliberately excludes TERMINATED rows. Counting them would let settled
+   // history permanently exhaust the registry: terminated rows are erased only by the
+   // capped, permissionless `prune`, so a chain with churn would eventually refuse every
+   // registration. UNKNOWN, ACTIVE and SLASHED all count — UNKNOWN is what an attacker
+   // accumulates for free, and ACTIVE + SLASHED is exactly what the roster ships.
+   BOOST_REQUIRE_EQUAL(success(), setconfig(21, 1, 21));
+
+   BOOST_REQUIRE_EQUAL(success(),
+      regoperator("batchop.a"_n, OperatorType::OPERATOR_TYPE_BATCH, false));
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: operator registration ceiling reached for "
+            "this operator type"),
+      regoperator("batchop.b"_n, OperatorType::OPERATOR_TYPE_BATCH, false));
+
+   // Terminating the incumbent frees the slot even before `prune` erases the row.
+   BOOST_REQUIRE_EQUAL(success(), terminate("batchop.a"_n, "test"));
+   BOOST_REQUIRE_EQUAL(success(),
+      regoperator("batchop.b"_n, OperatorType::OPERATOR_TYPE_BATCH, false));
+} FC_LOG_AND_RETHROW() }
+
 BOOST_AUTO_TEST_SUITE_END()

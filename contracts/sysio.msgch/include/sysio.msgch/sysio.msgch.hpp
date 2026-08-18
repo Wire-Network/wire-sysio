@@ -9,6 +9,7 @@
 #include <sysio.opp.common/slug_name.hpp>
 #include <sysio.opp.common/opp_table_types.hpp>
 #include <sysio.opp.common/opp_keys.hpp>
+#include <sysio.opp.common/opp_envelope_budget.hpp>
 
 namespace sysio {
 
@@ -95,6 +96,19 @@ namespace sysio {
       /// delivered to the wrong same-kind chain.
       [[sysio::action]]
       void buildenv(uint64_t chain_code);
+
+      // -----------------------------------------------------------------------
+      //  Envelope budget
+      // -----------------------------------------------------------------------
+      //
+      // ALIASES of the canonical values in `sysio.opp.common/opp_envelope_budget.hpp`, so the
+      // packing loop below can read them unqualified. They are not copies: the budget bounds
+      // what any attestation PRODUCER may emit, so `sysio.epoch` derives its roster ceiling
+      // from the same header rather than from this contract.
+
+      static constexpr size_t MAX_ENVELOPE_BYTES         = opp::MAX_ENVELOPE_BYTES;
+      static constexpr size_t ATTESTATION_OVERHEAD_BYTES = opp::ATTESTATION_OVERHEAD_BYTES;
+      static constexpr size_t ENVELOPE_BASELINE_BYTES    = opp::ENVELOPE_BASELINE_BYTES;
 
       // -----------------------------------------------------------------------
       //  Tables

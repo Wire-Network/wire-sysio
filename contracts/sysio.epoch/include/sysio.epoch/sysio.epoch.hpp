@@ -8,6 +8,11 @@
 #include <sysio/system.hpp>
 #include <sysio/opp/types/types.pb.hpp>
 #include <sysio.opp.common/opp_table_types.hpp>
+// For the OPP envelope budget — the roster ceiling below derives from it rather than
+// restating a consensus-visible cap in a second place. Deliberately the shared
+// opp.common header and NOT `sysio.msgch.hpp`: several contracts include this header
+// without msgch on their include path.
+#include <sysio.opp.common/opp_envelope_budget.hpp>
 
 namespace sysio {
 
@@ -118,6 +123,45 @@ namespace sysio {
 
       using blocklog_t = sysio::kv::table<"blocklog"_n, blocklog_key, blocklog_entry>;
 
+      /// Digest of the last OPERATORS attestation queued for one outpost.
+      ///
+      /// `advance` re-derives the roster every epoch but queues it only when this
+      /// digest changes, so a static roster costs zero envelope bytes. The roster
+      /// changes on registration / activation / slash — rarely — while `advance`
+      /// runs every epoch, and re-sending it bought nothing: an outpost cannot miss
+      /// an envelope and continue (both outposts enforce strict epoch sequencing, so
+      /// a missed envelope stalls rather than diverges), and an outpost that DROPS a
+      /// roster does so on conditions that are pure functions of the payload, which a
+      /// byte-identical re-send reproduces exactly.
+      ///
+      /// Per-outpost rather than global because a newly-activated outpost has never
+      /// received the roster: the ABSENCE of a row is what makes its first `advance`
+      /// send unconditionally. Rows are reused, never erased, mirroring
+      /// `msgch::outpost_consensus_entry`.
+      ///
+      /// There is deliberately no periodic re-send. Every case in which an outpost
+      /// could want a roster it was already sent is an explicit operational act that
+      /// needs depot-side coordination regardless: an outpost re-init resets its epoch
+      /// cursor alongside its registry, so it rejects every envelope until it is
+      /// re-bootstrapped, and raising an outpost's own roster ceiling is a program
+      /// upgrade with a runbook. A timer would serve those late while costing a send
+      /// forever.
+      struct roster_digest_key {
+         uint64_t chain_code;
+         uint64_t primary_key() const { return chain_code; }
+         SYSLIB_SERIALIZE(roster_digest_key, (chain_code))
+      };
+
+      struct [[sysio::table("rosterdig")]] roster_digest_entry {
+         uint64_t    chain_code    = 0;
+         checksum256 digest        = {};
+         uint32_t    sent_at_epoch = 0;
+
+         SYSLIB_SERIALIZE(roster_digest_entry, (chain_code)(digest)(sent_at_epoch))
+      };
+
+      using rosterdig_t = sysio::kv::table<"rosterdig"_n, roster_digest_key, roster_digest_entry>;
+
       // Well-known accounts
       static constexpr name CHALG_ACCOUNT  = "sysio.chalg"_n;
       static constexpr name MSGCH_ACCOUNT  = "sysio.msgch"_n;
@@ -171,6 +215,86 @@ namespace sysio {
       /// large would leave little room for value-bearing attestations in the same
       /// envelope, and `buildenv` would carry the remainder to the next epoch.
       static constexpr uint32_t MAX_SCHEDULED_BATCH_OPERATORS = 1000;
+
+      /// Upper bound on the authex-linked chain addresses carried for ONE operator
+      /// in the OPERATORS attestation.
+      ///
+      /// The per-operator address walk is otherwise unbounded — `authex::links` has
+      /// no cap on how many keys one account may link — so a single account could
+      /// inflate one roster entry without limit and push the attestation past the
+      /// envelope on its own. An operator legitimately needs one address per
+      /// registered outpost chain (two today: EVM + SVM), so 8 is generous headroom
+      /// while still bounding the entry. It also matches what the Solana outpost
+      /// already assumes when sizing its own pre-decode payload gate.
+      static constexpr uint32_t MAX_OPERATOR_CHAIN_ADDRESSES = 8;
+
+      // -----------------------------------------------------------------------
+      //  OPERATORS roster ceiling
+      // -----------------------------------------------------------------------
+      //
+      // `MAX_SCHEDULED_BATCH_OPERATORS` above does this arithmetic for the sibling
+      // BATCH_OPERATOR_GROUPS attestation; it was never done for OPERATORS, which is
+      // ~5x fatter per member and drawn from an UNBOUNDED registry rather than a
+      // bounded schedule window. `sysio.opreg::setconfig` validates its summed
+      // `max_available_*` ceilings against the result, so a governance change cannot
+      // raise the registry past what an envelope can carry.
+
+      /// Encoded bytes of one `ChainAddress`: 1 B tag + 1 B length + 2 B `kind` varint
+      /// + 2 B inner tag/length + a 33-byte compressed secp256k1 key (Ed25519 is 32,
+      /// so 33 is the worst case).
+      static constexpr uint32_t ROSTER_BYTES_PER_ADDRESS = 39;
+
+      /// Encoded bytes of one `OperatorEntry` carrying `addresses` chain addresses:
+      /// a maximum-length WIRE account name (4 B framing + 13 B) + its addresses
+      /// + 2 B `type` + 3 B `status` (SLASHED is 241, a two-byte varint) + 2 B for the
+      /// repeated-field framing in `Operators`.
+      ///
+      /// Parameterised on the address count rather than pinned to today's outpost set:
+      /// an operator carries one address per registered outpost, so registering a third
+      /// outpost makes every entry ~39 B fatter. A fixed constant would silently
+      /// overstate capacity the moment that happens.
+      static constexpr uint32_t roster_bytes_per_operator(uint32_t addresses) {
+         return 17 + addresses * ROSTER_BYTES_PER_ADDRESS + 2 + 3 + 2;
+      }
+
+      /// The share of one envelope the roster may claim.
+      ///
+      /// Sizing the ceiling against the WHOLE budget would let a legal configuration
+      /// produce a roster that fills an envelope by itself — the exact hazard
+      /// `MAX_SCHEDULED_BATCH_OPERATORS` names ("little room for value-bearing
+      /// attestations in the same envelope"). Half leaves the remainder for
+      /// BATCH_OPERATOR_GROUPS and the SWAP_REMIT / WITHDRAW_REMIT / RESERVE_READY
+      /// traffic that settles user value, which must not be deferred behind the roster.
+      static constexpr uint32_t ROSTER_ENVELOPE_SHARE_DIVISOR = 2;
+
+      /// Strictest OUTPOST-side ceiling on roster ENTRIES.
+      ///
+      /// The depot's envelope arithmetic is necessary but not sufficient: an outpost
+      /// that cannot seat the roster it receives skips the WHOLE attestation and keeps
+      /// its previous one, so the roster silently stops tracking the depot. The Solana
+      /// outpost's `OperatorRegistry` is a fixed-size PDA — 32 entries today, raised to
+      /// 128 by wire-solana#442 (SOL-385), which explicitly defers the depot-side number
+      /// to WIRE-342. Ethereum applies no count cap, so Solana is the binding one.
+      ///
+      /// Keep in lock-step with `liqsol-core`'s `MAX_OPERATORS`; this bound is only
+      /// meaningful while it is the smaller of the two.
+      static constexpr uint32_t MAX_OUTPOST_ROSTER_ENTRIES = 128;
+
+      /// Roster ceiling for a network carrying `outpost_count` active outposts: the
+      /// smaller of what half an envelope can carry and what the strictest outpost can
+      /// seat. Both bounds are real and neither implies the other — bytes gate what the
+      /// depot can SEND, entries gate what an outpost can STORE.
+      static constexpr uint32_t max_roster_operators(uint32_t outpost_count) {
+         const uint32_t addresses =
+            outpost_count == 0 ? 1
+                               : (outpost_count > MAX_OPERATOR_CHAIN_ADDRESSES
+                                     ? MAX_OPERATOR_CHAIN_ADDRESSES : outpost_count);
+         const uint32_t by_bytes =
+            static_cast<uint32_t>(sysio::opp::SINGLE_ATTESTATION_BUDGET_BYTES
+                                  / ROSTER_ENVELOPE_SHARE_DIVISOR
+                                  / roster_bytes_per_operator(addresses));
+         return by_bytes < MAX_OUTPOST_ROSTER_ENTRIES ? by_bytes : MAX_OUTPOST_ROSTER_ENTRIES;
+      }
 
    private:
 

@@ -55,33 +55,11 @@ using sysio::slug_name_literals::operator""_s;
 /// binds inbound registrations to this exact outpost — see the WSA-005 note there.
 constexpr sysio::slug_name NODE_OWNER_SRC_CHAIN = "ETHEREUM"_s;
 
-/// Hard cap on the encoded envelope size in BOTH directions, mirroring the
-/// Solana (`opp_outpost::MAX_ENVELOPE_BYTES`) and Ethereum (`OPP.MAX_ENVELOPE_BYTES`)
-/// caps. 32 KiB is the e2e-supported maximum across WIRE / Ethereum / Solana.
-/// Solana's 256 KiB BPF heap divided by ~3.3× envelope-size peak heap usage
-/// during the finalising chunk's `Envelope::decode + keccak::hash + clone`
-/// tolerates more, but Ethereum is the binding constraint: a cold
-/// `emitOutboundEnvelope` of a near-64-KiB envelope costs ~45 M gas, ~2.7× the
-/// EIP-7825 per-transaction cap of 16 777 216, so the platform cap is 32 768.
-/// Outbound, the `buildenv` packing loop uses this to decide how many READY
-/// attestations to bundle into the current epoch's envelope; any that don't fit
-/// stay in the `attestations` table with status READY for the next epoch's
-/// `buildenv` call. Inbound, `deliver` rejects anything larger before hashing
-/// or storing it.
-constexpr size_t   MAX_ENVELOPE_BYTES         = 32'768;
-
-/// Conservative per-attestation byte budget used by the `buildenv` packing
-/// loop: protobuf tags + length prefixes + the attestation type/data-size
-/// fields. Over-counts by a few bytes per attestation versus the actual
-/// `zpp::bits` encoded size, which keeps the loop O(N) and always errs on the
-/// side of leaving a gap. The trailing `packed.size()` check after final
-/// serialisation is the hard backstop.
-constexpr size_t   ATTESTATION_OVERHEAD_BYTES = 24;
-
-/// Conservative envelope/message header budget for the packing loop —
-/// covers the `Envelope` header fields, the wrapping `Message`, its header
-/// + payload preamble, and a safety margin for `zpp::bits` length prefixes.
-constexpr size_t   ENVELOPE_BASELINE_BYTES    = 512;
+// MAX_ENVELOPE_BYTES / ATTESTATION_OVERHEAD_BYTES / ENVELOPE_BASELINE_BYTES are declared
+// on the `msgch` contract class in sysio.msgch.hpp — the envelope budget bounds what any
+// attestation producer may emit, so `sysio.epoch` derives its roster ceiling from them
+// instead of restating the numbers. Every use below is inside a `msgch` member function
+// and so still resolves unqualified.
 
 /// Stable audit marker for a UIC rejected before it can reach `rcrdcommit`.
 constexpr const char* UIC_DISPATCH_REJECTED_LOG_PREFIX =
@@ -1723,10 +1701,25 @@ void msgch::buildenv(uint64_t chain_code) {
 
    // First-attestation-too-big guard. The estimator picks zero only when the first candidate alone
    // overshoots the envelope; the trim loop below would surface the same condition, but aborting
-   // upfront avoids building anything in the doomed case. Never expected at protocol level because
-   // every valid current attestation should fit by itself.
-   check(included_count > 0,
-         "sysio.msgch::buildenv: a single READY attestation exceeds the outbound envelope");
+   // upfront avoids building anything in the doomed case.
+   //
+   // This abort is far more severe than "this outpost's envelope is skipped": `buildenv` is
+   // inline-sent from `sysio.epoch::advance`, so it takes the whole epoch-advance transaction with
+   // it and epoch advancement stops CHAIN-WIDE. The head-of-line `break` above makes it permanent
+   // rather than probabilistic — the same oversized candidate re-packs identically every epoch, and
+   // everything queued behind it never ships either.
+   //
+   // So the message carries the offending row's id and the arithmetic that rejected it, rather than
+   // being an anonymous overflow that has to be reconstructed from table state afterwards. The
+   // attestation type is readable from the `attestations` row the id names.
+   if (included_count == 0) {
+      const size_t head_bytes = ATTESTATION_OVERHEAD_BYTES + candidate_entries.front().data.size();
+      check(false,
+            "sysio.msgch::buildenv: a single READY attestation exceeds the outbound envelope"
+            " -- att_id=" + std::to_string(candidate_ids.front()) +
+            " bytes=" + std::to_string(head_bytes) +
+            " budget=" + std::to_string(opp::SINGLE_ATTESTATION_BUDGET_BYTES));
+   }
 
    std::vector<opp::AttestationEntry> entries(
       std::make_move_iterator(candidate_entries.begin()),
