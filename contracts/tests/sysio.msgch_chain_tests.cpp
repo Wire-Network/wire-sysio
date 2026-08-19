@@ -58,6 +58,69 @@ using fc::slug_name_literals::operator""_s;
 
 constexpr uint64_t ETH_OUTPOST_ID = "ETH"_s.value;
 constexpr uint64_t SOL_OUTPOST_ID = "SOL"_s.value;
+constexpr std::string_view ETH_CHAIN_CODE = "ETH";
+constexpr std::string_view SOL_CHAIN_CODE = "SOL";
+constexpr uint64_t BATCH_OPERATOR_MINIMUM_COLLATERAL = 1;
+constexpr uint64_t TABLE_SCAN_LIMIT = 64;
+
+/// sysio.opreg action identifiers used by the WNS-16 fixture.
+namespace opreg_actions {
+constexpr name SET_CONFIG = "setconfig"_n;
+} // namespace opreg_actions
+
+/// sysio.opreg ABI field identifiers used by the WNS-16 fixture.
+namespace opreg_fields {
+constexpr const char* STATUS         = "status";
+constexpr const char* RECENT_ACTIONS = "recent_actions";
+constexpr const char* ACTION         = "action";
+constexpr const char* ACTION_TYPE    = "action_type";
+constexpr const char* SUCCESS        = "success";
+constexpr const char* CHAIN_CODE     = "chain_code";
+} // namespace opreg_fields
+
+/// sysio.opreg configuration ABI field identifiers used by the WNS-16 fixture.
+namespace opreg_config_fields {
+constexpr const char* MAX_AVAILABLE_PRODUCERS          = "max_available_producers";
+constexpr const char* MAX_AVAILABLE_BATCH_OPERATORS    = "max_available_batch_ops";
+constexpr const char* MAX_AVAILABLE_UNDERWRITERS       = "max_available_underwriters";
+constexpr const char* TERMINATE_PRUNE_DELAY_MS         = "terminate_prune_delay_ms";
+constexpr const char* TERMINATE_MAX_CONSECUTIVE_MISSES = "terminate_max_consecutive_misses";
+constexpr const char* TERMINATE_MAX_PERCENT_MISSES_24H = "terminate_max_pct_misses_24h";
+constexpr const char* TERMINATE_WINDOW_MS              = "terminate_window_ms";
+constexpr const char* REQUIRED_PRODUCER_COLLATERAL     = "req_prod_collat";
+constexpr const char* REQUIRED_BATCH_OPERATOR_COLLATERAL = "req_batchop_collat";
+constexpr const char* REQUIRED_UNDERWRITER_COLLATERAL  = "req_uw_collat";
+} // namespace opreg_config_fields
+
+/// sysio.msgch action identifiers used by the WNS-16 fixture.
+namespace msgch_actions {
+constexpr name CHECK_CONSENSUS = "chkcons"_n;
+} // namespace msgch_actions
+
+/// sysio.msgch table identifiers used by the WNS-16 fixture.
+namespace msgch_tables {
+constexpr name ENVELOPES = "envelopes"_n;
+} // namespace msgch_tables
+
+/// sysio.msgch ABI type identifiers used by the WNS-16 fixture.
+namespace msgch_abi_types {
+constexpr const char* ENVELOPE_ENTRY = "envelope_entry";
+} // namespace msgch_abi_types
+
+/// sysio.msgch ABI field identifiers used by the WNS-16 fixture.
+namespace msgch_fields {
+constexpr const char* CHAIN_CODE    = "chain_code";
+constexpr const char* EPOCH_INDEX   = "epoch_index";
+constexpr const char* BATCH_OP_NAME = "batch_op_name";
+constexpr const char* WINNING_CHECKSUM = "winning_checksum";
+constexpr const char* CHECKSUM         = "checksum";
+} // namespace msgch_fields
+
+/// sysio.epoch ABI field identifiers used by the WNS-16 fixture.
+namespace epoch_fields {
+constexpr const char* BATCH_OP_GROUPS       = "batch_op_groups";
+constexpr const char* CURRENT_BATCH_OP_GROUP = "current_batch_op_group";
+} // namespace epoch_fields
 
 } // anonymous namespace
 
@@ -95,6 +158,7 @@ public:
       });
       produce_blocks(2);
 
+      deploy(CHALG_ACCOUNT,  contracts::chalg_wasm(),  contracts::chalg_abi(),  chalg_abi);
       deploy(EPOCH_ACCOUNT,  contracts::epoch_wasm(),  contracts::epoch_abi(),  epoch_abi);
       deploy(OPREG_ACCOUNT,  contracts::opreg_wasm(),  contracts::opreg_abi(),  opreg_abi);
       deploy(MSGCH_ACCOUNT,  contracts::msgch_wasm(),  contracts::msgch_abi(),  msgch_abi);
@@ -178,10 +242,10 @@ public:
             ("pay_cadence_epochs",     uint16_t(1))));
    }
 
-   /// Epoch + opreg config, bootstrapped batch ops (`BATCHOP` always; `BATCHOP_B`/`BATCHOP_C` when
-   /// `n_batch_ops` is 3 -- a single group of three, so consensus needs more than one delivery),
-   /// ETH + SOL chain rows, group schedule, genesis advance.
-   void bootstrap(uint32_t n_batch_ops = 1) {
+   /// Epoch + opreg config, a configurable `BATCHOP` plus bootstrapped `BATCHOP_B`/`BATCHOP_C` when
+   /// `n_batch_ops` is 3 (a single group of three, so consensus needs more than one delivery), ETH +
+   /// SOL chain rows, group schedule, and genesis advance.
+   void bootstrap(uint32_t n_batch_ops = 1, bool batchop_is_bootstrapped = true) {
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT,
          "setconfig"_n, mvo()
             ("epoch_duration_sec",                  EPOCH_DURATION_SEC)
@@ -208,7 +272,16 @@ public:
             ("terminate_max_pct_misses_24h",     5)
             ("terminate_window_ms",              uint64_t{24ULL * 60 * 60 * 1000})
             ("req_prod_collat",                  fc::variants{})
-            ("req_batchop_collat",               fc::variants{})
+            // Empty collateral requirements intentionally keep non-bootstrapped
+            // operators UNKNOWN. Give the WNS-16 fixture's non-bootstrapped
+            // operator the one-unit ETH and SOL requirements it satisfies below.
+            ("req_batchop_collat",               batchop_is_bootstrapped
+                                                   ? fc::variants{}
+                                                   : fc::variants{
+                                                        make_chain_min_bond(ETH_CHAIN_CODE, ETH_CHAIN_CODE,
+                                                                            BATCH_OPERATOR_MINIMUM_COLLATERAL),
+                                                        make_chain_min_bond(SOL_CHAIN_CODE, SOL_CHAIN_CODE,
+                                                                            BATCH_OPERATOR_MINIMUM_COLLATERAL) })
             ("req_uw_collat",                    fc::variants{})));
 
       std::vector<name> batch_ops{BATCHOP};
@@ -221,11 +294,21 @@ public:
             "regoperator"_n, mvo()
                ("account",          op.to_string())
                ("type",             opp::types::OperatorType::OPERATOR_TYPE_BATCH)
-               ("is_bootstrapped",  true)));
+               ("is_bootstrapped",  op == BATCHOP ? batchop_is_bootstrapped : true)));
       }
 
-      register_chain(opp::types::ChainKind::CHAIN_KIND_EVM, "ETH", 31337);
-      register_chain(opp::types::ChainKind::CHAIN_KIND_SVM, "SOL", 1);
+      register_chain(opp::types::ChainKind::CHAIN_KIND_EVM, ETH_CHAIN_CODE, 31337);
+      register_chain(opp::types::ChainKind::CHAIN_KIND_SVM, SOL_CHAIN_CODE, 1);
+
+      // A non-bootstrapped batch operator starts UNKNOWN and becomes ACTIVE
+      // only after a collateral update re-evaluates its role eligibility.
+      if (!batchop_is_bootstrapped) {
+         BOOST_REQUIRE_EQUAL(success(), depositinle(BATCHOP, ETH_CHAIN_CODE, ETH_CHAIN_CODE,
+                                                    BATCH_OPERATOR_MINIMUM_COLLATERAL));
+         BOOST_REQUIRE_EQUAL(success(), depositinle(BATCHOP, SOL_CHAIN_CODE, SOL_CHAIN_CODE,
+                                                    BATCH_OPERATOR_MINIMUM_COLLATERAL,
+                                                    opp::types::ChainKind::CHAIN_KIND_SVM));
+      }
 
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT,
          "schbatchgps"_n, mvo()));
@@ -324,11 +407,28 @@ public:
          abi_serializer::create_yield_function(abi_serializer_max_time));
    }
 
+   /// Inbound delivery metadata for one (outpost, epoch, batch operator), or null when absent.
+   /// Consensus deliberately clears only raw_data, leaving this row for advance() to classify.
+   fc::variant find_inbound_delivery(uint64_t chain_code, uint32_t epoch_index, name batch_op,
+                                     uint64_t scan_until = TABLE_SCAN_LIMIT) {
+      for (uint64_t id = 0; id < scan_until; ++id) {
+         auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, msgch_tables::ENVELOPES, id);
+         if (data.empty()) continue;
+         auto row = msgch_abi.binary_to_variant(
+            msgch_abi_types::ENVELOPE_ENTRY, data,
+            abi_serializer::create_yield_function(abi_serializer_max_time));
+         if (row[msgch_fields::CHAIN_CODE].as_uint64() == chain_code &&
+             row[msgch_fields::EPOCH_INDEX].as<uint32_t>() == epoch_index &&
+             row[msgch_fields::BATCH_OP_NAME].as_string() == batch_op.to_string()) return row;
+      }
+      return fc::variant{};
+   }
+
    /// Count attestation rows recorded for (`chain_code`, `epoch_index`); the observable effect
    /// of an ACCEPTED inbound envelope (rows are emplaced before dispatch, even for types
    /// dispatch drops as out of scope).
    uint32_t attestation_count(uint64_t chain_code, uint32_t epoch_index,
-                              uint64_t scan_until = 64) {
+                              uint64_t scan_until = TABLE_SCAN_LIMIT) {
       uint32_t n = 0;
       for (uint64_t id = 0; id < scan_until; ++id) {
          auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "attestations"_n, id);
@@ -392,10 +492,33 @@ public:
          "operator_entry", data, abi_serializer::create_yield_function(abi_serializer_max_time));
    }
 
+   /// Count successful SLASH audit entries for `account` routed to `chain_code`.
+   /// opreg emits and logs one action for each immediately slashable collateral balance.
+   uint32_t slash_action_count(name account, uint64_t chain_code) {
+      auto op = get_operator(account);
+      if (op.is_null()) return 0;
+
+      using operator_action_type = sysio::opp::attestations::OperatorAction_ActionType;
+      uint32_t n = 0;
+      for (const auto& log : op[opreg_fields::RECENT_ACTIONS].get_array()) {
+         operator_action_type action_type =
+            sysio::opp::attestations::OperatorAction_ActionType_ACTION_TYPE_UNKNOWN;
+         const auto& action = log[opreg_fields::ACTION];
+         const bool is_slash =
+            sysio::opp::attestations::OperatorAction_ActionType_Parse(
+               action[opreg_fields::ACTION_TYPE].as_string(), &action_type) &&
+            action_type == sysio::opp::attestations::OperatorAction_ActionType_ACTION_TYPE_SLASH;
+         if (!log[opreg_fields::SUCCESS].as_bool() || !is_slash ||
+             action[opreg_fields::CHAIN_CODE].as_uint64() != chain_code) continue;
+         ++n;
+      }
+      return n;
+   }
+
    /// Count DELIVERED dellog rows still present for `account`. recorddel PRUNES (erases) rows that
    /// have aged out of the rolling window, so a surviving delivered row proves that record is still
    /// inside the window -- the direct check that the edge anchor was not pruned.
-   uint32_t delivered_dellog_count(name account, uint64_t scan_until = 64) {
+   uint32_t delivered_dellog_count(name account, uint64_t scan_until = TABLE_SCAN_LIMIT) {
       uint32_t n = 0;
       for (uint64_t id = 0; id < scan_until; ++id) {
          auto data = get_row_by_account(OPREG_ACCOUNT, OPREG_ACCOUNT, "dellog"_n, name{id});
@@ -450,16 +573,51 @@ public:
          ("config_timestamp_ms", uint64_t{0}));
    }
 
+   /// Reconfigure only the rolling-termination rails while preserving the WNS-16 fixture's
+   /// collateral requirements. This lets the test build real history under a permissive policy,
+   /// then demonstrate that deferred slashing wins when the same history becomes terminating.
+   void set_termination_thresholds(uint32_t max_consecutive_misses, uint32_t max_percent_misses) {
+      constexpr uint32_t MAX_AVAILABLE_PRODUCERS    = 21;
+      constexpr uint32_t MAX_AVAILABLE_BATCH_OPERATORS = 63;
+      constexpr uint32_t MAX_AVAILABLE_UNDERWRITERS = 21;
+      constexpr uint64_t TERMINATE_PRUNE_DELAY_MS   = 600'000;
+      constexpr uint64_t TERMINATE_WINDOW_MS        = 24ULL * 60 * 60 * 1000;
+
+      BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT,
+         opreg_actions::SET_CONFIG, mvo()
+            (opreg_config_fields::MAX_AVAILABLE_PRODUCERS,          MAX_AVAILABLE_PRODUCERS)
+            (opreg_config_fields::MAX_AVAILABLE_BATCH_OPERATORS,    MAX_AVAILABLE_BATCH_OPERATORS)
+            (opreg_config_fields::MAX_AVAILABLE_UNDERWRITERS,       MAX_AVAILABLE_UNDERWRITERS)
+            (opreg_config_fields::TERMINATE_PRUNE_DELAY_MS,         TERMINATE_PRUNE_DELAY_MS)
+            (opreg_config_fields::TERMINATE_MAX_CONSECUTIVE_MISSES, max_consecutive_misses)
+            (opreg_config_fields::TERMINATE_MAX_PERCENT_MISSES_24H, max_percent_misses)
+            (opreg_config_fields::TERMINATE_WINDOW_MS,              TERMINATE_WINDOW_MS)
+            (opreg_config_fields::REQUIRED_PRODUCER_COLLATERAL,     fc::variants{})
+            (opreg_config_fields::REQUIRED_BATCH_OPERATOR_COLLATERAL, fc::variants{
+               make_chain_min_bond(ETH_CHAIN_CODE, ETH_CHAIN_CODE, BATCH_OPERATOR_MINIMUM_COLLATERAL),
+               make_chain_min_bond(SOL_CHAIN_CODE, SOL_CHAIN_CODE, BATCH_OPERATOR_MINIMUM_COLLATERAL) })
+            (opreg_config_fields::REQUIRED_UNDERWRITER_COLLATERAL,  fc::variants{})));
+   }
+
+   /// Once every active outpost has a durable consensus row for the current epoch, trigger the
+   /// production `chkcons -> advance` route that records delivery history and evaluates termination.
+   void advance_via_consensus() {
+      BOOST_REQUIRE_EQUAL(success(), push(MSGCH_ACCOUNT, msgch_abi, MSGCH_ACCOUNT,
+                                         msgch_actions::CHECK_CONSENSUS, mvo()));
+      produce_blocks();
+   }
+
    /// Inline collateral credit (the path sysio.msgch drives in production; pushed directly here) that
    /// lifts a non-bootstrapped operator to ACTIVE once its bond meets the configured minimum.
    action_result depositinle(name account, std::string_view chain_code, std::string_view token_code,
-                             uint64_t amount) {
+                             uint64_t amount,
+                             opp::types::ChainKind actor_chain = opp::types::ChainKind::CHAIN_KIND_EVM) {
       return push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "depositinle"_n, mvo()
          ("account",             account.to_string())
          ("chain_code",          codename_mvo(chain_code))
          ("token_code",          codename_mvo(token_code))
          ("amount",              amount)
-         ("actor_chain",         opp::types::ChainKind::CHAIN_KIND_EVM)
+         ("actor_chain",         actor_chain)
          ("actor_address",       std::vector<char>{})
          ("original_message_id", std::string(64, '0')));
    }
@@ -517,7 +675,7 @@ public:
       produce_blocks();
    }
 
-   abi_serializer sysio_abi, token_abi, epoch_abi, opreg_abi, msgch_abi, chains_abi, uwrit_abi;
+   abi_serializer sysio_abi, token_abi, epoch_abi, opreg_abi, msgch_abi, chalg_abi, chains_abi, uwrit_abi;
 };
 
 // ---------------------------------------------------------------------------
@@ -1124,6 +1282,139 @@ BOOST_FIXTURE_TEST_CASE(late_confirmation_after_consensus_recorded, sysio_msgch_
       BOOST_REQUIRE_EQUAL(opc["envelope_digest"].as_string(), winner_digest.str());
       BOOST_REQUIRE_EQUAL(attestation_count(ETH_OUTPOST_ID, epoch), 1u);
    }
+} FC_LOG_AND_RETHROW() }
+
+/// WNS-16: a non-canonical delivery must be slashed before its historical
+/// miss window can terminate it. The fixture builds its historical anchor and
+/// miss through real `chkcons -> advance` transitions, then lowers the
+/// consecutive-miss threshold before the divergent epoch. Pre-fix, `termcheck`
+/// marked BATCHOP TERMINATED before `slashop` rejected that state and rolled
+/// the entire epoch back.
+BOOST_FIXTURE_TEST_CASE(noncanonical_delivery_slashes_before_termination, sysio_msgch_chain_tester) { try {
+   constexpr uint32_t kBatchOperatorCount                  = 3;
+   constexpr uint32_t kExpectedInitialEpoch                = 1;
+   constexpr uint32_t kPermissiveMaxConsecutiveMisses      = 5;
+   constexpr uint32_t kPermissiveMaxPercentMisses          = 99;
+   constexpr uint32_t kTerminatingMaxConsecutiveMisses     = 1;
+   constexpr const char* kHistoricalAnchorPayload          = "history-anchor";
+   constexpr const char* kHistoricalMissPayload            = "history-miss";
+   constexpr const char* kCanonicalPayload                 = "canonical";
+   constexpr const char* kNonCanonicalPayload              = "non-canonical";
+   constexpr uint32_t kExpectedSlashActionsPerOutpost      = 1;
+   constexpr uint32_t kEpochAdvanceCount                   = 1;
+   constexpr uint32_t kExpectedDeliveredLogCount           = 4;
+
+   bootstrap(/*n_batch_ops=*/kBatchOperatorCount, /*batchop_is_bootstrapped=*/false);
+   BOOST_REQUIRE_EQUAL(kExpectedInitialEpoch, current_epoch());
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE,
+                       get_operator(BATCHOP)[opreg_fields::STATUS]
+                          .as<opp::types::OperatorStatus>());
+   {
+      auto state = read_epoch_state();
+      auto groups = state[epoch_fields::BATCH_OP_GROUPS].get_array();
+      auto active_group =
+         groups[state[epoch_fields::CURRENT_BATCH_OP_GROUP].as_uint64()].get_array();
+      bool batchop_is_scheduled = false;
+      for (const auto& member : active_group) {
+         if (member.as_string() == BATCHOP.to_string()) batchop_is_scheduled = true;
+      }
+      BOOST_REQUIRE(batchop_is_scheduled);
+   }
+
+   // Create reachable history under permissive rails. The first epoch's canonical anchor prevents
+   // the 99% percent rail from terminating BATCHOP while the next epoch records two real misses
+   // (one per active outpost) through advance()'s inline recorddel/termcheck calls.
+   set_termination_thresholds(kPermissiveMaxConsecutiveMisses, kPermissiveMaxPercentMisses);
+   const uint32_t anchor_epoch = current_epoch();
+   const auto historical_anchor = encode_delivery(anchor_epoch, kHistoricalAnchorPayload);
+   const auto historical_anchor_digest = oracle::epoch_digest(decode_envelope(historical_anchor));
+   const auto historical_anchor_message_id = delivery_message_id(historical_anchor);
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP,   ETH_OUTPOST_ID, historical_anchor));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP,   SOL_OUTPOST_ID, historical_anchor));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, historical_anchor));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, SOL_OUTPOST_ID, historical_anchor));
+   elapse_epoch_boundary();
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, ETH_OUTPOST_ID, historical_anchor));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, SOL_OUTPOST_ID, historical_anchor));
+   advance_via_consensus();
+   BOOST_REQUIRE_EQUAL(anchor_epoch + kEpochAdvanceCount, current_epoch());
+
+   const uint32_t missed_epoch = current_epoch();
+   const auto historical_miss = encode_delivery(
+      missed_epoch, kHistoricalMissPayload,
+      oracle::digest_bytes(historical_anchor_digest), historical_anchor_message_id);
+   const auto historical_miss_digest = oracle::epoch_digest(decode_envelope(historical_miss));
+   const auto historical_miss_message_id = delivery_message_id(historical_miss);
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, historical_miss));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, SOL_OUTPOST_ID, historical_miss));
+   elapse_epoch_boundary();
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, ETH_OUTPOST_ID, historical_miss));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, SOL_OUTPOST_ID, historical_miss));
+   advance_via_consensus();
+   BOOST_REQUIRE_EQUAL(missed_epoch + kEpochAdvanceCount, current_epoch());
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE,
+                       get_operator(BATCHOP)[opreg_fields::STATUS]
+                          .as<opp::types::OperatorStatus>());
+
+   // The accumulated real misses are now terminating. A non-canonical delivery is still recorded
+   // as delivered, so only slash-first ordering prevents termcheck from blocking this advance.
+   set_termination_thresholds(kTerminatingMaxConsecutiveMisses, kPermissiveMaxPercentMisses);
+
+   const uint32_t epoch = current_epoch();
+   const auto canonical = encode_delivery(
+      epoch, kCanonicalPayload,
+      oracle::digest_bytes(historical_miss_digest), historical_miss_message_id);
+   const auto divergent = encode_delivery(
+      epoch, kNonCanonicalPayload,
+      oracle::digest_bytes(historical_miss_digest), historical_miss_message_id);
+   const auto canonical_checksum = fc::sha256::hash(canonical.data(), canonical.size());
+   const auto divergent_checksum = fc::sha256::hash(divergent.data(), divergent.size());
+   BOOST_REQUIRE_NE(canonical_checksum, divergent_checksum);
+
+   // Stage the split deliveries for both outposts before the boundary. BATCHOP
+   // is non-canonical everywhere, so `advance` must deduplicate it before
+   // invoking slashop: a second opreg::slash throws and would roll the epoch
+   // advance back. BATCHOP_B/C establish canonical consensus after the boundary.
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP,   ETH_OUTPOST_ID, divergent));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP,   SOL_OUTPOST_ID, divergent));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, canonical));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, SOL_OUTPOST_ID, canonical));
+   elapse_epoch_boundary();
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, ETH_OUTPOST_ID, canonical));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, SOL_OUTPOST_ID, canonical));
+   {
+      auto eth_consensus = get_outpcons(ETH_OUTPOST_ID);
+      BOOST_REQUIRE(!eth_consensus.is_null());
+      BOOST_REQUIRE_EQUAL(epoch, eth_consensus[msgch_fields::EPOCH_INDEX].as<uint32_t>());
+      BOOST_REQUIRE_EQUAL(canonical_checksum.str(),
+                          eth_consensus[msgch_fields::WINNING_CHECKSUM].as_string());
+      auto divergent_delivery = find_inbound_delivery(ETH_OUTPOST_ID, epoch, BATCHOP);
+      BOOST_REQUIRE(!divergent_delivery.is_null());
+      BOOST_REQUIRE_EQUAL(divergent_checksum.str(),
+                          divergent_delivery[msgch_fields::CHECKSUM].as_string());
+   }
+   {
+      auto sol_consensus = get_outpcons(SOL_OUTPOST_ID);
+      BOOST_REQUIRE(!sol_consensus.is_null());
+      BOOST_REQUIRE_EQUAL(epoch, sol_consensus[msgch_fields::EPOCH_INDEX].as<uint32_t>());
+      BOOST_REQUIRE_EQUAL(canonical_checksum.str(),
+                          sol_consensus[msgch_fields::WINNING_CHECKSUM].as_string());
+      auto divergent_delivery = find_inbound_delivery(SOL_OUTPOST_ID, epoch, BATCHOP);
+      BOOST_REQUIRE(!divergent_delivery.is_null());
+      BOOST_REQUIRE_EQUAL(divergent_checksum.str(),
+                          divergent_delivery[msgch_fields::CHECKSUM].as_string());
+   }
+   advance_via_consensus();
+
+   auto op = get_operator(BATCHOP);
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_SLASHED,
+                       op[opreg_fields::STATUS].as<opp::types::OperatorStatus>());
+   BOOST_REQUIRE_EQUAL(kExpectedSlashActionsPerOutpost,
+                       slash_action_count(BATCHOP, ETH_OUTPOST_ID));
+   BOOST_REQUIRE_EQUAL(kExpectedSlashActionsPerOutpost,
+                       slash_action_count(BATCHOP, SOL_OUTPOST_ID));
+   BOOST_REQUIRE_EQUAL(epoch + kEpochAdvanceCount, current_epoch());
+   BOOST_REQUIRE_EQUAL(kExpectedDeliveredLogCount, delivered_dellog_count(BATCHOP));
 } FC_LOG_AND_RETHROW() }
 
 // SEC-28 (huang review): terminate on the CONSECUTIVE-miss rail through the REAL rotation -- a
