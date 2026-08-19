@@ -5,19 +5,72 @@
 
 #include <sysio/sysio.hpp>
 
+#include <set>
 #include <utility>
 
 namespace sysiosystem {
+
+namespace {
+
+constexpr char producer_not_registered_error[] = "producer is not registered";
+constexpr char producer_not_active_error[] = "producer is not active";
+constexpr char producer_rank_too_high_error[] = "producer rank exceeds maximum for snapshot providers";
+
+/// Classifies the producer-table state that determines snapshot-provider eligibility.
+enum class snapshot_producer_eligibility {
+   eligible,
+   inactive,
+   rank_exceeds_maximum,
+};
+
+/// Returns the eligibility of a producer record for snapshot-provider registration and voting.
+snapshot_producer_eligibility get_snapshot_producer_eligibility(const producer_info& producer) {
+   if (!producer.active()) {
+      return snapshot_producer_eligibility::inactive;
+   }
+   if (producer.rank > max_snap_provider_rank) {
+      return snapshot_producer_eligibility::rank_exceeds_maximum;
+   }
+   return snapshot_producer_eligibility::eligible;
+}
+
+/// Requires the producer's current table state to permit snapshot-provider registration or voting.
+void require_snapshot_producer_eligibility(const producers_table& producers, name producer) {
+   const auto prod_itr = producers.require_find(producer_key_t{producer.value}, producer_not_registered_error);
+   const auto eligibility = get_snapshot_producer_eligibility(*prod_itr);
+   check(eligibility != snapshot_producer_eligibility::inactive, producer_not_active_error);
+   check(eligibility != snapshot_producer_eligibility::rank_exceeds_maximum, producer_rank_too_high_error);
+}
+
+using eligible_snapshot_producers = std::set<uint64_t>;
+
+/// Collects the producers that currently have both an eligible producer record and a provider mapping.
+eligible_snapshot_producers collect_eligible_snapshot_producers(const snap_providers_table& providers,
+                                                                 const producers_table& producers) {
+   eligible_snapshot_producers eligible;
+   for (auto provider_itr = providers.begin(); provider_itr != providers.end(); ++provider_itr) {
+      const auto producer_key = producer_key_t{provider_itr->producer.value};
+      if (!producers.contains(producer_key)) {
+         continue;
+      }
+      if (get_snapshot_producer_eligibility(producers.get(producer_key))
+          == snapshot_producer_eligibility::eligible) {
+         eligible.emplace(provider_itr->producer.value);
+      }
+   }
+   return eligible;
+}
+
+} // namespace
 
 // -------------------------------------------------------------------------------------------------
 void snapshot_attest::regsnapprov(name producer, name snap_account) {
    require_auth(producer);
 
-   // Validate producer is registered and rank <= max_snap_provider_rank
+   // Validate the producer's current eligibility. A retained mapping must never give an inactive
+   // or demoted producer a way to re-enter snapshot voting.
    producers_table producers(get_self());
-   auto prod_itr = producers.require_find(producer_key_t{producer.value}, "producer is not registered");
-   check(prod_itr->rank <= max_snap_provider_rank,
-         "producer rank exceeds maximum for snapshot providers");
+   require_snapshot_producer_eligibility(producers, producer);
 
    // Ensure snap_account is not already registered
    snap_providers_table provs(get_self());
@@ -75,6 +128,11 @@ void snapshot_attest::votesnaphash(name snap_account, checksum256 block_id, chec
    check(prov_itr != provs.end(), "snap_account is not a registered snapshot provider");
    const name producer = prov_itr->producer;
 
+   // Provider mappings are historical records. Revalidate the delegating producer at vote time so
+   // unregistration or a rank change revokes voting rights without requiring a separate cleanup action.
+   producers_table producers(get_self());
+   require_snapshot_producer_eligibility(producers, producer);
+
    uint32_t block_num = block_info::block_height_from_id(block_id);
    check(block_num > 0, "invalid block_id");
 
@@ -98,9 +156,8 @@ void snapshot_attest::votesnaphash(name snap_account, checksum256 block_id, chec
    snap_votes_table votes(get_self());
    auto by_bn = votes.get_index<"byblocknum"_n>();
 
-   uint64_t vote_id     = 0;
-   uint32_t voter_count = 0;
-   bool     found       = false;
+   uint64_t vote_id = 0;
+   bool     found   = false;
    for (auto itr = by_bn.lower_bound(static_cast<uint64_t>(block_num));
         itr != by_bn.end() && itr->block_num == block_num; ++itr) {
       if (itr->block_id == block_id && itr->snapshot_hash == snapshot_hash) {
@@ -109,9 +166,8 @@ void snapshot_attest::votesnaphash(name snap_account, checksum256 block_id, chec
          for (const auto& v : itr->voters) {
             check(v != producer, "producer has already voted for this snapshot");
          }
-         vote_id     = itr->id;
-         voter_count = static_cast<uint32_t>(itr->voters.size()) + 1;
-         found       = true;
+         vote_id = itr->id;
+         found   = true;
          break;
       }
    }
@@ -129,25 +185,33 @@ void snapshot_attest::votesnaphash(name snap_account, checksum256 block_id, chec
          row.snapshot_hash = snapshot_hash;
          row.voters        = {producer};
       });
-      voter_count = 1;
+      vote_id = new_id;
    }
 
-   // Check quorum
+   // Count only producers that are currently eligible and still have a provider mapping. The same
+   // set governs the denominator and pending voters, so an old vote cannot survive a deactivation,
+   // demotion, or provider removal to help satisfy quorum later.
+   const auto eligible_producers = collect_eligible_snapshot_producers(provs, producers);
+   uint32_t voter_count = 0;
+   const auto current_vote = votes.get(snap_vote_key_t{vote_id});
+   for (const auto& voter : current_vote.voters) {
+      if (eligible_producers.find(voter.value) != eligible_producers.end()) {
+         ++voter_count;
+      }
+   }
+
+   // Check quorum.
    snap_config_singleton cfg_singleton(get_self());
    snap_config cfg = cfg_singleton.get_or_default(snap_config{});
 
-   // Count total registered providers.
-   // O(n) iteration is acceptable here: max_snap_provider_rank (30) bounds the table size.
-   uint32_t provider_count = 0;
-   for (auto itr = provs.begin(); itr != provs.end(); ++itr) {
-      ++provider_count;
-   }
+   const uint32_t provider_count = static_cast<uint32_t>(eligible_producers.size());
 
    // Byzantine-safe quorum floor: under the standard < N/3 fault assumption an attestation must
-   // carry more than N/3 of registered providers, so a Byzantine minority cannot on its own attest
-   // an arbitrary (block_id, snapshot_hash) — and, combined with the disagreement reject above,
-   // cannot win the race to quorum. Enforced independently of the governance-set min_providers /
-   // threshold_pct (which could be misconfigured as low as 1, allowing a single-provider attest).
+   // carry more than N/3 of currently eligible providers, so a Byzantine minority cannot on its
+   // own attest an arbitrary (block_id, snapshot_hash) — and, combined with the disagreement reject
+   // above, cannot win the race to quorum. Enforced independently of the governance-set
+   // min_providers / threshold_pct (which could be misconfigured as low as 1, allowing a
+   // single-provider attest).
    const uint32_t bft_floor = provider_count / 3 + 1;
    uint32_t quorum = std::max(std::max(cfg.min_providers,
                                        (provider_count * cfg.threshold_pct + 99) / 100),

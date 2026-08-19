@@ -131,9 +131,11 @@ Storage uses the KV table API (`sysio::kv::table` / `sysio::kv::global`).
 ### Registration
 
 A producer calls `regsnapprov` to designate a separate `snap_account` as its snapshot
-provider. The producer must be registered (via `regproducer`) and ranked at or below
-`max_snap_provider_rank` (30). Delegating to a separate account decouples authority: the
-producer's keys never have to live on the snapshot node -- only the snap_account's key does.
+provider. The producer must be registered (via `regproducer`), active, and ranked at or below
+`max_snap_provider_rank` (30). The same eligibility is revalidated when the provider votes, so a
+retained mapping does not preserve voting authority after producer deactivation or rank demotion.
+Delegating to a separate account decouples authority: the producer's keys never have to live on
+the snapshot node -- only the snap_account's key does.
 
 Either party can call `delsnapprov` to end the relationship. The action looks the mapping up
 in both directions, so it works whether invoked by the snap_account (deregistering itself) or
@@ -145,16 +147,20 @@ After computing a snapshot, a provider calls `votesnaphash(snap_account, block_i
 snapshot_hash)`. The contract checks that `snap_account` is a registered provider, derives
 `block_num` from `block_id`, and accumulates the vote.
 
-A hash is attested when the number of distinct providers voting for the same
+A hash is attested when the number of distinct, currently eligible providers voting for the same
 `(block_num, block_id, snapshot_hash)` tuple reaches:
 
 ```
-quorum = max(min_providers, ceil(registered_providers * threshold_pct / 100))
+quorum = max(min_providers, ceil(eligible_providers * threshold_pct / 100))
 ```
 
 - `min_providers` is a hard floor (default 1; raised for mainnet) set by `setsnpcfg`.
-- `threshold_pct` is the share of registered providers required (default 67, i.e.
+- `threshold_pct` is the share of currently eligible providers required (default 67, i.e.
   two-thirds).
+
+The quorum numerator uses the same current eligibility set. A vote cast before its producer is
+deactivated, demoted, or removed from `snapprovs` does not continue to count toward a later
+attestation.
 
 The floor guarantees a minimum number of attestors even on a small network; the percentage
 makes the quorum scale with participation.

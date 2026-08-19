@@ -14,7 +14,7 @@ namespace sysiosystem {
 using sysio::checksum256;
 using sysio::name;
 
-// Max producer rank eligible to register as snapshot provider
+// Max producer rank eligible to register and vote as a snapshot provider.
 static constexpr uint32_t max_snap_provider_rank = 30;
 
 // Error code for snapshot attestation disagreement (snapshot hash or block id differs from the
@@ -113,7 +113,10 @@ struct [[sysio::contract("sysio.system")]] snapshot_attest : public sysio::contr
 
    /**
     * Register a snapshot provider account delegated by a producer.
-    * The producer must be registered and have rank <= max_snap_provider_rank.
+    *
+    * The producer must be active and have rank <= max_snap_provider_rank. A retained provider
+    * mapping does not preserve eligibility: votes revalidate the producer's current active state
+    * and rank.
     */
    [[sysio::action]]
    void regsnapprov(name producer, name snap_account);
@@ -126,10 +129,13 @@ struct [[sysio::contract("sysio.system")]] snapshot_attest : public sysio::contr
    void delsnapprov(name account);
 
    /**
-    * Submit a snapshot hash vote. Votes aggregate per (block_num, block_id, snapshot_hash);
-    * when quorum is reached, creates an attested snap_record and purges older votes.
-    * Rejects with snap_hash_disagreement_error when an attested record already exists for the
-    * height and either the snapshot hash or the block id differs from it.
+    * Submit a snapshot hash vote from a currently active, rank-eligible provider.
+    *
+    * Votes aggregate per (block_num, block_id, snapshot_hash) and derive both the quorum
+    * denominator and numerator from currently eligible provider mappings. When quorum is reached,
+    * creates an attested snap_record and purges older votes. Rejects with
+    * snap_hash_disagreement_error when an attested record already exists for the height and either
+    * the snapshot hash or the block id differs from it.
     */
    [[sysio::action]]
    void votesnaphash(name snap_account, checksum256 block_id, checksum256 snapshot_hash);
@@ -138,9 +144,9 @@ struct [[sysio::contract("sysio.system")]] snapshot_attest : public sysio::contr
     * Update snapshot attestation configuration. Requires contract authority.
     *
     * @param min_providers  minimum voters required to attest (must be >= 1).
-    * @param threshold_pct  percentage of registered providers required (1..100).
+    * @param threshold_pct  percentage of currently eligible providers required (1..100).
     *
-    * For N registered providers the effective quorum is
+    * For N currently eligible providers the effective quorum is
     *     max( max(min_providers, ceil(N * threshold_pct / 100)), floor(N/3) + 1 )
     * The trailing floor(N/3)+1 is a Byzantine safety floor (see votesnaphash): an attestation
     * must always carry more than N/3 providers so a misconfigured-low threshold cannot let a

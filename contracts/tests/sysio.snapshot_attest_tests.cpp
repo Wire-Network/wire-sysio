@@ -64,6 +64,12 @@ public:
          ("account", account));
    }
 
+   // Helper: deactivate a producer while retaining its producer-table row.
+   action_result unregproducer(name producer) {
+      return push_action(producer, "unregprod"_n, mvo()
+         ("producer", producer));
+   }
+
    // Helper: vote on a snapshot hash
    action_result votesnaphash(name snap_account, const fc::sha256& block_id, const fc::sha256& snapshot_hash) {
       return push_action(snap_account, "votesnaphash"_n, mvo()
@@ -178,6 +184,14 @@ BOOST_FIXTURE_TEST_CASE(regsnapprov_rank_too_high, snapshot_attest_tester) { try
                         regsnapprov("highrank"_n, "snapprov1"_n));
 } FC_LOG_AND_RETHROW() }
 
+BOOST_FIXTURE_TEST_CASE(regsnapprov_rejects_inactive_producer, snapshot_attest_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), unregproducer("producer1"_n));
+
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("producer is not active"),
+                        regsnapprov("producer1"_n, "snapprov1"_n));
+   BOOST_REQUIRE(get_snap_provider("snapprov1"_n).is_null());
+} FC_LOG_AND_RETHROW() }
+
 // ---------------------------------------------------------------------------
 // delsnapprov tests
 // ---------------------------------------------------------------------------
@@ -239,6 +253,66 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_unregistered, snapshot_attest_tester) { try
    auto shash = make_snap_hash(1);
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("snap_account is not a registered snapshot provider"),
                         votesnaphash("snapprov1"_n, bid, shash));
+} FC_LOG_AND_RETHROW() }
+
+// CertiK WNS-17 / WIRE-350: unregprod retains the producer row and its provider mapping, but the
+// mapping must not retain voting authority after the producer is inactive.
+BOOST_FIXTURE_TEST_CASE(votesnaphash_rejects_provider_after_producer_unregistered, snapshot_attest_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
+   BOOST_REQUIRE_EQUAL(success(), unregproducer("producer1"_n));
+
+   const auto bid = make_block_id(9000);
+   const auto hash = make_snap_hash(9);
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("producer is not active"),
+                        votesnaphash("snapprov1"_n, bid, hash));
+   BOOST_REQUIRE(getsnaphash(9000).is_null());
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(votesnaphash_rejects_provider_after_producer_rank_demotion, snapshot_attest_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
+   BOOST_REQUIRE_EQUAL(success(), setrank("producer1"_n, 31));
+
+   const auto bid = make_block_id(9001);
+   const auto hash = make_snap_hash(10);
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("producer rank exceeds maximum for snapshot providers"),
+                        votesnaphash("snapprov1"_n, bid, hash));
+   BOOST_REQUIRE(getsnaphash(9001).is_null());
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(votesnaphash_excludes_inactive_providers_from_quorum, snapshot_attest_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer3"_n, "snapprov3"_n));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1, 67));
+   BOOST_REQUIRE_EQUAL(success(), unregproducer("producer3"_n));
+
+   const auto bid = make_block_id(9002);
+   const auto hash = make_snap_hash(11);
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, bid, hash));
+   BOOST_REQUIRE(getsnaphash(9002).is_null());
+
+   // Only producer1 and producer2 are currently eligible, so their second vote reaches N = 2 quorum.
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, bid, hash));
+   BOOST_REQUIRE(!getsnaphash(9002).is_null());
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(votesnaphash_excludes_inactive_pending_voters_from_quorum, snapshot_attest_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer3"_n, "snapprov3"_n));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2, 1));
+
+   const auto bid = make_block_id(9003);
+   const auto hash = make_snap_hash(12);
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, bid, hash));
+   BOOST_REQUIRE_EQUAL(success(), unregproducer("producer1"_n));
+
+   // producer1's pending vote is stale, so producer2 alone must not attest the snapshot.
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, bid, hash));
+   BOOST_REQUIRE(getsnaphash(9003).is_null());
+
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov3"_n, bid, hash));
+   BOOST_REQUIRE(!getsnaphash(9003).is_null());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(votesnaphash_single_no_quorum, snapshot_attest_tester) { try {
