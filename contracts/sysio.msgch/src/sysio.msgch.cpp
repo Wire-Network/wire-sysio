@@ -141,6 +141,30 @@ uint64_t mint_att_id(name self) {
 /// Falls back to the configured size when the schedule has not been materialized yet
 /// (`schbatchgps` has not run) or when the active group is empty -- an empty group has no
 /// deliveries to count, so the fallback only avoids reporting a zero-sized electorate.
+/// The group size the configuration ASKS for, which is the security policy the chain was
+/// bootstrapped with rather than the roster it happens to have right now.
+uint32_t epoch_configured_group_size() {
+   epoch::epochcfg_t tbl(EPOCH_ACCOUNT);
+   return tbl.exists() ? tbl.get().operators_per_epoch : 7;
+}
+
+/// Smallest electorate allowed to settle an epoch: a strict majority of the CONFIGURED group.
+///
+/// The thresholds scale with the serving group so a short group is not stuck asking for more
+/// deliveries than it has members. Scaling alone, though, would let an arbitrarily small group
+/// speak for the whole chain -- a single surviving operator satisfies "all of the group agreed"
+/// on its own and would become authoritative for everything this outpost delivers inbound.
+///
+/// So the serving group must ALSO carry more than half the configured group before it may settle
+/// anything. Below that the epoch simply does not reach consensus, which costs this outpost's
+/// inbound stream until the roster recovers and costs epoch advancement nothing: `advance` reads
+/// the winner only to classify deliveries for slashing and tolerates its absence ("an outpost that
+/// never reached a winner"). Paused inbound traffic is recoverable; an envelope accepted on one
+/// operator's say-so is not.
+uint32_t min_consensus_electorate() {
+   return epoch_configured_group_size() / 2 + 1;
+}
+
 uint32_t epoch_operators_per_group() {
    epoch::epochstate_t state_tbl(EPOCH_ACCOUNT);
    if (state_tbl.exists()) {
@@ -1439,6 +1463,18 @@ void msgch::evalcons(uint64_t chain_code, uint32_t epoch_index) {
    }
 
    uint32_t operators_per_group = epoch_operators_per_group();
+
+   // Electorate floor: a group too far below its configured size does not speak for the chain.
+   // Returning here leaves the epoch un-consensused, exactly as an undelivered epoch would be, so
+   // a later delivery re-enters and a recovered roster resumes settlement with no operator action.
+   if (operators_per_group < min_consensus_electorate()) {
+      sysio::print_f(
+         "msgch::evalcons: outpost %llu epoch %u -- serving group of %u is below the minimum "
+         "electorate %u (configured group %u); consensus withheld until the roster recovers\n",
+         chain_code, epoch_index, operators_per_group, min_consensus_electorate(),
+         epoch_configured_group_size());
+      return;
+   }
 
    // Consensus check
    bool consensus_reached = false;

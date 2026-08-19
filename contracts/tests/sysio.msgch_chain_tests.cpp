@@ -1060,6 +1060,42 @@ BOOST_FIXTURE_TEST_CASE(inbound_bootstrap_accepts_unverifiable_prev, sysio_msgch
    BOOST_REQUIRE_EQUAL(attestation_count(SOL_OUTPOST_ID, epoch), 1u);
 } FC_LOG_AND_RETHROW() }
 
+// A group too far below its configured size may NOT settle an epoch, however few members it has
+// left. Scaling the threshold to the serving group without this floor would let a lone survivor
+// satisfy "the whole group agreed" by itself and become authoritative for everything this outpost
+// delivers inbound -- so the serving group must carry more than half the configured group before
+// it settles anything. Three of a configured seven is below that floor (7 / 2 + 1 = 4), and so is
+// every smaller group, including a single operator.
+//
+// Withholding consensus costs this outpost's inbound stream until the roster recovers, and costs
+// epoch advancement nothing: `advance` reads the winner only to classify deliveries for slashing
+// and tolerates its absence.
+BOOST_FIXTURE_TEST_CASE(sub_floor_group_cannot_settle_an_epoch, sysio_msgch_chain_tester) { try {
+   bootstrap(/*n_batch_ops=*/3);   // a scheduled group of three
+
+   BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "setconfig"_n, mvo()
+      ("epoch_duration_sec",                  EPOCH_DURATION_SEC)
+      ("operators_per_epoch",                 7)
+      ("batch_operator_minimum_active",       7)
+      ("batch_op_groups",                     1)
+      ("epoch_retention_envelope_log_count",  200)));
+
+   const uint32_t epoch  = current_epoch();
+   auto           winner = encode_delivery(epoch, "sub-floor");
+
+   // Every operator on duty delivers the SAME envelope: unanimity within the serving group, which
+   // is precisely the shape a lone survivor would present. It still must not settle.
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP,   ETH_OUTPOST_ID, winner));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, winner));
+   elapse_epoch_boundary();
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, ETH_OUTPOST_ID, winner));
+   produce_blocks();
+
+   auto opc = get_outpcons(ETH_OUTPOST_ID);
+   BOOST_REQUIRE(opc.is_null() || !opc["consensus_reached"].as<bool>());
+} FC_LOG_AND_RETHROW() }
+
+
 // Consensus thresholds measure the group that is SERVING, not the group size the config asks
 // for. `sysio.epoch::advance` admits a short tail group rather than aborting -- aborting would
 // halt OPP epoch advancement chain-wide -- so the two diverge whenever batch operators are
@@ -1072,12 +1108,14 @@ BOOST_FIXTURE_TEST_CASE(short_group_reaches_consensus_on_its_own_size, sysio_msg
 
    // Raise the CONFIGURED size without rescheduling. `setconfig` pins the rotation length once a
    // schedule is materialized but not the group size, so the live group keeps its three members
-   // while the config now asks for seven -- the same divergence a run of terminations produces,
-   // without having to drive the terminations.
+   // while the config now asks for five -- the same divergence a run of terminations produces,
+   // without having to drive the terminations. Three of a configured five still carries the
+   // electorate floor (5 / 2 + 1 = 3), so this group may settle; the case below is the one that
+   // may not.
    BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "setconfig"_n, mvo()
       ("epoch_duration_sec",                  EPOCH_DURATION_SEC)
-      ("operators_per_epoch",                 7)
-      ("batch_operator_minimum_active",       7)
+      ("operators_per_epoch",                 5)
+      ("batch_operator_minimum_active",       5)
       ("batch_op_groups",                     1)
       ("epoch_retention_envelope_log_count",  200)));
 
@@ -1089,7 +1127,7 @@ BOOST_FIXTURE_TEST_CASE(short_group_reaches_consensus_on_its_own_size, sysio_msg
    elapse_epoch_boundary();
 
    // Two of the three operators on duty is a majority of the serving group. Against the
-   // configured seven it is neither a majority nor unanimity, so this delivery settles the epoch
+   // configured five it is neither a majority nor unanimity, so this delivery settles the epoch
    // only because the threshold follows the group that is actually serving.
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, winner));
    produce_blocks();
