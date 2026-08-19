@@ -118,11 +118,6 @@ uint64_t mint_att_id(name self) {
    return out;
 }
 
-uint32_t epoch_operators_per_group() {
-   epoch::epochcfg_t tbl(EPOCH_ACCOUNT);
-   return tbl.exists() ? tbl.get().operators_per_epoch : 7;
-}
-
 /// Size of the ACTIVE batch-operator group -- the set that can actually deliver for the current
 /// epoch. Every consensus threshold derives from THIS, never from the configured
 /// `operators_per_epoch`.
@@ -151,9 +146,10 @@ uint32_t epoch_operators_per_group() {
 /// delivers -> 2 of a 2-member group, with C never heard from). Numerator and denominator come from
 /// this one snapshot so they cannot diverge.
 ///
-/// Empty when epoch state is unreadable or the group cursor is out of range. That is fail-closed
-/// rather than falling back to the configured size: `deliver` requires `is_batch_operator_active`,
-/// which requires the same epoch state, so there is nothing to tally in that window anyway.
+/// Empty when epoch state is unreadable or the group cursor is out of range. That is fail-closed:
+/// `deliver` requires `is_batch_operator_active`, which requires the same epoch state, so there is
+/// nothing to tally in that window anyway. There is deliberately no configured-size fallback --
+/// `epochcfg.operators_per_epoch` sizes the schedule, it does not describe who can deliver now.
 std::vector<name> eligible_batch_operators() {
    epoch::epochstate_t tbl(EPOCH_ACCOUNT);
    if (!tbl.exists()) return {};

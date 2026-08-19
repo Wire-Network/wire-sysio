@@ -185,9 +185,10 @@ public:
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT,
          "setconfig"_n, mvo()
             ("epoch_duration_sec",                  EPOCH_DURATION_SEC)
-            // Consensus group size: evalcons' unanimous/majority thresholds derive from
-            // `epochcfg.operators_per_epoch` (see msgch's epoch_operators_per_group). The epoch
-            // contract enforces minimum_active == operators_per_epoch * batch_op_groups.
+            // Sizes the SCHEDULE, not the consensus threshold: evalcons derives its thresholds
+            // from the live eligible group (msgch's `eligible_batch_operators`), so tests that
+            // shrink the eligible set below this value still reach consensus. The epoch contract
+            // enforces minimum_active == operators_per_epoch * batch_op_groups.
             ("operators_per_epoch",                 n_batch_ops)
             ("batch_operator_minimum_active",       n_batch_ops)
             ("batch_op_groups",                     1)
