@@ -673,13 +673,58 @@ void epoch::advance() {
       for (size_t i = 0; i < pool.size() && new_tail.size() < cfg.operators_per_epoch; ++i) {
          new_tail.push_back(pool[i].first);
       }
-      // An empty or short new tail is a degraded but non-fatal state: batch
-      // operators were terminated faster than replacements could activate.
-      // Aborting advance() here would halt OPP epoch advancement chain-wide,
-      // leaving manual operator-roster repair as the only recovery -- so the
-      // window keeps its N groups (this one possibly empty) and the shortfall
-      // is reported instead. The empty group is also visible cross-chain in
-      // the BatchOperatorGroups attestation built below.
+
+      // Backfill from operators already resident in the surviving groups when fresh faces run
+      // out, preferring the bootstrapped ones the network runs itself.
+      //
+      // The pool above deliberately excludes residents so the rotation moves through the roster.
+      // Taken alone that makes the tail as small as the supply of unseen operators, and a short
+      // group is not merely cosmetic: every consensus threshold is a fraction of the group that
+      // can deliver, so a group of one lets one operator settle an epoch by itself. Worse, the
+      // recovery story does not hold -- registering replacements does not touch the current
+      // group, and only `advance` reseats groups, so a group too small to reach consensus stops
+      // `chkcons` from ever authorizing the `advance` that would replace it.
+      //
+      // Backfilling inverts the preference on purpose: rotation prefers operators the network
+      // does NOT run, and the fallback prefers the ones it does. Serving in two groups at once
+      // is the cost, and it is the right cost -- it is bounded, it lands on the network's own
+      // operators first, and it keeps the electorate at full size so a short ROSTER is the only
+      // thing that can produce a short group.
+      if (new_tail.size() < cfg.operators_per_epoch) {
+         std::vector<std::pair<name, bool>> fallback;
+         for (auto it = status_idx.lower_bound(
+                 magic_enum::enum_integer(OperatorStatus::OPERATOR_STATUS_ACTIVE));
+              it != status_idx.end() &&
+              it->status == OperatorStatus::OPERATOR_STATUS_ACTIVE; ++it) {
+            if (it->type != OperatorType::OPERATOR_TYPE_BATCH) continue;
+            bool already_scheduled = false;
+            for (const auto& picked : new_tail) {
+               if (picked == it->account) { already_scheduled = true; break; }
+            }
+            if (!already_scheduled) fallback.push_back({it->account, it->is_bootstrapped});
+         }
+         std::sort(fallback.begin(), fallback.end(),
+            [](const auto& a, const auto& b) {
+               if (a.second != b.second) return a.second; // bootstrapped FIRST -- the fallback
+               return a.first < b.first;
+            });
+         for (size_t i = 0; i < fallback.size() && new_tail.size() < cfg.operators_per_epoch; ++i) {
+            new_tail.push_back(fallback[i].first);
+         }
+         if (!new_tail.empty() && new_tail.size() < cfg.operators_per_epoch) {
+            sysio::print("sysio.epoch::advance: batch operator roster cannot fill a group of ",
+                         cfg.operators_per_epoch, " at epoch ",
+                         state.current_epoch_index + cfg.batch_op_groups - 1,
+                         " even after backfill -- scheduling ", new_tail.size(),
+                         "; operator roster needs attention\n");
+         }
+      }
+
+      // An empty new tail means the roster holds no ACTIVE batch operator at all, so even the
+      // backfill above found nothing. Aborting advance() here would halt OPP epoch advancement
+      // chain-wide, leaving manual operator-roster repair as the only recovery -- so the window
+      // keeps its N groups (this one empty) and the shortfall is reported instead. The empty
+      // group is also visible cross-chain in the BatchOperatorGroups attestation built below.
       if (new_tail.empty()) {
          sysio::print("sysio.epoch::advance: no eligible batch operators for "
                       "the new tail group at epoch ",
