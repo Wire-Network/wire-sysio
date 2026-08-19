@@ -47,5 +47,5 @@ Path to an Ethereum contract ABI file (relative from current working directory o
 ## Minimum Configuration
 To successfully start the application, the following are required:
 1.  At least **one** Ethereum signature provider.
-2.  At least **one** Ethereum outpost client, from the unified file or legacy option.
+2.  At least **one** Ethereum outpost client, from the unified file or CLI option.
 3.  At least **one** Ethereum ABI file reference.
