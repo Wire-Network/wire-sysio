@@ -565,16 +565,14 @@ void epoch::advance() {
       // operator is marked SLASHED.
       //
       // Invariant — no cross-epoch double slash: opreg::slash THROWS on an already-SLASHED operator,
-      // which would abort advance and stall OPP epoch advancement. A slashed operator is guaranteed
-      // never to reappear in a later expiring group, so advance never attempts a second slash of it:
-      //   1. this flush runs BEFORE the window-slide below, so the operator is already SLASHED when
-      //      the next tail group is formed;
-      //   2. the new-tail filter pulls OPERATOR_STATUS_ACTIVE operators only (see the schedule slide
-      //      below), so a SLASHED operator is excluded from every newly-formed group; and
-      //   3. resident-exclusion keeps an operator in at most one group within the window, so the
-      //      operator slashed for THIS (expiring) group is not also sitting in a future
-      //      already-scheduled group.
-      // If any of those three scheduling facts change, this single-slash path must be revisited.
+      // which would abort advance and stall OPP epoch advancement. These inline slashes execute only
+      // after advance returns, so the schedule slide below can temporarily place a just-slashed
+      // operator in its new tail while the operator still reads ACTIVE. That member cannot create a
+      // later non-canonical observation: sysio.msgch::deliver requires its current sysio.opreg status
+      // to be ACTIVE before accepting delivery. Once the slash has executed, the scheduled SLASHED
+      // member cannot deliver or be queued for another non-canonical-delivery slash. The collection
+      // above also deduplicates multiple non-canonical observations for one member in this advance.
+      // Keep the deliver status gate and this single-slash path in sync if either behavior changes.
       for (const auto& member : to_slash) {
          action(
             permission_level{get_self(), "owner"_n},
