@@ -58,6 +58,69 @@ using fc::slug_name_literals::operator""_s;
 
 constexpr uint64_t ETH_OUTPOST_ID = "ETH"_s.value;
 constexpr uint64_t SOL_OUTPOST_ID = "SOL"_s.value;
+constexpr std::string_view ETH_CHAIN_CODE = "ETH";
+constexpr std::string_view SOL_CHAIN_CODE = "SOL";
+constexpr uint64_t BATCH_OPERATOR_MINIMUM_COLLATERAL = 1;
+constexpr uint64_t TABLE_SCAN_LIMIT = 64;
+
+/// sysio.opreg action identifiers used by the WNS-16 fixture.
+namespace opreg_actions {
+constexpr name SET_CONFIG = "setconfig"_n;
+} // namespace opreg_actions
+
+/// sysio.opreg ABI field identifiers used by the WNS-16 fixture.
+namespace opreg_fields {
+constexpr const char* STATUS         = "status";
+constexpr const char* RECENT_ACTIONS = "recent_actions";
+constexpr const char* ACTION         = "action";
+constexpr const char* ACTION_TYPE    = "action_type";
+constexpr const char* SUCCESS        = "success";
+constexpr const char* CHAIN_CODE     = "chain_code";
+} // namespace opreg_fields
+
+/// sysio.opreg configuration ABI field identifiers used by the WNS-16 fixture.
+namespace opreg_config_fields {
+constexpr const char* MAX_AVAILABLE_PRODUCERS          = "max_available_producers";
+constexpr const char* MAX_AVAILABLE_BATCH_OPERATORS    = "max_available_batch_ops";
+constexpr const char* MAX_AVAILABLE_UNDERWRITERS       = "max_available_underwriters";
+constexpr const char* TERMINATE_PRUNE_DELAY_MS         = "terminate_prune_delay_ms";
+constexpr const char* TERMINATE_MAX_CONSECUTIVE_MISSES = "terminate_max_consecutive_misses";
+constexpr const char* TERMINATE_MAX_PERCENT_MISSES_24H = "terminate_max_pct_misses_24h";
+constexpr const char* TERMINATE_WINDOW_MS              = "terminate_window_ms";
+constexpr const char* REQUIRED_PRODUCER_COLLATERAL     = "req_prod_collat";
+constexpr const char* REQUIRED_BATCH_OPERATOR_COLLATERAL = "req_batchop_collat";
+constexpr const char* REQUIRED_UNDERWRITER_COLLATERAL  = "req_uw_collat";
+} // namespace opreg_config_fields
+
+/// sysio.msgch action identifiers used by the WNS-16 fixture.
+namespace msgch_actions {
+constexpr name CHECK_CONSENSUS = "chkcons"_n;
+} // namespace msgch_actions
+
+/// sysio.msgch table identifiers used by the WNS-16 fixture.
+namespace msgch_tables {
+constexpr name ENVELOPES = "envelopes"_n;
+} // namespace msgch_tables
+
+/// sysio.msgch ABI type identifiers used by the WNS-16 fixture.
+namespace msgch_abi_types {
+constexpr const char* ENVELOPE_ENTRY = "envelope_entry";
+} // namespace msgch_abi_types
+
+/// sysio.msgch ABI field identifiers used by the WNS-16 fixture.
+namespace msgch_fields {
+constexpr const char* CHAIN_CODE    = "chain_code";
+constexpr const char* EPOCH_INDEX   = "epoch_index";
+constexpr const char* BATCH_OP_NAME = "batch_op_name";
+constexpr const char* WINNING_CHECKSUM = "winning_checksum";
+constexpr const char* CHECKSUM         = "checksum";
+} // namespace msgch_fields
+
+/// sysio.epoch ABI field identifiers used by the WNS-16 fixture.
+namespace epoch_fields {
+constexpr const char* BATCH_OP_GROUPS       = "batch_op_groups";
+constexpr const char* CURRENT_BATCH_OP_GROUP = "current_batch_op_group";
+} // namespace epoch_fields
 
 } // anonymous namespace
 
@@ -95,6 +158,7 @@ public:
       });
       produce_blocks(2);
 
+      deploy(CHALG_ACCOUNT,  contracts::chalg_wasm(),  contracts::chalg_abi(),  chalg_abi);
       deploy(EPOCH_ACCOUNT,  contracts::epoch_wasm(),  contracts::epoch_abi(),  epoch_abi);
       deploy(OPREG_ACCOUNT,  contracts::opreg_wasm(),  contracts::opreg_abi(),  opreg_abi);
       deploy(MSGCH_ACCOUNT,  contracts::msgch_wasm(),  contracts::msgch_abi(),  msgch_abi);
@@ -178,20 +242,24 @@ public:
             ("pay_cadence_epochs",     uint16_t(1))));
    }
 
-   /// Epoch + opreg config, bootstrapped batch ops (`BATCHOP` always; `BATCHOP_B`/`BATCHOP_C` when
-   /// `n_batch_ops` is 3 -- a single group of three, so consensus needs more than one delivery),
-   /// ETH + SOL chain rows, group schedule, genesis advance.
-   void bootstrap(uint32_t n_batch_ops = 1) {
+   /// Epoch + opreg config, a configurable `BATCHOP` plus bootstrapped `BATCHOP_B`/`BATCHOP_C` when
+   /// `n_batch_ops` is 3 (a single group of three, so consensus needs more than one delivery), ETH +
+   /// SOL chain rows, group schedule, and genesis advance.
+   /// `n_groups` splits the registered batch ops across that many rotation groups, so a
+   /// group's members are resident and excluded from the next tail -- the condition under
+   /// which `advance` has to backfill. Defaults to one group, i.e. every op on duty.
+   void bootstrap(uint32_t n_batch_ops = 1, bool batchop_is_bootstrapped = true,
+                  uint32_t n_groups = 1) {
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT,
          "setconfig"_n, mvo()
             ("epoch_duration_sec",                  EPOCH_DURATION_SEC)
-            // Consensus group size: evalcons' unanimous/majority thresholds derive from the
-            // SERVING group's size (see msgch's epoch_operators_per_group). Config and serving
-            // size coincide here because every registered batch op is scheduled. The epoch
-            // contract enforces minimum_active == operators_per_epoch * batch_op_groups.
-            ("operators_per_epoch",                 n_batch_ops)
+            // Sizes the SCHEDULE, not the consensus threshold: evalcons derives its thresholds
+            // from the live eligible group (msgch's `eligible_batch_operators`), so tests that
+            // shrink the eligible set below this value still reach consensus. The epoch contract
+            // enforces minimum_active == operators_per_epoch * batch_op_groups.
+            ("operators_per_epoch",                 n_batch_ops / n_groups)
             ("batch_operator_minimum_active",       n_batch_ops)
-            ("batch_op_groups",                     1)
+            ("batch_op_groups",                     n_groups)
             ("epoch_retention_envelope_log_count",  200)));
 
       BOOST_REQUIRE_EQUAL(success(), setemitcfg_defaults());
@@ -209,7 +277,16 @@ public:
             ("terminate_max_pct_misses_24h",     5)
             ("terminate_window_ms",              uint64_t{24ULL * 60 * 60 * 1000})
             ("req_prod_collat",                  fc::variants{})
-            ("req_batchop_collat",               fc::variants{})
+            // Empty collateral requirements intentionally keep non-bootstrapped
+            // operators UNKNOWN. Give the WNS-16 fixture's non-bootstrapped
+            // operator the one-unit ETH and SOL requirements it satisfies below.
+            ("req_batchop_collat",               batchop_is_bootstrapped
+                                                   ? fc::variants{}
+                                                   : fc::variants{
+                                                        make_chain_min_bond(ETH_CHAIN_CODE, ETH_CHAIN_CODE,
+                                                                            BATCH_OPERATOR_MINIMUM_COLLATERAL),
+                                                        make_chain_min_bond(SOL_CHAIN_CODE, SOL_CHAIN_CODE,
+                                                                            BATCH_OPERATOR_MINIMUM_COLLATERAL) })
             ("req_uw_collat",                    fc::variants{})));
 
       std::vector<name> batch_ops{BATCHOP};
@@ -222,11 +299,21 @@ public:
             "regoperator"_n, mvo()
                ("account",          op.to_string())
                ("type",             opp::types::OperatorType::OPERATOR_TYPE_BATCH)
-               ("is_bootstrapped",  true)));
+               ("is_bootstrapped",  op == BATCHOP ? batchop_is_bootstrapped : true)));
       }
 
-      register_chain(opp::types::ChainKind::CHAIN_KIND_EVM, "ETH", 31337);
-      register_chain(opp::types::ChainKind::CHAIN_KIND_SVM, "SOL", 1);
+      register_chain(opp::types::ChainKind::CHAIN_KIND_EVM, ETH_CHAIN_CODE, 31337);
+      register_chain(opp::types::ChainKind::CHAIN_KIND_SVM, SOL_CHAIN_CODE, 1);
+
+      // A non-bootstrapped batch operator starts UNKNOWN and becomes ACTIVE
+      // only after a collateral update re-evaluates its role eligibility.
+      if (!batchop_is_bootstrapped) {
+         BOOST_REQUIRE_EQUAL(success(), depositinle(BATCHOP, ETH_CHAIN_CODE, ETH_CHAIN_CODE,
+                                                    BATCH_OPERATOR_MINIMUM_COLLATERAL));
+         BOOST_REQUIRE_EQUAL(success(), depositinle(BATCHOP, SOL_CHAIN_CODE, SOL_CHAIN_CODE,
+                                                    BATCH_OPERATOR_MINIMUM_COLLATERAL,
+                                                    opp::types::ChainKind::CHAIN_KIND_SVM));
+      }
 
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT,
          "schbatchgps"_n, mvo()));
@@ -325,11 +412,28 @@ public:
          abi_serializer::create_yield_function(abi_serializer_max_time));
    }
 
+   /// Inbound delivery metadata for one (outpost, epoch, batch operator), or null when absent.
+   /// Consensus deliberately clears only raw_data, leaving this row for advance() to classify.
+   fc::variant find_inbound_delivery(uint64_t chain_code, uint32_t epoch_index, name batch_op,
+                                     uint64_t scan_until = TABLE_SCAN_LIMIT) {
+      for (uint64_t id = 0; id < scan_until; ++id) {
+         auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, msgch_tables::ENVELOPES, id);
+         if (data.empty()) continue;
+         auto row = msgch_abi.binary_to_variant(
+            msgch_abi_types::ENVELOPE_ENTRY, data,
+            abi_serializer::create_yield_function(abi_serializer_max_time));
+         if (row[msgch_fields::CHAIN_CODE].as_uint64() == chain_code &&
+             row[msgch_fields::EPOCH_INDEX].as<uint32_t>() == epoch_index &&
+             row[msgch_fields::BATCH_OP_NAME].as_string() == batch_op.to_string()) return row;
+      }
+      return fc::variant{};
+   }
+
    /// Count attestation rows recorded for (`chain_code`, `epoch_index`); the observable effect
    /// of an ACCEPTED inbound envelope (rows are emplaced before dispatch, even for types
    /// dispatch drops as out of scope).
    uint32_t attestation_count(uint64_t chain_code, uint32_t epoch_index,
-                              uint64_t scan_until = 64) {
+                              uint64_t scan_until = TABLE_SCAN_LIMIT) {
       uint32_t n = 0;
       for (uint64_t id = 0; id < scan_until; ++id) {
          auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "attestations"_n, id);
@@ -393,10 +497,33 @@ public:
          "operator_entry", data, abi_serializer::create_yield_function(abi_serializer_max_time));
    }
 
+   /// Count successful SLASH audit entries for `account` routed to `chain_code`.
+   /// opreg emits and logs one action for each immediately slashable collateral balance.
+   uint32_t slash_action_count(name account, uint64_t chain_code) {
+      auto op = get_operator(account);
+      if (op.is_null()) return 0;
+
+      using operator_action_type = sysio::opp::attestations::OperatorAction_ActionType;
+      uint32_t n = 0;
+      for (const auto& log : op[opreg_fields::RECENT_ACTIONS].get_array()) {
+         operator_action_type action_type =
+            sysio::opp::attestations::OperatorAction_ActionType_ACTION_TYPE_UNKNOWN;
+         const auto& action = log[opreg_fields::ACTION];
+         const bool is_slash =
+            sysio::opp::attestations::OperatorAction_ActionType_Parse(
+               action[opreg_fields::ACTION_TYPE].as_string(), &action_type) &&
+            action_type == sysio::opp::attestations::OperatorAction_ActionType_ACTION_TYPE_SLASH;
+         if (!log[opreg_fields::SUCCESS].as_bool() || !is_slash ||
+             action[opreg_fields::CHAIN_CODE].as_uint64() != chain_code) continue;
+         ++n;
+      }
+      return n;
+   }
+
    /// Count DELIVERED dellog rows still present for `account`. recorddel PRUNES (erases) rows that
    /// have aged out of the rolling window, so a surviving delivered row proves that record is still
    /// inside the window -- the direct check that the edge anchor was not pruned.
-   uint32_t delivered_dellog_count(name account, uint64_t scan_until = 64) {
+   uint32_t delivered_dellog_count(name account, uint64_t scan_until = TABLE_SCAN_LIMIT) {
       uint32_t n = 0;
       for (uint64_t id = 0; id < scan_until; ++id) {
          auto data = get_row_by_account(OPREG_ACCOUNT, OPREG_ACCOUNT, "dellog"_n, name{id});
@@ -451,16 +578,51 @@ public:
          ("config_timestamp_ms", uint64_t{0}));
    }
 
+   /// Reconfigure only the rolling-termination rails while preserving the WNS-16 fixture's
+   /// collateral requirements. This lets the test build real history under a permissive policy,
+   /// then demonstrate that deferred slashing wins when the same history becomes terminating.
+   void set_termination_thresholds(uint32_t max_consecutive_misses, uint32_t max_percent_misses) {
+      constexpr uint32_t MAX_AVAILABLE_PRODUCERS    = 21;
+      constexpr uint32_t MAX_AVAILABLE_BATCH_OPERATORS = 63;
+      constexpr uint32_t MAX_AVAILABLE_UNDERWRITERS = 21;
+      constexpr uint64_t TERMINATE_PRUNE_DELAY_MS   = 600'000;
+      constexpr uint64_t TERMINATE_WINDOW_MS        = 24ULL * 60 * 60 * 1000;
+
+      BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT,
+         opreg_actions::SET_CONFIG, mvo()
+            (opreg_config_fields::MAX_AVAILABLE_PRODUCERS,          MAX_AVAILABLE_PRODUCERS)
+            (opreg_config_fields::MAX_AVAILABLE_BATCH_OPERATORS,    MAX_AVAILABLE_BATCH_OPERATORS)
+            (opreg_config_fields::MAX_AVAILABLE_UNDERWRITERS,       MAX_AVAILABLE_UNDERWRITERS)
+            (opreg_config_fields::TERMINATE_PRUNE_DELAY_MS,         TERMINATE_PRUNE_DELAY_MS)
+            (opreg_config_fields::TERMINATE_MAX_CONSECUTIVE_MISSES, max_consecutive_misses)
+            (opreg_config_fields::TERMINATE_MAX_PERCENT_MISSES_24H, max_percent_misses)
+            (opreg_config_fields::TERMINATE_WINDOW_MS,              TERMINATE_WINDOW_MS)
+            (opreg_config_fields::REQUIRED_PRODUCER_COLLATERAL,     fc::variants{})
+            (opreg_config_fields::REQUIRED_BATCH_OPERATOR_COLLATERAL, fc::variants{
+               make_chain_min_bond(ETH_CHAIN_CODE, ETH_CHAIN_CODE, BATCH_OPERATOR_MINIMUM_COLLATERAL),
+               make_chain_min_bond(SOL_CHAIN_CODE, SOL_CHAIN_CODE, BATCH_OPERATOR_MINIMUM_COLLATERAL) })
+            (opreg_config_fields::REQUIRED_UNDERWRITER_COLLATERAL,  fc::variants{})));
+   }
+
+   /// Once every active outpost has a durable consensus row for the current epoch, trigger the
+   /// production `chkcons -> advance` route that records delivery history and evaluates termination.
+   void advance_via_consensus() {
+      BOOST_REQUIRE_EQUAL(success(), push(MSGCH_ACCOUNT, msgch_abi, MSGCH_ACCOUNT,
+                                         msgch_actions::CHECK_CONSENSUS, mvo()));
+      produce_blocks();
+   }
+
    /// Inline collateral credit (the path sysio.msgch drives in production; pushed directly here) that
    /// lifts a non-bootstrapped operator to ACTIVE once its bond meets the configured minimum.
    action_result depositinle(name account, std::string_view chain_code, std::string_view token_code,
-                             uint64_t amount) {
+                             uint64_t amount,
+                             opp::types::ChainKind actor_chain = opp::types::ChainKind::CHAIN_KIND_EVM) {
       return push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "depositinle"_n, mvo()
          ("account",             account.to_string())
          ("chain_code",          codename_mvo(chain_code))
          ("token_code",          codename_mvo(token_code))
          ("amount",              amount)
-         ("actor_chain",         opp::types::ChainKind::CHAIN_KIND_EVM)
+         ("actor_chain",         actor_chain)
          ("actor_address",       std::vector<char>{})
          ("original_message_id", std::string(64, '0')));
    }
@@ -518,7 +680,7 @@ public:
       produce_blocks();
    }
 
-   abi_serializer sysio_abi, token_abi, epoch_abi, opreg_abi, msgch_abi, chains_abi, uwrit_abi;
+   abi_serializer sysio_abi, token_abi, epoch_abi, opreg_abi, msgch_abi, chalg_abi, chains_abi, uwrit_abi;
 };
 
 // ---------------------------------------------------------------------------
@@ -1060,85 +1222,6 @@ BOOST_FIXTURE_TEST_CASE(inbound_bootstrap_accepts_unverifiable_prev, sysio_msgch
    BOOST_REQUIRE_EQUAL(attestation_count(SOL_OUTPOST_ID, epoch), 1u);
 } FC_LOG_AND_RETHROW() }
 
-// A group too far below its configured size may NOT settle an epoch, however few members it has
-// left. Scaling the threshold to the serving group without this floor would let a lone survivor
-// satisfy "the whole group agreed" by itself and become authoritative for everything this outpost
-// delivers inbound -- so the serving group must carry more than half the configured group before
-// it settles anything. Three of a configured seven is below that floor (7 / 2 + 1 = 4), and so is
-// every smaller group, including a single operator.
-//
-// Withholding consensus costs this outpost's inbound stream until the roster recovers, and costs
-// epoch advancement nothing: `advance` reads the winner only to classify deliveries for slashing
-// and tolerates its absence.
-BOOST_FIXTURE_TEST_CASE(sub_floor_group_cannot_settle_an_epoch, sysio_msgch_chain_tester) { try {
-   bootstrap(/*n_batch_ops=*/3);   // a scheduled group of three
-
-   BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "setconfig"_n, mvo()
-      ("epoch_duration_sec",                  EPOCH_DURATION_SEC)
-      ("operators_per_epoch",                 7)
-      ("batch_operator_minimum_active",       7)
-      ("batch_op_groups",                     1)
-      ("epoch_retention_envelope_log_count",  200)));
-
-   const uint32_t epoch  = current_epoch();
-   auto           winner = encode_delivery(epoch, "sub-floor");
-
-   // Every operator on duty delivers the SAME envelope: unanimity within the serving group, which
-   // is precisely the shape a lone survivor would present. It still must not settle.
-   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP,   ETH_OUTPOST_ID, winner));
-   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, winner));
-   elapse_epoch_boundary();
-   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, ETH_OUTPOST_ID, winner));
-   produce_blocks();
-
-   auto opc = get_outpcons(ETH_OUTPOST_ID);
-   BOOST_REQUIRE(opc.is_null() || !opc["consensus_reached"].as<bool>());
-} FC_LOG_AND_RETHROW() }
-
-
-// Consensus thresholds measure the group that is SERVING, not the group size the config asks
-// for. `sysio.epoch::advance` admits a short tail group rather than aborting -- aborting would
-// halt OPP epoch advancement chain-wide -- so the two diverge whenever batch operators are
-// terminated faster than replacements activate. Measured against the configured size, a short
-// group reaches NEITHER threshold: the unanimous path wants a full group's worth of identical
-// deliveries and the majority path wants more than half of a group that large, so every epoch
-// that group serves stalls, with no dispute either (that needs three variants).
-BOOST_FIXTURE_TEST_CASE(short_group_reaches_consensus_on_its_own_size, sysio_msgch_chain_tester) { try {
-   bootstrap(/*n_batch_ops=*/3);   // a scheduled group of three
-
-   // Raise the CONFIGURED size without rescheduling. `setconfig` pins the rotation length once a
-   // schedule is materialized but not the group size, so the live group keeps its three members
-   // while the config now asks for five -- the same divergence a run of terminations produces,
-   // without having to drive the terminations. Three of a configured five still carries the
-   // electorate floor (5 / 2 + 1 = 3), so this group may settle; the case below is the one that
-   // may not.
-   BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "setconfig"_n, mvo()
-      ("epoch_duration_sec",                  EPOCH_DURATION_SEC)
-      ("operators_per_epoch",                 5)
-      ("batch_operator_minimum_active",       5)
-      ("batch_op_groups",                     1)
-      ("epoch_retention_envelope_log_count",  200)));
-
-   const uint32_t epoch  = current_epoch();
-   auto           winner = encode_delivery(epoch, "short-group");
-   const auto     winner_digest = oracle::epoch_digest(decode_envelope(winner));
-
-   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, winner));
-   elapse_epoch_boundary();
-
-   // Two of the three operators on duty is a majority of the serving group. Against the
-   // configured five it is neither a majority nor unanimity, so this delivery settles the epoch
-   // only because the threshold follows the group that is actually serving.
-   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, winner));
-   produce_blocks();
-
-   auto opc = get_outpcons(ETH_OUTPOST_ID);
-   BOOST_REQUIRE(!opc.is_null());
-   BOOST_REQUIRE_EQUAL(opc["consensus_reached"].as<bool>(), true);
-   BOOST_REQUIRE_EQUAL(opc["epoch_index"].as<uint32_t>(), epoch);
-   BOOST_REQUIRE_EQUAL(opc["envelope_digest"].as_string(), winner_digest.str());
-} FC_LOG_AND_RETHROW() }
-
 /// Late confirmation: once an epoch's winner is accepted, the per-stream tip advances to the
 /// winner's own digest, so the winner no longer "continues" the chain it just extended. The
 /// remaining operators of the group still deliver the exact accepted bytes (`sysio.epoch::advance`
@@ -1206,6 +1289,139 @@ BOOST_FIXTURE_TEST_CASE(late_confirmation_after_consensus_recorded, sysio_msgch_
    }
 } FC_LOG_AND_RETHROW() }
 
+/// WNS-16: a non-canonical delivery must be slashed before its historical
+/// miss window can terminate it. The fixture builds its historical anchor and
+/// miss through real `chkcons -> advance` transitions, then lowers the
+/// consecutive-miss threshold before the divergent epoch. Pre-fix, `termcheck`
+/// marked BATCHOP TERMINATED before `slashop` rejected that state and rolled
+/// the entire epoch back.
+BOOST_FIXTURE_TEST_CASE(noncanonical_delivery_slashes_before_termination, sysio_msgch_chain_tester) { try {
+   constexpr uint32_t kBatchOperatorCount                  = 3;
+   constexpr uint32_t kExpectedInitialEpoch                = 1;
+   constexpr uint32_t kPermissiveMaxConsecutiveMisses      = 5;
+   constexpr uint32_t kPermissiveMaxPercentMisses          = 99;
+   constexpr uint32_t kTerminatingMaxConsecutiveMisses     = 1;
+   constexpr const char* kHistoricalAnchorPayload          = "history-anchor";
+   constexpr const char* kHistoricalMissPayload            = "history-miss";
+   constexpr const char* kCanonicalPayload                 = "canonical";
+   constexpr const char* kNonCanonicalPayload              = "non-canonical";
+   constexpr uint32_t kExpectedSlashActionsPerOutpost      = 1;
+   constexpr uint32_t kEpochAdvanceCount                   = 1;
+   constexpr uint32_t kExpectedDeliveredLogCount           = 4;
+
+   bootstrap(/*n_batch_ops=*/kBatchOperatorCount, /*batchop_is_bootstrapped=*/false);
+   BOOST_REQUIRE_EQUAL(kExpectedInitialEpoch, current_epoch());
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE,
+                       get_operator(BATCHOP)[opreg_fields::STATUS]
+                          .as<opp::types::OperatorStatus>());
+   {
+      auto state = read_epoch_state();
+      auto groups = state[epoch_fields::BATCH_OP_GROUPS].get_array();
+      auto active_group =
+         groups[state[epoch_fields::CURRENT_BATCH_OP_GROUP].as_uint64()].get_array();
+      bool batchop_is_scheduled = false;
+      for (const auto& member : active_group) {
+         if (member.as_string() == BATCHOP.to_string()) batchop_is_scheduled = true;
+      }
+      BOOST_REQUIRE(batchop_is_scheduled);
+   }
+
+   // Create reachable history under permissive rails. The first epoch's canonical anchor prevents
+   // the 99% percent rail from terminating BATCHOP while the next epoch records two real misses
+   // (one per active outpost) through advance()'s inline recorddel/termcheck calls.
+   set_termination_thresholds(kPermissiveMaxConsecutiveMisses, kPermissiveMaxPercentMisses);
+   const uint32_t anchor_epoch = current_epoch();
+   const auto historical_anchor = encode_delivery(anchor_epoch, kHistoricalAnchorPayload);
+   const auto historical_anchor_digest = oracle::epoch_digest(decode_envelope(historical_anchor));
+   const auto historical_anchor_message_id = delivery_message_id(historical_anchor);
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP,   ETH_OUTPOST_ID, historical_anchor));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP,   SOL_OUTPOST_ID, historical_anchor));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, historical_anchor));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, SOL_OUTPOST_ID, historical_anchor));
+   elapse_epoch_boundary();
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, ETH_OUTPOST_ID, historical_anchor));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, SOL_OUTPOST_ID, historical_anchor));
+   advance_via_consensus();
+   BOOST_REQUIRE_EQUAL(anchor_epoch + kEpochAdvanceCount, current_epoch());
+
+   const uint32_t missed_epoch = current_epoch();
+   const auto historical_miss = encode_delivery(
+      missed_epoch, kHistoricalMissPayload,
+      oracle::digest_bytes(historical_anchor_digest), historical_anchor_message_id);
+   const auto historical_miss_digest = oracle::epoch_digest(decode_envelope(historical_miss));
+   const auto historical_miss_message_id = delivery_message_id(historical_miss);
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, historical_miss));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, SOL_OUTPOST_ID, historical_miss));
+   elapse_epoch_boundary();
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, ETH_OUTPOST_ID, historical_miss));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, SOL_OUTPOST_ID, historical_miss));
+   advance_via_consensus();
+   BOOST_REQUIRE_EQUAL(missed_epoch + kEpochAdvanceCount, current_epoch());
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE,
+                       get_operator(BATCHOP)[opreg_fields::STATUS]
+                          .as<opp::types::OperatorStatus>());
+
+   // The accumulated real misses are now terminating. A non-canonical delivery is still recorded
+   // as delivered, so only slash-first ordering prevents termcheck from blocking this advance.
+   set_termination_thresholds(kTerminatingMaxConsecutiveMisses, kPermissiveMaxPercentMisses);
+
+   const uint32_t epoch = current_epoch();
+   const auto canonical = encode_delivery(
+      epoch, kCanonicalPayload,
+      oracle::digest_bytes(historical_miss_digest), historical_miss_message_id);
+   const auto divergent = encode_delivery(
+      epoch, kNonCanonicalPayload,
+      oracle::digest_bytes(historical_miss_digest), historical_miss_message_id);
+   const auto canonical_checksum = fc::sha256::hash(canonical.data(), canonical.size());
+   const auto divergent_checksum = fc::sha256::hash(divergent.data(), divergent.size());
+   BOOST_REQUIRE_NE(canonical_checksum, divergent_checksum);
+
+   // Stage the split deliveries for both outposts before the boundary. BATCHOP
+   // is non-canonical everywhere, so `advance` must deduplicate it before
+   // invoking slashop: a second opreg::slash throws and would roll the epoch
+   // advance back. BATCHOP_B/C establish canonical consensus after the boundary.
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP,   ETH_OUTPOST_ID, divergent));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP,   SOL_OUTPOST_ID, divergent));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, canonical));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, SOL_OUTPOST_ID, canonical));
+   elapse_epoch_boundary();
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, ETH_OUTPOST_ID, canonical));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, SOL_OUTPOST_ID, canonical));
+   {
+      auto eth_consensus = get_outpcons(ETH_OUTPOST_ID);
+      BOOST_REQUIRE(!eth_consensus.is_null());
+      BOOST_REQUIRE_EQUAL(epoch, eth_consensus[msgch_fields::EPOCH_INDEX].as<uint32_t>());
+      BOOST_REQUIRE_EQUAL(canonical_checksum.str(),
+                          eth_consensus[msgch_fields::WINNING_CHECKSUM].as_string());
+      auto divergent_delivery = find_inbound_delivery(ETH_OUTPOST_ID, epoch, BATCHOP);
+      BOOST_REQUIRE(!divergent_delivery.is_null());
+      BOOST_REQUIRE_EQUAL(divergent_checksum.str(),
+                          divergent_delivery[msgch_fields::CHECKSUM].as_string());
+   }
+   {
+      auto sol_consensus = get_outpcons(SOL_OUTPOST_ID);
+      BOOST_REQUIRE(!sol_consensus.is_null());
+      BOOST_REQUIRE_EQUAL(epoch, sol_consensus[msgch_fields::EPOCH_INDEX].as<uint32_t>());
+      BOOST_REQUIRE_EQUAL(canonical_checksum.str(),
+                          sol_consensus[msgch_fields::WINNING_CHECKSUM].as_string());
+      auto divergent_delivery = find_inbound_delivery(SOL_OUTPOST_ID, epoch, BATCHOP);
+      BOOST_REQUIRE(!divergent_delivery.is_null());
+      BOOST_REQUIRE_EQUAL(divergent_checksum.str(),
+                          divergent_delivery[msgch_fields::CHECKSUM].as_string());
+   }
+   advance_via_consensus();
+
+   auto op = get_operator(BATCHOP);
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_SLASHED,
+                       op[opreg_fields::STATUS].as<opp::types::OperatorStatus>());
+   BOOST_REQUIRE_EQUAL(kExpectedSlashActionsPerOutpost,
+                       slash_action_count(BATCHOP, ETH_OUTPOST_ID));
+   BOOST_REQUIRE_EQUAL(kExpectedSlashActionsPerOutpost,
+                       slash_action_count(BATCHOP, SOL_OUTPOST_ID));
+   BOOST_REQUIRE_EQUAL(epoch + kEpochAdvanceCount, current_epoch());
+   BOOST_REQUIRE_EQUAL(kExpectedDeliveredLogCount, delivered_dellog_count(BATCHOP));
+} FC_LOG_AND_RETHROW() }
+
 // SEC-28 (huang review): terminate on the CONSECUTIVE-miss rail through the REAL rotation -- a
 // materialized three-group schedule driven by advance() with one outpost, at exactly the minimum
 // window the span bound accepts. A resident operator is on duty once per three-epoch rotation, and
@@ -1268,6 +1484,194 @@ BOOST_FIXTURE_TEST_CASE(terminate_at_duty_rotation_via_advance, sysio_msgch_chai
       }
    }
    BOOST_REQUIRE(terminated);
+} FC_LOG_AND_RETHROW() }
+
+// WNS-15(a) / WNS-08 (WIRE-346 / WIRE-322): consensus thresholds must derive from the group that
+// can ACTUALLY deliver, not from the configured `operators_per_epoch`.
+//
+// The resident group is a snapshot; `deliver` additionally requires current opreg ACTIVE status, so
+// slashing a member shrinks the deliverable set without shrinking the snapshot. With the configured
+// size still 3, the pre-fix thresholds were both unreachable for the surviving two: unanimity
+// required 3 deliveries, and the boundary-majority path required `count > 3/2`, i.e. 3 as well.
+// Consensus was arithmetically impossible and the epoch stalled chain-wide with every remaining
+// operator behaving correctly. CertiK shipped this as
+// sysio_msgch_chain_tests/short_one_member_group_still_uses_configured_three_member_quorum.
+BOOST_FIXTURE_TEST_CASE(short_group_after_slash_still_reaches_consensus, sysio_msgch_chain_tester) { try {
+   bootstrap(/*n_batch_ops=*/3);   // configured operators_per_epoch == 3, resident group == 3
+
+   // Slash one member. It stays in batch_op_groups[current] until the next reschedule, but can no
+   // longer deliver -- so the eligible set is 2 while the configured size is still 3.
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, CHALG_ACCOUNT, "slash"_n,
+      mvo()("account", BATCHOP_C.to_string())("reason", "WNS-15 short-group regression")));
+   produce_blocks();
+
+   const uint32_t epoch = current_epoch();
+   auto envelope = encode_delivery(epoch, "short-group");
+   const auto digest = oracle::epoch_digest(decode_envelope(envelope));
+
+   // The slashed member is refused outright -- it is not merely uncounted.
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: delivering operator is not ACTIVE in sysio.opreg"),
+      deliver_as(BATCHOP_C, ETH_OUTPOST_ID, envelope));
+   produce_blocks();
+
+   // Both surviving members deliver identical bytes: unanimity over the ELIGIBLE group.
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, envelope));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, envelope));
+   produce_blocks();
+
+   auto opc = get_outpcons(ETH_OUTPOST_ID);
+   BOOST_REQUIRE(!opc.is_null());
+   BOOST_REQUIRE_EQUAL(opc["consensus_reached"].as<bool>(), true);
+   BOOST_REQUIRE_EQUAL(opc["epoch_index"].as<uint32_t>(), epoch);
+   BOOST_REQUIRE_EQUAL(opc["envelope_digest"].as_string(), digest.str());
+} FC_LOG_AND_RETHROW() }
+
+// WNS-15(b) / WNS-21 (WIRE-346 / WIRE-354): a majority that forms BEFORE the epoch boundary must
+// still be finalized once the boundary passes.
+//
+// `evalcons` runs only as an inline of `deliver`, and `deliver` rejects a second delivery from the
+// same operator, so before the fix nothing on chain could re-examine a pre-boundary majority once
+// the time gate opened -- the epoch stalled permanently even though the votes were already cast and
+// unanimous among those who voted. `chkcons` (permissionless, cranked every tick) now re-drives
+// `evalcons` for every outpost still lacking a current-epoch consensus row.
+//
+// Note the re-drive lands as an inline AFTER chkcons returns, so the row appears on the following
+// block -- this test asserts exactly that ordering rather than same-transaction settlement.
+BOOST_FIXTURE_TEST_CASE(pre_boundary_majority_finalized_by_chkcons_crank, sysio_msgch_chain_tester) { try {
+   bootstrap(/*n_batch_ops=*/3);
+
+   const uint32_t epoch = current_epoch();
+   auto envelope = encode_delivery(epoch, "pre-boundary-majority");
+   const auto digest = oracle::epoch_digest(decode_envelope(envelope));
+
+   // Two of three agree, all BEFORE the boundary. The unanimous path needs all three, and the
+   // majority path is time-gated, so no consensus is recorded yet.
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, envelope));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, envelope));
+   produce_blocks();
+   {
+      auto opc = get_outpcons(ETH_OUTPOST_ID);
+      BOOST_REQUIRE(opc.is_null() || !opc["consensus_reached"].as<bool>());
+   }
+
+   // The boundary passes with NO further delivery -- the third operator never shows up, and the two
+   // that did are barred from delivering again. This is the stall state.
+   elapse_epoch_boundary();
+
+   // The permissionless crank re-drives evalcons for the outposts still awaiting consensus.
+   BOOST_REQUIRE_EQUAL(success(), push(MSGCH_ACCOUNT, msgch_abi, BATCHOP, "chkcons"_n, mvo()));
+   produce_blocks();
+
+   auto opc = get_outpcons(ETH_OUTPOST_ID);
+   BOOST_REQUIRE(!opc.is_null());
+   BOOST_REQUIRE_EQUAL(opc["consensus_reached"].as<bool>(), true);
+   BOOST_REQUIRE_EQUAL(opc["epoch_index"].as<uint32_t>(), epoch);
+   BOOST_REQUIRE_EQUAL(opc["envelope_digest"].as_string(), digest.str());
+} FC_LOG_AND_RETHROW() }
+
+// Review follow-up on WNS-15(a): the consensus tally and the threshold must be drawn from the SAME
+// population. Sizing the group to the live set while still counting every delivery row lets a
+// slashed operator's pre-slash vote carry a threshold it is no longer part of:
+//
+//   A delivers X -> A is slashed -> B delivers X
+//   group_size == 2 (B, C), counts[X] == total == 2  ->  Option A accepts,
+//
+// finalizing on A+B even though C -- one of the two currently-ACTIVE members -- never delivered.
+// That is a strictly smaller quorum than the live group, so it must not resolve until C speaks.
+BOOST_FIXTURE_TEST_CASE(slash_after_delivery_does_not_count_toward_consensus, sysio_msgch_chain_tester) { try {
+   bootstrap(/*n_batch_ops=*/3);
+
+   const uint32_t epoch = current_epoch();
+   auto envelope = encode_delivery(epoch, "slash-after-delivery");
+   const auto digest = oracle::epoch_digest(decode_envelope(envelope));
+
+   // A delivers, then loses eligibility. Its row survives in the deliveries table.
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, envelope));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, CHALG_ACCOUNT, "slash"_n,
+      mvo()("account", BATCHOP.to_string())("reason", "WNS-15 slash-after-delivery regression")));
+   produce_blocks();
+
+   // B delivers. Eligible set is {B, C}; only B has delivered among them, so one of two is not a
+   // majority and A's stale row must not make up the difference.
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, envelope));
+   produce_blocks();
+   {
+      auto opc = get_outpcons(ETH_OUTPOST_ID);
+      BOOST_REQUIRE(opc.is_null() || !opc["consensus_reached"].as<bool>());
+   }
+
+   // Past the boundary the answer must still be no: A is not part of the group being counted.
+   elapse_epoch_boundary();
+   BOOST_REQUIRE_EQUAL(success(), push(MSGCH_ACCOUNT, msgch_abi, BATCHOP_B, "chkcons"_n, mvo()));
+   produce_blocks();
+   {
+      auto opc = get_outpcons(ETH_OUTPOST_ID);
+      BOOST_REQUIRE(opc.is_null() || !opc["consensus_reached"].as<bool>());
+   }
+
+   // C delivers: now both eligible members agree and consensus is legitimate.
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, ETH_OUTPOST_ID, envelope));
+   produce_blocks();
+
+   auto opc = get_outpcons(ETH_OUTPOST_ID);
+   BOOST_REQUIRE(!opc.is_null());
+   BOOST_REQUIRE_EQUAL(opc["consensus_reached"].as<bool>(), true);
+   BOOST_REQUIRE_EQUAL(opc["epoch_index"].as<uint32_t>(), epoch);
+   BOOST_REQUIRE_EQUAL(opc["envelope_digest"].as_string(), digest.str());
+} FC_LOG_AND_RETHROW() }
+
+// `advance` fills a new tail from operators NOT resident in the surviving groups, so a roster that
+// cannot field a full group of unseen faces would schedule a short one. A short group is not merely
+// degraded: every consensus threshold is a fraction of the group that can deliver, so a small group
+// lowers the bar for settling an epoch, and a group too small to settle anything stops `chkcons`
+// from ever authorizing the `advance` that would replace it. The tail therefore backfills from
+// operators already resident, preferring the bootstrapped ones the network runs itself.
+BOOST_FIXTURE_TEST_CASE(short_pool_backfills_the_tail_from_resident_operators,
+                        sysio_msgch_chain_tester) { try {
+   // Three operators, one per rotation group: the two off duty are resident and excluded from the
+   // next tail, so the only non-resident candidate is the operator whose group is expiring.
+   bootstrap(/*n_batch_ops=*/3, /*batchop_is_bootstrapped=*/true, /*n_groups=*/3);
+
+   // The operator on duty is the front group's member; its group is the one about to expire.
+   name duty;
+   {
+      auto st = read_epoch_state();
+      BOOST_REQUIRE(!st.is_null());
+      const auto& groups = st["batch_op_groups"].get_array();
+      const auto  cursor = st["current_batch_op_group"].as_uint64();
+      BOOST_REQUIRE(cursor < groups.size());
+      const auto& members = groups[cursor].get_array();
+      BOOST_REQUIRE(!members.empty());
+      duty = name(members[0].as_string());
+   }
+
+   // Slash the one operator that would otherwise fill the new tail, emptying the fresh pool.
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, CHALG_ACCOUNT, "slash"_n,
+      mvo()("account", duty.to_string())("reason", "backfill regression")));
+   produce_blocks();
+
+   // `advance` only rotates once the epoch's wall clock has run out; without this it returns
+   // early and the window is untouched.
+   elapse_epoch_boundary();
+   BOOST_REQUIRE_EQUAL(success(),
+      push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "advance"_n, mvo()));
+   produce_blocks();
+
+   auto st = read_epoch_state();
+   BOOST_REQUIRE(!st.is_null());
+   const auto& groups = st["batch_op_groups"].get_array();
+   BOOST_REQUIRE(!groups.empty());
+   const auto& tail = groups[groups.size() - 1].get_array();
+
+   // Without the backfill this tail is empty -- the state from which no delivery can ever settle
+   // an epoch, and therefore the state no `advance` can ever be authorized to replace.
+   BOOST_REQUIRE_MESSAGE(!tail.empty(), "new tail group is empty: backfill did not run");
+   BOOST_REQUIRE_EQUAL(tail.size(), 1u);
+   BOOST_REQUIRE(name(tail[0].as_string()) != duty);   // the slashed operator is not rescheduled
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()
