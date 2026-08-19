@@ -143,21 +143,31 @@ uint32_t epoch_operators_per_group() {
 /// after a mid-window slash -- the very case WNS-15 names. A missing operator row counts as
 /// not-active, failing closed the same way `deliver` does.
 ///
-/// Falls back to the configured size only when epoch state is unreadable (pre-bootstrap) or the
-/// group cursor is out of range, so behaviour is unchanged before the first schedule exists.
-uint32_t active_batch_op_group_size() {
+/// Returned as the SET, not just a count, because the consensus tally must filter deliveries
+/// through the same membership test that produces the threshold. Counting every delivery row while
+/// sizing the group to the live set mixes two different populations: an operator that delivers and
+/// is then slashed leaves a row behind that would still count toward a threshold it is no longer
+/// part of, letting a strictly smaller set finalize an envelope (A delivers, A is slashed, B
+/// delivers -> 2 of a 2-member group, with C never heard from). Numerator and denominator come from
+/// this one snapshot so they cannot diverge.
+///
+/// Empty when epoch state is unreadable or the group cursor is out of range. That is fail-closed
+/// rather than falling back to the configured size: `deliver` requires `is_batch_operator_active`,
+/// which requires the same epoch state, so there is nothing to tally in that window anyway.
+std::vector<name> eligible_batch_operators() {
    epoch::epochstate_t tbl(EPOCH_ACCOUNT);
-   if (!tbl.exists()) return epoch_operators_per_group();
+   if (!tbl.exists()) return {};
    auto state = tbl.get();
-   if (state.current_batch_op_group >= state.batch_op_groups.size()) return epoch_operators_per_group();
+   if (state.current_batch_op_group >= state.batch_op_groups.size()) return {};
 
-   const auto& members = state.batch_op_groups[state.current_batch_op_group];
    opreg::operators_t ops(OPREG_ACCOUNT);
-   uint32_t eligible = 0;
-   for (const auto& member : members) {
+   std::vector<name> eligible;
+   for (const auto& member : state.batch_op_groups[state.current_batch_op_group]) {
       const auto key = opreg::operator_key{member.value};
       if (!ops.contains(key)) continue;
-      if (ops.get(key).status == opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE) ++eligible;
+      if (ops.get(key).status == opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE) {
+         eligible.push_back(member);
+      }
    }
    return eligible;
 }
@@ -1419,6 +1429,20 @@ void msgch::evalcons(uint64_t chain_code, uint32_t epoch_index) {
       if (d_idx.find(composite) != d_idx.end()) return;
    }
 
+   // The eligible set is resolved BEFORE the tally so both the counts and the threshold come from
+   // one snapshot -- see eligible_batch_operators(). A delivery from an operator that is no longer
+   // eligible is skipped outright rather than counted against a group it is not part of.
+   const std::vector<name> eligible = eligible_batch_operators();
+   if (eligible.empty()) {
+      sysio::print_f("msgch::evalcons: no consensus for (chain=%llu, epoch=%u): no eligible batch operators\n",
+                     chain_code, epoch_index);
+      return;
+   }
+   const uint32_t group_size = static_cast<uint32_t>(eligible.size());
+   const auto is_eligible = [&eligible](const name& op) {
+      return std::find(eligible.begin(), eligible.end(), op) != eligible.end();
+   };
+
    // Group envelopes by checksum, tracking the operators that delivered each version (CDT-compatible
    // parallel vectors). The per-version operator lists become the dispute candidates on a 3+-way
    // split.
@@ -1430,6 +1454,7 @@ void msgch::evalcons(uint64_t chain_code, uint32_t epoch_index) {
 
    for (auto it = oe_idx.lower_bound(composite);
         it != oe_idx.end() && it->by_outpost_epoch() == composite; ++it) {
+      if (!is_eligible(it->batch_op_name)) continue;
       bool found = false;
       for (size_t g = 0; g < seen_checksums.size(); ++g) {
          if (seen_checksums[g] == it->checksum) {
@@ -1446,16 +1471,6 @@ void msgch::evalcons(uint64_t chain_code, uint32_t epoch_index) {
          checksum_operators.push_back(std::vector<name>{it->batch_op_name});
       }
       total_deliveries++;
-   }
-
-   // Thresholds derive from the LIVE active group, not the configured size -- see
-   // active_batch_op_group_size(). A zero-sized group can satisfy no threshold at all; returning
-   // here keeps `agreeing >= 0` from making the first delivery a trivial "majority".
-   const uint32_t group_size = active_batch_op_group_size();
-   if (group_size == 0) {
-      sysio::print_f("msgch::evalcons: no consensus for (chain=%llu, epoch=%u): active batch-operator group is empty\n",
-                     chain_code, epoch_index);
-      return;
    }
 
    // Consensus check

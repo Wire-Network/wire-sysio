@@ -1276,4 +1276,56 @@ BOOST_FIXTURE_TEST_CASE(pre_boundary_majority_finalized_by_chkcons_crank, sysio_
    BOOST_REQUIRE_EQUAL(opc["envelope_digest"].as_string(), digest.str());
 } FC_LOG_AND_RETHROW() }
 
+// Review follow-up on WNS-15(a): the consensus tally and the threshold must be drawn from the SAME
+// population. Sizing the group to the live set while still counting every delivery row lets a
+// slashed operator's pre-slash vote carry a threshold it is no longer part of:
+//
+//   A delivers X -> A is slashed -> B delivers X
+//   group_size == 2 (B, C), counts[X] == total == 2  ->  Option A accepts,
+//
+// finalizing on A+B even though C -- one of the two currently-ACTIVE members -- never delivered.
+// That is a strictly smaller quorum than the live group, so it must not resolve until C speaks.
+BOOST_FIXTURE_TEST_CASE(slash_after_delivery_does_not_count_toward_consensus, sysio_msgch_chain_tester) { try {
+   bootstrap(/*n_batch_ops=*/3);
+
+   const uint32_t epoch = current_epoch();
+   auto envelope = encode_delivery(epoch, "slash-after-delivery");
+   const auto digest = oracle::epoch_digest(decode_envelope(envelope));
+
+   // A delivers, then loses eligibility. Its row survives in the deliveries table.
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, envelope));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, CHALG_ACCOUNT, "slash"_n,
+      mvo()("account", BATCHOP.to_string())("reason", "WNS-15 slash-after-delivery regression")));
+   produce_blocks();
+
+   // B delivers. Eligible set is {B, C}; only B has delivered among them, so one of two is not a
+   // majority and A's stale row must not make up the difference.
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, envelope));
+   produce_blocks();
+   {
+      auto opc = get_outpcons(ETH_OUTPOST_ID);
+      BOOST_REQUIRE(opc.is_null() || !opc["consensus_reached"].as<bool>());
+   }
+
+   // Past the boundary the answer must still be no: A is not part of the group being counted.
+   elapse_epoch_boundary();
+   BOOST_REQUIRE_EQUAL(success(), push(MSGCH_ACCOUNT, msgch_abi, BATCHOP_B, "chkcons"_n, mvo()));
+   produce_blocks();
+   {
+      auto opc = get_outpcons(ETH_OUTPOST_ID);
+      BOOST_REQUIRE(opc.is_null() || !opc["consensus_reached"].as<bool>());
+   }
+
+   // C delivers: now both eligible members agree and consensus is legitimate.
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, ETH_OUTPOST_ID, envelope));
+   produce_blocks();
+
+   auto opc = get_outpcons(ETH_OUTPOST_ID);
+   BOOST_REQUIRE(!opc.is_null());
+   BOOST_REQUIRE_EQUAL(opc["consensus_reached"].as<bool>(), true);
+   BOOST_REQUIRE_EQUAL(opc["epoch_index"].as<uint32_t>(), epoch);
+   BOOST_REQUIRE_EQUAL(opc["envelope_digest"].as_string(), digest.str());
+} FC_LOG_AND_RETHROW() }
+
 BOOST_AUTO_TEST_SUITE_END()
