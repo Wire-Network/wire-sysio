@@ -42,21 +42,29 @@ namespace field {
 }
 
 /**
- * @brief Resolve the address of one remote role, applying the single-program rule.
+ * @brief Resolve the address of one remote role for a chain's deployment shape.
  *
- * An EVM outpost deploys a separate contract per role, so each role field names
- * its own address. An SVM outpost is ONE program serving every role, so the
- * registry stores it in `opp_addr` and `sysio.chains` REQUIRES the role fields
- * to be empty. A reader that wants a specific role therefore falls back to
- * `opp_addr` whenever the role field is empty, and both deployment shapes are
- * handled without branching on `ChainKind` at every call site.
+ * An SVM outpost is ONE program serving every role: the registry stores it in
+ * `opp_addr` and `sysio.chains` REQUIRES the role fields to be empty, so every
+ * role resolves to `opp_addr`. An EVM outpost deploys a SEPARATE contract per
+ * role, so a role resolves to its own field and NOTHING else.
  *
- * @param role_addr Role-specific field from the row's `outpost` struct.
- * @param opp_addr  The row's `opp_addr` field.
- * @return The role's address, or empty when the row is not configured yet.
+ * The EVM case must not fall back to `opp_addr`. `setoutpost` accepts a partial
+ * EVM set — a row may legitimately carry the OPP address before its
+ * OperatorRegistry is deployed — and substituting `opp_addr` there would yield a
+ * plausible, non-empty, WRONG address: it passes any is-it-configured check and
+ * then sends commits or verification reads to the OPP contract. An unset EVM
+ * role stays empty so the caller fails closed and waits for `setoutpost`.
+ *
+ * @param role_addr      Role-specific field from the row's `outpost` struct.
+ * @param opp_addr       The row's `opp_addr` field.
+ * @param single_program True when one program serves every role (SVM).
+ * @return The role's address, or empty when this role is not configured yet.
  */
-inline std::string resolve_role_addr(std::string_view role_addr, std::string_view opp_addr) {
-   return role_addr.empty() ? std::string{opp_addr} : std::string{role_addr};
+inline std::string resolve_role_addr(std::string_view role_addr,
+                                     std::string_view opp_addr,
+                                     bool             single_program) {
+   return single_program ? std::string{opp_addr} : std::string{role_addr};
 }
 
 } // namespace sysio::depot::chains

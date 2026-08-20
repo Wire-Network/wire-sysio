@@ -1264,9 +1264,22 @@ struct underwriter_plugin::impl {
          auto ext = outpost_external_chain_ids.find(chain_code);
          if (ext == outpost_external_chain_ids.end()) continue;
          if (ep.commit_addr.empty()) {
-            wlog("underwriter_plugin: outpost chain {} has no remote contract address on its "
-                 "sysio.chains row — not wiring until sysio.chains::setoutpost supplies one",
-                 code_str);
+            // A row can LOSE an address: `setoutpost` replaces the whole set, so
+            // clearing a role retires that deployment. Drop any handle built
+            // against it — keeping one would let a later destination leg commit
+            // to a deployment the registry no longer names, which is worse than
+            // not committing at all.
+            if (outpost_by_chain.erase(chain_code) > 0) {
+               wlog("underwriter_plugin: outpost chain {} no longer carries a remote contract "
+                    "address — retired the wired client; not committing on this chain until "
+                    "sysio.chains::setoutpost supplies one",
+                    code_str);
+            } else {
+               wlog("underwriter_plugin: outpost chain {} has no remote contract address on its "
+                    "sysio.chains row — not wiring until sysio.chains::setoutpost supplies one",
+                    code_str);
+            }
+            wired_commit_addrs.erase(chain_code);
             continue;
          }
          if (auto wired = wired_commit_addrs.find(chain_code);
@@ -1326,10 +1339,15 @@ struct underwriter_plugin::impl {
          operator_registry_addr = read(depot_chains::field::outpost_addr::operator_registry_addr);
          source_deposit_addr    = read(depot_chains::field::outpost_addr::source_deposit_addr);
       }
-      // An SVM outpost is one program serving every role, so the role fields
-      // are empty on its row and resolve back to opp_addr.
-      ep.commit_addr         = depot_chains::resolve_role_addr(operator_registry_addr, opp_addr);
-      ep.source_deposit_addr = depot_chains::resolve_role_addr(source_deposit_addr, opp_addr);
+      // An SVM outpost is one program serving every role; an EVM outpost names a
+      // distinct contract per role and must NEVER fall back to opp_addr, or a
+      // row whose OperatorRegistry is not deployed yet would commit to the OPP
+      // contract instead of failing closed.
+      const bool single_program = ep.kind == ChainKind::CHAIN_KIND_SVM;
+      ep.commit_addr =
+         depot_chains::resolve_role_addr(operator_registry_addr, opp_addr, single_program);
+      ep.source_deposit_addr =
+         depot_chains::resolve_role_addr(source_deposit_addr, opp_addr, single_program);
       outpost_endpoints[chain_code] = std::move(ep);
    }
 
