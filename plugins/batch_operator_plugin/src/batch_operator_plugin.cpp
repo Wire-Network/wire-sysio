@@ -133,6 +133,8 @@ struct outpost_descriptor {
 struct batch_operator_plugin::impl {
    // Configuration
    chain::name  operator_account;
+   /// Derived from `operator_account` at plugin_initialize: the relay runs iff
+   /// an account was configured. There is no separate enable flag.
    bool         enabled             = false;
    uint32_t     epoch_poll_ms       = EPOCH_POLL_MS;
    uint32_t     delivery_timeout_ms = DELIVERY_TIMEOUT_MS;
@@ -974,8 +976,13 @@ signal<void(const opp::debugging::DebugEnvelopeEvent&)>& batch_operator_plugin::
 void batch_operator_plugin::set_program_options(options_description& cli,
                                                  options_description& cfg) {
    auto opts = cfg.add_options();
+   // Presence of this option IS the enable switch (mirrors producer_plugin's
+   // producer-name): the relay runs when an account is configured. Keying off
+   // the account rather than the plugin being listed matters because
+   // external_debugging_plugin declares this plugin as a dependency, which
+   // would otherwise silently promote a debug node to a batch operator.
    opts("batch-operator-account", bpo::value<std::string>(),
-        "WIRE account name for this batch operator");
+        "WIRE account name for this batch operator. Configuring an account enables the relay.");
    opts("batch-epoch-poll-ms", bpo::value<uint32_t>()->default_value(EPOCH_POLL_MS),
         "How often to check epoch state (ms)");
    // SIZING RULE for batch-delivery-timeout-ms: it bounds the WHOLE outbound
@@ -996,8 +1003,6 @@ void batch_operator_plugin::set_program_options(options_description& cli,
    // splits nodeop --help output on that token).
    opts("batch-delivery-timeout-ms", bpo::value<uint32_t>()->default_value(DELIVERY_TIMEOUT_MS),
         "Max time to wait for chain delivery confirmation (ms)");
-   opts("batch-enabled", bpo::value<bool>()->default_value(false),
-        "Enable batch operator functionality");
 }
 
 void batch_operator_plugin::plugin_initialize(const variables_map& options) {
@@ -1005,7 +1010,8 @@ void batch_operator_plugin::plugin_initialize(const variables_map& options) {
       _impl->operator_account = chain::name(options["batch-operator-account"].as<std::string>());
    _impl->epoch_poll_ms       = options["batch-epoch-poll-ms"].as<uint32_t>();
    _impl->delivery_timeout_ms = options["batch-delivery-timeout-ms"].as<uint32_t>();
-   _impl->enabled             = options["batch-enabled"].as<bool>();
+   _impl->enabled             = _impl->operator_account.good();
+
    _impl->chain_plug = &app().get_plugin<chain_plugin>();
    _impl->cron_plug  = &app().get_plugin<cron_plugin>();
    _impl->eth_plug   = &app().get_plugin<outpost_ethereum_client_plugin>();
@@ -1025,7 +1031,7 @@ void batch_operator_plugin::plugin_initialize(const variables_map& options) {
 
 void batch_operator_plugin::plugin_startup() {
    if (!_impl->enabled) {
-      ilog("batch_operator_plugin: disabled, skipping startup");
+      ilog("batch_operator_plugin: no batch-operator-account configured, skipping startup");
       return;
    }
 

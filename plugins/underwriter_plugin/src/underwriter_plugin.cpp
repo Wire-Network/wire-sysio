@@ -242,7 +242,9 @@ struct outpost_endpoint {
 struct underwriter_plugin::impl {
    // Configuration
    chain::name  underwriter_account;
-   bool         enabled             = underwriter_defaults::enabled;
+   /// Derived from `underwriter_account` at plugin_initialize: the scan cycle
+   /// runs iff an account was configured. There is no separate enable flag.
+   bool         enabled             = false;
    uint32_t     scan_interval_ms    = underwriter_defaults::scan_interval_ms;
    uint32_t     action_timeout_ms   = underwriter_defaults::action_timeout_ms;
    /// SEC-13/WSA-027: per-chain outpost wiring, keyed by EXACT `chain_code`
@@ -2884,14 +2886,14 @@ underwriter_plugin::~underwriter_plugin() = default;
 void underwriter_plugin::set_program_options(options_description& cli,
                                               options_description& cfg) {
    auto opts = cfg.add_options();
+   // Presence of this option IS the enable switch (mirrors producer_plugin's
+   // producer-name): the scan cycle runs when an account is configured.
    opts("underwriter-account", bpo::value<std::string>(),
-        "WIRE account name for this underwriter");
+        "WIRE account name for this underwriter. Configuring an account enables the scan cycle.");
    opts("underwriter-scan-interval-ms", bpo::value<uint32_t>()->default_value(underwriter_defaults::scan_interval_ms),
         "How often to scan for pending underwrite requests (ms)");
    opts("underwriter-action-timeout-ms", bpo::value<uint32_t>()->default_value(underwriter_defaults::action_timeout_ms),
         "Timeout for outpost contract calls and table reads (ms)");
-   opts("underwriter-enabled", bpo::value<bool>()->default_value(underwriter_defaults::enabled),
-        "Enable underwriter functionality");
    opts("underwriter-eth-source-deposit-function", bpo::value<std::string>(),
         "Name of the ETH swap-deposit function. Resolved at preflight against the ABI "
         "files registered with --ethereum-abi-file; the matching `function` entry's keccak256 "
@@ -2915,7 +2917,7 @@ void underwriter_plugin::plugin_initialize(const variables_map& options) {
       _impl->underwriter_account = chain::name(options["underwriter-account"].as<std::string>());
    _impl->scan_interval_ms  = options["underwriter-scan-interval-ms"].as<uint32_t>();
    _impl->action_timeout_ms = options["underwriter-action-timeout-ms"].as<uint32_t>();
-   _impl->enabled           = options["underwriter-enabled"].as<bool>();
+   _impl->enabled           = _impl->underwriter_account.good();
    if (options.count("underwriter-eth-source-deposit-function"))
       _impl->eth_source_deposit_function_name =
          options["underwriter-eth-source-deposit-function"].as<std::string>();
@@ -2947,7 +2949,7 @@ void underwriter_plugin::plugin_initialize(const variables_map& options) {
 
 void underwriter_plugin::plugin_startup() {
    if (!_impl->enabled) {
-      ilog("underwriter_plugin: disabled, skipping startup");
+      ilog("underwriter_plugin: no underwriter-account configured, skipping startup");
       return;
    }
 
