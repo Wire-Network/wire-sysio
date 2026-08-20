@@ -34,7 +34,7 @@ and optional per-client transaction policies. See
 [`docs/ethereum-client-config.example.json`](../../../docs/ethereum-client-config.example.json) and the
 [outpost client configuration guide](../../../docs/outpost-client-plugins.md).
 
-The legacy
+The CLI
 `--outpost-ethereum-client <eth-client-id>,<sig-provider-id>,<eth-node-url>[,<eth-chain-id>]` option remains
 available. It assigns maximum-value policy defaults and cannot be combined with
 `--outpost-ethereum-client-config-file`. Those defaults preserve compatibility only, provide no
