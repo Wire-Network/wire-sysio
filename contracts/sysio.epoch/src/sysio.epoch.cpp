@@ -851,15 +851,22 @@ void epoch::advance() {
       }
    }
 
-   // Emissions side. Two inline actions queued in FIFO order:
+   // Emissions side. Three inline actions queued in FIFO order:
    //   1. accrueepoch: always queued. Records this epoch's per-epoch share
    //      onto t5state (pending_emission_amount + batch_group_epochs[group]
    //      + last_epoch_emission for decay continuity).
-   //   2. payepoch: queued only on pay-epochs. Reads the now-updated t5state
+   //   2. rcrdbatch: always queued. Records the immutable roster that accrued
+   //      this epoch after the schedule has slid for the next advance.
+   //   3. payepoch: queued only on pay-epochs. Reads the now-updated t5state
    //      (which already includes this epoch's contribution from step 1),
    //      distributes period_emission, and resets the accumulator.
    // Both run after advance() returns; their FIFO ordering guarantees
-   // payepoch sees the post-accrue state.
+   // payepoch sees the post-accrue roster history and state.
+   std::vector<name> active_batch_op_members;
+   if (state.current_batch_op_group < state.batch_op_groups.size()) {
+      active_batch_op_members = state.batch_op_groups[state.current_batch_op_group];
+   }
+
    action(
       permission_level{get_self(), "owner"_n},
       SYSTEM_ACCOUNT,
@@ -869,6 +876,13 @@ void epoch::advance() {
          state.current_batch_op_group,
          gate.emission_amount
       )
+   ).send();
+
+   action(
+      permission_level{get_self(), "owner"_n},
+      SYSTEM_ACCOUNT,
+      "rcrdbatch"_n,
+      std::make_tuple(state.current_epoch_index, active_batch_op_members)
    ).send();
 
    if (gate.is_pay_epoch) {

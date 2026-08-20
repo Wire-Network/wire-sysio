@@ -126,7 +126,7 @@ Everything `sysio.epoch::advance` inlines, directly:
 | `sysio.opreg` | `recorddel`, `termcheck`, `flushwtdw` |
 | `sysio.chalg` | `slashop` |
 | `sysio.msgch` | `queueout`, `buildenv` |
-| `sysio` | `accrueepoch`, `payepoch` |
+| `sysio` | `accrueepoch`, `rcrdbatch`, `payepoch` |
 
 Those callees inline further (`drainfwq` → `sysio.reserv::refundwire`,
 `termcheck` → the `sysio.opreg` remit path, `payepoch` → `sysio.token::transfer`),
@@ -136,6 +136,27 @@ abort surface.
 Independently of inlines, the emissions readiness gate in `sysio.epoch` **reads**
 `sysio.system`'s `emitcfg`, `t5state` and `payclaimtot`, and `sysio.token`'s
 `accounts`.
+
+### WIRE-343 pre-launch activation
+
+WIRE-343 intentionally has **no mixed-version compatibility path**: every
+accrued epoch must have an immutable batch roster. Activate it in one quiesced
+maintenance window, with no `sysio.epoch::advance` between contract deployments:
+
+1. While the current code is still running, set `pay_cadence_epochs` to a value
+   in `[1, 10]`. The new history cap is resource-derived (at most ten rosters of
+   at most 100 scheduled operators); an older stored value above 10 is not
+   rewritten by deployment.
+2. Wait for a completed payment period and verify that `t5state` has
+   `pending_emission_amount == 0`, all `batch_group_epochs` counters are zero,
+   and `batchepochs` is empty.
+3. Quiesce epoch advancement and deploy the new `sysio.system` and
+   `sysio.epoch` contracts together before allowing the next `advance`.
+
+Do not deploy only one of these contracts, deploy into an in-progress payment
+period, or downgrade while `batchepochs` is non-empty: a missing roster is a
+deliberate invariant failure, not a positional-payout fallback. T5 must also be
+initialized before its first successful epoch advance.
 
 ## The two rules for future changes
 

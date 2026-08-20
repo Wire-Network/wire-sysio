@@ -626,15 +626,12 @@ namespace sysiosystem {
           * pools as today, scaled to the period.
           *
           * `batch_op_groups` is the full state.batch_op_groups vector from
-          * sysio.epoch; payepoch reads t5state.batch_group_epochs to weight
-          * the batch pool proportionally to each group's active-epoch count
-          * over the period, normalized by the ACTUAL accrued-epoch count (the
-          * sum of those counters) rather than the configured
-          * pay_cadence_epochs, which a mid-period setemitcfg change or the
-          * shortened genesis period can make disagree. Groups active in zero
-          * epochs are skipped, which happens whenever the accrued count is
-          * smaller than batch_op_groups.size(); skipping costs them nothing,
-          * since a zero count already weights their allocation to zero.
+          * sysio.epoch. Payout uses the immutable `batchepochs` roster history
+          * written for every accrued epoch; t5state.batch_group_epochs supplies
+          * the ACTUAL accrued-epoch count, rather than configured
+          * pay_cadence_epochs, because a mid-period config change or shortened
+          * genesis period can make those differ. A complete history is a strict
+          * precondition for payout.
           *
           * Runtime conditions (config missing, treasury exhausted, balance
           * insufficient) are caught upstream by the gate, which records the
@@ -655,7 +652,8 @@ namespace sysiosystem {
           *
           * Increments t5state.pending_emission_amount by `per_epoch_emission`
           * and bumps t5state.batch_group_epochs[batch_group_index] by 1, so
-          * the next payepoch sees the period total + per-group counts.
+          * the next payepoch sees the period total. `rcrdbatch` records the
+          * corresponding immutable roster separately.
           *
           * Because it also runs on the pay epoch, the counter sum that
           * `payepoch` normalizes by includes the epoch being paid. Reading this
@@ -669,6 +667,15 @@ namespace sysiosystem {
          void accrueepoch(uint32_t epoch_index,
                           uint8_t  batch_group_index,
                           int64_t  per_epoch_emission);
+
+         /**
+          * Record the immutable batch-operator roster for an accrued epoch.
+          * Empty rosters are retained so their emission share stays in the
+          * treasury. Called inline by sysio.epoch::advance immediately after
+          * accrueepoch. Auth: require_auth("sysio.epoch").
+          */
+         [[sysio::action]]
+         void rcrdbatch(uint32_t epoch_index, std::vector<sysio::name> members);
 
          /**
           * Fund a sysio.dclaim capital draw against the T5 drainable pool.

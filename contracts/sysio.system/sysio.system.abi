@@ -119,6 +119,30 @@
             ]
         },
         {
+            "name": "batch_epoch",
+            "base": "",
+            "fields": [
+                {
+                    "name": "sysio_epoch_index",
+                    "type": "uint32"
+                },
+                {
+                    "name": "members",
+                    "type": "name[]"
+                }
+            ]
+        },
+        {
+            "name": "batch_epoch_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "sysio_epoch_index",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
             "name": "block_header",
             "base": "",
             "fields": [
@@ -1041,6 +1065,20 @@
             ]
         },
         {
+            "name": "rcrdbatch",
+            "base": "",
+            "fields": [
+                {
+                    "name": "epoch_index",
+                    "type": "uint32"
+                },
+                {
+                    "name": "members",
+                    "type": "name[]"
+                }
+            ]
+        },
+        {
             "name": "regfinkey",
             "base": "",
             "fields": [
@@ -1904,6 +1942,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "rcrdbatch",
+            "type": "rcrdbatch",
+            "ricardian_contract": ""
+        },
+        {
             "name": "regfinkey",
             "type": "regfinkey",
             "ricardian_contract": ""
@@ -2077,6 +2120,14 @@
             "key_names": ["owner"],
             "key_types": ["uint64"],
             "table_id": 49446
+        },
+        {
+            "name": "batchepochs",
+            "type": "batch_epoch",
+            "index_type": "i64",
+            "key_names": ["sysio_epoch_index"],
+            "key_types": ["uint32"],
+            "table_id": 22503
         },
         {
             "name": "blockinfo",

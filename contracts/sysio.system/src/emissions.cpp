@@ -323,10 +323,12 @@ void system_contract::setemitcfg(const emissions::emission_config& cfg) {
                  "epoch_log_retention_count must be positive");
 
    // Pay cadence (number of epochs accumulated per payepoch firing). Zero
-   // would divide-by-zero in the period share-by-rounds math; no upper
-   // bound is enforced (operator's call).
+   // would divide-by-zero in the period share-by-rounds math. The upper bound
+   // caps retained batch-roster history and the payoff work it entails.
    sysio::check(cfg.pay_cadence_epochs > 0,
                  "pay_cadence_epochs must be positive");
+   sysio::check(cfg.pay_cadence_epochs <= emissions::MAX_PAY_CADENCE_EPOCHS,
+                 "pay_cadence_epochs exceeds batch roster history safety cap");
 
    // Single read of sysio.epoch::epochcfg shared by the round-to-zero guards
    // (which need epoch_secs to scale annual values) and the post-init guard
@@ -653,6 +655,39 @@ void system_contract::accrueepoch(uint32_t epoch_index,
    t5s.set(state, get_self());
 }
 
+// rcrdbatch - retain the exact roster that accrued this epoch. The schedule
+// mutates before advance queues its inline actions, so a current position is
+// not a stable identity for an earlier epoch.
+void system_contract::rcrdbatch(uint32_t epoch_index, std::vector<sysio::name> members) {
+   require_auth(epoch_refs::account);
+
+   t5state_t t5s(get_self());
+   sysio::check(t5s.exists(), "t5 state not initialized");
+   const auto state = t5s.get();
+   sysio::check(epoch_index == state.last_epoch_index,
+                "rcrdbatch must run after accrueepoch for the same epoch_index");
+
+   // The scheduler supplies canonical order today. Sorting here keeps the
+   // table identity stable even if a future scheduler changes that detail.
+   std::sort(members.begin(), members.end());
+
+   batchepochs_t history(get_self());
+   const batch_epoch_key key{epoch_index};
+   sysio::check(!history.contains(key), "batch roster already recorded for epoch");
+   uint16_t history_count = 0;
+   for (auto it = history.begin();
+        it != history.end() && history_count < emissions::MAX_PAY_CADENCE_EPOCHS;
+        ++it) {
+      ++history_count;
+   }
+   sysio::check(history_count < emissions::MAX_PAY_CADENCE_EPOCHS,
+                "batch roster history exceeds safety cap");
+   history.emplace(get_self(), key, batch_epoch{
+      .sysio_epoch_index = epoch_index,
+      .members           = members,
+   });
+}
+
 // payepoch - pay the compute, capex, and governance shares of accumulated
 // emissions for the pay period ending at `epoch_index`. Called inline by
 // sysio.epoch::advance on a pay-epoch (period boundary defined by
@@ -689,7 +724,7 @@ void system_contract::accrueepoch(uint32_t epoch_index,
 // Slashed / terminated batch-op group members are skipped via opreg filter;
 // their slice remains in the treasury.
 void system_contract::payepoch(uint32_t epoch_index,
-                               std::vector<std::vector<sysio::name>> batch_op_groups,
+                               std::vector<std::vector<sysio::name>>,
                                int64_t period_emission) {
    require_auth(epoch_refs::account);
 
@@ -734,7 +769,7 @@ void system_contract::payepoch(uint32_t epoch_index,
    // normalizations correct whatever the config did mid-period.
    //
    // Sum in int64: each counter is a uint32 epoch tally and the vector is sized
-   // from batch_op_groups, so the total cannot approach the int64 range. Zero is
+   // from a scheduler-bounded group list, so the total cannot approach the int64 range. Zero is
    // impossible in practice (payepoch asserts accrueepoch ran for this same
    // epoch_index, and accrueepoch always increments a slot) but is guarded at
    // each use, because a zero divisor would abort the whole advance chain.
@@ -742,6 +777,50 @@ void system_contract::payepoch(uint32_t epoch_index,
    for (const uint32_t group_epoch_count : state.batch_group_epochs) {
       accrued_epochs += group_epoch_count;
    }
+
+   // Preserve roster identity separately from the legacy positional counters.
+   // advance() slides its schedule before queueing this action, so a counter at
+   // position g cannot identify the roster that was active in a prior epoch.
+   struct recorded_batch_group {
+      std::vector<sysio::name> members;
+      uint32_t                 active_epochs = 0;
+   };
+
+   batchepochs_t batch_history(get_self());
+   std::vector<recorded_batch_group> recorded_batch_groups;
+   bool batch_history_complete = accrued_epochs > 0;
+   int64_t recorded_epochs = 0;
+   uint64_t expected_epoch_index =
+      state.period_start_epoch == 0 ? 1 : state.period_start_epoch;
+
+   for (auto it = batch_history.begin(); it != batch_history.end(); ++it) {
+      ++recorded_epochs;
+      sysio::check(recorded_epochs <= emissions::MAX_PAY_CADENCE_EPOCHS,
+                   "batch roster history exceeds safety cap");
+      if (static_cast<uint64_t>(it->sysio_epoch_index) != expected_epoch_index) {
+         batch_history_complete = false;
+      }
+      ++expected_epoch_index;
+
+      auto group_it = std::find_if(
+         recorded_batch_groups.begin(), recorded_batch_groups.end(),
+         [&](const auto& group) { return group.members == it->members; });
+      if (group_it == recorded_batch_groups.end()) {
+         recorded_batch_groups.push_back(recorded_batch_group{
+            .members       = it->members,
+            .active_epochs = 1,
+         });
+      } else {
+         group_it->active_epochs += 1;
+      }
+   }
+
+   batch_history_complete =
+      batch_history_complete
+      && recorded_epochs == accrued_epochs
+      && expected_epoch_index == static_cast<uint64_t>(epoch_index) + 1;
+   sysio::check(accrued_epochs == 0 || batch_history_complete,
+                "batch roster history incomplete");
 
    // ----- Swap-fee rewards fold-in -----
    // The BATCH-OPERATOR half of collected swap fees accrues in sysio.reserv's
@@ -924,61 +1003,45 @@ void system_contract::payepoch(uint32_t epoch_index,
    }
 
    // =======================================================================
-   // Batch-op pay. With pay_cadence_epochs > 1 the active group can rotate
-   // multiple times across a period, so each group's slice is weighted by
-   // its active-epoch count (state.batch_group_epochs[g]) over the period.
-   //
-   // The divisor is the ACTUAL accrued epoch count -- the sum of those counters
-   // -- NOT cfg.pay_cadence_epochs. The two can disagree: accrueepoch increments
-   // one slot per epoch unconditionally, while setemitcfg may change
-   // pay_cadence_epochs at any time, taking effect on the next advance. Lowering
-   // cadence 3->1 after one accrual leaves the counters summing to 2 against a
-   // divisor of 1, which pays 2x batch_pool AND 2x fee_batch_pool -- the surplus
-   // fee drawn from this treasury even though only one fee pool was swept from
-   // sysio.reserv, and invisible to total_distributed because fee payouts are
-   // excluded from it. A shortened genesis period underpays by the inverse.
-   // Summing the counters makes the per-group weights partition the pool by
-   // construction, whatever the config did mid-period.
-   //
-   // A group active in zero epochs is skipped, but that retains NOTHING: its
-   // weighted allocation is `pool * 0 / accrued_epochs` == 0, and since the
-   // counters sum to that divisor the remaining groups already absorb the whole
-   // pool. What ACTUALLY leaves WIRE behind in the treasury is:
-   //   * no groups at all (the enclosing `if` fails) — the entire pool;
-   //   * an EMPTY group that owns POSITIVE epochs — skipped by the `group.empty()`
-   //     test BEFORE the epoch check, so its weighted slice is never paid;
-   //   * a member not registered ACTIVE in sysio.opreg (slashed / terminated /
-   //     unknown) — that member's per-member slice;
-   //   * the remainders of the two integer divisions below (per-group weighting
-   //     and the even per-member split).
+   // Batch-op pay. Each historical roster receives a slice weighted by its
+   // actual active epochs over the period. The legacy counters still supply the
+   // actual period length, rather than cfg.pay_cadence_epochs: configuration can
+   // change between accruals. The complete immutable history is a strict
+   // invariant and is bounded by MAX_PAY_CADENCE_EPOCHS.
    // =======================================================================
-   if (accrued_epochs > 0 && !batch_op_groups.empty()) {
-      for (size_t g = 0; g < batch_op_groups.size(); ++g) {
-         const auto& group = batch_op_groups[g];
-         if (group.empty()) continue;
-         const uint32_t group_epochs =
-            (g < state.batch_group_epochs.size()) ? state.batch_group_epochs[g] : 0;
-         if (group_epochs == 0) continue;
+   auto pay_batch_group = [&](const std::vector<sysio::name>& group,
+                              uint32_t active_epochs) {
+      if (group.empty() || active_epochs == 0) return;
 
-         // Period-weighted slices for this group, divided evenly among members.
-         // Emission and fee are weighted identically (by the group's active-epoch
-         // count over the period) so a member's fee tracks its emission reward.
-         const int64_t members = static_cast<int64_t>(group.size());
-         const int64_t group_pool = static_cast<int64_t>(
-            static_cast<__int128>(batch_pool) * group_epochs / accrued_epochs);
-         const int64_t fee_group_pool = static_cast<int64_t>(
-            static_cast<__int128>(fee_batch_pool) * group_epochs / accrued_epochs);
-         const int64_t per_member     = group_pool / members;
-         const int64_t fee_per_member = fee_group_pool / members;
+      // Period-weighted slices for this group, divided evenly among members.
+      // Emission and fee are weighted identically by active-epoch count.
+      const int64_t members = static_cast<int64_t>(group.size());
+      const int64_t group_pool = static_cast<int64_t>(
+         static_cast<__int128>(batch_pool) * active_epochs / accrued_epochs);
+      const int64_t fee_group_pool = static_cast<int64_t>(
+         static_cast<__int128>(fee_batch_pool) * active_epochs / accrued_epochs);
+      const int64_t per_member     = group_pool / members;
+      const int64_t fee_per_member = fee_group_pool / members;
 
-         for (const auto& m : group) {
-            if (!is_op_active(m, OperatorType::OPERATOR_TYPE_BATCH)) continue;
-            // One credit carries both the emission and the fee share.
-            credit_pay(get_self(), m, per_member + fee_per_member, memo::batch_op_reward);
-            actual_paid += per_member;
-            fee_paid    += fee_per_member;
-         }
+      for (const auto& m : group) {
+         if (!is_op_active(m, OperatorType::OPERATOR_TYPE_BATCH)) continue;
+         // One credit carries both the emission and the fee share.
+         credit_pay(get_self(), m, per_member + fee_per_member, memo::batch_op_reward);
+         actual_paid += per_member;
+         fee_paid    += fee_per_member;
       }
+   };
+
+   if (accrued_epochs > 0) {
+      for (const auto& group : recorded_batch_groups) {
+         pay_batch_group(group.members, group.active_epochs);
+      }
+   }
+
+   // A pay period is the history lifetime. The whole action is atomic, so this
+   // can only clear a complete history after its corresponding payout.
+   for (auto it = batch_history.begin(); it != batch_history.end(); ) {
+      it = batch_history.erase(it);
    }
 
    // =======================================================================
