@@ -41,6 +41,14 @@ constexpr std::string_view OP_UW_COMMIT   = "uw_commit:commit_underwrite";
 constexpr std::string_view EPOCH_DELIVERIES_SEED = "epoch_deliveries";
 constexpr std::string_view ENVELOPE_CHUNKS_SEED  = "envelope_chunks";
 
+/// Anchor seed literals for the collateral-settlement PDAs. Byte-exact
+/// mirrors of the program's `COLLATERAL_POSITION_SEED` /
+/// `COLLATERAL_VAULT_SEED` constants (wire-solana `opp_states.rs`) -- a
+/// one-character drift derives a well-formed WRONG PDA that only surfaces at
+/// runtime as `EffectAccountMissing`, holding the dispatch cursor.
+constexpr std::string_view COLLATERAL_POSITION_SEED = "collateral_position";
+constexpr std::string_view COLLATERAL_VAULT_SEED    = "collateral_vault";
+
 /// The 4-byte little-endian seed encoding of a WIRE epoch index -- the exact
 /// bytes the program's `epoch_index.to_le_bytes()` seed component uses.
 std::vector<uint8_t> epoch_index_le_seed(uint32_t epoch_index) {
@@ -124,6 +132,17 @@ namespace reserve_account {
    constexpr auto field_custody_mint     = "custody_mint";
    constexpr auto field_custody_decimals = "custody_decimals";
 } // namespace reserve_account
+
+/// Field identifiers of the per-`(operator, token_code)` collateral position.
+/// Its custody mint is pinned at first deposit and is what the on-chain
+/// settlement handlers branch on.
+namespace collateral_position {
+   constexpr auto account_name       = "CollateralPosition";
+   constexpr auto field_operator     = "operator";
+   constexpr auto field_token_code   = "token_code";
+   constexpr auto field_custody_mint = "custody_mint";
+   constexpr auto field_amount       = "amount";
+} // namespace collateral_position
 
 } // anonymous namespace
 
@@ -267,6 +286,49 @@ void assert_epoch_deliveries_shape(const fc::network::solana::idl::program& prog
              "EpochDeliveries IDL missing '{}' field; the dispatch crank would resume from 0 on "
              "every tick and re-send settled windows forever",
              epoch_deliveries::field_dispatched_count);
+}
+
+/// Assert the loaded IDL declares `CollateralPosition` with the four fields
+/// its on-chain settlement path binds together. Full contract on the header
+/// declaration.
+void assert_collateral_position_shape(const fc::network::solana::idl::program& program) {
+   namespace idl = fc::network::solana::idl;
+   const auto& fields = declared_account_fields(program, collateral_position::account_name);
+
+   bool has_operator   = false;
+   bool has_token_code = false;
+   bool has_mint       = false;
+   bool has_amount     = false;
+   for (const auto& field : fields) {
+      const bool is_pubkey =
+         field.type.is_primitive() && field.type.primitive == idl::primitive_type::pubkey;
+      const bool is_u64 =
+         field.type.is_primitive() && field.type.primitive == idl::primitive_type::u64;
+      if (field.name == collateral_position::field_operator) {
+         FC_ASSERT(is_pubkey, "CollateralPosition '{}' must be declared pubkey, got '{}'",
+                   collateral_position::field_operator, describe_idl_type(field.type));
+         has_operator = true;
+      } else if (field.name == collateral_position::field_token_code) {
+         FC_ASSERT(is_u64, "CollateralPosition '{}' must be declared u64, got '{}'",
+                   collateral_position::field_token_code, describe_idl_type(field.type));
+         has_token_code = true;
+      } else if (field.name == collateral_position::field_custody_mint) {
+         FC_ASSERT(is_pubkey, "CollateralPosition '{}' must be declared pubkey, got '{}'",
+                   collateral_position::field_custody_mint, describe_idl_type(field.type));
+         has_mint = true;
+      } else if (field.name == collateral_position::field_amount) {
+         FC_ASSERT(is_u64, "CollateralPosition '{}' must be declared u64, got '{}'",
+                   collateral_position::field_amount, describe_idl_type(field.type));
+         has_amount = true;
+      }
+   }
+   FC_ASSERT(has_operator && has_token_code && has_mint && has_amount,
+             "CollateralPosition IDL missing '{}' / '{}' / '{}' / '{}' "
+             "(found {} / {} / {} / {}); a live collateral position's pinned custody cannot be "
+             "resolved safely without this declaration",
+             collateral_position::field_operator, collateral_position::field_token_code,
+             collateral_position::field_custody_mint, collateral_position::field_amount,
+             has_operator, has_token_code, has_mint, has_amount);
 }
 
 /// Assert the loaded IDL declares `Reserve` with the three fields the terminal
@@ -518,6 +580,11 @@ std::vector<uint8_t> u64_seed(uint64_t value) {
    return out;
 }
 
+/// Seed bytes of a `solana_public_key` for Anchor PDA derivation.
+std::vector<uint8_t> pubkey_seed(const fc::network::solana::solana_public_key& key) {
+   return std::vector<uint8_t>(key._data.begin(), key._data.end());
+}
+
 } // anonymous namespace (within outpost_solana_client_detail)
 
 /// Derive the per-reserve `Reserve` PDA. Full contract on the header
@@ -543,6 +610,30 @@ fc::network::solana::solana_public_key derive_reserve_vault_pda(
       {std::vector<uint8_t>{'r','e','s','e','r','v','e','_','v','a','u','l','t'},
        u64_seed(token_code),
        u64_seed(reserve_code)},
+      program_id).first;
+}
+
+/// Derive the per-`(operator, token_code)` `CollateralPosition` PDA. Full
+/// contract on the header declaration.
+fc::network::solana::solana_public_key derive_collateral_position_pda(
+   const fc::network::solana::solana_public_key& program_id,
+   const fc::network::solana::solana_public_key& operator_key,
+   uint64_t token_code) {
+   return fc::network::solana::system::find_program_address(
+      {std::vector<uint8_t>(COLLATERAL_POSITION_SEED.begin(), COLLATERAL_POSITION_SEED.end()),
+       pubkey_seed(operator_key),
+       u64_seed(token_code)},
+      program_id).first;
+}
+
+/// Derive the per-`token_code` `collateral_vault` PDA. Full contract on the
+/// header declaration.
+fc::network::solana::solana_public_key derive_collateral_vault_pda(
+   const fc::network::solana::solana_public_key& program_id,
+   uint64_t token_code) {
+   return fc::network::solana::system::find_program_address(
+      {std::vector<uint8_t>(COLLATERAL_VAULT_SEED.begin(), COLLATERAL_VAULT_SEED.end()),
+       u64_seed(token_code)},
       program_id).first;
 }
 
@@ -587,15 +678,25 @@ extract_inbound_effects(const std::vector<char>& envelope_bytes) {
       for (const auto& entry : message.payload().attestations()) {
          const size_t at = index++;
          switch (entry.type()) {
+            // The collateral-settling operator actions (SOL-379/380). Both
+            // resolve the per-(operator, token_code) CollateralPosition PDA
+            // out of remaining_accounts, so both carry the amount's
+            // token_code alongside the operator key.
             case sysio::opp::types::ATTESTATION_TYPE_OPERATOR_ACTION: {
                sysio::opp::attestations::OperatorAction oa;
                if (!oa.ParseFromString(entry.data())) continue;
-               if (oa.action_type() !=
+               std::optional<effect_shape> shape;
+               if (oa.action_type() ==
                      sysio::opp::attestations::OperatorAction_ActionType_ACTION_TYPE_WITHDRAW_REMIT) {
-                  continue;
+                  shape = effect_shape::withdraw_remit;
+               } else if (oa.action_type() ==
+                     sysio::opp::attestations::OperatorAction_ActionType_ACTION_TYPE_SLASH) {
+                  shape = effect_shape::slash;
                }
+               if (!shape.has_value()) continue;
                if (auto pk = sol_pubkey_from_chain_address(oa.op_address())) {
-                  effects.push_back(inbound_effect{at, effect_shape::native_payee, *pk, std::nullopt});
+                  effects.push_back(inbound_effect{
+                     at, *shape, *pk, std::nullopt, oa.amount().token_code()});
                }
                break;
             }
@@ -603,7 +704,9 @@ extract_inbound_effects(const std::vector<char>& envelope_bytes) {
                sysio::opp::attestations::DepositRevert dr;
                if (!dr.ParseFromString(entry.data())) continue;
                if (auto pk = sol_pubkey_from_chain_address(dr.depositor())) {
-                  effects.push_back(inbound_effect{at, effect_shape::native_payee, *pk, std::nullopt});
+                  effects.push_back(inbound_effect{
+                     at, effect_shape::deposit_revert, *pk, std::nullopt,
+                     dr.refund_amount().token_code()});
                }
                break;
             }
@@ -689,6 +792,8 @@ std::vector<std::vector<fc::network::solana::account_meta>> build_dispatch_manif
    uint32_t                                      total_attestations,
    const std::function<void()>&                  throw_if_past_deadline,
    const reserve_info_reader&                    read_reserve_info,
+   const collateral_custody_reader&              read_collateral_custody,
+   const fc::network::solana::solana_public_key& reserve_aggregate,
    const std::string&                            log_label) {
    const auto& token_program_id = fc::network::solana::system::program_ids::TOKEN_PROGRAM;
    const auto& associated_token_program_id =
@@ -715,6 +820,22 @@ std::vector<std::vector<fc::network::solana::account_meta>> build_dispatch_manif
          .first->second;
    };
 
+   // One read per DISTINCT collateral position for the whole build. Custody
+   // is pinned per `(operator, token_code)`, so both values are load-bearing
+   // cache keys; absent/empty reads are memoised too.
+   using collateral_key = std::pair<fc::network::solana::solana_public_key, uint64_t>;
+   std::map<collateral_key, std::optional<token_custody_info>> collateral_custody_cache;
+   auto collateral_custody =
+      [&](const fc::network::solana::solana_public_key& operator_key,
+          uint64_t token_code) -> const std::optional<token_custody_info>& {
+      const auto cache_key = std::make_pair(operator_key, token_code);
+      auto it = collateral_custody_cache.find(cache_key);
+      if (it != collateral_custody_cache.end()) return it->second;
+      return collateral_custody_cache
+         .emplace(cache_key, read_collateral_custody(operator_key, token_code))
+         .first->second;
+   };
+
    std::vector<std::vector<fc::network::solana::account_meta>> per_attestation(total_attestations);
    for (const auto& effect : effects) {
       // The deadline is probed per effect, BEFORE its reserve read: a build
@@ -738,10 +859,49 @@ std::vector<std::vector<fc::network::solana::account_meta>> build_dispatch_manif
          record_terminal_account(metas, key, is_writable);
       };
 
-      if (effect.shape == effect_shape::native_payee) {
-         if (effect.recipient) add(*effect.recipient, true);
+      // Collateral-settling shapes (SOL-379/380). Every one resolves the
+      // per-(operator, token_code) `CollateralPosition` PDA out of
+      // remaining_accounts and settles in the asset the position escrows.
+      if (effect.shape == effect_shape::withdraw_remit || effect.shape == effect_shape::slash ||
+          effect.shape == effect_shape::deposit_revert) {
+         if (!effect.recipient || !effect.collateral_token_code) continue;
+         const auto collateral_token_code = *effect.collateral_token_code;
+         // WITHDRAW_REMIT pays the operator and DEPOSIT_REVERT refunds the
+         // depositor; SLASH pays nobody directly -- its native seizure lands
+         // in the named `reserve_aggregate`.
+         if (effect.shape != effect_shape::slash) add(*effect.recipient, true);
+         add(derive_collateral_position_pda(program_id, *effect.recipient,
+                                            collateral_token_code),
+             true);
+
+         const auto& custody_opt = collateral_custody(*effect.recipient, collateral_token_code);
+         if (!custody_opt.has_value()) continue;   // custody lookup already wlogged
+         const auto& custody = *custody_opt;
+         if (is_native_custody(custody.mint)) continue;
+
+         // SPL custody: the collateral vault drains into the destination's
+         // canonical ATA -- the operator's for WITHDRAW_REMIT, the
+         // depositor's for DEPOSIT_REVERT, the `reserve_aggregate`'s for
+         // SLASH.
+         //
+         // LOCK-STEP: which shapes settle SPL here must match the program's
+         // handlers (`resolve_collateral_vault_transfer` callers in
+         // wire-solana `inbound.rs`) exactly -- the relay's shape decisions
+         // are unversioned against the program, and a handler that
+         // `require_remaining_account`s an account this manifest omits aborts
+         // the dispatch round and re-packs the identical window from the same
+         // cursor on every retry. A program-side settlement-policy change and
+         // this manifest must move together.
+         const auto settlement_owner =
+            effect.shape == effect_shape::slash ? reserve_aggregate : *effect.recipient;
+         add(derive_collateral_vault_pda(program_id, collateral_token_code), true);
+         add(fc::network::solana::system::get_associated_token_address(
+                settlement_owner, custody.mint),
+             true);
+         add(token_program_id, false);
          continue;
       }
+
       if (!effect.reserve) continue;
 
       const auto token_code   = effect.reserve->token_code;
@@ -991,6 +1151,11 @@ outpost_solana_client::outpost_solana_client(
       // derive, and every later window repacks from the same cursor -- so it
       // has to be a boot failure, not a first-drain surprise.
       outpost_solana_client_detail::assert_reserve_shape(*_program_client->get_program());
+      // A drifted CollateralPosition declaration makes a LIVE position's
+      // pinned custody unreadable and would wedge every collateral dispatch
+      // window on the same unadvanced cursor.
+      outpost_solana_client_detail::assert_collateral_position_shape(
+         *_program_client->get_program());
    }
 }
 
@@ -1189,9 +1354,10 @@ std::string outpost_solana_client::drain_dispatch(
    // Per-attestation manifests, indexed by the SAME flat position the on-chain
    // dispatch cursor counts. Attestations needing no effect account keep an
    // empty entry so the indices stay aligned. The build reads ONE account per
-   // distinct reserve -- the `Reserve` PDA the handlers themselves branch on --
-   // probes the deadline per effect, and degrades a single unusable reserve
-   // instead of abandoning the envelope's other manifests.
+   // distinct Reserve or CollateralPosition -- the exact PDA the handlers
+   // themselves branch on -- probes the deadline per effect, and degrades a
+   // single absent account instead of abandoning the envelope's other
+   // manifests.
    const auto effects = outpost_solana_client_detail::extract_inbound_effects(envelope_bytes);
    const uint32_t total_attestations =
       outpost_solana_client_detail::count_inbound_attestations(envelope_bytes);
@@ -1203,6 +1369,10 @@ std::string outpost_solana_client::drain_dispatch(
       [&](uint64_t token_code, uint64_t reserve_code) {
          return reserve_info_for_codes(token_code, reserve_code);
       },
+      [&](const fc::network::solana::solana_public_key& operator_key, uint64_t token_code) {
+         return collateral_position_custody(operator_key, token_code);
+      },
+      _program_client->reserve_pda,
       to_string());
 
    // Settlement is a SEPARATE instruction, driven from the on-chain cursor.
@@ -1218,6 +1388,46 @@ std::string outpost_solana_client::drain_dispatch(
             epoch_index, dispatch_limit, std::move(batch_accounts));
       },
       to_string());
+}
+
+std::optional<outpost_solana_client_detail::token_custody_info>
+outpost_solana_client::collateral_position_custody(
+   const fc::network::solana::solana_public_key& operator_key, uint64_t token_code) {
+   const auto position_pda = outpost_solana_client_detail::derive_collateral_position_pda(
+      _program_id, operator_key, token_code);
+   const auto pda_label = position_pda.to_string(fc::yield_function_t{});
+
+   // An RPC/deadline exception is not evidence that this position is absent,
+   // so the read deliberately sits outside the decode-only try/catch.
+   const auto account_info = _entry->client->get_account_info(position_pda);
+   if (!account_info.has_value() || account_info->data.empty()) {
+      wlog("outpost_solana_client[{}]: CollateralPosition({}, {}) absent or empty at {}; "
+           "terminal manifest will omit branch-specific accounts for this position -- the "
+           "handler log-and-skips an uninitialized position",
+           to_string(), operator_key.to_string(fc::yield_function_t{}), token_code, pda_label);
+      return std::nullopt;
+   }
+
+   try {
+      const auto position_v = _program_client->decode_account_info_data(
+         collateral_position::account_name, account_info->data);
+      const auto& position = position_v.get_object();
+      FC_ASSERT(position.contains(collateral_position::field_custody_mint),
+                "CollateralPosition account missing '{}' field",
+                collateral_position::field_custody_mint);
+      return outpost_solana_client_detail::token_custody_info{
+         fc::network::solana::solana_public_key::from_base58_string(
+            position[collateral_position::field_custody_mint].as_string())};
+   } catch (const fc::exception& e) {
+      elog("outpost_solana_client[{}]: CollateralPosition({}, {}) at {} EXISTS ({} bytes) but "
+           "this relay cannot read its pinned custody; refusing to build a manifest the program "
+           "is guaranteed to abort on. The dispatch cursor is left untouched and this epoch "
+           "cannot settle until the cause is fixed -- check the loaded IDL against the deployed "
+           "program: {}",
+           to_string(), operator_key.to_string(fc::yield_function_t{}), token_code, pda_label,
+           account_info->data.size(), e.to_detail_string());
+      throw;
+   }
 }
 
 std::string outpost_solana_client::deliver_outbound_envelope(
