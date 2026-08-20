@@ -235,6 +235,91 @@ BOOST_AUTO_TEST_CASE(rotating_size_triggers_rollover) try {
    fs::remove_all(dir);
 } FC_LOG_AND_RETHROW()
 
+// rotating_file_sink_config::max_size is a MEGABYTE count that configure_logging scales by 1 MiB. A byte
+// count slipped in here silently turns rotation off: 1048576*10 reads as "10MB" but means ~10 TiB.
+static_assert(fc::sink::default_rotating_max_size_mb <= 1024,
+              "default_rotating_max_size_mb is a megabyte count -- a byte count here disables rotation");
+
+BOOST_AUTO_TEST_CASE(rotating_max_size_defaults_to_megabytes) try {
+   // Omitting max_size in logging.json must land on the documented megabyte default. The static_assert above
+   // guards the value itself; this covers the config path an operator actually exercises.
+   auto args_json = R"({ "base_filename": "/tmp/defaults.log", "max_files": 3 })";
+   auto cfg = fc::json::from_string(args_json).as<fc::sink::rotating_file_sink_config>();
+   BOOST_CHECK_EQUAL(cfg.max_size,  fc::sink::default_rotating_max_size_mb);
+   BOOST_CHECK_EQUAL(cfg.max_files, 3u);
+} FC_LOG_AND_RETHROW()
+
+BOOST_AUTO_TEST_CASE(configure_logging_rotating_max_size_is_megabytes) try {
+   // Pin the unit end to end: max_size = 1 must mean 1 MiB. A byte count would rotate on every record and
+   // run through max_files; a gigabyte count would never rotate at all.
+   auto dir     = make_temp_dir("mbunit");
+   auto cleanup = fc::make_scoped_exit([&]{ fs::remove_all(dir); });
+   auto restore = fc::make_scoped_exit([]{ fc::configure_logging(fc::logging_config::default_config()); });
+
+   auto file = dir / "mb.log";
+   fc::logging_config cfg;
+
+   fc::sink_config s;
+   s.name = "mb_rot";
+   s.type = "rotating_file_sink";
+   fc::sink::rotating_file_sink_config rot_cfg;
+   rot_cfg.base_filename = file.string();
+   rot_cfg.max_size  = 1; // 1 MiB
+   rot_cfg.max_files = 3;
+   s.args = fc::variant{rot_cfg};
+   cfg.sinks.push_back(s);
+
+   fc::logger_config lcfg;
+   lcfg.name    = "test_mb_unit_logger";
+   lcfg.level   = fc::log_level::info;
+   lcfg.enabled = true;
+   lcfg.sinks   = {"mb_rot"};
+   cfg.loggers.push_back(lcfg);
+
+   BOOST_REQUIRE(fc::configure_logging(cfg));
+   {
+      auto lgr = fc::log_config::get_logger("test_mb_unit_logger");
+      // ~1.2 MiB of payload: enough to cross a 1 MiB threshold exactly once.
+      const std::string payload(1024, 'x');
+      for (int i = 0; i < 1200; ++i) {
+         fc_ilog(lgr, "{}", payload);
+      }
+   }
+   // Drop the sink so the rotated files are closed and their sizes settle.
+   fc::configure_logging(fc::logging_config::default_config());
+
+   BOOST_REQUIRE(fs::exists(file));
+   BOOST_CHECK(fs::exists(dir / "mb.1.log"));  // rotated once -- so max_size is not gigabytes
+   BOOST_CHECK(!fs::exists(dir / "mb.2.log")); // and not bytes, which would have rotated on every record
+   BOOST_CHECK_LE(fs::file_size(file), std::size_t{1024} * 1024);
+} FC_LOG_AND_RETHROW()
+
+BOOST_AUTO_TEST_CASE(configure_logging_rejects_zero_max_size) try {
+   // spdlog rejects a zero rotation size; configure_logging must fail cleanly rather than propagate it.
+   auto dir     = make_temp_dir("zeromb");
+   auto cleanup = fc::make_scoped_exit([&]{ fs::remove_all(dir); });
+   auto restore = fc::make_scoped_exit([]{ fc::configure_logging(fc::logging_config::default_config()); });
+
+   fc::logging_config cfg;
+
+   fc::sink_config s;
+   s.name = "zero_rot";
+   s.type = "rotating_file_sink";
+   fc::sink::rotating_file_sink_config rot_cfg;
+   rot_cfg.base_filename = (dir / "zero.log").string();
+   rot_cfg.max_size  = 0;
+   rot_cfg.max_files = 3;
+   s.args = fc::variant{rot_cfg};
+   cfg.sinks.push_back(s);
+
+   fc::logger_config lcfg;
+   lcfg.name  = "test_zero_max_size_logger";
+   lcfg.sinks = {"zero_rot"};
+   cfg.loggers.push_back(lcfg);
+
+   BOOST_CHECK(!fc::configure_logging(cfg));
+} FC_LOG_AND_RETHROW()
+
 BOOST_AUTO_TEST_CASE(parse_config_from_json_text) try {
    // Full sink_config round-trip through fc::json. extra_fields must accept
    // the natural JSON-object form so operators can hand-edit logging.json.
