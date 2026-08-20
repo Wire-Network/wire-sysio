@@ -17,25 +17,42 @@ namespace c = sysio::depot::chains;
 
 BOOST_AUTO_TEST_SUITE(chains_registry_tests)
 
+namespace {
+constexpr auto EVM_OPP     = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+constexpr auto EVM_OPREG   = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
+constexpr auto SVM_PROGRAM = "So11111111111111111111111111111111111111112";
+constexpr bool ONE_PROGRAM = true;   // SVM
+constexpr bool PER_ROLE    = false;  // EVM
+} // namespace
+
 /// EVM: each role names its own contract, so the role field wins.
 BOOST_AUTO_TEST_CASE(role_specific_address_is_used_when_present) {
-   constexpr auto opp    = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
-   constexpr auto opreg  = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
-   BOOST_REQUIRE_EQUAL(std::string{opreg}, c::resolve_role_addr(opreg, opp));
+   BOOST_REQUIRE_EQUAL(std::string{EVM_OPREG},
+                       c::resolve_role_addr(EVM_OPREG, EVM_OPP, PER_ROLE));
 }
 
 /// SVM: one program serves every role, so `sysio.chains` requires the role
-/// fields to be empty and a reader falls back to `opp_addr`.
-BOOST_AUTO_TEST_CASE(empty_role_address_falls_back_to_opp_addr) {
-   constexpr auto program = "So11111111111111111111111111111111111111112";
-   BOOST_REQUIRE_EQUAL(std::string{program}, c::resolve_role_addr("", program));
+/// fields to be empty and every role resolves to `opp_addr`.
+BOOST_AUTO_TEST_CASE(single_program_outpost_resolves_every_role_to_opp_addr) {
+   BOOST_REQUIRE_EQUAL(std::string{SVM_PROGRAM},
+                       c::resolve_role_addr("", SVM_PROGRAM, ONE_PROGRAM));
 }
 
-/// A row registered before its remote contracts were deployed carries neither,
-/// and must resolve to empty so the caller can fail closed rather than sign to
-/// the zero address.
+/// The regression this signature exists to prevent: `setoutpost` accepts a
+/// partial EVM set, so a row can carry the OPP address while its
+/// OperatorRegistry is still undeployed. Substituting `opp_addr` there would be
+/// a plausible, non-empty, WRONG address — it passes an is-it-configured check
+/// and then commits to the OPP contract. The role must stay empty.
+BOOST_AUTO_TEST_CASE(per_role_outpost_never_falls_back_to_opp_addr) {
+   BOOST_REQUIRE_EQUAL(std::string{}, c::resolve_role_addr("", EVM_OPP, PER_ROLE));
+}
+
+/// A row registered before any remote contract was deployed carries neither,
+/// and must resolve to empty under either shape so the caller fails closed
+/// rather than signing to the zero address.
 BOOST_AUTO_TEST_CASE(unconfigured_row_resolves_to_empty) {
-   BOOST_REQUIRE_EQUAL(std::string{}, c::resolve_role_addr("", ""));
+   BOOST_REQUIRE_EQUAL(std::string{}, c::resolve_role_addr("", "", PER_ROLE));
+   BOOST_REQUIRE_EQUAL(std::string{}, c::resolve_role_addr("", "", ONE_PROGRAM));
 }
 
 /// Spelling regression guard — these must match `chain_row` and its nested
