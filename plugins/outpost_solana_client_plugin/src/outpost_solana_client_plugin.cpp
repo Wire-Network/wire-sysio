@@ -66,8 +66,10 @@ public:
       return std::views::values(_clients) | std::ranges::to<std::vector>();
    }
 
+   /** Return the published client identified by @p id, or null when there is none. */
    solana_client_entry_ptr get_client(const std::string& id) {
-      return _clients.at(id);
+      auto it = _clients.find(id);
+      return it == _clients.end() ? nullptr : it->second;
    }
 
    void add_client(const std::string& id, solana_client_entry_ptr client) {
@@ -160,7 +162,9 @@ void outpost_solana_client_plugin::set_program_options(options_description& cli,
       boost::program_options::value<std::vector<std::string>>()->multitoken(),
       "Outpost Solana Client spec, the plugin supports 1 to many clients in a given process. "
       "Format: `<sol-client-id>,<sig-provider-id>,<rpc-url>`. The signer id must "
-      "match an explicitly named --signature-provider with the Solana target chain and key type")(
+      "match an explicitly named --signature-provider with the Solana target chain and key type. "
+      "For a client serving an OPP outpost the sol-client-id MUST be that chain's sysio.chains "
+      "code (e.g. SOLANA): the operator daemons look their RPC client up under the chain code")(
       option_idl_file,
       boost::program_options::value<std::vector<std::filesystem::path>>()->multitoken(),
       "Solana program IDL file(s). Expects each file to be a JSON IDL (Anchor format) program definition.")(

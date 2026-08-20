@@ -32,6 +32,7 @@
 #include <sysio/underwriter_plugin/uic_signature_detail.hpp>
 #include <sysio/underwriter_plugin/uic_construction_detail.hpp>
 #include <sysio/underwriter_plugin/variant_enum_detail.hpp>
+#include <sysio/depot/chains_registry.hpp>
 #include <sysio/depot/opreg_status.hpp>
 #include <sysio/opp/opp.hpp>
 #include <sysio/opp/types/types.pb.h>
@@ -54,6 +55,9 @@ using namespace chain_apis;
 using namespace sysio::opp::types;
 namespace eth = fc::network::ethereum;
 namespace opp_att = sysio::opp::attestations;
+/// Field spellings for the `sysio.chains::chains` rows this plugin reads,
+/// shared with batch_operator_plugin so the two daemons cannot drift apart.
+namespace depot_chains = sysio::depot::chains;
 
 // SEC-13/WSA-027: exact-(chain_code, token_code, reserve_code) routing /
 // accounting keys, lifted to a testable detail header. These replace the
@@ -224,6 +228,10 @@ struct credit_line {
 struct outpost_endpoint {
    ChainKind   kind = ChainKind::CHAIN_KIND_UNKNOWN;
    std::string client_id;            ///< RPC connection id in the outpost client plugin
+   /// Remote contract identities, filled by `read_outpost_registry` from the
+   /// chain's `sysio.chains` row rather than from this node's config, so every
+   /// underwriter commits against the same deployment. Empty until governance
+   /// configures the row; the preflight and the wiring step both fail closed.
    std::string commit_addr;          ///< ETH OperatorRegistry addr / SOL program id
    std::string source_deposit_addr;  ///< ETH SwapDeposit contract / SOL program id
 };
@@ -240,10 +248,10 @@ struct underwriter_plugin::impl {
    uint32_t     scan_interval_ms    = underwriter_defaults::scan_interval_ms;
    uint32_t     action_timeout_ms   = underwriter_defaults::action_timeout_ms;
    /// SEC-13/WSA-027: per-chain outpost wiring, keyed by EXACT `chain_code`
-   /// slug value. One entry per chain the underwriter serves (operator-supplied
-   /// via `--underwriter-{eth,sol}-outpost`). Replaces the former single
-   /// eth/sol client-id + address, which could not distinguish two chains of
-   /// the same VM family.
+   /// slug value — one entry per ACTIVE non-depot chain. Built entirely by
+   /// `read_outpost_registry` from `sysio.chains`: the registry names which
+   /// chains are served and where their contracts live, and the RPC client id
+   /// is the chain's own code. Nothing here comes from this node's config.
    std::map<uint64_t, outpost_endpoint> outpost_endpoints;
    /// Per-chain external (numeric) chain id, captured from `sysio.chains`
    /// (`external_chain_id`) by `read_outpost_registry`, fed to
@@ -367,6 +375,9 @@ struct underwriter_plugin::impl {
    /// discovery, address encoding, on-chain confirmation) lives in the
    /// concrete. Per `outpost-client-spi.md`.
    std::map<uint64_t, sysio::outpost_client_ptr> outpost_by_chain;
+   /// The `commit_addr` each entry of `outpost_by_chain` was built against, so
+   /// a `sysio.chains::setoutpost` redeploy is noticed and the handle rebuilt.
+   std::map<uint64_t, std::string>               wired_commit_addrs;
    /// v6 cross-walk: token slug_name → TokenKind enum. Refreshed each
    /// scan cycle by `read_credit_lines` (which reads `sysio.tokens::tokens`
    /// for the lookup); used by `scan_pending_requests` to translate the
@@ -544,52 +555,49 @@ struct underwriter_plugin::impl {
       // the link + balance coverage checks know what to look for.
       read_outpost_registry();
 
-      // -- Check 2: outpost-client wiring covers every active chain --
+      // -- Check 2: an RPC client is registered for every active chain --
       //
       // The served set is `outpost_chain_kinds` (ACTIVE non-depot chains only,
-      // per `read_outpost_registry`) as consumed by `select_coverable`, but
-      // the outpost_client handles are built only from
-      // operator-supplied `--underwriter-{eth,sol}-outpost` config
-      // (`outpost_endpoints`). An active chain that is unconfigured, or
-      // configured under the wrong VM family, would let the scan loop SELECT a
-      // request for it and land one leg before discovering the other leg has no
-      // (or a wrong-kind) client (SEC-13/WSA-027). Fail closed here so a
+      // per `read_outpost_registry`) as consumed by `select_coverable`. An
+      // active chain with no RPC client would let the scan loop SELECT a
+      // request for it and land one leg before discovering the other leg has
+      // nowhere to commit (SEC-13/WSA-027). Fail closed here so a
       // misconfigured underwriter never starts committing partial swaps.
-      {
-         std::map<uint64_t, int> registered_kinds;
-         for (const auto& [code, kind] : outpost_chain_kinds)
-            registered_kinds[code] = magic_enum::enum_integer(kind);
-         std::map<uint64_t, int> configured_kinds;
-         for (const auto& [code, ep] : outpost_endpoints)
-            configured_kinds[code] = magic_enum::enum_integer(ep.kind);
+      //
+      // The client is looked up under the chain's OWN code: an
+      // outpost-ethereum-client / outpost-solana-client entry is registered
+      // with the chain code as its client id, which makes the binding exact by
+      // construction rather than inferred, and makes "wrong VM family" simply a
+      // client that is not there.
+      for (const auto& [chain_code, ep] : outpost_endpoints) {
+         const auto code_str = fc::slug_name{chain_code}.to_string();
+         const bool have_client =
+            ep.kind == ChainKind::CHAIN_KIND_EVM ? eth_plug->get_client(ep.client_id) != nullptr
+          : ep.kind == ChainKind::CHAIN_KIND_SVM ? sol_plug->get_client(ep.client_id) != nullptr
+                                                 : false;
+         if (!have_client) {
+            elog("underwriter preflight: active outpost chain {} (kind={}) has no RPC client "
+                 "registered under that chain code — add an outpost-ethereum-client / "
+                 "outpost-solana-client entry whose client id is {}",
+                 code_str,
+                 std::string{sysio::opp::types::ChainKind_Name(ep.kind)},
+                 code_str);
+            return false;
+         }
+      }
 
-         if (auto gap = underwriter_detail::find_endpoint_coverage_gap(
-                registered_kinds, configured_kinds)) {
-            const auto code_str = fc::slug_name{gap->chain_code}.to_string();
-            if (!gap->registry_kind) {
-               elog("underwriter preflight: configured outpost chain {} has no active "
-                    "sysio.chains::chains row; run activchain for this chain or remove its "
-                    "--underwriter-*-outpost flag",
-                    code_str);
-               return false;
-            }
-            // Re-derive the typed ChainKind names from the source maps rather
-            // than reverse-casting the raw ints; the generated `_Name` helper
-            // is the CLAUDE.md-mandated spelling for proto enums.
-            const ChainKind reg_kind = outpost_chain_kinds.at(gap->chain_code);
-            if (!gap->config_kind) {
-               elog("underwriter preflight: active outpost chain {} (kind={}) has no "
-                    "--underwriter-eth-outpost / --underwriter-sol-outpost entry; configure "
-                    "one endpoint for every active outpost chain",
-                    code_str, std::string{sysio::opp::types::ChainKind_Name(reg_kind)});
-            } else {
-               const ChainKind cfg_kind = outpost_endpoints.at(gap->chain_code).kind;
-               elog("underwriter preflight: outpost chain {} is registered as kind={} but "
-                    "configured as kind={}; fix --underwriter-*-outpost to match the registry",
-                    code_str,
-                    std::string{sysio::opp::types::ChainKind_Name(reg_kind)},
-                    std::string{sysio::opp::types::ChainKind_Name(cfg_kind)});
-            }
+      // -- Check 2b: the registry supplies every served chain's remote addresses --
+      //
+      // The addresses are no longer per-node config: `sysio.chains` carries them
+      // so every underwriter commits against the same deployment. A row
+      // registered before its remote contracts existed leaves them empty, and
+      // committing against an empty address would mean signing to the zero
+      // address. Fail closed until governance runs `sysio.chains::setoutpost`.
+      for (const auto& [chain_code, ep] : outpost_endpoints) {
+         if (ep.commit_addr.empty() || ep.source_deposit_addr.empty()) {
+            elog("underwriter preflight: outpost chain {} carries no remote contract addresses "
+                 "on its sysio.chains row — run sysio.chains::setoutpost for this chain",
+                 fc::slug_name{chain_code}.to_string());
             return false;
          }
       }
@@ -972,46 +980,18 @@ struct underwriter_plugin::impl {
          return;
       }
 
-      // Materialize one outpost_client SPI handle per CONFIGURED chain
-      // (SEC-13/WSA-027: keyed by EXACT chain_code, so two chains of the same VM
-      // family each get their own client + RPC). The underwriter never sees raw
-      // `ethereum_client` / `solana_client` instances after this point — every
-      // outpost-side action goes through the SPI virtuals. Per `outpost-client-spi.md`:
-      //   * ETH client carries only the OperatorRegistry address (the uw_commit
-      //     target); the underwriter neither consumes nor emits OPP envelopes, so
-      //     OPP / OPPInbound addresses are left empty.
-      //   * SOL client carries the opp-outpost program id; the typed wrapper
-      //     exposes `commit_underwrite` directly.
-      // `external_chain_id` comes from the matching ACTIVE `sysio.chains` row.
-      // The preflight above enforces that inverse coverage for both EVM and SVM
-      // endpoints before either client plugin is asked to build a handle.
+      // The preflight above already established that every active chain has both
+      // an RPC client and contract addresses; wire_outpost_clients documents the
+      // handles it builds.
       read_outpost_registry();
       try {
-         for (const auto& [chain_code, ep] : outpost_endpoints) {
-            const auto     code_str = fc::slug_name{chain_code}.to_string();
-            const uint32_t ext_id   = outpost_external_chain_ids.at(chain_code);
-            if (ep.kind == ChainKind::CHAIN_KIND_EVM) {
-               outpost_by_chain[chain_code] =
-                  eth_plug->create_outpost_client(ep.client_id, chain_code, ext_id,
-                                                  /*opp_addr=*/"", /*opp_inbound_addr=*/"",
-                                                  ep.commit_addr);
-               ilog("underwriter_plugin: wired ETH outpost_client chain={} (client_id='{}', opreg={})",
-                    code_str, ep.client_id, ep.commit_addr);
-            } else if (ep.kind == ChainKind::CHAIN_KIND_SVM) {
-               outpost_by_chain[chain_code] =
-                  sol_plug->create_outpost_client(ep.client_id, chain_code, ext_id,
-                                                  ep.commit_addr /*program_id*/,
-                                                  solana_outpost_role::underwriter);
-               ilog("underwriter_plugin: wired SOL outpost_client chain={} (client_id='{}', program={})",
-                    code_str, ep.client_id, ep.commit_addr);
-            } else {
-               wlog("underwriter_plugin: outpost_endpoint chain={} has unknown kind — skipped",
-                    code_str);
-            }
-         }
+         wire_outpost_clients();
          if (outpost_by_chain.empty()) {
-            wlog("underwriter_plugin: NO outpost_clients wired — pass "
-                 "--underwriter-eth-outpost / --underwriter-sol-outpost for each served chain");
+            // Preflight passed, so every ACTIVE chain had a client and addresses
+            // — reaching here means the registry holds no active non-depot chain
+            // at all, which the preflight reports separately. Nothing to serve yet.
+            wlog("underwriter_plugin: NO outpost_clients wired — sysio.chains lists no active "
+                 "non-depot chain");
          }
       } catch (const fc::exception& e) {
          gate_state = underwriter_detail::startup_state::wiring_failed;
@@ -1092,8 +1072,18 @@ struct underwriter_plugin::impl {
       poll_own_status();
       if (!is_active) return;
 
-      // Step 1: Read outpost registry for chain_kind mappings
+      // Step 1: Read outpost registry for chain_kind mappings, then re-wire any
+      // outpost whose remote deployment moved since the handle was built.
       read_outpost_registry();
+      try {
+         wire_outpost_clients();
+      } catch (const fc::exception& e) {
+         // A rebuild that fails leaves the previous handle in place; the next
+         // tick retries. Losing the whole scan cycle over one chain's RPC
+         // hiccup would stall commits on every OTHER chain too.
+         wlog("underwriter_plugin: outpost re-wire failed, keeping existing clients: {}",
+              e.to_detail_string());
+      }
 
       // Step 2: Read our credit lines from sysio.opreg::operators
       read_credit_lines();
@@ -1200,6 +1190,7 @@ struct underwriter_plugin::impl {
    void read_outpost_registry() {
       outpost_chain_kinds.clear();
       outpost_external_chain_ids.clear();
+      outpost_endpoints.clear();
       // v6 refactor: chain rows moved from `sysio.epoch::outposts` to
       // `sysio.chains::chains`. Each row is a `Chain` with fields:
       //   `code`              — slug_name (the universal chain identifier; the
@@ -1242,7 +1233,104 @@ struct underwriter_plugin::impl {
          outpost_chain_kinds[chain_code] = obj["kind"].as<ChainKind>();
          outpost_external_chain_ids[chain_code] =
             static_cast<uint32_t>(obj["external_chain_id"].as_uint64());
+         build_endpoint_from_row(chain_code, obj);
       }
+   }
+
+   /// Build one `outpost_client` SPI handle per CONFIGURED chain (SEC-13/WSA-027:
+   /// keyed by EXACT chain_code, so two chains of the same VM family each get
+   /// their own client + RPC). The underwriter never sees raw `ethereum_client`
+   /// / `solana_client` instances after this point — every outpost-side action
+   /// goes through the SPI virtuals. Per `outpost-client-spi.md`:
+   ///   * ETH client carries only the OperatorRegistry address (the uw_commit
+   ///     target); the underwriter neither consumes nor emits OPP envelopes, so
+   ///     OPP / OPPInbound addresses are left empty.
+   ///   * SOL client carries the opp-outpost program id; the typed wrapper
+   ///     exposes `commit_underwrite` directly.
+   /// `external_chain_id` and the contract addresses both come from the chain's
+   /// ACTIVE `sysio.chains` row, read by {@link read_outpost_registry}.
+   ///
+   /// Idempotent, and re-run every scan tick: a handle is rebuilt only when the
+   /// registry now names a DIFFERENT remote address than the one it was built
+   /// with. Governance can move a deployment under a running underwriter with
+   /// `sysio.chains::setoutpost`, and without this the daemon would keep
+   /// committing to the address the outpost has moved off.
+   void wire_outpost_clients() {
+      for (const auto& [chain_code, ep] : outpost_endpoints) {
+         const auto code_str = fc::slug_name{chain_code}.to_string();
+         // Skip chains with no active registry row: the preflight already
+         // failed the startup path on those, and on a rescan a chain can be
+         // deactivated without invalidating the clients still in use.
+         auto ext = outpost_external_chain_ids.find(chain_code);
+         if (ext == outpost_external_chain_ids.end()) continue;
+         if (ep.commit_addr.empty()) {
+            wlog("underwriter_plugin: outpost chain {} has no remote contract address on its "
+                 "sysio.chains row — not wiring until sysio.chains::setoutpost supplies one",
+                 code_str);
+            continue;
+         }
+         if (auto wired = wired_commit_addrs.find(chain_code);
+             wired != wired_commit_addrs.end() && wired->second == ep.commit_addr
+             && outpost_by_chain.contains(chain_code)) {
+            continue;   // already wired against this exact deployment
+         }
+         const bool rebuilt = outpost_by_chain.contains(chain_code);
+         if (ep.kind == ChainKind::CHAIN_KIND_EVM) {
+            outpost_by_chain[chain_code] =
+               eth_plug->create_outpost_client(ep.client_id, chain_code, ext->second,
+                                               /*opp_addr=*/"", /*opp_inbound_addr=*/"",
+                                               ep.commit_addr);
+            ilog("underwriter_plugin: {} ETH outpost_client chain={} (client_id='{}', opreg={})",
+                 rebuilt ? "rewired" : "wired", code_str, ep.client_id, ep.commit_addr);
+         } else if (ep.kind == ChainKind::CHAIN_KIND_SVM) {
+            outpost_by_chain[chain_code] =
+               sol_plug->create_outpost_client(ep.client_id, chain_code, ext->second,
+                                               ep.commit_addr /*program_id*/,
+                                               solana_outpost_role::underwriter);
+            ilog("underwriter_plugin: {} SOL outpost_client chain={} (client_id='{}', program={})",
+                 rebuilt ? "rewired" : "wired", code_str, ep.client_id, ep.commit_addr);
+         } else {
+            wlog("underwriter_plugin: outpost_endpoint chain={} has unknown kind — skipped",
+                 code_str);
+            continue;
+         }
+         wired_commit_addrs[chain_code] = ep.commit_addr;
+      }
+   }
+
+   /// Build this chain's endpoint entirely from its `chains` row.
+   ///
+   /// Nothing about an outpost is per-node any more: the registry names WHICH
+   /// chains are served (every active non-depot row) and WHERE each one lives,
+   /// and the RPC client is the one registered under the chain's own code. That
+   /// leaves the operator responsible only for supplying the endpoints
+   /// themselves, and makes it impossible for one underwriter to commit against
+   /// a deployment the rest of the network disagrees on.
+   void build_endpoint_from_row(uint64_t chain_code, const fc::variant_object& obj) {
+      outpost_endpoint ep;
+      ep.kind = outpost_chain_kinds.at(chain_code);
+      // The chain code IS the RPC client id — see outpost-ethereum-client /
+      // outpost-solana-client. The preflight fails closed when no client is
+      // registered under it.
+      ep.client_id = fc::slug_name{chain_code}.to_string();
+
+      std::string opp_addr, operator_registry_addr, source_deposit_addr;
+      if (auto out_it = obj.find(depot_chains::field::outpost);
+          out_it != obj.end() && out_it->value().is_object()) {
+         const auto& out = out_it->value().get_object();
+         const auto read = [&](const char* f) -> std::string {
+            auto it = out.find(f);
+            return it == out.end() ? std::string{} : it->value().as_string();
+         };
+         opp_addr               = read(depot_chains::field::outpost_addr::opp_addr);
+         operator_registry_addr = read(depot_chains::field::outpost_addr::operator_registry_addr);
+         source_deposit_addr    = read(depot_chains::field::outpost_addr::source_deposit_addr);
+      }
+      // An SVM outpost is one program serving every role, so the role fields
+      // are empty on its row and resolve back to opp_addr.
+      ep.commit_addr         = depot_chains::resolve_role_addr(operator_registry_addr, opp_addr);
+      ep.source_deposit_addr = depot_chains::resolve_role_addr(source_deposit_addr, opp_addr);
+      outpost_endpoints[chain_code] = std::move(ep);
    }
 
    /// True iff `code` is the WIRE depot's own chain code. Exact compare
@@ -2806,26 +2894,11 @@ void underwriter_plugin::set_program_options(options_description& cli,
         "How often to scan for pending underwrite requests (ms)");
    opts("underwriter-action-timeout-ms", bpo::value<uint32_t>()->default_value(underwriter_defaults::action_timeout_ms),
         "Timeout for outpost contract calls and table reads (ms)");
-   opts("underwriter-eth-outpost",
-        bpo::value<std::vector<std::string>>()->composing(),
-        "Per-EVM-chain outpost wiring (repeatable, one per EVM chain served). Format: "
-        "`<chain_code>,<client_id>,<operator_registry_addr>,<source_deposit_contract_addr>` — "
-        "chain_code is the sysio.chains codename (e.g. ETHEREUM); client_id names the RPC "
-        "connection of a configured Ethereum client; operator_registry_addr is the OPP "
-        "OperatorRegistry (uw_commit target); source_deposit_contract_addr is the SwapDeposit-"
-        "emitting contract scanned by the verify path. SEC-13/WSA-027: keyed by exact chain_code, "
-        "so two EVM chains are wired independently.");
-   opts("underwriter-sol-outpost",
-        bpo::value<std::vector<std::string>>()->composing(),
-        "Per-SVM-chain outpost wiring (repeatable, one per SVM chain served). Format: "
-        "`<chain_code>,<client_id>,<opp_outpost_program_id>` — client_id names the RPC connection "
-        "registered via --outpost-solana-client; program_id is the opp-outpost program (used for "
-        "both commit_underwrite and the source-deposit scan).");
    opts("underwriter-eth-source-deposit-function", bpo::value<std::string>(),
         "Name of the ETH swap-deposit function. Resolved at preflight against the ABI "
         "files registered with --ethereum-abi-file; the matching `function` entry's keccak256 "
         "signature yields the chain-agnostic 4-byte selector. The per-chain source contract "
-        "address comes from --underwriter-eth-outpost. Required.");
+        "address comes from the chain's sysio.chains row. Required.");
    opts("underwriter-sol-source-deposit-instruction", bpo::value<std::string>(),
         "Name of the SOL swap-deposit instruction. Resolved at preflight against the IDL "
         "files registered with --solana-idl-file; the matching instruction's anchor "
@@ -2845,45 +2918,6 @@ void underwriter_plugin::plugin_initialize(const variables_map& options) {
    _impl->scan_interval_ms  = options["underwriter-scan-interval-ms"].as<uint32_t>();
    _impl->action_timeout_ms = options["underwriter-action-timeout-ms"].as<uint32_t>();
    _impl->enabled           = _impl->underwriter_account.good();
-   // SEC-13/WSA-027: parse the repeatable per-chain outpost wiring into
-   // `outpost_endpoints`, keyed by EXACT chain_code. Each entry is a
-   // comma-separated `<chain_code>,<client_id>,<addr...>`.
-   {
-      auto split_csv = [](const std::string& s) {
-         std::vector<std::string> out;
-         for (size_t start = 0;;) {
-            const size_t comma = s.find(',', start);
-            out.push_back(s.substr(start, comma == std::string::npos ? comma : comma - start));
-            if (comma == std::string::npos) break;
-            start = comma + 1;
-         }
-         return out;
-      };
-      auto parse_outpost = [&](const char* opt, ChainKind kind, size_t min_fields) {
-         if (!options.count(opt)) return;
-         for (const auto& spec : options[opt].as<std::vector<std::string>>()) {
-            const auto f = split_csv(spec);
-            if (f.size() < min_fields || f[0].empty() || f[1].empty() || f[2].empty()) {
-               elog("underwriter: ignoring malformed {} entry '{}' (need "
-                    ">= {} non-empty comma-separated fields)", opt, spec, min_fields);
-               continue;
-            }
-            try {
-               outpost_endpoint ep;
-               ep.kind                = kind;
-               ep.client_id           = f[1];
-               ep.commit_addr         = f[2];
-               ep.source_deposit_addr = (f.size() > 3 && !f[3].empty()) ? f[3] : f[2];
-               _impl->outpost_endpoints[fc::slug_name{f[0]}.value] = ep;
-            } catch (const fc::exception& e) {
-               elog("underwriter: ignoring {} entry '{}' — bad chain_code '{}': {}",
-                    opt, spec, f[0], e.to_detail_string());
-            }
-         }
-      };
-      parse_outpost("underwriter-eth-outpost", ChainKind::CHAIN_KIND_EVM, /*min_fields=*/4);
-      parse_outpost("underwriter-sol-outpost", ChainKind::CHAIN_KIND_SVM, /*min_fields=*/3);
-   }
    if (options.count("underwriter-eth-source-deposit-function"))
       _impl->eth_source_deposit_function_name =
          options["underwriter-eth-source-deposit-function"].as<std::string>();

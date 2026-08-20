@@ -37,19 +37,120 @@ void require_priv_caller() {
                 "sysio.chains: privileged account required");
 }
 
+// ---------------------------------------------------------------------------
+//  Remote-address format validation
+//
+//  These addresses are consensus facts: every batch operator and underwriter
+//  reads the same row, so one malformed value breaks relay for the whole
+//  network rather than for a single misconfigured node. Validate the format at
+//  the ingress boundary, where the caller can still fix it.
+//
+//  Empty is allowed -- a chain may be registered before its remote contracts
+//  are deployed and filled in later via `setoutpost`; both daemons fail closed
+//  and skip a row whose address they need but do not have. The exception is a
+//  field that is structurally meaningless for the kind, which must be empty.
+// ---------------------------------------------------------------------------
+
+constexpr size_t EVM_ADDR_LEN = 42;    // "0x" + 20 bytes hex
+constexpr size_t SVM_ADDR_MIN = 32;    // base58 of a 32-byte pubkey, lower bound
+constexpr size_t SVM_ADDR_MAX = 44;    // base58 of a 32-byte pubkey, upper bound
+
+// Upper bound for a kind whose address format is not constrained below. The
+// EVM and SVM checks are far tighter; this exists only so an unrecognised
+// future kind cannot park an unbounded string in `sysio`-billed state, the
+// same concern `registry_metadata.hpp` bounds `name` and `description` for.
+constexpr size_t ADDR_MAX_BYTES = 128;
+
+bool is_hex_digit(char c) {
+   return (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F');
+}
+
+/// Bitcoin/Solana base58 alphabet -- [1-9A-HJ-NP-Za-km-z] (excludes 0, O, I, l).
+bool is_base58_char(char c) {
+   return (c >= '1' && c <= '9')
+       || (c >= 'A' && c <= 'H') || (c >= 'J' && c <= 'N') || (c >= 'P' && c <= 'Z')
+       || (c >= 'a' && c <= 'k') || (c >= 'm' && c <= 'z');
+}
+
+void check_evm_addr(const std::string& addr, const char* label) {
+   sysio::check(addr.size() == EVM_ADDR_LEN && addr[0] == '0' && addr[1] == 'x',
+                std::string("sysio.chains: ") + label + " must be a 0x-prefixed 20-byte hex address");
+   for (size_t i = 2; i < addr.size(); ++i) {
+      sysio::check(is_hex_digit(addr[i]),
+                   std::string("sysio.chains: ") + label + " contains a non-hex character");
+   }
+}
+
+void check_svm_addr(const std::string& addr, const char* label) {
+   sysio::check(addr.size() >= SVM_ADDR_MIN && addr.size() <= SVM_ADDR_MAX,
+                std::string("sysio.chains: ") + label + " must be a base58 program id (32-44 chars)");
+   for (char c : addr) {
+      sysio::check(is_base58_char(c),
+                   std::string("sysio.chains: ") + label + " contains a non-base58 character");
+   }
+}
+
+void check_empty(const std::string& addr, const char* label, const char* why) {
+   sysio::check(addr.empty(), std::string("sysio.chains: ") + label + " must be empty -- " + why);
+}
+
+/// Validate an `outpost_addrs` set against the chain kind. Non-empty values
+/// must match the kind's format; structurally-unused fields must be empty.
+void validate_outpost_addrs(opp::types::ChainKind kind, const outpost_addrs& o) {
+   // Applies to every kind, including ones with no format rule yet.
+   for (const auto* f : {&o.opp_addr, &o.opp_inbound_addr,
+                         &o.operator_registry_addr, &o.source_deposit_addr}) {
+      sysio::check(f->size() <= ADDR_MAX_BYTES,
+                   "sysio.chains: outpost address exceeds "
+                   + std::to_string(ADDR_MAX_BYTES) + " bytes");
+   }
+
+   switch (kind) {
+      case opp::types::CHAIN_KIND_WIRE: {
+         constexpr auto why = "the WIRE depot self-row has no remote deployment";
+         check_empty(o.opp_addr,               "opp_addr",               why);
+         check_empty(o.opp_inbound_addr,       "opp_inbound_addr",       why);
+         check_empty(o.operator_registry_addr, "operator_registry_addr", why);
+         check_empty(o.source_deposit_addr,    "source_deposit_addr",    why);
+         break;
+      }
+      case opp::types::CHAIN_KIND_EVM:
+         // Each role is its own contract on an EVM chain.
+         if (!o.opp_addr.empty())               check_evm_addr(o.opp_addr,               "opp_addr");
+         if (!o.opp_inbound_addr.empty())       check_evm_addr(o.opp_inbound_addr,       "opp_inbound_addr");
+         if (!o.operator_registry_addr.empty()) check_evm_addr(o.operator_registry_addr, "operator_registry_addr");
+         if (!o.source_deposit_addr.empty())    check_evm_addr(o.source_deposit_addr,    "source_deposit_addr");
+         break;
+      case opp::types::CHAIN_KIND_SVM: {
+         // One program serves every role; the daemons substitute opp_addr.
+         constexpr auto why = "an SVM outpost is a single program, named by opp_addr";
+         if (!o.opp_addr.empty()) check_svm_addr(o.opp_addr, "opp_addr");
+         check_empty(o.opp_inbound_addr,       "opp_inbound_addr",       why);
+         check_empty(o.operator_registry_addr, "operator_registry_addr", why);
+         check_empty(o.source_deposit_addr,    "source_deposit_addr",    why);
+         break;
+      }
+      default:
+         // Future kinds: bounded above, no format constraint yet.
+         break;
+   }
+}
+
 } // namespace
 
 void chains::regchain(opp::types::ChainKind kind,
                       sysio::slug_name       code,
                       uint32_t              external_chain_id,
                       std::string           name,
-                      std::string           description) {
+                      std::string           description,
+                      outpost_addrs         outpost) {
    require_priv_caller();
 
    sysio::check(kind != opp::types::CHAIN_KIND_UNKNOWN,
                 "sysio.chains: kind must not be UNKNOWN");
    // Both strings persist into a `sysio`-billed row -- bound them before emplace.
    opp::registry::check_metadata(name, description, "sysio.chains");
+   validate_outpost_addrs(kind, outpost);
 
    chains_t tbl(get_self());
    chain_key pk{code};
@@ -120,6 +221,7 @@ void chains::regchain(opp::types::ChainKind kind,
       .active             = bootstrap,
       .registered_at_ms   = now,
       .activated_at_ms    = bootstrap ? now : 0,
+      .outpost            = std::move(outpost),
    });
 }
 
@@ -135,6 +237,22 @@ void chains::activchain(sysio::slug_name code) {
    tbl.modify(ram_payer, pk, [&](auto& row) {
       row.active          = true;
       row.activated_at_ms = current_time_ms();
+   });
+}
+
+void chains::setoutpost(sysio::slug_name code, outpost_addrs outpost) {
+   require_priv_caller();
+
+   chains_t tbl(get_self());
+   chain_key pk{code};
+   auto it = tbl.find(pk);
+   sysio::check(it != tbl.end(), "sysio.chains: chain code not registered");
+   sysio::check(!it->is_depot, "sysio.chains: the depot self-row has no remote deployment");
+
+   validate_outpost_addrs(it->kind, outpost);
+
+   tbl.modify(ram_payer, pk, [&](auto& row) {
+      row.outpost = std::move(outpost);
    });
 }
 

@@ -27,13 +27,35 @@ All 21 batch operators run this plugin in perpetuity. The epoch scheduler (`sysi
 | `--batch-operator-account` | — | WIRE account name for this operator. Configuring it enables the relay |
 | `--batch-epoch-poll-ms` | 15000 | How often to check epoch state (ms) |
 | `--batch-delivery-timeout-ms` | 15000 | Max time to wait for chain delivery confirmation (ms) |
-| `--batch-sol-client-id` | `sol-default` | Solana outpost client ID (RPC connection) for SVM outpost rows |
-| `--batch-outpost` | — | Remote OPP contract binding for one active `sysio.chains` row, repeatable once per chain code. Spec: `CHAIN_CODE,opp_addr[,opp_inbound_addr]` |
 
 There is no separate enable flag: the relay runs when `--batch-operator-account`
 is configured, the way `producer_plugin` keys off `--producer-name`. The plugin
 must also be listed under `plugin =` (or pulled in as a dependency by
 `external_debugging_plugin`), and requires `read-mode = irreversible`.
+
+### Outpost wiring
+
+Nothing about an outpost is declared per node.
+
+* **Which chains** — every active non-depot `sysio.chains` row.
+* **Where each one lives** — the row's own `outpost` struct (`opp_addr` /
+  `opp_inbound_addr`), so every operator relays a chain through the same
+  deployment.
+* **How to reach it** — the RPC client registered under that chain's **own
+  code**. `--outpost-ethereum-client` / `--outpost-solana-client` take the
+  client id as their first field, and for an outpost that id must be the chain
+  code (`ETHEREUM`, `SOLANA`, ...). The Ethereum client's verified `eth_chainId`
+  is additionally asserted against the row's `external_chain_id`, so a client
+  registered under the wrong code is rejected rather than relayed through.
+
+An elected group must deliver on **every** active chain, so a missing RPC client
+is fatal: the node logs the chains it cannot serve and shuts down. The check runs
+after the sync gate, where `sysio.chains` is readable. Missing contract
+*addresses* are not fatal — they are governance state, fixable with
+`sysio.chains::setoutpost` without touching a node — so such a chain is skipped
+fail-closed and picked up on a later tick. A `setoutpost` redeploy is likewise
+picked up on the next epoch tick: the relay job is rebuilt against the new
+address rather than left pointing at the old one.
 
 ## Dependencies
 
