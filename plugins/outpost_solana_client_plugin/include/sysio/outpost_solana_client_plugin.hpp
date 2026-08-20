@@ -380,6 +380,10 @@ public:
    virtual void plugin_shutdown();
 
    std::vector<solana_client_entry_ptr> get_clients();
+   /// Return the configured client registered under `id`, or nullptr when there
+   /// is none. For an outpost the id is the chain's `sysio.chains` code, so a
+   /// null result means that chain has no endpoint configured on this node and
+   /// the caller must fail closed rather than fall back to another client.
    solana_client_entry_ptr get_client(const std::string& id);
    const std::vector<std::pair<std::filesystem::path, std::vector<fc::network::solana::idl::program>>>& get_idl_files();
 

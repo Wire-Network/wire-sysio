@@ -21,7 +21,6 @@
 #include <compare>
 #include <cstdint>
 #include <map>
-#include <optional>
 
 namespace sysio::underwriter_detail {
 
@@ -171,40 +170,6 @@ inline stored_commit_plan plan_stored_commits(bool candidate_exists,
       .submit_source = !source_complete,
       .submit_destination = !destination_complete,
    };
-}
-
-/// One outpost chain whose active registry row and configured endpoint disagree.
-struct endpoint_coverage_gap {
-   uint64_t           chain_code = 0;  ///< `fc::slug_name::value` of the offending chain.
-   std::optional<int> registry_kind;   ///< Registry kind, or empty when inactive/unregistered.
-   std::optional<int> config_kind;     ///< Configured kind, or empty when unconfigured.
-};
-
-/// Verify a one-to-one match between active registry chains and configured endpoints.
-///
-/// SEC-13 / WSA-027: the underwriter derives its served set from the on-chain
-/// registry (`sysio.chains`) but builds its outpost_client handles only from
-/// operator config. A registered chain that is unconfigured, or configured
-/// under the wrong VM family, lets the scan loop select a request whose leg has
-/// no (or a wrong-kind) client and land only the OTHER leg. Preflight uses this
-/// to fail closed before scheduling the scan job. Kinds are compared as raw
-/// integers so this header stays free of opp/fc dependencies (the plugin passes
-/// `magic_enum::enum_integer(kind)` at the boundary).
-inline std::optional<endpoint_coverage_gap>
-find_endpoint_coverage_gap(const std::map<uint64_t, int>& registered_kinds,
-                           const std::map<uint64_t, int>& configured_kinds) {
-   for (const auto& [chain_code, reg_kind] : registered_kinds) {
-      auto it = configured_kinds.find(chain_code);
-      if (it == configured_kinds.end())
-         return endpoint_coverage_gap{chain_code, reg_kind, std::nullopt};
-      if (it->second != reg_kind)
-         return endpoint_coverage_gap{chain_code, reg_kind, it->second};
-   }
-   for (const auto& [chain_code, config_kind] : configured_kinds) {
-      if (!registered_kinds.contains(chain_code))
-         return endpoint_coverage_gap{chain_code, std::nullopt, config_kind};
-   }
-   return std::nullopt;
 }
 
 } // namespace sysio::underwriter_detail

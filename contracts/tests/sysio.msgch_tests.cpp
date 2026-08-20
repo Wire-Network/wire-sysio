@@ -7,6 +7,7 @@
 #include <fc/slug_name.hpp>
 
 #include "contracts.hpp"
+#include "contract_test_support.hpp"
 #include <sysio/chain/action.hpp>
 
 using namespace sysio::testing;
@@ -101,6 +102,7 @@ public:
          ("external_chain_id", chain_id)
          ("name",              std::string("outpost"))
          ("description",       std::string{})
+         ("outpost", sysio_system::test_support::no_outpost_mvo())
       );
       return success();
    }
@@ -270,6 +272,7 @@ public:
             ("external_chain_id", chain_id)
             ("name",              std::string("outpost"))
             ("description",       std::string{})
+            ("outpost", sysio_system::test_support::no_outpost_mvo())
          ));
    }
 
