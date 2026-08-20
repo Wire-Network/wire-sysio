@@ -669,8 +669,14 @@ struct batch_operator_plugin::impl {
                continue;
             }
          } catch (const fc::exception& e) {
-            wlog("batch_operator: failed to build outpost_client for outpost {}: {}",
-                 code_str, e.to_string());
+            // The factory throws on a client that cannot serve this row at all —
+            // most importantly when the client registered under this chain code
+            // reports a different eth_chainId than the row's external_chain_id.
+            // That is a misconfiguration only the operator can fix, so it is
+            // unserviceable on the same terms as a missing client; swallowing it
+            // here would leave an elected operator silently unable to deliver.
+            unserviceable.emplace_back(code_str,
+               std::format("outpost client could not be built: {}", e.top_message()));
             continue;
          }
 
