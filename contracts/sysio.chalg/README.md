@@ -5,8 +5,8 @@ OPP envelope dispute resolution and slash-execution contract.
 ## Responsibility
 
 - Resolves conflicting OPP outpost envelopes via a Tier-1 node-owner vote when the automatic
-  consensus rules in `sysio.msgch` cannot: a terminal two-version tie, or an existing 3+-version
-  split with no majority for one (outpost, epoch)
+  consensus rules in `sysio.msgch` see two or more versions with no strict majority after the epoch
+  boundary for one (outpost, epoch), including when an otherwise eligible operator was silent
 - Pauses epoch advancement while a dispute is open and releases it on resolution
 - Dispatches the winning envelope (via `sysio.msgch::resolvedisp`) once a checksum wins
 - Executes slashing of operators through `sysio.opreg` -- the single slashing chokepoint that holds
@@ -30,16 +30,17 @@ OPP envelope dispute resolution and slash-execution contract.
 
 ## Dispute-vote flow
 
-1. **Open**: `sysio.msgch::evalcons` calls `opendispute` inline for either a terminal two-version
-   tie (all live eligible batch operators delivered) or an existing 3+-version no-majority split
-   past the epoch boundary. The dispute records the candidate checksums, snapshots the active ROA
-   generation's Tier-1 electorate and fixed quorum, and pauses `sysio.epoch`.
+1. **Open**: `sysio.msgch::evalcons` calls `opendispute` inline for a post-boundary no-majority
+   split with at least two versions, regardless of whether every eligible operator delivered. The
+   dispute records the candidate checksums, snapshots the active ROA generation's Tier-1 electorate
+   and fixed quorum, and pauses `sysio.epoch`.
 2. **Vote**: owners in the dispute's frozen Tier-1 electorate call `votedispute` with one of the
    candidate checksums. Later ROA registrations cannot join an in-flight dispute. One vote per owner.
 3. **Tally**: anyone cranks `chkdispute`. With `N` equal to the snapshotted electorate size and
    fixed `Q = floor(N/2)+1`, a checksum reaching `Q` votes wins at any time (fast path); after the 24h
    deadline the bar relaxes to a quorum of cast votes (`cast >= Q`) plus a strict majority of cast
-   (`2*votes > cast`). No plurality / tie-break -- an undecided tally keeps waiting for votes.
+   (`2*votes > cast`). No plurality / tie-break -- an undecided tally remains open and keeps the
+   epoch paused until Tier-1 supplies a resolvable vote.
 4. **Resolve**: the winning checksum is recorded and dispatched via `sysio.msgch::resolvedisp`.
    `sysio.epoch` is unpaused when the final open dispute resolves. The next
    `sysio.epoch::advance` then slashes every operator that delivered a non-canonical checksum for
