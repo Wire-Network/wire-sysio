@@ -99,6 +99,22 @@ is what caused a payout to be multiplied. The positional counters establish the
 actual period length only; `batchepochs` supplies roster identity, so a schedule
 rotation cannot reassign an earlier epoch to the current front group.
 
+### Roster-history bounds and recovery
+
+`setemitcfg` accepts a payment cadence only in `[1, 10]`, which bounds an
+ordinary payment period to at most ten immutable roster snapshots. When
+`sysio.epoch` reads an older serialized configuration during an upgrade, it
+effectively clamps a zero or out-of-range cadence to that same safe window; the
+stored value is not rewritten until a normal `setemitcfg` update.
+
+The `rcrdbatch` inline action also prunes the exact oldest retained row before
+writing a new one, so a legacy overlong period cannot halt epoch advancement.
+If `payepoch` sees missing, stale, non-contiguous, or over-cap history, it does
+not guess a roster or abort the enclosing `advance`: it retains that period's
+batch-emission and swap-fee slices in the treasury, clears the unusable history
+after the accrued period, and begins a clean history in the next period. A
+complete history remains required to credit batch-operator rewards.
+
 `epochlog.fee_distributed` records what was actually paid, so it can be lower
 than the swept amount — and is `0` when no eligible batch operator existed at all,
 even though `drainrewards` swept the bucket to zero regardless.

@@ -124,12 +124,19 @@ emissions_gate_result check_emissions_ready(uint32_t epoch_duration_sec, uint32_
       return r;
    }
 
-   // Decide whether this advance fires payepoch. Pay fires when the target
-   // epoch is `pay_cadence_epochs - 1` past `period_start_epoch`. Genesis
-   // case: t5s.period_start_epoch = 0, so the first period covers epochs
-   // 1..(pay_cadence - 1) (one short, since epoch 0 is genesis). Subsequent
-   // periods are exactly pay_cadence_epochs long.
-   r.is_pay_epoch = (target_epoch >= t5s.period_start_epoch + cfg.pay_cadence_epochs - 1);
+   // Decide whether this advance fires payepoch. New writes are bounded by
+   // setemitcfg, but pre-bound deployments can retain a larger stored cadence.
+   // Clamp it here so a legacy value cannot make rcrdbatch retain an unbounded
+   // roster history or defer the corrective payout forever. A zero value is
+   // likewise treated as the minimum safe cadence for old serialized state.
+   const uint16_t effective_pay_cadence_epochs = std::clamp<uint16_t>(
+      cfg.pay_cadence_epochs, 1, sysiosystem::emissions::MAX_PAY_CADENCE_EPOCHS);
+
+   // Pay fires when the target epoch is `effective_pay_cadence_epochs - 1`
+   // past `period_start_epoch`. Genesis case: t5s.period_start_epoch = 0, so
+   // the first period covers epochs 1..(pay_cadence - 1) (one short, since
+   // epoch 0 is genesis). Subsequent periods are exactly cadence epochs long.
+   r.is_pay_epoch = (target_epoch >= t5s.period_start_epoch + effective_pay_cadence_epochs - 1);
 
    // Pay-epoch only: check the period total (pending + this epoch's share)
    // against sysio's balance. Non-pay epochs do not transfer, so no balance
@@ -892,7 +899,7 @@ void epoch::advance() {
          "payepoch"_n,
          std::make_tuple(
             state.current_epoch_index,
-            state.batch_op_groups,
+            std::vector<std::vector<name>>{},
             gate.period_emission
          )
       ).send();

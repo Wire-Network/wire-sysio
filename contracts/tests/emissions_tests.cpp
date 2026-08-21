@@ -2444,10 +2444,11 @@ BOOST_FIXTURE_TEST_CASE( accrueepoch_saturates_pending_accumulator, sysio_emissi
       get_t5_state()["pending_emission_amount"].as<int64_t>() );
 } FC_LOG_AND_RETHROW()
 
-BOOST_FIXTURE_TEST_CASE( payepoch_rejects_incomplete_batch_roster_history, sysio_emissions_tester ) try {
-   // A complete immutable roster history is intentionally mandatory. This
-   // prevents a mixed contract version or a late activation from silently
-   // assigning prior epochs to the current rotation position.
+BOOST_FIXTURE_TEST_CASE( payepoch_recovers_from_incomplete_batch_roster_history, sysio_emissions_tester ) try {
+   // A mixed contract version can reach payepoch without any immutable roster
+   // snapshots. That must retain the batch slice rather than aborting the
+   // inline sysio.epoch::advance path chain-wide.
+   create_t5_holding_accounts();
    BOOST_REQUIRE_EQUAL(success(), setemitcfg_defaults(config::system_account_name));
    BOOST_REQUIRE_EQUAL(success(), initt5(config::system_account_name, tpsec(head_secs())));
    BOOST_REQUIRE_EQUAL(success(),
@@ -2458,11 +2459,74 @@ BOOST_FIXTURE_TEST_CASE( payepoch_rejects_incomplete_batch_roster_history, sysio
       ("epoch_index", 1)
       ("batch_op_groups", vector<vector<name>>{})
       ("period_emission", int64_t(1)));
-   BOOST_REQUIRE(r != success());
-   require_substr(r, "batch roster history incomplete");
+   BOOST_REQUIRE_EQUAL(success(), r);
 
-   // The failed inline-equivalent action leaves the outstanding period intact.
-   BOOST_REQUIRE_EQUAL(int64_t(1), get_t5_state()["pending_emission_amount"].as<int64_t>());
+   // The period completes and establishes a clean next-period boundary.
+   auto state = get_t5_state();
+   BOOST_REQUIRE_EQUAL(int64_t(0), state["pending_emission_amount"].as<int64_t>());
+   BOOST_REQUIRE_EQUAL(uint32_t(2), state["period_start_epoch"].as<uint32_t>());
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( payepoch_seeds_initial_roster_history_at_activation_epoch, sysio_emissions_tester ) try {
+   // T5 may be initialized after sysio.epoch has already advanced. The first
+   // retained roster, not literal epoch one, defines that initial period.
+   create_t5_holding_accounts();
+   BOOST_REQUIRE_EQUAL(success(), setemitcfg_defaults(config::system_account_name));
+   BOOST_REQUIRE_EQUAL(success(), initt5(config::system_account_name, tpsec(head_secs())));
+   BOOST_REQUIRE_EQUAL(success(),
+      push_system_action(EPOCH, "accrueepoch"_n, mvo()
+         ("epoch_index", 42)("batch_group_index", 0)("per_epoch_emission", int64_t(1))));
+   BOOST_REQUIRE_EQUAL(success(),
+      push_system_action(EPOCH, "rcrdbatch"_n, mvo()
+         ("epoch_index", 42)("members", vector<name>{})));
+
+   BOOST_REQUIRE_EQUAL(success(), push_system_action(EPOCH, "payepoch"_n, mvo()
+      ("epoch_index", 42)
+      ("batch_op_groups", vector<vector<name>>{})
+      ("period_emission", int64_t(1))));
+
+   BOOST_REQUIRE_EQUAL(uint32_t(43), get_t5_state()["period_start_epoch"].as<uint32_t>());
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( payepoch_recovers_after_legacy_roster_history_exceeds_cap, sysio_emissions_tester ) try {
+   // A legacy cadence above the new cap can leave more accrued epochs than
+   // retained rosters. The eleventh rcrdbatch must prune its exact oldest row
+   // rather than halting advance; payepoch then takes the retention/recovery
+   // path and the following clean period pays normally.
+   constexpr uint32_t roster_history_cap = 10;
+   create_t5_holding_accounts();
+   BOOST_REQUIRE_EQUAL(success(), setemitcfg_defaults(config::system_account_name));
+   BOOST_REQUIRE_EQUAL(success(), initt5(config::system_account_name, tpsec(head_secs())));
+
+   for (uint32_t epoch_index = 1; epoch_index <= roster_history_cap + 1; ++epoch_index) {
+      BOOST_REQUIRE_EQUAL(success(), push_system_action(EPOCH, "accrueepoch"_n, mvo()
+         ("epoch_index", epoch_index)("batch_group_index", 0)("per_epoch_emission", int64_t(1))));
+      BOOST_REQUIRE_EQUAL(success(), push_system_action(EPOCH, "rcrdbatch"_n, mvo()
+         ("epoch_index", epoch_index)("members", vector<name>{})));
+   }
+
+   // Reaching this point proves the cap boundary did not reject the mandatory
+   // eleventh record. Its missing first snapshot takes the recovery path.
+   BOOST_REQUIRE_EQUAL(success(), push_system_action(EPOCH, "payepoch"_n, mvo()
+      ("epoch_index", roster_history_cap + 1)
+      ("batch_op_groups", vector<vector<name>>{})
+      ("period_emission", int64_t(roster_history_cap + 1))));
+   BOOST_REQUIRE_EQUAL(uint32_t(roster_history_cap + 2),
+                       get_t5_state()["period_start_epoch"].as<uint32_t>());
+
+   // The failed-completeness period cleared its history; the next complete
+   // period is processed normally rather than inheriting stale rows.
+   const uint32_t recovery_epoch = roster_history_cap + 2;
+   BOOST_REQUIRE_EQUAL(success(), push_system_action(EPOCH, "accrueepoch"_n, mvo()
+      ("epoch_index", recovery_epoch)("batch_group_index", 0)("per_epoch_emission", int64_t(1))));
+   BOOST_REQUIRE_EQUAL(success(), push_system_action(EPOCH, "rcrdbatch"_n, mvo()
+      ("epoch_index", recovery_epoch)("members", vector<name>{})));
+   BOOST_REQUIRE_EQUAL(success(), push_system_action(EPOCH, "payepoch"_n, mvo()
+      ("epoch_index", recovery_epoch)
+      ("batch_op_groups", vector<vector<name>>{})
+      ("period_emission", int64_t(1))));
+   BOOST_REQUIRE_EQUAL(uint32_t(recovery_epoch + 1),
+                       get_t5_state()["period_start_epoch"].as<uint32_t>());
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( setemitcfg_bounds_period_accrual_to_asset_range, sysio_emissions_tester ) try {

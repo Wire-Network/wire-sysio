@@ -625,13 +625,14 @@ namespace sysiosystem {
           * distributes it across producer / batch / capital / capex / gov
           * pools as today, scaled to the period.
           *
-          * `batch_op_groups` is the full state.batch_op_groups vector from
-          * sysio.epoch. Payout uses the immutable `batchepochs` roster history
-          * written for every accrued epoch; t5state.batch_group_epochs supplies
-          * the ACTUAL accrued-epoch count, rather than configured
+          * `batch_op_groups` is retained as an ABI-compatible reserved field;
+          * payout uses only the immutable `batchepochs` roster history written
+          * for every accrued epoch. t5state.batch_group_epochs supplies the
+          * ACTUAL accrued-epoch count, rather than configured
           * pay_cadence_epochs, because a mid-period config change or shortened
-          * genesis period can make those differ. A complete history is a strict
-          * precondition for payout.
+          * genesis period can make those differ. Incomplete history retains the
+          * batch slice in treasury and is reset for the next period; it must
+          * never halt sysio.epoch::advance.
           *
           * Runtime conditions (config missing, treasury exhausted, balance
           * insufficient) are caught upstream by the gate, which records the

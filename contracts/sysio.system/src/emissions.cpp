@@ -674,14 +674,19 @@ void system_contract::rcrdbatch(uint32_t epoch_index, std::vector<sysio::name> m
    batchepochs_t history(get_self());
    const batch_epoch_key key{epoch_index};
    sysio::check(!history.contains(key), "batch roster already recorded for epoch");
-   uint16_t history_count = 0;
-   for (auto it = history.begin();
-        it != history.end() && history_count < emissions::MAX_PAY_CADENCE_EPOCHS;
-        ++it) {
-      ++history_count;
+
+   // Never let an old stored cadence make this mandatory inline action throw.
+   // Normal advances pay at most every MAX_PAY_CADENCE_EPOCHS, but the exact
+   // oldest key probe also heals a pre-bound configuration without
+   // deserializing every historical roster on each advance.
+   if (epoch_index > emissions::MAX_PAY_CADENCE_EPOCHS) {
+      const batch_epoch_key oldest_retained{
+         static_cast<uint32_t>(epoch_index - emissions::MAX_PAY_CADENCE_EPOCHS)};
+      if (history.contains(oldest_retained)) {
+         history.erase(oldest_retained);
+      }
    }
-   sysio::check(history_count < emissions::MAX_PAY_CADENCE_EPOCHS,
-                "batch roster history exceeds safety cap");
+
    history.emplace(get_self(), key, batch_epoch{
       .sysio_epoch_index = epoch_index,
       .members           = members,
@@ -790,13 +795,25 @@ void system_contract::payepoch(uint32_t epoch_index,
    std::vector<recorded_batch_group> recorded_batch_groups;
    bool batch_history_complete = accrued_epochs > 0;
    int64_t recorded_epochs = 0;
-   uint64_t expected_epoch_index =
-      state.period_start_epoch == 0 ? 1 : state.period_start_epoch;
+   uint64_t expected_epoch_index = state.period_start_epoch;
 
    for (auto it = batch_history.begin(); it != batch_history.end(); ++it) {
+      // A stale/corrupted table must not make the mandatory payepoch inline
+      // action abort. Bound deserialization to the configured safety window,
+      // retain the batch slice, and clear the table below so the next period
+      // starts from a fresh immutable roster history.
+      if (recorded_epochs == emissions::MAX_PAY_CADENCE_EPOCHS) {
+         batch_history_complete = false;
+         break;
+      }
       ++recorded_epochs;
-      sysio::check(recorded_epochs <= emissions::MAX_PAY_CADENCE_EPOCHS,
-                   "batch roster history exceeds safety cap");
+
+      // A clean activation may initialize T5 after sysio.epoch has already
+      // advanced. In that first period, the earliest recorded roster defines
+      // the start rather than an obsolete literal epoch-one assumption.
+      if (expected_epoch_index == 0) {
+         expected_epoch_index = it->sysio_epoch_index;
+      }
       if (static_cast<uint64_t>(it->sysio_epoch_index) != expected_epoch_index) {
          batch_history_complete = false;
       }
@@ -819,8 +836,6 @@ void system_contract::payepoch(uint32_t epoch_index,
       batch_history_complete
       && recorded_epochs == accrued_epochs
       && expected_epoch_index == static_cast<uint64_t>(epoch_index) + 1;
-   sysio::check(accrued_epochs == 0 || batch_history_complete,
-                "batch roster history incomplete");
 
    // ----- Swap-fee rewards fold-in -----
    // The BATCH-OPERATOR half of collected swap fees accrues in sysio.reserv's
@@ -1006,8 +1021,9 @@ void system_contract::payepoch(uint32_t epoch_index,
    // Batch-op pay. Each historical roster receives a slice weighted by its
    // actual active epochs over the period. The legacy counters still supply the
    // actual period length, rather than cfg.pay_cadence_epochs: configuration can
-   // change between accruals. The complete immutable history is a strict
-   // invariant and is bounded by MAX_PAY_CADENCE_EPOCHS.
+   // change between accruals. Complete immutable history is required for a
+   // batch payout and bounded by MAX_PAY_CADENCE_EPOCHS. Incomplete history
+   // takes the non-halting retention path below, so it cannot abort advance.
    // =======================================================================
    auto pay_batch_group = [&](const std::vector<sysio::name>& group,
                               uint32_t active_epochs) {
@@ -1032,16 +1048,24 @@ void system_contract::payepoch(uint32_t epoch_index,
       }
    };
 
-   if (accrued_epochs > 0) {
+   if (batch_history_complete) {
       for (const auto& group : recorded_batch_groups) {
          pay_batch_group(group.members, group.active_epochs);
       }
+   } else if (accrued_epochs > 0) {
+      // Do not guess a roster during a mixed-version upgrade or an incomplete
+      // first period: retain its batch emission and swap-fee slices in the
+      // treasury, then let the next period establish a complete history.
+      sysio::print("batch roster history incomplete; retaining batch operator rewards for this period");
    }
 
-   // A pay period is the history lifetime. The whole action is atomic, so this
-   // can only clear a complete history after its corresponding payout.
-   for (auto it = batch_history.begin(); it != batch_history.end(); ) {
-      it = batch_history.erase(it);
+   // A pay period is the history lifetime. Clear only after an actual accrued
+   // period: on the defensive zero-accrual path the history is preserved rather
+   // than silently discarding roster identity without a batch payout.
+   if (accrued_epochs > 0) {
+      for (auto it = batch_history.begin(); it != batch_history.end(); ) {
+         it = batch_history.erase(it);
+      }
    }
 
    // =======================================================================
