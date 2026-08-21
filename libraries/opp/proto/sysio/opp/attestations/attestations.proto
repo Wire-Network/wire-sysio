@@ -34,13 +34,6 @@ message ReserveBalanceSheet {
 //  during the deprecation pass)
 // ---------------------------------------------------------------------------
 
-message PretokenStakeChange {
-  sysio.opp.types.ChainAddress actor          = 1;
-  sysio.opp.types.TokenAmount  amount         = 2;
-  int64                        index_at_mint  = 10;
-  int64                        index_at_burn  = 11;
-}
-
 message PretokenPurchase {
   sysio.opp.types.ChainAddress actor          = 1;
   sysio.opp.types.TokenAmount  amount         = 2;
