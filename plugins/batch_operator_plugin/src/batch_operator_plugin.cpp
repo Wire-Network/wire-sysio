@@ -52,7 +52,8 @@ namespace {
    /// Exact secondary-index lookups should return at most the matching row.
    constexpr uint32_t EXACT_LOOKUP_LIMIT = 1;
 
-   /// my_group sentinel meaning "we are not in any batch-op group".
+   /// Group-index sentinel. For `my_group` it means "we are not in any
+   /// batch-op group"; for `current_group`, "no epoch state parsed yet".
    constexpr uint8_t GROUP_NONE = 255;
 
    // ── WIRE contract identifiers (actions, tables, indexes, field names) ──
@@ -151,11 +152,11 @@ struct batch_operator_plugin::impl {
 
    // Epoch state tracked across polls
    uint32_t                 current_epoch = 0;
-   uint8_t                  my_group = 255;
+   uint8_t                  my_group = GROUP_NONE;
    /// The group index ON DUTY, straight from `epochstate.current_batch_op_group`.
    /// Retained across polls because the election decision is made in
    /// `parse_epoch_state` but reported in `do_poll_epoch_state`.
-   uint8_t                  current_group = 255;
+   uint8_t                  current_group = GROUP_NONE;
    bool                     is_elected = false;
    fc::time_point           epoch_start;
    fc::time_point           next_epoch_start;
