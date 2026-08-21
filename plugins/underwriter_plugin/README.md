@@ -156,10 +156,9 @@ authenticated depot submitter.
 
 | Option | Default | Description |
 |---|---|---|
-| `--underwriter-account` | — | WIRE account name for this underwriter |
+| `--underwriter-account` | — | WIRE account name for this underwriter. Configuring it enables the scan cycle |
 | `--underwriter-scan-interval-ms` | 5000 | How often to scan for pending uwreqs (ms) |
 | `--underwriter-action-timeout-ms` | 15000 | Timeout for outpost RPC calls and table reads (ms) |
-| `--underwriter-enabled` | false | Enable underwriter functionality |
 | `--underwriter-eth-outpost` | — | Per-EVM-chain outpost wiring (repeatable, one per served EVM chain). Format `<chain_code>,<client_id>,<operator_registry_addr>,<source_deposit_contract_addr>` — keyed by exact `chain_code`, so two EVM chains are wired independently |
 | `--underwriter-sol-outpost` | — | Per-SVM-chain outpost wiring (repeatable, one per served SVM chain). Format `<chain_code>,<client_id>,<opp_outpost_program_id>` |
 | `--underwriter-eth-source-deposit-function` | — | Name of the ETH swap-deposit function; the chain-agnostic 4-byte selector is resolved at preflight from the loaded `--ethereum-abi-file` ABIs (required) |
@@ -195,10 +194,10 @@ completes they report the startup-gate state instead of the payload
 `wiring_failed` / `startup_failed` with `detail`); once the gate opens
 they serve the payloads above with `status: "active"`.
 
-The endpoints are registered only when the underwriter is enabled:
-with the plugin loaded but `--underwriter-enabled false` (the
-default), `plugin_startup` skips endpoint registration and every
-listener returns 404 for these routes.
+The endpoints are registered only when the underwriter is enabled,
+which means only when `--underwriter-account` is configured. With the
+plugin loaded but no account, `plugin_startup` skips endpoint
+registration and every listener returns 404 for these routes.
 
 ### Listener exposure
 
@@ -222,7 +221,7 @@ nodeop \
   --http-server-address http-category-address \
   --http-category-address underwriter,127.0.0.1:8890 \
   --plugin sysio::underwriter_plugin \
-  --underwriter-enabled true \
+  --underwriter-account myuwriter \
   ...
 ```
 

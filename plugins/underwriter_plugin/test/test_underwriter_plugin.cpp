@@ -40,6 +40,11 @@ namespace {
 /// the option-surface test catch any future non-finality escape hatch.
 constexpr std::string_view removed_eth_min_confirmations_option = "underwriter-eth-min-confirmations";
 
+/// Removed enable flag. Configuring underwriter-account is what enables the
+/// scan cycle; a separate flag would let an operator set the account and still
+/// underwrite nothing, which is indistinguishable from a healthy node.
+constexpr std::string_view removed_enabled_option = "underwriter-enabled";
+
 /// Program id used by the scanner tests to model the configured opp-outpost.
 const std::string test_sol_program_id = "OppOutpost11111111111111111111111111111111";
 
@@ -346,11 +351,11 @@ BOOST_AUTO_TEST_CASE(plugin_options_are_registered) try {
    BOOST_CHECK(option_names.count("underwriter-account") > 0);
    BOOST_CHECK(option_names.count("underwriter-scan-interval-ms") > 0);
    BOOST_CHECK(option_names.count("underwriter-action-timeout-ms") > 0);
-   BOOST_CHECK(option_names.count("underwriter-enabled") > 0);
    BOOST_CHECK(option_names.count("underwriter-eth-outpost") > 0);
    BOOST_CHECK(option_names.count("underwriter-sol-outpost") > 0);
    BOOST_CHECK(option_names.count(std::string{ETH_SOURCE_DEPOSIT_LOOKBACK_BLOCKS_OPTION}) > 0);
    BOOST_CHECK_EQUAL(option_names.count(std::string{removed_eth_min_confirmations_option}), 0);
+   BOOST_CHECK_EQUAL(option_names.count(std::string{removed_enabled_option}), 0);
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(default_options_are_correct) try {
@@ -365,7 +370,8 @@ BOOST_AUTO_TEST_CASE(default_options_are_correct) try {
 
    BOOST_CHECK_EQUAL(vm["underwriter-scan-interval-ms"].as<uint32_t>(), scan_interval_ms);
    BOOST_CHECK_EQUAL(vm["underwriter-action-timeout-ms"].as<uint32_t>(), action_timeout_ms);
-   BOOST_CHECK_EQUAL(vm["underwriter-enabled"].as<bool>(), enabled);
+   // No default account: an unconfigured node leaves the scan cycle off.
+   BOOST_CHECK_EQUAL(vm.count("underwriter-account"), 0u);
    // SEC-13/WSA-027: the former single --underwriter-{eth,sol}-client-id were
    // replaced by repeatable per-chain --underwriter-{eth,sol}-outpost (no scalar
    // default to assert; presence is checked in the option-registration case).
