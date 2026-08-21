@@ -23,6 +23,10 @@ constexpr name ram_payer = "sysio"_n;
 
 namespace {
 
+/// Rejection text for a dispute without enough competing envelope versions to adjudicate.
+constexpr const char* DISPUTE_REQUIRES_TWO_CANDIDATES =
+   "a dispute requires at least two candidate envelope versions";
+
 /// WIRE asset symbol for the challenge-bond escrow + payouts (9 decimals — mirrors
 /// `sysio.reserv`'s WIRE_SYMBOL; deliberately NOT opreg's CORE_SYM).
 constexpr sysio::symbol WIRE_SYMBOL{"WIRE", 9};
@@ -244,8 +248,8 @@ void chalg::opendispute(uint64_t chain_code,
                         uint32_t epoch_index,
                         std::vector<dispute_candidate> candidates) {
    require_auth(MSGCH_ACCOUNT);
-   check(candidates.size() >= 3,
-         "a dispute requires at least 3 candidate envelope versions");
+   check(candidates.size() >= chalg_limits::minimum_dispute_candidate_versions,
+         DISPUTE_REQUIRES_TWO_CANDIDATES);
 
    disputes_t disputes(get_self());
 

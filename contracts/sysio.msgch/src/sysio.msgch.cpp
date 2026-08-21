@@ -87,6 +87,16 @@ constexpr size_t   ENVELOPE_BASELINE_BYTES    = 512;
 constexpr const char* UIC_DISPATCH_REJECTED_LOG_PREFIX =
    "UIC_DISPATCH_REJECTED";
 
+/// Diagnostic for a split with fewer competing versions than a Tier-1 vote can adjudicate.
+constexpr const char* DISPUTE_TOO_FEW_CANDIDATES_LOG =
+   "msgch::maybe_open_dispute: no dispute for (chain=%llu, epoch=%u): "
+   "%u distinct version(s), a vote needs >=%u\n";
+
+/// Diagnostic for a non-terminal two-version split whose outstanding operator may form a majority.
+constexpr const char* DISPUTE_TWO_WAY_SPLIT_INCOMPLETE_LOG =
+   "msgch::maybe_open_dispute: no dispute for (chain=%llu, epoch=%u): "
+   "two-way split has %u of %u eligible deliveries\n";
+
 uint32_t current_epoch_index() {
    epoch::epochstate_t tbl(EPOCH_ACCOUNT);
    return tbl.exists() ? tbl.get().current_epoch_index : 0;
@@ -1175,21 +1185,23 @@ void dispatch_attestation(name self, uint64_t attestation_id,
    return true;
 }
 
-/// Evaluate the dispute trigger and, if met, open a Tier-1 dispute vote via sysio.chalg. Trigger:
-/// the epoch boundary has passed, 3+ distinct envelope versions exist, and no version holds a
-/// majority of the operator group. A majority — even within a 3+-way split — resolves without a
-/// vote, so it is not a trigger; a sub-3-way or pre-boundary split just waits for more deliveries.
+/// Evaluate the dispute trigger and, if met, open a Tier-1 dispute vote via sysio.chalg. A
+/// post-boundary no-majority split with three or more versions retains the existing behavior. A
+/// two-version split is disputable only when every live eligible operator has delivered, so an
+/// outstanding operator can still break a partial split by forming a strict majority. A majority
+/// always resolves without a vote; a one-version or pre-boundary split waits for more deliveries.
 void maybe_open_dispute(name self, uint64_t chain_code, uint32_t epoch_index,
-                        uint32_t group_size,
+                        uint32_t group_size, uint32_t total_deliveries,
                         const std::vector<checksum256>& seen_checksums,
                         const std::vector<uint32_t>& checksum_counts,
                         const std::vector<std::vector<name>>& checksum_operators) {
    // OPP silent-return diagnostics: each branch below silently declines to open a
    // dispute. Logged (visible under --contracts-console) so "the dispute never
    // opened" is greppable instead of a black hole.
-   if (seen_checksums.size() < 3) {
-      sysio::print_f("msgch::maybe_open_dispute: no dispute for (chain=%llu, epoch=%u): %u distinct version(s), a vote needs >=3\n",
-                     chain_code, epoch_index, (uint32_t)seen_checksums.size());
+   if (seen_checksums.size() < chalg_limits::minimum_dispute_candidate_versions) {
+      sysio::print_f(DISPUTE_TOO_FEW_CANDIDATES_LOG,
+                     chain_code, epoch_index, (uint32_t)seen_checksums.size(),
+                     chalg_limits::minimum_dispute_candidate_versions);
       return;
    }
 
@@ -1197,6 +1209,17 @@ void maybe_open_dispute(name self, uint64_t chain_code, uint32_t epoch_index,
    if (!state_tbl.exists() || current_time_point() < state_tbl.get().next_epoch_start) {
       sysio::print_f("msgch::maybe_open_dispute: no dispute for (chain=%llu, epoch=%u): epoch boundary not yet passed\n",
                      chain_code, epoch_index);
+      return;
+   }
+
+   // A partial two-way split has eligible operators that can still deliver a legitimate strict
+   // majority. Escalating it to a Tier-1 vote would pause the whole epoch prematurely, so only the
+   // terminal form — every eligible operator already delivered — becomes a dispute. Multi-version
+   // splits deliberately retain their existing post-boundary behavior.
+   if (seen_checksums.size() == chalg_limits::minimum_dispute_candidate_versions &&
+       total_deliveries != group_size) {
+      sysio::print_f(DISPUTE_TWO_WAY_SPLIT_INCOMPLETE_LOG,
+                     chain_code, epoch_index, total_deliveries, group_size);
       return;
    }
 
@@ -1440,8 +1463,8 @@ void msgch::evalcons(uint64_t chain_code, uint32_t epoch_index) {
    };
 
    // Group envelopes by checksum, tracking the operators that delivered each version (CDT-compatible
-   // parallel vectors). The per-version operator lists become the dispute candidates on a 3+-way
-   // split.
+   // parallel vectors). The per-version operator lists become the dispute candidates on a terminal
+   // two-way or an existing multi-version split.
    std::vector<checksum256>       seen_checksums;
    std::vector<uint32_t>          checksum_counts;
    std::vector<std::vector<char>> checksum_data;
@@ -1498,9 +1521,10 @@ void msgch::evalcons(uint64_t chain_code, uint32_t epoch_index) {
    }
 
    if (!consensus_reached) {
-      // No automatic consensus. On a 3+-way no-majority split past the epoch boundary, open a
-      // Tier-1 dispute vote; a smaller or pre-boundary split just waits for more deliveries.
-      maybe_open_dispute(get_self(), chain_code, epoch_index, group_size,
+      // No automatic consensus. A terminal two-way or an existing multi-version no-majority split
+      // past the epoch boundary opens a Tier-1 dispute vote; a one-version or pre-boundary split
+      // waits for more deliveries.
+      maybe_open_dispute(get_self(), chain_code, epoch_index, group_size, total_deliveries,
                          seen_checksums, checksum_counts, checksum_operators);
       return;
    }

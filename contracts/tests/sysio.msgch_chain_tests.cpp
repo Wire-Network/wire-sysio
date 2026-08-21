@@ -62,6 +62,12 @@ constexpr std::string_view ETH_CHAIN_CODE = "ETH";
 constexpr std::string_view SOL_CHAIN_CODE = "SOL";
 constexpr uint64_t BATCH_OPERATOR_MINIMUM_COLLATERAL = 1;
 constexpr uint64_t TABLE_SCAN_LIMIT = 64;
+constexpr uint32_t ONE_OPERATOR_PER_TIED_VERSION = 1;
+constexpr uint32_t THREE_OPERATORS_PER_TIED_VERSION = 3;
+constexpr std::string_view ONE_TO_ONE_LEFT_PAYLOAD = "one-to-one-left";
+constexpr std::string_view ONE_TO_ONE_RIGHT_PAYLOAD = "one-to-one-right";
+constexpr std::string_view THREE_TO_THREE_LEFT_PAYLOAD = "three-to-three-left";
+constexpr std::string_view THREE_TO_THREE_RIGHT_PAYLOAD = "three-to-three-right";
 
 /// sysio.opreg action identifiers used by the WNS-16 fixture.
 namespace opreg_actions {
@@ -116,10 +122,44 @@ constexpr const char* WINNING_CHECKSUM = "winning_checksum";
 constexpr const char* CHECKSUM         = "checksum";
 } // namespace msgch_fields
 
+/// sysio.chalg table identifiers used by the split-consensus regressions.
+namespace chalg_tables {
+constexpr name DISPUTES = "disputes"_n;
+} // namespace chalg_tables
+
+/// sysio.chalg action identifiers used by the terminal-tie regressions.
+namespace chalg_actions {
+constexpr name CHECK_DISPUTE = "chkdispute"_n;
+constexpr name VOTE_DISPUTE  = "votedispute"_n;
+} // namespace chalg_actions
+
+/// sysio.chalg ABI type identifiers used by the split-consensus regressions.
+namespace chalg_abi_types {
+constexpr const char* DISPUTE_ENTRY = "dispute_entry";
+} // namespace chalg_abi_types
+
+/// sysio.chalg ABI field identifiers used by the split-consensus regressions.
+namespace chalg_fields {
+constexpr const char* CANDIDATES  = "candidates";
+constexpr const char* CHAIN_CODE  = "chain_code";
+constexpr const char* CHECKSUM    = "checksum";
+constexpr const char* EPOCH_INDEX = "epoch_index";
+constexpr const char* OPERATORS   = "operators";
+constexpr const char* STATUS      = "status";
+} // namespace chalg_fields
+
+/// sysio.chalg vote-action ABI field identifiers used by the terminal-tie regressions.
+namespace chalg_vote_fields {
+constexpr const char* CHOSEN_CHECKSUM = "chosen_checksum";
+constexpr const char* DISPUTE_ID       = "dispute_id";
+constexpr const char* OWNER            = "owner";
+} // namespace chalg_vote_fields
+
 /// sysio.epoch ABI field identifiers used by the WNS-16 fixture.
 namespace epoch_fields {
 constexpr const char* BATCH_OP_GROUPS       = "batch_op_groups";
 constexpr const char* CURRENT_BATCH_OP_GROUP = "current_batch_op_group";
+constexpr const char* IS_PAUSED              = "is_paused";
 } // namespace epoch_fields
 
 } // anonymous namespace
@@ -142,8 +182,14 @@ public:
    static constexpr auto BATCHOP        = "batchop.a"_n;
    static constexpr auto BATCHOP_B      = "batchop.b"_n;
    static constexpr auto BATCHOP_C      = "batchop.c"_n;
+   static constexpr auto BATCHOP_D      = "batchop.d"_n;
+   static constexpr auto BATCHOP_E      = "batchop.e"_n;
+   static constexpr auto BATCHOP_F      = "batchop.f"_n;
 
    static constexpr uint32_t EPOCH_DURATION_SEC = 60;
+   static constexpr uint32_t ONE_TO_ONE_TIE_GROUP_SIZE = 2;
+   static constexpr uint32_t THREE_TO_THREE_TIE_GROUP_SIZE = 6;
+   static constexpr uint64_t FIRST_DISPUTE_ID = 1;
 
    sysio_msgch_chain_tester() {
       produce_blocks(2);
@@ -153,7 +199,8 @@ public:
       // pay-epoch transfers. Same bootstrap rationale as sysio_epoch_flushwtdw_tester.
       create_accounts({
          TOKEN_ACCOUNT, EPOCH_ACCOUNT, OPREG_ACCOUNT, MSGCH_ACCOUNT,
-         CHALG_ACCOUNT, CHAINS_ACCOUNT, UWRIT_ACCOUNT, BATCHOP, BATCHOP_B, BATCHOP_C,
+         CHALG_ACCOUNT, CHAINS_ACCOUNT, UWRIT_ACCOUNT,
+         BATCHOP, BATCHOP_B, BATCHOP_C, BATCHOP_D, BATCHOP_E, BATCHOP_F,
          "sysio.dclaim"_n, "sysio.gov"_n, "sysio.ops"_n
       });
       produce_blocks(2);
@@ -242,9 +289,8 @@ public:
             ("pay_cadence_epochs",     uint16_t(1))));
    }
 
-   /// Epoch + opreg config, a configurable `BATCHOP` plus bootstrapped `BATCHOP_B`/`BATCHOP_C` when
-   /// `n_batch_ops` is 3 (a single group of three, so consensus needs more than one delivery), ETH +
-   /// SOL chain rows, group schedule, and genesis advance.
+   /// Configure one test cohort of up to six batch operators, the ETH/SOL outpost rows, its one-group
+   /// schedule, and the genesis advance. The configurable cohort supports even split regressions.
    void bootstrap(uint32_t n_batch_ops = 1, bool batchop_is_bootstrapped = true) {
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT,
          "setconfig"_n, mvo()
@@ -285,11 +331,11 @@ public:
                                                                             BATCH_OPERATOR_MINIMUM_COLLATERAL) })
             ("req_uw_collat",                    fc::variants{})));
 
-      std::vector<name> batch_ops{BATCHOP};
-      if (n_batch_ops == 3) {
-         batch_ops.push_back(BATCHOP_B);
-         batch_ops.push_back(BATCHOP_C);
-      }
+      const std::vector<name> available_batch_ops{
+         BATCHOP, BATCHOP_B, BATCHOP_C, BATCHOP_D, BATCHOP_E, BATCHOP_F};
+      BOOST_REQUIRE(n_batch_ops > 0 && n_batch_ops <= available_batch_ops.size());
+      std::vector<name> batch_ops(available_batch_ops.begin(),
+                                  available_batch_ops.begin() + n_batch_ops);
       for (const auto& op : batch_ops) {
          BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT,
             "regoperator"_n, mvo()
@@ -406,6 +452,68 @@ public:
       return data.empty() ? fc::variant() : msgch_abi.binary_to_variant(
          "outpost_consensus_entry", data,
          abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
+   /// Return the dispute row by id, or null when the consensus path did not open one.
+   fc::variant get_dispute(uint64_t dispute_id) {
+      auto data = get_row_by_id(CHALG_ACCOUNT, CHALG_ACCOUNT, chalg_tables::DISPUTES, dispute_id);
+      return data.empty() ? fc::variant() : chalg_abi.binary_to_variant(
+         chalg_abi_types::DISPUTE_ENTRY, data,
+         abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
+   /// Assert that the full `chkcons -> evalcons -> opendispute` route recorded the exact split.
+   void assert_open_tie_dispute(uint32_t expected_epoch,
+                                const std::vector<fc::sha256>& expected_checksums,
+                                const std::vector<uint32_t>& expected_operator_counts) {
+      BOOST_REQUIRE_EQUAL(expected_checksums.size(), expected_operator_counts.size());
+      const auto dispute = get_dispute(FIRST_DISPUTE_ID);
+      BOOST_REQUIRE(!dispute.is_null());
+      BOOST_REQUIRE_EQUAL(
+         dispute[chalg_fields::STATUS].as<opp::types::DisputeStatus>(),
+         opp::types::DisputeStatus::DISPUTE_STATUS_OPEN);
+      BOOST_REQUIRE_EQUAL(dispute[chalg_fields::CHAIN_CODE].as_uint64(), ETH_OUTPOST_ID);
+      BOOST_REQUIRE_EQUAL(dispute[chalg_fields::EPOCH_INDEX].as<uint32_t>(), expected_epoch);
+
+      const auto candidates = dispute[chalg_fields::CANDIDATES].get_array();
+      BOOST_REQUIRE_EQUAL(candidates.size(), expected_checksums.size());
+      for (size_t index = 0; index < candidates.size(); ++index) {
+         BOOST_REQUIRE_EQUAL(candidates[index][chalg_fields::CHECKSUM].as_string(),
+                             expected_checksums[index].str());
+         BOOST_REQUIRE_EQUAL(candidates[index][chalg_fields::OPERATORS].get_array().size(),
+                             expected_operator_counts[index]);
+      }
+   }
+
+   /// Cast the sole seeded Tier-1 vote for a terminal tie's expected winning envelope.
+   action_result vote_dispute(uint64_t dispute_id, const fc::sha256& chosen_checksum) {
+      return push(CHALG_ACCOUNT, chalg_abi, NODE_DADDY, chalg_actions::VOTE_DISPUTE, mvo()
+         (chalg_vote_fields::OWNER, NODE_DADDY.to_string())
+         (chalg_vote_fields::DISPUTE_ID, dispute_id)
+         (chalg_vote_fields::CHOSEN_CHECKSUM, chosen_checksum));
+   }
+
+   /// Resolve the first dispute and verify that its selected envelope is durably accepted by msgch.
+   void resolve_tie_dispute(uint32_t expected_epoch, const fc::sha256& expected_winner) {
+      BOOST_REQUIRE_EQUAL(success(), vote_dispute(FIRST_DISPUTE_ID, expected_winner));
+      BOOST_REQUIRE_EQUAL(success(), push(CHALG_ACCOUNT, chalg_abi, BATCHOP,
+                                         chalg_actions::CHECK_DISPUTE,
+                                         mvo()(chalg_vote_fields::DISPUTE_ID, FIRST_DISPUTE_ID)));
+
+      const auto dispute = get_dispute(FIRST_DISPUTE_ID);
+      BOOST_REQUIRE_EQUAL(
+         dispute[chalg_fields::STATUS].as<opp::types::DisputeStatus>(),
+         opp::types::DisputeStatus::DISPUTE_STATUS_RESOLVED);
+      const auto consensus = get_outpcons(ETH_OUTPOST_ID);
+      BOOST_REQUIRE(!consensus.is_null());
+      BOOST_REQUIRE_EQUAL(consensus[msgch_fields::EPOCH_INDEX].as<uint32_t>(), expected_epoch);
+      BOOST_REQUIRE_EQUAL(consensus[msgch_fields::WINNING_CHECKSUM].as_string(), expected_winner.str());
+   }
+
+   /// Return whether the epoch is paused by one or more unresolved disputes.
+   bool epoch_paused() {
+      const auto state = read_epoch_state();
+      return !state.is_null() && state[epoch_fields::IS_PAUSED].as_bool();
    }
 
    /// Inbound delivery metadata for one (outpost, epoch, batch operator), or null when absent.
@@ -1566,6 +1674,92 @@ BOOST_FIXTURE_TEST_CASE(pre_boundary_majority_finalized_by_chkcons_crank, sysio_
    BOOST_REQUIRE_EQUAL(opc["consensus_reached"].as<bool>(), true);
    BOOST_REQUIRE_EQUAL(opc["epoch_index"].as<uint32_t>(), epoch);
    BOOST_REQUIRE_EQUAL(opc["envelope_digest"].as_string(), digest.str());
+} FC_LOG_AND_RETHROW() }
+
+/// A 1–1 split leaves no strict majority. The deliveries deliberately land before the epoch
+/// boundary, so only the permissionless `chkcons` crank can re-drive evalcons and open the dispute.
+BOOST_FIXTURE_TEST_CASE(chkcons_opens_dispute_for_one_to_one_tie, sysio_msgch_chain_tester) { try {
+   bootstrap(ONE_TO_ONE_TIE_GROUP_SIZE);
+
+   const uint32_t epoch = current_epoch();
+   const auto left = encode_delivery(epoch, std::string(ONE_TO_ONE_LEFT_PAYLOAD));
+   const auto right = encode_delivery(epoch, std::string(ONE_TO_ONE_RIGHT_PAYLOAD));
+
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, left));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, right));
+   produce_blocks();
+   BOOST_REQUIRE(get_dispute(FIRST_DISPUTE_ID).is_null());
+
+   elapse_epoch_boundary();
+   advance_via_consensus();
+
+   assert_open_tie_dispute(epoch,
+                           {fc::sha256::hash(left.data(), left.size()),
+                            fc::sha256::hash(right.data(), right.size())},
+                           {ONE_OPERATOR_PER_TIED_VERSION, ONE_OPERATOR_PER_TIED_VERSION});
+   resolve_tie_dispute(epoch, fc::sha256::hash(left.data(), left.size()));
+} FC_LOG_AND_RETHROW() }
+
+/// The same `chkcons` route must preserve the full candidate tallies for a larger even 3–3 split.
+BOOST_FIXTURE_TEST_CASE(chkcons_opens_dispute_for_three_to_three_tie, sysio_msgch_chain_tester) { try {
+   bootstrap(THREE_TO_THREE_TIE_GROUP_SIZE);
+
+   const uint32_t epoch = current_epoch();
+   const auto left = encode_delivery(epoch, std::string(THREE_TO_THREE_LEFT_PAYLOAD));
+   const auto right = encode_delivery(epoch, std::string(THREE_TO_THREE_RIGHT_PAYLOAD));
+   const std::vector<name> left_operators{BATCHOP, BATCHOP_B, BATCHOP_C};
+   const std::vector<name> right_operators{BATCHOP_D, BATCHOP_E, BATCHOP_F};
+
+   for (const auto& operator_name : left_operators) {
+      BOOST_REQUIRE_EQUAL(success(), deliver_as(operator_name, ETH_OUTPOST_ID, left));
+      produce_blocks();
+   }
+   for (const auto& operator_name : right_operators) {
+      BOOST_REQUIRE_EQUAL(success(), deliver_as(operator_name, ETH_OUTPOST_ID, right));
+      produce_blocks();
+   }
+   BOOST_REQUIRE(get_dispute(FIRST_DISPUTE_ID).is_null());
+
+   elapse_epoch_boundary();
+   advance_via_consensus();
+
+   assert_open_tie_dispute(epoch,
+                           {fc::sha256::hash(left.data(), left.size()),
+                            fc::sha256::hash(right.data(), right.size())},
+                           {THREE_OPERATORS_PER_TIED_VERSION, THREE_OPERATORS_PER_TIED_VERSION});
+   resolve_tie_dispute(epoch, fc::sha256::hash(left.data(), left.size()));
+} FC_LOG_AND_RETHROW() }
+
+/// Two conflicting deliveries must not pause the epoch while a third eligible operator can form a
+/// strict majority. Its later matching delivery proves the partial split was not terminal.
+BOOST_FIXTURE_TEST_CASE(chkcons_waits_for_an_outstanding_operator_in_a_two_way_split,
+                        sysio_msgch_chain_tester) { try {
+   bootstrap(/*n_batch_ops=*/3);
+
+   const uint32_t epoch = current_epoch();
+   const auto left = encode_delivery(epoch, std::string(ONE_TO_ONE_LEFT_PAYLOAD));
+   const auto right = encode_delivery(epoch, std::string(ONE_TO_ONE_RIGHT_PAYLOAD));
+   const auto left_checksum = fc::sha256::hash(left.data(), left.size());
+
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, left));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, right));
+   produce_blocks();
+
+   elapse_epoch_boundary();
+   advance_via_consensus();
+
+   BOOST_REQUIRE(get_dispute(FIRST_DISPUTE_ID).is_null());
+   BOOST_REQUIRE(!epoch_paused());
+
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, ETH_OUTPOST_ID, left));
+   produce_blocks();
+
+   const auto consensus = get_outpcons(ETH_OUTPOST_ID);
+   BOOST_REQUIRE(!consensus.is_null());
+   BOOST_REQUIRE_EQUAL(consensus[msgch_fields::EPOCH_INDEX].as<uint32_t>(), epoch);
+   BOOST_REQUIRE_EQUAL(consensus[msgch_fields::WINNING_CHECKSUM].as_string(), left_checksum.str());
 } FC_LOG_AND_RETHROW() }
 
 // Review follow-up on WNS-15(a): the consensus tally and the threshold must be drawn from the SAME
