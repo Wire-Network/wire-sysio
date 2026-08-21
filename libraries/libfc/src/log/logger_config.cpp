@@ -63,6 +63,9 @@ namespace fc {
    }
 
    namespace {
+      /// rotating_file_sink_config::max_size is expressed in megabytes; spdlog wants a byte count.
+      constexpr std::size_t bytes_per_mb = 1024 * 1024;
+
       std::unique_ptr<spdlog::formatter> build_formatter(const format_config& f, const std::string& sink_name) {
          if (f.type == "pattern") {
             std::string pattern;
@@ -157,8 +160,9 @@ namespace fc {
                log_config::get().sink_map[cfg.sinks[i].name] = sink;
             } else if (cfg.sinks[i].type == "rotating_file_sink") {
                auto config = cfg.sinks[i].args.as<sink::rotating_file_sink_config>();
+               FC_ASSERT(config.max_size > 0, "rotating_file_sink max_size must be greater than zero MB");
                auto sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(
-                       config.base_filename, std::size_t{config.max_size}*1024*1024, config.max_files);
+                       config.base_filename, std::size_t{config.max_size} * bytes_per_mb, config.max_files);
                log_config::get().sink_map[cfg.sinks[i].name] = sink;
             } else if (cfg.sinks[i].type == "dmlog_sink") {
                auto config = cfg.sinks[i].args.as<sink::dmlog_sink_config>();

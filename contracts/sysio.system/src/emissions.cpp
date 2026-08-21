@@ -905,15 +905,21 @@ void system_contract::payepoch(uint32_t epoch_index,
       actual_paid += distributed_to_producers;
 
       // Reset round-tracking after distribution (iteration-safe: uses PK snapshot).
+      // The reclaimed count is accumulated across the loop and applied to the global in one
+      // modify, so the whole reset costs a single deferred KV write rather than one per producer.
+      uint32_t reclaimed_unpaid_blocks = 0;
       for (const auto& owner : to_reset) {
          auto key = producer_key_t{owner.value};
          _producers.modify(same_payer, key, [&](auto& p) {
-            _gstate.total_unpaid_blocks -= p.unpaid_blocks;
+            reclaimed_unpaid_blocks += p.unpaid_blocks;
             p.unpaid_blocks        = 0;
             p.eligible_rounds      = 0;
             p.current_round_blocks = 0;
             p.last_block_num       = no_prev_block;
          });
+      }
+      if (reclaimed_unpaid_blocks > 0) {
+         _global.modify(get_self(), [&](auto& g) { g.total_unpaid_blocks -= reclaimed_unpaid_blocks; });
       }
    }
 

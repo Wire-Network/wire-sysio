@@ -132,23 +132,6 @@ uint32_t get_current_epoch() {
    return es.get().current_epoch_index;
 }
 
-/// Compose the `sha256(account || chain_code || token_code)` composite key.
-/// Post v6 split-index design (§B.2): the rollup helpers (`opreg_pending_withdraws`,
-/// `sum_locks_inline`) now scan the per-uint64 secondary indexes (`byaccount`,
-/// `byuw`) and filter `(chain_code, token_code)` in memory instead of indexing
-/// by a 24-byte composite. This helper is kept only for any caller that still
-/// needs to derive the same key for cross-contract diagnostic comparison.
-checksum256 compose_account_chain_token_ck(name account,
-                                            sysio::slug_name chain_code,
-                                            sysio::slug_name token_code) {
-   std::array<uint8_t, 24> buf{};
-   uint64_t acc_v = account.value;
-   std::memcpy(buf.data() +  0, &acc_v,             8);
-   std::memcpy(buf.data() +  8, &chain_code.value,  8);
-   std::memcpy(buf.data() + 16, &token_code.value,  8);
-   return sysio::sha256(reinterpret_cast<const char*>(buf.data()), buf.size());
-}
-
 /// Sum the underwriter's pending withdraws on opreg for the given
 /// `(chain_code, token_code)`. Per v6 plan §B.2 (split-index design):
 /// `opreg::wtdwqueue_t` exposes only uint64 secondary indexes. The `byaccount`
@@ -173,29 +156,72 @@ uint64_t opreg_pending_withdraws(name underwriter,
    return total;
 }
 
-/// Sum this contract's active locks for the given
-/// `(underwriter, chain_code, token_code)`. Per v6 plan §B.2 (split-index
-/// design): `uwrit::locks_t` exposes only uint64 secondary indexes. The `byuw`
-/// index keys on `underwriter.value`; rows are filtered on `(chain_code,
-/// token_code)` in memory. Per-underwriter lock counts are O(1)-ish so the
-/// scan is cheap.
+/// This contract's active lock total for the given
+/// `(underwriter, chain_code, token_code)` — an O(1) read of the `locksums`
+/// rollup maintained by `add_locked_total` / `sub_locked_total`. An absent row
+/// means the bucket holds no live locks.
+///
+/// This used to walk every lock row the underwriter held, on the assumption
+/// that per-underwriter lock counts stay small. They do not: locks are held
+/// for the whole wall-clock challenge window and are never released by
+/// delivery, so the count is (settlement rate × lock duration). See the
+/// `lock_sum` docs for why that mattered on this particular call path.
 uint64_t sum_locks_inline(name self,
                            name underwriter,
                            sysio::slug_name chain_code,
                            sysio::slug_name token_code) {
-   uwrit::locks_t locks(self);
-   auto idx = locks.template get_index<"byuw"_n>();
+   uwrit::locksums_t sums(self);
+   uwrit::lock_sum_key pk{underwriter, chain_code, token_code};
+   return sums.contains(pk) ? sums.get(pk).amount : 0;
+}
 
-   uint64_t total = 0;
-   auto it  = idx.lower_bound(underwriter.value);
-   auto end = idx.upper_bound(underwriter.value);
-   for (; it != end; ++it) {
-      if (it->chain_code != chain_code || it->token_code != token_code) continue;
-      // Saturating: amounts are uncapped uint64 (external-chain values); a
-      // wrapped subtotal would understate `reserved` and overstate availability.
-      total = opp::safe::add_sat_u64(total, it->amount);
+/// Add `amount` to the `(underwriter, chain_code, token_code)` bucket,
+/// creating the row when the bucket was empty. Called once per lock row
+/// written by `try_select_winner`.
+///
+/// Saturating, matching the scan it replaced: amounts are uncapped uint64
+/// external-chain values, and a wrapped total would UNDERSTATE what is
+/// reserved and so OVERSTATE availability — the one direction that lets an
+/// overcommit through. Saturation instead overstates `locked`, which fails
+/// closed (a swap is refused, never over-collateralized).
+void add_locked_total(name self, name underwriter, sysio::slug_name chain_code,
+                      sysio::slug_name token_code, uint64_t amount) {
+   uwrit::locksums_t sums(self);
+   uwrit::lock_sum_key pk{underwriter, chain_code, token_code};
+   if (sums.contains(pk)) {
+      sums.modify(ram_payer, pk, [&](auto& row) {
+         row.amount = opp::safe::add_sat_u64(row.amount, amount);
+      });
+      return;
    }
-   return total;
+   sums.emplace(ram_payer, pk, uwrit::lock_sum{
+      .underwriter = underwriter,
+      .chain_code  = chain_code,
+      .token_code  = token_code,
+      .amount      = amount,
+   });
+}
+
+/// Subtract `amount` from the bucket, erasing the row once it reaches zero so
+/// the table holds only live buckets.
+///
+/// Clamped at zero rather than wrapping. A wrap here would leave a colossal
+/// `locked` on the bucket and zero the underwriter's `available()` for the
+/// rest of the chain's life — and this runs inside `chklocks`, which is inline
+/// in `sysio.epoch::advance` and must never throw. Clamping keeps a
+/// hypothetical accounting slip local and self-healing instead.
+void sub_locked_total(name self, name underwriter, sysio::slug_name chain_code,
+                      sysio::slug_name token_code, uint64_t amount) {
+   uwrit::locksums_t sums(self);
+   uwrit::lock_sum_key pk{underwriter, chain_code, token_code};
+   if (!sums.contains(pk)) return;
+   const uint64_t current = sums.get(pk).amount;
+   const uint64_t next    = current > amount ? current - amount : 0;
+   if (next == 0) {
+      sums.erase(pk);
+      return;
+   }
+   sums.modify(ram_payer, pk, [&](auto& row) { row.amount = next; });
 }
 
 /// Look up an underwriter's balance on opreg for the given
@@ -1416,8 +1442,9 @@ void reject_and_refund(name self, uwrit::uwreqs_t& reqs, const uwrit::id_key& pk
 /// envelope (so both the inline reserv settlement actions and the remit are
 /// unreachable-failure by construction — nothing past the CONFIRMED write can
 /// `check()`-abort and stall evalcons), push one lock per required leg (a 12h
-/// wall-clock challenge window — released only by `chklocks`, never by
-/// delivery), mark CONFIRMED, then settle:
+/// wall-clock challenge window — never released by delivery: `chklocks` sweeps
+/// it at expiry, or `sweeplocks` erases it earlier on an UPHELD challenge),
+/// mark CONFIRMED, then settle:
 ///   * normal     — reserv::applyswap  + SWAP_REMIT to the dst outpost
 ///   * from-WIRE  — reserv::applyfromwire + SWAP_REMIT to the dst outpost
 ///   * to-WIRE    — reserv::paywire (REAL WIRE to the recipient; no remit)
@@ -1774,8 +1801,9 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate,
    // (`chain_code, token_code, reserve_code`) so a future slash routes
    // unambiguously back to the originating reserve. Locks are a
    // wall-clock challenge window (12h default): they are NEVER released
-   // by delivery — only `chklocks` (epoch advance) sweeps them after
-   // `expires_at_ms`.
+   // by delivery — `chklocks` (epoch advance) sweeps them after
+   // `expires_at_ms` on the healthy path, and `sweeplocks` erases them
+   // ahead of it when a challenge against the commitment is UPHELD.
    const uint64_t now_ms_v = current_time_ms();
    uwrit::uwconfig_t uwcfg_tbl(self);
    auto uwcfg = uwcfg_tbl.get_or_default(uwrit::uw_config{});
@@ -1796,6 +1824,8 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate,
          .created_at_ms = now_ms_v,
          .expires_at_ms = expires_ms,
       });
+      add_locked_total(self, candidate, req.src_chain_code, req.src_token_code,
+                       req.src_amount);
    }
 
    if (dst_needed) {
@@ -1811,6 +1841,8 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate,
          .created_at_ms = now_ms_v,
          .expires_at_ms = expires_ms,
       });
+      add_locked_total(self, candidate, req.dst_chain_code, req.dst_token_code,
+                       req.dst_amount);
    }
 
    reqs.modify(same_payer, pk, [&](auto& r) {
@@ -2357,7 +2389,8 @@ uint64_t uwrit::sumlocks(name underwriter,
 }
 
 // ---------------------------------------------------------------------------
-//  chklocks — epoch-boundary sweep of expired locks (the ONLY release path)
+//  chklocks — epoch-boundary sweep of expired locks (the only HEALTHY release
+//  path; `sweeplocks` also erases, on an UPHELD challenge)
 // ---------------------------------------------------------------------------
 //
 // Locks are a wall-clock challenge window (12h default via uwconfig) and
@@ -2415,12 +2448,15 @@ void finalize_settled_uwreqs(name self, uwrit::locks_t& locks,
 
 } // anonymous namespace
 
-void uwrit::chklocks() {
-   // Two valid callers:
-   //   * sysio.epoch::advance — inlined at every epoch boundary.
-   //   * sysio.uwrit — manual cleanup invocation, e.g. from a migration.
+void uwrit::chklocks(uint32_t max_rows) {
+   // Two valid callers, mirroring pruneuwreqs / drainfwq:
+   //   * sysio.epoch::advance — inlined at every epoch boundary with
+   //     MAX_LOCK_RELEASE_PER_EPOCH.
+   //   * sysio.uwrit — manual cleanup invocation with a caller-chosen budget,
+   //     e.g. from a migration.
    check(has_auth(EPOCH_ACCOUNT) || has_auth(get_self()),
          "chklocks requires sysio.epoch or sysio.uwrit authority");
+   if (max_rows == 0) return;
 
    const uint64_t now_ms = current_time_ms();
    locks_t locks(get_self());
@@ -2437,10 +2473,34 @@ void uwrit::chklocks() {
    // cadence (the chain is not paused during a challenge, so the epoch
    // tick keeps arriving; envelope disputes need a standalone crank
    // precisely because theirs does not).
+   //
+   // Bounded to `max_rows`, for the same reason as MAX_UWREQ_PRUNE_PER_EPOCH
+   // and MAX_FWQ_DRAIN_PER_EPOCH: the per-lock work here is an inline
+   // `opreg::releaselock` dispatch plus an erase, and it runs inside
+   // advance's hard, uncatchable transaction CPU deadline. Expiries arrive
+   // in BURSTS — every lock is stamped `now + collateral_lock_duration_ms`
+   // at creation, so one epoch's settlements all fall due in one epoch a
+   // lock-duration later — and an unbounded sweep of such a burst would
+   // abort `advance`. Those locks would still be expired at the next
+   // advance, so it would abort identically every epoch thereafter: a
+   // permanent chain-wide epoch stall. Ascending expiry order makes the
+   // bound a FIFO drain; an oversized burst simply spreads across
+   // subsequent epochs.
+   //
+   // The counter is EXAMINED ROWS, not released locks. A held lock is skipped
+   // rather than released, so counting only releases would let an unbounded
+   // number of held rows be scanned AND let every distinct challenge among
+   // them fan out its own inline `chkuwchal` — reintroducing precisely the
+   // unbounded advance work this bound removes. Counting the row when it is
+   // examined bounds the scan, the release fan-out and the challenge poke
+   // fan-out with one budget (`open_challenges.size() <= max_rows` follows).
    std::vector<lock_entry> expired;
    std::vector<uint64_t>   open_challenges;
+   uint32_t                examined = 0;
    for (auto it = idx.begin();
-        it != idx.end() && it->expires_at_ms <= now_ms; ++it) {
+        it != idx.end() && it->expires_at_ms <= now_ms && examined < max_rows;
+        ++it) {
+      ++examined;
       if (it->challenge_id != 0) {
          if (std::find(open_challenges.begin(), open_challenges.end(),
                        it->challenge_id) == open_challenges.end()) {
@@ -2473,6 +2533,7 @@ void uwrit::chklocks() {
          std::make_tuple(l.underwriter, l.chain_code, l.token_code, l.amount)
       ).send();
       locks.erase(lock_key{l.lock_id});
+      sub_locked_total(get_self(), l.underwriter, l.chain_code, l.token_code, l.amount);
       if (std::find(affected.begin(), affected.end(), l.uwreq_id) == affected.end()) {
          affected.push_back(l.uwreq_id);
       }
@@ -2579,6 +2640,13 @@ void uwrit::sweeplocks(uint64_t uwreq_id, name underwriter) {
    // so each releaselock takes its deferred-slash branch: the locked
    // collateral is debited from opreg and the outbound SLASH attestation
    // queued for the outpost's slash-to-reserve hop.
+   // This is the THIRD lock-erasure path (with `chklocks` and, historically,
+   // nothing else), so it carries the same obligation: the `locksums` rollup is
+   // authoritative for `available()` and must never outlive the rows it
+   // summarizes. Erasing here without decrementing would leave the bucket
+   // permanently positive after its last lock is gone — `sumlocks` would report
+   // phantom locked collateral forever, and a re-registering operator would find
+   // that collateral unusable even though nothing holds it.
    std::vector<uint64_t> affected;
    for (const auto& l : held) {
       action(
@@ -2587,6 +2655,7 @@ void uwrit::sweeplocks(uint64_t uwreq_id, name underwriter) {
          std::make_tuple(l.underwriter, l.chain_code, l.token_code, l.amount)
       ).send();
       locks.erase(lock_key{l.lock_id});
+      sub_locked_total(get_self(), l.underwriter, l.chain_code, l.token_code, l.amount);
       if (std::find(affected.begin(), affected.end(), l.uwreq_id) == affected.end()) {
          affected.push_back(l.uwreq_id);
       }

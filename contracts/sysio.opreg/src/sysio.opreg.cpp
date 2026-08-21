@@ -370,28 +370,33 @@ void opreg::regoperator(name account,
 
 namespace {
 
-/// Sum the active locks on `sysio.uwrit::locks` for a given (op, chain, token).
-/// Returns 0 if uwrit's locks table is empty or if the operator has no locks
-/// on that chain/token.
+/// The active lock total on `sysio.uwrit` for a given (op, chain, token) —
+/// an O(1) read of uwrit's `locksums` rollup. Returns 0 when the operator
+/// holds no live locks on that chain/token (the rollup erases a bucket's row
+/// once it empties, so an absent row IS zero).
 ///
-/// Per v6 plan §B.2 (split-index design): `sysio.uwrit::locks_t` exposes only
-/// uint64 secondary indexes. The `byuw` index keys on `underwriter.value`;
-/// rows are filtered on `(chain_code, token_code)` in memory. Per-underwriter
-/// lock counts are O(1)-ish in steady state so the scan is cheap.
+/// This used to scan `sysio.uwrit::locks` through its `byuw` index and filter
+/// `(chain_code, token_code)` in memory, on the stated assumption that
+/// per-underwriter lock counts are "O(1)-ish in steady state so the scan is
+/// cheap". That assumption does not hold: uwrit locks are held for the full
+/// wall-clock challenge window and are never released by delivery, so a
+/// bucket's live lock count is (settlement rate × lock duration). uwrit now
+/// maintains the total at the THREE sites that can change it:
+///
+///   * `try_select_winner` — ADDS, one lock per required leg, on a win.
+///   * `chklocks`          — DECREMENTS, releasing locks at expiry.
+///   * `sweeplocks`        — DECREMENTS, erasing the held locks of a
+///                           commitment whose underwriter-fault challenge was
+///                           UPHELD (WIRE-297), outside `chklocks`.
+///
+/// That third path is the one this PR's stale-cache bug came from, so the
+/// count is worth keeping exact here: this reader trusts the rollup
+/// completely, and a bucket left positive after its last lock row is gone
+/// suppresses that collateral forever. See `uwrit::lock_sum`.
 uint64_t sum_locks_inline(name account, sysio::slug_name chain_code, sysio::slug_name token_code) {
-   uwrit::locks_t locks(opreg::UWRIT_ACCOUNT);
-   auto idx = locks.template get_index<"byuw"_n>();
-
-   uint64_t total = 0;
-   auto it  = idx.lower_bound(account.value);
-   auto end = idx.upper_bound(account.value);
-   for (; it != end; ++it) {
-      if (it->chain_code != chain_code || it->token_code != token_code) continue;
-      // Saturating: amounts are uncapped uint64 (external-chain values); a
-      // wrapped subtotal would understate `reserved` and overstate availability.
-      total = opp::safe::add_sat_u64(total, it->amount);
-   }
-   return total;
+   uwrit::locksums_t sums(opreg::UWRIT_ACCOUNT);
+   uwrit::lock_sum_key pk{account, chain_code, token_code};
+   return sums.contains(pk) ? sums.get(pk).amount : 0;
 }
 
 /// Sum the pending (not-yet-flushed) withdraws on this contract for a given

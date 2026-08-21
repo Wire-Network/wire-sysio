@@ -160,7 +160,14 @@ void multisig::propose( name proposer,
       proptable.emplace( proposer, pk, proposal{
          .proposal_name      = proposal_name,
          .packed_transaction = std::move(pkd_trans),
-         .earliest_exec_time = binary_extension< std::optional<time_point> >{},
+         // Present outer extension holding an empty inner optional, matching upstream's
+         // `earliest_exec_time.emplace()`. Nothing reads the distinction: `approve` and
+         // `exec` key off the proposed transaction's `delay_sec`, not the extension's
+         // shape. It states the row's intent honestly -- a proposal with no deadline yet,
+         // rather than one written before deadlines existed -- and the stored bytes are
+         // identical either way, since the CDT writes `value_or()` for an absent extension
+         // and every read emplaces it back.
+         .earliest_exec_time = binary_extension< std::optional<time_point> >{ std::optional<time_point>{} },
          .chunk_count        = uint32_t{0},
          .total_size         = static_cast<uint32_t>(size),
          .trx_hash           = trx_hash,
@@ -188,7 +195,8 @@ void multisig::propose( name proposer,
       proptable.emplace( proposer, pk, proposal{
          .proposal_name      = proposal_name,
          .packed_transaction = {},                       // empty: signals chunked storage
-         .earliest_exec_time = binary_extension< std::optional<time_point> >{},
+         // Present-with-empty, for the reason given on the inline path above.
+         .earliest_exec_time = binary_extension< std::optional<time_point> >{ std::optional<time_point>{} },
          .chunk_count        = n_chunks,
          .total_size         = static_cast<uint32_t>(size),
          .trx_hash           = trx_hash,
@@ -263,23 +271,47 @@ void multisig::approve( name proposer, name proposal_name, permission_level leve
    // reassembling the entire packed_transaction just to inspect delay_sec/expiration.
    transaction_header trx_header = read_trx_header(prop, get_self(), proposer);
 
-   if( prop.earliest_exec_time.has_value() ) {
-      if( !prop.earliest_exec_time->has_value() ) {
-         auto table_op = [](auto&&, auto&&){};
-         // The auth recheck needs the full blob. For inline proposals `assemble_packed_trx`
-         // moves the existing buffer out of `prop` (no copy); for chunked it reassembles
-         // from the propchunks table. Either way the cost is incurred at most once per
-         // proposal — the first approve that pushes it over the threshold. `prop` must
-         // not be read after this point.
-         const auto packed = assemble_packed_trx(std::move(prop), get_self(), proposer);
-         if( trx_is_authorized(get_approvals_and_adjust_table(get_self(), proposer, proposal_name, table_op), packed) ) {
-            proptable.modify( proposer, pk, [&]( auto& p ) {
-               p.earliest_exec_time.emplace(time_point{ current_time_point() + sysio::seconds(trx_header.delay_sec.value)});
-            });
-         }
+   // Undelayed proposals have no deadline to maintain: `exec` gates them on authorization
+   // alone, so the blob reassembly below would be pure cost. This is the common case.
+   if( trx_header.delay_sec.value == 0 ) return;
+
+   // The deadline is (re)computed exactly when THIS approval is the one that carries the
+   // proposal from unauthorized to authorized -- not merely when no deadline is stored.
+   //
+   // Recomputing only on an empty deadline is not sufficient, because a stored deadline can
+   // outlive the approval set that earned it: `invalidate` voids an approver's approvals
+   // wholesale and is O(1) by design, so it never visits proposals and cannot clear their
+   // deadlines. An approver could therefore approve to the threshold, invalidate, wait out
+   // the delay, and re-approve -- executing immediately against a deadline the current
+   // approval set never earned, with no delay window at all.
+   //
+   // Recomputing on the transition rather than on every approve is what keeps an extra
+   // approval from restarting the clock: a blanket recompute would let any requested
+   // approver push execution back indefinitely on a proposal that is already authorized.
+   auto table_op = [](auto&&, auto&&){};
+   const auto approvals_after =
+      get_approvals_and_adjust_table(get_self(), proposer, proposal_name, table_op);
+   std::vector<permission_level> approvals_before;
+   approvals_before.reserve( approvals_after.size() );
+   bool this_level_dropped = false;
+   for( const auto& approved : approvals_after ) {
+      // Drop exactly one instance -- the approval recorded above -- to reconstruct the set
+      // as it stood before this action.
+      if( !this_level_dropped && approved == level ) {
+         this_level_dropped = true;
+         continue;
       }
-   } else {
-      check( trx_header.delay_sec.value == 0, "old proposals are not allowed to have non-zero `delay_sec`; cancel and retry" );
+      approvals_before.push_back( approved );
+   }
+
+   // The auth recheck needs the full blob. For inline proposals `assemble_packed_trx`
+   // moves the existing buffer out of `prop` (no copy); for chunked it reassembles from
+   // the propchunks table. `prop` must not be read after this point.
+   const auto packed = assemble_packed_trx(std::move(prop), get_self(), proposer);
+   if( trx_is_authorized(approvals_after, packed) && !trx_is_authorized(approvals_before, packed) ) {
+      proptable.modify( proposer, pk, [&]( auto& p ) {
+         p.earliest_exec_time.emplace(time_point{ current_time_point() + sysio::seconds(trx_header.delay_sec.value)});
+      });
    }
 }
 
@@ -313,22 +345,24 @@ void multisig::unapprove( name proposer, name proposal_name, permission_level le
    // Non-const so we can std::move into `assemble_packed_trx` below.
    auto prop = proptable.get( pk, "proposal not found" );
 
-   if( prop.earliest_exec_time.has_value() ) {
-      if( prop.earliest_exec_time->has_value() ) {
-         auto table_op = [](auto&&, auto&&){};
-         // Reassemble for chunked proposals — same one-time cost pattern as approve.
-         // For inline proposals this moves the existing buffer out of `prop` rather
-         // than copying it. `prop` must not be read after this point in this branch.
-         const auto packed = assemble_packed_trx(std::move(prop), get_self(), proposer);
-         if( !trx_is_authorized(get_approvals_and_adjust_table(get_self(), proposer, proposal_name, table_op), packed) ) {
-            proptable.modify( proposer, pk, [&]( auto& p ) {
-               p.earliest_exec_time.emplace();
-            });
-         }
+   // Same scoping as `approve`: an undelayed proposal carries no deadline to drop.
+   if( read_trx_header(prop, get_self(), proposer).delay_sec.value == 0 ) return;
+
+   if( prop.earliest_exec_time.has_value() && prop.earliest_exec_time->has_value() ) {
+      auto table_op = [](auto&&, auto&&){};
+      // Reassemble for chunked proposals — same cost pattern as approve. For inline
+      // proposals this moves the existing buffer out of `prop` rather than copying it.
+      // `prop` must not be read after this point.
+      const auto packed = assemble_packed_trx(std::move(prop), get_self(), proposer);
+      if( !trx_is_authorized(get_approvals_and_adjust_table(get_self(), proposer, proposal_name, table_op), packed) ) {
+         // Dropping below the threshold discards the deadline, so the delay is served
+         // afresh if the proposal is authorized again. Correctness does not rest on this
+         // -- `approve` recomputes on the unauthorized-to-authorized transition either way
+         // -- but it keeps the stored row honest for anyone reading it.
+         proptable.modify( proposer, pk, [&]( auto& p ) {
+            p.earliest_exec_time.emplace();
+         });
       }
-   } else {
-      transaction_header trx_header = read_trx_header(prop, get_self(), proposer);
-      check( trx_header.delay_sec.value == 0, "old proposals are not allowed to have non-zero `delay_sec`; cancel and retry" );
    }
 }
 
@@ -400,10 +434,15 @@ void multisig::exec( name proposer, name proposal_name, name executer ) {
    bool ok = trx_is_authorized(get_approvals_and_adjust_table(get_self(), proposer, proposal_name, table_op), packed);
    check( ok, "transaction authorization failed" );
 
-   if ( earliest_exec_time.has_value() && earliest_exec_time->has_value() ) {
+   if ( trx_header.delay_sec.value > 0 ) {
+      // The authorization recheck above establishes that the proposal is authorized NOW,
+      // not that it has been authorized for the whole delay. Only `approve` can record the
+      // deadline, and only on the approval that made the proposal authorized, so a missing
+      // deadline here means the current approval set never crossed the threshold -- the
+      // state left behind when `invalidate` voided the approvals that did.
+      check( earliest_exec_time.has_value() && earliest_exec_time->has_value(),
+             "proposal has not been authorized long enough; approve again to start the delay" );
       check( **earliest_exec_time <= current_time_point(), "too early to execute" );
-   } else {
-      check( trx_header.delay_sec.value == 0, "old proposals are not allowed to have non-zero `delay_sec`; cancel and retry" );
    }
 
    for (const auto& act : actions) {

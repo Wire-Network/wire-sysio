@@ -344,6 +344,11 @@ public:
    /// force whenever a case does not push its own `uwrit::setconfig`. Tests that
    /// re-derive a swap quote must charge the same fee the contract did.
    static constexpr uint32_t kDefaultUwritFeeBps = 10;
+
+   /// Mirrors `sysio.uwrit::MAX_LOCK_RELEASE_PER_EPOCH` — the per-epoch `chklocks` budget
+   /// `sysio.epoch::advance` passes. Tests that sweep "as production would" use this; tests
+   /// exercising the bound itself pass their own smaller value.
+   static constexpr uint32_t kMaxLockReleasePerEpoch = 32;
    static constexpr auto TOKEN_ACCOUNT  = "sysio.token"_n;
    static constexpr auto AUTHEX_ACCOUNT = "sysio.authex"_n;
    static constexpr auto CHAINS_ACCOUNT = "sysio.chains"_n;
@@ -1035,6 +1040,78 @@ public:
       return push(OPREG_ACCOUNT, opreg_abi, CHALG_ACCOUNT, "slash"_n, mvo()
          ("account", account.to_string())
          ("reason",  reason));
+   }
+
+   /// The `locksums` rollup total for one (underwriter, chain, token) bucket.
+   /// `locksums` is keyed by a checksum256 over the triple, so this walks the
+   /// KV table and filters in memory — same shape as `get_reserve`. An absent
+   /// row IS zero: the rollup erases a bucket once it empties.
+   uint64_t get_lock_sum(name underwriter, std::string_view chain_code,
+                         std::string_view token_code) {
+      const auto target_chain = fc::slug_name{chain_code}.value;
+      const auto target_token = fc::slug_name{token_code}.value;
+      const auto& db       = control->db();
+      const auto  table_id = chain::compute_table_id("locksums"_n.to_uint64_t());
+      const auto& kv_idx   = db.get_index<chain::kv_index, chain::by_code_key>();
+      auto itr = kv_idx.lower_bound(boost::make_tuple(UWRIT_ACCOUNT, table_id, std::string_view{}));
+      for (; itr != kv_idx.end() && itr->code == UWRIT_ACCOUNT
+             && itr->table_id == table_id; ++itr) {
+         std::vector<char> raw(itr->value.size());
+         if (!raw.empty()) std::memcpy(raw.data(), itr->value.data(), raw.size());
+         try {
+            auto row = uwrit_abi.binary_to_variant("lock_sum", raw,
+               abi_serializer::create_yield_function(abi_serializer_max_time));
+            if (row["underwriter"].as_string()             == underwriter.to_string() &&
+                row["chain_code"]["value"].as_uint64()     == target_chain &&
+                row["token_code"]["value"].as_uint64()      == target_token) {
+               return row["amount"].as_uint64();
+            }
+         } catch (...) {
+            // Not a lock_sum row — skip.
+         }
+      }
+      return 0;
+   }
+
+   /// Recompute the same bucket total from the AUTHORITATIVE `locks` rows.
+   /// This is the oracle the materialized rollup is asserted against — it is
+   /// the derivation `sum_locks_inline` used to perform inline before the
+   /// rollup replaced it.
+   uint64_t scan_lock_total(name underwriter, std::string_view chain_code,
+                            std::string_view token_code) {
+      const auto target_chain = fc::slug_name{chain_code}.value;
+      const auto target_token = fc::slug_name{token_code}.value;
+      const auto& db       = control->db();
+      const auto  table_id = chain::compute_table_id("locks"_n.to_uint64_t());
+      const auto& kv_idx   = db.get_index<chain::kv_index, chain::by_code_key>();
+      uint64_t total = 0;
+      auto itr = kv_idx.lower_bound(boost::make_tuple(UWRIT_ACCOUNT, table_id, std::string_view{}));
+      for (; itr != kv_idx.end() && itr->code == UWRIT_ACCOUNT
+             && itr->table_id == table_id; ++itr) {
+         std::vector<char> raw(itr->value.size());
+         if (!raw.empty()) std::memcpy(raw.data(), itr->value.data(), raw.size());
+         try {
+            auto row = uwrit_abi.binary_to_variant("lock_entry", raw,
+               abi_serializer::create_yield_function(abi_serializer_max_time));
+            if (row["underwriter"].as_string()         == underwriter.to_string() &&
+                row["chain_code"]["value"].as_uint64() == target_chain &&
+                row["token_code"]["value"].as_uint64() == target_token) {
+               total += row["amount"].as_uint64();
+            }
+         } catch (...) {
+            // Not a lock_entry row — skip.
+         }
+      }
+      return total;
+   }
+
+   /// Direct `sysio.uwrit::chklocks` call with an explicit budget
+   /// (self-authorized). `advance` inlines it with MAX_LOCK_RELEASE_PER_EPOCH;
+   /// the tests call it directly to exercise the budget itself without an
+   /// intervening advance sweeping the whole backlog first.
+   action_result chklocks_direct(uint32_t max_rows) {
+      return push(UWRIT_ACCOUNT, uwrit_abi, UWRIT_ACCOUNT, "chklocks"_n, mvo()
+         ("max_rows", max_rows));
    }
 
    /// Direct sysio.opreg::releaselock call (UWRIT-authorized). In production
@@ -2528,6 +2605,126 @@ BOOST_FIXTURE_TEST_CASE(swap_underbonded_candidate_cannot_terminally_reject,
 // alone, so any caller — it is permissionless — could erase the row first;
 // `releaselock` then returns at its missing-operator check and the retained
 // collateral is stranded with no attestation that could ever release it.
+// `chklocks` releases at most `max_rows` locks per call, and the remainder
+// drains on the next sweep.
+//
+// Lock expiry is inherently BURSTY: every lock is stamped
+// `now + collateral_lock_duration_ms` when its race is won, so a burst of
+// settlements inside one epoch produces a burst of expiries inside one epoch,
+// exactly one lock-duration later. Each expired lock costs an inline
+// `opreg::releaselock` dispatch plus an erase, all inside `advance`'s hard,
+// uncatchable transaction CPU deadline — so an UNBOUNDED sweep of a large
+// enough burst aborts `advance`, and because those same locks are still
+// expired at the next advance it aborts identically forever: a permanent
+// chain-wide epoch stall, not a transient one. The budget converts that into
+// bounded release latency, which is harmless because the challenge window has
+// already closed by the time a lock is swept.
+BOOST_FIXTURE_TEST_CASE(chklocks_budget_bounds_the_sweep_and_backlog_drains,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+   // A 2-minute lock window, so the locks can expire inside the test.
+   BOOST_REQUIRE_EQUAL(success(), push(UWRIT_ACCOUNT, uwrit_abi, UWRIT_ACCOUNT, "setconfig"_n, mvo()
+      ("fee_bps", kDefaultUwritFeeBps)("collateral_lock_duration_ms", 120'000u)
+      ("min_fromwire_amount", 1)("fromwire_revert_fee_bps", 0)
+      ("uwreq_pending_timeout_epochs", 10)("uwreq_retention_epochs", 10)));
+
+   const uint64_t eth       = fc::slug_name{"ETH"}.value;
+   const uint64_t primary   = fc::slug_name{"PRIMARY"}.value;
+   const uint64_t secondary = fc::slug_name{"SECOND"}.value;
+   constexpr uint64_t ATT_ID     = 9750;
+   constexpr int64_t  SRC_AMOUNT = 1'000'000;
+
+   // Both legs on ETH — the shape whose race reaches CONFIRMED and writes a
+   // lock per required leg, so one won race yields the two locks this bound
+   // is exercised against.
+   setup_wire_token_and_reserves();
+   BOOST_REQUIRE_EQUAL(success(), regreserve_active("ETH", "ETH", "SECOND"));
+   BOOST_REQUIRE_EQUAL(success(),
+      depositinle_credit(UWRIT_OP, "ETH", "ETH", uint64_t{1'000'000'000}));
+   enable_epoch_advancement();
+
+   const uint64_t quote = expected_quote("ETH", "ETH", "PRIMARY", SRC_AMOUNT,
+                                         "ETH", "ETH", "SECOND", kDefaultUwritFeeBps);
+   BOOST_REQUIRE(quote > 0);
+   const auto sr = encode_swap_request(
+      ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
+      eth, eth, primary, SRC_AMOUNT,
+      eth, eth, secondary, /*target_amount*/ quote,
+      /*tolerance_bps*/ 10'000, ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0b'));
+   BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, eth, sr));
+   const auto src_uic = create_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
+   BOOST_REQUIRE_EQUAL(success(),
+      rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIMARY", src_uic));
+   const auto dst_uic = create_signed_uic(UWRIT_OP, ATT_ID, eth, eth, secondary);
+   BOOST_REQUIRE_EQUAL(success(),
+      rcrdcommit_direct(ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "SECOND", dst_uic));
+   BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_CONFIRMED",
+                       get_uwreq(ATT_ID)["status"].as_string());
+   BOOST_REQUIRE(!get_lock(1).is_null());
+   BOOST_REQUIRE(!get_lock(2).is_null());
+
+   // Both legs are ETH/ETH, so they share one collateral bucket: the rollup
+   // carries their sum, and agrees with the authoritative scan of the lock
+   // rows it materializes.
+   BOOST_REQUIRE_EQUAL(uint64_t(SRC_AMOUNT) + quote,
+                       get_lock_sum(UWRIT_OP, "ETH", "ETH"));
+   BOOST_REQUIRE_EQUAL(scan_lock_total(UWRIT_OP, "ETH", "ETH"),
+                       get_lock_sum(UWRIT_OP, "ETH", "ETH"));
+
+   // Let the lock window elapse WITHOUT an advance, so both locks are due and
+   // nothing has swept them yet (advance would run the full budget inline).
+   produce_blocks(260);   // > 120s at 0.5s/block
+   BOOST_REQUIRE(!get_lock(1).is_null());
+   BOOST_REQUIRE(!get_lock(2).is_null());
+
+   // Zero budget is a no-op even with expired locks waiting.
+   BOOST_REQUIRE_EQUAL(success(), chklocks_direct(0));
+   BOOST_REQUIRE(!get_lock(1).is_null());
+   BOOST_REQUIRE(!get_lock(2).is_null());
+
+   // Budget of one releases EXACTLY one lock. Both were written by the same
+   // transaction and so share an `expires_at_ms`; the bound is what is under
+   // test here, not the tie-break between equal expiries.
+   BOOST_REQUIRE_EQUAL(success(), chklocks_direct(1));
+   BOOST_REQUIRE(get_lock(1).is_null() != get_lock(2).is_null());
+
+   // The rollup decremented by exactly the released leg and still matches the
+   // surviving lock rows — a partial sweep leaves the two consistent.
+   BOOST_REQUIRE_EQUAL(scan_lock_total(UWRIT_OP, "ETH", "ETH"),
+                       get_lock_sum(UWRIT_OP, "ETH", "ETH"));
+   BOOST_REQUIRE_GT(get_lock_sum(UWRIT_OP, "ETH", "ETH"), 0u);
+
+   // A block between the two sweeps: the second call carries identical action
+   // data and the same signer, so without a fresh TAPOS reference block the
+   // two pushes hash to the same transaction id and the second is rejected as
+   // a duplicate. In production each sweep rides its own epoch's advance.
+   produce_blocks();
+
+   // The remainder drains on the next sweep — an oversized burst costs release
+   // latency, never a stalled advance.
+   BOOST_REQUIRE_EQUAL(success(), chklocks_direct(1));
+   BOOST_REQUIRE(get_lock(1).is_null());
+   BOOST_REQUIRE(get_lock(2).is_null());
+
+   // Bucket emptied: the rollup row is ERASED, so it reads as zero and the
+   // table is left holding only live buckets.
+   BOOST_REQUIRE_EQUAL(0u, get_lock_sum(UWRIT_OP, "ETH", "ETH"));
+   BOOST_REQUIRE_EQUAL(0u, scan_lock_total(UWRIT_OP, "ETH", "ETH"));
+
+   // The releaselock fan-out still ran for both, benignly: UWRIT_OP is healthy
+   // (neither SLASHED nor TERMINATED), so each release is a no-op on the
+   // ledger and the bond is left whole — the lock rows disappearing is what
+   // restores `available()`.
+   {
+      const auto op = get_operator(UWRIT_OP);
+      BOOST_REQUIRE(!op.is_null());
+      BOOST_REQUIRE_EQUAL("OPERATOR_STATUS_ACTIVE", op["status"].as_string());
+      uint64_t total = 0;
+      for (const auto& b : op["balances"].get_array()) total += b["balance"].as_uint64();
+      BOOST_REQUIRE_EQUAL(uint64_t{1'000'000'000}, total);
+   }
+} FC_LOG_AND_RETHROW() }
+
 BOOST_FIXTURE_TEST_CASE(prune_keeps_terminated_operator_until_collateral_settles,
                         sysio_dispatch_tester) { try {
    bootstrap_for_dispatch();
@@ -5273,6 +5470,18 @@ public:
 
       BOOST_REQUIRE_EQUAL(success(), depositinle_credit(UWRIT_OP, "ETH", "ETH", 200));
 
+      add_confirmed_uwreq(att_id);
+   }
+
+   /// The uwreq half of `make_confirmed_uwreq`, without the one-time bootstrap: creates one more
+   /// CONFIRMED (ETH,ETH) commitment and its two locks on an already-provisioned cluster. Callers
+   /// wanting a second commitment must first credit its collateral — the two legs lock
+   /// `2 * LEG_AMOUNT`, and the bootstrap deposits only enough for one.
+   void add_confirmed_uwreq(uint64_t att_id) {
+      const uint64_t eth       = fc::slug_name{"ETH"}.value;
+      const uint64_t primary   = fc::slug_name{"PRIMARY"}.value;
+      const uint64_t secondary = fc::slug_name{"SECOND"}.value;
+
       const auto sr = encode_swap_request(
          ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
          eth, eth, primary,   /*src_amount*/ LEG_AMOUNT,
@@ -5464,8 +5673,10 @@ public:
    }
 
    /// Sweep expired locks as the epoch machinery would (`chklocks` accepts epoch or self auth).
-   action_result chklocks() {
-      return push(UWRIT_ACCOUNT, uwrit_abi, UWRIT_ACCOUNT, "chklocks"_n, mvo());
+   /// Defaults to the budget `sysio.epoch::advance` passes, so a challenge test sweeps exactly as
+   /// production does; pass a smaller one to exercise the bound itself.
+   action_result chklocks(uint32_t max_rows = kMaxLockReleasePerEpoch) {
+      return chklocks_direct(max_rows);
    }
 };
 
@@ -5707,6 +5918,17 @@ BOOST_FIXTURE_TEST_CASE(chkuwchal_uphold_slashes_and_returns_bond, sysio_uwchal_
    BOOST_REQUIRE(get_lock(1).is_null());
    BOOST_REQUIRE(get_lock(2).is_null());
 
+   // `sweeplocks` is a lock-erasure path that does NOT go through `chklocks`, so it carries the
+   // rollup obligation independently: the cache must not outlive the rows it summarizes. Assert
+   // both halves — agreement with an authoritative scan, and zero, since the sweep took every
+   // lock in the bucket. Without the `sub_locked_total` in `sweeplocks` the rollup stays at the
+   // pre-sweep 200 while the scan reads 0, and that phantom locked amount is permanent: it
+   // suppresses `available()` on this bucket for good, so collateral deposited after a later
+   // re-registration is unusable with nothing holding it.
+   BOOST_REQUIRE_EQUAL(scan_lock_total(UWRIT_OP, "ETH", "ETH"),
+                       get_lock_sum(UWRIT_OP, "ETH", "ETH"));
+   BOOST_REQUIRE_EQUAL(0u, get_lock_sum(UWRIT_OP, "ETH", "ETH"));
+
    // Every bucket drains: `opreg::slash` debits each bucket's slashable-now portion (balance
    // minus active locks — for the challenged (ETH, ETH) bucket that is everything ABOVE the two
    // 100-unit locks), and the two sweeping releaselocks then take the deferred-slash branch for
@@ -5840,6 +6062,63 @@ BOOST_FIXTURE_TEST_CASE(chklocks_skips_held_lock_and_lapse_refunds, sysio_uwchal
    BOOST_REQUIRE(get_lock(1).is_null());
    BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_COMPLETED",
                        get_uwreq(ATT_ID)["status"].as_string());
+} FC_LOG_AND_RETHROW() }
+
+// The epoch budget counts rows EXAMINED, not locks released. A held lock is skipped rather than
+// released, so a budget spent only on releases would let an unbounded run of held rows be scanned
+// — and every distinct challenge among them fan out its own inline `chkuwchal` — which is exactly
+// the unbounded `advance` work the bound exists to delete.
+//
+// The discriminator is a budget SMALLER than the run of held locks, with an ordinary expired lock
+// queued behind them: counting examined rows stops inside the held run and releases nothing;
+// counting releases walks past every held row and reaches the ordinary lock in the same call.
+BOOST_FIXTURE_TEST_CASE(chklocks_budget_counts_held_locks_and_still_drains,
+                        sysio_uwchal_tester) { try {
+   constexpr uint64_t HELD_ATT     = 9820;   // challenged: contributes the two HELD locks (1, 2)
+   constexpr uint64_t ORDINARY_ATT = 9821;   // unchallenged: its locks (3, 4) sit behind them
+   make_confirmed_uwreq(HELD_ATT);
+
+   // A second commitment needs its own collateral; the bootstrap funds exactly one. Fresh TAPOS
+   // first — this credit is byte-identical to the bootstrap's and would otherwise collide as a
+   // duplicate transaction.
+   produce_block();
+   BOOST_REQUIRE_EQUAL(success(), depositinle_credit(UWRIT_OP, "ETH", "ETH", 200));
+   add_confirmed_uwreq(ORDINARY_ATT);
+   for (uint64_t id : {1u, 2u, 3u, 4u}) BOOST_REQUIRE(!get_lock(id).is_null());
+
+   // Hold ONLY the first commitment's locks, then expire everything.
+   BOOST_REQUIRE_EQUAL(success(),
+      openuwchal(CHALLENGER, HELD_ATT, UWRIT_OP, REASON_DEPOSIT_MISSING, "held run"));
+   BOOST_REQUIRE_GT(get_lock(1)["challenge_id"].as_uint64(), 0u);
+   BOOST_REQUIRE_GT(get_lock(2)["challenge_id"].as_uint64(), 0u);
+   BOOST_REQUIRE_EQUAL(0u, get_lock(3)["challenge_id"].as_uint64());
+   BOOST_REQUIRE_EQUAL(0u, get_lock(4)["challenge_id"].as_uint64());
+
+   produce_blocks();
+   produce_block(fc::hours(13));   // every lock now expired; the challenge deadline has passed
+
+   // Budget of 1 against a 2-lock held run: the sweep spends it on the first held row and stops.
+   // Nothing is released — in particular the ordinary locks behind the run are never reached.
+   BOOST_REQUIRE_EQUAL(success(), chklocks(1));
+   for (uint64_t id : {1u, 2u, 3u, 4u}) BOOST_REQUIRE(!get_lock(id).is_null());
+
+   // Eventual progress: the pokes the budget DID afford lapse the challenge, and once the hold is
+   // gone the same bounded sweep drains the whole backlog over subsequent ticks.
+   for (int sweep = 0; sweep < 4; ++sweep) {
+      produce_block();   // identical sweep bytes — fresh TAPOS
+      BOOST_REQUIRE_EQUAL(success(), chklocks());
+   }
+   BOOST_REQUIRE_EQUAL("LAPSED", get_uwchal(1)["verdict"].as_string());
+   for (uint64_t id : {1u, 2u, 3u, 4u}) BOOST_REQUIRE(get_lock(id).is_null());
+   BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_COMPLETED",
+                       get_uwreq(HELD_ATT)["status"].as_string());
+   BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_COMPLETED",
+                       get_uwreq(ORDINARY_ATT)["status"].as_string());
+
+   // The rollup tracked every release and lands at zero with the rows gone.
+   BOOST_REQUIRE_EQUAL(scan_lock_total(UWRIT_OP, "ETH", "ETH"),
+                       get_lock_sum(UWRIT_OP, "ETH", "ETH"));
+   BOOST_REQUIRE_EQUAL(0u, get_lock_sum(UWRIT_OP, "ETH", "ETH"));
 } FC_LOG_AND_RETHROW() }
 
 // A resolved challenge keeps only what consensus still needs: the uniqueness gate and the

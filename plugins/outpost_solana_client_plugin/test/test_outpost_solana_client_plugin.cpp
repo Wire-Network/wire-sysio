@@ -845,11 +845,15 @@ std::vector<char> envelope_with_entries(
 }
 
 /// Build an `OPERATOR_ACTION(WITHDRAW_REMIT)` entry pointing at
-/// `op_addr`. Other proto fields are populated with neutral defaults —
-/// the decoder only reads `op_address` + `action_type`.
-sysio::opp::AttestationEntry remit_entry(const sysio::opp::types::ChainAddress& op_addr) {
+/// `op_addr`, remitting `token_code`. The decoder reads `op_address`,
+/// `action_type` and `amount.token_code` (SOL-379/380 keys the
+/// CollateralPosition PDA on it); other proto fields stay neutral.
+sysio::opp::AttestationEntry remit_entry(uint64_t                               token_code,
+                                         const sysio::opp::types::ChainAddress& op_addr) {
    sysio::opp::attestations::OperatorAction oa;
    oa.set_action_type(sysio::opp::attestations::OperatorAction_ActionType_ACTION_TYPE_WITHDRAW_REMIT);
+   oa.mutable_amount()->set_token_code(token_code);
+   oa.mutable_amount()->set_amount(777);
    *oa.mutable_op_address() = op_addr;
    std::string body;
    oa.SerializeToString(&body);
@@ -860,11 +864,15 @@ sysio::opp::AttestationEntry remit_entry(const sysio::opp::types::ChainAddress& 
    return entry;
 }
 
-/// Same as `remit_entry` but for SLASH (which should NOT be returned —
-/// SLASH routes to the Reserve PDA which is in the static account list).
-sysio::opp::AttestationEntry slash_entry(const sysio::opp::types::ChainAddress& op_addr) {
+/// Same as `remit_entry` but for SLASH — surfaced with its own shape so the
+/// manifest can declare the slashed operator's CollateralPosition PDA (and
+/// the reserve_aggregate ATA under SPL custody).
+sysio::opp::AttestationEntry slash_entry(uint64_t                               token_code,
+                                         const sysio::opp::types::ChainAddress& op_addr) {
    sysio::opp::attestations::OperatorAction oa;
    oa.set_action_type(sysio::opp::attestations::OperatorAction_ActionType_ACTION_TYPE_SLASH);
+   oa.mutable_amount()->set_token_code(token_code);
+   oa.mutable_amount()->set_amount(777);
    *oa.mutable_op_address() = op_addr;
    std::string body;
    oa.SerializeToString(&body);
@@ -875,9 +883,40 @@ sysio::opp::AttestationEntry slash_entry(const sysio::opp::types::ChainAddress& 
    return entry;
 }
 
-/// Build a `DEPOSIT_REVERT` entry pointing at `depositor_addr`.
-sysio::opp::AttestationEntry revert_entry(const sysio::opp::types::ChainAddress& depositor_addr) {
+/// Build an `OPERATOR_ACTION` entry whose action type settles no collateral
+/// (a DEPOSIT_REQUEST is outbound-from-outpost) — must contribute no effect.
+sysio::opp::AttestationEntry deposit_request_entry(
+   uint64_t token_code, const sysio::opp::types::ChainAddress& op_addr) {
+   sysio::opp::attestations::OperatorAction oa;
+   oa.set_action_type(
+      sysio::opp::attestations::OperatorAction_ActionType_ACTION_TYPE_DEPOSIT_REQUEST);
+   oa.mutable_amount()->set_token_code(token_code);
+   oa.mutable_amount()->set_amount(777);
+   *oa.mutable_op_address() = op_addr;
+   std::string body;
+   oa.SerializeToString(&body);
+
+   sysio::opp::AttestationEntry entry;
+   entry.set_type(sysio::opp::types::ATTESTATION_TYPE_OPERATOR_ACTION);
+   entry.set_data(std::move(body));
+   return entry;
+}
+
+/// Build an `OPERATORS` state-mirror entry — updates tables on-chain, needs
+/// no effect accounts, but still occupies its dispatch-order index.
+sysio::opp::AttestationEntry operators_mirror_entry() {
+   sysio::opp::AttestationEntry entry;
+   entry.set_type(sysio::opp::types::ATTESTATION_TYPE_OPERATORS);
+   return entry;
+}
+
+/// Build a `DEPOSIT_REVERT` entry pointing at `depositor_addr`, refunding
+/// `token_code` (keys the CollateralPosition PDA).
+sysio::opp::AttestationEntry revert_entry(uint64_t                               token_code,
+                                          const sysio::opp::types::ChainAddress& depositor_addr) {
    sysio::opp::attestations::DepositRevert dr;
+   dr.mutable_refund_amount()->set_token_code(token_code);
+   dr.mutable_refund_amount()->set_amount(888);
    *dr.mutable_depositor() = depositor_addr;
    std::string body;
    dr.SerializeToString(&body);
@@ -969,27 +1008,33 @@ BOOST_AUTO_TEST_CASE(extract_effects_empty_envelope_returns_empty) try {
 BOOST_AUTO_TEST_CASE(extract_effects_single_withdraw_remit) try {
    namespace detail = sysio::outpost_solana_client_detail;
    auto op_pk = filled_pubkey(0xAA);
-   auto envelope = envelope_with_entries({remit_entry(make_sol_addr(op_pk))});
+   auto envelope = envelope_with_entries({remit_entry(501, make_sol_addr(op_pk))});
 
    const auto effects = detail::extract_inbound_effects(envelope);
    BOOST_REQUIRE_EQUAL(effects.size(), 1u);
    BOOST_CHECK_EQUAL(effects[0].attestation_index, 0u);
-   BOOST_CHECK(effects[0].shape == detail::effect_shape::native_payee);
+   BOOST_CHECK(effects[0].shape == detail::effect_shape::withdraw_remit);
    BOOST_REQUIRE(effects[0].recipient.has_value());
    BOOST_CHECK(effects[0].recipient->serialize() == op_pk);
    BOOST_CHECK(!effects[0].reserve.has_value());
+   // SOL-379: the remit amount's token_code keys the CollateralPosition PDA.
+   BOOST_REQUIRE(effects[0].collateral_token_code.has_value());
+   BOOST_CHECK_EQUAL(*effects[0].collateral_token_code, 501u);
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(extract_effects_deposit_revert) try {
    namespace detail = sysio::outpost_solana_client_detail;
    auto depositor_pk = filled_pubkey(0xBB);
-   auto envelope = envelope_with_entries({revert_entry(make_sol_addr(depositor_pk))});
+   auto envelope = envelope_with_entries({revert_entry(503, make_sol_addr(depositor_pk))});
 
    const auto effects = detail::extract_inbound_effects(envelope);
    BOOST_REQUIRE_EQUAL(effects.size(), 1u);
-   BOOST_CHECK(effects[0].shape == detail::effect_shape::native_payee);
+   BOOST_CHECK(effects[0].shape == detail::effect_shape::deposit_revert);
    BOOST_REQUIRE(effects[0].recipient.has_value());
    BOOST_CHECK(effects[0].recipient->serialize() == depositor_pk);
+   // SOL-379: the refund amount's token_code keys the CollateralPosition PDA.
+   BOOST_REQUIRE(effects[0].collateral_token_code.has_value());
+   BOOST_CHECK_EQUAL(*effects[0].collateral_token_code, 503u);
 } FC_LOG_AND_RETHROW();
 
 /// The effect index MUST equal the attestation's flat position in dispatch
@@ -1007,13 +1052,14 @@ BOOST_AUTO_TEST_CASE(extract_effects_indices_track_dispatch_order) try {
    auto remit_op = filled_pubkey(0x11);
    auto revert_op = filled_pubkey(0x22);
 
-   // SLASH sits BETWEEN the two account-needing attestations and contributes
-   // no effect entry -- but it still occupies index 1 on chain, so the entries
-   // either side must report 0 and 2, not 0 and 1.
+   // An OPERATORS state-mirror sits BETWEEN the two account-needing
+   // attestations and contributes no effect entry -- but it still occupies
+   // index 1 on chain, so the entries either side must report 0 and 2, not
+   // 0 and 1.
    auto envelope = envelope_with_entries({
-      remit_entry(make_sol_addr(remit_op)),
-      slash_entry(make_sol_addr(filled_pubkey(0x33))),
-      revert_entry(make_sol_addr(revert_op)),
+      remit_entry(601, make_sol_addr(remit_op)),
+      operators_mirror_entry(),
+      revert_entry(602, make_sol_addr(revert_op)),
    });
 
    BOOST_CHECK_EQUAL(detail::count_inbound_attestations(envelope), 3u);
@@ -1022,12 +1068,12 @@ BOOST_AUTO_TEST_CASE(extract_effects_indices_track_dispatch_order) try {
    BOOST_REQUIRE_EQUAL(effects.size(), 2u);
 
    BOOST_CHECK_EQUAL(effects[0].attestation_index, 0u);
-   BOOST_CHECK(effects[0].shape == detail::effect_shape::native_payee);
+   BOOST_CHECK(effects[0].shape == detail::effect_shape::withdraw_remit);
    BOOST_REQUIRE(effects[0].recipient.has_value());
    BOOST_CHECK(effects[0].recipient->serialize() == remit_op);
 
    BOOST_CHECK_EQUAL(effects[1].attestation_index, 2u);
-   BOOST_CHECK(effects[1].shape == detail::effect_shape::native_payee);
+   BOOST_CHECK(effects[1].shape == detail::effect_shape::deposit_revert);
    BOOST_REQUIRE(effects[1].recipient.has_value());
    BOOST_CHECK(effects[1].recipient->serialize() == revert_op);
 } FC_LOG_AND_RETHROW();
@@ -1045,15 +1091,16 @@ BOOST_AUTO_TEST_CASE(extract_effects_on_undecodable_envelope_is_empty) try {
 BOOST_AUTO_TEST_CASE(extract_effects_repeated_recipient_yields_one_entry_per_attestation) try {
    namespace detail = sysio::outpost_solana_client_detail;
    auto op_pk = filled_pubkey(0xCC);
-   // Two WITHDRAW_REMITs to the same operator (e.g. ETH bond + SOL bond
-   // both being returned in one envelope referencing the operator's SOL
-   // wallet twice). The walk is per-attestation with NO cross-attestation
-   // dedup -- the cursor counts both -- and the duplicate ACCOUNT merges
-   // later in `record_terminal_account` when a batch's manifests union
-   // (pinned by record_terminal_account_dedupes_and_merges_writable).
+   // Two identical WITHDRAW_REMITs to the same operator and token_code. The
+   // walk is per-attestation with NO cross-attestation dedup -- the cursor
+   // counts both, so collapsing them would misalign every later
+   // dispatch_limit -- and the duplicate ACCOUNTS (operator wallet,
+   // CollateralPosition PDA) merge later in `record_terminal_account` when a
+   // batch's manifests union (pinned by
+   // record_terminal_account_dedupes_and_merges_writable).
    auto envelope = envelope_with_entries({
-      remit_entry(make_sol_addr(op_pk)),
-      remit_entry(make_sol_addr(op_pk)),
+      remit_entry(600, make_sol_addr(op_pk)),
+      remit_entry(600, make_sol_addr(op_pk)),
    });
 
    const auto effects = detail::extract_inbound_effects(envelope);
@@ -1064,24 +1111,64 @@ BOOST_AUTO_TEST_CASE(extract_effects_repeated_recipient_yields_one_entry_per_att
    BOOST_CHECK(effects[1].recipient->serialize() == op_pk);
 } FC_LOG_AND_RETHROW();
 
-BOOST_AUTO_TEST_CASE(extract_effects_skips_slash) try {
+BOOST_AUTO_TEST_CASE(extract_effects_slash_carries_collateral_position_key) try {
    namespace detail = sysio::outpost_solana_client_detail;
-   // SLASH attestations target the Reserve PDA, which is already a
-   // declared account on the dispatch instruction. They MUST NOT bloat
-   // the remaining_accounts list — every entry costs ~33 bytes against
-   // the 1 232-byte tx MTU — but they still occupy their dispatch-order
-   // index.
+   // SLASH MUST be surfaced (SOL-379/380): the handler resolves the slashed
+   // operator's per-(operator, token_code) CollateralPosition PDA out of
+   // remaining_accounts, and under SPL custody additionally the collateral
+   // vault + reserve_aggregate ATA. An omitted manifest entry would abort
+   // the dispatch call on-chain and stall the cursor on this attestation.
    auto slash_op = filled_pubkey(0xDD);
    auto remit_op = filled_pubkey(0xEE);
    auto envelope = envelope_with_entries({
-      slash_entry(make_sol_addr(slash_op)),
-      remit_entry(make_sol_addr(remit_op)),
+      slash_entry(502, make_sol_addr(slash_op)),
+      remit_entry(504, make_sol_addr(remit_op)),
+   });
+
+   const auto effects = detail::extract_inbound_effects(envelope);
+   BOOST_REQUIRE_EQUAL(effects.size(), 2u);
+
+   BOOST_CHECK_EQUAL(effects[0].attestation_index, 0u);
+   BOOST_CHECK(effects[0].shape == detail::effect_shape::slash);
+   BOOST_REQUIRE(effects[0].recipient.has_value());
+   BOOST_CHECK(effects[0].recipient->serialize() == slash_op);
+   BOOST_REQUIRE(effects[0].collateral_token_code.has_value());
+   BOOST_CHECK_EQUAL(*effects[0].collateral_token_code, 502u);
+
+   BOOST_CHECK_EQUAL(effects[1].attestation_index, 1u);
+   BOOST_CHECK(effects[1].shape == detail::effect_shape::withdraw_remit);
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(extract_effects_keeps_distinct_collateral_token_codes) try {
+   namespace detail = sysio::outpost_solana_client_detail;
+   // One operator withdrawing two different token_codes resolves TWO
+   // distinct CollateralPosition PDAs — each effect carries its own key.
+   auto op_pk    = filled_pubkey(0x75);
+   auto envelope = envelope_with_entries({
+      remit_entry(700, make_sol_addr(op_pk)),
+      remit_entry(701, make_sol_addr(op_pk)),
+   });
+
+   const auto effects = detail::extract_inbound_effects(envelope);
+   BOOST_REQUIRE_EQUAL(effects.size(), 2u);
+   BOOST_CHECK_EQUAL(*effects[0].collateral_token_code, 700u);
+   BOOST_CHECK_EQUAL(*effects[1].collateral_token_code, 701u);
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(extract_effects_skips_non_settling_operator_actions) try {
+   namespace detail = sysio::outpost_solana_client_detail;
+   // A DEPOSIT_REQUEST is outbound-from-outpost — inbound it settles
+   // nothing and must contribute no effect entry (it still occupies its
+   // dispatch-order index).
+   auto envelope = envelope_with_entries({
+      deposit_request_entry(801, make_sol_addr(filled_pubkey(0x77))),
+      remit_entry(802, make_sol_addr(filled_pubkey(0x78))),
    });
 
    const auto effects = detail::extract_inbound_effects(envelope);
    BOOST_REQUIRE_EQUAL(effects.size(), 1u);
    BOOST_CHECK_EQUAL(effects[0].attestation_index, 1u);
-   BOOST_CHECK(effects[0].recipient->serialize() == remit_op);
+   BOOST_CHECK(effects[0].shape == detail::effect_shape::withdraw_remit);
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(extract_effects_skips_non_solana_chain) try {
@@ -1089,7 +1176,7 @@ BOOST_AUTO_TEST_CASE(extract_effects_skips_non_solana_chain) try {
    // for this outpost and must not contribute a SOL effect entry.
    auto eth_bytes = filled_pubkey(0x01);
    auto envelope  = envelope_with_entries({
-      remit_entry(make_eth_addr_32(eth_bytes)),
+      remit_entry(800, make_eth_addr_32(eth_bytes)),
    });
 
    auto effects = sysio::outpost_solana_client_detail::extract_inbound_effects(envelope);
@@ -1105,7 +1192,7 @@ BOOST_AUTO_TEST_CASE(extract_effects_skips_malformed_address_length) try {
    std::vector<uint8_t> short_addr(20, 0xAB);
    malformed.set_address(short_addr.data(), short_addr.size());
 
-   auto envelope = envelope_with_entries({remit_entry(malformed)});
+   auto envelope = envelope_with_entries({remit_entry(801, malformed)});
 
    auto effects = sysio::outpost_solana_client_detail::extract_inbound_effects(envelope);
    BOOST_CHECK(effects.empty());
@@ -1117,9 +1204,9 @@ BOOST_AUTO_TEST_CASE(extract_effects_mixed_remit_and_revert_preserved_order) try
    auto depositor  = filled_pubkey(0x20);
    auto op_b       = filled_pubkey(0x30);
    auto envelope   = envelope_with_entries({
-      remit_entry(make_sol_addr(op_a)),
-      revert_entry(make_sol_addr(depositor)),
-      remit_entry(make_sol_addr(op_b)),
+      remit_entry(901, make_sol_addr(op_a)),
+      revert_entry(902, make_sol_addr(depositor)),
+      remit_entry(903, make_sol_addr(op_b)),
    });
 
    const auto effects = detail::extract_inbound_effects(envelope);
@@ -1140,19 +1227,21 @@ BOOST_AUTO_TEST_CASE(extract_effects_swap_shapes_carry_wallets_and_reserve_seeds
    auto envelope       = envelope_with_entries({
       swap_remit_entry(10, 20, make_sol_addr(swap_recipient)),
       swap_revert_entry(11, 21, make_sol_addr(swap_depositor)),
-      remit_entry(make_sol_addr(withdraw_op)),
+      remit_entry(12, make_sol_addr(withdraw_op)),
    });
 
    const auto effects = detail::extract_inbound_effects(envelope);
    BOOST_REQUIRE_EQUAL(effects.size(), 3u);
 
    // SWAP_REMIT: recipient wallet + (token, reserve) seeds for the
-   // Reserve/vault PDA derivations and the recipient ATA.
+   // Reserve/vault PDA derivations and the recipient ATA. Reserve-backed
+   // shapes carry no collateral key — custody rides the Reserve record.
    BOOST_CHECK(effects[0].shape == detail::effect_shape::swap_remit);
    BOOST_CHECK(effects[0].recipient->serialize() == swap_recipient);
    BOOST_REQUIRE(effects[0].reserve.has_value());
    BOOST_CHECK_EQUAL(effects[0].reserve->token_code, 10u);
    BOOST_CHECK_EQUAL(effects[0].reserve->reserve_code, 20u);
+   BOOST_CHECK(!effects[0].collateral_token_code.has_value());
 
    // SWAP_REVERT: the wallet is the DEPOSITOR (the refund target).
    BOOST_CHECK(effects[1].shape == detail::effect_shape::swap_revert);
@@ -1160,8 +1249,9 @@ BOOST_AUTO_TEST_CASE(extract_effects_swap_shapes_carry_wallets_and_reserve_seeds
    BOOST_REQUIRE(effects[1].reserve.has_value());
    BOOST_CHECK_EQUAL(effects[1].reserve->token_code, 11u);
    BOOST_CHECK_EQUAL(effects[1].reserve->reserve_code, 21u);
+   BOOST_CHECK(!effects[1].collateral_token_code.has_value());
 
-   BOOST_CHECK(effects[2].shape == detail::effect_shape::native_payee);
+   BOOST_CHECK(effects[2].shape == detail::effect_shape::withdraw_remit);
    BOOST_CHECK(effects[2].recipient->serialize() == withdraw_op);
 } FC_LOG_AND_RETHROW();
 
@@ -1246,26 +1336,33 @@ BOOST_AUTO_TEST_CASE(record_terminal_account_dedupes_and_merges_writable) try {
 } FC_LOG_AND_RETHROW();
 
 // ── build_dispatch_manifests: the per-attestation account manifests the
-//    dispatch crank packs its windows from, driven through its ONE RPC seam
-//    (the Reserve read). These pin the three properties the manifest build
-//    must hold before a single dispatch is sent: custody comes from the
-//    Reserve the on-chain handler branches on, one read per distinct reserve,
-//    and a single unusable reserve degrades ITSELF rather than the envelope.
+//    dispatch crank packs its windows from, driven through its Reserve and
+//    CollateralPosition read seams. These pin the properties the manifest
+//    build must hold before a single dispatch is sent: custody comes from the
+//    exact account the on-chain handler branches on, reads are memoised by the
+//    account's full PDA seed tuple, and an absent account degrades only itself.
 
 namespace {
 
 namespace manifest_detail = sysio::outpost_solana_client_detail;
 
-/// Scripted stand-in for the Reserve reads a manifest build performs.
-/// `records` is the on-chain truth; anything absent from it reads as a
-/// degraded (unusable) reserve. Every call is recorded so the build's read
-/// COUNT is assertable.
+/// Scripted stand-in for the Reserve and CollateralPosition reads a manifest
+/// build performs. The record maps are on-chain truth; absent entries degrade
+/// as uninitialized accounts. Every call is recorded so memoization is
+/// assertable.
 struct manifest_build_harness {
-   using seeds = std::pair<uint64_t, uint64_t>;
+   using seeds            = std::pair<uint64_t, uint64_t>;
+   /// One collateral position's full `(operator, token_code)` PDA seed tuple.
+   using collateral_seeds = std::pair<solana_public_key, uint64_t>;
 
-   solana_public_key                                     program_id = measurement_pubkey(42);
-   std::map<seeds, manifest_detail::reserve_terminal_info> records;
-   std::vector<seeds>                                    reads;
+   solana_public_key program_id = measurement_pubkey(42);
+   /// The named `reserve_aggregate` account — SPL slash seizures settle into
+   /// its canonical ATA.
+   solana_public_key reserve_aggregate = measurement_pubkey(43);
+   std::map<seeds, manifest_detail::reserve_terminal_info>             records;
+   std::vector<seeds>                                                   reads;
+   std::map<collateral_seeds, manifest_detail::token_custody_info> collateral_records;
+   std::vector<collateral_seeds>                                      collateral_reads;
 
    void put(uint64_t token_code, uint64_t reserve_code,
             const solana_public_key& creator, const solana_public_key& custody_mint,
@@ -1273,6 +1370,13 @@ struct manifest_build_harness {
       records.emplace(seeds{token_code, reserve_code},
                       manifest_detail::reserve_terminal_info{creator, custody_mint,
                                                              custody_decimals});
+   }
+
+   /// Seed one position's pinned custody for the collateral reader.
+   void put_collateral(const solana_public_key& operator_key, uint64_t token_code,
+                       const solana_public_key& custody_mint) {
+      collateral_records.emplace(collateral_seeds{operator_key, token_code},
+                                 manifest_detail::token_custody_info{custody_mint});
    }
 
    manifest_detail::reserve_info_reader reader() {
@@ -1285,12 +1389,26 @@ struct manifest_build_harness {
       };
    }
 
+   /// Scripted stand-in for `collateral_position_custody`: anything absent
+   /// from `collateral_records` reads as an absent-position degrade.
+   manifest_detail::collateral_custody_reader collateral_reader() {
+      return [this](const solana_public_key& operator_key,
+                    uint64_t token_code) -> std::optional<manifest_detail::token_custody_info> {
+         const auto key = collateral_seeds{operator_key, token_code};
+         collateral_reads.emplace_back(key);
+         auto it = collateral_records.find(key);
+         if (it == collateral_records.end()) return std::nullopt;
+         return it->second;
+      };
+   }
+
    std::vector<std::vector<account_meta>> build(
       const std::vector<manifest_detail::inbound_effect>& effects,
       uint32_t                                            total_attestations,
       const std::function<void()>&                        deadline_probe = [] {}) {
       return manifest_detail::build_dispatch_manifests(
-         program_id, effects, total_attestations, deadline_probe, reader(), "test-relay");
+         program_id, effects, total_attestations, deadline_probe, reader(),
+         collateral_reader(), reserve_aggregate, "test-relay");
    }
 };
 
@@ -1303,11 +1421,30 @@ manifest_detail::inbound_effect swap_remit_effect(size_t index, uint64_t token_c
       manifest_detail::reserve_pda_seeds{token_code, reserve_code}};
 }
 
-/// One WITHDRAW_REMIT-style effect at `index` paying a native SOL wallet.
-manifest_detail::inbound_effect native_payee_effect(size_t index,
-                                                    const solana_public_key& recipient) {
+/// One WITHDRAW_REMIT effect at `index` paying `recipient` out of their
+/// `token_code`-keyed `CollateralPosition`.
+manifest_detail::inbound_effect withdraw_remit_effect(size_t index, uint64_t token_code,
+                                                      const solana_public_key& recipient) {
    return manifest_detail::inbound_effect{
-      index, manifest_detail::effect_shape::native_payee, recipient, std::nullopt};
+      index, manifest_detail::effect_shape::withdraw_remit, recipient, std::nullopt,
+      token_code};
+}
+
+/// One SLASH effect at `index` seizing `operator_key`'s `token_code`-keyed
+/// `CollateralPosition`.
+manifest_detail::inbound_effect slash_effect(size_t index, uint64_t token_code,
+                                             const solana_public_key& operator_key) {
+   return manifest_detail::inbound_effect{
+      index, manifest_detail::effect_shape::slash, operator_key, std::nullopt, token_code};
+}
+
+/// One DEPOSIT_REVERT effect at `index` refunding `depositor`'s
+/// `token_code`-keyed `CollateralPosition`.
+manifest_detail::inbound_effect deposit_revert_effect(size_t index, uint64_t token_code,
+                                                      const solana_public_key& depositor) {
+   return manifest_detail::inbound_effect{
+      index, manifest_detail::effect_shape::deposit_revert, depositor, std::nullopt,
+      token_code};
 }
 
 bool manifest_has(const std::vector<account_meta>& metas, const solana_public_key& key) {
@@ -1369,6 +1506,152 @@ BOOST_AUTO_TEST_CASE(build_manifests_follows_reserve_custody_per_reserve) try {
    BOOST_CHECK(!manifest_has(native, system::program_ids::TOKEN_PROGRAM));
 } FC_LOG_AND_RETHROW();
 
+/// Collateral custody MUST be resolved per position, never per token code.
+/// The program pins `custody_mint` on each `(operator, token_code)`
+/// `CollateralPosition`, so two operators using the same token code may take
+/// different native/SPL settlement branches. A token-code-only cache would
+/// make one manifest disagree with the program and permanently wedge the
+/// dispatch cursor on `EffectAccountMissing`.
+BOOST_AUTO_TEST_CASE(build_manifests_follows_collateral_custody_per_position) try {
+   constexpr uint64_t token_code = 700;
+   const auto native_operator = measurement_pubkey(96);
+   const auto spl_operator    = measurement_pubkey(97);
+   const auto spl_mint        = measurement_pubkey(98);
+
+   manifest_build_harness harness;
+   harness.put_collateral(native_operator, token_code,
+                          system::program_ids::SYSTEM_PROGRAM);
+   harness.put_collateral(spl_operator, token_code, spl_mint);
+
+   const auto manifests = harness.build(
+      {withdraw_remit_effect(0, token_code, native_operator),
+       withdraw_remit_effect(1, token_code, spl_operator)},
+      2);
+   BOOST_REQUIRE_EQUAL(manifests.size(), 2u);
+
+   // Native position: operator + position only, with no SPL extras.
+   const auto& native = manifests[0];
+   BOOST_REQUIRE_EQUAL(native.size(), 2u);
+   BOOST_CHECK(manifest_has(native, native_operator));
+   BOOST_CHECK(manifest_has(native, manifest_detail::derive_collateral_position_pda(
+                                      harness.program_id, native_operator, token_code)));
+   BOOST_CHECK(!manifest_has(native, manifest_detail::derive_collateral_vault_pda(
+                                       harness.program_id, token_code)));
+   BOOST_CHECK(!manifest_has(native, system::program_ids::TOKEN_PROGRAM));
+
+   // SPL position, same token code: position + collateral vault + operator's
+   // ATA for THIS POSITION'S mint + token program.
+   const auto& spl = manifests[1];
+   BOOST_REQUIRE_EQUAL(spl.size(), 5u);
+   BOOST_CHECK(manifest_has(spl, spl_operator));
+   BOOST_CHECK(manifest_has(spl, manifest_detail::derive_collateral_position_pda(
+                                   harness.program_id, spl_operator, token_code)));
+   BOOST_CHECK(manifest_has(spl, manifest_detail::derive_collateral_vault_pda(
+                                   harness.program_id, token_code)));
+   BOOST_CHECK(manifest_has(spl, system::get_associated_token_address(spl_operator, spl_mint)));
+   BOOST_CHECK(manifest_has(spl, system::program_ids::TOKEN_PROGRAM));
+
+   BOOST_REQUIRE_EQUAL(harness.collateral_reads.size(), 2u);
+   BOOST_CHECK((harness.collateral_reads[0] ==
+                manifest_build_harness::collateral_seeds{native_operator, token_code}));
+   BOOST_CHECK((harness.collateral_reads[1] ==
+                manifest_build_harness::collateral_seeds{spl_operator, token_code}));
+} FC_LOG_AND_RETHROW();
+
+/// SLASH is the one collateral shape whose SPL destination is NOT the
+/// recipient: the seizure settles into the `reserve_aggregate`'s canonical
+/// ATA, and the operator wallet is deliberately absent (SLASH pays nobody
+/// directly). A wrong ATA owner here is the silently-stuck-seizure failure
+/// mode — the handler's uninitialised-destination check degrades to
+/// "status flipped, funds stuck" rather than aborting — so the owner swap is
+/// pinned at the manifest level, native and SPL.
+BOOST_AUTO_TEST_CASE(build_manifests_slash_settles_into_reserve_aggregate_ata) try {
+   constexpr uint64_t token_code = 700;
+   const auto native_operator = measurement_pubkey(90);
+   const auto spl_operator    = measurement_pubkey(91);
+   const auto spl_mint        = measurement_pubkey(92);
+
+   manifest_build_harness harness;
+   harness.put_collateral(native_operator, token_code,
+                          system::program_ids::SYSTEM_PROGRAM);
+   harness.put_collateral(spl_operator, token_code, spl_mint);
+
+   const auto manifests = harness.build(
+      {slash_effect(0, token_code, native_operator),
+       slash_effect(1, token_code, spl_operator)},
+      2);
+   BOOST_REQUIRE_EQUAL(manifests.size(), 2u);
+
+   // Native seizure: position ONLY — the lamports land in the named
+   // `reserve_aggregate` account, and the operator wallet is never declared.
+   const auto& native = manifests[0];
+   BOOST_REQUIRE_EQUAL(native.size(), 1u);
+   BOOST_CHECK(manifest_has(native, manifest_detail::derive_collateral_position_pda(
+                                      harness.program_id, native_operator, token_code)));
+   BOOST_CHECK(!manifest_has(native, native_operator));
+
+   // SPL seizure: position + collateral vault + the RESERVE_AGGREGATE's ATA
+   // (not the operator's) + token program; still no operator wallet.
+   const auto& spl = manifests[1];
+   BOOST_REQUIRE_EQUAL(spl.size(), 4u);
+   BOOST_CHECK(manifest_has(spl, manifest_detail::derive_collateral_position_pda(
+                                   harness.program_id, spl_operator, token_code)));
+   BOOST_CHECK(manifest_has(spl, manifest_detail::derive_collateral_vault_pda(
+                                   harness.program_id, token_code)));
+   BOOST_CHECK(manifest_has(
+      spl, system::get_associated_token_address(harness.reserve_aggregate, spl_mint)));
+   BOOST_CHECK(!manifest_has(spl, system::get_associated_token_address(spl_operator, spl_mint)));
+   BOOST_CHECK(manifest_has(spl, system::program_ids::TOKEN_PROGRAM));
+   BOOST_CHECK(!manifest_has(spl, spl_operator));
+} FC_LOG_AND_RETHROW();
+
+/// DEPOSIT_REVERT settles SPL for real on the companion program
+/// (`handle_deposit_revert`'s non-native branch drains the collateral vault
+/// into the DEPOSITOR's canonical ATA via `resolve_collateral_vault_transfer`,
+/// which `require_remaining_account`s the vault, the destination ATA, and the
+/// token program). A manifest that omits them aborts the dispatch round and
+/// re-packs the identical window from the same cursor on every retry — the
+/// regression this test pins is exactly the earlier "SPL deposit-revert is
+/// refused on-chain" early-return, which held the cursor once the companion
+/// implemented settlement.
+BOOST_AUTO_TEST_CASE(build_manifests_deposit_revert_declares_spl_refund_accounts) try {
+   constexpr uint64_t token_code = 700;
+   const auto native_depositor = measurement_pubkey(93);
+   const auto spl_depositor    = measurement_pubkey(94);
+   const auto spl_mint         = measurement_pubkey(95);
+
+   manifest_build_harness harness;
+   harness.put_collateral(native_depositor, token_code,
+                          system::program_ids::SYSTEM_PROGRAM);
+   harness.put_collateral(spl_depositor, token_code, spl_mint);
+
+   const auto manifests = harness.build(
+      {deposit_revert_effect(0, token_code, native_depositor),
+       deposit_revert_effect(1, token_code, spl_depositor)},
+      2);
+   BOOST_REQUIRE_EQUAL(manifests.size(), 2u);
+
+   // Native refund: depositor + position only, with no SPL extras.
+   const auto& native = manifests[0];
+   BOOST_REQUIRE_EQUAL(native.size(), 2u);
+   BOOST_CHECK(manifest_has(native, native_depositor));
+   BOOST_CHECK(manifest_has(native, manifest_detail::derive_collateral_position_pda(
+                                      harness.program_id, native_depositor, token_code)));
+   BOOST_CHECK(!manifest_has(native, system::program_ids::TOKEN_PROGRAM));
+
+   // SPL refund: depositor wallet (the full-drain close's rent recipient) +
+   // position + collateral vault + the DEPOSITOR's ATA + token program.
+   const auto& spl = manifests[1];
+   BOOST_REQUIRE_EQUAL(spl.size(), 5u);
+   BOOST_CHECK(manifest_has(spl, spl_depositor));
+   BOOST_CHECK(manifest_has(spl, manifest_detail::derive_collateral_position_pda(
+                                   harness.program_id, spl_depositor, token_code)));
+   BOOST_CHECK(manifest_has(spl, manifest_detail::derive_collateral_vault_pda(
+                                   harness.program_id, token_code)));
+   BOOST_CHECK(manifest_has(spl, system::get_associated_token_address(spl_depositor, spl_mint)));
+   BOOST_CHECK(manifest_has(spl, system::program_ids::TOKEN_PROGRAM));
+} FC_LOG_AND_RETHROW();
+
 /// The build reads each DISTINCT reserve exactly once, however many
 /// attestations reference it -- the property that keeps a 500-remit envelope
 /// from costing 500 sequential round-trips per drain. There is no
@@ -1413,10 +1696,12 @@ BOOST_AUTO_TEST_CASE(build_manifests_degrade_an_absent_reserve) try {
    manifest_build_harness harness;
    harness.put(10, 20, creator, mint, 6);
    // (12, 22) deliberately absent -> the read degrades.
+   // Native custody for the collateral token: the zero-mint marker.
+   harness.put_collateral(payee, 700, system::program_ids::SYSTEM_PROGRAM);
 
    const auto manifests = harness.build({swap_remit_effect(0, 10, 20, recipient),
                                          swap_remit_effect(1, 12, 22, recipient),
-                                         native_payee_effect(2, payee)},
+                                         withdraw_remit_effect(2, 700, payee)},
                                         3);
    BOOST_REQUIRE_EQUAL(manifests.size(), 3u);
 
@@ -1430,9 +1715,12 @@ BOOST_AUTO_TEST_CASE(build_manifests_degrade_an_absent_reserve) try {
    BOOST_CHECK(manifest_has(manifests[1], manifest_detail::derive_reserve_vault_pda(
                                              harness.program_id, 12, 22)));
    BOOST_CHECK(manifest_has(manifests[1], recipient));
-   // The attestation AFTER the degraded one is untouched by it.
-   BOOST_REQUIRE_EQUAL(manifests[2].size(), 1u);
+   // The attestation AFTER the degraded one is untouched by it: a native
+   // withdraw remit declares exactly the payee and their CollateralPosition.
+   BOOST_REQUIRE_EQUAL(manifests[2].size(), 2u);
    BOOST_CHECK(manifest_has(manifests[2], payee));
+   BOOST_CHECK(manifest_has(manifests[2], manifest_detail::derive_collateral_position_pda(
+                                             harness.program_id, payee, 700)));
 
    // A permanently unusable reserve costs ONE read for the whole build, not
    // one per attestation referencing it.
@@ -1473,7 +1761,8 @@ BOOST_AUTO_TEST_CASE(build_manifests_propagate_an_unreadable_reserve) try {
       manifest_detail::build_dispatch_manifests(
          harness.program_id,
          {swap_remit_effect(0, 10, 20, recipient), swap_remit_effect(1, 11, 21, later)},
-         2, [] {}, throwing_reader, "test-relay"),
+         2, [] {}, throwing_reader, harness.collateral_reader(), harness.reserve_aggregate,
+         "test-relay"),
       fc::exception,
       [](const fc::exception& e) {
          return e.to_detail_string().find("undecodable") != std::string::npos;
@@ -1524,17 +1813,25 @@ BOOST_AUTO_TEST_CASE(build_manifests_index_by_flat_dispatch_position) try {
    const auto payee = measurement_pubkey(93);
 
    manifest_build_harness harness;
-   // Attestation 1 (e.g. a SLASH) contributes no effect at all.
-   const auto manifests = harness.build({native_payee_effect(2, payee)}, 4);
+   // Native custody for the collateral token: the zero-mint marker.
+   harness.put_collateral(payee, 700, system::program_ids::SYSTEM_PROGRAM);
+   // Attestations 0, 1 and 3 contribute no effect at all.
+   const auto manifests = harness.build({withdraw_remit_effect(2, 700, payee)}, 4);
 
    BOOST_REQUIRE_EQUAL(manifests.size(), 4u);
    BOOST_CHECK(manifests[0].empty());
    BOOST_CHECK(manifests[1].empty());
-   BOOST_REQUIRE_EQUAL(manifests[2].size(), 1u);
+   BOOST_REQUIRE_EQUAL(manifests[2].size(), 2u);
    BOOST_CHECK(manifest_has(manifests[2], payee));
+   BOOST_CHECK(manifest_has(manifests[2], manifest_detail::derive_collateral_position_pda(
+                                             harness.program_id, payee, 700)));
    BOOST_CHECK(manifests[3].empty());
-   // A native payee needs no reserve, so no read is paid for it.
+   // A collateral settlement needs no Reserve record — only its one custody
+   // lookup is paid.
    BOOST_CHECK(harness.reads.empty());
+   BOOST_REQUIRE_EQUAL(harness.collateral_reads.size(), 1u);
+   BOOST_CHECK((harness.collateral_reads[0] ==
+                manifest_build_harness::collateral_seeds{payee, 700u}));
 } FC_LOG_AND_RETHROW();
 
 // ── drive_dispatch_rounds: the dispatch-crank state machine, driven through
@@ -2142,6 +2439,77 @@ BOOST_AUTO_TEST_CASE(reserve_shape_rejects_drifted_declarations) try {
    BOOST_CHECK_THROW(assert_reserve_shape(idl::program{}), fc::assert_exception);
    BOOST_CHECK_THROW(assert_reserve_shape(named_account_program("Reserve", {}, false)),
                      fc::assert_exception);
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(collateral_position_shape_accepts_the_expected_declaration) try {
+   using sysio::outpost_solana_client_detail::assert_collateral_position_shape;
+
+   const std::vector<idl::field> fields{
+      {"bump", prim(idl::primitive_type::u8)},
+      {"operator", prim(idl::primitive_type::pubkey)},
+      {"token_code", prim(idl::primitive_type::u64)},
+      {"custody_mint", prim(idl::primitive_type::pubkey)},
+      {"amount", prim(idl::primitive_type::u64)}};
+   for (bool in_types : {false, true}) {
+      BOOST_CHECK_NO_THROW(assert_collateral_position_shape(
+         named_account_program("CollateralPosition", fields, in_types)));
+   }
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(collateral_position_shape_rejects_drifted_declarations) try {
+   using sysio::outpost_solana_client_detail::assert_collateral_position_shape;
+
+   struct reject_case {
+      const char*             name;
+      std::vector<idl::field> fields;
+   };
+   const auto pubkey_t = prim(idl::primitive_type::pubkey);
+   const auto u64_t    = prim(idl::primitive_type::u64);
+
+   std::vector<reject_case> cases;
+   cases.push_back({"operator dropped",
+                    {{"token_code", u64_t}, {"custody_mint", pubkey_t}, {"amount", u64_t}}});
+   cases.push_back({"token_code dropped",
+                    {{"operator", pubkey_t}, {"custody_mint", pubkey_t}, {"amount", u64_t}}});
+   cases.push_back({"custody_mint dropped",
+                    {{"operator", pubkey_t}, {"token_code", u64_t}, {"amount", u64_t}}});
+   cases.push_back({"amount dropped",
+                    {{"operator", pubkey_t}, {"token_code", u64_t}, {"custody_mint", pubkey_t}}});
+   cases.push_back({"operator declared as a byte array",
+                    {{"operator", u8_32_array()},
+                     {"token_code", u64_t},
+                     {"custody_mint", pubkey_t},
+                     {"amount", u64_t}}});
+   cases.push_back({"custody_mint declared as a byte array",
+                    {{"operator", pubkey_t},
+                     {"token_code", u64_t},
+                     {"custody_mint", u8_32_array()},
+                     {"amount", u64_t}}});
+   cases.push_back({"token_code declared u32",
+                    {{"operator", pubkey_t},
+                     {"token_code", prim(idl::primitive_type::u32)},
+                     {"custody_mint", pubkey_t},
+                     {"amount", u64_t}}});
+   cases.push_back({"amount declared u32",
+                    {{"operator", pubkey_t},
+                     {"token_code", u64_t},
+                     {"custody_mint", pubkey_t},
+                     {"amount", prim(idl::primitive_type::u32)}}});
+
+   for (const auto& c : cases) {
+      BOOST_TEST_CONTEXT(c.name) {
+         for (bool in_types : {false, true}) {
+            BOOST_CHECK_THROW(assert_collateral_position_shape(
+                                 named_account_program("CollateralPosition", c.fields, in_types)),
+                              fc::assert_exception);
+         }
+      }
+   }
+
+   BOOST_CHECK_THROW(assert_collateral_position_shape(idl::program{}), fc::assert_exception);
+   BOOST_CHECK_THROW(
+      assert_collateral_position_shape(named_account_program("CollateralPosition", {}, false)),
+      fc::assert_exception);
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(decode_latest_envelope_reads_both_known_layouts) try {

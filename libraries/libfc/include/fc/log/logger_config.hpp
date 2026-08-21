@@ -69,10 +69,18 @@ namespace fc {
          uint32_t       max_files = 0;
       };
 
+      /// Rotation threshold for rotating_file_sink, in MEGABYTES. configure_logging multiplies max_size by
+      /// 1 MiB when constructing the spdlog sink, so this is a count of megabytes and not a byte count.
+      inline constexpr uint32_t default_rotating_max_size_mb = 10;
+      /// Number of rotated files kept alongside the active one, matching spdlog's max_files semantics.
+      inline constexpr uint32_t default_rotating_max_files = 10;
+
+      /// Size-based rotating log file. Rotates once the active file reaches max_size megabytes, keeping at
+      /// most max_files rotated copies. max_size must be non-zero -- spdlog rejects a zero rotation size.
       struct rotating_file_sink_config {
          std::string    base_filename;
-         uint32_t       max_size = 1048576*10; // 10MB
-         uint32_t       max_files = 10;
+         uint32_t       max_size = default_rotating_max_size_mb;  // megabytes
+         uint32_t       max_files = default_rotating_max_files;
       };
 
       struct dmlog_sink_config {
