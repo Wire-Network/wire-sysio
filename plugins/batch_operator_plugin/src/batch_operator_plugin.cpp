@@ -152,6 +152,10 @@ struct batch_operator_plugin::impl {
    // Epoch state tracked across polls
    uint32_t                 current_epoch = 0;
    uint8_t                  my_group = 255;
+   /// The group index ON DUTY, straight from `epochstate.current_batch_op_group`.
+   /// Retained across polls because the election decision is made in
+   /// `parse_epoch_state` but reported in `do_poll_epoch_state`.
+   uint8_t                  current_group = 255;
    bool                     is_elected = false;
    fc::time_point           epoch_start;
    fc::time_point           next_epoch_start;
@@ -458,6 +462,7 @@ struct batch_operator_plugin::impl {
          }
       }
 
+      current_group = cur_group;
       is_elected = (my_group == cur_group);
 
       // Parse epoch timing
@@ -492,7 +497,7 @@ struct batch_operator_plugin::impl {
       if (!is_elected) {
          if (epoch_index != current_epoch) {
             ilog("batch_operator: not elected for epoch {} (my_group={}, active_group={})",
-                 epoch_index, my_group, (epoch_index % 3));
+                 epoch_index, my_group, current_group);
          }
          // Keep current_epoch fresh even when not elected: per-outpost jobs
          // consult it via depot_ops, and they bail on !is_elected anyway.
