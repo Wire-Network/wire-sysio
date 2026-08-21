@@ -148,6 +148,53 @@ BOOST_FIXTURE_TEST_CASE(regsnapprov_basic, snapshot_attest_tester) { try {
    BOOST_REQUIRE_EQUAL("producer1", prov["producer"].as_string());
 } FC_LOG_AND_RETHROW() }
 
+BOOST_FIXTURE_TEST_CASE(regsnapprov_rejects_provider_beyond_maximum, snapshot_attest_tester) { try {
+   constexpr uint32_t max_registered_snapshot_providers = 30;
+   constexpr uint32_t fixture_snapshot_providers        = 5;
+   constexpr uint32_t additional_providers_to_fill_cap =
+      max_registered_snapshot_providers - fixture_snapshot_providers;
+
+   // The fixture provides five producers. Add 26 producers so 25 can fill the
+   // remaining slots and the final, rank-eligible producer can exercise the rejection path.
+   const std::vector<account_name> capacity_producers = {
+      "capprova"_n, "capprovb"_n, "capprovc"_n, "capprovd"_n, "capprove"_n,
+      "capprovf"_n, "capprovg"_n, "capprovh"_n, "capprovi"_n, "capprovj"_n,
+      "capprovk"_n, "capprovl"_n, "capprovm"_n, "capprovn"_n, "capprovo"_n,
+      "capprovp"_n, "capprovq"_n, "capprovr"_n, "capprovs"_n, "capprovt"_n,
+      "capprovu"_n, "capprovv"_n, "capprovw"_n, "capprovx"_n, "capprovy"_n,
+      "capprovz"_n,
+   };
+   BOOST_REQUIRE_EQUAL(additional_providers_to_fill_cap + 1, capacity_producers.size());
+
+   setup_producer_accounts(capacity_producers);
+   produce_blocks();
+   for (const auto& producer : capacity_producers) {
+      regproducer(producer);
+   }
+   produce_blocks();
+   for (uint32_t index = 0; index < capacity_producers.size(); ++index) {
+      const uint32_t rank = index < additional_providers_to_fill_cap
+         ? fixture_snapshot_providers + index + 1
+         : max_registered_snapshot_providers;
+      BOOST_REQUIRE_EQUAL(success(), setrank(capacity_producers[index], rank));
+   }
+   produce_blocks();
+
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer3"_n, "snapprov3"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer4"_n, "snapprov4"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer5"_n, "snapprov5"_n));
+   for (uint32_t index = 0; index < additional_providers_to_fill_cap; ++index) {
+      // A producer may delegate snapshot signing to itself; this minimizes setup while still
+      // exercising the public registration action and its provider-table capacity check.
+      BOOST_REQUIRE_EQUAL(success(), regsnapprov(capacity_producers[index], capacity_producers[index]));
+   }
+
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("maximum registered snapshot providers reached"),
+                        regsnapprov(capacity_producers.back(), capacity_producers.back()));
+} FC_LOG_AND_RETHROW() }
+
 BOOST_FIXTURE_TEST_CASE(regsnapprov_duplicate_rejected, snapshot_attest_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
 
@@ -283,7 +330,7 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_excludes_inactive_providers_from_quorum, sn
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer3"_n, "snapprov3"_n));
-   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1, 67));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1, 50));
    BOOST_REQUIRE_EQUAL(success(), unregproducer("producer3"_n));
 
    const auto bid = make_block_id(9002);
@@ -291,9 +338,31 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_excludes_inactive_providers_from_quorum, sn
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, bid, hash));
    BOOST_REQUIRE(getsnaphash(9002).is_null());
 
-   // Only producer1 and producer2 are currently eligible, so their second vote reaches N = 2 quorum.
+   // The three registered mappings require two votes at 50%; producer3's inactive status must not
+   // lower that denominator or let producer1 attest on its own.
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, bid, hash));
    BOOST_REQUIRE(!getsnaphash(9002).is_null());
+} FC_LOG_AND_RETHROW() }
+
+// CertiK WNS-17 / WIRE-350: producer eligibility controls who may cast a vote, but rank churn must
+// not lower the stable registered-provider quorum for an irreversible attestation record.
+BOOST_FIXTURE_TEST_CASE(votesnaphash_preserves_registered_provider_quorum_after_rank_demotion, snapshot_attest_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer3"_n, "snapprov3"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer4"_n, "snapprov4"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer5"_n, "snapprov5"_n));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1, 50));
+
+   BOOST_REQUIRE_EQUAL(success(), setrank("producer2"_n, 31));
+   BOOST_REQUIRE_EQUAL(success(), setrank("producer3"_n, 31));
+   BOOST_REQUIRE_EQUAL(success(), setrank("producer4"_n, 31));
+   BOOST_REQUIRE_EQUAL(success(), setrank("producer5"_n, 31));
+
+   const auto bid = make_block_id(9004);
+   const auto hash = make_snap_hash(13);
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, bid, hash));
+   BOOST_REQUIRE(getsnaphash(9004).is_null());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(votesnaphash_excludes_inactive_pending_voters_from_quorum, snapshot_attest_tester) { try {
@@ -358,7 +427,7 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_quorum_reached, snapshot_attest_tester) { t
    BOOST_REQUIRE_EQUAL(1000u, rec["block_num"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(votesnaphash_duplicate_vote, snapshot_attest_tester) { try {
+BOOST_FIXTURE_TEST_CASE(votesnaphash_same_tuple_retry_is_idempotent, snapshot_attest_tester) { try {
    // Need 2 providers, min_providers=2 so single vote won't attest and purge
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
@@ -369,8 +438,8 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_duplicate_vote, snapshot_attest_tester) { t
    auto shash = make_snap_hash(1);
 
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, bid, shash));
-   BOOST_REQUIRE_EQUAL(wasm_assert_msg("producer has already voted for this snapshot"),
-                        votesnaphash("snapprov1"_n, bid, shash));
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, bid, shash));
+   BOOST_REQUIRE(getsnaphash(1000).is_null());
 } FC_LOG_AND_RETHROW() }
 
 // ---------------------------------------------------------------------------
@@ -448,7 +517,7 @@ BOOST_FIXTURE_TEST_CASE(blockid_mismatch_votes_not_aggregated, snapshot_attest_t
    BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2, 50));
    produce_blocks();
 
-   // Same height and same snapshot hash, but different block ids (competing forks)
+   // Same height and same snapshot hash, but different block ids (competing forks).
    auto bid_a  = make_block_id(8000);
    auto bid_b  = make_block_id(8000, 1);
    auto shash  = make_snap_hash(8);
@@ -460,13 +529,56 @@ BOOST_FIXTURE_TEST_CASE(blockid_mismatch_votes_not_aggregated, snapshot_attest_t
    // jointly reach the quorum of 2.
    BOOST_REQUIRE_EQUAL(true, getsnaphash(8000).is_null());
 
-   // A second vote for the same (block_id, hash) pair reaches quorum and the
-   // attested record carries that pair's block id.
-   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, bid_a, shash));
+   // A distinct producer may join the first tuple to reach quorum; producer2 cannot vote twice
+   // across the competing tuples at the same height.
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer3"_n, "snapprov3"_n));
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov3"_n, bid_a, shash));
    auto rec = getsnaphash(8000);
    BOOST_REQUIRE_EQUAL(false, rec.is_null());
    BOOST_REQUIRE_EQUAL(bid_a.str(), rec["block_id"].as_string());
    BOOST_REQUIRE_EQUAL(shash.str(), rec["snapshot_hash"].as_string());
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(votesnaphash_rejects_producer_equivocation_across_hashes, snapshot_attest_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2, 50));
+
+   const auto bid = make_block_id(8001);
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, bid, make_snap_hash(80)));
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("producer has already voted for this snapshot"),
+                        votesnaphash("snapprov1"_n, bid, make_snap_hash(81)));
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(votesnaphash_retries_pending_vote_after_eligibility_restored, snapshot_attest_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer3"_n, "snapprov3"_n));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(3, 50));
+
+   const auto bid  = make_block_id(8002);
+   const auto hash = make_snap_hash(82);
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov3"_n, bid, hash));
+   BOOST_REQUIRE_EQUAL(success(), unregproducer("producer3"_n));
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, bid, hash));
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, bid, hash));
+   BOOST_REQUIRE(getsnaphash(8002).is_null());
+
+   BOOST_REQUIRE_EQUAL(success(), regproducer("producer3"_n));
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov3"_n, bid, hash));
+   BOOST_REQUIRE(!getsnaphash(8002).is_null());
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(votesnaphash_reports_disagreement_before_eligibility_failure, snapshot_attest_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1, 50));
+
+   const auto bid = make_block_id(8003);
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, bid, make_snap_hash(83)));
+   BOOST_REQUIRE_EQUAL(success(), unregproducer("producer2"_n));
+   BOOST_REQUIRE_EQUAL(wasm_assert_code(9001),
+                        votesnaphash("snapprov2"_n, bid, make_snap_hash(84)));
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(record_blockid_disagreement, snapshot_attest_tester) { try {
@@ -558,10 +670,10 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_enforces_byzantine_quorum_floor, snapshot_a
    BOOST_REQUIRE(!getsnaphash(1000).is_null());
 } FC_LOG_AND_RETHROW() }
 
-// A single producer must not be able to clear the Byzantine floor by itself by rotating
-// snap_accounts: regsnapprov(A) -> vote -> delsnapprov(A) -> regsnapprov(B) -> vote again for the
-// SAME (block_id, snapshot_hash). Votes are counted by the stable producer identity, so the second
-// vote (fresh snap_account, same producer) is rejected and the lone producer cannot reach quorum.
+// A single producer must not be able to clear the Byzantine floor by rotating
+// snap_accounts: regsnapprov(A) -> vote -> delsnapprov(A) -> regsnapprov(B) -> retry the same
+// (block_id, snapshot_hash). The retry is idempotent by stable producer identity, so it adds no
+// second weight and the lone producer cannot reach quorum.
 BOOST_FIXTURE_TEST_CASE(votesnaphash_rejects_snap_account_rotation_sybil, snapshot_attest_tester) { try {
    // 4 providers -> floor = 4/3 + 1 = 2 is the binding quorum (threshold 1% rounds to 1).
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
@@ -583,10 +695,9 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_rejects_snap_account_rotation_sybil, snapsh
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov5"_n));
    produce_blocks();
 
-   // The rotated snap_account resolves to the same producer, which already voted -> rejected,
-   // and the snapshot is still NOT attested (one producer cannot reach the floor of 2).
-   BOOST_REQUIRE_EQUAL(wasm_assert_msg("producer has already voted for this snapshot"),
-                        votesnaphash("snapprov5"_n, bid, hash));
+   // The rotated snap_account resolves to the same producer, so its idempotent retry adds no
+   // second weight and the snapshot is still NOT attested (one producer cannot reach the floor of 2).
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov5"_n, bid, hash));
    BOOST_REQUIRE(getsnaphash(7000).is_null());
 
    // A genuinely distinct producer supplies the second, quorum-reaching vote.

@@ -14,7 +14,7 @@ namespace sysiosystem {
 using sysio::checksum256;
 using sysio::name;
 
-// Max producer rank eligible to register and vote as a snapshot provider.
+// Maximum registered snapshot providers and producer rank eligible to register one.
 static constexpr uint32_t max_snap_provider_rank = 30;
 
 // Error code for snapshot attestation disagreement (snapshot hash or block id differs from the
@@ -131,9 +131,10 @@ struct [[sysio::contract("sysio.system")]] snapshot_attest : public sysio::contr
    /**
     * Submit a snapshot hash vote from a currently active, rank-eligible provider.
     *
-    * Votes aggregate per (block_num, block_id, snapshot_hash) and derive both the quorum
-    * denominator and numerator from currently eligible provider mappings. When quorum is reached,
-    * creates an attested snap_record and purges older votes. Rejects with
+    * Votes aggregate per (block_num, block_id, snapshot_hash). The quorum denominator is the
+    * stable registered-provider membership, while the numerator includes only currently eligible
+    * voters. Retrying the same tuple is idempotent and re-evaluates pending voter eligibility. When
+    * quorum is reached, creates an attested snap_record and purges older votes. Rejects with
     * snap_hash_disagreement_error when an attested record already exists for the height and either
     * the snapshot hash or the block id differs from it.
     */
@@ -144,9 +145,9 @@ struct [[sysio::contract("sysio.system")]] snapshot_attest : public sysio::contr
     * Update snapshot attestation configuration. Requires contract authority.
     *
     * @param min_providers  minimum voters required to attest (must be >= 1).
-    * @param threshold_pct  percentage of currently eligible providers required (1..100).
+    * @param threshold_pct  percentage of registered providers required (1..100).
     *
-    * For N currently eligible providers the effective quorum is
+    * For N registered providers the effective quorum is
     *     max( max(min_providers, ceil(N * threshold_pct / 100)), floor(N/3) + 1 )
     * The trailing floor(N/3)+1 is a Byzantine safety floor (see votesnaphash): an attestation
     * must always carry more than N/3 providers so a misconfigured-low threshold cannot let a

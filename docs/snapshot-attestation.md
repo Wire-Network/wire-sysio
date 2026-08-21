@@ -151,16 +151,27 @@ A hash is attested when the number of distinct, currently eligible providers vot
 `(block_num, block_id, snapshot_hash)` tuple reaches:
 
 ```
-quorum = max(min_providers, ceil(eligible_providers * threshold_pct / 100))
+quorum = max(
+    min_providers,
+    ceil(registered_providers * threshold_pct / 100),
+    floor(registered_providers / 3) + 1
+)
 ```
 
 - `min_providers` is a hard floor (default 1; raised for mainnet) set by `setsnpcfg`.
-- `threshold_pct` is the share of currently eligible providers required (default 67, i.e.
+- `threshold_pct` is the share of registered provider mappings required (default 67, i.e.
   two-thirds).
+- `floor(registered_providers / 3) + 1` is an independent Byzantine-safety floor. It prevents a
+  misconfigured low `threshold_pct` from allowing a Byzantine minority to attest a snapshot.
 
-The quorum numerator uses the same current eligibility set. A vote cast before its producer is
-deactivated, demoted, or removed from `snapprovs` does not continue to count toward a later
-attestation.
+The registered-provider denominator is deliberately stable: rank churn or producer deactivation
+must not lower the threshold for a permanent record. Current producer activity and rank control
+whether a pending vote contributes to the numerator. Provider membership changes are explicit:
+`delsnapprov` removes a mapping, and `regsnapprov` admits at most 30 mappings.
+
+A provider may resubmit the same pending tuple after regaining eligibility. This is idempotent—its
+identity remains a single vote—but lets the contract re-evaluate the existing vote set without a
+separate keeper action. A producer cannot submit a different tuple for the same height.
 
 The floor guarantees a minimum number of attestors even on a small network; the percentage
 makes the quorum scale with participation.
