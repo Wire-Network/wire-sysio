@@ -546,7 +546,8 @@ public:
 
    /// The default emission config payload, split out so a caller that must push it through a
    /// different transport (see push_system_action_no_block) does not restate twenty fields.
-   fc::variant_object default_emit_cfg( uint16_t cadence ) {
+   fc::variant_object default_emit_cfg( uint16_t cadence,
+                                        int64_t annual_max_emission = ANNUAL_MAX_EMISSION ) {
       return mvo()
          ("t1_allocation",          T1_ALLOCATION.get_amount())
          ("t2_allocation",          T2_ALLOCATION.get_amount())
@@ -559,7 +560,7 @@ public:
          ("t5_floor",               125'000'000'000'000'000LL)
          ("target_annual_decay_bps", TARGET_ANNUAL_DECAY_BPS)
          ("annual_initial_emission", ANNUAL_INITIAL_EMISSION)
-         ("annual_max_emission",     ANNUAL_MAX_EMISSION)
+         ("annual_max_emission",     annual_max_emission)
          ("annual_min_emission",     ANNUAL_MIN_EMISSION)
          ("compute_bps",            COMPUTE_BPS)
          ("capex_bps",              CAPEX_BPS)
@@ -2443,37 +2444,130 @@ BOOST_FIXTURE_TEST_CASE( accrueepoch_saturates_pending_accumulator, sysio_emissi
       get_t5_state()["pending_emission_amount"].as<int64_t>() );
 } FC_LOG_AND_RETHROW()
 
+BOOST_FIXTURE_TEST_CASE( payepoch_recovers_from_incomplete_batch_roster_history, sysio_emissions_tester ) try {
+   // A mixed contract version can reach payepoch without any immutable roster
+   // snapshots. That must retain the batch slice rather than aborting the
+   // inline sysio.epoch::advance path chain-wide.
+   create_t5_holding_accounts();
+   BOOST_REQUIRE_EQUAL(success(), setemitcfg_defaults(config::system_account_name));
+   BOOST_REQUIRE_EQUAL(success(), initt5(config::system_account_name, tpsec(head_secs())));
+   BOOST_REQUIRE_EQUAL(success(),
+      push_system_action(EPOCH, "accrueepoch"_n, mvo()
+         ("epoch_index", 1)("batch_group_index", 0)("per_epoch_emission", int64_t(1))));
+
+   auto r = push_system_action(EPOCH, "payepoch"_n, mvo()
+      ("epoch_index", 1)
+      ("batch_op_groups", vector<vector<name>>{})
+      ("period_emission", int64_t(1)));
+   BOOST_REQUIRE_EQUAL(success(), r);
+
+   // The period completes and establishes a clean next-period boundary.
+   auto state = get_t5_state();
+   BOOST_REQUIRE_EQUAL(int64_t(0), state["pending_emission_amount"].as<int64_t>());
+   BOOST_REQUIRE_EQUAL(uint32_t(2), state["period_start_epoch"].as<uint32_t>());
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( payepoch_seeds_initial_roster_history_at_activation_epoch, sysio_emissions_tester ) try {
+   // T5 may be initialized after sysio.epoch has already advanced. The first
+   // retained roster, not literal epoch one, defines that initial period.
+   create_t5_holding_accounts();
+   BOOST_REQUIRE_EQUAL(success(), setemitcfg_defaults(config::system_account_name));
+   BOOST_REQUIRE_EQUAL(success(), initt5(config::system_account_name, tpsec(head_secs())));
+   BOOST_REQUIRE_EQUAL(success(),
+      push_system_action(EPOCH, "accrueepoch"_n, mvo()
+         ("epoch_index", 42)("batch_group_index", 0)("per_epoch_emission", int64_t(1))));
+   BOOST_REQUIRE_EQUAL(success(),
+      push_system_action(EPOCH, "rcrdbatch"_n, mvo()
+         ("epoch_index", 42)("members", vector<name>{})));
+
+   BOOST_REQUIRE_EQUAL(success(), push_system_action(EPOCH, "payepoch"_n, mvo()
+      ("epoch_index", 42)
+      ("batch_op_groups", vector<vector<name>>{})
+      ("period_emission", int64_t(1))));
+
+   BOOST_REQUIRE_EQUAL(uint32_t(43), get_t5_state()["period_start_epoch"].as<uint32_t>());
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( payepoch_recovers_after_legacy_roster_history_exceeds_cap, sysio_emissions_tester ) try {
+   // A legacy cadence above the new cap can leave more accrued epochs than
+   // retained rosters. The eleventh rcrdbatch must prune its exact oldest row
+   // rather than halting advance; payepoch then takes the retention/recovery
+   // path and the following clean period pays normally.
+   constexpr uint32_t roster_history_cap = 10;
+   create_t5_holding_accounts();
+   BOOST_REQUIRE_EQUAL(success(), setemitcfg_defaults(config::system_account_name));
+   BOOST_REQUIRE_EQUAL(success(), initt5(config::system_account_name, tpsec(head_secs())));
+
+   for (uint32_t epoch_index = 1; epoch_index <= roster_history_cap + 1; ++epoch_index) {
+      BOOST_REQUIRE_EQUAL(success(), push_system_action(EPOCH, "accrueepoch"_n, mvo()
+         ("epoch_index", epoch_index)("batch_group_index", 0)("per_epoch_emission", int64_t(1))));
+      BOOST_REQUIRE_EQUAL(success(), push_system_action(EPOCH, "rcrdbatch"_n, mvo()
+         ("epoch_index", epoch_index)("members", vector<name>{})));
+   }
+
+   // Reaching this point proves the cap boundary did not reject the mandatory
+   // eleventh record. Its missing first snapshot takes the recovery path.
+   BOOST_REQUIRE_EQUAL(success(), push_system_action(EPOCH, "payepoch"_n, mvo()
+      ("epoch_index", roster_history_cap + 1)
+      ("batch_op_groups", vector<vector<name>>{})
+      ("period_emission", int64_t(roster_history_cap + 1))));
+   BOOST_REQUIRE_EQUAL(uint32_t(roster_history_cap + 2),
+                       get_t5_state()["period_start_epoch"].as<uint32_t>());
+
+   // The failed-completeness period cleared its history; the next complete
+   // period is processed normally rather than inheriting stale rows.
+   const uint32_t recovery_epoch = roster_history_cap + 2;
+   BOOST_REQUIRE_EQUAL(success(), push_system_action(EPOCH, "accrueepoch"_n, mvo()
+      ("epoch_index", recovery_epoch)("batch_group_index", 0)("per_epoch_emission", int64_t(1))));
+   BOOST_REQUIRE_EQUAL(success(), push_system_action(EPOCH, "rcrdbatch"_n, mvo()
+      ("epoch_index", recovery_epoch)("members", vector<name>{})));
+   BOOST_REQUIRE_EQUAL(success(), push_system_action(EPOCH, "payepoch"_n, mvo()
+      ("epoch_index", recovery_epoch)
+      ("batch_op_groups", vector<vector<name>>{})
+      ("period_emission", int64_t(1))));
+   BOOST_REQUIRE_EQUAL(uint32_t(recovery_epoch + 1),
+                       get_t5_state()["period_start_epoch"].as<uint32_t>());
+} FC_LOG_AND_RETHROW()
+
 BOOST_FIXTURE_TEST_CASE( setemitcfg_bounds_period_accrual_to_asset_range, sysio_emissions_tester ) try {
    // The pending accumulator saturates at asset::max_amount (previous test), and
    // a saturated accumulator leaves the pay-epoch readiness gate demanding a
    // balance no account can hold -- permanently blocking epoch advancement. So
    // setemitcfg must reject any config whose worst-case pay-period accumulation
    // (per-epoch emission ceiling * pay_cadence_epochs) could reach the clamp.
-   //
-   // At a 30-day epoch the fixture's ANNUAL_MAX_EMISSION scales to exactly
-   // 9.0e16 per epoch (3.0e15 per day * 30 days), and the asset ceiling
-   // (2^62 - 1 ~= 4.61e18) divides to 51.24 epochs of headroom: cadence 51
-   // fits, cadence 52 must be rejected.
+   // A deliberately high annual ceiling scales to ~4.93e17 at a 30-day epoch:
+   // cadence 9 fits the asset range, whereas cadence 10 must be rejected.
+   constexpr int64_t high_annual_max = 6'000'000'000'000'000'000LL;
    BOOST_REQUIRE_EQUAL( success(), init_epoch_state(2'592'000) ); // 30-day epochs
 
    BOOST_REQUIRE_EQUAL( success(),
-      setemitcfg_with_cadence( config::system_account_name, uint16_t(51) ) );
+      setemitcfg(config::system_account_name, default_emit_cfg(uint16_t(9), high_annual_max)) );
 
-   auto r = setemitcfg_with_cadence( config::system_account_name, uint16_t(52) );
+   auto r = setemitcfg(config::system_account_name, default_emit_cfg(uint16_t(10), high_annual_max));
    BOOST_REQUIRE( r != success() );
    require_substr( r, "per-epoch emission ceiling x pay_cadence_epochs exceeds the asset range" );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( setemitcfg_caps_batch_roster_history, sysio_emissions_tester ) try {
+   // Each retained roster may hold the scheduler maximum of 100 operators.
+   // The cadence cap keeps a payepoch below 1,000 historical roster names.
+   BOOST_REQUIRE_EQUAL( success(),
+      setemitcfg_with_cadence(config::system_account_name, uint16_t(10)) );
+
+   auto r = setemitcfg_with_cadence(config::system_account_name, uint16_t(11));
+   BOOST_REQUIRE( r != success() );
+   require_substr(r, "pay_cadence_epochs exceeds batch roster history safety cap");
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( epoch_setconfig_rejects_duration_breaking_accrual_bound, sysio_emissions_tester ) try {
    // Mirror of the previous test from the other config boundary:
    // scale_annual_to_epoch is linear in epoch_duration_sec, so a duration raise
    // can invalidate the period-accrual bound setemitcfg validated at the old
-   // duration. A maximal cadence accepted at 60s epochs (ceiling ~2.08e12 *
-   // 65535 ~= 1.4e17) must block a raise to 30-day epochs (9.0e16 * 65535
-   // ~= 5.9e21, far past 2^62), while a modest raise to 600s epochs
-   // (2.08e13 * 65535 ~= 1.4e18) still fits.
+   // duration. With a high annual ceiling and maximum bounded cadence, 60s
+   // epochs fit, a raise to 30-day epochs must block, and 600s still fits.
+   constexpr int64_t high_annual_max = 6'000'000'000'000'000'000LL;
    BOOST_REQUIRE_EQUAL( success(),
-      setemitcfg_with_cadence( config::system_account_name, uint16_t(65535) ) );
+      setemitcfg(config::system_account_name, default_emit_cfg(uint16_t(10), high_annual_max)) );
 
    auto r = init_epoch_state(2'592'000);
    BOOST_REQUIRE( r != success() );
@@ -4711,6 +4805,69 @@ BOOST_FIXTURE_TEST_CASE( pay_cadence_2_pays_every_other_epoch, sysio_emissions_t
       BOOST_REQUIRE_EQUAL( state["pending_emission_amount"].as<int64_t>(), 0 );  // drained
       BOOST_REQUIRE_EQUAL( state["period_start_epoch"].as<uint32_t>(), 4u );  // next period anchor
    }
+} FC_LOG_AND_RETHROW()
+
+// WNS-13 / WIRE-343: advance() slides the schedule before it queues accrual,
+// so the position-based counter cannot identify the roster that accrued a past
+// epoch. A cadence-two period must split the batch pool between its two
+// historical rosters, and clearing that history must make the next period work
+// independently as well.
+BOOST_FIXTURE_TEST_CASE( pay_cadence_rotating_batch_rosters_receive_their_own_epochs,
+                         sysio_emissions_tester ) try {
+   const account_name BATCH_OP_A = "batchopa"_n;
+   const account_name BATCH_OP_B = "batchopb"_n;
+
+   create_t5_holding_accounts();
+   create_accounts({ BATCH_OP_A, BATCH_OP_B }, false, false, false, true);
+   BOOST_REQUIRE_EQUAL( success(),
+      register_operator(BATCH_OP_A, OperatorType::OPERATOR_TYPE_BATCH, /*is_bootstrapped*/true) );
+   BOOST_REQUIRE_EQUAL( success(),
+      register_operator(BATCH_OP_B, OperatorType::OPERATOR_TYPE_BATCH, /*is_bootstrapped*/true) );
+
+   // Two one-member groups rotate on every advance. The scheduler chooses the
+   // front group only after it has shifted the window, which is exactly the
+   // positional-identity loss this regression covers.
+   BOOST_REQUIRE_EQUAL( success(), init_epoch_state(60, /*operators_per_epoch*/1,
+                                                    /*batch_op_groups_count*/2) );
+   produce_blocks(1);
+   BOOST_REQUIRE_EQUAL( success(), push_epoch_action(EPOCH, "schbatchgps"_n, mvo()) );
+
+   BOOST_REQUIRE_EQUAL( success(),
+      setemitcfg_with_cadence(config::system_account_name, uint16_t(2)) );
+   const uint32_t start = head_secs() - ONE_EPOCH - 1;
+   BOOST_REQUIRE_EQUAL( success(), initt5(config::system_account_name, tpsec(start)) );
+
+   // Epoch 1 is the shortened genesis pay period. Claim it before comparing
+   // the two full cadence-two periods below.
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+   const int64_t a_before = get_wire_balance_paid(BATCH_OP_A).get_amount();
+   const int64_t b_before = get_wire_balance_paid(BATCH_OP_B).get_amount();
+
+   // Epochs 2 and 3 are the first full period; each roster is active once.
+   produce_blocks(130);
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() ); // epoch 2, non-pay
+   produce_blocks(130);
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() ); // epoch 3, pay
+   const int64_t a_first = get_wire_balance_paid(BATCH_OP_A).get_amount() - a_before;
+   const int64_t b_first = get_wire_balance_paid(BATCH_OP_B).get_amount() - b_before;
+   BOOST_REQUIRE_GT(a_first, 0);
+   BOOST_REQUIRE_GT(b_first, 0);
+   BOOST_REQUIRE_EQUAL(a_first, b_first);
+
+   // A second period proves payepoch cleared the consumed history. If rows
+   // from epochs 2-3 survived, the current period's history is malformed and
+   // the compatibility fallback would again pay only the boundary roster.
+   const int64_t a_after_first = get_wire_balance(BATCH_OP_A).get_amount();
+   const int64_t b_after_first = get_wire_balance(BATCH_OP_B).get_amount();
+   produce_blocks(130);
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() ); // epoch 4, non-pay
+   produce_blocks(130);
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() ); // epoch 5, pay
+   const int64_t a_second = get_wire_balance_paid(BATCH_OP_A).get_amount() - a_after_first;
+   const int64_t b_second = get_wire_balance_paid(BATCH_OP_B).get_amount() - b_after_first;
+   BOOST_REQUIRE_GT(a_second, 0);
+   BOOST_REQUIRE_GT(b_second, 0);
+   BOOST_REQUIRE_EQUAL(a_second, b_second);
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( pay_cadence_pending_accumulates_then_drains, sysio_emissions_tester ) try {

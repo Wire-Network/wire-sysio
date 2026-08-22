@@ -126,7 +126,7 @@ Everything `sysio.epoch::advance` inlines, directly:
 | `sysio.opreg` | `recorddel`, `termcheck`, `flushwtdw` |
 | `sysio.chalg` | `slashop` |
 | `sysio.msgch` | `queueout`, `buildenv` |
-| `sysio` | `accrueepoch`, `payepoch` |
+| `sysio` | `accrueepoch`, `rcrdbatch`, `payepoch` |
 
 Those callees inline further (`drainfwq` → `sysio.reserv::refundwire`,
 `termcheck` → the `sysio.opreg` remit path, `payepoch` → `sysio.token::transfer`),
@@ -136,6 +136,33 @@ abort surface.
 Independently of inlines, the emissions readiness gate in `sysio.epoch` **reads**
 `sysio.system`'s `emitcfg`, `t5state` and `payclaimtot`, and `sysio.token`'s
 `accounts`.
+
+### WIRE-343 pre-launch activation
+
+Activate WIRE-343 in one quiesced maintenance window, with no
+`sysio.epoch::advance` between contract deployments. This remains the normal
+pre-launch procedure because a complete immutable roster history is required
+to credit the batch-operator payout:
+
+1. Set `pay_cadence_epochs` to a value in `[1, 10]` before the window. New
+   writes are bounded to that range; an older stored value outside it is read
+   with an effective clamp until it is rewritten.
+2. Prefer a completed payment period and verify that `t5state` has
+   `pending_emission_amount == 0`, all `batch_group_epochs` counters are zero,
+   and `batchepochs` is empty.
+3. Quiesce epoch advancement and deploy the new `sysio.system` and
+   `sysio.epoch` contracts together before allowing the next `advance`.
+
+The deployed contracts also have a bounded recovery path for an accidental
+mixed or mid-period deployment. `rcrdbatch` prunes the exact oldest retained
+roster so a legacy overlong cadence cannot stall `advance`. If `payepoch` sees
+missing, stale, non-contiguous, or over-cap history, it retains that period's
+batch-emission and swap-fee slices in the treasury, clears the unusable history
+after the accrued period, and begins a clean history next period. Producer,
+capex, and governance processing still completes. This is a recovery path, not
+a replacement for the normal quiesced deployment. Do not downgrade while
+`batchepochs` is non-empty. T5 must also be initialized before its first
+successful epoch advance.
 
 ## The two rules for future changes
 
