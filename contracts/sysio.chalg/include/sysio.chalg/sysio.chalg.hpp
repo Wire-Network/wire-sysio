@@ -12,6 +12,12 @@
 
 namespace sysio {
 
+   namespace chalg_limits {
+      /// Minimum number of distinct envelope versions required to make a consensus split
+      /// adjudicable by the Tier-1 dispute vote.
+      inline constexpr uint32_t minimum_dispute_candidate_versions = 2;
+   } // namespace chalg_limits
+
    class [[sysio::contract("sysio.chalg")]] chalg : public contract {
    public:
       using contract::contract;
@@ -42,9 +48,11 @@ namespace sysio {
       //  OPP envelope dispute vote (Tier-1 node-owner resolution)
       // -----------------------------------------------------------------------
 
-      /// Open an OPP envelope dispute. Called inline by `sysio.msgch::evalcons` when the active
-      /// batch operators delivered 3+ distinct envelope versions for one (outpost, epoch) with no
-      /// majority. Records the candidate checksums, snapshots the Tier-1 electorate (the Tier-1
+      /// Open an OPP envelope dispute. Called inline by `sysio.msgch::evalcons` for a post-boundary
+      /// no-majority split with at least `chalg_limits::minimum_dispute_candidate_versions` distinct
+      /// versions. msgch owns the consensus boundary and strict-majority checks because it alone has
+      /// the live eligible group and delivery tally.
+      /// Records the candidate checksums, snapshots the Tier-1 electorate (the Tier-1
       /// rows of `sysio.roa::nodeowners` for the current network generation) together with its
       /// quorum, and pauses epoch advancement until a Tier-1 node-owner vote resolves the
       /// canonical envelope. Rejects opening when no Tier-1 node owner is registered: an
@@ -212,10 +220,10 @@ namespace sysio {
          SYSLIB_SERIALIZE(dispute_key, (id))
       };
 
-      /// OPP envelope dispute. Opened on a 3+-way no-majority split for one (outpost, epoch);
-      /// resolved by a Tier-1 node-owner vote on the canonical checksum. The row is retained after
-      /// resolution as the audit record (and as the guard that prevents re-opening the same
-      /// (outpost, epoch) dispute).
+      /// OPP envelope dispute. Opened for a post-boundary no-majority split with at least two
+      /// versions for one (outpost, epoch); resolved by a Tier-1 node-owner vote on the canonical
+      /// checksum. The row is retained after resolution as the audit record (and as the guard that
+      /// prevents re-opening the same (outpost, epoch) dispute).
       struct [[sysio::table("disputes")]] dispute_entry {
          uint64_t                       id;
          uint64_t                       chain_code;        ///< outpost slug_name value
