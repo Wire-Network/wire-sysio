@@ -484,7 +484,12 @@ $BUILD_DIR/programs/sys-util/sys-util snapshot info /tmp/snap_v1.bin
 
 ### When to Regenerate
 
-Regenerate all reference data whenever:
-- Any production contract is recompiled (changes action merkle roots)
+Regenerate only the reference data whose fixture can actually change:
+- The snapshot compatibility fixture deploys a contract whose WASM changed (currently
+  `sysio.bios`, `sysio.roa`, or `snapshot_test`)
 - Chain-level serialization changes (block format, snapshot format)
 - Genesis intrinsics change (different genesis state)
+
+Do not regenerate `unittests/snapshots/` merely because an unrelated production contract such as
+`sysio.system` is rebuilt: the compatibility fixture never deploys it, so replacing the historical
+snapshot would remove rather than add compatibility coverage.

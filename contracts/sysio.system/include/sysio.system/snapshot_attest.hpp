@@ -14,7 +14,7 @@ namespace sysiosystem {
 using sysio::checksum256;
 using sysio::name;
 
-// Max producer rank eligible to register as snapshot provider
+// Maximum registered snapshot providers and producer rank eligible to register one.
 static constexpr uint32_t max_snap_provider_rank = 30;
 
 // Error code for snapshot attestation disagreement (snapshot hash or block id differs from the
@@ -113,7 +113,10 @@ struct [[sysio::contract("sysio.system")]] snapshot_attest : public sysio::contr
 
    /**
     * Register a snapshot provider account delegated by a producer.
-    * The producer must be registered and have rank <= max_snap_provider_rank.
+    *
+    * The producer must be active and have rank <= max_snap_provider_rank. A retained provider
+    * mapping does not preserve eligibility: votes revalidate the producer's current active state
+    * and rank.
     */
    [[sysio::action]]
    void regsnapprov(name producer, name snap_account);
@@ -126,10 +129,14 @@ struct [[sysio::contract("sysio.system")]] snapshot_attest : public sysio::contr
    void delsnapprov(name account);
 
    /**
-    * Submit a snapshot hash vote. Votes aggregate per (block_num, block_id, snapshot_hash);
-    * when quorum is reached, creates an attested snap_record and purges older votes.
-    * Rejects with snap_hash_disagreement_error when an attested record already exists for the
-    * height and either the snapshot hash or the block id differs from it.
+    * Submit a snapshot hash vote from a currently active, rank-eligible provider.
+    *
+    * Votes aggregate per (block_num, block_id, snapshot_hash). The quorum denominator is the
+    * stable registered-provider membership, while the numerator includes only currently eligible
+    * voters. Retrying the same tuple is idempotent and re-evaluates pending voter eligibility. When
+    * quorum is reached, creates an attested snap_record and purges older votes. Rejects with
+    * snap_hash_disagreement_error when an attested record already exists for the height and either
+    * the snapshot hash or the block id differs from it.
     */
    [[sysio::action]]
    void votesnaphash(name snap_account, checksum256 block_id, checksum256 snapshot_hash);
