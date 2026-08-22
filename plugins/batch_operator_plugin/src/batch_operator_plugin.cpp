@@ -105,6 +105,18 @@ namespace {
       }
    }
 
+   namespace chalg {
+      constexpr auto account           = "sysio.chalg";
+      constexpr auto table_disputes    = "disputes";
+      constexpr auto action_chkdispute = "chkdispute";
+      /// Field names on `dispute_entry` rows, plus the `chkdispute` action arg.
+      namespace field {
+         constexpr auto id         = "id";
+         constexpr auto status     = "status";
+         constexpr auto dispute_id = "dispute_id";
+      }
+   }
+
    /// v6: chain registry was split out of `sysio.epoch` onto its own
    /// `sysio.chains` contract. The `outposts` table was replaced by the
    /// `chains` KV table, keyed by slug_name (uint64 packed).
@@ -352,6 +364,70 @@ struct batch_operator_plugin::impl {
                         fc::mutable_variant_object());
          } catch (const fc::exception& e) {
             dlog("batch_operator: chkcons: {}", e.to_string());
+         }
+      }
+
+      // Tally any OPEN envelope dispute. Deliberately NOT gated on `is_elected`
+      // — see crank_open_disputes.
+      try {
+         crank_open_disputes();
+      } FC_LOG_AND_DROP();
+   }
+
+   /**
+    * Crank `sysio.chalg::chkdispute` for every OPEN envelope dispute.
+    *
+    * `sysio.chalg::opendispute` sends `sysio.epoch::pause`, and `chkdispute` is
+    * the ONLY action that tallies the Tier-1 votes, dispatches the winning
+    * envelope and lifts that pause. Nothing on chain drives it: its sibling
+    * `chkuwchal` needs no cadence because `sysio.uwrit::chklocks` pokes it from
+    * every `sysio.epoch::advance` — which works precisely because an
+    * underwriter challenge does NOT pause the chain. An envelope dispute halts
+    * `advance` itself, so no inline poke can reach it. Without this crank a
+    * dispute stays OPEN after Tier-1 has already reached quorum, and epoch
+    * advancement is paused indefinitely.
+    *
+    * Not gated on `is_elected` (unlike the `chkcons` push above): the elected
+    * operator may be the very one that is offline or delivered the
+    * non-canonical envelope — often the reason the dispute exists. Disputes are
+    * rare, so pushing from every ACTIVE operator costs effectively nothing, and
+    * `chkdispute` asserts the dispute is still OPEN, which makes a redundant
+    * push a cheap no-op.
+    *
+    * The scan is a full-table filter rather than a `byepoch` index lookup: the
+    * table retains RESOLVED rows as the audit trail, but disputes are rare and
+    * `poll_own_status` already scans a comparably-sized table each tick. If
+    * disputes ever become frequent, bound this by `current_epoch` via the
+    * `byepoch` secondary index.
+    */
+   void crank_open_disputes() {
+      sysio::chain_apis::read_only::get_table_rows_params p;
+      p.code        = chain::name(chalg::account);
+      p.scope       = chalg::account;
+      p.table       = chalg::table_disputes;
+      p.all_rows    = true;
+      p.values_only = true;
+      p.filter      = [](const fc::variant& row) {
+         const auto& obj = row.get_object();
+         auto status_it  = obj.find(chalg::field::status);
+         return status_it != obj.end() &&
+                status_it->value().as<DisputeStatus>() == DISPUTE_STATUS_OPEN;
+      };
+      auto rows = read_table(std::move(p));
+
+      for (const auto& r : rows.rows) {
+         const auto& obj = r.get_object();
+         auto id_it      = obj.find(chalg::field::id);
+         if (id_it == obj.end()) continue;
+         const uint64_t dispute_id = id_it->value().as_uint64();
+
+         try {
+            push_action(chalg::account, chalg::action_chkdispute, operator_account,
+                        fc::mutable_variant_object()(chalg::field::dispute_id, dispute_id));
+         } catch (const fc::exception& e) {
+            // Expected-transient: the dispute resolved between the scan and the push, or
+            // another operator's crank won the race.
+            dlog("batch_operator: chkdispute({}): {}", dispute_id, e.to_string());
          }
       }
    }

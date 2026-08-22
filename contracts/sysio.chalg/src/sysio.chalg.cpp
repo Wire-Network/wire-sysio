@@ -347,7 +347,11 @@ void chalg::votedispute(name owner, uint64_t dispute_id, checksum256 chosen_chec
 //  chkdispute — tally votes; on resolution dispatch the winner and unpause
 // ---------------------------------------------------------------------------
 void chalg::chkdispute(uint64_t dispute_id) {
-   // Permissionless crank — batch operators call this on their ~15s cadence.
+   // Permissionless crank, driven by `batch_operator_plugin`'s epoch tick
+   // (`--batch-epoch-poll-ms`, 15s default) from every ACTIVE batch operator.
+   // That cadence is this action's ONLY driver: unlike `chkuwchal`, which
+   // `sysio.uwrit::chklocks` pokes from every `sysio.epoch::advance`, a dispute
+   // pauses `advance` itself, so no inline poke can reach here.
    disputes_t disputes(get_self());
    auto d_pk = dispute_key{dispute_id};
    auto d = disputes.get(d_pk, "dispute not found");
