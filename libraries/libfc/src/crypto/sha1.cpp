@@ -6,12 +6,13 @@
 #include <fc/variant.hpp>
 #include <vector>
 #include "_digest_common.hpp"
+#include <fc/exception/exception.hpp>
 
 namespace fc
 {
 
 sha1::sha1() { memset( _hash, 0, sizeof(_hash) ); }
-sha1::sha1( const std::string& hex_str ) {
+sha1::sha1( std::string_view hex_str ) {
    auto bytes_written = fc::from_hex( hex_str, (char*)_hash, sizeof(_hash) );
    if( bytes_written < sizeof(_hash) )
       memset( (char*)_hash + bytes_written, 0, (sizeof(_hash) - bytes_written) ); 
@@ -86,19 +87,12 @@ bool operator == ( const sha1& h1, const sha1& h2 ) {
   return memcmp( h1._hash, h2._hash, sizeof(h1._hash) ) == 0;
 }
 
-  void to_variant( const sha1& bi, variant& v )
-  {
-     v = std::vector<char>( (const char*)&bi, ((const char*)&bi) + sizeof(bi) );
-  }
-  void from_variant( const variant& v, sha1& bi )
-  {
-    std::vector<char> ve = v.as< std::vector<char> >();
-    if( ve.size() )
-    {
-        memcpy(bi.data(), ve.data(), fc::min<size_t>(ve.size(),sizeof(bi)) );
-    }
-    else
-        memset( bi.data(), char(0), sizeof(bi) );
+  sha1 sha1::from_string(std::string_view s) {
+    // The pre-trait from_variant path (vector<char>) rejected odd-length hex;
+    // keep that strictness so a trailing lone nibble is malformed input, not
+    // silently zero-extended.
+    FC_ASSERT(s.size() % 2 == 0, "sha1 hex string length must be even, got {}", s.size());
+    return sha1(s);
   }
 
 } // fc

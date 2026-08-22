@@ -105,6 +105,7 @@ class beast_http_session : public detail::abstract_conn,
             break;
 
          case http_content_type::json:
+         case http_content_type::json_raw:
          default:
             res_->set(http::field::content_type, "application/json");
       }
@@ -164,9 +165,26 @@ class beast_http_session : public detail::abstract_conn,
                   remote_endpoint_, to_log_string(req) );
 
          std::string resource = std::string(req.target());
-         // look for the URL handler to handle this resource
+         // look for the URL handler to handle this resource - check the streaming map
+         // first since it's the smaller of the two during migration; both maps share
+         // the URL keyspace and registration asserts disjointness.
+         auto stream_itr = plugin_state_->url_handlers_stream.find(resource);
          auto handler_itr = plugin_state_->url_handlers.find(resource);
-         if(handler_itr != plugin_state_->url_handlers.end() && categories_.contains(handler_itr->second.category)) {
+         if(stream_itr != plugin_state_->url_handlers_stream.end() && categories_.contains(stream_itr->second.category)) {
+            fc_tlog(plugin_state_->get_logger(), "resource (stream): {}", resource);
+            std::string body = req.body();
+            // Streaming responses are always application/json - the json_writer output
+            // is the response body verbatim, no plaintext / json_raw distinction.
+            set_content_type_header(http_content_type::json);
+
+            if (plugin_state_->update_metrics)
+               plugin_state_->update_metrics({resource});
+
+            stream_itr->second.fn(this->shared_from_this(),
+                                  std::move(resource),
+                                  std::move(body),
+                                  make_http_stream_response_handler(*plugin_state_, this->shared_from_this()));
+         } else if(handler_itr != plugin_state_->url_handlers.end() && categories_.contains(handler_itr->second.category)) {
             fc_tlog(plugin_state_->get_logger(), "resource: {}", resource);
             std::string body = req.body();
             auto content_type = handler_itr->second.content_type;
@@ -182,6 +200,10 @@ class beast_http_session : public detail::abstract_conn,
          } else if (resource == "/v1/node/get_supported_apis") {
             http_plugin::get_supported_apis_result result;
             for (const auto& handler : plugin_state_->url_handlers) {
+               if (categories_.contains(handler.second.category))
+                  result.apis.push_back(handler.first);
+            }
+            for (const auto& handler : plugin_state_->url_handlers_stream) {
                if (categories_.contains(handler.second.category))
                   result.apis.push_back(handler.first);
             }

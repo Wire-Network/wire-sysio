@@ -177,6 +177,11 @@ datastream<ST>& operator >> (datastream<ST>& s, sysio::chain::may_not_exist<T>& 
 }
 
 template<typename T>
+void to_json_stream(const sysio::chain::may_not_exist<T>& e, fc::json_writer& w) {
+   to_json_stream( e.value, w );
+}
+
+template<typename T>
 void to_variant(const sysio::chain::may_not_exist<T>& e, fc::variant& v) {
    to_variant( e.value, v);
 }

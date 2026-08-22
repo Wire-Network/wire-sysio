@@ -1,20 +1,12 @@
 #pragma once
 #include <fc/basic_name.hpp>
+#include <fc/serialize_as_string.hpp>
 #include <fc/reflect/reflect.hpp>
 
 #include <cstdint>
 #include <string>
 #include <string_view>
 #include <type_traits>
-
-namespace sysio::chain {
-  struct name;
-}
-namespace fc {
-  class variant;
-  void to_variant(const sysio::chain::name& c, fc::variant& v);
-  void from_variant(const fc::variant& v, sysio::chain::name& check);
-} // fc
 
 namespace sysio::chain {
 
@@ -46,6 +38,10 @@ namespace sysio::chain {
       using base = fc::basic_name<sysio_name_traits>;
       using base::base;                  // inherits name(uint64_t), name(std::string_view)
       constexpr name() = default;
+
+      /// Factory used by the FC_SERIALIZE_AS_STRING trait: parses through the
+      /// validating string_view constructor inherited from fc::basic_name.
+      static name from_string( std::string_view str ) { return name(str); }
 
       /**
        *  Returns the prefix.
@@ -164,3 +160,4 @@ namespace std {
 };
 
 FC_REFLECT_DERIVED_EMPTY( sysio::chain::name, (fc::basic_name<sysio::chain::sysio_name_traits>) )
+FC_SERIALIZE_AS_STRING(sysio::chain::name)

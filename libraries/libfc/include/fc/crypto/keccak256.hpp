@@ -6,6 +6,7 @@
 #include <string>
 #include <span>
 #include <vector>
+#include <fc/serialize_as_string.hpp>
 
 namespace fc { namespace crypto {
 
@@ -19,10 +20,14 @@ public:
    static constexpr size_t byte_size = 256 / (8 * sizeof(uint8_t));
 
    keccak256();
-   explicit keccak256(const std::string& hex_str);
+   explicit keccak256(std::string_view hex_str);
 
    // in hex
    std::string str() const;
+   std::string to_string() const { return str(); }
+   /// Validating parse used by the FC_SERIALIZE_AS_STRING trait: rejects odd-length
+   /// hex (the strictness the pre-trait from_variant vector<char> path enforced).
+   static keccak256 from_string(std::string_view s);
 
    const uint8_t* data() const { return _hash; }
    constexpr size_t data_size() const { return byte_size; }
@@ -71,11 +76,8 @@ private:
 };
 } // namespace crypto
 
-class variant;
-void to_variant(const crypto::keccak256& bi, variant& v);
-void from_variant(const variant& v, crypto::keccak256& bi);
-
 } // namespace fc
 
 #include <fc/reflect/reflect.hpp>
 FC_REFLECT_TYPENAME(fc::crypto::keccak256)
+FC_SERIALIZE_AS_STRING(fc::crypto::keccak256)

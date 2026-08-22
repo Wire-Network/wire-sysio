@@ -4,6 +4,7 @@
 #include <fc/crypto/packhash.hpp>
 #include <fc/io/raw_fwd.hpp>
 #include <fc/string.hpp>
+#include <fc/serialize_as_string.hpp>
 
 namespace fc
 {
@@ -12,9 +13,13 @@ class sha224 : public add_packhash_to_hash<sha224>
 {
   public:
     sha224();
-    explicit sha224( const std::string& hex_str );
+    explicit sha224( std::string_view hex_str );
 
     std::string str()const;
+    std::string to_string() const { return str(); }
+    /// Validating parse used by the FC_SERIALIZE_AS_STRING trait: rejects odd-length
+    /// hex (the strictness the pre-trait from_variant vector<char> path enforced).
+    static sha224 from_string(std::string_view s);
     operator std::string()const;
 
     char*       data();
@@ -70,10 +75,6 @@ class sha224 : public add_packhash_to_hash<sha224>
     uint32_t _hash[7]; 
 };
 
-  class variant;
-  void to_variant( const sha224& bi, variant& v );
-  void from_variant( const variant& v, sha224& bi );
-
 } // fc
 namespace std
 {
@@ -88,3 +89,4 @@ namespace std
 }
 #include <fc/reflect/reflect.hpp>
 FC_REFLECT_TYPENAME( fc::sha224 )
+FC_SERIALIZE_AS_STRING(fc::sha224)

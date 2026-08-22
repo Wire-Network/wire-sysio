@@ -1,12 +1,16 @@
 #include <algorithm>
+#include <bit>
+#include <cmath>
 #include <vector>
 #include <iterator>
 #include <cstdlib>
+#include <limits>
 
 #include <boost/test/unit_test.hpp>
 
 #include <fc/variant.hpp>
 #include <fc/io/json.hpp>
+#include <fc/io/json_stream.hpp>
 #include <fc/exception/exception.hpp>
 #include <fc/log/logger.hpp>
 #include <fc/time.hpp>
@@ -52,6 +56,21 @@ static fc::time_point get_deadline() {
 
 static auto yield_fn() { return abi_serializer::create_yield_function( max_serialization_time ); }
 
+// Verify the streaming `binary_to_json_stream` path emits byte-identical JSON to
+// `to_string(binary_to_variant(...))` for the same packed bytes.  Called from the
+// round-trip helpers below so every type already exercised by abi_tests gets a
+// parity check on the streaming path for free.
+void verify_stream_matches_variant( const abi_serializer& abis, const type_name& type, const bytes& packed, const std::string& variant_json )
+{
+   std::string stream_json;
+   {
+      fc::json_writer w(stream_json);
+      abis.binary_to_json_stream(type, packed, w, yield_fn());
+      BOOST_REQUIRE( w.balanced() );
+   }
+   BOOST_TEST( stream_json == variant_json );
+}
+
 // verify that round trip conversion, via bytes, reproduces the exact same data
 fc::variant verify_byte_round_trip_conversion( const abi_serializer& abis, const type_name& type, const fc::variant& var )
 {
@@ -65,6 +84,8 @@ fc::variant verify_byte_round_trip_conversion( const abi_serializer& abis, const
    std::string r2 = fc::json::to_string(var2, get_deadline());
    std::string r3 = fc::json::to_string(var3, get_deadline());
    BOOST_TEST( r2 == r3 );
+
+   verify_stream_matches_variant( abis, type, bytes, r2 );
 
    auto bytes2 = abis.variant_to_binary(type, var2, yield_fn());
    auto bytes3 = abis.variant_to_binary(type, var3, max_serialization_time);
@@ -86,6 +107,7 @@ void verify_round_trip_conversion( const abi_serializer& abis, const type_name& 
    BOOST_REQUIRE_EQUAL(fc::json::to_string(var2, get_deadline()), expected_json);
    auto var3 = abis.binary_to_variant(type, b, max_serialization_time );
    BOOST_REQUIRE_EQUAL(fc::json::to_string(var3, get_deadline()), expected_json);
+   verify_stream_matches_variant(abis, type, bytes, expected_json);
    auto bytes2 = abis.variant_to_binary(type, var2, yield_fn());
    BOOST_REQUIRE_EQUAL(fc::to_hex(bytes2), hex);
    auto b2 = abis.variant_to_binary(type, var3, max_serialization_time);
@@ -127,6 +149,8 @@ fc::variant verify_type_round_trip_conversion( const abi_serializer& abis, const
    std::string r2 = fc::json::to_string(var2, get_deadline());
    std::string r3 = fc::json::to_string(var3, get_deadline());
    BOOST_TEST( r2 == r3 );
+
+   verify_stream_matches_variant( abis, type, bytes, r2 );
 
    auto bytes2 = abis.variant_to_binary(type, var2, yield_fn());
    auto b3 = abis.variant_to_binary(type, var3, max_serialization_time);
@@ -731,15 +755,142 @@ BOOST_AUTO_TEST_CASE(uint_types)
 
 } FC_LOG_AND_RETHROW() }
 
-
-BOOST_AUTO_TEST_CASE(general)
+// int64/uint64 quoting boundaries through the ABI paths: values with magnitude past
+// fc::json_integer_quote_magnitude (0xffffffff) emit as quoted JSON strings, values at the
+// boundary stay bare -- and binary_to_json_stream must agree byte-for-byte with
+// binary_to_variant + json::to_string (verify_byte_round_trip_conversion runs
+// verify_stream_matches_variant on every case).
+BOOST_AUTO_TEST_CASE(large_int_quoting_boundaries)
 { try {
 
-   auto abi = sysio_contract_abi(fc::json::from_string(my_abi).as<abi_def>());
+   const char* test_abi = R"=====(
+   {
+       "version": "sysio::abi/1.0",
+       "types": [],
+       "structs": [{
+           "name": "int_boundaries",
+           "base": "",
+           "fields": [{
+               "name": "i64_bare_max",
+               "type": "int64"
+           },{
+               "name": "i64_quoted",
+               "type": "int64"
+           },{
+               "name": "i64_neg_bare",
+               "type": "int64"
+           },{
+               "name": "i64_neg_quoted",
+               "type": "int64"
+           },{
+               "name": "u64_bare",
+               "type": "uint64"
+           },{
+               "name": "u64_quoted",
+               "type": "uint64"
+           }]
+       }],
+       "actions": [],
+       "tables": [],
+       "ricardian_clauses": []
+   }
+   )=====";
 
-   abi_serializer abis(abi_def(abi), yield_fn());
+   abi_serializer abis(fc::json::from_string(test_abi).as<abi_def>(), yield_fn());
 
-   const char *my_other = R"=====(
+   const char* test_data = R"=====(
+   {
+     "i64_bare_max"   : 4294967295,
+     "i64_quoted"     : "4294967296",
+     "i64_neg_bare"   : -4294967295,
+     "i64_neg_quoted" : "-4294967296",
+     "u64_bare"       : 4294967295,
+     "u64_quoted"     : "18446744073709551615"
+   }
+   )=====";
+
+   auto var2 = verify_byte_round_trip_conversion(abis, "int_boundaries", fc::json::from_string(test_data));
+
+   // Pin the emitted shapes: at the quote magnitude stays bare, one past it emits quoted.
+   const std::string json = fc::json::to_string(var2, get_deadline());
+   BOOST_CHECK(json.find("\"i64_bare_max\":4294967295") != std::string::npos);
+   BOOST_CHECK(json.find("\"i64_quoted\":\"4294967296\"") != std::string::npos);
+   BOOST_CHECK(json.find("\"i64_neg_bare\":-4294967295") != std::string::npos);
+   BOOST_CHECK(json.find("\"i64_neg_quoted\":\"-4294967296\"") != std::string::npos);
+   BOOST_CHECK(json.find("\"u64_bare\":4294967295") != std::string::npos);
+   BOOST_CHECK(json.find("\"u64_quoted\":\"18446744073709551615\"") != std::string::npos);
+
+} FC_LOG_AND_RETHROW() }
+
+// Non-finite float32/float64 bit patterns through the ABI paths: the variant path
+// (s_fc_to_string) formats non-finite doubles explicitly as "nan" / "-nan" / "inf" /
+// "-inf" -- platform-independent, unlike the C library formatting it bypasses (glibc
+// prints "-nan" where Apple prints "nan") -- and binary_to_json_stream must agree
+// byte-for-byte.  NaN never compares, so its sign only survives via signbit -- and
+// since no JSON input can produce a NaN, the packed bytes are built directly from raw
+// bit patterns, exactly as an arbitrary on-chain payload could.
+BOOST_AUTO_TEST_CASE(non_finite_float_sign_parity)
+{ try {
+
+   const char* test_abi = R"=====(
+   {
+       "version": "sysio::abi/1.0",
+       "types": [],
+       "structs": [{
+           "name": "floats",
+           "base": "",
+           "fields": [{
+               "name": "f64_pos_nan",
+               "type": "float64"
+           },{
+               "name": "f64_neg_nan",
+               "type": "float64"
+           },{
+               "name": "f64_neg_inf",
+               "type": "float64"
+           },{
+               "name": "f32_neg_nan",
+               "type": "float32"
+           }]
+       }],
+       "actions": [],
+       "tables": [],
+       "ricardian_clauses": []
+   }
+   )=====";
+
+   abi_serializer abis(fc::json::from_string(test_abi).as<abi_def>(), yield_fn());
+
+   const double f64_pos_nan = std::bit_cast<double>(uint64_t{0x7FF8000000000000ULL});
+   const double f64_neg_nan = std::bit_cast<double>(uint64_t{0xFFF8000000000000ULL});
+   const double f64_neg_inf = -std::numeric_limits<double>::infinity();
+   const float  f32_neg_nan = std::bit_cast<float>(uint32_t{0xFFC00000u});
+
+   bytes packed(3 * sizeof(double) + sizeof(float));
+   fc::datastream<char*> ds(packed.data(), packed.size());
+   fc::raw::pack(ds, f64_pos_nan);
+   fc::raw::pack(ds, f64_neg_nan);
+   fc::raw::pack(ds, f64_neg_inf);
+   fc::raw::pack(ds, f32_neg_nan);
+
+   const std::string variant_json =
+      fc::json::to_string(abis.binary_to_variant("floats", packed, yield_fn()), get_deadline());
+
+   // Pin the legacy shapes, sign included.
+   BOOST_CHECK(variant_json.find("\"f64_pos_nan\":\"nan\"") != std::string::npos);
+   BOOST_CHECK(variant_json.find("\"f64_neg_nan\":\"-nan\"") != std::string::npos);
+   BOOST_CHECK(variant_json.find("\"f64_neg_inf\":\"-inf\"") != std::string::npos);
+   BOOST_CHECK(variant_json.find("\"f32_neg_nan\":\"-nan\"") != std::string::npos);
+
+   verify_stream_matches_variant(abis, "floats", packed, variant_json);
+
+} FC_LOG_AND_RETHROW() }
+
+
+// Shared fixture for `general` and the streaming-parity test.  Top-level fields
+// cover every built-in plus inherited base structs, large-int quoting boundaries,
+// optional/array containers, and the ABI-described meta-types.
+static const char* my_other_json = R"=====(
     {
       "publickey"     :  "SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV",
       "publickey_arr" :  ["SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV","SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV","SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV"],
@@ -932,7 +1083,14 @@ BOOST_AUTO_TEST_CASE(general)
     }
    )=====";
 
-   auto var = fc::json::from_string(my_other);
+BOOST_AUTO_TEST_CASE(general)
+{ try {
+
+   auto abi = sysio_contract_abi(fc::json::from_string(my_abi).as<abi_def>());
+
+   abi_serializer abis(abi_def(abi), yield_fn());
+
+   auto var = fc::json::from_string(my_other_json);
    verify_byte_round_trip_conversion(abi_serializer{std::move(abi), yield_fn()}, "A", var);
 
 } FC_LOG_AND_RETHROW() }
@@ -3393,17 +3551,19 @@ BOOST_AUTO_TEST_CASE(abi_to_variant__add_action__good_return_value)
    abi_serializer abis(abi_def(abidef), yield_fn());
 
    {
+      fc::variant trace_var;
+      abi_serializer::to_variant(at, trace_var, get_resolver(abidef), yield_fn());
       mutable_variant_object mvo;
-      sysio::chain::impl::abi_traverse_context ctx(yield_fn(), fc::microseconds{});
-      sysio::chain::impl::abi_to_variant::add(mvo, "action_traces", at, get_resolver(abidef), ctx);
+      mvo("action_traces", std::move(trace_var));
       std::string res = fc::json::to_string(mvo, get_deadline());
 
       BOOST_CHECK_EQUAL(res, expected_json);
    }
    {
+      fc::variant trace_var;
+      abi_serializer::to_variant(at, trace_var, get_resolver(abidef), max_serialization_time);
       mutable_variant_object mvo;
-      sysio::chain::impl::abi_traverse_context ctx(abi_serializer::create_depth_yield_function(), max_serialization_time);
-      sysio::chain::impl::abi_to_variant::add(mvo, "action_traces", at, get_resolver(abidef), ctx);
+      mvo("action_traces", std::move(trace_var));
       std::string res = fc::json::to_string(mvo, get_deadline());
 
       BOOST_CHECK_EQUAL(res, expected_json);
@@ -3428,17 +3588,19 @@ BOOST_AUTO_TEST_CASE(abi_to_variant__add_action__bad_return_value)
    abi_serializer abis(abi_def(abidef), yield_fn());
 
    {
+      fc::variant trace_var;
+      abi_serializer::to_variant(at, trace_var, get_resolver(abidef), yield_fn());
       mutable_variant_object mvo;
-      sysio::chain::impl::abi_traverse_context ctx(yield_fn(), fc::microseconds{});
-      sysio::chain::impl::abi_to_variant::add(mvo, "action_traces", at, get_resolver(abidef), ctx);
+      mvo("action_traces", std::move(trace_var));
       std::string res = fc::json::to_string(mvo, get_deadline());
 
       BOOST_CHECK_EQUAL(res, expected_json);
    }
    {
+      fc::variant trace_var;
+      abi_serializer::to_variant(at, trace_var, get_resolver(abidef), max_serialization_time);
       mutable_variant_object mvo;
-      sysio::chain::impl::abi_traverse_context ctx(abi_serializer::create_depth_yield_function(), max_serialization_time);
-      sysio::chain::impl::abi_to_variant::add(mvo, "action_traces", at, get_resolver(abidef), ctx);
+      mvo("action_traces", std::move(trace_var));
       std::string res = fc::json::to_string(mvo, get_deadline());
 
       BOOST_CHECK_EQUAL(res, expected_json);
@@ -3473,20 +3635,124 @@ BOOST_AUTO_TEST_CASE(abi_to_variant__add_action__no_return_value)
    abi_serializer abis(abi_def(abidef), yield_fn());
 
    {
+      fc::variant trace_var;
+      abi_serializer::to_variant(at, trace_var, get_resolver(abidef), yield_fn());
       mutable_variant_object mvo;
-      sysio::chain::impl::abi_traverse_context ctx(yield_fn(), fc::microseconds{});
-      sysio::chain::impl::abi_to_variant::add(mvo, "action_traces", at, get_resolver(abidef), ctx);
+      mvo("action_traces", std::move(trace_var));
       std::string res = fc::json::to_string(mvo, get_deadline());
 
       BOOST_CHECK_EQUAL(res, expected_json);
    }
    {
+      fc::variant trace_var;
+      abi_serializer::to_variant(at, trace_var, get_resolver(abidef), max_serialization_time);
       mutable_variant_object mvo;
-      sysio::chain::impl::abi_traverse_context ctx(abi_serializer::create_depth_yield_function(), max_serialization_time);
-      sysio::chain::impl::abi_to_variant::add(mvo, "action_traces", at, get_resolver(abidef), ctx);
+      mvo("action_traces", std::move(trace_var));
       std::string res = fc::json::to_string(mvo, get_deadline());
 
       BOOST_CHECK_EQUAL(res, expected_json);
+   }
+}
+
+// When the action_result decode fails partway, the field is silently omitted
+// from the JSON (existing variant-path behavior).  The streaming sink had a
+// bug where sink.key("return_value_data") was emitted BEFORE the inner unpack,
+// so a mid-stream throw left a dangling key + orphan frame and end_object()
+// closed the wrong scope.  Stream + variant must produce identical JSON.
+BOOST_AUTO_TEST_CASE(abi_to_variant__add_action_trace__return_value_unpack_throws_silently_omitted)
+{
+   action_trace at;
+   std::string expected_json;
+   // Set up a return_value whose declared type is "string" (length-prefix + body)
+   // but the bytes are a single 0x09 length-prefix with no body -> unpack throws
+   // partway.  generate_action_trace's parsable=false branch suppresses the
+   // return_value_data field in expected_json, which is what we want.
+   std::tie(at, expected_json) = generate_action_trace(std::optional<char>{0x09}, "09", false);
+
+   auto abi = R"({
+      "version": "sysio::abi/1.0",
+      "structs": [
+         {"name": "acttest", "base": "", "fields": [
+            {"name": "str", "type": "string"}
+         ]}
+      ],
+      "action_results": [
+         {"name": "acttest", "result_type": "string"}
+      ]
+   })";
+   auto abidef = fc::json::from_string(abi).as<abi_def>();
+
+   // Variant path: known good, builds expected_json (return_value_data omitted).
+   fc::variant variant_v;
+   abi_serializer::to_variant(at, variant_v, get_resolver(abidef), yield_fn());
+   mutable_variant_object variant_mvo;
+   variant_mvo("action_traces", std::move(variant_v));
+   const std::string variant_json = fc::json::to_string(variant_mvo, get_deadline());
+   BOOST_CHECK_EQUAL(variant_json, expected_json);
+
+   // Streaming path: must emit byte-identical JSON, with no orphan frame.
+   std::string stream_json;
+   {
+      fc::json_writer w(stream_json);
+      w.begin_object();
+      w.key("action_traces");
+      abi_serializer::to_json_stream(at, w, get_resolver(abidef), yield_fn());
+      w.end_object();
+      BOOST_REQUIRE(w.balanced());
+   }
+   BOOST_CHECK_EQUAL(stream_json, expected_json);
+   BOOST_CHECK_NO_THROW(fc::json::from_string(stream_json));
+}
+
+// When action data fails ABI decode partway through (truncated bytes, missing
+// fields, etc.), both the variant path and the streaming path must fall back
+// to the hex-only form.  The streaming sink had a bug where sink.key("data")
+// was emitted BEFORE the inner unpack, so a mid-stream throw left the writer
+// in a half-written state and the catch-side hex fallback emitted a duplicate
+// "data" key plus an orphan inner object frame, producing invalid JSON.
+BOOST_AUTO_TEST_CASE(abi_to_variant__add_action__data_unpack_throws_falls_back_to_hex)
+{
+   auto abi = R"({
+      "version": "sysio::abi/1.0",
+      "structs": [
+         {"name": "acttest", "base": "", "fields": [
+            {"name": "str", "type": "string"}
+         ]}
+      ],
+      "actions": [
+         {"name": "acttest", "type": "acttest", "ricardian_contract": ""}
+      ]
+   })";
+   auto abidef = fc::json::from_string(abi).as<abi_def>();
+
+   // String length prefix says 9 bytes but no body follows -> unpack throws partway.
+   action act(
+      std::vector<sysio::chain::permission_level>{ {account_name{"acctest"}, permission_name{"active"}} },
+      account_name{"acctest"},
+      action_name{"acttest"},
+      bytes{0x09});
+
+   const std::string expected_hex = "09";
+   const std::string expected_json =
+      "{\"account\":\"acctest\",\"name\":\"acttest\","
+      "\"authorization\":[{\"actor\":\"acctest\",\"permission\":\"active\"}],"
+      "\"data\":\"" + expected_hex + "\","
+      "\"hex_data\":\"" + expected_hex + "\"}";
+
+   {
+      fc::variant v;
+      abi_serializer::to_variant(act, v, get_resolver(abidef), yield_fn());
+      const std::string s = fc::json::to_string(v, get_deadline());
+      BOOST_CHECK_EQUAL(s, expected_json);
+   }
+   {
+      std::string s;
+      fc::json_writer w(s);
+      abi_serializer::to_json_stream(act, w, get_resolver(abidef), yield_fn());
+      BOOST_REQUIRE(w.balanced());
+      BOOST_CHECK_EQUAL(s, expected_json);
+      // Round-trip parses cleanly (catches duplicate-key / orphan-frame regressions).
+      BOOST_CHECK_NO_THROW(fc::json::from_string(s));
    }
 }
 

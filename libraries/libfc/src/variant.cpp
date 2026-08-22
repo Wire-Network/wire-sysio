@@ -8,9 +8,11 @@
 #include <boost/scoped_array.hpp>
 #include <fc/reflect/variant.hpp>
 #include <fc/io/json.hpp>
+#include <fc/io/json_stream.hpp>
 #include <fc/utf8.hpp>
 #include <algorithm>
 #include <cassert>
+#include <cmath>
 #include <functional>
 #include <fc/int256.hpp>
 
@@ -785,6 +787,15 @@ bool  variant::as_bool()const
 
 static std::string s_fc_to_string(double d)
 {
+   // Non-finite spellings are formatted explicitly rather than left to the C library the
+   // stringstream delegates to: glibc prints "-nan" for a negative NaN while Apple's libc
+   // drops the sign and prints "nan", so platform formatting would make the emitted bytes
+   // differ across platforms and diverge from the streaming path (fc/reflect/json_stream.hpp),
+   // which pins these exact shapes.  NaN never compares, so its sign must come from signbit.
+   if( std::isnan( d ) )
+      return std::signbit( d ) ? "-nan" : "nan";
+   if( std::isinf( d ) )
+      return std::signbit( d ) ? "-inf" : "inf";
    // +2 is required to ensure that the double is rounded correctly when read back in.  http://docs.oracle.com/cd/E19957-01/806-3568/ncg_goldberg.html
    std::stringstream ss;
    ss << std::setprecision(std::numeric_limits<double>::digits10 + 2) << std::fixed << d;
@@ -1069,6 +1080,12 @@ void to_variant( const std::vector<char>& var,  variant& vo )
       vo = variant(to_hex(var.data(),var.size()));
    else vo = "";
 }
+void to_json_stream( const std::vector<char>& var,  json_writer& w )
+{
+   FC_ASSERT( var.size() <= MAX_SIZE_OF_BYTE_ARRAYS );
+   // value_hex with size 0 emits `""` already; no separate empty branch needed.
+   w.value_hex(var.data(), var.size());
+}
 void from_variant( const variant& var,  std::vector<char>& vo )
 {
    std::string_view str = var.get_string();
@@ -1083,6 +1100,10 @@ void from_variant( const variant& var,  std::vector<char>& vo )
 
 void to_variant( const blob& b, variant& v ) {
    v = variant(base64_encode(b.data.data(), b.data.size()));
+}
+
+void to_json_stream( const blob& b, json_writer& w ) {
+   w.value_string(base64_encode(b.data.data(), b.data.size()));
 }
 
 void from_variant( const variant& v, blob& b ) {
@@ -1263,4 +1284,69 @@ std::string format_string( const std::string& frmt, const variant_object& args, 
    }
 
 
+   void to_json_stream( const variant& v, json_writer& w, uint32_t max_depth ) {
+      // Walk the variant tree token-by-token directly into json_writer instead of
+      // building a JSON string via fc::json::to_string and splicing it back in.  Mirrors
+      // the compact (indent=0) form of fc::json::to_string for byte-identical output.
+      FC_ASSERT( max_depth > 0, "to_json_stream: variant nesting exceeds max depth" );
+      switch( v.get_type() ) {
+         case variant::null_type:
+            w.value_null();
+            return;
+         case variant::int64_type: {
+            int64_t i = v.as_int64();
+            if( i > json_integer_quote_magnitude || i < -json_integer_quote_magnitude ) {
+               // Quote out-of-range integers so 64-bit JS clients don't lose precision.
+               w.value_string( v.as_string() );
+            } else {
+               w.value_int64( i );
+            }
+            return;
+         }
+         case variant::uint64_type: {
+            uint64_t i = v.as_uint64();
+            if( i > static_cast<uint64_t>(json_integer_quote_magnitude) ) {
+               w.value_string( v.as_string() );
+            } else {
+               w.value_uint64( i );
+            }
+            return;
+         }
+         case variant::int128_type:
+         case variant::uint128_type:
+         case variant::int256_type:
+         case variant::uint256_type:
+            // Always quoted; representation is a decimal string already.
+            w.value_string( v.as_string() );
+            return;
+         case variant::double_type:
+            // Quoted form matches fc::json::to_string's existing convention.
+            w.value_string( v.as_string() );
+            return;
+         case variant::bool_type:
+            w.value_bool( v.as_bool() );
+            return;
+         case variant::string_type:
+         case variant::string_sso_type:
+            w.value_string( v.get_string() );
+            return;
+         case variant::blob_type:
+            // as_string() returns the base64-encoded form for blobs; matches the existing
+            // fc::json::to_string blob handling.
+            w.value_string( v.as_string() );
+            return;
+         case variant::array_type: {
+            const variants& a = v.get_array();
+            w.begin_array();
+            for( const auto& e : a ) to_json_stream( e, w, max_depth - 1 );
+            w.end_array();
+            return;
+         }
+         case variant::object_type:
+            to_json_stream( v.get_object(), w, max_depth - 1 );
+            return;
+         default:
+            FC_THROW_EXCEPTION( fc::invalid_arg_exception, "Unsupported variant type: {}", std::to_string( v.get_type() ) );
+      }
+   }
 } // namespace fc

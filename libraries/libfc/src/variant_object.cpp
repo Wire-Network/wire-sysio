@@ -1,6 +1,6 @@
 #include <fc/variant_object.hpp>
 #include <fc/exception/exception.hpp>
-
+#include <fc/io/json_stream.hpp>
 
 namespace fc
 {
@@ -502,6 +502,36 @@ namespace fc
    void to_variant( const mutable_variant_object& var,  variant& vo )
    {
       vo = variant(var);
+   }
+
+   namespace {
+      // Shared walker for both object flavors (they iterate the same entry shape).
+      // Walks the key/value pairs directly into json_writer, mirroring the compact
+      // (indent=0) form of fc::json::to_string for byte-identical output; values
+      // recurse into to_json_stream(variant, w) which handles nested arrays / objects
+      // without going through fc::json::to_string at any level.  `max_depth` bounds
+      // the recursion in lock-step with the variant walker.
+      template<typename Object>
+      void object_to_json_stream( const Object& vo, json_writer& w, uint32_t max_depth )
+      {
+         FC_ASSERT( max_depth > 0, "to_json_stream: variant_object nesting exceeds max depth" );
+         w.begin_object();
+         for( const auto& kv : vo ) {
+            w.key( kv.key() );
+            to_json_stream( kv.value(), w, max_depth - 1 );
+         }
+         w.end_object();
+      }
+   }
+
+   void to_json_stream( const variant_object& vo, json_writer& w, uint32_t max_depth )
+   {
+      object_to_json_stream( vo, w, max_depth );
+   }
+
+   void to_json_stream( const mutable_variant_object& vo, json_writer& w, uint32_t max_depth )
+   {
+      object_to_json_stream( vo, w, max_depth );
    }
 
    void from_variant( const variant& var,  mutable_variant_object& vo )

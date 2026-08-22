@@ -31,7 +31,7 @@ namespace fc::crypto::bls {
       , _jacobian_montgomery_le(from_affine_bytes_le(_affine_non_montgomery_le)) {
    }
 
-   public_key::public_key(const std::string& base64urlstr)
+   public_key::public_key(std::string_view base64urlstr)
       : _affine_non_montgomery_le(deserialize_bls_base64url(base64urlstr))
       , _jacobian_montgomery_le(from_affine_bytes_le(_affine_non_montgomery_le)) {
    }
@@ -53,15 +53,3 @@ namespace fc::crypto::bls {
    }
 
 } // fc::crypto::bls
-
-namespace fc {
-
-   void to_variant(const crypto::bls::public_key& var, variant& vo) {
-      vo = var.to_string();
-   }
-
-   void from_variant(const variant& var, crypto::bls::public_key& vo) {
-      vo = crypto::bls::public_key(var.as_string());
-   }
-
-} // fc

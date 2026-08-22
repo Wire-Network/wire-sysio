@@ -23,6 +23,8 @@
 
 #include <test_contracts.hpp>
 
+#include <fc/io/json_stream.hpp>
+#include <fc/reflect/json_stream.hpp>
 #include <fc/variant_object.hpp>
 
 using namespace sysio;
@@ -309,6 +311,121 @@ BOOST_FIXTURE_TEST_CASE(find_with_index_returns_single_match_even_when_all_rows,
 
    BOOST_REQUIRE_EQUAL(res.rows.size(), 1u);
    BOOST_CHECK_EQUAL(res.rows[0].get_object()["sec64"].as_uint64(), 3u);
+} FC_LOG_AND_RETHROW()
+
+// Byte-identical compat between the variant-cb path (fc::variant + fc::json::to_string)
+// and the streaming-cb path (fc::to_json_stream via reflector dispatch).  The HTTP
+// /v1/chain/get_table_rows endpoint flips between these via add_api / add_api_stream;
+// any drift in the streaming path's emitted JSON would break clients that depend on
+// the exact byte sequence (eg keypair-string ordering, integer formatting).  This case
+// pins parity for a representative populated result.
+BOOST_FIXTURE_TEST_CASE(streaming_vs_variant_byte_identical, validating_tester) try {
+   deploy_contract(*this);
+   populate_numobjs(*this, 4);
+
+   auto p = numobjs_params();
+   p.all_rows  = true;
+   p.show_payer = true;
+
+   auto ro  = make_read_only(*this);
+   auto res = run(ro, p);
+
+   const std::string variant_path =
+      fc::json::to_string(fc::variant(res), fc::time_point::maximum());
+   const std::string stream_path = fc::to_json_string(res);
+
+   BOOST_CHECK_EQUAL(variant_path, stream_path);
+} FC_LOG_AND_RETHROW()
+
+namespace {
+   /// Run the new direct-streaming `get_table_rows_stream` to completion and return the
+   /// emitted JSON.  Fails the test if the RPC produced an exception_ptr.
+   std::string run_stream(read_only& ro, const read_only::get_table_rows_params& p) {
+      auto outer = ro.get_table_rows_stream(p, fc::time_point::maximum())();
+      BOOST_REQUIRE(!std::holds_alternative<fc::exception_ptr>(outer));
+      auto emit = std::get<read_only::get_table_rows_stream_emit_fn>(std::move(outer));
+      std::string out;
+      {
+         fc::json_writer w(out);
+         emit(w);
+         BOOST_REQUIRE(w.balanced());
+      }
+      return out;
+   }
+}
+
+// Byte-identical compat for the new direct-streaming path.  `get_table_rows_stream`
+// bypasses the per-row fc::variant assembly step; its emitted JSON must match
+// `fc::json::to_string(fc::variant(get_table_rows().result))` for the same params.
+// Any drift here would break HTTP clients that hit /v1/chain/get_table_rows after the
+// chain_api_plugin migration to CHAIN_RO_CALL_STREAM_POST_DIRECT.
+BOOST_FIXTURE_TEST_CASE(stream_direct_vs_variant_byte_identical, validating_tester) try {
+   deploy_contract(*this);
+   populate_numobjs(*this, 4);
+
+   auto ro = make_read_only(*this);
+
+   // Three shapes worth pinning: full wrapper + payer, all_rows escape hatch, and
+   // values_only stripped form.  Each exercises a distinct branch in the stream
+   // emit closure (wrapped object vs bare value, more/next_key suppression).
+   for (auto setup : { +[](read_only::get_table_rows_params& q) { q.all_rows = true; q.show_payer = true; },
+                       +[](read_only::get_table_rows_params& q) { q.show_payer = true; q.limit = 2; },
+                       +[](read_only::get_table_rows_params& q) { q.values_only = true; q.all_rows = true; } }) {
+      auto p = numobjs_params();
+      setup(p);
+
+      auto via_variant = run(ro, p);
+      const std::string variant_json =
+         fc::json::to_string(fc::variant(via_variant), fc::time_point::maximum());
+
+      const std::string stream_json = run_stream(ro, p);
+
+      BOOST_CHECK_EQUAL(variant_json, stream_json);
+   }
+} FC_LOG_AND_RETHROW()
+
+// A row whose value fails ABI decode mid-emission must fall back to a hex string without
+// corrupting the response.  The streaming path writes tokens as it walks the ABI, so a decode
+// failure after some fields were already emitted has to rewind before the hex fallback -- a
+// regression here produces structurally invalid JSON on the wire (a hex token appended after a
+// half-written value object).  Force the failure by re-setting the contract ABI with an extra
+// trailing field on `numobj`: stored rows then under-run the declared struct and throw
+// "stream unexpectedly ended" after the five real fields were emitted.
+BOOST_FIXTURE_TEST_CASE(stream_decode_failure_falls_back_to_hex_valid_json, validating_tester) try {
+   deploy_contract(*this);
+   populate_numobjs(*this, 3);
+
+   const std::string abi_json = test_contracts::get_table_test_abi();
+   abi_def abi = fc::json::from_string(abi_json).as<abi_def>();
+   for (auto& st : abi.structs) {
+      if (st.name == "numobj") {
+         st.fields.push_back({"extra_field", "uint64"});
+      }
+   }
+   set_abi("test"_n, fc::json::to_string(fc::variant(abi), fc::time_point::maximum()));
+   produce_block();
+
+   auto ro = make_read_only(*this);
+   auto p  = numobjs_params();
+   p.show_payer = true;
+
+   // The streamed body must be parseable JSON even though every row's value decode threw.
+   const std::string stream_json = run_stream(ro, p);
+   fc::variant parsed;
+   BOOST_REQUIRE_NO_THROW(parsed = fc::json::from_string(stream_json));
+
+   // Every row fell back to the bare hex-string form (not a half-decoded object).
+   const auto& rows = parsed.get_object()["rows"].get_array();
+   BOOST_REQUIRE_EQUAL(rows.size(), 3u);
+   for (const auto& row : rows) {
+      BOOST_CHECK(row.get_object()["value"].is_string());
+   }
+
+   // And the fallback shape stays byte-identical to the variant path's fallback.
+   auto via_variant = run(ro, p);
+   const std::string variant_json =
+      fc::json::to_string(fc::variant(via_variant), fc::time_point::maximum());
+   BOOST_CHECK_EQUAL(variant_json, stream_json);
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -1,5 +1,6 @@
 #include <fc/crypto/city.hpp>
 #include <fc/int128.hpp>
+#include <fc/io/json_stream.hpp>
 #include <fc/variant.hpp>
 #include <fc/log/logger.hpp>
 #include <fc/exception/exception.hpp>
@@ -82,6 +83,14 @@ void from_variant(const variant& var, fc::uint128& vo) {
 
 void to_variant(const fc::int128& var, fc::variant& vo) {
    vo = fc::to_string(var);
+}
+
+void to_json_stream(const fc::uint128& var, fc::json_writer& w) {
+   w.value_string(fc::to_string(var));
+}
+
+void to_json_stream(const fc::int128& var, fc::json_writer& w) {
+   w.value_string(fc::to_string(var));
 }
 void from_variant(const variant& var, fc::int128& vo) {
    if( var.is_int128() ) {
