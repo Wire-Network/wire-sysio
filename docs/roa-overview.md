@@ -51,12 +51,14 @@ pays, still needs the chain's native token, and the price still moves with the u
 
 In all three, the account that signs is the account that is billed.
 
-On Wire the account that signs is not billed at all. The contract is. It is provisioned once, by a
-node owner issuing a policy, and every account that calls it transacts without charge.
+On Wire the signer is billed only if it asks to be. By default the contract is, and it is
+provisioned once by a node owner issuing a policy, after which every account that calls it
+transacts without charge. A signer that names itself with `sysio.payer` takes the bill instead —
+the exception, not the ordinary path.
 
 | | EOS staking | REX | PowerUp | **Wire ROA** |
 |---|---|---|---|---|
-| Who is billed for a transaction | Signer | Signer | Signer | **Called contract** |
+| Who is billed for a transaction | Signer | Signer | Signer | **Called contract, unless the action names an explicit payer** |
 | End user needs native token | Yes | Yes | Yes | **No** |
 | CPU/NET acquired by | Locking tokens | Renting from a pool | Daily fee on a curve | **A node owner's policy** |
 | RAM acquired by | Bancor market purchase | same | same | **A node owner's policy** |
