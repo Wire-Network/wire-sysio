@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+"""Exercise snapshot-provider registration, quorum voting, restart, and load verification."""
+
 import json
 import signal
 
@@ -104,7 +106,8 @@ try:
         Print(f"Registered producer {name}")
 
     # setrank reads the on-chain producers table and asserts "producer not found"
-    # if a registration is missing. pushMessage only confirms speculative
+    # if a registration is missing. The same action also reconciles snapshot-provider membership.
+    # pushMessage only confirms speculative
     # execution, and waitForHeadToAdvance() does not guarantee these specific
     # transactions were applied — with multiple producers a transaction pushed
     # to node0 can be forwarded into a peer's block. Wait for both regproducer
@@ -154,7 +157,7 @@ try:
 
     # ---------------------------------------------------------------
     # Set attestation config: min_providers=1, threshold_pct=50
-    # With 2 providers and 50%, quorum = max(1, ceil(2*50/100)) = 1
+    # With 2 providers, quorum = max(1, ceil(2*50/100), floor(2/3)+1) = 1
     # So a single vote will create an attested record.
     # ---------------------------------------------------------------
     Print("Set snapshot attestation config")
@@ -171,13 +174,13 @@ try:
     # in a block before proceeding. The exact-count assertion below depends on
     # the registrations, and Test 1's single votesnaphash depends on setsnpcfg
     # making quorum == 1 — if the config is forwarded into a peer's block and not
-    # yet applied, the vote runs against the default config (2 providers @ 67%,
-    # quorum 2), creates no snaprecords entry, and the test fails.
+    # yet applied, voting remains disabled by the default zero provider floor and
+    # the test fails.
     assert node0.waitForTransactionsInBlock(regSnapProvTransIds + [setCfgTransId], timeout=60), \
         "regsnapprov/setsnpcfg transactions did not make it into a block"
     Print("Verify snapshot providers registered")
-    providers = node0.getTableRows("sysio", "sysio", "snapregs")
-    assert providers is not None, "Failed to read snapregs table"
+    providers = node0.getTableRows("sysio", "sysio", "snapprovs")
+    assert providers is not None, "Failed to read snapprovs table"
     assert len(providers) == 2, f"Expected 2 providers, got {len(providers)}"
     Print(f"Registered providers: {providers}")
 
@@ -405,7 +408,7 @@ try:
     assert node0.waitForTransactionsInBlock([delSnapProvTransId], timeout=60), \
         "delsnapprov transaction did not make it into a block before provider table check"
 
-    providers = node0.getTableRows("sysio", "sysio", "snapregs")
+    providers = node0.getTableRows("sysio", "sysio", "snapprovs")
     assert len(providers) == 1, f"Expected 1 provider after deregistration, got {len(providers)}"
     assert providers[0]["value"]["snap_account"] == snapProv1.name, \
         f"Remaining provider should be {snapProv1.name}, got {providers[0]['value']['snap_account']}"

@@ -11,6 +11,8 @@ set(CHAIN_PLUGIN_TEST_CASES
         chain_plugin_rejects_snapshot_without_attestation_table
         snapshot_attestation_table_read_failure_policy
         snapshot_attestation_table_read_timeout_policy
+        snapshot_attestation_required_schema_policy
+        snapshot_attestation_record_tuple_policy
         chain_plugin_snapshot_endpoint_option_registration
         outbound_http_global_option_registration
         chain_plugin_snapshot_endpoint_option_validation

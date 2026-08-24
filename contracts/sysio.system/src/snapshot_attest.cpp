@@ -1,3 +1,4 @@
+
 #include <sysio.system/sysio.system.hpp>
 #include <sysio.system/snapshot_attest.hpp>
 #include <sysio.system/block_utils.hpp>
@@ -5,8 +6,6 @@
 #include <sysio/sysio.hpp>
 
 #include <algorithm>
-#include <optional>
-#include <tuple>
 #include <utility>
 
 namespace sysiosystem {
@@ -16,57 +15,29 @@ namespace {
 constexpr char producer_not_registered_error[] = "producer is not registered";
 constexpr char producer_not_active_error[] = "producer is not active";
 constexpr char producer_rank_too_high_error[] = "producer rank exceeds maximum for snapshot providers";
-constexpr char provider_not_registered_error[] = "snap_account is not a registered snapshot provider candidate";
-constexpr char roster_membership_error[] = "snap_account is not a member of the active snapshot roster";
-constexpr char roster_version_error[] = "snapshot roster version mismatch";
-constexpr char vote_tuple_error[] = "pending snapshot vote does not match the expected tuple";
-constexpr char equivocation_error[] =
-   "producer already voted a different snapshot tuple for this height and roster version";
+constexpr char provider_not_registered_error[] = "snap_account is not a registered snapshot provider";
+constexpr char provider_already_registered_error[] = "snap_account is already registered as a provider";
+constexpr char producer_already_registered_error[] = "producer already has a registered snapshot provider";
+constexpr char provider_capacity_error[] = "maximum registered snapshot providers reached";
+constexpr char vote_equivocation_error[] = "producer already voted a different snapshot tuple for this height";
+constexpr char snapshot_config_unset_error[] = "snapshot attestation configuration has not been set";
+constexpr char insufficient_provider_count_error[] = "registered snapshot providers are below min_providers";
+constexpr char provider_or_producer_not_registered_error[] =
+   "account is not registered as a snapshot provider or producer";
 constexpr char invalid_block_id_error[] = "invalid block_id";
 constexpr char future_block_id_error[] = "snapshot block cannot be in the future";
-constexpr char pending_vote_not_found_error[] = "pending snapshot vote not found";
-constexpr char roster_count_mismatch_error[] = "snapshot roster state count mismatch";
-constexpr char roster_digest_mismatch_error[] = "snapshot roster state digest mismatch";
-constexpr char governance_excluded_voter_error[] =
-   "snapshot provider is excluded from the pending governance roster";
-constexpr char duplicate_provider_error[] = "snap_account is already registered as a provider candidate";
-constexpr char duplicate_producer_error[] = "producer already has a registered snapshot provider candidate";
-constexpr char candidate_rank_error[] =
-   "snapshot provider candidate does not rank within the maximum roster size";
-constexpr char missing_registration_error[] =
-   "account is not registered as a snapshot provider candidate or producer";
-constexpr char roster_not_ready_error[] = "snapshot roster is not ready for activation";
-constexpr char roster_not_bootstrapped_error[] = "cannot propose a snapshot roster before bootstrap activation";
-constexpr char proposal_below_minimum_error[] = "proposed snapshot roster is below min_providers";
-constexpr char proposal_not_shrinking_error[] = "governance roster proposal must shrink the active roster";
-constexpr char invalid_proposal_members_error[] =
-   "proposed snapshot roster contains an invalid, duplicate, or ineligible member";
-constexpr char missing_proposal_error[] = "no snapshot roster proposal exists";
-constexpr char threshold_range_error[] = "threshold_pct must be between 1 and 100";
-constexpr char minimum_provider_error[] = "min_providers must be at least 1";
-constexpr char minimum_provider_max_error[] = "min_providers exceeds the maximum snapshot roster size";
-constexpr char missing_record_error[] = "no attested snapshot record for this block number";
-
-/// Divisor used by the active-roster Byzantine quorum floor.
-constexpr uint32_t byzantine_quorum_divisor = 3;
-
-/// Increment that makes the Byzantine quorum floor strictly greater than one third.
-constexpr uint32_t byzantine_quorum_increment = 1;
-
-/// Whole-percentage scale used by threshold configuration and quorum rounding.
-constexpr uint32_t percentage_scale = 100;
+constexpr char threshold_pct_range_error[] = "threshold_pct must be between 1 and 100";
+constexpr char min_providers_range_error[] = "min_providers must be at least 1";
+constexpr char min_providers_capacity_error[] = "min_providers exceeds the maximum registrable providers";
+constexpr char snapshot_record_not_found_error[] = "no attested snapshot record for this block number";
+constexpr uint32_t quorum_percentage_denominator = 100;
+constexpr uint32_t byzantine_fault_denominator = 3;
 
 /// Classifies the producer-table state that determines snapshot-provider eligibility.
 enum class snapshot_producer_eligibility {
    eligible,
    inactive,
    rank_exceeds_maximum,
-};
-
-/// Couples a registration with the current producer rank used for candidate selection.
-struct ranked_registration {
-   snap_roster_member member;
-   uint32_t           rank;
 };
 
 /// Returns the eligibility of a producer record for snapshot-provider registration and voting.
@@ -81,540 +52,367 @@ snapshot_producer_eligibility get_snapshot_producer_eligibility(const producer_i
 }
 
 /// Requires the producer's current table state to permit snapshot-provider registration or voting.
-producer_info require_snapshot_producer_eligibility(const producers_table& producers, name producer) {
+void require_snapshot_producer_eligibility(const producers_table& producers, name producer) {
    const auto prod_itr = producers.require_find(producer_key_t{producer.value}, producer_not_registered_error);
    const auto eligibility = get_snapshot_producer_eligibility(*prod_itr);
    check(eligibility != snapshot_producer_eligibility::inactive, producer_not_active_error);
    check(eligibility != snapshot_producer_eligibility::rank_exceeds_maximum, producer_rank_too_high_error);
-   return *prod_itr;
 }
 
-/// Returns whether a producer exists and is currently eligible for snapshot membership.
-bool is_currently_eligible_snapshot_producer(const producers_table& producers, name producer) {
-   const auto producer_row = producers.try_get(producer_key_t{producer.value});
-   return producer_row
-          && get_snapshot_producer_eligibility(*producer_row) == snapshot_producer_eligibility::eligible;
+/// Counts the current live provider mappings used by both sides of the quorum calculation.
+uint32_t count_snapshot_providers(const snap_providers_table& providers) {
+   uint32_t provider_count = 0;
+   for (auto provider_itr = providers.begin(); provider_itr != providers.end(); ++provider_itr) {
+      ++provider_count;
+   }
+   return provider_count;
 }
 
-/// Orders registration candidates by producer rank and then producer account.
-bool candidate_precedes(const ranked_registration& lhs, const ranked_registration& rhs) {
-   return std::tie(lhs.rank, lhs.member.producer.value) < std::tie(rhs.rank, rhs.member.producer.value);
+/// Calculates the quorum required from the current live provider set.
+uint32_t calculate_snapshot_quorum(uint32_t provider_count, const snap_config& cfg) {
+   // The Byzantine floor remains independent of governance configuration so a low percentage
+   // cannot allow a minority of the same live registration set to finalize a tuple.
+   const uint32_t bft_floor = provider_count / byzantine_fault_denominator + 1;
+   return std::max(
+      std::max(cfg.min_providers,
+               (provider_count * cfg.threshold_pct + quorum_percentage_denominator - 1)
+                  / quorum_percentage_denominator),
+      bft_floor);
 }
 
-/// Returns members in the canonical producer/account order used for roster digests.
-std::vector<snap_roster_member> canonicalize_members(std::vector<snap_roster_member> members) {
-   std::sort(members.begin(), members.end(), [](const auto& lhs, const auto& rhs) {
-      return std::tie(lhs.producer.value, lhs.snap_account.value)
-             < std::tie(rhs.producer.value, rhs.snap_account.value);
-   });
-   return members;
-}
-
-/// Hashes the canonical packed roster representation.
-checksum256 digest_members(const std::vector<snap_roster_member>& members) {
-   const auto canonical_members = canonicalize_members(members);
-   const auto packed = sysio::pack(canonical_members);
-   return sysio::sha256(packed.data(), packed.size());
-}
-
-/// Reads all currently retained registration candidates in deterministic selection order.
-std::vector<ranked_registration> collect_ranked_registrations(name self) {
-   snap_registrations_table registrations(self);
-   producers_table          producers(self);
-   std::vector<ranked_registration> result;
-   result.reserve(max_snap_roster_size);
-
-   for (auto itr = registrations.begin(); itr != registrations.end(); ++itr) {
-      const auto producer = producers.try_get(producer_key_t{itr->producer.value});
-      if (producer
-          && get_snapshot_producer_eligibility(*producer) == snapshot_producer_eligibility::eligible) {
-         result.push_back({snap_roster_member{itr->snap_account, itr->producer}, producer->rank});
+/// Counts the voters in one pending tuple that remain in the current live provider set.
+uint32_t count_current_snapshot_voters(snap_providers_table& providers, const std::vector<name>& voters) {
+   const auto by_producer = providers.get_index<"byproducer"_n>();
+   uint32_t voter_count = 0;
+   for (const auto& voter : voters) {
+      if (by_producer.find(voter.value) != by_producer.end()) {
+         ++voter_count;
       }
    }
-   std::sort(result.begin(), result.end(), candidate_precedes);
-   return result;
+   return voter_count;
 }
 
-/// Projects ranked registration candidates to the active-roster row type.
-std::vector<snap_roster_member> collect_candidate_members(name self) {
-   const auto ranked = collect_ranked_registrations(self);
-   std::vector<snap_roster_member> members;
-   members.reserve(ranked.size());
-   for (const auto& registration : ranked) {
-      members.push_back(registration.member);
-   }
-   return members;
-}
-
-/// Returns all active roster rows in canonical digest order.
-std::vector<snap_roster_member> collect_active_members(name self) {
-   snap_roster_table roster(self);
-   std::vector<snap_roster_member> members;
-   members.reserve(max_snap_roster_size);
-   for (auto itr = roster.begin(); itr != roster.end(); ++itr) {
-      members.push_back(*itr);
-   }
-   return canonicalize_members(std::move(members));
-}
-
-/// Returns whether an exact producer/provider pair belongs to the supplied roster.
-bool contains_member(const std::vector<snap_roster_member>& members, name producer, name snap_account) {
-   return std::find_if(members.begin(), members.end(), [&](const auto& member) {
-      return member.producer == producer && member.snap_account == snap_account;
-   }) != members.end();
-}
-
-/// Validates uniqueness, current registration, and eligibility for every proposed roster member.
-bool validate_roster_members(name self, const std::vector<snap_roster_member>& members) {
-   if (members.empty() || members.size() > max_snap_roster_size) {
-      return false;
-   }
-
-   snap_registrations_table registrations(self);
-   producers_table producers(self);
-   std::vector<name> seen_producers;
-   std::vector<name> seen_accounts;
-   seen_producers.reserve(members.size());
-   seen_accounts.reserve(members.size());
-
-   for (const auto& member : members) {
-      if (std::find(seen_producers.begin(), seen_producers.end(), member.producer) != seen_producers.end()
-          || std::find(seen_accounts.begin(), seen_accounts.end(), member.snap_account) != seen_accounts.end()) {
-         return false;
-      }
-      const auto registration = registrations.try_get(snap_account_key_t{member.snap_account.value});
-      if (!registration || registration->producer != member.producer
-          || !is_currently_eligible_snapshot_producer(producers, member.producer)) {
-         return false;
-      }
-      seen_producers.push_back(member.producer);
-      seen_accounts.push_back(member.snap_account);
-   }
-   return true;
-}
-
-/// Returns whether the height already has any pending vote, which closes its activation boundary.
-bool has_pending_vote_for_height(snap_votes_table& votes, uint32_t block_num) {
-   auto by_block = votes.get_index<"byblocknum"_n>();
-   const auto itr = by_block.lower_bound(static_cast<uint64_t>(block_num));
-   return itr != by_block.end() && itr->block_num == block_num;
-}
-
-/// Atomically replaces the complete active roster and advances its version.
-snap_roster_state activate_roster(name self,
-                                  const std::vector<snap_roster_member>& members,
-                                  snap_roster_state state) {
-   snap_roster_table roster(self);
-   auto itr = roster.begin();
-   while (itr != roster.end()) {
-      itr = roster.erase(std::move(itr));
-   }
-   for (const auto& member : members) {
-      roster.emplace(self, snap_account_key_t{member.snap_account.value}, [&](auto& row) {
-         row = member;
-      });
-   }
-
-   state.active_version += 1;
-   state.activated_at_block = static_cast<uint32_t>(sysio::current_block_number());
-   state.active_count = static_cast<uint32_t>(members.size());
-   state.active_digest = digest_members(members);
-   snap_roster_state_singleton(self).set(state, self);
-   return state;
-}
-
-/// Activates a valid governance proposal or complete non-shrinking candidate at a new-height boundary.
-snap_roster_state maybe_activate_roster(name self,
-                                       uint32_t block_num,
-                                       name producer,
-                                       name snap_account,
-                                       snap_votes_table& votes) {
-   snap_roster_state_singleton state_singleton(self);
-   auto state = state_singleton.get_or_default(snap_roster_state{});
-   if (has_pending_vote_for_height(votes, block_num)) {
-      return state;
-   }
-
+/// Finalizes every deterministically ordered pending tuple that meets the current live-set quorum.
+void finalize_eligible_snapshot_votes(name self) {
    snap_config_singleton cfg_singleton(self);
-   const auto cfg = cfg_singleton.get_or_default(snap_config{});
-   snap_roster_proposal_singleton proposal_singleton(self);
-   if (proposal_singleton.exists()) {
-      const auto proposal = proposal_singleton.get();
-      if (proposal.expected_active_version != state.active_version) {
-         proposal_singleton.remove();
-      } else if (proposal.members.size() >= cfg.min_providers
-                 && validate_roster_members(self, proposal.members)) {
-         // A valid governance shrink owns every open boundary. Excluded members must fail before
-         // creating an old-version row, otherwise one member can consume every boundary and veto
-         // the approved shrink indefinitely.
-         check(contains_member(proposal.members, producer, snap_account), governance_excluded_voter_error);
-         state = activate_roster(self, proposal.members, state);
-         proposal_singleton.remove();
-         return state;
-      } else {
-         proposal_singleton.remove();
-      }
+   const snap_config cfg = cfg_singleton.get_or_default(snap_config{});
+   if (cfg.min_providers == 0) {
+      return;
    }
 
-   const auto candidates = collect_candidate_members(self);
-   const auto candidate_digest = digest_members(candidates);
-   const bool enough_members = state.active_version == 0
-                               ? candidates.size() >= cfg.min_providers
-                               : candidates.size() >= state.active_count;
-   if (enough_members && candidate_digest != state.active_digest
-       && contains_member(candidates, producer, snap_account)) {
-      state = activate_roster(self, candidates, state);
+   snap_providers_table providers(self);
+   const uint32_t       provider_count = count_snapshot_providers(providers);
+   if (provider_count < cfg.min_providers) {
+      return;
    }
-   return state;
-}
+   const uint32_t quorum = calculate_snapshot_quorum(provider_count, cfg);
 
-/// Returns whether a pending voter still carries weight in the exact active roster.
-bool is_currently_weighted_voter(name self, name producer) {
-   snap_roster_table roster(self);
-   auto roster_by_producer = roster.get_index<"byproducer"_n>();
-   const auto roster_itr = roster_by_producer.find(producer.value);
-   if (roster_itr == roster_by_producer.end()) {
-      return false;
-   }
-
-   snap_registrations_table registrations(self);
-   const auto registration = registrations.try_get(snap_account_key_t{roster_itr->snap_account.value});
-   if (!registration || registration->producer != producer) {
-      return false;
-   }
-
-   return is_currently_eligible_snapshot_producer(producers_table(self), producer);
-}
-
-/// Scans the next bounded vote-table page and removes obsolete or finalized rows.
-void cleanup_pending_votes(name self,
-                           snap_votes_table& votes,
-                           snap_roster_state& state,
-                           std::optional<uint32_t> finalized_height = std::nullopt) {
-   if (finalized_height) {
-      state.cleanup_finalized_height =
-         std::max(state.cleanup_finalized_height, *finalized_height);
-   }
-   uint32_t inspected = 0;
-   auto itr = state.cleanup_cursor == 0
-                 ? votes.begin()
-                 : votes.lower_bound(snap_vote_key_t{state.cleanup_cursor});
-   while (itr != votes.end() && inspected < max_snap_vote_cleanup_rows) {
-      ++inspected;
-      if (itr->roster_version < state.active_version
-          || (state.cleanup_finalized_height > 0
-              && itr->block_num <= state.cleanup_finalized_height)) {
-         itr = votes.erase(std::move(itr));
-      } else {
-         ++itr;
-      }
-   }
-   state.cleanup_cursor = itr == votes.end() ? 0 : itr->id;
-   snap_roster_state_singleton(self).set(state, self);
-}
-
-/// Validates the final-record state for a tuple and returns true for an identical existing record.
-bool validate_final_record(name self,
-                           uint32_t block_num,
-                           const checksum256& block_id,
-                           const checksum256& snapshot_hash) {
    snap_records_table records(self);
-   const auto record = records.try_get(snap_record_key_t{static_cast<uint64_t>(block_num)});
-   if (!record) {
+   snap_votes_table   votes(self);
+   auto               by_block_num = votes.get_index<"byblocknum"_n>();
+   while (true) {
+      bool        found_candidate = false;
+      uint32_t    candidate_block_num = 0;
+      checksum256 candidate_block_id;
+      checksum256 candidate_snapshot_hash;
+
+      for (auto vote_itr = by_block_num.begin(); vote_itr != by_block_num.end(); ++vote_itr) {
+         if (count_current_snapshot_voters(providers, vote_itr->voters) < quorum) {
+            continue;
+         }
+         found_candidate         = true;
+         candidate_block_num     = vote_itr->block_num;
+         candidate_block_id      = vote_itr->block_id;
+         candidate_snapshot_hash = vote_itr->snapshot_hash;
+         break;
+      }
+      if (!found_candidate) {
+         return;
+      }
+
+      const snap_record_key_t record_key{static_cast<uint64_t>(candidate_block_num)};
+      const auto              record_itr = records.find(record_key);
+      if (record_itr == records.end()) {
+         const uint32_t current_block = static_cast<uint32_t>(sysio::current_block_number());
+         records.emplace(self, record_key, [&](auto& row) {
+            row.block_num         = candidate_block_num;
+            row.block_id          = candidate_block_id;
+            row.snapshot_hash     = candidate_snapshot_hash;
+            row.attested_at_block = current_block;
+         });
+      } else {
+         check(record_itr->block_id == candidate_block_id
+                  && record_itr->snapshot_hash == candidate_snapshot_hash,
+               snap_hash_disagreement_error);
+      }
+
+      auto purge_itr = by_block_num.begin();
+      while (purge_itr != by_block_num.end() && purge_itr->block_num <= candidate_block_num) {
+         purge_itr = by_block_num.erase(std::move(purge_itr));
+      }
+   }
+}
+
+/// Returns true for an existing matching final record and rejects a conflicting final tuple.
+bool matches_final_snapshot_record(snap_records_table& records, snap_record_key_t record_key,
+                                   const checksum256& block_id, const checksum256& snapshot_hash) {
+   const auto record_itr = records.find(record_key);
+   if (record_itr == records.end()) {
       return false;
    }
-   check(record->snapshot_hash == snapshot_hash && record->block_id == block_id,
+   check(record_itr->snapshot_hash == snapshot_hash && record_itr->block_id == block_id,
          snap_hash_disagreement_error);
    return true;
 }
 
-/// Evaluates one exact pending tuple and creates its final record when quorum is reached.
-void evaluate_pending_vote(name self,
-                           uint64_t vote_id,
-                           const checksum256& expected_block_id,
-                           const checksum256& expected_snapshot_hash,
-                           uint64_t expected_roster_version) {
-   const uint32_t block_num = block_info::block_height_from_id(expected_block_id);
-   check(block_num > 0, invalid_block_id_error);
-
-   snap_records_table records(self);
-   const auto final_record = records.try_get(snap_record_key_t{static_cast<uint64_t>(block_num)});
-   const bool matches_final_record = final_record
-                                     && final_record->snapshot_hash == expected_snapshot_hash
-                                     && final_record->block_id == expected_block_id;
-
+/// Remove selected producers from every pending tuple, erasing tuples that become empty.
+void remove_snapshot_producer_votes(name self, const std::vector<name>& removed_producers) {
    snap_votes_table votes(self);
-   const auto vote = votes.try_get(snap_vote_key_t{vote_id});
-   if (!vote) {
-      check(matches_final_record, pending_vote_not_found_error);
-      return;
-   }
-   check(vote->roster_version == expected_roster_version
-         && vote->block_num == block_num
-         && vote->block_id == expected_block_id
-         && vote->snapshot_hash == expected_snapshot_hash,
-         vote_tuple_error);
-
-   snap_roster_state_singleton state_singleton(self);
-   auto state = state_singleton.get_or_default(snap_roster_state{});
-   if (final_record || expected_roster_version < state.active_version) {
-      const auto stale_vote = votes.find(snap_vote_key_t{vote_id});
-      if (stale_vote != votes.end()) {
-         votes.erase(std::move(stale_vote));
-      }
-      const std::optional<uint32_t> finalized_height = final_record
-                                                          ? std::optional<uint32_t>{block_num}
-                                                          : std::optional<uint32_t>{};
-      cleanup_pending_votes(self, votes, state, finalized_height);
-      return;
-   }
-   check(state.active_version == expected_roster_version, roster_version_error);
-
-   const auto active_members = collect_active_members(self);
-   check(active_members.size() == state.active_count, roster_count_mismatch_error);
-   check(digest_members(active_members) == state.active_digest, roster_digest_mismatch_error);
-
-   snap_config_singleton cfg_singleton(self);
-   const auto cfg = cfg_singleton.get_or_default(snap_config{});
-   if (state.active_count < cfg.min_providers) {
-      cleanup_pending_votes(self, votes, state);
-      return;
-   }
-
-   uint32_t voter_count = 0;
-   for (const auto& voter : vote->voters) {
-      if (is_currently_weighted_voter(self, voter)) {
-         ++voter_count;
-      }
-   }
-
-   const uint32_t bft_floor =
-      state.active_count / byzantine_quorum_divisor + byzantine_quorum_increment;
-   const uint32_t quorum = std::max(
-      std::max(cfg.min_providers,
-               (state.active_count * cfg.threshold_pct + percentage_scale - 1) / percentage_scale),
-      bft_floor);
-   if (voter_count < quorum) {
-      cleanup_pending_votes(self, votes, state);
-      return;
-   }
-
-   const snap_record_key_t record_key{static_cast<uint64_t>(block_num)};
-   if (!records.contains(record_key)) {
-      records.emplace(self, record_key, [&](auto& row) {
-         row.block_num         = block_num;
-         row.block_id          = expected_block_id;
-         row.snapshot_hash     = expected_snapshot_hash;
-         row.attested_at_block = static_cast<uint32_t>(sysio::current_block_number());
-         row.roster_version    = state.active_version;
-         row.roster_digest     = state.active_digest;
+   auto             vote_itr = votes.begin();
+   while (vote_itr != votes.end()) {
+      const auto vote_id = vote_itr->id;
+      const bool has_removed_voter = std::any_of(vote_itr->voters.begin(), vote_itr->voters.end(), [&](name voter) {
+         return std::find(removed_producers.begin(), removed_producers.end(), voter) != removed_producers.end();
       });
-   }
+      ++vote_itr;
+      if (!has_removed_voter) {
+         continue;
+      }
 
-   const auto current_vote = votes.find(snap_vote_key_t{vote_id});
-   if (current_vote != votes.end()) {
-      votes.erase(std::move(current_vote));
+      const auto current_vote = votes.get(snap_vote_key_t{vote_id});
+      const auto retained_voter_count = static_cast<uint32_t>(std::count_if(
+         current_vote.voters.begin(), current_vote.voters.end(), [&](name voter) {
+            return std::find(removed_producers.begin(), removed_producers.end(), voter) == removed_producers.end();
+         }));
+      if (retained_voter_count == 0) {
+         auto erase_itr = votes.find(snap_vote_key_t{vote_id});
+         votes.erase(std::move(erase_itr));
+      } else {
+         votes.modify(same_payer, snap_vote_key_t{vote_id}, [&](auto& row) {
+            row.voters.erase(std::remove_if(row.voters.begin(), row.voters.end(), [&](name voter) {
+               return std::find(removed_producers.begin(), removed_producers.end(), voter)
+                      != removed_producers.end();
+            }), row.voters.end());
+         });
+      }
    }
-   cleanup_pending_votes(self, votes, state, block_num);
+   finalize_eligible_snapshot_votes(self);
 }
 
 } // namespace
 
 // -------------------------------------------------------------------------------------------------
 void reconcile_snapshot_registrations(name self) {
-   snap_registrations_table registrations(self);
-   producers_table producers(self);
+   snap_providers_table providers(self);
+   producers_table      producers(self);
+   std::vector<name>    removed_producers;
 
-   auto itr = registrations.begin();
-   while (itr != registrations.end()) {
-      if (!is_currently_eligible_snapshot_producer(producers, itr->producer)) {
-         itr = registrations.erase(std::move(itr));
+   auto provider_itr = providers.begin();
+   while (provider_itr != providers.end()) {
+      const auto producer_itr = producers.try_get(producer_key_t{provider_itr->producer.value});
+      if (!producer_itr
+          || get_snapshot_producer_eligibility(*producer_itr) != snapshot_producer_eligibility::eligible) {
+         removed_producers.push_back(provider_itr->producer);
+         provider_itr = providers.erase(std::move(provider_itr));
       } else {
-         ++itr;
+         ++provider_itr;
       }
    }
 
-   const auto candidates = collect_candidate_members(self);
-   snap_roster_state_singleton state_singleton(self);
-   if (candidates.empty() && !state_singleton.exists()) {
-      return;
+   if (!removed_producers.empty()) {
+      remove_snapshot_producer_votes(self, removed_producers);
    }
-   auto state = state_singleton.get_or_default(snap_roster_state{});
-   state.candidate_count = static_cast<uint32_t>(candidates.size());
-   state.candidate_digest = digest_members(candidates);
-   state_singleton.set(state, self);
 }
 
 // -------------------------------------------------------------------------------------------------
 void snapshot_attest::regsnapprov(name producer, name snap_account) {
    require_auth(producer);
+
    reconcile_snapshot_registrations(get_self());
 
    producers_table producers(get_self());
-   const auto producer_row = require_snapshot_producer_eligibility(producers, producer);
+   require_snapshot_producer_eligibility(producers, producer);
 
-   snap_registrations_table registrations(get_self());
-   check(!registrations.contains(snap_account_key_t{snap_account.value}),
-         duplicate_provider_error);
-   auto by_producer = registrations.get_index<"byproducer"_n>();
-   check(by_producer.find(producer.value) == by_producer.end(),
-         duplicate_producer_error);
+   snap_providers_table provs(get_self());
+   check(!provs.contains(snap_provider_key_t{snap_account.value}), provider_already_registered_error);
 
-   const auto ranked = collect_ranked_registrations(get_self());
-   if (ranked.size() >= max_snap_roster_size) {
-      const ranked_registration candidate{snap_roster_member{snap_account, producer}, producer_row.rank};
-      const auto& worst = ranked.back();
-      check(candidate_precedes(candidate, worst),
-            candidate_rank_error);
-      registrations.erase(snap_account_key_t{worst.member.snap_account.value});
-   }
+   auto by_prod = provs.get_index<"byproducer"_n>();
+   check(by_prod.find(producer.value) == by_prod.end(), producer_already_registered_error);
+   check(count_snapshot_providers(provs) < max_snap_provider_rank, provider_capacity_error);
 
-   registrations.emplace(producer, snap_account_key_t{snap_account.value}, [&](auto& row) {
+   provs.emplace(producer, snap_provider_key_t{snap_account.value}, [&](auto& row) {
       row.snap_account = snap_account;
-      row.producer = producer;
+      row.producer     = producer;
    });
-   reconcile_snapshot_registrations(get_self());
 }
 
 // -------------------------------------------------------------------------------------------------
+// The `account` parameter is overloaded: it can be either a snap_account (primary key lookup)
+// or a producer (secondary index lookup). The primary key path takes precedence.
+// This means a producer can unregister their own provider, and a snap_account can unregister itself.
+// If one account occupies both roles in different mappings, the first call removes its primary-key
+// snap_account mapping and a repeated call removes its producer-keyed delegation.
 void snapshot_attest::delsnapprov(name account) {
    require_auth(account);
-   snap_registrations_table registrations(get_self());
 
-   auto registration = registrations.find(snap_account_key_t{account.value});
-   if (registration != registrations.end()) {
-      require_auth(registration->snap_account);
-      registrations.erase(std::move(registration));
-      reconcile_snapshot_registrations(get_self());
+   snap_providers_table provs(get_self());
+
+   // First try lookup as snap_account (primary key)
+   auto prov_itr = provs.find(snap_provider_key_t{account.value});
+   if (prov_itr != provs.end()) {
+      require_auth(prov_itr->snap_account);
+      const name producer = prov_itr->producer;
+      provs.erase(std::move(prov_itr));
+      remove_snapshot_producer_votes(get_self(), {producer});
       return;
    }
 
-   auto by_producer = registrations.get_index<"byproducer"_n>();
-   auto producer_registration = by_producer.find(account.value);
-   check(producer_registration != by_producer.end(),
-         missing_registration_error);
-   by_producer.erase(std::move(producer_registration));
-   reconcile_snapshot_registrations(get_self());
+   // Then try lookup as producer (secondary index)
+   auto by_prod = provs.get_index<"byproducer"_n>();
+   auto prod_itr = by_prod.find(account.value);
+   check(prod_itr != by_prod.end(), provider_or_producer_not_registered_error);
+   const name producer = prod_itr->producer;
+   by_prod.erase(std::move(prod_itr));
+   remove_snapshot_producer_votes(get_self(), {producer});
 }
 
 // -------------------------------------------------------------------------------------------------
 void snapshot_attest::votesnaphash(name snap_account, checksum256 block_id, checksum256 snapshot_hash) {
    require_auth(snap_account);
+
    const uint32_t block_num = block_info::block_height_from_id(block_id);
    check(block_num > 0, invalid_block_id_error);
    check(block_num <= sysio::current_block_number(), future_block_id_error);
-   if (validate_final_record(get_self(), block_num, block_id, snapshot_hash)) {
+
+   snap_records_table records(get_self());
+   snap_record_key_t  rec_key{static_cast<uint64_t>(block_num)};
+   if (matches_final_snapshot_record(records, rec_key, block_id, snapshot_hash)) {
       return;
    }
 
+   // The final-record disagreement check intentionally precedes authorization so a node with a stale
+   // registration still receives the fatal disagreement signal for a conflicting local snapshot.
    reconcile_snapshot_registrations(get_self());
-   snap_registrations_table registrations(get_self());
-   const auto registration = registrations.try_get(snap_account_key_t{snap_account.value});
-   check(registration.has_value(), provider_not_registered_error);
-   const name producer = registration->producer;
-   require_snapshot_producer_eligibility(producers_table(get_self()), producer);
+   if (matches_final_snapshot_record(records, rec_key, block_id, snapshot_hash)) {
+      return;
+   }
+
+   snap_providers_table provs(get_self());
+   const auto prov_itr = provs.find(snap_provider_key_t{snap_account.value});
+   check(prov_itr != provs.end(), provider_not_registered_error);
+   const name producer = prov_itr->producer;
+
+   producers_table producers(get_self());
+   require_snapshot_producer_eligibility(producers, producer);
 
    snap_votes_table votes(get_self());
-   const auto state = maybe_activate_roster(get_self(), block_num, producer, snap_account, votes);
-   check(state.active_version > 0, roster_not_ready_error);
+   auto by_bn = votes.get_index<"byblocknum"_n>();
 
-   snap_roster_table roster(get_self());
-   const auto active_member = roster.try_get(snap_account_key_t{snap_account.value});
-   check(active_member && active_member->producer == producer, roster_membership_error);
+   snap_config_singleton cfg_singleton(get_self());
+   const snap_config cfg = cfg_singleton.get_or_default(snap_config{});
+   check(cfg.min_providers > 0, snapshot_config_unset_error);
 
-   auto by_block_roster = votes.get_index<"byblkroster"_n>();
-   const auto block_roster_key = make_snap_vote_block_roster_key(block_num, state.active_version);
-   uint64_t vote_id = 0;
-   bool found_producer_vote = false;
-   std::optional<uint64_t> matching_vote_id;
-   for (auto itr = by_block_roster.lower_bound(block_roster_key);
-        itr != by_block_roster.end() && itr->by_block_roster() == block_roster_key; ++itr) {
+   const uint32_t provider_count = count_snapshot_providers(provs);
+   check(provider_count >= cfg.min_providers, insufficient_provider_count_error);
+
+   uint64_t vote_id           = 0;
+   bool     found             = false;
+   bool     append_vote       = false;
+   uint64_t matching_vote_id  = 0;
+   bool     has_matching_vote = false;
+   std::vector<uint64_t> superseded_vote_ids;
+   for (auto itr = votes.begin(); itr != votes.end(); ++itr) {
+      if (itr->block_num == block_num) {
+         continue;
+      }
       if (std::find(itr->voters.begin(), itr->voters.end(), producer) != itr->voters.end()) {
-         check(itr->block_id == block_id && itr->snapshot_hash == snapshot_hash, equivocation_error);
-         vote_id = itr->id;
-         found_producer_vote = true;
+         superseded_vote_ids.push_back(itr->id);
+      }
+   }
+   for (auto itr = by_bn.lower_bound(static_cast<uint64_t>(block_num));
+        itr != by_bn.end() && itr->block_num == block_num; ++itr) {
+      for (const auto& voter : itr->voters) {
+         if (voter == producer) {
+            check(itr->block_id == block_id && itr->snapshot_hash == snapshot_hash,
+                  vote_equivocation_error);
+            vote_id = itr->id;
+            found   = true;
+            break;
+         }
+      }
+      if (found) {
          break;
       }
       if (itr->block_id == block_id && itr->snapshot_hash == snapshot_hash) {
-         matching_vote_id = itr->id;
+         matching_vote_id  = itr->id;
+         has_matching_vote = true;
       }
    }
 
-   if (!found_producer_vote && matching_vote_id) {
-      vote_id = *matching_vote_id;
+   // A producer carries at most one pending vote across all heights. Moving to another height
+   // removes only that producer's old weight, so one Byzantine provider cannot globally advance
+   // the pending set or erase honest votes. With at most 30 producers, both rows and voters remain
+   // bounded by the live registration cap.
+   for (const auto superseded_vote_id : superseded_vote_ids) {
+      const auto superseded_vote = votes.get(snap_vote_key_t{superseded_vote_id});
+      if (superseded_vote.voters.size() == 1) {
+         auto superseded_itr = votes.find(snap_vote_key_t{superseded_vote_id});
+         votes.erase(std::move(superseded_itr));
+      } else {
+         votes.modify(same_payer, snap_vote_key_t{superseded_vote_id}, [&](auto& row) {
+            row.voters.erase(std::remove(row.voters.begin(), row.voters.end(), producer), row.voters.end());
+         });
+      }
+   }
+
+   if (!found && has_matching_vote) {
+      vote_id     = matching_vote_id;
+      found       = true;
+      append_vote = true;
+   }
+
+   if (append_vote) {
       votes.modify(same_payer, snap_vote_key_t{vote_id}, [&](auto& row) {
          row.voters.push_back(producer);
       });
-   } else if (!found_producer_vote) {
-      vote_id = votes.available_primary_key();
-      votes.emplace(snap_account, snap_vote_key_t{vote_id}, [&](auto& row) {
-         row.id = vote_id;
-         row.roster_version = state.active_version;
-         row.block_num = block_num;
-         row.block_id = block_id;
+   } else if (!found) {
+      uint64_t new_id = votes.available_primary_key();
+      votes.emplace(snap_account, snap_vote_key_t{new_id}, [&](auto& row) {
+         row.id            = new_id;
+         row.block_num     = block_num;
+         row.block_id      = block_id;
          row.snapshot_hash = snapshot_hash;
-         row.voters = {producer};
+         row.voters        = {producer};
       });
+      vote_id = new_id;
    }
 
-   evaluate_pending_vote(get_self(), vote_id, block_id, snapshot_hash, state.active_version);
-}
-
-// -------------------------------------------------------------------------------------------------
-void snapshot_attest::evalsnapvote(uint64_t vote_id,
-                                   checksum256 expected_block_id,
-                                   checksum256 expected_snapshot_hash,
-                                   uint64_t expected_roster_version) {
-   evaluate_pending_vote(get_self(), vote_id, expected_block_id, expected_snapshot_hash,
-                         expected_roster_version);
-}
-
-// -------------------------------------------------------------------------------------------------
-void snapshot_attest::propsnaprost(std::vector<snap_roster_member> members,
-                                   uint64_t expected_active_version) {
-   require_auth(get_self());
-   reconcile_snapshot_registrations(get_self());
-
-   snap_roster_state_singleton state_singleton(get_self());
-   const auto state = state_singleton.get_or_default(snap_roster_state{});
-   check(state.active_version > 0, roster_not_bootstrapped_error);
-   check(state.active_version == expected_active_version, roster_version_error);
-
-   snap_config_singleton cfg_singleton(get_self());
-   const auto cfg = cfg_singleton.get_or_default(snap_config{});
-   check(members.size() >= cfg.min_providers, proposal_below_minimum_error);
-   check(members.size() < state.active_count, proposal_not_shrinking_error);
-
-   members = canonicalize_members(std::move(members));
-   check(validate_roster_members(get_self(), members), invalid_proposal_members_error);
-   snap_roster_proposal_singleton(get_self()).set(
-      snap_roster_proposal{expected_active_version, members, digest_members(members)}, get_self());
-}
-
-// -------------------------------------------------------------------------------------------------
-void snapshot_attest::cancsnaprost() {
-   require_auth(get_self());
-   snap_roster_proposal_singleton proposal(get_self());
-   check(proposal.exists(), missing_proposal_error);
-   proposal.remove();
+   finalize_eligible_snapshot_votes(get_self());
 }
 
 // -------------------------------------------------------------------------------------------------
 void snapshot_attest::setsnpcfg(uint32_t min_providers, uint32_t threshold_pct) {
    require_auth(get_self());
-   check(threshold_pct > 0 && threshold_pct <= percentage_scale, threshold_range_error);
-   check(min_providers > 0, minimum_provider_error);
-   check(min_providers <= max_snap_roster_size,
-         minimum_provider_max_error);
-   snap_config_singleton(get_self()).set(snap_config{min_providers, threshold_pct}, get_self());
+
+   check(threshold_pct > 0 && threshold_pct <= quorum_percentage_denominator,
+         threshold_pct_range_error);
+   check(min_providers > 0, min_providers_range_error);
+   // regsnapprov limits the provider table to `max_snap_provider_rank` mappings, so a
+   // `min_providers` above that ceiling can never be met. votesnaphash separately rejects
+   // attestation while the current live set is smaller than the configured floor.
+   check(min_providers <= max_snap_provider_rank, min_providers_capacity_error);
+
+   snap_config_singleton cfg_singleton(get_self());
+   cfg_singleton.set(snap_config{min_providers, threshold_pct}, get_self());
+   finalize_eligible_snapshot_votes(get_self());
 }
 
 // -------------------------------------------------------------------------------------------------
 snap_record snapshot_attest::getsnaphash(uint32_t block_num) {
    snap_records_table records(get_self());
-   const auto record = records.require_find(snap_record_key_t{static_cast<uint64_t>(block_num)},
-                                            missing_record_error);
-   return *record;
+   auto rec_itr = records.require_find(
+      snap_record_key_t{static_cast<uint64_t>(block_num)}, snapshot_record_not_found_error);
+   return *rec_itr;
 }
 
 } // namespace sysiosystem

@@ -57,7 +57,7 @@ if("native-module" IN_LIST SYSIO_WASM_RUNTIMES AND BUILD_SYSTEM_CONTRACTS)
       ABI_FILE       ${CMAKE_BINARY_DIR}/contracts/sysio.system/sysio.system.abi
       EXTRA_DISPATCH "sysiosystem::peer_keys:regpeerkey,delpeerkey,getpeerkeys"
                      "sysiosystem::trx_priority:addtrxp,deltrxp"
-                     "sysiosystem::snapshot_attest:regsnapprov,delsnapprov,votesnaphash,evalsnapvote,propsnaprost,cancsnaprost,setsnpcfg,getsnaphash"
+                     "sysiosystem::snapshot_attest:regsnapprov,delsnapprov,votesnaphash,setsnpcfg,getsnaphash"
    )
 
    target_link_libraries(sysio.system_native

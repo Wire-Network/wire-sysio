@@ -8,7 +8,6 @@
 #include <sysio/name.hpp>
 #include <sysio/protocol/snapshot_attestation.hpp>
 
-#include <limits>
 #include <vector>
 
 namespace sysiosystem {
@@ -16,28 +15,25 @@ namespace sysiosystem {
 using sysio::checksum256;
 using sysio::name;
 
-/// Maximum producer rank eligible for snapshot-provider registration.
+/// Maximum registered snapshot providers and producer rank eligible to register one.
 static constexpr uint32_t max_snap_provider_rank = 30;
 
-/// Maximum number of snapshot registrations and active roster members.
-static constexpr uint32_t max_snap_roster_size = 30;
+/// Default quorum percentage used after governance sets a nonzero provider floor.
+static constexpr uint32_t default_snap_threshold_pct = 67;
 
-/// Maximum obsolete pending-vote rows removed by one snapshot action.
-static constexpr uint32_t max_snap_vote_cleanup_rows = 30;
-
-/// Error code for a tuple that differs from the already-attested record; nodeop fails closed on it.
+/// Error code for disagreement with an already-attested snapshot record.
 static constexpr uint64_t snap_hash_disagreement_error =
    sysio::protocol::snapshot_attestation::disagreement_error_code;
 
 // -------------------------------------------------------------------------------------------------
 // Snapshot attestation configuration (singleton)
 // -------------------------------------------------------------------------------------------------
-/** Governance-controlled snapshot quorum configuration. */
+/** Governance-controlled quorum configuration. */
 struct [[sysio::table("snapconfig"), sysio::contract("sysio.system")]] snap_config {
-   /// Hard minimum number of weighted voters required for attestation.
-   uint32_t min_providers  = 1;
-   /// Percentage of the stable active roster required for attestation.
-   uint32_t threshold_pct  = 67;
+   /// Zero means governance has not configured the security floor yet, so voting is disabled.
+   uint32_t min_providers  = 0;
+   /// Percentage of current live registrations required to attest.
+   uint32_t threshold_pct  = default_snap_threshold_pct;
 
    SYSLIB_SERIALIZE(snap_config, (min_providers)(threshold_pct))
 };
@@ -45,172 +41,89 @@ struct [[sysio::table("snapconfig"), sysio::contract("sysio.system")]] snap_conf
 using snap_config_singleton = sysio::kv::global<"snapconfig"_n, snap_config>;
 
 // -------------------------------------------------------------------------------------------------
-// Snapshot-provider registration candidates
+// Registered snapshot providers
 // -------------------------------------------------------------------------------------------------
-/** Primary key for provider-account keyed snapshot tables. */
-struct snap_account_key_t {
+/** Provider-account primary key for live snapshot registrations. */
+struct snap_provider_key_t {
    /// Raw snapshot-provider account value.
    uint64_t snap_account;
-   SYSLIB_SERIALIZE(snap_account_key_t, (snap_account))
+   SYSLIB_SERIALIZE(snap_provider_key_t, (snap_account))
 };
 
-/** Currently eligible producer-to-provider registration candidate. */
-struct [[sysio::table("snapregs"), sysio::contract("sysio.system")]] snap_registration {
-   /// Account authorized to sign snapshot attestations.
+/** One live producer-to-snapshot-account delegation. */
+struct [[sysio::table("snapprovs"), sysio::contract("sysio.system")]] snap_provider {
+   /// Account authorized to submit snapshot votes.
    name snap_account;
-   /// Producer that delegated authority to the provider account.
+   /// Active, rank-eligible producer represented by this account.
    name producer;
 
    /** Return the producer secondary-index key. */
    uint64_t by_producer() const { return producer.value; }
 
-   SYSLIB_SERIALIZE(snap_registration, (snap_account)(producer))
+   SYSLIB_SERIALIZE(snap_provider, (snap_account)(producer))
 };
 
-using snap_registrations_table = sysio::kv::table<
-   "snapregs"_n, snap_account_key_t, snap_registration,
-   sysio::kv::index<"byproducer"_n,
-                    sysio::const_mem_fun<snap_registration, uint64_t, &snap_registration::by_producer>>>;
-
-// -------------------------------------------------------------------------------------------------
-// Stable active snapshot-provider roster
-// -------------------------------------------------------------------------------------------------
-/** One producer/provider pair in the stable active voting roster. */
-struct [[sysio::table("snaproster"), sysio::contract("sysio.system")]] snap_roster_member {
-   /// Account authorized to sign snapshot attestations.
-   name snap_account;
-   /// Producer whose voting weight the provider represents.
-   name producer;
-
-   /** Return the producer secondary-index key. */
-   uint64_t by_producer() const { return producer.value; }
-
-   SYSLIB_SERIALIZE(snap_roster_member, (snap_account)(producer))
-};
-
-using snap_roster_table = sysio::kv::table<
-   "snaproster"_n, snap_account_key_t, snap_roster_member,
-   sysio::kv::index<"byproducer"_n,
-                    sysio::const_mem_fun<snap_roster_member, uint64_t, &snap_roster_member::by_producer>>>;
-
-/** Versioned digests and cleanup progress for the active and candidate rosters. */
-struct [[sysio::table("snaprstate"), sysio::contract("sysio.system")]] snap_roster_state {
-   /// Monotonic active-roster version.
-   uint64_t    active_version       = 0;
-   /// Block at which the current roster became active.
-   uint32_t    activated_at_block   = 0;
-   /// Stable active-roster denominator.
-   uint32_t    active_count         = 0;
-   /// Digest of the canonical active roster.
-   checksum256 active_digest;
-   /// Number of currently eligible registration candidates.
-   uint32_t    candidate_count      = 0;
-   /// Digest of the canonical candidate pool.
-   checksum256 candidate_digest;
-   /// Inclusive primary-id cursor for the next bounded pending-vote cleanup page.
-   uint64_t    cleanup_cursor       = 0;
-   /// Highest finalized snapshot height applied by all cleanup-cursor continuation pages.
-   uint32_t    cleanup_finalized_height = 0;
-
-   SYSLIB_SERIALIZE(snap_roster_state,
-                    (active_version)(activated_at_block)(active_count)(active_digest)
-                    (candidate_count)(candidate_digest)(cleanup_cursor)(cleanup_finalized_height))
-};
-
-using snap_roster_state_singleton = sysio::kv::global<"snaprstate"_n, snap_roster_state>;
-
-/** Governance-approved active-roster shrink staged for a snapshot boundary. */
-struct [[sysio::table("snaprprop"), sysio::contract("sysio.system")]] snap_roster_proposal {
-   /// Active version that the proposal is authorized to replace.
-   uint64_t                        expected_active_version = 0;
-   /// Exact ordered member set approved by governance.
-   std::vector<snap_roster_member> members;
-   /// Digest of the canonical proposed member set.
-   checksum256                     digest;
-
-   SYSLIB_SERIALIZE(snap_roster_proposal, (expected_active_version)(members)(digest))
-};
-
-using snap_roster_proposal_singleton = sysio::kv::global<"snaprprop"_n, snap_roster_proposal>;
+using snap_providers_table = sysio::kv::table<
+   "snapprovs"_n, snap_provider_key_t, snap_provider,
+   sysio::kv::index<"byproducer"_n, sysio::const_mem_fun<snap_provider, uint64_t, &snap_provider::by_producer>>>;
 
 // -------------------------------------------------------------------------------------------------
 // Pending snapshot votes (before quorum is reached)
 // -------------------------------------------------------------------------------------------------
 /** Auto-incrementing primary key for pending snapshot tuples. */
 struct snap_vote_key_t {
-   /// Pending-vote identifier.
+   /// Pending tuple identifier.
    uint64_t id;
-   // primary_key() lets snap_votes_table.available_primary_key() allocate the next vote id.
+   /// Lets snap_votes_table.available_primary_key() allocate the next vote id.
    uint64_t primary_key() const { return id; }
    SYSLIB_SERIALIZE(snap_vote_key_t, (id))
 };
 
-/** Build the exact secondary-index key for one block height and roster version. */
-constexpr uint128_t make_snap_vote_block_roster_key(uint32_t block_num, uint64_t roster_version) {
-   return (uint128_t{block_num} << std::numeric_limits<uint64_t>::digits) | roster_version;
-}
-
-/** One version-bound pending snapshot tuple and its producer voters. */
+/** One pending snapshot tuple and its live producer voters. */
 struct [[sysio::table("snapvotes"), sysio::contract("sysio.system")]] snap_vote {
-   /// Pending-vote identifier.
+   /// Pending tuple identifier.
    uint64_t           id;
-   /// Active-roster version under which votes were cast.
-   uint64_t           roster_version;
-   /// Snapshot block height derived from block_id.
+   /// Snapshot height derived from block_id.
    uint32_t           block_num;
-   /// Irreversible block identifier bound to the snapshot.
+   /// Exact irreversible block identifier.
    checksum256        block_id;
    /// Deterministic snapshot root hash.
    checksum256        snapshot_hash;
-   // Delegating PRODUCER identities that have voted -- NOT snap_accounts. Counting by the
-   // stable producer prevents a producer from inflating the count (and clearing the Byzantine
-   // quorum floor) by rotating snap_accounts. See snapshot_attest::votesnaphash.
+   /// Delegating producer identities, rather than rotatable snapshot-account identities.
    std::vector<name>  voters;
 
    /** Return the block-height secondary-index key. */
    uint64_t by_block_num() const { return static_cast<uint64_t>(block_num); }
 
-   /** Return the exact block-height and roster-version composite index key. */
-   uint128_t by_block_roster() const {
-      return make_snap_vote_block_roster_key(block_num, roster_version);
-   }
-
-   SYSLIB_SERIALIZE(snap_vote, (id)(roster_version)(block_num)(block_id)(snapshot_hash)(voters))
+   SYSLIB_SERIALIZE(snap_vote, (id)(block_num)(block_id)(snapshot_hash)(voters))
 };
 
 using snap_votes_table = sysio::kv::table<
    "snapvotes"_n, snap_vote_key_t, snap_vote,
-   sysio::kv::index<"byblocknum"_n, sysio::const_mem_fun<snap_vote, uint64_t, &snap_vote::by_block_num>>,
-   sysio::kv::index<"byblkroster"_n,
-                    sysio::const_mem_fun<snap_vote, uint128_t, &snap_vote::by_block_roster>>>;
+   sysio::kv::index<"byblocknum"_n, sysio::const_mem_fun<snap_vote, uint64_t, &snap_vote::by_block_num>>>;
 
 // -------------------------------------------------------------------------------------------------
 // Attested snapshot records (quorum reached)
 // -------------------------------------------------------------------------------------------------
-/** Block-height primary key for final snapshot records. */
+/** Block-height primary key for final snapshot attestations. */
 struct snap_record_key_t {
-   /// Finalized snapshot block height.
+   /// Attested snapshot block height.
    uint64_t block_num;
    SYSLIB_SERIALIZE(snap_record_key_t, (block_num))
 };
 
-/** Permanent final snapshot attestation and its exact roster provenance. */
+/** Permanent on-chain snapshot attestation. */
 struct [[sysio::table("snaprecords"), sysio::contract("sysio.system")]] snap_record {
-   /// Finalized snapshot block height.
+   /// Attested snapshot block height.
    uint32_t    block_num;
-   /// Irreversible block identifier bound to the snapshot.
+   /// Exact irreversible block identifier.
    checksum256 block_id;
    /// Deterministic snapshot root hash.
    checksum256 snapshot_hash;
-   /// Chain block at which quorum finalized the record.
+   /// Chain block that created this record.
    uint32_t    attested_at_block;
-   /// Active-roster version that reached quorum.
-   uint64_t    roster_version;
-   /// Digest of the exact roster that reached quorum.
-   checksum256 roster_digest;
 
-   SYSLIB_SERIALIZE(snap_record,
-                    (block_num)(block_id)(snapshot_hash)(attested_at_block)(roster_version)(roster_digest))
+   SYSLIB_SERIALIZE(snap_record, (block_num)(block_id)(snapshot_hash)(attested_at_block))
 };
 
 using snap_records_table = sysio::kv::table<"snaprecords"_n, snap_record_key_t, snap_record>;
@@ -220,77 +133,54 @@ using snap_records_table = sysio::kv::table<"snaprecords"_n, snap_record_key_t, 
 // -------------------------------------------------------------------------------------------------
 struct [[sysio::contract("sysio.system")]] snapshot_attest : public sysio::contract {
 
+   /** Construct the snapshot-attestation sub-contract dispatcher. */
    snapshot_attest(name s, name code, sysio::datastream<const char*> ds)
       : sysio::contract(s, code, ds) {}
 
    /**
-    * Register a snapshot provider candidate delegated by a producer.
+    * Register a snapshot provider account delegated by a producer.
     *
-    * The producer must be active and have rank <= max_snap_provider_rank. A retained provider
-    * registration does not preserve eligibility: producer lifecycle changes remove ineligible
-    * candidates without mutating the stable active roster. At capacity, deterministic rank/name
-    * ordering retains only the best max_snap_roster_size candidates.
+    * The producer must be active and have rank <= max_snap_provider_rank. Stale registrations are
+    * removed at every producer-eligibility mutation site and rechecked before each vote.
     */
    [[sysio::action]]
    void regsnapprov(name producer, name snap_account);
 
    /**
-    * Unregister a snapshot-provider candidate. Can be called by the snap_account itself or looked
-    * up by producer via secondary index. Active roster membership remains unchanged until a later
-    * atomic roster activation.
+    * Unregister a snapshot provider. Can be called by the snap_account itself
+    * or looked up by producer via secondary index.
     */
    [[sysio::action]]
    void delsnapprov(name account);
 
    /**
-    * Submit a snapshot hash vote from a currently registered, eligible active-roster member.
+    * Submit a snapshot hash vote from a currently active, rank-eligible provider.
     *
-    * Votes aggregate per (roster_version, block_num, block_id, snapshot_hash). The first vote for a
-    * height may atomically activate a complete non-shrinking candidate roster. Retrying the same
-    * tuple is idempotent. Rejects with snap_hash_disagreement_error when an attested record already
-    * exists for the height and either the snapshot hash or the block id differs from it.
+    * Votes aggregate per (block_num, block_id, snapshot_hash). The numerator and denominator both
+    * use the same current registration set. A producer carries at most one pending vote across all
+    * heights, and retrying the same tuple is idempotent. Removing a registration prunes only that
+    * producer's pending weight; additions preserve pending votes. Any tuple made quorate by a
+    * removal is finalized synchronously. Rejects with snap_hash_disagreement_error when a final
+    * record at the height differs by block id or snapshot hash.
     */
    [[sysio::action]]
    void votesnaphash(name snap_account, checksum256 block_id, checksum256 snapshot_hash);
 
    /**
-    * Permissionlessly re-evaluate one exact pending tuple against its bound active roster version.
-    *
-    * The supplied tuple and version must exactly match vote_id. Exact obsolete rows are accepted as
-    * bounded cleanup work. The action adds no vote and is idempotent after a matching final record.
-    */
-   [[sysio::action]]
-   void evalsnapvote(uint64_t vote_id,
-                     checksum256 expected_block_id,
-                     checksum256 expected_snapshot_hash,
-                     uint64_t expected_roster_version);
-
-   /**
-    * Stage an exact governance-approved active-roster shrink for the next snapshot boundary.
-    *
-    * The proposal must target the current active version, contain fewer members than the current
-    * roster, remain at or above min_providers, and contain only currently eligible registrations.
-    */
-   [[sysio::action]]
-   void propsnaprost(std::vector<snap_roster_member> members, uint64_t expected_active_version);
-
-   /** Cancel the currently staged governance roster proposal. */
-   [[sysio::action]]
-   void cancsnaprost();
-
-   /**
     * Update snapshot attestation configuration. Requires contract authority.
     *
     * @param min_providers  minimum voters required to attest (must be >= 1).
-    * @param threshold_pct  percentage of active-roster members required (1..100).
+    * @param threshold_pct  percentage of currently registered providers required (1..100).
     *
-    * For N active-roster members the effective quorum is
+    * No attestation is permitted until this action stores a nonzero min_providers. For N current
+    * providers, N must be at least min_providers and the effective quorum is
     *     max( max(min_providers, ceil(N * threshold_pct / 100)), floor(N/3) + 1 )
     * The trailing floor(N/3)+1 is a Byzantine safety floor (see votesnaphash): an attestation
     * must always carry more than N/3 providers so a misconfigured-low threshold cannot let a
     * Byzantine minority attest an arbitrary snapshot. It is a no-op under the default
     * threshold_pct = 67 (ceil(0.67*N) >= floor(N/3)+1 for every N) and only raises the bar when
-    * threshold_pct is set below ~33%. A single-provider chain (N = 1) attests with one vote.
+    * threshold_pct is set below ~33%. Lowering the configured quorum immediately re-evaluates all
+    * bounded pending tuples against the new configuration.
     */
    [[sysio::action]]
    void setsnpcfg(uint32_t min_providers, uint32_t threshold_pct);
@@ -303,11 +193,10 @@ struct [[sysio::contract("sysio.system")]] snapshot_attest : public sysio::contr
 };
 
 /**
- * Reconcile the bounded snapshot-registration candidate pool after a producer lifecycle change.
+ * Remove registrations whose producers are no longer active or rank-eligible.
  *
- * This shared helper is called by snapshot-provider actions and every system-contract mutation of
- * producer activity or rank. It may remove ineligible registrations and refresh candidate state,
- * but it never mutates the stable active roster.
+ * Every producer lifecycle/rank mutation calls this helper. It removes each departed producer's
+ * pending weight and synchronously finalizes tuples that meet the smaller live-set quorum.
  */
 void reconcile_snapshot_registrations(name self);
 

@@ -2,6 +2,7 @@
 #include <array>
 #include <boost/program_options.hpp>
 #include <boost/test/unit_test.hpp>
+#include <iterator>
 #include <sysio/chain/abi_serializer.hpp>
 #include <sysio/chain/app.hpp>
 #include <sysio/chain/config.hpp>
@@ -28,8 +29,40 @@ constexpr auto config_dir_option_name = "--config-dir";
 constexpr auto data_dir_option_name = "--data-dir";
 constexpr auto snapshot_without_attestation_table_filename =
    "snapshot-without-attestation-table.bin";
-constexpr auto missing_attestation_table_error_fragment = "must declare the 'snaprecords' table";
+constexpr auto missing_attestation_table_error_fragment =
+   "must declare a compatible 'snaprecords' table schema";
+constexpr auto incompatible_index_type = "i128";
+constexpr auto incompatible_record_type = "other_record";
+constexpr auto loaded_block_seed = "loaded block";
+constexpr auto other_block_seed = "other block";
+constexpr auto loaded_snapshot_hash =
+   "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f";
+constexpr auto other_snapshot_hash =
+   "1f1e1d1c1b1a191817161514131211100f0e0d0c0b0a09080706050403020100";
+constexpr uint16_t incompatible_table_id = 0;
 constexpr uint32_t snapshot_source_block_count = 3;
+
+/** Build the exact snaprecords ABI fragment required before snapshot replay. */
+sysio::chain::abi_def make_snapshot_attestation_abi() {
+   sysio::chain::abi_def abi;
+   abi.tables.emplace_back(
+      snapshot_attest::table_snaprecords,
+      snapshot_attest::index_type_i64,
+      std::vector<sysio::chain::field_name>{snapshot_attest::field::block_num},
+      std::vector<sysio::chain::type_name>{snapshot_attest::abi_type::uint64},
+      snapshot_attest::type_snap_record,
+      sysio::snapshot_attestation_table_id());
+   abi.structs.emplace_back(
+      snapshot_attest::type_snap_record,
+      "",
+      std::vector<sysio::chain::field_def>{
+         {snapshot_attest::field::block_num, snapshot_attest::abi_type::uint32},
+         {snapshot_attest::field::block_id, snapshot_attest::abi_type::checksum256},
+         {snapshot_attest::field::snapshot_hash, snapshot_attest::abi_type::checksum256},
+         {snapshot_attest::field::attested_at_block, snapshot_attest::abi_type::uint32},
+      });
+   return abi;
+}
 
 /** Initialize chain_plugin with one snapshot response-size limit override. */
 sysio::chain::exit_code::exit_code initialize_with_snapshot_size_limit(std::string_view option_name,
@@ -82,17 +115,19 @@ BOOST_AUTO_TEST_CASE(chain_plugin_default_tests) {
 
 }
 
-/** Successful absence remains distinguishable from a terminal caught-up table-read failure. */
+/** Table-read failure retries through sync/grace before normal missing-record trust policy applies. */
 BOOST_AUTO_TEST_CASE(snapshot_attestation_table_read_failure_policy) {
    using status = sysio::snapshot_attestation_table_read_status;
    using action = sysio::snapshot_attestation_table_read_action;
 
-   BOOST_CHECK(sysio::classify_snapshot_attestation_table_read(status::success, true)
+   BOOST_CHECK(sysio::classify_snapshot_attestation_table_read(status::success, true, false)
                == action::inspect_result);
-   BOOST_CHECK(sysio::classify_snapshot_attestation_table_read(status::failure, false)
+   BOOST_CHECK(sysio::classify_snapshot_attestation_table_read(status::failure, false, false)
                == action::retry);
-   BOOST_CHECK(sysio::classify_snapshot_attestation_table_read(status::failure, true)
-               == action::halt);
+   BOOST_CHECK(sysio::classify_snapshot_attestation_table_read(status::failure, true, true)
+               == action::retry);
+   BOOST_CHECK(sysio::classify_snapshot_attestation_table_read(status::failure, true, false)
+               == action::apply_missing_record_policy);
 }
 
 /** Internal attestation reads retain a decoder budget when the operator ABI timeout is too small. */
@@ -110,6 +145,55 @@ BOOST_AUTO_TEST_CASE(snapshot_attestation_table_read_timeout_policy) {
                == sysio::snapshot_attestation_minimum_table_read_timeout);
    BOOST_CHECK(sysio::snapshot_attestation_table_read_timeout(above_minimum)
                == above_minimum);
+}
+
+/** Require the exact table keys and record fields needed by bootstrap verification. */
+BOOST_AUTO_TEST_CASE(snapshot_attestation_required_schema_policy) {
+   const auto valid_abi = make_snapshot_attestation_abi();
+   BOOST_REQUIRE(sysio::has_required_snapshot_attestation_schema(valid_abi));
+
+   auto wrong_index = valid_abi;
+   wrong_index.tables.front().index_type = incompatible_index_type;
+   BOOST_CHECK(!sysio::has_required_snapshot_attestation_schema(wrong_index));
+
+   auto wrong_table_id = valid_abi;
+   wrong_table_id.tables.front().table_id = incompatible_table_id;
+   BOOST_CHECK(!sysio::has_required_snapshot_attestation_schema(wrong_table_id));
+
+   auto wrong_key = valid_abi;
+   wrong_key.tables.front().key_types.front() = snapshot_attest::abi_type::uint32;
+   BOOST_CHECK(!sysio::has_required_snapshot_attestation_schema(wrong_key));
+
+   auto wrong_key_name = valid_abi;
+   wrong_key_name.tables.front().key_names.front() = snapshot_attest::field::block_id;
+   BOOST_CHECK(!sysio::has_required_snapshot_attestation_schema(wrong_key_name));
+
+   auto wrong_record_type = valid_abi;
+   wrong_record_type.tables.front().type = incompatible_record_type;
+   BOOST_CHECK(!sysio::has_required_snapshot_attestation_schema(wrong_record_type));
+
+   auto missing_field = valid_abi;
+   missing_field.structs.front().fields.pop_back();
+   BOOST_CHECK(!sysio::has_required_snapshot_attestation_schema(missing_field));
+
+   auto wrong_field_type = valid_abi;
+   wrong_field_type.structs.front().fields[1].type = snapshot_attest::abi_type::uint64;
+   BOOST_CHECK(!sysio::has_required_snapshot_attestation_schema(wrong_field_type));
+}
+
+/** Match both the loaded block id and root hash against the attested tuple. */
+BOOST_AUTO_TEST_CASE(snapshot_attestation_record_tuple_policy) {
+   const auto loaded_block_id = fc::sha256::hash(std::string{loaded_block_seed});
+   const auto other_block_id = fc::sha256::hash(std::string{other_block_seed});
+   const fc::crypto::blake3 loaded_hash(loaded_snapshot_hash);
+   const fc::crypto::blake3 other_hash(other_snapshot_hash);
+
+   BOOST_CHECK(sysio::snapshot_attestation_record_matches(
+      loaded_block_id, loaded_hash, loaded_block_id, loaded_hash.str()));
+   BOOST_CHECK(!sysio::snapshot_attestation_record_matches(
+      loaded_block_id, loaded_hash, other_block_id, loaded_hash.str()));
+   BOOST_CHECK(!sysio::snapshot_attestation_record_matches(
+      loaded_block_id, loaded_hash, loaded_block_id, other_hash.str()));
 }
 
 /** Reject a legacy snapshot even when retained blocks contain a later attestation ABI. */
@@ -143,12 +227,16 @@ BOOST_AUTO_TEST_CASE(chain_plugin_rejects_snapshot_without_attestation_table) {
    // Put a later ABI declaration in the retained block log. Validation after replay would see
    // this declaration and incorrectly accept the older snapshot, so startup must inspect the
    // snapshot state before replay begins.
-   BOOST_REQUIRE(!legacy_system_abi.tables.empty());
    auto current_system_abi = legacy_system_abi;
-   auto snapshot_attestation_table = current_system_abi.tables.front();
-   snapshot_attestation_table.name = snapshot_attest::table_snaprecords;
-   snapshot_attestation_table.table_id = 0;
-   current_system_abi.tables.emplace_back(std::move(snapshot_attestation_table));
+   auto snapshot_attestation_abi = make_snapshot_attestation_abi();
+   current_system_abi.tables.insert(
+      current_system_abi.tables.end(),
+      std::make_move_iterator(snapshot_attestation_abi.tables.begin()),
+      std::make_move_iterator(snapshot_attestation_abi.tables.end()));
+   current_system_abi.structs.insert(
+      current_system_abi.structs.end(),
+      std::make_move_iterator(snapshot_attestation_abi.structs.begin()),
+      std::make_move_iterator(snapshot_attestation_abi.structs.end()));
    source.set_abi(sysio::chain::config::system_account_name,
                   fc::json::to_string(current_system_abi, fc::time_point::maximum()));
    const auto abi_upgrade_block = source.produce_block()->block_num();

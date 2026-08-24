@@ -74,10 +74,11 @@ namespace snapshot_attest = sysio::protocol::snapshot_attestation;
 /// snapshot interval.
 constexpr uint32_t snapshot_attestation_grace_blocks = 12500;
 
-/// Fatal diagnostic when a caught-up node cannot authoritatively read snapshot attestation state.
+/// Fatal diagnostic when an auto-fetched snapshot remains unverifiable after the grace window.
 constexpr auto snapshot_attestation_table_read_failure_log =
-   "FATAL: Could not read the on-chain snapshot attestation for block #{} after reaching the "
-   "live chain tip. The node has been stopped rather than continuing with an unverified snapshot.";
+   "FATAL: Could not read the on-chain snapshot attestation for block #{} after syncing {} blocks "
+   "past it. Auto-fetched snapshots require on-chain attestation for security. The node has been "
+   "stopped rather than continuing with an unverified snapshot.";
 
 /// Startup diagnostic when a loaded snapshot omits the required system account.
 constexpr auto snapshot_attestation_missing_system_account_message =
@@ -87,9 +88,9 @@ constexpr auto snapshot_attestation_missing_system_account_message =
 constexpr auto snapshot_attestation_invalid_system_abi_message =
    "The '{}' system account in the snapshot has an invalid ABI";
 
-/// Startup diagnostic when a loaded snapshot predates the required attestation interface.
-constexpr auto snapshot_attestation_missing_table_message =
-   "The '{}' system account in the snapshot must declare the '{}' table";
+/// Startup diagnostic when a loaded snapshot lacks the exact attestation record schema.
+constexpr auto snapshot_attestation_incompatible_table_message =
+   "The '{}' system account in the snapshot must declare a compatible '{}' table schema";
 
 constexpr uint64_t bytes_per_mebibyte = 1024 * 1024;
 
@@ -315,6 +316,38 @@ using fc::flat_map;
 
 using boost::signals2::scoped_connection;
 
+bool has_required_snapshot_attestation_schema(const abi_def& abi) {
+   const auto table = std::ranges::find(abi.tables, snapshot_attest::table_snaprecords,
+                                        &table_def::name);
+   if (table == abi.tables.end()
+       || table->type != snapshot_attest::type_snap_record
+       || table->index_type != snapshot_attest::index_type_i64
+       || table->table_id != snapshot_attestation_table_id()
+       || table->key_names != std::vector<field_name>{snapshot_attest::field::block_num}
+       || table->key_types != std::vector<type_name>{snapshot_attest::abi_type::uint64}) {
+      return false;
+   }
+
+   const auto record = std::ranges::find(abi.structs, snapshot_attest::type_snap_record,
+                                         &struct_def::name);
+   const std::vector<field_def> expected_fields = {
+      {snapshot_attest::field::block_num, snapshot_attest::abi_type::uint32},
+      {snapshot_attest::field::block_id, snapshot_attest::abi_type::checksum256},
+      {snapshot_attest::field::snapshot_hash, snapshot_attest::abi_type::checksum256},
+      {snapshot_attest::field::attested_at_block, snapshot_attest::abi_type::uint32},
+   };
+   return record != abi.structs.end() && record->base.empty() && record->fields == expected_fields;
+}
+
+bool snapshot_attestation_record_matches(
+   const block_id_type& loaded_block_id,
+   const fc::crypto::blake3& loaded_snapshot_hash,
+   const block_id_type& attested_block_id,
+   std::string_view attested_snapshot_hash) {
+   return loaded_block_id == attested_block_id
+          && loaded_snapshot_hash.str() == attested_snapshot_hash;
+}
+
 class chain_plugin_impl {
 public:
    chain_plugin_impl()
@@ -345,6 +378,7 @@ public:
    // Snapshot attestation verification: set when starting from a snapshot,
    // checked once after syncing past the snapshot block.
    std::optional<uint32_t>    snapshot_loaded_block_num;
+   block_id_type              snapshot_loaded_block_id;
    fc::crypto::blake3         snapshot_loaded_root_hash;
    bool                       snapshot_auto_fetched = false; // true when loaded via --snapshot-endpoint
 
@@ -1462,10 +1496,8 @@ void chain_plugin_impl::require_snapshot_attestation_table() const {
               snapshot_attestation_invalid_system_abi_message,
               config::system_account_name);
 
-   const auto table = std::ranges::find(system_abi.tables, snapshot_attest::table_snaprecords,
-                                        &table_def::name);
-   SYS_ASSERT(table != system_abi.tables.end(), plugin_config_exception,
-              snapshot_attestation_missing_table_message,
+   SYS_ASSERT(has_required_snapshot_attestation_schema(system_abi), plugin_config_exception,
+              snapshot_attestation_incompatible_table_message,
               config::system_account_name, snapshot_attest::table_snaprecords);
 }
 
@@ -1482,6 +1514,7 @@ void chain_plugin_impl::plugin_startup()
          chain->startup(shutdown, check_shutdown, snapshot_reader, [this, snapshot_reader]() {
             require_snapshot_attestation_table();
             snapshot_loaded_block_num = chain->head().block_num();
+            snapshot_loaded_block_id = chain->head().id();
             snapshot_loaded_root_hash = snapshot_reader->get_root_hash();
             ilog("Snapshot loaded at block #{} with root hash {}, will verify attestation after sync",
                  *snapshot_loaded_block_num, snapshot_loaded_root_hash.str());
@@ -1836,9 +1869,13 @@ void chain_plugin_impl::verify_snapshot_attestation(const signed_block_ptr& lib_
    const auto caught_up_tolerance = fc::seconds(30);
    const bool caught_up =
       fc::time_point::now() - lib_block->timestamp.to_time_point() < caught_up_tolerance;
+   const bool within_grace =
+      static_cast<uint64_t>(lib_block->block_num())
+      < static_cast<uint64_t>(snap_block_num) + snapshot_attestation_grace_blocks;
 
    try {
-      bool        have_record = false;
+      bool        have_record       = false;
+      bool        table_read_failed = false;
       fc::variant record_row;
       // Read the attested record from the system contract's `snaprecords` table through the
       // supported read path, which performs ABI decoding and abstracts the table store. The
@@ -1871,27 +1908,27 @@ void chain_plugin_impl::verify_snapshot_attestation(const signed_block_ptr& lib_
       switch (classify_snapshot_attestation_table_read(
          read_result ? snapshot_attestation_table_read_status::success
                      : snapshot_attestation_table_read_status::failure,
-         caught_up)) {
+         caught_up, within_grace)) {
          case snapshot_attestation_table_read_action::retry:
             return;
-         case snapshot_attestation_table_read_action::halt:
-            snapshot_loaded_block_num.reset();
-            elog(snapshot_attestation_table_read_failure_log, snap_block_num);
-            app().quit();
-            return;
+         case snapshot_attestation_table_read_action::apply_missing_record_policy:
+            table_read_failed = true;
+            break;
          case snapshot_attestation_table_read_action::inspect_result:
             break;
       }
-      const auto& rows = read_result->rows;
 
-      if (!rows.empty() && rows[0].is_object() &&
-          rows[0].get_object()[snapshot_attest::field::block_num].as_uint64() == snap_block_num) {
-         if (rows[0].get_object()[snapshot_attest::field::attested_at_block].as_uint64()
-             > lib_block->block_num()) {
-            return;
+      if (read_result) {
+         const auto& rows = read_result->rows;
+         if (!rows.empty() && rows[0].is_object()
+             && rows[0].get_object()[snapshot_attest::field::block_num].as_uint64() == snap_block_num) {
+            if (rows[0].get_object()[snapshot_attest::field::attested_at_block].as_uint64()
+                > lib_block->block_num()) {
+               return;
+            }
+            have_record = true;
+            record_row  = rows[0];
          }
-         have_record = true;
-         record_row  = rows[0];
       }
 
       if (!have_record) {
@@ -1909,7 +1946,7 @@ void chain_plugin_impl::verify_snapshot_attestation(const signed_block_ptr& lib_
          // still be in flight (see snapshot_attestation_grace_blocks). Keep verification pending
          // for a deterministic window of finalized blocks past the snapshot height before
          // concluding the height was never attested.
-         if (lib_block->block_num() < snap_block_num + snapshot_attestation_grace_blocks)
+         if (within_grace)
             return; // retry on the next finalized block while the attestation can still arrive
 
          snapshot_loaded_block_num.reset();
@@ -1917,41 +1954,60 @@ void chain_plugin_impl::verify_snapshot_attestation(const signed_block_ptr& lib_
             // A snapshot fetched via --snapshot-endpoint came from an untrusted remote provider;
             // without an on-chain attestation there is nothing tying its content to the chain,
             // so refusing to run is the only safe outcome.
-            elog("FATAL: No attested snapshot record found for block #{} after syncing {} blocks past it. "
-                 "Auto-fetched snapshots require on-chain attestation for security. "
-                 "The node has been stopped. It is highly recommended that you delete this chain state "
-                 "and acquire a snapshot from a trusted source before restarting.",
-                 snap_block_num, lib_block->block_num() - snap_block_num);
+            if (table_read_failed) {
+               elog(snapshot_attestation_table_read_failure_log,
+                    snap_block_num, lib_block->block_num() - snap_block_num);
+            } else {
+               elog("FATAL: No attested snapshot record found for block #{} after syncing {} blocks past it. "
+                    "Auto-fetched snapshots require on-chain attestation for security. "
+                    "The node has been stopped. It is highly recommended that you delete this chain state "
+                    "and acquire a snapshot from a trusted source before restarting.",
+                    snap_block_num, lib_block->block_num() - snap_block_num);
+            }
             app().quit();
             return;
          }
-         wlog("No attested snapshot record found for block #{} after syncing to the chain tip and "
-              "waiting {} blocks past the snapshot height. Skipping snapshot verification. "
-              "Only snapshots taken at attested block heights can be verified.",
-              snap_block_num, lib_block->block_num() - snap_block_num);
+         if (table_read_failed) {
+            wlog("Could not read the on-chain snapshot attestation for block #{} after syncing to "
+                 "the chain tip and waiting {} blocks past the snapshot height. Skipping verification "
+                 "for this manually supplied snapshot.",
+                 snap_block_num, lib_block->block_num() - snap_block_num);
+         } else {
+            wlog("No attested snapshot record found for block #{} after syncing to the chain tip and "
+                 "waiting {} blocks past the snapshot height. Skipping snapshot verification. "
+                 "Only snapshots taken at attested block heights can be verified.",
+                 snap_block_num, lib_block->block_num() - snap_block_num);
+         }
          return;
       }
 
       // The record is present -- this attempt is terminal regardless of the outcome below.
       snapshot_loaded_block_num.reset();
 
-      // snap_record.snapshot_hash is a checksum256; with json=true the ABI serializer renders
-      // it as lowercase hex, the same form fc::crypto::blake3::str() produces.
-      const auto on_chain_hash = record_row.get_object()[snapshot_attest::field::snapshot_hash].as_string();
-      if (on_chain_hash != snapshot_loaded_root_hash.str()) {
-         elog("FATAL: Snapshot hash mismatch for block #{}! "
-              "On-chain attested hash: {}, loaded snapshot hash: {}. "
+      // Both tuple components are immutable. Matching only the height and root hash would accept
+      // a record attested for a competing same-height block id.
+      const auto& record = record_row.get_object();
+      const auto attested_block_id = record[snapshot_attest::field::block_id].as<block_id_type>();
+      const auto attested_snapshot_hash =
+         record[snapshot_attest::field::snapshot_hash].as_string();
+      if (!snapshot_attestation_record_matches(
+             snapshot_loaded_block_id, snapshot_loaded_root_hash,
+             attested_block_id, attested_snapshot_hash)) {
+         elog("FATAL: Snapshot attestation mismatch for block #{}! "
+              "On-chain block id/hash: {}/{}, loaded block id/hash: {}/{}. "
               "This snapshot does NOT match the on-chain attestation and MUST NOT be trusted - "
               "it may be corrupted or tampered with. The node has been stopped. "
               "It is highly recommended that you delete this chain state and acquire a new "
               "snapshot from a trusted source before restarting.",
-              snap_block_num, on_chain_hash, snapshot_loaded_root_hash.str());
+              snap_block_num, attested_block_id, attested_snapshot_hash,
+              snapshot_loaded_block_id, snapshot_loaded_root_hash.str());
          app().quit();
          return;
       }
 
-      ilog("Snapshot attestation verified successfully for block #{}: hash {} matches on-chain record",
-           snap_block_num, snapshot_loaded_root_hash.str());
+      ilog("Snapshot attestation verified successfully for block #{}: block id {} and hash {} "
+           "match the on-chain record",
+           snap_block_num, snapshot_loaded_block_id, snapshot_loaded_root_hash.str());
 
    } catch (const fc::exception& e) {
       snapshot_loaded_block_num.reset();

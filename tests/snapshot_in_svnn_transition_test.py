@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+"""Verify snapshot restart behavior and the required attestation ABI during Savanna transition."""
+
 import json
 import signal
 import tempfile

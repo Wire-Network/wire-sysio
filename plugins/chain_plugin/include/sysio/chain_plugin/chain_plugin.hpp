@@ -20,6 +20,7 @@
 #include <sysio/chain/plugin_interface.hpp>
 #include <sysio/chain/types.hpp>
 #include <sysio/chain/fixed_bytes.hpp>
+#include <sysio/protocol/snapshot_attestation.hpp>
 
 #include <boost/container/flat_set.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
@@ -72,21 +73,23 @@ namespace sysio {
    enum class snapshot_attestation_table_read_action {
       /// Inspect the successful result and apply record/absence policy.
       inspect_result,
-      /// The node is still syncing, so retry the failed scan on a later irreversible block.
+      /// Retry the failed scan on a later irreversible block.
       retry,
-      /// The node is caught up and must fail closed instead of running unverified indefinitely.
-      halt,
+      /// Grace expired at the live tip, so apply the normal missing-record trust policy.
+      apply_missing_record_policy,
    };
 
-   /** Classify a snaprecords scan without conflating successful absence with read failure. */
+   /** Classify a snaprecords scan without making one transient live-tip failure terminal. */
    constexpr snapshot_attestation_table_read_action classify_snapshot_attestation_table_read(
       snapshot_attestation_table_read_status status,
-      bool caught_up) {
+      bool caught_up,
+      bool within_grace) {
       if (status == snapshot_attestation_table_read_status::success) {
          return snapshot_attestation_table_read_action::inspect_result;
       }
-      return caught_up ? snapshot_attestation_table_read_action::halt
-                       : snapshot_attestation_table_read_action::retry;
+      return caught_up && !within_grace
+                ? snapshot_attestation_table_read_action::apply_missing_record_policy
+                : snapshot_attestation_table_read_action::retry;
    }
 
    /// Minimum decoder budget for safety-critical snapshot-attestation table reads.
@@ -100,6 +103,22 @@ namespace sysio {
                 ? snapshot_attestation_minimum_table_read_timeout
                 : configured_timeout;
    }
+
+   /** Return whether an ABI declares the exact final snapshot-attestation table schema. */
+   bool has_required_snapshot_attestation_schema(const abi_def& abi);
+
+   /** Return the canonical physical KV table identifier for final snapshot attestations. */
+   inline uint16_t snapshot_attestation_table_id() {
+      return chain::compute_table_id(
+         chain::name{protocol::snapshot_attestation::table_snaprecords}.to_uint64_t());
+   }
+
+   /** Compare both immutable tuple components loaded from a snapshot with an attested record. */
+   bool snapshot_attestation_record_matches(
+      const chain::block_id_type& loaded_block_id,
+      const fc::crypto::blake3& loaded_snapshot_hash,
+      const chain::block_id_type& attested_block_id,
+      std::string_view attested_snapshot_hash);
 
    inline auto make_resolver(const controller& control, fc::microseconds abi_serializer_max_time, throw_on_yield yield_throw ) {
       return [&control, abi_serializer_max_time, yield_throw](const account_name& name) -> std::optional<abi_serializer> {

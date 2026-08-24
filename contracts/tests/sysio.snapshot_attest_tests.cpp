@@ -6,15 +6,11 @@
 #include <sysio/chain/exceptions.hpp>
 #include <sysio/chain/resource_limits.hpp>
 #include <sysio/testing/tester.hpp>
-#include <sysio/protocol/snapshot_attestation.hpp>
 
 #include <fc/exception/exception.hpp>
 #include <fc/variant_object.hpp>
 
 #include "sysio.system_tester.hpp"
-
-#include <map>
-#include <optional>
 
 using namespace sysio_system;
 
@@ -55,14 +51,14 @@ public:
       produce_blocks();
    }
 
-   /// Register a snapshot-provider candidate.
+   /// Register a snapshot provider.
    action_result regsnapprov(name producer, name snap_account) {
       return push_action(producer, "regsnapprov"_n, mvo()
          ("producer", producer)
          ("snap_account", snap_account));
    }
 
-   /// Unregister a snapshot-provider candidate.
+   /// Unregister a snapshot provider.
    action_result delsnapprov(name account) {
       return push_action(account, "delsnapprov"_n, mvo()
          ("account", account));
@@ -74,6 +70,25 @@ public:
          ("producer", producer));
    }
 
+   /// Publish a producer-key schedule through the rank-assignment action path.
+   action_result set_producer_schedule(const std::vector<name>& producers) {
+      std::vector<fc::variant> schedule;
+      schedule.reserve(producers.size());
+      for (const auto producer : producers) {
+         schedule.push_back(mvo()
+            ("producer_name", producer)
+            ("block_signing_key", get_public_key(producer, "active")));
+      }
+      return push_action(config::system_account_name, "setprodkeys"_n, mvo()
+         ("schedule", schedule));
+   }
+
+   /// Remove a producer through the governance-authorized lifecycle action.
+   action_result remove_producer(name producer) {
+      return push_action(config::system_account_name, "rmvproducer"_n, mvo()
+         ("producer", producer));
+   }
+
    /// Vote on a snapshot hash.
    action_result votesnaphash(name snap_account, const fc::sha256& block_id, const fc::sha256& snapshot_hash) {
       return push_action(snap_account, "votesnaphash"_n, mvo()
@@ -82,27 +97,7 @@ public:
          ("snapshot_hash", snapshot_hash));
    }
 
-   /// Permissionlessly re-evaluate an exact pending snapshot tuple.
-   action_result evalsnapvote(uint64_t vote_id,
-                              const fc::sha256& block_id,
-                              const fc::sha256& snapshot_hash,
-                              uint64_t roster_version,
-                              name caller = config::system_account_name) {
-      return push_action(caller, "evalsnapvote"_n, mvo()
-         ("vote_id", vote_id)
-         ("expected_block_id", block_id)
-         ("expected_snapshot_hash", snapshot_hash)
-         ("expected_roster_version", roster_version));
-   }
-
-   /// Stage an exact governance roster proposal.
-   action_result propsnaprost(const fc::variants& members, uint64_t expected_active_version) {
-      return push_action(config::system_account_name, "propsnaprost"_n, mvo()
-         ("members", members)
-         ("expected_active_version", expected_active_version));
-   }
-
-   /// Set snapshot configuration.
+   /// Set snapshot attestation configuration.
    action_result setsnpcfg(uint32_t min_providers, uint32_t threshold_pct) {
       return push_action(config::system_account_name, "setsnpcfg"_n, mvo()
          ("min_providers", min_providers)
@@ -111,7 +106,6 @@ public:
 
    /// Return an attested snapshot record from the contract table.
    fc::variant getsnaphash(uint32_t block_num) {
-      block_num = resolve_snapshot_block_num(block_num);
       vector<char> data = get_row_by_account(
          config::system_account_name, config::system_account_name,
          "snaprecords"_n, name(block_num));
@@ -119,64 +113,40 @@ public:
          "snap_record", data, abi_serializer::create_yield_function(abi_serializer_max_time));
    }
 
-   /// Return a snapshot registration candidate.
+   /// Return a registered snapshot provider from the contract table.
    fc::variant get_snap_provider(name snap_account) {
       vector<char> data = get_row_by_account(
          config::system_account_name, config::system_account_name,
-         "snapregs"_n, snap_account);
+         "snapprovs"_n, snap_account);
       return data.empty() ? fc::variant() : abi_ser.binary_to_variant(
-         "snap_registration", data, abi_serializer::create_yield_function(abi_serializer_max_time));
+         "snap_provider", data, abi_serializer::create_yield_function(abi_serializer_max_time));
    }
 
-   /// Return an active snapshot-roster member.
-   fc::variant get_snap_roster_member(name snap_account) {
-      vector<char> data = get_row_by_account(
-         config::system_account_name, config::system_account_name,
-         "snaproster"_n, snap_account);
-      return data.empty() ? fc::variant() : abi_ser.binary_to_variant(
-         "snap_roster_member", data, abi_serializer::create_yield_function(abi_serializer_max_time));
-   }
-
-   /// Return the snapshot-roster singleton state.
-   fc::variant get_snap_roster_state() {
-      vector<char> data = get_row_by_account(
-         config::system_account_name, config::system_account_name,
-         "snaprstate"_n, "snaprstate"_n);
-      return data.empty() ? fc::variant() : abi_ser.binary_to_variant(
-         "snap_roster_state", data, abi_serializer::create_yield_function(abi_serializer_max_time));
-   }
-
-   /// Return one pending snapshot vote by primary id.
-   fc::variant get_snap_vote(uint64_t vote_id) {
-      vector<char> data = get_row_by_account(
-         config::system_account_name, config::system_account_name,
-         "snapvotes"_n, name(vote_id));
-      return data.empty() ? fc::variant() : abi_ser.binary_to_variant(
-         "snap_vote", data, abi_serializer::create_yield_function(abi_serializer_max_time));
-   }
-
-   /** Return the actual past height assigned to a human-readable test label. */
-   uint32_t resolve_snapshot_block_num(uint32_t block_num) const {
-      const auto itr = logical_snapshot_blocks.find(block_num);
-      return itr == logical_snapshot_blocks.end() ? block_num : itr->second;
-   }
-
-   /// Make a fake block id with a valid past block number embedded in big-endian.
-   // `fork` differentiates block ids that share the same height, emulating blocks
-   // from competing forks (same first-4-byte height prefix, different remainder).
-   fc::sha256 make_block_id(uint32_t block_num, uint8_t fork = 0) {
-      auto [itr, inserted] = logical_snapshot_blocks.emplace(block_num, next_snapshot_block_num);
-      if (inserted) {
-         if (next_snapshot_block_num > control->head().block_num()) {
-            produce_blocks(snapshot_block_allocation_batch);
+   /// Count pending snapshot tuple rows across the bounded live committee.
+   uint32_t snapshot_vote_count() {
+      constexpr uint64_t maximum_vote_rows = 64;
+      uint32_t           count             = 0;
+      for (uint64_t id = 0; id < maximum_vote_rows; ++id) {
+         const auto data = get_row_by_account(
+            config::system_account_name, config::system_account_name, "snapvotes"_n, name{id});
+         if (!data.empty()) {
+            ++count;
          }
-         itr->second = next_snapshot_block_num++;
       }
-      return make_raw_block_id(itr->second, fork);
+      return count;
    }
 
-   /// Make a fake block id with an exact block number embedded in big-endian.
-   static fc::sha256 make_raw_block_id(uint32_t block_num, uint8_t fork = 0) {
+   /// Return a final block height at or before the current head for synthetic vote tuples.
+   uint32_t vote_block_num(uint32_t blocks_before_head = 0) const {
+      return control->head().block_num() - blocks_before_head;
+   }
+
+   /**
+    * Make a synthetic block id with a specific block number embedded in big-endian form.
+    *
+    * `fork` differentiates ids at the same height to emulate competing forks.
+    */
+   static fc::sha256 make_block_id(uint32_t block_num, uint8_t fork = 0) {
       fc::sha256 id;
       memset(id.data(), 0, id.data_size());
       auto* data = id.data();
@@ -189,7 +159,7 @@ public:
       return id;
    }
 
-   /// Make a fake snapshot hash.
+   /// Make a synthetic snapshot hash.
    static fc::sha256 make_snap_hash(uint32_t seed) {
       fc::sha256 hash;
       memset(hash.data(), 0, hash.data_size());
@@ -201,14 +171,6 @@ public:
       data[31] = static_cast<char>(seed & 0xFF);
       return hash;
    }
-
-private:
-   /// Number of blocks produced when more distinct past-height labels are needed.
-   static constexpr uint32_t snapshot_block_allocation_batch = 64;
-   /// Next valid past height allocated to a new logical test label.
-   uint32_t next_snapshot_block_num = 1;
-   /// Stable mapping from readable test labels to valid past block heights.
-   std::map<uint32_t, uint32_t> logical_snapshot_blocks;
 };
 
 // ===========================================================================
@@ -269,27 +231,19 @@ BOOST_FIXTURE_TEST_CASE(regsnapprov_rejects_provider_beyond_maximum, snapshot_at
       BOOST_REQUIRE_EQUAL(success(), regsnapprov(capacity_producers[index], capacity_producers[index]));
    }
 
-   BOOST_REQUIRE_EQUAL(wasm_assert_msg(
-                           "snapshot provider candidate does not rank within the maximum roster size"),
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("maximum registered snapshot providers reached"),
                         regsnapprov(capacity_producers.back(), capacity_producers.back()));
-
-   // A later rank improvement deterministically displaces the current worst candidate instead of
-   // leaving the registration pool permanently first-come-first-served.
-   BOOST_REQUIRE_EQUAL(success(), setrank(capacity_producers.back(), 1));
-   BOOST_REQUIRE_EQUAL(success(), regsnapprov(capacity_producers.back(), capacity_producers.back()));
-   BOOST_REQUIRE(!get_snap_provider(capacity_producers.back()).is_null());
-   BOOST_REQUIRE(get_snap_provider(capacity_producers[additional_providers_to_fill_cap - 1]).is_null());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(regsnapprov_duplicate_rejected, snapshot_attest_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
 
    // Same snap_account should fail
-   BOOST_REQUIRE_EQUAL(wasm_assert_msg("snap_account is already registered as a provider candidate"),
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("snap_account is already registered as a provider"),
                         regsnapprov("producer1"_n, "snapprov1"_n));
 
    // Same producer different snap_account should fail
-   BOOST_REQUIRE_EQUAL(wasm_assert_msg("producer already has a registered snapshot provider candidate"),
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("producer already has a registered snapshot provider"),
                         regsnapprov("producer1"_n, "snapprov2"_n));
 } FC_LOG_AND_RETHROW() }
 
@@ -346,7 +300,7 @@ BOOST_FIXTURE_TEST_CASE(delsnapprov_by_producer, snapshot_attest_tester) { try {
 
 BOOST_FIXTURE_TEST_CASE(delsnapprov_not_found, snapshot_attest_tester) { try {
    BOOST_REQUIRE_EQUAL(
-      wasm_assert_msg("account is not registered as a snapshot provider candidate or producer"),
+      wasm_assert_msg("account is not registered as a snapshot provider or producer"),
       delsnapprov("snapprov1"_n));
 } FC_LOG_AND_RETHROW() }
 
@@ -370,11 +324,11 @@ BOOST_FIXTURE_TEST_CASE(setsnpcfg_validation, snapshot_attest_tester) { try {
                         setsnpcfg(1, 101));
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("min_providers must be at least 1"),
                         setsnpcfg(0, 67));
-   // min_providers cannot exceed the active-roster ceiling (max_snap_roster_size == 30):
-   // above it, quorum is unreachable no matter how many candidates register.
+   // min_providers cannot exceed the provider-table ceiling (max_snap_provider_rank
+   // == 30): above it, quorum is unreachable no matter how many providers register.
    // The boundary value is accepted; one past it is rejected.
    BOOST_REQUIRE_EQUAL(success(), setsnpcfg(30, 80));
-   BOOST_REQUIRE_EQUAL(wasm_assert_msg("min_providers exceeds the maximum snapshot roster size"),
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("min_providers exceeds the maximum registrable providers"),
                         setsnpcfg(31, 80));
 } FC_LOG_AND_RETHROW() }
 
@@ -382,133 +336,176 @@ BOOST_FIXTURE_TEST_CASE(setsnpcfg_validation, snapshot_attest_tester) { try {
 // votesnaphash tests
 // ---------------------------------------------------------------------------
 BOOST_FIXTURE_TEST_CASE(votesnaphash_unregistered, snapshot_attest_tester) { try {
-   auto bid = make_block_id(1000);
+   auto bid = make_block_id(vote_block_num());
    auto shash = make_snap_hash(1);
-   BOOST_REQUIRE_EQUAL(wasm_assert_msg("snap_account is not a registered snapshot provider candidate"),
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("snap_account is not a registered snapshot provider"),
                         votesnaphash("snapprov1"_n, bid, shash));
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(votesnaphash_rejects_future_height_preseed_before_roster_shrink,
-                        snapshot_attest_tester) { try {
-   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
-   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
-   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer3"_n, "snapprov3"_n));
-   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2, 100));
-   BOOST_REQUIRE_EQUAL(success(), votesnaphash(
-      "snapprov1"_n, make_block_id(8900), make_snap_hash(89)));
-
-   constexpr uint32_t future_distance = 3;
-   const uint32_t future_block_num = control->head().block_num() + future_distance;
-   const auto future_block_id = make_raw_block_id(future_block_num);
-   const auto future_hash = make_snap_hash(90);
-   BOOST_REQUIRE_EQUAL(wasm_assert_msg("snapshot block cannot be in the future"),
-                       votesnaphash("snapprov3"_n, future_block_id, future_hash));
-   BOOST_REQUIRE(get_snap_vote(1).is_null());
-
-   const fc::variants members = {
-      mvo()("snap_account", "snapprov1")("producer", "producer1"),
-      mvo()("snap_account", "snapprov2")("producer", "producer2"),
-   };
-   BOOST_REQUIRE_EQUAL(success(), propsnaprost(members, 1));
-   produce_blocks(future_distance);
-
-   // The rejected pre-seed left this boundary open, so the included member activates the shrink
-   // when the scheduled height actually becomes current/past.
-   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, future_block_id, future_hash));
-   BOOST_REQUIRE_EQUAL(2u, get_snap_roster_state()["active_version"].as_uint64());
-} FC_LOG_AND_RETHROW() }
-
-// CertiK WNS-17 / WIRE-350: unregprod retains the producer row but automatically removes its
-// candidate registration without changing an already-active roster.
+/// CertiK WNS-17 / WIRE-350: unregprod removes the provider mapping with voting authority.
 BOOST_FIXTURE_TEST_CASE(votesnaphash_rejects_provider_after_producer_unregistered, snapshot_attest_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
    BOOST_REQUIRE_EQUAL(success(), unregproducer("producer1"_n));
 
-   const auto bid = make_block_id(9000);
+   const auto block_num = vote_block_num();
+   const auto bid = make_block_id(block_num);
    const auto hash = make_snap_hash(9);
-   BOOST_REQUIRE_EQUAL(wasm_assert_msg(
-                           "snap_account is not a registered snapshot provider candidate"),
-                        votesnaphash("snapprov1"_n, bid, hash));
    BOOST_REQUIRE(get_snap_provider("snapprov1"_n).is_null());
-   BOOST_REQUIRE(getsnaphash(9000).is_null());
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("snap_account is not a registered snapshot provider"),
+                        votesnaphash("snapprov1"_n, bid, hash));
+   BOOST_REQUIRE(getsnaphash(block_num).is_null());
 } FC_LOG_AND_RETHROW() }
 
+/// A rank demotion removes the provider mapping at the rank-mutation hook.
 BOOST_FIXTURE_TEST_CASE(votesnaphash_rejects_provider_after_producer_rank_demotion, snapshot_attest_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
    BOOST_REQUIRE_EQUAL(success(), setrank("producer1"_n, 31));
 
-   const auto bid = make_block_id(9001);
+   const auto block_num = vote_block_num();
+   const auto bid = make_block_id(block_num);
    const auto hash = make_snap_hash(10);
-   BOOST_REQUIRE_EQUAL(wasm_assert_msg(
-                           "snap_account is not a registered snapshot provider candidate"),
-                        votesnaphash("snapprov1"_n, bid, hash));
    BOOST_REQUIRE(get_snap_provider("snapprov1"_n).is_null());
-   BOOST_REQUIRE(getsnaphash(9001).is_null());
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("snap_account is not a registered snapshot provider"),
+                        votesnaphash("snapprov1"_n, bid, hash));
+   BOOST_REQUIRE(getsnaphash(block_num).is_null());
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(votesnaphash_excludes_inactive_providers_from_quorum, snapshot_attest_tester) { try {
+/// Automatic schedule churn reconciles mappings after assign_producer_ranks demotes a producer.
+BOOST_FIXTURE_TEST_CASE(votesnaphash_reconciles_assigned_schedule_rank_demotion, snapshot_attest_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), setrank("producer3"_n, 10));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer3"_n, "snapprov3"_n));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2, 67));
+
+   const auto block_num = vote_block_num();
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash(
+      "snapprov3"_n, make_block_id(block_num), make_snap_hash(110)));
+   BOOST_REQUIRE_EQUAL(1u, snapshot_vote_count());
+
+   // Excluding rank-10 producer3 adds max_producers (21), making its rank 31.
+   BOOST_REQUIRE_EQUAL(success(), set_producer_schedule({"producer1"_n, "producer2"_n}));
+   BOOST_REQUIRE(get_snap_provider("snapprov3"_n).is_null());
+   BOOST_REQUIRE_EQUAL(0u, snapshot_vote_count());
+} FC_LOG_AND_RETHROW() }
+
+/// Governance producer removal reconciles the delegated mapping and its pending vote.
+BOOST_FIXTURE_TEST_CASE(votesnaphash_reconciles_governance_producer_removal, snapshot_attest_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2, 67));
+
+   const auto block_num = vote_block_num();
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash(
+      "snapprov2"_n, make_block_id(block_num), make_snap_hash(111)));
+   BOOST_REQUIRE_EQUAL(1u, snapshot_vote_count());
+
+   BOOST_REQUIRE_EQUAL(success(), remove_producer("producer2"_n));
+   BOOST_REQUIRE(get_snap_provider("snapprov2"_n).is_null());
+   BOOST_REQUIRE_EQUAL(0u, snapshot_vote_count());
+} FC_LOG_AND_RETHROW() }
+
+/// Quorum numerator and denominator both use the remaining live registration set.
+BOOST_FIXTURE_TEST_CASE(votesnaphash_uses_live_provider_set_after_unregistration, snapshot_attest_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer3"_n, "snapprov3"_n));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2, 50));
+   BOOST_REQUIRE_EQUAL(success(), unregproducer("producer3"_n));
+
+   const auto block_num = vote_block_num();
+   const auto bid = make_block_id(block_num);
+   const auto hash = make_snap_hash(11);
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, bid, hash));
+   BOOST_REQUIRE(getsnaphash(block_num).is_null());
+
+   // The two remaining mappings supply both the denominator and the two-vote configuration floor.
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, bid, hash));
+   BOOST_REQUIRE(!getsnaphash(block_num).is_null());
+} FC_LOG_AND_RETHROW() }
+
+/// Rank reconciliation preserves the explicit security floor while shrinking the live denominator.
+BOOST_FIXTURE_TEST_CASE(votesnaphash_uses_live_provider_set_after_rank_demotion, snapshot_attest_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer3"_n, "snapprov3"_n));
    BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2, 50));
 
-   const auto bid = make_block_id(9002);
-   const auto hash = make_snap_hash(11);
-   // The first vote atomically bootstraps the three-member active roster.
-   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, bid, hash));
-   BOOST_REQUIRE(getsnaphash(9002).is_null());
-   BOOST_REQUIRE_EQUAL(success(), unregproducer("producer3"_n));
+   BOOST_REQUIRE_EQUAL(success(), setrank("producer3"_n, 31));
 
-   // Candidate cleanup removes producer3's registration, but the active denominator remains three.
-   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, bid, hash));
-   BOOST_REQUIRE(!getsnaphash(9002).is_null());
-} FC_LOG_AND_RETHROW() }
-
-// CertiK WNS-17 / WIRE-350: rank churn may clean the candidate pool but must not shrink the
-// already-active roster or lower its irreversible-attestation denominator.
-BOOST_FIXTURE_TEST_CASE(
-   votesnaphash_preserves_registered_provider_quorum_after_rank_demotion,
-   snapshot_attest_tester) { try {
-   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
-   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
-   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer3"_n, "snapprov3"_n));
-   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer4"_n, "snapprov4"_n));
-   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer5"_n, "snapprov5"_n));
-   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1, 50));
-
-   const auto bid = make_block_id(9004);
+   const auto block_num = vote_block_num();
+   const auto bid = make_block_id(block_num);
    const auto hash = make_snap_hash(13);
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, bid, hash));
-
-   BOOST_REQUIRE_EQUAL(success(), setrank("producer2"_n, 31));
-   BOOST_REQUIRE_EQUAL(success(), setrank("producer3"_n, 31));
-   BOOST_REQUIRE_EQUAL(success(), setrank("producer4"_n, 31));
-   BOOST_REQUIRE_EQUAL(success(), setrank("producer5"_n, 31));
-
-   const auto state = get_snap_roster_state();
-   BOOST_REQUIRE_EQUAL(1u, state["active_version"].as_uint64());
-   BOOST_REQUIRE_EQUAL(5u, state["active_count"].as_uint64());
-   BOOST_REQUIRE_EQUAL(1u, state["candidate_count"].as_uint64());
-   BOOST_REQUIRE(getsnaphash(9004).is_null());
+   BOOST_REQUIRE(getsnaphash(block_num).is_null());
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, bid, hash));
+   BOOST_REQUIRE(!getsnaphash(block_num).is_null());
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(votesnaphash_excludes_inactive_pending_voters_from_quorum, snapshot_attest_tester) { try {
+/// A producer eligibility change removes only that producer's pending weight.
+BOOST_FIXTURE_TEST_CASE(votesnaphash_prunes_removed_producer_vote, snapshot_attest_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer3"_n, "snapprov3"_n));
    BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2, 1));
 
-   const auto bid = make_block_id(9003);
+   const auto block_num = vote_block_num();
+   const auto bid = make_block_id(block_num);
    const auto hash = make_snap_hash(12);
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, bid, hash));
+   BOOST_REQUIRE_EQUAL(1u, snapshot_vote_count());
    BOOST_REQUIRE_EQUAL(success(), unregproducer("producer1"_n));
+   BOOST_REQUIRE_EQUAL(0u, snapshot_vote_count());
 
-   // producer1's pending vote is stale, so producer2 alone must not attest the snapshot.
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, bid, hash));
-   BOOST_REQUIRE(getsnaphash(9003).is_null());
+   BOOST_REQUIRE(getsnaphash(block_num).is_null());
 
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov3"_n, bid, hash));
-   BOOST_REQUIRE(!getsnaphash(9003).is_null());
+   BOOST_REQUIRE(!getsnaphash(block_num).is_null());
+} FC_LOG_AND_RETHROW() }
+
+/// Removing a non-voter immediately finalizes a tuple that meets the smaller live-set quorum.
+BOOST_FIXTURE_TEST_CASE(votesnaphash_rechecks_quorum_after_nonvoter_removal, snapshot_attest_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer3"_n, "snapprov3"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer4"_n, "snapprov4"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer5"_n, "snapprov5"_n));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(3, 67));
+
+   const auto block_num = vote_block_num();
+   const auto block_id = make_block_id(block_num);
+   const auto snapshot_hash = make_snap_hash(115);
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, block_id, snapshot_hash));
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, block_id, snapshot_hash));
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov3"_n, block_id, snapshot_hash));
+   BOOST_REQUIRE(getsnaphash(block_num).is_null());
+
+   // Five providers require four votes. Deregistering non-voter producer5 leaves four providers and
+   // lowers the quorum to three, so the existing tuple must finalize without a vote resubmission.
+   BOOST_REQUIRE_EQUAL(success(), delsnapprov("snapprov5"_n));
+   BOOST_REQUIRE(!getsnaphash(block_num).is_null());
+   BOOST_REQUIRE_EQUAL(0u, snapshot_vote_count());
+} FC_LOG_AND_RETHROW() }
+
+/// Lowering governance's quorum immediately evaluates already-collected live votes.
+BOOST_FIXTURE_TEST_CASE(votesnaphash_rechecks_quorum_after_config_change, snapshot_attest_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer3"_n, "snapprov3"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer4"_n, "snapprov4"_n));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1, 100));
+
+   const auto block_num = vote_block_num();
+   const auto block_id = make_block_id(block_num);
+   const auto snapshot_hash = make_snap_hash(116);
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, block_id, snapshot_hash));
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, block_id, snapshot_hash));
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov3"_n, block_id, snapshot_hash));
+   BOOST_REQUIRE(getsnaphash(block_num).is_null());
+
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1, 67));
+   BOOST_REQUIRE(!getsnaphash(block_num).is_null());
+   BOOST_REQUIRE_EQUAL(0u, snapshot_vote_count());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(votesnaphash_single_no_quorum, snapshot_attest_tester) { try {
@@ -520,13 +517,14 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_single_no_quorum, snapshot_attest_tester) {
    BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2, 50));
    produce_blocks();
 
-   auto bid = make_block_id(1000);
+   const auto block_num = vote_block_num();
+   auto bid = make_block_id(block_num);
    auto shash = make_snap_hash(1);
 
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, bid, shash));
 
    // No attested record yet
-   auto rec = getsnaphash(1000);
+   auto rec = getsnaphash(block_num);
    BOOST_REQUIRE_EQUAL(true, rec.is_null());
 } FC_LOG_AND_RETHROW() }
 
@@ -539,19 +537,20 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_quorum_reached, snapshot_attest_tester) { t
    BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2, 50));
    produce_blocks();
 
-   auto bid = make_block_id(1000);
+   const auto block_num = vote_block_num();
+   auto bid = make_block_id(block_num);
    auto shash = make_snap_hash(1);
 
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, bid, shash));
    // 1 vote, quorum=2, not attested yet
-   BOOST_REQUIRE_EQUAL(true, getsnaphash(1000).is_null());
+   BOOST_REQUIRE_EQUAL(true, getsnaphash(block_num).is_null());
 
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, bid, shash));
 
    // Quorum reached — attested record should exist
-   auto rec = getsnaphash(1000);
+   auto rec = getsnaphash(block_num);
    BOOST_REQUIRE_EQUAL(false, rec.is_null());
-   BOOST_REQUIRE_EQUAL(resolve_snapshot_block_num(1000), rec["block_num"].as_uint64());
+   BOOST_REQUIRE_EQUAL(block_num, rec["block_num"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(votesnaphash_same_tuple_retry_is_idempotent, snapshot_attest_tester) { try {
@@ -561,31 +560,74 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_same_tuple_retry_is_idempotent, snapshot_at
    BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2, 67));
    produce_blocks();
 
-   auto bid = make_block_id(1000);
+   const auto block_num = vote_block_num();
+   auto bid = make_block_id(block_num);
    auto shash = make_snap_hash(1);
 
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, bid, shash));
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, bid, shash));
-   BOOST_REQUIRE(getsnaphash(1000).is_null());
+   BOOST_REQUIRE(getsnaphash(block_num).is_null());
+} FC_LOG_AND_RETHROW() }
+
+/// An exact retry remains idempotent after finalization and subsequent eligibility removal.
+BOOST_FIXTURE_TEST_CASE(votesnaphash_final_tuple_retry_is_idempotent, snapshot_attest_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1, 67));
+
+   const auto block_num = vote_block_num();
+   const auto block_id = make_block_id(block_num);
+   const auto snapshot_hash = make_snap_hash(103);
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, block_id, snapshot_hash));
+   BOOST_REQUIRE(!getsnaphash(block_num).is_null());
+   BOOST_REQUIRE_EQUAL(0u, snapshot_vote_count());
+
+   BOOST_REQUIRE_EQUAL(success(), unregproducer("producer1"_n));
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, block_id, snapshot_hash));
+   BOOST_REQUIRE_EQUAL(0u, snapshot_vote_count());
+} FC_LOG_AND_RETHROW() }
+
+/// Voting is disabled until governance explicitly chooses a nonzero provider floor.
+BOOST_FIXTURE_TEST_CASE(votesnaphash_rejects_unconfigured_quorum, snapshot_attest_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
+
+   const auto block_num = vote_block_num();
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("snapshot attestation configuration has not been set"),
+                       votesnaphash("snapprov1"_n, make_block_id(block_num), make_snap_hash(101)));
+   BOOST_REQUIRE(getsnaphash(block_num).is_null());
+} FC_LOG_AND_RETHROW() }
+
+/// A provider cannot pre-attest a tuple for a block height the chain has not reached.
+BOOST_FIXTURE_TEST_CASE(votesnaphash_rejects_future_block_height, snapshot_attest_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1, 67));
+
+   // The action executes in the pending block at head + 1, so head + 2 is the first
+   // height that is strictly beyond current_block_number().
+   const auto future_block_num = vote_block_num() + 2;
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("snapshot block cannot be in the future"),
+                       votesnaphash("snapprov1"_n,
+                                    make_block_id(future_block_num),
+                                    make_snap_hash(102)));
 } FC_LOG_AND_RETHROW() }
 
 // ---------------------------------------------------------------------------
 // threshold / min_providers tests
 // ---------------------------------------------------------------------------
 BOOST_FIXTURE_TEST_CASE(threshold_min_providers_floor, snapshot_attest_tester) { try {
-   // A candidate pool below min_providers cannot bootstrap an active roster.
+   // A live committee smaller than min_providers is rejected before quorum calculation.
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
    BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2, 67));
    produce_blocks();
 
-   auto bid = make_block_id(2000);
+   const auto block_num = vote_block_num();
+   auto bid = make_block_id(block_num);
    auto shash = make_snap_hash(2);
 
-   BOOST_REQUIRE_EQUAL(wasm_assert_msg("snapshot roster is not ready for activation"),
-                        votesnaphash("snapprov1"_n, bid, shash));
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("registered snapshot providers are below min_providers"),
+                       votesnaphash("snapprov1"_n, bid, shash));
 
    // Not attested because min_providers floor is 2
-   auto rec = getsnaphash(2000);
+   auto rec = getsnaphash(block_num);
    BOOST_REQUIRE_EQUAL(true, rec.is_null());
 } FC_LOG_AND_RETHROW() }
 
@@ -600,18 +642,19 @@ BOOST_FIXTURE_TEST_CASE(threshold_percentage_calculation, snapshot_attest_tester
    BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1, 67));
    produce_blocks();
 
-   auto bid = make_block_id(3000);
+   const auto block_num = vote_block_num();
+   auto bid = make_block_id(block_num);
    auto shash = make_snap_hash(3);
 
    // 3 votes should NOT be enough (need 4)
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, bid, shash));
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, bid, shash));
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov3"_n, bid, shash));
-   BOOST_REQUIRE_EQUAL(true, getsnaphash(3000).is_null());
+   BOOST_REQUIRE_EQUAL(true, getsnaphash(block_num).is_null());
 
    // 4th vote reaches quorum
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov4"_n, bid, shash));
-   BOOST_REQUIRE_EQUAL(false, getsnaphash(3000).is_null());
+   BOOST_REQUIRE_EQUAL(false, getsnaphash(block_num).is_null());
 } FC_LOG_AND_RETHROW() }
 
 // ---------------------------------------------------------------------------
@@ -624,21 +667,23 @@ BOOST_FIXTURE_TEST_CASE(disagreement_detection, snapshot_attest_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1, 50));
    produce_blocks();
 
-   auto bid = make_block_id(4000);
+   const auto block_num = vote_block_num();
+   auto bid = make_block_id(block_num);
    auto shash = make_snap_hash(4);
 
    // Attest with one vote (quorum=1)
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, bid, shash));
-   BOOST_REQUIRE_EQUAL(false, getsnaphash(4000).is_null());
+   BOOST_REQUIRE_EQUAL(false, getsnaphash(block_num).is_null());
 
    // Second provider votes with different hash for same block — disagreement
    auto bad_hash = make_snap_hash(999);
-   BOOST_REQUIRE_EQUAL(wasm_assert_code(sysio::protocol::snapshot_attestation::disagreement_error_code),
+   // snap_hash_disagreement_error = 9001 (defined in snapshot_attest.hpp)
+   BOOST_REQUIRE_EQUAL(wasm_assert_code(9001),
                         votesnaphash("snapprov2"_n, bid, bad_hash));
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(blockid_mismatch_votes_not_aggregated, snapshot_attest_tester) { try {
-   // Three active providers, quorum = max(2, ceil(3*50/100), floor(3/3)+1) = 2.
+   // 3 providers, quorum = max(2, ceil(3*50/100)) = 2.
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer3"_n, "snapprov3"_n));
@@ -646,8 +691,9 @@ BOOST_FIXTURE_TEST_CASE(blockid_mismatch_votes_not_aggregated, snapshot_attest_t
    produce_blocks();
 
    // Same height and same snapshot hash, but different block ids (competing forks).
-   auto bid_a  = make_block_id(8000);
-   auto bid_b  = make_block_id(8000, 1);
+   const auto block_num = vote_block_num();
+   auto bid_a  = make_block_id(block_num);
+   auto bid_b  = make_block_id(block_num, 1);
    auto shash  = make_snap_hash(8);
 
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, bid_a, shash));
@@ -655,12 +701,11 @@ BOOST_FIXTURE_TEST_CASE(blockid_mismatch_votes_not_aggregated, snapshot_attest_t
 
    // The two votes agree on the hash but not the block id, so they must NOT
    // jointly reach the quorum of 2.
-   BOOST_REQUIRE_EQUAL(true, getsnaphash(8000).is_null());
+   BOOST_REQUIRE_EQUAL(true, getsnaphash(block_num).is_null());
 
-   // A distinct producer may join the first tuple to reach quorum; producer2 cannot vote twice
-   // across the competing tuples at the same height.
+   // A distinct producer may join the first tuple to reach quorum.
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov3"_n, bid_a, shash));
-   auto rec = getsnaphash(8000);
+   auto rec = getsnaphash(block_num);
    BOOST_REQUIRE_EQUAL(false, rec.is_null());
    BOOST_REQUIRE_EQUAL(bid_a.str(), rec["block_id"].as_string());
    BOOST_REQUIRE_EQUAL(shash.str(), rec["snapshot_hash"].as_string());
@@ -671,35 +716,33 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_rejects_producer_equivocation_across_hashes
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
    BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2, 50));
 
-   const auto bid = make_block_id(8001);
+   const auto bid = make_block_id(vote_block_num());
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, bid, make_snap_hash(80)));
-   BOOST_REQUIRE_EQUAL(wasm_assert_msg(
-                           "producer already voted a different snapshot tuple for this height and roster version"),
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("producer already voted a different snapshot tuple for this height"),
                         votesnaphash("snapprov1"_n, bid, make_snap_hash(81)));
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(votesnaphash_retries_pending_vote_after_eligibility_restored, snapshot_attest_tester) { try {
+/// Re-registering an eligible producer starts from an empty pending set rather than reviving stale weight.
+BOOST_FIXTURE_TEST_CASE(votesnaphash_reregistration_does_not_restore_pending_vote, snapshot_attest_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer3"_n, "snapprov3"_n));
-   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(3, 50));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2, 50));
 
-   const auto bid  = make_block_id(8002);
+   const auto block_num = vote_block_num();
+   const auto bid  = make_block_id(block_num);
    const auto hash = make_snap_hash(82);
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov3"_n, bid, hash));
+   BOOST_REQUIRE_EQUAL(1u, snapshot_vote_count());
    BOOST_REQUIRE_EQUAL(success(), unregproducer("producer3"_n));
-   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, bid, hash));
-   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, bid, hash));
-   BOOST_REQUIRE(getsnaphash(8002).is_null());
-
-   const auto pending = get_snap_vote(0);
-   BOOST_REQUIRE(!pending.is_null());
-   BOOST_REQUIRE_EQUAL(1u, pending["roster_version"].as_uint64());
+   BOOST_REQUIRE_EQUAL(0u, snapshot_vote_count());
 
    BOOST_REQUIRE_EQUAL(success(), regproducer("producer3"_n));
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer3"_n, "snapprov3"_n));
-   BOOST_REQUIRE_EQUAL(success(), evalsnapvote(0, bid, hash, 1));
-   BOOST_REQUIRE(!getsnaphash(8002).is_null());
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov3"_n, bid, hash));
+   BOOST_REQUIRE(getsnaphash(block_num).is_null());
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, bid, hash));
+   BOOST_REQUIRE(!getsnaphash(block_num).is_null());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(votesnaphash_reports_disagreement_before_eligibility_failure, snapshot_attest_tester) { try {
@@ -707,10 +750,10 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_reports_disagreement_before_eligibility_fai
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
    BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1, 50));
 
-   const auto bid = make_block_id(8003);
+   const auto bid = make_block_id(vote_block_num());
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, bid, make_snap_hash(83)));
    BOOST_REQUIRE_EQUAL(success(), unregproducer("producer2"_n));
-   BOOST_REQUIRE_EQUAL(wasm_assert_code(sysio::protocol::snapshot_attestation::disagreement_error_code),
+   BOOST_REQUIRE_EQUAL(wasm_assert_code(9001),
                         votesnaphash("snapprov2"_n, bid, make_snap_hash(84)));
 } FC_LOG_AND_RETHROW() }
 
@@ -721,343 +764,110 @@ BOOST_FIXTURE_TEST_CASE(record_blockid_disagreement, snapshot_attest_tester) { t
    BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1, 50));
    produce_blocks();
 
-   auto bid_a = make_block_id(9000);
-   auto bid_b = make_block_id(9000, 1);
+   const auto block_num = vote_block_num();
+   auto bid_a = make_block_id(block_num);
+   auto bid_b = make_block_id(block_num, 1);
    auto shash = make_snap_hash(9);
 
    // Attest with one vote (quorum=1)
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, bid_a, shash));
-   BOOST_REQUIRE_EQUAL(false, getsnaphash(9000).is_null());
+   BOOST_REQUIRE_EQUAL(false, getsnaphash(block_num).is_null());
 
    // Same snapshot hash under a different block id disagrees with the attested record
-   BOOST_REQUIRE_EQUAL(wasm_assert_code(sysio::protocol::snapshot_attestation::disagreement_error_code),
+   BOOST_REQUIRE_EQUAL(wasm_assert_code(9001),
                         votesnaphash("snapprov2"_n, bid_b, shash));
-} FC_LOG_AND_RETHROW() }
-
-// ---------------------------------------------------------------------------
-// staged roster transition and evaluator tests
-// ---------------------------------------------------------------------------
-BOOST_FIXTURE_TEST_CASE(candidate_cleanup_cannot_shrink_active_roster, snapshot_attest_tester) { try {
-   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
-   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
-   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer3"_n, "snapprov3"_n));
-   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(3, 100));
-
-   BOOST_REQUIRE_EQUAL(success(),
-                        votesnaphash("snapprov1"_n, make_block_id(9100), make_snap_hash(91)));
-   BOOST_REQUIRE_EQUAL(success(), unregproducer("producer2"_n));
-   BOOST_REQUIRE_EQUAL(success(), unregproducer("producer3"_n));
-
-   // A new-height vote cannot activate the one-member candidate over the three-member roster.
-   BOOST_REQUIRE_EQUAL(success(),
-                        votesnaphash("snapprov1"_n, make_block_id(9101), make_snap_hash(92)));
-   const auto state = get_snap_roster_state();
-   BOOST_REQUIRE_EQUAL(1u, state["active_version"].as_uint64());
-   BOOST_REQUIRE_EQUAL(3u, state["active_count"].as_uint64());
-   BOOST_REQUIRE_EQUAL(1u, state["candidate_count"].as_uint64());
-   BOOST_REQUIRE(!get_snap_roster_member("snapprov2"_n).is_null());
-   BOOST_REQUIRE(!get_snap_roster_member("snapprov3"_n).is_null());
-   BOOST_REQUIRE(getsnaphash(9101).is_null());
-} FC_LOG_AND_RETHROW() }
-
-BOOST_FIXTURE_TEST_CASE(complete_candidate_activates_atomically_at_new_height, snapshot_attest_tester) { try {
-   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
-   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
-   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer3"_n, "snapprov3"_n));
-   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(3, 100));
-   BOOST_REQUIRE_EQUAL(success(),
-                        votesnaphash("snapprov1"_n, make_block_id(9200), make_snap_hash(93)));
-
-   BOOST_REQUIRE_EQUAL(success(), unregproducer("producer3"_n));
-   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer4"_n, "snapprov4"_n));
-
-   const auto bid = make_block_id(9201);
-   const auto hash = make_snap_hash(94);
-   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, bid, hash));
-   auto state = get_snap_roster_state();
-   BOOST_REQUIRE_EQUAL(2u, state["active_version"].as_uint64());
-   BOOST_REQUIRE_EQUAL(3u, state["active_count"].as_uint64());
-   BOOST_REQUIRE(get_snap_roster_member("snapprov3"_n).is_null());
-   BOOST_REQUIRE(!get_snap_roster_member("snapprov4"_n).is_null());
-
-   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, bid, hash));
-   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov4"_n, bid, hash));
-   const auto record = getsnaphash(9201);
-   BOOST_REQUIRE_EQUAL(2u, record["roster_version"].as_uint64());
-   BOOST_REQUIRE_EQUAL(state["active_digest"].as_string(), record["roster_digest"].as_string());
-} FC_LOG_AND_RETHROW() }
-
-BOOST_FIXTURE_TEST_CASE(evalsnapvote_rejects_stale_or_mismatched_expectations, snapshot_attest_tester) { try {
-   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
-   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
-   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2, 100));
-
-   const auto bid = make_block_id(9300);
-   const auto hash = make_snap_hash(95);
-   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, bid, hash));
-   BOOST_REQUIRE_EQUAL(wasm_assert_msg("pending snapshot vote does not match the expected tuple"),
-                        evalsnapvote(0, bid, hash, 2));
-   BOOST_REQUIRE_EQUAL(wasm_assert_msg("pending snapshot vote does not match the expected tuple"),
-                        evalsnapvote(0, bid, make_snap_hash(96), 1));
-} FC_LOG_AND_RETHROW() }
-
-BOOST_FIXTURE_TEST_CASE(governance_shrink_activates_only_at_snapshot_boundary, snapshot_attest_tester) { try {
-   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
-   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
-   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer3"_n, "snapprov3"_n));
-   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2, 100));
-   BOOST_REQUIRE_EQUAL(success(),
-                        votesnaphash("snapprov1"_n, make_block_id(9400), make_snap_hash(97)));
-
-   const fc::variants members = {
-      mvo()("snap_account", "snapprov1")( "producer", "producer1"),
-      mvo()("snap_account", "snapprov2")( "producer", "producer2"),
-   };
-   BOOST_REQUIRE_EQUAL(error("missing authority of sysio"),
-                        push_action("producer1"_n, "propsnaprost"_n, mvo()
-                           ("members", members)
-                           ("expected_active_version", 1)));
-   BOOST_REQUIRE_EQUAL(success(), propsnaprost(members, 1));
-   BOOST_REQUIRE_EQUAL(1u, get_snap_roster_state()["active_version"].as_uint64());
-
-   const auto bid = make_block_id(9401);
-   const auto hash = make_snap_hash(98);
-   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, bid, hash));
-   const auto state = get_snap_roster_state();
-   BOOST_REQUIRE_EQUAL(2u, state["active_version"].as_uint64());
-   BOOST_REQUIRE_EQUAL(2u, state["active_count"].as_uint64());
-   BOOST_REQUIRE(get_snap_roster_member("snapprov3"_n).is_null());
-   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, bid, hash));
-   BOOST_REQUIRE(!getsnaphash(9401).is_null());
-} FC_LOG_AND_RETHROW() }
-
-BOOST_FIXTURE_TEST_CASE(governance_shrink_cannot_be_bypassed_by_excluded_first_voter,
-                        snapshot_attest_tester) { try {
-   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
-   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
-   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer3"_n, "snapprov3"_n));
-   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2, 100));
-   BOOST_REQUIRE_EQUAL(success(),
-                        votesnaphash("snapprov1"_n, make_block_id(9450), make_snap_hash(101)));
-
-   // Make the ordinary candidate roster complete and different from the active roster.
-   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer4"_n, "snapprov4"_n));
-   const fc::variants members = {
-      mvo()("snap_account", "snapprov1")( "producer", "producer1"),
-      mvo()("snap_account", "snapprov2")( "producer", "producer2"),
-   };
-   BOOST_REQUIRE_EQUAL(success(), propsnaprost(members, 1));
-
-   // An excluded active member cannot consume a snapshot boundary under version 1. Repeating at
-   // another height also fails, so it cannot indefinitely veto the approved shrink.
-   BOOST_REQUIRE_EQUAL(wasm_assert_msg(
-                           "snapshot provider is excluded from the pending governance roster"),
-                        votesnaphash("snapprov3"_n, make_block_id(9451), make_snap_hash(102)));
-   BOOST_REQUIRE_EQUAL(wasm_assert_msg(
-                           "snapshot provider is excluded from the pending governance roster"),
-                        votesnaphash("snapprov3"_n, make_block_id(9452), make_snap_hash(103)));
-   BOOST_REQUIRE_EQUAL(1u, get_snap_roster_state()["active_version"].as_uint64());
-
-   // The proposal remains staged and activates when an included member opens a boundary.
-   BOOST_REQUIRE_EQUAL(success(),
-                        votesnaphash("snapprov1"_n, make_block_id(9452), make_snap_hash(103)));
-   const auto state = get_snap_roster_state();
-   BOOST_REQUIRE_EQUAL(2u, state["active_version"].as_uint64());
-   BOOST_REQUIRE_EQUAL(2u, state["active_count"].as_uint64());
-   BOOST_REQUIRE(get_snap_roster_member("snapprov3"_n).is_null());
-   BOOST_REQUIRE(get_snap_roster_member("snapprov4"_n).is_null());
-} FC_LOG_AND_RETHROW() }
-
-BOOST_FIXTURE_TEST_CASE(bounded_cleanup_cursor_advances_across_vote_table, snapshot_attest_tester) { try {
-   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
-   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
-   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer3"_n, "snapprov3"_n));
-   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(3, 100));
-
-   for (uint32_t offset = 0; offset < 31; ++offset) {
-      BOOST_REQUIRE_EQUAL(success(), votesnaphash(
-         "snapprov1"_n, make_block_id(9460 + offset), make_snap_hash(110 + offset)));
-   }
-
-   // Each action scans at most 30 rows. The 31st row therefore becomes the next inclusive page.
-   BOOST_REQUIRE_EQUAL(30u, get_snap_roster_state()["cleanup_cursor"].as_uint64());
-   BOOST_REQUIRE_EQUAL(success(), evalsnapvote(
-      30, make_block_id(9490), make_snap_hash(140), 1));
-   BOOST_REQUIRE_EQUAL(0u, get_snap_roster_state()["cleanup_cursor"].as_uint64());
-} FC_LOG_AND_RETHROW() }
-
-BOOST_FIXTURE_TEST_CASE(finalized_height_cleanup_persists_across_bounded_pages,
-                        snapshot_attest_tester) { try {
-   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
-   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
-   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer3"_n, "snapprov3"_n));
-   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(3, 100));
-
-   constexpr uint32_t pending_rows = 61;
-   constexpr uint32_t block_label_base = 9900;
-   constexpr uint32_t hash_seed_base = 400;
-   constexpr uint32_t cleanup_continuation_limit = 4;
-   for (uint32_t offset = 0; offset < pending_rows; ++offset) {
-      BOOST_REQUIRE_EQUAL(success(), votesnaphash(
-         "snapprov1"_n,
-         make_block_id(block_label_base + offset),
-         make_snap_hash(hash_seed_base + offset)));
-   }
-
-   constexpr uint32_t finalized_offset = pending_rows - 1;
-   const auto finalized_block_id = make_block_id(block_label_base + finalized_offset);
-   const auto finalized_hash = make_snap_hash(hash_seed_base + finalized_offset);
-   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, finalized_block_id, finalized_hash));
-   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov3"_n, finalized_block_id, finalized_hash));
-   BOOST_REQUIRE(!getsnaphash(block_label_base + finalized_offset).is_null());
-
-   const auto finalized_block_num = resolve_snapshot_block_num(
-      block_label_base + finalized_offset);
-   BOOST_REQUIRE_EQUAL(
-      finalized_block_num,
-      get_snap_roster_state()["cleanup_finalized_height"].as_uint64());
-
-   for (uint32_t pass = 0; pass < cleanup_continuation_limit; ++pass) {
-      std::optional<uint32_t> remaining_vote_id;
-      for (uint32_t vote_id = 0; vote_id < pending_rows - 1; ++vote_id) {
-         if (!get_snap_vote(vote_id).is_null()) {
-            remaining_vote_id = vote_id;
-            break;
-         }
-      }
-      if (!remaining_vote_id) {
-         break;
-      }
-      BOOST_REQUIRE_EQUAL(success(), evalsnapvote(
-         *remaining_vote_id,
-         make_block_id(block_label_base + *remaining_vote_id),
-         make_snap_hash(hash_seed_base + *remaining_vote_id),
-         1));
-   }
-
-   for (uint64_t vote_id = 0; vote_id < pending_rows; ++vote_id) {
-      BOOST_REQUIRE(get_snap_vote(vote_id).is_null());
-   }
-   BOOST_REQUIRE_EQUAL(0u, get_snap_roster_state()["cleanup_cursor"].as_uint64());
-} FC_LOG_AND_RETHROW() }
-
-BOOST_FIXTURE_TEST_CASE(evalsnapvote_cleans_exact_obsolete_version_row, snapshot_attest_tester) { try {
-   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
-   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
-   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer3"_n, "snapprov3"_n));
-   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(3, 100));
-
-   for (uint32_t offset = 0; offset < 31; ++offset) {
-      BOOST_REQUIRE_EQUAL(success(), votesnaphash(
-         "snapprov1"_n, make_block_id(9500 + offset), make_snap_hash(150 + offset)));
-   }
-   // Reset the inclusive cleanup cursor without removing any current-version rows.
-   BOOST_REQUIRE_EQUAL(success(), evalsnapvote(
-      30, make_block_id(9530), make_snap_hash(180), 1));
-   BOOST_REQUIRE_EQUAL(0u, get_snap_roster_state()["cleanup_cursor"].as_uint64());
-
-   // Replace one member with a complete non-shrinking candidate roster. Activation removes only
-   // the first cleanup page, deliberately leaving vote 30 bound to version 1.
-   BOOST_REQUIRE_EQUAL(success(), unregproducer("producer3"_n));
-   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer4"_n, "snapprov4"_n));
-   BOOST_REQUIRE_EQUAL(success(), votesnaphash(
-      "snapprov1"_n, make_block_id(9540), make_snap_hash(181)));
-   BOOST_REQUIRE_EQUAL(2u, get_snap_roster_state()["active_version"].as_uint64());
-   BOOST_REQUIRE_EQUAL(1u, get_snap_vote(30)["roster_version"].as_uint64());
-
-   BOOST_REQUIRE_EQUAL(success(), evalsnapvote(
-      30, make_block_id(9530), make_snap_hash(180), 1, "producer5"_n));
-   BOOST_REQUIRE(get_snap_vote(30).is_null());
-   BOOST_REQUIRE_EQUAL(0u, get_snap_roster_state()["cleanup_cursor"].as_uint64());
-} FC_LOG_AND_RETHROW() }
-
-BOOST_FIXTURE_TEST_CASE(evalsnapvote_cleans_exact_matching_final_row, snapshot_attest_tester) { try {
-   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
-   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
-   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1, 100));
-
-   constexpr uint32_t pending_rows = 61;
-   constexpr uint64_t matching_vote_id = pending_rows - 1;
-   constexpr uint32_t max_cursor_reset_passes = 3;
-   for (uint32_t offset = 0; offset < pending_rows; ++offset) {
-      BOOST_REQUIRE_EQUAL(success(), votesnaphash(
-         "snapprov1"_n, make_block_id(9600 + offset), make_snap_hash(200 + offset)));
-   }
-   for (uint32_t pass = 0;
-        pass < max_cursor_reset_passes
-        && get_snap_roster_state()["cleanup_cursor"].as_uint64() != 0;
-        ++pass) {
-      BOOST_REQUIRE_EQUAL(success(), evalsnapvote(
-         matching_vote_id, make_block_id(9660), make_snap_hash(260), 1));
-   }
-   BOOST_REQUIRE_EQUAL(0u, get_snap_roster_state()["cleanup_cursor"].as_uint64());
-
-   // Replace one member, lower quorum to one, and use two finalizations to consume the two cleanup
-   // pages before the matching old-version row. The old row is therefore still present when the
-   // identical tuple finalizes under version 2.
-   BOOST_REQUIRE_EQUAL(success(), unregproducer("producer2"_n));
-   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer3"_n, "snapprov3"_n));
-   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1, 1));
-   BOOST_REQUIRE_EQUAL(success(), votesnaphash(
-      "snapprov1"_n, make_block_id(9800), make_snap_hash(300)));
-   BOOST_REQUIRE_EQUAL(2u, get_snap_roster_state()["active_version"].as_uint64());
-
-   const auto matching_block_id = make_block_id(9660);
-   const auto matching_hash = make_snap_hash(260);
-   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, matching_block_id, matching_hash));
-   BOOST_REQUIRE(!getsnaphash(9660).is_null());
-   BOOST_REQUIRE(!get_snap_vote(matching_vote_id).is_null());
-
-   // A non-governance account can permissionlessly remove the exact lingering row. Once absent,
-   // retrying the same finalized tuple remains idempotent even with an arbitrary missing id.
-   BOOST_REQUIRE_EQUAL(success(), evalsnapvote(
-      matching_vote_id, matching_block_id, matching_hash, 1, "producer5"_n));
-   BOOST_REQUIRE(get_snap_vote(matching_vote_id).is_null());
-   BOOST_REQUIRE_EQUAL(success(), evalsnapvote(
-      matching_vote_id, matching_block_id, matching_hash, 1, "producer5"_n));
-} FC_LOG_AND_RETHROW() }
-
-BOOST_FIXTURE_TEST_CASE(identical_final_retry_does_not_recreate_pending_vote, snapshot_attest_tester) { try {
-   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
-   const auto bid = make_block_id(9500);
-   const auto hash = make_snap_hash(99);
-   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, bid, hash));
-   BOOST_REQUIRE(!getsnaphash(9500).is_null());
-   BOOST_REQUIRE(get_snap_vote(0).is_null());
-
-   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, bid, hash));
-   BOOST_REQUIRE(get_snap_vote(0).is_null());
 } FC_LOG_AND_RETHROW() }
 
 // ---------------------------------------------------------------------------
 // purging tests
 // ---------------------------------------------------------------------------
-BOOST_FIXTURE_TEST_CASE(vote_purging_on_attestation, snapshot_attest_tester) { try {
+BOOST_FIXTURE_TEST_CASE(vote_retention_is_bounded_per_producer, snapshot_attest_tester) { try {
    // Register 2 providers, min_providers=2
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
    BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2, 50));
    produce_blocks();
 
-   // Vote on block 5000 (won't reach quorum with just 1 vote)
-   auto bid1 = make_block_id(5000);
+   const auto older_block_num = vote_block_num(2);
+   const auto middle_block_num = vote_block_num(1);
+   const auto latest_block_num = vote_block_num();
+
+   // Vote at an older height (won't reach quorum with just 1 vote).
+   auto bid1 = make_block_id(older_block_num);
    auto shash1 = make_snap_hash(5);
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, bid1, shash1));
+   BOOST_REQUIRE_EQUAL(1u, snapshot_vote_count());
 
-   // Vote on block 6000 — both providers vote, reaching quorum
-   auto bid2 = make_block_id(6000);
+   // Moving to a newer height drops only producer1's obsolete vote. Because that vote was
+   // the old tuple's sole weight, its empty row is erased.
+   auto bid2 = make_block_id(middle_block_num);
    auto shash2 = make_snap_hash(6);
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, bid2, shash2));
+   BOOST_REQUIRE_EQUAL(1u, snapshot_vote_count());
+
+   // producer2 may still vote at the older height; this cannot erase producer1's newer vote.
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, bid1, shash1));
+   BOOST_REQUIRE_EQUAL(2u, snapshot_vote_count());
+
+   // Moving producer2 to the middle height erases the now-empty old row and reaches quorum.
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, bid2, shash2));
 
-   BOOST_REQUIRE_EQUAL(false, getsnaphash(6000).is_null());
+   BOOST_REQUIRE_EQUAL(false, getsnaphash(middle_block_num).is_null());
+   BOOST_REQUIRE_EQUAL(0u, snapshot_vote_count());
 
    // Verify system works for subsequent attestations
-   auto bid3 = make_block_id(7000);
+   auto bid3 = make_block_id(latest_block_num);
    auto shash3 = make_snap_hash(7);
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, bid3, shash3));
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, bid3, shash3));
-   BOOST_REQUIRE_EQUAL(false, getsnaphash(7000).is_null());
+   BOOST_REQUIRE_EQUAL(false, getsnaphash(latest_block_num).is_null());
+} FC_LOG_AND_RETHROW() }
+
+/// A provider voting at a newer height cannot erase honest weight at an older height.
+BOOST_FIXTURE_TEST_CASE(votesnaphash_newer_vote_cannot_censor_older_tuple, snapshot_attest_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer3"_n, "snapprov3"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer4"_n, "snapprov4"_n));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(3, 67));
+
+   const auto newer_block_num = vote_block_num();
+   const auto older_block_num = newer_block_num - 1;
+   const auto older_block_id = make_block_id(older_block_num);
+   const auto older_hash = make_snap_hash(112);
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, older_block_id, older_hash));
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, older_block_id, older_hash));
+
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash(
+      "snapprov3"_n, make_block_id(newer_block_num), make_snap_hash(113)));
+   BOOST_REQUIRE_EQUAL(2u, snapshot_vote_count());
+
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov4"_n, older_block_id, older_hash));
+   BOOST_REQUIRE(!getsnaphash(older_block_num).is_null());
+   BOOST_REQUIRE_EQUAL(1u, snapshot_vote_count());
+} FC_LOG_AND_RETHROW() }
+
+/// Registration churn cannot erase pending votes cast by other live producers.
+BOOST_FIXTURE_TEST_CASE(votesnaphash_registration_churn_preserves_other_votes, snapshot_attest_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer3"_n, "snapprov3"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer4"_n, "snapprov4"_n));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(3, 67));
+
+   const auto block_num = vote_block_num();
+   const auto block_id = make_block_id(block_num);
+   const auto snapshot_hash = make_snap_hash(114);
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, block_id, snapshot_hash));
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, block_id, snapshot_hash));
+
+   BOOST_REQUIRE_EQUAL(success(), delsnapprov("snapprov3"_n));
+   BOOST_REQUIRE_EQUAL(1u, snapshot_vote_count());
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer3"_n, "snapprov5"_n));
+   BOOST_REQUIRE_EQUAL(1u, snapshot_vote_count());
+
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov4"_n, block_id, snapshot_hash));
+   BOOST_REQUIRE(!getsnaphash(block_num).is_null());
 } FC_LOG_AND_RETHROW() }
 
 // ---------------------------------------------------------------------------
@@ -1086,21 +896,21 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_enforces_byzantine_quorum_floor, snapshot_a
    // Low/misconfigured quorum — without the floor, one vote would attest.
    BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1, 1));
 
-   const auto bid  = make_block_id(1000);
+   const auto block_num = vote_block_num();
+   const auto bid  = make_block_id(block_num);
    const auto hash = make_snap_hash(1);
 
    // 3 providers -> floor = 3/3 + 1 = 2. A single vote must NOT create an attested record.
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, bid, hash));
-   BOOST_REQUIRE(getsnaphash(1000).is_null());
+   BOOST_REQUIRE(getsnaphash(block_num).is_null());
 
    // A second agreeing vote reaches the floor and attests.
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, bid, hash));
-   BOOST_REQUIRE(!getsnaphash(1000).is_null());
+   BOOST_REQUIRE(!getsnaphash(block_num).is_null());
 } FC_LOG_AND_RETHROW() }
 
-// A snapshot-account rotation is only a candidate change. It cannot carry the producer's active
-// membership or vote identity into an already-open height.
-BOOST_FIXTURE_TEST_CASE(votesnaphash_rejects_snap_account_rotation_sybil, snapshot_attest_tester) { try {
+/// Rotating a snapshot account prunes only that producer's old pending weight.
+BOOST_FIXTURE_TEST_CASE(votesnaphash_invalidates_pending_votes_on_snap_account_rotation, snapshot_attest_tester) { try {
    // 4 providers -> floor = 4/3 + 1 = 2 is the binding quorum (threshold 1% rounds to 1).
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
@@ -1109,34 +919,26 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_rejects_snap_account_rotation_sybil, snapsh
    BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1, 1));
    produce_blocks();
 
-   const auto bid  = make_block_id(7000);
+   const auto block_num = vote_block_num();
+   const auto bid  = make_block_id(block_num);
    const auto hash = make_snap_hash(7);
 
    // producer1 votes via its first snap_account.
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, bid, hash));
 
    // producer1 rotates its snap_account: drop snapprov1, register a fresh snapprov5.
-   // provider_count is unchanged (still 4), so the floor stays 2.
    BOOST_REQUIRE_EQUAL(success(), delsnapprov("snapprov1"_n));
+   BOOST_REQUIRE_EQUAL(0u, snapshot_vote_count());
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov5"_n));
    produce_blocks();
 
-   // The height is bound to roster version 1, where producer1's member account is still snapprov1.
-   BOOST_REQUIRE_EQUAL(wasm_assert_msg("snap_account is not a member of the active snapshot roster"),
-                        votesnaphash("snapprov5"_n, bid, hash));
-   BOOST_REQUIRE(getsnaphash(7000).is_null());
+   // The rotated account starts a fresh pending tuple; one producer cannot reach the floor of 2.
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov5"_n, bid, hash));
+   BOOST_REQUIRE(getsnaphash(block_num).is_null());
 
-   // A second producer cannot combine with the now-unregistered old member vote.
+   // A genuinely distinct producer supplies the second, quorum-reaching vote.
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, bid, hash));
-   BOOST_REQUIRE(getsnaphash(7000).is_null());
-
-   // The complete candidate activates at the next height. Only then can the rotated account vote
-   // under a new roster version without carrying its old-version weight forward.
-   const auto next_bid = make_block_id(7001);
-   const auto next_hash = make_snap_hash(71);
-   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov5"_n, next_bid, next_hash));
-   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, next_bid, next_hash));
-   BOOST_REQUIRE(!getsnaphash(7001).is_null());
+   BOOST_REQUIRE(!getsnaphash(block_num).is_null());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()

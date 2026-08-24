@@ -98,10 +98,9 @@ clio push action sysio setrank \
   -p sysio@active
 ```
 
-### 2. Register a snapshot provider candidate
+### 2. Register a snapshot provider account
 
-Each producer delegates a separate account as a candidate snapshot provider. This account signs
-attestation votes if it becomes a member of the active roster:
+Each producer delegates a separate account to act as its snapshot provider. This account signs the attestation votes:
 
 ```bash
 # Create the provider account (if it doesn't exist)
@@ -119,11 +118,6 @@ To unregister later:
 clio push action sysio delsnapprov '{"account": "mysnapprov1"}' -p mysnapprov1@active
 ```
 
-Registration and removal update the bounded candidate pool, not the active quorum immediately. At
-a new snapshot-height boundary, a sufficiently complete candidate set atomically becomes the next
-versioned active roster. Ordinary churn cannot shrink the active denominator; governance must
-explicitly stage a roster shrink.
-
 ### 3. Configure attestation quorum (network-wide)
 
 The attestation config is a network-wide singleton set by the `sysio` authority. It controls how many provider votes are needed before a snapshot is considered attested:
@@ -134,30 +128,12 @@ clio push action sysio setsnpcfg \
   -p sysio@active
 ```
 
-- `min_providers` — minimum number of active-roster providers required for any quorum to be possible
-- `threshold_pct` — percentage of the versioned active roster that must vote for the same hash (e.g., 67 means two-thirds); the contract also enforces an independent greater-than-one-third floor
+- `min_providers` — explicit minimum live registration count and voter floor; voting remains disabled until this nonzero value is configured
+- `threshold_pct` — percentage of registered providers that must vote for the same hash to reach quorum (e.g., 67 means two-thirds)
 
-### 4. Run automatic provider mode (preferred)
+### 4. Generate and attest snapshots
 
-Configure a dedicated syncing node with the provider account and make its active signing key
-available through the signature-provider manager:
-
-```ini
-snapshot-provider-account = mysnapprov1
-```
-
-Provider mode automatically schedules snapshots at exact 25,000-block multiples, signs and submits
-`votesnaphash`, and runs recovery every 120 irreversible blocks. The latest unresolved tuple and
-bounded `evalsnapvote` cursor are persisted in `snapshot-provider-recovery.json` under
-`snapshots-dir`. An irreversible conflict creates a durable quarantine latch and prevents restart
-until the operator investigates and explicitly removes the recovery state.
-
-`snapshot-provider-account` cannot be combined with `producer-name` on the same node.
-
-### 5. Generate and attest snapshots manually
-
-The producer API remains a manual alternative. After creating a snapshot, submit a vote with its
-block ID and root hash:
+After creating a snapshot, the provider submits a vote with the snapshot's block ID and root hash. When enough providers vote for the same hash, an attested record is created on-chain in the `snaprecords` table.
 
 ```bash
 # Create a snapshot (returns block_num, block_id, root_hash)
@@ -169,27 +145,20 @@ clio push action sysio votesnaphash \
   -p mysnapprov1@active
 ```
 
-The `votesnaphash` action accumulates a version-bound tuple in `snapvotes`. Once the threshold is
-met, the contract writes a `snaprecords` row containing the roster version and digest, then performs
-bounded cleanup of at most 30 pending rows per action.
+The `votesnaphash` action accumulates votes in the `snapvotes` table. The numerator and denominator use the same live registration set. Removing a registration prunes only that producer's vote, preserves other live votes, and immediately re-evaluates the smaller committee's quorum. Once the threshold is met, the system contract moves the entry to `snaprecords` and purges pending votes through that height.
 
-Snapshot startup first requires the snapshot's own system ABI to declare `snaprecords`. Verification
-then waits for catch-up, irreversibility, and the shared 12,500-block grace window. After grace, a
-missing record warns for manual snapshots and stops auto-fetched bootstraps; an irreversible mismatch
-or caught-up table-read failure stops both.
+Bootstrapping nodes verify the `snaprecords` table after syncing — if no attested record exists for the snapshot's block number, auto-fetched bootstraps will shut down with a fatal error.
 
-### 6. Manual producer-API scheduling
+### 5. Automate with scheduled snapshots
 
-Manual producer-API users may schedule recurring snapshots:
+For production, schedule recurring snapshots rather than creating them manually:
 
 ```bash
 curl -X POST http://127.0.0.1:8888/v1/producer/schedule_snapshot \
   -d '{"block_spacing": 25000, "start_block_num": 1, "end_block_num": 4294967295}'
 ```
 
-This creates a snapshot every 25,000 blocks (~3.5 hours at 0.5s block time). Producer-API snapshots
-are not auto-voted; an external script or monitoring daemon must submit `votesnaphash`. Prefer
-`snapshot-provider-account` when automatic voting and recovery are desired.
+This creates a snapshot every 25,000 blocks (~3.5 hours at 0.5s block time). The attestation vote (`votesnaphash`) still needs to be submitted after each snapshot finalizes — this is typically handled by an external script or monitoring daemon that watches for new snapshots and submits the vote automatically.
 
 Both `create_snapshot` and `schedule_snapshot` require `producer_api_plugin` to be enabled. When a snapshot finalizes (becomes irreversible), it is automatically added to the serving catalog.
 
@@ -273,9 +242,8 @@ The bootstrap process:
 1. Fetches snapshot metadata from the endpoint
 2. Downloads the snapshot binary
 3. Verifies the file's root hash matches the advertised hash
-4. Requires the snapshot's system ABI to declare `snaprecords`
-5. Loads the snapshot and begins syncing from that point
-6. Retries verification until the record is irreversible or a terminal policy outcome is reached
+4. Loads the snapshot and begins syncing from that point
+5. After syncing, verifies the snapshot's on-chain attestation record
 
 `--delete-all-blocks` is required when existing chain data is present. The `--snapshot-endpoint` option is incompatible with `--snapshot` (local file).
 
