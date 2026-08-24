@@ -6,34 +6,38 @@ How Wire pays for CPU, NET, and RAM — and why end users don't.
 
 ## The short version
 
-On Wire, **the payer is chosen per action, and by default it is the contract, not the caller.**
+**A new account on Wire costs its owner nothing and can immediately use every provisioned
+contract on the network.** It holds no CPU or NET allocation, does not need one, and never
+acquires one — because the applications it calls pay instead of it.
 
-If the first authorization on an action carries the reserved `sysio.payer` permission, that actor
-is the payer. Otherwise the payer is the contract account being called. Ordinary transactions do
-not name a payer, so the contract pays.
+That is the whole model in one line. The rest of this page is how it works and what it costs the
+people who do pay.
 
-That means when you sign a normal transaction, the CPU time and network bandwidth it consumes are
-billed to the *contract account you called* — not to you. Sending tokens, swapping on a DEX,
-minting an NFT: the signing account is not charged CPU, NET, or RAM for them, and needs no
-resource allocation, stake, or rental.
+**Applications pay, users don't.** When you sign an ordinary transaction, the CPU time and network
+bandwidth it consumes are billed to the *contract account you called*. Sending tokens, swapping on
+a DEX, minting an NFT: the signing account is charged nothing and needs no allocation, stake, or
+rental.
 
-An account **can** elect to pay for itself by naming `sysio.payer` — a relayer or an operator that
-wants its own dedicated throughput does exactly this. It then needs its own allocation, and fails
-without one. See [Explicit self-pay](#explicit-self-pay).
+**Applications get paid for by node owners.** A contract cannot conjure its own capacity. It
+receives a **policy** — a grant of CPU, NET, and RAM weight — from a **node owner**, who holds a
+fixed share of the network's capacity determined by their tier and issues slices of it through the
+`sysio.roa` contract. Only registered node owners can issue policies. No account can grant itself
+bandwidth.
 
-Resources reach contract accounts through **policies** issued by **node owners**. A node owner
-holds a fixed share of the network's resource capacity, determined by their tier, and grants
-slices of it to accounts via the `sysio.roa` contract. Under default billing, a contract with a
-policy works and a contract without one cannot be called — because the contract is the payer, and
-an unprovisioned one has nothing to pay with. A caller that names itself with `sysio.payer` takes
-the bill instead, and the contract's own limits are then never consulted.
+**A contract without a policy does not run.** Because the contract is the payer, an unprovisioned
+one has nothing to pay with, and ordinary calls into it fail. Provisioning the contract — not the
+user — is what makes an application usable.
+
+There is one exception, covered in [Who pays](#who-pays-the-payer-model): an account can volunteer
+to pay for itself. It is opt-in, it requires signatures, and it is not how ordinary traffic works.
 
 ---
 
-## How this compares to EOS and Antelope
+## How this compares to Antelope-family chains
 
-If you have used EOS, Antelope, or Vaulta, you have seen three answers to the same question —
-*how does an account get the right to consume chain resources?*
+Antelope-family chains bill the signer, and over time offered three ways to fund that signer's
+CPU and NET. Not every chain ran all three, and they arrived in sequence rather than as a set — so
+what you have used depends on which chain and which era.
 
 **Staking (2018).** You locked tokens with `delegatebw` to get a proportional share of CPU and NET,
 and bought RAM outright from a Bancor-curve market with `buyram`. Users had to hold enough token to
@@ -62,7 +66,7 @@ the exception, not the ordinary path.
 | End user needs native token | Yes | Yes | Yes | **No** |
 | CPU/NET acquired by | Locking tokens | Renting from a pool | Daily fee on a curve | **A node owner's policy** |
 | RAM acquired by | Bancor market purchase | same | same | **A node owner's policy** |
-| Acquisition price set by | RAM market | Rental market | Utilization curve | **Off-chain, between issuer and recipient** |
+| Acquisition price set by | RAM market | Rental market | Utilization curve | **Off-chain, between issuer and recipient** ([what the weight then buys is on-chain](#how-weight-becomes-throughput)) |
 | Reclaimable by | Unstake (3d) | Sell rex | Expires daily | **`reducepolicy` after `time_block`** |
 | Cost to onboard a user | Tokens + stake + RAM | same | same | **None to the user** |
 
@@ -90,16 +94,42 @@ only by deleting the data holding it.
 
 This is the part that differs most from Antelope, and it is worth being precise about.
 
-Every action carries a list of authorizations. Wire adds a reserved permission name,
-`sysio.payer`, that may appear as the **first** authorization on an action. The rule is:
+**The default: the called contract pays.** An ordinary transaction names no payer at all, so the
+account billed for an action is the contract that action invokes. Nothing in the transaction has
+to say so and no permission has to be added — this is what happens when you do nothing special,
+which is the case for essentially all user traffic.
+
+**The exception: an account can volunteer to pay for itself.** Wire reserves a permission name,
+`sysio.payer`, for this. It is not a way to bill a stranger, and adding it is not a way to obtain
+resources. The protocol requires all three of the following together:
+
+- the `sysio.payer` entry sits at **index 0** of the action's authorizations,
+- the **same actor** also appears on that action with a real permission, and
+- the transaction carries **signatures** satisfying that actor's `active` authority.
+
+You can only volunteer yourself, or someone who co-signs. An account that names itself payer needs
+its own allocation and fails without one.
+
+Those two rules are the whole of `action::payer()`:
 
 ```cpp
 // libraries/chain/action.cpp
 account_name action::payer() const {
    if (!authorization.empty() && authorization[0].permission == config::sysio_payer_name)
-      return authorization[0].actor;
-   return account;    // the contract being called
+      return authorization[0].actor;   // the exception: index 0 named a payer
+   return account;                     // the default: the contract being called
 }
+```
+
+```mermaid
+flowchart TD
+    A["Action arrives"] --> B{"authorization[0].permission<br/>== sysio.payer ?"}
+    B -->|"No — ordinary traffic"| C["Payer = the contract being called"]
+    B -->|"Yes — opt-in"| D{"Same actor also present<br/>with a real permission,<br/>and signed for?"}
+    D -->|"No"| E["Rejected:<br/>unsatisfied authorization"]
+    D -->|"Yes"| F["Payer = that actor"]
+    C --> G["Contract needs a policy.<br/>Signer never checked."]
+    F --> H["Actor needs its own allocation.<br/>Contract never checked."]
 ```
 
 The transaction's billing map is keyed on `payer()` and nothing else. An authorizing account that
@@ -111,18 +141,39 @@ is not the payer never enters the map, so its CPU and NET are neither charged no
 | `{alice, sysio.payer}, {alice, active}` | `alice` | Explicit self-pay. Alice needs her own allocation. |
 | `{alice, sysio.payer}, {alice, active}, {bob, active}` | `alice` | Alice covers the whole action's cost. |
 
-An explicit payer is not a way to bill a stranger. The protocol requires that the `sysio.payer`
-entry sit at index 0, that the same actor also appear with a real permission on that action, and
-that the transaction carry signatures satisfying that actor's `active` authority. You can only
-volunteer yourself, or someone who co-signs.
+### Porting a contract from Antelope
+
+This trips people up, so it is worth stating plainly.
+
+On Antelope your contract works as soon as it is deployed, because the users calling it arrive with
+their own staked or rented CPU and NET. On Wire they do not — every user account holds zero. Deploy
+a ported contract, push a transaction the way you always have, and the call fails:
+
+```
+account <yourcontract> net usage is too high: 132 > 0
+```
+
+Nothing is wrong with the contract, the transaction, or the signer. The contract has no policy, and
+the contract is the payer. It will look dead until a node owner issues it one.
+
+The fix is not to change the contract or ask users to acquire resources. It is a single `addpolicy`
+on the contract account. Once that exists, the same unmodified transaction succeeds, and every user
+of that contract transacts for free.
 
 ### Why the contract can afford it
 
-System accounts — anything whose name prefix is `sysio` — carry unlimited resource limits
-(`-1`), and `sysio.roa` preserves that: every code path that touches a `sysio.*` account's limits
-passes `-1` for CPU and NET, and `addpolicy` refuses to allocate CPU or NET to them at all. So
+System accounts — anything whose name prefix is `sysio` — carry unlimited resource limits, and
+`sysio.roa` preserves that: every code path that touches a `sysio.*` account's limits passes the
+unlimited marker for CPU and NET, and `addpolicy` refuses to allocate CPU or NET to them at all. So
 `sysio.token` transfers, `sysio.msig` proposals, and every other system-contract call are covered
 by the system itself.
+
+> **What `-1` means here.** Resource limits are signed integers, and `-1` is a **sentinel** — a
+> reserved value meaning "no limit," not a quantity. The chain tests for it explicitly
+> (`if (cpu_weight < 0) …`, `is_unlimited_cpu` returns `cpu_weight == -1`) and, where a number is
+> actually needed, substitutes a large finite one rather than doing arithmetic on the `-1`. It is
+> not a very large number, and it is not an overflow; reading it as either will mislead you when
+> you look at a `get_account` response and see `-1` in the limit fields.
 
 A third-party contract is different. It is an ordinary account, and it is the payer for every call
 into it that does not name one explicitly — which is every ordinary call — so it needs a real
@@ -489,6 +540,13 @@ Alice is charged nothing, for anything, on a token transfer.
 > So billing RAM to a user is an explicit opt-in by the user, not a choice the contract makes
 > alone, and it opts them into paying for bandwidth at the same time. Contract authors who want the
 > gasless experience should bill RAM to the contract account, which needs no such marker.
+>
+> **Compared with Antelope.** There, a contract names a RAM payer in the action body and the
+> requirement is only that the named account authorized the action at all — CPU and NET follow a
+> separate path entirely, funded by the signer's stake or rental. On Wire the two are welded
+> together: naming a user as RAM payer requires the `sysio.payer` marker, and because that marker
+> must sit at index 0 it makes the same user the CPU and NET payer for the action. There is no way
+> to charge a user for storage while the contract absorbs their bandwidth.
 
 ### A developer deploys a contract
 
@@ -502,9 +560,32 @@ RAM sizing at the launch price of 104 bytes per 0.0001 SYS:
 | ABI | ~4,000 | ~0.0039 SYS |
 | 10,000 token holder rows @ ~144 B | ~1,440,000 | ~1.3847 SYS |
 
-CPU and NET weight are separate and much smaller in absolute terms — the allocation a node owner
-gives their own account at registration is `0.0500 SYS` each, and a routine test account is
-provisioned with `0.0010 SYS` each.
+### Sizing CPU and NET
+
+RAM has a direct conversion, so the table above can be exact. CPU and NET do not — a weight buys a
+proportional share of network capacity, and the share depends on how much weight the whole network
+has allocated. There is no protocol constant for "one transfer," and any document that gives you
+one is guessing.
+
+What you can do is measure and scale. Push the action once on testnet and read it back from the
+transaction trace: `cpu_usage_us` for CPU, and the action's billable size for NET. Then work out
+the rate you need — actions per averaging window, not actions in total — and ask a node owner for
+weight that sustains it.
+
+Two anchors to calibrate against:
+
+- **NET is small and predictable.** It is just the serialized action, so it scales with argument
+  size. A minimal no-argument action measures **132 bytes**; adding a second authorization took the
+  same action to 148. A token transfer with a short memo is a few hundred.
+- **CPU is the one to measure, not assume.** It depends on what the contract does and on the node's
+  hardware and WASM runtime, so a figure from someone else's chain or from a debug build is not
+  guidance. Measure yours.
+
+For scale on the weight side: the allocation a node owner gives their own account at registration
+is `0.0500 SYS` of each, and a routine test account is provisioned with `0.0010 SYS` of each.
+
+Budget headroom beyond the steady-state rate. Failed and retried transactions still consume CPU and
+NET, and a contract that saturates its share starts rejecting work until the window rolls forward.
 
 The contract-plus-ABI footprint is **under one tenth of a SYS**. For scale, even a *tier-3* node
 owner — the smallest tier — holds ~1.93 SYS free, enough to sponsor several small contracts.
@@ -586,8 +667,8 @@ Mechanisms an Antelope background might lead you to look for, which do not exist
 - **No RAM market.** `buyram` and `sellram` do not exist. RAM is not priced by a Bancor curve and
   is not tradeable. It arrives only through a policy.
 - **No REX, no PowerUp, no rentals.** None of these contracts or actions exist.
-- **No staking for resources.** `delegatebw` has no equivalent. Staking on Wire exists for other
-  purposes; it grants no CPU, NET, or RAM.
+- **No `delegatebw`.** There is no way to convert a token balance into CPU, NET, or RAM. Those come
+  from a node owner's policy and nowhere else.
 - **No whitelist.** There is no allow-list of approved contracts. The only distinction is whether a
   contract holds a policy: with one it is callable by anyone, without one it is callable only by a
   caller who names itself with `sysio.payer` and covers the cost.
