@@ -547,7 +547,8 @@ public:
    /// The default emission config payload, split out so a caller that must push it through a
    /// different transport (see push_system_action_no_block) does not restate twenty fields.
    fc::variant_object default_emit_cfg( uint16_t cadence,
-                                        int64_t annual_max_emission = ANNUAL_MAX_EMISSION ) {
+                                        int64_t annual_max_emission = ANNUAL_MAX_EMISSION,
+                                        uint32_t epoch_log_retention_count = 8640 ) {
       return mvo()
          ("t1_allocation",          T1_ALLOCATION.get_amount())
          ("t2_allocation",          T2_ALLOCATION.get_amount())
@@ -568,8 +569,30 @@ public:
          ("producer_bps",           PRODUCER_BPS)
          ("batch_op_bps",           uint16_t(3000))
          ("standby_end_rank",       T_STANDBY_END_RANK)
-         ("epoch_log_retention_count", uint32_t(8640))
+         ("epoch_log_retention_count", epoch_log_retention_count)
          ("pay_cadence_epochs",     cadence);
+   }
+
+   /// Simulate an emission config written before the cadence bounds existed.
+   /// This deliberately bypasses the current action validation and is used
+   /// only to exercise the mixed-version recovery paths in sysio.epoch.
+   void set_legacy_emitcfg_cadence_raw( uint16_t cadence ) {
+      const auto bytes = sysio_abi_ser.variant_to_binary(
+         "emission_config", default_emit_cfg(cadence),
+         abi_serializer::create_yield_function(abi_serializer_max_time));
+
+      char key_buf[chain::kv_pri_key_size];
+      chain::kv_encode_be64(key_buf, "emitcfg"_n.to_uint64_t());
+      auto& db = const_cast<chainbase::database&>(control->db());
+      const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
+      auto it = kv_idx.find(boost::make_tuple(
+         config::system_account_name,
+         chain::compute_table_id("emitcfg"_n.to_uint64_t()),
+         std::string_view(key_buf, chain::kv_pri_key_size)));
+      BOOST_REQUIRE(it != kv_idx.end());
+      db.modify(*it, [&](auto& row) {
+         row.value.assign(bytes.data(), bytes.size());
+      });
    }
 
    action_result setinittime( account_name signer, time_point_sec start ) {
@@ -728,6 +751,28 @@ public:
                                      account_name(sysio_epoch_index));
       if (data.empty()) return fc::variant();
       return sysio_abi_ser.binary_to_variant("epoch_log", data,
+          abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
+   fc::variant get_batch_epoch( uint64_t sysio_epoch_index ) {
+      // batch_epoch_key stores uint32_t in order-preserving big-endian form;
+      // get_row_by_id is specialized for the common 8-byte integer key.
+      const uint32_t index = static_cast<uint32_t>(sysio_epoch_index);
+      const char key_buf[4] = {
+         static_cast<char>(index >> 24),
+         static_cast<char>(index >> 16),
+         static_cast<char>(index >> 8),
+         static_cast<char>(index),
+      };
+      const auto& kv_idx = control->db().get_index<chain::kv_index, chain::by_code_key>();
+      auto it = kv_idx.find(boost::make_tuple(
+         config::system_account_name,
+         chain::compute_table_id("batchepochs"_n.to_uint64_t()),
+         std::string_view(key_buf, sizeof(key_buf))));
+      if (it == kv_idx.end()) return fc::variant();
+      vector<char> data(it->value.begin(), it->value.end());
+      if (data.empty()) return fc::variant();
+      return sysio_abi_ser.binary_to_variant("batch_epoch", data,
           abi_serializer::create_yield_function(abi_serializer_max_time));
    }
 
@@ -2446,25 +2491,34 @@ BOOST_FIXTURE_TEST_CASE( accrueepoch_saturates_pending_accumulator, sysio_emissi
 
 BOOST_FIXTURE_TEST_CASE( payepoch_recovers_from_incomplete_batch_roster_history, sysio_emissions_tester ) try {
    // A mixed contract version can reach payepoch without any immutable roster
-   // snapshots. That must retain the batch slice rather than aborting the
-   // inline sysio.epoch::advance path chain-wide.
+   // snapshots. That must retain and durably attribute the batch slice rather
+   // than aborting the inline sysio.epoch::advance path chain-wide.
+   constexpr int64_t period_emission = 10'000;
    create_t5_holding_accounts();
    BOOST_REQUIRE_EQUAL(success(), setemitcfg_defaults(config::system_account_name));
    BOOST_REQUIRE_EQUAL(success(), initt5(config::system_account_name, tpsec(head_secs())));
    BOOST_REQUIRE_EQUAL(success(),
       push_system_action(EPOCH, "accrueepoch"_n, mvo()
-         ("epoch_index", 1)("batch_group_index", 0)("per_epoch_emission", int64_t(1))));
+         ("epoch_index", 1)("batch_group_index", 0)("per_epoch_emission", period_emission)));
 
    auto r = push_system_action(EPOCH, "payepoch"_n, mvo()
       ("epoch_index", 1)
       ("batch_op_groups", vector<vector<name>>{})
-      ("period_emission", int64_t(1)));
+      ("period_emission", period_emission));
    BOOST_REQUIRE_EQUAL(success(), r);
 
    // The period completes and establishes a clean next-period boundary.
    auto state = get_t5_state();
    BOOST_REQUIRE_EQUAL(int64_t(0), state["pending_emission_amount"].as<int64_t>());
    BOOST_REQUIRE_EQUAL(uint32_t(2), state["period_start_epoch"].as<uint32_t>());
+
+   const int64_t compute = test_split_bps(period_emission, COMPUTE_BPS);
+   const int64_t producer_pool = test_split_bps(compute, PRODUCER_BPS);
+   auto log = get_epoch_log(1);
+   BOOST_REQUIRE(!log["batch_history_complete"].as_bool());
+   BOOST_REQUIRE_EQUAL(compute - producer_pool,
+                       log["batch_emission_retained"].as<int64_t>());
+   BOOST_REQUIRE_EQUAL(int64_t(0), log["batch_fee_retained"].as<int64_t>());
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( payepoch_seeds_initial_roster_history_at_activation_epoch, sysio_emissions_tester ) try {
@@ -2529,6 +2583,64 @@ BOOST_FIXTURE_TEST_CASE( payepoch_recovers_after_legacy_roster_history_exceeds_c
                        get_t5_state()["period_start_epoch"].as<uint32_t>());
 } FC_LOG_AND_RETHROW()
 
+BOOST_FIXTURE_TEST_CASE( payepoch_bounded_cleanup_drains_overlong_roster_history,
+                         sysio_emissions_tester ) try {
+   // Gapped legacy/corrupt keys bypass rcrdbatch's exact oldest-key healing and
+   // can leave more than the normal ten rows. payepoch must bound each cleanup
+   // transaction, retain rewards while stale rows remain, and drain the table
+   // monotonically instead of attempting an unbounded erase loop.
+   constexpr uint32_t overlong_rows = 25;
+   constexpr uint32_t cleanup_rows = 20;
+   create_t5_holding_accounts();
+   BOOST_REQUIRE_EQUAL(success(), setemitcfg_defaults(config::system_account_name));
+   BOOST_REQUIRE_EQUAL(success(), initt5(config::system_account_name, tpsec(head_secs())));
+
+   for (uint32_t i = 1; i <= overlong_rows; ++i) {
+      const uint32_t epoch_index = i * 100;
+      BOOST_REQUIRE_EQUAL(success(), push_system_action(EPOCH, "accrueepoch"_n, mvo()
+         ("epoch_index", epoch_index)("batch_group_index", 0)("per_epoch_emission", int64_t(1))));
+      BOOST_REQUIRE_EQUAL(success(), push_system_action(EPOCH, "rcrdbatch"_n, mvo()
+         ("epoch_index", epoch_index)("members", vector<name>{})));
+   }
+
+   BOOST_REQUIRE_EQUAL(success(), push_system_action(EPOCH, "payepoch"_n, mvo()
+      ("epoch_index", overlong_rows * 100)
+      ("batch_op_groups", vector<vector<name>>{})
+      ("period_emission", int64_t(overlong_rows))));
+
+   for (uint32_t i = 1; i <= cleanup_rows; ++i) {
+      BOOST_REQUIRE(get_batch_epoch(i * 100).is_null());
+   }
+   for (uint32_t i = cleanup_rows + 1; i <= overlong_rows; ++i) {
+      BOOST_REQUIRE(!get_batch_epoch(i * 100).is_null());
+   }
+
+   // One more period removes the five stale rows plus its current row, still
+   // within the bound. The following contiguous period then has clean history.
+   const uint32_t recovery_epoch = overlong_rows * 100 + 1;
+   BOOST_REQUIRE_EQUAL(success(), push_system_action(EPOCH, "accrueepoch"_n, mvo()
+      ("epoch_index", recovery_epoch)("batch_group_index", 0)("per_epoch_emission", int64_t(1))));
+   BOOST_REQUIRE_EQUAL(success(), push_system_action(EPOCH, "rcrdbatch"_n, mvo()
+      ("epoch_index", recovery_epoch)("members", vector<name>{})));
+   BOOST_REQUIRE_EQUAL(success(), push_system_action(EPOCH, "payepoch"_n, mvo()
+      ("epoch_index", recovery_epoch)
+      ("batch_op_groups", vector<vector<name>>{})
+      ("period_emission", int64_t(1))));
+   BOOST_REQUIRE(get_batch_epoch(overlong_rows * 100).is_null());
+   BOOST_REQUIRE(get_batch_epoch(recovery_epoch).is_null());
+
+   const uint32_t clean_epoch = recovery_epoch + 1;
+   BOOST_REQUIRE_EQUAL(success(), push_system_action(EPOCH, "accrueepoch"_n, mvo()
+      ("epoch_index", clean_epoch)("batch_group_index", 0)("per_epoch_emission", int64_t(1))));
+   BOOST_REQUIRE_EQUAL(success(), push_system_action(EPOCH, "rcrdbatch"_n, mvo()
+      ("epoch_index", clean_epoch)("members", vector<name>{})));
+   BOOST_REQUIRE_EQUAL(success(), push_system_action(EPOCH, "payepoch"_n, mvo()
+      ("epoch_index", clean_epoch)
+      ("batch_op_groups", vector<vector<name>>{})
+      ("period_emission", int64_t(1))));
+   BOOST_REQUIRE(get_epoch_log(clean_epoch)["batch_history_complete"].as_bool());
+} FC_LOG_AND_RETHROW()
+
 BOOST_FIXTURE_TEST_CASE( setemitcfg_bounds_period_accrual_to_asset_range, sysio_emissions_tester ) try {
    // The pending accumulator saturates at asset::max_amount (previous test), and
    // a saturated accumulator leaves the pay-epoch readiness gate demanding a
@@ -2549,14 +2661,85 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_bounds_period_accrual_to_asset_range, sysio_
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( setemitcfg_caps_batch_roster_history, sysio_emissions_tester ) try {
-   // Each retained roster may hold the scheduler maximum of 100 operators.
-   // The cadence cap keeps a payepoch below 1,000 historical roster names.
+   // The independent history cap keeps payepoch at no more than ten immutable
+   // snapshots; the joint credit-work cap is covered separately below.
    BOOST_REQUIRE_EQUAL( success(),
       setemitcfg_with_cadence(config::system_account_name, uint16_t(10)) );
 
    auto r = setemitcfg_with_cadence(config::system_account_name, uint16_t(11));
    BOOST_REQUIRE( r != success() );
    require_substr(r, "pay_cadence_epochs exceeds batch roster history safety cap");
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( emission_config_boundaries_cap_batch_payout_credit_work,
+                         sysio_emissions_tester ) try {
+   // setemitcfg owns cadence changes. With the epoch roster at its maximum of
+   // 100, cadence two would permit 200 distinct recipient credits and must be
+   // rejected at that boundary.
+   BOOST_REQUIRE_EQUAL(success(), setemitcfg_defaults(config::system_account_name));
+   BOOST_REQUIRE_EQUAL(success(), init_epoch_state(60, /*operators_per_epoch*/100,
+                                                   /*batch_op_groups_count*/3));
+   auto r = setemitcfg_with_cadence(config::system_account_name, uint16_t(2));
+   BOOST_REQUIRE(r != success());
+   require_substr(r, "pay_cadence_epochs x operators_per_epoch exceeds the batch payout credit safety cap (100)");
+
+   // sysio.epoch::setconfig owns roster-size changes and enforces the same
+   // bound. Ten epochs at the normal seven-member roster fit; raising the
+   // roster to eleven would permit 110 credits and is rejected.
+   BOOST_REQUIRE_EQUAL(success(), init_epoch_state(60, /*operators_per_epoch*/7,
+                                                   /*batch_op_groups_count*/3));
+   BOOST_REQUIRE_EQUAL(success(),
+      setemitcfg_with_cadence(config::system_account_name, uint16_t(10)));
+   r = init_epoch_state(60, /*operators_per_epoch*/11, /*batch_op_groups_count*/3);
+   BOOST_REQUIRE(r != success());
+   require_substr(r, "pay_cadence_epochs x operators_per_epoch exceeds the batch payout credit safety cap (100)");
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( epoch_setconfig_recovers_legacy_cadence_with_runtime_work_bound,
+                         sysio_emissions_tester ) try {
+   // A pre-bound cadence above today's history cap is shortened at runtime.
+   // setconfig must validate that same effective value, while the preceding
+   // boundary test continues to reject an unsafe roster change for a current,
+   // otherwise-valid stored cadence.
+   set_legacy_emitcfg_cadence_raw(uint16_t(1000));
+   BOOST_REQUIRE_EQUAL(success(), init_epoch_state(
+      60, /*operators_per_epoch*/11, /*batch_op_groups_count*/3));
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( payepoch_recovers_when_legacy_rosters_exceed_credit_budget,
+                         sysio_emissions_tester ) try {
+   // Runtime defense-in-depth must keep malformed/legacy history from issuing
+   // more than 100 expensive credit_pay calls even if it bypassed both current
+   // configuration setters.
+   constexpr int64_t per_epoch_emission = 10'000;
+   vector<name> first_roster;
+   vector<name> second_roster;
+   for (uint64_t value = 1; value <= 51; ++value) {
+      first_roster.emplace_back(value);
+      second_roster.emplace_back(value + 100);
+   }
+
+   create_t5_holding_accounts();
+   BOOST_REQUIRE_EQUAL(success(), setemitcfg_defaults(config::system_account_name));
+   BOOST_REQUIRE_EQUAL(success(), initt5(config::system_account_name, tpsec(head_secs())));
+   for (uint32_t epoch_index = 1; epoch_index <= 2; ++epoch_index) {
+      BOOST_REQUIRE_EQUAL(success(), push_system_action(EPOCH, "accrueepoch"_n, mvo()
+         ("epoch_index", epoch_index)
+         ("batch_group_index", 0)
+         ("per_epoch_emission", per_epoch_emission)));
+      BOOST_REQUIRE_EQUAL(success(), push_system_action(EPOCH, "rcrdbatch"_n, mvo()
+         ("epoch_index", epoch_index)
+         ("members", epoch_index == 1 ? first_roster : second_roster)));
+   }
+
+   BOOST_REQUIRE_EQUAL(success(), push_system_action(EPOCH, "payepoch"_n, mvo()
+      ("epoch_index", 2)
+      ("batch_op_groups", vector<vector<name>>{})
+      ("period_emission", per_epoch_emission * 2)));
+
+   auto log = get_epoch_log(2);
+   BOOST_REQUIRE(!log["batch_history_complete"].as_bool());
+   BOOST_REQUIRE_GT(log["batch_emission_retained"].as<int64_t>(), 0);
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( epoch_setconfig_rejects_duration_breaking_accrual_bound, sysio_emissions_tester ) try {
@@ -3739,6 +3922,7 @@ BOOST_FIXTURE_TEST_CASE( payepoch_folds_swap_fee_rewards, sysio_emissions_tester
    const int64_t capex         = log["capex_amount"].as<int64_t>();
    const int64_t gov           = log["governance_amount"].as<int64_t>();
    const int64_t producer_pool = test_split_bps(compute, PRODUCER_BPS);
+   const int64_t batch_pool    = compute - producer_pool;
 
    // The producer received its emission share and NOTHING MORE. Swap fees pay
    // the parties that carry an individual swap — the winning underwriter and the
@@ -3753,6 +3937,9 @@ BOOST_FIXTURE_TEST_CASE( payepoch_folds_swap_fee_rewards, sysio_emissions_tester
    // operator actually receiving the fee is
    // `payepoch_pays_swap_fee_to_active_batch_operator` below.
    BOOST_REQUIRE_EQUAL( log["fee_distributed"].as<int64_t>(), 0 );
+   BOOST_REQUIRE(log["batch_history_complete"].as_bool());
+   BOOST_REQUIRE_EQUAL(log["batch_emission_retained"].as<int64_t>(), batch_pool);
+   BOOST_REQUIRE_EQUAL(log["batch_fee_retained"].as<int64_t>(), fee_total);
 
    // The bucket was still swept to zero by the inline drain — the drain is
    // unconditional on there being a recipient, and it must not overdraw.
@@ -3869,6 +4056,9 @@ BOOST_FIXTURE_TEST_CASE( payepoch_pays_swap_fee_to_active_batch_operator, sysio_
    // make. Exact value, not merely positive: a fee that leaked into the producer
    // pool or was double-counted would still be > 0 here.
    BOOST_REQUIRE_EQUAL( log["fee_distributed"].as<int64_t>(), fee_total );
+   BOOST_REQUIRE(log["batch_history_complete"].as_bool());
+   BOOST_REQUIRE_EQUAL(log["batch_emission_retained"].as<int64_t>(), int64_t(0));
+   BOOST_REQUIRE_EQUAL(log["batch_fee_retained"].as<int64_t>(), int64_t(0));
 
    // Bucket swept, and the fee is NOT charged against the emission curve —
    // total_distributed moves by the EMISSION only, excluding fee_total.
@@ -4748,6 +4938,31 @@ BOOST_FIXTURE_TEST_CASE( epochlog_prunes_past_retention_cap, sysio_emissions_tes
    BOOST_REQUIRE( !get_epoch_log(3).is_null() );
    BOOST_REQUIRE( !get_epoch_log(4).is_null() );
    BOOST_REQUIRE( !get_epoch_log(5).is_null() );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( epochlog_retention_counts_payment_rows_not_epoch_distance,
+                         sysio_emissions_tester ) try {
+   // With cadence > 1, pay-epoch indexes are spaced apart. Retention is a row
+   // count, so an index-distance calculation would prematurely prune rows.
+   create_t5_holding_accounts();
+   auto cfg = default_emit_cfg(uint16_t(2), ANNUAL_MAX_EMISSION, uint32_t(3));
+   BOOST_REQUIRE_EQUAL(success(), setemitcfg(config::system_account_name, cfg));
+   BOOST_REQUIRE_EQUAL(success(), initt5(config::system_account_name, tpsec(head_secs())));
+
+   for (const uint32_t epoch_index : {1u, 3u, 5u, 7u, 9u}) {
+      BOOST_REQUIRE_EQUAL(success(), push_system_action(EPOCH, "accrueepoch"_n, mvo()
+         ("epoch_index", epoch_index)("batch_group_index", 0)("per_epoch_emission", int64_t(1))));
+      BOOST_REQUIRE_EQUAL(success(), push_system_action(EPOCH, "payepoch"_n, mvo()
+         ("epoch_index", epoch_index)
+         ("batch_op_groups", vector<vector<name>>{})
+         ("period_emission", int64_t(1))));
+   }
+
+   BOOST_REQUIRE(get_epoch_log(1).is_null());
+   BOOST_REQUIRE(get_epoch_log(3).is_null());
+   BOOST_REQUIRE(!get_epoch_log(5).is_null());
+   BOOST_REQUIRE(!get_epoch_log(7).is_null());
+   BOOST_REQUIRE(!get_epoch_log(9).is_null());
 } FC_LOG_AND_RETHROW()
 
 // ---------------------------------------------------------------------------

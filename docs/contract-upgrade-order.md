@@ -155,14 +155,17 @@ to credit the batch-operator payout:
 
 The deployed contracts also have a bounded recovery path for an accidental
 mixed or mid-period deployment. `rcrdbatch` prunes the exact oldest retained
-roster so a legacy overlong cadence cannot stall `advance`. If `payepoch` sees
-missing, stale, non-contiguous, or over-cap history, it retains that period's
-batch-emission and swap-fee slices in the treasury, clears the unusable history
-after the accrued period, and begins a clean history next period. Producer,
-capex, and governance processing still completes. This is a recovery path, not
-a replacement for the normal quiesced deployment. Do not downgrade while
-`batchepochs` is non-empty. T5 must also be initialized before its first
-successful epoch advance.
+roster, and `payepoch` removes at most 20 history rows per payment, so even a
+malformed gapped table cannot turn cleanup into an unbounded `advance`.
+If `payepoch` sees missing, stale, non-contiguous, or over-cap history, it
+retains that period's batch-emission and swap-fee slices in the treasury,
+records the exact retained amounts and incomplete-history status in `epochlog`,
+and drains stale history monotonically before resuming batch payouts. Producer,
+capex, and governance processing still completes. The runtime also shortens a
+legacy cadence when necessary to keep batch credits at or below 100 per payout.
+This is a recovery path, not a replacement for the normal quiesced deployment.
+Do not downgrade while `batchepochs` is non-empty. T5 must also be initialized
+before its first successful epoch advance.
 
 ## The two rules for future changes
 

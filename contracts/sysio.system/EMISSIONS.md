@@ -84,13 +84,12 @@ historical active-epoch count. Producers are not paid out of swap fees, so
 `producer_bps` / `batch_op_bps` govern the emission split only.
 
 Allocated is not the same as paid: as with emissions, only **eligible** shares
-are actually credited. WIRE stays in the treasury when there are **no groups
-at all**, when an **empty group owns positive active epochs** (its weighted slice
-is skipped), when a **member is not opreg-ACTIVE**, or as the **remainder** of the
-two integer divisions (per-group weighting, then the even per-member split). A
-group active in **zero** epochs is *not* one of these cases — its weighted
-allocation is already zero, and because the per-group counts sum to the **actual
-accrued-epoch divisor** the remaining groups absorb the whole pool.
+are actually credited. WIRE stays in the treasury when an **empty historical
+roster** owns an accrued epoch, when a **member is not opreg-ACTIVE**, as the
+**remainder** of the two integer divisions (per-roster weighting, then the even
+per-member split), or when roster history is incomplete and the whole batch
+slice takes the bounded recovery path. Every `batchepochs` row represents one
+accrued epoch, so a zero-epoch historical roster cannot arise.
 
 That divisor is the sum of `t5state.batch_group_epochs`, **not** the configured
 `pay_cadence_epochs`. The two can differ — a mid-period `setemitcfg` cadence
@@ -102,22 +101,35 @@ rotation cannot reassign an earlier epoch to the current front group.
 ### Roster-history bounds and recovery
 
 `setemitcfg` accepts a payment cadence only in `[1, 10]`, which bounds an
-ordinary payment period to at most ten immutable roster snapshots. When
+ordinary payment period to at most ten immutable roster snapshots. It also
+validates `pay_cadence_epochs * operators_per_epoch <= 100`, preserving the
+prior one-roster ceiling on expensive per-recipient credits; `sysio.epoch`
+enforces the same constraint when its operator count changes. When
 `sysio.epoch` reads an older serialized configuration during an upgrade, it
-effectively clamps a zero or out-of-range cadence to that same safe window; the
-stored value is not rewritten until a normal `setemitcfg` update.
+effectively shortens the cadence to satisfy both bounds; the stored value is not
+rewritten until a normal `setemitcfg` update. `payepoch` independently refuses
+to credit more than 100 distinct historical-roster entries and takes the
+non-halting recovery path if malformed legacy history exceeds that limit.
 
 The `rcrdbatch` inline action also prunes the exact oldest retained row before
-writing a new one, so a legacy overlong period cannot halt epoch advancement.
+writing a new one. `payepoch` caps cleanup at 20 rows per payment, twice the
+largest accepted period, so even a malformed gapped table cannot turn recovery
+into an unbounded transaction; stale history drains monotonically.
 If `payepoch` sees missing, stale, non-contiguous, or over-cap history, it does
 not guess a roster or abort the enclosing `advance`: it retains that period's
-batch-emission and swap-fee slices in the treasury, clears the unusable history
-after the accrued period, and begins a clean history in the next period. A
-complete history remains required to credit batch-operator rewards.
+batch-emission and swap-fee slices in the treasury, drains the unusable history
+within the cleanup bound, and begins clean history after stale rows are gone. A
+complete history remains required to credit batch-operator rewards. Every
+`epochlog` row records whether history was complete and the exact batch-emission
+and fee amounts retained, making recovery distinguishable from an ordinary
+zero-eligible payout.
 
-`epochlog.fee_distributed` records what was actually paid, so it can be lower
-than the swept amount — and is `0` when no eligible batch operator existed at all,
-even though `drainrewards` swept the bucket to zero regardless.
+`epoch_log_retention_count` counts payment rows, not elapsed epoch indexes, so
+cadence values greater than one retain the configured number of audit records.
+
+`epochlog.fee_distributed` records what was actually paid, while
+`batch_fee_retained` records the swept amount left in treasury. The analogous
+`batch_emission_retained` field records undistributed batch emission.
 
 ## Retrieved via a claim action (pulled by recipient)
 
