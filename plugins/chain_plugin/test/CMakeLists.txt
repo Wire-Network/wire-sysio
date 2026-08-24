@@ -11,12 +11,15 @@ target_include_directories(test_chain_plugin PRIVATE
         ${CMAKE_BINARY_DIR}/unittests/include)
 set(CHAIN_PLUGIN_TEST_CASES
         chain_plugin_default_tests
-        chain_plugin_accepts_valid_snapshot_attestation
-        chain_plugin_rejects_snapshot_without_attestation_table
+        chain_plugin_accepts_attested_auto_fetched_snapshot
+        chain_plugin_rejects_auto_fetched_snapshot_without_enabled_config
+        chain_plugin_accepts_trusted_manual_snapshot_without_attestation_table
         snapshot_attestation_table_read_failure_policy
         snapshot_attestation_table_read_timeout_policy
         snapshot_attestation_required_schema_policy
+        snapshot_attestation_enabled_config_policy
         snapshot_attestation_record_tuple_policy
+        snapshot_endpoint_block_identity_policy
         chain_plugin_snapshot_endpoint_option_registration
         outbound_http_global_option_registration
         chain_plugin_snapshot_endpoint_option_validation

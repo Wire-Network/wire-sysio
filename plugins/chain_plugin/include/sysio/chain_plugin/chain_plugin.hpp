@@ -31,6 +31,7 @@
 
 #include <atomic>
 #include <optional>
+#include <string>
 #include <string_view>
 
 namespace fc { class variant; }
@@ -104,13 +105,32 @@ namespace sysio {
                 : configured_timeout;
    }
 
-   /** Return whether an ABI declares the required compatible snapshot-attestation table schema. */
+   /** Return whether an ABI declares the tables consumed during auto-fetched snapshot bootstrap. */
    bool has_required_snapshot_attestation_schema(const abi_def& abi);
+
+   /** Return whether one decoded snapconfig row enables snapshot attestation. */
+   bool snapshot_attestation_config_is_enabled(const fc::variants& rows);
+
+   /** Return whether endpoint metadata identifies the loaded scheduled snapshot head exactly. */
+   bool snapshot_endpoint_block_matches(uint32_t advertised_block_num, uint32_t loaded_block_num);
+
+   /** Return whether endpoint metadata honors an optional specifically requested block. */
+   bool snapshot_endpoint_request_matches(const std::optional<uint32_t>& requested_block_num,
+                                          uint32_t advertised_block_num);
+
+   /** Parse one complete decimal URL segment as a uint32 block number. */
+   std::optional<uint32_t> parse_snapshot_endpoint_block_num(std::string_view segment);
 
    /** Return the canonical physical KV table identifier for final snapshot attestations. */
    inline uint16_t snapshot_attestation_table_id() {
       return chain::compute_table_id(
          chain::name{protocol::snapshot_attestation::table_snaprecords}.to_uint64_t());
+   }
+
+   /** Return the canonical physical KV table identifier for snapshot attestation configuration. */
+   inline uint16_t snapshot_attestation_config_table_id() {
+      return chain::compute_table_id(
+         chain::name{protocol::snapshot_attestation::table_snapconfig}.to_uint64_t());
    }
 
    /** Compare both immutable tuple components loaded from a snapshot with an attested record. */
@@ -748,12 +768,12 @@ public:
    ///
    /// `shutdown_flag` is polled every 200ms on the off-thread path so the caller returns early on plugin shutdown
    /// instead of stalling up to `timeout` for the executor to drain. `abi_serializer_timeout` independently bounds
-   /// ABI decoding, and `log_prefix` is a short tag (plugin name) used in error log lines.
+   /// ABI decoding, and `log_prefix` is an owned short tag (plugin name) used in error log lines.
    std::optional<chain_apis::read_only::get_table_rows_result>
    read_table_rows_checked(chain_apis::read_only::get_table_rows_params params,
                            fc::microseconds timeout,
                            fc::microseconds abi_serializer_timeout,
-                           std::string_view log_prefix,
+                           std::string log_prefix,
                            const std::atomic<bool>& shutdown_flag);
 
    /** Run a table scan while preserving the legacy empty-result-on-failure behavior. */

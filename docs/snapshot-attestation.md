@@ -11,8 +11,8 @@ Wire answers this with *on-chain snapshot attestation*. A set of registered snap
 providers independently generate a snapshot at the same block height, compute a
 deterministic hash of it, and record their agreement on-chain. Once a quorum of providers
 vote for the same hash at a given block, that hash becomes an attested record in
-system-contract state. Any node that loads a snapshot can then verify its block ID and hash
-against the attested record after it has synced past the snapshot's block.
+system-contract state. Any node that auto-fetches a snapshot can then verify its block ID and
+hash against the attested record after it has synced past the snapshot's block.
 
 This document covers the design and its moving parts:
 
@@ -32,8 +32,8 @@ provider over HTTP) builds on this foundation and is documented separately with 
   recorded on-chain.
 - Keep snapshot generation deterministic, so every honest provider produces an identical
   file and identical root hash for the same block.
-- Halt a node when its loaded snapshot block ID or hash contradicts the on-chain attestation, while
-  staying permissive when no attestation exists for the loaded block.
+- Halt an auto-fetching node when its loaded snapshot lacks a usable attestation or its block ID or
+  hash contradicts the on-chain record. Keep manual `--snapshot` as an operator-trusted escape hatch.
 - Reuse existing transaction and table infrastructure rather than adding a parallel
   signing and vote-accumulation layer.
 
@@ -112,10 +112,9 @@ Files:
 
 | Action | Authority | Description |
 |--------|-----------|-------------|
-| `regsnapprov(producer, snap_account)` | `producer` | Delegate `snap_account` as the producer's snapshot provider. |
-| `delsnapprov(account)` | `account` | Sever the relationship; accepts either the snap_account or the producer. |
+| `regsnapprov(producer, snap_account)` | `producer` | Create or rotate the producer's snapshot-provider delegation. |
 | `votesnaphash(snap_account, block_id, snapshot_hash)` | `snap_account` | Submit a hash vote for the block named by `block_id`. |
-| `setsnpcfg(min_providers, threshold_pct)` | `sysio` | Set the attestation quorum parameters. |
+| `setsnpcfg(min_providers)` | `sysio` | Set the fixed number K of producer votes required to attest. |
 | `getsnaphash(block_num)` | read-only | Return the attested record for a block, if any. |
 
 ### Tables (all scoped to `sysio`)
@@ -124,9 +123,9 @@ Storage uses the KV table API (`sysio::kv::table` / `sysio::kv::global`).
 
 | Table | Key | Contents | Secondary index |
 |-------|-----|----------|-----------------|
-| `snapconfig` | singleton | `{ min_providers, threshold_pct }` | -- |
+| `snapconfig` | singleton | `{ min_providers }` | -- |
 | `snapprovs` | `snap_account` | `{ snap_account, producer }` | `byproducer` |
-| `snapvotes` | auto-increment `id` | `{ id, block_num, block_id, snapshot_hash, quorum, voters[] }` | `byblocknum` |
+| `snapvotes` | auto-increment `id` | `{ id, block_num, block_id, snapshot_hash, voters[] }` | `byblocknum` |
 | `snaprecords` | `block_num` | `{ block_num, block_id, snapshot_hash, attested_at_block }` | -- |
 
 ### Registration
@@ -140,14 +139,15 @@ stable delegation through ordinary producer churn.
 
 The registration table is capped at 30. Normal producer lifecycle actions do no attestation work.
 Only when a new registration encounters a full table does `regsnapprov` lazily remove mappings whose
-producer is missing, inactive, or ranked above 30, then reapply the cap. Pending votes are never
-retracted by this cleanup.
+producer is missing, inactive, or ranked above 30, print each eviction, then reapply the cap. All
+uniqueness checks run before pruning, so a doomed registration cannot mutate unrelated mappings.
+Pending votes are never retracted by this cleanup.
 Delegating to a separate account decouples authority: the producer's keys never have to live on
 the snapshot node -- only the snap_account's key does.
 
-Either party can call `delsnapprov` to end the relationship. The action looks the mapping up
-in both directions, so it works whether invoked by the snap_account (deregistering itself) or
-by the producer (removing its delegate).
+Calling `regsnapprov` again with the same pair is idempotent. Calling it with a new snap_account
+atomically replaces that producer's old mapping. Votes store producer identities, so rotating the
+signing account neither retracts an accepted vote nor allows the producer to vote twice.
 
 ### Voting and quorum
 
@@ -155,32 +155,18 @@ After computing a snapshot, a provider calls `votesnaphash(snap_account, block_i
 snapshot_hash)`. The contract checks that `snap_account` is a registered provider, derives
 `block_num` from `block_id`, and accumulates the vote.
 
-The first vote at a scheduled height freezes one quorum for that height:
+`min_providers` is the governance-set fixed K: every tuple finalizes after K distinct producer
+votes. Its stored default is zero, which disables voting until governance chooses the launch value.
+K does not scale with the number of registered mappings; governance explicitly owns that security
+and liveness tradeoff. Configuration changes apply to pending heights, and retrying an existing
+vote finalizes its tuple if a newly lowered K is already met.
 
-```
-quorum = max(
-    min_providers,
-    ceil(registered_providers_at_first_vote * threshold_pct / 100),
-    floor(registered_providers_at_first_vote / 3) + 1
-)
-```
-
-- `min_providers` is a hard floor set explicitly by `setsnpcfg`. Its stored default is zero,
-  which disables new tallies until governance chooses a launch value.
-- `threshold_pct` is the share of registrations required (default 67, i.e. two-thirds).
-- `floor(registered_providers_at_first_vote / 3) + 1` is an independent Byzantine-safety
-  floor that prevents a misconfigured low percentage from authorizing a Byzantine minority.
-
-Every competing tuple at the same height inherits the same frozen quorum. Later registration,
-producer-status, or configuration changes do not change it and do not remove votes. A producer may
-retry the same tuple idempotently and may vote at multiple scheduled heights, but cannot submit two
-different tuples at one height.
+A producer may retry the same tuple idempotently and may vote at multiple scheduled heights, but
+cannot submit two different tuples at one height. Registration and producer-status churn never
+removes an accepted vote.
 
 Only exact multiples of 25,000 are accepted. This bounds the height space to the provider schedule
 and rejects manual/on-demand snapshots before they can create pending rows.
-
-The floor guarantees a minimum number of attestors even on a small network; the percentage
-makes the quorum scale with participation.
 
 ### Lifecycle and storage
 
@@ -231,17 +217,20 @@ manual snapshot at an arbitrary height.
 
 ## 4. Snapshot verification on load
 
-When a node starts with `--snapshot`, `chain_plugin` records the loaded snapshot's block
+When a node starts with `--snapshot-endpoint`, `chain_plugin` records the loaded snapshot's block
 number, block ID, and BLAKE3 root hash. Verification is not a single check at a fixed point: starting
-with the first irreversible block past the snapshot height, the node attempts verification
-on every finalized block until it reaches a terminal outcome. The `snaprecords` row for a
-height is created by the providers' `votesnaphash` transactions, which land on-chain some
-blocks *after* that height, so the record can legitimately be absent on early attempts and
-appear on a later one.
+with the first irreversible block past the snapshot height, the node attempts verification on every
+finalized block until it reaches a terminal outcome. The `snaprecords` row for a height is created by
+the providers' `votesnaphash` transactions, which land on-chain some blocks *after* that height, so
+the record can legitimately be absent on early attempts and appear on a later one.
+
+Manual `--snapshot` is an explicit operator-trusted escape hatch. It loads without requiring the
+attestation ABI or configuration and never enters the post-sync attestation verification path.
 
 For `--snapshot-endpoint`, metadata at a non-cadence height is rejected before the snapshot
-file is downloaded. Only exact 25,000-block cadence heights can ever receive an attestation,
-so loading any other remote snapshot could never satisfy strict verification.
+file is downloaded. A specific `/N` request must return metadata for exactly block N, and the
+loaded snapshot head must match that metadata. Only exact 25,000-block cadence heights can ever
+receive an attestation, so loading any other remote snapshot could never satisfy strict verification.
 
 Each attempt reads the on-chain `snaprecords` table (through the standard table-read path,
 which performs ABI decoding) and resolves as follows:
@@ -253,34 +242,30 @@ which performs ABI decoding) and resolves as follows:
 | No record; node still syncing | Pending; retry on the next finalized block. |
 | No record; caught up; within the grace window | Pending; retry on the next finalized block. |
 | Table read fails; syncing or within the grace window | Pending; retry on the next finalized block. |
-| No record/read failure; caught up; grace exhausted; manual snapshot | Warning; verification skipped. |
-| No record/read failure; caught up; grace exhausted; auto-fetched snapshot | Fatal error; node halts. |
+| No record/read failure; caught up; grace exhausted | Fatal error; node halts. |
 | Unexpected error during verification | Fatal error; node halts. |
 
 "Caught up" means the latest finalized block's timestamp is within 30 seconds of wall-clock
 time. The grace window is 12,500 finalized blocks past the snapshot height -- half the fixed
 25,000-block provider snapshot interval -- and exists because a node bootstrapping from a
 fresh snapshot can reach the live tip before the providers' votes for that height have
-landed. A missing record only becomes the terminal "never attested" warning once the node is
+landed. A missing record only becomes the terminal "never attested" failure once the node is
 caught up *and* the finalized head is at least 12,500 blocks past the snapshot height.
 
 Two implementation details worth knowing as an operator:
 
-- Before replay begins, the loaded snapshot's system ABI must declare the compatible `snaprecords`
-  physical table identifier, key, and record-field schema used by verification. Snapshots without
-  that exact interface are rejected before their state is advanced.
+- Before replay begins, an auto-fetched snapshot's system ABI must declare compatible `snaprecords`
+  and `snapconfig` physical table identifiers, keys, and value schemas. Its decoded `snapconfig`
+  row must also contain a nonzero `min_providers`; otherwise startup fails immediately rather than
+  discovering after a long sync that attestation is disabled.
 - Verification cannot happen before the snapshot is loaded -- there is no chain state to
   query until then. The node loads the snapshot optimistically and verifies from synced
   on-chain state as it catches up.
 
-The permissive terminal warning for a missing record or persistent table-read failure is deliberate
-for manual `--snapshot` use because operators can load their own trusted snapshots. A block-ID or
-hash *mismatch* is never permissive:
-the node stops, and the recommended recovery is to delete the chain state derived from the
-untrusted snapshot and acquire a fresh snapshot from a trusted source before restarting.
-The HTTP bootstrap path (`plugins/snapshot_api_plugin/README.md`) applies strict enforcement
-instead, because an auto-fetched snapshot comes from an untrusted peer and must be backed by
-an attested record.
+The HTTP bootstrap path (`plugins/snapshot_api_plugin/README.md`) is strict because an auto-fetched
+snapshot comes from an untrusted peer and must be backed by an attested record. A mismatch or an
+unattested auto-fetched snapshot stops the node; recovery is to delete the derived chain state and
+acquire a fresh snapshot from a trusted source before restarting.
 
 ## Operator deployment model
 
@@ -301,9 +286,9 @@ A minimal operator flow:
 clio push action sysio regsnapprov \
   '{"producer":"myproducer1","snap_account":"mysnapprov1"}' -p myproducer1@active
 
-# set the network-wide quorum (sysio authority)
+# set the network-wide fixed K (sysio authority)
 clio push action sysio setsnpcfg \
-  '{"min_providers":3,"threshold_pct":67}' -p sysio@active
+  '{"min_providers":3}' -p sysio@active
 
 # a vote (auto-submitted in snapshot-provider mode; shown here for reference)
 clio push action sysio votesnaphash \
@@ -329,17 +314,17 @@ clio push action sysio votesnaphash \
 ## Testing
 
 - Contract tests (`contracts/tests/sysio.snapshot_attest_tests.cpp`) cover registration and
-  lazy full-table pruning, config validation, scheduled-height rejection, frozen quorum,
-  monotonic votes across churn and heights, equivocation/disagreement rejection, finalization
-  purging, and the `getsnaphash` query.
+  rotation, side-effect-free uniqueness failures, traceable lazy full-table pruning, fixed-K
+  configuration, scheduled-height rejection, monotonic votes across churn and heights,
+  equivocation/disagreement rejection, finalization purging, and the `getsnaphash` query.
 - Unit tests (`unittests/snapshot_attest_tests.cpp`) cover snapshot round-trip hash
   stability, a full chain whose snapshot hash matches its on-chain record, mismatch
   detection, the no-attestation case, and survival of attestation state across a snapshot
-  load. The shared real-contract fixture also drives a focused chain-plugin test from block
-  25,000 through replay of the matching record and terminal irreversible-block callback
-  verification.
+  load. The shared real-contract fixture also drives a chain-plugin auto-fetch test through
+  download, early schema/configuration validation, retained-block replay, and terminal tuple
+  verification. Chain-plugin tests additionally cover disabled configuration, endpoint-to-file
+  block identity, and the trusted manual-snapshot bypass.
 - The wall-clock integration test (`tests/snapshot_attest_test.py`) covers provider lifecycle
   actions and proves an on-demand snapshot is rejected outside the production cadence. C++ tests
-  construct block 25,000 without hours of real-time production to cover scheduled quorum,
-  attestation-record persistence, snapshot round trips, and successful chain-plugin callback/table
-  verification after replay.
+  construct block 25,000 without hours of real-time production to cover fixed-K voting,
+  attestation-record persistence, snapshot round trips, and strict auto-fetch verification.

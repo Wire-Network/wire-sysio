@@ -66,12 +66,6 @@ public:
          ("snap_account", snap_account));
    }
 
-   /// Unregister a snapshot provider.
-   action_result delsnapprov(name account) {
-      return push_action(account, "delsnapprov"_n, mvo()
-         ("account", account));
-   }
-
    /// Deactivate a producer while retaining its producer-table row.
    action_result unregproducer(name producer) {
       return push_action(producer, "unregprod"_n, mvo()
@@ -88,10 +82,9 @@ public:
    }
 
    /// Set snapshot attestation configuration.
-   action_result setsnpcfg(uint32_t min_providers, uint32_t threshold_pct) {
+   action_result setsnpcfg(uint32_t min_providers) {
       return push_action(config::system_account_name, "setsnpcfg"_n, mvo()
-         ("min_providers", min_providers)
-         ("threshold_pct", threshold_pct));
+         ("min_providers", min_providers));
    }
 
    /// Return an attested snapshot record from the contract table.
@@ -226,8 +219,12 @@ BOOST_FIXTURE_TEST_CASE(regsnapprov_rejects_provider_beyond_maximum, snapshot_at
                         regsnapprov(capacity_producers.back(), capacity_producers.back()));
 
    // Eligibility changes do not touch the normal lifecycle path. A full-table registration lazily
-   // removes stale mappings before enforcing the cap.
+   // removes stale mappings before enforcing the cap, but a registration that already conflicts
+   // must fail without pruning unrelated rows.
    BOOST_REQUIRE_EQUAL(success(), unregproducer("producer1"_n));
+   BOOST_REQUIRE(!get_snap_provider("snapprov1"_n).is_null());
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("snap_account is already registered as a provider"),
+                       regsnapprov(capacity_producers.back(), "snapprov2"_n));
    BOOST_REQUIRE(!get_snap_provider("snapprov1"_n).is_null());
    BOOST_REQUIRE_EQUAL(success(),
                        regsnapprov(capacity_producers.back(), capacity_producers.back()));
@@ -235,16 +232,22 @@ BOOST_FIXTURE_TEST_CASE(regsnapprov_rejects_provider_beyond_maximum, snapshot_at
    BOOST_REQUIRE(!get_snap_provider(capacity_producers.back()).is_null());
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(regsnapprov_duplicate_rejected, snapshot_attest_tester) { try {
+BOOST_FIXTURE_TEST_CASE(regsnapprov_is_idempotent_and_rotates_provider, snapshot_attest_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov2"_n));
 
-   // Same snap_account should fail
+   BOOST_REQUIRE(get_snap_provider("snapprov1"_n).is_null());
+   const auto rotated_provider = get_snap_provider("snapprov2"_n);
+   BOOST_REQUIRE(!rotated_provider.is_null());
+   BOOST_REQUIRE_EQUAL("producer1", rotated_provider["producer"].as_string());
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(regsnapprov_rejects_provider_owned_by_another_producer,
+                        snapshot_attest_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("snap_account is already registered as a provider"),
-                        regsnapprov("producer1"_n, "snapprov1"_n));
-
-   // Same producer different snap_account should fail
-   BOOST_REQUIRE_EQUAL(wasm_assert_msg("producer already has a registered snapshot provider"),
-                        regsnapprov("producer1"_n, "snapprov2"_n));
+                        regsnapprov("producer2"_n, "snapprov1"_n));
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(regsnapprov_wrong_auth, snapshot_attest_tester) { try {
@@ -280,56 +283,26 @@ BOOST_FIXTURE_TEST_CASE(regsnapprov_rejects_inactive_producer, snapshot_attest_t
 } FC_LOG_AND_RETHROW() }
 
 // ---------------------------------------------------------------------------
-// delsnapprov tests
-// ---------------------------------------------------------------------------
-BOOST_FIXTURE_TEST_CASE(delsnapprov_by_snap_account, snapshot_attest_tester) { try {
-   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
-   BOOST_REQUIRE_EQUAL(success(), delsnapprov("snapprov1"_n));
-
-   auto prov = get_snap_provider("snapprov1"_n);
-   BOOST_REQUIRE_EQUAL(true, prov.is_null());
-} FC_LOG_AND_RETHROW() }
-
-BOOST_FIXTURE_TEST_CASE(delsnapprov_by_producer, snapshot_attest_tester) { try {
-   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
-   BOOST_REQUIRE_EQUAL(success(), delsnapprov("producer1"_n));
-
-   auto prov = get_snap_provider("snapprov1"_n);
-   BOOST_REQUIRE_EQUAL(true, prov.is_null());
-} FC_LOG_AND_RETHROW() }
-
-BOOST_FIXTURE_TEST_CASE(delsnapprov_not_found, snapshot_attest_tester) { try {
-   BOOST_REQUIRE_EQUAL(
-      wasm_assert_msg("account is not registered as a snapshot provider or producer"),
-      delsnapprov("snapprov1"_n));
-} FC_LOG_AND_RETHROW() }
-
-// ---------------------------------------------------------------------------
 // setsnpcfg tests
 // ---------------------------------------------------------------------------
 BOOST_FIXTURE_TEST_CASE(setsnpcfg_basic, snapshot_attest_tester) { try {
-   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(3, 80));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(3));
 
    // Only sysio can call — producer1 should fail
    BOOST_REQUIRE_EQUAL(error("missing authority of sysio"),
                         push_action("producer1"_n, "setsnpcfg"_n, mvo()
-                           ("min_providers", 2)
-                           ("threshold_pct", 50)));
+                           ("min_providers", 2)));
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(setsnpcfg_validation, snapshot_attest_tester) { try {
-   BOOST_REQUIRE_EQUAL(wasm_assert_msg("threshold_pct must be between 1 and 100"),
-                        setsnpcfg(1, 0));
-   BOOST_REQUIRE_EQUAL(wasm_assert_msg("threshold_pct must be between 1 and 100"),
-                        setsnpcfg(1, 101));
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("min_providers must be at least 1"),
-                        setsnpcfg(0, 67));
+                        setsnpcfg(0));
    // min_providers cannot exceed the provider-table ceiling (max_snap_provider_rank
    // == 30): above it, quorum is unreachable no matter how many providers register.
    // The boundary value is accepted; one past it is rejected.
-   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(30, 80));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(30));
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("min_providers exceeds the maximum registrable providers"),
-                        setsnpcfg(31, 80));
+                        setsnpcfg(31));
 } FC_LOG_AND_RETHROW() }
 
 // ---------------------------------------------------------------------------
@@ -347,7 +320,7 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_preserves_registered_authority_after_produc
                         snapshot_attest_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
-   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2, 67));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2));
    BOOST_REQUIRE_EQUAL(success(), unregproducer("producer1"_n));
    BOOST_REQUIRE(!get_snap_provider("snapprov1"_n).is_null());
 
@@ -360,34 +333,32 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_preserves_registered_authority_after_produc
    BOOST_REQUIRE(!getsnaphash(block_num).is_null());
 } FC_LOG_AND_RETHROW() }
 
-/// The first vote freezes quorum despite later deregistration and configuration changes.
-BOOST_FIXTURE_TEST_CASE(votesnaphash_freezes_height_quorum, snapshot_attest_tester) { try {
+/// A governance change applies to pending votes, and an exact retry can finalize the existing tuple.
+BOOST_FIXTURE_TEST_CASE(votesnaphash_uses_current_fixed_k_for_pending_votes, snapshot_attest_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer3"_n, "snapprov3"_n));
-   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(3, 100));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(3));
 
    const auto block_num = vote_block_num();
    const auto block_id = make_block_id(block_num);
    const auto snapshot_hash = make_snap_hash(10);
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, block_id, snapshot_hash));
-   BOOST_REQUIRE_EQUAL(success(), delsnapprov("snapprov1"_n));
-   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1, 1));
-
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, block_id, snapshot_hash));
    BOOST_REQUIRE(getsnaphash(block_num).is_null());
-   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov3"_n, block_id, snapshot_hash));
+
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2));
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, block_id, snapshot_hash));
    BOOST_REQUIRE(!getsnaphash(block_num).is_null());
 } FC_LOG_AND_RETHROW() }
 
-/// Competing tuples at one height inherit the quorum frozen by that height's first tuple.
-BOOST_FIXTURE_TEST_CASE(votesnaphash_shares_frozen_quorum_across_competing_tuples,
+/// Every competing tuple at one height is measured against the same current governance-set K.
+BOOST_FIXTURE_TEST_CASE(votesnaphash_uses_current_fixed_k_for_competing_tuples,
                         snapshot_attest_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer3"_n, "snapprov3"_n));
-   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer4"_n, "snapprov4"_n));
-   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(3, 67));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(3));
 
    const auto block_num = vote_block_num();
    const auto block_id_a = make_block_id(block_num);
@@ -395,21 +366,21 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_shares_frozen_quorum_across_competing_tuple
    const auto hash_a = make_snap_hash(11);
    const auto hash_b = make_snap_hash(12);
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, block_id_a, hash_a));
-   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1, 1));
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, block_id_b, hash_b));
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov3"_n, block_id_b, hash_b));
    BOOST_REQUIRE(getsnaphash(block_num).is_null());
-   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov4"_n, block_id_b, hash_b));
+
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2));
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, block_id_b, hash_b));
    BOOST_REQUIRE(!getsnaphash(block_num).is_null());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(votesnaphash_single_no_quorum, snapshot_attest_tester) { try {
-   // 3 providers, 50% threshold -> ceil(3*50/100) = 2, min_providers=2
-   // quorum = max(2, 2) = 2; single vote not enough
+   // Fixed K is two, so a single vote remains pending regardless of registration count.
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer3"_n, "snapprov3"_n));
-   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2, 50));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2));
    produce_blocks();
 
    const auto block_num = vote_block_num();
@@ -424,12 +395,11 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_single_no_quorum, snapshot_attest_tester) {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(votesnaphash_quorum_reached, snapshot_attest_tester) { try {
-   // 3 providers, 50% threshold -> ceil(3*50/100) = ceil(1.5) = 2
-   // quorum = max(2, 2) = 2
+   // Fixed K is two, so the second distinct producer finalizes the tuple.
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer3"_n, "snapprov3"_n));
-   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2, 50));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2));
    produce_blocks();
 
    const auto block_num = vote_block_num();
@@ -437,12 +407,12 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_quorum_reached, snapshot_attest_tester) { t
    auto shash = make_snap_hash(1);
 
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, bid, shash));
-   // 1 vote, quorum=2, not attested yet
+   // One vote is below K=2, so the tuple is not attested yet.
    BOOST_REQUIRE_EQUAL(true, getsnaphash(block_num).is_null());
 
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, bid, shash));
 
-   // Quorum reached — attested record should exist
+   // K reached — the attested record should exist.
    auto rec = getsnaphash(block_num);
    BOOST_REQUIRE_EQUAL(false, rec.is_null());
    BOOST_REQUIRE_EQUAL(block_num, rec["block_num"].as_uint64());
@@ -452,7 +422,7 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_same_tuple_retry_is_idempotent, snapshot_at
    // Need 2 providers, min_providers=2 so single vote won't attest and purge
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
-   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2, 67));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2));
    produce_blocks();
 
    const auto block_num = vote_block_num();
@@ -467,7 +437,7 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_same_tuple_retry_is_idempotent, snapshot_at
 /// An exact retry remains idempotent after finalization and subsequent eligibility removal.
 BOOST_FIXTURE_TEST_CASE(votesnaphash_final_tuple_retry_is_idempotent, snapshot_attest_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
-   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1, 67));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1));
 
    const auto block_num = vote_block_num();
    const auto block_id = make_block_id(block_num);
@@ -481,7 +451,7 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_final_tuple_retry_is_idempotent, snapshot_a
    BOOST_REQUIRE_EQUAL(0u, snapshot_vote_count());
 } FC_LOG_AND_RETHROW() }
 
-/// Voting is disabled until governance explicitly chooses a nonzero provider floor.
+/// Voting is disabled until governance explicitly chooses a nonzero fixed K.
 BOOST_FIXTURE_TEST_CASE(votesnaphash_rejects_unconfigured_quorum, snapshot_attest_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
 
@@ -494,7 +464,7 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_rejects_unconfigured_quorum, snapshot_attes
 /// A provider cannot pre-attest a tuple for a block height the chain has not reached.
 BOOST_FIXTURE_TEST_CASE(votesnaphash_rejects_future_block_height, snapshot_attest_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
-   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1, 67));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1));
 
    const uint32_t future_block_num =
       vote_block_num() + sysio::protocol::snapshot_attestation::block_spacing;
@@ -507,7 +477,7 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_rejects_future_block_height, snapshot_attes
 /// A manual snapshot height cannot enter the bounded on-chain tally space.
 BOOST_FIXTURE_TEST_CASE(votesnaphash_rejects_unscheduled_block_height, snapshot_attest_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
-   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1, 67));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1));
 
    const uint32_t unscheduled_block_num = vote_block_num() + 1;
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("snapshot block is not a scheduled attestation height"),
@@ -517,48 +487,44 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_rejects_unscheduled_block_height, snapshot_
 } FC_LOG_AND_RETHROW() }
 
 // ---------------------------------------------------------------------------
-// threshold / min_providers tests
+// fixed-K tests
 // ---------------------------------------------------------------------------
-BOOST_FIXTURE_TEST_CASE(threshold_min_providers_floor, snapshot_attest_tester) { try {
-   // A registration set smaller than min_providers is rejected before freezing quorum.
+BOOST_FIXTURE_TEST_CASE(fixed_k_can_be_reached_after_more_providers_register, snapshot_attest_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
-   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2, 67));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2));
    produce_blocks();
 
    const auto block_num = vote_block_num();
    auto bid = make_block_id(block_num);
    auto shash = make_snap_hash(2);
 
-   BOOST_REQUIRE_EQUAL(wasm_assert_msg("registered snapshot providers are below min_providers"),
-                       votesnaphash("snapprov1"_n, bid, shash));
-
-   // Not attested because min_providers floor is 2
-   auto rec = getsnaphash(block_num);
-   BOOST_REQUIRE_EQUAL(true, rec.is_null());
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, bid, shash));
+   BOOST_REQUIRE(getsnaphash(block_num).is_null());
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, bid, shash));
+   BOOST_REQUIRE(!getsnaphash(block_num).is_null());
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(threshold_percentage_calculation, snapshot_attest_tester) { try {
-   // 5 providers, 67% threshold -> ceil(5*67/100) = ceil(3.35) = 4
-   // quorum = max(1, 4) = 4
+BOOST_FIXTURE_TEST_CASE(fixed_k_is_independent_of_registration_count, snapshot_attest_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer3"_n, "snapprov3"_n));
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer4"_n, "snapprov4"_n));
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer5"_n, "snapprov5"_n));
-   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1, 67));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(4));
    produce_blocks();
 
    const auto block_num = vote_block_num();
    auto bid = make_block_id(block_num);
    auto shash = make_snap_hash(3);
 
-   // 3 votes should NOT be enough (need 4)
+   // Three votes do not meet K even though the registration population is five.
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, bid, shash));
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, bid, shash));
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov3"_n, bid, shash));
    BOOST_REQUIRE_EQUAL(true, getsnaphash(block_num).is_null());
 
-   // 4th vote reaches quorum
+   // The fourth distinct producer reaches the governance-set K.
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov4"_n, bid, shash));
    BOOST_REQUIRE_EQUAL(false, getsnaphash(block_num).is_null());
 } FC_LOG_AND_RETHROW() }
@@ -567,17 +533,17 @@ BOOST_FIXTURE_TEST_CASE(threshold_percentage_calculation, snapshot_attest_tester
 // disagreement tests
 // ---------------------------------------------------------------------------
 BOOST_FIXTURE_TEST_CASE(disagreement_detection, snapshot_attest_tester) { try {
-   // 2 providers, quorum = max(1, ceil(2*50/100)) = 1
+   // K=1 finalizes on the first vote regardless of the two registered mappings.
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
-   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1, 50));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1));
    produce_blocks();
 
    const auto block_num = vote_block_num();
    auto bid = make_block_id(block_num);
    auto shash = make_snap_hash(4);
 
-   // Attest with one vote (quorum=1)
+   // Attest with one vote because K=1.
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, bid, shash));
    BOOST_REQUIRE_EQUAL(false, getsnaphash(block_num).is_null());
 
@@ -589,11 +555,11 @@ BOOST_FIXTURE_TEST_CASE(disagreement_detection, snapshot_attest_tester) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(blockid_mismatch_votes_not_aggregated, snapshot_attest_tester) { try {
-   // 3 providers, quorum = max(2, ceil(3*50/100)) = 2.
+   // Three providers are registered, but the fixed K remains two.
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer3"_n, "snapprov3"_n));
-   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2, 50));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2));
    produce_blocks();
 
    // Same height and same snapshot hash, but different block ids (competing forks).
@@ -606,10 +572,10 @@ BOOST_FIXTURE_TEST_CASE(blockid_mismatch_votes_not_aggregated, snapshot_attest_t
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, bid_b, shash));
 
    // The two votes agree on the hash but not the block id, so they must NOT
-   // jointly reach the quorum of 2.
+   // jointly reach K=2.
    BOOST_REQUIRE_EQUAL(true, getsnaphash(block_num).is_null());
 
-   // A distinct producer may join the first tuple to reach quorum.
+   // A distinct producer may join the first tuple to reach K.
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov3"_n, bid_a, shash));
    auto rec = getsnaphash(block_num);
    BOOST_REQUIRE_EQUAL(false, rec.is_null());
@@ -620,7 +586,7 @@ BOOST_FIXTURE_TEST_CASE(blockid_mismatch_votes_not_aggregated, snapshot_attest_t
 BOOST_FIXTURE_TEST_CASE(votesnaphash_rejects_producer_equivocation_across_hashes, snapshot_attest_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
-   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2, 50));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2));
 
    const auto bid = make_block_id(vote_block_num());
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, bid, make_snap_hash(80)));
@@ -631,7 +597,7 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_rejects_producer_equivocation_across_hashes
 BOOST_FIXTURE_TEST_CASE(votesnaphash_reports_disagreement_before_eligibility_failure, snapshot_attest_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
-   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1, 50));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1));
 
    const auto bid = make_block_id(vote_block_num());
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, bid, make_snap_hash(83)));
@@ -641,10 +607,10 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_reports_disagreement_before_eligibility_fai
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(record_blockid_disagreement, snapshot_attest_tester) { try {
-   // 2 providers, quorum = max(1, ceil(2*50/100)) = 1
+   // K=1 finalizes on the first vote regardless of the two registered mappings.
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
-   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1, 50));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1));
    produce_blocks();
 
    const auto block_num = vote_block_num();
@@ -652,7 +618,7 @@ BOOST_FIXTURE_TEST_CASE(record_blockid_disagreement, snapshot_attest_tester) { t
    auto bid_b = make_block_id(block_num, 1);
    auto shash = make_snap_hash(9);
 
-   // Attest with one vote (quorum=1)
+   // Attest with one vote because K=1.
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, bid_a, shash));
    BOOST_REQUIRE_EQUAL(false, getsnaphash(block_num).is_null());
 
@@ -669,7 +635,7 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_keeps_scheduled_heights_independent_until_f
                         snapshot_attest_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
-   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2, 50));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2));
 
    const uint32_t older_block_num = vote_block_num();
    const auto older_block_id = make_block_id(older_block_num);
@@ -698,7 +664,7 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_rejects_reopening_purged_historical_height,
                         snapshot_attest_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
-   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2, 50));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2));
 
    const uint32_t older_block_num = vote_block_num();
    const auto older_block_id = make_block_id(older_block_num);
@@ -727,7 +693,7 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_registration_churn_preserves_other_votes, s
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer3"_n, "snapprov3"_n));
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer4"_n, "snapprov4"_n));
-   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(3, 67));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(3));
 
    const auto block_num = vote_block_num();
    const auto block_id = make_block_id(block_num);
@@ -735,8 +701,6 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_registration_churn_preserves_other_votes, s
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, block_id, snapshot_hash));
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, block_id, snapshot_hash));
 
-   BOOST_REQUIRE_EQUAL(success(), delsnapprov("snapprov3"_n));
-   BOOST_REQUIRE_EQUAL(1u, snapshot_vote_count());
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer3"_n, "snapprov5"_n));
    BOOST_REQUIRE_EQUAL(1u, snapshot_vote_count());
 
@@ -759,27 +723,18 @@ BOOST_FIXTURE_TEST_CASE(getsnaphash_action_not_found, snapshot_attest_tester) { 
                            ("block_num", 99999)));
 } FC_LOG_AND_RETHROW() }
 
-// A misconfigured low quorum (min_providers=1) must NOT let a single provider attest an arbitrary
-// (block_id, snapshot_hash): votesnaphash enforces a Byzantine quorum floor (provider_count/3 + 1)
-// independently of the governance config, so a fault minority cannot attest on its own (which would
-// drive honest providers whose hash differs to self-shutdown).
-BOOST_FIXTURE_TEST_CASE(votesnaphash_enforces_byzantine_quorum_floor, snapshot_attest_tester) { try {
+/// Governance owns the fixed-K tradeoff; K=1 deliberately permits one of many providers to attest.
+BOOST_FIXTURE_TEST_CASE(votesnaphash_honors_governance_fixed_k, snapshot_attest_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer3"_n, "snapprov3"_n));
-   // Low/misconfigured quorum — without the floor, one vote would attest.
-   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1, 1));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1));
 
    const auto block_num = vote_block_num();
    const auto bid  = make_block_id(block_num);
    const auto hash = make_snap_hash(1);
 
-   // 3 providers -> floor = 3/3 + 1 = 2. A single vote must NOT create an attested record.
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, bid, hash));
-   BOOST_REQUIRE(getsnaphash(block_num).is_null());
-
-   // A second agreeing vote reaches the floor and attests.
-   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, bid, hash));
    BOOST_REQUIRE(!getsnaphash(block_num).is_null());
 } FC_LOG_AND_RETHROW() }
 
@@ -789,7 +744,7 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_preserves_pending_vote_on_snap_account_rota
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer3"_n, "snapprov3"_n));
-   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2, 1));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2));
 
    const auto block_num = vote_block_num();
    const auto block_id = make_block_id(block_num);
@@ -797,8 +752,6 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_preserves_pending_vote_on_snap_account_rota
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, block_id, snapshot_hash));
    BOOST_REQUIRE_EQUAL(1u, snapshot_vote_count());
 
-   BOOST_REQUIRE_EQUAL(success(), delsnapprov("snapprov1"_n));
-   BOOST_REQUIRE_EQUAL(1u, snapshot_vote_count());
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov5"_n));
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov5"_n, block_id, snapshot_hash));
    BOOST_REQUIRE_EQUAL(1u, snapshot_vote_count());

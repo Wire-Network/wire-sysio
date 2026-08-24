@@ -85,7 +85,7 @@ try:
     # test wants to generate a long fork
     extraNodeopArgs=" --production-pause-vote-timeout-ms 0 "
 
-    if cluster.launch(topo="./tests/bridge_for_fork_test_shape.json", pnodes=totalProducerNodes, loadSystemContract=True,
+    if cluster.launch(topo="./tests/bridge_for_fork_test_shape.json", pnodes=totalProducerNodes, loadSystemContract=False,
                       totalNodes=totalNodes, totalProducers=totalProducerNodes, activateIF=activateIF, biosFinalizer=False,
                       extraNodeopArgs=extraNodeopArgs, specificExtraNodeopArgs=specificExtraNodeopArgs) is False:
         Utils.cmdError("launcher")
@@ -113,8 +113,7 @@ try:
     jumboAcc = Account("itsjumbotime")
     jumboAcc.ownerPublicKey = "SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV"
     jumboAcc.activePublicKey = "SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV"
-    # Wait for the ROA policy to take effect before the contract deployment consumes its RAM grant.
-    nonProdNode.createInitializeAccount(jumboAcc, cluster.sysioAccount, nodeOwner=cluster.carlAccount, stakedDeposit=0, waitForTransBlock=True, stakeNet=10000, stakeCPU=10000, buyRAM=2000000, exitOnError=True)
+    nonProdNode.createInitializeAccount(jumboAcc, cluster.sysioAccount, nodeOwner=cluster.carlAccount, stakedDeposit=0, waitForTransBlock=False, stakeNet=10000, stakeCPU=10000, buyRAM=2000000, exitOnError=True)
 
     contract = "jumborow"
     contractDir = "unittests/system-test-contracts/%s" % (contract)

@@ -12,14 +12,12 @@ from TestHarness.TestHelper import AppArgs
 #
 #  Tests on-chain snapshot attestation via sysio.system contract.
 #  This test validates the snapshot serving pipeline:
-#  - Snapshot provider registration and deregistration
+#  - Snapshot provider registration and account rotation
 #  - Manual snapshot creation
 #  - Rejection of votes outside the fixed 25,000-block cadence
 #
-#  Successful quorum formation and attestation-record persistence use synthetic
-#  scheduled heights in the C++ contract and unit test suites. A focused
-#  chain-plugin test loads block 25,000, replays its matching record, and drives
-#  the irreversible-block callback to terminal verification. Waiting for that
+#  Successful fixed-K formation and attestation-record persistence use synthetic
+#  scheduled heights in the C++ contract and unit test suites. Waiting for that
 #  height in this wall-clock integration test would take hours.
 #
 #  Cluster layout:
@@ -161,12 +159,12 @@ try:
     regSnapProvTransIds.append(node0.getTransId(trans))
 
     # ---------------------------------------------------------------
-    # Set attestation config: min_providers=1, threshold_pct=50
+    # Set attestation config: fixed K=1.
     # This confirms governance configuration independently of the cadence rejection below.
     # ---------------------------------------------------------------
     Print("Set snapshot attestation config")
     success, trans = node0.pushMessage("sysio", "setsnpcfg",
-        json.dumps({"min_providers": 1, "threshold_pct": 50}),
+        json.dumps({"min_providers": 1}),
         "--permission sysio@active")
     assert success, f"Failed to set snapshot config: {trans}"
     setCfgTransId = node0.getTransId(trans)
@@ -224,26 +222,27 @@ try:
     Print("Test 1 PASSED: Manual snapshot stays outside the scheduled attestation tally")
 
     # ---------------------------------------------------------------
-    # Test 2: Deregistration of snapshot provider
+    # Test 2: Rotate a producer's snapshot provider account
     # ---------------------------------------------------------------
-    Print("=== Test 2: Provider deregistration ===")
+    Print("=== Test 2: Provider account rotation ===")
 
-    Print(f"Deregister snapshot provider {snapProv2.name}")
-    success, trans = node0.pushMessage("sysio", "delsnapprov",
-        json.dumps({"account": snapProv2.name}),
-        f"--permission {snapProv2.name}@active")
-    assert success, f"Failed to deregister provider: {trans}"
-    delSnapProvTransId = node0.getTransId(trans)
+    Print(f"Rotate {producerB} snapshot provider from {snapProv2.name} to {producerB}")
+    success, trans = node0.pushMessage("sysio", "regsnapprov",
+        json.dumps({"producer": producerB, "snap_account": producerB}),
+        f"--permission {producerB}@active")
+    assert success, f"Failed to rotate provider account: {trans}"
+    rotateSnapProvTransId = node0.getTransId(trans)
 
-    assert node0.waitForTransactionsInBlock([delSnapProvTransId], timeout=60), \
-        "delsnapprov transaction did not make it into a block before provider table check"
+    assert node0.waitForTransactionsInBlock([rotateSnapProvTransId], timeout=60), \
+        "provider rotation transaction did not make it into a block before table check"
 
     providers = node0.getTableRows("sysio", "sysio", "snapprovs")
-    assert len(providers) == 1, f"Expected 1 provider after deregistration, got {len(providers)}"
-    assert providers[0]["value"]["snap_account"] == snapProv1.name, \
-        f"Remaining provider should be {snapProv1.name}, got {providers[0]['value']['snap_account']}"
+    assert len(providers) == 2, f"Expected 2 providers after rotation, got {len(providers)}"
+    providerAccounts = {provider["value"]["snap_account"] for provider in providers}
+    assert providerAccounts == {snapProv1.name, producerB}, \
+        f"Unexpected providers after rotation: {providerAccounts}"
 
-    Print("Test 2 PASSED: Provider deregistration works")
+    Print("Test 2 PASSED: Provider account rotation replaces the old mapping")
 
     # ---------------------------------------------------------------
     Print("All snapshot attestation tests PASSED")

@@ -21,9 +21,6 @@ static constexpr uint32_t max_snap_provider_rank = 30;
 /// Maximum number of producer-to-snapshot-account delegations retained at once.
 static constexpr uint32_t max_snap_providers = max_snap_provider_rank;
 
-/// Default quorum percentage used after governance sets a nonzero provider floor.
-static constexpr uint32_t default_snap_threshold_pct = 67;
-
 /// Error code for disagreement with an already-attested snapshot record.
 static constexpr uint64_t snap_hash_disagreement_error =
    sysio::protocol::snapshot_attestation::disagreement_error_code;
@@ -41,12 +38,10 @@ static constexpr auto by_block_num = "byblocknum"_n;
 // -------------------------------------------------------------------------------------------------
 /** Governance-controlled quorum configuration. */
 struct [[sysio::table("snapconfig"), sysio::contract("sysio.system")]] snap_config {
-   /// Zero means governance has not configured the security floor yet, so voting is disabled.
-   uint32_t min_providers  = 0;
-   /// Percentage of registrations used to freeze a height's quorum on its first vote.
-   uint32_t threshold_pct  = default_snap_threshold_pct;
+   /// Fixed number of distinct producer votes required; zero disables attestation.
+   uint32_t min_providers = 0;
 
-   SYSLIB_SERIALIZE(snap_config, (min_providers)(threshold_pct))
+   SYSLIB_SERIALIZE(snap_config, (min_providers))
 };
 
 using snap_config_singleton = sysio::kv::global<"snapconfig"_n, snap_config>;
@@ -101,15 +96,13 @@ struct [[sysio::table("snapvotes"), sysio::contract("sysio.system")]] snap_vote 
    checksum256        block_id;
    /// Deterministic snapshot root hash.
    checksum256        snapshot_hash;
-   /// Quorum frozen from the registration set when the first vote at this height was cast.
-   uint32_t           quorum;
    /// Delegating producer identities, rather than rotatable snapshot-account identities.
    std::vector<name>  voters;
 
    /** Return the block-height secondary-index key. */
    uint64_t by_block_num() const { return static_cast<uint64_t>(block_num); }
 
-   SYSLIB_SERIALIZE(snap_vote, (id)(block_num)(block_id)(snapshot_hash)(quorum)(voters))
+   SYSLIB_SERIALIZE(snap_vote, (id)(block_num)(block_id)(snapshot_hash)(voters))
 };
 
 using snap_votes_table = sysio::kv::table<
@@ -157,29 +150,23 @@ struct [[sysio::contract("sysio.system")]] snapshot_attest : public sysio::contr
     *
     * The producer must be active and have rank <= max_snap_provider_rank at registration time.
     * Operator-registry status is deliberately not consulted: producer-table eligibility is the
-    * attestation trust root. When the table is full, stale producer mappings are pruned lazily
-    * before enforcing the capacity limit.
+    * attestation trust root. Re-registering rotates that producer's snapshot account without
+    * retracting votes already recorded under the producer identity. When the table is full, stale
+    * producer mappings are pruned lazily before enforcing the capacity limit.
     */
    [[sysio::action]]
    void regsnapprov(name producer, name snap_account);
 
    /**
-    * Unregister a snapshot provider. Can be called by the snap_account itself
-    * or looked up by producer via secondary index.
-    */
-   [[sysio::action]]
-   void delsnapprov(name account);
-
-   /**
     * Submit a snapshot hash vote from a registered provider for a scheduled snapshot height.
     *
-    * Votes aggregate per (block_num, block_id, snapshot_hash). The first vote at a height freezes
-    * one quorum shared by every competing tuple at that height. Votes are monotonic, producer
-    * equivocation is rejected per height, and retrying the same tuple is idempotent. Snapshot
-    * heights must be exact multiples of protocol::snapshot_attestation::block_spacing. Rejects
-    * with snap_hash_disagreement_error when a final record at the height differs by block id or
-    * snapshot hash. A height without its own final record cannot be reopened below the latest
-    * attested height after pending rows have been purged.
+    * Votes aggregate per (block_num, block_id, snapshot_hash) and finalize when the current fixed
+    * min_providers value is reached. Votes are monotonic, producer equivocation is rejected per
+    * height, and retrying the same tuple is idempotent. Snapshot heights must be exact multiples of
+    * protocol::snapshot_attestation::block_spacing. Rejects with snap_hash_disagreement_error when
+    * a final record at the height differs by block id or snapshot hash. A height without its own
+    * final record cannot be reopened below the latest attested height after pending rows have been
+    * purged.
     */
    [[sysio::action]]
    void votesnaphash(name snap_account, checksum256 block_id, checksum256 snapshot_hash);
@@ -187,22 +174,15 @@ struct [[sysio::contract("sysio.system")]] snapshot_attest : public sysio::contr
    /**
     * Update snapshot attestation configuration. Requires contract authority.
     *
-    * @param min_providers  minimum voters required to attest (must be >= 1).
-    * @param threshold_pct  percentage of currently registered providers required (1..100).
+    * @param min_providers fixed number of distinct producer voters required to attest (1..30).
     *
-    * No attestation is permitted until this action stores a nonzero min_providers. When the first
-    * vote arrives at a height, N registered providers must be at least min_providers and the
-    * height's immutable quorum is
-    *     max( max(min_providers, ceil(N * threshold_pct / 100)), floor(N/3) + 1 )
-    * The trailing floor(N/3)+1 is a Byzantine safety floor (see votesnaphash): an attestation
-    * must always carry more than N/3 providers so a misconfigured-low threshold cannot let a
-    * Byzantine minority attest an arbitrary snapshot. It is a no-op under the default
-    * threshold_pct = 67 (ceil(0.67*N) >= floor(N/3)+1 for every N) and only raises the bar when
-    * threshold_pct is set below ~33%. Configuration changes apply only to heights that have not
-    * received their first vote yet.
+    * No attestation is permitted until this action stores a nonzero min_providers. Governance is
+    * responsible for choosing K with the desired security and liveness tradeoff. Configuration
+    * changes apply to pending heights; an exact vote retry finalizes a tuple that already meets a
+    * newly lowered K.
     */
    [[sysio::action]]
-   void setsnpcfg(uint32_t min_providers, uint32_t threshold_pct);
+   void setsnpcfg(uint32_t min_providers);
 
    /**
     * Read-only: return the attested snapshot record for a given block number.

@@ -112,10 +112,12 @@ clio push action sysio regsnapprov \
   -p myproducer1@active
 ```
 
-To unregister later:
+To rotate the signing account later, call the same action with the replacement account:
 
 ```bash
-clio push action sysio delsnapprov '{"account": "mysnapprov1"}' -p mysnapprov1@active
+clio push action sysio regsnapprov \
+  '{"producer": "myproducer1", "snap_account": "mysnapprov2"}' \
+  -p myproducer1@active
 ```
 
 ### 3. Configure attestation quorum (network-wide)
@@ -124,12 +126,11 @@ The attestation config is a network-wide singleton set by the `sysio` authority.
 
 ```bash
 clio push action sysio setsnpcfg \
-  '{"min_providers": 3, "threshold_pct": 67}' \
+  '{"min_providers": 3}' \
   -p sysio@active
 ```
 
-- `min_providers` — explicit minimum registration count and voter floor; voting remains disabled until this nonzero value is configured
-- `threshold_pct` — percentage of registered providers at a height's first vote that must vote for the same hash to reach quorum (e.g., 67 means two-thirds)
+- `min_providers` — fixed number K of distinct producer votes required; voting remains disabled until this nonzero value is configured
 
 ### 4. Enable automatic scheduled snapshots
 
@@ -154,13 +155,14 @@ clio push action sysio votesnaphash \
   -p mysnapprov1@active
 ```
 
-The `votesnaphash` action accumulates votes in the `snapvotes` table. The first vote at a height freezes that height's
-quorum from the current registration count and configuration. Later registration or configuration changes do not alter
-the frozen quorum, and deregistration does not retract accepted votes. Once the threshold is met, the system contract
-moves the entry to `snaprecords` and purges pending votes through that height.
+The `votesnaphash` action accumulates producer identities in the `snapvotes` table. Every tuple uses the current fixed K;
+registration count does not change it. Configuration changes apply to pending heights, while provider-account rotation
+does not retract accepted votes. Once K is met, the system contract moves the entry to `snaprecords` and purges pending
+votes through that height.
 
-Bootstrapping nodes verify the `snaprecords` table after syncing — if no attested record exists for the snapshot's
-block number, auto-fetched bootstraps shut down with a fatal error.
+Before replay, auto-fetching nodes require compatible `snaprecords` and `snapconfig` schemas plus a nonzero K. After
+syncing, they verify the `snaprecords` row and shut down if the snapshot is missing or disagrees. Manual `--snapshot`
+remains an operator-trusted path without attestation verification.
 
 The manual `create_snapshot` and `schedule_snapshot` APIs remain available through `producer_api_plugin`, but they are
 not part of the provider attestation workflow. When a snapshot finalizes (becomes irreversible), it is automatically

@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 
-"""Verify snapshot restart behavior and the required attestation ABI during Savanna transition."""
+"""Verify snapshot restart behavior during Savanna transition."""
 
-import json
 import signal
-import tempfile
 
 from TestHarness import Cluster, TestHelper, Utils, WalletMgr
 from TestHarness.TestHelper import AppArgs
@@ -39,7 +37,6 @@ dumpErrorDetails=args.dump_error_details
 
 snapshotNodeId = 0
 irrNodeId=pnodes
-snapshotAttestationTableName="snaprecords"
 # Allow loaded CI runners up to thirty seconds of block production around the transition.
 transitionSnapshotBlockWindow=60
 
@@ -80,33 +77,6 @@ try:
     nodeSnap=cluster.getNode(snapshotNodeId)
     nodeIrr=cluster.getNode(irrNodeId)
 
-    # Keep the BIOS setfinalizer action while declaring the strict startup table expected by
-    # snapshots in this pre-launch configuration.
-    biosAbiPath=cluster.libTestingContractsPath / "sysio.bios" / "sysio.bios.abi"
-    with open(biosAbiPath, encoding="utf-8") as biosAbiFile:
-        transitionAbi=json.load(biosAbiFile)
-    systemAbiPath=cluster.contractsPath / "sysio.system" / "sysio.system.abi"
-    with open(systemAbiPath, encoding="utf-8") as systemAbiFile:
-        systemAbi=json.load(systemAbiFile)
-    assert all(table["name"] != snapshotAttestationTableName for table in transitionAbi["tables"]), \
-        f"BIOS ABI already declares {snapshotAttestationTableName}"
-    snapshotTable=next(table.copy() for table in systemAbi["tables"]
-                       if table["name"] == snapshotAttestationTableName)
-    snapshotStruct=next(struct.copy() for struct in systemAbi["structs"]
-                        if struct["name"] == snapshotTable["type"])
-    assert all(struct["name"] != snapshotStruct["name"] for struct in transitionAbi["structs"]), \
-        f"BIOS ABI already declares {snapshotStruct['name']}"
-    transitionAbi["tables"].append(snapshotTable)
-    transitionAbi["structs"].append(snapshotStruct)
-    with tempfile.NamedTemporaryFile(mode="w", suffix=".abi") as transitionAbiFile:
-        json.dump(transitionAbi, transitionAbiFile)
-        transitionAbiFile.flush()
-        abiTrans=cluster.biosNode.setCodeOrAbi(cluster.sysioAccount, "abi", transitionAbiFile.name,
-                                               returnTrans=True)
-    assert abiTrans is not None, "Failed to install transition snapshot ABI"
-    assert cluster.biosNode.waitForTransactionInBlock(cluster.biosNode.getTransId(abiTrans)), \
-        "Transition snapshot ABI transaction did not enter a block"
-
     # Activate Savanna without waiting for activation to be finished so that we can take a
     # snapshot during transition
     success, transId = cluster.activateInstantFinality(biosFinalizer=False, waitForFinalization=False)
@@ -141,8 +111,6 @@ try:
     Print("Take snapshot on nodeIrr")
     takeSnapshot(nodeIrr)
 
-    assert cluster.deploySystemContract(cluster.biosNode, cluster.sysioAccount), "Failed to deploy system contract"
-    assert cluster.initializeSystemContract(cluster.biosNode, cluster.sysioAccount), "Failed to initialize system contract"
     assert cluster.biosNode.waitForTransFinalization(transId, timeout=21*12*3), f'Failed to validate transaction {transId} got rolled into a LIB block on server port {cluster.biosNode.port}'
     assert cluster.biosNode.waitForLibToAdvance(), "Lib should advance after instant finality activated"
     assert cluster.biosNode.waitForProducer("defproducera"), "Did not see defproducera"

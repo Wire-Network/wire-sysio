@@ -55,8 +55,8 @@ try:
     Print("Stand up cluster")
     # test expects split network to advance with single producer
     extraNodeopArgs=" --production-pause-vote-timeout-ms 0 "
-    # Snapshot restores require the current system ABI, which declares the attestation table.
-    if cluster.launch(pnodes=pnodes, totalNodes=total_nodes, totalProducers=pnodes, delay=delay, loadSystemContract=True,
+    # For now do not load system contract as it does not support setfinalizer
+    if cluster.launch(pnodes=pnodes, totalNodes=total_nodes, totalProducers=pnodes, delay=delay, loadSystemContract=False,
                       activateIF=True, extraNodeopArgs=extraNodeopArgs) is False:
         errorExit("Failed to stand up sys cluster.")
 

@@ -25,11 +25,8 @@ inline constexpr auto producer_account = "producer1"_n;
 /// Provider registered for the shared snapshot-attestation tests.
 inline constexpr auto snapshot_provider_account = "snapprov1"_n;
 
-/// One-provider quorum floor used by tests that finalize with one vote.
+/// One-provider fixed K used by tests that finalize with one vote.
 inline constexpr uint32_t single_provider_minimum = 1;
-
-/// Unanimous voting threshold used by the one-provider test configuration.
-inline constexpr uint32_t unanimous_threshold_pct = 100;
 
 /// Distance from a scheduled height to the immediately preceding block.
 inline constexpr uint32_t preceding_block_offset = 1;
@@ -105,12 +102,11 @@ public:
       BOOST_REQUIRE_EQUAL(success(), result);
    }
 
-   /** Configure the governance-controlled quorum parameters and commit the action in a new block. */
-   void set_snap_config(uint32_t min_providers, uint32_t threshold_pct) {
+   /** Configure the governance-controlled fixed K and commit the action in a new block. */
+   void set_snap_config(uint32_t min_providers) {
       const auto result = push_action(
          config::system_account_name, action_name{snapshot_attestation::action_setsnapcfg},
-         mvo()(snapshot_attestation::field::min_providers, min_providers)
-            (snapshot_attestation::field::threshold_pct, threshold_pct));
+         mvo()(snapshot_attestation::field::min_providers, min_providers));
       BOOST_REQUIRE_EQUAL(success(), result);
    }
 

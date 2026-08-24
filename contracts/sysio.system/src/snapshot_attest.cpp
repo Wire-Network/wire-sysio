@@ -2,6 +2,7 @@
 #include <sysio.system/snapshot_attest.hpp>
 #include <sysio.system/block_utils.hpp>
 
+#include <sysio/print.hpp>
 #include <sysio/sysio.hpp>
 
 #include <algorithm>
@@ -19,23 +20,19 @@ constexpr char producer_not_active_error[] = "producer is not active";
 constexpr char producer_rank_too_high_error[] = "producer rank exceeds maximum for snapshot providers";
 constexpr char provider_not_registered_error[] = "snap_account is not a registered snapshot provider";
 constexpr char provider_already_registered_error[] = "snap_account is already registered as a provider";
-constexpr char producer_already_registered_error[] = "producer already has a registered snapshot provider";
 constexpr char provider_capacity_error[] = "maximum registered snapshot providers reached";
 constexpr char vote_equivocation_error[] = "producer already voted a different snapshot tuple for this height";
 constexpr char snapshot_config_unset_error[] = "snapshot attestation configuration has not been set";
-constexpr char insufficient_provider_count_error[] = "registered snapshot providers are below min_providers";
-constexpr char provider_or_producer_not_registered_error[] =
-   "account is not registered as a snapshot provider or producer";
 constexpr char invalid_block_id_error[] = "invalid block_id";
 constexpr char unscheduled_block_id_error[] = "snapshot block is not a scheduled attestation height";
 constexpr char historical_block_id_error[] = "snapshot block is older than latest attested snapshot height";
 constexpr char future_block_id_error[] = "snapshot block cannot be in the future";
-constexpr char threshold_pct_range_error[] = "threshold_pct must be between 1 and 100";
 constexpr char min_providers_range_error[] = "min_providers must be at least 1";
 constexpr char min_providers_capacity_error[] = "min_providers exceeds the maximum registrable providers";
 constexpr char snapshot_record_not_found_error[] = "no attested snapshot record for this block number";
-constexpr uint32_t quorum_percentage_denominator = 100;
-constexpr uint32_t byzantine_fault_denominator = 3;
+constexpr char stale_provider_prune_log_prefix[] = "regsnapprov: pruned stale mapping for producer ";
+constexpr char stale_provider_prune_log_infix[] = " and snapshot provider ";
+constexpr char log_line_ending[] = "\n";
 
 /// Classifies the producer-table state used as the snapshot-provider registration gate.
 enum class snapshot_producer_eligibility {
@@ -63,7 +60,7 @@ void require_snapshot_producer_eligibility(const producers_table& producers, nam
    check(eligibility != snapshot_producer_eligibility::rank_exceeds_maximum, producer_rank_too_high_error);
 }
 
-/// Counts the provider mappings used to establish a new height's frozen quorum.
+/// Counts provider mappings for the bounded registration-capacity check.
 uint32_t count_snapshot_providers(const snap_providers_table& providers) {
    uint32_t provider_count = 0;
    for (auto provider_itr = providers.begin(); provider_itr != providers.end(); ++provider_itr) {
@@ -84,21 +81,15 @@ void prune_stale_snapshot_providers_if_full(name self, snap_providers_table& pro
       const auto producer_itr = producers.try_get(producer_key_t{provider_itr->producer.value});
       if (!producer_itr
           || get_snapshot_producer_eligibility(*producer_itr) != snapshot_producer_eligibility::eligible) {
+         const name stale_producer = provider_itr->producer;
+         const name stale_snap_account = provider_itr->snap_account;
          provider_itr = providers.erase(std::move(provider_itr));
+         sysio::print(stale_provider_prune_log_prefix, stale_producer,
+                      stale_provider_prune_log_infix, stale_snap_account, log_line_ending);
       } else {
          ++provider_itr;
       }
    }
-}
-
-/// Calculates the quorum frozen when the first vote for a scheduled height arrives.
-uint32_t calculate_snapshot_quorum(uint32_t provider_count, const snap_config& cfg) {
-   const uint32_t bft_floor = provider_count / byzantine_fault_denominator + 1;
-   return std::max(
-      std::max(cfg.min_providers,
-               (provider_count * cfg.threshold_pct + quorum_percentage_denominator - 1)
-                  / quorum_percentage_denominator),
-      bft_floor);
 }
 
 /// Returns true for an existing matching final record and rejects a conflicting final tuple.
@@ -143,40 +134,25 @@ void snapshot_attest::regsnapprov(name producer, name snap_account) {
    require_snapshot_producer_eligibility(producers, producer);
 
    snap_providers_table providers(get_self());
-   prune_stale_snapshot_providers_if_full(get_self(), providers);
+   const auto provider_itr = providers.find(snap_provider_key_t{snap_account.value});
+   if (provider_itr != providers.end()) {
+      check(provider_itr->producer == producer, provider_already_registered_error);
+      return;
+   }
 
-   check(!providers.contains(snap_provider_key_t{snap_account.value}), provider_already_registered_error);
    auto by_producer = providers.get_index<snapshot_index::by_producer>();
-   check(by_producer.find(producer.value) == by_producer.end(), producer_already_registered_error);
+   auto producer_itr = by_producer.find(producer.value);
+   if (producer_itr != by_producer.end()) {
+      by_producer.erase(std::move(producer_itr));
+   } else {
+      prune_stale_snapshot_providers_if_full(get_self(), providers);
+   }
    check(count_snapshot_providers(providers) < max_snap_providers, provider_capacity_error);
 
    providers.emplace(producer, snap_provider_key_t{snap_account.value}, [&](auto& row) {
       row.snap_account = snap_account;
       row.producer     = producer;
    });
-}
-
-// -------------------------------------------------------------------------------------------------
-// The `account` parameter is overloaded: it can be either a snap_account (primary key lookup)
-// or a producer (secondary index lookup). The primary key path takes precedence.
-// This means a producer can unregister their own provider, and a snap_account can unregister itself.
-// If one account occupies both roles in different mappings, the first call removes its primary-key
-// snap_account mapping and a repeated call removes its producer-keyed delegation.
-void snapshot_attest::delsnapprov(name account) {
-   require_auth(account);
-
-   snap_providers_table providers(get_self());
-   auto provider_itr = providers.find(snap_provider_key_t{account.value});
-   if (provider_itr != providers.end()) {
-      require_auth(provider_itr->snap_account);
-      providers.erase(std::move(provider_itr));
-      return;
-   }
-
-   auto by_producer = providers.get_index<snapshot_index::by_producer>();
-   auto producer_itr = by_producer.find(account.value);
-   check(producer_itr != by_producer.end(), provider_or_producer_not_registered_error);
-   by_producer.erase(std::move(producer_itr));
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -209,31 +185,31 @@ void snapshot_attest::votesnaphash(name snap_account, checksum256 block_id, chec
 
    snap_votes_table votes(get_self());
    auto             by_block_num = votes.get_index<snapshot_index::by_block_num>();
-   std::optional<uint32_t> frozen_quorum;
    std::optional<uint64_t> matching_vote_id;
+   uint32_t                voter_count = 0;
+   bool                    exact_retry = false;
    for (auto vote_itr = by_block_num.lower_bound(static_cast<uint64_t>(block_num));
         vote_itr != by_block_num.end() && vote_itr->block_num == block_num; ++vote_itr) {
-      if (!frozen_quorum) {
-         frozen_quorum = vote_itr->quorum;
-      }
-
       if (std::find(vote_itr->voters.begin(), vote_itr->voters.end(), producer) != vote_itr->voters.end()) {
          check(vote_itr->block_id == block_id && vote_itr->snapshot_hash == snapshot_hash,
                vote_equivocation_error);
-         return;
+         voter_count = static_cast<uint32_t>(vote_itr->voters.size());
+         exact_retry = true;
+         break;
       }
       if (vote_itr->block_id == block_id && vote_itr->snapshot_hash == snapshot_hash) {
          matching_vote_id = vote_itr->id;
       }
    }
 
-   if (!frozen_quorum) {
-      const uint32_t provider_count = count_snapshot_providers(providers);
-      check(provider_count >= config.min_providers, insufficient_provider_count_error);
-      frozen_quorum = calculate_snapshot_quorum(provider_count, config);
+   if (exact_retry) {
+      if (voter_count >= config.min_providers) {
+         finalize_snapshot_vote(get_self(), block_num, block_id, snapshot_hash);
+      }
+      return;
    }
 
-   uint32_t voter_count = 1;
+   voter_count = 1;
    if (matching_vote_id) {
       const auto matching_vote = votes.get(snap_vote_key_t{*matching_vote_id});
       voter_count = static_cast<uint32_t>(matching_vote.voters.size()) + 1;
@@ -247,27 +223,24 @@ void snapshot_attest::votesnaphash(name snap_account, checksum256 block_id, chec
          row.block_num     = block_num;
          row.block_id      = block_id;
          row.snapshot_hash = snapshot_hash;
-         row.quorum        = *frozen_quorum;
          row.voters        = {producer};
       });
    }
 
-   if (voter_count >= *frozen_quorum) {
+   if (voter_count >= config.min_providers) {
       finalize_snapshot_vote(get_self(), block_num, block_id, snapshot_hash);
    }
 }
 
 // -------------------------------------------------------------------------------------------------
-void snapshot_attest::setsnpcfg(uint32_t min_providers, uint32_t threshold_pct) {
+void snapshot_attest::setsnpcfg(uint32_t min_providers) {
    require_auth(get_self());
 
-   check(threshold_pct > 0 && threshold_pct <= quorum_percentage_denominator,
-         threshold_pct_range_error);
    check(min_providers > 0, min_providers_range_error);
    check(min_providers <= max_snap_providers, min_providers_capacity_error);
 
    snap_config_singleton config_singleton(get_self());
-   config_singleton.set(snap_config{min_providers, threshold_pct}, get_self());
+   config_singleton.set(snap_config{min_providers}, get_self());
 }
 
 // -------------------------------------------------------------------------------------------------

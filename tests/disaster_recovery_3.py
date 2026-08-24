@@ -55,7 +55,7 @@ try:
 
     Print("Stand up cluster")
     extraNodeopArgs = " --plugin sysio::producer_api_plugin "
-    if cluster.launch(pnodes=pnodes, totalNodes=total_nodes, totalProducers=pnodes, delay=delay, loadSystemContract=True,
+    if cluster.launch(pnodes=pnodes, totalNodes=total_nodes, totalProducers=pnodes, delay=delay, loadSystemContract=False,
                       extraNodeopArgs=extraNodeopArgs, activateIF=True, biosFinalizer=False) is False:
         errorExit("Failed to stand up sys cluster.")
 

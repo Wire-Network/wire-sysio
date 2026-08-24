@@ -21,7 +21,6 @@ using snapshot_attest_test_support::snapshot_attest_fixture;
 using snapshot_attest_test_support::single_provider_minimum;
 using snapshot_attest_test_support::snapshot_provider_account;
 using snapshot_attest_test_support::to_contract_snapshot_hash;
-using snapshot_attest_test_support::unanimous_threshold_pct;
 
 namespace {
 
@@ -38,8 +37,8 @@ BOOST_AUTO_TEST_SUITE(snapshot_attest_tests)
 // after a successful attestation vote
 // ---------------------------------------------------------------------------
 BOOST_FIXTURE_TEST_CASE(snapshot_hash_matches_attestation, snapshot_attest_fixture) { try {
-   // Set config: single vote sufficient (min_providers=1, threshold=100)
-   set_snap_config(single_provider_minimum, unanimous_threshold_pct);
+   // Set fixed K so one vote is sufficient.
+   set_snap_config(single_provider_minimum);
 
    // Take a snapshot
    control->abort_block();
@@ -56,7 +55,7 @@ BOOST_FIXTURE_TEST_CASE(snapshot_hash_matches_attestation, snapshot_attest_fixtu
    // Convert blake3 root_hash to sha256 for the contract (both are 32 bytes)
    const auto hash_as_sha256 = to_contract_snapshot_hash(root_hash);
 
-   // Submit attestation vote — quorum=1, so this creates the attested record
+   // Submit attestation vote — K=1, so this creates the attested record.
    produce_block(); // need a new block so we can push actions
    vote_snapshot(snapshot_provider_account, block_id, hash_as_sha256);
    produce_blocks();
@@ -101,7 +100,7 @@ BOOST_FIXTURE_TEST_CASE(snapshot_roundtrip_preserves_hash, snapshot_attest_fixtu
 // Test: hash mismatch is detectable — wrong hash on-chain vs snapshot
 // ---------------------------------------------------------------------------
 BOOST_FIXTURE_TEST_CASE(snapshot_hash_mismatch_detected, snapshot_attest_fixture) { try {
-   set_snap_config(single_provider_minimum, unanimous_threshold_pct);
+   set_snap_config(single_provider_minimum);
 
    control->abort_block();
    auto block_num = control->head().block_num();
@@ -165,7 +164,7 @@ BOOST_FIXTURE_TEST_CASE(snapshot_no_attestation_detected, snapshot_attest_fixtur
 // Test: snapshot loaded in a new tester preserves attestation records
 // ---------------------------------------------------------------------------
 BOOST_FIXTURE_TEST_CASE(attestation_survives_snapshot_load, snapshot_attest_fixture) { try {
-   set_snap_config(single_provider_minimum, unanimous_threshold_pct);
+   set_snap_config(single_provider_minimum);
 
    // Get current state and create attestation
    control->abort_block();

@@ -27,14 +27,23 @@ inline constexpr auto action_setsnapcfg = "setsnpcfg";
 /// Name of the final snapshot-attestation record table.
 inline constexpr auto table_snaprecords = "snaprecords";
 
+/// Name of the governance-owned snapshot-attestation configuration table.
+inline constexpr auto table_snapconfig = "snapconfig";
+
 /// ABI struct stored by the final snapshot-attestation record table.
 inline constexpr auto type_snap_record = "snap_record";
+
+/// ABI struct stored by the snapshot-attestation configuration table.
+inline constexpr auto type_snap_config = "snap_config";
 
 /// ABI primary-index kind required by the block-number keyed record table.
 inline constexpr auto index_type_i64 = "i64";
 
 /// ABI primitive type identifiers used by the final record schema.
 namespace abi_type {
+
+/// ABI spelling for an Antelope account or identifier name.
+inline constexpr auto name = "name";
 
 /// ABI spelling for a 32-byte checksum.
 inline constexpr auto checksum256 = "checksum256";
@@ -50,7 +59,10 @@ inline constexpr auto uint64 = "uint64";
 /// ABI field identifiers used by host-side table readers.
 namespace field {
 
-/// Minimum registered-provider count required before voting can begin.
+/// Primary-key field used by a global configuration row.
+inline constexpr auto name = "name";
+
+/// Fixed number of distinct producer votes required to attest a tuple.
 inline constexpr auto min_providers = "min_providers";
 
 /// Producer account associated with a snapshot provider.
@@ -70,9 +82,6 @@ inline constexpr auto block_num = "block_num";
 
 /// Final snapshot root hash.
 inline constexpr auto snapshot_hash = "snapshot_hash";
-
-/// Percentage of registered providers required to finalize a tuple.
-inline constexpr auto threshold_pct = "threshold_pct";
 
 } // namespace field
 

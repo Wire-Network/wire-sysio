@@ -333,16 +333,6 @@
             ]
         },
         {
-            "name": "delsnapprov",
-            "base": "",
-            "fields": [
-                {
-                    "name": "account",
-                    "type": "name"
-                }
-            ]
-        },
-        {
             "name": "emission_config",
             "base": "",
             "fields": [
@@ -1329,10 +1319,6 @@
                 {
                     "name": "min_providers",
                     "type": "uint32"
-                },
-                {
-                    "name": "threshold_pct",
-                    "type": "uint32"
                 }
             ]
         },
@@ -1342,10 +1328,6 @@
             "fields": [
                 {
                     "name": "min_providers",
-                    "type": "uint32"
-                },
-                {
-                    "name": "threshold_pct",
                     "type": "uint32"
                 }
             ]
@@ -1425,10 +1407,6 @@
                 {
                     "name": "snapshot_hash",
                     "type": "checksum256"
-                },
-                {
-                    "name": "quorum",
-                    "type": "uint32"
                 },
                 {
                     "name": "voters",
@@ -1855,11 +1833,6 @@
         {
             "name": "delfinkey",
             "type": "delfinkey",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "delsnapprov",
-            "type": "delsnapprov",
             "ricardian_contract": ""
         },
         {

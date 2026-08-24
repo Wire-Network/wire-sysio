@@ -1,8 +1,14 @@
 #include <algorithm>
 #include <array>
+#include <boost/asio.hpp>
+#include <boost/beast/core.hpp>
+#include <boost/beast/http.hpp>
 #include <boost/program_options.hpp>
 #include <boost/test/unit_test.hpp>
+#include <filesystem>
+#include <fstream>
 #include <iterator>
+#include <limits>
 #include <sysio/chain/abi_serializer.hpp>
 #include <sysio/chain/app.hpp>
 #include <sysio/chain/config.hpp>
@@ -16,36 +22,164 @@
 #include <stdint.h>
 #include <string>
 #include <string_view>
+#include <thread>
 #include <vector>
 
 namespace {
 
 namespace snapshot_attest = sysio::protocol::snapshot_attestation;
+namespace http = boost::beast::http;
 
 /** Shared command-line and fixture constants for chain-plugin configuration tests. */
 constexpr auto chain_plugin_test_program_name = "test_chain_plugin";
 constexpr auto snapshot_option_name = "--snapshot";
+constexpr auto snapshot_endpoint_option_name = "--snapshot-endpoint";
 constexpr auto blocks_dir_option_name = "--blocks-dir";
 constexpr auto config_dir_option_name = "--config-dir";
 constexpr auto data_dir_option_name = "--data-dir";
 constexpr auto snapshot_without_attestation_table_filename =
    "snapshot-without-attestation-table.bin";
-constexpr auto missing_attestation_table_error_fragment =
-   "must declare a compatible 'snaprecords' table schema";
+constexpr auto valid_snapshot_filename = "snapshot-with-valid-attestation.bin";
+constexpr auto unconfigured_snapshot_filename = "snapshot-without-enabled-attestation.bin";
+constexpr auto snapshot_metadata_path = "/v1/snapshot/latest";
+constexpr auto snapshot_by_block_path = "/v1/snapshot/by_block";
+constexpr auto snapshot_download_path = "/v1/snapshot/download";
+constexpr auto snapshot_root_hash_field = "root_hash";
+constexpr auto json_content_type = "application/json";
+constexpr auto binary_content_type = "application/octet-stream";
+constexpr auto loopback_address = "127.0.0.1";
+constexpr auto loopback_url_prefix = "http://127.0.0.1:";
+constexpr auto url_path_separator = "/";
 constexpr auto incompatible_index_type = "i128";
 constexpr auto incompatible_record_type = "other_record";
 constexpr auto loaded_block_seed = "loaded block";
 constexpr auto other_block_seed = "other block";
+constexpr auto invalid_block_segment = "not-a-block";
 constexpr auto loaded_snapshot_hash =
    "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f";
 constexpr auto other_snapshot_hash =
    "1f1e1d1c1b1a191817161514131211100f0e0d0c0b0a09080706050403020100";
-constexpr auto valid_snapshot_filename = "snapshot-with-valid-attestation.bin";
+constexpr auto unconfigured_attestation_error_fragment = "min_providers to be configured before bootstrap";
 constexpr uint16_t incompatible_table_id = 0;
 constexpr uint32_t snapshot_source_block_count = 3;
 constexpr uint32_t attestation_finality_block_count = 24;
+constexpr uint32_t snapshot_endpoint_response_count = 2;
+constexpr uint16_t ephemeral_port = 0;
 
-/** Build the exact snaprecords ABI fragment required before snapshot replay. */
+/** Serve one snapshot endpoint metadata response and its binary download on loopback. */
+class snapshot_endpoint_server {
+public:
+   /** Start a bounded two-request server for the supplied scheduled snapshot. */
+   snapshot_endpoint_server(uint32_t block_num, const fc::crypto::blake3& root_hash,
+                            const std::filesystem::path& snapshot_path)
+      : metadata_body(fc::json::to_string(
+           fc::mutable_variant_object()(snapshot_attest::field::block_num, block_num)
+              (snapshot_root_hash_field, root_hash.str()),
+           fc::time_point::maximum()))
+      , snapshot_body(read_snapshot(snapshot_path))
+      , acceptor(io, tcp::endpoint(boost::asio::ip::make_address(loopback_address), ephemeral_port))
+      , port(acceptor.local_endpoint().port())
+      , worker([this] { serve(); }) {}
+
+   snapshot_endpoint_server(const snapshot_endpoint_server&) = delete;
+   snapshot_endpoint_server& operator=(const snapshot_endpoint_server&) = delete;
+
+   /** Stop an unused accept and join the server thread. */
+   ~snapshot_endpoint_server() {
+      // Wake every accept the bounded worker could still be waiting on. If it already returned,
+      // the extra loopback connects are harmlessly queued until the acceptor closes.
+      for (uint32_t response_index = 0; response_index < snapshot_endpoint_response_count;
+           ++response_index) {
+         boost::system::error_code error;
+         boost::asio::io_context connector_io;
+         tcp::socket socket(connector_io);
+         socket.connect(tcp::endpoint(boost::asio::ip::make_address(loopback_address), port), error);
+         socket.close(error);
+      }
+      if (worker.joinable()) {
+         worker.join();
+      }
+      boost::system::error_code error;
+      acceptor.close(error);
+   }
+
+   /** Return the loopback base URL selected for the server. */
+   std::string url() const {
+      return loopback_url_prefix + std::to_string(port);
+   }
+
+private:
+   using tcp = boost::asio::ip::tcp;
+
+   /** Read a snapshot file without altering its binary bytes. */
+   static std::string read_snapshot(const std::filesystem::path& path) {
+      std::ifstream input(path, std::ios::binary);
+      return {std::istreambuf_iterator<char>(input), std::istreambuf_iterator<char>()};
+   }
+
+   /** Serve the metadata request followed by the snapshot download request. */
+   void serve() {
+      for (uint32_t response_index = 0; response_index < snapshot_endpoint_response_count;
+           ++response_index) {
+         boost::system::error_code error;
+         tcp::socket socket(io);
+         acceptor.accept(socket, error);
+         if (error) {
+            return;
+         }
+
+         boost::beast::flat_buffer request_buffer;
+         http::request<http::string_body> request;
+         http::read(socket, request_buffer, request, error);
+         if (error) {
+            return;
+         }
+
+         const std::string target(request.target().data(), request.target().size());
+         const bool is_metadata = target == snapshot_metadata_path || target == snapshot_by_block_path;
+         const bool is_download = target == snapshot_download_path;
+         http::response<http::string_body> response{
+            is_metadata || is_download ? http::status::ok : http::status::not_found,
+            request.version()};
+         response.set(http::field::content_type,
+                      is_metadata ? json_content_type : binary_content_type);
+         response.keep_alive(false);
+         if (is_metadata) {
+            response.body() = metadata_body;
+         } else if (is_download) {
+            response.body() = snapshot_body;
+         }
+         response.prepare_payload();
+         http::write(socket, response, error);
+      }
+   }
+
+   /// Serialized response for `/v1/snapshot/latest`.
+   std::string metadata_body;
+   /// Exact snapshot bytes returned by `/v1/snapshot/download`.
+   std::string snapshot_body;
+   /// Event loop owned by the server thread.
+   boost::asio::io_context io;
+   /// Loopback listener retained until teardown.
+   tcp::acceptor acceptor;
+   /// Ephemeral port assigned by the operating system.
+   uint16_t port;
+   /// Worker serving the bounded request sequence.
+   std::thread worker;
+};
+
+/** Write a production-shaped snapshot and return its deterministic root hash. */
+fc::crypto::blake3 write_chain_plugin_snapshot(
+   sysio::chain::controller& control, const std::filesystem::path& snapshot_path) {
+   auto writer = std::make_shared<sysio::chain::threaded_snapshot_writer>(snapshot_path);
+   control.write_snapshot(writer);
+   // chain_plugin enables root-extension tracking while the tester fixture does not.
+   writer->write_section<sysio::chain::contract_root_object>([](auto&) {});
+   writer->finalize();
+   return writer->get_root_hash();
+}
+
+/** Build the exact attestation ABI fragment required before auto-fetched snapshot replay. */
 sysio::chain::abi_def make_snapshot_attestation_abi() {
    sysio::chain::abi_def abi;
    abi.tables.emplace_back(
@@ -55,6 +189,13 @@ sysio::chain::abi_def make_snapshot_attestation_abi() {
       std::vector<sysio::chain::type_name>{snapshot_attest::abi_type::uint64},
       snapshot_attest::type_snap_record,
       sysio::snapshot_attestation_table_id());
+   abi.tables.emplace_back(
+      snapshot_attest::table_snapconfig,
+      snapshot_attest::index_type_i64,
+      std::vector<sysio::chain::field_name>{snapshot_attest::field::name},
+      std::vector<sysio::chain::type_name>{snapshot_attest::abi_type::name},
+      snapshot_attest::type_snap_config,
+      sysio::snapshot_attestation_config_table_id());
    abi.structs.emplace_back(
       snapshot_attest::type_snap_record,
       "",
@@ -63,6 +204,12 @@ sysio::chain::abi_def make_snapshot_attestation_abi() {
          {snapshot_attest::field::block_id, snapshot_attest::abi_type::checksum256},
          {snapshot_attest::field::snapshot_hash, snapshot_attest::abi_type::checksum256},
          {snapshot_attest::field::attested_at_block, snapshot_attest::abi_type::uint32},
+      });
+   abi.structs.emplace_back(
+      snapshot_attest::type_snap_config,
+      "",
+      std::vector<sysio::chain::field_def>{
+         {snapshot_attest::field::min_providers, snapshot_attest::abi_type::uint32},
       });
    return abi;
 }
@@ -190,6 +337,28 @@ BOOST_AUTO_TEST_CASE(snapshot_attestation_required_schema_policy) {
    auto reordered_fields = valid_abi;
    std::swap(reordered_fields.structs.front().fields[1], reordered_fields.structs.front().fields[2]);
    BOOST_CHECK(!sysio::has_required_snapshot_attestation_schema(reordered_fields));
+
+   auto missing_config_table = valid_abi;
+   missing_config_table.tables.pop_back();
+   BOOST_CHECK(!sysio::has_required_snapshot_attestation_schema(missing_config_table));
+
+   auto wrong_config_table_id = valid_abi;
+   wrong_config_table_id.tables.back().table_id = incompatible_table_id;
+   BOOST_CHECK(!sysio::has_required_snapshot_attestation_schema(wrong_config_table_id));
+
+   auto wrong_config_field = valid_abi;
+   wrong_config_field.structs.back().fields.front().type = snapshot_attest::abi_type::uint64;
+   BOOST_CHECK(!sysio::has_required_snapshot_attestation_schema(wrong_config_field));
+}
+
+/** Recognize only one decoded snapconfig row with a positive fixed K. */
+BOOST_AUTO_TEST_CASE(snapshot_attestation_enabled_config_policy) {
+   BOOST_CHECK(sysio::snapshot_attestation_config_is_enabled(
+      {fc::mutable_variant_object()(snapshot_attest::field::min_providers, 1)}));
+   BOOST_CHECK(!sysio::snapshot_attestation_config_is_enabled({}));
+   BOOST_CHECK(!sysio::snapshot_attestation_config_is_enabled(
+      {fc::mutable_variant_object()(snapshot_attest::field::min_providers, 0)}));
+   BOOST_CHECK(!sysio::snapshot_attestation_config_is_enabled({fc::variant{"malformed"}}));
 }
 
 /** Match both the loaded block id and root hash against the attested tuple. */
@@ -207,12 +376,42 @@ BOOST_AUTO_TEST_CASE(snapshot_attestation_record_tuple_policy) {
       loaded_block_id, loaded_hash, loaded_block_id, other_hash.str()));
 }
 
-/** Load a scheduled snapshot, replay its matching record, and finish callback verification. */
+/** Require endpoint metadata to identify the loaded scheduled snapshot head exactly. */
+BOOST_AUTO_TEST_CASE(snapshot_endpoint_block_identity_policy) {
+   constexpr uint32_t scheduled_block = snapshot_attest::block_spacing;
+   constexpr uint32_t other_scheduled_block = snapshot_attest::block_spacing * 2;
+   constexpr uint32_t unscheduled_block = scheduled_block + 1;
+   constexpr uint64_t first_unsupported_block =
+      static_cast<uint64_t>(std::numeric_limits<uint32_t>::max()) + 1;
+
+   BOOST_CHECK(sysio::snapshot_endpoint_block_matches(scheduled_block, scheduled_block));
+   BOOST_CHECK(!sysio::snapshot_endpoint_block_matches(scheduled_block, other_scheduled_block));
+   BOOST_CHECK(!sysio::snapshot_endpoint_block_matches(unscheduled_block, unscheduled_block));
+   BOOST_CHECK(sysio::snapshot_endpoint_request_matches(std::nullopt, scheduled_block));
+   BOOST_CHECK(sysio::snapshot_endpoint_request_matches(
+      std::optional<uint32_t>{scheduled_block}, scheduled_block));
+   BOOST_CHECK(!sysio::snapshot_endpoint_request_matches(
+      std::optional<uint32_t>{scheduled_block}, other_scheduled_block));
+
+   const auto parsed_scheduled_block =
+      sysio::parse_snapshot_endpoint_block_num(std::to_string(scheduled_block));
+   BOOST_REQUIRE(parsed_scheduled_block);
+   BOOST_CHECK_EQUAL(*parsed_scheduled_block, scheduled_block);
+
+   const auto parsed_maximum_block = sysio::parse_snapshot_endpoint_block_num(
+      std::to_string(std::numeric_limits<uint32_t>::max()));
+   BOOST_REQUIRE(parsed_maximum_block);
+   BOOST_CHECK_EQUAL(*parsed_maximum_block, std::numeric_limits<uint32_t>::max());
+
+   BOOST_CHECK(!sysio::parse_snapshot_endpoint_block_num(std::to_string(first_unsupported_block)));
+   BOOST_CHECK(!sysio::parse_snapshot_endpoint_block_num(invalid_block_segment));
+}
+
+/** Auto-fetch a scheduled snapshot, replay its later attestation, and finish verification. */
 BOOST_FIXTURE_TEST_CASE(
-   chain_plugin_accepts_valid_snapshot_attestation,
+   chain_plugin_accepts_attested_auto_fetched_snapshot,
    snapshot_attest_test_support::snapshot_attest_fixture) {
-   set_snap_config(snapshot_attest_test_support::single_provider_minimum,
-                   snapshot_attest_test_support::unanimous_threshold_pct);
+   set_snap_config(snapshot_attest_test_support::single_provider_minimum);
    control->abort_block();
 
    const auto snapshot_block_num = control->head().block_num();
@@ -221,13 +420,7 @@ BOOST_FIXTURE_TEST_CASE(
 
    fc::temp_directory snapshot_dir;
    const auto snapshot_path = snapshot_dir.path() / valid_snapshot_filename;
-   auto writer = std::make_shared<sysio::chain::threaded_snapshot_writer>(snapshot_path);
-   control->write_snapshot(writer);
-   // chain_plugin enables root-extension tracking while this tester fixture does not.
-   writer->write_section<sysio::chain::contract_root_object>([](auto&) {});
-   writer->finalize();
-   const auto snapshot_root_hash = writer->get_root_hash();
-
+   const auto snapshot_root_hash = write_chain_plugin_snapshot(*control, snapshot_path);
    const auto contract_hash =
       snapshot_attest_test_support::to_contract_snapshot_hash(snapshot_root_hash);
 
@@ -241,14 +434,15 @@ BOOST_FIXTURE_TEST_CASE(
    const auto source_blocks_path = get_config().blocks_dir.string();
    validate_and_close();
 
+   snapshot_endpoint_server endpoint(snapshot_block_num, snapshot_root_hash, snapshot_path);
    fc::temp_directory node_dir;
    sysio::chain::application exe({.enable_resource_monitor = false});
    const auto node_path = node_dir.path().string();
-   const auto snapshot_path_string = snapshot_path.string();
+   const auto endpoint_url = endpoint.url() + url_path_separator + std::to_string(snapshot_block_num);
    std::array args{
       chain_plugin_test_program_name,
-      snapshot_option_name,
-      snapshot_path_string.c_str(),
+      snapshot_endpoint_option_name,
+      endpoint_url.c_str(),
       blocks_dir_option_name,
       source_blocks_path.c_str(),
       config_dir_option_name,
@@ -269,18 +463,62 @@ BOOST_FIXTURE_TEST_CASE(
    plugin.plugin_shutdown();
 }
 
-/** Reject a legacy snapshot even when retained blocks contain a later attestation ABI. */
-BOOST_AUTO_TEST_CASE(chain_plugin_rejects_snapshot_without_attestation_table) {
+/** Reject an auto-fetched snapshot before replay when governance has not enabled attestation. */
+BOOST_FIXTURE_TEST_CASE(
+   chain_plugin_rejects_auto_fetched_snapshot_without_enabled_config,
+   snapshot_attest_test_support::snapshot_attest_fixture) {
+   produce_block();
+   control->abort_block();
+
+   const auto snapshot_block_num = control->head().block_num();
+   BOOST_REQUIRE_EQUAL(snapshot_block_num, snapshot_attest::block_spacing);
+
+   fc::temp_directory snapshot_dir;
+   const auto snapshot_path = snapshot_dir.path() / unconfigured_snapshot_filename;
+   const auto snapshot_root_hash = write_chain_plugin_snapshot(*control, snapshot_path);
+   const auto source_blocks_path = get_config().blocks_dir.string();
+   validate_and_close();
+
+   snapshot_endpoint_server endpoint(snapshot_block_num, snapshot_root_hash, snapshot_path);
+   fc::temp_directory node_dir;
+   sysio::chain::application exe({.enable_resource_monitor = false});
+   const auto node_path = node_dir.path().string();
+   const auto endpoint_url = endpoint.url();
+   std::array args{
+      chain_plugin_test_program_name,
+      snapshot_endpoint_option_name,
+      endpoint_url.c_str(),
+      blocks_dir_option_name,
+      source_blocks_path.c_str(),
+      config_dir_option_name,
+      node_path.c_str(),
+      data_dir_option_name,
+      node_path.c_str(),
+   };
+
+   BOOST_REQUIRE(exe.init<sysio::chain_plugin>(args.size(), const_cast<char**>(args.data()))
+                 == sysio::chain::exit_code::SUCCESS);
+   auto& plugin = appbase::app().get_plugin<sysio::chain_plugin>();
+   BOOST_CHECK_EXCEPTION(
+      plugin.plugin_startup(), sysio::chain::plugin_config_exception,
+      [](const sysio::chain::plugin_config_exception& error) {
+         return error.to_detail_string().find(unconfigured_attestation_error_fragment)
+                != std::string::npos;
+      });
+}
+
+/** A manual --snapshot is an operator-trusted escape hatch without an attestation schema gate. */
+BOOST_AUTO_TEST_CASE(chain_plugin_accepts_trusted_manual_snapshot_without_attestation_table) {
    sysio::testing::tester source(sysio::testing::setup_policy::full);
 
-   sysio::chain::abi_def legacy_system_abi;
+   sysio::chain::abi_def system_abi;
    const auto* system_account = source.control->find_account_metadata(
       sysio::chain::config::system_account_name);
    BOOST_REQUIRE(system_account != nullptr);
    BOOST_REQUIRE(sysio::chain::abi_serializer::to_abi(system_account->abi,
-                                                       legacy_system_abi));
+                                                       system_abi));
    BOOST_REQUIRE(std::none_of(
-      legacy_system_abi.tables.begin(), legacy_system_abi.tables.end(),
+      system_abi.tables.begin(), system_abi.tables.end(),
       [](const sysio::chain::table_def& table) {
          return table.name == snapshot_attest::table_snaprecords;
       }));
@@ -297,25 +535,6 @@ BOOST_AUTO_TEST_CASE(chain_plugin_rejects_snapshot_without_attestation_table) {
    writer->write_section<sysio::chain::contract_root_object>([](auto&) {});
    writer->finalize();
 
-   // Put a later ABI declaration in the retained block log. Validation after replay would see
-   // this declaration and incorrectly accept the older snapshot, so startup must inspect the
-   // snapshot state before replay begins.
-   auto current_system_abi = legacy_system_abi;
-   auto snapshot_attestation_abi = make_snapshot_attestation_abi();
-   current_system_abi.tables.insert(
-      current_system_abi.tables.end(),
-      std::make_move_iterator(snapshot_attestation_abi.tables.begin()),
-      std::make_move_iterator(snapshot_attestation_abi.tables.end()));
-   current_system_abi.structs.insert(
-      current_system_abi.structs.end(),
-      std::make_move_iterator(snapshot_attestation_abi.structs.begin()),
-      std::make_move_iterator(snapshot_attestation_abi.structs.end()));
-   source.set_abi(sysio::chain::config::system_account_name,
-                  fc::json::to_string(current_system_abi, fc::time_point::maximum()));
-   const auto abi_upgrade_block = source.produce_block()->block_num();
-   while (source.last_irreversible_block_num() < abi_upgrade_block)
-      source.produce_block();
-   source.control->abort_block();
    const auto source_blocks_path = source.get_config().blocks_dir.string();
    source.close();
 
@@ -338,13 +557,11 @@ BOOST_AUTO_TEST_CASE(chain_plugin_rejects_snapshot_without_attestation_table) {
    BOOST_REQUIRE(exe.init<sysio::chain_plugin>(args.size(), const_cast<char**>(args.data()))
                  == sysio::chain::exit_code::SUCCESS);
    auto& plugin = appbase::app().get_plugin<sysio::chain_plugin>();
-   BOOST_CHECK_EXCEPTION(
-      plugin.plugin_startup(), sysio::chain::plugin_config_exception,
-      [](const sysio::chain::plugin_config_exception& error) {
-         return error.to_detail_string().find(missing_attestation_table_error_fragment)
-                != std::string::npos;
-      });
+   plugin.plugin_startup();
    BOOST_CHECK_EQUAL(plugin.chain().head().block_num(), snapshot_block_num);
+   BOOST_CHECK(!plugin.has_pending_snapshot_attestation());
+   BOOST_CHECK(!appbase::app().is_quiting());
+   plugin.plugin_shutdown();
 }
 
 /** Verify snapshot endpoint registration and removal of endpoint-specific resource knobs. */
