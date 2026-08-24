@@ -382,12 +382,12 @@ try:
     # The table read above proves the record synced into state, but would still
     # pass if chain_plugin's verification skipped early. Assert the restarted
     # node actually logged the terminal verification success for the loaded
-    # snapshot's exact block and hash. Verification stays pending until the
+    # snapshot's exact block ID and hash. Verification stays pending until the
     # snaprecords row is visible in synced state, so poll the log rather than
     # checking once.
     Print("Verify chain_plugin logged successful attestation verification")
     verifiedLogLine = (f"Snapshot attestation verified successfully for block #{attestBlockNum}: "
-                       f"hash {attestRootHash} matches on-chain record")
+                       f"block id {attestBlockId} and hash {attestRootHash} match the on-chain record")
     assert Utils.waitForBool(lambda: validationNode.findInLog(verifiedLogLine) is not None, timeout=90), \
         f"Restarted node did not log successful attestation verification: '{verifiedLogLine}'"
 
