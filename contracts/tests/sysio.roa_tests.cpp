@@ -1833,6 +1833,62 @@ BOOST_FIXTURE_TEST_CASE( nodeownreg_reconciles_existing_reslimit_net_cpu, sysio_
    BOOST_REQUIRE_EQUAL(cpu, 10000);
 } FC_LOG_AND_RETHROW()
 
+// SEC-087 at TIER 1, which is the only tier regnodeowner still provisions a personal allocation for.
+// The two tier-2 companions above now pass zero weights into increase_reslimit, so this is the case
+// that exercises its MODIFY branch with non-zero deltas: the planted policy's weights and the
+// node-owner personal weights must stack, and the one-time newaccount_ram gift must be counted once
+// rather than re-added. Without this the arithmetic that reconcile depends on would go untested on
+// the registration path.
+BOOST_FIXTURE_TEST_CASE( nodeownreg_tier1_reconcile_stacks_personal_weights, sysio_roa_nodeownreg_tester ) try {
+   const auto owner    = "t1own"_n;   // tier-1 name rule: 2-6 characters
+   const auto wire_pub = gen_k1_key();
+   const auto eth_pub  = gen_em_key();
+
+   BOOST_REQUIRE_EQUAL(success(), newnameduser(owner, wire_pub, 1));
+   produce_blocks();
+   add_roa_policy(NODE_DADDY, owner, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0, 0);
+   produce_blocks();
+
+   const int64_t bytes_per_unit     = 104;
+   const int64_t planted_ram_bytes  = 10000 * bytes_per_unit;   // 1.0000 SYS policy
+   const int64_t personal_ram_bytes = 80    * bytes_per_unit;   // tier-1 personal RAM (0.0080 SYS)
+
+   // Pre-state: planted policy only, gift folded in once by addpolicy's create branch.
+   auto r = get_reslimit(owner);
+   BOOST_REQUIRE_EQUAL(r.is_null(), false);
+   BOOST_REQUIRE_EQUAL(r["net_weight"].as_string(), "1.0000 SYS");
+   BOOST_REQUIRE_EQUAL(r["ram_bytes"].as_int64(), planted_ram_bytes + newaccount_ram);
+
+   BOOST_REQUIRE_EQUAL(success(), nodeownreg(owner, 1, eth_pub, wire_pub));
+   produce_blocks();
+
+   BOOST_REQUIRE_EQUAL(get_nodeowner(owner)["tier"].as<uint32_t>(), 1);
+   BOOST_REQUIRE_EQUAL(get_nodeownerreg(owner)["status"].as<uint64_t>(), CONFIRMED);
+
+   // MODIFY branch with non-zero deltas: planted 1.0000 + personal 0.0500 = 1.0500 SYS of net/cpu,
+   // ram = planted + gift + personal, with the gift NOT re-added.
+   const int64_t expected_ram = planted_ram_bytes + newaccount_ram + personal_ram_bytes;
+   r = get_reslimit(owner);
+   BOOST_REQUIRE_EQUAL(r["net_weight"].as_string(), "1.0500 SYS");
+   BOOST_REQUIRE_EQUAL(r["cpu_weight"].as_string(), "1.0500 SYS");
+   BOOST_REQUIRE_EQUAL(r["ram_bytes"].as_int64(), expected_ram);
+
+   int64_t ram = 0, net = 0, cpu = 0;
+   control->get_resource_limits_manager().get_account_limits(owner, ram, net, cpu);
+   BOOST_REQUIRE_EQUAL(ram, expected_ram);
+   BOOST_REQUIRE_EQUAL(net, 10500);
+   BOOST_REQUIRE_EQUAL(cpu, 10500);
+
+   // Planted policy untouched; the tier-1 personal policy now sits alongside it.
+   auto planted = get_policy(owner, NODE_DADDY);
+   BOOST_REQUIRE_EQUAL(planted.is_null(), false);
+   BOOST_REQUIRE_EQUAL(planted["net_weight"].as_string(), "1.0000 SYS");
+   auto personal = get_policy(owner, owner);
+   BOOST_REQUIRE_EQUAL(personal.is_null(), false);
+   BOOST_REQUIRE_EQUAL(personal["net_weight"].as_string(), "0.0500 SYS");
+   BOOST_REQUIRE_EQUAL(personal["ram_weight"].as_string(), "0.0080 SYS");
+} FC_LOG_AND_RETHROW()
+
 // Account already carries a DIFFERENT EVM link (e.g. an operator createlink or an earlier deposit
 // key) -> nodeownreg soft-fails LINK_KEY_MISMATCH rather than recording CONFIRMED against a stale
 // link or silently keeping the old key.
