@@ -202,6 +202,73 @@ account. Using the launch configuration of 75,496 SYS `total_sys`:
 Every `addpolicy` and `expandpolicy` checks `total_new_allocation <= node.total_sys -
 node.allocated_sys`. A node owner cannot issue more than they hold.
 
+### What registration provisions
+
+`regnodeowner` spends part of the tier allocation before the owner has issued anything:
+
+| Component | Amount | Scales with tier |
+|---|---|---|
+| `sysio` RAM pool grant | 10% of the tier allocation | Yes |
+| Personal RAM | 0.0080 SYS (8,320 bytes) | No — flat |
+| Personal NET | 0.0500 SYS | No — flat |
+| Personal CPU | 0.0500 SYS | No — flat |
+
+The 10% grant is not for the owner. It moves bytes into `sysio`'s RAM pool, which funds the
+1,144-byte gift every new account on the network receives. It is written with
+`time_block = UINT32_MAX` and is never reclaimable.
+
+The three personal components land in a self-issued policy — `issuer == owner` — carrying
+`time_block = 1`, so an owner can reshape or reclaim them immediately with `expandpolicy` or
+`reducepolicy`. Because they are flat while the tier budgets are not, together they cost a tier-3
+owner 4.77% of its allocation and a tier-1 owner 0.0036%.
+
+### What a node owner needs to operate
+
+Almost nothing. Managing policies costs a node owner no resources at all:
+
+- `addpolicy`, `expandpolicy`, `extendpolicy`, and `reducepolicy` are actions on `sysio.roa`, so
+  `payer()` resolves to `sysio.roa`, which carries unlimited CPU and NET.
+- Every row the contract writes for registration and policy management is billed to `sysio.roa`
+  as well — `policies`, `reslimit`, and `nodeowners` rows are all `emplace(get_self(), …)`.
+
+An owner reduced to zero CPU, zero NET, and zero spare RAM can still issue a policy. Membership —
+the `nodeowners` row — is what confers the ability to issue, not any allocation the owner holds.
+
+The one exception is tier-1's `newuser`, which bills its `sponsors` and `sponsorcount` rows to
+`creator`. Those are the only two writes in the contract charged to a node owner, so a tier-1
+owner needs RAM headroom before its first `newuser` call.
+
+### What differs between tiers
+
+| | Tier 1 | Tier 2 | Tier 3 |
+|---|---|---|---|
+| Issue, expand, extend, reduce policies | Yes | Yes | Yes |
+| Budget per owner | 3,019.8400 SYS | 113.2440 SYS | 2.2649 SYS |
+| Max owners | 21 | 84 | 1,000 |
+| `newuser` (sponsored accounts) | Yes | No | No |
+
+Policy mechanics are identical across tiers — there is no tier check in any of the four policy
+actions. `newuser` is the only tier-gated capability, guarded by
+`check(node.tier == 1, "Creator is not a registered tier-1 node owner")`.
+
+### Where network RAM comes from
+
+`activateroa` splits the SYS left over after all tier allocations between two pools:
+
+| Pool | Size | Funds |
+|---|---|---|
+| `sysio.roa` | ~157 MB, fixed | The contract's own rows: policies, reslimits, node-owner records |
+| `sysio` | ~157 MB at activation, ~7.98 GB once every node owner has registered | The 1,144-byte gift every new account receives |
+
+`sysio`'s pool grows as owners register, because each registration deposits 10% of its tier
+allocation into it. At 1,144 bytes per account, the funded pool supports roughly 6.97 million
+accounts.
+
+The gap between those two pools is why `newuser` bills its sponsorship rows to the sponsoring
+tier-1 owner rather than to the contract. `sysio.roa`'s pool is fixed at ~157 MB and would cap
+sponsorship near 530,000 users — long before `sysio`'s account pool ran out. A tier-1 owner's own
+free budget of ~2.83 GB is the only one that scales with how many users it actually onboards.
+
 ### The four policy actions
 
 **`addpolicy`** — create a policy. Fails if this issuer already has one for this owner (use
