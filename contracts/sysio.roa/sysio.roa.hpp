@@ -413,15 +413,17 @@ namespace sysio {
                 name nonce;
                 name username;
 
-                uint64_t by_username() const { return username.value; }
-
                 SYSLIB_SERIALIZE(sponsor, (nonce)(username))
             };
 
-            using sponsors_t = kv::scoped_table<
-                "sponsors"_n, sponsor_key, sponsor,
-                kv::index<"byusername"_n, const_mem_fun<sponsor, uint64_t, &sponsor::by_username>>
-            >;
+            // No secondary index on `username`. A reverse lookup is unnecessary: newuser mints
+            // "<creator>.<generated>" from a dot-free charmap, so name::prefix() recovers the
+            // creator from the username by string arithmetic alone -- cheaper than any index read.
+            // The only lookup the contract performs is the point read of the (creator, nonce)
+            // replay guard, which the primary key already serves. Dropping the index halves the
+            // sponsoring owner's RAM cost per user (~296 -> ~152 bytes), which matters because
+            // these are the only rows in the contract billed to a node owner.
+            using sponsors_t = kv::scoped_table<"sponsors"_n, sponsor_key, sponsor>;
 
             /**
              * @brief Table tracking how many new users a node owner has sponsored.
