@@ -812,4 +812,158 @@ BOOST_AUTO_TEST_CASE( authority_threshold_not_lowered ) { try {
    );
 } FC_LOG_AND_RETHROW() }
 
+/// Session-key topology: a code-only parent permission over a key-only child.
+///
+///   alice@sessgate  (parent active) -- threshold 1, accounts [{sessmgr, sysio.code}], NO keys
+///   alice@session   (parent sessgate) -- threshold 1, keys [session key], NO code entry
+///
+/// The contract's seat sits in the parent, so the session key cannot evict it: updateauth on a
+/// permission requires satisfying that permission, and a child never satisfies its parent. The
+/// reaper meanwhile satisfies every descendant of sessgate, because permission_object::satisfies
+/// walks up the target's ancestry.
+///
+/// Putting the key and the code seat in the SAME permission instead is unsafe -- a permission
+/// satisfies itself, so the key could rewrite that authority and drop the code seat while the
+/// linkauth survived, leaving the contract unable to clean up.
+///
+/// These cases drive the native auth actions, which take the `special_case` branch of
+/// authorization_manager::check_authorization rather than the linked-permission lookup that every
+/// other sysio.code test in the tree exercises. `provided_permissions` is passed exactly as
+/// apply_context::execute_inline builds it: `{{receiver, sysio.code}}`.
+namespace {
+
+constexpr auto code_parent = "sessgate"_n;
+constexpr auto key_child   = "session"_n;
+
+/// Build the code-only parent and key-only child on alice, returning the child's public key.
+public_key_type setup_session_topology( validating_tester& chain, account_name grantee ) {
+   const authority gate_auth( 1, {}, {{{grantee, config::sysio_code_name}, 1}} );
+   chain.set_authority( "alice"_n, code_parent, gate_auth, config::active_name );
+
+   const auto session_pub_key = chain.get_public_key( "alice"_n, "session" );
+   const authority session_auth( 1, {{session_pub_key, 1}}, {} );
+   chain.set_authority( "alice"_n, key_child, session_auth, code_parent );
+   chain.produce_block();
+   return session_pub_key;
+}
+
+} // anonymous namespace
+
+BOOST_AUTO_TEST_CASE( code_parent_satisfies_child_deleteauth ) { try {
+   validating_tester chain;
+   chain.create_accounts( {"alice"_n, "sessmgr"_n, "mallory"_n} );
+   chain.produce_block();
+   setup_session_topology( chain, "sessmgr"_n );
+
+   const auto& authmgr = chain.control->get_authorization_manager();
+   // The reaper declares the parent, which satisfies the child being deleted.
+   const action del{ {{"alice"_n, code_parent}}, deleteauth{"alice"_n, key_child} };
+
+   // sessmgr's sysio.code seat is the only weight in the parent, so the delete authorizes with no
+   // signing key at all.
+   BOOST_CHECK_NO_THROW( authmgr.check_authorization( {del}, {}, {{"sessmgr"_n, config::sysio_code_name}} ) );
+
+   // Without that seat presented, nothing reaches the parent's threshold.
+   BOOST_CHECK_THROW( authmgr.check_authorization( {del}, {}, {} ), unsatisfied_authorization );
+
+   // A different contract's sysio.code is not the seat alice granted.
+   BOOST_CHECK_THROW( authmgr.check_authorization( {del}, {}, {{"mallory"_n, config::sysio_code_name}} ),
+                      unsatisfied_authorization );
+} FC_LOG_AND_RETHROW() }
+
+BOOST_AUTO_TEST_CASE( code_parent_satisfies_child_updateauth ) { try {
+   validating_tester chain;
+   chain.create_accounts( {"alice"_n, "sessmgr"_n} );
+   chain.produce_block();
+   setup_session_topology( chain, "sessmgr"_n );
+
+   const auto& authmgr = chain.control->get_authorization_manager();
+
+   // Rotating the child's key is the positive updateauth path: the parent satisfies the child, and
+   // the sysio.code seat carries the parent.
+   const action rotate{ {{"alice"_n, code_parent}},
+                        updateauth{ .account    = "alice"_n,
+                                    .permission = key_child,
+                                    .parent     = code_parent,
+                                    .auth       = authority( chain.get_public_key( "alice"_n, "rotated" ) ) } };
+   BOOST_CHECK_NO_THROW( authmgr.check_authorization( {rotate}, {}, {{"sessmgr"_n, config::sysio_code_name}} ) );
+   BOOST_CHECK_THROW( authmgr.check_authorization( {rotate}, {}, {} ), unsatisfied_authorization );
+} FC_LOG_AND_RETHROW() }
+
+BOOST_AUTO_TEST_CASE( session_key_cannot_reach_code_parent ) { try {
+   validating_tester chain;
+   chain.create_accounts( {"alice"_n, "sessmgr"_n} );
+   chain.produce_block();
+   setup_session_topology( chain, "sessmgr"_n );
+
+   const auto& authmgr = chain.control->get_authorization_manager();
+   const flat_set<public_key_type> session_key{ chain.get_public_key( "alice"_n, "session" ) };
+
+   // The whole point of the split: the child cannot rewrite the parent, so it cannot evict the
+   // contract's seat and strand its own cleanup.
+   const action evict{ {{"alice"_n, key_child}},
+                       updateauth{ .account    = "alice"_n,
+                                   .permission = code_parent,
+                                   .parent     = config::active_name,
+                                   .auth       = authority( chain.get_public_key( "alice"_n, "attacker" ) ) } };
+   BOOST_CHECK_THROW( authmgr.check_authorization( {evict}, session_key ), irrelevant_auth_exception );
+
+   // Nor delete it outright.
+   const action drop{ {{"alice"_n, key_child}}, deleteauth{"alice"_n, code_parent} };
+   BOOST_CHECK_THROW( authmgr.check_authorization( {drop}, session_key ), irrelevant_auth_exception );
+
+   // And still nothing reaching active, which is the parent of the gate.
+   const action to_active{ {{"alice"_n, key_child}}, deleteauth{"alice"_n, config::active_name} };
+   BOOST_CHECK_THROW( authmgr.check_authorization( {to_active}, session_key ), irrelevant_auth_exception );
+} FC_LOG_AND_RETHROW() }
+
+BOOST_AUTO_TEST_CASE( code_parent_satisfies_child_unlinkauth ) { try {
+   validating_tester chain;
+   chain.create_accounts( {"alice"_n, "sessmgr"_n} );
+   chain.produce_block();
+   setup_session_topology( chain, "sessmgr"_n );
+
+   chain.link_authority( "alice"_n, "sysio"_n, key_child, "reqauth"_n );
+   chain.produce_block();
+
+   const auto& authmgr = chain.control->get_authorization_manager();
+
+   // deleteauth refuses while a link survives, so cleanup must unlink first -- and that action has
+   // to authorize by the same route.
+   const action unlink{ {{"alice"_n, code_parent}}, unlinkauth{"alice"_n, "sysio"_n, "reqauth"_n} };
+   BOOST_CHECK_NO_THROW( authmgr.check_authorization( {unlink}, {}, {{"sessmgr"_n, config::sysio_code_name}} ) );
+   BOOST_CHECK_THROW( authmgr.check_authorization( {unlink}, {}, {} ), unsatisfied_authorization );
+} FC_LOG_AND_RETHROW() }
+
+BOOST_AUTO_TEST_CASE( unlinked_child_cannot_authorize_linked_actions ) { try {
+   validating_tester chain;
+   chain.create_accounts( {"alice"_n, "sessmgr"_n} );
+   chain.produce_block();
+   setup_session_topology( chain, "sessmgr"_n );
+
+   const auto session_priv_key = chain.get_private_key( "alice"_n, "session" );
+
+   // Narrow property: with no link, the minimum permission for an ordinary action defaults to
+   // active, and a child of active does not satisfy active. This is NOT a claim that the child is
+   // inert -- the native auth actions are special-cased and reach it with no link at all, which
+   // is why it can still rotate its own key below.
+   BOOST_CHECK_THROW( chain.push_reqauth( "alice"_n, {permission_level{"alice"_n, key_child}}, {session_priv_key} ),
+                      irrelevant_auth_exception );
+
+   // Unlinked, and still able to act on itself.
+   const auto& authmgr = chain.control->get_authorization_manager();
+   const action self_rotate{ {{"alice"_n, key_child}},
+                             updateauth{ .account    = "alice"_n,
+                                         .permission = key_child,
+                                         .parent     = code_parent,
+                                         .auth       = authority( chain.get_public_key( "alice"_n, "rotated" ) ) } };
+   BOOST_CHECK_NO_THROW( authmgr.check_authorization( {self_rotate},
+                                                      {chain.get_public_key( "alice"_n, "session" )} ) );
+
+   // linkauth is what lets it authorize the action it names.
+   chain.link_authority( "alice"_n, "sysio"_n, key_child, "reqauth"_n );
+   chain.produce_block();
+   chain.push_reqauth( "alice"_n, {permission_level{"alice"_n, key_child}}, {session_priv_key} );
+} FC_LOG_AND_RETHROW() }
+
 BOOST_AUTO_TEST_SUITE_END()

@@ -2,6 +2,8 @@
 #include <sysio/testing/tester.hpp>
 #include <sysio/chain/abi_serializer.hpp>
 #include <sysio/chain/kv_table_objects.hpp>
+#include <sysio/chain/authorization_manager.hpp>
+#include <sysio/chain/permission_object.hpp>
 #include "sysio.system_tester.hpp"
 #include <contracts.hpp>
 #include <sysio/opp/opp.hpp>
@@ -857,6 +859,246 @@ public:
       produce_block();
    }
 };
+
+// Session-key onboarding: what can and cannot share a transaction.
+//
+// RAM is verified once at transaction finalize rather than per action, so a ROA grant and the
+// spending of that grant may ride in the same transaction -- nothing can land in between and
+// consume it.
+//
+// Authorization, by contrast, is decided for every TOP-LEVEL action before any of them executes
+// (controller checks the whole action list, then calls trx_context.exec()). Two top-level
+// updateauth actions therefore cannot create a permission and its child together: the child's
+// parent lookup runs while the parent does not yet exist.
+//
+// That restriction is specific to the top-level path. An INLINE action is authorized during
+// execution, by which time the parent exists -- see session_onboarding_single_transaction_via_inline
+// for the one-transaction shape a contract-managed onboarding can actually use.
+BOOST_FIXTURE_TEST_CASE( session_onboarding_grant_and_setup, sysio_roa_full_tester ) try {
+   const auto issuer = node_owners[2];
+   const auto sessmgr = "sessmgr"_n;   // stands in for the dapp's reaper contract
+   create_accounts( {sessmgr}, false, false, false, false );
+   const auto user   = create_newuser( issuer );
+   produce_block();
+
+   // create_newuser seeds the account with the creator's active key, so one signature satisfies
+   // both the issuer and the user authorizations below.
+   const auto signing_key = get_private_key( issuer, "active" );
+   const vector<permission_level> as_user{{user, config::active_name}};
+
+   const authority gate_auth( 1, {}, {{{sessmgr, config::sysio_code_name}, 1}} );
+   const authority session_auth( 1, {{get_public_key( issuer, "session" ), 1}}, {} );
+
+   auto make_gate = [&]{ return updateauth{ .account = user, .permission = "sessgate"_n,
+                                            .parent  = config::active_name, .auth = gate_auth }; };
+   auto make_child = [&]{ return updateauth{ .account = user, .permission = "session"_n,
+                                             .parent  = "sessgate"_n, .auth = session_auth }; };
+   auto addpolicy_action = [&]{
+      return get_action( config::roa_account_name, "addpolicy"_n,
+                         vector<permission_level>{{issuer, config::active_name}},
+                         mvo()( "owner", user )( "issuer", issuer )
+                              ( "net_weight", "0.0000 SYS" )( "cpu_weight", "0.0000 SYS" )
+                              ( "ram_weight", "0.0010 SYS" )   // 10 units of RAM
+                              ( "time_block", 0 )( "network_gen", 0 ) );
+   };
+   auto sign_and_push = [&]( signed_transaction& trx ) {
+      set_transaction_headers( trx );
+      trx.sign( signing_key, control->get_chain_id() );
+      return push_transaction( trx );
+   };
+
+   const auto& authmgr = control->get_authorization_manager();
+
+   // Without a grant, even the code-only parent alone exceeds the creation gift.
+   {
+      signed_transaction trx;
+      trx.actions.emplace_back( as_user, make_gate() );
+      BOOST_CHECK_THROW( sign_and_push( trx ), ram_usage_exceeded );
+   }
+   produce_block();
+   BOOST_REQUIRE( authmgr.find_permission( {user, "sessgate"_n} ) == nullptr );
+
+   // Parent and child cannot be created together, even with the grant present: the child's
+   // authorization check resolves its parent before the parent's action has run.
+   {
+      signed_transaction trx;
+      trx.actions.emplace_back( addpolicy_action() );
+      trx.actions.emplace_back( as_user, make_gate() );
+      trx.actions.emplace_back( as_user, make_child() );
+      BOOST_CHECK_THROW( sign_and_push( trx ), permission_query_exception );
+   }
+   produce_block();
+   BOOST_REQUIRE( authmgr.find_permission( {user, "sessgate"_n} ) == nullptr ); // whole trx reverted
+
+   // Grant and parent together: atomic, so the grant cannot be intercepted and spent elsewhere.
+   {
+      signed_transaction trx;
+      trx.actions.emplace_back( addpolicy_action() );
+      trx.actions.emplace_back( as_user, make_gate() );
+      sign_and_push( trx );
+   }
+   produce_block();
+   BOOST_REQUIRE( authmgr.find_permission( {user, "sessgate"_n} ) != nullptr );
+
+   // Child and its link follow in a second transaction, paid for out of the same grant.
+   {
+      signed_transaction trx;
+      trx.actions.emplace_back( as_user, make_child() );
+      trx.actions.emplace_back( as_user, linkauth{ user, "sysio"_n, "reqauth"_n, "session"_n } );
+      sign_and_push( trx );
+   }
+   produce_block();
+   BOOST_REQUIRE( authmgr.find_permission( {user, "session"_n} ) != nullptr );
+} FC_LOG_AND_RETHROW()
+
+// The top-level restriction above is not a property of transactions, only of top-level actions.
+// Inline actions are authorized during execution, after earlier actions have applied, so a contract
+// holding a seat in the gate can create the child in the same transaction that creates the gate.
+// The trailing top-level linkauth is fine too: its precheck resolves the currently linked
+// permission (none), and only apply_sysio_linkauth requires the requirement to exist, by which
+// point the inline has created it.
+//
+// This is the shape a contract-managed onboarding should use -- it never leaves an unspent grant
+// exposed between transactions.
+BOOST_FIXTURE_TEST_CASE( session_onboarding_single_transaction_via_inline, sysio_roa_full_tester ) try {
+   const auto issuer  = node_owners[3];
+   const auto sessmgr = "sessmgr2"_n;
+   create_accounts( {sessmgr}, false, false, false, false );
+   // the forwarder needs RAM to hold its code, and NET/CPU because in Wire the contract account
+   // is billed for its own execution rather than the caller
+   add_roa_policy( issuer, sessmgr, "8.0000 SYS", "8.0000 SYS", "8.0000 SYS", 0, 0 );
+   produce_block();
+   set_code( sessmgr, system_contracts::testing::test_contracts::sendinline_wasm() );
+   set_abi( sessmgr, system_contracts::testing::test_contracts::sendinline_abi().data() );
+   const auto user = create_newuser( issuer );
+   produce_block();
+
+   const auto signing_key = get_private_key( issuer, "active" );
+   const authority gate_auth( 1, {}, {{{sessmgr, config::sysio_code_name}, 1}} );
+   const authority session_auth( 1, {{get_public_key( issuer, "session" ), 1}}, {} );
+
+   signed_transaction trx;
+   // 1. grant
+   trx.actions.emplace_back( get_action( config::roa_account_name, "addpolicy"_n,
+                                         vector<permission_level>{{issuer, config::active_name}},
+                                         mvo()( "owner", user )( "issuer", issuer )
+                                              ( "net_weight", "0.0000 SYS" )( "cpu_weight", "0.0000 SYS" )
+                                              ( "ram_weight", "0.0010 SYS" )
+                                              ( "time_block", 0 )( "network_gen", 0 ) ) );
+   // 2. top-level: the code-only gate
+   trx.actions.emplace_back( vector<permission_level>{{user, config::active_name}},
+                             updateauth{ .account = user, .permission = "sessgate"_n,
+                                         .parent  = config::active_name, .auth = gate_auth } );
+   // 3. inline: the contract creates the child under the gate, authorized at execution time
+   trx.actions.emplace_back( get_action( sessmgr, "send"_n,
+                                         vector<permission_level>{{issuer, config::active_name}},
+                                         mvo()( "contract", config::system_account_name )
+                                              ( "action_name", "updateauth" )
+                                              ( "auths", std::vector<permission_level>{{user, "sessgate"_n}} )
+                                              ( "payload", fc::raw::pack(
+                                                   updateauth{ .account = user, .permission = "session"_n,
+                                                               .parent  = "sessgate"_n, .auth = session_auth } ) ) ) );
+   // 4. top-level: link the child that step 3 will have created
+   trx.actions.emplace_back( vector<permission_level>{{user, config::active_name}},
+                             linkauth{ user, "sysio"_n, "reqauth"_n, "session"_n } );
+
+   set_transaction_headers( trx );
+   trx.sign( signing_key, control->get_chain_id() );
+   push_transaction( trx );
+   produce_block();
+
+   const auto& authmgr = control->get_authorization_manager();
+   const auto* gate  = authmgr.find_permission( {user, "sessgate"_n} );
+   const auto* child = authmgr.find_permission( {user, "session"_n} );
+   BOOST_REQUIRE( gate != nullptr );
+   BOOST_REQUIRE( child != nullptr );
+   BOOST_REQUIRE( child->parent == gate->id );
+} FC_LOG_AND_RETHROW()
+
+// The contract cannot pay for a user's permission RAM, in either of the two ways one might try.
+//
+// apply_sysio_updateauth and its siblings call add_ram_usage against the permission's OWNER with no
+// payer parameter, so a well-funded contract driving the change via an inline action still leaves
+// the charge on the user. And the sysio.payer mechanism cannot be pointed at these actions at all:
+// the native auth actions require exactly one declared authorization, so a payer role cannot even
+// be attached.
+BOOST_FIXTURE_TEST_CASE( contract_cannot_pay_for_permission_ram, sysio_roa_full_tester ) try {
+   const auto issuer  = node_owners[4];
+   const auto sessmgr = "sessmgr3"_n;
+   create_accounts( {sessmgr}, false, false, false, false );
+   add_roa_policy( issuer, sessmgr, "8.0000 SYS", "8.0000 SYS", "8.0000 SYS", 0, 0 );
+   produce_block();
+   set_code( sessmgr, system_contracts::testing::test_contracts::sendinline_wasm() );
+   set_abi( sessmgr, system_contracts::testing::test_contracts::sendinline_abi().data() );
+
+   const auto user = create_newuser( issuer );
+   // Room to spare, so any failure below is about who pays rather than affordability.
+   add_roa_policy( issuer, user, "0.0000 SYS", "0.0000 SYS", "0.0100 SYS", 0, 0 );
+   produce_block();
+
+   const auto signing_key = get_private_key( issuer, "active" );
+   const authority gate_auth( 1, {}, {{{sessmgr, config::sysio_code_name}, 1}} );
+
+   // The gate, so the contract has a seat to act through.
+   set_authority( user, "sessgate"_n, gate_auth, config::active_name,
+                  { permission_level{user, config::active_name} }, { signing_key } );
+   produce_block();
+
+   auto& rm = control->get_mutable_resource_limits_manager();
+   const int64_t user_before = rm.get_account_ram_usage( user );
+   const int64_t mgr_before  = rm.get_account_ram_usage( sessmgr );
+
+   // A richly funded contract creates the child through its seat. The charge still lands on the user.
+   const authority session_auth( 1, {{get_public_key( issuer, "session" ), 1}}, {} );
+   base_tester::push_action( sessmgr, "send"_n, issuer, mvo()
+                   ( "contract", config::system_account_name )
+                   ( "action_name", "updateauth" )
+                   ( "auths", std::vector<permission_level>{{user, "sessgate"_n}} )
+                   ( "payload", fc::raw::pack( updateauth{ .account = user, .permission = "session"_n,
+                                                           .parent  = "sessgate"_n, .auth = session_auth } ) ) );
+   produce_block();
+
+   BOOST_TEST( rm.get_account_ram_usage( user ) > user_before );      // the owner pays
+   BOOST_TEST( rm.get_account_ram_usage( sessmgr ) == mgr_before );   // the contract does not
+
+   // Nor can a payer role be attached. Two independent barriers make sysio.payer unreachable for
+   // the native auth actions, and together they close the door.
+   const authority spare_auth( 1, {{get_public_key( issuer, "spare" ), 1}}, {} );
+
+   // 1. validate_referenced_accounts requires the payer to also carry a real authorization on the
+   //    same action, so naming the contract as payer alone is rejected outright.
+   {
+      signed_transaction trx;
+      trx.actions.emplace_back( vector<permission_level>{ {sessmgr, config::sysio_payer_name},
+                                                          {user, config::active_name} },
+                                updateauth{ .account = user, .permission = "session2"_n,
+                                            .parent  = config::active_name, .auth = spare_auth } );
+      set_transaction_headers( trx );
+      trx.sign( signing_key, control->get_chain_id() );
+      trx.sign( get_private_key( sessmgr, "active" ), control->get_chain_id() );
+      BOOST_CHECK_EXCEPTION( push_transaction( trx ),
+                             transaction_exception,
+                             fc_exception_message_starts_with( "Payer 'sessmgr3' did not authorize this action" ) );
+   }
+
+   // 2. Giving the payer that real authorization pushes the action past two declared auths, and the
+   //    native auth actions accept exactly one -- so there is no arrangement that satisfies both.
+   {
+      signed_transaction trx;
+      trx.actions.emplace_back( vector<permission_level>{ {sessmgr, config::sysio_payer_name},
+                                                          {sessmgr, config::active_name},
+                                                          {user, config::active_name} },
+                                updateauth{ .account = user, .permission = "session2"_n,
+                                            .parent  = config::active_name, .auth = spare_auth } );
+      set_transaction_headers( trx );
+      trx.sign( signing_key, control->get_chain_id() );
+      trx.sign( get_private_key( sessmgr, "active" ), control->get_chain_id() );
+      BOOST_CHECK_EXCEPTION( push_transaction( trx ),
+                             irrelevant_auth_exception,
+                             fc_exception_message_starts_with(
+                                "updateauth action should only have one declared authorization" ) );
+   }
+} FC_LOG_AND_RETHROW()
 
 // ===== 1. addpolicy validation =====
 
