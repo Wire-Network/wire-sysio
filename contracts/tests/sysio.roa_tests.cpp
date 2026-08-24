@@ -2,6 +2,7 @@
 #include <sysio/testing/tester.hpp>
 #include <sysio/chain/abi_serializer.hpp>
 #include <sysio/chain/kv_table_objects.hpp>
+#include <sysio/chain/subjective_billing.hpp>
 #include "sysio.system_tester.hpp"
 #include <contracts.hpp>
 #include <sysio/opp/opp.hpp>
@@ -122,6 +123,21 @@ public:
       return base_tester::push_action( ROA, name,
          vector<permission_level>{{signer, "sysio.payer"_n},{signer, "active"_n}},
          data);
+   }
+
+   /// Push a sysio.roa action WITHOUT an explicit billed CPU time, so
+   /// transaction_context::verify_init_subjective_billing() actually runs. The ordinary tester
+   /// helpers pass DEFAULT_BILLED_CPU_TIME_US, which sets explicit_billed_cpu_time and makes that
+   /// check return on its first line -- meaning the subjective admission path is invisible to them.
+   transaction_trace_ptr push_subjective_action( const account_name& signer, const action_name& name,
+                                                 const variant_object& data ) {
+      signed_transaction trx;
+      trx.actions.emplace_back( get_action( ROA, name,
+                                            vector<permission_level>{{signer, config::active_name}},
+                                            data ) );
+      set_transaction_headers( trx );
+      trx.sign( get_private_key( signer, "active" ), control->get_chain_id() );
+      return push_transaction( trx, fc::time_point::maximum(), 0 /* no explicit billed cpu */ );
    }
 
    fc::variant get_nodeowner( account_name acc )
@@ -1887,6 +1903,53 @@ BOOST_FIXTURE_TEST_CASE( nodeownreg_tier1_reconcile_stacks_personal_weights, sys
    BOOST_REQUIRE_EQUAL(personal.is_null(), false);
    BOOST_REQUIRE_EQUAL(personal["net_weight"].as_string(), "0.0500 SYS");
    BOOST_REQUIRE_EQUAL(personal["ram_weight"].as_string(), "0.0080 SYS");
+} FC_LOG_AND_RETHROW()
+
+// A tier-2 owner holds no CPU after this change, so it reaches
+// transaction_context::verify_init_subjective_billing() with an objective limit of zero and is
+// admitted purely on the subjective allowance. Objective billing is not the whole story here:
+// addpolicy's payer is sysio.roa, but the subjective check looks at first-authorizers that are NOT
+// payers, which is the issuer. Pushed without an explicit billed CPU so that check actually runs.
+BOOST_FIXTURE_TEST_CASE( zero_cpu_owner_issues_under_subjective_billing, sysio_roa_full_tester ) try {
+   create_accounts({"t2owner"_n, "targetacct"_n}, false, false, false, false);
+   register_node_owner("t2owner"_n, 2);
+   produce_block();
+
+   auto& rlm = control->get_resource_limits_manager();
+   int64_t ram = 0, net = 0, cpu = 0;
+   rlm.get_account_limits("t2owner"_n, ram, net, cpu);
+   BOOST_REQUIRE_EQUAL(net, 0);
+   BOOST_REQUIRE_EQUAL(cpu, 0);
+
+   auto& sub_bill = control->get_mutable_subjective_billing();
+   sub_bill.set_disabled(false);
+   BOOST_REQUIRE_GT(sub_bill.get_subjective_account_cpu_allowed().count(), 0);
+
+   auto trace = push_subjective_action("t2owner"_n, "addpolicy"_n, mvo()
+      ("owner", "targetacct")("issuer", "t2owner")
+      ("net_weight", "0.0100 SYS")("cpu_weight", "0.0100 SYS")("ram_weight", "0.0100 SYS")
+      ("time_block", 0)("network_gen", 0));
+   BOOST_REQUIRE(!trace->except);
+   produce_block();
+
+   // The grant landed, and the issuer still holds nothing of its own.
+   rlm.get_account_limits("targetacct"_n, ram, net, cpu);
+   BOOST_REQUIRE_EQUAL(net, 100);
+   BOOST_REQUIRE_EQUAL(cpu, 100);
+   rlm.get_account_limits("t2owner"_n, ram, net, cpu);
+   BOOST_REQUIRE_EQUAL(cpu, 0);
+
+   // Prove the admission gate was actually reached rather than skipped: with the allowance driven
+   // to zero the identical push is rejected by it. Without this, the assertions above would pass
+   // just as happily if explicit_billed_cpu_time had short-circuited the check.
+   sub_bill.set_subjective_account_cpu_allowed(fc::microseconds(0));
+   BOOST_REQUIRE_EXCEPTION(
+      push_subjective_action("t2owner"_n, "addpolicy"_n, mvo()
+         ("owner", "targetacct")("issuer", "t2owner")
+         ("net_weight", "0.0100 SYS")("cpu_weight", "0.0000 SYS")("ram_weight", "0.0000 SYS")
+         ("time_block", 0)("network_gen", 0)),
+      tx_cpu_usage_exceeded,
+      fc_exception_message_contains("Subjectively terminated trx"));
 } FC_LOG_AND_RETHROW()
 
 // Account already carries a DIFFERENT EVM link (e.g. an operator createlink or an earlier deposit
