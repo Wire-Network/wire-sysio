@@ -213,7 +213,6 @@ BOOST_FIXTURE_TEST_CASE(
    snapshot_attest_test_support::snapshot_attest_fixture) {
    set_snap_config(snapshot_attest_test_support::single_provider_minimum,
                    snapshot_attest_test_support::unanimous_threshold_pct);
-   produce_blocks();
    control->abort_block();
 
    const auto snapshot_block_num = control->head().block_num();

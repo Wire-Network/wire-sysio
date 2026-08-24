@@ -105,7 +105,7 @@ public:
       BOOST_REQUIRE_EQUAL(success(), result);
    }
 
-   /** Configure the governance-controlled quorum parameters. */
+   /** Configure the governance-controlled quorum parameters and commit the action in a new block. */
    void set_snap_config(uint32_t min_providers, uint32_t threshold_pct) {
       const auto result = push_action(
          config::system_account_name, action_name{snapshot_attestation::action_setsnapcfg},

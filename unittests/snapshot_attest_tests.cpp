@@ -40,7 +40,6 @@ BOOST_AUTO_TEST_SUITE(snapshot_attest_tests)
 BOOST_FIXTURE_TEST_CASE(snapshot_hash_matches_attestation, snapshot_attest_fixture) { try {
    // Set config: single vote sufficient (min_providers=1, threshold=100)
    set_snap_config(single_provider_minimum, unanimous_threshold_pct);
-   produce_blocks();
 
    // Take a snapshot
    control->abort_block();
@@ -103,7 +102,6 @@ BOOST_FIXTURE_TEST_CASE(snapshot_roundtrip_preserves_hash, snapshot_attest_fixtu
 // ---------------------------------------------------------------------------
 BOOST_FIXTURE_TEST_CASE(snapshot_hash_mismatch_detected, snapshot_attest_fixture) { try {
    set_snap_config(single_provider_minimum, unanimous_threshold_pct);
-   produce_blocks();
 
    control->abort_block();
    auto block_num = control->head().block_num();
@@ -168,7 +166,6 @@ BOOST_FIXTURE_TEST_CASE(snapshot_no_attestation_detected, snapshot_attest_fixtur
 // ---------------------------------------------------------------------------
 BOOST_FIXTURE_TEST_CASE(attestation_survives_snapshot_load, snapshot_attest_fixture) { try {
    set_snap_config(single_provider_minimum, unanimous_threshold_pct);
-   produce_blocks();
 
    // Get current state and create attestation
    control->abort_block();
