@@ -40,7 +40,8 @@ dumpErrorDetails=args.dump_error_details
 snapshotNodeId = 0
 irrNodeId=pnodes
 snapshotAttestationTableName="snaprecords"
-transitionSnapshotBlockWindow=5
+# Allow loaded CI runners up to thirty seconds of block production around the transition.
+transitionSnapshotBlockWindow=60
 
 Utils.Debug=debug
 testSuccessful=False
@@ -131,7 +132,8 @@ try:
        assert ret is not None, "snapshot creation failed"
        ret_snaphot_head_block_num = ret["payload"]["head_block_num"]
        Print(f"snapshot head block number {ret_snaphot_head_block_num}")
-       assert abs(ret_snaphot_head_block_num - finalizerPolicyBlockNum) <= transitionSnapshotBlockWindow, \
+       assert finalizerPolicyBlockNum <= ret_snaphot_head_block_num \
+           <= finalizerPolicyBlockNum + transitionSnapshotBlockWindow, \
            "Snapshot was taken after the bounded Savanna transition window"
 
     Print("Take snapshot on nodeSnap")

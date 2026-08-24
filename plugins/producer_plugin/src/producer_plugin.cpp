@@ -673,6 +673,12 @@ public:
    void submit_snapshot_vote(const snapshot_scheduler::snapshot_information& si) {
       if (_snapshot_provider_account.empty()) return;
 
+      if (!snapshot_attest::is_scheduled_block(si.head_block_num)) {
+         dlog("Snapshot provider: skipping on-chain vote for unscheduled manual snapshot at block {}",
+              si.head_block_num);
+         return;
+      }
+
       try {
          chain::controller& chain = chain_plug->chain();
 
@@ -876,8 +882,6 @@ public:
 
    // snapshot provider configuration
    std::string _snapshot_provider_account;
-   /// Fixed interval shared by every automatic snapshot provider.
-   static constexpr uint32_t _snapshot_provider_block_spacing = 25000;
    /// Lifetime of an automatically submitted provider vote transaction.
    static constexpr uint32_t _snapshot_vote_expiration_seconds = 30;
    /// Description persisted with the automatic provider schedule.
@@ -1794,8 +1798,8 @@ void producer_plugin_impl::plugin_startup() {
       // blocks 25000, 50000, 75000, ...
       if (!_snapshot_provider_account.empty()) {
          snapshot_scheduler::snapshot_request_information sri;
-         sri.block_spacing = _snapshot_provider_block_spacing;
-         sri.start_block_num = _snapshot_provider_block_spacing;
+         sri.block_spacing = snapshot_attest::block_spacing;
+         sri.start_block_num = snapshot_attest::block_spacing;
          sri.end_block_num = std::numeric_limits<uint32_t>::max();
          sri.snapshot_description = _snapshot_provider_schedule_description;
 
@@ -1804,13 +1808,13 @@ void producer_plugin_impl::plugin_startup() {
          // otherwise schedule_snapshot() would throw duplicate_snapshot_request on every restart.
          if (auto existing = _snapshot_scheduler.find_snapshot_request(sri.block_spacing, sri.start_block_num, sri.end_block_num)) {
             ilog("Snapshot provider mode: reusing persisted auto-schedule for every {} blocks (request id {})",
-                 _snapshot_provider_block_spacing, *existing);
+                 snapshot_attest::block_spacing, *existing);
          } else {
             // scheduled (non create_snapshot) requests store no completion callback; the produced
             // snapshots are observed through add_snapshot_finalized_callback (provider-mode voting)
             auto result = _snapshot_scheduler.schedule_snapshot(sri, {});
             ilog("Snapshot provider mode: auto-scheduled snapshots every {} blocks (request id {})",
-                 _snapshot_provider_block_spacing, result.snapshot_request_id);
+                 snapshot_attest::block_spacing, result.snapshot_request_id);
          }
       }
 

@@ -128,39 +128,43 @@ clio push action sysio setsnpcfg \
   -p sysio@active
 ```
 
-- `min_providers` — explicit minimum live registration count and voter floor; voting remains disabled until this nonzero value is configured
-- `threshold_pct` — percentage of registered providers that must vote for the same hash to reach quorum (e.g., 67 means two-thirds)
+- `min_providers` — explicit minimum registration count and voter floor; voting remains disabled until this nonzero value is configured
+- `threshold_pct` — percentage of registered providers at a height's first vote that must vote for the same hash to reach quorum (e.g., 67 means two-thirds)
 
-### 4. Generate and attest snapshots
+### 4. Enable automatic scheduled snapshots
 
-After creating a snapshot, the provider submits a vote with the snapshot's block ID and root hash. When enough providers vote for the same hash, an attested record is created on-chain in the `snaprecords` table.
+For production, enable snapshot provider mode in `config.ini`:
+
+```ini
+snapshot-provider-account = mysnapprov1
+```
+
+Provider mode creates the canonical schedule automatically: snapshots are taken at exact 25,000-block multiples
+(25,000, 50,000, 75,000, ...), and `votesnaphash` is submitted automatically after each scheduled snapshot finalizes.
+Manual snapshots are not attested because their heights need not satisfy the shared cadence.
+
+### 5. Attestation lifecycle
+
+The provider plugin submits the snapshot's block ID and root hash automatically. The equivalent action is shown here
+only as a protocol reference; its block ID must name an exact 25,000-block cadence height:
 
 ```bash
-# Create a snapshot (returns block_num, block_id, root_hash)
-curl -s -X POST http://127.0.0.1:8888/v1/producer/create_snapshot
-
-# Submit attestation vote using the snapshot metadata
 clio push action sysio votesnaphash \
   '{"snap_account": "mysnapprov1", "block_id": "0000c350...", "snapshot_hash": "abcdef12..."}' \
   -p mysnapprov1@active
 ```
 
-The `votesnaphash` action accumulates votes in the `snapvotes` table. The numerator and denominator use the same live registration set. Removing a registration prunes only that producer's vote, preserves other live votes, and immediately re-evaluates the smaller committee's quorum. Once the threshold is met, the system contract moves the entry to `snaprecords` and purges pending votes through that height.
+The `votesnaphash` action accumulates votes in the `snapvotes` table. The first vote at a height freezes that height's
+quorum from the current registration count and configuration. Later registration or configuration changes do not alter
+the frozen quorum, and deregistration does not retract accepted votes. Once the threshold is met, the system contract
+moves the entry to `snaprecords` and purges pending votes through that height.
 
-Bootstrapping nodes verify the `snaprecords` table after syncing — if no attested record exists for the snapshot's block number, auto-fetched bootstraps will shut down with a fatal error.
+Bootstrapping nodes verify the `snaprecords` table after syncing — if no attested record exists for the snapshot's
+block number, auto-fetched bootstraps shut down with a fatal error.
 
-### 5. Automate with scheduled snapshots
-
-For production, schedule recurring snapshots rather than creating them manually:
-
-```bash
-curl -X POST http://127.0.0.1:8888/v1/producer/schedule_snapshot \
-  -d '{"block_spacing": 25000, "start_block_num": 1, "end_block_num": 4294967295}'
-```
-
-This creates a snapshot every 25,000 blocks (~3.5 hours at 0.5s block time). The attestation vote (`votesnaphash`) still needs to be submitted after each snapshot finalizes — this is typically handled by an external script or monitoring daemon that watches for new snapshots and submits the vote automatically.
-
-Both `create_snapshot` and `schedule_snapshot` require `producer_api_plugin` to be enabled. When a snapshot finalizes (becomes irreversible), it is automatically added to the serving catalog.
+The manual `create_snapshot` and `schedule_snapshot` APIs remain available through `producer_api_plugin`, but they are
+not part of the provider attestation workflow. When a snapshot finalizes (becomes irreversible), it is automatically
+added to the serving catalog.
 
 ### Startup catalog
 
@@ -240,12 +244,15 @@ nodeop \
 
 The bootstrap process:
 1. Fetches snapshot metadata from the endpoint
-2. Downloads the snapshot binary
-3. Verifies the file's root hash matches the advertised hash
-4. Loads the snapshot and begins syncing from that point
-5. After syncing, verifies the snapshot's on-chain attestation record
+2. Rejects snapshots outside the exact 25,000-block attestation cadence
+3. Downloads the snapshot binary
+4. Verifies the file's root hash matches the advertised hash
+5. Loads the snapshot and begins syncing from that point
+6. After syncing, verifies the snapshot's on-chain attestation record
 
 `--delete-all-blocks` is required when existing chain data is present. The `--snapshot-endpoint` option is incompatible with `--snapshot` (local file).
+Manual/on-demand snapshots remain available through the serving API, but endpoint bootstrap rejects
+their unscheduled heights before download because they can never receive an on-chain attestation.
 
 ### Bootstrap download status and limits
 

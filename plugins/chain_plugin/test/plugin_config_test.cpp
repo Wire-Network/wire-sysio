@@ -12,6 +12,7 @@
 #include <sysio/http_client_plugin/http_client_options.hpp>
 #include <sysio/protocol/snapshot_attestation.hpp>
 #include <sysio/testing/tester.hpp>
+#include <snapshot_attest_fixture.hpp>
 #include <stdint.h>
 #include <string>
 #include <string_view>
@@ -39,8 +40,10 @@ constexpr auto loaded_snapshot_hash =
    "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f";
 constexpr auto other_snapshot_hash =
    "1f1e1d1c1b1a191817161514131211100f0e0d0c0b0a09080706050403020100";
+constexpr auto valid_snapshot_filename = "snapshot-with-valid-attestation.bin";
 constexpr uint16_t incompatible_table_id = 0;
 constexpr uint32_t snapshot_source_block_count = 3;
+constexpr uint32_t attestation_finality_block_count = 24;
 
 /** Build the exact snaprecords ABI fragment required before snapshot replay. */
 sysio::chain::abi_def make_snapshot_attestation_abi() {
@@ -147,10 +150,14 @@ BOOST_AUTO_TEST_CASE(snapshot_attestation_table_read_timeout_policy) {
                == above_minimum);
 }
 
-/** Require the exact table keys and record fields needed by bootstrap verification. */
+/** Require the table keys and ordered field prefix consumed by bootstrap verification. */
 BOOST_AUTO_TEST_CASE(snapshot_attestation_required_schema_policy) {
    const auto valid_abi = make_snapshot_attestation_abi();
    BOOST_REQUIRE(sysio::has_required_snapshot_attestation_schema(valid_abi));
+
+   auto extended_record = valid_abi;
+   extended_record.structs.front().fields.push_back({"future_extension", snapshot_attest::abi_type::uint64});
+   BOOST_CHECK(sysio::has_required_snapshot_attestation_schema(extended_record));
 
    auto wrong_index = valid_abi;
    wrong_index.tables.front().index_type = incompatible_index_type;
@@ -179,6 +186,10 @@ BOOST_AUTO_TEST_CASE(snapshot_attestation_required_schema_policy) {
    auto wrong_field_type = valid_abi;
    wrong_field_type.structs.front().fields[1].type = snapshot_attest::abi_type::uint64;
    BOOST_CHECK(!sysio::has_required_snapshot_attestation_schema(wrong_field_type));
+
+   auto reordered_fields = valid_abi;
+   std::swap(reordered_fields.structs.front().fields[1], reordered_fields.structs.front().fields[2]);
+   BOOST_CHECK(!sysio::has_required_snapshot_attestation_schema(reordered_fields));
 }
 
 /** Match both the loaded block id and root hash against the attested tuple. */
@@ -194,6 +205,69 @@ BOOST_AUTO_TEST_CASE(snapshot_attestation_record_tuple_policy) {
       loaded_block_id, loaded_hash, other_block_id, loaded_hash.str()));
    BOOST_CHECK(!sysio::snapshot_attestation_record_matches(
       loaded_block_id, loaded_hash, loaded_block_id, other_hash.str()));
+}
+
+/** Load a scheduled snapshot, replay its matching record, and finish callback verification. */
+BOOST_FIXTURE_TEST_CASE(
+   chain_plugin_accepts_valid_snapshot_attestation,
+   snapshot_attest_test_support::snapshot_attest_fixture) {
+   set_snap_config(snapshot_attest_test_support::single_provider_minimum,
+                   snapshot_attest_test_support::unanimous_threshold_pct);
+   produce_blocks();
+   control->abort_block();
+
+   const auto snapshot_block_num = control->head().block_num();
+   const auto snapshot_block_id = control->head().id();
+   BOOST_REQUIRE_EQUAL(snapshot_block_num, snapshot_attest::block_spacing);
+
+   fc::temp_directory snapshot_dir;
+   const auto snapshot_path = snapshot_dir.path() / valid_snapshot_filename;
+   auto writer = std::make_shared<sysio::chain::threaded_snapshot_writer>(snapshot_path);
+   control->write_snapshot(writer);
+   // chain_plugin enables root-extension tracking while this tester fixture does not.
+   writer->write_section<sysio::chain::contract_root_object>([](auto&) {});
+   writer->finalize();
+   const auto snapshot_root_hash = writer->get_root_hash();
+
+   const auto contract_hash =
+      snapshot_attest_test_support::to_contract_snapshot_hash(snapshot_root_hash);
+
+   produce_block();
+   vote_snapshot(snapshot_attest_test_support::snapshot_provider_account,
+                 snapshot_block_id, contract_hash);
+   const auto attestation_block_num = produce_block()->block_num();
+   produce_blocks(attestation_finality_block_count);
+   BOOST_REQUIRE_GT(last_irreversible_block_num(), attestation_block_num);
+
+   const auto source_blocks_path = get_config().blocks_dir.string();
+   validate_and_close();
+
+   fc::temp_directory node_dir;
+   sysio::chain::application exe({.enable_resource_monitor = false});
+   const auto node_path = node_dir.path().string();
+   const auto snapshot_path_string = snapshot_path.string();
+   std::array args{
+      chain_plugin_test_program_name,
+      snapshot_option_name,
+      snapshot_path_string.c_str(),
+      blocks_dir_option_name,
+      source_blocks_path.c_str(),
+      config_dir_option_name,
+      node_path.c_str(),
+      data_dir_option_name,
+      node_path.c_str(),
+   };
+
+   BOOST_REQUIRE(exe.init<sysio::chain_plugin>(args.size(), const_cast<char**>(args.data()))
+                 == sysio::chain::exit_code::SUCCESS);
+   auto& plugin = appbase::app().get_plugin<sysio::chain_plugin>();
+   BOOST_REQUIRE(!plugin.has_pending_snapshot_attestation());
+   plugin.plugin_startup();
+
+   BOOST_CHECK_GE(plugin.chain().head().block_num(), attestation_block_num);
+   BOOST_CHECK(!plugin.has_pending_snapshot_attestation());
+   BOOST_CHECK(!appbase::app().is_quiting());
+   plugin.plugin_shutdown();
 }
 
 /** Reject a legacy snapshot even when retained blocks contain a later attestation ABI. */

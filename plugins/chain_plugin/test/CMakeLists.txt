@@ -6,8 +6,12 @@ add_executable( test_chain_plugin
         main.cpp
         )
 target_link_libraries( test_chain_plugin chain_plugin sysio_testing sysio_chain_wrap version )
+target_include_directories(test_chain_plugin PRIVATE
+        ${CMAKE_SOURCE_DIR}/unittests
+        ${CMAKE_BINARY_DIR}/unittests/include)
 set(CHAIN_PLUGIN_TEST_CASES
         chain_plugin_default_tests
+        chain_plugin_accepts_valid_snapshot_attestation
         chain_plugin_rejects_snapshot_without_attestation_table
         snapshot_attestation_table_read_failure_policy
         snapshot_attestation_table_read_timeout_policy

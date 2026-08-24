@@ -104,7 +104,7 @@ namespace sysio {
                 : configured_timeout;
    }
 
-   /** Return whether an ABI declares the exact final snapshot-attestation table schema. */
+   /** Return whether an ABI declares the required compatible snapshot-attestation table schema. */
    bool has_required_snapshot_attestation_schema(const abi_def& abi);
 
    /** Return the canonical physical KV table identifier for final snapshot attestations. */
@@ -776,6 +776,9 @@ public:
    controller& chain();
    // Only call this after plugin_initialize()!
    const controller& chain() const;
+
+   /** Return whether a loaded snapshot still awaits terminal on-chain attestation verification. */
+   bool has_pending_snapshot_attestation() const;
 
    chain::chain_id_type get_chain_id() const;
    fc::microseconds get_abi_serializer_max_time() const;

@@ -1,5 +1,4 @@
 #include <sysio.system/sysio.system.hpp>
-#include <sysio.system/snapshot_attest.hpp>
 
 #include <sysio/crypto.hpp>
 #include <sysio/dispatcher.hpp>
@@ -202,7 +201,6 @@ namespace sysiosystem {
             });
          }
       }
-      reconcile_snapshot_registrations(get_self());
    }
 
    void system_contract::setrank( const name& producer, uint32_t rank ) {
@@ -213,7 +211,6 @@ namespace sysiosystem {
       _producers.modify( same_payer, key, [&](auto& p) {
          p.rank = rank;
       });
-      reconcile_snapshot_registrations(get_self());
    }
 
    void system_contract::setprods( const std::vector<sysio::producer_authority>& schedule ) {
@@ -268,7 +265,6 @@ namespace sysiosystem {
       _producers.modify( same_payer, key, [&](auto& p) {
             p.deactivate();
          });
-      reconcile_snapshot_registrations(get_self());
    }
 
    void transfer_ram( const name& from, const name& to, uint64_t bytes ) {

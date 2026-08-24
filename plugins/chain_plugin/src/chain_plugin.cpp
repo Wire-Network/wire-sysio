@@ -70,9 +70,9 @@ namespace snapshot_attest = sysio::protocol::snapshot_attestation;
 /// snapshot-attestation verification pending even after this node has caught up to the live chain tip.
 /// A node bootstrapping from a recently-taken snapshot reaches the tip before the providers'
 /// votesnaphash transactions (which must be generated, voted on, and reach quorum) have landed, so a
-/// missing record at the tip is not immediately conclusive. Half of the fixed 25,000-block provider
-/// snapshot interval.
-constexpr uint32_t snapshot_attestation_grace_blocks = 12500;
+/// missing record at the tip is not immediately conclusive. Half of the fixed provider snapshot
+/// interval.
+constexpr uint32_t snapshot_attestation_grace_blocks = snapshot_attest::block_spacing / 2;
 
 /// Fatal diagnostic when an auto-fetched snapshot remains unverifiable after the grace window.
 constexpr auto snapshot_attestation_table_read_failure_log =
@@ -88,9 +88,14 @@ constexpr auto snapshot_attestation_missing_system_account_message =
 constexpr auto snapshot_attestation_invalid_system_abi_message =
    "The '{}' system account in the snapshot has an invalid ABI";
 
-/// Startup diagnostic when a loaded snapshot lacks the exact attestation record schema.
+/// Startup diagnostic when a loaded snapshot lacks the required attestation record schema prefix.
 constexpr auto snapshot_attestation_incompatible_table_message =
    "The '{}' system account in the snapshot must declare a compatible '{}' table schema";
+
+/// Startup diagnostic when an endpoint advertises a snapshot that cannot receive an attestation.
+constexpr auto snapshot_endpoint_unscheduled_block_message =
+   "Snapshot endpoint returned unscheduled block #{}; auto-fetched snapshots must use exact "
+   "{}-block cadence heights";
 
 constexpr uint64_t bytes_per_mebibyte = 1024 * 1024;
 
@@ -336,7 +341,9 @@ bool has_required_snapshot_attestation_schema(const abi_def& abi) {
       {snapshot_attest::field::snapshot_hash, snapshot_attest::abi_type::checksum256},
       {snapshot_attest::field::attested_at_block, snapshot_attest::abi_type::uint32},
    };
-   return record != abi.structs.end() && record->base.empty() && record->fields == expected_fields;
+   return record != abi.structs.end() && record->base.empty()
+          && record->fields.size() >= expected_fields.size()
+          && std::equal(expected_fields.begin(), expected_fields.end(), record->fields.begin());
 }
 
 bool snapshot_attestation_record_matches(
@@ -1752,6 +1759,10 @@ void chain_plugin::accept_transaction(const chain::packed_transaction_ptr& trx, 
 controller& chain_plugin::chain() { return *my->chain; }
 const controller& chain_plugin::chain() const { return *my->chain; }
 
+bool chain_plugin::has_pending_snapshot_attestation() const {
+   return my->snapshot_loaded_block_num.has_value();
+}
+
 chain::chain_id_type chain_plugin::get_chain_id()const {
    return my->chain->get_chain_id();
 }
@@ -1815,8 +1826,11 @@ void chain_plugin_impl::fetch_snapshot_from_endpoint(
       metadata_response = http_client.post_sync(url, fc::variant(fc::mutable_variant_object()));
    }
 
-   auto snap_block_num = metadata_response["block_num"].as<uint32_t>();
-   auto snap_root_hash = metadata_response["root_hash"].as<fc::crypto::blake3>();
+   const auto snap_block_num = metadata_response["block_num"].as<uint32_t>();
+   SYS_ASSERT(snapshot_attest::is_scheduled_block(snap_block_num), plugin_config_exception,
+              snapshot_endpoint_unscheduled_block_message, snap_block_num,
+              snapshot_attest::block_spacing);
+   const auto snap_root_hash = metadata_response["root_hash"].as<fc::crypto::blake3>();
 
    ilog("Snapshot metadata: block #{}, hash {}", snap_block_num, snap_root_hash.str());
 

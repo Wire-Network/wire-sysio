@@ -1427,6 +1427,10 @@
                     "type": "checksum256"
                 },
                 {
+                    "name": "quorum",
+                    "type": "uint32"
+                },
+                {
                     "name": "voters",
                     "type": "name[]"
                 }

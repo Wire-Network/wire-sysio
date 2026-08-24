@@ -90,8 +90,9 @@ documented in `docs/snapshot-benchmarks.md`.
 ### Why an on-chain voting contract
 
 Attestation is implemented as a small voting contract rather than a BLS aggregate-signature
-and P2P vote-gossip layer. The trust model is equivalent -- in both cases you trust that a
-quorum of the active schedule honestly computed the hash -- but the contract approach:
+and P2P vote-gossip layer. Its trust assumption is a quorum of durable provider registrations
+whose producers satisfied the active/rank eligibility checks when registered. The contract
+approach:
 
 - adds no new P2P message types or off-chain vote accumulation,
 - needs no BLS key sharing between a producer and its snapshot node,
@@ -125,17 +126,22 @@ Storage uses the KV table API (`sysio::kv::table` / `sysio::kv::global`).
 |-------|-----|----------|-----------------|
 | `snapconfig` | singleton | `{ min_providers, threshold_pct }` | -- |
 | `snapprovs` | `snap_account` | `{ snap_account, producer }` | `byproducer` |
-| `snapvotes` | auto-increment `id` | `{ id, block_num, block_id, snapshot_hash, voters[] }` | `byblocknum` |
+| `snapvotes` | auto-increment `id` | `{ id, block_num, block_id, snapshot_hash, quorum, voters[] }` | `byblocknum` |
 | `snaprecords` | `block_num` | `{ block_num, block_id, snapshot_hash, attested_at_block }` | -- |
 
 ### Registration
 
 A producer calls `regsnapprov` to designate a separate `snap_account` as its snapshot
 provider. The producer must be registered (via `regproducer`), active, and ranked at or below
-`max_snap_provider_rank` (30). The registration set is capped at 30; a registration is rejected
-when the set is full rather than evicting a live member during an in-flight vote. The same
-eligibility is revalidated when the provider votes, and every producer activity/rank mutation
-removes registrations that are no longer eligible.
+`max_snap_provider_rank` (30) when the mapping is created. This producer-table check is the
+registration trust gate; operator-registry status is deliberately not an additional dependency.
+Eligibility is not rechecked while voting, so a provider that was valid when registered keeps a
+stable delegation through ordinary producer churn.
+
+The registration table is capped at 30. Normal producer lifecycle actions do no attestation work.
+Only when a new registration encounters a full table does `regsnapprov` lazily remove mappings whose
+producer is missing, inactive, or ranked above 30, then reapply the cap. Pending votes are never
+retracted by this cleanup.
 Delegating to a separate account decouples authority: the producer's keys never have to live on
 the snapshot node -- only the snap_account's key does.
 
@@ -149,47 +155,43 @@ After computing a snapshot, a provider calls `votesnaphash(snap_account, block_i
 snapshot_hash)`. The contract checks that `snap_account` is a registered provider, derives
 `block_num` from `block_id`, and accumulates the vote.
 
-A hash is attested when the number of distinct, currently eligible providers voting for the same
-`(block_num, block_id, snapshot_hash)` tuple reaches:
+The first vote at a scheduled height freezes one quorum for that height:
 
 ```
 quorum = max(
     min_providers,
-    ceil(registered_providers * threshold_pct / 100),
-    floor(registered_providers / 3) + 1
+    ceil(registered_providers_at_first_vote * threshold_pct / 100),
+    floor(registered_providers_at_first_vote / 3) + 1
 )
 ```
 
 - `min_providers` is a hard floor set explicitly by `setsnpcfg`. Its stored default is zero,
-  which disables voting until governance chooses a launch value.
-- `threshold_pct` is the share of registered provider mappings required (default 67, i.e.
-  two-thirds).
-- `floor(registered_providers / 3) + 1` is an independent Byzantine-safety floor. It prevents a
-  misconfigured low `threshold_pct` from allowing a Byzantine minority to attest a snapshot.
+  which disables new tallies until governance chooses a launch value.
+- `threshold_pct` is the share of registrations required (default 67, i.e. two-thirds).
+- `floor(registered_providers_at_first_vote / 3) + 1` is an independent Byzantine-safety
+  floor that prevents a misconfigured low percentage from authorizing a Byzantine minority.
 
-The numerator and denominator use the same current registration set. Producer deactivation or
-rank demotion removes its mapping, while the configured `min_providers` prevents committee shrinkage
-below the governance-approved security floor. Removing a registration removes only that producer's
-pending weight; adding a registration leaves existing live votes intact. A provider may retry the
-same tuple idempotently, but a producer cannot submit a different tuple for the same height and may
-carry at most one pending vote across all heights. Removal and quorum-lowering configuration changes
-synchronously re-evaluate the bounded pending set, so a tuple that becomes quorate is not stranded
-waiting for a provider to resubmit.
+Every competing tuple at the same height inherits the same frozen quorum. Later registration,
+producer-status, or configuration changes do not change it and do not remove votes. A producer may
+retry the same tuple idempotently and may vote at multiple scheduled heights, but cannot submit two
+different tuples at one height.
+
+Only exact multiples of 25,000 are accepted. This bounds the height space to the provider schedule
+and rejects manual/on-demand snapshots before they can create pending rows.
 
 The floor guarantees a minimum number of attestors even on a small network; the percentage
 makes the quorum scale with participation.
 
 ### Lifecycle and storage
 
-- Votes accumulate per `(block_num, block_id, snapshot_hash)`. When a producer moves to another
-  height, only its own earlier pending weight is removed; empty rows are erased. With at most one
-  pending vote per registered producer, both pending rows and total voters are bounded by the
-  30-member registration cap. Because snapshots are taken
-  at finalized (irreversible) blocks, the `block_id` for a given `block_num` is the same
-  across all honest providers, so honest votes converge on one tuple.
+- Votes accumulate monotonically per `(block_num, block_id, snapshot_hash)` at scheduled heights.
+  A vote at a later height does not supersede or retract an earlier vote. Because snapshots are
+  taken at finalized (irreversible) blocks, honest providers converge on one block ID and hash.
 - When a tuple reaches quorum, the contract writes a `snap_record` to `snaprecords` and
   purges pending votes through that block height. Only compact attested records are retained,
   keeping RAM use negligible over time.
+- Once a newer height is attested, a purged unfinished historical height cannot be reopened.
+  The latest retained `snaprecords` row acts as the monotonic finalized-height watermark.
 - After a block is attested, any later vote carrying a different block ID or hash for that height
   is rejected with error code `snap_hash_disagreement_error` (9001). This is the on-chain
   signal a provider node uses to detect that its own snapshot diverged from the network.
@@ -210,8 +212,10 @@ When this option is set, `nodeop`:
 1. Auto-schedules a recurring snapshot every 25,000 blocks. The interval is fixed (not
    configurable) so that all providers snapshot at identical heights; the schedule is offset
    so snapshots land on exact multiples (blocks 25000, 50000, 75000, ...).
-2. On each finalized snapshot, computes the deterministic BLAKE3 root hash and automatically
-   builds, signs, and submits a `votesnaphash` transaction. The transaction is authorized by
+2. On each finalized snapshot at an exact 25,000-block cadence height, computes the deterministic
+   BLAKE3 root hash and automatically builds, signs, and submits a `votesnaphash` transaction.
+   Unscheduled manual/on-demand snapshots are retained locally but skipped by the vote callback.
+   The transaction is authorized by
    `snap_account@active`; the signing key is resolved through the signature provider manager,
    so only the snap_account's key needs to be present on this node.
 3. If a submitted vote is rejected with error code 9001 (hash disagreement), logs a fatal
@@ -221,10 +225,9 @@ When this option is set, `nodeop`:
 Role exclusivity is enforced at startup: `snapshot-provider-account` cannot be combined with
 `producer-name`.
 
-This auto-vote path is specific to `snapshot-provider-account` mode. Snapshots created
-through the producer API (`create_snapshot` / `schedule_snapshot`) are not auto-voted; a
-provider using that path submits `votesnaphash` itself (for example from a monitoring
-script).
+This auto-vote path is specific to `snapshot-provider-account` mode and to scheduled heights.
+The contract independently enforces the same cadence, so a monitoring script cannot attest a
+manual snapshot at an arbitrary height.
 
 ## 4. Snapshot verification on load
 
@@ -235,6 +238,10 @@ on every finalized block until it reaches a terminal outcome. The `snaprecords` 
 height is created by the providers' `votesnaphash` transactions, which land on-chain some
 blocks *after* that height, so the record can legitimately be absent on early attempts and
 appear on a later one.
+
+For `--snapshot-endpoint`, metadata at a non-cadence height is rejected before the snapshot
+file is downloaded. Only exact 25,000-block cadence heights can ever receive an attestation,
+so loading any other remote snapshot could never satisfy strict verification.
 
 Each attempt reads the on-chain `snaprecords` table (through the standard table-read path,
 which performs ABI decoding) and resolves as follows:
@@ -306,9 +313,9 @@ clio push action sysio votesnaphash \
 
 ## Trust and security model
 
-- Trust reduces to: a quorum of registered providers (drawn from the ranked producer set)
-  honestly computed the snapshot hash. This is the same assumption as trusting the active
-  schedule.
+- Trust reduces to: a quorum of durable provider registrations honestly computed the snapshot
+  hash. Each registration's producer must be active and ranked at or below 30 when the mapping
+  is created; that eligibility is not continuously revalidated afterward.
 - Determinism is what makes a quorum meaningful: if honest providers could compute different
   hashes for the same block, votes would never converge. The fixed snapshot format and
   canonical section ordering remove that ambiguity.
@@ -322,13 +329,17 @@ clio push action sysio votesnaphash \
 ## Testing
 
 - Contract tests (`contracts/tests/sysio.snapshot_attest_tests.cpp`) cover registration and
-  deregistration (including wrong-authority and rank-too-high rejection), config validation
-  and authority, vote accumulation, quorum by floor and by percentage, post-attestation
-  disagreement rejection, vote purging, and the `getsnaphash` query.
+  lazy full-table pruning, config validation, scheduled-height rejection, frozen quorum,
+  monotonic votes across churn and heights, equivocation/disagreement rejection, finalization
+  purging, and the `getsnaphash` query.
 - Unit tests (`unittests/snapshot_attest_tests.cpp`) cover snapshot round-trip hash
   stability, a full chain whose snapshot hash matches its on-chain record, mismatch
   detection, the no-attestation case, and survival of attestation state across a snapshot
-  load.
-- An integration test (`tests/snapshot_attest_test.py`) drives the full flow: create a
-  snapshot, vote to quorum, verify the `snaprecords` entry, restart a node from the attested
-  snapshot, sync from peers, and confirm the attestation on the synced node.
+  load. The shared real-contract fixture also drives a focused chain-plugin test from block
+  25,000 through replay of the matching record and terminal irreversible-block callback
+  verification.
+- The wall-clock integration test (`tests/snapshot_attest_test.py`) covers provider lifecycle
+  actions and proves an on-demand snapshot is rejected outside the production cadence. C++ tests
+  construct block 25,000 without hours of real-time production to cover scheduled quorum,
+  attestation-record persistence, snapshot round trips, and successful chain-plugin callback/table
+  verification after replay.

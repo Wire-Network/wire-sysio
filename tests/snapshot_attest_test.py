@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 
-"""Exercise snapshot-provider registration, quorum voting, restart, and load verification."""
+"""Exercise provider registration and the scheduled-height attestation boundary."""
 
 import json
-import signal
 
-from TestHarness import Account, Cluster, TestHelper, Utils, WalletMgr
+from TestHarness import Cluster, TestHelper, Utils, WalletMgr
 from TestHarness.TestHelper import AppArgs
 
 ###############################################################
@@ -13,12 +12,15 @@ from TestHarness.TestHelper import AppArgs
 #
 #  Tests on-chain snapshot attestation via sysio.system contract.
 #  This test validates the snapshot serving pipeline:
-#  - Snapshot provider registration (regsnapprov)
-#  - Snapshot hash voting (votesnaphash) with quorum
-#  - Attested record creation and querying (snaprecords table)
-#  - Snapshot restart preserves attestation records
-#  - chain_plugin verifies the loaded snapshot against the on-chain
-#    attestation and logs the successful verification
+#  - Snapshot provider registration and deregistration
+#  - Manual snapshot creation
+#  - Rejection of votes outside the fixed 25,000-block cadence
+#
+#  Successful quorum formation and attestation-record persistence use synthetic
+#  scheduled heights in the C++ contract and unit test suites. A focused
+#  chain-plugin test loads block 25,000, replays its matching record, and drives
+#  the irreversible-block callback to terminal verification. Waiting for that
+#  height in this wall-clock integration test would take hours.
 #
 #  Cluster layout:
 #    Node 0: producer (defproducera) — takes snapshots, pushes actions
@@ -38,6 +40,9 @@ debug=args.v
 dumpErrorDetails=args.dump_error_details
 
 Utils.Debug=debug
+# Fixed production cadence shared by provider scheduling and the system contract.
+snapshotAttestationBlockSpacing=25000
+
 testSuccessful=False
 
 pnodes=2
@@ -106,7 +111,7 @@ try:
         Print(f"Registered producer {name}")
 
     # setrank reads the on-chain producers table and asserts "producer not found"
-    # if a registration is missing. The same action also reconciles snapshot-provider membership.
+    # if a registration is missing.
     # pushMessage only confirms speculative
     # execution, and waitForHeadToAdvance() does not guarantee these specific
     # transactions were applied — with multiple producers a transaction pushed
@@ -157,8 +162,7 @@ try:
 
     # ---------------------------------------------------------------
     # Set attestation config: min_providers=1, threshold_pct=50
-    # With 2 providers, quorum = max(1, ceil(2*50/100), floor(2/3)+1) = 1
-    # So a single vote will create an attested record.
+    # This confirms governance configuration independently of the cadence rejection below.
     # ---------------------------------------------------------------
     Print("Set snapshot attestation config")
     success, trans = node0.pushMessage("sysio", "setsnpcfg",
@@ -172,10 +176,7 @@ try:
     # ---------------------------------------------------------------
     # Ensure both provider registrations and the attestation config are applied
     # in a block before proceeding. The exact-count assertion below depends on
-    # the registrations, and Test 1's single votesnaphash depends on setsnpcfg
-    # making quorum == 1 — if the config is forwarded into a peer's block and not
-    # yet applied, voting remains disabled by the default zero provider floor and
-    # the test fails.
+    # those transactions being visible in table state.
     assert node0.waitForTransactionsInBlock(regSnapProvTransIds + [setCfgTransId], timeout=60), \
         "regsnapprov/setsnpcfg transactions did not make it into a block"
     Print("Verify snapshot providers registered")
@@ -185,218 +186,47 @@ try:
     Print(f"Registered providers: {providers}")
 
     # ---------------------------------------------------------------
-    # Test 1: Create snapshot and submit attestation vote
+    # Test 1: Manual snapshots cannot enter the scheduled attestation tally
     # ---------------------------------------------------------------
-    Print("=== Test 1: Snapshot creation and attestation vote ===")
+    Print("=== Test 1: Manual snapshot vote rejection ===")
 
-    Print("Create snapshot on node 0")
     ret = node0.createSnapshot()
     assert ret is not None, "Snapshot creation failed"
     snapInfo = ret["payload"]
     snapBlockNum = snapInfo["head_block_num"]
     snapBlockId = snapInfo["head_block_id"]
     snapRootHash = snapInfo["root_hash"]
-    Print(f"Snapshot: block_num={snapBlockNum}, block_id={snapBlockId}, root_hash={snapRootHash}")
+    Print(f"Manual snapshot: block_num={snapBlockNum}, root_hash={snapRootHash}")
 
-    assert snapRootHash is not None and snapRootHash != "", "Snapshot root_hash should not be empty"
+    assert snapBlockNum % snapshotAttestationBlockSpacing != 0, (
+        "Wall-clock integration snapshot unexpectedly landed on the production cadence"
+    )
     assert len(snapRootHash) == 64 and all(c in '0123456789abcdef' for c in snapRootHash), \
         f"Snapshot root_hash should be a 64-char hex string, got: {snapRootHash}"
 
-    Print(f"Submit votesnaphash from {snapProv1.name}")
     success, trans = node0.pushMessage("sysio", "votesnaphash",
         json.dumps({
             "snap_account": snapProv1.name,
             "block_id": snapBlockId,
             "snapshot_hash": snapRootHash
         }),
-        f"--permission {snapProv1.name}@active")
-    assert success, f"Failed to submit snapshot vote: {trans}"
+        f"--permission {snapProv1.name}@active",
+        silentErrors=True)
+    assert not success, f"Unscheduled manual snapshot vote unexpectedly succeeded: {trans}"
+    assert "snapshot block is not a scheduled attestation height" in str(trans), \
+        f"Unexpected manual snapshot vote failure: {trans}"
 
-    assert node0.waitForHeadToAdvance(), "Head did not advance after vote"
-
-    # ---------------------------------------------------------------
-    # Verify attested record created (quorum=1, single vote suffices)
-    # ---------------------------------------------------------------
-    Print("Verify attested snapshot record on-chain")
     records = node0.getTableRows("sysio", "sysio", "snaprecords")
     assert records is not None, "Failed to read snaprecords table"
-    assert len(records) >= 1, f"Expected at least 1 attested record, got {len(records)}"
+    assert not any(r["value"]["block_num"] == snapBlockNum for r in records), \
+        f"Manual snapshot block {snapBlockNum} unexpectedly entered snaprecords"
 
-    # KV table rows are returned as {"key": {...}, "value": {...}}
-    found = False
-    for rec in records:
-        val = rec["value"]
-        if val["block_num"] == snapBlockNum:
-            found = True
-            onChainHash = val["snapshot_hash"]
-            Print(f"On-chain record: block_num={val['block_num']}, snapshot_hash={onChainHash}")
-            assert onChainHash == snapRootHash, \
-                f"Hash mismatch! on-chain={onChainHash} vs snapshot={snapRootHash}"
-            break
-    assert found, f"No attested record found for block {snapBlockNum}"
-
-    Print("Test 1 PASSED: Snapshot hash matches on-chain attestation")
+    Print("Test 1 PASSED: Manual snapshot stays outside the scheduled attestation tally")
 
     # ---------------------------------------------------------------
-    # Test 2: Second provider can also vote (duplicate block, same hash)
+    # Test 2: Deregistration of snapshot provider
     # ---------------------------------------------------------------
-    Print("=== Test 2: Multiple provider votes ===")
-
-    Print("Create another snapshot for a new block")
-    assert node0.waitForHeadToAdvance(blocksToAdvance=2), "Head did not advance"
-
-    ret2 = node0.createSnapshot()
-    assert ret2 is not None, "Second snapshot creation failed"
-    snap2Info = ret2["payload"]
-    snap2BlockNum = snap2Info["head_block_num"]
-    snap2BlockId = snap2Info["head_block_id"]
-    snap2RootHash = snap2Info["root_hash"]
-    Print(f"Snapshot 2: block_num={snap2BlockNum}, root_hash={snap2RootHash}")
-
-    Print(f"Submit vote from {snapProv1.name}")
-    success, trans = node0.pushMessage("sysio", "votesnaphash",
-        json.dumps({
-            "snap_account": snapProv1.name,
-            "block_id": snap2BlockId,
-            "snapshot_hash": snap2RootHash
-        }),
-        f"--permission {snapProv1.name}@active")
-    assert success, f"First vote failed: {trans}"
-
-    Print(f"Submit vote from {snapProv2.name}")
-    success, trans = node0.pushMessage("sysio", "votesnaphash",
-        json.dumps({
-            "snap_account": snapProv2.name,
-            "block_id": snap2BlockId,
-            "snapshot_hash": snap2RootHash
-        }),
-        f"--permission {snapProv2.name}@active")
-    assert success, f"Second vote failed: {trans}"
-
-    assert node0.waitForHeadToAdvance(), "Head did not advance after votes"
-
-    Print("Verify second attested record")
-    records = node0.getTableRows("sysio", "sysio", "snaprecords")
-    found2 = any(r["value"]["block_num"] == snap2BlockNum for r in records)
-    assert found2, f"No attested record for block {snap2BlockNum}"
-
-    Print("Test 2 PASSED: Multiple provider votes and attestation")
-
-    # ---------------------------------------------------------------
-    # Test 3: getsnaphash read-only action
-    # ---------------------------------------------------------------
-    Print("=== Test 3: getsnaphash query ===")
-
-    success, trans = node0.pushMessage("sysio", "getsnaphash",
-        json.dumps({"block_num": snapBlockNum}),
-        "--permission sysio@active --read-only",
-        silentErrors=True)
-    # Read-only actions may not return standard transaction traces,
-    # but the action should not fail
-    Print(f"getsnaphash result: success={success}")
-
-    Print("Test 3 PASSED: getsnaphash query executed")
-
-    # ---------------------------------------------------------------
-    # Test 4: Node loads attested snapshot, syncs from peers, verifies
-    # ---------------------------------------------------------------
-    # Real-world flow:
-    #   1. Take a snapshot on node 0
-    #   2. Attest it on-chain (votesnaphash creates snaprecords entry)
-    #   3. Kill validation node (node 2), wipe its state
-    #   4. Restart node 2 from the attested snapshot
-    #   5. Node 2 syncs from producing nodes (0 and 1) to catch up
-    #   6. Once LIB advances past snapshot block, verification triggers
-    #   7. Verify attestation records are accessible on synced node
-    #   8. Assert node 2 logged successful attestation verification of the
-    #      loaded snapshot (proves verify_snapshot_attestation() ran to a
-    #      terminal success, not just that the table synced)
-    Print("=== Test 4: Load attested snapshot, sync, and verify ===")
-
-    Print("Wait for LIB to advance past earlier attestation blocks")
-    assert node0.waitForLibToAdvance(timeout=30), "LIB did not advance"
-
-    # Take a snapshot that we will attest
-    Print("Create attestable snapshot on node 0")
-    retAttest = node0.createSnapshot()
-    assert retAttest is not None, "Attestable snapshot creation failed"
-    attestInfo = retAttest["payload"]
-    attestBlockNum = attestInfo["head_block_num"]
-    attestBlockId = attestInfo["head_block_id"]
-    attestRootHash = attestInfo["root_hash"]
-    Print(f"Attestable snapshot: block_num={attestBlockNum}, root_hash={attestRootHash}")
-
-    # Submit attestation vote — quorum=1, so this creates the record
-    Print(f"Submit votesnaphash for attestable snapshot from {snapProv1.name}")
-    success, trans = node0.pushMessage("sysio", "votesnaphash",
-        json.dumps({
-            "snap_account": snapProv1.name,
-            "block_id": attestBlockId,
-            "snapshot_hash": attestRootHash
-        }),
-        f"--permission {snapProv1.name}@active")
-    assert success, f"Failed to attest snapshot: {trans}"
-
-    assert node0.waitForHeadToAdvance(), "Head did not advance after attestation"
-
-    # Verify the attestation record exists on the producing node
-    records = node0.getTableRows("sysio", "sysio", "snaprecords")
-    found = any(r["value"]["block_num"] == attestBlockNum for r in records)
-    assert found, f"Attestation record not created for block {attestBlockNum}"
-    Print(f"Attestation record confirmed for block {attestBlockNum}")
-
-    # Wait for attestation to become irreversible so syncing node will see it
-    assert node0.waitForLibToAdvance(timeout=30), "LIB did not advance after attestation"
-
-    # Get the attested snapshot file path (it's the latest snapshot on node 0)
-    attestedSnapshotFile = node0.getLatestSnapshot()
-    Print(f"Attested snapshot file: {attestedSnapshotFile}")
-
-    # Kill validation node (node 2) and wipe its state
-    validationNode = cluster.getNode(2)
-    Print("Kill validation node")
-    validationNode.kill(signal.SIGTERM)
-
-    Print("Wipe validation node state, keep peer connections")
-    validationNode.removeDataDir(rmBlocks=True)
-
-    # Restart from the attested snapshot — node keeps its p2p-peer-address
-    # connections to producing nodes so it can sync and catch up
-    Print("Restart validation node from attested snapshot")
-    isRelaunchSuccess = validationNode.relaunch(chainArg=f"--snapshot {attestedSnapshotFile}")
-    assert isRelaunchSuccess, "Failed to relaunch node from attested snapshot"
-
-    Print("Wait for restarted node to sync from peers")
-    assert validationNode.waitForLibToAdvance(timeout=60), \
-        "LIB did not advance on restarted node — check peer connectivity"
-
-    # After syncing, the node should have the attestation data from chain state
-    Print("Verify attestation records on synced node")
-    records = validationNode.getTableRows("sysio", "sysio", "snaprecords")
-    assert records is not None, "Failed to read snaprecords on synced node"
-    assert len(records) >= 1, f"Expected attestation records after sync, got {len(records)}"
-
-    found = any(r["value"]["block_num"] == attestBlockNum for r in records)
-    assert found, f"Attestation for block {attestBlockNum} not found after sync"
-
-    # The table read above proves the record synced into state, but would still
-    # pass if chain_plugin's verification skipped early. Assert the restarted
-    # node actually logged the terminal verification success for the loaded
-    # snapshot's exact block ID and hash. Verification stays pending until the
-    # snaprecords row is visible in synced state, so poll the log rather than
-    # checking once.
-    Print("Verify chain_plugin logged successful attestation verification")
-    verifiedLogLine = (f"Snapshot attestation verified successfully for block #{attestBlockNum}: "
-                       f"block id {attestBlockId} and hash {attestRootHash} match the on-chain record")
-    assert Utils.waitForBool(lambda: validationNode.findInLog(verifiedLogLine) is not None, timeout=90), \
-        f"Restarted node did not log successful attestation verification: '{verifiedLogLine}'"
-
-    Print("Test 4 PASSED: Attested snapshot loaded, synced, and verified")
-
-    # ---------------------------------------------------------------
-    # Test 5: Deregistration of snapshot provider
-    # ---------------------------------------------------------------
-    Print("=== Test 5: Provider deregistration ===")
+    Print("=== Test 2: Provider deregistration ===")
 
     Print(f"Deregister snapshot provider {snapProv2.name}")
     success, trans = node0.pushMessage("sysio", "delsnapprov",
@@ -413,7 +243,7 @@ try:
     assert providers[0]["value"]["snap_account"] == snapProv1.name, \
         f"Remaining provider should be {snapProv1.name}, got {providers[0]['value']['snap_account']}"
 
-    Print("Test 5 PASSED: Provider deregistration works")
+    Print("Test 2 PASSED: Provider deregistration works")
 
     # ---------------------------------------------------------------
     Print("All snapshot attestation tests PASSED")
