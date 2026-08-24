@@ -23,8 +23,10 @@ without one. See [Explicit self-pay](#explicit-self-pay).
 
 Resources reach contract accounts through **policies** issued by **node owners**. A node owner
 holds a fixed share of the network's resource capacity, determined by their tier, and grants
-slices of it to accounts via the `sysio.roa` contract. A contract with a policy works. A contract
-without one cannot be called at all.
+slices of it to accounts via the `sysio.roa` contract. Under default billing, a contract with a
+policy works and a contract without one cannot be called — because the contract is the payer, and
+an unprovisioned one has nothing to pay with. A caller that names itself with `sysio.payer` takes
+the bill instead, and the contract's own limits are then never consulted.
 
 ---
 
@@ -58,7 +60,7 @@ node owner issuing a policy, and every account that calls it transacts without c
 | End user needs native token | Yes | Yes | Yes | **No** |
 | CPU/NET acquired by | Locking tokens | Renting from a pool | Daily fee on a curve | **A node owner's policy** |
 | RAM acquired by | Bancor market purchase | same | same | **A node owner's policy** |
-| Price set by | RAM market | Rental market | Utilization curve | **Not set on-chain** |
+| Acquisition price set by | RAM market | Rental market | Utilization curve | **Off-chain, between issuer and recipient** |
 | Reclaimable by | Unstake (3d) | Sell rex | Expires daily | **`reducepolicy` after `time_block`** |
 | Cost to onboard a user | Tokens + stake + RAM | same | same | **None to the user** |
 
@@ -137,16 +139,23 @@ transfer_ram( get_self(), new_account_name, sysiosystem::newaccount_ram );  // 1
 For a **user** account, those zeros are never consulted. It signs, the contract pays, the
 transaction succeeds.
 
-For a **contract** account, those zeros are fatal. Calling a contract with no policy fails
-outright:
+For a **contract** account, those zeros are fatal under default billing. The contract is the payer,
+so calling one with no policy fails outright:
 
 ```
 account payloadless net usage is too high: 132 > 0
 ```
 
-The transaction throws. Nothing is charged to the caller and nothing is charged elsewhere. An
-unprovisioned contract is inert until a node owner issues it a policy — a contract either has
-budgeted capacity or it does not run.
+The transaction throws. Nothing is charged to the caller and nothing is charged elsewhere.
+
+That holds only while the contract is the payer. Because the billing map is keyed on `payer()` and
+nothing else, an action carrying `{caller, sysio.payer}` puts the caller in the map and leaves the
+contract out of it entirely — the contract's zero CPU and NET are never consulted. A provisioned
+caller or relayer can therefore drive an otherwise unprovisioned contract, so long as the caller
+has the capacity and any RAM the contract bills to *itself* is covered.
+
+So an unprovisioned contract is inert for ordinary users, not universally inert. Provisioning it is
+what makes it callable by anyone; without that, only a caller willing to pay its way can reach it.
 
 ---
 
@@ -335,8 +344,14 @@ Antelope the weight came from tokens staked with `delegatebw`. On Wire it comes 
 node owner issued. Nothing about an account's token balance affects its resource share.
 
 The practical consequence is the same as on Antelope: throughput is a share of a moving total. If
-the network's total allocated weight grows and an account's does not, its slice shrinks. This is
-what `setbyteprice` is for, and why each policy records the price it was struck at.
+the network's total allocated weight grows and an account's does not, its slice shrinks. The only
+remedy is more weight — `expandpolicy` from the existing issuer, or a policy from an additional
+node owner.
+
+`setbyteprice` does not help here. It rewrites `roastate.bytes_per_unit`, which governs how RAM
+weight converts to bytes for policies struck afterwards, and touches neither CPU/NET weights nor
+the total that divides them. That is also why each policy records the price it was struck at: so
+its RAM conversion stays fixed when the network price later moves.
 
 ---
 
@@ -461,9 +476,16 @@ sysio ram 411951 -> 412239   +288 bytes = two rows
 For `sysio.token`, transfers are RAM-free for both parties whether or not new state is created.
 Alice is charged nothing, for anything, on a token transfer.
 
-> This is a property of `sysio.token`'s implementation, not a universal rule. A third-party token
-> contract that names `from` or `to` as its RAM payer would bill that user for new rows. Contract
-> authors who want the gasless experience should bill RAM to the contract account.
+> This is a property of `sysio.token`'s implementation, not a universal rule — but a contract
+> cannot unilaterally charge RAM to its users either. For a positive RAM delta billed to an account
+> other than the receiving contract, `apply_context::validate_account_ram_deltas` requires that
+> account to appear in the action's authorizations with the `sysio.payer` permission; without it
+> the action fails with `Requested payer ... Missing sysio.payer`. And because `sysio.payer` must
+> sit at index 0, adding it also makes that user the action's CPU and NET payer.
+>
+> So billing RAM to a user is an explicit opt-in by the user, not a choice the contract makes
+> alone, and it opts them into paying for bandwidth at the same time. Contract authors who want the
+> gasless experience should bill RAM to the contract account, which needs no such marker.
 
 ### A developer deploys a contract
 
@@ -484,10 +506,21 @@ provisioned with `0.0010 SYS` each.
 The contract-plus-ABI footprint is **under one tenth of a SYS**. For scale, even a *tier-3* node
 owner — the smallest tier — holds ~1.93 SYS free, enough to sponsor several small contracts.
 
-The provisioning is a single `addpolicy` on the contract account. Because the contract is the payer
-for every call into it, the developer covers the cost once rather than per transaction: a token
-that does a million transfers consumes the same policy as one that does ten, subject only to the
-throughput share that policy buys.
+The provisioning is a single `addpolicy` on the contract account, and because the contract is the
+payer for every call into it, the users of that token are never billed. What the developer needs
+from the policy differs by resource, though:
+
+- **CPU and NET are replenishing shares, not per-transaction payments.** They meter rate, not
+  count, so a million transfers and ten transfers draw on the same weight. What the volume
+  determines is whether that weight is a wide enough slice to sustain the rate; exceed it and
+  transactions fail until the window rolls forward, rather than running down a balance.
+- **RAM is occupancy, and it does accumulate.** Every transfer that creates a new holder row adds
+  permanent state — the table above prices 10,000 of them at ~1.3847 SYS. A token expecting a
+  million holders needs a policy sized for a million rows, or a contract that bills those rows
+  elsewhere.
+
+So the CPU/NET side is genuinely a one-time provisioning decision; the RAM side has to be sized for
+the state the contract will hold.
 
 ### A trader swaps on a DEX
 
