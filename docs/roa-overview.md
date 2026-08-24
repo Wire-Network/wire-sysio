@@ -122,8 +122,9 @@ passes `-1` for CPU and NET, and `addpolicy` refuses to allocate CPU or NET to t
 `sysio.token` transfers, `sysio.msig` proposals, and every other system-contract call are covered
 by the system itself.
 
-A third-party contract is different. It is an ordinary account, it is the payer for every call
-into it, and it therefore needs a real allocation — that is exactly what a ROA policy provides.
+A third-party contract is different. It is an ordinary account, and it is the payer for every call
+into it that does not name one explicitly — which is every ordinary call — so it needs a real
+allocation. That is exactly what a ROA policy provides.
 
 ### What happens with no policy at all
 
@@ -506,9 +507,10 @@ provisioned with `0.0010 SYS` each.
 The contract-plus-ABI footprint is **under one tenth of a SYS**. For scale, even a *tier-3* node
 owner — the smallest tier — holds ~1.93 SYS free, enough to sponsor several small contracts.
 
-The provisioning is a single `addpolicy` on the contract account, and because the contract is the
-payer for every call into it, the users of that token are never billed. What the developer needs
-from the policy differs by resource, though:
+The provisioning is a single `addpolicy` on the contract account. Because the contract is the payer
+for any call that does not name one explicitly, ordinary users of that token are never billed — a
+user is billed only if they opt in with `sysio.payer`, which the wallet or client would have to put
+in the action deliberately. What the developer needs from the policy differs by resource, though:
 
 - **CPU and NET are replenishing shares, not per-transaction payments.** They meter rate, not
   count, so a million transfers and ten transfers draw on the same weight. What the volume
@@ -524,8 +526,10 @@ the state the contract will hold.
 
 ### A trader swaps on a DEX
 
-The trader signs swap actions on a DEX contract. The DEX contract is the payer for every one of
-them. The trader is charged no CPU, no NET, and no RAM by the protocol.
+The trader signs swap actions on a DEX contract. Those actions do not name a payer, so the DEX
+contract is billed for each of them and the trader is charged no CPU, no NET, and no RAM by the
+protocol. A trader wanting throughput independent of the DEX's own share can opt into paying with
+`sysio.payer`, but nothing requires it.
 
 Any swap fee the trader pays is defined by the DEX contract's own economics, at the application
 layer. There is no protocol-level resource charge underneath it.
@@ -582,8 +586,9 @@ Mechanisms an Antelope background might lead you to look for, which do not exist
 - **No REX, no PowerUp, no rentals.** None of these contracts or actions exist.
 - **No staking for resources.** `delegatebw` has no equivalent. Staking on Wire exists for other
   purposes; it grants no CPU, NET, or RAM.
-- **No whitelist.** There is no allow-list of approved contracts. A contract either holds a policy
-  or it is inert. That is the only distinction.
+- **No whitelist.** There is no allow-list of approved contracts. The only distinction is whether a
+  contract holds a policy: with one it is callable by anyone, without one it is callable only by a
+  caller who names itself with `sysio.payer` and covers the cost.
 
 ---
 
