@@ -65,7 +65,7 @@ try:
     specificExtraNodeopArgs[0]="--plugin sysio::net_api_plugin --plugin sysio::producer_api_plugin "
 
     if cluster.launch(pnodes=pnodes, totalNodes=total_nodes, totalProducers=pnodes, specificExtraNodeopArgs=specificExtraNodeopArgs,
-                      topo="./tests/disaster_recovery_2_test_shape.json", delay=delay, loadSystemContract=False,
+                      topo="./tests/disaster_recovery_2_test_shape.json", delay=delay, loadSystemContract=True,
                       activateIF=True,
                       biosFinalizer=False,
                       signatureProviderForNonProducer=True) is False:

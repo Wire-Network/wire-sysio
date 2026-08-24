@@ -11,6 +11,7 @@
 #include <sysio/chain/authority.hpp>
 #include <sysio/chain/account_object.hpp>
 #include <sysio/chain/block.hpp>
+#include <sysio/chain/config.hpp>
 #include <sysio/chain/controller.hpp>
 #include <sysio/chain/kv_table_objects.hpp>
 #include <sysio/chain/resource_limits.hpp>
@@ -28,6 +29,7 @@
 #include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
 
 #include <atomic>
+#include <optional>
 #include <string_view>
 
 namespace fc { class variant; }
@@ -57,6 +59,48 @@ namespace sysio {
    using chain::packed_transaction;
 
    enum class throw_on_yield { no, yes };
+
+   /** Outcome of the safety-sensitive snaprecords table scan itself. */
+   enum class snapshot_attestation_table_read_status {
+      /// The scan succeeded; its rows can be inspected, including an empty result.
+      success,
+      /// The scan threw, timed out, shut down, or returned an embedded exception.
+      failure,
+   };
+
+   /** Verification action selected for one snaprecords table-read outcome. */
+   enum class snapshot_attestation_table_read_action {
+      /// Inspect the successful result and apply record/absence policy.
+      inspect_result,
+      /// The node is still syncing, so retry the failed scan on a later irreversible block.
+      retry,
+      /// The node is caught up and must fail closed instead of running unverified indefinitely.
+      halt,
+   };
+
+   /** Classify a snaprecords scan without conflating successful absence with read failure. */
+   constexpr snapshot_attestation_table_read_action classify_snapshot_attestation_table_read(
+      snapshot_attestation_table_read_status status,
+      bool caught_up) {
+      if (status == snapshot_attestation_table_read_status::success) {
+         return snapshot_attestation_table_read_action::inspect_result;
+      }
+      return caught_up ? snapshot_attestation_table_read_action::halt
+                       : snapshot_attestation_table_read_action::retry;
+   }
+
+   /// Minimum decoder budget for safety-critical snapshot-attestation table reads.
+   inline constexpr fc::microseconds snapshot_attestation_minimum_table_read_timeout{
+      chain::config::default_abi_serializer_max_time_us};
+
+   /** Keep internal attestation decoding independent from a smaller operator-facing ABI timeout. */
+   constexpr fc::microseconds snapshot_attestation_table_read_timeout(
+      fc::microseconds configured_timeout) {
+      return configured_timeout < snapshot_attestation_minimum_table_read_timeout
+                ? snapshot_attestation_minimum_table_read_timeout
+                : configured_timeout;
+   }
+
    inline auto make_resolver(const controller& control, fc::microseconds abi_serializer_max_time, throw_on_yield yield_throw ) {
       return [&control, abi_serializer_max_time, yield_throw](const account_name& name) -> std::optional<abi_serializer> {
          if (name.good()) {
@@ -668,7 +712,11 @@ public:
    chain_apis::read_write get_read_write_api(const fc::microseconds& http_max_response_time);
    chain_apis::read_only get_read_only_api(const fc::microseconds& http_max_response_time) const;
 
-   /// Runs a `get_table_rows` scan and returns its result.
+   /** Construct a read-only API with independent request and ABI-decoder budgets. */
+   chain_apis::read_only get_read_only_api(const fc::microseconds& http_max_response_time,
+                                           const fc::microseconds& abi_serializer_max_time) const;
+
+   /// Runs a `get_table_rows` scan and distinguishes a successful empty result from read failure.
    ///
    /// When called off the main app thread (typical case: a cron worker), the scan is posted onto the executor's
    /// read_only queue and the calling thread blocks on the result. Running through the queue ensures chainbase
@@ -680,8 +728,16 @@ public:
    /// mutator; read window: main thread is one of the legitimate readers).
    ///
    /// `shutdown_flag` is polled every 200ms on the off-thread path so the caller returns early on plugin shutdown
-   /// instead of stalling up to `timeout` for the executor to drain. `log_prefix` is a short tag (plugin name) used
-   /// in error log lines.
+   /// instead of stalling up to `timeout` for the executor to drain. `abi_serializer_timeout` independently bounds
+   /// ABI decoding, and `log_prefix` is a short tag (plugin name) used in error log lines.
+   std::optional<chain_apis::read_only::get_table_rows_result>
+   read_table_rows_checked(chain_apis::read_only::get_table_rows_params params,
+                           fc::microseconds timeout,
+                           fc::microseconds abi_serializer_timeout,
+                           std::string_view log_prefix,
+                           const std::atomic<bool>& shutdown_flag);
+
+   /** Run a table scan while preserving the legacy empty-result-on-failure behavior. */
    chain_apis::read_only::get_table_rows_result
    read_table_rows(chain_apis::read_only::get_table_rows_params params,
                    fc::microseconds timeout,

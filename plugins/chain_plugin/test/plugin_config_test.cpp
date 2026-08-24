@@ -1,16 +1,35 @@
+#include <algorithm>
 #include <array>
 #include <boost/program_options.hpp>
 #include <boost/test/unit_test.hpp>
+#include <sysio/chain/abi_serializer.hpp>
 #include <sysio/chain/app.hpp>
+#include <sysio/chain/config.hpp>
+#include <sysio/chain/contract_root_object.hpp>
+#include <sysio/chain/snapshot.hpp>
 #include <sysio/chain_plugin/chain_plugin.hpp>
 #include <sysio/http_client_plugin/http_client_options.hpp>
+#include <sysio/protocol/snapshot_attestation.hpp>
+#include <sysio/testing/tester.hpp>
 #include <stdint.h>
 #include <string>
 #include <string_view>
-#include <utility>
 #include <vector>
 
 namespace {
+
+namespace snapshot_attest = sysio::protocol::snapshot_attestation;
+
+/** Shared command-line and fixture constants for chain-plugin configuration tests. */
+constexpr auto chain_plugin_test_program_name = "test_chain_plugin";
+constexpr auto snapshot_option_name = "--snapshot";
+constexpr auto blocks_dir_option_name = "--blocks-dir";
+constexpr auto config_dir_option_name = "--config-dir";
+constexpr auto data_dir_option_name = "--data-dir";
+constexpr auto snapshot_without_attestation_table_filename =
+   "snapshot-without-attestation-table.bin";
+constexpr auto missing_attestation_table_error_fragment = "must declare the 'snaprecords' table";
+constexpr uint32_t snapshot_source_block_count = 3;
 
 /** Initialize chain_plugin with one snapshot response-size limit override. */
 sysio::chain::exit_code::exit_code initialize_with_snapshot_size_limit(std::string_view option_name,
@@ -20,12 +39,12 @@ sysio::chain::exit_code::exit_code initialize_with_snapshot_size_limit(std::stri
 
    const auto tmp_path = tmp.path().string();
    std::vector<std::string> arguments{
-      "test_chain_plugin",
+      chain_plugin_test_program_name,
       "--snapshot-endpoint",
       "http://127.0.0.1:1",
-      "--config-dir",
+      config_dir_option_name,
       tmp_path,
-      "--data-dir",
+      data_dir_option_name,
       tmp_path,
       "--" + std::string(option_name),
       std::string(option_value),
@@ -49,7 +68,8 @@ BOOST_AUTO_TEST_CASE(chain_plugin_default_tests) {
 
    auto tmp_path = tmp.path().string();
    std::array          args = {
-       "test_chain_plugin", "--blocks-log-stride", "10", "--config-dir", tmp_path.c_str(), "--data-dir", tmp_path.c_str(),
+       chain_plugin_test_program_name, "--blocks-log-stride", "10", config_dir_option_name,
+       tmp_path.c_str(), data_dir_option_name, tmp_path.c_str(),
    };
 
    BOOST_CHECK(exe.init<sysio::chain_plugin>(args.size(), const_cast<char**>(args.data())) == sysio::chain::exit_code::SUCCESS);
@@ -60,6 +80,110 @@ BOOST_AUTO_TEST_CASE(chain_plugin_default_tests) {
    BOOST_CHECK_EQUAL(config->max_retained_files, UINT32_MAX);
    BOOST_CHECK_EQUAL(config->stride, 10);
 
+}
+
+/** Successful absence remains distinguishable from a terminal caught-up table-read failure. */
+BOOST_AUTO_TEST_CASE(snapshot_attestation_table_read_failure_policy) {
+   using status = sysio::snapshot_attestation_table_read_status;
+   using action = sysio::snapshot_attestation_table_read_action;
+
+   BOOST_CHECK(sysio::classify_snapshot_attestation_table_read(status::success, true)
+               == action::inspect_result);
+   BOOST_CHECK(sysio::classify_snapshot_attestation_table_read(status::failure, false)
+               == action::retry);
+   BOOST_CHECK(sysio::classify_snapshot_attestation_table_read(status::failure, true)
+               == action::halt);
+}
+
+/** Internal attestation reads retain a decoder budget when the operator ABI timeout is too small. */
+BOOST_AUTO_TEST_CASE(snapshot_attestation_table_read_timeout_policy) {
+   constexpr fc::microseconds disabled_timeout{0};
+   constexpr auto below_minimum =
+      sysio::snapshot_attestation_minimum_table_read_timeout - fc::microseconds{1};
+   constexpr auto above_minimum =
+      sysio::snapshot_attestation_minimum_table_read_timeout
+      + sysio::snapshot_attestation_minimum_table_read_timeout;
+
+   BOOST_CHECK(sysio::snapshot_attestation_table_read_timeout(disabled_timeout)
+               == sysio::snapshot_attestation_minimum_table_read_timeout);
+   BOOST_CHECK(sysio::snapshot_attestation_table_read_timeout(below_minimum)
+               == sysio::snapshot_attestation_minimum_table_read_timeout);
+   BOOST_CHECK(sysio::snapshot_attestation_table_read_timeout(above_minimum)
+               == above_minimum);
+}
+
+/** Reject a legacy snapshot even when retained blocks contain a later attestation ABI. */
+BOOST_AUTO_TEST_CASE(chain_plugin_rejects_snapshot_without_attestation_table) {
+   sysio::testing::tester source(sysio::testing::setup_policy::full);
+
+   sysio::chain::abi_def legacy_system_abi;
+   const auto* system_account = source.control->find_account_metadata(
+      sysio::chain::config::system_account_name);
+   BOOST_REQUIRE(system_account != nullptr);
+   BOOST_REQUIRE(sysio::chain::abi_serializer::to_abi(system_account->abi,
+                                                       legacy_system_abi));
+   BOOST_REQUIRE(std::none_of(
+      legacy_system_abi.tables.begin(), legacy_system_abi.tables.end(),
+      [](const sysio::chain::table_def& table) {
+         return table.name == snapshot_attest::table_snaprecords;
+      }));
+   source.produce_blocks(snapshot_source_block_count);
+   source.control->abort_block();
+   const auto snapshot_block_num = source.head().block_num();
+
+   fc::temp_directory snapshot_dir;
+   const auto snapshot_path = snapshot_dir.path() / snapshot_without_attestation_table_filename;
+   auto writer = std::make_shared<sysio::chain::threaded_snapshot_writer>(snapshot_path);
+   source.control->write_snapshot(writer);
+   // chain_plugin enables root-extension tracking while this system-contract fixture does not.
+   // Supply the empty section that a snapshot from a production node always contains.
+   writer->write_section<sysio::chain::contract_root_object>([](auto&) {});
+   writer->finalize();
+
+   // Put a later ABI declaration in the retained block log. Validation after replay would see
+   // this declaration and incorrectly accept the older snapshot, so startup must inspect the
+   // snapshot state before replay begins.
+   BOOST_REQUIRE(!legacy_system_abi.tables.empty());
+   auto current_system_abi = legacy_system_abi;
+   auto snapshot_attestation_table = current_system_abi.tables.front();
+   snapshot_attestation_table.name = snapshot_attest::table_snaprecords;
+   snapshot_attestation_table.table_id = 0;
+   current_system_abi.tables.emplace_back(std::move(snapshot_attestation_table));
+   source.set_abi(sysio::chain::config::system_account_name,
+                  fc::json::to_string(current_system_abi, fc::time_point::maximum()));
+   const auto abi_upgrade_block = source.produce_block()->block_num();
+   while (source.last_irreversible_block_num() < abi_upgrade_block)
+      source.produce_block();
+   source.control->abort_block();
+   const auto source_blocks_path = source.get_config().blocks_dir.string();
+   source.close();
+
+   fc::temp_directory node_dir;
+   sysio::chain::application exe({.enable_resource_monitor = false});
+   const auto node_path = node_dir.path().string();
+   const auto snapshot_path_string = snapshot_path.string();
+   std::array args{
+      chain_plugin_test_program_name,
+      snapshot_option_name,
+      snapshot_path_string.c_str(),
+      blocks_dir_option_name,
+      source_blocks_path.c_str(),
+      config_dir_option_name,
+      node_path.c_str(),
+      data_dir_option_name,
+      node_path.c_str(),
+   };
+
+   BOOST_REQUIRE(exe.init<sysio::chain_plugin>(args.size(), const_cast<char**>(args.data()))
+                 == sysio::chain::exit_code::SUCCESS);
+   auto& plugin = appbase::app().get_plugin<sysio::chain_plugin>();
+   BOOST_CHECK_EXCEPTION(
+      plugin.plugin_startup(), sysio::chain::plugin_config_exception,
+      [](const sysio::chain::plugin_config_exception& error) {
+         return error.to_detail_string().find(missing_attestation_table_error_fragment)
+                != std::string::npos;
+      });
+   BOOST_CHECK_EQUAL(plugin.chain().head().block_num(), snapshot_block_num);
 }
 
 /** Verify snapshot endpoint registration and removal of endpoint-specific resource knobs. */
@@ -73,7 +197,7 @@ BOOST_AUTO_TEST_CASE(chain_plugin_snapshot_endpoint_option_registration) {
    options.add(cli).add(cfg);
 
    std::array arguments{
-      "test_chain_plugin",
+      chain_plugin_test_program_name,
       "--snapshot-endpoint", "http://127.0.0.1:1",
    };
    boost::program_options::variables_map variables;
@@ -135,7 +259,7 @@ BOOST_AUTO_TEST_CASE(outbound_http_global_option_registration) {
    options.add(global).add(ethereum).add(solana).add(debugging).add(signing).add(snapshot);
 
    std::array arguments{
-      "test_chain_plugin",
+      chain_plugin_test_program_name,
       "--outbound-http-additional-ca-file", "/tmp/wire-global-ca.pem",
       "--outbound-http-additional-ca-path", "/tmp/wire-global-ca",
       "--outbound-http-proxy", "http://127.0.0.1:3128",
@@ -193,7 +317,8 @@ BOOST_AUTO_TEST_CASE(chain_plugin_default_sys_vm_oc_whitelist) {
 
    auto tmp_path = tmp.path().string();
    std::array          args = {
-       "test_chain_plugin", "--config-dir", tmp_path.c_str(), "--data-dir", tmp_path.c_str(),
+       chain_plugin_test_program_name, config_dir_option_name, tmp_path.c_str(),
+       data_dir_option_name, tmp_path.c_str(),
    };
 
    BOOST_CHECK(exe.init<sysio::chain_plugin>(args.size(), const_cast<char**>(args.data())) == sysio::chain::exit_code::SUCCESS);
@@ -216,7 +341,8 @@ BOOST_AUTO_TEST_CASE(chain_plugin_sys_vm_oc_whitelist) {
 
    auto tmp_path = tmp.path().string();
    std::array          args = {
-      "test_chain_plugin", "--sys-vm-oc-whitelist", "hello", "--config-dir", tmp_path.c_str(), "--data-dir", tmp_path.c_str(),
+      chain_plugin_test_program_name, "--sys-vm-oc-whitelist", "hello", config_dir_option_name,
+      tmp_path.c_str(), data_dir_option_name, tmp_path.c_str(),
   };
 
    BOOST_CHECK(exe.init<sysio::chain_plugin>(args.size(), const_cast<char**>(args.data())) == sysio::chain::exit_code::SUCCESS);

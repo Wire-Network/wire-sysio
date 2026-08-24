@@ -1364,7 +1364,9 @@ struct controller_impl {
       }
    }
 
-   void startup(std::function<void()> shutdown, std::function<bool()> check_shutdown, const snapshot_reader_ptr& snapshot) {
+   void startup(std::function<void()> shutdown, std::function<bool()> check_shutdown,
+                const snapshot_reader_ptr& snapshot,
+                std::function<void()> on_snapshot_loaded) {
       SYS_ASSERT( snapshot, snapshot_exception, "No snapshot reader provided" );
       this->shutdown = std::move(shutdown);
       assert(this->shutdown);
@@ -1387,6 +1389,8 @@ struct controller_impl {
                         "Snapshot is invalid." );
             blog.reset( chain_id, chain_head.block_num() + 1 );
          }
+         if (on_snapshot_loaded)
+            on_snapshot_loaded();
          ilog( "Snapshot loaded, head: {} : {}", chain_head.block_num(), chain_head.id() );
 
          init(startup_t::snapshot);
@@ -3787,8 +3791,10 @@ void controller::add_indices() {
    my->add_indices();
 }
 
-void controller::startup( std::function<void()> shutdown, std::function<bool()> check_shutdown, const snapshot_reader_ptr& snapshot ) {
-   my->startup(shutdown, check_shutdown, snapshot);
+void controller::startup( std::function<void()> shutdown, std::function<bool()> check_shutdown,
+                          const snapshot_reader_ptr& snapshot,
+                          std::function<void()> on_snapshot_loaded ) {
+   my->startup(shutdown, check_shutdown, snapshot, std::move(on_snapshot_loaded));
 }
 
 void controller::startup( std::function<void()> shutdown, std::function<bool()> check_shutdown, const genesis_state& genesis ) {

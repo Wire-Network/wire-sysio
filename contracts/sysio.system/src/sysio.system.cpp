@@ -201,6 +201,10 @@ namespace sysiosystem {
             });
          }
       }
+
+      // Schedule-driven rank changes only rebuild the bounded candidate pool. Active snapshot
+      // membership changes later, atomically, at a snapshot-height boundary.
+      reconcile_snapshot_registrations( get_self() );
    }
 
    void system_contract::setrank( const name& producer, uint32_t rank ) {
@@ -211,6 +215,9 @@ namespace sysiosystem {
       _producers.modify( same_payer, key, [&](auto& p) {
          p.rank = rank;
       });
+
+      // Explicit rank changes use the same candidate reconciliation as schedule assignment.
+      reconcile_snapshot_registrations( get_self() );
    }
 
    void system_contract::setprods( const std::vector<sysio::producer_authority>& schedule ) {
@@ -265,6 +272,9 @@ namespace sysiosystem {
       _producers.modify( same_payer, key, [&](auto& p) {
             p.deactivate();
          });
+
+      // Governance removal revokes candidate registration without piecemeal roster mutation.
+      reconcile_snapshot_registrations( get_self() );
    }
 
    void transfer_ram( const name& from, const name& to, uint64_t bytes ) {

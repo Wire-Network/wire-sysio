@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
+import json
 import signal
+import tempfile
 
 from TestHarness import Cluster, TestHelper, Utils, WalletMgr
 from TestHarness.TestHelper import AppArgs
@@ -35,6 +37,8 @@ dumpErrorDetails=args.dump_error_details
 
 snapshotNodeId = 0
 irrNodeId=pnodes
+snapshotAttestationTableName="snaprecords"
+transitionSnapshotBlockWindow=5
 
 Utils.Debug=debug
 testSuccessful=False
@@ -51,7 +55,7 @@ try:
 
     numTrxGenerators=2
     Print("Stand up cluster")
-    # For now do not load system contract as it does not support setfinalizer
+    # Retain the BIOS contract until setfinalizer has activated the Savanna transition.
     specificExtraNodeopArgs = { irrNodeId: "--read-mode irreversible"}
     if cluster.launch(pnodes=pnodes, totalNodes=total_nodes, prodCount=prod_count, maximumP2pPerHost=total_nodes+numTrxGenerators, topo=topo, delay=delay, loadSystemContract=False,
                       activateIF=False, specificExtraNodeopArgs=specificExtraNodeopArgs) is False:
@@ -73,26 +77,68 @@ try:
     nodeSnap=cluster.getNode(snapshotNodeId)
     nodeIrr=cluster.getNode(irrNodeId)
 
+    # Keep the BIOS setfinalizer action while declaring the strict startup table expected by
+    # snapshots in this pre-launch configuration.
+    biosAbiPath=cluster.libTestingContractsPath / "sysio.bios" / "sysio.bios.abi"
+    with open(biosAbiPath, encoding="utf-8") as biosAbiFile:
+        transitionAbi=json.load(biosAbiFile)
+    systemAbiPath=cluster.contractsPath / "sysio.system" / "sysio.system.abi"
+    with open(systemAbiPath, encoding="utf-8") as systemAbiFile:
+        systemAbi=json.load(systemAbiFile)
+    assert all(table["name"] != snapshotAttestationTableName for table in transitionAbi["tables"]), \
+        f"BIOS ABI already declares {snapshotAttestationTableName}"
+    snapshotTable=next(table.copy() for table in systemAbi["tables"]
+                       if table["name"] == snapshotAttestationTableName)
+    snapshotStruct=next(struct.copy() for struct in systemAbi["structs"]
+                        if struct["name"] == snapshotTable["type"])
+    assert all(struct["name"] != snapshotStruct["name"] for struct in transitionAbi["structs"]), \
+        f"BIOS ABI already declares {snapshotStruct['name']}"
+    transitionAbi["tables"].append(snapshotTable)
+    transitionAbi["structs"].append(snapshotStruct)
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".abi") as transitionAbiFile:
+        json.dump(transitionAbi, transitionAbiFile)
+        transitionAbiFile.flush()
+        abiTrans=cluster.biosNode.setCodeOrAbi(cluster.sysioAccount, "abi", transitionAbiFile.name,
+                                               returnTrans=True)
+    assert abiTrans is not None, "Failed to install transition snapshot ABI"
+    assert cluster.biosNode.waitForTransactionInBlock(cluster.biosNode.getTransId(abiTrans)), \
+        "Transition snapshot ABI transaction did not enter a block"
+
     # Activate Savanna without waiting for activation to be finished so that we can take a
     # snapshot during transition
     success, transId = cluster.activateInstantFinality(biosFinalizer=False, waitForFinalization=False)
     assert success, "Activate instant finality failed"
 
-    # allow time for instant finality activation to be processed
-    assert cluster.biosNode.waitForHeadToAdvance(blocksToAdvance=5), "Head should advance after instant finality activate"
-    
+    transitionInfo=cluster.biosNode.getInfo(exitOnError=True)
+    finalizerPolicyBlockNum=None
+    firstTransitionBlock=transitionInfo["head_block_num"]
+    lastTransitionBlock=firstTransitionBlock + transitionSnapshotBlockWindow
+    for blockNum in range(firstTransitionBlock, lastTransitionBlock + 1):
+        assert cluster.biosNode.waitForBlock(blockNum), \
+            f"Block {blockNum} was not produced while waiting for the finalizer-policy transition"
+        blockHeader=cluster.biosNode.getBlock(blockNum, exitOnError=True, header=True)
+        if blockHeader["signed_block_header"].get("new_finalizer_policy_diff") is not None:
+            finalizerPolicyBlockNum=blockNum
+            break
+    assert finalizerPolicyBlockNum is not None, "No finalizer-policy transition block found before snapshot"
+
     # Take snapshots
     def takeSnapshot(node):
+       """Create a snapshot and require it to remain inside the bounded transition window."""
        ret = node.createSnapshot()
        assert ret is not None, "snapshot creation failed"
        ret_snaphot_head_block_num = ret["payload"]["head_block_num"]
        Print(f"snapshot head block number {ret_snaphot_head_block_num}")
+       assert abs(ret_snaphot_head_block_num - finalizerPolicyBlockNum) <= transitionSnapshotBlockWindow, \
+           "Snapshot was taken after the bounded Savanna transition window"
 
     Print("Take snapshot on nodeSnap")
     takeSnapshot(nodeSnap)
     Print("Take snapshot on nodeIrr")
     takeSnapshot(nodeIrr)
 
+    assert cluster.deploySystemContract(cluster.biosNode, cluster.sysioAccount), "Failed to deploy system contract"
+    assert cluster.initializeSystemContract(cluster.biosNode, cluster.sysioAccount), "Failed to initialize system contract"
     assert cluster.biosNode.waitForTransFinalization(transId, timeout=21*12*3), f'Failed to validate transaction {transId} got rolled into a LIB block on server port {cluster.biosNode.port}'
     assert cluster.biosNode.waitForLibToAdvance(), "Lib should advance after instant finality activated"
     assert cluster.biosNode.waitForProducer("defproducera"), "Did not see defproducera"

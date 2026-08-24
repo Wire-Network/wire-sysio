@@ -1,6 +1,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include <sysio/producer_plugin/producer_plugin.hpp>
+#include <sysio/producer_plugin/snapshot_attestation_recovery.hpp>
 
 #include <sysio/testing/tester.hpp>
 
@@ -10,6 +11,10 @@
 #include <sysio/chain/name.hpp>
 
 #include <sysio/chain/application.hpp>
+
+#include "snapshot_attestation_test_utils.hpp"
+
+#include <limits>
 
 using namespace sysio;
 using namespace sysio::chain;
@@ -59,6 +64,56 @@ BOOST_AUTO_TEST_CASE(state_dir) {
       
    app->quit();
    app_thread.join();
+}
+
+/** Refuse snapshot-provider startup while the durable disagreement latch is set. */
+BOOST_AUTO_TEST_CASE(quarantined_snapshot_provider_rejects_startup) {
+   fc::temp_directory temp;
+   const auto data_dir = temp.path() / "data";
+   const auto state_dir = temp.path() / "state";
+   const auto config_dir = temp.path() / "config";
+   const auto snapshots_dir = temp.path() / "snapshots";
+   std::filesystem::create_directories(data_dir);
+   std::filesystem::create_directories(config_dir);
+   std::filesystem::create_directories(snapshots_dir);
+
+   const auto quarantined = snapshot_attestation_test::make_recovery_state(
+      genesis_state{}.compute_chain_id(), true);
+   const auto sidecar = snapshots_dir / snapshot_attestation_recovery_filename;
+   save_snapshot_attestation_recovery_state(sidecar, quarantined);
+
+   const auto data_dir_string = data_dir.string();
+   const auto state_dir_string = state_dir.string();
+   const auto config_dir_string = config_dir.string();
+   const auto snapshots_dir_string = snapshots_dir.string();
+   appbase::scoped_app app;
+   std::vector<const char*> argv = {
+      "test",
+      "--data-dir", data_dir_string.c_str(),
+      "--state-dir", state_dir_string.c_str(),
+      "--config-dir", config_dir_string.c_str(),
+      "--snapshots-dir", snapshots_dir_string.c_str(),
+      "--snapshot-provider-account", snapshot_attestation_test::provider_account_name,
+   };
+
+   BOOST_CHECK_THROW(
+      (app->initialize<chain_plugin, producer_plugin>(argv.size(), (char**)&argv[0])),
+      plugin_config_exception);
+
+   const auto retained = load_snapshot_attestation_recovery_state(sidecar);
+   BOOST_CHECK(retained.disagreement_detected);
+   BOOST_REQUIRE(retained.pending_vote);
+   BOOST_CHECK(retained.pending_vote->head_block_id == quarantined.pending_vote->head_block_id);
+}
+
+/** Align the automatic provider schedule with exact snapshot interval multiples. */
+BOOST_AUTO_TEST_CASE(snapshot_provider_auto_schedule_targets_exact_block_multiples) {
+   const auto request = make_snapshot_provider_auto_schedule_request();
+   BOOST_CHECK_EQUAL(snapshot_provider_block_spacing, request.block_spacing);
+   // on_start_block(start + 1) snapshots the current head, so start itself is the exact
+   // snapshotted height and each recurrence remains an exact interval multiple.
+   BOOST_CHECK_EQUAL(snapshot_provider_block_spacing, request.start_block_num);
+   BOOST_CHECK_EQUAL(std::numeric_limits<uint32_t>::max(), request.end_block_num);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

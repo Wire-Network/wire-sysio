@@ -8,6 +8,9 @@ add_executable( test_chain_plugin
 target_link_libraries( test_chain_plugin chain_plugin sysio_testing sysio_chain_wrap version )
 set(CHAIN_PLUGIN_TEST_CASES
         chain_plugin_default_tests
+        chain_plugin_rejects_snapshot_without_attestation_table
+        snapshot_attestation_table_read_failure_policy
+        snapshot_attestation_table_read_timeout_policy
         chain_plugin_snapshot_endpoint_option_registration
         outbound_http_global_option_registration
         chain_plugin_snapshot_endpoint_option_validation

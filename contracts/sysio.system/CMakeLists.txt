@@ -21,7 +21,8 @@ set(SYSIO_SYSTEM_HEADERS
 
 set(SYSIO_SYSTEM_INCLUDE_DIRS
    ${CMAKE_CURRENT_SOURCE_DIR}/include
-   ${CMAKE_CURRENT_SOURCE_DIR}/../sysio.token/include)
+   ${CMAKE_CURRENT_SOURCE_DIR}/../sysio.token/include
+   ${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/protocol/include)
 
 # OPP integration: emissions reads opreg/epoch state via generated protobuf types + shared DataStream operators.
 # generated-cdt is reached via CMAKE_CURRENT_BINARY_DIR since contracts_project is a nested ExternalProject.
@@ -56,7 +57,7 @@ if("native-module" IN_LIST SYSIO_WASM_RUNTIMES AND BUILD_SYSTEM_CONTRACTS)
       ABI_FILE       ${CMAKE_BINARY_DIR}/contracts/sysio.system/sysio.system.abi
       EXTRA_DISPATCH "sysiosystem::peer_keys:regpeerkey,delpeerkey,getpeerkeys"
                      "sysiosystem::trx_priority:addtrxp,deltrxp"
-                     "sysiosystem::snapshot_attest:regsnapprov,delsnapprov,votesnaphash,setsnpcfg,getsnaphash"
+                     "sysiosystem::snapshot_attest:regsnapprov,delsnapprov,votesnaphash,evalsnapvote,propsnaprost,cancsnaprost,setsnpcfg,getsnaphash"
    )
 
    target_link_libraries(sysio.system_native

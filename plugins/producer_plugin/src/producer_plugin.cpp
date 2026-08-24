@@ -1,11 +1,13 @@
 #include <sysio/producer_plugin/producer_plugin.hpp>
 #include <sysio/producer_plugin/block_timing_util.hpp>
 #include <sysio/producer_plugin/production_pause_vote_tracker.hpp>
+#include <sysio/producer_plugin/snapshot_attestation_recovery.hpp>
 #include <sysio/producer_plugin/trx_priority_db.hpp>
 #include <sysio/chain/authorization_manager.hpp>
 #include <sysio/chain/plugin_interface.hpp>
 #include <sysio/chain/global_property_object.hpp>
 #include <sysio/chain/snapshot.hpp>
+#include <sysio/protocol/snapshot_attestation.hpp>
 #include <sysio/chain/snapshot_scheduler.hpp>
 #include <sysio/chain/subjective_billing.hpp>
 #include <sysio/chain/thread_utils.hpp>
@@ -85,7 +87,7 @@ fc::logger        _transient_trx_failed_trace_log;
 
 namespace sysio {
 
-
+namespace snapshot_attest = protocol::snapshot_attestation;
 
 using namespace sysio::chain;
 using namespace sysio::chain::plugin_interface;
@@ -668,101 +670,312 @@ public:
       return {chain.head().id(), chain.calculate_integrity_hash()};
    }
 
-   void submit_snapshot_vote(const snapshot_scheduler::snapshot_information& si) {
-      if (_snapshot_provider_account.empty()) return;
+   /** Build, sign, and asynchronously submit snapshot-attestation actions. */
+   void submit_snapshot_actions(std::vector<chain::action> actions,
+                                snapshot_attestation_operation operation) {
+      chain::controller& chain = chain_plug->chain();
+      const auto operation_name = snapshot_attestation_operation_name(operation);
+      chain::signed_transaction trx;
+      trx.actions = std::move(actions);
+      trx.expiration = fc::time_point_sec(
+         chain.head().block_time() + fc::seconds(_snapshot_transaction_expiration_seconds));
+      trx.set_reference_block(chain.head().id());
+
+      auto& sig_plug = app().get_plugin<signature_provider_manager_plugin>();
+      auto wire_sig_providers = sig_plug.query_providers(
+         std::nullopt, std::nullopt, chain::crypto::chain_key_type_wire);
+
+      flat_set<chain::public_key_type> candidate_keys;
+      std::map<chain::public_key_type, fc::crypto::private_key> key_map;
+      for (auto& sig_provider : wire_sig_providers) {
+         if (sig_provider->private_key) {
+            candidate_keys.insert(sig_provider->public_key);
+            key_map[sig_provider->public_key] = *sig_provider->private_key;
+         }
+      }
+
+      const auto required_keys = chain.get_authorization_manager().get_required_keys(trx, candidate_keys);
+      if (required_keys.empty()) {
+         elog("Snapshot provider: no signing key available for {}@active {} transaction",
+              _snapshot_provider_account, operation_name);
+         return;
+      }
+      for (const auto& key : required_keys) {
+         trx.sign(key_map.at(key), chain.get_chain_id());
+      }
+
+      auto packed_trx = std::make_shared<chain::packed_transaction>(std::move(trx));
+      app().get_method<chain::plugin_interface::incoming::methods::transaction_async>()(
+         packed_trx, true /*api_trx*/, chain::transaction_metadata::trx_type::input,
+         true /*return_failure_traces*/,
+         [operation](
+            const chain::next_function_variant<chain::transaction_trace_ptr>& result) {
+            const auto operation_name = snapshot_attestation_operation_name(operation);
+            if (std::holds_alternative<fc::exception_ptr>(result)) {
+               const auto& exception = std::get<fc::exception_ptr>(result);
+               fc_elog(_log, "Snapshot provider: {} transaction failed: {}",
+                       operation_name, exception->to_detail_string());
+               return;
+            }
+
+            const auto trace = std::get<chain::transaction_trace_ptr>(result);
+            if (trace && trace->except) {
+               if (is_snapshot_attestation_disagreement_error(operation, trace->error_code)) {
+                  fc_wlog(_log, "Snapshot provider: votesnaphash reported disagreement against the "
+                                "current head (error code {}). The local tuple remains pending until "
+                                "the attestation record becomes irreversible.",
+                          snapshot_attest::disagreement_error_code);
+               } else {
+                  fc_elog(_log, "Snapshot provider: {} transaction failed: {}",
+                          operation_name, trace->except->to_detail_string());
+               }
+            } else if (trace && trace->receipt) {
+               fc_ilog(_log, "Snapshot provider: {} transaction submitted successfully in block {}",
+                       operation_name, trace->block_num);
+            }
+         });
+   }
+
+   /** Persist the local tuple and pending-table cursor for restart-safe recovery. */
+   void persist_snapshot_attestation_recovery() const {
+      save_snapshot_attestation_recovery_state(
+         _snapshots_dir / snapshot_attestation_recovery_filename,
+         snapshot_attestation_recovery_state{snapshot_attestation_recovery_schema_version,
+                                             chain_plug->chain().get_chain_id(),
+                                             chain::name(_snapshot_provider_account),
+                                             _pending_snapshot_vote,
+                                             _snapshot_vote_recovery_cursor,
+                                             _snapshot_attestation_disagreement_detected});
+   }
+
+   /** Restore and validate restart state before the provider begins scheduling snapshots. */
+   void restore_snapshot_attestation_recovery() {
+      const auto state = load_snapshot_attestation_recovery_state(
+         _snapshots_dir / snapshot_attestation_recovery_filename);
+      validate_snapshot_attestation_recovery_identity(
+         state, chain_plug->chain().get_chain_id(), chain::name(_snapshot_provider_account));
+      SYS_ASSERT(!state.disagreement_detected, plugin_config_exception, "{}",
+                 _snapshot_recovery_quarantine_error);
+      if (state.pending_vote) {
+         SYS_ASSERT(chain::block_header::num_from_id(state.pending_vote->head_block_id)
+                       == state.pending_vote->head_block_num,
+                    plugin_config_exception,
+                    "Snapshot-attestation recovery tuple has inconsistent block id and number");
+      }
+      _pending_snapshot_vote = state.pending_vote;
+      _snapshot_vote_recovery_cursor = state.pending_vote_cursor;
+      _snapshot_attestation_disagreement_detected = state.disagreement_detected;
+   }
+
+   /** Read and classify the final-record state for the currently pending local tuple. */
+   snapshot_attestation_record_status classify_pending_snapshot_vote(
+      std::optional<snapshot_attestation_final_record>& final_record,
+      uint32_t irreversible_block_num) const {
+      SYS_ASSERT(_pending_snapshot_vote.has_value(), producer_exception,
+                 "A pending snapshot vote is required for recovery classification");
+
+      static const std::atomic<bool> not_shutting_down{false};
+      chain_apis::read_only::get_table_rows_params record_params;
+      record_params.code = chain::config::system_account_name;
+      record_params.scope = chain::config::system_account_name.to_string();
+      record_params.table = snapshot_attest::table_snaprecords;
+      record_params.lower_bound = fc::json::to_string(
+         fc::mutable_variant_object()(snapshot_attest::field::block_num,
+                                      _pending_snapshot_vote->head_block_num),
+         fc::time_point::maximum());
+      record_params.limit = 1;
+      record_params.values_only = true;
+      const auto read_result = chain_plug->read_table_rows_checked(
+         std::move(record_params), _snapshot_recovery_read_timeout,
+         _snapshot_recovery_read_timeout,
+         _snapshot_provider_table_query_name, not_shutting_down);
+      SYS_ASSERT(read_result.has_value(), producer_exception, "{}",
+                 _snapshot_provider_table_read_error);
+      const auto& records = read_result->rows;
+      if (!records.empty()
+          && records.front().get_object()[snapshot_attest::field::block_num].as_uint64()
+                == _pending_snapshot_vote->head_block_num) {
+         const auto& record = records.front().get_object();
+         final_record = snapshot_attestation_final_record{
+            record[snapshot_attest::field::block_id].as<chain::block_id_type>(),
+            record[snapshot_attest::field::snapshot_hash].as<chain::digest_type>(),
+            record[snapshot_attest::field::attested_at_block].as<uint32_t>(),
+         };
+      }
+      return classify_snapshot_attestation_record(
+         *_pending_snapshot_vote, final_record, irreversible_block_num);
+   }
+
+   /** Resolve the current local tuple or quarantine this provider on a final-record conflict. */
+   bool resolve_pending_snapshot_vote(uint32_t irreversible_block_num) {
+      if (!_pending_snapshot_vote) {
+         return true;
+      }
+
+      std::optional<snapshot_attestation_final_record> final_record;
+      switch (classify_pending_snapshot_vote(final_record, irreversible_block_num)) {
+         case snapshot_attestation_record_status::matching:
+            _pending_snapshot_vote.reset();
+            persist_snapshot_attestation_recovery();
+            return true;
+         case snapshot_attestation_record_status::retry:
+            return true;
+         case snapshot_attestation_record_status::awaiting_irreversibility:
+            return false;
+         case snapshot_attestation_record_status::conflicting:
+            fc_elog(_log, "FATAL: Snapshot attestation disagreement detected during recovery for "
+                            "block {}. Local block/hash {}/{} differs from attested block/hash "
+                            "{}/{}. Recovery state is quarantined; shutting down.",
+                    _pending_snapshot_vote->head_block_num,
+                    _pending_snapshot_vote->head_block_id.str(),
+                    _pending_snapshot_vote->root_hash.str(),
+                    final_record->block_id.str(),
+                    final_record->snapshot_hash.str());
+            _snapshot_attestation_disagreement_detected = true;
+            auto quit_on_exit = fc::make_scoped_exit([]() { app().quit(); });
+            persist_snapshot_attestation_recovery();
+            return false;
+      }
+      return false;
+   }
+
+   /** Submit or re-submit the local provider's exact snapshot tuple. */
+   void submit_snapshot_vote(const snapshot_scheduler::snapshot_information& snapshot) {
+      if (_snapshot_provider_account.empty() || _snapshot_attestation_disagreement_detected) {
+         return;
+      }
 
       try {
-         chain::controller& chain = chain_plug->chain();
-
-         auto snap_account_name = chain::name(_snapshot_provider_account);
-
-         // Build the votesnaphash action
-         chain::action vote_action;
-         vote_action.account = chain::config::system_account_name;
-         vote_action.name = chain::name("votesnaphash");
-         vote_action.authorization = {{snap_account_name, chain::config::active_name}};
-         // Parameter order must match votesnaphash(name, checksum256, checksum256) in snapshot_attest.hpp.
-         // root_hash is fc::crypto::blake3 (32 bytes) which is binary-compatible with checksum256.
-         vote_action.data = fc::raw::pack(
-            std::make_tuple(snap_account_name, si.head_block_id, si.root_hash));
-
-         // Build the transaction
-         chain::signed_transaction trx;
-         trx.actions.emplace_back(std::move(vote_action));
-         trx.expiration = fc::time_point_sec(chain.head().block_time() + fc::seconds(30));
-         trx.set_reference_block(chain.head().id());
-
-         // Determine the required signing keys for the snapshot provider account's active authority
-         auto& sig_plug = app().get_plugin<signature_provider_manager_plugin>();
-         auto wire_sig_providers = sig_plug.query_providers(
-            std::nullopt, std::nullopt, chain::crypto::chain_key_type_wire);
-
-         // Collect available public keys
-         flat_set<chain::public_key_type> candidate_keys;
-         std::map<chain::public_key_type, fc::crypto::private_key> key_map;
-         for (auto& sig_prov : wire_sig_providers) {
-            if (sig_prov->private_key.has_value()) {
-               candidate_keys.insert(sig_prov->public_key);
-               key_map[sig_prov->public_key] = *sig_prov->private_key;
-            }
-         }
-
-         // Use authorization_manager to find which keys satisfy snap_account@active
-         auto required_keys = chain.get_authorization_manager().get_required_keys(
-            trx, candidate_keys);
-
-         if (required_keys.empty()) {
-            elog("Snapshot provider: no signing key available for {}@active votesnaphash transaction",
-                 _snapshot_provider_account);
+         const bool replaces_pending_tuple = _pending_snapshot_vote
+                                             && (_pending_snapshot_vote->head_block_id != snapshot.head_block_id
+                                                 || _pending_snapshot_vote->root_hash != snapshot.root_hash);
+         if (replaces_pending_tuple
+             && !resolve_pending_snapshot_vote(_snapshot_attestation_last_irreversible_block_num)) {
             return;
          }
 
-         for (const auto& key : required_keys) {
-            trx.sign(key_map.at(key), chain.get_chain_id());
-         }
+         const auto snap_account = chain::name(_snapshot_provider_account);
+         chain::action vote_action;
+         vote_action.account = chain::config::system_account_name;
+         vote_action.name = chain::name(snapshot_attest::action_votesnaphash);
+         vote_action.authorization = {{snap_account, chain::config::active_name}};
+         // root_hash is a 32-byte BLAKE3 value and is binary-compatible with checksum256.
+         vote_action.data = fc::raw::pack(
+            std::make_tuple(snap_account, snapshot.head_block_id, snapshot.root_hash));
 
-         auto packed_trx = std::make_shared<chain::packed_transaction>(std::move(trx));
-
-         // Submit via incoming transaction async method.
-         // return_failure_traces=true so we can inspect trace->error_code on assertion failures.
-         app().get_method<chain::plugin_interface::incoming::methods::transaction_async>()(
-            packed_trx, true /*api_trx*/,
-            chain::transaction_metadata::trx_type::input,
-            true /*return_failure_traces*/,
-            [](const chain::next_function_variant<chain::transaction_trace_ptr>& result) {
-               if (std::holds_alternative<fc::exception_ptr>(result)) {
-                  auto& ex = std::get<fc::exception_ptr>(result);
-                  fc_elog(_log, "Snapshot provider: votesnaphash transaction failed: {}", ex->to_detail_string());
-               } else {
-                  auto trace = std::get<chain::transaction_trace_ptr>(result);
-                  if (trace && trace->except) {
-                     // Check for snapshot hash disagreement via error code.
-                     // snap_hash_disagreement_error (9001) is defined in snapshot_attest.hpp
-                     // and emitted by the votesnaphash action's check() call.
-                     constexpr uint64_t snap_hash_disagreement_error = 9001;
-                     if (trace->error_code && *trace->error_code == snap_hash_disagreement_error) {
-                        fc_elog(_log, "FATAL: Snapshot hash disagreement detected (error code {})! "
-                                      "This node's snapshot differs from the attested record. Shutting down.",
-                                      snap_hash_disagreement_error);
-                        app().quit();
-                     } else {
-                        fc_elog(_log, "Snapshot provider: votesnaphash transaction failed: {}",
-                                 trace->except->to_detail_string());
-                     }
-                  } else if (trace && trace->receipt) {
-                     fc_ilog(_log, "Snapshot provider: votesnaphash submitted successfully for block {}", trace->block_num);
-                  }
-               }
-            });
-
+         _pending_snapshot_vote = snapshot;
+         // A newly finalized local snapshot is the documented terminal supersession point for an
+         // older pending tuple; only the newest periodic snapshot is retained and retried.
+         persist_snapshot_attestation_recovery();
+         submit_snapshot_actions({std::move(vote_action)}, snapshot_attestation_operation::votesnaphash);
          ilog("Snapshot provider: submitting votesnaphash for block {} with root hash {}",
-              si.head_block_num, si.root_hash.str());
-
+              snapshot.head_block_num, snapshot.root_hash.str());
       } catch (const fc::exception& e) {
          elog("Snapshot provider: failed to submit vote: {}", e.to_detail_string());
       } catch (const std::exception& e) {
          elog("Snapshot provider: failed to submit vote: {}", e.what());
       }
+   }
+
+   /** Require the retained tuple to be safe before any snapshot file can be promoted or created. */
+   bool pending_snapshot_vote_allows_promotion(uint32_t irreversible_block_num) {
+      if (_snapshot_provider_account.empty()) {
+         return true;
+      }
+      if (_snapshot_attestation_disagreement_detected) {
+         return false;
+      }
+      try {
+         return !_pending_snapshot_vote
+                || resolve_pending_snapshot_vote(irreversible_block_num);
+      } catch (const fc::exception& e) {
+         elog(_snapshot_provider_pending_tuple_check_error, e.to_detail_string());
+      } catch (const std::exception& e) {
+         elog(_snapshot_provider_pending_tuple_check_error, e.what());
+      }
+      return false;
+   }
+
+   /** Re-evaluate a bounded page of pending rows and retry the local tuple after roster changes. */
+   bool recover_snapshot_attestations(uint32_t irreversible_block_num) {
+      if (_snapshot_provider_account.empty()) {
+         return true;
+      }
+      if (_snapshot_attestation_disagreement_detected) {
+         return false;
+      }
+
+      try {
+         static const std::atomic<bool> not_shutting_down{false};
+         const bool periodic_recovery_due =
+            _last_snapshot_recovery_block == 0
+            || irreversible_block_num - _last_snapshot_recovery_block
+                  >= _snapshot_recovery_interval_blocks;
+         const auto recovery_work = prepare_snapshot_attestation_recovery(
+            periodic_recovery_due,
+            [this, irreversible_block_num]() {
+               return pending_snapshot_vote_allows_promotion(irreversible_block_num);
+            });
+         switch (recovery_work) {
+            case snapshot_attestation_recovery_work::blocked:
+               return false;
+            case snapshot_attestation_recovery_work::skip_periodic:
+               return true;
+            case snapshot_attestation_recovery_work::run_periodic:
+               break;
+         }
+         _last_snapshot_recovery_block = irreversible_block_num;
+
+         if (_pending_snapshot_vote) {
+            submit_snapshot_vote(*_pending_snapshot_vote);
+         }
+
+         chain_apis::read_only::get_table_rows_params vote_params;
+         vote_params.code = chain::config::system_account_name;
+         vote_params.scope = chain::config::system_account_name.to_string();
+         vote_params.table = snapshot_attest::table_snapvotes;
+         if (_snapshot_vote_recovery_cursor > 0) {
+            vote_params.lower_bound = fc::json::to_string(
+               fc::mutable_variant_object()(snapshot_attest::field::id, _snapshot_vote_recovery_cursor),
+               fc::time_point::maximum());
+         }
+         vote_params.limit = _snapshot_recovery_page_size;
+         vote_params.values_only = true;
+         const auto page = chain_plug->read_table_rows(
+            std::move(vote_params), _snapshot_recovery_read_timeout,
+            _snapshot_provider_table_query_name, not_shutting_down);
+
+         const auto snap_account = chain::name(_snapshot_provider_account);
+         for (const auto& row_variant : page.rows) {
+            const auto& row = row_variant.get_object();
+            const auto vote_id = row[snapshot_attest::field::id].as_uint64();
+            chain::action evaluate_action;
+            evaluate_action.account = chain::config::system_account_name;
+            evaluate_action.name = chain::name(snapshot_attest::action_evalsnapvote);
+            evaluate_action.authorization = {{snap_account, chain::config::active_name}};
+            evaluate_action.data = fc::raw::pack(std::make_tuple(
+               vote_id,
+               row[snapshot_attest::field::block_id].as<chain::digest_type>(),
+               row[snapshot_attest::field::snapshot_hash].as<chain::digest_type>(),
+               row[snapshot_attest::field::roster_version].as_uint64()));
+            // Each evaluator gets its own transaction: one evaluation may finalize and clean rows
+            // that appeared later in this page, and batching those actions would then roll back the
+            // successful finalization when a later action observes its row already removed.
+            submit_snapshot_actions({std::move(evaluate_action)}, snapshot_attestation_operation::evalsnapvote);
+            _snapshot_vote_recovery_cursor = vote_id + 1;
+            persist_snapshot_attestation_recovery();
+         }
+         if (!page.more || page.rows.empty()) {
+            _snapshot_vote_recovery_cursor = 0;
+            persist_snapshot_attestation_recovery();
+         }
+         return true;
+      } catch (const fc::exception& e) {
+         elog("Snapshot provider: recovery failed: {}", e.to_detail_string());
+      } catch (const std::exception& e) {
+         elog("Snapshot provider: recovery failed: {}", e.what());
+      }
+      return !_pending_snapshot_vote;
    }
 
    void update_runtime_options(const producer_plugin::runtime_options& options);
@@ -875,7 +1088,38 @@ public:
 
    // snapshot provider configuration
    std::string _snapshot_provider_account;
-   static constexpr uint32_t _snapshot_provider_block_spacing = 25000;
+   /// Irreversible-block cadence for local retry and permissionless pending-row evaluation.
+   static constexpr uint32_t _snapshot_recovery_interval_blocks = 120;
+   /// Maximum pending rows read and evaluated during one recovery pass.
+   static constexpr uint32_t _snapshot_recovery_page_size = 5;
+   /// Lifetime of transactions emitted by the snapshot provider recovery path.
+   static constexpr uint32_t _snapshot_transaction_expiration_seconds = 30;
+   /// Bound for each in-process snapshot table query.
+   static constexpr fc::microseconds _snapshot_recovery_read_timeout = fc::seconds(2);
+   /// Caller label applied to host-side snapshot-attestation table reads.
+   static constexpr auto _snapshot_provider_table_query_name = "snapshot_provider";
+   /// Diagnostic emitted when the final-record lookup cannot confirm row presence or absence.
+   static constexpr auto _snapshot_provider_table_read_error =
+      "Snapshot provider could not read the final attestation table";
+   /// Diagnostic emitted when the mandatory retained-tuple check cannot reach a safe decision.
+   static constexpr auto _snapshot_provider_pending_tuple_check_error =
+      "Snapshot provider: pending-tuple check failed: {}";
+   /// Startup diagnostic for a sidecar quarantined by a prior disagreement.
+   static constexpr auto _snapshot_recovery_quarantine_error =
+      "Snapshot-attestation recovery state is quarantined after a disagreement; "
+      "inspect the local snapshot and remove the recovery sidecar before restarting";
+   /// Most recent local tuple retained for idempotent re-voting after a roster transition.
+   std::optional<snapshot_scheduler::snapshot_information> _pending_snapshot_vote;
+   /// Last irreversible block at which recovery work was scheduled.
+   uint32_t _last_snapshot_recovery_block = 0;
+   /// Most recent irreversible height used to reject reversible attestation records.
+   uint32_t _snapshot_attestation_last_irreversible_block_num = 0;
+   /// Inclusive primary-id lower bound for the next bounded pending-vote page.
+   uint64_t _snapshot_vote_recovery_cursor = 0;
+   /// Durable fail-closed latch set when the provider observes an attested tuple disagreement.
+   bool _snapshot_attestation_disagreement_detected = false;
+   /// Whether block-start snapshot execution is safe against the retained provider tuple.
+   bool _snapshot_attestation_snapshot_execution_allowed = true;
 
    std::function<void(speculative_block_metrics)> _update_speculative_block_metrics;
 
@@ -992,7 +1236,16 @@ public:
       const chain::controller& chain = chain_plug->chain();
       SYS_ASSERT(chain.is_write_window(), producer_exception, "write window is expected for on_irreversible_block signal");
       _irreversible_block_time = lib->timestamp.to_time_point();
-      _snapshot_scheduler.on_irreversible_block(lib, block_id, chain);
+      _snapshot_attestation_last_irreversible_block_num = lib->block_num();
+      promote_snapshot_after_recovery(
+         [this, lib]() {
+            _snapshot_attestation_snapshot_execution_allowed =
+               recover_snapshot_attestations(lib->block_num());
+            return _snapshot_attestation_snapshot_execution_allowed;
+         },
+         [this, &chain, &lib, &block_id]() {
+            _snapshot_scheduler.on_irreversible_block(lib, block_id, chain);
+         });
       _trx_priority_db.on_irreversible_block(lib, block_id, chain);
    }
 
@@ -1725,6 +1978,8 @@ void producer_plugin_impl::plugin_initialize(const boost::program_options::varia
       SYS_ASSERT(!is_configured_producer(), plugin_config_exception,
                  "snapshot-provider-account cannot be used alongside producer-name");
 
+      restore_snapshot_attestation_recovery();
+
       _snapshot_scheduler.add_snapshot_finalized_callback(
          [this](const snapshot_scheduler::snapshot_information& si) {
             submit_snapshot_vote(si);
@@ -1752,6 +2007,14 @@ void producer_plugin_impl::plugin_startup() {
       dlog("producer plugin:  plugin_startup() begin");
 
       chain::controller& chain = chain_plug->chain();
+      const auto fork_db_root = chain.fork_db_root();
+      _snapshot_attestation_last_irreversible_block_num =
+         snapshot_attestation_startup_irreversible_block_num(fork_db_root);
+      if (!_snapshot_provider_account.empty()) {
+         _snapshot_attestation_snapshot_execution_allowed =
+            pending_snapshot_vote_allows_promotion(
+               _snapshot_attestation_last_irreversible_block_num);
+      }
 
       SYS_ASSERT(!is_configured_producer() || chain.get_validation_mode() == chain::validation_mode::FULL, plugin_config_exception,
                  "node cannot have any producer-name configured because block production is not safe when validation_mode is not \"full\"");
@@ -1773,6 +2036,10 @@ void producer_plugin_impl::plugin_startup() {
       }));
 
       _block_start_connection.emplace(chain.block_start().connect([this, &chain](uint32_t bs) {
+         if (!_snapshot_provider_account.empty()
+             && !_snapshot_attestation_snapshot_execution_allowed) {
+            return;
+         }
          try {
             _snapshot_scheduler.on_start_block(bs, chain);
          } catch (const snapshot_execution_exception& e) {
@@ -1783,28 +2050,24 @@ void producer_plugin_impl::plugin_startup() {
 
       // Auto-schedule periodic snapshots for snapshot provider mode.
       // All providers use the same block_spacing so they snapshot at identical heights.
-      // The scheduler fires when (height - start_block_num - 1) % block_spacing == 0,
-      // so set start_block_num = block_spacing - 1 to trigger at exact multiples:
+      // The scheduler fires on block_start(start_block_num + 1) and snapshots the current head,
+      // so using start_block_num = block_spacing targets exact head-height multiples:
       // blocks 25000, 50000, 75000, ...
       if (!_snapshot_provider_account.empty()) {
-         snapshot_scheduler::snapshot_request_information sri;
-         sri.block_spacing = _snapshot_provider_block_spacing;
-         sri.start_block_num = _snapshot_provider_block_spacing - 1;
-         sri.end_block_num = std::numeric_limits<uint32_t>::max();
-         sri.snapshot_description = "snapshot-provider auto";
+         const auto sri = make_snapshot_provider_auto_schedule_request();
 
          // The auto-schedule is persisted to snapshot-schedule.json and reloaded by set_db_path()
          // on restart, so only schedule it when an identical request is not already present;
          // otherwise schedule_snapshot() would throw duplicate_snapshot_request on every restart.
          if (auto existing = _snapshot_scheduler.find_snapshot_request(sri.block_spacing, sri.start_block_num, sri.end_block_num)) {
             ilog("Snapshot provider mode: reusing persisted auto-schedule for every {} blocks (request id {})",
-                 _snapshot_provider_block_spacing, *existing);
+                 snapshot_provider_block_spacing, *existing);
          } else {
             // scheduled (non create_snapshot) requests store no completion callback; the produced
             // snapshots are observed through add_snapshot_finalized_callback (provider-mode voting)
             auto result = _snapshot_scheduler.schedule_snapshot(sri, {});
             ilog("Snapshot provider mode: auto-scheduled snapshots every {} blocks (request id {})",
-                 _snapshot_provider_block_spacing, result.snapshot_request_id);
+                 snapshot_provider_block_spacing, result.snapshot_request_id);
          }
       }
 
@@ -1819,7 +2082,6 @@ void producer_plugin_impl::plugin_startup() {
          _vote_block_connection.emplace(chain.voted_block().connect(on_vote_signal));
       }
 
-      const auto fork_db_root = chain.fork_db_root();
       if (fork_db_root.block()) { // not available if starting from a snapshot
          on_irreversible_block(fork_db_root.block(), fork_db_root.id());
       } else {

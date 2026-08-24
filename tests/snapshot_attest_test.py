@@ -176,8 +176,8 @@ try:
     assert node0.waitForTransactionsInBlock(regSnapProvTransIds + [setCfgTransId], timeout=60), \
         "regsnapprov/setsnpcfg transactions did not make it into a block"
     Print("Verify snapshot providers registered")
-    providers = node0.getTableRows("sysio", "sysio", "snapprovs")
-    assert providers is not None, "Failed to read snapprovs table"
+    providers = node0.getTableRows("sysio", "sysio", "snapregs")
+    assert providers is not None, "Failed to read snapregs table"
     assert len(providers) == 2, f"Expected 2 providers, got {len(providers)}"
     Print(f"Registered providers: {providers}")
 
@@ -405,7 +405,7 @@ try:
     assert node0.waitForTransactionsInBlock([delSnapProvTransId], timeout=60), \
         "delsnapprov transaction did not make it into a block before provider table check"
 
-    providers = node0.getTableRows("sysio", "sysio", "snapprovs")
+    providers = node0.getTableRows("sysio", "sysio", "snapregs")
     assert len(providers) == 1, f"Expected 1 provider after deregistration, got {len(providers)}"
     assert providers[0]["value"]["snap_account"] == snapProv1.name, \
         f"Remaining provider should be {snapProv1.name}, got {providers[0]['value']['snap_account']}"

@@ -281,6 +281,11 @@
             ]
         },
         {
+            "name": "cancsnaprost",
+            "base": "",
+            "fields": []
+        },
+        {
             "name": "claimnodedis",
             "base": "",
             "fields": [
@@ -524,6 +529,28 @@
             "fields": [
                 {
                     "name": "sysio_epoch_index",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "evalsnapvote",
+            "base": "",
+            "fields": [
+                {
+                    "name": "vote_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "expected_block_id",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "expected_snapshot_hash",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "expected_roster_version",
                     "type": "uint64"
                 }
             ]
@@ -1041,6 +1068,20 @@
             ]
         },
         {
+            "name": "propsnaprost",
+            "base": "",
+            "fields": [
+                {
+                    "name": "members",
+                    "type": "snap_roster_member[]"
+                },
+                {
+                    "name": "expected_active_version",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "regfinkey",
             "base": "",
             "fields": [
@@ -1337,6 +1378,16 @@
             ]
         },
         {
+            "name": "snap_account_key_t",
+            "base": "",
+            "fields": [
+                {
+                    "name": "snap_account",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "snap_config",
             "base": "",
             "fields": [
@@ -1347,30 +1398,6 @@
                 {
                     "name": "threshold_pct",
                     "type": "uint32"
-                }
-            ]
-        },
-        {
-            "name": "snap_provider",
-            "base": "",
-            "fields": [
-                {
-                    "name": "snap_account",
-                    "type": "name"
-                },
-                {
-                    "name": "producer",
-                    "type": "name"
-                }
-            ]
-        },
-        {
-            "name": "snap_provider_key_t",
-            "base": "",
-            "fields": [
-                {
-                    "name": "snap_account",
-                    "type": "uint64"
                 }
             ]
         },
@@ -1393,6 +1420,14 @@
                 {
                     "name": "attested_at_block",
                     "type": "uint32"
+                },
+                {
+                    "name": "roster_version",
+                    "type": "uint64"
+                },
+                {
+                    "name": "roster_digest",
+                    "type": "checksum256"
                 }
             ]
         },
@@ -1407,11 +1442,99 @@
             ]
         },
         {
+            "name": "snap_registration",
+            "base": "",
+            "fields": [
+                {
+                    "name": "snap_account",
+                    "type": "name"
+                },
+                {
+                    "name": "producer",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "snap_roster_member",
+            "base": "",
+            "fields": [
+                {
+                    "name": "snap_account",
+                    "type": "name"
+                },
+                {
+                    "name": "producer",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "snap_roster_proposal",
+            "base": "",
+            "fields": [
+                {
+                    "name": "expected_active_version",
+                    "type": "uint64"
+                },
+                {
+                    "name": "members",
+                    "type": "snap_roster_member[]"
+                },
+                {
+                    "name": "digest",
+                    "type": "checksum256"
+                }
+            ]
+        },
+        {
+            "name": "snap_roster_state",
+            "base": "",
+            "fields": [
+                {
+                    "name": "active_version",
+                    "type": "uint64"
+                },
+                {
+                    "name": "activated_at_block",
+                    "type": "uint32"
+                },
+                {
+                    "name": "active_count",
+                    "type": "uint32"
+                },
+                {
+                    "name": "active_digest",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "candidate_count",
+                    "type": "uint32"
+                },
+                {
+                    "name": "candidate_digest",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "cleanup_cursor",
+                    "type": "uint64"
+                },
+                {
+                    "name": "cleanup_finalized_height",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
             "name": "snap_vote",
             "base": "",
             "fields": [
                 {
                     "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "roster_version",
                     "type": "uint64"
                 },
                 {
@@ -1834,6 +1957,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "cancsnaprost",
+            "type": "cancsnaprost",
+            "ricardian_contract": ""
+        },
+        {
             "name": "claimnodedis",
             "type": "claimnodedis",
             "ricardian_contract": ""
@@ -1856,6 +1984,11 @@
         {
             "name": "delsnapprov",
             "type": "delsnapprov",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "evalsnapvote",
+            "type": "evalsnapvote",
             "ricardian_contract": ""
         },
         {
@@ -1901,6 +2034,11 @@
         {
             "name": "payepoch",
             "type": "payepoch",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "propsnaprost",
+            "type": "propsnaprost",
             "ricardian_contract": ""
         },
         {
@@ -2225,27 +2363,58 @@
             "table_id": 45242
         },
         {
-            "name": "snapprovs",
-            "type": "snap_provider",
-            "index_type": "i64",
-            "key_names": ["snap_account"],
-            "key_types": ["uint64"],
-            "table_id": 42185,
-            "secondary_indexes": [
-                {
-                    "name": "byproducer",
-                    "key_type": "uint64",
-                    "table_id": 27665
-                }
-            ]
-        },
-        {
             "name": "snaprecords",
             "type": "snap_record",
             "index_type": "i64",
             "key_names": ["block_num"],
             "key_types": ["uint64"],
             "table_id": 43128
+        },
+        {
+            "name": "snapregs",
+            "type": "snap_registration",
+            "index_type": "i64",
+            "key_names": ["snap_account"],
+            "key_types": ["uint64"],
+            "table_id": 58578,
+            "secondary_indexes": [
+                {
+                    "name": "byproducer",
+                    "key_type": "uint64",
+                    "table_id": 42266
+                }
+            ]
+        },
+        {
+            "name": "snaproster",
+            "type": "snap_roster_member",
+            "index_type": "i64",
+            "key_names": ["snap_account"],
+            "key_types": ["uint64"],
+            "table_id": 51250,
+            "secondary_indexes": [
+                {
+                    "name": "byproducer",
+                    "key_type": "uint64",
+                    "table_id": 59514
+                }
+            ]
+        },
+        {
+            "name": "snaprprop",
+            "type": "snap_roster_proposal",
+            "index_type": "i64",
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 28931
+        },
+        {
+            "name": "snaprstate",
+            "type": "snap_roster_state",
+            "index_type": "i64",
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 23204
         },
         {
             "name": "snapvotes",
@@ -2259,6 +2428,11 @@
                     "name": "byblocknum",
                     "key_type": "uint64",
                     "table_id": 8321
+                },
+                {
+                    "name": "byblkroster",
+                    "key_type": "uint128",
+                    "table_id": 22340
                 }
             ]
         },

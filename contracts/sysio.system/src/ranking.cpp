@@ -56,6 +56,10 @@ namespace sysiosystem {
             if ( info.last_claim_time == time_point() )
                info.last_claim_time = ct;
          });
+
+      // Producer activity is an input to snapshot-candidate membership. Reconciliation may remove
+      // stale candidates but deliberately cannot mutate the stable active snapshot roster.
+      reconcile_snapshot_registrations( get_self() );
    }
 
    void system_contract::regproducer( const name& producer, const sysio::public_key& producer_key, const std::string& url, uint16_t location ) {
@@ -84,6 +88,9 @@ namespace sysiosystem {
       _producers.modify( get_self(), key, [&]( producer_info& info ){
          info.deactivate();
       });
+
+      // Deactivation immediately removes registration authority without shrinking active quorum.
+      reconcile_snapshot_registrations( get_self() );
    }
 
    void system_contract::update_ranked_producers( const block_timestamp& block_time ) {

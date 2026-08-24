@@ -111,9 +111,12 @@ Files:
 
 | Action | Authority | Description |
 |--------|-----------|-------------|
-| `regsnapprov(producer, snap_account)` | `producer` | Delegate `snap_account` as the producer's snapshot provider. |
-| `delsnapprov(account)` | `account` | Sever the relationship; accepts either the snap_account or the producer. |
-| `votesnaphash(snap_account, block_id, snapshot_hash)` | `snap_account` | Submit a hash vote for the block named by `block_id`. |
+| `regsnapprov(producer, snap_account)` | `producer` | Delegate `snap_account` into the bounded candidate pool. |
+| `delsnapprov(account)` | `account` | Remove a candidate delegation; accepts either the snap_account or producer. |
+| `votesnaphash(snap_account, block_id, snapshot_hash)` | `snap_account` | Submit a version-bound hash vote and, at a new-height boundary, activate a ready roster. |
+| `evalsnapvote(vote_id, block_id, snapshot_hash, roster_version)` | permissionless | Re-evaluate one exact pending tuple without adding a vote. |
+| `propsnaprost(members, expected_active_version)` | `sysio` | Stage an exact governance-approved roster shrink for the next snapshot boundary. |
+| `cancsnaprost()` | `sysio` | Cancel the staged governance roster proposal. |
 | `setsnpcfg(min_providers, threshold_pct)` | `sysio` | Set the attestation quorum parameters. |
 | `getsnaphash(block_num)` | read-only | Return the attested record for a block, if any. |
 
@@ -124,28 +127,55 @@ Storage uses the KV table API (`sysio::kv::table` / `sysio::kv::global`).
 | Table | Key | Contents | Secondary index |
 |-------|-----|----------|-----------------|
 | `snapconfig` | singleton | `{ min_providers, threshold_pct }` | -- |
-| `snapprovs` | `snap_account` | `{ snap_account, producer }` | `byproducer` |
-| `snapvotes` | auto-increment `id` | `{ id, block_num, block_id, snapshot_hash, voters[] }` | `byblocknum` |
-| `snaprecords` | `block_num` | `{ block_num, block_id, snapshot_hash, attested_at_block }` | -- |
+| `snapregs` | `snap_account` | Eligible registration candidates `{ snap_account, producer }` | `byproducer` |
+| `snaproster` | `snap_account` | Stable active members `{ snap_account, producer }` | `byproducer` |
+| `snaprstate` | singleton | Active version/count/digest, candidate count/digest, bounded cleanup cursor, and finalized-height cleanup high-water | -- |
+| `snaprprop` | singleton | Governance proposal with expected version, members, and digest | -- |
+| `snapvotes` | auto-increment `id` | `{ id, roster_version, block_num, block_id, snapshot_hash, voters[] }` | `byblocknum`, `byblkroster` |
+| `snaprecords` | `block_num` | Final tuple, attestation block, roster version, and roster digest | -- |
 
 ### Registration
 
-A producer calls `regsnapprov` to designate a separate `snap_account` as its snapshot
-provider. The producer must be registered (via `regproducer`), active, and ranked at or below
-`max_snap_provider_rank` (30). The same eligibility is revalidated when the provider votes, so a
-retained mapping does not preserve voting authority after producer deactivation or rank demotion.
-Delegating to a separate account decouples authority: the producer's keys never have to live on
-the snapshot node -- only the snap_account's key does.
+A producer calls `regsnapprov` to designate a separate `snap_account` as a candidate snapshot
+provider. The producer must be registered, active, and ranked at or below
+`max_snap_provider_rank` (30). Candidate selection is deterministic: lower producer rank wins,
+with producer account as the tie-break. The pool retains at most 30 candidates, so a better new
+candidate displaces the current worst candidate instead of capacity becoming first-come-first-served.
 
-Either party can call `delsnapprov` to end the relationship. The action looks the mapping up
-in both directions, so it works whether invoked by the snap_account (deregistering itself) or
-by the producer (removing its delegate).
+Every producer lifecycle mutation uses one shared reconciliation helper. Deactivation, removal,
+or rank demotion removes an ineligible `snapregs` row automatically. This cleanup never mutates
+`snaproster`; candidate capacity and quorum authority are deliberately separate. Reactivation does
+not recreate a removed delegation—the producer must authorize `regsnapprov` again. Delegating to a
+separate account keeps the producer's keys off the snapshot node.
+
+Either party can call `delsnapprov` to remove the candidate relationship. The active roster remains
+unchanged until a later atomic activation.
+
+### Staged active roster
+
+The first vote for a height with no pending row is a deterministic activation boundary. At that
+boundary the contract may replace the complete active roster from `snapregs` when:
+
+- bootstrap has at least `min_providers` candidates; or
+- an ordinary transition has at least as many candidates as the current active roster.
+
+The swap is atomic, increments `active_version`, and stores the member-set digest and activation
+block. Ordinary producer churn can therefore change candidate capacity but can never turn a
+10-member active roster into a smaller roster. If replacements are insufficient, the old roster
+and denominator remain in force and attestation intentionally pauses rather than weakening quorum.
+
+Intentional shrink is separate. `propsnaprost` requires `sysio` authority, an exact current-version
+match, a unique and currently eligible member set, and at least `min_providers`. The proposal
+activates only at a later new-height boundary; ordinary reconciliation cannot enter this path. A
+provider excluded from the proposal cannot consume that boundary with an old-version vote: its
+transaction fails until an included member activates the approved roster.
 
 ### Voting and quorum
 
 After computing a snapshot, a provider calls `votesnaphash(snap_account, block_id,
 snapshot_hash)`. The contract checks that `snap_account` is a registered provider, derives
-`block_num` from `block_id`, and accumulates the vote.
+`block_num` from `block_id`, activates a ready roster only at the boundary described above, checks
+exact membership in that active roster, and accumulates the vote under its `active_version`.
 
 A hash is attested when the number of distinct, currently eligible providers voting for the same
 `(block_num, block_id, snapshot_hash)` tuple reaches:
@@ -153,36 +183,50 @@ A hash is attested when the number of distinct, currently eligible providers vot
 ```
 quorum = max(
     min_providers,
-    ceil(registered_providers * threshold_pct / 100),
-    floor(registered_providers / 3) + 1
+    ceil(active_roster_size * threshold_pct / 100),
+    floor(active_roster_size / 3) + 1
 )
 ```
 
 - `min_providers` is a hard floor (default 1; raised for mainnet) set by `setsnpcfg`.
-- `threshold_pct` is the share of registered provider mappings required (default 67, i.e.
+- `threshold_pct` is the share of the active roster required (default 67, i.e.
   two-thirds).
-- `floor(registered_providers / 3) + 1` is an independent Byzantine-safety floor. It prevents a
+- `floor(active_roster_size / 3) + 1` is an independent Byzantine-safety floor. It prevents a
   misconfigured low `threshold_pct` from allowing a Byzantine minority to attest a snapshot.
 
-The registered-provider denominator is deliberately stable: rank churn or producer deactivation
-must not lower the threshold for a permanent record. Current producer activity and rank control
-whether a pending vote contributes to the numerator. Provider membership changes are explicit:
-`delsnapprov` removes a mapping, and `regsnapprov` admits at most 30 mappings.
+The versioned active roster is the denominator. A pending voter contributes only while its exact
+producer/provider pair is still registered, the producer is active and rank-eligible, and the pair
+belongs to the bound roster version. Rank churn cannot silently lower the threshold for a permanent
+record.
 
-A provider may resubmit the same pending tuple after regaining eligibility. This is idempotent—its
-identity remains a single vote—but lets the contract re-evaluate the existing vote set without a
-separate keeper action. A producer cannot submit a different tuple for the same height.
+A producer contributes to at most one tuple per height and roster version. An exact retry is
+idempotent; a conflicting retry reports that the producer voted a different tuple. Old-version
+votes never carry into a new active roster, so continuing providers vote again under the new
+version. Votes for heights beyond the current chain block are rejected, so a member cannot pre-seed
+future snapshot boundaries under an old roster.
+
+`evalsnapvote` makes recovery public and deterministic. Any transaction may supply one pending
+row's exact id, tuple, and expected version. The action adds no vote and invokes the same bounded
+tally/finalization helper as `votesnaphash`. Missing ids, mismatched tuples, and future versions fail
+closed, except that an already-finalized matching tuple remains idempotent after its pending row is
+gone. An exact obsolete-version row is accepted as bounded cleanup work. A pending tuple that
+conflicts with an already-final record is also removed rather than reporting provider-local
+divergence. Each snapshot action scans at most 30 pending rows, persists the inclusive cursor and a
+monotonic finalized-height cleanup high-water, and applies both to every continuation page. Voting
+looks up only the exact `(block_num, roster_version)` index range, so historical roster versions
+cannot expand one action's tuple scan.
 
 The floor guarantees a minimum number of attestors even on a small network; the percentage
 makes the quorum scale with participation.
 
 ### Lifecycle and storage
 
-- Votes accumulate per `(block_num, block_id, snapshot_hash)`. Because snapshots are taken
+- Votes accumulate per `(roster_version, block_num, block_id, snapshot_hash)`. Because snapshots are taken
   at finalized (irreversible) blocks, the `block_id` for a given `block_num` is the same
   across all honest providers, so honest votes converge on one tuple.
 - When a tuple reaches quorum, the contract writes a `snap_record` to `snaprecords` and
-  purges the pending votes for that block. Only the compact attested record is retained,
+  records the exact roster version and digest, and performs bounded pending-vote cleanup. Only the
+  compact attested record is retained,
   keeping RAM use negligible over time.
 - After a block is attested, any later vote carrying a different hash for that block is
   rejected with error code `snap_hash_disagreement_error` (9001). This is the on-chain
@@ -208,9 +252,22 @@ When this option is set, `nodeop`:
    builds, signs, and submits a `votesnaphash` transaction. The transaction is authorized by
    `snap_account@active`; the signing key is resolved through the signature provider manager,
    so only the snap_account's key needs to be present on this node.
-3. If a submitted vote is rejected with error code 9001 (hash disagreement), logs a fatal
-   error and shuts the node down -- the node's snapshot disagreed with the attested record
-   and must not be trusted.
+3. If a submitted vote is rejected with error code 9001 against the reversible head, retains the
+   tuple and defers the terminal decision. The node shuts down only after the conflicting record's
+   `attested_at_block` is irreversible, avoiding a false quarantine when that block forks out.
+4. Every 120 irreversible blocks, retries its most recent local tuple until a matching final record
+   exists and reads up to five on-chain `snapvotes` rows. It submits each `evalsnapvote` separately,
+   advances a bounded cursor, and resets the cursor after reaching the end. The newest local tuple
+   supersedes any older unfinalized tuple. Both that tuple and the cursor are atomically persisted in
+   `snapshot-provider-recovery.json` under `snapshots-dir`, bound to the configured chain id and
+   provider account, so recovery resumes after restart while the chain remains authoritative. A
+   final record clears the local tuple only when both block id and snapshot hash match and the
+   record's `attested_at_block` is no higher than the observed irreversible block. Either mismatch in
+   an irreversible record is fatal; the tuple and a durable quarantine latch remain in the sidecar.
+   Recovery runs before pending snapshot promotion, and a newly finalized local snapshot may replace an older
+   tuple only after the chain confirms that the older tuple has not finalized incompatibly. Every
+   restart fails immediately while quarantined, until the operator investigates and explicitly
+   removes the recovery state.
 
 Role exclusivity is enforced at startup: `snapshot-provider-account` cannot be combined with
 `producer-name`.
@@ -235,10 +292,12 @@ which performs ABI decoding) and resolves as follows:
 
 | Condition | Result |
 |-----------|--------|
-| Record found; hash matches the loaded snapshot hash | Success; logged, verification complete. |
-| Record found; hash differs from the loaded snapshot hash | Fatal error; node halts. |
+| Record found, but its `attested_at_block` is still reversible | Pending; retry after finality advances. |
+| Irreversible record found; hash matches the loaded snapshot hash | Success; logged, verification complete. |
+| Irreversible record found; hash differs from the loaded snapshot hash | Fatal error; node halts. |
+| Table read fails or times out while syncing | Pending; retry on the next finalized block. |
+| Table read fails or times out after catching up | Fatal error; node halts rather than remaining unverified. |
 | No record; node still syncing | Pending; retry on the next finalized block. |
-| No record; caught up; system contract ABI has no `snaprecords` table | Warning (chain does not support attestation); verification skipped. |
 | No record; caught up; within the grace window | Pending; retry on the next finalized block. |
 | No record; caught up; grace window exhausted | Warning (height was never attested); verification skipped. |
 | Unexpected error during verification | Fatal error; node halts. |
@@ -252,16 +311,15 @@ caught up *and* the finalized head is at least 12,500 blocks past the snapshot h
 
 Two implementation details worth knowing as an operator:
 
-- The system contract's ABI is re-checked on every attempt, so a system-contract upgrade
-  that adds attestation support while the node is still syncing is picked up and verification
-  proceeds normally.
+- Immediately after loading a snapshot, startup requires the snapshot's system contract ABI
+  to declare the `snaprecords` table. A snapshot without the current attestation interface is
+  rejected instead of being treated as a legacy chain.
 - Verification cannot happen before the snapshot is loaded -- there is no chain state to
   query until then. The node loads the snapshot optimistically and verifies from synced
   on-chain state as it catches up.
 
-The permissive terminal outcomes (warn and continue when no table or no record exists) are
-deliberate for manual `--snapshot` use: operators can load their own snapshots, and chains
-whose system contract predates attestation still work. A hash *mismatch* is never permissive:
+The permissive terminal outcome when no record exists is deliberate for manual `--snapshot`
+use: operators can load their own snapshots taken at unattested heights. A hash *mismatch* is never permissive:
 the node stops, and the recommended recovery is to delete the chain state derived from the
 untrusted snapshot and acquire a fresh snapshot from a trusted source before restarting.
 The HTTP bootstrap path (`plugins/snapshot_api_plugin/README.md`) applies strict enforcement
@@ -306,22 +364,27 @@ clio push action sysio votesnaphash \
   hashes for the same block, votes would never converge. The fixed snapshot format and
   canonical section ordering remove that ambiguity.
 - A divergent snapshot is caught from both directions: a provider whose snapshot disagrees
-  with an attested record is rejected on vote (error 9001) and self-halts; a joining node
-  whose loaded snapshot disagrees with the attested record halts on verification.
+  with an attested record is rejected on vote (error 9001), retains its tuple, and self-halts once
+  the conflicting record is irreversible; a joining node whose loaded snapshot disagrees with the
+  irreversible attested record halts on verification.
 - The attestation only certifies a hash. Confidentiality and availability of the snapshot
   files themselves are the distribution layer's concern (rate limiting, TLS, access control
   at a reverse proxy), described with the `snapshot_api_plugin`.
 
 ## Testing
 
-- Contract tests (`contracts/tests/sysio.snapshot_attest_tests.cpp`) cover registration and
-  deregistration (including wrong-authority and rank-too-high rejection), config validation
-  and authority, vote accumulation, quorum by floor and by percentage, post-attestation
-  disagreement rejection, vote purging, and the `getsnaphash` query.
-- Unit tests (`unittests/snapshot_attest_tests.cpp`) cover snapshot round-trip hash
-  stability, a full chain whose snapshot hash matches its on-chain record, mismatch
-  detection, the no-attestation case, and survival of attestation state across a snapshot
-  load.
+- Contract tests (`contracts/tests/sysio.snapshot_attest_tests.cpp`) cover bounded candidate
+  registration and reconciliation, deterministic replacement, versioned roster activation,
+  governance shrink proposals, quorum floors, permissionless recovery, bounded cleanup,
+  disagreement rejection, and record queries.
+- Host tests cover snapshot round-trip persistence (`unittests/snapshot_attest_tests.cpp`),
+  provider retry/quarantine and startup ordering
+  (`plugins/producer_plugin/test/test_snapshot_attestation_recovery.cpp`), exact automatic
+  scheduling (`plugins/producer_plugin/test/test_options.cpp`), and strict chain-plugin startup,
+  grace, retry, and table-read policies (`plugins/chain_plugin/test/plugin_config_test.cpp`).
 - An integration test (`tests/snapshot_attest_test.py`) drives the full flow: create a
   snapshot, vote to quorum, verify the `snaprecords` entry, restart a node from the attested
   snapshot, sync from peers, and confirm the attestation on the synced node.
+- `tests/snapshot_in_svnn_transition_test.py` verifies that snapshots taken before the Savanna
+  transition finalizes restart successfully while BIOS remains active with the real `snaprecords`
+  table and `snap_record` struct declarations merged into its ABI.
