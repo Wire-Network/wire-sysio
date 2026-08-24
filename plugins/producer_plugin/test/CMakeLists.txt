@@ -12,5 +12,8 @@ target_link_libraries( test_producer_plugin producer_plugin sysio_testing sysio_
 target_include_directories(test_producer_plugin PRIVATE
         ${CMAKE_SOURCE_DIR}/contracts/tests
         ${CMAKE_BINARY_DIR}/contracts/tests)
-add_dependencies(test_producer_plugin contracts_project)
+# Artifact-copy CI configurations intentionally omit the source-built contracts target.
+if(TARGET contracts_project)
+    add_dependencies(test_producer_plugin contracts_project)
+endif()
 add_p_test(NAME test_producer_plugin COMMAND plugins/producer_plugin/test/test_producer_plugin)
