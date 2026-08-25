@@ -13,6 +13,7 @@
 #include <string_view>
 
 #include "async_action_completion.hpp"
+#include "group_election.hpp"
 
 #include <sysio/batch_operator_plugin/batch_operator_plugin.hpp>
 #include <sysio/batch_operator_plugin/depot_ops.hpp>
@@ -51,9 +52,6 @@ namespace {
    constexpr std::size_t EPOCH_TICK_CRON_JOBS = 1;
    /// Exact secondary-index lookups should return at most the matching row.
    constexpr uint32_t EXACT_LOOKUP_LIMIT = 1;
-
-   /// my_group sentinel meaning "we are not in any batch-op group".
-   constexpr uint8_t GROUP_NONE = 255;
 
    // ── WIRE contract identifiers (actions, tables, indexes, field names) ──
    // Centralised so a contract rename/refactor shows up as one search hit,
@@ -163,11 +161,12 @@ struct batch_operator_plugin::impl {
 
    // Epoch state tracked across polls
    uint32_t                 current_epoch = 0;
-   uint8_t                  my_group = 255;
-   bool                     is_elected = false;
+   /// This operator's standing for `current_epoch`. Retained across polls
+   /// because the election is decided in `parse_epoch_state` but reported in
+   /// `do_poll_epoch_state`.
+   batch_operator_detail::group_election election;
    fc::time_point           epoch_start;
    fc::time_point           next_epoch_start;
-   std::vector<chain::name> current_group_members;
    std::vector<outpost_descriptor> outposts;
 
    // Operator awareness — set by `poll_own_status()` from sysio.opreg::operators.
@@ -280,7 +279,7 @@ struct batch_operator_plugin::impl {
       }
 
       bool     within_epoch_window() const override { return _impl.within_epoch_window(); }
-      bool     is_elected()         const override { return _impl.is_elected; }
+      bool     is_elected()         const override { return _impl.election.is_elected; }
       uint32_t current_epoch()      const override { return _impl.current_epoch; }
       bool     is_epoch_boundary_past() const override {
          // `next_epoch_start` is cached on `_impl` from
@@ -358,7 +357,7 @@ struct batch_operator_plugin::impl {
       // chkcons advances the epoch on consensus. Only the elected operator
       // should push it — the contract verifies authorization regardless,
       // but pushing from every batch op wastes trx slots.
-      if (is_elected) {
+      if (election.is_elected) {
          try {
             push_action(msgch::account, msgch::action_chkcons, operator_account,
                         fc::mutable_variant_object());
@@ -508,39 +507,22 @@ struct batch_operator_plugin::impl {
       bool     paused      = obj[epoch::field::is_paused].as_bool();
 
       if (paused) {
-         if (is_elected) {
+         if (election.is_elected) {
             ilog("batch_operator: epoch paused, suspending");
-            is_elected = false;
+            election.is_elected = false;
          }
          return {false, 0};
       }
 
       // Determine group assignment
-      my_group = GROUP_NONE;
-      current_group_members.clear();
-      auto groups_arr = obj[epoch::field::batch_op_groups].get_array(); // copy, not reference
-
-      for (uint8_t g = 0; g < groups_arr.size(); ++g) {
-         auto grp = groups_arr[g].get_array(); // copy
-         for (auto& member : grp) {
-            if (chain::name(member.as_string()) == operator_account) {
-               my_group = g;
-            }
-         }
-         if (g == cur_group) {
-            for (auto& member : grp) {
-               current_group_members.push_back(chain::name(member.as_string()));
-            }
-         }
-      }
-
-      is_elected = (my_group == cur_group);
+      election = batch_operator_detail::evaluate_group_election(
+         cur_group, obj[epoch::field::batch_op_groups].get_array(), operator_account);
 
       // Parse epoch timing
       fc::from_variant(obj[epoch::field::current_epoch_start], epoch_start);
       fc::from_variant(obj[epoch::field::next_epoch_start],    next_epoch_start);
 
-      if (is_elected) {
+      if (election.is_elected) {
          ilog("batch_operator: current_epoch={}", epoch_index);
       }
 
@@ -565,10 +547,9 @@ struct batch_operator_plugin::impl {
       // recorded during `evalcons` dispatch and the epoch time gate are met —
       // but they never AUTHORIZE bootstrap or advance directly.
 
-      if (!is_elected) {
+      if (!election.is_elected) {
          if (epoch_index != current_epoch) {
-            ilog("batch_operator: not elected for epoch {} (my_group={}, active_group={})",
-                 epoch_index, my_group, (epoch_index % 3));
+            ilog("{}", batch_operator_detail::not_elected_message(epoch_index, election));
          }
          // Keep current_epoch fresh even when not elected: per-outpost jobs
          // consult it via depot_ops, and they bail on !is_elected anyway.
@@ -578,7 +559,7 @@ struct batch_operator_plugin::impl {
 
       if (epoch_index != current_epoch) {
          ilog("batch_operator: ELECTED for epoch {} (group {}, {} members)",
-              epoch_index, my_group, current_group_members.size());
+              epoch_index, election.my_group, election.current_group_members.size());
       }
       current_epoch = epoch_index;
       // Refresh the outpost list so governance-added outposts become visible.
