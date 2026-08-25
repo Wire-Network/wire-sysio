@@ -626,14 +626,16 @@ fc::network::solana::solana_public_key derive_collateral_position_pda(
       program_id).first;
 }
 
-/// Derive the per-`token_code` `collateral_vault` PDA. Full contract on the
-/// header declaration.
+/// Derive the per-`(token_code, custody_mint)` `collateral_vault` PDA. Full
+/// contract on the header declaration.
 fc::network::solana::solana_public_key derive_collateral_vault_pda(
    const fc::network::solana::solana_public_key& program_id,
-   uint64_t token_code) {
+   uint64_t token_code,
+   const fc::network::solana::solana_public_key& custody_mint) {
    return fc::network::solana::system::find_program_address(
       {std::vector<uint8_t>(COLLATERAL_VAULT_SEED.begin(), COLLATERAL_VAULT_SEED.end()),
-       u64_seed(token_code)},
+       u64_seed(token_code),
+       pubkey_seed(custody_mint)},
       program_id).first;
 }
 
@@ -894,7 +896,7 @@ std::vector<std::vector<fc::network::solana::account_meta>> build_dispatch_manif
          // this manifest must move together.
          const auto settlement_owner =
             effect.shape == effect_shape::slash ? reserve_aggregate : *effect.recipient;
-         add(derive_collateral_vault_pda(program_id, collateral_token_code), true);
+         add(derive_collateral_vault_pda(program_id, collateral_token_code, custody.mint), true);
          add(fc::network::solana::system::get_associated_token_address(
                 settlement_owner, custody.mint),
              true);

@@ -1536,7 +1536,7 @@ BOOST_AUTO_TEST_CASE(build_manifests_follows_collateral_custody_per_position) tr
    BOOST_CHECK(manifest_has(native, manifest_detail::derive_collateral_position_pda(
                                       harness.program_id, native_operator, token_code)));
    BOOST_CHECK(!manifest_has(native, manifest_detail::derive_collateral_vault_pda(
-                                       harness.program_id, token_code)));
+                                       harness.program_id, token_code, spl_mint)));
    BOOST_CHECK(!manifest_has(native, system::program_ids::TOKEN_PROGRAM));
 
    // SPL position, same token code: position + collateral vault + operator's
@@ -1547,7 +1547,7 @@ BOOST_AUTO_TEST_CASE(build_manifests_follows_collateral_custody_per_position) tr
    BOOST_CHECK(manifest_has(spl, manifest_detail::derive_collateral_position_pda(
                                    harness.program_id, spl_operator, token_code)));
    BOOST_CHECK(manifest_has(spl, manifest_detail::derive_collateral_vault_pda(
-                                   harness.program_id, token_code)));
+                                   harness.program_id, token_code, spl_mint)));
    BOOST_CHECK(manifest_has(spl, system::get_associated_token_address(spl_operator, spl_mint)));
    BOOST_CHECK(manifest_has(spl, system::program_ids::TOKEN_PROGRAM));
 
@@ -1597,7 +1597,7 @@ BOOST_AUTO_TEST_CASE(build_manifests_slash_settles_into_reserve_aggregate_ata) t
    BOOST_CHECK(manifest_has(spl, manifest_detail::derive_collateral_position_pda(
                                    harness.program_id, spl_operator, token_code)));
    BOOST_CHECK(manifest_has(spl, manifest_detail::derive_collateral_vault_pda(
-                                   harness.program_id, token_code)));
+                                   harness.program_id, token_code, spl_mint)));
    BOOST_CHECK(manifest_has(
       spl, system::get_associated_token_address(harness.reserve_aggregate, spl_mint)));
    BOOST_CHECK(!manifest_has(spl, system::get_associated_token_address(spl_operator, spl_mint)));
@@ -1647,7 +1647,7 @@ BOOST_AUTO_TEST_CASE(build_manifests_deposit_revert_declares_spl_refund_accounts
    BOOST_CHECK(manifest_has(spl, manifest_detail::derive_collateral_position_pda(
                                    harness.program_id, spl_depositor, token_code)));
    BOOST_CHECK(manifest_has(spl, manifest_detail::derive_collateral_vault_pda(
-                                   harness.program_id, token_code)));
+                                   harness.program_id, token_code, spl_mint)));
    BOOST_CHECK(manifest_has(spl, system::get_associated_token_address(spl_depositor, spl_mint)));
    BOOST_CHECK(manifest_has(spl, system::program_ids::TOKEN_PROGRAM));
 } FC_LOG_AND_RETHROW();

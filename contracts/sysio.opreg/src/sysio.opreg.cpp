@@ -435,13 +435,19 @@ find_balance(const opreg::operator_entry& op,
    return nullptr;
 }
 
+/// Return true when the operator has entered a permanent punishment or
+/// removal state that collateral changes must never reverse.
+bool has_terminal_status(OperatorStatus status) {
+   return status == OperatorStatus::OPERATOR_STATUS_SLASHED ||
+          status == OperatorStatus::OPERATOR_STATUS_TERMINATED;
+}
+
 /// Compute available balance for a given (op, chain, token). The single
 /// rollup formula: balance - sum(active locks) - sum(pending withdraws),
 /// gated by status. Slashed / terminated operators read as zero.
 uint64_t available_inline(const opreg::operator_entry& op,
                           sysio::slug_name chain_code, sysio::slug_name token_code) {
-   if (op.status == OperatorStatus::OPERATOR_STATUS_SLASHED ||
-       op.status == OperatorStatus::OPERATOR_STATUS_TERMINATED) {
+   if (has_terminal_status(op.status)) {
       return 0;
    }
    const auto* bal = find_balance(op, chain_code, token_code);
@@ -838,6 +844,13 @@ void emit_withdraw_remit(name self,
 
 namespace {
 
+/// Re-evaluate whether an operator's available collateral still satisfies the
+/// configured minimums after a balance or reservation change.
+void reevaluate_eligibility(opreg::operators_t& ops,
+                            const opreg::operator_key& op_pk,
+                            name self,
+                            name account);
+
 /// Result of `try_enqueue_withdraw` — non-throwing variant for the
 /// msgch-dispatched `withdrawinle` path so failures get logged on the
 /// operator's row instead of reverting the inbound dispatch tx.
@@ -974,6 +987,9 @@ void opreg::withdraw(name account, uint64_t amount) {
    auto action = build_withdraw_request_action(account, kWireChainCode, kWireTokenCode, amount,
                                                result.request_id);
    append_action_log(ops, op_pk, action, result.success, std::move(result.error_message));
+   if (result.success) {
+      reevaluate_eligibility(ops, op_pk, get_self(), account);
+   }
 }
 
 // ---------------------------------------------------------------------------
@@ -1000,6 +1016,9 @@ void opreg::withdrawinle(name account,
    auto action = build_withdraw_request_action(account, chain_code, token_code, amount,
                                                result.request_id);
    append_action_log(ops, op_pk, action, result.success, std::move(result.error_message));
+   if (result.success) {
+      reevaluate_eligibility(ops, op_pk, get_self(), account);
+   }
 }
 
 // ---------------------------------------------------------------------------
@@ -1012,17 +1031,25 @@ void opreg::cancelwtdw(name account, uint64_t request_id) {
    auto row = queue.get(wkey, "withdraw request not found");
    check(row.account == account, "not your withdraw request");
    queue.erase(wkey);
+
+   operators_t ops(get_self());
+   auto op_pk = operator_key{account.value};
+   if (ops.contains(op_pk)) {
+      reevaluate_eligibility(ops, op_pk, get_self(), account);
+   }
 }
 
 // ---------------------------------------------------------------------------
-//  Eligibility re-check helper — invoked at the end of deposit/depositinle
+//  Eligibility re-check helper — invoked after collateral availability changes
 // ---------------------------------------------------------------------------
 namespace {
 
-/// After a balance change, re-evaluate whether the operator now meets the
-/// minimum-collateral threshold for their type. If the eligibility flipped
-/// vs the prior status, fan out to the per-type processor (`processprod` /
-/// `processbatch` / `processuw`) which owns the active/standby transition.
+/// After a balance or reservation change, re-evaluate whether the operator now
+/// meets the minimum-collateral threshold for their type. Terminal punishment
+/// and removal states are never reevaluated. If eligibility flipped versus the
+/// prior status, fan out to the per-type processor
+/// (`processprod` / `processbatch` / `processuw`) which owns the active/standby
+/// transition.
 void reevaluate_eligibility(opreg::operators_t& ops,
                             const opreg::operator_key& op_pk,
                             name self,
@@ -1031,6 +1058,7 @@ void reevaluate_eligibility(opreg::operators_t& ops,
    if (!cfg_tbl.exists()) return;
    auto cfg = cfg_tbl.get();
    auto refreshed = ops.get(op_pk);
+   if (has_terminal_status(refreshed.status)) return;
    bool was_eligible = (refreshed.status == OperatorStatus::OPERATOR_STATUS_ACTIVE);
    bool is_eligible  = meets_role_min(refreshed, cfg);
    if (was_eligible == is_eligible) return;
@@ -1300,11 +1328,14 @@ void opreg::flushwtdw(uint32_t current_epoch) {
       }
       append_action_log(ops, op_pk, remit_action, true, "");
 
+      // Remove the matured reservation before eligibility is recomputed. The
+      // balance debit already accounts for this withdrawal; leaving the queue
+      // row visible would make available_inline subtract the same amount twice.
+      queue.erase(wkey);
+
       // Re-check eligibility — this withdraw may have dropped the operator
       // below the role minimum.
       reevaluate_eligibility(ops, op_pk, get_self(), row.account);
-
-      queue.erase(wkey);
    }
 }
 
@@ -1322,6 +1353,12 @@ void process_eligibility_change(name self, name account,
    opreg::operators_t ops(self);
    auto op_pk = opreg::operator_key{account.value};
    check(ops.contains(op_pk), "operator not found");
+
+   // Eligibility callbacks are inline today, but the terminal-state invariant
+   // belongs at the transition sink as well as at each caller. A stale or
+   // newly introduced callback must never reactivate an operator after slash
+   // or termination merely because its collateral predicate says eligible.
+   if (has_terminal_status(ops.get(op_pk).status)) return;
 
    auto now = current_time_ms();
    if (!was_eligible && is_eligible) {
