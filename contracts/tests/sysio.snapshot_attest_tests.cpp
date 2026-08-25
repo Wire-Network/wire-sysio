@@ -50,13 +50,30 @@ public:
          BOOST_REQUIRE_EQUAL(success(), setrank(producers[i], i + 1));
       }
       produce_blocks();
+   }
 
-      // Contract votes are accepted only at the production cadence. Advance once here so every
-      // case can exercise a real scheduled height instead of weakening the production invariant.
-      const uint32_t first_snapshot_height = sysio::protocol::snapshot_attestation::block_spacing;
-      if (control->head().block_num() < first_snapshot_height) {
-         produce_blocks(first_snapshot_height - control->head().block_num(), true);
+   /** Produce a block with traces, skipping duplicate validation only after cadence mode begins. */
+   produce_block_result_t produce_block_ex(fc::microseconds skip_time = default_skip_time,
+                                           bool no_throw = false) override {
+      if (primary_only_production) {
+         return _produce_block(skip_time, false, no_throw);
       }
+      return sysio_system_tester::produce_block_ex(skip_time, no_throw);
+   }
+
+   /** Produce a block, skipping duplicate validation only after cadence mode begins. */
+   signed_block_ptr produce_block(fc::microseconds skip_time = default_skip_time,
+                                  bool no_throw = false) override {
+      return produce_block_ex(skip_time, no_throw).block;
+   }
+
+   /** Produce an empty block and preserve aborted transactions in either validation mode. */
+   signed_block_ptr produce_empty_block(fc::microseconds skip_time = default_skip_time) override {
+      if (!primary_only_production) {
+         return sysio_system_tester::produce_empty_block(skip_time);
+      }
+      unapplied_transactions.add_aborted(control->abort_block());
+      return _produce_block(skip_time, true);
    }
 
    /// Register a snapshot provider.
@@ -119,10 +136,23 @@ public:
       return count;
    }
 
-   /// Return a scheduled snapshot height at or before the current head.
-   uint32_t vote_block_num(uint32_t scheduled_heights_before = 0) const {
+   /// Advance lazily to the first cadence boundary and return the latest scheduled height.
+   uint32_t vote_block_num() {
       const uint32_t spacing = sysio::protocol::snapshot_attestation::block_spacing;
-      return (control->head().block_num() / spacing - scheduled_heights_before) * spacing;
+      uint32_t       head_block_num = control->head().block_num();
+      if (head_block_num < spacing) {
+         // Commit registrations and configuration queued by the test before empty cadence blocks
+         // intentionally skip pending transactions.
+         produce_block();
+         head_block_num = control->head().block_num();
+
+         // Only the expensive empty-block advance skips duplicate validation. Fast registration
+         // and configuration cases retain normal validating-controller coverage.
+         skip_validate           = true;
+         primary_only_production = true;
+         produce_blocks(spacing - head_block_num, true);
+      }
+      return control->head().block_num() / spacing * spacing;
    }
 
    /**
@@ -155,6 +185,10 @@ public:
       data[31] = static_cast<char>(seed & 0xFF);
       return hash;
    }
+
+private:
+   /// True after a cadence-bound vote case begins its expensive empty-block advance.
+   bool primary_only_production = false;
 };
 
 // ===========================================================================

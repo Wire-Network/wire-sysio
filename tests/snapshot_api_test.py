@@ -350,19 +350,21 @@ try:
     # ---------------------------------------------------------------
     Print("=== Test 9: Reject specific manual snapshot endpoint ===")
 
-    # The failed bootstrap process is already stopped; wipe its partial state again.
-    bootstrapNode.removeDataDir(rmBlocks=True)
+    # A failed relaunch does not replace the node's saved command. Pass the destructive bootstrap
+    # options explicitly again so partial state is cleared even when initialization exited before
+    # recreating the state directory.
 
     # Request the first manual snapshot by block number in the URL.
-    # Use addSwapFlags to replace --snapshot-endpoint value (avoid duplicate flags
-    # from the previous relaunch which stored the modified cmd).
     endpointUrlWithBlock = f"{endpointUrl}/{snapBlockNum}"
     Print(f"Restart with --snapshot-endpoint {endpointUrlWithBlock}")
 
     isRelaunchSuccess = bootstrapNode.relaunch(
-        addSwapFlags={"--snapshot-endpoint": endpointUrlWithBlock}, timeout=10)
+        chainArg=f"--delete-all-blocks --snapshot-endpoint {endpointUrlWithBlock}", timeout=10)
     assert not isRelaunchSuccess, \
         "Bootstrap should reject an unattestable specific manual snapshot"
+    assert bootstrapNode.findInLog(
+        rf"Snapshot endpoint returned unscheduled block #{snapBlockNum}") is not None, \
+        "Missing specific-block snapshot endpoint diagnostic"
     assert not list(bootstrapNode.data_dir.glob("snapshots/snapshot-bootstrap-*.bin")), \
         "Specific unscheduled endpoint snapshot was downloaded before rejection"
 
