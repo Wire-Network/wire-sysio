@@ -37,7 +37,11 @@ inline constexpr uint32_t T3_MAX_NODE_OWNERS = 1000;
 // Each recorded roster can contain at most sysio.epoch's 100 scheduled
 // operators. Keeping at most ten epochs of history bounds roster retention and
 // coalescing work. The joint cadence x roster-size guard below separately keeps
-// the expensive per-recipient payout work at the prior one-roster ceiling.
+// the expensive per-recipient payout work at the prior one-roster ceiling. At
+// the intended production topology of 21 operators per epoch, this permits a
+// maximum cadence of 4 (about 24 minutes at six-minute epochs). Raising the
+// credit cap requires separate evidence that a larger mandatory advance fits
+// the transaction CPU/KV budget.
 inline constexpr uint16_t MAX_PAY_CADENCE_EPOCHS = 10;
 inline constexpr uint32_t MAX_BATCH_PAYOUT_CREDITS = 100;
 // payepoch removes at most this many roster-history rows per payment. Normal
@@ -124,7 +128,8 @@ struct [[sysio::table("emitcfg"), sysio::contract("sysio.system")]] emission_con
    // every epoch (matches the original emissions behavior). The roster history
    // retained for a period is explicitly bounded at 10 epochs, while cadence x
    // operators_per_epoch is bounded separately to at most 100 recipient credits
-   // per payout. The period aggregate and per-recipient share-by-rounds math
+   // per payout. At 21 operators this makes 4 the maximum production cadence.
+   // The period aggregate and per-recipient share-by-rounds math
    // remain equivalent to summing per-epoch results. Must be in
    // [1, MAX_PAY_CADENCE_EPOCHS].
    uint16_t  pay_cadence_epochs;
@@ -489,9 +494,10 @@ struct [[sysio::table("epochlog"), sysio::contract("sysio.system")]] epoch_log {
    // this treasury and so never appears in this log.
    int64_t                fee_distributed   = 0;
    // Durable attribution for WIRE left in the treasury by the batch payout.
-   // The retained values include incomplete-history recovery, empty rosters,
-   // inactive members, and integer-division remainders. history_complete makes
-   // the recovery case distinguishable from ordinary eligibility shortfalls.
+   // Retained emission includes incomplete-history recovery; retained swept
+   // fees arise only from empty rosters, inactive members, or integer-division
+   // remainders because incomplete-history fees remain in sysio.reserv.
+   // history_complete distinguishes recovery from eligibility shortfalls.
    bool                   batch_history_complete   = false;
    int64_t                batch_emission_retained  = 0;
    int64_t                batch_fee_retained       = 0;

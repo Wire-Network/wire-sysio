@@ -144,9 +144,10 @@ Activate WIRE-343 in one quiesced maintenance window, with no
 pre-launch procedure because a complete immutable roster history is required
 to credit the batch-operator payout:
 
-1. Set `pay_cadence_epochs` to a value in `[1, 10]` before the window. New
-   writes are bounded to that range; an older stored value outside it is read
-   with an effective clamp until it is rewritten.
+1. Set `pay_cadence_epochs` to a value in `[1, 10]` that also satisfies
+   `pay_cadence_epochs * operators_per_epoch <= 100` before the window. At the
+   intended 21-operator topology, the maximum is 4. An older stored value
+   outside the accepted bounds is read with an effective clamp until rewritten.
 2. Prefer a completed payment period and verify that `t5state` has
    `pending_emission_amount == 0`, all `batch_group_epochs` counters are zero,
    and `batchepochs` is empty.
@@ -158,14 +159,15 @@ mixed or mid-period deployment. `rcrdbatch` prunes the exact oldest retained
 roster, and `payepoch` removes at most 20 history rows per payment, so even a
 malformed gapped table cannot turn cleanup into an unbounded `advance`.
 If `payepoch` sees missing, stale, non-contiguous, or over-cap history, it
-retains that period's batch-emission and swap-fee slices in the treasury,
-records the exact retained amounts and incomplete-history status in `epochlog`,
-and drains stale history monotonically before resuming batch payouts. Producer,
-capex, and governance processing still completes. The runtime also shortens a
-legacy cadence when necessary to keep batch credits at or below 100 per payout.
-This is a recovery path, not a replacement for the normal quiesced deployment.
-Do not downgrade while `batchepochs` is non-empty. T5 must also be initialized
-before its first successful epoch advance.
+retains that period's batch-emission slice in the treasury, leaves the swap-fee
+bucket in `sysio.reserv` for the next complete period, records the retained
+emission and incomplete-history status in `epochlog`, and drains stale history
+monotonically before resuming batch payouts. Producer, capex, and governance
+processing still completes. The runtime also shortens a legacy cadence when
+necessary to keep batch credits at or below 100 per payout. This is a recovery
+path, not a replacement for the normal quiesced deployment. Do not downgrade
+while `batchepochs` is non-empty. T5 must also be initialized before its first
+successful epoch advance.
 
 ## The two rules for future changes
 

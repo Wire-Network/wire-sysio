@@ -297,7 +297,8 @@ void epoch::setconfig(uint32_t epoch_duration_sec,
             : stored_pay_cadence;
          check(sysiosystem::emissions::batch_payout_work_fits(
                   effective_emit_cfg.pay_cadence_epochs, operators_per_epoch),
-               "pay_cadence_epochs x operators_per_epoch exceeds the batch payout credit safety cap (100)");
+               "stored sysio.system pay_cadence_epochs x operators_per_epoch "
+               "exceeds the batch payout credit safety cap (100)");
          sysiosystem::emissions::t5state_t t5s_tbl(SYSTEM_ACCOUNT);
          const int64_t pending =
             t5s_tbl.exists() ? t5s_tbl.get().pending_emission_amount : 0;

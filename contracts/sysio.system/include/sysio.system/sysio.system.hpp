@@ -631,8 +631,9 @@ namespace sysiosystem {
           * ACTUAL accrued-epoch count, rather than configured
           * pay_cadence_epochs, because a mid-period config change or shortened
           * genesis period can make those differ. Incomplete history retains the
-          * batch slice in treasury and is reset for the next period; it must
-          * never halt sysio.epoch::advance.
+          * batch-emission slice in treasury, leaves swap fees in sysio.reserv
+          * for a later complete period, and is reset for the next period; it
+          * must never halt sysio.epoch::advance.
           *
           * Runtime conditions (config missing, treasury exhausted, balance
           * insufficient) are caught upstream by the gate, which records the

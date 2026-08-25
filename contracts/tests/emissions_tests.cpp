@@ -507,6 +507,58 @@ public:
       produce_blocks(1);
    }
 
+   /// Current balance of sysio.reserv's batch-operator rewards bucket.
+   ///
+   /// Requires deploy_reserv(). A missing bucket is reported as zero.
+   int64_t reserv_reward_balance() {
+      const account_name RESERV = "sysio.reserv"_n;
+      auto data = get_row_by_account(RESERV, RESERV, "rewardbkt"_n, "rewardbkt"_n);
+      if (data.empty()) return 0;
+
+      const auto* meta = control->find_account_metadata(RESERV);
+      BOOST_REQUIRE(meta != nullptr);
+      abi_def def;
+      BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(meta->abi, def), true);
+      abi_serializer reserv_ser;
+      reserv_ser.set_abi(def, abi_serializer::create_yield_function(abi_serializer_max_time));
+      auto bucket = reserv_ser.binary_to_variant(
+         "rewards_bucket", data,
+         abi_serializer::create_yield_function(abi_serializer_max_time));
+      return static_cast<int64_t>(bucket["balance"].as_uint64());
+   }
+
+   /// Deploy sysio.reserv and seed its batch-operator rewards bucket with a
+   /// real bootstrap-window swap fee, returning the exact accrued balance.
+   int64_t seed_reserv_reward_bucket() {
+      const account_name RESERV = "sysio.reserv"_n;
+      const account_name UWRIT = "sysio.uwrit"_n;
+      deploy_reserv();
+
+      auto codename = [](std::string_view value) {
+         return mvo()("value", fc::slug_name{value}.value);
+      };
+      BOOST_REQUIRE_EQUAL(success(), push_reserv_action(RESERV, "regreserve"_n, mvo()
+         ("chain_code", codename("ETH"))("token_code", codename("ETH"))("reserve_code", codename("PRIMARY"))
+         ("name", "eth")("description", "")
+         ("initial_chain_amount", 1'000'000'000'000ULL)("initial_wire_amount", 1'000'000'000'000ULL)
+         ("source_token_precision", 9u)("connector_weight_bps", 5000u)("is_private", false)("owner", name{})));
+      BOOST_REQUIRE_EQUAL(success(), push_reserv_action(RESERV, "regreserve"_n, mvo()
+         ("chain_code", codename("SOLANA"))("token_code", codename("SOL"))("reserve_code", codename("PRIMARY"))
+         ("name", "sol")("description", "")
+         ("initial_chain_amount", 1'000'000'000'000ULL)("initial_wire_amount", 1'000'000'000'000ULL)
+         ("source_token_precision", 9u)("connector_weight_bps", 5000u)("is_private", false)("owner", name{})));
+      BOOST_REQUIRE_EQUAL(success(), push_reserv_action(UWRIT, "applyswap"_n, mvo()
+         ("src_chain_code", codename("ETH"))("src_token_code", codename("ETH"))("src_reserve_code", codename("PRIMARY"))
+         ("src_amount", 1'000'000'000ULL)
+         ("dst_chain_code", codename("SOLANA"))("dst_token_code", codename("SOL"))
+         ("dst_reserve_code", codename("PRIMARY"))
+         ("dst_amount", 100'000'000ULL)("underwriter", name{})));
+
+      const int64_t balance = reserv_reward_balance();
+      BOOST_REQUIRE_GT(balance, 0);
+      return balance;
+   }
+
    /// `sysio.reserv::wireclaims` balance owed to `acc`, or 0 when there is no row.
    /// Requires deploy_reserv(). Credited by paywire / refundwire, drained by claimwire, and
    /// reclaimed to the treasury by the retention sweep sysio.epoch::advance inlines.
@@ -2495,6 +2547,7 @@ BOOST_FIXTURE_TEST_CASE( payepoch_recovers_from_incomplete_batch_roster_history,
    // than aborting the inline sysio.epoch::advance path chain-wide.
    constexpr int64_t period_emission = 10'000;
    create_t5_holding_accounts();
+   const int64_t fee_total = seed_reserv_reward_bucket();
    BOOST_REQUIRE_EQUAL(success(), setemitcfg_defaults(config::system_account_name));
    BOOST_REQUIRE_EQUAL(success(), initt5(config::system_account_name, tpsec(head_secs())));
    BOOST_REQUIRE_EQUAL(success(),
@@ -2518,7 +2571,9 @@ BOOST_FIXTURE_TEST_CASE( payepoch_recovers_from_incomplete_batch_roster_history,
    BOOST_REQUIRE(!log["batch_history_complete"].as_bool());
    BOOST_REQUIRE_EQUAL(compute - producer_pool,
                        log["batch_emission_retained"].as<int64_t>());
+   BOOST_REQUIRE_EQUAL(int64_t(0), log["fee_distributed"].as<int64_t>());
    BOOST_REQUIRE_EQUAL(int64_t(0), log["batch_fee_retained"].as<int64_t>());
+   BOOST_REQUIRE_EQUAL(fee_total, reserv_reward_balance());
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( payepoch_seeds_initial_roster_history_at_activation_epoch, sysio_emissions_tester ) try {
@@ -2693,6 +2748,22 @@ BOOST_FIXTURE_TEST_CASE( emission_config_boundaries_cap_batch_payout_credit_work
    r = init_epoch_state(60, /*operators_per_epoch*/11, /*batch_op_groups_count*/3);
    BOOST_REQUIRE(r != success());
    require_substr(r, "pay_cadence_epochs x operators_per_epoch exceeds the batch payout credit safety cap (100)");
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( epoch_setconfig_names_prebootstrap_stored_cadence_in_work_bound_error,
+                         sysio_emissions_tester ) try {
+   // setemitcfg cannot validate the joint bound before sysio.epoch has a
+   // configuration. The first epoch setconfig must reject an incompatible
+   // roster size and point operators back to the already-stored system cadence.
+   BOOST_REQUIRE_EQUAL(success(),
+      setemitcfg_with_cadence(config::system_account_name, uint16_t(10)));
+
+   auto r = init_epoch_state(60, /*operators_per_epoch*/11,
+                             /*batch_op_groups_count*/3);
+   BOOST_REQUIRE(r != success());
+   require_substr(
+      r,
+      "stored sysio.system pay_cadence_epochs x operators_per_epoch exceeds the batch payout credit safety cap (100)");
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( epoch_setconfig_recovers_legacy_cadence_with_runtime_work_bound,
@@ -3849,56 +3920,8 @@ BOOST_FIXTURE_TEST_CASE( single_active_producer_full_active_share, sysio_emissio
 // more, the bucket is swept to 0 regardless, and the fee is NOT counted against
 // the emission treasury.
 BOOST_FIXTURE_TEST_CASE( payepoch_folds_swap_fee_rewards, sysio_emissions_tester ) try {
-   const account_name RESERV = "sysio.reserv"_n;
-   const account_name UWRIT  = "sysio.uwrit"_n;
-
    create_t5_holding_accounts();
-
-   // Deploy sysio.reserv (the single extra real contract this test stands up).
-   deploy_reserv();
-
-   // Local ABI serializer + slug_name helper for reserv reads/writes.
-   abi_serializer reserv_ser;
-   {
-      const auto* a = control->find_account_metadata( RESERV );
-      BOOST_REQUIRE( a != nullptr );
-      abi_def d;
-      BOOST_REQUIRE_EQUAL( abi_serializer::to_abi(a->abi, d), true );
-      reserv_ser.set_abi( d, abi_serializer::create_yield_function(abi_serializer_max_time) );
-   }
-   auto codename = [](std::string_view s) { return mvo()("value", fc::slug_name{s}.value); };
-   auto reward_balance = [&]() -> int64_t {
-      auto data = get_row_by_account(RESERV, RESERV, "rewardbkt"_n, "rewardbkt"_n);
-      if (data.empty()) return 0;
-      auto v = reserv_ser.binary_to_variant("rewards_bucket", data,
-                  abi_serializer::create_yield_function(abi_serializer_max_time));
-      return static_cast<int64_t>(v["balance"].as_uint64());
-   };
-
-   // --- Seed the rewards bucket via a real swap (still in the bootstrap window,
-   // current_epoch_index == 0, so regreserve is permitted) ---
-   BOOST_REQUIRE_EQUAL( success(), push_reserv_action(RESERV, "regreserve"_n, mvo()
-      ("chain_code", codename("ETH"))("token_code", codename("ETH"))("reserve_code", codename("PRIMARY"))
-      ("name", "eth")("description", "")
-      ("initial_chain_amount", 1'000'000'000'000ULL)("initial_wire_amount", 1'000'000'000'000ULL)
-      ("source_token_precision", 9u)("connector_weight_bps", 5000u)("is_private", false)("owner", name{}) ) );
-   BOOST_REQUIRE_EQUAL( success(), push_reserv_action(RESERV, "regreserve"_n, mvo()
-      ("chain_code", codename("SOLANA"))("token_code", codename("SOL"))("reserve_code", codename("PRIMARY"))
-      ("name", "sol")("description", "")
-      ("initial_chain_amount", 1'000'000'000'000ULL)("initial_wire_amount", 1'000'000'000'000ULL)
-      ("source_token_precision", 9u)("connector_weight_bps", 5000u)("is_private", false)("owner", name{}) ) );
-   // No winning underwriter on this settlement (`underwriter` unset): the whole
-   // fee falls through to the rewards bucket, which is the quantity payepoch
-   // drains. The underwriter half's own accrual + claim is covered by
-   // sysio.reserv_tests; this test is about the drain and who it reaches.
-   BOOST_REQUIRE_EQUAL( success(), push_reserv_action(UWRIT, "applyswap"_n, mvo()
-      ("src_chain_code", codename("ETH"))("src_token_code", codename("ETH"))("src_reserve_code", codename("PRIMARY"))
-      ("src_amount", 1'000'000'000ULL)
-      ("dst_chain_code", codename("SOLANA"))("dst_token_code", codename("SOL"))("dst_reserve_code", codename("PRIMARY"))
-      ("dst_amount", 100'000'000ULL)("underwriter", name{}) ) );
-
-   const int64_t fee_total = reward_balance();
-   BOOST_REQUIRE_GT( fee_total, 0 );
+   const int64_t fee_total = seed_reserv_reward_bucket();
 
    // --- Single full-round producer; advance to the cadence-1 pay-epoch ---
    setup_producers(1);
@@ -3943,7 +3966,7 @@ BOOST_FIXTURE_TEST_CASE( payepoch_folds_swap_fee_rewards, sysio_emissions_tester
 
    // The bucket was still swept to zero by the inline drain — the drain is
    // unconditional on there being a recipient, and it must not overdraw.
-   BOOST_REQUIRE_EQUAL( reward_balance(), 0 );
+   BOOST_REQUIRE_EQUAL( reserv_reward_balance(), 0 );
 
    // total_distributed counts emission only (producer_pool + capex + gov, with
    // the empty batch group's share staying in treasury) -- the fee is NOT
@@ -3965,51 +3988,10 @@ BOOST_FIXTURE_TEST_CASE( payepoch_folds_swap_fee_rewards, sysio_emissions_tester
 // batch pool and the entire fee pool. Asserts the recipient's balance delta and
 // the exact positive `epochlog.fee_distributed`.
 BOOST_FIXTURE_TEST_CASE( payepoch_pays_swap_fee_to_active_batch_operator, sysio_emissions_tester ) try {
-   const account_name RESERV    = "sysio.reserv"_n;
-   const account_name UWRIT     = "sysio.uwrit"_n;
    const account_name BATCH_OP  = "batchopa"_n;
 
    create_t5_holding_accounts();
-   deploy_reserv();
-
-   abi_serializer reserv_ser;
-   {
-      const auto* a = control->find_account_metadata( RESERV );
-      BOOST_REQUIRE( a != nullptr );
-      abi_def d;
-      BOOST_REQUIRE_EQUAL( abi_serializer::to_abi(a->abi, d), true );
-      reserv_ser.set_abi( d, abi_serializer::create_yield_function(abi_serializer_max_time) );
-   }
-   auto codename = [](std::string_view s) { return mvo()("value", fc::slug_name{s}.value); };
-   auto reward_balance = [&]() -> int64_t {
-      auto data = get_row_by_account(RESERV, RESERV, "rewardbkt"_n, "rewardbkt"_n);
-      if (data.empty()) return 0;
-      auto v = reserv_ser.binary_to_variant("rewards_bucket", data,
-                  abi_serializer::create_yield_function(abi_serializer_max_time));
-      return static_cast<int64_t>(v["balance"].as_uint64());
-   };
-
-   // --- Seed the rewards bucket with a real swap fee (bootstrap window) ---
-   BOOST_REQUIRE_EQUAL( success(), push_reserv_action(RESERV, "regreserve"_n, mvo()
-      ("chain_code", codename("ETH"))("token_code", codename("ETH"))("reserve_code", codename("PRIMARY"))
-      ("name", "eth")("description", "")
-      ("initial_chain_amount", 1'000'000'000'000ULL)("initial_wire_amount", 1'000'000'000'000ULL)
-      ("source_token_precision", 9u)("connector_weight_bps", 5000u)("is_private", false)("owner", name{}) ) );
-   BOOST_REQUIRE_EQUAL( success(), push_reserv_action(RESERV, "regreserve"_n, mvo()
-      ("chain_code", codename("SOLANA"))("token_code", codename("SOL"))("reserve_code", codename("PRIMARY"))
-      ("name", "sol")("description", "")
-      ("initial_chain_amount", 1'000'000'000'000ULL)("initial_wire_amount", 1'000'000'000'000ULL)
-      ("source_token_precision", 9u)("connector_weight_bps", 5000u)("is_private", false)("owner", name{}) ) );
-   // No winning underwriter, so the whole network fee lands in the rewards bucket
-   // — the quantity payepoch drains and must hand to the batch operator.
-   BOOST_REQUIRE_EQUAL( success(), push_reserv_action(UWRIT, "applyswap"_n, mvo()
-      ("src_chain_code", codename("ETH"))("src_token_code", codename("ETH"))("src_reserve_code", codename("PRIMARY"))
-      ("src_amount", 1'000'000'000ULL)
-      ("dst_chain_code", codename("SOLANA"))("dst_token_code", codename("SOL"))("dst_reserve_code", codename("PRIMARY"))
-      ("dst_amount", 100'000'000ULL)("underwriter", name{}) ) );
-
-   const int64_t fee_total = reward_balance();
-   BOOST_REQUIRE_GT( fee_total, 0 );
+   const int64_t fee_total = seed_reserv_reward_bucket();
 
    // --- A one-member rotation group, ACTIVE in opreg ---
    // Bootstrapped so the ACTIVE flip bypasses the collateral gate (see
@@ -4062,7 +4044,7 @@ BOOST_FIXTURE_TEST_CASE( payepoch_pays_swap_fee_to_active_batch_operator, sysio_
 
    // Bucket swept, and the fee is NOT charged against the emission curve —
    // total_distributed moves by the EMISSION only, excluding fee_total.
-   BOOST_REQUIRE_EQUAL( reward_balance(), 0 );
+   BOOST_REQUIRE_EQUAL( reserv_reward_balance(), 0 );
    const int64_t capex = log["capex_amount"].as<int64_t>();
    const int64_t gov   = log["governance_amount"].as<int64_t>();
    const int64_t t5_after = get_t5_state()["total_distributed"].as<int64_t>();
@@ -4084,48 +4066,10 @@ BOOST_FIXTURE_TEST_CASE( payepoch_pays_swap_fee_to_active_batch_operator, sysio_
 // zero fee makes the fee half of the bug invisible.
 BOOST_FIXTURE_TEST_CASE( cadence_drop_midperiod_does_not_multiply_batch_fee_payout,
                          sysio_emissions_tester ) try {
-   const account_name RESERV   = "sysio.reserv"_n;
-   const account_name UWRIT    = "sysio.uwrit"_n;
    const account_name BATCH_OP = "batchopb"_n;
 
    create_t5_holding_accounts();
-   deploy_reserv();
-
-   abi_serializer reserv_ser;
-   {
-      const auto* a = control->find_account_metadata( RESERV );
-      BOOST_REQUIRE( a != nullptr );
-      abi_def d;
-      BOOST_REQUIRE_EQUAL( abi_serializer::to_abi(a->abi, d), true );
-      reserv_ser.set_abi( d, abi_serializer::create_yield_function(abi_serializer_max_time) );
-   }
-   auto codename = [](std::string_view s) { return mvo()("value", fc::slug_name{s}.value); };
-   auto reward_balance = [&]() -> int64_t {
-      auto data = get_row_by_account(RESERV, RESERV, "rewardbkt"_n, "rewardbkt"_n);
-      if (data.empty()) return 0;
-      auto v = reserv_ser.binary_to_variant("rewards_bucket", data,
-                  abi_serializer::create_yield_function(abi_serializer_max_time));
-      return static_cast<int64_t>(v["balance"].as_uint64());
-   };
-
-   BOOST_REQUIRE_EQUAL( success(), push_reserv_action(RESERV, "regreserve"_n, mvo()
-      ("chain_code", codename("ETH"))("token_code", codename("ETH"))("reserve_code", codename("PRIMARY"))
-      ("name", "eth")("description", "")
-      ("initial_chain_amount", 1'000'000'000'000ULL)("initial_wire_amount", 1'000'000'000'000ULL)
-      ("source_token_precision", 9u)("connector_weight_bps", 5000u)("is_private", false)("owner", name{}) ) );
-   BOOST_REQUIRE_EQUAL( success(), push_reserv_action(RESERV, "regreserve"_n, mvo()
-      ("chain_code", codename("SOLANA"))("token_code", codename("SOL"))("reserve_code", codename("PRIMARY"))
-      ("name", "sol")("description", "")
-      ("initial_chain_amount", 1'000'000'000'000ULL)("initial_wire_amount", 1'000'000'000'000ULL)
-      ("source_token_precision", 9u)("connector_weight_bps", 5000u)("is_private", false)("owner", name{}) ) );
-   BOOST_REQUIRE_EQUAL( success(), push_reserv_action(UWRIT, "applyswap"_n, mvo()
-      ("src_chain_code", codename("ETH"))("src_token_code", codename("ETH"))("src_reserve_code", codename("PRIMARY"))
-      ("src_amount", 1'000'000'000ULL)
-      ("dst_chain_code", codename("SOLANA"))("dst_token_code", codename("SOL"))("dst_reserve_code", codename("PRIMARY"))
-      ("dst_amount", 100'000'000ULL)("underwriter", name{}) ) );
-
-   const int64_t fee_total = reward_balance();
-   BOOST_REQUIRE_GT( fee_total, 0 );
+   const int64_t fee_total = seed_reserv_reward_bucket();
 
    create_accounts( { BATCH_OP }, false, false, false, true );
    BOOST_REQUIRE_EQUAL( success(),
@@ -4169,7 +4113,7 @@ BOOST_FIXTURE_TEST_CASE( cadence_drop_midperiod_does_not_multiply_batch_fee_payo
    // The load-bearing assertion: the fee is distributed ONCE. Under the old
    // divisor this was 2 * fee_total, with the surplus drawn from the treasury.
    BOOST_REQUIRE_EQUAL( log["fee_distributed"].as<int64_t>(), fee_total );
-   BOOST_REQUIRE_EQUAL( reward_balance(), 0 );
+   BOOST_REQUIRE_EQUAL( reserv_reward_balance(), 0 );
 
    // And the emission side is not double-paid either.
    const int64_t capex = log["capex_amount"].as<int64_t>();

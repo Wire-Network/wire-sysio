@@ -717,17 +717,18 @@ void system_contract::rcrdbatch(uint32_t epoch_index, std::vector<sysio::name> m
 // dclaim has funds the moment a claim is credited rather than at the next
 // pay-epoch.
 //
-// Swap-fee rewards: the batch-operator share of collected swap fees
-// (sysio.reserv's rewards_bucket) is swept here via an inline drainrewards and
-// allocated EXCLUSIVELY to the batch-operator distribution, on top of their
-// emission share and weighted by the same historical-roster active-epoch count.
+// Swap-fee rewards: when immutable roster history is complete, the batch-operator
+// share of collected swap fees (sysio.reserv's rewards_bucket) is swept here via
+// an inline drainrewards and allocated EXCLUSIVELY to the batch-operator
+// distribution, on top of their emission share and weighted by the same
+// historical-roster active-epoch count. Incomplete history leaves the bucket in
+// sysio.reserv for a later complete period.
 // Producers are NOT paid out of swap fees, so producer_bps / batch_op_bps govern
 // the emission split only -- see the fold-in comment at the drain. Allocated is
-// not paid: only ELIGIBLE shares go out, and whatever is skipped stays in this
-// treasury, exactly as undistributed emission does. The audit row records the
-// retained batch emission and fees and whether roster history was complete.
-// Fees are funded by the sweep (not the treasury) and so are excluded from
-// total_distributed.
+// not paid: only ELIGIBLE shares go out, and any skipped amount from a completed
+// sweep stays in this treasury. The audit row records retained batch emission,
+// retained swept fees, and whether roster history was complete. Fees are funded
+// by the sweep (not the treasury) and so are excluded from total_distributed.
 //
 // Single-trx semantics guarantee gate conditions hold through this call;
 // payepoch trusts the gate-computed period_emission and does not recompute.
@@ -871,29 +872,31 @@ void system_contract::payepoch(uint32_t epoch_index,
    // `compute_amount` split only, and the entire drained fee pool goes to the
    // batch-op distribution below.
    //
-   // The fee WIRE lives in sysio.reserv's custody, so it must be swept here
-   // before the payouts below can spend it. drainrewards is queued FIRST (ahead
-   // of every payout transfer): inline actions execute depth-first, so the drain
-   // -- and the reserv->sysio transfer it queues -- run to completion before any
-   // sibling payout queued after it, landing the WIRE in this account's balance
+   // The fee WIRE lives in sysio.reserv's custody. Sweep it only when immutable
+   // roster history is complete; otherwise leave the bucket in reserv so a later
+   // complete period can distribute it. When swept, drainrewards is queued FIRST
+   // (ahead of every payout transfer): inline actions execute depth-first, so the
+   // drain -- and the reserv->sysio transfer it queues -- run to completion before
+   // any sibling payout queued after it, landing the WIRE in this account's balance
    // first. MUST remain ahead of the first send_wire_transfer below.
    //
    // Fees are funded by that transfer, NOT the T5 treasury, so fee payouts are
    // tracked in `fee_paid` and excluded from total_distributed (which governs
-   // the emission curve). Any fee not distributed stays in this treasury, exactly
-   // as undistributed emission does — see the batch-op loop for what is actually
-   // retained (incomplete history, an empty historical roster, non-ACTIVE
-   // members, or the two integer divisions' remainders).
-   const int64_t fee_total = get_reserv_rewards_balance();
-   if (fee_total > 0) {
-      sysio::action(
-         {get_self(), "active"_n},
-         RESERV_CONTRACT,
-         "drainrewards"_n,
-         std::make_tuple(fee_total)
-      ).send();
+   // the emission curve). After a complete-history sweep, any amount skipped for
+   // an empty roster, non-ACTIVE members, or integer-division remainders stays in
+   // this treasury. Incomplete history leaves the entire bucket in reserv.
+   int64_t fee_batch_pool = 0;
+   if (batch_history_complete) {
+      fee_batch_pool = get_reserv_rewards_balance();
+      if (fee_batch_pool > 0) {
+         sysio::action(
+            {get_self(), "active"_n},
+            RESERV_CONTRACT,
+            "drainrewards"_n,
+            std::make_tuple(fee_batch_pool)
+         ).send();
+      }
    }
-   const int64_t fee_batch_pool = fee_total;
 
    // "paid" here means DISTRIBUTED -- credited to `payclaims` for producers / standbys /
    // batch operators, transferred for the category buckets. Both leave the treasury's
@@ -1072,9 +1075,9 @@ void system_contract::payepoch(uint32_t epoch_index,
       }
    } else if (accrued_epochs > 0) {
       // Do not guess a roster during a mixed-version upgrade or an incomplete
-      // first period: retain its batch emission and swap-fee slices in the
-      // treasury, then let the next period establish a complete history.
-      sysio::print("batch roster history incomplete; retaining batch operator rewards for this period\n");
+      // first period: retain its batch emission in the treasury, leave swap fees
+      // in sysio.reserv, and let the next period establish complete history.
+      sysio::print("batch roster history incomplete; retaining batch emission and deferring swap fees\n");
    }
 
    const int64_t batch_emission_retained = batch_pool - batch_emission_paid;
