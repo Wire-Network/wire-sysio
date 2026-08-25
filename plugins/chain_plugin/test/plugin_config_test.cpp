@@ -62,6 +62,7 @@ constexpr auto other_snapshot_hash =
 constexpr auto unconfigured_attestation_error_fragment = "min_providers to be configured before bootstrap";
 constexpr uint16_t incompatible_table_id = 0;
 constexpr uint32_t snapshot_source_block_count = 3;
+constexpr uint32_t snapshot_block_log_extension_block_count = 3;
 constexpr uint32_t attestation_finality_block_count = 24;
 constexpr uint32_t snapshot_endpoint_response_count = 2;
 constexpr uint16_t ephemeral_port = 0;
@@ -177,6 +178,12 @@ fc::crypto::blake3 write_chain_plugin_snapshot(
    writer->write_section<sysio::chain::contract_root_object>([](auto&) {});
    writer->finalize();
    return writer->get_root_hash();
+}
+
+/** Advance a snapshot source until its retained block log includes the snapshot head. */
+template <typename Tester>
+void extend_block_log_past_snapshot(Tester& source) {
+   source.produce_blocks(snapshot_block_log_extension_block_count);
 }
 
 /** Build the exact attestation ABI fragment required before auto-fetched snapshot replay. */
@@ -476,6 +483,7 @@ BOOST_FIXTURE_TEST_CASE(
    fc::temp_directory snapshot_dir;
    const auto snapshot_path = snapshot_dir.path() / unconfigured_snapshot_filename;
    const auto snapshot_root_hash = write_chain_plugin_snapshot(*control, snapshot_path);
+   extend_block_log_past_snapshot(*this);
    const auto source_blocks_path = get_config().blocks_dir.string();
    validate_and_close();
 
@@ -535,6 +543,7 @@ BOOST_AUTO_TEST_CASE(chain_plugin_accepts_trusted_manual_snapshot_without_attest
    writer->write_section<sysio::chain::contract_root_object>([](auto&) {});
    writer->finalize();
 
+   extend_block_log_past_snapshot(source);
    const auto source_blocks_path = source.get_config().blocks_dir.string();
    source.close();
 
@@ -558,7 +567,7 @@ BOOST_AUTO_TEST_CASE(chain_plugin_accepts_trusted_manual_snapshot_without_attest
                  == sysio::chain::exit_code::SUCCESS);
    auto& plugin = appbase::app().get_plugin<sysio::chain_plugin>();
    plugin.plugin_startup();
-   BOOST_CHECK_EQUAL(plugin.chain().head().block_num(), snapshot_block_num);
+   BOOST_CHECK_GE(plugin.chain().head().block_num(), snapshot_block_num);
    BOOST_CHECK(!plugin.has_pending_snapshot_attestation());
    BOOST_CHECK(!appbase::app().is_quiting());
    plugin.plugin_shutdown();
