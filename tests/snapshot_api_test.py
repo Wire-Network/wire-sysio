@@ -350,16 +350,16 @@ try:
     # ---------------------------------------------------------------
     Print("=== Test 9: Reject specific manual snapshot endpoint ===")
 
-    # A failed relaunch does not replace the node's saved command. Pass the destructive bootstrap
-    # options explicitly again so partial state is cleared even when initialization exited before
-    # recreating the state directory.
+    # launchCmd saves the attempted command before readiness is checked, including for an expected
+    # startup failure. Reuse its --delete-all-blocks option and replace the endpoint instead of
+    # appending duplicate options that would fail before endpoint validation.
 
     # Request the first manual snapshot by block number in the URL.
     endpointUrlWithBlock = f"{endpointUrl}/{snapBlockNum}"
     Print(f"Restart with --snapshot-endpoint {endpointUrlWithBlock}")
 
     isRelaunchSuccess = bootstrapNode.relaunch(
-        chainArg=f"--delete-all-blocks --snapshot-endpoint {endpointUrlWithBlock}", timeout=10)
+        addSwapFlags={"--snapshot-endpoint": endpointUrlWithBlock}, timeout=10)
     assert not isRelaunchSuccess, \
         "Bootstrap should reject an unattestable specific manual snapshot"
     assert bootstrapNode.findInLog(
