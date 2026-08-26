@@ -420,6 +420,131 @@ BOOST_FIXTURE_TEST_CASE(get_required_keys_explicit_payer_tests, validating_teste
       produce_block();
    }
 
+   // --- Structural rules: discovery must refuse the pairings consensus refuses, rather than
+   //     reporting a key set for a transaction no signature can authorize. Each case asserts BOTH
+   //     that discovery throws AND that consensus rejects the same transaction, so the two cannot
+   //     drift apart. get_required_keys is reached directly by /v1/chain/get_required_keys, which
+   //     never runs validate_referenced_accounts, so it cannot rely on that earlier gate. ---
+   create_account( "bob"_n );
+   produce_block();
+   const auto bob_active_pub = get_public_key( "bob"_n, "active" );
+   const flat_set<public_key_type> keys_with_bob{ owner_pub, active_pub, custom_pub, bob_active_pub };
+
+   auto expect_both_reject = [&]( const signed_transaction& trx, const char* discovery_msg ) {
+      BOOST_CHECK_EXCEPTION( required_keys( trx, keys_with_bob ), fc::exception,
+                             fc_exception_message_starts_with( discovery_msg ) );
+      auto signed_trx = trx;
+      signed_trx.sign( active_key,   control->get_chain_id() );
+      signed_trx.sign( owner_key,    control->get_chain_id() );
+      signed_trx.sign( get_private_key( "bob"_n, "active" ), control->get_chain_id() );
+      BOOST_CHECK_THROW( push_transaction( signed_trx ), fc::exception );
+   };
+
+   auto payer_trx = [&]( vector<permission_level> auths ) {
+      signed_transaction trx;
+      trx.actions.emplace_back( std::move( auths ), "payloadless"_n, "doit"_n, bytes{} );
+      set_transaction_headers( trx );
+      return trx;
+   };
+
+   // Payer paired with a DIFFERENT actor: bob's key satisfies bob@active, but nothing authorizes
+   // payloadless as payer. Skipping the marker outright would have returned bob's key here.
+   expect_both_reject( payer_trx( { { "payloadless"_n, config::sysio_payer_name },
+                                    { "bob"_n,        config::active_name } } ),
+                       "Payer authorization for" );
+
+   // Payer with no real permission at all -- would otherwise discover an EMPTY key set, which a
+   // signing tool reads as "nothing to sign".
+   expect_both_reject( payer_trx( { { "payloadless"_n, config::sysio_payer_name } } ),
+                       "Payer authorization for" );
+
+   // Marker present but not at index 0.
+   expect_both_reject( payer_trx( { { "payloadless"_n, config::active_name },
+                                    { "payloadless"_n, config::sysio_payer_name } } ),
+                       "Explicit payer must be the first declared authorization" );
+
+   // Two markers on one action.
+   expect_both_reject( payer_trx( { { "payloadless"_n, config::sysio_payer_name },
+                                    { "payloadless"_n, config::active_name },
+                                    { "payloadless"_n, config::sysio_payer_name } } ),
+                       "Multiple payers specified for action" );
+
+   // Pairing must be on the SAME action: the marker is on action 0 while payloadless's real
+   // permission sits on action 1. Consensus scopes the pairing per-action, so discovery must too.
+   {
+      signed_transaction trx;
+      trx.actions.emplace_back(
+         vector<permission_level>{ { "payloadless"_n, config::sysio_payer_name },
+                                   { "bob"_n,        config::active_name } },
+         "payloadless"_n, "doit"_n, bytes{} );
+      trx.actions.emplace_back(
+         vector<permission_level>{ { "payloadless"_n, config::active_name } },
+         "payloadless"_n, "doit"_n, bytes{} );
+      set_transaction_headers( trx );
+      expect_both_reject( trx, "Payer authorization for" );
+   }
+
+   // --- Context-free actions contribute nothing and are not screened here. Consensus passes only
+   //     trn.actions to check_authorization, so CFAs are never authorization-checked there either;
+   //     the sole authorization one may carry is a keyless `sysio.payer` marker that inherits an
+   //     authorization proven on a regular action. Discovery mirrors check_authorization's rules,
+   //     not transaction_context's -- the CFA shape rule lives only in validate_referenced_accounts
+   //     and is deliberately left to it. ---
+   {
+      signed_transaction trx;
+      trx.context_free_actions.emplace_back(
+         vector<permission_level>{ { "payloadless"_n, config::sysio_payer_name } },
+         "payloadless"_n, "doit"_n, bytes{} );
+      trx.actions.emplace_back(
+         vector<permission_level>{ { "payloadless"_n, config::sysio_payer_name },
+                                   { "payloadless"_n, config::active_name } },
+         "payloadless"_n, "doit"_n, bytes{} );
+      set_transaction_headers( trx );
+
+      // The CFA's marker adds no key; only the regular action's paired permission does.
+      BOOST_CHECK( required_keys( trx, all_keys ) == flat_set<public_key_type>{ active_pub } );
+   }
+   {
+      // A CFA marker naming an actor that is NOT a payer in trx.actions is rejected by
+      // validate_referenced_accounts, but discovery does not walk CFAs and so does not throw.
+      // Asserting the asymmetry keeps it deliberate: a later change that starts screening CFAs
+      // here should have to update this expectation rather than silently widen the function.
+      signed_transaction trx;
+      trx.context_free_actions.emplace_back(
+         vector<permission_level>{ { "bob"_n, config::sysio_payer_name } },
+         "payloadless"_n, "doit"_n, bytes{} );
+      trx.actions.emplace_back(
+         vector<permission_level>{ { "payloadless"_n, config::sysio_payer_name },
+                                   { "payloadless"_n, config::active_name } },
+         "payloadless"_n, "doit"_n, bytes{} );
+      set_transaction_headers( trx );
+
+      BOOST_CHECK( required_keys( trx, keys_with_bob ) == flat_set<public_key_type>{ active_pub } );
+
+      auto signed_trx = trx;
+      signed_trx.sign( active_key, control->get_chain_id() );
+      BOOST_CHECK_EXCEPTION( push_transaction( signed_trx ), sysio::chain::transaction_exception,
+                             fc_exception_message_is(
+                                "context-free actions can only have a valid explicit payer authorization" ) );
+   }
+
+   // A well-formed payer action alongside an unrelated one still discovers normally -- the rules
+   // above must not reject a transaction merely for containing more than one action.
+   {
+      signed_transaction trx;
+      trx.actions.emplace_back(
+         vector<permission_level>{ { "payloadless"_n, config::sysio_payer_name },
+                                   { "payloadless"_n, config::active_name } },
+         "payloadless"_n, "doit"_n, bytes{} );
+      trx.actions.emplace_back(
+         vector<permission_level>{ { "bob"_n, config::active_name } },
+         "payloadless"_n, "doit"_n, bytes{} );
+      set_transaction_headers( trx );
+
+      BOOST_CHECK( required_keys( trx, keys_with_bob )
+                   == ( flat_set<public_key_type>{ active_pub, bob_active_pub } ) );
+   }
+
    BOOST_REQUIRE_EQUAL( validate(), true );
 } FC_LOG_AND_RETHROW() }
 
