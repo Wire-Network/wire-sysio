@@ -793,6 +793,31 @@ BOOST_AUTO_TEST_CASE( key_heap_size_covers_every_alternative ) { try {
    BOOST_TEST( heap_of( wa ) == shared_string_header_billable_size + 35u + rpid.size() );
 } FC_LOG_AND_RETHROW() }
 
+// check_deleteauth_authorization reports its own action name. The assert text was copied from
+// check_updateauth_authorization and named updateauth, which misidentifies the failing action --
+// especially in a transaction carrying both. Reaching this path needs a same-account authority
+// that does not satisfy the permission being deleted, which no other delete_auth case produces:
+// the existing ones cover a missing permission, a linked permission, and success.
+BOOST_AUTO_TEST_CASE( deleteauth_error_names_deleteauth ) { try {
+   validating_tester chain;
+   chain.create_accounts( {"alice"_n} );
+   chain.produce_block();
+
+   // Two siblings under active. Neither is an ancestor of the other, so neither satisfies the other.
+   chain.set_authority( "alice"_n, "perma"_n, authority( chain.get_public_key( "alice"_n, "perma" ) ),
+                        config::active_name );
+   chain.set_authority( "alice"_n, "permb"_n, authority( chain.get_public_key( "alice"_n, "permb" ) ),
+                        config::active_name );
+   chain.produce_block();
+
+   BOOST_CHECK_EXCEPTION(
+      chain.delete_authority( "alice"_n, "permb"_n,
+                              { permission_level{"alice"_n, "perma"_n} },
+                              { chain.get_private_key( "alice"_n, "perma" ) } ),
+      irrelevant_auth_exception,
+      fc_exception_message_starts_with( "deleteauth action declares irrelevant authority" ) );
+} FC_LOG_AND_RETHROW() }
+
 BOOST_AUTO_TEST_CASE( authority_without_waits ) { try {
    // Verify that authority without waits validates and works correctly
    validating_tester chain;
