@@ -92,10 +92,11 @@ billable size.
 
 **RAM** — persistent state: account rows, permissions, contract code, and every table row a
 contract writes. Measured in bytes. Unlike CPU and NET, RAM is not a rate — it is an occupancy
-level. It is consumed when state is written and released when state is deleted.
+level. It is consumed when state is written and released when state is deleted, or replaced by a
+smaller value — `setcode` and `setabi` apply a signed `new_size - old_size` delta.
 
 CPU and NET replenish continuously over an averaging window. RAM does not replenish; it is freed
-only by deleting the data holding it.
+only by deleting or shrinking the data holding it.
 
 ---
 
@@ -297,19 +298,16 @@ node owner has exactly the same policy powers as a tier-1 node owner. What diffe
 
 Registration consumes part of an owner's own budget — 10% of the tier allocation set aside into
 the network RAM pool, plus a flat personal policy for the owner's own account: 0.0080 SYS of RAM
-and 0.0500 SYS each of NET and CPU, 0.1080 SYS in total, the same for every tier. Using the launch
-configuration of 75,496 SYS `total_sys`:
-
-> This section describes current `master`. [#585](https://github.com/Wire-Network/wire-sysio/pull/585)
-> provisions the personal policy for tier 1 only, which returns 0.1080 SYS to every tier-2 and
-> tier-3 budget (tier 3 becomes ~2.04 SYS, ~2.1 MB all-RAM). That PR merges after this one and
-> carries the corresponding edit here.
+and 0.0500 SYS each of NET and CPU, 0.1080 SYS in total — **tier 1 only**. Tiers 2 and 3 receive
+no personal policy: managing policies costs an owner nothing, so they need no allocation of their
+own and keep the whole remainder issuable. Using the launch configuration of 75,496 SYS
+`total_sys`:
 
 | Tier | Total allocation | Free to issue after registration | ≈ RAM if spent entirely on RAM |
 |---|---|---|---|
 | 1 | 3,019.8400 SYS | ~2,718 SYS | ~2.8 GB |
 | 2 | 113.2440 SYS | ~102 SYS | ~106 MB |
-| 3 | 2.2649 SYS | ~2 SYS | ~2.0 MB |
+| 3 | 2.2649 SYS | ~2.04 SYS | ~2.1 MB |
 
 Every `addpolicy` and `expandpolicy` checks `total_new_allocation <= node.total_sys -
 node.allocated_sys`. A node owner cannot issue more than they hold.
@@ -320,21 +318,20 @@ node.allocated_sys`. A node owner cannot issue more than they hold.
 
 | Component | Amount | Scales with tier |
 |---|---|---|
-| `sysio` RAM pool grant | 10% of the tier allocation | Yes |
-| Personal RAM | 0.0080 SYS (8,320 bytes) | No — flat |
-| Personal NET | 0.0500 SYS | No — flat |
-| Personal CPU | 0.0500 SYS | No — flat |
+| `sysio` RAM pool grant | 10% of the tier allocation | Yes — every tier |
+| Personal RAM | 0.0080 SYS (8,320 bytes) | Tier 1 only |
+| Personal NET | 0.0500 SYS | Tier 1 only |
+| Personal CPU | 0.0500 SYS | Tier 1 only |
 
 The 10% grant is not for the owner. It moves bytes into `sysio`'s RAM pool, which funds the
 1,144-byte gift every new account on the network receives. It is written with
 `time_block = UINT32_MAX` and is never reclaimable.
 
-The three personal components land in a self-issued policy — `issuer == owner` — carrying
-`time_block = 1`, so an owner can reshape or reclaim them immediately with `expandpolicy` or
-`reducepolicy`. Because they are flat while the tier budgets are not, together they cost a tier-3
-owner 4.77% of its allocation and a tier-1 owner 0.0036% — the disparity
-[#585](https://github.com/Wire-Network/wire-sysio/pull/585) removes by provisioning the personal
-policy for tier 1 only. The 10% grant is not tier-gated and is unaffected either way.
+A tier-1 owner's three personal components land in a self-issued policy — `issuer == owner` —
+carrying `time_block = 1`, so it can reshape or reclaim them immediately with `expandpolicy` or
+`reducepolicy`. Tier 1 gets them because it is the only tier that can call `newuser`, whose
+`sponsors` and `sponsorcount` rows are the only writes in the contract billed to a node owner. The
+10% grant is not tier-gated.
 
 ### What a node owner needs to operate
 
@@ -401,7 +398,7 @@ where `activateroa` starts them.
 **`extendpolicy`** — push `time_block` further out. It can only move forward, never back, and never
 to a block already in the past. A policy's term can be lengthened but not shortened.
 
-**`reducepolicy`** — take weight back. Only callable once `time_block` has passed. Each weight is
+**`reducepolicy`** — take weight back. Callable at or after `time_block`. Each weight is
 capped at the stored policy weight, so an issuer can never withdraw more than they granted.
 
 ### Stacking policies from multiple issuers
@@ -484,7 +481,8 @@ different layers.
 ### The contract's own share is a hard cap
 
 CPU and NET are rate limits over a window, and the payer's limit is the one that applies. Spam
-aimed at a contract consumes that contract's share and nothing else. Once it is exhausted, further
+aimed at a contract consumes that contract's own account quota, not another account's rolling
+share — though every success it lands also draws on block-wide capacity. Once exhausted, further
 calls fail with `tx_cpu_usage_exceeded` or `tx_net_usage_exceeded` naming the contract, and keep
 failing until the window rolls forward.
 
@@ -793,8 +791,10 @@ Mechanisms an Antelope background might lead you to look for, which do not exist
   fixed 1,144-byte gift every new account receives, application capacity comes from a node owner's
   policy. (Bootstrap and governance keep their own routes — `sysio.roa::giftram` and the privileged
   `setalimits` / `setacctcpu` / `setacctnet` — which are not open to applications.)
-- **No consensus whitelist.** ROA has no allow-list of approved contracts; the only on-chain
-  distinction is whether a contract holds a policy. A *producer* may still refuse traffic:
+- **No consensus whitelist.** ROA has no allow-list of approved contracts. Holding a policy is
+  what makes a contract callable by ordinary users, not a boolean gate on callability: a
+  provisioned explicit payer can drive one without a policy, and privileged paths can set limits
+  outside ROA. A *producer* may still refuse traffic:
   `nodeop`'s `actor-whitelist` / `contract-whitelist` and their blacklists are node-local
   configuration, checked during speculative execution, and can reject a fully provisioned
   contract.
@@ -870,7 +870,7 @@ and are omitted.
 | `A policy for this owner already exists from this issuer.` | Use `expandpolicy` |
 | `Cannot reduce policy before time_block` | The policy's committed term has not elapsed |
 | `Cannot allocate CPU/NET to sysio accounts.` | ROA refuses CPU/NET policies for any `sysio.`-prefixed owner. It does not mean the account is unlimited — `sysio.acct` is at zero |
-| `Only privileged accounts can create new accounts` | Use `sysio.roa::newuser` instead of native `newaccount` |
+| `Only privileged accounts can create new accounts` | The declared creator is not privileged. Ordinary accounts cannot call native `newaccount`; `sysio.roa::newuser` is the supported flow, and only for a registered tier-1 sponsor |
 | `Creator is not a registered tier-1 node owner` | `newuser` is tier-1 only |
 
 ---
