@@ -256,8 +256,9 @@ Two implementation details worth knowing as an operator:
 
 - Before replay begins, an auto-fetched snapshot's system ABI must declare compatible `snaprecords`
   and `snapconfig` physical table identifiers, keys, and value schemas. Its decoded `snapconfig`
-  row must also contain a nonzero `min_providers`; otherwise startup fails immediately rather than
-  discovering after a long sync that attestation is disabled.
+  row must also contain a nonzero `min_providers`; bounded reads use a one-second cold-state
+  budget per attempt. Otherwise startup fails immediately and tells the operator to delete the
+  loaded chain state before restarting without `--snapshot-endpoint`.
 - Verification cannot happen before the snapshot is loaded -- there is no chain state to
   query until then. The node loads the snapshot optimistically and verifies from synced
   on-chain state as it catches up.

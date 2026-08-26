@@ -94,13 +94,17 @@ constexpr auto snapshot_attestation_invalid_system_abi_message =
 constexpr auto snapshot_attestation_incompatible_table_message =
    "The '{}' system account in an auto-fetched snapshot must declare compatible '{}' and '{}' table schemas";
 
-/// Startup diagnostic when an auto-fetched snapshot's configuration row cannot be read.
-constexpr auto snapshot_attestation_config_read_failure_message =
-   "Could not read '{}::{}' from an auto-fetched snapshot";
+/// Shared recovery diagnostic after a loaded snapshot fails its configuration preflight.
+constexpr auto snapshot_attestation_config_failure_message =
+   "Auto-fetched snapshot configuration check failed for '{}::{}': {}. Delete chain state in '{}' "
+   "before restarting without --snapshot-endpoint";
 
-/// Startup diagnostic when governance has not enabled snapshot attestation.
-constexpr auto snapshot_attestation_config_unset_message =
-   "Auto-fetched snapshots require '{}::{}' min_providers to be configured before bootstrap";
+/// Failure reason when the loaded snapshot's configuration row cannot be read.
+constexpr auto snapshot_attestation_config_read_failure_reason = "table read failed";
+
+/// Failure reason when governance has not enabled snapshot attestation.
+constexpr auto snapshot_attestation_config_unset_reason =
+   "min_providers must be configured before bootstrap";
 
 /// Startup diagnostic when endpoint metadata describes a different snapshot than the downloaded file.
 constexpr auto snapshot_endpoint_block_mismatch_message =
@@ -480,6 +484,21 @@ bool snapshot_attestation_record_matches(
    std::string_view attested_snapshot_hash) {
    return loaded_block_id == attested_block_id
           && loaded_snapshot_hash.str() == attested_snapshot_hash;
+}
+
+chain_apis::read_only::get_table_rows_params
+make_snapshot_attestation_record_query(uint32_t block_num) {
+   chain_apis::read_only::get_table_rows_params params;
+   params.json        = true;
+   params.code        = config::system_account_name;
+   params.scope       = config::system_account_name.to_string();
+   params.table       = snapshot_attest::table_snaprecords;
+   params.lower_bound = fc::json::to_string(
+      fc::mutable_variant_object()(snapshot_attest::field::block_num, block_num),
+      fc::time_point::maximum());
+   params.limit       = 1;
+   params.values_only = true;
+   return params;
 }
 
 class chain_plugin_impl {
@@ -1655,11 +1674,15 @@ void chain_plugin_impl::require_snapshot_attestation_configuration() const {
          snapshot_attestation_config_log_prefix, not_shutting_down);
    });
    SYS_ASSERT(read_result, plugin_config_exception,
-              snapshot_attestation_config_read_failure_message,
-              config::system_account_name, snapshot_attest::table_snapconfig);
+              snapshot_attestation_config_failure_message,
+              config::system_account_name, snapshot_attest::table_snapconfig,
+              snapshot_attestation_config_read_failure_reason,
+              chain_config->state_dir.generic_string());
    SYS_ASSERT(snapshot_attestation_config_is_enabled(read_result->rows), plugin_config_exception,
-              snapshot_attestation_config_unset_message,
-              config::system_account_name, snapshot_attest::table_snapconfig);
+              snapshot_attestation_config_failure_message,
+              config::system_account_name, snapshot_attest::table_snapconfig,
+              snapshot_attestation_config_unset_reason,
+              chain_config->state_dir.generic_string());
 }
 
 void chain_plugin_impl::plugin_startup()
@@ -2072,20 +2095,11 @@ void chain_plugin_impl::verify_snapshot_attestation(const signed_block_ptr& lib_
       // supported read path, which performs ABI decoding and abstracts the table store. The
       // contract creates the table as records(get_self(), get_self().value), so both the
       // code and the scope are the system account.
-      chain_apis::read_only::get_table_rows_params p;
-      p.json        = true;
-      p.code        = config::system_account_name;
-      p.scope       = config::system_account_name.to_string();
-      p.table       = snapshot_attest::table_snaprecords;
       // Bounds on the unified table read are JSON key *objects* keyed by the table's ABI
       // key_names -- be_key_codec::encode_key rejects bare scalars -- so the bound must be
       // {"block_num": N}, not "N". A bare scalar throws inside the scan, which the checked
       // read reports as failure rather than confirmed absence.
-      p.lower_bound = fc::json::to_string(
-         fc::mutable_variant_object()(snapshot_attest::field::block_num, snap_block_num),
-         fc::time_point::maximum());
-      p.limit       = 1;
-      p.values_only = true;
+      auto p = make_snapshot_attestation_record_query(snap_block_num);
 
       // verify_snapshot_attestation() runs on the main thread from the irreversible-block
       // handler during sync, so read_table_rows takes its inline main-thread fast path and

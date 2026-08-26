@@ -159,7 +159,7 @@ Role exclusivity is enforced at startup: `snapshot-provider-account` cannot be u
 
 ### Snapshot Verification on Load
 
-When a node starts with `--snapshot-endpoint`, it captures the auto-fetched snapshot's block number, block ID, and BLAKE3 root hash. It first validates the required ABI schemas and enabled configuration before replay. Once the node syncs and LIB advances past the snapshot block, it verifies the tuple against on-chain `snaprecords`:
+When a node starts with `--snapshot-endpoint`, it captures the auto-fetched snapshot's block number, block ID, and BLAKE3 root hash. It first validates the required ABI schemas and enabled configuration before replay. A configuration-read or disabled-configuration rejection tells the operator to delete the loaded chain state before restarting without `--snapshot-endpoint`. Once the node syncs and LIB advances past the snapshot block, it verifies the tuple against on-chain `snaprecords`:
 
 - **Invalid system ABI, missing/incompatible `snaprecords` or `snapconfig` schema, or disabled configuration:** Fatal startup error before replay.
 - **No record or persistent table-read failure after sync and grace:** Fatal error.
@@ -225,9 +225,9 @@ All endpoints use `api_category::snapshot_ro` and are registered during `plugin_
 
 | Endpoint | Registration | Request | Response |
 |----------|-------------|---------|----------|
-| `POST /v1/snapshot/latest` | `add_api` (read_only queue) | no params | `{ block_num, block_id, block_time, root_hash }` or 404 |
-| `POST /v1/snapshot/by_block` | `add_api` (read_only queue) | `{ block_num: N }` | same metadata or 404 |
-| `POST /v1/snapshot/download` | `add_raw_handler` | `{ block_num: N }` | Binary file with `Content-Disposition: attachment`, supports `Range` header (206 Partial Content) |
+| `POST /v1/snapshot/latest` | `add_api` (read_only queue) | no params | newest scheduled metadata, or 404 |
+| `POST /v1/snapshot/by_block` | `add_api` (read_only queue) | `{ block_num: N }` | matching catalog metadata, or 404 |
+| `POST /v1/snapshot/download` | `add_raw_handler` | `{ block_num: N }` | Binary file for a servable entry, with `Content-Disposition: attachment`; supports `Range` (206 Partial Content) |
 
 ### Implementation Details
 
@@ -314,7 +314,7 @@ Manual `--snapshot` is the operator-trusted escape hatch and bypasses attestatio
 
 **Retry-based verification:** The attestation check (`verify_snapshot_attestation()`) runs on each irreversible block after the snapshot block. In the real-world flow, a snapshot is taken first, then providers independently generate their own snapshots (which can take minutes), submit votes, reach quorum, and the attestation becomes irreversible. The bootstrap node loads the snapshot, syncs forward, and eventually reaches the block containing the attestation record.
 
-The auto-fetched snapshot must contain a valid system ABI with compatible physical `snaprecords` and `snapconfig` table identifiers, keys, and value schemas. Its configuration row must enable a nonzero K; these checks run before block replay. The record check then retries on each finalized block while the node is still catching up (finalized block time more than ~30 seconds behind wall-clock), and it applies the same retry behavior to transient table-read failures. At the live tip, both missing records and read failures remain pending for a grace window of 12,500 finalized blocks past the snapshot height (half the 25,000-block provider snapshot interval). After grace, the node shuts down because the remote source is untrusted without an on-chain record.
+The auto-fetched snapshot must contain a valid system ABI with compatible physical `snaprecords` and `snapconfig` table identifiers, keys, and value schemas. Its configuration row must enable a nonzero K; bounded startup reads use a one-second cold-state budget per attempt and these checks run before block replay. A configuration-read or disabled-configuration rejection tells the operator to delete the loaded chain state before restarting without `--snapshot-endpoint`. The record check then retries on each finalized block while the node is still catching up (finalized block time more than ~30 seconds behind wall-clock), and it applies the same retry behavior to transient table-read failures. At the live tip, both missing records and read failures remain pending for a grace window of 12,500 finalized blocks past the snapshot height (half the 25,000-block provider snapshot interval). After grace, the node shuts down because the remote source is untrusted without an on-chain record.
 
 **Note:** ABI compatibility is verified before replay. Record existence and the attested block ID/hash are verified after sync, because the node cannot query later on-chain state before it has replayed to that state.
 
@@ -346,7 +346,7 @@ For a complete operator setup guide — including producer registration, provide
 - Storage: monotonic producer votes, finalization purge, historical-height closure, disagreement error 9001, and `getsnaphash` behavior
 **Chain-plugin policy tests** (`plugins/chain_plugin/test/plugin_config_test.cpp`):
 - transient table-read retry/grace behavior and decoder-timeout floor
-- pre-replay `snaprecords`/`snapconfig` schema validation, enabled-configuration policy, and trusted manual-snapshot bypass
+- pre-replay `snaprecords`/`snapconfig` schema validation, enabled-configuration policy, recovery diagnostics, and trusted manual-snapshot bypass
 - loaded block-ID and root-hash tuple matching
 - endpoint metadata must honor an explicitly requested block and identify the loaded scheduled snapshot head exactly
 - real auto-fetch download, enabled-config preflight, retained-block replay, and terminal tuple verification
@@ -362,6 +362,11 @@ For a complete operator setup guide — including producer registration, provide
 **Integration test** (`tests/snapshot_attest_test.py` — 2 tests):
 - Manual snapshot creation and rejection outside the fixed production cadence
 - Provider registration and snapshot-account rotation
+
+**Snapshot API policy tests** (`tests/snapshot_api_plugin_tests.cpp`):
+- scheduled explicit serving requires a complete, exact block-ID/root tuple whose attestation block is irreversible
+- malformed, mismatched, missing, and pending scheduled attestations fail closed; manual entries remain explicit-only
+
 **Integration test** (`tests/snapshot_api_test.py` — 10 tests):
 
 Phase 3 (API endpoints):
@@ -379,7 +384,7 @@ Phase 4 (bootstrap):
 - Raw snapshot downloads honor HTTP `max-bytes-in-flight` admission control
 
 C++ tests construct cadence heights without waiting for 25,000 wall-clock blocks and cover the
-contract record, snapshot round trip, and strict auto-fetch verification. The
+contract record, scheduled-serving attestation gate, snapshot round trip, and strict auto-fetch verification. The
 integration test proves manual endpoint snapshots cannot enter base-URL discovery and fail closed before download when
 requested explicitly.
 

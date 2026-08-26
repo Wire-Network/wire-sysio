@@ -59,7 +59,9 @@ constexpr auto loaded_snapshot_hash =
    "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f";
 constexpr auto other_snapshot_hash =
    "1f1e1d1c1b1a191817161514131211100f0e0d0c0b0a09080706050403020100";
-constexpr auto unconfigured_attestation_error_fragment = "min_providers to be configured before bootstrap";
+constexpr auto unconfigured_attestation_error_fragment = "min_providers must be configured before bootstrap";
+/// Recovery instruction required when loaded state fails attestation configuration preflight.
+constexpr auto delete_loaded_chain_state_error_fragment = "Delete chain state in";
 constexpr uint16_t incompatible_table_id = 0;
 constexpr uint32_t snapshot_source_block_count = 3;
 constexpr uint32_t snapshot_block_log_extension_block_count = 3;
@@ -314,7 +316,7 @@ BOOST_AUTO_TEST_CASE(snapshot_attestation_table_read_timeout_policy) {
                      + sysio::snapshot_attestation_startup_minimum_table_read_timeout);
 }
 
-/** A transient startup read is retried only up to the bounded attempt count. */
+/** A transient startup read is retried, while a confirmed empty read is terminal. */
 BOOST_AUTO_TEST_CASE(snapshot_attestation_startup_table_read_retry_policy) {
    uint32_t successful_attempts = 0;
    const auto successful_read = sysio::retry_snapshot_attestation_startup_table_read(
@@ -336,6 +338,16 @@ BOOST_AUTO_TEST_CASE(snapshot_attestation_startup_table_read_retry_policy) {
       });
    BOOST_CHECK(!failed_read);
    BOOST_CHECK_EQUAL(failed_attempts, sysio::snapshot_attestation_startup_table_read_attempts);
+
+   uint32_t empty_attempts = 0;
+   const auto empty_read = sysio::retry_snapshot_attestation_startup_table_read(
+      [&]() -> std::optional<sysio::chain_apis::read_only::get_table_rows_result> {
+         ++empty_attempts;
+         return sysio::chain_apis::read_only::get_table_rows_result{};
+      });
+   BOOST_REQUIRE(empty_read);
+   BOOST_CHECK(empty_read->rows.empty());
+   BOOST_CHECK_EQUAL(empty_attempts, 1u);
 }
 
 /** Require the table keys and ordered field prefix consumed by bootstrap verification. */
@@ -544,8 +556,9 @@ BOOST_FIXTURE_TEST_CASE(
    BOOST_CHECK_EXCEPTION(
       plugin.plugin_startup(), sysio::chain::plugin_config_exception,
       [](const sysio::chain::plugin_config_exception& error) {
-         return error.to_detail_string().find(unconfigured_attestation_error_fragment)
-                != std::string::npos;
+         const auto detail = error.to_detail_string();
+         return detail.find(unconfigured_attestation_error_fragment) != std::string::npos
+                && detail.find(delete_loaded_chain_state_error_fragment) != std::string::npos;
       });
 }
 

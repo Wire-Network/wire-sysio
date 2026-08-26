@@ -762,6 +762,10 @@ public:
 
 } // namespace chain_apis
 
+/** Build the exact primary-key query shared by snapshot-attestation consumers. */
+chain_apis::read_only::get_table_rows_params
+make_snapshot_attestation_record_query(uint32_t block_num);
+
 class chain_plugin : public plugin<chain_plugin> {
 public:
    APPBASE_PLUGIN_REQUIRES((signature_provider_manager_plugin))

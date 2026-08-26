@@ -9,6 +9,7 @@
 #include <fc/variant.hpp>
 #include <fc/crypto/blake3.hpp>
 
+#include <atomic>
 #include <filesystem>
 #include <map>
 #include <mutex>
@@ -19,8 +20,15 @@ namespace sysio {
 using namespace sysio;
 using namespace sysio::chain;
 
-/// Diagnostic returned when the catalog has no snapshot eligible for attested bootstrap.
+/// Diagnostic returned when the catalog has no snapshot eligible for scheduled bootstrap.
 constexpr auto no_scheduled_snapshots_message = "No scheduled snapshots available";
+
+/// Request and ABI-decoder budget for one steady-state attestation-record lookup.
+constexpr auto snapshot_attestation_query_timeout =
+   snapshot_attestation_minimum_table_read_timeout;
+
+/// Log label for a scheduled catalog entry whose attestation record cannot be inspected.
+constexpr auto snapshot_attestation_query_log_prefix = "snapshot_api_plugin";
 
 struct snapshot_entry {
    block_num_type         block_num = 0;
@@ -56,10 +64,49 @@ namespace sysio {
 
 class snapshot_api_plugin_impl {
 public:
+   /** Bind catalog eligibility checks to the local chain state. */
+   explicit snapshot_api_plugin_impl(chain_plugin& chain_plugin)
+      : chain_plugin_(chain_plugin) {}
+
    mutable std::mutex                          catalog_mtx_;
    std::map<block_num_type, snapshot_entry>    catalog_; // block_num -> entry
 
    std::filesystem::path                       snapshots_dir_;
+
+   /// Chain access used only through a valid main-thread or executor read window.
+   chain_plugin&                               chain_plugin_;
+
+   /** Return whether irreversible local state attests the exact snapshot tuple. */
+   bool is_attested_snapshot(const snapshot_entry& entry) const {
+      auto params = make_snapshot_attestation_record_query(entry.block_num);
+      const auto expected_block_num = entry.block_num;
+      const auto expected_block_id = entry.block_id;
+      const auto expected_root_hash = entry.root_hash;
+      params.filter = [this, expected_block_num, expected_block_id, expected_root_hash](
+                         const fc::variant& row) {
+         const auto& chain = chain_plugin_.chain();
+         if (!chain.fork_db_has_root()) {
+            return false;
+         }
+         return snapshot_api::is_servable_snapshot_attestation(
+            row, expected_block_num, expected_block_id, expected_root_hash,
+            chain.fork_db_root().block_num());
+      };
+
+      static const std::atomic<bool> not_shutting_down{false};
+      const auto result = chain_plugin_.read_table_rows_checked(
+         std::move(params), snapshot_attestation_query_timeout,
+         snapshot_attestation_query_timeout, snapshot_attestation_query_log_prefix,
+         not_shutting_down);
+      return result && !result->rows.empty();
+   }
+
+   /** Return whether an explicit snapshot download passes scheduled-serving policy. */
+   bool is_servable_snapshot(const snapshot_entry& entry) const {
+      return snapshot_api::is_snapshot_servable(
+         entry.block_num, entry,
+         [this](const snapshot_entry& snapshot) { return is_attested_snapshot(snapshot); });
+   }
 
    void scan_snapshots_dir() {
       namespace fs = std::filesystem;
@@ -131,7 +178,7 @@ public:
       ilog("Added snapshot to catalog: block #{}", si.head_block_num);
    }
 
-   /** Return the newest snapshot eligible for scheduled attestation and base-URL bootstrap. */
+   /** Return the newest snapshot eligible for scheduled bootstrap discovery. */
    std::optional<snapshot_entry> get_latest() const {
       std::lock_guard lock(catalog_mtx_);
       const auto entry = snapshot_api::find_latest_scheduled_snapshot(catalog_);
@@ -141,12 +188,14 @@ public:
       return std::optional{entry->second};
    }
 
+   /** Return an explicit catalog entry without applying the separate download policy. */
    std::optional<snapshot_entry> get_by_block(block_num_type block_num) const {
       std::lock_guard lock(catalog_mtx_);
-      auto it = catalog_.find(block_num);
-      if (it == catalog_.end())
+      const auto entry = catalog_.find(block_num);
+      if (entry == catalog_.end()) {
          return std::nullopt;
-      return std::optional{it->second};
+      }
+      return std::optional{entry->second};
    }
 };
 
@@ -162,7 +211,8 @@ void snapshot_api_plugin::plugin_initialize(const variables_map& vm) {
 void snapshot_api_plugin::plugin_startup() {
    ilog("starting snapshot_api_plugin");
 
-   auto impl = std::make_shared<snapshot_api_plugin_impl>();
+   auto impl = std::make_shared<snapshot_api_plugin_impl>(
+      app().get_plugin<chain_plugin>());
 
    auto& producer = app().get_plugin<producer_plugin>();
    impl->snapshots_dir_ = producer.get_snapshots_dir();
@@ -224,7 +274,7 @@ void snapshot_api_plugin::plugin_startup() {
          try {
             auto params = parse_params<download_params, http_params_types::params_required>(body);
             auto entry = impl->get_by_block(params.block_num);
-            if (!entry) {
+            if (!entry || !impl->is_servable_snapshot(*entry)) {
                conn->send_response(fc::json::to_string(
                                       fc::mutable_variant_object()
                                       ("code", 404)

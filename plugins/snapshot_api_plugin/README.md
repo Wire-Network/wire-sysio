@@ -160,9 +160,10 @@ registration count does not change it. Configuration changes apply to pending he
 does not retract accepted votes. Once K is met, the system contract moves the entry to `snaprecords` and purges pending
 votes through that height.
 
-Before replay, auto-fetching nodes require compatible `snaprecords` and `snapconfig` schemas plus a nonzero K. After
-syncing, they verify the `snaprecords` row and shut down if the snapshot is missing or disagrees. Manual `--snapshot`
-remains an operator-trusted path without attestation verification.
+Before replay, auto-fetching nodes require compatible `snaprecords` and `snapconfig` schemas plus a nonzero K. A
+configuration-read or disabled-configuration rejection tells the operator to delete the loaded chain state before
+restarting without `--snapshot-endpoint`. After syncing, nodes verify the `snaprecords` row and shut down if the
+snapshot is missing or disagrees. Manual `--snapshot` remains an operator-trusted path without attestation verification.
 
 The manual `create_snapshot` and `schedule_snapshot` APIs remain available through `producer_api_plugin`, but they are
 not part of the provider attestation workflow. When a snapshot finalizes (becomes irreversible), it is automatically
@@ -179,7 +180,8 @@ All endpoints use POST with JSON bodies, consistent with other Wire Sysio APIs.
 ### `POST /v1/snapshot/latest`
 
 Returns metadata for the newest snapshot at an exact attestation-cadence height. Newer manual snapshots are skipped so
-base-URL bootstrap continues to discover the newest snapshot that can receive an on-chain attestation.
+base-URL bootstrap continues to discover the newest snapshot that can receive an on-chain attestation. The download
+endpoint then requires the scheduled snapshot's exact attestation to be irreversible before serving its bytes.
 
 **Request:** empty body or `{}`
 
@@ -197,7 +199,8 @@ base-URL bootstrap continues to discover the newest snapshot that can receive an
 
 ### `POST /v1/snapshot/by_block`
 
-Returns metadata for a snapshot at a specific block number.
+Returns metadata for a snapshot at a specific block number. Download eligibility is enforced separately by the raw
+download endpoint.
 
 **Request:**
 ```json
@@ -210,7 +213,8 @@ Returns metadata for a snapshot at a specific block number.
 
 ### `POST /v1/snapshot/download`
 
-Downloads a snapshot file as a binary stream.
+Downloads a snapshot file as a binary stream. Scheduled snapshots return 404 until an irreversible on-chain
+`snaprecords` row matches the exact block ID and root hash. Manual unscheduled snapshots remain explicitly downloadable.
 
 **Request:**
 ```json
