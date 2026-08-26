@@ -2,6 +2,7 @@
 #include <sysio/testing/tester.hpp>
 #include <sysio/chain/abi_serializer.hpp>
 #include <sysio/chain/kv_table_objects.hpp>
+#include <sysio/chain/subjective_billing.hpp>
 #include "sysio.system_tester.hpp"
 #include <contracts.hpp>
 #include <sysio/opp/opp.hpp>
@@ -122,6 +123,21 @@ public:
       return base_tester::push_action( ROA, name,
          vector<permission_level>{{signer, "sysio.payer"_n},{signer, "active"_n}},
          data);
+   }
+
+   /// Push a sysio.roa action WITHOUT an explicit billed CPU time, so
+   /// transaction_context::verify_init_subjective_billing() actually runs. The ordinary tester
+   /// helpers pass DEFAULT_BILLED_CPU_TIME_US, which sets explicit_billed_cpu_time and makes that
+   /// check return on its first line -- meaning the subjective admission path is invisible to them.
+   transaction_trace_ptr push_subjective_action( const account_name& signer, const action_name& name,
+                                                 const variant_object& data ) {
+      signed_transaction trx;
+      trx.actions.emplace_back( get_action( ROA, name,
+                                            vector<permission_level>{{signer, config::active_name}},
+                                            data ) );
+      set_transaction_headers( trx );
+      trx.sign( get_private_key( signer, "active" ), control->get_chain_id() );
+      return push_transaction( trx, fc::time_point::maximum(), 0 /* no explicit billed cpu */ );
    }
 
    fc::variant get_nodeowner( account_name acc )
@@ -1271,6 +1287,71 @@ BOOST_FIXTURE_TEST_CASE( newuser_tier2_fails, sysio_roa_full_tester ) try {
       sysio_assert_message_is("Creator is not a registered tier-1 node owner"));
 } FC_LOG_AND_RETHROW()
 
+// Only tier 1 is provisioned a personal policy at registration -- it is the sole tier that can call
+// newuser, whose sponsorship rows are the only writes billed to a node owner. Tiers 2 and 3 get the
+// nodeowners budget, a reslimit row, and the 10% sysio RAM grant, but no allocation of their own,
+// and can still self-issue afterwards because addpolicy costs the issuer nothing.
+BOOST_FIXTURE_TEST_CASE( regnodeowner_personal_policy_is_tier1_only, sysio_roa_full_tester ) try {
+   // The fixture already fills all 21 tier-1 slots, so reuse one rather than registering another.
+   const auto t1owner = node_owners[1];
+   create_accounts({"t2owner"_n, "t3owner"_n}, false, false, false, false);
+   register_node_owner("t2owner"_n, 2);
+   register_node_owner("t3owner"_n, 3);
+   produce_block();
+
+   // Tier 1 keeps its self-issued personal policy: 0.0500 SYS each of NET/CPU, 0.0080 SYS of RAM.
+   auto t1_personal = get_policy(t1owner, t1owner);
+   BOOST_REQUIRE(!t1_personal.is_null());
+   BOOST_TEST(t1_personal["net_weight"].as<asset>().get_amount() == 500);
+   BOOST_TEST(t1_personal["cpu_weight"].as<asset>().get_amount() == 500);
+   BOOST_TEST(t1_personal["ram_weight"].as<asset>().get_amount() == 80);
+
+   // Tiers 2 and 3 get none.
+   BOOST_TEST(get_policy("t2owner"_n, "t2owner"_n).is_null());
+   BOOST_TEST(get_policy("t3owner"_n, "t3owner"_n).is_null());
+
+   // Every tier still contributes 10% of its allocation to the sysio RAM pool.
+   for (auto owner : {t1owner, "t2owner"_n, "t3owner"_n}) {
+      auto grant = get_policy("sysio"_n, owner);
+      BOOST_REQUIRE(!grant.is_null());
+      auto node = get_nodeowner(owner);
+      BOOST_REQUIRE(!node.is_null());
+      BOOST_TEST(grant["ram_weight"].as<asset>().get_amount()
+                 == node["total_sys"].as<asset>().get_amount() / 10);
+      BOOST_TEST(grant["net_weight"].as<asset>().get_amount() == 0);
+      BOOST_TEST(grant["cpu_weight"].as<asset>().get_amount() == 0);
+   }
+
+   // Tier 2/3 hold no bandwidth, and their nodeowners accounting excludes the personal weights,
+   // so the full remainder of the tier budget stays issuable.
+   for (auto owner : {"t2owner"_n, "t3owner"_n}) {
+      int64_t ram, net, cpu;
+      control->get_resource_limits_manager().get_account_limits(owner, ram, net, cpu);
+      BOOST_TEST(net == 0);
+      BOOST_TEST(cpu == 0);
+
+      auto node = get_nodeowner(owner);
+      const int64_t total = node["total_sys"].as<asset>().get_amount();
+      BOOST_TEST(node["allocated_bw"].as<asset>().get_amount() == 0);
+      BOOST_TEST(node["allocated_ram"].as<asset>().get_amount() == total / 10);
+      BOOST_TEST(node["allocated_sys"].as<asset>().get_amount() == total / 10);
+   }
+
+   // A tier-3 owner can still issue to itself; sysio.roa pays both the CPU/NET and the row RAM.
+   add_roa_policy("t3owner"_n, "t3owner"_n, "0.0100 SYS", "0.0100 SYS", "0.0100 SYS", 0, 0);
+   produce_block();
+
+   auto t3_self = get_policy("t3owner"_n, "t3owner"_n);
+   BOOST_REQUIRE(!t3_self.is_null());
+   BOOST_TEST(t3_self["net_weight"].as<asset>().get_amount() == 100);
+   BOOST_TEST(t3_self["cpu_weight"].as<asset>().get_amount() == 100);
+
+   int64_t ram, net, cpu;
+   control->get_resource_limits_manager().get_account_limits("t3owner"_n, ram, net, cpu);
+   BOOST_TEST(net == 100);
+   BOOST_TEST(cpu == 100);
+} FC_LOG_AND_RETHROW()
+
 // newuser correctly populates both policies table and reslimit for sysio.acct
 BOOST_FIXTURE_TEST_CASE( newuser_sysio_acct_policy_tracking, sysio_roa_full_tester ) try {
    auto p = get_policy("sysio.acct"_n, "sysio"_n);
@@ -1675,11 +1756,11 @@ BOOST_FIXTURE_TEST_CASE( nodeownreg_reconciles_existing_reslimit, sysio_roa_node
    add_roa_policy(NODE_DADDY, owner, "0.0000 SYS", "0.0000 SYS", "1.0000 SYS", 0, 0);
    produce_blocks();
 
-   // bytes_per_unit and the node-owner personal RAM are fixture constants (cf. verify_ram): the
-   // activation price is 104, regnodeowner's personal_ram_weight is 0.0080 SYS (80 units).
-   const int64_t bytes_per_unit     = 104;
-   const int64_t planted_ram_bytes  = 10000 * bytes_per_unit;   // 1.0000 SYS RAM-only policy
-   const int64_t personal_ram_bytes = 80    * bytes_per_unit;   // node-owner personal RAM (0.0080 SYS)
+   // bytes_per_unit is a fixture constant (cf. verify_ram): the activation price is 104. The claim
+   // registers at TIER 2, which regnodeowner provisions with no personal allocation -- the personal
+   // policy is tier-1 only -- so the reconcile stacks nothing on top of the planted policy.
+   const int64_t bytes_per_unit    = 104;
+   const int64_t planted_ram_bytes = 10000 * bytes_per_unit;   // 1.0000 SYS RAM-only policy
 
    // Pre-state: the planted row exists with the one-time newaccount_ram gift folded in once (by the
    // addpolicy create-branch), and net/cpu still zero.
@@ -1702,19 +1783,20 @@ BOOST_FIXTURE_TEST_CASE( nodeownreg_reconciles_existing_reslimit, sysio_roa_node
    BOOST_REQUIRE_EQUAL(audit["status"].as<uint64_t>(), CONFIRMED);
    BOOST_REQUIRE_EQUAL(audit["reason"].as<uint64_t>(), 0); // NONE
 
-   // reslimit reconciled: planted RAM kept, node-owner net/cpu/ram stacked on top, gift NOT re-added.
-   const int64_t expected_ram = planted_ram_bytes + newaccount_ram + personal_ram_bytes; // 1,049,464
+   // reslimit reconciled: the planted row is preserved untouched and the gift is NOT re-added. A
+   // tier-2 registration adds no personal weight, so the row is exactly what addpolicy left.
+   const int64_t expected_ram = planted_ram_bytes + newaccount_ram;
    r = get_reslimit(owner);
-   BOOST_REQUIRE_EQUAL(r["net_weight"].as_string(), "0.0500 SYS");
-   BOOST_REQUIRE_EQUAL(r["cpu_weight"].as_string(), "0.0500 SYS");
+   BOOST_REQUIRE_EQUAL(r["net_weight"].as_string(), "0.0000 SYS");
+   BOOST_REQUIRE_EQUAL(r["cpu_weight"].as_string(), "0.0000 SYS");
    BOOST_REQUIRE_EQUAL(r["ram_bytes"].as_int64(), expected_ram);
 
    // On-chain quota synced to the reconciled row totals (absolute set in regnodeowner).
    int64_t ram = 0, net = 0, cpu = 0;
    control->get_resource_limits_manager().get_account_limits(owner, ram, net, cpu);
    BOOST_REQUIRE_EQUAL(ram, expected_ram);
-   BOOST_REQUIRE_EQUAL(net, 500);
-   BOOST_REQUIRE_EQUAL(cpu, 500);
+   BOOST_REQUIRE_EQUAL(net, 0);
+   BOOST_REQUIRE_EQUAL(cpu, 0);
 
    // The planted policy is untouched: still issued by NODE_DADDY, still reclaimable via reducepolicy.
    auto pol = get_policy(owner, NODE_DADDY);
@@ -1731,8 +1813,8 @@ BOOST_FIXTURE_TEST_CASE( nodeownreg_reconciles_existing_reslimit, sysio_roa_node
    BOOST_REQUIRE_EQUAL(daddy_after["allocated_ram"].as_string(), daddy_before["allocated_ram"].as_string());
 } FC_LOG_AND_RETHROW()
 
-// SEC-087 companion: a planted policy can carry NET/CPU as well as RAM. Verify the reconcile stacks
-// net/cpu too (the increase_reslimit MODIFY branch) and registration still reaches CONFIRMED.
+// SEC-087 companion: a planted policy can carry NET/CPU as well as RAM. Verify the reconcile leaves
+// them intact (the increase_reslimit MODIFY branch) and registration still reaches CONFIRMED.
 BOOST_FIXTURE_TEST_CASE( nodeownreg_reconciles_existing_reslimit_net_cpu, sysio_roa_nodeownreg_tester ) try {
    const auto owner    = "claimacct"_n;
    const auto wire_pub = gen_k1_key();
@@ -1743,9 +1825,8 @@ BOOST_FIXTURE_TEST_CASE( nodeownreg_reconciles_existing_reslimit_net_cpu, sysio_
    add_roa_policy(NODE_DADDY, owner, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0, 0);
    produce_blocks();
 
-   const int64_t bytes_per_unit     = 104;
-   const int64_t planted_ram_bytes  = 10000 * bytes_per_unit;
-   const int64_t personal_ram_bytes = 80    * bytes_per_unit;
+   const int64_t bytes_per_unit    = 104;
+   const int64_t planted_ram_bytes = 10000 * bytes_per_unit;
 
    BOOST_REQUIRE_EQUAL(success(), nodeownreg(owner, 2, eth_pub, wire_pub));
    produce_blocks();
@@ -1753,9 +1834,57 @@ BOOST_FIXTURE_TEST_CASE( nodeownreg_reconciles_existing_reslimit_net_cpu, sysio_
    BOOST_REQUIRE_EQUAL(get_nodeowner(owner).is_null(), false);
    BOOST_REQUIRE_EQUAL(get_nodeownerreg(owner)["status"].as<uint64_t>(), CONFIRMED);
 
-   // net/cpu = planted 1.0000 + node-owner 0.0500 = 1.0500 SYS; ram = planted + gift + personal.
-   const int64_t expected_ram = planted_ram_bytes + newaccount_ram + personal_ram_bytes;
+   // A tier-2 registration adds no personal weight, so the planted 1.0000 SYS of net/cpu and the
+   // planted RAM (plus the one-time gift) survive the reconcile unchanged.
+   const int64_t expected_ram = planted_ram_bytes + newaccount_ram;
    auto r = get_reslimit(owner);
+   BOOST_REQUIRE_EQUAL(r["net_weight"].as_string(), "1.0000 SYS");
+   BOOST_REQUIRE_EQUAL(r["cpu_weight"].as_string(), "1.0000 SYS");
+   BOOST_REQUIRE_EQUAL(r["ram_bytes"].as_int64(), expected_ram);
+
+   int64_t ram = 0, net = 0, cpu = 0;
+   control->get_resource_limits_manager().get_account_limits(owner, ram, net, cpu);
+   BOOST_REQUIRE_EQUAL(ram, expected_ram);
+   BOOST_REQUIRE_EQUAL(net, 10000); // 1.0000 SYS at precision 4
+   BOOST_REQUIRE_EQUAL(cpu, 10000);
+} FC_LOG_AND_RETHROW()
+
+// SEC-087 at TIER 1, which is the only tier regnodeowner still provisions a personal allocation for.
+// The two tier-2 companions above now pass zero weights into increase_reslimit, so this is the case
+// that exercises its MODIFY branch with non-zero deltas: the planted policy's weights and the
+// node-owner personal weights must stack, and the one-time newaccount_ram gift must be counted once
+// rather than re-added. Without this the arithmetic that reconcile depends on would go untested on
+// the registration path.
+BOOST_FIXTURE_TEST_CASE( nodeownreg_tier1_reconcile_stacks_personal_weights, sysio_roa_nodeownreg_tester ) try {
+   const auto owner    = "t1own"_n;   // tier-1 name rule: 2-6 characters
+   const auto wire_pub = gen_k1_key();
+   const auto eth_pub  = gen_em_key();
+
+   BOOST_REQUIRE_EQUAL(success(), newnameduser(owner, wire_pub, 1));
+   produce_blocks();
+   add_roa_policy(NODE_DADDY, owner, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0, 0);
+   produce_blocks();
+
+   const int64_t bytes_per_unit     = 104;
+   const int64_t planted_ram_bytes  = 10000 * bytes_per_unit;   // 1.0000 SYS policy
+   const int64_t personal_ram_bytes = 80    * bytes_per_unit;   // tier-1 personal RAM (0.0080 SYS)
+
+   // Pre-state: planted policy only, gift folded in once by addpolicy's create branch.
+   auto r = get_reslimit(owner);
+   BOOST_REQUIRE_EQUAL(r.is_null(), false);
+   BOOST_REQUIRE_EQUAL(r["net_weight"].as_string(), "1.0000 SYS");
+   BOOST_REQUIRE_EQUAL(r["ram_bytes"].as_int64(), planted_ram_bytes + newaccount_ram);
+
+   BOOST_REQUIRE_EQUAL(success(), nodeownreg(owner, 1, eth_pub, wire_pub));
+   produce_blocks();
+
+   BOOST_REQUIRE_EQUAL(get_nodeowner(owner)["tier"].as<uint32_t>(), 1);
+   BOOST_REQUIRE_EQUAL(get_nodeownerreg(owner)["status"].as<uint64_t>(), CONFIRMED);
+
+   // MODIFY branch with non-zero deltas: planted 1.0000 + personal 0.0500 = 1.0500 SYS of net/cpu,
+   // ram = planted + gift + personal, with the gift NOT re-added.
+   const int64_t expected_ram = planted_ram_bytes + newaccount_ram + personal_ram_bytes;
+   r = get_reslimit(owner);
    BOOST_REQUIRE_EQUAL(r["net_weight"].as_string(), "1.0500 SYS");
    BOOST_REQUIRE_EQUAL(r["cpu_weight"].as_string(), "1.0500 SYS");
    BOOST_REQUIRE_EQUAL(r["ram_bytes"].as_int64(), expected_ram);
@@ -1763,8 +1892,64 @@ BOOST_FIXTURE_TEST_CASE( nodeownreg_reconciles_existing_reslimit_net_cpu, sysio_
    int64_t ram = 0, net = 0, cpu = 0;
    control->get_resource_limits_manager().get_account_limits(owner, ram, net, cpu);
    BOOST_REQUIRE_EQUAL(ram, expected_ram);
-   BOOST_REQUIRE_EQUAL(net, 10500); // 1.0500 SYS at precision 4
+   BOOST_REQUIRE_EQUAL(net, 10500);
    BOOST_REQUIRE_EQUAL(cpu, 10500);
+
+   // Planted policy untouched; the tier-1 personal policy now sits alongside it.
+   auto planted = get_policy(owner, NODE_DADDY);
+   BOOST_REQUIRE_EQUAL(planted.is_null(), false);
+   BOOST_REQUIRE_EQUAL(planted["net_weight"].as_string(), "1.0000 SYS");
+   auto personal = get_policy(owner, owner);
+   BOOST_REQUIRE_EQUAL(personal.is_null(), false);
+   BOOST_REQUIRE_EQUAL(personal["net_weight"].as_string(), "0.0500 SYS");
+   BOOST_REQUIRE_EQUAL(personal["ram_weight"].as_string(), "0.0080 SYS");
+} FC_LOG_AND_RETHROW()
+
+// A tier-2 owner holds no CPU after this change, so it reaches
+// transaction_context::verify_init_subjective_billing() with an objective limit of zero and is
+// admitted purely on the subjective allowance. Objective billing is not the whole story here:
+// addpolicy's payer is sysio.roa, but the subjective check looks at first-authorizers that are NOT
+// payers, which is the issuer. Pushed without an explicit billed CPU so that check actually runs.
+BOOST_FIXTURE_TEST_CASE( zero_cpu_owner_issues_under_subjective_billing, sysio_roa_full_tester ) try {
+   create_accounts({"t2owner"_n, "targetacct"_n}, false, false, false, false);
+   register_node_owner("t2owner"_n, 2);
+   produce_block();
+
+   auto& rlm = control->get_resource_limits_manager();
+   int64_t ram = 0, net = 0, cpu = 0;
+   rlm.get_account_limits("t2owner"_n, ram, net, cpu);
+   BOOST_REQUIRE_EQUAL(net, 0);
+   BOOST_REQUIRE_EQUAL(cpu, 0);
+
+   auto& sub_bill = control->get_mutable_subjective_billing();
+   sub_bill.set_disabled(false);
+   BOOST_REQUIRE_GT(sub_bill.get_subjective_account_cpu_allowed().count(), 0);
+
+   auto trace = push_subjective_action("t2owner"_n, "addpolicy"_n, mvo()
+      ("owner", "targetacct")("issuer", "t2owner")
+      ("net_weight", "0.0100 SYS")("cpu_weight", "0.0100 SYS")("ram_weight", "0.0100 SYS")
+      ("time_block", 0)("network_gen", 0));
+   BOOST_REQUIRE(!trace->except);
+   produce_block();
+
+   // The grant landed, and the issuer still holds nothing of its own.
+   rlm.get_account_limits("targetacct"_n, ram, net, cpu);
+   BOOST_REQUIRE_EQUAL(net, 100);
+   BOOST_REQUIRE_EQUAL(cpu, 100);
+   rlm.get_account_limits("t2owner"_n, ram, net, cpu);
+   BOOST_REQUIRE_EQUAL(cpu, 0);
+
+   // Prove the admission gate was actually reached rather than skipped: with the allowance driven
+   // to zero the identical push is rejected by it. Without this, the assertions above would pass
+   // just as happily if explicit_billed_cpu_time had short-circuited the check.
+   sub_bill.set_subjective_account_cpu_allowed(fc::microseconds(0));
+   BOOST_REQUIRE_EXCEPTION(
+      push_subjective_action("t2owner"_n, "addpolicy"_n, mvo()
+         ("owner", "targetacct")("issuer", "t2owner")
+         ("net_weight", "0.0100 SYS")("cpu_weight", "0.0000 SYS")("ram_weight", "0.0000 SYS")
+         ("time_block", 0)("network_gen", 0)),
+      tx_cpu_usage_exceeded,
+      fc_exception_message_contains("Subjectively terminated trx"));
 } FC_LOG_AND_RETHROW()
 
 // Account already carries a DIFFERENT EVM link (e.g. an operator createlink or an earlier deposit

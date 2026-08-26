@@ -445,7 +445,20 @@ namespace sysio {
             // ---- Private Functions ----
 
             /**
-             * @brief Registers 'owner' as a Node Owner scoped by network_gen, granting SYS allotment based on Tier and creates a default policy for owner.
+             * @brief Registers 'owner' as a Node Owner scoped by network_gen, granting the tier's SYS
+             *        allotment and contributing 10% of it to the network RAM pool.
+             *
+             * Every tier gets a `nodeowners` row (the budget and the membership that gates policy
+             * issuance), a reslimit row, and a policy granting 10% of the tier allocation to `sysio`
+             * for the account-creation RAM pool.
+             *
+             * Only tier 1 additionally gets a personal self-issued policy. It is the only tier that can
+             * call `newuser`, whose `sponsors` / `sponsorcount` rows are the sole writes in this
+             * contract billed to a node owner instead of to `sysio.roa`. Tiers 2 and 3 need no
+             * allocation of their own: a policy action that does not name an explicit `sysio.payer`
+             * resolves `action::payer()` to `sysio.roa` and bills its rows to `sysio.roa`, so it draws
+             * nothing from the issuer. They can self-issue on demand with `addpolicy` against the
+             * recorded tier budget.
              *
              * NOTE: Can only register for the current generation of the network.
              *
