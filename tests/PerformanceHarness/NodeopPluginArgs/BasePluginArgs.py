@@ -24,9 +24,17 @@ class BasePluginArgs:
                 default = getattr(self, f"_{field.name}NodeopDefault")
                 current = getattr(self, field.name)
                 if current is not None and current != default:
-                    if type(current) is bool:
-                        args.append(f"{getattr(self, f'_{field.name}NodeopArg')}")
+                    arg = getattr(self, f'_{field.name}NodeopArg')
+                    # Emit a bare flag only for options nodeop declares as a switch. The generator
+                    # types those `bool`; an option that takes a value is typed from its default
+                    # (`int`, `str`, ...). Keying on the runtime type instead would emit a bare flag
+                    # for any field merely *assigned* a Python bool -- which nodeop then rejects,
+                    # because boost consumes the following argument as the missing value.
+                    if field.type is bool:
+                        args.append(f"{arg}")
                     else:
-                        args.append(f"{getattr(self, f'_{field.name}NodeopArg')} {getattr(self, field.name)}")
+                        # A value-taking option needs 1/0; f-string on a bool renders True/False.
+                        value = int(current) if isinstance(current, bool) else current
+                        args.append(f"{arg} {value}")
 
         return "--plugin " + self._pluginNamespace + "::" + self._pluginName + " " + " ".join(args) if len(args) > 0 else ""
