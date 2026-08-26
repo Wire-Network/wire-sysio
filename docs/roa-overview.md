@@ -157,7 +157,7 @@ flowchart TD
 The objective billing map is keyed on `payer()` and nothing else. An authorizing account that is
 not the payer never enters it, so consensus neither charges nor limits its CPU and NET. A producer
 running [subjective billing](#subjective-billing-meters-the-signer) does meter the signer, but
-that is node-local and off by default.
+that is node-local rather than consensus, and an operator can turn it off.
 
 | Action authorizations | Payer | Notes |
 |---|---|---|
