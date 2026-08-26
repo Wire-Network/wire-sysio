@@ -556,16 +556,13 @@ derive_collateral_position_pda(const fc::network::solana::solana_public_key& pro
                                const fc::network::solana::solana_public_key& operator_key,
                                uint64_t token_code);
 
-/// Derive the per-`(token_code, custody_mint)` `collateral_vault` PDA: seeds
-/// `["collateral_vault", token_code.to_le_bytes(), custody_mint.as_ref()]`.
-/// Including the pinned mint lets an admin rotate a drained token code from
-/// one SPL mint to another without colliding with the prior mint's token
-/// account. Native collateral settles straight out of the named `vault`, so
-/// this account only rides an SPL manifest.
+/// Derive the per-`token_code` `collateral_vault` PDA: seeds
+/// `["collateral_vault", token_code.to_le_bytes()]`. The vault holds the
+/// token's SPL collateral custody; native collateral settles straight out of
+/// the named `vault`, so this account only rides an SPL manifest.
 fc::network::solana::solana_public_key
 derive_collateral_vault_pda(const fc::network::solana::solana_public_key& program_id,
-                            uint64_t token_code,
-                            const fc::network::solana::solana_public_key& custody_mint);
+                            uint64_t token_code);
 
 /// Which family of effect accounts one inbound attestation needs. The relay
 /// derives the concrete metas per shape; the on-chain handler resolves them
@@ -578,7 +575,7 @@ derive_collateral_vault_pda(const fc::network::solana::solana_public_key& progra
 /// asset the position actually escrows — so their manifests must declare the
 /// position PDA (seeds `[COLLATERAL_POSITION_SEED, operator.as_ref(),
 /// &token_code.to_le_bytes()]`) and, for SPL custody, the
-/// `[COLLATERAL_VAULT_SEED, &token_code.to_le_bytes(), custody_mint]` vault PDA, the
+/// `[COLLATERAL_VAULT_SEED, &token_code.to_le_bytes()]` vault PDA, the
 /// destination ATA and the SPL token program.
 enum class effect_shape {
    /// OPERATOR_ACTION(WITHDRAW_REMIT): pays the operator (natively out of the

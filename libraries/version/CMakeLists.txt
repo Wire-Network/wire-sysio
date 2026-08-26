@@ -20,8 +20,7 @@ target_include_directories(
 
 # Create a custom target to update the version metadata upon every build.
 find_package(Git)
-# Git worktrees represent `.git` as a file, while primary checkouts use a directory.
-if(GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
+if(IS_DIRECTORY ${CMAKE_SOURCE_DIR}/.git AND ${GIT_FOUND})
    add_custom_target(
       evaluate_every_build ALL
       COMMAND ${CMAKE_COMMAND} -DGIT_EXEC=${GIT_EXECUTABLE}
