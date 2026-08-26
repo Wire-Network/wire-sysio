@@ -29,6 +29,11 @@ constexpr std::string_view es_errors_false_token = R"("errors":false)";
 constexpr auto es_warn_interval = std::chrono::seconds(5);
 constexpr auto es_drain_poll    = std::chrono::milliseconds(25);
 constexpr auto es_max_backoff   = std::chrono::milliseconds(2000);
+/// Clamp for the backoff doubling exponent: `1u << attempt` is UB once `attempt`
+/// reaches the width of unsigned (max_retries is operator-controlled and may exceed
+/// 32). es_max_backoff already caps the RESULT after ~4 doublings, so clamping the
+/// exponent changes no observable behavior.
+constexpr uint32_t es_max_backoff_exponent = 16;
 /// Bulk responses carry one item per document; cap them well above realistic sizes.
 constexpr uint64_t es_max_response_body_bytes = 4ULL * 1024ULL * 1024ULL;
 constexpr uint32_t http_status_ok_min            = 200;
@@ -271,9 +276,9 @@ void es_sink_mt::deliver(batch& delivery) {
       // predicate deliberately keys on _cancel_requested (set at drain-timeout), NOT
       // _shutting_down (set at teardown start) -- otherwise retries would spin at zero
       // backoff for the whole graceful-drain window.
-      const auto backoff =
-         std::min<std::chrono::milliseconds>(std::chrono::milliseconds(_cfg.retry_backoff_ms) * (1u << attempt),
-                                             es_max_backoff);
+      const auto backoff = std::min<std::chrono::milliseconds>(
+         std::chrono::milliseconds(_cfg.retry_backoff_ms) * (1u << std::min(attempt, es_max_backoff_exponent)),
+         es_max_backoff);
       std::unique_lock<std::mutex> lk(_timer_mtx);
       if (_timer_cv.wait_for(lk, backoff, [this] { return _cancel_requested.load(std::memory_order_relaxed); })) {
          _failed_batches.fetch_add(1, std::memory_order_relaxed);

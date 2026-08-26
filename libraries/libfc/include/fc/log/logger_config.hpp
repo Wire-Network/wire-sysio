@@ -112,10 +112,15 @@ namespace fc {
       inline constexpr uint32_t default_es_retry_backoff_ms = 250;
       inline constexpr uint32_t default_es_connect_timeout_ms = 5000;
       inline constexpr uint32_t default_es_request_timeout_ms = 10000;
-      /// App-thread stall budget: the sink destructor runs on the app/SIGHUP thread
-      /// during plugin handle_sighup() fan-out -- this bounds that stall, NOT a
-      /// background wait.
-      inline constexpr uint32_t default_es_shutdown_flush_timeout_ms = 500;
+      /// Stall budget on the BLOCK-PRODUCTION thread, not a background wait: SIGHUP
+      /// posts through the priority_queue_executor's single-threaded read_write
+      /// queue -- the same queue block production uses -- and handlers run to
+      /// completion, so the sink destructor's drain (which fires inside the
+      /// handle_sighup() fan-out, e.g. on every logrotate) delays the next
+      /// production handler by up to this budget plus the ~50 ms cancel-poll join.
+      /// Sized well under the 500 ms block interval; against a dead endpoint the
+      /// drain always times out, so the worst case recurs on every SIGHUP.
+      inline constexpr uint32_t default_es_shutdown_flush_timeout_ms = 100;
       /// Hard ceiling on max_batch_bytes; bounds sink memory even with an absurd config.
       inline constexpr uint32_t es_max_batch_bytes_ceiling = 16u * 1024 * 1024;
 
