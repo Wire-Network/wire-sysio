@@ -615,17 +615,23 @@ namespace sysio { namespace chain {
 
       for (const auto& act : trx.actions ) {
          for (const auto& declared_auth : act.authorization) {
-            if (declared_auth.permission == config::sysio_payer_name) {
-               auto active_auth = permission_level{declared_auth.actor, sysio::chain::config::active_name};
-               SYS_ASSERT( checker.satisfied(active_auth), unsatisfied_authorization,
-                           "transaction declares payer authority '{}', but does not have signatures for it.",
-                           active_auth );
+            // `sysio.payer` is a virtual marker, not a permission: no `permission_object`
+            // exists for it and it carries no keys of its own. check_authorization requires
+            // the payer to also appear on the same action under a REAL permission -- any
+            // permission other than `sysio.payer` itself -- and satisfies that entry. It is
+            // reached on its own iteration of this loop, so the marker needs no check here.
+            //
+            // Checking `<payer>@active` instead, as this once did, diverges from consensus
+            // the moment the paired permission is not `active`: a transaction the chain
+            // accepts under `owner` or a linked custom permission was rejected here, so the
+            // signing tools that discover keys through /v1/chain/get_required_keys could not
+            // sign it. It was masked whenever owner and active shared a key.
+            if (declared_auth.permission == config::sysio_payer_name)
+               continue;
 
-            } else {
-               SYS_ASSERT( checker.satisfied(declared_auth), unsatisfied_authorization,
-                           "transaction declares authority '{}', but does not have signatures for it.",
-                           declared_auth );
-            }
+            SYS_ASSERT( checker.satisfied(declared_auth), unsatisfied_authorization,
+                        "transaction declares authority '{}', but does not have signatures for it.",
+                        declared_auth );
          }
       }
 
