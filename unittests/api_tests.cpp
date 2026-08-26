@@ -430,14 +430,29 @@ BOOST_FIXTURE_TEST_CASE(get_required_keys_explicit_payer_tests, validating_teste
    const auto bob_active_pub = get_public_key( "bob"_n, "active" );
    const flat_set<public_key_type> keys_with_bob{ owner_pub, active_pub, custom_pub, bob_active_pub };
 
-   auto expect_both_reject = [&]( const signed_transaction& trx, const char* discovery_msg ) {
+   // Sign ONLY the real permissions each case actually declares. Signing spare keys would make
+   // check_authorization throw tx_irrelevant_sig if the structural guards were ever removed, and a
+   // broad throw-check would stay green for the wrong reason -- the transaction would be rejected
+   // for carrying a useless signature rather than for the malformed payer. Both halves also assert
+   // the specific message, so a case cannot pass on an unrelated failure.
+   auto expect_both_reject = [&]( const signed_transaction& trx,
+                                  const char* discovery_msg,
+                                  const char* consensus_msg ) {
       BOOST_CHECK_EXCEPTION( required_keys( trx, keys_with_bob ), fc::exception,
                              fc_exception_message_starts_with( discovery_msg ) );
+
       auto signed_trx = trx;
-      signed_trx.sign( active_key,   control->get_chain_id() );
-      signed_trx.sign( owner_key,    control->get_chain_id() );
-      signed_trx.sign( get_private_key( "bob"_n, "active" ), control->get_chain_id() );
-      BOOST_CHECK_THROW( push_transaction( signed_trx ), fc::exception );
+      flat_set<name> signed_actors;
+      for( const auto& act : trx.actions ) {
+         for( const auto& auth : act.authorization ) {
+            if( auth.permission == config::sysio_payer_name ) continue;
+            if( !signed_actors.insert( auth.actor ).second )  continue;
+            signed_trx.sign( get_private_key( auth.actor, auth.permission.to_string() ),
+                             control->get_chain_id() );
+         }
+      }
+      BOOST_CHECK_EXCEPTION( push_transaction( signed_trx ), fc::exception,
+                             fc_exception_message_starts_with( consensus_msg ) );
    };
 
    auto payer_trx = [&]( vector<permission_level> auths ) {
@@ -451,23 +466,37 @@ BOOST_FIXTURE_TEST_CASE(get_required_keys_explicit_payer_tests, validating_teste
    // payloadless as payer. Skipping the marker outright would have returned bob's key here.
    expect_both_reject( payer_trx( { { "payloadless"_n, config::sysio_payer_name },
                                     { "bob"_n,        config::active_name } } ),
-                       "Payer authorization for" );
+                       "Payer authorization for",
+                       "Payer 'payloadless' did not authorize this action" );
 
    // Payer with no real permission at all -- would otherwise discover an EMPTY key set, which a
    // signing tool reads as "nothing to sign".
    expect_both_reject( payer_trx( { { "payloadless"_n, config::sysio_payer_name } } ),
-                       "Payer authorization for" );
+                       "Payer authorization for",
+                       "Payer 'payloadless' did not authorize this action" );
+
+   // An EMPTY payer actor. `account_name{}` is what an empty string decodes to, so tracking the
+   // marker by "is the actor still unset?" would leave this looking like no payer was declared and
+   // skip the pairing check -- handing back bob's key. Consensus never sees it, because
+   // validate_referenced_accounts rejects the non-existent actor first, and this function does not
+   // run that pass.
+   expect_both_reject( payer_trx( { { name{},   config::sysio_payer_name },
+                                    { "bob"_n,  config::active_name } } ),
+                       "Payer authorization for",
+                       "action's paying actor '' does not exist" );
 
    // Marker present but not at index 0.
    expect_both_reject( payer_trx( { { "payloadless"_n, config::active_name },
                                     { "payloadless"_n, config::sysio_payer_name } } ),
+                       "Explicit payer must be the first declared authorization",
                        "Explicit payer must be the first declared authorization" );
 
    // Two markers on one action.
    expect_both_reject( payer_trx( { { "payloadless"_n, config::sysio_payer_name },
                                     { "payloadless"_n, config::active_name },
                                     { "payloadless"_n, config::sysio_payer_name } } ),
-                       "Multiple payers specified for action" );
+                       "Multiple payers specified for action",
+                       "action cannot have multiple payers" );
 
    // Pairing must be on the SAME action: the marker is on action 0 while payloadless's real
    // permission sits on action 1. Consensus scopes the pairing per-action, so discovery must too.
@@ -481,7 +510,8 @@ BOOST_FIXTURE_TEST_CASE(get_required_keys_explicit_payer_tests, validating_teste
          vector<permission_level>{ { "payloadless"_n, config::active_name } },
          "payloadless"_n, "doit"_n, bytes{} );
       set_transaction_headers( trx );
-      expect_both_reject( trx, "Payer authorization for" );
+      expect_both_reject( trx, "Payer authorization for",
+                          "Payer 'payloadless' did not authorize this action" );
    }
 
    // --- Context-free actions contribute nothing and are not screened here. Consensus passes only

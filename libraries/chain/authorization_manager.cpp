@@ -652,16 +652,24 @@ namespace sysio { namespace chain {
          // duplicated rather than shared with the consensus validators -- this function is not on
          // the apply path, and refactoring the consensus copies to serve it would put a
          // non-consensus caller in a position to change consensus behaviour.
+         // Marker presence is tracked separately from the actor rather than using an empty
+         // account_name as the sentinel. An empty actor is valid JSON and decodes to
+         // account_name{}, so a `{"": sysio.payer}` entry would leave the sentinel looking unset
+         // and skip the pairing check below. Consensus is not exposed to that -- it rejects the
+         // empty actor earlier, in validate_referenced_accounts ("action's paying actor '' does
+         // not exist") -- but this function never runs that pass.
+         bool         has_payer = false;
          account_name payer;
          for (size_t i = 0; i < act.authorization.size(); ++i) {
             const auto& declared_auth = act.authorization[i];
 
             if (declared_auth.permission == config::sysio_payer_name) {
-               SYS_ASSERT( payer.empty(), irrelevant_auth_exception,
+               SYS_ASSERT( !has_payer, irrelevant_auth_exception,
                            "Multiple payers specified for action" );
                SYS_ASSERT( i == 0, irrelevant_auth_exception,
                            "Explicit payer must be the first declared authorization" );
-               payer = declared_auth.actor;
+               has_payer = true;
+               payer     = declared_auth.actor;
                continue;
             }
 
@@ -670,7 +678,7 @@ namespace sysio { namespace chain {
                         declared_auth );
          }
 
-         if (!payer.empty()) {
+         if (has_payer) {
             const bool paired = std::ranges::any_of(act.authorization, [&](const auto& auth) {
                return auth.actor == payer && auth.permission != config::sysio_payer_name;
             });
