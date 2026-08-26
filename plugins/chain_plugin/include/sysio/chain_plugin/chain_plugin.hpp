@@ -105,6 +105,34 @@ namespace sysio {
                 : configured_timeout;
    }
 
+   /// Minimum decoder and request budget for a cold startup configuration read.
+   inline constexpr fc::microseconds snapshot_attestation_startup_minimum_table_read_timeout{
+      1'000'000};
+
+   /// Maximum number of startup configuration reads before bootstrap fails closed.
+   inline constexpr uint32_t snapshot_attestation_startup_table_read_attempts = 3;
+
+   /** Give a cold startup read more headroom than steady-state attestation polling. */
+   constexpr fc::microseconds snapshot_attestation_startup_table_read_timeout(
+      fc::microseconds configured_timeout) {
+      return configured_timeout < snapshot_attestation_startup_minimum_table_read_timeout
+                ? snapshot_attestation_startup_minimum_table_read_timeout
+                : configured_timeout;
+   }
+
+   /** Retry transient startup read failures while preserving a terminal empty result. */
+   template <typename Read>
+   auto retry_snapshot_attestation_startup_table_read(Read&& read) -> decltype(read()) {
+      for (uint32_t attempt = 0; attempt < snapshot_attestation_startup_table_read_attempts;
+           ++attempt) {
+         auto result = read();
+         if (result) {
+            return result;
+         }
+      }
+      return {};
+   }
+
    /** Return whether an ABI declares the tables consumed during auto-fetched snapshot bootstrap. */
    bool has_required_snapshot_attestation_schema(const abi_def& abi);
 

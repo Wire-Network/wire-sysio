@@ -365,22 +365,23 @@ For a complete operator setup guide — including producer registration, provide
 **Integration test** (`tests/snapshot_api_test.py` — 10 tests):
 
 Phase 3 (API endpoints):
-- `/v1/snapshot/latest` returns 404 with empty catalog
-- Create snapshot and verify `/v1/snapshot/latest` metadata
+- `/v1/snapshot/latest` returns 404 without a scheduled snapshot
+- Manual snapshots remain available through explicit-block metadata and download endpoints
 - `/v1/snapshot/by_block` returns correct metadata
 - `/v1/snapshot/by_block` returns 404 for non-existent block
 - `/v1/snapshot/download` serves binary file matching on-disk snapshot
 - Range header support (206 Partial Content with correct `Content-Range`)
-- Second snapshot updates catalog; first snapshot still accessible
+- Additional manual snapshots remain explicit-only and do not replace scheduled discovery
 
 Phase 4 (bootstrap):
-- Latest manual snapshot metadata is rejected before download because its height is unattestable
+- Base-URL bootstrap fails discovery when no scheduled snapshot is available
 - A specific manual snapshot URL is rejected before download for the same cadence invariant
 - Raw snapshot downloads honor HTTP `max-bytes-in-flight` admission control
 
 C++ tests construct cadence heights without waiting for 25,000 wall-clock blocks and cover the
 contract record, snapshot round trip, and strict auto-fetch verification. The
-integration test proves manual endpoint snapshots fail closed before their bytes are downloaded.
+integration test proves manual endpoint snapshots cannot enter base-URL discovery and fail closed before download when
+requested explicitly.
 
 ---
 

@@ -166,7 +166,7 @@ remains an operator-trusted path without attestation verification.
 
 The manual `create_snapshot` and `schedule_snapshot` APIs remain available through `producer_api_plugin`, but they are
 not part of the provider attestation workflow. When a snapshot finalizes (becomes irreversible), it is automatically
-added to the serving catalog.
+added to the serving catalog and remains available through the explicit-block metadata and download endpoints.
 
 ### Startup catalog
 
@@ -178,7 +178,8 @@ All endpoints use POST with JSON bodies, consistent with other Wire Sysio APIs.
 
 ### `POST /v1/snapshot/latest`
 
-Returns metadata for the most recent snapshot.
+Returns metadata for the newest snapshot at an exact attestation-cadence height. Newer manual snapshots are skipped so
+base-URL bootstrap continues to discover the newest snapshot that can receive an on-chain attestation.
 
 **Request:** empty body or `{}`
 
@@ -192,7 +193,7 @@ Returns metadata for the most recent snapshot.
 }
 ```
 
-**Response (404):** No snapshots in catalog.
+**Response (404):** No scheduled snapshots in the catalog. Manual snapshots may still be available by explicit block.
 
 ### `POST /v1/snapshot/by_block`
 
@@ -253,8 +254,9 @@ The bootstrap process:
 6. After syncing, verifies the snapshot's on-chain attestation record
 
 `--delete-all-blocks` is required when existing chain data is present. The `--snapshot-endpoint` option is incompatible with `--snapshot` (local file).
-Manual/on-demand snapshots remain available through the serving API, but endpoint bootstrap rejects
-their unscheduled heights before download because they can never receive an on-chain attestation.
+Manual/on-demand snapshots remain available through the explicit-block serving APIs. Base-URL discovery ignores their
+unscheduled heights, and an explicit-block bootstrap request rejects them before download because they can never
+receive an on-chain attestation.
 
 ### Bootstrap download status and limits
 

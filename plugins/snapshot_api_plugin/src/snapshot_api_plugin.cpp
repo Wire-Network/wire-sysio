@@ -1,4 +1,5 @@
 #include <sysio/snapshot_api_plugin/snapshot_api_plugin.hpp>
+#include <sysio/snapshot_api_plugin/snapshot_catalog.hpp>
 #include <sysio/http_plugin/common.hpp>
 #include <sysio/chain/exceptions.hpp>
 #include <sysio/chain/snapshot.hpp>
@@ -17,6 +18,9 @@ namespace sysio {
 
 using namespace sysio;
 using namespace sysio::chain;
+
+/// Diagnostic returned when the catalog has no snapshot eligible for attested bootstrap.
+constexpr auto no_scheduled_snapshots_message = "No scheduled snapshots available";
 
 struct snapshot_entry {
    block_num_type         block_num = 0;
@@ -127,11 +131,14 @@ public:
       ilog("Added snapshot to catalog: block #{}", si.head_block_num);
    }
 
+   /** Return the newest snapshot eligible for scheduled attestation and base-URL bootstrap. */
    std::optional<snapshot_entry> get_latest() const {
       std::lock_guard lock(catalog_mtx_);
-      if (catalog_.empty())
+      const auto entry = snapshot_api::find_latest_scheduled_snapshot(catalog_);
+      if (entry == catalog_.rend()) {
          return std::nullopt;
-      return std::optional{catalog_.rbegin()->second}; // highest block_num
+      }
+      return std::optional{entry->second};
    }
 
    std::optional<snapshot_entry> get_by_block(block_num_type block_num) const {
@@ -171,7 +178,7 @@ void snapshot_api_plugin::plugin_startup() {
 
    auto& http = app().get_plugin<http_plugin>();
 
-   // /v1/snapshot/latest - return metadata of latest snapshot
+   // /v1/snapshot/latest - return metadata of latest scheduled snapshot
    http.add_api({
       {std::string("/v1/snapshot/latest"),
        api_category::snapshot_ro,
@@ -180,7 +187,7 @@ void snapshot_api_plugin::plugin_startup() {
              parse_params<std::string, http_params_types::no_params>(body);
              auto entry = impl->get_latest();
              if (!entry) {
-                cb(404, fc::variant(fc::mutable_variant_object()("message", "No snapshots available")));
+                cb(404, fc::variant(fc::mutable_variant_object()("message", no_scheduled_snapshots_message)));
                 return;
              }
              snapshot_metadata meta{entry->block_num, entry->block_id, entry->block_time, entry->root_hash};

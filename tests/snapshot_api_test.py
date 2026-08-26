@@ -21,13 +21,13 @@ from TestHarness.TestHelper import AppArgs
 #  from a snapshot endpoint (--snapshot-endpoint CLI option).
 #
 #  API endpoints tests:
-#   - /v1/snapshot/latest    — metadata of highest block snapshot
+#   - /v1/snapshot/latest    — metadata of newest scheduled snapshot
 #   - /v1/snapshot/by_block  — metadata for specific block
 #   - /v1/snapshot/download  — binary file download
 #   - Range header support for partial downloads
 #
 #  bootstrap tests:
-#   - Reject latest manual snapshot before endpoint download
+#   - Exclude manual snapshots from latest endpoint discovery
 #   - Reject a specific manual snapshot before endpoint download
 #
 #  Cluster layout:
@@ -81,9 +81,9 @@ try:
     # ===================================================================
 
     # ---------------------------------------------------------------
-    # Test 1: /v1/snapshot/latest returns 404 when no snapshots exist
+    # Test 1: /v1/snapshot/latest returns 404 when no scheduled snapshots exist
     # ---------------------------------------------------------------
-    Print("=== Test 1: /v1/snapshot/latest returns 404 with no snapshots ===")
+    Print("=== Test 1: /v1/snapshot/latest returns 404 with no scheduled snapshots ===")
 
     try:
         result = node0.processUrllibRequest("snapshot", "latest", silentErrors=True)
@@ -100,9 +100,9 @@ try:
     Print("Test 1 PASSED")
 
     # ---------------------------------------------------------------
-    # Test 2: Create snapshot and query /v1/snapshot/latest
+    # Test 2: Manual snapshots remain explicit-only
     # ---------------------------------------------------------------
-    Print("=== Test 2: Create snapshot and query /v1/snapshot/latest ===")
+    Print("=== Test 2: Manual snapshots remain explicit-only ===")
 
     assert node0.waitForHeadToAdvance(blocksToAdvance=3), "Head did not advance"
 
@@ -111,22 +111,12 @@ try:
     assert ret is not None, "Snapshot creation failed"
     snapInfo = ret["payload"]
     snapBlockNum = snapInfo["head_block_num"]
-    snapBlockId = snapInfo["head_block_id"]
     snapRootHash = snapInfo["root_hash"]
     Print(f"Created snapshot: block_num={snapBlockNum}, root_hash={snapRootHash}")
 
-    Print("Query /v1/snapshot/latest")
-    result = node0.processUrllibRequest("snapshot", "latest")
-    assert result is not None and result.get("code") == 200, \
-        f"latest endpoint failed: {result}"
-    meta = result["payload"]
-
-    assert meta["block_num"] == snapBlockNum, \
-        f"block_num mismatch: expected {snapBlockNum}, got {meta['block_num']}"
-    assert meta["block_id"] == snapBlockId, \
-        f"block_id mismatch: expected {snapBlockId}, got {meta['block_id']}"
-    assert meta["root_hash"] == snapRootHash, \
-        f"root_hash mismatch: expected {snapRootHash}, got {meta['root_hash']}"
+    Print("Verify /v1/snapshot/latest excludes the manual snapshot")
+    result = node0.processUrllibRequest("snapshot", "latest", silentErrors=True)
+    assert result is None, f"Expected no scheduled latest snapshot, got: {result}"
 
     Print("Test 2 PASSED")
 
@@ -290,9 +280,9 @@ try:
     Print("Test 6 PASSED")
 
     # ---------------------------------------------------------------
-    # Test 7: Second snapshot updates catalog
+    # Test 7: Additional manual snapshots remain explicit-only
     # ---------------------------------------------------------------
-    Print("=== Test 7: Second snapshot updates catalog ===")
+    Print("=== Test 7: Additional manual snapshots remain explicit-only ===")
 
     assert node0.waitForHeadToAdvance(blocksToAdvance=3), "Head did not advance"
 
@@ -302,10 +292,14 @@ try:
     snap2BlockNum = snap2Info["head_block_num"]
     assert snap2BlockNum > snapBlockNum
 
-    result = node0.processUrllibRequest("snapshot", "latest")
+    result = node0.processUrllibRequest("snapshot", "latest", silentErrors=True)
+    assert result is None, f"Expected no scheduled latest snapshot, got: {result}"
+
+    # Both manual snapshots remain explicitly accessible.
+    result = node0.processUrllibRequest("snapshot", "by_block",
+                                         payload={"block_num": snap2BlockNum})
     assert result is not None and result["payload"]["block_num"] == snap2BlockNum
 
-    # First snapshot still accessible
     result = node0.processUrllibRequest("snapshot", "by_block",
                                          payload={"block_num": snapBlockNum})
     assert result is not None and result["payload"]["block_num"] == snapBlockNum
@@ -316,14 +310,15 @@ try:
     # Snapshot endpoint cadence enforcement
     # ===================================================================
     # These API-created snapshots are manual and therefore intentionally outside the
-    # 25,000-block attestation cadence. Auto-fetch must reject them before download;
+    # 25,000-block attestation cadence. Base-URL discovery must ignore them, while an
+    # explicit block request must still reject an unscheduled height before download;
     # scheduled-attestation verification is covered by C++ tests that can construct
     # cadence heights without hours of wall-clock block production.
 
     # ---------------------------------------------------------------
-    # Test 8: Reject latest manual snapshot endpoint
+    # Test 8: Base-URL bootstrap ignores manual snapshots
     # ---------------------------------------------------------------
-    Print("=== Test 8: Reject latest manual snapshot endpoint ===")
+    Print("=== Test 8: Base-URL bootstrap ignores manual snapshots ===")
 
     # Kill and wipe bootstrap node
     Print("Kill and wipe bootstrap node (node 2)")
@@ -333,15 +328,15 @@ try:
     endpointUrl = node0.endpointHttp
     Print(f"Attempt bootstrap with --snapshot-endpoint {endpointUrl}")
 
-    # Metadata is fetched, but the unscheduled height must be rejected before download.
+    # No scheduled snapshot exists, so discovery must fail before any manual snapshot download.
     isRelaunchSuccess = bootstrapNode.relaunch(
         chainArg=f"--delete-all-blocks --snapshot-endpoint {endpointUrl}", timeout=10)
     assert not isRelaunchSuccess, \
-        "Bootstrap should reject an unattestable latest manual snapshot"
-    assert bootstrapNode.findInLog(r"Snapshot endpoint returned unscheduled block") is not None, \
-        "Missing unscheduled snapshot endpoint diagnostic"
+        "Bootstrap should reject an endpoint without a scheduled snapshot"
+    assert bootstrapNode.findInLog(r"URL not found") is not None, \
+        "Missing no-scheduled-snapshot endpoint diagnostic"
     assert not list(bootstrapNode.data_dir.glob("snapshots/snapshot-bootstrap-*.bin")), \
-        "Unscheduled endpoint snapshot was downloaded before rejection"
+        "Manual endpoint snapshot was downloaded before discovery rejection"
 
     Print("Test 8 PASSED")
 

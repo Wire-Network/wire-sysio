@@ -509,14 +509,16 @@ public:
    fc::microseconds                  abi_serializer_max_time_us;
    std::optional<std::filesystem::path>          snapshot_path;
 
-   // Snapshot attestation verification: set when starting from a snapshot,
-   // checked once after syncing past the snapshot block.
+   /// Auto-fetched snapshot height awaiting post-sync attestation verification.
    std::optional<uint32_t>    snapshot_loaded_block_num;
    /// Block height advertised by the endpoint for the downloaded snapshot.
    std::optional<uint32_t>    snapshot_endpoint_block_num;
+   /// Block ID loaded from the auto-fetched snapshot and compared with the attested tuple.
    block_id_type              snapshot_loaded_block_id;
+   /// BLAKE3 root loaded from the auto-fetched snapshot and compared with the attested tuple.
    fc::crypto::blake3         snapshot_loaded_root_hash;
-   bool                       snapshot_auto_fetched = false; // true when loaded via --snapshot-endpoint
+   /// Whether the configured snapshot path was populated by --snapshot-endpoint.
+   bool                       snapshot_auto_fetched = false;
 
    // --native-contract mappings: account -> path to .so
    std::vector<std::pair<chain::name, std::filesystem::path>> native_contracts;
@@ -1646,10 +1648,12 @@ void chain_plugin_impl::require_snapshot_attestation_configuration() const {
 
    static const std::atomic<bool> not_shutting_down{false};
    const auto table_read_timeout =
-      snapshot_attestation_table_read_timeout(abi_serializer_max_time_us);
-   const auto read_result = app().get_plugin<chain_plugin>().read_table_rows_checked(
-      std::move(params), table_read_timeout, table_read_timeout,
-      snapshot_attestation_config_log_prefix, not_shutting_down);
+      snapshot_attestation_startup_table_read_timeout(abi_serializer_max_time_us);
+   const auto read_result = retry_snapshot_attestation_startup_table_read([&]() {
+      return app().get_plugin<chain_plugin>().read_table_rows_checked(
+         params, table_read_timeout, table_read_timeout,
+         snapshot_attestation_config_log_prefix, not_shutting_down);
+   });
    SYS_ASSERT(read_result, plugin_config_exception,
               snapshot_attestation_config_read_failure_message,
               config::system_account_name, snapshot_attest::table_snapconfig);

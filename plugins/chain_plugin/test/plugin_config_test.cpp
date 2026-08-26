@@ -302,6 +302,40 @@ BOOST_AUTO_TEST_CASE(snapshot_attestation_table_read_timeout_policy) {
                == sysio::snapshot_attestation_minimum_table_read_timeout);
    BOOST_CHECK(sysio::snapshot_attestation_table_read_timeout(above_minimum)
                == above_minimum);
+
+   BOOST_CHECK(sysio::snapshot_attestation_startup_table_read_timeout(disabled_timeout)
+               == sysio::snapshot_attestation_startup_minimum_table_read_timeout);
+   BOOST_CHECK(sysio::snapshot_attestation_startup_table_read_timeout(above_minimum)
+               == sysio::snapshot_attestation_startup_minimum_table_read_timeout);
+   BOOST_CHECK(sysio::snapshot_attestation_startup_table_read_timeout(
+                  sysio::snapshot_attestation_startup_minimum_table_read_timeout
+                  + sysio::snapshot_attestation_startup_minimum_table_read_timeout)
+               == sysio::snapshot_attestation_startup_minimum_table_read_timeout
+                     + sysio::snapshot_attestation_startup_minimum_table_read_timeout);
+}
+
+/** A transient startup read is retried only up to the bounded attempt count. */
+BOOST_AUTO_TEST_CASE(snapshot_attestation_startup_table_read_retry_policy) {
+   uint32_t successful_attempts = 0;
+   const auto successful_read = sysio::retry_snapshot_attestation_startup_table_read(
+      [&]() -> std::optional<uint32_t> {
+         ++successful_attempts;
+         if (successful_attempts < sysio::snapshot_attestation_startup_table_read_attempts) {
+            return std::nullopt;
+         }
+         return successful_attempts;
+      });
+   BOOST_REQUIRE(successful_read);
+   BOOST_CHECK_EQUAL(*successful_read, sysio::snapshot_attestation_startup_table_read_attempts);
+
+   uint32_t failed_attempts = 0;
+   const auto failed_read = sysio::retry_snapshot_attestation_startup_table_read(
+      [&]() -> std::optional<uint32_t> {
+         ++failed_attempts;
+         return std::nullopt;
+      });
+   BOOST_CHECK(!failed_read);
+   BOOST_CHECK_EQUAL(failed_attempts, sysio::snapshot_attestation_startup_table_read_attempts);
 }
 
 /** Require the table keys and ordered field prefix consumed by bootstrap verification. */

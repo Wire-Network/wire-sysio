@@ -772,8 +772,8 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_honors_governance_fixed_k, snapshot_attest_
    BOOST_REQUIRE(!getsnaphash(block_num).is_null());
 } FC_LOG_AND_RETHROW() }
 
-/// Rotating a snapshot account preserves the producer's monotonic vote and makes retries idempotent.
-BOOST_FIXTURE_TEST_CASE(votesnaphash_preserves_pending_vote_on_snap_account_rotation,
+/// Rotating a snapshot account cannot add Sybil weight and makes exact retries idempotent.
+BOOST_FIXTURE_TEST_CASE(votesnaphash_snap_account_rotation_does_not_add_sybil_weight,
                         snapshot_attest_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
@@ -789,6 +789,7 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_preserves_pending_vote_on_snap_account_rota
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov5"_n));
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov5"_n, block_id, snapshot_hash));
    BOOST_REQUIRE_EQUAL(1u, snapshot_vote_count());
+   BOOST_REQUIRE(getsnaphash(block_num).is_null());
 
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, block_id, snapshot_hash));
    BOOST_REQUIRE(!getsnaphash(block_num).is_null());
