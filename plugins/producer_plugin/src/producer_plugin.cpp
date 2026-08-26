@@ -832,8 +832,8 @@ public:
    fc::time_point                                    _pending_block_deadline;
    uint32_t                                          _max_block_cpu_usage_threshold_us            = 0;
    uint32_t                                          _max_block_net_usage_threshold_bytes         = 0;
-   bool                                              _disable_subjective_p2p_billing              = true;
-   bool                                              _disable_subjective_api_billing              = true;
+   bool                                              _disable_subjective_p2p_billing              = false;
+   bool                                              _disable_subjective_api_billing              = false;
    fc::time_point                                    _irreversible_block_time;
 
    std::vector<chain::digest_type> _protocol_features_to_activate;
@@ -1465,11 +1465,13 @@ void producer_plugin::set_program_options(
           "Maximum size (in MiB) of the incoming transaction queue. Exceeding this value will subjectively drop transaction with resource exhaustion.")
          ("disable-subjective-account-billing", boost::program_options::value<vector<string>>()->composing()->multitoken(),
           "Account which is excluded from subjective CPU billing")
-         ("disable-subjective-payer-billing", bpo::value<bool>()->default_value(false),
-          "Disable subjective CPU billing for all contract payer accounts")
-         ("disable-subjective-p2p-billing", bpo::value<bool>()->default_value(true),
+         ("disable-subjective-payer-billing", bpo::value<bool>()->default_value(true),
+          "Disable subjective CPU billing for all contract payer accounts. On by default: under "
+          "contract-pays the payer is the called contract, so billing it for its callers' failures "
+          "charges the party provisioned to absorb traffic rather than the account causing it")
+         ("disable-subjective-p2p-billing", bpo::value<bool>()->default_value(false),
           "Disable subjective CPU billing for P2P transactions")
-         ("disable-subjective-api-billing", bpo::value<bool>()->default_value(true),
+         ("disable-subjective-api-billing", bpo::value<bool>()->default_value(false),
           "Disable subjective CPU billing for API transactions")
          ("snapshots-dir", bpo::value<std::filesystem::path>()->default_value("snapshots"),
           "the location of the snapshots directory (absolute path or relative to application data dir)")
