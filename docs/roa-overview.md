@@ -574,21 +574,24 @@ producer-side retry.
 
 ### Defaults
 
-Subjective billing ships **off**. Both `disable-subjective-p2p-billing` and
-`disable-subjective-api-billing` default to `true`, and when both are set the producer plugin
-disables subjective billing entirely and logs `Subjective CPU billing disabled`. The failure
-limiter is gated on the same flag, so it is off with it. Operators opt in per traffic source.
+Subjective billing ships **on**, and the failure limiter with it — both are gated on the same
+flag. The contract payer is excluded: under contract-pays it is the account deliberately
+provisioned to absorb traffic, so billing it for its callers' failures would point the cost at the
+wrong account. The signer, which is the account generating them, is still billed.
 
 | Option | Default | Effect |
 |---|---|---|
-| `disable-subjective-p2p-billing` | `true` | Skip subjective enforcement for P2P transactions |
-| `disable-subjective-api-billing` | `true` | Skip subjective enforcement for API transactions |
+| `disable-subjective-p2p-billing` | `false` | Set true to skip subjective enforcement for P2P transactions |
+| `disable-subjective-api-billing` | `false` | Set true to skip subjective enforcement for API transactions |
 | `subjective-account-cpu-allowed-us` | `300000` | Subjective CPU budget above an account's objective limit |
 | `subjective-account-decay-time-minutes` | `1440` | Time to return a full subjective budget |
 | `subjective-account-max-failures` | `3` | Failures allowed per account per window |
 | `subjective-account-max-failures-window-size` | `1` | Window size in blocks for the failure limit |
-| `disable-subjective-payer-billing` | `false` | When billing is on, also meter the payer (the contract) |
+| `disable-subjective-payer-billing` | `true` | Set false to also meter the payer (the contract) |
 | `disable-subjective-account-billing <acct>` | — | Exempt named accounts entirely |
+
+Setting the p2p and api flags *both* true disables subjective billing outright, and the producer
+logs `Subjective CPU billing disabled`.
 
 Independent of all of it, `incoming-transaction-queue-size-mb` (default `1024`) subjectively drops
 transactions with a resource-exhaustion error when the incoming queue overflows.
@@ -703,11 +706,10 @@ is `0.0500 SYS` of each, and a routine test account is provisioned with `0.0010 
 Budget headroom for peaks above the average rate, not for failures: objective CPU and NET are
 billed only on the success path, since `add_transaction_usage` runs from `finalize()` and a
 throwing transaction has its session undone. A failed attempt costs the payer nothing *objectively*,
-and a retry that lands is billed once. Subjectively it is not free: `update_billed_cpu_time` records
-CPU against the payer, and a non-exhaustion failure passes that to `subjective_bill_failure` unless
-`disable-subjective-payer-billing` is set, which it is not by default — so failed spam eats the
-contract's node-local headroom too. Leave room for it. (The *signer* is billed separately — see
-[Subjective billing](#subjective-billing-meters-the-signer).)
+and a retry that lands is billed once. Nor does the contract pay for them subjectively:
+`disable-subjective-payer-billing` defaults true, so `subjective_bill_failure` skips the payer. The
+cost of failures lands on the *signer* — see
+[Subjective billing](#subjective-billing-meters-the-signer).
 
 The provisioning is a single `addpolicy` on the contract account. Because the contract is the payer
 for any call that does not name one explicitly, ordinary users of that token are never billed — a
