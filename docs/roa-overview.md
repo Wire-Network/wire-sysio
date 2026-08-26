@@ -21,8 +21,10 @@ rental.
 **Applications get paid for by node owners.** A contract cannot conjure its own capacity. It
 receives a **policy** — a grant of CPU, NET, and RAM weight — from a **node owner**, who holds a
 fixed share of the network's capacity determined by their tier and issues slices of it through the
-`sysio.roa` contract. Only registered node owners can issue policies. No account can grant itself
-bandwidth.
+`sysio.roa` contract. Only registered node owners can issue policies, and only out of their own
+tier budget — so an ordinary account cannot grant itself bandwidth, and no account can create
+capacity that was not already allocated to some node owner. A node owner may name itself as the
+recipient of one of its own policies; registration does exactly that for the owner's own account.
 
 **A contract without a policy does not run.** Because the contract is the payer, an unprovisioned
 one has nothing to pay with, and ordinary calls into it fail. Provisioning the contract — not the
@@ -39,21 +41,27 @@ Antelope-family chains bill the signer, and over time offered three ways to fund
 CPU and NET. Not every chain ran all three, and they arrived in sequence rather than as a set — so
 what you have used depends on which chain and which era.
 
-**Staking (2018).** You locked tokens with `delegatebw` to get a proportional share of CPU and NET,
-and bought RAM outright from a Bancor-curve market with `buyram`. Users had to hold enough token to
-stake, understand three resource types, and manage `undelegatebw` timing. A dApp onboarding new
-users had to hand each of them staked tokens or build a custodial account layer. RAM price moved
-with the market, so contract deployment cost moved with it.
+**Staking (2018).** Tokens locked with `delegatebw` bought a proportional share of CPU and NET, and
+RAM was bought outright from a Bancor-curve market with `buyram`. `delegatebw` takes separate
+`from` and `receiver` arguments, so a third party could stake on a user's behalf without that user
+holding any token — but somebody still had to hold and lock tokens per user, keep track of the
+`undelegatebw` timing to get them back, and understand three resource types to do it. A dApp
+onboarding new users therefore built a funding or custodial layer of its own. RAM price moved with
+the market, so contract deployment cost moved with it.
 
 **REX (2019).** A lending market let token holders rent out their staked CPU/NET for yield instead
 of leaving it idle. It improved capital efficiency and added a third system to understand alongside
 staking and the RAM market.
 
-**PowerUp (2021).** Replaced REX rentals with a stateless daily-expiring rental priced off a
-utilization curve. Simpler to use — you paid for a day's worth of CPU/NET — but the signer still
-pays, still needs the chain's native token, and the price still moves with the utilization curve.
+**PowerUp (2021).** Replaced REX rentals with a daily-expiring rental priced off a utilization
+curve. Simpler to use — you paid for a day's worth of CPU/NET — and, like `delegatebw`, it
+separates the fee `payer` from the resource `receiver`, so the user need not hold the token. It is
+not stateless, though: the system contract keeps a `powup_state` singleton whose utilization drives
+the price, plus an order table that has to be expired as rentals lapse. Somebody still pays per
+user, per day, at a price that moves with the curve.
 
-In all three, the account that signs is the account that is billed.
+In all three, the account that signs is the account that is *billed* — funding it is a separate
+problem each of them leaves to the application.
 
 On Wire the signer is billed only if it asks to be. By default the contract is, and it is
 provisioned once by a node owner issuing a policy, after which every account that calls it
@@ -63,12 +71,12 @@ the exception, not the ordinary path.
 | | EOS staking | REX | PowerUp | **Wire ROA** |
 |---|---|---|---|---|
 | Who is billed for a transaction | Signer | Signer | Signer | **Called contract, unless the action names an explicit payer** |
-| End user needs native token | Yes | Yes | Yes | **No** |
+| End user needs native token | No — but someone does, per user | No — but someone does, per user | No — but someone does, per user | **No — the contract's one policy covers every caller** |
 | CPU/NET acquired by | Locking tokens | Renting from a pool | Daily fee on a curve | **A node owner's policy** |
 | RAM acquired by | Bancor market purchase | same | same | **A node owner's policy** |
 | Acquisition price set by | RAM market | Rental market | Utilization curve | **Off-chain, between issuer and recipient** ([what the weight then buys is on-chain](#how-weight-becomes-throughput)) |
 | Reclaimable by | Unstake (3d) | Sell rex | Expires daily | **`reducepolicy` after `time_block`** |
-| Cost to onboard a user | Tokens + stake + RAM | same | same | **None to the user** |
+| Cost to onboard a user | Per-user stake + RAM, held or funded by someone | same | Per-user daily fee | **Nothing per user — the contract is already provisioned** |
 
 ---
 
@@ -104,8 +112,21 @@ which is the case for essentially all user traffic.
 resources. The protocol requires all three of the following together:
 
 - the `sysio.payer` entry sits at **index 0** of the action's authorizations,
-- the **same actor** also appears on that action with a real permission, and
-- the transaction carries **signatures** satisfying that actor's `active` authority.
+- the **same actor** also appears on that action under a real permission, and
+- the transaction carries **signatures** satisfying that paired declared authorization.
+
+The paired permission is not required to be `active`. `authorization_manager` looks for any entry
+whose actor matches the payer and whose permission is not `sysio.payer` itself, then satisfies it
+like any other declared authority — so `owner`, or a custom permission linked to that action, works
+as well:
+
+```cpp
+// libraries/chain/authorization_manager.cpp — checking the explicit payer is paired
+if (auth.actor == payer && auth.permission != config::sysio_payer_name) {
+   foundPayer = true;   // any real permission of the payer, not `active` specifically
+   break;
+}
+```
 
 You can only volunteer yourself, or someone who co-signs. An account that names itself payer needs
 its own allocation and fails without one.
@@ -156,17 +177,56 @@ account <yourcontract> net usage is too high: 132 > 0
 Nothing is wrong with the contract, the transaction, or the signer. The contract has no policy, and
 the contract is the payer. It will look dead until a node owner issues it one.
 
-The fix is not to change the contract or ask users to acquire resources. It is a single `addpolicy`
-on the contract account. Once that exists, the same unmodified transaction succeeds, and every user
-of that contract transacts for free.
+The fix is not to ask users to acquire resources. It is a single `addpolicy` on the contract
+account, and for a contract that bills its own state that is the whole of it — the same unmodified
+transaction then succeeds, and every user transacts for free.
+
+**One porting change is not optional, though.** A great many Antelope contracts name an
+authorizing user as the RAM payer for rows they create — the `{user, "active"_n}` idiom, with
+`user` passed to `emplace`. Wire rejects that transaction whatever policy the contract holds:
+`validate_account_ram_deltas` requires a payer other than the receiver to carry the `sysio.payer`
+permission on the action, and `active` does not satisfy it:
+
+```
+Requested payer alice did not authorize payment. Missing sysio.payer.
+```
+
+There are two ways through, and the choice is a product decision, not a mechanical one:
+
+- **Bill the rows to the contract** (`emplace(get_self(), ...)`). The contract's policy covers the
+  storage, users stay free, and nothing about the caller's transaction changes. This is the
+  gasless path, and what most ports want.
+- **Keep billing the user**, which now requires the client to add `sysio.payer` at index 0. That
+  makes the user the CPU and NET payer too, so they need their own allocation — see
+  [Who pays](#who-pays-the-payer-model).
+
+So: a policy on the contract makes an unprovisioned contract callable, but it does not by itself
+make every Antelope contract portable unchanged. Check where the contract bills its RAM first.
 
 ### Why the contract can afford it
 
-System accounts — anything whose name prefix is `sysio` — carry unlimited resource limits, and
-`sysio.roa` preserves that: every code path that touches a `sysio.*` account's limits passes the
-unlimited marker for CPU and NET, and `addpolicy` refuses to allocate CPU or NET to them at all. So
-`sysio.token` transfers, `sysio.msig` proposals, and every other system-contract call are covered
-by the system itself.
+The executable system contracts — `sysio.token`, `sysio.msig`, `sysio.wrap` and the rest — carry
+unlimited CPU and NET, so their calls are covered by the system itself. Two separate mechanisms
+produce that, and neither is a chain-level rule that a `sysio.` prefix means unlimited:
+
+- **They were never provisioned.** A resource-limits row is *born* unlimited — `net_weight`,
+  `cpu_weight` and `ram_bytes` all default to `-1` — and these accounts simply never had limits
+  set on them.
+- **`sysio.roa` preserves it when it syncs a quota.** `add_system_resources` passes `-1, -1` for
+  CPU and NET when the owner is `sysio.`-prefixed, and `addpolicy` / `expandpolicy` refuse to
+  allocate CPU or NET to such an account at all.
+
+**The prefix alone guarantees nothing.** `activateroa` deliberately creates `sysio.acct` with
+**zero** CPU and NET — it is a pure RAM bucket for account creation, not an executable contract:
+
+```cpp
+// contracts/sysio.roa/sysio.roa.cpp — activateroa
+// Seed the sysio.acct account-creation bucket ... No CPU/NET.
+set_resource_limits("sysio.acct"_n, acct_seed_bytes, 0, 0);
+```
+
+Read the guarantee as being about the system contracts that were provisioned unlimited, not about
+the name.
 
 > **What `-1` means here.** Resource limits are signed integers, and `-1` is a **sentinel** — a
 > reserved value meaning "no limit," not a quantity. The chain tests for it explicitly
@@ -190,8 +250,17 @@ set_resource_limits( new_account_name, 0, 0, 0 );
 transfer_ram( get_self(), new_account_name, sysiosystem::newaccount_ram );  // 1144 bytes
 ```
 
-For a **user** account, those zeros are never consulted. It signs, the contract pays, the
-transaction succeeds.
+For a **user** account, those zeros are never consulted under default billing. It signs, the
+contract pays, the transaction succeeds.
+
+> With subjective billing enabled they are read, though not as a limit. For a first authorizer
+> that is not the payer, `verify_init_subjective_billing` calls `get_cpu_limit` on the signer and
+> folds it into an *additive* budget —
+> `available = subjective_cpu_allowed + cpu_limit - subjective_bill` — skipping the account
+> entirely when it is unlimited. A zero objective limit therefore contributes nothing rather than
+> failing the transaction: the signer still transacts on the node's subjective allowance alone,
+> until its accumulated subjective bill exhausts that. See
+> [Subjective billing](#subjective-billing-meters-the-signer); it is off by default.
 
 For a **contract** account, those zeros are fatal under default billing. The contract is the payer,
 so calling one with no policy fails outright:
@@ -252,15 +321,23 @@ node owner has exactly the same policy powers as a tier-1 node owner. What diffe
 | 2 | 0.15% | 84 | 12.6% |
 | 3 | 0.003% | 1,000 | 3.0% |
 
-Registration consumes part of an owner's own budget — a personal RAM allocation, 10% of the tier
-allocation set aside into the network RAM pool, and a small CPU/NET allocation for the owner's own
-account. Using the launch configuration of 75,496 SYS `total_sys`:
+Registration consumes part of an owner's own budget — 10% of the tier allocation set aside into
+the network RAM pool, plus a flat personal policy for the owner's own account: 0.0080 SYS of RAM
+and 0.0500 SYS each of NET and CPU, 0.1080 SYS in total, the same for every tier. Using the launch
+configuration of 75,496 SYS `total_sys`:
 
 | Tier | Total allocation | Free to issue after registration | ≈ RAM if spent entirely on RAM |
 |---|---|---|---|
 | 1 | 3,019.8400 SYS | ~2,717.75 SYS | ~2.8 GB |
 | 2 | 113.2440 SYS | ~101.81 SYS | ~106 MB |
 | 3 | 2.2649 SYS | ~1.93 SYS | ~2.0 MB |
+
+> **Pending change.** [#585](https://github.com/Wire-Network/wire-sysio/pull/585) provisions the
+> personal policy for **tier 1 only**; the 10% network-RAM deposit is unchanged for every tier. A
+> tier-2 or tier-3 owner would then register with no personal CPU/NET quota and no personal RAM,
+> and would keep the 0.1080 SYS — free budgets become **101.9196 SYS** (tier 2) and **2.0385 SYS**
+> (tier 3), tier 1 unchanged. That is negligible for tier 2 and about +5.6% for tier 3. This table
+> tracks master; whichever of the two PRs lands second updates it.
 
 Every `addpolicy` and `expandpolicy` checks `total_new_allocation <= node.total_sys -
 node.allocated_sys`. A node owner cannot issue more than they hold.
@@ -283,7 +360,10 @@ The 10% grant is not for the owner. It moves bytes into `sysio`'s RAM pool, whic
 The three personal components land in a self-issued policy — `issuer == owner` — carrying
 `time_block = 1`, so an owner can reshape or reclaim them immediately with `expandpolicy` or
 `reducepolicy`. Because they are flat while the tier budgets are not, together they cost a tier-3
-owner 4.77% of its allocation and a tier-1 owner 0.0036%.
+owner 4.77% of its allocation and a tier-1 owner 0.0036%. That disparity is what
+[#585](https://github.com/Wire-Network/wire-sysio/pull/585) addresses by provisioning the personal
+policy for tier 1 only — see the note under [Node owner tiers](#node-owner-tiers). The 10% grant is
+not tier-gated and is unaffected.
 
 ### What a node owner needs to operate
 
@@ -328,9 +408,19 @@ allocation into it. At 1,144 bytes per account, the funded pool supports roughly
 accounts.
 
 The gap between those two pools is why `newuser` bills its sponsorship rows to the sponsoring
-tier-1 owner rather than to the contract. `sysio.roa`'s pool is fixed at ~157 MB and would cap
-sponsorship near 530,000 users — long before `sysio`'s account pool ran out. A tier-1 owner's own
-free budget of ~2.83 GB is the only one that scales with how many users it actually onboards.
+tier-1 owner rather than to the contract. Billed to the contract, `sysio.roa`'s ~157 MB would cap
+sponsorship near **1.09 million** users — well short of what `sysio`'s account pool can create. A
+tier-1 owner's own free budget of ~2.83 GB is the only one that scales with how many users it
+actually onboards.
+
+A sponsorship costs **144 bytes**: a 16-byte key and 16-byte value over
+`billable_size_v<kv_object>` of 112. It was 280 bytes until #584 dropped the `byusername`
+secondary index, whose `kv_index_object` row cost another 136. The creator also pays a one-time
+144-byte `sponsorcount` row on its first `newuser`.
+
+Neither pool is a hard ceiling. `addpolicy` refuses CPU and NET to a `sysio.`-prefixed account but
+not RAM, so a node owner can issue a RAM-only policy to `sysio.roa` or to `sysio` and extend
+either. The ~157 MB is the allocation `activateroa` starts them with, not a limit.
 
 ### The four policy actions
 
@@ -421,11 +511,26 @@ aimed at a contract consumes that contract's share and nothing else. Once it is 
 calls fail with `tx_cpu_usage_exceeded` or `tx_net_usage_exceeded` naming the contract, and keep
 failing until the window rolls forward.
 
-That is the structural answer: the blast radius of spamming a contract is that contract. It cannot
-spill onto other contracts, other users, or the rest of the network, because it was never drawing
-on a shared pool — it was drawing on one policy's slice of the proportional share. The issuer's
-exposure is bounded by what they granted and reclaimable via `reducepolicy` once `time_block`
-passes.
+That is the structural answer, and it bounds the *quota* damage: the spammer cannot consume
+another contract's share, because it was never drawing on a shared pool — it was drawing on one
+policy's slice of the proportional share. The issuer's exposure is bounded by what they granted and
+reclaimable via `reducepolicy` once `time_block` passes.
+
+**It does not make the blast radius zero.** Every transaction that succeeds is billed twice over —
+once to the payer's rolling window, and once to the block:
+
+```cpp
+// libraries/chain/resource_limits.cpp — add_transaction_usage
+// account for this transaction in the block and do not exceed those limits either
+rls.pending_cpu_usage += total_cpu_usage;
+rls.pending_net_usage += total_net_usage;
+```
+
+`pending_*_usage` is what `get_block_cpu_limit()` / `get_block_net_limit()` subtract from to size
+the *next* transaction's limits, so a heavily provisioned contract being hammered inside its own
+quota still occupies block capacity and can delay unrelated traffic. What the quota guarantees is
+that the spam stops when that contract's share runs out — not that nobody else notices while it
+lasts. Bounding the shared-capacity effect is the second layer's job.
 
 This is objective, part of consensus, and applies on every node with no configuration.
 
@@ -461,9 +566,18 @@ Two properties keep this landing on abusers rather than on ordinary users:
 - **Successful transactions do not accumulate.** A subjective bill is held as `pending_cpu_us` and
   removed when the transaction appears in a block. Traffic that lands costs the signer nothing over
   time.
-- **Failures accumulate and decay slowly.** A transaction that fails or expires moves its bill into
-  a decaying accumulator whose window is `subjective-account-decay-time-minutes` — 24 hours by
+- **Most failures accumulate and decay slowly.** A failed transaction moves its bill into a
+  decaying accumulator whose window is `subjective-account-decay-time-minutes` — 24 hours by
   default. Repeatedly submitting transactions that fail is what burns the budget.
+
+  Two classes are deliberately excluded, so a signer is not punished for conditions it did not
+  cause: **duplicates** (`tx_duplicate`), and **block-level exhaustion** —
+  `block_cpu_usage_exceeded`, `block_net_usage_exceeded`, `deadline_exception`,
+  `interrupt_exception`, and the read-only VM-OC compile failure. Blowing your *own* CPU or NET
+  limit (`tx_cpu_usage_exceeded`, `tx_net_usage_exceeded`) is **not** excluded and does
+  accumulate. The producer's separate failure counter, below, skips the same two classes.
+
+  Subjective billing is **CPU only**. There is no subjective NET.
 
 A blunter limiter runs alongside it: `subjective-account-max-failures` (default `3`) per
 `subjective-account-max-failures-window-size` blocks (default `1`). An account over the limit has
@@ -530,16 +644,37 @@ sysio ram 411951 -> 412239   +288 bytes = two rows
 For `sysio.token`, transfers are RAM-free for both parties whether or not new state is created.
 Alice is charged nothing, for anything, on a token transfer.
 
-> This is a property of `sysio.token`'s implementation, not a universal rule — but a contract
-> cannot unilaterally charge RAM to its users either. For a positive RAM delta billed to an account
-> other than the receiving contract, `apply_context::validate_account_ram_deltas` requires that
-> account to appear in the action's authorizations with the `sysio.payer` permission; without it
-> the action fails with `Requested payer ... Missing sysio.payer`. And because `sysio.payer` must
-> sit at index 0, adding it also makes that user the action's CPU and NET payer.
+> This is a property of `sysio.token`'s implementation, not a universal rule — but an ordinary
+> third-party contract cannot unilaterally charge RAM to its users either. For a positive RAM delta
+> billed to an account other than the receiving contract,
+> `apply_context::validate_account_ram_deltas` requires that account to appear in the action's
+> authorizations with the `sysio.payer` permission; without it the action fails with
+> `Requested payer ... Missing sysio.payer`. And because `sysio.payer` must sit at index 0, adding
+> it also makes that user the action's CPU and NET payer.
 >
 > So billing RAM to a user is an explicit opt-in by the user, not a choice the contract makes
 > alone, and it opts them into paying for bandwidth at the same time. Contract authors who want the
 > gasless experience should bill RAM to the contract account, which needs no such marker.
+>
+> **Scope: this guarantee covers unprivileged contracts.** The check carries bypasses that a
+> deployed third-party contract cannot reach, but which a system contract can:
+>
+> ```cpp
+> // libraries/chain/apply_context.cpp — validate_account_ram_deltas
+> if (receiver.prefix() == config::system_account_name && is_privileged()) {
+>    // sysio.* contracts allowed
+> } else if (payer == config::system_account_name && is_privileged()) {
+>    // explicit sysio payer allowed when privileged
+> } else {
+>    // ... otherwise the payer must carry sysio.payer on this action
+> ```
+>
+> Both bypasses require **privilege AND a `sysio.` name prefix** — neither alone is enough. The
+> `privileged_kv_payer_bypass` test pins exactly that: `sysio.test`, privileged and `sysio.`-
+> prefixed, bills a user's RAM with no marker and succeeds, while `privtest` — equally privileged
+> but not `sysio.`-prefixed — fails with `Missing sysio.payer`. A third bypass accepts any
+> authorization whose actor is `sysio` itself. Privilege is granted by governance, so this is a
+> statement about the system contracts, not an escape hatch an application can take.
 >
 > **Compared with Antelope.** There, a contract names a RAM payer in the action body and the
 > requirement is only that the named account authorized the action at all — CPU and NET follow a
@@ -556,9 +691,32 @@ RAM sizing at the launch price of 104 bytes per 0.0001 SYS:
 
 | Item | Bytes | `ram_weight` |
 |---|---|---|
-| A 60 KB contract WASM | ~61,440 | ~0.0591 SYS |
+| A 60 KiB contract WASM | ~614,400 | ~0.5908 SYS |
+| One-time account metadata row | 152 | ~0.0002 SYS |
 | ABI | ~4,000 | ~0.0039 SYS |
 | 10,000 token holder rows @ ~144 B | ~1,440,000 | ~1.3847 SYS |
+
+> **Code is billed at ten times its size.** `setcode` does not charge the WASM byte count — it
+> charges `code_size * setcode_ram_bytes_multiplier`, and that multiplier is **10**, to account for
+> multiple copies and cached compilation:
+>
+> ```cpp
+> // libraries/chain/config.hpp
+> static constexpr uint32_t setcode_ram_bytes_multiplier = 10;
+>
+> // libraries/chain/sysio_contract.cpp — apply_sysio_setcode
+> int64_t new_size = code_size * config::setcode_ram_bytes_multiplier;
+> context.add_ram_usage( act.account, new_size - old_size + metadata_ram_delta );
+> ```
+>
+> So a 60 KiB contract needs ~600 KB of RAM weight, not ~60 KB. Size deployment from the ×10
+> figure or the `setcode` will fail. The multiplier applies to **code only** — `setabi` bills the
+> ABI at its actual size, and table rows are billed normally.
+>
+> Two consequences worth knowing. The charge is levied even when the WASM is byte-identical to one
+> already on chain (the `code_object` is shared by refcount, but the deploying account still pays
+> the full ×10), and re-deploying subtracts the old `old_size * 10` before adding the new — so an
+> upgrade costs only the difference.
 
 ### Sizing CPU and NET
 
@@ -584,11 +742,20 @@ Two anchors to calibrate against:
 For scale on the weight side: the allocation a node owner gives their own account at registration
 is `0.0500 SYS` of each, and a routine test account is provisioned with `0.0010 SYS` of each.
 
-Budget headroom beyond the steady-state rate. Failed and retried transactions still consume CPU and
-NET, and a contract that saturates its share starts rejecting work until the window rolls forward.
+Budget headroom beyond the steady-state rate — but note what a failure actually costs. Objective
+CPU and NET are billed only on the success path: `add_transaction_usage` is reached from
+`transaction_context::finalize()`, which runs only if `exec()` returned, and a transaction that
+throws has its database session undone instead. A failed attempt therefore does **not** draw down
+the payer's objective CPU/NET window, and a retry that lands is billed once, not twice.
 
-The contract-plus-ABI footprint is **under one tenth of a SYS**. For scale, even a *tier-3* node
-owner — the smallest tier — holds ~1.93 SYS free, enough to sponsor several small contracts.
+What a failure can cost is subjective CPU against the *signer* — where enabled, and excluding the
+duplicate and block-exhaustion classes noted in
+[Subjective billing](#subjective-billing-meters-the-signer). The reason to keep headroom is
+therefore the retries that succeed and the peaks above the average rate, not a per-failure charge:
+a contract that saturates its share rejects work until the window rolls forward.
+
+The contract-plus-ABI footprint above is **about 0.6 SYS** — the ×10 code multiplier dominates
+it, and a larger contract scales that up linearly.
 
 The provisioning is a single `addpolicy` on the contract account. Because the contract is the payer
 for any call that does not name one explicitly, ordinary users of that token are never billed — a
@@ -685,8 +852,31 @@ identical mechanics. There is no tier check in `addpolicy`, `expandpolicy`, `ext
 
 **Sponsorship is not exclusive.** Because policies from different issuers stack additively into one
 quota, an account is never limited to a single issuer. It can hold grants from any number of node
-owners simultaneously, and any one of them can exit — after their own `time_block` — without
-affecting the others' grants.
+owners simultaneously, and any one of them can reduce their own policy — after their own
+`time_block` — without touching another issuer's policy row.
+
+**Exiting cleanly is not guaranteed, though.** `reducepolicy` unwinds CPU and NET in full, whatever
+the account actually burned, because they are rate limits with nothing to hand back. RAM is
+different — it can be *occupied*:
+
+```cpp
+// contracts/sysio.roa/sysio.roa.cpp — reducepolicy
+int64_t ram_unused = ram_bytes - ram_usage;
+int64_t ram_to_reclaim = std::min(ram_unused, requested_ram_bytes);
+int64_t remainder = ram_to_reclaim % (int64_t) bytes_per_unit;
+divisible_ram_to_reclaim = ram_to_reclaim - remainder;
+```
+
+The reclaim is capped by the owner's **unused** RAM and floored to a whole multiple of the policy's
+`bytes_per_unit`, and both the policy row and the issuer's `allocated_sys` are decremented by what
+was *reclaimed*, not what was requested. So if the grant has been spent on live state, the residual
+weight stays on the policy and stays counted against the issuer's budget until that state is
+deleted. The policy row is erased only once all three weights reach zero.
+
+One consequence is worth planning around: `ram_unused` is computed over the **whole account's**
+quota, not the issuing policy's share of it. With several issuers funding one account, whoever
+reduces first draws against the shared unused pool — so one issuer's grant can be pinned by state
+another issuer's grant paid for.
 
 **Grants are time-committed.** `reducepolicy` is blocked until `time_block`, and `extendpolicy` can
 only push that block further out, never shorten it. An issuer commits to a term when they issue and
