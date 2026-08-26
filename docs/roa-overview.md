@@ -577,8 +577,6 @@ Two properties keep this landing on abusers rather than on ordinary users:
   limit (`tx_cpu_usage_exceeded`, `tx_net_usage_exceeded`) is **not** excluded and does
   accumulate. The producer's separate failure counter, below, skips the same two classes.
 
-  Subjective billing is **CPU only**. There is no subjective NET.
-
 A blunter limiter runs alongside it: `subjective-account-max-failures` (default `3`) per
 `subjective-account-max-failures-window-size` blocks (default `1`). An account over the limit has
 its transactions rejected outright until the window resets:
