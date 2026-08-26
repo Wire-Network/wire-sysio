@@ -22,8 +22,8 @@ rental.
 receives a **policy** — a grant of CPU, NET, and RAM weight — from a **node owner**, who holds a
 fixed share of the network's capacity determined by their tier and issues slices of it through the
 `sysio.roa` contract. Only registered node owners can issue policies, and only out of their own
-tier budget — so an ordinary account cannot grant itself bandwidth, and no account can create
-capacity that was not already allocated to some node owner. A node owner may name itself as the
+tier budget — so an ordinary account cannot grant itself bandwidth. (Privileged system paths
+sit outside this: `setalimits` and the fixed account gift can set limits without a policy.) A node owner may name itself as the
 recipient of one of its own policies; registration does exactly that for the owner's own account.
 
 **A contract without a policy does not run.** Because the contract is the payer, an unprovisioned
@@ -76,7 +76,7 @@ the exception, not the ordinary path.
 | CPU/NET acquired by | Locking tokens | Renting from a pool | Term fee on a curve | **A node owner's policy** |
 | RAM acquired by | Bancor market purchase | same | same | **A node owner's policy** |
 | Acquisition price set by | RAM market | Rental market | Utilization curve | **Off-chain, between issuer and recipient** ([what the weight then buys is on-chain](#how-weight-becomes-throughput)) |
-| Reclaimable by | Unstake (3d) | Sell rex | Expires at term | **`reducepolicy` after `time_block`** |
+| Reclaimable by | Unstake (3d) | Sell rex | Expires at term | **`reducepolicy` at or after `time_block`** |
 | Cost to onboard a user | Per-user stake + RAM, held or funded by someone | same | Per-user recurring fee | **Nothing per user — the contract is already provisioned** |
 
 ---
@@ -206,10 +206,11 @@ portable unchanged. Check where the contract bills its RAM first.
 ### Why the contract can afford it
 
 The executable system contracts — `sysio.token`, `sysio.msig`, `sysio.wrap` and the rest — carry
-unlimited CPU and NET, so their calls are covered by the system itself. That is not a rule about
-the name: a resource-limits row is *born* unlimited (`-1` for all three) and these accounts simply
-never had limits set, while `sysio.roa` preserves it on any quota sync by passing `-1, -1` for a
-`sysio.`-prefixed owner. The prefix alone guarantees nothing — `activateroa` deliberately creates
+unlimited CPU and NET, so their calls are covered by the system itself. That is established, not
+inherited: native `newaccount` writes 0/0/0 and transfers the fixed RAM gift, then `setsyscode` →
+`giftram` sets CPU and NET to `-1` while funding the code RAM. `sysio.roa` preserves it on any
+later quota sync by passing `-1, -1` for a `sysio.`-prefixed owner. The prefix alone guarantees
+nothing — `activateroa` deliberately creates
 `sysio.acct` at **zero** CPU and NET, a pure RAM bucket for account creation.
 
 > **What `-1` means here.** It is a **sentinel** meaning "no limit," not a quantity. The chain
@@ -298,6 +299,11 @@ Registration consumes part of an owner's own budget — 10% of the tier allocati
 the network RAM pool, plus a flat personal policy for the owner's own account: 0.0080 SYS of RAM
 and 0.0500 SYS each of NET and CPU, 0.1080 SYS in total, the same for every tier. Using the launch
 configuration of 75,496 SYS `total_sys`:
+
+> This section describes current `master`. [#585](https://github.com/Wire-Network/wire-sysio/pull/585)
+> provisions the personal policy for tier 1 only, which returns 0.1080 SYS to every tier-2 and
+> tier-3 budget (tier 3 becomes ~2.04 SYS, ~2.1 MB all-RAM). That PR merges after this one and
+> carries the corresponding edit here.
 
 | Tier | Total allocation | Free to issue after registration | ≈ RAM if spent entirely on RAM |
 |---|---|---|---|
@@ -485,7 +491,7 @@ failing until the window rolls forward.
 That is the structural answer, and it bounds the *quota* damage: the spammer cannot consume
 another contract's share, because it was never drawing on a shared pool — it was drawing on one
 policy's slice of the proportional share. The issuer's exposure is bounded by what they granted and
-reclaimable via `reducepolicy` once `time_block` passes.
+reclaimable via `reducepolicy` at or after `time_block`.
 
 **It does not make the blast radius zero.** Every transaction that succeeds is billed twice over —
 once to the payer's rolling window, and once to the block:
@@ -675,7 +681,8 @@ Two anchors to calibrate against:
 
 - **NET is small and predictable, but it is not just the action.** Each action is billed its own
   serialized size *plus a share of the transaction's overhead* — a fixed 16 bytes, the signatures,
-  the extensions and the header, divided across the actions and rounded up:
+  the extensions and the header, divided across the actions and rounded up. A context-free action
+  is additionally billed the bytes of its matching `context_free_data` entry:
 
   ```cpp
   // libraries/chain/transaction.cpp
@@ -695,8 +702,11 @@ is `0.0500 SYS` of each, and a routine test account is provisioned with `0.0010 
 
 Budget headroom for peaks above the average rate, not for failures: objective CPU and NET are
 billed only on the success path, since `add_transaction_usage` runs from `finalize()` and a
-throwing transaction has its session undone. A failed attempt costs the payer nothing, and a retry
-that lands is billed once. (It can cost the *signer* subjective CPU — see
+throwing transaction has its session undone. A failed attempt costs the payer nothing *objectively*,
+and a retry that lands is billed once. Subjectively it is not free: `update_billed_cpu_time` records
+CPU against the payer, and a non-exhaustion failure passes that to `subjective_bill_failure` unless
+`disable-subjective-payer-billing` is set, which it is not by default — so failed spam eats the
+contract's node-local headroom too. Leave room for it. (The *signer* is billed separately — see
 [Subjective billing](#subjective-billing-meters-the-signer).)
 
 The provisioning is a single `addpolicy` on the contract account. Because the contract is the payer
@@ -749,9 +759,10 @@ immediately use every provisioned contract on the network.
 Two limits worth knowing:
 
 - `newuser` is **tier-1 only**. Tiers 2 and 3 cannot use it.
-- Nobody can call the native `newaccount` directly. Wire gates it on the creator being a privileged
-  account, which replaced Antelope's name-suffix ownership rule. Account creation runs through
-  `sysio.roa`, either via `newuser` or via the NFT-claim flow the OPP depot drives.
+- Ordinary accounts cannot call the native `newaccount` directly: Wire gates it on the declared
+  creator being privileged, which replaced Antelope's name-suffix ownership rule. A privileged
+  creator that authorized the action can. For applications that means `sysio.roa` — `newuser`, or
+  the NFT-claim flow the OPP depot drives.
 
 ### Explicit self-pay
 
@@ -774,7 +785,7 @@ can avoid competing for a shared contract's window.
 Mechanisms an Antelope background might lead you to look for, which do not exist on Wire:
 
 - **No RAM market.** `buyram` and `sellram` do not exist. RAM is not priced by a Bancor curve and
-  is not tradeable. It arrives only through a policy.
+  is not tradeable. For applications it arrives only through a policy.
 - **No REX, no PowerUp, no rentals.** None of these contracts or actions exist.
 - **No `delegatebw`.** There is no way to convert a token balance into CPU, NET, or RAM. Beyond the
   fixed 1,144-byte gift every new account receives, application capacity comes from a node owner's
@@ -798,7 +809,7 @@ identical mechanics. There is no tier check in `addpolicy`, `expandpolicy`, `ext
 
 **Sponsorship is not exclusive.** Because policies from different issuers stack additively into one
 quota, an account is never limited to a single issuer. It can hold grants from any number of node
-owners simultaneously, and any one of them can reduce their own policy — after their own
+owners simultaneously, and any one of them can reduce their own policy — at or after their own
 `time_block` — without touching another issuer's row. Reducing it is not the same as exiting
 cleanly: see [Stacking policies](#stacking-policies-from-multiple-issuers) for what consumed RAM
 does to the reclaim.
@@ -829,7 +840,7 @@ and are omitted.
 | `addpolicy` | issuer (a node owner) | Create a policy for an account |
 | `expandpolicy` | issuer | Increase an existing policy's weights |
 | `extendpolicy` | issuer | Push `time_block` further out |
-| `reducepolicy` | issuer, after `time_block` | Reclaim weight |
+| `reducepolicy` | issuer, at or after `time_block` | Reclaim weight |
 | `newuser` | tier-1 node owner | Create a sponsored sub-account |
 | `newnameduser` | `sysio.roa` | Create a vanity account (NFT-claim flow) |
 | `nodeownreg` | `sysio.roa` | Register a node owner from an OPP attestation |
