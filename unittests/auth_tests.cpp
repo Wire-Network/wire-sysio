@@ -761,6 +761,38 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( delete_auth, TESTER, validating_testers ) { try {
 
 } FC_LOG_AND_RETHROW() }/// delete_auth
 
+// heap_size drives the per-key RAM charge, and one of its branches cannot be reached through any
+// consensus path: BLS keys are rejected wherever a permission is created, so no authority can ever
+// hold one. Exercise the helper directly so every alternative is covered anyway -- a regression
+// returning zero for a heap-backed payload would otherwise leave every account-level test green.
+BOOST_AUTO_TEST_CASE( key_heap_size_covers_every_alternative ) { try {
+   using kt = private_key_type::key_type;
+
+   auto heap_of = []( const public_key_type& pk ) {
+      return heap_size( shared_key_weight( key_weight{ pk, 1 } ).key );
+   };
+
+   // The fixed-size alternatives keep their bytes inside the variant and add nothing.
+   for( auto type : { kt::k1, kt::r1, kt::em, kt::ed } ) {
+      BOOST_TEST( heap_of( private_key_type::generate( type ).get_public_key() ) == 0u );
+   }
+
+   // BLS holds its payload behind a shared_string, so it costs that payload plus the string header.
+   const auto bls_pub = private_key_type::generate( kt::bls ).get_public_key();
+   const auto bls_payload = bls_pub.get<fc::crypto::bls::public_key_shim>().serialize().size();
+   BOOST_TEST( heap_of( bls_pub ) == shared_string_header_billable_size + bls_payload );
+   BOOST_TEST( bls_payload > 0u );
+
+   // WebAuthn stores its packed form the same way: 33 key + 1 user_presence + 1 varint + rpid.
+   fc::crypto::webauthn::public_key::public_key_data_type kd{};
+   kd[0] = 0x02;
+   const std::string rpid( 20, 'a' );
+   const public_key_type wa( public_key_type::storage_type(
+      fc::crypto::webauthn::public_key(
+         kd, fc::crypto::webauthn::public_key::user_presence_t::USER_PRESENCE_PRESENT, rpid ) ) );
+   BOOST_TEST( heap_of( wa ) == shared_string_header_billable_size + 35u + rpid.size() );
+} FC_LOG_AND_RETHROW() }
+
 BOOST_AUTO_TEST_CASE( authority_without_waits ) { try {
    // Verify that authority without waits validates and works correctly
    validating_tester chain;
