@@ -31,6 +31,13 @@ namespace fc {
          // (string/number/bool/null) coerced to string at load time. Nested
          // objects or arrays throw fc::bad_cast_exception on configure_logging.
          fc::variant_object extra_fields;
+         // layout is a fc::log::json_layout token template controlling the document
+         // shape (see fc/log/json_layout.hpp). Empty/absent renders the historical
+         // fc JSONL shape (fc::log::default_layout); fc::log::es_default_layout is
+         // the shipped Elasticsearch/OpenSearch document template. A malformed
+         // template (unknown token/modifier, unterminated placeholder) fails
+         // configure_logging.
+         std::string layout;
       };
    } // namespace format
 
@@ -69,14 +76,75 @@ namespace fc {
          uint32_t       max_files = 0;
       };
 
+      /// Rotation threshold for rotating_file_sink, in MEGABYTES. configure_logging multiplies max_size by
+      /// 1 MiB when constructing the spdlog sink, so this is a count of megabytes and not a byte count.
+      inline constexpr uint32_t default_rotating_max_size_mb = 10;
+      /// Number of rotated files kept alongside the active one, matching spdlog's max_files semantics.
+      inline constexpr uint32_t default_rotating_max_files = 10;
+
+      /// Size-based rotating log file. Rotates once the active file reaches max_size megabytes, keeping at
+      /// most max_files rotated copies. max_size must be non-zero -- spdlog rejects a zero rotation size.
       struct rotating_file_sink_config {
          std::string    base_filename;
-         uint32_t       max_size = 1048576*10; // 10MB
-         uint32_t       max_files = 10;
+         uint32_t       max_size = default_rotating_max_size_mb;  // megabytes
+         uint32_t       max_files = default_rotating_max_files;
       };
 
       struct dmlog_sink_config {
          std::string file = "-";
+      };
+
+      /// Defaults for es_sink. Worst-case buffered memory is roughly
+      /// (max_pending_batches + 2) * max_batch_bytes -- the pending batch, the queued
+      /// batches, and one batch in flight.
+      inline constexpr uint32_t default_es_batch_size = 100; ///< documents per bulk request
+      /// NDJSON bulk-request body cap, in bytes.
+      inline constexpr uint32_t default_es_max_batch_bytes = 1024 * 1024;
+      /// Single-document cap, in bytes; a larger formatted document is dropped and counted.
+      inline constexpr uint32_t default_es_max_doc_bytes = 256 * 1024;
+      /// Interval flush cadence for a partially-filled batch.
+      inline constexpr uint32_t default_es_flush_interval_ms = 1000;
+      /// Delivery-queue bound, in batches; a full queue drops the newest batch.
+      inline constexpr uint32_t default_es_max_pending_batches = 8;
+      /// ADDITIONAL delivery attempts after the first (total attempts = max_retries + 1).
+      inline constexpr uint32_t default_es_max_retries = 2;
+      /// Initial retry backoff; doubles per attempt, capped inside the sink.
+      inline constexpr uint32_t default_es_retry_backoff_ms = 250;
+      inline constexpr uint32_t default_es_connect_timeout_ms = 5000;
+      inline constexpr uint32_t default_es_request_timeout_ms = 10000;
+      /// Stall budget on the BLOCK-PRODUCTION thread, not a background wait: SIGHUP
+      /// posts through the priority_queue_executor's single-threaded read_write
+      /// queue -- the same queue block production uses -- and handlers run to
+      /// completion, so the sink destructor's drain (which fires inside the
+      /// handle_sighup() fan-out, e.g. on every logrotate) delays the next
+      /// production handler by up to this budget plus the ~50 ms cancel-poll join.
+      /// Sized well under the 500 ms block interval; against a dead endpoint the
+      /// drain always times out, so the worst case recurs on every SIGHUP.
+      inline constexpr uint32_t default_es_shutdown_flush_timeout_ms = 100;
+      /// Hard ceiling on max_batch_bytes; bounds sink memory even with an absurd config.
+      inline constexpr uint32_t es_max_batch_bytes_ceiling = 16u * 1024 * 1024;
+
+      /// Ships log documents to an OpenSearch/Elasticsearch _bulk endpoint from a
+      /// dedicated worker thread. Document shape is owned by the sink's formatter
+      /// (fc::log::json_formatter with the fc::log::es_default_layout template by
+      /// default); identity fields (env/app/principal/logStream/...) ride the
+      /// formatter's extra_fields. This struct configures endpoint, batching, and
+      /// delivery only.
+      struct es_sink_config {
+         std::string url;                     ///< base URL, e.g. "https://elasticsearch.example.com" (required; trailing '/' stripped)
+         std::string index;                   ///< target index or write alias (required non-empty)
+         std::optional<std::string> username; ///< optional HTTP basic auth user
+         std::optional<std::string> password; ///< required iff username is set
+         uint32_t batch_size          = default_es_batch_size;
+         uint32_t max_batch_bytes     = default_es_max_batch_bytes;
+         uint32_t max_doc_bytes       = default_es_max_doc_bytes;
+         uint32_t flush_interval_ms   = default_es_flush_interval_ms;
+         uint32_t max_pending_batches = default_es_max_pending_batches;
+         uint32_t max_retries               = default_es_max_retries;
+         uint32_t retry_backoff_ms          = default_es_retry_backoff_ms;
+         uint32_t connect_timeout_ms        = default_es_connect_timeout_ms;
+         uint32_t request_timeout_ms        = default_es_request_timeout_ms;
+         uint32_t shutdown_flush_timeout_ms = default_es_shutdown_flush_timeout_ms;
       };
    } // namespace sink
 
@@ -125,12 +193,17 @@ namespace fc {
 FC_REFLECT( fc::sink_config, (name)(type)(args)(format)(enabled) )
 FC_REFLECT( fc::format_config, (type)(args) )
 FC_REFLECT( fc::format::pattern_config, (pattern) )
-FC_REFLECT( fc::format::json_config, (extra_fields) )
+FC_REFLECT( fc::format::json_config, (extra_fields)(layout) )
 FC_REFLECT( fc::sink::level_color, (level)(color) )
 FC_REFLECT_ENUM( fc::sink::output_t, (stderr)(stdout) )
 FC_REFLECT( fc::sink::console_sink_config, (color)(level_colors)(output_type) )
 FC_REFLECT( fc::sink::daily_file_sink_config, (base_filename)(rotation_hour)(rotation_minute)(truncate)(max_files) )
 FC_REFLECT( fc::sink::rotating_file_sink_config, (base_filename)(max_size)(max_files) )
 FC_REFLECT( fc::sink::dmlog_sink_config, (file) )
+FC_REFLECT( fc::sink::es_sink_config,
+   (url)(index)(username)(password)
+   (batch_size)(max_batch_bytes)(max_doc_bytes)(flush_interval_ms)(max_pending_batches)
+   (max_retries)(retry_backoff_ms)(connect_timeout_ms)(request_timeout_ms)
+   (shutdown_flush_timeout_ms) )
 FC_REFLECT( fc::logger_config, (name)(level)(enabled)(sinks) )
 FC_REFLECT( fc::logging_config, (includes)(sinks)(loggers) )

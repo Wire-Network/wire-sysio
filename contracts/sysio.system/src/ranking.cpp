@@ -87,7 +87,7 @@ namespace sysiosystem {
    }
 
    void system_contract::update_ranked_producers( const block_timestamp& block_time ) {
-      _gstate.last_producer_schedule_update = block_time;
+      _global.modify( get_self(), [&]( auto& g ) { g.last_producer_schedule_update = block_time; });
 
       auto idx = _producers.get_index<"prodrank"_n>();
 
@@ -165,7 +165,9 @@ namespace sysiosystem {
          producers.push_back( std::move(item.first) );
 
       if( set_proposed_producers( producers ) >= 0 ) {
-         _gstate.last_producer_schedule_size = static_cast<decltype(_gstate.last_producer_schedule_size)>( producers.size() );
+         _global.modify( get_self(), [&]( auto& g ) {
+            g.last_producer_schedule_size = static_cast<decltype(g.last_producer_schedule_size)>( producers.size() );
+         });
       }
 
       set_proposed_finalizers( std::move(proposed_finalizers) );

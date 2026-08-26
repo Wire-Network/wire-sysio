@@ -21,8 +21,11 @@ namespace sysio {
     *
     * - opreg owns the bond ledger (per-(operator, chain_code, token_code) aggregate
     *   balance). uwrit owns the **lock vector** — one row per leg of every
-    *   in-flight UWREQ. opreg's `available()` rollup reads this table via a
-    *   mirror to subtract active locks from the operator's spendable balance.
+    *   in-flight UWREQ, plus `locksums` — the per-(underwriter, chain_code,
+    *   token_code) materialized total of those rows. `locks` is the
+    *   authority; `locksums` is the O(1) read cache, and it is what opreg's
+    *   `available()` reads cross-contract to subtract active locks from the
+    *   operator's spendable balance.
     *
     * - Identity has been rekeyed onto `sysio::slug_name` (uint64). Each
     *   `lock_entry` carries `(chain_code, token_code, reserve_code)`; the
@@ -31,15 +34,21 @@ namespace sysio {
     *   multiple reserves can route unambiguously. `uw_request_t` carries
     *   `src_*` and `dst_*` slug_name triples for the same reason.
     *
-    * - The per-underwriter composite lock index can no longer fit in a
-    *   `uint128_t` (3 × uint64 = 192 bits). It is split into two secondary
-    *   indexes per the plan's B.2 design:
-    *     * `byuwck`         — `checksum256(account || chain_code || token_code)`
-    *                          for the per-(chain, token) rollup that opreg's
-    *                          `available()` reads.
-    *     * `byunderwriter` — uint64 split-index keyed on `underwriter.value`
+    * - The per-underwriter composite lock key can no longer fit in a
+    *   `uint128_t` (3 × uint64 = 192 bits), so per the plan's B.2 design the
+    *   table carries only uint64 secondary indexes and the composite lives
+    *   outside them:
+    *     * `compose_account_chain_token_ck` — `checksum256(account ||
+    *                          chain_code || token_code)`, computed on the row
+    *                          by `lock_entry::by_underwriter_ck()` and used
+    *                          as the `locksums` primary key. NOT a
+    *                          table-managed secondary index.
+    *     * `byuw`           — uint64 split-index keyed on `underwriter.value`
     *                          for cheap per-operator scans (in-memory filter
     *                          on chain_code / token_code / reserve_code).
+    *     * `byuwreq`, `byexpire` — uint64 indexes on `uwreq_id` and
+    *                          `expires_at_ms`; the latter is the window
+    *                          `chklocks` sweeps.
     *
     * - On `UNDERWRITE_INTENT_COMMIT` arrival (one per outpost; underwriters
     *   call `commit(...)` JSON-RPC on each side), `record_commit` registers
@@ -106,6 +115,28 @@ namespace sysio {
       // per-epoch work must be bounded; a backlog simply drains across
       // subsequent epochs.
       static constexpr uint32_t MAX_UWREQ_PRUNE_PER_EPOCH = 32;
+
+      // Locks `sysio.epoch::advance` passes to `chklocks` each epoch. Sized
+      // like MAX_UWREQ_PRUNE_PER_EPOCH / MAX_FWQ_DRAIN_PER_EPOCH, and for the
+      // same reason — but the exposure here is sharper than either, because
+      // lock EXPIRY is inherently bursty. Every lock is stamped
+      // `now + collateral_lock_duration_ms` at creation, so a burst of
+      // settlements inside one epoch produces a burst of expiries inside one
+      // epoch, exactly one lock-duration later. Sustained swap traffic
+      // therefore presents `chklocks` with a whole epoch's settlements at
+      // once, and per expired lock the sweep does an inline
+      // `opreg::releaselock` dispatch plus an erase — all inside advance's
+      // hard, uncatchable transaction CPU deadline.
+      //
+      // Unbounded, a large enough expiry burst aborts `advance`; and because
+      // those same locks are still expired at the next advance, it aborts
+      // identically every epoch thereafter — a PERMANENT chain-wide epoch
+      // stall rather than a transient one. Bounded, an oversized burst is
+      // just release latency that drains across subsequent epochs, which is
+      // harmless: the challenge window has already closed, so a lock freed an
+      // epoch or two late costs only a brief overstatement of the
+      // underwriter's reserved collateral.
+      static constexpr uint32_t MAX_LOCK_RELEASE_PER_EPOCH = 32;
 
       // ── UWREQ row-growth rails (SEC-129 / WSA-223) ─────────────────────────
       // Every uwreqs `modify` re-serializes the whole row inside the
@@ -344,10 +375,74 @@ namespace sysio {
       /// (delivery itself is implicit — there is no SWAP_REMIT ack; the
       /// lock window expiring IS the settlement horizon).
       ///
-      /// This sweep is the ONLY lock-release path: locks are a wall-clock
-      /// challenge window (12h default) and are never released by delivery.
+      /// This sweep is the only HEALTHY lock-release path: locks are a
+      /// wall-clock challenge window (12h default) and are never released by
+      /// delivery. It is not the only path that ERASES a lock — `sweeplocks`
+      /// does too, on an UPHELD challenge (see `lock_sum`, whose rollup both
+      /// must maintain).
+      ///
+      /// EXCEPTION (WIRE-297): a lock whose `challenge_id` is non-zero — an
+      /// underwriter-fault challenge is OPEN against its commitment — is NOT
+      /// released at expiry. The sweep skips it and instead pokes
+      /// `sysio.chalg::chkuwchal`, whose resolution either sweeps the locks
+      /// with the underwriter slashed (`sweeplocks`) or clears the hold
+      /// (`freelocks`) so the NEXT sweep releases them normally. The epoch
+      /// tick is thereby the challenge system's only cadence.
+      ///
+      /// Budget-bounded, mirroring `pruneuwreqs` / `drainfwq`: walks the
+      /// `byexpire` index in ascending `expires_at_ms` and EXAMINES at most
+      /// `max_rows` rows (`max_rows == 0` is a no-op). Inlined from
+      /// `sysio.epoch::advance` with `MAX_LOCK_RELEASE_PER_EPOCH`; also
+      /// invocable by `sysio.uwrit` itself with a caller-chosen budget for a
+      /// manual backlog drain. NEVER throws past the auth gate: it runs inline
+      /// inside `advance`, where an abort stalls epoch progress chain-wide.
+      ///
+      /// The budget counts rows EXAMINED, not locks released — held locks and
+      /// the challenge pokes they generate cost real work too. Bounding only
+      /// releases would let an arbitrary number of held rows be scanned and an
+      /// arbitrary number of distinct challenges fan out an inline
+      /// `chkuwchal` each, which is exactly the unbounded `advance` work this
+      /// bound exists to remove. `open_challenges` is therefore bounded by
+      /// `max_rows` as a consequence of the same counter.
+      ///
+      /// Ascending-expiry order makes the bound a FIFO drain, so an oversized
+      /// burst simply spreads across subsequent epochs. Held locks are the one
+      /// thing that can sit at the head of that queue without leaving it: they
+      /// are skipped, not erased, so while more than `max_rows` challenges are
+      /// open the rows behind them wait. That is bounded and self-clearing
+      /// rather than a stall — each sweep pokes the challenges it can see, and
+      /// a resolved challenge removes its locks (`sweeplocks`) or clears their
+      /// hold (`freelocks`), letting the window advance on the next tick.
+
       [[sysio::action]]
-      void chklocks();
+      void chklocks(uint32_t max_rows);
+
+      /// Mark the winning underwriter's locks for `uwreq_id` as held by the OPEN underwriter-
+      /// fault challenge `chal_id` (WIRE-297). Auth: `sysio.chalg`, inlined from `openuwchal`.
+      /// This is the AUTHORITATIVE liveness validation for a filing — every lock must still be
+      /// inside its window and free of any other challenge, and at least one lock must exist —
+      /// so a stale challenge aborts whole here, bond escrow included.
+      [[sysio::action]]
+      void holdlocks(uint64_t uwreq_id, name underwriter, uint64_t chal_id);
+
+      /// Clear the challenge hold on the underwriter's locks for `uwreq_id` — the challenge was
+      /// REJECTED by the council or LAPSED at the window's end. The locks then release on their
+      /// next normal `chklocks` sweep: a healthy release, no collateral moves. Auth:
+      /// `sysio.chalg`. Deliberately a silent no-op when nothing is held: it runs inline from
+      /// the epoch tick (`chklocks` -> `chkuwchal` -> here), where an abort would stall epoch
+      /// advancement chain-wide.
+      [[sysio::action]]
+      void freelocks(uint64_t uwreq_id, name underwriter);
+
+      /// Release + erase the underwriter's locks for `uwreq_id` after an UPHELD challenge. The
+      /// underwriter is already SLASHED (`chkuwchal` slashes before sweeping — inline actions
+      /// run depth-first in send order), so every inlined `opreg::releaselock` takes its
+      /// deferred-slash branch: the locked collateral is debited and the outbound SLASH
+      /// attestation queued. Ends with the same COMPLETED-flip / evidence-clear / retention
+      /// tail `chklocks` runs when a uwreq's last lock leaves. Auth: `sysio.chalg`; silent
+      /// no-op when no locks remain (same never-throw-inside-advance reasoning as `freelocks`).
+      [[sysio::action]]
+      void sweeplocks(uint64_t uwreq_id, name underwriter);
 
       /// Bounded UWREQ lifecycle sweep (SEC-129 / WSA-223). Inlined from
       /// `sysio.epoch::advance` each epoch with `MAX_UWREQ_PRUNE_PER_EPOCH`;
@@ -364,8 +459,9 @@ namespace sysio {
       ///     retention window.
       ///   * COMPLETED / REJECTED / EXPIRED past retention — erase the row.
       ///   * CONFIRMED never appears: winner selection zeroes the deadline
-      ///     (the wall-clock lock window owns the row until `chklocks`
-      ///     terminalizes it).
+      ///     (the wall-clock lock window owns the row until whichever eraser
+      ///     takes its last lock terminalizes it — `chklocks` at expiry, or
+      ///     `sweeplocks` earlier on an UPHELD challenge).
       ///
       /// NEVER throws past the auth gate — it runs inline inside `advance`,
       /// where an abort stalls epoch progress chain-wide. There are no timers
@@ -439,21 +535,48 @@ namespace sysio {
       };
 
       /// Per-leg lock row. Rows are pushed by `try_select_winner` and erased
-      /// by `release`.
+      /// by `chklocks` (natural expiry) or `sweeplocks` (an UPHELD
+      /// underwriter-fault challenge's slash-sweep, before expiry). Each of
+      /// those erase sites must also decrement `locksums` — see `lock_sum`.
       ///
-      /// The `(underwriter, chain_code, token_code)` triple is the indexing
-      /// surface opreg's `available()` rollup uses (cross-contract read of
-      /// `sysio::uwrit::locks_t` from `sysio.opreg`). 3 × uint64 = 192 bits
-      /// exceeds `uint128_t`, so the composite is hashed into a `checksum256`
-      /// via `by_underwriter_ck`. A separate `by_underwriter` split-index
-      /// (uint64 keyed on `underwriter.value`) provides the cheap
-      /// per-operator scan path for consumers that filter on chain / token
-      /// / reserve in-memory (per plan §B.2).
+      /// The `(underwriter, chain_code, token_code)` triple is the collateral
+      /// bucket a row rolls up into. 3 × uint64 = 192 bits exceeds
+      /// `uint128_t`, so the composite is hashed into a `checksum256` via
+      /// `by_underwriter_ck` — the same digest `locksums` uses to address
+      /// that bucket's materialized total, which is the O(1) surface opreg's
+      /// `available()` actually reads cross-contract. A separate
+      /// `by_underwriter` split-index (uint64 keyed on `underwriter.value`)
+      /// provides the cheap per-operator scan path for consumers that filter
+      /// on chain / token / reserve in-memory (per plan §B.2).
       ///
       /// `reserve_code` records which specific reserve this leg covers; on
       /// a slash, the outpost routes seized collateral to that reserve via
       /// `ReserveAmount`, even when multiple reserves exist for the same
       /// `(chain_code, token_code)` pair.
+      /// The `(account, chain_code, token_code)` collateral-bucket digest:
+      /// the three uint64 identities packed little-endian into 24 bytes and
+      /// hashed. 3 × uint64 = 192 bits does not fit `uint128_t`, so the triple
+      /// is hashed to land in a `checksum256`.
+      ///
+      /// SINGLE SOURCE for that encoding, and it must stay that way.
+      /// `lock_entry::by_underwriter_ck()` says which bucket a lock row
+      /// belongs to; `lock_sum_key::primary_key()` addresses that bucket's
+      /// materialized total. If the two derivations ever diverged, the rollup
+      /// would be keyed differently from the rows it summarizes and every
+      /// reader would silently observe zero locked — collateral already
+      /// committed to a live lock would look spendable. Both call this, so
+      /// they cannot diverge.
+      static checksum256 compose_account_chain_token_ck(name account,
+                                                        sysio::slug_name chain_code,
+                                                        sysio::slug_name token_code) {
+         std::array<uint8_t, 24> buf{};
+         uint64_t acc_v = account.value;
+         std::memcpy(buf.data() +  0, &acc_v,             8);
+         std::memcpy(buf.data() +  8, &chain_code.value,  8);
+         std::memcpy(buf.data() + 16, &token_code.value,  8);
+         return sysio::sha256(reinterpret_cast<const char*>(buf.data()), buf.size());
+      }
+
       struct lock_key {
          uint64_t lock_id;
          uint64_t primary_key() const { return lock_id; }
@@ -476,18 +599,20 @@ namespace sysio {
          /// `byexpire` so `chklocks` sweeps expired locks in ascending order.
          uint64_t                expires_at_ms    = 0;
 
-         /// Composite checksum index for opreg's `available()` rollup:
-         /// `sha256(underwriter.value || chain_code.value || token_code.value)`
-         /// packed as 24 little-endian bytes. 3 × uint64 = 192 bits doesn't
-         /// fit `uint128_t`, so we hash the triple to land in `checksum256`.
+         /// Which collateral bucket this lock belongs to — see
+         /// `compose_account_chain_token_ck`, the single source of that
+         /// encoding, shared with `lock_sum_key::primary_key()`.
          checksum256 by_underwriter_ck() const {
-            std::array<uint8_t, 24> buf{};
-            uint64_t uw_v = underwriter.value;
-            std::memcpy(buf.data() +  0, &uw_v,             8);
-            std::memcpy(buf.data() +  8, &chain_code.value, 8);
-            std::memcpy(buf.data() + 16, &token_code.value, 8);
-            return sysio::sha256(reinterpret_cast<const char*>(buf.data()), buf.size());
+            return compose_account_chain_token_ck(underwriter, chain_code, token_code);
          }
+         /// Non-zero while an underwriter-fault challenge (the `sysio.chalg::uwchals` row id) is
+         /// OPEN against this lock's commitment (WIRE-297). A held lock is NOT released at
+         /// `expires_at_ms`: `chklocks` skips it and instead pokes the challenge's tally crank,
+         /// so the collateral stays at risk until the council resolves or the challenge lapses.
+         /// Stamped by `holdlocks`, cleared by `freelocks` (reject/lapse); an UPHELD challenge
+         /// erases the row through `sweeplocks` instead.
+         uint64_t                challenge_id     = 0;
+
          /// Split-index for cheap per-operator scans (plan §B.2). Callers
          /// pull all rows for a given underwriter and filter on
          /// chain_code / token_code / reserve_code in memory.
@@ -497,17 +622,28 @@ namespace sysio {
 
          SYSLIB_SERIALIZE(lock_entry,
             (lock_id)(uwreq_id)(underwriter)(chain_code)(token_code)(reserve_code)
-            (amount)(created_at_ms)(expires_at_ms))
+            (amount)(created_at_ms)(expires_at_ms)(challenge_id))
       };
 
       // Per plan §B.2: split-index approach — keep only uint64 secondary
       // indexes. `by_underwriter_ck` (checksum256) is computed on the row
       // when needed for cross-contract composite comparisons, but is NOT a
       // table-managed secondary index (Antelope KV's secondary-index
-      // templates expect fixed-width integer keys). opreg's `available()`
-      // rollup scans `byunderwriter` (uint64) and filters (chain_code,
-      // token_code) in memory — cheap because underwriters hold O(1)
-      // concurrent locks.
+      // templates expect fixed-width integer keys).
+      //
+      // This table is the AUTHORITY for locked collateral — one row per live
+      // lock leg, and the only thing that can settle what is actually locked.
+      // `locksums` is the O(1) read cache derived from it, one row per
+      // (underwriter, chain_code, token_code) bucket; `sysio.opreg`'s
+      // `available()` reads THAT cross-contract, not this table.
+      //
+      // It used to scan `byuw` (uint64) and filter (chain_code, token_code)
+      // in memory, on the assumption that underwriters hold O(1) concurrent
+      // locks. That assumption is false: locks are held for the full
+      // wall-clock challenge window and are never released by delivery, so a
+      // bucket's live count is (settlement rate × lock duration). See
+      // `lock_sum` for the three sites that maintain the cache, and why a
+      // missed one is permanent rather than merely stale.
       using locks_t = sysio::kv::table<"locks"_n, lock_key, lock_entry,
          sysio::kv::index<"byuw"_n,
             sysio::const_mem_fun<lock_entry, uint64_t, &lock_entry::by_underwriter>>,
@@ -516,6 +652,72 @@ namespace sysio {
          sysio::kv::index<"byexpire"_n,
             sysio::const_mem_fun<lock_entry, uint64_t, &lock_entry::by_expires_at_ms>>
       >;
+
+      /// Primary key of `locksums`: one (underwriter, chain_code, token_code)
+      /// collateral bucket, addressed by the SAME digest
+      /// `lock_entry::by_underwriter_ck()` uses to say which bucket a lock row
+      /// belongs to — both call `compose_account_chain_token_ck`.
+      struct lock_sum_key {
+         name             underwriter;
+         sysio::slug_name chain_code;
+         sysio::slug_name token_code;
+         checksum256 primary_key() const {
+            return compose_account_chain_token_ck(underwriter, chain_code, token_code);
+         }
+         SYSLIB_SERIALIZE(lock_sum_key, (underwriter)(chain_code)(token_code))
+      };
+
+      /// Materialized Σ `lock_entry.amount` for one (underwriter, chain_code,
+      /// token_code) bucket — the "locked" half of `sysio.opreg::available()`.
+      ///
+      /// A CACHE of the `locks` table with exactly ONE writer: every code path
+      /// that can change a bucket's total lives in this contract. There are
+      /// THREE, and any new one inherits the same obligation — nothing
+      /// structural enforces it:
+      ///
+      ///   * `try_select_winner` — ADDS, one lock per required leg, on a win.
+      ///   * `chklocks`  — DECREMENTS, releasing locks at expiry.
+      ///   * `sweeplocks` — DECREMENTS, erasing the held locks of a commitment
+      ///     whose underwriter-fault challenge was UPHELD (WIRE-297). This one
+      ///     runs OUTSIDE `chklocks`, which is exactly why it was missed once:
+      ///     this block previously said `chklocks` was the sole erase path, and
+      ///     `sweeplocks` erased rows without decrementing.
+      ///
+      /// Getting that wrong is permanent and silent rather than merely stale:
+      /// the rollup is authoritative for `sysio.opreg::available()`, so a bucket
+      /// left positive after its last row is gone suppresses that collateral
+      /// forever — nothing decrements it again, because the rows that would
+      /// have are already erased.
+      ///
+      /// A row is erased when its total reaches zero, so an absent row reads as
+      /// zero and the table holds only live buckets.
+      ///
+      /// It exists because the derivation it replaces does not scale. Both
+      /// `sum_locks_inline` rollups (here and in sysio.opreg) previously
+      /// walked every lock row an underwriter held, each documenting the
+      /// assumption that "per-underwriter lock counts are O(1)-ish so the scan
+      /// is cheap". That is false under sustained swap traffic: locks are held
+      /// for the full wall-clock challenge window
+      /// (`collateral_lock_duration_ms`, 12h default) and are NEVER released
+      /// by delivery, so a bucket's live lock count is
+      /// (settlement rate × lock duration) — unbounded within the window. The
+      /// scan ran per candidate inside `try_select_winner` (up to
+      /// MAX_UWREQ_CANDIDATES of them per uwreq), i.e. inside the same
+      /// consensus-dispatch CPU budget whose overrun stalls the chain.
+      ///
+      /// `sumlocks` reads this rollup, so it stays the cheap external answer
+      /// to "how much of this bucket is locked"; the authoritative recompute
+      /// is the `locks` table itself, which the contract tests scan and
+      /// compare against this total.
+      struct [[sysio::table("locksums")]] lock_sum {
+         name             underwriter;
+         sysio::slug_name chain_code;
+         sysio::slug_name token_code;
+         uint64_t         amount = 0;
+         SYSLIB_SERIALIZE(lock_sum, (underwriter)(chain_code)(token_code)(amount))
+      };
+
+      using locksums_t = sysio::kv::table<"locksums"_n, lock_sum_key, lock_sum>;
 
       /// Per-underwriter race entry inside an UWREQ row. Tracks when each
       /// leg of a dual-COMMIT pair arrived so `try_select_winner` can
@@ -668,6 +870,19 @@ namespace sysio {
          /// Empty until that flow lands.
          std::vector<char>                       attestation_outbound_data;
 
+         /// Non-zero while an underwriter-fault challenge (the `sysio.chalg::uwchals` row id)
+         /// is OPEN against this request's commitment — stamped by `holdlocks`, cleared by
+         /// `freelocks`, alongside the identical marker on each held lock.
+         ///
+         /// `pruneuwreqs` refuses to erase a row carrying one. The lock marker alone is not
+         /// enough: the locks hold the COLLATERAL, but this row holds the EVIDENCE a challenge
+         /// adjudicates against — `attestation_inbound_data` (the stored SwapRequest),
+         /// `source_tx_id`, and `commits_by` with the per-leg UIC bytes. Terminal rows are
+         /// erased at `terminal_epoch + uwreq_retention_epochs`, which is far shorter than the
+         /// challenge window, so without this a challenge could outlive the record it exists
+         /// to adjudicate and resolve against nothing.
+         uint64_t                                challenge_id      = 0;
+
          uint64_t by_status() const { return magic_enum::enum_integer(status); }
          uint64_t by_winner() const { return winner.value; }
          uint64_t by_expires_at_epoch() const { return expires_at_epoch; }
@@ -678,7 +893,7 @@ namespace sysio {
             (dst_chain_code)(dst_token_code)(dst_reserve_code)(dst_amount)
             (target_amount)(variance_tolerance_bps)(source_tx_id)(depositor)
             (commits_by)(winner)(committed_at_ms)(settled_at_ms)(expires_at_epoch)
-            (attestation_inbound_data)(attestation_outbound_data))
+            (attestation_inbound_data)(attestation_outbound_data)(challenge_id))
       };
 
       using uwreqs_t = sysio::kv::table<"uwreqs"_n, id_key, uw_request_t,
@@ -756,8 +971,9 @@ namespace sysio {
          uint32_t fee_bps                      = 10;           // 0.1% per spoke
          /// Wall-clock collateral lock duration — the challenge window.
          /// Locks are NEVER released by delivery; they expire this many ms
-         /// after creation and are swept by `chklocks` at epoch advance.
-         /// Default 12 hours.
+         /// after creation and are swept by `chklocks` at epoch advance. An
+         /// UPHELD challenge cuts the window short — `sweeplocks` erases the
+         /// commitment's locks where they stand. Default 12 hours.
          uint64_t collateral_lock_duration_ms  = 43'200'000;
          /// Minimum WIRE escrow accepted by `swapfromwire` (atomic units,
          /// 9 decimals) — the queue-slot price floor.

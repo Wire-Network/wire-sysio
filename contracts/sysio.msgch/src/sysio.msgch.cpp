@@ -1,5 +1,4 @@
 #include <sysio.msgch/sysio.msgch.hpp>
-#include <sysio.msgch/solana_terminal_budget.hpp>
 #include <sysio.epoch/sysio.epoch.hpp>
 #include <sysio.authex/sysio.authex.hpp>
 #include <sysio.chains/sysio.chains.hpp>
@@ -58,15 +57,18 @@ constexpr sysio::slug_name NODE_OWNER_SRC_CHAIN = "ETHEREUM"_s;
 
 /// Hard cap on the encoded envelope size in BOTH directions, mirroring the
 /// Solana (`opp_outpost::MAX_ENVELOPE_BYTES`) and Ethereum (`OPP.MAX_ENVELOPE_BYTES`)
-/// caps. 64 KiB is the e2e-supported maximum across WIRE / Ethereum / Solana,
-/// bound by Solana's 256 KiB BPF heap divided by ~3.3× envelope-size peak heap
-/// usage during the finalising chunk's `Envelope::decode + keccak::hash + clone`.
+/// caps. 32 KiB is the e2e-supported maximum across WIRE / Ethereum / Solana.
+/// Solana's 256 KiB BPF heap divided by ~3.3× envelope-size peak heap usage
+/// during the finalising chunk's `Envelope::decode + keccak::hash + clone`
+/// tolerates more, but Ethereum is the binding constraint: a cold
+/// `emitOutboundEnvelope` of a near-64-KiB envelope costs ~45 M gas, ~2.7× the
+/// EIP-7825 per-transaction cap of 16 777 216, so the platform cap is 32 768.
 /// Outbound, the `buildenv` packing loop uses this to decide how many READY
 /// attestations to bundle into the current epoch's envelope; any that don't fit
 /// stay in the `attestations` table with status READY for the next epoch's
 /// `buildenv` call. Inbound, `deliver` rejects anything larger before hashing
 /// or storing it.
-constexpr size_t   MAX_ENVELOPE_BYTES         = 65'536;
+constexpr size_t   MAX_ENVELOPE_BYTES         = 32'768;
 
 /// Conservative per-attestation byte budget used by the `buildenv` packing
 /// loop: protobuf tags + length prefixes + the attestation type/data-size
@@ -84,74 +86,6 @@ constexpr size_t   ENVELOPE_BASELINE_BYTES    = 512;
 /// Stable audit marker for a UIC rejected before it can reach `rcrdcommit`.
 constexpr const char* UIC_DISPATCH_REJECTED_LOG_PREFIX =
    "UIC_DISPATCH_REJECTED";
-
-using namespace sysio::msgch_svm_terminal_budget;
-
-static_assert(svm_hard_dynamic_account_budget() == 16,
-              "SEC-94 SVM dynamic-account budget changed; update tests and terminal budget docs");
-
-/// Pessimistic dynamic-account estimate for one Solana-bound outbound
-/// attestation. `std::nullopt` means the attestation is not covered by the
-/// SEC-94 manifest and must not be committed to a Solana envelope.
-std::optional<size_t> estimate_svm_dynamic_accounts(AttestationType type,
-                                                    const std::vector<char>& data) {
-   using AT = AttestationType;
-   switch (type) {
-      case AT::ATTESTATION_TYPE_OPERATORS:
-      case AT::ATTESTATION_TYPE_BATCH_OPERATOR_GROUPS:
-      case AT::ATTESTATION_TYPE_EMISSIONS_BLOCKED:
-         return SVM_DYNAMIC_ACCOUNTS_NONE;
-
-      case AT::ATTESTATION_TYPE_OPERATOR_ACTION: {
-         opp::attestations::OperatorAction oa;
-         auto in = zpp::bits::in{std::span{data.data(), data.size()}, zpp::bits::no_size{}};
-         if (in(oa) != zpp::bits::errc{}) return std::nullopt;
-
-         using OAT = opp::attestations::OperatorAction;
-         switch (oa.action_type) {
-            case OAT::ACTION_TYPE_WITHDRAW_REMIT:
-               return SVM_DYNAMIC_ACCOUNTS_NATIVE_WALLET;
-            case OAT::ACTION_TYPE_SLASH:
-               return SVM_DYNAMIC_ACCOUNTS_NONE;
-            case OAT::ACTION_TYPE_DEPOSIT_REQUEST:
-            case OAT::ACTION_TYPE_WITHDRAW_REQUEST:
-            case OAT::ACTION_TYPE_UNKNOWN:
-            default:
-               return std::nullopt;
-         }
-      }
-
-      case AT::ATTESTATION_TYPE_DEPOSIT_REVERT:
-      case AT::ATTESTATION_TYPE_RESERVE_READY:
-         return SVM_DYNAMIC_ACCOUNTS_NATIVE_WALLET;
-
-      case AT::ATTESTATION_TYPE_SWAP_REMIT:
-      case AT::ATTESTATION_TYPE_SWAP_REVERT:
-      case AT::ATTESTATION_TYPE_RESERVE_CREATE_CANCELLED:
-         return SVM_DYNAMIC_ACCOUNTS_RESERVE_EFFECT_WORST_CASE;
-
-      case AT::ATTESTATION_TYPE_UNSPECIFIED:
-      case AT::ATTESTATION_TYPE_STAKE:
-      case AT::ATTESTATION_TYPE_UNSTAKE:
-      case AT::ATTESTATION_TYPE_PRETOKEN_PURCHASE:
-      case AT::ATTESTATION_TYPE_PRETOKEN_YIELD:
-      case AT::ATTESTATION_TYPE_WIRE_TOKEN_PURCHASE:
-      case AT::ATTESTATION_TYPE_RESERVE_BALANCE_SHEET:
-      case AT::ATTESTATION_TYPE_STAKE_UPDATE:
-      case AT::ATTESTATION_TYPE_CHALLENGE_RESPONSE:
-      case AT::ATTESTATION_TYPE_SWAP_REQUEST:
-      case AT::ATTESTATION_TYPE_CHALLENGE_REQUEST:
-      case AT::ATTESTATION_TYPE_NODE_OWNER_REG:
-      case AT::ATTESTATION_TYPE_STAKING_REWARD:
-      case AT::ATTESTATION_TYPE_STAKE_RESULT:
-      case AT::ATTESTATION_TYPE_ATTESTATION_PROCESSING_ERROR:
-      case AT::ATTESTATION_TYPE_UNDERWRITE_INTENT_COMMIT:
-      case AT::ATTESTATION_TYPE_RESERVE_CREATE:
-      case AT::ATTESTATION_TYPE_RESERVE_CREATE_CANCEL:
-      default:
-         return std::nullopt;
-   }
-}
 
 uint32_t current_epoch_index() {
    epoch::epochstate_t tbl(EPOCH_ACCOUNT);
@@ -184,9 +118,54 @@ uint64_t mint_att_id(name self) {
    return out;
 }
 
-uint32_t epoch_operators_per_group() {
-   epoch::epochcfg_t tbl(EPOCH_ACCOUNT);
-   return tbl.exists() ? tbl.get().operators_per_epoch : 7;
+/// Size of the ACTIVE batch-operator group -- the set that can actually deliver for the current
+/// epoch. Every consensus threshold derives from THIS, never from the configured
+/// `operators_per_epoch`.
+///
+/// The two differ routinely. `sysio.epoch::advance` fills a new tail only *up to* the configured
+/// size (`for (... && new_tail.size() < cfg.operators_per_epoch; ...)`) and documents a short group
+/// as "a degraded but non-fatal state: batch operators were terminated faster than replacements
+/// could activate". With the configured 7 and a live group of S, a config-derived threshold makes
+/// the unanimous path unreachable for any S < 7 and the majority path unreachable for S <= 3 --
+/// consensus becomes arithmetically impossible and the epoch stalls chain-wide.
+///
+/// The count is of members who can ACTUALLY deliver, which is the resident group INTERSECTED with
+/// current opreg ACTIVE status -- exactly the admission rule `deliver` enforces. The resident group
+/// is a snapshot taken at schbatchgps/advance time; an operator slashed, terminated, or dropped
+/// below its collateral minimum mid-window stays in `batch_op_groups[current]` but is refused by
+/// `deliver` ("delivering operator is not ACTIVE in sysio.opreg"). Counting raw snapshot members
+/// would therefore still overstate the reachable set and leave the unanimous path unsatisfiable
+/// after a mid-window slash -- the very case WNS-15 names. A missing operator row counts as
+/// not-active, failing closed the same way `deliver` does.
+///
+/// Returned as the SET, not just a count, because the consensus tally must filter deliveries
+/// through the same membership test that produces the threshold. Counting every delivery row while
+/// sizing the group to the live set mixes two different populations: an operator that delivers and
+/// is then slashed leaves a row behind that would still count toward a threshold it is no longer
+/// part of, letting a strictly smaller set finalize an envelope (A delivers, A is slashed, B
+/// delivers -> 2 of a 2-member group, with C never heard from). Numerator and denominator come from
+/// this one snapshot so they cannot diverge.
+///
+/// Empty when epoch state is unreadable or the group cursor is out of range. That is fail-closed:
+/// `deliver` requires `is_batch_operator_active`, which requires the same epoch state, so there is
+/// nothing to tally in that window anyway. There is deliberately no configured-size fallback --
+/// `epochcfg.operators_per_epoch` sizes the schedule, it does not describe who can deliver now.
+std::vector<name> eligible_batch_operators() {
+   epoch::epochstate_t tbl(EPOCH_ACCOUNT);
+   if (!tbl.exists()) return {};
+   auto state = tbl.get();
+   if (state.current_batch_op_group >= state.batch_op_groups.size()) return {};
+
+   opreg::operators_t ops(OPREG_ACCOUNT);
+   std::vector<name> eligible;
+   for (const auto& member : state.batch_op_groups[state.current_batch_op_group]) {
+      const auto key = opreg::operator_key{member.value};
+      if (!ops.contains(key)) continue;
+      if (ops.get(key).status == opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE) {
+         eligible.push_back(member);
+      }
+   }
+   return eligible;
 }
 
 /// Insert a metadata row into `envelope_log` and, if the table has grown
@@ -1084,7 +1063,8 @@ void dispatch_attestation(name self, uint64_t attestation_id,
    // `inbound_envelope_valid`, which `deliver` already ran at ingress and which is re-checked below.
    const auto op_row = [&]() {
       sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
-      return chains_tbl.get(sysio::chains::chain_key{sysio::slug_name{chain_code}});
+      return chains_tbl.get(sysio::chains::chain_key{sysio::slug_name{chain_code}},
+                            "sysio.msgch: inbound envelope names an unregistered chain_code");
    }();
    // Validate the envelope-level chain + per-message semantic headers -- the SAME check `deliver`
    // runs at ingress (see `inbound_envelope_valid`), re-run here as defense in depth. A drop is a
@@ -1200,7 +1180,7 @@ void dispatch_attestation(name self, uint64_t attestation_id,
 /// majority of the operator group. A majority — even within a 3+-way split — resolves without a
 /// vote, so it is not a trigger; a sub-3-way or pre-boundary split just waits for more deliveries.
 void maybe_open_dispute(name self, uint64_t chain_code, uint32_t epoch_index,
-                        uint32_t operators_per_group,
+                        uint32_t group_size,
                         const std::vector<checksum256>& seen_checksums,
                         const std::vector<uint32_t>& checksum_counts,
                         const std::vector<std::vector<name>>& checksum_operators) {
@@ -1224,9 +1204,11 @@ void maybe_open_dispute(name self, uint64_t chain_code, uint32_t epoch_index,
    for (auto c : checksum_counts) {
       if (c > max_count) max_count = c;
    }
-   if (max_count > operators_per_group / 2) {  // a majority exists -> no vote needed
+   // Same strict-majority form as evalcons Option B -- these two MUST agree, or a split that
+   // evalcons treats as un-resolved could be declined a dispute here (or vice versa).
+   if (max_count * 2 > group_size) {  // a majority exists -> no vote needed
       sysio::print_f("msgch::maybe_open_dispute: no dispute for (chain=%llu, epoch=%u): a version holds a majority (%u of group %u), resolved without a vote\n",
-                     chain_code, epoch_index, max_count, operators_per_group);
+                     chain_code, epoch_index, max_count, group_size);
       return;
    }
 
@@ -1300,7 +1282,7 @@ void msgch::deliver(name batch_op_name, uint64_t chain_code, std::vector<char> d
    check(!data.empty(), "delivery data cannot be empty");
 
    // Enforce the protocol envelope cap on the inbound boundary, not just in the
-   // outbound `buildenv` packer: every outpost packs to the same 64 KiB cap, so
+   // outbound `buildenv` packer: every outpost packs to the same 32 KiB cap, so
    // an oversized delivery is malformed by construction. The generic chain
    // ceilings (`max_inline_action_size` ~512 KiB, `max_kv_value_size` ~256 KiB)
    // are far looser and would otherwise let an operator persist envelopes here
@@ -1443,6 +1425,20 @@ void msgch::evalcons(uint64_t chain_code, uint32_t epoch_index) {
       if (d_idx.find(composite) != d_idx.end()) return;
    }
 
+   // The eligible set is resolved BEFORE the tally so both the counts and the threshold come from
+   // one snapshot -- see eligible_batch_operators(). A delivery from an operator that is no longer
+   // eligible is skipped outright rather than counted against a group it is not part of.
+   const std::vector<name> eligible = eligible_batch_operators();
+   if (eligible.empty()) {
+      sysio::print_f("msgch::evalcons: no consensus for (chain=%llu, epoch=%u): no eligible batch operators\n",
+                     chain_code, epoch_index);
+      return;
+   }
+   const uint32_t group_size = static_cast<uint32_t>(eligible.size());
+   const auto is_eligible = [&eligible](const name& op) {
+      return std::find(eligible.begin(), eligible.end(), op) != eligible.end();
+   };
+
    // Group envelopes by checksum, tracking the operators that delivered each version (CDT-compatible
    // parallel vectors). The per-version operator lists become the dispute candidates on a 3+-way
    // split.
@@ -1454,6 +1450,7 @@ void msgch::evalcons(uint64_t chain_code, uint32_t epoch_index) {
 
    for (auto it = oe_idx.lower_bound(composite);
         it != oe_idx.end() && it->by_outpost_epoch() == composite; ++it) {
+      if (!is_eligible(it->batch_op_name)) continue;
       bool found = false;
       for (size_t g = 0; g < seen_checksums.size(); ++g) {
          if (seen_checksums[g] == it->checksum) {
@@ -1472,22 +1469,22 @@ void msgch::evalcons(uint64_t chain_code, uint32_t epoch_index) {
       total_deliveries++;
    }
 
-   uint32_t operators_per_group = epoch_operators_per_group();
-
    // Consensus check
    bool consensus_reached = false;
    size_t consensus_group = 0;
 
    for (size_t g = 0; g < seen_checksums.size(); ++g) {
       // Option A: ALL operators delivered identical data
-      if (checksum_counts[g] == operators_per_group &&
-          total_deliveries == operators_per_group) {
+      if (checksum_counts[g] == group_size &&
+          total_deliveries == group_size) {
          consensus_reached = true;
          consensus_group = g;
          break;
       }
-      // Option B: Majority at epoch boundary (current time >= next_epoch_start)
-      if (checksum_counts[g] > operators_per_group / 2) {
+      // Option B: Majority at epoch boundary (current time >= next_epoch_start).
+      // Strict majority written as `count * 2 > group_size` rather than `count > group_size / 2`:
+      // a short tail can be EVEN, where integer division would accept an exact half as a majority.
+      if (checksum_counts[g] * 2 > group_size) {
          epoch::epochstate_t state_tbl(EPOCH_ACCOUNT);
          if (state_tbl.exists()) {
             auto state = state_tbl.get();
@@ -1503,7 +1500,7 @@ void msgch::evalcons(uint64_t chain_code, uint32_t epoch_index) {
    if (!consensus_reached) {
       // No automatic consensus. On a 3+-way no-majority split past the epoch boundary, open a
       // Tier-1 dispute vote; a smaller or pre-boundary split just waits for more deliveries.
-      maybe_open_dispute(get_self(), chain_code, epoch_index, operators_per_group,
+      maybe_open_dispute(get_self(), chain_code, epoch_index, group_size,
                          seen_checksums, checksum_counts, checksum_operators);
       return;
    }
@@ -1546,6 +1543,9 @@ void msgch::chkcons() {
    sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
    bool all_consensus = true;
    uint32_t outpost_count = 0;
+   // Outposts with no current-epoch consensus row. Collected rather than short-circuited so the
+   // post-boundary re-evaluation below can re-drive EVERY laggard, not just the first one.
+   std::vector<uint64_t> awaiting_consensus;
 
    for (auto it = chains_tbl.begin(); it != chains_tbl.end(); ++it) {
       if (!it->active || it->is_depot) continue;
@@ -1553,7 +1553,8 @@ void msgch::chkcons() {
       auto opc_pk = outpost_consensus_key{it->code.value};
       if (!opcons.contains(opc_pk)) {
          all_consensus = false;
-         break;
+         awaiting_consensus.push_back(it->code.value);
+         continue;
       }
       auto opc = opcons.get(opc_pk);
       // Readiness is the durable `epoch_index == current epoch` signal that apply_consensus writes on
@@ -1564,17 +1565,46 @@ void msgch::chkcons() {
       // A stale row from a prior epoch fails this check; a fresh dispatch for the new epoch overwrites it.
       if (opc.epoch_index != epoch) {
          all_consensus = false;
-         break;
+         awaiting_consensus.push_back(it->code.value);
+         continue;
       }
    }
 
-   if (outpost_count == 0 || !all_consensus) return;
+   if (outpost_count == 0) return;
 
    // Check wall-clock: next_epoch_start must be in the past
    epoch::epochstate_t estate(EPOCH_ACCOUNT);
    if (!estate.exists()) return;
    auto state = estate.get();
-   if (current_time_point() < state.next_epoch_start) return;
+   const bool past_boundary = current_time_point() >= state.next_epoch_start;
+
+   if (!all_consensus) {
+      // Post-boundary re-evaluation. evalcons runs ONLY as an inline of deliver(), and deliver()
+      // rejects a second delivery from the same operator ("operator already delivered for this
+      // outpost+epoch"). So a majority that formed BEFORE the boundary, with no further delivery
+      // after it, is never re-examined once the time gate opens -- nothing on chain can trigger the
+      // evaluation and the epoch stalls permanently. Re-drive it from here: chkcons is
+      // permissionless and already cranked every tick by batch_operator_plugin.
+      //
+      // The inline is sent as msgch itself, so evalcons's require_auth(get_self()) still holds and
+      // its authority is unchanged. Inlines run after this action returns, so the refreshed
+      // outpcons row is observed by the NEXT tick -- this call still returns without advancing.
+      // Gated on past_boundary because Option B cannot fire before it, so a pre-boundary re-drive
+      // would be pure work with no possible effect.
+      if (past_boundary) {
+         for (uint64_t outpost_code : awaiting_consensus) {
+            action(
+               permission_level{get_self(), "active"_n},
+               get_self(),
+               "evalcons"_n,
+               std::make_tuple(outpost_code, epoch)
+            ).send();
+         }
+      }
+      return;
+   }
+
+   if (!past_boundary) return;
 
    // All conditions met. Trigger advance. Per-outpost consensus is intentionally NOT reset here:
    // advance() can legally return without advancing (the emissions gate), and that graceful return does
@@ -1650,15 +1680,25 @@ void msgch::queueout(uint64_t chain_code,
          has_auth(RESERV_ACCOUNT) || has_auth(get_self()),
          "queueout: caller not authorized to queue outbound attestations");
 
-   {
-      sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
-      auto chain = chains_tbl.get(sysio::chains::chain_key{sysio::slug_name{chain_code}},
-                                  "sysio.msgch::queueout: chain_code is not registered");
-      if (chain.kind == ChainKind::CHAIN_KIND_SVM) {
-         check(estimate_svm_dynamic_accounts(attest_type, data).has_value(),
-               "sysio.msgch::queueout: no Solana terminal account estimate for attestation");
-      }
-   }
+   // The chains registry is the ONLY authority on which chain codes exist.
+   //
+   // This is not an attack gate -- the authorization check above is. It is an
+   // ops gate: all eight production call sites derive their code from
+   // sysio.chains, but a governance msig holding one of those authorities can
+   // call queueout directly, and a typo'd code used to abort here. Without it
+   // the row is created READY and is then unreachable forever: epoch::advance
+   // only fans buildenv to registered active outposts, the PROCESSED drain
+   // skips mismatched codes, and no prune action exists -- so it is permanent
+   // sysio-pool RAM, re-walked by the Phase-1 bystatus scan on every buildenv,
+   // for every outpost, every epoch.
+   //
+   // The SVM terminal-account estimator that used to live beside this lookup
+   // was deliberately deleted (it made the depot model another chain's packet
+   // limit); the registration assert was scaffolding for it and fell out by
+   // accident. Only the assert comes back.
+   sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
+   chains_tbl.get(sysio::chains::chain_key{sysio::slug_name{chain_code}},
+                  "sysio.msgch::queueout: chain_code is not registered");
 
    auto now_sec = static_cast<uint64_t>(current_time_point().sec_since_epoch());
 
@@ -1739,9 +1779,9 @@ void msgch::buildenv(uint64_t chain_code) {
 
    const auto op_row = [&]() {
       sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
-      return chains_tbl.get(sysio::chains::chain_key{sysio::slug_name{chain_code}});
+      return chains_tbl.get(sysio::chains::chain_key{sysio::slug_name{chain_code}},
+                            "sysio.msgch::buildenv: chain_code is not registered");
    }();
-   const bool is_svm_destination = op_row.kind == ChainKind::CHAIN_KIND_SVM;
 
    // Route endpoints, stamped into the wire envelope below and mirrored on the envlog audit
    // row (symmetric with the evalcons inbound projection: `kind` → ChainId.kind,
@@ -1757,40 +1797,31 @@ void msgch::buildenv(uint64_t chain_code) {
 
    // Phase 2: estimator-based initial pick. Walk candidates in order, accumulating a conservative byte
    // estimate; stop once the next one would push the envelope over MAX_ENVELOPE_BYTES. The trim loop
-   // below is the source of truth for the encoded size invariant; for SVM destinations this pass also
-   // enforces the consensus-critical terminal transaction budget before the envelope is committed.
+   // below is the source of truth for the encoded size invariant.
+   //
+   // This pass deliberately does NOT bound the envelope by any destination chain's transaction
+   // capacity. Solana dispatch is resumable: the outpost settles `[cursor, cursor + dispatch_limit)`
+   // per terminal call and the relay loops until the cursor drains, so an envelope that needs more
+   // effect accounts than one Solana transaction can carry is settled across several calls rather
+   // than refused here. Sizing a WIRE consensus envelope against another chain's packet limit put
+   // that chain's MTU inside depot consensus; the cursor removes the need.
    size_t              included_count = 0;
    size_t              estimated_bytes = ENVELOPE_BASELINE_BYTES;
-   size_t              estimated_svm_dynamic_accounts = 0;
    for (const auto& entry : candidate_entries) {
       const size_t entry_bytes = ATTESTATION_OVERHEAD_BYTES + entry.data.size();
       if (estimated_bytes + entry_bytes > MAX_ENVELOPE_BYTES) {
          break;
       }
-      size_t next_svm_dynamic_accounts = estimated_svm_dynamic_accounts;
-      size_t entry_svm_dynamic_accounts = 0;
-      if (is_svm_destination) {
-         auto estimate = estimate_svm_dynamic_accounts(entry.type, entry.data);
-         check(estimate.has_value(),
-               "sysio.msgch::buildenv: no Solana terminal account estimate for READY attestation");
-         entry_svm_dynamic_accounts = *estimate;
-         next_svm_dynamic_accounts += entry_svm_dynamic_accounts;
-         if (!svm_terminal_budget_fits(next_svm_dynamic_accounts)) {
-            break;
-         }
-      }
       estimated_bytes += entry_bytes;
-      estimated_svm_dynamic_accounts = next_svm_dynamic_accounts;
       ++included_count;
    }
 
    // First-attestation-too-big guard. The estimator picks zero only when the first candidate alone
-   // overshoots the envelope or SVM terminal cap; the trim loop below would surface the same envelope
-   // condition, but aborting upfront avoids building anything in the doomed case. Never expected at
-   // protocol level because every valid current Solana-bound attestation should fit by itself.
+   // overshoots the envelope; the trim loop below would surface the same condition, but aborting
+   // upfront avoids building anything in the doomed case. Never expected at protocol level because
+   // every valid current attestation should fit by itself.
    check(included_count > 0,
-         "sysio.msgch::buildenv: a single READY attestation exceeds "
-         "the outbound envelope or Solana terminal budget");
+         "sysio.msgch::buildenv: a single READY attestation exceeds the outbound envelope");
 
    std::vector<opp::AttestationEntry> entries(
       std::make_move_iterator(candidate_entries.begin()),

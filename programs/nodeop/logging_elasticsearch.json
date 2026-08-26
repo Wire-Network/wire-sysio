@@ -1,0 +1,266 @@
+{
+  "includes": [],
+  "sinks": [{
+    "name": "stderr_color",
+    "type": "console_sink",
+    "args": {
+      "output_type": "stderr",
+      "color": true,
+      "level_colors": [{
+        "level": "debug",
+        "color": "green"
+      },{
+        "level": "info",
+        "color": "reset"
+      },{
+        "level": "warn",
+        "color": "yellow"
+      },{
+        "level": "error",
+        "color": "red"
+      }
+      ]
+    }
+  },{
+    "name": "daily_file",
+    "type": "daily_file_sink",
+    "args": {
+      "base_filename": "./logs/daily.log",
+      "rotation_hour": 0,
+      "rotation_minute": 0,
+      "truncate": false,
+      "max_files": 0
+    }
+  },{
+    "name": "rotate_file",
+    "type": "rotating_file_sink",
+    "args": {
+      "base_filename": "./logs/rotate.log",
+      "max_size": 10,
+      "max_files": 10,
+      "_comment": "max_size is in MB, max_files is the max number of rotated files"
+    }
+  },{
+    "name" : "dmlog",
+    "type": "dmlog_sink",
+    "args": {
+      "file": "-",
+      "_comment": "file can be a filename or -, -stdout, -stderr. -stdout is same as -"
+    }
+  },{
+    "name": "json_daily_file",
+    "type": "daily_file_sink",
+    "args": {
+      "base_filename": "./logs/daily.jsonl",
+      "rotation_hour": 0,
+      "rotation_minute": 0,
+      "truncate": false,
+      "max_files": 0
+    },
+    "format": {
+      "type": "json",
+      "args": { "extra_fields": {} }
+    },
+    "_comment": "JSONL output; rotates daily. Attach \"json_daily_file\" to any logger's sinks[] to enable."
+  },{
+    "name": "json_rotate_file",
+    "type": "rotating_file_sink",
+    "args": {
+      "base_filename": "./logs/rotate.jsonl",
+      "max_size": 10,
+      "max_files": 10
+    },
+    "format": {
+      "type": "json",
+      "args": { "extra_fields": {} }
+    },
+    "_comment": "JSONL output; rotates at max_size MB."
+  },{
+    "name": "json_stderr",
+    "type": "console_sink",
+    "args": { "output_type": "stderr", "color": false },
+    "format": {
+      "type": "json",
+      "args": { "extra_fields": {} }
+    },
+    "_comment": "JSONL output to stderr; formatter and sink are independently swappable."
+  },{
+    "name": "es",
+    "type": "es_sink",
+    "args": {
+      "url": "https://elasticsearch.example.com",
+      "index": "wire-logs",
+      "_comment": "batch_size/max_batch_bytes/max_doc_bytes/flush_interval_ms/max_pending_batches/max_retries/retry_backoff_ms/connect_timeout_ms/request_timeout_ms/shutdown_flush_timeout_ms and username/password are optional; see fc::sink::es_sink_config defaults"
+    },
+    "format": {
+      "type": "json",
+      "args": {
+        "layout": "{\"@timestamp\":${timestamp:epoch_millis},\"level\":\"${level:upper}\",\"message\":\"${message}\",\"category\":\"${logger}\",\"sourceLocation\":\"${file}:${line} ${func}\",\"data\":{\"thread\":\"${thread}\"}${extra_flat}}",
+        "extra_fields": { "env": "local", "app": "nodeop", "principal": "nodeop" }
+      }
+    },
+    "_comment": "Forwards logs to ES/OpenSearch via the _bulk API. Point `url`/`index` at YOUR endpoint and write index/alias, and change `app`/`principal` to values identifying your deployment before enabling. `layout` is a token template (tokens: timestamp[:iso8601|epoch_millis], level[:upper|lower], message, logger, file, line, func, thread, extra_flat, extra_object); this value reproduces fc::log::es_default_layout and is also the sink's default when the format block is omitted -- though then without extra_fields. ${extra_flat} splices extra_fields at that spot, which is how env/app/principal/logStream identity is stamped into every document."
+  }
+  ],
+  "loggers": [{
+    "name": "default",
+    "level": "info",
+    "enabled": true,
+    "sinks": [
+      "stderr_color",
+      "es"
+    ]
+  },{
+    "name": "net_plugin_impl",
+    "level": "info",
+    "enabled": true,
+    "sinks": [
+      "stderr_color",
+      "es"
+    ]
+  },{
+    "name": "p2p_log",
+    "level": "info",
+    "enabled": true,
+    "sinks": [
+      "stderr_color",
+      "es"
+    ]
+  },{
+    "name": "p2p_trx",
+    "level": "info",
+    "enabled": true,
+    "sinks": [
+      "stderr_color",
+      "es"
+    ]
+  },{
+    "name": "p2p_block",
+    "level": "info",
+    "enabled": true,
+    "sinks": [
+      "stderr_color",
+      "es"
+    ]
+  },{
+    "name": "p2p_message",
+    "level": "info",
+    "enabled": true,
+    "sinks": [
+      "stderr_color",
+      "es"
+    ]
+  },{
+    "name": "p2p_connection",
+    "level": "info",
+    "enabled": true,
+    "sinks": [
+      "stderr_color",
+      "es"
+    ]
+  },{
+    "name": "http_plugin",
+    "level": "info",
+    "enabled": true,
+    "sinks": [
+      "stderr_color",
+      "es"
+    ]
+  },{
+    "name": "producer_plugin",
+    "level": "info",
+    "enabled": true,
+    "sinks": [
+      "stderr_color",
+      "es"
+    ]
+  },{
+    "name": "transaction_success_tracing",
+    "level": "info",
+    "enabled": false,
+    "sinks": [
+      "stderr_color",
+      "es"
+    ]
+  },{
+    "name": "transaction_failure_tracing",
+    "level": "info",
+    "enabled": false,
+    "sinks": [
+      "stderr_color",
+      "es"
+    ]
+  },{
+    "name": "trace_api",
+    "level": "info",
+    "enabled": true,
+    "sinks": [
+      "stderr_color",
+      "es"
+    ]
+  },{
+    "name": "transaction_trace_success",
+    "level": "debug",
+    "enabled": false,
+    "sinks": [
+      "stderr_color",
+      "es"
+    ]
+  },{
+    "name": "transaction_trace_failure",
+    "level": "debug",
+    "enabled": false,
+    "sinks": [
+      "stderr_color",
+      "es"
+    ]
+  },{
+    "name": "transient_trx_success_tracing",
+    "level": "debug",
+    "enabled": false,
+    "sinks": [
+      "stderr_color",
+      "es"
+    ]
+  },{
+    "name": "transient_trx_failure_tracing",
+    "level": "debug",
+    "enabled": false,
+    "sinks": [
+      "stderr_color",
+      "es"
+    ]
+  },{
+    "name": "transaction",
+    "level": "debug",
+    "enabled": false,
+    "sinks": [
+      "stderr_color",
+      "es"
+    ]
+  },{
+    "name": "state_history",
+    "level": "info",
+    "enabled": true,
+    "sinks": [
+      "stderr_color",
+      "es"
+    ]
+  },{
+    "name": "vote",
+    "level": "debug",
+    "enabled": false,
+    "sinks": [
+      "stderr_color",
+      "es"
+    ]
+  },{
+    "name": "dmlog",
+    "level": "debug",
+    "enabled": false,
+    "sinks": [
+      "dmlog"
+    ]
+  }
+  ]
+}

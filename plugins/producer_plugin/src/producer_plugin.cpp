@@ -15,6 +15,7 @@
 #include <sysio/resource_monitor_plugin/resource_monitor_plugin.hpp>
 
 #include <fc/io/json.hpp>
+#include <fc/system_timer.hpp>
 #include <fc/log/logger_config.hpp>
 #include <fc/scoped_exit.hpp>
 #include <fc/time.hpp>
@@ -791,7 +792,9 @@ public:
    bool                                  _pause_production   = false;
 
    sysio::chain::named_thread_pool<struct prod>      _timer_thread;
-   boost::asio::system_timer                         _timer{_timer_thread.get_executor()};
+   // Runs on the real clock in production; a test engages fc's mock clock via
+   // fc::mock_time_traits::set_now() and drives production timing deterministically.
+   fc::system_timer                                  _timer{_timer_thread.get_executor()};
 
    using signature_provider_type = fc::crypto::sign_fn;
    std::map<chain::public_key_type, fc::crypto::signature_provider_ptr> _signature_providers;
@@ -3085,7 +3088,7 @@ void producer_plugin_impl::schedule_maybe_produce_block(bool exhausted) {
    if (!exhausted && deadline > fc::time_point::now()) {
       // ship this block off no later than its deadline
       SYS_ASSERT(chain.is_building_block(), missing_pending_block_state, "producing without pending_block_state, start_block succeeded");
-      _timer.expires_at(deadline.to_system_clock());
+      _timer.expires_at(fc::system_clock::from_time_point(deadline));
       fc_dlog(_log, "Scheduling Block Production on Normal Block #{} for {}",
               chain.head().block_num() + 1, deadline);
    } else {
@@ -3120,7 +3123,7 @@ void producer_plugin_impl::schedule_delayed_production_loop(const std::weak_ptr<
                                                             std::optional<fc::time_point>              wake_up_time) {
    if (wake_up_time) {
       fc_dlog(_log, "Scheduling Speculative/Production Change at {}", *wake_up_time);
-      _timer.expires_at(wake_up_time->to_system_clock());
+      _timer.expires_at(fc::system_clock::from_time_point(*wake_up_time));
       _timer.async_wait([this, cid = ++_timer_corelation_id](const boost::system::error_code& ec) {
          if (ec != boost::asio::error::operation_aborted && cid == _timer_corelation_id) {
             interrupt_transaction(controller::interrupt_t::all_trx);

@@ -23,6 +23,8 @@ set(fc_sources
         src/log/dmlog_formatter.cpp
         src/log/json_formatter.cpp
         src/log/pattern_formatter.cpp
+        src/log/json_layout.cpp
+        src/log/es_sink.cpp
         src/log/logger_config.cpp
         src/crypto/_digest_common.cpp
         src/crypto/aes.cpp

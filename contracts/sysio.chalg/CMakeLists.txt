@@ -35,6 +35,12 @@ if(BUILD_SYSTEM_CONTRACTS)
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.epoch/include>
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.system/include>
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.roa>
+                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.uwrit/include>
+                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.reserv/include>
+                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.opreg/include>
+                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.chains/include>
+                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.authex/include>
+                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.msgch/include>
         )
 
         target_link_libraries(${target}

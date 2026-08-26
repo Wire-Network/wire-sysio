@@ -22,8 +22,8 @@ namespace sysiosystem {
       // Add latest block information to blockinfo table.
       add_to_blockinfo_table(previous_block_id, timestamp);
 
-      if( _gstate.last_pervote_bucket_fill == time_point() )  /// start the presses
-         _gstate.last_pervote_bucket_fill = current_time_point();
+      if( _global.get().last_pervote_bucket_fill == time_point() )  /// start the presses
+         _global.modify( get_self(), []( auto& g ) { g.last_pervote_bucket_fill = current_time_point(); });
 
 
       /**
@@ -32,7 +32,7 @@ namespace sysiosystem {
        */
       auto key = producer_key_t{producer.value};
       if ( _producers.contains(key) ) {
-         // Round-boundary detection uses _gstate.total_unpaid_blocks as a
+         // Round-boundary detection uses the global's total_unpaid_blocks as a
          // per-producer "sequence stamp" -- NOT a monotonic block height.
          // The counter is decremented by processepoch when it resets producer
          // unpaid_blocks, so its absolute value is not stable across epochs.
@@ -42,8 +42,8 @@ namespace sysiosystem {
          // onblock after a reset. Invariant: if a producer's last_block_num is
          // non-sentinel, some counter (unpaid_blocks / eligible_rounds /
          // current_round_blocks) is non-zero, so processepoch will reset it.
-         uint32_t prod_counter_stamp = _gstate.total_unpaid_blocks; // capture BEFORE increment
-         _gstate.total_unpaid_blocks++;
+         uint32_t prod_counter_stamp = _global.get().total_unpaid_blocks; // capture BEFORE increment
+         _global.modify( get_self(), []( auto& g ) { g.total_unpaid_blocks++; });
          _producers.modify( same_payer, key, [&](auto& p) {
             p.unpaid_blocks++;
 
@@ -68,7 +68,7 @@ namespace sysiosystem {
       }
 
       /// only update block producers once every minute, block_timestamp is in half seconds
-      if( timestamp.slot - _gstate.last_producer_schedule_update.slot > 120 ) {
+      if( timestamp.slot - _global.get().last_producer_schedule_update.slot > 120 ) {
          update_ranked_producers( timestamp );
       }
    }

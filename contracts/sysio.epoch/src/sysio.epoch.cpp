@@ -4,15 +4,21 @@
 #include <sysio.opp.common/opp_keys.hpp>
 #include <sysio.authex/sysio.authex.hpp>
 #include <sysio.token/sysio.token.hpp>
-// For uwrit::MAX_UWREQ_PRUNE_PER_EPOCH — the per-epoch budget advance hands
-// to the inline `pruneuwreqs` sweep (the constant is owned by sysio.uwrit).
+// For uwrit::MAX_LOCK_RELEASE_PER_EPOCH and uwrit::MAX_UWREQ_PRUNE_PER_EPOCH —
+// the per-epoch budgets advance hands to the inline `chklocks` and
+// `pruneuwreqs` sweeps (both constants are owned by sysio.uwrit).
 #include <sysio.uwrit/sysio.uwrit.hpp>
+// For reserve::MAX_CLAIM_SWEEP_PER_EPOCH — the per-epoch budget advance hands
+// to the inline `sweepclaims` retention sweep (the constant is owned by
+// sysio.reserv).
+#include <sysio.reserv/sysio.reserv.hpp>
 // Canonical sysio.system emissions types + compute_epoch_emission. The
 // [[sysio::contract("sysio.system")]] attribute on emission_config / t5_state
 // pins them to sysio.system's ABI; no readonly mirror needed here.
 #include <sysio.system/emissions.hpp>
 #include <sysio.chains/sysio.chains.hpp>
 #include <sysio/opp/attestations/attestations.pb.hpp>
+#include <magic_enum/magic_enum.hpp>
 
 namespace sysio {
 
@@ -39,6 +45,21 @@ namespace {
 
 constexpr name SYSTEM_ACCOUNT     = "sysio"_n;
 constexpr name TOKEN_ACCOUNT      = "sysio.token"_n;
+
+/// Action identifiers owned by sysio.chalg and invoked by epoch close.
+namespace chalg_actions {
+constexpr name SLASHOP = "slashop"_n;
+} // namespace chalg_actions
+
+/// Action identifiers owned by sysio.opreg and invoked while closing an epoch.
+namespace opreg_actions {
+constexpr name RECORD_DELIVERY = "recorddel"_n;
+constexpr name TERMINATION_CHECK = "termcheck"_n;
+} // namespace opreg_actions
+
+/// Durable reason prefix for an epoch-delivery classification slash.
+constexpr const char* NON_CANONICAL_DELIVERY_REASON_PREFIX =
+   "non-canonical OPP envelope delivery, epoch ";
 
 // System-owned rows are billed to the sysio RAM pool rather than to this contract account (the
 // privileged-contract model sysio.token uses): the contract account stays finite at its code+abi
@@ -128,6 +149,18 @@ emissions_gate_result check_emissions_ready(uint32_t epoch_duration_sec, uint32_
       if (acct_tbl.contains(key)) {
          r.sysio_balance = acct_tbl.get(key).balance.amount;
       }
+
+      // Reserve pay that payepoch has already credited but nobody has pulled yet. Those balances
+      // still sit in sysio's token balance while being fully owed, so counting them as available
+      // would let the gate authorize a period the treasury cannot actually cover -- the next
+      // claimpay would then fail on overdraw and strand earned pay. `sysio_balance` is reported to
+      // the blocklog as the SPENDABLE amount for exactly this reason: an operator reading
+      // BALANCE_INSUFFICIENT needs the shortfall against what can really be paid, not the gross.
+      sysiosystem::emissions::payclaimtot_t claim_tot_tbl(SYSTEM_ACCOUNT);
+      const int64_t claims_reserve = static_cast<int64_t>(
+         claim_tot_tbl.get_or_default(sysiosystem::emissions::pay_claim_total{}).outstanding);
+      r.sysio_balance -= claims_reserve;
+      if (r.sysio_balance < 0) r.sysio_balance = 0;
 
       // emission_amount / period_emission is retained on the
       // BALANCE_INSUFFICIENT path so the blocklog row reports the real
@@ -330,6 +363,45 @@ void epoch::advance() {
    // wall clock for the current epoch effectively extends until the gate
    // eventually passes on a subsequent chkcons retry.
    const uint32_t target_epoch = state.current_epoch_index + 1;
+
+   // Bounded retention sweep of expired `sysio.reserv::wireclaims`: erase rows whose one-year
+   // window closed and return their WIRE to the treasury.
+   //
+   // Runs BEFORE the emissions gate, deliberately. This is maintenance, not economics, and the
+   // WIRE it reclaims lands in the very balance the gate measures -- so ordering it after the gate
+   // creates a deadlock: an epoch blocked as BALANCE_INSUFFICIENT returns below without ever
+   // reclaiming forfeited WIRE that could cover the shortfall, and every retry takes the same
+   // path. The contract would be sitting on the funds needed to unblock itself. `sweepclaims`
+   // takes only epoch or reserv authority, so no ordinary keeper could break that cycle either.
+   //
+   // Safe to run ahead of the gate because it is bounded, never-throwing past its auth check, and
+   // touches no epoch state -- a blocked epoch that sweeps and still cannot pay is exactly as
+   // blocked as before, minus some expired rows.
+   //
+   // `sysio.reserv` also sweeps opportunistically when crediting a new claim, but that only fires
+   // while settlement traffic arrives; this call is what makes the deadline hold when swaps stop.
+   //
+   // GUARDED on the account existing. Dispatching an inline action to an absent code account is a
+   // hard `action_validate_exception`, which inside `advance` is a chain-wide epoch stall.
+   // `sysio.reserv` is not a precondition for advancing an epoch -- a chain can advance before
+   // reserves are ever deployed -- and nothing can have accrued a wireclaim in that state, so
+   // skipping is precisely correct rather than merely defensive.
+   //
+   // That guard covers an ABSENT account, not a STALE one: an old `sysio.reserv` build has the
+   // account and not the action, and the CDT dispatcher asserts on an action it does not
+   // implement -- so deploying `sysio.epoch` ahead of `sysio.reserv` aborts every advance. The
+   // deploy is therefore one atomic `sysio.msig` transaction, or `sysio.reserv` first. Both this
+   // edge and the `sysio.epoch`-before-`sysio.system` one the emissions gate creates are written
+   // up in `docs/contract-upgrade-order.md`.
+   if (is_account(RESERV_ACCOUNT)) {
+      action(
+         permission_level{get_self(), "owner"_n},
+         RESERV_ACCOUNT,
+         "sweepclaims"_n,
+         std::make_tuple(reserve::MAX_CLAIM_SWEEP_PER_EPOCH)
+      ).send();
+   }
+
    const auto gate = check_emissions_ready(cfg.epoch_duration_sec, target_epoch);
    if (!gate.ready) {
       // OPP silent-return diagnostic: the epoch silently does NOT advance when the
@@ -359,7 +431,7 @@ void epoch::advance() {
       permission_level{get_self(), "owner"_n},
       UWRIT_ACCOUNT,
       "chklocks"_n,
-      std::make_tuple()
+      std::make_tuple(uwrit::MAX_LOCK_RELEASE_PER_EPOCH)
    ).send();
 
    // Bounded UWREQ lifecycle sweep (SEC-129 / WSA-223): erase terminal
@@ -384,9 +456,9 @@ void epoch::advance() {
    // For each (outpost × member of the expiring group):
    //   - scan `msgch::envelopes` (`byoutepoch` index) for any row matching
    //     (chain_code, current_epoch_index, batch_op_name == member)
-   //   - inline `opreg::recorddel(member, current_epoch_index, did_deliver)`
-   //   - inline `opreg::termcheck(member)` — the threshold + window come
-   //     from `op_config`, so tests dial the thresholds via setconfig
+   //   - collect the delivery result and every non-canonical deliverer
+   //   - slash all non-canonical deliverers before delivery accounting can
+   //     terminate them, then record the result and run `termcheck`
    //
    // The outpost set is sourced via a cross-contract read of
    // `sysio.chains::chains` (no local mirror) filtered to
@@ -412,6 +484,15 @@ void epoch::advance() {
       // outposts must be slashed a single time (opreg::slash throws on a second slash of the same
       // operator, which would abort advance and stall the chain).
       std::vector<name> to_slash;
+
+      /// A delivery result retained until non-canonical offenders have been
+      /// slashed. `recorddel` remains an audit record even for a newly
+      /// slashed operator, while `termcheck` safely skips non-ACTIVE rows.
+      struct delivery_observation {
+         name member;
+         bool did_deliver;
+      };
+      std::vector<delivery_observation> observations;
 
       sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
       for (auto op_it = chains_tbl.begin(); op_it != chains_tbl.end(); ++op_it) {
@@ -464,22 +545,11 @@ void epoch::advance() {
                   break;
                }
             }
-            action(
-               permission_level{get_self(), "owner"_n},
-               OPREG_ACCOUNT,
-               "recorddel"_n,
-               std::make_tuple(member, state.current_epoch_index, did_deliver)
-            ).send();
-            action(
-               permission_level{get_self(), "owner"_n},
-               OPREG_ACCOUNT,
-               "termcheck"_n,
-               std::make_tuple(member)
-            ).send();
+            observations.push_back({member, did_deliver});
 
             // Single slash path (dispute-vote design, per-operator outcome table): a delivered
             // NON-canonical checksum is a fault -> slash. Silence (no delivery) is never slashed; it
-            // stays on the recorddel/termcheck miss ladder above. Collect here; flush once below.
+            // stays on the recorddel/termcheck miss ladder below. Collect here; flush once below.
             if (did_deliver && have_winner && member_checksum != winner) {
                bool queued = false;
                for (const auto& s : to_slash) {
@@ -495,24 +565,40 @@ void epoch::advance() {
       // operator is marked SLASHED.
       //
       // Invariant — no cross-epoch double slash: opreg::slash THROWS on an already-SLASHED operator,
-      // which would abort advance and stall OPP epoch advancement. A slashed operator is guaranteed
-      // never to reappear in a later expiring group, so advance never attempts a second slash of it:
-      //   1. this flush runs BEFORE the window-slide below, so the operator is already SLASHED when
-      //      the next tail group is formed;
-      //   2. the new-tail filter pulls OPERATOR_STATUS_ACTIVE operators only (see the schedule slide
-      //      below), so a SLASHED operator is excluded from every newly-formed group; and
-      //   3. resident-exclusion keeps an operator in at most one group within the window, so the
-      //      operator slashed for THIS (expiring) group is not also sitting in a future
-      //      already-scheduled group.
-      // If any of those three scheduling facts change, this single-slash path must be revisited.
+      // which would abort advance and stall OPP epoch advancement. These inline slashes execute only
+      // after advance returns, so the schedule slide below can temporarily place a just-slashed
+      // operator in its new tail while the operator still reads ACTIVE. That member cannot create a
+      // later non-canonical observation: sysio.msgch::deliver requires its current sysio.opreg status
+      // to be ACTIVE before accepting delivery. Once the slash has executed, the scheduled SLASHED
+      // member cannot deliver or be queued for another non-canonical-delivery slash. The collection
+      // above also deduplicates multiple non-canonical observations for one member in this advance.
+      // Keep the deliver status gate and this single-slash path in sync if either behavior changes.
       for (const auto& member : to_slash) {
          action(
             permission_level{get_self(), "owner"_n},
             CHALG_ACCOUNT,
-            "slashop"_n,
+            chalg_actions::SLASHOP,
             std::make_tuple(member,
-                            std::string("non-canonical OPP envelope delivery, epoch ")
+                            std::string(NON_CANONICAL_DELIVERY_REASON_PREFIX)
                                + std::to_string(state.current_epoch_index))
+         ).send();
+      }
+
+      // Preserve the delivery history after slashing. A non-canonical operator is already
+      // SLASHED here, so opreg::termcheck returns without converting the punitive outcome into a
+      // termination/remit. Other group members retain their normal delivery accounting.
+      for (const auto& observation : observations) {
+         action(
+            permission_level{get_self(), "owner"_n},
+            OPREG_ACCOUNT,
+            opreg_actions::RECORD_DELIVERY,
+            std::make_tuple(observation.member, state.current_epoch_index, observation.did_deliver)
+         ).send();
+         action(
+            permission_level{get_self(), "owner"_n},
+            OPREG_ACCOUNT,
+            opreg_actions::TERMINATION_CHECK,
+            std::make_tuple(observation.member)
          ).send();
       }
 
@@ -569,7 +655,7 @@ void epoch::advance() {
       auto status_idx = opreg_ops.get_index<"bystatus"_n>();
       std::vector<std::pair<name, bool>> pool;
       for (auto it = status_idx.lower_bound(
-              static_cast<uint64_t>(OperatorStatus::OPERATOR_STATUS_ACTIVE));
+              magic_enum::enum_integer(OperatorStatus::OPERATOR_STATUS_ACTIVE));
            it != status_idx.end() &&
            it->status == OperatorStatus::OPERATOR_STATUS_ACTIVE; ++it) {
          if (it->type == OperatorType::OPERATOR_TYPE_BATCH && !is_resident(it->account)) {
@@ -615,8 +701,10 @@ void epoch::advance() {
    // Drain matured rows from `sysio.opreg::wtdwqueue`. Operators that queued
    // a withdrawal at least WITHDRAW_WAIT_EPOCHS ago are now eligible — opreg
    // subtracts from the balance and emits OPERATOR_ACTION(WITHDRAW_REMIT) to
-   // the matching outpost (or transfers WIRE tokens directly for WIRE-direct
-   // withdraws). Slashed-during-the-wait rows are dropped silently inside
+   // the matching outpost (or, for WIRE-direct withdraws, CREDITS the operator's
+   // `sysio.opreg::remitclaims` row, which it pulls with `claimremit` — nothing
+   // is transferred from this path, precisely because it runs inline from here).
+   // Slashed-during-the-wait rows are dropped silently inside
    // opreg's flushwtdw. See CLAUDE-WIRE-OPERATOR-COLLATERAL-IMPL-PLAN.md §3.3.
    action(
       permission_level{get_self(), "owner"_n},
@@ -647,7 +735,7 @@ void epoch::advance() {
          auto link_it = links_by_name.lower_bound(it->account.value);
          while (link_it != links_by_name.end() && link_it->username == it->account) {
             opp::types::ChainAddress chain_addr;
-            chain_addr.kind = static_cast<opp::types::ChainKind>(link_it->chain_kind);
+            chain_addr.kind = link_it->chain_kind;
 
             std::visit([&](const auto& key_data) {
                using T = std::decay_t<decltype(key_data)>;
@@ -831,7 +919,7 @@ void epoch::schbatchgps() {
    auto status_idx = opreg_ops.get_index<"bystatus"_n>();
    std::vector<std::pair<name, bool>> available_batch; // (account, is_bootstrapped)
    for (auto it = status_idx.lower_bound(
-           static_cast<uint64_t>(OperatorStatus::OPERATOR_STATUS_ACTIVE));
+           magic_enum::enum_integer(OperatorStatus::OPERATOR_STATUS_ACTIVE));
         it != status_idx.end() &&
         it->status == OperatorStatus::OPERATOR_STATUS_ACTIVE; ++it) {
       if (it->type == OperatorType::OPERATOR_TYPE_BATCH) {

@@ -13,6 +13,7 @@
 #include <string_view>
 
 #include "async_action_completion.hpp"
+#include "group_election.hpp"
 
 #include <sysio/batch_operator_plugin/batch_operator_plugin.hpp>
 #include <sysio/batch_operator_plugin/depot_ops.hpp>
@@ -51,9 +52,6 @@ namespace {
    constexpr std::size_t EPOCH_TICK_CRON_JOBS = 1;
    /// Exact secondary-index lookups should return at most the matching row.
    constexpr uint32_t EXACT_LOOKUP_LIMIT = 1;
-
-   /// my_group sentinel meaning "we are not in any batch-op group".
-   constexpr uint8_t GROUP_NONE = 255;
 
    // ── WIRE contract identifiers (actions, tables, indexes, field names) ──
    // Centralised so a contract rename/refactor shows up as one search hit,
@@ -105,6 +103,18 @@ namespace {
       }
    }
 
+   namespace chalg {
+      constexpr auto account           = "sysio.chalg";
+      constexpr auto table_disputes    = "disputes";
+      constexpr auto action_chkdispute = "chkdispute";
+      /// Field names on `dispute_entry` rows, plus the `chkdispute` action arg.
+      namespace field {
+         constexpr auto id         = "id";
+         constexpr auto status     = "status";
+         constexpr auto dispute_id = "dispute_id";
+      }
+   }
+
    /// v6: chain registry was split out of `sysio.epoch` onto its own
    /// `sysio.chains` contract. The `outposts` table was replaced by the
    /// `chains` KV table, keyed by slug_name (uint64 packed).
@@ -151,11 +161,12 @@ struct batch_operator_plugin::impl {
 
    // Epoch state tracked across polls
    uint32_t                 current_epoch = 0;
-   uint8_t                  my_group = 255;
-   bool                     is_elected = false;
+   /// This operator's standing for `current_epoch`. Retained across polls
+   /// because the election is decided in `parse_epoch_state` but reported in
+   /// `do_poll_epoch_state`.
+   batch_operator_detail::group_election election;
    fc::time_point           epoch_start;
    fc::time_point           next_epoch_start;
-   std::vector<chain::name> current_group_members;
    std::vector<outpost_descriptor> outposts;
 
    // Operator awareness — set by `poll_own_status()` from sysio.opreg::operators.
@@ -268,7 +279,7 @@ struct batch_operator_plugin::impl {
       }
 
       bool     within_epoch_window() const override { return _impl.within_epoch_window(); }
-      bool     is_elected()         const override { return _impl.is_elected; }
+      bool     is_elected()         const override { return _impl.election.is_elected; }
       uint32_t current_epoch()      const override { return _impl.current_epoch; }
       bool     is_epoch_boundary_past() const override {
          // `next_epoch_start` is cached on `_impl` from
@@ -346,12 +357,76 @@ struct batch_operator_plugin::impl {
       // chkcons advances the epoch on consensus. Only the elected operator
       // should push it — the contract verifies authorization regardless,
       // but pushing from every batch op wastes trx slots.
-      if (is_elected) {
+      if (election.is_elected) {
          try {
             push_action(msgch::account, msgch::action_chkcons, operator_account,
                         fc::mutable_variant_object());
          } catch (const fc::exception& e) {
             dlog("batch_operator: chkcons: {}", e.to_string());
+         }
+      }
+
+      // Tally any OPEN envelope dispute. Deliberately NOT gated on `is_elected`
+      // — see crank_open_disputes.
+      try {
+         crank_open_disputes();
+      } FC_LOG_AND_DROP();
+   }
+
+   /**
+    * Crank `sysio.chalg::chkdispute` for every OPEN envelope dispute.
+    *
+    * `sysio.chalg::opendispute` sends `sysio.epoch::pause`, and `chkdispute` is
+    * the ONLY action that tallies the Tier-1 votes, dispatches the winning
+    * envelope and lifts that pause. Nothing on chain drives it: its sibling
+    * `chkuwchal` needs no cadence because `sysio.uwrit::chklocks` pokes it from
+    * every `sysio.epoch::advance` — which works precisely because an
+    * underwriter challenge does NOT pause the chain. An envelope dispute halts
+    * `advance` itself, so no inline poke can reach it. Without this crank a
+    * dispute stays OPEN after Tier-1 has already reached quorum, and epoch
+    * advancement is paused indefinitely.
+    *
+    * Not gated on `is_elected` (unlike the `chkcons` push above): the elected
+    * operator may be the very one that is offline or delivered the
+    * non-canonical envelope — often the reason the dispute exists. Disputes are
+    * rare, so pushing from every ACTIVE operator costs effectively nothing, and
+    * `chkdispute` asserts the dispute is still OPEN, which makes a redundant
+    * push a cheap no-op.
+    *
+    * The scan is a full-table filter rather than a `byepoch` index lookup: the
+    * table retains RESOLVED rows as the audit trail, but disputes are rare and
+    * `poll_own_status` already scans a comparably-sized table each tick. If
+    * disputes ever become frequent, bound this by `current_epoch` via the
+    * `byepoch` secondary index.
+    */
+   void crank_open_disputes() {
+      sysio::chain_apis::read_only::get_table_rows_params p;
+      p.code        = chain::name(chalg::account);
+      p.scope       = chalg::account;
+      p.table       = chalg::table_disputes;
+      p.all_rows    = true;
+      p.values_only = true;
+      p.filter      = [](const fc::variant& row) {
+         const auto& obj = row.get_object();
+         auto status_it  = obj.find(chalg::field::status);
+         return status_it != obj.end() &&
+                status_it->value().as<DisputeStatus>() == DISPUTE_STATUS_OPEN;
+      };
+      auto rows = read_table(std::move(p));
+
+      for (const auto& r : rows.rows) {
+         const auto& obj = r.get_object();
+         auto id_it      = obj.find(chalg::field::id);
+         if (id_it == obj.end()) continue;
+         const uint64_t dispute_id = id_it->value().as_uint64();
+
+         try {
+            push_action(chalg::account, chalg::action_chkdispute, operator_account,
+                        fc::mutable_variant_object()(chalg::field::dispute_id, dispute_id));
+         } catch (const fc::exception& e) {
+            // Expected-transient: the dispute resolved between the scan and the push, or
+            // another operator's crank won the race.
+            dlog("batch_operator: chkdispute({}): {}", dispute_id, e.to_string());
          }
       }
    }
@@ -432,39 +507,22 @@ struct batch_operator_plugin::impl {
       bool     paused      = obj[epoch::field::is_paused].as_bool();
 
       if (paused) {
-         if (is_elected) {
+         if (election.is_elected) {
             ilog("batch_operator: epoch paused, suspending");
-            is_elected = false;
+            election.is_elected = false;
          }
          return {false, 0};
       }
 
       // Determine group assignment
-      my_group = GROUP_NONE;
-      current_group_members.clear();
-      auto groups_arr = obj[epoch::field::batch_op_groups].get_array(); // copy, not reference
-
-      for (uint8_t g = 0; g < groups_arr.size(); ++g) {
-         auto grp = groups_arr[g].get_array(); // copy
-         for (auto& member : grp) {
-            if (chain::name(member.as_string()) == operator_account) {
-               my_group = g;
-            }
-         }
-         if (g == cur_group) {
-            for (auto& member : grp) {
-               current_group_members.push_back(chain::name(member.as_string()));
-            }
-         }
-      }
-
-      is_elected = (my_group == cur_group);
+      election = batch_operator_detail::evaluate_group_election(
+         cur_group, obj[epoch::field::batch_op_groups].get_array(), operator_account);
 
       // Parse epoch timing
       fc::from_variant(obj[epoch::field::current_epoch_start], epoch_start);
       fc::from_variant(obj[epoch::field::next_epoch_start],    next_epoch_start);
 
-      if (is_elected) {
+      if (election.is_elected) {
          ilog("batch_operator: current_epoch={}", epoch_index);
       }
 
@@ -489,10 +547,9 @@ struct batch_operator_plugin::impl {
       // recorded during `evalcons` dispatch and the epoch time gate are met —
       // but they never AUTHORIZE bootstrap or advance directly.
 
-      if (!is_elected) {
+      if (!election.is_elected) {
          if (epoch_index != current_epoch) {
-            ilog("batch_operator: not elected for epoch {} (my_group={}, active_group={})",
-                 epoch_index, my_group, (epoch_index % 3));
+            ilog("{}", batch_operator_detail::not_elected_message(epoch_index, election));
          }
          // Keep current_epoch fresh even when not elected: per-outpost jobs
          // consult it via depot_ops, and they bail on !is_elected anyway.
@@ -502,7 +559,7 @@ struct batch_operator_plugin::impl {
 
       if (epoch_index != current_epoch) {
          ilog("batch_operator: ELECTED for epoch {} (group {}, {} members)",
-              epoch_index, my_group, current_group_members.size());
+              epoch_index, election.my_group, election.current_group_members.size());
       }
       current_epoch = epoch_index;
       // Refresh the outpost list so governance-added outposts become visible.
@@ -928,6 +985,22 @@ void batch_operator_plugin::set_program_options(options_description& cli,
         "WIRE account name for this batch operator");
    opts("batch-epoch-poll-ms", bpo::value<uint32_t>()->default_value(EPOCH_POLL_MS),
         "How often to check epoch state (ms)");
+   // SIZING RULE for batch-delivery-timeout-ms: it bounds the WHOLE outbound
+   // delivery, and an Ethereum delivery is now one transaction PER CHUNK
+   // (ETHEREUM_MAX_CHUNK_BYTES = 8192; Solana chunks at 672). Size it as
+   //     total chunks x (target block time + confirmation margin)
+   // for the largest envelope the outpost is expected to carry. At the 32768
+   // byte platform envelope cap that is 4 Ethereum chunks, so the 15000 ms
+   // default covers a 1 s block time with wide margin. Undersizing is not fatal:
+   // the relay resumes from the on-chain per-operator high-water mark on the
+   // next cron tick, so a truncated tick converges rather than restarting from
+   // chunk zero. SHARED KNOB: this same value also bounds the depot
+   // push_action completion wait (see push_action above); post-WIRE-331 a
+   // timeout there is safe (the async_action_completion callback retains its
+   // own state), but raising this option lengthens BOTH waits, so raise it for
+   // chunking deliberately rather than as a blanket tuning step.
+   // Help text below must stay ASCII with no " --" sequence (PerformanceHarness
+   // splits nodeop --help output on that token).
    opts("batch-delivery-timeout-ms", bpo::value<uint32_t>()->default_value(DELIVERY_TIMEOUT_MS),
         "Max time to wait for chain delivery confirmation (ms)");
    opts("batch-enabled", bpo::value<bool>()->default_value(false),

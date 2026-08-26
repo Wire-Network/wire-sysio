@@ -107,15 +107,17 @@ void test_trxs_common(std::vector<const char*>& specific_args) {
                   "-p", "sysio", "-e", // actual arguments follow
                   "--data-dir", temp_dir_str.c_str(),
                   "--config-dir", temp_dir_str.c_str(),
-                  // -1 == no wall-clock cap on write transactions. The setup step below deploys the
-                  // sysio.bios contract via setcode, a write transaction. Under heavy CI parallelism
-                  // (this binary runs alongside ~1800 wasm_spec_tests saturating every core) the
-                  // setcode is repeatedly descheduled: it bills ~0 cpu yet its wall-clock checktime
-                  // can run hundreds of ms, tripping a tight --max-transaction-time and failing the
-                  // run with tx_cpu_usage_exceeded. This test exercises read-only execution, not
-                  // write-trx cpu enforcement, so the cap only adds flake. The setup is still bounded
-                  // by push_input_trx's 5s future wait, and read-only transactions remain bounded by
-                  // read-only-read-window-time-us (effective ~390000us after the 10000us margin).
+                  // -1 == no node-configured wall-clock cap on write transactions. The setup step below
+                  // deploys the sysio.bios contract via setcode, a write transaction. Under heavy CI
+                  // parallelism (this binary runs alongside ~1800 wasm_spec_tests saturating every core)
+                  // the setcode is repeatedly descheduled, so the wall clock its cpu bill is measured
+                  // against runs far longer than the work it performs. This test exercises read-only
+                  // execution, not write-trx cpu enforcement, so the cap only adds flake. It removes the
+                  // subjective cap only: the chain's objective max_transaction_cpu_usage still applies and
+                  // can still drop the setcode, which push_input_trx recovers from by resubmitting. The
+                  // setup is still bounded by that helper's attempt limit and its 5s per-attempt future
+                  // wait, and read-only transactions remain bounded by read-only-read-window-time-us
+                  // (effective ~390000us after the 10000us margin).
                   "--max-transaction-time=-1",
                   "--abi-serializer-max-time-ms=999",
                   "--read-only-write-window-time-us=100000",

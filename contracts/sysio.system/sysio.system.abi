@@ -291,6 +291,16 @@
             ]
         },
         {
+            "name": "claimpay",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account_name",
+                    "type": "name"
+                }
+            ]
+        },
+        {
             "name": "deleteauth",
             "base": "",
             "fields": [
@@ -837,6 +847,44 @@
                 {
                     "name": "header",
                     "type": "block_header"
+                }
+            ]
+        },
+        {
+            "name": "pay_claim",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account_name",
+                    "type": "name"
+                },
+                {
+                    "name": "balance",
+                    "type": "uint64"
+                },
+                {
+                    "name": "expires_at_sec",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "pay_claim_total",
+            "base": "",
+            "fields": [
+                {
+                    "name": "outstanding",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "payclaim_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account_name",
+                    "type": "uint64"
                 }
             ]
         },
@@ -1791,6 +1839,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "claimpay",
+            "type": "claimpay",
+            "ricardian_contract": ""
+        },
+        {
             "name": "deleteauth",
             "type": "deleteauth",
             "ricardian_contract": ""
@@ -2124,6 +2177,29 @@
             "key_names": ["account_name"],
             "key_types": ["uint64"],
             "table_id": 49260
+        },
+        {
+            "name": "payclaims",
+            "type": "pay_claim",
+            "index_type": "i64",
+            "key_names": ["account_name"],
+            "key_types": ["uint64"],
+            "table_id": 829,
+            "secondary_indexes": [
+                {
+                    "name": "byexpiry",
+                    "key_type": "uint128",
+                    "table_id": 24323
+                }
+            ]
+        },
+        {
+            "name": "payclaimtot",
+            "type": "pay_claim_total",
+            "index_type": "i64",
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 16636
         },
         {
             "name": "producers",

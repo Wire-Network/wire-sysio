@@ -181,6 +181,16 @@
             ]
         },
         {
+            "name": "claimremit",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                }
+            ]
+        },
+        {
             "name": "delivery_key",
             "base": "",
             "fields": [
@@ -512,6 +522,34 @@
             ]
         },
         {
+            "name": "remit_claim",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "balance",
+                    "type": "uint64"
+                },
+                {
+                    "name": "expires_at_sec",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "remitclaim_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "setconfig",
             "base": "",
             "fields": [
@@ -718,6 +756,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "claimremit",
+            "type": "claimremit",
+            "ricardian_contract": ""
+        },
+        {
             "name": "deposit",
             "type": "deposit",
             "ricardian_contract": ""
@@ -847,6 +890,21 @@
                     "name": "bystatus",
                     "key_type": "uint64",
                     "table_id": 57937
+                }
+            ]
+        },
+        {
+            "name": "remitclaims",
+            "type": "remit_claim",
+            "index_type": "i64",
+            "key_names": ["account"],
+            "key_types": ["uint64"],
+            "table_id": 45499,
+            "secondary_indexes": [
+                {
+                    "name": "byexpiry",
+                    "key_type": "uint128",
+                    "table_id": 43905
                 }
             ]
         },
