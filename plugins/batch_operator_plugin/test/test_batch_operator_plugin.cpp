@@ -57,8 +57,11 @@ BOOST_AUTO_TEST_CASE(plugin_options_are_registered) try {
    BOOST_CHECK(option_names.count("batch-operator-account") > 0);
    BOOST_CHECK(option_names.count("batch-epoch-poll-ms") > 0);
    BOOST_CHECK(option_names.count("batch-delivery-timeout-ms") > 0);
-   BOOST_CHECK(option_names.count("batch-enabled") > 0);
    BOOST_CHECK(option_names.count(sysio::batch_operator_detail::BATCH_OUTPOST_OPTION) > 0);
+   // Configuring batch-operator-account is what enables the relay. A separate
+   // enable flag would let an operator set the account and still relay nothing,
+   // which is indistinguishable from a healthy node until the group misses an epoch.
+   BOOST_CHECK(option_names.count("batch-enabled") == 0);
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(default_options_are_correct) try {
@@ -74,7 +77,8 @@ BOOST_AUTO_TEST_CASE(default_options_are_correct) try {
 
    BOOST_CHECK_EQUAL(vm["batch-epoch-poll-ms"].as<uint32_t>(), 15000u);
    BOOST_CHECK_EQUAL(vm["batch-delivery-timeout-ms"].as<uint32_t>(), 15000u);
-   BOOST_CHECK_EQUAL(vm["batch-enabled"].as<bool>(), false);
+   // No default account: an unconfigured node leaves the relay off.
+   BOOST_CHECK_EQUAL(vm.count("batch-operator-account"), 0u);
 } FC_LOG_AND_RETHROW();
 
 /// A normal push result invokes its callback and wakes the waiting relay job.
