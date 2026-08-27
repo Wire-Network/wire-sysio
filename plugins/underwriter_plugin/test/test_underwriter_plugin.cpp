@@ -45,6 +45,13 @@ constexpr std::string_view removed_eth_min_confirmations_option = "underwriter-e
 /// underwrite nothing, which is indistinguishable from a healthy node.
 constexpr std::string_view removed_enabled_option = "underwriter-enabled";
 
+/// Removed per-chain outpost wiring options. Nothing about an outpost is
+/// declared per node any more: `sysio.chains` names which chains are served and
+/// where their contracts live, and the RPC client for a chain is the one
+/// registered under that chain's own code.
+constexpr std::string_view removed_eth_outpost_option = "underwriter-eth-outpost";
+constexpr std::string_view removed_sol_outpost_option = "underwriter-sol-outpost";
+
 /// Program id used by the scanner tests to model the configured opp-outpost.
 const std::string test_sol_program_id = "OppOutpost11111111111111111111111111111111";
 
@@ -351,11 +358,11 @@ BOOST_AUTO_TEST_CASE(plugin_options_are_registered) try {
    BOOST_CHECK(option_names.count("underwriter-account") > 0);
    BOOST_CHECK(option_names.count("underwriter-scan-interval-ms") > 0);
    BOOST_CHECK(option_names.count("underwriter-action-timeout-ms") > 0);
-   BOOST_CHECK(option_names.count("underwriter-eth-outpost") > 0);
-   BOOST_CHECK(option_names.count("underwriter-sol-outpost") > 0);
    BOOST_CHECK(option_names.count(std::string{ETH_SOURCE_DEPOSIT_LOOKBACK_BLOCKS_OPTION}) > 0);
    BOOST_CHECK_EQUAL(option_names.count(std::string{removed_eth_min_confirmations_option}), 0);
    BOOST_CHECK_EQUAL(option_names.count(std::string{removed_enabled_option}), 0);
+   BOOST_CHECK_EQUAL(option_names.count(std::string{removed_eth_outpost_option}), 0);
+   BOOST_CHECK_EQUAL(option_names.count(std::string{removed_sol_outpost_option}), 0);
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(default_options_are_correct) try {
@@ -372,9 +379,9 @@ BOOST_AUTO_TEST_CASE(default_options_are_correct) try {
    BOOST_CHECK_EQUAL(vm["underwriter-action-timeout-ms"].as<uint32_t>(), action_timeout_ms);
    // No default account: an unconfigured node leaves the scan cycle off.
    BOOST_CHECK_EQUAL(vm.count("underwriter-account"), 0u);
-   // SEC-13/WSA-027: the former single --underwriter-{eth,sol}-client-id were
-   // replaced by repeatable per-chain --underwriter-{eth,sol}-outpost (no scalar
-   // default to assert; presence is checked in the option-registration case).
+   // No per-chain outpost wiring to default either: the former
+   // --underwriter-{eth,sol}-outpost options are gone, and their absence is
+   // asserted in the option-registration case above.
    BOOST_CHECK_EQUAL(
       vm[std::string{ETH_SOURCE_DEPOSIT_LOOKBACK_BLOCKS_OPTION}].as<uint64_t>(),
       ETH_SOURCE_DEPOSIT_LOOKBACK_BLOCKS);

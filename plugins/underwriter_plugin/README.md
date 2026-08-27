@@ -159,20 +159,33 @@ authenticated depot submitter.
 | `--underwriter-account` | — | WIRE account name for this underwriter. Configuring it enables the scan cycle |
 | `--underwriter-scan-interval-ms` | 5000 | How often to scan for pending uwreqs (ms) |
 | `--underwriter-action-timeout-ms` | 15000 | Timeout for outpost RPC calls and table reads (ms) |
-| `--underwriter-eth-outpost` | — | Per-EVM-chain outpost wiring (repeatable, one per served EVM chain). Format `<chain_code>,<client_id>,<operator_registry_addr>,<source_deposit_contract_addr>` — keyed by exact `chain_code`, so two EVM chains are wired independently |
-| `--underwriter-sol-outpost` | — | Per-SVM-chain outpost wiring (repeatable, one per served SVM chain). Format `<chain_code>,<client_id>,<opp_outpost_program_id>` |
 | `--underwriter-eth-source-deposit-function` | — | Name of the ETH swap-deposit function; the chain-agnostic 4-byte selector is resolved at preflight from the loaded `--ethereum-abi-file` ABIs (required) |
 | `--underwriter-sol-source-deposit-instruction` | — | Name of the SOL swap-deposit instruction; the 8-byte anchor discriminator is resolved at preflight from the loaded `--solana-idl-file` IDLs (required) |
 | `--underwriter-eth-source-deposit-lookback-blocks` | 7200 | Recent finalized ETH blocks searched per source deposit |
 
-> SEC-13/WSA-027: the former single `--underwriter-eth-client-id`,
-> `--underwriter-sol-client-id`, `--underwriter-eth-opreg-addr`, and
-> `--underwriter-sol-program-id` options are replaced by the repeatable,
-> exact-`chain_code`-keyed `--underwriter-{eth,sol}-outpost` options above.
-> One entry is required for **every active** non-depot chain in
-> `sysio.chains::chains` (inactive/not-yet-activated chains are skipped);
-> the underwriter's per-chain contract / program address now lives in that
-> entry rather than in a per-family scalar option.
+### Outpost wiring
+
+Nothing about an outpost is declared per node.
+
+* **Which chains** — every active non-depot `sysio.chains` row. There is no
+  per-chain config entry to keep in sync with the registry.
+* **Where each one lives** — the row's `outpost` struct: the EVM
+  OperatorRegistry (the `uw_commit` target) and source-deposit contract, or the
+  single SVM outpost program, which stands in for both roles. Every underwriter
+  therefore commits against the same deployment.
+* **How to reach it** — the RPC client registered under that chain's **own
+  code**. `--outpost-ethereum-client` / `--outpost-solana-client` take the client
+  id as their first field, and for an outpost that id must be the chain code
+  (`ETHEREUM`, `SOLANA`, ...).
+
+Preflight fails closed when an active chain has no RPC client registered under
+its code, or when its row carries no contract addresses. A
+`sysio.chains::setoutpost` redeploy is picked up on the next scan tick — the
+client handle is rebuilt against the new address.
+
+SEC-13/WSA-027 is preserved by construction: the client is keyed by exact chain
+code, so two chains of the same VM family are wired independently and a
+wrong-family entry is simply a client that is not there.
 
 ## HTTP diagnostics
 
