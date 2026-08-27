@@ -2897,7 +2897,10 @@ producer_plugin_impl::handle_push_result(const transaction_metadata_ptr&        
             // this failed our configured maximum transaction time, we don't want to replay it
             fc_tlog(_log, "Failed {} trx, auth: {}, prev billed: {}us, ran: {}us, id: {}, except: {}",
                     e.code(), auths, trace->total_cpu_usage_us, fc::time_point::now() - start, trx->id(), e.to_string());
-            if (!disable_subjective_enforcement)
+            // Only blame authorizers the chain has verified. Before that the list is
+            // attacker-chosen: naming a victim on an unsignable trx throttles the victim, not the
+            // spammer, who just names a different existing account each time.
+            if (!disable_subjective_enforcement && trx->auth_verified)
                _account_fails.add(auths, e);
          }
          if (next) {

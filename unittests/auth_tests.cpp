@@ -812,4 +812,79 @@ BOOST_AUTO_TEST_CASE( authority_threshold_not_lowered ) { try {
    );
 } FC_LOG_AND_RETHROW() }
 
+// producer_plugin blames the accounts a failed trx names only when auth_verified says the chain
+// confirmed they authorized it. Otherwise naming a victim on a trx one cannot sign throttles the
+// victim, since the authorization list is attacker-chosen up to that point.
+BOOST_FIXTURE_TEST_CASE( auth_verified_tracks_authorization, validating_tester ) { try {
+   create_accounts( {"alice"_n} );
+   produce_block();
+   set_authority( "alice"_n, "perma"_n, authority( get_public_key( "alice"_n, "perma" ) ), config::active_name );
+   set_authority( "alice"_n, "permb"_n, authority( get_public_key( "alice"_n, "permb" ) ), config::active_name );
+   set_authority( "alice"_n, "permc"_n, authority( get_public_key( "alice"_n, "permc" ) ), "perma"_n );
+   produce_block();
+   // Linked, so deleting permc fails in apply rather than in check_authorization.
+   push_action( config::system_account_name, "linkauth"_n, "alice"_n, fc::mutable_variant_object()
+                   ("account", "alice")("code", "sysio")("type", "reqauth")("requirement", "permc") );
+   produce_block();
+
+   // Mirrors base_tester::push_transaction but keeps the metadata so the flag can be read, and can
+   // re-push the same metadata to model a retry out of the unapplied queue.
+   auto push = [&]( const transaction_metadata_ptr& meta ) {
+      if( !control->is_building_block() )
+         _start_block( control->head().block_time() + fc::microseconds(config::block_interval_us) );
+      return control->push_transaction( meta, fc::time_point::maximum(), fc::microseconds::maximum() );
+   };
+   auto deleteauth_trx = [&]( permission_name declared, permission_name target, bool sign ) {
+      signed_transaction trx;
+      trx.actions.emplace_back( vector<permission_level>{{"alice"_n, declared}}, deleteauth{ "alice"_n, target } );
+      set_transaction_headers( trx );
+      if( sign )
+         trx.sign( get_private_key( "alice"_n, declared.to_string() ), control->get_chain_id() );
+      auto ptrx = std::make_shared<packed_transaction>( trx, packed_transaction::compression_type::none );
+      return transaction_metadata::start_recover_keys( ptrx, control->get_thread_pool(), control->get_chain_id(),
+                                                       fc::microseconds::maximum(),
+                                                       transaction_metadata::trx_type::input ).get();
+   };
+
+   // Declares alice@active but carries no signature: authorization fails, so alice is not blamed.
+   {
+      auto meta  = deleteauth_trx( config::active_name, "permb"_n, false );
+      auto trace = push( meta );
+      BOOST_REQUIRE( trace->except );
+      BOOST_TEST( trace->except->code() == unsatisfied_authorization::code_value );
+      BOOST_TEST( !meta->auth_verified );
+   }
+
+   // Properly signed and successful.
+   {
+      auto meta  = deleteauth_trx( config::active_name, "permb"_n, true );
+      auto trace = push( meta );
+      BOOST_REQUIRE( !trace->except );
+      BOOST_TEST( meta->auth_verified );
+   }
+
+   // Authorization passes and execution then fails. This is what the failure limiter is for, so the
+   // flag must stay set.
+   auto meta = deleteauth_trx( "perma"_n, "permc"_n, true );
+   {
+      auto trace = push( meta );
+      BOOST_REQUIRE( trace->except );
+      BOOST_TEST( trace->except->code() == action_validate_exception::code_value );
+      BOOST_TEST( meta->auth_verified );
+   }
+
+   // Retried out of the unapplied queue after perma was re-keyed: the recovered key no longer
+   // satisfies the permission, so the earlier verdict must not carry over. A failed trx leaves no
+   // dedup record, so the same metadata can be pushed again.
+   produce_block();
+   set_authority( "alice"_n, "perma"_n, authority( get_public_key( "alice"_n, "rekeyed" ) ), config::active_name );
+   produce_block();
+   {
+      auto trace = push( meta );
+      BOOST_REQUIRE( trace->except );
+      BOOST_TEST( trace->except->code() == unsatisfied_authorization::code_value );
+      BOOST_TEST( !meta->auth_verified );
+   }
+} FC_LOG_AND_RETHROW() }
+
 BOOST_AUTO_TEST_SUITE_END()
