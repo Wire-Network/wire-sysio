@@ -21,6 +21,5 @@ add_custom_target(GenNodeopPluginArgs ALL
                   DEPENDS ${GEN_FILES}
                   COMMENT "Generating NodeopPluginArgs files")
 
-add_test(NAME plugin_args_emission_test COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/plugin_args_emission_test.py
-         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-set_property(TEST plugin_args_emission_test PROPERTY LABELS nonparallelizable_tests)
+add_p_test(NAME plugin_args_emission_test
+           COMMAND tests/PerformanceHarness/NodeopPluginArgs/plugin_args_emission_test.py)
