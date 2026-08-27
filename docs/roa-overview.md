@@ -23,8 +23,8 @@ receives a **policy** — a grant of CPU, NET, and RAM weight — from a **node 
 fixed share of the network's capacity determined by their tier and issues slices of it through the
 `sysio.roa` contract. Only registered node owners can issue policies, and only out of their own
 tier budget — so an ordinary account cannot grant itself bandwidth. (Privileged system paths
-sit outside this: `setalimits` and the fixed account gift can set limits without a policy.) A node owner may name itself as the
-recipient of one of its own policies; registration does exactly that for the owner's own account.
+sit outside this: `setalimits` and the fixed account gift can set limits without a policy.) A node
+owner may name itself as its own policy's recipient; registration does that for tier 1 only.
 
 **A contract without a policy does not run.** Because the contract is the payer, an unprovisioned
 one has nothing to pay with, and ordinary calls into it fail. Provisioning the contract — not the
@@ -158,7 +158,7 @@ flowchart TD
 The objective billing map is keyed on `payer()` and nothing else. An authorizing account that is
 not the payer never enters it, so consensus neither charges nor limits its CPU and NET. A producer
 running [subjective billing](#subjective-billing-meters-the-signer) does meter the signer, but
-that is node-local rather than consensus, and an operator can turn it off.
+that is node-local rather than consensus, and off by default.
 
 | Action authorizations | Payer | Notes |
 |---|---|---|
@@ -434,7 +434,7 @@ Four things to know when stacking:
   `min(unused RAM on the whole account, requested)`, floored to a whole `bytes_per_unit`, and
   decrements the policy row and the issuer's `allocated_sys` by what was **reclaimed**, not
   requested. Grant spent on live state therefore stays counted against the issuer's budget until
-  that state is deleted, and the row is erased only once all three weights reach zero. Because the
+  that state is deleted or shrunk, and the row is erased only once all three weights reach zero. Because the
   cap is the *account's* unused RAM rather than this policy's share, one issuer's grant can be
   pinned by state another issuer's grant paid for.
 - **The ceiling is network-wide unallocated SYS,** not a per-account cap. There is no limit on how
@@ -486,10 +486,10 @@ share — though every success it lands also draws on block-wide capacity. Once 
 calls fail with `tx_cpu_usage_exceeded` or `tx_net_usage_exceeded` naming the contract, and keep
 failing until the window rolls forward.
 
-That is the structural answer, and it bounds the *quota* damage: the spammer cannot consume
-another contract's share, because it was never drawing on a shared pool — it was drawing on one
-policy's slice of the proportional share. The issuer's exposure is bounded by what they granted and
-reclaimable via `reducepolicy` at or after `time_block`.
+That is the structural answer, and it bounds the *quota* damage: the spammer draws on the payer
+account's own provisioned share — the sum of every policy stacked on it — never another account's.
+Each issuer's exposure stays bounded by its own grant, reclaimable via `reducepolicy` at or after
+`time_block`.
 
 **It does not make the blast radius zero.** Every transaction that succeeds is billed twice over —
 once to the payer's rolling window, and once to the block:
@@ -572,24 +572,21 @@ producer-side retry.
 
 ### Defaults
 
-Subjective billing ships **on**, and the failure limiter with it — both are gated on the same
-flag. The contract payer is excluded: under contract-pays it is the account deliberately
-provisioned to absorb traffic, so billing it for its callers' failures would point the cost at the
-wrong account. The signer, which is the account generating them, is still billed.
+Subjective billing ships **off**: `disable-subjective-p2p-billing` and
+`disable-subjective-api-billing` both default true, and setting both disables it outright — the
+producer logs `Subjective CPU billing disabled`. The failure limiter is gated on the same flag.
+Operators opt in per traffic source.
 
 | Option | Default | Effect |
 |---|---|---|
-| `disable-subjective-p2p-billing` | `false` | Set true to skip subjective enforcement for P2P transactions |
-| `disable-subjective-api-billing` | `false` | Set true to skip subjective enforcement for API transactions |
+| `disable-subjective-p2p-billing` | `true` | Skip subjective enforcement for P2P transactions |
+| `disable-subjective-api-billing` | `true` | Skip subjective enforcement for API transactions |
 | `subjective-account-cpu-allowed-us` | `300000` | Subjective CPU budget above an account's objective limit |
 | `subjective-account-decay-time-minutes` | `1440` | Time to return a full subjective budget |
 | `subjective-account-max-failures` | `3` | Failures allowed per account per window |
 | `subjective-account-max-failures-window-size` | `1` | Window size in blocks for the failure limit |
-| `disable-subjective-payer-billing` | `true` | Set false to also meter the payer (the contract) |
+| `disable-subjective-payer-billing` | `false` | When billing is on, also meter the payer (the contract) |
 | `disable-subjective-account-billing <acct>` | — | Exempt named accounts entirely |
-
-Setting the p2p and api flags *both* true disables subjective billing outright, and the producer
-logs `Subjective CPU billing disabled`.
 
 Independent of all of it, `incoming-transaction-queue-size-mb` (default `1024`) subjectively drops
 transactions with a resource-exhaustion error when the incoming queue overflows.
@@ -704,9 +701,8 @@ is `0.0500 SYS` of each, and a routine test account is provisioned with `0.0010 
 Budget headroom for peaks above the average rate, not for failures: objective CPU and NET are
 billed only on the success path, since `add_transaction_usage` runs from `finalize()` and a
 throwing transaction has its session undone. A failed attempt costs the payer nothing *objectively*,
-and a retry that lands is billed once. Nor does the contract pay for them subjectively:
-`disable-subjective-payer-billing` defaults true, so `subjective_bill_failure` skips the payer. The
-cost of failures lands on the *signer* — see
+and a retry that lands is billed once. Where an operator has enabled subjective billing and left
+payer billing on, failures do consume the contract's node-local headroom — see
 [Subjective billing](#subjective-billing-meters-the-signer).
 
 The provisioning is a single `addpolicy` on the contract account. Because the contract is the payer
@@ -769,7 +765,8 @@ Two limits worth knowing:
 An account that bears its own cost — a relayer, an operator isolating its throughput from a shared
 contract — puts `{self, sysio.payer}` first in the authorization list.
 
-This requires a real allocation. An account with no policy attempting it fails immediately:
+This requires CPU/NET allocation of its own. An ordinary account holding only its fixed gift fails
+immediately:
 
 ```
 account alice net usage is too high: 148 > 0
