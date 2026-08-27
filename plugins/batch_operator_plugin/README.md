@@ -24,11 +24,16 @@ All 21 batch operators run this plugin in perpetuity. The epoch scheduler (`sysi
 
 | Option | Default | Description |
 |--------|---------|-------------|
-| `--batch-operator-account` | — | WIRE account name for this operator |
-| `--batch-epoch-poll-ms` | 5000 | How often to check epoch state (ms) |
-| `--batch-outpost-poll-ms` | 3000 | How often to poll outpost for new messages (ms) |
-| `--batch-delivery-timeout-ms` | 30000 | Max time to wait for chain delivery confirmation (ms) |
-| `--batch-enabled` | false | Enable batch operator functionality |
+| `--batch-operator-account` | — | WIRE account name for this operator. Configuring it enables the relay |
+| `--batch-epoch-poll-ms` | 15000 | How often to check epoch state (ms) |
+| `--batch-delivery-timeout-ms` | 15000 | Max time to wait for chain delivery confirmation (ms) |
+| `--batch-sol-client-id` | `sol-default` | Solana outpost client ID (RPC connection) for SVM outpost rows |
+| `--batch-outpost` | — | Remote OPP contract binding for one active `sysio.chains` row, repeatable once per chain code. Spec: `CHAIN_CODE,opp_addr[,opp_inbound_addr]` |
+
+There is no separate enable flag: the relay runs when `--batch-operator-account`
+is configured, the way `producer_plugin` keys off `--producer-name`. The plugin
+must also be listed under `plugin =` (or pulled in as a dependency by
+`external_debugging_plugin`), and requires `read-mode = irreversible`.
 
 ## Dependencies
 
