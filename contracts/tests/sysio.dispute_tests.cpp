@@ -493,7 +493,9 @@ BOOST_FIXTURE_TEST_CASE(opendispute_rejects_one_candidate, sysio_dispute_tester)
    std::vector<fc::variant> one{
       candidate(fc::sha256::hash(std::string("a")), {BATCHOP}),
    };
-   BOOST_REQUIRE(opendispute(eth_code(), current_epoch(), one) != success());
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: a dispute requires at least two candidate envelope versions"),
+      opendispute(eth_code(), current_epoch(), one));
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(opendispute_rejects_duplicate, sysio_dispute_tester) { try {

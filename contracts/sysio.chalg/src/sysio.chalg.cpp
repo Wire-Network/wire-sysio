@@ -269,9 +269,9 @@ void chalg::opendispute(uint64_t chain_code,
    const uint8_t network_gen = roa::current_network_gen(ROA_ACCOUNT);
    auto electorate = snapshot_t1_electorate(ROA_ACCOUNT, network_gen);
 
-   // An empty electorate could never vote, so the dispute could never resolve and the epoch pause
-   // below would hold forever. Refuse to open instead -- the conflicting deliveries keep this
-   // epoch from reaching consensus regardless, and the failure then names the actual problem.
+   // Defense in depth for direct calls: msgch preflights this invariant and soft-returns so a
+   // terminal delivery remains retryable, while this assertion keeps every other caller from
+   // opening an unresolvable, permanently-pausing dispute.
    check(!electorate.empty(), "cannot open a dispute with no registered tier-1 node owners");
    const uint32_t quorum = static_cast<uint32_t>(electorate.size()) / 2 + 1;
 

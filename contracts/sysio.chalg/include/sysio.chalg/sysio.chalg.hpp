@@ -48,15 +48,16 @@ namespace sysio {
       //  OPP envelope dispute vote (Tier-1 node-owner resolution)
       // -----------------------------------------------------------------------
 
-      /// Open an OPP envelope dispute. Called inline by `sysio.msgch::evalcons` for a post-boundary
-      /// no-majority split with at least `chalg_limits::minimum_dispute_candidate_versions` distinct
-      /// versions. msgch owns the consensus boundary and strict-majority checks because it alone has
-      /// the live eligible group and delivery tally.
+      /// Open an OPP envelope dispute. Called inline by `sysio.msgch::evalcons` for a terminal
+      /// two-version tie or a post-boundary multi-version no-majority split. msgch owns the
+      /// consensus boundary, terminality, strict-majority, and electorate-preflight checks because
+      /// it alone has the live eligible group and delivery tally.
       /// Records the candidate checksums, snapshots the Tier-1 electorate (the Tier-1
       /// rows of `sysio.roa::nodeowners` for the current network generation) together with its
       /// quorum, and pauses epoch advancement until a Tier-1 node-owner vote resolves the
-      /// canonical envelope. Rejects opening when no Tier-1 node owner is registered: an
-      /// empty-electorate dispute could never resolve and would hold the epoch paused forever.
+      /// canonical envelope. Defensively rejects direct calls when no Tier-1 node owner is
+      /// registered: an empty-electorate dispute could never resolve and would hold the epoch
+      /// paused forever.
       [[sysio::action]]
       void opendispute(uint64_t chain_code,
                        uint32_t epoch_index,

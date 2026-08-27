@@ -4,6 +4,7 @@
 #include <sysio.chains/sysio.chains.hpp>
 #include <sysio.chalg/sysio.chalg.hpp>     // dispute trigger + open-dispute gate (disputes table)
 #include <sysio.opreg/sysio.opreg.hpp>     // operator-status delivery gate (operators table)
+#include <sysio.roa.hpp>                    // authoritative Tier-1 electorate preflight
 #include <sysio.opp.common/slug_name.hpp>
 #include <sysio.opp.common/safe_ops.hpp>   // to_depot_amount — WSA-028 fail-closed TokenAmount gate
 #include <sysio.opp.common/name_ops.hpp>   // parse_wire_account_name — never-throw account-name parse
@@ -12,6 +13,7 @@
 #include <sysio/opp/opp.pb.hpp>
 #include <sysio/opp/attestations/attestations.pb.hpp>
 #include <zpp_bits.h>
+#include <magic_enum/magic_enum.hpp>
 #include <algorithm>
 #include <optional>
 
@@ -24,6 +26,7 @@ using opp::types::MessageStatus;
 using opp::types::EnvelopeStatus;
 using opp::types::AttestationType;
 using opp::types::AttestationStatus;
+using opp::types::NodeOwnerTier;
 
 namespace {
 
@@ -91,6 +94,16 @@ constexpr const char* UIC_DISPATCH_REJECTED_LOG_PREFIX =
 constexpr const char* DISPUTE_TOO_FEW_CANDIDATES_LOG =
    "msgch::maybe_open_dispute: no dispute for (chain=%llu, epoch=%u): "
    "%u distinct version(s), a vote needs >=%u\n";
+
+/// Diagnostic for a two-version split that can still acquire a strict majority from silent operators.
+constexpr const char* DISPUTE_INCOMPLETE_TWO_WAY_LOG =
+   "msgch::maybe_open_dispute: no dispute for (chain=%llu, epoch=%u): "
+   "two versions but only %u of %u eligible operators delivered\n";
+
+/// Diagnostic for a terminal split that cannot be voted on until Tier-1 registration exists.
+constexpr const char* DISPUTE_NO_TIER_ONE_ELECTORATE_LOG =
+   "msgch::maybe_open_dispute: no dispute for (chain=%llu, epoch=%u): "
+   "no registered tier-1 node owners\n";
 
 uint32_t current_epoch_index() {
    epoch::epochstate_t tbl(EPOCH_ACCOUNT);
@@ -1180,12 +1193,12 @@ void dispatch_attestation(name self, uint64_t attestation_id,
    return true;
 }
 
-/// Evaluate the dispute trigger and, if met, open a Tier-1 dispute vote via sysio.chalg. A
-/// post-boundary no-majority split with at least two versions is anomalous enough to require Tier-1
-/// adjudication, including when an eligible operator was silent. A strict majority always resolves
-/// without a vote; a one-version or pre-boundary split waits for more deliveries.
+/// Evaluate the dispute trigger and, if met, open a Tier-1 dispute vote via sysio.chalg. A two-way
+/// split is actionable only after every eligible operator has delivered, preserving the chance for
+/// silent operators to create a strict majority. An existing three-or-more-version split remains
+/// actionable at the boundary. A strict majority, one-version split, or pre-boundary split waits.
 void maybe_open_dispute(name self, uint64_t chain_code, uint32_t epoch_index,
-                        uint32_t group_size,
+                        uint32_t group_size, uint32_t total_deliveries,
                         const std::vector<checksum256>& seen_checksums,
                         const std::vector<uint32_t>& checksum_counts,
                         const std::vector<std::vector<name>>& checksum_operators) {
@@ -1215,6 +1228,26 @@ void maybe_open_dispute(name self, uint64_t chain_code, uint32_t epoch_index,
    if (max_count * 2 > group_size) {  // a majority exists -> no vote needed
       sysio::print_f("msgch::maybe_open_dispute: no dispute for (chain=%llu, epoch=%u): a version holds a majority (%u of group %u), resolved without a vote\n",
                      chain_code, epoch_index, max_count, group_size);
+      return;
+   }
+
+   // A two-way split is not terminal while an eligible operator remains silent: that operator can
+   // still establish a strict majority. Three-or-more candidate splits intentionally retain the
+   // existing post-boundary dispute behavior.
+   if (seen_checksums.size() == chalg_limits::minimum_dispute_candidate_versions &&
+       total_deliveries != group_size) {
+      sysio::print_f(DISPUTE_INCOMPLETE_TWO_WAY_LOG,
+                     chain_code, epoch_index, total_deliveries, group_size);
+      return;
+   }
+
+   // `opendispute` defensively asserts this invariant, but this user-triggered evalcons route
+   // must remain retryable: a missing Tier-1 electorate must not revert the terminal delivery or
+   // pause the epoch before a node owner has registered.
+   const uint8_t network_gen = roa::current_network_gen(ROA_ACCOUNT);
+   const uint8_t tier_one = magic_enum::enum_integer(NodeOwnerTier::NODE_OWNER_TIER_T1);
+   if (roa::nodeowner_count(ROA_ACCOUNT, network_gen, tier_one) == 0) {
+      sysio::print_f(DISPUTE_NO_TIER_ONE_ELECTORATE_LOG, chain_code, epoch_index);
       return;
    }
 
@@ -1446,8 +1479,8 @@ void msgch::evalcons(uint64_t chain_code, uint32_t epoch_index) {
    };
 
    // Group envelopes by checksum, tracking the operators that delivered each version (CDT-compatible
-   // parallel vectors). The per-version operator lists become the dispute candidates on a terminal
-   // two-way or an existing multi-version split.
+   // parallel vectors). The per-version operator lists become dispute candidates only for an
+   // all-delivered two-way tie or an existing multi-version split.
    std::vector<checksum256>       seen_checksums;
    std::vector<uint32_t>          checksum_counts;
    std::vector<std::vector<char>> checksum_data;
@@ -1504,9 +1537,10 @@ void msgch::evalcons(uint64_t chain_code, uint32_t epoch_index) {
    }
 
    if (!consensus_reached) {
-      // No automatic consensus. A two-or-more-version no-majority split past the epoch boundary
-      // opens a Tier-1 dispute vote; a one-version or pre-boundary split waits for more deliveries.
-      maybe_open_dispute(get_self(), chain_code, epoch_index, group_size,
+      // No automatic consensus. A terminal two-way tie or a three-or-more-version no-majority
+      // split past the epoch boundary opens a Tier-1 dispute vote; all other cases wait for more
+      // deliveries.
+      maybe_open_dispute(get_self(), chain_code, epoch_index, group_size, total_deliveries,
                          seen_checksums, checksum_counts, checksum_operators);
       return;
    }

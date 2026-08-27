@@ -120,6 +120,7 @@ constexpr const char* EPOCH_INDEX   = "epoch_index";
 constexpr const char* BATCH_OP_NAME = "batch_op_name";
 constexpr const char* WINNING_CHECKSUM = "winning_checksum";
 constexpr const char* CHECKSUM         = "checksum";
+constexpr const char* CONSENSUS_REACHED = "consensus_reached";
 } // namespace msgch_fields
 
 /// sysio.chalg table identifiers used by the split-consensus regressions.
@@ -159,7 +160,32 @@ constexpr const char* OWNER            = "owner";
 namespace epoch_fields {
 constexpr const char* BATCH_OP_GROUPS       = "batch_op_groups";
 constexpr const char* CURRENT_BATCH_OP_GROUP = "current_batch_op_group";
+constexpr const char* IS_PAUSED              = "is_paused";
 } // namespace epoch_fields
+
+/// sysio.roa action identifiers used by the empty-electorate retry regression.
+namespace roa_actions {
+constexpr name ACTIVATE = "activateroa"_n;
+constexpr name FORCE_REGISTER = "forcereg"_n;
+} // namespace roa_actions
+
+/// sysio.system identifiers used while activating the empty ROA fixture.
+namespace system_actions {
+constexpr name SET_PRIVILEGED = "setpriv"_n;
+} // namespace system_actions
+
+namespace system_fields {
+constexpr const char* ACCOUNT = "account";
+constexpr const char* IS_PRIVILEGED = "is_priv";
+} // namespace system_fields
+
+/// sysio.roa ABI field identifiers used by the empty-electorate retry regression.
+namespace roa_fields {
+constexpr const char* OWNER          = "owner";
+constexpr const char* TIER           = "tier";
+constexpr const char* TOTAL_SYSTEM   = "total_sys";
+constexpr const char* BYTES_PER_UNIT = "bytes_per_unit";
+} // namespace roa_fields
 
 } // anonymous namespace
 
@@ -178,6 +204,7 @@ public:
    static constexpr auto CHALG_ACCOUNT  = "sysio.chalg"_n;
    static constexpr auto CHAINS_ACCOUNT = "sysio.chains"_n;
    static constexpr auto UWRIT_ACCOUNT  = "sysio.uwrit"_n;
+   static constexpr auto ROA_ACCOUNT    = "sysio.roa"_n;
    static constexpr auto BATCHOP        = "batchop.a"_n;
    static constexpr auto BATCHOP_B      = "batchop.b"_n;
    static constexpr auto BATCHOP_C      = "batchop.c"_n;
@@ -190,8 +217,15 @@ public:
    static constexpr uint32_t THREE_TO_THREE_TIE_GROUP_SIZE = 6;
    static constexpr uint32_t INCOMPLETE_TWO_WAY_SPLIT_GROUP_SIZE = 3;
    static constexpr uint64_t FIRST_DISPUTE_ID = 1;
+   static constexpr auto TIER_ONE_OWNER = "tierone"_n;
+   static constexpr const char* EMPTY_ROA_TOTAL_SYSTEM = "75496.0000 SYS";
+   static constexpr uint64_t EMPTY_ROA_BYTES_PER_UNIT = 104;
 
-   sysio_msgch_chain_tester() {
+   /// Construct an OPP integration fixture, optionally with an activated ROA that has no
+   /// registered node owners to exercise the msgch electorate preflight.
+   explicit sysio_msgch_chain_tester(bool empty_roa = false)
+      : tester(empty_roa ? setup_policy::full_except_do_not_set_finalizers : setup_policy::full) {
+      if (empty_roa) activate_empty_roa();
       produce_blocks(2);
 
       // sysio.* accounts BEFORE sysio.system so they keep unlimited RAM; the payepoch
@@ -202,7 +236,7 @@ public:
          CHALG_ACCOUNT, CHAINS_ACCOUNT, UWRIT_ACCOUNT,
          BATCHOP, BATCHOP_B, BATCHOP_C, BATCHOP_D, BATCHOP_E, BATCHOP_F,
          "sysio.dclaim"_n, "sysio.gov"_n, "sysio.ops"_n
-      });
+      }, false, true, !empty_roa);
       produce_blocks(2);
 
       deploy(CHALG_ACCOUNT,  contracts::chalg_wasm(),  contracts::chalg_abi(),  chalg_abi);
@@ -213,6 +247,8 @@ public:
       deploy(UWRIT_ACCOUNT,  contracts::uwrit_wasm(),  contracts::uwrit_abi(),  uwrit_abi);
       deploy(TOKEN_ACCOUNT,  contracts::token_wasm(),  contracts::token_abi(),  token_abi);
       produce_blocks(1);
+
+      load_abi(ROA_ACCOUNT, roa_abi);
 
       // sysio.system for the epoch::advance emissions readiness gate; without emitcfg/t5state
       // the gate returns CONFIG_MISSING and the epoch never advances.
@@ -252,6 +288,20 @@ public:
       set_abi(account, abi.data());
       set_privileged(account);
       load_abi(account, out_ser);
+   }
+
+   /// Activate the ROA registry without the normal genesis Tier-1 nodedaddy registration.
+   void activate_empty_roa() {
+      create_account(ROA_ACCOUNT, SYSIO_ACCOUNT, false, true, false, false);
+      create_account("sysio.acct"_n, SYSIO_ACCOUNT, false, false, false, false);
+      create_account("sysio.authex"_n, SYSIO_ACCOUNT, false, false, false, false);
+      set_contract(ROA_ACCOUNT, contracts::roa_wasm(), contracts::roa_abi().data());
+      base_tester::push_action(SYSIO_ACCOUNT, system_actions::SET_PRIVILEGED, SYSIO_ACCOUNT,
+                               mvo()(system_fields::ACCOUNT, ROA_ACCOUNT.to_string())
+                                    (system_fields::IS_PRIVILEGED, true));
+      base_tester::push_action(ROA_ACCOUNT, roa_actions::ACTIVATE, ROA_ACCOUNT,
+                               mvo()(roa_fields::TOTAL_SYSTEM, asset::from_string(EMPTY_ROA_TOTAL_SYSTEM))
+                                    (roa_fields::BYTES_PER_UNIT, EMPTY_ROA_BYTES_PER_UNIT));
    }
 
    action_result push(name contract, abi_serializer& ser, name signer,
@@ -408,6 +458,15 @@ public:
          ("data",          data));
    }
 
+   /// Register `owner` as Tier-1 after the empty-ROA path has soft-declined a dispute.
+   void register_tier_one_node_owner(name owner) {
+      create_account(owner, SYSIO_ACCOUNT, false, true, false);
+      const uint8_t tier_one = magic_enum::enum_integer(
+         opp::types::NodeOwnerTier::NODE_OWNER_TIER_T1);
+      BOOST_REQUIRE_EQUAL(success(), push(ROA_ACCOUNT, roa_abi, ROA_ACCOUNT, roa_actions::FORCE_REGISTER,
+                                         mvo()(roa_fields::OWNER, owner.to_string())(roa_fields::TIER, tier_one)));
+   }
+
    /// Let the consensus boundary elapse WITHOUT advancing the epoch: evalcons' fallback
    /// (majority) path opens once `epoch_duration_sec` has passed since the epoch started,
    /// while `deliver`'s epoch gate keeps accepting envelopes for the still-current epoch.
@@ -452,6 +511,13 @@ public:
       return data.empty() ? fc::variant() : msgch_abi.binary_to_variant(
          "outpost_consensus_entry", data,
          abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
+   /// Return whether the epoch contract currently holds advancement for an open dispute.
+   bool epoch_is_paused() {
+      auto state = read_epoch_state();
+      BOOST_REQUIRE(!state.is_null());
+      return state[epoch_fields::IS_PAUSED].as<bool>();
    }
 
    /// Return the dispute row by id, or null when the consensus path did not open one.
@@ -778,7 +844,7 @@ public:
       produce_blocks();
    }
 
-   abi_serializer sysio_abi, token_abi, epoch_abi, opreg_abi, msgch_abi, chalg_abi, chains_abi, uwrit_abi;
+   abi_serializer sysio_abi, token_abi, epoch_abi, opreg_abi, msgch_abi, chalg_abi, chains_abi, uwrit_abi, roa_abi;
 };
 
 // ---------------------------------------------------------------------------
@@ -1725,9 +1791,9 @@ BOOST_FIXTURE_TEST_CASE(chkcons_opens_dispute_for_three_to_three_tie, sysio_msgc
    resolve_tie_dispute(epoch, fc::sha256::hash(left.data(), left.size()));
 } FC_LOG_AND_RETHROW() }
 
-/// A 1-1 split of three eligible operators is already a post-boundary anomaly. It must open a
-/// Tier-1 dispute even when the third operator remains silent, rather than stalling the epoch.
-BOOST_FIXTURE_TEST_CASE(chkcons_opens_dispute_for_incomplete_two_way_split,
+/// A 1-1 split with one silent eligible operator is not terminal. `chkcons` must leave it
+/// undecided and unpaused so the final delivery can establish a strict majority without a vote.
+BOOST_FIXTURE_TEST_CASE(chkcons_waits_for_incomplete_two_way_split,
                         sysio_msgch_chain_tester) { try {
    bootstrap(INCOMPLETE_TWO_WAY_SPLIT_GROUP_SIZE);
 
@@ -1735,7 +1801,6 @@ BOOST_FIXTURE_TEST_CASE(chkcons_opens_dispute_for_incomplete_two_way_split,
    const auto left = encode_delivery(epoch, std::string(ONE_TO_ONE_LEFT_PAYLOAD));
    const auto right = encode_delivery(epoch, std::string(ONE_TO_ONE_RIGHT_PAYLOAD));
    const auto left_checksum = fc::sha256::hash(left.data(), left.size());
-   const auto right_checksum = fc::sha256::hash(right.data(), right.size());
 
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, left));
    produce_blocks();
@@ -1745,10 +1810,56 @@ BOOST_FIXTURE_TEST_CASE(chkcons_opens_dispute_for_incomplete_two_way_split,
    elapse_epoch_boundary();
    advance_via_consensus();
 
+   BOOST_REQUIRE(get_dispute(FIRST_DISPUTE_ID).is_null());
+   BOOST_REQUIRE(!epoch_is_paused());
+   auto opc = get_outpcons(ETH_OUTPOST_ID);
+   BOOST_REQUIRE(opc.is_null() || !opc[msgch_fields::CONSENSUS_REACHED].as<bool>());
+
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, ETH_OUTPOST_ID, left));
+   produce_blocks();
+
+   opc = get_outpcons(ETH_OUTPOST_ID);
+   BOOST_REQUIRE(!opc.is_null());
+   BOOST_REQUIRE_EQUAL(opc[msgch_fields::CONSENSUS_REACHED].as<bool>(), true);
+   BOOST_REQUIRE_EQUAL(opc[msgch_fields::EPOCH_INDEX].as<uint32_t>(), epoch);
+   BOOST_REQUIRE_EQUAL(opc[msgch_fields::WINNING_CHECKSUM].as_string(), left_checksum.str());
+} FC_LOG_AND_RETHROW() }
+
+/// A terminal tie with no Tier-1 electorate must soft-decline through `chkcons`, leaving the epoch
+/// unpaused and retryable. Once a Tier-1 owner registers, the same crank opens the dispute.
+struct sysio_msgch_empty_roa_tester : sysio_msgch_chain_tester {
+   sysio_msgch_empty_roa_tester() : sysio_msgch_chain_tester(/*empty_roa=*/true) {}
+};
+
+BOOST_FIXTURE_TEST_CASE(chkcons_retries_terminal_tie_after_tier_one_registration,
+                        sysio_msgch_empty_roa_tester) { try {
+   bootstrap(ONE_TO_ONE_TIE_GROUP_SIZE);
+
+   const uint32_t epoch = current_epoch();
+   const auto left = encode_delivery(epoch, std::string(ONE_TO_ONE_LEFT_PAYLOAD));
+   const auto right = encode_delivery(epoch, std::string(ONE_TO_ONE_RIGHT_PAYLOAD));
+
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, left));
+   produce_blocks();
+
+   // The terminal conflicting delivery arrives after the boundary. The msgch preflight must
+   // soft-decline instead of reverting this delivery or pausing the epoch.
+   elapse_epoch_boundary();
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, right));
+   produce_blocks();
+
+   advance_via_consensus();
+
+   BOOST_REQUIRE(get_dispute(FIRST_DISPUTE_ID).is_null());
+   BOOST_REQUIRE(!epoch_is_paused());
+
+   register_tier_one_node_owner(TIER_ONE_OWNER);
+   advance_via_consensus();
+
    assert_open_tie_dispute(epoch,
-                           {left_checksum, right_checksum},
+                           {fc::sha256::hash(left.data(), left.size()),
+                            fc::sha256::hash(right.data(), right.size())},
                            {ONE_OPERATOR_PER_TIED_VERSION, ONE_OPERATOR_PER_TIED_VERSION});
-   resolve_tie_dispute(epoch, left_checksum);
 } FC_LOG_AND_RETHROW() }
 
 // Review follow-up on WNS-15(a): the consensus tally and the threshold must be drawn from the SAME
