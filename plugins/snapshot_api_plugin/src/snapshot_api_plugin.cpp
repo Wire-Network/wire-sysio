@@ -12,16 +12,18 @@
 #include <atomic>
 #include <filesystem>
 #include <map>
+#include <memory>
 #include <mutex>
 #include <regex>
+#include <system_error>
 
 namespace sysio {
 
 using namespace sysio;
 using namespace sysio::chain;
 
-/// Diagnostic returned when the catalog has no snapshot eligible for scheduled bootstrap.
-constexpr auto no_scheduled_snapshots_message = "No scheduled snapshots available";
+/// Diagnostic returned when the catalog has no attested snapshot eligible for scheduled bootstrap.
+constexpr auto no_servable_scheduled_snapshots_message = "No attested scheduled snapshots available";
 
 /// Request and ABI-decoder budget for one steady-state attestation-record lookup.
 constexpr auto snapshot_attestation_query_timeout =
@@ -29,6 +31,9 @@ constexpr auto snapshot_attestation_query_timeout =
 
 /// Log label for a scheduled catalog entry whose attestation record cannot be inspected.
 constexpr auto snapshot_attestation_query_log_prefix = "snapshot_api_plugin";
+
+/// Maximum attestation records inspected in one reverse discovery query.
+constexpr uint32_t snapshot_attestation_discovery_page_size = 50;
 
 struct snapshot_entry {
    block_num_type         block_num = 0;
@@ -54,6 +59,12 @@ struct download_params {
    block_num_type block_num = 0;
 };
 
+/** Return whether a catalog entry still names a regular snapshot file. */
+bool is_snapshot_file_available(const snapshot_entry& entry) {
+   std::error_code error;
+   return std::filesystem::is_regular_file(entry.file_path, error);
+}
+
 } // namespace sysio
 
 FC_REFLECT(sysio::snapshot_metadata, (block_num)(block_id)(block_time)(root_hash))
@@ -78,34 +89,37 @@ public:
 
    /** Return whether irreversible local state attests the exact snapshot tuple. */
    bool is_attested_snapshot(const snapshot_entry& entry) const {
-      auto params = make_snapshot_attestation_record_query(entry.block_num);
       const auto expected_block_num = entry.block_num;
       const auto expected_block_id = entry.block_id;
       const auto expected_root_hash = entry.root_hash;
-      params.filter = [this, expected_block_num, expected_block_id, expected_root_hash](
-                         const fc::variant& row) {
-         const auto& chain = chain_plugin_.chain();
-         if (!chain.fork_db_has_root()) {
-            return false;
-         }
-         return snapshot_api::is_servable_snapshot_attestation(
-            row, expected_block_num, expected_block_id, expected_root_hash,
-            chain.fork_db_root().block_num());
-      };
 
       static const std::atomic<bool> not_shutting_down{false};
-      const auto result = chain_plugin_.read_table_rows_checked(
-         std::move(params), snapshot_attestation_query_timeout,
-         snapshot_attestation_query_timeout, snapshot_attestation_query_log_prefix,
-         not_shutting_down);
+      const auto result = retry_snapshot_attestation_table_read([&]() {
+         auto params = make_snapshot_attestation_record_query(expected_block_num);
+         params.filter = [this, expected_block_num, expected_block_id, expected_root_hash](
+                            const fc::variant& row) {
+            const auto& chain = chain_plugin_.chain();
+            if (!chain.fork_db_has_root()) {
+               return false;
+            }
+            return snapshot_api::is_servable_snapshot_attestation(
+               row, expected_block_num, expected_block_id, expected_root_hash,
+               chain.fork_db_root().block_num());
+         };
+         return chain_plugin_.read_table_rows_checked(
+            std::move(params), snapshot_attestation_query_timeout,
+            snapshot_attestation_query_timeout, snapshot_attestation_query_log_prefix,
+            not_shutting_down);
+      });
       return result && !result->rows.empty();
    }
 
-   /** Return whether an explicit snapshot download passes scheduled-serving policy. */
+   /** Return whether an explicit snapshot download passes file and scheduled-serving policy. */
    bool is_servable_snapshot(const snapshot_entry& entry) const {
-      return snapshot_api::is_snapshot_servable(
-         entry.block_num, entry,
-         [this](const snapshot_entry& snapshot) { return is_attested_snapshot(snapshot); });
+      return is_snapshot_file_available(entry)
+             && snapshot_api::is_snapshot_servable(
+                entry.block_num, entry,
+                [this](const snapshot_entry& snapshot) { return is_attested_snapshot(snapshot); });
    }
 
    void scan_snapshots_dir() {
@@ -178,14 +192,88 @@ public:
       ilog("Added snapshot to catalog: block #{}", si.head_block_num);
    }
 
-   /** Return the newest snapshot eligible for scheduled bootstrap discovery. */
-   std::optional<snapshot_entry> get_latest() const {
-      std::lock_guard lock(catalog_mtx_);
-      const auto entry = snapshot_api::find_latest_scheduled_snapshot(catalog_);
-      if (entry == catalog_.rend()) {
+   /**
+    * Return the newest locally available snapshot with an exact irreversible attestation.
+    *
+    * This method is called from the HTTP thread pool. Each reverse attestation page is therefore
+    * posted once to the read executor rather than nesting a blocking read inside a read-only task.
+    * The configured HTTP response budget bounds the complete multi-page scan.
+    */
+   std::optional<snapshot_entry> get_latest(fc::microseconds max_response_time) const {
+      std::shared_ptr<const std::map<block_num_type, snapshot_entry>> catalog_snapshot;
+      {
+         std::lock_guard lock(catalog_mtx_);
+         catalog_snapshot = std::make_shared<const std::map<block_num_type, snapshot_entry>>(catalog_);
+      }
+
+      std::optional<block_num_type> oldest_available_scheduled;
+      std::optional<block_num_type> newest_available_scheduled;
+      for (const auto& [block_num, entry] : *catalog_snapshot) {
+         if (!protocol::snapshot_attestation::is_scheduled_block(block_num)
+             || !is_snapshot_file_available(entry)) {
+            continue;
+         }
+         if (!oldest_available_scheduled) {
+            oldest_available_scheduled = block_num;
+         }
+         newest_available_scheduled = block_num;
+      }
+      if (!oldest_available_scheduled || !newest_available_scheduled) {
          return std::nullopt;
       }
-      return std::optional{entry->second};
+
+      auto params = make_snapshot_attestation_record_query(*oldest_available_scheduled);
+      params.limit = snapshot_attestation_discovery_page_size;
+      params.reverse = true;
+      params.upper_bound = fc::json::to_string(
+         fc::mutable_variant_object()
+         (protocol::snapshot_attestation::field::block_num,
+          static_cast<uint64_t>(*newest_available_scheduled) + 1),
+         fc::time_point::maximum());
+      params.filter = [this, catalog_snapshot](const fc::variant& row) {
+         const auto& chain = chain_plugin_.chain();
+         return chain.fork_db_has_root()
+                && snapshot_api::is_servable_catalog_snapshot_attestation(
+                   *catalog_snapshot, row, chain.fork_db_root().block_num(),
+                   [](const snapshot_entry& snapshot) {
+                      return is_snapshot_file_available(snapshot);
+                   });
+      };
+
+      const auto discovery_deadline = max_response_time == fc::microseconds::maximum()
+                                         ? fc::time_point::maximum()
+                                         : fc::time_point::now().safe_add(max_response_time);
+      static const std::atomic<bool> not_shutting_down{false};
+      while (true) {
+         if (fc::time_point::now() >= discovery_deadline) {
+            return std::nullopt;
+         }
+         const auto result = retry_snapshot_attestation_table_read([&]() {
+            return chain_plugin_.read_table_rows_checked(
+               params, snapshot_attestation_query_timeout,
+               snapshot_attestation_query_timeout, snapshot_attestation_query_log_prefix,
+               not_shutting_down);
+         });
+         if (!result) {
+            return std::nullopt;
+         }
+
+         if (!result->rows.empty()) {
+            const auto block_num = snapshot_api::snapshot_attestation_block_num(result->rows.front());
+            if (!block_num) {
+               return std::nullopt;
+            }
+            const auto entry = catalog_snapshot->find(*block_num);
+            if (entry == catalog_snapshot->end()) {
+               return std::nullopt;
+            }
+            return std::optional{entry->second};
+         }
+         if (!result->more || result->next_key.empty()) {
+            return std::nullopt;
+         }
+         params.upper_bound = result->next_key;
+      }
    }
 
    /** Return an explicit catalog entry without applying the separate download policy. */
@@ -227,26 +315,30 @@ void snapshot_api_plugin::plugin_startup() {
       });
 
    auto& http = app().get_plugin<http_plugin>();
+   const auto snapshot_discovery_max_response_time = http.get_max_response_time();
 
-   // /v1/snapshot/latest - return metadata of latest scheduled snapshot
-   http.add_api({
-      {std::string("/v1/snapshot/latest"),
-       api_category::snapshot_ro,
-       [impl](string&&, string&& body, url_response_callback&& cb) {
-          try {
-             parse_params<std::string, http_params_types::no_params>(body);
-             auto entry = impl->get_latest();
-             if (!entry) {
-                cb(404, fc::variant(fc::mutable_variant_object()("message", no_scheduled_snapshots_message)));
-                return;
-             }
-             snapshot_metadata meta{entry->block_num, entry->block_id, entry->block_time, entry->root_hash};
-             cb(200, fc::variant(meta));
-          } catch (...) {
-             http_plugin::handle_exception("snapshot", "latest", body, cb);
-          }
-       }},
-   }, appbase::exec_queue::read_only, appbase::priority::medium_low);
+   // /v1/snapshot/latest - discover on the HTTP worker so chain reads can use the read executor
+   http.add_raw_handler("/v1/snapshot/latest", api_category::snapshot_ro,
+      [impl, snapshot_discovery_max_response_time](
+         sysio::detail::abstract_conn_ptr conn, string&&, string&& body) {
+         try {
+            parse_params<std::string, http_params_types::no_params>(body);
+            auto entry = impl->get_latest(snapshot_discovery_max_response_time);
+            if (!entry) {
+               conn->send_response(fc::json::to_string(
+                                      fc::mutable_variant_object()
+                                      ("message", no_servable_scheduled_snapshots_message),
+                                      fc::time_point::maximum()),
+                                   404);
+               return;
+            }
+            snapshot_metadata meta{entry->block_num, entry->block_id, entry->block_time, entry->root_hash};
+            conn->send_response(
+               fc::json::to_string(fc::variant(meta), fc::time_point::maximum()), 200);
+         } catch (...) {
+            conn->handle_exception();
+         }
+      });
 
    // /v1/snapshot/by_block - return metadata of snapshot at specific block
    http.add_api({
@@ -279,16 +371,6 @@ void snapshot_api_plugin::plugin_startup() {
                                       fc::mutable_variant_object()
                                       ("code", 404)
                                       ("message", "No snapshot found for block " + std::to_string(params.block_num)),
-                                      fc::time_point::maximum()),
-                                   404);
-               return;
-            }
-
-            if (!std::filesystem::exists(entry->file_path)) {
-               conn->send_response(fc::json::to_string(
-                                      fc::mutable_variant_object()
-                                      ("code", 404)
-                                      ("message", "Snapshot file no longer exists on disk"),
                                       fc::time_point::maximum()),
                                    404);
                return;

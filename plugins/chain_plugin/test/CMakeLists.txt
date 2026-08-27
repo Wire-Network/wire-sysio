@@ -16,7 +16,7 @@ set(CHAIN_PLUGIN_TEST_CASES
         chain_plugin_accepts_trusted_manual_snapshot_without_attestation_table
         snapshot_attestation_table_read_failure_policy
         snapshot_attestation_table_read_timeout_policy
-        snapshot_attestation_startup_table_read_retry_policy
+        snapshot_attestation_table_read_retry_policy
         snapshot_attestation_required_schema_policy
         snapshot_attestation_enabled_config_policy
         snapshot_attestation_record_tuple_policy

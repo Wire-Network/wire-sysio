@@ -316,31 +316,31 @@ BOOST_AUTO_TEST_CASE(snapshot_attestation_table_read_timeout_policy) {
                      + sysio::snapshot_attestation_startup_minimum_table_read_timeout);
 }
 
-/** A transient startup read is retried, while a confirmed empty read is terminal. */
-BOOST_AUTO_TEST_CASE(snapshot_attestation_startup_table_read_retry_policy) {
+/** A transient attestation read is retried, while a confirmed empty read is terminal. */
+BOOST_AUTO_TEST_CASE(snapshot_attestation_table_read_retry_policy) {
    uint32_t successful_attempts = 0;
-   const auto successful_read = sysio::retry_snapshot_attestation_startup_table_read(
+   const auto successful_read = sysio::retry_snapshot_attestation_table_read(
       [&]() -> std::optional<uint32_t> {
          ++successful_attempts;
-         if (successful_attempts < sysio::snapshot_attestation_startup_table_read_attempts) {
+         if (successful_attempts < sysio::snapshot_attestation_table_read_attempts) {
             return std::nullopt;
          }
          return successful_attempts;
       });
    BOOST_REQUIRE(successful_read);
-   BOOST_CHECK_EQUAL(*successful_read, sysio::snapshot_attestation_startup_table_read_attempts);
+   BOOST_CHECK_EQUAL(*successful_read, sysio::snapshot_attestation_table_read_attempts);
 
    uint32_t failed_attempts = 0;
-   const auto failed_read = sysio::retry_snapshot_attestation_startup_table_read(
+   const auto failed_read = sysio::retry_snapshot_attestation_table_read(
       [&]() -> std::optional<uint32_t> {
          ++failed_attempts;
          return std::nullopt;
       });
    BOOST_CHECK(!failed_read);
-   BOOST_CHECK_EQUAL(failed_attempts, sysio::snapshot_attestation_startup_table_read_attempts);
+   BOOST_CHECK_EQUAL(failed_attempts, sysio::snapshot_attestation_table_read_attempts);
 
    uint32_t empty_attempts = 0;
-   const auto empty_read = sysio::retry_snapshot_attestation_startup_table_read(
+   const auto empty_read = sysio::retry_snapshot_attestation_table_read(
       [&]() -> std::optional<sysio::chain_apis::read_only::get_table_rows_result> {
          ++empty_attempts;
          return sysio::chain_apis::read_only::get_table_rows_result{};

@@ -179,9 +179,11 @@ All endpoints use POST with JSON bodies, consistent with other Wire Sysio APIs.
 
 ### `POST /v1/snapshot/latest`
 
-Returns metadata for the newest snapshot at an exact attestation-cadence height. Newer manual snapshots are skipped so
-base-URL bootstrap continues to discover the newest snapshot that can receive an on-chain attestation. The download
-endpoint then requires the scheduled snapshot's exact attestation to be irreversible before serving its bytes.
+Returns metadata for the newest snapshot at an exact attestation-cadence height whose matching on-chain attestation is
+irreversible and whose file is still available on disk. Newer manual snapshots, unavailable files, and scheduled
+snapshots that are not yet attested are skipped, so base-URL bootstrap discovers the newest snapshot it can immediately
+download. Discovery reads final attestation records newest-first in bounded pages limited to the locally available
+snapshot-height range, and transient table-read failures are retried before discovery fails closed.
 
 **Request:** empty body or `{}`
 
@@ -195,7 +197,8 @@ endpoint then requires the scheduled snapshot's exact attestation to be irrevers
 }
 ```
 
-**Response (404):** No scheduled snapshots in the catalog. Manual snapshots may still be available by explicit block.
+**Response (404):** No attested scheduled snapshot is currently downloadable. Manual snapshots may still be available
+by explicit block.
 
 ### `POST /v1/snapshot/by_block`
 

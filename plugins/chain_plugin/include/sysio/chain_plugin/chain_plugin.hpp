@@ -109,8 +109,8 @@ namespace sysio {
    inline constexpr fc::microseconds snapshot_attestation_startup_minimum_table_read_timeout{
       1'000'000};
 
-   /// Maximum number of startup configuration reads before bootstrap fails closed.
-   inline constexpr uint32_t snapshot_attestation_startup_table_read_attempts = 3;
+   /// Maximum number of bounded attestation-table reads before the caller fails closed.
+   inline constexpr uint32_t snapshot_attestation_table_read_attempts = 3;
 
    /** Give a cold startup read more headroom than steady-state attestation polling. */
    constexpr fc::microseconds snapshot_attestation_startup_table_read_timeout(
@@ -120,11 +120,10 @@ namespace sysio {
                 : configured_timeout;
    }
 
-   /** Retry transient startup read failures while preserving a terminal empty result. */
+   /** Retry transient attestation-table read failures while preserving a terminal empty result. */
    template <typename Read>
-   auto retry_snapshot_attestation_startup_table_read(Read&& read) -> decltype(read()) {
-      for (uint32_t attempt = 0; attempt < snapshot_attestation_startup_table_read_attempts;
-           ++attempt) {
+   auto retry_snapshot_attestation_table_read(Read&& read) -> decltype(read()) {
+      for (uint32_t attempt = 0; attempt < snapshot_attestation_table_read_attempts; ++attempt) {
          auto result = read();
          if (result) {
             return result;

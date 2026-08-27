@@ -1668,7 +1668,7 @@ void chain_plugin_impl::require_snapshot_attestation_configuration() const {
    static const std::atomic<bool> not_shutting_down{false};
    const auto table_read_timeout =
       snapshot_attestation_startup_table_read_timeout(abi_serializer_max_time_us);
-   const auto read_result = retry_snapshot_attestation_startup_table_read([&]() {
+   const auto read_result = retry_snapshot_attestation_table_read([&]() {
       return app().get_plugin<chain_plugin>().read_table_rows_checked(
          params, table_read_timeout, table_read_timeout,
          snapshot_attestation_config_log_prefix, not_shutting_down);

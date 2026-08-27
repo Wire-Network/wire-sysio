@@ -225,7 +225,7 @@ All endpoints use `api_category::snapshot_ro` and are registered during `plugin_
 
 | Endpoint | Registration | Request | Response |
 |----------|-------------|---------|----------|
-| `POST /v1/snapshot/latest` | `add_api` (read_only queue) | no params | newest scheduled metadata, or 404 |
+| `POST /v1/snapshot/latest` | `add_raw_handler` (chain reads use the read-only queue) | no params | newest attested, on-disk scheduled metadata, or 404 |
 | `POST /v1/snapshot/by_block` | `add_api` (read_only queue) | `{ block_num: N }` | matching catalog metadata, or 404 |
 | `POST /v1/snapshot/download` | `add_raw_handler` | `{ block_num: N }` | Binary file for a servable entry, with `Content-Disposition: attachment`; supports `Range` (206 Partial Content) |
 
@@ -366,11 +366,12 @@ For a complete operator setup guide — including producer registration, provide
 **Snapshot API policy tests** (`tests/snapshot_api_plugin_tests.cpp`):
 - scheduled explicit serving requires a complete, exact block-ID/root tuple whose attestation block is irreversible
 - malformed, mismatched, missing, and pending scheduled attestations fail closed; manual entries remain explicit-only
+- latest discovery skips newer unattested entries and attested entries whose local file is unavailable
 
 **Integration test** (`tests/snapshot_api_test.py` — 10 tests):
 
 Phase 3 (API endpoints):
-- `/v1/snapshot/latest` returns 404 without a scheduled snapshot
+- `/v1/snapshot/latest` returns 404 without a scheduled snapshot and excludes newer manual snapshots
 - Manual snapshots remain available through explicit-block metadata and download endpoints
 - `/v1/snapshot/by_block` returns correct metadata
 - `/v1/snapshot/by_block` returns 404 for non-existent block
@@ -379,7 +380,7 @@ Phase 3 (API endpoints):
 - Additional manual snapshots remain explicit-only and do not replace scheduled discovery
 
 Phase 4 (bootstrap):
-- Base-URL bootstrap fails discovery when no scheduled snapshot is available
+- Base-URL bootstrap fails discovery when no attested scheduled snapshot is downloadable
 - A specific manual snapshot URL is rejected before download for the same cadence invariant
 - Raw snapshot downloads honor HTTP `max-bytes-in-flight` admission control
 
