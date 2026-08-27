@@ -98,7 +98,17 @@ BOOST_FIXTURE_TEST_CASE(gifted_account_affords_linkauth, sysio_system::sysio_sys
     resource_manager.get_account_limits("linker"_n, ram_bytes, net_limit, cpu_limit);
     const int64_t usage_before = resource_manager.get_account_ram_usage("linker"_n);
 
+    // Derived from the protocol constants rather than read back from the code under test, so a
+    // billing change fails here instead of silently moving what is measured.
+    constexpr int64_t expected_link_cost = 144; // 40 fixed + 3 indices x 32, aligned to 16
+    // 96 account_object + 448 two permission_objects + 272 initialize_account + 64 per key_weight.
+    // new_account_ram_tests pins the same 944 for K1; pinning here extends it to R1, EM and Ed25519.
+    constexpr int64_t expected_fixed_key_account_ram = 96 + 448 + 272 + 2 * 64;
+
     constexpr int64_t link_cost = static_cast<int64_t>(config::billable_size_v<permission_link_object>);
+    static_assert( link_cost == expected_link_cost,
+                   "permission_link_object billing changed; a linkauth now costs a different amount of RAM" );
+    BOOST_TEST( usage_before == expected_fixed_key_account_ram );
     BOOST_TEST( ram_bytes - usage_before >= link_cost ); // the gift has to leave room for one link
 
     // The scope claim above covers four key types, so exercise all four rather than only the K1 that
@@ -146,8 +156,9 @@ BOOST_FIXTURE_TEST_CASE(gifted_account_affords_linkauth, sysio_system::sysio_sys
 //
 // The supported shape is a short RPID. Longer ones are not rejected by key validation -- post_init
 // only requires a non-empty RPID -- they simply do not fit the gift and need a ROA policy like any
-// other account that outgrows it. The boundary is derived here rather than hardcoded so a future
-// billing change moves it visibly instead of silently.
+// other account that outgrows it. The boundary is measured and also pinned: measuring keeps the fit
+// and overflow probes meaningful, pinning is what makes a billing change fail instead of silently
+// sliding the boundary.
 BOOST_FIXTURE_TEST_CASE(webauthn_account_rpid_bounded_by_gift, sysio_system::sysio_system_tester) { try {
     produce_block();
     auto& resource_manager = control->get_mutable_resource_limits_manager();
@@ -174,20 +185,27 @@ BOOST_FIXTURE_TEST_CASE(webauthn_account_rpid_bounded_by_gift, sysio_system::sys
        push_transaction( trx );
     };
 
-    // Measure the shortest supported shape, then derive the longest that still fits. Each extra
-    // RPID character costs one byte in each of the two authorities.
+    // From the wire format, independently of the code under test: newaccount bills 816 outside its
+    // keys, and each authority adds a 64-byte key_weight element plus an 8-byte shared_string header
+    // over the packed key (33 point + 1 presence + 1 varint + RPID).
+    constexpr int64_t webauthn_packed_len_one = 33 + 1 + 1 + 1;
+    constexpr int64_t expected_at_len_one     = 816 + 2 * ( 64 + 8 + webauthn_packed_len_one ); // 1032
+    constexpr int64_t expected_max_rpid_len   = 1 + ( (int64_t)newaccount_ram - expected_at_len_one ) / 2; // 57
+    static_assert( expected_at_len_one == 1032 && expected_max_rpid_len == 57 );
+
+    // Measure the shortest supported shape, then derive the longest that still fits.
     create_webauthn_account( "wakeyshort"_n, 1 );
     produce_block();
     const int64_t at_len_one = resource_manager.get_account_ram_usage( "wakeyshort"_n );
-    BOOST_TEST( at_len_one <= (int64_t)newaccount_ram );
+    BOOST_TEST( at_len_one == expected_at_len_one );
 
     const int64_t max_rpid_len = 1 + ( (int64_t)newaccount_ram - at_len_one ) / 2;
-    BOOST_TEST( max_rpid_len > 0 );
+    BOOST_TEST( max_rpid_len == expected_max_rpid_len );
 
-    // The longest supported RPID fits exactly.
+    // The longest supported RPID lands exactly on the gift, leaving nothing over.
     create_webauthn_account( "wakeymaxlen"_n, (size_t)max_rpid_len );
     produce_block();
-    BOOST_TEST( resource_manager.get_account_ram_usage( "wakeymaxlen"_n ) <= (int64_t)newaccount_ram );
+    BOOST_TEST( resource_manager.get_account_ram_usage( "wakeymaxlen"_n ) == (int64_t)newaccount_ram );
 
     // One character more does not, and fails on RAM rather than on key validation.
     BOOST_CHECK_THROW( create_webauthn_account( "wakeytoolong"_n, (size_t)max_rpid_len + 1 ),

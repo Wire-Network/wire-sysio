@@ -777,20 +777,29 @@ BOOST_AUTO_TEST_CASE( key_heap_size_covers_every_alternative ) { try {
       BOOST_TEST( heap_of( private_key_type::generate( type ).get_public_key() ) == 0u );
    }
 
-   // BLS holds its payload behind a shared_string, so it costs that payload plus the string header.
+   // Exact sizes from the wire formats, not from the constants under test: shared_cow_string::impl
+   // is a reference count and a size ahead of the data, so 8, and a BLS key serializes to 96.
+   constexpr size_t string_header = 8;
+   constexpr size_t bls_serialized_size = 96;
+
    const auto bls_pub = private_key_type::generate( kt::bls ).get_public_key();
-   const auto bls_payload = bls_pub.get<fc::crypto::bls::public_key_shim>().serialize().size();
-   BOOST_TEST( heap_of( bls_pub ) == shared_string_header_billable_size + bls_payload );
-   BOOST_TEST( bls_payload > 0u );
+   BOOST_TEST( bls_pub.get<fc::crypto::bls::public_key_shim>().serialize().size() == bls_serialized_size );
+   BOOST_TEST( heap_of( bls_pub ) == string_header + bls_serialized_size );
 
    // WebAuthn stores its packed form the same way: 33 key + 1 user_presence + 1 varint + rpid.
    fc::crypto::webauthn::public_key::public_key_data_type kd{};
    kd[0] = 0x02;
-   const std::string rpid( 20, 'a' );
+   constexpr size_t rpid_len = 20; // one varint byte covers any length below 128
+   const std::string rpid( rpid_len, 'a' );
    const public_key_type wa( public_key_type::storage_type(
       fc::crypto::webauthn::public_key(
          kd, fc::crypto::webauthn::public_key::user_presence_t::USER_PRESENCE_PRESENT, rpid ) ) );
-   BOOST_TEST( heap_of( wa ) == shared_string_header_billable_size + 35u + rpid.size() );
+   BOOST_TEST( heap_of( wa ) == string_header + 33u + 1u + 1u + rpid_len );
+
+   // Pins the constant the two branches above share, rather than letting it cancel out.
+   static_assert( shared_string_header_billable_size == string_header,
+                  "shared_string_header_billable_size changed; this alters RAM billing for every "
+                  "authority holding a WebAuthn or BLS key" );
 } FC_LOG_AND_RETHROW() }
 
 // check_deleteauth_authorization reports its own action name. The assert text was copied from
