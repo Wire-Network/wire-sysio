@@ -23,6 +23,10 @@ constexpr name ram_payer = "sysio"_n;
 
 namespace {
 
+/// Rejection text for a dispute without enough competing envelope versions to adjudicate.
+constexpr const char* DISPUTE_REQUIRES_TWO_CANDIDATES =
+   "a dispute requires at least two candidate envelope versions";
+
 /// WIRE asset symbol for the challenge-bond escrow + payouts (9 decimals — mirrors
 /// `sysio.reserv`'s WIRE_SYMBOL; deliberately NOT opreg's CORE_SYM).
 constexpr sysio::symbol WIRE_SYMBOL{"WIRE", 9};
@@ -244,8 +248,8 @@ void chalg::opendispute(uint64_t chain_code,
                         uint32_t epoch_index,
                         std::vector<dispute_candidate> candidates) {
    require_auth(MSGCH_ACCOUNT);
-   check(candidates.size() >= 3,
-         "a dispute requires at least 3 candidate envelope versions");
+   check(candidates.size() >= chalg_limits::minimum_dispute_candidate_versions,
+         DISPUTE_REQUIRES_TWO_CANDIDATES);
 
    disputes_t disputes(get_self());
 
@@ -265,9 +269,9 @@ void chalg::opendispute(uint64_t chain_code,
    const uint8_t network_gen = roa::current_network_gen(ROA_ACCOUNT);
    auto electorate = snapshot_t1_electorate(ROA_ACCOUNT, network_gen);
 
-   // An empty electorate could never vote, so the dispute could never resolve and the epoch pause
-   // below would hold forever. Refuse to open instead -- the conflicting deliveries keep this
-   // epoch from reaching consensus regardless, and the failure then names the actual problem.
+   // Defense in depth for direct calls: msgch preflights this invariant and soft-returns so a
+   // terminal delivery remains retryable, while this assertion keeps every other caller from
+   // opening an unresolvable, permanently-pausing dispute.
    check(!electorate.empty(), "cannot open a dispute with no registered tier-1 node owners");
    const uint32_t quorum = static_cast<uint32_t>(electorate.size()) / 2 + 1;
 
