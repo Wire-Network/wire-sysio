@@ -8,7 +8,9 @@
 #include <fc/variant.hpp>
 
 #include <limits>
+#include <memory>
 #include <optional>
+#include <utility>
 
 namespace sysio::snapshot_api {
 
@@ -102,13 +104,14 @@ bool is_servable_catalog_snapshot_attestation(const Catalog& catalog,
  */
 template <typename Catalog, typename IsAvailable, typename IsServableAttestation,
           typename ReadPage, typename DeadlineReached>
-auto discover_latest_servable_scheduled_snapshot(const Catalog& catalog,
+auto discover_latest_servable_scheduled_snapshot(std::shared_ptr<const Catalog> catalog_snapshot,
                                                  IsAvailable&& is_available,
                                                  IsServableAttestation&& is_servable_attestation,
                                                  ReadPage&& read_page,
                                                  DeadlineReached&& deadline_reached)
    -> snapshot_discovery_result<typename Catalog::mapped_type> {
    using result_type = snapshot_discovery_result<typename Catalog::mapped_type>;
+   const auto& catalog = *catalog_snapshot;
 
    std::optional<uint32_t> oldest_available_scheduled;
    std::optional<uint32_t> newest_available_scheduled;
@@ -134,8 +137,12 @@ auto discover_latest_servable_scheduled_snapshot(const Catalog& catalog,
       (protocol::snapshot_attestation::field::block_num,
        static_cast<uint64_t>(*newest_available_scheduled) + 1),
       fc::time_point::maximum());
-   params.filter = [&catalog, &is_servable_attestation](const fc::variant& row) {
-      return is_servable_attestation(catalog, row);
+   // A timed-out table read leaves its executor task queued, so the copied request filter must own
+   // every object it may use after this discovery call has returned.
+   params.filter = [catalog_snapshot,
+                    is_servable_attestation = std::forward<IsServableAttestation>(is_servable_attestation)](
+                      const fc::variant& row) {
+      return is_servable_attestation(*catalog_snapshot, row);
    };
 
    while (true) {

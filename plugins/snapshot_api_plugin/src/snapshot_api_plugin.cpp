@@ -244,7 +244,7 @@ public:
          return fc::time_point::now() >= discovery_deadline;
       };
       return snapshot_api::discover_latest_servable_scheduled_snapshot(
-         *catalog_snapshot, is_available, is_servable_attestation, read_page,
+         catalog_snapshot, is_available, is_servable_attestation, read_page,
          deadline_reached);
    }
 

@@ -5,8 +5,10 @@
 #include <cstddef>
 #include <cstdint>
 #include <map>
+#include <memory>
 #include <optional>
 #include <string>
+#include <utility>
 
 namespace snapshot_attest = sysio::protocol::snapshot_attestation;
 
@@ -40,6 +42,9 @@ struct test_snapshot_entry {
    fc::crypto::blake3          root_hash;
    bool                        available;
 };
+
+/** Immutable catalog snapshot used by discovery-driver tests. */
+using test_snapshot_catalog = std::map<uint32_t, test_snapshot_entry>;
 
 /** Build one decoded snapshot-attestation row for selection and validation tests. */
 fc::variant make_attestation_record(uint32_t block_num,
@@ -103,7 +108,7 @@ BOOST_AUTO_TEST_CASE(latest_servable_scheduled_snapshot_paginates_filtered_empty
    const fc::crypto::blake3 stale_hash{
       std::string(fc::crypto::blake3::byte_size * hex_characters_per_byte, other_hash_hex_digit)};
 
-   const std::map<uint32_t, test_snapshot_entry> catalog{
+   const auto catalog = std::make_shared<const test_snapshot_catalog>(test_snapshot_catalog{
       {first_scheduled_block,
        {first_scheduled_block, first_block_id, first_hash, true}},
       {pending_scheduled_block,
@@ -112,7 +117,7 @@ BOOST_AUTO_TEST_CASE(latest_servable_scheduled_snapshot_paginates_filtered_empty
        {stale_scheduled_block, stale_block_id, stale_hash, false}},
       {newer_manual_block,
        {newer_manual_block, stale_block_id, stale_hash, true}},
-   };
+   });
    const auto is_attested = [](const test_snapshot_entry& snapshot) {
       const uint32_t block_num = snapshot.block_num;
       return block_num == first_scheduled_block;
@@ -120,7 +125,7 @@ BOOST_AUTO_TEST_CASE(latest_servable_scheduled_snapshot_paginates_filtered_empty
    const auto is_available = [](const test_snapshot_entry& snapshot) {
       return snapshot.available;
    };
-   const auto is_servable_attestation = [last_irreversible_block, &is_available](
+   const auto is_servable_attestation = [last_irreversible_block, is_available](
                                            const auto& candidate_catalog,
                                            const fc::variant& row) {
       return sysio::snapshot_api::is_servable_catalog_snapshot_attestation(
@@ -178,11 +183,11 @@ BOOST_AUTO_TEST_CASE(latest_servable_scheduled_snapshot_paginates_filtered_empty
    BOOST_CHECK_EQUAL(page_count, expected_discovery_page_count);
 
    BOOST_CHECK(sysio::snapshot_api::is_snapshot_servable(
-      first_scheduled_block, catalog.at(first_scheduled_block), is_attested));
+      first_scheduled_block, catalog->at(first_scheduled_block), is_attested));
    BOOST_CHECK(!sysio::snapshot_api::is_snapshot_servable(
-      pending_scheduled_block, catalog.at(pending_scheduled_block), is_attested));
+      pending_scheduled_block, catalog->at(pending_scheduled_block), is_attested));
    BOOST_CHECK(sysio::snapshot_api::is_snapshot_servable(
-      newer_manual_block, catalog.at(newer_manual_block), is_attested));
+      newer_manual_block, catalog->at(newer_manual_block), is_attested));
 }
 
 /** Discovery distinguishes exhausted scans from read and deadline failures. */
@@ -191,13 +196,13 @@ BOOST_AUTO_TEST_CASE(latest_servable_scheduled_snapshot_reports_discovery_outcom
    constexpr uint32_t last_irreversible_block = scheduled_block + attestation_delay_blocks;
    const auto block_id = sysio::chain::block_id_type::hash(expected_block_seed);
    const fc::crypto::blake3 snapshot_hash;
-   const std::map<uint32_t, test_snapshot_entry> catalog{
+   const auto catalog = std::make_shared<const test_snapshot_catalog>(test_snapshot_catalog{
       {scheduled_block, {scheduled_block, block_id, snapshot_hash, true}},
-   };
+   });
    const auto is_available = [](const test_snapshot_entry& snapshot) {
       return snapshot.available;
    };
-   const auto is_servable_attestation = [last_irreversible_block, &is_available](
+   const auto is_servable_attestation = [last_irreversible_block, is_available](
                                            const auto& candidate_catalog,
                                            const fc::variant& row) {
       return sysio::snapshot_api::is_servable_catalog_snapshot_attestation(
@@ -235,6 +240,54 @@ BOOST_AUTO_TEST_CASE(latest_servable_scheduled_snapshot_reports_discovery_outcom
    BOOST_CHECK(timed_out.status == sysio::snapshot_api::snapshot_discovery_status::unavailable);
    BOOST_CHECK(!timed_out.snapshot);
    BOOST_CHECK_EQUAL(deadline_read_count, 0U);
+}
+
+/** A copied table request owns its catalog and predicate after discovery returns. */
+BOOST_AUTO_TEST_CASE(latest_servable_scheduled_snapshot_filter_owns_abandoned_request_state) {
+   constexpr uint32_t scheduled_block = snapshot_attest::block_spacing;
+   constexpr uint32_t last_irreversible_block = scheduled_block + attestation_delay_blocks;
+   const auto block_id = sysio::chain::block_id_type::hash(expected_block_seed);
+   const fc::crypto::blake3 snapshot_hash;
+   auto catalog = std::make_shared<const test_snapshot_catalog>(test_snapshot_catalog{
+      {scheduled_block, {scheduled_block, block_id, snapshot_hash, true}},
+   });
+   std::weak_ptr<const test_snapshot_catalog> catalog_lifetime = catalog;
+   auto predicate_lifetime = std::make_shared<const bool>(true);
+   std::weak_ptr<const bool> predicate_lifetime_observer = predicate_lifetime;
+   const auto is_available = [](const test_snapshot_entry& snapshot) {
+      return snapshot.available;
+   };
+   auto is_servable_attestation = [last_irreversible_block, is_available, predicate_lifetime](
+                                     const auto& candidate_catalog,
+                                     const fc::variant& row) {
+      return *predicate_lifetime
+             && sysio::snapshot_api::is_servable_catalog_snapshot_attestation(
+                candidate_catalog, row, last_irreversible_block, is_available);
+   };
+   std::optional<sysio::chain_apis::read_only::get_table_rows_params> abandoned_request;
+   const auto abandon_read = [&abandoned_request](const auto& params)
+      -> std::optional<sysio::chain_apis::read_only::get_table_rows_result> {
+      abandoned_request = params;
+      return std::nullopt;
+   };
+
+   const auto result = sysio::snapshot_api::discover_latest_servable_scheduled_snapshot(
+      catalog, is_available, std::move(is_servable_attestation), abandon_read,
+      []() { return false; });
+   BOOST_CHECK(result.status == sysio::snapshot_api::snapshot_discovery_status::unavailable);
+   BOOST_REQUIRE(abandoned_request);
+   BOOST_REQUIRE(abandoned_request->filter);
+
+   catalog.reset();
+   predicate_lifetime.reset();
+   BOOST_CHECK(!catalog_lifetime.expired());
+   BOOST_CHECK(!predicate_lifetime_observer.expired());
+   BOOST_CHECK((*abandoned_request->filter)(make_attestation_record(
+      scheduled_block, block_id, snapshot_hash, last_irreversible_block)));
+
+   abandoned_request.reset();
+   BOOST_CHECK(catalog_lifetime.expired());
+   BOOST_CHECK(predicate_lifetime_observer.expired());
 }
 
 BOOST_AUTO_TEST_SUITE_END()
