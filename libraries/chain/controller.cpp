@@ -1989,6 +1989,13 @@ struct controller_impl {
       try {
          auto start = fc::time_point::now();
          const bool check_auth = !skip_auth_check() && !trx->implicit() && !trx->is_read_only();
+         if( check_auth ) {
+            // Cleared per attempt: a trx retried from the unapplied queue may name a permission
+            // updated since. Guarded so this unsynchronized field is never written from the
+            // read-only thread pool.
+            assert( !trx->is_read_only() );
+            trx->auth_verified = false;
+         }
          const fc::microseconds sig_cpu_usage = trx->signature_cpu_usage();
 
          if( !explicit_billed_cpu_time ) {
@@ -2048,6 +2055,7 @@ struct controller_impl {
                        false,
                        trx->is_dry_run()
                );
+               trx->auth_verified = true;
             }
             trx_context.exec();
             trx_context.finalize(); // Automatically rounds up network and CPU usage in trace and bills payers if successful
