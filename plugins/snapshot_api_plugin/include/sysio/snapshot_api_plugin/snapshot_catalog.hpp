@@ -4,12 +4,30 @@
 #include <sysio/protocol/snapshot_attestation.hpp>
 
 #include <fc/crypto/blake3.hpp>
+#include <fc/io/json.hpp>
 #include <fc/variant.hpp>
 
 #include <limits>
 #include <optional>
 
 namespace sysio::snapshot_api {
+
+/// Maximum number of attestation records inspected in one reverse discovery query.
+inline constexpr uint32_t snapshot_attestation_discovery_page_size = 50;
+
+/** Outcome of attempting to discover the latest servable scheduled snapshot. */
+enum class snapshot_discovery_status {
+   found,
+   not_found,
+   unavailable,
+};
+
+/** A discovery outcome and the snapshot present only for a successful lookup. */
+template <typename Snapshot>
+struct snapshot_discovery_result {
+   snapshot_discovery_status status = snapshot_discovery_status::not_found;
+   std::optional<Snapshot> snapshot;
+};
 
 /**
  * Return whether a decoded record irreversibly attests the expected snapshot tuple.
@@ -76,24 +94,75 @@ bool is_servable_catalog_snapshot_attestation(const Catalog& catalog,
 }
 
 /**
- * Find the first locally available catalog entry matched by newest-first irreversible attestations.
+ * Discover the newest locally available scheduled snapshot through bounded reverse table pages.
  *
- * Malformed rows, rows without a local catalog entry, unavailable files, and tuple mismatches are
- * skipped so callers can continue with an older attestation page.
+ * The reader must apply the supplied C++-only row filter while servicing each page. An exhausted
+ * scan is a genuine absence; a failed read, expired deadline, or inconsistent filtered row is a
+ * temporary discovery failure.
  */
-template <typename Catalog, typename IsAvailable>
-auto find_latest_servable_scheduled_snapshot(const Catalog& catalog,
-                                             const fc::variants& newest_first_attestations,
-                                             uint32_t last_irreversible_block_num,
-   IsAvailable&& is_available) {
-   for (const auto& row : newest_first_attestations) {
-      if (!is_servable_catalog_snapshot_attestation(
-             catalog, row, last_irreversible_block_num, is_available)) {
+template <typename Catalog, typename IsAvailable, typename IsServableAttestation,
+          typename ReadPage, typename DeadlineReached>
+auto discover_latest_servable_scheduled_snapshot(const Catalog& catalog,
+                                                 IsAvailable&& is_available,
+                                                 IsServableAttestation&& is_servable_attestation,
+                                                 ReadPage&& read_page,
+                                                 DeadlineReached&& deadline_reached)
+   -> snapshot_discovery_result<typename Catalog::mapped_type> {
+   using result_type = snapshot_discovery_result<typename Catalog::mapped_type>;
+
+   std::optional<uint32_t> oldest_available_scheduled;
+   std::optional<uint32_t> newest_available_scheduled;
+   for (const auto& [block_num, entry] : catalog) {
+      if (!protocol::snapshot_attestation::is_scheduled_block(block_num)
+          || !is_available(entry)) {
          continue;
       }
-      return catalog.find(*snapshot_attestation_block_num(row));
+      if (!oldest_available_scheduled) {
+         oldest_available_scheduled = block_num;
+      }
+      newest_available_scheduled = block_num;
    }
-   return catalog.end();
+   if (!oldest_available_scheduled || !newest_available_scheduled) {
+      return result_type{snapshot_discovery_status::not_found, std::nullopt};
+   }
+
+   auto params = make_snapshot_attestation_record_query(*oldest_available_scheduled);
+   params.limit = snapshot_attestation_discovery_page_size;
+   params.reverse = true;
+   params.upper_bound = fc::json::to_string(
+      fc::mutable_variant_object()
+      (protocol::snapshot_attestation::field::block_num,
+       static_cast<uint64_t>(*newest_available_scheduled) + 1),
+      fc::time_point::maximum());
+   params.filter = [&catalog, &is_servable_attestation](const fc::variant& row) {
+      return is_servable_attestation(catalog, row);
+   };
+
+   while (true) {
+      if (deadline_reached()) {
+         return result_type{snapshot_discovery_status::unavailable, std::nullopt};
+      }
+
+      const auto page = read_page(params);
+      if (!page) {
+         return result_type{snapshot_discovery_status::unavailable, std::nullopt};
+      }
+      if (!page->rows.empty()) {
+         const auto block_num = snapshot_attestation_block_num(page->rows.front());
+         if (!block_num) {
+            return result_type{snapshot_discovery_status::unavailable, std::nullopt};
+         }
+         const auto entry = catalog.find(*block_num);
+         if (entry == catalog.end()) {
+            return result_type{snapshot_discovery_status::unavailable, std::nullopt};
+         }
+         return result_type{snapshot_discovery_status::found, entry->second};
+      }
+      if (!page->more || page->next_key.empty()) {
+         return result_type{snapshot_discovery_status::not_found, std::nullopt};
+      }
+      params.upper_bound = page->next_key;
+   }
 }
 
 /** Return whether an entry may be served explicitly: manual, or scheduled and attested. */

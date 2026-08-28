@@ -200,6 +200,8 @@ snapshot-height range, and transient table-read failures are retried before disc
 **Response (404):** No attested scheduled snapshot is currently downloadable. Manual snapshots may still be available
 by explicit block.
 
+**Response (503):** Discovery could not complete before its deadline or after retrying an attestation-table read.
+
 ### `POST /v1/snapshot/by_block`
 
 Returns metadata for a snapshot at a specific block number. Download eligibility is enforced separately by the raw

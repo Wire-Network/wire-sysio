@@ -225,7 +225,7 @@ All endpoints use `api_category::snapshot_ro` and are registered during `plugin_
 
 | Endpoint | Registration | Request | Response |
 |----------|-------------|---------|----------|
-| `POST /v1/snapshot/latest` | `add_raw_handler` (chain reads use the read-only queue) | no params | newest attested, on-disk scheduled metadata, or 404 |
+| `POST /v1/snapshot/latest` | `add_raw_handler` (chain reads use the read-only queue) | no params | newest attested, on-disk scheduled metadata; 404 if absent; 503 if discovery is unavailable |
 | `POST /v1/snapshot/by_block` | `add_api` (read_only queue) | `{ block_num: N }` | matching catalog metadata, or 404 |
 | `POST /v1/snapshot/download` | `add_raw_handler` | `{ block_num: N }` | Binary file for a servable entry, with `Content-Disposition: attachment`; supports `Range` (206 Partial Content) |
 
@@ -366,7 +366,8 @@ For a complete operator setup guide — including producer registration, provide
 **Snapshot API policy tests** (`tests/snapshot_api_plugin_tests.cpp`):
 - scheduled explicit serving requires a complete, exact block-ID/root tuple whose attestation block is irreversible
 - malformed, mismatched, missing, and pending scheduled attestations fail closed; manual entries remain explicit-only
-- latest discovery skips newer unattested entries and attested entries whose local file is unavailable
+- latest discovery tests its production paging driver: available bounds, continuation after a filtered-empty newest
+  page, first-row selection, exhaustion, read failure, and deadline expiration
 
 **Integration test** (`tests/snapshot_api_test.py` — 10 tests):
 
