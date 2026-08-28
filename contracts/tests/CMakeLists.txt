@@ -16,6 +16,7 @@ enable_testing()
 # build unit test executable
 file(GLOB UNIT_TESTS CONFIGURE_DEPENDS "*.cpp" "*.hpp") # find all unit test suites
 set(CONTRACT_UNIT_TEST_EXE contracts_unit_test)
+set(CONTRACT_UNIT_TEST_TIMEOUT_SECONDS 2700)
 unittest_target(
         ${CONTRACT_UNIT_TEST_EXE}
         SOURCE_FILES
@@ -32,3 +33,6 @@ target_include_directories(${CONTRACT_UNIT_TEST_EXE} PRIVATE
 
 # add_sysio_test_executable(${CONTRACT_UNIT_TEST_EXE} ${UNIT_TESTS}) # build unit tests as one executable
 add_test(NAME ${CONTRACT_UNIT_TEST_EXE} COMMAND ${CONTRACT_UNIT_TEST_EXE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+# Snapshot-attestation cases exercise the production 25,000-block cadence. Keep this aggregate
+# binary parallelizable while allowing sanitizer configurations enough time to complete it.
+set_tests_properties(${CONTRACT_UNIT_TEST_EXE} PROPERTIES TIMEOUT ${CONTRACT_UNIT_TEST_TIMEOUT_SECONDS})

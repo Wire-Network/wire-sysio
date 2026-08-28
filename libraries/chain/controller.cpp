@@ -1364,7 +1364,9 @@ struct controller_impl {
       }
    }
 
-   void startup(std::function<void()> shutdown, std::function<bool()> check_shutdown, const snapshot_reader_ptr& snapshot) {
+   void startup(std::function<void()> shutdown, std::function<bool()> check_shutdown,
+                const snapshot_reader_ptr& snapshot,
+                std::function<void()> on_snapshot_loaded) {
       SYS_ASSERT( snapshot, snapshot_exception, "No snapshot reader provided" );
       this->shutdown = std::move(shutdown);
       assert(this->shutdown);
@@ -1387,6 +1389,8 @@ struct controller_impl {
                         "Snapshot is invalid." );
             blog.reset( chain_id, chain_head.block_num() + 1 );
          }
+         if (on_snapshot_loaded)
+            on_snapshot_loaded();
          ilog( "Snapshot loaded, head: {} : {}", chain_head.block_num(), chain_head.id() );
 
          init(startup_t::snapshot);
@@ -1989,6 +1993,13 @@ struct controller_impl {
       try {
          auto start = fc::time_point::now();
          const bool check_auth = !skip_auth_check() && !trx->implicit() && !trx->is_read_only();
+         if( check_auth ) {
+            // Cleared per attempt: a trx retried from the unapplied queue may name a permission
+            // updated since. Guarded so this unsynchronized field is never written from the
+            // read-only thread pool.
+            assert( !trx->is_read_only() );
+            trx->auth_verified = false;
+         }
          const fc::microseconds sig_cpu_usage = trx->signature_cpu_usage();
 
          if( !explicit_billed_cpu_time ) {
@@ -2048,6 +2059,7 @@ struct controller_impl {
                        false,
                        trx->is_dry_run()
                );
+               trx->auth_verified = true;
             }
             trx_context.exec();
             trx_context.finalize(); // Automatically rounds up network and CPU usage in trace and bills payers if successful
@@ -3787,8 +3799,10 @@ void controller::add_indices() {
    my->add_indices();
 }
 
-void controller::startup( std::function<void()> shutdown, std::function<bool()> check_shutdown, const snapshot_reader_ptr& snapshot ) {
-   my->startup(shutdown, check_shutdown, snapshot);
+void controller::startup( std::function<void()> shutdown, std::function<bool()> check_shutdown,
+                          const snapshot_reader_ptr& snapshot,
+                          std::function<void()> on_snapshot_loaded ) {
+   my->startup(shutdown, check_shutdown, snapshot, std::move(on_snapshot_loaded));
 }
 
 void controller::startup( std::function<void()> shutdown, std::function<bool()> check_shutdown, const genesis_state& genesis ) {

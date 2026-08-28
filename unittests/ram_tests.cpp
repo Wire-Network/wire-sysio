@@ -38,7 +38,7 @@ BOOST_FIXTURE_TEST_CASE(new_account_ram_tests, sysio_system::sysio_system_tester
     BOOST_TEST( ram_bytes == newaccount_ram ); // RAM usage allowed to account
 
     int64_t ram_usage = resource_manager.get_account_ram_usage("kevin"_n);
-    BOOST_TEST( ram_usage == 1004 ); // RAM used by "kevin" during account creation, provided by sysio
+    BOOST_TEST( ram_usage == 944 ); // RAM used by "kevin" during account creation, provided by sysio
 
     int64_t sys_ram_bytes, sys_net_limit, sys_cpu_limit;
     resource_manager.get_account_limits(config::system_account_name, sys_ram_bytes, sys_net_limit, sys_cpu_limit);
@@ -75,6 +75,147 @@ BOOST_FIXTURE_TEST_CASE(new_account_ram_tests, sysio_system::sysio_system_tester
     BOOST_CHECK_THROW( set_authority(name("kevin"), name("spending"), authority(spending_pub_key), name("active"),
                                      { permission_level{name("kevin"), name("active")} }, { new_active_priv_key }),
                        ram_usage_exceeded);
+
+} FC_LOG_AND_RETHROW() }
+
+// A freshly gifted account with fixed-size keys must be able to scope a permission to a contract,
+// and linkauth is the only way to do that. If the creation gift does not cover one
+// permission_link_object then such an account is born unable to link anything, so guard the
+// affordance against billing drift in either the gift or the link cost.
+//
+// Scope: this holds for the fixed-size key types (K1, R1, EM, Ed25519), whose bytes live inside
+// the authority element. A WebAuthn authority additionally carries its RPID payload on the heap
+// and leaves less than a link's worth of the gift free at any RPID length -- see
+// webauthn_account_rpid_bounded_by_gift below. Such accounts need a ROA policy to link, like any
+// other account that outgrows the gift.
+BOOST_FIXTURE_TEST_CASE(gifted_account_affords_linkauth, sysio_system::sysio_system_tester) { try {
+    produce_block();
+
+    auto& resource_manager = control->get_mutable_resource_limits_manager();
+    create_account("linker"_n, config::system_account_name, false, false, false, false);
+
+    int64_t ram_bytes, net_limit, cpu_limit;
+    resource_manager.get_account_limits("linker"_n, ram_bytes, net_limit, cpu_limit);
+    const int64_t usage_before = resource_manager.get_account_ram_usage("linker"_n);
+
+    // Derived from the protocol constants rather than read back from the code under test, so a
+    // billing change fails here instead of silently moving what is measured.
+    constexpr int64_t expected_link_cost = 144; // 40 fixed + 3 indices x 32, aligned to 16
+    // 96 account_object + 448 two permission_objects + 272 initialize_account + 64 per key_weight.
+    // new_account_ram_tests pins the same 944 for K1; pinning here extends it to R1, EM and Ed25519.
+    constexpr int64_t expected_fixed_key_account_ram = 96 + 448 + 272 + 2 * 64;
+
+    constexpr int64_t link_cost = static_cast<int64_t>(config::billable_size_v<permission_link_object>);
+    static_assert( link_cost == expected_link_cost,
+                   "permission_link_object billing changed; a linkauth now costs a different amount of RAM" );
+    BOOST_TEST( usage_before == expected_fixed_key_account_ram );
+    BOOST_TEST( ram_bytes - usage_before >= link_cost ); // the gift has to leave room for one link
+
+    // The scope claim above covers four key types, so exercise all four rather than only the K1 that
+    // create_account defaults to. Each is billed the fixed element cost with no heap payload, so an
+    // account built on any of them must cost the same and leave the same room.
+    {
+       using kt = private_key_type::key_type;
+       int idx = 0;
+       for( auto type : { kt::k1, kt::r1, kt::em, kt::ed } ) {
+          const auto who = name{ std::string( "fixedkey" ) + std::to_string( 1111 + idx++ ) };
+          const authority auth( private_key_type::generate( type ).get_public_key() );
+          signed_transaction trx;
+          trx.actions.emplace_back( vector<permission_level>{{config::system_account_name, config::active_name}},
+                                    newaccount{ .creator = config::system_account_name, .name = who,
+                                                .owner = auth, .active = auth } );
+          set_transaction_headers( trx );
+          trx.sign( get_private_key( config::system_account_name, "active" ), control->get_chain_id() );
+          push_transaction( trx );
+          produce_block();
+
+          int64_t rb, nl, cl;
+          resource_manager.get_account_limits( who, rb, nl, cl );
+          BOOST_TEST( resource_manager.get_account_ram_usage( who ) == usage_before );
+          BOOST_TEST( rb - resource_manager.get_account_ram_usage( who ) >= link_cost );
+       }
+    }
+
+    base_tester::push_action( config::system_account_name, "linkauth"_n, "linker"_n, mvo()
+                                 ("account", "linker")
+                                 ("code", "sysio")
+                                 ("type", "reqauth")
+                                 ("requirement", "active") );
+    produce_block();
+
+    const int64_t usage_after = resource_manager.get_account_ram_usage("linker"_n);
+    BOOST_TEST( usage_after - usage_before == link_cost ); // billed exactly the link object
+    BOOST_TEST( usage_after <= ram_bytes );                // and still inside the gift
+
+} FC_LOG_AND_RETHROW() }
+
+// A WebAuthn key stores its RPID payload outside the authority element, so an authority using one
+// costs more than a fixed-size key by exactly that payload. The account creation gift is therefore
+// the binding constraint on RPID length: an account whose owner and active are both WebAuthn only
+// fits while the extra payload stays inside newaccount_ram.
+//
+// The supported shape is a short RPID. Longer ones are not rejected by key validation -- post_init
+// only requires a non-empty RPID -- they simply do not fit the gift and need a ROA policy like any
+// other account that outgrows it. The boundary is measured and also pinned: measuring keeps the fit
+// and overflow probes meaningful, pinning is what makes a billing change fail instead of silently
+// sliding the boundary.
+BOOST_FIXTURE_TEST_CASE(webauthn_account_rpid_bounded_by_gift, sysio_system::sysio_system_tester) { try {
+    produce_block();
+    auto& resource_manager = control->get_mutable_resource_limits_manager();
+
+    fc::crypto::webauthn::public_key::public_key_data_type key_data{};
+    key_data[0] = 0x02; // compressed-point prefix; contents are irrelevant to size accounting
+
+    auto webauthn_key = [&]( size_t rpid_len ) {
+       fc::crypto::webauthn::public_key k(
+          key_data,
+          fc::crypto::webauthn::public_key::user_presence_t::USER_PRESENCE_PRESENT,
+          std::string( rpid_len, 'a' ) );
+       return public_key_type( public_key_type::storage_type( std::move(k) ) );
+    };
+
+    auto create_webauthn_account = [&]( account_name who, size_t rpid_len ) {
+       const authority auth( webauthn_key( rpid_len ) );
+       signed_transaction trx;
+       trx.actions.emplace_back( vector<permission_level>{{config::system_account_name, config::active_name}},
+                                 newaccount{ .creator = config::system_account_name, .name = who,
+                                             .owner = auth, .active = auth } );
+       set_transaction_headers( trx );
+       trx.sign( get_private_key( config::system_account_name, "active" ), control->get_chain_id() );
+       push_transaction( trx );
+    };
+
+    // From the wire format, independently of the code under test: newaccount bills 816 outside its
+    // keys, and each authority adds a 64-byte key_weight element plus an 8-byte shared_string header
+    // over the packed key (33 point + 1 presence + 1 varint + RPID).
+    constexpr int64_t webauthn_packed_len_one = 33 + 1 + 1 + 1;
+    constexpr int64_t expected_at_len_one     = 816 + 2 * ( 64 + 8 + webauthn_packed_len_one ); // 1032
+    constexpr int64_t expected_max_rpid_len   = 1 + ( (int64_t)newaccount_ram - expected_at_len_one ) / 2; // 57
+    static_assert( expected_at_len_one == 1032 && expected_max_rpid_len == 57 );
+
+    // Measure the shortest supported shape, then derive the longest that still fits.
+    create_webauthn_account( "wakeyshort"_n, 1 );
+    produce_block();
+    const int64_t at_len_one = resource_manager.get_account_ram_usage( "wakeyshort"_n );
+    BOOST_TEST( at_len_one == expected_at_len_one );
+
+    const int64_t max_rpid_len = 1 + ( (int64_t)newaccount_ram - at_len_one ) / 2;
+    BOOST_TEST( max_rpid_len == expected_max_rpid_len );
+
+    // The longest supported RPID lands exactly on the gift, leaving nothing over.
+    create_webauthn_account( "wakeymaxlen"_n, (size_t)max_rpid_len );
+    produce_block();
+    BOOST_TEST( resource_manager.get_account_ram_usage( "wakeymaxlen"_n ) == (int64_t)newaccount_ram );
+
+    // One character more does not, and fails on RAM rather than on key validation.
+    BOOST_CHECK_THROW( create_webauthn_account( "wakeytoolong"_n, (size_t)max_rpid_len + 1 ),
+                       ram_usage_exceeded );
+
+    // At every supported length a WebAuthn account has less than a link's worth of gift left, which
+    // is why gifted_account_affords_linkauth is scoped to the fixed-size key types.
+    int64_t ram_bytes, net_limit, cpu_limit;
+    resource_manager.get_account_limits( "wakeyshort"_n, ram_bytes, net_limit, cpu_limit );
+    BOOST_TEST( ram_bytes - at_len_one < (int64_t)config::billable_size_v<permission_link_object> );
 
 } FC_LOG_AND_RETHROW() }
 

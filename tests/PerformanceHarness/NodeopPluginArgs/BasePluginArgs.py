@@ -11,8 +11,9 @@ class BasePluginArgs:
     def supportedNodeopArgs(self) -> list:
         args = []
         for field in dataclasses.fields(self):
-            match = re.search("\w*NodeopArg", field.name)
-            if match is not None:
+            # Anchored: sibling metadata fields such as _<key>NodeopArgTakesValue must not be
+            # mistaken for the option string itself.
+            if field.name.endswith("NodeopArg"):
                 args.append(getattr(self, field.name))
         return args
 
@@ -24,9 +25,15 @@ class BasePluginArgs:
                 default = getattr(self, f"_{field.name}NodeopDefault")
                 current = getattr(self, field.name)
                 if current is not None and current != default:
-                    if type(current) is bool:
-                        args.append(f"{getattr(self, f'_{field.name}NodeopArg')}")
+                    arg = getattr(self, f'_{field.name}NodeopArg')
+                    # Arity comes from what nodeop declares, recorded by the generator. The field's
+                    # Python type does not track it: an option can be typed bool and still consume a
+                    # value, and a switch can be typed str.
+                    if getattr(self, f'_{field.name}NodeopArgTakesValue'):
+                        # A value-taking option needs 1/0; f-string on a bool renders True/False.
+                        value = int(current) if isinstance(current, bool) else current
+                        args.append(f"{arg} {value}")
                     else:
-                        args.append(f"{getattr(self, f'_{field.name}NodeopArg')} {getattr(self, field.name)}")
+                        args.append(f"{arg}")
 
         return "--plugin " + self._pluginNamespace + "::" + self._pluginName + " " + " ".join(args) if len(args) > 0 else ""
