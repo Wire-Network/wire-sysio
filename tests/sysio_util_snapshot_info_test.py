@@ -17,7 +17,7 @@ expected_results = [
         "result": {
             "version": 1,
             "chain_id": "087244f65e31c0106a58554b8f855e30ae657efb98c6c40348bb14db8bdb3f8e",
-            "head_block_id": "0000001d7e7b44f83a2de0c7fdcb0d7bc192340b87acbd5a4180b1d976a5e41d",
+            "head_block_id": "0000001dc59bcae1448e5cdd5e637fe8f0833300970eb4c630bba7b2606d08d2",
             "head_block_num": 29,
             "head_block_time": "2025-01-01T00:00:14.000"
         }
