@@ -1696,6 +1696,116 @@ BOOST_AUTO_TEST_CASE(build_manifests_carry_transfer_hook_accounts_for_a_hook_min
    BOOST_CHECK_EQUAL(writable_of(hook_program), false);
 } FC_LOG_AND_RETHROW();
 
+namespace {
+
+/// Build a well-formed `ExtraAccountMetaList` account: the Execute TLV
+/// discriminator, a u32 entry length, then a PodSlice (u32 count + 35-byte
+/// records). `declared_count` is what the header CLAIMS, so a test can make it
+/// disagree with the bytes actually present.
+std::vector<uint8_t> validation_account(uint32_t declared_count, uint32_t present_records,
+                                        std::optional<uint32_t> entry_len_override = std::nullopt) {
+   const std::array<uint8_t, 8> execute_disc = {0x69, 0x25, 0x65, 0xc5, 0x4b, 0xfb, 0x66, 0x1a};
+   const uint32_t entry_len = entry_len_override.value_or(4 + present_records * 35);
+
+   std::vector<uint8_t> data(execute_disc.begin(), execute_disc.end());
+   const auto push_u32 = [&](uint32_t v) {
+      data.push_back(static_cast<uint8_t>(v & 0xff));
+      data.push_back(static_cast<uint8_t>((v >> 8) & 0xff));
+      data.push_back(static_cast<uint8_t>((v >> 16) & 0xff));
+      data.push_back(static_cast<uint8_t>((v >> 24) & 0xff));
+   };
+   push_u32(entry_len);
+   push_u32(declared_count);
+   for (uint32_t i = 0; i < present_records; ++i) data.insert(data.end(), 35, 0);
+   return data;
+}
+
+} // anonymous namespace
+
+/// The parser must THROW on every malformed shape rather than returning a short
+/// list. A partial parse is the worst outcome available: the caller wraps it as
+/// authoritative, the manifest carries the hook program and validation PDA while
+/// silently omitting declared metas, and the CPI then fails with
+/// `IncorrectAccount` -- window aborted, cursor pinned, nothing naming the cause.
+BOOST_AUTO_TEST_CASE(extra_account_meta_parser_refuses_malformed_accounts) try {
+   using manifest_detail::parse_extra_account_metas;
+
+   // Sanity: the well-formed shape parses, so the rejections below are about
+   // malformation and not about the builder being wrong.
+   BOOST_CHECK_EQUAL(parse_extra_account_metas(validation_account(2, 2)).size(), 2u);
+
+   // Too short to hold a TLV header at all.
+   BOOST_CHECK_THROW(parse_extra_account_metas(std::vector<uint8_t>(11, 0)), fc::assert_exception);
+
+   // Entry claims more bytes than the account holds.
+   BOOST_CHECK_THROW(parse_extra_account_metas(validation_account(1, 1, /*entry_len*/ 4096)),
+                     fc::assert_exception);
+
+   // THE DANGEROUS ONE: a count that overruns its own entry. Bounding the walk
+   // by the account size instead of the entry's extent would parse the FOLLOWING
+   // TLV bytes as metas and push arbitrary pubkeys in as writable accounts.
+   auto lying = validation_account(/*declared*/ 8, /*present*/ 1);
+   lying.insert(lying.end(), 35 * 8, 0xAB);   // plenty of trailing bytes to walk into
+   BOOST_CHECK_THROW(parse_extra_account_metas(lying), fc::assert_exception);
+
+   // No Execute entry: the mint declares a hook whose accounts are undeterminable.
+   auto wrong_disc = validation_account(1, 1);
+   wrong_disc[0] ^= 0xff;
+   BOOST_CHECK_THROW(parse_extra_account_metas(wrong_disc), fc::assert_exception);
+} FC_LOG_AND_RETHROW();
+
+/// The worst-case hook manifest against the dispatch budget.
+///
+/// `swap_revert` and `reserve_create_cancelled` on a hook mint carry the most
+/// accounts of any shape, and with the REAL liqSOL hook's five declared metas
+/// that comes to 15 of `MAX_TERMINAL_DYNAMIC_ACCOUNTS` (16). The packer always
+/// takes at least one attestation regardless of size, so a manifest over budget
+/// is not deferred -- `transaction::serialize` throws locally, which the header
+/// documents as "an alarm, not a retry", and the epoch cannot settle at all.
+///
+/// One more declared meta, or one more effect account added program-side, spends
+/// the last slot. Pinning the number here turns that cliff into a failing test
+/// instead of a wedged outpost.
+BOOST_AUTO_TEST_CASE(hook_manifest_worst_case_fits_the_dispatch_budget) try {
+   constexpr uint64_t token_code   = 161;
+   constexpr uint64_t reserve_code = 262;
+   const auto spl_mint     = measurement_pubkey(102);
+   const auto depositor    = measurement_pubkey(103);
+   const auto creator      = measurement_pubkey(104);
+   const auto token_2022   = measurement_pubkey(105);
+   const auto hook_program = measurement_pubkey(106);
+   const auto core_program = measurement_pubkey(107);
+   const auto bucket_ata   = measurement_pubkey(108);
+
+   manifest_build_harness harness;
+   harness.put(token_code, reserve_code, creator, spl_mint, 6, token_2022);
+   // The real liqSOL declaration (transfer-hook/src/lib.rs): the core program,
+   // the source and destination `user_record`s, `distribution_state`, and the
+   // bucket token account.
+   harness.put_hook(spl_mint, hook_program,
+                    {literal_meta(core_program, false),
+                     external_pda_meta(5, {seed_literal{"user_record"}, seed_account_key{0}}, true),
+                     external_pda_meta(5, {seed_literal{"user_record"}, seed_account_key{2}}, true),
+                     external_pda_meta(5, {seed_literal{"distribution_state"}}, true),
+                     literal_meta(bucket_ata, false)});
+
+   const auto manifests = harness.build(
+      {swap_revert_effect(0, token_code, reserve_code, depositor),
+       reserve_create_cancelled_effect(1, token_code, reserve_code)},
+      2);
+   BOOST_REQUIRE_EQUAL(manifests.size(), 2u);
+
+   for (const auto& m : manifests) {
+      BOOST_TEST_CONTEXT("manifest size " << m.size()) {
+         BOOST_CHECK_LE(m.size(), sysio::MAX_TERMINAL_DYNAMIC_ACCOUNTS);
+      }
+   }
+   // Pinned exactly, not just bounded: a silent creep to 16 would still pass a
+   // <= check while leaving zero headroom.
+   BOOST_CHECK_EQUAL(manifests[0].size(), 15u);
+   BOOST_CHECK_EQUAL(manifests[1].size(), 15u);
+} FC_LOG_AND_RETHROW();
+
 /// A hook-free mint -- every mint in the system today -- must be byte-for-byte
 /// unchanged by the hook support. Pins that this is additive.
 BOOST_AUTO_TEST_CASE(build_manifests_are_unchanged_for_a_hook_free_mint) try {

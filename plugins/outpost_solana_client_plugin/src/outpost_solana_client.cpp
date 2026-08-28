@@ -333,7 +333,7 @@ void assert_collateral_position_shape(const fc::network::solana::idl::program& p
              has_operator, has_token_code, has_mint, has_amount);
 }
 
-/// Assert the loaded IDL declares `Reserve` with the three fields the terminal
+/// Assert the loaded IDL declares `Reserve` with the four fields the terminal
 /// manifest resolves from it. Full contract on the header declaration.
 void assert_reserve_shape(const fc::network::solana::idl::program& program) {
    namespace idl = fc::network::solana::idl;
@@ -661,7 +661,6 @@ constexpr uint8_t  META_DISC_PUBKEY_DATA    = 2;
 constexpr uint8_t  META_DISC_INDEX_BASE     = 0x80;  // U8_TOP_BIT
 constexpr uint8_t  SEED_UNINITIALIZED       = 0;
 constexpr uint8_t  SEED_LITERAL             = 1;
-constexpr uint8_t  SEED_INSTRUCTION_DATA    = 2;
 constexpr uint8_t  SEED_ACCOUNT_KEY         = 3;
 
 /// First 8 bytes of sha256("spl-transfer-hook-interface:execute").
@@ -717,23 +716,45 @@ derive_extra_account_metas_pda(const fc::network::solana::solana_public_key& hoo
 
 std::vector<extra_account_meta>
 parse_extra_account_metas(const std::vector<uint8_t>& validation_account_data) {
+   // EVERY malformed shape below throws rather than returning a short list.
+   // A partial parse is the worst possible outcome: `mint_transfer_hook_for`
+   // would wrap it as authoritative, the manifest would carry the hook program
+   // and validation PDA while silently omitting declared metas, and the CPI
+   // would then fail with `IncorrectAccount` -- window aborted, cursor pinned,
+   // nothing in the log naming the cause. That is exactly what the resolver
+   // below refuses to do, and the parser must not undercut it.
    std::vector<extra_account_meta> metas;
-   if (validation_account_data.size() < 12) return metas;
+   const size_t size = validation_account_data.size();
+   FC_ASSERT(size >= 12,
+             "ExtraAccountMetaList account is {} bytes, too short to hold even one TLV header",
+             size);
    const auto* bytes = validation_account_data.data();
 
    size_t cursor = 0;
-   while (cursor + 12 <= validation_account_data.size()) {
+   while (cursor + 12 <= size) {
       const bool is_execute =
          std::memcmp(bytes + cursor, EXECUTE_TLV_DISCRIMINATOR.data(), 8) == 0;
       const uint32_t entry_len = le_u32(bytes + cursor + 8);
       const size_t   value     = cursor + 12;
-      if (value + entry_len > validation_account_data.size()) break;
+      FC_ASSERT(value + entry_len <= size,
+                "ExtraAccountMetaList TLV entry at {} claims {} bytes but only {} remain",
+                cursor, entry_len, size - value);
       if (is_execute) {
-         if (entry_len < 4) break;
+         FC_ASSERT(entry_len >= 4,
+                   "ExtraAccountMetaList Execute entry is {} bytes, too short for its count",
+                   entry_len);
          const uint32_t count = le_u32(bytes + value);
+         // `count` comes from account data we do not control. Bound the walk by
+         // the ENTRY's extent, never by the account's: a count that overruns the
+         // entry would otherwise parse the FOLLOWING TLV bytes as metas and push
+         // arbitrary pubkeys into the manifest as writable accounts.
+         const size_t declared = static_cast<size_t>(count) * EXTRA_ACCOUNT_META_SIZE;
+         FC_ASSERT(4 + declared <= entry_len,
+                   "ExtraAccountMetaList declares {} metas ({} bytes) but its entry holds {}",
+                   count, declared, entry_len);
+         metas.reserve(count);
          for (uint32_t i = 0; i < count; ++i) {
             const size_t at = value + 4 + static_cast<size_t>(i) * EXTRA_ACCOUNT_META_SIZE;
-            if (at + EXTRA_ACCOUNT_META_SIZE > validation_account_data.size()) break;
             extra_account_meta meta;
             meta.discriminator = bytes[at];
             std::memcpy(meta.address_config.data(), bytes + at + 1, 32);
@@ -745,7 +766,10 @@ parse_extra_account_metas(const std::vector<uint8_t>& validation_account_data) {
       }
       cursor = value + entry_len;
    }
-   return metas;
+   FC_ASSERT(false,
+             "ExtraAccountMetaList carries no Execute entry; the mint declares a transfer hook "
+             "whose required accounts cannot be determined");
+   return metas;   // unreachable; FC_ASSERT above always throws
 }
 
 std::vector<fc::network::solana::account_meta>
@@ -1032,6 +1056,22 @@ std::vector<std::vector<fc::network::solana::account_meta>> build_dispatch_manif
          .first->second;
    };
 
+   // One read per DISTINCT custody mint for the whole build, matching the two
+   // caches around it. Without this every reserve-backed SPL attestation pays a
+   // `get_account_info(custody_mint)` -- two when the mint has a hook, since the
+   // reader also reads the validation PDA -- so an envelope with 30 SPL remits
+   // over 3 reserves would go from 3 reads to 33, inside a build that probes the
+   // deadline per effect and aborts wholesale on a transient RPC throw.
+   // `nullopt` (no hook) is memoised too: that is every mint in the system today.
+   std::map<fc::network::solana::solana_public_key, std::optional<mint_transfer_hook>> hook_cache;
+   auto transfer_hook =
+      [&](const fc::network::solana::solana_public_key& custody_mint)
+      -> const std::optional<mint_transfer_hook>& {
+      auto it = hook_cache.find(custody_mint);
+      if (it != hook_cache.end()) return it->second;
+      return hook_cache.emplace(custody_mint, read_transfer_hook(custody_mint)).first->second;
+   };
+
    // One read per DISTINCT collateral position for the whole build. Custody
    // is pinned per `(operator, token_code)`, so both values are load-bearing
    // cache keys; absent/empty reads are memoised too.
@@ -1190,7 +1230,7 @@ std::vector<std::vector<fc::network::solana::account_meta>> build_dispatch_manif
       const auto add_hook_accounts = [&](const fc::network::solana::solana_public_key& source,
                                          const fc::network::solana::solana_public_key& destination,
                                          const fc::network::solana::solana_public_key& authority) {
-         const auto hook = read_transfer_hook(info.custody_mint);
+         const auto& hook = transfer_hook(info.custody_mint);
          if (!hook.has_value()) return;
          const auto validation_pda =
             derive_extra_account_metas_pda(hook->program, info.custody_mint);
@@ -1668,8 +1708,17 @@ std::string outpost_solana_client::drain_dispatch(
 std::optional<outpost_solana_client_detail::mint_transfer_hook>
 outpost_solana_client::mint_transfer_hook_for(
    const fc::network::solana::solana_public_key& custody_mint) {
+   // NOT degraded to `nullopt`: the custody mint is pinned on a Reserve that
+   // demonstrably exists, so "absent" is an anomaly (a lagging bank behind the
+   // default commitment, say), not a mint without a hook. Reporting "no hook"
+   // here would build a hook-free manifest for a hook mint and abort inside the
+   // CPI with no local signal -- the same asymmetry this function already
+   // refuses for the validation PDA below.
    const auto mint_info = _entry->client->get_account_info(custody_mint);
-   if (!mint_info.has_value() || mint_info->data.empty()) return std::nullopt;
+   FC_ASSERT(mint_info.has_value() && !mint_info->data.empty(),
+             "custody mint {} is absent or empty; it is pinned on an existing Reserve, so this "
+             "is a read anomaly rather than a mint without a transfer hook",
+             custody_mint.to_string(fc::yield_function_t{}));
 
    const auto hook_program =
       outpost_solana_client_detail::mint_transfer_hook_program(mint_info->data);
