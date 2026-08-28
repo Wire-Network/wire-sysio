@@ -550,7 +550,8 @@ Two properties keep this landing on abusers rather than on ordinary users:
   `block_cpu_usage_exceeded`, `block_net_usage_exceeded`, `deadline_exception`,
   `interrupt_exception`, and the read-only VM-OC compile failure. Blowing your *own* CPU or NET
   limit (`tx_cpu_usage_exceeded`, `tx_net_usage_exceeded`) is **not** excluded and does
-  accumulate. The producer's separate failure counter, below, skips the same two classes.
+  accumulate. The producer's separate failure counter, below, skips the same two classes and
+  additionally ignores anything that failed before authorization.
 
 A blunter limiter runs alongside it: `subjective-account-max-failures` (default `3`) per
 `subjective-account-max-failures-window-size` blocks (default `1`). An account over the limit has
@@ -561,7 +562,9 @@ transaction <id> exceeded failure limit for account <name> until <time>
 ```
 
 Failures are blamed on every per-action first authorizer, so a multi-action transaction shares
-responsibility across all of them.
+responsibility across all of them — but only once the chain has confirmed those accounts authorized
+it. A transaction that fails authorization is not counted against the accounts it names, so naming
+someone on a transaction you cannot sign does not throttle them.
 
 ### It is node-local, not consensus
 
@@ -609,10 +612,12 @@ account rather than to sender or receiver. Measured over two transfers — the f
 balance row from scratch, the second modifying an existing one:
 
 ```
-alice ram 1068 -> 1068       unchanged
-bob   ram 1068 -> 1068       unchanged, even though a NEW row was created
-sysio ram 411951 -> 412239   +288 bytes = two rows
+alice ram 944 -> 944   unchanged
+bob   ram 944 -> 944   unchanged, even though a NEW row was created
+sysio ram       +144   the new balance row, billed to sysio
 ```
+
+The second transfer added nothing beyond the per-block charge `onblock` already bills to `sysio`.
 
 For `sysio.token`, transfers are RAM-free for both parties whether or not new state is created.
 Alice is charged nothing, for anything, on a token transfer.
