@@ -373,7 +373,7 @@ namespace sysio { namespace chain {
       SYS_ASSERT( get_permission(auth).satisfies( min_permission,
                                                   _db.get_index<permission_index>().indices() ),
                   irrelevant_auth_exception,
-                  "updateauth action declares irrelevant authority '{}'; minimum authority is {}",
+                  "deleteauth action declares irrelevant authority '{}'; minimum authority is {}",
                   auth, permission_level{min_permission.owner, min_permission.name} );
    }
 

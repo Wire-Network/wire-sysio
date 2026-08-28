@@ -180,6 +180,35 @@ inline bool operator==( const key_weight& lhs, const shared_key_weight& rhs ) {
    return tie( lhs.key, lhs.weight ) == tie( rhs.key, rhs.weight );
 }
 
+/**
+ * @brief Bytes chainbase prepends to every heap-allocated shared_string payload.
+ *
+ * shared_cow_string::_alloc requests sizeof(impl) + size, where impl carries a reference_count and
+ * a size ahead of the data. Charging the payload alone would bill a heap-backed key at exactly its
+ * resident footprint with no margin, while inline keys carry the usual alignment surplus.
+ *
+ * Fixed as a protocol constant rather than read from chainbase, for the same reason
+ * billable_size<key_weight> is: a layout change there must become a deliberate billing decision
+ * rather than a silent one.
+ */
+inline constexpr size_t shared_string_header_billable_size = 8;
+
+/**
+ * @brief Bytes a key holds outside its own vector element.
+ *
+ * The fixed-size alternatives (K1, R1, EM, Ed25519) store their bytes inline in the variant and
+ * add nothing beyond sizeof(shared_key_weight). The WebAuthn and BLS alternatives keep their
+ * payload in a shared_string on the heap, charged here as the allocation chainbase actually makes:
+ * the header plus the payload.
+ */
+inline size_t heap_size( const shared_public_key& k ) {
+   return std::visit( overloaded {
+      []( const auto& )                    -> size_t { return 0; },
+      []( const shared_string& s )         -> size_t { return shared_string_header_billable_size + s.size(); },
+      []( const shared_bls_public_key& s ) -> size_t { return shared_string_header_billable_size + s.size(); }
+   }, k.pubkey );
+}
+
 namespace config {
    template<>
    struct billable_size<permission_level_weight> {
@@ -189,8 +218,18 @@ namespace config {
 
    template<>
    struct billable_size<key_weight> {
-      // no sizeof guard: key billed dynamically via shared_authority::get_billable_size()
-      static const uint64_t value = 8; ///< over value of weight for safety, dynamically sizing key
+      /// Footprint of one shared_key_weight element in shared_authority::keys. Bytes the key holds
+      /// outside that element are added per key by shared_authority::get_billable_size().
+      ///
+      /// Deliberately a fixed protocol constant rather than sizeof(shared_key_weight):
+      /// shared_key_weight embeds a std::variant, whose layout is a toolchain and standard-library
+      /// property. Deriving the charge from sizeof would let a layout change cross a 16-byte
+      /// billing bucket and make heterogeneous builds debit different RAM for the same authority.
+      /// The assert below fails loudly if the resident type ever outgrows the constant.
+      static const uint64_t value = 56;
+      static_assert(sizeof(shared_key_weight) <= value,
+                    "shared_key_weight no longer fits billable_size<key_weight>; "
+                    "raising this constant changes RAM billing and needs a deliberate decision");
    };
 }
 
@@ -283,7 +322,7 @@ struct shared_authority {
       size_t keys_size = 0;
       for (const auto& k: keys) {
          keys_size += config::billable_size_v<key_weight>;
-         keys_size += fc::raw::pack_size(k.key);  ///< serialized size of the key
+         keys_size += heap_size(k.key);  ///< bytes held outside the element (WebAuthn, BLS)
       }
 
       return accounts_size + keys_size;

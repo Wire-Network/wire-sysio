@@ -761,6 +761,72 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( delete_auth, TESTER, validating_testers ) { try {
 
 } FC_LOG_AND_RETHROW() }/// delete_auth
 
+// heap_size drives the per-key RAM charge, and one of its branches cannot be reached through any
+// consensus path: BLS keys are rejected wherever a permission is created, so no authority can ever
+// hold one. Exercise the helper directly so every alternative is covered anyway -- a regression
+// returning zero for a heap-backed payload would otherwise leave every account-level test green.
+BOOST_AUTO_TEST_CASE( key_heap_size_covers_every_alternative ) { try {
+   using kt = private_key_type::key_type;
+
+   auto heap_of = []( const public_key_type& pk ) {
+      return heap_size( shared_key_weight( key_weight{ pk, 1 } ).key );
+   };
+
+   // The fixed-size alternatives keep their bytes inside the variant and add nothing.
+   for( auto type : { kt::k1, kt::r1, kt::em, kt::ed } ) {
+      BOOST_TEST( heap_of( private_key_type::generate( type ).get_public_key() ) == 0u );
+   }
+
+   // Exact sizes from the wire formats, not from the constants under test: shared_cow_string::impl
+   // is a reference count and a size ahead of the data, so 8, and a BLS key serializes to 96.
+   constexpr size_t string_header = 8;
+   constexpr size_t bls_serialized_size = 96;
+
+   const auto bls_pub = private_key_type::generate( kt::bls ).get_public_key();
+   BOOST_TEST( bls_pub.get<fc::crypto::bls::public_key_shim>().serialize().size() == bls_serialized_size );
+   BOOST_TEST( heap_of( bls_pub ) == string_header + bls_serialized_size );
+
+   // WebAuthn stores its packed form the same way: 33 key + 1 user_presence + 1 varint + rpid.
+   fc::crypto::webauthn::public_key::public_key_data_type kd{};
+   kd[0] = 0x02;
+   constexpr size_t rpid_len = 20; // one varint byte covers any length below 128
+   const std::string rpid( rpid_len, 'a' );
+   const public_key_type wa( public_key_type::storage_type(
+      fc::crypto::webauthn::public_key(
+         kd, fc::crypto::webauthn::public_key::user_presence_t::USER_PRESENCE_PRESENT, rpid ) ) );
+   BOOST_TEST( heap_of( wa ) == string_header + 33u + 1u + 1u + rpid_len );
+
+   // Pins the constant the two branches above share, rather than letting it cancel out.
+   static_assert( shared_string_header_billable_size == string_header,
+                  "shared_string_header_billable_size changed; this alters RAM billing for every "
+                  "authority holding a WebAuthn or BLS key" );
+} FC_LOG_AND_RETHROW() }
+
+// check_deleteauth_authorization reports its own action name. The assert text was copied from
+// check_updateauth_authorization and named updateauth, which misidentifies the failing action --
+// especially in a transaction carrying both. Reaching this path needs a same-account authority
+// that does not satisfy the permission being deleted, which no other delete_auth case produces:
+// the existing ones cover a missing permission, a linked permission, and success.
+BOOST_AUTO_TEST_CASE( deleteauth_error_names_deleteauth ) { try {
+   validating_tester chain;
+   chain.create_accounts( {"alice"_n} );
+   chain.produce_block();
+
+   // Two siblings under active. Neither is an ancestor of the other, so neither satisfies the other.
+   chain.set_authority( "alice"_n, "perma"_n, authority( chain.get_public_key( "alice"_n, "perma" ) ),
+                        config::active_name );
+   chain.set_authority( "alice"_n, "permb"_n, authority( chain.get_public_key( "alice"_n, "permb" ) ),
+                        config::active_name );
+   chain.produce_block();
+
+   BOOST_CHECK_EXCEPTION(
+      chain.delete_authority( "alice"_n, "permb"_n,
+                              { permission_level{"alice"_n, "perma"_n} },
+                              { chain.get_private_key( "alice"_n, "perma" ) } ),
+      irrelevant_auth_exception,
+      fc_exception_message_starts_with( "deleteauth action declares irrelevant authority" ) );
+} FC_LOG_AND_RETHROW() }
+
 BOOST_AUTO_TEST_CASE( authority_without_waits ) { try {
    // Verify that authority without waits validates and works correctly
    validating_tester chain;
