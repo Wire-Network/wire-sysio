@@ -10,6 +10,7 @@
 #include <fc/crypto/public_key.hpp>
 
 #include "contracts.hpp"
+#include "contract_test_support.hpp"
 
 using namespace sysio::testing;
 using namespace sysio;
@@ -137,7 +138,8 @@ public:
          ("code",              codename_mvo(code))
          ("external_chain_id", external_chain_id)
          ("name",              std::string("outpost"))
-         ("description",       std::string{}));
+         ("description",       std::string{})
+         ("outpost", sysio_system::test_support::no_outpost_mvo()));
    }
 
    action_result push_to(name account, abi_serializer& ser, name signer,
@@ -238,6 +240,37 @@ public:
       auto data = get_row_by_account(RESERVE_ACCOUNT, RESERVE_ACCOUNT, "rewardbkt"_n, "rewardbkt"_n);
       return data.empty() ? fc::variant() : abi_ser.binary_to_variant(
          "rewards_bucket", data, abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
+   /// Claimable WIRE credited by `paywire` / `refundwire`. Null when the account is owed
+   /// nothing. `paywire` and `refundwire` credit rather than transfer, because both run on
+   /// never-throw paths where a recipient's transfer-notify handler could otherwise abort the
+   /// enclosing transaction.
+   fc::variant get_wireclaim(name account) {
+      auto data = get_row_by_account(RESERVE_ACCOUNT, RESERVE_ACCOUNT, "wireclaims"_n, account);
+      return data.empty() ? fc::variant() : abi_ser.binary_to_variant(
+         "wire_claim", data, abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
+   /// Claimable balance owed to `account`, or 0 when there is no row.
+   uint64_t wire_claimable(name account) {
+      auto c = get_wireclaim(account);
+      return c.is_null() ? 0u : c["balance"].as_uint64();
+   }
+
+   action_result claimwire(name account) {
+      return push_action(account, "claimwire"_n, mvo()("account", account));
+   }
+
+   /// Mirrors `sysio.reserv::MAX_CLAIM_SWEEP_PER_EPOCH` — the budget
+   /// `sysio.epoch::advance` hands the inline retention sweep.
+   static constexpr uint32_t reserve_max_claim_sweep_per_epoch = 32;
+
+   /// Drive the retention sweep directly, as the epoch tick would. Signed by the contract itself
+   /// (`sweepclaims` accepts `sysio.epoch` or self), so a test can age rows out without standing
+   /// up the epoch machinery.
+   action_result sweepclaims(uint32_t max_rows) {
+      return push_action(RESERVE_ACCOUNT, "sweepclaims"_n, mvo()("max_rows", max_rows));
    }
 
    /// Walk every row in `sysio.reserv::reserves` (KV-keyed by checksum256)
@@ -1410,8 +1443,17 @@ BOOST_FIXTURE_TEST_CASE(paywire_pays_real_wire_from_custody, sysio_reserve_teste
    auto r = find_reserve("ETH", "ETH", "PRIMARY");
    BOOST_REQUIRE_EQUAL(1100, r["reserve_chain_amount"].as_uint64());
    BOOST_REQUIRE_EQUAL(910,  r["reserve_wire_amount"].as_uint64());
-   // Custody invariant: Σ reserve_wire_amount dropped by the payout AND the real
-   // balance dropped by the payout, together.
+
+   // Custody invariant: `Σ reserve_wire_amount` drops by the payout immediately, but the
+   // WIRE itself does NOT leave -- it moves sideways into `Σ wireclaims.balance`, still in this
+   // contract's custody, until the recipient pulls it. paywire credits rather than transfers
+   // because it settles inside the never-throw consensus dispatch chain.
+   BOOST_REQUIRE_EQUAL(90u,  wire_claimable("alice"_n));
+   BOOST_REQUIRE_EQUAL(1000, wire_balance(RESERVE_ACCOUNT));   // unchanged: 910 booked + 90 claimable
+   BOOST_REQUIRE_EQUAL(0,    wire_balance("alice"_n));
+
+   // The pull completes the settlement and restores the original end state.
+   BOOST_REQUIRE_EQUAL(success(), claimwire("alice"_n));
    BOOST_REQUIRE_EQUAL(910, wire_balance(RESERVE_ACCOUNT));
    BOOST_REQUIRE_EQUAL(90,  wire_balance("alice"_n));
 } FC_LOG_AND_RETHROW() }
@@ -1452,6 +1494,8 @@ BOOST_FIXTURE_TEST_CASE(paywire_rejects_payout_above_curve_output, sysio_reserve
       ("recipient",        "alice")
       ("wire_out",         9)
       ("underwriter",      "underwriter1")));
+   BOOST_REQUIRE_EQUAL(9u, wire_claimable("alice"_n));   // credited, not pushed
+   BOOST_REQUIRE_EQUAL(success(), claimwire("alice"_n));
    BOOST_REQUIRE_EQUAL(9, wire_balance("alice"_n));
 } FC_LOG_AND_RETHROW() }
 
@@ -1467,13 +1511,126 @@ BOOST_FIXTURE_TEST_CASE(refundwire_returns_escrow, sysio_reserve_tester) { try {
       ("wire_amount",    150)
       ("revert_fee_bps", 0)));
 
+   // The refund is CREDITED, not pushed. Until alice pulls it the WIRE stays in this
+   // contract's custody, so the escrow is owed but has not moved.
+   BOOST_REQUIRE_EQUAL(150u, wire_claimable("alice"_n));
+   BOOST_REQUIRE_EQUAL(0,    wire_balance("alice"_n));
+   BOOST_REQUIRE_EQUAL(1000, wire_balance(RESERVE_ACCOUNT));
+
+   // Pulling it produces the original settlement: alice holds the escrow, custody drops by it.
+   BOOST_REQUIRE_EQUAL(success(), claimwire("alice"_n));
    BOOST_REQUIRE_EQUAL(150, wire_balance("alice"_n));
    BOOST_REQUIRE_EQUAL(850, wire_balance(RESERVE_ACCOUNT));
+   BOOST_REQUIRE(get_wireclaim("alice"_n).is_null());   // row consumed by the payout
 
    auto r = find_reserve("ETH", "ETH", "PRIMARY");
    BOOST_REQUIRE_EQUAL(1000, r["reserve_wire_amount"].as_uint64());   // untouched
 
    BOOST_REQUIRE(get_rewardbkt().is_null());   // no fee — nothing accrued
+} FC_LOG_AND_RETHROW() }
+
+// The retention deadline has to hold WITHOUT further settlement traffic. `credit_wire_claim`
+// sweeps opportunistically, so it only fires while swaps keep arriving; if traffic stops, nothing
+// revisits an aged-out row and both the system-funded table and the WIRE it reserves stay
+// outstanding forever. `sweepclaims` — inlined every epoch by `sysio.epoch::advance` — is the
+// trigger that makes the window real, and `claimwire` refuses an expired row so the deadline means
+// "claimable until" rather than "swept eventually".
+BOOST_FIXTURE_TEST_CASE(expired_wire_claim_is_swept_without_further_traffic, sysio_reserve_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(),
+      regreserve("ETH", "ETH", "PRIMARY", 1000, 1000));
+
+   BOOST_REQUIRE_EQUAL(success(), push_action(UWRIT_ACCOUNT, "refundwire"_n, mvo()
+      ("recipient",      "alice")
+      ("wire_amount",    150)
+      ("revert_fee_bps", 0)));
+   BOOST_REQUIRE_EQUAL(150u, wire_claimable("alice"_n));
+
+   const int64_t treasury_before = wire_balance(SYSIO_ACCOUNT);
+   const int64_t custody_before  = wire_balance(RESERVE_ACCOUNT);
+
+   // Age past the one-year window with NO further credits — the opportunistic sweep never runs.
+   produce_block();
+   produce_block(fc::days(366));
+   BOOST_REQUIRE_EQUAL(150u, wire_claimable("alice"_n));   // still sitting there
+
+   // The deadline is enforced at the claim, so the forfeit balance cannot be pulled.
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: claimwire: this claim expired and is pending sweep to the treasury"),
+      claimwire("alice"_n));
+
+   // A zero budget is a no-op even with an expired row waiting.
+   BOOST_REQUIRE_EQUAL(success(), sweepclaims(0));
+   BOOST_REQUIRE_EQUAL(150u, wire_claimable("alice"_n));
+
+   // The epoch-driven sweep reclaims it with no settlement traffic involved: the row is gone and
+   // its WIRE has left custody for the treasury.
+   BOOST_REQUIRE_EQUAL(success(), sweepclaims(reserve_max_claim_sweep_per_epoch));
+   BOOST_REQUIRE(get_wireclaim("alice"_n).is_null());
+   BOOST_REQUIRE_EQUAL(0u, wire_claimable("alice"_n));
+   BOOST_REQUIRE_EQUAL(treasury_before + 150, wire_balance(SYSIO_ACCOUNT));
+   BOOST_REQUIRE_EQUAL(custody_before  - 150, wire_balance(RESERVE_ACCOUNT));
+
+   // Nothing to claim afterwards — the balance is forfeit, not merely deferred.
+   BOOST_REQUIRE_EQUAL(error("assertion failure with message: no claimable WIRE for this account"),
+                       claimwire("alice"_n));
+} FC_LOG_AND_RETHROW() }
+
+// Crediting an account whose row already expired must not resurrect the forfeited balance.
+// `claimable::credit` upserts, so without settling first the old amount would be added to and its
+// stamp refreshed — making a balance `claimwire` has been refusing claimable again, and letting a
+// trickle of small credits keep a system-funded row alive forever. The new credit legitimately
+// starts a fresh window (an account being credited is not abandoned); only the old balance is
+// forfeit.
+BOOST_FIXTURE_TEST_CASE(recredit_after_expiry_does_not_revive_the_forfeited_balance,
+                        sysio_reserve_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(),
+      regreserve("ETH", "ETH", "PRIMARY", 1000, 1000));
+
+   BOOST_REQUIRE_EQUAL(success(), push_action(UWRIT_ACCOUNT, "refundwire"_n, mvo()
+      ("recipient",      "alice")
+      ("wire_amount",    150)
+      ("revert_fee_bps", 0)));
+   BOOST_REQUIRE_EQUAL(150u, wire_claimable("alice"_n));
+
+   // Age past the window WITHOUT sweeping, so the forfeited row is still sitting there.
+   produce_block();
+   produce_block(fc::days(366));
+   BOOST_REQUIRE_EQUAL(150u, wire_claimable("alice"_n));
+
+   const int64_t treasury_before = wire_balance(SYSIO_ACCOUNT);
+
+   // A later refund for the same account credits 40.
+   BOOST_REQUIRE_EQUAL(success(), push_action(UWRIT_ACCOUNT, "refundwire"_n, mvo()
+      ("recipient",      "alice")
+      ("wire_amount",    40)
+      ("revert_fee_bps", 0)));
+
+   // Only the NEW amount is claimable — the forfeited 150 went to the treasury, it did not
+   // accumulate into a 190 balance with a fresh window.
+   BOOST_REQUIRE_EQUAL(40u, wire_claimable("alice"_n));
+   BOOST_REQUIRE_EQUAL(treasury_before + 150, wire_balance(SYSIO_ACCOUNT));
+
+   // And the fresh claim is live, so the recipient is not penalised for the new payout.
+   BOOST_REQUIRE_EQUAL(success(), claimwire("alice"_n));
+   BOOST_REQUIRE_EQUAL(40, wire_balance("alice"_n));
+} FC_LOG_AND_RETHROW() }
+
+// A LIVE row is untouched by the sweep and still claims normally — the budget walks the
+// expiry-ordered index and stops at the first row whose window is open.
+BOOST_FIXTURE_TEST_CASE(sweepclaims_leaves_live_rows_alone, sysio_reserve_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(),
+      regreserve("ETH", "ETH", "PRIMARY", 1000, 1000));
+
+   BOOST_REQUIRE_EQUAL(success(), push_action(UWRIT_ACCOUNT, "refundwire"_n, mvo()
+      ("recipient",      "alice")
+      ("wire_amount",    150)
+      ("revert_fee_bps", 0)));
+
+   BOOST_REQUIRE_EQUAL(success(), sweepclaims(reserve_max_claim_sweep_per_epoch));
+   BOOST_REQUIRE_EQUAL(150u, wire_claimable("alice"_n));
+
+   BOOST_REQUIRE_EQUAL(success(), claimwire("alice"_n));
+   BOOST_REQUIRE_EQUAL(150, wire_balance("alice"_n));
 } FC_LOG_AND_RETHROW() }
 
 // A nonzero revert fee (caller-fault drain revert) is taken out of the refund and
@@ -1491,6 +1648,13 @@ BOOST_FIXTURE_TEST_CASE(refundwire_routes_revert_fee, sysio_reserve_tester) { tr
       ("wire_amount",    150)
       ("revert_fee_bps", 1000)));   // 10%
 
+   // Credited net of the fee, and the refund waits to be pulled. With the default zero
+   // emissions dial the whole fee stays in custody as rewards, so nothing leaves at all.
+   BOOST_REQUIRE_EQUAL(135u, wire_claimable("alice"_n));         // 150 - 15 fee
+   BOOST_REQUIRE_EQUAL(0,    wire_balance("alice"_n));
+   BOOST_REQUIRE_EQUAL(1000, wire_balance(RESERVE_ACCOUNT));     // nothing transferred out yet
+
+   BOOST_REQUIRE_EQUAL(success(), claimwire("alice"_n));
    BOOST_REQUIRE_EQUAL(135, wire_balance("alice"_n));            // 150 - 15 fee
    BOOST_REQUIRE_EQUAL(865, wire_balance(RESERVE_ACCOUNT));      // 1000 - 135; the fee stays in custody
 

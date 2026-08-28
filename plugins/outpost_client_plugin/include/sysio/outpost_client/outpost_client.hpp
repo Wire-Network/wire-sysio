@@ -15,9 +15,17 @@
 namespace sysio {
 
 /// Cross-chain hard cap for a serialized OPP envelope accepted from an outpost.
-/// This mirrors the Solana program's `MAX_ENVELOPE_BYTES` and the e2e-supported
-/// WIRE / Ethereum / Solana envelope boundary.
-inline constexpr size_t OPP_MAX_ENVELOPE_BYTES = 65'536;
+/// This mirrors the Solana program's `MAX_ENVELOPE_BYTES`, the Ethereum
+/// `OPPCommon.MAX_ENVELOPE_BYTES`, and the depot's `sysio.msgch` packing cap —
+/// the e2e-supported WIRE / Ethereum / Solana envelope boundary.
+///
+/// MIRROR DUTY — never let one side differ. Reduced 65'536 -> 32'768: a cold
+/// near-64-KiB `emitOutboundEnvelope` on Ethereum costs ~45 M gas, roughly 2.7x
+/// EIP-7825's 16'777'216 per-transaction cap, so an envelope that large is
+/// undeliverable by construction. Every derived guard in the clients (hex
+/// bounds, JSON-RPC response ceilings, Solana chunk counts) follows from this
+/// single declaration.
+inline constexpr size_t OPP_MAX_ENVELOPE_BYTES = 32'768;
 
 /**
  * @brief Chain-agnostic facade for OPP delivery on a single external outpost.

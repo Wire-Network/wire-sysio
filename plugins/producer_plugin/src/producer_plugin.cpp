@@ -15,6 +15,7 @@
 #include <sysio/resource_monitor_plugin/resource_monitor_plugin.hpp>
 
 #include <fc/io/json.hpp>
+#include <fc/system_timer.hpp>
 #include <fc/log/logger_config.hpp>
 #include <fc/scoped_exit.hpp>
 #include <fc/time.hpp>
@@ -791,7 +792,9 @@ public:
    bool                                  _pause_production   = false;
 
    sysio::chain::named_thread_pool<struct prod>      _timer_thread;
-   boost::asio::system_timer                         _timer{_timer_thread.get_executor()};
+   // Runs on the real clock in production; a test engages fc's mock clock via
+   // fc::mock_time_traits::set_now() and drives production timing deterministically.
+   fc::system_timer                                  _timer{_timer_thread.get_executor()};
 
    using signature_provider_type = fc::crypto::sign_fn;
    std::map<chain::public_key_type, fc::crypto::signature_provider_ptr> _signature_providers;
@@ -829,8 +832,8 @@ public:
    fc::time_point                                    _pending_block_deadline;
    uint32_t                                          _max_block_cpu_usage_threshold_us            = 0;
    uint32_t                                          _max_block_net_usage_threshold_bytes         = 0;
-   bool                                              _disable_subjective_p2p_billing              = true;
-   bool                                              _disable_subjective_api_billing              = true;
+   bool                                              _disable_subjective_p2p_billing              = false;
+   bool                                              _disable_subjective_api_billing              = false;
    fc::time_point                                    _irreversible_block_time;
 
    std::vector<chain::digest_type> _protocol_features_to_activate;
@@ -1462,11 +1465,13 @@ void producer_plugin::set_program_options(
           "Maximum size (in MiB) of the incoming transaction queue. Exceeding this value will subjectively drop transaction with resource exhaustion.")
          ("disable-subjective-account-billing", boost::program_options::value<vector<string>>()->composing()->multitoken(),
           "Account which is excluded from subjective CPU billing")
-         ("disable-subjective-payer-billing", bpo::value<bool>()->default_value(false),
-          "Disable subjective CPU billing for all contract payer accounts")
-         ("disable-subjective-p2p-billing", bpo::value<bool>()->default_value(true),
+         ("disable-subjective-payer-billing", bpo::value<bool>()->default_value(true),
+          "Disable subjective CPU billing for all contract payer accounts. On by default: under "
+          "contract-pays the payer is the called contract, so billing it for its callers' failures "
+          "charges the party provisioned to absorb traffic rather than the account causing it")
+         ("disable-subjective-p2p-billing", bpo::value<bool>()->default_value(false),
           "Disable subjective CPU billing for P2P transactions")
-         ("disable-subjective-api-billing", bpo::value<bool>()->default_value(true),
+         ("disable-subjective-api-billing", bpo::value<bool>()->default_value(false),
           "Disable subjective CPU billing for API transactions")
          ("snapshots-dir", bpo::value<std::filesystem::path>()->default_value("snapshots"),
           "the location of the snapshots directory (absolute path or relative to application data dir)")
@@ -2892,7 +2897,10 @@ producer_plugin_impl::handle_push_result(const transaction_metadata_ptr&        
             // this failed our configured maximum transaction time, we don't want to replay it
             fc_tlog(_log, "Failed {} trx, auth: {}, prev billed: {}us, ran: {}us, id: {}, except: {}",
                     e.code(), auths, trace->total_cpu_usage_us, fc::time_point::now() - start, trx->id(), e.to_string());
-            if (!disable_subjective_enforcement)
+            // Only blame authorizers the chain has verified. Before that the list is
+            // attacker-chosen: naming a victim on an unsignable trx throttles the victim, not the
+            // spammer, who just names a different existing account each time.
+            if (!disable_subjective_enforcement && trx->auth_verified)
                _account_fails.add(auths, e);
          }
          if (next) {
@@ -3085,7 +3093,7 @@ void producer_plugin_impl::schedule_maybe_produce_block(bool exhausted) {
    if (!exhausted && deadline > fc::time_point::now()) {
       // ship this block off no later than its deadline
       SYS_ASSERT(chain.is_building_block(), missing_pending_block_state, "producing without pending_block_state, start_block succeeded");
-      _timer.expires_at(deadline.to_system_clock());
+      _timer.expires_at(fc::system_clock::from_time_point(deadline));
       fc_dlog(_log, "Scheduling Block Production on Normal Block #{} for {}",
               chain.head().block_num() + 1, deadline);
    } else {
@@ -3120,7 +3128,7 @@ void producer_plugin_impl::schedule_delayed_production_loop(const std::weak_ptr<
                                                             std::optional<fc::time_point>              wake_up_time) {
    if (wake_up_time) {
       fc_dlog(_log, "Scheduling Speculative/Production Change at {}", *wake_up_time);
-      _timer.expires_at(wake_up_time->to_system_clock());
+      _timer.expires_at(fc::system_clock::from_time_point(*wake_up_time));
       _timer.async_wait([this, cid = ++_timer_corelation_id](const boost::system::error_code& ec) {
          if (ec != boost::asio::error::operation_aborted && cid == _timer_corelation_id) {
             interrupt_transaction(controller::interrupt_t::all_trx);

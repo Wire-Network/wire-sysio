@@ -115,8 +115,11 @@ struct opp_solana_outpost_client : fc::network::solana::solana_program_client {
    /// DEPOSIT_REVERT by the program's signed system_program::transfer
    /// CPI. Pre-derived from seed `outpost_vault`.
    fc::network::solana::solana_public_key vault_pda;
-   /// Outpost Reserve PDA — receives slashed-collateral routing and
-   /// DEPOSIT_REVERT penalties. Pre-derived from seed `outpost_reserve`.
+   /// Outpost `reserve_aggregate` PDA — receives slashed-collateral routing
+   /// and DEPOSIT_REVERT penalties, and owns the destination ATA of an SPL
+   /// SLASH seizure. Pre-derived from seed `reserve_aggregate` (see the
+   /// derivation below for the `outpost_reserve` mis-seed incident this
+   /// spelling replaced).
    fc::network::solana::solana_public_key reserve_pda;
 
    /// `initialize(consensus_threshold: u32) -> signature`.
@@ -240,25 +243,19 @@ struct opp_solana_outpost_client : fc::network::solana::solana_program_client {
                   epoch_seed,
                   std::vector<uint8_t>(signer_pk.begin(), signer_pk.end())},
                  program_id);
-           // The Solana program's `epoch_in` finalize path now fires the
-           // outbound emit inline at consensus reach (see
-           // `epoch_in.rs::finalize_envelope`), so the IDL's account list
-           // grew to carry the outbound-emit accounts. The relay injects
-           // pre-derived PDAs for all of them; the operator never sends a
-           // separate `emit_outbound_envelope` tx.
+           // `epoch_in` only stages/finalizes inbound chunks and, on
+           // consensus reach, processes the enclosed attestations inline —
+           // it no longer fires an outbound emit itself (that moved to the
+           // `dispatch_attestations` crank below, which drains the epoch's
+           // attestation cursor and carries the outbound-emit accounts).
+           // The IDL's `epoch_in` account list is just the 7 delivery/
+           // staging/consensus accounts below; no outbound PDAs needed here.
            account_overrides_t overrides = {
               {"config",                    config_pda},
               {"operator_registry",         operator_registry_pda},
               {"epoch_deliveries",          epoch_deliveries_pda},
               {"chunk_buffer",              chunk_buffer_pda},
               {"inbound_envelopes",         inbound_envelopes_pda},
-              {"outbound_message_buffer",   outbound_message_buffer_pda},
-              {"outbound_envelopes",        outbound_envelopes_pda},
-              {"latest_outbound_envelope",  latest_outbound_envelope_pda},
-              {"vault",                     vault_pda},
-              // v6 IDL field is `reserve_aggregate` (matches the Anchor
-              // `#[derive(Accounts)]` field name in epoch_in.rs / Initialize).
-              {"reserve_aggregate",         reserve_pda},
            };
            auto& instr = get_idl("epoch_in");
            program_invoke_data_items params = {
@@ -291,7 +288,7 @@ struct opp_solana_outpost_client : fc::network::solana::solana_program_client {
            // Deliberately NOT injecting `set_compute_unit_limit` — the
            // OOM tx consumed 116 K of 200 K CU, so CU is not the
            // bottleneck for the production 2.5 KB envelope. Add a CU
-           // bump only when 64 KB envelopes land live.
+           // bump only when cap-sized (32 KiB) envelopes land live.
            std::vector<fc::network::solana::instruction> pre_ixs;
            if (chunk_index == total_chunks) {
               pre_ixs.push_back(
@@ -386,6 +383,10 @@ public:
    virtual void plugin_shutdown();
 
    std::vector<solana_client_entry_ptr> get_clients();
+   /// Return the configured client registered under `id`, or nullptr when there
+   /// is none. For an outpost the id is the chain's `sysio.chains` code, so a
+   /// null result means that chain has no endpoint configured on this node and
+   /// the caller must fail closed rather than fall back to another client.
    solana_client_entry_ptr get_client(const std::string& id);
    const std::vector<std::pair<std::filesystem::path, std::vector<fc::network::solana::idl::program>>>& get_idl_files();
 

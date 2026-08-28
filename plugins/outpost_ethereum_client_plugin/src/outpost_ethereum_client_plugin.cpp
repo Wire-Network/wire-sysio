@@ -26,7 +26,7 @@ constexpr auto option_abi_file = "ethereum-abi-file";
 constexpr auto chain_id_resolution_timeout = fc::seconds(5);
 constexpr auto chain_id_resolution_initial_backoff = fc::milliseconds(200);
 constexpr auto chain_id_resolution_max_backoff = fc::seconds(1);
-constexpr std::string_view legacy_transaction_policy_client_id = "legacy-client";
+constexpr std::string_view cli_transaction_policy_client_id = "cli-client";
 constexpr auto unavailable_policy_limit = "n/a";
 constexpr std::string_view chain_id_resolution_operation = "ethereum-client:eth_chainId";
 constexpr std::string_view outbound_http_failure_prefix = "Outbound HTTP ";
@@ -73,7 +73,7 @@ enum class rpc_chain_id_validation {
 };
 
 /** Parse a positive decimal or Ethereum hex quantity without fixed-width wraparound. */
-std::optional<uint32_t> parse_legacy_chain_id(std::string_view text) {
+std::optional<uint32_t> parse_cli_chain_id(std::string_view text) {
    if (text.empty()) return std::nullopt;
 
    uint32_t base = 10;
@@ -118,12 +118,12 @@ ethereum_transaction_policy maximum_policy(std::string client_id, uint32_t chain
    };
 }
 
-/** Preserve legacy client names while keeping the new structured policy log label safe. */
+/** Preserve CLI client names while keeping the structured policy log label safe. */
 std::string transaction_policy_client_label(std::string_view client_id) {
    if (fc::network::ethereum::is_safe_transaction_policy_identifier(client_id)) {
       return std::string(client_id);
    }
-   return std::string(legacy_transaction_policy_client_id);
+   return std::string(cli_transaction_policy_client_id);
 }
 
 /** Convert a validated protobuf client policy to the runtime transaction-policy model. */
@@ -343,8 +343,8 @@ client_map load_file_clients(
    return clients;
 }
 
-/** Load legacy command-line client specifications with maximum compatibility policies. */
-client_map load_legacy_clients(
+/** Load command-line client specifications with maximum compatibility policies. */
+client_map load_cli_clients(
    const std::vector<std::string>& client_specs,
    signature_provider_manager_plugin& signature_provider_manager,
    const fc::network::json_rpc::client_options& rpc_options) {
@@ -376,7 +376,7 @@ client_map load_legacy_clients(
 
       uint32_t chain_id = 0;
       if (parts.size() == 4) {
-         const auto parsed = parse_legacy_chain_id(parts[3]);
+         const auto parsed = parse_cli_chain_id(parts[3]);
          SYS_ASSERT(parsed,
                     chain::plugin_config_exception,
                     "Invalid {} spec for client '{}': chain id must be a positive 32-bit decimal or hex integer",
@@ -435,18 +435,10 @@ public:
       return std::views::values(_clients) | std::ranges::to<std::vector>();
    }
 
-   /** Return the published client identified by @p id. */
-   ethereum_client_entry_ptr get_client(const std::string& id) { return _clients.at(id); }
-
-   /** Return the unique client for @p chain_id, or null when the id is ambiguous. */
-   ethereum_client_entry_ptr get_client_by_chain_id(uint32_t chain_id) {
-      ethereum_client_entry_ptr match;
-      for (const auto& entry : std::views::values(_clients)) {
-         if (entry->chain_id != chain_id) continue;
-         if (match) return nullptr;
-         match = entry;
-      }
-      return match;
+   /** Return the published client identified by @p id, or null when there is none. */
+   ethereum_client_entry_ptr get_client(const std::string& id) {
+      auto it = _clients.find(id);
+      return it == _clients.end() ? nullptr : it->second;
    }
 
    /** Return all loaded ABI files and their parsed contracts. */
@@ -459,8 +451,8 @@ void outpost_ethereum_client_plugin::plugin_initialize(const variables_map& opti
    }
 
    const bool has_file = options.contains(option_name_client_config_file);
-   const bool has_legacy = options.contains(option_name_client);
-   SYS_ASSERT(has_file != has_legacy,
+   const bool has_cli = options.contains(option_name_client);
+   SYS_ASSERT(has_file != has_cli,
               chain::plugin_config_exception,
               "Configure exactly one of --{} or --{}",
               option_name_client_config_file,
@@ -476,7 +468,7 @@ void outpost_ethereum_client_plugin::plugin_initialize(const variables_map& opti
             signature_provider_manager,
             rpc_options));
       } else {
-         my->set_clients(load_legacy_clients(
+         my->set_clients(load_cli_clients(
             options.at(option_name_client).as<std::vector<std::string>>(),
             signature_provider_manager,
             rpc_options));
@@ -512,9 +504,11 @@ void outpost_ethereum_client_plugin::set_program_options(options_description& cl
    cfg.add_options()
       (option_name_client,
        boost::program_options::value<std::vector<std::string>>()->multitoken(),
-       "Legacy outpost Ethereum client spec: "
+       "CLI outpost Ethereum client spec: "
        "<client-id>,<signature-provider-id>,<rpc-url>[,<chain-id>]. A three-field spec resolves "
-       "eth_chainId during startup; a four-field chain id controls signing and is verified against the endpoint.")
+       "eth_chainId during startup; a four-field chain id controls signing and is verified against the endpoint. "
+       "For a client serving an OPP outpost the client-id MUST be that chain's sysio.chains code "
+       "(e.g. ETHEREUM): the operator daemons look their RPC client up under the chain code.")
       (option_name_client_config_file,
        boost::program_options::value<std::filesystem::path>(),
        "Versioned protobuf-JSON outpost Ethereum client configuration file. Cannot be combined "
@@ -535,10 +529,6 @@ std::vector<ethereum_client_entry_ptr> outpost_ethereum_client_plugin::get_clien
 
 ethereum_client_entry_ptr outpost_ethereum_client_plugin::get_client(const std::string& id) {
    return my->get_client(id);
-}
-
-ethereum_client_entry_ptr outpost_ethereum_client_plugin::get_client_by_chain_id(uint32_t chain_id) {
-   return my->get_client_by_chain_id(chain_id);
 }
 
 const std::vector<std::pair<std::filesystem::path,

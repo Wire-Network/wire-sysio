@@ -46,7 +46,7 @@ constexpr std::string_view test_chain_id_quantity = "0x7a69";
 constexpr std::string_view ethereum_mainnet_chain_id_quantity = "0x1";
 using tcp = boost::asio::ip::tcp;
 
-/** One-shot JSON-RPC endpoint used to preserve coverage of the legacy three-field client form. */
+/** One-shot JSON-RPC endpoint used to preserve coverage of the historical three-field CLI client form. */
 class chain_id_rpc_server {
 public:
    /** Start a loopback server that returns the supplied chain id once. */
@@ -132,6 +132,30 @@ ethabi::contract bytes_argument_function(std::string name) {
       .name = std::move(name),
       .type = ethabi::invoke_target_type::function,
       .inputs = {ethabi::component_type{"data", ethabi::data_type::bytes}},
+      .outputs = {},
+   };
+}
+
+/** Build the chunked `epochIn` function ABI. */
+ethabi::contract chunked_epoch_in_function(std::string name) {
+   return ethabi::contract{
+      .name = std::move(name),
+      .type = ethabi::invoke_target_type::function,
+      .inputs = {ethabi::component_type{"epochIndex", ethabi::data_type::uint32},
+                 ethabi::component_type{"chunkIndex", ethabi::data_type::uint16},
+                 ethabi::component_type{"totalChunks", ethabi::data_type::uint16},
+                 ethabi::component_type{"totalBytes", ethabi::data_type::uint32},
+                 ethabi::component_type{"chunkData", ethabi::data_type::bytes}},
+      .outputs = {},
+   };
+}
+
+/** Build a function ABI with one address argument. */
+ethabi::contract address_argument_function(std::string name) {
+   return ethabi::contract{
+      .name = std::move(name),
+      .type = ethabi::invoke_target_type::function,
+      .inputs = {ethabi::component_type{"operator_", ethabi::data_type::address}},
       .outputs = {},
    };
 }
@@ -457,10 +481,20 @@ BOOST_AUTO_TEST_CASE(all_typed_write_wrappers_share_the_policy_enforced_path) {
    sysio::opp_inbound_contract_client inbound{
       client,
       std::string(contract_address),
-      {bytes_argument_function("epochIn"), no_argument_function("nextEpochIndex")},
+      {chunked_epoch_in_function("epochIn"), no_argument_function("nextEpochIndex"),
+       no_argument_function("discardEnvelopeChunks"),
+       address_argument_function("envelopeChunkState")},
    };
-   std::string envelope = "01";
-   expect_policy_rejection([&] { inbound.epoch_in(envelope); });
+   // Both OPPInbound write wrappers — the per-chunk delivery and the staged
+   // recovery — must be rejected by the policy before signing.
+   uint32_t    epoch_index = 1;
+   uint16_t    chunk_index = 0;
+   uint16_t    total_chunks = 1;
+   uint32_t    total_bytes = 1;
+   std::string chunk = "01";
+   expect_policy_rejection(
+      [&] { inbound.epoch_in(epoch_index, chunk_index, total_chunks, total_bytes, chunk); });
+   expect_policy_rejection([&] { inbound.discard_envelope_chunks(); });
 
    sysio::operator_registry_contract_client registry{
       client,
@@ -614,7 +648,7 @@ BOOST_AUTO_TEST_CASE(file_configuration_does_not_publish_a_partial_client_map) {
    BOOST_CHECK_EQUAL(initialize_rejected_file_and_observe_published_clients(path), 0u);
 }
 
-BOOST_AUTO_TEST_CASE(legacy_client_option_uses_default_policy_with_explicit_chain_id) {
+BOOST_AUTO_TEST_CASE(cli_client_option_uses_default_policy_with_explicit_chain_id) {
    chain_id_rpc_server rpc_server;
    const auto clients = initialize_outpost_plugin(
       {"--outpost-ethereum-client", "client-a,signer-a," + rpc_server.url() + ",31337"});
@@ -624,17 +658,17 @@ BOOST_AUTO_TEST_CASE(legacy_client_option_uses_default_policy_with_explicit_chai
    BOOST_CHECK_EQUAL(clients.front()->client->transaction_policy().max_fee_per_gas, maximum);
 }
 
-BOOST_AUTO_TEST_CASE(legacy_client_option_preserves_nonempty_identifier_compatibility) {
+BOOST_AUTO_TEST_CASE(cli_client_option_preserves_nonempty_identifier_compatibility) {
    chain_id_rpc_server rpc_server;
    const auto clients = initialize_outpost_plugin(
-      {"--outpost-ethereum-client", "legacy/client,prod/signing," + rpc_server.url() + ",31337"},
+      {"--outpost-ethereum-client", "cli/client,prod/signing," + rpc_server.url() + ",31337"},
       "prod/signing");
    BOOST_REQUIRE_EQUAL(clients.size(), 1u);
-   BOOST_CHECK_EQUAL(clients.front()->id, "legacy/client");
-   BOOST_CHECK_EQUAL(clients.front()->client->transaction_policy().client_id, "legacy-client");
+   BOOST_CHECK_EQUAL(clients.front()->id, "cli/client");
+   BOOST_CHECK_EQUAL(clients.front()->client->transaction_policy().client_id, "cli-client");
 }
 
-BOOST_AUTO_TEST_CASE(legacy_three_field_client_resolves_chain_id_from_rpc) {
+BOOST_AUTO_TEST_CASE(cli_three_field_client_resolves_chain_id_from_rpc) {
    chain_id_rpc_server rpc_server;
    const auto clients = initialize_outpost_plugin(
       {"--outpost-ethereum-client", "client-a,signer-a," + rpc_server.url()});
@@ -643,7 +677,7 @@ BOOST_AUTO_TEST_CASE(legacy_three_field_client_resolves_chain_id_from_rpc) {
    BOOST_CHECK_EQUAL(clients.front()->client->get_chain_id(), 31337);
 }
 
-BOOST_AUTO_TEST_CASE(plugin_startup_rejects_mixed_unified_and_legacy_modes) {
+BOOST_AUTO_TEST_CASE(plugin_startup_rejects_mixed_unified_and_cli_modes) {
    fc::temp_directory directory;
    const auto path = write_client_configuration_file(
       directory, R"json({"schema_version":1,"clients":[]})json");

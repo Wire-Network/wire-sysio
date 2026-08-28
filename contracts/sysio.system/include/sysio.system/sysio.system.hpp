@@ -222,7 +222,27 @@ namespace sysiosystem {
 
    using fin_key_id_gen_global = sysio::kv::global< "finkeyidgen"_n, fin_key_id_generator_info >;
 
-   using global_state_singleton = sysio::kv::global< "global"_n, sysio_global_state >;
+   /**
+    * What the `global` singleton reads as on a chain where the row has never been written.
+    *
+    * A free function rather than a member because global_state_singleton names it as a template
+    * argument, and that alias has to exist before system_contract is declared.
+    */
+   sysio_global_state default_global_state();
+
+   // cached_global, not global: onblock reads this three times and mutates it twice, then calls
+   // update_ranked_producers which mutates it twice more, so caching collapses one action's worth
+   // of traffic into a single kv_get and a single kv_set. A plain global forced an unconditional
+   // write from ~system_contract(), which made EVERY action -- including the read-only view
+   // actions -- fail inside a read-only transaction with "cannot store a KV record when executing
+   // a readonly transaction".
+   //
+   // The defaults ride on the type. That is what lets the handle be a plain member with nothing to
+   // initialize in the constructor body: only five functions touch this singleton at all, and every
+   // other action now neither reads the row nor computes the defaults. An action that only reads it
+   // still owes no write.
+   using global_state_singleton =
+      sysio::kv::cached_global< "global"_n, sysio_global_state, &default_global_state >;
 
    /**
     * The `sysio.system` smart contract is provided by `Wire.Network` as a sample system contract, and it defines the
@@ -245,7 +265,6 @@ namespace sysiosystem {
          std::optional<std::vector<finalizer_auth_info>> _last_prop_finalizers_cached;
          fin_key_id_gen_global    _fin_key_id_generator;
          global_state_singleton   _global;
-         sysio_global_state       _gstate;
 
       public:
          static constexpr sysio::name active_permission{"active"_n};
@@ -253,7 +272,6 @@ namespace sysiosystem {
          static constexpr sysio::name null_account{"sysio.null"_n};
 
          system_contract( name s, name code, datastream<const char*> ds );
-         ~system_contract();
 
          // Actions:
          /**
@@ -560,6 +578,30 @@ namespace sysiosystem {
          void claimnodedis(const sysio::name& account_name);
 
          /**
+          * Claim epoch pay credited by payepoch — a producer, standby or batch-operator share.
+          * Drains the caller's `payclaims` row and transfers the whole balance out.
+          *
+          * payepoch credits rather than transfers because it runs inline from
+          * sysio.epoch::advance: `sysio.token::transfer` notifies the recipient, and a recipient
+          * whose notify handler aborts (or burns CPU) would abort advance and stall epoch
+          * advancement chain-wide. Moving the transfer here puts it under the claimant's own
+          * authority, so a hostile recipient can only block its own payout.
+          *
+          * The T5 category buckets (`sysio.ops` capex, `sysio.gov` governance) are NOT credited
+          * here — payepoch transfers to them directly. A claim needs `require_auth(account_name)`
+          * and neither can ever produce it: `sysio.roa` forces `net_weight`/`cpu_weight` to zero
+          * for every `sysio`-prefixed account, so they cannot pay for a transaction, and unlike
+          * `sysio.dclaim` they carry no contract that could emit the claim inline. They are
+          * protocol-owned holding accounts with no code, so the notify-handler threat the pull
+          * model defends against does not exist for them. See the note at the push site in
+          * emissions.cpp for the standing constraint that keeps it that way.
+          *
+          * Auth: the claiming account.
+          */
+         [[sysio::action]]
+         void claimpay(const sysio::name& account_name);
+
+         /**
           * Read-only: view claimable Node Owner distributions.
           */
          [[sysio::action, sysio::read_only]]
@@ -676,7 +718,6 @@ namespace sysiosystem {
          // Implementation details:
 
          //defined in sysio.system.cpp
-         static sysio_global_state get_default_parameters();
 
          // defined in voting.cpp
          void register_producer( const name& producer, const sysio::block_signing_authority& producer_authority, const std::string& url, uint16_t location );

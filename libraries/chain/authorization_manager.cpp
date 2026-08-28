@@ -613,19 +613,77 @@ namespace sysio { namespace chain {
                                         _noop_checktime
                                       );
 
+      // Context-free actions are not walked, matching consensus: controller passes only
+      // `trn.actions` to check_authorization, so CFAs are never authorization-checked there either.
+      // Their only screen is validate_referenced_accounts, which permits a CFA to carry EITHER no
+      // authorization at all (the ordinary case -- a CFA has no access to authorization state) OR
+      // exactly one, and that one only a `sysio.payer` marker whose actor is already a declared
+      // payer in trx.actions.
+      //
+      // That allowance exists for billing, not authorization: transaction_context::init bills every
+      // action -- context-free included -- to act.payer(), which falls through to the contract when
+      // no marker is present. Without it a self-paying account's CFAs would still bill the contract,
+      // splitting one transaction across two payers. The pairing requirement is what keeps it safe:
+      // a CFA carries no signatures and no real permission, so a marker standing alone would name a
+      // payer with nothing authorizing it. Requiring the actor to already be a payer in trx.actions
+      // means the CFA inherits an authorization proven over there (index 0, paired real permission,
+      // satisfying signatures) rather than creating one.
+      //
+      // For discovery that means a CFA has no key to contribute: the marker is keyless, and the key
+      // backing that payer sits on the paired real permission in trx.actions, which is walked below.
       for (const auto& act : trx.actions ) {
-         for (const auto& declared_auth : act.authorization) {
-            if (declared_auth.permission == config::sysio_payer_name) {
-               auto active_auth = permission_level{declared_auth.actor, sysio::chain::config::active_name};
-               SYS_ASSERT( checker.satisfied(active_auth), unsatisfied_authorization,
-                           "transaction declares payer authority '{}', but does not have signatures for it.",
-                           active_auth );
+         // `sysio.payer` is a virtual marker, not a permission: no `permission_object` exists for
+         // it and it carries no keys of its own. The key that authorizes a payer is the one on the
+         // REAL permission the same actor must also declare on that action, which is reached on its
+         // own iteration below.
+         //
+         // Checking `<payer>@active` instead, as this once did, diverges from consensus the moment
+         // the paired permission is not `active`: a transaction the chain accepts under `owner` or a
+         // linked custom permission was rejected here, so the signing tools that discover keys
+         // through /v1/chain/get_required_keys could not sign it. It was masked whenever owner and
+         // active shared a key.
+         //
+         // Skipping the marker outright, however, would let discovery succeed for pairings consensus
+         // rejects -- `{alice, sysio.payer}, {bob, active}` would return bob's key for a transaction
+         // no signature set can authorize, and a payer-only action would return an empty set that
+         // reads as "nothing to sign". So the structural rules that give the marker meaning are
+         // re-checked here, mirroring check_authorization's: position 0, at most one, and paired
+         // with a real permission from the same actor ON THE SAME ACTION. They are deliberately
+         // duplicated rather than shared with the consensus validators -- this function is not on
+         // the apply path, and refactoring the consensus copies to serve it would put a
+         // non-consensus caller in a position to change consensus behaviour.
+         // Marker presence is tracked separately from the actor rather than using an empty
+         // account_name as the sentinel. An empty actor is valid JSON and decodes to
+         // account_name{}, so a `{"": sysio.payer}` entry would leave the sentinel looking unset
+         // and skip the pairing check below. Consensus is not exposed to that -- it rejects the
+         // empty actor earlier, in validate_referenced_accounts ("action's paying actor '' does
+         // not exist") -- but this function never runs that pass.
+         bool         has_payer = false;
+         account_name payer;
+         for (size_t i = 0; i < act.authorization.size(); ++i) {
+            const auto& declared_auth = act.authorization[i];
 
-            } else {
-               SYS_ASSERT( checker.satisfied(declared_auth), unsatisfied_authorization,
-                           "transaction declares authority '{}', but does not have signatures for it.",
-                           declared_auth );
+            if (declared_auth.permission == config::sysio_payer_name) {
+               SYS_ASSERT( !has_payer, irrelevant_auth_exception,
+                           "Multiple payers specified for action" );
+               SYS_ASSERT( i == 0, irrelevant_auth_exception,
+                           "Explicit payer must be the first declared authorization" );
+               has_payer = true;
+               payer     = declared_auth.actor;
+               continue;
             }
+
+            SYS_ASSERT( checker.satisfied(declared_auth), unsatisfied_authorization,
+                        "transaction declares authority '{}', but does not have signatures for it.",
+                        declared_auth );
+         }
+
+         if (has_payer) {
+            const bool paired = std::ranges::any_of(act.authorization, [&](const auto& auth) {
+               return auth.actor == payer && auth.permission != config::sysio_payer_name;
+            });
+            SYS_ASSERT( paired, unsatisfied_authorization,
+                        "Payer authorization for {} not paired with matching auth", payer );
          }
       }
 

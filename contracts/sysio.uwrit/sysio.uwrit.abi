@@ -6,7 +6,12 @@
         {
             "name": "chklocks",
             "base": "",
-            "fields": []
+            "fields": [
+                {
+                    "name": "max_rows",
+                    "type": "uint32"
+                }
+            ]
         },
         {
             "name": "commit_entry",
@@ -78,6 +83,20 @@
             "fields": []
         },
         {
+            "name": "freelocks",
+            "base": "",
+            "fields": [
+                {
+                    "name": "uwreq_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "underwriter",
+                    "type": "name"
+                }
+            ]
+        },
+        {
             "name": "fromwire_q",
             "base": "",
             "fields": [
@@ -138,6 +157,24 @@
             ]
         },
         {
+            "name": "holdlocks",
+            "base": "",
+            "fields": [
+                {
+                    "name": "uwreq_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "underwriter",
+                    "type": "name"
+                },
+                {
+                    "name": "chal_id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "id_key",
             "base": "",
             "fields": [
@@ -186,6 +223,10 @@
                 {
                     "name": "expires_at_ms",
                     "type": "uint64"
+                },
+                {
+                    "name": "challenge_id",
+                    "type": "uint64"
                 }
             ]
         },
@@ -196,6 +237,46 @@
                 {
                     "name": "lock_id",
                     "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "lock_sum",
+            "base": "",
+            "fields": [
+                {
+                    "name": "underwriter",
+                    "type": "name"
+                },
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "amount",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "lock_sum_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "underwriter",
+                    "type": "name"
+                },
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
                 }
             ]
         },
@@ -344,6 +425,20 @@
             ]
         },
         {
+            "name": "sweeplocks",
+            "base": "",
+            "fields": [
+                {
+                    "name": "uwreq_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "underwriter",
+                    "type": "name"
+                }
+            ]
+        },
+        {
             "name": "uw_config",
             "base": "",
             "fields": [
@@ -478,6 +573,10 @@
                 {
                     "name": "attestation_outbound_data",
                     "type": "bytes"
+                },
+                {
+                    "name": "challenge_id",
+                    "type": "uint64"
                 }
             ]
         }
@@ -496,6 +595,16 @@
         {
             "name": "drainfwq",
             "type": "drainfwq",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "freelocks",
+            "type": "freelocks",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "holdlocks",
+            "type": "holdlocks",
             "ricardian_contract": ""
         },
         {
@@ -521,6 +630,11 @@
         {
             "name": "swapfromwire",
             "type": "swapfromwire",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "sweeplocks",
+            "type": "sweeplocks",
             "ricardian_contract": ""
         }
     ],
@@ -564,6 +678,14 @@
                     "table_id": 53377
                 }
             ]
+        },
+        {
+            "name": "locksums",
+            "type": "lock_sum",
+            "index_type": "i64",
+            "key_names": ["underwriter","chain_code","token_code"],
+            "key_types": ["name","slug_name","slug_name"],
+            "table_id": 57617
         },
         {
             "name": "uwconfig",
