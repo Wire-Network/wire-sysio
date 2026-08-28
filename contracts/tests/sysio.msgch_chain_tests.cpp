@@ -423,7 +423,8 @@ public:
             ("code",              codename_mvo(code))
             ("external_chain_id", chain_id)
             ("name",              std::string("outpost-test"))
-            ("description",       std::string{})));
+            ("description",       std::string{})
+            ("outpost", sysio_system::test_support::no_outpost_mvo())));
    }
 
    uint32_t advance_one_epoch() {

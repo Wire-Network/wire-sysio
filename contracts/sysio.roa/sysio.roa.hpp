@@ -413,15 +413,17 @@ namespace sysio {
                 name nonce;
                 name username;
 
-                uint64_t by_username() const { return username.value; }
-
                 SYSLIB_SERIALIZE(sponsor, (nonce)(username))
             };
 
-            using sponsors_t = kv::scoped_table<
-                "sponsors"_n, sponsor_key, sponsor,
-                kv::index<"byusername"_n, const_mem_fun<sponsor, uint64_t, &sponsor::by_username>>
-            >;
+            // No secondary index on `username`. A reverse lookup is unnecessary: newuser mints
+            // "<creator>.<generated>" from a dot-free charmap, so name::prefix() recovers the
+            // creator from the username by string arithmetic alone -- cheaper than any index read.
+            // The only lookup the contract performs is the point read of the (creator, nonce)
+            // replay guard, which the primary key already serves. Dropping the index halves the
+            // sponsoring owner's RAM cost per user (~296 -> ~152 bytes), which matters because
+            // these are the only rows in the contract billed to a node owner.
+            using sponsors_t = kv::scoped_table<"sponsors"_n, sponsor_key, sponsor>;
 
             /**
              * @brief Table tracking how many new users a node owner has sponsored.
@@ -443,7 +445,20 @@ namespace sysio {
             // ---- Private Functions ----
 
             /**
-             * @brief Registers 'owner' as a Node Owner scoped by network_gen, granting SYS allotment based on Tier and creates a default policy for owner.
+             * @brief Registers 'owner' as a Node Owner scoped by network_gen, granting the tier's SYS
+             *        allotment and contributing 10% of it to the network RAM pool.
+             *
+             * Every tier gets a `nodeowners` row (the budget and the membership that gates policy
+             * issuance), a reslimit row, and a policy granting 10% of the tier allocation to `sysio`
+             * for the account-creation RAM pool.
+             *
+             * Only tier 1 additionally gets a personal self-issued policy. It is the only tier that can
+             * call `newuser`, whose `sponsors` / `sponsorcount` rows are the sole writes in this
+             * contract billed to a node owner instead of to `sysio.roa`. Tiers 2 and 3 need no
+             * allocation of their own: a policy action that does not name an explicit `sysio.payer`
+             * resolves `action::payer()` to `sysio.roa` and bills its rows to `sysio.roa`, so it draws
+             * nothing from the issuer. They can self-issue on demand with `addpolicy` against the
+             * recorded tier budget.
              *
              * NOTE: Can only register for the current generation of the network.
              *

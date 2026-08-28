@@ -214,7 +214,8 @@ public:
 
       BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
          ("kind", ChainKind::CHAIN_KIND_EVM)("code", codename_mvo("ETH"))
-         ("external_chain_id", 31337)("name", std::string("ethereum-test"))("description", std::string{})));
+         ("external_chain_id", 31337)("name", std::string("ethereum-test"))("description", std::string{})
+         ("outpost", sysio_system::test_support::no_outpost_mvo())));
 
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "schbatchgps"_n, mvo()));
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "advance"_n, mvo()));
@@ -903,7 +904,8 @@ BOOST_FIXTURE_TEST_CASE(chkdispute_unpauses_only_after_last_open_dispute, sysio_
    // exist concurrently with the ETH one.
    BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
       ("kind", ChainKind::CHAIN_KIND_EVM)("code", codename_mvo("BASE"))
-      ("external_chain_id", 8453)("name", std::string("base-test"))("description", std::string{})));
+      ("external_chain_id", 8453)("name", std::string("base-test"))("description", std::string{})
+      ("outpost", sysio_system::test_support::no_outpost_mvo())));
    const uint64_t base_code = fc::slug_name{"BASE"}.value;
 
    const uint32_t epoch = current_epoch();

@@ -13,6 +13,7 @@ add_executable( test_fc
         io/test_json.cpp
         io/test_secure_file.cpp
         log/test_json_formatter.cpp
+        log/test_es_sink.cpp
         io/test_json_variant.cpp
         io/test_random_access_file.cpp
         io/test_raw.cpp
@@ -42,6 +43,7 @@ add_executable( test_fc
         test_bls.cpp
         test_bitset.cpp
         test_ordered_diff.cpp
+        test_chains_registry.cpp
         test_opreg_status.cpp
         test_system_timer.cpp
         parallel/test_worker_task_queue.cpp
