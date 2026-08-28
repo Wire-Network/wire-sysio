@@ -875,19 +875,26 @@ public:
       produce_block();
    }
 
-   /// Assert an onboarded session is actually usable: the linkauth resolves sysio::reqauth to the
-   /// session permission, and the session key alone satisfies the resulting authorization. Without
-   /// this the onboarding cases would pass on a linkauth that had become a no-op or named the wrong
-   /// requirement, since permission existence and hierarchy say nothing about the link.
+   /// Assert an onboarded session is actually usable: the linkauth resolves sysio::reqauth to
+   /// exactly the session permission, and the session key alone satisfies the resulting
+   /// authorization. Without this the onboarding cases would pass on a linkauth that had become a
+   /// no-op or named the wrong requirement, since permission existence and hierarchy say nothing
+   /// about the link.
    ///
    /// Built as a bare action rather than push_reqauth because sysio carries the system contract in
    /// this fixture, so reqauth is absent from its ABI; reqauth's payload is just the account name.
    void check_session_is_live( account_name user, account_name issuer ) {
       const auto& authmgr = control->get_authorization_manager();
 
-      // check_authorization covers the link on its own: with no link, or one naming a different
-      // requirement, the minimum permission for sysio::reqauth falls back to active, which a child
-      // of the gate does not satisfy -- so the call below would throw irrelevant_auth_exception.
+      // Resolve the requirement explicitly. check_authorization alone is not sufficient: a link to
+      // sysio.any makes lookup_minimum_permission return empty, which skips the relevance check
+      // entirely, so the key check below would bless an overbroad requirement. Only a link naming a
+      // permission the child does not satisfy -- active, say -- would throw on its own.
+      const auto minimum = authmgr.lookup_minimum_permission( user, config::system_account_name,
+                                                              "reqauth"_n );
+      BOOST_REQUIRE( minimum.has_value() );
+      BOOST_REQUIRE( *minimum == "session"_n );
+
       action reqauth_act;
       reqauth_act.account       = config::system_account_name;
       reqauth_act.name          = "reqauth"_n;
