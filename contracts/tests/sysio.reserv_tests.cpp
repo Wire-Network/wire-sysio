@@ -10,6 +10,7 @@
 #include <fc/crypto/public_key.hpp>
 
 #include "contracts.hpp"
+#include "contract_test_support.hpp"
 
 using namespace sysio::testing;
 using namespace sysio;
@@ -137,7 +138,8 @@ public:
          ("code",              codename_mvo(code))
          ("external_chain_id", external_chain_id)
          ("name",              std::string("outpost"))
-         ("description",       std::string{}));
+         ("description",       std::string{})
+         ("outpost", sysio_system::test_support::no_outpost_mvo()));
    }
 
    action_result push_to(name account, abi_serializer& ser, name signer,
