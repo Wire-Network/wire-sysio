@@ -874,6 +874,29 @@ public:
       }
       produce_block();
    }
+
+   /// Assert an onboarded session is actually usable: the linkauth resolves sysio::reqauth to the
+   /// session permission, and the session key alone satisfies the resulting authorization. Without
+   /// this the onboarding cases would pass on a linkauth that had become a no-op or named the wrong
+   /// requirement, since permission existence and hierarchy say nothing about the link.
+   ///
+   /// Built as a bare action rather than push_reqauth because sysio carries the system contract in
+   /// this fixture, so reqauth is absent from its ABI; reqauth's payload is just the account name.
+   void check_session_is_live( account_name user, account_name issuer ) {
+      const auto& authmgr = control->get_authorization_manager();
+
+      // check_authorization covers the link on its own: with no link, or one naming a different
+      // requirement, the minimum permission for sysio::reqauth falls back to active, which a child
+      // of the gate does not satisfy -- so the call below would throw irrelevant_auth_exception.
+      action reqauth_act;
+      reqauth_act.account       = config::system_account_name;
+      reqauth_act.name          = "reqauth"_n;
+      reqauth_act.authorization = { permission_level{user, "session"_n} };
+      reqauth_act.data          = fc::raw::pack( user );
+
+      BOOST_CHECK_NO_THROW( authmgr.check_authorization(
+         { reqauth_act }, { get_public_key( issuer, "session" ) } ) );
+   }
 };
 
 // Session-key onboarding: what can and cannot share a transaction.
@@ -965,6 +988,12 @@ BOOST_FIXTURE_TEST_CASE( session_onboarding_grant_and_setup, sysio_roa_full_test
    }
    produce_block();
    BOOST_REQUIRE( authmgr.find_permission( {user, "session"_n} ) != nullptr );
+
+   // The permissions existing is not the onboarding result -- the point is a session key that can
+   // actually act. Resolve the link and check the session key satisfies it, so a linkauth that
+   // became a no-op or named the wrong requirement fails here rather than passing silently.
+   // (push_reqauth is unavailable: sysio carries the system contract here, not bios.)
+   check_session_is_live( user, issuer );
 } FC_LOG_AND_RETHROW()
 
 // The top-level restriction above is not a property of transactions, only of top-level actions.
@@ -1029,6 +1058,11 @@ BOOST_FIXTURE_TEST_CASE( session_onboarding_single_transaction_via_inline, sysio
    BOOST_REQUIRE( gate != nullptr );
    BOOST_REQUIRE( child != nullptr );
    BOOST_REQUIRE( child->parent == gate->id );
+
+   // As above, the onboarding result is a usable session key, not merely two permissions and a
+   // hierarchy. The trailing linkauth is the part most easily broken without any of the structural
+   // assertions noticing, so resolve it and check the session key satisfies it.
+   check_session_is_live( user, issuer );
 } FC_LOG_AND_RETHROW()
 
 // The contract cannot pay for a user's permission RAM, in either of the two ways one might try.
