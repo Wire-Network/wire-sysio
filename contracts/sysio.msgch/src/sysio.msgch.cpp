@@ -1870,21 +1870,31 @@ void msgch::buildenv(uint64_t chain_code) {
       candidate_ids.begin(),
       candidate_ids.begin() + included_count);
 
-   // Chain links: the previous envelope emitted for this outpost. `outenvelopes` is one-deep per
-   // outpost (see the cleanup below), so the single surviving row is the previous emit; its
-   // `envelope_hash` is that envelope's epoch digest and its `last_message_id` is this outpost's
-   // message-stream tip. The first emit for an outpost has no row and chains both links from
-   // empty (genesis), matching the outpost contracts' zero genesis tip.
+   // Chain links: the previous envelope emitted for this outpost -- the NEWEST row for
+   // `chain_code`, its `envelope_hash` that envelope's epoch digest and its `last_message_id`
+   // this outpost's message-stream tip. The first emit for an outpost has no row and chains both
+   // links from empty (genesis), matching the outpost contracts' zero genesis tip.
+   //
+   // Walked over `byoutepoch` rather than `byoutpost`: KV secondary entries sort by ascending
+   // PRIMARY key within one secondary key, so a `byoutpost` lower_bound yields the OLDEST row for
+   // the outpost. That was the tip only while exactly one row survived; the ack-gated cleanup
+   // below legitimately retains an emit the outpost has not consumed, so the tip must be selected
+   // by epoch instead of by "the only row left".
+   //
+   // `byoutepoch` packs `(chain_code, epoch_index)`, so this outpost's rows are contiguous and
+   // ascending by epoch -- the LAST match in the walk is the tip. Forward-only (`lower_bound` +
+   // `++` + the chain_code guard), the same shape as the sweep below; the walk is one row in the
+   // healthy path and bounded by the retained emits otherwise.
    outenvelopes_t envelopes(get_self());
    std::vector<char> prev_envelope_digest;
    std::vector<char> prev_message_id;
    {
-      auto by_outpost = envelopes.get_index<"byoutpost"_n>();
-      auto prev_it = by_outpost.lower_bound(chain_code);
-      if (prev_it != by_outpost.end() && prev_it->chain_code == chain_code) {
-         const auto digest_bytes = prev_it->envelope_hash.extract_as_byte_array();
+      auto by_epoch = envelopes.get_index<"byoutepoch"_n>();
+      for (auto it = by_epoch.lower_bound(opp::outpost_epoch_key(chain_code, 0));
+           it != by_epoch.end() && it->chain_code == chain_code; ++it) {
+         const auto digest_bytes = it->envelope_hash.extract_as_byte_array();
          prev_envelope_digest.assign(digest_bytes.begin(), digest_bytes.end());
-         const auto tip_bytes = prev_it->last_message_id.extract_as_byte_array();
+         const auto tip_bytes = it->last_message_id.extract_as_byte_array();
          prev_message_id.assign(tip_bytes.begin(), tip_bytes.end());
       }
    }
@@ -2003,20 +2013,56 @@ void msgch::buildenv(uint64_t chain_code) {
    // === AUDIT LOG + INLINE CLEANUP OF WORKING STATE ===
    //
    // Audit-log row mirrors the outbound emit (WIRE → outpost). Followed
-   // by inline drains of the previous-epoch outenvelopes row (one-deep
-   // retention; the batch op only ever reads the most-recent emit) and
-   // the just-PROCESSED attestations for this outpost (their bytes are
-   // now baked into `packed` above).
+   // by inline drains of the outenvelopes rows this outpost has already
+   // CONSUMED (see the ack gate below) and the just-PROCESSED
+   // attestations for this outpost (their bytes are now baked into
+   // `packed` above).
    {
       // Same endpoints the wire envelope carries (derived above from the
       // destination's `sysio.chains` row).
       write_envelope_log(get_self(), route_endpoints, epoch, envelope_digest);
 
-      // Drop previous outpost emits — keep only the row we just inserted.
+      // Drop previous outpost emits the destination has CONSUMED, and only those.
+      //
+      // `outpcons.epoch_index` is the last epoch whose INBOUND envelope from this outpost
+      // reached consensus, and an outpost can only emit its epoch-N envelope after accepting
+      // the depot's epoch-N emit -- Solana asserts it directly
+      // (`emit.rs`: `require!(wire_epoch_index < config.next_epoch_index, EmitBeforeEpochAccepted)`,
+      // which binds the admin recovery instruction too), and Ethereum reaches
+      // `OPP::emitOutboundEnvelope` only from the `OPPInbound` consensus tip under
+      // `OPP_FINALIZER_ROLE`. So `epoch_index <= acked` is PROOF the outpost consumed that emit.
+      //
+      // In the healthy path this erases exactly what the old unconditional sweep did and leaves
+      // the table one-deep: `chkcons` only released the `advance` that reached this `buildenv`
+      // because every active outpost had already reached consensus at the previous epoch, so
+      // `acked` covers the prior emit. A row survives only when that interlock did not hold, in
+      // which case its bytes are the ONLY copy of an envelope the outpost still needs -- the
+      // audit log keeps a checksum, not a payload, and the source attestations are drained just
+      // below. Retaining is what stops a chain break from becoming unrecoverable data loss.
+      //
+      // `has_ack` is load-bearing, not defensive: NO row means the outpost has acknowledged
+      // NOTHING, which a bare `epoch_index` default of 0 would make indistinguishable from
+      // having acknowledged epoch 0 -- and would erase an epoch-0 emit on that reading.
+      outpost_consensus_t opcons(get_self());
+      const auto     opc_pk  = outpost_consensus_key{chain_code};
+      const bool     has_ack = opcons.contains(opc_pk);
+      const uint32_t acked   = has_ack ? opcons.get(opc_pk).epoch_index : 0;
+
       auto by_outpost = envelopes.get_index<"byoutpost"_n>();
       for (auto it = by_outpost.lower_bound(chain_code);
            it != by_outpost.end() && it->chain_code == chain_code; ) {
          if (it->id == out_id) { ++it; continue; }
+         if (!has_ack || it->epoch_index > acked) {
+            // Never expected: reaching this `buildenv` required consensus past this emit.
+            // Logged (visible under --contracts-console) so a broken interlock is greppable
+            // rather than a silently growing table.
+            sysio::print_f("msgch::buildenv: retaining unacknowledged emit chain_code=%llu "
+                           "epoch=%u has_ack=%d acked=%u\n",
+                           static_cast<unsigned long long>(chain_code), it->epoch_index,
+                           static_cast<int>(has_ack), acked);
+            ++it;
+            continue;
+         }
          it = by_outpost.erase(std::move(it));
       }
 
