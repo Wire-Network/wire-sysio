@@ -191,7 +191,13 @@ namespace sysio::chain {
          ~controller();
 
          void add_indices();
-         void startup( std::function<void()> shutdown, std::function<bool()> check_shutdown, const snapshot_reader_ptr& snapshot);
+         /**
+          * Start from a snapshot and invoke `on_snapshot_loaded` after its state is loaded but
+          * before retained block-log replay can mutate that state.
+          */
+         void startup( std::function<void()> shutdown, std::function<bool()> check_shutdown,
+                       const snapshot_reader_ptr& snapshot,
+                       std::function<void()> on_snapshot_loaded = {} );
          void startup( std::function<void()> shutdown, std::function<bool()> check_shutdown, const genesis_state& genesis);
          void startup( std::function<void()> shutdown, std::function<bool()> check_shutdown);
 

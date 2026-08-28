@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+"""Verify snapshot restart behavior during Savanna transition."""
+
 import signal
 
 from TestHarness import Cluster, TestHelper, Utils, WalletMgr
@@ -35,6 +37,8 @@ dumpErrorDetails=args.dump_error_details
 
 snapshotNodeId = 0
 irrNodeId=pnodes
+# Allow loaded CI runners up to thirty seconds of block production around the transition.
+transitionSnapshotBlockWindow=60
 
 Utils.Debug=debug
 testSuccessful=False
@@ -51,7 +55,7 @@ try:
 
     numTrxGenerators=2
     Print("Stand up cluster")
-    # For now do not load system contract as it does not support setfinalizer
+    # Retain the BIOS contract until setfinalizer has activated the Savanna transition.
     specificExtraNodeopArgs = { irrNodeId: "--read-mode irreversible"}
     if cluster.launch(pnodes=pnodes, totalNodes=total_nodes, prodCount=prod_count, maximumP2pPerHost=total_nodes+numTrxGenerators, topo=topo, delay=delay, loadSystemContract=False,
                       activateIF=False, specificExtraNodeopArgs=specificExtraNodeopArgs) is False:
@@ -78,15 +82,29 @@ try:
     success, transId = cluster.activateInstantFinality(biosFinalizer=False, waitForFinalization=False)
     assert success, "Activate instant finality failed"
 
-    # allow time for instant finality activation to be processed
-    assert cluster.biosNode.waitForHeadToAdvance(blocksToAdvance=5), "Head should advance after instant finality activate"
-    
+    transitionInfo=cluster.biosNode.getInfo(exitOnError=True)
+    finalizerPolicyBlockNum=None
+    firstTransitionBlock=transitionInfo["head_block_num"]
+    lastTransitionBlock=firstTransitionBlock + transitionSnapshotBlockWindow
+    for blockNum in range(firstTransitionBlock, lastTransitionBlock + 1):
+        assert cluster.biosNode.waitForBlock(blockNum), \
+            f"Block {blockNum} was not produced while waiting for the finalizer-policy transition"
+        blockHeader=cluster.biosNode.getBlock(blockNum, exitOnError=True, header=True)
+        if blockHeader["signed_block_header"].get("new_finalizer_policy_diff") is not None:
+            finalizerPolicyBlockNum=blockNum
+            break
+    assert finalizerPolicyBlockNum is not None, "No finalizer-policy transition block found before snapshot"
+
     # Take snapshots
     def takeSnapshot(node):
+       """Create a snapshot and require it to remain inside the bounded transition window."""
        ret = node.createSnapshot()
        assert ret is not None, "snapshot creation failed"
        ret_snaphot_head_block_num = ret["payload"]["head_block_num"]
        Print(f"snapshot head block number {ret_snaphot_head_block_num}")
+       assert finalizerPolicyBlockNum <= ret_snaphot_head_block_num \
+           <= finalizerPolicyBlockNum + transitionSnapshotBlockWindow, \
+           "Snapshot was taken after the bounded Savanna transition window"
 
     Print("Take snapshot on nodeSnap")
     takeSnapshot(nodeSnap)

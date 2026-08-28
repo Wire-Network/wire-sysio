@@ -149,6 +149,10 @@ add_subdirectory(benchmark)
 add_subdirectory(contracts)
 add_subdirectory(contracts/tests)
 
+if(TARGET test_chain_plugin AND TARGET contracts_project)
+  add_dependencies(test_chain_plugin contracts_project)
+endif()
+
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sysio.version.in ${CMAKE_CURRENT_BINARY_DIR}/sysio.version.hpp)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/sysio.version.hpp DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} COMPONENT dev)
 
