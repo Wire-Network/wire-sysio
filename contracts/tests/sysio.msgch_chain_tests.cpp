@@ -492,18 +492,47 @@ public:
 
    // -- Table readers --
 
-   /// The single surviving outbound envelope row for `chain_code` (the table is one-deep per
-   /// outpost); null variant when none.
+   /// The newest outbound envelope row for `chain_code` (the chain tip); null variant when none.
    fc::variant find_outbound_envelope(uint64_t chain_code, uint64_t scan_until = 32) {
+      fc::variant newest;
       for (uint64_t id = 0; id < scan_until; ++id) {
          auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "outenvelopes"_n, id);
          if (data.empty()) continue;
          auto row = msgch_abi.binary_to_variant(
             "outbound_envelope", data,
             abi_serializer::create_yield_function(abi_serializer_max_time));
-         if (row["chain_code"].as_uint64() == chain_code) return row;
+         if (row["chain_code"].as_uint64() == chain_code) newest = row;
+      }
+      return newest;
+   }
+
+   /// The outbound envelope row for `chain_code` at `epoch_index`; null variant when absent.
+   fc::variant outbound_envelope_for_epoch(uint64_t chain_code, uint32_t epoch_index,
+                                           uint64_t scan_until = 32) {
+      for (uint64_t id = 0; id < scan_until; ++id) {
+         auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "outenvelopes"_n, id);
+         if (data.empty()) continue;
+         auto row = msgch_abi.binary_to_variant(
+            "outbound_envelope", data,
+            abi_serializer::create_yield_function(abi_serializer_max_time));
+         if (row["chain_code"].as_uint64() == chain_code &&
+             row["epoch_index"].as<uint32_t>() == epoch_index) return row;
       }
       return fc::variant{};
+   }
+
+   /// Live outbound envelope rows for `chain_code`.
+   uint32_t outbound_envelope_count(uint64_t chain_code, uint64_t scan_until = 32) {
+      uint32_t n = 0;
+      for (uint64_t id = 0; id < scan_until; ++id) {
+         auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "outenvelopes"_n, id);
+         if (data.empty()) continue;
+         auto row = msgch_abi.binary_to_variant(
+            "outbound_envelope", data,
+            abi_serializer::create_yield_function(abi_serializer_max_time));
+         if (row["chain_code"].as_uint64() == chain_code) ++n;
+      }
+      return n;
    }
 
    /// Per-outpost consensus row (`outpcons`, primary key = chain_code); null variant when absent.
@@ -1202,6 +1231,46 @@ BOOST_FIXTURE_TEST_CASE(buildenv_first_emit_chains_from_empty, sysio_msgch_chain
 } FC_LOG_AND_RETHROW() }
 
 // ---------------------------------------------------------------------------
+//  Outbound retention: an emit is erased only once the outpost acknowledges it.
+// ---------------------------------------------------------------------------
+
+/// WNS-18 / WIRE-348: unacknowledged emits accumulate; one acknowledgement drains every emit at or
+/// below its epoch, leaving the table one-deep.
+BOOST_FIXTURE_TEST_CASE(buildenv_erases_acknowledged_outenvelope, sysio_msgch_chain_tester) { try {
+   bootstrap();
+
+   // bootstrap()'s genesis `advance` fanned a buildenv to every registered outpost.
+   const uint32_t epoch_a = current_epoch();
+   BOOST_REQUIRE(!outbound_envelope_for_epoch(ETH_OUTPOST_ID, epoch_a).is_null());
+   BOOST_REQUIRE(get_outpcons(ETH_OUTPOST_ID).is_null());   // nothing acknowledged yet
+
+   // Unacknowledged: the next epoch's emit does NOT displace epoch A's.
+   const uint32_t epoch_b = advance_one_epoch();
+   BOOST_REQUIRE_NE(epoch_a, epoch_b);
+   BOOST_REQUIRE(!outbound_envelope_for_epoch(ETH_OUTPOST_ID, epoch_a).is_null());
+   BOOST_REQUIRE(!outbound_envelope_for_epoch(ETH_OUTPOST_ID, epoch_b).is_null());
+   BOOST_REQUIRE_EQUAL(2u, outbound_envelope_count(ETH_OUTPOST_ID));
+
+   // The tip is the NEWEST row, not the retained predecessor.
+   BOOST_REQUIRE_EQUAL(find_outbound_envelope(ETH_OUTPOST_ID)["epoch_index"].as<uint32_t>(),
+                       epoch_b);
+
+   // An inbound envelope accepted for epoch B acknowledges the depot's epoch-B emit.
+   BOOST_REQUIRE_EQUAL(success(), deliver(ETH_OUTPOST_ID, encode_delivery(epoch_b, "alpha")));
+   produce_blocks();
+   auto opc = get_outpcons(ETH_OUTPOST_ID);
+   BOOST_REQUIRE(!opc.is_null());
+   BOOST_REQUIRE_EQUAL(opc["epoch_index"].as<uint32_t>(), epoch_b);
+
+   // The next emit drains everything at or below the acknowledged epoch: A and B.
+   const uint32_t epoch_c = advance_one_epoch();
+   BOOST_REQUIRE(outbound_envelope_for_epoch(ETH_OUTPOST_ID, epoch_a).is_null());
+   BOOST_REQUIRE(outbound_envelope_for_epoch(ETH_OUTPOST_ID, epoch_b).is_null());
+   BOOST_REQUIRE(!outbound_envelope_for_epoch(ETH_OUTPOST_ID, epoch_c).is_null());
+   BOOST_REQUIRE_EQUAL(1u, outbound_envelope_count(ETH_OUTPOST_ID));
+} FC_LOG_AND_RETHROW() }
+
+// ---------------------------------------------------------------------------
 //  Inbound: apply_consensus records and verifies the per-outpost chain tip.
 // ---------------------------------------------------------------------------
 
@@ -1444,7 +1513,7 @@ BOOST_FIXTURE_TEST_CASE(inbound_rejects_cross_stream_link_for_svm_outposts,
 
    // Next epoch: emit a depot outbound envelope, then deliver an inbound envelope whose prev is
    // that emit's digest (NOT the inbound tip). Building the outbound envelope in the delivery
-   // epoch pins the one-deep outenvelopes row so no epoch-advance emission replaces it.
+   // epoch pins the outenvelopes tip so no epoch-advance emission supersedes it.
    epoch = advance_one_epoch();
    BOOST_REQUIRE_EQUAL(success(), queueout(SOL_OUTPOST_ID,
       sysio::opp::types::ATTESTATION_TYPE_OPERATORS, std::vector<char>{0x0a}));
