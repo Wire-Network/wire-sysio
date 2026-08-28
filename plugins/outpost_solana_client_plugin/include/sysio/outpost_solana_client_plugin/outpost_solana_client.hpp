@@ -243,14 +243,21 @@ struct reserve_terminal_info {
    fc::network::solana::solana_public_key custody_mint;
    /// Chain-native decimals pinned at reserve creation.
    uint8_t                                custody_decimals = 0;
+   /// Token program the reserve's custody is held under, pinned at reserve
+   /// creation (SOL-396). The SAME (owner, mint) pair has DIFFERENT canonical
+   /// ATAs under SPL-Token and Token-2022, so this drives BOTH the ATA
+   /// derivation and the token-program account the terminal handlers require.
+   /// Deriving with the legacy default against a Token-2022 reserve yields an
+   /// address the program never asks for -- `EffectAccountMissing`, forever.
+   fc::network::solana::solana_public_key custody_token_program;
 };
 
 /// Extract the terminal-finalization facts from an already-decoded `Reserve`
-/// account object. ALL THREE fields are required: `creator`, `custody_mint`
-/// and `custody_decimals` are written together at reserve creation, so a
-/// record missing any of them is not a reserve this relay can build an
-/// account-consistent manifest for — guessing custody is precisely the
-/// divergence that aborts the on-chain call.
+/// account object. ALL FOUR fields are required: `creator`, `custody_mint`,
+/// `custody_decimals` and `custody_token_program` are written together at
+/// reserve creation, so a record missing any of them is not a reserve this
+/// relay can build an account-consistent manifest for — guessing custody is
+/// precisely the divergence that aborts the on-chain call.
 ///
 /// Throwing here FAILS THE BUILD, by design — do not "restore" a degrade on
 /// this path. Reaching this function means the account EXISTS and the program

@@ -123,14 +123,16 @@ namespace epoch_deliveries {
 } // namespace epoch_deliveries
 
 /// Field identifiers of the per-`(token_code, reserve_code)` `Reserve`
-/// account. `custody_mint` / `custody_decimals` are pinned at reserve creation
+/// account. `custody_mint` / `custody_decimals` / `custody_token_program` are
+/// pinned at reserve creation
 /// and are what the on-chain terminal handlers branch on, so the relay's
 /// manifest must read custody from HERE and nowhere else.
 namespace reserve_account {
-   constexpr auto account_name           = "Reserve";
-   constexpr auto field_creator          = "creator";
-   constexpr auto field_custody_mint     = "custody_mint";
-   constexpr auto field_custody_decimals = "custody_decimals";
+   constexpr auto account_name                = "Reserve";
+   constexpr auto field_creator               = "creator";
+   constexpr auto field_custody_mint          = "custody_mint";
+   constexpr auto field_custody_decimals      = "custody_decimals";
+   constexpr auto field_custody_token_program = "custody_token_program";
 } // namespace reserve_account
 
 /// Field identifiers of the per-`(operator, token_code)` collateral position.
@@ -337,9 +339,10 @@ void assert_reserve_shape(const fc::network::solana::idl::program& program) {
    namespace idl = fc::network::solana::idl;
    const auto& fields = declared_account_fields(program, reserve_account::account_name);
 
-   bool has_creator  = false;
-   bool has_mint     = false;
-   bool has_decimals = false;
+   bool has_creator       = false;
+   bool has_mint          = false;
+   bool has_decimals      = false;
+   bool has_token_program = false;
    for (const auto& field : fields) {
       // Compare against the optional member directly, as the sibling shape
       // checks do: a malformed type object must reach the per-field diagnostic
@@ -359,18 +362,24 @@ void assert_reserve_shape(const fc::network::solana::idl::program& program) {
                    "Reserve '{}' must be declared u8, got '{}'",
                    reserve_account::field_custody_decimals, describe_idl_type(field.type));
          has_decimals = true;
+      } else if (field.name == reserve_account::field_custody_token_program) {
+         FC_ASSERT(is_pubkey, "Reserve '{}' must be declared pubkey, got '{}'",
+                   reserve_account::field_custody_token_program, describe_idl_type(field.type));
+         has_token_program = true;
       }
    }
-   // One message for all three: they are written together at reserve creation,
+   // One message for all four: they are written together at reserve creation,
    // and any one missing costs the manifest the same way -- the effect account
    // the program's branch requires cannot be derived, so its dispatch window
    // aborts and the cursor never moves past it.
-   FC_ASSERT(has_creator && has_mint && has_decimals,
-             "Reserve IDL missing '{}' / '{}' / '{}' (found {} / {} / {}); the terminal manifest "
-             "resolves custody and the cancel-refund target from these, and a reserve-backed "
-             "dispatch window cannot be built without them",
+   FC_ASSERT(has_creator && has_mint && has_decimals && has_token_program,
+             "Reserve IDL missing '{}' / '{}' / '{}' / '{}' (found {} / {} / {} / {}); the terminal "
+             "manifest resolves custody, the cancel-refund target and the ATA-deriving token "
+             "program from these, and a reserve-backed dispatch window cannot be built without them",
              reserve_account::field_creator, reserve_account::field_custody_mint,
-             reserve_account::field_custody_decimals, has_creator, has_mint, has_decimals);
+             reserve_account::field_custody_decimals,
+             reserve_account::field_custody_token_program,
+             has_creator, has_mint, has_decimals, has_token_program);
 }
 
 /// Keep only the candidate IDLs whose declared address matches the deployed
@@ -772,6 +781,10 @@ reserve_terminal_info reserve_info_from_account(const fc::variant_object& reserv
              reserve_account::field_custody_mint);
    FC_ASSERT(reserve.contains(reserve_account::field_custody_decimals),
              "Reserve account missing '{}' field", reserve_account::field_custody_decimals);
+   FC_ASSERT(reserve.contains(reserve_account::field_custody_token_program),
+             "Reserve account missing '{}' field — the canonical ATA differs per token program, "
+             "so deriving with the legacy default would name an account the program never asks for",
+             reserve_account::field_custody_token_program);
 
    const auto decimals = reserve[reserve_account::field_custody_decimals].as_uint64();
    FC_ASSERT(decimals <= std::numeric_limits<uint8_t>::max(),
@@ -783,7 +796,9 @@ reserve_terminal_info reserve_info_from_account(const fc::variant_object& reserv
          reserve[reserve_account::field_creator].as_string()),
       fc::network::solana::solana_public_key::from_base58_string(
          reserve[reserve_account::field_custody_mint].as_string()),
-      static_cast<uint8_t>(decimals)};
+      static_cast<uint8_t>(decimals),
+      fc::network::solana::solana_public_key::from_base58_string(
+         reserve[reserve_account::field_custody_token_program].as_string())};
 }
 
 std::vector<std::vector<fc::network::solana::account_meta>> build_dispatch_manifests(
@@ -925,11 +940,13 @@ std::vector<std::vector<fc::network::solana::account_meta>> build_dispatch_manif
          //
          // The accounts are still passed because the reserve may be created
          // between this read and the crank landing. If it is, this manifest is
-         // complete only for a NATIVE swap remit/revert (Reserve PDA +
-         // recipient); an SPL one is short the recipient ATA, and a
-         // RESERVE_CREATE_CANCELLED is short the `creator` on EITHER custody
-         // kind, since the creator is read off the Reserve we could not
-         // decode. Those windows abort and the next tick rebuilds them against
+         // complete only for a NATIVE swap remit/revert (Reserve PDA + recipient);
+         // an SPL one is short the recipient ATA, the custody mint and the custody
+         // token program — all three are read off the Reserve we could not decode,
+         // and the ATA is not even derivable without the token program (SOL-396) —
+         // and a RESERVE_CREATE_CANCELLED is short the `creator` on EITHER custody
+         // kind, since the creator is read off the Reserve we could not decode.
+         // Those windows abort and the next tick rebuilds them against
          // a now-readable Reserve.
          //
          // The degrade is PER-ATTESTATION: the manifests are built for every
@@ -944,19 +961,41 @@ std::vector<std::vector<fc::network::solana::account_meta>> build_dispatch_manif
               log_label, token_code, reserve_code, effect.attestation_index);
          add(vault_pda, true);
          if (effect.recipient) add(*effect.recipient, true);
+         // Best-effort only, and right solely for a legacy-SPL reserve: the real
+         // token program is pinned on the Reserve we could not read. Not the
+         // sanctioned derivation — see `custody_token_program` below.
          add(token_program_id, false);
          continue;
       }
       const auto& info = *info_opt;
+
+      // SOL-396 LOCK-STEP: every reserve-backed SPL settlement routes through the
+      // program's `reserve_vault_transfer`, which requires BOTH the reserve's
+      // `custody_token_program` AND its `custody_mint` in remaining_accounts, and
+      // derives the destination ATA with that token program. Both facts come from
+      // the Reserve — never the legacy SPL-Token default — because the same
+      // (owner, mint) pair has different canonical ATAs under each program.
+      const auto& custody_token_program = info.custody_token_program;
+      const auto  custody_ata           = [&](const fc::network::solana::solana_public_key& owner) {
+         return fc::network::solana::system::get_associated_token_address(
+            owner, info.custody_mint, custody_token_program);
+      };
 
       switch (effect.shape) {
          case effect_shape::swap_remit: {
             if (!effect.recipient) break;
             if (is_native_custody(info.custody_mint)) { add(*effect.recipient, true); break; }
             add(vault_pda, true);
-            add(fc::network::solana::system::get_associated_token_address(
-                   *effect.recipient, info.custody_mint), true);
-            add(token_program_id, false);
+            add(custody_ata(*effect.recipient), true);
+            // The mint is REQUIRED here, not optional: `reserve_vault_transfer`
+            // `require_remaining_account`s it, and the CPI's `transfer_checked`
+            // needs the mint account to verify the decimals against — the decimals
+            // themselves come from the Reserve record, not from this account.
+            // Omitting it is what aborted every SPL swap remit with
+            // `EffectAccountMissing` after SOL-396 — the one reserve-backed shape
+            // that had never carried it.
+            add(info.custody_mint, false);
+            add(custody_token_program, false);
             break;
          }
          case effect_shape::swap_revert: {
@@ -965,9 +1004,8 @@ std::vector<std::vector<fc::network::solana::account_meta>> build_dispatch_manif
             add(vault_pda, true);
             add(info.custody_mint, false);
             add(*effect.recipient, true);
-            add(fc::network::solana::system::get_associated_token_address(
-                   *effect.recipient, info.custody_mint), true);
-            add(token_program_id, false);
+            add(custody_ata(*effect.recipient), true);
+            add(custody_token_program, false);
             add(associated_token_program_id, false);
             add(system_program_id, false);
             break;
@@ -976,10 +1014,9 @@ std::vector<std::vector<fc::network::solana::account_meta>> build_dispatch_manif
             if (is_native_custody(info.custody_mint)) { add(info.creator, true); break; }
             add(vault_pda, true);
             add(info.creator, false);
-            add(fc::network::solana::system::get_associated_token_address(
-                   info.creator, info.custody_mint), true);
+            add(custody_ata(info.creator), true);
             add(info.custody_mint, false);
-            add(token_program_id, false);
+            add(custody_token_program, false);
             add(associated_token_program_id, false);
             add(system_program_id, false);
             break;

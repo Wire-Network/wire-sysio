@@ -482,10 +482,13 @@ namespace {
 /// pubkeys as base58 strings, `custody_decimals` as an integer.
 fc::variant_object reserve_row(const solana_public_key& creator,
                                const solana_public_key& custody_mint,
-                               unsigned                 custody_decimals) {
+                               unsigned                 custody_decimals,
+                               const solana_public_key& custody_token_program =
+                                  system::program_ids::TOKEN_PROGRAM) {
    return fc::mutable_variant_object("creator", creator.to_string(fc::yield_function_t{}))(
       "custody_mint", custody_mint.to_string(fc::yield_function_t{}))(
-      "custody_decimals", custody_decimals);
+      "custody_decimals", custody_decimals)(
+      "custody_token_program", custody_token_program.to_string(fc::yield_function_t{}));
 }
 
 } // anonymous namespace
@@ -504,6 +507,15 @@ BOOST_AUTO_TEST_CASE(reserve_info_reads_custody_from_the_reserve_account) try {
    BOOST_CHECK(spl.creator == creator);
    BOOST_CHECK(spl.custody_mint == spl_mint);
    BOOST_CHECK_EQUAL(static_cast<unsigned>(spl.custody_decimals), 6u);
+   BOOST_CHECK(spl.custody_token_program == system::program_ids::TOKEN_PROGRAM);
+
+   // SOL-396: a Token-2022 reserve must round-trip its OWN token program --
+   // the ATA derivation and the token-program account both hang off this, and
+   // silently substituting the legacy default names accounts the program never
+   // asks for (EffectAccountMissing, on every retry, forever).
+   const auto t22_program = measurement_pubkey(80);
+   const auto t22 = reserve_info_from_account(reserve_row(creator, spl_mint, 6, t22_program));
+   BOOST_CHECK(t22.custody_token_program == t22_program);
 
    // Native custody is the all-zero `NATIVE_TOKEN_MARKER`, which is exactly
    // what the handler compares against to take the lamport branch.
@@ -533,6 +545,12 @@ BOOST_AUTO_TEST_CASE(reserve_info_requires_every_custody_field) try {
       reserve_info_from_account(fc::mutable_variant_object(
          "creator", creator.to_string(fc::yield_function_t{}))(
          "custody_mint", spl_mint.to_string(fc::yield_function_t{}))),
+      fc::assert_exception);
+   // ...including the token program: without it the ATA is not derivable at all.
+   BOOST_CHECK_THROW(
+      reserve_info_from_account(fc::mutable_variant_object(
+         "creator", creator.to_string(fc::yield_function_t{}))(
+         "custody_mint", spl_mint.to_string(fc::yield_function_t{}))("custody_decimals", 6)),
       fc::assert_exception);
    BOOST_CHECK_THROW(reserve_info_from_account(fc::variant_object{fc::mutable_variant_object{}}),
                      fc::assert_exception);
@@ -1366,10 +1384,13 @@ struct manifest_build_harness {
 
    void put(uint64_t token_code, uint64_t reserve_code,
             const solana_public_key& creator, const solana_public_key& custody_mint,
-            uint8_t custody_decimals) {
+            uint8_t custody_decimals,
+            const solana_public_key& custody_token_program =
+               system::program_ids::TOKEN_PROGRAM) {
       records.emplace(seeds{token_code, reserve_code},
                       manifest_detail::reserve_terminal_info{creator, custody_mint,
-                                                             custody_decimals});
+                                                             custody_decimals,
+                                                             custody_token_program});
    }
 
    /// Seed one position's pinned custody for the collateral reader.
@@ -1418,6 +1439,24 @@ manifest_detail::inbound_effect swap_remit_effect(size_t index, uint64_t token_c
                                                   const solana_public_key& recipient) {
    return manifest_detail::inbound_effect{
       index, manifest_detail::effect_shape::swap_remit, recipient,
+      manifest_detail::reserve_pda_seeds{token_code, reserve_code}};
+}
+
+/// One SWAP_REVERT effect at `index` refunding `depositor` out of `(token, reserve)`.
+manifest_detail::inbound_effect swap_revert_effect(size_t index, uint64_t token_code,
+                                                   uint64_t reserve_code,
+                                                   const solana_public_key& depositor) {
+   return manifest_detail::inbound_effect{
+      index, manifest_detail::effect_shape::swap_revert, depositor,
+      manifest_detail::reserve_pda_seeds{token_code, reserve_code}};
+}
+
+/// One RESERVE_CREATE_CANCELLED effect at `index` for `(token, reserve)`; the
+/// refund target is the creator read off the Reserve, not a carried recipient.
+manifest_detail::inbound_effect reserve_create_cancelled_effect(size_t index, uint64_t token_code,
+                                                                uint64_t reserve_code) {
+   return manifest_detail::inbound_effect{
+      index, manifest_detail::effect_shape::reserve_create_cancelled, std::nullopt,
       manifest_detail::reserve_pda_seeds{token_code, reserve_code}};
 }
 
@@ -1483,13 +1522,20 @@ BOOST_AUTO_TEST_CASE(build_manifests_follows_reserve_custody_per_reserve) try {
    BOOST_REQUIRE_EQUAL(manifests.size(), 2u);
 
    // SPL branch: Reserve PDA + vault + the recipient's ATA FOR THE RESERVE'S
-   // OWN MINT + the token program.
+   // OWN MINT + the custody mint + the token program.
    const auto& spl = manifests[0];
    BOOST_CHECK(manifest_has(spl, manifest_detail::derive_reserve_pda(
                                     harness.program_id, token_code, 200)));
    BOOST_CHECK(manifest_has(spl, manifest_detail::derive_reserve_vault_pda(
                                     harness.program_id, token_code, 200)));
    BOOST_CHECK(manifest_has(spl, system::get_associated_token_address(spl_recipient, spl_mint)));
+   // The MINT itself. `reserve_vault_transfer` require_remaining_account()s it
+   // for the checked transfer's decimals, and swap_remit was the one
+   // reserve-backed shape that never carried it -- every SPL swap remit aborted
+   // with EffectAccountMissing and the epoch never closed. Asserted here
+   // because this case previously checked the ATA and token program only,
+   // which is exactly why the omission shipped.
+   BOOST_CHECK(manifest_has(spl, spl_mint));
    BOOST_CHECK(manifest_has(spl, system::program_ids::TOKEN_PROGRAM));
    // The bare recipient wallet is the NATIVE branch's account and must not
    // appear on the SPL one.
@@ -1504,6 +1550,80 @@ BOOST_AUTO_TEST_CASE(build_manifests_follows_reserve_custody_per_reserve) try {
    BOOST_CHECK(!manifest_has(native, manifest_detail::derive_reserve_vault_pda(
                                         harness.program_id, token_code, 201)));
    BOOST_CHECK(!manifest_has(native, system::program_ids::TOKEN_PROGRAM));
+} FC_LOG_AND_RETHROW();
+
+/// SOL-396: the reserve's OWN `custody_token_program` drives both the ATA
+/// derivation and the token-program account. The same (owner, mint) pair has a
+/// DIFFERENT canonical ATA under Token-2022, so deriving with the legacy
+/// SPL-Token default names an account the program never asks for -- and
+/// `require_remaining_account` then aborts the window on every retry, with the
+/// cursor pinned, forever.
+BOOST_AUTO_TEST_CASE(build_manifests_derive_the_ata_with_the_reserves_token_program) try {
+   constexpr uint64_t token_code   = 121;
+   constexpr uint64_t reserve_code = 222;
+   const auto spl_mint    = measurement_pubkey(84);
+   const auto recipient   = measurement_pubkey(85);
+   const auto creator     = measurement_pubkey(86);
+   const auto token_2022  = measurement_pubkey(87);   // stands in for the Token-2022 program
+
+   manifest_build_harness harness;
+   harness.put(token_code, reserve_code, creator, spl_mint, 6, token_2022);
+
+   const auto manifests =
+      harness.build({swap_remit_effect(0, token_code, reserve_code, recipient)}, 1);
+   BOOST_REQUIRE_EQUAL(manifests.size(), 1u);
+   const auto& m = manifests[0];
+
+   // The ATA under the RESERVE'S program, and that program as the token
+   // program account.
+   BOOST_CHECK(manifest_has(
+      m, system::get_associated_token_address(recipient, spl_mint, token_2022)));
+   BOOST_CHECK(manifest_has(m, token_2022));
+   BOOST_CHECK(manifest_has(m, spl_mint));
+
+   // And NOT the legacy default's ATA, nor the legacy program.
+   BOOST_CHECK(!manifest_has(m, system::get_associated_token_address(recipient, spl_mint)));
+   BOOST_CHECK(!manifest_has(m, system::program_ids::TOKEN_PROGRAM));
+} FC_LOG_AND_RETHROW();
+
+/// The SAME pinned-token-program derivation must hold for the other two
+/// reserve-backed shapes. Without these, reverting either branch to the legacy
+/// 2-arg `get_associated_token_address` leaves the suite green — which is exactly
+/// how the missing custody mint shipped on `swap_remit` in the first place.
+BOOST_AUTO_TEST_CASE(build_manifests_pin_the_token_program_on_revert_and_cancel) try {
+   constexpr uint64_t token_code   = 131;
+   constexpr uint64_t reserve_code = 232;
+   const auto spl_mint   = measurement_pubkey(88);
+   const auto depositor  = measurement_pubkey(89);
+   const auto creator    = measurement_pubkey(90);
+   const auto token_2022 = measurement_pubkey(91);
+
+   manifest_build_harness harness;
+   harness.put(token_code, reserve_code, creator, spl_mint, 6, token_2022);
+
+   const auto manifests = harness.build(
+      {swap_revert_effect(0, token_code, reserve_code, depositor),
+       reserve_create_cancelled_effect(1, token_code, reserve_code)},
+      2);
+   BOOST_REQUIRE_EQUAL(manifests.size(), 2u);
+
+   // SWAP_REVERT refunds the depositor's ATA under the reserve's own program.
+   const auto& revert = manifests[0];
+   BOOST_CHECK(manifest_has(
+      revert, system::get_associated_token_address(depositor, spl_mint, token_2022)));
+   BOOST_CHECK(manifest_has(revert, token_2022));
+   BOOST_CHECK(manifest_has(revert, spl_mint));
+   BOOST_CHECK(!manifest_has(revert, system::get_associated_token_address(depositor, spl_mint)));
+   BOOST_CHECK(!manifest_has(revert, system::program_ids::TOKEN_PROGRAM));
+
+   // RESERVE_CREATE_CANCELLED refunds the CREATOR's ATA, same program.
+   const auto& cancelled = manifests[1];
+   BOOST_CHECK(manifest_has(
+      cancelled, system::get_associated_token_address(creator, spl_mint, token_2022)));
+   BOOST_CHECK(manifest_has(cancelled, token_2022));
+   BOOST_CHECK(manifest_has(cancelled, spl_mint));
+   BOOST_CHECK(!manifest_has(cancelled, system::get_associated_token_address(creator, spl_mint)));
+   BOOST_CHECK(!manifest_has(cancelled, system::program_ids::TOKEN_PROGRAM));
 } FC_LOG_AND_RETHROW();
 
 /// Collateral custody MUST be resolved per position, never per token code.
