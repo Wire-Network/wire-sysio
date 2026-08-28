@@ -1077,42 +1077,79 @@ BOOST_FIXTURE_TEST_CASE( contract_cannot_pay_for_permission_ram, sysio_roa_full_
    BOOST_TEST( rm.get_account_ram_usage( user ) > user_before );      // the owner pays
    BOOST_TEST( rm.get_account_ram_usage( sessmgr ) == mgr_before );   // the contract does not
 
-   // Nor can a payer role be attached. Two independent barriers make sysio.payer unreachable for
-   // the native auth actions, and together they close the door.
+   // Nor can a payer role be attached. Each of the four native auth actions carries its own
+   // auths.size() == 1 guard, so exercising only updateauth would leave a regression in any of the
+   // other three invisible while making sysio.payer attachable on that path. Two independent
+   // barriers, checked across all four.
    const authority spare_auth( 1, {{get_public_key( issuer, "spare" ), 1}}, {} );
 
-   // 1. validate_referenced_accounts requires the payer to also carry a real authorization on the
-   //    same action, so naming the contract as payer alone is rejected outright.
+   // Pre-state, so each action below is otherwise valid and the rejection is about the payer rather
+   // than about a missing permission or link.
+   set_authority( user, "paydel"_n, spare_auth, config::active_name,
+                  { permission_level{user, config::active_name} }, { signing_key } );
+   set_authority( user, "payperm"_n, spare_auth, config::active_name,
+                  { permission_level{user, config::active_name} }, { signing_key } );
    {
-      signed_transaction trx;
-      trx.actions.emplace_back( vector<permission_level>{ {sessmgr, config::sysio_payer_name},
-                                                          {user, config::active_name} },
-                                updateauth{ .account = user, .permission = "session2"_n,
-                                            .parent  = config::active_name, .auth = spare_auth } );
-      set_transaction_headers( trx );
-      trx.sign( signing_key, control->get_chain_id() );
-      trx.sign( get_private_key( sessmgr, "active" ), control->get_chain_id() );
-      BOOST_CHECK_EXCEPTION( push_transaction( trx ),
-                             transaction_exception,
-                             fc_exception_message_starts_with( "Payer 'sessmgr3' did not authorize this action" ) );
+      // link_authority() takes no keys and would sign as get_private_key(user, "active");
+      // create_newuser seeded this account with the creator's key, so sign explicitly.
+      signed_transaction link_trx;
+      link_trx.actions.emplace_back( vector<permission_level>{{user, config::active_name}},
+                                     linkauth{ user, config::system_account_name,
+                                               "reqauth"_n, "payperm"_n } );
+      set_transaction_headers( link_trx );
+      link_trx.sign( signing_key, control->get_chain_id() );
+      push_transaction( link_trx );
    }
+   produce_block();
 
-   // 2. Giving the payer that real authorization pushes the action past two declared auths, and the
-   //    native auth actions accept exactly one -- so there is no arrangement that satisfies both.
-   {
-      signed_transaction trx;
-      trx.actions.emplace_back( vector<permission_level>{ {sessmgr, config::sysio_payer_name},
-                                                          {sessmgr, config::active_name},
-                                                          {user, config::active_name} },
-                                updateauth{ .account = user, .permission = "session2"_n,
-                                            .parent  = config::active_name, .auth = spare_auth } );
-      set_transaction_headers( trx );
-      trx.sign( signing_key, control->get_chain_id() );
-      trx.sign( get_private_key( sessmgr, "active" ), control->get_chain_id() );
-      BOOST_CHECK_EXCEPTION( push_transaction( trx ),
-                             irrelevant_auth_exception,
-                             fc_exception_message_starts_with(
-                                "updateauth action should only have one declared authorization" ) );
+   using add_action_fn = std::function<void( signed_transaction&, const vector<permission_level>& )>;
+   const std::vector<std::pair<std::string, add_action_fn>> cases = {
+      { "updateauth action should only have one declared authorization",
+        [&]( signed_transaction& t, const vector<permission_level>& a ) {
+           t.actions.emplace_back( a, updateauth{ .account = user, .permission = "paynew"_n,
+                                                  .parent = config::active_name, .auth = spare_auth } ); } },
+      { "deleteauth action should only have one declared authorization",
+        [&]( signed_transaction& t, const vector<permission_level>& a ) {
+           t.actions.emplace_back( a, deleteauth{ user, "paydel"_n } ); } },
+      { "link action should only have one declared authorization",
+        [&]( signed_transaction& t, const vector<permission_level>& a ) {
+           t.actions.emplace_back( a, linkauth{ user, config::system_account_name,
+                                                "reqauth2"_n, "payperm"_n } ); } },
+      { "unlink action should only have one declared authorization",
+        [&]( signed_transaction& t, const vector<permission_level>& a ) {
+           t.actions.emplace_back( a, unlinkauth{ user, config::system_account_name, "reqauth"_n } ); } },
+   };
+
+   for( const auto& entry : cases ) {
+      const std::string& expected   = entry.first;
+      const add_action_fn& add_action = entry.second;
+
+      // 1. validate_referenced_accounts requires the payer to also carry a real authorization on the
+      //    same action, so naming the contract as payer alone is rejected outright.
+      {
+         signed_transaction trx;
+         add_action( trx, { {sessmgr, config::sysio_payer_name}, {user, config::active_name} } );
+         set_transaction_headers( trx );
+         trx.sign( signing_key, control->get_chain_id() );
+         trx.sign( get_private_key( sessmgr, "active" ), control->get_chain_id() );
+         BOOST_CHECK_EXCEPTION( push_transaction( trx ), transaction_exception,
+                                fc_exception_message_starts_with(
+                                   "Payer 'sessmgr3' did not authorize this action" ) );
+      }
+
+      // 2. Giving the payer that real authorization pushes the action past the single declared
+      //    authorization each of these accepts, so no arrangement satisfies both barriers.
+      {
+         signed_transaction trx;
+         add_action( trx, { {sessmgr, config::sysio_payer_name},
+                            {sessmgr, config::active_name},
+                            {user, config::active_name} } );
+         set_transaction_headers( trx );
+         trx.sign( signing_key, control->get_chain_id() );
+         trx.sign( get_private_key( sessmgr, "active" ), control->get_chain_id() );
+         BOOST_CHECK_EXCEPTION( push_transaction( trx ), irrelevant_auth_exception,
+                                fc_exception_message_starts_with( expected ) );
+      }
    }
 } FC_LOG_AND_RETHROW()
 

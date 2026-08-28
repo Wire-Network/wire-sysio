@@ -235,6 +235,12 @@ BOOST_FIXTURE_TEST_CASE( session_key_escapes_gate_by_recreation, inline_auth_tes
                             irrelevant_auth_exception,
                             fc_exception_message_contains( "declares irrelevant authority" ) );
    BOOST_REQUIRE( find_perm( key_child ) != nullptr );
+
+   // The escape is usable, not merely an orphaned permission: the relink took effect and the
+   // original session key still authorizes through it. Without exercising it, this test would pass
+   // even if the final linkauth had been a no-op or named the wrong requirement, leaving an
+   // escaped-but-inert permission rather than the live session the case is about.
+   push_reqauth( alice, { permission_level{alice, key_child} }, { get_private_key( alice, "session" ) } );
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( code_parent_can_update_child, inline_auth_tester ) try {
