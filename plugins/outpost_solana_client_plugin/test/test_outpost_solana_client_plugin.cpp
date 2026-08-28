@@ -1423,13 +1423,33 @@ struct manifest_build_harness {
       };
    }
 
+   /// Per-mint transfer-hook configuration. Empty by default: every mint in
+   /// the system today is hook-free, so the manifest is unchanged unless a
+   /// case opts in via `put_hook`.
+   std::map<solana_public_key, manifest_detail::mint_transfer_hook> hooks;
+
+   void put_hook(const solana_public_key& mint, const solana_public_key& hook_program,
+                 std::vector<manifest_detail::extra_account_meta> declared) {
+      hooks.emplace(mint,
+                    manifest_detail::mint_transfer_hook{hook_program, std::move(declared)});
+   }
+
+   manifest_detail::transfer_hook_reader hook_reader() {
+      return [this](const solana_public_key& mint)
+                -> std::optional<manifest_detail::mint_transfer_hook> {
+         auto it = hooks.find(mint);
+         if (it == hooks.end()) return std::nullopt;
+         return it->second;
+      };
+   }
+
    std::vector<std::vector<account_meta>> build(
       const std::vector<manifest_detail::inbound_effect>& effects,
       uint32_t                                            total_attestations,
       const std::function<void()>&                        deadline_probe = [] {}) {
       return manifest_detail::build_dispatch_manifests(
          program_id, effects, total_attestations, deadline_probe, reader(),
-         collateral_reader(), reserve_aggregate, "test-relay");
+         collateral_reader(), hook_reader(), reserve_aggregate, "test-relay");
    }
 };
 
@@ -1550,6 +1570,150 @@ BOOST_AUTO_TEST_CASE(build_manifests_follows_reserve_custody_per_reserve) try {
    BOOST_CHECK(!manifest_has(native, manifest_detail::derive_reserve_vault_pda(
                                         harness.program_id, token_code, 201)));
    BOOST_CHECK(!manifest_has(native, system::program_ids::TOKEN_PROGRAM));
+} FC_LOG_AND_RETHROW();
+
+namespace {
+
+/// Pack a seed list into an `ExtraAccountMeta::address_config`, exactly as
+/// `Seed::pack_into_address_config` does on chain: each seed is a 1-byte tag
+/// then its payload, and the remainder is left zero (the Uninitialized
+/// terminator). Only the two forms the resolver implements are modelled.
+struct seed_literal { std::string bytes; };
+struct seed_account_key { uint8_t index; };
+using packed_seed = std::variant<seed_literal, seed_account_key>;
+
+std::array<uint8_t, 32> pack_seeds(const std::vector<packed_seed>& seeds) {
+   std::array<uint8_t, 32> config{};
+   size_t at = 0;
+   for (const auto& seed : seeds) {
+      if (const auto* lit = std::get_if<seed_literal>(&seed)) {
+         config[at++] = 1;                                     // Seed::Literal
+         config[at++] = static_cast<uint8_t>(lit->bytes.size());
+         for (char c : lit->bytes) config[at++] = static_cast<uint8_t>(c);
+      } else {
+         const auto& acct = std::get<seed_account_key>(seed);
+         config[at++] = 3;                                     // Seed::AccountKey
+         config[at++] = acct.index;
+      }
+   }
+   return config;
+}
+
+manifest_detail::extra_account_meta literal_meta(const solana_public_key& key, bool writable) {
+   manifest_detail::extra_account_meta meta;
+   meta.discriminator = 0;
+   const auto bytes = key._data;
+   std::copy(bytes.begin(), bytes.end(), meta.address_config.begin());
+   meta.is_writable = writable;
+   return meta;
+}
+
+manifest_detail::extra_account_meta external_pda_meta(uint8_t program_index,
+                                                      const std::vector<packed_seed>& seeds,
+                                                      bool writable) {
+   manifest_detail::extra_account_meta meta;
+   meta.discriminator  = static_cast<uint8_t>(program_index + 0x80);
+   meta.address_config = pack_seeds(seeds);
+   meta.is_writable    = writable;
+   return meta;
+}
+
+} // anonymous namespace
+
+/// A hook-bearing Token-2022 custody mint -- the case SOL-396 exists for, and
+/// the one the ATA-derivation cases above do NOT cover.
+///
+/// `reserve_vault_transfer` routes through
+/// `spl_token_2022::onchain::invoke_transfer_checked`, which for such a mint
+/// resolves the hook program, its ExtraAccountMetaList PDA, and every account
+/// that PDA declares out of `remaining_accounts`. Omitting them aborts the CPI
+/// before the transfer and re-packs the window from the unadvanced cursor.
+///
+/// The declared metas mirror the real liqSOL hook: a literal program id, then
+/// per-participant `user_record` PDAs seeded on the SOURCE and DESTINATION
+/// token accounts -- which is why the Execute account order (0 source, 1 mint,
+/// 2 destination, 3 authority, 4 validation PDA) is load-bearing rather than
+/// decorative.
+BOOST_AUTO_TEST_CASE(build_manifests_carry_transfer_hook_accounts_for_a_hook_mint) try {
+   constexpr uint64_t token_code   = 141;
+   constexpr uint64_t reserve_code = 242;
+   const auto spl_mint     = measurement_pubkey(92);
+   const auto recipient    = measurement_pubkey(93);
+   const auto creator      = measurement_pubkey(94);
+   const auto token_2022   = measurement_pubkey(95);
+   const auto hook_program = measurement_pubkey(96);
+   const auto hook_owned   = measurement_pubkey(97);   // a literal meta, e.g. liqsol_core
+
+   manifest_build_harness harness;
+   harness.put(token_code, reserve_code, creator, spl_mint, 6, token_2022);
+   harness.put_hook(spl_mint, hook_program,
+                    {literal_meta(hook_owned, false),
+                     // sender's user_record, seeded on the SOURCE token account (index 0)
+                     external_pda_meta(5, {seed_literal{"user_record"}, seed_account_key{0}}, true),
+                     // receiver's user_record, seeded on the DESTINATION (index 2)
+                     external_pda_meta(5, {seed_literal{"user_record"}, seed_account_key{2}}, true)});
+
+   const auto manifests =
+      harness.build({swap_remit_effect(0, token_code, reserve_code, recipient)}, 1);
+   BOOST_REQUIRE_EQUAL(manifests.size(), 1u);
+   const auto& m = manifests[0];
+
+   const auto vault = manifest_detail::derive_reserve_vault_pda(harness.program_id, token_code,
+                                                                reserve_code);
+   const auto dest_ata =
+      system::get_associated_token_address(recipient, spl_mint, token_2022);
+   const auto validation_pda =
+      manifest_detail::derive_extra_account_metas_pda(hook_program, spl_mint);
+
+   // The hook program and its validation PDA.
+   BOOST_CHECK(manifest_has(m, hook_program));
+   BOOST_CHECK(manifest_has(m, validation_pda));
+   // The literal meta.
+   BOOST_CHECK(manifest_has(m, hook_owned));
+
+   // The two per-participant PDAs, derived under the meta's NAMED program
+   // (index 5 = the first resolved extra, i.e. `hook_owned`) and seeded on the
+   // transfer's source and destination respectively.
+   const auto source_record = system::find_program_address(
+      {std::vector<uint8_t>{'u','s','e','r','_','r','e','c','o','r','d'},
+       std::vector<uint8_t>(vault._data.begin(), vault._data.end())}, hook_owned).first;
+   const auto dest_record = system::find_program_address(
+      {std::vector<uint8_t>{'u','s','e','r','_','r','e','c','o','r','d'},
+       std::vector<uint8_t>(dest_ata._data.begin(), dest_ata._data.end())}, hook_owned).first;
+   BOOST_CHECK(manifest_has(m, source_record));
+   BOOST_CHECK(manifest_has(m, dest_record));
+
+   // Writability is carried from the declaration, not guessed.
+   const auto writable_of = [&](const solana_public_key& key) {
+      const auto it = std::find_if(m.begin(), m.end(),
+                                   [&](const account_meta& a) { return a.key == key; });
+      BOOST_REQUIRE(it != m.end());
+      return it->is_writable;
+   };
+   BOOST_CHECK_EQUAL(writable_of(source_record), true);
+   BOOST_CHECK_EQUAL(writable_of(dest_record), true);
+   BOOST_CHECK_EQUAL(writable_of(hook_owned), false);
+   BOOST_CHECK_EQUAL(writable_of(hook_program), false);
+} FC_LOG_AND_RETHROW();
+
+/// A hook-free mint -- every mint in the system today -- must be byte-for-byte
+/// unchanged by the hook support. Pins that this is additive.
+BOOST_AUTO_TEST_CASE(build_manifests_are_unchanged_for_a_hook_free_mint) try {
+   constexpr uint64_t token_code   = 151;
+   constexpr uint64_t reserve_code = 252;
+   const auto spl_mint   = measurement_pubkey(98);
+   const auto recipient  = measurement_pubkey(99);
+   const auto creator    = measurement_pubkey(100);
+   const auto token_2022 = measurement_pubkey(101);
+
+   manifest_build_harness harness;   // no put_hook: the reader returns nullopt
+   harness.put(token_code, reserve_code, creator, spl_mint, 6, token_2022);
+
+   const auto manifests =
+      harness.build({swap_remit_effect(0, token_code, reserve_code, recipient)}, 1);
+   BOOST_REQUIRE_EQUAL(manifests.size(), 1u);
+   // Reserve PDA + vault + recipient ATA + mint + token program, and nothing else.
+   BOOST_CHECK_EQUAL(manifests[0].size(), 5u);
 } FC_LOG_AND_RETHROW();
 
 /// SOL-396: the reserve's OWN `custody_token_program` drives both the ATA
@@ -1881,8 +2045,8 @@ BOOST_AUTO_TEST_CASE(build_manifests_propagate_an_unreadable_reserve) try {
       manifest_detail::build_dispatch_manifests(
          harness.program_id,
          {swap_remit_effect(0, 10, 20, recipient), swap_remit_effect(1, 11, 21, later)},
-         2, [] {}, throwing_reader, harness.collateral_reader(), harness.reserve_aggregate,
-         "test-relay"),
+         2, [] {}, throwing_reader, harness.collateral_reader(), harness.hook_reader(),
+         harness.reserve_aggregate, "test-relay"),
       fc::exception,
       [](const fc::exception& e) {
          return e.to_detail_string().find("undecodable") != std::string::npos;
@@ -2529,21 +2693,47 @@ BOOST_AUTO_TEST_CASE(reserve_shape_rejects_drifted_declarations) try {
    const auto pubkey_t = prim(idl::primitive_type::pubkey);
    const auto u8_t     = prim(idl::primitive_type::u8);
 
+   // Every case is the VALID four-field declaration with exactly ONE field
+   // dropped or mis-typed. Building them that way is load-bearing: the previous
+   // cases each omitted `custody_token_program` while testing some other defect,
+   // so deleting the `has_token_program` check (or its is_pubkey branch) left the
+   // whole suite green — the same coverage hole that let the missing custody mint
+   // ship in the first place.
+   const auto valid = [&](const char* drop, const char* retype,
+                          const idl::idl_type& replacement) {
+      std::vector<idl::field> fields;
+      const std::pair<const char*, idl::idl_type> declared[] = {
+         {"creator", pubkey_t},
+         {"custody_mint", pubkey_t},
+         {"custody_decimals", u8_t},
+         {"custody_token_program", pubkey_t},
+      };
+      for (const auto& [name, type] : declared) {
+         if (drop != nullptr && std::string_view(name) == drop) continue;
+         fields.push_back({name,
+                           (retype != nullptr && std::string_view(name) == retype) ? replacement
+                                                                                  : type});
+      }
+      return fields;
+   };
+   const auto none = prim(idl::primitive_type::u8);   // unused placeholder
+
    std::vector<reject_case> cases;
-   cases.push_back({"creator dropped",
-                    {{"custody_mint", pubkey_t}, {"custody_decimals", u8_t}}});
-   cases.push_back({"custody_mint dropped",
-                    {{"creator", pubkey_t}, {"custody_decimals", u8_t}}});
-   cases.push_back({"custody_decimals dropped",
-                    {{"creator", pubkey_t}, {"custody_mint", pubkey_t}}});
+   cases.push_back({"creator dropped", valid("creator", nullptr, none)});
+   cases.push_back({"custody_mint dropped", valid("custody_mint", nullptr, none)});
+   cases.push_back({"custody_decimals dropped", valid("custody_decimals", nullptr, none)});
+   // The boot gate this PR adds: a pre-SOL-396 IDL is exactly the valid three
+   // fields with `custody_token_program` absent.
+   cases.push_back({"custody_token_program dropped (pre-SOL-396 IDL)",
+                    valid("custody_token_program", nullptr, none)});
    cases.push_back({"custody_mint declared as a byte array",
-                    {{"creator", pubkey_t},
-                     {"custody_mint", u8_32_array()},
-                     {"custody_decimals", u8_t}}});
+                    valid(nullptr, "custody_mint", u8_32_array())});
    cases.push_back({"custody_decimals declared u32",
-                    {{"creator", pubkey_t},
-                     {"custody_mint", pubkey_t},
-                     {"custody_decimals", prim(idl::primitive_type::u32)}}});
+                    valid(nullptr, "custody_decimals", prim(idl::primitive_type::u32))});
+   cases.push_back({"custody_token_program declared as a byte array",
+                    valid(nullptr, "custody_token_program", u8_32_array())});
+   cases.push_back({"creator declared as a byte array",
+                    valid(nullptr, "creator", u8_32_array())});
 
    for (const auto& c : cases) {
       BOOST_TEST_CONTEXT(c.name) {
