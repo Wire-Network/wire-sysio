@@ -5,8 +5,9 @@ OPP envelope dispute resolution and slash-execution contract.
 ## Responsibility
 
 - Resolves conflicting OPP outpost envelopes via a Tier-1 node-owner vote when the automatic
-  consensus rules in `sysio.msgch` see two or more versions with no strict majority after the epoch
-  boundary for one (outpost, epoch), including when an otherwise eligible operator was silent
+  consensus rules in `sysio.msgch` see a post-boundary no-strict-majority split for one
+  (outpost, epoch): a two-version split only after every eligible operator has delivered, or a
+  three-or-more-version split even when eligible operators are silent.
 - Pauses epoch advancement while a dispute is open and releases it on resolution
 - Dispatches the winning envelope (via `sysio.msgch::resolvedisp`) once a checksum wins
 - Executes slashing of operators through `sysio.opreg` -- the single slashing chokepoint that holds
@@ -30,8 +31,9 @@ OPP envelope dispute resolution and slash-execution contract.
 
 ## Dispute-vote flow
 
-1. **Open**: `sysio.msgch::evalcons` calls `opendispute` inline for a post-boundary no-majority
-   split with at least two versions, regardless of whether every eligible operator delivered. The
+1. **Open**: `sysio.msgch::evalcons` calls `opendispute` inline for an eligible post-boundary
+   no-majority split with at least two versions. A two-version split must be terminal (every
+   eligible operator delivered); a three-or-more-version split may open at the boundary. The
    dispute records the candidate checksums, snapshots the active ROA generation's Tier-1 electorate
    and fixed quorum, and pauses `sysio.epoch`.
 2. **Vote**: owners in the dispute's frozen Tier-1 electorate call `votedispute` with one of the

@@ -221,10 +221,12 @@ namespace sysio {
          SYSLIB_SERIALIZE(dispute_key, (id))
       };
 
-      /// OPP envelope dispute. Opened for a post-boundary no-majority split with at least two
-      /// versions for one (outpost, epoch); resolved by a Tier-1 node-owner vote on the canonical
-      /// checksum. The row is retained after resolution as the audit record (and as the guard that
-      /// prevents re-opening the same (outpost, epoch) dispute).
+      /// OPP envelope dispute. Opened for an eligible post-boundary no-majority split with at least
+      /// two versions for one (outpost, epoch): exactly two versions require every eligible operator
+      /// to deliver, while a three-or-more-version split may open at the boundary. Resolved by a
+      /// Tier-1 node-owner vote on the canonical checksum. The row is retained after resolution as
+      /// the audit record (and as the guard that prevents re-opening the same (outpost, epoch)
+      /// dispute).
       struct [[sysio::table("disputes")]] dispute_entry {
          uint64_t                       id;
          uint64_t                       chain_code;        ///< outpost slug_name value
