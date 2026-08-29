@@ -310,7 +310,12 @@ struct extra_account_meta {
 
 /// Read a Token-2022 MINT account's TLV and return its `TransferHook`
 /// program id, or `nullopt` when the mint carries no hook (a legacy SPL mint,
-/// or a Token-2022 mint without the extension).
+/// a Token-2022 mint without the extension, or one whose hook is explicitly
+/// disabled by an all-zero program id).
+///
+/// Throws on a MALFORMED TLV -- a truncated entry, or a `TransferHook` entry
+/// too short to carry its authority and program id. Neither can be read as
+/// "no hook" without risking a hook-free manifest for a hook mint.
 ///
 /// A hook mint is the case SOL-396 exists for: `reserve_vault_transfer` routes
 /// through `spl_token_2022::onchain::invoke_transfer_checked`, which for such a
@@ -327,7 +332,9 @@ derive_extra_account_metas_pda(const fc::network::solana::solana_public_key& hoo
                                const fc::network::solana::solana_public_key& mint);
 
 /// Parse the validation account's TLV into its declared metas, in order.
-/// Returns empty when the account carries no `Execute` entry.
+/// Throws when the account carries no `Execute` entry, or on any malformed
+/// entry: a partial parse yields a manifest short exactly the accounts the CPI
+/// is about to demand, which is worse than failing here.
 std::vector<extra_account_meta>
 parse_extra_account_metas(const std::vector<uint8_t>& validation_account_data);
 

@@ -662,6 +662,9 @@ constexpr uint8_t  META_DISC_INDEX_BASE     = 0x80;  // U8_TOP_BIT
 constexpr uint8_t  SEED_UNINITIALIZED       = 0;
 constexpr uint8_t  SEED_LITERAL             = 1;
 constexpr uint8_t  SEED_ACCOUNT_KEY         = 3;
+/// A `TransferHook` TLV value is a 32-byte authority followed by a 32-byte
+/// program id; anything shorter cannot be read as either a hook or its absence.
+constexpr uint16_t TRANSFER_HOOK_EXT_MIN_LEN = 64;
 
 /// First 8 bytes of sha256("spl-transfer-hook-interface:execute").
 const std::array<uint8_t, 8> EXECUTE_TLV_DISCRIMINATOR = {
@@ -689,9 +692,22 @@ mint_transfer_hook_program(const std::vector<uint8_t>& mint_account_data) {
       const uint16_t ext_type = le_u16(bytes + cursor);
       const uint16_t ext_len  = le_u16(bytes + cursor + 2);
       const size_t   value    = cursor + 4;
-      if (ext_type == 0) break;                              // Uninitialized terminator
-      if (value + ext_len > mint_account_data.size()) break;  // truncated: stop, do not guess
-      if (ext_type == EXT_TYPE_TRANSFER_HOOK && ext_len >= 64) {
+      if (ext_type == 0) break;  // Uninitialized terminator: the normal end of the TLV
+      // A truncated entry is NOT "no hook". Degrading here builds a hook-free
+      // manifest for a mint that may well declare one, and the CPI then aborts
+      // with the cursor pinned -- the partial-parse outcome `parse_extra_account_metas`
+      // is strict to prevent. Fail against the mint we could not read instead.
+      FC_ASSERT(value + ext_len <= mint_account_data.size(),
+                "custody mint TLV entry at offset {} claims {} bytes but the account holds {}; "
+                "refusing to guess whether it declares a transfer hook",
+                cursor, ext_len, mint_account_data.size());
+      if (ext_type == EXT_TYPE_TRANSFER_HOOK) {
+         // Same asymmetry: a TransferHook entry too short to carry its
+         // authority+program pair cannot be read as "hook disabled".
+         FC_ASSERT(ext_len >= TRANSFER_HOOK_EXT_MIN_LEN,
+                   "custody mint declares a TransferHook extension of {} bytes, below the {} "
+                   "its authority and program id require",
+                   ext_len, TRANSFER_HOOK_EXT_MIN_LEN);
          // authority occupies the first 32; program_id the second.
          std::array<uint8_t, 32> program{};
          std::memcpy(program.data(), bytes + value + 32, 32);
@@ -790,6 +806,17 @@ resolve_hook_metas(const std::vector<extra_account_meta>&        metas,
 
    for (size_t i = 0; i < metas.size(); ++i) {
       const auto& meta = metas[i];
+      // The dispatch transaction is signed by the batch operator alone, so a
+      // meta demanding a signature is a shape this builder cannot satisfy: the
+      // on-chain `add_extra_accounts_for_execute_cpi` would carry `is_signer`
+      // through (de-escalation only applies to accounts already on the CPI
+      // instruction, never a freshly appended extra) and `invoke_signed` would
+      // abort as an unauthorized signer -- inside the CPI, with the cursor
+      // pinned and no local diagnostic. Refuse loudly here, naming the meta,
+      // exactly as the unsupported seed and discriminator forms below do.
+      FC_ASSERT(!meta.is_signer,
+                "transfer-hook meta {} demands a signature, which the dispatch transaction "
+                "cannot provide", i);
       fc::network::solana::solana_public_key key;
 
       if (meta.discriminator == META_DISC_LITERAL) {
@@ -1032,8 +1059,8 @@ std::vector<std::vector<fc::network::solana::account_meta>> build_dispatch_manif
    const fc::network::solana::solana_public_key& reserve_aggregate,
    const std::string&                            log_label) {
    const auto& token_program_id = fc::network::solana::system::program_ids::TOKEN_PROGRAM;
-   const auto& associated_token_program_id =
-      fc::network::solana::system::program_ids::ASSOCIATED_TOKEN_PROGRAM;
+   const auto& token_2022_program_id =
+      fc::network::solana::system::program_ids::TOKEN_2022_PROGRAM;
    const auto& system_program_id = fc::network::solana::system::program_ids::SYSTEM_PROGRAM;
 
    // `NATIVE_TOKEN_MARKER` on the program side: an all-zero custody mint means
@@ -1230,6 +1257,12 @@ std::vector<std::vector<fc::network::solana::account_meta>> build_dispatch_manif
       const auto add_hook_accounts = [&](const fc::network::solana::solana_public_key& source,
                                          const fc::network::solana::solana_public_key& destination,
                                          const fc::network::solana::solana_public_key& authority) {
+         // A legacy-SPL reserve cannot carry a Token-2022 extension, so there is
+         // no hook to find and no reason to pay a `get_account_info` -- nor to
+         // let a transient absent read fail the WHOLE build (the reader asserts
+         // rather than degrading). Gating here keeps that assert scoped to the
+         // mints where a hook is actually representable.
+         if (info.custody_token_program != token_2022_program_id) return;
          const auto& hook = transfer_hook(info.custody_mint);
          if (!hook.has_value()) return;
          const auto validation_pda =
@@ -1270,8 +1303,6 @@ std::vector<std::vector<fc::network::solana::account_meta>> build_dispatch_manif
             add(custody_ata(*effect.recipient), true);
             add(custody_token_program, false);
             add_hook_accounts(vault_pda, custody_ata(*effect.recipient), vault_pda);
-            add(associated_token_program_id, false);
-            add(system_program_id, false);
             break;
          }
          case effect_shape::reserve_create_cancelled: {
@@ -1282,8 +1313,6 @@ std::vector<std::vector<fc::network::solana::account_meta>> build_dispatch_manif
             add(info.custody_mint, false);
             add(custody_token_program, false);
             add_hook_accounts(vault_pda, custody_ata(info.creator), vault_pda);
-            add(associated_token_program_id, false);
-            add(system_program_id, false);
             break;
          }
          default:
@@ -1697,9 +1726,12 @@ std::string outpost_solana_client::drain_dispatch(
 
 /// Read one custody mint's transfer-hook configuration off chain.
 ///
-/// Absent mint, no TransferHook extension, or a hook explicitly disabled (an
-/// all-zero program id) all return `nullopt` and leave the manifest unchanged
-/// -- which is every mint in the system today.
+/// Called only for a Token-2022 custody reserve -- a legacy-SPL reserve cannot
+/// carry the extension, so the caller gates and this never reads that mint.
+///
+/// No TransferHook extension, or a hook explicitly disabled (an all-zero
+/// program id), returns `nullopt` and leaves the manifest unchanged -- which is
+/// every mint in the system today. An ABSENT mint does not: see below.
 ///
 /// A hook that IS configured but whose validation PDA cannot be read is NOT
 /// degraded to `nullopt`: that would silently emit a manifest short the very
