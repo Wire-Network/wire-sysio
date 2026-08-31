@@ -85,10 +85,13 @@ the exception, not the ordinary path.
 
 Wire meters the same three resources Antelope does.
 
-**CPU** — execution time, in microseconds. Metered per action and billed to that action's payer.
+**CPU** — execution time, in microseconds. Metered per action the transaction itself declares and
+billed to that action's payer. An inline action is timed inside the declared action that triggered
+it, so the *caller's* payer covers a callee contract's CPU and the callee's own policy is never
+consulted for that work.
 
-**NET** — transaction size on the wire, in bytes. Billed per action based on its serialized
-billable size.
+**NET** — transaction size on the wire, in bytes. Billed per declared action based on its serialized
+billable size; inline actions add none.
 
 **RAM** — persistent state: account rows, permissions, contract code, and every table row a
 contract writes. Measured in bytes. Unlike CPU and NET, RAM is not a rate — it is an occupancy
@@ -111,7 +114,7 @@ which is the case for essentially all user traffic.
 
 **The exception: an account can volunteer to pay for itself.** Wire reserves a permission name,
 `sysio.payer`, for this. It is not a way to bill a stranger, and adding it is not a way to obtain
-resources. The protocol requires all three of the following together:
+resources. On a regular action the protocol requires all three of the following together:
 
 - the `sysio.payer` entry sits at **index 0** of the action's authorizations,
 - the **same actor** also appears on that action under a real permission, and
@@ -244,7 +247,8 @@ so calling one with no policy fails outright:
 account payloadless net usage is too high: 132 > 0
 ```
 
-The transaction throws. Nothing is charged to the caller and nothing is charged elsewhere.
+The transaction throws. Nothing is charged *objectively* — but this failure lands after
+authorization, so the signer accrues subjective CPU and a failure count against the limiter.
 
 That holds only while the contract is the payer. Because the billing map is keyed on `payer()` and
 nothing else, an action carrying `{caller, sysio.payer}` puts the caller in the map and leaves the
@@ -548,10 +552,8 @@ Two properties keep this landing on abusers rather than on ordinary users:
   Two classes are deliberately excluded, so a signer is not punished for conditions it did not
   cause: **duplicates** (`tx_duplicate`), and **block-level exhaustion** —
   `block_cpu_usage_exceeded`, `block_net_usage_exceeded`, `deadline_exception`,
-  `interrupt_exception`, and the read-only VM-OC compile failure. Blowing your *own* CPU or NET
-  limit (`tx_cpu_usage_exceeded`, `tx_net_usage_exceeded`) is **not** excluded and does
-  accumulate. The producer's separate failure counter, below, skips the same two classes and
-  additionally ignores anything that failed before authorization.
+  `interrupt_exception`, and the read-only VM-OC compile failure. Whether anything accumulates at
+  all depends on how far the transaction got — see below.
 
 A blunter limiter runs alongside it: `subjective-account-max-failures` (default `3`) per
 `subjective-account-max-failures-window-size` blocks (default `1`). An account over the limit has
@@ -589,7 +591,7 @@ failures would point the cost at the wrong account. The signer still is.
 | `subjective-account-max-failures` | `3` | Failures allowed per account per window |
 | `subjective-account-max-failures-window-size` | `1` | Window size in blocks for the failure limit |
 | `disable-subjective-payer-billing` | `true` | Set false to also meter the payer (the contract) |
-| `disable-subjective-account-billing <acct>` | — | Exempt named accounts entirely |
+| `disable-subjective-account-billing <acct>` | — | Disables subjective billing for the **whole transaction** when any first authorizer matches — including the failure-limit precheck, and for every co-authorizer |
 
 Independent of all of it, `incoming-transaction-queue-size-mb` (default `1024`) subjectively drops
 transactions with a resource-exhaustion error when the incoming queue overflows.
@@ -707,8 +709,8 @@ Budget headroom for peaks above the average rate, not for failures: objective CP
 billed only on the success path, since `add_transaction_usage` runs from `finalize()` and a
 throwing transaction has its session undone. A failed attempt costs the payer nothing *objectively*,
 and a retry that lands is billed once. Nor subjectively: `disable-subjective-payer-billing` defaults
-true, so `subjective_bill_failure` skips the payer and the cost lands on the *signer* — see
-[Subjective billing](#subjective-billing-meters-the-signer).
+true, so `subjective_bill_failure` skips the payer and the cost lands on the *signer*, if the
+transaction reached authorization — see [Subjective billing](#subjective-billing-meters-the-signer).
 
 The provisioning is a single `addpolicy` on the contract account. Because the contract is the payer
 for any call that does not name one explicitly, ordinary users of that token are never billed — a
