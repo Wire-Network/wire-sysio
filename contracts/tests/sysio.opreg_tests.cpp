@@ -29,11 +29,23 @@ constexpr uint32_t kDefaultMaxConsecutiveMisses = 5;
 /// Focused threshold that terminates after a second consecutive miss.
 constexpr uint32_t kSingleAllowedConsecutiveMiss = 1;
 
+/// Successful active delivery that seeds the pre-withdrawal percentage sample.
+constexpr uint32_t kPreWithdrawalDeliveredEpoch = 1;
+
+/// Missed active delivery immediately before the withdrawal-ineligibility interval.
+constexpr uint32_t kPreWithdrawalMissedEpoch = kPreWithdrawalDeliveredEpoch + 1;
+
 /// First delivery epoch used by the withdrawal-ineligibility regression.
-constexpr uint32_t kFirstIneligibleDeliveryEpoch = 1;
+constexpr uint32_t kFirstIneligibleDeliveryEpoch = kPreWithdrawalMissedEpoch + 1;
 
 /// Second delivery epoch used by the withdrawal-ineligibility regression.
 constexpr uint32_t kSecondIneligibleDeliveryEpoch = kFirstIneligibleDeliveryEpoch + 1;
+
+/// Missed active delivery immediately after withdrawal cancellation.
+constexpr uint32_t kPostReactivationMissedEpoch = kSecondIneligibleDeliveryEpoch + 1;
+
+/// Successful active delivery that closes the post-reactivation sample.
+constexpr uint32_t kPostReactivationDeliveredEpoch = kPostReactivationMissedEpoch + 1;
 
 /// Current production rolling-window miss-percentage threshold.
 constexpr uint32_t kDefaultMaxPctMisses24h = 5;
@@ -55,6 +67,15 @@ constexpr uint64_t kFirstWithdrawalRequestId = 1;
 
 /// First identifier assigned by an empty delivery-log table.
 constexpr uint64_t kFirstDeliveryLogId = 1;
+
+/// Second identifier assigned by an empty delivery-log table.
+constexpr uint64_t kSecondDeliveryLogId = kFirstDeliveryLogId + 1;
+
+/// Third identifier assigned by an empty delivery-log table.
+constexpr uint64_t kThirdDeliveryLogId = kSecondDeliveryLogId + 1;
+
+/// Minimum wall-clock separation that gives delivery rows distinct millisecond stamps.
+constexpr uint32_t kDeliveryTimestampSeparationSeconds = 2;
 
 /// Production-size producer capacity used by focused collateral tests.
 constexpr uint32_t kTestMaxProducers = 21;
@@ -1406,13 +1427,24 @@ BOOST_FIXTURE_TEST_CASE(termcheck_keeps_bootstrapped_operator_exempt, sysio_opre
    BOOST_REQUIRE_EQUAL(1, op["is_bootstrapped"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
-/// Withdrawal-induced ineligibility prevents delivery, so observations made
-/// during that interval must not become termination misses after reactivation.
+/// Withdrawal-induced ineligibility starts a fresh duty interval when the
+/// operator reactivates, so miss runs cannot span the ineligible interval.
 BOOST_FIXTURE_TEST_CASE(recorddel_ignores_withdrawal_ineligibility, sysio_opreg_tester) { try {
    activate_batch_operator(
       kEligibilityBatchOperator,
       /*max_consec_misses=*/kSingleAllowedConsecutiveMiss,
       /*max_pct_misses_24h=*/kMaxAcceptedPctMisses24h);
+
+   BOOST_REQUIRE_EQUAL(success(),
+      recorddel(kEligibilityBatchOperator, kPreWithdrawalDeliveredEpoch, /*delivered=*/true));
+   BOOST_REQUIRE_EQUAL(success(),
+      recorddel(kEligibilityBatchOperator, kPreWithdrawalMissedEpoch, /*delivered=*/false));
+   BOOST_REQUIRE_EQUAL(success(), termcheck(kEligibilityBatchOperator));
+   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE ==
+                 get_operator(kEligibilityBatchOperator)[eligibility_field::status].as<OperatorStatus>());
+   produce_blocks();
+   produce_block(fc::seconds(kDeliveryTimestampSeparationSeconds));
+
    BOOST_REQUIRE_EQUAL(success(),
       withdrawinle(kEligibilityBatchOperator, kEthCodename, kEthCodename, kTestMinBond));
    BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_UNKNOWN ==
@@ -1422,15 +1454,32 @@ BOOST_FIXTURE_TEST_CASE(recorddel_ignores_withdrawal_ineligibility, sysio_opreg_
       recorddel(kEligibilityBatchOperator, kFirstIneligibleDeliveryEpoch, /*delivered=*/false));
    BOOST_REQUIRE_EQUAL(success(),
       recorddel(kEligibilityBatchOperator, kSecondIneligibleDeliveryEpoch, /*delivered=*/false));
-   BOOST_REQUIRE(get_dellog_entry(kFirstDeliveryLogId).is_null());
+   BOOST_REQUIRE(!get_dellog_entry(kFirstDeliveryLogId).is_null());
+   BOOST_REQUIRE(!get_dellog_entry(kSecondDeliveryLogId).is_null());
+   BOOST_REQUIRE(get_dellog_entry(kThirdDeliveryLogId).is_null());
 
    BOOST_REQUIRE_EQUAL(success(), cancelwtdw(
       kEligibilityBatchOperator, kEligibilityBatchOperator, kFirstWithdrawalRequestId));
+   auto reactivated = get_operator(kEligibilityBatchOperator);
+   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE ==
+                 reactivated[eligibility_field::status].as<OperatorStatus>());
+   auto pre_withdrawal_miss_ts = get_dellog_entry(kSecondDeliveryLogId)["ts_ms"].as_uint64();
+   auto reactivated_at         = reactivated["available_at"].as_uint64();
+   BOOST_REQUIRE_MESSAGE(pre_withdrawal_miss_ts < reactivated_at,
+                         "pre-withdrawal miss timestamp " << pre_withdrawal_miss_ts
+                                                           << " must precede reactivation " << reactivated_at);
+   produce_blocks();
+
+   BOOST_REQUIRE_EQUAL(success(),
+      recorddel(kEligibilityBatchOperator, kPostReactivationMissedEpoch, /*delivered=*/false));
+   BOOST_REQUIRE_EQUAL(success(),
+      recorddel(kEligibilityBatchOperator, kPostReactivationDeliveredEpoch, /*delivered=*/true));
    BOOST_REQUIRE_EQUAL(success(), termcheck(kEligibilityBatchOperator));
 
    auto op = get_operator(kEligibilityBatchOperator);
-   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE ==
-                 op[eligibility_field::status].as<OperatorStatus>());
+   BOOST_REQUIRE_MESSAGE(OperatorStatus::OPERATOR_STATUS_ACTIVE ==
+                            op[eligibility_field::status].as<OperatorStatus>(),
+                         op["status_reason"].as_string());
 } FC_LOG_AND_RETHROW() }
 
 // ---- dellog retention: bounded pruning of rows outside the rolling window ----

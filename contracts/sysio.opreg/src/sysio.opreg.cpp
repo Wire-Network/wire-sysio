@@ -9,6 +9,7 @@
 #include <sysio/opp/attestations/attestations.pb.hpp>
 #include <magic_enum/magic_enum.hpp>
 #include <zpp_bits.h>
+#include <algorithm>
 #include <array>
 #include <cstring>
 
@@ -1684,9 +1685,14 @@ void opreg::termcheck(name account) {
    uint64_t now_ms      = current_time_ms();
    uint64_t window_open = termination_window_open_ms(now_ms, cfg);
 
+   // A transition back to ACTIVE starts a new duty interval. Rows from an
+   // earlier active interval must not join a consecutive-miss run across time
+   // when the operator was ineligible and could not deliver.
+   uint64_t scan_open = std::max(window_open, op.available_at);
+
    dellog_t log(get_self());
    auto idx = log.get_index<"byaccountts"_n>();
-   uint128_t lower_key = (static_cast<uint128_t>(account.value) << 64) | window_open;
+   uint128_t lower_key = (static_cast<uint128_t>(account.value) << 64) | scan_open;
    uint128_t upper_key = (static_cast<uint128_t>(account.value) << 64) | std::numeric_limits<uint64_t>::max();
 
    uint32_t consecutive_misses = 0;
