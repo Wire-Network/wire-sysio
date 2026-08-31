@@ -26,9 +26,9 @@ tier budget — so an ordinary account cannot grant itself bandwidth. (Privilege
 sit outside this: `setalimits` and the fixed account gift can set limits without a policy.) A node
 owner may name itself as its own policy's recipient; registration does that for tier 1 only.
 
-**A contract without a policy does not run.** Because the contract is the payer, an unprovisioned
-one has nothing to pay with, and ordinary calls into it fail. Provisioning the contract — not the
-user — is what makes an application usable.
+**A contract without a policy does not run.** Because the contract is the payer for actions declared
+on it, an unprovisioned one has nothing to pay with and those calls fail. Provisioning the contract
+— not the user — is what makes an application usable.
 
 There is one exception, covered in [Who pays](#who-pays-the-payer-model): an account can volunteer
 to pay for itself. It is opt-in, it requires signatures, and it is not how ordinary traffic works.
@@ -152,15 +152,16 @@ flowchart TD
     B -->|"Yes — opt-in"| D{"Same actor also present<br/>with a real permission,<br/>and signed for?"}
     D -->|"No"| E["Rejected:<br/>unsatisfied authorization"]
     D -->|"Yes"| F["Payer = that actor"]
-    C --> G["Contract needs a policy.<br/>Signer not billed."]
+    C --> G["Contract needs a policy for<br/>actions declared on it.<br/>Signer not billed."]
     F --> H["Actor needs its own allocation.<br/>Contract not billed."]
 ```
 
-The objective billing map is keyed on `payer()` and nothing else, and it holds one entry per action
-the transaction *declares*. An authorizing account that is not the payer never enters it, so
-consensus neither charges nor limits its CPU and NET. Nor does a contract reached only inline: its
-work is timed inside the declared action that triggered it and billed to that action's payer, so it
-needs no allocation of its own. A producer running
+The objective billing map is populated only from the actions a transaction *declares*, and is keyed
+on `payer()` — so two declared actions sharing a payer aggregate into one entry. An authorizing
+account that is not the payer never enters it, so consensus neither charges nor limits its CPU and
+NET. Nor does a contract reached only inline: its work is timed inside the declared action that
+triggered it and billed to that action's payer, so it needs no CPU or NET allocation for that work.
+RAM is separate — a callee that bills state to itself still needs the capacity. A producer running
 [subjective billing](#subjective-billing-meters-the-signer) does meter the signer, but that is
 node-local rather than consensus.
 
@@ -256,9 +257,6 @@ nothing else, an action carrying `{caller, sysio.payer}` puts the caller in the 
 contract out of it entirely — the contract's zero CPU and NET are never consulted. A provisioned
 caller or relayer can therefore drive an otherwise unprovisioned contract, so long as the caller
 has the capacity and any RAM the contract bills to *itself* is covered.
-
-So an unprovisioned contract is inert for ordinary users, not universally inert. Provisioning it is
-what makes it callable by anyone; without that, only a caller willing to pay its way can reach it.
 
 ---
 
@@ -710,8 +708,8 @@ Budget headroom for peaks above the average rate, not for failures: objective CP
 billed only on the success path, since `add_transaction_usage` runs from `finalize()` and a
 throwing transaction has its session undone. A failed attempt costs the payer nothing *objectively*,
 and a retry that lands is billed once. Nor subjectively: `disable-subjective-payer-billing` defaults
-true, so `subjective_bill_failure` skips the payer and the cost lands on the *signer*, once
-authorization succeeds — see [Subjective billing](#subjective-billing-meters-the-signer).
+true, so `subjective_bill_failure` skips the payer and the cost lands on the *signer*, once an
+action begins executing — see [Subjective billing](#subjective-billing-meters-the-signer).
 
 The provisioning is a single `addpolicy` on the contract account. Because the contract is the payer
 for any declared action that does not name one explicitly, ordinary users of that token are never billed — a
