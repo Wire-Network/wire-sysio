@@ -85,10 +85,8 @@ the exception, not the ordinary path.
 
 Wire meters the same three resources Antelope does.
 
-**CPU** — execution time, in microseconds. Metered per action the transaction itself declares and
-billed to that action's payer. An inline action is timed inside the declared action that triggered
-it, so the *caller's* payer covers a callee contract's CPU and the callee's own policy is never
-consulted for that work.
+**CPU** — execution time, in microseconds. Metered per action the transaction declares and billed to
+that action's payer; an inline action is timed inside the declared action that triggered it.
 
 **NET** — transaction size on the wire, in bytes. Billed per declared action based on its serialized
 billable size; inline actions add none.
@@ -158,10 +156,13 @@ flowchart TD
     F --> H["Actor needs its own allocation.<br/>Contract not billed."]
 ```
 
-The objective billing map is keyed on `payer()` and nothing else. An authorizing account that is
-not the payer never enters it, so consensus neither charges nor limits its CPU and NET. A producer
-running [subjective billing](#subjective-billing-meters-the-signer) does meter the signer, but
-that is node-local rather than consensus.
+The objective billing map is keyed on `payer()` and nothing else, and it holds one entry per action
+the transaction *declares*. An authorizing account that is not the payer never enters it, so
+consensus neither charges nor limits its CPU and NET. Nor does a contract reached only inline: its
+work is timed inside the declared action that triggered it and billed to that action's payer, so it
+needs no allocation of its own. A producer running
+[subjective billing](#subjective-billing-meters-the-signer) does meter the signer, but that is
+node-local rather than consensus.
 
 | Action authorizations | Payer | Notes |
 |---|---|---|
@@ -179,8 +180,8 @@ a ported contract, push a transaction the way you always have, and the call fail
 account <yourcontract> net usage is too high: 132 > 0
 ```
 
-Nothing is wrong with the contract, the transaction, or the signer. The contract has no policy, and
-the contract is the payer. It will look dead until a node owner issues it one.
+Nothing is wrong with the contract, the transaction, or the signer — the contract is the payer and
+has no policy. It will look dead until a node owner issues it one.
 
 The fix is not to ask users to acquire resources. It is a single `addpolicy` on the contract
 account, and for a contract that bills its own state that is the whole of it — the same unmodified
@@ -222,9 +223,9 @@ nothing — `activateroa` deliberately creates
 > finite number where arithmetic is needed. Seeing `-1` in a `get_account` response is not an
 > overflow.
 
-A third-party contract is different. It is an ordinary account, and it is the payer for every call
-into it that does not name one explicitly — which is every ordinary call — so it needs a real
-allocation. That is exactly what a ROA policy provides.
+A third-party contract is different. It is an ordinary account, and it is the payer for every action
+a transaction declares on it without naming one explicitly — which is every ordinary call — so it
+needs a real allocation. That is exactly what a ROA policy provides.
 
 ### What happens with no policy at all
 
@@ -241,7 +242,7 @@ For a **user** account, consensus never consults those zeros. It signs, the cont
 transaction succeeds.
 
 For a **contract** account, those zeros are fatal under default billing. The contract is the payer,
-so calling one with no policy fails outright:
+so a transaction that declares an action on it with no policy fails outright:
 
 ```
 account payloadless net usage is too high: 132 > 0
@@ -709,11 +710,11 @@ Budget headroom for peaks above the average rate, not for failures: objective CP
 billed only on the success path, since `add_transaction_usage` runs from `finalize()` and a
 throwing transaction has its session undone. A failed attempt costs the payer nothing *objectively*,
 and a retry that lands is billed once. Nor subjectively: `disable-subjective-payer-billing` defaults
-true, so `subjective_bill_failure` skips the payer and the cost lands on the *signer*, if the
-transaction reached authorization — see [Subjective billing](#subjective-billing-meters-the-signer).
+true, so `subjective_bill_failure` skips the payer and the cost lands on the *signer*, once
+authorization succeeds — see [Subjective billing](#subjective-billing-meters-the-signer).
 
 The provisioning is a single `addpolicy` on the contract account. Because the contract is the payer
-for any call that does not name one explicitly, ordinary users of that token are never billed — a
+for any declared action that does not name one explicitly, ordinary users of that token are never billed — a
 user is billed only if they opt in with `sysio.payer`, which the wallet or client would have to put
 in the action deliberately. What the developer needs from the policy differs by resource, though:
 
