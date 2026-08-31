@@ -33,6 +33,7 @@
 #include <fc/crypto/private_key.hpp>
 #include <fc/crypto/public_key.hpp>
 #include <fc/crypto/signature.hpp>
+#include <fc/crypto/ethereum/ethereum_types.hpp>
 #include <magic_enum/magic_enum.hpp>
 
 #include <algorithm>
@@ -277,12 +278,16 @@ std::string encode_node_owner_registration(
    uint32_t tier,
    sysio::opp::types::WireKeyType wire_key_type,
    const std::vector<char>& wire_key_bytes,
-   const std::vector<char>& eth_pubkey_bytes)
+   const std::vector<char>& eth_pubkey_bytes,
+   const std::vector<uint8_t>& eth_address)
 {
    sysio::opp::attestations::NodeOwnerRegistration reg;
    reg.mutable_account()->set_name(account);
    reg.set_tier(tier);
    reg.set_actor_pub_key(eth_pubkey_bytes.data(), eth_pubkey_bytes.size());
+   auto* actor = reg.mutable_actor();
+   actor->set_kind(sysio::opp::types::CHAIN_KIND_EVM);
+   actor->set_address(eth_address.data(), eth_address.size());
    auto* wk = reg.mutable_wire_pub_key();
    wk->set_key_type(wire_key_type);
    wk->set_key(wire_key_bytes.data(), wire_key_bytes.size());
@@ -350,6 +355,7 @@ public:
    static constexpr uint32_t kMaxLockReleasePerEpoch = 32;
    static constexpr auto TOKEN_ACCOUNT  = "sysio.token"_n;
    static constexpr auto AUTHEX_ACCOUNT = "sysio.authex"_n;
+   static constexpr auto DCLAIM_ACCOUNT = "sysio.dclaim"_n;
    static constexpr auto CHAINS_ACCOUNT = "sysio.chains"_n;
    static constexpr auto ROA_ACCOUNT    = "sysio.roa"_n;
    static constexpr auto BATCHOP        = "batchop.a"_n;
@@ -366,7 +372,7 @@ public:
       create_accounts({
          MSGCH_ACCOUNT, OPREG_ACCOUNT, UWRIT_ACCOUNT, EPOCH_ACCOUNT,
          RESERV_ACCOUNT, CHALG_ACCOUNT, TOKEN_ACCOUNT, CHAINS_ACCOUNT,
-         BATCHOP, UWRIT_OP
+         DCLAIM_ACCOUNT, BATCHOP, UWRIT_OP
       });
       // CLAIM_ACCOUNT with NO roa policy (include_roa_policy=false) so regnodeowner exercises the
       // fresh create-branch of increase_reslimit. (A pre-existing reslimit row would now be reconciled,
@@ -383,6 +389,7 @@ public:
       deploy(EPOCH_ACCOUNT,  contracts::epoch_wasm(),   contracts::epoch_abi(),   epoch_abi);
       deploy(RESERV_ACCOUNT, contracts::reserve_wasm(), contracts::reserve_abi(), reserv_abi);
       deploy(AUTHEX_ACCOUNT, contracts::authex_wasm(),  contracts::authex_abi(),  authex_abi);
+      deploy(DCLAIM_ACCOUNT, contracts::dclaim_wasm(),  contracts::dclaim_abi(),  dclaim_abi);
       deploy(CHAINS_ACCOUNT, contracts::chains_wasm(),  contracts::chains_abi(),  chains_abi);
       // sysio.roa is a genesis system account already running this build's code (active, with the
       // sysio.acct policy), so re-deploying it would fail set_exact_code. Just load its on-chain abi
@@ -1387,8 +1394,8 @@ public:
          push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "advance"_n, mvo()));
    }
 
-   abi_serializer msgch_abi, opreg_abi, uwrit_abi, epoch_abi, reserv_abi, authex_abi, chains_abi, roa_abi,
-                  token_abi;
+   abi_serializer msgch_abi, opreg_abi, uwrit_abi, epoch_abi, reserv_abi, authex_abi, dclaim_abi,
+                  chains_abi, roa_abi, token_abi;
 
    std::vector<char> uwrit_op_eth_pubkey;
 };
@@ -1936,10 +1943,11 @@ BOOST_FIXTURE_TEST_CASE(dispatch_routes_node_owner_reg_to_roa, sysio_dispatch_te
    // Depositor's ETH key (EM, 33-byte compressed).
    auto eth_pub = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em).get_public_key();
    auto eth_bytes = em_pubkey_bytes(eth_pub);
+   auto eth_address = fc::crypto::ethereum::address_to_bytes(eth_pub);
 
    auto payload = encode_node_owner_registration(
       CLAIM_ACCOUNT.to_string(), /*tier=*/2,
-      sysio::opp::types::WIRE_KEY_TYPE_K1, wire_key, eth_bytes);
+      sysio::opp::types::WIRE_KEY_TYPE_K1, wire_key, eth_bytes, eth_address);
    auto envelope = encode_envelope_with_one_attestation(
       current_epoch(), sysio::opp::types::ATTESTATION_TYPE_NODE_OWNER_REG, payload);
 
@@ -1973,9 +1981,10 @@ BOOST_FIXTURE_TEST_CASE(node_owner_reg_from_other_evm_outpost_is_dropped, sysio_
    auto wire_key  = k1_pubkey_bytes(get_public_key(CLAIM_ACCOUNT, "active"));
    auto eth_pub   = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em).get_public_key();
    auto eth_bytes = em_pubkey_bytes(eth_pub);
+   auto eth_address = fc::crypto::ethereum::address_to_bytes(eth_pub);
    auto payload   = encode_node_owner_registration(
       CLAIM_ACCOUNT.to_string(), /*tier=*/2,
-      sysio::opp::types::WIRE_KEY_TYPE_K1, wire_key, eth_bytes);
+      sysio::opp::types::WIRE_KEY_TYPE_K1, wire_key, eth_bytes, eth_address);
    auto envelope  = encode_envelope_with_one_attestation(
       current_epoch(), sysio::opp::types::ATTESTATION_TYPE_NODE_OWNER_REG, payload);
 
@@ -2000,9 +2009,10 @@ BOOST_FIXTURE_TEST_CASE(node_owner_reg_from_non_evm_outpost_is_dropped, sysio_di
    auto wire_key  = k1_pubkey_bytes(get_public_key(CLAIM_ACCOUNT, "active"));
    auto eth_pub   = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em).get_public_key();
    auto eth_bytes = em_pubkey_bytes(eth_pub);
+   auto eth_address = fc::crypto::ethereum::address_to_bytes(eth_pub);
    auto payload   = encode_node_owner_registration(
       CLAIM_ACCOUNT.to_string(), /*tier=*/2,
-      sysio::opp::types::WIRE_KEY_TYPE_K1, wire_key, eth_bytes);
+      sysio::opp::types::WIRE_KEY_TYPE_K1, wire_key, eth_bytes, eth_address);
    auto envelope  = encode_envelope_with_one_attestation(
       current_epoch(), sysio::opp::types::ATTESTATION_TYPE_NODE_OWNER_REG, payload);
 
@@ -2270,7 +2280,8 @@ BOOST_FIXTURE_TEST_CASE(swap_missing_dst_authex_recovers_after_exact_uic_replay,
       AUTHEX_ACCOUNT, authex_abi, AUTHEX_ACCOUNT, "recordlink"_n, mvo()
          ("account", UWRIT_OP)
          ("chain_kind", ChainKind::CHAIN_KIND_SVM)
-         ("pub_key", solana_link_key)));
+         ("pub_key", solana_link_key)
+         ("native_address", std::vector<char>(32, '\x0b'))));
    produce_block();
 
    BOOST_REQUIRE_EQUAL(success(), rcrdcommit_direct(
@@ -3792,7 +3803,8 @@ BOOST_FIXTURE_TEST_CASE(swap_forged_claim_cannot_overwrite_honest_candidate,
       AUTHEX_ACCOUNT, authex_abi, AUTHEX_ACCOUNT, "recordlink"_n, mvo()
          ("account", UWRIT_OP)
          ("chain_kind", ChainKind::CHAIN_KIND_SVM)
-         ("pub_key", solana_link_key)));
+         ("pub_key", solana_link_key)
+         ("native_address", std::vector<char>(32, '\x0b'))));
    setup_wire_token_and_reserves();
 
    const uint64_t eth       = fc::slug_name{"ETH"}.value;
@@ -4346,7 +4358,8 @@ BOOST_FIXTURE_TEST_CASE(swap_race_time_reserve_drain_rejects_request,
       AUTHEX_ACCOUNT, authex_abi, AUTHEX_ACCOUNT, "recordlink"_n, mvo()
          ("account", UWRIT_OP)
          ("chain_kind", ChainKind::CHAIN_KIND_SVM)
-         ("pub_key", solana_link_key)));
+         ("pub_key", solana_link_key)
+         ("native_address", std::vector<char>(32, '\x0b'))));
    setup_wire_token_and_reserves();
 
    const uint64_t eth       = fc::slug_name{"ETH"}.value;
@@ -4456,7 +4469,8 @@ BOOST_FIXTURE_TEST_CASE(swap_replayed_uic_variance_drift_rejects_request,
       AUTHEX_ACCOUNT, authex_abi, AUTHEX_ACCOUNT, "recordlink"_n, mvo()
          ("account", UWRIT_OP)
          ("chain_kind", ChainKind::CHAIN_KIND_SVM)
-         ("pub_key", solana_link_key)));
+         ("pub_key", solana_link_key)
+         ("native_address", std::vector<char>(32, '\x0b'))));
    produce_block();
 
    BOOST_REQUIRE_EQUAL(success(), rcrdcommit_direct(

@@ -14,7 +14,9 @@
 #include <fc/crypto/private_key.hpp>
 #include <fc/crypto/base58.hpp>
 #include <fc/crypto/ripemd160.hpp>
+#include <fc/crypto/ethereum/ethereum_types.hpp>
 #include <sysio/opp/opp.hpp>     // FC_REFLECT_ENUM for sysio::opp::types::ChainKind
+#include "contract_test_support.hpp"
 #include <magic_enum/magic_enum.hpp>
 
 using namespace sysio::testing;
@@ -51,16 +53,29 @@ static std::string build_link_message(
 class sysio_authex_tester : public tester {
 public:
    static constexpr auto AUTHEX = "sysio.authex"_n;
+   static constexpr auto DCLAIM = "sysio.dclaim"_n;
+   static constexpr auto MSGCH = "sysio.msgch"_n;
 
    sysio_authex_tester() {
       produce_blocks( 2 );
 
-      create_accounts( { "alice"_n, "bob"_n, "carol"_n, } );
+      create_accounts( { DCLAIM, MSGCH, "alice"_n, "bob"_n, "carol"_n, } );
       produce_blocks( 2 );
 
       set_code( AUTHEX, contracts::authex_wasm() );
       set_abi( AUTHEX, contracts::authex_abi().data() );
       set_privileged( AUTHEX );
+
+      set_code( DCLAIM, contracts::dclaim_wasm() );
+      set_abi( DCLAIM, contracts::dclaim_abi().data() );
+      set_privileged( DCLAIM );
+
+      // createlink declares sysio.authex.active on its inline linkswept action. Grant the
+      // contract's own code that permission, matching production bootstrap.
+      authority authex_active(get_public_key(AUTHEX, "active"));
+      authex_active.accounts.push_back(
+         permission_level_weight{{AUTHEX, config::sysio_code_name}, 1});
+      set_authority(AUTHEX, config::active_name, authex_active, config::owner_name);
 
       produce_blocks();
 
@@ -69,6 +84,16 @@ public:
       abi_def abi;
       BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, abi), true);
       abi_ser.set_abi(abi, abi_serializer::create_yield_function(abi_serializer_max_time));
+      dclaim_abi_ser.set_abi(load_abi(DCLAIM),
+         abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
+   abi_def load_abi(name account) {
+      const auto* metadata = control->find_account_metadata(account);
+      BOOST_REQUIRE(metadata != nullptr);
+      abi_def abi;
+      BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(metadata->abi, abi), true);
+      return abi;
    }
 
    action_result push_action( const account_name& signer, const action_name& name, const variant_object& data ) {
@@ -106,6 +131,56 @@ public:
       return push_action( signer, "clearlinks"_n, mvo() );
    }
 
+   action_result recordlink(const account_name& signer, const std::string& account,
+                            const fc::crypto::public_key& pub_key,
+                            const std::vector<char>& native_address,
+                            ChainKind chain_kind = ChainKind::CHAIN_KIND_EVM) {
+      return push_action(signer, "recordlink"_n, mvo()
+         ("account", account)
+         ("chain_kind", chain_kind)
+         ("pub_key", pub_key)
+         ("native_address", native_address));
+   }
+
+   // Serialize through the upgraded ABI while omitting its trailing extension. The resulting
+   // three-field bytes are the exact pre-WIRE-352 action shape used by legacy callers.
+   action_result recordlink_legacy(const account_name& signer, const name& account,
+                                   ChainKind chain_kind,
+                                   const fc::crypto::public_key& pub_key) {
+      return push_action(signer, "recordlink"_n, mvo()
+         ("account", account)
+         ("chain_kind", chain_kind)
+         ("pub_key", pub_key));
+   }
+
+   action_result onreward(const std::vector<char>& native_address, uint64_t amount,
+                          ChainKind chain_kind = ChainKind::CHAIN_KIND_EVM) {
+      return sysio_system::test_support::push_contract_action_and_produce_block(
+         *this, DCLAIM, dclaim_abi_ser, MSGCH, "onreward"_n, mvo()
+            ("chain_code", uint64_t{1})
+            ("staker_wire_account", std::string{})
+            ("reward_chain", chain_kind)
+            ("staker_native_addr", native_address)
+            ("reward_amount", amount)
+            ("reward_epoch_index", uint32_t{7})
+            ("external_epoch_ref", uint64_t{100})
+            ("share_bps", uint32_t{10000}));
+   }
+
+   fc::variant get_dclaim_row(name table, const char* type, uint64_t id) {
+      auto data = get_row_by_id(DCLAIM, DCLAIM, table, id);
+      return data.empty() ? fc::variant()
+         : dclaim_abi_ser.binary_to_variant(
+              type, data, abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
+   fc::variant get_link(uint64_t id) {
+      auto data = get_row_by_id(AUTHEX, AUTHEX, "links"_n, id);
+      return data.empty() ? fc::variant()
+         : abi_ser.binary_to_variant(
+              "links_s", data, abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
    uint64_t now_ms() {
       return control->head().block_time().time_since_epoch().count() / 1000;
    }
@@ -133,6 +208,7 @@ public:
    }
 
    abi_serializer abi_ser;
+   abi_serializer dclaim_abi_ser;
 };
 
 
@@ -207,6 +283,101 @@ BOOST_FIXTURE_TEST_CASE( createlink_eth_success, sysio_authex_tester ) try {
    for (const auto& kw : auth.keys)
       BOOST_CHECK_MESSAGE( kw.key != link.pub, "EM key must not be added to active" );
    BOOST_REQUIRE( auth_mgr.find_permission({"alice"_n, "ex.eth"_n}) == nullptr );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( createlink_eth_sweeps_prelink_dclaim_rewards, sysio_authex_tester ) try {
+   auto link = make_eth_link("alice", now_ms());
+   const auto address_bytes = fc::crypto::ethereum::address_to_bytes(link.pub);
+   const std::vector<char> native_address(address_bytes.begin(), address_bytes.end());
+
+   BOOST_REQUIRE_EQUAL(success(), onreward(native_address, 5000));
+   BOOST_REQUIRE(!get_dclaim_row("unmapped"_n, "unmapped_token", 1).is_null());
+
+   BOOST_REQUIRE_EQUAL(success(), createlink(
+      "alice"_n, ChainKind::CHAIN_KIND_EVM, "alice", link.sig, link.pub, link.nonce));
+   produce_blocks();
+
+   BOOST_REQUIRE(get_dclaim_row("unmapped"_n, "unmapped_token", 1).is_null());
+   auto pending = get_dclaim_row("pclaims"_n, "pending_claim", "alice"_n.to_uint64_t());
+   BOOST_REQUIRE(!pending.is_null());
+   BOOST_REQUIRE_EQUAL(pending["balance"].as<asset>().get_amount(), 5000);
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( recordlink_accepts_legacy_three_field_payload, sysio_authex_tester ) try {
+   const auto public_key = fc::crypto::private_key::generate(
+      fc::crypto::private_key::key_type::em).get_public_key();
+   const auto address_bytes = fc::crypto::ethereum::address_to_bytes(public_key);
+   const std::vector<char> native_address(address_bytes.begin(), address_bytes.end());
+
+   BOOST_REQUIRE_EQUAL(success(), onreward(native_address, 6000));
+   BOOST_REQUIRE(!get_dclaim_row("unmapped"_n, "unmapped_token", 1).is_null());
+
+   BOOST_REQUIRE_EQUAL(success(), recordlink_legacy(
+      AUTHEX, "bob"_n, ChainKind::CHAIN_KIND_EVM, public_key));
+   produce_blocks();
+
+   auto link = get_link(0);
+   BOOST_REQUIRE(!link.is_null());
+   BOOST_REQUIRE_EQUAL(link["username"].as<name>(), "bob"_n);
+   BOOST_REQUIRE_EQUAL(link["pub_key"].as<fc::crypto::public_key>(), public_key);
+   // Absence of the extension preserves legacy semantics: link creation succeeds
+   // without attempting a DClaim sweep that the old payload could not identify.
+   BOOST_REQUIRE(!get_dclaim_row("unmapped"_n, "unmapped_token", 1).is_null());
+   BOOST_REQUIRE(get_dclaim_row("pclaims"_n, "pending_claim", "bob"_n.to_uint64_t()).is_null());
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( recordlink_eth_sweeps_prelink_dclaim_rewards, sysio_authex_tester ) try {
+   const auto private_key = fc::crypto::private_key::generate(
+      fc::crypto::private_key::key_type::em);
+   const auto public_key = private_key.get_public_key();
+   const auto address_bytes = fc::crypto::ethereum::address_to_bytes(public_key);
+   const std::vector<char> native_address(address_bytes.begin(), address_bytes.end());
+
+   BOOST_REQUIRE_EQUAL(success(), onreward(native_address, 7000));
+   BOOST_REQUIRE_EQUAL(success(), recordlink(AUTHEX, "bob", public_key, native_address));
+   produce_blocks();
+
+   BOOST_REQUIRE(get_dclaim_row("unmapped"_n, "unmapped_token", 1).is_null());
+   auto pending = get_dclaim_row("pclaims"_n, "pending_claim", "bob"_n.to_uint64_t());
+   BOOST_REQUIRE(!pending.is_null());
+   BOOST_REQUIRE_EQUAL(pending["balance"].as<asset>().get_amount(), 7000);
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( recordlink_svm_sweeps_prelink_dclaim_rewards, sysio_authex_tester ) try {
+   const auto public_key = fc::crypto::private_key::generate(
+      fc::crypto::private_key::key_type::ed).get_public_key();
+   const auto raw_key = public_key.get<fc::crypto::ed::public_key_shim>().serialize();
+   const std::vector<char> native_address(raw_key.begin(), raw_key.end());
+
+   BOOST_REQUIRE_EQUAL(success(), onreward(
+      native_address, 8000, ChainKind::CHAIN_KIND_SVM));
+   BOOST_REQUIRE_EQUAL(success(), recordlink(
+      AUTHEX, "carol", public_key, native_address, ChainKind::CHAIN_KIND_SVM));
+   produce_blocks();
+
+   BOOST_REQUIRE(get_dclaim_row("unmapped"_n, "unmapped_token", 1).is_null());
+   auto pending = get_dclaim_row("pclaims"_n, "pending_claim", "carol"_n.to_uint64_t());
+   BOOST_REQUIRE(!pending.is_null());
+   BOOST_REQUIRE_EQUAL(pending["balance"].as<asset>().get_amount(), 8000);
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( recordlink_identical_retry_resweeps_dclaim_rewards, sysio_authex_tester ) try {
+   const auto public_key = fc::crypto::private_key::generate(
+      fc::crypto::private_key::key_type::em).get_public_key();
+   const auto address_bytes = fc::crypto::ethereum::address_to_bytes(public_key);
+   const std::vector<char> native_address(address_bytes.begin(), address_bytes.end());
+
+   BOOST_REQUIRE_EQUAL(success(), recordlink(AUTHEX, "bob", public_key, native_address));
+   BOOST_REQUIRE_EQUAL(success(), onreward(native_address, 9000));
+   BOOST_REQUIRE(!get_dclaim_row("unmapped"_n, "unmapped_token", 1).is_null());
+
+   BOOST_REQUIRE_EQUAL(success(), recordlink(AUTHEX, "bob", public_key, native_address));
+   produce_blocks();
+
+   BOOST_REQUIRE(get_dclaim_row("unmapped"_n, "unmapped_token", 1).is_null());
+   auto pending = get_dclaim_row("pclaims"_n, "pending_claim", "bob"_n.to_uint64_t());
+   BOOST_REQUIRE(!pending.is_null());
+   BOOST_REQUIRE_EQUAL(pending["balance"].as<asset>().get_amount(), 9000);
 } FC_LOG_AND_RETHROW()
 
 // --- createlink: account bears no RAM cost (link row is sysio-paid) ---

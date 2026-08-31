@@ -258,6 +258,10 @@
                 {
                     "name": "wire_pub_key",
                     "type": "public_key"
+                },
+                {
+                    "name": "eth_address",
+                    "type": "bytes$"
                 }
             ]
         },

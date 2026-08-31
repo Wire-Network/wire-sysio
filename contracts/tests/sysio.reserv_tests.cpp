@@ -8,6 +8,7 @@
 #include <fc/variant_object.hpp>
 #include <fc/slug_name.hpp>
 #include <fc/crypto/public_key.hpp>
+#include <fc/crypto/ethereum/ethereum_types.hpp>
 
 #include "contracts.hpp"
 #include "contract_test_support.hpp"
@@ -51,6 +52,7 @@ public:
    static constexpr auto UWRIT_ACCOUNT   = "sysio.uwrit"_n;
    static constexpr auto TOKEN_ACCOUNT   = "sysio.token"_n;
    static constexpr auto AUTHEX_ACCOUNT  = "sysio.authex"_n;
+   static constexpr auto DCLAIM_ACCOUNT  = "sysio.dclaim"_n;
    static constexpr auto CHAINS_ACCOUNT  = "sysio.chains"_n;
    static constexpr auto SYSIO_ACCOUNT   = "sysio"_n;
    /// Stand-in for a swap's winning underwriter — the account the settlement
@@ -62,7 +64,7 @@ public:
       // sysio.authex is pre-created by the tester boot (account linking) —
       // creating it again would collide.
       create_accounts({RESERVE_ACCOUNT, MSGCH_ACCOUNT, UWRIT_ACCOUNT,
-                       TOKEN_ACCOUNT, CHAINS_ACCOUNT, "alice"_n,
+                       TOKEN_ACCOUNT, CHAINS_ACCOUNT, DCLAIM_ACCOUNT, "alice"_n,
                        UNDERWRITER_ACCOUNT});
       produce_blocks(2);
 
@@ -338,10 +340,13 @@ public:
    /// presenting the matching raw pubkey reads as linked in oncrtreserve.
    action_result recordlink_em(name account, ChainKind chain_kind,
                                const fc::crypto::public_key& pub) {
+      const auto address_bytes = fc::crypto::ethereum::address_to_bytes(pub);
+      const std::vector<char> native_address(address_bytes.begin(), address_bytes.end());
       return push_to(AUTHEX_ACCOUNT, authex_abi_ser, AUTHEX_ACCOUNT, "recordlink"_n, mvo()
          ("account",    account)
          ("chain_kind", chain_kind)
-         ("pub_key",    pub));
+         ("pub_key",    pub)
+         ("native_address", native_address));
    }
 
    /// Deploy sysio.msgch so inline queueout actions execute in tests that

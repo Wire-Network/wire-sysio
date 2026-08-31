@@ -673,7 +673,8 @@ namespace sysio {
     };
 
     void roa::nodeownreg(const name& owner, const uint8_t& tier, const public_key& eth_pub_key,
-                         const public_key& wire_pub_key) {
+                         const public_key& wire_pub_key,
+                         const binary_extension<bytes>& eth_address) {
         // Dispatched by the OPP depot (sysio.msgch) when it processes an inbound
         // ATTESTATION_TYPE_NODE_OWNER_REG attestation. msgch inline-sends newnameduser (account
         // create) and then this action, both declaring permission_level{sysio.roa, active}; the
@@ -691,6 +692,9 @@ namespace sysio {
         // NFT deposits land on Ethereum, so the recorded link is always an EM (secp256k1) key.
         check(eth_pub_key.index() == fc::crypto::key_type_em,
               "eth_pub_key must be an EM (secp256k1) public key");
+        if (eth_address.has_value()) {
+            check(eth_address->size() == 20, "eth_address must be exactly 20 bytes");
+        }
 
         // ROA-active is a hard system invariant (the network cannot function with ROA inactive).
         // Read the state once here so the soft-fail audit rows below scope to the live network_gen
@@ -764,8 +768,15 @@ namespace sysio {
         // recordlink requires sysio.authex.active, satisfied by the sysio.roa@sysio.code delegation
         // on authex; it is idempotent and non-throwing. EVM-only by design (NFT deposits originate
         // on Ethereum); to extend to another ChainKind, promote the kind to an action parameter.
-        action(permission_level{AUTHEX_ACCOUNT, "active"_n}, AUTHEX_ACCOUNT, AUTHEX_RECORDLINK,
-               std::make_tuple(owner, opp::types::ChainKind::CHAIN_KIND_EVM, eth_pub_key)).send();
+        if (eth_address.has_value()) {
+            action(permission_level{AUTHEX_ACCOUNT, "active"_n}, AUTHEX_ACCOUNT, AUTHEX_RECORDLINK,
+                   std::make_tuple(owner, opp::types::ChainKind::CHAIN_KIND_EVM, eth_pub_key,
+                                   *eth_address)).send();
+        } else {
+            // Preserve the exact pre-WIRE-352 recordlink payload for legacy nodeownreg callers.
+            action(permission_level{AUTHEX_ACCOUNT, "active"_n}, AUTHEX_ACCOUNT, AUTHEX_RECORDLINK,
+                   std::make_tuple(owner, opp::types::ChainKind::CHAIN_KIND_EVM, eth_pub_key)).send();
+        }
 
         regnodeowner(owner, tier);
         record_nodereg(owner, tier, CONFIRMED, NONE, gen);

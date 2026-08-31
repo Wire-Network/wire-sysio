@@ -6,6 +6,7 @@
 
 #include <fc-lite/crypto/chain_types.hpp>   // fc::crypto::key_type_em used by pubkey_to_string below
 #include <sysio/name.hpp>
+#include <sysio/binary_extension.hpp>
 #include <sysio/kv_table.hpp>
 #include <sysio/sysio.hpp>
 #include <sysio/system.hpp>
@@ -222,8 +223,11 @@ namespace sysio {
      * Record an external-chain public-key link WITHOUT signature verification -- the trusted,
      * depot-only counterpart to createlink. The OPP NodeOwnerRegistration dispatch has already
      * established (via the deposit attestation) that `pub_key` belongs to `account`, so this skips
-     * createlink's signature/nonce checks and just inserts the link. `require_auth(get_self())`;
-     * idempotent and non-throwing so the trust-OPP depot dispatch is never aborted.
+     * createlink's signature/nonce checks and inserts the link.
+     * `require_auth(get_self())`; idempotent and non-throwing so the trust-OPP depot dispatch is
+     * never aborted. When an upgraded caller appends `native_address`, a successful or idempotent
+     * link also sweeps matching pre-link DClaim rewards. Legacy three-field payloads remain valid
+     * and retain the pre-sweep behavior.
      *
      * Unlike createlink, this does NOT enforce a unique `pub_key`: one external wallet may hold
      * several WireNodes NFTs and back several Wire accounts, so one ETH key -> many accounts is
@@ -231,12 +235,14 @@ namespace sysio {
      *
      * @param account    The WIRE account to link.
      * @param chain_kind The external chain identifier (opp::types::ChainKind).
-     * @param pub_key     The external chain's public key, Wire format.
+     * @param pub_key        The external chain's public key, Wire format.
+     * @param native_address Optional raw external-chain address used to find unmapped DClaim rewards.
      */
     [[sysio::action]] void recordlink(
         const name& account,
         const opp::types::ChainKind chain_kind,
-        const sysio::public_key& pub_key);
+        const sysio::public_key& pub_key,
+        const binary_extension<bytes>& native_address);
 
     // ----- Tables (public so sister contracts can read via cross-contract kv::table reads) -----
 
