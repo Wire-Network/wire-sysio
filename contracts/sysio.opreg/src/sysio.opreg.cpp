@@ -1307,6 +1307,7 @@ void opreg::flushwtdw(uint32_t current_epoch) {
          append_action_log(ops, op_pk, remit_action, false,
                            "insufficient balance at flush (rollup mismatch)");
          queue.erase(wkey);
+         reevaluate_eligibility(ops, op_pk, get_self(), row.account);
          continue;
       }
 
@@ -1618,6 +1619,21 @@ void opreg::claimremit(name account) {
 
 void opreg::recorddel(name account, uint32_t epoch, bool delivered) {
    require_auth(EPOCH_ACCOUNT);
+
+   // A temporarily ineligible operator cannot submit deliveries because
+   // sysio.msgch requires ACTIVE status. Do not turn that expected downtime
+   // into termination misses after collateral is restored. Terminal-state
+   // observations remain durable audit records; termcheck already excludes
+   // those operators permanently.
+   operators_t ops(get_self());
+   auto op_pk = operator_key{account.value};
+   if (ops.contains(op_pk)) {
+      auto status = ops.get(op_pk).status;
+      if (status != OperatorStatus::OPERATOR_STATUS_ACTIVE &&
+          !has_terminal_status(status)) {
+         return;
+      }
+   }
 
    uint64_t now_ms = current_time_ms();
 

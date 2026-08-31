@@ -26,6 +26,15 @@ constexpr uint64_t kDefaultPruneDelayMs = 600000;
 /// Current production consecutive-miss threshold.
 constexpr uint32_t kDefaultMaxConsecutiveMisses = 5;
 
+/// Focused threshold that terminates after a second consecutive miss.
+constexpr uint32_t kSingleAllowedConsecutiveMiss = 1;
+
+/// First delivery epoch used by the withdrawal-ineligibility regression.
+constexpr uint32_t kFirstIneligibleDeliveryEpoch = 1;
+
+/// Second delivery epoch used by the withdrawal-ineligibility regression.
+constexpr uint32_t kSecondIneligibleDeliveryEpoch = kFirstIneligibleDeliveryEpoch + 1;
+
 /// Current production rolling-window miss-percentage threshold.
 constexpr uint32_t kDefaultMaxPctMisses24h = 5;
 
@@ -43,6 +52,9 @@ constexpr uint64_t kInsufficientTestBond = kTestMinBond + 1;
 
 /// First identifier assigned by an empty withdrawal-request table.
 constexpr uint64_t kFirstWithdrawalRequestId = 1;
+
+/// First identifier assigned by an empty delivery-log table.
+constexpr uint64_t kFirstDeliveryLogId = 1;
 
 /// Production-size producer capacity used by focused collateral tests.
 constexpr uint32_t kTestMaxProducers = 21;
@@ -1392,6 +1404,33 @@ BOOST_FIXTURE_TEST_CASE(termcheck_keeps_bootstrapped_operator_exempt, sysio_opre
    auto op = get_operator("batchop.a"_n);
    BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE == op["status"].as<OperatorStatus>());
    BOOST_REQUIRE_EQUAL(1, op["is_bootstrapped"].as_uint64());
+} FC_LOG_AND_RETHROW() }
+
+/// Withdrawal-induced ineligibility prevents delivery, so observations made
+/// during that interval must not become termination misses after reactivation.
+BOOST_FIXTURE_TEST_CASE(recorddel_ignores_withdrawal_ineligibility, sysio_opreg_tester) { try {
+   activate_batch_operator(
+      kEligibilityBatchOperator,
+      /*max_consec_misses=*/kSingleAllowedConsecutiveMiss,
+      /*max_pct_misses_24h=*/kMaxAcceptedPctMisses24h);
+   BOOST_REQUIRE_EQUAL(success(),
+      withdrawinle(kEligibilityBatchOperator, kEthCodename, kEthCodename, kTestMinBond));
+   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_UNKNOWN ==
+                 get_operator(kEligibilityBatchOperator)[eligibility_field::status].as<OperatorStatus>());
+
+   BOOST_REQUIRE_EQUAL(success(),
+      recorddel(kEligibilityBatchOperator, kFirstIneligibleDeliveryEpoch, /*delivered=*/false));
+   BOOST_REQUIRE_EQUAL(success(),
+      recorddel(kEligibilityBatchOperator, kSecondIneligibleDeliveryEpoch, /*delivered=*/false));
+   BOOST_REQUIRE(get_dellog_entry(kFirstDeliveryLogId).is_null());
+
+   BOOST_REQUIRE_EQUAL(success(), cancelwtdw(
+      kEligibilityBatchOperator, kEligibilityBatchOperator, kFirstWithdrawalRequestId));
+   BOOST_REQUIRE_EQUAL(success(), termcheck(kEligibilityBatchOperator));
+
+   auto op = get_operator(kEligibilityBatchOperator);
+   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE ==
+                 op[eligibility_field::status].as<OperatorStatus>());
 } FC_LOG_AND_RETHROW() }
 
 // ---- dellog retention: bounded pruning of rows outside the rolling window ----
