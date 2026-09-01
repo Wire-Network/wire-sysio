@@ -10,6 +10,8 @@
 
 #include <sysio/resource_monitor_plugin/resource_monitor_plugin.hpp>
 
+#include <fc/reflect/json_stream.hpp>
+
 #include <boost/signals2/connection.hpp>
 
 #include <algorithm>
@@ -142,6 +144,16 @@ namespace {
 
       std::shared_ptr<Store> store;
    };
+
+   /// Build a stream_emitter for an error_results payload -- the streaming twin of the
+   /// old `cb(code, fc::variant(error_results{...}))` error responses.  Emits through the
+   /// same reflector path http_plugin::handle_exception_stream uses, so the error body
+   /// shape matches the variant path byte-for-byte.
+   sysio::stream_emitter make_error_results_emitter(sysio::error_results results) {
+      return [results = std::move(results)](fc::json_writer& w) mutable {
+         fc::to_json_stream(results, w);
+      };
+   }
 }
 
 namespace sysio {
@@ -283,9 +295,15 @@ struct trace_api_rpc_plugin_impl : public std::enable_shared_from_this<trace_api
    void plugin_startup() {
       auto& http = app().get_plugin<http_plugin>();
 
-      http.add_async_handler({"/v1/trace_api/get_block",
+      // Streaming-cb registration: the emitter writes the response body directly into the
+      // guarded fc::json_writer the http layer provides, so --http-max-bytes-in-flight-mb
+      // observes -- and can abort -- large trace responses WHILE they serialize, instead
+      // of only after the full body has been allocated (the old json_raw pass-through).
+      // Misses resolve to their 404 before an emitter is committed; error responses emit
+      // tiny error_results objects through the same streaming path.
+      http.add_async_api_stream({{std::string("/v1/trace_api/get_block"),
             api_category::trace_api,
-            [self = shared_from_this()](std::string, std::string body, url_response_callback cb)
+            [self = shared_from_this()](std::string&&, std::string&& body, url_response_stream_callback&& cb)
       {
          auto block_number = ([&body]() -> std::optional<uint32_t> {
             if (body.empty()) {
@@ -305,29 +323,28 @@ struct trace_api_rpc_plugin_impl : public std::enable_shared_from_this<trace_api
          })();
 
          if (!block_number) {
-            error_results results{400, "Bad or missing block_num"};
-            cb( 400, fc::variant( results ));
+            cb( 400, make_error_results_emitter({400, "Bad or missing block_num"}) );
             return;
          }
 
          try {
-
-            auto resp = self->req_handler->get_block_trace(*block_number);
-            if (resp.is_null()) {
-               error_results results{404, "Trace API: block trace missing"};
-               cb( 404, fc::variant( results ));
+            auto emitter = self->req_handler->get_block_trace_emitter(*block_number);
+            if (!emitter) {
+               cb( 404, make_error_results_emitter({404, "Trace API: block trace missing"}) );
             } else {
-               cb( 200, std::move(resp) );
+               // self keeps req_handler (bound as `this` inside the emitter) alive until
+               // emission completes on the http thread pool.
+               cb( 200, [self, emit = std::move(*emitter)](fc::json_writer& w) { emit(w); } );
             }
          } catch (...) {
-            http_plugin::handle_exception("trace_api", "get_block", body, cb);
+            http_plugin::handle_exception_stream("trace_api", "get_block", body, cb);
          }
-      }});
+      }}});
 
 
-      http.add_async_handler({"/v1/trace_api/get_transaction_trace",
+      http.add_async_api_stream({{std::string("/v1/trace_api/get_transaction_trace"),
             api_category::trace_api,
-            [self = shared_from_this()](std::string, std::string body, url_response_callback cb)
+            [self = shared_from_this()](std::string&&, std::string&& body, url_response_stream_callback&& cb)
       {
          auto trx_id = ([&body]() -> std::optional<transaction_id_type> {
             if (body.empty()) {
@@ -346,8 +363,7 @@ struct trace_api_rpc_plugin_impl : public std::enable_shared_from_this<trace_api
          })();
 
          if (!trx_id) {
-            error_results results{400, "Bad or missing transaction ID"};
-            cb( 400, fc::variant( results ));
+            cb( 400, make_error_results_emitter({400, "Bad or missing transaction ID"}) );
             return;
          }
 
@@ -355,21 +371,21 @@ struct trace_api_rpc_plugin_impl : public std::enable_shared_from_this<trace_api
             // search for the block that contains the transaction
             get_block_n blk_num = self->common->store->get_trx_block_number(*trx_id);
             if (!blk_num.has_value()){
-               error_results results{404, "Trace API: transaction id missing in the transaction id log files"};
-               cb( 404, fc::variant( results ));
+               cb( 404, make_error_results_emitter({404, "Trace API: transaction id missing in the transaction id log files"}) );
             } else {
-               auto resp = self->req_handler->get_transaction_trace(*trx_id, *blk_num);
-               if (resp.is_null()) {
-                  error_results results{404, "Trace API: transaction trace missing"};
-                  cb( 404, fc::variant( results ));
+               auto emitter = self->req_handler->get_transaction_trace_emitter(*trx_id, *blk_num);
+               if (!emitter) {
+                  cb( 404, make_error_results_emitter({404, "Trace API: transaction trace missing"}) );
                } else {
-                  cb( 200, std::move(resp) );
+                  // self keeps req_handler (bound as `this` inside the emitter) alive until
+                  // emission completes on the http thread pool, mirroring get_block.
+                  cb( 200, [self, emit = std::move(*emitter)](fc::json_writer& w) { emit(w); } );
                }
             }
           } catch (...) {
-             http_plugin::handle_exception("trace_api", "get_transaction", body, cb);
+             http_plugin::handle_exception_stream("trace_api", "get_transaction", body, cb);
           }
-      }});
+      }}});
 
       http.add_async_handler({"/v1/trace_api/get_actions",
             api_category::trace_api,

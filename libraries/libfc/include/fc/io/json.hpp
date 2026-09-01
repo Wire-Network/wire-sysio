@@ -3,6 +3,7 @@
 #include <fc/filesystem.hpp>
 #include <fc/time.hpp>
 #include <fc/utility.hpp>
+#include <fc/io/json_escape.hpp>
 #include <fc/exception/exception.hpp>
 
 #define DEFAULT_MAX_RECURSION_DEPTH 200
@@ -26,7 +27,7 @@ namespace fc
             relaxed_parser        = 2,
             legacy_parser_with_string_doubles = 3
          };
-         using yield_function_t = fc::optional_delegate<void(size_t)>;
+         using yield_function_t = fc::json_yield_function_t;
          static constexpr uint64_t max_length_limit = std::numeric_limits<uint64_t>::max();
          static constexpr size_t escape_string_yield_check_count = 128;
          static variant  from_string( const std::string& utf8_str, const parse_type ptype = parse_type::legacy_parser, uint32_t max_depth = DEFAULT_MAX_RECURSION_DEPTH );
@@ -90,10 +91,6 @@ namespace fc
             return save_to_file( variant(v), std::filesystem::path(p), pretty );
          }
    };
-
-   std::string escape_string( const std::string_view& str, const json::yield_function_t& yield, bool escape_control_chars = true );
-   /// Returns true if any characters were escaped or invalid UTF-8 was pruned.
-   bool        escape_string( const std::string_view& str, std::string& out, const json::yield_function_t& yield, bool escape_control_chars = true );
 
 } // fc
 

@@ -4,6 +4,8 @@
 
 namespace sysio::chain_apis {
 
+struct streamed_processed_trace; // defined in chain_plugin.hpp
+
 /**
  * This class manages the ephemeral indices and data that provide the transaction retry feature.
  * It is designed to be run on an API node, as it only tracks incoming API transactions.
@@ -47,7 +49,8 @@ public:
     * @param next report result to user by calling next
     * @throws throw tx_resource_exhaustion if trx would exceeds max_mem_usage_size
     */
-   void track_transaction( chain::packed_transaction_ptr ptrx, std::optional<uint16_t> num_blocks, sysio::chain::next_function<std::unique_ptr<fc::variant>> next );
+   void track_transaction( chain::packed_transaction_ptr ptrx, std::optional<uint16_t> num_blocks,
+                           sysio::chain::next_function<std::unique_ptr<streamed_processed_trace>> next );
 
    /**
     * Attach to chain applied_transaction signal

@@ -59,6 +59,10 @@ namespace chain {
 
 namespace fc {
   class variant;
+  class json_writer;
   void to_variant(const sysio::chain::chain_id_type& cid, fc::variant& v);
   void from_variant(const fc::variant& v, sysio::chain::chain_id_type& cid);
+  /// JSON shape: lowercase-hex string -- matches the to_variant emit (which writes
+  /// the underlying sha256 as a string).
+  void to_json_stream(const sysio::chain::chain_id_type& cid, fc::json_writer& w);
 } // fc

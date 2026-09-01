@@ -4,6 +4,7 @@
 #include <fc/io/datastream.hpp>
 #include <fc/io/varint.hpp>
 #include <fc/fwd.hpp>
+#include <fc/nullable.hpp>
 #include <fc/time.hpp>
 #include <fc/filesystem.hpp>
 #include <fc/exception/exception.hpp>
@@ -258,6 +259,19 @@ namespace fc {
       if( b ) { v = T(); fc::raw::unpack( s, *v ); }
       else { v.reset(); } // in case v has already has a value
     } FC_RETHROW_EXCEPTIONS( warn, "optional<{}>", fc::get_typename<T>::name() ) }
+
+    // fc::nullable -- binary serialization parity with std::optional: the wrapper only
+    // changes JSON emission (key always present, explicit null when disengaged), so its
+    // wire form delegates to the wrapped optional unchanged.
+    template<typename Stream, typename T>
+    void pack( Stream& s, const fc::nullable<T>& v ) {
+      fc::raw::pack( s, v.value );
+    }
+
+    template<typename Stream, typename T>
+    void unpack( Stream& s, fc::nullable<T>& v ) {
+      fc::raw::unpack( s, v.value );
+    }
 
     // std::vector<char>
     template<typename Stream> inline void pack( Stream& s, const std::vector<char>& value ) {

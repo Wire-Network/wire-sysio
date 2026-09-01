@@ -36,7 +36,7 @@ signature::signature(bls::signature_data_span affine_non_montgomery_le)
    , _jacobian_montgomery_le(to_jacobian_montgomery_le(_affine_non_montgomery_le))
 {}
 
-signature::signature(const std::string& base64urlstr)
+signature::signature(std::string_view base64urlstr)
    : _affine_non_montgomery_le(sig_parse_base64url(base64urlstr))
    , _jacobian_montgomery_le(to_jacobian_montgomery_le(_affine_non_montgomery_le))
 {}
@@ -50,7 +50,7 @@ std::string signature::to_string() const {
    return to_string(_affine_non_montgomery_le);
 }
 
-aggregate_signature::aggregate_signature(const std::string& base64_url_str)
+aggregate_signature::aggregate_signature(std::string_view base64_url_str)
    : _jacobian_montgomery_le(signature::to_jacobian_montgomery_le(sig_parse_base64url(base64_url_str)))
 {}
 
@@ -61,22 +61,3 @@ std::string aggregate_signature::to_string() const {
 }
 
 } // fc::crypto::bls
-
-namespace fc {
-
-void to_variant(const crypto::bls::signature& var, variant& vo) {
-   vo = var.to_string();
-}
-
-void from_variant(const variant& var, crypto::bls::signature& vo) {
-   vo = crypto::bls::signature(var.as_string());
-}
-
-void to_variant(const crypto::bls::aggregate_signature& var, variant& vo) {
-   vo = var.to_string();
-}
-
-void from_variant(const variant& var, crypto::bls::aggregate_signature& vo) {
-   vo = crypto::bls::aggregate_signature(var.as_string());
-}
-} // fc

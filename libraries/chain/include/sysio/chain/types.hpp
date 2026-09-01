@@ -5,6 +5,7 @@
 #include <chainbase/chainbase.hpp>
 
 #include <fc/interprocess/container.hpp>
+#include <fc/move_only_function.hpp>
 #include <fc/io/varint.hpp>
 #include <fc/io/enum_type.hpp>
 #include <fc/crypto/sha224.hpp>
@@ -13,7 +14,6 @@
 #include <fc/io/raw.hpp>
 #include <fc/static_variant.hpp>
 #include <fc/crypto/ripemd160.hpp>
-#include <fc/fixed_string.hpp>
 #include <fc/crypto/private_key.hpp>
 
 #include <boost/version.hpp>
@@ -515,10 +515,12 @@ namespace sysio::chain {
    // serialized as output.
    // The function accepts a variant which can contain an exception_ptr (if an exception occured while
    // processing the API) or the result T.
-   // The third option is a function which can be executed in a multithreaded context (likely on the
-   // http_plugin thread pool) and which completes the API processing and returns the result T.
+   // The third option is a deferred_call: a function which can be executed in a multithreaded context
+   // (likely on the http_plugin thread pool) and which completes the API processing and returns the
+   // result T, carrying the retained size of the phase-1 data it captured so the transport can charge
+   // it while the call is queued.
    //
-   // The user-provided callable is held inside a std::move_only_function so consume-on-call captures
+   // The user-provided callable is held inside an fc::move_only_function so consume-on-call captures
    // (e.g. [cb = std::move(cb)] mutable {...}) work correctly. The outer wrapper is copyable via a
    // shared_ptr indirection - required because the callback travels through paths that copy
    // (boost::signals2 slot dispatch, boost::multi_index value storage, lambdas captured by [=],
@@ -538,72 +540,58 @@ namespace sysio::chain {
    template<typename T>
    using t_or_exception = std::variant<T, fc::exception_ptr>;
 
+   /**
+    * @brief Phase-2 api work, plus the retained size of the phase-1 data captured into it.
+    *
+    * The two-phase api shape (collect raw bytes on the calling queue, decode/serialize on the http
+    * thread pool) means the callable owns real memory -- copied ABI blobs, collected table rows, a
+    * fetched block, a transaction trace -- for the whole time it sits on the pool queue.  A
+    * `std::function` type-erases those captures, so the transport cannot measure them; the producer,
+    * which does know, states the size here and the http layer charges it against
+    * `--http-max-bytes-in-flight-mb` from the moment the call is queued until it has run.
+    *
+    * `retained_size` is a reservation-grade estimate with the same semantics as
+    * `http_plugin`'s `in_flight_sizeof` and `chain_apis::queued_payload_size`: the dominant heap
+    * bytes, ignoring small fixed-size fields.  It is a required constructor argument so that a new
+    * two-phase endpoint cannot silently return an unaccounted callable.
+    *
+    * Copyable (the callable is a `std::function`) because `next_function_variant` travels through
+    * paths that copy the whole variant.
+    */
    template<typename T>
-   using next_function_variant = std::variant<fc::exception_ptr, T, std::function<t_or_exception<T>()>>;
+   class deferred_call {
+   public:
+      using function_type = std::function<t_or_exception<T>()>;
+
+      deferred_call() = default;
+
+      deferred_call(function_type fn, size_t retained_size)
+         : _fn(std::move(fn))
+         , _retained_size(retained_size) {}
+
+      /// Estimated bytes of phase-1 data held alive by the callable.
+      size_t retained_size() const noexcept { return _retained_size; }
+
+      /// Runs phase 2.  Single invocation, like the callable it wraps.  const to match
+      /// std::function::operator(), so consumers holding it in a non-mutable lambda still call it.
+      t_or_exception<T> operator()() const { return _fn(); }
+
+      explicit operator bool() const noexcept { return static_cast<bool>(_fn); }
+
+   private:
+      function_type _fn;
+      size_t        _retained_size = 0;
+   };
+
+   template<typename T>
+   using next_function_variant = std::variant<fc::exception_ptr, T, deferred_call<T>>;
 
    namespace detail {
-      /**
-       * @brief Move-only callable storage for standard libraries without std::move_only_function.
-       *
-       * libc++ versions shipped with current AppleClang do not always provide the C++23
-       * std::move_only_function API. This wrapper preserves the same move-only capture support
-       * needed by next_function without requiring that library feature.
-       *
-       * This is intentionally a narrow polyfill for next_function's current
-       * `void(T&&)` storage shape, not a general std::move_only_function
-       * replacement. If next_function starts storing another callable
-       * signature, extend this wrapper alongside that change.
-       */
+      // Portable move-only callable storage; fc::move_only_function selects
+      // std::move_only_function where the standard library provides it and a
+      // general type-erased polyfill otherwise (AppleClang's libc++ lacks it).
       template<typename Signature>
-      class move_only_function;
-
-      template<typename Arg>
-      class move_only_function<void(Arg&&)> {
-      public:
-         move_only_function() = default;
-         move_only_function(std::nullptr_t) noexcept {}
-
-         template<typename F>
-            requires (!std::is_same_v<std::decay_t<F>, move_only_function> &&
-                      std::is_invocable_r_v<void, std::decay_t<F>&, Arg&&>)
-         move_only_function(F&& f)
-            : _callable(std::make_unique<callable<std::decay_t<F>>>(std::forward<F>(f))) {}
-
-         move_only_function(move_only_function&&) noexcept = default;
-         move_only_function& operator=(move_only_function&&) noexcept = default;
-         move_only_function(const move_only_function&) = delete;
-         move_only_function& operator=(const move_only_function&) = delete;
-
-         void operator()(Arg&& arg) { _callable->invoke(std::forward<Arg>(arg)); }
-         explicit operator bool() const noexcept { return static_cast<bool>(_callable); }
-
-      private:
-         struct callable_base {
-            virtual ~callable_base() = default;
-            virtual void invoke(Arg&& arg) = 0;
-         };
-
-         template<typename F>
-         struct callable final : callable_base {
-            template<typename Fn>
-            explicit callable(Fn&& fn)
-               : f(std::forward<Fn>(fn)) {}
-
-            void invoke(Arg&& arg) override { f(std::forward<Arg>(arg)); }
-
-            F f;
-         };
-
-         std::unique_ptr<callable_base> _callable;
-      };
-
-      template<typename Signature>
-      using next_move_only_function =
-#if defined(__cpp_lib_move_only_function) && __cpp_lib_move_only_function >= 202110L
-         std::move_only_function<Signature>;
-#else
-         move_only_function<Signature>;
-#endif
+      using next_move_only_function = fc::move_only_function<Signature>;
    }
 
    template<typename T>

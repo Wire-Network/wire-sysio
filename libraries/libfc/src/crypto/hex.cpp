@@ -42,13 +42,8 @@ size_t from_hex(std::string_view hex_str, char* out_data, size_t out_data_len) {
 }
 
 
-std::vector<uint8_t> from_hex(const std::string& hex, bool trim_prefix) {
-   auto cleaned_hex = trim_prefix ? trim_hex_prefix(hex) : hex;
-   if (cleaned_hex.size() % 2) {
-      cleaned_hex = "0" + cleaned_hex;
-   }
-   std::vector<uint8_t> out;
-   out.reserve(cleaned_hex.size() / 2);
+std::vector<uint8_t> from_hex(std::string_view hex, bool trim_prefix) {
+   if (trim_prefix) hex = trim_hex_prefix(hex);
 
    auto from_hex = [](char c) -> int {
       if (c >= '0' && c <= '9')
@@ -60,18 +55,25 @@ std::vector<uint8_t> from_hex(const std::string& hex, bool trim_prefix) {
       throw std::runtime_error("Invalid hex char");
    };
 
-   for (size_t i = 0; i < cleaned_hex.size(); i += 2) {
-      uint8_t byte =
-         (from_hex(cleaned_hex[i]) << 4) | from_hex(cleaned_hex[i + 1]);
-      out.push_back(byte);
+   std::vector<uint8_t> out;
+   out.reserve((hex.size() + 1) / 2);
+
+   size_t i = 0;
+   if (hex.size() % 2) {
+      // Odd-length hex: the first nibble decodes to a single byte with high nibble = 0.
+      out.push_back(static_cast<uint8_t>(from_hex(hex[0])));
+      i = 1;
+   }
+   for (; i < hex.size(); i += 2) {
+      out.push_back(static_cast<uint8_t>((from_hex(hex[i]) << 4) | from_hex(hex[i + 1])));
    }
 
    return out;
 }
 
-std::string trim_hex_prefix(const std::string& hex) {
+std::string_view trim_hex_prefix(std::string_view hex) {
    if (hex.starts_with("0x") || hex.starts_with("0X")) {
-      return hex.substr(2);
+      hex.remove_prefix(2);
    }
    return hex;
 }
