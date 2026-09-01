@@ -47,6 +47,19 @@ constexpr uint32_t kPostReactivationMissedEpoch = kSecondIneligibleDeliveryEpoch
 /// Successful active delivery that closes the post-reactivation sample.
 constexpr uint32_t kPostReactivationDeliveredEpoch = kPostReactivationMissedEpoch + 1;
 
+/// First epoch in the healthy history used by the percent-rail regression.
+constexpr uint32_t kFirstPercentRailHistoryEpoch = 1;
+
+/// Healthy observations required so one later miss is exactly five percent.
+constexpr uint32_t kPercentRailHealthyHistoryRows = 19;
+
+/// Delivery-log identifier of the final healthy percent-rail observation.
+constexpr uint64_t kLastPercentRailHistoryLogId = kPercentRailHealthyHistoryRows;
+
+/// First missed epoch after percent-rail reactivation.
+constexpr uint32_t kPercentRailPostReactivationMissEpoch =
+   kFirstPercentRailHistoryEpoch + kPercentRailHealthyHistoryRows;
+
 /// Current production rolling-window miss-percentage threshold.
 constexpr uint32_t kDefaultMaxPctMisses24h = 5;
 
@@ -1474,6 +1487,48 @@ BOOST_FIXTURE_TEST_CASE(recorddel_ignores_withdrawal_ineligibility, sysio_opreg_
       recorddel(kEligibilityBatchOperator, kPostReactivationMissedEpoch, /*delivered=*/false));
    BOOST_REQUIRE_EQUAL(success(),
       recorddel(kEligibilityBatchOperator, kPostReactivationDeliveredEpoch, /*delivered=*/true));
+   BOOST_REQUIRE_EQUAL(success(), termcheck(kEligibilityBatchOperator));
+
+   auto op = get_operator(kEligibilityBatchOperator);
+   BOOST_REQUIRE_MESSAGE(OperatorStatus::OPERATOR_STATUS_ACTIVE ==
+                            op[eligibility_field::status].as<OperatorStatus>(),
+                         op["status_reason"].as_string());
+} FC_LOG_AND_RETHROW() }
+
+/// Reactivation resets only the consecutive-miss run. Healthy observations
+/// from before withdrawal-induced parking remain in the rolling percentage
+/// sample, so one miss among twenty rows stays at the production five-percent
+/// ceiling rather than becoming a one-row, 100-percent sample.
+BOOST_FIXTURE_TEST_CASE(termcheck_preserves_percent_sample_across_withdrawal_ineligibility,
+                        sysio_opreg_tester) { try {
+   activate_batch_operator(
+      kEligibilityBatchOperator,
+      /*max_consec_misses=*/kDefaultMaxConsecutiveMisses,
+      /*max_pct_misses_24h=*/kDefaultMaxPctMisses24h);
+
+   for (uint32_t epoch = kFirstPercentRailHistoryEpoch;
+        epoch < kPercentRailPostReactivationMissEpoch;
+        ++epoch) {
+      BOOST_REQUIRE_EQUAL(success(),
+         recorddel(kEligibilityBatchOperator, epoch, /*delivered=*/true));
+   }
+   produce_blocks();
+   produce_block(fc::seconds(kDeliveryTimestampSeparationSeconds));
+
+   BOOST_REQUIRE_EQUAL(success(),
+      withdrawinle(kEligibilityBatchOperator, kEthCodename, kEthCodename, kTestMinBond));
+   BOOST_REQUIRE_EQUAL(success(), cancelwtdw(
+      kEligibilityBatchOperator, kEligibilityBatchOperator, kFirstWithdrawalRequestId));
+
+   auto reactivated = get_operator(kEligibilityBatchOperator);
+   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE ==
+                 reactivated[eligibility_field::status].as<OperatorStatus>());
+   auto healthy_history_end = get_dellog_entry(kLastPercentRailHistoryLogId)["ts_ms"].as_uint64();
+   auto reactivated_at      = reactivated["available_at"].as_uint64();
+   BOOST_REQUIRE(healthy_history_end < reactivated_at);
+
+   BOOST_REQUIRE_EQUAL(success(), recorddel(
+      kEligibilityBatchOperator, kPercentRailPostReactivationMissEpoch, /*delivered=*/false));
    BOOST_REQUIRE_EQUAL(success(), termcheck(kEligibilityBatchOperator));
 
    auto op = get_operator(kEligibilityBatchOperator);
