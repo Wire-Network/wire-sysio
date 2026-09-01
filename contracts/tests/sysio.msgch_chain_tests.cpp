@@ -653,6 +653,67 @@ public:
       return decode_envelope(raw).messages(0).header().message_id();
    }
 
+   /// The decoded BATCH_OPERATOR_GROUPS attestation the most recent `advance` shipped to
+   /// `chain_code`. Read from the surviving `outenvelopes` row, NOT the msgch `attestations`
+   /// working table — `advance` queues its schedule attestations via `queueout` and then fans out
+   /// `buildenv` inline in the SAME transaction, and `buildenv` packs the READY rows into the
+   /// outbound envelope, marks them PROCESSED, and ERASES them before the transaction ends. The
+   /// packed envelope (one-deep per outpost) is therefore the only durable copy of what `advance`
+   /// emitted; scanning `attestations` after an advance always finds zero rows.
+   sysio::opp::attestations::BatchOperatorGroups shipped_batch_operator_groups(uint64_t chain_code) {
+      auto row = find_outbound_envelope(chain_code);
+      BOOST_REQUIRE(!row.is_null());
+      auto env = decode_envelope(row["raw_envelope"].as<std::vector<char>>());
+      BOOST_REQUIRE_EQUAL(env.messages_size(), 1);
+      // Scans to the LAST match, not the first. `buildenv`'s trim loop pops
+      // overflowing entries off the end and leaves them READY to ride the next
+      // envelope, so one envelope can legitimately carry a DEFERRED
+      // BATCH_OPERATOR_GROUPS from epoch N -- lower attestation id, therefore
+      // packed first -- ahead of epoch N+1's fresh one. Depot semantics are
+      // last-write-wins (the outpost applies each in order and the final one
+      // survives), so taking the first would silently assert against the stale
+      // payload the moment a trim occurred.
+      bool                                          found = false;
+      sysio::opp::attestations::BatchOperatorGroups groups_attestation;
+      for (const auto& att : env.messages(0).payload().attestations()) {
+         if (att.type() != sysio::opp::types::ATTESTATION_TYPE_BATCH_OPERATOR_GROUPS) continue;
+         BOOST_REQUIRE(groups_attestation.ParseFromArray(att.data().data(),
+                                                         static_cast<int>(att.data().size())));
+         found = true;
+      }
+      if (!found) {
+         BOOST_FAIL("outbound envelope carries no BATCH_OPERATOR_GROUPS attestation");
+      }
+      return groups_attestation;
+   }
+
+   /// How many BATCH_OPERATOR_GROUPS attestations the most recent `advance` shipped to
+   /// `chain_code` -- 0 when the depot WITHHELD it. Distinct from
+   /// `shipped_batch_operator_groups`, which fails the test on absence: the withhold path
+   /// needs to assert absence while still proving the envelope itself was built (i.e. that
+   /// `advance` skipped only this queueout and went on to emit the epoch's other
+   /// attestations, rather than returning early).
+   int shipped_batch_operator_groups_count(uint64_t chain_code) {
+      auto row = find_outbound_envelope(chain_code);
+      BOOST_REQUIRE(!row.is_null());
+      auto env = decode_envelope(row["raw_envelope"].as<std::vector<char>>());
+      BOOST_REQUIRE_EQUAL(env.messages_size(), 1);
+      int count = 0;
+      for (const auto& att : env.messages(0).payload().attestations()) {
+         if (att.type() == sysio::opp::types::ATTESTATION_TYPE_BATCH_OPERATOR_GROUPS) ++count;
+      }
+      return count;
+   }
+
+   /// Total attestations in the most recent outbound envelope for `chain_code`.
+   int shipped_attestation_count(uint64_t chain_code) {
+      auto row = find_outbound_envelope(chain_code);
+      BOOST_REQUIRE(!row.is_null());
+      auto env = decode_envelope(row["raw_envelope"].as<std::vector<char>>());
+      BOOST_REQUIRE_EQUAL(env.messages_size(), 1);
+      return env.messages(0).payload().attestations_size();
+   }
+
    // -- SEC-28 rotation-termination helpers (drive recorddel/termcheck through the REAL advance) --
 
    /// The opreg operator row for `account` (status + status_reason), or null when absent.
@@ -1913,6 +1974,126 @@ BOOST_FIXTURE_TEST_CASE(slash_after_delivery_does_not_count_toward_consensus, sy
    BOOST_REQUIRE_EQUAL(opc["consensus_reached"].as<bool>(), true);
    BOOST_REQUIRE_EQUAL(opc["epoch_index"].as<uint32_t>(), epoch);
    BOOST_REQUIRE_EQUAL(opc["envelope_digest"].as_string(), digest.str());
+} FC_LOG_AND_RETHROW() }
+
+// ---------------------------------------------------------------------------
+//  SOL-378: the shipped BATCH_OPERATOR_GROUPS active index is a one-epoch
+//  lookahead into the shipped window.
+//
+//  Why lookahead: an outpost that scopes envelope admission to its seated
+//  active group must hold epoch N's duty roster BEFORE epoch N's envelope
+//  arrives — that envelope's own deliverer belongs to epoch N's group, so
+//  shipping epoch N's roster inside epoch N's envelope is circular and stalls
+//  the bridge at the first rotation. Envelope N-1 therefore seats epoch N's
+//  group. Only the attestation looks ahead; the depot's `epoch_state`
+//  (`current_batch_op_group`) still names the group on duty now.
+// ---------------------------------------------------------------------------
+
+/// Rotating schedule (three single-member groups): the member the shipped `active_group_index`
+/// names must be the one ACTUALLY on duty one epoch later. Asserted against the OBSERVED
+/// rotation — read the shipped index, advance one epoch, and require the promised member to be
+/// the depot's own on-duty member — so an off-by-one in EITHER direction fails: index 0 promises
+/// the group whose duty just started (stale after the advance), index 2 promises the group two
+/// epochs out; only the true lookahead survives the comparison. Walked one epoch past a full
+/// rotation so every group is promised (and verified) at least once.
+BOOST_FIXTURE_TEST_CASE(advance_ships_lookahead_batch_operator_group, sysio_msgch_chain_tester) { try {
+   constexpr uint32_t kGroups = 3;
+   // Termination rails are irrelevant here — a comfortably wide window keeps recorddel/termcheck
+   // quiet while the rotation is walked (same span shape the SEC-28 fixture derives).
+   constexpr uint64_t kRotationWindowMs = 12ULL * kGroups * EPOCH_DURATION_SEC * 1000ULL;
+   bootstrap_rotation(kRotationWindowMs);
+
+   for (uint32_t round = 0; round < kGroups + 1; ++round) {
+      const auto shipped = shipped_batch_operator_groups(ETH_OUTPOST_ID);
+      BOOST_REQUIRE_EQUAL(shipped.groups_size(), static_cast<int>(kGroups));
+      const uint32_t shipped_index = shipped.active_group_index();
+      BOOST_REQUIRE_LT(shipped_index, static_cast<uint32_t>(shipped.groups_size()));
+      BOOST_REQUIRE_EQUAL(shipped.groups(shipped_index).operators_size(), 1);
+      const std::string promised = shipped.groups(shipped_index).operators(0).address();
+
+      // The depot's own schedule is NOT shifted: `current_batch_op_group` still names the group
+      // on duty NOW, and with disjoint single-member groups the promised (next-epoch) member
+      // must differ from it. A reverted lookahead fails here already — it promises the current
+      // duty member.
+      BOOST_REQUIRE(promised != duty_member().to_string());
+
+      // One epoch later the promised member must be exactly the one the depot seats on duty.
+      advance_to_next_epoch();
+      BOOST_REQUIRE_EQUAL(promised, duty_member().to_string());
+   }
+} FC_LOG_AND_RETHROW() }
+
+/// Single group: nothing rotates, so the shipped index must stay 0 on every advance — never a
+/// wrapped/overrun 1 that runs off the one-group window — and must keep naming the one real
+/// member, who is perpetually on duty.
+BOOST_FIXTURE_TEST_CASE(advance_ships_group_index_zero_for_single_group, sysio_msgch_chain_tester) { try {
+   constexpr uint32_t kRounds = 3;
+   bootstrap();
+
+   for (uint32_t round = 0; round < kRounds; ++round) {
+      const auto shipped = shipped_batch_operator_groups(ETH_OUTPOST_ID);
+      BOOST_REQUIRE_EQUAL(shipped.groups_size(), 1);
+      BOOST_REQUIRE_EQUAL(shipped.active_group_index(), 0u);
+      BOOST_REQUIRE_EQUAL(shipped.groups(0).operators_size(), 1);
+      BOOST_REQUIRE_EQUAL(shipped.groups(0).operators(0).address(), BATCHOP.to_string());
+
+      // The lone group stays on duty across the advance — the shipped index keeps naming it.
+      advance_to_next_epoch();
+      BOOST_REQUIRE_EQUAL(duty_member().to_string(), BATCHOP.to_string());
+   }
+} FC_LOG_AND_RETHROW() }
+
+/// The depot must NEVER publish an active index that names an EMPTY group: that index selects
+/// the group an outpost admits against and sizes its quorum from, so an empty one admits nobody,
+/// can never reach consensus, and wedges the outpost permanently — the handler that could replace
+/// the window runs only PAST the gate the empty group breaks.
+///
+/// The state is reached by starving an EXISTING window, which is the only way it is reachable:
+/// `schbatchgps` refuses to build a starved schedule up front ("not enough available batch
+/// operators for group assignment"), so a pool smaller than the window can only arise AFTER the
+/// schedule exists — operators leaving the ACTIVE set. Here two of the three are administratively
+/// terminated. The slide then finds no ACTIVE operator outside the surviving groups (residency is
+/// what keeps window groups DISJOINT, which Ethereum's `_resolveChunkPosition` depends on, so it
+/// is not relaxed to fill the gap), pushes an empty tail, and the lookahead index — `cursor + 1`
+/// — names it.
+///
+/// Asserted here: the BATCH_OPERATOR_GROUPS attestation is absent, AND the envelope still exists
+/// carrying other attestations. The second half is the regression guard that matters — withholding
+/// is implemented by skipping ONE queueout, and an early `return` from `advance` would also produce
+/// a missing roster while silently dropping the rest of the epoch's emissions.
+BOOST_FIXTURE_TEST_CASE(advance_withholds_batch_operator_groups_when_next_group_is_empty,
+                        sysio_msgch_chain_tester) { try {
+   constexpr uint32_t kGroups = 3;
+   constexpr uint64_t kRotationWindowMs = 12ULL * kGroups * EPOCH_DURATION_SEC * 1000ULL;
+   bootstrap_rotation(kRotationWindowMs);
+
+   // A full window ships its roster every epoch — the baseline the withhold is measured against.
+   BOOST_REQUIRE_EQUAL(1, shipped_batch_operator_groups_count(ETH_OUTPOST_ID));
+
+   // Starve it: terminate two of the three, leaving one ACTIVE operator for a three-seat window.
+   for (const auto& op : {BATCHOP_B, BATCHOP_C}) {
+      BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "terminate"_n,
+         mvo()("account", op.to_string())("reason", std::string("starve the schedule window"))));
+   }
+   produce_blocks();
+
+   // The terminated pair still occupy their seats until they slide out, so the sole survivor is
+   // resident and the residency-excluded pool is empty: every tail from here is empty. Walk the
+   // window so an empty group reaches the lookahead seat, then hold there.
+   bool observed_withhold = false;
+   for (uint32_t round = 0; round < kGroups + 1; ++round) {
+      advance_to_next_epoch();
+      // `advance` skipped at most ONE queueout, never the rest of its work.
+      BOOST_REQUIRE_GT(shipped_attestation_count(ETH_OUTPOST_ID), 0);
+      if (shipped_batch_operator_groups_count(ETH_OUTPOST_ID) == 0) observed_withhold = true;
+      if (observed_withhold) {
+         // Once the lookahead seat is empty it stays empty — the roster is never republished
+         // while starved, and an empty active index is never shipped.
+         BOOST_REQUIRE_EQUAL(0, shipped_batch_operator_groups_count(ETH_OUTPOST_ID));
+      }
+   }
+   BOOST_REQUIRE_MESSAGE(observed_withhold,
+      "starved window never withheld BATCH_OPERATOR_GROUPS -- an empty active group was published");
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()
