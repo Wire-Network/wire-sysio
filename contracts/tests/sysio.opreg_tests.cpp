@@ -26,6 +26,40 @@ constexpr uint64_t kDefaultPruneDelayMs = 600000;
 /// Current production consecutive-miss threshold.
 constexpr uint32_t kDefaultMaxConsecutiveMisses = 5;
 
+/// Focused threshold that terminates after a second consecutive miss.
+constexpr uint32_t kSingleAllowedConsecutiveMiss = 1;
+
+/// Successful active delivery that seeds the pre-withdrawal percentage sample.
+constexpr uint32_t kPreWithdrawalDeliveredEpoch = 1;
+
+/// Missed active delivery immediately before the withdrawal-ineligibility interval.
+constexpr uint32_t kPreWithdrawalMissedEpoch = kPreWithdrawalDeliveredEpoch + 1;
+
+/// First delivery epoch used by the withdrawal-ineligibility regression.
+constexpr uint32_t kFirstIneligibleDeliveryEpoch = kPreWithdrawalMissedEpoch + 1;
+
+/// Second delivery epoch used by the withdrawal-ineligibility regression.
+constexpr uint32_t kSecondIneligibleDeliveryEpoch = kFirstIneligibleDeliveryEpoch + 1;
+
+/// Missed active delivery immediately after withdrawal cancellation.
+constexpr uint32_t kPostReactivationMissedEpoch = kSecondIneligibleDeliveryEpoch + 1;
+
+/// Successful active delivery that closes the post-reactivation sample.
+constexpr uint32_t kPostReactivationDeliveredEpoch = kPostReactivationMissedEpoch + 1;
+
+/// First epoch in the healthy history used by the percent-rail regression.
+constexpr uint32_t kFirstPercentRailHistoryEpoch = 1;
+
+/// Healthy observations required so one later miss is exactly five percent.
+constexpr uint32_t kPercentRailHealthyHistoryRows = 19;
+
+/// Delivery-log identifier of the final healthy percent-rail observation.
+constexpr uint64_t kLastPercentRailHistoryLogId = kPercentRailHealthyHistoryRows;
+
+/// First missed epoch after percent-rail reactivation.
+constexpr uint32_t kPercentRailPostReactivationMissEpoch =
+   kFirstPercentRailHistoryEpoch + kPercentRailHealthyHistoryRows;
+
 /// Current production rolling-window miss-percentage threshold.
 constexpr uint32_t kDefaultMaxPctMisses24h = 5;
 
@@ -37,6 +71,75 @@ constexpr uint32_t kDisablingPctMisses24h = 100;
 
 /// Compact collateral amount used to activate non-bootstrapped batch operators.
 constexpr uint64_t kTestMinBond = 1;
+
+/// Collateral request that exceeds the compact test balance.
+constexpr uint64_t kInsufficientTestBond = kTestMinBond + 1;
+
+/// First identifier assigned by an empty withdrawal-request table.
+constexpr uint64_t kFirstWithdrawalRequestId = 1;
+
+/// First identifier assigned by an empty delivery-log table.
+constexpr uint64_t kFirstDeliveryLogId = 1;
+
+/// Second identifier assigned by an empty delivery-log table.
+constexpr uint64_t kSecondDeliveryLogId = kFirstDeliveryLogId + 1;
+
+/// Third identifier assigned by an empty delivery-log table.
+constexpr uint64_t kThirdDeliveryLogId = kSecondDeliveryLogId + 1;
+
+/// Minimum wall-clock separation that gives delivery rows distinct millisecond stamps.
+constexpr uint32_t kDeliveryTimestampSeparationSeconds = 2;
+
+/// Production-size producer capacity used by focused collateral tests.
+constexpr uint32_t kTestMaxProducers = 21;
+
+/// Production-size batch-operator capacity used by focused collateral tests.
+constexpr uint32_t kTestMaxBatchOperators = 63;
+
+/// Production-size underwriter capacity used by focused collateral tests.
+constexpr uint32_t kTestMaxUnderwriters = 21;
+
+/// Epoch value that matures every queued withdrawal in focused flush tests.
+constexpr uint32_t kFlushAllMaturedEpoch = std::numeric_limits<uint32_t>::max();
+
+/// Batch operator account used by focused eligibility tests.
+constexpr auto kEligibilityBatchOperator = "batchop.a"_n;
+
+/// Producer account used by focused eligibility tests.
+constexpr auto kEligibilityProducer = "producer.a"_n;
+
+/// Ethereum chain and token codename used by focused collateral tests.
+constexpr std::string_view kEthCodename = "ETH";
+
+/// Native WIRE chain and token codename used by focused collateral tests.
+constexpr std::string_view kWireCodename = "WIRE";
+
+/// Punishment reason used by terminal-status eligibility regressions.
+constexpr std::string_view kTestSlashReason = "test slash";
+
+/// Administrative-removal reason used by terminal-status eligibility regressions.
+constexpr std::string_view kTestTerminationReason = "test termination";
+
+/// Contract action identifiers used by withdrawal lifecycle helpers.
+namespace withdrawal_action {
+constexpr auto withdraw = "withdraw"_n;
+constexpr auto cancel   = "cancelwtdw"_n;
+constexpr auto flush    = "flushwtdw"_n;
+} // namespace withdrawal_action
+
+/// Contract field identifiers used by withdrawal lifecycle helpers.
+namespace withdrawal_field {
+constexpr char account[]       = "account";
+constexpr char amount[]        = "amount";
+constexpr char request_id[]    = "request_id";
+constexpr char current_epoch[] = "current_epoch";
+} // namespace withdrawal_field
+
+/// Result field identifiers inspected by focused eligibility tests.
+namespace eligibility_field {
+constexpr char status[]  = "status";
+constexpr char success[] = "success";
+} // namespace eligibility_field
 
 /// Rejected collateral minimum that would make eligibility checks vacuous.
 constexpr uint64_t kRejectedZeroMinBond = 0;
@@ -305,16 +408,38 @@ public:
          ("amount",      amount));
    }
 
+   /// `withdraw`: operator-authorized WIRE-direct withdrawal request.
+   action_result withdraw(name account, uint64_t amount) {
+      return push_opreg_action(account, withdrawal_action::withdraw, mvo()
+         (withdrawal_field::account, account)
+         (withdrawal_field::amount,  amount));
+   }
+
+   /// Cancel an operator-owned queued withdrawal request.
    action_result cancelwtdw(name signer, name account, uint64_t request_id) {
-      return push_opreg_action(signer, "cancelwtdw"_n, mvo()
-         ("account",     account)
-         ("request_id",  request_id));
+      return push_opreg_action(signer, withdrawal_action::cancel, mvo()
+         (withdrawal_field::account,    account)
+         (withdrawal_field::request_id, request_id));
+   }
+
+   /// Flush every matured withdrawal through the epoch-authorized action.
+   action_result flushwtdw(uint32_t current_epoch) {
+      return push_opreg_action(EPOCH_ACCOUNT, withdrawal_action::flush, mvo()
+         (withdrawal_field::current_epoch, current_epoch));
    }
 
    action_result terminate(name account, std::string reason) {
       return push_opreg_action(OPREG_ACCOUNT, "terminate"_n, mvo()
          ("account",  account)
          ("reason",   reason));
+   }
+
+   /// Invoke the contract-owned batch eligibility transition callback.
+   action_result processbatch(name account, bool was_eligible, bool is_eligible) {
+      return push_opreg_action(OPREG_ACCOUNT, "processbatch"_n, mvo()
+         ("account",      account)
+         ("was_eligible", was_eligible)
+         ("is_eligible",  is_eligible));
    }
 
    action_result releaselock(name signer, name account,
@@ -686,7 +811,7 @@ BOOST_FIXTURE_TEST_CASE(regoperator_non_bootstrapped_pending, sysio_opreg_tester
    auto op = get_operator("uwrit.a"_n);
    BOOST_REQUIRE_EQUAL("uwrit.a", op["account"].as_string());
    BOOST_REQUIRE(OperatorType::OPERATOR_TYPE_UNDERWRITER == op["type"].as<OperatorType>());
-   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_UNKNOWN == op["status"].as<OperatorStatus>());
+   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_UNKNOWN == op[eligibility_field::status].as<OperatorStatus>());
    BOOST_REQUIRE_EQUAL(0, op["is_bootstrapped"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
@@ -987,6 +1112,64 @@ BOOST_FIXTURE_TEST_CASE(withdrawinle_subtracts_from_available_on_subsequent_call
                        entry["error_message"].as_string());
 } FC_LOG_AND_RETHROW() }
 
+/// A successful outpost withdrawal reservation immediately removes an
+/// undercollateralized batch operator from the active set.
+BOOST_FIXTURE_TEST_CASE(withdrawinle_rechecks_eligibility_after_enqueue, sysio_opreg_tester) { try {
+   activate_batch_operator(kEligibilityBatchOperator);
+
+   BOOST_REQUIRE_EQUAL(success(),
+      withdrawinle(kEligibilityBatchOperator, kEthCodename, kEthCodename, kTestMinBond));
+
+   auto op = get_operator(kEligibilityBatchOperator);
+   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_UNKNOWN == op[eligibility_field::status].as<OperatorStatus>());
+   BOOST_REQUIRE(!get_wtdw(kFirstWithdrawalRequestId).is_null());
+} FC_LOG_AND_RETHROW() }
+
+/// A direct WIRE withdrawal reservation applies the same immediate eligibility
+/// transition to a non-bootstrapped producer.
+BOOST_FIXTURE_TEST_CASE(withdraw_rechecks_eligibility_after_enqueue, sysio_opreg_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), setconfig(
+      /*max_prod=*/kTestMaxProducers,
+      /*max_batch=*/kTestMaxBatchOperators,
+      /*max_uw=*/kTestMaxUnderwriters,
+      /*prune_delay=*/kDefaultPruneDelayMs,
+      /*max_consec_misses=*/kDefaultMaxConsecutiveMisses,
+      /*max_pct_misses_24h=*/kMaxAcceptedPctMisses24h,
+      /*terminate_window_ms=*/kTerminateWindowMs,
+      /*req_prod_collat=*/{
+         make_chain_min_bond(kWireCodename, kWireCodename, kTestMinBond),
+      },
+      /*req_batchop_collat=*/{},
+      /*req_uw_collat=*/{}));
+   BOOST_REQUIRE_EQUAL(success(),
+      regoperator(kEligibilityProducer, OPERATOR_TYPE_PRODUCER, /*is_bootstrapped=*/false));
+   BOOST_REQUIRE_EQUAL(success(),
+      depositinle(kEligibilityProducer, kWireCodename, kWireCodename, kTestMinBond));
+   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE ==
+                 get_operator(kEligibilityProducer)[eligibility_field::status].as<OperatorStatus>());
+
+   BOOST_REQUIRE_EQUAL(success(), withdraw(kEligibilityProducer, kTestMinBond));
+
+   auto op = get_operator(kEligibilityProducer);
+   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_UNKNOWN == op[eligibility_field::status].as<OperatorStatus>());
+   BOOST_REQUIRE(!get_wtdw(kFirstWithdrawalRequestId).is_null());
+} FC_LOG_AND_RETHROW() }
+
+/// A rejected outpost withdrawal has no reservation side effect and therefore
+/// cannot change an otherwise eligible operator's status.
+BOOST_FIXTURE_TEST_CASE(withdrawinle_rejection_preserves_eligibility, sysio_opreg_tester) { try {
+   activate_batch_operator(kEligibilityBatchOperator);
+
+   BOOST_REQUIRE_EQUAL(success(),
+      withdrawinle(kEligibilityBatchOperator, kEthCodename, kEthCodename, kInsufficientTestBond));
+
+   auto op = get_operator(kEligibilityBatchOperator);
+   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE == op[eligibility_field::status].as<OperatorStatus>());
+   BOOST_REQUIRE(get_wtdw(kFirstWithdrawalRequestId).is_null());
+   auto entry = latest_action_log(kEligibilityBatchOperator);
+   BOOST_REQUIRE_EQUAL(false, entry[eligibility_field::success].as_bool());
+} FC_LOG_AND_RETHROW() }
+
 BOOST_FIXTURE_TEST_CASE(cancelwtdw_removes_pending_request, sysio_opreg_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), setconfig());
    BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.alice"_n, OPERATOR_TYPE_UNDERWRITER, false));
@@ -1002,6 +1185,75 @@ BOOST_FIXTURE_TEST_CASE(cancelwtdw_removes_pending_request, sysio_opreg_tester) 
 
    BOOST_REQUIRE_EQUAL(success(),
       withdrawinle("uwrit.alice"_n, "ETH", "ETH", 1000));
+} FC_LOG_AND_RETHROW() }
+
+/// Canceling the only pending reservation restores the operator immediately
+/// once its available collateral again covers the configured minimum.
+BOOST_FIXTURE_TEST_CASE(cancelwtdw_rechecks_eligibility_after_erase, sysio_opreg_tester) { try {
+   activate_batch_operator(kEligibilityBatchOperator);
+   BOOST_REQUIRE_EQUAL(success(),
+      withdrawinle(kEligibilityBatchOperator, kEthCodename, kEthCodename, kTestMinBond));
+   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_UNKNOWN ==
+                 get_operator(kEligibilityBatchOperator)[eligibility_field::status].as<OperatorStatus>());
+
+   BOOST_REQUIRE_EQUAL(success(), cancelwtdw(
+      kEligibilityBatchOperator, kEligibilityBatchOperator, kFirstWithdrawalRequestId));
+
+   auto op = get_operator(kEligibilityBatchOperator);
+   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE == op[eligibility_field::status].as<OperatorStatus>());
+   BOOST_REQUIRE(get_wtdw(kFirstWithdrawalRequestId).is_null());
+} FC_LOG_AND_RETHROW() }
+
+/// A stale eligibility callback after punishment must not reactivate a
+/// bootstrapped operator, even though bootstrapped operators bypass collateral
+/// minimums.
+BOOST_FIXTURE_TEST_CASE(processbatch_preserves_slashed_bootstrapped_status, sysio_opreg_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), setconfig());
+   BOOST_REQUIRE_EQUAL(success(),
+      regoperator(kEligibilityBatchOperator, OPERATOR_TYPE_BATCH, /*is_bootstrapped=*/true));
+   BOOST_REQUIRE_EQUAL(success(), slash(kEligibilityBatchOperator, std::string{kTestSlashReason}));
+
+   BOOST_REQUIRE_EQUAL(success(), processbatch(
+      kEligibilityBatchOperator, /*was_eligible=*/false, /*is_eligible=*/true));
+
+   auto op = get_operator(kEligibilityBatchOperator);
+   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_SLASHED ==
+                 op[eligibility_field::status].as<OperatorStatus>());
+} FC_LOG_AND_RETHROW() }
+
+/// A stale eligibility callback after administrative removal must likewise
+/// leave a bootstrapped operator permanently terminated.
+BOOST_FIXTURE_TEST_CASE(processbatch_preserves_terminated_bootstrapped_status, sysio_opreg_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), setconfig());
+   BOOST_REQUIRE_EQUAL(success(),
+      regoperator(kEligibilityBatchOperator, OPERATOR_TYPE_BATCH, /*is_bootstrapped=*/true));
+   BOOST_REQUIRE_EQUAL(success(),
+      terminate(kEligibilityBatchOperator, std::string{kTestTerminationReason}));
+
+   BOOST_REQUIRE_EQUAL(success(), processbatch(
+      kEligibilityBatchOperator, /*was_eligible=*/false, /*is_eligible=*/true));
+
+   auto op = get_operator(kEligibilityBatchOperator);
+   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_TERMINATED ==
+                 op[eligibility_field::status].as<OperatorStatus>());
+} FC_LOG_AND_RETHROW() }
+
+/// Flushing a partial withdrawal erases its reservation before eligibility is
+/// recomputed, so the matured amount is not subtracted twice.
+BOOST_FIXTURE_TEST_CASE(flushwtdw_rechecks_eligibility_after_erase, sysio_opreg_tester) { try {
+   activate_batch_operator(kEligibilityBatchOperator);
+   BOOST_REQUIRE_EQUAL(success(),
+      depositinle(kEligibilityBatchOperator, kEthCodename, kEthCodename, kTestMinBond));
+   BOOST_REQUIRE_EQUAL(success(),
+      withdrawinle(kEligibilityBatchOperator, kEthCodename, kEthCodename, kTestMinBond));
+   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE ==
+                 get_operator(kEligibilityBatchOperator)[eligibility_field::status].as<OperatorStatus>());
+
+   BOOST_REQUIRE_EQUAL(success(), flushwtdw(kFlushAllMaturedEpoch));
+
+   auto op = get_operator(kEligibilityBatchOperator);
+   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE == op[eligibility_field::status].as<OperatorStatus>());
+   BOOST_REQUIRE(get_wtdw(kFirstWithdrawalRequestId).is_null());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(cancelwtdw_rejects_other_operators_request, sysio_opreg_tester) { try {
@@ -1186,6 +1438,103 @@ BOOST_FIXTURE_TEST_CASE(termcheck_keeps_bootstrapped_operator_exempt, sysio_opre
    auto op = get_operator("batchop.a"_n);
    BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE == op["status"].as<OperatorStatus>());
    BOOST_REQUIRE_EQUAL(1, op["is_bootstrapped"].as_uint64());
+} FC_LOG_AND_RETHROW() }
+
+/// Withdrawal-induced ineligibility starts a fresh duty interval when the
+/// operator reactivates, so miss runs cannot span the ineligible interval.
+BOOST_FIXTURE_TEST_CASE(recorddel_ignores_withdrawal_ineligibility, sysio_opreg_tester) { try {
+   activate_batch_operator(
+      kEligibilityBatchOperator,
+      /*max_consec_misses=*/kSingleAllowedConsecutiveMiss,
+      /*max_pct_misses_24h=*/kMaxAcceptedPctMisses24h);
+
+   BOOST_REQUIRE_EQUAL(success(),
+      recorddel(kEligibilityBatchOperator, kPreWithdrawalDeliveredEpoch, /*delivered=*/true));
+   BOOST_REQUIRE_EQUAL(success(),
+      recorddel(kEligibilityBatchOperator, kPreWithdrawalMissedEpoch, /*delivered=*/false));
+   BOOST_REQUIRE_EQUAL(success(), termcheck(kEligibilityBatchOperator));
+   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE ==
+                 get_operator(kEligibilityBatchOperator)[eligibility_field::status].as<OperatorStatus>());
+   produce_blocks();
+   produce_block(fc::seconds(kDeliveryTimestampSeparationSeconds));
+
+   BOOST_REQUIRE_EQUAL(success(),
+      withdrawinle(kEligibilityBatchOperator, kEthCodename, kEthCodename, kTestMinBond));
+   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_UNKNOWN ==
+                 get_operator(kEligibilityBatchOperator)[eligibility_field::status].as<OperatorStatus>());
+
+   BOOST_REQUIRE_EQUAL(success(),
+      recorddel(kEligibilityBatchOperator, kFirstIneligibleDeliveryEpoch, /*delivered=*/false));
+   BOOST_REQUIRE_EQUAL(success(),
+      recorddel(kEligibilityBatchOperator, kSecondIneligibleDeliveryEpoch, /*delivered=*/false));
+   BOOST_REQUIRE(!get_dellog_entry(kFirstDeliveryLogId).is_null());
+   BOOST_REQUIRE(!get_dellog_entry(kSecondDeliveryLogId).is_null());
+   BOOST_REQUIRE(get_dellog_entry(kThirdDeliveryLogId).is_null());
+
+   BOOST_REQUIRE_EQUAL(success(), cancelwtdw(
+      kEligibilityBatchOperator, kEligibilityBatchOperator, kFirstWithdrawalRequestId));
+   auto reactivated = get_operator(kEligibilityBatchOperator);
+   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE ==
+                 reactivated[eligibility_field::status].as<OperatorStatus>());
+   auto pre_withdrawal_miss_ts = get_dellog_entry(kSecondDeliveryLogId)["ts_ms"].as_uint64();
+   auto reactivated_at         = reactivated["available_at"].as_uint64();
+   BOOST_REQUIRE_MESSAGE(pre_withdrawal_miss_ts < reactivated_at,
+                         "pre-withdrawal miss timestamp " << pre_withdrawal_miss_ts
+                                                           << " must precede reactivation " << reactivated_at);
+   produce_blocks();
+
+   BOOST_REQUIRE_EQUAL(success(),
+      recorddel(kEligibilityBatchOperator, kPostReactivationMissedEpoch, /*delivered=*/false));
+   BOOST_REQUIRE_EQUAL(success(),
+      recorddel(kEligibilityBatchOperator, kPostReactivationDeliveredEpoch, /*delivered=*/true));
+   BOOST_REQUIRE_EQUAL(success(), termcheck(kEligibilityBatchOperator));
+
+   auto op = get_operator(kEligibilityBatchOperator);
+   BOOST_REQUIRE_MESSAGE(OperatorStatus::OPERATOR_STATUS_ACTIVE ==
+                            op[eligibility_field::status].as<OperatorStatus>(),
+                         op["status_reason"].as_string());
+} FC_LOG_AND_RETHROW() }
+
+/// Reactivation resets only the consecutive-miss run. Healthy observations
+/// from before withdrawal-induced parking remain in the rolling percentage
+/// sample, so one miss among twenty rows stays at the production five-percent
+/// ceiling rather than becoming a one-row, 100-percent sample.
+BOOST_FIXTURE_TEST_CASE(termcheck_preserves_percent_sample_across_withdrawal_ineligibility,
+                        sysio_opreg_tester) { try {
+   activate_batch_operator(
+      kEligibilityBatchOperator,
+      /*max_consec_misses=*/kDefaultMaxConsecutiveMisses,
+      /*max_pct_misses_24h=*/kDefaultMaxPctMisses24h);
+
+   for (uint32_t epoch = kFirstPercentRailHistoryEpoch;
+        epoch < kPercentRailPostReactivationMissEpoch;
+        ++epoch) {
+      BOOST_REQUIRE_EQUAL(success(),
+         recorddel(kEligibilityBatchOperator, epoch, /*delivered=*/true));
+   }
+   produce_blocks();
+   produce_block(fc::seconds(kDeliveryTimestampSeparationSeconds));
+
+   BOOST_REQUIRE_EQUAL(success(),
+      withdrawinle(kEligibilityBatchOperator, kEthCodename, kEthCodename, kTestMinBond));
+   BOOST_REQUIRE_EQUAL(success(), cancelwtdw(
+      kEligibilityBatchOperator, kEligibilityBatchOperator, kFirstWithdrawalRequestId));
+
+   auto reactivated = get_operator(kEligibilityBatchOperator);
+   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE ==
+                 reactivated[eligibility_field::status].as<OperatorStatus>());
+   auto healthy_history_end = get_dellog_entry(kLastPercentRailHistoryLogId)["ts_ms"].as_uint64();
+   auto reactivated_at      = reactivated["available_at"].as_uint64();
+   BOOST_REQUIRE(healthy_history_end < reactivated_at);
+
+   BOOST_REQUIRE_EQUAL(success(), recorddel(
+      kEligibilityBatchOperator, kPercentRailPostReactivationMissEpoch, /*delivered=*/false));
+   BOOST_REQUIRE_EQUAL(success(), termcheck(kEligibilityBatchOperator));
+
+   auto op = get_operator(kEligibilityBatchOperator);
+   BOOST_REQUIRE_MESSAGE(OperatorStatus::OPERATOR_STATUS_ACTIVE ==
+                            op[eligibility_field::status].as<OperatorStatus>(),
+                         op["status_reason"].as_string());
 } FC_LOG_AND_RETHROW() }
 
 // ---- dellog retention: bounded pruning of rows outside the rolling window ----
