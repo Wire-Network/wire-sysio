@@ -26,12 +26,13 @@ tier budget — so an ordinary account cannot grant itself bandwidth. (Privilege
 sit outside this: `setalimits` and the fixed account gift can set limits without a policy.) A node
 owner may name itself as its own policy's recipient; registration does that for tier 1 only.
 
-**A contract without a policy does not run.** Because the contract is the payer for actions declared
-on it, an unprovisioned one has nothing to pay with and those calls fail. Provisioning the contract
-— not the user — is what makes an application usable.
+**A contract without a policy does not run when called directly.** Because the contract is the payer
+for actions declared on it, an unprovisioned one has nothing to pay with and those calls fail.
+Provisioning the contract — not the user — is what makes an application usable.
 
-There is one exception, covered in [Who pays](#who-pays-the-payer-model): an account can volunteer
-to pay for itself. It is opt-in, it requires signatures, and it is not how ordinary traffic works.
+For those calls there is one exception to who pays, covered in
+[Who pays](#who-pays-the-payer-model): an account can volunteer to pay for itself. It is opt-in, it
+requires signatures, and it is not how ordinary traffic works.
 
 ---
 
@@ -71,7 +72,7 @@ the exception, not the ordinary path.
 
 | | EOS staking | REX | PowerUp | **Wire ROA** |
 |---|---|---|---|---|
-| Who is billed for a transaction | Signer | Signer | Signer | **Called contract, unless the action names an explicit payer** |
+| Who is billed for a transaction | Signer | Signer | Signer | **Each declared action's contract, unless that action names an explicit payer** |
 | End user needs native token | No — but someone does, per user | No — but someone does, per user | No — but someone does, per user | **No — the contract's one policy covers every caller** |
 | CPU/NET acquired by | Locking tokens | Renting from a pool | Term fee on a curve | **A node owner's policy** |
 | RAM acquired by | Bancor market purchase | same | same | **A node owner's policy** |
