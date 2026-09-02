@@ -14,12 +14,15 @@ from TestHarness import Cluster, TestHelper, Utils, WalletMgr
 # 1. Launch 5-node cluster with system contract (bootstrap schedule has 5 producers)
 # 2. Record initial producer schedule (5 producers from bootstrap)
 # 3. Register all 5 producers via regproducer
-# 4. Rank only 4 via setrank (leave one unranked at UINT32_MAX)
-# 5. Register BLS finalizer keys for the 4 ranked producers
-# 6. Wait for update_ranked_producers to fire via onblock
-# 7. Verify producer schedule changed (5 → 4 producers, version increased)
-# 8. Verify finalizer policy set (4 finalizers from ranked producers)
-# 9. Test setrank action (positive and negative cases)
+# 4. Register BLS finalizer keys for only 4 of them
+# 5. Wait for update_ranked_producers to fire via onblock
+# 6. Verify producer schedule changed (5 → 4 producers, version increased)
+# 7. Verify finalizer policy set (4 finalizers from the keyed producers)
+#
+# Rank is POSITION in the score-ordered producer index, derived by iteration -- there is no
+# action that assigns it. A producer holds a position only if it is schedulable, which requires
+# an ACTIVE PRODUCER operator row in sysio.opreg AND an active finalizer key. Withholding the
+# finalizer key from one producer is therefore what makes the schedule drop from 5 to 4.
 #
 ###############################################################
 
@@ -30,7 +33,7 @@ args = TestHelper.parse_args({"--dump-error-details", "--keep-logs", "-v", "--le
 Utils.Debug = args.v
 pnodes = 5
 totalNodes = pnodes
-rankedCount = 4  # only rank 4 of the 5 producers
+keyedCount = 4  # only rank 4 of the 5 producers
 dumpErrorDetails = args.dump_error_details
 
 testSuccessful = False
@@ -65,13 +68,13 @@ try:
     prodNames = sorted(producers.keys())
     Print(f"Producers: {prodNames}")
 
-    # The first rankedCount producers (alphabetically) will be ranked;
-    # the last one will remain unranked and should be excluded from the
-    # schedule and finalizer policy after update_ranked_producers fires.
-    rankedProdNames = prodNames[:rankedCount]
-    excludedProd = prodNames[rankedCount]
-    Print(f"Ranked producers: {rankedProdNames}")
-    Print(f"Excluded (unranked) producer: {excludedProd}")
+    # The first keyedCount producers (alphabetically) get finalizer keys; the last one does not
+    # and so holds no rank position -- it should be excluded from the schedule and the finalizer
+    # policy once update_ranked_producers fires.
+    keyedProdNames = prodNames[:keyedCount]
+    excludedProd = prodNames[keyedCount]
+    Print(f"Finalizer-keyed producers: {keyedProdNames}")
+    Print(f"Excluded (no finalizer key) producer: {excludedProd}")
 
     # ----------------------------------------------------------------
     # Record initial producer schedule from bootstrap
@@ -115,28 +118,10 @@ try:
     # satisfied and scheduling turns purely on rank + finalizer key below.
 
     # ----------------------------------------------------------------
-    # Phase 2: Assign ranks to only rankedCount producers via setrank
+    # Phase 2: Register BLS finalizer keys for all but one producer
     # ----------------------------------------------------------------
-    # regproducer creates entries with rank=UINT32_MAX (unranked).
-    # update_ranked_producers only considers producers with rank <= 21.
-    # We intentionally leave the last producer unranked to verify that
-    # update_ranked_producers changes the schedule from 5 to 4.
-    Print("=== Phase 2: Assign producer ranks via setrank ===")
-    for i, name in enumerate(rankedProdNames):
-        rank = i + 1
-        data = json.dumps({"producer": name, "rank": rank})
-        opts = "--permission sysio@active"
-        trans = node0.pushMessage("sysio", "setrank", data, opts)
-        assert trans is not None and trans[0], f"Failed to set rank for {name}: {trans}"
-        Print(f"Set rank {rank} for producer {name}")
-
-    assert node0.waitForHeadToAdvance(blocksToAdvance=2), "Head should advance after setrank"
-
-    # ----------------------------------------------------------------
-    # Phase 3: Register BLS finalizer keys for ranked producers only
-    # ----------------------------------------------------------------
-    Print("=== Phase 3: Register finalizer keys via regfinkey ===")
-    for name in rankedProdNames:
+    Print("=== Phase 2: Register finalizer keys via regfinkey ===")
+    for name in keyedProdNames:
         n = producers[name]
         blsKey = n.keys[0].blspubkey
         blsPop = n.keys[0].blspop
@@ -153,14 +138,14 @@ try:
     assert node0.waitForHeadToAdvance(blocksToAdvance=2), "Head should advance after regfinkey"
 
     # ----------------------------------------------------------------
-    # Phase 4: Wait for update_ranked_producers to fire
+    # Phase 3: Wait for update_ranked_producers to fire
     # ----------------------------------------------------------------
     # onblock calls update_ranked_producers when timestamp.slot - last_update.slot > 120.
     # After system contract init, last_producer_schedule_update is 0, so the first
     # update_ranked_producers fires on the very first onblock. Since that happens before
     # we register keys, it finds no qualified producers and sets last_update to current time.
     # We need to wait ~120 more slots (60 seconds) for the next cycle.
-    Print("=== Phase 4: Waiting for update_ranked_producers cycle (~65 seconds) ===")
+    Print("=== Phase 3: Waiting for update_ranked_producers cycle (~65 seconds) ===")
     assert node0.waitForHeadToAdvance(blocksToAdvance=135, timeout=90), \
         "Head should advance 135 blocks for update_ranked_producers cycle"
 
@@ -173,9 +158,9 @@ try:
     assert node0.waitForLibToAdvance(timeout=30), "LIB should still be advancing"
 
     # ----------------------------------------------------------------
-    # Phase 5: Verify producer schedule changed
+    # Phase 4: Verify producer schedule changed
     # ----------------------------------------------------------------
-    Print("=== Phase 5: Verify producer schedule changed ===")
+    Print("=== Phase 4: Verify producer schedule changed ===")
     schedule = node0.processUrllibRequest("chain", "get_producer_schedule")
 
     activeSchedule = schedule["payload"]["active"]
@@ -187,24 +172,24 @@ try:
     assert newVersion > initVersion, \
         f"Schedule version should have increased from {initVersion}, got {newVersion}"
 
-    # Should have exactly rankedCount producers
-    assert len(activeProducers) == rankedCount, \
-        f"Expected {rankedCount} active producers, got {len(activeProducers)}: {activeProducers}"
+    # Should have exactly keyedCount producers
+    assert len(activeProducers) == keyedCount, \
+        f"Expected {keyedCount} active producers, got {len(activeProducers)}: {activeProducers}"
 
     # All ranked producers should be in the schedule
-    for name in rankedProdNames:
+    for name in keyedProdNames:
         assert name in activeProducers, f"Ranked producer {name} should be in active schedule"
 
     # The excluded producer should NOT be in the schedule
     assert excludedProd not in activeProducers, \
         f"Unranked producer {excludedProd} should NOT be in active schedule"
-    Print(f"Producer schedule changed: {pnodes} -> {rankedCount} producers, "
+    Print(f"Producer schedule changed: {pnodes} -> {keyedCount} producers, "
           f"version {initVersion} -> {newVersion}")
 
     # ----------------------------------------------------------------
-    # Phase 6: Verify finalizer policy
+    # Phase 5: Verify finalizer policy
     # ----------------------------------------------------------------
-    Print("=== Phase 6: Verify finalizer policy ===")
+    Print("=== Phase 5: Verify finalizer policy ===")
     finInfo = node0.getFinalizerInfo()
 
     activeFP = finInfo["payload"]["active_finalizer_policy"]
@@ -218,30 +203,30 @@ try:
         Print(f"Pending finalizer policy: generation={pendingFP.get('generation', 'N/A')}, "
               f"threshold={pendingFP.get('threshold', 'N/A')}, finalizers={pendingFinCount}")
 
-    # Look for the rankedCount-finalizer policy in either active or pending.
+    # Look for the keyedCount-finalizer policy in either active or pending.
     policyToCheck = None
     policyState = None
-    if activeFinCount == rankedCount:
+    if activeFinCount == keyedCount:
         policyToCheck = activeFP
         policyState = "active"
-    elif pendingFinCount == rankedCount:
+    elif pendingFinCount == keyedCount:
         policyToCheck = pendingFP
         policyState = "pending"
 
     assert policyToCheck is not None, \
-        f"Expected a finalizer policy with {rankedCount} finalizers. " \
+        f"Expected a finalizer policy with {keyedCount} finalizers. " \
         f"Active has {activeFinCount}, Pending has {pendingFinCount}"
     Print(f"System contract finalizer policy is {policyState}")
 
     # Verify threshold: (N * 2) / 3 + 1
-    expectedThreshold = rankedCount * 2 // 3 + 1
+    expectedThreshold = keyedCount * 2 // 3 + 1
     assert policyToCheck["threshold"] == expectedThreshold, \
         f"Expected threshold {expectedThreshold}, got {policyToCheck['threshold']}"
 
     # Verify each ranked producer has a finalizer entry with weight 1
     finalizerDescs = sorted([f["description"] for f in policyToCheck["finalizers"]])
     Print(f"Finalizer descriptions: {finalizerDescs}")
-    for name in rankedProdNames:
+    for name in keyedProdNames:
         assert name in finalizerDescs, f"Producer {name} should be in finalizer policy"
 
     # The excluded producer should NOT be a finalizer
@@ -250,38 +235,6 @@ try:
 
     for f in policyToCheck["finalizers"]:
         assert f["weight"] == 1, f"Finalizer weight should be 1, got {f['weight']}"
-
-    # ----------------------------------------------------------------
-    # Phase 7: Test setrank action
-    # ----------------------------------------------------------------
-    Print("=== Phase 7: Test setrank action ===")
-
-    # setrank requires sysio@active authority
-    target = rankedProdNames[0]
-    data = json.dumps({"producer": target, "rank": 1})
-    opts = "--permission sysio@active"
-    trans = node0.pushMessage("sysio", "setrank", data, opts)
-    assert trans is not None and trans[0], f"setrank for {target} to rank 1 should succeed: {trans}"
-    Print(f"setrank: {target} -> rank 1 succeeded")
-
-    # Verify setrank with rank 0 (invalid) is rejected
-    data = json.dumps({"producer": target, "rank": 0})
-    trans = node0.pushMessage("sysio", "setrank", data, opts, silentErrors=True)
-    assert trans is None or not trans[0], "setrank with rank 0 should fail"
-    Print("setrank with rank 0 correctly rejected")
-
-    # Verify setrank with non-existent producer fails
-    data = json.dumps({"producer": "nonexistent1", "rank": 1})
-    trans = node0.pushMessage("sysio", "setrank", data, opts, silentErrors=True)
-    assert trans is None or not trans[0], "setrank with non-existent producer should fail"
-    Print("setrank with non-existent producer correctly rejected")
-
-    # Verify setrank without sysio authority fails
-    data = json.dumps({"producer": target, "rank": 2})
-    badOpts = f"--permission {target}@active"
-    trans = node0.pushMessage("sysio", "setrank", data, badOpts, silentErrors=True)
-    assert trans is None or not trans[0], "setrank without sysio authority should fail"
-    Print("setrank without sysio authority correctly rejected")
 
     # ----------------------------------------------------------------
     # Final verification: LIB still advancing

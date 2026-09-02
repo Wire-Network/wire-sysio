@@ -1,4 +1,5 @@
 #include <sysio.system/sysio.system.hpp>
+#include <sysio.system/producer_score.hpp>
 #include <sysio.system/peer_keys.hpp>
 
 #include <sysio/sysio.hpp>
@@ -58,9 +59,20 @@ peer_keys::getpeerkeys_res_t peer_keys::getpeerkeys() {
    };
 
    auto idx = producers.get_index<"prodrank"_n>();
+   finalizers_table finalizers(get_self());
 
+   // `rank` is POSITION among SCHEDULABLE producers, so this counts matches rather than taking the
+   // first `max_rank` index entries. Taking the first N would let unbonded registrants -- which
+   // occupy index slots but can never be scheduled -- crowd real producers out of peer discovery.
+   // The demoted tier sorts last and is never schedulable, so it also bounds the walk over what is
+   // a permissionless, unbounded table.
+   uint32_t position = 0;
    for (auto i = idx.cbegin(); i != idx.cend() && resp.size() < max_return; ++i) {
-      if (i->rank > max_rank)
+      if (producer_rank::tier_of(i->rank_score) == producer_tier::demoted)
+         break;
+      if (!producer_rank::is_schedulable(*i, finalizers))
+         continue;
+      if (++position > max_rank)
          break;
       add_peer(*i);
    }

@@ -92,7 +92,7 @@ try:
         account = cluster.defProducerAccounts[name]
         walletMgr.importKey(account, ignWallet, ignoreDupKeyWarning=True)
 
-    # Register producers via regproducer (required before setrank)
+    # Register producers via regproducer (required before regfinkey)
     regProducerTransIds = []
     for name in [producerA, producerB]:
         account = cluster.defProducerAccounts[name]
@@ -108,37 +108,36 @@ try:
         regProducerTransIds.append(node0.getTransId(trans))
         Print(f"Registered producer {name}")
 
-    # setrank reads the on-chain producers table and asserts "producer not found"
-    # if a registration is missing.
-    # pushMessage only confirms speculative
-    # execution, and waitForHeadToAdvance() does not guarantee these specific
-    # transactions were applied — with multiple producers a transaction pushed
-    # to node0 can be forwarded into a peer's block. Wait for both regproducer
-    # transactions to appear in a block so setrank speculatively executes
-    # against state that already contains the registrations.
+    # regfinkey asserts "is not a registered producer" if the producers row is missing.
+    # pushMessage only confirms speculative execution, and waitForHeadToAdvance() does not
+    # guarantee these specific transactions were applied — with multiple producers a transaction
+    # pushed to node0 can be forwarded into a peer's block. Wait for both regproducer
+    # transactions to appear in a block first.
     assert node0.waitForTransactionsInBlock(regProducerTransIds, timeout=60), \
-        "regproducer transactions did not make it into a block before setrank"
+        "regproducer transactions did not make it into a block before regfinkey"
 
-    setRankTransIds = []
-    Print(f"Set rank for {producerA}")
-    success, trans = node0.pushMessage("sysio", "setrank",
-        json.dumps({"producer": producerA, "rank": 1}),
-        "--permission sysio@active")
-    assert success, f"Failed to set rank for {producerA}: {trans}"
-    setRankTransIds.append(node0.getTransId(trans))
+    # Snapshot-provider eligibility is POSITION in the score-ordered producer index, not a rank
+    # governance assigns. A producer holds a position only when it is schedulable, which requires
+    # an active finalizer key on top of the opreg operator row the bootstrap already created.
+    finKeyTransIds = []
+    for name in [producerA, producerB]:
+        node = next(cluster.getNode(i) for i in range(pnodes)
+                    if cluster.getNode(i).producerName == name)
+        Print(f"Register finalizer key for {name}")
+        success, trans = node0.pushMessage("sysio", "regfinkey",
+            json.dumps({
+                "finalizer_name": name,
+                "finalizer_key": node.keys[0].blspubkey,
+                "proof_of_possession": node.keys[0].blspop
+            }),
+            f"--permission {name}@active")
+        assert success, f"Failed to register finalizer key for {name}: {trans}"
+        finKeyTransIds.append(node0.getTransId(trans))
 
-    Print(f"Set rank for {producerB}")
-    success, trans = node0.pushMessage("sysio", "setrank",
-        json.dumps({"producer": producerB, "rank": 2}),
-        "--permission sysio@active")
-    assert success, f"Failed to set rank for {producerB}: {trans}"
-    setRankTransIds.append(node0.getTransId(trans))
-
-    # regsnapprov reads producer ranks from the on-chain producers table. A
-    # generic head advance can race the exact setrank transactions under
-    # multi-producer scheduling, so wait for those transactions specifically.
-    assert node0.waitForTransactionsInBlock(setRankTransIds, timeout=60), \
-        "setrank transactions did not make it into a block before regsnapprov"
+    # regsnapprov walks the producer index for its eligibility check, so wait for those
+    # registrations specifically rather than a generic head advance.
+    assert node0.waitForTransactionsInBlock(finKeyTransIds, timeout=60), \
+        "regfinkey transactions did not make it into a block before regsnapprov"
 
     # ---------------------------------------------------------------
     # Register snapshot providers

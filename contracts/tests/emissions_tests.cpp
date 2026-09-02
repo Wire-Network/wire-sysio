@@ -34,6 +34,8 @@
 #include <sysio/opp/opp.hpp>
 
 #include "sysio.system_tester.hpp"
+#include <sysio/testing/bls_utils.hpp>
+
 #include "finalizer_test_keys.hpp"
 
 #include <fc/variant_object.hpp>
@@ -771,6 +773,59 @@ public:
    //
    // If `register_opreg` is false, the caller is exercising the filter and will
    // handle opreg registration manually (e.g. to test a slashed operator).
+   /// Derive a producer's rank -- POSITION in the score-ordered index, counting from 1.
+   ///
+   /// `rank` is no longer a stored field: it is position in the "prodrank" index among schedulable
+   /// producers. A test that asserts on rank therefore reproduces the contract's own ordering --
+   /// ascending `rank_score`, ties broken by account name (the primary key). Scans the fixture's
+   /// `producer_name_at` roster, which is every producer these fixtures create.
+   ///
+   /// @param target the producer whose position is wanted.
+   /// @param scan   how many roster slots to consider.
+   /// @return the 1-based position, or 0 when the producer holds none.
+   uint32_t producer_rank_position(account_name target, uint32_t scan = 40) {
+      std::vector<std::pair<uint64_t, uint64_t>> ordered;
+      for (uint32_t i = 0; i < scan; ++i) {
+         auto candidate = producer_name_at(i);
+         auto info      = get_producer_info(candidate);
+         if (info.is_null()) continue;
+         if (!info["is_active"].as<bool>()) continue;
+         ordered.emplace_back(info["rank_score"].as<uint64_t>(), candidate.to_uint64_t());
+      }
+      std::sort(ordered.begin(), ordered.end());
+      for (uint32_t i = 0; i < ordered.size(); ++i) {
+         if (ordered[i].second == target.to_uint64_t()) return i + 1;
+      }
+      return 0;
+   }
+
+   action_result register_finalizer_key(account_name act, const std::string& key, const std::string& pop) {
+      return push_system_action(act, "regfinkey"_n, mvo()
+         ("finalizer_name", act)("finalizer_key", key)("proof_of_possession", pop));
+   }
+
+   /// Register an active finalizer key for each of the first `count` names, and configure the node
+   /// to vote with them. regfinkey auto-activates a producer's first key, which is what
+   /// `producer_rank::is_schedulable` requires -- a producer without one occupies no rank position,
+   /// so it is neither scheduled nor paid.
+   ///
+   /// The keys come from `get_bls_key(name)`, which the tester HOLDS the private half of. That is
+   /// load-bearing: update_ranked_producers proposes a finalizer policy built from the registered
+   /// keys, and a policy this node cannot sign for stops it voting -- LIB freezes, and a frozen LIB
+   /// means a pending producer schedule never becomes final and so never activates. Deriving from
+   /// the account name also gives a distinct key per producer, satisfying regfinkey's global
+   /// uniqueness check without a fixed key table.
+   void register_finalizer_keys(const std::vector<account_name>& names, uint32_t count) {
+      std::vector<account_name> registered;
+      for (uint32_t i = 0; i < count && i < names.size(); ++i) {
+         auto [privkey, pubkey, pop, sig_provider] = sysio::testing::get_bls_key(names[i]);
+         BOOST_REQUIRE_EQUAL(success(),
+            register_finalizer_key(names[i], pubkey.to_string(), pop.to_string()));
+         registered.push_back(names[i]);
+      }
+      set_node_finalizers(registered);
+   }
+
    void setup_producers( uint32_t count, bool register_opreg = true ) {
       std::vector<account_name> prod_names;
       for (uint32_t i = 0; i < count; ++i) {
@@ -804,6 +859,19 @@ public:
          }
          produce_blocks(1);
       }
+
+      // Every producer needs an active finalizer key: rank is position among SCHEDULABLE producers,
+      // and a producer without one holds no position -- so it is neither scheduled nor paid.
+      // regfinkey stores a row on the producer, which needs RAM this fixture does not otherwise
+      // grant (it does not activate the ROA / RAM market).
+      for (auto& pname : prod_names) {
+         BOOST_REQUIRE_EQUAL(success(), push_system_action(config::system_account_name, "setacctram"_n,
+            mvo()("account", pname)("ram_bytes", int64_t(1'000'000))));
+      }
+      produce_blocks(1);
+
+      register_finalizer_keys(prod_names, count);
+      produce_blocks(1);
 
       // Build schedule and call setprodkeys
       set_producer_schedule(prod_names);
@@ -3134,7 +3202,7 @@ BOOST_FIXTURE_TEST_CASE( standby_paid_without_block_check, sysio_emissions_teste
    // Verify the standby producer has rank 22
    auto standby_info = get_producer_info(standby_name);
    BOOST_REQUIRE( !standby_info.is_null() );
-   uint32_t standby_rank = standby_info["rank"].as<uint32_t>();
+   uint32_t standby_rank = producer_rank_position(standby_name);
    BOOST_REQUIRE( standby_rank >= T_STANDBY_START_RANK && standby_rank <= T_STANDBY_END_RANK );
 
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
@@ -3248,8 +3316,17 @@ BOOST_FIXTURE_TEST_CASE( producer_promoted_mid_epoch, sysio_emissions_tester ) t
    wait_for_producer_schedule();
    produce_complete_cycles(21, 1); // 1 cycle sufficient
 
-   // Promote the standby (rank 22) to active by replacing producera in the schedule
-   // New schedule: producers b..v + standby producer (index 21)
+   // Promote the standby (position 22) into the active band. Rank is POSITION in the score-ordered
+   // index, so governance can no longer hand out ranks -- `setprodkeys` proposes a schedule and
+   // nothing more. The lever that actually moves a position is the set of schedulable producers:
+   // unregistering the producer holding position 1 shifts every later producer up by one, promoting
+   // the standby at 22 into 21.
+   BOOST_REQUIRE_EQUAL( success(), push_system_action(producer_name_at(0), "unregprod"_n,
+      mvo()("producer", producer_name_at(0))) );
+   produce_blocks(1);
+
+   // `setprodkeys` still publishes a schedule -- it simply no longer assigns ranks -- so it stays
+   // the way this fixture puts the promoted producer on the roster that produces blocks.
    std::vector<account_name> new_schedule;
    for (uint32_t i = 1; i <= 21; ++i) {
       new_schedule.push_back(producer_name_at(i));
@@ -3268,7 +3345,7 @@ BOOST_FIXTURE_TEST_CASE( producer_promoted_mid_epoch, sysio_emissions_tester ) t
    name promoted = producer_name_at(21); // "producerv"
    auto promoted_info = get_producer_info(promoted);
    BOOST_REQUIRE( !promoted_info.is_null() );
-   uint32_t promoted_rank = promoted_info["rank"].as<uint32_t>();
+   uint32_t promoted_rank = producer_rank_position(promoted);
    BOOST_REQUIRE( promoted_rank >= 1 && promoted_rank <= T_ACTIVE_PRODUCER_COUNT );
 
    asset promoted_before = get_wire_balance_paid(promoted);
@@ -3279,9 +3356,9 @@ BOOST_FIXTURE_TEST_CASE( producer_promoted_mid_epoch, sysio_emissions_tester ) t
    BOOST_REQUIRE( promoted_got > 0 );
 } FC_LOG_AND_RETHROW()
 
-BOOST_FIXTURE_TEST_CASE( producer_demoted_mid_epoch, sysio_emissions_tester ) try {
-   // Producer starts as active, accumulates eligible_rounds, then gets demoted to standby
-   // At epoch end, treated as standby → full standby weight (no performance check)
+BOOST_FIXTURE_TEST_CASE( producer_unregistered_mid_epoch, sysio_emissions_tester ) try {
+   // Producer starts as active and accumulates eligible_rounds, then unregisters mid-epoch.
+   // It holds no rank position at epoch end, so it draws neither active nor standby pay.
    create_t5_holding_accounts();
 
    // Start with 22 producers: 21 active + 1 standby
@@ -3289,12 +3366,12 @@ BOOST_FIXTURE_TEST_CASE( producer_demoted_mid_epoch, sysio_emissions_tester ) tr
    wait_for_producer_schedule();
    produce_complete_cycles(21, 1); // producera accumulates eligible_rounds
 
-   // Demote producera: new schedule replaces producera with the standby
-   std::vector<account_name> new_schedule;
-   for (uint32_t i = 1; i <= 21; ++i) {
-      new_schedule.push_back(producer_name_at(i));
-   }
-   BOOST_REQUIRE_EQUAL( success(), set_producer_schedule(new_schedule) );
+   // Take producera out of the schedulable set. Rank is POSITION in the score-ordered index, so
+   // governance cannot demote a producer by republishing a schedule -- `setprodkeys` proposes and
+   // nothing more. `unregprod` is the real lever: it clears `is_active`, which drops the producer
+   // out of every rank position.
+   BOOST_REQUIRE_EQUAL( success(), push_system_action("producera"_n, "unregprod"_n,
+      mvo()("producer", "producera"_n)) );
    produce_blocks(1);
    wait_for_producer_schedule();
    produce_complete_cycles(21, 1);
@@ -3302,20 +3379,18 @@ BOOST_FIXTURE_TEST_CASE( producer_demoted_mid_epoch, sysio_emissions_tester ) tr
    const uint32_t start = head_secs() - ONE_EPOCH - 1;
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
 
-   // producera should now be demoted (rank 22+)
-   auto pa_info = get_producer_info("producera"_n);
-   BOOST_REQUIRE( !pa_info.is_null() );
-   uint32_t pa_rank = pa_info["rank"].as<uint32_t>();
-   BOOST_REQUIRE( pa_rank >= T_STANDBY_START_RANK );
+   // An unregistered producer holds NO rank position -- it is not merely pushed into the standby
+   // band. Displacement into standby by a higher-scoring producer is a different scenario, covered
+   // by the collateral-ordering tests.
+   uint32_t pa_rank = producer_rank_position("producera"_n);
+   BOOST_REQUIRE_EQUAL( 0u, pa_rank );
 
    asset demoted_before = get_wire_balance_paid("producera"_n);
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
-   if (pa_rank <= T_STANDBY_END_RANK) {
-      // Treated as standby → gets standby weight share (no performance check)
-      int64_t demoted_got = get_wire_balance_paid("producera"_n).get_amount() - demoted_before.get_amount();
-      BOOST_REQUIRE( demoted_got > 0 );
-   }
+   // No position means no pay -- neither the active share nor the standby weight. The
+   // eligible_rounds it accumulated before unregistering do not survive losing its slot.
+   BOOST_REQUIRE_EQUAL( get_wire_balance_paid("producera"_n), demoted_before );
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( producer_replaced_mid_epoch, sysio_emissions_tester ) try {
@@ -3351,7 +3426,7 @@ BOOST_FIXTURE_TEST_CASE( producer_replaced_mid_epoch, sysio_emissions_tester ) t
 
    // Verify: old producer (now standby) gets standby pay if in range
    auto pa_info = get_producer_info("producera"_n);
-   uint32_t pa_rank = pa_info["rank"].as<uint32_t>();
+   uint32_t pa_rank = producer_rank_position("producera"_n);
    if (pa_rank <= T_STANDBY_END_RANK) {
       int64_t old_got = get_wire_balance_paid("producera"_n).get_amount() - old_before.get_amount();
       BOOST_REQUIRE( old_got > 0 );
@@ -3530,7 +3605,7 @@ BOOST_FIXTURE_TEST_CASE( all_actives_excluded_standbys_still_paid, sysio_emissio
 
    // Standby should get paid (no block production check for standbys)
    auto standby_info = get_producer_info(standby);
-   uint32_t standby_rank = standby_info["rank"].as<uint32_t>();
+   uint32_t standby_rank = producer_rank_position(standby);
    if (standby_rank >= T_STANDBY_START_RANK && standby_rank <= T_STANDBY_END_RANK) {
       int64_t standby_got = get_wire_balance_paid(standby).get_amount() - standby_before.get_amount();
       BOOST_REQUIRE( standby_got > 0 );
@@ -4126,10 +4201,10 @@ BOOST_FIXTURE_TEST_CASE( rank_29_and_above_get_nothing, sysio_emissions_tester )
    auto b2_info = get_producer_info(beyond2);
 
    // Only check if their rank is actually > 28
-   if (!b1_info.is_null() && b1_info["rank"].as<uint32_t>() > T_STANDBY_END_RANK) {
+   if (!b1_info.is_null() && producer_rank_position(beyond1) > T_STANDBY_END_RANK) {
       BOOST_REQUIRE_EQUAL( get_wire_balance_paid(beyond1), beyond1_before );
    }
-   if (!b2_info.is_null() && b2_info["rank"].as<uint32_t>() > T_STANDBY_END_RANK) {
+   if (!b2_info.is_null() && producer_rank_position(beyond2) > T_STANDBY_END_RANK) {
       BOOST_REQUIRE_EQUAL( get_wire_balance_paid(beyond2), beyond2_before );
    }
 } FC_LOG_AND_RETHROW()
@@ -4152,7 +4227,7 @@ BOOST_FIXTURE_TEST_CASE( rank_28_standby_gets_minimum_weight, sysio_emissions_te
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
    auto info = get_producer_info(last_standby);
-   if (!info.is_null() && info["rank"].as<uint32_t>() == T_STANDBY_END_RANK) {
+   if (!info.is_null() && producer_rank_position(last_standby) == T_STANDBY_END_RANK) {
       int64_t got = get_wire_balance_paid(last_standby).get_amount() - last_before.get_amount();
       BOOST_REQUIRE( got > 0 ); // weight = 1, should still get paid
    }
@@ -5044,34 +5119,18 @@ struct producer_eligibility_tester : public sysio_emissions_tester {
       produce_blocks(1);
    }
 
-   action_result register_finalizer_key(account_name act, const std::string& key, const std::string& pop) {
-      return push_system_action(act, "regfinkey"_n, mvo()
-         ("finalizer_name", act)("finalizer_key", key)("proof_of_possession", pop));
-   }
-
-   /// Assigns key_pairs[i] to names[i] for the first `count` producers. regfinkey
-   /// auto-activates a producer's first key, satisfying the schedule's finalizer gate.
-   void register_finalizer_keys(const std::vector<account_name>& names, uint32_t count) {
-      for (uint32_t i = 0; i < count && i < names.size(); ++i) {
-         BOOST_REQUIRE_EQUAL(success(),
-            register_finalizer_key(names[i], sysio_test::key_pairs[i].pub_key, sysio_test::key_pairs[i].pop));
-      }
-   }
-
-   action_result setrank(account_name producer, uint32_t rank) {
-      return push_system_action(config::system_account_name, "setrank"_n, mvo()
-         ("producer", producer)("rank", rank));
-   }
-
    action_result terminate_operator(account_name account, const std::string& reason = "test terminate") {
       return push_opreg_action(OPREG, "terminate"_n, mvo()("account", account)("reason", reason));
    }
 
    /// Registers `count` producers, each an ACTIVE bootstrapped PRODUCER operator
-   /// with an active finalizer key, ranked 1..count via setrank. setrank is used
-   /// rather than setprodkeys because setprodkeys publishes the whole set through
-   /// set_proposed_producers, which the native layer caps at max_producers; this
-   /// helper must be able to seed standby ranks (> max_producers) for backfill.
+   /// with an active finalizer key.
+   ///
+   /// Rank is POSITION in the score-ordered "prodrank" index, not a stored ordinal, so nothing
+   /// assigns it here. Every producer registered by this fixture is bootstrapped and holds no
+   /// collateral, so they all land in the bootstrapped tier with an identical composite score --
+   /// and equal keys fall back to primary-key order, which is account-name order. `producer_name_at`
+   /// yields ascending names, so positions 1..count follow the index order the caller expects.
    /// The producer/finalizer rows are populated but no schedule is published
    /// until the caller triggers update_ranked_producers via trigger_reschedule().
    std::vector<account_name> setup_ranked_producers(uint32_t count) {
@@ -5083,9 +5142,6 @@ struct producer_eligibility_tester : public sysio_emissions_tester {
       }
       for (auto& p : names) {
          BOOST_REQUIRE_EQUAL(success(), register_operator(p, OperatorType::OPERATOR_TYPE_PRODUCER, true));
-      }
-      for (uint32_t i = 0; i < count; ++i) {
-         BOOST_REQUIRE_EQUAL(success(), setrank(names[i], i + 1));
       }
       register_finalizer_keys(names, count);
       produce_blocks(1);
@@ -5169,7 +5225,6 @@ BOOST_FIXTURE_TEST_CASE( noncollateralized_producer_not_scheduled_then_restored,
    for (uint32_t i = 0; i < 4; ++i) {
       BOOST_REQUIRE_EQUAL( success(), register_operator(names[i], OperatorType::OPERATOR_TYPE_PRODUCER, true) );
    }
-   for (uint32_t i = 0; i < 5; ++i) BOOST_REQUIRE_EQUAL( success(), setrank(names[i], i + 1) );
    register_finalizer_keys(names, 5);
    produce_blocks(1);
    trigger_reschedule();
@@ -5197,7 +5252,6 @@ BOOST_FIXTURE_TEST_CASE( active_batch_operator_not_scheduled_as_producer, produc
    }
    // names[4] is ACTIVE, but as a BATCH operator -- wrong type for producing.
    BOOST_REQUIRE_EQUAL( success(), register_operator(names[4], OperatorType::OPERATOR_TYPE_BATCH, true) );
-   for (uint32_t i = 0; i < 5; ++i) BOOST_REQUIRE_EQUAL( success(), setrank(names[i], i + 1) );
    register_finalizer_keys(names, 5);
    produce_blocks(1);
    trigger_reschedule();
@@ -5247,3 +5301,571 @@ BOOST_FIXTURE_TEST_CASE( schedule_not_shrunk_below_floor, producer_eligibility_t
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_SUITE_END() // sysio_producer_eligibility_tests
+
+// ===========================================================================
+// Producer SCORE, tiers and demotion (sysio_producer_score_tests)
+//
+// The suite above asserts WHO is schedulable. This one asserts the ORDER they
+// are schedulable in, and the demotion model that can take a producer out of
+// the schedule with no governance action at all.
+//
+// Nothing here reads a `rank` field, because none exists: rank is POSITION in
+// the "prodrank" index among schedulable producers. What IS stored is
+// `rank_score`, the packed key that index sorts on --
+// `tier << 62 | (composite_max - composite)`. Two consequences drive every
+// assertion below: a HIGHER composite is a NUMERICALLY LOWER key, and a higher
+// tier outweighs any composite whatsoever, which is what makes the uncapped
+// collateral term safe.
+//
+// A collateral-backed producer needs an opreg `opconfig` row to exist at all --
+// with none, `req_prod_collat` reads empty and `meets_role_min` refuses every
+// non-bootstrapped operator by design (SEC-22). That is why the eligibility
+// fixture above registers everything bootstrapped, and why this fixture's
+// collateral helpers install a config first.
+// ===========================================================================
+
+struct producer_score_tester : public producer_eligibility_tester {
+
+   /// Packed-key tier values, mirroring `producer_tier` in producer_rank.hpp.
+   static constexpr uint64_t tier_healthy      = 0;
+   static constexpr uint64_t tier_bootstrapped = 1;
+   static constexpr uint64_t tier_demoted      = 2;
+
+   /// Bits the packed key gives the composite; the tier occupies the two above them.
+   static constexpr unsigned composite_bits = 62;
+
+   /// Slots one producer holds before the round-robin rotates (config::producer_repetitions).
+   static constexpr uint32_t slots_per_producer = 12;
+
+   /// Chain/token pair the collateral helpers use. Any pair works -- opreg stores slug names
+   /// opaquely -- so these name a plausible outpost rather than carrying meaning.
+   static constexpr std::string_view collateral_chain = "ETH";
+   static constexpr std::string_view collateral_token = "ETH";
+
+   /// A second pair, for the "minimum across pairs" case.
+   static constexpr std::string_view second_chain = "SOL";
+   static constexpr std::string_view second_token = "SOL";
+
+   /// The minimum bond every collateral test measures its ratios against.
+   static constexpr uint64_t base_min_bond = 1'000'000;
+
+   /// The tier packed into a `rank_score`, mirroring `producer_rank::tier_of`.
+   static uint64_t tier_of(uint64_t rank_score) { return rank_score >> composite_bits; }
+
+   /// A `slug_name` in the shape the ABI serializes it: a single `value` field.
+   static fc::mutable_variant_object slug_mvo(std::string_view code) {
+      return mvo()("value", fc::slug_name{code}.value);
+   }
+
+   /// One `(chain, token, min_bond)` entry for opreg's `req_*_collat` vectors. The
+   /// `config_timestamp_ms` supplied here is ignored -- `setconfig` overwrites it with on-chain
+   /// time so consumers never trust the caller's clock.
+   static fc::variant min_bond_mvo(std::string_view chain, std::string_view token, uint64_t min_bond) {
+      return fc::variant(mvo()
+         ("chain_code",          slug_mvo(chain))
+         ("token_code",          slug_mvo(token))
+         ("min_bond",            min_bond)
+         ("config_timestamp_ms", uint64_t{0}));
+   }
+
+   /// Install an opreg configuration carrying `req_prod_collat`.
+   ///
+   /// @param req_prod_collat producer collateral requirement, built from `min_bond_mvo`.
+   /// @return the action result.
+   action_result set_producer_collateral(const fc::variants& req_prod_collat) {
+      return push_opreg_action(OPREG, "setconfig"_n, mvo()
+         ("max_available_producers",          uint32_t{21})
+         ("max_available_batch_ops",          uint32_t{63})
+         ("max_available_underwriters",       uint32_t{21})
+         ("terminate_prune_delay_ms",         uint64_t{600'000})
+         ("terminate_max_consecutive_misses", uint32_t{5})
+         ("terminate_max_pct_misses_24h",     uint32_t{5})
+         ("terminate_window_ms",              uint64_t{24ULL * 60 * 60 * 1000})
+         ("req_prod_collat",                  req_prod_collat)
+         ("req_batchop_collat",               fc::variants{})
+         ("req_uw_collat",                    fc::variants{}));
+   }
+
+   /// The single-pair requirement most tests use.
+   action_result set_single_pair_collateral(uint64_t min_bond = base_min_bond) {
+      return set_producer_collateral(fc::variants{
+         min_bond_mvo(collateral_chain, collateral_token, min_bond)});
+   }
+
+   /// Credit an outpost-side collateral row the way `sysio.msgch` does when it dispatches an
+   /// inbound DEPOSIT_REQUEST. Signing as sysio.opreg satisfies `depositinle`'s
+   /// `require_auth(get_self())`.
+   ///
+   /// This is the seam the score hangs off: a credit runs `reevaluate_eligibility`, which
+   /// dispatches `processprod` for producers on EVERY balance change, whose notification
+   /// sysio.system turns into a rescore.
+   action_result credit_collateral(account_name account, uint64_t amount,
+                                   std::string_view chain = collateral_chain,
+                                   std::string_view token = collateral_token) {
+      return push_opreg_action(OPREG, "depositinle"_n, mvo()
+         ("account",             account)
+         ("chain_code",          slug_mvo(chain))
+         ("token_code",          slug_mvo(token))
+         ("amount",              amount)
+         ("actor_chain",         ChainKind::CHAIN_KIND_EVM)
+         ("actor_address",       std::vector<char>(20, '\x06'))
+         ("original_message_id", fc::sha256()));
+   }
+
+   /// Push `setscorecfg`. Defaults mirror the contract's own so a test names only the weight it
+   /// is exercising.
+   action_result set_score_config(uint32_t collateral_weight    = 10'000,
+                                  uint32_t participation_weight = 10'000,
+                                  uint32_t snapshot_weight      = 10'000,
+                                  uint32_t max_consecutive_missed_rounds = 3,
+                                  uint32_t snapshot_target_attestations  = 1) {
+      return push_system_action(config::system_account_name, "setscorecfg"_n, mvo()
+         ("weights", mvo()
+            ("collateral_weight",             collateral_weight)
+            ("participation_weight",          participation_weight)
+            ("snapshot_weight",               snapshot_weight)
+            ("relay_weight",                  uint32_t{0})
+            ("api_weight",                    uint32_t{0})
+            ("benchmark_weight",              uint32_t{0})
+            ("max_consecutive_missed_rounds", max_consecutive_missed_rounds)
+            ("snapshot_target_attestations",  snapshot_target_attestations)));
+   }
+
+   /// The packed sort key stored on a producer.
+   uint64_t rank_score_of(account_name producer) {
+      auto info = get_producer_info(producer);
+      BOOST_REQUIRE_MESSAGE(!info.is_null(), "no producers row for " << producer.to_string());
+      return info["rank_score"].as<uint64_t>();
+   }
+
+   uint32_t missed_rounds_of(account_name producer) {
+      auto info = get_producer_info(producer);
+      BOOST_REQUIRE_MESSAGE(!info.is_null(), "no producers row for " << producer.to_string());
+      return info["consecutive_missed_rounds"].as<uint32_t>();
+   }
+
+   bool demoted(account_name producer) {
+      auto info = get_producer_info(producer);
+      BOOST_REQUIRE_MESSAGE(!info.is_null(), "no producers row for " << producer.to_string());
+      return info["is_demoted"].as<bool>();
+   }
+
+   /// The sysio.system global singleton, which carries the rescore cursor.
+   fc::variant get_global_state() {
+      auto data = get_row_by_account(config::system_account_name, config::system_account_name,
+                                     "global"_n, "global"_n);
+      if (data.empty()) return fc::variant();
+      return sysio_abi_ser.binary_to_variant("sysio_global_state", data,
+         abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
+   uint32_t rescore_generation() {
+      auto g = get_global_state();
+      BOOST_REQUIRE(!g.is_null());
+      return g["rescore_generation"].as<uint32_t>();
+   }
+
+   /// Register `count` producers as NON-bootstrapped operators, each bonded at `deposit` on the
+   /// single required pair, with an active finalizer key.
+   ///
+   /// Order is load-bearing: `regproducer` must precede the deposit, because a rescore is a no-op
+   /// while no producers row exists, and the deposit's `processprod` notification is what writes
+   /// the first real score.
+   ///
+   /// @param count   how many producers to create, from the fixture's roster.
+   /// @param deposit the bond credited to each, in the same units as the configured minimum.
+   /// @return the producer names, in roster (and therefore name) order.
+   std::vector<account_name> setup_collateralized_producers(uint32_t count,
+                                                            uint64_t deposit = base_min_bond) {
+      BOOST_REQUIRE_EQUAL(success(), set_single_pair_collateral());
+      produce_blocks(1);
+
+      auto names = producer_names(count);
+      create_producer_accounts(names);
+      for (auto& p : names) {
+         BOOST_REQUIRE_EQUAL(success(), push_system_action(p, "regproducer"_n, mvo()
+            ("producer", p)("producer_key", get_public_key(p, "active"))("url", "")("location", 0)));
+      }
+      for (auto& p : names) {
+         BOOST_REQUIRE_EQUAL(success(), register_operator(p, OperatorType::OPERATOR_TYPE_PRODUCER, false));
+      }
+      for (auto& p : names) {
+         BOOST_REQUIRE_EQUAL(success(), credit_collateral(p, deposit));
+      }
+      produce_blocks(1);
+      for (auto& p : names) {
+         auto op = get_opreg_operator(p);
+         BOOST_REQUIRE_MESSAGE(!op.is_null(), "no opreg row for " << p.to_string());
+         BOOST_REQUIRE_EQUAL("OPERATOR_STATUS_ACTIVE", op["status"].as_string());
+      }
+      register_finalizer_keys(names, count);
+      produce_blocks(1);
+      return names;
+   }
+
+   /// The active producer schedule, in schedule order.
+   std::vector<account_name> active_schedule_names() {
+      std::vector<account_name> names;
+      for (const auto& p : control->active_producers().producers) {
+         names.push_back(p.producer_name);
+      }
+      return names;
+   }
+
+   /// Produce until `expected` is in the ACTIVE schedule -- not merely proposed.
+   ///
+   /// Miss attribution reads the live schedule, so these tests need the proposal to have gone
+   /// final and activated, which the eligibility suite's `is_scheduled` deliberately does not
+   /// wait for.
+   void wait_for_active_schedule(account_name expected, uint32_t max_blocks = 400) {
+      for (uint32_t produced = 0; produced < max_blocks; ++produced) {
+         const auto schedule = active_schedule_names();
+         if (std::find(schedule.begin(), schedule.end(), expected) != schedule.end()) return;
+         produce_blocks(1);
+      }
+      BOOST_FAIL("producer " << expected.to_string() << " never entered the active schedule");
+   }
+
+   /// Skip `target`'s entire slot window so it produces nothing and is charged a missed round.
+   ///
+   /// A tester produces every scheduled block, so a miss has to be manufactured: advance one
+   /// window at a time until the producer immediately BEFORE the target holds the head block,
+   /// then jump the rest of that window plus the target's whole window in one step. The next
+   /// block therefore belongs to the producer AFTER the target, and the contract's walk from the
+   /// previous producer to this one finds exactly the target in between.
+   ///
+   /// @param target the producer whose round should go unproduced.
+   void skip_round_of(account_name target) {
+      const auto schedule = active_schedule_names();
+      BOOST_REQUIRE_MESSAGE(schedule.size() >= 3,
+         "skipping a round needs at least three scheduled producers");
+
+      const auto target_it = std::find(schedule.begin(), schedule.end(), target);
+      BOOST_REQUIRE_MESSAGE(target_it != schedule.end(),
+         target.to_string() << " is not in the active schedule");
+      const size_t target_index = static_cast<size_t>(std::distance(schedule.begin(), target_it));
+      const size_t before_index = (target_index + schedule.size() - 1) % schedule.size();
+
+      // Producer for a slot, exactly as the chain assigns it.
+      const auto index_at = [&](uint32_t slot) {
+         return (slot % (schedule.size() * slots_per_producer)) / slots_per_producer;
+      };
+
+      // Advance to the window immediately before the target's. Bounded by one full rotation plus
+      // a window, so a schedule change mid-walk fails loudly rather than spinning.
+      const uint32_t walk_limit = static_cast<uint32_t>(schedule.size() + 1) * slots_per_producer;
+      uint32_t walked = 0;
+      while (index_at(control->head().header().timestamp.slot) != before_index) {
+         produce_blocks(1);
+         BOOST_REQUIRE_MESSAGE(++walked < walk_limit,
+            "never reached the window before " << target.to_string());
+      }
+
+      const uint32_t slot        = control->head().header().timestamp.slot;
+      const uint32_t into_window = slot % slots_per_producer;
+      const uint32_t jump        = (slots_per_producer - into_window) + slots_per_producer;
+      produce_block(fc::milliseconds(int64_t(config::block_interval_ms) * jump));
+
+      BOOST_REQUIRE_MESSAGE(control->head().header().producer != target,
+         "the jump landed on " << target.to_string() << " instead of skipping it");
+   }
+};
+
+BOOST_AUTO_TEST_SUITE(sysio_producer_score_tests)
+
+// ---------------------------------------------------------------------------
+// Composite score
+// ---------------------------------------------------------------------------
+
+// Collateral is linear and uncapped, so a top-up strictly improves the score and moves the
+// producer up the index -- the "producers compete for rank by posting more" property. It also
+// covers the top-up seam: a deposit while already ACTIVE changes no status, and only reaches
+// sysio.system because producers dispatch `processprod` on every balance change.
+BOOST_FIXTURE_TEST_CASE( collateral_topup_raises_score_and_position, producer_score_tester ) try {
+   auto names = setup_collateralized_producers(5);
+
+   // Equal bonds, so the composite is equal and the index falls through to account-name order.
+   const uint64_t before = rank_score_of(names[4]);
+   BOOST_REQUIRE_EQUAL( before, rank_score_of(names[0]) );
+   BOOST_REQUIRE_EQUAL( 5u, producer_rank_position(names[4]) );
+
+   BOOST_REQUIRE_EQUAL( success(), credit_collateral(names[4], base_min_bond * 4) );
+   produce_blocks(1);
+
+   // A higher composite is a numerically LOWER key, and the last-by-name producer is now first.
+   BOOST_REQUIRE_LT( rank_score_of(names[4]), before );
+   BOOST_REQUIRE_EQUAL( 1u, producer_rank_position(names[4]) );
+   BOOST_REQUIRE_EQUAL( 2u, producer_rank_position(names[0]) );
+} FC_LOG_AND_RETHROW()
+
+// The collateral factor is the MINIMUM across the required pairs, with no sum term: posting extra
+// on the cheapest chain must do nothing at all, so raising the score requires lifting EVERY pair.
+BOOST_FIXTURE_TEST_CASE( collateral_is_minimum_across_required_pairs, producer_score_tester ) try {
+   BOOST_REQUIRE_EQUAL( success(), set_producer_collateral(fc::variants{
+      min_bond_mvo(collateral_chain, collateral_token, base_min_bond),
+      min_bond_mvo(second_chain,     second_token,     base_min_bond)}) );
+   produce_blocks(1);
+
+   auto names = producer_names(2);
+   create_producer_accounts(names);
+   for (auto& p : names) {
+      BOOST_REQUIRE_EQUAL( success(), push_system_action(p, "regproducer"_n, mvo()
+         ("producer", p)("producer_key", get_public_key(p, "active"))("url", "")("location", 0)) );
+      BOOST_REQUIRE_EQUAL( success(), register_operator(p, OperatorType::OPERATOR_TYPE_PRODUCER, false) );
+      BOOST_REQUIRE_EQUAL( success(), credit_collateral(p, base_min_bond) );
+      BOOST_REQUIRE_EQUAL( success(), credit_collateral(p, base_min_bond, second_chain, second_token) );
+   }
+   register_finalizer_keys(names, 2);
+   produce_blocks(1);
+   BOOST_REQUIRE_EQUAL( rank_score_of(names[0]), rank_score_of(names[1]) );
+
+   // Ten times the bond on ONE pair leaves the minimum -- and so the score -- untouched.
+   BOOST_REQUIRE_EQUAL( success(), credit_collateral(names[1], base_min_bond * 9) );
+   produce_blocks(1);
+   BOOST_REQUIRE_EQUAL( rank_score_of(names[0]), rank_score_of(names[1]) );
+
+   // Lifting the OTHER pair moves the minimum, and only then does the score improve.
+   BOOST_REQUIRE_EQUAL( success(), credit_collateral(names[1], base_min_bond, second_chain, second_token) );
+   produce_blocks(1);
+   BOOST_REQUIRE_LT( rank_score_of(names[1]), rank_score_of(names[0]) );
+} FC_LOG_AND_RETHROW()
+
+// A weight of zero removes its factor's influence entirely -- the property that lets a new factor
+// ship at weight 0 without disturbing any existing ordering.
+BOOST_FIXTURE_TEST_CASE( zero_weight_removes_factor_influence, producer_score_tester ) try {
+   auto names = setup_collateralized_producers(3);
+   BOOST_REQUIRE_EQUAL( success(), credit_collateral(names[2], base_min_bond * 20) );
+   produce_blocks(1);
+   BOOST_REQUIRE_LT( rank_score_of(names[2]), rank_score_of(names[0]) );
+
+   BOOST_REQUIRE_EQUAL( success(), set_score_config(/*collateral_weight=*/0) );
+   trigger_reschedule();
+
+   // Twenty times the bond now buys nothing: every producer carries the same composite.
+   BOOST_REQUIRE_EQUAL( rank_score_of(names[0]), rank_score_of(names[2]) );
+   BOOST_REQUIRE_EQUAL( rank_score_of(names[1]), rank_score_of(names[2]) );
+} FC_LOG_AND_RETHROW()
+
+// ---------------------------------------------------------------------------
+// Rescore sweep
+// ---------------------------------------------------------------------------
+
+// A weight change invalidates every stored score at once, and `producers` is unbounded because
+// `regproducer` is permissionless -- so the rewrite is a cursor `onblock` drains a bounded slice
+// of per schedule-rebuild tick. With more producers than one slice holds, the sweep must survive
+// across ticks: still in progress after the first, finished after the second.
+BOOST_FIXTURE_TEST_CASE( rescore_sweep_drains_across_ticks, producer_score_tester ) try {
+   constexpr uint32_t max_rescore_per_tick = 32;
+   constexpr uint32_t producer_count       = max_rescore_per_tick + 2;
+
+   auto names = setup_ranked_producers(producer_count);
+   trigger_reschedule();
+   BOOST_REQUIRE_EQUAL( 0u, rescore_generation() );
+
+   BOOST_REQUIRE_EQUAL( success(), set_score_config(/*collateral_weight=*/5'000) );
+   BOOST_REQUIRE( rescore_generation() != 0u );
+
+   trigger_reschedule();
+   BOOST_REQUIRE_MESSAGE( rescore_generation() != 0u,
+      "a sweep of " << producer_count << " rows must not finish in one "
+      << max_rescore_per_tick << "-row tick" );
+
+   trigger_reschedule();
+   BOOST_REQUIRE_EQUAL( 0u, rescore_generation() );
+} FC_LOG_AND_RETHROW()
+
+// The collateral minimums live on sysio.opreg, a contract sysio.system cannot be notified by
+// without a ten-parameter handler that would still miss any future writer. Instead the throttled
+// `onblock` tick compares the config's stamp against the one the stored scores were computed
+// under, and opens a sweep when they differ.
+BOOST_FIXTURE_TEST_CASE( collateral_minimum_change_opens_rescore_sweep, producer_score_tester ) try {
+   auto names = setup_collateralized_producers(3);
+   trigger_reschedule();
+   BOOST_REQUIRE_EQUAL( 0u, rescore_generation() );
+   const uint64_t before = rank_score_of(names[0]);
+
+   // Halving the minimum doubles every ratio, so every stored score is now wrong.
+   BOOST_REQUIRE_EQUAL( success(), set_single_pair_collateral(base_min_bond / 2) );
+   trigger_reschedule();
+
+   BOOST_REQUIRE_EQUAL( 0u, rescore_generation() );   // three rows drain in one tick
+   BOOST_REQUIRE_LT( rank_score_of(names[0]), before );
+} FC_LOG_AND_RETHROW()
+
+// ---------------------------------------------------------------------------
+// Tiers
+// ---------------------------------------------------------------------------
+
+// A bootstrap is the foundation-run backstop, so every healthy producer outranks it -- and does so
+// on the TIER, not on the composite: the bootstrap holds no collateral and could not close the gap
+// by posting any, because the tier sits above the composite in the packed key.
+BOOST_FIXTURE_TEST_CASE( healthy_tier_outranks_the_bootstrap_backstop, producer_score_tester ) try {
+   auto collateralized = setup_collateralized_producers(2);
+
+   // A bootstrapped producer: ACTIVE by fiat, holding no collateral at all.
+   const auto bootstrap = producer_name_at(5);
+   create_producer_accounts({bootstrap});
+   BOOST_REQUIRE_EQUAL( success(), push_system_action(bootstrap, "regproducer"_n, mvo()
+      ("producer", bootstrap)("producer_key", get_public_key(bootstrap, "active"))("url", "")("location", 0)) );
+   BOOST_REQUIRE_EQUAL( success(), register_operator(bootstrap, OperatorType::OPERATOR_TYPE_PRODUCER, true) );
+   produce_blocks(1);
+
+   BOOST_REQUIRE_EQUAL( tier_healthy,      tier_of(rank_score_of(collateralized[0])) );
+   BOOST_REQUIRE_EQUAL( tier_bootstrapped, tier_of(rank_score_of(bootstrap)) );
+
+   // Every healthy producer outranks the bootstrap backstop, whatever the composites are.
+   BOOST_REQUIRE_LT( rank_score_of(collateralized[0]), rank_score_of(bootstrap) );
+   BOOST_REQUIRE_LT( rank_score_of(collateralized[1]), rank_score_of(bootstrap) );
+} FC_LOG_AND_RETHROW()
+
+// ---------------------------------------------------------------------------
+// Missed rounds and demotion
+// ---------------------------------------------------------------------------
+
+// Attribution is exact: skipping one producer's window charges that producer and nobody else, and
+// producing clears the streak.
+BOOST_FIXTURE_TEST_CASE( missed_round_is_charged_only_to_the_skipped_producer, producer_score_tester ) try {
+   auto names = setup_ranked_producers(5);
+   trigger_reschedule();
+   wait_for_active_schedule(names[2]);
+
+   for (const auto& p : names) BOOST_REQUIRE_EQUAL( 0u, missed_rounds_of(p) );
+
+   skip_round_of(names[2]);
+
+   BOOST_REQUIRE_EQUAL( 1u, missed_rounds_of(names[2]) );
+   for (const auto& p : names) {
+      if (p == names[2]) continue;
+      BOOST_REQUIRE_MESSAGE( missed_rounds_of(p) == 0u,
+         p.to_string() << " was charged a miss it did not earn" );
+   }
+
+   // One full rotation returns the skipped producer to its slot; producing resets the streak.
+   produce_blocks(names.size() * slots_per_producer + slots_per_producer);
+   BOOST_REQUIRE_EQUAL( 0u, missed_rounds_of(names[2]) );
+} FC_LOG_AND_RETHROW()
+
+// Demotion fires at EXACTLY the configured threshold -- not before -- and no amount of money
+// survives it. The target below carries twenty times every other producer's bond, which buys it
+// rank 1 while it is healthy and buys it nothing at all once it is demoted: the tier sits above
+// the composite in the packed key, which is precisely what makes the uncapped collateral term safe.
+BOOST_FIXTURE_TEST_CASE( demotion_fires_at_threshold_and_outweighs_collateral, producer_score_tester ) try {
+   auto names = setup_collateralized_producers(5);
+   const auto target = names[2];
+   BOOST_REQUIRE_EQUAL( success(), credit_collateral(target, base_min_bond * 19) );
+   produce_blocks(1);
+   BOOST_REQUIRE_EQUAL( 1u, producer_rank_position(target) );
+
+   trigger_reschedule();
+   wait_for_active_schedule(target);
+
+   for (uint32_t miss = 1; miss <= 3; ++miss) {
+      skip_round_of(target);
+      BOOST_REQUIRE_EQUAL( miss, missed_rounds_of(target) );
+      BOOST_REQUIRE_MESSAGE( demoted(target) == (miss == 3),
+         "demotion at miss " << miss << " should be " << (miss == 3) );
+   }
+
+   BOOST_REQUIRE_EQUAL( tier_demoted, tier_of(rank_score_of(target)) );
+   for (const auto& p : names) {
+      if (p == target) continue;
+      BOOST_REQUIRE_LT( rank_score_of(p), rank_score_of(target) );
+   }
+   BOOST_REQUIRE_EQUAL( names.size(), producer_rank_position(target) );   // last, despite the bond
+} FC_LOG_AND_RETHROW()
+
+// `regproducer` is the single door back, from an involuntary demotion as much as from a voluntary
+// park. There is no cooldown and no expiry -- a demoted producer is scheduled for no rounds, so it
+// could never clear the counter by producing.
+BOOST_FIXTURE_TEST_CASE( regproducer_clears_demotion_immediately, producer_score_tester ) try {
+   auto names = setup_ranked_producers(5);
+   trigger_reschedule();
+   wait_for_active_schedule(names[2]);
+
+   const auto target = names[2];
+   for (uint32_t miss = 0; miss < 3; ++miss) skip_round_of(target);
+   BOOST_REQUIRE( demoted(target) );
+
+   BOOST_REQUIRE_EQUAL( success(), push_system_action(target, "regproducer"_n, mvo()
+      ("producer", target)("producer_key", get_public_key(target, "active"))("url", "")("location", 0)) );
+   produce_blocks(1);
+
+   BOOST_REQUIRE( !demoted(target) );
+   BOOST_REQUIRE_EQUAL( 0u, missed_rounds_of(target) );
+   BOOST_REQUIRE_EQUAL( tier_bootstrapped, tier_of(rank_score_of(target)) );
+} FC_LOG_AND_RETHROW()
+
+// A voluntary park costs the producer its schedule slot and its rank position, but nothing else:
+// its opreg status and bond are untouched, so it returns at the position its collateral earns.
+BOOST_FIXTURE_TEST_CASE( unregprod_parks_without_touching_the_bond, producer_score_tester ) try {
+   auto names = setup_collateralized_producers(5);
+   trigger_reschedule();
+   BOOST_REQUIRE( is_scheduled(names[0]) );
+   const uint64_t before = rank_score_of(names[0]);
+
+   BOOST_REQUIRE_EQUAL( success(),
+      push_system_action(names[0], "unregprod"_n, mvo()("producer", names[0])) );
+   trigger_reschedule();
+
+   BOOST_REQUIRE( !is_scheduled(names[0]) );
+   BOOST_REQUIRE_EQUAL( 0u, producer_rank_position(names[0]) );   // consumes no position
+   {
+      const auto op = get_opreg_operator(names[0]);
+      BOOST_REQUIRE_EQUAL( "OPERATOR_STATUS_ACTIVE", op["status"].as_string() );
+   }
+
+   BOOST_REQUIRE_EQUAL( success(), push_system_action(names[0], "regproducer"_n, mvo()
+      ("producer", names[0])("producer_key", get_public_key(names[0], "active"))("url", "")("location", 0)) );
+   trigger_reschedule();
+
+   BOOST_REQUIRE( is_scheduled(names[0]) );
+   BOOST_REQUIRE_EQUAL( before, rank_score_of(names[0]) );        // same bond, same position
+   BOOST_REQUIRE_EQUAL( 1u, producer_rank_position(names[0]) );
+} FC_LOG_AND_RETHROW()
+
+// ---------------------------------------------------------------------------
+// Position versus index slot
+// ---------------------------------------------------------------------------
+
+// A permissionless `regproducer` with no bond behind it occupies an index slot but must consume no
+// rank POSITION: it sinks to the demoted tier, so it sorts behind every real producer and every
+// consumer's walk stops before reaching it.
+BOOST_FIXTURE_TEST_CASE( unbonded_registrant_consumes_no_rank_position, producer_score_tester ) try {
+   // Five producers, not three: below min_schedule_size (4) update_ranked_producers retains the
+   // last good schedule instead of publishing, so the scheduling assertions below would be vacuous.
+   auto names = setup_collateralized_producers(5);
+
+   // A registrant that never bonded: a producers row, no operator row at all.
+   const auto squatter = producer_name_at(5);
+   create_producer_accounts({squatter});
+   BOOST_REQUIRE_EQUAL( success(), push_system_action(squatter, "regproducer"_n, mvo()
+      ("producer", squatter)("producer_key", get_public_key(squatter, "active"))("url", "")("location", 0)) );
+   produce_blocks(1);
+
+   BOOST_REQUIRE_EQUAL( tier_demoted, tier_of(rank_score_of(squatter)) );
+   for (uint32_t i = 0; i < names.size(); ++i) {
+      BOOST_REQUIRE_EQUAL( i + 1, producer_rank_position(names[i]) );
+   }
+
+   trigger_reschedule();
+   BOOST_REQUIRE( !is_scheduled(squatter) );
+   BOOST_REQUIRE(  is_scheduled(names[0]) );
+} FC_LOG_AND_RETHROW()
+
+// ---------------------------------------------------------------------------
+// Collateralising a bootstrap
+// ---------------------------------------------------------------------------
+
+// A bootstrapped operator is ACTIVE by fiat and bypasses `meets_role_min` entirely, so collateral
+// credited to one could never affect its eligibility -- the deposit would land in a balance that
+// does nothing. `depositinle` already refused it; the WIRE-direct `deposit` now does too. There is
+// deliberately no way to collateralise a bootstrap: an operator who wants one registers a new
+// account.
+BOOST_FIXTURE_TEST_CASE( deposit_rejects_a_bootstrapped_operator, producer_score_tester ) try {
+   auto names = setup_ranked_producers(1);
+
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg("bootstrapped operators cannot deposit collateral"),
+      push_opreg_action(names[0], "deposit"_n, mvo()("account", names[0])("amount", uint64_t{1'000})) );
+} FC_LOG_AND_RETHROW()
+
+BOOST_AUTO_TEST_SUITE_END() // sysio_producer_score_tests

@@ -2,6 +2,7 @@
 
 #include <sysio/chain/abi_serializer.hpp>
 #include <sysio/testing/tester.hpp>
+#include <sysio/testing/bls_utils.hpp>
 
 #include <fc/variant_object.hpp>
 
@@ -143,6 +144,43 @@ public:
          ("max_ram_size", (n % 10 + 1) * 1024 * 1024)
          ("ram_reserve_ratio", 100 + n);
    }
+
+   /// Deploy sysio.opreg into the test chain, once. Every producer rank position is gated on an
+   /// ACTIVE OPERATOR_TYPE_PRODUCER row there via `is_op_active`, and this tester does not ship it.
+   void deploy_opreg_once() {
+      if (opreg_deployed) return;
+      create_account("sysio.opreg"_n, config::system_account_name, false, false, false, true);
+      // opreg is not privileged yet (setpriv requires setcode first). Give it RAM for the wasm and
+      // NET/CPU to sign regoperator; a sysio.* account is created with none by default.
+      push_action(config::system_account_name, "setacctram"_n, mvo()
+         ("account", "sysio.opreg"_n)("ram_bytes", int64_t(2'000'000)));
+      push_action(config::system_account_name, "setacctnet"_n, mvo()
+         ("account", "sysio.opreg"_n)("net_weight", int64_t(1'000'000)));
+      push_action(config::system_account_name, "setacctcpu"_n, mvo()
+         ("account", "sysio.opreg"_n)("cpu_weight", int64_t(1'000'000)));
+      produce_block();
+      set_code("sysio.opreg"_n, test_contracts::sysio_opreg_wasm());
+      set_abi ("sysio.opreg"_n, test_contracts::sysio_opreg_abi().data());
+      set_privileged("sysio.opreg"_n);
+      produce_block();
+      opreg_deployed = true;
+   }
+
+   /// Register each name as a bootstrapped PRODUCER operator -- ACTIVE-by-fiat, bypassing the
+   /// collateral minimum -- which is what every rank position is gated on.
+   void register_producer_operators(const std::vector<account_name>& names) {
+      for (const auto& p : names) {
+         base_tester::push_action("sysio.opreg"_n, "regoperator"_n, "sysio.opreg"_n, mvo()
+            ("account", p)
+            // The ABI spelling, not the C++ enum: this header is included by several test
+            // targets and pulling the OPP proto headers onto all of their include paths is far
+            // more fragile than naming the wire value at this one serialization boundary.
+            ("type", "OPERATOR_TYPE_PRODUCER")
+            ("is_bootstrapped", true));
+      }
+      produce_block();
+   }
+   bool opreg_deployed = false;
 
    action_result regproducer( const account_name& acnt, int params_fixture = 1 ) {
       action_result r = push_action( acnt, "regproducer"_n, mvo()

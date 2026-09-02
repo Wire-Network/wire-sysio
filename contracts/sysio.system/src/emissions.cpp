@@ -1,6 +1,7 @@
 #include <sysio.system/sysio.system.hpp>
 #include <sysio.system/emissions.hpp>
 #include <sysio.system/opreg_status.hpp>
+#include <sysio.system/producer_score.hpp>
 
 #include <sysio/opp/types/types.pb.hpp>
 #include <sysio.opp.common/opp_table_types.hpp>
@@ -846,31 +847,41 @@ void system_contract::payepoch(uint32_t epoch_index,
       // (eligible) and the counter-reset list (to_reset). The lists differ --
       // to_reset includes slashed / terminated producers with stale counters,
       // eligible does not.
+      // `rank` is POSITION in this index among SCHEDULABLE producers, counted while walking -- not
+      // a stored ordinal. The demoted tier sorts last and is never schedulable, so it bounds the
+      // walk over what is a permissionless, unbounded table.
+      //
+      // is_schedulable also requires an active finalizer key, which this loop did not check before.
+      // That is a fix, not a regression: a producer without one can never be scheduled, so it must
+      // not draw top-21 pay either.
+      uint32_t position = 0;
       for (auto it = prod_by_rank.begin(); it != prod_by_rank.end(); ++it) {
-         if (it->rank > cfg.standby_end_rank) break;
+         if (producer_rank::tier_of(it->rank_score) == producer_tier::demoted) break;
 
-         // Reset list: every rank-ranged producer with stale counters gets
-         // reset, regardless of is_active / opreg status. Slashed producers
-         // still need their counters cleared for the next epoch.
-         if (it->unpaid_blocks > 0 || it->eligible_rounds > 0 || it->current_round_blocks > 0) {
+         // Reset list: every producer walked with stale counters gets reset, regardless of
+         // is_active / opreg status. Slashed producers still need their counters cleared for the
+         // next epoch.
+         if (it->unpaid_blocks > 0 || it->eligible_rounds > 0 || it->current_round_blocks > 0
+             || it->snapshot_attestations > 0) {
             to_reset.push_back(it->owner);
          }
 
-         if (!it->is_active) continue;
-         // opreg filter: skip slashed / terminated / unknown
-         if (!is_op_active(it->owner, OperatorType::OPERATOR_TYPE_PRODUCER)) continue;
+         if (!producer_rank::is_schedulable(*it, _finalizers)) continue;
+
+         ++position;
+         if (position > cfg.standby_end_rank) break;
 
          uint32_t w      = 0;
          bool     standby = false;
          uint32_t rounds  = 0;
 
-         if (it->rank >= 1 && it->rank <= ACTIVE_PRODUCER_COUNT) {
+         if (position <= ACTIVE_PRODUCER_COUNT) {
             rounds = it->eligible_rounds;
             if (it->current_round_blocks >= min_blocks_per_round_for_pay) rounds++;
             if (rounds == 0) continue;
             w = ACTIVE_PRODUCER_WEIGHT;
-         } else if (it->rank >= STANDBY_START_RANK && it->rank <= cfg.standby_end_rank) {
-            w       = cfg.standby_end_rank + 1 - it->rank;
+         } else if (position >= STANDBY_START_RANK && position <= cfg.standby_end_rank) {
+            w       = cfg.standby_end_rank + 1 - position;
             standby = true;
          }
 
@@ -916,6 +927,7 @@ void system_contract::payepoch(uint32_t epoch_index,
             p.eligible_rounds      = 0;
             p.current_round_blocks = 0;
             p.last_block_num       = no_prev_block;
+            p.snapshot_attestations = 0;
          });
       }
       if (reclaimed_unpaid_blocks > 0) {

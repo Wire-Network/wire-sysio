@@ -175,61 +175,13 @@ namespace sysiosystem {
       set_resource_limits( account, ram, current_net, current_cpu );
    }
 
-   void system_contract::assign_producer_ranks( const std::vector<name>& producers ) {
-      auto idx = _producers.get_index<"prodrank"_n>();
-      std::set<name> rm_sched_prods;
-      for( auto i = idx.cbegin(); i != idx.cend(); ++i ) {
-         if( i->rank > max_producers ) break;
-         rm_sched_prods.insert(i->owner);
-      }
-      uint32_t rank = 0;
-      for( const auto& prod_name : producers ) {
-         ++rank;
-         auto key = producer_key_t{prod_name.value};
-         if( _producers.contains(key) ) {
-            _producers.modify(same_payer, key, [&](auto& p) {
-               p.rank = rank;
-            });
-         }
-         rm_sched_prods.erase(prod_name);
-      }
-      for( const auto& prod : rm_sched_prods ) {
-         auto key = producer_key_t{prod.value};
-         if( _producers.contains(key) ) {
-            _producers.modify(same_payer, key, [&](auto& p) {
-               p.rank = p.rank + max_producers;
-            });
-         }
-      }
-   }
-
-   void system_contract::setrank( const name& producer, uint32_t rank ) {
-      require_auth( get_self() );
-      auto key = producer_key_t{producer.value};
-      check( _producers.contains(key), "producer not found" );
-      check( rank > 0, "rank must be positive" );
-      _producers.modify( same_payer, key, [&](auto& p) {
-         p.rank = rank;
-      });
-   }
-
    void system_contract::setprods( const std::vector<sysio::producer_authority>& schedule ) {
       require_auth( get_self() );
-      std::vector<name> names;
-      names.reserve(schedule.size());
-      for( const auto& prod : schedule )
-         names.push_back(prod.producer_name);
-      assign_producer_ranks(names);
       set_proposed_producers( schedule );
    }
 
    void system_contract::setprodkeys( const std::vector<sysio::producer_key>& schedule ) {
       require_auth( get_self() );
-      std::vector<name> names;
-      names.reserve(schedule.size());
-      for( const auto& prod : schedule )
-         names.push_back(prod.producer_name);
-      assign_producer_ranks(names);
       set_proposed_producers( schedule );
    }
 

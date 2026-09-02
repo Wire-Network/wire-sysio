@@ -15,6 +15,7 @@
 #include <optional>
 
 #include "sysio.system_tester.hpp"
+#include "finalizer_test_keys.hpp"
 
 using namespace sysio_system;
 
@@ -47,7 +48,22 @@ public:
 BOOST_AUTO_TEST_SUITE(getpeerkeys_tests)
 
 BOOST_FIXTURE_TEST_CASE( getpeerkeys_test, getpeerkeys_tester ) { try {
-   std::vector<name> prod_names = activate_producers();
+   // getpeerkeys ranks by POSITION among SCHEDULABLE producers, so the roster needs opreg
+   // operator rows and an active finalizer key each -- not just regproducer.
+   std::vector<name> prod_names = activate_producers_with_operators();
+   for (size_t i = 0; i < prod_names.size(); ++i) {
+      push_action(config::system_account_name, "setacctram"_n,
+                  mvo()("account", prod_names[i])("ram_bytes", int64_t(1'000'000)));
+   }
+   produce_block();
+   for (size_t i = 0; i < prod_names.size(); ++i) {
+      BOOST_REQUIRE_EQUAL(success(),
+         push_action(prod_names[i], "regfinkey"_n, mvo()
+            ("finalizer_name", prod_names[i])
+            ("finalizer_key", sysio_test::key_pairs[i].pub_key)
+            ("proof_of_possession", sysio_test::key_pairs[i].pop)));
+   }
+   produce_block();
 
    // Register peer keys for the even-indexed producers; the odd ones stay keyless.
    std::map<name, fc::crypto::public_key> registered;

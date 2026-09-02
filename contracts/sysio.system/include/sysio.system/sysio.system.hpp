@@ -14,6 +14,7 @@
 
 #include <sysio.system/emissions.hpp>
 #include <sysio.system/native.hpp>
+#include <sysio.system/producer_rank.hpp>
 #include <sysio.system/snapshot_attest.hpp>
 
 #include <limits>
@@ -94,12 +95,45 @@ namespace sysiosystem {
       uint32_t             total_unpaid_blocks = 0; /// all blocks which have been produced but not paid
       uint16_t             last_producer_schedule_size = 0;
 
+      /// Producer of the previous block -- the cursor `onblock` walks to attribute a MISSED round:
+      /// the producers sitting between this one and the current block's producer in the active
+      /// schedule produced nothing in their slot. Whether that walk is meaningful is decided by
+      /// comparing the live schedule against the `prodsched` snapshot, since CDT exposes no
+      /// schedule version.
+      name                 last_producer;
+
+      /// Rescore cursor. A weight change (`setscorecfg`) or a `req_prod_collat` change
+      /// invalidates every stored `rank_score`, and the producers table is unbounded because
+      /// `regproducer` is permissionless. Rather than a mass rewrite, `rescore_generation` is
+      /// bumped and `onblock` drains `rescore_cursor` a bounded number of rows per schedule-rebuild
+      /// tick. The cursor walks PRIMARY-key order: rescoring mutates the secondary key, so walking
+      /// `prodrank` would revisit or skip rows.
+      uint64_t             rescore_cursor = 0;
+      /// Non-zero while a rescore sweep is in progress.
+      uint32_t             rescore_generation = 0;
+
+      /// `config_timestamp_ms` of the `req_prod_collat` entries the stored scores were computed
+      /// against, or 0 when that requirement vector was empty.
+      ///
+      /// The collateral factor is a RATIO against those minimums, so changing them invalidates
+      /// every stored score at once -- and `sysio.opreg::setconfig` is the only writer, on a
+      /// contract this one cannot reach into. Rather than have opreg notify (a ten-parameter
+      /// handler that would still miss any future writer), `onblock` compares this stamp against
+      /// the live config inside the throttle it already pays for and opens a sweep on a mismatch.
+      /// setconfig re-stamps every entry unconditionally, so an unrelated field change opens a
+      /// sweep too; that is harmless, since rescoring a row whose score is unchanged writes
+      /// nothing.
+      uint64_t             scored_collateral_stamp = 0;
+
       // explicit serialization macro is not necessary, used here only to improve compilation time
       SYSLIB_SERIALIZE_DERIVED( sysio_global_state, sysio::blockchain_parameters,
                                 (max_ram_size)(total_ram_bytes_reserved)
                                 (last_producer_schedule_update)(last_pervote_bucket_fill)
                                 (total_unpaid_blocks)
-                                (last_producer_schedule_size) )
+                                (last_producer_schedule_size)
+                                (last_producer)
+                                (rescore_cursor)(rescore_generation)
+                                (scored_collateral_stamp) )
    };
 
    inline sysio::block_signing_authority convert_to_block_signing_authority( const sysio::public_key& producer_key ) {
@@ -115,7 +149,11 @@ namespace sysiosystem {
    struct [[sysio::table("producers"), sysio::contract("sysio.system")]] producer_info {
       name                                                     owner;
       sysio::public_key                                        producer_key; /// a packed public key object
-      uint32_t                                                 rank = std::numeric_limits<uint32_t>::max();
+      /// Packed ordering key: producer_tier in the high bits, inverted composite score below.
+      /// NOT a rank -- `rank` is position in the "prodrank" index among schedulable producers,
+      /// derived by iteration. Defaults to the demoted tier's worst score so a registered but
+      /// never-scored row can never outrank a scored one.
+      uint64_t                                                 rank_score = producer_rank::unscored();
       bool                                                     is_active = true;
       std::string                                              url;
       uint32_t                                                 unpaid_blocks = 0;
@@ -125,8 +163,18 @@ namespace sysiosystem {
       uint32_t                                                 last_block_num = no_prev_block;
       uint16_t                                                 current_round_blocks = 0;   // blocks in current (in-progress) round
       uint32_t                                                 eligible_rounds      = 0;   // rounds meeting >= min_blocks threshold (per epoch)
+      /// Rounds this producer was scheduled for and produced nothing in, consecutively. Reset to 0
+      /// the moment it produces. At prodscorecfg's max_consecutive_missed_rounds it sets
+      /// `is_demoted`; see producer_rank.hpp.
+      uint32_t                                                 consecutive_missed_rounds = 0;
+      /// Demoted to standby for missing rounds. Categorical -- no score overcomes it. Cleared only
+      /// by `regproducer`, which is the single door back from both a voluntary `unregprod` park and
+      /// an involuntary demotion.
+      bool                                                     is_demoted = false;
+      /// Snapshot attestations credited this pay period; reset alongside the block counters.
+      uint32_t                                                 snapshot_attestations = 0;
 
-      uint64_t by_rank()const     { return rank; }
+      uint64_t by_rank_score()const { return rank_score; }
       bool     active()const      { return is_active;                               }
       void     deactivate()       { producer_key = public_key(); producer_authority = sysio::block_signing_authority{}; is_active = false; }
 
@@ -134,12 +182,13 @@ namespace sysiosystem {
          return producer_authority;
       }
 
-      SYSLIB_SERIALIZE( producer_info, (owner)(producer_key)(rank)(is_active)(url)(unpaid_blocks)(last_claim_time)(location)(producer_authority)
-                         (last_block_num)(current_round_blocks)(eligible_rounds) )
+      SYSLIB_SERIALIZE( producer_info, (owner)(producer_key)(rank_score)(is_active)(url)(unpaid_blocks)(last_claim_time)(location)(producer_authority)
+                         (last_block_num)(current_round_blocks)(eligible_rounds)
+                         (consecutive_missed_rounds)(is_demoted)(snapshot_attestations) )
    };
 
    using producers_table = sysio::kv::table< "producers"_n, producer_key_t, producer_info,
-                              sysio::kv::index<"prodrank"_n, const_mem_fun<producer_info, uint64_t, &producer_info::by_rank>>
+                              sysio::kv::index<"prodrank"_n, const_mem_fun<producer_info, uint64_t, &producer_info::by_rank_score>>
                            >;
 
    struct finkey_key_t {
@@ -422,20 +471,21 @@ namespace sysiosystem {
           */
          [[sysio::action]]
          void unregprod( const name& producer );
-
          /**
-          * Set the rank of an individual producer. Rank determines scheduling
-          * priority -- lower rank values are scheduled first. Producers with
-          * rank > 21 are considered standby.
+          * Install the producer-score weights.
           *
-          * @param producer - registered producer account,
-          * @param rank - positive integer rank (1 = highest priority).
+          * Each weight scales one normalised factor of the composite score that orders the
+          * `prodrank` index; a weight of 0 removes that factor's influence entirely, which is how
+          * `relay` / `api` / `benchmark` ship until an attestation path exists for them. Changing a
+          * weight invalidates every stored `rank_score`, so this bumps the global's rescore
+          * generation and `onblock` drains the cursor.
+          *
+          * @param weights - the full weight set plus the demotion threshold.
           *
           * @pre Require the authority of the contract itself
-          * @pre producer must be a registered producer
           */
          [[sysio::action]]
-         void setrank( const name& producer, uint32_t rank );
+         void setscorecfg( const producer_rank::producer_score_config& weights );
 
          /**
           * Action to register a finalizer key by a registered producer.
@@ -549,6 +599,19 @@ namespace sysiosystem {
           */
          [[sysio::on_notify("auth.msg::onlinkauth")]]
          void onlinkauth(const name &user, const name &permission, const sysio::public_key &pub_key);
+
+         /**
+          * Rescore a producer whose collateral standing just changed on sysio.opreg.
+          *
+          * `sysio.opreg::processprod` notifies this contract on every producer balance change --
+          * not only on an eligibility transition -- because producer rank is scored on the
+          * collateral actually posted: a top-up must raise the score and a withdraw must lower it.
+          * The handler recomputes from authoritative tables, so it needs no argument beyond the
+          * account and asserts no authority of its own: `require_recipient` delivers it only from
+          * sysio.opreg, and its sole effect is to bring a derived value back in step.
+          */
+         [[sysio::on_notify("sysio.opreg::processprod")]]
+         void onprocessprod( name account, bool was_eligible, bool is_eligible );
 
          // ---- Emissions actions (defined in emissions.cpp) ----
 
@@ -723,8 +786,26 @@ namespace sysiosystem {
          void register_producer( const name& producer, const sysio::block_signing_authority& producer_authority, const std::string& url, uint16_t location );
          void update_ranked_producers( const block_timestamp& timestamp );
 
+         /// Recompute and store one producer's packed `rank_score`. Called from every path that can
+         /// move a scoring input: regproducer (tier clear), the opreg eligibility notification
+         /// (collateral), onblock (miss counter), and the rescore sweep.
+         void rescore_producer( const name& producer );
+
+         /// Attribute missed rounds to the producers the active schedule skipped, and demote any
+         /// that crossed the threshold. Runs on every block; see producer_pay.cpp.
+         void record_round_participation( const name& current_producer );
+
+         /// Charge one producer a missed round, demoting it if that crosses the threshold.
+         void record_missed_round( const name& producer, uint32_t max_consecutive_missed_rounds );
+
+         /// Open a rescore sweep when sysio.opreg's producer collateral minimums have moved since
+         /// the stored scores were computed. See `sysio_global_state::scored_collateral_stamp`.
+         void detect_collateral_config_change();
+
+         /// Drain a bounded slice of the rescore cursor when weights or collateral minimums changed.
+         void drain_rescore_cursor();
+
          // defined in sysio.system.cpp
-         void assign_producer_ranks( const std::vector<name>& producers );
 
          // defined in block_info.cpp
          void add_to_blockinfo_table(const sysio::checksum256& previous_block_id, const sysio::block_timestamp timestamp) const;

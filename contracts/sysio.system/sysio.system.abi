@@ -831,6 +831,16 @@
             ]
         },
         {
+            "name": "observed_schedule",
+            "base": "",
+            "fields": [
+                {
+                    "name": "producers",
+                    "type": "name[]"
+                }
+            ]
+        },
+        {
             "name": "onblock",
             "base": "",
             "fields": [
@@ -951,8 +961,8 @@
                     "type": "public_key"
                 },
                 {
-                    "name": "rank",
-                    "type": "uint32"
+                    "name": "rank_score",
+                    "type": "uint64"
                 },
                 {
                     "name": "is_active",
@@ -988,6 +998,18 @@
                 },
                 {
                     "name": "eligible_rounds",
+                    "type": "uint32"
+                },
+                {
+                    "name": "consecutive_missed_rounds",
+                    "type": "uint32"
+                },
+                {
+                    "name": "is_demoted",
+                    "type": "bool"
+                },
+                {
+                    "name": "snapshot_attestations",
                     "type": "uint32"
                 }
             ]
@@ -1027,6 +1049,44 @@
                 {
                     "name": "producers",
                     "type": "producer_key[]"
+                }
+            ]
+        },
+        {
+            "name": "producer_score_config",
+            "base": "",
+            "fields": [
+                {
+                    "name": "collateral_weight",
+                    "type": "uint32"
+                },
+                {
+                    "name": "participation_weight",
+                    "type": "uint32"
+                },
+                {
+                    "name": "snapshot_weight",
+                    "type": "uint32"
+                },
+                {
+                    "name": "relay_weight",
+                    "type": "uint32"
+                },
+                {
+                    "name": "api_weight",
+                    "type": "uint32"
+                },
+                {
+                    "name": "benchmark_weight",
+                    "type": "uint32"
+                },
+                {
+                    "name": "max_consecutive_missed_rounds",
+                    "type": "uint32"
+                },
+                {
+                    "name": "snapshot_target_attestations",
+                    "type": "uint32"
                 }
             ]
         },
@@ -1299,16 +1359,12 @@
             ]
         },
         {
-            "name": "setrank",
+            "name": "setscorecfg",
             "base": "",
             "fields": [
                 {
-                    "name": "producer",
-                    "type": "name"
-                },
-                {
-                    "name": "rank",
-                    "type": "uint32"
+                    "name": "weights",
+                    "type": "producer_score_config"
                 }
             ]
         },
@@ -1451,6 +1507,22 @@
                 {
                     "name": "last_producer_schedule_size",
                     "type": "uint16"
+                },
+                {
+                    "name": "last_producer",
+                    "type": "name"
+                },
+                {
+                    "name": "rescore_cursor",
+                    "type": "uint64"
+                },
+                {
+                    "name": "rescore_generation",
+                    "type": "uint32"
+                },
+                {
+                    "name": "scored_collateral_stamp",
+                    "type": "uint64"
                 }
             ]
         },
@@ -1971,8 +2043,8 @@
             "ricardian_contract": ""
         },
         {
-            "name": "setrank",
-            "type": "setrank",
+            "name": "setscorecfg",
+            "type": "setscorecfg",
             "ricardian_contract": ""
         },
         {
@@ -2177,6 +2249,22 @@
             "key_names": ["name"],
             "key_types": ["name"],
             "table_id": 16636
+        },
+        {
+            "name": "prodsched",
+            "type": "observed_schedule",
+            "index_type": "i64",
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 35433
+        },
+        {
+            "name": "prodscorecfg",
+            "type": "producer_score_config",
+            "index_type": "i64",
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 26071
         },
         {
             "name": "producers",

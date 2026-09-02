@@ -7,6 +7,7 @@
 
 #include <sysio.system/sysio.system.hpp>
 #include <sysio.system/opreg_status.hpp>
+#include <sysio.system/producer_score.hpp>
 #include <sysio.token/sysio.token.hpp>
 
 #include <type_traits>
@@ -55,7 +56,61 @@ namespace sysiosystem {
             info.producer_authority = producer_authority;
             if ( info.last_claim_time == time_point() )
                info.last_claim_time = ct;
+            // regproducer is the SINGLE door back -- from a voluntary `unregprod` park and from an
+            // involuntary demotion alike. `unregprod` erases the signing key, so re-registering has
+            // to re-supply it, which makes this a genuine assertion of readiness rather than a
+            // no-op. There is deliberately no cooldown and no expiry: a producer that comes back
+            // before it is ready is demoted again within max_consecutive_missed_rounds rounds,
+            // which is self-correcting.
+            info.is_demoted                = false;
+            info.consecutive_missed_rounds = 0;
          });
+
+      // The clear above changes the producer's tier, so its sort key is stale until rescored.
+      rescore_producer( producer );
+   }
+
+   void system_contract::rescore_producer( const name& producer ) {
+      auto key = producer_key_t{producer.value};
+      if( !_producers.contains(key) ) return;
+
+      producer_rank::producer_score_config_t weights_tbl( get_self() );
+      const auto weights = weights_tbl.get_or_default( producer_rank::producer_score_config{} );
+
+      const auto info = _producers.get(key);
+      const auto score = producer_rank::compute(
+         producer,
+         producer_rank::score_inputs{
+            .is_demoted                = info.is_demoted,
+            .consecutive_missed_rounds = info.consecutive_missed_rounds,
+            .snapshot_attestations     = info.snapshot_attestations
+         },
+         weights );
+
+      if( score == info.rank_score ) return;   // no index move needed
+      _producers.modify( same_payer, key, [&]( auto& p ) { p.rank_score = score; });
+   }
+
+   void system_contract::onprocessprod( name account, bool, bool ) {
+      // The eligibility flags are not consulted: rescore_producer reads the operator's live status
+      // and balances, which is the same information after the flip and cannot go stale between the
+      // notification and this handler.
+      rescore_producer( account );
+   }
+
+   void system_contract::setscorecfg( const producer_rank::producer_score_config& weights ) {
+      require_auth( get_self() );
+
+      producer_rank::producer_score_config_t weights_tbl( get_self() );
+      weights_tbl.set( weights, get_self() );
+
+      // Every stored rank_score was computed under the OLD weights. Rather than rewrite an
+      // unbounded table inline, open a rescore sweep: onblock drains a bounded number of rows per
+      // schedule-rebuild tick until the cursor is exhausted.
+      _global.modify( get_self(), []( auto& g ) {
+         g.rescore_cursor = 0;
+         g.rescore_generation++;
+      });
    }
 
    void system_contract::regproducer( const name& producer, const sysio::public_key& producer_key, const std::string& url, uint16_t location ) {
@@ -97,43 +152,20 @@ namespace sysiosystem {
       top_producers.reserve(max_producers);
       proposed_finalizers.reserve(max_producers);
 
-      // Standbys (rank above max_producers, up to standby_end_rank) may backfill
-      // active slots vacated by ineligible producers, so the schedule stays at
-      // max_producers whenever replacements exist. standby_end_rank is
-      // governance-tunable on the emitcfg singleton (>= 22, capped by
-      // setemitcfg); before emissions config is installed there are no standbys,
-      // so fall back to max_producers.
-      uint32_t schedule_rank_limit = max_producers;
-      emissions::emitcfg_t emitcfg( get_self() );
-      if( emitcfg.exists() ) {
-         schedule_rank_limit = emitcfg.get().standby_end_rank;
-      }
-
+      // `rank` is POSITION in this index among schedulable producers, so the first max_producers
+      // matches ARE ranks 1..max_producers -- the active schedule. Standbys are the positions past
+      // it and never enter the schedule, which is why the old schedule_rank_limit branch is gone:
+      // a slot vacated by an ineligible producer is filled by the next schedulable entry for free,
+      // with no explicit backfill.
+      //
+      // The walk is bounded by the demoted tier. `regproducer` is permissionless, so the table is
+      // unbounded -- but producer_rank::compute sinks every non-ACTIVE producer operator into the
+      // demoted tier, which sorts last, so the scan stops before the spam tail.
       for( auto it = idx.cbegin(); it != idx.cend() && top_producers.size() < max_producers; ++it ) {
-         if( it->rank > schedule_rank_limit ) break;   // past the last standby
-         if( !it->active() ) continue;
+         if( producer_rank::tier_of( it->rank_score ) == producer_tier::demoted ) break;
+         if( !producer_rank::is_schedulable( *it, _finalizers ) ) continue;
 
-         // A producer must be a live, collateral-backed producer operator in
-         // sysio.opreg. A producer that withdrew collateral (status UNKNOWN),
-         // was slashed, or was terminated is no longer OPERATOR_STATUS_ACTIVE
-         // and must not be scheduled. Requiring OPERATOR_TYPE_PRODUCER prevents
-         // an account that is ACTIVE only as a different operator type (e.g. a
-         // batch operator, backed by different collateral) from being scheduled.
-         if( !is_op_active( it->owner, sysio::opp::types::OperatorType::OPERATOR_TYPE_PRODUCER ) ) {
-            continue;
-         }
-
-         // Require active finalizer key for all scheduled producers
-         auto fin_key = finalizer_key_t{it->owner.value};
-         if( !_finalizers.contains(fin_key) ) {
-            continue;
-         }
-         auto finalizer = _finalizers.get(fin_key);
-         if( finalizer.active_key_binary.empty() ) {
-            continue;
-         }
-
-         proposed_finalizers.emplace_back(finalizer);
+         proposed_finalizers.emplace_back( _finalizers.get( finalizer_key_t{it->owner.value} ) );
          top_producers.emplace_back(
             sysio::producer_authority{
                .producer_name = it->owner,

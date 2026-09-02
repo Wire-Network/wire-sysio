@@ -1,5 +1,9 @@
 #include <sysio.system/sysio.system.hpp>
+#include <sysio.system/producer_score.hpp>
 #include <sysio.token/sysio.token.hpp>
+
+#include <algorithm>
+#include <vector>
 
 namespace sysiosystem {
 
@@ -67,10 +71,159 @@ namespace sysiosystem {
          });
       }
 
+      // Attribute the rounds nobody produced. This must happen on every block: the counters above
+      // record PRESENCE only -- a producer that produces nothing is never visited by onblock at
+      // all, so absence leaves no trace unless the schedule is walked explicitly.
+      record_round_participation( producer );
+
       /// only update block producers once every minute, block_timestamp is in half seconds
       if( timestamp.slot - _global.get().last_producer_schedule_update.slot > 120 ) {
+         // A collateral-minimum change invalidates every stored score, and this throttle is the
+         // only place the chain looks. Detect BEFORE draining so a change noticed on this tick
+         // starts draining on it rather than a minute later.
+         detect_collateral_config_change();
+         // Drain any pending rescore BEFORE rebuilding, so the rebuild sees the freshest scores it
+         // can. A sweep spans several ticks; the schedule is proposed from a partially-rescored
+         // index in the meantime, which is safe because the tiers -- not the composite -- decide
+         // membership, and a tier only changes on demotion or recovery.
+         drain_rescore_cursor();
          update_ranked_producers( timestamp );
       }
+   }
+
+   void system_contract::record_round_participation( const name& current_producer ) {
+      const auto& state = _global.get();
+
+      // Mid-round: the same producer made the previous block, so no slot was skipped and its miss
+      // counter was already cleared on the first block of this round. This is 11 of every 12
+      // blocks, and returning here keeps the schedule read and the snapshot compare off the hot
+      // path for all of them.
+      if( state.last_producer == current_producer ) return;
+
+      const auto active_schedule = sysio::get_active_producers();
+
+      producer_rank::observed_schedule_t observed_tbl( get_self() );
+      const auto observed = observed_tbl.get_or_default( producer_rank::observed_schedule{} );
+
+      // A schedule change invalidates the cursor. The span between the previous producer and this
+      // one is only a list of MISSES while the schedule is the same set in the same order: after a
+      // change, a newly-added producer sitting in that span never had a slot to miss, and charging
+      // it a miss would count toward a demotion it did not earn. There is no schedule-version
+      // intrinsic, so the comparison is against the stored snapshot.
+      const bool schedule_unchanged = observed.producers == active_schedule;
+
+      if( !schedule_unchanged ) {
+         observed_tbl.set( producer_rank::observed_schedule{ .producers = active_schedule }, get_self() );
+      }
+
+      if( schedule_unchanged && state.last_producer.value != 0 ) {
+         const auto previous = std::find( active_schedule.begin(), active_schedule.end(),
+                                          state.last_producer );
+         const auto current  = std::find( active_schedule.begin(), active_schedule.end(),
+                                          current_producer );
+         if( previous != active_schedule.end() && current != active_schedule.end() ) {
+            producer_rank::producer_score_config_t weights_tbl( get_self() );
+            const auto weights = weights_tbl.get_or_default( producer_rank::producer_score_config{} );
+
+            // Walk forward from the slot AFTER the previous producer to the current one, wrapping
+            // at the end of the round-robin. Every name in between held a slot and produced
+            // nothing. Bounded by the schedule size (max_producers); normally zero iterations,
+            // since the next producer follows the previous one directly.
+            auto slot = previous + 1;
+            for( size_t stepped = 0; stepped < active_schedule.size(); ++stepped ) {
+               if( slot == active_schedule.end() ) slot = active_schedule.begin();
+               if( slot == current ) break;
+               record_missed_round( *slot, weights.max_consecutive_missed_rounds );
+               ++slot;
+            }
+         }
+      }
+
+      // The producer of this block is, by construction, not missing its round.
+      auto key = producer_key_t{current_producer.value};
+      if( _producers.contains(key) && _producers.get(key).consecutive_missed_rounds > 0 ) {
+         _producers.modify( same_payer, key, []( auto& p ) { p.consecutive_missed_rounds = 0; });
+         rescore_producer( current_producer );
+      }
+
+      _global.modify( get_self(), [&]( auto& g ) { g.last_producer = current_producer; });
+   }
+
+   void system_contract::record_missed_round( const name& producer,
+                                              uint32_t max_consecutive_missed_rounds ) {
+      auto key = producer_key_t{producer.value};
+      if( !_producers.contains(key) ) return;
+
+      _producers.modify( same_payer, key, [&]( auto& p ) {
+         p.consecutive_missed_rounds++;
+         // Demotion is CATEGORICAL: it moves the producer into a tier no score can climb out of,
+         // and it lasts until the producer re-registers. There is no cooldown and no expiry --
+         // a demoted producer is scheduled for no rounds, so it can never clear the counter by
+         // producing.
+         if( !p.is_demoted && max_consecutive_missed_rounds > 0
+             && p.consecutive_missed_rounds >= max_consecutive_missed_rounds ) {
+            p.is_demoted = true;
+         }
+      });
+
+      // The miss moved the participation factor, and a demotion moved the tier; either way the
+      // stored sort key is stale.
+      rescore_producer( producer );
+   }
+
+   void system_contract::detect_collateral_config_change() {
+      sysio::opreg::opconfig_t cfg_tbl( opreg_refs::account );
+      const auto cfg = cfg_tbl.get_or_default( sysio::opreg::op_config{} );
+
+      // setconfig stamps every entry with the same on-chain time, so the first entry represents the
+      // whole vector. An empty vector has no stamp; 0 stands for it, and it is distinguishable from
+      // any real stamp because current_time_ms() is never 0 on a live chain. Both directions of the
+      // empty/non-empty transition therefore register as a change.
+      const uint64_t stamp = cfg.req_prod_collat.empty()
+                                ? uint64_t{0}
+                                : cfg.req_prod_collat.front().config_timestamp_ms;
+
+      if( stamp == _global.get().scored_collateral_stamp ) return;
+
+      _global.modify( get_self(), [&]( auto& g ) {
+         g.scored_collateral_stamp = stamp;
+         g.rescore_cursor          = 0;
+         g.rescore_generation++;
+      });
+   }
+
+   void system_contract::drain_rescore_cursor() {
+      const auto& state = _global.get();
+      if( state.rescore_generation == 0 ) return;
+
+      // Bounded per tick, mirroring opreg's MAX_WTDW_FLUSH_PER_EPOCH: the producers table is
+      // unbounded, so a weight change can never rewrite it inline.
+      constexpr uint32_t max_rescore_per_tick = 32;
+
+      uint64_t cursor = state.rescore_cursor;
+      bool     done   = true;
+
+      // COLLECT first, rescore after. rescore_producer writes the row, which moves its entry in the
+      // secondary index; mutating the table while an iterator into it is live is not safe to rely
+      // on. The batch is bounded by max_rescore_per_tick, so the vector is small and fixed.
+      std::vector<name> batch;
+      batch.reserve( max_rescore_per_tick );
+      for( auto it = _producers.lower_bound( producer_key_t{cursor} ); it != _producers.end(); ++it ) {
+         if( batch.size() >= max_rescore_per_tick ) {
+            cursor = it->owner.value;   // resume here next tick
+            done   = false;
+            break;
+         }
+         batch.push_back( it->owner );
+      }
+      for( const auto& producer : batch ) {
+         rescore_producer( producer );
+      }
+
+      _global.modify( get_self(), [&]( auto& g ) {
+         g.rescore_cursor     = done ? 0 : cursor;
+         g.rescore_generation = done ? 0 : g.rescore_generation;
+      });
    }
 
 } //namespace sysiosystem

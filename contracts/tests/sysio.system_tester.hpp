@@ -1,6 +1,8 @@
 #pragma once
 
 #include <sysio/testing/tester.hpp>
+#include <sysio/testing/bls_utils.hpp>
+#include <sysio/opp/opp.hpp>
 #include <sysio/chain/abi_serializer.hpp>
 #include <sysio/chain/resource_limits.hpp>
 #include "contracts.hpp"
@@ -355,6 +357,60 @@ public:
       msig_abi_ser.set_abi(msig_abi, abi_serializer::create_yield_function(abi_serializer_max_time));
    }
 
+   /// activate_producers(), plus the sysio.opreg operator rows `producer_rank::is_schedulable`
+   /// requires.
+   ///
+   /// sysio.system schedules -- and getpeerkeys / snapshot-provider eligibility rank -- only
+   /// producers that are ACTIVE OPERATOR_TYPE_PRODUCER operators in sysio.opreg AND carry an
+   /// active finalizer key. `activate_producers()` yields neither, so this deploys sysio.opreg
+   /// (once) and registers each producer as a bootstrapped producer operator -- ACTIVE-by-fiat,
+   /// bypassing collateral.
+   ///
+   /// Finalizer keys are deliberately left to the caller. Which keys a test registers decides
+   /// whether this node can vote for the policy update_ranked_producers proposes, and some tests
+   /// depend on it NOT being able to (so the policy stays pending at the controller).
+   vector<name> activate_producers_with_operators( uint32_t count = 21 ) {
+      std::vector<name> producer_names = activate_producers(count);
+      deploy_opreg_once();
+      register_producer_operators(producer_names);
+      return producer_names;
+   }
+
+   /// Deploy sysio.opreg into the test chain, once. `sysio_system_tester` does not ship it, but
+   /// every rank consumer reads it through `is_op_active`.
+   void deploy_opreg_once() {
+      if (!opreg_deployed) {
+         create_account("sysio.opreg"_n, config::system_account_name, false, false, false, true);
+         // opreg is not privileged yet (setpriv requires setcode first). Give it RAM for the
+         // ~800KB wasm and NET/CPU to sign regoperator; a sysio.* account has none by default.
+         push_action(config::system_account_name, "setacctram"_n, mvo()
+            ("account", "sysio.opreg"_n)("ram_bytes", int64_t(2'000'000)));
+         push_action(config::system_account_name, "setacctnet"_n, mvo()
+            ("account", "sysio.opreg"_n)("net_weight", int64_t(1'000'000)));
+         push_action(config::system_account_name, "setacctcpu"_n, mvo()
+            ("account", "sysio.opreg"_n)("cpu_weight", int64_t(1'000'000)));
+         produce_block();
+         set_code("sysio.opreg"_n, contracts::opreg_wasm());
+         set_abi ("sysio.opreg"_n, contracts::opreg_abi().data());
+         set_privileged("sysio.opreg"_n);
+         produce_block();
+         opreg_deployed = true;
+      }
+   }
+
+   /// Register each name as a bootstrapped PRODUCER operator -- ACTIVE-by-fiat, bypassing the
+   /// collateral minimum -- which is what `is_op_active` gates every rank position on.
+   void register_producer_operators(const std::vector<name>& names) {
+      for (const auto& p : names) {
+         base_tester::push_action("sysio.opreg"_n, "regoperator"_n, "sysio.opreg"_n, mvo()
+            ("account", p)
+            ("type", sysio::opp::types::OperatorType::OPERATOR_TYPE_PRODUCER)
+            ("is_bootstrapped", true));
+      }
+      produce_block();
+   }
+   bool opreg_deployed = false;
+
    vector<name> activate_producers( uint32_t count = 21 ) {
       //stake more than 15% of total SYS supply to activate chain
       transfer( "sysio"_n, "alice1111111"_n, core_sym::from_string("650000000.0000"), config::system_account_name );
@@ -405,12 +461,6 @@ public:
       BOOST_REQUIRE_EQUAL( name("defproducera"), producer_keys[0].producer_name );
 
       return producer_names;
-   }
-
-   action_result setrank( const name& producer, uint32_t rank ) {
-      return push_action( config::system_account_name, "setrank"_n, mvo()
-                          ("producer", producer)
-                          ("rank", rank) );
    }
 
 
