@@ -629,9 +629,15 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_quorum_credits_voting_producers, snapshot_v
    const auto attestations_of = [this](account_name producer) {
       return get_producer_info(producer)["snapshot_attestations"].as<uint32_t>();
    };
+   const auto key_of = [this](account_name producer) {
+      return get_producer_info(producer)["rank_score"].as<uint64_t>();
+   };
    for (const auto& p : {"producer1"_n, "producer2"_n, "producer3"_n}) {
       BOOST_REQUIRE_EQUAL(0u, attestations_of(p));
    }
+   const uint64_t key1 = key_of("producer1"_n);
+   const uint64_t key2 = key_of("producer2"_n);
+   const uint64_t key3 = key_of("producer3"_n);
 
    const auto block_num = vote_block_num();
    auto       bid       = make_block_id(block_num);
@@ -648,6 +654,12 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_quorum_credits_voting_producers, snapshot_v
    BOOST_REQUIRE_EQUAL(1u, attestations_of("producer2"_n));
    // producer3 registered a provider but never voted, so it earned nothing.
    BOOST_REQUIRE_EQUAL(0u, attestations_of("producer3"_n));
+
+   // The credit is a SCORING factor and it reaches the index at once: a higher composite is a
+   // numerically LOWER key. producer3 earned nothing, so its key is untouched.
+   BOOST_REQUIRE_LT(key_of("producer1"_n), key1);
+   BOOST_REQUIRE_LT(key_of("producer2"_n), key2);
+   BOOST_REQUIRE_EQUAL(key3, key_of("producer3"_n));
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(votesnaphash_same_tuple_retry_is_idempotent, snapshot_voting_tester) { try {

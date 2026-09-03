@@ -129,7 +129,27 @@ namespace sysiosystem {
       }
 
       /**
-       * The ONE schedulable predicate every rank consumer walks.
+       * The operator half of the schedulable predicate: an active `producers` row whose owner is
+       * an ACTIVE OPERATOR_TYPE_PRODUCER operator in sysio.opreg.
+       *
+       * This is the predicate PEER DISCOVERY walks (`getpeerkeys`), and it deliberately stops
+       * short of the finalizer-key requirement. A producer scheduled through `setprods` -- the
+       * bootstrap window, and every harness that publishes schedules directly -- produces blocks
+       * and needs the BP gossip mesh whether or not it has registered a finalizer key yet; hiding
+       * it from `getpeerkeys` cuts a live block producer out of that mesh. Ranking, pay and
+       * snapshot-provider eligibility walk `is_schedulable` below.
+       *
+       * @param producer the producer row under consideration.
+       * @return true iff the producer is a live PRODUCER operator.
+       */
+      inline bool is_eligible_operator(const producer_info& producer) {
+         return producer.active()
+             && is_op_active(producer.owner, sysio::opp::types::OperatorType::OPERATOR_TYPE_PRODUCER);
+      }
+
+      /**
+       * The ONE schedulable predicate ranking, pay and snapshot eligibility walk:
+       * `is_eligible_operator` plus an active finalizer key.
        *
        * `rank` is position among the producers this returns true for -- so every consumer must
        * COUNT matches while walking the index, never take the first N index entries. An unbonded
@@ -137,8 +157,8 @@ namespace sysiosystem {
        * bootstrap tier; taking the first N would let a handful of them crowd real producers out of
        * peer discovery and snapshot-provider eligibility.
        *
-       * Before this existed the four consumers disagreed -- update_ranked_producers checked all
-       * three conditions, emissions only the first two, peer_keys and snapshot_attest none. Making
+       * Before this existed the consumers disagreed -- update_ranked_producers checked all three
+       * conditions, emissions only the first two, peer_keys and snapshot_attest none. Making
        * emissions honour the finalizer-key check is a behavioural fix, not a regression: a producer
        * with no active finalizer key can never be scheduled, so it should not draw top-21 pay.
        *
@@ -147,10 +167,7 @@ namespace sysiosystem {
        * @return true iff the producer is eligible to occupy a rank position.
        */
       inline bool is_schedulable(const producer_info& producer, finalizers_table& finalizers) {
-         if (!producer.active()) return false;
-         if (!is_op_active(producer.owner, sysio::opp::types::OperatorType::OPERATOR_TYPE_PRODUCER)) {
-            return false;
-         }
+         if (!is_eligible_operator(producer)) return false;
          const auto key = finalizer_key_t{producer.owner.value};
          if (!finalizers.contains(key)) return false;
          return !finalizers.get(key).active_key_binary.empty();
@@ -203,16 +220,20 @@ namespace sysiosystem {
          // demoted tier. That is correct on its own terms -- an unbonded registrant must never
          // outrank a bonded one -- and it is also what BOUNDS the rank walk: `regproducer` is
          // permissionless, so without this every consumer would scan an unbounded table. With it,
-         // the healthy and bootstrapped tiers hold only ACTIVE producer operators, and a consumer
-         // stops at the first demoted entry.
-         if (!is_op_active(producer, sysio::opp::types::OperatorType::OPERATOR_TYPE_PRODUCER)) {
-            return unscored();
-         }
-
+         // the healthy and bootstrapped tiers hold only producers that were ACTIVE operators at
+         // their LAST rescore, and a consumer stops at the first demoted entry. "Last rescore" is
+         // deliberate: a terminated or slashed operator is not notified (`reevaluate_eligibility`
+         // returns early on a terminal status), so its key sits in its old tier until the next
+         // sweep. That is harmless -- every consumer also tests the live predicate before counting
+         // a position -- so the one row is read once here rather than twice.
          sysio::opreg::operators_t ops(opreg_refs::account);
          const auto op_key = sysio::opreg::operator_key{producer.value};
          if (!ops.contains(op_key)) return unscored();
          const auto op = ops.get(op_key);
+         if (op.status != sysio::opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE
+             || op.type != sysio::opp::types::OperatorType::OPERATOR_TYPE_PRODUCER) {
+            return unscored();
+         }
 
          sysio::opreg::opconfig_t opreg_cfg_tbl(opreg_refs::account);
          const auto opreg_cfg = opreg_cfg_tbl.get_or_default(sysio::opreg::op_config{});
@@ -232,6 +253,41 @@ namespace sysiosystem {
 
          const uint64_t composite = add_sat(add_sat(collateral, participation), snapshot);
          return pack(tier_for(inputs.is_demoted, op.is_bootstrapped), composite);
+      }
+
+      /**
+       * Recompute one producer's packed `rank_score` from its live standing and store it if it
+       * moved.
+       *
+       * The ONE write path for the key. Every event that moves a scoring input ends here: a
+       * collateral change (via the opreg notification), a missed or produced round, a snapshot
+       * attestation credit, the pay-period counter reset, and the rescore sweep a weight or
+       * collateral-minimum change opens. A factor whose event does not reach this function never
+       * reaches the index.
+       *
+       * @param self      the sysio.system contract account.
+       * @param producers the producers table.
+       * @param producer  the producer to rescore; a name with no row is ignored.
+       */
+      inline void rescore(const sysio::name& self, producers_table& producers, const sysio::name& producer) {
+         const auto key = producer_key_t{producer.value};
+         if (!producers.contains(key)) return;
+
+         producer_score_config_t weights_tbl(self);
+         const auto weights = weights_tbl.get_or_default(producer_score_config{});
+
+         const auto info  = producers.get(key);
+         const auto score = compute(
+            producer,
+            score_inputs{
+               .is_demoted                = info.is_demoted,
+               .consecutive_missed_rounds = info.consecutive_missed_rounds,
+               .snapshot_attestations     = info.snapshot_attestations
+            },
+            weights);
+
+         if (score == info.rank_score) return;   // no index move needed
+         producers.modify(same_payer, key, [&](auto& row) { row.rank_score = score; });
       }
 
    } // namespace producer_rank

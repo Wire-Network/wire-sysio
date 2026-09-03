@@ -76,8 +76,6 @@ namespace sysiosystem {
    static constexpr int64_t  useconds_per_hour     = int64_t(seconds_per_hour) * 1000'000ll;
    static constexpr uint32_t blocks_per_day        = 2 * seconds_per_day; // half seconds per day
    static constexpr uint32_t blocks_per_round      = 12; // sysio::chain::config::producer_repetitions
-   static constexpr uint32_t min_blocks_per_round_for_pay = 6;
-   static constexpr uint32_t no_prev_block        = std::numeric_limits<uint32_t>::max(); // sentinel: no previous block
 
    // All fields (including max_action_return_value_size, KV limits) are now
    // in the base sysio::blockchain_parameters struct.
@@ -92,7 +90,6 @@ namespace sysiosystem {
 
       block_timestamp      last_producer_schedule_update;
       time_point           last_pervote_bucket_fill;
-      uint32_t             total_unpaid_blocks = 0; /// all blocks which have been produced but not paid
       uint16_t             last_producer_schedule_size = 0;
 
       /// Producer of the previous block -- the cursor `onblock` walks to attribute a MISSED round:
@@ -104,13 +101,14 @@ namespace sysiosystem {
 
       /// Rescore cursor. A weight change (`setscorecfg`) or a `req_prod_collat` change
       /// invalidates every stored `rank_score`, and the producers table is unbounded because
-      /// `regproducer` is permissionless. Rather than a mass rewrite, `rescore_generation` is
-      /// bumped and `onblock` drains `rescore_cursor` a bounded number of rows per schedule-rebuild
-      /// tick. The cursor walks PRIMARY-key order: rescoring mutates the secondary key, so walking
+      /// `regproducer` is permissionless. Rather than a mass rewrite, `rescore_pending` is set
+      /// and `onblock` drains `rescore_cursor` a bounded number of rows per schedule-rebuild tick.
+      /// The cursor walks PRIMARY-key order: rescoring mutates the secondary key, so walking
       /// `prodrank` would revisit or skip rows.
       uint64_t             rescore_cursor = 0;
-      /// Non-zero while a rescore sweep is in progress.
-      uint32_t             rescore_generation = 0;
+      /// True while a rescore sweep is in progress. A change landing mid-sweep restarts the
+      /// cursor from 0 under the same flag; there is nothing to count.
+      bool                 rescore_pending = false;
 
       /// `config_timestamp_ms` of the `req_prod_collat` entries the stored scores were computed
       /// against, or 0 when that requirement vector was empty.
@@ -129,10 +127,9 @@ namespace sysiosystem {
       SYSLIB_SERIALIZE_DERIVED( sysio_global_state, sysio::blockchain_parameters,
                                 (max_ram_size)(total_ram_bytes_reserved)
                                 (last_producer_schedule_update)(last_pervote_bucket_fill)
-                                (total_unpaid_blocks)
                                 (last_producer_schedule_size)
                                 (last_producer)
-                                (rescore_cursor)(rescore_generation)
+                                (rescore_cursor)(rescore_pending)
                                 (scored_collateral_stamp) )
    };
 
@@ -156,13 +153,16 @@ namespace sysiosystem {
       uint64_t                                                 rank_score = producer_rank::unscored();
       bool                                                     is_active = true;
       std::string                                              url;
+      /// Blocks produced and not yet paid -- the ONE pay input. `payepoch` credits every block at
+      /// the period's per-block rate and zeroes the count of every producer it pays; a block the
+      /// producer's slot did not deliver is simply never counted, so its pay stays in the treasury.
+      /// The count SURVIVES a park, a demotion, or a lost key: a producer that is not schedulable
+      /// at a payepoch is neither paid nor reset, and whatever it made is paid at the first
+      /// payepoch where it is schedulable again (never, for a slashed or terminated one).
       uint32_t                                                 unpaid_blocks = 0;
       time_point                                               last_claim_time;
       uint16_t                                                 location = 0;
       sysio::block_signing_authority                           producer_authority; // added in version 1.9.0
-      uint32_t                                                 last_block_num = no_prev_block;
-      uint16_t                                                 current_round_blocks = 0;   // blocks in current (in-progress) round
-      uint32_t                                                 eligible_rounds      = 0;   // rounds meeting >= min_blocks threshold (per epoch)
       /// Rounds this producer was scheduled for and produced nothing in, consecutively. Reset to 0
       /// the moment it produces. At prodscorecfg's max_consecutive_missed_rounds it sets
       /// `is_demoted`; see producer_rank.hpp.
@@ -183,7 +183,6 @@ namespace sysiosystem {
       }
 
       SYSLIB_SERIALIZE( producer_info, (owner)(producer_key)(rank_score)(is_active)(url)(unpaid_blocks)(last_claim_time)(location)(producer_authority)
-                         (last_block_num)(current_round_blocks)(eligible_rounds)
                          (consecutive_missed_rounds)(is_demoted)(snapshot_attestations) )
    };
 
@@ -477,8 +476,8 @@ namespace sysiosystem {
           * Each weight scales one normalised factor of the composite score that orders the
           * `prodrank` index; a weight of 0 removes that factor's influence entirely, which is how
           * `relay` / `api` / `benchmark` ship until an attestation path exists for them. Changing a
-          * weight invalidates every stored `rank_score`, so this bumps the global's rescore
-          * generation and `onblock` drains the cursor.
+          * weight invalidates every stored `rank_score`, so this flags a rescore sweep on the
+          * global and `onblock` drains the cursor.
           *
           * @param weights - the full weight set plus the demotion threshold.
           *

@@ -40,11 +40,9 @@ namespace {
 
 constexpr sysio::symbol WIRE_SYMBOL{"WIRE", 9};
 
-constexpr uint32_t ACTIVE_PRODUCER_COUNT  = 21;
 constexpr uint32_t STANDBY_START_RANK     = 22;
-constexpr uint32_t MAX_STANDBY_END_RANK   = 100; // safety cap: bounds inline-action count in payepoch
-constexpr uint32_t TOTAL_BLOCKS_PER_ROUND = ACTIVE_PRODUCER_COUNT * blocks_per_round; // 252
-constexpr uint32_t ACTIVE_PRODUCER_WEIGHT = 15; // > any standby weight (1..cfg.standby_end_rank-21)
+constexpr uint32_t MAX_STANDBY_END_RANK   = 100; // safety cap: bounds the standby credit count in payepoch
+constexpr int64_t  MS_PER_SECOND          = 1000;
 
 // Basis-point denominator for all category / sub-split ratios.
 constexpr int64_t  BPS_DENOMINATOR        = 10000;
@@ -260,7 +258,7 @@ emission_config get_emit_cfg(name self) {
 }
 
 // Canonical epoch duration lives on sysio.epoch::epochcfg. Both payepoch
-// (producer expected_rounds) and viewepoch (seconds_until_next) read it
+// (the producer pay period's slot count) and viewepoch (seconds_until_next) read it
 // here cross-contract so the value cannot drift from what advance() uses.
 uint32_t get_epoch_duration_sec() {
    sysio::epoch::epochcfg_t cfg_tbl(epoch_refs::account);
@@ -318,6 +316,8 @@ void system_contract::setemitcfg(const emissions::emission_config& cfg) {
                  "standby_end_rank must be >= standby_start_rank (22)");
    sysio::check(cfg.standby_end_rank <= MAX_STANDBY_END_RANK,
                  "standby_end_rank exceeds safety cap");
+   sysio::check(cfg.standby_bps <= BPS_DENOMINATOR,
+                 "standby_bps must be <= 10000");
 
    // Audit-log retention
    sysio::check(cfg.epoch_log_retention_count > 0,
@@ -794,144 +794,129 @@ void system_contract::payepoch(uint32_t epoch_index,
    int64_t fee_paid    = 0; // swap-fee rewards actually distributed (does NOT count toward treasury)
 
    // =======================================================================
-   // Producer + standby pay. Active producers (rank 1..21) are paid in
-   // proportion to their eligible_rounds across the pay period; standbys
-   // (rank 22..cfg.standby_end_rank) are paid by the existing rank-
-   // decreasing weight without an eligible_rounds requirement. Producer
-   // counters accumulate across non-pay epochs (no reset by accrueepoch)
-   // and are zeroed at the end of this action. Recipients are filtered
-   // by opreg status so slashed / terminated operators are skipped.
+   // Producer + standby pay.
+   //
+   // Producers are paid PER BLOCK. The active slice of the producer pool is spread over the block
+   // slots the period held, and every schedulable producer is credited that rate for each block
+   // it made. A missed block is never counted, so its pay stays in the treasury: it does not flow
+   // to the producers that did show up, because the rate does not depend on who did. The divisor
+   // is the period's nominal slot count, raised to the blocks actually produced when a period runs
+   // long (an epoch can extend while a batch operator delivers), so the slice is never exceeded.
+   //
+   // Standbys (positions 22..cfg.standby_end_rank) draw a retainer from the standby slice
+   // (cfg.standby_bps of the pool). Each POSITION holds a fixed share, decaying linearly from
+   // position 22, over the constant sum of every position's weight -- a vacant position's share
+   // stays in the treasury. Block pay is not gated on position, so a producer that slid from 21
+   // to 22 mid-period is still paid for the blocks it made before the schedule caught up.
+   //
+   // Counters accumulate across non-pay epochs (no reset by accrueepoch) and are zeroed at the
+   // end of this action for every producer PAID by it. A producer that is not schedulable when the
+   // walk reaches it -- parked, keyless, slashed, terminated -- is neither paid nor reset: its
+   // block count waits for the first payepoch where it is schedulable again (a parked or re-keyed
+   // producer's return; never, for a slashed or terminated one). A producer BELOW the walk
+   // (demoted, or parked and already rescored) is not visited at all, with the same effect. Every
+   // block a producer makes is paid exactly once, at the first payepoch where it is payable.
    // =======================================================================
    {
       auto prod_by_rank = _producers.get_index<"prodrank"_n>();
 
-      // expected_rounds is derived from the configured epoch duration on
-      // sysio.epoch (canonical source of truth) scaled by the period's ACTUAL
-      // accrued epoch count, because elig_rounds accumulates across exactly those
-      // epochs. It must NOT scale by cfg.pay_cadence_epochs: a mid-period cadence
-      // change makes the two disagree (see accrued_epochs above), and the
-      // mismatch silently distorts every producer's pay share -- too small a
-      // denominator lets everyone hit the clamp and collect their full share, too
-      // large a one forfeits pay that was earned. Unlike the batch-op pool this
-      // cannot overpay past producer_pool (the clamp bounds each share by
-      // emis_share), so it skews proportions rather than the total.
-      const uint32_t epoch_duration_sec = get_epoch_duration_sec();
-      // Compute in uint64: epoch_duration_sec (<= 30 days) * the accrued epoch
-      // count * 2 overflows uint32 at the extremes, and a wrapped
-      // denominator would silently distort every producer's pay share. uint64
-      // holds the full product with room to spare; the result is a small round
-      // count that fits back into uint64 for the divide below.
-      uint64_t expected_rounds =
-         (static_cast<uint64_t>(epoch_duration_sec)
-          * static_cast<uint64_t>(accrued_epochs > 0 ? accrued_epochs : 1) * 2) / TOTAL_BLOCKS_PER_ROUND;
-      // Below ~126s of effective period duration (one full 21-producer round
-      // at 0.5s/block), expected_rounds truncates to zero. Falling back to 1
-      // keeps the pay formula well-defined -- producer pay collapses to
-      // "elig_rounds clamped to 1, pay = full_share" at the floor. This
-      // coarse-grained pay is the price of allowing sub-rotation period
-      // durations; documented at MIN_EPOCH_DURATION_SEC.
-      if (expected_rounds == 0) expected_rounds = 1;
+      const int64_t standby_pool = split_bps(producer_pool, cfg.standby_bps);
+      const int64_t active_pool  = producer_pool - standby_pool;
 
-      struct prod_entry {
+      // Nominal block slots in the period: the configured epoch duration (canonical on
+      // sysio.epoch) times the epochs the period ACTUALLY accrued -- never
+      // cfg.pay_cadence_epochs, which a mid-period change makes disagree with the accrual --
+      // at one slot per block interval. uint64: a 30-day epoch times a large cadence overflows
+      // uint32.
+      const uint64_t nominal_slots =
+         static_cast<uint64_t>(get_epoch_duration_sec())
+         * static_cast<uint64_t>(accrued_epochs > 0 ? accrued_epochs : 1)
+         * static_cast<uint64_t>(MS_PER_SECOND)
+         / static_cast<uint64_t>(sysio::block_timestamp::block_interval_ms);
+
+      // Standby position weights run N at position 22 down to 1 at standby_end_rank; their sum
+      // is the divisor, so a position's share is the same whether or not it is filled.
+      const uint64_t standby_positions  = cfg.standby_end_rank + 1 - STANDBY_START_RANK;
+      const uint64_t standby_weight_sum = standby_positions * (standby_positions + 1) / 2;
+
+      struct pay_entry {
          name     owner;
-         uint32_t weight;
-         uint32_t elig_rounds;
-         bool     is_standby;
+         uint32_t blocks;
+         uint64_t standby_weight;
       };
-      std::vector<prod_entry> eligible;
-      std::vector<name>       to_reset; // snapshot before modify: avoids
-                                         // iterating while mutating secondary idx
-      uint32_t total_weight = 0;
+      struct reset_entry {
+         name owner;
+         bool blocks;   // a paid row starts its count over; an unpayable row keeps it
+      };
+      std::vector<pay_entry>   entries;
+      std::vector<reset_entry> to_reset; // snapshot before modify: avoids
+                                          // iterating while mutating secondary idx
+      uint64_t produced_blocks = 0;
 
-      // Single pass over the rank-ordered producers: builds both the pay list
-      // (eligible) and the counter-reset list (to_reset). The lists differ --
-      // to_reset includes slashed / terminated producers with stale counters,
-      // eligible does not.
-      // `rank` is POSITION in this index among SCHEDULABLE producers, counted while walking -- not
-      // a stored ordinal. The demoted tier sorts last and is never schedulable, so it bounds the
-      // walk over what is a permissionless, unbounded table.
+      // Single pass over the rank-ordered producers: builds both the pay list (entries) and the
+      // counter-reset list (to_reset). `position` is POSITION in this index among SCHEDULABLE
+      // producers, counted while walking -- not a stored ordinal. The demoted tier sorts last and
+      // is never schedulable, so it bounds the walk over what is a permissionless, unbounded
+      // table; every row above it is an ACTIVE bonded producer operator.
       //
-      // is_schedulable also requires an active finalizer key, which this loop did not check before.
-      // That is a fix, not a regression: a producer without one can never be scheduled, so it must
-      // not draw top-21 pay either.
+      // The divisor counts exactly the blocks this payepoch pays for. A count that waits on an
+      // unpayable row is neither paid nor counted now; when its producer is payable again the
+      // carried blocks are paid at THAT period's rate and counted in THAT period's divisor.
       uint32_t position = 0;
       for (auto it = prod_by_rank.begin(); it != prod_by_rank.end(); ++it) {
          if (producer_rank::tier_of(it->rank_score) == producer_tier::demoted) break;
 
-         // Reset list: every producer walked with stale counters gets reset, regardless of
-         // is_active / opreg status. Slashed producers still need their counters cleared for the
-         // next epoch.
-         if (it->unpaid_blocks > 0 || it->eligible_rounds > 0 || it->current_round_blocks > 0
-             || it->snapshot_attestations > 0) {
-            to_reset.push_back(it->owner);
+         // is_schedulable requires an active row, ACTIVE opreg status, and an active finalizer
+         // key: a producer missing any of them can never be scheduled, so it draws neither block
+         // pay nor a standby retainer -- and keeps its block count for when it can. The snapshot
+         // counter is per period regardless.
+         if (!producer_rank::is_schedulable(*it, _finalizers)) {
+            if (it->snapshot_attestations > 0) to_reset.push_back({it->owner, false});
+            continue;
          }
 
-         if (!producer_rank::is_schedulable(*it, _finalizers)) continue;
+         produced_blocks += it->unpaid_blocks;
+         if (it->unpaid_blocks > 0 || it->snapshot_attestations > 0) {
+            to_reset.push_back({it->owner, true});
+         }
 
          ++position;
-         if (position > cfg.standby_end_rank) break;
-
-         uint32_t w      = 0;
-         bool     standby = false;
-         uint32_t rounds  = 0;
-
-         if (position <= ACTIVE_PRODUCER_COUNT) {
-            rounds = it->eligible_rounds;
-            if (it->current_round_blocks >= min_blocks_per_round_for_pay) rounds++;
-            if (rounds == 0) continue;
-            w = ACTIVE_PRODUCER_WEIGHT;
-         } else if (position >= STANDBY_START_RANK && position <= cfg.standby_end_rank) {
-            w       = cfg.standby_end_rank + 1 - position;
-            standby = true;
-         }
-
-         if (w > 0) {
-            eligible.push_back({it->owner, w, rounds, standby});
-            total_weight += w;
+         const bool standby = position >= STANDBY_START_RANK && position <= cfg.standby_end_rank;
+         const uint64_t standby_weight = standby ? cfg.standby_end_rank + 1 - position : 0;
+         if (it->unpaid_blocks > 0 || standby_weight > 0) {
+            entries.push_back({it->owner, it->unpaid_blocks, standby_weight});
          }
       }
+
+      const uint64_t slot_divisor = std::max<uint64_t>(std::max(nominal_slots, produced_blocks), 1);
 
       // Producers are paid the emission share only — swap fees go to the
       // underwriter + batch operators (see the fold-in comment above).
       int64_t distributed_to_producers = 0;
-      if (total_weight > 0) {
-         for (const auto& pe : eligible) {
-            const int64_t emis_share = static_cast<int64_t>(
-               static_cast<__int128>(producer_pool) * pe.weight / total_weight);
-            int64_t pay;
-            if (pe.is_standby) {
-               pay = emis_share;
-            } else {
-               uint64_t r = (pe.elig_rounds > expected_rounds) ? expected_rounds : pe.elig_rounds;
-               pay = static_cast<int64_t>(
-                  static_cast<__int128>(emis_share) * r / expected_rounds);
-            }
-            if (pay > 0) {
-               credit_pay(get_self(), pe.owner, pay, memo::producer_reward);
-               distributed_to_producers += pay;
-            }
+      for (const auto& entry : entries) {
+         int64_t pay = static_cast<int64_t>(
+            static_cast<__int128>(active_pool) * entry.blocks / slot_divisor);
+         if (entry.standby_weight > 0) {
+            pay += static_cast<int64_t>(
+               static_cast<__int128>(standby_pool) * entry.standby_weight / standby_weight_sum);
+         }
+         if (pay > 0) {
+            credit_pay(get_self(), entry.owner, pay, memo::producer_reward);
+            distributed_to_producers += pay;
          }
       }
 
       actual_paid += distributed_to_producers;
 
-      // Reset round-tracking after distribution (iteration-safe: uses PK snapshot).
-      // The reclaimed count is accumulated across the loop and applied to the global in one
-      // modify, so the whole reset costs a single deferred KV write rather than one per producer.
-      uint32_t reclaimed_unpaid_blocks = 0;
-      for (const auto& owner : to_reset) {
-         auto key = producer_key_t{owner.value};
+      // Reset the period's counters after distribution (iteration-safe: uses PK snapshot).
+      for (const auto& entry : to_reset) {
+         auto key = producer_key_t{entry.owner.value};
          _producers.modify(same_payer, key, [&](auto& p) {
-            reclaimed_unpaid_blocks += p.unpaid_blocks;
-            p.unpaid_blocks        = 0;
-            p.eligible_rounds      = 0;
-            p.current_round_blocks = 0;
-            p.last_block_num       = no_prev_block;
+            if (entry.blocks) p.unpaid_blocks = 0;
             p.snapshot_attestations = 0;
          });
-      }
-      if (reclaimed_unpaid_blocks > 0) {
-         _global.modify(get_self(), [&](auto& g) { g.total_unpaid_blocks -= reclaimed_unpaid_blocks; });
+         // Zeroing snapshot_attestations moved the snapshot factor; keep the sort key in step.
+         rescore_producer(entry.owner);
       }
    }
 

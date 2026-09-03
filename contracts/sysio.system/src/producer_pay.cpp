@@ -34,45 +34,15 @@ namespace sysiosystem {
        * At startup the initial producer may not be one that is registered / elected
        * and therefore there may be no producer object for them.
        */
+      // Pay is per block: count it. payepoch credits every counted block at the period's rate and
+      // zeroes the count; a block this producer's slot did not deliver is simply never counted.
       auto key = producer_key_t{producer.value};
       if ( _producers.contains(key) ) {
-         // Round-boundary detection uses the global's total_unpaid_blocks as a
-         // per-producer "sequence stamp" -- NOT a monotonic block height.
-         // The counter is decremented by processepoch when it resets producer
-         // unpaid_blocks, so its absolute value is not stable across epochs.
-         // The gap check (stamp != last_stamp + 1) only remains correct because
-         // processepoch ALSO resets each producer's last_block_num to the
-         // no_prev_block sentinel, forcing the check to skip on the first
-         // onblock after a reset. Invariant: if a producer's last_block_num is
-         // non-sentinel, some counter (unpaid_blocks / eligible_rounds /
-         // current_round_blocks) is non-zero, so processepoch will reset it.
-         uint32_t prod_counter_stamp = _global.get().total_unpaid_blocks; // capture BEFORE increment
-         _global.modify( get_self(), []( auto& g ) { g.total_unpaid_blocks++; });
-         _producers.modify( same_payer, key, [&](auto& p) {
-            p.unpaid_blocks++;
-
-            // Round boundary detection: gap in sequence = new round started
-            if (p.last_block_num != no_prev_block && prod_counter_stamp != p.last_block_num + 1) {
-               // Previous round ended - check threshold
-               if (p.current_round_blocks >= min_blocks_per_round_for_pay) {
-                  p.eligible_rounds++;
-               }
-               p.current_round_blocks = 0;
-            }
-
-            p.current_round_blocks++;
-            p.last_block_num = prod_counter_stamp;
-
-            // Full round always eligible
-            if (p.current_round_blocks >= blocks_per_round) {
-               p.eligible_rounds++;
-               p.current_round_blocks = 0;
-            }
-         });
+         _producers.modify( same_payer, key, []( auto& p ) { p.unpaid_blocks++; });
       }
 
-      // Attribute the rounds nobody produced. This must happen on every block: the counters above
-      // record PRESENCE only -- a producer that produces nothing is never visited by onblock at
+      // Attribute the rounds nobody produced. This must happen on every block: the count above
+      // records PRESENCE only -- a producer that produces nothing is never visited by onblock at
       // all, so absence leaves no trace unless the schedule is walked explicitly.
       record_round_participation( producer );
 
@@ -97,7 +67,10 @@ namespace sysiosystem {
       // Mid-round: the same producer made the previous block, so no slot was skipped and its miss
       // counter was already cleared on the first block of this round. This is 11 of every 12
       // blocks, and returning here keeps the schedule read and the snapshot compare off the hot
-      // path for all of them.
+      // path for all of them. The same test also fires when EVERY other producer missed and the
+      // round-robin came back to this one; that case is indistinguishable from mid-round here and
+      // is deliberately left uncharged -- with every other producer absent the chain has no
+      // finality left to activate a replacement schedule anyway.
       if( state.last_producer == current_producer ) return;
 
       const auto active_schedule = sysio::get_active_producers();
@@ -167,7 +140,8 @@ namespace sysiosystem {
       });
 
       // The miss moved the participation factor, and a demotion moved the tier; either way the
-      // stored sort key is stale.
+      // stored sort key is stale. A demoted producer keeps its block count: it is paid for those
+      // blocks at the first payepoch after regproducer brings it back into the pay walk.
       rescore_producer( producer );
    }
 
@@ -188,13 +162,13 @@ namespace sysiosystem {
       _global.modify( get_self(), [&]( auto& g ) {
          g.scored_collateral_stamp = stamp;
          g.rescore_cursor          = 0;
-         g.rescore_generation++;
+         g.rescore_pending         = true;
       });
    }
 
    void system_contract::drain_rescore_cursor() {
       const auto& state = _global.get();
-      if( state.rescore_generation == 0 ) return;
+      if( !state.rescore_pending ) return;
 
       // Bounded per tick, mirroring opreg's MAX_WTDW_FLUSH_PER_EPOCH: the producers table is
       // unbounded, so a weight change can never rewrite it inline.
@@ -221,8 +195,8 @@ namespace sysiosystem {
       }
 
       _global.modify( get_self(), [&]( auto& g ) {
-         g.rescore_cursor     = done ? 0 : cursor;
-         g.rescore_generation = done ? 0 : g.rescore_generation;
+         g.rescore_cursor  = done ? 0 : cursor;
+         g.rescore_pending = !done;
       });
    }
 

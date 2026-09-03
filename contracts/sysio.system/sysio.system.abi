@@ -413,6 +413,10 @@
                     "type": "uint32"
                 },
                 {
+                    "name": "standby_bps",
+                    "type": "uint16"
+                },
+                {
                     "name": "epoch_log_retention_count",
                     "type": "uint32"
                 },
@@ -989,18 +993,6 @@
                     "type": "block_signing_authority"
                 },
                 {
-                    "name": "last_block_num",
-                    "type": "uint32"
-                },
-                {
-                    "name": "current_round_blocks",
-                    "type": "uint16"
-                },
-                {
-                    "name": "eligible_rounds",
-                    "type": "uint32"
-                },
-                {
                     "name": "consecutive_missed_rounds",
                     "type": "uint32"
                 },
@@ -1501,10 +1493,6 @@
                     "type": "time_point"
                 },
                 {
-                    "name": "total_unpaid_blocks",
-                    "type": "uint32"
-                },
-                {
                     "name": "last_producer_schedule_size",
                     "type": "uint16"
                 },
@@ -1517,8 +1505,8 @@
                     "type": "uint64"
                 },
                 {
-                    "name": "rescore_generation",
-                    "type": "uint32"
+                    "name": "rescore_pending",
+                    "type": "bool"
                 },
                 {
                     "name": "scored_collateral_stamp",

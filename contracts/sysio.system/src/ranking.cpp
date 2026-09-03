@@ -71,24 +71,7 @@ namespace sysiosystem {
    }
 
    void system_contract::rescore_producer( const name& producer ) {
-      auto key = producer_key_t{producer.value};
-      if( !_producers.contains(key) ) return;
-
-      producer_rank::producer_score_config_t weights_tbl( get_self() );
-      const auto weights = weights_tbl.get_or_default( producer_rank::producer_score_config{} );
-
-      const auto info = _producers.get(key);
-      const auto score = producer_rank::compute(
-         producer,
-         producer_rank::score_inputs{
-            .is_demoted                = info.is_demoted,
-            .consecutive_missed_rounds = info.consecutive_missed_rounds,
-            .snapshot_attestations     = info.snapshot_attestations
-         },
-         weights );
-
-      if( score == info.rank_score ) return;   // no index move needed
-      _producers.modify( same_payer, key, [&]( auto& p ) { p.rank_score = score; });
+      producer_rank::rescore( get_self(), _producers, producer );
    }
 
    void system_contract::onprocessprod( name account, bool, bool ) {
@@ -108,8 +91,8 @@ namespace sysiosystem {
       // unbounded table inline, open a rescore sweep: onblock drains a bounded number of rows per
       // schedule-rebuild tick until the cursor is exhausted.
       _global.modify( get_self(), []( auto& g ) {
-         g.rescore_cursor = 0;
-         g.rescore_generation++;
+         g.rescore_cursor  = 0;
+         g.rescore_pending = true;
       });
    }
 

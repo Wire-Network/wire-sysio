@@ -102,6 +102,9 @@ void credit_snapshot_attestations(name self, const std::vector<name>& voters) {
       auto key = producer_key_t{voter.value};
       if (!producers.contains(key)) continue;
       producers.modify(same_payer, key, [](auto& row) { row.snapshot_attestations++; });
+      // The credit moved the snapshot factor, so the stored sort key is stale until rescored.
+      // Without this the factor would reach the index only on the next unrelated rescore.
+      producer_rank::rescore(self, producers, voter);
    }
 }
 

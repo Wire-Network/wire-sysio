@@ -29,6 +29,8 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include <map>
+
 #include <sysio/testing/tester.hpp>
 #include <sysio/chain/abi_serializer.hpp>
 #include <sysio/opp/opp.hpp>
@@ -137,6 +139,7 @@ struct emit_cfg_result {
    uint16_t  producer_bps;
    uint16_t  batch_op_bps;
    uint32_t  standby_end_rank;
+   uint16_t  standby_bps;
    uint32_t  epoch_log_retention_count;
 };
 FC_REFLECT( emit_cfg_result,
@@ -147,7 +150,7 @@ FC_REFLECT( emit_cfg_result,
    (annual_initial_emission)(annual_max_emission)(annual_min_emission)
    (compute_bps)(capex_bps)(governance_bps)
    (producer_bps)(batch_op_bps)
-   (standby_end_rank)(epoch_log_retention_count) )
+   (standby_end_rank)(standby_bps)(epoch_log_retention_count) )
 
 // T5 test helper: compute expected split
 static int64_t test_split_bps(int64_t total, uint16_t bps) {
@@ -225,6 +228,11 @@ static constexpr uint16_t PRODUCER_BPS           = 7000;
 static constexpr uint32_t T_ACTIVE_PRODUCER_COUNT = 21;
 static constexpr uint32_t T_STANDBY_START_RANK    = 22;
 static constexpr uint32_t T_STANDBY_END_RANK      = 28;
+/// Share of the producer pool reserved for the standby retainer -- 8% keeps the economics where
+/// the weight-based model left them (28 of 343 weight units at full attendance).
+static constexpr uint16_t T_STANDBY_BPS           = 800;
+/// The fixture's default epoch (init_epoch_state) is 60s at one block per 500ms.
+static constexpr uint32_t T_EPOCH_SECS            = 60;
 
 // Helper: amount NOT transferred at payepoch when no producers / batch
 // members are paid. Equals producer_pool + batch_pool (compute share, both
@@ -238,6 +246,37 @@ static int64_t compute_undistributed_if_no_operators(int64_t emission) {
    const int64_t capex = test_split_bps(emission, CAPEX_BPS);
    const int64_t gov   = test_split_bps(emission, GOV_BPS);
    return emission - capex - gov;
+}
+
+// ---------------------------------------------------------------------------
+// Producer pay model (pay per block + a position-decaying standby retainer)
+// ---------------------------------------------------------------------------
+
+/// Block slots a pay period of `epoch_secs` (cadence 1) holds: one per 500ms block interval.
+static uint64_t test_nominal_slots(uint32_t epoch_secs) {
+   return static_cast<uint64_t>(epoch_secs) * 1000 / 500;
+}
+/// The slice of the producer pool spread over the period's slots as the per-block rate.
+static int64_t test_active_pool(int64_t compute) {
+   const int64_t producer_pool = test_split_bps(compute, PRODUCER_BPS);
+   return producer_pool - test_split_bps(producer_pool, T_STANDBY_BPS);
+}
+/// The slice of the producer pool reserved for the standby retainer.
+static int64_t test_standby_pool(int64_t compute) {
+   return test_split_bps(test_split_bps(compute, PRODUCER_BPS), T_STANDBY_BPS);
+}
+/// What `blocks` blocks earn: the active slice over `divisor` slots (the nominal count, raised to
+/// the blocks actually produced when the period ran long), truncated exactly as payepoch does.
+static int64_t test_block_pay(int64_t active_pool, uint64_t blocks, uint64_t divisor) {
+   return static_cast<int64_t>(static_cast<__int128>(active_pool) * blocks / divisor);
+}
+/// A standby POSITION's fixed share of the retainer: weight N at position 22 down to 1 at
+/// T_STANDBY_END_RANK, over the constant sum of every position's weight.
+static int64_t test_standby_pay(int64_t standby_pool, uint32_t position) {
+   const uint64_t positions  = T_STANDBY_END_RANK + 1 - T_STANDBY_START_RANK;
+   const uint64_t weight_sum = positions * (positions + 1) / 2;
+   const uint64_t weight     = T_STANDBY_END_RANK + 1 - position;
+   return static_cast<int64_t>(static_cast<__int128>(standby_pool) * weight / weight_sum);
 }
 
 class sysio_emissions_tester : public tester {
@@ -569,6 +608,7 @@ public:
          ("producer_bps",           PRODUCER_BPS)
          ("batch_op_bps",           uint16_t(3000))
          ("standby_end_rank",       T_STANDBY_END_RANK)
+         ("standby_bps",            T_STANDBY_BPS)
          ("epoch_log_retention_count", uint32_t(8640))
          ("pay_cadence_epochs",     cadence);
    }
@@ -744,6 +784,16 @@ public:
       if (data.empty()) return fc::variant();
       return sysio_abi_ser.binary_to_variant("producer_info", data,
           abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
+   /// Blocks `producer` has made this pay period -- the row's `unpaid_blocks`, the one pay input.
+   /// Read after the last block-closing call (`produce_blocks`, and every `push_system_action`
+   /// such as `initt5`) and before the advance is pushed: the pending block's onblock has already
+   /// counted, and the advance lands in that same pending block.
+   uint32_t unpaid_blocks_of( account_name producer ) {
+      auto info = get_producer_info(producer);
+      BOOST_REQUIRE_MESSAGE(!info.is_null(), "no producers row for " << producer.to_string());
+      return info["unpaid_blocks"].as<uint32_t>();
    }
 
    // -----------------------------
@@ -2063,7 +2113,7 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_requires_sysio_auth, sysio_emissions_tester 
       ("annual_initial_emission", int64_t(1)) ("annual_max_emission", int64_t(1)) ("annual_min_emission", int64_t(0))
       ("compute_bps", uint16_t(10000)) ("capex_bps", uint16_t(0)) ("governance_bps", uint16_t(0))
       ("producer_bps", uint16_t(5000)) ("batch_op_bps", uint16_t(5000))
-      ("standby_end_rank", uint32_t(28))
+      ("standby_end_rank", uint32_t(28))("standby_bps", T_STANDBY_BPS)
       ("epoch_log_retention_count", uint32_t(8640))("pay_cadence_epochs", uint16_t(1));
 
    auto r = setemitcfg("alice"_n, cfg);
@@ -2083,7 +2133,7 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_rejects_bad_category_bps, sysio_emissions_te
       ("annual_initial_emission", int64_t(1)) ("annual_max_emission", int64_t(1)) ("annual_min_emission", int64_t(0))
       ("compute_bps", uint16_t(5000)) ("capex_bps", uint16_t(4000)) ("governance_bps", uint16_t(2000))
       ("producer_bps", uint16_t(5000)) ("batch_op_bps", uint16_t(5000))
-      ("standby_end_rank", uint32_t(28))
+      ("standby_end_rank", uint32_t(28))("standby_bps", T_STANDBY_BPS)
       ("epoch_log_retention_count", uint32_t(8640))("pay_cadence_epochs", uint16_t(1));
 
    auto r = setemitcfg(config::system_account_name, cfg);
@@ -2101,7 +2151,7 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_rejects_bad_compute_subsplit, sysio_emission
       ("annual_initial_emission", int64_t(1)) ("annual_max_emission", int64_t(1)) ("annual_min_emission", int64_t(0))
       ("compute_bps", uint16_t(4000)) ("capex_bps", uint16_t(2000)) ("governance_bps", uint16_t(1000))
       ("producer_bps", uint16_t(6000)) ("batch_op_bps", uint16_t(3000))
-      ("standby_end_rank", uint32_t(28))
+      ("standby_end_rank", uint32_t(28))("standby_bps", T_STANDBY_BPS)
       ("epoch_log_retention_count", uint32_t(8640))("pay_cadence_epochs", uint16_t(1));
 
    auto r = setemitcfg(config::system_account_name, cfg);
@@ -2119,7 +2169,7 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_rejects_zero_duration, sysio_emissions_teste
       ("annual_initial_emission", int64_t(1)) ("annual_max_emission", int64_t(1)) ("annual_min_emission", int64_t(0))
       ("compute_bps", uint16_t(4000)) ("capex_bps", uint16_t(2000)) ("governance_bps", uint16_t(1000))
       ("producer_bps", uint16_t(7000)) ("batch_op_bps", uint16_t(3000))
-      ("standby_end_rank", uint32_t(28))
+      ("standby_end_rank", uint32_t(28))("standby_bps", T_STANDBY_BPS)
       ("epoch_log_retention_count", uint32_t(8640))("pay_cadence_epochs", uint16_t(1));
 
    auto r = setemitcfg(config::system_account_name, cfg);
@@ -2139,7 +2189,7 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_rejects_invalid_decay_target, sysio_emission
          ("annual_initial_emission", int64_t(1)) ("annual_max_emission", int64_t(1)) ("annual_min_emission", int64_t(0))
          ("compute_bps", uint16_t(4000)) ("capex_bps", uint16_t(2000)) ("governance_bps", uint16_t(1000))
          ("producer_bps", uint16_t(7000)) ("batch_op_bps", uint16_t(3000))
-         ("standby_end_rank", uint32_t(28))
+         ("standby_end_rank", uint32_t(28))("standby_bps", T_STANDBY_BPS)
          ("epoch_log_retention_count", uint32_t(8640))("pay_cadence_epochs", uint16_t(1));
    };
 
@@ -2173,7 +2223,7 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_rejects_round_to_zero_per_epoch, sysio_emiss
          ("compute_bps", COMPUTE_BPS)
          ("capex_bps", CAPEX_BPS) ("governance_bps", uint16_t(1000))
          ("producer_bps", PRODUCER_BPS) ("batch_op_bps", uint16_t(3000))
-         ("standby_end_rank", T_STANDBY_END_RANK)
+         ("standby_end_rank", T_STANDBY_END_RANK)("standby_bps", T_STANDBY_BPS)
          ("epoch_log_retention_count", uint32_t(8640))("pay_cadence_epochs", uint16_t(1));
    };
 
@@ -2203,7 +2253,7 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_rejects_bad_standby_rank, sysio_emissions_te
       ("annual_initial_emission", int64_t(1)) ("annual_max_emission", int64_t(1)) ("annual_min_emission", int64_t(0))
       ("compute_bps", uint16_t(4000)) ("capex_bps", uint16_t(2000)) ("governance_bps", uint16_t(1000))
       ("producer_bps", uint16_t(7000)) ("batch_op_bps", uint16_t(3000))
-      ("standby_end_rank", uint32_t(21))
+      ("standby_end_rank", uint32_t(21))("standby_bps", T_STANDBY_BPS)
       ("epoch_log_retention_count", uint32_t(8640))("pay_cadence_epochs", uint16_t(1));
 
    auto r = setemitcfg(config::system_account_name, cfg);
@@ -2222,12 +2272,20 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_rejects_standby_rank_over_cap, sysio_emissio
       ("annual_initial_emission", int64_t(1)) ("annual_max_emission", int64_t(1)) ("annual_min_emission", int64_t(0))
       ("compute_bps", uint16_t(4000)) ("capex_bps", uint16_t(2000)) ("governance_bps", uint16_t(1000))
       ("producer_bps", uint16_t(7000)) ("batch_op_bps", uint16_t(3000))
-      ("standby_end_rank", uint32_t(101))
+      ("standby_end_rank", uint32_t(101))("standby_bps", T_STANDBY_BPS)
       ("epoch_log_retention_count", uint32_t(8640))("pay_cadence_epochs", uint16_t(1));
 
    auto r = setemitcfg(config::system_account_name, cfg);
    BOOST_REQUIRE( r != success() );
    require_substr( r, "standby_end_rank exceeds safety cap" );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( setemitcfg_rejects_standby_bps_over_full, sysio_emissions_tester ) try {
+   // The retainer is a slice of the producer pool; more than the whole pool is a typo.
+   auto cfg = mvo(default_emit_cfg(uint16_t(1)))("standby_bps", uint16_t(10001));
+   auto r = setemitcfg(config::system_account_name, cfg);
+   BOOST_REQUIRE( r != success() );
+   require_substr( r, "standby_bps must be <= 10000" );
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( setinittime_rejects_epoch_zero, sysio_emissions_tester ) try {
@@ -2259,7 +2317,7 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_reconfigurable, sysio_emissions_tester ) try
       ("governance_bps", uint16_t(1000))
       ("producer_bps", uint16_t(7000))
       ("batch_op_bps", uint16_t(3000))
-      ("standby_end_rank", uint32_t(28))
+      ("standby_end_rank", uint32_t(28))("standby_bps", T_STANDBY_BPS)
       ("epoch_log_retention_count", uint32_t(8640))("pay_cadence_epochs", uint16_t(1));
 
    BOOST_REQUIRE_EQUAL( success(), setemitcfg(config::system_account_name, cfg) );
@@ -2298,6 +2356,7 @@ BOOST_FIXTURE_TEST_CASE( viewemitcfg_returns_current_config, sysio_emissions_tes
    BOOST_REQUIRE_EQUAL( cfg.producer_bps, PRODUCER_BPS );
    BOOST_REQUIRE_EQUAL( cfg.batch_op_bps, uint16_t(3000) );
    BOOST_REQUIRE_EQUAL( cfg.standby_end_rank, T_STANDBY_END_RANK );
+   BOOST_REQUIRE_EQUAL( cfg.standby_bps, T_STANDBY_BPS );
 } FC_LOG_AND_RETHROW()
 
 /// The view actions exist to be called through clio --read / send_read_only_transaction, so they
@@ -2434,7 +2493,7 @@ BOOST_FIXTURE_TEST_CASE( viewemitcfg_reflects_update, sysio_emissions_tester ) t
       ("governance_bps", uint16_t(2500))
       ("producer_bps", uint16_t(5000))
       ("batch_op_bps", uint16_t(5000))
-      ("standby_end_rank", uint32_t(30))
+      ("standby_end_rank", uint32_t(30))("standby_bps", uint16_t(1234))
       ("epoch_log_retention_count", uint32_t(2880))("pay_cadence_epochs", uint16_t(1));
 
    BOOST_REQUIRE_EQUAL( success(), setemitcfg(config::system_account_name, cfg) );
@@ -2448,6 +2507,7 @@ BOOST_FIXTURE_TEST_CASE( viewemitcfg_reflects_update, sysio_emissions_tester ) t
    BOOST_REQUIRE_EQUAL( result.compute_bps, uint16_t(2500) );
    BOOST_REQUIRE_EQUAL( result.producer_bps, uint16_t(5000) );
    BOOST_REQUIRE_EQUAL( result.standby_end_rank, uint32_t(30) );
+   BOOST_REQUIRE_EQUAL( result.standby_bps, uint16_t(1234) );
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_SUITE_END() // sysio_emissions_tests
@@ -2576,7 +2636,7 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_post_initt5_rejects_brick_reduce, sysio_emis
       ("compute_bps", COMPUTE_BPS)
       ("capex_bps", CAPEX_BPS) ("governance_bps", uint16_t(1000))
       ("producer_bps", PRODUCER_BPS) ("batch_op_bps", uint16_t(3000))
-      ("standby_end_rank", T_STANDBY_END_RANK)
+      ("standby_end_rank", T_STANDBY_END_RANK)("standby_bps", T_STANDBY_BPS)
       ("epoch_log_retention_count", uint32_t(8640))("pay_cadence_epochs", uint16_t(1));
 
    auto r = setemitcfg(config::system_account_name, cfg);
@@ -2619,7 +2679,7 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_post_initt5_rejects_unreachable_min_emission
       ("compute_bps", COMPUTE_BPS)
       ("capex_bps", CAPEX_BPS) ("governance_bps", uint16_t(1000))
       ("producer_bps", PRODUCER_BPS) ("batch_op_bps", uint16_t(3000))
-      ("standby_end_rank", T_STANDBY_END_RANK)
+      ("standby_end_rank", T_STANDBY_END_RANK)("standby_bps", T_STANDBY_BPS)
       ("epoch_log_retention_count", uint32_t(8640))("pay_cadence_epochs", uint16_t(1));
 
    auto r = setemitcfg(config::system_account_name, cfg);
@@ -2716,7 +2776,7 @@ BOOST_FIXTURE_TEST_CASE( gate_block_reason_change_updates_row, sysio_emissions_t
       ("compute_bps",            COMPUTE_BPS)
       ("capex_bps",              CAPEX_BPS)   ("governance_bps", uint16_t(1000))
       ("producer_bps",           PRODUCER_BPS)("batch_op_bps", uint16_t(3000))
-      ("standby_end_rank",       T_STANDBY_END_RANK)
+      ("standby_end_rank",       T_STANDBY_END_RANK)("standby_bps", T_STANDBY_BPS)
       ("epoch_log_retention_count", uint32_t(8640))("pay_cadence_epochs", uint16_t(1));
    BOOST_REQUIRE_EQUAL( success(), setemitcfg(config::system_account_name, cfg) );
    BOOST_REQUIRE_EQUAL( success(), initt5(config::system_account_name, tpsec(head_secs())) );
@@ -2936,31 +2996,52 @@ BOOST_FIXTURE_TEST_CASE( no_producers_undistributed_stays_in_sysio, sysio_emissi
    BOOST_REQUIRE_EQUAL( sysio_decrease, emission - undist );
 } FC_LOG_AND_RETHROW()
 
-BOOST_FIXTURE_TEST_CASE( active_producers_get_equal_share, sysio_emissions_tester ) try {
+// Pay is per block: every producer is credited the period's per-block rate times the blocks it
+// made, and the slots nobody filled are paid to nobody -- they stay in the treasury rather than
+// flowing to the producers that did show up.
+BOOST_FIXTURE_TEST_CASE( active_producers_are_paid_per_block, sysio_emissions_tester ) try {
    create_t5_holding_accounts();
    setup_producers(3);
 
    // Wait for schedule to activate, then produce complete cycles
    wait_for_producer_schedule();
-   produce_complete_cycles(3, 2); // 2 cycles sufficient for eligible_rounds
+   produce_complete_cycles(3, 2);
 
    const uint32_t start = head_secs() - ONE_EPOCH - 1;
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
 
-   asset bal_a_before = get_wire_balance_paid("producera"_n);
-   asset bal_b_before = get_wire_balance_paid("producerb"_n);
-   asset bal_c_before = get_wire_balance_paid("producerc"_n);
+   const std::vector<name> producers{ "producera"_n, "producerb"_n, "producerc"_n };
+   std::map<name, uint32_t> blocks;
+   std::map<name, asset>    before;
+   uint64_t produced = 0;
+   for (const auto& p : producers) {
+      blocks.emplace(p, unpaid_blocks_of(p));
+      before.emplace(p, get_wire_balance_paid(p));
+      produced += blocks.at(p);
+   }
+   BOOST_REQUIRE_GT( produced, 0u );
+   // Two rotations of three producers fill far fewer than the period's slots, so the divisor is
+   // the nominal count and the unfilled slots are the treasury's.
+   const uint64_t slots = test_nominal_slots(T_EPOCH_SECS);
+   BOOST_REQUIRE_LT( produced, slots );
 
+   const int64_t t5_before = get_t5_state()["total_distributed"].as<int64_t>();
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
-   int64_t got_a = get_wire_balance_paid("producera"_n).get_amount() - bal_a_before.get_amount();
-   int64_t got_b = get_wire_balance_paid("producerb"_n).get_amount() - bal_b_before.get_amount();
-   int64_t got_c = get_wire_balance_paid("producerc"_n).get_amount() - bal_c_before.get_amount();
-
-   // All producers should receive equal payment (same eligible_rounds)
-   BOOST_REQUIRE_EQUAL( got_a, got_b );
-   BOOST_REQUIRE_EQUAL( got_b, got_c );
-   BOOST_REQUIRE( got_a > 0 );
+   auto log = get_epoch_log(1);
+   const int64_t compute     = log["compute_amount"].as<int64_t>();
+   const int64_t active_pool = test_active_pool(compute);
+   int64_t paid = 0;
+   for (const auto& p : producers) {
+      const int64_t got = get_wire_balance_paid(p).get_amount() - before.at(p).get_amount();
+      BOOST_REQUIRE_EQUAL( got, test_block_pay(active_pool, blocks.at(p), slots) );
+      BOOST_REQUIRE_GT( got, 0 );
+      paid += got;
+   }
+   // The unfilled slots' pay was distributed to no one.
+   BOOST_REQUIRE_LT( paid, active_pool );
+   BOOST_REQUIRE_EQUAL( get_t5_state()["total_distributed"].as<int64_t>() - t5_before,
+                        paid + log["capex_amount"].as<int64_t>() + log["governance_amount"].as<int64_t>() );
 } FC_LOG_AND_RETHROW()
 
 // A producer cannot halt epoch pay for everyone by refusing its own payout.
@@ -3001,8 +3082,8 @@ BOOST_FIXTURE_TEST_CASE( blocking_producer_cannot_stall_payepoch, sysio_emission
    const int64_t owed_b = pay_claimable("producerb"_n);
    const int64_t owed_c = pay_claimable("producerc"_n);
    BOOST_REQUIRE( owed_a > 0 );
-   BOOST_REQUIRE_EQUAL( owed_a, owed_b );   // equal eligible_rounds -> equal share
-   BOOST_REQUIRE_EQUAL( owed_b, owed_c );
+   BOOST_REQUIRE( owed_b > 0 );   // the blocker is credited for its blocks like anyone else
+   BOOST_REQUIRE( owed_c > 0 );
 
    // The cooperative producers pull their pay normally.
    BOOST_REQUIRE_EQUAL( success(),
@@ -3125,10 +3206,10 @@ BOOST_FIXTURE_TEST_CASE( viewepoch_estimates_next_emission, sysio_emissions_test
 // ---------------------------------------------------------------------------
 
 BOOST_FIXTURE_TEST_CASE( non_producing_active_excluded, sysio_emissions_tester ) try {
-   // Producers with rank 1-21 but 0 eligible_rounds get no pay
+   // Producers holding active positions but with 0 blocks made are paid nothing
    create_t5_holding_accounts();
    setup_producers(3);
-   // Do NOT produce extra blocks — schedule hasn't activated, so producers have 0 eligible_rounds
+   // Do NOT produce extra blocks — schedule hasn't activated, so no producer has made a block
 
    const uint32_t start = head_secs() - ONE_EPOCH - 1;
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
@@ -3139,34 +3220,29 @@ BOOST_FIXTURE_TEST_CASE( non_producing_active_excluded, sysio_emissions_tester )
 
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
-   // Producers should receive nothing (0 eligible_rounds → excluded)
+   // Producers should receive nothing (0 blocks → nothing to pay for)
    BOOST_REQUIRE_EQUAL( get_wire_balance_paid("producera"_n), bal_a_before );
    BOOST_REQUIRE_EQUAL( get_wire_balance_paid("producerb"_n), bal_b_before );
    BOOST_REQUIRE_EQUAL( get_wire_balance_paid("producerc"_n), bal_c_before );
 } FC_LOG_AND_RETHROW()
 
-BOOST_FIXTURE_TEST_CASE( partial_uptime_proportional_pay, sysio_emissions_tester ) try {
-   // Producers with eligible_rounds < expected_rounds get proportional share.
-   // Override epoch_duration_sec so expected_rounds (=epoch_secs*2/252) is
-   // well above the eligible_rounds the test produces (~2 from 2 cycles), so
-   // the proportional path is exercised rather than the elig>=expected cap.
-   BOOST_REQUIRE_EQUAL( success(), init_epoch_state(7200) );
+BOOST_FIXTURE_TEST_CASE( partial_uptime_pays_the_per_block_rate, sysio_emissions_tester ) try {
+   // A producer that made a fraction of its period's slots is paid exactly that fraction. A long
+   // epoch makes the slot count dwarf the blocks the test produces (~24 of 14400), so the rate is
+   // small and the pay is far below an even third of the pool.
+   constexpr uint32_t EPOCH_SECS = 7200;
+   BOOST_REQUIRE_EQUAL( success(), init_epoch_state(EPOCH_SECS) );
    create_t5_holding_accounts();
    setup_producers(3);
 
-   // Produce blocks so producers accumulate eligible_rounds
    wait_for_producer_schedule();
-   produce_complete_cycles(3, 2); // 2 cycles sufficient
-
-   // Read eligible_rounds for producera before advance
-   auto pa_info = get_producer_info("producera"_n);
-   BOOST_REQUIRE( !pa_info.is_null() );
-   uint16_t elig_a = pa_info["eligible_rounds"].as<uint16_t>();
-   BOOST_REQUIRE( elig_a > 0 );
+   produce_complete_cycles(3, 2);
 
    const uint32_t start = head_secs() - ONE_EPOCH - 1;
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
 
+   const uint32_t blocks_a = unpaid_blocks_of("producera"_n);
+   BOOST_REQUIRE_GT( blocks_a, 0u );
    asset bal_a_before = get_wire_balance_paid("producera"_n);
 
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
@@ -3174,13 +3250,11 @@ BOOST_FIXTURE_TEST_CASE( partial_uptime_proportional_pay, sysio_emissions_tester
    int64_t got_a = get_wire_balance_paid("producera"_n).get_amount() - bal_a_before.get_amount();
    BOOST_REQUIRE( got_a > 0 );
 
-   // Verify proportional: got_a < full_share (since elig < expected)
    auto log = get_epoch_log(1);
-   int64_t compute = log["compute_amount"].as<int64_t>();
-   int64_t producer_pool = test_split_bps(compute, PRODUCER_BPS);
-   // Full share for one of 3 equal-weight producers
-   int64_t full_share = producer_pool / 3;
-   BOOST_REQUIRE( got_a < full_share );
+   const int64_t compute = log["compute_amount"].as<int64_t>();
+   BOOST_REQUIRE_EQUAL( got_a, test_block_pay(test_active_pool(compute), blocks_a,
+                                              test_nominal_slots(EPOCH_SECS)) );
+   BOOST_REQUIRE_LT( got_a, test_split_bps(compute, PRODUCER_BPS) / 3 );
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( standby_paid_without_block_check, sysio_emissions_tester ) try {
@@ -3190,13 +3264,14 @@ BOOST_FIXTURE_TEST_CASE( standby_paid_without_block_check, sysio_emissions_teste
    // Set up 24 producers: 21 active + 3 standby (ranks 22-24)
    setup_producers(24);
    wait_for_producer_schedule();
-   produce_complete_cycles(21, 1); // 1 cycle sufficient for eligible_rounds
+   produce_complete_cycles(21, 1);
 
    const uint32_t start = head_secs() - ONE_EPOCH - 1;
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
 
    // Standby producer (rank 22) is "producerw" (index 22)
    name standby_name = producer_name_at(21); // index 21 = 'v', rank 22
+   BOOST_REQUIRE_EQUAL( 0u, unpaid_blocks_of(standby_name) );
    asset standby_before = get_wire_balance_paid(standby_name);
 
    // Verify the standby producer has rank 22
@@ -3207,44 +3282,39 @@ BOOST_FIXTURE_TEST_CASE( standby_paid_without_block_check, sysio_emissions_teste
 
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
-   // Standby should receive payment even with 0 blocks produced
+   // Standby should receive payment even with 0 blocks produced -- its POSITION's fixed share of
+   // the retainer slice, not the whole slice: the vacant positions' shares stay in the treasury.
    int64_t standby_got = get_wire_balance_paid(standby_name).get_amount() - standby_before.get_amount();
    BOOST_REQUIRE( standby_got > 0 );
+   const int64_t standby_pool = test_standby_pool(get_epoch_log(1)["compute_amount"].as<int64_t>());
+   BOOST_REQUIRE_EQUAL( standby_got, test_standby_pay(standby_pool, standby_rank) );
+   BOOST_REQUIRE_LT( standby_got, standby_pool );
 } FC_LOG_AND_RETHROW()
 
-BOOST_FIXTURE_TEST_CASE( round_tracking_reset_after_epoch, sysio_emissions_tester ) try {
-   // After advance, all round-tracking fields should be reset
+BOOST_FIXTURE_TEST_CASE( block_count_reset_after_pay, sysio_emissions_tester ) try {
+   // After the pay-epoch every paid producer's block count starts over
    create_t5_holding_accounts();
    setup_producers(3);
    wait_for_producer_schedule();
    produce_complete_cycles(3, 2);
 
-   // Verify fields are non-zero before advance
-   auto pa_before = get_producer_info("producera"_n);
-   BOOST_REQUIRE( pa_before["eligible_rounds"].as<uint16_t>() > 0 );
-   BOOST_REQUIRE( pa_before["unpaid_blocks"].as<uint32_t>() > 0 );
+   BOOST_REQUIRE_GT( unpaid_blocks_of("producera"_n), 0u );
 
    const uint32_t start = head_secs() - ONE_EPOCH - 1;
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+   produce_blocks(1);
 
-   // After advance, fields are reset; however, the block that commits the
-   // advance transaction is itself produced by one of the test producers,
-   // so onblock runs once after the reset and that producer's per-block tracking
-   // (current_round_blocks + unpaid_blocks + last_block_num) gets re-bumped by 1.
-   // eligible_rounds should still be 0 because a single block cannot satisfy
-   // the per-round threshold.
-   auto pa_after = get_producer_info("producera"_n);
-   BOOST_REQUIRE_EQUAL( pa_after["eligible_rounds"].as<uint16_t>(), 0u );
-   BOOST_REQUIRE( pa_after["current_round_blocks"].as<uint16_t>() <= 1 );
-   BOOST_REQUIRE( pa_after["unpaid_blocks"].as<uint32_t>() <= 1 );
+   // The count is reset by payepoch; the block that followed it is produced by one of the test
+   // producers, so onblock may have counted one block for producera again.
+   BOOST_REQUIRE_LE( unpaid_blocks_of("producera"_n), 1u );
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( total_distributed_excludes_undistributed, sysio_emissions_tester ) try {
    // When some producers are excluded, total_distributed < emission
    create_t5_holding_accounts();
    setup_producers(3);
-   // Producers have 0 eligible_rounds - all excluded - producer_pool undistributed.
+   // No producer has made a block - nothing to pay - producer_pool undistributed.
    // Batch-op pool is also undistributed (no members in the rotation group).
 
    const uint32_t start = head_secs() - ONE_EPOCH - 1;
@@ -3261,45 +3331,42 @@ BOOST_FIXTURE_TEST_CASE( total_distributed_excludes_undistributed, sysio_emissio
    BOOST_REQUIRE( distributed < emission );
 } FC_LOG_AND_RETHROW()
 
-BOOST_FIXTURE_TEST_CASE( inprogress_round_finalized, sysio_emissions_tester ) try {
-   // A producer with current_round_blocks >= 6 (but < 12) gets credit at epoch end
+// There is no round threshold: a producer that made a handful of blocks in a round it did not
+// complete is paid for exactly those blocks. (A fork switch or a rough handoff costs a producer
+// the blocks it lost, and nothing more.)
+BOOST_FIXTURE_TEST_CASE( every_block_is_paid_without_a_round_threshold, sysio_emissions_tester ) try {
    create_t5_holding_accounts();
    setup_producers(3);
    wait_for_producer_schedule();
 
-   // Produce complete cycles so producers have some eligible_rounds
-   produce_complete_cycles(3, 1);
-
-   // Now produce blocks one-at-a-time until producera has a partial round with >= 6 blocks
-   for (int i = 0; i < 200; ++i) {
-      produce_blocks(1);
-      auto info = get_producer_info("producera"_n);
-      uint16_t cur = info["current_round_blocks"].as<uint16_t>();
-      if (cur >= 6 && cur < 12) break;
-   }
-
-   // Check producera has in-progress round
-   auto pa_info = get_producer_info("producera"_n);
-   BOOST_REQUIRE( !pa_info.is_null() );
-   uint16_t current_blocks = pa_info["current_round_blocks"].as<uint16_t>();
-   uint16_t elig_before = pa_info["eligible_rounds"].as<uint16_t>();
-
-   // producera should have in-progress blocks >= 6 and accumulated eligible rounds
-   BOOST_REQUIRE( current_blocks >= 6 );
-   BOOST_REQUIRE( current_blocks < 12 );
-   BOOST_REQUIRE( elig_before >= 0 );
+   // A few blocks past activation: whoever holds the current window has made fewer than half a
+   // round, and no producer has completed one.
+   produce_blocks(2);
 
    const uint32_t start = head_secs() - ONE_EPOCH - 1;
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
 
-   asset bal_a_before = get_wire_balance_paid("producera"_n);
+   // Read AFTER initt5 -- push_system_action closes a block, and its producer is credited for it.
+   const std::vector<name> producers{ "producera"_n, "producerb"_n, "producerc"_n };
+   std::map<name, uint32_t> blocks;
+   std::map<name, asset>    before;
+   uint32_t partial_producers = 0;
+   for (const auto& p : producers) {
+      blocks.emplace(p, unpaid_blocks_of(p));
+      before.emplace(p, get_wire_balance_paid(p));
+      BOOST_REQUIRE_LT( blocks.at(p), 6u );
+      if (blocks.at(p) > 0) ++partial_producers;
+   }
+   BOOST_REQUIRE_GT( partial_producers, 0u );
+
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
-   int64_t got_a = get_wire_balance_paid("producera"_n).get_amount() - bal_a_before.get_amount();
-
-   // payepoch finalizes in-progress round (>= 6 blocks) -> adds 1 to eligible_rounds
-   // Pay should be based on (elig_before + 1) rounds > 0
-   BOOST_REQUIRE( got_a > 0 );
+   const int64_t active_pool = test_active_pool(get_epoch_log(1)["compute_amount"].as<int64_t>());
+   for (const auto& p : producers) {
+      const int64_t got = get_wire_balance_paid(p).get_amount() - before.at(p).get_amount();
+      BOOST_REQUIRE_EQUAL( got, test_block_pay(active_pool, blocks.at(p), test_nominal_slots(T_EPOCH_SECS)) );
+      if (blocks.at(p) > 0) BOOST_REQUIRE_GT( got, 0 );
+   }
 } FC_LOG_AND_RETHROW()
 
 // ---------------------------------------------------------------------------
@@ -3308,7 +3375,7 @@ BOOST_FIXTURE_TEST_CASE( inprogress_round_finalized, sysio_emissions_tester ) tr
 
 BOOST_FIXTURE_TEST_CASE( producer_promoted_mid_epoch, sysio_emissions_tester ) try {
    // Producer starts as standby, gets promoted to active mid-epoch
-   // Should receive proportional active pay based on eligible_rounds after promotion
+   // Should be paid for the blocks it made after promotion
    create_t5_holding_accounts();
 
    // Start with 22 producers: 21 active + 1 standby
@@ -3357,14 +3424,14 @@ BOOST_FIXTURE_TEST_CASE( producer_promoted_mid_epoch, sysio_emissions_tester ) t
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( producer_unregistered_mid_epoch, sysio_emissions_tester ) try {
-   // Producer starts as active and accumulates eligible_rounds, then unregisters mid-epoch.
+   // Producer starts as active and makes blocks, then unregisters mid-epoch.
    // It holds no rank position at epoch end, so it draws neither active nor standby pay.
    create_t5_holding_accounts();
 
    // Start with 22 producers: 21 active + 1 standby
    setup_producers(22);
    wait_for_producer_schedule();
-   produce_complete_cycles(21, 1); // producera accumulates eligible_rounds
+   produce_complete_cycles(21, 1); // producera makes blocks
 
    // Take producera out of the schedulable set. Rank is POSITION in the score-ordered index, so
    // governance cannot demote a producer by republishing a schedule -- `setprodkeys` proposes and
@@ -3388,8 +3455,9 @@ BOOST_FIXTURE_TEST_CASE( producer_unregistered_mid_epoch, sysio_emissions_tester
    asset demoted_before = get_wire_balance_paid("producera"_n);
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
-   // No position means no pay -- neither the active share nor the standby weight. The
-   // eligible_rounds it accumulated before unregistering do not survive losing its slot.
+   // No position means no pay at THIS payout -- neither block pay nor the standby retainer. The
+   // blocks it made before parking stay on the row and are paid at the first payout after it
+   // re-registers (see the park_and_return tests).
    BOOST_REQUIRE_EQUAL( get_wire_balance_paid("producera"_n), demoted_before );
 } FC_LOG_AND_RETHROW()
 
@@ -3439,6 +3507,88 @@ BOOST_FIXTURE_TEST_CASE( producer_replaced_mid_epoch, sysio_emissions_tester ) t
    // Total distributed should be less than full emission (both had partial epochs)
    auto state = get_t5_state();
    BOOST_REQUIRE( state["total_distributed"].as<int64_t>() < emission );
+} FC_LOG_AND_RETHROW()
+
+// Every block a producer makes is paid, at the first payout where it is back in the pay walk.
+// A park (`unregprod`) does not cost the blocks made before it: re-register before the payout and
+// they are paid at that payout like anyone else's.
+BOOST_FIXTURE_TEST_CASE( park_and_return_before_the_payout_keeps_the_blocks, sysio_emissions_tester ) try {
+   create_t5_holding_accounts();
+   setup_producers(3);
+   wait_for_producer_schedule();
+   produce_complete_cycles(3, 2);
+
+   const uint32_t made_before_park = unpaid_blocks_of("producera"_n);
+   BOOST_REQUIRE_GT( made_before_park, 0u );
+
+   // Park, fix "the issue", come back -- all before the payout.
+   BOOST_REQUIRE_EQUAL( success(), push_system_action("producera"_n, "unregprod"_n,
+      mvo()("producer", "producera"_n)) );
+   BOOST_REQUIRE_GE( unpaid_blocks_of("producera"_n), made_before_park );   // the park kept them
+   BOOST_REQUIRE_EQUAL( success(), push_system_action("producera"_n, "regproducer"_n, mvo()
+      ("producer", "producera"_n)
+      ("producer_key", get_public_key("producera"_n, "active"))
+      ("url", "")("location", 0)) );
+
+   const uint32_t start = head_secs() - ONE_EPOCH - 1;
+   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
+
+   const uint32_t blocks_a = unpaid_blocks_of("producera"_n);
+   BOOST_REQUIRE_GE( blocks_a, made_before_park );
+   asset bal_a_before = get_wire_balance_paid("producera"_n);
+
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+
+   const int64_t got_a = get_wire_balance_paid("producera"_n).get_amount() - bal_a_before.get_amount();
+   const int64_t active_pool = test_active_pool(get_epoch_log(1)["compute_amount"].as<int64_t>());
+   BOOST_REQUIRE_EQUAL( got_a, test_block_pay(active_pool, blocks_a, test_nominal_slots(T_EPOCH_SECS)) );
+   BOOST_REQUIRE_GT( got_a, 0 );
+} FC_LOG_AND_RETHROW()
+
+// A park that spans a payout defers the blocks rather than losing them: nothing at that payout
+// (the row sits below the walk), and the carried count is paid at the first payout after the
+// return -- at that period's rate, and counted in that period's divisor.
+BOOST_FIXTURE_TEST_CASE( park_across_a_payout_defers_the_blocks_to_the_return, sysio_emissions_tester ) try {
+   create_t5_holding_accounts();
+   setup_producers(3);
+   wait_for_producer_schedule();
+   produce_complete_cycles(3, 2);
+
+   const uint32_t start = head_secs() - ONE_EPOCH - 1;
+   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
+
+   BOOST_REQUIRE_EQUAL( success(), push_system_action("producera"_n, "unregprod"_n,
+      mvo()("producer", "producera"_n)) );
+   const uint32_t carried = unpaid_blocks_of("producera"_n);
+   BOOST_REQUIRE_GT( carried, 0u );
+
+   // Payout 1: parked, so nothing -- and the count is untouched.
+   asset bal_a_before = get_wire_balance_paid("producera"_n);
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+   BOOST_REQUIRE_EQUAL( get_wire_balance_paid("producera"_n), bal_a_before );
+   BOOST_REQUIRE_EQUAL( carried, unpaid_blocks_of("producera"_n) );
+
+   // Return, then run out the next period.
+   BOOST_REQUIRE_EQUAL( success(), push_system_action("producera"_n, "regproducer"_n, mvo()
+      ("producer", "producera"_n)
+      ("producer_key", get_public_key("producera"_n, "active"))
+      ("url", "")("location", 0)) );
+   produce_blocks(130);
+
+   const std::vector<name> producers{ "producera"_n, "producerb"_n, "producerc"_n };
+   uint64_t produced = 0;
+   for (const auto& p : producers) produced += unpaid_blocks_of(p);
+   const uint32_t blocks_a = unpaid_blocks_of("producera"_n);
+   BOOST_REQUIRE_GE( blocks_a, carried );
+   bal_a_before = get_wire_balance_paid("producera"_n);
+
+   // Payout 2: the carried blocks are paid with this period's, at this period's rate.
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+   const int64_t got_a = get_wire_balance_paid("producera"_n).get_amount() - bal_a_before.get_amount();
+   const int64_t active_pool = test_active_pool(get_epoch_log(2)["compute_amount"].as<int64_t>());
+   const uint64_t divisor = std::max<uint64_t>(produced, test_nominal_slots(T_EPOCH_SECS));
+   BOOST_REQUIRE_EQUAL( got_a, test_block_pay(active_pool, blocks_a, divisor) );
+   BOOST_REQUIRE_GT( got_a, 0 );
 } FC_LOG_AND_RETHROW()
 
 // ---------------------------------------------------------------------------
@@ -3581,17 +3731,17 @@ BOOST_FIXTURE_TEST_CASE( epoch_log_records_all_fields, sysio_emissions_tester ) 
 // ---------------------------------------------------------------------------
 
 BOOST_FIXTURE_TEST_CASE( all_actives_excluded_standbys_still_paid, sysio_emissions_tester ) try {
-   // When all 21 active producers have 0 eligible_rounds, only standbys receive payment.
+   // When no active producer has made a block, only standbys receive payment.
    create_t5_holding_accounts();
 
    // Set up 24 producers: 21 active + 3 standby
-   // Do NOT wait for schedule or produce blocks — actives have 0 eligible_rounds
+   // Do NOT wait for schedule or produce blocks — no active has made a block
    setup_producers(24);
 
    const uint32_t start = head_secs() - ONE_EPOCH - 1;
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
 
-   // Active producer should have 0 eligible_rounds
+   // Active producer has made no block
    name active = producer_name_at(0);
    name standby = producer_name_at(21);
 
@@ -3600,7 +3750,7 @@ BOOST_FIXTURE_TEST_CASE( all_actives_excluded_standbys_still_paid, sysio_emissio
 
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
-   // Active should get nothing (0 eligible_rounds)
+   // Active should get nothing (0 blocks)
    BOOST_REQUIRE_EQUAL( get_wire_balance_paid(active), active_before );
 
    // Standby should get paid (no block production check for standbys)
@@ -3612,8 +3762,9 @@ BOOST_FIXTURE_TEST_CASE( all_actives_excluded_standbys_still_paid, sysio_emissio
    }
 } FC_LOG_AND_RETHROW()
 
-BOOST_FIXTURE_TEST_CASE( single_active_producer_full_active_share, sysio_emissions_tester ) try {
-   // A single active producer who produces blocks should get the entire active-weight share
+BOOST_FIXTURE_TEST_CASE( single_active_producer_paid_per_block, sysio_emissions_tester ) try {
+   // A lone producer is paid the per-block rate for its blocks -- never the whole pool: the slots
+   // it did not fill and the standby slice both stay in the treasury.
    create_t5_holding_accounts();
    setup_producers(1);
    wait_for_producer_schedule();
@@ -3622,20 +3773,17 @@ BOOST_FIXTURE_TEST_CASE( single_active_producer_full_active_share, sysio_emissio
    const uint32_t start = head_secs() - ONE_EPOCH - 1;
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
 
+   const uint32_t blocks = unpaid_blocks_of("producera"_n);
    asset bal_before = get_wire_balance_paid("producera"_n);
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
    int64_t got = get_wire_balance_paid("producera"_n).get_amount() - bal_before.get_amount();
    BOOST_REQUIRE( got > 0 );
 
-   // With only 1 active (weight=15, total_weight=15), full_share = producer_pool
-   // Payment is proportional: pool * min(elig, expected) / expected
-   auto log = get_epoch_log(1);
-   int64_t compute = log["compute_amount"].as<int64_t>();
-   int64_t producer_pool = test_split_bps(compute, PRODUCER_BPS);
-
-   // They must get something > 0 and <= producer_pool
-   BOOST_REQUIRE( got <= producer_pool );
+   const int64_t compute = get_epoch_log(1)["compute_amount"].as<int64_t>();
+   BOOST_REQUIRE_EQUAL( got, test_block_pay(test_active_pool(compute), blocks,
+                                            test_nominal_slots(T_EPOCH_SECS)) );
+   BOOST_REQUIRE_LT( got, test_active_pool(compute) );
 } FC_LOG_AND_RETHROW()
 
 // Swap-fee rewards (sysio.reserv rewards_bucket) are folded into payepoch's
@@ -3707,6 +3855,7 @@ BOOST_FIXTURE_TEST_CASE( payepoch_folds_swap_fee_rewards, sysio_emissions_tester
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
 
    const int64_t t5_before = get_t5_state()["total_distributed"].as<int64_t>();
+   const uint32_t blocks   = unpaid_blocks_of("producera"_n);
    const int64_t bal_before = get_wire_balance_paid("producera"_n).get_amount();
 
    // Must NOT overdraw: payepoch queues the reserv->sysio drain ahead of the
@@ -3724,9 +3873,11 @@ BOOST_FIXTURE_TEST_CASE( payepoch_folds_swap_fee_rewards, sysio_emissions_tester
    // The producer received its emission share and NOTHING MORE. Swap fees pay
    // the parties that carry an individual swap — the winning underwriter and the
    // batch operators that relay it — never producers, who earn emissions for
-   // securing the chain. (expected_rounds clamps to 1 at the 60s epoch, so the
-   // single active producer takes the whole producer pool.)
-   BOOST_REQUIRE_EQUAL( got, producer_pool );
+   // securing the chain. (The share is the per-block rate times its blocks; the
+   // slots it did not fill and the standby slice stay in the treasury.)
+   BOOST_REQUIRE_EQUAL( got, test_block_pay(test_active_pool(compute), blocks,
+                                            test_nominal_slots(T_EPOCH_SECS)) );
+   BOOST_REQUIRE_LT( got, producer_pool );
 
    // Nothing was distributed out of the fee: the whole pool is allocated to the
    // batch-operator distribution and this fixture has no active rotation group,
@@ -3739,11 +3890,12 @@ BOOST_FIXTURE_TEST_CASE( payepoch_folds_swap_fee_rewards, sysio_emissions_tester
    // unconditional on there being a recipient, and it must not overdraw.
    BOOST_REQUIRE_EQUAL( reward_balance(), 0 );
 
-   // total_distributed counts emission only (producer_pool + capex + gov, with
-   // the empty batch group's share staying in treasury) -- the fee is NOT
-   // charged against the emission curve.
+   // total_distributed counts emission only (the producer's block pay + capex +
+   // gov, with the unfilled slots, the standby slice and the empty batch group's
+   // share staying in treasury) -- the fee is NOT charged against the emission
+   // curve.
    const int64_t t5_after = get_t5_state()["total_distributed"].as<int64_t>();
-   BOOST_REQUIRE_EQUAL( t5_after - t5_before, producer_pool + capex + gov );
+   BOOST_REQUIRE_EQUAL( t5_after - t5_before, got + capex + gov );
 } FC_LOG_AND_RETHROW()
 
 // The POSITIVE counterpart: a swap fee actually reaching an ACTIVE batch
@@ -3829,6 +3981,7 @@ BOOST_FIXTURE_TEST_CASE( payepoch_pays_swap_fee_to_active_batch_operator, sysio_
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
 
    const int64_t t5_before  = get_t5_state()["total_distributed"].as<int64_t>();
+   const uint32_t producer_blocks = unpaid_blocks_of("producera"_n);
    const int64_t bal_before = get_wire_balance(BATCH_OP).get_amount();
 
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
@@ -3857,7 +4010,9 @@ BOOST_FIXTURE_TEST_CASE( payepoch_pays_swap_fee_to_active_batch_operator, sysio_
    const int64_t capex = log["capex_amount"].as<int64_t>();
    const int64_t gov   = log["governance_amount"].as<int64_t>();
    const int64_t t5_after = get_t5_state()["total_distributed"].as<int64_t>();
-   BOOST_REQUIRE_EQUAL( t5_after - t5_before, producer_pool + batch_pool + capex + gov );
+   const int64_t producer_pay = test_block_pay(test_active_pool(compute), producer_blocks,
+                                               test_nominal_slots(T_EPOCH_SECS));
+   BOOST_REQUIRE_EQUAL( t5_after - t5_before, producer_pay + batch_pool + capex + gov );
 } FC_LOG_AND_RETHROW()
 
 // Lowering pay_cadence_epochs MID-PERIOD must not multiply the payout.
@@ -3944,6 +4099,7 @@ BOOST_FIXTURE_TEST_CASE( cadence_drop_midperiod_does_not_multiply_batch_fee_payo
 
    const int64_t bal_before = get_wire_balance(BATCH_OP).get_amount();
    produce_blocks(130);
+   const uint32_t producer_blocks = unpaid_blocks_of("producera"_n);
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );   // pay-epoch
    BOOST_REQUIRE_EQUAL( get_t5_state()["epoch_count"].as<uint64_t>(), 1u );
 
@@ -3962,16 +4118,20 @@ BOOST_FIXTURE_TEST_CASE( cadence_drop_midperiod_does_not_multiply_batch_fee_payo
    BOOST_REQUIRE_EQUAL( log["fee_distributed"].as<int64_t>(), fee_total );
    BOOST_REQUIRE_EQUAL( reward_balance(), 0 );
 
-   // And the emission side is not double-paid either.
+   // And the emission side is not double-paid either: the producer's count spans both accrued
+   // epochs and is paid once, over the two epochs' worth of slots.
    const int64_t capex = log["capex_amount"].as<int64_t>();
    const int64_t gov   = log["governance_amount"].as<int64_t>();
+   const int64_t producer_pay = test_block_pay(test_active_pool(compute), producer_blocks,
+                                               2 * test_nominal_slots(T_EPOCH_SECS));
    BOOST_REQUIRE_EQUAL( get_t5_state()["total_distributed"].as<int64_t>(),
-                        producer_pool + batch_pool + capex + gov );
+                        producer_pay + batch_pool + capex + gov );
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( standby_weight_decreases_by_rank, sysio_emissions_tester ) try {
-   // Rank 22 should receive more than rank 23, which should receive more than rank 24, etc.
-   // Weight formula: w = 29 - rank (22→7, 23→6, 24→5)
+   // Position 22 receives more than 23, which receives more than 24, etc. -- each an exact,
+   // position-fixed share of the retainer slice: weight 29 - position (22→7, 23→6, 24→5) over
+   // the constant sum 28, so the four vacant positions' shares stay in the treasury.
    create_t5_holding_accounts();
 
    // Set up 25 producers: 21 active + 4 standby (ranks 22-25)
@@ -3985,6 +4145,15 @@ BOOST_FIXTURE_TEST_CASE( standby_weight_decreases_by_rank, sysio_emissions_teste
    name sb1 = producer_name_at(21); // rank 22, weight 7
    name sb2 = producer_name_at(22); // rank 23, weight 6
    name sb3 = producer_name_at(23); // rank 24, weight 5
+
+   // The fixture's setprodkeys schedule names all 25 producers until the ranked rebuild trims it
+   // to 21, so a standby may have held a window -- and block pay is not gated on position, so
+   // those blocks are paid on top of the retainer. Expect both, over the roster-wide divisor
+   // (one 21-producer rotation already exceeds the 120 slots a 60s period holds).
+   uint64_t produced = 0;
+   for (uint32_t i = 0; i < 25; ++i) produced += unpaid_blocks_of(producer_name_at(i));
+   const uint64_t divisor = std::max<uint64_t>(produced, test_nominal_slots(T_EPOCH_SECS));
+   const uint32_t blocks1 = unpaid_blocks_of(sb1), blocks2 = unpaid_blocks_of(sb2), blocks3 = unpaid_blocks_of(sb3);
 
    asset sb1_before = get_wire_balance_paid(sb1);
    asset sb2_before = get_wire_balance_paid(sb2);
@@ -4000,77 +4169,76 @@ BOOST_FIXTURE_TEST_CASE( standby_weight_decreases_by_rank, sysio_emissions_teste
    BOOST_REQUIRE( got1 > got2 );
    BOOST_REQUIRE( got2 > got3 );
    BOOST_REQUIRE( got3 > 0 );
+
+   const int64_t compute      = get_epoch_log(1)["compute_amount"].as<int64_t>();
+   const int64_t standby_pool = test_standby_pool(compute);
+   const int64_t active_pool  = test_active_pool(compute);
+   BOOST_REQUIRE_EQUAL( got1, test_standby_pay(standby_pool, 22) + test_block_pay(active_pool, blocks1, divisor) );
+   BOOST_REQUIRE_EQUAL( got2, test_standby_pay(standby_pool, 23) + test_block_pay(active_pool, blocks2, divisor) );
+   BOOST_REQUIRE_EQUAL( got3, test_standby_pay(standby_pool, 24) + test_block_pay(active_pool, blocks3, divisor) );
+   // The retainer alone never exhausts its slice: four positions are vacant.
+   BOOST_REQUIRE_LT( test_standby_pay(standby_pool, 22) + test_standby_pay(standby_pool, 23)
+                     + test_standby_pay(standby_pool, 24), standby_pool );
 } FC_LOG_AND_RETHROW()
 
-BOOST_FIXTURE_TEST_CASE( inprogress_round_below_threshold_no_credit, sysio_emissions_tester ) try {
-   // A producer with current_round_blocks < 6 should NOT get credit from in-progress finalization.
-   // If that means 0 total eligible_rounds, they get excluded from payment.
+// A single standby holds position 22's share alone: the six vacant positions pay nobody.
+BOOST_FIXTURE_TEST_CASE( vacant_standby_positions_pay_nobody, sysio_emissions_tester ) try {
    create_t5_holding_accounts();
-   setup_producers(3);
+   setup_producers(22);
    wait_for_producer_schedule();
-
-   // Produce blocks one-at-a-time until producera has < 6 current_round_blocks
-   // We need: eligible_rounds == 0 AND 0 < current_round_blocks < 6
-   // Strategy: produce less than one full cycle so producera doesn't complete a round
-   for (int i = 0; i < 5; ++i) {
-      produce_blocks(1);
-   }
-
-   auto pa_info = get_producer_info("producera"_n);
-   if (pa_info.is_null()) {
-      // producera hasn't produced yet, eligible_rounds=0
-   } else {
-      uint16_t current_blocks = pa_info["current_round_blocks"].as<uint16_t>();
-      uint16_t elig_rounds    = pa_info["eligible_rounds"].as<uint16_t>();
-
-      // If producera has produced, it should have < 6 blocks in current round and 0 eligible
-      if (current_blocks > 0 && current_blocks < 6 && elig_rounds == 0) {
-         const uint32_t start = head_secs() - ONE_EPOCH - 1;
-         BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
-
-         asset bal_before = get_wire_balance_paid("producera"_n);
-         BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
-
-         // Finalization should NOT credit this round (< 6 blocks)
-         // So eligible_rounds stays 0 → excluded from payment
-         BOOST_REQUIRE_EQUAL( get_wire_balance_paid("producera"_n), bal_before );
-      }
-   }
-} FC_LOG_AND_RETHROW()
-
-BOOST_FIXTURE_TEST_CASE( active_capped_at_expected_rounds, sysio_emissions_tester ) try {
-   // expected_rounds = (epoch_duration_sec * 2) / TOTAL_BLOCKS_PER_ROUND.
-   // Use 7200s so expected_rounds = 57, well above the elig_rounds the test
-   // produces (~2 from 2 cycles). Pay then = elig/expected * full_share which
-   // is strictly less than full_share -- exercising the proportional path.
-   BOOST_REQUIRE_EQUAL( success(), init_epoch_state(7200) );
-   create_t5_holding_accounts();
-   setup_producers(3);
-   wait_for_producer_schedule();
-   produce_complete_cycles(3, 2); // some eligible_rounds
+   produce_complete_cycles(21, 1);
 
    const uint32_t start = head_secs() - ONE_EPOCH - 1;
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
 
-   // All 3 producers have same eligible_rounds and same weight
-   asset bal_a_before = get_wire_balance_paid("producera"_n);
+   const name standby = producer_name_at(21);
+   BOOST_REQUIRE_EQUAL( 22u, producer_rank_position(standby) );
+   asset standby_before = get_wire_balance_paid(standby);
+
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
 
-   int64_t got_a = get_wire_balance_paid("producera"_n).get_amount() - bal_a_before.get_amount();
+   const int64_t standby_pool = test_standby_pool(get_epoch_log(1)["compute_amount"].as<int64_t>());
+   const int64_t got = get_wire_balance_paid(standby).get_amount() - standby_before.get_amount();
+   BOOST_REQUIRE_EQUAL( got, test_standby_pay(standby_pool, 22) );
+   BOOST_REQUIRE_EQUAL( got, standby_pool * 7 / 28 );
+} FC_LOG_AND_RETHROW()
 
-   auto log = get_epoch_log(1);
-   int64_t compute = log["compute_amount"].as<int64_t>();
-   int64_t producer_pool = test_split_bps(compute, PRODUCER_BPS);
+// A period that runs long holds more blocks than its nominal slots (an epoch can extend while a
+// batch operator delivers). The divisor rises to the blocks actually produced, so the rate scales
+// down and the active slice is never exceeded.
+BOOST_FIXTURE_TEST_CASE( period_running_long_scales_the_rate_down, sysio_emissions_tester ) try {
+   create_t5_holding_accounts();
+   setup_producers(3);
+   wait_for_producer_schedule();
+   // Four rotations of three producers: 144 blocks, past the 120 slots a 60s period holds.
+   produce_complete_cycles(3, 4);
 
-   // Each has weight 15 out of total 45, so full_share = pool * 15 / 45 = pool / 3
-   int64_t full_share = static_cast<int64_t>(
-      static_cast<__int128>(producer_pool) * 15 / 45);
+   const uint32_t start = head_secs() - ONE_EPOCH - 1;
+   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
 
-   // Payment is min(elig_rounds, expected_rounds) / expected_rounds * full_share
-   // Since elig_rounds << expected_rounds (2 cycles vs 685), pay < full_share
-   BOOST_REQUIRE( got_a > 0 );
-   BOOST_REQUIRE( got_a < full_share );
+   const std::vector<name> producers{ "producera"_n, "producerb"_n, "producerc"_n };
+   std::map<name, uint32_t> blocks;
+   std::map<name, asset>    before;
+   uint64_t produced = 0;
+   for (const auto& p : producers) {
+      blocks.emplace(p, unpaid_blocks_of(p));
+      before.emplace(p, get_wire_balance_paid(p));
+      produced += blocks.at(p);
+   }
+   BOOST_REQUIRE_GT( produced, test_nominal_slots(T_EPOCH_SECS) );
 
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+
+   const int64_t active_pool = test_active_pool(get_epoch_log(1)["compute_amount"].as<int64_t>());
+   int64_t paid = 0;
+   for (const auto& p : producers) {
+      const int64_t got = get_wire_balance_paid(p).get_amount() - before.at(p).get_amount();
+      BOOST_REQUIRE_EQUAL( got, test_block_pay(active_pool, blocks.at(p), produced) );
+      paid += got;
+   }
+   BOOST_REQUIRE_LE( paid, active_pool );
+   // Within rounding of the whole slice: every slot the period held was filled.
+   BOOST_REQUIRE_GT( paid, active_pool - static_cast<int64_t>(producers.size()) );
 } FC_LOG_AND_RETHROW()
 
 // ---------------------------------------------------------------------------
@@ -4270,28 +4438,6 @@ BOOST_FIXTURE_TEST_CASE( inactive_producer_excluded_from_distribution, sysio_emi
 // Additional coverage: round tracking correctness
 // ---------------------------------------------------------------------------
 
-BOOST_FIXTURE_TEST_CASE( eligible_rounds_increment_per_complete_cycle, sysio_emissions_tester ) try {
-   // Verify that eligible_rounds increments correctly as complete rounds are produced
-   create_t5_holding_accounts();
-   setup_producers(3);
-   wait_for_producer_schedule();
-
-   // Produce 1 complete cycle: each of 3 producers does 12 blocks = 1 eligible round each
-   produce_complete_cycles(3, 1);
-
-   auto pa_info = get_producer_info("producera"_n);
-   BOOST_REQUIRE( !pa_info.is_null() );
-   uint16_t elig_1 = pa_info["eligible_rounds"].as<uint16_t>();
-   BOOST_REQUIRE( elig_1 >= 1 );
-
-   // Produce another cycle
-   produce_complete_cycles(3, 1);
-
-   auto pa_info2 = get_producer_info("producera"_n);
-   uint16_t elig_2 = pa_info2["eligible_rounds"].as<uint16_t>();
-   BOOST_REQUIRE( elig_2 > elig_1 );
-} FC_LOG_AND_RETHROW()
-
 BOOST_FIXTURE_TEST_CASE( unpaid_blocks_track_actual_production, sysio_emissions_tester ) try {
    // Verify unpaid_blocks counts actual blocks produced
    create_t5_holding_accounts();
@@ -4341,6 +4487,8 @@ BOOST_FIXTURE_TEST_CASE( opreg_slashed_producer_excluded_from_pay, sysio_emissio
    const uint32_t start = head_secs() - ONE_EPOCH - 1;
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
 
+   const uint32_t blocks_a = unpaid_blocks_of("producera"_n);
+   const uint32_t blocks_c = unpaid_blocks_of("producerc"_n);
    asset bal_a_before = get_wire_balance_paid("producera"_n);
    asset bal_b_before = get_wire_balance_paid("producerb"_n);
    asset bal_c_before = get_wire_balance_paid("producerc"_n);
@@ -4354,9 +4502,11 @@ BOOST_FIXTURE_TEST_CASE( opreg_slashed_producer_excluded_from_pay, sysio_emissio
    BOOST_REQUIRE_EQUAL( got_b, 0 );
    BOOST_REQUIRE( got_a > 0 );
    BOOST_REQUIRE( got_c > 0 );
-   // producera / producerc keep their original 1/3 share (weighted by rank * eligible_rounds);
-   // producerb's share does not flow to them.
-   BOOST_REQUIRE_EQUAL( got_a, got_c );
+   // producera / producerc are paid exactly their own blocks at the period's rate; producerb's
+   // slots' pay does not flow to them.
+   const int64_t active_pool = test_active_pool(get_epoch_log(1)["compute_amount"].as<int64_t>());
+   BOOST_REQUIRE_EQUAL( got_a, test_block_pay(active_pool, blocks_a, test_nominal_slots(T_EPOCH_SECS)) );
+   BOOST_REQUIRE_EQUAL( got_c, test_block_pay(active_pool, blocks_c, test_nominal_slots(T_EPOCH_SECS)) );
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( opreg_unregistered_producer_excluded_from_pay, sysio_emissions_tester ) try {
@@ -4682,7 +4832,7 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_rejects_zero_retention, sysio_emissions_test
       ("compute_bps", COMPUTE_BPS)
       ("capex_bps", CAPEX_BPS) ("governance_bps", uint16_t(1000))
       ("producer_bps", PRODUCER_BPS) ("batch_op_bps", uint16_t(3000))
-      ("standby_end_rank", T_STANDBY_END_RANK)
+      ("standby_end_rank", T_STANDBY_END_RANK)("standby_bps", T_STANDBY_BPS)
       ("epoch_log_retention_count", uint32_t(0))("pay_cadence_epochs", uint16_t(1));
 
    auto r = setemitcfg(config::system_account_name, cfg);
@@ -4708,7 +4858,7 @@ BOOST_FIXTURE_TEST_CASE( epochlog_prunes_past_retention_cap, sysio_emissions_tes
       ("compute_bps", COMPUTE_BPS)
       ("capex_bps", CAPEX_BPS) ("governance_bps", uint16_t(1000))
       ("producer_bps", PRODUCER_BPS) ("batch_op_bps", uint16_t(3000))
-      ("standby_end_rank", T_STANDBY_END_RANK)
+      ("standby_end_rank", T_STANDBY_END_RANK)("standby_bps", T_STANDBY_BPS)
       ("epoch_log_retention_count", uint32_t(3))("pay_cadence_epochs", uint16_t(1));
    BOOST_REQUIRE_EQUAL( success(), setemitcfg(config::system_account_name, cfg) );
 
@@ -4889,7 +5039,7 @@ BOOST_FIXTURE_TEST_CASE( pay_cadence_treasury_exhausted_gates_non_pay_epoch, sys
       ("compute_bps", COMPUTE_BPS)
       ("capex_bps", CAPEX_BPS) ("governance_bps", uint16_t(1000))
       ("producer_bps", PRODUCER_BPS) ("batch_op_bps", uint16_t(3000))
-      ("standby_end_rank", T_STANDBY_END_RANK)
+      ("standby_end_rank", T_STANDBY_END_RANK)("standby_bps", T_STANDBY_BPS)
       ("epoch_log_retention_count", uint32_t(8640))
       ("pay_cadence_epochs", uint16_t(3));                  // non-pay epochs in the period
    BOOST_REQUIRE_EQUAL( success(), setemitcfg(config::system_account_name, cfg) );
@@ -5037,7 +5187,7 @@ BOOST_FIXTURE_TEST_CASE( fundclaim_caps_to_remaining_pool_and_records_shortfall,
       ("compute_bps", COMPUTE_BPS)
       ("capex_bps", CAPEX_BPS) ("governance_bps", GOV_BPS)
       ("producer_bps", PRODUCER_BPS) ("batch_op_bps", uint16_t(3000))
-      ("standby_end_rank", T_STANDBY_END_RANK)
+      ("standby_end_rank", T_STANDBY_END_RANK)("standby_bps", T_STANDBY_BPS)
       ("epoch_log_retention_count", uint32_t(8640))("pay_cadence_epochs", uint16_t(1));
    BOOST_REQUIRE_EQUAL( success(), setemitcfg( config::system_account_name, cfg ) );
 
@@ -5459,10 +5609,16 @@ struct producer_score_tester : public producer_eligibility_tester {
          abi_serializer::create_yield_function(abi_serializer_max_time));
    }
 
-   uint32_t rescore_generation() {
+   bool rescore_pending() {
       auto g = get_global_state();
       BOOST_REQUIRE(!g.is_null());
-      return g["rescore_generation"].as<uint32_t>();
+      return g["rescore_pending"].as<bool>();
+   }
+
+   uint32_t unpaid_blocks_of(account_name producer) {
+      auto info = get_producer_info(producer);
+      BOOST_REQUIRE_MESSAGE(!info.is_null(), "no producers row for " << producer.to_string());
+      return info["unpaid_blocks"].as<uint32_t>();
    }
 
    /// Register `count` producers as NON-bootstrapped operators, each bonded at `deposit` on the
@@ -5660,18 +5816,18 @@ BOOST_FIXTURE_TEST_CASE( rescore_sweep_drains_across_ticks, producer_score_teste
 
    auto names = setup_ranked_producers(producer_count);
    trigger_reschedule();
-   BOOST_REQUIRE_EQUAL( 0u, rescore_generation() );
+   BOOST_REQUIRE( !rescore_pending() );
 
    BOOST_REQUIRE_EQUAL( success(), set_score_config(/*collateral_weight=*/5'000) );
-   BOOST_REQUIRE( rescore_generation() != 0u );
+   BOOST_REQUIRE( rescore_pending() );
 
    trigger_reschedule();
-   BOOST_REQUIRE_MESSAGE( rescore_generation() != 0u,
+   BOOST_REQUIRE_MESSAGE( rescore_pending(),
       "a sweep of " << producer_count << " rows must not finish in one "
       << max_rescore_per_tick << "-row tick" );
 
    trigger_reschedule();
-   BOOST_REQUIRE_EQUAL( 0u, rescore_generation() );
+   BOOST_REQUIRE( !rescore_pending() );
 } FC_LOG_AND_RETHROW()
 
 // The collateral minimums live on sysio.opreg, a contract sysio.system cannot be notified by
@@ -5681,14 +5837,14 @@ BOOST_FIXTURE_TEST_CASE( rescore_sweep_drains_across_ticks, producer_score_teste
 BOOST_FIXTURE_TEST_CASE( collateral_minimum_change_opens_rescore_sweep, producer_score_tester ) try {
    auto names = setup_collateralized_producers(3);
    trigger_reschedule();
-   BOOST_REQUIRE_EQUAL( 0u, rescore_generation() );
+   BOOST_REQUIRE( !rescore_pending() );
    const uint64_t before = rank_score_of(names[0]);
 
    // Halving the minimum doubles every ratio, so every stored score is now wrong.
    BOOST_REQUIRE_EQUAL( success(), set_single_pair_collateral(base_min_bond / 2) );
    trigger_reschedule();
 
-   BOOST_REQUIRE_EQUAL( 0u, rescore_generation() );   // three rows drain in one tick
+   BOOST_REQUIRE( !rescore_pending() );   // three rows drain in one tick
    BOOST_REQUIRE_LT( rank_score_of(names[0]), before );
 } FC_LOG_AND_RETHROW()
 
@@ -5730,10 +5886,15 @@ BOOST_FIXTURE_TEST_CASE( missed_round_is_charged_only_to_the_skipped_producer, p
    wait_for_active_schedule(names[2]);
 
    for (const auto& p : names) BOOST_REQUIRE_EQUAL( 0u, missed_rounds_of(p) );
+   const uint64_t before = rank_score_of(names[2]);
 
    skip_round_of(names[2]);
 
    BOOST_REQUIRE_EQUAL( 1u, missed_rounds_of(names[2]) );
+   // One miss is not a demotion, but it IS a worse participation factor: the key moves (a
+   // higher key sorts later) while the tier stays put.
+   BOOST_REQUIRE_GT( rank_score_of(names[2]), before );
+   BOOST_REQUIRE_EQUAL( tier_of(before), tier_of(rank_score_of(names[2])) );
    for (const auto& p : names) {
       if (p == names[2]) continue;
       BOOST_REQUIRE_MESSAGE( missed_rounds_of(p) == 0u,
@@ -5743,6 +5904,7 @@ BOOST_FIXTURE_TEST_CASE( missed_round_is_charged_only_to_the_skipped_producer, p
    // One full rotation returns the skipped producer to its slot; producing resets the streak.
    produce_blocks(names.size() * slots_per_producer + slots_per_producer);
    BOOST_REQUIRE_EQUAL( 0u, missed_rounds_of(names[2]) );
+   BOOST_REQUIRE_EQUAL( before, rank_score_of(names[2]) );   // and the key comes back with it
 } FC_LOG_AND_RETHROW()
 
 // Demotion fires at EXACTLY the configured threshold -- not before -- and no amount of money
@@ -5759,6 +5921,11 @@ BOOST_FIXTURE_TEST_CASE( demotion_fires_at_threshold_and_outweighs_collateral, p
    trigger_reschedule();
    wait_for_active_schedule(target);
 
+   // One full rotation, so the target has produced its own window and holds pay counters to
+   // lose -- which is what the reclaim assertions after the demotion need.
+   produce_blocks(names.size() * slots_per_producer);
+   BOOST_REQUIRE_GT( unpaid_blocks_of(target), 0u );
+
    for (uint32_t miss = 1; miss <= 3; ++miss) {
       skip_round_of(target);
       BOOST_REQUIRE_EQUAL( miss, missed_rounds_of(target) );
@@ -5772,6 +5939,10 @@ BOOST_FIXTURE_TEST_CASE( demotion_fires_at_threshold_and_outweighs_collateral, p
       BOOST_REQUIRE_LT( rank_score_of(p), rank_score_of(target) );
    }
    BOOST_REQUIRE_EQUAL( names.size(), producer_rank_position(target) );   // last, despite the bond
+
+   // Demotion does NOT touch the block count: the producer is paid for the blocks it made at the
+   // first payepoch after regproducer brings it back into the pay walk.
+   BOOST_REQUIRE_GT( unpaid_blocks_of(target), 0u );
 } FC_LOG_AND_RETHROW()
 
 // `regproducer` is the single door back, from an involuntary demotion as much as from a voluntary
@@ -5866,6 +6037,109 @@ BOOST_FIXTURE_TEST_CASE( deposit_rejects_a_bootstrapped_operator, producer_score
 
    BOOST_REQUIRE_EQUAL( wasm_assert_msg("bootstrapped operators cannot deposit collateral"),
       push_opreg_action(names[0], "deposit"_n, mvo()("account", names[0])("amount", uint64_t{1'000})) );
+} FC_LOG_AND_RETHROW()
+
+// ---------------------------------------------------------------------------
+// Saturation
+// ---------------------------------------------------------------------------
+
+// The collateral factor is UNCAPPED by policy, so a large enough bond runs it to the composite's
+// bit budget; the weight multiply and the composite sum then saturate rather than wrap. A wrap
+// would drop the best-bonded producer to the bottom of the index -- exactly what the uint128
+// intermediate exists to prevent. Two producers past the ceiling must tie, and both must still
+// outrank a producer at exactly the minimum.
+BOOST_FIXTURE_TEST_CASE( collateral_factor_saturates_at_the_bit_budget, producer_score_tester ) try {
+   // A minimum bond of 1 makes the ratio the raw deposit times score_scale, so a deposit of 1e15
+   // is a factor of 1e19 -- past the 2^62 composite ceiling (~4.6e18) before any weight applies.
+   constexpr uint64_t unit_min_bond   = 1;
+   constexpr uint64_t saturating_bond = 1'000'000'000'000'000ULL;
+
+   BOOST_REQUIRE_EQUAL( success(), set_single_pair_collateral(unit_min_bond) );
+   produce_blocks(1);
+
+   auto names = producer_names(3);
+   create_producer_accounts(names);
+   for (auto& p : names) {
+      BOOST_REQUIRE_EQUAL( success(), push_system_action(p, "regproducer"_n, mvo()
+         ("producer", p)("producer_key", get_public_key(p, "active"))("url", "")("location", 0)) );
+      BOOST_REQUIRE_EQUAL( success(), register_operator(p, OperatorType::OPERATOR_TYPE_PRODUCER, false) );
+   }
+   BOOST_REQUIRE_EQUAL( success(), credit_collateral(names[0], saturating_bond) );
+   BOOST_REQUIRE_EQUAL( success(), credit_collateral(names[1], saturating_bond * 2) );
+   BOOST_REQUIRE_EQUAL( success(), credit_collateral(names[2], unit_min_bond) );
+   produce_blocks(1);
+   register_finalizer_keys(names, 3);
+   produce_blocks(1);
+
+   for (const auto& p : names) {
+      BOOST_REQUIRE_EQUAL( tier_healthy, tier_of(rank_score_of(p)) );
+   }
+   // Past the ceiling, twice the bond buys nothing: the two saturated keys are identical...
+   BOOST_REQUIRE_EQUAL( rank_score_of(names[0]), rank_score_of(names[1]) );
+   // ...and neither wrapped: both still sort ahead of the producer at exactly the minimum.
+   BOOST_REQUIRE_LT( rank_score_of(names[0]), rank_score_of(names[2]) );
+   BOOST_REQUIRE_EQUAL( 1u, producer_rank_position(names[0]) );   // equal keys: name order
+   BOOST_REQUIRE_EQUAL( 2u, producer_rank_position(names[1]) );
+   BOOST_REQUIRE_EQUAL( 3u, producer_rank_position(names[2]) );
+} FC_LOG_AND_RETHROW()
+
+// ---------------------------------------------------------------------------
+// Displacement at the schedule boundary
+// ---------------------------------------------------------------------------
+
+// The bootstrapped tier is a BACKSTOP: with max_producers collateralised producers ahead of it a
+// bootstrap holds position 22 and no schedule slot, yet stays ACTIVE and eligible. The moment a
+// collateralised producer leaves it moves into the schedule, and the moment one returns it yields
+// the slot again -- with no governance action anywhere.
+BOOST_FIXTURE_TEST_CASE( collateralised_producers_displace_the_bootstrap_at_the_boundary, producer_score_tester ) try {
+   constexpr uint32_t collateralised_count = 21;   // max_producers
+   static_assert( collateralised_count == 21, "this test pins the 21/22 schedule boundary" );
+
+   BOOST_REQUIRE_EQUAL( success(), set_single_pair_collateral() );
+   produce_blocks(1);
+
+   // One roster: 21 collateralised producers plus the bootstrap, keyed in ONE call so the node
+   // holds every finalizer key any proposed policy can carry.
+   auto names = producer_names(collateralised_count + 1);
+   const auto bootstrap = names.back();
+   create_producer_accounts(names);
+   for (auto& p : names) {
+      BOOST_REQUIRE_EQUAL( success(), push_system_action(p, "regproducer"_n, mvo()
+         ("producer", p)("producer_key", get_public_key(p, "active"))("url", "")("location", 0)) );
+   }
+   for (uint32_t i = 0; i < collateralised_count; ++i) {
+      BOOST_REQUIRE_EQUAL( success(), register_operator(names[i], OperatorType::OPERATOR_TYPE_PRODUCER, false) );
+      BOOST_REQUIRE_EQUAL( success(), credit_collateral(names[i], base_min_bond) );
+   }
+   BOOST_REQUIRE_EQUAL( success(), register_operator(bootstrap, OperatorType::OPERATOR_TYPE_PRODUCER, true) );
+   produce_blocks(1);
+   register_finalizer_keys(names, collateralised_count + 1);
+   produce_blocks(1);
+
+   // Position 22: outside the schedule, but ACTIVE and holding a rank position.
+   trigger_reschedule();
+   BOOST_REQUIRE_EQUAL( tier_bootstrapped, tier_of(rank_score_of(bootstrap)) );
+   BOOST_REQUIRE_EQUAL( collateralised_count + 1, producer_rank_position(bootstrap) );
+   BOOST_REQUIRE( !is_scheduled(bootstrap) );
+   BOOST_REQUIRE(  is_scheduled(names[0]) );
+   BOOST_REQUIRE_EQUAL( "OPERATOR_STATUS_ACTIVE", get_opreg_operator(bootstrap)["status"].as_string() );
+
+   // A collateralised producer parks: the bootstrap moves up into the schedule.
+   BOOST_REQUIRE_EQUAL( success(),
+      push_system_action(names[0], "unregprod"_n, mvo()("producer", names[0])) );
+   trigger_reschedule();
+   BOOST_REQUIRE_EQUAL( collateralised_count, producer_rank_position(bootstrap) );
+   BOOST_REQUIRE(  is_scheduled(bootstrap) );
+   BOOST_REQUIRE( !is_scheduled(names[0]) );
+
+   // It returns: the bootstrap yields the slot again, and is still ACTIVE for the next time.
+   BOOST_REQUIRE_EQUAL( success(), push_system_action(names[0], "regproducer"_n, mvo()
+      ("producer", names[0])("producer_key", get_public_key(names[0], "active"))("url", "")("location", 0)) );
+   trigger_reschedule();
+   BOOST_REQUIRE_EQUAL( collateralised_count + 1, producer_rank_position(bootstrap) );
+   BOOST_REQUIRE( !is_scheduled(bootstrap) );
+   BOOST_REQUIRE(  is_scheduled(names[0]) );
+   BOOST_REQUIRE_EQUAL( "OPERATOR_STATUS_ACTIVE", get_opreg_operator(bootstrap)["status"].as_string() );
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_SUITE_END() // sysio_producer_score_tests

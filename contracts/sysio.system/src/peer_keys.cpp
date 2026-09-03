@@ -59,18 +59,22 @@ peer_keys::getpeerkeys_res_t peer_keys::getpeerkeys() {
    };
 
    auto idx = producers.get_index<"prodrank"_n>();
-   finalizers_table finalizers(get_self());
 
-   // `rank` is POSITION among SCHEDULABLE producers, so this counts matches rather than taking the
+   // `rank` is POSITION among ELIGIBLE producers, so this counts matches rather than taking the
    // first `max_rank` index entries. Taking the first N would let unbonded registrants -- which
    // occupy index slots but can never be scheduled -- crowd real producers out of peer discovery.
-   // The demoted tier sorts last and is never schedulable, so it also bounds the walk over what is
+   // The demoted tier sorts last and is never eligible, so it also bounds the walk over what is
    // a permissionless, unbounded table.
+   //
+   // Peer discovery walks `is_eligible_operator`, NOT `is_schedulable`: it must not require a
+   // finalizer key. A producer scheduled through `setprods` -- the bootstrap window, and every
+   // harness that publishes schedules directly -- produces blocks before it registers one, and a
+   // block producer that `getpeerkeys` hides is a block producer the BP gossip mesh cannot reach.
    uint32_t position = 0;
    for (auto i = idx.cbegin(); i != idx.cend() && resp.size() < max_return; ++i) {
       if (producer_rank::tier_of(i->rank_score) == producer_tier::demoted)
          break;
-      if (!producer_rank::is_schedulable(*i, finalizers))
+      if (!producer_rank::is_eligible_operator(*i))
          continue;
       if (++position > max_rank)
          break;

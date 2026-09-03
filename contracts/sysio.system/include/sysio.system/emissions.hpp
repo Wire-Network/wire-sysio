@@ -79,6 +79,11 @@ struct [[sysio::table("emitcfg"), sysio::contract("sysio.system")]] emission_con
 
    // Producer config
    uint32_t  standby_end_rank;       // last standby rank (default 28)
+   // Share of the producer pool reserved for the standby retainer (basis points, <= 10000). The
+   // rest funds the per-block rate active producers are paid at. Each standby POSITION
+   // (22..standby_end_rank) holds a fixed, linearly decaying share of this slice; a vacant
+   // position's share stays in the treasury rather than flowing to the standbys present.
+   uint16_t  standby_bps;
 
    // Audit-log retention. Caps the unbounded `epochlog` table at this many
    // rows; payepoch prunes head-first after each insert. One row per epoch
@@ -102,7 +107,7 @@ struct [[sysio::table("emitcfg"), sysio::contract("sysio.system")]] emission_con
       (annual_initial_emission)(annual_max_emission)(annual_min_emission)
       (compute_bps)(capex_bps)(governance_bps)
       (producer_bps)(batch_op_bps)
-      (standby_end_rank)(epoch_log_retention_count)
+      (standby_end_rank)(standby_bps)(epoch_log_retention_count)
       (pay_cadence_epochs))
 };
 

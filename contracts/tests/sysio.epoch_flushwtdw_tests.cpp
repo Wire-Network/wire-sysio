@@ -183,7 +183,7 @@ public:
             ("governance_bps",         uint16_t(1000))
             ("producer_bps",           uint16_t(7000))
             ("batch_op_bps",           uint16_t(3000))
-            ("standby_end_rank",       uint32_t(28))
+            ("standby_end_rank",       uint32_t(28))("standby_bps", uint16_t(800))
             ("epoch_log_retention_count", uint32_t(8640))
             ("pay_cadence_epochs",     uint16_t(1))));
    }
