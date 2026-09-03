@@ -9,6 +9,7 @@
 #include <sysio/opp/types/types.pb.hpp>
 #include <sysio.opp.common/slug_name.hpp>
 #include <sysio.opp.common/opp_table_types.hpp>
+#include <sysio.opp.common/wire_asset.hpp>
 #include <magic_enum/magic_enum.hpp>
 
 namespace sysio {
@@ -52,8 +53,8 @@ namespace sysio {
       static constexpr name TOKEN_ACCOUNT  = "sysio.token"_n;
       static constexpr name SYSTEM_ACCOUNT = "sysio"_n;
 
-      // Core token symbol — currently SYS, may change to WIRE
-      static constexpr symbol CORE_SYM = symbol("SYS", 4);
+      /// WIRE collateral asset held by the depot-side operator registry.
+      static constexpr symbol WIRE_SYM = opp::wire::asset_symbol;
 
       // 2-epoch wait between `queue_withdraw` and `flushwithdraws` releasing
       // funds. Long enough that an operator who would drop below the role
@@ -219,7 +220,7 @@ namespace sysio {
                        opp::types::OperatorType type,
                        bool is_bootstrapped);
 
-      /// Operator-callable: lock CORE_SYM tokens directly as the operator's
+      /// Operator-callable: lock WIRE tokens directly as the operator's
       /// WIRE-side collateral. The tokens transfer in the same transaction;
       /// the corresponding (operator, WIRE, WIRE_TOKEN) balance row is
       /// credited. Reverts on validation failure (no escrow exists yet —
@@ -345,7 +346,7 @@ namespace sysio {
       [[sysio::action]]
       void terminate(name account, std::string reason);
 
-      /// Auth = the claiming operator. Pull CORE_SYM collateral credited by a WIRE-chain remit
+      /// Auth = the claiming operator. Pull WIRE collateral credited by a WIRE-chain remit
       /// (withdraw flush, deferred lock release, or termination payout) in a single transfer.
       ///
       /// The remit paths credit rather than transfer because they are reachable from
@@ -537,7 +538,7 @@ namespace sysio {
             sysio::const_mem_fun<delivery_log_entry, uint128_t, &delivery_log_entry::by_account_ts>>
       >;
 
-      /// Claimable CORE_SYM collateral owed to an operator by a WIRE-chain remit: a withdraw
+      /// Claimable WIRE collateral owed to an operator by a WIRE-chain remit: a withdraw
       /// flush (`flushwtdw`), a deferred lock release on a TERMINATED operator, or the
       /// termination payout itself.
       ///
@@ -579,7 +580,7 @@ namespace sysio {
 
       struct [[sysio::table("remitclaims")]] remit_claim {
          sysio::name account;
-         uint64_t    balance        = 0;   // atomic CORE_SYM units owed, not yet claimed
+         uint64_t    balance        = 0;   ///< Atomic WIRE units owed, not yet claimed.
          uint32_t    expires_at_sec = 0;   // recorded by `credit`; read by nothing yet (WIRE-339)
 
          /// Expiry-major composite so the secondary index orders by expiry and a future retention

@@ -2,6 +2,7 @@
 #include <sysio.opreg/sysio.opreg.hpp>
 #include <sysio.msgch/sysio.msgch.hpp>
 #include <sysio.opp.common/opp_keys.hpp>
+#include <sysio.opp.common/wire_asset.hpp>
 #include <sysio.authex/sysio.authex.hpp>
 #include <sysio.token/sysio.token.hpp>
 // For uwrit::MAX_LOCK_RELEASE_PER_EPOCH and uwrit::MAX_UWREQ_PRUNE_PER_EPOCH —
@@ -65,8 +66,6 @@ constexpr const char* NON_CANONICAL_DELIVERY_REASON_PREFIX =
 // privileged-contract model sysio.token uses): the contract account stays finite at its code+abi
 // size while table growth draws from sysio's pool. Permitted because the contract is privileged.
 constexpr name ram_payer          = "sysio"_n;
-constexpr symbol WIRE_SYMBOL{"WIRE", 9};
-
 /// True when a chains row represents an active outpost (i.e. not the depot
 /// self-row and is active). Pulled out so every fanout loop in `advance`
 /// uses the identical predicate.
@@ -145,7 +144,7 @@ emissions_gate_result check_emissions_ready(uint32_t epoch_duration_sec, uint32_
          t5s.pending_emission_amount, r.emission_amount);
 
       sysio::token::token::accounts acct_tbl(TOKEN_ACCOUNT, SYSTEM_ACCOUNT.value);
-      sysio::token::token::acct_key key{WIRE_SYMBOL.code().raw()};
+      sysio::token::token::acct_key key{opp::wire::asset_symbol.code().raw()};
       if (acct_tbl.contains(key)) {
          r.sysio_balance = acct_tbl.get(key).balance.amount;
       }
