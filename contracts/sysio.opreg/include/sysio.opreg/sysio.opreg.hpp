@@ -222,7 +222,8 @@ namespace sysio {
 
       /// Operator-callable: lock WIRE tokens directly as the operator's
       /// WIRE-side collateral. The tokens transfer in the same transaction;
-      /// the corresponding (operator, WIRE, WIRE_TOKEN) balance row is
+      /// the corresponding (operator, opp::wire::chain_code,
+      /// opp::wire::token_code) balance row is
       /// credited. Reverts on validation failure (no escrow exists yet —
       /// failure surfaces in the operator's signing tx so they can retry).
       [[sysio::action]]

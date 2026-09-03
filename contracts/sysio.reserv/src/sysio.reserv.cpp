@@ -692,8 +692,8 @@ uint64_t reserve::swapquote(sysio::slug_name from_chain_code,
                              sysio::slug_name to_reserve_code) {
    if (from_amount == 0) return 0;
 
-   const bool src_is_wire = (from_token_code == opp::wire::token_code);
-   const bool dst_is_wire = (to_token_code   == opp::wire::token_code);
+   const bool src_is_wire = opp::wire::is_native_asset(from_chain_code, from_token_code);
+   const bool dst_is_wire = opp::wire::is_native_asset(to_chain_code, to_token_code);
    if (src_is_wire && dst_is_wire) return from_amount; // WIRE->WIRE is a plain transfer
 
    reserves_t tbl(get_self());

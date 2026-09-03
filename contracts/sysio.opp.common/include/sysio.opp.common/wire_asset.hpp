@@ -22,6 +22,12 @@ inline constexpr sysio::symbol asset_symbol{"WIRE", 9};
 inline constexpr sysio::slug_name token_code = "WIRE"_s;
 
 /// Registry slug identifying the WIRE depot chain.
-inline constexpr sysio::slug_name chain_code = token_code;
+inline constexpr sysio::slug_name chain_code = "WIRE"_s;
+
+/// True when a registry pair identifies the depot-native WIRE asset.
+[[nodiscard]] inline constexpr bool is_native_asset(sysio::slug_name chain,
+                                                     sysio::slug_name token) noexcept {
+   return chain == chain_code && token == token_code;
+}
 
 } // namespace sysio::opp::wire

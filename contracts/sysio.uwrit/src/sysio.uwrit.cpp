@@ -332,8 +332,8 @@ uint64_t swap_quote(sysio::slug_name src_chain_code,
                     uint64_t src_amount,
                     uint32_t fee_bps) {
    if (src_amount == 0) return 0;
-   const bool src_is_wire = (src_token_code == opp::wire::token_code);
-   const bool dst_is_wire = (dst_token_code == opp::wire::token_code);
+   const bool src_is_wire = opp::wire::is_native_asset(src_chain_code, src_token_code);
+   const bool dst_is_wire = opp::wire::is_native_asset(dst_chain_code, dst_token_code);
    if (src_is_wire && dst_is_wire) return src_amount;
 
    auto active = [](std::optional<reserve::reserve_row>&& r)
@@ -381,9 +381,9 @@ bool required_reserves_active(sysio::slug_name src_chain_code,
       auto row = find_reserve(c, t, r);
       return row && row->status == ReserveStatus::RESERVE_STATUS_ACTIVE;
    };
-   if (src_token_code != opp::wire::token_code
+   if (!opp::wire::is_native_asset(src_chain_code, src_token_code)
        && !leg_active(src_chain_code, src_token_code, src_reserve_code)) return false;
-   if (dst_token_code != opp::wire::token_code
+   if (!opp::wire::is_native_asset(dst_chain_code, dst_token_code)
        && !leg_active(dst_chain_code, dst_token_code, dst_reserve_code)) return false;
    return true;
 }

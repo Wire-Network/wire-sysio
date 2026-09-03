@@ -1417,7 +1417,9 @@ BOOST_FIXTURE_TEST_CASE(claimremit_pays_terminated_operator_and_clears_row, sysi
    BOOST_REQUIRE_EQUAL(success(), terminate(OPERATOR, "rolling-24h miss"));
 
    BOOST_REQUIRE_EQUAL(DEPOSIT, get_remitclaim(OPERATOR)["balance"].as_uint64());
+   const int64_t balance_before_claim = wire_balance(OPERATOR);
    BOOST_REQUIRE_EQUAL(success(), claimremit(OPERATOR));
+   BOOST_REQUIRE_EQUAL(balance_before_claim + static_cast<int64_t>(DEPOSIT), wire_balance(OPERATOR));
    BOOST_REQUIRE(get_remitclaim(OPERATOR).is_null());   // row erased by the payout
 
    // Double-claim finds nothing -- the erase happens before the transfer, closing the re-entrancy

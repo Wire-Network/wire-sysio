@@ -154,7 +154,7 @@ uwchal_bond_quote compute_uwchal_bond(name uwrit_account, name reserv_account, n
    opp::amm::u128 total = 0;
    for (const auto& bal : op->balances) {
       if (bal.balance == 0) continue;
-      if (bal.token_code == opp::wire::token_code) {
+      if (opp::wire::is_native_asset(bal.chain_code, bal.token_code)) {
          total += bal.balance;   // already WIRE — no curve to ride
          continue;
       }
