@@ -9,6 +9,7 @@
 #include <sysio.opp.common/safe_ops.hpp>
 #include <sysio.opp.common/claimable.hpp>
 #include <sysio.opp.common/registry_metadata.hpp>
+#include <sysio.opp.common/wire_asset.hpp>
 
 #include <zpp_bits.h>
 
@@ -43,12 +44,6 @@ void require_priv_caller() {
    sysio::check(sysio::is_privileged(current_receiver()),
                 "sysio.reserv: privileged account required");
 }
-
-using sysio::slug_name_literals::operator""_s;
-
-/// The WIRE token / depot-chain slug. A reserve leg whose token code is WIRE is
-/// a depot (WIRE) endpoint with no token/WIRE pool of its own.
-constexpr sysio::slug_name WIRE_TOKEN = "WIRE"_s;
 
 /// Saturating uint64 credit for reserve balances / rewards-bucket counters. These accumulate from
 /// operator-relayed external-chain amounts (no on-chain supply cap), and the credit sites run
@@ -99,13 +94,6 @@ reserve::reserve_key make_key(sysio::slug_name chain_code,
                               sysio::slug_name reserve_code) {
    return reserve::reserve_key{chain_code, token_code, reserve_code};
 }
-
-/// Reserve custody is denominated in WIRE (9 decimals) — the emissions
-/// treasury symbol (`sysio.system/src/emissions.cpp:42`,
-/// `sysio.epoch.cpp:38`). Deliberately NOT opreg's `CORE_SYM` (SYS, 4):
-/// operator collateral and reserve custody are independent surfaces with
-/// different symbols; mixing them would silently corrupt custody.
-constexpr sysio::symbol WIRE_SYMBOL{"WIRE", 9};
 
 /// Resolve a `chain_code` to its `ChainKind` via the `sysio.chains`
 /// registry (mirrors `sysio.uwrit`'s helper of the same name). Returns
@@ -261,7 +249,7 @@ void route_wire_fee(name self, const opp::amm::wire_fee& fee, name underwriter) 
          permission_level{self, "active"_n},
          reserve::TOKEN_ACCOUNT, "transfer"_n,
          std::make_tuple(self, reserve::TREASURY_ACCOUNT,
-            asset(static_cast<int64_t>(fee.emissions_share), WIRE_SYMBOL),
+            asset(static_cast<int64_t>(fee.emissions_share), opp::wire::asset_symbol),
             std::string("sysio.reserv::swap fee -> emissions"))
       ).send();
    }
@@ -301,7 +289,7 @@ uint64_t sweep_expired_wire_claims(name self, uint32_t now_sec, uint32_t max_row
          permission_level{self, "active"_n},
          reserve::TOKEN_ACCOUNT, "transfer"_n,
          std::make_tuple(self, reserve::TREASURY_ACCOUNT,
-            asset(static_cast<int64_t>(reclaimed), WIRE_SYMBOL),
+            asset(static_cast<int64_t>(reclaimed), opp::wire::asset_symbol),
             std::string("sysio.reserv::expired WIRE claim -> emissions"))
       ).send();
    }
@@ -336,7 +324,7 @@ void credit_wire_claim(name self, name recipient, uint64_t amount) {
             permission_level{self, "active"_n},
             reserve::TOKEN_ACCOUNT, "transfer"_n,
             std::make_tuple(self, reserve::TREASURY_ACCOUNT,
-               asset(static_cast<int64_t>(forfeited), WIRE_SYMBOL),
+               asset(static_cast<int64_t>(forfeited), opp::wire::asset_symbol),
                std::string("sysio.reserv::expired WIRE claim -> emissions"))
          ).send();
       }
@@ -395,7 +383,7 @@ void reserve::regreserve(sysio::slug_name chain_code,
       permission_level{TREASURY_ACCOUNT, "active"_n},
       TOKEN_ACCOUNT, "transfer"_n,
       std::make_tuple(TREASURY_ACCOUNT, get_self(),
-         asset(static_cast<int64_t>(initial_wire_amount), WIRE_SYMBOL),
+         asset(static_cast<int64_t>(initial_wire_amount), opp::wire::asset_symbol),
          std::string("sysio.reserv::regreserve bootstrap WIRE backing"))
    ).send();
 
@@ -651,7 +639,7 @@ void reserve::matchreserve(sysio::slug_name chain_code,
       permission_level{matcher, "active"_n},
       TOKEN_ACCOUNT, "transfer"_n,
       std::make_tuple(matcher, get_self(),
-         asset(static_cast<int64_t>(wire_amount), WIRE_SYMBOL),
+         asset(static_cast<int64_t>(wire_amount), opp::wire::asset_symbol),
          std::string("sysio.reserv::matchreserve WIRE escrow"))
    ).send();
 
@@ -737,8 +725,8 @@ uint64_t reserve::swapquote(sysio::slug_name from_chain_code,
                              sysio::slug_name to_reserve_code) {
    if (from_amount == 0) return 0;
 
-   const bool src_is_wire = (from_token_code == WIRE_TOKEN);
-   const bool dst_is_wire = (to_token_code   == WIRE_TOKEN);
+   const bool src_is_wire = opp::wire::is_native_asset(from_chain_code, from_token_code);
+   const bool dst_is_wire = opp::wire::is_native_asset(to_chain_code, to_token_code);
    if (src_is_wire && dst_is_wire) return from_amount; // WIRE->WIRE is a plain transfer
 
    reserves_t tbl(get_self());
@@ -806,7 +794,7 @@ void reserve::drainrewards(int64_t amount) {
       permission_level{get_self(), "active"_n},
       TOKEN_ACCOUNT, "transfer"_n,
       std::make_tuple(get_self(), TREASURY_ACCOUNT,
-         asset(static_cast<int64_t>(req), WIRE_SYMBOL),
+         asset(static_cast<int64_t>(req), opp::wire::asset_symbol),
          std::string("sysio.reserv::swap-fee rewards -> emissions payepoch"))
    ).send();
 }
@@ -1166,7 +1154,7 @@ void reserve::claimrsvfee(sysio::slug_name chain_code,
       permission_level{get_self(), "active"_n},
       TOKEN_ACCOUNT, "transfer"_n,
       std::make_tuple(get_self(), owner,
-         asset(static_cast<int64_t>(amount), WIRE_SYMBOL),
+         asset(static_cast<int64_t>(amount), opp::wire::asset_symbol),
          std::string("sysio.reserv::reserve owner fee claim"))
    ).send();
 }
@@ -1202,7 +1190,7 @@ void reserve::claimuwfee(sysio::name underwriter) {
       permission_level{get_self(), "active"_n},
       TOKEN_ACCOUNT, "transfer"_n,
       std::make_tuple(get_self(), underwriter,
-         asset(static_cast<int64_t>(amount), WIRE_SYMBOL),
+         asset(static_cast<int64_t>(amount), opp::wire::asset_symbol),
          std::string("sysio.reserv::underwriter swap-fee claim"))
    ).send();
 }
@@ -1227,7 +1215,7 @@ void reserve::claimwire(sysio::name account) {
 
    sysio::opp::claimable::pay_out(
       claims, pk, get_self(), TOKEN_ACCOUNT,
-      account, WIRE_SYMBOL, std::string("sysio.reserv::claimwire payout"),
+      account, opp::wire::asset_symbol, std::string("sysio.reserv::claimwire payout"),
       "no claimable WIRE for this account");
 }
 
