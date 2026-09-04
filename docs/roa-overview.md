@@ -14,9 +14,9 @@ That is the whole model in one line. The rest of this page is how it works and w
 people who do pay.
 
 **Applications pay, users don't.** When you sign an ordinary transaction, the CPU time and network
-bandwidth it consumes are billed to the *contract account you called*. Sending tokens, swapping on
-a DEX, minting an NFT: the signing account is charged nothing and needs no allocation, stake, or
-rental.
+bandwidth it consumes are billed to the *contract each declared action calls*. Sending tokens,
+swapping on a DEX, minting an NFT: the signing account is charged nothing and needs no allocation,
+stake, or rental.
 
 **Applications get paid for by node owners.** A contract cannot conjure its own capacity. It
 receives a **policy** — a grant of CPU, NET, and RAM weight — from a **node owner**, who holds a
@@ -26,13 +26,15 @@ tier budget — so an ordinary account cannot grant itself bandwidth. (Privilege
 sit outside this: `setalimits` and the fixed account gift can set limits without a policy.) A node
 owner may name itself as its own policy's recipient; registration does that for tier 1 only.
 
-**A contract without a policy does not run when called directly.** Because the contract is the payer
-for actions declared on it, an unprovisioned one has nothing to pay with and those calls fail.
-Provisioning the contract — not the user — is what makes an application usable.
+**Under default billing, a contract without a policy does not run when called directly.** Because
+the contract is the payer for actions declared on it, an unprovisioned one has nothing to pay with
+and those calls fail. Provisioning the contract — not the user — is what makes an application
+usable.
 
 For those calls there is one exception to who pays, covered in
-[Who pays](#who-pays-the-payer-model): an account can volunteer to pay for itself. It is opt-in, it
-requires signatures, and it is not how ordinary traffic works.
+[Who pays](#who-pays-the-payer-model): an account can volunteer to pay for itself, which takes the
+contract's own allocation out of the picture. It is opt-in, it requires signatures, and it is not
+how ordinary traffic works.
 
 ---
 
@@ -107,9 +109,9 @@ only by deleting or shrinking the data holding it.
 This is the part that differs most from Antelope, and it is worth being precise about.
 
 **The default: the called contract pays.** An ordinary transaction names no payer at all, so the
-account billed for an action is the contract that action invokes. Nothing in the transaction has
-to say so and no permission has to be added — this is what happens when you do nothing special,
-which is the case for essentially all user traffic.
+account billed for each action the transaction declares is the contract that action invokes.
+Nothing in the transaction has to say so and no permission has to be added — this is what happens
+when you do nothing special, which is the case for essentially all user traffic.
 
 **The exception: an account can volunteer to pay for itself.** Wire reserves a permission name,
 `sysio.payer`, for this. It is not a way to bill a stranger, and adding it is not a way to obtain
