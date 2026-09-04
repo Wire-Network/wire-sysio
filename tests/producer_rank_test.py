@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
 import json
+import signal
+import time
 
 from TestHarness import Cluster, TestHelper, Utils, WalletMgr
 
@@ -18,11 +20,18 @@ from TestHarness import Cluster, TestHelper, Utils, WalletMgr
 # 5. Wait for update_ranked_producers to fire via onblock
 # 6. Verify producer schedule changed (5 → 4 producers, version increased)
 # 7. Verify finalizer policy set (4 finalizers from the keyed producers)
+# 8. Take one scheduled producer's node down and verify it is DEMOTED for missed rounds
+# 9. Verify the schedule-size floor retains it rather than publishing a short schedule
+# 10. Restart the node and verify producing a block clears the demotion
 #
 # Rank is POSITION in the score-ordered producer index, derived by iteration -- there is no
 # action that assigns it. A producer holds a position only if it is schedulable, which requires
 # an ACTIVE PRODUCER operator row in sysio.opreg AND an active finalizer key. Withholding the
 # finalizer key from one producer is therefore what makes the schedule drop from 5 to 4.
+#
+# The demotion phases exercise what no single-process contract test can: miss attribution against
+# real block production, and recovery against real finality. They are only reachable on a live
+# cluster because a producer has to actually stop producing, and then actually start again.
 #
 ###############################################################
 
@@ -235,6 +244,119 @@ try:
 
     for f in policyToCheck["finalizers"]:
         assert f["weight"] == 1, f"Finalizer weight should be 1, got {f['weight']}"
+
+    # ----------------------------------------------------------------
+    # Phase 6: A scheduled producer that stops producing is demoted
+    # ----------------------------------------------------------------
+    # Demotion is what makes the score model self-defending: a producer that holds a slot but is
+    # absent has to lose its standing without anyone intervening. `onblock` charges a missed round
+    # to every name the round-robin passed over, and once `max_consecutive_missed_rounds` (3 by
+    # default) land consecutively the producer moves into a tier no amount of collateral can climb
+    # out of.
+    Print("=== Phase 6: Demote a producer by taking its node down ===")
+
+    def producerRow(name):
+        """The producer's `sysio.system::producers` row, or None if it has none.
+
+        v6 promotes the table to KV, so each row arrives as {"key": ..., "value": ...} and the
+        fields live under `value`; the fallback keeps this working if that ever flattens.
+        """
+        resp = node0.processUrllibRequest("chain", "get_table_rows", {
+            "code": "sysio", "scope": "sysio", "table": "producers", "limit": 100, "json": True
+        })
+        assert resp["code"] == 200, f"get_table_rows(producers) returned {resp['code']}: {resp}"
+        for row in resp["payload"]["rows"]:
+            fields = row.get("value", row)
+            if fields.get("owner") == name:
+                return fields
+        return None
+
+    def waitForDemotedFlag(name, expected, timeout=300):
+        """Poll `name`'s producers row until `is_demoted` is `expected`.
+
+        Returns the row, or None if the flag never got there. Polling one producer window at a
+        time keeps the query count low while a node is down and blocks arrive at a reduced rate.
+        """
+        deadline = time.time() + timeout
+        while time.time() < deadline:
+            row = producerRow(name)
+            if row is not None and row["is_demoted"] == expected:
+                return row
+            node0.waitForHeadToAdvance(blocksToAdvance=12, timeout=60)
+        return None
+
+    # Demote a producer node0 does NOT host, so every query below keeps working while it is down.
+    demotedProd = next(name for name in keyedProdNames
+                       if producers[name].nodeId != node0.nodeId)
+    demotedNode = producers[demotedProd]
+    Print(f"Demotion target: {demotedProd} (node {demotedNode.nodeId})")
+
+    beforeRow = producerRow(demotedProd)
+    assert beforeRow is not None, f"{demotedProd} should have a producers row"
+    assert not beforeRow["is_demoted"], f"{demotedProd} should not be demoted before its outage"
+
+    demotedNode.kill(signal.SIGTERM)
+    Print(f"Stopped {demotedProd}'s node; waiting for its rounds to go unproduced")
+
+    demotedRow = waitForDemotedFlag(demotedProd, True)
+    assert demotedRow is not None, \
+        f"{demotedProd} should have been demoted after missing consecutive rounds"
+    assert demotedRow["consecutive_missed_rounds"] >= 3, \
+        f"Expected at least 3 consecutive missed rounds, got {demotedRow['consecutive_missed_rounds']}"
+    Print(f"{demotedProd} demoted after {demotedRow['consecutive_missed_rounds']} missed rounds")
+
+    # Every other producer keeps producing, so none of them may be charged a miss: attribution is
+    # per-slot, not a blanket penalty on the round.
+    for name in keyedProdNames:
+        if name == demotedProd:
+            continue
+        row = producerRow(name)
+        assert row is not None and not row["is_demoted"], \
+            f"{name} was still producing and must not be demoted"
+
+    # Finality survives the outage. The policy carries keyedCount finalizers with a threshold of
+    # keyedCount * 2 // 3 + 1, so one absent finalizer still leaves enough to reach it -- which is
+    # what lets the chain keep advancing long enough to demote the absent producer at all.
+    assert node0.waitForLibToAdvance(timeout=60), \
+        "LIB should keep advancing with one of the finalizers down"
+
+    # ----------------------------------------------------------------
+    # Phase 7: The schedule-size floor retains the demoted producer
+    # ----------------------------------------------------------------
+    # Demotion drops the schedulable count to keyedCount - 1, below `min_schedule_size`.
+    # `update_ranked_producers` refuses to publish a schedule under that floor -- it retains the
+    # last good one rather than concentrate block production and finality onto too few nodes --
+    # so the demoted producer keeps its slot. That gap between "demoted" and "rescheduled" is
+    # exactly the window Phase 8 recovers from, and on a real outage it can stay open for good.
+    Print("=== Phase 7: Verify the schedule-size floor retains the demoted producer ===")
+    assert node0.waitForHeadToAdvance(blocksToAdvance=135, timeout=240), \
+        "Head should advance through an update_ranked_producers cycle"
+
+    heldSchedule = node0.processUrllibRequest("chain", "get_producer_schedule")
+    heldProducers = sorted([p["producer_name"] for p in heldSchedule["payload"]["active"]["producers"]])
+    Print(f"Schedule after demotion: {heldProducers}")
+    assert demotedProd in heldProducers, \
+        f"The floor should have retained {demotedProd}; schedule is {heldProducers}"
+    assert len(heldProducers) == keyedCount, \
+        f"Expected the schedule retained at {keyedCount} producers, got {heldProducers}"
+
+    # ----------------------------------------------------------------
+    # Phase 8: Producing again clears the demotion
+    # ----------------------------------------------------------------
+    # A block is the strongest liveness proof there is, so a demoted producer that is STILL in the
+    # active schedule recovers by producing one -- no `regproducer`, no operator intervention.
+    # Without it the producers a mass outage demoted would keep producing under the retained
+    # schedule while `payepoch` skipped them, earning nothing until every operator re-registered by
+    # hand. A producer the schedule has actually dropped never reaches this path.
+    Print("=== Phase 8: Restart the node and verify the demotion clears ===")
+    assert demotedNode.relaunch(), f"Failed to relaunch {demotedProd}'s node"
+
+    recoveredRow = waitForDemotedFlag(demotedProd, False)
+    assert recoveredRow is not None, \
+        f"{demotedProd} should have cleared its demotion by producing a block"
+    assert recoveredRow["consecutive_missed_rounds"] == 0, \
+        f"Expected the miss streak to reset, got {recoveredRow['consecutive_missed_rounds']}"
+    Print(f"{demotedProd} recovered by producing -- demotion and miss streak both cleared")
 
     # ----------------------------------------------------------------
     # Final verification: LIB still advancing
