@@ -3371,6 +3371,46 @@ BOOST_FIXTURE_TEST_CASE( no_producers_undistributed_stays_in_sysio, sysio_emissi
 // Pay is per block: every producer is credited the period's per-block rate times the blocks it
 // made, and the slots nobody filled are paid to nobody -- they stay in the treasury rather than
 // flowing to the producers that did show up.
+// Integer division is the one way the no-forfeiture rule could be broken silently: a real block
+// count over a pool too small to represent it pays zero, and consuming the count then would destroy
+// work that was actually done. The blocks wait instead, for a period whose pool can pay them.
+BOOST_FIXTURE_TEST_CASE( pay_rounding_to_zero_does_not_consume_the_blocks, sysio_emissions_tester ) try {
+   create_t5_holding_accounts();
+   setup_producers(3);
+   wait_for_producer_schedule();
+   produce_complete_cycles(3, 1);
+
+   const uint32_t start = head_secs() - ONE_EPOCH - 1;
+   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
+
+   const auto  target = "producera"_n;
+   const asset before = get_wire_balance_paid(target);
+
+   // A period whose entire producer pool is one unit. active_pool * blocks / slot_divisor is
+   // integer division, so every producer's block pay floors to zero.
+   const int64_t tiny_emission = 2;
+   BOOST_REQUIRE_EQUAL( success(), push_system_action(EPOCH, "accrueepoch"_n, mvo()
+      ("epoch_index", 1)("batch_group_index", 0)("per_epoch_emission", tiny_emission)) );
+
+   // Read the count LAST, immediately before the payout: every push_system_action closes a block,
+   // and the target keeps producing into its own counter while the setup runs.
+   const uint32_t blocks = unpaid_blocks_of(target);
+   BOOST_REQUIRE_GT( blocks, 0u );
+   // Fewer blocks than the period's nominal slots, so the divisor is the nominal count.
+   BOOST_REQUIRE_LT( uint64_t(blocks), test_nominal_slots(T_EPOCH_SECS) );
+
+   BOOST_REQUIRE_EQUAL( success(), push_system_action(EPOCH, "payepoch"_n, mvo()
+      ("epoch_index", 1)("batch_op_groups", vector<vector<name>>{})("period_emission", tiny_emission)) );
+
+   // Nothing was credited ...
+   BOOST_REQUIRE_MESSAGE( get_wire_balance_paid(target) == before,
+      "the pool was large enough to pay after all -- this test no longer exercises the rounding case" );
+   // ... so nothing may be consumed. The count can only have GROWN, by the blocks the payout's own
+   // transaction produced; a reset would drop it far below what it was.
+   BOOST_REQUIRE_MESSAGE( unpaid_blocks_of(target) >= blocks,
+      "uncredited blocks were consumed: had " << blocks << ", now " << unpaid_blocks_of(target) );
+} FC_LOG_AND_RETHROW()
+
 BOOST_FIXTURE_TEST_CASE( active_producers_are_paid_per_block, sysio_emissions_tester ) try {
    create_t5_holding_accounts();
    setup_producers(3);

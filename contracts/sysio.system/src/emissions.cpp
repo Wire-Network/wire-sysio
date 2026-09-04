@@ -966,7 +966,7 @@ void system_contract::payepoch(uint32_t epoch_index,
       };
       struct reset_entry {
          name owner;
-         bool blocks;   // a paid row starts its count over; an unpayable row keeps it
+         bool snapshot; // this payout consumed the row's attestation credit
       };
       std::vector<pay_entry>   entries;
       std::vector<reset_entry> to_reset; // snapshot before modify: avoids
@@ -992,13 +992,13 @@ void system_contract::payepoch(uint32_t epoch_index,
          // pay nor a standby retainer -- and keeps its block count for when it can. The snapshot
          // counter is per period regardless.
          if (!producer_rank::is_schedulable(*it, _finalizers)) {
-            if (it->snapshot_attestations > 0) to_reset.push_back({it->owner, false});
+            if (it->snapshot_attestations > 0) to_reset.push_back({it->owner, true});
             continue;
          }
 
          produced_blocks += it->unpaid_blocks;
          if (it->unpaid_blocks > 0 || it->snapshot_attestations > 0) {
-            to_reset.push_back({it->owner, true});
+            to_reset.push_back({it->owner, it->snapshot_attestations > 0});
          }
 
          ++position;
@@ -1013,10 +1013,20 @@ void system_contract::payepoch(uint32_t epoch_index,
 
       // Producers are paid the emission share only — swap fees go to the
       // underwriter + batch operators (see the fold-in comment above).
+      //
+      // A row's blocks are cleared ONLY when the block portion actually credited something. The
+      // division is integer, so a small pool over a large divisor can round a real block count to
+      // zero pay; clearing the count then would destroy work the producer did, which is the one
+      // thing this model promises never to do. An uncredited count carries to the next payout
+      // exactly as an unpayable row's does, and the rate it eventually settles at is the settling
+      // period's -- so the blocks are worth something the moment the pool can represent them.
       int64_t distributed_to_producers = 0;
+      std::vector<name> block_paid;
+      block_paid.reserve(entries.size());
       for (const auto& entry : entries) {
-         int64_t pay = static_cast<int64_t>(
+         const int64_t block_pay = static_cast<int64_t>(
             static_cast<__int128>(active_pool) * entry.blocks / slot_divisor);
+         int64_t pay = block_pay;
          if (entry.standby_weight > 0) {
             pay += static_cast<int64_t>(
                static_cast<__int128>(standby_pool) * entry.standby_weight / standby_weight_sum);
@@ -1025,19 +1035,25 @@ void system_contract::payepoch(uint32_t epoch_index,
             credit_pay(get_self(), entry.owner, pay, memo::producer_reward);
             distributed_to_producers += pay;
          }
+         // The BLOCK portion specifically -- a standby whose retainer paid but whose block pay
+         // rounded to zero keeps its blocks too.
+         if (block_pay > 0) block_paid.push_back(entry.owner);
       }
 
       actual_paid += distributed_to_producers;
 
       // Reset the period's counters after distribution (iteration-safe: uses PK snapshot).
       for (const auto& entry : to_reset) {
+         const bool clear_blocks =
+            std::find(block_paid.begin(), block_paid.end(), entry.owner) != block_paid.end();
+         if (!clear_blocks && !entry.snapshot) continue;
          auto key = producer_key_t{entry.owner.value};
          _producers.modify(same_payer, key, [&](auto& p) {
-            if (entry.blocks) p.unpaid_blocks = 0;
-            p.snapshot_attestations = 0;
+            if (clear_blocks)   p.unpaid_blocks          = 0;
+            if (entry.snapshot) p.snapshot_attestations  = 0;
          });
          // Zeroing snapshot_attestations moved the snapshot factor; keep the sort key in step.
-         rescore_producer(entry.owner);
+         if (entry.snapshot) rescore_producer(entry.owner);
       }
    }
 
