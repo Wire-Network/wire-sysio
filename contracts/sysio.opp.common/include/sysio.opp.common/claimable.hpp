@@ -34,9 +34,9 @@
  * require only that the row expose:
  *
  *   * `uint64_t balance`            -- required, the claimable amount in atomic units of THAT
- *                                      contract's token (WIRE for sysio.system / sysio.reserv,
- *                                      CORE_SYM for sysio.opreg) -- these helpers never name a
- *                                      symbol; `pay_out`'s caller supplies it
+ *                                      contract's token (currently WIRE for every consumer) --
+ *                                      these helpers never name a symbol; `pay_out`'s caller
+ *                                      supplies it
  *   * `uint32_t expires_at_sec`     -- optional; when present it is maintained by `credit` and
  *                                      makes the row eligible for `sweep_expired`
  */

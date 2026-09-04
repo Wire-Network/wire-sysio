@@ -12,6 +12,7 @@
 #include <sysio/chain/unapplied_transaction_queue.hpp>
 #include <sysio/chain/fork_database.hpp>
 #include <sysio/chain/platform_timer.hpp>
+#include <sysio/protocol/snapshot_attestation.hpp>
 #include <sysio/resource_monitor_plugin/resource_monitor_plugin.hpp>
 
 #include <fc/io/json.hpp>
@@ -85,7 +86,7 @@ fc::logger        _transient_trx_failed_trace_log;
 
 namespace sysio {
 
-
+namespace snapshot_attest = protocol::snapshot_attestation;
 
 using namespace sysio::chain;
 using namespace sysio::chain::plugin_interface;
@@ -668,8 +669,15 @@ public:
       return {chain.head().id(), chain.calculate_integrity_hash()};
    }
 
+   /** Build, sign, and asynchronously submit one finalized snapshot vote. */
    void submit_snapshot_vote(const snapshot_scheduler::snapshot_information& si) {
       if (_snapshot_provider_account.empty()) return;
+
+      if (!snapshot_attest::is_scheduled_block(si.head_block_num)) {
+         dlog("Snapshot provider: skipping on-chain vote for unscheduled manual snapshot at block {}",
+              si.head_block_num);
+         return;
+      }
 
       try {
          chain::controller& chain = chain_plug->chain();
@@ -679,7 +687,7 @@ public:
          // Build the votesnaphash action
          chain::action vote_action;
          vote_action.account = chain::config::system_account_name;
-         vote_action.name = chain::name("votesnaphash");
+         vote_action.name = chain::name(snapshot_attest::action_votesnaphash);
          vote_action.authorization = {{snap_account_name, chain::config::active_name}};
          // Parameter order must match votesnaphash(name, checksum256, checksum256) in snapshot_attest.hpp.
          // root_hash is fc::crypto::blake3 (32 bytes) which is binary-compatible with checksum256.
@@ -689,7 +697,8 @@ public:
          // Build the transaction
          chain::signed_transaction trx;
          trx.actions.emplace_back(std::move(vote_action));
-         trx.expiration = fc::time_point_sec(chain.head().block_time() + fc::seconds(30));
+         trx.expiration = fc::time_point_sec(
+            chain.head().block_time() + fc::seconds(_snapshot_vote_expiration_seconds));
          trx.set_reference_block(chain.head().id());
 
          // Determine the required signing keys for the snapshot provider account's active authority
@@ -736,21 +745,19 @@ public:
                } else {
                   auto trace = std::get<chain::transaction_trace_ptr>(result);
                   if (trace && trace->except) {
-                     // Check for snapshot hash disagreement via error code.
-                     // snap_hash_disagreement_error (9001) is defined in snapshot_attest.hpp
-                     // and emitted by the votesnaphash action's check() call.
-                     constexpr uint64_t snap_hash_disagreement_error = 9001;
-                     if (trace->error_code && *trace->error_code == snap_hash_disagreement_error) {
+                     if (trace->error_code
+                         && *trace->error_code == snapshot_attest::disagreement_error_code) {
                         fc_elog(_log, "FATAL: Snapshot hash disagreement detected (error code {})! "
                                       "This node's snapshot differs from the attested record. Shutting down.",
-                                      snap_hash_disagreement_error);
+                                      snapshot_attest::disagreement_error_code);
                         app().quit();
                      } else {
                         fc_elog(_log, "Snapshot provider: votesnaphash transaction failed: {}",
                                  trace->except->to_detail_string());
                      }
                   } else if (trace && trace->receipt) {
-                     fc_ilog(_log, "Snapshot provider: votesnaphash submitted successfully for block {}", trace->block_num);
+                     fc_ilog(_log, "Snapshot provider: votesnaphash submitted successfully for block {}",
+                             trace->block_num);
                   }
                }
             });
@@ -832,8 +839,8 @@ public:
    fc::time_point                                    _pending_block_deadline;
    uint32_t                                          _max_block_cpu_usage_threshold_us            = 0;
    uint32_t                                          _max_block_net_usage_threshold_bytes         = 0;
-   bool                                              _disable_subjective_p2p_billing              = true;
-   bool                                              _disable_subjective_api_billing              = true;
+   bool                                              _disable_subjective_p2p_billing              = false;
+   bool                                              _disable_subjective_api_billing              = false;
    fc::time_point                                    _irreversible_block_time;
 
    std::vector<chain::digest_type> _protocol_features_to_activate;
@@ -875,7 +882,10 @@ public:
 
    // snapshot provider configuration
    std::string _snapshot_provider_account;
-   static constexpr uint32_t _snapshot_provider_block_spacing = 25000;
+   /// Lifetime of an automatically submitted provider vote transaction.
+   static constexpr uint32_t _snapshot_vote_expiration_seconds = 30;
+   /// Description persisted with the automatic provider schedule.
+   static constexpr auto _snapshot_provider_schedule_description = "snapshot-provider auto";
 
    std::function<void(speculative_block_metrics)> _update_speculative_block_metrics;
 
@@ -1465,11 +1475,13 @@ void producer_plugin::set_program_options(
           "Maximum size (in MiB) of the incoming transaction queue. Exceeding this value will subjectively drop transaction with resource exhaustion.")
          ("disable-subjective-account-billing", boost::program_options::value<vector<string>>()->composing()->multitoken(),
           "Account which is excluded from subjective CPU billing")
-         ("disable-subjective-payer-billing", bpo::value<bool>()->default_value(false),
-          "Disable subjective CPU billing for all contract payer accounts")
-         ("disable-subjective-p2p-billing", bpo::value<bool>()->default_value(true),
+         ("disable-subjective-payer-billing", bpo::value<bool>()->default_value(true),
+          "Disable subjective CPU billing for all contract payer accounts. On by default: under "
+          "contract-pays the payer is the called contract, so billing it for its callers' failures "
+          "charges the party provisioned to absorb traffic rather than the account causing it")
+         ("disable-subjective-p2p-billing", bpo::value<bool>()->default_value(false),
           "Disable subjective CPU billing for P2P transactions")
-         ("disable-subjective-api-billing", bpo::value<bool>()->default_value(true),
+         ("disable-subjective-api-billing", bpo::value<bool>()->default_value(false),
           "Disable subjective CPU billing for API transactions")
          ("snapshots-dir", bpo::value<std::filesystem::path>()->default_value("snapshots"),
           "the location of the snapshots directory (absolute path or relative to application data dir)")
@@ -1783,28 +1795,28 @@ void producer_plugin_impl::plugin_startup() {
 
       // Auto-schedule periodic snapshots for snapshot provider mode.
       // All providers use the same block_spacing so they snapshot at identical heights.
-      // The scheduler fires when (height - start_block_num - 1) % block_spacing == 0,
-      // so set start_block_num = block_spacing - 1 to trigger at exact multiples:
+      // on_start_block(height) snapshots the current head at height - 1, so start_block_num equal
+      // to block_spacing snapshots exact head-height multiples:
       // blocks 25000, 50000, 75000, ...
       if (!_snapshot_provider_account.empty()) {
          snapshot_scheduler::snapshot_request_information sri;
-         sri.block_spacing = _snapshot_provider_block_spacing;
-         sri.start_block_num = _snapshot_provider_block_spacing - 1;
+         sri.block_spacing = snapshot_attest::block_spacing;
+         sri.start_block_num = snapshot_attest::block_spacing;
          sri.end_block_num = std::numeric_limits<uint32_t>::max();
-         sri.snapshot_description = "snapshot-provider auto";
+         sri.snapshot_description = _snapshot_provider_schedule_description;
 
          // The auto-schedule is persisted to snapshot-schedule.json and reloaded by set_db_path()
          // on restart, so only schedule it when an identical request is not already present;
          // otherwise schedule_snapshot() would throw duplicate_snapshot_request on every restart.
          if (auto existing = _snapshot_scheduler.find_snapshot_request(sri.block_spacing, sri.start_block_num, sri.end_block_num)) {
             ilog("Snapshot provider mode: reusing persisted auto-schedule for every {} blocks (request id {})",
-                 _snapshot_provider_block_spacing, *existing);
+                 snapshot_attest::block_spacing, *existing);
          } else {
             // scheduled (non create_snapshot) requests store no completion callback; the produced
             // snapshots are observed through add_snapshot_finalized_callback (provider-mode voting)
             auto result = _snapshot_scheduler.schedule_snapshot(sri, {});
             ilog("Snapshot provider mode: auto-scheduled snapshots every {} blocks (request id {})",
-                 _snapshot_provider_block_spacing, result.snapshot_request_id);
+                 snapshot_attest::block_spacing, result.snapshot_request_id);
          }
       }
 
@@ -2895,7 +2907,10 @@ producer_plugin_impl::handle_push_result(const transaction_metadata_ptr&        
             // this failed our configured maximum transaction time, we don't want to replay it
             fc_tlog(_log, "Failed {} trx, auth: {}, prev billed: {}us, ran: {}us, id: {}, except: {}",
                     e.code(), auths, trace->total_cpu_usage_us, fc::time_point::now() - start, trx->id(), e.to_string());
-            if (!disable_subjective_enforcement)
+            // Only blame authorizers the chain has verified. Before that the list is
+            // attacker-chosen: naming a victim on an unsignable trx throttles the victim, not the
+            // spammer, who just names a different existing account each time.
+            if (!disable_subjective_enforcement && trx->auth_verified)
                _account_fails.add(auths, e);
          }
          if (next) {

@@ -2,6 +2,9 @@
 #include <sysio/testing/tester.hpp>
 #include <sysio/chain/abi_serializer.hpp>
 #include <sysio/chain/kv_table_objects.hpp>
+#include <sysio/chain/authorization_manager.hpp>
+#include <sysio/chain/permission_object.hpp>
+#include <sysio/chain/subjective_billing.hpp>
 #include "sysio.system_tester.hpp"
 #include <contracts.hpp>
 #include <sysio/opp/opp.hpp>
@@ -122,6 +125,21 @@ public:
       return base_tester::push_action( ROA, name,
          vector<permission_level>{{signer, "sysio.payer"_n},{signer, "active"_n}},
          data);
+   }
+
+   /// Push a sysio.roa action WITHOUT an explicit billed CPU time, so
+   /// transaction_context::verify_init_subjective_billing() actually runs. The ordinary tester
+   /// helpers pass DEFAULT_BILLED_CPU_TIME_US, which sets explicit_billed_cpu_time and makes that
+   /// check return on its first line -- meaning the subjective admission path is invisible to them.
+   transaction_trace_ptr push_subjective_action( const account_name& signer, const action_name& name,
+                                                 const variant_object& data ) {
+      signed_transaction trx;
+      trx.actions.emplace_back( get_action( ROA, name,
+                                            vector<permission_level>{{signer, config::active_name}},
+                                            data ) );
+      set_transaction_headers( trx );
+      trx.sign( get_private_key( signer, "active" ), control->get_chain_id() );
+      return push_transaction( trx, fc::time_point::maximum(), 0 /* no explicit billed cpu */ );
    }
 
    fc::variant get_nodeowner( account_name acc )
@@ -856,7 +874,325 @@ public:
       }
       produce_block();
    }
+
+   /// Assert an onboarded session is actually usable: the linkauth resolves sysio::reqauth to
+   /// exactly the session permission, and the session key alone satisfies the resulting
+   /// authorization. Without this the onboarding cases would pass on a linkauth that had become a
+   /// no-op or named the wrong requirement, since permission existence and hierarchy say nothing
+   /// about the link.
+   ///
+   /// Built as a bare action rather than push_reqauth because sysio carries the system contract in
+   /// this fixture, so reqauth is absent from its ABI; reqauth's payload is just the account name.
+   void check_session_is_live( account_name user, account_name issuer ) {
+      const auto& authmgr = control->get_authorization_manager();
+
+      // Resolve the requirement explicitly. check_authorization alone is not sufficient: a link to
+      // sysio.any makes lookup_minimum_permission return empty, which skips the relevance check
+      // entirely, so the key check below would bless an overbroad requirement. Only a link naming a
+      // permission the child does not satisfy -- active, say -- would throw on its own.
+      const auto minimum = authmgr.lookup_minimum_permission( user, config::system_account_name,
+                                                              "reqauth"_n );
+      BOOST_REQUIRE( minimum.has_value() );
+      BOOST_REQUIRE( *minimum == "session"_n );
+
+      action reqauth_act;
+      reqauth_act.account       = config::system_account_name;
+      reqauth_act.name          = "reqauth"_n;
+      reqauth_act.authorization = { permission_level{user, "session"_n} };
+      reqauth_act.data          = fc::raw::pack( user );
+
+      BOOST_CHECK_NO_THROW( authmgr.check_authorization(
+         { reqauth_act }, { get_public_key( issuer, "session" ) } ) );
+   }
 };
+
+// Session-key onboarding: what can and cannot share a transaction.
+//
+// RAM is verified once at transaction finalize rather than per action, so a ROA grant and the
+// spending of that grant may ride in the same transaction -- nothing can land in between and
+// consume it.
+//
+// Authorization, by contrast, is decided for every TOP-LEVEL action before any of them executes
+// (controller checks the whole action list, then calls trx_context.exec()). Two top-level
+// updateauth actions therefore cannot create a permission and its child together: the child's
+// parent lookup runs while the parent does not yet exist.
+//
+// That restriction is specific to the top-level path. An INLINE action is authorized during
+// execution, by which time the parent exists -- see session_onboarding_single_transaction_via_inline
+// for the one-transaction shape a contract-managed onboarding can actually use.
+BOOST_FIXTURE_TEST_CASE( session_onboarding_grant_and_setup, sysio_roa_full_tester ) try {
+   const auto issuer = node_owners[2];
+   const auto sessmgr = "sessmgr"_n;   // stands in for the dapp's reaper contract
+   create_accounts( {sessmgr}, false, false, false, false );
+   const auto user   = create_newuser( issuer );
+   produce_block();
+
+   // create_newuser seeds the account with the creator's active key, so one signature satisfies
+   // both the issuer and the user authorizations below.
+   const auto signing_key = get_private_key( issuer, "active" );
+   const vector<permission_level> as_user{{user, config::active_name}};
+
+   const authority gate_auth( 1, {}, {{{sessmgr, config::sysio_code_name}, 1}} );
+   const authority session_auth( 1, {{get_public_key( issuer, "session" ), 1}}, {} );
+
+   auto make_gate = [&]{ return updateauth{ .account = user, .permission = "sessgate"_n,
+                                            .parent  = config::active_name, .auth = gate_auth }; };
+   auto make_child = [&]{ return updateauth{ .account = user, .permission = "session"_n,
+                                             .parent  = "sessgate"_n, .auth = session_auth }; };
+   auto addpolicy_action = [&]{
+      return get_action( config::roa_account_name, "addpolicy"_n,
+                         vector<permission_level>{{issuer, config::active_name}},
+                         mvo()( "owner", user )( "issuer", issuer )
+                              ( "net_weight", "0.0000 SYS" )( "cpu_weight", "0.0000 SYS" )
+                              ( "ram_weight", "0.0010 SYS" )   // 10 units of RAM
+                              ( "time_block", 0 )( "network_gen", 0 ) );
+   };
+   auto sign_and_push = [&]( signed_transaction& trx ) {
+      set_transaction_headers( trx );
+      trx.sign( signing_key, control->get_chain_id() );
+      return push_transaction( trx );
+   };
+
+   const auto& authmgr = control->get_authorization_manager();
+
+   // Without a grant, even the code-only parent alone exceeds the creation gift.
+   {
+      signed_transaction trx;
+      trx.actions.emplace_back( as_user, make_gate() );
+      BOOST_CHECK_THROW( sign_and_push( trx ), ram_usage_exceeded );
+   }
+   produce_block();
+   BOOST_REQUIRE( authmgr.find_permission( {user, "sessgate"_n} ) == nullptr );
+
+   // Parent and child cannot be created together, even with the grant present: the child's
+   // authorization check resolves its parent before the parent's action has run.
+   {
+      signed_transaction trx;
+      trx.actions.emplace_back( addpolicy_action() );
+      trx.actions.emplace_back( as_user, make_gate() );
+      trx.actions.emplace_back( as_user, make_child() );
+      BOOST_CHECK_THROW( sign_and_push( trx ), permission_query_exception );
+   }
+   produce_block();
+   BOOST_REQUIRE( authmgr.find_permission( {user, "sessgate"_n} ) == nullptr ); // whole trx reverted
+
+   // Grant and parent together: atomic, so the grant cannot be intercepted and spent elsewhere.
+   {
+      signed_transaction trx;
+      trx.actions.emplace_back( addpolicy_action() );
+      trx.actions.emplace_back( as_user, make_gate() );
+      sign_and_push( trx );
+   }
+   produce_block();
+   BOOST_REQUIRE( authmgr.find_permission( {user, "sessgate"_n} ) != nullptr );
+
+   // Child and its link follow in a second transaction, paid for out of the same grant.
+   {
+      signed_transaction trx;
+      trx.actions.emplace_back( as_user, make_child() );
+      trx.actions.emplace_back( as_user, linkauth{ user, "sysio"_n, "reqauth"_n, "session"_n } );
+      sign_and_push( trx );
+   }
+   produce_block();
+   BOOST_REQUIRE( authmgr.find_permission( {user, "session"_n} ) != nullptr );
+
+   // The permissions existing is not the onboarding result -- the point is a session key that can
+   // actually act. Resolve the link and check the session key satisfies it, so a linkauth that
+   // became a no-op or named the wrong requirement fails here rather than passing silently.
+   // (push_reqauth is unavailable: sysio carries the system contract here, not bios.)
+   check_session_is_live( user, issuer );
+} FC_LOG_AND_RETHROW()
+
+// The top-level restriction above is not a property of transactions, only of top-level actions.
+// Inline actions are authorized during execution, after earlier actions have applied, so a contract
+// holding a seat in the gate can create the child in the same transaction that creates the gate.
+// The trailing top-level linkauth is fine too: its precheck resolves the currently linked
+// permission (none), and only apply_sysio_linkauth requires the requirement to exist, by which
+// point the inline has created it.
+//
+// This is the shape a contract-managed onboarding should use -- it never leaves an unspent grant
+// exposed between transactions.
+BOOST_FIXTURE_TEST_CASE( session_onboarding_single_transaction_via_inline, sysio_roa_full_tester ) try {
+   const auto issuer  = node_owners[3];
+   const auto sessmgr = "sessmgr2"_n;
+   create_accounts( {sessmgr}, false, false, false, false );
+   // the forwarder needs RAM to hold its code, and NET/CPU because in Wire the contract account
+   // is billed for its own execution rather than the caller
+   add_roa_policy( issuer, sessmgr, "8.0000 SYS", "8.0000 SYS", "8.0000 SYS", 0, 0 );
+   produce_block();
+   set_code( sessmgr, system_contracts::testing::test_contracts::sendinline_wasm() );
+   set_abi( sessmgr, system_contracts::testing::test_contracts::sendinline_abi().data() );
+   const auto user = create_newuser( issuer );
+   produce_block();
+
+   const auto signing_key = get_private_key( issuer, "active" );
+   const authority gate_auth( 1, {}, {{{sessmgr, config::sysio_code_name}, 1}} );
+   const authority session_auth( 1, {{get_public_key( issuer, "session" ), 1}}, {} );
+
+   signed_transaction trx;
+   // 1. grant
+   trx.actions.emplace_back( get_action( config::roa_account_name, "addpolicy"_n,
+                                         vector<permission_level>{{issuer, config::active_name}},
+                                         mvo()( "owner", user )( "issuer", issuer )
+                                              ( "net_weight", "0.0000 SYS" )( "cpu_weight", "0.0000 SYS" )
+                                              ( "ram_weight", "0.0010 SYS" )
+                                              ( "time_block", 0 )( "network_gen", 0 ) ) );
+   // 2. top-level: the code-only gate
+   trx.actions.emplace_back( vector<permission_level>{{user, config::active_name}},
+                             updateauth{ .account = user, .permission = "sessgate"_n,
+                                         .parent  = config::active_name, .auth = gate_auth } );
+   // 3. inline: the contract creates the child under the gate, authorized at execution time
+   trx.actions.emplace_back( get_action( sessmgr, "send"_n,
+                                         vector<permission_level>{{issuer, config::active_name}},
+                                         mvo()( "contract", config::system_account_name )
+                                              ( "action_name", "updateauth" )
+                                              ( "auths", std::vector<permission_level>{{user, "sessgate"_n}} )
+                                              ( "payload", fc::raw::pack(
+                                                   updateauth{ .account = user, .permission = "session"_n,
+                                                               .parent  = "sessgate"_n, .auth = session_auth } ) ) ) );
+   // 4. top-level: link the child that step 3 will have created
+   trx.actions.emplace_back( vector<permission_level>{{user, config::active_name}},
+                             linkauth{ user, "sysio"_n, "reqauth"_n, "session"_n } );
+
+   set_transaction_headers( trx );
+   trx.sign( signing_key, control->get_chain_id() );
+   push_transaction( trx );
+   produce_block();
+
+   const auto& authmgr = control->get_authorization_manager();
+   const auto* gate  = authmgr.find_permission( {user, "sessgate"_n} );
+   const auto* child = authmgr.find_permission( {user, "session"_n} );
+   BOOST_REQUIRE( gate != nullptr );
+   BOOST_REQUIRE( child != nullptr );
+   BOOST_REQUIRE( child->parent == gate->id );
+
+   // As above, the onboarding result is a usable session key, not merely two permissions and a
+   // hierarchy. The trailing linkauth is the part most easily broken without any of the structural
+   // assertions noticing, so resolve it and check the session key satisfies it.
+   check_session_is_live( user, issuer );
+} FC_LOG_AND_RETHROW()
+
+// The contract cannot pay for a user's permission RAM, in either of the two ways one might try.
+//
+// apply_sysio_updateauth and its siblings call add_ram_usage against the permission's OWNER with no
+// payer parameter, so a well-funded contract driving the change via an inline action still leaves
+// the charge on the user. And the sysio.payer mechanism cannot be pointed at these actions at all:
+// the native auth actions require exactly one declared authorization, so a payer role cannot even
+// be attached.
+BOOST_FIXTURE_TEST_CASE( contract_cannot_pay_for_permission_ram, sysio_roa_full_tester ) try {
+   const auto issuer  = node_owners[4];
+   const auto sessmgr = "sessmgr3"_n;
+   create_accounts( {sessmgr}, false, false, false, false );
+   add_roa_policy( issuer, sessmgr, "8.0000 SYS", "8.0000 SYS", "8.0000 SYS", 0, 0 );
+   produce_block();
+   set_code( sessmgr, system_contracts::testing::test_contracts::sendinline_wasm() );
+   set_abi( sessmgr, system_contracts::testing::test_contracts::sendinline_abi().data() );
+
+   const auto user = create_newuser( issuer );
+   // Room to spare, so any failure below is about who pays rather than affordability.
+   add_roa_policy( issuer, user, "0.0000 SYS", "0.0000 SYS", "0.0100 SYS", 0, 0 );
+   produce_block();
+
+   const auto signing_key = get_private_key( issuer, "active" );
+   const authority gate_auth( 1, {}, {{{sessmgr, config::sysio_code_name}, 1}} );
+
+   // The gate, so the contract has a seat to act through.
+   set_authority( user, "sessgate"_n, gate_auth, config::active_name,
+                  { permission_level{user, config::active_name} }, { signing_key } );
+   produce_block();
+
+   auto& rm = control->get_mutable_resource_limits_manager();
+   const int64_t user_before = rm.get_account_ram_usage( user );
+   const int64_t mgr_before  = rm.get_account_ram_usage( sessmgr );
+
+   // A richly funded contract creates the child through its seat. The charge still lands on the user.
+   const authority session_auth( 1, {{get_public_key( issuer, "session" ), 1}}, {} );
+   base_tester::push_action( sessmgr, "send"_n, issuer, mvo()
+                   ( "contract", config::system_account_name )
+                   ( "action_name", "updateauth" )
+                   ( "auths", std::vector<permission_level>{{user, "sessgate"_n}} )
+                   ( "payload", fc::raw::pack( updateauth{ .account = user, .permission = "session"_n,
+                                                           .parent  = "sessgate"_n, .auth = session_auth } ) ) );
+   produce_block();
+
+   BOOST_TEST( rm.get_account_ram_usage( user ) > user_before );      // the owner pays
+   BOOST_TEST( rm.get_account_ram_usage( sessmgr ) == mgr_before );   // the contract does not
+
+   // Nor can a payer role be attached. Each of the four native auth actions carries its own
+   // auths.size() == 1 guard, so exercising only updateauth would leave a regression in any of the
+   // other three invisible while making sysio.payer attachable on that path. Two independent
+   // barriers, checked across all four.
+   const authority spare_auth( 1, {{get_public_key( issuer, "spare" ), 1}}, {} );
+
+   // Pre-state, so each action below is otherwise valid and the rejection is about the payer rather
+   // than about a missing permission or link.
+   set_authority( user, "paydel"_n, spare_auth, config::active_name,
+                  { permission_level{user, config::active_name} }, { signing_key } );
+   set_authority( user, "payperm"_n, spare_auth, config::active_name,
+                  { permission_level{user, config::active_name} }, { signing_key } );
+   {
+      // link_authority() takes no keys and would sign as get_private_key(user, "active");
+      // create_newuser seeded this account with the creator's key, so sign explicitly.
+      signed_transaction link_trx;
+      link_trx.actions.emplace_back( vector<permission_level>{{user, config::active_name}},
+                                     linkauth{ user, config::system_account_name,
+                                               "reqauth"_n, "payperm"_n } );
+      set_transaction_headers( link_trx );
+      link_trx.sign( signing_key, control->get_chain_id() );
+      push_transaction( link_trx );
+   }
+   produce_block();
+
+   using add_action_fn = std::function<void( signed_transaction&, const vector<permission_level>& )>;
+   const std::vector<std::pair<std::string, add_action_fn>> cases = {
+      { "updateauth action should only have one declared authorization",
+        [&]( signed_transaction& t, const vector<permission_level>& a ) {
+           t.actions.emplace_back( a, updateauth{ .account = user, .permission = "paynew"_n,
+                                                  .parent = config::active_name, .auth = spare_auth } ); } },
+      { "deleteauth action should only have one declared authorization",
+        [&]( signed_transaction& t, const vector<permission_level>& a ) {
+           t.actions.emplace_back( a, deleteauth{ user, "paydel"_n } ); } },
+      { "link action should only have one declared authorization",
+        [&]( signed_transaction& t, const vector<permission_level>& a ) {
+           t.actions.emplace_back( a, linkauth{ user, config::system_account_name,
+                                                "reqauth2"_n, "payperm"_n } ); } },
+      { "unlink action should only have one declared authorization",
+        [&]( signed_transaction& t, const vector<permission_level>& a ) {
+           t.actions.emplace_back( a, unlinkauth{ user, config::system_account_name, "reqauth"_n } ); } },
+   };
+
+   for( const auto& entry : cases ) {
+      const std::string& expected   = entry.first;
+      const add_action_fn& add_action = entry.second;
+
+      // 1. validate_referenced_accounts requires the payer to also carry a real authorization on the
+      //    same action, so naming the contract as payer alone is rejected outright.
+      {
+         signed_transaction trx;
+         add_action( trx, { {sessmgr, config::sysio_payer_name}, {user, config::active_name} } );
+         set_transaction_headers( trx );
+         trx.sign( signing_key, control->get_chain_id() );
+         trx.sign( get_private_key( sessmgr, "active" ), control->get_chain_id() );
+         BOOST_CHECK_EXCEPTION( push_transaction( trx ), transaction_exception,
+                                fc_exception_message_starts_with(
+                                   "Payer 'sessmgr3' did not authorize this action" ) );
+      }
+
+      // 2. Giving the payer that real authorization pushes the action past the single declared
+      //    authorization each of these accepts, so no arrangement satisfies both barriers.
+      {
+         signed_transaction trx;
+         add_action( trx, { {sessmgr, config::sysio_payer_name},
+                            {sessmgr, config::active_name},
+                            {user, config::active_name} } );
+         set_transaction_headers( trx );
+         trx.sign( signing_key, control->get_chain_id() );
+         trx.sign( get_private_key( sessmgr, "active" ), control->get_chain_id() );
+         BOOST_CHECK_EXCEPTION( push_transaction( trx ), irrelevant_auth_exception,
+                                fc_exception_message_starts_with( expected ) );
+      }
+   }
+} FC_LOG_AND_RETHROW()
 
 // ===== 1. addpolicy validation =====
 
@@ -1271,6 +1607,71 @@ BOOST_FIXTURE_TEST_CASE( newuser_tier2_fails, sysio_roa_full_tester ) try {
       sysio_assert_message_is("Creator is not a registered tier-1 node owner"));
 } FC_LOG_AND_RETHROW()
 
+// Only tier 1 is provisioned a personal policy at registration -- it is the sole tier that can call
+// newuser, whose sponsorship rows are the only writes billed to a node owner. Tiers 2 and 3 get the
+// nodeowners budget, a reslimit row, and the 10% sysio RAM grant, but no allocation of their own,
+// and can still self-issue afterwards because addpolicy costs the issuer nothing.
+BOOST_FIXTURE_TEST_CASE( regnodeowner_personal_policy_is_tier1_only, sysio_roa_full_tester ) try {
+   // The fixture already fills all 21 tier-1 slots, so reuse one rather than registering another.
+   const auto t1owner = node_owners[1];
+   create_accounts({"t2owner"_n, "t3owner"_n}, false, false, false, false);
+   register_node_owner("t2owner"_n, 2);
+   register_node_owner("t3owner"_n, 3);
+   produce_block();
+
+   // Tier 1 keeps its self-issued personal policy: 0.0500 SYS each of NET/CPU, 0.0080 SYS of RAM.
+   auto t1_personal = get_policy(t1owner, t1owner);
+   BOOST_REQUIRE(!t1_personal.is_null());
+   BOOST_TEST(t1_personal["net_weight"].as<asset>().get_amount() == 500);
+   BOOST_TEST(t1_personal["cpu_weight"].as<asset>().get_amount() == 500);
+   BOOST_TEST(t1_personal["ram_weight"].as<asset>().get_amount() == 80);
+
+   // Tiers 2 and 3 get none.
+   BOOST_TEST(get_policy("t2owner"_n, "t2owner"_n).is_null());
+   BOOST_TEST(get_policy("t3owner"_n, "t3owner"_n).is_null());
+
+   // Every tier still contributes 10% of its allocation to the sysio RAM pool.
+   for (auto owner : {t1owner, "t2owner"_n, "t3owner"_n}) {
+      auto grant = get_policy("sysio"_n, owner);
+      BOOST_REQUIRE(!grant.is_null());
+      auto node = get_nodeowner(owner);
+      BOOST_REQUIRE(!node.is_null());
+      BOOST_TEST(grant["ram_weight"].as<asset>().get_amount()
+                 == node["total_sys"].as<asset>().get_amount() / 10);
+      BOOST_TEST(grant["net_weight"].as<asset>().get_amount() == 0);
+      BOOST_TEST(grant["cpu_weight"].as<asset>().get_amount() == 0);
+   }
+
+   // Tier 2/3 hold no bandwidth, and their nodeowners accounting excludes the personal weights,
+   // so the full remainder of the tier budget stays issuable.
+   for (auto owner : {"t2owner"_n, "t3owner"_n}) {
+      int64_t ram, net, cpu;
+      control->get_resource_limits_manager().get_account_limits(owner, ram, net, cpu);
+      BOOST_TEST(net == 0);
+      BOOST_TEST(cpu == 0);
+
+      auto node = get_nodeowner(owner);
+      const int64_t total = node["total_sys"].as<asset>().get_amount();
+      BOOST_TEST(node["allocated_bw"].as<asset>().get_amount() == 0);
+      BOOST_TEST(node["allocated_ram"].as<asset>().get_amount() == total / 10);
+      BOOST_TEST(node["allocated_sys"].as<asset>().get_amount() == total / 10);
+   }
+
+   // A tier-3 owner can still issue to itself; sysio.roa pays both the CPU/NET and the row RAM.
+   add_roa_policy("t3owner"_n, "t3owner"_n, "0.0100 SYS", "0.0100 SYS", "0.0100 SYS", 0, 0);
+   produce_block();
+
+   auto t3_self = get_policy("t3owner"_n, "t3owner"_n);
+   BOOST_REQUIRE(!t3_self.is_null());
+   BOOST_TEST(t3_self["net_weight"].as<asset>().get_amount() == 100);
+   BOOST_TEST(t3_self["cpu_weight"].as<asset>().get_amount() == 100);
+
+   int64_t ram, net, cpu;
+   control->get_resource_limits_manager().get_account_limits("t3owner"_n, ram, net, cpu);
+   BOOST_TEST(net == 100);
+   BOOST_TEST(cpu == 100);
+} FC_LOG_AND_RETHROW()
+
 // newuser correctly populates both policies table and reslimit for sysio.acct
 BOOST_FIXTURE_TEST_CASE( newuser_sysio_acct_policy_tracking, sysio_roa_full_tester ) try {
    auto p = get_policy("sysio.acct"_n, "sysio"_n);
@@ -1675,11 +2076,11 @@ BOOST_FIXTURE_TEST_CASE( nodeownreg_reconciles_existing_reslimit, sysio_roa_node
    add_roa_policy(NODE_DADDY, owner, "0.0000 SYS", "0.0000 SYS", "1.0000 SYS", 0, 0);
    produce_blocks();
 
-   // bytes_per_unit and the node-owner personal RAM are fixture constants (cf. verify_ram): the
-   // activation price is 104, regnodeowner's personal_ram_weight is 0.0080 SYS (80 units).
-   const int64_t bytes_per_unit     = 104;
-   const int64_t planted_ram_bytes  = 10000 * bytes_per_unit;   // 1.0000 SYS RAM-only policy
-   const int64_t personal_ram_bytes = 80    * bytes_per_unit;   // node-owner personal RAM (0.0080 SYS)
+   // bytes_per_unit is a fixture constant (cf. verify_ram): the activation price is 104. The claim
+   // registers at TIER 2, which regnodeowner provisions with no personal allocation -- the personal
+   // policy is tier-1 only -- so the reconcile stacks nothing on top of the planted policy.
+   const int64_t bytes_per_unit    = 104;
+   const int64_t planted_ram_bytes = 10000 * bytes_per_unit;   // 1.0000 SYS RAM-only policy
 
    // Pre-state: the planted row exists with the one-time newaccount_ram gift folded in once (by the
    // addpolicy create-branch), and net/cpu still zero.
@@ -1702,19 +2103,20 @@ BOOST_FIXTURE_TEST_CASE( nodeownreg_reconciles_existing_reslimit, sysio_roa_node
    BOOST_REQUIRE_EQUAL(audit["status"].as<uint64_t>(), CONFIRMED);
    BOOST_REQUIRE_EQUAL(audit["reason"].as<uint64_t>(), 0); // NONE
 
-   // reslimit reconciled: planted RAM kept, node-owner net/cpu/ram stacked on top, gift NOT re-added.
-   const int64_t expected_ram = planted_ram_bytes + newaccount_ram + personal_ram_bytes; // 1,049,464
+   // reslimit reconciled: the planted row is preserved untouched and the gift is NOT re-added. A
+   // tier-2 registration adds no personal weight, so the row is exactly what addpolicy left.
+   const int64_t expected_ram = planted_ram_bytes + newaccount_ram;
    r = get_reslimit(owner);
-   BOOST_REQUIRE_EQUAL(r["net_weight"].as_string(), "0.0500 SYS");
-   BOOST_REQUIRE_EQUAL(r["cpu_weight"].as_string(), "0.0500 SYS");
+   BOOST_REQUIRE_EQUAL(r["net_weight"].as_string(), "0.0000 SYS");
+   BOOST_REQUIRE_EQUAL(r["cpu_weight"].as_string(), "0.0000 SYS");
    BOOST_REQUIRE_EQUAL(r["ram_bytes"].as_int64(), expected_ram);
 
    // On-chain quota synced to the reconciled row totals (absolute set in regnodeowner).
    int64_t ram = 0, net = 0, cpu = 0;
    control->get_resource_limits_manager().get_account_limits(owner, ram, net, cpu);
    BOOST_REQUIRE_EQUAL(ram, expected_ram);
-   BOOST_REQUIRE_EQUAL(net, 500);
-   BOOST_REQUIRE_EQUAL(cpu, 500);
+   BOOST_REQUIRE_EQUAL(net, 0);
+   BOOST_REQUIRE_EQUAL(cpu, 0);
 
    // The planted policy is untouched: still issued by NODE_DADDY, still reclaimable via reducepolicy.
    auto pol = get_policy(owner, NODE_DADDY);
@@ -1731,8 +2133,8 @@ BOOST_FIXTURE_TEST_CASE( nodeownreg_reconciles_existing_reslimit, sysio_roa_node
    BOOST_REQUIRE_EQUAL(daddy_after["allocated_ram"].as_string(), daddy_before["allocated_ram"].as_string());
 } FC_LOG_AND_RETHROW()
 
-// SEC-087 companion: a planted policy can carry NET/CPU as well as RAM. Verify the reconcile stacks
-// net/cpu too (the increase_reslimit MODIFY branch) and registration still reaches CONFIRMED.
+// SEC-087 companion: a planted policy can carry NET/CPU as well as RAM. Verify the reconcile leaves
+// them intact (the increase_reslimit MODIFY branch) and registration still reaches CONFIRMED.
 BOOST_FIXTURE_TEST_CASE( nodeownreg_reconciles_existing_reslimit_net_cpu, sysio_roa_nodeownreg_tester ) try {
    const auto owner    = "claimacct"_n;
    const auto wire_pub = gen_k1_key();
@@ -1743,9 +2145,8 @@ BOOST_FIXTURE_TEST_CASE( nodeownreg_reconciles_existing_reslimit_net_cpu, sysio_
    add_roa_policy(NODE_DADDY, owner, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0, 0);
    produce_blocks();
 
-   const int64_t bytes_per_unit     = 104;
-   const int64_t planted_ram_bytes  = 10000 * bytes_per_unit;
-   const int64_t personal_ram_bytes = 80    * bytes_per_unit;
+   const int64_t bytes_per_unit    = 104;
+   const int64_t planted_ram_bytes = 10000 * bytes_per_unit;
 
    BOOST_REQUIRE_EQUAL(success(), nodeownreg(owner, 2, eth_pub, wire_pub));
    produce_blocks();
@@ -1753,9 +2154,57 @@ BOOST_FIXTURE_TEST_CASE( nodeownreg_reconciles_existing_reslimit_net_cpu, sysio_
    BOOST_REQUIRE_EQUAL(get_nodeowner(owner).is_null(), false);
    BOOST_REQUIRE_EQUAL(get_nodeownerreg(owner)["status"].as<uint64_t>(), CONFIRMED);
 
-   // net/cpu = planted 1.0000 + node-owner 0.0500 = 1.0500 SYS; ram = planted + gift + personal.
-   const int64_t expected_ram = planted_ram_bytes + newaccount_ram + personal_ram_bytes;
+   // A tier-2 registration adds no personal weight, so the planted 1.0000 SYS of net/cpu and the
+   // planted RAM (plus the one-time gift) survive the reconcile unchanged.
+   const int64_t expected_ram = planted_ram_bytes + newaccount_ram;
    auto r = get_reslimit(owner);
+   BOOST_REQUIRE_EQUAL(r["net_weight"].as_string(), "1.0000 SYS");
+   BOOST_REQUIRE_EQUAL(r["cpu_weight"].as_string(), "1.0000 SYS");
+   BOOST_REQUIRE_EQUAL(r["ram_bytes"].as_int64(), expected_ram);
+
+   int64_t ram = 0, net = 0, cpu = 0;
+   control->get_resource_limits_manager().get_account_limits(owner, ram, net, cpu);
+   BOOST_REQUIRE_EQUAL(ram, expected_ram);
+   BOOST_REQUIRE_EQUAL(net, 10000); // 1.0000 SYS at precision 4
+   BOOST_REQUIRE_EQUAL(cpu, 10000);
+} FC_LOG_AND_RETHROW()
+
+// SEC-087 at TIER 1, which is the only tier regnodeowner still provisions a personal allocation for.
+// The two tier-2 companions above now pass zero weights into increase_reslimit, so this is the case
+// that exercises its MODIFY branch with non-zero deltas: the planted policy's weights and the
+// node-owner personal weights must stack, and the one-time newaccount_ram gift must be counted once
+// rather than re-added. Without this the arithmetic that reconcile depends on would go untested on
+// the registration path.
+BOOST_FIXTURE_TEST_CASE( nodeownreg_tier1_reconcile_stacks_personal_weights, sysio_roa_nodeownreg_tester ) try {
+   const auto owner    = "t1own"_n;   // tier-1 name rule: 2-6 characters
+   const auto wire_pub = gen_k1_key();
+   const auto eth_pub  = gen_em_key();
+
+   BOOST_REQUIRE_EQUAL(success(), newnameduser(owner, wire_pub, 1));
+   produce_blocks();
+   add_roa_policy(NODE_DADDY, owner, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0, 0);
+   produce_blocks();
+
+   const int64_t bytes_per_unit     = 104;
+   const int64_t planted_ram_bytes  = 10000 * bytes_per_unit;   // 1.0000 SYS policy
+   const int64_t personal_ram_bytes = 80    * bytes_per_unit;   // tier-1 personal RAM (0.0080 SYS)
+
+   // Pre-state: planted policy only, gift folded in once by addpolicy's create branch.
+   auto r = get_reslimit(owner);
+   BOOST_REQUIRE_EQUAL(r.is_null(), false);
+   BOOST_REQUIRE_EQUAL(r["net_weight"].as_string(), "1.0000 SYS");
+   BOOST_REQUIRE_EQUAL(r["ram_bytes"].as_int64(), planted_ram_bytes + newaccount_ram);
+
+   BOOST_REQUIRE_EQUAL(success(), nodeownreg(owner, 1, eth_pub, wire_pub));
+   produce_blocks();
+
+   BOOST_REQUIRE_EQUAL(get_nodeowner(owner)["tier"].as<uint32_t>(), 1);
+   BOOST_REQUIRE_EQUAL(get_nodeownerreg(owner)["status"].as<uint64_t>(), CONFIRMED);
+
+   // MODIFY branch with non-zero deltas: planted 1.0000 + personal 0.0500 = 1.0500 SYS of net/cpu,
+   // ram = planted + gift + personal, with the gift NOT re-added.
+   const int64_t expected_ram = planted_ram_bytes + newaccount_ram + personal_ram_bytes;
+   r = get_reslimit(owner);
    BOOST_REQUIRE_EQUAL(r["net_weight"].as_string(), "1.0500 SYS");
    BOOST_REQUIRE_EQUAL(r["cpu_weight"].as_string(), "1.0500 SYS");
    BOOST_REQUIRE_EQUAL(r["ram_bytes"].as_int64(), expected_ram);
@@ -1763,8 +2212,64 @@ BOOST_FIXTURE_TEST_CASE( nodeownreg_reconciles_existing_reslimit_net_cpu, sysio_
    int64_t ram = 0, net = 0, cpu = 0;
    control->get_resource_limits_manager().get_account_limits(owner, ram, net, cpu);
    BOOST_REQUIRE_EQUAL(ram, expected_ram);
-   BOOST_REQUIRE_EQUAL(net, 10500); // 1.0500 SYS at precision 4
+   BOOST_REQUIRE_EQUAL(net, 10500);
    BOOST_REQUIRE_EQUAL(cpu, 10500);
+
+   // Planted policy untouched; the tier-1 personal policy now sits alongside it.
+   auto planted = get_policy(owner, NODE_DADDY);
+   BOOST_REQUIRE_EQUAL(planted.is_null(), false);
+   BOOST_REQUIRE_EQUAL(planted["net_weight"].as_string(), "1.0000 SYS");
+   auto personal = get_policy(owner, owner);
+   BOOST_REQUIRE_EQUAL(personal.is_null(), false);
+   BOOST_REQUIRE_EQUAL(personal["net_weight"].as_string(), "0.0500 SYS");
+   BOOST_REQUIRE_EQUAL(personal["ram_weight"].as_string(), "0.0080 SYS");
+} FC_LOG_AND_RETHROW()
+
+// A tier-2 owner holds no CPU after this change, so it reaches
+// transaction_context::verify_init_subjective_billing() with an objective limit of zero and is
+// admitted purely on the subjective allowance. Objective billing is not the whole story here:
+// addpolicy's payer is sysio.roa, but the subjective check looks at first-authorizers that are NOT
+// payers, which is the issuer. Pushed without an explicit billed CPU so that check actually runs.
+BOOST_FIXTURE_TEST_CASE( zero_cpu_owner_issues_under_subjective_billing, sysio_roa_full_tester ) try {
+   create_accounts({"t2owner"_n, "targetacct"_n}, false, false, false, false);
+   register_node_owner("t2owner"_n, 2);
+   produce_block();
+
+   auto& rlm = control->get_resource_limits_manager();
+   int64_t ram = 0, net = 0, cpu = 0;
+   rlm.get_account_limits("t2owner"_n, ram, net, cpu);
+   BOOST_REQUIRE_EQUAL(net, 0);
+   BOOST_REQUIRE_EQUAL(cpu, 0);
+
+   auto& sub_bill = control->get_mutable_subjective_billing();
+   sub_bill.set_disabled(false);
+   BOOST_REQUIRE_GT(sub_bill.get_subjective_account_cpu_allowed().count(), 0);
+
+   auto trace = push_subjective_action("t2owner"_n, "addpolicy"_n, mvo()
+      ("owner", "targetacct")("issuer", "t2owner")
+      ("net_weight", "0.0100 SYS")("cpu_weight", "0.0100 SYS")("ram_weight", "0.0100 SYS")
+      ("time_block", 0)("network_gen", 0));
+   BOOST_REQUIRE(!trace->except);
+   produce_block();
+
+   // The grant landed, and the issuer still holds nothing of its own.
+   rlm.get_account_limits("targetacct"_n, ram, net, cpu);
+   BOOST_REQUIRE_EQUAL(net, 100);
+   BOOST_REQUIRE_EQUAL(cpu, 100);
+   rlm.get_account_limits("t2owner"_n, ram, net, cpu);
+   BOOST_REQUIRE_EQUAL(cpu, 0);
+
+   // Prove the admission gate was actually reached rather than skipped: with the allowance driven
+   // to zero the identical push is rejected by it. Without this, the assertions above would pass
+   // just as happily if explicit_billed_cpu_time had short-circuited the check.
+   sub_bill.set_subjective_account_cpu_allowed(fc::microseconds(0));
+   BOOST_REQUIRE_EXCEPTION(
+      push_subjective_action("t2owner"_n, "addpolicy"_n, mvo()
+         ("owner", "targetacct")("issuer", "t2owner")
+         ("net_weight", "0.0100 SYS")("cpu_weight", "0.0000 SYS")("ram_weight", "0.0000 SYS")
+         ("time_block", 0)("network_gen", 0)),
+      tx_cpu_usage_exceeded,
+      fc_exception_message_contains("Subjectively terminated trx"));
 } FC_LOG_AND_RETHROW()
 
 // Account already carries a DIFFERENT EVM link (e.g. an operator createlink or an earlier deposit

@@ -5,6 +5,7 @@
 #include <fc/exception/exception.hpp>
 #include <fc/log/dmlog_sink.hpp>
 #include <fc/log/dmlog_formatter.hpp>
+#include <fc/log/es_sink.hpp>
 #include <fc/log/json_formatter.hpp>
 #include <fc/log/pattern_formatter.hpp>
 #include <spdlog/sinks/stdout_sinks.h>
@@ -63,6 +64,20 @@ namespace fc {
    }
 
    namespace {
+      /// rotating_file_sink_config::max_size is expressed in megabytes; spdlog wants a byte count.
+      constexpr std::size_t bytes_per_mb = 1024 * 1024;
+
+      constexpr std::string_view dmlog_sink_type  = "dmlog_sink";
+      constexpr std::string_view es_sink_type     = "es_sink";
+      constexpr std::string_view json_format_type = "json";
+
+      /// Sinks whose ctor installs a purpose-built default formatter that the
+      /// no-format pattern fallback must not overwrite. An explicit "format" block
+      /// still overrides (that is how es_sink gets identity extra_fields).
+      bool sink_ships_own_formatter(std::string_view type) {
+         return type == dmlog_sink_type || type == es_sink_type;
+      }
+
       std::unique_ptr<spdlog::formatter> build_formatter(const format_config& f, const std::string& sink_name) {
          if (f.type == "pattern") {
             std::string pattern;
@@ -72,14 +87,14 @@ namespace fc {
             return pattern.empty()
                ? fc::log::make_pattern_formatter()
                : fc::log::make_pattern_formatter(pattern);
-         } else if (f.type == "json") {
+         } else if (f.type == json_format_type) {
+            format::json_config jc;
+            if (!f.args.is_null())
+               jc = f.args.as<format::json_config>();
             std::map<std::string, std::string> extras;
-            if (!f.args.is_null()) {
-               auto jc = f.args.as<format::json_config>();
-               for (const auto& kv : jc.extra_fields)
-                  extras[kv.key()] = kv.value().as_string();
-            }
-            return std::make_unique<fc::log::json_formatter>(std::move(extras));
+            for (const auto& kv : jc.extra_fields)
+               extras[kv.key()] = kv.value().as_string();
+            return std::make_unique<fc::log::json_formatter>(std::move(extras), std::move(jc.layout));
          } else if (f.type == "dmlog") {
             return std::make_unique<fc::log::dmlog_formatter>();
          }
@@ -157,27 +172,45 @@ namespace fc {
                log_config::get().sink_map[cfg.sinks[i].name] = sink;
             } else if (cfg.sinks[i].type == "rotating_file_sink") {
                auto config = cfg.sinks[i].args.as<sink::rotating_file_sink_config>();
+               FC_ASSERT(config.max_size > 0, "rotating_file_sink max_size must be greater than zero MB");
                auto sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(
-                       config.base_filename, std::size_t{config.max_size}*1024*1024, config.max_files);
+                       config.base_filename, std::size_t{config.max_size} * bytes_per_mb, config.max_files);
                log_config::get().sink_map[cfg.sinks[i].name] = sink;
             } else if (cfg.sinks[i].type == "dmlog_sink") {
                auto config = cfg.sinks[i].args.as<sink::dmlog_sink_config>();
                auto sink = std::make_shared<fc::dmlog_sink_mt>(config.file);
                log_config::get().sink_map[cfg.sinks[i].name] = sink;
+            } else if (cfg.sinks[i].type == es_sink_type) {
+               // Bulk documents must be JSON -- a pattern block makes every request
+               // malformed NDJSON (silent total loss). Template-level validity is
+               // asserted after formatter attachment below.
+               FC_ASSERT(!cfg.sinks[i].format || cfg.sinks[i].format->type == json_format_type,
+                         "es_sink '{}' requires a json format block (got '{}')", cfg.sinks[i].name,
+                         cfg.sinks[i].format->type);
+               auto config = cfg.sinks[i].args.as<sink::es_sink_config>();
+               log_config::get().sink_map[cfg.sinks[i].name] = std::make_shared<fc::es_sink_mt>(std::move(config));
             } else {
                std::cerr << "\nWARNING: Unknown sink type: " << cfg.sinks[i].type << std::endl;
             }
 
-            // Attach formatter. Explicit format overrides the default; absent
-            // format means pattern (except for dmlog_sink which ships with
-            // dmlog_formatter already attached by its ctor).
+            // Attach formatter. Explicit format overrides the default; absent format
+            // means pattern -- except for sinks that ship their own formatter
+            // (dmlog_sink's dmlog_formatter, es_sink's json es_default_layout).
+            // NOTE: set_formatter, the es_sink sample render below, and the es_sink
+            // timer thread all take base_sink::mutex_ -- keep formatter use on-mutex.
             auto sink_it = log_config::get().sink_map.find(cfg.sinks[i].name);
             if (sink_it != log_config::get().sink_map.end()) {
                if (cfg.sinks[i].format) {
                   sink_it->second->set_formatter(build_formatter(*cfg.sinks[i].format, cfg.sinks[i].name));
-               } else if (cfg.sinks[i].type != "dmlog_sink") {
+               } else if (!sink_ships_own_formatter(cfg.sinks[i].type)) {
                   sink_it->second->set_formatter(fc::log::make_pattern_formatter());
                }
+               // es_sink: validate the FINAL formatter (default or explicit override)
+               // by sample-rendering one record -- a template that does not produce
+               // one-line JSON fails configure_logging here instead of silently
+               // 400-ing every bulk request at runtime.
+               if (cfg.sinks[i].type == es_sink_type)
+                  std::static_pointer_cast<fc::es_sink_mt>(sink_it->second)->assert_formatter_renders_json();
             }
          }
 

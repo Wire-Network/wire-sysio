@@ -761,6 +761,72 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( delete_auth, TESTER, validating_testers ) { try {
 
 } FC_LOG_AND_RETHROW() }/// delete_auth
 
+// heap_size drives the per-key RAM charge, and one of its branches cannot be reached through any
+// consensus path: BLS keys are rejected wherever a permission is created, so no authority can ever
+// hold one. Exercise the helper directly so every alternative is covered anyway -- a regression
+// returning zero for a heap-backed payload would otherwise leave every account-level test green.
+BOOST_AUTO_TEST_CASE( key_heap_size_covers_every_alternative ) { try {
+   using kt = private_key_type::key_type;
+
+   auto heap_of = []( const public_key_type& pk ) {
+      return heap_size( shared_key_weight( key_weight{ pk, 1 } ).key );
+   };
+
+   // The fixed-size alternatives keep their bytes inside the variant and add nothing.
+   for( auto type : { kt::k1, kt::r1, kt::em, kt::ed } ) {
+      BOOST_TEST( heap_of( private_key_type::generate( type ).get_public_key() ) == 0u );
+   }
+
+   // Exact sizes from the wire formats, not from the constants under test: shared_cow_string::impl
+   // is a reference count and a size ahead of the data, so 8, and a BLS key serializes to 96.
+   constexpr size_t string_header = 8;
+   constexpr size_t bls_serialized_size = 96;
+
+   const auto bls_pub = private_key_type::generate( kt::bls ).get_public_key();
+   BOOST_TEST( bls_pub.get<fc::crypto::bls::public_key_shim>().serialize().size() == bls_serialized_size );
+   BOOST_TEST( heap_of( bls_pub ) == string_header + bls_serialized_size );
+
+   // WebAuthn stores its packed form the same way: 33 key + 1 user_presence + 1 varint + rpid.
+   fc::crypto::webauthn::public_key::public_key_data_type kd{};
+   kd[0] = 0x02;
+   constexpr size_t rpid_len = 20; // one varint byte covers any length below 128
+   const std::string rpid( rpid_len, 'a' );
+   const public_key_type wa( public_key_type::storage_type(
+      fc::crypto::webauthn::public_key(
+         kd, fc::crypto::webauthn::public_key::user_presence_t::USER_PRESENCE_PRESENT, rpid ) ) );
+   BOOST_TEST( heap_of( wa ) == string_header + 33u + 1u + 1u + rpid_len );
+
+   // Pins the constant the two branches above share, rather than letting it cancel out.
+   static_assert( shared_string_header_billable_size == string_header,
+                  "shared_string_header_billable_size changed; this alters RAM billing for every "
+                  "authority holding a WebAuthn or BLS key" );
+} FC_LOG_AND_RETHROW() }
+
+// check_deleteauth_authorization reports its own action name. The assert text was copied from
+// check_updateauth_authorization and named updateauth, which misidentifies the failing action --
+// especially in a transaction carrying both. Reaching this path needs a same-account authority
+// that does not satisfy the permission being deleted, which no other delete_auth case produces:
+// the existing ones cover a missing permission, a linked permission, and success.
+BOOST_AUTO_TEST_CASE( deleteauth_error_names_deleteauth ) { try {
+   validating_tester chain;
+   chain.create_accounts( {"alice"_n} );
+   chain.produce_block();
+
+   // Two siblings under active. Neither is an ancestor of the other, so neither satisfies the other.
+   chain.set_authority( "alice"_n, "perma"_n, authority( chain.get_public_key( "alice"_n, "perma" ) ),
+                        config::active_name );
+   chain.set_authority( "alice"_n, "permb"_n, authority( chain.get_public_key( "alice"_n, "permb" ) ),
+                        config::active_name );
+   chain.produce_block();
+
+   BOOST_CHECK_EXCEPTION(
+      chain.delete_authority( "alice"_n, "permb"_n,
+                              { permission_level{"alice"_n, "perma"_n} },
+                              { chain.get_private_key( "alice"_n, "perma" ) } ),
+      irrelevant_auth_exception,
+      fc_exception_message_starts_with( "deleteauth action declares irrelevant authority" ) );
+} FC_LOG_AND_RETHROW() }
+
 BOOST_AUTO_TEST_CASE( authority_without_waits ) { try {
    // Verify that authority without waits validates and works correctly
    validating_tester chain;
@@ -810,6 +876,235 @@ BOOST_AUTO_TEST_CASE( authority_threshold_not_lowered ) { try {
            ("parent", "active")
            ("auth", authority(1, {{key, 1}}))
    );
+} FC_LOG_AND_RETHROW() }
+
+/// Session-key topology: a code-only parent permission over a key-only child.
+///
+///   alice@sessgate  (parent active) -- threshold 1, accounts [{sessmgr, sysio.code}], NO keys
+///   alice@session   (parent sessgate) -- threshold 1, keys [session key], NO code entry
+///
+/// The contract's seat sits in the parent, so the session key cannot evict it: updateauth on a
+/// permission requires satisfying that permission, and a child never satisfies its parent. The
+/// reaper meanwhile satisfies every descendant of sessgate, because permission_object::satisfies
+/// walks up the target's ancestry.
+///
+/// Putting the key and the code seat in the SAME permission instead is unsafe -- a permission
+/// satisfies itself, so the key could rewrite that authority and drop the code seat while the
+/// linkauth survived, leaving the contract unable to clean up.
+///
+/// These cases drive the native auth actions, which take the `special_case` branch of
+/// authorization_manager::check_authorization rather than the linked-permission lookup that every
+/// other sysio.code test in the tree exercises. `provided_permissions` is passed exactly as
+/// apply_context::execute_inline builds it: `{{receiver, sysio.code}}`.
+namespace {
+
+constexpr auto code_parent = "sessgate"_n;
+constexpr auto key_child   = "session"_n;
+
+/// Build the code-only parent and key-only child on alice, returning the child's public key.
+public_key_type setup_session_topology( validating_tester& chain, account_name grantee ) {
+   const authority gate_auth( 1, {}, {{{grantee, config::sysio_code_name}, 1}} );
+   chain.set_authority( "alice"_n, code_parent, gate_auth, config::active_name );
+
+   const auto session_pub_key = chain.get_public_key( "alice"_n, "session" );
+   const authority session_auth( 1, {{session_pub_key, 1}}, {} );
+   chain.set_authority( "alice"_n, key_child, session_auth, code_parent );
+   chain.produce_block();
+   return session_pub_key;
+}
+
+} // anonymous namespace
+
+BOOST_AUTO_TEST_CASE( code_parent_satisfies_child_deleteauth ) { try {
+   validating_tester chain;
+   chain.create_accounts( {"alice"_n, "sessmgr"_n, "mallory"_n} );
+   chain.produce_block();
+   setup_session_topology( chain, "sessmgr"_n );
+
+   const auto& authmgr = chain.control->get_authorization_manager();
+   // The reaper declares the parent, which satisfies the child being deleted.
+   const action del{ {{"alice"_n, code_parent}}, deleteauth{"alice"_n, key_child} };
+
+   // sessmgr's sysio.code seat is the only weight in the parent, so the delete authorizes with no
+   // signing key at all.
+   BOOST_CHECK_NO_THROW( authmgr.check_authorization( {del}, {}, {{"sessmgr"_n, config::sysio_code_name}} ) );
+
+   // Without that seat presented, nothing reaches the parent's threshold.
+   BOOST_CHECK_THROW( authmgr.check_authorization( {del}, {}, {} ), unsatisfied_authorization );
+
+   // A different contract's sysio.code is not the seat alice granted.
+   BOOST_CHECK_THROW( authmgr.check_authorization( {del}, {}, {{"mallory"_n, config::sysio_code_name}} ),
+                      unsatisfied_authorization );
+} FC_LOG_AND_RETHROW() }
+
+BOOST_AUTO_TEST_CASE( code_parent_satisfies_child_updateauth ) { try {
+   validating_tester chain;
+   chain.create_accounts( {"alice"_n, "sessmgr"_n} );
+   chain.produce_block();
+   setup_session_topology( chain, "sessmgr"_n );
+
+   const auto& authmgr = chain.control->get_authorization_manager();
+
+   // Rotating the child's key is the positive updateauth path: the parent satisfies the child, and
+   // the sysio.code seat carries the parent.
+   const action rotate{ {{"alice"_n, code_parent}},
+                        updateauth{ .account    = "alice"_n,
+                                    .permission = key_child,
+                                    .parent     = code_parent,
+                                    .auth       = authority( chain.get_public_key( "alice"_n, "rotated" ) ) } };
+   BOOST_CHECK_NO_THROW( authmgr.check_authorization( {rotate}, {}, {{"sessmgr"_n, config::sysio_code_name}} ) );
+   BOOST_CHECK_THROW( authmgr.check_authorization( {rotate}, {}, {} ), unsatisfied_authorization );
+} FC_LOG_AND_RETHROW() }
+
+BOOST_AUTO_TEST_CASE( session_key_cannot_reach_code_parent ) { try {
+   validating_tester chain;
+   chain.create_accounts( {"alice"_n, "sessmgr"_n} );
+   chain.produce_block();
+   setup_session_topology( chain, "sessmgr"_n );
+
+   const auto& authmgr = chain.control->get_authorization_manager();
+   const flat_set<public_key_type> session_key{ chain.get_public_key( "alice"_n, "session" ) };
+
+   // The whole point of the split: the child cannot rewrite the parent, so it cannot evict the
+   // contract's seat and strand its own cleanup.
+   const action evict{ {{"alice"_n, key_child}},
+                       updateauth{ .account    = "alice"_n,
+                                   .permission = code_parent,
+                                   .parent     = config::active_name,
+                                   .auth       = authority( chain.get_public_key( "alice"_n, "attacker" ) ) } };
+   BOOST_CHECK_THROW( authmgr.check_authorization( {evict}, session_key ), irrelevant_auth_exception );
+
+   // Nor delete it outright.
+   const action drop{ {{"alice"_n, key_child}}, deleteauth{"alice"_n, code_parent} };
+   BOOST_CHECK_THROW( authmgr.check_authorization( {drop}, session_key ), irrelevant_auth_exception );
+
+   // And still nothing reaching active, which is the parent of the gate.
+   const action to_active{ {{"alice"_n, key_child}}, deleteauth{"alice"_n, config::active_name} };
+   BOOST_CHECK_THROW( authmgr.check_authorization( {to_active}, session_key ), irrelevant_auth_exception );
+} FC_LOG_AND_RETHROW() }
+
+BOOST_AUTO_TEST_CASE( code_parent_satisfies_child_unlinkauth ) { try {
+   validating_tester chain;
+   chain.create_accounts( {"alice"_n, "sessmgr"_n} );
+   chain.produce_block();
+   setup_session_topology( chain, "sessmgr"_n );
+
+   chain.link_authority( "alice"_n, "sysio"_n, key_child, "reqauth"_n );
+   chain.produce_block();
+
+   const auto& authmgr = chain.control->get_authorization_manager();
+
+   // deleteauth refuses while a link survives, so cleanup must unlink first -- and that action has
+   // to authorize by the same route.
+   const action unlink{ {{"alice"_n, code_parent}}, unlinkauth{"alice"_n, "sysio"_n, "reqauth"_n} };
+   BOOST_CHECK_NO_THROW( authmgr.check_authorization( {unlink}, {}, {{"sessmgr"_n, config::sysio_code_name}} ) );
+   BOOST_CHECK_THROW( authmgr.check_authorization( {unlink}, {}, {} ), unsatisfied_authorization );
+} FC_LOG_AND_RETHROW() }
+
+BOOST_AUTO_TEST_CASE( unlinked_child_cannot_authorize_linked_actions ) { try {
+   validating_tester chain;
+   chain.create_accounts( {"alice"_n, "sessmgr"_n} );
+   chain.produce_block();
+   setup_session_topology( chain, "sessmgr"_n );
+
+   const auto session_priv_key = chain.get_private_key( "alice"_n, "session" );
+
+   // Narrow property: with no link, the minimum permission for an ordinary action defaults to
+   // active, and a child of active does not satisfy active. This is NOT a claim that the child is
+   // inert -- the native auth actions are special-cased and reach it with no link at all, which
+   // is why it can still rotate its own key below.
+   BOOST_CHECK_THROW( chain.push_reqauth( "alice"_n, {permission_level{"alice"_n, key_child}}, {session_priv_key} ),
+                      irrelevant_auth_exception );
+
+   // Unlinked, and still able to act on itself.
+   const auto& authmgr = chain.control->get_authorization_manager();
+   const action self_rotate{ {{"alice"_n, key_child}},
+                             updateauth{ .account    = "alice"_n,
+                                         .permission = key_child,
+                                         .parent     = code_parent,
+                                         .auth       = authority( chain.get_public_key( "alice"_n, "rotated" ) ) } };
+   BOOST_CHECK_NO_THROW( authmgr.check_authorization( {self_rotate},
+                                                      {chain.get_public_key( "alice"_n, "session" )} ) );
+
+   // linkauth is what lets it authorize the action it names.
+   chain.link_authority( "alice"_n, "sysio"_n, key_child, "reqauth"_n );
+   chain.produce_block();
+   chain.push_reqauth( "alice"_n, {permission_level{"alice"_n, key_child}}, {session_priv_key} );
+} FC_LOG_AND_RETHROW() }
+
+// producer_plugin blames the accounts a failed trx names only when auth_verified says the chain
+// confirmed they authorized it. Otherwise naming a victim on a trx one cannot sign throttles the
+// victim, since the authorization list is attacker-chosen up to that point.
+BOOST_FIXTURE_TEST_CASE( auth_verified_tracks_authorization, validating_tester ) { try {
+   create_accounts( {"alice"_n} );
+   produce_block();
+   set_authority( "alice"_n, "perma"_n, authority( get_public_key( "alice"_n, "perma" ) ), config::active_name );
+   set_authority( "alice"_n, "permb"_n, authority( get_public_key( "alice"_n, "permb" ) ), config::active_name );
+   set_authority( "alice"_n, "permc"_n, authority( get_public_key( "alice"_n, "permc" ) ), "perma"_n );
+   produce_block();
+   // Linked, so deleting permc fails in apply rather than in check_authorization.
+   push_action( config::system_account_name, "linkauth"_n, "alice"_n, fc::mutable_variant_object()
+                   ("account", "alice")("code", "sysio")("type", "reqauth")("requirement", "permc") );
+   produce_block();
+
+   // Mirrors base_tester::push_transaction but keeps the metadata so the flag can be read, and can
+   // re-push the same metadata to model a retry out of the unapplied queue.
+   auto push = [&]( const transaction_metadata_ptr& meta ) {
+      if( !control->is_building_block() )
+         _start_block( control->head().block_time() + fc::microseconds(config::block_interval_us) );
+      return control->push_transaction( meta, fc::time_point::maximum(), fc::microseconds::maximum() );
+   };
+   auto deleteauth_trx = [&]( permission_name declared, permission_name target, bool sign ) {
+      signed_transaction trx;
+      trx.actions.emplace_back( vector<permission_level>{{"alice"_n, declared}}, deleteauth{ "alice"_n, target } );
+      set_transaction_headers( trx );
+      if( sign )
+         trx.sign( get_private_key( "alice"_n, declared.to_string() ), control->get_chain_id() );
+      auto ptrx = std::make_shared<packed_transaction>( trx, packed_transaction::compression_type::none );
+      return transaction_metadata::start_recover_keys( ptrx, control->get_thread_pool(), control->get_chain_id(),
+                                                       fc::microseconds::maximum(),
+                                                       transaction_metadata::trx_type::input ).get();
+   };
+
+   // Declares alice@active but carries no signature: authorization fails, so alice is not blamed.
+   {
+      auto meta  = deleteauth_trx( config::active_name, "permb"_n, false );
+      auto trace = push( meta );
+      BOOST_REQUIRE( trace->except );
+      BOOST_TEST( trace->except->code() == unsatisfied_authorization::code_value );
+      BOOST_TEST( !meta->auth_verified );
+   }
+
+   // Properly signed and successful.
+   {
+      auto meta  = deleteauth_trx( config::active_name, "permb"_n, true );
+      auto trace = push( meta );
+      BOOST_REQUIRE( !trace->except );
+      BOOST_TEST( meta->auth_verified );
+   }
+
+   // Authorization passes and execution then fails. This is what the failure limiter is for, so the
+   // flag must stay set.
+   auto meta = deleteauth_trx( "perma"_n, "permc"_n, true );
+   {
+      auto trace = push( meta );
+      BOOST_REQUIRE( trace->except );
+      BOOST_TEST( trace->except->code() == action_validate_exception::code_value );
+      BOOST_TEST( meta->auth_verified );
+   }
+
+   // Retried out of the unapplied queue after perma was re-keyed: the recovered key no longer
+   // satisfies the permission, so the earlier verdict must not carry over. A failed trx leaves no
+   // dedup record, so the same metadata can be pushed again.
+   produce_block();
+   set_authority( "alice"_n, "perma"_n, authority( get_public_key( "alice"_n, "rekeyed" ) ), config::active_name );
+   produce_block();
+   {
+      auto trace = push( meta );
+      BOOST_REQUIRE( trace->except );
+      BOOST_TEST( trace->except->code() == unsatisfied_authorization::code_value );
+      BOOST_TEST( !meta->auth_verified );
+   }
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()

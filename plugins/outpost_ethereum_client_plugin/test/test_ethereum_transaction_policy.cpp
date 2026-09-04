@@ -46,7 +46,7 @@ constexpr std::string_view test_chain_id_quantity = "0x7a69";
 constexpr std::string_view ethereum_mainnet_chain_id_quantity = "0x1";
 using tcp = boost::asio::ip::tcp;
 
-/** One-shot JSON-RPC endpoint used to preserve coverage of the legacy three-field client form. */
+/** One-shot JSON-RPC endpoint used to preserve coverage of the historical three-field CLI client form. */
 class chain_id_rpc_server {
 public:
    /** Start a loopback server that returns the supplied chain id once. */
@@ -648,7 +648,7 @@ BOOST_AUTO_TEST_CASE(file_configuration_does_not_publish_a_partial_client_map) {
    BOOST_CHECK_EQUAL(initialize_rejected_file_and_observe_published_clients(path), 0u);
 }
 
-BOOST_AUTO_TEST_CASE(legacy_client_option_uses_default_policy_with_explicit_chain_id) {
+BOOST_AUTO_TEST_CASE(cli_client_option_uses_default_policy_with_explicit_chain_id) {
    chain_id_rpc_server rpc_server;
    const auto clients = initialize_outpost_plugin(
       {"--outpost-ethereum-client", "client-a,signer-a," + rpc_server.url() + ",31337"});
@@ -658,17 +658,17 @@ BOOST_AUTO_TEST_CASE(legacy_client_option_uses_default_policy_with_explicit_chai
    BOOST_CHECK_EQUAL(clients.front()->client->transaction_policy().max_fee_per_gas, maximum);
 }
 
-BOOST_AUTO_TEST_CASE(legacy_client_option_preserves_nonempty_identifier_compatibility) {
+BOOST_AUTO_TEST_CASE(cli_client_option_preserves_nonempty_identifier_compatibility) {
    chain_id_rpc_server rpc_server;
    const auto clients = initialize_outpost_plugin(
-      {"--outpost-ethereum-client", "legacy/client,prod/signing," + rpc_server.url() + ",31337"},
+      {"--outpost-ethereum-client", "cli/client,prod/signing," + rpc_server.url() + ",31337"},
       "prod/signing");
    BOOST_REQUIRE_EQUAL(clients.size(), 1u);
-   BOOST_CHECK_EQUAL(clients.front()->id, "legacy/client");
-   BOOST_CHECK_EQUAL(clients.front()->client->transaction_policy().client_id, "legacy-client");
+   BOOST_CHECK_EQUAL(clients.front()->id, "cli/client");
+   BOOST_CHECK_EQUAL(clients.front()->client->transaction_policy().client_id, "cli-client");
 }
 
-BOOST_AUTO_TEST_CASE(legacy_three_field_client_resolves_chain_id_from_rpc) {
+BOOST_AUTO_TEST_CASE(cli_three_field_client_resolves_chain_id_from_rpc) {
    chain_id_rpc_server rpc_server;
    const auto clients = initialize_outpost_plugin(
       {"--outpost-ethereum-client", "client-a,signer-a," + rpc_server.url()});
@@ -677,7 +677,7 @@ BOOST_AUTO_TEST_CASE(legacy_three_field_client_resolves_chain_id_from_rpc) {
    BOOST_CHECK_EQUAL(clients.front()->client->get_chain_id(), 31337);
 }
 
-BOOST_AUTO_TEST_CASE(plugin_startup_rejects_mixed_unified_and_legacy_modes) {
+BOOST_AUTO_TEST_CASE(plugin_startup_rejects_mixed_unified_and_cli_modes) {
    fc::temp_directory directory;
    const auto path = write_client_configuration_file(
       directory, R"json({"schema_version":1,"clients":[]})json");

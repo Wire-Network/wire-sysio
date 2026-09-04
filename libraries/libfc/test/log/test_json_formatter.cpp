@@ -235,6 +235,91 @@ BOOST_AUTO_TEST_CASE(rotating_size_triggers_rollover) try {
    fs::remove_all(dir);
 } FC_LOG_AND_RETHROW()
 
+// rotating_file_sink_config::max_size is a MEGABYTE count that configure_logging scales by 1 MiB. A byte
+// count slipped in here silently turns rotation off: 1048576*10 reads as "10MB" but means ~10 TiB.
+static_assert(fc::sink::default_rotating_max_size_mb <= 1024,
+              "default_rotating_max_size_mb is a megabyte count -- a byte count here disables rotation");
+
+BOOST_AUTO_TEST_CASE(rotating_max_size_defaults_to_megabytes) try {
+   // Omitting max_size in logging.json must land on the documented megabyte default. The static_assert above
+   // guards the value itself; this covers the config path an operator actually exercises.
+   auto args_json = R"({ "base_filename": "/tmp/defaults.log", "max_files": 3 })";
+   auto cfg = fc::json::from_string(args_json).as<fc::sink::rotating_file_sink_config>();
+   BOOST_CHECK_EQUAL(cfg.max_size,  fc::sink::default_rotating_max_size_mb);
+   BOOST_CHECK_EQUAL(cfg.max_files, 3u);
+} FC_LOG_AND_RETHROW()
+
+BOOST_AUTO_TEST_CASE(configure_logging_rotating_max_size_is_megabytes) try {
+   // Pin the unit end to end: max_size = 1 must mean 1 MiB. A byte count would rotate on every record and
+   // run through max_files; a gigabyte count would never rotate at all.
+   auto dir     = make_temp_dir("mbunit");
+   auto cleanup = fc::make_scoped_exit([&]{ fs::remove_all(dir); });
+   auto restore = fc::make_scoped_exit([]{ fc::configure_logging(fc::logging_config::default_config()); });
+
+   auto file = dir / "mb.log";
+   fc::logging_config cfg;
+
+   fc::sink_config s;
+   s.name = "mb_rot";
+   s.type = "rotating_file_sink";
+   fc::sink::rotating_file_sink_config rot_cfg;
+   rot_cfg.base_filename = file.string();
+   rot_cfg.max_size  = 1; // 1 MiB
+   rot_cfg.max_files = 3;
+   s.args = fc::variant{rot_cfg};
+   cfg.sinks.push_back(s);
+
+   fc::logger_config lcfg;
+   lcfg.name    = "test_mb_unit_logger";
+   lcfg.level   = fc::log_level::info;
+   lcfg.enabled = true;
+   lcfg.sinks   = {"mb_rot"};
+   cfg.loggers.push_back(lcfg);
+
+   BOOST_REQUIRE(fc::configure_logging(cfg));
+   {
+      auto lgr = fc::log_config::get_logger("test_mb_unit_logger");
+      // ~1.2 MiB of payload: enough to cross a 1 MiB threshold exactly once.
+      const std::string payload(1024, 'x');
+      for (int i = 0; i < 1200; ++i) {
+         fc_ilog(lgr, "{}", payload);
+      }
+   }
+   // Drop the sink so the rotated files are closed and their sizes settle.
+   fc::configure_logging(fc::logging_config::default_config());
+
+   BOOST_REQUIRE(fs::exists(file));
+   BOOST_CHECK(fs::exists(dir / "mb.1.log"));  // rotated once -- so max_size is not gigabytes
+   BOOST_CHECK(!fs::exists(dir / "mb.2.log")); // and not bytes, which would have rotated on every record
+   BOOST_CHECK_LE(fs::file_size(file), std::size_t{1024} * 1024);
+} FC_LOG_AND_RETHROW()
+
+BOOST_AUTO_TEST_CASE(configure_logging_rejects_zero_max_size) try {
+   // spdlog rejects a zero rotation size; configure_logging must fail cleanly rather than propagate it.
+   auto dir     = make_temp_dir("zeromb");
+   auto cleanup = fc::make_scoped_exit([&]{ fs::remove_all(dir); });
+   auto restore = fc::make_scoped_exit([]{ fc::configure_logging(fc::logging_config::default_config()); });
+
+   fc::logging_config cfg;
+
+   fc::sink_config s;
+   s.name = "zero_rot";
+   s.type = "rotating_file_sink";
+   fc::sink::rotating_file_sink_config rot_cfg;
+   rot_cfg.base_filename = (dir / "zero.log").string();
+   rot_cfg.max_size  = 0;
+   rot_cfg.max_files = 3;
+   s.args = fc::variant{rot_cfg};
+   cfg.sinks.push_back(s);
+
+   fc::logger_config lcfg;
+   lcfg.name  = "test_zero_max_size_logger";
+   lcfg.sinks = {"zero_rot"};
+   cfg.loggers.push_back(lcfg);
+
+   BOOST_CHECK(!fc::configure_logging(cfg));
+} FC_LOG_AND_RETHROW()
+
 BOOST_AUTO_TEST_CASE(parse_config_from_json_text) try {
    // Full sink_config round-trip through fc::json. extra_fields must accept
    // the natural JSON-object form so operators can hand-edit logging.json.
@@ -586,6 +671,214 @@ BOOST_AUTO_TEST_CASE(dmlog_formatter_direct_format) try {
    fmt.format(empty_msg, out2);
    std::string line2{out2.data(), out2.size()};
    BOOST_CHECK_EQUAL(line2, "DMLOG \n");
+} FC_LOG_AND_RETHROW()
+
+// ---------------------------------------------------------------------------
+// json_layout token-template cases. The `layout` config value is an OPEN token
+// template (fc/log/json_layout.hpp); the two shipped shapes are the
+// fc::log::default_layout and fc::log::es_default_layout constants.
+// ---------------------------------------------------------------------------
+
+namespace {
+
+/// Render one synthetic record through a json_formatter built with @p extras +
+/// @p layout_template and return the emitted line.
+std::string direct_format(std::map<std::string, std::string> extras, std::string layout_template,
+                          spdlog::level::level_enum level = spdlog::level::warn,
+                          std::string_view payload = "hello \"world\"") {
+   fc::log::json_formatter fmt{std::move(extras), std::move(layout_template)};
+   spdlog::details::log_msg msg{
+      spdlog::source_loc{"src.cpp", 42, "my_func"},
+      "direct_logger",
+      level,
+      spdlog::string_view_t{payload.data(), payload.size()}
+   };
+   spdlog::memory_buf_t out;
+   fmt.format(msg, out);
+   return std::string{out.data(), out.size()};
+}
+
+} // anonymous namespace
+
+// Empty layout compiles fc::log::default_layout -- byte-identical to spelling the
+// constant out explicitly (the regression pin for replacing the hand-written body
+// with the compiled template; the earlier cases in this suite pin the shape itself).
+BOOST_AUTO_TEST_CASE(layout_default_matches_default_layout_constant) try {
+   fc::log::json_formatter implicit_fmt{{{"env", "test"}}};
+   fc::log::json_formatter explicit_fmt{{{"env", "test"}}, std::string{fc::log::default_layout}};
+   spdlog::details::log_msg msg{
+      spdlog::source_loc{"src.cpp", 42, "my_func"}, "direct_logger", spdlog::level::info, "same bytes"};
+   spdlog::memory_buf_t a, b;
+   implicit_fmt.format(msg, a);
+   explicit_fmt.format(msg, b);
+   BOOST_CHECK_EQUAL(std::string(a.data(), a.size()), std::string(b.data(), b.size()));
+} FC_LOG_AND_RETHROW()
+
+BOOST_AUTO_TEST_CASE(layout_es_template_doc_shape) try {
+   auto line = direct_format({}, std::string{fc::log::es_default_layout});
+   BOOST_REQUIRE(!line.empty());
+   BOOST_CHECK_EQUAL(line.back(), '\n');
+   auto v = parse_json(line);
+   const auto& obj = v.get_object();
+   BOOST_CHECK(obj.contains("@timestamp"));
+   BOOST_CHECK(obj.contains("level"));
+   BOOST_CHECK(obj.contains("message"));
+   BOOST_CHECK(obj.contains("category"));
+   BOOST_CHECK(obj.contains("sourceLocation"));
+   BOOST_CHECK(obj.contains("data"));
+   BOOST_CHECK(!obj.contains("ts"));
+   BOOST_CHECK(!obj.contains("lvl"));
+   BOOST_CHECK(!obj.contains("msg"));
+   BOOST_CHECK(!obj.contains("logger"));
+   BOOST_CHECK(!obj.contains("extra"));
+   BOOST_CHECK_EQUAL(obj["category"].as_string(), "direct_logger");
+   BOOST_CHECK_EQUAL(obj["message"].as_string(), "hello \"world\"");
+   BOOST_CHECK_EQUAL(obj["sourceLocation"].as_string(), "src.cpp:42 my_func");
+   BOOST_CHECK(!obj["data"].get_object()["thread"].as_string().empty());
+} FC_LOG_AND_RETHROW()
+
+// @timestamp must be a bare epoch-milliseconds NUMBER (matching a date/epoch_millis
+// index mapping), not an ISO string.
+BOOST_AUTO_TEST_CASE(layout_es_epoch_millis_numeric) try {
+   fc::log::json_formatter fmt{{}, std::string{fc::log::es_default_layout}};
+   spdlog::details::log_msg msg{
+      spdlog::source_loc{"src.cpp", 42, "my_func"}, "direct_logger", spdlog::level::info, "ts"};
+   const auto known = std::chrono::system_clock::time_point{std::chrono::milliseconds{1700000000123}};
+   msg.time = known;
+   spdlog::memory_buf_t out;
+   fmt.format(msg, out);
+   std::string line{out.data(), out.size()};
+   BOOST_CHECK(line.find(R"("@timestamp":1700000000123,)") != std::string::npos);
+   auto v = parse_json(line);
+   BOOST_CHECK_EQUAL(v.get_object()["@timestamp"].as_int64(), 1700000000123);
+} FC_LOG_AND_RETHROW()
+
+BOOST_AUTO_TEST_CASE(layout_level_modifiers) try {
+   const std::string preserve_template = R"({"l":"${level}"})";
+   const std::string upper_template    = R"({"l":"${level:upper}"})";
+   const std::string lower_template    = R"({"l":"${level:lower}"})";
+   BOOST_CHECK(direct_format({}, preserve_template, spdlog::level::warn).find(R"("l":"warn")") != std::string::npos);
+   BOOST_CHECK(direct_format({}, upper_template, spdlog::level::trace).find(R"("l":"TRACE")") != std::string::npos);
+   BOOST_CHECK(direct_format({}, upper_template, spdlog::level::critical).find(R"("l":"CRIT")") != std::string::npos);
+   BOOST_CHECK(direct_format({}, lower_template, spdlog::level::err).find(R"("l":"error")") != std::string::npos);
+} FC_LOG_AND_RETHROW()
+
+BOOST_AUTO_TEST_CASE(layout_timestamp_modifiers) try {
+   auto iso_line = direct_format({}, R"({"t":"${timestamp:iso8601}"})");
+   auto v = parse_json(iso_line);
+   std::regex iso_re{R"(^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}Z$)"};
+   BOOST_CHECK(std::regex_match(v.get_object()["t"].as_string(), iso_re));
+
+   auto ms_line = parse_json(direct_format({}, R"({"t":${timestamp:epoch_millis}})"));
+   BOOST_CHECK(ms_line.get_object()["t"].as_int64() > 0);
+} FC_LOG_AND_RETHROW()
+
+// Null filename/funcname (spdlog's empty source_loc) must render gracefully.
+BOOST_AUTO_TEST_CASE(layout_source_location_null_guards) try {
+   fc::log::json_formatter fmt{{}, std::string{fc::log::es_default_layout}};
+   spdlog::details::log_msg msg{spdlog::source_loc{}, "direct_logger", spdlog::level::info, "no source"};
+   spdlog::memory_buf_t out;
+   fmt.format(msg, out);
+   std::string line{out.data(), out.size()};
+   auto v = parse_json(line);
+   BOOST_CHECK_EQUAL(v.get_object()["sourceLocation"].as_string(), ":0 ");
+} FC_LOG_AND_RETHROW()
+
+// An author-written template with different keys renders exactly as authored, with
+// token values JSON-escaped.
+BOOST_AUTO_TEST_CASE(layout_custom_template) try {
+   auto line = direct_format({}, R"({"m":"${message}","who":"${logger}","src":"custom"})");
+   auto v = parse_json(line);
+   const auto& obj = v.get_object();
+   BOOST_CHECK_EQUAL(obj["m"].as_string(), "hello \"world\"");
+   BOOST_CHECK_EQUAL(obj["who"].as_string(), "direct_logger");
+   BOOST_CHECK_EQUAL(obj["src"].as_string(), "custom");
+   BOOST_CHECK(!obj.contains("@timestamp"));
+} FC_LOG_AND_RETHROW()
+
+// ${extra_flat} splices `,"k":"v"` pairs at its placement point (the es template puts
+// them at the document top level); ${extra_object} keeps the historical `extra`
+// object. Both render NOTHING when extra_fields is empty.
+BOOST_AUTO_TEST_CASE(layout_extra_flat_and_object) try {
+   auto flat = parse_json(direct_format({{"env", "local"}, {"app", "nodeop"}},
+                                        std::string{fc::log::es_default_layout}));
+   BOOST_CHECK_EQUAL(flat.get_object()["env"].as_string(), "local");
+   BOOST_CHECK_EQUAL(flat.get_object()["app"].as_string(), "nodeop");
+   BOOST_CHECK(!flat.get_object().contains("extra"));
+
+   auto empty_flat = direct_format({}, R"({"a":1${extra_flat}})");
+   BOOST_CHECK_EQUAL(empty_flat, "{\"a\":1}\n");
+
+   auto object = parse_json(direct_format({{"env", "prod"}}, R"({"a":1${extra_object}})"));
+   BOOST_CHECK_EQUAL(object.get_object()["extra"].get_object()["env"].as_string(), "prod");
+
+   auto empty_object = direct_format({}, R"({"a":1${extra_object}})");
+   BOOST_CHECK_EQUAL(empty_object, "{\"a\":1}\n");
+} FC_LOG_AND_RETHROW()
+
+BOOST_AUTO_TEST_CASE(layout_unknown_token_throws) try {
+   BOOST_CHECK_THROW(fc::log::json_formatter({}, R"({"x":"${bogus}"})"), fc::exception);
+   BOOST_CHECK_THROW(fc::log::json_formatter({}, R"({"x":"${message:upper}"})"), fc::exception);
+   BOOST_CHECK_THROW(fc::log::json_formatter({}, R"({"x":"${message)"), fc::exception);
+
+   // End to end: a broken template in a format block fails configure_logging.
+   auto restore = fc::make_scoped_exit([]{ fc::configure_logging(fc::logging_config::default_config()); });
+   fc::logging_config cfg;
+   fc::sink_config s;
+   s.name = "bad_layout";
+   s.type = "console_sink";
+   s.args = fc::variant{fc::sink::console_sink_config{}};
+   fc::format_config fmt_cfg;
+   fmt_cfg.type = "json";
+   fc::format::json_config jc;
+   jc.layout = R"({"x":"${bogus}"})";
+   fmt_cfg.args = fc::variant{jc};
+   s.format = fmt_cfg;
+   cfg.sinks.push_back(s);
+   fc::logger_config lcfg;
+   lcfg.name  = "test_bad_layout_logger";
+   lcfg.sinks = {"bad_layout"};
+   cfg.loggers.push_back(lcfg);
+   BOOST_CHECK(!fc::configure_logging(cfg));
+} FC_LOG_AND_RETHROW()
+
+BOOST_AUTO_TEST_CASE(layout_dollar_escape) try {
+   auto line = direct_format({}, R"({"x":"$${message}"})");
+   BOOST_CHECK_EQUAL(line, "{\"x\":\"${message}\"}\n");
+} FC_LOG_AND_RETHROW()
+
+// Token VALUES are escaped regardless of the template around them.
+BOOST_AUTO_TEST_CASE(layout_escaping) try {
+   fc::log::json_formatter fmt{{}, std::string{fc::log::es_default_layout}};
+   spdlog::details::log_msg msg{spdlog::source_loc{"src.cpp", 1, "f"}, "direct_logger", spdlog::level::info,
+                                "quote:\" backslash:\\ newline:\n tab:\t ctrl:\x01 utf8:\xC3\xA9"};
+   spdlog::memory_buf_t out;
+   fmt.format(msg, out);
+   std::string line{out.data(), out.size()};
+   auto v = parse_json(line);
+   BOOST_CHECK_EQUAL(v.get_object()["message"].as_string(),
+                     "quote:\" backslash:\\ newline:\n tab:\t ctrl:\x01 utf8:\xC3\xA9");
+} FC_LOG_AND_RETHROW()
+
+BOOST_AUTO_TEST_CASE(layout_clone_preserves_template) try {
+   fc::log::json_formatter fmt{{{"env", "local"}}, std::string{fc::log::es_default_layout}};
+   auto cloned = fmt.clone();
+   spdlog::details::log_msg msg{
+      spdlog::source_loc{"src.cpp", 42, "my_func"}, "direct_logger", spdlog::level::info, "clone me"};
+   spdlog::memory_buf_t a, b;
+   fmt.format(msg, a);
+   cloned->format(msg, b);
+   BOOST_CHECK_EQUAL(std::string(a.data(), a.size()), std::string(b.data(), b.size()));
+} FC_LOG_AND_RETHROW()
+
+// json_config.layout is a plain STRING; absent parses to empty (default_layout).
+BOOST_AUTO_TEST_CASE(json_config_layout_parses) try {
+   auto with_layout =
+      fc::json::from_string(R"({"extra_fields":{},"layout":"{\"m\":\"${message}\"}"})").as<fc::format::json_config>();
+   BOOST_CHECK_EQUAL(with_layout.layout, R"({"m":"${message}"})");
+
+   auto without_layout = fc::json::from_string(R"({"extra_fields":{}})").as<fc::format::json_config>();
+   BOOST_CHECK(without_layout.layout.empty());
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_SUITE_END()

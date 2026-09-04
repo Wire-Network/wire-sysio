@@ -185,9 +185,31 @@ std::vector<char> decode_latest_envelope_account(opp_solana_outpost_client&  pro
 ///         is absent or disagrees with what the cursor read decodes.
 void assert_epoch_deliveries_shape(const fc::network::solana::idl::program& program);
 
-/// Assert that the loaded IDL's `Reserve` declaration carries the three fields
-/// the terminal manifest resolves from it: `creator` and `custody_mint`
-/// (pubkeys) and `custody_decimals` (u8), in either IDL field home.
+/// Assert that the loaded IDL's `CollateralPosition` declaration carries the
+/// four fields the on-chain settlement path binds together: `operator` and
+/// `custody_mint` (pubkeys), plus `token_code` and `amount` (u64), in either
+/// IDL field home.
+///
+/// The relay itself decodes only `custody_mint`; the other three are a
+/// DELIBERATE drift canary — a program-side rename of any of the four fails
+/// loudly at boot rather than surfacing later as a live position this relay
+/// silently half-understands.
+///
+/// Called at construction for the batch-operator role. IDL drift is the
+/// realistic reason a live, program-readable position becomes unreadable to
+/// THIS relay; without its pinned custody mint the manifest cannot include the
+/// effect accounts the program's real branch requires, so the dispatch window
+/// would abort and every retry would wedge on the same cursor position.
+///
+/// @param program  the program's loaded Anchor IDL.
+/// @throws fc::exception if the account or any of the four fields is absent,
+///         or a field has a type the manifest builder cannot interpret.
+void assert_collateral_position_shape(const fc::network::solana::idl::program& program);
+
+/// Assert that the loaded IDL's `Reserve` declaration carries the four fields
+/// the terminal manifest resolves from it: `creator`, `custody_mint` and
+/// `custody_token_program` (pubkeys) and `custody_decimals` (u8), in either IDL
+/// field home.
 ///
 /// Called at construction for the batch-operator role, beside the
 /// `EpochDeliveries` check. IDL drift is the realistic reason a live,
@@ -198,7 +220,7 @@ void assert_epoch_deliveries_shape(const fc::network::solana::idl::program& prog
 /// wedged epoch into a startup error while the IDL is still fixable.
 ///
 /// @param program  the program's loaded Anchor IDL.
-/// @throws fc::exception if the account or any of the three fields is absent,
+/// @throws fc::exception if the account or any of the four fields is absent,
 ///         or a field has a type the manifest builder cannot interpret.
 void assert_reserve_shape(const fc::network::solana::idl::program& program);
 
@@ -222,14 +244,21 @@ struct reserve_terminal_info {
    fc::network::solana::solana_public_key custody_mint;
    /// Chain-native decimals pinned at reserve creation.
    uint8_t                                custody_decimals = 0;
+   /// Token program the reserve's custody is held under, pinned at reserve
+   /// creation (SOL-396). The SAME (owner, mint) pair has DIFFERENT canonical
+   /// ATAs under SPL-Token and Token-2022, so this drives BOTH the ATA
+   /// derivation and the token-program account the terminal handlers require.
+   /// Deriving with the legacy default against a Token-2022 reserve yields an
+   /// address the program never asks for -- `EffectAccountMissing`, forever.
+   fc::network::solana::solana_public_key custody_token_program;
 };
 
 /// Extract the terminal-finalization facts from an already-decoded `Reserve`
-/// account object. ALL THREE fields are required: `creator`, `custody_mint`
-/// and `custody_decimals` are written together at reserve creation, so a
-/// record missing any of them is not a reserve this relay can build an
-/// account-consistent manifest for — guessing custody is precisely the
-/// divergence that aborts the on-chain call.
+/// account object. ALL FOUR fields are required: `creator`, `custody_mint`,
+/// `custody_decimals` and `custody_token_program` are written together at
+/// reserve creation, so a record missing any of them is not a reserve this
+/// relay can build an account-consistent manifest for — guessing custody is
+/// precisely the divergence that aborts the on-chain call.
 ///
 /// Throwing here FAILS THE BUILD, by design — do not "restore" a degrade on
 /// this path. Reaching this function means the account EXISTS and the program
@@ -261,6 +290,89 @@ reserve_terminal_info reserve_info_from_account(const fc::variant_object& reserv
 /// propagated by `build_dispatch_manifests` rather than absorbed.
 using reserve_info_reader =
    std::function<std::optional<reserve_terminal_info>(uint64_t token_code, uint64_t reserve_code)>;
+
+/// One entry of a Token-2022 mint's `ExtraAccountMetaList`, exactly as the
+/// validation account stores it (35 bytes: discriminator, 32-byte address
+/// config, signer flag, writable flag).
+///
+/// `discriminator` selects how `address_config` resolves:
+///   * `0`        — the config IS the pubkey.
+///   * `1`        — a PDA of the HOOK program, seeds packed in the config.
+///   * `>= 0x80`  — a PDA of the account at index `discriminator - 0x80`
+///                  in the Execute account list, seeds packed in the config.
+/// `2` (pubkey-from-account-data) is not resolved; see `resolve_hook_metas`.
+struct extra_account_meta {
+   uint8_t                    discriminator = 0;
+   std::array<uint8_t, 32>    address_config{};
+   bool                       is_signer     = false;
+   bool                       is_writable   = false;
+};
+
+/// Read a Token-2022 MINT account's TLV and return its `TransferHook`
+/// program id, or `nullopt` when the mint carries no hook (a legacy SPL mint,
+/// a Token-2022 mint without the extension, or one whose hook is explicitly
+/// disabled by an all-zero program id).
+///
+/// Throws on a MALFORMED TLV -- a truncated entry, or a `TransferHook` entry
+/// too short to carry its authority and program id. Neither can be read as
+/// "no hook" without risking a hook-free manifest for a hook mint.
+///
+/// A hook mint is the case SOL-396 exists for: `reserve_vault_transfer` routes
+/// through `spl_token_2022::onchain::invoke_transfer_checked`, which for such a
+/// mint resolves the hook program, its validation PDA and every account that
+/// PDA declares OUT OF `remaining_accounts`. Omitting them aborts the dispatch
+/// window before the transfer and re-packs it from the unadvanced cursor.
+std::optional<fc::network::solana::solana_public_key>
+mint_transfer_hook_program(const std::vector<uint8_t>& mint_account_data);
+
+/// Derive the `ExtraAccountMetaList` validation PDA for `mint` under
+/// `hook_program`: seeds `["extra-account-metas", mint]`.
+fc::network::solana::solana_public_key
+derive_extra_account_metas_pda(const fc::network::solana::solana_public_key& hook_program,
+                               const fc::network::solana::solana_public_key& mint);
+
+/// Parse the validation account's TLV into its declared metas, in order.
+/// Throws when the account carries no `Execute` entry, or on any malformed
+/// entry: a partial parse yields a manifest short exactly the accounts the CPI
+/// is about to demand, which is worse than failing here.
+std::vector<extra_account_meta>
+parse_extra_account_metas(const std::vector<uint8_t>& validation_account_data);
+
+/// Resolve declared metas into concrete accounts against the Execute account
+/// list, whose fixed prefix is `[source, mint, destination, authority,
+/// validation_pda]` — the indices `AccountKey` seeds refer to. Resolved metas
+/// append to that list in order, so later entries may reference earlier ones.
+///
+/// THROWS on a seed or discriminator form this resolver does not implement
+/// (`InstructionData` beyond the Execute payload, `AccountData`, pubkey-from-
+/// account-data). Failing loudly is deliberate: silently dropping a meta
+/// produces exactly the wedged epoch this resolution exists to prevent, and it
+/// would be invisible until an outpost stalled.
+std::vector<fc::network::solana::account_meta>
+resolve_hook_metas(const std::vector<extra_account_meta>&        metas,
+                   const fc::network::solana::solana_public_key& hook_program,
+                   const fc::network::solana::solana_public_key& source,
+                   const fc::network::solana::solana_public_key& mint,
+                   const fc::network::solana::solana_public_key& destination,
+                   const fc::network::solana::solana_public_key& authority,
+                   const fc::network::solana::solana_public_key& validation_pda);
+
+/// The transfer-hook facts a Token-2022 custody mint carries, as read from
+/// chain: the hook program and the metas its validation PDA declares.
+struct mint_transfer_hook {
+   fc::network::solana::solana_public_key program;
+   std::vector<extra_account_meta>        declared;
+};
+
+/// Read one custody mint's transfer-hook configuration. `nullopt` means the
+/// mint carries no hook -- the overwhelmingly common case (every legacy SPL
+/// mint, and any Token-2022 mint without the extension), for which the
+/// manifest is unchanged.
+using transfer_hook_reader =
+   std::function<std::optional<mint_transfer_hook>(
+      const fc::network::solana::solana_public_key& custody_mint)>;
+
+
 
 /// How far the outpost has settled one inbound epoch's attestations.
 struct epoch_dispatch_progress {
@@ -322,6 +434,26 @@ std::string drive_dispatch_rounds(
    const std::function<std::string(uint32_t, std::vector<fc::network::solana::account_meta>)>&
                                                                       send_dispatch,
    const std::string&                                                 log_label);
+
+/// Custody binding read from the account the on-chain settlement handler
+/// branches on. Deliberately mint-only: `CollateralPosition` carries no
+/// decimals, and the manifest path branches on the mint alone — a decimals
+/// field here could only ever hold a made-up value (contrast
+/// `reserve_terminal_info`, whose `custody_decimals` is a real pinned fact).
+struct token_custody_info {
+   /// SPL mint for the token, or the all-zero system-program key when the
+   /// token is native lamports (the on-chain zero-marker convention).
+   fc::network::solana::solana_public_key mint;
+};
+
+/// Reads ONE `(operator, token_code)` position's custody binding from its
+/// `CollateralPosition` PDA, exactly where the on-chain handler resolves it.
+/// Absent positions degrade because the program log-and-skips them; a present
+/// but unreadable position throws so the relay never submits a manifest that
+/// is guaranteed to abort.
+using collateral_custody_reader =
+   std::function<std::optional<token_custody_info>(
+      const fc::network::solana::solana_public_key& operator_key, uint64_t token_code)>;
 
 } // namespace outpost_solana_client_detail
 
@@ -434,6 +566,28 @@ private:
       uint32_t                                       dispatch_limit,
       std::vector<fc::network::solana::account_meta> extra_remaining_accounts);
 
+   /// Resolve one per-`(operator, token_code)` collateral position's pinned
+   /// custody mint from the `CollateralPosition` PDA the on-chain handlers
+   /// themselves branch on.
+   ///
+   /// An ABSENT or EMPTY position returns empty because the program
+   /// log-and-skips an uninitialized account. A position that EXISTS but this
+   /// relay cannot decode THROWS after logging: the program takes its real
+   /// custody branch, so degrading would omit required effect accounts and
+   /// permanently wedge the unadvanced dispatch cursor.
+   std::optional<outpost_solana_client_detail::token_custody_info>
+   collateral_position_custody(
+      const fc::network::solana::solana_public_key& operator_key, uint64_t token_code);
+
+   /// Read one custody mint's transfer-hook configuration (SOL-396). `nullopt`
+   /// when the mint carries no hook -- every mint in the system today, for
+   /// which the manifest is unchanged. A CONFIGURED hook whose
+   /// `ExtraAccountMetaList` cannot be read throws rather than degrading: a
+   /// manifest silently short the hook's accounts wedges the epoch inside the
+   /// transfer CPI with no diagnostic pointing at the cause.
+   std::optional<outpost_solana_client_detail::mint_transfer_hook>
+   mint_transfer_hook_for(const fc::network::solana::solana_public_key& custody_mint);
+
    solana_client_entry_ptr                       _entry;
    fc::network::solana::solana_public_key        _program_id;
    std::shared_ptr<opp_solana_outpost_client>    _program_client;
@@ -491,12 +645,51 @@ derive_reserve_vault_pda(const fc::network::solana::solana_public_key& program_i
                          uint64_t token_code,
                          uint64_t reserve_code);
 
+/// Derive the per-`(operator, token_code)` `CollateralPosition` PDA (SOL-379):
+/// seeds `["collateral_position", operator.as_ref(), token_code.to_le_bytes()]`.
+/// Byte-exact mirror of the program's `#[account(seeds = ...)]` declaration.
+///
+/// Exported so the manifest builder and its tests derive through ONE
+/// implementation rather than re-spelling the seed list.
+fc::network::solana::solana_public_key
+derive_collateral_position_pda(const fc::network::solana::solana_public_key& program_id,
+                               const fc::network::solana::solana_public_key& operator_key,
+                               uint64_t token_code);
+
+/// Derive the per-`token_code` `collateral_vault` PDA: seeds
+/// `["collateral_vault", token_code.to_le_bytes()]`. The vault holds the
+/// token's SPL collateral custody; native collateral settles straight out of
+/// the named `vault`, so this account only rides an SPL manifest.
+fc::network::solana::solana_public_key
+derive_collateral_vault_pda(const fc::network::solana::solana_public_key& program_id,
+                            uint64_t token_code);
+
 /// Which family of effect accounts one inbound attestation needs. The relay
 /// derives the concrete metas per shape; the on-chain handler resolves them
 /// out of `remaining_accounts` by pubkey.
+///
+/// The collateral-settling shapes (`withdraw_remit`, `slash`,
+/// `deposit_revert`) exist because SOL-379 replaced the bounded collateral
+/// `Vec` on `OperatorRegistry` with a per-`(operator, token_code)`
+/// `CollateralPosition` PDA, and SOL-380 made the handlers settle in the
+/// asset the position actually escrows — so their manifests must declare the
+/// position PDA (seeds `[COLLATERAL_POSITION_SEED, operator.as_ref(),
+/// &token_code.to_le_bytes()]`) and, for SPL custody, the
+/// `[COLLATERAL_VAULT_SEED, &token_code.to_le_bytes()]` vault PDA, the
+/// destination ATA and the SPL token program.
 enum class effect_shape {
-   /// Pays a native-SOL recipient directly (WITHDRAW_REMIT, DEPOSIT_REVERT).
-   native_payee,
+   /// OPERATOR_ACTION(WITHDRAW_REMIT): pays the operator (natively out of the
+   /// named `vault`, or into their canonical ATA under SPL custody) and
+   /// debits their `CollateralPosition` PDA.
+   withdraw_remit,
+   /// OPERATOR_ACTION(SLASH): debits the operator's `CollateralPosition` PDA
+   /// and routes the seizure into the named `reserve_aggregate` (native) or
+   /// its canonical ATA via the collateral vault + token program (SPL).
+   slash,
+   /// OPERATOR_ACTION(DEPOSIT_REVERT): refunds the depositor (natively out of
+   /// the named `vault`, or into their canonical ATA under SPL custody) and
+   /// debits their `CollateralPosition` PDA.
+   deposit_revert,
    /// SWAP_REMIT: Reserve PDA, plus vault + recipient ATA + token program
    /// when the reserve's custody mint is SPL rather than native.
    swap_remit,
@@ -521,10 +714,17 @@ enum class effect_shape {
 struct inbound_effect {
    size_t                                                attestation_index;
    effect_shape                                          shape;
-   /// Native payee / SWAP_REMIT recipient / SWAP_REVERT depositor.
+   /// WITHDRAW_REMIT operator / DEPOSIT_REVERT depositor / SWAP_REMIT
+   /// recipient / SWAP_REVERT depositor. For `slash` it is the SLASHED
+   /// operator — it keys the `CollateralPosition` PDA and the destination
+   /// ATA owner lookup but is never itself paid.
    std::optional<fc::network::solana::solana_public_key> recipient;
    /// Set for every reserve-backed shape.
    std::optional<reserve_pda_seeds>                      reserve;
+   /// Set for every collateral-settling shape (`withdraw_remit`, `slash`,
+   /// `deposit_revert`): the `token_code` keying the `CollateralPosition`
+   /// PDA and its pinned custody lookup.
+   std::optional<uint64_t>                               collateral_token_code;
 };
 
 /// Walk `envelope_bytes` ONCE and return every attestation that needs effect
@@ -578,12 +778,26 @@ uint32_t count_inbound_attestations(const std::vector<char>& envelope_bytes);
 ///     read propagates untouched — it means a manifest the program would abort
 ///     on, and shipping one would wedge the epoch rather than delay it.
 ///
+///   * Collateral-settling shapes (`withdraw_remit`, `slash`, `deposit_revert`)
+///     resolve custody through `read_collateral_custody` — called at most ONCE
+///     per distinct `(operator, token_code)` position, memoised like the
+///     reserve reads. A degraded (empty) custody read costs that attestation
+///     only its SPL extras; the `CollateralPosition` PDA and (where owed) the
+///     recipient are still declared, matching the program's log-and-skip /
+///     abort-and-retry gates.
+///
 /// @param program_id            outpost program id, for PDA derivation.
 /// @param effects               account-needing attestations, in dispatch order.
 /// @param total_attestations    the envelope's attestation total (the cursor's
 ///                              denominator) -- the size of the result.
 /// @param throw_if_past_deadline  throws once the caller's deadline passes.
 /// @param read_reserve_info     reads one `Reserve` record (may degrade).
+/// @param read_collateral_custody  reads one `(operator, token_code)`
+///                              position's pinned custody (may degrade only
+///                              when the position is absent or empty).
+/// @param reserve_aggregate     the named `reserve_aggregate` account — the
+///                              destination whose ATA receives an SPL slash
+///                              seizure.
 /// @param log_label             client identity for log lines.
 /// @return one manifest per attestation, in dispatch order.
 std::vector<std::vector<fc::network::solana::account_meta>> build_dispatch_manifests(
@@ -592,6 +806,9 @@ std::vector<std::vector<fc::network::solana::account_meta>> build_dispatch_manif
    uint32_t                                      total_attestations,
    const std::function<void()>&                  throw_if_past_deadline,
    const reserve_info_reader&                    read_reserve_info,
+   const collateral_custody_reader&              read_collateral_custody,
+   const transfer_hook_reader&                   read_transfer_hook,
+   const fc::network::solana::solana_public_key& reserve_aggregate,
    const std::string&                            log_label);
 
 } // namespace outpost_solana_client_detail

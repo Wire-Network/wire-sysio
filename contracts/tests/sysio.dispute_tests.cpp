@@ -1,7 +1,7 @@
 /// Contract tests for the OPP envelope dispute vote (sysio.chalg dispute-vote flow).
 ///
 /// Covers the new chalg actions in isolation and against a minimally-bootstrapped OPP stack:
-///   * opendispute  -- auth (sysio.msgch), >=3 candidates, no duplicate (outpost,epoch), pauses
+///   * opendispute  -- auth (sysio.msgch), >=2 candidates, no duplicate (outpost,epoch), pauses
 ///                     epoch, snapshots the Tier-1 electorate + quorum from sysio.roa::nodeowners
 ///                     (rejecting an empty electorate)
 ///   * votedispute  -- electorate-snapshot eligibility (the Tier-1 set frozen at open; later
@@ -214,7 +214,8 @@ public:
 
       BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
          ("kind", ChainKind::CHAIN_KIND_EVM)("code", codename_mvo("ETH"))
-         ("external_chain_id", 31337)("name", std::string("ethereum-test"))("description", std::string{})));
+         ("external_chain_id", 31337)("name", std::string("ethereum-test"))("description", std::string{})
+         ("outpost", sysio_system::test_support::no_outpost_mvo())));
 
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "schbatchgps"_n, mvo()));
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "advance"_n, mvo()));
@@ -478,14 +479,24 @@ BOOST_FIXTURE_TEST_CASE(opendispute_requires_msgch_auth, sysio_dispute_tester) {
                        opendispute(eth_code(), current_epoch(), cands, /*signer=*/"voter1"_n));
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(opendispute_requires_three_candidates, sysio_dispute_tester) { try {
+/// A two-version tie has no automatic majority, so chalg must accept it as an adjudicable dispute.
+BOOST_FIXTURE_TEST_CASE(opendispute_accepts_two_candidates, sysio_dispute_tester) { try {
    std::vector<fc::variant> two{
       candidate(fc::sha256::hash(std::string("a")), {BATCHOP}),
       candidate(fc::sha256::hash(std::string("b")), {"voter1"_n}),
    };
+   BOOST_REQUIRE_EQUAL(success(), opendispute(eth_code(), current_epoch(), two));
+   BOOST_REQUIRE_EQUAL(two.size(), get_dispute(1)["candidates"].get_array().size());
+} FC_LOG_AND_RETHROW() }
+
+/// One envelope version has no competing candidate, so chalg must retain the two-version floor.
+BOOST_FIXTURE_TEST_CASE(opendispute_rejects_one_candidate, sysio_dispute_tester) { try {
+   std::vector<fc::variant> one{
+      candidate(fc::sha256::hash(std::string("a")), {BATCHOP}),
+   };
    BOOST_REQUIRE_EQUAL(
-      error("assertion failure with message: a dispute requires at least 3 candidate envelope versions"),
-      opendispute(eth_code(), current_epoch(), two));
+      error("assertion failure with message: a dispute requires at least two candidate envelope versions"),
+      opendispute(eth_code(), current_epoch(), one));
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(opendispute_rejects_duplicate, sysio_dispute_tester) { try {
@@ -893,7 +904,8 @@ BOOST_FIXTURE_TEST_CASE(chkdispute_unpauses_only_after_last_open_dispute, sysio_
    // exist concurrently with the ETH one.
    BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
       ("kind", ChainKind::CHAIN_KIND_EVM)("code", codename_mvo("BASE"))
-      ("external_chain_id", 8453)("name", std::string("base-test"))("description", std::string{})));
+      ("external_chain_id", 8453)("name", std::string("base-test"))("description", std::string{})
+      ("outpost", sysio_system::test_support::no_outpost_mvo())));
    const uint64_t base_code = fc::slug_name{"BASE"}.value;
 
    const uint32_t epoch = current_epoch();

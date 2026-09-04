@@ -34,7 +34,7 @@ and optional per-client transaction policies. See
 [`docs/ethereum-client-config.example.json`](../../../docs/ethereum-client-config.example.json) and the
 [outpost client configuration guide](../../../docs/outpost-client-plugins.md).
 
-The legacy
+The CLI
 `--outpost-ethereum-client <eth-client-id>,<sig-provider-id>,<eth-node-url>[,<eth-chain-id>]` option remains
 available. It assigns maximum-value policy defaults and cannot be combined with
 `--outpost-ethereum-client-config-file`. Those defaults preserve compatibility only, provide no
@@ -47,5 +47,5 @@ Path to an Ethereum contract ABI file (relative from current working directory o
 ## Minimum Configuration
 To successfully start the application, the following are required:
 1.  At least **one** Ethereum signature provider.
-2.  At least **one** Ethereum outpost client, from the unified file or legacy option.
+2.  At least **one** Ethereum outpost client, from the unified file or CLI option.
 3.  At least **one** Ethereum ABI file reference.

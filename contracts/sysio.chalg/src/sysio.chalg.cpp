@@ -5,6 +5,7 @@
 #include <sysio.reserv/sysio.reserv.hpp> // reserve books that price the challenge bond
 #include <sysio.opreg/sysio.opreg.hpp>   // operator status guard before slashing
 #include <sysio.opp.common/amm_math.hpp> // token_to_wire — the bond's WIRE valuation
+#include <sysio.opp.common/wire_asset.hpp>
 #include <magic_enum/magic_enum.hpp>
 
 #include <algorithm>
@@ -23,14 +24,9 @@ constexpr name ram_payer = "sysio"_n;
 
 namespace {
 
-/// WIRE asset symbol for the challenge-bond escrow + payouts (9 decimals — mirrors
-/// `sysio.reserv`'s WIRE_SYMBOL; deliberately NOT opreg's CORE_SYM).
-constexpr sysio::symbol WIRE_SYMBOL{"WIRE", 9};
-
-/// The WIRE token's slug code. A collateral bucket denominated in WIRE needs no curve — it is
-/// already in the unit the bond is posted in. (`sysio.reserv`'s own `WIRE_TOKEN` is file-local
-/// to that translation unit, so it cannot be reused here.)
-constexpr sysio::slug_name WIRE_TOKEN_CODE = "WIRE"_s;
+/// Rejection text for a dispute without enough competing envelope versions to adjudicate.
+constexpr const char* DISPUTE_REQUIRES_TWO_CANDIDATES =
+   "a dispute requires at least two candidate envelope versions";
 
 /// Floor valuation, in WIRE atomic units, for a NONZERO collateral bucket the depot cannot price —
 /// its `(chain_code, token_code)` pair carries no ACTIVE reserve, or the pair's books floor the
@@ -115,7 +111,8 @@ struct uwchal_bond_quote {
 /// full argument.
 ///
 /// The bound is the TRANSFERABLE asset range (2^62-1), not `uint64_t`'s: `openuwchal` escrows the
-/// quote as `asset(static_cast<int64_t>(quote.bond), WIRE_SYMBOL)`, and `asset`'s own range check
+/// quote as `asset(static_cast<int64_t>(quote.bond), opp::wire::asset_symbol)`, and `asset`'s range
+/// check
 /// rejects anything above `max_amount`. Bounding at uint64 instead let a two-leg quote land in
 /// (`asset::max_amount`, `uint64_t::max`] — `uwchalbond` would advertise a nonzero bond that
 /// `openuwchal` could never escrow, so filing reverted before any lock was held and the
@@ -157,7 +154,7 @@ uwchal_bond_quote compute_uwchal_bond(name uwrit_account, name reserv_account, n
    opp::amm::u128 total = 0;
    for (const auto& bal : op->balances) {
       if (bal.balance == 0) continue;
-      if (bal.token_code == WIRE_TOKEN_CODE) {
+      if (opp::wire::is_native_asset(bal.chain_code, bal.token_code)) {
          total += bal.balance;   // already WIRE — no curve to ride
          continue;
       }
@@ -244,8 +241,8 @@ void chalg::opendispute(uint64_t chain_code,
                         uint32_t epoch_index,
                         std::vector<dispute_candidate> candidates) {
    require_auth(MSGCH_ACCOUNT);
-   check(candidates.size() >= 3,
-         "a dispute requires at least 3 candidate envelope versions");
+   check(candidates.size() >= chalg_limits::minimum_dispute_candidate_versions,
+         DISPUTE_REQUIRES_TWO_CANDIDATES);
 
    disputes_t disputes(get_self());
 
@@ -265,9 +262,9 @@ void chalg::opendispute(uint64_t chain_code,
    const uint8_t network_gen = roa::current_network_gen(ROA_ACCOUNT);
    auto electorate = snapshot_t1_electorate(ROA_ACCOUNT, network_gen);
 
-   // An empty electorate could never vote, so the dispute could never resolve and the epoch pause
-   // below would hold forever. Refuse to open instead -- the conflicting deliveries keep this
-   // epoch from reaching consensus regardless, and the failure then names the actual problem.
+   // Defense in depth for direct calls: msgch preflights this invariant and soft-returns so a
+   // terminal delivery remains retryable, while this assertion keeps every other caller from
+   // opening an unresolvable, permanently-pausing dispute.
    check(!electorate.empty(), "cannot open a dispute with no registered tier-1 node owners");
    const uint32_t quorum = static_cast<uint32_t>(electorate.size()) / 2 + 1;
 
@@ -343,7 +340,11 @@ void chalg::votedispute(name owner, uint64_t dispute_id, checksum256 chosen_chec
 //  chkdispute — tally votes; on resolution dispatch the winner and unpause
 // ---------------------------------------------------------------------------
 void chalg::chkdispute(uint64_t dispute_id) {
-   // Permissionless crank — batch operators call this on their ~15s cadence.
+   // Permissionless crank, driven by `batch_operator_plugin`'s epoch tick
+   // (`--batch-epoch-poll-ms`, 15s default) from every ACTIVE batch operator.
+   // That cadence is this action's ONLY driver: unlike `chkuwchal`, which
+   // `sysio.uwrit::chklocks` pokes from every `sysio.epoch::advance`, a dispute
+   // pauses `advance` itself, so no inline poke can reach here.
    disputes_t disputes(get_self());
    auto d_pk = dispute_key{dispute_id};
    auto d = disputes.get(d_pk, "dispute not found");
@@ -470,7 +471,7 @@ void chalg::openuwchal(name challenger, uint64_t uwreq_id, name underwriter,
       permission_level{challenger, "active"_n},
       TOKEN_ACCOUNT, "transfer"_n,
       std::make_tuple(challenger, get_self(),
-         asset(static_cast<int64_t>(quote.bond), WIRE_SYMBOL),
+         asset(static_cast<int64_t>(quote.bond), opp::wire::asset_symbol),
          std::string("sysio.chalg::openuwchal challenge bond"))
    ).send();
 
@@ -687,7 +688,7 @@ void chalg::claimbond(name account) {
       permission_level{get_self(), "active"_n},
       TOKEN_ACCOUNT, "transfer"_n,
       std::make_tuple(get_self(), account,
-         asset(static_cast<int64_t>(amount), WIRE_SYMBOL),
+         asset(static_cast<int64_t>(amount), opp::wire::asset_symbol),
          std::string("sysio.chalg challenge bond payout"))
    ).send();
 }

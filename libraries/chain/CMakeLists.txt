@@ -177,6 +177,7 @@ target_link_libraries(
 )
 target_include_directories( sysio_chain
                             PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include" "${CMAKE_CURRENT_BINARY_DIR}/include"
+                                   "${CMAKE_CURRENT_SOURCE_DIR}/../protocol/include"
                                    "${CMAKE_CURRENT_SOURCE_DIR}/../wasm-jit/Include"
                             )
 target_compile_definitions( sysio_chain PUBLIC ${CHAIN_NATIVE_MODULE_DEFINITIONS} )

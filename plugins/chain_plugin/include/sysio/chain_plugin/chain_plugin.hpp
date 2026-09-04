@@ -11,6 +11,7 @@
 #include <sysio/chain/authority.hpp>
 #include <sysio/chain/account_object.hpp>
 #include <sysio/chain/block.hpp>
+#include <sysio/chain/config.hpp>
 #include <sysio/chain/controller.hpp>
 #include <sysio/chain/kv_table_objects.hpp>
 #include <sysio/chain/resource_limits.hpp>
@@ -19,6 +20,7 @@
 #include <sysio/chain/plugin_interface.hpp>
 #include <sysio/chain/types.hpp>
 #include <sysio/chain/fixed_bytes.hpp>
+#include <sysio/protocol/snapshot_attestation.hpp>
 
 #include <boost/container/flat_set.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
@@ -28,6 +30,8 @@
 #include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
 
 #include <atomic>
+#include <optional>
+#include <string>
 #include <string_view>
 
 namespace fc { class variant; }
@@ -57,6 +61,112 @@ namespace sysio {
    using chain::packed_transaction;
 
    enum class throw_on_yield { no, yes };
+
+   /** Outcome of the safety-sensitive snaprecords table scan itself. */
+   enum class snapshot_attestation_table_read_status {
+      /// The scan succeeded; its rows can be inspected, including an empty result.
+      success,
+      /// The scan threw, timed out, shut down, or returned an embedded exception.
+      failure,
+   };
+
+   /** Verification action selected for one snaprecords table-read outcome. */
+   enum class snapshot_attestation_table_read_action {
+      /// Inspect the successful result and apply record/absence policy.
+      inspect_result,
+      /// Retry the failed scan on a later irreversible block.
+      retry,
+      /// Grace expired at the live tip, so apply the normal missing-record trust policy.
+      apply_missing_record_policy,
+   };
+
+   /** Classify a snaprecords scan without making one transient live-tip failure terminal. */
+   constexpr snapshot_attestation_table_read_action classify_snapshot_attestation_table_read(
+      snapshot_attestation_table_read_status status,
+      bool caught_up,
+      bool within_grace) {
+      if (status == snapshot_attestation_table_read_status::success) {
+         return snapshot_attestation_table_read_action::inspect_result;
+      }
+      return caught_up && !within_grace
+                ? snapshot_attestation_table_read_action::apply_missing_record_policy
+                : snapshot_attestation_table_read_action::retry;
+   }
+
+   /// Minimum decoder budget for safety-critical snapshot-attestation table reads.
+   inline constexpr fc::microseconds snapshot_attestation_minimum_table_read_timeout{
+      chain::config::default_abi_serializer_max_time_us};
+
+   /** Keep internal attestation decoding independent from a smaller operator-facing ABI timeout. */
+   constexpr fc::microseconds snapshot_attestation_table_read_timeout(
+      fc::microseconds configured_timeout) {
+      return configured_timeout < snapshot_attestation_minimum_table_read_timeout
+                ? snapshot_attestation_minimum_table_read_timeout
+                : configured_timeout;
+   }
+
+   /// Minimum decoder and request budget for a cold startup configuration read.
+   inline constexpr fc::microseconds snapshot_attestation_startup_minimum_table_read_timeout{
+      1'000'000};
+
+   /// Maximum number of bounded attestation-table reads before the caller fails closed.
+   inline constexpr uint32_t snapshot_attestation_table_read_attempts = 3;
+
+   /** Give a cold startup read more headroom than steady-state attestation polling. */
+   constexpr fc::microseconds snapshot_attestation_startup_table_read_timeout(
+      fc::microseconds configured_timeout) {
+      return configured_timeout < snapshot_attestation_startup_minimum_table_read_timeout
+                ? snapshot_attestation_startup_minimum_table_read_timeout
+                : configured_timeout;
+   }
+
+   /** Retry transient attestation-table read failures while preserving a terminal empty result. */
+   template <typename Read>
+   auto retry_snapshot_attestation_table_read(Read&& read) -> decltype(read()) {
+      for (uint32_t attempt = 0; attempt < snapshot_attestation_table_read_attempts; ++attempt) {
+         auto result = read();
+         if (result) {
+            return result;
+         }
+      }
+      return {};
+   }
+
+   /** Return whether an ABI declares the tables consumed during auto-fetched snapshot bootstrap. */
+   bool has_required_snapshot_attestation_schema(const abi_def& abi);
+
+   /** Return whether one decoded snapconfig row enables snapshot attestation. */
+   bool snapshot_attestation_config_is_enabled(const fc::variants& rows);
+
+   /** Return whether endpoint metadata identifies the loaded scheduled snapshot head exactly. */
+   bool snapshot_endpoint_block_matches(uint32_t advertised_block_num, uint32_t loaded_block_num);
+
+   /** Return whether endpoint metadata honors an optional specifically requested block. */
+   bool snapshot_endpoint_request_matches(const std::optional<uint32_t>& requested_block_num,
+                                          uint32_t advertised_block_num);
+
+   /** Parse one complete decimal URL segment as a uint32 block number. */
+   std::optional<uint32_t> parse_snapshot_endpoint_block_num(std::string_view segment);
+
+   /** Return the canonical physical KV table identifier for final snapshot attestations. */
+   inline uint16_t snapshot_attestation_table_id() {
+      return chain::compute_table_id(
+         chain::name{protocol::snapshot_attestation::table_snaprecords}.to_uint64_t());
+   }
+
+   /** Return the canonical physical KV table identifier for snapshot attestation configuration. */
+   inline uint16_t snapshot_attestation_config_table_id() {
+      return chain::compute_table_id(
+         chain::name{protocol::snapshot_attestation::table_snapconfig}.to_uint64_t());
+   }
+
+   /** Compare both immutable tuple components loaded from a snapshot with an attested record. */
+   bool snapshot_attestation_record_matches(
+      const chain::block_id_type& loaded_block_id,
+      const fc::crypto::blake3& loaded_snapshot_hash,
+      const chain::block_id_type& attested_block_id,
+      std::string_view attested_snapshot_hash);
+
    inline auto make_resolver(const controller& control, fc::microseconds abi_serializer_max_time, throw_on_yield yield_throw ) {
       return [&control, abi_serializer_max_time, yield_throw](const account_name& name) -> std::optional<abi_serializer> {
          if (name.good()) {
@@ -651,6 +761,10 @@ public:
 
 } // namespace chain_apis
 
+/** Build the exact primary-key query shared by snapshot-attestation consumers. */
+chain_apis::read_only::get_table_rows_params
+make_snapshot_attestation_record_query(uint32_t block_num);
+
 class chain_plugin : public plugin<chain_plugin> {
 public:
    APPBASE_PLUGIN_REQUIRES((signature_provider_manager_plugin))
@@ -668,7 +782,11 @@ public:
    chain_apis::read_write get_read_write_api(const fc::microseconds& http_max_response_time);
    chain_apis::read_only get_read_only_api(const fc::microseconds& http_max_response_time) const;
 
-   /// Runs a `get_table_rows` scan and returns its result.
+   /** Construct a read-only API with independent request and ABI-decoder budgets. */
+   chain_apis::read_only get_read_only_api(const fc::microseconds& http_max_response_time,
+                                           const fc::microseconds& abi_serializer_max_time) const;
+
+   /// Runs a `get_table_rows` scan and distinguishes a successful empty result from read failure.
    ///
    /// When called off the main app thread (typical case: a cron worker), the scan is posted onto the executor's
    /// read_only queue and the calling thread blocks on the result. Running through the queue ensures chainbase
@@ -680,8 +798,16 @@ public:
    /// mutator; read window: main thread is one of the legitimate readers).
    ///
    /// `shutdown_flag` is polled every 200ms on the off-thread path so the caller returns early on plugin shutdown
-   /// instead of stalling up to `timeout` for the executor to drain. `log_prefix` is a short tag (plugin name) used
-   /// in error log lines.
+   /// instead of stalling up to `timeout` for the executor to drain. `abi_serializer_timeout` independently bounds
+   /// ABI decoding, and `log_prefix` is an owned short tag (plugin name) used in error log lines.
+   std::optional<chain_apis::read_only::get_table_rows_result>
+   read_table_rows_checked(chain_apis::read_only::get_table_rows_params params,
+                           fc::microseconds timeout,
+                           fc::microseconds abi_serializer_timeout,
+                           std::string log_prefix,
+                           const std::atomic<bool>& shutdown_flag);
+
+   /** Run a table scan while preserving the legacy empty-result-on-failure behavior. */
    chain_apis::read_only::get_table_rows_result
    read_table_rows(chain_apis::read_only::get_table_rows_params params,
                    fc::microseconds timeout,
@@ -701,6 +827,9 @@ public:
    controller& chain();
    // Only call this after plugin_initialize()!
    const controller& chain() const;
+
+   /** Return whether a loaded snapshot still awaits terminal on-chain attestation verification. */
+   bool has_pending_snapshot_attestation() const;
 
    chain::chain_id_type get_chain_id() const;
    fc::microseconds get_abi_serializer_max_time() const;

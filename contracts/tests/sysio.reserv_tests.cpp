@@ -10,6 +10,7 @@
 #include <fc/crypto/public_key.hpp>
 
 #include "contracts.hpp"
+#include "contract_test_support.hpp"
 
 using namespace sysio::testing;
 using namespace sysio;
@@ -137,7 +138,8 @@ public:
          ("code",              codename_mvo(code))
          ("external_chain_id", external_chain_id)
          ("name",              std::string("outpost"))
-         ("description",       std::string{}));
+         ("description",       std::string{})
+         ("outpost", sysio_system::test_support::no_outpost_mvo()));
    }
 
    action_result push_to(name account, abi_serializer& ser, name signer,
@@ -1206,6 +1208,18 @@ BOOST_FIXTURE_TEST_CASE(swapquote_prices_the_reserve_owner_fees, sysio_reserve_t
    BOOST_CHECK_EQUAL(source_only, expected(OWNER_FEE, 0));
    BOOST_CHECK_LT(source_only, before);
    BOOST_CHECK_GT(source_only, after);
+} FC_LOG_AND_RETHROW() }
+
+/// WIRE-375: a token called WIRE on a foreign chain is not depot-native WIRE.
+/// Without an ACTIVE `(ETH, WIRE, PRIMARY)` reserve, the source leg cannot be
+/// priced and must return zero instead of taking the native WIRE-at-par path.
+BOOST_FIXTURE_TEST_CASE(swapquote_foreign_wire_codename_requires_reserve,
+                        sysio_reserve_tester) { try {
+   constexpr uint64_t FROM = 2'000'000'000;
+
+   BOOST_REQUIRE(find_reserve("ETH", "WIRE", "PRIMARY").is_null());
+   BOOST_REQUIRE_EQUAL(0u, swapquote_value("ETH", "WIRE", "PRIMARY", FROM,
+                                           "WIRE", "WIRE", "WIRE"));
 } FC_LOG_AND_RETHROW() }
 
 // ── Underwriter fee accrual + owner-authenticated claim ──

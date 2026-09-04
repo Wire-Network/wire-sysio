@@ -41,6 +41,14 @@ constexpr std::string_view OP_UW_COMMIT   = "uw_commit:commit_underwrite";
 constexpr std::string_view EPOCH_DELIVERIES_SEED = "epoch_deliveries";
 constexpr std::string_view ENVELOPE_CHUNKS_SEED  = "envelope_chunks";
 
+/// Anchor seed literals for the collateral-settlement PDAs. Byte-exact
+/// mirrors of the program's `COLLATERAL_POSITION_SEED` /
+/// `COLLATERAL_VAULT_SEED` constants (wire-solana `opp_states.rs`) -- a
+/// one-character drift derives a well-formed WRONG PDA that only surfaces at
+/// runtime as `EffectAccountMissing`, holding the dispatch cursor.
+constexpr std::string_view COLLATERAL_POSITION_SEED = "collateral_position";
+constexpr std::string_view COLLATERAL_VAULT_SEED    = "collateral_vault";
+
 /// The 4-byte little-endian seed encoding of a WIRE epoch index -- the exact
 /// bytes the program's `epoch_index.to_le_bytes()` seed component uses.
 std::vector<uint8_t> epoch_index_le_seed(uint32_t epoch_index) {
@@ -115,15 +123,28 @@ namespace epoch_deliveries {
 } // namespace epoch_deliveries
 
 /// Field identifiers of the per-`(token_code, reserve_code)` `Reserve`
-/// account. `custody_mint` / `custody_decimals` are pinned at reserve creation
+/// account. `custody_mint` / `custody_decimals` / `custody_token_program` are
+/// pinned at reserve creation
 /// and are what the on-chain terminal handlers branch on, so the relay's
 /// manifest must read custody from HERE and nowhere else.
 namespace reserve_account {
-   constexpr auto account_name           = "Reserve";
-   constexpr auto field_creator          = "creator";
-   constexpr auto field_custody_mint     = "custody_mint";
-   constexpr auto field_custody_decimals = "custody_decimals";
+   constexpr auto account_name                = "Reserve";
+   constexpr auto field_creator               = "creator";
+   constexpr auto field_custody_mint          = "custody_mint";
+   constexpr auto field_custody_decimals      = "custody_decimals";
+   constexpr auto field_custody_token_program = "custody_token_program";
 } // namespace reserve_account
+
+/// Field identifiers of the per-`(operator, token_code)` collateral position.
+/// Its custody mint is pinned at first deposit and is what the on-chain
+/// settlement handlers branch on.
+namespace collateral_position {
+   constexpr auto account_name       = "CollateralPosition";
+   constexpr auto field_operator     = "operator";
+   constexpr auto field_token_code   = "token_code";
+   constexpr auto field_custody_mint = "custody_mint";
+   constexpr auto field_amount       = "amount";
+} // namespace collateral_position
 
 } // anonymous namespace
 
@@ -269,15 +290,59 @@ void assert_epoch_deliveries_shape(const fc::network::solana::idl::program& prog
              epoch_deliveries::field_dispatched_count);
 }
 
-/// Assert the loaded IDL declares `Reserve` with the three fields the terminal
+/// Assert the loaded IDL declares `CollateralPosition` with the four fields
+/// its on-chain settlement path binds together. Full contract on the header
+/// declaration.
+void assert_collateral_position_shape(const fc::network::solana::idl::program& program) {
+   namespace idl = fc::network::solana::idl;
+   const auto& fields = declared_account_fields(program, collateral_position::account_name);
+
+   bool has_operator   = false;
+   bool has_token_code = false;
+   bool has_mint       = false;
+   bool has_amount     = false;
+   for (const auto& field : fields) {
+      const bool is_pubkey =
+         field.type.is_primitive() && field.type.primitive == idl::primitive_type::pubkey;
+      const bool is_u64 =
+         field.type.is_primitive() && field.type.primitive == idl::primitive_type::u64;
+      if (field.name == collateral_position::field_operator) {
+         FC_ASSERT(is_pubkey, "CollateralPosition '{}' must be declared pubkey, got '{}'",
+                   collateral_position::field_operator, describe_idl_type(field.type));
+         has_operator = true;
+      } else if (field.name == collateral_position::field_token_code) {
+         FC_ASSERT(is_u64, "CollateralPosition '{}' must be declared u64, got '{}'",
+                   collateral_position::field_token_code, describe_idl_type(field.type));
+         has_token_code = true;
+      } else if (field.name == collateral_position::field_custody_mint) {
+         FC_ASSERT(is_pubkey, "CollateralPosition '{}' must be declared pubkey, got '{}'",
+                   collateral_position::field_custody_mint, describe_idl_type(field.type));
+         has_mint = true;
+      } else if (field.name == collateral_position::field_amount) {
+         FC_ASSERT(is_u64, "CollateralPosition '{}' must be declared u64, got '{}'",
+                   collateral_position::field_amount, describe_idl_type(field.type));
+         has_amount = true;
+      }
+   }
+   FC_ASSERT(has_operator && has_token_code && has_mint && has_amount,
+             "CollateralPosition IDL missing '{}' / '{}' / '{}' / '{}' "
+             "(found {} / {} / {} / {}); a live collateral position's pinned custody cannot be "
+             "resolved safely without this declaration",
+             collateral_position::field_operator, collateral_position::field_token_code,
+             collateral_position::field_custody_mint, collateral_position::field_amount,
+             has_operator, has_token_code, has_mint, has_amount);
+}
+
+/// Assert the loaded IDL declares `Reserve` with the four fields the terminal
 /// manifest resolves from it. Full contract on the header declaration.
 void assert_reserve_shape(const fc::network::solana::idl::program& program) {
    namespace idl = fc::network::solana::idl;
    const auto& fields = declared_account_fields(program, reserve_account::account_name);
 
-   bool has_creator  = false;
-   bool has_mint     = false;
-   bool has_decimals = false;
+   bool has_creator       = false;
+   bool has_mint          = false;
+   bool has_decimals      = false;
+   bool has_token_program = false;
    for (const auto& field : fields) {
       // Compare against the optional member directly, as the sibling shape
       // checks do: a malformed type object must reach the per-field diagnostic
@@ -297,18 +362,24 @@ void assert_reserve_shape(const fc::network::solana::idl::program& program) {
                    "Reserve '{}' must be declared u8, got '{}'",
                    reserve_account::field_custody_decimals, describe_idl_type(field.type));
          has_decimals = true;
+      } else if (field.name == reserve_account::field_custody_token_program) {
+         FC_ASSERT(is_pubkey, "Reserve '{}' must be declared pubkey, got '{}'",
+                   reserve_account::field_custody_token_program, describe_idl_type(field.type));
+         has_token_program = true;
       }
    }
-   // One message for all three: they are written together at reserve creation,
+   // One message for all four: they are written together at reserve creation,
    // and any one missing costs the manifest the same way -- the effect account
    // the program's branch requires cannot be derived, so its dispatch window
    // aborts and the cursor never moves past it.
-   FC_ASSERT(has_creator && has_mint && has_decimals,
-             "Reserve IDL missing '{}' / '{}' / '{}' (found {} / {} / {}); the terminal manifest "
-             "resolves custody and the cancel-refund target from these, and a reserve-backed "
-             "dispatch window cannot be built without them",
+   FC_ASSERT(has_creator && has_mint && has_decimals && has_token_program,
+             "Reserve IDL missing '{}' / '{}' / '{}' / '{}' (found {} / {} / {} / {}); the terminal "
+             "manifest resolves custody, the cancel-refund target and the ATA-deriving token "
+             "program from these, and a reserve-backed dispatch window cannot be built without them",
              reserve_account::field_creator, reserve_account::field_custody_mint,
-             reserve_account::field_custody_decimals, has_creator, has_mint, has_decimals);
+             reserve_account::field_custody_decimals,
+             reserve_account::field_custody_token_program,
+             has_creator, has_mint, has_decimals, has_token_program);
 }
 
 /// Keep only the candidate IDLs whose declared address matches the deployed
@@ -518,6 +589,11 @@ std::vector<uint8_t> u64_seed(uint64_t value) {
    return out;
 }
 
+/// Seed bytes of a `solana_public_key` for Anchor PDA derivation.
+std::vector<uint8_t> pubkey_seed(const fc::network::solana::solana_public_key& key) {
+   return std::vector<uint8_t>(key._data.begin(), key._data.end());
+}
+
 } // anonymous namespace (within outpost_solana_client_detail)
 
 /// Derive the per-reserve `Reserve` PDA. Full contract on the header
@@ -543,6 +619,277 @@ fc::network::solana::solana_public_key derive_reserve_vault_pda(
       {std::vector<uint8_t>{'r','e','s','e','r','v','e','_','v','a','u','l','t'},
        u64_seed(token_code),
        u64_seed(reserve_code)},
+      program_id).first;
+}
+
+/// Derive the per-`(operator, token_code)` `CollateralPosition` PDA. Full
+/// contract on the header declaration.
+fc::network::solana::solana_public_key derive_collateral_position_pda(
+   const fc::network::solana::solana_public_key& program_id,
+   const fc::network::solana::solana_public_key& operator_key,
+   uint64_t token_code) {
+   return fc::network::solana::system::find_program_address(
+      {std::vector<uint8_t>(COLLATERAL_POSITION_SEED.begin(), COLLATERAL_POSITION_SEED.end()),
+       pubkey_seed(operator_key),
+       u64_seed(token_code)},
+      program_id).first;
+}
+
+
+// ── Token-2022 transfer-hook resolution (SOL-396 lock-step) ─────────────────
+//
+// Layout constants are the on-chain ones, not guesses:
+//   * a Token-2022 MINT with extensions is padded to `Account::LEN` (165),
+//     byte 165 is the AccountType tag, and the TLV starts at 166. Each entry is
+//     `type: u16 LE`, `length: u16 LE`, `value[length]`.
+//   * `ExtensionType::TransferHook` is 14, and its value is
+//     `authority: [u8;32]` then `program_id: [u8;32]`, each an
+//     OptionalNonZeroPubkey where all-zero means None.
+//   * the validation account is spl-type-length-value: `discriminator: [u8;8]`,
+//     `length: u32 LE`, `value`. The Execute entry's discriminator is the first
+//     8 bytes of sha256("spl-transfer-hook-interface:execute"). Its value is a
+//     PodSlice: `count: u32 LE` then `count` × 35-byte `ExtraAccountMeta`.
+namespace {
+
+constexpr size_t   TOKEN_ACCOUNT_LEN        = 165;   // Account::LEN
+constexpr size_t   TLV_START                = TOKEN_ACCOUNT_LEN + 1;
+constexpr uint16_t EXT_TYPE_TRANSFER_HOOK   = 14;
+constexpr size_t   EXTRA_ACCOUNT_META_SIZE  = 35;
+constexpr uint8_t  META_DISC_LITERAL        = 0;
+constexpr uint8_t  META_DISC_HOOK_PDA       = 1;
+constexpr uint8_t  META_DISC_PUBKEY_DATA    = 2;
+constexpr uint8_t  META_DISC_INDEX_BASE     = 0x80;  // U8_TOP_BIT
+constexpr uint8_t  SEED_UNINITIALIZED       = 0;
+constexpr uint8_t  SEED_LITERAL             = 1;
+constexpr uint8_t  SEED_ACCOUNT_KEY         = 3;
+/// A `TransferHook` TLV value is a 32-byte authority followed by a 32-byte
+/// program id; anything shorter cannot be read as either a hook or its absence.
+constexpr uint16_t TRANSFER_HOOK_EXT_MIN_LEN = 64;
+
+/// First 8 bytes of sha256("spl-transfer-hook-interface:execute").
+const std::array<uint8_t, 8> EXECUTE_TLV_DISCRIMINATOR = {
+   0x69, 0x25, 0x65, 0xc5, 0x4b, 0xfb, 0x66, 0x1a};
+
+uint16_t le_u16(const unsigned char* p) {
+   return static_cast<uint16_t>(p[0]) | (static_cast<uint16_t>(p[1]) << 8);
+}
+uint32_t le_u32(const unsigned char* p) {
+   return static_cast<uint32_t>(p[0]) | (static_cast<uint32_t>(p[1]) << 8)
+        | (static_cast<uint32_t>(p[2]) << 16) | (static_cast<uint32_t>(p[3]) << 24);
+}
+
+} // anonymous namespace
+
+std::optional<fc::network::solana::solana_public_key>
+mint_transfer_hook_program(const std::vector<uint8_t>& mint_account_data) {
+   // A legacy SPL mint is exactly 82 bytes and carries no TLV at all; a
+   // Token-2022 mint without extensions never reaches TLV_START either.
+   if (mint_account_data.size() <= TLV_START) return std::nullopt;
+   const auto* bytes = mint_account_data.data();
+
+   size_t cursor = TLV_START;
+   while (cursor + 4 <= mint_account_data.size()) {
+      const uint16_t ext_type = le_u16(bytes + cursor);
+      const uint16_t ext_len  = le_u16(bytes + cursor + 2);
+      const size_t   value    = cursor + 4;
+      if (ext_type == 0) break;  // Uninitialized terminator: the normal end of the TLV
+      // A truncated entry is NOT "no hook". Degrading here builds a hook-free
+      // manifest for a mint that may well declare one, and the CPI then aborts
+      // with the cursor pinned -- the partial-parse outcome `parse_extra_account_metas`
+      // is strict to prevent. Fail against the mint we could not read instead.
+      FC_ASSERT(value + ext_len <= mint_account_data.size(),
+                "custody mint TLV entry at offset {} claims {} bytes but the account holds {}; "
+                "refusing to guess whether it declares a transfer hook",
+                cursor, ext_len, mint_account_data.size());
+      if (ext_type == EXT_TYPE_TRANSFER_HOOK) {
+         // Same asymmetry: a TransferHook entry too short to carry its
+         // authority+program pair cannot be read as "hook disabled".
+         FC_ASSERT(ext_len >= TRANSFER_HOOK_EXT_MIN_LEN,
+                   "custody mint declares a TransferHook extension of {} bytes, below the {} "
+                   "its authority and program id require",
+                   ext_len, TRANSFER_HOOK_EXT_MIN_LEN);
+         // authority occupies the first 32; program_id the second.
+         std::array<uint8_t, 32> program{};
+         std::memcpy(program.data(), bytes + value + 32, 32);
+         const bool none = std::all_of(program.begin(), program.end(),
+                                       [](uint8_t b) { return b == 0; });
+         if (none) return std::nullopt;   // extension present, hook disabled
+         return fc::network::solana::solana_public_key(program);
+      }
+      cursor = value + ext_len;
+   }
+   return std::nullopt;
+}
+
+fc::network::solana::solana_public_key
+derive_extra_account_metas_pda(const fc::network::solana::solana_public_key& hook_program,
+                               const fc::network::solana::solana_public_key& mint) {
+   static const std::string seed = "extra-account-metas";
+   return fc::network::solana::system::find_program_address(
+             {std::vector<uint8_t>(seed.begin(), seed.end()), pubkey_seed(mint)}, hook_program)
+      .first;
+}
+
+std::vector<extra_account_meta>
+parse_extra_account_metas(const std::vector<uint8_t>& validation_account_data) {
+   // EVERY malformed shape below throws rather than returning a short list.
+   // A partial parse is the worst possible outcome: `mint_transfer_hook_for`
+   // would wrap it as authoritative, the manifest would carry the hook program
+   // and validation PDA while silently omitting declared metas, and the CPI
+   // would then fail with `IncorrectAccount` -- window aborted, cursor pinned,
+   // nothing in the log naming the cause. That is exactly what the resolver
+   // below refuses to do, and the parser must not undercut it.
+   std::vector<extra_account_meta> metas;
+   const size_t size = validation_account_data.size();
+   FC_ASSERT(size >= 12,
+             "ExtraAccountMetaList account is {} bytes, too short to hold even one TLV header",
+             size);
+   const auto* bytes = validation_account_data.data();
+
+   size_t cursor = 0;
+   while (cursor + 12 <= size) {
+      const bool is_execute =
+         std::memcmp(bytes + cursor, EXECUTE_TLV_DISCRIMINATOR.data(), 8) == 0;
+      const uint32_t entry_len = le_u32(bytes + cursor + 8);
+      const size_t   value     = cursor + 12;
+      FC_ASSERT(value + entry_len <= size,
+                "ExtraAccountMetaList TLV entry at {} claims {} bytes but only {} remain",
+                cursor, entry_len, size - value);
+      if (is_execute) {
+         FC_ASSERT(entry_len >= 4,
+                   "ExtraAccountMetaList Execute entry is {} bytes, too short for its count",
+                   entry_len);
+         const uint32_t count = le_u32(bytes + value);
+         // `count` comes from account data we do not control. Bound the walk by
+         // the ENTRY's extent, never by the account's: a count that overruns the
+         // entry would otherwise parse the FOLLOWING TLV bytes as metas and push
+         // arbitrary pubkeys into the manifest as writable accounts.
+         const size_t declared = static_cast<size_t>(count) * EXTRA_ACCOUNT_META_SIZE;
+         FC_ASSERT(4 + declared <= entry_len,
+                   "ExtraAccountMetaList declares {} metas ({} bytes) but its entry holds {}",
+                   count, declared, entry_len);
+         metas.reserve(count);
+         for (uint32_t i = 0; i < count; ++i) {
+            const size_t at = value + 4 + static_cast<size_t>(i) * EXTRA_ACCOUNT_META_SIZE;
+            extra_account_meta meta;
+            meta.discriminator = bytes[at];
+            std::memcpy(meta.address_config.data(), bytes + at + 1, 32);
+            meta.is_signer   = bytes[at + 33] != 0;
+            meta.is_writable = bytes[at + 34] != 0;
+            metas.push_back(meta);
+         }
+         return metas;
+      }
+      cursor = value + entry_len;
+   }
+   FC_ASSERT(false,
+             "ExtraAccountMetaList carries no Execute entry; the mint declares a transfer hook "
+             "whose required accounts cannot be determined");
+   return metas;   // unreachable; FC_ASSERT above always throws
+}
+
+std::vector<fc::network::solana::account_meta>
+resolve_hook_metas(const std::vector<extra_account_meta>&        metas,
+                   const fc::network::solana::solana_public_key& hook_program,
+                   const fc::network::solana::solana_public_key& source,
+                   const fc::network::solana::solana_public_key& mint,
+                   const fc::network::solana::solana_public_key& destination,
+                   const fc::network::solana::solana_public_key& authority,
+                   const fc::network::solana::solana_public_key& validation_pda) {
+   // The Execute account list the hook's seeds index into. Resolved metas are
+   // appended as we go, because a later meta may key off an earlier one.
+   std::vector<fc::network::solana::solana_public_key> accounts = {
+      source, mint, destination, authority, validation_pda};
+
+   std::vector<fc::network::solana::account_meta> resolved;
+   resolved.reserve(metas.size());
+
+   for (size_t i = 0; i < metas.size(); ++i) {
+      const auto& meta = metas[i];
+      // The dispatch transaction is signed by the batch operator alone, so a
+      // meta demanding a signature is a shape this builder cannot satisfy: the
+      // on-chain `add_extra_accounts_for_execute_cpi` would carry `is_signer`
+      // through (de-escalation only applies to accounts already on the CPI
+      // instruction, never a freshly appended extra) and `invoke_signed` would
+      // abort as an unauthorized signer -- inside the CPI, with the cursor
+      // pinned and no local diagnostic. Refuse loudly here, naming the meta,
+      // exactly as the unsupported seed and discriminator forms below do.
+      FC_ASSERT(!meta.is_signer,
+                "transfer-hook meta {} demands a signature, which the dispatch transaction "
+                "cannot provide", i);
+      fc::network::solana::solana_public_key key;
+
+      if (meta.discriminator == META_DISC_LITERAL) {
+         key = fc::network::solana::solana_public_key(meta.address_config);
+      } else if (meta.discriminator == META_DISC_HOOK_PDA
+                 || meta.discriminator >= META_DISC_INDEX_BASE) {
+         const auto& seed_program =
+            meta.discriminator == META_DISC_HOOK_PDA
+               ? hook_program
+               : [&]() -> const fc::network::solana::solana_public_key& {
+                    const size_t idx = meta.discriminator - META_DISC_INDEX_BASE;
+                    FC_ASSERT(idx < accounts.size(),
+                              "transfer-hook meta {} names program index {}, but only {} "
+                              "accounts are resolved at that point",
+                              i, idx, accounts.size());
+                    return accounts[idx];
+                 }();
+
+         std::vector<std::vector<uint8_t>> seeds;
+         size_t at = 0;
+         while (at < meta.address_config.size()) {
+            const uint8_t tag = meta.address_config[at];
+            if (tag == SEED_UNINITIALIZED) break;
+            if (tag == SEED_LITERAL) {
+               FC_ASSERT(at + 1 < meta.address_config.size(), "truncated literal seed");
+               const uint8_t len = meta.address_config[at + 1];
+               FC_ASSERT(at + 2 + len <= meta.address_config.size(), "literal seed overruns config");
+               seeds.emplace_back(meta.address_config.begin() + at + 2,
+                                  meta.address_config.begin() + at + 2 + len);
+               at += 2 + len;
+            } else if (tag == SEED_ACCOUNT_KEY) {
+               FC_ASSERT(at + 1 < meta.address_config.size(), "truncated account-key seed");
+               const size_t idx = meta.address_config[at + 1];
+               FC_ASSERT(idx < accounts.size(),
+                         "transfer-hook meta {} seeds on account index {}, but only {} "
+                         "accounts are resolved at that point",
+                         i, idx, accounts.size());
+               seeds.push_back(pubkey_seed(accounts[idx]));
+               at += 2;
+            } else {
+               // InstructionData / AccountData. Both are resolvable only with
+               // the Execute payload or another account's contents, neither of
+               // which this builder has. Refuse rather than emit a manifest
+               // that is short an account the CPI will demand.
+               FC_ASSERT(false,
+                         "transfer-hook meta {} uses unsupported seed form {}; the dispatch "
+                         "manifest cannot be completed for this mint",
+                         i, static_cast<unsigned>(tag));
+            }
+         }
+         key = fc::network::solana::system::find_program_address(seeds, seed_program).first;
+      } else {
+         FC_ASSERT(meta.discriminator != META_DISC_PUBKEY_DATA,
+                   "transfer-hook meta {} resolves a pubkey out of account data, which this "
+                   "builder cannot read", i);
+         FC_ASSERT(false, "transfer-hook meta {} has unknown discriminator {}",
+                   i, static_cast<unsigned>(meta.discriminator));
+      }
+
+      accounts.push_back(key);
+      resolved.push_back(fc::network::solana::account_meta{key, meta.is_signer, meta.is_writable});
+   }
+   return resolved;
+}
+
+/// Derive the per-`token_code` `collateral_vault` PDA. Full contract on the
+/// header declaration.
+fc::network::solana::solana_public_key derive_collateral_vault_pda(
+   const fc::network::solana::solana_public_key& program_id,
+   uint64_t token_code) {
+   return fc::network::solana::system::find_program_address(
+      {std::vector<uint8_t>(COLLATERAL_VAULT_SEED.begin(), COLLATERAL_VAULT_SEED.end()),
+       u64_seed(token_code)},
       program_id).first;
 }
 
@@ -587,15 +934,25 @@ extract_inbound_effects(const std::vector<char>& envelope_bytes) {
       for (const auto& entry : message.payload().attestations()) {
          const size_t at = index++;
          switch (entry.type()) {
+            // The collateral-settling operator actions (SOL-379/380). Both
+            // resolve the per-(operator, token_code) CollateralPosition PDA
+            // out of remaining_accounts, so both carry the amount's
+            // token_code alongside the operator key.
             case sysio::opp::types::ATTESTATION_TYPE_OPERATOR_ACTION: {
                sysio::opp::attestations::OperatorAction oa;
                if (!oa.ParseFromString(entry.data())) continue;
-               if (oa.action_type() !=
+               std::optional<effect_shape> shape;
+               if (oa.action_type() ==
                      sysio::opp::attestations::OperatorAction_ActionType_ACTION_TYPE_WITHDRAW_REMIT) {
-                  continue;
+                  shape = effect_shape::withdraw_remit;
+               } else if (oa.action_type() ==
+                     sysio::opp::attestations::OperatorAction_ActionType_ACTION_TYPE_SLASH) {
+                  shape = effect_shape::slash;
                }
+               if (!shape.has_value()) continue;
                if (auto pk = sol_pubkey_from_chain_address(oa.op_address())) {
-                  effects.push_back(inbound_effect{at, effect_shape::native_payee, *pk, std::nullopt});
+                  effects.push_back(inbound_effect{
+                     at, *shape, *pk, std::nullopt, oa.amount().token_code()});
                }
                break;
             }
@@ -603,7 +960,9 @@ extract_inbound_effects(const std::vector<char>& envelope_bytes) {
                sysio::opp::attestations::DepositRevert dr;
                if (!dr.ParseFromString(entry.data())) continue;
                if (auto pk = sol_pubkey_from_chain_address(dr.depositor())) {
-                  effects.push_back(inbound_effect{at, effect_shape::native_payee, *pk, std::nullopt});
+                  effects.push_back(inbound_effect{
+                     at, effect_shape::deposit_revert, *pk, std::nullopt,
+                     dr.refund_amount().token_code()});
                }
                break;
             }
@@ -669,6 +1028,10 @@ reserve_terminal_info reserve_info_from_account(const fc::variant_object& reserv
              reserve_account::field_custody_mint);
    FC_ASSERT(reserve.contains(reserve_account::field_custody_decimals),
              "Reserve account missing '{}' field", reserve_account::field_custody_decimals);
+   FC_ASSERT(reserve.contains(reserve_account::field_custody_token_program),
+             "Reserve account missing '{}' field — the canonical ATA differs per token program, "
+             "so deriving with the legacy default would name an account the program never asks for",
+             reserve_account::field_custody_token_program);
 
    const auto decimals = reserve[reserve_account::field_custody_decimals].as_uint64();
    FC_ASSERT(decimals <= std::numeric_limits<uint8_t>::max(),
@@ -680,7 +1043,9 @@ reserve_terminal_info reserve_info_from_account(const fc::variant_object& reserv
          reserve[reserve_account::field_creator].as_string()),
       fc::network::solana::solana_public_key::from_base58_string(
          reserve[reserve_account::field_custody_mint].as_string()),
-      static_cast<uint8_t>(decimals)};
+      static_cast<uint8_t>(decimals),
+      fc::network::solana::solana_public_key::from_base58_string(
+         reserve[reserve_account::field_custody_token_program].as_string())};
 }
 
 std::vector<std::vector<fc::network::solana::account_meta>> build_dispatch_manifests(
@@ -689,10 +1054,13 @@ std::vector<std::vector<fc::network::solana::account_meta>> build_dispatch_manif
    uint32_t                                      total_attestations,
    const std::function<void()>&                  throw_if_past_deadline,
    const reserve_info_reader&                    read_reserve_info,
+   const collateral_custody_reader&              read_collateral_custody,
+   const transfer_hook_reader&                   read_transfer_hook,
+   const fc::network::solana::solana_public_key& reserve_aggregate,
    const std::string&                            log_label) {
    const auto& token_program_id = fc::network::solana::system::program_ids::TOKEN_PROGRAM;
-   const auto& associated_token_program_id =
-      fc::network::solana::system::program_ids::ASSOCIATED_TOKEN_PROGRAM;
+   const auto& token_2022_program_id =
+      fc::network::solana::system::program_ids::TOKEN_2022_PROGRAM;
    const auto& system_program_id = fc::network::solana::system::program_ids::SYSTEM_PROGRAM;
 
    // `NATIVE_TOKEN_MARKER` on the program side: an all-zero custody mint means
@@ -712,6 +1080,38 @@ std::vector<std::vector<fc::network::solana::account_meta>> build_dispatch_manif
       auto       it        = reserve_cache.find(cache_key);
       if (it != reserve_cache.end()) return it->second;
       return reserve_cache.emplace(cache_key, read_reserve_info(token_code, reserve_code))
+         .first->second;
+   };
+
+   // One read per DISTINCT custody mint for the whole build, matching the two
+   // caches around it. Without this every reserve-backed SPL attestation pays a
+   // `get_account_info(custody_mint)` -- two when the mint has a hook, since the
+   // reader also reads the validation PDA -- so an envelope with 30 SPL remits
+   // over 3 reserves would go from 3 reads to 33, inside a build that probes the
+   // deadline per effect and aborts wholesale on a transient RPC throw.
+   // `nullopt` (no hook) is memoised too: that is every mint in the system today.
+   std::map<fc::network::solana::solana_public_key, std::optional<mint_transfer_hook>> hook_cache;
+   auto transfer_hook =
+      [&](const fc::network::solana::solana_public_key& custody_mint)
+      -> const std::optional<mint_transfer_hook>& {
+      auto it = hook_cache.find(custody_mint);
+      if (it != hook_cache.end()) return it->second;
+      return hook_cache.emplace(custody_mint, read_transfer_hook(custody_mint)).first->second;
+   };
+
+   // One read per DISTINCT collateral position for the whole build. Custody
+   // is pinned per `(operator, token_code)`, so both values are load-bearing
+   // cache keys; absent/empty reads are memoised too.
+   using collateral_key = std::pair<fc::network::solana::solana_public_key, uint64_t>;
+   std::map<collateral_key, std::optional<token_custody_info>> collateral_custody_cache;
+   auto collateral_custody =
+      [&](const fc::network::solana::solana_public_key& operator_key,
+          uint64_t token_code) -> const std::optional<token_custody_info>& {
+      const auto cache_key = std::make_pair(operator_key, token_code);
+      auto it = collateral_custody_cache.find(cache_key);
+      if (it != collateral_custody_cache.end()) return it->second;
+      return collateral_custody_cache
+         .emplace(cache_key, read_collateral_custody(operator_key, token_code))
          .first->second;
    };
 
@@ -738,10 +1138,49 @@ std::vector<std::vector<fc::network::solana::account_meta>> build_dispatch_manif
          record_terminal_account(metas, key, is_writable);
       };
 
-      if (effect.shape == effect_shape::native_payee) {
-         if (effect.recipient) add(*effect.recipient, true);
+      // Collateral-settling shapes (SOL-379/380). Every one resolves the
+      // per-(operator, token_code) `CollateralPosition` PDA out of
+      // remaining_accounts and settles in the asset the position escrows.
+      if (effect.shape == effect_shape::withdraw_remit || effect.shape == effect_shape::slash ||
+          effect.shape == effect_shape::deposit_revert) {
+         if (!effect.recipient || !effect.collateral_token_code) continue;
+         const auto collateral_token_code = *effect.collateral_token_code;
+         // WITHDRAW_REMIT pays the operator and DEPOSIT_REVERT refunds the
+         // depositor; SLASH pays nobody directly -- its native seizure lands
+         // in the named `reserve_aggregate`.
+         if (effect.shape != effect_shape::slash) add(*effect.recipient, true);
+         add(derive_collateral_position_pda(program_id, *effect.recipient,
+                                            collateral_token_code),
+             true);
+
+         const auto& custody_opt = collateral_custody(*effect.recipient, collateral_token_code);
+         if (!custody_opt.has_value()) continue;   // custody lookup already wlogged
+         const auto& custody = *custody_opt;
+         if (is_native_custody(custody.mint)) continue;
+
+         // SPL custody: the collateral vault drains into the destination's
+         // canonical ATA -- the operator's for WITHDRAW_REMIT, the
+         // depositor's for DEPOSIT_REVERT, the `reserve_aggregate`'s for
+         // SLASH.
+         //
+         // LOCK-STEP: which shapes settle SPL here must match the program's
+         // handlers (`resolve_collateral_vault_transfer` callers in
+         // wire-solana `inbound.rs`) exactly -- the relay's shape decisions
+         // are unversioned against the program, and a handler that
+         // `require_remaining_account`s an account this manifest omits aborts
+         // the dispatch round and re-packs the identical window from the same
+         // cursor on every retry. A program-side settlement-policy change and
+         // this manifest must move together.
+         const auto settlement_owner =
+            effect.shape == effect_shape::slash ? reserve_aggregate : *effect.recipient;
+         add(derive_collateral_vault_pda(program_id, collateral_token_code), true);
+         add(fc::network::solana::system::get_associated_token_address(
+                settlement_owner, custody.mint),
+             true);
+         add(token_program_id, false);
          continue;
       }
+
       if (!effect.reserve) continue;
 
       const auto token_code   = effect.reserve->token_code;
@@ -765,11 +1204,13 @@ std::vector<std::vector<fc::network::solana::account_meta>> build_dispatch_manif
          //
          // The accounts are still passed because the reserve may be created
          // between this read and the crank landing. If it is, this manifest is
-         // complete only for a NATIVE swap remit/revert (Reserve PDA +
-         // recipient); an SPL one is short the recipient ATA, and a
-         // RESERVE_CREATE_CANCELLED is short the `creator` on EITHER custody
-         // kind, since the creator is read off the Reserve we could not
-         // decode. Those windows abort and the next tick rebuilds them against
+         // complete only for a NATIVE swap remit/revert (Reserve PDA + recipient);
+         // an SPL one is short the recipient ATA, the custody mint and the custody
+         // token program — all three are read off the Reserve we could not decode,
+         // and the ATA is not even derivable without the token program (SOL-396) —
+         // and a RESERVE_CREATE_CANCELLED is short the `creator` on EITHER custody
+         // kind, since the creator is read off the Reserve we could not decode.
+         // Those windows abort and the next tick rebuilds them against
          // a now-readable Reserve.
          //
          // The degrade is PER-ATTESTATION: the manifests are built for every
@@ -784,19 +1225,73 @@ std::vector<std::vector<fc::network::solana::account_meta>> build_dispatch_manif
               log_label, token_code, reserve_code, effect.attestation_index);
          add(vault_pda, true);
          if (effect.recipient) add(*effect.recipient, true);
+         // Best-effort only, and right solely for a legacy-SPL reserve: the real
+         // token program is pinned on the Reserve we could not read. Not the
+         // sanctioned derivation — see `custody_token_program` below.
          add(token_program_id, false);
          continue;
       }
       const auto& info = *info_opt;
+
+      // SOL-396 LOCK-STEP: every reserve-backed SPL settlement routes through the
+      // program's `reserve_vault_transfer`, which requires BOTH the reserve's
+      // `custody_token_program` AND its `custody_mint` in remaining_accounts, and
+      // derives the destination ATA with that token program. Both facts come from
+      // the Reserve — never the legacy SPL-Token default — because the same
+      // (owner, mint) pair has different canonical ATAs under each program.
+      const auto& custody_token_program = info.custody_token_program;
+      const auto  custody_ata           = [&](const fc::network::solana::solana_public_key& owner) {
+         return fc::network::solana::system::get_associated_token_address(
+            owner, info.custody_mint, custody_token_program);
+      };
+
+      // SOL-396, one layer deeper: `reserve_vault_transfer` routes through
+      // `spl_token_2022::onchain::invoke_transfer_checked`, which for a mint
+      // carrying the TransferHook extension resolves the hook program, its
+      // validation PDA and every account that PDA declares OUT OF
+      // `remaining_accounts`. A hook mint whose extras are missing aborts the
+      // CPI before the transfer -- the same wedge, with the cursor pinned.
+      //
+      // No-op for every non-hook mint, which is all of them today: the reader
+      // returns nullopt and nothing is appended.
+      const auto add_hook_accounts = [&](const fc::network::solana::solana_public_key& source,
+                                         const fc::network::solana::solana_public_key& destination,
+                                         const fc::network::solana::solana_public_key& authority) {
+         // A legacy-SPL reserve cannot carry a Token-2022 extension, so there is
+         // no hook to find and no reason to pay a `get_account_info` -- nor to
+         // let a transient absent read fail the WHOLE build (the reader asserts
+         // rather than degrading). Gating here keeps that assert scoped to the
+         // mints where a hook is actually representable.
+         if (info.custody_token_program != token_2022_program_id) return;
+         const auto& hook = transfer_hook(info.custody_mint);
+         if (!hook.has_value()) return;
+         const auto validation_pda =
+            derive_extra_account_metas_pda(hook->program, info.custody_mint);
+         add(hook->program, false);
+         add(validation_pda, false);
+         for (const auto& meta : resolve_hook_metas(hook->declared, hook->program, source,
+                                                    info.custody_mint, destination, authority,
+                                                    validation_pda)) {
+            add(meta.key, meta.is_writable);
+         }
+      };
 
       switch (effect.shape) {
          case effect_shape::swap_remit: {
             if (!effect.recipient) break;
             if (is_native_custody(info.custody_mint)) { add(*effect.recipient, true); break; }
             add(vault_pda, true);
-            add(fc::network::solana::system::get_associated_token_address(
-                   *effect.recipient, info.custody_mint), true);
-            add(token_program_id, false);
+            add(custody_ata(*effect.recipient), true);
+            add_hook_accounts(vault_pda, custody_ata(*effect.recipient), vault_pda);
+            // The mint is REQUIRED here, not optional: `reserve_vault_transfer`
+            // `require_remaining_account`s it, and the CPI's `transfer_checked`
+            // needs the mint account to verify the decimals against — the decimals
+            // themselves come from the Reserve record, not from this account.
+            // Omitting it is what aborted every SPL swap remit with
+            // `EffectAccountMissing` after SOL-396 — the one reserve-backed shape
+            // that had never carried it.
+            add(info.custody_mint, false);
+            add(custody_token_program, false);
             break;
          }
          case effect_shape::swap_revert: {
@@ -805,23 +1300,19 @@ std::vector<std::vector<fc::network::solana::account_meta>> build_dispatch_manif
             add(vault_pda, true);
             add(info.custody_mint, false);
             add(*effect.recipient, true);
-            add(fc::network::solana::system::get_associated_token_address(
-                   *effect.recipient, info.custody_mint), true);
-            add(token_program_id, false);
-            add(associated_token_program_id, false);
-            add(system_program_id, false);
+            add(custody_ata(*effect.recipient), true);
+            add(custody_token_program, false);
+            add_hook_accounts(vault_pda, custody_ata(*effect.recipient), vault_pda);
             break;
          }
          case effect_shape::reserve_create_cancelled: {
             if (is_native_custody(info.custody_mint)) { add(info.creator, true); break; }
             add(vault_pda, true);
             add(info.creator, false);
-            add(fc::network::solana::system::get_associated_token_address(
-                   info.creator, info.custody_mint), true);
+            add(custody_ata(info.creator), true);
             add(info.custody_mint, false);
-            add(token_program_id, false);
-            add(associated_token_program_id, false);
-            add(system_program_id, false);
+            add(custody_token_program, false);
+            add_hook_accounts(vault_pda, custody_ata(info.creator), vault_pda);
             break;
          }
          default:
@@ -991,6 +1482,11 @@ outpost_solana_client::outpost_solana_client(
       // derive, and every later window repacks from the same cursor -- so it
       // has to be a boot failure, not a first-drain surprise.
       outpost_solana_client_detail::assert_reserve_shape(*_program_client->get_program());
+      // A drifted CollateralPosition declaration makes a LIVE position's
+      // pinned custody unreadable and would wedge every collateral dispatch
+      // window on the same unadvanced cursor.
+      outpost_solana_client_detail::assert_collateral_position_shape(
+         *_program_client->get_program());
    }
 }
 
@@ -1189,9 +1685,10 @@ std::string outpost_solana_client::drain_dispatch(
    // Per-attestation manifests, indexed by the SAME flat position the on-chain
    // dispatch cursor counts. Attestations needing no effect account keep an
    // empty entry so the indices stay aligned. The build reads ONE account per
-   // distinct reserve -- the `Reserve` PDA the handlers themselves branch on --
-   // probes the deadline per effect, and degrades a single unusable reserve
-   // instead of abandoning the envelope's other manifests.
+   // distinct Reserve or CollateralPosition -- the exact PDA the handlers
+   // themselves branch on -- probes the deadline per effect, and degrades a
+   // single absent account instead of abandoning the envelope's other
+   // manifests.
    const auto effects = outpost_solana_client_detail::extract_inbound_effects(envelope_bytes);
    const uint32_t total_attestations =
       outpost_solana_client_detail::count_inbound_attestations(envelope_bytes);
@@ -1203,6 +1700,13 @@ std::string outpost_solana_client::drain_dispatch(
       [&](uint64_t token_code, uint64_t reserve_code) {
          return reserve_info_for_codes(token_code, reserve_code);
       },
+      [&](const fc::network::solana::solana_public_key& operator_key, uint64_t token_code) {
+         return collateral_position_custody(operator_key, token_code);
+      },
+      [&](const fc::network::solana::solana_public_key& custody_mint) {
+         return mint_transfer_hook_for(custody_mint);
+      },
+      _program_client->reserve_pda,
       to_string());
 
    // Settlement is a SEPARATE instruction, driven from the on-chain cursor.
@@ -1218,6 +1722,93 @@ std::string outpost_solana_client::drain_dispatch(
             epoch_index, dispatch_limit, std::move(batch_accounts));
       },
       to_string());
+}
+
+/// Read one custody mint's transfer-hook configuration off chain.
+///
+/// Called only for a Token-2022 custody reserve -- a legacy-SPL reserve cannot
+/// carry the extension, so the caller gates and this never reads that mint.
+///
+/// No TransferHook extension, or a hook explicitly disabled (an all-zero
+/// program id), returns `nullopt` and leaves the manifest unchanged -- which is
+/// every mint in the system today. An ABSENT mint does not: see below.
+///
+/// A hook that IS configured but whose validation PDA cannot be read is NOT
+/// degraded to `nullopt`: that would silently emit a manifest short the very
+/// accounts the CPI is about to demand, wedging the epoch with no diagnostic.
+/// Throwing surfaces it against the account we could not read.
+std::optional<outpost_solana_client_detail::mint_transfer_hook>
+outpost_solana_client::mint_transfer_hook_for(
+   const fc::network::solana::solana_public_key& custody_mint) {
+   // NOT degraded to `nullopt`: the custody mint is pinned on a Reserve that
+   // demonstrably exists, so "absent" is an anomaly (a lagging bank behind the
+   // default commitment, say), not a mint without a hook. Reporting "no hook"
+   // here would build a hook-free manifest for a hook mint and abort inside the
+   // CPI with no local signal -- the same asymmetry this function already
+   // refuses for the validation PDA below.
+   const auto mint_info = _entry->client->get_account_info(custody_mint);
+   FC_ASSERT(mint_info.has_value() && !mint_info->data.empty(),
+             "custody mint {} is absent or empty; it is pinned on an existing Reserve, so this "
+             "is a read anomaly rather than a mint without a transfer hook",
+             custody_mint.to_string(fc::yield_function_t{}));
+
+   const auto hook_program =
+      outpost_solana_client_detail::mint_transfer_hook_program(mint_info->data);
+   if (!hook_program.has_value()) return std::nullopt;
+
+   const auto validation_pda =
+      outpost_solana_client_detail::derive_extra_account_metas_pda(*hook_program, custody_mint);
+   const auto validation_info = _entry->client->get_account_info(validation_pda);
+   FC_ASSERT(validation_info.has_value() && !validation_info->data.empty(),
+             "custody mint {} declares transfer hook {}, but its ExtraAccountMetaList {} is "
+             "absent or empty; the dispatch manifest cannot be completed",
+             custody_mint.to_string(fc::yield_function_t{}),
+             hook_program->to_string(fc::yield_function_t{}),
+             validation_pda.to_string(fc::yield_function_t{}));
+
+   return outpost_solana_client_detail::mint_transfer_hook{
+      *hook_program,
+      outpost_solana_client_detail::parse_extra_account_metas(validation_info->data)};
+}
+
+std::optional<outpost_solana_client_detail::token_custody_info>
+outpost_solana_client::collateral_position_custody(
+   const fc::network::solana::solana_public_key& operator_key, uint64_t token_code) {
+   const auto position_pda = outpost_solana_client_detail::derive_collateral_position_pda(
+      _program_id, operator_key, token_code);
+   const auto pda_label = position_pda.to_string(fc::yield_function_t{});
+
+   // An RPC/deadline exception is not evidence that this position is absent,
+   // so the read deliberately sits outside the decode-only try/catch.
+   const auto account_info = _entry->client->get_account_info(position_pda);
+   if (!account_info.has_value() || account_info->data.empty()) {
+      wlog("outpost_solana_client[{}]: CollateralPosition({}, {}) absent or empty at {}; "
+           "terminal manifest will omit branch-specific accounts for this position -- the "
+           "handler log-and-skips an uninitialized position",
+           to_string(), operator_key.to_string(fc::yield_function_t{}), token_code, pda_label);
+      return std::nullopt;
+   }
+
+   try {
+      const auto position_v = _program_client->decode_account_info_data(
+         collateral_position::account_name, account_info->data);
+      const auto& position = position_v.get_object();
+      FC_ASSERT(position.contains(collateral_position::field_custody_mint),
+                "CollateralPosition account missing '{}' field",
+                collateral_position::field_custody_mint);
+      return outpost_solana_client_detail::token_custody_info{
+         fc::network::solana::solana_public_key::from_base58_string(
+            position[collateral_position::field_custody_mint].as_string())};
+   } catch (const fc::exception& e) {
+      elog("outpost_solana_client[{}]: CollateralPosition({}, {}) at {} EXISTS ({} bytes) but "
+           "this relay cannot read its pinned custody; refusing to build a manifest the program "
+           "is guaranteed to abort on. The dispatch cursor is left untouched and this epoch "
+           "cannot settle until the cause is fixed -- check the loaded IDL against the deployed "
+           "program: {}",
+           to_string(), operator_key.to_string(fc::yield_function_t{}), token_code, pda_label,
+           account_info->data.size(), e.to_detail_string());
+      throw;
+   }
 }
 
 std::string outpost_solana_client::deliver_outbound_envelope(

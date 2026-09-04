@@ -5,6 +5,7 @@
 #include <sysio/opp/types/types.pb.hpp>
 #include <sysio.opp.common/opp_table_types.hpp>
 #include <sysio.opp.common/claimable.hpp>
+#include <sysio.opp.common/wire_asset.hpp>
 
 // Canonical contract headers used for cross-contract reads. The
 // [[sysio::contract("sysio.<name>")]] attribute on each table struct pins
@@ -36,8 +37,6 @@ namespace {
 // ---------------------------------------------------------------------------
 // Compile-time constants (not user-configurable)
 // ---------------------------------------------------------------------------
-
-constexpr sysio::symbol WIRE_SYMBOL{"WIRE", 9};
 
 constexpr uint32_t ACTIVE_PRODUCER_COUNT  = 21;
 constexpr uint32_t STANDBY_START_RANK     = 22;
@@ -135,7 +134,7 @@ node_claim_result compute_node_claim(const emission_state& emission,
 // accounts table because the upstream types are private.
 int64_t get_wire_balance(name account) {
    sysio::token::token::accounts acct_tbl(TOKEN_CONTRACT, account.value);
-   sysio::token::token::acct_key key{WIRE_SYMBOL.code().raw()};
+   sysio::token::token::acct_key key{sysio::opp::wire::asset_symbol.code().raw()};
    if (!acct_tbl.contains(key)) return 0;
    return acct_tbl.get(key).balance.amount;
 }
@@ -204,7 +203,7 @@ void send_wire_transfer(name self, name to, int64_t amount, std::string_view mem
       {self, "active"_n},
       TOKEN_CONTRACT,
       "transfer"_n,
-      std::make_tuple(self, to, asset{amount, WIRE_SYMBOL}, std::string{memo_str})
+      std::make_tuple(self, to, asset{amount, sysio::opp::wire::asset_symbol}, std::string{memo_str})
    ).send();
 }
 
@@ -477,8 +476,8 @@ void system_contract::addnodeowner(const sysio::name& account_name, uint8_t tier
 
    nodedist.emplace(get_self(), pk, node_owner_distribution{
       .account_name     = account_name,
-      .total_allocation = asset{total_allocation_amount, WIRE_SYMBOL},
-      .claimed          = asset{0, WIRE_SYMBOL},
+      .total_allocation = asset{total_allocation_amount, sysio::opp::wire::asset_symbol},
+      .claimed          = asset{0, sysio::opp::wire::asset_symbol},
       .total_duration   = duration_seconds,
    });
 }
@@ -555,7 +554,7 @@ void system_contract::claimpay(const sysio::name& account_name) {
    payclaims_t claims(get_self());
    const uint64_t paid = sysio::opp::claimable::pay_out(
       claims, payclaim_key{account_name.value}, get_self(), TOKEN_CONTRACT,
-      account_name, WIRE_SYMBOL, std::string{memo::epoch_pay_claim}, NOTHING_TO_CLAIM_MSG);
+      account_name, sysio::opp::wire::asset_symbol, std::string{memo::epoch_pay_claim}, NOTHING_TO_CLAIM_MSG);
 
    payclaimtot_t tot_tbl(get_self());
    auto tot = tot_tbl.get_or_default(pay_claim_total{});

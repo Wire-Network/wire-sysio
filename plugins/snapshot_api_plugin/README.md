@@ -112,10 +112,12 @@ clio push action sysio regsnapprov \
   -p myproducer1@active
 ```
 
-To unregister later:
+To rotate the signing account later, call the same action with the replacement account:
 
 ```bash
-clio push action sysio delsnapprov '{"account": "mysnapprov1"}' -p mysnapprov1@active
+clio push action sysio regsnapprov \
+  '{"producer": "myproducer1", "snap_account": "mysnapprov2"}' \
+  -p myproducer1@active
 ```
 
 ### 3. Configure attestation quorum (network-wide)
@@ -124,43 +126,48 @@ The attestation config is a network-wide singleton set by the `sysio` authority.
 
 ```bash
 clio push action sysio setsnpcfg \
-  '{"min_providers": 3, "threshold_pct": 67}' \
+  '{"min_providers": 3}' \
   -p sysio@active
 ```
 
-- `min_providers` — minimum number of registered providers required for any quorum to be possible
-- `threshold_pct` — percentage of registered providers that must vote for the same hash to reach quorum (e.g., 67 means two-thirds)
+- `min_providers` — fixed number K of distinct producer votes required; voting remains disabled until this nonzero value is configured
 
-### 4. Generate and attest snapshots
+### 4. Enable automatic scheduled snapshots
 
-After creating a snapshot, the provider submits a vote with the snapshot's block ID and root hash. When enough providers vote for the same hash, an attested record is created on-chain in the `snaprecords` table.
+For production, enable snapshot provider mode in `config.ini`:
+
+```ini
+snapshot-provider-account = mysnapprov1
+```
+
+Provider mode creates the canonical schedule automatically: snapshots are taken at exact 25,000-block multiples
+(25,000, 50,000, 75,000, ...), and `votesnaphash` is submitted automatically after each scheduled snapshot finalizes.
+Manual snapshots are not attested because their heights need not satisfy the shared cadence.
+
+### 5. Attestation lifecycle
+
+The provider plugin submits the snapshot's block ID and root hash automatically. The equivalent action is shown here
+only as a protocol reference; its block ID must name an exact 25,000-block cadence height:
 
 ```bash
-# Create a snapshot (returns block_num, block_id, root_hash)
-curl -s -X POST http://127.0.0.1:8888/v1/producer/create_snapshot
-
-# Submit attestation vote using the snapshot metadata
 clio push action sysio votesnaphash \
   '{"snap_account": "mysnapprov1", "block_id": "0000c350...", "snapshot_hash": "abcdef12..."}' \
   -p mysnapprov1@active
 ```
 
-The `votesnaphash` action accumulates votes in the `snapvotes` table. Once the threshold is met, the system contract moves the entry to `snaprecords` and purges the pending votes.
+The `votesnaphash` action accumulates producer identities in the `snapvotes` table. Every tuple uses the current fixed K;
+registration count does not change it. Configuration changes apply to pending heights, while provider-account rotation
+does not retract accepted votes. Once K is met, the system contract moves the entry to `snaprecords` and purges pending
+votes through that height.
 
-Bootstrapping nodes verify the `snaprecords` table after syncing — if no attested record exists for the snapshot's block number, auto-fetched bootstraps will shut down with a fatal error.
+Before replay, auto-fetching nodes require compatible `snaprecords` and `snapconfig` schemas plus a nonzero K. A
+configuration-read or disabled-configuration rejection tells the operator to delete the loaded chain state before
+restarting without `--snapshot-endpoint`. After syncing, nodes verify the `snaprecords` row and shut down if the
+snapshot is missing or disagrees. Manual `--snapshot` remains an operator-trusted path without attestation verification.
 
-### 5. Automate with scheduled snapshots
-
-For production, schedule recurring snapshots rather than creating them manually:
-
-```bash
-curl -X POST http://127.0.0.1:8888/v1/producer/schedule_snapshot \
-  -d '{"block_spacing": 25000, "start_block_num": 1, "end_block_num": 4294967295}'
-```
-
-This creates a snapshot every 25,000 blocks (~3.5 hours at 0.5s block time). The attestation vote (`votesnaphash`) still needs to be submitted after each snapshot finalizes — this is typically handled by an external script or monitoring daemon that watches for new snapshots and submits the vote automatically.
-
-Both `create_snapshot` and `schedule_snapshot` require `producer_api_plugin` to be enabled. When a snapshot finalizes (becomes irreversible), it is automatically added to the serving catalog.
+The manual `create_snapshot` and `schedule_snapshot` APIs remain available through `producer_api_plugin`, but they are
+not part of the provider attestation workflow. When a snapshot finalizes (becomes irreversible), it is automatically
+added to the serving catalog and remains available through the explicit-block metadata and download endpoints.
 
 ### Startup catalog
 
@@ -172,7 +179,11 @@ All endpoints use POST with JSON bodies, consistent with other Wire Sysio APIs.
 
 ### `POST /v1/snapshot/latest`
 
-Returns metadata for the most recent snapshot.
+Returns metadata for the newest snapshot at an exact attestation-cadence height whose matching on-chain attestation is
+irreversible and whose file is still available on disk. Newer manual snapshots, unavailable files, and scheduled
+snapshots that are not yet attested are skipped, so base-URL bootstrap discovers the newest snapshot it can immediately
+download. Discovery reads final attestation records newest-first in bounded pages limited to the locally available
+snapshot-height range, and transient table-read failures are retried before discovery fails closed.
 
 **Request:** empty body or `{}`
 
@@ -186,11 +197,15 @@ Returns metadata for the most recent snapshot.
 }
 ```
 
-**Response (404):** No snapshots in catalog.
+**Response (404):** No attested scheduled snapshot is currently downloadable. Manual snapshots may still be available
+by explicit block.
+
+**Response (503):** Discovery could not complete before its deadline or after retrying an attestation-table read.
 
 ### `POST /v1/snapshot/by_block`
 
-Returns metadata for a snapshot at a specific block number.
+Returns metadata for a snapshot at a specific block number. Download eligibility is enforced separately by the raw
+download endpoint.
 
 **Request:**
 ```json
@@ -203,7 +218,8 @@ Returns metadata for a snapshot at a specific block number.
 
 ### `POST /v1/snapshot/download`
 
-Downloads a snapshot file as a binary stream.
+Downloads a snapshot file as a binary stream. Scheduled snapshots return 404 until an irreversible on-chain
+`snaprecords` row matches the exact block ID and root hash. Manual unscheduled snapshots remain explicitly downloadable.
 
 **Request:**
 ```json
@@ -240,12 +256,16 @@ nodeop \
 
 The bootstrap process:
 1. Fetches snapshot metadata from the endpoint
-2. Downloads the snapshot binary
-3. Verifies the file's root hash matches the advertised hash
-4. Loads the snapshot and begins syncing from that point
-5. After syncing, verifies the snapshot's on-chain attestation record
+2. Rejects snapshots outside the exact 25,000-block attestation cadence
+3. Downloads the snapshot binary
+4. Verifies the file's root hash matches the advertised hash
+5. Loads the snapshot and begins syncing from that point
+6. After syncing, verifies the snapshot's on-chain attestation record
 
 `--delete-all-blocks` is required when existing chain data is present. The `--snapshot-endpoint` option is incompatible with `--snapshot` (local file).
+Manual/on-demand snapshots remain available through the explicit-block serving APIs. Base-URL discovery ignores their
+unscheduled heights, and an explicit-block bootstrap request rejects them before download because they can never
+receive an on-chain attestation.
 
 ### Bootstrap download status and limits
 

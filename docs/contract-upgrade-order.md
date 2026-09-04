@@ -219,6 +219,14 @@ short-decode one (see [above](#why-a-mixed-version-is-not-merely-degraded)).
 
 ## Downgrades
 
+> **WIRE-350 pre-launch note:** Provider nodes that previously started with the old automatic
+> snapshot schedule must delete their local `snapshot-schedule.json` once before starting this
+> build. The old `(spacing=25000, start=24999, end=MAX)` request and the corrected
+> `(spacing=25000, start=25000, end=MAX)` request have different identities, so the scheduler would
+> otherwise retain both persisted requests. No on-chain migration or production upgrade path is
+> provided because snapshot attestation is being deployed before launch.
+>
+
 **A downgrade is not the upgrade run backwards. It is a data-migration problem
 first, and a code-ordering problem second** — because by the time you want to
 roll back, all three claim tables may hold value that only the NEW code can pay
