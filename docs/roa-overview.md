@@ -33,7 +33,7 @@ usable.
 
 For those calls there is one exception to who pays, covered in
 [Who pays](#who-pays-the-payer-model): an account can volunteer to pay for itself, which takes the
-contract's own allocation out of the picture. It is opt-in, it requires signatures, and it is not
+contract's own CPU and NET out of the picture. It is opt-in, it requires signatures, and it is not
 how ordinary traffic works.
 
 ---
@@ -156,7 +156,7 @@ flowchart TD
     D -->|"No"| E["Rejected:<br/>unsatisfied authorization"]
     D -->|"Yes"| F["Payer = that actor"]
     C --> G["Contract needs a policy for<br/>actions declared on it.<br/>Signer not billed."]
-    F --> H["Actor needs its own allocation.<br/>Contract not billed."]
+    F --> H["Declared action: actor billed CPU and NET,<br/>contract not. Either way the marker<br/>authorizes RAM billed to the actor."]
 ```
 
 The objective billing map is populated only from the actions a transaction *declares*, and is keyed
@@ -164,9 +164,13 @@ on `payer()` — so two declared actions sharing a payer aggregate into one entr
 account that is not the payer never enters it, so consensus neither charges nor limits its CPU and
 NET. Nor does a contract reached only inline: its work is timed inside the declared action that
 triggered it and billed to that action's payer, so it needs no CPU or NET allocation for that work.
-RAM is separate — a callee that bills state to itself still needs the capacity. A producer running
-[subjective billing](#subjective-billing-meters-the-signer) does meter the signer, but that is
-node-local rather than consensus.
+A producer running [subjective billing](#subjective-billing-meters-the-signer) does meter the
+signer, but that is node-local rather than consensus.
+
+RAM is separate: it is checked against the authorizations on the action *executing*, so a callee
+that bills state to itself still needs the capacity — and an inline action carrying the marker for a
+user who has granted the contract `sysio.code` bills that user's RAM while its CPU and NET stay with
+the declared action's payer.
 
 | Action authorizations | Payer | Notes |
 |---|---|---|
@@ -648,9 +652,10 @@ Alice is charged nothing, for anything, on a token transfer.
 > **Compared with Antelope.** There, a contract names a RAM payer in the action body and the
 > requirement is only that the named account authorized the action at all — CPU and NET follow a
 > separate path entirely, funded by the signer's stake or rental. On Wire the two are welded
-> together: naming a user as RAM payer requires the `sysio.payer` marker, and because that marker
-> must sit at index 0 it makes the same user the CPU and NET payer for the action. There is no way
-> to charge a user for storage while the contract absorbs their bandwidth.
+> together: naming a user as RAM payer requires the `sysio.payer` marker, and on a *declared* action
+> that marker makes the same user the CPU and NET payer too. The split survives only on the inline
+> path, where the marker bills the user's RAM and the declared action's payer keeps the bandwidth
+> ([Who pays](#who-pays-the-payer-model)).
 
 ### A developer deploys a contract
 
