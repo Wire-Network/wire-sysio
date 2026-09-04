@@ -2329,6 +2329,34 @@ BOOST_FIXTURE_TEST_CASE(swap_zero_quote_from_active_reserve_fails_closed,
    BOOST_REQUIRE(get_uwreq(ATT_ID).is_null());
 } FC_LOG_AND_RETHROW() }
 
+/// WIRE-375: a foreign-chain token named WIRE is still an outpost asset. With
+/// no ACTIVE `(ETH, WIRE, PRIMARY)` reserve, the ingress quote must remain
+/// unavailable instead of treating both legs as native WIRE and pricing at par.
+/// Keeping the zero-quote PENDING row also pins the existing unprovisioned-LP
+/// behavior and proves `required_reserves_active` uses the same chain-aware test.
+BOOST_FIXTURE_TEST_CASE(swap_foreign_wire_codename_is_not_native,
+                        sysio_dispatch_tester) { try {
+   constexpr uint64_t ATT_ID = 6101;
+   constexpr int64_t SOURCE_AMOUNT = 2'000'000'000;
+   bootstrap_for_dispatch();
+   register_wire_depot();
+
+   const uint64_t eth     = fc::slug_name{"ETH"}.value;
+   const uint64_t wire    = fc::slug_name{"WIRE"}.value;
+   const uint64_t primary = fc::slug_name{"PRIMARY"}.value;
+   const auto sr = encode_swap_request(
+      ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
+      eth, wire, primary, SOURCE_AMOUNT,
+      wire, wire, wire, static_cast<uint64_t>(SOURCE_AMOUNT),
+      /*tolerance_bps=*/10'000, ChainKind::CHAIN_KIND_WIRE,
+      std::vector<char>{});
+
+   BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, eth, sr));
+   const auto req = get_uwreq(ATT_ID);
+   BOOST_REQUIRE(!req.is_null());
+   BOOST_REQUIRE_EQUAL(0u, req["dst_amount"].as_uint64());
+} FC_LOG_AND_RETHROW() }
+
 // [P0] WNS-02 (CertiK "Wire Network - Sysio Audit 1", Critical): a swap must
 // settle on the AMM QUOTE, never on the caller's `target_amount`.
 //
@@ -5561,7 +5589,8 @@ public:
          if (amount == 0) continue;
          const auto chain = bal["chain_code"]["value"].as_uint64(),
                     token = bal["token_code"]["value"].as_uint64();
-         if (token == fc::slug_name{"WIRE"}.value) {
+         const uint64_t wire = fc::slug_name{"WIRE"}.value;
+         if (chain == wire && token == wire) {
             total += amount;   // already WIRE — no curve
             continue;
          }
@@ -5711,6 +5740,28 @@ BOOST_FIXTURE_TEST_CASE(uwchalbond_quotes_the_live_lock_value, sysio_uwchal_test
    BOOST_REQUIRE_EQUAL(0u, uwchalbond(ATT_ID, "batchop.a"_n));   // not the winner
 } FC_LOG_AND_RETHROW() }
 
+/// WIRE-375: a direct depot deposit is already denominated in atomic WIRE-9,
+/// so challenge-bond valuation must add exactly the deposited atomic amount.
+/// The pre-existing ETH bucket keeps the confirmed request challengeable; the
+/// before/after delta isolates the direct `(WIRE, WIRE)` collateral path.
+BOOST_FIXTURE_TEST_CASE(wire_direct_deposit_adds_exact_units_to_uwchalbond,
+                        sysio_uwchal_tester) { try {
+   constexpr uint64_t ATT_ID = 9101;
+   const asset direct_deposit{2'000'000'000, symbol{9, "WIRE"}};
+   make_confirmed_uwreq(ATT_ID);
+
+   const uint64_t before = uwchalbond(ATT_ID, UWRIT_OP);
+   BOOST_REQUIRE_EQUAL(success(), push(TOKEN_ACCOUNT, token_abi, config::system_account_name,
+      "transfer"_n, mvo()("from", "sysio")("to", UWRIT_OP.to_string())
+         ("quantity", direct_deposit)("memo", "fund native collateral")));
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, UWRIT_OP, "deposit"_n, mvo()
+      ("account", UWRIT_OP.to_string())("amount", static_cast<uint64_t>(direct_deposit.get_amount()))));
+
+   const uint64_t after = uwchalbond(ATT_ID, UWRIT_OP);
+   BOOST_REQUIRE_EQUAL(before + static_cast<uint64_t>(direct_deposit.get_amount()), after);
+   BOOST_REQUIRE_EQUAL(expected_bond(UWRIT_OP), after);
+} FC_LOG_AND_RETHROW() }
+
 // A collateral bucket whose (chain, token) pair carries NO ACTIVE reserve must not void the quote.
 // `opreg::depositinle` accepts any positive amount for any pair without requiring one that quotes,
 // so voiding here handed the underwriter an immunity switch: seed one unreserved bucket and every
@@ -5737,6 +5788,26 @@ BOOST_FIXTURE_TEST_CASE(unreserved_collateral_bucket_still_quotes_a_bond, sysio_
    BOOST_REQUIRE_EQUAL(success(),
       openuwchal(CHALLENGER, ATT_ID, UWRIT_OP, REASON_DEPOSIT_MISSING, "no such deposit"));
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(quoted), wire_balance(CHALG_ACCOUNT));
+} FC_LOG_AND_RETHROW() }
+
+/// A foreign-chain collateral bucket whose token codename is WIRE must not be
+/// mistaken for depot-native WIRE and valued at par. With no ACTIVE reserve for
+/// `(ETH, WIRE)`, it contributes only the unpriceable-bucket safety floor.
+BOOST_FIXTURE_TEST_CASE(foreign_wire_collateral_bucket_is_not_native,
+                        sysio_uwchal_tester) { try {
+   constexpr uint64_t ATT_ID = 9801;
+   constexpr uint64_t FOREIGN_WIRE_AMOUNT = 5'000;
+   make_confirmed_uwreq(ATT_ID);
+
+   const uint64_t priced_only = uwchalbond(ATT_ID, UWRIT_OP);
+   BOOST_REQUIRE_EQUAL(success(),
+      depositinle_credit(UWRIT_OP, "ETH", "WIRE", FOREIGN_WIRE_AMOUNT));
+   BOOST_REQUIRE(first_active_reserve(fc::slug_name{"ETH"}.value,
+                                      fc::slug_name{"WIRE"}.value).is_null());
+
+   const uint64_t quoted = uwchalbond(ATT_ID, UWRIT_OP);
+   BOOST_REQUIRE_EQUAL(priced_only + MIN_UWCHAL_BUCKET_WIRE, quoted);
+   BOOST_REQUIRE_EQUAL(expected_bond(UWRIT_OP), quoted);
 } FC_LOG_AND_RETHROW() }
 
 // Same property for the DUST flavour: the pair HAS an ACTIVE reserve, but its books floor the

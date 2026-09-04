@@ -8,6 +8,7 @@
 #include <sysio.opp.common/amm_math.hpp>
 #include <sysio.opp.common/safe_ops.hpp>
 #include <sysio.opp.common/name_ops.hpp>
+#include <sysio.opp.common/wire_asset.hpp>
 #include <sysio/opp/uic_signature_canonical.hpp>
 #include <sysio/opp/attestations/attestations.pb.hpp>
 #include <sysio/permission.hpp>
@@ -43,17 +44,6 @@ constexpr name ram_payer = "sysio"_n;
 /// the caller does not control (system state changed after enqueue, uwreq
 /// rejected at resolution) forfeit nothing.
 constexpr uint32_t REFUND_FEE_EXEMPT_BPS = 0;
-
-using sysio::slug_name_literals::operator""_s;
-
-/// The WIRE token's slug — both the depot-native token code and (by
-/// protocol convention) the depot chain's own registry code.
-constexpr sysio::slug_name WIRE_TOKEN = "WIRE"_s;
-
-/// WIRE token symbol (9 decimals) — the emissions/epoch denomination
-/// (`sysio.system/src/emissions.cpp:42`). Never opreg's CORE_SYM (SYS, 4):
-/// collateral and swap custody are different surfaces.
-constexpr sysio::symbol WIRE_SYMBOL{"WIRE", 9};
 
 /// High bit partitions depot-originated (swap-from-WIRE) uwreq ids from
 /// inbound attestation ids — msgch's `mint_att_id` counts monotonically
@@ -342,8 +332,8 @@ uint64_t swap_quote(sysio::slug_name src_chain_code,
                     uint64_t src_amount,
                     uint32_t fee_bps) {
    if (src_amount == 0) return 0;
-   const bool src_is_wire = (src_token_code == WIRE_TOKEN);
-   const bool dst_is_wire = (dst_token_code == WIRE_TOKEN);
+   const bool src_is_wire = opp::wire::is_native_asset(src_chain_code, src_token_code);
+   const bool dst_is_wire = opp::wire::is_native_asset(dst_chain_code, dst_token_code);
    if (src_is_wire && dst_is_wire) return src_amount;
 
    auto active = [](std::optional<reserve::reserve_row>&& r)
@@ -391,9 +381,9 @@ bool required_reserves_active(sysio::slug_name src_chain_code,
       auto row = find_reserve(c, t, r);
       return row && row->status == ReserveStatus::RESERVE_STATUS_ACTIVE;
    };
-   if (src_token_code != WIRE_TOKEN
+   if (!opp::wire::is_native_asset(src_chain_code, src_token_code)
        && !leg_active(src_chain_code, src_token_code, src_reserve_code)) return false;
-   if (dst_token_code != WIRE_TOKEN
+   if (!opp::wire::is_native_asset(dst_chain_code, dst_token_code)
        && !leg_active(dst_chain_code, dst_token_code, dst_reserve_code)) return false;
    return true;
 }
@@ -2169,7 +2159,7 @@ void uwrit::swapfromwire(name                  user,
       permission_level{user, "active"_n},
       TOKEN_ACCOUNT, "transfer"_n,
       std::make_tuple(user, RESERVE_ACCOUNT,
-         asset(static_cast<int64_t>(wire_amount), WIRE_SYMBOL),
+         asset(static_cast<int64_t>(wire_amount), opp::wire::asset_symbol),
          std::string("sysio.uwrit::swapfromwire escrow"))
    ).send();
 
@@ -2278,7 +2268,8 @@ void uwrit::drainfwq() {
       // weighted-Bancor kernel to price). Fail closed and refund: otherwise a
       // caller-chosen target_amount bypasses variance and drains the reserve's
       // token side for a negligible WIRE escrow (WSA-041).
-      const uint64_t quote = swap_quote(*depot_code, WIRE_TOKEN, WIRE_TOKEN,
+      const uint64_t quote = swap_quote(*depot_code, opp::wire::token_code,
+                                        opp::wire::token_code,
                                          row.dst_chain_code, row.dst_token_code,
                                          row.dst_reserve_code, row.wire_amount,
                                          cfg.fee_bps);
@@ -2311,10 +2302,10 @@ void uwrit::drainfwq() {
          auto user_bytes = wire_name_bytes(row.user);
          sr.actor.address.assign(user_bytes.begin(), user_bytes.end());
       }
-      sr.source_amount.token_code = WIRE_TOKEN.value;
+      sr.source_amount.token_code = opp::wire::token_code.value;
       sr.source_amount.amount     = static_cast<int64_t>(row.wire_amount);
       sr.source_chain_code        = depot_code->value;
-      sr.source_reserve_code      = WIRE_TOKEN.value;   // sentinel — no WIRE-side reserve
+      sr.source_reserve_code      = opp::wire::token_code.value; // sentinel — no WIRE-side reserve
       sr.target_chain_code        = row.dst_chain_code.value;
       sr.target_token_code        = row.dst_token_code.value;
       sr.target_reserve_code      = row.dst_reserve_code.value;
@@ -2350,8 +2341,8 @@ void uwrit::drainfwq() {
          .type                      = AttestationType::ATTESTATION_TYPE_SWAP_REQUEST,
          .status                    = UnderwriteRequestStatus::UNDERWRITE_REQUEST_STATUS_PENDING,
          .src_chain_code            = *depot_code,
-         .src_token_code            = WIRE_TOKEN,
-         .src_reserve_code          = WIRE_TOKEN,
+         .src_token_code            = opp::wire::token_code,
+         .src_reserve_code          = opp::wire::token_code,
          .src_amount                = row.wire_amount,
          .dst_chain_code            = row.dst_chain_code,
          .dst_token_code            = row.dst_token_code,

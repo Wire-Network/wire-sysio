@@ -1,17 +1,11 @@
 #include <sysio.chains/sysio.chains.hpp>
 #include <sysio.epoch/sysio.epoch.hpp>
 #include <sysio.opp.common/registry_metadata.hpp>
+#include <sysio.opp.common/wire_asset.hpp>
 
 namespace sysio {
 
 namespace {
-
-using sysio::slug_name_literals::operator""_s;
-
-// The canonical code of the depot self-row. Bootstrap invariant V3
-// (docs/platform-bootstrap-config.md) fixes the depot at
-// `(kind=WIRE, code="WIRE", external_chain_id=0, is_depot=true)`.
-constexpr sysio::slug_name WIRE_CHAIN_CODE = "WIRE"_s;
 
 // System-owned rows bill to the sysio RAM pool, not this contract account (privileged-contract
 // model, as sysio.token uses): the account stays finite at code+abi size; growth draws from the pool.
@@ -170,7 +164,7 @@ void chains::regchain(opp::types::ChainKind kind,
    // the canonical row unregisterable -- bricking bootstrap with no on-chain recovery. Both
    // directions are needed; the forward check alone still admits `regchain(EVM, "WIRE", ...)`.
    if (kind == opp::types::CHAIN_KIND_WIRE) {
-      sysio::check(code == WIRE_CHAIN_CODE,
+      sysio::check(code == opp::wire::chain_code,
                    "sysio.chains: a WIRE chain must use the code WIRE");
 
       auto by_kind_idx = tbl.template get_index<"bykind"_n>();
@@ -178,7 +172,7 @@ void chains::regchain(opp::types::ChainKind kind,
       sysio::check(by_kind_idx.lower_bound(wire_kind_value) == by_kind_idx.upper_bound(wire_kind_value),
                    "sysio.chains: a WIRE chain (depot self-row) already exists");
    } else {
-      sysio::check(code != WIRE_CHAIN_CODE,
+      sysio::check(code != opp::wire::chain_code,
                    "sysio.chains: the code WIRE is reserved for the depot self-row");
    }
 

@@ -114,6 +114,18 @@ constexpr std::string_view kEthCodename = "ETH";
 /// Native WIRE chain and token codename used by focused collateral tests.
 constexpr std::string_view kWireCodename = "WIRE";
 
+/// WIRE asset used by depot-side collateral custody and remits.
+const symbol kWireSymbol{9, "WIRE"};
+
+/// One whole WIRE expressed in atomic 9-decimal units.
+constexpr uint64_t kWireUnit = 1'000'000'000;
+
+/// WIRE quantity used to fund direct-deposit regression operators.
+constexpr std::string_view kWireFundingQuantity = "10.000000000 WIRE";
+
+/// Maximum WIRE quantity representable by an Antelope asset.
+constexpr std::string_view kWireMaximumSupply = "4611686018.427387903 WIRE";
+
 /// Punishment reason used by terminal-status eligibility regressions.
 constexpr std::string_view kTestSlashReason = "test slash";
 
@@ -126,6 +138,11 @@ constexpr auto withdraw = "withdraw"_n;
 constexpr auto cancel   = "cancelwtdw"_n;
 constexpr auto flush    = "flushwtdw"_n;
 } // namespace withdrawal_action
+
+/// Contract action identifiers used by direct collateral deposit helpers.
+namespace collateral_action {
+constexpr auto deposit = "deposit"_n;
+} // namespace collateral_action
 
 /// Contract field identifiers used by withdrawal lifecycle helpers.
 namespace withdrawal_field {
@@ -415,6 +432,13 @@ public:
          (withdrawal_field::amount,  amount));
    }
 
+   /// `deposit`: operator-authorized WIRE-direct collateral deposit.
+   action_result deposit(name account, uint64_t amount) {
+      return push_opreg_action(account, collateral_action::deposit, mvo()
+         (withdrawal_field::account, account)
+         (withdrawal_field::amount, amount));
+   }
+
    /// Cancel an operator-owned queued withdrawal request.
    action_result cancelwtdw(name signer, name account, uint64_t request_id) {
       return push_opreg_action(signer, withdrawal_action::cancel, mvo()
@@ -492,7 +516,7 @@ public:
       return log.empty() ? fc::variant() : log.back();
    }
 
-   /// Claimable CORE_SYM row credited by a WIRE-chain remit. Empty variant when absent.
+   /// Claimable WIRE row credited by a WIRE-chain remit. Empty variant when absent.
    fc::variant get_remitclaim(name account) {
       auto data = get_row_by_account(OPREG_ACCOUNT, OPREG_ACCOUNT, "remitclaims"_n, account);
       return data.empty() ? fc::variant() : opreg_abi_ser.binary_to_variant(
@@ -504,20 +528,24 @@ public:
       return push_opreg_action(account, "claimremit"_n, mvo()("account", account));
    }
 
-   /// Stand up sysio.token with the opreg CORE_SYM (SYS, precision 4) and fund `who`, so a
-   /// WIRE-chain `deposit` can move real collateral. Mirrors the setup in
-   /// deposit_reentrancy_cannot_exceed_max_collateral.
-   void setup_core_token_and_fund(name who, const std::string& quantity) {
+   /// Stand up sysio.token with the opreg WIRE asset and fund `who`, so a
+   /// WIRE-chain `deposit` can move real collateral.
+   void setup_wire_token_and_fund(name who, std::string_view quantity) {
       set_code(TOKEN_ACCOUNT, contracts::token_wasm());
       set_abi(TOKEN_ACCOUNT, contracts::token_abi().data());
       set_privileged(TOKEN_ACCOUNT);   // so create/issue can bill the stat/balance RAM
       produce_blocks();
       base_tester::push_action(TOKEN_ACCOUNT, "create"_n, TOKEN_ACCOUNT,
-         mvo()("issuer", "sysio")("maximum_supply", "461168601842738.7903 SYS"));
+         mvo()("issuer", "sysio")("maximum_supply", std::string(kWireMaximumSupply)));
       base_tester::push_action(TOKEN_ACCOUNT, "issue"_n, config::system_account_name,
-         mvo()("to", "sysio")("quantity", quantity)("memo", "seed"));
+         mvo()("to", "sysio")("quantity", std::string(quantity))("memo", "seed"));
       base_tester::push_action(TOKEN_ACCOUNT, "transfer"_n, config::system_account_name,
-         mvo()("from", "sysio")("to", who)("quantity", quantity)("memo", "fund operator"));
+         mvo()("from", "sysio")("to", who)("quantity", std::string(quantity))("memo", "fund operator"));
+   }
+
+   /// Read one account's WIRE balance in atomic 9-decimal units.
+   int64_t wire_balance(name account) {
+      return get_currency_balance(TOKEN_ACCOUNT, kWireSymbol, account).get_amount();
    }
 
    /// Park the blocking contract on `who`: every INCOMING sysio.token::transfer asserts.
@@ -935,7 +963,7 @@ BOOST_FIXTURE_TEST_CASE(deposit_aggregates_into_existing_balance_row, sysio_opre
 
 // SEC-103 (WSA-028 follow-up): operator collateral must never accumulate past
 // asset::max_amount (2^62-1). A balance above the asset range would abort the
-// WIRE-direct remit path's asset(balance, CORE_SYM); on the never-throw
+// WIRE-direct remit path's asset(balance, WIRE_SYM); on the never-throw
 // depositinle (OPP-inbound) path that abort would stall consensus. depositinle
 // gates the RUNNING SUM: a credit that would push the balance over the cap is
 // refunded via DEPOSIT_REVERT (the action still succeeds — never throws) and the
@@ -972,9 +1000,50 @@ BOOST_FIXTURE_TEST_CASE(depositinle_credit_over_max_collateral_is_reverted, sysi
    }
 } FC_LOG_AND_RETHROW() }
 
+/// WIRE-375 / WNS-40: direct depot deposits must custody the same 9-decimal WIRE
+/// asset that the `(WIRE, WIRE)` collateral bucket denotes. Crediting raw
+/// 4-decimal SYS units into that bucket made challenge-bond valuation interpret
+/// one SYS atomic unit as one WIRE atomic unit, understating the bond by 10^5.
+BOOST_FIXTURE_TEST_CASE(deposit_custodies_and_credits_wire_units, sysio_opreg_tester) { try {
+   constexpr uint64_t DEPOSIT = 2 * kWireUnit;
+   const auto OPERATOR = "uwrit.alice"_n;
+
+   BOOST_REQUIRE_EQUAL(success(), setconfig(
+      /*max_prod=*/kTestMaxProducers,
+      /*max_batch=*/kTestMaxBatchOperators,
+      /*max_uw=*/kTestMaxUnderwriters,
+      /*prune_delay=*/kDefaultPruneDelayMs,
+      /*max_consec_misses=*/kDefaultMaxConsecutiveMisses,
+      /*max_pct_misses_24h=*/kDefaultMaxPctMisses24h,
+      /*terminate_window_ms=*/kTerminateWindowMs,
+      /*req_prod_collat=*/{},
+      /*req_batchop_collat=*/{},
+      /*req_uw_collat=*/{
+         make_chain_min_bond(kWireCodename, kWireCodename, DEPOSIT),
+      }));
+   BOOST_REQUIRE_EQUAL(success(),
+      regoperator(OPERATOR, OPERATOR_TYPE_UNDERWRITER, /*is_bootstrapped=*/false));
+   setup_wire_token_and_fund(OPERATOR, kWireFundingQuantity);
+
+   const int64_t operator_before = wire_balance(OPERATOR);
+   const int64_t opreg_before = wire_balance(OPREG_ACCOUNT);
+   BOOST_REQUIRE_EQUAL(success(), deposit(OPERATOR, DEPOSIT));
+
+   BOOST_REQUIRE_EQUAL(operator_before - static_cast<int64_t>(DEPOSIT), wire_balance(OPERATOR));
+   BOOST_REQUIRE_EQUAL(opreg_before + static_cast<int64_t>(DEPOSIT), wire_balance(OPREG_ACCOUNT));
+
+   auto op = get_operator(OPERATOR);
+   auto balances = op["balances"].get_array();
+   BOOST_REQUIRE_EQUAL(1u, balances.size());
+   BOOST_REQUIRE_EQUAL(cn(kWireCodename).value, balances[0]["chain_code"]["value"].as_uint64());
+   BOOST_REQUIRE_EQUAL(cn(kWireCodename).value, balances[0]["token_code"]["value"].as_uint64());
+   BOOST_REQUIRE_EQUAL(DEPOSIT, balances[0]["balance"].as_uint64());
+   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE == op["status"].as<OperatorStatus>());
+} FC_LOG_AND_RETHROW() }
+
 // SEC-103 (PR #449 review): the deposit cap must hold under RE-ENTRANCY. An
 // operator account that carries contract code is notified by sysio.token::transfer
-// when opreg::deposit moves its SYS collateral, and can re-enter deposit during
+// when opreg::deposit moves its WIRE collateral, and can re-enter deposit during
 // that notification. Were the cap a pre-read-then-credit (not atomic with the
 // mutation), two credits could pass against the same stale balance and push the
 // WIRE collateral row past asset::max_amount. opreg::deposit performs the cap check
@@ -983,26 +1052,16 @@ BOOST_FIXTURE_TEST_CASE(depositinle_credit_over_max_collateral_is_reverted, sysi
 // and the whole transaction aborts. reenter_deposit (contracts/test_contracts)
 // models the malicious operator — it re-enters deposit(+1) on the outgoing transfer.
 BOOST_FIXTURE_TEST_CASE(deposit_reentrancy_cannot_exceed_max_collateral, sysio_opreg_tester) { try {
-   constexpr uint64_t MAX_COLLATERAL = (uint64_t{1} << 62) - 1;     // asset::max_amount
-   const std::string  CAP_SYS        = "461168601842738.7903 SYS";  // (2^62-1) at precision 4
-   const auto         OPERATOR       = "uwrit.alice"_n;
+   constexpr uint64_t MAX_COLLATERAL = (uint64_t{1} << 62) - 1; // asset::max_amount
+   const auto OPERATOR = "uwrit.alice"_n;
 
    BOOST_REQUIRE_EQUAL(success(), setconfig());
    BOOST_REQUIRE_EQUAL(success(), regoperator(OPERATOR, OPERATOR_TYPE_UNDERWRITER, false));
 
-   // Core SYS token (opreg's CORE_SYM = symbol("SYS", 4)); fund the operator with
-   // EXACTLY the cap so the outer deposit fills the WIRE row to asset::max_amount
+   // Fund the operator with EXACTLY the WIRE asset cap so the outer deposit fills
+   // the WIRE row to asset::max_amount
    // and only the re-entrant +1 would exceed it.
-   set_code(TOKEN_ACCOUNT, contracts::token_wasm());
-   set_abi(TOKEN_ACCOUNT, contracts::token_abi().data());
-   set_privileged(TOKEN_ACCOUNT);   // so create/issue can bill the stat/balance RAM
-   produce_blocks();
-   base_tester::push_action(TOKEN_ACCOUNT, "create"_n, TOKEN_ACCOUNT,
-      mvo()("issuer", "sysio")("maximum_supply", CAP_SYS));
-   base_tester::push_action(TOKEN_ACCOUNT, "issue"_n, config::system_account_name,
-      mvo()("to", "sysio")("quantity", CAP_SYS)("memo", "seed"));
-   base_tester::push_action(TOKEN_ACCOUNT, "transfer"_n, config::system_account_name,
-      mvo()("from", "sysio")("to", OPERATOR)("quantity", CAP_SYS)("memo", "fund operator"));
+   setup_wire_token_and_fund(OPERATOR, kWireMaximumSupply);
 
    // Turn the operator into a re-entrant contract, and grant its active authority
    // the sysio.code permission so its inline deposit ({operator, active}) authorizes.
@@ -1016,11 +1075,10 @@ BOOST_FIXTURE_TEST_CASE(deposit_reentrancy_cannot_exceed_max_collateral, sysio_o
    produce_blocks();
 
    // Deposit the entire cap: the credit fills the WIRE row to asset::max_amount, the
-   // outgoing SYS transfer notifies the operator, and its handler re-enters
+   // outgoing WIRE transfer notifies the operator, and its handler re-enters
    // deposit(+1). The +1 would push the row to 2^62 — its in-modify cap check trips
    // and aborts the whole transaction. No over-credit is possible.
-   auto r = push_opreg_action(OPERATOR, "deposit"_n,
-                              mvo()("account", OPERATOR)("amount", MAX_COLLATERAL));
+   auto r = deposit(OPERATOR, MAX_COLLATERAL);
    BOOST_REQUIRE_MESSAGE(r != success(), "re-entrant over-cap deposit unexpectedly succeeded");
    BOOST_REQUIRE_MESSAGE(r.find("deposit would exceed max collateral") != std::string::npos,
                          "unexpected failure reason: " + r);
@@ -1304,17 +1362,16 @@ BOOST_FIXTURE_TEST_CASE(terminate_marks_status_and_zeros_unlocked_balance, sysio
 // in the claim ledger; the ONLY thing its handler can still block is its own `claimremit`.
 BOOST_FIXTURE_TEST_CASE(terminate_survives_operator_blocking_its_own_remit, sysio_opreg_tester) { try {
    const auto OPERATOR    = "batchop.a"_n;
-   const uint64_t DEPOSIT = 5000;   // atomic SYS units (CORE_SYM precision 4)
+   const uint64_t DEPOSIT = 5000;   // atomic WIRE units
 
    BOOST_REQUIRE_EQUAL(success(), setconfig());
    BOOST_REQUIRE_EQUAL(success(),
       regoperator(OPERATOR, OPERATOR_TYPE_BATCH, /*is_bootstrapped=*/false));
 
-   // Real CORE_SYM collateral on the WIRE chain, so termination takes the WIRE-direct remit
+   // Real WIRE collateral on the WIRE chain, so termination takes the WIRE-direct remit
    // branch rather than emitting a WITHDRAW_REMIT attestation to an outpost.
-   setup_core_token_and_fund(OPERATOR, "1.0000 SYS");
-   BOOST_REQUIRE_EQUAL(success(),
-      push_opreg_action(OPERATOR, "deposit"_n, mvo()("account", OPERATOR)("amount", DEPOSIT)));
+   setup_wire_token_and_fund(OPERATOR, kWireFundingQuantity);
+   BOOST_REQUIRE_EQUAL(success(), deposit(OPERATOR, DEPOSIT));
 
    // Arm the operator AFTER the deposit: `deposit`'s escrow leg is an OUTGOING transfer, which the
    // blocking contract deliberately ignores, but deploying afterwards keeps the setup honest about
@@ -1355,13 +1412,14 @@ BOOST_FIXTURE_TEST_CASE(claimremit_pays_terminated_operator_and_clears_row, sysi
    BOOST_REQUIRE_EQUAL(success(), setconfig());
    BOOST_REQUIRE_EQUAL(success(),
       regoperator(OPERATOR, OPERATOR_TYPE_BATCH, /*is_bootstrapped=*/false));
-   setup_core_token_and_fund(OPERATOR, "1.0000 SYS");
-   BOOST_REQUIRE_EQUAL(success(),
-      push_opreg_action(OPERATOR, "deposit"_n, mvo()("account", OPERATOR)("amount", DEPOSIT)));
+   setup_wire_token_and_fund(OPERATOR, kWireFundingQuantity);
+   BOOST_REQUIRE_EQUAL(success(), deposit(OPERATOR, DEPOSIT));
    BOOST_REQUIRE_EQUAL(success(), terminate(OPERATOR, "rolling-24h miss"));
 
    BOOST_REQUIRE_EQUAL(DEPOSIT, get_remitclaim(OPERATOR)["balance"].as_uint64());
+   const int64_t balance_before_claim = wire_balance(OPERATOR);
    BOOST_REQUIRE_EQUAL(success(), claimremit(OPERATOR));
+   BOOST_REQUIRE_EQUAL(balance_before_claim + static_cast<int64_t>(DEPOSIT), wire_balance(OPERATOR));
    BOOST_REQUIRE(get_remitclaim(OPERATOR).is_null());   // row erased by the payout
 
    // Double-claim finds nothing -- the erase happens before the transfer, closing the re-entrancy
