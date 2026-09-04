@@ -51,8 +51,6 @@ package opp.types #F5F5F5 {
 
     enum attestation_type_t <<uint16>> {
         reserve_balance_sheet = 0xAA00
-        stake               = 0x0BB9
-        unstake             = 0x0BBA
         pretoken_purchase   = 0x0BBB
         pretoken_yield      = 0x0BBE
         --
@@ -149,21 +147,6 @@ package opp.attestations #FCE4EC {
         * amounts  : token_amount[]
     }
 
-    entity stake {
-        * actor      : chain_address
-        * amount               : token_amount
-        * pretoken_count           : uint256
-        * index_at_mint : uint256
-    }
-
-    entity unstake {
-        * unstaker      : chain_address
-        * amount               : token_amount
-        * pretoken_count           : uint256
-        * index_at_burn    : uint256
-
-    }
-
     entity pretoken_purchase {
         * actor             : chain_address
         * amount            : token_amount
@@ -249,8 +232,6 @@ package opp.attestations #FCE4EC {
 
 ' -- Assertion entry resolves to concrete payloads --
 opp.attestation_entry ..> opp.attestations.reserve_balance_sheet
-opp.attestation_entry ..> opp.attestations.stake
-opp.attestation_entry ..> opp.attestations.unstake
 opp.attestation_entry ..> opp.attestations.pretoken_purchase
 opp.attestation_entry ..> opp.attestations.pretoken_yield
 opp.attestation_entry ..> opp.attestations.stake_update
