@@ -30,8 +30,6 @@ set(SYSIO_SYSTEM_OPP_INCLUDE_DIRS
    ${CMAKE_CURRENT_BINARY_DIR}/../../libraries/opp/generated-cdt
    ${CMAKE_CURRENT_SOURCE_DIR}/../sysio.opp.common/include
    ${CMAKE_CURRENT_SOURCE_DIR}/../sysio.opreg/include
-   ${CMAKE_CURRENT_SOURCE_DIR}/../sysio.uwrit/include
-   ${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/libfc-lite/include
    ${CMAKE_CURRENT_SOURCE_DIR}/../sysio.epoch/include)
 
 if(BUILD_SYSTEM_CONTRACTS)

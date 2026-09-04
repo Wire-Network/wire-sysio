@@ -132,6 +132,12 @@ namespace sysiosystem {
       _producers.modify( get_self(), key, [&]( producer_info& info ){
          info.deactivate();
       });
+
+      // A parked row scores into the demoted tier, so the sort key is stale until rescored. This
+      // is what keeps the tier a statement about LIVE standing: every rank walk stops at the first
+      // demoted entry, and a parked producer left in its old tier would be visited (and skipped)
+      // by every one of them until some unrelated event happened to rescore it.
+      rescore_producer( producer );
    }
 
    void system_contract::update_ranked_producers( const block_timestamp& block_time ) {

@@ -5986,6 +5986,10 @@ BOOST_FIXTURE_TEST_CASE( unregprod_parks_without_touching_the_bond, producer_sco
 
    BOOST_REQUIRE_EQUAL( success(),
       push_system_action(names[0], "unregprod"_n, mvo()("producer", names[0])) );
+   // The park rescores at once: a parked row is not a live producer, so its key sinks to the
+   // demoted tier where no walk visits it -- not left in the healthy tier until some unrelated
+   // event happened to rescore it.
+   BOOST_REQUIRE_EQUAL( tier_demoted, tier_of(rank_score_of(names[0])) );
    trigger_reschedule();
 
    BOOST_REQUIRE( !is_scheduled(names[0]) );
@@ -5997,11 +6001,35 @@ BOOST_FIXTURE_TEST_CASE( unregprod_parks_without_touching_the_bond, producer_sco
 
    BOOST_REQUIRE_EQUAL( success(), push_system_action(names[0], "regproducer"_n, mvo()
       ("producer", names[0])("producer_key", get_public_key(names[0], "active"))("url", "")("location", 0)) );
+   BOOST_REQUIRE_EQUAL( tier_healthy, tier_of(rank_score_of(names[0])) );
    trigger_reschedule();
 
    BOOST_REQUIRE( is_scheduled(names[0]) );
    BOOST_REQUIRE_EQUAL( before, rank_score_of(names[0]) );        // same bond, same position
    BOOST_REQUIRE_EQUAL( 1u, producer_rank_position(names[0]) );
+} FC_LOG_AND_RETHROW()
+
+// A slash or a termination ends a producer's standing, and its rank key has to say so at once:
+// opreg dispatches the same `processprod` notification it uses for balance changes, and the
+// rescore sinks the key to the demoted tier in the same transaction. Before this, a slashed
+// position-1 producer stayed first in the index -- skipped by every walk, but visited by every
+// one of them -- until an unrelated event rescored it.
+BOOST_FIXTURE_TEST_CASE( slash_and_termination_sink_the_key_at_once, producer_score_tester ) try {
+   auto names = setup_collateralized_producers(5);
+   for (const auto& p : names) BOOST_REQUIRE_EQUAL( tier_healthy, tier_of(rank_score_of(p)) );
+
+   BOOST_REQUIRE_EQUAL( success(), slash_operator(names[4]) );
+   BOOST_REQUIRE_EQUAL( tier_demoted, tier_of(rank_score_of(names[4])) );
+
+   BOOST_REQUIRE_EQUAL( success(), terminate_operator(names[3]) );
+   BOOST_REQUIRE_EQUAL( tier_demoted, tier_of(rank_score_of(names[3])) );
+
+   // The others are untouched, and the two sunk rows now sort BEHIND every one of them in index
+   // order (equal demoted keys fall back to name order), so a walk stops before reaching either.
+   for (uint32_t i = 0; i < 3; ++i) BOOST_REQUIRE_EQUAL( tier_healthy, tier_of(rank_score_of(names[i])) );
+   BOOST_REQUIRE_EQUAL( 3u, producer_rank_position(names[2]) );
+   BOOST_REQUIRE_EQUAL( 4u, producer_rank_position(names[3]) );
+   BOOST_REQUIRE_EQUAL( 5u, producer_rank_position(names[4]) );
 } FC_LOG_AND_RETHROW()
 
 // ---------------------------------------------------------------------------

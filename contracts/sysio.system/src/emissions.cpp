@@ -811,11 +811,13 @@ void system_contract::payepoch(uint32_t epoch_index,
    //
    // Counters accumulate across non-pay epochs (no reset by accrueepoch) and are zeroed at the
    // end of this action for every producer PAID by it. A producer that is not schedulable when the
-   // walk reaches it -- parked, keyless, slashed, terminated -- is neither paid nor reset: its
-   // block count waits for the first payepoch where it is schedulable again (a parked or re-keyed
-   // producer's return; never, for a slashed or terminated one). A producer BELOW the walk
-   // (demoted, or parked and already rescored) is not visited at all, with the same effect. Every
-   // block a producer makes is paid exactly once, at the first payepoch where it is payable.
+   // walk reaches it -- keyless, or one whose standing ended since its last rescore -- is neither
+   // paid nor reset: its block count waits for the first payepoch where it is schedulable again
+   // (a re-keyed producer's return; a terminated operator's, should it settle and re-register;
+   // never, for a slashed one, whose row is never pruned and which `regoperator` refuses). A
+   // producer BELOW the walk (demoted, parked, unbonded, slashed, terminated -- each rescored at
+   // the event) is not visited at all, with the same effect. Every block a producer makes is paid
+   // exactly once, at the first payepoch where it is payable.
    // =======================================================================
    {
       auto prod_by_rank = _producers.get_index<"prodrank"_n>();
@@ -857,7 +859,8 @@ void system_contract::payepoch(uint32_t epoch_index,
       // counter-reset list (to_reset). `position` is POSITION in this index among SCHEDULABLE
       // producers, counted while walking -- not a stored ordinal. The demoted tier sorts last and
       // is never schedulable, so it bounds the walk over what is a permissionless, unbounded
-      // table; every row above it is an ACTIVE bonded producer operator.
+      // table; every row above it was a live, bonded producer operator at its last rescore, and
+      // every event that ends that standing rescores the row (see producer_rank::compute).
       //
       // The divisor counts exactly the blocks this payepoch pays for. A count that waits on an
       // unpayable row is neither paid nor counted now; when its producer is payable again the

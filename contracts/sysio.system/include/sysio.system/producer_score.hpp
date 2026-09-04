@@ -3,7 +3,6 @@
 #include <sysio/name.hpp>
 #include <sysio/opp/types/types.pb.hpp>
 #include <sysio.opreg/sysio.opreg.hpp>
-#include <sysio.uwrit/sysio.uwrit.hpp>
 
 #include <sysio.system/opreg_status.hpp>
 #include <sysio.system/producer_rank.hpp>
@@ -16,59 +15,43 @@
 // on-chain standing into the composite score `producer_rank::pack` encodes.
 //
 // Split from producer_rank.hpp, which sysio.system.hpp includes, because this header pulls in the
-// sysio.opreg and sysio.uwrit table declarations plus the OPP protobuf types. Only the translation
-// units that actually compute a score include it -- the same reason opreg_status.hpp exists
-// separately.
+// sysio.opreg table declarations plus the OPP protobuf types. Only the translation units that
+// actually compute a score include it -- the same reason opreg_status.hpp exists separately.
 
 namespace sysiosystem {
 
    namespace producer_rank {
 
-      /// Well-known sysio.uwrit account -- `locksums` lives here and is the O(1) read cache for a
-      /// bucket's active locks.
-      namespace uwrit_refs {
-         constexpr sysio::name account = "sysio.uwrit"_n;
-      }
-
       /**
-       * Balance minus active locks for one (chain, token) pair, read cross-contract from sysio.opreg
-       * and sysio.uwrit.
+       * The bond a producer has posted on one (chain, token) pair, read from its sysio.opreg row.
        *
-       * This is opreg's `slashable_now`, NOT its `available()`. available() subtracts pending
-       * withdraws, and withdraw / cancelwtdw are both free and uncapped -- an operator could
-       * oscillate their own rank without moving funds. available() also walks the withdraw queue per
-       * account with no row cap, where this is two O(1) lookups. Ranking on what is actually
-       * slashable is also the right principle: score should track what can be taken from you, and a
-       * queued withdraw does not reduce exposure.
+       * This is what a slash seizes from a producer, and it is deliberately the BALANCE rather than
+       * opreg's `available()`: available() subtracts pending withdraws, and withdraw / cancelwtdw are
+       * both free, uncapped and cooldown-free, so an operator could oscillate their own rank without
+       * moving funds. Score tracks what can be taken from you, and a queued withdraw does not reduce
+       * exposure. Nothing is subtracted for sysio.uwrit locks: an account holds exactly one operator
+       * row of one type, and only ACTIVE underwriters ever carry locks, so a PRODUCER's whole balance
+       * is slashable.
        *
        * @param op         the operator row read from sysio.opreg.
        * @param chain_code the chain slug of the pair.
        * @param token_code the token slug of the pair.
-       * @return balance minus active locks, saturating at zero.
+       * @return the pair's balance, or 0 when the operator holds no row for it.
        */
-      inline uint64_t slashable_now(const sysio::opreg::operator_entry& op,
-                                    sysio::slug_name chain_code,
-                                    sysio::slug_name token_code) {
-         uint64_t balance = 0;
-         bool     found   = false;
+      inline uint64_t bonded_balance(const sysio::opreg::operator_entry& op,
+                                     sysio::slug_name chain_code,
+                                     sysio::slug_name token_code) {
          for (const auto& entry : op.balances) {
             if (entry.chain_code == chain_code && entry.token_code == token_code) {
-               balance = entry.balance;
-               found   = true;
-               break;
+               return entry.balance;
             }
          }
-         if (!found) return 0;
-
-         sysio::uwrit::locksums_t sums(uwrit_refs::account);
-         const sysio::uwrit::lock_sum_key key{op.account, chain_code, token_code};
-         const uint64_t locked = sums.contains(key) ? sums.get(key).amount : 0;
-         return balance > locked ? balance - locked : 0;
+         return 0;
       }
 
       /**
        * Collateral factor: the MINIMUM, across every (chain, token) pair in `req_prod_collat`, of
-       * slashable / min_bond -- in basis points, linear and uncapped (saturating only at the bit
+       * bonded / min_bond -- in basis points, linear and uncapped (saturating only at the bit
        * budget).
        *
        * `min` rather than a sum: posting extra on the cheapest chain must do nothing, so raising the
@@ -94,10 +77,10 @@ namespace sysiosystem {
             // than divide by zero if that ever regresses.
             check(req.min_bond > 0, "req_prod_collat entry has a zero min_bond");
 
-            // uint128 intermediate is mandatory: slashable_now runs to 2^62 and multiplying by
+            // uint128 intermediate is mandatory: a bond runs to 2^62 and multiplying by
             // score_scale overflows uint64.
             const unsigned __int128 scaled =
-               static_cast<unsigned __int128>(slashable_now(op, req.chain_code, req.token_code))
+               static_cast<unsigned __int128>(bonded_balance(op, req.chain_code, req.token_code))
                * static_cast<unsigned __int128>(score_scale);
             const unsigned __int128 ratio = scaled / static_cast<unsigned __int128>(req.min_bond);
             const uint64_t bounded = ratio > static_cast<unsigned __int128>(composite_max)
@@ -193,6 +176,8 @@ namespace sysiosystem {
       /// four positional flags so a new factor's input is a new member, not a new parameter at every
       /// call site.
       struct score_inputs {
+         /// Whether the producers row is active -- false after `unregprod` parks it.
+         bool     is_active                  = true;
          /// Whether the producer is currently demoted for consecutive missed rounds.
          bool     is_demoted                 = false;
          /// The producer's current miss streak.
@@ -216,16 +201,19 @@ namespace sysiosystem {
       inline uint64_t compute(const sysio::name& producer,
                               const score_inputs& inputs,
                               const producer_score_config& weights) {
-         // A producer that is not a live, collateral-backed PRODUCER operator scores into the
-         // demoted tier. That is correct on its own terms -- an unbonded registrant must never
-         // outrank a bonded one -- and it is also what BOUNDS the rank walk: `regproducer` is
-         // permissionless, so without this every consumer would scan an unbounded table. With it,
-         // the healthy and bootstrapped tiers hold only producers that were ACTIVE operators at
-         // their LAST rescore, and a consumer stops at the first demoted entry. "Last rescore" is
-         // deliberate: a terminated or slashed operator is not notified (`reevaluate_eligibility`
-         // returns early on a terminal status), so its key sits in its old tier until the next
-         // sweep. That is harmless -- every consumer also tests the live predicate before counting
-         // a position -- so the one row is read once here rather than twice.
+         // A producer that is not a live, collateral-backed PRODUCER operator -- parked by
+         // `unregprod`, unbonded, slashed, terminated -- scores into the demoted tier. That is
+         // correct on its own terms (an unbonded registrant must never outrank a bonded one) and it
+         // is also what BOUNDS the rank walk: `regproducer` is permissionless, so without this
+         // every consumer would scan an unbounded table. With it, the healthy and bootstrapped
+         // tiers hold only producers that were live at their LAST rescore, and a consumer stops at
+         // the first demoted entry. Every event that can end a producer's standing rescores it --
+         // `unregprod` directly, and sysio.opreg through its `processprod` notification, which it
+         // dispatches on every balance change AND on slash and termination. The one row a rescore
+         // cannot reach is one `prune` erased, and the termination before it already sank the
+         // key; every consumer still tests the live predicate before counting a position.
+         if (!inputs.is_active) return unscored();
+
          sysio::opreg::operators_t ops(opreg_refs::account);
          const auto op_key = sysio::opreg::operator_key{producer.value};
          if (!ops.contains(op_key)) return unscored();
@@ -276,18 +264,34 @@ namespace sysiosystem {
          producer_score_config_t weights_tbl(self);
          const auto weights = weights_tbl.get_or_default(producer_score_config{});
 
-         const auto info  = producers.get(key);
-         const auto score = compute(
-            producer,
-            score_inputs{
-               .is_demoted                = info.is_demoted,
-               .consecutive_missed_rounds = info.consecutive_missed_rounds,
-               .snapshot_attestations     = info.snapshot_attestations
-            },
-            weights);
+         const auto info = producers.get(key);
+         auto inputs = score_inputs{
+            .is_active                 = info.active(),
+            .is_demoted                = info.is_demoted,
+            .consecutive_missed_rounds = info.consecutive_missed_rounds,
+            .snapshot_attestations     = info.snapshot_attestations
+         };
+         uint64_t score = compute(producer, inputs, weights);
 
-         if (score == info.rank_score) return;   // no index move needed
-         producers.modify(same_payer, key, [&](auto& row) { row.rank_score = score; });
+         // A producer RE-ENTERING the walk starts the period's snapshot credit at zero. `payepoch`
+         // zeroes the counter only on the rows it visits, and it never visits the demoted tier, so
+         // a credit earned before a demotion, a park or a de-collateralization would otherwise
+         // ride back in as a stale factor and outrank a producer that actually attested this
+         // period. Only the credit restarts: the miss streak stays, so leaving and re-entering
+         // cannot be used to dodge a demotion, and the block count is pay, never a score input.
+         const bool re_entering  = tier_of(info.rank_score) == producer_tier::demoted
+                                && tier_of(score) != producer_tier::demoted;
+         const bool reset_credit = re_entering && info.snapshot_attestations > 0;
+         if (reset_credit) {
+            inputs.snapshot_attestations = 0;
+            score = compute(producer, inputs, weights);
+         }
+
+         if (score == info.rank_score && !reset_credit) return;   // no index move needed
+         producers.modify(same_payer, key, [&](auto& row) {
+            row.rank_score = score;
+            if (reset_credit) row.snapshot_attestations = 0;
+         });
       }
 
    } // namespace producer_rank

@@ -662,6 +662,40 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_quorum_credits_voting_producers, snapshot_v
    BOOST_REQUIRE_EQUAL(key3, key_of("producer3"_n));
 } FC_LOG_AND_RETHROW() }
 
+// A credit is a per-period factor, and `payepoch` zeroes it only on the rows it visits -- never
+// the demoted tier. A producer that leaves the walk with a credit (a park here; a demotion or a
+// de-collateralization take the same path) must therefore restart at zero when it re-enters,
+// or a credit earned before it left would outrank a producer that actually attested this period.
+BOOST_FIXTURE_TEST_CASE(re_entering_the_walk_restarts_the_snapshot_credit, snapshot_voting_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2));
+   produce_blocks();
+
+   const auto attestations_of = [this](account_name producer) {
+      return get_producer_info(producer)["snapshot_attestations"].as<uint32_t>();
+   };
+   const auto key_of = [this](account_name producer) {
+      return get_producer_info(producer)["rank_score"].as<uint64_t>();
+   };
+   const uint64_t uncredited = key_of("producer1"_n);
+
+   const auto block_num = vote_block_num();
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, make_block_id(block_num), make_snap_hash(1)));
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, make_block_id(block_num), make_snap_hash(1)));
+   BOOST_REQUIRE_EQUAL(1u, attestations_of("producer1"_n));
+   BOOST_REQUIRE_LT(key_of("producer1"_n), uncredited);
+
+   // Leaving the walk keeps the counter (nothing visits the row to zero it) ...
+   BOOST_REQUIRE_EQUAL(success(), unregproducer("producer1"_n));
+   BOOST_REQUIRE_EQUAL(1u, attestations_of("producer1"_n));
+
+   // ... and re-entering restarts it: the key comes back exactly as it was before the credit.
+   BOOST_REQUIRE_EQUAL(success(), regproducer("producer1"_n));
+   BOOST_REQUIRE_EQUAL(0u, attestations_of("producer1"_n));
+   BOOST_REQUIRE_EQUAL(uncredited, key_of("producer1"_n));
+} FC_LOG_AND_RETHROW() }
+
 BOOST_FIXTURE_TEST_CASE(votesnaphash_same_tuple_retry_is_idempotent, snapshot_voting_tester) { try {
    // Need 2 providers, min_providers=2 so single vote won't attest and purge
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));

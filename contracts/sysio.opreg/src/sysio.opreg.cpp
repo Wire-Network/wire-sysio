@@ -1106,6 +1106,22 @@ void reevaluate_eligibility(opreg::operators_t& ops,
    ).send();
 }
 
+/// Tell sysio.system that a producer's standing ended through a path
+/// `reevaluate_eligibility` does not cover -- a terminal transition (slash,
+/// termination). Same `processprod` channel, no eligibility transition
+/// (was == is), so the notification is the whole effect: sysio.system rescores
+/// the producer from its live status and sinks its rank key at once, instead of
+/// leaving a slashed or terminated producer in the healthy tier until some
+/// unrelated event rescored it.
+void notify_producer_standing(name self, const opreg::operator_entry& op) {
+   if (op.type != OperatorType::OPERATOR_TYPE_PRODUCER) return;
+   action(
+      permission_level{self, "active"_n},
+      self, "processprod"_n,
+      std::make_tuple(op.account, false, false)
+   ).send();
+}
+
 } // anonymous namespace
 
 // ---------------------------------------------------------------------------
@@ -1394,24 +1410,28 @@ void process_eligibility_change(name self, name account,
    // belongs at the transition sink as well as at each caller. A stale or
    // newly introduced callback must never reactivate an operator after slash
    // or termination merely because its collateral predicate says eligible.
-   if (has_terminal_status(ops.get(op_pk).status)) return;
+   // The notification below is NOT gated on it: a producer's terminal
+   // transition is exactly what sysio.system must hear about, and slash and
+   // termination dispatch through here (`notify_producer_standing`) to say so.
+   const bool terminal = has_terminal_status(ops.get(op_pk).status);
 
    auto now = current_time_ms();
-   if (!was_eligible && is_eligible) {
+   if (!terminal && !was_eligible && is_eligible) {
       ops.modify(same_payer, op_pk, [&](auto& o) {
          o.status       = OperatorStatus::OPERATOR_STATUS_ACTIVE;
          o.available_at = now;
       });
-   } else if (was_eligible && !is_eligible) {
+   } else if (!terminal && was_eligible && !is_eligible) {
       ops.modify(same_payer, op_pk, [&](auto& o) {
          o.status = OperatorStatus::OPERATOR_STATUS_UNKNOWN;
       });
    }
 
    // Notify OUTSIDE the transition branches. sysio.system rescores the producer's rank from its
-   // live collateral, so it must hear about a top-up that changed no status, and about a drop out
-   // of ACTIVE -- not only about a promotion into it. A stale score is not merely cosmetic: it
-   // leaves a de-collateralized producer holding an index slot ahead of bonded ones.
+   // live standing, so it must hear about a top-up that changed no status, about a drop out of
+   // ACTIVE, and about a slash or termination -- not only about a promotion. A stale score is not
+   // merely cosmetic: it leaves a de-collateralized, slashed or terminated producer holding an
+   // index slot ahead of bonded ones.
    if (notify_system) {
       require_recipient(opreg::SYSTEM_ACCOUNT);
    }
@@ -1484,6 +1504,8 @@ void opreg::slash(name account, std::string reason) {
       emit_slash_attestation(get_self(), slash_action);
       append_action_log(ops, op_pk, slash_action, /*success*/ true, "");
    }
+
+   notify_producer_standing(get_self(), op);
 }
 
 // ---------------------------------------------------------------------------
@@ -1628,6 +1650,8 @@ void terminate_inline(name self, name account, const std::string& reason) {
       append_action_log(ops, op_pk, remit_action, /*success*/ true,
                         std::string("terminate-remit"));
    }
+
+   notify_producer_standing(self, op);
 }
 
 } // anonymous namespace
