@@ -34,6 +34,45 @@ inline constexpr uint32_t T1_MAX_NODE_OWNERS = 21;
 inline constexpr uint32_t T2_MAX_NODE_OWNERS = 84;
 inline constexpr uint32_t T3_MAX_NODE_OWNERS = 1000;
 
+// Each recorded roster can contain at most sysio.epoch's 100 scheduled
+// operators. Keeping at most ten epochs of history bounds roster retention and
+// coalescing work. The joint cadence x roster-size guard below separately keeps
+// the expensive per-recipient payout work at the prior one-roster ceiling. At
+// the intended production topology of 21 operators per epoch, this permits a
+// maximum cadence of 4 (about 24 minutes at six-minute epochs). Raising the
+// credit cap requires separate evidence that a larger mandatory advance fits
+// the transaction CPU/KV budget.
+inline constexpr uint16_t MAX_PAY_CADENCE_EPOCHS = 10;
+inline constexpr uint32_t MAX_BATCH_PAYOUT_CREDITS = 100;
+// payepoch removes at most this many roster-history rows per payment. Normal
+// operation adds no more than MAX_PAY_CADENCE_EPOCHS rows, so a malformed or
+// legacy overlong table drains monotonically without an unbounded erase loop.
+inline constexpr uint32_t MAX_BATCH_HISTORY_CLEANUP_ROWS =
+   MAX_PAY_CADENCE_EPOCHS * 2;
+
+inline uint16_t history_bounded_pay_cadence_epochs(uint16_t configured_cadence) {
+   return std::clamp<uint16_t>(configured_cadence, 1, MAX_PAY_CADENCE_EPOCHS);
+}
+
+inline bool batch_payout_work_fits(uint16_t pay_cadence_epochs,
+                                   uint32_t operators_per_epoch) {
+   return static_cast<uint64_t>(pay_cadence_epochs) * operators_per_epoch
+      <= MAX_BATCH_PAYOUT_CREDITS;
+}
+
+// Existing chains can carry a configuration written before the joint payout
+// bound existed. Shorten that effective period at the advance gate rather than
+// risking an over-budget mandatory inline payepoch. The runtime history check
+// remains defense-in-depth for malformed rosters and legacy operator counts.
+inline uint16_t effective_pay_cadence_epochs(uint16_t configured_cadence,
+                                             uint32_t operators_per_epoch) {
+   const uint16_t history_bounded = history_bounded_pay_cadence_epochs(configured_cadence);
+   const uint32_t safe_operators = std::max<uint32_t>(operators_per_epoch, 1);
+   const uint32_t work_bounded = std::max<uint32_t>(
+      MAX_BATCH_PAYOUT_CREDITS / safe_operators, 1);
+   return std::min<uint16_t>(history_bounded, static_cast<uint16_t>(work_bounded));
+}
+
 // ---------------------------------------------------------------------------
 // Emission configuration (set via setemitcfg action)
 // ---------------------------------------------------------------------------
@@ -86,17 +125,18 @@ struct [[sysio::table("emitcfg"), sysio::contract("sysio.system")]] emission_con
    uint16_t  standby_bps;
 
    // Audit-log retention. Caps the unbounded `epochlog` table at this many
-   // rows; payepoch prunes head-first after each insert. One row per epoch
-   // (~64 bytes), so 8640 ~= 30 days at 6-min epoch cadence.
+   // rows; payepoch prunes head-first after each insert. There is one row per
+   // payment period (one per epoch when pay_cadence_epochs == 1).
    uint32_t  epoch_log_retention_count;
 
    // How many epochs accumulate before `payepoch` actually fires. 1 = pay
-   // every epoch (matches the original emissions behavior). Recommended
-   // production value: 100, which at a 6-min epoch is ~10h between pays
-   // and at a 1-min epoch is ~1h40m. Higher values reduce the per-tick
-   // inline-transfer count proportionally; the period-aggregate emission
-   // and per-recipient share-by-rounds math stay equivalent to summing
-   // the per-epoch results. Must be > 0; setemitcfg rejects zero.
+   // every epoch (matches the original emissions behavior). The roster history
+   // retained for a period is explicitly bounded at 10 epochs, while cadence x
+   // operators_per_epoch is bounded separately to at most 100 recipient credits
+   // per payout. At 21 operators this makes 4 the maximum production cadence.
+   // The period aggregate and per-recipient share-by-rounds math
+   // remain equivalent to summing per-epoch results. Must be in
+   // [1, MAX_PAY_CADENCE_EPOCHS].
    uint16_t  pay_cadence_epochs;
 
    SYSLIB_SERIALIZE(emission_config,
@@ -282,11 +322,11 @@ struct [[sysio::table("t5state"), sysio::contract("sysio.system")]] t5_state {
    // legacy per-epoch behavior is unchanged.
    int64_t                pending_emission_amount = 0;
    uint32_t               period_start_epoch      = 0;
-   // Per-batch-op-group active-epoch counter, indexed by group number.
-   // accrueepoch increments batch_group_epochs[current_batch_op_group]
-   // each non-pay epoch; payepoch divides batch_pool proportionally
-   // and clears the vector. Sized lazily to current_batch_op_group+1
-   // on first use; pre-pay-cadence chains see length 0.
+   // Per-batch-op-schedule-position active-epoch counter. This remains the
+   // authoritative count of accrued epochs; immutable roster snapshots live
+   // in batchepochs_t so schedule rotation cannot reassign prior epochs.
+   // Sized lazily to current_batch_op_group+1 on first use; pre-pay-cadence
+   // chains see length 0.
    std::vector<uint32_t>  batch_group_epochs;
 
    // Cumulative shortfall (WIRE subunits) between requested and actually-
@@ -303,6 +343,23 @@ struct [[sysio::table("t5state"), sysio::contract("sysio.system")]] t5_state {
 };
 
 using t5state_t = sysio::kv::global<"t5state"_n, t5_state>;
+
+// One immutable batch-operator roster for each accrued epoch in the pending
+// payment period. payepoch consumes and clears this history atomically.
+struct batch_epoch_key {
+   uint32_t sysio_epoch_index;
+
+   SYSLIB_SERIALIZE(batch_epoch_key, (sysio_epoch_index))
+};
+
+struct [[sysio::table("batchepochs"), sysio::contract("sysio.system")]] batch_epoch {
+   uint32_t                 sysio_epoch_index;
+   std::vector<sysio::name> members;
+
+   SYSLIB_SERIALIZE(batch_epoch, (sysio_epoch_index)(members))
+};
+
+using batchepochs_t = sysio::kv::table<"batchepochs"_n, batch_epoch_key, batch_epoch>;
 
 // ---------------------------------------------------------------------------
 // Per-epoch derivations from annual config + canonical epoch_duration_sec.
@@ -441,10 +498,20 @@ struct [[sysio::table("epochlog"), sysio::contract("sysio.system")]] epoch_log {
    // fee, which accrues in sysio.reserv and is claimed there — it never reaches
    // this treasury and so never appears in this log.
    int64_t                fee_distributed   = 0;
+   // Durable attribution for WIRE left in the treasury by the batch payout.
+   // Retained emission includes incomplete-history recovery; retained swept
+   // fees arise only after a non-empty roster enabled the sweep, from another
+   // empty roster, inactive members, or integer-division remainders. Incomplete
+   // and all-empty history leave fees in sysio.reserv.
+   // history_complete distinguishes recovery from eligibility shortfalls.
+   bool                   batch_history_complete   = false;
+   int64_t                batch_emission_retained  = 0;
+   int64_t                batch_fee_retained       = 0;
 
    SYSLIB_SERIALIZE(epoch_log,
       (sysio_epoch_index)(epoch_count)(timestamp)(total_emission)
-      (compute_amount)(capex_amount)(governance_amount)(fee_distributed))
+      (compute_amount)(capex_amount)(governance_amount)(fee_distributed)
+      (batch_history_complete)(batch_emission_retained)(batch_fee_retained))
 };
 
 using epochlog_t = sysio::kv::table<"epochlog"_n, epochlog_key, epoch_log>;

@@ -30,8 +30,6 @@ void reevaluate_eligibility(opreg::operators_t& ops,
                             name self,
                             name account);
 
-using namespace sysio::slug_name_literals;
-
 // System-owned rows bill to the sysio RAM pool, not this contract account (privileged-contract
 // model, as sysio.token uses): the account stays finite at code+abi size; growth draws from the pool.
 constexpr name ram_payer = "sysio"_n;
@@ -59,14 +57,6 @@ void credit_remit_claim(name self, name account, uint64_t amount) {
                                  opreg::remit_claim{.account = account}, amount,
                                  now_sec + opreg::REMIT_CLAIM_WINDOW_SEC);
 }
-
-/// Well-known chain code for the WIRE depot itself. Comparisons of the form
-/// `chain == ChainKind::CHAIN_KIND_WIRE` are now `chain_code == kWireChainCode`.
-constexpr sysio::slug_name kWireChainCode = "WIRE"_s;
-
-/// Well-known token code for the WIRE-native token. Replaces the historical
-/// `TokenKind::TOKEN_KIND_WIRE` discriminant in (chain, token) tuples.
-constexpr sysio::slug_name kWireTokenCode = "WIRE"_s;
 
 uint64_t current_time_ms() {
    return static_cast<uint64_t>(current_time_point().sec_since_epoch()) * 1000;
@@ -544,7 +534,7 @@ namespace {
 
 /// Maximum collateral a single `(chain_code, token_code)` balance row may hold:
 /// the Antelope `asset` magnitude limit (`2^62 - 1`). A stored balance above
-/// this cannot be carried by the WIRE-frame `asset()` that the withdraw /
+/// this cannot be carried by the `asset()` that the withdraw /
 /// terminate remit path constructs — `asset()` `check()`-aborts past
 /// `asset::max_amount` — so every credit is gated to keep the running sum within
 /// range. The WSA-028 ingress gate (`sysio.msgch`) already bounds a *single*
@@ -724,7 +714,7 @@ OperatorAction build_slash_action(name account,
 /// the WIRE chain) or has no registered outpost.
 void emit_slash_attestation(name self, const OperatorAction& slash_action) {
    const sysio::slug_name chain_code{slash_action.chain_code};
-   if (chain_code == kWireChainCode) return;
+   if (chain_code == opp::wire::chain_code) return;
    auto resolved = find_outpost_id_for_chain(chain_code);
    if (!resolved) return;   // no outpost on this chain — nothing to slash through
 
@@ -1001,8 +991,8 @@ void opreg::withdraw(name account, uint64_t amount) {
    operators_t ops(get_self());
    auto op_pk = operator_key{account.value};
 
-   auto result = try_enqueue_withdraw(account, kWireChainCode, kWireTokenCode, amount);
-   auto action = build_withdraw_request_action(account, kWireChainCode, kWireTokenCode, amount,
+   auto result = try_enqueue_withdraw(account, opp::wire::chain_code, opp::wire::token_code, amount);
+   auto action = build_withdraw_request_action(account, opp::wire::chain_code, opp::wire::token_code, amount,
                                                result.request_id);
    append_action_log(ops, op_pk, action, result.success, std::move(result.error_message));
    if (result.success) {
@@ -1160,7 +1150,7 @@ void opreg::deposit(name account, uint64_t amount) {
    // `deposit`. A separate pre-read-then-check-then-credit could let two credits
    // pass against the same stale balance and push the WIRE row past
    // `asset::max_amount` — recreating the withdraw/terminate remit abort
-   // (`asset(balance, CORE_SYM)` aborts above the limit). Checking inside the
+   // (`asset(balance, WIRE_SYM)` aborts above the limit). Checking inside the
    // modify makes check+credit indivisible, and crediting before the transfer
    // means any re-entry observes the committed balance. A direct user deposit may
    // legitimately `check()`-throw here (unlike the never-throw OPP `depositinle`);
@@ -1168,9 +1158,9 @@ void opreg::deposit(name account, uint64_t amount) {
    // transaction — including this credit — rolls back. (SEC-103; PR #449 review.)
    ops.modify(same_payer, op_pk, [&](auto& o) {
       check(amount <= MAX_COLLATERAL_AMOUNT &&
-               balance_of(o, kWireChainCode, kWireTokenCode) <= MAX_COLLATERAL_AMOUNT - amount,
+               balance_of(o, opp::wire::chain_code, opp::wire::token_code) <= MAX_COLLATERAL_AMOUNT - amount,
             "deposit would exceed max collateral");
-      add_balance(o, kWireChainCode, kWireTokenCode, amount);
+      add_balance(o, opp::wire::chain_code, opp::wire::token_code, amount);
    });
 
    // Direct WIRE token transfer from operator -> opreg, sent after the credit so
@@ -1179,13 +1169,13 @@ void opreg::deposit(name account, uint64_t amount) {
       permission_level{account, "active"_n},
       TOKEN_ACCOUNT, "transfer"_n,
       std::make_tuple(account, get_self(),
-         asset(static_cast<int64_t>(amount), CORE_SYM),
+         asset(static_cast<int64_t>(amount), WIRE_SYM),
          std::string("opreg::deposit"))
    ).send();
 
    auto deposit_action = build_deposit_action(
-      operator_chain_address(account, kWireChainCode),
-      kWireChainCode, kWireTokenCode, amount);
+      operator_chain_address(account, opp::wire::chain_code),
+      opp::wire::chain_code, opp::wire::token_code, amount);
    append_action_log(ops, op_pk, deposit_action, /*success*/ true, "");
 
    reevaluate_eligibility(ops, op_pk, get_self(), account);
@@ -1266,7 +1256,7 @@ void opreg::depositinle(name account,
    }
    // SEC-103 (WSA-028 follow-up): the credited collateral must stay within the
    // asset magnitude range so the WIRE-direct remit path's `asset(balance,
-   // CORE_SYM)` can never abort — an abort on this OPP-inbound path would stall
+   // WIRE_SYM)` can never abort — an abort on this OPP-inbound path would stall
    // consensus. The msgch ingress gate already bounds a single `amount` to
    // `asset::max_amount`; this additionally bounds the running sum. Fail closed
    // by refunding via DEPOSIT_REVERT — never `check()`.
@@ -1372,7 +1362,7 @@ void opreg::flushwtdw(uint32_t current_epoch) {
       // `sysio.epoch::advance`, where a pushed transfer would let the operator's notify handler
       // abort epoch advancement chain-wide. For outpost chains: queue an
       // OPERATOR_ACTION(WITHDRAW_REMIT) to the outpost so it can release the escrow on its end.
-      if (row.chain_code == kWireChainCode) {
+      if (row.chain_code == opp::wire::chain_code) {
          credit_remit_claim(get_self(), row.account, row.amount);
       } else {
          emit_withdraw_remit(get_self(), row.account, op.type,
@@ -1575,7 +1565,7 @@ void opreg::releaselock(name account,
       // and leaving the lock unreleased on every retry. (Aborting the termination itself is the
       // `terminate_inline` case below.) Otherwise queue WITHDRAW_REMIT so the outpost can transfer
       // to the authex destination. request_id == 0 (this remit isn't queued in wtdwqueue).
-      if (chain_code == kWireChainCode) {
+      if (chain_code == opp::wire::chain_code) {
          credit_remit_claim(get_self(), account, settle_amount);
       } else {
          emit_withdraw_remit(get_self(), op.account, op.type,
@@ -1639,7 +1629,7 @@ void terminate_inline(name self, name account, const std::string& reason) {
    // a normal queued withdraw, only resolvable by querying msgch internals
    // (which are transient — the rows drain on the next `buildenv`).
    for (const auto& rp : to_remit) {
-      if (rp.chain_code == kWireChainCode) {
+      if (rp.chain_code == opp::wire::chain_code) {
          credit_remit_claim(self, account, rp.amount);
       } else {
          emit_withdraw_remit(self, account, op.type,
@@ -1677,7 +1667,7 @@ void opreg::claimremit(name account) {
    remitclaims_t claims(get_self());
    sysio::opp::claimable::pay_out(
       claims, remitclaim_key{account.value}, get_self(), TOKEN_ACCOUNT,
-      account, CORE_SYM, std::string("opreg::claimremit collateral payout"),
+      account, WIRE_SYM, std::string("opreg::claimremit collateral payout"),
       "no claimable remit for this account");
 }
 
