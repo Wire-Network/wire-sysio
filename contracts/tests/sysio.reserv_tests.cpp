@@ -563,6 +563,7 @@ BOOST_FIXTURE_TEST_CASE(oncrtreserve_unlinked_creator_is_cancelled, sysio_reserv
 BOOST_FIXTURE_TEST_CASE(oncrtreserve_creator_chain_kind_mismatch_is_cancelled,
                         sysio_reserve_tester) { try {
    deploy_authex();
+   deploy_msgch();
 
    auto creator_pub = fc::crypto::private_key::generate(
       fc::crypto::private_key::key_type::ed).get_public_key();
@@ -589,6 +590,42 @@ BOOST_FIXTURE_TEST_CASE(oncrtreserve_creator_chain_kind_mismatch_is_cancelled,
    BOOST_REQUIRE(!r.is_null());
    BOOST_REQUIRE_EQUAL("RESERVE_STATUS_CANCELLED", r["status"].as_string());
    BOOST_REQUIRE(r["creator_pub_key"].as_string().empty());
+
+   // The mismatch must take the refund path, not merely write the tombstone.
+   // `queueout` starts attestation ids at 1 (id 0 is its sequence singleton).
+   auto queued = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "attestations"_n, 1);
+   BOOST_REQUIRE(!queued.empty());
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(oncrtreserve_invalid_creator_address_is_cancelled,
+                        sysio_reserve_tester) { try {
+   deploy_authex();
+
+   auto creator_pub = fc::crypto::private_key::generate(
+      fc::crypto::private_key::key_type::em).get_public_key();
+   BOOST_REQUIRE_EQUAL(success(),
+      recordlink("alice"_n, ChainKind::CHAIN_KIND_EVM, creator_pub));
+   const auto creator_key = em_pubkey_bytes(creator_pub);
+
+   BOOST_REQUIRE_EQUAL(success(), push_action(MSGCH_ACCOUNT, "oncrtreserve"_n, mvo()
+      ("chain_code",            codename_mvo("ETH"))
+      ("token_code",            codename_mvo("ETH"))
+      ("reserve_code",          codename_mvo("BADADDR"))
+      ("name",                  "malformed creator address")
+      ("description",           "")
+      ("external_token_amount", 1000)
+      ("requested_wire_amount", 1000)
+      ("source_token_precision", 9u)
+      ("connector_weight_bps",  5000)
+      ("creator_chain_kind",    ChainKind::CHAIN_KIND_EVM)
+      ("creator_chain_addr",    std::vector<char>(32, '\x01'))
+      ("is_private",            false)
+      ("creator_pub_key",       creator_key)));
+
+   auto r = find_reserve("ETH", "ETH", "BADADDR");
+   BOOST_REQUIRE(!r.is_null());
+   BOOST_REQUIRE_EQUAL("RESERVE_STATUS_CANCELLED", r["status"].as_string());
+   BOOST_REQUIRE(r["creator_addr"]["address"].as_string().empty());
 } FC_LOG_AND_RETHROW() }
 
 // A re-relay of the same unlinked create must be idempotent — it must NOT

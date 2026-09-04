@@ -130,6 +130,18 @@ registered_chain_kind_or_skip(sysio::slug_name chain_code, const char* handler) 
    return std::nullopt;
 }
 
+/// Validate the raw creator address against the authoritative registry kind.
+/// User-created reserves originate on supported external outposts only: EVM
+/// addresses are 20 bytes and SVM addresses are 32 bytes. Unknown/depot kinds
+/// are not valid creator-address domains for this handler.
+bool creator_address_matches_kind(opp::types::ChainKind kind,
+                                  const std::vector<char>& address) {
+   using opp::types::ChainKind;
+   if (kind == ChainKind::CHAIN_KIND_EVM) return address.size() == 20;
+   if (kind == ChainKind::CHAIN_KIND_SVM) return address.size() == 32;
+   return false;
+}
+
 /// Reconstruct a `sysio::public_key` variant from the raw creator-key
 /// bytes carried on a ReserveCreate attestation. EVM chains require the
 /// 33-byte compressed secp256k1 key in `creator_pub_key` (the EM variant,
@@ -446,6 +458,8 @@ void reserve::oncrtreserve(sysio::slug_name       chain_code,
    // must not select a different public-key variant or produce a reserve that
    // `matchreserve` can never match against the registered chain kind.
    const bool creator_chain_kind_mismatch = creator_chain_kind != *expected_chain_kind;
+   const bool invalid_creator_address =
+      !creator_address_matches_kind(*expected_chain_kind, creator_chain_addr);
    // Same `sysio`-billed metadata bound the privileged registrations enforce with
    // `check_metadata`, asked the non-throwing way: this handler must never abort, so an
    // over-bound string joins the reject/refund path below rather than reverting dispatch.
@@ -482,8 +496,8 @@ void reserve::oncrtreserve(sysio::slug_name       chain_code,
    // Create gating: the creator must already be authex-linked to a WIRE
    // account ("the only requirement to create a reserve"). Reconstruct the
    // creator's key variant and probe `sysio.authex::links.bypubkey`. On
-   // any failure — a chain-kind mismatch, malformed key bytes, no link, an
-   // invalid amount, OR over-bound metadata — reject by inserting a
+   // any failure — a chain-kind mismatch, malformed address/key bytes, no
+   // link, an invalid amount, OR over-bound metadata — reject by inserting a
    // CANCELLED row (for refund idempotency) and queueing
    // RESERVE_CREATE_CANCELLED so the outpost refunds the creator's escrow.
    // The CANCELLED row does NOT permanently burn the identity: a later,
@@ -501,7 +515,8 @@ void reserve::oncrtreserve(sysio::slug_name       chain_code,
             canonical_creator_key = sysio::pubkey_to_bytes(*pk_variant);
          }
       }
-      if (creator_chain_kind_mismatch || !linked || invalid_amount || oversized_metadata) {
+      if (creator_chain_kind_mismatch || invalid_creator_address || !linked ||
+          invalid_amount || oversized_metadata) {
          // A CANCELLED row already standing means this is a re-relay of the same
          // rejected create (an unlinked squatter OR an invalid amount). Leave it
          // and do NOT queue a second refund — the refund was queued when the row
@@ -513,8 +528,12 @@ void reserve::oncrtreserve(sysio::slug_name       chain_code,
             return;
          }
          sysio::print("oncrtreserve: rejecting with RESERVE_CREATE_CANCELLED "
-                      "(creator chain-kind mismatch, invalid amount, over-bound metadata, "
-                      "or unlinked / malformed creator key)\n");
+                      "(creator chain-kind/address mismatch, invalid amount, over-bound "
+                      "metadata, or unlinked / malformed creator key)\n");
+         // Do not persist attacker-sized address bytes in the sysio-billed
+         // cancellation tombstone. The outpost refunds by the reserve triple,
+         // so a malformed creator address is unnecessary for that handshake.
+         if (invalid_creator_address) creator.address.clear();
          const auto now = current_time_ms();
          tbl.emplace(ram_payer, pk, reserve_row{
             .chain_code             = chain_code,
@@ -663,7 +682,9 @@ void reserve::oncnclrsv(sysio::slug_name       chain_code,
                          opp::types::ChainKind creator_chain_kind,
                          std::vector<char>     creator_chain_addr) {
    require_auth(MSGCH_ACCOUNT);
-   if (!registered_chain_kind_or_skip(chain_code, "oncnclrsv").has_value()) return;
+   const auto expected_chain_kind =
+      registered_chain_kind_or_skip(chain_code, "oncnclrsv");
+   if (!expected_chain_kind.has_value()) return;
 
    reserves_t tbl(get_self());
    auto pk = make_key(chain_code, token_code, reserve_code);
@@ -679,7 +700,8 @@ void reserve::oncnclrsv(sysio::slug_name       chain_code,
    }
 
    const bool addr_matches =
-      it->creator_addr.kind    == creator_chain_kind &&
+      creator_chain_kind       == *expected_chain_kind &&
+      it->creator_addr.kind    == *expected_chain_kind &&
       it->creator_addr.address == creator_chain_addr;
    if (!addr_matches) {
       sysio::print("oncnclrsv: creator_addr mismatch; silently skipping\n");
