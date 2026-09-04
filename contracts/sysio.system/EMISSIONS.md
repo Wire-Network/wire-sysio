@@ -77,8 +77,9 @@ by the full group size). Equal rosters are coalesced before their weighted slice
 is calculated, preserving one group-level rounding step per roster. A credit is
 made only for members that are opreg-ACTIVE, so the slices of skipped (inactive /
 slashed / terminated) members stay in the treasury rather than being redistributed
-to the active ones. When roster history is complete, swap-fee rewards from
-`sysio.reserv`'s `rewards_bucket` are swept in (`drainrewards`) and allocated
+to the active ones. When roster history is complete and includes at least one
+non-empty roster, swap-fee rewards from `sysio.reserv`'s `rewards_bucket` are
+swept in (`drainrewards`) and allocated
 **exclusively to the batch-operator
 distribution**, on top of their emission share and weighted by that same
 historical active-epoch count. Producers are not paid out of swap fees, so
@@ -89,9 +90,10 @@ credited. Emission WIRE stays in the treasury when an **empty historical
 roster** owns an accrued epoch, when a **member is not opreg-ACTIVE**, as the
 **remainder** of the two integer divisions (per-roster weighting, then the even
 per-member split), or when roster history is incomplete and the whole batch
-emission slice takes the bounded recovery path. Incomplete history leaves swap
-fees in `sysio.reserv` as described below. Every `batchepochs` row represents
-one accrued epoch, so a zero-epoch historical roster cannot arise.
+emission slice takes the bounded recovery path. Incomplete or entirely empty
+history leaves swap fees in `sysio.reserv` as described below. Every
+`batchepochs` row represents one accrued epoch, so a zero-epoch historical
+roster cannot arise.
 
 That divisor is the sum of `t5state.batch_group_epochs`, **not** the configured
 `pay_cadence_epochs`. The two can differ — a mid-period `setemitcfg` cadence
@@ -134,11 +136,11 @@ retained, making recovery distinguishable from an ordinary zero-eligible payout.
 cadence values greater than one retain the configured number of audit records.
 
 `epochlog.fee_distributed` records what was actually paid, while
-`batch_fee_retained` records a complete-history sweep amount left in treasury
-because an empty roster, inactive member, or division remainder prevented its
-distribution. It is zero for incomplete history because those fees remain in
-`sysio.reserv` for a later period. The analogous `batch_emission_retained` field
-records undistributed batch emission.
+`batch_fee_retained` records a swept amount left in treasury because an empty
+roster alongside a non-empty roster, an inactive member, or a division remainder
+prevented its distribution. It is zero for incomplete or entirely empty history
+because those fees remain in `sysio.reserv` for a later payable period. The
+analogous `batch_emission_retained` field records undistributed batch emission.
 
 ## Retrieved via a claim action (pulled by recipient)
 

@@ -495,8 +495,9 @@ struct [[sysio::table("epochlog"), sysio::contract("sysio.system")]] epoch_log {
    int64_t                fee_distributed   = 0;
    // Durable attribution for WIRE left in the treasury by the batch payout.
    // Retained emission includes incomplete-history recovery; retained swept
-   // fees arise only from empty rosters, inactive members, or integer-division
-   // remainders because incomplete-history fees remain in sysio.reserv.
+   // fees arise only after a non-empty roster enabled the sweep, from another
+   // empty roster, inactive members, or integer-division remainders. Incomplete
+   // and all-empty history leave fees in sysio.reserv.
    // history_complete distinguishes recovery from eligibility shortfalls.
    bool                   batch_history_complete   = false;
    int64_t                batch_emission_retained  = 0;

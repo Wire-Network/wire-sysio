@@ -2545,6 +2545,7 @@ BOOST_FIXTURE_TEST_CASE( payepoch_recovers_from_incomplete_batch_roster_history,
    // A mixed contract version can reach payepoch without any immutable roster
    // snapshots. That must retain and durably attribute the batch slice rather
    // than aborting the inline sysio.epoch::advance path chain-wide.
+   const account_name BATCH_OP = "batchopa"_n;
    constexpr int64_t period_emission = 10'000;
    create_t5_holding_accounts();
    const int64_t fee_total = seed_reserv_reward_bucket();
@@ -2574,6 +2575,29 @@ BOOST_FIXTURE_TEST_CASE( payepoch_recovers_from_incomplete_batch_roster_history,
    BOOST_REQUIRE_EQUAL(int64_t(0), log["fee_distributed"].as<int64_t>());
    BOOST_REQUIRE_EQUAL(int64_t(0), log["batch_fee_retained"].as<int64_t>());
    BOOST_REQUIRE_EQUAL(fee_total, reserv_reward_balance());
+
+   // The next complete period must pick up the same retained fee bucket. This
+   // proves the recovery path did not merely leave it readable before silently
+   // clearing or replacing it on the following pay epoch.
+   create_accounts({ BATCH_OP }, false, false, false, true);
+   BOOST_REQUIRE_EQUAL(success(),
+      register_operator(BATCH_OP, OperatorType::OPERATOR_TYPE_BATCH,
+                        /*is_bootstrapped*/true));
+   BOOST_REQUIRE_EQUAL(success(),
+      push_system_action(EPOCH, "accrueepoch"_n, mvo()
+         ("epoch_index", 2)("batch_group_index", 0)("per_epoch_emission", period_emission)));
+   BOOST_REQUIRE_EQUAL(success(),
+      push_system_action(EPOCH, "rcrdbatch"_n, mvo()
+         ("epoch_index", 2)("members", vector<name>{ BATCH_OP })));
+   BOOST_REQUIRE_EQUAL(success(), push_system_action(EPOCH, "payepoch"_n, mvo()
+      ("epoch_index", 2)
+      ("batch_op_groups", vector<vector<name>>{})
+      ("period_emission", period_emission)));
+
+   auto recovery_log = get_epoch_log(2);
+   BOOST_REQUIRE(recovery_log["batch_history_complete"].as_bool());
+   BOOST_REQUIRE_EQUAL(fee_total, recovery_log["fee_distributed"].as<int64_t>());
+   BOOST_REQUIRE_EQUAL(int64_t(0), reserv_reward_balance());
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( payepoch_seeds_initial_roster_history_at_activation_epoch, sysio_emissions_tester ) try {
@@ -3917,8 +3941,8 @@ BOOST_FIXTURE_TEST_CASE( single_active_producer_full_active_share, sysio_emissio
 // batch_op_bps govern the emission split alone). End-to-end: deploy reserv,
 // seed the bucket with a real swap fee, advance to the (cadence-1) pay-epoch,
 // and verify the single producer is paid its emission producer_pool and NOTHING
-// more, the bucket is swept to 0 regardless, and the fee is NOT counted against
-// the emission treasury.
+// more, the all-empty roster leaves the bucket in reserv, and the fee is NOT
+// counted against the emission treasury.
 BOOST_FIXTURE_TEST_CASE( payepoch_folds_swap_fee_rewards, sysio_emissions_tester ) try {
    create_t5_holding_accounts();
    const int64_t fee_total = seed_reserv_reward_bucket();
@@ -3954,19 +3978,16 @@ BOOST_FIXTURE_TEST_CASE( payepoch_folds_swap_fee_rewards, sysio_emissions_tester
    // single active producer takes the whole producer pool.)
    BOOST_REQUIRE_EQUAL( got, producer_pool );
 
-   // Nothing was distributed out of the fee: the whole pool is allocated to the
-   // batch-operator distribution and this fixture has no active rotation group,
-   // so every share rolls to treasury. This is the NEGATIVE case — a batch
-   // operator actually receiving the fee is
+   // Nothing was distributed out of the fee: this fixture has no non-empty
+   // rotation group, so the bucket stays in reserv for a future payable period.
+   // This is the NEGATIVE case — a batch operator actually receiving the fee is
    // `payepoch_pays_swap_fee_to_active_batch_operator` below.
    BOOST_REQUIRE_EQUAL( log["fee_distributed"].as<int64_t>(), 0 );
    BOOST_REQUIRE(log["batch_history_complete"].as_bool());
    BOOST_REQUIRE_EQUAL(log["batch_emission_retained"].as<int64_t>(), batch_pool);
-   BOOST_REQUIRE_EQUAL(log["batch_fee_retained"].as<int64_t>(), fee_total);
+   BOOST_REQUIRE_EQUAL(log["batch_fee_retained"].as<int64_t>(), int64_t(0));
 
-   // The bucket was still swept to zero by the inline drain — the drain is
-   // unconditional on there being a recipient, and it must not overdraw.
-   BOOST_REQUIRE_EQUAL( reserv_reward_balance(), 0 );
+   BOOST_REQUIRE_EQUAL( reserv_reward_balance(), fee_total );
 
    // total_distributed counts emission only (producer_pool + capex + gov, with
    // the empty batch group's share staying in treasury) -- the fee is NOT
@@ -3976,11 +3997,9 @@ BOOST_FIXTURE_TEST_CASE( payepoch_folds_swap_fee_rewards, sysio_emissions_tester
 } FC_LOG_AND_RETHROW()
 
 // The POSITIVE counterpart: a swap fee actually reaching an ACTIVE batch
-// operator's balance. `payepoch_folds_swap_fee_rewards` proves only that the
-// bucket is SWEPT — `drainrewards` does that unconditionally, even when every
-// payout is skipped — so on its own it cannot distinguish "batch ops were paid"
-// from "the fee silently rolled to treasury". Neither can a flow test that waits
-// for `sysio.reserv` custody to fall by the reward share, for the same reason.
+// operator's balance. `payepoch_folds_swap_fee_rewards` proves that an all-empty
+// history preserves reserv custody; this positive case proves a non-empty,
+// eligible roster drains and distributes the bucket.
 //
 // Scaled to a ONE-member rotation (operators_per_epoch = batch_op_groups = 1) so
 // the arithmetic is exact rather than a proportional bound: with one group active

@@ -716,12 +716,13 @@ void system_contract::rcrdbatch(uint32_t epoch_index, std::vector<sysio::name> m
 // dclaim has funds the moment a claim is credited rather than at the next
 // pay-epoch.
 //
-// Swap-fee rewards: when immutable roster history is complete, the batch-operator
-// share of collected swap fees (sysio.reserv's rewards_bucket) is swept here via
-// an inline drainrewards and allocated EXCLUSIVELY to the batch-operator
-// distribution, on top of their emission share and weighted by the same
-// historical-roster active-epoch count. Incomplete history leaves the bucket in
-// sysio.reserv for a later complete period.
+// Swap-fee rewards: when immutable roster history is complete and contains at
+// least one non-empty roster, the batch-operator share of collected swap fees
+// (sysio.reserv's rewards_bucket) is swept here via an inline drainrewards and
+// allocated EXCLUSIVELY to the batch-operator distribution, on top of their
+// emission share and weighted by the same historical-roster active-epoch count.
+// Incomplete or all-empty history leaves the bucket in sysio.reserv for a later
+// payable period.
 // Producers are NOT paid out of swap fees, so producer_bps / batch_op_bps govern
 // the emission split only -- see the fold-in comment at the drain. Allocated is
 // not paid: only ELIGIBLE shares go out, and any skipped amount from a completed
@@ -802,6 +803,7 @@ void system_contract::payepoch(uint32_t epoch_index,
    batchepochs_t batch_history(get_self());
    std::vector<recorded_batch_group> recorded_batch_groups;
    bool batch_history_complete = accrued_epochs > 0;
+   bool has_nonempty_batch_roster = false;
    int64_t recorded_epochs = 0;
    uint32_t batch_payout_credits = 0;
    uint64_t expected_epoch_index = state.period_start_epoch;
@@ -838,6 +840,8 @@ void system_contract::payepoch(uint32_t epoch_index,
             batch_history_complete = false;
          } else {
             batch_payout_credits = static_cast<uint32_t>(credits_with_group);
+            has_nonempty_batch_roster =
+               has_nonempty_batch_roster || !it->members.empty();
             recorded_batch_groups.push_back(recorded_batch_group{
                .members       = it->members,
                .active_epochs = 1,
@@ -872,8 +876,9 @@ void system_contract::payepoch(uint32_t epoch_index,
    // batch-op distribution below.
    //
    // The fee WIRE lives in sysio.reserv's custody. Sweep it only when immutable
-   // roster history is complete; otherwise leave the bucket in reserv so a later
-   // complete period can distribute it. When swept, drainrewards is queued FIRST
+   // roster history is complete and at least one roster can receive a share;
+   // otherwise leave the bucket in reserv so a later payable period can
+   // distribute it. When swept, drainrewards is queued FIRST
    // (ahead of every payout transfer): inline actions execute depth-first, so the
    // drain -- and the reserv->sysio transfer it queues -- run to completion before
    // any sibling payout queued after it, landing the WIRE in this account's balance
@@ -881,11 +886,12 @@ void system_contract::payepoch(uint32_t epoch_index,
    //
    // Fees are funded by that transfer, NOT the T5 treasury, so fee payouts are
    // tracked in `fee_paid` and excluded from total_distributed (which governs
-   // the emission curve). After a complete-history sweep, any amount skipped for
-   // an empty roster, non-ACTIVE members, or integer-division remainders stays in
-   // this treasury. Incomplete history leaves the entire bucket in reserv.
+   // the emission curve). After a sweep, any amount skipped for an empty roster
+   // alongside a non-empty one, non-ACTIVE members, or integer-division
+   // remainders stays in this treasury. Incomplete or all-empty history leaves
+   // the entire bucket in reserv.
    int64_t fee_batch_pool = 0;
-   if (batch_history_complete) {
+   if (batch_history_complete && has_nonempty_batch_roster) {
       fee_batch_pool = get_reserv_rewards_balance();
       if (fee_batch_pool > 0) {
          sysio::action(
