@@ -1507,10 +1507,6 @@
                 {
                     "name": "rescore_pending",
                     "type": "bool"
-                },
-                {
-                    "name": "scored_collateral_stamp",
-                    "type": "uint64"
                 }
             ]
         },

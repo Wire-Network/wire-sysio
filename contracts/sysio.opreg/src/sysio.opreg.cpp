@@ -282,6 +282,11 @@ void opreg::setconfig(uint32_t max_available_producers,
    cfg.req_batchop_collat               = std::move(req_batchop_collat);
    cfg.req_uw_collat                    = std::move(req_uw_collat);
    cfg_tbl.set(cfg, ram_payer);
+
+   // sysio.system scores producer rank on the ratio of posted collateral to these minimums, so
+   // every stored score is stale the moment they move. Tell it on the same channel processprod
+   // uses; it opens a bounded rescore sweep on the notification.
+   require_recipient(opreg::SYSTEM_ACCOUNT);
 }
 
 // ---------------------------------------------------------------------------

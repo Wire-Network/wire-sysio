@@ -5830,22 +5830,32 @@ BOOST_FIXTURE_TEST_CASE( rescore_sweep_drains_across_ticks, producer_score_teste
    BOOST_REQUIRE( !rescore_pending() );
 } FC_LOG_AND_RETHROW()
 
-// The collateral minimums live on sysio.opreg, a contract sysio.system cannot be notified by
-// without a ten-parameter handler that would still miss any future writer. Instead the throttled
-// `onblock` tick compares the config's stamp against the one the stored scores were computed
-// under, and opens a sweep when they differ.
+// The collateral minimums live on sysio.opreg, whose `setconfig` notifies sysio.system on the
+// same channel `processprod` uses. The notification opens the sweep at once -- no throttle tick
+// has to notice a stamp -- so two changes inside one second cannot lose the second one.
 BOOST_FIXTURE_TEST_CASE( collateral_minimum_change_opens_rescore_sweep, producer_score_tester ) try {
    auto names = setup_collateralized_producers(3);
    trigger_reschedule();
    BOOST_REQUIRE( !rescore_pending() );
    const uint64_t before = rank_score_of(names[0]);
 
-   // Halving the minimum doubles every ratio, so every stored score is now wrong.
+   // Halving the minimum doubles every ratio, so every stored score is now wrong -- and the
+   // sweep is pending the moment setconfig lands, before any tick.
    BOOST_REQUIRE_EQUAL( success(), set_single_pair_collateral(base_min_bond / 2) );
+   BOOST_REQUIRE( rescore_pending() );
    trigger_reschedule();
 
    BOOST_REQUIRE( !rescore_pending() );   // three rows drain in one tick
-   BOOST_REQUIRE_LT( rank_score_of(names[0]), before );
+   const uint64_t halved = rank_score_of(names[0]);
+   BOOST_REQUIRE_LT( halved, before );
+
+   // Every change opens a sweep, the second as surely as the first; the drain scores against the
+   // config that is live when it runs.
+   BOOST_REQUIRE_EQUAL( success(), set_single_pair_collateral(base_min_bond / 4) );
+   BOOST_REQUIRE( rescore_pending() );
+   trigger_reschedule();
+   BOOST_REQUIRE( !rescore_pending() );
+   BOOST_REQUIRE_LT( rank_score_of(names[0]), halved );
 } FC_LOG_AND_RETHROW()
 
 // ---------------------------------------------------------------------------

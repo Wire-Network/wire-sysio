@@ -110,27 +110,13 @@ namespace sysiosystem {
       /// cursor from 0 under the same flag; there is nothing to count.
       bool                 rescore_pending = false;
 
-      /// `config_timestamp_ms` of the `req_prod_collat` entries the stored scores were computed
-      /// against, or 0 when that requirement vector was empty.
-      ///
-      /// The collateral factor is a RATIO against those minimums, so changing them invalidates
-      /// every stored score at once -- and `sysio.opreg::setconfig` is the only writer, on a
-      /// contract this one cannot reach into. Rather than have opreg notify (a ten-parameter
-      /// handler that would still miss any future writer), `onblock` compares this stamp against
-      /// the live config inside the throttle it already pays for and opens a sweep on a mismatch.
-      /// setconfig re-stamps every entry unconditionally, so an unrelated field change opens a
-      /// sweep too; that is harmless, since rescoring a row whose score is unchanged writes
-      /// nothing.
-      uint64_t             scored_collateral_stamp = 0;
-
       // explicit serialization macro is not necessary, used here only to improve compilation time
       SYSLIB_SERIALIZE_DERIVED( sysio_global_state, sysio::blockchain_parameters,
                                 (max_ram_size)(total_ram_bytes_reserved)
                                 (last_producer_schedule_update)(last_pervote_bucket_fill)
                                 (last_producer_schedule_size)
                                 (last_producer)
-                                (rescore_cursor)(rescore_pending)
-                                (scored_collateral_stamp) )
+                                (rescore_cursor)(rescore_pending) )
    };
 
    inline sysio::block_signing_authority convert_to_block_signing_authority( const sysio::public_key& producer_key ) {
@@ -612,6 +598,18 @@ namespace sysiosystem {
          [[sysio::on_notify("sysio.opreg::processprod")]]
          void onprocessprod( name account, bool was_eligible, bool is_eligible );
 
+         /**
+          * Open a rescore sweep when sysio.opreg's producer collateral minimums change.
+          *
+          * The collateral factor is a RATIO against those minimums, so `sysio.opreg::setconfig`
+          * invalidates every stored score at once. opreg notifies this contract from that action
+          * on the same channel as `processprod`. The handler declares none of the action's fields
+          * -- the dispatcher unpacks only what a handler declares -- because the sweep re-reads
+          * the live config per row; the notification is the trigger, not the payload.
+          */
+         [[sysio::on_notify("sysio.opreg::setconfig")]]
+         void onsetconfig();
+
          // ---- Emissions actions (defined in emissions.cpp) ----
 
          /**
@@ -797,9 +795,10 @@ namespace sysiosystem {
          /// Charge one producer a missed round, demoting it if that crosses the threshold.
          void record_missed_round( const name& producer, uint32_t max_consecutive_missed_rounds );
 
-         /// Open a rescore sweep when sysio.opreg's producer collateral minimums have moved since
-         /// the stored scores were computed. See `sysio_global_state::scored_collateral_stamp`.
-         void detect_collateral_config_change();
+         /// Restart the rescore cursor from row 0 and flag the sweep pending -- every stored
+         /// score is stale after a weight change (`setscorecfg`) or a collateral-minimum change
+         /// (`onsetconfig`).
+         void open_rescore_sweep();
 
          /// Drain a bounded slice of the rescore cursor when weights or collateral minimums changed.
          void drain_rescore_cursor();

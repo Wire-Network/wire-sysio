@@ -90,6 +90,16 @@ namespace sysiosystem {
       // Every stored rank_score was computed under the OLD weights. Rather than rewrite an
       // unbounded table inline, open a rescore sweep: onblock drains a bounded number of rows per
       // schedule-rebuild tick until the cursor is exhausted.
+      open_rescore_sweep();
+   }
+
+   void system_contract::onsetconfig() {
+      // The collateral minimums moved (sysio.opreg::setconfig notified us), so every stored score's
+      // collateral ratio is stale. Same remedy as a weight change.
+      open_rescore_sweep();
+   }
+
+   void system_contract::open_rescore_sweep() {
       _global.modify( get_self(), []( auto& g ) {
          g.rescore_cursor  = 0;
          g.rescore_pending = true;

@@ -48,10 +48,6 @@ namespace sysiosystem {
 
       /// only update block producers once every minute, block_timestamp is in half seconds
       if( timestamp.slot - _global.get().last_producer_schedule_update.slot > 120 ) {
-         // A collateral-minimum change invalidates every stored score, and this throttle is the
-         // only place the chain looks. Detect BEFORE draining so a change noticed on this tick
-         // starts draining on it rather than a minute later.
-         detect_collateral_config_change();
          // Drain any pending rescore BEFORE rebuilding, so the rebuild sees the freshest scores it
          // can. A sweep spans several ticks; the schedule is proposed from a partially-rescored
          // index in the meantime, which is safe because the tiers -- not the composite -- decide
@@ -143,27 +139,6 @@ namespace sysiosystem {
       // stored sort key is stale. A demoted producer keeps its block count: it is paid for those
       // blocks at the first payepoch after regproducer brings it back into the pay walk.
       rescore_producer( producer );
-   }
-
-   void system_contract::detect_collateral_config_change() {
-      sysio::opreg::opconfig_t cfg_tbl( opreg_refs::account );
-      const auto cfg = cfg_tbl.get_or_default( sysio::opreg::op_config{} );
-
-      // setconfig stamps every entry with the same on-chain time, so the first entry represents the
-      // whole vector. An empty vector has no stamp; 0 stands for it, and it is distinguishable from
-      // any real stamp because current_time_ms() is never 0 on a live chain. Both directions of the
-      // empty/non-empty transition therefore register as a change.
-      const uint64_t stamp = cfg.req_prod_collat.empty()
-                                ? uint64_t{0}
-                                : cfg.req_prod_collat.front().config_timestamp_ms;
-
-      if( stamp == _global.get().scored_collateral_stamp ) return;
-
-      _global.modify( get_self(), [&]( auto& g ) {
-         g.scored_collateral_stamp = stamp;
-         g.rescore_cursor          = 0;
-         g.rescore_pending         = true;
-      });
    }
 
    void system_contract::drain_rescore_cursor() {
