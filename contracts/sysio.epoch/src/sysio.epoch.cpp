@@ -84,7 +84,9 @@ struct emissions_gate_result {
    EmissionsBlockReason  reason             = opp::types::EMISSIONS_BLOCK_REASON_UNSPECIFIED;
 };
 
-emissions_gate_result check_emissions_ready(uint32_t epoch_duration_sec, uint32_t target_epoch) {
+emissions_gate_result check_emissions_ready(uint32_t epoch_duration_sec,
+                                            uint32_t operators_per_epoch,
+                                            uint32_t target_epoch) {
    emissions_gate_result r;
 
    sysiosystem::emissions::emitcfg_t emit_cfg_tbl(SYSTEM_ACCOUNT);
@@ -124,12 +126,20 @@ emissions_gate_result check_emissions_ready(uint32_t epoch_duration_sec, uint32_
       return r;
    }
 
-   // Decide whether this advance fires payepoch. Pay fires when the target
-   // epoch is `pay_cadence_epochs - 1` past `period_start_epoch`. Genesis
-   // case: t5s.period_start_epoch = 0, so the first period covers epochs
-   // 1..(pay_cadence - 1) (one short, since epoch 0 is genesis). Subsequent
-   // periods are exactly pay_cadence_epochs long.
-   r.is_pay_epoch = (target_epoch >= t5s.period_start_epoch + cfg.pay_cadence_epochs - 1);
+   // Decide whether this advance fires payepoch. New writes are bounded by
+   // setemitcfg, but pre-bound deployments can retain a larger stored cadence.
+   // Clamp it here so a legacy value cannot make rcrdbatch retain an unbounded
+   // roster history or defer the corrective payout forever. A zero value is
+   // likewise treated as the minimum safe cadence for old serialized state.
+   const uint16_t effective_pay_cadence_epochs =
+      sysiosystem::emissions::effective_pay_cadence_epochs(
+         cfg.pay_cadence_epochs, operators_per_epoch);
+
+   // Pay fires when the target epoch is `effective_pay_cadence_epochs - 1`
+   // past `period_start_epoch`. Genesis case: t5s.period_start_epoch = 0, so
+   // the first period covers epochs 1..(pay_cadence - 1) (one short, since
+   // epoch 0 is genesis). Subsequent periods are exactly cadence epochs long.
+   r.is_pay_epoch = (target_epoch >= t5s.period_start_epoch + effective_pay_cadence_epochs - 1);
 
    // Pay-epoch only: check the period total (pending + this epoch's share)
    // against sysio's balance. Non-pay epochs do not transfer, so no balance
@@ -272,11 +282,28 @@ void epoch::setconfig(uint32_t epoch_duration_sec,
    {
       sysiosystem::emissions::emitcfg_t emit_cfg_tbl(SYSTEM_ACCOUNT);
       if (emit_cfg_tbl.exists()) {
+         auto effective_emit_cfg = emit_cfg_tbl.get();
+         const uint16_t stored_pay_cadence = effective_emit_cfg.pay_cadence_epochs;
+         const bool legacy_stored_cadence =
+            stored_pay_cadence < 1
+            || stored_pay_cadence > sysiosystem::emissions::MAX_PAY_CADENCE_EPOCHS;
+         // Current configurations must satisfy the joint setter invariant:
+         // changing the roster cannot silently shorten a valid configured pay
+         // period. Only a pre-bound stored cadence outside today's accepted
+         // range uses the same runtime recovery clamp as advance().
+         effective_emit_cfg.pay_cadence_epochs = legacy_stored_cadence
+            ? sysiosystem::emissions::effective_pay_cadence_epochs(
+                 stored_pay_cadence, operators_per_epoch)
+            : stored_pay_cadence;
+         check(sysiosystem::emissions::batch_payout_work_fits(
+                  effective_emit_cfg.pay_cadence_epochs, operators_per_epoch),
+               "stored sysio.system pay_cadence_epochs x operators_per_epoch "
+               "exceeds the batch payout credit safety cap (100)");
          sysiosystem::emissions::t5state_t t5s_tbl(SYSTEM_ACCOUNT);
          const int64_t pending =
             t5s_tbl.exists() ? t5s_tbl.get().pending_emission_amount : 0;
          check(sysiosystem::emissions::period_accrual_fits_asset_range(
-                  emit_cfg_tbl.get(), epoch_duration_sec, pending),
+                  effective_emit_cfg, epoch_duration_sec, pending),
                "per-epoch emission ceiling x pay_cadence_epochs exceeds the asset range at this epoch_duration_sec");
       }
    }
@@ -402,7 +429,8 @@ void epoch::advance() {
       ).send();
    }
 
-   const auto gate = check_emissions_ready(cfg.epoch_duration_sec, target_epoch);
+   const auto gate = check_emissions_ready(
+      cfg.epoch_duration_sec, cfg.operators_per_epoch, target_epoch);
    if (!gate.ready) {
       // OPP silent-return diagnostic: the epoch silently does NOT advance when the
       // emissions gate is not ready. Also recorded to blocklog, but a console
@@ -977,15 +1005,22 @@ void epoch::advance() {
       }
    }
 
-   // Emissions side. Two inline actions queued in FIFO order:
+   // Emissions side. Three inline actions queued in FIFO order:
    //   1. accrueepoch: always queued. Records this epoch's per-epoch share
    //      onto t5state (pending_emission_amount + batch_group_epochs[group]
    //      + last_epoch_emission for decay continuity).
-   //   2. payepoch: queued only on pay-epochs. Reads the now-updated t5state
+   //   2. rcrdbatch: always queued. Records the immutable roster that accrued
+   //      this epoch after the schedule has slid for the next advance.
+   //   3. payepoch: queued only on pay-epochs. Reads the now-updated t5state
    //      (which already includes this epoch's contribution from step 1),
    //      distributes period_emission, and resets the accumulator.
    // Both run after advance() returns; their FIFO ordering guarantees
-   // payepoch sees the post-accrue state.
+   // payepoch sees the post-accrue roster history and state.
+   std::vector<name> active_batch_op_members;
+   if (state.current_batch_op_group < state.batch_op_groups.size()) {
+      active_batch_op_members = state.batch_op_groups[state.current_batch_op_group];
+   }
+
    action(
       permission_level{get_self(), "owner"_n},
       SYSTEM_ACCOUNT,
@@ -997,6 +1032,13 @@ void epoch::advance() {
       )
    ).send();
 
+   action(
+      permission_level{get_self(), "owner"_n},
+      SYSTEM_ACCOUNT,
+      "rcrdbatch"_n,
+      std::make_tuple(state.current_epoch_index, active_batch_op_members)
+   ).send();
+
    if (gate.is_pay_epoch) {
       action(
          permission_level{get_self(), "owner"_n},
@@ -1004,7 +1046,7 @@ void epoch::advance() {
          "payepoch"_n,
          std::make_tuple(
             state.current_epoch_index,
-            state.batch_op_groups,
+            std::vector<std::vector<name>>{},
             gate.period_emission
          )
       ).send();

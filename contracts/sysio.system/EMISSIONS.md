@@ -11,9 +11,11 @@ through a claim action. All amounts are `WIRE` (9-decimal subunits).
 
 - Every epoch calls `accrueepoch`, which adds that epoch's curve share
   (`compute_epoch_emission`) to `t5state.pending_emission_amount`.
+- It then calls `rcrdbatch`, which records the immutable batch-operator
+  roster that accrued that epoch.
 - On a pay-epoch boundary (`emitcfg.pay_cadence_epochs`) it then calls
-  `payepoch`, which distributes the accumulated `period_emission` by the
-  configured basis-point splits.
+  `payepoch`, which distributes the accumulated `period_emission`, consumes
+  the recorded rosters, and clears that period's history.
 
 The curve decays from `annual_initial_emission` toward `annual_min_emission`
 (clamped by `annual_max_emission`), stops at `t5_floor`, and auto-throttles as
@@ -69,35 +71,76 @@ same exception `fundclaim` makes for `sysio.dclaim`.
 Producer pay is weight-scaled: active producers carry a flat weight and are
 additionally scaled by their eligible rounds over the pay period, while standbys
 carry a rank-decreasing weight and are not round-scaled. Batch-op pay is weighted
-per group by that group's active-epoch count over the pay period, then split
-evenly across all of the group's scheduled members (the per-member slice is the
-group pool divided by the full group size). A credit is made only for members
-that are opreg-ACTIVE, so the slices of skipped (inactive / slashed / terminated)
-members stay in the treasury rather than being redistributed to the active
-ones. Swap-fee rewards from `sysio.reserv`'s `rewards_bucket` are swept in
-(`drainrewards`) and allocated **exclusively to the batch-operator
+by the roster captured for each accrued epoch, then split evenly across all
+members of each historical roster (the per-member slice is the group pool divided
+by the full group size). Equal rosters are coalesced before their weighted slice
+is calculated, preserving one group-level rounding step per roster. A credit is
+made only for members that are opreg-ACTIVE, so the slices of skipped (inactive /
+slashed / terminated) members stay in the treasury rather than being redistributed
+to the active ones. When roster history is complete and includes at least one
+non-empty roster, swap-fee rewards from `sysio.reserv`'s `rewards_bucket` are
+swept in (`drainrewards`) and allocated
+**exclusively to the batch-operator
 distribution**, on top of their emission share and weighted by that same
-per-group active-epoch count. Producers are not paid out of swap fees, so
+historical active-epoch count. Producers are not paid out of swap fees, so
 `producer_bps` / `batch_op_bps` govern the emission split only.
 
-Allocated is not the same as paid: as with emissions, only **eligible** shares
-are actually credited. WIRE stays in the treasury when there are **no groups
-at all**, when an **empty group owns positive active epochs** (its weighted slice
-is skipped), when a **member is not opreg-ACTIVE**, or as the **remainder** of the
-two integer divisions (per-group weighting, then the even per-member split). A
-group active in **zero** epochs is *not* one of these cases — its weighted
-allocation is already zero, and because the per-group counts sum to the **actual
-accrued-epoch divisor** the remaining groups absorb the whole pool.
+Allocated is not the same as paid: only **eligible** shares are actually
+credited. Emission WIRE stays in the treasury when an **empty historical
+roster** owns an accrued epoch, when a **member is not opreg-ACTIVE**, as the
+**remainder** of the two integer divisions (per-roster weighting, then the even
+per-member split), or when roster history is incomplete and the whole batch
+emission slice takes the bounded recovery path. Incomplete or entirely empty
+history leaves swap fees in `sysio.reserv` as described below. Every
+`batchepochs` row represents one accrued epoch, so a zero-epoch historical
+roster cannot arise.
 
-That divisor is the sum of the per-group counters, **not** the configured
+That divisor is the sum of `t5state.batch_group_epochs`, **not** the configured
 `pay_cadence_epochs`. The two can differ — a mid-period `setemitcfg` cadence
 change, or the shortened genesis period — and normalizing by the configured value
-is what caused a payout to be multiplied. Deriving it from the counters is what
-makes the weights partition each pool by construction.
+is what caused a payout to be multiplied. The positional counters establish the
+actual period length only; `batchepochs` supplies roster identity, so a schedule
+rotation cannot reassign an earlier epoch to the current front group.
 
-`epochlog.fee_distributed` records what was actually paid, so it can be lower
-than the swept amount — and is `0` when no eligible batch operator existed at all,
-even though `drainrewards` swept the bucket to zero regardless.
+### Roster-history bounds and recovery
+
+`setemitcfg` accepts a payment cadence only in `[1, 10]`, which bounds an
+ordinary payment period to at most ten immutable roster snapshots. It also
+validates `pay_cadence_epochs * operators_per_epoch <= 100`, preserving the
+prior one-roster ceiling on expensive per-recipient credits; `sysio.epoch`
+enforces the same constraint when its operator count changes. At the intended
+production topology of 21 operators per epoch, the maximum accepted cadence is
+4 (about 24 minutes at six-minute epochs); the conservative 100-credit ceiling
+limits peak work in the mandatory `advance` transaction. When
+`sysio.epoch` reads an older serialized configuration during an upgrade, it
+effectively shortens the cadence to satisfy both bounds; the stored value is not
+rewritten until a normal `setemitcfg` update. `payepoch` independently refuses
+to issue more than 100 recipient credits summed across distinct historical
+rosters and takes the non-halting recovery path if malformed legacy history
+exceeds that limit.
+
+The `rcrdbatch` inline action also prunes the exact oldest retained row before
+writing a new one. `payepoch` caps cleanup at 20 rows per payment, twice the
+largest accepted period, so even a malformed gapped table cannot turn recovery
+into an unbounded transaction; stale history drains monotonically.
+If `payepoch` sees missing, stale, non-contiguous, or over-cap history, it does
+not guess a roster or abort the enclosing `advance`: it retains that period's
+batch-emission slice in the treasury, leaves the swap-fee bucket in
+`sysio.reserv` for the next complete period, drains the unusable history within
+the cleanup bound, and begins clean history after stale rows are gone. A complete
+history remains required to credit batch-operator rewards. Every `epochlog` row
+records whether history was complete and the exact batch-emission amount
+retained, making recovery distinguishable from an ordinary zero-eligible payout.
+
+`epoch_log_retention_count` counts payment rows, not elapsed epoch indexes, so
+cadence values greater than one retain the configured number of audit records.
+
+`epochlog.fee_distributed` records what was actually paid, while
+`batch_fee_retained` records a swept amount left in treasury because an empty
+roster alongside a non-empty roster, an inactive member, or a division remainder
+prevented its distribution. It is zero for incomplete or entirely empty history
+because those fees remain in `sysio.reserv` for a later payable period. The
+analogous `batch_emission_retained` field records undistributed batch emission.
 
 ## Retrieved via a claim action (pulled by recipient)
 
@@ -173,6 +216,7 @@ period_emission
 | `claimnodedis` | node owner | Claim vested node-owner allocation (refused when it would spend pay reserved in `payclaimtot`) |
 | `claimpay` | the claiming account | Claim epoch pay credited by `payepoch` (producer / standby / batch-operator share) |
 | `accrueepoch` | `sysio.epoch` | Accrue this epoch's curve share |
+| `rcrdbatch` | `sysio.epoch` | Record the batch-operator roster for this accrued epoch |
 | `payepoch` | `sysio.epoch` | Distribute the period's compute / capex / governance (credits `payclaims`; pushes only the category buckets) |
 | `fundclaim` | `sysio.dclaim` | Lazy capital drain into dclaim (never-throw) |
 | `viewnodedist` | read-only | Preview a node owner's claimable amount |
@@ -190,11 +234,12 @@ period_emission
 | `payclaims` | Table | Per-account epoch pay credited by `payepoch` and not yet claimed |
 | `payclaimtot` | Singleton | Running total of outstanding `payclaims`, reserved by every gate that spends the treasury balance |
 | `t5state` | Singleton | Treasury state: pending emission, total distributed, decay continuity |
+| `batchepochs` | Table | Up to ten immutable batch-operator rosters for unprocessed accrued epochs; cleared by `payepoch` |
 | `epochlog` | Table | Per-pay-epoch audit log (head-pruned to `epoch_log_retention_count`) |
 
 ## Dependencies
 
-- Driven inline by `sysio.epoch::advance` (`accrueepoch` + `payepoch`).
+- Driven inline by `sysio.epoch::advance` (`accrueepoch` + `rcrdbatch` + `payepoch`).
 - Reads producer eligibility and operator status from `sysio.opreg`.
 - Reads the canonical epoch duration from `sysio.epoch::epochcfg`.
 - Folds swap-fee rewards from `sysio.reserv` (`drainrewards`).
