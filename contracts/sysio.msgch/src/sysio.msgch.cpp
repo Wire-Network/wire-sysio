@@ -799,13 +799,16 @@ void dispatch_node_owner_reg(const std::vector<char>& data, uint64_t chain_code)
    auto eth_pk = em_pubkey_from_eth_bytes(reg.actor_pub_key);
    if (!eth_pk) return;                           // unusable depositor ETH key; drop
 
+   if (reg.actor.kind != opp::types::ChainKind::CHAIN_KIND_EVM
+       || reg.actor.address.size() != 20) return; // unusable depositor ETH address; drop
+
    // 1) Create the account (idempotent; soft-skips a name that breaks the tier rule).
    action(permission_level{ROA_ACCOUNT, "active"_n}, ROA_ACCOUNT, "newnameduser"_n,
           std::make_tuple(*owner, *wire_pk, tier)).send();
 
    // 2) Register the owner + record the ETH link, with claim-payload soft-fail + audit recording.
    action(permission_level{ROA_ACCOUNT, "active"_n}, ROA_ACCOUNT, "nodeownreg"_n,
-          std::make_tuple(*owner, tier, *eth_pk, *wire_pk)).send();
+          std::make_tuple(*owner, tier, *eth_pk, *wire_pk, reg.actor.address)).send();
 }
 
 /// Per-attestation dispatch entry. Called from the inbound extraction loop

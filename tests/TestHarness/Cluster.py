@@ -1310,7 +1310,7 @@ class Cluster(object):
             return trans
 
         # sysio.noop used by trx_generator for noop action
-        systemAccounts = ['sysio.noop', 'sysio.bpay', 'sysio.msig', 'sysio.names', 'sysio.token', 'sysio.vpay', 'sysio.wrap', 'sysio.roa', 'sysio.acct', 'sysio.authex', 'sysio.opreg', 'carl']
+        systemAccounts = ['sysio.noop', 'sysio.bpay', 'sysio.msig', 'sysio.names', 'sysio.token', 'sysio.vpay', 'sysio.wrap', 'sysio.roa', 'sysio.acct', 'sysio.authex', 'sysio.dclaim', 'sysio.opreg', 'carl']
         acctTrans = list(map(createSystemAccount, systemAccounts))
 
         for trans in acctTrans:
@@ -1508,6 +1508,23 @@ class Cluster(object):
         trans=biosNode.setPriv(sysioAuthexAccount, sysioAccount, isPriv=True, waitForTransBlock=True)
         if trans is None:
             Utils.Print("ERROR: Failed to set sysio.authex as privileged")
+            return None
+
+        sysioDclaimAccount = copy.deepcopy(sysioAccount)
+        sysioDclaimAccount.name = 'sysio.dclaim'
+        contract="sysio.dclaim"
+        contractDir=str(self.contractsPath / contract)
+        wasmFile="%s.wasm" % (contract)
+        abiFile="%s.abi" % (contract)
+        Utils.Print("Publish %s contract" % (contract))
+        trans=biosNode.publishContract(sysioDclaimAccount, contractDir, wasmFile, abiFile, waitForTransBlock=True)
+        if trans is None:
+            Utils.Print("ERROR: Failed to publish contract %s." % (contract))
+            return None
+
+        trans=biosNode.setPriv(sysioDclaimAccount, sysioAccount, isPriv=True, waitForTransBlock=True)
+        if trans is None:
+            Utils.Print("ERROR: Failed to set sysio.dclaim as privileged")
             return None
 
         # Delegate sysio.authex.active to sysio.roa@sysio.code so sysio.roa::nodeownreg's inline
