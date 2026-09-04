@@ -140,6 +140,15 @@ namespace sysiosystem {
        * It only orders producers across the misses BEFORE demotion fires; the categorical
        * consequence of being offline is the tier, not this term.
        *
+       * A miss short of demotion still has a lasting consequence, and it is deliberate. The streak
+       * clears only when the producer PRODUCES, so a producer whose penalty drops it below the
+       * active schedule stops being scheduled, stops producing, and holds the penalty until it
+       * acts: `regproducer` clears the streak, and enough additional collateral outranks it. That
+       * is the intended shape -- a producer that missed is worth less than an identical one that
+       * did not, and the way back is an explicit assertion of readiness rather than the passage of
+       * time. The alternative, clearing the streak for producers outside the schedule, would let a
+       * producer sitting on the boundary flap in and out at every rebuild.
+       *
        * @param consecutive_missed_rounds     the producer's current miss streak.
        * @param max_consecutive_missed_rounds the configured demotion threshold.
        * @return the participation factor in basis points, clamped to [0, score_scale].
@@ -171,8 +180,14 @@ namespace sysiosystem {
          uint32_t collateral_weight    = static_cast<uint32_t>(score_scale);
          /// Weight on the participation factor derived from consecutive missed rounds.
          uint32_t participation_weight = static_cast<uint32_t>(score_scale);
-         /// Weight on the snapshot-provider attestation rate.
-         uint32_t snapshot_weight      = static_cast<uint32_t>(score_scale);
+         /// Weight on the snapshot-provider attestation rate. A TENTH of the collateral weight,
+         /// deliberately: at parity a single quorum attestation moved the composite by as much as
+         /// an entire minimum bond, so among producers bonded near each other the credit decided
+         /// the top-21 boundary and the pay-period reset decided it back -- two producer-schedule
+         /// and finalizer-policy proposals per snapshot event, with no change in real standing.
+         /// Snapshot service should separate producers the collateral term has left tied, not
+         /// outrank collateral.
+         uint32_t snapshot_weight      = static_cast<uint32_t>(score_scale) / 10;
          /// Reserved -- needs an attestation path before it can carry weight.
          uint32_t relay_weight         = 0;
          /// Reserved -- needs an attestation path before it can carry weight.
@@ -180,10 +195,9 @@ namespace sysiosystem {
          /// Reserved -- needs an attestation path before it can carry weight.
          uint32_t benchmark_weight     = 0;
 
-         /// Consecutive missed rounds that demote a producer to standby. Demotion lasts until the
-         /// producer re-registers: there is no cooldown, no expiry and no automatic recovery,
-         /// because a demoted producer is scheduled for no rounds and so can never clear the
-         /// counter by producing.
+         /// Consecutive missed rounds that demote a producer to standby. There is no cooldown and
+         /// no expiry: a demoted producer recovers by re-registering, or by producing a block while
+         /// still in the active schedule -- the window a schedule too small to rebuild holds open.
          uint32_t max_consecutive_missed_rounds = 3;
 
          /// Snapshot attestations within one pay period that earn full marks on the snapshot

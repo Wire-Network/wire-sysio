@@ -5955,9 +5955,8 @@ BOOST_FIXTURE_TEST_CASE( demotion_fires_at_threshold_and_outweighs_collateral, p
    BOOST_REQUIRE_GT( unpaid_blocks_of(target), 0u );
 } FC_LOG_AND_RETHROW()
 
-// `regproducer` is the single door back, from an involuntary demotion as much as from a voluntary
-// park. There is no cooldown and no expiry -- a demoted producer is scheduled for no rounds, so it
-// could never clear the counter by producing.
+// `regproducer` is the door back for a producer the schedule has DROPPED, from an involuntary
+// demotion as much as from a voluntary park. There is no cooldown and no expiry.
 BOOST_FIXTURE_TEST_CASE( regproducer_clears_demotion_immediately, producer_score_tester ) try {
    auto names = setup_ranked_producers(5);
    trigger_reschedule();
@@ -5970,6 +5969,41 @@ BOOST_FIXTURE_TEST_CASE( regproducer_clears_demotion_immediately, producer_score
    BOOST_REQUIRE_EQUAL( success(), push_system_action(target, "regproducer"_n, mvo()
       ("producer", target)("producer_key", get_public_key(target, "active"))("url", "")("location", 0)) );
    produce_blocks(1);
+
+   BOOST_REQUIRE( !demoted(target) );
+   BOOST_REQUIRE_EQUAL( 0u, missed_rounds_of(target) );
+   BOOST_REQUIRE_EQUAL( tier_bootstrapped, tier_of(rank_score_of(target)) );
+} FC_LOG_AND_RETHROW()
+
+// The OTHER door back, and the one no operator has to walk through: a demoted producer that is
+// still in the active schedule recovers by producing a block.
+//
+// Demotion and rescheduling are separate events, and the schedule-size floor can hold the gap
+// between them open indefinitely. Four producers here, one demoted, leaves three schedulable --
+// below `min_schedule_size` -- so `update_ranked_producers` retains the last good schedule rather
+// than publish a short one, and the demoted producer keeps its slot. That is the shape a mass
+// outage takes: without this, those producers would produce indefinitely while `payepoch` skipped
+// them, earning nothing until every operator pushed `regproducer` by hand.
+BOOST_FIXTURE_TEST_CASE( producing_while_still_scheduled_clears_a_demotion, producer_score_tester ) try {
+   auto names = setup_ranked_producers(4);
+   trigger_reschedule();
+   wait_for_active_schedule(names[2]);
+
+   const auto target = names[2];
+   for (uint32_t miss = 0; miss < 3; ++miss) skip_round_of(target);
+   BOOST_REQUIRE( demoted(target) );
+   BOOST_REQUIRE_EQUAL( tier_demoted, tier_of(rank_score_of(target)) );
+
+   // The floor kept it in the schedule: three schedulable producers cannot replace four.
+   trigger_reschedule();
+   const auto schedule = active_schedule_names();
+   BOOST_REQUIRE_MESSAGE(
+      std::find(schedule.begin(), schedule.end(), target) != schedule.end(),
+      "the demoted producer should still hold its slot under the schedule-size floor" );
+
+   // Its window comes round and it produces. One block is proof of life, so the demotion and the
+   // streak both clear and the key returns to the tier its standing earns.
+   produce_blocks(names.size() * slots_per_producer + slots_per_producer);
 
    BOOST_REQUIRE( !demoted(target) );
    BOOST_REQUIRE_EQUAL( 0u, missed_rounds_of(target) );

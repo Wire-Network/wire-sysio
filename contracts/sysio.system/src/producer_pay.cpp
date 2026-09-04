@@ -108,11 +108,29 @@ namespace sysiosystem {
          }
       }
 
-      // The producer of this block is, by construction, not missing its round.
+      // The producer of this block is, by construction, not missing its round -- and a block is
+      // the strongest liveness proof there is, so it clears a DEMOTION as well as the streak.
+      //
+      // That matters because demotion and rescheduling are not simultaneous. A producer is demoted
+      // the moment its third miss lands, but it leaves the schedule only at the next rebuild, and
+      // when demotions drop the schedulable count below `min_schedule_size` the rebuild retains the
+      // last good schedule instead of publishing a short one -- so the demoted producers come back
+      // and keep producing under it. Without this, they would produce indefinitely while `payepoch`
+      // skipped them (the walk stops at the demoted tier), earning nothing until every operator
+      // pushed `regproducer` by hand. A mass outage is exactly the case that produces it.
+      //
+      // A demoted producer that is NOT in the active schedule never reaches this path, so recovery
+      // still requires `regproducer` for anyone the schedule has actually dropped.
       auto key = producer_key_t{current_producer.value};
-      if( _producers.contains(key) && _producers.get(key).consecutive_missed_rounds > 0 ) {
-         _producers.modify( same_payer, key, []( auto& p ) { p.consecutive_missed_rounds = 0; });
-         rescore_producer( current_producer );
+      if( _producers.contains(key) ) {
+         const auto& info = _producers.get(key);
+         if( info.consecutive_missed_rounds > 0 || info.is_demoted ) {
+            _producers.modify( same_payer, key, []( auto& p ) {
+               p.consecutive_missed_rounds = 0;
+               p.is_demoted                = false;
+            });
+            rescore_producer( current_producer );
+         }
       }
 
       _global.modify( get_self(), [&]( auto& g ) { g.last_producer = current_producer; });
@@ -125,10 +143,11 @@ namespace sysiosystem {
 
       _producers.modify( same_payer, key, [&]( auto& p ) {
          p.consecutive_missed_rounds++;
-         // Demotion is CATEGORICAL: it moves the producer into a tier no score can climb out of,
-         // and it lasts until the producer re-registers. There is no cooldown and no expiry --
-         // a demoted producer is scheduled for no rounds, so it can never clear the counter by
-         // producing.
+         // Demotion is CATEGORICAL: it moves the producer into a tier no score can climb out of.
+         // There is no cooldown and no expiry, and the only two ways back are `regproducer` and
+         // producing a block while still in the active schedule -- the latter covering the window
+         // between a demotion and the rebuild that acts on it, which the schedule-size floor can
+         // hold open indefinitely.
          if( !p.is_demoted && max_consecutive_missed_rounds > 0
              && p.consecutive_missed_rounds >= max_consecutive_missed_rounds ) {
             p.is_demoted = true;

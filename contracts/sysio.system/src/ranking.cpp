@@ -56,12 +56,15 @@ namespace sysiosystem {
             info.producer_authority = producer_authority;
             if ( info.last_claim_time == time_point() )
                info.last_claim_time = ct;
-            // regproducer is the SINGLE door back -- from a voluntary `unregprod` park and from an
-            // involuntary demotion alike. `unregprod` erases the signing key, so re-registering has
+            // regproducer is the door back for a producer the schedule has DROPPED -- a voluntary
+            // `unregprod` park, an involuntary demotion, or a participation penalty that pushed it
+            // below the active set (the streak clears only by producing, and a producer that is not
+            // scheduled cannot produce). `unregprod` erases the signing key, so re-registering has
             // to re-supply it, which makes this a genuine assertion of readiness rather than a
             // no-op. There is deliberately no cooldown and no expiry: a producer that comes back
             // before it is ready is demoted again within max_consecutive_missed_rounds rounds,
-            // which is self-correcting.
+            // which is self-correcting. A demoted producer that is still in the active schedule
+            // recovers on its own by producing -- see `record_round_participation`.
             info.is_demoted                = false;
             info.consecutive_missed_rounds = 0;
          });
