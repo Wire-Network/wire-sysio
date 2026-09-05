@@ -222,8 +222,10 @@ namespace sysiosystem {
       // The walk is bounded by the demoted tier. `regproducer` is permissionless, so the table is
       // unbounded -- but producer_rank::compute sinks every non-ACTIVE producer operator into the
       // demoted tier, which sorts last, so the scan stops before the spam tail.
+      uint32_t examined = 0;
       for( auto it = idx.cbegin(); it != idx.cend() && top_producers.size() < max_producers; ++it ) {
          if( producer_rank::tier_of( it->rank_score ) == producer_tier::demoted ) break;
+         if( ++examined > max_rank_walk_rows ) break;
          if( !producer_rank::is_schedulable( *it, _finalizers ) ) continue;
 
          proposed_finalizers.emplace_back( _finalizers.get( finalizer_key_t{it->owner.value} ) );

@@ -198,7 +198,8 @@ namespace sysiosystem {
        * @param weights  the live `prodscorecfg` weights.
        * @return the packed sort key to store on `producer_info::rank_score`.
        */
-      inline uint64_t compute(const sysio::name& producer,
+      inline uint64_t compute(const sysio::name& self,
+                              const sysio::name& producer,
                               const score_inputs& inputs,
                               const producer_score_config& weights) {
          // A producer that is not a live, collateral-backed PRODUCER operator -- parked by
@@ -213,6 +214,22 @@ namespace sysiosystem {
          // cannot reach is one `prune` erased, and the termination before it already sank the
          // key; every consumer still tests the live predicate before counting a position.
          if (!inputs.is_active) return unscored();
+
+         // No active finalizer key, no schedule position -- so no place above the demoted tier
+         // either. This is what BOUNDS every rank walk. Registration is permissionless and the
+         // table is unbounded, so if bonded-but-keyless rows stayed in the healthy tier a walk
+         // looking for 21 schedulable producers could skip an arbitrary number of rows that can
+         // never qualify, on `onblock`'s schedule rebuild and inline in the epoch payout.
+         //
+         // Peer discovery is deliberately unaffected: it seeds from the ACTIVE SCHEDULE before it
+         // ranks anything, so a producer scheduled through `setprods` without a finalizer key is
+         // still discoverable. That ordering is why sinking these rows is safe -- see
+         // `peer_keys::getpeerkeys`.
+         finalizers_table finalizers(self);
+         const auto fin_key = finalizer_key_t{producer.value};
+         if (!finalizers.contains(fin_key) || finalizers.get(fin_key).active_key_binary.empty()) {
+            return unscored();
+         }
 
          sysio::opreg::operators_t ops(opreg_refs::account);
          const auto op_key = sysio::opreg::operator_key{producer.value};
@@ -287,6 +304,7 @@ namespace sysiosystem {
 
          const auto info  = producers.get(key);
          const auto score = compute(
+            self,
             producer,
             score_inputs{
                .is_active                 = info.active(),

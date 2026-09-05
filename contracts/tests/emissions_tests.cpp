@@ -6247,12 +6247,19 @@ BOOST_FIXTURE_TEST_CASE( collateral_minimum_change_opens_rescore_sweep, producer
 BOOST_FIXTURE_TEST_CASE( healthy_tier_outranks_the_bootstrap_backstop, producer_score_tester ) try {
    auto collateralized = setup_collateralized_producers(2);
 
-   // A bootstrapped producer: ACTIVE by fiat, holding no collateral at all.
+   // A bootstrapped producer: ACTIVE by fiat, holding no collateral at all. It still needs a
+   // finalizer key -- without one it could not take part in finality, so it would be unschedulable
+   // and sink below both tiers, and this test would be comparing something else entirely.
    const auto bootstrap = producer_name_at(5);
    create_producer_accounts({bootstrap});
    BOOST_REQUIRE_EQUAL( success(), push_system_action(bootstrap, "regproducer"_n, mvo()
       ("producer", bootstrap)("producer_key", get_public_key(bootstrap, "active"))("url", "")("location", 0)) );
    BOOST_REQUIRE_EQUAL( success(), register_operator(bootstrap, OperatorType::OPERATOR_TYPE_PRODUCER, true) );
+   {
+      auto [privkey, pubkey, pop, sig_provider] = sysio::testing::get_bls_key(bootstrap);
+      BOOST_REQUIRE_EQUAL( success(),
+         register_finalizer_key(bootstrap, pubkey.to_string(), pop.to_string()) );
+   }
    produce_blocks(1);
 
    BOOST_REQUIRE_EQUAL( tier_healthy,      tier_of(rank_score_of(collateralized[0])) );
@@ -6542,6 +6549,44 @@ BOOST_FIXTURE_TEST_CASE( slash_and_termination_sink_the_key_at_once, producer_sc
 // A permissionless `regproducer` with no bond behind it occupies an index slot but must consume no
 // rank POSITION: it sinks to the demoted tier, so it sorts behind every real producer and every
 // consumer's walk stops before reaching it.
+// A producer with a bond but no active finalizer key can never be scheduled -- it could not take
+// part in finality -- so it must not sit in a tier the rank walks traverse. That is what BOUNDS
+// them: `regproducer` is permissionless and the table unbounded, so if these rows ranked among the
+// healthy the schedule rebuild and the inline epoch payout could skip an arbitrary number of rows
+// that can never qualify.
+//
+// Peer discovery is deliberately NOT affected, and that ordering is load-bearing: it seeds from the
+// active schedule before it ranks anything, so a producer scheduled through `setprods` without a
+// finalizer key stays reachable by BP gossip. See `getpeerkeys_returns_every_scheduled_producer`.
+BOOST_FIXTURE_TEST_CASE( a_bonded_producer_without_a_finalizer_key_holds_no_rank, producer_score_tester ) try {
+   auto names = setup_collateralized_producers(5);
+
+   // Bonded exactly like the others, registered as a producer, but never `regfinkey`.
+   const auto keyless = producer_name_at(5);
+   create_producer_accounts({keyless});
+   BOOST_REQUIRE_EQUAL( success(), push_system_action(keyless, "regproducer"_n, mvo()
+      ("producer", keyless)("producer_key", get_public_key(keyless, "active"))("url", "")("location", 0)) );
+   BOOST_REQUIRE_EQUAL( success(),
+      register_operator(keyless, OperatorType::OPERATOR_TYPE_PRODUCER, false) );
+   BOOST_REQUIRE_EQUAL( success(), credit_collateral(keyless, base_min_bond * 10) );
+   produce_blocks(1);
+
+   // Ten times the bond of anyone else buys it nothing: without a key it cannot be scheduled, so
+   // it sorts behind every producer that can be.
+   {
+      const auto op = get_opreg_operator(keyless);
+      BOOST_REQUIRE_EQUAL( "OPERATOR_STATUS_ACTIVE", op["status"].as_string() );
+   }
+   BOOST_REQUIRE_EQUAL( tier_demoted, tier_of(rank_score_of(keyless)) );
+   for (uint32_t i = 0; i < names.size(); ++i) {
+      BOOST_REQUIRE_EQUAL( i + 1, producer_rank_position(names[i]) );
+   }
+
+   trigger_reschedule();
+   BOOST_REQUIRE( !is_scheduled(keyless) );
+   BOOST_REQUIRE(  is_scheduled(names[0]) );
+} FC_LOG_AND_RETHROW()
+
 BOOST_FIXTURE_TEST_CASE( unbonded_registrant_consumes_no_rank_position, producer_score_tester ) try {
    // Five producers, not three: below min_schedule_size (4) update_ranked_producers retains the
    // last good schedule instead of publishing, so the scheduling assertions below would be vacuous.

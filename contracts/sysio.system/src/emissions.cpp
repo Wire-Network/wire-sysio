@@ -984,8 +984,14 @@ void system_contract::payepoch(uint32_t epoch_index,
       // unpayable row is neither paid nor counted now; when its producer is payable again the
       // carried blocks are paid at THAT period's rate and counted in THAT period's divisor.
       uint32_t position = 0;
+      uint32_t examined = 0;
       for (auto it = prod_by_rank.begin(); it != prod_by_rank.end(); ++it) {
          if (producer_rank::tier_of(it->rank_score) == producer_tier::demoted) break;
+         // Hard ceiling on rows examined. This walk runs INLINE in an epoch advance, where an
+         // overrun stalls the chain, so its cost may not depend on the demoted tier actually
+         // bounding it. A row past the ceiling is neither paid nor reset -- the same treatment an
+         // unpayable row gets -- so its blocks carry rather than vanish.
+         if (++examined > max_rank_walk_rows) break;
 
          // is_schedulable requires an active row, ACTIVE opreg status, and an active finalizer
          // key: a producer missing any of them can never be scheduled, so it draws neither block

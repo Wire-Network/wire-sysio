@@ -68,6 +68,19 @@ namespace sysiosystem {
    /// too few nodes. Raising it trades more aggressive removal of ineligible
    /// producers for a stronger anti-concentration floor.
    static constexpr size_t   min_schedule_size     = 4;
+   /// Ceiling on rows a rank walk may EXAMINE before giving up on finding more.
+   ///
+   /// The demoted tier already bounds these walks: a row that cannot be scheduled scores into it
+   /// and sorts last. This is the belt to that pair of braces -- `regproducer` is permissionless
+   /// and the table unbounded, so a walk that runs inline in `onblock` or in the epoch payout
+   /// should never depend for its CPU cost on a predicate holding. Generous enough that it binds
+   /// only when something has already gone wrong: the schedule needs `max_producers` matches and
+   /// the payout `standby_end_rank`, both far below it.
+   ///
+   /// Stopping early is SAFE for pay because of the no-forfeiture rule: a row the walk never
+   /// reaches is neither paid nor reset, exactly like an unpayable one, so its blocks carry to the
+   /// next payout rather than being lost.
+   static constexpr uint32_t max_rank_walk_rows     = 500;
    static constexpr uint32_t seconds_per_year      = 52 * 7 * 24 * 3600;
    static constexpr uint32_t seconds_per_day       = 24 * 3600;
    static constexpr uint32_t seconds_per_hour      = 3600;

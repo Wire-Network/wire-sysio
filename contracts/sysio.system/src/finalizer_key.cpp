@@ -177,6 +177,12 @@ namespace sysiosystem {
             ++f.finalizer_key_count;
          });
       }
+      // Whether a producer HAS an active finalizer key is a scoring input: without one it
+      // cannot be scheduled, so it sinks below the tier every rank walk traverses. Every
+      // action that changes that answer has to move the stored key with it, or the producer
+      // sits at a rank its standing no longer matches -- and a stale demoted key at the front
+      // of the index stops the walks before the producers behind it.
+      rescore_producer( finalizer_name );
    }
 
    /*
@@ -236,6 +242,12 @@ namespace sysiosystem {
 
          set_proposed_finalizers(std::move(proposed_finalizers));
       }
+      // Whether a producer HAS an active finalizer key is a scoring input: without one it
+      // cannot be scheduled, so it sinks below the tier every rank walk traverses. Every
+      // action that changes that answer has to move the stored key with it, or the producer
+      // sits at a rank its standing no longer matches -- and a stale demoted key at the front
+      // of the index stops the walks before the producers behind it.
+      rescore_producer( finalizer_name );
    }
 
    /*
@@ -277,5 +289,11 @@ namespace sysiosystem {
 
       // Remove the key from finalizer_keys table
       idx.erase( std::move(fin_key_itr) );
+      // Whether a producer HAS an active finalizer key is a scoring input: without one it
+      // cannot be scheduled, so it sinks below the tier every rank walk traverses. Every
+      // action that changes that answer has to move the stored key with it, or the producer
+      // sits at a rank its standing no longer matches -- and a stale demoted key at the front
+      // of the index stops the walks before the producers behind it.
+      rescore_producer( finalizer_name );
    }
 } /// namespace sysiosystem
