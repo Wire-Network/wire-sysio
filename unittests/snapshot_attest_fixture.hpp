@@ -33,15 +33,6 @@ inline constexpr uint32_t preceding_block_offset = 1;
 
 namespace system_contract {
 
-/// Producer rank assignment action used during fixture bootstrap.
-inline constexpr auto action_setrank = "setrank"_n;
-
-/// Producer rank field in the rank-assignment action.
-inline constexpr auto field_rank = "rank";
-
-/// Top eligible producer rank assigned by the fixture.
-inline constexpr uint32_t producer_rank = 1;
-
 } // namespace system_contract
 
 /** Convert a BLAKE3 snapshot root to the checksum representation stored by the contract. */
@@ -68,12 +59,24 @@ public:
       regproducer(producer_account);
       produce_blocks();
 
-      BOOST_REQUIRE_EQUAL(
-         success(),
-         push_action(
-            config::system_account_name, system_contract::action_setrank,
-            mvo()(snapshot_attestation::field::producer, producer_account)
-               (system_contract::field_rank, system_contract::producer_rank)));
+      // Snapshot-provider eligibility is POSITION in the score-ordered producer index, not a rank
+      // governance assigns. A producer holds a position only as an ACTIVE PRODUCER operator in
+      // sysio.opreg carrying an active finalizer key, so the fixture must supply both.
+      deploy_opreg_once();
+      register_producer_operators({producer_account});
+      push_action(config::system_account_name, "setacctram"_n,
+                  mvo()("account", producer_account)("ram_bytes", int64_t(1'000'000)));
+      produce_blocks();
+      {
+         auto [privkey, pubkey, pop, sig_provider] = sysio::testing::get_bls_key(producer_account);
+         BOOST_REQUIRE_EQUAL(
+            success(),
+            push_action(producer_account, "regfinkey"_n,
+               mvo()("finalizer_name", producer_account)
+                    ("finalizer_key", pubkey.to_string())
+                    ("proof_of_possession", pop.to_string())));
+      }
+      set_node_finalizers(std::vector<name>{producer_account});
       produce_blocks();
 
       BOOST_REQUIRE_EQUAL(

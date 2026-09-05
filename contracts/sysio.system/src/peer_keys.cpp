@@ -1,9 +1,12 @@
 #include <sysio.system/sysio.system.hpp>
+#include <sysio.system/producer_score.hpp>
 #include <sysio.system/peer_keys.hpp>
 
 #include <sysio/sysio.hpp>
+#include <algorithm>
 #include <cassert>
 #include <cstdint>
+#include <vector>
 
 namespace sysiosystem {
 
@@ -49,20 +52,63 @@ peer_keys::getpeerkeys_res_t peer_keys::getpeerkeys() {
    getpeerkeys_res_t resp;
    resp.reserve(max_return);
 
-   auto add_peer = [&](const producer_info& p) {
-      auto pk = peerkey_key{p.owner.value};
-      if (!pkt.contains(pk))
-         resp.push_back(peerkeys_t{p.owner, {}});
-      else
-         resp.push_back(peerkeys_t{p.owner, pkt.get(pk).get_public_key()});
+   // Names already in the response, so a producer seeded from the schedule is not repeated by the
+   // rank walk. Bounded by max_return, so the linear scan is trivial.
+   std::vector<name> added;
+   added.reserve(max_return);
+
+   auto already_added = [&](const name& owner) {
+      return std::find(added.begin(), added.end(), owner) != added.end();
    };
+
+   // Keyed by NAME, not by a producers row: a producer scheduled through `setprods` during the
+   // bootstrap window may have no `producers` row at all, and its peer key still has to be
+   // discoverable. An absent peerkeys row yields an empty key rather than an omission -- the
+   // consumer needs to know the producer EXISTS.
+   auto add_peer = [&](const name& owner) {
+      auto pk = peerkey_key{owner.value};
+      if (!pkt.contains(pk))
+         resp.push_back(peerkeys_t{owner, {}});
+      else
+         resp.push_back(peerkeys_t{owner, pkt.get(pk).get_public_key()});
+      added.push_back(owner);
+   };
+
+   // SEED with the live schedule before ranking anything. `peer_keys_db_t::update_peer_keys`
+   // returns early only on an EMPTY response, so a non-empty one ERASES every producer it omits --
+   // omitting a producer that is currently producing blocks evicts it from the BP peer map and
+   // cuts it out of the gossip mesh. Rank alone does not identify those producers: a demoted one
+   // retained by the `min_schedule_size` floor still holds its slot and still produces (its next
+   // block is what clears the demotion), yet it sorts into the tier this walk stops at. The
+   // schedule is the authority on who is producing; rank only orders the candidates behind them.
+   for (const auto& scheduled : sysio::get_active_producers()) {
+      if (resp.size() >= max_return) break;
+      if (!already_added(scheduled)) add_peer(scheduled);
+   }
 
    auto idx = producers.get_index<"prodrank"_n>();
 
+   // `rank` is POSITION among ELIGIBLE producers, so this counts matches rather than taking the
+   // first `max_rank` index entries. Taking the first N would let unbonded registrants -- which
+   // occupy index slots but can never be scheduled -- crowd real producers out of peer discovery.
+   // The demoted tier sorts last and is never eligible, so it also bounds the walk over what is
+   // a permissionless, unbounded table.
+   //
+   // Peer discovery walks `is_eligible_operator`, NOT `is_schedulable`: it must not require a
+   // finalizer key. A producer scheduled through `setprods` -- the bootstrap window, and every
+   // harness that publishes schedules directly -- produces blocks before it registers one, and a
+   // block producer that `getpeerkeys` hides is a block producer the BP gossip mesh cannot reach.
+   uint32_t position = 0;
    for (auto i = idx.cbegin(); i != idx.cend() && resp.size() < max_return; ++i) {
-      if (i->rank > max_rank)
+      if (producer_rank::tier_of(i->rank_score) == producer_tier::demoted)
          break;
-      add_peer(*i);
+      if (!producer_rank::is_eligible_operator(*i))
+         continue;
+      if (++position > max_rank)
+         break;
+      if (already_added(i->owner))
+         continue;
+      add_peer(i->owner);
    }
 
    return resp;

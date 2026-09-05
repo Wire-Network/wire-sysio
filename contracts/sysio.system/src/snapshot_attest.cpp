@@ -1,4 +1,5 @@
 #include <sysio.system/sysio.system.hpp>
+#include <sysio.system/producer_score.hpp>
 #include <sysio.system/snapshot_attest.hpp>
 #include <sysio.system/block_utils.hpp>
 
@@ -42,22 +43,75 @@ enum class snapshot_producer_eligibility {
 };
 
 /// Returns the producer-table eligibility used only when a provider mapping is registered.
-snapshot_producer_eligibility get_snapshot_producer_eligibility(const producer_info& producer) {
+///
+/// `rank` is no longer a stored field -- it is POSITION in the "prodrank" index among schedulable
+/// producers. So the rank gate is a bounded walk of at most `max_snap_provider_rank` schedulable
+/// entries, testing membership, rather than a point read. Counting matches (rather than taking the
+/// first N index entries) is what stops unbonded registrants -- which occupy index slots but can
+/// never be scheduled -- from crowding real producers out of snapshot-provider eligibility.
+/// The producers holding rank positions 1..max_snap_provider_rank, in rank order.
+///
+/// Computed ONCE per caller and then tested for membership, rather than re-walked per producer:
+/// the prune path checks up to max_snap_providers entries, and a per-entry walk would make that
+/// quadratic.
+std::vector<name> snapshot_ranked_producers(name self) {
+   producers_table  producers(self);
+   finalizers_table finalizers(self);
+
+   std::vector<name> ranked;
+   ranked.reserve(max_snap_provider_rank);
+
+   auto idx = producers.get_index<"prodrank"_n>();
+   for (auto i = idx.cbegin(); i != idx.cend() && ranked.size() < max_snap_provider_rank; ++i) {
+      if (producer_rank::tier_of(i->rank_score) == producer_tier::demoted) break;
+      if (!producer_rank::is_schedulable(*i, finalizers)) continue;
+      ranked.push_back(i->owner);
+   }
+   return ranked;
+}
+
+/// Returns the producer-table eligibility used only when a provider mapping is registered.
+snapshot_producer_eligibility get_snapshot_producer_eligibility(const producer_info& producer,
+                                                               const std::vector<name>& ranked) {
    if (!producer.active()) {
       return snapshot_producer_eligibility::inactive;
    }
-   if (producer.rank > max_snap_provider_rank) {
+   if (std::find(ranked.begin(), ranked.end(), producer.owner) == ranked.end()) {
       return snapshot_producer_eligibility::rank_exceeds_maximum;
    }
    return snapshot_producer_eligibility::eligible;
 }
 
 /// Requires the producer's current table state to permit snapshot-provider registration.
-void require_snapshot_producer_eligibility(const producers_table& producers, name producer) {
+void require_snapshot_producer_eligibility(name self, name producer) {
+   producers_table producers(self);
    const auto prod_itr = producers.require_find(producer_key_t{producer.value}, producer_not_registered_error);
-   const auto eligibility = get_snapshot_producer_eligibility(*prod_itr);
+   const auto eligibility = get_snapshot_producer_eligibility(*prod_itr, snapshot_ranked_producers(self));
    check(eligibility != snapshot_producer_eligibility::inactive, producer_not_active_error);
    check(eligibility != snapshot_producer_eligibility::rank_exceeds_maximum, producer_rank_too_high_error);
+}
+
+/// Credit every producer whose vote contributed to a quorum-reaching snapshot record.
+///
+/// The vote rows -- the only place a per-producer voter list exists -- are PURGED once the record is
+/// finalized, so without this counter there is no attestation history to score. Reset on the same
+/// `payepoch` cadence as the block counters, which supplies the trailing window.
+void credit_snapshot_attestations(name self, const std::vector<name>& voters) {
+   producers_table producers(self);
+   for (const auto& voter : voters) {
+      auto key = producer_key_t{voter.value};
+      if (!producers.contains(key)) continue;
+      // Settle any RE-ENTRY reset BEFORE crediting. `rescore` drops a stale credit when a row
+      // comes back into the walk, and it recognises that by the tier its stored key moves out of.
+      // Crediting first would hand that reset this period's credit to consume -- the row is
+      // re-entering and freshly credited in the same transaction, and the reset cannot tell the
+      // two apart. Rescoring first spends the reset on the old value, so the increment below is
+      // the only credit standing when the second rescore records it.
+      producers.modify(same_payer, key, [](auto& row) { row.snapshot_attestations++; });
+      // The credit moved the snapshot factor, so the stored sort key is stale until rescored.
+      // Without this the factor would reach the index only on the next unrelated rescore.
+      producer_rank::rescore(self, producers, voter);
+   }
 }
 
 /// Counts provider mappings for the bounded registration-capacity check.
@@ -75,12 +129,13 @@ void prune_stale_snapshot_providers_if_full(name self, snap_providers_table& pro
       return;
    }
 
-   producers_table producers(self);
-   auto            provider_itr = providers.begin();
+   producers_table   producers(self);
+   const auto        ranked = snapshot_ranked_producers(self);
+   auto              provider_itr = providers.begin();
    while (provider_itr != providers.end()) {
       const auto producer_itr = producers.try_get(producer_key_t{provider_itr->producer.value});
       if (!producer_itr
-          || get_snapshot_producer_eligibility(*producer_itr) != snapshot_producer_eligibility::eligible) {
+          || get_snapshot_producer_eligibility(*producer_itr, ranked) != snapshot_producer_eligibility::eligible) {
          const name stale_producer = provider_itr->producer;
          const name stale_snap_account = provider_itr->snap_account;
          provider_itr = providers.erase(std::move(provider_itr));
@@ -131,7 +186,7 @@ void snapshot_attest::regsnapprov(name producer, name snap_account) {
    require_auth(producer);
 
    producers_table producers(get_self());
-   require_snapshot_producer_eligibility(producers, producer);
+   require_snapshot_producer_eligibility(get_self(), producer);
 
    snap_providers_table providers(get_self());
    const auto provider_itr = providers.find(snap_provider_key_t{snap_account.value});
@@ -188,13 +243,15 @@ void snapshot_attest::votesnaphash(name snap_account, checksum256 block_id, chec
    std::optional<uint64_t> matching_vote_id;
    uint32_t                voter_count = 0;
    bool                    exact_retry = false;
+   std::vector<name>       quorum_voters;
    for (auto vote_itr = by_block_num.lower_bound(static_cast<uint64_t>(block_num));
         vote_itr != by_block_num.end() && vote_itr->block_num == block_num; ++vote_itr) {
       if (std::find(vote_itr->voters.begin(), vote_itr->voters.end(), producer) != vote_itr->voters.end()) {
          check(vote_itr->block_id == block_id && vote_itr->snapshot_hash == snapshot_hash,
                vote_equivocation_error);
-         voter_count = static_cast<uint32_t>(vote_itr->voters.size());
-         exact_retry = true;
+         voter_count   = static_cast<uint32_t>(vote_itr->voters.size());
+         quorum_voters = vote_itr->voters;
+         exact_retry   = true;
          break;
       }
       if (vote_itr->block_id == block_id && vote_itr->snapshot_hash == snapshot_hash) {
@@ -204,6 +261,7 @@ void snapshot_attest::votesnaphash(name snap_account, checksum256 block_id, chec
 
    if (exact_retry) {
       if (voter_count >= config.min_providers) {
+         credit_snapshot_attestations(get_self(), quorum_voters);
          finalize_snapshot_vote(get_self(), block_num, block_id, snapshot_hash);
       }
       return;
@@ -215,6 +273,7 @@ void snapshot_attest::votesnaphash(name snap_account, checksum256 block_id, chec
       voter_count = static_cast<uint32_t>(matching_vote.voters.size()) + 1;
       votes.modify(same_payer, snap_vote_key_t{*matching_vote_id}, [&](auto& row) {
          row.voters.push_back(producer);
+         quorum_voters = row.voters;
       });
    } else {
       const uint64_t new_id = votes.available_primary_key();
@@ -224,10 +283,12 @@ void snapshot_attest::votesnaphash(name snap_account, checksum256 block_id, chec
          row.block_id      = block_id;
          row.snapshot_hash = snapshot_hash;
          row.voters        = {producer};
+         quorum_voters     = row.voters;
       });
    }
 
    if (voter_count >= config.min_providers) {
+      credit_snapshot_attestations(get_self(), quorum_voters);
       finalize_snapshot_vote(get_self(), block_num, block_id, snapshot_hash);
    }
 }

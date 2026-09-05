@@ -23,6 +23,13 @@ using opp::attestations::DepositRevert;
 
 namespace {
 
+/// Forward declaration -- defined with the other eligibility helpers further down. `regoperator`
+/// needs it so registering a PRODUCER notifies sysio.system to score the new operator row.
+void reevaluate_eligibility(opreg::operators_t& ops,
+                            const opreg::operator_key& op_pk,
+                            name self,
+                            name account);
+
 // System-owned rows bill to the sysio RAM pool, not this contract account (privileged-contract
 // model, as sysio.token uses): the account stays finite at code+abi size; growth draws from the pool.
 constexpr name ram_payer = "sysio"_n;
@@ -265,6 +272,11 @@ void opreg::setconfig(uint32_t max_available_producers,
    cfg.req_batchop_collat               = std::move(req_batchop_collat);
    cfg.req_uw_collat                    = std::move(req_uw_collat);
    cfg_tbl.set(cfg, ram_payer);
+
+   // sysio.system scores producer rank on the ratio of posted collateral to these minimums, so
+   // every stored score is stale the moment they move. Tell it on the same channel processprod
+   // uses; it opens a bounded rescore sweep on the notification.
+   require_recipient(opreg::SYSTEM_ACCOUNT);
 }
 
 // ---------------------------------------------------------------------------
@@ -352,6 +364,12 @@ void opreg::regoperator(name account,
       .registered_at   = now,
       .available_at    = is_bootstrapped ? now : 0,
    });
+
+   // Producer rank is scored from the operator row, so registering one -- which is what decides its
+   // tier -- must bring sysio.system's stored score in step. reevaluate_eligibility dispatches
+   // processprod for producers regardless of transition, which is the notification that does it.
+   // Declared below; see the forward declaration above regoperator.
+   reevaluate_eligibility(ops, op_pk, get_self(), account);
 }
 
 // ---------------------------------------------------------------------------
@@ -1044,14 +1062,16 @@ void reevaluate_eligibility(opreg::operators_t& ops,
                             const opreg::operator_key& op_pk,
                             name self,
                             name account) {
+   // An absent config must not silently skip evaluation: `meets_role_min` already treats a default
+   // (empty) requirement vector as "no operator of this role can activate", and a bootstrapped
+   // operator bypasses it either way. Returning early here also suppressed the producer rescore
+   // notification on chains that had not yet installed opconfig.
    opreg::opconfig_t cfg_tbl(self);
-   if (!cfg_tbl.exists()) return;
-   auto cfg = cfg_tbl.get();
+   auto cfg = cfg_tbl.get_or_default(opreg::op_config{});
    auto refreshed = ops.get(op_pk);
    if (has_terminal_status(refreshed.status)) return;
    bool was_eligible = (refreshed.status == OperatorStatus::OPERATOR_STATUS_ACTIVE);
    bool is_eligible  = meets_role_min(refreshed, cfg);
-   if (was_eligible == is_eligible) return;
 
    name handler;
    switch (refreshed.type) {
@@ -1060,10 +1080,35 @@ void reevaluate_eligibility(opreg::operators_t& ops,
       case OperatorType::OPERATOR_TYPE_UNDERWRITER: handler = "processuw"_n;    break;
       default:                                       return;
    }
+
+   // Producers dispatch on EVERY balance change, not only on an eligibility transition, because
+   // sysio.system scores producer rank on the collateral actually posted: a top-up while already
+   // ACTIVE must raise that score, and a partial withdraw must lower it. `processprod` is a no-op
+   // on the status when was == is; its notification is the point. Batch operators and underwriters
+   // have no such score, so they keep the transition-only dispatch.
+   if (was_eligible == is_eligible && refreshed.type != OperatorType::OPERATOR_TYPE_PRODUCER) {
+      return;
+   }
    action(
       permission_level{self, "active"_n},
       self, handler,
       std::make_tuple(account, was_eligible, is_eligible)
+   ).send();
+}
+
+/// Tell sysio.system that a producer's standing ended through a path
+/// `reevaluate_eligibility` does not cover -- a terminal transition (slash,
+/// termination). Same `processprod` channel, no eligibility transition
+/// (was == is), so the notification is the whole effect: sysio.system rescores
+/// the producer from its live status and sinks its rank key at once, instead of
+/// leaving a slashed or terminated producer in the healthy tier until some
+/// unrelated event rescored it.
+void notify_producer_standing(name self, const opreg::operator_entry& op) {
+   if (op.type != OperatorType::OPERATOR_TYPE_PRODUCER) return;
+   action(
+      permission_level{self, "active"_n},
+      self, "processprod"_n,
+      std::make_tuple(op.account, false, false)
    ).send();
 }
 
@@ -1090,6 +1135,12 @@ void opreg::deposit(name account, uint64_t amount) {
    check(op.status != OperatorStatus::OPERATOR_STATUS_SLASHED &&
          op.status != OperatorStatus::OPERATOR_STATUS_TERMINATED,
          "operator not in a deposit-eligible state");
+   // Bootstrapped operators are ACTIVE by fiat and bypass `meets_role_min` entirely, so collateral
+   // credited to one can never affect its eligibility -- the deposit would be accepted into a
+   // balance that does nothing. `depositinle` already rejects them; this closes the WIRE-direct
+   // path. There is deliberately no way to collateralise a bootstrap: an operator who wants a
+   // collateralised producer registers a new account.
+   check(!op.is_bootstrapped, "bootstrapped operators cannot deposit collateral");
 
    // Credit collateral BEFORE the outbound WIRE transfer, with the cap check
    // performed ATOMICALLY inside the same `modify` as the credit — reading the
@@ -1349,21 +1400,30 @@ void process_eligibility_change(name self, name account,
    // belongs at the transition sink as well as at each caller. A stale or
    // newly introduced callback must never reactivate an operator after slash
    // or termination merely because its collateral predicate says eligible.
-   if (has_terminal_status(ops.get(op_pk).status)) return;
+   // The notification below is NOT gated on it: a producer's terminal
+   // transition is exactly what sysio.system must hear about, and slash and
+   // termination dispatch through here (`notify_producer_standing`) to say so.
+   const bool terminal = has_terminal_status(ops.get(op_pk).status);
 
    auto now = current_time_ms();
-   if (!was_eligible && is_eligible) {
+   if (!terminal && !was_eligible && is_eligible) {
       ops.modify(same_payer, op_pk, [&](auto& o) {
          o.status       = OperatorStatus::OPERATOR_STATUS_ACTIVE;
          o.available_at = now;
       });
-      if (notify_system) {
-         require_recipient(opreg::SYSTEM_ACCOUNT);
-      }
-   } else if (was_eligible && !is_eligible) {
+   } else if (!terminal && was_eligible && !is_eligible) {
       ops.modify(same_payer, op_pk, [&](auto& o) {
          o.status = OperatorStatus::OPERATOR_STATUS_UNKNOWN;
       });
+   }
+
+   // Notify OUTSIDE the transition branches. sysio.system rescores the producer's rank from its
+   // live standing, so it must hear about a top-up that changed no status, about a drop out of
+   // ACTIVE, and about a slash or termination -- not only about a promotion. A stale score is not
+   // merely cosmetic: it leaves a de-collateralized, slashed or terminated producer holding an
+   // index slot ahead of bonded ones.
+   if (notify_system) {
+      require_recipient(opreg::SYSTEM_ACCOUNT);
    }
 }
 
@@ -1434,6 +1494,8 @@ void opreg::slash(name account, std::string reason) {
       emit_slash_attestation(get_self(), slash_action);
       append_action_log(ops, op_pk, slash_action, /*success*/ true, "");
    }
+
+   notify_producer_standing(get_self(), op);
 }
 
 // ---------------------------------------------------------------------------
@@ -1578,6 +1640,8 @@ void terminate_inline(name self, name account, const std::string& reason) {
       append_action_log(ops, op_pk, remit_action, /*success*/ true,
                         std::string("terminate-remit"));
    }
+
+   notify_producer_standing(self, op);
 }
 
 } // anonymous namespace
@@ -1661,9 +1725,19 @@ void opreg::termcheck(name account) {
    // `batch_operator_minimum_active` with no remaining ACTIVE operators
    // to advance consensus and no recovery path.
    if (op.is_bootstrapped) return;
-   // Termination on rolling-buffer underperformance is, for now, scoped to
-   // batch operators. Producer schedule misses + underwriter offline-too-long
-   // are open questions per the plan §1; revisit when those decisions land.
+   // Termination on rolling-buffer underperformance is scoped to batch operators, and for
+   // producers that is now a DECISION rather than an open question.
+   //
+   // A producer that misses `max_consecutive_missed_rounds` consecutive scheduled rounds is
+   // DEMOTED by sysio.system -- moved to a categorical tier no score can climb out of, so it
+   // leaves the schedule and draws no pay. Demotion is deliberately recoverable: the producer
+   // re-registers via `regproducer` when it is ready again. Termination is not recoverable, and
+   // it also returns the bond, so applying it to an offline-but-bonded producer would convert a
+   // reversible outage into a permanent exit and hand back the collateral that makes the operator
+   // accountable. An indefinitely-demoted producer therefore stays demoted -- holding its row and
+   // its bond -- until it either re-registers or withdraws of its own accord.
+   //
+   // Underwriter offline-too-long remains open; they have no committee and no schedule to miss.
    if (op.type != OperatorType::OPERATOR_TYPE_BATCH) return;
 
    // Thresholds come from opconfig — tests can dial them down so the

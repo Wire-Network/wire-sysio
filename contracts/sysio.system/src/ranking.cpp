@@ -7,6 +7,7 @@
 
 #include <sysio.system/sysio.system.hpp>
 #include <sysio.system/opreg_status.hpp>
+#include <sysio.system/producer_score.hpp>
 #include <sysio.token/sysio.token.hpp>
 
 #include <type_traits>
@@ -55,7 +56,96 @@ namespace sysiosystem {
             info.producer_authority = producer_authority;
             if ( info.last_claim_time == time_point() )
                info.last_claim_time = ct;
+            // regproducer is the door back for a producer the schedule has DROPPED -- a voluntary
+            // `unregprod` park, an involuntary demotion, or a participation penalty that pushed it
+            // below the active set (the streak clears only by producing, and a producer that is not
+            // scheduled cannot produce). `unregprod` erases the signing key, so re-registering has
+            // to re-supply it, which makes this a genuine assertion of readiness rather than a
+            // no-op. There is deliberately no cooldown and no expiry: a producer that comes back
+            // before it is ready is demoted again within max_consecutive_missed_rounds rounds,
+            // which is self-correcting. A demoted producer that is still in the active schedule
+            // recovers on its own by producing -- see `record_round_participation`.
+            // Clears the DEMOTION, not the record. `regproducer` costs nothing but a signature
+            // and may be repeated, so clearing the streak here would let an offline operator cron
+            // its way back to healthy after every second miss and never produce a block -- the
+            // demotion model would stop meaning anything. The streak survives and clears only by
+            // PRODUCING, so a producer that returns unready is demoted again on its next missed
+            // round; until it produces, the participation factor keeps scoring it accordingly.
+            //
+            // The miss WINDOW does reset, and that is safe for the same reason: the consecutive
+            // gate is what defeats a cron loop, and it is untouched here. Without this reset a
+            // producer whose rate gate tripped could never recover -- demoted, it is not
+            // scheduled, so it observes no rounds, so its rate can never improve.
+            info.is_demoted              = false;
+            info.rounds_in_window        = 0;
+            info.missed_rounds_in_window = 0;
+            info.miss_window_open_ms     = 0;
          });
+
+      // The clear above changes the producer's tier, so its sort key is stale until rescored.
+      rescore_producer( producer );
+   }
+
+   void system_contract::rescore_producer( const name& producer ) {
+      producer_rank::rescore( get_self(), _producers, producer );
+   }
+
+   void system_contract::reconcile_and_rescore( const name& producer ) {
+      auto key = producer_key_t{producer.value};
+      if( !_producers.contains(key) ) return;
+
+      producer_rank::producer_score_config_t weights_tbl( get_self() );
+      const auto weights = weights_tbl.get_or_default( producer_rank::producer_score_config{} );
+      const auto info    = _producers.get(key);
+
+      // A LOWERED threshold has to reach the streaks that already passed it. Demotion is normally
+      // decided when a round is observed, and a producer that has fallen off the schedule observes
+      // none -- so without this a lowered threshold would never bind on exactly the producers it
+      // was lowered to catch. This runs only on the sweep, which the config change itself opens,
+      // so an ordinary rescore never re-derives the flag.
+      //
+      // A RAISED threshold deliberately does NOT un-demote anyone. Demotion is categorical: it
+      // clears by producing a block while still scheduled, or by `regproducer`. Governance
+      // widening the tolerance is not a pardon for producers already judged under the old one, and
+      // either door back is open to them immediately.
+      if( !info.is_demoted
+          && producer_rank::warrants_demotion( info.consecutive_missed_rounds, info.rounds_in_window,
+                                               info.missed_rounds_in_window, weights ) ) {
+         _producers.modify( same_payer, key, []( auto& p ) { p.is_demoted = true; });
+      }
+      rescore_producer( producer );
+   }
+
+   void system_contract::onprocessprod( name account, bool, bool ) {
+      // The eligibility flags are not consulted: rescore_producer reads the operator's live status
+      // and balances, which is the same information after the flip and cannot go stale between the
+      // notification and this handler.
+      rescore_producer( account );
+   }
+
+   void system_contract::setscorecfg( const producer_rank::producer_score_config& weights ) {
+      require_auth( get_self() );
+
+      producer_rank::producer_score_config_t weights_tbl( get_self() );
+      weights_tbl.set( weights, get_self() );
+
+      // Every stored rank_score was computed under the OLD weights. Rather than rewrite an
+      // unbounded table inline, open a rescore sweep: onblock drains a bounded number of rows per
+      // schedule-rebuild tick until the cursor is exhausted.
+      open_rescore_sweep();
+   }
+
+   void system_contract::onsetconfig() {
+      // The collateral minimums moved (sysio.opreg::setconfig notified us), so every stored score's
+      // collateral ratio is stale. Same remedy as a weight change.
+      open_rescore_sweep();
+   }
+
+   void system_contract::open_rescore_sweep() {
+      _global.modify( get_self(), []( auto& g ) {
+         g.rescore_cursor  = 0;
+         g.rescore_pending = true;
+      });
    }
 
    void system_contract::regproducer( const name& producer, const sysio::public_key& producer_key, const std::string& url, uint16_t location ) {
@@ -83,11 +173,37 @@ namespace sysiosystem {
       _producers.get( key, "producer not found" );
       _producers.modify( get_self(), key, [&]( producer_info& info ){
          info.deactivate();
+         // A park leaves the pay walk exactly as a demotion does, so it consumes the period's
+         // snapshot credit for the same reason -- see `record_round_outcome`.
+         info.snapshot_attestations = 0;
       });
+
+      // A parked row scores into the demoted tier, so the sort key is stale until rescored. This
+      // is what keeps the tier a statement about LIVE standing: every rank walk stops at the first
+      // demoted entry, and a parked producer left in its old tier would be visited (and skipped)
+      // by every one of them until some unrelated event happened to rescore it.
+      rescore_producer( producer );
    }
 
    void system_contract::update_ranked_producers( const block_timestamp& block_time ) {
+      // Never publish a schedule out of a HALF-SWEPT index. A weight or minimum change invalidates
+      // every stored score at once, and the sweep rewrites them a bounded batch at a time -- so
+      // while it drains, the index holds scores from two different configurations at once. Order
+      // within a tier is what picks the top 21 and the standby band, so ranking off that mixture
+      // would propose a schedule and a finalizer policy matching NEITHER configuration, and would
+      // do it repeatedly as the sweep advanced. Waiting costs at most a few ticks and the
+      // schedule the chain is already producing under stays in force meanwhile.
+      //
+      // `payepoch` deliberately does NOT wait: deferring it would withhold a period's pay for a
+      // configuration change, and block pay is a per-producer count that does not depend on the
+      // order of the walk at all. Only the standby retainer reads position, so at worst one
+      // period's retainer is assigned off a mixed order -- a far smaller cost than not paying.
+      // The throttle stamp advances FIRST, even when the rebuild below is skipped: it is what
+      // keeps this to one attempt per tick. Returning before it would leave `onblock` re-entering
+      // on every single block for as long as the sweep runs.
       _global.modify( get_self(), [&]( auto& g ) { g.last_producer_schedule_update = block_time; });
+
+      if( _global.get().rescore_pending ) return;
 
       auto idx = _producers.get_index<"prodrank"_n>();
 
@@ -97,43 +213,22 @@ namespace sysiosystem {
       top_producers.reserve(max_producers);
       proposed_finalizers.reserve(max_producers);
 
-      // Standbys (rank above max_producers, up to standby_end_rank) may backfill
-      // active slots vacated by ineligible producers, so the schedule stays at
-      // max_producers whenever replacements exist. standby_end_rank is
-      // governance-tunable on the emitcfg singleton (>= 22, capped by
-      // setemitcfg); before emissions config is installed there are no standbys,
-      // so fall back to max_producers.
-      uint32_t schedule_rank_limit = max_producers;
-      emissions::emitcfg_t emitcfg( get_self() );
-      if( emitcfg.exists() ) {
-         schedule_rank_limit = emitcfg.get().standby_end_rank;
-      }
-
+      // `rank` is POSITION in this index among schedulable producers, so the first max_producers
+      // matches ARE ranks 1..max_producers -- the active schedule. Standbys are the positions past
+      // it and never enter the schedule, which is why the old schedule_rank_limit branch is gone:
+      // a slot vacated by an ineligible producer is filled by the next schedulable entry for free,
+      // with no explicit backfill.
+      //
+      // The walk is bounded by the demoted tier. `regproducer` is permissionless, so the table is
+      // unbounded -- but producer_rank::compute sinks every non-ACTIVE producer operator into the
+      // demoted tier, which sorts last, so the scan stops before the spam tail.
+      uint32_t examined = 0;
       for( auto it = idx.cbegin(); it != idx.cend() && top_producers.size() < max_producers; ++it ) {
-         if( it->rank > schedule_rank_limit ) break;   // past the last standby
-         if( !it->active() ) continue;
+         if( producer_rank::tier_of( it->rank_score ) == producer_tier::demoted ) break;
+         if( ++examined > max_rank_walk_rows ) break;
+         if( !producer_rank::is_schedulable( *it, _finalizers ) ) continue;
 
-         // A producer must be a live, collateral-backed producer operator in
-         // sysio.opreg. A producer that withdrew collateral (status UNKNOWN),
-         // was slashed, or was terminated is no longer OPERATOR_STATUS_ACTIVE
-         // and must not be scheduled. Requiring OPERATOR_TYPE_PRODUCER prevents
-         // an account that is ACTIVE only as a different operator type (e.g. a
-         // batch operator, backed by different collateral) from being scheduled.
-         if( !is_op_active( it->owner, sysio::opp::types::OperatorType::OPERATOR_TYPE_PRODUCER ) ) {
-            continue;
-         }
-
-         // Require active finalizer key for all scheduled producers
-         auto fin_key = finalizer_key_t{it->owner.value};
-         if( !_finalizers.contains(fin_key) ) {
-            continue;
-         }
-         auto finalizer = _finalizers.get(fin_key);
-         if( finalizer.active_key_binary.empty() ) {
-            continue;
-         }
-
-         proposed_finalizers.emplace_back(finalizer);
+         proposed_finalizers.emplace_back( _finalizers.get( finalizer_key_t{it->owner.value} ) );
          top_producers.emplace_back(
             sysio::producer_authority{
                .producer_name = it->owner,
