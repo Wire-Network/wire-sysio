@@ -662,11 +662,12 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_quorum_credits_voting_producers, snapshot_v
    BOOST_REQUIRE_EQUAL(key3, key_of("producer3"_n));
 } FC_LOG_AND_RETHROW() }
 
-// A credit is a per-period factor, and `payepoch` zeroes it only on the rows it visits -- never
-// the demoted tier. A producer that leaves the walk with a credit (a park here; a demotion or a
-// de-collateralization take the same path) must therefore restart at zero when it re-enters,
-// or a credit earned before it left would outrank a producer that actually attested this period.
-BOOST_FIXTURE_TEST_CASE(re_entering_the_walk_restarts_the_snapshot_credit, snapshot_voting_tester) { try {
+// A credit is a per-period SERVICE RATING, and `payepoch` zeroes it only on the rows it visits --
+// never the demoted tier. So leaving the pay walk consumes it, at the event that does the leaving:
+// a park here, a demotion in `record_round_outcome`. Otherwise a credit earned before the producer
+// left would ride back in and outrank producers who actually attested that period. Contrast the
+// block count, which is an earned debt and is deliberately carried across the same boundary.
+BOOST_FIXTURE_TEST_CASE(leaving_the_walk_consumes_the_snapshot_credit, snapshot_voting_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
    BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2));
@@ -686,11 +687,12 @@ BOOST_FIXTURE_TEST_CASE(re_entering_the_walk_restarts_the_snapshot_credit, snaps
    BOOST_REQUIRE_EQUAL(1u, attestations_of("producer1"_n));
    BOOST_REQUIRE_LT(key_of("producer1"_n), uncredited);
 
-   // Leaving the walk keeps the counter (nothing visits the row to zero it) ...
+   // Parking consumes the period's credit at once ...
    BOOST_REQUIRE_EQUAL(success(), unregproducer("producer1"_n));
-   BOOST_REQUIRE_EQUAL(1u, attestations_of("producer1"_n));
+   BOOST_REQUIRE_EQUAL(0u, attestations_of("producer1"_n));
 
-   // ... and re-entering restarts it: the key comes back exactly as it was before the credit.
+   // ... so coming back brings no stale service rating with it: the key is exactly what it was
+   // before the credit was ever granted.
    BOOST_REQUIRE_EQUAL(success(), regproducer("producer1"_n));
    BOOST_REQUIRE_EQUAL(0u, attestations_of("producer1"_n));
    BOOST_REQUIRE_EQUAL(uncredited, key_of("producer1"_n));

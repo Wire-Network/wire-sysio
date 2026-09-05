@@ -264,34 +264,24 @@ namespace sysiosystem {
          producer_score_config_t weights_tbl(self);
          const auto weights = weights_tbl.get_or_default(producer_score_config{});
 
-         const auto info = producers.get(key);
-         auto inputs = score_inputs{
-            .is_active                 = info.active(),
-            .is_demoted                = info.is_demoted,
-            .consecutive_missed_rounds = info.consecutive_missed_rounds,
-            .snapshot_attestations     = info.snapshot_attestations
-         };
-         uint64_t score = compute(producer, inputs, weights);
+         const auto info  = producers.get(key);
+         const auto score = compute(
+            producer,
+            score_inputs{
+               .is_active                 = info.active(),
+               .is_demoted                = info.is_demoted,
+               .consecutive_missed_rounds = info.consecutive_missed_rounds,
+               .snapshot_attestations     = info.snapshot_attestations
+            },
+            weights);
 
-         // A producer RE-ENTERING the walk starts the period's snapshot credit at zero. `payepoch`
-         // zeroes the counter only on the rows it visits, and it never visits the demoted tier, so
-         // a credit earned before a demotion, a park or a de-collateralization would otherwise
-         // ride back in as a stale factor and outrank a producer that actually attested this
-         // period. Only the credit restarts: the miss streak stays, so leaving and re-entering
-         // cannot be used to dodge a demotion, and the block count is pay, never a score input.
-         const bool re_entering  = tier_of(info.rank_score) == producer_tier::demoted
-                                && tier_of(score) != producer_tier::demoted;
-         const bool reset_credit = re_entering && info.snapshot_attestations > 0;
-         if (reset_credit) {
-            inputs.snapshot_attestations = 0;
-            score = compute(producer, inputs, weights);
-         }
-
-         if (score == info.rank_score && !reset_credit) return;   // no index move needed
-         producers.modify(same_payer, key, [&](auto& row) {
-            row.rank_score = score;
-            if (reset_credit) row.snapshot_attestations = 0;
-         });
+         // The period's snapshot credit is cleared at the EVENTS that drop a producer out of the
+         // pay walk -- demotion and `unregprod` -- not inferred here from a tier change. Inferring
+         // it was wrong: a row can be re-entering and freshly credited in the same block, and a
+         // tier comparison cannot tell that credit apart from a stale one, so it consumed credits
+         // that had just been earned.
+         if (score == info.rank_score) return;   // no index move needed
+         producers.modify(same_payer, key, [&](auto& row) { row.rank_score = score; });
       }
 
    } // namespace producer_rank

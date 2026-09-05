@@ -5943,7 +5943,9 @@ struct producer_score_tester : public producer_eligibility_tester {
                                   uint32_t participation_weight = 10'000,
                                   uint32_t snapshot_weight      = 10'000,
                                   uint32_t max_consecutive_missed_rounds = 3,
-                                  uint32_t snapshot_target_attestations  = 1) {
+                                  uint32_t snapshot_target_attestations  = 1,
+                                  uint64_t missed_round_window_ms         = 24ULL * 60 * 60 * 1000,
+                                  uint32_t max_pct_missed_rounds_in_window = 5) {
       return push_system_action(config::system_account_name, "setscorecfg"_n, mvo()
          ("weights", mvo()
             ("collateral_weight",             collateral_weight)
@@ -5953,7 +5955,9 @@ struct producer_score_tester : public producer_eligibility_tester {
             ("api_weight",                    uint32_t{0})
             ("benchmark_weight",              uint32_t{0})
             ("max_consecutive_missed_rounds", max_consecutive_missed_rounds)
-            ("snapshot_target_attestations",  snapshot_target_attestations)));
+            ("snapshot_target_attestations",  snapshot_target_attestations)
+            ("missed_round_window_ms",         missed_round_window_ms)
+            ("max_pct_missed_rounds_in_window", max_pct_missed_rounds_in_window)));
    }
 
    /// The packed sort key stored on a producer.
@@ -6331,7 +6335,10 @@ BOOST_FIXTURE_TEST_CASE( demotion_fires_at_threshold_and_outweighs_collateral, p
 } FC_LOG_AND_RETHROW()
 
 // `regproducer` is the door back for a producer the schedule has DROPPED, from an involuntary
-// demotion as much as from a voluntary park. There is no cooldown and no expiry.
+// demotion as much as from a voluntary park. There is no cooldown and no expiry -- but it returns
+// ELIGIBILITY, not a clean record: the miss streak survives it and clears only by producing.
+// Otherwise an offline operator could cron `regproducer` after every second miss and never produce
+// a block, and the demotion model would stop meaning anything.
 BOOST_FIXTURE_TEST_CASE( regproducer_clears_demotion_immediately, producer_score_tester ) try {
    auto names = setup_ranked_producers(5);
    trigger_reschedule();
@@ -6346,8 +6353,52 @@ BOOST_FIXTURE_TEST_CASE( regproducer_clears_demotion_immediately, producer_score
    produce_blocks(1);
 
    BOOST_REQUIRE( !demoted(target) );
-   BOOST_REQUIRE_EQUAL( 0u, missed_rounds_of(target) );
    BOOST_REQUIRE_EQUAL( tier_bootstrapped, tier_of(rank_score_of(target)) );
+   // The penalty stands: `regproducer` returns eligibility, not a clean record. Only producing
+   // clears the streak, so a cron loop of re-registrations cannot outrun the demotion model.
+   BOOST_REQUIRE_EQUAL( 3u, missed_rounds_of(target) );
+} FC_LOG_AND_RETHROW()
+
+// The second demotion gate: a miss RATE over a rolling window, mirroring the shape
+// `sysio.opreg::termcheck` applies to batch operators. It catches the producer that is not offline
+// long enough to trip the consecutive gate but misses far too often to be carrying a slot.
+//
+// The thresholds here isolate it deliberately. With a consecutive limit of 2 and a rate limit of
+// 40%, alternating miss / produce never lets the streak reach 2, so ONLY the rate gate can fire --
+// and the derived minimum sample (limit * 100 / percent = 5 rounds) means it cannot fire on the
+// first miss either, which is the whole reason that minimum exists.
+BOOST_FIXTURE_TEST_CASE( miss_rate_over_the_window_demotes_without_a_consecutive_run, producer_score_tester ) try {
+   auto names = setup_ranked_producers(5);
+   BOOST_REQUIRE_EQUAL( success(), set_score_config(
+      /*collateral_weight=*/10'000, /*participation_weight=*/10'000, /*snapshot_weight=*/1'000,
+      /*max_consecutive_missed_rounds=*/2, /*snapshot_target_attestations=*/1,
+      /*missed_round_window_ms=*/24ULL * 60 * 60 * 1000, /*max_pct_missed_rounds_in_window=*/40) );
+   trigger_reschedule();
+   wait_for_active_schedule(names[2]);
+
+   const auto target = names[2];
+   const auto miss_then_produce = [&]() {
+      skip_round_of(target);                                        // one missed round
+      produce_blocks(names.size() * slots_per_producer);            // one produced round
+   };
+
+   // One cycle: the rate is already 50%, but the sample is below the derived minimum, so the gate
+   // stays armed rather than firing. The streak never reaches the consecutive limit either.
+   miss_then_produce();
+   BOOST_REQUIRE_MESSAGE( !demoted(target),
+      "the rate gate fired on a sample too small to mean anything" );
+   BOOST_REQUIRE_LT( missed_rounds_of(target), 2u );
+
+   // Two more cycles, then one further miss: five observed rounds, three missed. The sample
+   // clears the minimum and 60% exceeds the 40% limit, so the producer is demoted for its RECORD,
+   // never for a run.
+   miss_then_produce();
+   skip_round_of(target);
+   BOOST_REQUIRE_MESSAGE( demoted(target),
+      "a producer missing half its rounds should be demoted by the rate gate" );
+   BOOST_REQUIRE_MESSAGE( missed_rounds_of(target) < 2u,
+      "the consecutive gate must not be what demoted it -- this test would prove nothing" );
+   BOOST_REQUIRE_EQUAL( tier_demoted, tier_of(rank_score_of(target)) );
 } FC_LOG_AND_RETHROW()
 
 // The OTHER door back, and the one no operator has to walk through: a demoted producer that is

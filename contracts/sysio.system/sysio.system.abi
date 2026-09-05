@@ -1039,6 +1039,18 @@
                 {
                     "name": "snapshot_attestations",
                     "type": "uint32"
+                },
+                {
+                    "name": "rounds_in_window",
+                    "type": "uint32"
+                },
+                {
+                    "name": "missed_rounds_in_window",
+                    "type": "uint32"
+                },
+                {
+                    "name": "miss_window_open_ms",
+                    "type": "uint64"
                 }
             ]
         },
@@ -1114,6 +1126,14 @@
                 },
                 {
                     "name": "snapshot_target_attestations",
+                    "type": "uint32"
+                },
+                {
+                    "name": "missed_round_window_ms",
+                    "type": "uint64"
+                },
+                {
+                    "name": "max_pct_missed_rounds_in_window",
                     "type": "uint32"
                 }
             ]

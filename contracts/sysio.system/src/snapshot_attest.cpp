@@ -101,6 +101,12 @@ void credit_snapshot_attestations(name self, const std::vector<name>& voters) {
    for (const auto& voter : voters) {
       auto key = producer_key_t{voter.value};
       if (!producers.contains(key)) continue;
+      // Settle any RE-ENTRY reset BEFORE crediting. `rescore` drops a stale credit when a row
+      // comes back into the walk, and it recognises that by the tier its stored key moves out of.
+      // Crediting first would hand that reset this period's credit to consume -- the row is
+      // re-entering and freshly credited in the same transaction, and the reset cannot tell the
+      // two apart. Rescoring first spends the reset on the old value, so the increment below is
+      // the only credit standing when the second rescore records it.
       producers.modify(same_payer, key, [](auto& row) { row.snapshot_attestations++; });
       // The credit moved the snapshot factor, so the stored sort key is stale until rescored.
       // Without this the factor would reach the index only on the next unrelated rescore.

@@ -65,8 +65,21 @@ namespace sysiosystem {
             // before it is ready is demoted again within max_consecutive_missed_rounds rounds,
             // which is self-correcting. A demoted producer that is still in the active schedule
             // recovers on its own by producing -- see `record_round_participation`.
-            info.is_demoted                = false;
-            info.consecutive_missed_rounds = 0;
+            // Clears the DEMOTION, not the record. `regproducer` costs nothing but a signature
+            // and may be repeated, so clearing the streak here would let an offline operator cron
+            // its way back to healthy after every second miss and never produce a block -- the
+            // demotion model would stop meaning anything. The streak survives and clears only by
+            // PRODUCING, so a producer that returns unready is demoted again on its next missed
+            // round; until it produces, the participation factor keeps scoring it accordingly.
+            //
+            // The miss WINDOW does reset, and that is safe for the same reason: the consecutive
+            // gate is what defeats a cron loop, and it is untouched here. Without this reset a
+            // producer whose rate gate tripped could never recover -- demoted, it is not
+            // scheduled, so it observes no rounds, so its rate can never improve.
+            info.is_demoted              = false;
+            info.rounds_in_window        = 0;
+            info.missed_rounds_in_window = 0;
+            info.miss_window_open_ms     = 0;
          });
 
       // The clear above changes the producer's tier, so its sort key is stale until rescored.
@@ -75,6 +88,32 @@ namespace sysiosystem {
 
    void system_contract::rescore_producer( const name& producer ) {
       producer_rank::rescore( get_self(), _producers, producer );
+   }
+
+   void system_contract::reconcile_and_rescore( const name& producer ) {
+      auto key = producer_key_t{producer.value};
+      if( !_producers.contains(key) ) return;
+
+      producer_rank::producer_score_config_t weights_tbl( get_self() );
+      const auto weights = weights_tbl.get_or_default( producer_rank::producer_score_config{} );
+      const auto info    = _producers.get(key);
+
+      // A LOWERED threshold has to reach the streaks that already passed it. Demotion is normally
+      // decided when a round is observed, and a producer that has fallen off the schedule observes
+      // none -- so without this a lowered threshold would never bind on exactly the producers it
+      // was lowered to catch. This runs only on the sweep, which the config change itself opens,
+      // so an ordinary rescore never re-derives the flag.
+      //
+      // A RAISED threshold deliberately does NOT un-demote anyone. Demotion is categorical: it
+      // clears by producing a block while still scheduled, or by `regproducer`. Governance
+      // widening the tolerance is not a pardon for producers already judged under the old one, and
+      // either door back is open to them immediately.
+      if( !info.is_demoted
+          && producer_rank::warrants_demotion( info.consecutive_missed_rounds, info.rounds_in_window,
+                                               info.missed_rounds_in_window, weights ) ) {
+         _producers.modify( same_payer, key, []( auto& p ) { p.is_demoted = true; });
+      }
+      rescore_producer( producer );
    }
 
    void system_contract::onprocessprod( name account, bool, bool ) {
@@ -134,6 +173,9 @@ namespace sysiosystem {
       _producers.get( key, "producer not found" );
       _producers.modify( get_self(), key, [&]( producer_info& info ){
          info.deactivate();
+         // A park leaves the pay walk exactly as a demotion does, so it consumes the period's
+         // snapshot credit for the same reason -- see `record_round_outcome`.
+         info.snapshot_attestations = 0;
       });
 
       // A parked row scores into the demoted tier, so the sort key is stale until rescored. This

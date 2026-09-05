@@ -153,12 +153,26 @@ namespace sysiosystem {
       /// the moment it produces. At prodscorecfg's max_consecutive_missed_rounds it sets
       /// `is_demoted`; see producer_rank.hpp.
       uint32_t                                                 consecutive_missed_rounds = 0;
-      /// Demoted to standby for missing rounds. Categorical -- no score overcomes it. Cleared only
-      /// by `regproducer`, which is the single door back from both a voluntary `unregprod` park and
-      /// an involuntary demotion.
+      /// Demoted to standby for missing rounds. Categorical -- no score overcomes it. Cleared by
+      /// producing a block while still scheduled, or by `regproducer`.
       bool                                                     is_demoted = false;
       /// Snapshot attestations credited this pay period; reset alongside the block counters.
       uint32_t                                                 snapshot_attestations = 0;
+      /// Scheduled rounds OBSERVED inside the current miss window, and how many went unproduced.
+      /// Only rounds the producer was actually scheduled for are counted, so time spent off the
+      /// schedule contributes nothing rather than reading as failure.
+      ///
+      /// DECLARED LAST, matching the tail of SYSLIB_SERIALIZE below. The ABI is generated from
+      /// these declarations while the contract serializes in the macro's order, so the two orders
+      /// must agree -- when they disagree every field past the divergence decodes from the wrong
+      /// bytes, silently, and a reader sees a plausible value belonging to its neighbour.
+      uint32_t                                                 rounds_in_window = 0;
+      uint32_t                                                 missed_rounds_in_window = 0;
+      /// When the current miss window opened (on-chain ms). A round observed after the window has
+      /// lapsed opens a fresh one, so these counters can never survive an absence longer than the
+      /// window itself -- the resurrection CertiK flagged as WNS-47, designed out rather than
+      /// patched.
+      uint64_t                                                 miss_window_open_ms = 0;
 
       uint64_t by_rank_score()const { return rank_score; }
       bool     active()const      { return is_active;                               }
@@ -169,7 +183,8 @@ namespace sysiosystem {
       }
 
       SYSLIB_SERIALIZE( producer_info, (owner)(producer_key)(rank_score)(is_active)(url)(unpaid_blocks)(last_claim_time)(location)(producer_authority)
-                         (consecutive_missed_rounds)(is_demoted)(snapshot_attestations) )
+                         (consecutive_missed_rounds)(is_demoted)(snapshot_attestations)
+                         (rounds_in_window)(missed_rounds_in_window)(miss_window_open_ms) )
    };
 
    using producers_table = sysio::kv::table< "producers"_n, producer_key_t, producer_info,
@@ -803,7 +818,21 @@ namespace sysiosystem {
          void record_round_participation( const name& current_producer );
 
          /// Charge one producer a missed round, demoting it if that crosses the threshold.
-         void record_missed_round( const name& producer, uint32_t max_consecutive_missed_rounds );
+         /**
+          * Record one scheduled round for `producer` -- made or missed -- rolling its miss window,
+          * updating the streak and the window counts, and applying both demotion gates.
+          *
+          * @param producer the producer whose round this was.
+          * @param missed   whether the round went unproduced.
+          * @param weights  the live score configuration.
+          */
+         void record_round_outcome( const name& producer, bool missed,
+                                    const producer_rank::producer_score_config& weights );
+
+         /// Re-derive `is_demoted` from the LIVE thresholds, then rescore. Sweep-only: a config
+         /// change is the one event that can leave a stored demotion flag disagreeing with the
+         /// rule that produced it.
+         void reconcile_and_rescore( const name& producer );
 
          /// Restart the rescore cursor from row 0 and flag the sweep pending -- every stored
          /// score is stale after a weight change (`setscorecfg`) or a collateral-minimum change

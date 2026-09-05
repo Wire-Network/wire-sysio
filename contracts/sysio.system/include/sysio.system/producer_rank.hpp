@@ -204,16 +204,79 @@ namespace sysiosystem {
          /// factor. The counter is reset on the same cadence as the block counters, so this is the
          /// window's target rather than an all-time total.
          uint32_t snapshot_target_attestations = 1;
+         /// Rolling window the miss RATE below is measured over, in milliseconds. Mirrors
+         /// `sysio.opreg`'s `terminate_window_ms`, which is the batch-operator equivalent: a
+         /// producer and a batch operator should answer to the same shape of availability test
+         /// even though a producer is DEMOTED where an operator is terminated.
+         uint64_t missed_round_window_ms = 24ULL * 60 * 60 * 1000;
+
+         /// Percent of its scheduled rounds a producer may miss inside that window before it is
+         /// demoted. Mirrors `terminate_max_pct_misses_24h`. Zero disables the rate gate, leaving
+         /// only the consecutive one.
+         uint32_t max_pct_missed_rounds_in_window = 5;
+
 
          SYSLIB_SERIALIZE(producer_score_config,
             (collateral_weight)(participation_weight)(snapshot_weight)
             (relay_weight)(api_weight)(benchmark_weight)
-            (max_consecutive_missed_rounds)(snapshot_target_attestations))
+            (max_consecutive_missed_rounds)(snapshot_target_attestations)
+            (missed_round_window_ms)(max_pct_missed_rounds_in_window))
       };
 
       /// The `prodscorecfg` singleton. Mirrors `emitcfg_t`: absent until governance installs it, so
       /// every read goes through `get_or_default(producer_score_config{})`.
       using producer_score_config_t = sysio::kv::global<"prodscorecfg"_n, producer_score_config>;
+
+      /**
+       * The observed-round sample the rate gate needs before it may fire, DERIVED rather than
+       * configured: the count at which the two gates agree. Below it the consecutive gate is
+       * strictly the stricter of the two, so the rate gate would add nothing except the power to
+       * demote a producer on its very first missed round -- at a sample of one, a single miss is a
+       * 100% miss rate.
+       *
+       * @param weights the live score configuration.
+       * @return the minimum observed rounds before the rate gate applies.
+       */
+      inline uint32_t rate_gate_minimum_sample(const producer_score_config& weights) {
+         if (weights.max_pct_missed_rounds_in_window == 0) return 0;
+         return weights.max_consecutive_missed_rounds * 100u
+              / weights.max_pct_missed_rounds_in_window;
+      }
+
+      /**
+       * Whether a producer's recorded window breaches the miss-RATE gate.
+       *
+       * @param rounds  scheduled rounds observed in the window.
+       * @param missed  how many of them went unproduced.
+       * @param weights the live score configuration.
+       * @return true iff the rate gate is armed and exceeded.
+       */
+      inline bool exceeds_miss_rate(uint32_t rounds, uint32_t missed,
+                                    const producer_score_config& weights) {
+         if (weights.max_pct_missed_rounds_in_window == 0) return false;
+         if (rounds < rate_gate_minimum_sample(weights)) return false;
+         if (rounds == 0) return false;
+         return (missed * 100u / rounds) > weights.max_pct_missed_rounds_in_window;
+      }
+
+      /**
+       * Whether a producer's recorded misses warrant demotion, under BOTH gates.
+       *
+       * The two mirror `sysio.opreg::termcheck`: a consecutive run says "you are offline right
+       * now", a rate over a rolling window says "you are chronically unreliable". Either demotes.
+       *
+       * @param consecutive_missed_rounds the producer's current streak.
+       * @param rounds                    scheduled rounds observed in the window.
+       * @param missed                    how many of them went unproduced.
+       * @param weights                   the live score configuration.
+       * @return true iff the producer should be demoted.
+       */
+      inline bool warrants_demotion(uint32_t consecutive_missed_rounds, uint32_t rounds,
+                                    uint32_t missed, const producer_score_config& weights) {
+         const bool exceeds_consecutive = weights.max_consecutive_missed_rounds > 0
+            && consecutive_missed_rounds >= weights.max_consecutive_missed_rounds;
+         return exceeds_consecutive || exceeds_miss_rate(rounds, missed, weights);
+      }
 
       /**
        * The active producer schedule as `onblock` last observed it.

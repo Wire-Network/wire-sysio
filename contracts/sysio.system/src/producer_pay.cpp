@@ -102,7 +102,7 @@ namespace sysiosystem {
             for( size_t stepped = 0; stepped < active_schedule.size(); ++stepped ) {
                if( slot == active_schedule.end() ) slot = active_schedule.begin();
                if( slot == current ) break;
-               record_missed_round( *slot, weights.max_consecutive_missed_rounds );
+               record_round_outcome( *slot, /*missed*/ true, weights );
                ++slot;
             }
          }
@@ -121,42 +121,81 @@ namespace sysiosystem {
       //
       // A demoted producer that is NOT in the active schedule never reaches this path, so recovery
       // still requires `regproducer` for anyone the schedule has actually dropped.
-      auto key = producer_key_t{current_producer.value};
-      if( _producers.contains(key) ) {
-         const auto& info = _producers.get(key);
-         if( info.consecutive_missed_rounds > 0 || info.is_demoted ) {
-            _producers.modify( same_payer, key, []( auto& p ) {
-               p.consecutive_missed_rounds = 0;
-               p.is_demoted                = false;
-            });
-            rescore_producer( current_producer );
-         }
+      {
+         producer_rank::producer_score_config_t weights_tbl( get_self() );
+         const auto weights = weights_tbl.get_or_default( producer_rank::producer_score_config{} );
+         record_round_outcome( current_producer, /*missed*/ false, weights );
       }
 
       _global.modify( get_self(), [&]( auto& g ) { g.last_producer = current_producer; });
    }
 
-   void system_contract::record_missed_round( const name& producer,
-                                              uint32_t max_consecutive_missed_rounds ) {
+   void system_contract::record_round_outcome( const name& producer, bool missed,
+                                               const producer_rank::producer_score_config& weights ) {
       auto key = producer_key_t{producer.value};
       if( !_producers.contains(key) ) return;
 
+      // On-chain time in ms, matching `missed_round_window_ms`. Microsecond precision from the
+      // intrinsic, divided down -- the window is measured in hours, so the units are what matter.
+      const uint64_t now_ms = static_cast<uint64_t>(
+         sysio::current_time_point().time_since_epoch().count() / 1000 );
+
       _producers.modify( same_payer, key, [&]( auto& p ) {
+         // Roll the window before recording into it. A producer that was off the schedule observed
+         // no rounds, so nothing accrued while it was away -- and if it stayed away longer than the
+         // window, its old counts lapse rather than greeting it on return. That is the WNS-47
+         // shape (stale per-period state resurrecting on re-entry) designed out at the source.
+         if( p.miss_window_open_ms == 0
+             || now_ms - p.miss_window_open_ms >= weights.missed_round_window_ms ) {
+            p.miss_window_open_ms     = now_ms;
+            p.rounds_in_window        = 0;
+            p.missed_rounds_in_window = 0;
+         }
+         p.rounds_in_window++;
+
+         if( !missed ) {
+            // A block is the strongest liveness proof there is: it clears the streak and, when the
+            // producer is still holding a schedule slot, the demotion with it. Demotion and
+            // rescheduling are not simultaneous, and the `min_schedule_size` floor can hold that
+            // gap open indefinitely -- without this those producers would produce for nothing,
+            // since `payepoch` stops at the demoted tier. The window counts are NOT cleared: one
+            // good round does not erase a day's record.
+            p.consecutive_missed_rounds = 0;
+            // A block clears the STREAK outright, and with it any demotion the consecutive gate
+            // caused -- that gate asks "are you offline right now", and this is the answer. It
+            // does NOT pardon the rate gate: one good round cannot erase a bad record, or a
+            // producer missing half its rounds would clear its demotion every time it managed
+            // one. So the flag is RE-DERIVED from the record rather than forced false. A producer
+            // still holding a slot climbs out by producing until its rate falls back under the
+            // limit; one the schedule has dropped uses `regproducer`, which opens a fresh window.
+            p.is_demoted = producer_rank::warrants_demotion( 0, p.rounds_in_window,
+                                                             p.missed_rounds_in_window, weights );
+            return;
+         }
+
+         p.missed_rounds_in_window++;
          p.consecutive_missed_rounds++;
          // Demotion is CATEGORICAL: it moves the producer into a tier no score can climb out of.
          // There is no cooldown and no expiry, and the only two ways back are `regproducer` and
          // producing a block while still in the active schedule -- the latter covering the window
          // between a demotion and the rebuild that acts on it, which the schedule-size floor can
          // hold open indefinitely.
-         if( !p.is_demoted && max_consecutive_missed_rounds > 0
-             && p.consecutive_missed_rounds >= max_consecutive_missed_rounds ) {
+         if( !p.is_demoted
+             && producer_rank::warrants_demotion( p.consecutive_missed_rounds, p.rounds_in_window,
+                                                  p.missed_rounds_in_window, weights ) ) {
             p.is_demoted = true;
+            // Leaving the pay walk consumes the period's snapshot credit. `payepoch` zeroes that
+            // counter only for rows it VISITS, and it stops at the demoted tier -- so a credit
+            // carried out of the walk would ride back in on return and outrank producers who
+            // actually attested that period. It is a per-period SERVICE RATING, unlike the block
+            // count, which is an earned debt and is deliberately kept.
+            p.snapshot_attestations = 0;
          }
       });
 
-      // The miss moved the participation factor, and a demotion moved the tier; either way the
-      // stored sort key is stale. A demoted producer keeps its block count: it is paid for those
-      // blocks at the first payepoch after regproducer brings it back into the pay walk.
+      // The round moved the participation factor, and a demotion or its clearing moved the tier;
+      // either way the stored sort key is stale. A demoted producer keeps its block count: it is
+      // paid for those blocks at the first payepoch where it is payable again.
       rescore_producer( producer );
    }
 
@@ -185,7 +224,7 @@ namespace sysiosystem {
          batch.push_back( it->owner );
       }
       for( const auto& producer : batch ) {
-         rescore_producer( producer );
+         reconcile_and_rescore( producer );
       }
 
       _global.modify( get_self(), [&]( auto& g ) {
