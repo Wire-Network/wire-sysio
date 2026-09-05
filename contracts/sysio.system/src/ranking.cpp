@@ -186,7 +186,24 @@ namespace sysiosystem {
    }
 
    void system_contract::update_ranked_producers( const block_timestamp& block_time ) {
+      // Never publish a schedule out of a HALF-SWEPT index. A weight or minimum change invalidates
+      // every stored score at once, and the sweep rewrites them a bounded batch at a time -- so
+      // while it drains, the index holds scores from two different configurations at once. Order
+      // within a tier is what picks the top 21 and the standby band, so ranking off that mixture
+      // would propose a schedule and a finalizer policy matching NEITHER configuration, and would
+      // do it repeatedly as the sweep advanced. Waiting costs at most a few ticks and the
+      // schedule the chain is already producing under stays in force meanwhile.
+      //
+      // `payepoch` deliberately does NOT wait: deferring it would withhold a period's pay for a
+      // configuration change, and block pay is a per-producer count that does not depend on the
+      // order of the walk at all. Only the standby retainer reads position, so at worst one
+      // period's retainer is assigned off a mixed order -- a far smaller cost than not paying.
+      // The throttle stamp advances FIRST, even when the rebuild below is skipped: it is what
+      // keeps this to one attempt per tick. Returning before it would leave `onblock` re-entering
+      // on every single block for as long as the sweep runs.
       _global.modify( get_self(), [&]( auto& g ) { g.last_producer_schedule_update = block_time; });
+
+      if( _global.get().rescore_pending ) return;
 
       auto idx = _producers.get_index<"prodrank"_n>();
 

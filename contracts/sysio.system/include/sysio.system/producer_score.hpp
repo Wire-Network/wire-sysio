@@ -226,10 +226,31 @@ namespace sysiosystem {
          sysio::opreg::opconfig_t opreg_cfg_tbl(opreg_refs::account);
          const auto opreg_cfg = opreg_cfg_tbl.get_or_default(sysio::opreg::op_config{});
 
+         // The LIVE minimum decides eligibility, not the stored status. `sysio.opreg::setconfig`
+         // rewrites the requirement vectors and re-evaluates nobody: it is the one event that can
+         // leave an operator ACTIVE while it no longer meets the bar, and the status it wrote
+         // under the old minimums would otherwise keep it scheduled and paid indefinitely.
+         //
+         // The test costs nothing extra. `collateral_factor` is the ratio of posted bond to the
+         // required minimum, taken across every required pair, so a value below `score_scale` IS
+         // "short on at least one pair" -- the same question `meets_role_min` answers, asked of
+         // the numbers already in hand. Calling opreg's own predicate instead would drag in its
+         // pending-withdraw walk, which is unbounded per account, on a path that runs for every
+         // scored row.
+         //
+         // Only the config case needs catching here: any BALANCE movement already re-evaluates
+         // status in opreg and notifies this contract. And the sweep that `setconfig` opens is
+         // what carries the new minimums across the table, so convergence is bounded rather than
+         // immediate -- which is all it needs to be.
+         //
+         // Bootstrapped producers are exempt, exactly as they are in `meets_role_min`: they are
+         // ACTIVE by fiat and hold no bond to measure.
+         const uint64_t collateral_ratio = collateral_factor(op, opreg_cfg);
+         if (!op.is_bootstrapped && collateral_ratio < score_scale) return unscored();
+
          // Every term saturates: the collateral factor is uncapped by design, so factor * weight
          // must not be allowed to wrap.
-         const uint64_t collateral =
-            mul_sat(collateral_factor(op, opreg_cfg), weights.collateral_weight);
+         const uint64_t collateral = mul_sat(collateral_ratio, weights.collateral_weight);
          const uint64_t participation =
             mul_sat(participation_factor(inputs.consecutive_missed_rounds,
                                          weights.max_consecutive_missed_rounds),

@@ -114,8 +114,23 @@ of them means no position, no pay, and no schedule slot.
 
 ## How your rank is scored
 
-The score is a weighted sum of normalised factors, ordered within a tier. Tier always beats score,
-so no amount of collateral lifts a demoted producer above a healthy one.
+The score is a weighted sum of normalised factors, ordered **within a tier**. Tier always beats
+score, so no amount of collateral lifts a producer out of the tier it is in.
+
+There are three, and they sort in this order:
+
+| Tier | Who is in it |
+|---|---|
+| **healthy** | Every qualifying producer that posted its own bond. |
+| **bootstrapped** | The genesis producers a chain launches with. |
+| **demoted** | Producers currently being penalised for missed rounds, plus anyone not presently eligible at all. |
+
+Healthy sorting **ahead of** bootstrapped is the whole design of the hand-over. Genesis producers
+are the network's always-on backup: they are ACTIVE by fiat, they hold no bond to measure, and the
+miss machinery never terminates them, so the chain always has someone able to produce. But any
+community producer that qualifies outranks all of them. They fill the schedule only while there are
+too few community producers to fill it, and they yield those slots automatically as real producers
+arrive. Nobody has to vote them out, and there is no flag day.
 
 | Factor | What it measures |
 |---|---|
@@ -129,7 +144,10 @@ of free points.
 
 Snapshot service is optional. If you want it, register a snapshot provider account with
 `regsnapprov` and vote snapshot hashes with `votesnaphash`. Only votes that reach quorum are
-credited, so registering alone earns nothing.
+credited, so registering alone earns nothing. The credit is a rating of the CURRENT pay period, so
+it does not follow you out: leaving the pay walk, whether by demotion or by parking, consumes it,
+and you start the next period from zero. Blocks you have already produced behave the opposite way,
+because they are earnings rather than a rating.
 
 ## Getting paid
 
@@ -152,17 +170,35 @@ Claim what you have earned with `claimpay`.
 A **round** is your entire slot window. You are charged a missed round only when the whole window
 goes unproduced, so a brief hiccup that costs you a block or two is not a miss.
 
-Miss three rounds in a row and you are **demoted**. Demotion is categorical: it moves you into a
-tier that no amount of collateral climbs out of, and the next rebuild drops you from the schedule.
+Two separate tests can demote you, and either is enough. They are the same pair of gates the
+network applies to batch operators, so availability means the same thing whatever role you hold.
+
+| Gate | Asks | Default |
+|---|---|---|
+| **Consecutive** | Are you offline right now? | three missed rounds in a row |
+| **Rate** | Are you chronically unreliable? | more than 5% of your scheduled rounds missed inside a rolling 24 hours |
+
+The rate gate only applies once it has seen enough of your rounds to mean anything. Below that
+sample the consecutive gate is the stricter of the two anyway, so nothing is lost. Only rounds you
+were actually scheduled for count, so time spent off the schedule neither helps nor hurts you, and
+a gap longer than the window starts your record fresh.
+
+Demotion is categorical: it moves you into a tier that no amount of collateral climbs out of, and
+the next rebuild drops you from the schedule.
 
 There are two ways back:
 
-1. **Produce a block while you are still scheduled.** Demotion and rescheduling are separate
-   events, and the schedule floor can hold that gap open. A block is proof you are alive, so it
-   clears the demotion outright, with no action on your part beyond being back online.
+1. **Produce.** A block clears your consecutive streak immediately, and with it any demotion that
+   gate caused. It does not wipe your rate: one good round cannot erase a bad day, so if the rate
+   gate is what demoted you, keep producing and it clears when your record recovers. This works
+   only while you still hold a slot, which happens more often than you might expect, because
+   demotion and rescheduling are separate events and the schedule floor can hold that gap open.
 2. **Call `regproducer` again.** This is the way back once the schedule has actually dropped you.
-   It re-supplies your signing key, which makes it a real statement that you are ready rather than
-   a formality. There is no cooldown and no waiting period.
+   It re-supplies your signing key, which makes it a real statement of readiness rather than a
+   formality, and it starts a fresh rate window. It does **not** clear your consecutive streak.
+   That is deliberate: re-registering costs nothing but a signature and can be repeated, so if it
+   wiped the streak an absent operator could simply call it on a timer and never produce at all.
+   There is no cooldown and no waiting period.
 
 One subtlety worth planning around: even a single missed round short of demotion lowers your
 participation factor, and if that drops you below the last scheduled position you stop being
@@ -175,9 +211,14 @@ collateral to outrank the producer that displaced you.
 - **Park** with `unregprod`. Your bond is untouched and your operator status stays `ACTIVE`; you
   simply hold no schedule position. `regproducer` brings you back at the position your collateral
   earns.
-- **Withdraw** with `sysio.opreg::withdraw`, which queues the request; `cancelwtdw` cancels it
-  before it flushes. Once your balance falls below the minimum on any required chain you leave
-  `ACTIVE` and the schedule drops you at the next rebuild.
+- **Withdraw** from the chain that holds the bond. An outpost bond is released through that
+  outpost's own withdrawal entry point, the counterpart of the deposit you made in step 3, which
+  travels to WIRE and settles against your registry balance. `sysio.opreg::withdraw` is **not**
+  that path: it takes only an account and an amount and applies to your WIRE-native balance, so
+  calling it for an Ethereum or Solana bond fails for insufficient balance and leaves the outpost
+  collateral untouched. Either way the request is queued rather than immediate, and `cancelwtdw`
+  cancels it before it flushes. Once your balance falls below the minimum on any required chain you
+  leave `ACTIVE` and the schedule drops you at the next rebuild.
 - **Slashing** is punitive and permanent. A slashed operator's row is never pruned and the registry
   refuses to re-register it, so a slashed account cannot come back.
 

@@ -6359,6 +6359,49 @@ BOOST_FIXTURE_TEST_CASE( regproducer_clears_demotion_immediately, producer_score
    BOOST_REQUIRE_EQUAL( 3u, missed_rounds_of(target) );
 } FC_LOG_AND_RETHROW()
 
+// Raising a producer collateral minimum has to reach the producers already below it. `setconfig`
+// rewrites the requirement vector and re-evaluates nobody -- an operator's status is only ever
+// re-derived when its own BALANCE moves -- so a producer left ACTIVE under the old minimum would
+// otherwise stay scheduled and paid on a bond the chain no longer accepts. Scoring tests the live
+// minimum itself, and the sweep `setconfig` opens carries that across the table.
+BOOST_FIXTURE_TEST_CASE( raising_the_collateral_minimum_sinks_producers_now_below_it, producer_score_tester ) try {
+   auto names = setup_collateralized_producers(5);
+   const auto target = names[0];
+   // Lift everyone EXCEPT the target well clear of the bar, so the raise below catches exactly
+   // one producer and the others stay put as the control.
+   for (uint32_t i = 1; i < names.size(); ++i) {
+      BOOST_REQUIRE_EQUAL( success(), credit_collateral(names[i], base_min_bond * 3) );
+   }
+   produce_blocks(1);
+   BOOST_REQUIRE_EQUAL( tier_healthy, tier_of(rank_score_of(target)) );
+   BOOST_REQUIRE_GT( producer_rank_position(target), 0u );
+
+   // Raised above the target's bond but below everyone else's. opreg still says ACTIVE -- nothing
+   // moved this operator's balance.
+   BOOST_REQUIRE_EQUAL( success(), set_single_pair_collateral(base_min_bond * 2) );
+   {
+      const auto op = get_opreg_operator(target);
+      BOOST_REQUIRE_EQUAL( "OPERATOR_STATUS_ACTIVE", op["status"].as_string() );
+   }
+
+   // The sweep the config change opened carries the new minimum across the table.
+   trigger_reschedule();
+
+   BOOST_REQUIRE_MESSAGE( tier_of(rank_score_of(target)) == tier_demoted,
+      "a producer below the RAISED minimum must stop being schedulable, whatever its stored status says" );
+   // Sorted behind every producer still meeting the bar, so every walk stops before reaching it.
+   BOOST_REQUIRE_EQUAL( names.size(), producer_rank_position(target) );
+   for (uint32_t i = 1; i < names.size(); ++i) {
+      BOOST_REQUIRE_EQUAL( tier_healthy, tier_of(rank_score_of(names[i])) );
+   }
+
+   // Topping back up over the new bar restores it -- the deposit re-evaluates status in opreg and
+   // the score follows.
+   BOOST_REQUIRE_EQUAL( success(), credit_collateral(target, base_min_bond * 3) );
+   produce_blocks(1);
+   BOOST_REQUIRE_EQUAL( tier_healthy, tier_of(rank_score_of(target)) );
+} FC_LOG_AND_RETHROW()
+
 // The second demotion gate: a miss RATE over a rolling window, mirroring the shape
 // `sysio.opreg::termcheck` applies to batch operators. It catches the producer that is not offline
 // long enough to trip the consecutive gate but misses far too often to be carrying a slot.
