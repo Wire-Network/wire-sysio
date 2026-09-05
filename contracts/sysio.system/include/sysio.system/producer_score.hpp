@@ -248,12 +248,23 @@ namespace sysiosystem {
          // leave an operator ACTIVE while it no longer meets the bar, and the status it wrote
          // under the old minimums would otherwise keep it scheduled and paid indefinitely.
          //
-         // The test costs nothing extra. `collateral_factor` is the ratio of posted bond to the
-         // required minimum, taken across every required pair, so a value below `score_scale` IS
-         // "short on at least one pair" -- the same question `meets_role_min` answers, asked of
-         // the numbers already in hand. Calling opreg's own predicate instead would drag in its
-         // pending-withdraw walk, which is unbounded per account, on a path that runs for every
-         // scored row.
+         // The test costs nothing extra: `collateral_factor` is the ratio of POSTED BOND to the
+         // required minimum across every required pair, so a value below `score_scale` is "short
+         // on at least one pair" using numbers already in hand.
+         //
+         // It is deliberately NOT `meets_role_min`, and not only for cost. That predicate measures
+         // `available` -- balance minus locks and pending withdraws -- and this one measures the
+         // balance, for the same reason the SCORE does (see `bonded_balance`): withdraw and
+         // cancelwtdw are free, uncapped and cooldown-free, so subtracting a queued withdraw would
+         // let an operator oscillate its own eligibility without moving funds. Calling opreg's
+         // predicate would also drag in its pending-withdraw walk, unbounded per account, onto a
+         // path that runs for every scored row.
+         //
+         // The gap that leaves is a producer whose queued withdraw puts `available` under a newly
+         // raised minimum while its balance still clears it. That row keeps its rank until the
+         // withdraw FLUSHES -- at which point the balance moves, opreg re-evaluates status, and the
+         // notification sinks it here. Convergence rather than an instant switch, which is the same
+         // bargain the raised minimum itself is on.
          //
          // Only the config case needs catching here: any BALANCE movement already re-evaluates
          // status in opreg and notifies this contract. And the sweep that `setconfig` opens is

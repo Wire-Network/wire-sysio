@@ -98,9 +98,19 @@ peer_keys::getpeerkeys_res_t peer_keys::getpeerkeys() {
    // finalizer key. A producer scheduled through `setprods` -- the bootstrap window, and every
    // harness that publishes schedules directly -- produces blocks before it registers one, and a
    // block producer that `getpeerkeys` hides is a block producer the BP gossip mesh cannot reach.
+   //
+   // Bounded on ROWS EXAMINED as well as on matched positions. `position` advances only on a
+   // match, so the `continue` above it is free to skip an unbounded number of healthy-tier rows
+   // whose LIVE eligibility no longer matches their CACHED tier -- and each skip costs a
+   // cross-contract sysio.opreg read. This walk runs on the node's main thread every 120 blocks
+   // (`peer_keys_db_t::should_update`), so an unbounded scan is a host stall, not just a slow
+   // query.
    uint32_t position = 0;
+   uint32_t examined = 0;
    for (auto i = idx.cbegin(); i != idx.cend() && resp.size() < max_return; ++i) {
       if (producer_rank::tier_of(i->rank_score) == producer_tier::demoted)
+         break;
+      if (++examined > max_rank_walk_rows)
          break;
       if (!producer_rank::is_eligible_operator(*i))
          continue;

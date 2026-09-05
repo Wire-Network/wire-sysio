@@ -98,20 +98,30 @@ namespace sysiosystem {
       const auto weights = weights_tbl.get_or_default( producer_rank::producer_score_config{} );
       const auto info    = _producers.get(key);
 
-      // A LOWERED threshold has to reach the streaks that already passed it. Demotion is normally
-      // decided when a round is observed, and a producer that has fallen off the schedule observes
-      // none -- so without this a lowered threshold would never bind on exactly the producers it
-      // was lowered to catch. This runs only on the sweep, which the config change itself opens,
-      // so an ordinary rescore never re-derives the flag.
+      // A LOWERED RATE threshold has to reach the windows that already breach it. The rate gate is
+      // the one that cannot self-correct: a producer the schedule has dropped observes no rounds,
+      // so its recorded rate never improves, and without this a tightened limit would never bind on
+      // exactly the producers it was tightened to catch. This runs only on the sweep, which the
+      // config change itself opens, so an ordinary rescore never re-derives the flag.
+      //
+      // The CONSECUTIVE gate is deliberately NOT reconciled here, and that is load-bearing rather
+      // than an omission. `regproducer` clears the demotion and the window but preserves the
+      // streak, so a pardoned producer sits at (is_demoted == false, streak >= threshold) until it
+      // produces. Re-deriving the consecutive gate on that row would re-demote it with no new miss,
+      // and -- being unscheduled -- it could never produce the block that is its only other door
+      // back, so every subsequent sweep would undo `regproducer` again: a permanent lockout. The
+      // gate loses nothing by waiting. It asks "are you offline right now", which only an OBSERVED
+      // round can answer, and `record_round_outcome` evaluates the live threshold on every miss --
+      // so a lowered limit binds on the producer's very next missed round.
       //
       // A RAISED threshold deliberately does NOT un-demote anyone. Demotion is categorical: it
       // clears by producing a block while still scheduled, or by `regproducer`. Governance
       // widening the tolerance is not a pardon for producers already judged under the old one, and
       // either door back is open to them immediately.
       if( !info.is_demoted
-          && producer_rank::warrants_demotion( info.consecutive_missed_rounds, info.rounds_in_window,
+          && producer_rank::exceeds_miss_rate( info.rounds_in_window,
                                                info.missed_rounds_in_window, weights ) ) {
-         _producers.modify( same_payer, key, []( auto& p ) { p.is_demoted = true; });
+         _producers.modify( same_payer, key, []( auto& p ) { p.set_demoted( true ); });
       }
       rescore_producer( producer );
    }
@@ -125,6 +135,43 @@ namespace sysiosystem {
 
    void system_contract::setscorecfg( const producer_rank::producer_score_config& weights ) {
       require_auth( get_self() );
+
+      // A miss percentage is a percentage.
+      check( weights.max_pct_missed_rounds_in_window <= 100,
+             "max_pct_missed_rounds_in_window cannot exceed 100" );
+
+      // The rate gate's minimum sample is DERIVED from the consecutive threshold
+      // (max_consecutive * 100 / max_pct), so the two settings are not independent: at
+      // max_consecutive == 0 the sample floor collapses to zero and the rate gate fires on a
+      // sample of ONE, where a single missed round is a 100% miss rate. That inverts the field's
+      // meaning -- zero reads as "disable the consecutive gate" and would instead demote every
+      // producer on its first missed slot, dropping the schedulable count below
+      // `min_schedule_size` chain-wide. Disabling a gate is spelled by zeroing THAT gate's own
+      // percentage, so require the pair to be coherent instead.
+      check( weights.max_pct_missed_rounds_in_window == 0 || weights.max_consecutive_missed_rounds > 0,
+             "max_consecutive_missed_rounds must be positive while the rate gate is armed" );
+      check( weights.max_pct_missed_rounds_in_window == 0 || weights.missed_round_window_ms > 0,
+             "missed_round_window_ms must be positive while the rate gate is armed" );
+
+      // `rate_gate_minimum_sample` computes `max_consecutive * 100`, so cap the input well below
+      // the point that multiply wraps a uint32.
+      check( weights.max_consecutive_missed_rounds <= max_consecutive_missed_rounds_limit,
+             "max_consecutive_missed_rounds is unreasonably large" );
+
+      // Every factor is multiplied by its weight and summed. `mul_sat` keeps a single term from
+      // wrapping, but a configuration whose weights cannot be told apart is still useless, so
+      // bound them at the scale the factors are normalised to.
+      check( weights.collateral_weight    <= producer_rank::max_factor_weight
+             && weights.participation_weight <= producer_rank::max_factor_weight
+             && weights.snapshot_weight      <= producer_rank::max_factor_weight
+             && weights.relay_weight         <= producer_rank::max_factor_weight
+             && weights.api_weight           <= producer_rank::max_factor_weight
+             && weights.benchmark_weight     <= producer_rank::max_factor_weight,
+             "factor weight exceeds the maximum" );
+
+      // A zero target would make the snapshot factor divide by zero.
+      check( weights.snapshot_target_attestations > 0,
+             "snapshot_target_attestations must be positive" );
 
       producer_rank::producer_score_config_t weights_tbl( get_self() );
       weights_tbl.set( weights, get_self() );
@@ -186,24 +233,18 @@ namespace sysiosystem {
    }
 
    void system_contract::update_ranked_producers( const block_timestamp& block_time ) {
-      // Never publish a schedule out of a HALF-SWEPT index. A weight or minimum change invalidates
-      // every stored score at once, and the sweep rewrites them a bounded batch at a time -- so
-      // while it drains, the index holds scores from two different configurations at once. Order
-      // within a tier is what picks the top 21 and the standby band, so ranking off that mixture
-      // would propose a schedule and a finalizer policy matching NEITHER configuration, and would
-      // do it repeatedly as the sweep advanced. Waiting costs at most a few ticks and the
-      // schedule the chain is already producing under stays in force meanwhile.
+      // A config sweep does NOT hold the schedule back. While it drains, the index carries scores
+      // from two configurations at once, so a rebuild can order a producer by a score the current
+      // weights would not give it -- and that is accepted: ranking is allowed to converge rather
+      // than switch atomically, and it self-corrects within a few ticks as the cursor advances.
       //
-      // `payepoch` deliberately does NOT wait: deferring it would withhold a period's pay for a
-      // configuration change, and block pay is a per-producer count that does not depend on the
-      // order of the walk at all. Only the standby retainer reads position, so at worst one
-      // period's retainer is assigned off a mixed order -- a far smaller cost than not paying.
-      // The throttle stamp advances FIRST, even when the rebuild below is skipped: it is what
-      // keeps this to one attempt per tick. Returning before it would leave `onblock` re-entering
-      // on every single block for as long as the sweep runs.
+      // Deferring instead is what is NOT safe. The sweep's length scales with the table, the table
+      // is unbounded, and `regproducer` is permissionless with its RAM billed to this contract --
+      // so waiting for the sweep would let anyone hold BOTH the producer schedule and the finalizer
+      // policy frozen for as long as they kept registering, during which a slashed, terminated or
+      // demoted producer would keep its slot and its finality weight. A briefly mixed ordering is a
+      // far smaller harm than a schedule that cannot be rebuilt at all.
       _global.modify( get_self(), [&]( auto& g ) { g.last_producer_schedule_update = block_time; });
-
-      if( _global.get().rescore_pending ) return;
 
       auto idx = _producers.get_index<"prodrank"_n>();
 

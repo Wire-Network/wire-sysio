@@ -5945,7 +5945,8 @@ struct producer_score_tester : public producer_eligibility_tester {
                                   uint32_t max_consecutive_missed_rounds = 3,
                                   uint32_t snapshot_target_attestations  = 1,
                                   uint64_t missed_round_window_ms         = 24ULL * 60 * 60 * 1000,
-                                  uint32_t max_pct_missed_rounds_in_window = 5) {
+                                  uint32_t max_pct_missed_rounds_in_window = 5,
+                                  uint32_t min_blocks_per_round = 6) {
       return push_system_action(config::system_account_name, "setscorecfg"_n, mvo()
          ("weights", mvo()
             ("collateral_weight",             collateral_weight)
@@ -5957,7 +5958,8 @@ struct producer_score_tester : public producer_eligibility_tester {
             ("max_consecutive_missed_rounds", max_consecutive_missed_rounds)
             ("snapshot_target_attestations",  snapshot_target_attestations)
             ("missed_round_window_ms",         missed_round_window_ms)
-            ("max_pct_missed_rounds_in_window", max_pct_missed_rounds_in_window)));
+            ("max_pct_missed_rounds_in_window", max_pct_missed_rounds_in_window)
+            ("min_blocks_per_round",           min_blocks_per_round)));
    }
 
    /// The packed sort key stored on a producer.
@@ -6417,6 +6419,118 @@ BOOST_FIXTURE_TEST_CASE( raising_the_collateral_minimum_sinks_producers_now_belo
 // 40%, alternating miss / produce never lets the streak reach 2, so ONLY the rate gate can fire --
 // and the derived minimum sample (limit * 100 / percent = 5 rounds) means it cannot fire on the
 // first miss either, which is the whole reason that minimum exists.
+// THE LOCKOUT REGRESSION. `regproducer` deliberately preserves the consecutive streak, so a
+// pardoned producer sits at (is_demoted == false, streak >= threshold). The config sweep used to
+// re-derive BOTH gates on that row, which re-demoted it with no new miss -- and, unscheduled, it
+// could never produce the block that is its only other door back, so every later sweep undid
+// `regproducer` again. Permanent lockout, reachable from ordinary governance.
+//
+// The sweep now reconciles the RATE gate only. The consecutive gate loses nothing by waiting: it
+// asks "are you offline right now", which only an observed round answers, and `record_round_outcome`
+// tests the live threshold on every miss.
+BOOST_FIXTURE_TEST_CASE( a_config_sweep_does_not_undo_regproducer, producer_score_tester ) try {
+   auto names = setup_ranked_producers(5);
+   trigger_reschedule();
+   wait_for_active_schedule(names[2]);
+
+   const auto target = names[2];
+   for (uint32_t miss = 0; miss < 3; ++miss) skip_round_of(target);
+   BOOST_REQUIRE( demoted(target) );
+
+   BOOST_REQUIRE_EQUAL( success(), push_system_action(target, "regproducer"_n, mvo()
+      ("producer", target)("producer_key", get_public_key(target, "active"))("url", "")("location", 0)) );
+   produce_blocks(1);
+   BOOST_REQUIRE( !demoted(target) );
+   // The streak survives the pardon -- that is the behaviour this test exists to protect.
+   BOOST_REQUIRE_EQUAL( 3u, missed_rounds_of(target) );
+
+   // Any config change opens a sweep over the whole table.
+   BOOST_REQUIRE_EQUAL( success(), set_score_config() );
+
+   // Drained a few blocks at a time, because the window this test is about is NARROW: `onblock`
+   // runs `drain_rescore_cursor` immediately BEFORE `update_ranked_producers`, so the sweep
+   // reconciles this row while it is still off the schedule -- exactly the state where a
+   // re-demotion is unrecoverable, since an unscheduled producer can never produce. Checking only
+   // at the end would let the producer be demoted, rescheduled and cleared again in between, and
+   // the test would pass over the defect it exists to catch.
+   for (uint32_t tick = 0; tick < 14; ++tick) {
+      produce_blocks(10);
+      BOOST_REQUIRE_MESSAGE( !demoted(target),
+         "the sweep re-demoted a producer regproducer pardoned, at block batch " << tick
+         << " -- unscheduled, it could never produce the block that is its only other way back" );
+   }
+
+   // The streak is NOT asserted here on purpose: once the pardon puts the producer back in the
+   // schedule it produces, and producing clears the streak legitimately. What must hold is that it
+   // was never demoted on the way there.
+} FC_LOG_AND_RETHROW()
+
+// `setscorecfg` writes ten governance-tunable fields and used to validate none of them. The one
+// that matters most is the pair below: the rate gate's minimum sample is DERIVED as
+// max_consecutive * 100 / max_pct, so at max_consecutive == 0 -- which reads as "disable the
+// consecutive gate" -- the sample floor collapses to zero and the rate gate fires on a sample of
+// ONE, where a single missed round is a 100% miss rate. Every producer would be demoted on its
+// first missed slot and the schedule would fall below its floor chain-wide.
+BOOST_FIXTURE_TEST_CASE( setscorecfg_rejects_a_configuration_that_inverts_the_rate_gate, producer_score_tester ) try {
+   BOOST_REQUIRE_EQUAL(
+      wasm_assert_msg("max_consecutive_missed_rounds must be positive while the rate gate is armed"),
+      set_score_config(10'000, 10'000, 10'000, /*max_consecutive=*/0) );
+
+   // Spelling the DISABLE on the rate gate's own field is the coherent form, and is accepted.
+   BOOST_REQUIRE_EQUAL( success(),
+      set_score_config(10'000, 10'000, 10'000, /*max_consecutive=*/0,
+                       /*snapshot_target=*/1, /*window_ms=*/24ULL * 60 * 60 * 1000,
+                       /*max_pct=*/0) );
+
+   BOOST_REQUIRE_EQUAL(
+      wasm_assert_msg("max_pct_missed_rounds_in_window cannot exceed 100"),
+      set_score_config(10'000, 10'000, 10'000, 3, 1, 24ULL * 60 * 60 * 1000, /*max_pct=*/101) );
+
+   BOOST_REQUIRE_EQUAL(
+      wasm_assert_msg("missed_round_window_ms must be positive while the rate gate is armed"),
+      set_score_config(10'000, 10'000, 10'000, 3, 1, /*window_ms=*/0, 5) );
+
+   BOOST_REQUIRE_EQUAL(
+      wasm_assert_msg("snapshot_target_attestations must be positive"),
+      set_score_config(10'000, 10'000, 10'000, 3, /*snapshot_target=*/0) );
+
+   BOOST_REQUIRE_EQUAL(
+      wasm_assert_msg("factor weight exceeds the maximum"),
+      set_score_config(/*collateral_weight=*/1'000'001) );
+
+   BOOST_REQUIRE_EQUAL(
+      wasm_assert_msg("max_consecutive_missed_rounds is unreasonably large"),
+      set_score_config(10'000, 10'000, 10'000, /*max_consecutive=*/1'000'001) );
+} FC_LOG_AND_RETHROW()
+
+// `rmvproducer` performs the same deactivation `unregprod` does, and was the one is_active path
+// this work left unrescored. A removed producer that keeps its healthy-tier sort key is VISITED
+// and skipped by every rank walk -- consuming a position and an examined-row budget slot -- for as
+// long as nothing else happens to rescore it, which for a removed row is forever.
+BOOST_FIXTURE_TEST_CASE( rmvproducer_sinks_the_key_and_consumes_the_credit, producer_score_tester ) try {
+   auto names = setup_ranked_producers(5);
+   trigger_reschedule();
+
+   const auto target = names[1];
+   // `setup_ranked_producers` seeds the bootstrapped backstop, not collateral-backed producers.
+   BOOST_REQUIRE_EQUAL( tier_bootstrapped, tier_of(rank_score_of(target)) );
+
+   BOOST_REQUIRE_EQUAL( success(), push_system_action(config::system_account_name, "rmvproducer"_n,
+      mvo()("producer", target)) );
+   produce_blocks(1);
+
+   BOOST_REQUIRE_MESSAGE( tier_of(rank_score_of(target)) == tier_demoted,
+      "a removed producer must sink immediately, or every walk keeps visiting a row it can never use" );
+   BOOST_REQUIRE_EQUAL( 0u, get_producer_info(target)["snapshot_attestations"].as<uint32_t>() );
+   // No position AT ALL, not merely the last one: `deactivate` clears `is_active`, and position is
+   // counted over active rows only. The remaining producers close ranks over the gap.
+   BOOST_REQUIRE_EQUAL( 0u, producer_rank_position(target) );
+   for (uint32_t i = 0; i < names.size(); ++i) {
+      if (names[i] == target) continue;
+      BOOST_REQUIRE_GT( producer_rank_position(names[i]), 0u );
+   }
+} FC_LOG_AND_RETHROW()
+
 BOOST_FIXTURE_TEST_CASE( miss_rate_over_the_window_demotes_without_a_consecutive_run, producer_score_tester ) try {
    auto names = setup_ranked_producers(5);
    BOOST_REQUIRE_EQUAL( success(), set_score_config(

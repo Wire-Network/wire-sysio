@@ -214,9 +214,19 @@ namespace sysiosystem {
       require_auth( get_self() );
       auto key = producer_key_t{producer.value};
       check( _producers.contains(key), "producer not found" );
-      _producers.modify( same_payer, key, [&](auto& p) {
+      _producers.modify( get_self(), key, [&](auto& p) {
             p.deactivate();
+            // A removed producer leaves the pay walk exactly as a park does, so it consumes the
+            // period's snapshot credit for the same reason -- see `producer_info::set_demoted`.
+            p.snapshot_attestations = 0;
          });
+
+      // The deactivation sinks this row to the demoted tier, so its sort key is stale until
+      // rescored. Skipping this is not cosmetic: every rank walk stops at the first demoted entry,
+      // and a removed producer left in the healthy tier is VISITED (and skipped) by all of them
+      // while consuming a position and an examined-row budget slot -- indefinitely, since nothing
+      // else rescores a row nobody touches. `unregprod` does exactly this; so must this action.
+      rescore_producer( producer );
    }
 
    void transfer_ram( const name& from, const name& to, uint64_t bytes ) {

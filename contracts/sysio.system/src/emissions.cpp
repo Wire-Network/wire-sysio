@@ -40,7 +40,11 @@ namespace {
 // ---------------------------------------------------------------------------
 
 constexpr uint32_t STANDBY_START_RANK     = 22;
-constexpr uint32_t MAX_STANDBY_END_RANK   = 100; // safety cap: bounds the standby credit count in payepoch
+constexpr uint32_t MAX_STANDBY_END_RANK   = 100; // safety cap: bounds how many STANDBY retainers one
+                                                 // payepoch can credit. It does NOT bound the pay walk --
+                                                 // no-forfeiture means a producer far below the standby
+                                                 // band still has carried blocks to collect, so the walk
+                                                 // runs past this and is bounded by max_rank_walk_rows.
 constexpr int64_t  MS_PER_SECOND          = 1000;
 
 // Basis-point denominator for all category / sub-split ratios.
@@ -1015,7 +1019,31 @@ void system_contract::payepoch(uint32_t epoch_index,
          }
       }
 
-      const uint64_t slot_divisor = std::max<uint64_t>(std::max(nominal_slots, produced_blocks), 1);
+      // Blocks CARRIED from an earlier period must not inflate this period's divisor. A row whose
+      // block pay rounds to zero keeps its blocks (that promise is what makes the model
+      // forfeiture-free), but it was counted in `produced_blocks` -- so without this correction the
+      // same blocks raise the divisor again at the next payout, and every producer that worked a
+      // full period is paid at a diluted rate to fund someone else's back-pay out of the wrong
+      // period's pool.
+      //
+      // One correction pass is enough and cannot oscillate: removing blocks only LOWERS the
+      // divisor, which only RAISES each block's pay, so a row that cleared zero on the first pass
+      // still clears it on the second. A row that crosses back over the threshold is simply paid,
+      // which is the outcome we want; any residue left by that is a smaller divisor than strictly
+      // ideal, i.e. it errs toward paying producers rather than withholding.
+      auto divisor_for = [&](uint64_t blocks) {
+         return std::max<uint64_t>(std::max(nominal_slots, blocks), 1);
+      };
+      uint64_t unpayable_blocks = 0;
+      {
+         const uint64_t first_pass = divisor_for(produced_blocks);
+         for (const auto& entry : entries) {
+            const bool rounds_to_zero =
+               static_cast<__int128>(active_pool) * entry.blocks / first_pass == 0;
+            if (rounds_to_zero) unpayable_blocks += entry.blocks;
+         }
+      }
+      const uint64_t slot_divisor = divisor_for(produced_blocks - unpayable_blocks);
 
       // Producers are paid the emission share only — swap fees go to the
       // underwriter + batch operators (see the fold-in comment above).
@@ -1048,10 +1076,16 @@ void system_contract::payepoch(uint32_t epoch_index,
 
       actual_paid += distributed_to_producers;
 
+      // Sorted so the join below is a binary search. This action runs INLINE in the epoch advance,
+      // where an overrun stalls the chain, and both vectors are bounded by `max_rank_walk_rows` --
+      // a linear scan per reset entry is quadratic in a number an unbounded, permissionless table
+      // controls.
+      std::sort(block_paid.begin(), block_paid.end());
+
       // Reset the period's counters after distribution (iteration-safe: uses PK snapshot).
       for (const auto& entry : to_reset) {
          const bool clear_blocks =
-            std::find(block_paid.begin(), block_paid.end(), entry.owner) != block_paid.end();
+            std::binary_search(block_paid.begin(), block_paid.end(), entry.owner);
          if (!clear_blocks && !entry.snapshot) continue;
          auto key = producer_key_t{entry.owner.value};
          _producers.modify(same_payer, key, [&](auto& p) {

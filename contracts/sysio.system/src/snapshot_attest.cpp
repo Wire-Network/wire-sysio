@@ -61,9 +61,18 @@ std::vector<name> snapshot_ranked_producers(name self) {
    std::vector<name> ranked;
    ranked.reserve(max_snap_provider_rank);
 
+   // Bounded on ROWS EXAMINED, not just on matches. `rank_score` is a CACHE while `is_schedulable`
+   // is evaluated LIVE, so healthy-tier rows that no longer qualify are skipped by `continue` and
+   // would otherwise cost an unbounded scan -- at a cross-contract sysio.opreg read plus two
+   // finalizer reads apiece. That matters more here than on the other walks: this one is reached
+   // from `regsnapprov`, a user-signed write, and re-walked once per entry inside the capacity
+   // prune, so an unbounded scan turns into a transaction that cannot fit its CPU budget and
+   // `regsnapprov` stops working for everyone.
+   uint32_t examined = 0;
    auto idx = producers.get_index<"prodrank"_n>();
    for (auto i = idx.cbegin(); i != idx.cend() && ranked.size() < max_snap_provider_rank; ++i) {
       if (producer_rank::tier_of(i->rank_score) == producer_tier::demoted) break;
+      if (++examined > max_rank_walk_rows) break;
       if (!producer_rank::is_schedulable(*i, finalizers)) continue;
       ranked.push_back(i->owner);
    }
@@ -101,12 +110,13 @@ void credit_snapshot_attestations(name self, const std::vector<name>& voters) {
    for (const auto& voter : voters) {
       auto key = producer_key_t{voter.value};
       if (!producers.contains(key)) continue;
-      // Settle any RE-ENTRY reset BEFORE crediting. `rescore` drops a stale credit when a row
-      // comes back into the walk, and it recognises that by the tier its stored key moves out of.
-      // Crediting first would hand that reset this period's credit to consume -- the row is
-      // re-entering and freshly credited in the same transaction, and the reset cannot tell the
-      // two apart. Rescoring first spends the reset on the old value, so the increment below is
-      // the only credit standing when the second rescore records it.
+      // A DEMOTED producer earns no credit. The counter is a rating of the CURRENT pay period, and
+      // `payepoch` -- which is what resets it -- stops at the demoted tier, so a credit handed to a
+      // demoted row is never cleared: it accumulates for as long as the producer stays demoted and
+      // then re-enters at full marks the moment `regproducer` lifts the tier, outranking producers
+      // that actually served the period it returns into. A demoted producer that keeps voting is
+      // not a fault to reject, just service that earns no rating, so this skips silently.
+      if (producers.get(key).is_demoted) continue;
       producers.modify(same_payer, key, [](auto& row) { row.snapshot_attestations++; });
       // The credit moved the snapshot factor, so the stored sort key is stale until rescored.
       // Without this the factor would reach the index only on the next unrelated rescore.

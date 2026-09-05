@@ -1135,6 +1135,10 @@
                 {
                     "name": "max_pct_missed_rounds_in_window",
                     "type": "uint32"
+                },
+                {
+                    "name": "min_blocks_per_round",
+                    "type": "uint32"
                 }
             ]
         },
@@ -1577,6 +1581,10 @@
                 {
                     "name": "rescore_pending",
                     "type": "bool"
+                },
+                {
+                    "name": "round_start_block",
+                    "type": "uint32"
                 }
             ]
         },

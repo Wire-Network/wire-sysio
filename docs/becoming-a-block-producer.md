@@ -176,16 +176,27 @@ Claim what you have earned with `claimpay`.
 
 ## Staying in the schedule
 
-A **round** is your entire slot window. You are charged a missed round only when the whole window
-goes unproduced, so a brief hiccup that costs you a block or two is not a miss.
+A **round** is your entire slot window. Producing nothing at all in one is a missed round. Producing
+only a handful of its blocks is a **short** round: a brief hiccup costs you nothing, but a node that
+routinely delivers a fraction of its window is not carrying the slot it holds, and past a threshold
+those rounds start counting against you too.
+
+The two are treated differently on purpose. A round that produced nothing says you are offline right
+now, and that is caught fast. A short round says you are degraded, which is given the whole window
+to recover in — so a bad hour costs you nothing, while a chronic pattern of half-served rounds
+demotes you.
 
 Two separate tests can demote you, and either is enough. They are the same pair of gates the
 network applies to batch operators, so availability means the same thing whatever role you hold.
 
 | Gate | Asks | Default |
 |---|---|---|
-| **Consecutive** | Are you offline right now? | three missed rounds in a row |
-| **Rate** | Are you chronically unreliable? | more than 5% of your scheduled rounds missed inside a rolling 24 hours |
+| **Consecutive** | Are you offline right now? | three rounds in a row that produced nothing |
+| **Rate** | Are you chronically unreliable? | more than 5% of your scheduled rounds missed inside a rolling 24 hours — counting both rounds that produced nothing and rounds that came up short |
+
+A round counts as short below **half its blocks** by default (six of a twelve-slot round). Only the
+rate gate sees short rounds; the consecutive gate is reserved for rounds that produced nothing, so
+delivering even one block keeps you off it.
 
 The rate gate only applies once it has seen enough of your rounds to mean anything. Below that
 sample the consecutive gate is the stricter of the two anyway, so nothing is lost. Only rounds you

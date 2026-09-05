@@ -81,6 +81,13 @@ namespace sysiosystem {
    /// reaches is neither paid nor reset, exactly like an unpayable one, so its blocks carry to the
    /// next payout rather than being lost.
    static constexpr uint32_t max_rank_walk_rows     = 500;
+
+   /// Ceiling `setscorecfg` accepts for `max_consecutive_missed_rounds`.
+   ///
+   /// `rate_gate_minimum_sample` evaluates `max_consecutive * 100` in uint32, so the input has to
+   /// stay well below the wrap point. A million consecutive missed rounds is already far past any
+   /// meaningful availability policy -- at 21 producers and half-second slots it is over a year.
+   static constexpr uint32_t max_consecutive_missed_rounds_limit = 1'000'000;
    static constexpr uint32_t seconds_per_year      = 52 * 7 * 24 * 3600;
    static constexpr uint32_t seconds_per_day       = 24 * 3600;
    static constexpr uint32_t seconds_per_hour      = 3600;
@@ -123,13 +130,26 @@ namespace sysiosystem {
       /// cursor from 0 under the same flag; there is nothing to count.
       bool                 rescore_pending = false;
 
+      /// Block height at which `last_producer`'s current round began.
+      ///
+      /// Every block between that height and the height of the next producer's first block belongs
+      /// to `last_producer` by construction -- a round is a contiguous run of slots held by one
+      /// producer -- so the difference IS the block count it delivered, with no per-block counter
+      /// and no work on the 11-of-12 blocks that do not change producer.
+      ///
+      /// DECLARED LAST, matching the tail of SYSLIB_SERIALIZE_DERIVED below. The ABI is generated
+      /// from the declarations while the wasm serializes in macro order, so a field inserted
+      /// anywhere but the end makes the two disagree silently.
+      uint32_t             round_start_block = 0;
+
       // explicit serialization macro is not necessary, used here only to improve compilation time
       SYSLIB_SERIALIZE_DERIVED( sysio_global_state, sysio::blockchain_parameters,
                                 (max_ram_size)(total_ram_bytes_reserved)
                                 (last_producer_schedule_update)(last_pervote_bucket_fill)
                                 (last_producer_schedule_size)
                                 (last_producer)
-                                (rescore_cursor)(rescore_pending) )
+                                (rescore_cursor)(rescore_pending)
+                                (round_start_block) )
    };
 
    inline sysio::block_signing_authority convert_to_block_signing_authority( const sysio::public_key& producer_key ) {
@@ -190,6 +210,22 @@ namespace sysiosystem {
       uint64_t by_rank_score()const { return rank_score; }
       bool     active()const      { return is_active;                               }
       void     deactivate()       { producer_key = public_key(); producer_authority = sysio::block_signing_authority{}; is_active = false; }
+
+      /// Applies a demotion decision, consuming the pay period's snapshot credit on the way OUT.
+      ///
+      /// Every site that decides the flag routes through here, because the credit must not survive
+      /// the transition and three separate sites decide it: the missed-round branch, the produced
+      /// branch (which RE-DERIVES the flag and can raise it on a block the producer made, via the
+      /// rate gate), and the config sweep. `payepoch` resets counters only on rows it VISITS and it
+      /// stops at the demoted tier, so a credit carried out of the walk would ride back in on
+      /// return and outrank producers that actually attested that period. It is a per-period
+      /// SERVICE RATING -- unlike `unpaid_blocks`, which is an earned debt and is deliberately
+      /// kept. Clearing on the false->true edge only is what makes it idempotent: re-deciding
+      /// "still demoted" must not wipe a credit earned since.
+      void set_demoted(bool demoted) {
+         if (demoted && !is_demoted) snapshot_attestations = 0;
+         is_demoted = demoted;
+      }
 
       const sysio::block_signing_authority& get_producer_authority()const {
          return producer_authority;
@@ -828,7 +864,31 @@ namespace sysiosystem {
 
          /// Attribute missed rounds to the producers the active schedule skipped, and demote any
          /// that crossed the threshold. Runs on every block; see producer_pay.cpp.
-         void record_round_participation( const name& current_producer );
+         ///
+         /// @param current_producer the producer of the block being processed.
+         /// @param block_height     that block's height, used to measure the OUTGOING producer's
+         ///                         round length. Derived from the block header already in hand.
+         void record_round_participation( const name& current_producer, uint32_t block_height );
+
+         /**
+          * Amend a round already recorded as SERVED when the producer delivered too few blocks in
+          * it, counting it against the miss RATE.
+          *
+          * A round is charged as missed only when the whole window goes unproduced, which leaves a
+          * producer free to deliver one block of twelve and read as fully available. This closes
+          * that gap without touching the consecutive gate: chronic partial delivery accumulates
+          * against the window and demotes on rate, while a total outage stays the streak's
+          * business and is caught within `max_consecutive_missed_rounds` rounds.
+          *
+          * The round was already counted in `rounds_in_window` when it began, so this adds only to
+          * `missed_rounds_in_window` -- it amends a recorded round rather than recording a second.
+          *
+          * @param producer         the producer whose round just ended.
+          * @param blocks_delivered blocks it produced in that round.
+          * @param weights          the live score configuration.
+          */
+         void record_short_round( const name& producer, uint32_t blocks_delivered,
+                                  const producer_rank::producer_score_config& weights );
 
          /// Charge one producer a missed round, demoting it if that crosses the threshold.
          /**

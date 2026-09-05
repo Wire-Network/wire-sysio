@@ -46,6 +46,14 @@ namespace sysiosystem {
       /// "100%"; a collateral ratio of exactly the configured minimum bond is also `score_scale`.
       constexpr uint64_t score_scale = 10'000;
 
+      /// Ceiling `setscorecfg` accepts for any single factor weight.
+      ///
+      /// Weights are multiplied by factors normalised to `score_scale`, and `mul_sat` already stops
+      /// one term from wrapping -- but a saturated term carries no ordering information, so a
+      /// configuration above this bound silently stops ranking rather than ranking differently.
+      /// A hundred times full scale leaves ample room to make one factor dominant on purpose.
+      constexpr uint32_t max_factor_weight = static_cast<uint32_t>(score_scale) * 100;
+
       /// Bits the packed key reserves for producer_tier (the two high bits).
       constexpr unsigned tier_bits = 2;
 
@@ -215,12 +223,29 @@ namespace sysiosystem {
          /// only the consecutive one.
          uint32_t max_pct_missed_rounds_in_window = 5;
 
+         /// Blocks a producer must deliver within its own round for that round to count as served.
+         ///
+         /// A round is a contiguous run of slots held by one producer, and delivering a single
+         /// block in it used to be indistinguishable from delivering all of them: the miss walk
+         /// charges a round only when the WHOLE window goes unproduced, so a producer could hold a
+         /// scheduled slot indefinitely while delivering a fraction of it. A short round now counts
+         /// against the RATE gate -- chronic partial delivery demotes over the window -- while the
+         /// CONSECUTIVE gate stays reserved for rounds that produced nothing at all, so a total
+         /// outage is still caught quickly and a degraded node is given the window to recover in.
+         ///
+         /// Zero disables the check, leaving the whole-window rule alone. The default is half a
+         /// standard 12-slot round, matching the threshold the retired per-round pay model used.
+         ///
+         /// DECLARED LAST, matching the tail of SYSLIB_SERIALIZE below.
+         uint32_t min_blocks_per_round = 6;
+
 
          SYSLIB_SERIALIZE(producer_score_config,
             (collateral_weight)(participation_weight)(snapshot_weight)
             (relay_weight)(api_weight)(benchmark_weight)
             (max_consecutive_missed_rounds)(snapshot_target_attestations)
-            (missed_round_window_ms)(max_pct_missed_rounds_in_window))
+            (missed_round_window_ms)(max_pct_missed_rounds_in_window)
+            (min_blocks_per_round))
       };
 
       /// The `prodscorecfg` singleton. Mirrors `emitcfg_t`: absent until governance installs it, so
