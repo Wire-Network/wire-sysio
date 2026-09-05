@@ -104,13 +104,22 @@ arrives, or it will simply miss the round.
 Nothing. That is the point.
 
 Rank is **position in a score-ordered index**, derived by iteration rather than assigned by any
-action. The chain rebuilds the schedule at most once every 120 blocks; at that point the highest
-ranked eligible producers become the active schedule, and the finalizer policy is rebuilt to match.
-If your score puts you in the top 21 you are scheduled, and you begin producing in your slot.
+action. The chain rebuilds the schedule at most once every 120 block slots, roughly a minute; at
+that point the highest ranked eligible producers become the active schedule, and the finalizer
+policy is rebuilt to match. If your score puts you in the top 21 you are scheduled, and you begin
+producing in your slot.
 
 To hold a position at all you need three things at once: an active producer row, an `ACTIVE`
 producer operator registration backed by collateral, and an active finalizer key. Missing any one
 of them means no position, no pay, and no schedule slot.
+
+Two of those are worth watching after you are already running. A finalizer key that is removed or
+deactivated costs you your position immediately, however large your bond — the chain measures a
+producer it cannot schedule as one that holds no rank at all. And the collateral requirement is a
+governance setting, so it can be raised after you have bonded: if that happens your registration
+stays `ACTIVE` and nothing is taken from you, but you hold no rank until you top up to the new
+minimum. A raised minimum reaches the table through a background rescore rather than all at once,
+and the schedule is not rebuilt until that finishes.
 
 ## How your rank is scored
 
@@ -202,9 +211,12 @@ There are two ways back:
 
 One subtlety worth planning around: even a single missed round short of demotion lowers your
 participation factor, and if that drops you below the last scheduled position you stop being
-scheduled. The miss counter only clears by producing, so a producer displaced this way holds the
-penalty until it acts. Calling `regproducer` clears it, and so does posting enough additional
-collateral to outrank the producer that displaced you.
+scheduled. The counter behind that factor clears only by producing, and `regproducer` deliberately
+does not clear it — so re-registering returns you to the healthy tier but not to your former score.
+Until you hold a slot again you are ranked on collateral carrying a reduced participation term,
+which makes collateral the lever that works from outside the schedule: post enough to outrank
+whoever displaced you and the next rebuild puts you back, and the first block you produce restores
+the factor.
 
 ## Leaving, voluntarily or otherwise
 
