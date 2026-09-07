@@ -1,6 +1,7 @@
 #include <cstdint>
 #include <sysio.authex/sysio.authex.hpp>
 #include <sysio/print.hpp>
+#include <sysio/privileged.hpp>
 
 namespace {
 using namespace sysio;
@@ -30,10 +31,19 @@ std::vector<char> evm_address_from_uncompressed_key(const std::array<char, 65>& 
    return std::vector<char>(hash.end() - evm_address_size, hash.end());
 }
 
-/** Sweep rewards deposited before this external-chain identity was linked. */
-void sweep_linked_rewards(const name account, const opp::types::ChainKind chain_kind,
+/**
+ * Sweep rewards deposited before this external-chain identity was linked.
+ *
+ * A missing or non-privileged DClaim deployment cannot safely bill new rows to sysio. Treat either
+ * rollout state as "sweep unavailable": the link remains recordable and a later identical
+ * recordlink call can retry once bootstrap has completed.
+ */
+void sweep_linked_rewards(const name self, const name account,
+                          const opp::types::ChainKind chain_kind,
                           const std::vector<char>& native_address) {
-   action(permission_level{"sysio.authex"_n, "active"_n}, dclaim_account, linkswept_action,
+   if (!is_account(dclaim_account) || !is_privileged(dclaim_account)) return;
+
+   action(permission_level{self, "active"_n}, dclaim_account, linkswept_action,
           std::make_tuple(account, chain_kind, native_address)).send();
 }
 
@@ -148,7 +158,7 @@ namespace sysio {
       .pub_key = verified_pub_key,
    });
 
-   sweep_linked_rewards(account, chain_kind, native_address);
+   sweep_linked_rewards(get_self(), account, chain_kind, native_address);
 
    // The verified key is recorded in the links table only; it is NOT added to the
    // account's `active` (or any) permission, so the link grants no Wire signing
@@ -174,8 +184,9 @@ namespace sysio {
 
 // Trusted depot-only link insert -- the counterpart to createlink that skips signature/nonce
 // verification. The OPP NodeOwnerRegistration attestation is the proof; the chain accepts this
-// inline send because sysio.authex.active trusts the caller (sysio.roa@sysio.code). Idempotent and
-// non-throwing so the trust-OPP dispatch never aborts.
+// inline send because sysio.authex.active trusts the caller (sysio.roa@sysio.code). Unsupported
+// chain/key pairs are soft-dropped. Idempotent and non-throwing so the trust-OPP dispatch never
+// aborts, including during a staged rollout where sysio.dclaim is absent or not yet privileged.
 [[sysio::action]] void authex::recordlink(const name& account, const opp::types::ChainKind chain_kind,
                                           const public_key& pub_key,
                                           const binary_extension<bytes>& native_address) {
@@ -184,12 +195,11 @@ namespace sysio {
    const bool valid_evm = chain_kind == opp::types::ChainKind::CHAIN_KIND_EVM
                        && pub_key.index() == fc::crypto::key_type_em;
    const bool valid_svm = chain_kind == opp::types::ChainKind::CHAIN_KIND_SVM
-                       && pub_key.index() == 4;
+                       && pub_key.index() == fc::crypto::key_type_ed;
    if (!valid_evm && !valid_svm) return;
-   if (native_address.has_value()) {
-      const size_t expected_size = valid_evm ? evm_address_size : svm_address_size;
-      if (native_address->size() != expected_size) return;
-   }
+   const size_t expected_size = valid_evm ? evm_address_size : svm_address_size;
+   const bool can_sweep = native_address.has_value()
+                       && native_address->size() == expected_size;
 
    links_t links(get_self());
    auto by_namechain = links.get_index<"bynamechain"_n>();
@@ -205,8 +215,8 @@ namespace sysio {
    // than a later node-owner duplicate.
    auto existing = by_namechain.find(to_namechain_key(account, chain_kind));
    if (existing != by_namechain.end()) {
-      if (existing->pub_key == pub_key && native_address.has_value()) {
-         sweep_linked_rewards(account, chain_kind, *native_address);
+      if (existing->pub_key == pub_key && can_sweep) {
+         sweep_linked_rewards(get_self(), account, chain_kind, *native_address);
       }
       return;
    }
@@ -223,8 +233,8 @@ namespace sysio {
       .pub_key = pub_key,
    });
 
-   if (native_address.has_value()) {
-      sweep_linked_rewards(account, chain_kind, *native_address);
+   if (can_sweep) {
+      sweep_linked_rewards(get_self(), account, chain_kind, *native_address);
    }
 }
 

@@ -1966,15 +1966,8 @@ public:
       // Delegate sysio.authex.active to sysio.roa@sysio.code so nodeownreg's inline recordlink
       // (declared {sysio.authex, active}) is authorized -- the same code-permission grant the
       // production bootstrap wires. Without it the inline send fails auth and aborts the claim.
-      // A single co-signer is trivially sorted, so no accounts re-sort is needed.
       authority a( get_public_key( AUTHEX, "active" ) );
-      a.accounts.push_back( permission_level_weight{ { AUTHEX, config::sysio_code_name }, 1 } );
       a.accounts.push_back( permission_level_weight{ { ROA, config::sysio_code_name }, 1 } );
-      std::sort(a.accounts.begin(), a.accounts.end(),
-         [](const auto& lhs, const auto& rhs) {
-            return std::tie(lhs.permission.actor, lhs.permission.permission)
-                 < std::tie(rhs.permission.actor, rhs.permission.permission);
-         });
       set_authority( AUTHEX, config::active_name, a, config::owner_name );
       produce_blocks();
    }

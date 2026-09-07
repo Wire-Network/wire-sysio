@@ -234,6 +234,13 @@ std::vector<char> em_pubkey_bytes(const fc::crypto::public_key& pk) {
    return std::vector<char>(compressed.begin(), compressed.end());
 }
 
+/// Extract the 65-byte uncompressed EVM key emitted by BAR for NodeOwnerRegistration.
+std::vector<char> em_uncompressed_pubkey_bytes(const fc::crypto::public_key& pk) {
+   const auto& shim = pk.get<fc::em::public_key_shim>();
+   auto uncompressed = shim.unwrapped().serialize_uncompressed();
+   return std::vector<char>(uncompressed.begin(), uncompressed.end());
+}
+
 /// Encode an OperatorAction attestation payload (v6 schema).
 /// `chain_code` and `amount.token_code` are slug_name-packed uint64 values.
 std::string encode_operator_action(
@@ -664,6 +671,13 @@ public:
             abi_serializer::create_yield_function(abi_serializer_max_time));
       }
       return fc::variant();
+   }
+
+   fc::variant get_dclaim_row(name table, const char* type, uint64_t id) {
+      auto data = get_row_by_id(DCLAIM_ACCOUNT, DCLAIM_ACCOUNT, table, id);
+      return data.empty() ? fc::variant()
+         : dclaim_abi.binary_to_variant(
+              type, data, abi_serializer::create_yield_function(abi_serializer_max_time));
    }
 
    // ── uwrit swap-race helpers (direct msgch-auth action calls) ──
@@ -1940,10 +1954,21 @@ BOOST_FIXTURE_TEST_CASE(dispatch_routes_node_owner_reg_to_roa, sysio_dispatch_te
    const auto eth_code = fc::slug_name{"ETHEREUM"}.value;
    // The claim must carry CLAIM_ACCOUNT's own active key so nodeownreg's active_key_matches passes.
    auto wire_key = k1_pubkey_bytes(get_public_key(CLAIM_ACCOUNT, "active"));
-   // Depositor's ETH key (EM, 33-byte compressed).
+   // BAR supplies the depositor's ETH key as an uncompressed 65-byte point.
    auto eth_pub = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em).get_public_key();
-   auto eth_bytes = em_pubkey_bytes(eth_pub);
+   auto eth_bytes = em_uncompressed_pubkey_bytes(eth_pub);
    auto eth_address = fc::crypto::ethereum::address_to_bytes(eth_pub);
+
+   // Seed a pre-link reward at the key-derived address, then deliberately put a conflicting address
+   // in the redundant actor field. Dispatch must derive from actor_pub_key and sweep the real row.
+   const std::vector<char> native_address(eth_address.begin(), eth_address.end());
+   BOOST_REQUIRE_EQUAL(success(), push(DCLAIM_ACCOUNT, dclaim_abi, MSGCH_ACCOUNT, "onreward"_n, mvo()
+      ("chain_code", eth_code)("staker_wire_account", std::string{})
+      ("reward_chain", ChainKind::CHAIN_KIND_EVM)("staker_native_addr", native_address)
+      ("reward_amount", uint64_t{4321})("reward_epoch_index", uint32_t{7})
+      ("external_epoch_ref", uint64_t{100})("share_bps", uint32_t{10000})));
+   BOOST_REQUIRE(!get_dclaim_row("unmapped"_n, "unmapped_token", 1).is_null());
+   std::fill(eth_address.begin(), eth_address.end(), uint8_t{0xA5});
 
    auto payload = encode_node_owner_registration(
       CLAIM_ACCOUNT.to_string(), /*tier=*/2,
@@ -1960,6 +1985,10 @@ BOOST_FIXTURE_TEST_CASE(dispatch_routes_node_owner_reg_to_roa, sysio_dispatch_te
    auto audit = get_nodeownerreg(CLAIM_ACCOUNT);
    BOOST_REQUIRE(!audit.is_null());
    BOOST_REQUIRE_EQUAL(audit["status"].as<uint64_t>(), 0u);  // CONFIRMED
+   BOOST_REQUIRE(get_dclaim_row("unmapped"_n, "unmapped_token", 1).is_null());
+   auto pending = get_dclaim_row("pclaims"_n, "pending_claim", CLAIM_ACCOUNT.to_uint64_t());
+   BOOST_REQUIRE(!pending.is_null());
+   BOOST_REQUIRE_EQUAL(pending["balance"].as<asset>().get_amount(), 4321);
 } FC_LOG_AND_RETHROW() }
 
 // WSA-005: node-owner registration is bound to the EXACT Ethereum source outpost (NODE_OWNER_SRC_CHAIN
@@ -1980,7 +2009,7 @@ BOOST_FIXTURE_TEST_CASE(node_owner_reg_from_other_evm_outpost_is_dropped, sysio_
 
    auto wire_key  = k1_pubkey_bytes(get_public_key(CLAIM_ACCOUNT, "active"));
    auto eth_pub   = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em).get_public_key();
-   auto eth_bytes = em_pubkey_bytes(eth_pub);
+   auto eth_bytes = em_uncompressed_pubkey_bytes(eth_pub);
    auto eth_address = fc::crypto::ethereum::address_to_bytes(eth_pub);
    auto payload   = encode_node_owner_registration(
       CLAIM_ACCOUNT.to_string(), /*tier=*/2,
@@ -2008,7 +2037,7 @@ BOOST_FIXTURE_TEST_CASE(node_owner_reg_from_non_evm_outpost_is_dropped, sysio_di
 
    auto wire_key  = k1_pubkey_bytes(get_public_key(CLAIM_ACCOUNT, "active"));
    auto eth_pub   = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em).get_public_key();
-   auto eth_bytes = em_pubkey_bytes(eth_pub);
+   auto eth_bytes = em_uncompressed_pubkey_bytes(eth_pub);
    auto eth_address = fc::crypto::ethereum::address_to_bytes(eth_pub);
    auto payload   = encode_node_owner_registration(
       CLAIM_ACCOUNT.to_string(), /*tier=*/2,

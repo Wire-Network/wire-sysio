@@ -225,9 +225,13 @@ namespace sysio {
      * established (via the deposit attestation) that `pub_key` belongs to `account`, so this skips
      * createlink's signature/nonce checks and inserts the link.
      * `require_auth(get_self())`; idempotent and non-throwing so the trust-OPP depot dispatch is
-     * never aborted. When an upgraded caller appends `native_address`, a successful or idempotent
-     * link also sweeps matching pre-link DClaim rewards. Legacy three-field payloads remain valid
-     * and retain the pre-sweep behavior.
+     * never aborted. Unsupported chain/key pairs are silently ignored. When an upgraded caller
+     * appends a correctly sized `native_address`, a successful or idempotent link also sweeps
+     * matching pre-link DClaim rewards. A malformed address skips only the sweep, not link
+     * insertion. A missing or non-privileged sysio.dclaim deployment likewise skips the sweep; the
+     * production bootstrap must deploy sysio.dclaim as privileged, and an identical recordlink can
+     * retry the sweep after bootstrap completes. Legacy three-field payloads remain valid and
+     * retain the pre-sweep behavior.
      *
      * Unlike createlink, this does NOT enforce a unique `pub_key`: one external wallet may hold
      * several WireNodes NFTs and back several Wire accounts, so one ETH key -> many accounts is

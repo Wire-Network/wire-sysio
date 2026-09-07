@@ -59,23 +59,12 @@ public:
    sysio_authex_tester() {
       produce_blocks( 2 );
 
-      create_accounts( { DCLAIM, MSGCH, "alice"_n, "bob"_n, "carol"_n, } );
+      create_accounts( { MSGCH, "alice"_n, "bob"_n, "carol"_n, } );
       produce_blocks( 2 );
 
       set_code( AUTHEX, contracts::authex_wasm() );
       set_abi( AUTHEX, contracts::authex_abi().data() );
       set_privileged( AUTHEX );
-
-      set_code( DCLAIM, contracts::dclaim_wasm() );
-      set_abi( DCLAIM, contracts::dclaim_abi().data() );
-      set_privileged( DCLAIM );
-
-      // createlink declares sysio.authex.active on its inline linkswept action. Grant the
-      // contract's own code that permission, matching production bootstrap.
-      authority authex_active(get_public_key(AUTHEX, "active"));
-      authex_active.accounts.push_back(
-         permission_level_weight{{AUTHEX, config::sysio_code_name}, 1});
-      set_authority(AUTHEX, config::active_name, authex_active, config::owner_name);
 
       produce_blocks();
 
@@ -84,8 +73,23 @@ public:
       abi_def abi;
       BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, abi), true);
       abi_ser.set_abi(abi, abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
+   void deploy_dclaim() {
+      create_accounts( { DCLAIM } );
+      set_code( DCLAIM, contracts::dclaim_wasm() );
+      set_abi( DCLAIM, contracts::dclaim_abi().data() );
+      set_privileged( DCLAIM );
+      produce_blocks();
       dclaim_abi_ser.set_abi(load_abi(DCLAIM),
          abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
+   void set_dclaim_privileged(bool is_privileged) {
+      base_tester::push_action(config::system_account_name, "setpriv"_n,
+         config::system_account_name,
+         mvo()("account", DCLAIM)("is_priv", is_privileged ? 1 : 0));
+      produce_blocks();
    }
 
    abi_def load_abi(name account) {
@@ -286,6 +290,7 @@ BOOST_FIXTURE_TEST_CASE( createlink_eth_success, sysio_authex_tester ) try {
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( createlink_eth_sweeps_prelink_dclaim_rewards, sysio_authex_tester ) try {
+   deploy_dclaim();
    auto link = make_eth_link("alice", now_ms());
    const auto address_bytes = fc::crypto::ethereum::address_to_bytes(link.pub);
    const std::vector<char> native_address(address_bytes.begin(), address_bytes.end());
@@ -304,6 +309,7 @@ BOOST_FIXTURE_TEST_CASE( createlink_eth_sweeps_prelink_dclaim_rewards, sysio_aut
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( recordlink_accepts_legacy_three_field_payload, sysio_authex_tester ) try {
+   deploy_dclaim();
    const auto public_key = fc::crypto::private_key::generate(
       fc::crypto::private_key::key_type::em).get_public_key();
    const auto address_bytes = fc::crypto::ethereum::address_to_bytes(public_key);
@@ -326,7 +332,60 @@ BOOST_FIXTURE_TEST_CASE( recordlink_accepts_legacy_three_field_payload, sysio_au
    BOOST_REQUIRE(get_dclaim_row("pclaims"_n, "pending_claim", "bob"_n.to_uint64_t()).is_null());
 } FC_LOG_AND_RETHROW()
 
+BOOST_FIXTURE_TEST_CASE( recordlink_records_link_when_dclaim_is_missing, sysio_authex_tester ) try {
+   const auto public_key = fc::crypto::private_key::generate(
+      fc::crypto::private_key::key_type::em).get_public_key();
+   const auto address_bytes = fc::crypto::ethereum::address_to_bytes(public_key);
+   const std::vector<char> native_address(address_bytes.begin(), address_bytes.end());
+
+   BOOST_REQUIRE_EQUAL(success(), recordlink(AUTHEX, "bob", public_key, native_address));
+   produce_blocks();
+
+   auto link = get_link(0);
+   BOOST_REQUIRE(!link.is_null());
+   BOOST_REQUIRE_EQUAL(link["username"].as<name>(), "bob"_n);
+   BOOST_REQUIRE_EQUAL(link["pub_key"].as<fc::crypto::public_key>(), public_key);
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( recordlink_records_link_when_native_address_is_malformed,
+                         sysio_authex_tester ) try {
+   const auto public_key = fc::crypto::private_key::generate(
+      fc::crypto::private_key::key_type::em).get_public_key();
+   const std::vector<char> malformed_address(19, char{0x01});
+
+   BOOST_REQUIRE_EQUAL(success(), recordlink(AUTHEX, "bob", public_key, malformed_address));
+   produce_blocks();
+
+   auto link = get_link(0);
+   BOOST_REQUIRE(!link.is_null());
+   BOOST_REQUIRE_EQUAL(link["username"].as<name>(), "bob"_n);
+   BOOST_REQUIRE_EQUAL(link["pub_key"].as<fc::crypto::public_key>(), public_key);
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( recordlink_records_link_when_dclaim_is_not_privileged,
+                         sysio_authex_tester ) try {
+   deploy_dclaim();
+   const auto public_key = fc::crypto::private_key::generate(
+      fc::crypto::private_key::key_type::em).get_public_key();
+   const auto address_bytes = fc::crypto::ethereum::address_to_bytes(public_key);
+   const std::vector<char> native_address(address_bytes.begin(), address_bytes.end());
+
+   BOOST_REQUIRE_EQUAL(success(), onreward(native_address, 6500));
+   BOOST_REQUIRE(!get_dclaim_row("unmapped"_n, "unmapped_token", 1).is_null());
+   set_dclaim_privileged(false);
+
+   BOOST_REQUIRE_EQUAL(success(), recordlink(AUTHEX, "bob", public_key, native_address));
+   produce_blocks();
+
+   auto link = get_link(0);
+   BOOST_REQUIRE(!link.is_null());
+   BOOST_REQUIRE_EQUAL(link["username"].as<name>(), "bob"_n);
+   BOOST_REQUIRE(!get_dclaim_row("unmapped"_n, "unmapped_token", 1).is_null());
+   BOOST_REQUIRE(get_dclaim_row("pclaims"_n, "pending_claim", "bob"_n.to_uint64_t()).is_null());
+} FC_LOG_AND_RETHROW()
+
 BOOST_FIXTURE_TEST_CASE( recordlink_eth_sweeps_prelink_dclaim_rewards, sysio_authex_tester ) try {
+   deploy_dclaim();
    const auto private_key = fc::crypto::private_key::generate(
       fc::crypto::private_key::key_type::em);
    const auto public_key = private_key.get_public_key();
@@ -344,6 +403,7 @@ BOOST_FIXTURE_TEST_CASE( recordlink_eth_sweeps_prelink_dclaim_rewards, sysio_aut
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( recordlink_svm_sweeps_prelink_dclaim_rewards, sysio_authex_tester ) try {
+   deploy_dclaim();
    const auto public_key = fc::crypto::private_key::generate(
       fc::crypto::private_key::key_type::ed).get_public_key();
    const auto raw_key = public_key.get<fc::crypto::ed::public_key_shim>().serialize();
@@ -362,6 +422,7 @@ BOOST_FIXTURE_TEST_CASE( recordlink_svm_sweeps_prelink_dclaim_rewards, sysio_aut
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( recordlink_identical_retry_resweeps_dclaim_rewards, sysio_authex_tester ) try {
+   deploy_dclaim();
    const auto public_key = fc::crypto::private_key::generate(
       fc::crypto::private_key::key_type::em).get_public_key();
    const auto address_bytes = fc::crypto::ethereum::address_to_bytes(public_key);
