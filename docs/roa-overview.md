@@ -152,7 +152,7 @@ account_name action::payer() const {
 flowchart TD
     A["Action arrives"] --> B{"authorization[0].permission<br/>== sysio.payer ?"}
     B -->|"No — ordinary traffic"| C["Payer = the contract being called"]
-    B -->|"Yes — opt-in"| D{"Same actor also present<br/>with a real permission,<br/>and signed for?"}
+    B -->|"Yes — opt-in"| D{"Same actor also present with a<br/>real permission, satisfied by signatures<br/>or, inline, by receiver@sysio.code ?"}
     D -->|"No"| E["Rejected:<br/>unsatisfied authorization"]
     D -->|"Yes"| F["Payer = that actor"]
     C --> G["Contract needs a policy for<br/>actions declared on it.<br/>Signer not billed."]
@@ -175,8 +175,8 @@ the declared action's payer.
 | Action authorizations | Payer | Notes |
 |---|---|---|
 | `{alice, active}` | `sysio.token` (the contract) | The default. Alice pays nothing. |
-| `{alice, sysio.payer}, {alice, active}` | `alice` | Explicit self-pay. Alice needs her own allocation. |
-| `{alice, sysio.payer}, {alice, active}, {bob, active}` | `alice` | Alice covers the whole action's cost. |
+| `{alice, sysio.payer}, {alice, active}` | `alice` | Explicit self-pay. Declared, Alice needs her own CPU and NET allocation; inline, the marker covers RAM only. |
+| `{alice, sysio.payer}, {alice, active}, {bob, active}` | `alice` | Alice is the payer for the whole action; Bob is neither billed nor limited. |
 
 ### Porting a contract from Antelope
 
@@ -635,12 +635,12 @@ Alice is charged nothing, for anything, on a token transfer.
 > billed to an account other than the receiving contract,
 > `apply_context::validate_account_ram_deltas` requires that account to appear in the action's
 > authorizations with the `sysio.payer` permission; without it the action fails with
-> `Requested payer ... Missing sysio.payer`. And because `sysio.payer` must sit at index 0, adding
-> it also makes that user the action's CPU and NET payer.
+> `Requested payer ... Missing sysio.payer`. On a *declared* action that marker also makes the user
+> the action's CPU and NET payer; on an inline one it authorizes the RAM alone.
 >
 > So billing RAM to a user is an explicit opt-in by the user, not a choice the contract makes
-> alone, and it opts them into paying for bandwidth at the same time. Contract authors who want the
-> gasless experience should bill RAM to the contract account, which needs no such marker.
+> alone. Contract authors who want the gasless experience should bill RAM to the contract account,
+> which needs no such marker.
 >
 > **Scope: unprivileged contracts.** `validate_account_ram_deltas` bypasses the marker when the
 > receiver is privileged **and** `sysio.`-prefixed (neither alone suffices — the
@@ -720,9 +720,10 @@ true, so `subjective_bill_failure` skips the payer and the cost lands on the *si
 action begins executing — see [Subjective billing](#subjective-billing-meters-the-signer).
 
 The provisioning is a single `addpolicy` on the contract account. Because the contract is the payer
-for any declared action that does not name one explicitly, ordinary users of that token are never billed — a
-user is billed only if they opt in with `sysio.payer`, which the wallet or client would have to put
-in the action deliberately. What the developer needs from the policy differs by resource, though:
+for any declared action that does not name one explicitly, ordinary users of that token are never
+billed — a user is billed CPU and NET only if they opt in with `sysio.payer` on a declared action,
+which the wallet or client would have to put there deliberately. What the developer needs from the
+policy differs by resource, though:
 
 - **CPU and NET are replenishing shares, not per-transaction payments.** They meter rate, not
   count, so a million transfers and ten transfers draw on the same weight. What the volume
