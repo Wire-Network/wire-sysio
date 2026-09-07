@@ -160,7 +160,7 @@ flowchart TD
     D -->|"No"| E["Rejected:<br/>unsatisfied authorization"]
     D -->|"Yes"| F["Payer = that actor"]
     C --> G["Contract needs a policy for<br/>actions declared on it.<br/>Signer not billed."]
-    F --> H["Actor is billed CPU, NET,<br/>and RAM billed to it.<br/>Contract not billed."]
+    F --> H["Actor billed CPU and NET, contract not.<br/>Marker authorizes RAM billed to the actor;<br/>contract may still bill RAM to itself."]
 ```
 
 Declared regular actions only. A context-free action takes the marker alone, as above; inline and
