@@ -25,6 +25,10 @@ namespace sysiosystem {
    void system_contract::register_producer( const name& producer, const sysio::block_signing_authority& producer_authority, const std::string& url, uint16_t location ) {
       const auto ct = current_time_point();
 
+      producer_rank::producer_score_config_t weights_tbl( get_self() );
+      const auto     weights = weights_tbl.get_or_default( producer_rank::producer_score_config{} );
+      const uint64_t now_ms  = static_cast<uint64_t>( ct.time_since_epoch().count() / 1000 );
+
       sysio::public_key producer_key{};
 
       std::visit( [&](auto&& auth ) {
@@ -72,20 +76,22 @@ namespace sysiosystem {
             // PRODUCING, so a producer that returns unready is demoted again on its next missed
             // round; until it produces, the participation factor keeps scoring it accordingly.
             //
-            // The miss WINDOW resets ONLY on a genuine demoted-to-recovered transition, never on
-            // an ordinary re-registration. A demoted producer is not scheduled, so it observes no
-            // rounds and its recorded rate could never improve on its own -- that is what the
-            // reset is for. An ACTIVE producer has no such problem, and wiping its window would
-            // hand it the cron loop the streak was protected from: a producer delivering a
-            // fraction of every round never advances the CONSECUTIVE counter (a short round feeds
-            // the rate gate alone), so if `regproducer` also cleared the window there would be no
-            // surviving evidence against it at all, and the rate gate could never fire.
-            if( info.is_demoted ) {
-               info.is_demoted              = false;
-               info.rounds_in_window        = 0;
-               info.missed_rounds_in_window = 0;
-               info.miss_window_open_ms     = 0;
-            }
+            // `regproducer` answers the CONSECUTIVE gate and nothing else. That gate asks "are
+            // you offline right now", and re-supplying a signing key is a real answer to it, so
+            // a demotion it caused clears outright.
+            //
+            // It is NOT an answer to the rate gate, which is a claim about a RECORD. Gating the
+            // window reset on `is_demoted` alone was still a loop: a producer demoted on rate can
+            // call this immediately, before any rebuild drops it, and re-registering after every
+            // demotion made chronic short-round delivery unpunishable -- short rounds never touch
+            // the consecutive counter, so preserving the streak protected nothing.
+            //
+            // So the window is rolled only when it has genuinely LAPSED, and the flag is then
+            // re-derived from whatever remains. A producer serving out a rate demotion has to
+            // spend the window without a slot; one whose record has aged out is back immediately.
+            // Time is what heals it, which is also why this can never become a lockout.
+            info.roll_miss_window( now_ms, weights.missed_round_window_ms );
+            info.is_demoted = breaches_miss_rate( info, now_ms, weights );
          });
 
       // The clear above changes the producer's tier, so its sort key is stale until rescored.
@@ -124,9 +130,9 @@ namespace sysiosystem {
       // clears by producing a block while still scheduled, or by `regproducer`. Governance
       // widening the tolerance is not a pardon for producers already judged under the old one, and
       // either door back is open to them immediately.
-      if( !info.is_demoted
-          && producer_rank::exceeds_miss_rate( info.rounds_in_window,
-                                               info.missed_rounds_in_window, weights ) ) {
+      const uint64_t now_ms = static_cast<uint64_t>(
+         sysio::current_time_point().time_since_epoch().count() / 1000 );
+      if( !info.is_demoted && breaches_miss_rate( info, now_ms, weights ) ) {
          _producers.modify( same_payer, key, []( auto& p ) { p.set_demoted( true ); });
       }
       rescore_producer( producer );

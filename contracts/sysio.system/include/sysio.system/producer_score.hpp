@@ -325,13 +325,29 @@ namespace sysiosystem {
             },
             weights);
 
-         // The period's snapshot credit is cleared at the EVENTS that drop a producer out of the
-         // pay walk -- demotion and `unregprod` -- not inferred here from a tier change. Inferring
-         // it was wrong: a row can be re-entering and freshly credited in the same block, and a
-         // tier comparison cannot tell that credit apart from a stale one, so it consumed credits
-         // that had just been earned.
          if (score == info.rank_score) return;   // no index move needed
-         producers.modify(same_payer, key, [&](auto& row) { row.rank_score = score; });
+
+         // Consume the period's snapshot credit on the way OUT of the pay walk, whichever event
+         // caused it. Demotion and `unregprod` clear it at their own sites, but they are not the
+         // only exits: deleting the last finalizer key, losing ACTIVE producer status in opreg,
+         // and falling under a RAISED collateral minimum all sink the row here and only here.
+         // `payepoch` stops at the demoted tier, so a credit carried out through one of those
+         // doors is never reset and reappears at full marks on the way back.
+         //
+         // ONE DIRECTION ONLY, and that is the whole difference from the re-entry heuristic this
+         // replaces. That version tried to infer a stale credit from a tier change on the way IN,
+         // where a row may be re-entering and freshly credited in the same block and the tier
+         // cannot tell the two apart -- so it consumed credit that had just been earned. Leaving
+         // the walk carries no such ambiguity: whatever the row holds belongs to a period it is
+         // no longer in.
+         const bool was_in_walk = tier_of(info.rank_score) != producer_tier::demoted;
+         const bool now_in_walk = tier_of(score) != producer_tier::demoted;
+         const bool left_the_walk = was_in_walk && !now_in_walk;
+
+         producers.modify(same_payer, key, [&](auto& row) {
+            row.rank_score = score;
+            if (left_the_walk) row.snapshot_attestations = 0;
+         });
       }
 
    } // namespace producer_rank

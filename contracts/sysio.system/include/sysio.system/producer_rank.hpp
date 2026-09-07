@@ -276,12 +276,55 @@ namespace sysiosystem {
        * @param weights the live score configuration.
        * @return true iff the rate gate is armed and exceeded.
        */
-      inline bool exceeds_miss_rate(uint32_t rounds, uint32_t missed,
+      inline bool exceeds_miss_rate(uint64_t rounds, uint64_t missed,
                                     const producer_score_config& weights) {
          if (weights.max_pct_missed_rounds_in_window == 0) return false;
          if (rounds < rate_gate_minimum_sample(weights)) return false;
          if (rounds == 0) return false;
          return (missed * 100u / rounds) > weights.max_pct_missed_rounds_in_window;
+      }
+
+      /// Rounds and misses the trailing window covers, from the two-bucket approximation.
+      struct miss_window_view {
+         uint64_t rounds = 0;
+         uint64_t missed = 0;
+      };
+
+      /**
+       * Weight the previous bucket by the fraction of it the trailing window still covers.
+       *
+       * One bucket emptied at its duration is a TUMBLING window, and a tumbling window is
+       * evadable: with a 5-round minimum and a 40% limit, `GGGSS | SSGGG` reads 40% in each
+       * bucket while the trailing five rounds are `GSSSS` -- 80%. `miss_window_open_ms` is
+       * on-chain, so the boundary can be targeted deliberately, and short rounds do not advance
+       * the consecutive gate that would otherwise catch it.
+       *
+       * Counting the previous bucket in proportion to how much of it remains inside the window
+       * closes that: at elapsed = 0 it counts in full, at elapsed = window it counts for nothing.
+       * The result is an estimate rather than a per-observation truth, which is the trade for
+       * O(1) state on a path `onblock` runs.
+       *
+       * @param rounds      scheduled rounds observed in the CURRENT bucket.
+       * @param missed      how many of them went unproduced or came up short.
+       * @param prev_rounds the previous bucket's rounds.
+       * @param prev_missed the previous bucket's misses.
+       * @param elapsed_ms  how long the current bucket has been open.
+       * @param weights     the live score configuration.
+       * @return the weighted view the rate gate is evaluated against.
+       */
+      inline miss_window_view weighted_miss_window(uint32_t rounds, uint32_t missed,
+                                                   uint32_t prev_rounds, uint32_t prev_missed,
+                                                   uint64_t elapsed_ms,
+                                                   const producer_score_config& weights) {
+         const uint64_t window = weights.missed_round_window_ms;
+         if (window == 0 || elapsed_ms >= window) {
+            return { rounds, missed };
+         }
+         const uint64_t remaining = window - elapsed_ms;
+         return {
+            static_cast<uint64_t>(rounds) + static_cast<uint64_t>(prev_rounds) * remaining / window,
+            static_cast<uint64_t>(missed) + static_cast<uint64_t>(prev_missed) * remaining / window
+         };
       }
 
       /**

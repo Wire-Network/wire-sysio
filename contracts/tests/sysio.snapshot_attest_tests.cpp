@@ -198,6 +198,91 @@ public:
          ("producer", producer));
    }
 
+   /// Produce until `expected` is in the ACTIVE schedule, or give up. Returns whether it made it.
+   bool reach_active_schedule(name expected, uint32_t max_blocks = 400) {
+      for (uint32_t produced = 0; produced < max_blocks; produced += 10) {
+         for (const auto& entry : control->active_producers().producers) {
+            if (entry.producer_name == expected) return true;
+         }
+         produce_blocks(10);
+      }
+      for (const auto& entry : control->active_producers().producers) {
+         if (entry.producer_name == expected) return true;
+      }
+      return false;
+   }
+
+   /// Advance past `producer`'s entire slot window without it producing, so `onblock` charges it
+   /// a missed round. Modelled on the emissions suite's helper; the schedule comes from the live
+   /// active set because miss attribution reads that, not the proposal.
+   void skip_one_round_of(name producer) {
+      static constexpr uint32_t slots_per_producer = 12;
+      std::vector<account_name> schedule;
+      for (const auto& entry : control->active_producers().producers) {
+         schedule.push_back(entry.producer_name);
+      }
+      const auto target_it = std::find(schedule.begin(), schedule.end(), producer);
+      BOOST_REQUIRE_MESSAGE(target_it != schedule.end(),
+         producer.to_string() << " is not in the active schedule");
+      BOOST_REQUIRE_MESSAGE(schedule.size() >= 3,
+         "skipping a round needs at least three scheduled producers");
+
+      const size_t target_index = static_cast<size_t>(std::distance(schedule.begin(), target_it));
+      const size_t before_index = (target_index + schedule.size() - 1) % schedule.size();
+      const auto index_at = [&](uint32_t slot) {
+         return (slot % (schedule.size() * slots_per_producer)) / slots_per_producer;
+      };
+
+      const uint32_t walk_limit = static_cast<uint32_t>(schedule.size() + 1) * slots_per_producer;
+      uint32_t walked = 0;
+      while (index_at(control->head().header().timestamp.slot) != before_index) {
+         produce_blocks(1);
+         BOOST_REQUIRE_MESSAGE(++walked < walk_limit,
+            "never reached the window before " << producer.to_string());
+      }
+
+      const uint32_t slot         = control->head().header().timestamp.slot;
+      const uint32_t into_window  = slot % slots_per_producer;
+      const uint32_t jump         = (slots_per_producer - into_window) + slots_per_producer;
+      produce_block(fc::milliseconds(int64_t(config::block_interval_ms) * jump));
+      BOOST_REQUIRE_MESSAGE(control->head().header().producer != producer,
+         "the jump landed on " << producer.to_string() << " instead of skipping it");
+   }
+
+   /// Delete a producer's registered finalizer key — an exit from the pay walk that neither
+   /// demotion nor `unregprod` covers, and the one `compute` sinks through `unscored()`.
+   action_result delete_finalizer_key(name producer) {
+      auto [privkey, pubkey, pop, sig_provider] = sysio::testing::get_bls_key(producer);
+      return push_action(producer, "delfinkey"_n, mvo()
+         ("finalizer_name", producer)
+         ("finalizer_key", pubkey.to_string()));
+   }
+
+   /// Drive a producer to a MISS demotion through the consecutive gate, which is the cheapest
+   /// route to a demoted row: its producer row, opreg status and finalizer key all stay intact,
+   /// so `is_schedulable` still passes and only the tier says it has left the walk.
+   void demote_producer(name producer) {
+      const auto weights = mvo()
+         ("collateral_weight",              uint32_t(10'000))
+         ("participation_weight",           uint32_t(10'000))
+         ("snapshot_weight",                uint32_t(1'000))
+         ("relay_weight",                   uint32_t(0))
+         ("api_weight",                     uint32_t(0))
+         ("benchmark_weight",               uint32_t(0))
+         ("max_consecutive_missed_rounds",  uint32_t(1))
+         ("snapshot_target_attestations",   uint32_t(1))
+         ("missed_round_window_ms",         uint64_t(24ULL * 60 * 60 * 1000))
+         ("max_pct_missed_rounds_in_window", uint32_t(0))
+         ("min_blocks_per_round",           uint32_t(0));
+      BOOST_REQUIRE_EQUAL(success(),
+         push_action(config::system_account_name, "setscorecfg"_n, mvo()("weights", weights)));
+      produce_blocks();
+      // One missed round is enough at a consecutive limit of 1.
+      skip_one_round_of(producer);
+      BOOST_REQUIRE_MESSAGE(get_producer_info(producer)["is_demoted"].as<bool>(),
+         producer.to_string() << " was not demoted by the consecutive gate");
+   }
+
 
    /// Vote on a snapshot hash.
    action_result votesnaphash(name snap_account, const fc::sha256& block_id, const fc::sha256& snapshot_hash) {
@@ -731,6 +816,67 @@ BOOST_FIXTURE_TEST_CASE(a_parked_producer_earns_no_snapshot_credit, snapshot_vot
    BOOST_REQUIRE_MESSAGE(attestations_of("producer1"_n) == 0u,
       "a parked producer was credited: the gate is testing the is_demoted flag, which unregprod "
       "never sets, rather than live schedulability");
+} FC_LOG_AND_RETHROW() }
+
+// N3: a MISS-DEMOTED producer earns no credit either, and `is_schedulable` alone does not say so.
+//
+// That predicate tests the active row, ACTIVE producer status in opreg, and the finalizer key --
+// it never looks at `is_demoted` or the row's tier. A demoted producer passes it while `payepoch`
+// stops before its tier, so credit handed to it is never reset and comes back at full marks. The
+// gate is the pay walk's own pair: tier plus live schedulability.
+BOOST_FIXTURE_TEST_CASE(a_demoted_producer_earns_no_snapshot_credit, snapshot_voting_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2));
+   produce_blocks();
+
+   const auto attestations_of = [this](account_name producer) {
+      return get_producer_info(producer)["snapshot_attestations"].as<uint32_t>();
+   };
+
+   // Demote producer1 directly on the row: this is about the CREDIT gate, not about how the
+   // demotion was reached. Its row stays active, opreg-eligible and keyed, so `is_schedulable`
+   // still passes -- which is exactly the hole.
+   BOOST_REQUIRE_MESSAGE(reach_active_schedule("producer1"_n),
+      "producer1 never entered the active schedule; a miss cannot be attributed without it");
+   demote_producer("producer1"_n);
+   BOOST_REQUIRE_EQUAL(true, get_producer_info("producer1"_n)["is_demoted"].as<bool>());
+   BOOST_REQUIRE_EQUAL(0u, attestations_of("producer1"_n));
+
+   const auto block_num = vote_block_num();
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, make_block_id(block_num), make_snap_hash(11)));
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, make_block_id(block_num), make_snap_hash(11)));
+
+   BOOST_REQUIRE_EQUAL(1u, attestations_of("producer2"_n));
+   BOOST_REQUIRE_MESSAGE(attestations_of("producer1"_n) == 0u,
+      "a demoted producer was credited: the gate tests live schedulability alone, which never "
+      "looks at the tier the pay walk stops at");
+} FC_LOG_AND_RETHROW() }
+
+// N4: leaving the pay walk by ANY door consumes the period's credit, not just demotion and
+// `unregprod`. Deleting the last finalizer key sinks the row through `compute` -> `unscored()`,
+// and `payepoch` stops at that tier, so a credit carried out this way would never be reset and
+// would reappear the moment the producer re-keys.
+BOOST_FIXTURE_TEST_CASE(losing_the_finalizer_key_consumes_the_snapshot_credit, snapshot_voting_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2));
+   produce_blocks();
+
+   const auto attestations_of = [this](account_name producer) {
+      return get_producer_info(producer)["snapshot_attestations"].as<uint32_t>();
+   };
+
+   const auto block_num = vote_block_num();
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, make_block_id(block_num), make_snap_hash(12)));
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, make_block_id(block_num), make_snap_hash(12)));
+   BOOST_REQUIRE_EQUAL(1u, attestations_of("producer1"_n));
+
+   // Out through a door neither `set_demoted` nor `unregprod` covers.
+   BOOST_REQUIRE_EQUAL(success(), delete_finalizer_key("producer1"_n));
+   BOOST_REQUIRE_MESSAGE(attestations_of("producer1"_n) == 0u,
+      "the credit survived a finalizer-key exit: payepoch stops at that tier, so it would never "
+      "be reset and would return at full marks on re-keying");
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(votesnaphash_same_tuple_retry_is_idempotent, snapshot_voting_tester) { try {

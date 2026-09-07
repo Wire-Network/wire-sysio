@@ -117,12 +117,18 @@ void credit_snapshot_attestations(name self, const std::vector<name>& voters) {
       // long as the producer stays out and then re-enters at full marks, outranking producers that
       // actually served the period it returns into.
       //
-      // The test is the LIVE schedulable predicate, not the `is_demoted` flag. `unregprod` parks a
-      // row by clearing `is_active` and letting the rescore sink it by TIER -- the flag stays
-      // false throughout -- and losing a finalizer key or opreg eligibility does the same. Gating
-      // on the flag would credit every one of them. A producer outside the walk that keeps voting
-      // is not a fault to reject, just service that earns no rating, so this skips silently.
-      if (!producer_rank::is_schedulable(producers.get(key), finalizers)) continue;
+      // The test is the SAME PAIR the pay walk applies: the row's tier, and live schedulability.
+      // Neither alone is enough. `is_demoted` misses a parked row -- `unregprod` clears
+      // `is_active` and lets the rescore sink it by TIER, so the flag stays false -- while
+      // `is_schedulable` misses a miss-demoted one, because it tests the active row, opreg status
+      // and finalizer key and never looks at the tier. A producer outside the walk that keeps
+      // voting is not a fault to reject, just service that earns no rating, so this skips
+      // silently.
+      const auto& row = producers.get(key);
+      if (producer_rank::tier_of(row.rank_score) == producer_tier::demoted
+          || !producer_rank::is_schedulable(row, finalizers)) {
+         continue;
+      }
       producers.modify(same_payer, key, [](auto& row) { row.snapshot_attestations++; });
       // The credit moved the snapshot factor, so the stored sort key is stale until rescored.
       // Without this the factor would reach the index only on the next unrelated rescore.

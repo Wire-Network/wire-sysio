@@ -151,6 +151,18 @@ namespace sysiosystem {
       });
    }
 
+   bool system_contract::breaches_miss_rate( const producer_info& producer, uint64_t now_ms,
+                                            const producer_rank::producer_score_config& weights ) const {
+      const uint64_t elapsed = producer.miss_window_open_ms == 0
+         ? weights.missed_round_window_ms                 // nothing recorded yet: no carry
+         : now_ms - producer.miss_window_open_ms;
+      const auto window = producer_rank::weighted_miss_window(
+         producer.rounds_in_window, producer.missed_rounds_in_window,
+         producer.prev_rounds_in_window, producer.prev_missed_rounds_in_window,
+         elapsed, weights );
+      return producer_rank::exceeds_miss_rate( window.rounds, window.missed, weights );
+   }
+
    void system_contract::record_short_round( const name& producer, uint32_t blocks_delivered,
                                              const producer_rank::producer_score_config& weights ) {
       // Zero disables the check, leaving the whole-window rule alone.
@@ -159,6 +171,9 @@ namespace sysiosystem {
 
       auto key = producer_key_t{producer.value};
       if( !_producers.contains(key) ) return;
+
+      const uint64_t now_ms = static_cast<uint64_t>(
+         sysio::current_time_point().time_since_epoch().count() / 1000 );
 
       _producers.modify( same_payer, key, [&]( auto& p ) {
          // The window is NOT rolled here. This amends a round `record_round_outcome` already
@@ -169,9 +184,7 @@ namespace sysiosystem {
          // service, not an outage, and the consecutive gate exists to catch the latter fast. A
          // producer delivering a fraction of every round is caught by the window instead, which
          // is the "acceptable up to a point" the threshold encodes.
-         if( !p.is_demoted
-             && producer_rank::exceeds_miss_rate( p.rounds_in_window,
-                                                  p.missed_rounds_in_window, weights ) ) {
+         if( !p.is_demoted && breaches_miss_rate( p, now_ms, weights ) ) {
             p.set_demoted( true );
          }
       });
@@ -206,12 +219,7 @@ namespace sysiosystem {
          // no rounds, so nothing accrued while it was away -- and if it stayed away longer than the
          // window, its old counts lapse rather than greeting it on return. That is the WNS-47
          // shape (stale per-period state resurrecting on re-entry) designed out at the source.
-         if( p.miss_window_open_ms == 0
-             || now_ms - p.miss_window_open_ms >= weights.missed_round_window_ms ) {
-            p.miss_window_open_ms     = now_ms;
-            p.rounds_in_window        = 0;
-            p.missed_rounds_in_window = 0;
-         }
+         p.roll_miss_window( now_ms, weights.missed_round_window_ms );
          p.rounds_in_window++;
 
          if( !missed ) {
@@ -229,8 +237,7 @@ namespace sysiosystem {
             // one. So the flag is RE-DERIVED from the record rather than forced false. A producer
             // still holding a slot climbs out by producing until its rate falls back under the
             // limit; one the schedule has dropped uses `regproducer`, which opens a fresh window.
-            p.set_demoted( producer_rank::warrants_demotion( 0, p.rounds_in_window,
-                                                             p.missed_rounds_in_window, weights ) );
+            p.set_demoted( breaches_miss_rate( p, now_ms, weights ) );
             return;
          }
 
@@ -241,9 +248,9 @@ namespace sysiosystem {
          // producing a block while still in the active schedule -- the latter covering the window
          // between a demotion and the rebuild that acts on it, which the schedule-size floor can
          // hold open indefinitely.
-         if( !p.is_demoted
-             && producer_rank::warrants_demotion( p.consecutive_missed_rounds, p.rounds_in_window,
-                                                  p.missed_rounds_in_window, weights ) ) {
+         const bool exceeds_consecutive = weights.max_consecutive_missed_rounds > 0
+            && p.consecutive_missed_rounds >= weights.max_consecutive_missed_rounds;
+         if( !p.is_demoted && ( exceeds_consecutive || breaches_miss_rate( p, now_ms, weights ) ) ) {
             // `set_demoted` consumes the period's snapshot credit as the row leaves the walk.
             p.set_demoted( true );
          }

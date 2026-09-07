@@ -3459,26 +3459,49 @@ BOOST_FIXTURE_TEST_CASE( a_tiny_pool_never_credits_more_than_it_holds, sysio_emi
    create_t5_holding_accounts();
    setup_producers(3);
    wait_for_producer_schedule();
-   produce_complete_cycles(3, 1);
+
+   // Enough rotations that EVERY producer holds at least a full period's nominal slots. That is
+   // what lets the divisor collapse: the first pass sees produced_blocks (~3x nominal) and rounds
+   // every row to zero, all of them leave the divisor, and it falls back to the nominal count --
+   // at which point each row's blocks alone would price at a whole unit.
+   produce_complete_cycles(3, 12);
 
    const uint32_t start = head_secs() - ONE_EPOCH - 1;
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
 
+   // 5 subunits is the smallest emission that survives the bps splits to a NONZERO active pool:
+   // compute 5*4000/10000 = 2, producer 2*7000/10000 = 1, standby 1*800/10000 = 0, active = 1.
+   // At 1 the whole pool is a single subunit, so any second row credited is money that does not
+   // exist. An emission of 1 leaves active_pool at 0 and the test can observe nothing at all.
+   const int64_t emission = 5;
+   BOOST_REQUIRE_EQUAL( 1, test_active_pool(test_split_bps(emission, COMPUTE_BPS)) );
+
    const int64_t outstanding_before = pay_outstanding_total();
+   const uint64_t nominal = test_nominal_slots(T_EPOCH_SECS);
 
-   // A pool of one unit against a full period of slots: every producer's block pay floors to zero
-   // on the first pass, so every row leaves the divisor. If the second pass then priced them at
-   // the collapsed divisor, each would be credited a whole unit out of a one-unit pool.
-   const int64_t tiny_emission = 1;
+   // Precondition: at least two rows individually clear the nominal count, so a collapsed divisor
+   // would price each of them at a full unit. Without this the path is unreachable and the test
+   // passes for the wrong reason.
+   uint32_t rows_over_nominal = 0;
+   for (const auto& producer : { "producera"_n, "producerb"_n, "producerc"_n }) {
+      if (uint64_t(unpaid_blocks_of(producer)) >= nominal) ++rows_over_nominal;
+   }
+   BOOST_REQUIRE_MESSAGE( rows_over_nominal >= 2,
+      "only " << rows_over_nominal << " producers hold a full period of blocks -- the divisor "
+      "cannot collapse and this test would not exercise the over-distribution path" );
+
    BOOST_REQUIRE_EQUAL( success(), push_system_action(EPOCH, "accrueepoch"_n, mvo()
-      ("epoch_index", 1)("batch_group_index", 0)("per_epoch_emission", tiny_emission)) );
+      ("epoch_index", 1)("batch_group_index", 0)("per_epoch_emission", emission)) );
    BOOST_REQUIRE_EQUAL( success(), push_system_action(EPOCH, "payepoch"_n, mvo()
-      ("epoch_index", 1)("batch_op_groups", vector<vector<name>>{})("period_emission", tiny_emission)) );
+      ("epoch_index", 1)("batch_op_groups", vector<vector<name>>{})("period_emission", emission)) );
 
+   // The invariant: a period may never credit more than the pool it was drawn from. Reverting the
+   // `block_payable` guard credits one unit per row that crossed back over the threshold -- two or
+   // three units out of a one-unit pool -- and fails here.
    const int64_t credited = pay_outstanding_total() - outstanding_before;
-   BOOST_REQUIRE_MESSAGE( credited <= tiny_emission,
-      "payepoch credited " << credited << " from a pool of " << tiny_emission
-      << " -- rows excluded from the divisor were priced anyway" );
+   BOOST_REQUIRE_MESSAGE( credited <= 1,
+      "payepoch credited " << credited << " from an active pool of 1 -- rows excluded from the "
+      "divisor were priced against the collapsed one" );
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( active_producers_are_paid_per_block, sysio_emissions_tester ) try {
@@ -6058,6 +6081,13 @@ struct producer_score_tester : public producer_eligibility_tester {
       return info["rounds_in_window"].as<uint32_t>();
    }
 
+   /// The PREVIOUS bucket's rounds — the half of the two-bucket window that ages out.
+   uint32_t prev_rounds_in_window_of(account_name producer) {
+      auto info = get_producer_info(producer);
+      BOOST_REQUIRE_MESSAGE(!info.is_null(), "no producers row for " << producer.to_string());
+      return info["prev_rounds_in_window"].as<uint32_t>();
+   }
+
    /// How many of those rounds went unproduced or came up short.
    uint32_t missed_rounds_in_window_of(account_name producer) {
       auto info = get_producer_info(producer);
@@ -6709,25 +6739,128 @@ BOOST_FIXTURE_TEST_CASE( regproducer_does_not_launder_the_miss_window, producer_
       "the consecutive gate must not be what demoted it -- this test would prove nothing" );
 } FC_LOG_AND_RETHROW()
 
-// The reset that IS kept: a demoted producer observes no rounds (it is not scheduled), so without
-// clearing the window on the way back its recorded rate could never improve and the gate would be
-// a life sentence.
-BOOST_FIXTURE_TEST_CASE( regproducer_clears_the_window_of_a_demoted_producer, producer_score_tester ) try {
+// N1: a RATE demotion cannot be re-registered away while the producer still holds its slot.
+//
+// `regproducer` answers the CONSECUTIVE gate -- "are you offline right now" -- and re-supplying a
+// signing key is a real answer to that. It is not an answer to a RECORD. Gating the window reset
+// on `is_demoted` alone was still a loop: a rate-demoted producer can call this immediately,
+// before any rebuild drops it, and short rounds never touch the consecutive counter, so
+// preserving the streak protected nothing.
+BOOST_FIXTURE_TEST_CASE( regproducer_cannot_clear_a_rate_demotion_on_demand, producer_score_tester ) try {
    auto names = setup_ranked_producers(5);
+   BOOST_REQUIRE_EQUAL( success(), set_score_config(
+      /*collateral_weight=*/10'000, /*participation_weight=*/10'000, /*snapshot_weight=*/1'000,
+      /*max_consecutive_missed_rounds=*/2, /*snapshot_target_attestations=*/1,
+      /*missed_round_window_ms=*/24ULL * 60 * 60 * 1000, /*max_pct_missed_rounds_in_window=*/40) );
    trigger_reschedule();
    wait_for_active_schedule(names[2]);
 
    const auto target = names[2];
-   for (uint32_t miss = 0; miss < 3; ++miss) skip_round_of(target);
-   BOOST_REQUIRE( demoted(target) );
-   BOOST_REQUIRE_GT( rounds_in_window_of(target), 0u );
+   const auto miss_then_produce = [&]() {
+      skip_round_of(target);
+      produce_blocks(names.size() * slots_per_producer);
+   };
 
+   // Drive the rate gate without ever reaching the consecutive limit.
+   miss_then_produce();
+   miss_then_produce();
+   skip_round_of(target);
+   BOOST_REQUIRE( demoted(target) );
+   BOOST_REQUIRE_MESSAGE( missed_rounds_of(target) < 2u,
+      "the consecutive gate demoted it -- this test would prove nothing" );
+
+   // Re-register immediately, with the window nowhere near lapsed.
    BOOST_REQUIRE_EQUAL( success(), push_system_action(target, "regproducer"_n, mvo()
       ("producer", target)("producer_key", get_public_key(target, "active"))("url", "")("location", 0)) );
    produce_blocks(1);
 
-   BOOST_REQUIRE( !demoted(target) );
-   BOOST_REQUIRE_EQUAL( 0u, missed_rounds_in_window_of(target) );
+   BOOST_REQUIRE_MESSAGE( demoted(target),
+      "regproducer cleared a RATE demotion on demand: the producer never left the schedule, so "
+      "re-registering after every demotion makes chronic short-round delivery unpunishable" );
+   BOOST_REQUIRE_GT( rounds_in_window_of(target), 0u );
+} FC_LOG_AND_RETHROW()
+
+// N2: the window ROLLS rather than tumbles. A single bucket emptied at its duration lets an
+// operator straddle the boundary -- each bucket reads under the limit while the trailing window
+// does not -- and `miss_window_open_ms` is on-chain, so the boundary is targetable.
+//
+// The two-bucket carry is what closes it: the previous bucket's misses stay visible, weighted by
+// how much of it the trailing window still covers.
+BOOST_FIXTURE_TEST_CASE( the_miss_window_carries_the_previous_bucket, producer_score_tester ) try {
+   auto names = setup_ranked_producers(5);
+   // A window short enough to roll inside the test, with the rate gate armed.
+   BOOST_REQUIRE_EQUAL( success(), set_score_config(
+      /*collateral_weight=*/10'000, /*participation_weight=*/10'000, /*snapshot_weight=*/1'000,
+      /*max_consecutive_missed_rounds=*/2, /*snapshot_target_attestations=*/1,
+      /*missed_round_window_ms=*/30'000, /*max_pct_missed_rounds_in_window=*/40) );
+   trigger_reschedule();
+   wait_for_active_schedule(names[2]);
+
+   const auto target = names[2];
+   skip_round_of(target);
+   produce_blocks(names.size() * slots_per_producer);
+   const uint32_t first_bucket_rounds = rounds_in_window_of(target);
+   BOOST_REQUIRE_GT( first_bucket_rounds, 0u );
+
+   // Let the window lapse so the next observed round opens a fresh bucket.
+   produce_blocks(70);
+   skip_round_of(target);
+
+   // The bucket rolled ...
+   BOOST_REQUIRE_MESSAGE( rounds_in_window_of(target) <= first_bucket_rounds,
+      "the current bucket did not roll" );
+   // ... and the prior observations were CARRIED rather than discarded, which is the whole
+   // difference between a rolling window and a tumbling one.
+   BOOST_REQUIRE_MESSAGE( prev_rounds_in_window_of(target) > 0u,
+      "the previous bucket was discarded on roll: the window is tumbling, so a producer can "
+      "straddle the boundary and hold roughly twice the configured rate indefinitely" );
+} FC_LOG_AND_RETHROW()
+
+// The window survives an un-lapsed re-registration, and clears once it has actually run out.
+//
+// `regproducer` answers the CONSECUTIVE gate: re-supplying a signing key says "I am here now", so
+// a demotion that gate caused clears outright. It says nothing about a RECORD, so the window is
+// rolled only when its full duration has elapsed. Both halves matter -- the first stops a
+// demote/re-register loop from laundering the evidence, the second is why a rate demotion can
+// never become a life sentence: a demoted producer is unscheduled and observes no rounds, so time
+// is the only thing that can clear its record, and this is where time gets to.
+BOOST_FIXTURE_TEST_CASE( regproducer_rolls_the_window_only_once_it_has_lapsed, producer_score_tester ) try {
+   auto names = setup_ranked_producers(5);
+   // A window short enough to lapse inside the test.
+   BOOST_REQUIRE_EQUAL( success(), set_score_config(
+      /*collateral_weight=*/10'000, /*participation_weight=*/10'000, /*snapshot_weight=*/1'000,
+      /*max_consecutive_missed_rounds=*/3, /*snapshot_target_attestations=*/1,
+      /*missed_round_window_ms=*/30'000, /*max_pct_missed_rounds_in_window=*/0) );
+   trigger_reschedule();
+   wait_for_active_schedule(names[2]);
+
+   const auto target = names[2];
+   const auto reregister = [&]() {
+      BOOST_REQUIRE_EQUAL( success(), push_system_action(target, "regproducer"_n, mvo()
+         ("producer", target)("producer_key", get_public_key(target, "active"))("url", "")("location", 0)) );
+      produce_blocks(1);
+   };
+
+   for (uint32_t miss = 0; miss < 3; ++miss) skip_round_of(target);
+   BOOST_REQUIRE( demoted(target) );
+   const uint32_t recorded = missed_rounds_in_window_of(target);
+   BOOST_REQUIRE_GT( recorded, 0u );
+
+   // Immediately: the CONSECUTIVE demotion clears, the record does not.
+   reregister();
+   BOOST_REQUIRE_MESSAGE( !demoted(target),
+      "regproducer must clear a demotion the consecutive gate caused" );
+   BOOST_REQUIRE_MESSAGE( missed_rounds_in_window_of(target) == recorded,
+      "the window was wiped by an un-lapsed re-registration: a demote/re-register loop would "
+      "erase the only evidence a short-round producer ever accrues" );
+
+   // Once the window has genuinely run out, re-registering rolls it -- the door that keeps a rate
+   // demotion from being permanent.
+   produce_blocks(70);
+   reregister();
+   BOOST_REQUIRE_MESSAGE( missed_rounds_in_window_of(target) == 0u,
+      "a lapsed window was not rolled: a rate-demoted producer observes no rounds, so nothing "
+      "else could ever clear its record" );
 } FC_LOG_AND_RETHROW()
 
 // The OTHER door back, and the one no operator has to walk through: a demoted producer that is
