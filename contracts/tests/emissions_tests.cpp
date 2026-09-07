@@ -835,6 +835,13 @@ public:
           abi_serializer::create_yield_function(abi_serializer_max_time));
    }
 
+   /// Block slots accumulated for the OPEN pay period, one accrual at a time.
+   uint64_t pending_nominal_slots() {
+      auto state = get_t5_state();
+      BOOST_REQUIRE_MESSAGE(!state.is_null(), "t5 state not initialized");
+      return state["pending_nominal_slots"].as_uint64();
+   }
+
    // Reads the audit-log row keyed by sysio.epoch's current_epoch_index
    // (t5_state::last_epoch_index at write time). Callers pass the sysio.epoch
    // index they want to inspect.
@@ -3415,6 +3422,39 @@ BOOST_FIXTURE_TEST_CASE( pay_rounding_to_zero_does_not_consume_the_blocks, sysio
 // rows are payable and removes the rest from the divisor; the second only PRICES that set. Paying
 // a row the first pass excluded would pay for blocks the divisor no longer counts, and the claims
 // credited could then exceed the pool they were drawn from -- real money the treasury never had.
+// The divisor has to be built the way the POOL is: per epoch, at the duration in force for that
+// epoch. Computing it at payout from the CURRENT duration applies today's value to epochs that ran
+// under a different one, so a period spanning a duration change is mis-sized -- a 60s epoch (120
+// slots) followed by a 120s epoch (240 slots) is 360 slots but would be computed as 480, paying
+// only 75% of the active pool under full production.
+BOOST_FIXTURE_TEST_CASE( nominal_slots_accrue_at_each_epochs_own_duration, sysio_emissions_tester ) try {
+   create_t5_holding_accounts();
+   setup_producers(3);
+   wait_for_producer_schedule();
+
+   const uint32_t start = head_secs() - ONE_EPOCH - 1;
+   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
+
+   // One epoch accrues at 60s ...
+   BOOST_REQUIRE_EQUAL( success(), push_system_action(EPOCH, "accrueepoch"_n, mvo()
+      ("epoch_index", 1)("batch_group_index", 0)("per_epoch_emission", int64_t{1'000'000})) );
+   const uint64_t after_first = pending_nominal_slots();
+   BOOST_REQUIRE_EQUAL( test_nominal_slots(T_EPOCH_SECS), after_first );
+
+   // ... then the duration doubles and a second epoch accrues at the NEW value.
+   BOOST_REQUIRE_EQUAL( success(), init_epoch_state(T_EPOCH_SECS * 2) );
+   BOOST_REQUIRE_EQUAL( success(), push_system_action(EPOCH, "accrueepoch"_n, mvo()
+      ("epoch_index", 2)("batch_group_index", 0)("per_epoch_emission", int64_t{1'000'000})) );
+
+   const uint64_t accumulated = pending_nominal_slots();
+   BOOST_REQUIRE_EQUAL( test_nominal_slots(T_EPOCH_SECS) + test_nominal_slots(T_EPOCH_SECS * 2),
+                        accumulated );
+   // The old formula -- current duration times the epoch count -- would have produced this
+   // instead, a third too many, and paid producers proportionally less.
+   BOOST_REQUIRE_MESSAGE( accumulated < test_nominal_slots(T_EPOCH_SECS * 2) * 2,
+      "the accumulator is applying the current duration to every accrued epoch" );
+} FC_LOG_AND_RETHROW()
+
 BOOST_FIXTURE_TEST_CASE( a_tiny_pool_never_credits_more_than_it_holds, sysio_emissions_tester ) try {
    create_t5_holding_accounts();
    setup_producers(3);

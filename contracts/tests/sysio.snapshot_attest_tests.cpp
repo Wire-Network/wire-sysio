@@ -698,6 +698,41 @@ BOOST_FIXTURE_TEST_CASE(leaving_the_walk_consumes_the_snapshot_credit, snapshot_
    BOOST_REQUIRE_EQUAL(uncredited, key_of("producer1"_n));
 } FC_LOG_AND_RETHROW() }
 
+// A producer OUTSIDE the pay walk earns no credit, and `is_demoted` is not the test for that.
+// `unregprod` parks a row by clearing `is_active` and letting the rescore sink it by TIER -- the
+// flag stays false throughout -- and losing a finalizer key or opreg eligibility does the same.
+// The counter rates the CURRENT pay period and only `payepoch` resets it, and `payepoch` stops at
+// the demoted tier, so credit handed to a parked row is never cleared: it accumulates for as long
+// as the producer stays parked and re-enters at full marks, outranking producers that actually
+// served the period it comes back into.
+BOOST_FIXTURE_TEST_CASE(a_parked_producer_earns_no_snapshot_credit, snapshot_voting_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2));
+   produce_blocks();
+
+   const auto attestations_of = [this](account_name producer) {
+      return get_producer_info(producer)["snapshot_attestations"].as<uint32_t>();
+   };
+
+   // Park producer1. Its provider mapping survives -- the prune only runs when the table is full
+   // -- so it can keep voting, and its `is_demoted` flag is still false.
+   BOOST_REQUIRE_EQUAL(success(), unregproducer("producer1"_n));
+   BOOST_REQUIRE_EQUAL(false, get_producer_info("producer1"_n)["is_demoted"].as<bool>());
+   BOOST_REQUIRE_EQUAL(0u, attestations_of("producer1"_n));
+
+   const auto block_num = vote_block_num();
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, make_block_id(block_num), make_snap_hash(7)));
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, make_block_id(block_num), make_snap_hash(7)));
+
+   // The quorum was reached and the still-schedulable producer was credited ...
+   BOOST_REQUIRE_EQUAL(1u, attestations_of("producer2"_n));
+   // ... while the parked one earned nothing, despite its vote counting toward that quorum.
+   BOOST_REQUIRE_MESSAGE(attestations_of("producer1"_n) == 0u,
+      "a parked producer was credited: the gate is testing the is_demoted flag, which unregprod "
+      "never sets, rather than live schedulability");
+} FC_LOG_AND_RETHROW() }
+
 BOOST_FIXTURE_TEST_CASE(votesnaphash_same_tuple_retry_is_idempotent, snapshot_voting_tester) { try {
    // Need 2 providers, min_providers=2 so single vote won't attest and purge
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
