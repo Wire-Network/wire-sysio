@@ -121,6 +121,10 @@ resources. On a regular action the protocol requires all three of the following 
 - the **same actor** also appears on that action under a real permission, and
 - the transaction carries **signatures** satisfying that paired declared authorization.
 
+A context-free action takes the opposite form. It may carry the marker *alone* — a paired real
+permission there is rejected outright — and only when that same actor is already an explicit payer
+on one of the transaction's regular actions.
+
 The paired permission is not required to be `active`. `authorization_manager` looks for any entry
 whose actor matches the payer and whose permission is not `sysio.payer` itself, then satisfies it
 like any other declared authority — so `owner`, or a custom permission linked to that action, works
@@ -134,8 +138,8 @@ if (auth.actor == payer && auth.permission != config::sysio_payer_name) {
 }
 ```
 
-You can only volunteer yourself, or someone who co-signs. An account that names itself payer needs
-its own allocation and fails without one.
+On a declared regular action you can only volunteer yourself, or someone who co-signs, and that
+account needs its own CPU and NET allocation. Inline actions differ on both counts, below.
 
 Those two rules are the whole of `action::payer()`:
 
@@ -150,7 +154,7 @@ account_name action::payer() const {
 
 ```mermaid
 flowchart TD
-    A["Action arrives"] --> B{"authorization[0].permission<br/>== sysio.payer ?"}
+    A["Regular action arrives"] --> B{"authorization[0].permission<br/>== sysio.payer ?"}
     B -->|"No — ordinary traffic"| C["Payer = the contract being called"]
     B -->|"Yes — opt-in"| D{"Same actor also present with a<br/>real permission, satisfied by signatures<br/>or, inline, by receiver@sysio.code ?"}
     D -->|"No"| E["Rejected:<br/>unsatisfied authorization"]
@@ -211,7 +215,10 @@ Two ways through, and the choice is a product decision:
   storage, users stay free, and the caller's transaction is unchanged. This is the gasless path,
   and what most ports want.
 - **Keep billing the user**, which requires the client to add `sysio.payer` at index 0 — making
-  the user the CPU and NET payer too, so they need their own allocation.
+  the user the CPU and NET payer too, so they need their own allocation. This one is closed to a
+  notification handler: `validate_account_ram_deltas` rejects any positive delta billed away from
+  the receiver inside a notify context, before it looks at the marker at all. A handler bills its
+  own account, or the write moves to a direct or inline action.
 
 A policy makes an unprovisioned contract callable; it does not make every Antelope contract
 portable unchanged. Check where the contract bills its RAM first.
@@ -246,8 +253,9 @@ set_resource_limits( new_account_name, 0, 0, 0 );
 transfer_ram( get_self(), new_account_name, sysiosystem::newaccount_ram );  // 1144 bytes
 ```
 
-For a **user** account, consensus never consults those zeros. It signs, the contract pays, the
-transaction succeeds.
+For a **user** account making an ordinary contract-paid call, consensus never consults those zeros.
+It signs, the contract pays, the transaction succeeds. Opt into self-pay and they are consulted like
+any other payer's.
 
 For a **contract** account, those zeros are fatal under default billing. The contract is the payer,
 so a transaction that declares an action on it with no policy fails outright:
