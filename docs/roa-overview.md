@@ -154,14 +154,17 @@ account_name action::payer() const {
 
 ```mermaid
 flowchart TD
-    A["Regular action arrives"] --> B{"authorization[0].permission<br/>== sysio.payer ?"}
+    A["Transaction-declared<br/>regular action"] --> B{"authorization[0].permission<br/>== sysio.payer ?"}
     B -->|"No — ordinary traffic"| C["Payer = the contract being called"]
-    B -->|"Yes — opt-in"| D{"Same actor also present with a<br/>real permission, satisfied by signatures<br/>or, inline, by receiver@sysio.code ?"}
+    B -->|"Yes — opt-in"| D{"Same actor also present<br/>with a real permission,<br/>and signed for?"}
     D -->|"No"| E["Rejected:<br/>unsatisfied authorization"]
     D -->|"Yes"| F["Payer = that actor"]
     C --> G["Contract needs a policy for<br/>actions declared on it.<br/>Signer not billed."]
-    F --> H["Declared action: actor billed CPU and NET,<br/>contract not. Either way the marker<br/>authorizes RAM billed to the actor."]
+    F --> H["Actor is billed CPU, NET,<br/>and RAM billed to it.<br/>Contract not billed."]
 ```
+
+Declared regular actions only. A context-free action takes the marker alone, as above; inline and
+notification execution differ on both authorization and billing, below.
 
 The objective billing map is populated only from the actions a transaction *declares*, and is keyed
 on `payer()` — so two declared actions sharing a payer aggregate into one entry. An authorizing
@@ -215,10 +218,10 @@ Two ways through, and the choice is a product decision:
   storage, users stay free, and the caller's transaction is unchanged. This is the gasless path,
   and what most ports want.
 - **Keep billing the user**, which requires the client to add `sysio.payer` at index 0 — making
-  the user the CPU and NET payer too, so they need their own allocation. This one is closed to a
-  notification handler: `validate_account_ram_deltas` rejects any positive delta billed away from
-  the receiver inside a notify context, before it looks at the marker at all. A handler bills its
-  own account, or the write moves to a direct or inline action.
+  the user the CPU and NET payer too, so they need their own allocation. This one is closed to an
+  *unprivileged* notification handler: `validate_account_ram_deltas` rejects a positive delta billed
+  away from the receiver inside a notify context before it looks at the marker at all. Such a
+  handler bills its own account, or the write moves to a direct or inline action.
 
 A policy makes an unprovisioned contract callable; it does not make every Antelope contract
 portable unchanged. Check where the contract bills its RAM first.
