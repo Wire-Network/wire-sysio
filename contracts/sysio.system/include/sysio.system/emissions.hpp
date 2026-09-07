@@ -335,11 +335,27 @@ struct [[sysio::table("t5state"), sysio::contract("sysio.system")]] t5_state {
    // visible without breaking the OPP-handler never-throw contract.
    int64_t                capital_shortfall_total = 0;
 
+   /// Block slots the open pay period is entitled to, accumulated as each epoch accrues.
+   ///
+   /// The DIVISOR has to be built the same way the POOL is. `pending_emission_amount` above adds
+   /// each epoch's share at the moment that epoch accrues; computing the slot count at payout
+   /// instead -- current duration times the epoch count -- applies today's duration to epochs that
+   /// ran under a different one. A period spanning a duration change then mis-sizes the divisor: a
+   /// 60s epoch (120 slots) followed by a 120s epoch (240 slots) is 360 slots, but is computed as
+   /// 480, paying 75% of the active pool under full production.
+   ///
+   /// Reset with `pending_emission_amount` at each payout.
+   ///
+   /// DECLARED LAST, matching the tail of SYSLIB_SERIALIZE below. The ABI is generated from the
+   /// declarations while the wasm serializes in macro order, so a field inserted anywhere but the
+   /// end makes the two disagree silently.
+   uint64_t               pending_nominal_slots = 0;
+
    SYSLIB_SERIALIZE(t5_state,
       (start_time)(epoch_count)(last_epoch_index)
       (last_epoch_time)(last_epoch_emission)(total_distributed)
       (pending_emission_amount)(period_start_epoch)(batch_group_epochs)
-      (capital_shortfall_total))
+      (capital_shortfall_total)(pending_nominal_slots))
 };
 
 using t5state_t = sysio::kv::global<"t5state"_n, t5_state>;

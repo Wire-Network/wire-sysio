@@ -3411,6 +3411,36 @@ BOOST_FIXTURE_TEST_CASE( pay_rounding_to_zero_does_not_consume_the_blocks, sysio
       "uncredited blocks were consumed: had " << blocks << ", now " << unpaid_blocks_of(target) );
 } FC_LOG_AND_RETHROW()
 
+// The solvency invariant the two-pass divisor exists to preserve. The first pass decides which
+// rows are payable and removes the rest from the divisor; the second only PRICES that set. Paying
+// a row the first pass excluded would pay for blocks the divisor no longer counts, and the claims
+// credited could then exceed the pool they were drawn from -- real money the treasury never had.
+BOOST_FIXTURE_TEST_CASE( a_tiny_pool_never_credits_more_than_it_holds, sysio_emissions_tester ) try {
+   create_t5_holding_accounts();
+   setup_producers(3);
+   wait_for_producer_schedule();
+   produce_complete_cycles(3, 1);
+
+   const uint32_t start = head_secs() - ONE_EPOCH - 1;
+   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
+
+   const int64_t outstanding_before = pay_outstanding_total();
+
+   // A pool of one unit against a full period of slots: every producer's block pay floors to zero
+   // on the first pass, so every row leaves the divisor. If the second pass then priced them at
+   // the collapsed divisor, each would be credited a whole unit out of a one-unit pool.
+   const int64_t tiny_emission = 1;
+   BOOST_REQUIRE_EQUAL( success(), push_system_action(EPOCH, "accrueepoch"_n, mvo()
+      ("epoch_index", 1)("batch_group_index", 0)("per_epoch_emission", tiny_emission)) );
+   BOOST_REQUIRE_EQUAL( success(), push_system_action(EPOCH, "payepoch"_n, mvo()
+      ("epoch_index", 1)("batch_op_groups", vector<vector<name>>{})("period_emission", tiny_emission)) );
+
+   const int64_t credited = pay_outstanding_total() - outstanding_before;
+   BOOST_REQUIRE_MESSAGE( credited <= tiny_emission,
+      "payepoch credited " << credited << " from a pool of " << tiny_emission
+      << " -- rows excluded from the divisor were priced anyway" );
+} FC_LOG_AND_RETHROW()
+
 BOOST_FIXTURE_TEST_CASE( active_producers_are_paid_per_block, sysio_emissions_tester ) try {
    create_t5_holding_accounts();
    setup_producers(3);
@@ -5981,6 +6011,20 @@ struct producer_score_tester : public producer_eligibility_tester {
       return info["is_demoted"].as<bool>();
    }
 
+   /// Scheduled rounds observed inside the producer's current miss window.
+   uint32_t rounds_in_window_of(account_name producer) {
+      auto info = get_producer_info(producer);
+      BOOST_REQUIRE_MESSAGE(!info.is_null(), "no producers row for " << producer.to_string());
+      return info["rounds_in_window"].as<uint32_t>();
+   }
+
+   /// How many of those rounds went unproduced or came up short.
+   uint32_t missed_rounds_in_window_of(account_name producer) {
+      auto info = get_producer_info(producer);
+      BOOST_REQUIRE_MESSAGE(!info.is_null(), "no producers row for " << producer.to_string());
+      return info["missed_rounds_in_window"].as<uint32_t>();
+   }
+
    /// The sysio.system global singleton, which carries the rescore cursor.
    fc::variant get_global_state() {
       auto data = get_row_by_account(config::system_account_name, config::system_account_name,
@@ -6501,6 +6545,20 @@ BOOST_FIXTURE_TEST_CASE( setscorecfg_rejects_a_configuration_that_inverts_the_ra
    BOOST_REQUIRE_EQUAL(
       wasm_assert_msg("max_consecutive_missed_rounds is unreasonably large"),
       set_score_config(10'000, 10'000, 10'000, /*max_consecutive=*/1'000'001) );
+
+   // A round holds 12 slots, so a threshold above it can never be met: every fully produced round
+   // would count as SHORT and the rate gate would demote the entire network.
+   BOOST_REQUIRE_EQUAL(
+      wasm_assert_msg("min_blocks_per_round cannot exceed the round size"),
+      set_score_config(10'000, 10'000, 10'000, 3, 1, 24ULL * 60 * 60 * 1000, 5,
+                       /*min_blocks_per_round=*/13) );
+   // The boundary itself is accepted, as is the disabled spelling.
+   BOOST_REQUIRE_EQUAL( success(),
+      set_score_config(10'000, 10'000, 10'000, 3, 1, 24ULL * 60 * 60 * 1000, 5,
+                       /*min_blocks_per_round=*/12) );
+   BOOST_REQUIRE_EQUAL( success(),
+      set_score_config(10'000, 10'000, 10'000, 3, 1, 24ULL * 60 * 60 * 1000, 5,
+                       /*min_blocks_per_round=*/0) );
 } FC_LOG_AND_RETHROW()
 
 // `rmvproducer` performs the same deactivation `unregprod` does, and was the one is_active path
@@ -6563,6 +6621,73 @@ BOOST_FIXTURE_TEST_CASE( miss_rate_over_the_window_demotes_without_a_consecutive
    BOOST_REQUIRE_MESSAGE( missed_rounds_of(target) < 2u,
       "the consecutive gate must not be what demoted it -- this test would prove nothing" );
    BOOST_REQUIRE_EQUAL( tier_demoted, tier_of(rank_score_of(target)) );
+} FC_LOG_AND_RETHROW()
+
+// `regproducer` must not launder the miss RATE. It clears the window only on a genuine
+// demoted-to-recovered transition; on an ordinary re-registration the record stands.
+//
+// This is what stops the cron loop now that short rounds exist. A producer delivering a fraction
+// of every round never advances the CONSECUTIVE counter -- a short round feeds the rate gate alone
+// -- so if a free, repeatable `regproducer` also wiped the window there would be no surviving
+// evidence against it and the rate gate could never fire on anyone.
+BOOST_FIXTURE_TEST_CASE( regproducer_does_not_launder_the_miss_window, producer_score_tester ) try {
+   auto names = setup_ranked_producers(5);
+   BOOST_REQUIRE_EQUAL( success(), set_score_config(
+      /*collateral_weight=*/10'000, /*participation_weight=*/10'000, /*snapshot_weight=*/1'000,
+      /*max_consecutive_missed_rounds=*/2, /*snapshot_target_attestations=*/1,
+      /*missed_round_window_ms=*/24ULL * 60 * 60 * 1000, /*max_pct_missed_rounds_in_window=*/40) );
+   trigger_reschedule();
+   wait_for_active_schedule(names[2]);
+
+   const auto target = names[2];
+   const auto reregister = [&]() {
+      BOOST_REQUIRE_EQUAL( success(), push_system_action(target, "regproducer"_n, mvo()
+         ("producer", target)("producer_key", get_public_key(target, "active"))("url", "")("location", 0)) );
+      produce_blocks(1);
+   };
+   const auto miss_then_produce = [&]() {
+      skip_round_of(target);
+      produce_blocks(names.size() * slots_per_producer);
+   };
+
+   // Alternate misses with produced rounds, re-registering after every one. The producer stays
+   // ACTIVE and undemoted throughout, so each call is an ordinary upsert -- exactly the loop an
+   // operator could cron.
+   miss_then_produce();
+   reregister();
+   BOOST_REQUIRE( !demoted(target) );
+   BOOST_REQUIRE_MESSAGE( rounds_in_window_of(target) > 0u,
+      "an ordinary regproducer erased the window: the rate gate can never fire again" );
+
+   miss_then_produce();
+   reregister();
+   skip_round_of(target);
+
+   BOOST_REQUIRE_MESSAGE( demoted(target),
+      "the rate gate must still fire through a cron loop of re-registrations" );
+   BOOST_REQUIRE_MESSAGE( missed_rounds_of(target) < 2u,
+      "the consecutive gate must not be what demoted it -- this test would prove nothing" );
+} FC_LOG_AND_RETHROW()
+
+// The reset that IS kept: a demoted producer observes no rounds (it is not scheduled), so without
+// clearing the window on the way back its recorded rate could never improve and the gate would be
+// a life sentence.
+BOOST_FIXTURE_TEST_CASE( regproducer_clears_the_window_of_a_demoted_producer, producer_score_tester ) try {
+   auto names = setup_ranked_producers(5);
+   trigger_reschedule();
+   wait_for_active_schedule(names[2]);
+
+   const auto target = names[2];
+   for (uint32_t miss = 0; miss < 3; ++miss) skip_round_of(target);
+   BOOST_REQUIRE( demoted(target) );
+   BOOST_REQUIRE_GT( rounds_in_window_of(target), 0u );
+
+   BOOST_REQUIRE_EQUAL( success(), push_system_action(target, "regproducer"_n, mvo()
+      ("producer", target)("producer_key", get_public_key(target, "active"))("url", "")("location", 0)) );
+   produce_blocks(1);
+
+   BOOST_REQUIRE( !demoted(target) );
+   BOOST_REQUIRE_EQUAL( 0u, missed_rounds_in_window_of(target) );
 } FC_LOG_AND_RETHROW()
 
 // The OTHER door back, and the one no operator has to walk through: a demoted producer that is

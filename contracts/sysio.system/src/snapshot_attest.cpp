@@ -106,17 +106,23 @@ void require_snapshot_producer_eligibility(name self, name producer) {
 /// finalized, so without this counter there is no attestation history to score. Reset on the same
 /// `payepoch` cadence as the block counters, which supplies the trailing window.
 void credit_snapshot_attestations(name self, const std::vector<name>& voters) {
-   producers_table producers(self);
+   producers_table  producers(self);
+   finalizers_table finalizers(self);
    for (const auto& voter : voters) {
       auto key = producer_key_t{voter.value};
       if (!producers.contains(key)) continue;
-      // A DEMOTED producer earns no credit. The counter is a rating of the CURRENT pay period, and
-      // `payepoch` -- which is what resets it -- stops at the demoted tier, so a credit handed to a
-      // demoted row is never cleared: it accumulates for as long as the producer stays demoted and
-      // then re-enters at full marks the moment `regproducer` lifts the tier, outranking producers
-      // that actually served the period it returns into. A demoted producer that keeps voting is
-      // not a fault to reject, just service that earns no rating, so this skips silently.
-      if (producers.get(key).is_demoted) continue;
+      // Only a producer currently IN the pay walk earns credit. The counter is a rating of the
+      // CURRENT pay period and `payepoch` -- the only thing that resets it -- stops at the demoted
+      // tier, so a credit handed to a row outside the walk is never cleared: it accumulates for as
+      // long as the producer stays out and then re-enters at full marks, outranking producers that
+      // actually served the period it returns into.
+      //
+      // The test is the LIVE schedulable predicate, not the `is_demoted` flag. `unregprod` parks a
+      // row by clearing `is_active` and letting the rescore sink it by TIER -- the flag stays
+      // false throughout -- and losing a finalizer key or opreg eligibility does the same. Gating
+      // on the flag would credit every one of them. A producer outside the walk that keeps voting
+      // is not a fault to reject, just service that earns no rating, so this skips silently.
+      if (!producer_rank::is_schedulable(producers.get(key), finalizers)) continue;
       producers.modify(same_payer, key, [](auto& row) { row.snapshot_attestations++; });
       // The credit moved the snapshot factor, so the stored sort key is stale until rescored.
       // Without this the factor would reach the index only on the next unrelated rescore.

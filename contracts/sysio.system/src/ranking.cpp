@@ -72,14 +72,20 @@ namespace sysiosystem {
             // PRODUCING, so a producer that returns unready is demoted again on its next missed
             // round; until it produces, the participation factor keeps scoring it accordingly.
             //
-            // The miss WINDOW does reset, and that is safe for the same reason: the consecutive
-            // gate is what defeats a cron loop, and it is untouched here. Without this reset a
-            // producer whose rate gate tripped could never recover -- demoted, it is not
-            // scheduled, so it observes no rounds, so its rate can never improve.
-            info.is_demoted              = false;
-            info.rounds_in_window        = 0;
-            info.missed_rounds_in_window = 0;
-            info.miss_window_open_ms     = 0;
+            // The miss WINDOW resets ONLY on a genuine demoted-to-recovered transition, never on
+            // an ordinary re-registration. A demoted producer is not scheduled, so it observes no
+            // rounds and its recorded rate could never improve on its own -- that is what the
+            // reset is for. An ACTIVE producer has no such problem, and wiping its window would
+            // hand it the cron loop the streak was protected from: a producer delivering a
+            // fraction of every round never advances the CONSECUTIVE counter (a short round feeds
+            // the rate gate alone), so if `regproducer` also cleared the window there would be no
+            // surviving evidence against it at all, and the rate gate could never fire.
+            if( info.is_demoted ) {
+               info.is_demoted              = false;
+               info.rounds_in_window        = 0;
+               info.missed_rounds_in_window = 0;
+               info.miss_window_open_ms     = 0;
+            }
          });
 
       // The clear above changes the producer's tier, so its sort key is stale until rescored.
@@ -172,6 +178,12 @@ namespace sysiosystem {
       // A zero target would make the snapshot factor divide by zero.
       check( weights.snapshot_target_attestations > 0,
              "snapshot_target_attestations must be positive" );
+
+      // A round holds `blocks_per_round` slots, so a threshold above it can never be met: every
+      // fully produced round would count as SHORT and the rate gate would demote the entire
+      // network. Zero remains the disabled spelling.
+      check( weights.min_blocks_per_round <= blocks_per_round,
+             "min_blocks_per_round cannot exceed the round size" );
 
       producer_rank::producer_score_config_t weights_tbl( get_self() );
       weights_tbl.set( weights, get_self() );

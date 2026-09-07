@@ -119,7 +119,14 @@ producer it cannot schedule as one that holds no rank at all. And the collateral
 governance setting, so it can be raised after you have bonded: if that happens your registration
 stays `ACTIVE` and nothing is taken from you, but you hold no rank until you top up to the new
 minimum. A raised minimum reaches the table through a background rescore rather than all at once,
-and the schedule is not rebuilt until that finishes.
+and the schedule keeps being rebuilt while that runs — ranking converges over a few rounds rather
+than switching in one step, so expect a short window where positions reflect a mix of the old and
+new minimum.
+
+A **lowered** minimum works the other way and is worth knowing about: it does not promote you on
+its own. If you fell below the bar and governance later lowers it under your bond, your operator
+status is only re-evaluated when your balance next moves — so make any deposit, however small, to
+be picked back up.
 
 ## How your rank is scored
 
@@ -167,10 +174,15 @@ and that pay stays in the treasury rather than being handed to whoever did produ
 Positions 22 and beyond, up to a configured end rank, are **standbys**. They draw a retainer from a
 separate slice of the pool, decaying linearly with position, so the network keeps a ready bench.
 
-Nothing is ever forfeited. If you are not payable when a payout runs, whether parked, demoted, or
-temporarily under-collateralized, your block count is held rather than cleared, and it is paid at
-the first payout after you are payable again. Unregistering right after producing and
+Blocks you have produced are not forfeited. If you are not payable when a payout runs — parked,
+demoted, or temporarily under-collateralized — your block count is held rather than cleared, and it
+is paid at the first payout after you are payable again. Unregistering right after producing and
 re-registering before your next round costs you nothing.
+
+The one bound worth stating: a payout walks the ranking from the top and stops after a fixed number
+of rows, far below which no producer is paid anything anyway. Settling held blocks therefore
+requires you to be back within that reach, which is roughly twenty times the paid band — so in
+practice it means being a ranked producer again, not a specific position.
 
 Claim what you have earned with `claimpay`.
 

@@ -653,6 +653,13 @@ void system_contract::accrueepoch(uint32_t epoch_index,
    state.pending_emission_amount =
       saturating_accrue(state.pending_emission_amount, per_epoch_emission);
 
+   // The divisor accrues with the pool, at the duration in force for THIS epoch. Computing it at
+   // payout from the current duration would apply today's value to epochs that ran under a
+   // different one, mis-sizing the divisor for any period spanning a duration change.
+   state.pending_nominal_slots += static_cast<uint64_t>(get_epoch_duration_sec())
+      * static_cast<uint64_t>(MS_PER_SECOND)
+      / static_cast<uint64_t>(sysio::block_timestamp::block_interval_ms);
+
    // Lazy-grow batch_group_epochs to fit batch_group_index. Pre-pay-cadence
    // chains see length 0 and grow on first epoch under the new schema.
    if (batch_group_index >= state.batch_group_epochs.size()) {
@@ -952,11 +959,16 @@ void system_contract::payepoch(uint32_t epoch_index,
       // cfg.pay_cadence_epochs, which a mid-period change makes disagree with the accrual --
       // at one slot per block interval. uint64: a 30-day epoch times a large cadence overflows
       // uint32.
-      const uint64_t nominal_slots =
+      // Accumulated by `accrueepoch` at each epoch's OWN duration -- every epoch of the period
+      // including this one, exactly as `pending_emission_amount` is (the equality check above
+      // pins that). The fallback is the zero-accrual case, not a compatibility path.
+      const uint64_t this_epoch_slots =
          static_cast<uint64_t>(get_epoch_duration_sec())
-         * static_cast<uint64_t>(accrued_epochs > 0 ? accrued_epochs : 1)
          * static_cast<uint64_t>(MS_PER_SECOND)
          / static_cast<uint64_t>(sysio::block_timestamp::block_interval_ms);
+      const uint64_t nominal_slots = state.pending_nominal_slots > 0
+         ? state.pending_nominal_slots
+         : this_epoch_slots * static_cast<uint64_t>(accrued_epochs > 0 ? accrued_epochs : 1);
 
       // Standby position weights run N at position 22 down to 1 at standby_end_rank; their sum
       // is the divisor, so a position's share is the same whether or not it is filled.
@@ -1026,20 +1038,28 @@ void system_contract::payepoch(uint32_t epoch_index,
       // full period is paid at a diluted rate to fund someone else's back-pay out of the wrong
       // period's pool.
       //
-      // One correction pass is enough and cannot oscillate: removing blocks only LOWERS the
-      // divisor, which only RAISES each block's pay, so a row that cleared zero on the first pass
-      // still clears it on the second. A row that crosses back over the threshold is simply paid,
-      // which is the outcome we want; any residue left by that is a smaller divisor than strictly
-      // ideal, i.e. it errs toward paying producers rather than withholding.
+      // A row excluded from the divisor is excluded from the PAYOUT too, and that pairing is what
+      // keeps the pool solvent. Removing blocks lowers the divisor, which raises every remaining
+      // block's pay -- so an excluded row can cross back over the rounding threshold on the second
+      // pass. Paying it there would be paying for blocks the divisor no longer counts: with
+      // nominal_slots=120, active_pool=1 and two rows of 120 blocks, both round to zero at the
+      // first divisor of 240, both leave it, the divisor falls to 120, and both would then be
+      // credited 1 -- two units out of a one-unit pool.
+      //
+      // So the first pass DECIDES the payable set, and the second only prices it. An excluded
+      // row's blocks carry to the next payout exactly as an unpayable row's do.
       auto divisor_for = [&](uint64_t blocks) {
          return std::max<uint64_t>(std::max(nominal_slots, blocks), 1);
       };
+      std::vector<bool> block_payable;
+      block_payable.reserve(entries.size());
       uint64_t unpayable_blocks = 0;
       {
          const uint64_t first_pass = divisor_for(produced_blocks);
          for (const auto& entry : entries) {
             const bool rounds_to_zero =
                static_cast<__int128>(active_pool) * entry.blocks / first_pass == 0;
+            block_payable.push_back(!rounds_to_zero);
             if (rounds_to_zero) unpayable_blocks += entry.blocks;
          }
       }
@@ -1057,9 +1077,13 @@ void system_contract::payepoch(uint32_t epoch_index,
       int64_t distributed_to_producers = 0;
       std::vector<name> block_paid;
       block_paid.reserve(entries.size());
-      for (const auto& entry : entries) {
-         const int64_t block_pay = static_cast<int64_t>(
-            static_cast<__int128>(active_pool) * entry.blocks / slot_divisor);
+      for (size_t index = 0; index < entries.size(); ++index) {
+         const auto& entry = entries[index];
+         // Priced only if the first pass admitted it -- see the divisor comment above.
+         const int64_t block_pay = block_payable[index]
+            ? static_cast<int64_t>(
+                 static_cast<__int128>(active_pool) * entry.blocks / slot_divisor)
+            : 0;
          int64_t pay = block_pay;
          if (entry.standby_weight > 0) {
             pay += static_cast<int64_t>(
@@ -1204,6 +1228,7 @@ void system_contract::payepoch(uint32_t epoch_index,
 
    // Drain accumulator + advance period boundary.
    state.pending_emission_amount = 0;
+   state.pending_nominal_slots   = 0;
    std::fill(state.batch_group_epochs.begin(), state.batch_group_epochs.end(), 0);
    state.period_start_epoch = epoch_index + 1;
 

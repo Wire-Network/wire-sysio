@@ -1631,6 +1631,10 @@
                 {
                     "name": "capital_shortfall_total",
                     "type": "int64"
+                },
+                {
+                    "name": "pending_nominal_slots",
+                    "type": "uint64"
                 }
             ]
         },
