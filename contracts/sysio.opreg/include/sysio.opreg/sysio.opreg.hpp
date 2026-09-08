@@ -61,10 +61,11 @@ namespace sysio {
       // minimum is demoted before the funds physically leave.
       static constexpr uint32_t WITHDRAW_WAIT_EPOCHS = 2;
 
-      /// Global per-operator cap on pending collateral withdrawals (WIRE-376 / WNS-41).
-      /// The cap spans every chain/token bucket and both request entry points. A
-      /// cancellation or flush erases the row and permits the next request.
-      static constexpr uint32_t MAX_OUTSTANDING_WITHDRAWS_PER_OPERATOR = 1;
+      /// Per-(operator, chain, token) cap on pending collateral withdrawals
+      /// (WIRE-376 / WNS-41). The cap covers both request entry points. A
+      /// cancellation or flush erases the row and permits the next request for
+      /// that collateral bucket.
+      static constexpr uint32_t MAX_OUTSTANDING_WITHDRAWS_PER_COLLATERAL_BUCKET = 1;
 
       /// Safety rail on collateral-withdraw flush work (SEC-78 / WSA-166).
       /// MAX_WTDW_FLUSH_PER_EPOCH bounds the matured rows flushed per advance;
@@ -496,8 +497,9 @@ namespace sysio {
       // the row as `by_account_ck()` for cross-contract comparisons but is
       // NOT a table-managed secondary index. Callers scan `byaccount`
       // (uint64) and filter (chain_code, token_code) in memory — cheap
-      // because pending-withdraw counts per account are bounded by
-      // MAX_OUTSTANDING_WITHDRAWS_PER_OPERATOR.
+      // because pending-withdraw counts per account are bounded by the number
+      // of its collateral buckets times
+      // MAX_OUTSTANDING_WITHDRAWS_PER_COLLATERAL_BUCKET.
       using wtdwqueue_t = sysio::kv::table<"wtdwqueue"_n, withdraw_key, withdraw_request,
          sysio::kv::index<"byeligible"_n,
             sysio::const_mem_fun<withdraw_request, uint64_t, &withdraw_request::by_eligible>>,

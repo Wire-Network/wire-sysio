@@ -1151,7 +1151,29 @@ BOOST_FIXTURE_TEST_CASE(withdrawinle_logs_failure_on_insufficient_available, sys
                        entry["error_message"].as_string());
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(withdrawinle_rejects_second_request_across_collateral_buckets,
+BOOST_FIXTURE_TEST_CASE(withdrawinle_subtracts_from_available_on_subsequent_call,
+                        sysio_opreg_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), setconfig());
+   BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.alice"_n, OPERATOR_TYPE_UNDERWRITER, false));
+   BOOST_REQUIRE_EQUAL(success(),
+      depositinle("uwrit.alice"_n, "ETH", "ETH", 1000));
+
+   BOOST_REQUIRE_EQUAL(success(),
+      withdrawinle("uwrit.alice"_n, "ETH", "ETH", 700));
+
+   BOOST_REQUIRE_EQUAL(success(),
+      withdrawinle("uwrit.alice"_n, "ETH", "ETH", 400));
+
+   auto entry = latest_action_log("uwrit.alice"_n);
+   BOOST_REQUIRE(!entry.is_null());
+   BOOST_REQUIRE_EQUAL(false, entry["success"].as_bool());
+   BOOST_REQUIRE_EQUAL(std::string("insufficient available balance for withdraw"),
+                       entry["error_message"].as_string());
+   BOOST_REQUIRE(!get_wtdw(1).is_null());
+   BOOST_REQUIRE(get_wtdw(2).is_null());
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(withdrawinle_allows_requests_across_collateral_buckets,
                         sysio_opreg_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), setconfig());
    BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.alice"_n, OPERATOR_TYPE_UNDERWRITER, false));
@@ -1168,31 +1190,28 @@ BOOST_FIXTURE_TEST_CASE(withdrawinle_rejects_second_request_across_collateral_bu
 
    auto entry = latest_action_log("uwrit.alice"_n);
    BOOST_REQUIRE(!entry.is_null());
-   BOOST_REQUIRE_EQUAL(false, entry["success"].as_bool());
-   BOOST_REQUIRE_EQUAL(std::string("operator already has an outstanding withdraw request"),
-                       entry["error_message"].as_string());
+   BOOST_REQUIRE_EQUAL(true, entry["success"].as_bool());
    BOOST_REQUIRE(!get_wtdw(1).is_null());
-   BOOST_REQUIRE(get_wtdw(2).is_null());
+   BOOST_REQUIRE(!get_wtdw(2).is_null());
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(withdraw_rejects_when_inline_request_is_outstanding,
+BOOST_FIXTURE_TEST_CASE(withdraw_rejects_when_inline_request_is_outstanding_for_same_bucket,
                         sysio_opreg_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), setconfig());
    BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.alice"_n, OPERATOR_TYPE_UNDERWRITER, false));
    BOOST_REQUIRE_EQUAL(success(),
-      depositinle("uwrit.alice"_n, "ETH", "ETH", 1000));
-   BOOST_REQUIRE_EQUAL(success(),
       depositinle("uwrit.alice"_n, "WIRE", "WIRE", 1000));
 
    BOOST_REQUIRE_EQUAL(success(),
-      withdrawinle("uwrit.alice"_n, "ETH", "ETH", 400));
+      withdrawinle("uwrit.alice"_n, "WIRE", "WIRE", 400));
    BOOST_REQUIRE_EQUAL(success(), withdraw("uwrit.alice"_n, 400));
 
    auto entry = latest_action_log("uwrit.alice"_n);
    BOOST_REQUIRE(!entry.is_null());
    BOOST_REQUIRE_EQUAL(false, entry["success"].as_bool());
-   BOOST_REQUIRE_EQUAL(std::string("operator already has an outstanding withdraw request"),
-                       entry["error_message"].as_string());
+   BOOST_REQUIRE_EQUAL(
+      std::string("operator already has an outstanding withdraw request for this collateral bucket"),
+      entry["error_message"].as_string());
    BOOST_REQUIRE(!get_wtdw(1).is_null());
    BOOST_REQUIRE(get_wtdw(2).is_null());
 } FC_LOG_AND_RETHROW() }

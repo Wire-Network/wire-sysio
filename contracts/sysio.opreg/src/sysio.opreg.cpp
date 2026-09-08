@@ -396,7 +396,7 @@ uint64_t sum_locks_inline(name account, sysio::slug_name chain_code, sysio::slug
 /// Per v6 plan §B.2 (split-index design): `wtdwqueue_t` exposes only uint64
 /// secondary indexes. `byaccount` keys on `account.value`; rows are filtered
 /// on `(chain_code, token_code)` in memory. Per-account pending-withdraw
-/// counts are O(1)-ish so the scan is cheap.
+/// counts are bounded by the operator's collateral-bucket count.
 uint64_t sum_pending_withdraws(name account, sysio::slug_name chain_code, sysio::slug_name token_code) {
    // The queue is scoped to opreg itself; reference the well-known account.
    opreg::wtdwqueue_t real_queue(name{"sysio.opreg"_n});
@@ -873,22 +873,27 @@ enqueue_result try_enqueue_withdraw(name account,
       return { false, 0, "operator not in a withdraw-eligible state" };
    }
 
-   opreg::wtdwqueue_t queue(name{"sysio.opreg"_n});
-   auto by_account = queue.get_index<"byaccount"_n>();
-   uint32_t outstanding = 0;
-   for (auto it = by_account.lower_bound(account.value);
-        it != by_account.upper_bound(account.value) &&
-        outstanding < opreg::MAX_OUTSTANDING_WITHDRAWS_PER_OPERATOR;
-        ++it) {
-      ++outstanding;
-   }
-   if (outstanding >= opreg::MAX_OUTSTANDING_WITHDRAWS_PER_OPERATOR) {
-      return { false, 0, "operator already has an outstanding withdraw request" };
-   }
-
    uint64_t avail = available_inline(op, chain_code, token_code);
    if (avail < amount) {
       return { false, 0, "insufficient available balance for withdraw" };
+   }
+
+   opreg::wtdwqueue_t queue(name{"sysio.opreg"_n});
+   auto by_account = queue.get_index<"byaccount"_n>();
+   auto it  = by_account.lower_bound(account.value);
+   auto end = by_account.upper_bound(account.value);
+   uint32_t outstanding = 0;
+   for (; it != end &&
+          outstanding < opreg::MAX_OUTSTANDING_WITHDRAWS_PER_COLLATERAL_BUCKET;
+        ++it) {
+      if (it->account != account) break;
+      if (it->chain_code != chain_code || it->token_code != token_code) continue;
+      ++outstanding;
+   }
+   if (outstanding >= opreg::MAX_OUTSTANDING_WITHDRAWS_PER_COLLATERAL_BUCKET) {
+      return {
+         false, 0, "operator already has an outstanding withdraw request for this collateral bucket"
+      };
    }
 
    uint32_t now_ep = get_current_epoch();
