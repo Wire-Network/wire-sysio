@@ -873,6 +873,19 @@ enqueue_result try_enqueue_withdraw(name account,
       return { false, 0, "operator not in a withdraw-eligible state" };
    }
 
+   opreg::wtdwqueue_t queue(name{"sysio.opreg"_n});
+   auto by_account = queue.get_index<"byaccount"_n>();
+   uint32_t outstanding = 0;
+   for (auto it = by_account.lower_bound(account.value);
+        it != by_account.upper_bound(account.value) &&
+        outstanding < opreg::MAX_OUTSTANDING_WITHDRAWS_PER_OPERATOR;
+        ++it) {
+      ++outstanding;
+   }
+   if (outstanding >= opreg::MAX_OUTSTANDING_WITHDRAWS_PER_OPERATOR) {
+      return { false, 0, "operator already has an outstanding withdraw request" };
+   }
+
    uint64_t avail = available_inline(op, chain_code, token_code);
    if (avail < amount) {
       return { false, 0, "insufficient available balance for withdraw" };
@@ -881,7 +894,6 @@ enqueue_result try_enqueue_withdraw(name account,
    uint32_t now_ep = get_current_epoch();
    uint64_t request_id = next_withdraw_id();
 
-   opreg::wtdwqueue_t queue(name{"sysio.opreg"_n});
    queue.emplace(ram_payer, opreg::withdraw_key{request_id}, opreg::withdraw_request{
       .request_id          = request_id,
       .account             = account,
