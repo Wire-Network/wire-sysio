@@ -229,8 +229,9 @@ struct node_claim_result {
 //
 // Rows do not expire: this is earned pay, held until claimed.
 //
-// The recipient set is bounded only CONCURRENTLY (ranks 1..standby_end_rank, plus batch-op group
-// members) — not across this table's lifetime. Producers and batch
+// The recipient set is bounded only CONCURRENTLY (the schedulable rows one payepoch walk reaches,
+// capped at max_rank_walk_rows, plus batch-op group members) — not across this table's lifetime.
+// It is NOT `standby_end_rank`: no-forfeiture pays carried blocks well below the standby band. Producers and batch
 // operators churn, and every departed account that never calls `claimpay` leaves a row billed to
 // the sysio RAM pool forever, so system-funded claim storage grows with historical participants
 // rather than with the live set. That is a known, accepted cost here: expiring earned pay is an

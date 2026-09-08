@@ -269,6 +269,12 @@ uint32_t get_epoch_duration_sec() {
    return cfg_tbl.get().epoch_duration_sec;
 }
 
+// Same value for callers that may not throw -- see accrueepoch.
+uint32_t epoch_duration_sec_or_zero() {
+   sysio::epoch::epochcfg_t cfg_tbl(epoch_refs::account);
+   return cfg_tbl.exists() ? cfg_tbl.get().epoch_duration_sec : 0;
+}
+
 } // anonymous namespace
 
 // ===========================================================================
@@ -656,7 +662,10 @@ void system_contract::accrueepoch(uint32_t epoch_index,
    // The divisor accrues with the pool, at the duration in force for THIS epoch. Computing it at
    // payout from the current duration would apply today's value to epochs that ran under a
    // different one, mis-sizing the divisor for any period spanning a duration change.
-   state.pending_nominal_slots += static_cast<uint64_t>(get_epoch_duration_sec())
+   // Read WITHOUT asserting the epoch config exists: this action is inline from
+   // sysio.epoch::advance and must not throw. A 0 duration accrues no slots and payout falls
+   // through to the produced-block divisor.
+   state.pending_nominal_slots += static_cast<uint64_t>(epoch_duration_sec_or_zero())
       * static_cast<uint64_t>(MS_PER_SECOND)
       / static_cast<uint64_t>(sysio::block_timestamp::block_interval_ms);
 
@@ -1031,17 +1040,13 @@ void system_contract::payepoch(uint32_t epoch_index,
          }
       }
 
-      // Blocks CARRIED from an earlier period must not inflate this period's divisor. A row whose
-      // block pay rounds to zero keeps its blocks (that promise is what makes the model
-      // forfeiture-free), but it was counted in `produced_blocks` -- so without this correction the
-      // same blocks raise the divisor again at the next payout, and every producer that worked a
-      // full period is paid at a diluted rate to fund someone else's back-pay out of the wrong
-      // period's pool.
-      //
       // `nominal_slots` is the period's entitlement; `produced_blocks` raises it when a period ran
-      // long, so no producer's rate exceeds its slice. A row whose pay rounds to zero keeps its
-      // blocks and stays in the divisor -- a hair of dilution, and only when the per-block rate is
-      // under one subunit. Correcting for that took a second pass that could overdraw the pool.
+      // long, so no producer's rate exceeds its slice.
+      //
+      // Carried blocks are NOT subtracted back out. A row whose pay rounds to zero keeps its blocks
+      // (that promise is what makes the model forfeiture-free) and they are counted again in the
+      // period that settles them -- a hair of dilution, and only when the per-block rate is under
+      // one subunit. Correcting it took a second pass that could overdraw the pool.
       const uint64_t slot_divisor = std::max<uint64_t>(std::max(nominal_slots, produced_blocks), 1);
 
       // Producers are paid the emission share only — swap fees go to the

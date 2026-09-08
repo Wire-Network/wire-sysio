@@ -199,17 +199,7 @@ namespace sysiosystem {
       bool     active()const      { return is_active;                               }
       void     deactivate()       { producer_key = public_key(); producer_authority = sysio::block_signing_authority{}; is_active = false; }
 
-      /// Applies a demotion decision, consuming the pay period's snapshot credit on the way OUT.
-      ///
-      /// Every site that decides the flag routes through here, because the credit must not survive
-      /// the transition and three separate sites decide it: the missed-round branch, the produced
-      /// branch (which RE-DERIVES the flag and can raise it on a block the producer made, via the
-      /// rate gate), and the config sweep. `payepoch` resets counters only on rows it VISITS and it
-      /// stops at the demoted tier, so a credit carried out of the walk would ride back in on
-      /// return and outrank producers that actually attested that period. It is a per-period
-      /// SERVICE RATING -- unlike `unpaid_blocks`, which is an earned debt and is deliberately
-      /// kept. Clearing on the false->true edge only is what makes it idempotent: re-deciding
-      /// "still demoted" must not wipe a credit earned since.
+      /// The block-signing authority this producer is scheduled with.
       const sysio::block_signing_authority& get_producer_authority()const {
          return producer_authority;
       }

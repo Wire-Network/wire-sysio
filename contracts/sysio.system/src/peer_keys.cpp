@@ -99,6 +99,13 @@ peer_keys::getpeerkeys_res_t peer_keys::getpeerkeys() {
    // harness that publishes schedules directly -- produces blocks before it registers one, and a
    // block producer that `getpeerkeys` hides is a block producer the BP gossip mesh cannot reach.
    //
+   // Inside THIS walk the two predicates cannot actually differ: `compute` sinks a keyless
+   // producer into the demoted tier, so it is already behind the `break` above. The SEED is what
+   // carries keyless producers, and it is the reason this is correct -- every keyless producer
+   // that matters is one the chain is currently scheduling. `is_eligible_operator` stands here
+   // because the walk must not RE-ADD the finalizer requirement the seed was built to sidestep:
+   // if the tier rule ever stops sinking keyless rows, this loop keeps returning them.
+   //
    // Bounded on ROWS EXAMINED as well as on matched positions. `position` advances only on a
    // match, so the `continue` above it is free to skip an unbounded number of healthy-tier rows
    // whose LIVE eligibility no longer matches their CACHED tier -- and each skip costs a

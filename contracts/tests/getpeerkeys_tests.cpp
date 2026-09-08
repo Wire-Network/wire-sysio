@@ -47,6 +47,25 @@ public:
       produce_block();
    }
 
+   /// Register an active finalizer key for each name.
+   ///
+   /// Required to reach the RANK WALK at all: `producer_rank::compute` sinks a keyless producer
+   /// into the demoted tier, which is the tier the walk breaks at. Keys come from `get_bls_key`,
+   /// whose private half this tester holds -- update_ranked_producers proposes a policy from them
+   /// and a policy the node cannot sign freezes LIB.
+   void register_finalizer_keys( const std::vector<name>& names ) {
+      std::vector<account_name> registered;
+      for (const auto& p : names) {
+         auto [privkey, pubkey, pop, sig_provider] = sysio::testing::get_bls_key(p);
+         BOOST_REQUIRE_EQUAL( success(), push_action(p, "regfinkey"_n, mvo()
+            ("finalizer_name", p)("finalizer_key", pubkey.to_string())
+            ("proof_of_possession", pop.to_string())) );
+         registered.push_back(p);
+      }
+      set_node_finalizers(registered);
+      produce_block();
+   }
+
    /// The producers the chain is currently scheduled to produce blocks from.
    std::vector<name> active_schedule_names() {
       std::vector<name> names;
@@ -81,9 +100,9 @@ BOOST_FIXTURE_TEST_CASE( getpeerkeys_test, getpeerkeys_tester ) { try {
       }
    }
 
-   // getpeerkeys returns every ranked producer (rank <= 30); a registered producer carries its
-   // peer key, an unregistered one an empty optional. A dropped return value decodes to an empty
-   // vector and fails the size check below.
+   // getpeerkeys returns every producer; a registered one carries its peer key, an unregistered
+   // one an empty optional. All 21 are in the active schedule, so this covers the SEED. A dropped
+   // return value decodes to an empty vector and fails the size check below.
    auto peerkeys = get_peer_keys();
    BOOST_REQUIRE_EQUAL( peerkeys.size(), prod_names.size() );
 
@@ -118,7 +137,9 @@ BOOST_FIXTURE_TEST_CASE( getpeerkeys_returns_every_scheduled_producer, getpeerke
    BOOST_REQUIRE( !scheduled.empty() );
    const auto dropped = scheduled.front();
 
-   // Baseline: the rank walk alone already covers it.
+   // Baseline: it is returned before the termination. These producers hold no finalizer key, so
+   // they are all demoted-tier and the rank walk breaks immediately -- the SEED is what covers
+   // them here, which is exactly the property under test. The rank walk has its own case below.
    {
       auto peerkeys = get_peer_keys();
       BOOST_REQUIRE( std::any_of(peerkeys.begin(), peerkeys.end(),
@@ -143,6 +164,37 @@ BOOST_FIXTURE_TEST_CASE( getpeerkeys_returns_every_scheduled_producer, getpeerke
 
    // Every scheduled producer, not just the one under test, and each exactly once.
    for (const auto& p : after) {
+      const auto hits = std::count_if(peerkeys.begin(), peerkeys.end(),
+         [&](const gpk_peerkeys_t& pk) { return pk.producer_name == p; });
+      BOOST_REQUIRE_MESSAGE( hits == 1,
+         p.to_string() << " appears " << hits << " times in peer discovery; expected exactly 1" );
+   }
+} FC_LOG_AND_RETHROW() }
+
+// The RANK WALK half of getpeerkeys: producers past the active schedule.
+//
+// The other two cases register no finalizer key, so every row is demoted-tier and the walk breaks
+// on its first iteration -- they cover the seed and nothing else. Here all 24 hold an active key,
+// so the 3 that the 21-slot schedule left out are reachable ONLY by walking the rank index. That
+// is also what the dedupe between the seed and the walk is exercised by: the 21 scheduled
+// producers are added by the seed first and must not appear twice.
+BOOST_FIXTURE_TEST_CASE( getpeerkeys_walks_past_the_active_schedule, getpeerkeys_tester ) { try {
+   constexpr size_t total = 24;   // 21 scheduled + 3 that only the rank walk can reach
+   std::vector<name> prod_names = activate_producers_with_operators( total );
+   register_finalizer_keys( prod_names );
+
+   const auto scheduled = active_schedule_names();
+   BOOST_REQUIRE_EQUAL( scheduled.size(), 21u );
+
+   auto peerkeys = get_peer_keys();
+
+   // Precondition: without the walk this is 21. Asserted so a regression that breaks the walk
+   // fails HERE rather than silently reducing this case to the seed.
+   BOOST_REQUIRE_MESSAGE( peerkeys.size() == total,
+      "peer discovery returned " << peerkeys.size() << " of " << total
+      << "; the rank walk did not reach the unscheduled producers" );
+
+   for (const auto& p : prod_names) {
       const auto hits = std::count_if(peerkeys.begin(), peerkeys.end(),
          [&](const gpk_peerkeys_t& pk) { return pk.producer_name == p; });
       BOOST_REQUIRE_MESSAGE( hits == 1,

@@ -378,6 +378,11 @@ public:
 
    /// Deploy sysio.opreg into the test chain, once. `sysio_system_tester` does not ship it, but
    /// every rank consumer reads it through `is_op_active`.
+   ///
+   /// TWIN: `unittests/sysio_system_tester.hpp` carries the same recipe for the `unit_test` tree.
+   /// The trees cannot share a header -- they resolve the wasm through different accessors
+   /// (`contracts::` vs `test_contracts::`) -- so a change to the grants, the privilege step or
+   /// the regoperator shape must be made in BOTH.
    void deploy_opreg_once() {
       if (!opreg_deployed) {
          create_account("sysio.opreg"_n, config::system_account_name, false, false, false, true);

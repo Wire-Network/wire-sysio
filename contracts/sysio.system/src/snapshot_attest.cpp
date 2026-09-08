@@ -51,9 +51,9 @@ enum class snapshot_producer_eligibility {
 /// never be scheduled -- from crowding real producers out of snapshot-provider eligibility.
 /// The producers holding rank positions 1..max_snap_provider_rank, in rank order.
 ///
-/// Computed ONCE per caller and then tested for membership, rather than re-walked per producer:
-/// the prune path checks up to max_snap_providers entries, and a per-entry walk would make that
-/// quadratic.
+/// Computed ONCE per ACTION -- `regsnapprov` walks it here and threads the result through both the
+/// eligibility check and the capacity prune -- then tested for membership rather than re-walked per
+/// producer, which would make the prune's max_snap_providers entries quadratic.
 std::vector<name> snapshot_ranked_producers(name self) {
    producers_table  producers(self);
    finalizers_table finalizers(self);
@@ -63,11 +63,10 @@ std::vector<name> snapshot_ranked_producers(name self) {
 
    // Bounded on ROWS EXAMINED, not just on matches. `rank_score` is a CACHE while `is_schedulable`
    // is evaluated LIVE, so healthy-tier rows that no longer qualify are skipped by `continue` and
-   // would otherwise cost an unbounded scan -- at a cross-contract sysio.opreg read plus two
-   // finalizer reads apiece. That matters more here than on the other walks: this one is reached
-   // from `regsnapprov`, a user-signed write, and re-walked once per entry inside the capacity
-   // prune, so an unbounded scan turns into a transaction that cannot fit its CPU budget and
-   // `regsnapprov` stops working for everyone.
+   // would otherwise cost an unbounded scan -- at a cross-contract sysio.opreg read plus a
+   // finalizer read apiece. That matters more here than on the other walks: this one is reached
+   // from `regsnapprov`, a user-signed write, so an unbounded scan turns into a transaction that
+   // cannot fit its CPU budget and `regsnapprov` stops working for everyone.
    uint32_t examined = 0;
    auto idx = producers.get_index<"prodrank"_n>();
    for (auto i = idx.cbegin(); i != idx.cend() && ranked.size() < max_snap_provider_rank; ++i) {
@@ -92,10 +91,13 @@ snapshot_producer_eligibility get_snapshot_producer_eligibility(const producer_i
 }
 
 /// Requires the producer's current table state to permit snapshot-provider registration.
-void require_snapshot_producer_eligibility(name self, name producer) {
+///
+/// Takes `ranked` rather than walking for it: `regsnapprov` also needs the list for the capacity
+/// prune, and this walk is the expensive part of that user-signed action.
+void require_snapshot_producer_eligibility(name self, name producer, const std::vector<name>& ranked) {
    producers_table producers(self);
    const auto prod_itr = producers.require_find(producer_key_t{producer.value}, producer_not_registered_error);
-   const auto eligibility = get_snapshot_producer_eligibility(*prod_itr, snapshot_ranked_producers(self));
+   const auto eligibility = get_snapshot_producer_eligibility(*prod_itr, ranked);
    check(eligibility != snapshot_producer_eligibility::inactive, producer_not_active_error);
    check(eligibility != snapshot_producer_eligibility::rank_exceeds_maximum, producer_rank_too_high_error);
 }
@@ -135,13 +137,13 @@ uint32_t count_snapshot_providers(const snap_providers_table& providers) {
 }
 
 /// Removes stale mappings only when capacity would otherwise reject a new registration.
-void prune_stale_snapshot_providers_if_full(name self, snap_providers_table& providers) {
+void prune_stale_snapshot_providers_if_full(name self, snap_providers_table& providers,
+                                            const std::vector<name>& ranked) {
    if (count_snapshot_providers(providers) < max_snap_providers) {
       return;
    }
 
    producers_table   producers(self);
-   const auto        ranked = snapshot_ranked_producers(self);
    auto              provider_itr = providers.begin();
    while (provider_itr != providers.end()) {
       const auto producer_itr = producers.try_get(producer_key_t{provider_itr->producer.value});
@@ -196,8 +198,10 @@ void finalize_snapshot_vote(name self, uint32_t block_num, const checksum256& bl
 void snapshot_attest::regsnapprov(name producer, name snap_account) {
    require_auth(producer);
 
-   producers_table producers(get_self());
-   require_snapshot_producer_eligibility(get_self(), producer);
+   // Walked ONCE and shared with the capacity prune below -- the walk is bounded but expensive,
+   // and this is a user-signed action.
+   const auto ranked = snapshot_ranked_producers(get_self());
+   require_snapshot_producer_eligibility(get_self(), producer, ranked);
 
    snap_providers_table providers(get_self());
    const auto provider_itr = providers.find(snap_provider_key_t{snap_account.value});
@@ -211,7 +215,7 @@ void snapshot_attest::regsnapprov(name producer, name snap_account) {
    if (producer_itr != by_producer.end()) {
       by_producer.erase(std::move(producer_itr));
    } else {
-      prune_stale_snapshot_providers_if_full(get_self(), providers);
+      prune_stale_snapshot_providers_if_full(get_self(), providers, ranked);
    }
    check(count_snapshot_providers(providers) < max_snap_providers, provider_capacity_error);
 

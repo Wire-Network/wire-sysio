@@ -31,10 +31,6 @@ inline constexpr uint32_t single_provider_minimum = 1;
 /// Distance from a scheduled height to the immediately preceding block.
 inline constexpr uint32_t preceding_block_offset = 1;
 
-namespace system_contract {
-
-} // namespace system_contract
-
 /** Convert a BLAKE3 snapshot root to the checksum representation stored by the contract. */
 inline fc::sha256 to_contract_snapshot_hash(const fc::crypto::blake3& snapshot_root) {
    static_assert(fc::sha256::byte_size == fc::crypto::blake3::byte_size);

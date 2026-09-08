@@ -11,6 +11,7 @@
 
 #include <cstdint>
 #include <limits>
+#include <optional>
 
 // The producer-score FACTORS -- everything that reads the operator registry to turn a producer's
 // on-chain standing into the composite score `producer_rank::pack` encodes.
@@ -73,10 +74,14 @@ namespace sysiosystem {
          if (cfg.req_prod_collat.empty()) return 0;
 
          uint64_t lowest = std::numeric_limits<uint64_t>::max();
+         bool     measured = false;
          for (const auto& req : cfg.req_prod_collat) {
-            // setconfig's require_positive_min_bond already guarantees this (SEC-22); assert rather
-            // than divide by zero if that ever regresses.
-            check(req.min_bond > 0, "req_prod_collat entry has a zero min_bond");
+            // A zero minimum constrains nothing, so skip it rather than divide by zero. NOT a
+            // `check`: this runs under `onblock`, where a throw silently costs the chain block
+            // counting, miss attribution and every schedule rebuild. setconfig's
+            // require_positive_min_bond (SEC-22) is what actually prevents the value.
+            if (req.min_bond == 0) continue;
+            measured = true;
 
             // uint128 intermediate is mandatory: a bond runs to 2^62 and multiplying by
             // score_scale overflows uint64.
@@ -89,7 +94,8 @@ namespace sysiosystem {
                                         : static_cast<uint64_t>(ratio);
             if (bounded < lowest) lowest = bounded;
          }
-         return lowest;
+         // Every requirement was zero: nothing to measure, same as an empty vector.
+         return measured ? lowest : 0;
       }
 
       /**
@@ -150,11 +156,25 @@ namespace sysiosystem {
        * @param finalizers the sysio.system finalizers table.
        * @return true iff the producer is eligible to occupy a rank position.
        */
+      /**
+       * The producer's finalizer row if it holds an active key, else nullopt.
+       *
+       * One table read. Callers that need the ROW (the schedule rebuild, which proposes it as a
+       * finalizer) use this instead of testing `is_schedulable` and fetching again.
+       *
+       * @param producer   the producer's account name.
+       * @param finalizers the finalizers table.
+       * @return the active finalizer row, or nullopt.
+       */
+      inline std::optional<finalizer_info> active_finalizer(const sysio::name& producer,
+                                                            finalizers_table& finalizers) {
+         auto row = finalizers.try_get(finalizer_key_t{producer.value});
+         if (!row || row->active_key_binary.empty()) return std::nullopt;
+         return row;
+      }
+
       inline bool is_schedulable(const producer_info& producer, finalizers_table& finalizers) {
-         if (!is_eligible_operator(producer)) return false;
-         const auto key = finalizer_key_t{producer.owner.value};
-         if (!finalizers.contains(key)) return false;
-         return !finalizers.get(key).active_key_binary.empty();
+         return is_eligible_operator(producer) && active_finalizer(producer.owner, finalizers).has_value();
       }
 
       /**
@@ -294,6 +314,17 @@ namespace sysiosystem {
       }
 
       /**
+       * The pay period now open, which is what a snapshot credit is stamped against.
+       *
+       * @param self the system account.
+       * @return the open period's start epoch, or 0 before T5 emissions are initialised.
+       */
+      inline uint32_t current_pay_period(const sysio::name& self) {
+         emissions::t5state_t t5s(self);
+         return t5s.exists() ? t5s.get().period_start_epoch : 0;
+      }
+
+      /**
        * Recompute one producer's packed `rank_score` from its live standing and store it if it
        * moved.
        *
@@ -307,17 +338,6 @@ namespace sysiosystem {
        * @param producers the producers table.
        * @param producer  the producer to rescore; a name with no row is ignored.
        */
-      /**
-       * The pay period now open, which is what a snapshot credit is stamped against.
-       *
-       * @param self the system account.
-       * @return the open period's start epoch, or 0 before T5 emissions are initialised.
-       */
-      inline uint32_t current_pay_period(const sysio::name& self) {
-         emissions::t5state_t t5s(self);
-         return t5s.exists() ? t5s.get().period_start_epoch : 0;
-      }
-
       inline void rescore(const sysio::name& self, producers_table& producers, const sysio::name& producer) {
          const auto key = producer_key_t{producer.value};
          if (!producers.contains(key)) return;

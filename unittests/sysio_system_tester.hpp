@@ -147,6 +147,11 @@ public:
 
    /// Deploy sysio.opreg into the test chain, once. Every producer rank position is gated on an
    /// ACTIVE OPERATOR_TYPE_PRODUCER row there via `is_op_active`, and this tester does not ship it.
+   ///
+   /// TWIN: `contracts/tests/sysio.system_tester.hpp` carries the same recipe for the
+   /// `contracts_unit_test` tree. The trees cannot share a header -- they resolve the wasm through
+   /// different accessors (`test_contracts::` vs `contracts::`) -- so a change to the grants, the
+   /// privilege step or the regoperator shape must be made in BOTH.
    void deploy_opreg_once() {
       if (opreg_deployed) return;
       create_account("sysio.opreg"_n, config::system_account_name, false, false, false, true);

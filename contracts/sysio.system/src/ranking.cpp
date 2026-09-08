@@ -194,9 +194,12 @@ namespace sysiosystem {
       for( auto it = idx.cbegin(); it != idx.cend() && top_producers.size() < max_producers; ++it ) {
          if( producer_rank::tier_of( it->rank_score ) == producer_tier::demoted ) break;
          if( ++examined > max_rank_walk_rows ) break;
-         if( !producer_rank::is_schedulable( *it, _finalizers ) ) continue;
+         if( !producer_rank::is_eligible_operator( *it ) ) continue;
+         // One finalizer read for both the predicate and the row proposed below.
+         auto finalizer = producer_rank::active_finalizer( it->owner, _finalizers );
+         if( !finalizer ) continue;
 
-         proposed_finalizers.emplace_back( _finalizers.get( finalizer_key_t{it->owner.value} ) );
+         proposed_finalizers.emplace_back( *finalizer );
          top_producers.emplace_back(
             sysio::producer_authority{
                .producer_name = it->owner,
