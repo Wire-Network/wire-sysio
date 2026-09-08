@@ -1038,32 +1038,11 @@ void system_contract::payepoch(uint32_t epoch_index,
       // full period is paid at a diluted rate to fund someone else's back-pay out of the wrong
       // period's pool.
       //
-      // A row excluded from the divisor is excluded from the PAYOUT too, and that pairing is what
-      // keeps the pool solvent. Removing blocks lowers the divisor, which raises every remaining
-      // block's pay -- so an excluded row can cross back over the rounding threshold on the second
-      // pass. Paying it there would be paying for blocks the divisor no longer counts: with
-      // nominal_slots=120, active_pool=1 and two rows of 120 blocks, both round to zero at the
-      // first divisor of 240, both leave it, the divisor falls to 120, and both would then be
-      // credited 1 -- two units out of a one-unit pool.
-      //
-      // So the first pass DECIDES the payable set, and the second only prices it. An excluded
-      // row's blocks carry to the next payout exactly as an unpayable row's do.
-      auto divisor_for = [&](uint64_t blocks) {
-         return std::max<uint64_t>(std::max(nominal_slots, blocks), 1);
-      };
-      std::vector<bool> block_payable;
-      block_payable.reserve(entries.size());
-      uint64_t unpayable_blocks = 0;
-      {
-         const uint64_t first_pass = divisor_for(produced_blocks);
-         for (const auto& entry : entries) {
-            const bool rounds_to_zero =
-               static_cast<__int128>(active_pool) * entry.blocks / first_pass == 0;
-            block_payable.push_back(!rounds_to_zero);
-            if (rounds_to_zero) unpayable_blocks += entry.blocks;
-         }
-      }
-      const uint64_t slot_divisor = divisor_for(produced_blocks - unpayable_blocks);
+      // `nominal_slots` is the period's entitlement; `produced_blocks` raises it when a period ran
+      // long, so no producer's rate exceeds its slice. A row whose pay rounds to zero keeps its
+      // blocks and stays in the divisor -- a hair of dilution, and only when the per-block rate is
+      // under one subunit. Correcting for that took a second pass that could overdraw the pool.
+      const uint64_t slot_divisor = std::max<uint64_t>(std::max(nominal_slots, produced_blocks), 1);
 
       // Producers are paid the emission share only — swap fees go to the
       // underwriter + batch operators (see the fold-in comment above).
@@ -1077,13 +1056,9 @@ void system_contract::payepoch(uint32_t epoch_index,
       int64_t distributed_to_producers = 0;
       std::vector<name> block_paid;
       block_paid.reserve(entries.size());
-      for (size_t index = 0; index < entries.size(); ++index) {
-         const auto& entry = entries[index];
-         // Priced only if the first pass admitted it -- see the divisor comment above.
-         const int64_t block_pay = block_payable[index]
-            ? static_cast<int64_t>(
-                 static_cast<__int128>(active_pool) * entry.blocks / slot_divisor)
-            : 0;
+      for (const auto& entry : entries) {
+         const int64_t block_pay = static_cast<int64_t>(
+            static_cast<__int128>(active_pool) * entry.blocks / slot_divisor);
          int64_t pay = block_pay;
          if (entry.standby_weight > 0) {
             pay += static_cast<int64_t>(

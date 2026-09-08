@@ -82,12 +82,6 @@ namespace sysiosystem {
    /// next payout rather than being lost.
    static constexpr uint32_t max_rank_walk_rows     = 500;
 
-   /// Ceiling `setscorecfg` accepts for `max_consecutive_missed_rounds`.
-   ///
-   /// `rate_gate_minimum_sample` evaluates `max_consecutive * 100` in uint32, so the input has to
-   /// stay well below the wrap point. A million consecutive missed rounds is already far past any
-   /// meaningful availability policy -- at 21 producers and half-second slots it is over a year.
-   static constexpr uint32_t max_consecutive_missed_rounds_limit = 1'000'000;
    static constexpr uint32_t seconds_per_year      = 52 * 7 * 24 * 3600;
    static constexpr uint32_t seconds_per_day       = 24 * 3600;
    static constexpr uint32_t seconds_per_hour      = 3600;
@@ -191,35 +185,15 @@ namespace sysiosystem {
       bool                                                     is_demoted = false;
       /// Snapshot attestations credited this pay period; reset alongside the block counters.
       uint32_t                                                 snapshot_attestations = 0;
-      /// Scheduled rounds OBSERVED inside the current miss window, and how many went unproduced.
-      /// Only rounds the producer was actually scheduled for are counted, so time spent off the
-      /// schedule contributes nothing rather than reading as failure.
+      /// The pay period `snapshot_attestations` was earned in; `compute` ignores the count when
+      /// this is not the current one. Staleness decided at READ time, so no exit from the pay walk
+      /// has to consume the credit.
       ///
-      /// DECLARED LAST, matching the tail of SYSLIB_SERIALIZE below. The ABI is generated from
-      /// these declarations while the contract serializes in the macro's order, so the two orders
-      /// must agree -- when they disagree every field past the divergence decodes from the wrong
-      /// bytes, silently, and a reader sees a plausible value belonging to its neighbour.
-      uint32_t                                                 rounds_in_window = 0;
-      uint32_t                                                 missed_rounds_in_window = 0;
-      /// When the current miss window opened (on-chain ms). A round observed after the window has
-      /// lapsed opens a fresh one, so these counters can never survive an absence longer than the
-      /// window itself -- the resurrection CertiK flagged as WNS-47, designed out rather than
-      /// patched.
-      uint64_t                                                 miss_window_open_ms = 0;
-      /// The bucket BEFORE the current one, and the reason the window is rolling rather than
-      /// tumbling.
-      ///
-      /// A single bucket emptied when its duration elapses is a TUMBLING window: each bucket can
-      /// read under the limit while the trailing window does not, and `miss_window_open_ms` is
-      /// on-chain, so an operator can straddle the boundary deliberately and hold roughly twice
-      /// the configured rate forever. Keeping the previous bucket and counting the fraction of it
-      /// the trailing window still covers is the standard approximation -- exact enough to close
-      /// that gap, and O(1), unlike the per-observation log `sysio.opreg` can afford on a
-      /// once-per-epoch path but `onblock` cannot.
+      /// Inert until T5 is initialised: `current_pay_period` is 0 before then, so every stamp
+      /// matches. Bounded -- there is no pay pre-T5, and the snapshot factor saturates.
       ///
       /// DECLARED LAST, matching the tail of SYSLIB_SERIALIZE below.
-      uint32_t                                                 prev_rounds_in_window = 0;
-      uint32_t                                                 prev_missed_rounds_in_window = 0;
+      uint32_t                                                 snapshot_period = 0;
 
       uint64_t by_rank_score()const { return rank_score; }
       bool     active()const      { return is_active;                               }
@@ -236,39 +210,13 @@ namespace sysiosystem {
       /// SERVICE RATING -- unlike `unpaid_blocks`, which is an earned debt and is deliberately
       /// kept. Clearing on the false->true edge only is what makes it idempotent: re-deciding
       /// "still demoted" must not wipe a credit earned since.
-      /// Advance the miss window to the bucket starting at `now_ms`, if the current one has run
-      /// its full duration.
-      ///
-      /// The current bucket becomes the previous one, so the trailing window can still count the
-      /// part of it that has not aged out. A gap of two full durations or more leaves nothing
-      /// worth carrying, so both buckets clear -- that is what makes an absence longer than the
-      /// window start a producer's record fresh rather than greet it with a stale one.
-      void roll_miss_window(uint64_t now_ms, uint64_t window_ms) {
-         if (window_ms == 0) return;
-         if (miss_window_open_ms != 0 && now_ms - miss_window_open_ms < window_ms) return;
-
-         const bool carry = miss_window_open_ms != 0
-            && now_ms - miss_window_open_ms < window_ms * 2;
-         prev_rounds_in_window        = carry ? rounds_in_window : 0;
-         prev_missed_rounds_in_window = carry ? missed_rounds_in_window : 0;
-         rounds_in_window             = 0;
-         missed_rounds_in_window      = 0;
-         miss_window_open_ms          = now_ms;
-      }
-
-      void set_demoted(bool demoted) {
-         if (demoted && !is_demoted) snapshot_attestations = 0;
-         is_demoted = demoted;
-      }
-
       const sysio::block_signing_authority& get_producer_authority()const {
          return producer_authority;
       }
 
       SYSLIB_SERIALIZE( producer_info, (owner)(producer_key)(rank_score)(is_active)(url)(unpaid_blocks)(last_claim_time)(location)(producer_authority)
                          (consecutive_missed_rounds)(is_demoted)(snapshot_attestations)
-                         (rounds_in_window)(missed_rounds_in_window)(miss_window_open_ms)
-                         (prev_rounds_in_window)(prev_missed_rounds_in_window) )
+                         (snapshot_period) )
    };
 
    using producers_table = sysio::kv::table< "producers"_n, producer_key_t, producer_info,
@@ -897,20 +845,7 @@ namespace sysiosystem {
          /// (collateral), onblock (miss counter), and the rescore sweep.
          void rescore_producer( const name& producer );
 
-            /// Whether a producer's TRAILING miss window breaches the rate limit.
-         ///
-         /// The one place the two-bucket weighting is applied, so every gate -- the round record,
-         /// the short-round amendment, the config sweep and re-registration -- reads the same
-         /// number. Evaluating the current bucket alone is what makes a window tumble.
-         ///
-         /// @param producer the producer's row.
-         /// @param now_ms   on-chain time in milliseconds.
-         /// @param weights  the live score configuration.
-         /// @return true iff the weighted window exceeds the configured percentage.
-         bool breaches_miss_rate( const producer_info& producer, uint64_t now_ms,
-                                  const producer_rank::producer_score_config& weights ) const;
-
-      /// Attribute missed rounds to the producers the active schedule skipped, and demote any
+         /// Attribute missed rounds to the producers the active schedule skipped, and demote any
          /// that crossed the threshold. Runs on every block; see producer_pay.cpp.
          ///
          /// @param current_producer the producer of the block being processed.
@@ -919,41 +854,19 @@ namespace sysiosystem {
          void record_round_participation( const name& current_producer, uint32_t block_height );
 
          /**
-          * Amend a round already recorded as SERVED when the producer delivered too few blocks in
-          * it, counting it against the miss RATE.
+          * Record one scheduled round for `producer`, scored by how much of it was delivered.
           *
-          * A round is charged as missed only when the whole window goes unproduced, which leaves a
-          * producer free to deliver one block of twelve and read as fully available. This closes
-          * that gap without touching the consecutive gate: chronic partial delivery accumulates
-          * against the window and demotes on rate, while a total outage stays the streak's
-          * business and is caught within `max_consecutive_missed_rounds` rounds.
+          * A round counts as SERVED at `min_blocks_per_round` blocks or more and clears the miss
+          * streak; anything less -- including nothing at all -- increments it, and the streak
+          * reaching `max_consecutive_missed_rounds` demotes. ONE threshold, applied ONCE per
+          * round, at the transition where the block count is finally known.
           *
-          * The round was already counted in `rounds_in_window` when it began, so this adds only to
-          * `missed_rounds_in_window` -- it amends a recorded round rather than recording a second.
-          *
-          * @param producer         the producer whose round just ended.
+          * @param producer         the producer whose round this was.
           * @param blocks_delivered blocks it produced in that round.
           * @param weights          the live score configuration.
           */
-         void record_short_round( const name& producer, uint32_t blocks_delivered,
-                                  const producer_rank::producer_score_config& weights );
-
-         /// Charge one producer a missed round, demoting it if that crosses the threshold.
-         /**
-          * Record one scheduled round for `producer` -- made or missed -- rolling its miss window,
-          * updating the streak and the window counts, and applying both demotion gates.
-          *
-          * @param producer the producer whose round this was.
-          * @param missed   whether the round went unproduced.
-          * @param weights  the live score configuration.
-          */
-         void record_round_outcome( const name& producer, bool missed,
+         void record_round_outcome( const name& producer, uint32_t blocks_delivered,
                                     const producer_rank::producer_score_config& weights );
-
-         /// Re-derive `is_demoted` from the LIVE thresholds, then rescore. Sweep-only: a config
-         /// change is the one event that can leave a stored demotion flag disagreeing with the
-         /// rule that produced it.
-         void reconcile_and_rescore( const name& producer );
 
          /// Restart the rescore cursor from row 0 and flag the sweep pending -- every stored
          /// score is stale after a weight change (`setscorecfg`) or a collateral-minimum change

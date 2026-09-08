@@ -107,42 +107,22 @@ namespace sysiosystem {
             for( size_t stepped = 0; stepped < active_schedule.size(); ++stepped ) {
                if( slot == active_schedule.end() ) slot = active_schedule.begin();
                if( slot == current ) break;
-               record_round_outcome( *slot, /*missed*/ true, weights );
+               // Held a slot and delivered nothing.
+               record_round_outcome( *slot, /*blocks_delivered*/ 0, weights );
                ++slot;
             }
          }
       }
 
-      // The producer of this block is, by construction, not missing its round -- and a block is
-      // the strongest liveness proof there is, so it clears a DEMOTION as well as the streak.
-      //
-      // That matters because demotion and rescheduling are not simultaneous. A producer is demoted
-      // the moment its third miss lands, but it leaves the schedule only at the next rebuild, and
-      // when demotions drop the schedulable count below `min_schedule_size` the rebuild retains the
-      // last good schedule instead of publishing a short one -- so the demoted producers come back
-      // and keep producing under it. Without this, they would produce indefinitely while `payepoch`
-      // skipped them (the walk stops at the demoted tier), earning nothing until every operator
-      // pushed `regproducer` by hand. A mass outage is exactly the case that produces it.
-      //
-      // A demoted producer that is NOT in the active schedule never reaches this path, so recovery
-      // still requires `regproducer` for anyone the schedule has actually dropped.
-      {
+      // The outgoing producer's round just ended and its length is only known now, so a round is
+      // scored once, here. Every block from `round_start_block` to this one was its own, so the
+      // difference IS the count -- no per-block counter. Skipped across a schedule change, where
+      // the stored height belongs to a round that no longer exists.
+      if( schedule_unchanged && state.last_producer.value != 0 && state.round_start_block != 0
+          && block_height > state.round_start_block ) {
          producer_rank::producer_score_config_t weights_tbl( get_self() );
          const auto weights = weights_tbl.get_or_default( producer_rank::producer_score_config{} );
-
-         // The OUTGOING producer's round just ended, and only now is its length known. Every block
-         // from `round_start_block` up to this one belonged to it -- a round is a contiguous run of
-         // slots held by one producer -- so the difference is exactly the count it delivered.
-         //
-         // Attributed only when the schedule is unchanged, for the same reason the miss walk is:
-         // across a change the stored height belongs to a round that no longer exists. A zero
-         // stamp means no round has been measured yet.
-         if( schedule_unchanged && state.last_producer.value != 0 && state.round_start_block != 0
-             && block_height > state.round_start_block ) {
-            record_short_round( state.last_producer, block_height - state.round_start_block, weights );
-         }
-
-         record_round_outcome( current_producer, /*missed*/ false, weights );
+         record_round_outcome( state.last_producer, block_height - state.round_start_block, weights );
       }
 
       _global.modify( get_self(), [&]( auto& g ) {
@@ -151,119 +131,43 @@ namespace sysiosystem {
       });
    }
 
-   bool system_contract::breaches_miss_rate( const producer_info& producer, uint64_t now_ms,
-                                            const producer_rank::producer_score_config& weights ) const {
-      const uint64_t elapsed = producer.miss_window_open_ms == 0
-         ? weights.missed_round_window_ms                 // nothing recorded yet: no carry
-         : now_ms - producer.miss_window_open_ms;
-      const auto window = producer_rank::weighted_miss_window(
-         producer.rounds_in_window, producer.missed_rounds_in_window,
-         producer.prev_rounds_in_window, producer.prev_missed_rounds_in_window,
-         elapsed, weights );
-      return producer_rank::exceeds_miss_rate( window.rounds, window.missed, weights );
-   }
-
-   void system_contract::record_short_round( const name& producer, uint32_t blocks_delivered,
-                                             const producer_rank::producer_score_config& weights ) {
-      // Zero disables the check, leaving the whole-window rule alone.
-      if( weights.min_blocks_per_round == 0 ) return;
-      if( blocks_delivered >= weights.min_blocks_per_round ) return;
-
-      auto key = producer_key_t{producer.value};
-      if( !_producers.contains(key) ) return;
-
-      const uint64_t now_ms = static_cast<uint64_t>(
-         sysio::current_time_point().time_since_epoch().count() / 1000 );
-
-      _producers.modify( same_payer, key, [&]( auto& p ) {
-         // The window is NOT rolled here. This amends a round `record_round_outcome` already
-         // counted when it began, so rolling would discard the very count being amended.
-         p.missed_rounds_in_window++;
-
-         // The RATE gate only. The streak is deliberately untouched: a short round is degraded
-         // service, not an outage, and the consecutive gate exists to catch the latter fast. A
-         // producer delivering a fraction of every round is caught by the window instead, which
-         // is the "acceptable up to a point" the threshold encodes.
-         if( !p.is_demoted && breaches_miss_rate( p, now_ms, weights ) ) {
-            p.set_demoted( true );
-         }
-      });
-
-      // Only a DEMOTION moves the score here -- `missed_rounds_in_window` is not a scoring input --
-      // so an ordinary short round costs no rescore, and with it no cross-contract read.
-      if( _producers.get(key).is_demoted ) rescore_producer( producer );
-   }
-
-   void system_contract::record_round_outcome( const name& producer, bool missed,
+   void system_contract::record_round_outcome( const name& producer, uint32_t blocks_delivered,
                                                const producer_rank::producer_score_config& weights ) {
       auto key = producer_key_t{producer.value};
       if( !_producers.contains(key) ) return;
 
-      // On-chain time in ms, matching `missed_round_window_ms`. Microsecond precision from the
-      // intrinsic, divided down -- the window is measured in hours, so the units are what matter.
-      const uint64_t now_ms = static_cast<uint64_t>(
-         sysio::current_time_point().time_since_epoch().count() / 1000 );
+      // ONE verdict: SERVED at `min_blocks_per_round` or more, otherwise counted against the
+      // producer. Zero keeps only the wholly-unproduced case.
+      const bool served = weights.min_blocks_per_round == 0
+         ? blocks_delivered > 0
+         : blocks_delivered >= weights.min_blocks_per_round;
 
-      // Only the three fields below feed the score. `rounds_in_window` /
-      // `missed_rounds_in_window` do not, so the common case -- a healthy producer serving its
-      // round with the streak already at zero -- moves nothing and must not pay for a rescore.
-      // That matters because this runs on every round transition, and a rescore costs two
-      // CROSS-CONTRACT sysio.opreg reads plus two finalizer reads, inline in `onblock`.
       const auto before = _producers.get(key);
-      const auto before_streak   = before.consecutive_missed_rounds;
-      const auto before_demoted  = before.is_demoted;
-      const auto before_snapshot = before.snapshot_attestations;
+      const auto before_streak  = before.consecutive_missed_rounds;
+      const auto before_demoted = before.is_demoted;
 
       _producers.modify( same_payer, key, [&]( auto& p ) {
-         // Roll the window before recording into it. A producer that was off the schedule observed
-         // no rounds, so nothing accrued while it was away -- and if it stayed away longer than the
-         // window, its old counts lapse rather than greeting it on return. That is the WNS-47
-         // shape (stale per-period state resurrecting on re-entry) designed out at the source.
-         p.roll_miss_window( now_ms, weights.missed_round_window_ms );
-         p.rounds_in_window++;
-
-         if( !missed ) {
-            // A block is the strongest liveness proof there is: it clears the streak and, when the
-            // producer is still holding a schedule slot, the demotion with it. Demotion and
-            // rescheduling are not simultaneous, and the `min_schedule_size` floor can hold that
-            // gap open indefinitely -- without this those producers would produce for nothing,
-            // since `payepoch` stops at the demoted tier. The window counts are NOT cleared: one
-            // good round does not erase a day's record.
+         if( served ) {
+            // Serving clears the streak and the demotion. Demotion and rescheduling are not
+            // simultaneous -- the `min_schedule_size` floor can keep a demoted producer in the
+            // schedule -- so without this it would produce indefinitely for nothing.
             p.consecutive_missed_rounds = 0;
-            // A block clears the STREAK outright, and with it any demotion the consecutive gate
-            // caused -- that gate asks "are you offline right now", and this is the answer. It
-            // does NOT pardon the rate gate: one good round cannot erase a bad record, or a
-            // producer missing half its rounds would clear its demotion every time it managed
-            // one. So the flag is RE-DERIVED from the record rather than forced false. A producer
-            // still holding a slot climbs out by producing until its rate falls back under the
-            // limit; one the schedule has dropped uses `regproducer`, which opens a fresh window.
-            p.set_demoted( breaches_miss_rate( p, now_ms, weights ) );
+            p.is_demoted                = false;
             return;
          }
 
-         p.missed_rounds_in_window++;
          p.consecutive_missed_rounds++;
-         // Demotion is CATEGORICAL: it moves the producer into a tier no score can climb out of.
-         // There is no cooldown and no expiry, and the only two ways back are `regproducer` and
-         // producing a block while still in the active schedule -- the latter covering the window
-         // between a demotion and the rebuild that acts on it, which the schedule-size floor can
-         // hold open indefinitely.
-         const bool exceeds_consecutive = weights.max_consecutive_missed_rounds > 0
-            && p.consecutive_missed_rounds >= weights.max_consecutive_missed_rounds;
-         if( !p.is_demoted && ( exceeds_consecutive || breaches_miss_rate( p, now_ms, weights ) ) ) {
-            // `set_demoted` consumes the period's snapshot credit as the row leaves the walk.
-            p.set_demoted( true );
+         // Categorical: a tier no score climbs out of. Back via `regproducer`, or by serving a
+         // round while still scheduled.
+         if( producer_rank::warrants_demotion( p.consecutive_missed_rounds, weights ) ) {
+            p.is_demoted = true;
          }
       });
 
-      // The round moved the participation factor, or a demotion moved the tier, or a demotion
-      // consumed the snapshot credit -- any of the three leaves the stored sort key stale. None of
-      // them moved, and there is nothing to restate. A demoted producer keeps its block count: it
-      // is paid for those blocks at the first payepoch where it is payable again.
+      // Only these two feed the score, and a rescore costs two cross-contract opreg reads on an
+      // `onblock` path -- so a round that moved neither pays nothing.
       const auto after = _producers.get(key);
-      if( after.consecutive_missed_rounds != before_streak
-          || after.is_demoted             != before_demoted
-          || after.snapshot_attestations  != before_snapshot ) {
+      if( after.consecutive_missed_rounds != before_streak || after.is_demoted != before_demoted ) {
          rescore_producer( producer );
       }
    }
@@ -293,7 +197,7 @@ namespace sysiosystem {
          batch.push_back( it->owner );
       }
       for( const auto& producer : batch ) {
-         reconcile_and_rescore( producer );
+         rescore_producer( producer );
       }
 
       _global.modify( get_self(), [&]( auto& g ) {

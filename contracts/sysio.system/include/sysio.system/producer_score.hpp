@@ -4,6 +4,7 @@
 #include <sysio/opp/types/types.pb.hpp>
 #include <sysio.opreg/sysio.opreg.hpp>
 
+#include <sysio.system/emissions.hpp>
 #include <sysio.system/opreg_status.hpp>
 #include <sysio.system/producer_rank.hpp>
 #include <sysio.system/sysio.system.hpp>
@@ -306,6 +307,17 @@ namespace sysiosystem {
        * @param producers the producers table.
        * @param producer  the producer to rescore; a name with no row is ignored.
        */
+      /**
+       * The pay period now open, which is what a snapshot credit is stamped against.
+       *
+       * @param self the system account.
+       * @return the open period's start epoch, or 0 before T5 emissions are initialised.
+       */
+      inline uint32_t current_pay_period(const sysio::name& self) {
+         emissions::t5state_t t5s(self);
+         return t5s.exists() ? t5s.get().period_start_epoch : 0;
+      }
+
       inline void rescore(const sysio::name& self, producers_table& producers, const sysio::name& producer) {
          const auto key = producer_key_t{producer.value};
          if (!producers.contains(key)) return;
@@ -321,33 +333,15 @@ namespace sysiosystem {
                .is_active                 = info.active(),
                .is_demoted                = info.is_demoted,
                .consecutive_missed_rounds = info.consecutive_missed_rounds,
-               .snapshot_attestations     = info.snapshot_attestations
+               // Stale credit does not count -- see `producer_info::snapshot_period`.
+               .snapshot_attestations     = info.snapshot_period == current_pay_period(self)
+                                               ? info.snapshot_attestations : 0
             },
             weights);
 
          if (score == info.rank_score) return;   // no index move needed
 
-         // Consume the period's snapshot credit on the way OUT of the pay walk, whichever event
-         // caused it. Demotion and `unregprod` clear it at their own sites, but they are not the
-         // only exits: deleting the last finalizer key, losing ACTIVE producer status in opreg,
-         // and falling under a RAISED collateral minimum all sink the row here and only here.
-         // `payepoch` stops at the demoted tier, so a credit carried out through one of those
-         // doors is never reset and reappears at full marks on the way back.
-         //
-         // ONE DIRECTION ONLY, and that is the whole difference from the re-entry heuristic this
-         // replaces. That version tried to infer a stale credit from a tier change on the way IN,
-         // where a row may be re-entering and freshly credited in the same block and the tier
-         // cannot tell the two apart -- so it consumed credit that had just been earned. Leaving
-         // the walk carries no such ambiguity: whatever the row holds belongs to a period it is
-         // no longer in.
-         const bool was_in_walk = tier_of(info.rank_score) != producer_tier::demoted;
-         const bool now_in_walk = tier_of(score) != producer_tier::demoted;
-         const bool left_the_walk = was_in_walk && !now_in_walk;
-
-         producers.modify(same_payer, key, [&](auto& row) {
-            row.rank_score = score;
-            if (left_the_walk) row.snapshot_attestations = 0;
-         });
+         producers.modify(same_payer, key, [&](auto& row) { row.rank_score = score; });
       }
 
    } // namespace producer_rank

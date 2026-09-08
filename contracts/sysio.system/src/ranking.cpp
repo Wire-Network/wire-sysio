@@ -25,10 +25,6 @@ namespace sysiosystem {
    void system_contract::register_producer( const name& producer, const sysio::block_signing_authority& producer_authority, const std::string& url, uint16_t location ) {
       const auto ct = current_time_point();
 
-      producer_rank::producer_score_config_t weights_tbl( get_self() );
-      const auto     weights = weights_tbl.get_or_default( producer_rank::producer_score_config{} );
-      const uint64_t now_ms  = static_cast<uint64_t>( ct.time_since_epoch().count() / 1000 );
-
       sysio::public_key producer_key{};
 
       std::visit( [&](auto&& auth ) {
@@ -60,38 +56,12 @@ namespace sysiosystem {
             info.producer_authority = producer_authority;
             if ( info.last_claim_time == time_point() )
                info.last_claim_time = ct;
-            // regproducer is the door back for a producer the schedule has DROPPED -- a voluntary
-            // `unregprod` park, an involuntary demotion, or a participation penalty that pushed it
-            // below the active set (the streak clears only by producing, and a producer that is not
-            // scheduled cannot produce). `unregprod` erases the signing key, so re-registering has
-            // to re-supply it, which makes this a genuine assertion of readiness rather than a
-            // no-op. There is deliberately no cooldown and no expiry: a producer that comes back
-            // before it is ready is demoted again within max_consecutive_missed_rounds rounds,
-            // which is self-correcting. A demoted producer that is still in the active schedule
-            // recovers on its own by producing -- see `record_round_participation`.
-            // Clears the DEMOTION, not the record. `regproducer` costs nothing but a signature
-            // and may be repeated, so clearing the streak here would let an offline operator cron
-            // its way back to healthy after every second miss and never produce a block -- the
-            // demotion model would stop meaning anything. The streak survives and clears only by
-            // PRODUCING, so a producer that returns unready is demoted again on its next missed
-            // round; until it produces, the participation factor keeps scoring it accordingly.
-            //
-            // `regproducer` answers the CONSECUTIVE gate and nothing else. That gate asks "are
-            // you offline right now", and re-supplying a signing key is a real answer to it, so
-            // a demotion it caused clears outright.
-            //
-            // It is NOT an answer to the rate gate, which is a claim about a RECORD. Gating the
-            // window reset on `is_demoted` alone was still a loop: a producer demoted on rate can
-            // call this immediately, before any rebuild drops it, and re-registering after every
-            // demotion made chronic short-round delivery unpunishable -- short rounds never touch
-            // the consecutive counter, so preserving the streak protected nothing.
-            //
-            // So the window is rolled only when it has genuinely LAPSED, and the flag is then
-            // re-derived from whatever remains. A producer serving out a rate demotion has to
-            // spend the window without a slot; one whose record has aged out is back immediately.
-            // Time is what heals it, which is also why this can never become a lockout.
-            info.roll_miss_window( now_ms, weights.missed_round_window_ms );
-            info.is_demoted = breaches_miss_rate( info, now_ms, weights );
+            // The door back for a producer the schedule dropped. Clears the DEMOTION, not the
+            // streak: `regproducer` costs only a signature and may be repeated, so clearing the
+            // streak would let an offline operator cron its way back and never serve a round. The
+            // streak clears by SERVING one. No cooldown -- a producer that returns unready is
+            // demoted again on its next unserved round.
+            info.is_demoted = false;
          });
 
       // The clear above changes the producer's tier, so its sort key is stale until rescored.
@@ -100,42 +70,6 @@ namespace sysiosystem {
 
    void system_contract::rescore_producer( const name& producer ) {
       producer_rank::rescore( get_self(), _producers, producer );
-   }
-
-   void system_contract::reconcile_and_rescore( const name& producer ) {
-      auto key = producer_key_t{producer.value};
-      if( !_producers.contains(key) ) return;
-
-      producer_rank::producer_score_config_t weights_tbl( get_self() );
-      const auto weights = weights_tbl.get_or_default( producer_rank::producer_score_config{} );
-      const auto info    = _producers.get(key);
-
-      // A LOWERED RATE threshold has to reach the windows that already breach it. The rate gate is
-      // the one that cannot self-correct: a producer the schedule has dropped observes no rounds,
-      // so its recorded rate never improves, and without this a tightened limit would never bind on
-      // exactly the producers it was tightened to catch. This runs only on the sweep, which the
-      // config change itself opens, so an ordinary rescore never re-derives the flag.
-      //
-      // The CONSECUTIVE gate is deliberately NOT reconciled here, and that is load-bearing rather
-      // than an omission. `regproducer` clears the demotion and the window but preserves the
-      // streak, so a pardoned producer sits at (is_demoted == false, streak >= threshold) until it
-      // produces. Re-deriving the consecutive gate on that row would re-demote it with no new miss,
-      // and -- being unscheduled -- it could never produce the block that is its only other door
-      // back, so every subsequent sweep would undo `regproducer` again: a permanent lockout. The
-      // gate loses nothing by waiting. It asks "are you offline right now", which only an OBSERVED
-      // round can answer, and `record_round_outcome` evaluates the live threshold on every miss --
-      // so a lowered limit binds on the producer's very next missed round.
-      //
-      // A RAISED threshold deliberately does NOT un-demote anyone. Demotion is categorical: it
-      // clears by producing a block while still scheduled, or by `regproducer`. Governance
-      // widening the tolerance is not a pardon for producers already judged under the old one, and
-      // either door back is open to them immediately.
-      const uint64_t now_ms = static_cast<uint64_t>(
-         sysio::current_time_point().time_since_epoch().count() / 1000 );
-      if( !info.is_demoted && breaches_miss_rate( info, now_ms, weights ) ) {
-         _producers.modify( same_payer, key, []( auto& p ) { p.set_demoted( true ); });
-      }
-      rescore_producer( producer );
    }
 
    void system_contract::onprocessprod( name account, bool, bool ) {
@@ -147,28 +81,6 @@ namespace sysiosystem {
 
    void system_contract::setscorecfg( const producer_rank::producer_score_config& weights ) {
       require_auth( get_self() );
-
-      // A miss percentage is a percentage.
-      check( weights.max_pct_missed_rounds_in_window <= 100,
-             "max_pct_missed_rounds_in_window cannot exceed 100" );
-
-      // The rate gate's minimum sample is DERIVED from the consecutive threshold
-      // (max_consecutive * 100 / max_pct), so the two settings are not independent: at
-      // max_consecutive == 0 the sample floor collapses to zero and the rate gate fires on a
-      // sample of ONE, where a single missed round is a 100% miss rate. That inverts the field's
-      // meaning -- zero reads as "disable the consecutive gate" and would instead demote every
-      // producer on its first missed slot, dropping the schedulable count below
-      // `min_schedule_size` chain-wide. Disabling a gate is spelled by zeroing THAT gate's own
-      // percentage, so require the pair to be coherent instead.
-      check( weights.max_pct_missed_rounds_in_window == 0 || weights.max_consecutive_missed_rounds > 0,
-             "max_consecutive_missed_rounds must be positive while the rate gate is armed" );
-      check( weights.max_pct_missed_rounds_in_window == 0 || weights.missed_round_window_ms > 0,
-             "missed_round_window_ms must be positive while the rate gate is armed" );
-
-      // `rate_gate_minimum_sample` computes `max_consecutive * 100`, so cap the input well below
-      // the point that multiply wraps a uint32.
-      check( weights.max_consecutive_missed_rounds <= max_consecutive_missed_rounds_limit,
-             "max_consecutive_missed_rounds is unreasonably large" );
 
       // Every factor is multiplied by its weight and summed. `mul_sat` keeps a single term from
       // wrapping, but a configuration whose weights cannot be told apart is still useless, so
@@ -238,9 +150,6 @@ namespace sysiosystem {
       _producers.get( key, "producer not found" );
       _producers.modify( get_self(), key, [&]( producer_info& info ){
          info.deactivate();
-         // A park leaves the pay walk exactly as a demotion does, so it consumes the period's
-         // snapshot credit for the same reason -- see `record_round_outcome`.
-         info.snapshot_attestations = 0;
       });
 
       // A parked row scores into the demoted tier, so the sort key is stale until rescored. This

@@ -212,29 +212,17 @@ namespace sysiosystem {
          /// factor. The counter is reset on the same cadence as the block counters, so this is the
          /// window's target rather than an all-time total.
          uint32_t snapshot_target_attestations = 1;
-         /// Rolling window the miss RATE below is measured over, in milliseconds. Mirrors
-         /// `sysio.opreg`'s `terminate_window_ms`, which is the batch-operator equivalent: a
-         /// producer and a batch operator should answer to the same shape of availability test
-         /// even though a producer is DEMOTED where an operator is terminated.
-         uint64_t missed_round_window_ms = 24ULL * 60 * 60 * 1000;
-
-         /// Percent of its scheduled rounds a producer may miss inside that window before it is
-         /// demoted. Mirrors `terminate_max_pct_misses_24h`. Zero disables the rate gate, leaving
-         /// only the consecutive one.
-         uint32_t max_pct_missed_rounds_in_window = 5;
-
-         /// Blocks a producer must deliver within its own round for that round to count as served.
+         /// Blocks a producer must deliver within its own round for that round to count as SERVED.
          ///
-         /// A round is a contiguous run of slots held by one producer, and delivering a single
-         /// block in it used to be indistinguishable from delivering all of them: the miss walk
-         /// charges a round only when the WHOLE window goes unproduced, so a producer could hold a
-         /// scheduled slot indefinitely while delivering a fraction of it. A short round now counts
-         /// against the RATE gate -- chronic partial delivery demotes over the window -- while the
-         /// CONSECUTIVE gate stays reserved for rounds that produced nothing at all, so a total
-         /// outage is still caught quickly and a degraded node is given the window to recover in.
+         /// This is the whole round verdict. A round is a contiguous run of slots held by one
+         /// producer; delivering this many or more clears the miss streak, anything less --
+         /// including nothing at all -- increments it. Without a threshold, one block of twelve was
+         /// indistinguishable from twelve, so a producer could hold a scheduled slot indefinitely
+         /// while delivering a fraction of it.
          ///
-         /// Zero disables the check, leaving the whole-window rule alone. The default is half a
-         /// standard 12-slot round, matching the threshold the retired per-round pay model used.
+         /// Zero disables the check, leaving only a wholly unproduced round as a miss. The default
+         /// is half a standard 12-slot round, matching the threshold the retired per-round pay
+         /// model used.
          ///
          /// DECLARED LAST, matching the tail of SYSLIB_SERIALIZE below.
          uint32_t min_blocks_per_round = 6;
@@ -244,7 +232,6 @@ namespace sysiosystem {
             (collateral_weight)(participation_weight)(snapshot_weight)
             (relay_weight)(api_weight)(benchmark_weight)
             (max_consecutive_missed_rounds)(snapshot_target_attestations)
-            (missed_round_window_ms)(max_pct_missed_rounds_in_window)
             (min_blocks_per_round))
       };
 
@@ -253,97 +240,20 @@ namespace sysiosystem {
       using producer_score_config_t = sysio::kv::global<"prodscorecfg"_n, producer_score_config>;
 
       /**
-       * The observed-round sample the rate gate needs before it may fire, DERIVED rather than
-       * configured: the count at which the two gates agree. Below it the consecutive gate is
-       * strictly the stricter of the two, so the rate gate would add nothing except the power to
-       * demote a producer on its very first missed round -- at a sample of one, a single miss is a
-       * 100% miss rate.
+       * Whether a producer's miss streak warrants demotion.
        *
-       * @param weights the live score configuration.
-       * @return the minimum observed rounds before the rate gate applies.
-       */
-      inline uint32_t rate_gate_minimum_sample(const producer_score_config& weights) {
-         if (weights.max_pct_missed_rounds_in_window == 0) return 0;
-         return weights.max_consecutive_missed_rounds * 100u
-              / weights.max_pct_missed_rounds_in_window;
-      }
-
-      /**
-       * Whether a producer's recorded window breaches the miss-RATE gate.
+       * One gate, one question: has it failed to serve its round this many times running? A round
+       * is served at `min_blocks_per_round` blocks or more, so a producer delivering a fraction of
+       * every round accrues the streak exactly as one that produces nothing does.
        *
-       * @param rounds  scheduled rounds observed in the window.
-       * @param missed  how many of them went unproduced.
-       * @param weights the live score configuration.
-       * @return true iff the rate gate is armed and exceeded.
-       */
-      inline bool exceeds_miss_rate(uint64_t rounds, uint64_t missed,
-                                    const producer_score_config& weights) {
-         if (weights.max_pct_missed_rounds_in_window == 0) return false;
-         if (rounds < rate_gate_minimum_sample(weights)) return false;
-         if (rounds == 0) return false;
-         return (missed * 100u / rounds) > weights.max_pct_missed_rounds_in_window;
-      }
-
-      /// Rounds and misses the trailing window covers, from the two-bucket approximation.
-      struct miss_window_view {
-         uint64_t rounds = 0;
-         uint64_t missed = 0;
-      };
-
-      /**
-       * Weight the previous bucket by the fraction of it the trailing window still covers.
-       *
-       * One bucket emptied at its duration is a TUMBLING window, and a tumbling window is
-       * evadable: with a 5-round minimum and a 40% limit, `GGGSS | SSGGG` reads 40% in each
-       * bucket while the trailing five rounds are `GSSSS` -- 80%. `miss_window_open_ms` is
-       * on-chain, so the boundary can be targeted deliberately, and short rounds do not advance
-       * the consecutive gate that would otherwise catch it.
-       *
-       * Counting the previous bucket in proportion to how much of it remains inside the window
-       * closes that: at elapsed = 0 it counts in full, at elapsed = window it counts for nothing.
-       * The result is an estimate rather than a per-observation truth, which is the trade for
-       * O(1) state on a path `onblock` runs.
-       *
-       * @param rounds      scheduled rounds observed in the CURRENT bucket.
-       * @param missed      how many of them went unproduced or came up short.
-       * @param prev_rounds the previous bucket's rounds.
-       * @param prev_missed the previous bucket's misses.
-       * @param elapsed_ms  how long the current bucket has been open.
-       * @param weights     the live score configuration.
-       * @return the weighted view the rate gate is evaluated against.
-       */
-      inline miss_window_view weighted_miss_window(uint32_t rounds, uint32_t missed,
-                                                   uint32_t prev_rounds, uint32_t prev_missed,
-                                                   uint64_t elapsed_ms,
-                                                   const producer_score_config& weights) {
-         const uint64_t window = weights.missed_round_window_ms;
-         if (window == 0 || elapsed_ms >= window) {
-            return { rounds, missed };
-         }
-         const uint64_t remaining = window - elapsed_ms;
-         return {
-            static_cast<uint64_t>(rounds) + static_cast<uint64_t>(prev_rounds) * remaining / window,
-            static_cast<uint64_t>(missed) + static_cast<uint64_t>(prev_missed) * remaining / window
-         };
-      }
-
-      /**
-       * Whether a producer's recorded misses warrant demotion, under BOTH gates.
-       *
-       * The two mirror `sysio.opreg::termcheck`: a consecutive run says "you are offline right
-       * now", a rate over a rolling window says "you are chronically unreliable". Either demotes.
-       *
-       * @param consecutive_missed_rounds the producer's current streak.
-       * @param rounds                    scheduled rounds observed in the window.
-       * @param missed                    how many of them went unproduced.
+       * @param consecutive_missed_rounds rounds in a row it failed to serve.
        * @param weights                   the live score configuration.
-       * @return true iff the producer should be demoted.
+       * @return true iff the streak has reached the configured limit.
        */
-      inline bool warrants_demotion(uint32_t consecutive_missed_rounds, uint32_t rounds,
-                                    uint32_t missed, const producer_score_config& weights) {
-         const bool exceeds_consecutive = weights.max_consecutive_missed_rounds > 0
-            && consecutive_missed_rounds >= weights.max_consecutive_missed_rounds;
-         return exceeds_consecutive || exceeds_miss_rate(rounds, missed, weights);
+      inline bool warrants_demotion(uint32_t consecutive_missed_rounds,
+                                    const producer_score_config& weights) {
+         return weights.max_consecutive_missed_rounds > 0
+             && consecutive_missed_rounds >= weights.max_consecutive_missed_rounds;
       }
 
       /**

@@ -106,30 +106,19 @@ void require_snapshot_producer_eligibility(name self, name producer) {
 /// finalized, so without this counter there is no attestation history to score. Reset on the same
 /// `payepoch` cadence as the block counters, which supplies the trailing window.
 void credit_snapshot_attestations(name self, const std::vector<name>& voters) {
-   producers_table  producers(self);
-   finalizers_table finalizers(self);
+   producers_table producers(self);
+   const uint32_t  current_period = producer_rank::current_pay_period(self);
    for (const auto& voter : voters) {
       auto key = producer_key_t{voter.value};
       if (!producers.contains(key)) continue;
-      // Only a producer currently IN the pay walk earns credit. The counter is a rating of the
-      // CURRENT pay period and `payepoch` -- the only thing that resets it -- stops at the demoted
-      // tier, so a credit handed to a row outside the walk is never cleared: it accumulates for as
-      // long as the producer stays out and then re-enters at full marks, outranking producers that
-      // actually served the period it returns into.
-      //
-      // The test is the SAME PAIR the pay walk applies: the row's tier, and live schedulability.
-      // Neither alone is enough. `is_demoted` misses a parked row -- `unregprod` clears
-      // `is_active` and lets the rescore sink it by TIER, so the flag stays false -- while
-      // `is_schedulable` misses a miss-demoted one, because it tests the active row, opreg status
-      // and finalizer key and never looks at the tier. A producer outside the walk that keeps
-      // voting is not a fault to reject, just service that earns no rating, so this skips
-      // silently.
-      const auto& row = producers.get(key);
-      if (producer_rank::tier_of(row.rank_score) == producer_tier::demoted
-          || !producer_rank::is_schedulable(row, finalizers)) {
-         continue;
-      }
-      producers.modify(same_payer, key, [](auto& row) { row.snapshot_attestations++; });
+      // Stamped with its pay period; `compute` ignores a stale one. No exit has to consume it.
+      producers.modify(same_payer, key, [&](auto& row) {
+         if (row.snapshot_period != current_period) {
+            row.snapshot_period       = current_period;
+            row.snapshot_attestations = 0;
+         }
+         row.snapshot_attestations++;
+      });
       // The credit moved the snapshot factor, so the stored sort key is stale until rescored.
       // Without this the factor would reach the index only on the next unrelated rescore.
       producer_rank::rescore(self, producers, voter);

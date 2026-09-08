@@ -216,9 +216,6 @@ namespace sysiosystem {
       check( _producers.contains(key), "producer not found" );
       _producers.modify( get_self(), key, [&](auto& p) {
             p.deactivate();
-            // A removed producer leaves the pay walk exactly as a park does, so it consumes the
-            // period's snapshot credit for the same reason -- see `producer_info::set_demoted`.
-            p.snapshot_attestations = 0;
          });
 
       // The deactivation sinks this row to the demoted tier, so its sort key is stale until
