@@ -1989,18 +1989,6 @@ public:
          ("eth_address", eth_address));
    }
 
-   // Serialize through the upgraded ABI while omitting its trailing extension. The resulting
-   // four-field bytes are the exact pre-WIRE-352 action shape used by legacy callers.
-   action_result nodeownreg_legacy(const name& owner, uint8_t tier,
-                                   const fc::crypto::public_key& eth_pub_key,
-                                   const fc::crypto::public_key& wire_pub_key) {
-      return push_action(ROA, "nodeownreg"_n, mvo()
-         ("owner", owner)
-         ("tier", tier)
-         ("eth_pub_key", eth_pub_key)
-         ("wire_pub_key", wire_pub_key));
-   }
-
    // Create the claim account in-flow (depot path) with `wire_pub_key` as owner/active.
    action_result newnameduser(const name& account, const fc::crypto::public_key& wire_pub_key, uint8_t tier) {
       return push_action(ROA, "newnameduser"_n, mvo()
@@ -2063,26 +2051,6 @@ BOOST_FIXTURE_TEST_CASE( nodeownreg_happy_path, sysio_roa_nodeownreg_tester ) tr
    // nodeownreg returning success implies the inline recordlink ({sysio.authex, active}) was
    // authorized and ran -- an unauthorized inline send would have aborted the whole transaction.
    // recordlink's own table effects are covered by the sysio.authex unit tests.
-} FC_LOG_AND_RETHROW()
-
-BOOST_FIXTURE_TEST_CASE( nodeownreg_accepts_legacy_four_field_payload,
-                         sysio_roa_nodeownreg_tester ) try {
-   const auto owner    = "claimacct"_n;
-   const auto wire_pub = gen_k1_key();
-   const auto eth_pub  = gen_em_key();
-
-   BOOST_REQUIRE_EQUAL(success(), newnameduser(owner, wire_pub, 2));
-   produce_blocks();
-
-   BOOST_REQUIRE_EQUAL(success(), nodeownreg_legacy(owner, 2, eth_pub, wire_pub));
-   produce_blocks();
-
-   auto reg = get_nodeowner(owner);
-   BOOST_REQUIRE(!reg.is_null());
-   BOOST_REQUIRE_EQUAL(reg["tier"].as<uint32_t>(), 2);
-   auto audit = get_nodeownerreg(owner);
-   BOOST_REQUIRE(!audit.is_null());
-   BOOST_REQUIRE_EQUAL(audit["status"].as<uint64_t>(), CONFIRMED);
 } FC_LOG_AND_RETHROW()
 
 // Existing account controlled by a different key than the claim -> REJECTED/ACCOUNT_KEY_MISMATCH.

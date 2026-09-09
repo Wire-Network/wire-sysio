@@ -146,17 +146,6 @@ public:
          ("native_address", native_address));
    }
 
-   // Serialize through the upgraded ABI while omitting its trailing extension. The resulting
-   // three-field bytes are the exact pre-WIRE-352 action shape used by legacy callers.
-   action_result recordlink_legacy(const account_name& signer, const name& account,
-                                   ChainKind chain_kind,
-                                   const fc::crypto::public_key& pub_key) {
-      return push_action(signer, "recordlink"_n, mvo()
-         ("account", account)
-         ("chain_kind", chain_kind)
-         ("pub_key", pub_key));
-   }
-
    action_result onreward(const std::vector<char>& native_address, uint64_t amount,
                           ChainKind chain_kind = ChainKind::CHAIN_KIND_EVM) {
       return sysio_system::test_support::push_contract_action_and_produce_block(
@@ -306,30 +295,6 @@ BOOST_FIXTURE_TEST_CASE( createlink_eth_sweeps_prelink_dclaim_rewards, sysio_aut
    auto pending = get_dclaim_row("pclaims"_n, "pending_claim", "alice"_n.to_uint64_t());
    BOOST_REQUIRE(!pending.is_null());
    BOOST_REQUIRE_EQUAL(pending["balance"].as<asset>().get_amount(), 5000);
-} FC_LOG_AND_RETHROW()
-
-BOOST_FIXTURE_TEST_CASE( recordlink_accepts_legacy_three_field_payload, sysio_authex_tester ) try {
-   deploy_dclaim();
-   const auto public_key = fc::crypto::private_key::generate(
-      fc::crypto::private_key::key_type::em).get_public_key();
-   const auto address_bytes = fc::crypto::ethereum::address_to_bytes(public_key);
-   const std::vector<char> native_address(address_bytes.begin(), address_bytes.end());
-
-   BOOST_REQUIRE_EQUAL(success(), onreward(native_address, 6000));
-   BOOST_REQUIRE(!get_dclaim_row("unmapped"_n, "unmapped_token", 1).is_null());
-
-   BOOST_REQUIRE_EQUAL(success(), recordlink_legacy(
-      AUTHEX, "bob"_n, ChainKind::CHAIN_KIND_EVM, public_key));
-   produce_blocks();
-
-   auto link = get_link(0);
-   BOOST_REQUIRE(!link.is_null());
-   BOOST_REQUIRE_EQUAL(link["username"].as<name>(), "bob"_n);
-   BOOST_REQUIRE_EQUAL(link["pub_key"].as<fc::crypto::public_key>(), public_key);
-   // Absence of the extension preserves legacy semantics: link creation succeeds
-   // without attempting a DClaim sweep that the old payload could not identify.
-   BOOST_REQUIRE(!get_dclaim_row("unmapped"_n, "unmapped_token", 1).is_null());
-   BOOST_REQUIRE(get_dclaim_row("pclaims"_n, "pending_claim", "bob"_n.to_uint64_t()).is_null());
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( recordlink_records_link_when_dclaim_is_missing, sysio_authex_tester ) try {

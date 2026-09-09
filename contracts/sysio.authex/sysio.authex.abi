@@ -84,7 +84,7 @@
                 },
                 {
                     "name": "native_address",
-                    "type": "bytes$"
+                    "type": "bytes"
                 }
             ]
         }

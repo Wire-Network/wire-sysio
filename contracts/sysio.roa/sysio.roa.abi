@@ -261,7 +261,7 @@
                 },
                 {
                     "name": "eth_address",
-                    "type": "bytes$"
+                    "type": "bytes"
                 }
             ]
         },

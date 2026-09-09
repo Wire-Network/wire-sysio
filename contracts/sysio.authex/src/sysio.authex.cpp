@@ -189,7 +189,7 @@ namespace sysio {
 // aborts, including during a staged rollout where sysio.dclaim is absent or not yet privileged.
 [[sysio::action]] void authex::recordlink(const name& account, const opp::types::ChainKind chain_kind,
                                           const public_key& pub_key,
-                                          const binary_extension<bytes>& native_address) {
+                                          const bytes& native_address) {
    require_auth(get_self());
 
    const bool valid_evm = chain_kind == opp::types::ChainKind::CHAIN_KIND_EVM
@@ -198,8 +198,7 @@ namespace sysio {
                        && pub_key.index() == fc::crypto::key_type_ed;
    if (!valid_evm && !valid_svm) return;
    const size_t expected_size = valid_evm ? evm_address_size : svm_address_size;
-   const bool can_sweep = native_address.has_value()
-                       && native_address->size() == expected_size;
+   const bool can_sweep = native_address.size() == expected_size;
 
    links_t links(get_self());
    auto by_namechain = links.get_index<"bynamechain"_n>();
@@ -216,7 +215,7 @@ namespace sysio {
    auto existing = by_namechain.find(to_namechain_key(account, chain_kind));
    if (existing != by_namechain.end()) {
       if (existing->pub_key == pub_key && can_sweep) {
-         sweep_linked_rewards(get_self(), account, chain_kind, *native_address);
+         sweep_linked_rewards(get_self(), account, chain_kind, native_address);
       }
       return;
    }
@@ -234,7 +233,7 @@ namespace sysio {
    });
 
    if (can_sweep) {
-      sweep_linked_rewards(get_self(), account, chain_kind, *native_address);
+      sweep_linked_rewards(get_self(), account, chain_kind, native_address);
    }
 }
 

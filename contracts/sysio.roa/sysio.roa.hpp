@@ -6,7 +6,6 @@
 #include <sysio/kv_global.hpp>
 #include <sysio/system.hpp> // For current_block_number
 #include <sysio/asset.hpp>
-#include <sysio/binary_extension.hpp>
 #include <sysio/dispatcher.hpp> // For SYSIO_DISPATCH of native action
 #include <sysio/privileged.hpp>
 
@@ -144,14 +143,13 @@ namespace sysio {
              * @param eth_pub_key  The depositor's ETH public key (Wire PUB_EM format); recorded as the link.
              * @param wire_pub_key The Wire account owner/active key the claim specified; an existing
              *                     account must be controlled by exactly this key or the claim is rejected.
-             * @param eth_address  Optional depositor 20-byte ETH address. Upgraded callers append it
-             *                     to sweep DClaim rewards deposited before the link existed; legacy
-             *                     four-field payloads omit it and retain the pre-sweep behavior.
+             * @param eth_address  Depositor 20-byte ETH address used to sweep DClaim rewards
+             *                     deposited before the link existed.
              */
             [[sysio::action]]
             void nodeownreg(const name& owner, const uint8_t& tier, const public_key& eth_pub_key,
                             const public_key& wire_pub_key,
-                            const binary_extension<bytes>& eth_address);
+                            const bytes& eth_address);
 
             /**
              * @brief Creates a new user account on the network and records the sponsor mapping.
@@ -181,7 +179,8 @@ namespace sysio {
             /**
              * @brief Create a node-owner account with a user-chosen (vanity) name and the holder's
              * K1 key as owner/active, funded with the fixed newaccount_ram from sysio's pool. The
-             * create step of the OPP NFT claim flow (create -> createlink -> nodeownreg).
+             * create step of the OPP NFT claim flow (newnameduser -> nodeownreg, whose inline
+             * recordlink records the external-chain link and sweeps pre-link rewards).
              *
              * Dispatched by the OPP depot (sysio.msgch) as {sysio.roa, active} via delegation, like
              * nodeownreg. Idempotent: a no-op if the account already exists. Tier-based name rules:

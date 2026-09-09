@@ -6,8 +6,8 @@ nodeownreg_test.py — OPP Node Owner NFT Registration integration test (create-
 Drives sysio.roa the way the depot (sysio.msgch) does for an inbound NodeOwnerRegistration,
 pushing the two inline actions directly as sysio.roa:
   1. newnameduser(account, wire_key, tier)        -- create the claim account
-  2. nodeownreg(account, tier, eth_key, wire_key[, eth_address])
-                                                   -- register + inline-record the ETH link
+  2. nodeownreg(account, tier, eth_key, wire_key, eth_address)
+                                                  -- register + inline-record the ETH link
 
 Verifies the nodeowners + nodeownerreg tables, plus the soft-fail (audit row) and hard-fail paths.
 The sysio.authex.active <- sysio.roa@sysio.code delegation that the inline recordlink needs is wired
@@ -73,14 +73,6 @@ def push_nodeownreg(node, owner, tier, eth_address, eth_key, wire_key, silent=Fa
                             "--permission sysio.roa@active", silentErrors=silent)
 
 
-def push_nodeownreg_legacy(node, owner, tier, eth_key, wire_key, silent=False):
-    """Push the pre-WIRE-352 four-field action shape (no trailing binary extension)."""
-    data = json.dumps({"owner": owner, "tier": tier,
-                       "eth_pub_key": eth_key, "wire_pub_key": wire_key})
-    return node.pushMessage("sysio.roa", "nodeownreg", data,
-                            "--permission sysio.roa@active", silentErrors=silent)
-
-
 def get_nodeowner(node, owner):
     """nodeowners row for owner (scope = network_gen = 0); kv::table rows wrap the struct in 'value'."""
     rows = node.getTableRows("sysio.roa", "0", "nodeowners")
@@ -140,23 +132,6 @@ try:
     audit = get_audit(node, owner)
     assert audit is not None and int(audit["status"]) == CONFIRMED, f"expected CONFIRMED, got {audit}"
     Utils.Print(f"  Verified: {owner} registered tier-2, audit CONFIRMED")
-
-    # ---- Test 1b: the pre-WIRE-352 payload remains valid after contract rollout ----
-    Utils.Print("=== Test 1b: legacy four-field nodeownreg payload ===")
-    legacy_owner = "claimacct1b"
-    legacy_wire_key = wallet_create_key(walletMgr.host, walletMgr.port, "K1")
-    legacy_eth_key = wallet_create_key(walletMgr.host, walletMgr.port, "EM")
-    assert push_newnameduser(node, legacy_owner, legacy_wire_key, 2)[0], \
-        "legacy newnameduser failed"
-    assert push_nodeownreg_legacy(node, legacy_owner, 2, legacy_eth_key, legacy_wire_key)[0], \
-        "legacy nodeownreg payload failed"
-    legacy_reg = get_nodeowner(node, legacy_owner)
-    legacy_audit = get_audit(node, legacy_owner)
-    assert legacy_reg is not None and int(legacy_reg["tier"]) == 2, \
-        f"legacy node owner registration missing: {legacy_reg}"
-    assert legacy_audit is not None and int(legacy_audit["status"]) == CONFIRMED, \
-        f"legacy nodeownreg expected CONFIRMED, got {legacy_audit}"
-    Utils.Print("  Verified: legacy payload remains accepted")
 
     # ---- Test 2: account controlled by a different key -> soft-fail ACCOUNT_KEY_MISMATCH ----
     Utils.Print("=== Test 2: nodeownreg with a non-matching wire key (soft-fail) ===")
