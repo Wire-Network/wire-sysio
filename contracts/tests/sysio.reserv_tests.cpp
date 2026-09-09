@@ -31,14 +31,6 @@ std::vector<char> em_pubkey_bytes(const fc::crypto::public_key& pk) {
    return std::vector<char>(compressed.begin(), compressed.end());
 }
 
-/// Extract the raw 32-byte ed25519 pubkey carried by an SVM ChainAddress.
-std::vector<char> ed_pubkey_bytes(const fc::crypto::public_key& pk) {
-   const auto& shim = pk.get<fc::crypto::ed::public_key_shim>();
-   const auto raw = shim.serialize();
-   return std::vector<char>(reinterpret_cast<const char*>(raw.data()),
-                            reinterpret_cast<const char*>(raw.data()) + raw.size());
-}
-
 } // anonymous namespace
 
 /// v6 data-model: reserves are keyed by the triple `(chain_code, token_code,
@@ -555,21 +547,21 @@ BOOST_FIXTURE_TEST_CASE(oncrtreserve_unlinked_creator_is_cancelled, sysio_reserv
    BOOST_REQUIRE_EQUAL("RESERVE_STATUS_CANCELLED", r["status"].as_string());
 } FC_LOG_AND_RETHROW() }
 
-// WNS-28: `chain_code` determines the authoritative ChainKind. Before the fix,
-// a payload could name ETH while supplying SVM plus an authex-linked ED key;
-// oncrtreserve trusted the payload kind and created a PENDING row that
-// matchreserve could never match using ETH's registered EVM kind. The handler
-// must reject through its non-throwing cancel/refund path instead.
+// WNS-28: `chain_code` determines the authoritative ChainKind. Keep the EVM
+// address, key, and authex link otherwise valid so only the redundant payload
+// kind is malformed. Without the explicit registry-kind comparison this would
+// create a PENDING row under ETH despite declaring its creator as SVM.
 BOOST_FIXTURE_TEST_CASE(oncrtreserve_creator_chain_kind_mismatch_is_cancelled,
                         sysio_reserve_tester) { try {
    deploy_authex();
    deploy_msgch();
 
    auto creator_pub = fc::crypto::private_key::generate(
-      fc::crypto::private_key::key_type::ed).get_public_key();
+      fc::crypto::private_key::key_type::em).get_public_key();
    BOOST_REQUIRE_EQUAL(success(),
-      recordlink("alice"_n, ChainKind::CHAIN_KIND_SVM, creator_pub));
-   const auto creator_key = ed_pubkey_bytes(creator_pub);
+      recordlink("alice"_n, ChainKind::CHAIN_KIND_EVM, creator_pub));
+   const auto creator_key = em_pubkey_bytes(creator_pub);
+   const std::vector<char> creator_address(20, '\x01');
 
    BOOST_REQUIRE_EQUAL(success(), push_action(MSGCH_ACCOUNT, "oncrtreserve"_n, mvo()
       ("chain_code",            codename_mvo("ETH"))
@@ -582,7 +574,7 @@ BOOST_FIXTURE_TEST_CASE(oncrtreserve_creator_chain_kind_mismatch_is_cancelled,
       ("source_token_precision", 9u)
       ("connector_weight_bps",  5000)
       ("creator_chain_kind",    ChainKind::CHAIN_KIND_SVM)
-      ("creator_chain_addr",    creator_key)
+      ("creator_chain_addr",    creator_address)
       ("is_private",            false)
       ("creator_pub_key",       creator_key)));
 
@@ -595,6 +587,66 @@ BOOST_FIXTURE_TEST_CASE(oncrtreserve_creator_chain_kind_mismatch_is_cancelled,
    // `queueout` starts attestation ids at 1 (id 0 is its sequence singleton).
    auto queued = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "attestations"_n, 1);
    BOOST_REQUIRE(!queued.empty());
+} FC_LOG_AND_RETHROW() }
+
+// `oncnclrsv` must authenticate the redundant payload kind against the chain
+// registry before cancelling. A mismatched callback silently preserves the
+// PENDING row and queues no refund; the matching callback then wins the race,
+// marks the row CANCELLED, and queues exactly one refund attestation.
+BOOST_FIXTURE_TEST_CASE(oncnclrsv_requires_registry_creator_kind,
+                        sysio_reserve_tester) { try {
+   deploy_authex();
+   deploy_msgch();
+
+   auto creator_pub = fc::crypto::private_key::generate(
+      fc::crypto::private_key::key_type::em).get_public_key();
+   BOOST_REQUIRE_EQUAL(success(),
+      recordlink("alice"_n, ChainKind::CHAIN_KIND_EVM, creator_pub));
+   const auto creator_key = em_pubkey_bytes(creator_pub);
+   const std::vector<char> creator_address(20, '\x01');
+
+   BOOST_REQUIRE_EQUAL(success(), push_action(MSGCH_ACCOUNT, "oncrtreserve"_n, mvo()
+      ("chain_code",            codename_mvo("ETH"))
+      ("token_code",            codename_mvo("ETH"))
+      ("reserve_code",          codename_mvo("CANCEL"))
+      ("name",                  "cancel kind guard")
+      ("description",           "")
+      ("external_token_amount", 1000)
+      ("requested_wire_amount", 1000)
+      ("source_token_precision", 9u)
+      ("connector_weight_bps",  5000)
+      ("creator_chain_kind",    ChainKind::CHAIN_KIND_EVM)
+      ("creator_chain_addr",    creator_address)
+      ("is_private",            false)
+      ("creator_pub_key",       creator_key)));
+
+   auto pending = find_reserve("ETH", "ETH", "CANCEL");
+   BOOST_REQUIRE(!pending.is_null());
+   BOOST_REQUIRE_EQUAL("RESERVE_STATUS_PENDING", pending["status"].as_string());
+
+   BOOST_REQUIRE_EQUAL(success(), push_action(MSGCH_ACCOUNT, "oncnclrsv"_n, mvo()
+      ("chain_code",         codename_mvo("ETH"))
+      ("token_code",         codename_mvo("ETH"))
+      ("reserve_code",       codename_mvo("CANCEL"))
+      ("creator_chain_kind", ChainKind::CHAIN_KIND_SVM)
+      ("creator_chain_addr", creator_address)));
+
+   auto after_mismatch = find_reserve("ETH", "ETH", "CANCEL");
+   BOOST_REQUIRE_EQUAL("RESERVE_STATUS_PENDING", after_mismatch["status"].as_string());
+   BOOST_REQUIRE(get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT,
+                               "attestations"_n, 1).empty());
+
+   BOOST_REQUIRE_EQUAL(success(), push_action(MSGCH_ACCOUNT, "oncnclrsv"_n, mvo()
+      ("chain_code",         codename_mvo("ETH"))
+      ("token_code",         codename_mvo("ETH"))
+      ("reserve_code",       codename_mvo("CANCEL"))
+      ("creator_chain_kind", ChainKind::CHAIN_KIND_EVM)
+      ("creator_chain_addr", creator_address)));
+
+   auto cancelled = find_reserve("ETH", "ETH", "CANCEL");
+   BOOST_REQUIRE_EQUAL("RESERVE_STATUS_CANCELLED", cancelled["status"].as_string());
+   BOOST_REQUIRE(!get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT,
+                                "attestations"_n, 1).empty());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(oncrtreserve_invalid_creator_address_is_cancelled,

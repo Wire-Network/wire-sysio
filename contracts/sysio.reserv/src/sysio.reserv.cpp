@@ -13,6 +13,7 @@
 
 #include <zpp_bits.h>
 
+#include <cstddef>
 #include <cstring>
 #include <limits>
 #include <optional>
@@ -24,6 +25,11 @@ namespace {
 // System-owned rows bill to the sysio RAM pool, not this contract account (privileged-contract
 // model, as sysio.token uses): the account stays finite at code+abi size; growth draws from the pool.
 constexpr name ram_payer = "sysio"_n;
+
+/// Canonical raw address widths for the creator-address domains accepted by
+/// reserve creation.
+constexpr std::size_t evm_creator_address_bytes = 20;
+constexpr std::size_t svm_creator_address_bytes = 32;
 
 uint64_t current_time_ms() {
    return static_cast<uint64_t>(current_time_point().sec_since_epoch()) * 1000;
@@ -125,8 +131,18 @@ registered_chain_kind_or_skip(sysio::slug_name chain_code, const char* handler) 
 bool creator_address_matches_kind(opp::types::ChainKind kind,
                                   const std::vector<char>& address) {
    using opp::types::ChainKind;
-   if (kind == ChainKind::CHAIN_KIND_EVM) return address.size() == 20;
-   if (kind == ChainKind::CHAIN_KIND_SVM) return address.size() == 32;
+   switch (kind) {
+      case ChainKind::CHAIN_KIND_UNKNOWN:
+      case ChainKind::CHAIN_KIND_WIRE:
+         return false;
+      case ChainKind::CHAIN_KIND_EVM:
+         return address.size() == evm_creator_address_bytes;
+      case ChainKind::CHAIN_KIND_SVM:
+         return address.size() == svm_creator_address_bytes;
+   }
+
+   // Fail closed for an invalid numeric enum value while leaving the switch
+   // exhaustive, so adding a declared ChainKind produces a compiler warning.
    return false;
 }
 
