@@ -139,7 +139,7 @@ There are three, and they sort in this order:
 |---|---|
 | **healthy** | Every qualifying producer that posted its own bond. |
 | **bootstrapped** | The genesis producers a chain launches with. |
-| **demoted** | Producers currently being penalised for missed rounds, plus anyone not presently eligible at all. |
+| **demoted** | Producers currently being penalised for unserved rounds, plus anyone not presently eligible at all. |
 
 Healthy sorting **ahead of** bootstrapped is the whole design of the hand-over. Genesis producers
 are the network's always-on backup: they are ACTIVE by fiat, they hold no bond to measure, and the
@@ -151,7 +151,7 @@ arrive. Nobody has to vote them out, and there is no flag day.
 | Factor | What it measures |
 |---|---|
 | Collateral | Your bond divided by the required minimum, taken as the **minimum** across every required chain. Linear and uncapped, so more collateral always outranks less. |
-| Participation | Falls with each consecutive missed round and recovers when you produce. |
+| Participation | Falls with each consecutive unserved round and recovers when you serve one. |
 | Snapshot service | Snapshot attestations that reached quorum in the current pay period. Weighted at a tenth of collateral, so it separates producers the bond has left tied rather than outranking a larger bond. |
 
 Three further factors, relay, API and benchmark service, exist in the configuration at zero weight.
@@ -160,10 +160,11 @@ of free points.
 
 Snapshot service is optional. If you want it, register a snapshot provider account with
 `regsnapprov` and vote snapshot hashes with `votesnaphash`. Only votes that reach quorum are
-credited, so registering alone earns nothing. The credit is a rating of the CURRENT pay period, so
-it does not follow you out: leaving the pay walk, whether by demotion or by parking, consumes it,
-and you start the next period from zero. Blocks you have already produced behave the opposite way,
-because they are earnings rather than a rating.
+credited, so registering alone earns nothing. The credit is a rating of the CURRENT pay period and
+is stamped with it, so it expires at the period boundary rather than being consumed when you leave:
+attestations you earned this period still count if you park and come back inside it, and none of
+them survive into the next one. Blocks you have already produced behave the opposite way, because
+they are earnings rather than a rating.
 
 ## Getting paid
 
@@ -188,58 +189,46 @@ Claim what you have earned with `claimpay`.
 
 ## Staying in the schedule
 
-A **round** is your entire slot window. Producing nothing at all in one is a missed round. Producing
-only a handful of its blocks is a **short** round: a brief hiccup costs you nothing, but a node that
-routinely delivers a fraction of its window is not carrying the slot it holds, and past a threshold
-those rounds start counting against you too.
+A **round** is your entire slot window. You **served** it if you produced at least a threshold
+number of its blocks — six of twelve by default. Anything less counts against you, whether you
+delivered nothing or delivered five: holding a slot and covering half of it is the bar, and a node
+that routinely delivers a fraction of its window is not carrying the slot it holds.
 
-The two are treated differently on purpose. A round that produced nothing says you are offline right
-now, and that is caught fast. A short round says you are degraded, which is given the whole window
-to recover in — so a bad hour costs you nothing, while a chronic pattern of half-served rounds
-demotes you.
+There is one gate. Miss the bar on **three rounds in a row** and you are demoted; serve one round
+and the streak resets to zero. Both numbers are configurable, and setting the block threshold to
+zero relaxes the bar to "produced anything at all".
 
-Two separate tests can demote you, and either is enough. They are the same pair of gates the
-network applies to batch operators, so availability means the same thing whatever role you hold.
-
-| Gate | Asks | Default |
-|---|---|---|
-| **Consecutive** | Are you offline right now? | three rounds in a row that produced nothing |
-| **Rate** | Are you chronically unreliable? | more than 5% of your scheduled rounds missed inside a rolling 24 hours — counting both rounds that produced nothing and rounds that came up short |
-
-A round counts as short below **half its blocks** by default (six of a twelve-slot round). Only the
-rate gate sees short rounds; the consecutive gate is reserved for rounds that produced nothing, so
-delivering even one block keeps you off it.
-
-The rate gate only applies once it has seen enough of your rounds to mean anything. Below that
-sample the consecutive gate is the stricter of the two anyway, so nothing is lost. Only rounds you
-were actually scheduled for count, so time spent off the schedule neither helps nor hurts you, and
-a gap longer than the window starts your record fresh.
+Only rounds you were actually scheduled for count, so time spent off the schedule neither helps nor
+hurts you. The streak is consecutive rather than a rate, so it measures whether you are down right
+now, not what your record looked like last week.
 
 Demotion is categorical: it moves you into a tier that no amount of collateral climbs out of, and
 the next rebuild drops you from the schedule.
 
-There are two ways back:
+There are two ways back, and which one applies depends on whether you still hold a slot:
 
-1. **Produce.** A block clears your consecutive streak immediately, and with it any demotion that
-   gate caused. It does not wipe your rate: one good round cannot erase a bad day, so if the rate
-   gate is what demoted you, keep producing and it clears when your record recovers. This works
-   only while you still hold a slot, which happens more often than you might expect, because
-   demotion and rescheduling are separate events and the schedule floor can hold that gap open.
-2. **Call `regproducer` again.** This is the way back once the schedule has actually dropped you.
-   It re-supplies your signing key, which makes it a real statement of readiness rather than a
-   formality, and it starts a fresh rate window. It does **not** clear your consecutive streak.
-   That is deliberate: re-registering costs nothing but a signature and can be repeated, so if it
-   wiped the streak an absent operator could simply call it on a timer and never produce at all.
-   There is no cooldown and no waiting period.
+1. **Serve a round.** This is the way back *while you are still scheduled*, which happens more often
+   than you might expect — demotion and rescheduling are separate events, and the schedule floor can
+   hold that gap open. Serving clears the streak and the demotion together.
+2. **Call `regproducer` again.** This is the way back *once the schedule has actually dropped you*,
+   and it is refused as a pardon while you are still in it. Off the schedule there are no rounds
+   left to serve, so this clears the streak along with the demotion; re-supplying your signing key
+   is what makes it a statement of readiness. There is no cooldown and no waiting period.
 
-One subtlety worth planning around: even a single missed round short of demotion lowers your
+The schedule check is what keeps the second door honest. `regproducer` costs nothing but a
+signature and can be repeated, so if a scheduled producer could call it to erase a demotion, an
+absent operator would simply run it on a timer and hold its slot without ever producing.
+
+One subtlety worth planning around: even a single unserved round short of demotion lowers your
 participation factor, and if that drops you below the last scheduled position you stop being
-scheduled. The counter behind that factor clears only by producing, and `regproducer` deliberately
-does not clear it — so re-registering returns you to the healthy tier but not to your former score.
-Until you hold a slot again you are ranked on collateral carrying a reduced participation term,
-which makes collateral the lever that works from outside the schedule: post enough to outrank
-whoever displaced you and the next rebuild puts you back, and the first block you produce restores
-the factor.
+scheduled — without being demoted. You are then in the first case's blind spot and the second
+case's reach: no slot to serve, so `regproducer` is the lever, and it restores your score along
+with your tier. Collateral works from outside the schedule too — post enough to outrank whoever
+displaced you and the next rebuild puts you back.
+
+Changing either threshold re-derives every producer's standing as the rescore sweep drains, so a
+lowered limit binds on streaks that already breach it and a raised one releases the producers now
+under it. It is not applied only to rounds missed from that point on.
 
 ## Leaving, voluntarily or otherwise
 
@@ -262,4 +251,4 @@ the factor.
 The chain will not publish a schedule smaller than its safety floor. If demotions or withdrawals
 would leave too few eligible producers, it keeps the last good schedule rather than concentrate
 block production and finality onto too few nodes. During such a window a demoted producer may keep
-its slot, which is exactly the case the "produce a block to recover" rule above exists for.
+its slot, which is exactly the case the "serve a round to recover" rule above exists for.

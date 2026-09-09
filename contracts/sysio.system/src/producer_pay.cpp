@@ -196,7 +196,21 @@ namespace sysiosystem {
          }
          batch.push_back( it->owner );
       }
+      // The demotion flag is a CACHE of the streak, so a changed threshold has to re-derive it:
+      // `tier_for` reads the flag, not the streak, so otherwise a lowered limit never binds on a
+      // streak that already breaches it -- and a producer off the schedule observes no rounds, so
+      // no later miss would ever flip it. A raised limit releases the rows now under it by the same
+      // rule. Safe against `regproducer`, which clears the streak along with the flag.
+      producer_rank::producer_score_config_t weights_tbl( get_self() );
+      const auto weights = weights_tbl.get_or_default( producer_rank::producer_score_config{} );
+
       for( const auto& producer : batch ) {
+         auto       key     = producer_key_t{producer.value};
+         const auto info    = _producers.get( key );
+         const bool demoted = producer_rank::warrants_demotion( info.consecutive_missed_rounds, weights );
+         if( info.is_demoted != demoted ) {
+            _producers.modify( same_payer, key, [&]( auto& p ) { p.is_demoted = demoted; });
+         }
          rescore_producer( producer );
       }
 

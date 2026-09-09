@@ -6152,6 +6152,21 @@ struct producer_score_tester : public producer_eligibility_tester {
       BOOST_FAIL("producer " << expected.to_string() << " never entered the active schedule");
    }
 
+   /// Skip `target`'s rounds until the schedule has actually dropped it.
+   ///
+   /// A rebuild only PROPOSES, so a sunk producer holds its slot until that proposal goes final --
+   /// and a tester produces every scheduled block, so simply waiting would have the target serve a
+   /// round and recover before it ever left. Missing every round it still holds is what carries a
+   /// demotion out of the schedule intact.
+   void miss_until_dropped_from_schedule(account_name target, uint32_t max_rounds = 40) {
+      for (uint32_t round = 0; round < max_rounds; ++round) {
+         const auto schedule = active_schedule_names();
+         if (std::find(schedule.begin(), schedule.end(), target) == schedule.end()) return;
+         skip_round_of(target);
+      }
+      BOOST_FAIL("producer " << target.to_string() << " never left the active schedule");
+   }
+
    /// Skip `target`'s entire slot window so it produces nothing and is charged a missed round.
    ///
    /// A tester produces every scheduled block, so a miss has to be manufactured: advance one
@@ -6436,29 +6451,96 @@ BOOST_FIXTURE_TEST_CASE( demotion_fires_at_threshold_and_outweighs_collateral, p
    BOOST_REQUIRE_GT( unpaid_blocks_of(target), 0u );
 } FC_LOG_AND_RETHROW()
 
-// `regproducer` is the door back for a producer the schedule has DROPPED, from an involuntary
-// demotion as much as from a voluntary park. There is no cooldown and no expiry -- but it returns
-// ELIGIBILITY, not a clean record: the miss streak survives it and clears only by producing.
-// Otherwise an offline operator could cron `regproducer` after every second miss and never produce
-// a block, and the demotion model would stop meaning anything.
-BOOST_FIXTURE_TEST_CASE( regproducer_clears_demotion_immediately, producer_score_tester ) try {
+// `regproducer` costs a signature and may be repeated, so pardoning a producer that still holds a
+// slot would defeat the whole demotion model: an offline operator could run it on a timer, clearing
+// the flag between the demotion and the next rebuild, and hold its slot forever without producing.
+// Four producers, one demoted, leaves three schedulable -- under `min_schedule_size` -- so the floor
+// keeps the target scheduled and the loop below is the actual cron the gate has to survive.
+BOOST_FIXTURE_TEST_CASE( regproducer_cannot_pardon_a_scheduled_producer, producer_score_tester ) try {
+   auto names = setup_ranked_producers(4);
+   trigger_reschedule();
+   wait_for_active_schedule(names[2]);
+   const auto target = names[2];
+
+   for (uint32_t attempt = 1; attempt <= 3; ++attempt) {
+      for (uint32_t miss = 0; miss < 3; ++miss) skip_round_of(target);
+      BOOST_REQUIRE_MESSAGE( demoted(target), "not demoted on attempt " << attempt );
+
+      const auto schedule = active_schedule_names();
+      BOOST_REQUIRE_MESSAGE(
+         std::find(schedule.begin(), schedule.end(), target) != schedule.end(),
+         "the floor should have kept the target scheduled on attempt " << attempt );
+
+      BOOST_REQUIRE_EQUAL( success(), push_system_action(target, "regproducer"_n, mvo()
+         ("producer", target)("producer_key", get_public_key(target, "active"))("url", "")("location", 0)) );
+      produce_blocks(1);
+
+      // Refused as a pardon, and the streak it would have reset is untouched -- so the next
+      // unserved round demotes again immediately rather than restarting the count.
+      BOOST_REQUIRE_MESSAGE( demoted(target), "regproducer pardoned a scheduled producer on attempt " << attempt );
+      BOOST_REQUIRE_EQUAL( tier_demoted, tier_of(rank_score_of(target)) );
+      BOOST_REQUIRE_EQUAL( 3u * attempt, missed_rounds_of(target) );
+   }
+} FC_LOG_AND_RETHROW()
+
+// The other side of that gate: once the schedule has actually dropped the producer there are no
+// rounds left for it to serve, so `regproducer` is its only door back and clears the streak with
+// the demotion. Five producers, one demoted, leaves four -- exactly `min_schedule_size` -- so the
+// rebuild publishes without it.
+BOOST_FIXTURE_TEST_CASE( regproducer_pardons_a_producer_the_schedule_dropped, producer_score_tester ) try {
    auto names = setup_ranked_producers(5);
    trigger_reschedule();
    wait_for_active_schedule(names[2]);
-
    const auto target = names[2];
+
    for (uint32_t miss = 0; miss < 3; ++miss) skip_round_of(target);
    BOOST_REQUIRE( demoted(target) );
+
+   // Carry the demotion out of the schedule: a served round would clear it before the drop, and
+   // the pardon below would then be testing nothing.
+   miss_until_dropped_from_schedule(target);
+   BOOST_REQUIRE( demoted(target) );
+   BOOST_REQUIRE_GE( missed_rounds_of(target), 3u );
 
    BOOST_REQUIRE_EQUAL( success(), push_system_action(target, "regproducer"_n, mvo()
       ("producer", target)("producer_key", get_public_key(target, "active"))("url", "")("location", 0)) );
    produce_blocks(1);
 
    BOOST_REQUIRE( !demoted(target) );
+   BOOST_REQUIRE_EQUAL( 0u, missed_rounds_of(target) );
    BOOST_REQUIRE_EQUAL( tier_bootstrapped, tier_of(rank_score_of(target)) );
-   // The penalty stands: `regproducer` returns eligibility, not a clean record. Only producing
-   // clears the streak, so a cron loop of re-registrations cannot outrun the demotion model.
-   BOOST_REQUIRE_EQUAL( 3u, missed_rounds_of(target) );
+} FC_LOG_AND_RETHROW()
+
+// `tier_for` reads the stored demotion flag, not the streak, so a changed threshold that only
+// rewrote the config would never reach a producer already past it. That matters most exactly where
+// this test puts the target: off the schedule it observes no rounds, so no later miss could ever
+// flip the flag and the standing would be frozen against the config for good. The sweep re-derives
+// the flag from the streak, which is the evidence -- one expression, so it binds a lowered limit
+// and releases a raised one alike.
+BOOST_FIXTURE_TEST_CASE( a_raised_miss_threshold_reconciles_an_existing_demotion, producer_score_tester ) try {
+   auto names = setup_ranked_producers(5);
+   trigger_reschedule();
+   wait_for_active_schedule(names[2]);
+   const auto target = names[2];
+
+   for (uint32_t miss = 0; miss < 3; ++miss) skip_round_of(target);
+   BOOST_REQUIRE( demoted(target) );
+
+   // Four schedulable producers remain -- exactly the floor -- so the rebuild publishes without the
+   // target. Past that point it observes no rounds and the streak is frozen.
+   miss_until_dropped_from_schedule(target);
+   const uint32_t frozen_streak = missed_rounds_of(target);
+   BOOST_REQUIRE_GE( frozen_streak, 3u );
+   BOOST_REQUIRE( demoted(target) );
+
+   BOOST_REQUIRE_EQUAL( success(),
+      set_score_config(10'000, 10'000, 10'000, /*max_missed=*/frozen_streak + 1) );
+   trigger_reschedule();   // drains the sweep the config change opened
+
+   // Released by the sweep alone: the target held no slot and `regproducer` was never called. The
+   // streak is not asserted after -- release reschedules it, and serving then clears it legitimately.
+   BOOST_REQUIRE_MESSAGE( !demoted(target),
+      "a threshold raised over the streak must release the flag -- unscheduled, no round ever can" );
 } FC_LOG_AND_RETHROW()
 
 // Raising a producer collateral minimum has to reach the producers already below it. `setconfig`

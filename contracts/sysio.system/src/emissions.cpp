@@ -1214,6 +1214,21 @@ void system_contract::payepoch(uint32_t epoch_index,
 
    t5s.set(state, get_self());
 
+   // The pay walk breaks at the demoted tier and again at max_rank_walk_rows, so a credited row
+   // past either is never reset while `period_start_epoch` moves on regardless. `compute` would
+   // drop the credit as stale, but nothing rescores a parked or sunk row, so its stored rank_score
+   // would keep scoring a rating the period it belonged to has ended. Credit only ever reaches a
+   // mapped provider, and that table is capped at max_snap_providers, so rescoring the ones still
+   // holding it settles both cases. Must follow the t5s.set above: the score reads the period
+   // boundary this action just moved.
+   snap_providers_table snap_providers(get_self());
+   for (auto p = snap_providers.begin(); p != snap_providers.end(); ++p) {
+      auto key = producer_key_t{p->producer.value};
+      if (!_producers.contains(key)) continue;
+      if (_producers.get(key).snapshot_attestations == 0) continue; // already reset by the walk
+      rescore_producer(p->producer);
+   }
+
    // Audit log: records the AUTHORIZED period emission + the four category
    // amounts for the period that just paid, plus the swap-fee rewards folded
    // into the batch-operator distribution (fee_distributed, sourced from swap

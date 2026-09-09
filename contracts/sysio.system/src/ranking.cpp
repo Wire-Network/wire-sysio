@@ -37,6 +37,11 @@ namespace sysiosystem {
          }
       }, producer_authority );
 
+      // A pardon is only for a producer the schedule actually DROPPED -- see the clear below.
+      const auto active_schedule = sysio::get_active_producers();
+      const bool scheduled = std::find( active_schedule.begin(), active_schedule.end(), producer )
+                             != active_schedule.end();
+
       auto key = producer_key_t{producer.value};
       _producers.upsert( get_self(), key,
          producer_info{
@@ -56,12 +61,16 @@ namespace sysiosystem {
             info.producer_authority = producer_authority;
             if ( info.last_claim_time == time_point() )
                info.last_claim_time = ct;
-            // The door back for a producer the schedule dropped. Clears the DEMOTION, not the
-            // streak: `regproducer` costs only a signature and may be repeated, so clearing the
-            // streak would let an offline operator cron its way back and never serve a round. The
-            // streak clears by SERVING one. No cooldown -- a producer that returns unready is
-            // demoted again on its next unserved round.
-            info.is_demoted = false;
+            // The door back for a producer the schedule DROPPED, and only for one. `regproducer`
+            // costs a signature and may be repeated, so pardoning a producer that still holds a
+            // slot would let an offline operator re-register after every demotion and never serve
+            // a round. One still scheduled recovers the way it lost the tier: by serving.
+            if( scheduled ) return;
+            // Off the schedule there are no rounds to serve, so the streak clears with the flag --
+            // otherwise it would be permanent, and the sweep would re-derive the demotion straight
+            // back (see drain_rescore_cursor).
+            info.is_demoted                = false;
+            info.consecutive_missed_rounds = 0;
          });
 
       // The clear above changes the producer's tier, so its sort key is stale until rescored.
