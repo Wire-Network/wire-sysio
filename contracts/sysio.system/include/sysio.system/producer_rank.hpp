@@ -149,9 +149,10 @@ namespace sysiosystem {
        * consequence of being offline is the tier, not this term.
        *
        * A miss short of demotion still has a lasting consequence, and it is deliberate. The streak
-       * clears only when the producer PRODUCES, so a producer whose penalty drops it below the
-       * active schedule stops being scheduled, stops producing, and holds the penalty until it
-       * acts: `regproducer` clears the streak, and enough additional collateral outranks it. That
+       * clears only when the producer SERVES a round -- `min_blocks_per_round` or better -- so a
+       * producer whose penalty drops it below the active schedule stops being scheduled, stops
+       * producing, and holds the penalty until it acts: `regproducer` clears the streak once the
+       * schedule has dropped it, and enough additional collateral outranks it. That
        * is the intended shape -- a producer that missed is worth less than an identical one that
        * did not, and the way back is an explicit assertion of readiness rather than the passage of
        * time. The alternative, clearing the streak for producers outside the schedule, would let a

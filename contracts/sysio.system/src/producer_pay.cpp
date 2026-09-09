@@ -65,10 +65,11 @@ namespace sysiosystem {
                                                      uint32_t block_height ) {
       const auto& state = _global.get();
 
-      // Mid-round: the same producer made the previous block, so no slot was skipped and its miss
-      // counter was already cleared on the first block of this round. This is 11 of every 12
-      // blocks, and returning here keeps the schedule read and the snapshot compare off the hot
-      // path for all of them. The same test also fires when EVERY other producer missed and the
+      // Mid-round: the same producer made the previous block, so no slot was skipped. Nothing is
+      // scored here -- a round is judged once, at the transition where its block count is known,
+      // because the served/unserved verdict needs the whole round. This is 11 of every 12 blocks,
+      // and returning here keeps the schedule read and the snapshot compare off the hot path for
+      // all of them. The same test also fires when EVERY other producer missed and the
       // round-robin came back to this one; that case is indistinguishable from mid-round here and
       // is deliberately left uncharged -- with every other producer absent the chain has no
       // finality left to activate a replacement schedule anyway.
