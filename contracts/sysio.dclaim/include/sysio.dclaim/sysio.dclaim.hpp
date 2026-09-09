@@ -8,6 +8,7 @@
 #include <sysio/system.hpp>
 #include <sysio/opp/types/types.pb.hpp>
 #include <sysio.opp.common/opp_table_types.hpp>
+#include <sysio.opp.common/wire_asset.hpp>
 
 #include <cstring>
 #include <cstdint>
@@ -62,8 +63,8 @@ namespace sysio {
       static constexpr name RESERV_ACCOUNT = "sysio.reserv"_n;
       static constexpr name SYSTEM_ACCOUNT = "sysio"_n;
 
-      // WIRE token symbol. 9 decimals system-wide.
-      static constexpr symbol WIRE_SYM = symbol("WIRE", 9);
+      /// WIRE token symbol with the system-wide nine-decimal precision.
+      static constexpr symbol WIRE_SYM = opp::wire::asset_symbol;
 
       // Default claimable-reward lifespan: 180 days, in seconds. Configurable
       // per deployment via `setclmwindow`.

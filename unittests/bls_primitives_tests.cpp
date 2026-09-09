@@ -599,6 +599,89 @@ BOOST_AUTO_TEST_CASE( bls_empty ) { try {
 
 } FC_LOG_AND_RETHROW() }
 
+BOOST_AUTO_TEST_CASE( bls_num_length_agreement ) { try {
+   tester c( setup_policy::full );
+
+   const auto& tester1_account = account_name("tester1");
+   c.create_accounts( {tester1_account} );
+   c.produce_block();
+
+   c.expand_roa_policy( c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "4.0000 SYS", 0);
+   c.set_code( tester1_account, test_contracts::bls_primitives_test_wasm() );
+   c.set_abi( tester1_account, test_contracts::bls_primitives_test_abi().data() );
+   c.produce_block();
+
+   constexpr size_t g1_size     = 96;
+   constexpr size_t g2_size     = 192;
+   constexpr size_t gt_size     = 576;
+   constexpr size_t scalar_size = 32;
+
+   // The test contract derives points_len / scalars_len from num with 32-bit arithmetic, so a large
+   // num hands the host functions buffers describing fewer elements than num claims. num * 96,
+   // num * 192 and num * 32 all reduce to zero bytes for num_to_zero_len and to one element for
+   // num_to_one_len; the host functions must reject both rather than trust num.
+   constexpr uint32_t num_to_zero_len = 0x08000000;
+   constexpr uint32_t num_to_one_len  = 0x08000001;
+
+   //expected return is failure
+   c.push_action( tester1_account, "testg1wsum"_n, tester1_account, mutable_variant_object()
+      ("points", std::vector<char>())
+      ("scalars", std::vector<char>())
+      ("num", num_to_zero_len)
+      ("res", std::vector<char>(g1_size, 0))
+      ("expected_error", (int32_t)return_code::failure)
+   );
+
+   //expected return is failure
+   c.push_action( tester1_account, "testg2wsum"_n, tester1_account, mutable_variant_object()
+      ("points", std::vector<char>())
+      ("scalars", std::vector<char>())
+      ("num", num_to_zero_len)
+      ("res", std::vector<char>(g2_size, 0))
+      ("expected_error", (int32_t)return_code::failure)
+   );
+
+   //expected return is failure
+   c.push_action( tester1_account, "testpairing"_n, tester1_account, mutable_variant_object()
+      ("g1_points", std::vector<char>())
+      ("g2_points", std::vector<char>())
+      ("num", num_to_zero_len)
+      ("res", std::vector<char>(gt_size, 0))
+      ("expected_error", (int32_t)return_code::failure)
+   );
+
+   // The single element supplied below is the point at infinity, which the host functions accept
+   // when num is 1, so the count/length disagreement is the only reason these must fail.
+
+   //expected return is failure
+   c.push_action( tester1_account, "testg1wsum"_n, tester1_account, mutable_variant_object()
+      ("points", std::vector<char>(g1_size, 0))
+      ("scalars", std::vector<char>(scalar_size, 0))
+      ("num", num_to_one_len)
+      ("res", std::vector<char>(g1_size, 0))
+      ("expected_error", (int32_t)return_code::failure)
+   );
+
+   //expected return is failure
+   c.push_action( tester1_account, "testg2wsum"_n, tester1_account, mutable_variant_object()
+      ("points", std::vector<char>(g2_size, 0))
+      ("scalars", std::vector<char>(scalar_size, 0))
+      ("num", num_to_one_len)
+      ("res", std::vector<char>(g2_size, 0))
+      ("expected_error", (int32_t)return_code::failure)
+   );
+
+   //expected return is failure
+   c.push_action( tester1_account, "testpairing"_n, tester1_account, mutable_variant_object()
+      ("g1_points", std::vector<char>(g1_size, 0))
+      ("g2_points", std::vector<char>(g2_size, 0))
+      ("num", num_to_one_len)
+      ("res", std::vector<char>(gt_size, 0))
+      ("expected_error", (int32_t)return_code::failure)
+   );
+
+} FC_LOG_AND_RETHROW() }
+
 BOOST_AUTO_TEST_CASE( bls_testfpmul ) { try {
    tester c( setup_policy::full );
 

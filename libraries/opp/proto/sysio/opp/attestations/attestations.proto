@@ -274,8 +274,76 @@ message OperatorEntry {
 }
 
 message BatchOperatorGroups {
+  // Index into `groups` of the batch-operator group that will be on duty for
+  // the epoch AFTER `epoch_index` -- a one-epoch LOOKAHEAD, not the group
+  // serving right now (SOL-378 / WNS-141).
+  //
+  // An outpost that scopes `epoch_in` admission to its seated active group has
+  // to know epoch N's duty group before epoch N's envelope arrives: that
+  // envelope's own deliverer belongs to epoch N's group, so shipping epoch N's
+  // roster inside it is circular and stalls the bridge at the first rotation.
+  // Looking one epoch ahead means envelope N-1 seats the group that authorises
+  // envelope N.
+  //
+  // The depot's internal schedule is NOT shifted -- `epoch_state`'s
+  // `current_batch_op_group` still names the group on duty now. Only this field
+  // looks ahead.
+  //
+  // WHAT OUTPOSTS DO WITH IT TODAY (read before wiring it into new math) --
+  // the two outposts do NOT agree, so check both before assuming either:
+  //
+  //   Solana READS it for the quorum denominator: `epoch_in` sizes consensus
+  //   via `active_group_member_count(groups, active_group_index)`, so this
+  //   index selects the group whose seat count is the bar. Admission does NOT
+  //   use it yet -- `check_epoch_in_signer` accepts membership in ANY seated
+  //   group -- so a change here moves the DENOMINATOR only.
+  //
+  //   Ethereum only STORES it (a public getter). Its threshold math sizes
+  //   `groupSize` from `batchOpGroups[0]` -- the FRONT group, i.e. the CURRENT
+  //   epoch's -- while this index names the NEXT epoch's.
+  //
+  // The two are not interchangeable: an integrator who swaps `batchOpGroups[0]`
+  // for `batchOpGroups[activeGroupIndex()]` without also moving to next-epoch
+  // semantics would size the quorum off the wrong group. Until Ethereum adopts
+  // the index, the two outposts scope their denominators to DIFFERENT groups
+  // for the same envelope -- invisible while every group is the same size, and
+  // not invisible once one is short.
+  //
+  // INVARIANT -- the group this index names is NEVER EMPTY. `advance` WITHHOLDS
+  // this attestation entirely rather than publish an empty active group, so an
+  // outpost that scopes admission or a quorum denominator to this index may rely
+  // on non-emptiness. It may NOT rely on the group being FULL: a group short of
+  // `operators_per_epoch` is reachable whenever the ACTIVE batch-operator roster
+  // falls below `batch_operator_minimum_active`, and the depot deliberately does
+  // not repair that by re-seating a resident operator (window groups must stay
+  // DISJOINT -- Ethereum's `_resolveChunkPosition` scans groups in order and
+  // returns the first match, so a duplicated operator stages its chunks against
+  // a group it is not serving in).
+  //
+  // A SHORT group is therefore a real, degraded state, and it is NOT benign:
+  // group size IS the quorum denominator on both outposts, so short lowers the
+  // bar and makes EVEN sizes reachable. Solana's `majority_threshold` is a
+  // strict `n / 2 + 1` and is safe at even sizes; Ethereum's
+  // `majorityThreshold = (groupSize + 1) / 2` is an exact half at even sizes,
+  // where two competing digests can both clear it. Treat a short group as an
+  // operations alarm, not as a supported configuration.
+  //
+  // BASE CASE -- epoch 1's own duty group is deliberately NOT shipped here. The
+  // genesis advance (0 -> 1) ships the group for epoch 2; each outpost obtains
+  // epoch 1's roster from its own bootstrap instead. On Solana that is
+  // `opp_bootstrap`, which seats `registry.groups` explicitly and pins
+  // `active_group_index = 0` (NOT `initialize_outpost`, which is init-once and
+  // deliberately seats no groups). On Ethereum it is the `rosterInitialized ==
+  // false` trust window, during which `isActiveOperator` admits any sender until
+  // the first roster lands. The induction therefore starts at bootstrap, not at
+  // an attestation -- do not "fix" the apparently-missing base case by shipping
+  // epoch 1's group through this field.
   uint32                       active_group_index = 1;
+  // The epoch this envelope is FOR. It identifies the envelope, not the roster
+  // above; `active_group_index` names the group for `epoch_index + 1`.
   uint32                       epoch_index        = 2;
+  // The full sliding window, always shipped whole so a late-joining or
+  // soft-reset outpost re-converges on its next inbound envelope.
   repeated BatchOperatorGroup  groups             = 3;
   uint32                       epoch_duration_sec = 4;
 }

@@ -9,9 +9,11 @@
 #include <sysio.opp.common/safe_ops.hpp>
 #include <sysio.opp.common/claimable.hpp>
 #include <sysio.opp.common/registry_metadata.hpp>
+#include <sysio.opp.common/wire_asset.hpp>
 
 #include <zpp_bits.h>
 
+#include <cstddef>
 #include <cstring>
 #include <limits>
 #include <optional>
@@ -23,6 +25,11 @@ namespace {
 // System-owned rows bill to the sysio RAM pool, not this contract account (privileged-contract
 // model, as sysio.token uses): the account stays finite at code+abi size; growth draws from the pool.
 constexpr name ram_payer = "sysio"_n;
+
+/// Canonical raw address widths for the creator-address domains accepted by
+/// reserve creation.
+constexpr std::size_t evm_creator_address_bytes = 20;
+constexpr std::size_t svm_creator_address_bytes = 32;
 
 uint64_t current_time_ms() {
    return static_cast<uint64_t>(current_time_point().sec_since_epoch()) * 1000;
@@ -43,12 +50,6 @@ void require_priv_caller() {
    sysio::check(sysio::is_privileged(current_receiver()),
                 "sysio.reserv: privileged account required");
 }
-
-using sysio::slug_name_literals::operator""_s;
-
-/// The WIRE token / depot-chain slug. A reserve leg whose token code is WIRE is
-/// a depot (WIRE) endpoint with no token/WIRE pool of its own.
-constexpr sysio::slug_name WIRE_TOKEN = "WIRE"_s;
 
 /// Saturating uint64 credit for reserve balances / rewards-bucket counters. These accumulate from
 /// operator-relayed external-chain amounts (no on-chain supply cap), and the credit sites run
@@ -100,13 +101,6 @@ reserve::reserve_key make_key(sysio::slug_name chain_code,
    return reserve::reserve_key{chain_code, token_code, reserve_code};
 }
 
-/// Reserve custody is denominated in WIRE (9 decimals) — the emissions
-/// treasury symbol (`sysio.system/src/emissions.cpp:42`,
-/// `sysio.epoch.cpp:38`). Deliberately NOT opreg's `CORE_SYM` (SYS, 4):
-/// operator collateral and reserve custody are independent surfaces with
-/// different symbols; mixing them would silently corrupt custody.
-constexpr sysio::symbol WIRE_SYMBOL{"WIRE", 9};
-
 /// Resolve a `chain_code` to its `ChainKind` via the `sysio.chains`
 /// registry (mirrors `sysio.uwrit`'s helper of the same name). Returns
 /// `std::nullopt` when the chain is unregistered.
@@ -117,13 +111,38 @@ std::optional<opp::types::ChainKind> chain_kind_for_code(sysio::slug_name chain_
    return tbl.get(pk).kind;
 }
 
-/// Soft-gate never-throw msgch handlers before they can emit a queueout to an
-/// unregistered destination chain. `sysio.msgch::queueout` fails loudly for
-/// direct callers, but dispatch callbacks must log-and-skip instead of
-/// aborting the consensus-tipping delivery transaction.
-bool registered_chain_or_skip(sysio::slug_name chain_code, const char* handler) {
-   if (chain_kind_for_code(chain_code).has_value()) return true;
+/// Resolve the authoritative kind while soft-gating never-throw msgch handlers
+/// before they can emit a queueout to an unregistered destination chain.
+/// `sysio.msgch::queueout` fails loudly for direct callers, but dispatch
+/// callbacks must log-and-skip instead of aborting the consensus-tipping
+/// delivery transaction.
+std::optional<opp::types::ChainKind>
+registered_chain_kind_or_skip(sysio::slug_name chain_code, const char* handler) {
+   auto kind = chain_kind_for_code(chain_code);
+   if (kind.has_value()) return kind;
    sysio::print(handler, ": chain_code is not registered; skipping\n");
+   return std::nullopt;
+}
+
+/// Validate the raw creator address against the authoritative registry kind.
+/// User-created reserves originate on supported external outposts only: EVM
+/// addresses are 20 bytes and SVM addresses are 32 bytes. Unknown/depot kinds
+/// are not valid creator-address domains for this handler.
+bool creator_address_matches_kind(opp::types::ChainKind kind,
+                                  const std::vector<char>& address) {
+   using opp::types::ChainKind;
+   switch (kind) {
+      case ChainKind::CHAIN_KIND_UNKNOWN:
+      case ChainKind::CHAIN_KIND_WIRE:
+         return false;
+      case ChainKind::CHAIN_KIND_EVM:
+         return address.size() == evm_creator_address_bytes;
+      case ChainKind::CHAIN_KIND_SVM:
+         return address.size() == svm_creator_address_bytes;
+   }
+
+   // Fail closed for an invalid numeric enum value while leaving the switch
+   // exhaustive, so adding a declared ChainKind produces a compiler warning.
    return false;
 }
 
@@ -246,7 +265,7 @@ void route_wire_fee(name self, const opp::amm::wire_fee& fee, name underwriter) 
          permission_level{self, "active"_n},
          reserve::TOKEN_ACCOUNT, "transfer"_n,
          std::make_tuple(self, reserve::TREASURY_ACCOUNT,
-            asset(static_cast<int64_t>(fee.emissions_share), WIRE_SYMBOL),
+            asset(static_cast<int64_t>(fee.emissions_share), opp::wire::asset_symbol),
             std::string("sysio.reserv::swap fee -> emissions"))
       ).send();
    }
@@ -286,7 +305,7 @@ uint64_t sweep_expired_wire_claims(name self, uint32_t now_sec, uint32_t max_row
          permission_level{self, "active"_n},
          reserve::TOKEN_ACCOUNT, "transfer"_n,
          std::make_tuple(self, reserve::TREASURY_ACCOUNT,
-            asset(static_cast<int64_t>(reclaimed), WIRE_SYMBOL),
+            asset(static_cast<int64_t>(reclaimed), opp::wire::asset_symbol),
             std::string("sysio.reserv::expired WIRE claim -> emissions"))
       ).send();
    }
@@ -321,7 +340,7 @@ void credit_wire_claim(name self, name recipient, uint64_t amount) {
             permission_level{self, "active"_n},
             reserve::TOKEN_ACCOUNT, "transfer"_n,
             std::make_tuple(self, reserve::TREASURY_ACCOUNT,
-               asset(static_cast<int64_t>(forfeited), WIRE_SYMBOL),
+               asset(static_cast<int64_t>(forfeited), opp::wire::asset_symbol),
                std::string("sysio.reserv::expired WIRE claim -> emissions"))
          ).send();
       }
@@ -380,7 +399,7 @@ void reserve::regreserve(sysio::slug_name chain_code,
       permission_level{TREASURY_ACCOUNT, "active"_n},
       TOKEN_ACCOUNT, "transfer"_n,
       std::make_tuple(TREASURY_ACCOUNT, get_self(),
-         asset(static_cast<int64_t>(initial_wire_amount), WIRE_SYMBOL),
+         asset(static_cast<int64_t>(initial_wire_amount), opp::wire::asset_symbol),
          std::string("sysio.reserv::regreserve bootstrap WIRE backing"))
    ).send();
 
@@ -422,7 +441,9 @@ void reserve::oncrtreserve(sysio::slug_name       chain_code,
                             bool                  is_private,
                             std::vector<char>     creator_pub_key) {
    require_auth(MSGCH_ACCOUNT);
-   if (!registered_chain_or_skip(chain_code, "oncrtreserve")) return;
+   const auto expected_chain_kind =
+      registered_chain_kind_or_skip(chain_code, "oncrtreserve");
+   if (!expected_chain_kind.has_value()) return;
 
    // Soft-validate; silent skip per feedback_opp_handlers_never_throw.
    if (connector_weight_bps == 0 || connector_weight_bps > MAX_CONNECTOR_WEIGHT_BPS) {
@@ -436,6 +457,13 @@ void reserve::oncrtreserve(sysio::slug_name       chain_code,
    // the SAME cancel/refund path as an unlinked creator below (insert a CANCELLED
    // row + queue RESERVE_CREATE_CANCELLED), idempotently.
    const bool invalid_amount = (external_token_amount == 0 || requested_wire_amount == 0);
+   // `chain_code` is registry-owned and authoritative. The attestation also
+   // carries a creator kind, but that redundant, externally supplied value
+   // must not select a different public-key variant or produce a reserve that
+   // `matchreserve` can never match against the registered chain kind.
+   const bool creator_chain_kind_mismatch = creator_chain_kind != *expected_chain_kind;
+   const bool invalid_creator_address =
+      !creator_address_matches_kind(*expected_chain_kind, creator_chain_addr);
    // Same `sysio`-billed metadata bound the privileged registrations enforce with
    // `check_metadata`, asked the non-throwing way: this handler must never abort, so an
    // over-bound string joins the reject/refund path below rather than reverting dispatch.
@@ -466,14 +494,14 @@ void reserve::oncrtreserve(sysio::slug_name       chain_code,
    }
 
    opp::types::ChainAddress creator;
-   creator.kind    = creator_chain_kind;
+   creator.kind    = *expected_chain_kind;
    creator.address = std::move(creator_chain_addr);
 
    // Create gating: the creator must already be authex-linked to a WIRE
    // account ("the only requirement to create a reserve"). Reconstruct the
    // creator's key variant and probe `sysio.authex::links.bypubkey`. On
-   // any failure — malformed key bytes, no link, an invalid amount, OR
-   // over-bound metadata — reject by inserting a
+   // any failure — a chain-kind mismatch, malformed address/key bytes, no
+   // link, an invalid amount, OR over-bound metadata — reject by inserting a
    // CANCELLED row (for refund idempotency) and queueing
    // RESERVE_CREATE_CANCELLED so the outpost refunds the creator's escrow.
    // The CANCELLED row does NOT permanently burn the identity: a later,
@@ -481,7 +509,7 @@ void reserve::oncrtreserve(sysio::slug_name       chain_code,
    // (prevents namespace squatting). Never throws.
    std::vector<char> canonical_creator_key;
    {
-      auto pk_variant = pubkey_from_raw(creator_chain_kind, creator_pub_key, creator.address);
+      auto pk_variant = pubkey_from_raw(*expected_chain_kind, creator_pub_key, creator.address);
       bool linked = false;
       if (pk_variant) {
          sysio::authex::links_t links(AUTHEX_ACCOUNT);
@@ -491,7 +519,8 @@ void reserve::oncrtreserve(sysio::slug_name       chain_code,
             canonical_creator_key = sysio::pubkey_to_bytes(*pk_variant);
          }
       }
-      if (!linked || invalid_amount || oversized_metadata) {
+      if (creator_chain_kind_mismatch || invalid_creator_address || !linked ||
+          invalid_amount || oversized_metadata) {
          // A CANCELLED row already standing means this is a re-relay of the same
          // rejected create (an unlinked squatter OR an invalid amount). Leave it
          // and do NOT queue a second refund — the refund was queued when the row
@@ -503,7 +532,12 @@ void reserve::oncrtreserve(sysio::slug_name       chain_code,
             return;
          }
          sysio::print("oncrtreserve: rejecting with RESERVE_CREATE_CANCELLED "
-                      "(invalid amount, over-bound metadata, or unlinked / malformed creator key)\n");
+                      "(creator chain-kind/address mismatch, invalid amount, over-bound "
+                      "metadata, or unlinked / malformed creator key)\n");
+         // Do not persist attacker-sized address bytes in the sysio-billed
+         // cancellation tombstone. The outpost refunds by the reserve triple,
+         // so a malformed creator address is unnecessary for that handshake.
+         if (invalid_creator_address) creator.address.clear();
          const auto now = current_time_ms();
          tbl.emplace(ram_payer, pk, reserve_row{
             .chain_code             = chain_code,
@@ -621,7 +655,7 @@ void reserve::matchreserve(sysio::slug_name chain_code,
       permission_level{matcher, "active"_n},
       TOKEN_ACCOUNT, "transfer"_n,
       std::make_tuple(matcher, get_self(),
-         asset(static_cast<int64_t>(wire_amount), WIRE_SYMBOL),
+         asset(static_cast<int64_t>(wire_amount), opp::wire::asset_symbol),
          std::string("sysio.reserv::matchreserve WIRE escrow"))
    ).send();
 
@@ -652,7 +686,9 @@ void reserve::oncnclrsv(sysio::slug_name       chain_code,
                          opp::types::ChainKind creator_chain_kind,
                          std::vector<char>     creator_chain_addr) {
    require_auth(MSGCH_ACCOUNT);
-   if (!registered_chain_or_skip(chain_code, "oncnclrsv")) return;
+   const auto expected_chain_kind =
+      registered_chain_kind_or_skip(chain_code, "oncnclrsv");
+   if (!expected_chain_kind.has_value()) return;
 
    reserves_t tbl(get_self());
    auto pk = make_key(chain_code, token_code, reserve_code);
@@ -668,7 +704,8 @@ void reserve::oncnclrsv(sysio::slug_name       chain_code,
    }
 
    const bool addr_matches =
-      it->creator_addr.kind    == creator_chain_kind &&
+      creator_chain_kind       == *expected_chain_kind &&
+      it->creator_addr.kind    == *expected_chain_kind &&
       it->creator_addr.address == creator_chain_addr;
    if (!addr_matches) {
       sysio::print("oncnclrsv: creator_addr mismatch; silently skipping\n");
@@ -704,8 +741,8 @@ uint64_t reserve::swapquote(sysio::slug_name from_chain_code,
                              sysio::slug_name to_reserve_code) {
    if (from_amount == 0) return 0;
 
-   const bool src_is_wire = (from_token_code == WIRE_TOKEN);
-   const bool dst_is_wire = (to_token_code   == WIRE_TOKEN);
+   const bool src_is_wire = opp::wire::is_native_asset(from_chain_code, from_token_code);
+   const bool dst_is_wire = opp::wire::is_native_asset(to_chain_code, to_token_code);
    if (src_is_wire && dst_is_wire) return from_amount; // WIRE->WIRE is a plain transfer
 
    reserves_t tbl(get_self());
@@ -773,7 +810,7 @@ void reserve::drainrewards(int64_t amount) {
       permission_level{get_self(), "active"_n},
       TOKEN_ACCOUNT, "transfer"_n,
       std::make_tuple(get_self(), TREASURY_ACCOUNT,
-         asset(static_cast<int64_t>(req), WIRE_SYMBOL),
+         asset(static_cast<int64_t>(req), opp::wire::asset_symbol),
          std::string("sysio.reserv::swap-fee rewards -> emissions payepoch"))
    ).send();
 }
@@ -1133,7 +1170,7 @@ void reserve::claimrsvfee(sysio::slug_name chain_code,
       permission_level{get_self(), "active"_n},
       TOKEN_ACCOUNT, "transfer"_n,
       std::make_tuple(get_self(), owner,
-         asset(static_cast<int64_t>(amount), WIRE_SYMBOL),
+         asset(static_cast<int64_t>(amount), opp::wire::asset_symbol),
          std::string("sysio.reserv::reserve owner fee claim"))
    ).send();
 }
@@ -1169,7 +1206,7 @@ void reserve::claimuwfee(sysio::name underwriter) {
       permission_level{get_self(), "active"_n},
       TOKEN_ACCOUNT, "transfer"_n,
       std::make_tuple(get_self(), underwriter,
-         asset(static_cast<int64_t>(amount), WIRE_SYMBOL),
+         asset(static_cast<int64_t>(amount), opp::wire::asset_symbol),
          std::string("sysio.reserv::underwriter swap-fee claim"))
    ).send();
 }
@@ -1194,7 +1231,7 @@ void reserve::claimwire(sysio::name account) {
 
    sysio::opp::claimable::pay_out(
       claims, pk, get_self(), TOKEN_ACCOUNT,
-      account, WIRE_SYMBOL, std::string("sysio.reserv::claimwire payout"),
+      account, opp::wire::asset_symbol, std::string("sysio.reserv::claimwire payout"),
       "no claimable WIRE for this account");
 }
 
