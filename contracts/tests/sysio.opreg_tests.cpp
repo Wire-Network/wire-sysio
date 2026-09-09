@@ -1151,7 +1151,8 @@ BOOST_FIXTURE_TEST_CASE(withdrawinle_logs_failure_on_insufficient_available, sys
                        entry["error_message"].as_string());
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(withdrawinle_subtracts_from_available_on_subsequent_call, sysio_opreg_tester) { try {
+BOOST_FIXTURE_TEST_CASE(withdrawinle_subtracts_from_available_on_subsequent_call,
+                        sysio_opreg_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), setconfig());
    BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.alice"_n, OPERATOR_TYPE_UNDERWRITER, false));
    BOOST_REQUIRE_EQUAL(success(),
@@ -1168,6 +1169,51 @@ BOOST_FIXTURE_TEST_CASE(withdrawinle_subtracts_from_available_on_subsequent_call
    BOOST_REQUIRE_EQUAL(false, entry["success"].as_bool());
    BOOST_REQUIRE_EQUAL(std::string("insufficient available balance for withdraw"),
                        entry["error_message"].as_string());
+   BOOST_REQUIRE(!get_wtdw(1).is_null());
+   BOOST_REQUIRE(get_wtdw(2).is_null());
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(withdrawinle_allows_requests_across_collateral_buckets,
+                        sysio_opreg_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), setconfig());
+   BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.alice"_n, OPERATOR_TYPE_UNDERWRITER, false));
+   BOOST_REQUIRE_EQUAL(success(),
+      depositinle("uwrit.alice"_n, "ETH", "ETH", 1000));
+   BOOST_REQUIRE_EQUAL(success(),
+      depositinle("uwrit.alice"_n, "SOL", "SOL", 1000));
+
+   BOOST_REQUIRE_EQUAL(success(),
+      withdrawinle("uwrit.alice"_n, "ETH", "ETH", 400));
+
+   BOOST_REQUIRE_EQUAL(success(),
+      withdrawinle("uwrit.alice"_n, "SOL", "SOL", 400));
+
+   auto entry = latest_action_log("uwrit.alice"_n);
+   BOOST_REQUIRE(!entry.is_null());
+   BOOST_REQUIRE_EQUAL(true, entry["success"].as_bool());
+   BOOST_REQUIRE(!get_wtdw(1).is_null());
+   BOOST_REQUIRE(!get_wtdw(2).is_null());
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(withdraw_rejects_when_inline_request_is_outstanding_for_same_bucket,
+                        sysio_opreg_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), setconfig());
+   BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.alice"_n, OPERATOR_TYPE_UNDERWRITER, false));
+   BOOST_REQUIRE_EQUAL(success(),
+      depositinle("uwrit.alice"_n, "WIRE", "WIRE", 1000));
+
+   BOOST_REQUIRE_EQUAL(success(),
+      withdrawinle("uwrit.alice"_n, "WIRE", "WIRE", 400));
+   BOOST_REQUIRE_EQUAL(success(), withdraw("uwrit.alice"_n, 400));
+
+   auto entry = latest_action_log("uwrit.alice"_n);
+   BOOST_REQUIRE(!entry.is_null());
+   BOOST_REQUIRE_EQUAL(false, entry["success"].as_bool());
+   BOOST_REQUIRE_EQUAL(
+      std::string("operator already has an outstanding withdraw request for this collateral bucket"),
+      entry["error_message"].as_string());
+   BOOST_REQUIRE(!get_wtdw(1).is_null());
+   BOOST_REQUIRE(get_wtdw(2).is_null());
 } FC_LOG_AND_RETHROW() }
 
 /// A successful outpost withdrawal reservation immediately removes an
@@ -1243,6 +1289,7 @@ BOOST_FIXTURE_TEST_CASE(cancelwtdw_removes_pending_request, sysio_opreg_tester) 
 
    BOOST_REQUIRE_EQUAL(success(),
       withdrawinle("uwrit.alice"_n, "ETH", "ETH", 1000));
+   BOOST_REQUIRE(!get_wtdw(2).is_null());
 } FC_LOG_AND_RETHROW() }
 
 /// Canceling the only pending reservation restores the operator immediately
@@ -1312,6 +1359,22 @@ BOOST_FIXTURE_TEST_CASE(flushwtdw_rechecks_eligibility_after_erase, sysio_opreg_
    auto op = get_operator(kEligibilityBatchOperator);
    BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE == op[eligibility_field::status].as<OperatorStatus>());
    BOOST_REQUIRE(get_wtdw(kFirstWithdrawalRequestId).is_null());
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(flushwtdw_allows_operator_to_request_again, sysio_opreg_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), setconfig());
+   BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.alice"_n, OPERATOR_TYPE_UNDERWRITER, false));
+   BOOST_REQUIRE_EQUAL(success(),
+      depositinle("uwrit.alice"_n, "ETH", "ETH", 1000));
+   BOOST_REQUIRE_EQUAL(success(),
+      withdrawinle("uwrit.alice"_n, "ETH", "ETH", 400));
+
+   BOOST_REQUIRE_EQUAL(success(), flushwtdw(kFlushAllMaturedEpoch));
+   BOOST_REQUIRE(get_wtdw(1).is_null());
+
+   BOOST_REQUIRE_EQUAL(success(),
+      withdrawinle("uwrit.alice"_n, "ETH", "ETH", 600));
+   BOOST_REQUIRE(!get_wtdw(2).is_null());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(cancelwtdw_rejects_other_operators_request, sysio_opreg_tester) { try {
@@ -1813,32 +1876,33 @@ BOOST_FIXTURE_TEST_CASE(flushwtdw_terminated_operator_does_not_abort, sysio_opre
    BOOST_REQUIRE(get_wtdw(1).is_null());   // matured row erased, not stuck re-throwing every advance
 } FC_LOG_AND_RETHROW() }
 
-// SEC-78 / WSA-166: flushwtdw drains at most MAX_WTDW_FLUSH_PER_EPOCH matured rows per advance, so an
-// operator cannot split collateral into enough queued withdraws to blow the transaction CPU deadline
-// advance shares with the rest of its fan-out and stall epoch progress chain-wide. The remainder
-// flushes on the next advance. This drives a TERMINATED operator so every matured row takes the
-// erase-without-remit branch (no outpost/token infra needed) -- the bound lives at the top of the
-// loop, above the per-row branches, so it holds regardless of which branch each row takes.
+// SEC-78 / WSA-166: flushwtdw drains at most MAX_WTDW_FLUSH_PER_EPOCH matured rows per advance.
+// WIRE-376 limits each operator to one queued row, so this regression uses distinct operators to
+// retain coverage of the global work bound. Every operator is TERMINATED so each matured row takes
+// the erase-without-remit branch (no outpost/token infra needed); the bound lives above the per-row
+// branches and therefore holds regardless of which branch a row takes.
 BOOST_FIXTURE_TEST_CASE(flushwtdw_bounds_rows_per_epoch, sysio_opreg_tester) { try {
    // Mirror of the contract-internal cap (contract headers are not host-compilable, same convention
    // as the msgch size-cap tests). Keep in sync with sysio.opreg.hpp::MAX_WTDW_FLUSH_PER_EPOCH.
    constexpr uint32_t MAX_WTDW_FLUSH_PER_EPOCH = 32;
    constexpr uint32_t N = MAX_WTDW_FLUSH_PER_EPOCH + 8;   // 40 > one epoch's flush budget
 
-   BOOST_REQUIRE_EQUAL(success(), setconfig());
-   BOOST_REQUIRE_EQUAL(success(),
-      regoperator("batchop.a"_n, OPERATOR_TYPE_BATCH, /*is_bootstrapped=*/false));
-   BOOST_REQUIRE_EQUAL(success(), depositinle("batchop.a"_n, "ETH", "ETH", 100'000));
+   constexpr auto OPERATOR_NAME_BASE = "batchop.a"_n;
 
-   // Queue N one-*ish*-unit withdraws. Amounts vary (i+1) only so each is a distinct transaction
-   // (identical actions in one block would be rejected as duplicates before the contract runs); the
-   // per-row amount is irrelevant to the bound. Sum stays well under the deposited balance.
+   BOOST_REQUIRE_EQUAL(success(), setconfig());
+
+   // Each distinct operator contributes its one permitted queue row. Raw name values remain valid
+   // Antelope names and avoid coupling this global-bound regression to a fixed account-name list.
    for (uint32_t i = 0; i < N; ++i) {
+      const name account{OPERATOR_NAME_BASE.value + i + 1};
       BOOST_REQUIRE_EQUAL(success(),
-         withdrawinle("batchop.a"_n, "ETH", "ETH", i + 1));
+         regoperator(account, OPERATOR_TYPE_BATCH, /*is_bootstrapped=*/false));
+      BOOST_REQUIRE_EQUAL(success(), depositinle(account, "ETH", "ETH", i + 1));
+      BOOST_REQUIRE_EQUAL(success(),
+         withdrawinle(account, "ETH", "ETH", i + 1));
+      BOOST_REQUIRE_EQUAL(success(), terminate(account, "rolling-24h miss"));
+      produce_blocks();
    }
-   // Terminate so every matured row takes flushwtdw's erase-without-remit branch.
-   BOOST_REQUIRE_EQUAL(success(), terminate("batchop.a"_n, "rolling-24h miss"));
 
    // Count remaining queue rows by probing the monotonic ids 1..N (order-independent).
    auto count_pending = [&]() {
