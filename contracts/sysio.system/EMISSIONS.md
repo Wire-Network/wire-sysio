@@ -68,10 +68,12 @@ carries a contract that could emit the claim inline. They are protocol-owned
 holding accounts with no code, so the notify-handler risk does not apply — the
 same exception `fundclaim` makes for `sysio.dclaim`.
 
-Producer pay is weight-scaled: active producers carry a flat weight and are
-additionally scaled by their eligible rounds over the pay period, while standbys
-carry a rank-decreasing weight and are not round-scaled. Batch-op pay is weighted
-by the roster captured for each accrued epoch, then split evenly across all
+Producer pay is per block produced: the active slice of the producer pool is
+divided by the period's nominal slot count, raised to the blocks actually
+produced when a period runs long, and each producer is paid for the blocks it
+made. Standbys draw from a separate slice, at a rank-decreasing weight, and are
+not paid per block. Batch-op pay is weighted by the roster captured for each
+accrued epoch, then split evenly across all
 members of each historical roster (the per-member slice is the group pool divided
 by the full group size). Equal rosters are coalesced before their weighted slice
 is calculated, preserving one group-level rounding step per roster. A credit is

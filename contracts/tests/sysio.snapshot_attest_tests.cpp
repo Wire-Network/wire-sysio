@@ -428,59 +428,6 @@ BOOST_FIXTURE_TEST_CASE(regsnapprov_rank_band_bounds_provider_table, snapshot_ca
    BOOST_REQUIRE(!get_snap_provider(capacity_producers.back()).is_null());
 } FC_LOG_AND_RETHROW() }
 
-/// Capacity producers on a chain already advanced to an attestable height.
-///
-/// The prune path and real snapshot credit each need a different half of the setup, and consuming
-/// credit at the prune is only observable with both.
-struct snapshot_capacity_voting_tester : public snapshot_attest_tester {
-   snapshot_capacity_voting_tester()
-      : snapshot_attest_tester(snapshot_capacity_tester::capacity_producers(), /*cadence_periods*/ 1) {}
-};
-
-// `payepoch` expires stale snapshot credit by walking `snapprovs`, so a mapping pruned for capacity
-// would orphan the credit still sitting on the producer row -- the pay walk breaks at the demoted
-// tier and at max_rank_walk_rows, so a parked or sunk producer is never reached, and with its
-// mapping gone nothing else would rescore it either. The prune consumes the credit instead.
-BOOST_FIXTURE_TEST_CASE(pruning_a_provider_consumes_its_snapshot_credit, snapshot_capacity_voting_tester) { try {
-   constexpr uint32_t max_registered_snapshot_providers = 30;
-   constexpr uint32_t fixture_snapshot_providers        = 5;
-
-   const auto capacity_producers = snapshot_capacity_tester::capacity_producers();
-   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
-   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
-   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer3"_n, "snapprov3"_n));
-   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer4"_n, "snapprov4"_n));
-   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer5"_n, "snapprov5"_n));
-   for (uint32_t index = 0; index < max_registered_snapshot_providers - fixture_snapshot_providers; ++index) {
-      BOOST_REQUIRE_EQUAL(success(), regsnapprov(capacity_producers[index], capacity_producers[index]));
-   }
-
-   // One provider is quorum, so a single vote finalizes the record and credits producer1.
-   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1));
-   const auto block_num = vote_block_num();
-   BOOST_REQUIRE_EQUAL(success(),
-      votesnaphash("snapprov1"_n, make_block_id(block_num), make_snap_hash(1)));
-   BOOST_REQUIRE_EQUAL(1u, get_producer_info("producer1"_n)["snapshot_attestations"].as<uint32_t>());
-
-   // Park it: the credit survives the park (nothing consumes it on the way out), and parking is
-   // what both frees a rank position and makes the mapping stale enough to prune.
-   BOOST_REQUIRE_EQUAL(success(), unregproducer("producer1"_n));
-   produce_blocks();
-   BOOST_REQUIRE_EQUAL(1u, get_producer_info("producer1"_n)["snapshot_attestations"].as<uint32_t>());
-
-   // A full-table registration prunes the stale mapping to make room.
-   BOOST_REQUIRE_EQUAL(success(),
-                       regsnapprov(capacity_producers.back(), capacity_producers.back()));
-   BOOST_REQUIRE(get_snap_provider("snapprov1"_n).is_null());
-
-   // The credit went with the mapping rather than being left behind for a sweep that can no longer
-   // reach it. The stored key is not asserted: `compute` returns `unscored()` for an inactive row,
-   // so a parked producer carries no composite to observe the term leaving. The rows that DO carry
-   // it -- miss-demoted, or schedulable past the pay walk's ceiling -- cannot be reached from this
-   // fixture, but they share this one line of state.
-   BOOST_REQUIRE_EQUAL(0u, get_producer_info("producer1"_n)["snapshot_attestations"].as<uint32_t>());
-} FC_LOG_AND_RETHROW() }
-
 BOOST_FIXTURE_TEST_CASE(regsnapprov_is_idempotent_and_rotates_provider, snapshot_attest_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));

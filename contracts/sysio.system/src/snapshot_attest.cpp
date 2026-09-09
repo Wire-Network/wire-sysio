@@ -151,15 +151,6 @@ void prune_stale_snapshot_providers_if_full(name self, snap_providers_table& pro
           || get_snapshot_producer_eligibility(*producer_itr, ranked) != snapshot_producer_eligibility::eligible) {
          const name stale_producer = provider_itr->producer;
          const name stale_snap_account = provider_itr->snap_account;
-         // `payepoch` expires stale credit by walking THIS table, so a mapping erased with credit
-         // still on the row would orphan it -- nothing else rescores a producer the pay walk does
-         // not reach. Consume it here instead: the row is being pruned precisely because it is no
-         // longer a rank-eligible provider, so the rating no longer describes anything it can do.
-         if (producer_itr && producer_itr->snapshot_attestations > 0) {
-            producers.modify(same_payer, producer_key_t{stale_producer.value},
-                             [](auto& row) { row.snapshot_attestations = 0; });
-            producer_rank::rescore(self, producers, stale_producer);
-         }
          provider_itr = providers.erase(std::move(provider_itr));
          sysio::print(stale_provider_prune_log_prefix, stale_producer,
                       stale_provider_prune_log_infix, stale_snap_account, log_line_ending);

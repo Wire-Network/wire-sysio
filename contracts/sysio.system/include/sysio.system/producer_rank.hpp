@@ -203,9 +203,12 @@ namespace sysiosystem {
          /// Reserved -- needs an attestation path before it can carry weight.
          uint32_t benchmark_weight     = 0;
 
-         /// Consecutive missed rounds that demote a producer to standby. There is no cooldown and
-         /// no expiry: a demoted producer recovers by re-registering, or by producing a block while
-         /// still in the active schedule -- the window a schedule too small to rebuild holds open.
+         /// Consecutive UNSERVED rounds that demote a producer to standby -- a round is served at
+         /// `min_blocks_per_round` or better, so one that delivered too few blocks counts as much as
+         /// an empty one. No cooldown and no expiry: a demoted producer recovers by SERVING a round
+         /// while still in the active schedule -- the window a schedule too small to rebuild holds
+         /// open -- or, once the schedule has dropped it, by re-registering. `regproducer` is
+         /// refused as a pardon while the producer still holds a slot.
          uint32_t max_consecutive_missed_rounds = 3;
 
          /// Snapshot attestations within one pay period that earn full marks on the snapshot

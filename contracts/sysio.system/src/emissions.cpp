@@ -1016,6 +1016,14 @@ void system_contract::payepoch(uint32_t epoch_index,
          // overrun stalls the chain, so its cost may not depend on the demoted tier actually
          // bounding it. A row past the ceiling is neither paid nor reset -- the same treatment an
          // unpayable row gets -- so its blocks carry rather than vanish.
+         //
+         // Its snapshot counter is not reset either, and nothing rescores it, so a SCHEDULABLE row
+         // past this ceiling keeps a stored rank_score carrying last period's snapshot term until
+         // some unrelated event rescores it -- `compute` would drop the credit as stale, but the
+         // stored key is not recomputed. Accepted rather than swept: reaching it takes 500+ ranked
+         // schedulable producers, and the rows short of that are unaffected. A demoted row's stale
+         // term is inert (every walk breaks at that tier, so nothing reads the order within it),
+         // and an inactive one is `unscored()` and carries no term at all.
          if (++examined > max_rank_walk_rows) break;
 
          // is_schedulable requires an active row, ACTIVE opreg status, and an active finalizer
@@ -1213,23 +1221,6 @@ void system_contract::payepoch(uint32_t epoch_index,
    state.period_start_epoch = epoch_index + 1;
 
    t5s.set(state, get_self());
-
-   // The pay walk breaks at the demoted tier and again at max_rank_walk_rows, so a credited row
-   // past either is never reset while `period_start_epoch` moves on regardless. `compute` would
-   // drop the credit as stale, but nothing rescores those rows, so a stored rank_score would keep
-   // scoring a rating whose period has ended. (An inactive row is `unscored()` and carries no term;
-   // the ones that do are miss-demoted rows and schedulable rows past the ceiling.) Credit only
-   // ever reaches a mapped provider, and that table is capped at max_snap_providers, so rescoring
-   // the ones still holding it settles both cases -- and the prune in snapshot_attest.cpp consumes
-   // credit on the one path that removes a mapping. Must follow the t5s.set above: the score reads
-   // the period boundary this action just moved.
-   snap_providers_table snap_providers(get_self());
-   for (auto p = snap_providers.begin(); p != snap_providers.end(); ++p) {
-      auto key = producer_key_t{p->producer.value};
-      if (!_producers.contains(key)) continue;
-      if (_producers.get(key).snapshot_attestations == 0) continue; // already reset by the walk
-      rescore_producer(p->producer);
-   }
 
    // Audit log: records the AUTHORIZED period emission + the four category
    // amounts for the period that just paid, plus the swap-fee rewards folded
