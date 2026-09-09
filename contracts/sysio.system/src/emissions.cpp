@@ -1216,11 +1216,13 @@ void system_contract::payepoch(uint32_t epoch_index,
 
    // The pay walk breaks at the demoted tier and again at max_rank_walk_rows, so a credited row
    // past either is never reset while `period_start_epoch` moves on regardless. `compute` would
-   // drop the credit as stale, but nothing rescores a parked or sunk row, so its stored rank_score
-   // would keep scoring a rating the period it belonged to has ended. Credit only ever reaches a
-   // mapped provider, and that table is capped at max_snap_providers, so rescoring the ones still
-   // holding it settles both cases. Must follow the t5s.set above: the score reads the period
-   // boundary this action just moved.
+   // drop the credit as stale, but nothing rescores those rows, so a stored rank_score would keep
+   // scoring a rating whose period has ended. (An inactive row is `unscored()` and carries no term;
+   // the ones that do are miss-demoted rows and schedulable rows past the ceiling.) Credit only
+   // ever reaches a mapped provider, and that table is capped at max_snap_providers, so rescoring
+   // the ones still holding it settles both cases -- and the prune in snapshot_attest.cpp consumes
+   // credit on the one path that removes a mapping. Must follow the t5s.set above: the score reads
+   // the period boundary this action just moved.
    snap_providers_table snap_providers(get_self());
    for (auto p = snap_providers.begin(); p != snap_providers.end(); ++p) {
       auto key = producer_key_t{p->producer.value};

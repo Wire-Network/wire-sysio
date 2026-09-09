@@ -176,14 +176,17 @@ namespace sysiosystem {
       time_point                                               last_claim_time;
       uint16_t                                                 location = 0;
       sysio::block_signing_authority                           producer_authority; // added in version 1.9.0
-      /// Rounds this producer was scheduled for and produced nothing in, consecutively. Reset to 0
-      /// the moment it produces. At prodscorecfg's max_consecutive_missed_rounds it sets
-      /// `is_demoted`; see producer_rank.hpp.
+      /// Rounds this producer was scheduled for and did not SERVE, consecutively -- a round is
+      /// served at prodscorecfg's `min_blocks_per_round` or better, so a round that delivered some
+      /// but too few blocks counts here exactly as an empty one does. Reset to 0 by serving a
+      /// round. At max_consecutive_missed_rounds it sets `is_demoted`; see producer_rank.hpp.
       uint32_t                                                 consecutive_missed_rounds = 0;
-      /// Demoted to standby for missing rounds. Categorical -- no score overcomes it. Cleared by
-      /// producing a block while still scheduled, or by `regproducer`.
+      /// Demoted to standby for unserved rounds. Categorical -- no score overcomes it. Cleared by
+      /// serving a round while still scheduled, or by `regproducer` ONCE the schedule has dropped
+      /// the producer -- `regproducer` is refused as a pardon while it still holds a slot.
       bool                                                     is_demoted = false;
-      /// Snapshot attestations credited this pay period; reset alongside the block counters.
+      /// Snapshot attestations credited this pay period; reset alongside the block counters, and
+      /// consumed when the producer's provider mapping is pruned (see snapshot_attest.cpp).
       uint32_t                                                 snapshot_attestations = 0;
       /// The pay period `snapshot_attestations` was earned in; `compute` ignores the count when
       /// this is not the current one. Staleness decided at READ time, so no exit from the pay walk
