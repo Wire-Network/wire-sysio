@@ -6,6 +6,7 @@ const SHADOWING_WARNING_CODE = "2519"
 
 describe("generated ProtobufRuntime", () => {
   it("uses the exact configured compiler version", () => {
+    expect(Solc.version()).toMatch(/^0\.8\.25\+/)
     expect(generateRuntime()).toContain("pragma solidity 0.8.25;")
   })
 
