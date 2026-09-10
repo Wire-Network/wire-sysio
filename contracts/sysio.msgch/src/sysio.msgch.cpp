@@ -5,6 +5,7 @@
 #include <sysio.chalg/sysio.chalg.hpp>     // dispute trigger + open-dispute gate (disputes table)
 #include <sysio.opreg/sysio.opreg.hpp>     // operator-status delivery gate (operators table)
 #include <sysio.roa.hpp>                    // authoritative Tier-1 electorate preflight
+#include <sysio.opp.common/evm_address.hpp>
 #include <sysio.opp.common/slug_name.hpp>
 #include <sysio.opp.common/safe_ops.hpp>   // to_depot_amount — WSA-028 fail-closed TokenAmount gate
 #include <sysio.opp.common/name_ops.hpp>   // parse_wire_account_name — never-throw account-name parse
@@ -740,7 +741,8 @@ struct em_identity {
 /// its canonical EVM address from the same bytes. `reg.actor.address` is metadata only and is never
 /// trusted as identity input.
 std::optional<em_identity> em_identity_from_uncompressed_key(const std::vector<char>& b) {
-   if (b.size() != 65 || static_cast<uint8_t>(b[0]) != 0x04) return std::nullopt;
+   const auto address = opp::evm_address_from_uncompressed_key(b.data(), b.size());
+   if (!address) return std::nullopt;
 
    sysio::ecc_public_key compressed{};
    // Compressed prefix = 0x02 if Y is even, 0x03 if odd; Y is bytes [33,65), parity is its LSB.
@@ -749,10 +751,9 @@ std::optional<em_identity> em_identity_from_uncompressed_key(const std::vector<c
 
    sysio::public_key pk;
    pk.emplace<3>(compressed);  // variant index 3 = EM
-   const auto hash = keccak(b.data() + 1, b.size() - 1).extract_as_byte_array();
    return em_identity{
       .key = pk,
-      .address = std::vector<char>(hash.end() - 20, hash.end()),
+      .address = *address,
    };
 }
 
@@ -803,8 +804,6 @@ void dispatch_node_owner_reg(const std::vector<char>& data, uint64_t chain_code)
 
    auto eth_identity = em_identity_from_uncompressed_key(reg.actor_pub_key);
    if (!eth_identity) return;                     // unusable depositor ETH key; drop
-
-   if (reg.actor.kind != opp::types::ChainKind::CHAIN_KIND_EVM) return;
 
    // 1) Create the account (idempotent; soft-skips a name that breaks the tier rule).
    action(permission_level{ROA_ACCOUNT, "active"_n}, ROA_ACCOUNT, "newnameduser"_n,

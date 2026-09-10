@@ -3,6 +3,7 @@
 #include "sysio.system/emissions.hpp"
 
 #include <sysio.authex/sysio.authex.hpp>
+#include <sysio.opp.common/evm_address.hpp>
 #include <sysio.opp.common/safe_ops.hpp>   // add_sat_u64 / add_sat_i64 -- never-throw saturating accumulators
 #include <sysio/permission.hpp>   // get_permission -- read an account's active authority in nodeownreg
 
@@ -692,7 +693,8 @@ namespace sysio {
         // NFT deposits land on Ethereum, so the recorded link is always an EM (secp256k1) key.
         check(eth_pub_key.index() == fc::crypto::key_type_em,
               "eth_pub_key must be an EM (secp256k1) public key");
-        check(eth_address.size() == 20, "eth_address must be exactly 20 bytes");
+        check(eth_address.size() == opp::evm_address_size,
+              "eth_address must be exactly 20 bytes");
 
         // ROA-active is a hard system invariant (the network cannot function with ROA inactive).
         // Read the state once here so the soft-fail audit rows below scope to the live network_gen

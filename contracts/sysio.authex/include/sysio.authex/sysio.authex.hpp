@@ -195,7 +195,13 @@ namespace sysio {
     using bytes = std::vector<char>;
 
     /**
-     * @brief Using the signature and provided parameters, this action will create a link between the WIRE account name and the external chain address. Pub keys / Addresses are 1:1 mapped.
+     * @brief Verify and create a one-to-one link between a WIRE account and an external-chain key.
+     *
+     * A successful link derives its canonical native address and inline-sends
+     * `sysio.dclaim::linkswept` to move matching pre-link rewards. If sysio.dclaim is missing or
+     * non-privileged, the link still commits and the sweep is skipped. Because a second createlink
+     * for the same account and chain is rejected, that skipped sweep is not automatically retryable
+     * through this action; an authorized operator must use recordlink or linkswept for remediation.
      *
      * @param chain_kind The chain identifier from `opp::types::ChainKind`
      *                   (CHAIN_KIND_EVM / CHAIN_KIND_SVM).
@@ -226,10 +232,12 @@ namespace sysio {
      * `require_auth(get_self())`; idempotent and non-throwing so the trust-OPP depot dispatch is
      * never aborted. Unsupported chain/key pairs are silently ignored. With a correctly sized
      * `native_address`, a successful or idempotent link also sweeps matching pre-link DClaim
-     * rewards. A malformed address skips only the sweep, not link insertion. A missing or
-     * non-privileged sysio.dclaim deployment likewise skips the sweep; the production bootstrap
-     * must deploy sysio.dclaim as privileged, and an identical recordlink can retry the sweep after
-     * bootstrap completes.
+     * rewards. EVM addresses must be 20 bytes; SVM addresses must equal the raw ED public-key bytes.
+     * A malformed or mismatched address skips only the sweep, not link insertion. A missing or
+     * non-privileged sysio.dclaim deployment likewise skips the sweep. An identical recordlink can
+     * retry before node-owner registration completes; after registration, nodeownreg's duplicate
+     * gate returns before this action, so remediation requires an operator-pushed recordlink or
+     * linkswept action.
      *
      * Unlike createlink, this does NOT enforce a unique `pub_key`: one external wallet may hold
      * several WireNodes NFTs and back several Wire accounts, so one ETH key -> many accounts is

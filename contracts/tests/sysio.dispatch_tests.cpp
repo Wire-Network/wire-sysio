@@ -280,6 +280,8 @@ std::vector<char> k1_pubkey_bytes(const fc::crypto::public_key& pk) {
 
 /// Encode a NodeOwnerRegistration attestation payload: the Wire account name + tier, the new
 /// account's owner/active key as a `WireKey` (key_type + raw bytes), and the depositor's ETH key.
+/// Leaves `actor.kind` unset because the exact source-outpost binding proves the chain and actor is
+/// metadata only; `actor.address` remains populated so tests can prove it is not trusted as identity.
 std::string encode_node_owner_registration(
    const std::string& account,
    uint32_t tier,
@@ -293,7 +295,6 @@ std::string encode_node_owner_registration(
    reg.set_tier(tier);
    reg.set_actor_pub_key(eth_pubkey_bytes.data(), eth_pubkey_bytes.size());
    auto* actor = reg.mutable_actor();
-   actor->set_kind(sysio::opp::types::CHAIN_KIND_EVM);
    actor->set_address(eth_address.data(), eth_address.size());
    auto* wk = reg.mutable_wire_pub_key();
    wk->set_key_type(wire_key_type);
@@ -1989,6 +1990,29 @@ BOOST_FIXTURE_TEST_CASE(dispatch_routes_node_owner_reg_to_roa, sysio_dispatch_te
    auto pending = get_dclaim_row("pclaims"_n, "pending_claim", CLAIM_ACCOUNT.to_uint64_t());
    BOOST_REQUIRE(!pending.is_null());
    BOOST_REQUIRE_EQUAL(pending["balance"].as<asset>().get_amount(), 4321);
+} FC_LOG_AND_RETHROW() }
+
+// BAR's NodeOwnerRegistration contract emits a 65-byte uncompressed SEC1 key. A compressed EM key
+// is well-formed protobuf but unusable identity input: dispatch must soft-drop it while committing
+// the consensus envelope, with no sysio.roa registration or audit side effect.
+BOOST_FIXTURE_TEST_CASE(node_owner_reg_with_compressed_actor_key_is_dropped, sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch("ETHEREUM");
+   const auto eth_code = fc::slug_name{"ETHEREUM"}.value;
+   auto wire_key = k1_pubkey_bytes(get_public_key(CLAIM_ACCOUNT, "active"));
+   auto eth_pub = fc::crypto::private_key::generate(
+      fc::crypto::private_key::key_type::em).get_public_key();
+   auto compressed_eth_key = em_pubkey_bytes(eth_pub);
+   auto eth_address = fc::crypto::ethereum::address_to_bytes(eth_pub);
+   auto payload = encode_node_owner_registration(
+      CLAIM_ACCOUNT.to_string(), /*tier=*/2,
+      sysio::opp::types::WIRE_KEY_TYPE_K1, wire_key, compressed_eth_key, eth_address);
+   auto envelope = encode_envelope_with_one_attestation(
+      current_epoch(), sysio::opp::types::ATTESTATION_TYPE_NODE_OWNER_REG, payload);
+
+   BOOST_REQUIRE_EQUAL(success(), deliver(/*chain_code=*/eth_code, envelope));
+   BOOST_REQUIRE(!get_envelope(1).is_null());
+   BOOST_REQUIRE(get_nodeowner(CLAIM_ACCOUNT).is_null());
+   BOOST_REQUIRE(get_nodeownerreg(CLAIM_ACCOUNT).is_null());
 } FC_LOG_AND_RETHROW() }
 
 // WSA-005: node-owner registration is bound to the EXACT Ethereum source outpost (NODE_OWNER_SRC_CHAIN

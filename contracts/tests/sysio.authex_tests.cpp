@@ -386,6 +386,28 @@ BOOST_FIXTURE_TEST_CASE( recordlink_svm_sweeps_prelink_dclaim_rewards, sysio_aut
    BOOST_REQUIRE_EQUAL(pending["balance"].as<asset>().get_amount(), 8000);
 } FC_LOG_AND_RETHROW()
 
+BOOST_FIXTURE_TEST_CASE( recordlink_svm_mismatched_address_skips_sweep, sysio_authex_tester ) try {
+   deploy_dclaim();
+   const auto public_key = fc::crypto::private_key::generate(
+      fc::crypto::private_key::key_type::ed).get_public_key();
+   const auto raw_key = public_key.get<fc::crypto::ed::public_key_shim>().serialize();
+   std::vector<char> mismatched_address(raw_key.begin(), raw_key.end());
+   mismatched_address.front() ^= char{0x01};
+
+   BOOST_REQUIRE_EQUAL(success(), onreward(
+      mismatched_address, 8500, ChainKind::CHAIN_KIND_SVM));
+   BOOST_REQUIRE_EQUAL(success(), recordlink(
+      AUTHEX, "carol", public_key, mismatched_address, ChainKind::CHAIN_KIND_SVM));
+   produce_blocks();
+
+   auto link = get_link(0);
+   BOOST_REQUIRE(!link.is_null());
+   BOOST_REQUIRE_EQUAL(link["pub_key"].as<fc::crypto::public_key>(), public_key);
+   BOOST_REQUIRE(!get_dclaim_row("unmapped"_n, "unmapped_token", 1).is_null());
+   BOOST_REQUIRE(get_dclaim_row(
+      "pclaims"_n, "pending_claim", "carol"_n.to_uint64_t()).is_null());
+} FC_LOG_AND_RETHROW()
+
 BOOST_FIXTURE_TEST_CASE( recordlink_identical_retry_resweeps_dclaim_rewards, sysio_authex_tester ) try {
    deploy_dclaim();
    const auto public_key = fc::crypto::private_key::generate(

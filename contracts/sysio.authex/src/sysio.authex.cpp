@@ -1,5 +1,6 @@
 #include <cstdint>
 #include <sysio.authex/sysio.authex.hpp>
+#include <sysio.opp.common/evm_address.hpp>
 #include <sysio/print.hpp>
 #include <sysio/privileged.hpp>
 
@@ -10,8 +11,6 @@ using namespace sysio;
 constexpr name link_row_payer = "sysio"_n;
 constexpr name dclaim_account = "sysio.dclaim"_n;
 constexpr name linkswept_action = "linkswept"_n;
-constexpr size_t evm_address_size = 20;
-constexpr size_t svm_address_size = 32;
 
 using ed_raw_key_t = std::array<uint8_t, 32>;
 
@@ -20,15 +19,6 @@ using ed_raw_key_t = std::array<uint8_t, 32>;
    ed_raw_key_t raw_key;
    std::copy(arr.begin(), arr.end(), raw_key.data());
    return raw_key;
-}
-
-/** Derive the canonical 20-byte EVM address from an uncompressed secp256k1 key. */
-std::vector<char> evm_address_from_uncompressed_key(const std::array<char, 65>& pub_key) {
-   check(static_cast<uint8_t>(pub_key.front()) == 0x04,
-         "Recovered EVM public key must be uncompressed");
-
-   const auto hash = keccak(pub_key.data() + 1, pub_key.size() - 1).extract_as_byte_array();
-   return std::vector<char>(hash.end() - evm_address_size, hash.end());
 }
 
 /**
@@ -124,7 +114,10 @@ namespace sysio {
             "EM key recovery failed: x-coordinate mismatch");
 
       verified_pub_key = public_key{std::in_place_index<3>, recovered_raw};
-      native_address = evm_address_from_uncompressed_key(recovered_uncompressed);
+      const auto recovered_address = opp::evm_address_from_uncompressed_key(
+         recovered_uncompressed.data(), recovered_uncompressed.size());
+      check(recovered_address.has_value(), "Recovered EVM public key must be uncompressed");
+      native_address = *recovered_address;
 
    } else if (chain_kind == ChainKind::CHAIN_KIND_SVM) {
       checksum256 hash256;
@@ -197,8 +190,9 @@ namespace sysio {
    const bool valid_svm = chain_kind == opp::types::ChainKind::CHAIN_KIND_SVM
                        && pub_key.index() == fc::crypto::key_type_ed;
    if (!valid_evm && !valid_svm) return;
-   const size_t expected_size = valid_evm ? evm_address_size : svm_address_size;
-   const bool can_sweep = native_address.size() == expected_size;
+   const bool can_sweep = valid_evm
+      ? native_address.size() == opp::evm_address_size
+      : native_address == pubkey_to_bytes(pub_key);
 
    links_t links(get_self());
    auto by_namechain = links.get_index<"bynamechain"_n>();
