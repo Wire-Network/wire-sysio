@@ -662,9 +662,9 @@ void epoch::advance() {
    ).send();
 
    // Keep the refund subtree at its original depth; refundwire can itself
-   // transfer a fee or sweep expired claims. It needs the new epoch index,
-   // but not the new schedule, and finishes before roster publication.
-   // Drain the swap-from-WIRE queue: each row queued via
+   // transfer a fee or sweep expired claims. The state write above makes the
+   // new epoch index visible before this action runs, and the action finishes
+   // before roster publication. Each row queued via
    // `sysio.uwrit::swapfromwire` since the last advance is re-validated
    // (target reserve ACTIVE + public, variance) and either becomes a
    // PENDING uwreq for the single-leg underwriter race or is refunded.
@@ -829,7 +829,7 @@ void epoch::finishadv(uint32_t epoch_index, int64_t emission_amount) {
       // site: an incomplete window is never published (see the withhold
       // below), and is reported so the roster can be repaired off-chain.
       if (new_tail.size() < cfg.operators_per_epoch) {
-         sysio::print("sysio.epoch::advance: only ", new_tail.size(), " of ",
+         sysio::print("sysio.epoch::finishadv: only ", new_tail.size(), " of ",
                       cfg.operators_per_epoch,
                       " eligible batch operators for the new tail group at epoch ",
                       state.current_epoch_index + cfg.batch_op_groups - 1,
