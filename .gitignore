@@ -11,7 +11,7 @@ tmp
 .run/
 /.data
 *.a
-*.sw*
+*.sw?
 *.dylib
 *.ll
 *.bc
