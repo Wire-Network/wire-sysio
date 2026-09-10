@@ -86,11 +86,11 @@ int64_t swap::compute(int64_t x, int64_t y, int64_t z, int fee) {
     if (x > 0) {
         tmp = 1 + (prod - 1) / int128_t(z);
         check( (tmp <= MAX), "computation overflow" );
-        tmp_fee = (tmp * fee + 9999) / 10000;
+        tmp_fee = (tmp * fee + (FEE_DENOMINATOR - 1)) / FEE_DENOMINATOR;
     } else {
         tmp = prod / int128_t(z);
         check( (tmp >= -MAX), "computation underflow" );
-        tmp_fee =  (-tmp * fee + 9999) / 10000;
+        tmp_fee =  (-tmp * fee + (FEE_DENOMINATOR - 1)) / FEE_DENOMINATOR;
     }
     tmp += tmp_fee;
     return int64_t(tmp);
@@ -259,6 +259,7 @@ void swap::changefee(symbol_code pair_token, int newfee) {
     const auto& token = statstable.find( pair_token.raw() );
     check ( token != statstable.end(), "pair token does not exist" );
     require_auth(token->fee_contract);
+    check( 0 <= newfee && newfee <= MAX_FEE, "fee out of range" );
     statstable.modify( token, same_payer, [&]( auto& a ) {
       a.fee = newfee;
     } );
