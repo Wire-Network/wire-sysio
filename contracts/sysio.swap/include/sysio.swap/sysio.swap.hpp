@@ -17,6 +17,12 @@ namespace sysio {
          const int64_t INIT_MAX = 1000000000000000;  // 10^15 
          const int ADD_LIQUIDITY_FEE = 1;
          const int DEFAULT_FEE = 10;
+         /// Fees are expressed in units of 1/FEE_DENOMINATOR of the traded amount.
+         static constexpr int FEE_DENOMINATOR = 10000;
+         /// Upper bound accepted by changefee. compute() checks its result against the
+         /// int64 range BEFORE adding the fee, so a fee at or above 100% could push the
+         /// final amount past that range; below 100% the sum stays within int64.
+         static constexpr int MAX_FEE = FEE_DENOMINATOR - 1;
 
          using contract::contract;
          [[sysio::action]] void inittoken(name user, symbol new_symbol, 

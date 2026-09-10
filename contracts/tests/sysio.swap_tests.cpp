@@ -8,6 +8,7 @@
 
 #include <contracts.hpp>
 #include <cmath>
+#include <random>
 
 using namespace sysio::testing;
 using namespace sysio;
@@ -288,6 +289,27 @@ public:
         BOOST_REQUIRE_EQUAL( success(), transfer( "sysio.token"_n, "alice"_n, "sysio.swap"_n, asset::from_string("45000000000000000.00 TUSD"), "") );
         BOOST_REQUIRE_EQUAL( success(), transfer( "sysio.token"_n, "alice"_n, "sysio.swap"_n, asset::from_string("300000000000000.00 TUSD"), "deposit to: bob") );
     }
+    abi_def swap_abi_def() {
+        const auto* accnt = control->find_account_metadata( "sysio.swap"_n );
+        BOOST_REQUIRE( accnt != nullptr );
+        abi_def abi;
+        BOOST_REQUIRE_EQUAL( abi_serializer::to_abi(accnt->abi, abi), true );
+        return abi;
+    }
+    // LP-token balance, 0 when the user never held any (no accounts row).
+    int64_t lp_balance( name user, symbol_code pair_token ) {
+        auto row = get_balance( "sysio.swap"_n, user, "accounts"_n, pair_token.value, "account" );
+        return row.is_null() ? 0 : to_int( fc::json::to_string( row["balance"],
+                 fc::time_point(fc::time_point::now() + abi_serializer_max_time) ) );
+    }
+    int64_t pool_fee( symbol_code pair_token ) {
+        return get_balance( "sysio.swap"_n, name(pair_token.value), "stat"_n, pair_token.value,
+                            "currency_stats" )["fee"].as_int64();
+    }
+    // The two-pool state the math tests start from: EVO = EOS/VOICE and
+    // ETUSD = EOS/TUSD, both funded by alice, with abi_ser on the swap ABI.
+    // Defined after the file-scope symbols and `extend` it uses.
+    void setup_pools();
     void prepare_carol_token() {
         create( "carol"_n, "carol"_n, asset::from_string("4.0000 EOS") );
         issue( "carol"_n, "carol"_n, "carol"_n, asset::from_string("4.0000 EOS"), "");
@@ -311,10 +333,58 @@ static symbol_code TUSD = TUSD2.to_symbol_code();
 
 extended_asset extend(asset to_extend) {
   if (to_extend.symbol_name() == "VOICE") {
-    return extended_asset{to_extend, "anothertoken"_n};  
+    return extended_asset{to_extend, "anothertoken"_n};
   } else {
     return extended_asset{to_extend, "sysio.token"_n};
   }
+}
+
+// Reference quotes for the rounding tests, written from the SPEC rather than
+// copied from swap::compute: every rounding goes the pool's way. What a user
+// pays is rounded up, what a user receives is rounded down, and the fee on
+// either is rounded up (so it is never zero on a non-zero amount).
+namespace reference {
+   using wide = boost::multiprecision::int128_t;
+   constexpr int64_t FeeDenominator = 10000;
+
+   int64_t ceil_div( wide a, wide b )  { return int64_t( (a + b - 1) / b ); }
+   int64_t floor_div( wide a, wide b ) { return int64_t( a / b ); }
+   int64_t fee_on( int64_t amount, int fee ) { return ceil_div( wide(amount) * fee, FeeDenominator ); }
+
+   // Units of `pool_out` received for `amount_in` units of `pool_in`.
+   int64_t receive( int64_t amount_in, int64_t pool_in, int64_t pool_out, int fee ) {
+      const int64_t gross = floor_div( wide(amount_in) * pool_out, wide(pool_in) + amount_in );
+      return gross - fee_on( gross, fee );
+   }
+   // Units of `pool_pay` charged to withdraw exactly `amount_out` units of `pool_out`.
+   int64_t pay( int64_t amount_out, int64_t pool_out, int64_t pool_pay, int fee ) {
+      const int64_t gross = ceil_div( wide(amount_out) * pool_pay, wide(pool_out) - amount_out );
+      return gross + fee_on( gross, fee );
+   }
+   // Units of one leg charged for `shares` new LP tokens (ADD_LIQUIDITY_FEE = 1).
+   int64_t add_leg( int64_t shares, int64_t pool_leg, int64_t supply ) {
+      const int64_t gross = ceil_div( wide(shares) * pool_leg, supply );
+      return gross + fee_on( gross, 1 );
+   }
+   // Units of one leg returned for burning `shares` LP tokens (no fee).
+   int64_t remove_leg( int64_t shares, int64_t pool_leg, int64_t supply ) {
+      return floor_div( wide(shares) * pool_leg, supply );
+   }
+}
+
+void sysio_swap_tester::setup_pools() {
+    create_tokens_and_issue();
+    abi_ser.set_abi( swap_abi_def(), abi_serializer::create_yield_function(abi_serializer_max_time) );
+    many_openext();
+    many_transfer();
+    BOOST_REQUIRE_EQUAL( success(), transfer( "sysio.token"_n, "alice"_n, "sysio.swap"_n,
+                                              asset::from_string("168601842738.7903 EOS"), "") );
+    BOOST_REQUIRE_EQUAL( success(), inittoken( "alice"_n, EVO4,
+        extend(asset::from_string("23058430092.1369 EOS")),
+        extend(asset::from_string("96116860184.2738 VOICE")), 10, "wevotethefee"_n) );
+    BOOST_REQUIRE_EQUAL( success(), inittoken( "alice"_n, ETUSD3,
+        extend(asset::from_string("10000000000.0000 EOS")),
+        extend(asset::from_string("9911686018427.38 TUSD")), 10, "wevotethefee"_n) );
 }
 
 BOOST_AUTO_TEST_SUITE(sysio_swap_tests)
@@ -1118,4 +1188,211 @@ BOOST_FIXTURE_TEST_CASE( indextable, sysio_swap_tester ) try {
         10, "wevotethefee"_n) );
 } FC_LOG_AND_RETHROW()
 
-BOOST_AUTO_TEST_SUITE_END() 
+// ---------------------------------------------------------------------------
+// Coverage added with the WIRE port: fee bounds, an exact rounding table, and
+// the pool invariants under a long randomized operation sequence.
+// ---------------------------------------------------------------------------
+
+// The fee vector wevotethefee can select from; the swap contract itself must
+// accept the whole range and reject anything outside [0, MAX_FEE].
+static const std::vector<int> FeeVector{1, 2, 3, 5, 7, 10, 15, 20, 30, 50, 75, 100, 150, 200, 300};
+
+BOOST_FIXTURE_TEST_CASE( changefee_bounds, sysio_swap_tester ) try {
+    setup_pools();
+
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("fee out of range"), changefee(EVO, -1) );
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("fee out of range"), changefee(EVO, 10000) );
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("fee out of range"), changefee(EVO, std::numeric_limits<int>::max()) );
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("fee out of range"), changefee(EVO, std::numeric_limits<int>::min()) );
+    BOOST_REQUIRE_EQUAL( 10, pool_fee(EVO) );
+
+    BOOST_REQUIRE_EQUAL( success(), changefee(EVO, 0) );
+    BOOST_REQUIRE_EQUAL( 0, pool_fee(EVO) );
+    BOOST_REQUIRE_EQUAL( success(), changefee(EVO, 9999) );
+    BOOST_REQUIRE_EQUAL( 9999, pool_fee(EVO) );
+    for (int fee : FeeVector) {
+        BOOST_REQUIRE_EQUAL( success(), changefee(EVO, fee) );
+        BOOST_REQUIRE_EQUAL( fee, pool_fee(EVO) );
+    }
+
+    // At the maximum fee a swap still settles, and its output is exactly the
+    // spec quote -- the bound exists so this never overflows int64.
+    BOOST_REQUIRE_EQUAL( success(), changefee(EVO, 9999) );
+    auto before = system_balance(EVO.value);
+    const int64_t amount_in = 1'000'000'000;
+    const int64_t expected  = reference::receive(amount_in, before[0], before[1], 9999);
+    BOOST_REQUIRE_EQUAL( success(),
+        exchange( "alice"_n, EVO, extend(asset(amount_in, EOS4)), asset(expected, VOICE4) ) );
+    auto after = system_balance(EVO.value);
+    BOOST_REQUIRE_EQUAL( before[1] - expected, after[1] );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( compute_rounding_table, sysio_swap_tester ) try {
+    setup_pools();
+    static const std::vector<int64_t> amounts{1, 2, 3, 10, 100, 12345, 1'000'000};
+
+    // Swaps in both directions and exact-output withdrawals, at every fee.
+    for (int fee : FeeVector) {
+        BOOST_REQUIRE_EQUAL( success(), changefee(EVO, fee) );
+        for (int64_t amount : amounts) {
+            // EOS -> VOICE: one unit above the spec quote is refused, the quote itself lands
+            auto before = system_balance(EVO.value);
+            int64_t out = reference::receive(amount, before[0], before[1], fee);
+            int64_t alice_eos = balance("alice"_n, 0), alice_voice = balance("alice"_n, 1);
+            BOOST_REQUIRE_EQUAL( wasm_assert_msg("available is less than expected"),
+                exchange( "alice"_n, EVO, extend(asset(amount, EOS4)), asset(out + 1, VOICE4) ) );
+            BOOST_REQUIRE_EQUAL( success(),
+                exchange( "alice"_n, EVO, extend(asset(amount, EOS4)), asset(out, VOICE4) ) );
+            auto after = system_balance(EVO.value);
+            BOOST_REQUIRE_EQUAL( before[0] + amount, after[0] );
+            BOOST_REQUIRE_EQUAL( before[1] - out,    after[1] );
+            BOOST_REQUIRE_EQUAL( alice_eos - amount, balance("alice"_n, 0) );
+            BOOST_REQUIRE_EQUAL( alice_voice + out,  balance("alice"_n, 1) );
+
+            // VOICE -> EOS
+            before = after;
+            out = reference::receive(amount, before[1], before[0], fee);
+            BOOST_REQUIRE_EQUAL( wasm_assert_msg("available is less than expected"),
+                exchange( "alice"_n, EVO, extend(asset(amount, VOICE4)), asset(out + 1, EOS4) ) );
+            BOOST_REQUIRE_EQUAL( success(),
+                exchange( "alice"_n, EVO, extend(asset(amount, VOICE4)), asset(out, EOS4) ) );
+            after = system_balance(EVO.value);
+            BOOST_REQUIRE_EQUAL( before[1] + amount, after[1] );
+            BOOST_REQUIRE_EQUAL( before[0] - out,    after[0] );
+
+            // exact-output: withdraw exactly `amount` EOS, paying the spec quote in VOICE
+            before = after;
+            int64_t cost = reference::pay(amount, before[0], before[1], fee);
+            BOOST_REQUIRE_EQUAL( wasm_assert_msg("available is less than expected"),
+                exchange( "alice"_n, EVO, extend(asset(-amount, EOS4)), asset(-(cost - 1), VOICE4) ) );
+            BOOST_REQUIRE_EQUAL( success(),
+                exchange( "alice"_n, EVO, extend(asset(-amount, EOS4)), asset(-cost, VOICE4) ) );
+            after = system_balance(EVO.value);
+            BOOST_REQUIRE_EQUAL( before[0] - amount, after[0] );
+            BOOST_REQUIRE_EQUAL( before[1] + cost,   after[1] );
+        }
+    }
+
+    // Liquidity: adding charges ceil + the fixed 0.01% fee per leg, removing returns floor.
+    for (int64_t shares : {int64_t(1), int64_t(2), int64_t(3), int64_t(10), int64_t(12345)}) {
+        auto before = system_balance(EVO.value);
+        const int64_t pay1 = reference::add_leg(shares, before[0], before[2]);
+        const int64_t pay2 = reference::add_leg(shares, before[1], before[2]);
+        BOOST_REQUIRE_EQUAL( wasm_assert_msg("available is less than expected"),
+            addliquidity( "alice"_n, asset(shares, EVO4), asset(pay1 - 1, EOS4), asset(pay2, VOICE4) ) );
+        BOOST_REQUIRE_EQUAL( wasm_assert_msg("available is less than expected"),
+            addliquidity( "alice"_n, asset(shares, EVO4), asset(pay1, EOS4), asset(pay2 - 1, VOICE4) ) );
+        BOOST_REQUIRE_EQUAL( success(),
+            addliquidity( "alice"_n, asset(shares, EVO4), asset(pay1, EOS4), asset(pay2, VOICE4) ) );
+        auto after = system_balance(EVO.value);
+        BOOST_REQUIRE_EQUAL( before[0] + pay1,   after[0] );
+        BOOST_REQUIRE_EQUAL( before[1] + pay2,   after[1] );
+        BOOST_REQUIRE_EQUAL( before[2] + shares, after[2] );
+
+        before = after;
+        const int64_t get1 = reference::remove_leg(shares, before[0], before[2]);
+        const int64_t get2 = reference::remove_leg(shares, before[1], before[2]);
+        BOOST_REQUIRE_EQUAL( wasm_assert_msg("available is less than expected"),
+            remliquidity( "alice"_n, asset(shares, EVO4), asset(get1 + 1, EOS4), asset(get2, VOICE4) ) );
+        BOOST_REQUIRE_EQUAL( success(),
+            remliquidity( "alice"_n, asset(shares, EVO4), asset(get1, EOS4), asset(get2, VOICE4) ) );
+        after = system_balance(EVO.value);
+        BOOST_REQUIRE_EQUAL( before[0] - get1,   after[0] );
+        BOOST_REQUIRE_EQUAL( before[1] - get2,   after[1] );
+        BOOST_REQUIRE_EQUAL( before[2] - shares, after[2] );
+    }
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( invariants_under_random_sequences, sysio_swap_tester ) try {
+    setup_pools();
+
+    struct pool_spec {
+        symbol_code code;   // LP token
+        symbol      lp;
+        symbol      leg1;   // pool1
+        symbol      leg2;   // pool2
+        int         leg1_id, leg2_id;   // evodexacnts row ids (openext order: EOS=0, VOICE=1, TUSD=2)
+    };
+    const std::vector<pool_spec> pools{
+        { EVO,   EVO4,   EOS4, VOICE4, 0, 1 },
+        { ETUSD, ETUSD3, EOS4, TUSD2,  0, 2 },
+    };
+    const std::vector<name> users{ "alice"_n, "bob"_n };
+    // Failures the sequence is allowed to produce: every one is a guard the
+    // contract is SUPPOSED to raise, and each leaves state untouched.
+    const std::vector<action_result> allowed{
+        wasm_assert_msg("insufficient funds"),
+        wasm_assert_msg("available is less than expected"),
+        wasm_assert_msg("invalid parameters"),
+        wasm_assert_msg("computation overflow"),
+        wasm_assert_msg("computation underflow"),
+        wasm_assert_msg("the pool cannot be left empty"),
+        wasm_assert_msg("overdrawn balance"),
+        wasm_assert_msg("no balance object found"),
+    };
+
+    std::mt19937_64 rng(0x57495245'53574150ULL);   // fixed seed: the sequence is reproducible
+    // Log-uniform draw in [1, cap] so dust and large trades are both frequent.
+    auto draw = [&](int64_t cap) -> int64_t {
+        if (cap < 1) return 1;
+        int digits = 0;
+        for (int64_t c = cap; c > 0; c /= 10) ++digits;
+        int64_t magnitude = 1;
+        for (int e = rng() % digits; e > 0; --e) magnitude *= 10;
+        return std::min<int64_t>(cap, magnitude * (1 + rng() % 9));
+    };
+
+    enum op_kind { op_swap_forward, op_swap_backward, op_exact_output, op_add, op_remove, op_fee_change, op_count };
+    std::vector<int> successes(op_count, 0);
+    const int steps = 400;
+
+    for (int step = 0; step < steps; ++step) {
+        const auto& pool = pools[rng() % pools.size()];
+        const name  user = users[rng() % users.size()];
+        const auto  old_total = total();
+        const auto  old_vec   = system_balance(pool.code.value);
+        const int64_t user_leg1 = balance(user, pool.leg1_id);
+        const int64_t user_leg2 = balance(user, pool.leg2_id);
+        const int   op = rng() % op_count;
+
+        action_result r;
+        if (op == op_swap_forward) {
+            r = exchange( user, pool.code, extend(asset(draw(user_leg1), pool.leg1)), asset(0, pool.leg2) );
+        } else if (op == op_swap_backward) {
+            r = exchange( user, pool.code, extend(asset(draw(user_leg2), pool.leg2)), asset(0, pool.leg1) );
+        } else if (op == op_exact_output) {
+            // withdraw exactly `w` of leg1, paying at most the user's whole leg2 balance
+            const int64_t w = draw(old_vec[0] / 2);
+            r = exchange( user, pool.code, extend(asset(-w, pool.leg1)), asset(-user_leg2, pool.leg2) );
+        } else if (op == op_add) {
+            r = addliquidity( user, asset(draw(old_vec[2] / 10), pool.lp),
+                              asset(user_leg1, pool.leg1), asset(user_leg2, pool.leg2) );
+        } else if (op == op_remove) {
+            const int64_t lp = lp_balance(user, pool.code);
+            r = remliquidity( user, asset(draw(lp), pool.lp), asset(0, pool.leg1), asset(0, pool.leg2) );
+        } else {
+            r = changefee( pool.code, FeeVector[rng() % FeeVector.size()] );
+        }
+
+        if (r == success()) {
+            ++successes[op];
+        } else {
+            BOOST_REQUIRE_MESSAGE( std::find(allowed.begin(), allowed.end(), r) != allowed.end(),
+                                   "step " << step << " op " << op << ": unexpected failure: " << r );
+        }
+        // Conservation: nothing enters or leaves the contract in any of these ops.
+        BOOST_REQUIRE_MESSAGE( old_total == total(), "step " << step << " op " << op << ": totals changed" );
+        // Share value: P1*P2/S^2 never decreases through a swap, add, or remove.
+        BOOST_REQUIRE_MESSAGE( is_increasing(old_vec, system_balance(pool.code.value)),
+                               "step " << step << " op " << op << ": pool value per share decreased" );
+    }
+
+    // The run must actually have exercised every path, not merely survived it.
+    BOOST_REQUIRE_GE( successes[op_swap_forward] + successes[op_swap_backward], 60 );
+    BOOST_REQUIRE_GE( successes[op_exact_output], 15 );
+    BOOST_REQUIRE_GE( successes[op_add], 15 );
+    BOOST_REQUIRE_GE( successes[op_remove], 10 );
+    BOOST_REQUIRE_GE( successes[op_fee_change], 20 );
+} FC_LOG_AND_RETHROW()
+
+BOOST_AUTO_TEST_SUITE_END()
