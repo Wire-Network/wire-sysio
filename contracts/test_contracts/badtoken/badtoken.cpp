@@ -3,7 +3,7 @@
 void badtoken::transfer( const name& from, const name& to,
   const asset& quantity, const string& memo )
 {
-    require_recipient( "evolutiondex"_n );
+    require_recipient( "sysio.swap"_n );
 }
 
 void badtoken::ontransfer ( const name& from, const name& to, const asset& quantity, const string& memo )

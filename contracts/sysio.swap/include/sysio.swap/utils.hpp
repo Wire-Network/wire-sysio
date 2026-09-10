@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <iterator>
 
-#include <eosio/asset.hpp>
+#include <sysio/asset.hpp>
 #include "safe.hpp"
 
 string_view trim(string_view sv) {

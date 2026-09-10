@@ -1,29 +1,29 @@
 #pragma once
 
-#include <eosio/eosio.hpp>
-#include <eosio/asset.hpp>
-#include <eosio/system.hpp>
-#include <eosio/print.hpp>
+#include <sysio/sysio.hpp>
+#include <sysio/asset.hpp>
+#include <sysio/system.hpp>
+#include <sysio/print.hpp>
 #include <cmath>
 #include <numeric>
 
-using namespace eosio;
+using namespace sysio;
 using namespace std;
 
-class [[eosio::contract("wevotethefee")]] wevotethefee : public contract {
+class [[sysio::contract("wevotethefee")]] wevotethefee : public contract {
    public:
 
       using contract::contract;
-      [[eosio::action]] void votefee(name user, symbol_code pair_token, int fee_voted);
-      [[eosio::action]] void openfeetable(name user, symbol_code pair_token);
-      [[eosio::action]] void closevote(name user, symbol_code pair_token);
-      [[eosio::action]] void closefeetable(symbol_code pair_token);
-      [[eosio::action]] void updatefee(symbol_code pair_token);
-      [[eosio::on_notify("evolutiondex::addliquidity")]] void onaddliquidity(name user, asset to_buy, 
+      [[sysio::action]] void votefee(name user, symbol_code pair_token, int fee_voted);
+      [[sysio::action]] void openfeetable(name user, symbol_code pair_token);
+      [[sysio::action]] void closevote(name user, symbol_code pair_token);
+      [[sysio::action]] void closefeetable(symbol_code pair_token);
+      [[sysio::action]] void updatefee(symbol_code pair_token);
+      [[sysio::on_notify("sysio.swap::addliquidity")]] void onaddliquidity(name user, asset to_buy, 
         asset max_asset1, asset max_asset2);
-      [[eosio::on_notify("evolutiondex::remliquidity")]] void onremliquidity(name user, asset to_sell,
+      [[sysio::on_notify("sysio.swap::remliquidity")]] void onremliquidity(name user, asset to_sell,
         asset min_asset1, asset min_asset2);
-      [[eosio::on_notify("evolutiondex::transfer")]] void ontransfer(const name& from, const name& to, 
+      [[sysio::on_notify("sysio.swap::transfer")]] void ontransfer(const name& from, const name& to, 
            const asset& quantity, const string&  memo );
 
    private:
@@ -43,24 +43,24 @@ class [[eosio::contract("wevotethefee")]] wevotethefee : public contract {
       void add_balance(name user, asset to_add, bool need_update);
       asset bring_balance(name user, symbol_code pair_token);
 
-      struct [[eosio::table]] feeaccount {
+      struct [[sysio::table]] feeaccount {
          symbol_code pair_token;
          int fee_index_voted;
          uint64_t primary_key()const { return pair_token.raw(); }
       };
 
-      struct [[eosio::table]] feetable {
+      struct [[sysio::table]] feetable {
          symbol_code pair_token;
          vector <int64_t> votes;
          uint64_t primary_key()const { return pair_token.raw(); }
       };
 
-      typedef eosio::multi_index<"feeaccount"_n, feeaccount> feeaccounts;
-      typedef eosio::multi_index<"feetable"_n, feetable> feetables;
+      typedef sysio::multi_index<"feeaccount"_n, feeaccount> feeaccounts;
+      typedef sysio::multi_index<"feetable"_n, feetable> feetables;
 
-      struct [[eosio::table]] account {
+      struct [[sysio::table]] account {
          asset    balance;
          uint64_t primary_key()const { return balance.symbol.code().raw(); }
       };
-      typedef eosio::multi_index< "accounts"_n, account > accounts;
+      typedef sysio::multi_index< "accounts"_n, account > accounts;
 };
