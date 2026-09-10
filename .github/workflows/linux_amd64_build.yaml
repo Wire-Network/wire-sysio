@@ -649,7 +649,9 @@ jobs:
 
   all-passing:
     name: All Required Tests Passed
-    needs: [ build-test-package, root-node-tooling, verify-packages ]
+    # platform-cache and v gate build-test-package: when either fails the build is
+    # skipped, so both must be named here or the report blames a job that never ran.
+    needs: [ platform-cache, v, build-test-package, root-node-tooling, verify-packages ]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -660,8 +662,22 @@ jobs:
           webhook-url: ${{ secrets.WEBHOOK_URL }}
           notification-type: 1
           workflow-name: "Build & Test Workflow"
-          job-results: "build-test-package:${{ needs.build-test-package.result }},root-node-tooling:${{ needs.root-node-tooling.result }},verify-packages:${{ needs.verify-packages.result }}"
+          # SPACE-separated `job:status` pairs. The action word-splits this input; a
+          # comma-separated list arrives as one multi-colon word, parses to {}, and
+          # is reported as SUCCESS whatever the jobs actually did.
+          job-results: >-
+            platform-cache:${{ needs.platform-cache.result }}
+            discover-versions:${{ needs.v.result }}
+            build-test-package:${{ needs.build-test-package.result }}
+            root-node-tooling:${{ needs.root-node-tooling.result }}
+            verify-packages:${{ needs.verify-packages.result }}
           github-context: ${{ toJSON(github) }}
 
-      - if: needs.build-test-package.result != 'success' || needs.root-node-tooling.result != 'success' || needs.verify-packages.result != 'success'
+      - name: Fail when any required job did not succeed
+        if: >-
+          needs.platform-cache.result != 'success'
+          || needs.v.result != 'success'
+          || needs.build-test-package.result != 'success'
+          || needs.root-node-tooling.result != 'success'
+          || needs.verify-packages.result != 'success'
         run: false
