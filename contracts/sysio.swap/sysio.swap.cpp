@@ -1,9 +1,9 @@
-#include "evolutiondex.hpp"
-#include "utils.hpp"
+#include <sysio.swap/sysio.swap.hpp>
+#include <sysio.swap/utils.hpp>
 
-using namespace evolution;
+namespace sysio {
 
-void evolutiondex::openext( const name& user, const name& payer, const extended_symbol& ext_symbol) {
+void swap::openext( const name& user, const name& payer, const extended_symbol& ext_symbol) {
     check( is_account( user ), "user account does not exist" );
     require_auth( payer );
     evodexacnts acnts( get_self(), user.value );
@@ -18,7 +18,7 @@ void evolutiondex::openext( const name& user, const name& payer, const extended_
     }
 }
 
-void evolutiondex::closeext( const name& user, const name& to, const extended_symbol& ext_symbol, string memo) {
+void swap::closeext( const name& user, const name& to, const extended_symbol& ext_symbol, string memo) {
     require_auth( user );
     evodexacnts acnts( get_self(), user.value );
     auto index = acnts.get_index<"extended"_n>();
@@ -32,12 +32,12 @@ void evolutiondex::closeext( const name& user, const name& to, const extended_sy
     index.erase( acnt_balance );
 }
 
-void evolutiondex::ontransfer(name from, name to, asset quantity, string memo) {
+void swap::ontransfer(name from, name to, asset quantity, string memo) {
     constexpr string_view DEPOSIT_TO = "deposit to:";
     constexpr string_view EXCHANGE   = "exchange:";
 
     if (from == get_self()) return;
-    check(to == get_self(), "This transfer is not for evolutiondex");
+    check(to == get_self(), "This transfer is not for sysio.swap");
     check(quantity.amount >= 0, "quantity must be positive");
 
     auto incoming = extended_asset{quantity, get_first_receiver()};
@@ -53,7 +53,7 @@ void evolutiondex::ontransfer(name from, name to, asset quantity, string memo) {
     }
 }
 
-void evolutiondex::withdraw(name user, name to, extended_asset to_withdraw, string memo){
+void swap::withdraw(name user, name to, extended_asset to_withdraw, string memo){
     require_auth( user );
     check(to_withdraw.quantity.amount > 0, "quantity must be positive");
     add_signed_ext_balance(user, -to_withdraw);
@@ -61,7 +61,7 @@ void evolutiondex::withdraw(name user, name to, extended_asset to_withdraw, stri
       std::make_tuple( get_self(), to, to_withdraw.quantity, memo) ).send();
 }
 
-void evolutiondex::addliquidity(name user, asset to_buy, 
+void swap::addliquidity(name user, asset to_buy, 
   asset max_asset1, asset max_asset2) {
     require_auth(user);
     check( (to_buy.amount > 0), "to_buy amount must be positive");
@@ -69,7 +69,7 @@ void evolutiondex::addliquidity(name user, asset to_buy,
     add_signed_liq(user, to_buy, true, max_asset1, max_asset2);
 }
 
-void evolutiondex::remliquidity(name user, asset to_sell,
+void swap::remliquidity(name user, asset to_sell,
   asset min_asset1, asset min_asset2) {
     require_auth(user);
     check(to_sell.amount > 0, "to_sell amount must be positive");
@@ -78,7 +78,7 @@ void evolutiondex::remliquidity(name user, asset to_sell,
 }
 
 // computes x * y / z plus the fee
-int64_t evolutiondex::compute(int64_t x, int64_t y, int64_t z, int fee) {
+int64_t swap::compute(int64_t x, int64_t y, int64_t z, int fee) {
     check( (x != 0) && (y > 0) && (z > 0), "invalid parameters");
     int128_t prod = int128_t(x) * int128_t(y);
     int128_t tmp = 0;
@@ -96,7 +96,7 @@ int64_t evolutiondex::compute(int64_t x, int64_t y, int64_t z, int fee) {
     return int64_t(tmp);
 }
 
-void evolutiondex::add_signed_liq(name user, asset to_add, bool is_buying,
+void swap::add_signed_liq(name user, asset to_add, bool is_buying,
   asset max_asset1, asset max_asset2){
     check( to_add.is_valid(), "invalid asset");
     stats statstable( get_self(), to_add.symbol.code().raw() );
@@ -128,7 +128,7 @@ void evolutiondex::add_signed_liq(name user, asset to_add, bool is_buying,
     check(token->supply.amount != 0, "the pool cannot be left empty");
 }
 
-void evolutiondex::exchange( name user, symbol_code pair_token, 
+void swap::exchange( name user, symbol_code pair_token, 
   extended_asset ext_asset_in, asset min_expected) {
     require_auth(user);
     check( ((ext_asset_in.quantity.amount > 0) && (min_expected.amount >= 0)) ||
@@ -139,7 +139,7 @@ void evolutiondex::exchange( name user, symbol_code pair_token,
     add_signed_ext_balance(user, ext_asset_out);
 }
 
-extended_asset evolutiondex::process_exch(symbol_code pair_token,
+extended_asset swap::process_exch(symbol_code pair_token,
   extended_asset ext_asset_in, asset min_expected){
     stats statstable( get_self(), pair_token.raw() );
     const auto token = statstable.find( pair_token.raw() );
@@ -181,7 +181,7 @@ extended_asset evolutiondex::process_exch(symbol_code pair_token,
     return ext_asset_out;
 }
 
-void evolutiondex::memoexchange(name user, extended_asset ext_asset_in, string_view details){
+void swap::memoexchange(name user, extended_asset ext_asset_in, string_view details){
     auto parts = split(details, ",");
     check(parts.size() >= 2, "Expected format 'EVOTOKEN,min_expected_asset,optional memo'");
 
@@ -196,7 +196,7 @@ void evolutiondex::memoexchange(name user, extended_asset ext_asset_in, string_v
       std::make_tuple( get_self(), user, ext_asset_out.quantity, std::string(memo)) ).send();
 }
 
-void evolutiondex::inittoken(name user, symbol new_symbol, extended_asset initial_pool1,
+void swap::inittoken(name user, symbol new_symbol, extended_asset initial_pool1,
 extended_asset initial_pool2, int initial_fee, name fee_contract)
 {
     require_auth( user );
@@ -231,7 +231,7 @@ extended_asset initial_pool2, int initial_fee, name fee_contract)
     add_signed_ext_balance(user, -initial_pool2);
 }
 
-void evolutiondex::indexpair(name user, symbol evo_symbol) {
+void swap::indexpair(name user, symbol evo_symbol) {
     stats statstable( get_self(), evo_symbol.code().raw() );
     const auto& token = statstable.find( evo_symbol.code().raw() );
     check ( token != statstable.end(), "token symbol does not exist" );
@@ -240,7 +240,7 @@ void evolutiondex::indexpair(name user, symbol evo_symbol) {
     placeindex(user, evo_symbol, pool1, pool2);
 }
 
-void evolutiondex::placeindex(name user, symbol evo_symbol,
+void swap::placeindex(name user, symbol evo_symbol,
   extended_asset pool1, extended_asset pool2 ) {
     auto id_256 = make256key(pool1.contract.value, pool1.quantity.symbol.raw(),
                              pool2.contract.value, pool2.quantity.symbol.raw());
@@ -254,7 +254,7 @@ void evolutiondex::placeindex(name user, symbol evo_symbol,
     });
 }
 
-void evolutiondex::changefee(symbol_code pair_token, int newfee) {
+void swap::changefee(symbol_code pair_token, int newfee) {
     stats statstable( get_self(), pair_token.raw() );
     const auto& token = statstable.find( pair_token.raw() );
     check ( token != statstable.end(), "pair token does not exist" );
@@ -264,20 +264,20 @@ void evolutiondex::changefee(symbol_code pair_token, int newfee) {
     } );
 }
 
-uint128_t evolutiondex::make128key(uint64_t a, uint64_t b) {
+uint128_t swap::make128key(uint64_t a, uint64_t b) {
     uint128_t aa = a;
     uint128_t bb = b;
     return (aa << 64) + bb;
 }
 
-checksum256 evolutiondex::make256key(uint64_t a, uint64_t b, uint64_t c, uint64_t d) {
+checksum256 swap::make256key(uint64_t a, uint64_t b, uint64_t c, uint64_t d) {
     if (make128key(a,b) < make128key(c,d))
       return checksum256::make_from_word_sequence<uint64_t>(a,b,c,d);
     else
       return checksum256::make_from_word_sequence<uint64_t>(c,d,a,b);
 }
 
-void evolutiondex::add_signed_ext_balance( const name& user, const extended_asset& to_add )
+void swap::add_signed_ext_balance( const name& user, const extended_asset& to_add )
 {
     check( to_add.quantity.is_valid(), "invalid asset" );
     evodexacnts acnts( get_self(), user.value );
@@ -290,3 +290,4 @@ void evolutiondex::add_signed_ext_balance( const name& user, const extended_asse
         check( a.balance.quantity.amount >= 0, "insufficient funds");
     });
 }
+} // namespace sysio

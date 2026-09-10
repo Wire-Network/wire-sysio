@@ -18,7 +18,7 @@ int wevotethefee::median(symbol_code pair_token){
 void wevotethefee::updatefee(symbol_code pair_token) {
     int new_fee = median(pair_token);
     action(permission_level{ get_self(), "active"_n },
-      "evolutiondex"_n, "changefee"_n,
+      "sysio.swap"_n, "changefee"_n,
       make_tuple( pair_token, new_fee )).send();
 }
 
@@ -36,7 +36,7 @@ void wevotethefee::ontransfer(const name& from, const name& to, const asset& qua
 };
 
 asset wevotethefee::bring_balance(name user, symbol_code pair_token) {
-    accounts table( "evolutiondex"_n, user.value );
+    accounts table( "sysio.swap"_n, user.value );
     const auto& user_balance = table.find( pair_token.raw() );
     check ( user_balance != table.end(), "pair_token balance does not exist" );
     return user_balance->balance;

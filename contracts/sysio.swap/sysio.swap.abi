@@ -1,0 +1,478 @@
+{
+    "____comment": "This file was generated with sysio-abigen. DO NOT EDIT ",
+    "version": "sysio::abi/1.2",
+    "types": [],
+    "structs": [
+        {
+            "name": "account",
+            "base": "",
+            "fields": [
+                {
+                    "name": "balance",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "addliquidity",
+            "base": "",
+            "fields": [
+                {
+                    "name": "user",
+                    "type": "name"
+                },
+                {
+                    "name": "to_buy",
+                    "type": "asset"
+                },
+                {
+                    "name": "max_asset1",
+                    "type": "asset"
+                },
+                {
+                    "name": "max_asset2",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "changefee",
+            "base": "",
+            "fields": [
+                {
+                    "name": "pair_token",
+                    "type": "symbol_code"
+                },
+                {
+                    "name": "newfee",
+                    "type": "int32"
+                }
+            ]
+        },
+        {
+            "name": "close",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "symbol",
+                    "type": "symbol"
+                }
+            ]
+        },
+        {
+            "name": "closeext",
+            "base": "",
+            "fields": [
+                {
+                    "name": "user",
+                    "type": "name"
+                },
+                {
+                    "name": "to",
+                    "type": "name"
+                },
+                {
+                    "name": "ext_symbol",
+                    "type": "extended_symbol"
+                },
+                {
+                    "name": "memo",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "currency_stats",
+            "base": "",
+            "fields": [
+                {
+                    "name": "supply",
+                    "type": "asset"
+                },
+                {
+                    "name": "max_supply",
+                    "type": "asset"
+                },
+                {
+                    "name": "issuer",
+                    "type": "name"
+                },
+                {
+                    "name": "pool1",
+                    "type": "extended_asset"
+                },
+                {
+                    "name": "pool2",
+                    "type": "extended_asset"
+                },
+                {
+                    "name": "fee",
+                    "type": "int32"
+                },
+                {
+                    "name": "fee_contract",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "evodexaccount",
+            "base": "",
+            "fields": [
+                {
+                    "name": "balance",
+                    "type": "extended_asset"
+                },
+                {
+                    "name": "id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "exchange",
+            "base": "",
+            "fields": [
+                {
+                    "name": "user",
+                    "type": "name"
+                },
+                {
+                    "name": "pair_token",
+                    "type": "symbol_code"
+                },
+                {
+                    "name": "ext_asset_in",
+                    "type": "extended_asset"
+                },
+                {
+                    "name": "min_expected",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "extended_symbol",
+            "base": "",
+            "fields": [
+                {
+                    "name": "sym",
+                    "type": "symbol"
+                },
+                {
+                    "name": "contract",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "index_struct",
+            "base": "",
+            "fields": [
+                {
+                    "name": "evo_symbol",
+                    "type": "symbol"
+                },
+                {
+                    "name": "id_256",
+                    "type": "checksum256"
+                }
+            ]
+        },
+        {
+            "name": "indexpair",
+            "base": "",
+            "fields": [
+                {
+                    "name": "user",
+                    "type": "name"
+                },
+                {
+                    "name": "evo_symbol",
+                    "type": "symbol"
+                }
+            ]
+        },
+        {
+            "name": "inittoken",
+            "base": "",
+            "fields": [
+                {
+                    "name": "user",
+                    "type": "name"
+                },
+                {
+                    "name": "new_symbol",
+                    "type": "symbol"
+                },
+                {
+                    "name": "initial_pool1",
+                    "type": "extended_asset"
+                },
+                {
+                    "name": "initial_pool2",
+                    "type": "extended_asset"
+                },
+                {
+                    "name": "initial_fee",
+                    "type": "int32"
+                },
+                {
+                    "name": "fee_contract",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "open",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "symbol",
+                    "type": "symbol"
+                },
+                {
+                    "name": "ram_payer",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "openext",
+            "base": "",
+            "fields": [
+                {
+                    "name": "user",
+                    "type": "name"
+                },
+                {
+                    "name": "payer",
+                    "type": "name"
+                },
+                {
+                    "name": "ext_symbol",
+                    "type": "extended_symbol"
+                }
+            ]
+        },
+        {
+            "name": "remliquidity",
+            "base": "",
+            "fields": [
+                {
+                    "name": "user",
+                    "type": "name"
+                },
+                {
+                    "name": "to_sell",
+                    "type": "asset"
+                },
+                {
+                    "name": "min_asset1",
+                    "type": "asset"
+                },
+                {
+                    "name": "min_asset2",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "transfer",
+            "base": "",
+            "fields": [
+                {
+                    "name": "from",
+                    "type": "name"
+                },
+                {
+                    "name": "to",
+                    "type": "name"
+                },
+                {
+                    "name": "quantity",
+                    "type": "asset"
+                },
+                {
+                    "name": "memo",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "withdraw",
+            "base": "",
+            "fields": [
+                {
+                    "name": "user",
+                    "type": "name"
+                },
+                {
+                    "name": "to",
+                    "type": "name"
+                },
+                {
+                    "name": "to_withdraw",
+                    "type": "extended_asset"
+                },
+                {
+                    "name": "memo",
+                    "type": "string"
+                }
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "name": "addliquidity",
+            "type": "addliquidity",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "changefee",
+            "type": "changefee",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "close",
+            "type": "close",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "closeext",
+            "type": "closeext",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "exchange",
+            "type": "exchange",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "indexpair",
+            "type": "indexpair",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "inittoken",
+            "type": "inittoken",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "open",
+            "type": "open",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "openext",
+            "type": "openext",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "remliquidity",
+            "type": "remliquidity",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "transfer",
+            "type": "transfer",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "withdraw",
+            "type": "withdraw",
+            "ricardian_contract": ""
+        }
+    ],
+    "tables": [
+        {
+            "name": "account",
+            "type": "account",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": [],
+            "table_id": 15140
+        },
+        {
+            "name": "accounts",
+            "type": "account",
+            "index_type": "i64",
+            "key_names": ["scope","primary_key"],
+            "key_types": ["name","uint64"],
+            "table_id": 25660
+        },
+        {
+            "name": "currency_stats",
+            "type": "currency_stats",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": [],
+            "table_id": 18569
+        },
+        {
+            "name": "evodexaccount",
+            "type": "evodexaccount",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": [],
+            "table_id": 29959
+        },
+        {
+            "name": "evodexacnts",
+            "type": "evodexaccount",
+            "index_type": "i64",
+            "key_names": ["scope","primary_key"],
+            "key_types": ["name","uint64"],
+            "table_id": 63234,
+            "secondary_indexes": [
+                {
+                    "name": "extended",
+                    "key_type": "uint128",
+                    "table_id": 55555
+                }
+            ]
+        },
+        {
+            "name": "evoindex",
+            "type": "index_struct",
+            "index_type": "i64",
+            "key_names": ["scope","primary_key"],
+            "key_types": ["name","uint64"],
+            "table_id": 41326,
+            "secondary_indexes": [
+                {
+                    "name": "extended",
+                    "key_type": "checksum256",
+                    "table_id": 12143
+                }
+            ]
+        },
+        {
+            "name": "index_struct",
+            "type": "index_struct",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": [],
+            "table_id": 44724
+        },
+        {
+            "name": "stat",
+            "type": "currency_stats",
+            "index_type": "i64",
+            "key_names": ["scope","primary_key"],
+            "key_types": ["name","uint64"],
+            "table_id": 4264
+        }
+    ],
+    "ricardian_clauses": [],
+    "variants": [],
+    "action_results": []
+}

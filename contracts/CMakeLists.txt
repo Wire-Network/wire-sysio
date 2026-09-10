@@ -58,4 +58,5 @@ add_subdirectory(sysio.dclaim)
 
 add_subdirectory(sysio.token)
 add_subdirectory(sysio.wrap)
+add_subdirectory(sysio.swap)
 add_subdirectory(test_contracts)

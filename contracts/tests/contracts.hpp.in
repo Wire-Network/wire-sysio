@@ -38,8 +38,14 @@ struct contracts {
    static std::vector<char>    chains_abi() { return read_abi("${CMAKE_BINARY_DIR}/contracts/sysio.chains/sysio.chains.abi"); }
    static std::vector<uint8_t> tokens_wasm() { return read_wasm("${CMAKE_BINARY_DIR}/contracts/sysio.tokens/sysio.tokens.wasm"); }
    static std::vector<char>    tokens_abi() { return read_abi("${CMAKE_BINARY_DIR}/contracts/sysio.tokens/sysio.tokens.abi"); }
+   static std::vector<uint8_t> swap_wasm() { return read_wasm("${CMAKE_BINARY_DIR}/contracts/sysio.swap/sysio.swap.wasm"); }
+   static std::vector<char>    swap_abi() { return read_abi("${CMAKE_BINARY_DIR}/contracts/sysio.swap/sysio.swap.abi"); }
 
    struct util {
+      static std::vector<uint8_t> badtoken_wasm()     { return read_wasm("${CMAKE_BINARY_DIR}/contracts/test_contracts/badtoken/badtoken.wasm"); }
+      static std::vector<char>    badtoken_abi()      { return read_abi("${CMAKE_BINARY_DIR}/contracts/test_contracts/badtoken/badtoken.abi"); }
+      static std::vector<uint8_t> wevotethefee_wasm() { return read_wasm("${CMAKE_BINARY_DIR}/contracts/test_contracts/wevotethefee/wevotethefee.wasm"); }
+      static std::vector<char>    wevotethefee_abi()  { return read_abi("${CMAKE_BINARY_DIR}/contracts/test_contracts/wevotethefee/wevotethefee.abi"); }
       static std::vector<uint8_t> reject_all_wasm() { return read_wasm("${CMAKE_SOURCE_DIR}/contracts/test_contracts/reject_all.wasm"); }
       static std::vector<uint8_t> reenter_deposit_wasm() { return read_wasm("${CMAKE_SOURCE_DIR}/contracts/test_contracts/reenter_deposit/reenter_deposit.wasm"); }
       static std::vector<char>    reenter_deposit_abi()  { return read_abi("${CMAKE_SOURCE_DIR}/contracts/test_contracts/reenter_deposit/reenter_deposit.abi"); }
