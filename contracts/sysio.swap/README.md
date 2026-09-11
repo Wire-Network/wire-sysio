@@ -20,6 +20,8 @@ the price behaviour. Notice that whenever the amount to exchange is small compar
 When adding or removing liquidity, the (again standard) criterion is to keep fixed the ratios between minted evotokens and the amounts in the pools that back their value. Actually a small correction is in order for the case of adding liquidity: 
 the 0.01% fee charged will slightly increase the value of the evotoken afterwards.
 
+A pair is seeded with an evotoken supply equal to the square root of the product of the two initial amounts (integer, rounded down), so the unit's value does not depend on the ratio the creator picks. The creator may lock part of that supply: locked shares belong to nobody and can never be redeemed, so the pools always retain the value they represent and the pair can never be emptied and re-seeded at a different unit. Seed-time attacks only victimise the creator, so the size of the lock (zero included) is the creator's decision.
+
 
 **Time-weighted average prices**
 

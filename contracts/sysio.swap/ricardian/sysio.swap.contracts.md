@@ -79,6 +79,8 @@ summary: 'Initializes an evotoken by setting initial pair of token pools'
 
 The fee authority is the account whose authorization the changefee action requires for this pair. An empty {{fee_authority}} adopts the contract-wide fee authority set by setconfig; any other name makes that account the pair's own.
 
+The pair token supply minted is the square root of the product of the two initial pool amounts, rounded downward. Of it, {{locked_shares}} are held by no account and can never be redeemed, so the pools always retain the value those shares represent; the remainder is credited to {{user}}. {{locked_shares}} must be less than the amount minted.
+
 RAM will be deducted from {{user}}’s resources to create the necessary records.
 Authorization of {{user}} and of the contract is required.
 

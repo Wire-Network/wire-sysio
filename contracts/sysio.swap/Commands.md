@@ -29,9 +29,9 @@ Withdraw funds from your opened channels, to the account "TO":
 
     cleos push action evolutiondex withdraw '["YOUR_ACCOUNT", "TO", {"contract":"eosio.token", "quantity":"1.0000 EOS"}, "memo"]' -p YOUR_ACCOUNT
 
-Create the EOS/PESO evotoken. Set the initial liquidity, the initial fee for the trading pair (in units of 0.01%, here 0.1%) and the fee authority: an empty name adopts the contract-wide authority set at deployment, any other name makes that account the pair's own. The contract's authority is required alongside yours.
+Create the EOS/PESO evotoken. Set the initial liquidity, the initial fee for the trading pair (in units of 0.01%, here 0.1%), the fee authority (an empty name adopts the contract-wide authority set at deployment, any other name makes that account the pair's own) and the shares to lock. The supply minted is the square root of the product of the two amounts; the locked part is held by nobody and can never be redeemed, which keeps the pool from ever being emptied and bounds how far one share's value can be pushed. It is your call how much to lock, zero included. The contract's authority is required alongside yours.
 
-    cleos push action evolutiondex inittoken '["YOUR_ACCOUNT", "4,EOSPESO", {"contract":"eosio.token", "quantity":"1.0000 EOS"}, {"contract":"pesocontract", "quantity":"1.0000 PESO"}, 10, ""]' -p YOUR_ACCOUNT -p evolutiondex
+    cleos push action evolutiondex inittoken '["YOUR_ACCOUNT", "4,EOSPESO", {"contract":"eosio.token", "quantity":"1.0000 EOS"}, {"contract":"pesocontract", "quantity":"1.0000 PESO"}, 10, "", "0.1000 EOSPESO"]' -p YOUR_ACCOUNT -p evolutiondex
 
 Set the contract-wide fee authority (deployment step, the contract's own authority):
 

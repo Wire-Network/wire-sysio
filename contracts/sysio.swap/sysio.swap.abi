@@ -140,6 +140,10 @@
                 {
                     "name": "fee_authority",
                     "type": "name"
+                },
+                {
+                    "name": "locked_shares",
+                    "type": "asset"
                 }
             ]
         },
@@ -244,6 +248,10 @@
                 {
                     "name": "fee_authority",
                     "type": "name"
+                },
+                {
+                    "name": "locked_shares",
+                    "type": "asset"
                 }
             ]
         },

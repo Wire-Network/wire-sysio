@@ -169,6 +169,29 @@ inline uint64_t wire_to_token(uint64_t reserve_wire_amount,
                        amount_wire);
 }
 
+/// `floor(sqrt(n))` by Newton's method on integers: consensus-safe where the
+/// floating `sqrt` is not (its rounding is platform-dependent). Converges from
+/// an overestimate, so the loop ends the first time it stops decreasing.
+inline u128 isqrt(u128 n) {
+   if (n < 2) return n;
+   // Initial estimate 2^ceil(bits/2) >= sqrt(n).
+   int bits = 0;
+   for (u128 t = n; t != 0; t >>= 1) ++bits;
+   u128 x = static_cast<u128>(1) << ((bits + 1) / 2);
+   for (;;) {
+      const u128 y = (x + n / x) >> 1;
+      if (y >= x) return x;
+      x = y;
+   }
+}
+
+/// Shares minted to seed a two-sided pool: the geometric mean `floor(sqrt(x*y))`
+/// of the two deposits. It scales linearly with a proportional deposit, so the
+/// first depositor cannot price the unit by seeding lopsided.
+inline uint64_t geometric_mean(uint64_t x, uint64_t y) {
+   return static_cast<uint64_t>(isqrt(static_cast<u128>(x) * y));
+}
+
 /// Basis-points denominator (10000 = 100%).
 inline constexpr uint32_t BPS_TOTAL = 10000;
 

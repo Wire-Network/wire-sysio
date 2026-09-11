@@ -44,11 +44,16 @@ namespace sysio {
          /// executes approved proposals as `sysio`, so deployment sets it to `sysio`.
          /// Requires the contract's own authority.
          [[sysio::action]] void setconfig(name fee_authority);
-         /// Create a pair. `initial_fee` may be anything in [0, MAX_FEE]. An empty
-         /// `fee_authority` adopts the configured one; a name overrides it for this pair.
+         /// Create a pair, minting sqrt(pool1 * pool2) LP shares. `initial_fee` may be
+         /// anything in [0, MAX_FEE]. An empty `fee_authority` adopts the configured one;
+         /// a name overrides it for this pair. `locked_shares` (in the new symbol, below
+         /// the minted amount) are held by no account and can never be redeemed: they
+         /// keep the pool from ever being emptied and bound how far the value of one
+         /// share can be pushed. Seed-time attacks victimise the creator, so the size
+         /// of the lock is the creator's call; zero is allowed.
          [[sysio::action]] void inittoken(name user, symbol new_symbol,
            extended_asset initial_pool1, extended_asset initial_pool2,
-           int initial_fee, name fee_authority);
+           int initial_fee, name fee_authority, asset locked_shares);
          [[sysio::on_notify("*::transfer")]] void ontransfer(name from, name to, asset quantity, string memo);
          [[sysio::action]] void openext( const name& user, const name& payer, const extended_symbol& ext_symbol);
          [[sysio::action]] void closeext ( const name& user, const name& to, const extended_symbol& ext_symbol, string memo);
@@ -128,7 +133,8 @@ namespace sysio {
             extended_asset pool2;
             int            fee;
             name           fee_authority;   ///< whose signature changefee requires for this pair
-            SYSLIB_SERIALIZE(currency_stats, (supply)(max_supply)(issuer)(pool1)(pool2)(fee)(fee_authority))
+            asset          locked_shares;   ///< part of `supply` held by no account, never redeemable
+            SYSLIB_SERIALIZE(currency_stats, (supply)(max_supply)(issuer)(pool1)(pool2)(fee)(fee_authority)(locked_shares))
          };
 
          struct [[sysio::table("evoindex")]] pair_index {
