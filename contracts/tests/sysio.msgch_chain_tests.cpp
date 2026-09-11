@@ -160,6 +160,7 @@ constexpr const char* OWNER            = "owner";
 /// sysio.epoch ABI field identifiers used by the WNS-16 fixture.
 namespace epoch_fields {
 constexpr const char* BATCH_OP_GROUPS       = "batch_op_groups";
+constexpr const char* NEXT_BATCH_OP_GROUPS  = "next_batch_op_groups";
 constexpr const char* CURRENT_BATCH_OP_GROUP = "current_batch_op_group";
 constexpr const char* IS_PAUSED              = "is_paused";
 } // namespace epoch_fields
@@ -735,7 +736,7 @@ public:
       BOOST_REQUIRE(found_operator);
       if (expected_status != opp::types::OPERATOR_STATUS_ACTIVE && expect_schedule_absence) {
          const auto state = read_epoch_state();
-         for (const auto& group : state["batch_op_groups"].get_array()) {
+         for (const auto& group : state[epoch_fields::NEXT_BATCH_OP_GROUPS].get_array()) {
             for (const auto& member : group.get_array()) {
                BOOST_REQUIRE(member.as_string() != account.to_string());
             }
@@ -2112,8 +2113,8 @@ BOOST_FIXTURE_TEST_CASE(advance_ships_group_index_zero_for_single_group, sysio_m
 
 /// A one-group schedule has no pre-announced successor to rotate into. If one
 /// member loses eligibility at the exact floor, keep the announced vector and
-/// withhold it; once a standby appears, replace that member at the same slot so
-/// every healthy incumbent keeps the chunk position already known to outposts.
+/// withhold the candidate; once a standby appears, announce an in-place replacement
+/// for the following epoch. Healthy incumbents keep their known chunk positions.
 BOOST_FIXTURE_TEST_CASE(advance_repairs_single_group_ineligible_slot_in_place,
                         sysio_msgch_chain_tester) { try {
    bootstrap(/*n_batch_ops=*/3);
@@ -2149,6 +2150,51 @@ BOOST_FIXTURE_TEST_CASE(advance_repairs_single_group_ineligible_slot_in_place,
    BOOST_REQUIRE_EQUAL(repaired.groups(0).operators(0).address(), BATCHOP_D.to_string());
    BOOST_REQUIRE_EQUAL(repaired.groups(0).operators(1).address(), BATCHOP_C.to_string());
    BOOST_REQUIRE_EQUAL(repaired.groups(0).operators(2).address(), BATCHOP_B.to_string());
+   // Publishing the replacement cannot elect it for the envelope announcing it.
+   BOOST_REQUIRE_EQUAL(duty_member(), BATCHOP);
+   const auto pending = read_epoch_state()[epoch_fields::NEXT_BATCH_OP_GROUPS].get_array();
+   BOOST_REQUIRE_EQUAL(pending[0].get_array()[0].as_string(), BATCHOP_D.to_string());
+   advance_to_next_epoch();
+   BOOST_REQUIRE_EQUAL(duty_member(), BATCHOP_D);
+} FC_LOG_AND_RETHROW() }
+
+/// An insufficient candidate must not persist even its successful replacements.
+/// The serving window and slot positions survive every retry; activation follows
+/// publication only when enough standbys can fill all vacancies together.
+BOOST_FIXTURE_TEST_CASE(advance_discards_partial_candidate_and_activates_complete_publication,
+                        sysio_msgch_chain_tester) { try {
+   bootstrap(/*n_batch_ops=*/3);
+   for (const auto op : {BATCHOP, BATCHOP_B}) {
+      BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "terminate"_n,
+         mvo()("account", op.to_string())("reason", std::string("two vacant seats"))));
+   }
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "regoperator"_n,
+      mvo()("account", BATCHOP_D.to_string())
+         ("type", opp::types::OPERATOR_TYPE_BATCH)("is_bootstrapped", true)));
+   produce_blocks();
+   for (uint32_t attempt = 0; attempt < 2; ++attempt) {
+      advance_to_next_epoch();
+      const auto state = read_epoch_state();
+      BOOST_REQUIRE(state[epoch_fields::NEXT_BATCH_OP_GROUPS].get_array().empty());
+      const auto group = state[epoch_fields::BATCH_OP_GROUPS].get_array()[0].get_array();
+      BOOST_REQUIRE_EQUAL(group.size(), 3u);
+      BOOST_REQUIRE_EQUAL(group[0].as_string(), BATCHOP.to_string());
+      BOOST_REQUIRE_EQUAL(group[1].as_string(), BATCHOP_C.to_string());
+      BOOST_REQUIRE_EQUAL(group[2].as_string(), BATCHOP_B.to_string());
+      BOOST_REQUIRE_EQUAL(shipped_batch_operator_groups_count(ETH_OUTPOST_ID), 0);
+   }
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "regoperator"_n,
+      mvo()("account", BATCHOP_E.to_string())
+         ("type", opp::types::OPERATOR_TYPE_BATCH)("is_bootstrapped", true)));
+   produce_blocks();
+   advance_to_next_epoch();
+   const auto published = shipped_batch_operator_groups(ETH_OUTPOST_ID);
+   BOOST_REQUIRE_EQUAL(published.groups(0).operators(0).address(), BATCHOP_D.to_string());
+   BOOST_REQUIRE_EQUAL(published.groups(0).operators(1).address(), BATCHOP_C.to_string());
+   BOOST_REQUIRE_EQUAL(published.groups(0).operators(2).address(), BATCHOP_E.to_string());
+   BOOST_REQUIRE_EQUAL(duty_member(), BATCHOP);
+   advance_to_next_epoch();
+   BOOST_REQUIRE_EQUAL(duty_member(), BATCHOP_D);
 } FC_LOG_AND_RETHROW() }
 
 /// Depot-state regression for the transition race: the group announced for
@@ -2212,12 +2258,12 @@ BOOST_FIXTURE_TEST_CASE(advance_preserves_ineligible_announced_successor_positio
 /// operators for group assignment"), so a pool smaller than the window can only arise AFTER the
 /// schedule exists — operators leaving the ACTIVE set. Here the expiring operator is terminated
 /// at the exact configured minimum. The first slide enters the next, already-announced group and
-/// produces a short tail. Later advances must keep that announced group current until a new ACTIVE
+/// discards a candidate with a short tail. Later advances retain that group until a new ACTIVE
 /// standby fills the tail; otherwise Solana rejects the next duty group before the envelope carrying
 /// its authorizing roster can land.
 ///
 /// Asserted here: the incomplete window is withheld while other attestations continue, duty freezes
-/// on the group outposts already know, a new operator repairs the future vacancy in place, and only
+/// on the group outposts already know, a new operator completes a fresh candidate, and only
 /// the advance AFTER that repaired lookahead was published resumes rotation.
 BOOST_FIXTURE_TEST_CASE(advance_freezes_and_recovers_withheld_operator_window,
                         sysio_msgch_chain_tester) { try {
@@ -2243,6 +2289,11 @@ BOOST_FIXTURE_TEST_CASE(advance_freezes_and_recovers_withheld_operator_window,
 
    advance_to_next_epoch();
    BOOST_REQUIRE_EQUAL(duty_member(), BATCHOP_C);
+   const auto held_state = read_epoch_state();
+   BOOST_REQUIRE(held_state[epoch_fields::NEXT_BATCH_OP_GROUPS].get_array().empty());
+   const auto held_window = held_state[epoch_fields::BATCH_OP_GROUPS].get_array();
+   BOOST_REQUIRE_EQUAL(held_window.size(), kGroups);
+   for (const auto& group : held_window) BOOST_REQUIRE_EQUAL(group.get_array().size(), 1u);
    BOOST_REQUIRE_GT(shipped_attestation_count(ETH_OUTPOST_ID), 0);
    BOOST_REQUIRE_EQUAL(0, shipped_batch_operator_groups_count(ETH_OUTPOST_ID));
    require_fresh_roster(ETH_OUTPOST_ID, BATCHOP,
@@ -2321,7 +2372,7 @@ BOOST_FIXTURE_TEST_CASE(advance_roster_excludes_same_epoch_termination,
    }
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(advance_preserves_announced_successor_and_prunes_later_inactive_members,
+BOOST_FIXTURE_TEST_CASE(advance_preserves_announced_successor_and_withholds_inactive_future_members,
                         sysio_msgch_chain_tester) { try {
    constexpr uint32_t GROUP_COUNT = 3;
    constexpr uint64_t WINDOW_MS = 12ULL * GROUP_COUNT * EPOCH_DURATION_SEC * 1000ULL;

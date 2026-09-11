@@ -311,9 +311,8 @@ void epoch::setconfig(uint32_t epoch_duration_sec,
    }
 
    // The materialized rotation schedule (epoch_state.batch_op_groups) is
-   // sized from batch_op_groups once, at schbatchgps; advance() thereafter
-   // preserves its length (pop-front / push-back) and never re-reads the
-   // config to resize it. Every downstream invariant -- advance()'s
+   // sized from batch_op_groups at schbatchgps; later announcements and
+   // activations preserve that configured length. Every downstream invariant -- advance()'s
    // scheduling horizon (current_epoch_index + batch_op_groups - 1) and
    // sysio.opreg's termination window -- assumes cfg.batch_op_groups equals
    // the live rotation length, so once a schedule exists the group count is
@@ -708,13 +707,18 @@ void epoch::finishadv(uint32_t epoch_index, int64_t emission_amount) {
    epochstate_t state_tbl(get_self());
    auto state = state_tbl.get();
    check(state.current_epoch_index == epoch_index, "finishadv epoch mismatch");
-   const bool had_expiring_group = epoch_index > 1;
-
-   auto window_is_structurally_complete = [&]() {
-      return state.batch_op_groups.size() == cfg.batch_op_groups &&
-         std::all_of(state.batch_op_groups.begin(), state.batch_op_groups.end(),
-            [&](const auto& group) { return group.size() == cfg.operators_per_epoch; });
-   };
+   // Activate only a window published by the preceding advance. On a hold
+   // there is no pending announcement, so both membership and positions stay
+   // unchanged. In particular, one-group replacements cannot serve early.
+   std::vector<name> expired;
+   const bool activate_schedule = !state.next_batch_op_groups.empty();
+   if (activate_schedule) {
+      if (cfg.batch_op_groups > 1 && state.current_batch_op_group < state.batch_op_groups.size())
+         expired = state.batch_op_groups[state.current_batch_op_group];
+      state.batch_op_groups = std::move(state.next_batch_op_groups);
+      state.next_batch_op_groups.clear();
+      state.current_batch_op_group = cfg.batch_op_groups > 1 ? 1 : 0;
+   }
 
    opreg::operators_t current_ops(OPREG_ACCOUNT);
    auto is_active_batch_operator = [&](name account) {
@@ -725,204 +729,78 @@ void epoch::finishadv(uint32_t epoch_index, int64_t emission_amount) {
              op.type == OperatorType::OPERATOR_TYPE_BATCH;
    };
 
-   // For rotating schedules, a complete persisted window was published by the
-   // preceding epoch. An incomplete one was deliberately withheld, because the
-   // queueout gate below never publishes a short group. That persisted shape is
-   // therefore the rotation checkpoint: after the first withheld window has
-   // advanced into the group outposts already know, later epochs must hold that
-   // group on duty until the future seats can be repaired and announced. A
-   // single group uses the same structural value but never slides; its separate
-   // eligibility gate below decides whether its in-place repair may publish.
-   const bool previous_window_was_published = window_is_structurally_complete();
-   const bool single_group_schedule = cfg.batch_op_groups == 1;
+   // Construct a disposable candidate beginning with this epoch's serving
+   // group. Multi-group publication names its successor; a single group names
+   // its repaired self. Only the candidate may acquire replacement members.
+   std::vector<std::vector<name>> candidate_groups;
+   const uint32_t next_group_index = cfg.batch_op_groups > 1 ? 1 : 0;
+   if (state.current_batch_op_group < state.batch_op_groups.size()) {
+      candidate_groups.assign(state.batch_op_groups.begin() + state.current_batch_op_group,
+                              state.batch_op_groups.end());
+      const size_t retained_groups = candidate_groups.size();
+      candidate_groups.resize(cfg.batch_op_groups);
 
-   // A single group never rotates: the same positions authorize every epoch.
-   // Keep that announced vector in place and replace an ineligible seat at its
-   // exact index only after a standby exists. Until then, the final publication
-   // gate treats the named but ineligible seat as a vacancy and withholds the
-   // group. Healthy members therefore retain the chunk positions the outposts
-   // already know and can deliver the envelope that publishes the repair.
-   const bool advance_schedule = had_expiring_group &&
-      previous_window_was_published && !state.batch_op_groups.empty() &&
-      !single_group_schedule;
-
-   // A seated operator can have lost eligibility since the window was built.
-   // Preserve healthy members' order and never reuse a resident to fill a gap.
-   // While a window is held, retain group 0 exactly as it was announced. Its
-   // remaining eligible members must deliver the recovery envelope using the
-   // outposts' existing positions; replacing or deleting a seat here would
-   // change that current group before the outposts can authorize the change.
-   // On a normal rotating advance, group 1 is the successor already announced
-   // to outposts. Preserve it exactly before it slides to index 0, even if one
-   // member just lost eligibility; its healthy members must retain their old
-   // positions long enough to deliver the repaired lookahead. During a hold,
-   // group 0 has the same protection. A single-group schedule always protects
-   // its sole announced group and repairs in place below.
-   const size_t announced_group_index = advance_schedule ? 1 : state.current_batch_op_group;
-   for (size_t group_index = 0; group_index < state.batch_op_groups.size(); ++group_index) {
-      if (group_index == announced_group_index) continue;
-      auto& group = state.batch_op_groups[group_index];
-      group.erase(std::remove_if(group.begin(), group.end(), [&](name account) {
-         return !is_active_batch_operator(account);
-      }), group.end());
-   }
-
-   // ── Slide the schedule window ───────────────────────────────────────────
-   // Skip on the genesis advance (0 → 1): schbatchgps just placed
-   // [G1, G2, G3] for epochs 1, 2, 3 and G1 is now the current (front)
-   // group — popping here would lose it. From the SECOND advance onward
-   // (1 → 2, 2 → 3, ...), the front group has just expired so we pop
-   // it and compute a new tail.
-   //
-   // Eligibility for the new tail: ACTIVE batch ops, sorted non-bootstrapped
-   // first (preference rule), MINUS anyone already resident in the N-1
-   // surviving groups. The window itself encodes "scheduled in the last
-   // N-1 epochs" — no separate history table.
-   //
-   // After: window = [current, current+1, ..., current+N-1], front is
-   // always the active group → current_batch_op_group stays at 0.
-   std::vector<name> expired;
-   if (advance_schedule) {
-      expired = state.batch_op_groups.front();
-      state.batch_op_groups.erase(state.batch_op_groups.begin());
-   } else if (had_expiring_group && !previous_window_was_published) {
-      sysio::print("sysio.epoch::finishadv: previous operator window was withheld; "
-                   "holding the announced current group at epoch ",
-                   state.current_epoch_index, " while future seats are repaired\n");
-   }
-
-   // Candidate selection runs for every materialized schedule and after a
-   // rotating slide. Only an already-absent schedule skips it.
-   if (advance_schedule || !state.batch_op_groups.empty()) {
-      // Collect already-resident accounts so the new tail excludes them.
-      std::vector<name> resident;
-      resident.reserve(cfg.batch_op_groups * cfg.operators_per_epoch);
-      for (const auto& g : state.batch_op_groups) {
-         for (const auto& a : g) resident.push_back(a);
+      // Keep healthy seats at their existing positions. For multiple groups,
+      // candidate group zero is the unchanged delivery group and may contain
+      // inactive historical placeholders. Every active/future seat must be live.
+      for (size_t g = next_group_index; g < candidate_groups.size(); ++g) {
+         auto& group = candidate_groups[g];
+         group.resize(cfg.operators_per_epoch);
+         for (auto& member : group)
+            if (!is_active_batch_operator(member)) member = name{};
       }
-      auto is_resident = [&](name a) {
-         for (const auto& r : resident) if (r == a) return true;
-         return false;
-      };
 
-      // Pull ACTIVE batch ops, non-bootstrapped first. `exclude_resident`
-      // applies the load-spreading rule (an operator that served in one of the
-      // N-1 surviving groups is skipped, which is what makes "at most every
-      // Nth epoch" hold). One collector for both passes -- the only difference
-      // between them is whether that rule is enforced.
-      // The tail is drawn ONLY from operators not already resident in the
-      // surviving window groups. That residency exclusion is what makes "at
-      // most every Nth epoch" hold, and -- less obviously -- it is what keeps
-      // the window's groups DISJOINT, which the Ethereum outpost depends on by
-      // construction: `OPPInbound._resolveChunkPosition` scans the groups in
-      // order and returns the FIRST one containing the sender, using the
-      // sender's index WITHIN that group as its chunk-staging header slot. An
-      // operator seated in two groups therefore stages against a group it is
-      // not serving in. Do not "fill" a short tail by re-seating a resident.
-      opreg::operators_t opreg_ops(OPREG_ACCOUNT);
-      auto status_idx = opreg_ops.get_index<"bystatus"_n>();
+      std::vector<name> resident;
+      for (const auto& group : candidate_groups)
+         for (const auto member : group)
+            if (member.value != 0) resident.push_back(member);
+
+      // One disjoint pool serves every vacancy and the tail. Preserve the
+      // existing non-bootstrapped preference and deterministic account order.
       std::vector<std::pair<name, bool>> pool;
+      auto status_idx = current_ops.get_index<"bystatus"_n>();
       for (auto it = status_idx.lower_bound(
               magic_enum::enum_integer(OperatorStatus::OPERATOR_STATUS_ACTIVE));
-           it != status_idx.end() &&
-           it->status == OperatorStatus::OPERATOR_STATUS_ACTIVE; ++it) {
+           it != status_idx.end() && it->status == OperatorStatus::OPERATOR_STATUS_ACTIVE; ++it) {
          if (it->type != OperatorType::OPERATOR_TYPE_BATCH) continue;
-         if (is_resident(it->account)) continue;
+         if (std::find(resident.begin(), resident.end(), it->account) != resident.end()) continue;
          pool.push_back({it->account, it->is_bootstrapped});
       }
-      std::sort(pool.begin(), pool.end(),
-         [](const auto& a, const auto& b) {
-            if (a.second != b.second) return !a.second; // non-bootstrapped first
-            return a.first < b.first;
-         });
+      std::sort(pool.begin(), pool.end(), [](const auto& a, const auto& b) {
+         if (a.second != b.second) return !a.second;
+         return a.first < b.first;
+      });
 
-      // Repair seats before selecting a new tail. Otherwise a removed
-      // operator leaves a hole that eventually becomes an empty active group,
-      // even when a healthy standby could have been announced one epoch ahead.
-      // Prefer true standbys: recycling the expired group early would shorten
-      // its duty interval unnecessarily. All selections consume the same pool,
-      // so repaired groups and the tail remain disjoint.
-      // Vacancy recovery is an exception to the normal N-epoch duty spacing:
-      // absence from this window does not prove an operator has never served
-      // recently, particularly with windows larger than three groups. When a
-      // prior window was withheld there is no new tail: fill its existing
-      // future vacancies in place while group 0 remains the announced duty.
-      // In a rotating schedule, do not insert a new member into the CURRENT group here: outposts have
-      // not received this window yet, and their old chunk-slot assignments may
-      // collide with a replacement's position. During a hold, ineligible
-      // announced seats remain as placeholders until this group delivers the
-      // repaired lookahead and expires; OPERATORS still carries their removal.
-      const size_t first_repair_group = single_group_schedule ? 0 : 1;
-      for (size_t g = first_repair_group; g < state.batch_op_groups.size(); ++g) {
-         auto& group = state.batch_op_groups[g];
-
-         // A one-group schedule cannot compact its announced group without
-         // shifting healthy members' chunk positions. Replace each ineligible
-         // seat in place, consuming the same disjoint standby pool used for
-         // future-group repair. If the pool is exhausted, retain the old name
-         // as an unpublished denominator placeholder until a later advance.
-         if (single_group_schedule) {
-            for (auto& member : group) {
-               if (is_active_batch_operator(member)) continue;
-               if (pool.empty()) break;
-               member = pool.front().first;
-               pool.erase(pool.begin());
-            }
-         }
-
-         while (group.size() < cfg.operators_per_epoch) {
-            const auto standby = std::find_if(pool.begin(), pool.end(), [&](const auto& candidate) {
-               return !advance_schedule ||
+      for (size_t g = next_group_index; g < candidate_groups.size(); ++g) {
+         for (auto& member : candidate_groups[g]) {
+            if (member.value != 0) continue;
+            // On an ordinary advance, repair existing future groups with true
+            // standbys before recycling the expired group into the new tail.
+            // A hold may reuse it sooner to restore a complete disjoint window.
+            const auto replacement = std::find_if(pool.begin(), pool.end(), [&](const auto& candidate) {
+               return g >= retained_groups ||
                   std::find(expired.begin(), expired.end(), candidate.first) == expired.end();
             });
-            if (standby == pool.end()) break;
-            group.push_back(standby->first);
-            pool.erase(standby);
+            if (replacement == pool.end()) break;
+            member = replacement->first;
+            pool.erase(replacement);
          }
-      }
-
-      if (advance_schedule) {
-         std::vector<name> new_tail;
-         new_tail.reserve(cfg.operators_per_epoch);
-         for (size_t i = 0; i < pool.size() && new_tail.size() < cfg.operators_per_epoch; ++i) {
-            new_tail.push_back(pool[i].first);
-         }
-
-         // A tail SHORTER than `operators_per_epoch` means the ACTIVE batch-operator
-         // roster has fallen below `batch_operator_minimum_active` (the config
-         // equality at ::setconfig pins that minimum to
-         // `operators_per_epoch * batch_op_groups`, i.e. exactly this window). The
-         // depot cannot repair that here: with a pool smaller than the window, N
-         // groups that are both FULL and DISJOINT do not exist, and both escapes
-         // are unsound -- re-seating a resident breaks the Ethereum disjointness
-         // above, while a short group lowers the quorum denominator it defines.
-         // The incomplete persisted window records that publication was withheld,
-         // causing subsequent epochs to hold group 0 until a standby fills it.
-         if (new_tail.size() < cfg.operators_per_epoch) {
-            sysio::print("sysio.epoch::finishadv: only ", new_tail.size(), " of ",
-                         cfg.operators_per_epoch,
-                         " eligible batch operators for the new tail group at epoch ",
-                         state.current_epoch_index + cfg.batch_op_groups - 1,
-                         "; the ACTIVE roster is below batch_operator_minimum_active "
-                         "-- holding the announced duty until the roster is repaired\n");
-         }
-
-         state.batch_op_groups.push_back(std::move(new_tail));
       }
    }
 
-   // Pinned to the FRONT of the sliding window, unconditionally. The window
-   // slides (erase-front + push-back), it does not rotate, so the group on duty
-   // is always at index 0 -- and the next-group lookahead further down derives
-   // `active_group_index` as `cursor + 1`, which is only the NEXT epoch's group
-   // because this is 0. A change that gives the cursor any other value must
-   // revisit that derivation; it is stated here, at the write, because that is
-   // the only place the invariant can actually be violated.
-   state.current_batch_op_group = 0;
-
-   // Note: last_elected_epoch tracking is epoch-internal state.
-   // No operator table writes needed — group membership is in epoch_state.batch_op_groups.
-
+   // Failed candidates never become persistent schedule state. Empty pending
+   // state explicitly means no new publication and therefore no next activation.
+   const bool publish_schedule = candidate_groups.size() == cfg.batch_op_groups &&
+      std::all_of(candidate_groups.begin(), candidate_groups.end(), [&](const auto& group) {
+         return group.size() == cfg.operators_per_epoch &&
+            std::all_of(group.begin(), group.end(), [](name member) { return member.value != 0; });
+      });
+   if (publish_schedule) {
+      state.next_batch_op_groups = std::move(candidate_groups);
+   } else {
+      sysio::print("sysio.epoch::finishadv: incomplete schedule candidate at epoch ", epoch_index,
+                   "; withholding BatchOperatorGroups and retaining the announced duty\n");
+   }
    state_tbl.set(state, ram_payer);
 
    // Queue OPERATORS attestation (full roster with authex chain addresses) for each outpost.
@@ -993,87 +871,12 @@ void epoch::finishadv(uint32_t epoch_index, int64_t emission_amount) {
       }
    }
 
-   // Queue BATCH_OPERATOR_GROUPS attestation for each outpost.
-   //
-   // Ships ALL groups, and an active index that points ONE EPOCH AHEAD --
-   // at the group that will be on duty for `current_epoch_index + 1`, not the
-   // one on duty now (SOL-378 / WNS-141).
-   //
-   // The lookahead is what makes outpost-side admission possible at all. An
-   // outpost that scopes `epoch_in` admission to its seated active group must
-   // already hold epoch N's duty group BEFORE epoch N's envelope arrives --
-   // because that envelope's own deliverer is a member of epoch N's group, and
-   // authorising it is what lets the envelope land. Shipping epoch N's roster
-   // inside epoch N's envelope is circular: the roster that would authorise the
-   // delivery is inside the envelope being refused, so the bridge stalls
-   // permanently at the first rotation.
-   //
-   // Emitting the NEXT epoch's group here breaks that circle without loosening
-   // anything on the outpost: envelope N-1 seats epoch N's group, so when
-   // envelope N arrives the outpost already knows who is allowed to deliver it.
-   //
-   // Only the ATTESTATION looks ahead. The depot's own schedule state is
-   // untouched -- `current_batch_op_group` still names the group on duty NOW,
-   // and `advance` still slides the window so the front is the current epoch.
-   // Nothing that reads `epoch_state` changes meaning.
-   //
-   // `epoch_index` stays the epoch this envelope IS for; it identifies the
-   // envelope, not the roster, and no outpost reads it.
-   {
+   // Publish a complete next window using the unchanged OPP lookahead format.
+   // Current duty is kept separately and cannot change until the next advance.
+   // Group zero of a rotating candidate is historical when this announcement
+   // lands; inactive placeholders there preserve the serving group's positions.
+   if (publish_schedule) {
       opp::attestations::BatchOperatorGroups attest;
-      // The window SLIDES; it does not rotate. `advance` erases the front and
-      // pushes a new tail, and every write to the cursor pins it to 0 (here,
-      // and `schbatchgps`) -- so the group on duty NEXT is simply the one
-      // after the cursor.
-      //
-      // Deliberately NOT `(cursor + 1) % group_count`. A modulo encodes ring
-      // semantics this window does not have: on wrap it yields 0, which names
-      // the group whose duty just STARTED. That ships a stale roster with
-      // nothing to catch it -- no compile error, no failing test, and the
-      // outpost cannot distinguish a stale index from a fresh one.
-      //
-      // The bound check is also what keeps an EMPTY schedule off a division.
-      // `group_count == 0` is reachable here: the slide above is guarded by
-      // `!empty()`, but nothing requires a seated schedule before this block,
-      // and `% 0` is an `i32.rem_u` trap that would abort `advance` and halt
-      // epoch advancement chain-wide.
-      //
-      // Falling back to the cursor covers the single-group case: the same
-      // operators serve every epoch, so current IS next.
-      //
-      // The cursor is pinned to 0 by every write to it, and the fallback is
-      // only correct BECAUSE of that -- with a non-zero cursor it would return
-      // the group whose duty just started, which is the stale-roster outcome
-      // the modulo was rejected for. The invariant is asserted at the WRITE
-      // site (`state.current_batch_op_group = 0` earlier in this same call),
-      // not here: a check at this point is unreachable-by-construction and so
-      // proves nothing -- it can only ever observe the value assigned a few
-      // hundred lines above it.
-      const uint32_t group_count = static_cast<uint32_t>(state.batch_op_groups.size());
-      const uint32_t next_index  = state.current_batch_op_group + 1;
-      const uint32_t next_group_index =
-         next_index < group_count ? next_index : state.current_batch_op_group;
-
-      // Removing ineligible members must not lower an outpost's quorum
-      // denominator or publish an empty group. Withhold an incomplete window,
-      // while still sending OPERATORS with the authoritative removal statuses.
-      // Never duplicate residents to fill it: Ethereum's chunk routing assumes
-      // disjoint groups. Epoch accounting and envelope construction still run.
-      // In a rotating window, group 0 is historical by the time this lookahead
-      // lands and may retain an ineligible positional placeholder. In a
-      // one-group schedule it is also the active group, so every named seat
-      // must be eligible before publishing the replacement roster.
-      const bool single_group_is_eligible = !single_group_schedule ||
-         (group_count == 1 && std::all_of(state.batch_op_groups.front().begin(),
-            state.batch_op_groups.front().end(), is_active_batch_operator));
-      const bool have_complete_window = next_group_index < group_count &&
-         window_is_structurally_complete() && single_group_is_eligible;
-      if (!have_complete_window) {
-         sysio::print("sysio.epoch::finishadv: incomplete operator window at epoch ",
-                      state.current_epoch_index,
-                      "; withholding BatchOperatorGroups and holding the announced duty "
-                      "until the roster is repaired\n");
-      }
       attest.active_group_index = zpp::bits::vuint32_t{next_group_index};
       attest.epoch_index = zpp::bits::vuint32_t{state.current_epoch_index};
       // Propagate the depot's minimum epoch duration so the outpost can
@@ -1081,7 +884,7 @@ void epoch::finishadv(uint32_t epoch_index, int64_t emission_amount) {
       // seconds since the current epoch started — see
       // .claude/rules/opp-consensus.md.
       attest.epoch_duration_sec = zpp::bits::vuint32_t{cfg.epoch_duration_sec};
-      for (auto& group : state.batch_op_groups) {
+      for (const auto& group : state.next_batch_op_groups) {
          opp::attestations::BatchOperatorGroup grp;
          for (auto& op_name : group) {
             opp::types::ChainAddress addr;
@@ -1097,22 +900,19 @@ void epoch::finishadv(uint32_t epoch_index, int64_t emission_amount) {
       auto out = zpp::bits::out{encoded, zpp::bits::no_size{}};
       (void)out(attest);
 
-      // Withhold only the group attestation, never the remaining epoch work.
-      if (have_complete_window) {
-         sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
-         for (auto it = chains_tbl.begin(); it != chains_tbl.end(); ++it) {
-            if (!is_active_outpost(*it)) continue;
-            action(
-               permission_level{get_self(), "owner"_n},
-               MSGCH_ACCOUNT,
-               "queueout"_n,
-               std::make_tuple(
-                  it->code.value,
-                  opp::types::ATTESTATION_TYPE_BATCH_OPERATOR_GROUPS,
-                  encoded
-               )
-            ).send();
-         }
+      sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
+      for (auto it = chains_tbl.begin(); it != chains_tbl.end(); ++it) {
+         if (!is_active_outpost(*it)) continue;
+         action(
+            permission_level{get_self(), "owner"_n},
+            MSGCH_ACCOUNT,
+            "queueout"_n,
+            std::make_tuple(
+               it->code.value,
+               opp::types::ATTESTATION_TYPE_BATCH_OPERATOR_GROUPS,
+               encoded
+            )
+         ).send();
       }
    }
 
@@ -1135,7 +935,7 @@ void epoch::finishadv(uint32_t epoch_index, int64_t emission_amount) {
    //      onto t5state (pending_emission_amount + batch_group_epochs[group]
    //      + last_epoch_emission for decay continuity).
    //   2. rcrdbatch: always queued. Records the immutable roster that accrued
-   //      this epoch after the schedule has slid for the next advance.
+   //      this epoch from the activated serving window.
    //   3. payepoch: queued only on pay-epochs. Reads the now-updated t5state
    //      (which already includes this epoch's contribution from step 1),
    //      distributes period_emission, and resets the accumulator.
@@ -1181,11 +981,9 @@ void epoch::finishadv(uint32_t epoch_index, int64_t emission_amount) {
 //  them into N groups (`cfg.batch_op_groups`). The resulting window is
 //  [epoch_1_group, epoch_2_group, ..., epoch_N_group].
 //
-//  After this, every per-epoch `advance` pops the front group and pushes
-//  a new tail group, where the tail's members are drawn from the ACTIVE
-//  pool MINUS anyone still resident in the N-1 surviving groups. The
-//  window itself encodes "scheduled in the last N-1 epochs"; no separate
-//  history table is needed.
+//  Each advance activates the preceding announcement, then proposes a complete
+//  next window. Candidates retain the current/future groups, repair vacancies,
+//  and append a disjoint tail. Failed candidates leave the serving window intact.
 // ---------------------------------------------------------------------------
 void epoch::schbatchgps() {
    require_auth(get_self());
@@ -1239,8 +1037,9 @@ void epoch::schbatchgps() {
    // Store the window; advance picks up from here.
    epochstate_t state_tbl(get_self());
    epoch_state state = state_tbl.get_or_default(epoch_state{});
-   state.batch_op_groups = new_groups;
-   state.current_batch_op_group = 0; // front-of-window is always current
+   state.batch_op_groups = std::move(new_groups);
+   state.next_batch_op_groups.clear();
+   state.current_batch_op_group = 0; // bootstrap duty precedes the first announcement
    state_tbl.set(state, ram_payer);
 }
 

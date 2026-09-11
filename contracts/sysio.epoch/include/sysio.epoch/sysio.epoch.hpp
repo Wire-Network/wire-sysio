@@ -81,14 +81,19 @@ namespace sysio {
          uint32_t                          current_epoch_index = 0;
          time_point                        current_epoch_start{};
          time_point                        next_epoch_start{};
-         uint8_t                           current_batch_op_group = 0; // 0, 1, or 2
-         std::vector<std::vector<name>>    batch_op_groups;           // 3 groups of 7
+         /// Duty within the last activated window; independent of the epoch number.
+         uint8_t                           current_batch_op_group = 0;
+         /// Last activated complete window. Candidate construction never modifies it.
+         std::vector<std::vector<name>>    batch_op_groups;
+         /// Complete window published this epoch, to activate on the next advance.
+         /// Empty when publication was withheld: the current duty continues.
+         std::vector<std::vector<name>>    next_batch_op_groups;
          checksum256                       last_consensus_hash;
          bool                              is_paused = false;
 
          SYSLIB_SERIALIZE(epoch_state,
             (current_epoch_index)(current_epoch_start)(next_epoch_start)
-            (current_batch_op_group)(batch_op_groups)(last_consensus_hash)(is_paused))
+            (current_batch_op_group)(batch_op_groups)(next_batch_op_groups)(last_consensus_hash)(is_paused))
       };
 
       using epochstate_t = sysio::kv::global<"epochstate"_n, epoch_state>;
