@@ -1689,6 +1689,155 @@ BOOST_FIXTURE_TEST_CASE( get_kv_rows_index_name_test, validating_tester ) try {
 } FC_LOG_AND_RETHROW()
 
 // ---------------------------------------------------------------------------
+// kv::table secondary indexes on key types outside multi_index's five
+//
+// multi_index is capped at what upstream Antelope supports, because it exists to carry a
+// ported contract over unchanged. kv::table is the Wire-native path and is not: kv::index
+// keys through sysio::kv::be_key_stream, which encodes the narrow integers, the signed
+// ones, name, and composite structs in an order-preserving big-endian form.
+//
+// The chain has to agree, and it agrees through a SEPARATE implementation --
+// get_table_rows resolves index_name against the ABI and builds the caller's bound with
+// be_key_codec. Two implementations, one byte format. Until this test the only kv::index
+// in the suite was on `name`, so uint32, int64 and composite keys were unverified end to
+// end even though be_key_codec claims to handle them.
+//
+// Every row below is laid out so a little-endian encoding would order it differently: the
+// uint32 values are byte-rotations of each other, which LE reverses outright; the int64
+// values straddle zero, which LE sorts above the negatives; and the composite keys need
+// tier compared before owner, which only holds if each field encodes big-endian.
+// ---------------------------------------------------------------------------
+BOOST_FIXTURE_TEST_CASE( get_kv_rows_wide_secondary_keys, validating_tester ) try {
+   produce_block();
+   create_accounts({"widesec"_n});
+   produce_block();
+   set_code("widesec"_n, test_contracts::test_kv_wide_sec_wasm());
+   set_abi("widesec"_n, test_contracts::test_kv_wide_sec_abi());
+   produce_block();
+
+   auto additem = [&](uint64_t id, uint32_t small, int64_t score, uint32_t tier, const char* owner) {
+      push_action("widesec"_n, "additem"_n, "widesec"_n, mutable_variant_object()
+                  ("id", id)("small", small)("score", score)("tier", tier)("owner", owner));
+   };
+
+   // Ascending by every index is id 4, 3, 2, 1 -- i.e. `small` 1, 256, 65536, 16777216.
+   //
+   // The tiers are byte-rotations for the same reason the `small` values are. Small
+   // consecutive tiers (0, 1, 2) would NOT discriminate: they differ only in the
+   // least-significant byte, which little-endian puts first, so a LE encoding orders them
+   // correctly by accident. Ids 1 and 2 share a tier so `owner` is exercised as the
+   // tiebreaker rather than never being reached.
+   additem(1, 0x01000000u,  1, 0x00010000u, "zzz");
+   additem(2, 0x00010000u,  0, 0x00010000u, "aaa");
+   additem(3, 0x00000100u, -1, 0x00000100u, "mmm");
+   additem(4, 0x00000001u, -2, 0x00000001u, "bob");
+   produce_block();
+
+   std::optional<sysio::chain_apis::tracked_votes> _tracked_votes;
+   chain_apis::read_only plugin(*(this->control), {}, {}, _tracked_votes,
+                                fc::microseconds::maximum(), fc::microseconds::maximum(), {});
+
+   // `small` is unique per row, so the sequence of it identifies both the rows returned and
+   // the order they came back in.
+   auto smalls_of = [](const chain_apis::read_only::get_table_rows_result& r) {
+      std::vector<uint64_t> out;
+      for (const auto& row : r.rows) {
+         const auto& obj = row.get_object();
+         BOOST_REQUIRE(obj.contains("value"));
+         const auto& val = obj["value"];
+         BOOST_REQUIRE(val.is_object());
+         out.push_back(val.get_object()["small"].as_uint64());
+      }
+      return out;
+   };
+
+   auto query = [&](const char* index, const std::string& lower = {}, const std::string& upper = {},
+                    bool reverse = false) {
+      chain_apis::read_only::get_table_rows_params p;
+      p.json  = true;
+      p.code  = "widesec"_n;
+      p.table = "items";
+      p.index_name  = index;
+      p.lower_bound = lower;
+      p.upper_bound = upper;
+      if (reverse) p.reverse = true;
+      return get_table_rows_kv(plugin, p, fc::time_point::maximum());
+   };
+
+   const std::vector<uint64_t> ascending{1u, 256u, 65536u, 16777216u};
+
+   // (a) primary query returns everything, so a wrong count later is an index problem
+   {
+      chain_apis::read_only::get_table_rows_params p;
+      p.json = true;
+      p.code = "widesec"_n;
+      p.table = "items";
+      auto result = get_table_rows_kv(plugin, p, fc::time_point::maximum());
+      BOOST_CHECK_EQUAL(result.rows.size(), 4u);
+   }
+
+   // (b) uint32 secondary index, full scan. Under a little-endian encoding this comes back
+   //     exactly reversed.
+   BOOST_CHECK(smalls_of(query("bysmall")) == ascending);
+
+   // (c) int64 secondary index. Under LE the two non-negative scores sort ahead of the
+   //     negative ones, giving {65536, 16777216, 1, 256}.
+   BOOST_CHECK(smalls_of(query("byscore")) == ascending);
+
+   // (d) composite {uint32 tier, name owner}. be_key_codec expands the struct field by field
+   //     in declaration order and be_key_stream encodes each through the same overloads, so
+   //     tier is compared before owner.
+   BOOST_CHECK(smalls_of(query("bycombo")) == ascending);
+
+   // (e) JSON bound on the uint32 index -- the host encodes 256 big-endian and it has to
+   //     match the bytes the contract stored.
+   {
+      auto got = smalls_of(query("bysmall", R"({"bysmall": 256})"));
+      BOOST_CHECK((got == std::vector<uint64_t>{256u, 65536u, 16777216u}));
+   }
+
+   // (f) JSON bound on the signed index, at zero -- the sign-bit flip has to agree on both
+   //     sides or this returns the negatives too.
+   {
+      auto got = smalls_of(query("byscore", R"({"byscore": 0})"));
+      BOOST_CHECK((got == std::vector<uint64_t>{65536u, 16777216u}));
+   }
+
+   // (g) JSON bound on the composite index, at tier 256. The bound object nests by field
+   //     name, which is what encode_shape reads.
+   {
+      auto got = smalls_of(query("bycombo", R"({"bycombo": {"tier": 256, "owner": "mmm"}})"));
+      BOOST_CHECK((got == std::vector<uint64_t>{256u, 65536u, 16777216u}));
+   }
+
+   // (h) composite bounds narrowed to one row: within tier 65536, from "aaa" up to but not
+   //     including "zzz" leaves only id 2. This is the case that needs owner to encode
+   //     correctly as well as tier.
+   {
+      auto got = smalls_of(query("bycombo",
+                                 R"({"bycombo": {"tier": 65536, "owner": "aaa"}})",
+                                 R"({"bycombo": {"tier": 65536, "owner": "zzz"}})"));
+      BOOST_CHECK((got == std::vector<uint64_t>{65536u}));
+   }
+
+   // (i) reverse walks the same order backwards, which uses a different cursor path than
+   //     the forward scan.
+   {
+      auto got = smalls_of(query("bysmall", {}, {}, true));
+      std::vector<uint64_t> descending(ascending.rbegin(), ascending.rend());
+      BOOST_CHECK(got == descending);
+   }
+
+   // (j) a bound below every key returns everything; one above every key returns nothing.
+   //     A wrongly-encoded bound tends to land inside the range instead.
+   {
+      BOOST_CHECK(smalls_of(query("bysmall", R"({"bysmall": 0})")) == ascending);
+      BOOST_CHECK_EQUAL(query("bysmall", R"({"bysmall": 4294967295})").rows.size(), 0u);
+   }
+
+} FC_LOG_AND_RETHROW()
+
+// ---------------------------------------------------------------------------
 // New unified get_table_rows feature tests
 // ---------------------------------------------------------------------------
 
