@@ -153,9 +153,9 @@ export function relativeImportPath(fromSolFile: string, toSolFile: string): stri
 }
 
 /**
- * Solidity pragma version range.
+ * Exact Solidity compiler version used by generated sources.
  */
-export const SOL_PRAGMA = ">=0.8.0 <0.9.0"
+export const SOL_PRAGMA = "0.8.25"
 
 /**
  * SPDX license identifier for generated files.
