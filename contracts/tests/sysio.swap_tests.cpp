@@ -8,6 +8,8 @@
 
 #include <contracts.hpp>
 #include <sysio.opp.common/amm_math.hpp>
+#include <sysio.opp.common/twap.hpp>
+#include "twap_wide.hpp"
 #include <algorithm>
 #include <cmath>
 #include <random>
@@ -186,6 +188,51 @@ public:
           ( "pair_token", pair_token )
           ( "newfee", newfee )
         );
+    }
+    // Two exchanges by `user` in ONE transaction, so no block time can pass
+    // between them. (The fixture's push_action seals a block per action.)
+    void exchange_twice_in_one_transaction( name user, symbol_code pair,
+                                            extended_asset in_a, extended_asset in_b, symbol out_symbol ) {
+        signed_transaction trx;
+        for (const auto& in : { in_a, in_b }) {
+            action act;
+            act.account = "sysio.swap"_n;
+            act.name    = "exchange"_n;
+            act.authorization = { {user, config::sysio_payer_name}, {user, config::active_name} };
+            act.data = abi_ser.variant_to_binary( "exchange", mvo()
+                ( "user", user )( "pair_token", pair )( "ext_asset_in", in )( "min_expected", asset(0, out_symbol) ),
+                abi_serializer::create_yield_function(abi_serializer_max_time) );
+            trx.actions.emplace_back( std::move(act) );
+        }
+        set_transaction_headers( trx );
+        trx.sign( get_private_key( user, "active" ), control->get_chain_id() );
+        push_transaction( trx );
+    }
+    // sync needs no authorization; any account can foot the CPU.
+    action_result sync( symbol_code pair_token ) {
+        return push_action( "sysio.swap"_n, "alice"_n, "sync"_n, mvo()
+          ( "pair_token", pair_token )
+        );
+    }
+    // The pair's cumulative-price row, with the 256-bit accumulators widened and
+    // the timestamp in microseconds since the epoch.
+    struct accumulator_row {
+        boost::multiprecision::uint256_t price1;
+        boost::multiprecision::uint256_t price2;
+        int64_t                          last_update_us;
+    };
+    accumulator_row price_accumulator( symbol_code pair ) {
+        auto row = get_balance( "sysio.swap"_n, "sysio.swap"_n, "priceaccum"_n, pair.value, "price_accumulator" );
+        BOOST_REQUIRE( !row.is_null() );
+        // The ABI serializer decodes a `uint128` field into the variant's native
+        // 128-bit slot; widen it through the shared helper.
+        auto limb = [](const fc::variant& v) {
+            BOOST_REQUIRE( v.is_uint128() );
+            return twap_testing::wide( v.as_uint128() );
+        };
+        auto cumulative = [&](const fc::variant& c) { return (limb(c["hi"]) << 128) | limb(c["lo"]); };
+        return { cumulative(row["price1"]), cumulative(row["price2"]),
+                 fc::time_point::from_iso_string(row["last_update"].as_string()).time_since_epoch().count() };
     }
 
     action_result openfeetable( name user, symbol_code pair_token ) {
@@ -404,6 +451,17 @@ namespace model {
       uint64_t f = amm::split_wire_fee( g, uint32_t(fee), NoUnderwriterShareBps ).fee;
       if (fee > 0 && g > 0) f = std::max( f, MinSwapFee );
       return int64_t( g - f );
+   }
+}
+
+// The cumulative-price spec, written by hand: a side's spot price is the other
+// side's balance over its own, in Q64.64 rounded down, and an accumulator is
+// the sum of that price times the microseconds it held.
+namespace twap_reference {
+   using boost::multiprecision::uint256_t;
+   constexpr int PriceFractionBits = 64;
+   uint256_t price_fp( int64_t numerator, int64_t denominator ) {
+      return (uint256_t(numerator) << PriceFractionBits) / denominator;
    }
 }
 
@@ -1690,6 +1748,140 @@ BOOST_FIXTURE_TEST_CASE( guard_semantics_on_the_memo_path, sysio_swap_tester ) t
     BOOST_REQUIRE_EQUAL( before[1] - out,   after[1] );
 } FC_LOG_AND_RETHROW()
 
+// ---------------------------------------------------------------------------
+// Time-weighted average price: the cumulative-price accumulators.
+// ---------------------------------------------------------------------------
+
+BOOST_FIXTURE_TEST_CASE( price_accumulators_follow_the_pools, sysio_swap_tester ) try {
+    setup_pools();
+    // The tester replays a still-pending block's transactions at the skipped
+    // time when asked to skip ahead, so the pool creation is sealed at its own
+    // time before the clock moves. (The fixture's push_action seals a block per
+    // action, so the ops below need no sealing of their own.)
+    produce_block();
+    using boost::multiprecision::uint256_t;
+    namespace twap = sysio::opp::twap;
+
+    auto row = price_accumulator(EVO);
+    BOOST_REQUIRE( row.price1 == 0 && row.price2 == 0 );
+    const auto snapshot = row;   // the reader's t0
+    uint256_t expect1 = 0, expect2 = 0;
+
+    // Advance chain time by `skip`, apply `op`, and require the accumulators to
+    // have grown by the spot prices that held BEFORE the op, times the interval
+    // the row reports -- whatever the op then did to the pools.
+    auto step = [&](const fc::microseconds& skip, auto&& op) {
+        const auto pools = system_balance(EVO.value);
+        produce_block(skip);   // an empty block `skip` after the sealed head
+        op();
+        const auto next = price_accumulator(EVO);
+        const int64_t elapsed = next.last_update_us - row.last_update_us;
+        BOOST_REQUIRE_GE( elapsed, skip.count() );
+        expect1 += twap_reference::price_fp(pools[1], pools[0]) * elapsed;
+        expect2 += twap_reference::price_fp(pools[0], pools[1]) * elapsed;
+        BOOST_REQUIRE_MESSAGE( next.price1 == expect1, "price1 " << next.price1 << " expected " << expect1
+            << " elapsed " << elapsed << " pools " << pools[0] << "," << pools[1]
+            << " last_update " << row.last_update_us << " -> " << next.last_update_us );
+        BOOST_REQUIRE_MESSAGE( next.price2 == expect2, "price2 " << next.price2 << " expected " << expect2 );
+        row = next;
+    };
+    step( fc::seconds(10), [&]{ BOOST_REQUIRE_EQUAL( success(),
+        exchange("alice"_n, EVO, extend(asset::from_string("4.0000 EOS")), asset(0, VOICE4)) ); } );
+    step( fc::seconds(30), [&]{ BOOST_REQUIRE_EQUAL( success(),
+        addliquidity("alice"_n, asset::from_string("50.0000 EVO"),
+                     asset::from_string("100000.0000 EOS"), asset::from_string("100000.0000 VOICE")) ); } );
+    step( fc::minutes(5), [&]{ BOOST_REQUIRE_EQUAL( success(),
+        remliquidity("alice"_n, asset::from_string("25.0000 EVO"), asset(0, EOS4), asset(0, VOICE4)) ); } );
+    step( fc::hours(1), [&]{ BOOST_REQUIRE_EQUAL( success(),
+        exchange("alice"_n, EVO, extend(asset::from_string("7.0000 VOICE")), asset(0, EOS4)) ); } );
+    step( fc::hours(1), [&]{ BOOST_REQUIRE_EQUAL( success(), sync(EVO) ); } );
+
+    // The reader's window: (r_now - r_snapshot) / (t - t0), computed by the
+    // shared kernel and by exact 256-bit division, must agree...
+    const int64_t window = row.last_update_us - snapshot.last_update_us;
+    const uint256_t delta1 = row.price1 - snapshot.price1;
+    const twap::u128 average1 = twap::average_price(
+        twap::difference(twap_testing::to_cumulative(row.price1), twap_testing::to_cumulative(snapshot.price1)),
+        uint64_t(window) );
+    BOOST_REQUIRE( twap_testing::wide(average1) == delta1 / window );
+    // ...and land where the pools were all along: a little over four VOICE per EOS.
+    BOOST_REQUIRE( average1 >= 4 * twap::PRICE_ONE && average1 < 5 * twap::PRICE_ONE );
+    const twap::u128 average2 = twap::average_price(
+        twap::difference(twap_testing::to_cumulative(row.price2), twap_testing::to_cumulative(snapshot.price2)),
+        uint64_t(window) );
+    BOOST_REQUIRE( twap_testing::wide(average2) == (row.price2 - snapshot.price2) / window );
+    BOOST_REQUIRE( average2 > twap::PRICE_ONE / 5 && average2 < twap::PRICE_ONE / 4 );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( price_accumulators_ignore_same_block_moves, sysio_swap_tester ) try {
+    setup_pools();
+    produce_block();   // seal the pool creation before the clock moves
+    using boost::multiprecision::uint256_t;
+
+    auto row = price_accumulator(EVO);
+    const auto pools = system_balance(EVO.value);
+    produce_block(fc::seconds(20));
+
+    // Two trades in one transaction: the first settles the interval at the
+    // pre-trade price; the second -- more than twice the EOS side, collapsing
+    // the spot price -- happens with no time elapsed, so it contributes nothing
+    // however far it moves the spot.
+    exchange_twice_in_one_transaction( "alice"_n, EVO,
+        extend(asset::from_string("1.0000 EOS")), extend(asset::from_string("50000000000.0000 EOS")), VOICE4 );
+    const auto moved = system_balance(EVO.value);
+    BOOST_REQUIRE( twap_reference::price_fp(moved[1], moved[0]) * 2 < twap_reference::price_fp(pools[1], pools[0]) );
+    const auto after = price_accumulator(EVO);
+    const int64_t elapsed = after.last_update_us - row.last_update_us;
+    BOOST_REQUIRE_GE( elapsed, fc::seconds(20).count() );
+    BOOST_REQUIRE( after.price1 == twap_reference::price_fp(pools[1], pools[0]) * elapsed );
+    BOOST_REQUIRE( after.price2 == twap_reference::price_fp(pools[0], pools[1]) * elapsed );
+    produce_block();   // seal the transaction in its block
+
+    // Only once time passes does the moved price count, for exactly that time.
+    produce_block(fc::seconds(20));
+    BOOST_REQUIRE_EQUAL( success(), sync(EVO) );
+    const auto synced = price_accumulator(EVO);
+    const int64_t held = synced.last_update_us - after.last_update_us;
+    BOOST_REQUIRE_GE( held, fc::seconds(20).count() );
+    BOOST_REQUIRE( synced.price1 == after.price1 + twap_reference::price_fp(moved[1], moved[0]) * held );
+    BOOST_REQUIRE( synced.price2 == after.price2 + twap_reference::price_fp(moved[0], moved[1]) * held );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( price_accumulators_span_extreme_prices, sysio_swap_tester ) try {
+    // The steepest price int64 balances allow, held for a decade: the sum
+    // needs the high limb and the average still recovers the price exactly.
+    create_tokens_and_issue();
+    abi_ser.set_abi( swap_abi_def(), abi_serializer::create_yield_function(abi_serializer_max_time) );
+    many_openext();
+    BOOST_REQUIRE_EQUAL( success(), transfer( "sysio.token"_n, "alice"_n, "sysio.swap"_n, asset::from_string("461168601842738.7903 EOS"), "") );
+    BOOST_REQUIRE_EQUAL( success(), transfer( "anothertoken"_n, "bob"_n, "sysio.swap"_n, asset::from_string("461168601842738.7903 VOICE"), "deposit to: alice") );
+    const int64_t init_max = 1'000'000'000'000'000 - 1;
+    BOOST_REQUIRE_EQUAL( success(), inittoken( "alice"_n, EVO4,
+        extend(asset(1, EOS4)), extend(asset(init_max, VOICE4)), 10, "wevotethefee"_n) );
+    namespace twap = sysio::opp::twap;
+
+    // At this price a single block already carries the sum past 128 bits; a
+    // week makes the point without stretching the chain clock.
+    produce_block();   // seal the pool creation before the clock moves
+    const auto row = price_accumulator(EVO);
+    produce_block(fc::days(7));
+    BOOST_REQUIRE_EQUAL( success(), sync(EVO) );
+    const auto next = price_accumulator(EVO);
+    const int64_t elapsed = next.last_update_us - row.last_update_us;
+    BOOST_REQUIRE_GE( elapsed, fc::days(7).count() );
+
+    BOOST_REQUIRE( next.price1 == twap_reference::price_fp(init_max, 1) * elapsed );
+    BOOST_REQUIRE( next.price2 == twap_reference::price_fp(1, init_max) * elapsed );
+    BOOST_REQUIRE( (next.price1 >> 128) != 0 );   // beyond 128 bits, as designed for
+    const twap::u128 average1 = twap::average_price(
+        twap::difference(twap_testing::to_cumulative(next.price1), twap_testing::to_cumulative(row.price1)),
+        uint64_t(elapsed) );
+    BOOST_REQUIRE( average1 == twap::price_fp(uint64_t(init_max), 1) );
+
+    // And the pool still trades.
+    BOOST_REQUIRE_EQUAL( reference::receive(1, 1, init_max, 10), settle_swap("alice"_n, EVO, asset(1, EOS4), VOICE4, 1) );
+} FC_LOG_AND_RETHROW()
+
 BOOST_FIXTURE_TEST_CASE( abi_surface_is_pinned, sysio_swap_tester ) try {
     // The substitution is internal: the action set, the swap and fee
     // signatures, the pair row, and the table set must not move.
@@ -1699,7 +1891,7 @@ BOOST_FIXTURE_TEST_CASE( abi_surface_is_pinned, sysio_swap_tester ) try {
     for (const auto& a : abi.actions) actions.insert(a.name.to_string());
     const std::set<std::string> expected_actions{
         "addliquidity", "changefee", "close", "closeext", "exchange", "indexpair",
-        "inittoken", "open", "openext", "remliquidity", "transfer", "withdraw" };
+        "inittoken", "open", "openext", "remliquidity", "sync", "transfer", "withdraw" };
     BOOST_REQUIRE( actions == expected_actions );
 
     using field_list = std::vector<std::pair<std::string, std::string>>;
@@ -1720,15 +1912,23 @@ BOOST_FIXTURE_TEST_CASE( abi_surface_is_pinned, sysio_swap_tester ) try {
     const field_list currency_stats_fields{
         {"supply", "asset"}, {"max_supply", "asset"}, {"issuer", "name"}, {"pool1", "extended_asset"},
         {"pool2", "extended_asset"}, {"fee", "int32"}, {"fee_contract", "name"} };
+    const field_list sync_fields{ {"pair_token", "symbol_code"} };
+    const field_list cumulative_price_fields{ {"lo", "uint128"}, {"hi", "uint128"} };
+    const field_list price_accumulator_fields{
+        {"pair", "symbol_code"}, {"price1", "cumulative_price"}, {"price2", "cumulative_price"}, {"last_update", "time_point"} };
     BOOST_REQUIRE( fields("exchange") == exchange_fields );
     BOOST_REQUIRE( fields("changefee") == changefee_fields );
     BOOST_REQUIRE( fields("inittoken") == inittoken_fields );
     BOOST_REQUIRE( fields("currency_stats") == currency_stats_fields );
+    BOOST_REQUIRE( fields("sync") == sync_fields );
+    BOOST_REQUIRE( fields("cumulative_price") == cumulative_price_fields );
+    BOOST_REQUIRE( fields("price_accumulator") == price_accumulator_fields );
 
     std::set<std::string> tables;
     for (const auto& t : abi.tables) tables.insert(t.name);
     const std::set<std::string> expected_tables{
-        "account", "accounts", "currency_stats", "evodexaccount", "evodexacnts", "evoindex", "index_struct", "stat" };
+        "account", "accounts", "currency_stats", "evodexaccount", "evodexacnts", "evoindex", "index_struct",
+        "priceaccum", "stat" };
     BOOST_REQUIRE( tables == expected_tables );
 } FC_LOG_AND_RETHROW()
 

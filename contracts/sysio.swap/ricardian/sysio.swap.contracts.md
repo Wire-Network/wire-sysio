@@ -153,6 +153,19 @@ The operation is executed only if the extended asset to be added to {{user}} is 
 that indicated by {{user}}. 
 
 
+<h1 class="contract">sync</h1>
+
+---
+spec_version: "0.2.0"
+title: Sync price accumulators
+summary: 'Bring the cumulative prices of {{nowrap pair_token}} up to the current time'
+---
+
+The cumulative-price accumulators of the token {{pair_token}} are advanced to the current block time: each accumulator grows by the pool price that has held since the previous update, multiplied by the time elapsed. The pools are not modified. No authorization is required.
+
+The accumulators also advance in the same way immediately before any operation that changes the pools of {{pair_token}}. A reader that records the accumulators at two times obtains the time-weighted average price between them as the difference of the accumulators divided by the elapsed time.
+
+
 <h1 class="contract">changefee</h1>
 
 ---

@@ -26,6 +26,10 @@ When adding or removing liquidity, the (again standard) criterion is to keep fix
 the 0.01% fee charged will slightly increase the value of the evotoken afterwards.
 
 
+**Time-weighted average prices**
+
+Every pair keeps two cumulative-price accumulators in the `priceaccum` table, one per direction: the running sum of the pool's spot price (the other side's balance over this side's, in Q64.64 fixed point) multiplied by the microseconds that price held. They advance immediately before any operation that changes the pools, and on the permissionless `sync` action, so an interval is always weighted at the price that actually prevailed during it. A reader records an accumulator `r0` at time `t0` and reads `r` at `t`; `(r - r0) / (t - t0)` is the time-weighted average price over the window. A trade that moves the spot price inside a block contributes nothing until time passes at the moved price, which is what makes the average expensive to manipulate. The accumulators are 256 bits wide and cannot wrap; the arithmetic lives in `sysio.opp.common/twap.hpp`, which readers can use for the subtraction and division.
+
 **Some considerations from the perspective of liquidity providers**
 
 Being a liquidity provider is a financial position that deserves a

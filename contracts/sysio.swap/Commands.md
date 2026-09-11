@@ -62,6 +62,14 @@ of the input is account, evotoken, extended_asset to pay (exact), asset to recei
 The amount to pay must be positive and the amount to receive nonnegative; there is no
 exact-output form (asking for an exact amount to receive by passing negative amounts).
 
+Read the pair's cumulative prices (a time-weighted average price oracle). Each row holds, for both directions, the running sum of the pool price in Q64.64 fixed point multiplied by the microseconds it held, and the time of the last update:
+
+    cleos get table evolutiondex evolutiondex priceaccum -L EOSPESO -U EOSPESO
+
+Bring the accumulators up to the current block time without trading, so a snapshot taken now is current. Anyone may call this:
+
+    cleos push action evolutiondex sync '["EOSPESO"]' -p YOUR_ACCOUNT
+
 Transfer your evotokens to another account:
 
     cleos push action evolutiondex transfer '["YOUR_ACCOUNT", "argentinaeos", "0.0001 EOSPESO", "ITS ALIVE"]' -p YOUR_ACCOUNT
