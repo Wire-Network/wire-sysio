@@ -75,10 +75,12 @@ title: Initialize token
 summary: 'Initializes an evotoken by setting initial pair of token pools'
 ---
 
-{{user}} agrees to initialize a pair token with symbol {{new_symbol}}, with the following initial parameters: pool1 = {{initial_pool1}}, pool2 = {{initial_pool2}}, fee = {{initial_fee}}, fee_contract = {{fee_contract}}. The extended assets {{initial_pool1}} and {{initial_pool2}} will be deducted from the corresponding extended balances of {{user}}.
+{{user}} agrees to initialize a pair token with symbol {{new_symbol}}, with the following initial parameters: pool1 = {{initial_pool1}}, pool2 = {{initial_pool2}}, fee = {{initial_fee}} (in units of 1/10000, at most 9999), fee_authority = {{fee_authority}}. The extended assets {{initial_pool1}} and {{initial_pool2}} will be deducted from the corresponding extended balances of {{user}}.
+
+The fee authority is the account whose authorization the changefee action requires for this pair. An empty {{fee_authority}} adopts the contract-wide fee authority set by setconfig; any other name makes that account the pair's own.
 
 RAM will be deducted from {{user}}’s resources to create the necessary records.
-Authorization of {{user}} is required.
+Authorization of {{user}} and of the contract is required.
 
 
 <h1 class="contract">addliquidity</h1>
@@ -174,8 +176,21 @@ title: Change fee
 summary: 'Change the fee value associated to a pair'
 ---
 
-The account fee_contract associated to the token {{pair_token}} authorizes
-to change the fee parameter associated to the same token, to the value {{newfee}}.
+The fee authority associated to the token {{pair_token}} authorizes
+to change the fee parameter associated to the same token, to the value {{newfee}}, in units of 1/10000 and at most 9999.
+
+
+<h1 class="contract">setconfig</h1>
+
+---
+spec_version: "0.2.0"
+title: Set configuration
+summary: 'Set the contract-wide fee authority to {{nowrap fee_authority}}'
+---
+
+The contract sets {{fee_authority}} as the account whose authorization the changefee action requires for every pair created afterwards without a fee authority of its own. Pairs already created keep the authority they were created with.
+
+The authorization of the contract is required.
 
 
 <h1 class="contract">close</h1>
@@ -223,4 +238,3 @@ summary: 'Send {{nowrap quantity}} from {{nowrap from}} to {{nowrap to}}'
 
 (5) The account {{from}} is notified.
 (6) The account {{to}} is notified.
-(7) The account fee_contract corresponding to the token {{asset_to_symbol_code quantity}} is notified.

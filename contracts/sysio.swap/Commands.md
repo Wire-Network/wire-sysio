@@ -29,9 +29,17 @@ Withdraw funds from your opened channels, to the account "TO":
 
     cleos push action evolutiondex withdraw '["YOUR_ACCOUNT", "TO", {"contract":"eosio.token", "quantity":"1.0000 EOS"}, "memo"]' -p YOUR_ACCOUNT
 
-Create the EOS/PESO evotoken. Set the initial liquidity, the initial fee for the trading pair and the fee controller.
+Create the EOS/PESO evotoken. Set the initial liquidity, the initial fee for the trading pair (in units of 0.01%, here 0.1%) and the fee authority: an empty name adopts the contract-wide authority set at deployment, any other name makes that account the pair's own. The contract's authority is required alongside yours.
 
-    cleos push action evolutiondex inittoken '["YOUR_ACCOUNT", "4,EOSPESO", {"contract":"eosio.token", "quantity":"1.0000 EOS"}, {"contract":"pesocontract", "quantity":"1.0000 PESO"}, 10, "wevotethefee"]' -p YOUR_ACCOUNT
+    cleos push action evolutiondex inittoken '["YOUR_ACCOUNT", "4,EOSPESO", {"contract":"eosio.token", "quantity":"1.0000 EOS"}, {"contract":"pesocontract", "quantity":"1.0000 PESO"}, 10, ""]' -p YOUR_ACCOUNT -p evolutiondex
+
+Set the contract-wide fee authority (deployment step, the contract's own authority):
+
+    cleos push action evolutiondex setconfig '["sysio"]' -p evolutiondex
+
+Change a pair's fee, signed by its fee authority:
+
+    cleos push action evolutiondex changefee '["EOSPESO", 30]' -p sysio
 
 Check your evotokens balance:
 
@@ -162,7 +170,3 @@ where the file addliquidity.json contains:
 
 The same idea applies to the operations of removing liquidity and inittoken.
 Typically, a graphical user interface will perform this kind of multiaction transactions.
-
-The fee value will be governed by the liquidity providers using the
-smart contract wevotethefee.
-Check the commands of wevotethefee [here](wevotethefee/README.md).

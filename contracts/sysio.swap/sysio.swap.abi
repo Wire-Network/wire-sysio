@@ -138,7 +138,7 @@
                     "type": "int32"
                 },
                 {
-                    "name": "fee_contract",
+                    "name": "fee_authority",
                     "type": "name"
                 }
             ]
@@ -242,7 +242,7 @@
                     "type": "int32"
                 },
                 {
-                    "name": "fee_contract",
+                    "name": "fee_authority",
                     "type": "name"
                 }
             ]
@@ -366,6 +366,26 @@
             ]
         },
         {
+            "name": "setconfig",
+            "base": "",
+            "fields": [
+                {
+                    "name": "fee_authority",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "swap_config",
+            "base": "",
+            "fields": [
+                {
+                    "name": "fee_authority",
+                    "type": "name"
+                }
+            ]
+        },
+        {
             "name": "sync",
             "base": "",
             "fields": [
@@ -472,6 +492,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "setconfig",
+            "type": "setconfig",
+            "ricardian_contract": ""
+        },
+        {
             "name": "sync",
             "type": "sync",
             "ricardian_contract": ""
@@ -527,6 +552,14 @@
             "key_names": ["symbol_code"],
             "key_types": ["uint64"],
             "table_id": 4264
+        },
+        {
+            "name": "swapconfig",
+            "type": "swap_config",
+            "index_type": "i64",
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 40605
         }
     ],
     "ricardian_clauses": [],

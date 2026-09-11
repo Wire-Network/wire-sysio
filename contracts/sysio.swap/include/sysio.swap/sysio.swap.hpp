@@ -6,6 +6,7 @@
 #include <sysio/print.hpp>
 #include <sysio/kv_table.hpp>
 #include <sysio/kv_scoped_table.hpp>
+#include <sysio/kv_global.hpp>
 #include <sysio.opp.common/amm_math.hpp>
 #include <sysio.opp.common/twap.hpp>
 #include <algorithm>
@@ -21,7 +22,6 @@ namespace sysio {
          const int64_t MAX = sysio::asset::max_amount;
          const int64_t INIT_MAX = 1000000000000000;  // 10^15
          const int ADD_LIQUIDITY_FEE = 1;
-         const int DEFAULT_FEE = 10;
          /// Fees are expressed in units of 1/FEE_DENOMINATOR of the traded amount.
          static constexpr int FEE_DENOMINATOR = 10000;
          /// Upper bound accepted by changefee: strictly below 100%, so a positive quote
@@ -39,9 +39,16 @@ namespace sysio {
          static constexpr uint64_t MIN_SWAP_FEE = 1;
 
          using contract::contract;
+         /// Set the contract-wide fee authority: the account whose signature `changefee`
+         /// requires for every pair that did not name its own at creation. Governance
+         /// executes approved proposals as `sysio`, so deployment sets it to `sysio`.
+         /// Requires the contract's own authority.
+         [[sysio::action]] void setconfig(name fee_authority);
+         /// Create a pair. `initial_fee` may be anything in [0, MAX_FEE]. An empty
+         /// `fee_authority` adopts the configured one; a name overrides it for this pair.
          [[sysio::action]] void inittoken(name user, symbol new_symbol,
            extended_asset initial_pool1, extended_asset initial_pool2,
-           int initial_fee, name fee_contract);
+           int initial_fee, name fee_authority);
          [[sysio::on_notify("*::transfer")]] void ontransfer(name from, name to, asset quantity, string memo);
          [[sysio::action]] void openext( const name& user, const name& payer, const extended_symbol& ext_symbol);
          [[sysio::action]] void closeext ( const name& user, const name& to, const extended_symbol& ext_symbol, string memo);
@@ -97,6 +104,12 @@ namespace sysio {
 
          // --- Rows ---
 
+         /// Contract-wide configuration, set on deployment by `setconfig`.
+         struct [[sysio::table("swapconfig")]] swap_config {
+            name fee_authority;
+            SYSLIB_SERIALIZE(swap_config, (fee_authority))
+         };
+
          struct [[sysio::table("accounts")]] account {
             asset balance;
             SYSLIB_SERIALIZE(account, (balance))
@@ -114,8 +127,8 @@ namespace sysio {
             extended_asset pool1;
             extended_asset pool2;
             int            fee;
-            name           fee_contract;
-            SYSLIB_SERIALIZE(currency_stats, (supply)(max_supply)(issuer)(pool1)(pool2)(fee)(fee_contract))
+            name           fee_authority;   ///< whose signature changefee requires for this pair
+            SYSLIB_SERIALIZE(currency_stats, (supply)(max_supply)(issuer)(pool1)(pool2)(fee)(fee_authority))
          };
 
          struct [[sysio::table("evoindex")]] pair_index {
@@ -138,6 +151,7 @@ namespace sysio {
 
          // --- Tables ---
 
+         using swapconfig_t = kv::global<"swapconfig"_n, swap_config>;
          using accounts    = kv::scoped_table<"accounts"_n,    account_key,         account>;
          using evodexacnts = kv::scoped_table<"evodexacnts"_n, extended_symbol_key, evodex_account>;
          using stats       = kv::table<"stat"_n,       pair_key,          currency_stats>;

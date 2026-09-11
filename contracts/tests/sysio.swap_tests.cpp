@@ -28,11 +28,13 @@ using mvo = fc::mutable_variant_object;
 class sysio_swap_tester : public tester {
 public:
 
-    sysio_swap_tester() {
+    // `configure` = false leaves the fee authority unset, for the test that pins
+    // what pair creation does before deployment has run setconfig.
+    explicit sysio_swap_tester( bool configure = true ) {
         produce_blocks( 2 );
 
         create_accounts( { "alice"_n, "bob"_n, "carol"_n, "sysio.token"_n, "sysio.swap"_n,
-          "wevotethefee"_n, "badtoken"_n, "anothertoken"_n } );
+          "badtoken"_n, "anothertoken"_n } );
         produce_blocks( 2 );
 
         // sysio.token bills every row to the system account (ram_payer = "sysio"),
@@ -55,15 +57,34 @@ public:
         set_code( "badtoken"_n, contracts::util::badtoken_wasm() );
         set_abi( "badtoken"_n, contracts::util::badtoken_abi().data() );
 
-        set_code( "wevotethefee"_n, contracts::util::wevotethefee_wasm() );
-        set_abi( "wevotethefee"_n, contracts::util::wevotethefee_abi().data() );
-        
         produce_blocks();
+
+        // Deployment's configuration step: governance executes as sysio.
+        if (configure) BOOST_REQUIRE_EQUAL( success(), setconfig( config::system_account_name ) );
 
         const auto* accnt1 = control->find_account_metadata( "sysio.token"_n );
         abi_def abi1;
         BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt1->abi, abi1), true);
         abi_ser.set_abi(abi1, abi_serializer::create_yield_function(abi_serializer_max_time));
+    }
+
+    // Push `act` on sysio.swap under exactly the given authorities, resolving the
+    // action's type from the deployed ABI, and seal its block -- the same
+    // one-action-per-block cadence as the fixture's plain push_action. Helpers
+    // whose signer is not a plain user go through here.
+    action_result push_swap_action( action_name act, std::vector<permission_level> auths, const variant_object& data ) {
+        try {
+            sysio::testing::base_tester::push_action( "sysio.swap"_n, act, auths, data, 100 );
+        } catch (const fc::exception& ex) {
+            return error(ex.top_message());
+        }
+        produce_block();
+        return success();
+    }
+    action_result setconfig( name fee_authority, name signer = "sysio.swap"_n ) {
+        return push_swap_action( "setconfig"_n, { {signer, config::active_name} }, mvo()
+          ( "fee_authority", fee_authority )
+        );
     }
 
     fc::variant get_balance( name smartctr, name user, name table, int64_t id, string struc) 
@@ -136,27 +157,21 @@ public:
           ( "memo", "" )
         );
     }
+    // An empty `fee_authority` adopts the configured one (sysio in this fixture).
     action_result inittoken( name user, symbol new_symbol, extended_asset initial_pool1,
-      extended_asset initial_pool2, int initial_fee, name fee_contract){
-        // inittoken bills the new stat row to `user`, so the action must carry the
+      extended_asset initial_pool2, int initial_fee, name fee_authority = name{} ){
+        // inittoken bills the new rows to `user`, so the action must carry the
         // user's sysio.payer permission in addition to the two active authorities.
-        std::vector<permission_level> auths{ {user, config::sysio_payer_name},
-                                             {user, config::active_name},
-                                             {"sysio.swap"_n, config::active_name} };
-        try {
-        sysio::testing::base_tester::push_action( "sysio.swap"_n, "inittoken"_n, auths, mvo()
+        return push_swap_action( "inittoken"_n,
+          { {user, config::sysio_payer_name}, {user, config::active_name}, {"sysio.swap"_n, config::active_name} },
+          mvo()
           ( "user", user)
           ("new_symbol", new_symbol)
           ("initial_pool1", initial_pool1)
-          ("initial_pool2", initial_pool2) 
+          ("initial_pool2", initial_pool2)
           ("initial_fee", initial_fee)
-          ("fee_contract", fee_contract)
-        , 100);
-      } catch (const fc::exception& ex) {
-         edump((ex.to_detail_string()));
-         return error(ex.top_message());
-      }
-      return success();
+          ("fee_authority", fee_authority)
+        );
     }
     action_result addliquidity(name user, asset to_buy, asset max_asset1, asset max_asset2) {
         return push_action( "sysio.swap"_n, user, "addliquidity"_n, mvo()
@@ -183,8 +198,9 @@ public:
           ( "min_expected", min_expected )
         );
     }
-    action_result changefee( symbol_code pair_token, int newfee ) {
-        return push_action( "sysio.swap"_n, "wevotethefee"_n, "changefee"_n, mvo()
+    // Signed by the pair's fee authority: the configured sysio unless overridden.
+    action_result changefee( symbol_code pair_token, int newfee, name authority = config::system_account_name ) {
+        return push_swap_action( "changefee"_n, { {authority, config::active_name} }, mvo()
           ( "pair_token", pair_token )
           ( "newfee", newfee )
         );
@@ -235,35 +251,6 @@ public:
                  fc::time_point::from_iso_string(row["last_update"].as_string()).time_since_epoch().count() };
     }
 
-    action_result openfeetable( name user, symbol_code pair_token ) {
-        return push_action( "wevotethefee"_n, user, "openfeetable"_n, mvo()
-          ( "user", user )
-          ( "pair_token", pair_token )
-        );
-    }
-    action_result closefeetable( symbol_code pair_token ) {
-        return push_action( "wevotethefee"_n, "wevotethefee"_n, "closefeetable"_n, mvo()
-          ( "pair_token", pair_token )
-        );
-    }
-    action_result votefee( name user, symbol_code pair_token, int fee_voted ) {
-        return push_action( "wevotethefee"_n, user, "votefee"_n, mvo()
-          ( "user", user )
-          ( "pair_token", pair_token )
-          ( "fee_voted", fee_voted )
-        );
-    }
-    action_result closevote( name user, symbol_code pair_token ) {
-        return push_action( "wevotethefee"_n, user, "closevote"_n, mvo()
-          ( "user", user )
-          ( "pair_token", pair_token )
-        );
-    }
-    action_result updatefee( name user, symbol_code pair_token ) {
-      return push_action( "wevotethefee"_n, user, "updatefee"_n, mvo()
-        ( "pair_token", pair_token )
-      );
-    }
 
     // Raw KV read of a composite-keyed row: every key word big-endian, in order
     // (for a scoped table the scope is the first word). Empty when absent.
@@ -504,10 +491,10 @@ void sysio_swap_tester::setup_pools() {
                                               asset::from_string("168601842738.7903 EOS"), "") );
     BOOST_REQUIRE_EQUAL( success(), inittoken( "alice"_n, EVO4,
         extend(asset::from_string("23058430092.1369 EOS")),
-        extend(asset::from_string("96116860184.2738 VOICE")), 10, "wevotethefee"_n) );
+        extend(asset::from_string("96116860184.2738 VOICE")), 10, name{}) );
     BOOST_REQUIRE_EQUAL( success(), inittoken( "alice"_n, ETUSD3,
         extend(asset::from_string("10000000000.0000 EOS")),
-        extend(asset::from_string("9911686018427.38 TUSD")), 10, "wevotethefee"_n) );
+        extend(asset::from_string("9911686018427.38 TUSD")), 10, name{}) );
 }
 
 BOOST_AUTO_TEST_SUITE(sysio_swap_tests)
@@ -529,7 +516,7 @@ BOOST_FIXTURE_TEST_CASE( add_rem_liquidity, sysio_swap_tester ) try {
     
     inittoken( "alice"_n, EVO4,
       extend(asset::from_string("1000000.0000 EOS")), 
-      extend(asset::from_string("100000000.0000 VOICE")), 10, "wevotethefee"_n);
+      extend(asset::from_string("100000000.0000 VOICE")), 10, name{});
 
     auto alice_evo_balance = get_balance("sysio.swap"_n, "alice"_n, "accounts"_n, EVO.value, "account");
     auto bal = mvo() ("balance", asset::from_string("10000000.0000 EVO"));
@@ -631,7 +618,7 @@ BOOST_FIXTURE_TEST_CASE( exchange_action, sysio_swap_tester ) try {
     transfer( "anothertoken"_n, "alice"_n, "sysio.swap"_n, asset::from_string("200000000.0000 VOICE"), "");
     inittoken( "alice"_n, EVO4,
       extend(asset::from_string("1000000.0000 EOS")),
-      extend(asset::from_string("100000000.0000 VOICE")), 10, "wevotethefee"_n);
+      extend(asset::from_string("100000000.0000 VOICE")), 10, name{});
     addliquidity( "alice"_n, asset::from_string("50.0000 EVO"), 
       asset::from_string("5.0050 EOS"), asset::from_string("500.5000 VOICE") );
     remliquidity( "alice"_n, asset::from_string("17.1872 EVO"),
@@ -721,11 +708,11 @@ BOOST_FIXTURE_TEST_CASE( increasing_poolvalue, sysio_swap_tester) try {
 
     inittoken( "alice"_n, EVO4, 
       extend(asset::from_string("23058430092.1369 EOS")),
-      extend(asset::from_string("96116860184.2738 VOICE")), 10, "wevotethefee"_n);
+      extend(asset::from_string("96116860184.2738 VOICE")), 10, name{});
 
     inittoken( "alice"_n, ETUSD3, 
       extend(asset::from_string("10000000000.0000 EOS")),
-      extend(asset::from_string("9911686018427.38 TUSD")), 10, "wevotethefee"_n);
+      extend(asset::from_string("9911686018427.38 TUSD")), 10, name{});
 
     auto old_total = total();
     auto old_vec = system_balance(EVO.value);
@@ -832,7 +819,7 @@ BOOST_FIXTURE_TEST_CASE( memoexchange_test, sysio_swap_tester ) try {
     BOOST_REQUIRE_EQUAL( success(),
       inittoken( "alice"_n, EVO4,
         extend(asset::from_string("23058430092.1369 EOS")),
-        extend(asset::from_string("96116860184.2738 VOICE")), 10, "wevotethefee"_n) );
+        extend(asset::from_string("96116860184.2738 VOICE")), 10, name{}) );
 
     BOOST_REQUIRE_EQUAL( wasm_assert_msg("extended_symbol mismatch"), 
       transfer( "sysio.token"_n, "alice"_n, "sysio.swap"_n, asset::from_string("4.0000 EOS"), 
@@ -859,7 +846,7 @@ BOOST_FIXTURE_TEST_CASE( memoexchange_test, sysio_swap_tester ) try {
 
     inittoken( "alice"_n, ETUSD3,
       extend(asset::from_string("10000000000.0000 EOS")),
-      extend(asset::from_string("9911686018427.38 TUSD")), 10, "wevotethefee"_n);
+      extend(asset::from_string("9911686018427.38 TUSD")), 10, name{});
 
     BOOST_REQUIRE_EQUAL( wasm_assert_msg("available is less than expected"), 
       transfer( "sysio.token"_n, "alice"_n, "sysio.swap"_n,
@@ -954,57 +941,61 @@ BOOST_FIXTURE_TEST_CASE( the_other_actions, sysio_swap_tester ) try {
         ("user", "alice"_n) ("new_symbol", EVO4)
         ("initial_pool1", extend(asset::from_string("1.0000 EOS")))
         ("initial_pool2", extend(asset::from_string("1.0000 ECO")))
-        ("initial_fee", 1) ("fee_contract", "carol"_n) )
+        ("initial_fee", 1) ("fee_authority", "carol"_n) )
     );
     BOOST_REQUIRE_EQUAL( error("missing authority of alice"), 
       push_action( "sysio.swap"_n, "bob"_n, "inittoken"_n, mvo()
         ("user", "alice"_n) ("new_symbol", EVO4)
         ("initial_pool1", extend(asset::from_string("1.0000 EOS")))
         ("initial_pool2", extend(asset::from_string("1.0000 ECO")))
-        ("initial_fee", 1) ("fee_contract", "carol"_n) )
+        ("initial_fee", 1) ("fee_authority", "carol"_n) )
     );
     BOOST_REQUIRE_EQUAL( wasm_assert_msg("Both assets must be positive"), inittoken( "alice"_n, EVO4, 
       extend(asset::from_string("-0.0001 EOS")),
-      extend(asset::from_string("0.1000 VOICE")), 10, "wevotethefee"_n) );
+      extend(asset::from_string("0.1000 VOICE")), 10, name{}) );
     BOOST_REQUIRE_EQUAL( wasm_assert_msg("Both assets must be positive"), inittoken( "alice"_n, EVO4, 
       extend(asset::from_string("0.0001 EOS")),
-      extend(asset::from_string("-0.1000 VOICE")), 10, "wevotethefee"_n) );
+      extend(asset::from_string("-0.1000 VOICE")), 10, name{}) );
     BOOST_REQUIRE_EQUAL( wasm_assert_msg("Initial amounts must be less than 10^15"), inittoken( "alice"_n, EVO4, 
       extend(asset::from_string("0.0001 EOS")),
-      extend(asset::from_string("100000000000.0001 VOICE")), 10, "wevotethefee"_n) );
+      extend(asset::from_string("100000000000.0001 VOICE")), 10, name{}) );
     BOOST_REQUIRE_EQUAL( wasm_assert_msg("Initial amounts must be less than 10^15"), inittoken( "alice"_n, EVO4, 
       extend(asset::from_string("100000000000.0001 EOS")),
-      extend(asset::from_string("1.0001 VOICE")), 10, "wevotethefee"_n) );
+      extend(asset::from_string("1.0001 VOICE")), 10, name{}) );
     BOOST_REQUIRE_EQUAL( wasm_assert_msg("extended symbols must be different"), inittoken( "alice"_n, EVO4, 
       extend(asset::from_string("0.0001 EOS")),
-      extend(asset::from_string("0.1000 EOS")), 10, "wevotethefee"_n) );
+      extend(asset::from_string("0.1000 EOS")), 10, name{}) );
     BOOST_REQUIRE_EQUAL( wasm_assert_msg("insufficient funds"), 
       inittoken( "alice"_n, EVO4, 
       extend(asset::from_string("0.0003 EOS")), 
-      extend(asset::from_string("0.1000 VOICE")), 10, "wevotethefee"_n) );
+      extend(asset::from_string("0.1000 VOICE")), 10, name{}) );
     BOOST_REQUIRE_EQUAL(  wasm_assert_msg("insufficient funds"),
       inittoken( "alice"_n, EVO4, 
       extend(asset::from_string("0.0002 EOS")), 
-      extend(asset::from_string("100000000.0000 VOICE")), 10, "wevotethefee"_n) );
+      extend(asset::from_string("100000000.0000 VOICE")), 10, name{}) );
     BOOST_REQUIRE_EQUAL( wasm_assert_msg("new_symbol precision must be (precision1 + precision2) / 2"),
       inittoken( "alice"_n, EVO4, 
       extend(asset::from_string("0.0001 EOS")),
-      extend(asset::from_string("0.100 VOICE")), 10, "wevotethefee"_n) );
+      extend(asset::from_string("0.100 VOICE")), 10, name{}) );
     BOOST_REQUIRE_EQUAL( success(), inittoken( "alice"_n, EVO4, 
       extend(asset::from_string("0.0001 EOS")),
-      extend(asset::from_string("0.1000 VOICE")), 10, "wevotethefee"_n) );
+      extend(asset::from_string("0.1000 VOICE")), 10, name{}) );
     produce_blocks();
     BOOST_REQUIRE_EQUAL( wasm_assert_msg("token symbol already exists"), inittoken( "alice"_n, EVO4, 
       extend(asset::from_string("0.0001 EOS")),
-      extend(asset::from_string("0.1000 VOICE")), 10, "wevotethefee"_n) );
-    BOOST_REQUIRE_EQUAL( wasm_assert_msg("initial_fee must be 10"), inittoken( "alice"_n, ETUSD3, 
+      extend(asset::from_string("0.1000 VOICE")), 10, name{}) );
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("fee out of range"), inittoken( "alice"_n, ETUSD3,
       extend(asset::from_string("0.0001 EOS")),
-      extend(asset::from_string("0.10 TUSD")), 501, "wevotethefee"_n) );
-    BOOST_REQUIRE_EQUAL( wasm_assert_msg("fee_contract must be wevotethefee"), 
-      inittoken( "alice"_n, ETUSD3, 
+      extend(asset::from_string("0.10 TUSD")), 10000, name{}) );
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("fee out of range"), inittoken( "alice"_n, ETUSD3,
       extend(asset::from_string("0.0001 EOS")),
-      extend(asset::from_string("0.10 ETUSD")), 10, "alice"_n) );
+      extend(asset::from_string("0.10 TUSD")), -1, name{}) );
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("fee authority account does not exist"),
+      inittoken( "alice"_n, ETUSD3,
+      extend(asset::from_string("0.0001 EOS")),
+      extend(asset::from_string("0.10 TUSD")), 10, "natalia"_n) );
 // The assert "the pool is already indexed" is tested in "indextable" test case.
+// The fee authority itself is exercised in "fee_authority_configuration".
 
   // TRANSFER
     BOOST_REQUIRE_EQUAL( wasm_assert_msg("extended_symbol not registered for this user,\
@@ -1027,231 +1018,73 @@ BOOST_FIXTURE_TEST_CASE( the_other_actions, sysio_swap_tester ) try {
       closeext( "alice"_n, "bob"_n, extended_symbol{EOS4, "sysio.token"_n} ) );
 
   // CHANGEFEE
-    BOOST_REQUIRE_EQUAL( error("missing authority of wevotethefee"), 
-      push_action( "sysio.swap"_n, "bob"_n, "changefee"_n, 
-        mvo() ("pair_token", EVO) ("newfee", 50) )
-    );
+    BOOST_REQUIRE_EQUAL( error("missing authority of sysio"), changefee(EVO, 50, "bob"_n) );
     BOOST_REQUIRE_EQUAL( wasm_assert_msg("pair token does not exist"), changefee(EOS, 500));
     BOOST_REQUIRE_EQUAL( success(), changefee(EVO, 50) );
 
-  // Notifications to fee_contract 
-
-    set_code( "wevotethefee"_n, contracts::util::badtoken_wasm() );
-    set_abi( "wevotethefee"_n, contracts::util::badtoken_abi().data() );
-    many_openext();
-    transfer( "sysio.token"_n, "bob"_n, "sysio.swap"_n, asset::from_string("0.0004 EOS"), "");
-    transfer( "sysio.token"_n, "alice"_n, "sysio.swap"_n, asset::from_string("0.04 TUSD"), "deposit to: bob");
-
-    BOOST_REQUIRE_EQUAL( success(), inittoken( "bob"_n, ETUSD3, 
-      extend(asset::from_string("0.0002 EOS")),
-      extend(asset::from_string("0.02 TUSD")), 10, "wevotethefee"_n ) ); 
-    BOOST_REQUIRE_EQUAL( wasm_assert_msg("notification received"), 
-      transfer( "sysio.swap"_n, "bob"_n, "alice"_n, asset::from_string("0.001 ETUSD"), "") );
-    BOOST_REQUIRE_EQUAL( wasm_assert_msg("notification received"), 
-      addliquidity( "bob"_n, asset::from_string("0.001 ETUSD"), 
-      asset::from_string("0.0002 EOS"), asset::from_string("0.02 TUSD")));
-    BOOST_REQUIRE_EQUAL( wasm_assert_msg("notification received"), 
-      remliquidity( "bob"_n, asset::from_string("0.001 ETUSD"), 
-      asset::from_string("0.0001 EOS"), asset::from_string("0.01 TUSD")));
-
 } FC_LOG_AND_RETHROW()
 
+// A fixture whose deployment step has NOT run: the fee authority is unset.
+struct sysio_swap_unconfigured_tester : public sysio_swap_tester {
+    sysio_swap_unconfigured_tester() : sysio_swap_tester( false ) {}
+};
 
-BOOST_FIXTURE_TEST_CASE( we_vote_the_fee, sysio_swap_tester ) try {
-
+BOOST_FIXTURE_TEST_CASE( pair_creation_needs_a_configured_fee_authority, sysio_swap_unconfigured_tester ) try {
     create_tokens_and_issue();
-    transfer( "anothertoken"_n, "bob"_n, "alice"_n, asset::from_string("500000000.0000 VOICE"), "");
-
-    const auto* accnt2 = control->find_account_metadata( "sysio.swap"_n );
-    abi_def abi_evo;
-    BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt2->abi, abi_evo), true);
-    abi_ser.set_abi(abi_evo, abi_serializer::create_yield_function(abi_serializer_max_time));
-
+    abi_ser.set_abi( swap_abi_def(), abi_serializer::create_yield_function(abi_serializer_max_time) );
     many_openext();
-
-    transfer( "sysio.token"_n, "alice"_n, "sysio.swap"_n, asset::from_string("10000000.0000 EOS"), "");
-    transfer( "anothertoken"_n, "alice"_n, "sysio.swap"_n, asset::from_string("200000000.0000 VOICE"), "");
-    
-    inittoken( "alice"_n, EVO4,
-      extend(asset::from_string("1000000.0000 EOS")), 
-      extend(asset::from_string("100000000.0000 VOICE")), 10, "wevotethefee"_n);
-
-    const auto* accnt3 = control->find_account_metadata( "wevotethefee"_n );
-    abi_def abi_wevote;
-    BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt3->abi, abi_wevote), true);
-
-// Start wevotethefee actions. Testing checks and basic functions.
-    abi_ser.set_abi(abi_wevote, abi_serializer::create_yield_function(abi_serializer_max_time));
-    auto ISNT = symbol::from_string("4,ISNT").to_symbol_code();
-    BOOST_REQUIRE_EQUAL(wasm_assert_msg("pair_token balance does not exist"), 
-      votefee("alice"_n, ISNT, 10) );
-    BOOST_REQUIRE_EQUAL(wasm_assert_msg("pair_token balance does not exist"), 
-      votefee("bob"_n, EVO, 30) );
-    BOOST_REQUIRE_EQUAL(wasm_assert_msg("fee table nonexistent, run openfeetable"), votefee("alice"_n, EVO, 30));
-    BOOST_REQUIRE_EQUAL(wasm_assert_msg("fee table nonexistent, run openfeetable"), updatefee("alice"_n, EVO));
-    BOOST_REQUIRE_EQUAL(wasm_assert_msg("table does not exist"), closefeetable(EVO));
-    BOOST_REQUIRE_EQUAL(success(), openfeetable("alice"_n, EVO));
-    BOOST_REQUIRE_EQUAL(success(), closefeetable(EVO));
-    BOOST_REQUIRE_EQUAL(wasm_assert_msg("fee table nonexistent, run openfeetable"), votefee("alice"_n, EVO, 30));
-    BOOST_REQUIRE_EQUAL(success(), openfeetable("alice"_n, EVO));
-    BOOST_REQUIRE_EQUAL(wasm_assert_msg("already opened"), openfeetable("alice"_n, EVO));
-    BOOST_REQUIRE_EQUAL(wasm_assert_msg("user is not voting"), closevote("alice"_n, EVO));
-    BOOST_REQUIRE_EQUAL(wasm_assert_msg("only values between 10 and 100 are allowed"), votefee("alice"_n, EVO, 101));
-    BOOST_REQUIRE_EQUAL(wasm_assert_msg("only values between 10 and 100 are allowed"), votefee("alice"_n, EVO, -10));
-    BOOST_REQUIRE_EQUAL(wasm_assert_msg("only values between 10 and 100 are allowed"), votefee("alice"_n, EVO, 9));
-    BOOST_REQUIRE_EQUAL(success(), votefee("alice"_n, EVO, 30));
-    BOOST_REQUIRE_EQUAL(success(), updatefee("alice"_n, EVO));
-    BOOST_REQUIRE_EQUAL(wasm_assert_msg("table of votes is not empty"), closefeetable(EVO));
-
-    auto evo_votes = get_balance("wevotethefee"_n, name(EVO.value), "feetable"_n, EVO.value,
-      "feetable" )["votes"].get_array();
-    BOOST_REQUIRE_EQUAL(100000000000, evo_votes[8]);
-
-    abi_ser.set_abi(abi_evo, abi_serializer::create_yield_function(abi_serializer_max_time));
-    auto evo_stats = get_balance("sysio.swap"_n, name(EVO.value), "stat"_n, EVO.value, "currency_stats" );
-    BOOST_REQUIRE_EQUAL(30, evo_stats["fee"]);
-
-// Leave vote table with zero votes, fee value remains unchanged
-    transfer( "sysio.swap"_n, "alice"_n, "bob"_n, asset::from_string("10000000.0000 EVO"), "");
-    evo_stats = get_balance("sysio.swap"_n, name(EVO.value), "stat"_n, EVO.value, "currency_stats" );
-    BOOST_REQUIRE_EQUAL(30, evo_stats["fee"]);
-    abi_ser.set_abi(abi_wevote, abi_serializer::create_yield_function(abi_serializer_max_time));
-    evo_votes = get_balance("wevotethefee"_n, name(EVO.value), "feetable"_n, EVO.value,
-      "feetable" )["votes"].get_array();
-    BOOST_REQUIRE_EQUAL(0, evo_votes[5]);
-    abi_ser.set_abi(abi_evo, abi_serializer::create_yield_function(abi_serializer_max_time));
-    transfer( "sysio.swap"_n, "bob"_n, "alice"_n, asset::from_string("10000000.0000 EVO"), "");
-
-// Test authorizations
-    abi_ser.set_abi(abi_wevote, abi_serializer::create_yield_function(abi_serializer_max_time));
-    BOOST_REQUIRE_EQUAL( error("missing authority of bob"),
-      push_action( "wevotethefee"_n, "alice"_n, "votefee"_n, 
-        mvo()( "user", "bob"_n )( "pair_token", EVO )( "fee_voted", "10" ) )
-    );
-    BOOST_REQUIRE_EQUAL( error("missing authority of bob"),
-      push_action( "wevotethefee"_n, "alice"_n, "closevote"_n, 
-        mvo()( "user", "bob"_n )( "pair_token", EVO ) )
-    );
-
-// Vote balance change after transfer
-    abi_ser.set_abi(abi_evo, abi_serializer::create_yield_function(abi_serializer_max_time));
-    BOOST_REQUIRE_EQUAL(success(), 
-      transfer( "sysio.swap"_n, "alice"_n, "bob"_n, asset::from_string("100.0000 EVO"), ""));
-
-    abi_ser.set_abi(abi_wevote, abi_serializer::create_yield_function(abi_serializer_max_time));
-    BOOST_REQUIRE_EQUAL(success(), votefee("bob"_n, EVO, 100));
-    evo_votes = get_balance("wevotethefee"_n, name(EVO.value), "feetable"_n, EVO.value,
-      "feetable" )["votes"].get_array();
-    BOOST_REQUIRE_EQUAL(99999000000, evo_votes[8]);
-    BOOST_REQUIRE_EQUAL(1000000, evo_votes[11]);
-
-// Scenarios with many votes
-    create_accounts( { "dan"_n, "eva"_n, "fran"_n});
-    abi_ser.set_abi(abi_evo, abi_serializer::create_yield_function(abi_serializer_max_time));    
-    BOOST_REQUIRE_EQUAL(success(), transfer( "sysio.swap"_n, "alice"_n, "carol"_n, asset::from_string("2000.0000 EVO"), ""));
-    transfer( "sysio.swap"_n, "alice"_n, "dan"_n, asset::from_string("400000.0000 EVO"), "");
-    transfer( "sysio.swap"_n, "alice"_n, "eva"_n, asset::from_string("4240000.0000 EVO"), "");
-    transfer( "sysio.swap"_n, "alice"_n, "fran"_n, asset::from_string("2500000.0000 EVO"), "");
-
-    abi_ser.set_abi(abi_wevote, abi_serializer::create_yield_function(abi_serializer_max_time));
-    BOOST_REQUIRE_EQUAL(success(), votefee("carol"_n, EVO, 10));
-    votefee("dan"_n, EVO, 10);
-    votefee("eva"_n, EVO, 74);
-    votefee("fran"_n, EVO, 73);
-
-    abi_ser.set_abi(abi_evo, abi_serializer::create_yield_function(abi_serializer_max_time));
-    evo_stats = get_balance("sysio.swap"_n, name(EVO.value), "stat"_n, EVO.value, "currency_stats" );
-    BOOST_REQUIRE_EQUAL(75, evo_stats["fee"]);
-
-    // Test updatefee when closing votes, then restore votes.
-    abi_ser.set_abi(abi_wevote, abi_serializer::create_yield_function(abi_serializer_max_time));
-    closevote( "alice"_n, EVO );
-    closevote( "eva"_n, EVO );
-    closevote( "fran"_n, EVO );
-    evo_votes = get_balance("wevotethefee"_n, name(EVO.value), "feetable"_n, EVO.value,
-      "feetable" )["votes"].get_array();
-    abi_ser.set_abi(abi_evo, abi_serializer::create_yield_function(abi_serializer_max_time));
-    evo_stats = get_balance("sysio.swap"_n, name(EVO.value), "stat"_n, EVO.value, "currency_stats" );
-    BOOST_REQUIRE_EQUAL(10, evo_stats["fee"]);
-    abi_ser.set_abi(abi_wevote, abi_serializer::create_yield_function(abi_serializer_max_time));
-    votefee("alice"_n, EVO, 30); 
-    votefee("eva"_n, EVO, 75);
-    votefee("fran"_n, EVO, 75);
-    abi_ser.set_abi(abi_evo, abi_serializer::create_yield_function(abi_serializer_max_time));
-    evo_stats = get_balance("sysio.swap"_n, name(EVO.value), "stat"_n, EVO.value, "currency_stats" );
-    BOOST_REQUIRE_EQUAL(75, evo_stats["fee"]);
-
-    // Test fee modification when adding and removing liquidity
-    abi_ser.set_abi(abi_evo, abi_serializer::create_yield_function(abi_serializer_max_time));
-    openext( "eva"_n, "eva"_n, extended_symbol{symbol::from_string("4,EOS"), "sysio.token"_n});
-    openext( "eva"_n, "eva"_n, extended_symbol{symbol::from_string("4,VOICE"), "anothertoken"_n});
-    push_action( "sysio.swap"_n, "eva"_n, "remliquidity"_n, mvo()
-          ( "user", "eva"_n)( "to_sell", asset::from_string("4000000.0000 EVO"))
-          ( "min_asset1", asset::from_string("1.0000 EOS") )
-          ( "min_asset2", asset::from_string("1.0000 VOICE")) );
-    evo_stats = get_balance("sysio.swap"_n, name(EVO.value), "stat"_n, EVO.value, "currency_stats" );
-    BOOST_REQUIRE_EQUAL(30, evo_stats["fee"]);
-
-    BOOST_REQUIRE_EQUAL(success(), push_action( "sysio.swap"_n, "eva"_n, "addliquidity"_n, mvo()
-          ( "user", "eva"_n)( "to_buy", asset::from_string("3900000.0000 EVO"))
-          ( "max_asset1", asset::from_string("100000000000.0000 EOS") )
-          ( "max_asset2", asset::from_string("100000000000.0000 VOICE")) )   );
-    evo_stats = get_balance("sysio.swap"_n, name(EVO.value), "stat"_n, EVO.value, "currency_stats" );
-    BOOST_REQUIRE_EQUAL(75, evo_stats["fee"]);
-
-// median 10, due to clamp between 10 and 100
-    abi_ser.set_abi(abi_wevote, abi_serializer::create_yield_function(abi_serializer_max_time));
-    votefee("alice"_n, EVO, 10);
-    votefee("dan"_n, EVO, 10);
-    votefee("eva"_n, EVO, 10);
-    votefee("fran"_n, EVO, 10);
-    evo_votes = get_balance("wevotethefee"_n, name(EVO.value), "feetable"_n, EVO.value,
-      "feetable" )["votes"].get_array();
-    BOOST_REQUIRE_EQUAL(98999000000, evo_votes[5]);
-    abi_ser.set_abi(abi_evo, abi_serializer::create_yield_function(abi_serializer_max_time));
-    evo_stats = get_balance("sysio.swap"_n, name(EVO.value), "stat"_n, EVO.value, "currency_stats" );
-    BOOST_REQUIRE_EQUAL(10, evo_stats["fee"]);
-
-// check votes after transfer, remliquidity and addliquidity
-    BOOST_REQUIRE_EQUAL(success(), 
-      transfer( "sysio.swap"_n, "alice"_n, "bob"_n, asset::from_string("100.0000 EVO"), ""));
-    abi_ser.set_abi(abi_wevote, abi_serializer::create_yield_function(abi_serializer_max_time));
-      evo_votes = get_balance("wevotethefee"_n, name(EVO.value), "feetable"_n, EVO.value,
-      "feetable" )["votes"].get_array();
-    BOOST_REQUIRE_EQUAL(98998000000, evo_votes[5]);
-    BOOST_REQUIRE_EQUAL(2000000, evo_votes[11]);
-
-    abi_ser.set_abi(abi_evo, abi_serializer::create_yield_function(abi_serializer_max_time));
-    push_action( "sysio.swap"_n, "eva"_n, "remliquidity"_n, mvo()
-          ( "user", "eva"_n)( "to_sell", asset::from_string("10000.0000 EVO"))
-          ( "min_asset1", asset::from_string("1.0000 EOS") )
-          ( "min_asset2", asset::from_string("1.0000 VOICE")) );
-    abi_ser.set_abi(abi_wevote, abi_serializer::create_yield_function(abi_serializer_max_time));
-    evo_votes = get_balance("wevotethefee"_n, name(EVO.value), "feetable"_n, EVO.value,
-      "feetable" )["votes"].get_array();
-    BOOST_REQUIRE_EQUAL(98998000000 - 100000000, evo_votes[5]);
-
-    abi_ser.set_abi(abi_evo, abi_serializer::create_yield_function(abi_serializer_max_time));
-    push_action( "sysio.swap"_n, "eva"_n, "addliquidity"_n, mvo()
-          ( "user", "eva"_n)( "to_buy", asset::from_string("100.0000 EVO"))
-          ( "max_asset1", asset::from_string("10000000.0000 EOS") )
-          ( "max_asset2", asset::from_string("10000000.0000 VOICE")) );
-    abi_ser.set_abi(abi_wevote, abi_serializer::create_yield_function(abi_serializer_max_time));
-    evo_votes = get_balance("wevotethefee"_n, name(EVO.value), "feetable"_n, EVO.value,
-      "feetable" )["votes"].get_array();
-    BOOST_REQUIRE_EQUAL(98998000000 - 100000000 + 1000000, evo_votes[5]);
-
-// median 100
-    votefee("dan"_n, EVO, 100);
-    votefee("eva"_n, EVO, 100);
-    votefee("fran"_n, EVO, 100);
-    evo_votes = get_balance("wevotethefee"_n, name(EVO.value), "feetable"_n, EVO.value,
-      "feetable" )["votes"].get_array();
-    abi_ser.set_abi(abi_evo, abi_serializer::create_yield_function(abi_serializer_max_time));
-    evo_stats = get_balance("sysio.swap"_n, name(EVO.value), "stat"_n, EVO.value, "currency_stats" );
-    BOOST_REQUIRE_EQUAL(100, evo_stats["fee"]);
-
+    many_transfer();
+    // Adopting the configured authority is impossible until setconfig has run...
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("fee authority not configured"), inittoken( "alice"_n, EVO4,
+        extend(asset::from_string("1.0000 EOS")), extend(asset::from_string("1.0000 VOICE")), 10, name{}) );
+    // ...but a pair that names its own authority does not need it.
+    BOOST_REQUIRE_EQUAL( success(), inittoken( "alice"_n, EVO4,
+        extend(asset::from_string("1.0000 EOS")), extend(asset::from_string("1.0000 VOICE")), 10, "alice"_n) );
+    BOOST_REQUIRE_EQUAL( success(), changefee(EVO, 25, "alice"_n) );
+    BOOST_REQUIRE_EQUAL( 25, pool_fee(EVO) );
+    // setconfig is the contract's own call.
+    BOOST_REQUIRE_EQUAL( error("missing authority of sysio.swap"), setconfig( "alice"_n, "alice"_n ) );
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("fee authority account does not exist"), setconfig( "natalia"_n ) );
+    BOOST_REQUIRE_EQUAL( success(), setconfig( config::system_account_name ) );
+    BOOST_REQUIRE_EQUAL( success(), inittoken( "alice"_n, ETUSD3,
+        extend(asset::from_string("1.0000 EOS")), extend(asset::from_string("1.00 TUSD")), 10, name{}) );
+    BOOST_REQUIRE_EQUAL( success(), changefee(ETUSD, 25) );
 } FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( fee_authority_configuration, sysio_swap_tester ) try {
+    create_tokens_and_issue();
+    abi_ser.set_abi( swap_abi_def(), abi_serializer::create_yield_function(abi_serializer_max_time) );
+    many_openext();
+    many_transfer();
+
+    // EVO adopts the configured authority (sysio); ETUSD names alice as its own.
+    BOOST_REQUIRE_EQUAL( success(), inittoken( "alice"_n, EVO4,
+        extend(asset::from_string("1.0000 EOS")), extend(asset::from_string("1.0000 VOICE")), 10, name{}) );
+    BOOST_REQUIRE_EQUAL( success(), inittoken( "alice"_n, ETUSD3,
+        extend(asset::from_string("1.0000 EOS")), extend(asset::from_string("1.00 TUSD")), 10, "alice"_n) );
+
+    // Each pair answers only to its own authority.
+    BOOST_REQUIRE_EQUAL( success(), changefee(EVO, 30) );
+    BOOST_REQUIRE_EQUAL( error("missing authority of sysio"), changefee(EVO, 40, "alice"_n) );
+    BOOST_REQUIRE_EQUAL( 30, pool_fee(EVO) );
+    BOOST_REQUIRE_EQUAL( success(), changefee(ETUSD, 30, "alice"_n) );
+    BOOST_REQUIRE_EQUAL( error("missing authority of alice"), changefee(ETUSD, 40) );
+    BOOST_REQUIRE_EQUAL( 30, pool_fee(ETUSD) );
+
+    // Reconfiguring binds pairs created afterwards; existing pairs keep theirs.
+    BOOST_REQUIRE_EQUAL( success(), setconfig( "bob"_n ) );
+    BOOST_REQUIRE_EQUAL( success(), changefee(EVO, 35) );
+    BOOST_REQUIRE_EQUAL( error("missing authority of sysio"), changefee(EVO, 45, "bob"_n) );
+    // (VOICE/TUSD is the one pair of these three tokens not yet created.)
+    BOOST_REQUIRE_EQUAL( success(), inittoken( "alice"_n, symbol::from_string("3,BVO"),
+        extend(asset::from_string("1.0000 VOICE")), extend(asset::from_string("1.00 TUSD")), 0, name{}) );
+    const auto BVO = symbol::from_string("3,BVO").to_symbol_code();
+    BOOST_REQUIRE_EQUAL( 0, pool_fee(BVO) );
+    BOOST_REQUIRE_EQUAL( success(), changefee(BVO, 9999, "bob"_n) );
+    BOOST_REQUIRE_EQUAL( error("missing authority of bob"), changefee(BVO, 1) );
+    BOOST_REQUIRE_EQUAL( 9999, pool_fee(BVO) );
+} FC_LOG_AND_RETHROW()
+
 
 BOOST_FIXTURE_TEST_CASE( indextable, sysio_swap_tester ) try {
 
@@ -1271,7 +1104,7 @@ BOOST_FIXTURE_TEST_CASE( indextable, sysio_swap_tester ) try {
 
     BOOST_REQUIRE_EQUAL(success(), inittoken( "alice"_n, EVO4,
         extend(asset::from_string("1000000.0000 EOS")), 
-        extend(asset::from_string("100000000.0000 VOICE")), 10, "wevotethefee"_n) );
+        extend(asset::from_string("100000000.0000 VOICE")), 10, name{}) );
 
     BOOST_REQUIRE_EQUAL(wasm_assert_msg("the pool is already indexed"), 
       push_action( "sysio.swap"_n, "alice"_n, "indexpair"_n, 
@@ -1280,11 +1113,11 @@ BOOST_FIXTURE_TEST_CASE( indextable, sysio_swap_tester ) try {
     BOOST_REQUIRE_EQUAL(wasm_assert_msg("the pool is already indexed"), 
         inittoken( "alice"_n, EOS4,
         extend(asset::from_string("1.0000 EOS")), 
-        extend(asset::from_string("1.0000 VOICE")), 10, "wevotethefee"_n) );
+        extend(asset::from_string("1.0000 VOICE")), 10, name{}) );
     BOOST_REQUIRE_EQUAL(wasm_assert_msg("the pool is already indexed"),
         inittoken( "alice"_n, EOS4,
         extend(asset::from_string("1.0000 VOICE")), 
-        extend(asset::from_string("1.0000 EOS")), 10, "wevotethefee"_n) );
+        extend(asset::from_string("1.0000 EOS")), 10, name{}) );
 
     // The pair's uniqueness row is keyed by its legs in canonical order, the lower
     // (contract, symbol) first: anothertoken/VOICE ahead of sysio.token/EOS. The
@@ -1303,17 +1136,17 @@ BOOST_FIXTURE_TEST_CASE( indextable, sysio_swap_tester ) try {
  please run openext action or write exchange details in the memo of your transfer"),
         inittoken( "alice"_n, EOS4,
         extend(asset::from_string("1.00000 VOICE")), 
-        extend(asset::from_string("1.0000 EOS")), 10, "wevotethefee"_n) );
+        extend(asset::from_string("1.0000 EOS")), 10, name{}) );
     BOOST_REQUIRE_EQUAL(wasm_assert_msg("extended_symbol not registered for this user,\
  please run openext action or write exchange details in the memo of your transfer"),
         inittoken( "alice"_n, EOS4,
         extend(asset::from_string("1.0000 VOICE")), 
-        extend(asset::from_string("1.00000 EOS")), 10, "wevotethefee"_n) );
+        extend(asset::from_string("1.00000 EOS")), 10, name{}) );
     BOOST_REQUIRE_EQUAL(wasm_assert_msg("extended_symbol not registered for this user,\
  please run openext action or write exchange details in the memo of your transfer"),
         inittoken( "alice"_n, EOS4, extend(asset::from_string("1.0000 VOICE")), 
         extended_asset{asset::from_string("1.0000 EOS"), "anothertoken"_n}, 
-        10, "wevotethefee"_n) );
+        10, name{}) );
 } FC_LOG_AND_RETHROW()
 
 // ---------------------------------------------------------------------------
@@ -1321,8 +1154,8 @@ BOOST_FIXTURE_TEST_CASE( indextable, sysio_swap_tester ) try {
 // the pool invariants under a long randomized operation sequence.
 // ---------------------------------------------------------------------------
 
-// The fee vector wevotethefee can select from; the swap contract itself must
-// accept the whole range and reject anything outside [0, MAX_FEE].
+// A spread of fee rates across the accepted range; the contract itself must
+// accept the whole of [0, MAX_FEE] and reject anything outside it.
 static const std::vector<int> FeeVector{1, 2, 3, 5, 7, 10, 15, 20, 30, 50, 75, 100, 150, 200, 300};
 
 BOOST_FIXTURE_TEST_CASE( changefee_bounds, sysio_swap_tester ) try {
@@ -1607,11 +1440,11 @@ BOOST_FIXTURE_TEST_CASE( precision_extremes, sysio_swap_tester ) try {
     // A dust pool: one unit of EOS against the largest side inittoken accepts.
     const int64_t init_max = 1'000'000'000'000'000 - 1;
     BOOST_REQUIRE_EQUAL( success(), inittoken( "alice"_n, EVO4,
-        extend(asset(1, EOS4)), extend(asset(init_max, VOICE4)), 10, "wevotethefee"_n) );
+        extend(asset(1, EOS4)), extend(asset(init_max, VOICE4)), 10, name{}) );
     // A whale pool: both sides at the inittoken ceiling, then grown 2500x by
     // adding liquidity, which has no ceiling of its own.
     BOOST_REQUIRE_EQUAL( success(), inittoken( "alice"_n, ETUSD3,
-        extend(asset(init_max, EOS4)), extend(asset(init_max, TUSD2)), 10, "wevotethefee"_n) );
+        extend(asset(init_max, EOS4)), extend(asset(init_max, TUSD2)), 10, name{}) );
     {
         const auto before = system_balance(ETUSD.value);
         const int64_t shares = 2500 * before[2];
@@ -1700,7 +1533,7 @@ BOOST_FIXTURE_TEST_CASE( minimum_fee_closes_the_free_window, sysio_swap_tester )
     BOOST_REQUIRE_EQUAL( success(), transfer( "sysio.token"_n, "alice"_n, "sysio.swap"_n, asset::from_string("2000.0000 EOS"), "") );
     BOOST_REQUIRE_EQUAL( success(), transfer( "anothertoken"_n, "bob"_n, "sysio.swap"_n, asset::from_string("2000.0000 VOICE"), "deposit to: alice") );
     BOOST_REQUIRE_EQUAL( success(), inittoken( "alice"_n, EVO4,
-        extend(asset::from_string("1000.0000 EOS")), extend(asset::from_string("1000.0000 VOICE")), 10, "wevotethefee"_n) );
+        extend(asset::from_string("1000.0000 EOS")), extend(asset::from_string("1000.0000 VOICE")), 10, name{}) );
 
     // Below one unit of quote there is nothing to charge: the input is kept, nothing is paid.
     BOOST_REQUIRE_EQUAL( 0, settle_swap("alice"_n, EVO, asset(1, EOS4), VOICE4, 1) );
@@ -1753,7 +1586,7 @@ BOOST_FIXTURE_TEST_CASE( guard_semantics_on_the_memo_path, sysio_swap_tester ) t
     BOOST_REQUIRE_EQUAL( success(), transfer( "anothertoken"_n, "bob"_n, "sysio.swap"_n, asset::from_string("2000.0000 VOICE"), "deposit to: alice") );
     BOOST_REQUIRE_EQUAL( success(), inittoken( "alice"_n, EVO4,
         extended_asset{asset::from_string("1000.0000 EOS"), "badtoken"_n},
-        extend(asset::from_string("1000.0000 VOICE")), 10, "wevotethefee"_n) );
+        extend(asset::from_string("1000.0000 VOICE")), 10, name{}) );
 
     const auto before = system_balance(EVO.value);
     // A zero input through the memo path is refused before the pools move...
@@ -1886,7 +1719,7 @@ BOOST_FIXTURE_TEST_CASE( price_accumulators_span_extreme_prices, sysio_swap_test
     BOOST_REQUIRE_EQUAL( success(), transfer( "anothertoken"_n, "bob"_n, "sysio.swap"_n, asset::from_string("461168601842738.7903 VOICE"), "deposit to: alice") );
     const int64_t init_max = 1'000'000'000'000'000 - 1;
     BOOST_REQUIRE_EQUAL( success(), inittoken( "alice"_n, EVO4,
-        extend(asset(1, EOS4)), extend(asset(init_max, VOICE4)), 10, "wevotethefee"_n) );
+        extend(asset(1, EOS4)), extend(asset(init_max, VOICE4)), 10, name{}) );
     namespace twap = sysio::opp::twap;
 
     // At this price a single block already carries the sum past 128 bits; a
@@ -1920,7 +1753,7 @@ BOOST_FIXTURE_TEST_CASE( abi_surface_is_pinned, sysio_swap_tester ) try {
     for (const auto& a : abi.actions) actions.insert(a.name.to_string());
     const std::set<std::string> expected_actions{
         "addliquidity", "changefee", "close", "closeext", "exchange", "indexpair",
-        "inittoken", "open", "openext", "remliquidity", "sync", "transfer", "withdraw" };
+        "inittoken", "open", "openext", "remliquidity", "setconfig", "sync", "transfer", "withdraw" };
     BOOST_REQUIRE( actions == expected_actions );
 
     using field_list = std::vector<std::pair<std::string, std::string>>;
@@ -1937,10 +1770,12 @@ BOOST_FIXTURE_TEST_CASE( abi_surface_is_pinned, sysio_swap_tester ) try {
     const field_list changefee_fields{ {"pair_token", "symbol_code"}, {"newfee", "int32"} };
     const field_list inittoken_fields{
         {"user", "name"}, {"new_symbol", "symbol"}, {"initial_pool1", "extended_asset"},
-        {"initial_pool2", "extended_asset"}, {"initial_fee", "int32"}, {"fee_contract", "name"} };
+        {"initial_pool2", "extended_asset"}, {"initial_fee", "int32"}, {"fee_authority", "name"} };
     const field_list currency_stats_fields{
         {"supply", "asset"}, {"max_supply", "asset"}, {"issuer", "name"}, {"pool1", "extended_asset"},
-        {"pool2", "extended_asset"}, {"fee", "int32"}, {"fee_contract", "name"} };
+        {"pool2", "extended_asset"}, {"fee", "int32"}, {"fee_authority", "name"} };
+    const field_list setconfig_fields{ {"fee_authority", "name"} };
+    const field_list swap_config_fields{ {"fee_authority", "name"} };
     const field_list sync_fields{ {"pair_token", "symbol_code"} };
     const field_list cumulative_price_fields{ {"lo", "uint128"}, {"hi", "uint128"} };
     const field_list price_accumulator_fields{
@@ -1958,6 +1793,8 @@ BOOST_FIXTURE_TEST_CASE( abi_surface_is_pinned, sysio_swap_tester ) try {
     BOOST_REQUIRE( fields("account") == account_fields );
     BOOST_REQUIRE( fields("evodex_account") == evodex_account_fields );
     BOOST_REQUIRE( fields("pair_index") == pair_index_fields );
+    BOOST_REQUIRE( fields("setconfig") == setconfig_fields );
+    BOOST_REQUIRE( fields("swap_config") == swap_config_fields );
 
     // KV tables: the row type and the key layout an explorer needs to decode
     // the raw key bytes. A scoped table's first key word is the scope.
@@ -1977,10 +1814,11 @@ BOOST_FIXTURE_TEST_CASE( abi_surface_is_pinned, sysio_swap_tester ) try {
     BOOST_REQUIRE( same( shape("stat"),        { "currency_stats",    {"symbol_code"},                                 {"uint64"} } ) );
     BOOST_REQUIRE( same( shape("evoindex"),    { "pair_index",        {"contract1", "symbol1", "contract2", "symbol2"}, {"name", "uint64", "name", "uint64"} } ) );
     BOOST_REQUIRE( same( shape("priceaccum"),  { "price_accumulator", {"symbol_code"},                                 {"uint64"} } ) );
+    BOOST_REQUIRE( same( shape("swapconfig"),  { "swap_config",       {"name"},                                        {"name"} } ) );
 
     std::set<std::string> tables;
     for (const auto& t : abi.tables) tables.insert(t.name);
-    const std::set<std::string> expected_tables{ "accounts", "evodexacnts", "evoindex", "priceaccum", "stat" };
+    const std::set<std::string> expected_tables{ "accounts", "evodexacnts", "evoindex", "priceaccum", "stat", "swapconfig" };
     BOOST_REQUIRE( tables == expected_tables );
 } FC_LOG_AND_RETHROW()
 
