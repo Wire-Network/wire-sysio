@@ -163,11 +163,14 @@ extended_asset swap::process_exch(symbol_code pair_token,
     }
     const int64_t A_in = ext_asset_in.quantity.amount;
     check( (A_in > 0) && (P_in > 0) && (P_out > 0), "invalid parameters");
-    // Constant-product quote, floored, then the pair's fee rounded up against it.
-    const int128_t gross = opp::amm::out_given_in(uint64_t(P_in), CP_WEIGHT_BPS,
+    // Constant-product quote, floored, then the pair's fee taken off it with the
+    // depot-wide decomposition. The fee has no recipient here -- it stays in the
+    // pool for the liquidity providers -- so only the net is consumed.
+    const uint64_t gross = opp::amm::out_given_in(uint64_t(P_in), CP_WEIGHT_BPS,
                                                   uint64_t(P_out), CP_WEIGHT_BPS,
                                                   uint64_t(A_in));
-    const int64_t A_out = int64_t(gross - ceil_fee(gross, token->fee));
+    const int64_t A_out = int64_t(opp::amm::split_wire_fee(gross, uint32_t(token->fee),
+                                                           NO_UNDERWRITER_SHARE_BPS).net);
     check(min_expected.amount <= A_out, "available is less than expected");
     extended_asset ext_asset1, ext_asset2, ext_asset_out;
     if (in_first) {
